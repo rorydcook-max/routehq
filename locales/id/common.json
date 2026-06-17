@@ -1,0 +1,9 @@
+{
+  "dashboard": {
+    "title": "Pusat operasi",
+    "monthlyRevenue": "Pendapatan bulanan",
+    "outstanding": "Piutang",
+    "fleetProfit": "Laba armada",
+    "highAlerts": "Peringatan penting"
+  }
+}

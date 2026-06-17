@@ -1,0 +1,9 @@
+{
+  "dashboard": {
+    "title": "オペレーションセンター",
+    "monthlyRevenue": "月間売上",
+    "outstanding": "未収金",
+    "fleetProfit": "フリート利益",
+    "highAlerts": "重要アラート"
+  }
+}

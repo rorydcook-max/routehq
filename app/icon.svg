@@ -1,0 +1,11 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="112" fill="#0B1320"/>
+  <defs>
+    <linearGradient id="routehq-teal" x1="110" x2="300" y1="350" y2="468" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#06B6B6"/>
+      <stop offset="1" stop-color="#0EA5FF"/>
+    </linearGradient>
+  </defs>
+  <path d="M106 378V257L248 399H127C115.402 399 106 389.598 106 378Z" fill="url(#routehq-teal)"/>
+  <path d="M96 120H376C436 120 474 155 474 207C474 254 443 287 394 293L482 392H360L266 289H350C377 289 395 275 395 251C395 228 377 214 350 214H185L96 120Z" fill="white"/>
+</svg>

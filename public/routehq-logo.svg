@@ -1,0 +1,13 @@
+<svg width="840" height="220" viewBox="0 0 840 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="routehq-teal" x1="62" x2="172" y1="135" y2="200" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#06B6B6"/>
+      <stop offset="1" stop-color="#0EA5FF"/>
+    </linearGradient>
+  </defs>
+  <path d="M60 151V84L138 162H72C65.373 162 60 156.627 60 151Z" fill="url(#routehq-teal)"/>
+  <path d="M54 54H208C241 54 262 73 262 102C262 128 245 146 218 149L267 204H200L148 147H194C209 147 219 139 219 126C219 113 209 105 194 105H103L54 54Z" fill="#0B1320"/>
+  <text x="305" y="128" fill="#0B1320" font-family="Arial, Helvetica, sans-serif" font-size="76" font-weight="800" letter-spacing="-4">Route</text>
+  <text x="531" y="128" fill="#06B6B6" font-family="Arial, Helvetica, sans-serif" font-size="76" font-weight="800" letter-spacing="-4">HQ</text>
+  <text x="306" y="174" fill="#0B1320" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700" letter-spacing="12">RENTAL OPERATIONS OS</text>
+</svg>

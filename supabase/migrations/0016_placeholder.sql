@@ -1,0 +1,3 @@
+-- Intentionally skipped.
+-- Migration 0017_booking_flow_core.sql is self-contained and does not require
+-- a missing 0016 prerequisite.

@@ -1,0 +1,9 @@
+{
+  "dashboard": {
+    "title": "Centre des opérations",
+    "monthlyRevenue": "Revenus mensuels",
+    "outstanding": "Montants dus",
+    "fleetProfit": "Profit de la flotte",
+    "highAlerts": "Alertes importantes"
+  }
+}

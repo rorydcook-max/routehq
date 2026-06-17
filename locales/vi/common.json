@@ -1,0 +1,9 @@
+{
+  "dashboard": {
+    "title": "Trung tâm vận hành",
+    "monthlyRevenue": "Doanh thu tháng",
+    "outstanding": "Công nợ",
+    "fleetProfit": "Lợi nhuận đội xe",
+    "highAlerts": "Cảnh báo quan trọng"
+  }
+}

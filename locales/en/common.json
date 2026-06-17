@@ -1,0 +1,18 @@
+{
+  "dashboard": {
+    "title": "Operations command center",
+    "monthlyRevenue": "Monthly revenue",
+    "outstanding": "Outstanding",
+    "fleetProfit": "Fleet profit",
+    "highAlerts": "High alerts"
+  },
+  "vehicles": {
+    "addVehicle": "Add New Vehicle",
+    "fleetIntelligence": "Fleet intelligence"
+  },
+  "actions": {
+    "addBooking": "Add New Booking",
+    "addTransaction": "Add Transaction",
+    "completeTask": "Complete Task"
+  }
+}

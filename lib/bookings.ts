@@ -1,0 +1,274 @@
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+
+async function signedPath(supabase: any, path: string | null | undefined) {
+  if (!path || /^https?:\/\//.test(path) || path.startsWith("data:")) {
+    return path || null;
+  }
+  const { data } = await supabase.storage.from("documents").createSignedUrl(path, 60 * 60);
+  return data?.signedUrl || null;
+}
+
+async function signDocument(supabase: any, document: any) {
+  return {
+    ...document,
+    signed_url: await signedPath(supabase, document.storage_path)
+  };
+}
+
+async function signInspection(supabase: any, inspection: any) {
+  const photos = Array.isArray(inspection.photos) ? inspection.photos : [];
+  const damageItems = Array.isArray(inspection.damage_items) ? inspection.damage_items : [];
+  return {
+    ...inspection,
+    photos: await Promise.all(
+      photos.map(async (photo: any) => ({
+        ...photo,
+        signed_url: await signedPath(supabase, photo.url)
+      }))
+    ),
+    damage_items: await Promise.all(
+      damageItems.map(async (item: any) => ({
+        ...item,
+        photo_url: await signedPath(supabase, item.photo_url)
+      }))
+    ),
+    signed_video_url: await signedPath(supabase, inspection.video_url)
+  };
+}
+
+function portalActionSummary(action: any) {
+  const content = action.content || {};
+  if (action.action_type === "extension_request") return `Customer requested extension to ${content.new_end_date || "a new return date"}${content.note ? `: ${content.note}` : ""}`;
+  if (action.action_type === "return_confirmation") return `Customer confirmed return ${content.return_date || ""} ${content.return_time || ""}${content.return_location ? ` at ${content.return_location}` : ""}`.trim();
+  if (action.action_type === "problem_report") return `${content.category || "Problem report"}: ${content.description || "No description provided"}`;
+  if (action.action_type === "question") return content.question || "Customer asked a question";
+  return "Customer portal action";
+}
+
+function buildCommunicationTimeline(communicationLog: any[], portalActions: any[]) {
+  const logEntries = (communicationLog || []).map((entry: any) => ({
+    ...entry,
+    source: "communication_log",
+    timeline_type: entry.type,
+    timeline_id: `log-${entry.id}`,
+    content: entry.content || "",
+    created_at: entry.created_at
+  }));
+
+  const actionEntries = (portalActions || []).map((action: any) => ({
+    id: action.id,
+    source: "customer_portal_action",
+    timeline_type: "customer_portal_action",
+    timeline_id: `portal-${action.id}`,
+    type: "customer_portal_action",
+    action_type: action.action_type,
+    direction: "inbound",
+    channel: "booking_portal",
+    content: portalActionSummary(action),
+    status: action.status,
+    created_at: action.created_at,
+    action
+  }));
+
+  return [...logEntries, ...actionEntries].sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
+}
+
+export async function getBookingList(organizationId: string) {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const { data: rentals, error } = await supabase
+    .from("rentals")
+    .select("*, vehicles!rentals_vehicle_id_fkey(id, make, model, trim, year, registration_number, status), customers!rentals_customer_id_fkey(id, full_name, phone, nationality, document_status)")
+    .eq("organization_id", organizationId)
+    .is("deleted_at", null)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const rentalIds = (rentals || []).map((rental: any) => rental.id);
+  const [linksResult, transactionsResult] = rentalIds.length
+    ? await Promise.all([
+        supabase
+          .from("booking_links")
+          .select("id, rental_id, token, status, public_url, viewed_at, customer_details_submitted_at, contract_signed_at, completed_at, expires_at")
+          .eq("organization_id", organizationId)
+          .in("rental_id", rentalIds)
+          .is("deleted_at", null)
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("transactions")
+          .select("id, rental_id, type, amount")
+          .eq("organization_id", organizationId)
+          .in("rental_id", rentalIds)
+          .is("deleted_at", null)
+      ])
+    : [{ data: [] }, { data: [] }];
+
+  const queryError = [linksResult, transactionsResult].find((result: any) => result.error)?.error;
+  if (queryError) {
+    throw new Error(queryError.message);
+  }
+
+  const linkByRental = new Map<string, any>();
+  for (const link of linksResult.data || []) {
+    if (!linkByRental.has(link.rental_id)) {
+      linkByRental.set(link.rental_id, link);
+    }
+  }
+
+  const paidByRental = new Map<string, number>();
+  for (const transaction of transactionsResult.data || []) {
+    const current = paidByRental.get(transaction.rental_id) || 0;
+    const isIncome = ["rental_income", "deposit"].includes(transaction.type);
+    paidByRental.set(transaction.rental_id, current + (isIncome ? Math.abs(Number(transaction.amount || 0)) : 0));
+  }
+
+  return (rentals || []).map((rental: any) => ({
+    ...rental,
+    booking_link: linkByRental.get(rental.id) || null,
+    total_paid: paidByRental.get(rental.id) || 0
+  }));
+}
+
+export async function getBookingDetail(rentalId: string, organizationId: string) {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const { data: rental, error } = await supabase
+    .from("rentals")
+    .select("*, vehicles!rentals_vehicle_id_fkey(*), customers!rentals_customer_id_fkey(*)")
+    .eq("id", rentalId)
+    .eq("organization_id", organizationId)
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (!rental) {
+    return null;
+  }
+
+  const [bookingLinksResult, contractsResult, paymentsResult, transactionsResult, inspectionsResult, documentsResult, activityResult, portalActionsResult, communicationResult] = await Promise.all([
+    supabase
+      .from("booking_links")
+      .select("*")
+      .eq("organization_id", organizationId)
+      .eq("rental_id", rentalId)
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("contracts")
+      .select("*")
+      .eq("organization_id", organizationId)
+      .eq("rental_id", rentalId)
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("rental_payments")
+      .select("*")
+      .eq("organization_id", organizationId)
+      .eq("rental_id", rentalId)
+      .is("deleted_at", null)
+      .order("due_date", { ascending: true }),
+    supabase
+      .from("transactions")
+      .select("*")
+      .eq("organization_id", organizationId)
+      .eq("rental_id", rentalId)
+      .is("deleted_at", null)
+      .order("transaction_date", { ascending: false }),
+    supabase
+      .from("inspections")
+      .select("*, customers!inspections_customer_id_fkey(full_name, nationality, phone)")
+      .eq("organization_id", organizationId)
+      .eq("rental_id", rentalId)
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("documents")
+      .select("*")
+      .eq("organization_id", organizationId)
+      .in("owner_type", ["customer", "contract", "rental"])
+      .in("owner_id", [rental.customer_id, rental.contract_id, rental.id].filter(Boolean))
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("activity_events")
+      .select("*")
+      .eq("organization_id", organizationId)
+      .eq("rental_id", rentalId)
+      .order("occurred_at", { ascending: false }),
+    supabase
+      .from("customer_portal_actions")
+      .select("*")
+      .eq("organisation_id", organizationId)
+      .eq("rental_id", rentalId)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("communication_log")
+      .select("*")
+      .eq("organisation_id", organizationId)
+      .eq("rental_id", rentalId)
+      .order("created_at", { ascending: false })
+      .limit(50)
+  ]);
+
+  const queryError = [bookingLinksResult, contractsResult, paymentsResult, transactionsResult, inspectionsResult, documentsResult, activityResult, portalActionsResult, communicationResult].find((result: any) => result.error)?.error;
+  if (queryError) {
+    throw new Error(queryError.message);
+  }
+
+  const documents = await Promise.all((documentsResult.data || []).map((document: any) => signDocument(supabase, document)));
+  const contracts = await Promise.all(
+    (contractsResult.data || []).map(async (contract: any) => ({
+      ...contract,
+      signed_pdf_url: await signedPath(supabase, contract.content_pdf_url)
+    }))
+  );
+
+  const customerPortalActions = portalActionsResult.data || [];
+  const communicationLog = communicationResult.data || [];
+  const rentalPayments = paymentsResult.data || [];
+  const rentalTransactions = transactionsResult.data || [];
+  const totalScheduled = rentalPayments
+    .filter((payment: any) => !payment.voided && !payment.metadata?.voided && payment.status !== "voided" && payment.status !== "waived")
+    .reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
+  const totalPaidIncome = rentalTransactions
+    .filter((transaction: any) => transaction.type === "rental_income" && !transaction.voided && !transaction.metadata?.voided)
+    .reduce((sum: number, transaction: any) => sum + Math.abs(Number(transaction.amount || 0)), 0);
+  const calculatedBalance = Math.max(0, totalScheduled - totalPaidIncome);
+
+  return {
+    rental: {
+      ...rental,
+      rental_payments: rentalPayments,
+      balance_due: calculatedBalance,
+      total_scheduled: totalScheduled,
+      total_paid_income: totalPaidIncome
+    },
+    bookingLink: bookingLinksResult.data?.[0] || null,
+    bookingLinks: bookingLinksResult.data || [],
+    contract: contracts[0] || null,
+    contracts,
+    payments: rentalPayments,
+    transactions: rentalTransactions,
+    inspections: await Promise.all((inspectionsResult.data || []).map((inspection: any) => signInspection(supabase, inspection))),
+    documents,
+    activityEvents: activityResult.data || [],
+    customerPortalActions,
+    communicationLog,
+    communicationTimeline: buildCommunicationTimeline(communicationLog, customerPortalActions)
+  };
+}
+
+export async function getCustomersForSelector(organizationId: string) {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const { data } = await supabase
+    .from("customers")
+    .select("id, full_name, phone, nationality, document_status")
+    .eq("organization_id", organizationId)
+    .is("deleted_at", null)
+    .order("full_name", { ascending: true });
+  return (data || []) as Array<{ id: string; full_name: string; phone: string | null; nationality: string | null; document_status: string | null }>;
+}

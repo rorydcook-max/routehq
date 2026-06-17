@@ -1,0 +1,27 @@
+{
+  "dashboard": {
+    "title": "ศูนย์ควบคุมการดำเนินงาน",
+    "monthlyRevenue": "รายได้รายเดือน",
+    "outstanding": "ยอดค้างชำระ",
+    "fleetProfit": "กำไรกองยานพาหนะ",
+    "highAlerts": "การแจ้งเตือนสำคัญ"
+  },
+  "vehicles": {
+    "addVehicle": "เพิ่มยานพาหนะใหม่",
+    "fleetIntelligence": "ข้อมูลเชิงลึกกองยานพาหนะ"
+  },
+  "actions": {
+    "addBooking": "เพิ่มการจองใหม่",
+    "addTransaction": "เพิ่มรายการธุรกรรม",
+    "completeTask": "ทำงานให้เสร็จ"
+  },
+  "onboarding": {
+    "welcome": "ยินดีต้อนรับสู่ FleetOS",
+    "subtitle": "มาตั้งค่าบัญชีของคุณในไม่กี่ขั้นตอน",
+    "businessProfile": "ข้อมูลธุรกิจ",
+    "firstVehicle": "เพิ่มรถคันแรก",
+    "alerts": "ดูการแจ้งเตือนแรกของคุณ",
+    "line": "รับการอัปเดตประจำวันทาง LINE",
+    "complete": "ตั้งค่าเสร็จแล้ว"
+  }
+}

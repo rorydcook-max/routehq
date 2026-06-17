@@ -1,0 +1,9 @@
+{
+  "dashboard": {
+    "title": "Pusat operasi",
+    "monthlyRevenue": "Hasil bulanan",
+    "outstanding": "Tunggakan",
+    "fleetProfit": "Keuntungan fleet",
+    "highAlerts": "Amaran penting"
+  }
+}

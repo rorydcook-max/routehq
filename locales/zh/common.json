@@ -1,0 +1,9 @@
+{
+  "dashboard": {
+    "title": "运营控制中心",
+    "monthlyRevenue": "月收入",
+    "outstanding": "未收款",
+    "fleetProfit": "车队利润",
+    "highAlerts": "重要提醒"
+  }
+}

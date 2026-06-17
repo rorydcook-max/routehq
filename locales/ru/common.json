@@ -1,0 +1,9 @@
+{
+  "dashboard": {
+    "title": "Операционный центр",
+    "monthlyRevenue": "Месячная выручка",
+    "outstanding": "Задолженность",
+    "fleetProfit": "Прибыль автопарка",
+    "highAlerts": "Важные оповещения"
+  }
+}

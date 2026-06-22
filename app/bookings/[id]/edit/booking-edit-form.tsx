@@ -164,6 +164,15 @@ function GoogleLocationField({
   const [lng, setLng] = useState(initialLng === null || initialLng === undefined ? "" : String(initialLng));
   const [enabled, setEnabled] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [timedOut, setTimedOut] = useState(false);
+  const mapsKeyConfigured = Boolean(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY);
+
+  // If Maps hasn't loaded within 3 seconds, fall back to plain text input
+  useEffect(() => {
+    if (enabled || !mapsKeyConfigured) return;
+    const timer = setTimeout(() => setTimedOut(true), 3000);
+    return () => clearTimeout(timer);
+  }, [enabled, mapsKeyConfigured]);
 
   useEffect(() => {
     let cancelled = false;
@@ -227,7 +236,7 @@ function GoogleLocationField({
       <input name="deliveryLat" type="hidden" value={lat} />
       <input name="deliveryLng" type="hidden" value={lng} />
       <p className="mt-1 text-xs font-medium text-[var(--muted)]">
-        {failed || !process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+        {(failed || timedOut || !mapsKeyConfigured)
           ? "Google Maps search unavailable - enter address manually."
           : "Optional. Search a hotel, airport, pier, villa or address."}
       </p>

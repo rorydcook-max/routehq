@@ -1296,8 +1296,16 @@ function GooglePlaceInput({
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isEnabled, setIsEnabled] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [timedOut, setTimedOut] = useState(false);
   const [pinModalOpen, setPinModalOpen] = useState(false);
   const mapsKeyConfigured = Boolean(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY);
+
+  // If Maps hasn't loaded within 3 seconds, fall back to plain text input
+  useEffect(() => {
+    if (isEnabled || !mapsKeyConfigured) return;
+    const timer = setTimeout(() => setTimedOut(true), 3000);
+    return () => clearTimeout(timer);
+  }, [isEnabled, mapsKeyConfigured]);
 
   useEffect(() => {
     let cancelled = false;
@@ -1369,7 +1377,7 @@ function GooglePlaceInput({
         ) : null}
       </div>
       <p className="mt-2 text-xs font-semibold text-[var(--muted)]">
-        {isEnabled ? helperText : hasError || !mapsKeyConfigured ? "Google Maps search unavailable — enter address manually." : helperText}
+        {isEnabled ? helperText : (hasError || timedOut || !mapsKeyConfigured) ? "Google Maps search unavailable — enter address manually." : helperText}
       </p>
       {pinModalOpen ? (
         <GooglePinModal

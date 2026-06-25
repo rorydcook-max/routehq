@@ -352,7 +352,7 @@ export async function recordDeliveryCashPaymentAndReceipt(formData: FormData) {
     balance_due: Math.max(0, Number(rental.balance_due || 0) - amount)
   };
   if (depositAmount > 0) {
-    rentalUpdate.deposit_held = Number(rental.deposit_held || 0) + depositAmount;
+    rentalUpdate.deposit_held = depositAmount;
     rentalUpdate.deposit_status = "received";
     rentalUpdate.deposit_received_at = rental.deposit_received_at || now;
   }
@@ -384,17 +384,26 @@ export async function recordDeliveryCashPaymentAndReceipt(formData: FormData) {
     notifyPaymentReceived({ amount: rentalPaymentAmount, customerName, vehicleLabel }).catch(() => null);
   }
 
-  return generateReceipt({
-    organisationId: organizationId,
-    rentalId,
-    transactionId: receiptTransaction.id,
-    amount,
-    paymentMethod,
-    customerName,
-    vehicleMakeModel,
-    vehiclePlate,
-    rentalPeriod
-  });
+  try {
+    return await generateReceipt({
+      organisationId: organizationId,
+      rentalId,
+      transactionId: receiptTransaction.id,
+      amount: rentalPaymentAmount > 0 ? rentalPaymentAmount : amount,
+      paymentMethod,
+      customerName,
+      vehicleMakeModel,
+      vehiclePlate,
+      rentalPeriod
+    });
+  } catch (receiptError) {
+    console.error("Receipt generation failed after payment was recorded:", receiptError);
+    return {
+      receipt_number: "RECEIPT-PENDING",
+      pdf_url: "",
+      warning: "Payment recorded successfully. Receipt generation failed — you can regenerate from the booking page."
+    };
+  }
 }
 
 export async function createTransaction(formData: FormData) {
@@ -757,6 +766,17 @@ export async function deleteTransaction(transactionId: string) {
 
   const isDeposit = Boolean(transaction.is_deposit) || ["deposit", "deposit_received", "deposit_refunded"].includes(String(transaction.type || ""));
 
+  // Clear any linked receipt and rental_payment references before deleting
+  await supabase
+    .from("receipts")
+    .update({ transaction_id: null })
+    .eq("transaction_id", transaction.id);
+
+  await supabase
+    .from("rental_payments")
+    .update({ transaction_id: null })
+    .eq("transaction_id", transaction.id);
+
   const { error: deleteError } = await supabase
     .from("transactions")
     .delete()
@@ -828,6 +848,17 @@ export async function bulkDeleteTransactions(ids: string[]) {
     return { success: true, deleted: 0 };
   }
 
+  // Clear any linked receipt and rental_payment references before bulk deleting
+  await supabase
+    .from("receipts")
+    .update({ transaction_id: null })
+    .in("transaction_id", verifiedIds);
+
+  await supabase
+    .from("rental_payments")
+    .update({ transaction_id: null })
+    .in("transaction_id", verifiedIds);
+
   const { error: deleteError } = await supabase
     .from("transactions")
     .delete()
@@ -844,83 +875,6 @@ export async function bulkDeleteTransactions(ids: string[]) {
   return { success: true, deleted: verifiedIds.length };
 }
 
-export async function voidTransaction(transactionId: string, reason?: string | null) {
-  const supabase = (await createSupabaseServerClient()) as any;
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    throw new Error("You must be signed in.");
-  }
-
-  const cleanTransactionId = String(transactionId || "").trim();
-  if (!cleanTransactionId) {
-    throw new Error("Transaction is required.");
-  }
-
-  const { data: transaction, error } = await supabase
-    .from("transactions")
-    .select("*")
-    .eq("id", cleanTransactionId)
-    .is("deleted_at", null)
-    .maybeSingle();
-
-  if (error || !transaction) {
-    throw new Error(error?.message || "Transaction was not found.");
-  }
-
-  await ensureTransactionMembership(supabase, transaction.organization_id, user.id);
-
-  const voidReason = String(reason || "").trim() || "Correction";
-  const metadata = {
-    ...(transaction.metadata || {}),
-    voided: true,
-    voided_at: new Date().toISOString(),
-    voided_by: user.id,
-    void_reason: voidReason
-  };
-
-  const { error: updateError } = await supabase
-    .from("transactions")
-    .update({
-      voided: true,
-      voided_at: new Date().toISOString(),
-      voided_by: user.id,
-      void_reason: voidReason,
-      metadata
-    })
-    .eq("id", transaction.id)
-    .eq("organization_id", transaction.organization_id);
-
-  if (updateError) {
-    throw new Error(updateError.message);
-  }
-
-  const detail = `Transaction voided: ${String(transaction.type || "").replace(/_/g, " ")} THB ${Math.round(Number(transaction.amount || 0)).toLocaleString()} - ${voidReason}`;
-  await recordActivityEvent(supabase, {
-    organization_id: transaction.organization_id,
-    actor_id: user.id,
-    entity_type: "transaction",
-    entity_id: transaction.id,
-    vehicle_id: transaction.vehicle_id,
-    rental_id: transaction.rental_id,
-    customer_id: transaction.customer_id,
-    event_type: "correction",
-    title: "Transaction voided",
-    detail,
-    metadata: { type: "correction", content: detail, void_reason: voidReason }
-  });
-
-  revalidatePath("/");
-  revalidatePath("/transactions");
-  revalidatePath(`/fleet/${transaction.vehicle_id}`);
-  if (transaction.rental_id) {
-    revalidatePath(`/bookings/${transaction.rental_id}`);
-  }
-
-  return { success: true };
-}
 
 export async function sendPaymentReminder(
   rentalId: string

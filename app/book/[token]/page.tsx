@@ -3,14 +3,21 @@ import { AlertTriangle, CalendarDays, Car, Clock, CreditCard, MapPin, ReceiptTex
 import { ActiveRentalPortal } from "./active-rental-portal";
 import { BookingCompletionForm } from "./booking-completion-form";
 import { getPublicBookingDetail } from "@/lib/public-booking";
+import { BusinessLogoImage } from "@/components/business-logo-image";
+import { isMapsUrl, formatDeliveryLocation } from "@/lib/delivery-location";
 
 function money(value: unknown, currency = "THB") {
   return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0));
 }
 
-function ratePeriodLabel(value: unknown) {
-  const period = String(value || "rate").replace(/_/g, " ").trim();
-  return period ? `${period.slice(0, 1).toUpperCase()}${period.slice(1).toLowerCase()}` : "Rate";
+function rateLabel(rental: any) {
+  const currency = String(rental?.currency || "THB");
+  const rate = money(rental?.rental_rate, currency);
+  const period = String(rental?.pricing_model || "monthly").toLowerCase().replace(/_/g, " ").trim();
+  if (period === "daily") return `${rate} / day`;
+  if (period === "weekly") return `${rate} / week`;
+  if (period === "custom") return `${rate} (custom rate)`;
+  return `${rate} / month`;
 }
 
 function vehicleTitle(vehicle: any) {
@@ -37,13 +44,16 @@ function normalizedDeliveryMethod(value: unknown) {
 
 function deliveryText(rental: any, bookingData: Record<string, unknown>) {
   const method = normalizedDeliveryMethod(rental?.delivery_method || bookingData.delivery_method);
-  const location = String(bookingData.delivery_location || rental?.delivery_location || "").trim();
+  const rawLocation = String(bookingData.delivery_location || rental?.delivery_location || "").trim();
+  const locationWasMapsUrl = isMapsUrl(rawLocation);
+  const location = locationWasMapsUrl ? formatDeliveryLocation(rawLocation) : rawLocation;
   const dateTime = String(bookingData.delivery_datetime || rental?.delivery_datetime || "").trim();
   const methodLabel = method === "tbd" ? "Delivery method TBD" : method === "collection" ? "Customer collection" : "Delivery by operator";
-  const mapsUrl = deliveryMapsUrl(bookingData, location);
+  const mapsUrl = deliveryMapsUrl(bookingData, rawLocation);
+  const displayLocation = locationWasMapsUrl ? location : formatDeliveryAddress(location);
 
   return {
-    location: location ? `${methodLabel}:\n${formatDeliveryAddress(location)}${mapsUrl ? `\n${mapsUrl}` : ""}` : `${methodLabel}:\nLocation TBD`,
+    location: location ? `${methodLabel}:\n${displayLocation}${mapsUrl ? `\n${mapsUrl}` : ""}` : `${methodLabel}:\nLocation TBD`,
     time: formatDeliveryDateTime(dateTime)
   };
 }
@@ -195,12 +205,12 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
       <div className="mx-auto max-w-3xl space-y-5">
         <header className="rounded-2xl border border-[#d6e5e2] bg-white p-5 shadow-sm">
           <div className="flex items-center gap-3">
-            {logoUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img alt={`${organization.name} logo`} className="max-h-[60px] max-w-[160px] object-contain" src={logoUrl} />
-            ) : (
-              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#0f766e] text-lg font-black text-white">{String(organization?.name || "F").slice(0, 1)}</span>
-            )}
+            <BusinessLogoImage
+              alt={`${organization.name} logo`}
+              className="max-h-[60px] max-w-[160px] object-contain"
+              fallback={<span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#0f766e] text-lg font-black text-white">{String(organization?.name || "F").slice(0, 1)}</span>}
+              src={logoUrl}
+            />
             <div>
               <p className="text-xs font-black uppercase text-[#0f766e]">Rental booking</p>
               {logoUrl ? null : <h1 className="text-xl font-black">{organization?.name || "Rental operator"}</h1>}
@@ -219,7 +229,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             </div>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <Info icon={CalendarDays} label="Rental period" value={rental.is_indefinite ? `Open ended from ${formatSummaryDate(rental.start_date)}` : `${formatSummaryDate(rental.start_date)} to ${formatSummaryDate(rental.end_date)}`} />
-              <Info icon={CreditCard} label="Rate and deposit" value={`${ratePeriodLabel(rental.pricing_model)}: ${money(rental.rental_rate, rental.currency)}\nDeposit: ${money(rental.deposit_amount, rental.currency)}`} />
+              <Info icon={CreditCard} label="Rate and deposit" value={`${rateLabel(rental)}\nDeposit: ${money(rental.deposit_amount, rental.currency || "THB")}`} />
               <Info className="sm:row-span-2" icon={MapPin} label="Delivery" value={delivery.location} />
               <Info icon={ReceiptText} label="Payment due date" value={paymentDueText(rental, bookingData)} />
               <Info icon={Clock} label="Delivery time" value={delivery.time} />
@@ -280,6 +290,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
               depositAmount: Number(rental?.deposit_amount || 0),
               outstandingBalance: Number(rental?.outstanding_balance || 0),
               currency: String(rental?.currency || "THB"),
+              billingPeriod: String(rental?.billing_interval || rental?.pricing_model || "monthly"),
             }}
           />
         )}
@@ -298,7 +309,11 @@ function Info({ className = "", icon: Icon, label, value }: { className?: string
       </div>
       <p className="mt-1 whitespace-pre-line text-sm font-bold text-[#10252b]">
         {lines.map((line, index) => (
-          line.startsWith("https://") ? (
+          line.startsWith("https://www.google.com/maps") ? (
+            <a className="text-[#0f766e] underline underline-offset-2" href={line} key={`${line}-${index}`} rel="noreferrer" target="_blank">
+              View on map →
+            </a>
+          ) : line.startsWith("https://") ? (
             <a className="break-all text-[#0f766e] underline underline-offset-2" href={line} key={`${line}-${index}`} rel="noreferrer" target="_blank">
               {line}
             </a>

@@ -6,6 +6,7 @@ import { confirmCustomerPayment } from "@/app/actions/deposits";
 import { PaymentReminderButton } from "@/app/bookings/[id]/payment-reminder-button";
 import { acknowledgePortalAction, approveExtensionRequest, declinePortalAction, replyToPortalQuestion, resolvePortalAction } from "@/app/actions/portal-actions";
 import { AssignCustomerModal } from "@/app/bookings/[id]/assign-customer-modal";
+import { SkipInspectionButton } from "@/app/bookings/[id]/skip-inspection-button";
 import { BookingShareActions } from "@/app/bookings/[id]/booking-share-actions";
 import { OperatorContractSigning } from "@/app/bookings/[id]/operator-contract-signing";
 import { AppShell } from "@/components/app-shell";
@@ -15,10 +16,13 @@ import { RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
 import { InspectionViewer } from "@/components/inspection-viewer";
 import { PendingButton } from "@/components/pending-button";
 import { Badge, Card, SectionHeader } from "@/components/ui";
+import { activateRental } from "@/lib/rental-activation";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getBookingDetail, getCustomersForSelector } from "@/lib/bookings";
 import { flagForNationality } from "@/lib/customer-options";
 import { getDefaultOrganization } from "@/lib/organization";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { formatDeliveryLocation } from "@/lib/delivery-location";
 
 function money(value: unknown, currency = "THB") {
   return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0));
@@ -49,6 +53,44 @@ function formatPaymentTiming(value: string | null | undefined) {
   if (value === "now") return "Pay now";
   if (value === "on_delivery") return "Pay on delivery";
   return "—";
+}
+
+function formatDepositSummary(rental: any) {
+  const status = String(rental?.deposit_status || "pending");
+  const currency = rental?.currency || "THB";
+
+  if (status === "received") {
+    return money(rental?.deposit_held, currency);
+  }
+
+  if (status === "fully_returned") {
+    return "Returned";
+  }
+
+  if (status === "forfeited") {
+    return "Forfeited";
+  }
+
+  if (status === "partially_forfeited") {
+    return `${money(rental?.deposit_forfeited_amount, currency)} forfeited`;
+  }
+
+  if (status === "partially_returned") {
+    return `${money(rental?.deposit_refunded_amount, currency)} returned`;
+  }
+
+  return `${money(rental?.deposit_amount, currency)} - not yet collected`;
+}
+
+function startedAgoLabel(startDate: string | null | undefined): string {
+  if (!startDate) return "recently";
+  const start = new Date(String(startDate).slice(0, 10) + "T00:00:00Z");
+  const diffDays = Math.round((Date.now() - start.getTime()) / 86_400_000);
+  if (diffDays < 1) return "today";
+  if (diffDays === 1) return "yesterday";
+  if (diffDays < 30) return `${diffDays} days ago`;
+  const months = Math.round(diffDays / 30);
+  return `${months} month${months !== 1 ? "s" : ""} ago`;
 }
 
 function daysRemaining(value: string | null | undefined) {
@@ -107,7 +149,7 @@ function normalizedDeliveryMethod(value: unknown) {
 function deliveryDisplay(rental: any, bookingLink: any) {
   const bookingData = (bookingLink?.booking_data || {}) as Record<string, unknown>;
   const method = normalizedDeliveryMethod(rental?.delivery_method || bookingData.delivery_method);
-  const location = String(bookingData.delivery_location || rental?.delivery_location || "").trim();
+  const location = formatDeliveryLocation(String(bookingData.delivery_location || rental?.delivery_location || "").trim());
   const dateTime = String(bookingData.delivery_datetime || rental?.delivery_datetime || "").trim();
 
   if (method === "tbd") {
@@ -181,7 +223,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   const { id } = await params;
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const [userEmail, organization] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization()]);
-  const [detail, allCustomers] = await Promise.all([
+  let [detail, allCustomers] = await Promise.all([
     getBookingDetail(id, organization.id),
     getCustomersForSelector(organization.id)
   ]);
@@ -200,9 +242,48 @@ export default async function BookingDetailPage({ params, searchParams }: { para
     );
   }
 
+  // Auto-activate stale booked rentals and active rentals with no payment schedule
+  const sevenDaysAgo = new Date(Date.now() - 7 * 86_400_000);
+  const rentalStartDate = new Date(String(detail.rental.start_date || "").slice(0, 10) + "T00:00:00Z");
+  const needsAutoActivation =
+    (detail.rental.status === "booked" && (
+      detail.rental.entered_by_operator === true ||
+      rentalStartDate < sevenDaysAgo
+    )) ||
+    (detail.rental.status === "active" && detail.payments.length === 0);
+
+  if (needsAutoActivation) {
+    const supabase = (await createSupabaseServerClient()) as any;
+    // For booked rentals, update vehicle status to rented
+    if (detail.rental.status === "booked" && detail.rental.vehicles?.id) {
+      await supabase
+        .from("vehicles")
+        .update({
+          status: "rented",
+          availability_status: "rented",
+          current_rental_id: detail.rental.id,
+          current_customer_id: detail.rental.customers?.id || null
+        })
+        .eq("id", detail.rental.vehicles.id)
+        .eq("organization_id", organization.id);
+    }
+    await activateRental(detail.rental.id, supabase).catch(() => null);
+    const refreshed = await getBookingDetail(id, organization.id);
+    if (refreshed) detail = refreshed;
+  }
+
   const { rental, bookingLink, contract, payments, transactions, inspections, documents, activityEvents, customerPortalActions, communicationTimeline } = detail;
   const vehicle = rental.vehicles;
   const customer = rental.customers;
+  const isRetrospective = Boolean(rental.entered_by_operator) ||
+    Boolean(rental.start_date && new Date(String(rental.start_date).slice(0, 10) + "T00:00:00Z") < new Date(Date.now() - 7 * 86_400_000));
+  const displayStatus = (
+    rental.status === "booked" &&
+    rental.start_date &&
+    new Date(String(rental.start_date).slice(0, 10) + "T00:00:00Z") < new Date()
+  ) ? "active" : rental.status;
+  const upcomingPayments = detail.upcoming_payments || rental.upcoming_payments || [];
+  const vehicleEvents = detail.vehicle_events || rental.vehicle_events || [];
   const activePayments = payments.filter((payment: any) => !isVoidedPayment(payment));
   const activeTransactions = transactions.filter((transaction: any) => !isVoidedTransaction(transaction));
   const fallbackTotalRentalValue = activePayments.reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
@@ -210,7 +291,12 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   const totalRentalValue = Number(rental.total_scheduled ?? fallbackTotalRentalValue);
   const totalPaid = Number(rental.total_paid_income ?? fallbackTotalPaid);
   const outstandingBalance = Number(rental.balance_due ?? Math.max(0, totalRentalValue - totalPaid));
-  const voidedEntryCount = payments.filter((payment: any) => isVoidedPayment(payment)).length + transactions.filter((transaction: any) => isVoidedTransaction(transaction)).length;
+  const today = new Date().toISOString().slice(0, 10);
+  const nonVoidedPayments = payments.filter((p: any) => !isVoidedPayment(p));
+  const overduePaymentGroup = nonVoidedPayments.filter((p: any) => p.status !== "paid" && p.due_date && p.due_date < today);
+  const dueNowPaymentGroup = nonVoidedPayments.filter((p: any) => p.status !== "paid" && (!p.due_date || p.due_date === today));
+  const upcomingPaymentGroup = nonVoidedPayments.filter((p: any) => p.status !== "paid" && p.due_date && p.due_date > today);
+  const paidPaymentGroup = nonVoidedPayments.filter((p: any) => p.status === "paid");
   const pendingPayment = payments.find((payment: any) => !isVoidedPayment(payment) && ["pending", "overdue"].includes(String(payment.status || "pending")));
   const deliveryInspection = inspections.find((inspection: any) => inspection.type === "delivery" || inspection.inspection_type === "delivery");
   const returnInspection = inspections.find((inspection: any) => inspection.type === "return" || inspection.inspection_type === "return");
@@ -226,7 +312,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   const pendingPortalActions = (customerPortalActions || []).filter((action: any) => action.status === "pending");
   const canAdjustRental = ["active", "booked", "due_soon", "overdue"].includes(String(rental.status || "").toLowerCase());
   const needsExistingRentalPaymentSetup = Boolean(rental.entered_by_operator) && payments.length === 0;
-  const activeRentalStatus = ["active", "due_soon", "overdue", "extended"].includes(String(rental.status || "").toLowerCase());
+  const activeRentalStatus = ["active", "due_soon", "overdue", "extended"].includes(String(displayStatus || "").toLowerCase());
   const pendingPaymentAmount = activePayments
     .filter((payment: any) => ["pending", "overdue", "scheduled"].includes(String(payment.status || "pending")))
     .reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
@@ -323,7 +409,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
           <div className="card-section flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <Badge tone={statusTone(rental.status)}>{String(rental.status).replace(/_/g, " ")}</Badge>
+                <Badge tone={statusTone(displayStatus)}>{String(displayStatus).replace(/_/g, " ")}</Badge>
                 <Badge tone={bookingLink?.status === "completed" ? "green" : bookingLink?.status === "viewed" ? "blue" : "amber"}>{bookingLink?.status ? String(bookingLink.status).replace(/_/g, " ") : "No booking link"}</Badge>
                 {!customer ? <Badge tone="amber">Awaiting customer</Badge> : null}
                 {rental.entered_by_operator ? <Badge tone="blue">Operator entered</Badge> : null}
@@ -344,7 +430,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   Start delivery
                 </ActionButton>
               ) : null}
-              {["active", "due_soon", "overdue", "extended"].includes(rental.status) ? (
+              {["active", "due_soon", "overdue", "extended"].includes(displayStatus) ? (
                 <ActionButton href={`/inspections/return/${rental.id}` as Route}>
                   Start return
                 </ActionButton>
@@ -517,8 +603,68 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             <Card>
               <SectionHeader eyebrow="Inspections" title="Delivery and return" />
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                <InspectionStatus label="Delivery inspection" inspection={deliveryInspection} href={`/inspections/delivery/${rental.id}` as Route} available={rental.status === "booked"} />
-                <InspectionStatus label="Return inspection" inspection={returnInspection} href={`/inspections/return/${rental.id}` as Route} available={["active", "due_soon", "overdue", "extended"].includes(rental.status)} />
+                {deliveryInspection ? (
+                  <InspectionStatus label="Delivery inspection" inspection={deliveryInspection} href={`/inspections/delivery/${rental.id}` as Route} available={false} />
+                ) : isRetrospective && rental.status === "booked" ? (
+                  // Retrospective, not yet activated: equal-weight options
+                  <div className="sub-surface space-y-3 p-3">
+                    <div className="flex items-center gap-2 font-black text-[#10252b]">
+                      <AlertTriangle className="text-[#b7791f]" size={18} />
+                      Delivery inspection
+                    </div>
+                    <p className="text-sm text-[#667085]">
+                      No inspection on record. This rental started {startedAgoLabel(rental.start_date)}. Inspection is optional for retrospective bookings.
+                    </p>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <Link
+                        className="pressable flex items-center justify-center rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-center text-sm font-bold text-[var(--foreground-secondary)]"
+                        href={`/inspections/delivery/${rental.id}` as Route}
+                      >
+                        Complete inspection
+                      </Link>
+                      <SkipInspectionButton rentalId={rental.id} />
+                    </div>
+                  </div>
+                ) : isRetrospective ? (
+                  // Retrospective, already active, no inspection: soft prompt
+                  <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
+                    <div className="flex items-center gap-2 font-black text-[#92400e]">
+                      <AlertTriangle className="text-[#b7791f]" size={18} />
+                      No delivery inspection
+                    </div>
+                    <p className="mt-1 text-sm text-[#b45309]">
+                      Started {startedAgoLabel(rental.start_date)}. Inspection is optional for retrospective bookings.
+                    </p>
+                    <Link
+                      className="pressable mt-2 inline-flex items-center rounded-lg border border-[#fde68a] bg-white px-3 py-2 text-xs font-bold text-[#92400e]"
+                      href={`/inspections/delivery/${rental.id}` as Route}
+                    >
+                      Complete inspection (optional)
+                    </Link>
+                  </div>
+                ) : rental.status === "booked" ? (
+                  // New booking: prominent start inspection + skip
+                  <div className="sub-surface space-y-2 p-3">
+                    <div className="flex items-center gap-2 font-black text-[#10252b]">
+                      <AlertTriangle className="text-[#b7791f]" size={18} />
+                      Delivery inspection
+                    </div>
+                    <Link className="primary-action pressable block w-full px-3 py-2 text-center" href={`/inspections/delivery/${rental.id}` as Route}>
+                      Start delivery inspection
+                    </Link>
+                    <SkipInspectionButton rentalId={rental.id} />
+                  </div>
+                ) : (
+                  // Active, not retrospective, no inspection
+                  <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
+                    <div className="flex items-center gap-2 font-black text-[#92400e]">
+                      <AlertTriangle className="text-[#b7791f]" size={18} />
+                      No delivery inspection
+                    </div>
+                    <p className="mt-2 text-sm text-[#b45309]">This rental was activated without a delivery inspection on record.</p>
+                  </div>
+                )}
+                <InspectionStatus label="Return inspection" inspection={returnInspection} href={`/inspections/return/${rental.id}` as Route} available={["active", "due_soon", "overdue", "extended"].includes(displayStatus)} />
               </div>
               <div className="mt-3 space-y-3">
                 {inspections.length === 0 ? (
@@ -565,7 +711,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 <Info icon={Car} label="Vehicle" value={`${vehicleTitle(vehicle)} / ${vehicle?.registration_number || ""}`} />
                 <DeliveryInfo delivery={delivery} />
                 <Info icon={MapPin} label="Return" value={rental.return_location || "Not recorded"} />
-                <Info icon={CreditCard} label="Deposit" value={money(rental.deposit_amount, rental.currency)} />
+                <Info icon={CreditCard} label="Deposit" value={formatDepositSummary(rental)} />
                 <PaymentInfo method={paymentMethod} timing={paymentTiming} />
                 {customerReportedPayment ? (
                   <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
@@ -680,11 +826,6 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   </div>
                   <p className="mt-1 text-xs font-medium opacity-80">{financialState.detail}</p>
                 </div>
-                {voidedEntryCount > 0 ? (
-                  <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3 text-sm font-semibold text-[#92400e]">
-                    This booking has {voidedEntryCount} corrected or voided {voidedEntryCount === 1 ? "entry" : "entries"}. Voided entries are shown in grey and excluded from totals.
-                  </div>
-                ) : null}
                 {needsExistingRentalPaymentSetup ? (
                   <ExistingRentalPaymentSetupCard
                     currency={rental.currency}
@@ -703,7 +844,38 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   <SectionEmpty>No payments or transactions recorded yet.</SectionEmpty>
                 ) : null}
                 <AddRentalPaymentInlineForm currency={rental.currency} organizationId={organization.id} rentalId={rental.id} />
-                {payments.map((payment: any) => <EditableRentalPaymentRow key={payment.id} payment={payment} />)}
+                {overduePaymentGroup.length > 0 ? (
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[#dc2626]">Overdue — {overduePaymentGroup.length} payment{overduePaymentGroup.length !== 1 ? "s" : ""}</p>
+                    {overduePaymentGroup.map((payment: any) => <EditableRentalPaymentRow key={payment.id} payment={payment} />)}
+                  </div>
+                ) : null}
+                {dueNowPaymentGroup.length > 0 ? (
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[#92400e]">Due now / pending — {dueNowPaymentGroup.length} payment{dueNowPaymentGroup.length !== 1 ? "s" : ""}</p>
+                    {dueNowPaymentGroup.map((payment: any) => <EditableRentalPaymentRow key={payment.id} payment={payment} />)}
+                  </div>
+                ) : null}
+                {upcomingPaymentGroup.length > 0 ? (
+                  <details>
+                    <summary className="cursor-pointer text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--muted)] hover:text-[var(--foreground)]">
+                      Upcoming — {upcomingPaymentGroup.length} scheduled payment{upcomingPaymentGroup.length !== 1 ? "s" : ""}
+                    </summary>
+                    <div className="mt-2 space-y-1">
+                      {upcomingPaymentGroup.map((payment: any) => <EditableRentalPaymentRow key={payment.id} payment={payment} />)}
+                    </div>
+                  </details>
+                ) : null}
+                {paidPaymentGroup.length > 0 ? (
+                  <details>
+                    <summary className="cursor-pointer text-[10px] font-bold uppercase tracking-[0.08em] text-[#16a34a] hover:text-[#166534]">
+                      Paid — {paidPaymentGroup.length} payment{paidPaymentGroup.length !== 1 ? "s" : ""}
+                    </summary>
+                    <div className="mt-2 space-y-1">
+                      {paidPaymentGroup.map((payment: any) => <EditableRentalPaymentRow key={payment.id} payment={payment} />)}
+                    </div>
+                  </details>
+                ) : null}
                 {transactions.length > 0 ? (
                   <div className="pt-1">
                     <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Transactions</p>
@@ -714,6 +886,14 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 ) : null}
               </div>
             </Card>
+
+            <ComingUpCard
+              currency={rental.currency}
+              rentalId={rental.id}
+              upcomingPayments={upcomingPayments}
+              vehicle={vehicle}
+              vehicleEvents={vehicleEvents}
+            />
 
             {!["completed", "cancelled"].includes(rental.status) ? (
               <Card>
@@ -774,6 +954,159 @@ function PaymentInfo({ method, timing }: { method: string | null; timing: string
         <p className="mt-1 text-sm font-semibold text-[#667085]">Payment timing: {formatPaymentTiming(timing)}</p>
       </div>
     </div>
+  );
+}
+
+function daysUntilLabel(days: number | null | undefined) {
+  if (days === null || days === undefined) return "Date not set";
+  if (days < 0) return `${Math.abs(days)} days overdue`;
+  if (days === 0) return "Due today";
+  if (days === 1) return "Due tomorrow";
+  return `Due in ${days} days`;
+}
+
+function comingUpTone(severity?: string) {
+  if (severity === "high") return "border-[#fecaca] bg-[#fef2f2] text-[#dc2626]";
+  if (severity === "medium") return "border-[#fde68a] bg-[#fffbeb] text-[#d97706]";
+  return "border-[#d6e5e2] bg-white text-[#454d54]";
+}
+
+function paymentStatusTone(status?: string): "green" | "amber" | "red" | "blue" | "neutral" {
+  if (status === "overdue") return "red";
+  if (status === "pending") return "amber";
+  if (status === "scheduled") return "blue";
+  return "neutral";
+}
+
+function eventTypeLabel(type?: string) {
+  const labels: Record<string, string> = {
+    tax: "Tax",
+    insurance: "Insurance",
+    porbor: "Compulsory insurance",
+    service: "Service",
+    task: "Task"
+  };
+  return labels[String(type || "")] || "Event";
+}
+
+function ComingUpCard({
+  currency,
+  rentalId,
+  upcomingPayments,
+  vehicle,
+  vehicleEvents
+}: {
+  currency: string;
+  rentalId: string;
+  upcomingPayments: any[];
+  vehicle: any;
+  vehicleEvents: any[];
+}) {
+  const nextPayment = upcomingPayments[0] || null;
+  const nextPaymentStatus = String(nextPayment?.status || "scheduled").toLowerCase();
+  const showRecordPayment = nextPayment && ["pending", "overdue"].includes(nextPaymentStatus);
+  const visibleEvents = vehicleEvents.slice(0, 5);
+
+  return (
+    <Card>
+      <SectionHeader eyebrow="Upcoming" title="What's coming up" />
+      <div className="card-section">
+        <div className="grid gap-3 xl:grid-cols-2">
+          <div className={nextPayment ? "rounded-[11px] bg-[#141c2b] p-4 text-white" : ""}>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-white/45">Next payment</p>
+                {nextPayment ? (
+                  <>
+                    <p className="font-mono-data mt-2 text-2xl font-black tracking-[-0.03em] text-white">{money(nextPayment.amount, nextPayment.currency || currency)}</p>
+                    <p className="mt-1 text-xs font-semibold text-white/55">
+                      {formatDate(nextPayment.due_date)} · {daysUntilLabel(nextPayment.days_until)}
+                    </p>
+                  </>
+                ) : (
+                  <div
+                    className="w-full"
+                    style={{
+                      background: "#fffbeb",
+                      border: "0.5px solid #fde68a",
+                      borderRadius: 10,
+                      padding: "14px 16px"
+                    }}
+                  >
+                    <p style={{ fontSize: 13, fontWeight: 500, color: "#92400e", margin: "0 0 4px" }}>
+                      No payment schedule found
+                    </p>
+                    <p style={{ fontSize: 12, color: "#b45309", margin: 0 }}>
+                      Use the &ldquo;Regenerate schedule&rdquo; option in the payment schedule panel to set one up.
+                    </p>
+                  </div>
+                )}
+              </div>
+              {nextPayment ? <Badge tone={paymentStatusTone(nextPaymentStatus)}>{nextPaymentStatus}</Badge> : null}
+            </div>
+            {nextPayment ? (
+              <div className="mt-4">
+                {showRecordPayment ? (
+                  <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-lg bg-[#5eead4] px-3 text-xs font-black text-[#083344]" href={`#record-payment-${nextPayment.id}` as Route}>
+                    Record payment received
+                  </Link>
+                ) : (
+                  <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-lg border border-white/15 bg-white/8 px-3 text-xs font-black text-[#5eead4]" href={"#payment-schedule" as Route}>
+                    View payment schedule
+                  </Link>
+                )}
+              </div>
+            ) : null}
+            {upcomingPayments.length > 1 ? (
+              <div className="mt-4 space-y-2 border-t border-white/10 pt-3">
+                {upcomingPayments.slice(1, 4).map((payment: any) => (
+                  <div className="flex items-center justify-between gap-3 text-xs" key={payment.id}>
+                    <span className="truncate text-white/55">{formatDate(payment.due_date)}</span>
+                    <span className="font-mono-data shrink-0 font-black text-white">{money(payment.amount, payment.currency || currency)}</span>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
+
+          <div className="rounded-[11px] border border-[#e3e6e8] bg-white p-4">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Vehicle events</p>
+                <p className="mt-1 text-sm font-black text-[#10252b]">{vehicle?.registration_number || vehicleTitle(vehicle) || "Assigned vehicle"}</p>
+              </div>
+              {vehicle?.id ? (
+                <Link className="text-xs font-black text-[var(--primary)]" href={`/fleet/${vehicle.id}` as Route}>
+                  View vehicle
+                </Link>
+              ) : null}
+            </div>
+            {visibleEvents.length > 0 ? (
+              <div className="space-y-2">
+                {visibleEvents.map((event: any) => (
+                  <div className={`rounded-lg border px-3 py-2 ${comingUpTone(event.severity)}`} key={event.id}>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-black">{event.label}</p>
+                        <p className="mt-1 text-xs font-semibold opacity-75">{formatDate(event.due_date)}</p>
+                      </div>
+                      <span className="shrink-0 rounded-full bg-white px-2 py-1 text-[10px] font-black uppercase tracking-[0.04em]">
+                        {eventTypeLabel(event.type)}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-xs font-bold opacity-80">{daysUntilLabel(event.days_until)}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="rounded-lg border border-[#e3e6e8] bg-[#f8f9fa] p-3 text-sm font-semibold text-[var(--muted)]">
+                No compliance dates or vehicle tasks due in the next 180 days.
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    </Card>
   );
 }
 

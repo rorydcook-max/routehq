@@ -7,7 +7,7 @@ export async function getDefaultOrganization() {
   const supabase = (await createSupabaseServerClient()) as any;
   const { data, error } = await supabase
     .from("organizations")
-    .select("id, name, slug, default_locale, currency, timezone, settings, subscription_tier, created_at, logo_url, accepted_payment_methods, promptpay_id, promptpay_qr_url, bank_name, bank_account_number, bank_account_name, wise_link, revolut_link, receipt_prefix, receipt_footer_text, default_payment_method, line_user_id, line_notifications_enabled, line_daily_summary_enabled, line_daily_summary_time, line_channel_access_token")
+    .select("id, name, slug, default_locale, currency, timezone, settings, subscription_tier, created_at, logo_url, accepted_payment_methods, promptpay_id, promptpay_qr_url, bank_name, bank_account_number, bank_account_name, wise_link, revolut_link, receipt_prefix, receipt_footer_text, default_payment_method, line_user_id, line_notifications_enabled, line_daily_summary_enabled, line_daily_summary_time, line_channel_access_token, owner_signature_url, upfront_discount_enabled, upfront_discount_min_periods, upfront_discount_rate, upfront_discount_label")
     .eq("slug", getDefaultOrganizationSlug())
     .is("deleted_at", null)
     .single();
@@ -43,6 +43,11 @@ export async function getDefaultOrganization() {
     line_daily_summary_enabled: boolean | null;
     line_daily_summary_time: string | null;
     line_channel_access_token: string | null;
+    owner_signature_url: string | null;
+    upfront_discount_enabled: boolean | null;
+    upfront_discount_min_periods: number | null;
+    upfront_discount_rate: number | null;
+    upfront_discount_label: string | null;
   };
 }
 

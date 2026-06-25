@@ -294,9 +294,10 @@ export default async function Home() {
         <Card>
           <SectionHeader eyebrow="Accounting" title="Recent universal transactions" />
           <div className="mt-4 overflow-x-auto">
-            <table className="w-full min-w-[560px] text-left text-sm">
+            <table className="w-full min-w-[600px] text-left text-sm">
               <thead>
                 <tr className="border-b border-[#dfe4ea] text-xs uppercase text-[#667085]">
+                  <th className="w-24 py-2 pr-3">Category</th>
                   <th className="py-2 pr-3">Type</th>
                   <th className="px-3 py-2">Vehicle</th>
                   <th className="px-3 py-2">Date</th>
@@ -304,22 +305,48 @@ export default async function Home() {
                 </tr>
               </thead>
               <tbody>
-                {transactions.map((transaction) => (
-                  <tr className="border-b border-[#eef2f6] last:border-0" key={transaction.id}>
-                    <td className="py-3 pr-3">
-                      <p className="font-semibold">{transaction.type}</p>
-                      <p className="text-[#667085]">{transaction.note}</p>
-                    </td>
-                    <td className="px-3 py-3">{transaction.vehicle}</td>
-                    <td className="px-3 py-3">{transaction.date}</td>
-                    <td className={`px-3 py-3 text-right font-bold ${transaction.amount < 0 ? "text-[#be123c]" : "text-[#0f766e]"}`}>
-                      {money(transaction.amount)}
-                    </td>
-                  </tr>
-                ))}
+                {transactions.slice(0, 10).map((transaction) => {
+                  const rawType = transaction.rawType || transaction.type;
+                  const isDeposit = isRawDepositTransaction({ isDeposit: transaction.isDeposit, type: rawType });
+                  const isIncome = !isDeposit && isRevenueTransaction({ amount: Math.abs(transaction.amount), isDeposit: transaction.isDeposit, type: rawType });
+                  const category = isDeposit ? "liability" : isIncome ? "income" : "expense";
+                  const rowBg = category === "income" ? "bg-[#f0fdf4]" : category === "liability" ? "bg-[#fffbeb]" : "bg-[#fef2f2]";
+                  const pillClass = category === "income"
+                    ? "bg-[#dcfce7] text-[#16a34a] ring-[#bbf7d0]"
+                    : category === "liability"
+                      ? "bg-[#fef3c7] text-[#d97706] ring-[#fde68a]"
+                      : "bg-[#fee2e2] text-[#dc2626] ring-[#fecaca]";
+                  const pillLabel = category === "income" ? "Income" : category === "liability" ? "Liability" : "Expense";
+                  const amountClass = category === "income" ? "text-[#16a34a]" : category === "liability" ? "text-[#d97706]" : "text-[#dc2626]";
+                  return (
+                    <tr className={`group relative border-b border-[#eef2f6] last:border-0 ${rowBg} cursor-pointer`} key={transaction.id}>
+                      <td className="py-3 pr-3">
+                        <Link aria-label="View transactions" className="absolute inset-0 z-0" href="/transactions" />
+                        <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ring-1 ${pillClass}`}>{pillLabel}</span>
+                      </td>
+                      <td className="py-3 pr-3">
+                        <p className="font-semibold group-hover:text-[var(--primary)] transition-colors">{transaction.type}</p>
+                        <p className="text-[#667085]">{transaction.note}</p>
+                      </td>
+                      <td className="px-3 py-3">{transaction.vehicle}</td>
+                      <td className="px-3 py-3">{transaction.date}</td>
+                      <td className={`px-3 py-3 text-right font-bold ${amountClass}`}>
+                        {money(transaction.amount)}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
+          {transactions.length > 0 ? (
+            <div className="card-section flex justify-center border-t border-[var(--border)] pt-3">
+              <Link className="pressable inline-flex min-h-8 items-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 text-xs font-bold text-[var(--foreground-secondary)]" href="/transactions">
+                View all transactions
+                {transactions.length > 10 ? <span className="rounded-full bg-[var(--panel-secondary)] px-1.5 py-0.5 text-[10px] font-bold">{transactions.length}</span> : null}
+              </Link>
+            </div>
+          ) : null}
         </Card>
       </div>
 

@@ -1,4 +1,5 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { buildUpcomingPayments, buildVehicleEvents } from "@/lib/rental-upcoming";
 
 async function signedPath(supabase: any, path: string | null | undefined) {
   if (!path || /^https?:\/\//.test(path) || path.startsWith("data:")) {
@@ -87,7 +88,7 @@ export async function getBookingList(organizationId: string) {
   }
 
   const rentalIds = (rentals || []).map((rental: any) => rental.id);
-  const [linksResult, transactionsResult] = rentalIds.length
+  const [linksResult, transactionsResult, paymentsResult] = rentalIds.length
     ? await Promise.all([
         supabase
           .from("booking_links")
@@ -98,14 +99,21 @@ export async function getBookingList(organizationId: string) {
           .order("created_at", { ascending: false }),
         supabase
           .from("transactions")
-          .select("id, rental_id, type, amount")
+          .select("id, rental_id, type, amount, voided")
+          .eq("organization_id", organizationId)
+          .in("rental_id", rentalIds)
+          .is("deleted_at", null)
+          .neq("voided", true),
+        supabase
+          .from("rental_payments")
+          .select("id, rental_id, amount, status, voided, metadata")
           .eq("organization_id", organizationId)
           .in("rental_id", rentalIds)
           .is("deleted_at", null)
       ])
-    : [{ data: [] }, { data: [] }];
+    : [{ data: [] }, { data: [] }, { data: [] }];
 
-  const queryError = [linksResult, transactionsResult].find((result: any) => result.error)?.error;
+  const queryError = [linksResult, transactionsResult, paymentsResult].find((result: any) => result.error)?.error;
   if (queryError) {
     throw new Error(queryError.message);
   }
@@ -119,15 +127,24 @@ export async function getBookingList(organizationId: string) {
 
   const paidByRental = new Map<string, number>();
   for (const transaction of transactionsResult.data || []) {
+    if (transaction.type !== "rental_income") continue;
     const current = paidByRental.get(transaction.rental_id) || 0;
-    const isIncome = ["rental_income", "deposit"].includes(transaction.type);
-    paidByRental.set(transaction.rental_id, current + (isIncome ? Math.abs(Number(transaction.amount || 0)) : 0));
+    paidByRental.set(transaction.rental_id, current + Math.abs(Number(transaction.amount || 0)));
+  }
+
+  const balanceByRental = new Map<string, number>();
+  for (const payment of paymentsResult.data || []) {
+    if (payment.voided || payment.metadata?.voided || payment.metadata?.is_deposit) continue;
+    if (!["pending", "overdue"].includes(payment.status)) continue;
+    const current = balanceByRental.get(payment.rental_id) || 0;
+    balanceByRental.set(payment.rental_id, current + Number(payment.amount || 0));
   }
 
   return (rentals || []).map((rental: any) => ({
     ...rental,
     booking_link: linkByRental.get(rental.id) || null,
-    total_paid: paidByRental.get(rental.id) || 0
+    total_paid: paidByRental.get(rental.id) || 0,
+    balance_due: balanceByRental.get(rental.id) || 0
   }));
 }
 
@@ -149,7 +166,8 @@ export async function getBookingDetail(rentalId: string, organizationId: string)
     return null;
   }
 
-  const [bookingLinksResult, contractsResult, paymentsResult, transactionsResult, inspectionsResult, documentsResult, activityResult, portalActionsResult, communicationResult] = await Promise.all([
+  const today = new Date().toISOString().slice(0, 10);
+  const [bookingLinksResult, contractsResult, paymentsResult, upcomingPaymentsResult, vehicleTasksResult, transactionsResult, inspectionsResult, documentsResult, activityResult, portalActionsResult, communicationResult] = await Promise.all([
     supabase
       .from("booking_links")
       .select("*")
@@ -171,6 +189,28 @@ export async function getBookingDetail(rentalId: string, organizationId: string)
       .eq("rental_id", rentalId)
       .is("deleted_at", null)
       .order("due_date", { ascending: true }),
+    supabase
+      .from("rental_payments")
+      .select("id, amount, currency, due_date, scheduled_date, status, metadata, voided")
+      .eq("organization_id", organizationId)
+      .eq("rental_id", rentalId)
+      .is("deleted_at", null)
+      .in("status", ["scheduled", "pending", "overdue"])
+      .order("due_date", { ascending: true })
+      .limit(6),
+    rental.vehicle_id
+      ? supabase
+          .from("tasks")
+          .select("id, title, task_type, due_at, completed_at")
+          .eq("organization_id", organizationId)
+          .eq("vehicle_id", rental.vehicle_id)
+          .is("deleted_at", null)
+          .is("completed_at", null)
+          .gte("due_at", `${today}T00:00:00.000Z`)
+          .in("task_type", ["service", "insurance", "tax", "maintenance", "compliance"])
+          .order("due_at", { ascending: true, nullsFirst: false })
+          .limit(10)
+      : Promise.resolve({ data: [], error: null }),
     supabase
       .from("transactions")
       .select("*")
@@ -214,7 +254,7 @@ export async function getBookingDetail(rentalId: string, organizationId: string)
       .limit(50)
   ]);
 
-  const queryError = [bookingLinksResult, contractsResult, paymentsResult, transactionsResult, inspectionsResult, documentsResult, activityResult, portalActionsResult, communicationResult].find((result: any) => result.error)?.error;
+  const queryError = [bookingLinksResult, contractsResult, paymentsResult, upcomingPaymentsResult, vehicleTasksResult, transactionsResult, inspectionsResult, documentsResult, activityResult, portalActionsResult, communicationResult].find((result: any) => result.error)?.error;
   if (queryError) {
     throw new Error(queryError.message);
   }
@@ -230,22 +270,50 @@ export async function getBookingDetail(rentalId: string, organizationId: string)
   const customerPortalActions = portalActionsResult.data || [];
   const communicationLog = communicationResult.data || [];
   const rentalPayments = paymentsResult.data || [];
+  const upcomingPayments = buildUpcomingPayments(upcomingPaymentsResult.data || [], rental.currency || "THB");
+  const vehicleEvents = buildVehicleEvents(rental.vehicles, vehicleTasksResult.data || []);
   const rentalTransactions = transactionsResult.data || [];
-  const totalScheduled = rentalPayments
-    .filter((payment: any) => !payment.voided && !payment.metadata?.voided && payment.status !== "voided" && payment.status !== "waived")
+  const activeRentPayments = rentalPayments.filter((payment: any) => {
+    const metadata = payment.metadata || {};
+    return (
+      !payment.voided &&
+      !metadata.voided &&
+      payment.status !== "voided" &&
+      payment.status !== "waived" &&
+      metadata.is_deposit !== true &&
+      metadata.type !== "deposit"
+    );
+  });
+  const scheduledTotal = activeRentPayments
+    .filter((payment: any) => payment.status === "scheduled")
+    .reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
+  const pendingTotal = activeRentPayments
+    .filter((payment: any) => payment.status === "pending")
+    .reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
+  const overdueTotal = activeRentPayments
+    .filter((payment: any) => payment.status === "overdue")
     .reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
   const totalPaidIncome = rentalTransactions
     .filter((transaction: any) => transaction.type === "rental_income" && !transaction.voided && !transaction.metadata?.voided)
     .reduce((sum: number, transaction: any) => sum + Math.abs(Number(transaction.amount || 0)), 0);
-  const calculatedBalance = Math.max(0, totalScheduled - totalPaidIncome);
+  const outstandingBalance = pendingTotal + overdueTotal;
 
   return {
     rental: {
       ...rental,
       rental_payments: rentalPayments,
-      balance_due: calculatedBalance,
-      total_scheduled: totalScheduled,
-      total_paid_income: totalPaidIncome
+      balance_due: outstandingBalance,
+      outstandingBalance,
+      scheduledTotal,
+      pendingTotal,
+      overdueTotal,
+      total_scheduled: scheduledTotal,
+      scheduled_total: scheduledTotal,
+      pending_total: pendingTotal,
+      overdue_total: overdueTotal,
+      total_paid_income: totalPaidIncome,
+      upcoming_payments: upcomingPayments,
+      vehicle_events: vehicleEvents
     },
     bookingLink: bookingLinksResult.data?.[0] || null,
     bookingLinks: bookingLinksResult.data || [],
@@ -258,7 +326,9 @@ export async function getBookingDetail(rentalId: string, organizationId: string)
     activityEvents: activityResult.data || [],
     customerPortalActions,
     communicationLog,
-    communicationTimeline: buildCommunicationTimeline(communicationLog, customerPortalActions)
+    communicationTimeline: buildCommunicationTimeline(communicationLog, customerPortalActions),
+    upcoming_payments: upcomingPayments,
+    vehicle_events: vehicleEvents
   };
 }
 

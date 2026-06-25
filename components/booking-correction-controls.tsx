@@ -3,8 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
-import { addRentalPayment, recordPaymentReceived, setupExistingRentalPayments, updateRentalEndDate, updateRentalPayment, voidRentalPayment } from "@/app/actions/bookings";
-import { updateTransaction, voidTransaction } from "@/app/actions/transactions";
+import { addRentalPayment, deleteRentalPayment, recordPaymentReceived, setupExistingRentalPayments, updateRentalEndDate, updateRentalPayment } from "@/app/actions/bookings";
+import { deleteTransaction, updateTransaction } from "@/app/actions/transactions";
 
 type RentalPayment = {
   id: string;
@@ -159,7 +159,7 @@ export function AddRentalPaymentInlineForm({ organizationId, rentalId, currency 
               Amount
               <div className="mt-1 flex items-center rounded-lg border border-[var(--border-strong)] bg-white">
                 <span className="font-mono-data px-3 text-sm font-black text-[var(--muted)]">{currency === "THB" ? "฿" : currency}</span>
-                <input className="font-mono-data h-9 min-w-0 flex-1 border-0 bg-transparent px-0 pr-3 text-sm outline-none" min="0" step="1" type="number" value={amount} onChange={(event) => setAmount(event.target.value)} />
+                <input className="font-mono-data h-9 min-w-0 flex-1 border-0 bg-transparent px-0 pr-3 text-sm outline-none" min="0" step="0.01" type="number" value={amount} onChange={(event) => setAmount(event.target.value)} />
               </div>
             </label>
             <label>
@@ -275,7 +275,7 @@ export function ExistingRentalPaymentSetupCard({
               Amount
               <div className="mt-1 flex items-center rounded-lg border border-[var(--border-strong)] bg-white">
                 <span className="font-mono-data px-3 text-sm font-black text-[var(--muted)]">{currency === "THB" ? "฿" : currency}</span>
-                <input className="font-mono-data h-9 min-w-0 flex-1 border-0 bg-transparent px-0 pr-3 text-sm outline-none" min="0" step="1" type="number" value={firstPaymentAmount} onChange={(event) => setFirstPaymentAmount(event.target.value)} />
+                <input className="font-mono-data h-9 min-w-0 flex-1 border-0 bg-transparent px-0 pr-3 text-sm outline-none" min="0" step="0.01" type="number" value={firstPaymentAmount} onChange={(event) => setFirstPaymentAmount(event.target.value)} />
               </div>
             </label>
             <label>
@@ -319,7 +319,7 @@ export function ExistingRentalPaymentSetupCard({
                 Deposit amount
                 <div className="mt-1 flex items-center rounded-lg border border-[var(--border-strong)] bg-white">
                   <span className="font-mono-data px-3 text-sm font-black text-[var(--muted)]">{currency === "THB" ? "฿" : currency}</span>
-                  <input className="font-mono-data h-9 min-w-0 flex-1 border-0 bg-transparent px-0 pr-3 text-sm outline-none" min="0" step="1" type="number" value={depositPaymentAmount} onChange={(event) => setDepositPaymentAmount(event.target.value)} />
+                  <input className="font-mono-data h-9 min-w-0 flex-1 border-0 bg-transparent px-0 pr-3 text-sm outline-none" min="0" step="0.01" type="number" value={depositPaymentAmount} onChange={(event) => setDepositPaymentAmount(event.target.value)} />
                 </div>
               </label>
               <label>
@@ -455,6 +455,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
   const [recordNote, setRecordNote] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const badgeTone = voided ? "neutral" : status === "paid" ? "green" : status === "overdue" ? "red" : status === "waived" ? "blue" : "amber";
   const canRecordPayment = !voided && ["pending", "overdue"].includes(status);
@@ -488,21 +489,6 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
         router.refresh();
       } catch (error) {
         setMessage(error instanceof Error ? error.message : "Unable to update this payment.");
-      }
-    });
-  }
-
-  function voidPayment() {
-    if (!window.confirm("Are you sure you want to void this payment? This cannot be undone.")) return;
-    const reason = window.prompt("Reason for voiding this payment?", "Correction");
-    setMessage(null);
-    startTransition(async () => {
-      try {
-        await voidRentalPayment(payment.id, reason);
-        setEditing(false);
-        router.refresh();
-      } catch (error) {
-        setMessage(error instanceof Error ? error.message : "Unable to void this payment.");
       }
     });
   }
@@ -567,7 +553,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
               Amount received
               <div className="mt-1 flex items-center rounded-lg border border-[var(--border-strong)] bg-white">
                 <span className="font-mono-data px-3 text-sm font-black text-[var(--muted)]">฿</span>
-                <input className="font-mono-data h-9 min-w-0 flex-1 border-0 bg-transparent px-0 pr-3 text-sm outline-none" min="0" step="1" type="number" value={recordAmount} onChange={(event) => setRecordAmount(event.target.value)} />
+                <input className="font-mono-data h-9 min-w-0 flex-1 border-0 bg-transparent px-0 pr-3 text-sm outline-none" min="0" step="0.01" type="number" value={recordAmount} onChange={(event) => setRecordAmount(event.target.value)} />
               </div>
             </label>
             <label>
@@ -602,7 +588,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
               Amount
               <div className="mt-1 flex items-center rounded-lg border border-[var(--border-strong)] bg-white">
                 <span className="font-mono-data px-3 text-sm font-black text-[var(--muted)]">฿</span>
-                <input className="font-mono-data h-9 min-w-0 flex-1 border-0 bg-transparent px-0 pr-3 text-sm outline-none" min="0" step="1" type="number" value={amount} onChange={(event) => setAmount(event.target.value)} />
+                <input className="font-mono-data h-9 min-w-0 flex-1 border-0 bg-transparent px-0 pr-3 text-sm outline-none" min="0" step="0.01" type="number" value={amount} onChange={(event) => setAmount(event.target.value)} />
               </div>
             </label>
             <label>
@@ -632,8 +618,63 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
           <div className="mt-3 flex flex-wrap gap-2">
             <ActionButton disabled={isPending} onClick={save} tone="primary">{isPending ? "Saving..." : "Save changes"}</ActionButton>
             <ActionButton disabled={isPending} onClick={() => setEditing(false)}>Cancel</ActionButton>
-            <ActionButton disabled={isPending} onClick={voidPayment} tone="danger">Void this payment</ActionButton>
           </div>
+          {!showDeleteConfirm ? (
+            <div style={{ marginTop: 8 }}>
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                style={{
+                  fontSize: 11, padding: "4px 10px", borderRadius: 5,
+                  border: "0.5px solid #fecaca", background: "#fef2f2",
+                  color: "#dc2626", cursor: "pointer", fontWeight: 500
+                }}
+              >
+                Delete this payment
+              </button>
+            </div>
+          ) : (
+            <div style={{
+              background: "#fef2f2", border: "0.5px solid #fecaca",
+              borderRadius: 7, padding: "10px 12px", marginTop: 8
+            }}>
+              <p style={{ fontSize: 12, color: "#dc2626", fontWeight: 500, margin: "0 0 6px" }}>
+                Delete this payment? This cannot be undone.
+              </p>
+              <div style={{ display: "flex", gap: 6 }}>
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  style={{
+                    fontSize: 11, padding: "4px 10px", borderRadius: 5,
+                    border: "0.5px solid #e2e8f0", background: "#fff",
+                    color: "#64748b", cursor: "pointer"
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    setShowDeleteConfirm(false);
+                    startTransition(async () => {
+                      try {
+                        await deleteRentalPayment(payment.id);
+                        setEditing(false);
+                        router.refresh();
+                      } catch (error) {
+                        setMessage(error instanceof Error ? error.message : "Failed to delete payment");
+                      }
+                    });
+                  }}
+                  style={{
+                    fontSize: 11, padding: "4px 10px", borderRadius: 5,
+                    border: "none", background: "#dc2626",
+                    color: "#fff", cursor: "pointer", fontWeight: 500
+                  }}
+                >
+                  Confirm delete
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       ) : null}
     </div>
@@ -651,6 +692,7 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
   const [type, setType] = useState(String(transaction.type || "other"));
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const amountClass = useMemo(() => {
     if (voided) return "text-[var(--muted)] line-through";
@@ -672,21 +714,6 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
         router.refresh();
       } catch (error) {
         setMessage(error instanceof Error ? error.message : "Unable to update this transaction.");
-      }
-    });
-  }
-
-  function voidEntry() {
-    if (!window.confirm("Are you sure you want to void this transaction? This cannot be undone.")) return;
-    const reason = window.prompt("Reason for voiding this transaction?", "Correction");
-    setMessage(null);
-    startTransition(async () => {
-      try {
-        await voidTransaction(transaction.id, reason);
-        setEditing(false);
-        router.refresh();
-      } catch (error) {
-        setMessage(error instanceof Error ? error.message : "Unable to void this transaction.");
       }
     });
   }
@@ -720,7 +747,7 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
               Amount
               <div className="mt-1 flex items-center rounded-lg border border-[var(--border-strong)] bg-white">
                 <span className="font-mono-data px-3 text-sm font-black text-[var(--muted)]">฿</span>
-                <input className="font-mono-data h-9 min-w-0 flex-1 border-0 bg-transparent px-0 pr-3 text-sm outline-none" step="1" type="number" value={amount} onChange={(event) => setAmount(event.target.value)} />
+                <input className="font-mono-data h-9 min-w-0 flex-1 border-0 bg-transparent px-0 pr-3 text-sm outline-none" step="0.01" type="number" value={amount} onChange={(event) => setAmount(event.target.value)} />
               </div>
             </label>
             <label>
@@ -744,8 +771,63 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
           <div className="mt-3 flex flex-wrap gap-2">
             <ActionButton disabled={isPending} onClick={save} tone="primary">{isPending ? "Saving..." : "Save changes"}</ActionButton>
             <ActionButton disabled={isPending} onClick={() => setEditing(false)}>Cancel</ActionButton>
-            <ActionButton disabled={isPending} onClick={voidEntry} tone="danger">Void transaction</ActionButton>
           </div>
+          {!showDeleteConfirm ? (
+            <div style={{ marginTop: 8 }}>
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                style={{
+                  fontSize: 11, padding: "4px 10px", borderRadius: 5,
+                  border: "0.5px solid #fecaca", background: "#fef2f2",
+                  color: "#dc2626", cursor: "pointer", fontWeight: 500
+                }}
+              >
+                Delete this transaction
+              </button>
+            </div>
+          ) : (
+            <div style={{
+              background: "#fef2f2", border: "0.5px solid #fecaca",
+              borderRadius: 7, padding: "10px 12px", marginTop: 8
+            }}>
+              <p style={{ fontSize: 12, color: "#dc2626", fontWeight: 500, margin: "0 0 6px" }}>
+                Delete this transaction? This cannot be undone.
+              </p>
+              <div style={{ display: "flex", gap: 6 }}>
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  style={{
+                    fontSize: 11, padding: "4px 10px", borderRadius: 5,
+                    border: "0.5px solid #e2e8f0", background: "#fff",
+                    color: "#64748b", cursor: "pointer"
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    setShowDeleteConfirm(false);
+                    startTransition(async () => {
+                      try {
+                        await deleteTransaction(transaction.id);
+                        setEditing(false);
+                        router.refresh();
+                      } catch (error) {
+                        setMessage(error instanceof Error ? error.message : "Failed to delete transaction");
+                      }
+                    });
+                  }}
+                  style={{
+                    fontSize: 11, padding: "4px 10px", borderRadius: 5,
+                    border: "none", background: "#dc2626",
+                    color: "#fff", cursor: "pointer", fontWeight: 500
+                  }}
+                >
+                  Confirm delete
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       ) : null}
     </div>

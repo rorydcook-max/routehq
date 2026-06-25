@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { CheckCircle2, CreditCard, FileText, IdCard, ImageIcon, MessageCircle, PenLine, Upload, UserRound, XCircle } from "lucide-react";
 import { completePublicBooking, reportPublicBookingPayment } from "@/app/actions/public-booking";
+import { formatDeliveryLocation } from "@/lib/delivery-location";
 
 declare global {
   interface Window {
@@ -20,6 +21,10 @@ type OrgPaymentSettings = {
   wise_link: string | null;
   revolut_link: string | null;
   default_payment_method: string;
+  upfront_discount_enabled: boolean;
+  upfront_discount_min_periods: number;
+  upfront_discount_rate: number | null;
+  upfront_discount_label: string | null;
 };
 
 type PublicBookingDetail = {
@@ -44,10 +49,22 @@ type PublicBookingDetail = {
   outstandingBalance?: number;
   depositAmount?: number;
   currency?: string;
+  billingPeriod?: string;
 };
 
-const inputClass =
-  "mt-2 w-full rounded-xl border border-[#d6e5e2] bg-white px-4 py-3 text-base text-[#10252b] outline-none focus:border-[#0f766e] focus:ring-2 focus:ring-[#0f766e]/15";
+const fieldStyle = {
+  height: 42,
+  width: "100%",
+  fontSize: 14,
+  padding: "0 12px",
+  border: "0.5px solid #cbd5e1",
+  borderRadius: 8,
+  background: "#ffffff",
+  color: "#0f172a",
+  boxSizing: "border-box" as const,
+  outline: "none",
+};
+const inputClass = "mt-2 focus:ring-2 focus:ring-[#0f766e]/15";
 const emojiSelectStyle = {
   fontFamily: '"Segoe UI Emoji", "Noto Color Emoji", "Apple Color Emoji", "Segoe UI", system-ui, sans-serif'
 };
@@ -341,30 +358,49 @@ const phoneCountryOptions = [
 ];
 
 const phoneCountrySvgOptions = [
-  { flagCode: "th", code: "TH", callingCode: "+66" },
-  { flagCode: "gb", code: "GB", callingCode: "+44" },
-  { flagCode: "de", code: "DE", callingCode: "+49" },
-  { flagCode: "fr", code: "FR", callingCode: "+33" },
-  { flagCode: "ru", code: "RU", callingCode: "+7" },
-  { flagCode: "cn", code: "CN", callingCode: "+86" },
-  { flagCode: "jp", code: "JP", callingCode: "+81" },
-  { flagCode: "us", code: "US", callingCode: "+1" },
-  { flagCode: "au", code: "AU", callingCode: "+61" },
-  { flagCode: "ch", code: "CH", callingCode: "+41" },
-  { flagCode: "nl", code: "NL", callingCode: "+31" },
-  { flagCode: "se", code: "SE", callingCode: "+46" },
-  { flagCode: "il", code: "IL", callingCode: "+972" },
-  { flagCode: "dk", code: "DK", callingCode: "+45" },
-  { flagCode: "no", code: "NO", callingCode: "+47" },
-  { flagCode: "fi", code: "FI", callingCode: "+358" },
-  { flagCode: "id", code: "ID", callingCode: "+62" },
-  { flagCode: "my", code: "MY", callingCode: "+60" },
-  { flagCode: "sg", code: "SG", callingCode: "+65" },
-  { flagCode: "vn", code: "VN", callingCode: "+84" },
-  { flagCode: "ph", code: "PH", callingCode: "+63" },
-  { flagCode: "kh", code: "KH", callingCode: "+855" },
-  { flagCode: "la", code: "LA", callingCode: "+856" },
-  { flagCode: "in", code: "IN", callingCode: "+91" }
+  { flagCode: "th", code: "TH", callingCode: "+66", name: "Thailand" },
+  { flagCode: "gb", code: "GB", callingCode: "+44", name: "United Kingdom" },
+  { flagCode: "us", code: "US", callingCode: "+1", name: "United States" },
+  { flagCode: "au", code: "AU", callingCode: "+61", name: "Australia" },
+  { flagCode: "de", code: "DE", callingCode: "+49", name: "Germany" },
+  { flagCode: "fr", code: "FR", callingCode: "+33", name: "France" },
+  { flagCode: "ru", code: "RU", callingCode: "+7", name: "Russia" },
+  { flagCode: "ua", code: "UA", callingCode: "+380", name: "Ukraine" },
+  { flagCode: "cn", code: "CN", callingCode: "+86", name: "China" },
+  { flagCode: "jp", code: "JP", callingCode: "+81", name: "Japan" },
+  { flagCode: "kr", code: "KR", callingCode: "+82", name: "South Korea" },
+  { flagCode: "in", code: "IN", callingCode: "+91", name: "India" },
+  { flagCode: "id", code: "ID", callingCode: "+62", name: "Indonesia" },
+  { flagCode: "my", code: "MY", callingCode: "+60", name: "Malaysia" },
+  { flagCode: "sg", code: "SG", callingCode: "+65", name: "Singapore" },
+  { flagCode: "vn", code: "VN", callingCode: "+84", name: "Vietnam" },
+  { flagCode: "ph", code: "PH", callingCode: "+63", name: "Philippines" },
+  { flagCode: "kh", code: "KH", callingCode: "+855", name: "Cambodia" },
+  { flagCode: "la", code: "LA", callingCode: "+856", name: "Laos" },
+  { flagCode: "mm", code: "MM", callingCode: "+95", name: "Myanmar" },
+  { flagCode: "nl", code: "NL", callingCode: "+31", name: "Netherlands" },
+  { flagCode: "se", code: "SE", callingCode: "+46", name: "Sweden" },
+  { flagCode: "ch", code: "CH", callingCode: "+41", name: "Switzerland" },
+  { flagCode: "no", code: "NO", callingCode: "+47", name: "Norway" },
+  { flagCode: "dk", code: "DK", callingCode: "+45", name: "Denmark" },
+  { flagCode: "fi", code: "FI", callingCode: "+358", name: "Finland" },
+  { flagCode: "il", code: "IL", callingCode: "+972", name: "Israel" },
+  { flagCode: "es", code: "ES", callingCode: "+34", name: "Spain" },
+  { flagCode: "it", code: "IT", callingCode: "+39", name: "Italy" },
+  { flagCode: "pt", code: "PT", callingCode: "+351", name: "Portugal" },
+  { flagCode: "pl", code: "PL", callingCode: "+48", name: "Poland" },
+  { flagCode: "cz", code: "CZ", callingCode: "+420", name: "Czech Republic" },
+  { flagCode: "at", code: "AT", callingCode: "+43", name: "Austria" },
+  { flagCode: "be", code: "BE", callingCode: "+32", name: "Belgium" },
+  { flagCode: "ca", code: "CA", callingCode: "+1", name: "Canada" },
+  { flagCode: "nz", code: "NZ", callingCode: "+64", name: "New Zealand" },
+  { flagCode: "za", code: "ZA", callingCode: "+27", name: "South Africa" },
+  { flagCode: "ae", code: "AE", callingCode: "+971", name: "UAE" },
+  { flagCode: "sa", code: "SA", callingCode: "+966", name: "Saudi Arabia" },
+  { flagCode: "tr", code: "TR", callingCode: "+90", name: "Turkey" },
+  { flagCode: "tw", code: "TW", callingCode: "+886", name: "Taiwan" },
+  { flagCode: "hk", code: "HK", callingCode: "+852", name: "Hong Kong" },
+  { flagCode: "mo", code: "MO", callingCode: "+853", name: "Macau" },
 ];
 
 
@@ -410,8 +446,16 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
   const [phoneCountryCode, setPhoneCountryCode] = useState("+66");
   const [emergencyPhoneCountryCode, setEmergencyPhoneCountryCode] = useState("+66");
   const [currentAddress, setCurrentAddress] = useState(String(detail.customer?.address || ""));
-  const [contactChannelsSkipped, setContactChannelsSkipped] = useState(false);
-  const [preferredDeliveryLocation, setPreferredDeliveryLocation] = useState(String(detail.bookingData.delivery_location || ""));
+  const [contactChannelError, setContactChannelError] = useState("");
+  const [preferredContactMethod, setPreferredContactMethod] = useState<string>(() => {
+    const m = detail.customer?.preferred_contact_method || "";
+    return ["phone", "email", "whatsapp", "messenger", "line", "telegram"].includes(m) ? m : "";
+  });
+  const [whatsappNumber, setWhatsappNumber] = useState<string>(detail.customer?.whatsapp_number || "");
+  const [livePhone, setLivePhone] = useState(detail.customer?.phone || "");
+  const [liveEmail, setLiveEmail] = useState(detail.customer?.email || "");
+  const [focusField, setFocusField] = useState<"phone" | "email" | null>(null);
+  const [preferredDeliveryLocation, setPreferredDeliveryLocation] = useState(formatDeliveryLocation(String(detail.bookingData.delivery_location || "")));
   const [liveStatus, setLiveStatus] = useState(detail.completion);
   const orgPayment = detail.orgPayment;
   const acceptedMethods = useMemo(() => {
@@ -436,6 +480,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
   const rentalRate = detail.rentalRate ?? 0;
   const paymentAmount = detail.outstandingBalance && detail.outstandingBalance > 0 ? detail.outstandingBalance : rentalRate;
   const currency = detail.currency ?? "THB";
+  const [upfrontAccepted, setUpfrontAccepted] = useState<boolean | null>(null);
   const [isPending, startTransition] = useTransition();
   const [isPaymentReportPending, startPaymentReportTransition] = useTransition();
   const [paymentReported, setPaymentReported] = useState(false);
@@ -447,6 +492,21 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
   const operatorDeliveryIsToday = isTodayDateTime(operatorDeliveryDateTime);
   const operatorDeliveryTimeLabel = timeLabelFromDateTime(operatorDeliveryDateTime);
 
+  useEffect(() => {
+    if (!focusField || !formRef.current) return;
+    const el = formRef.current.querySelector(`[name="${focusField}"]`) as HTMLElement | null;
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    el.style.borderColor = "#dc2626";
+    el.style.boxShadow = "0 0 0 2px #fecaca";
+    const timer = setTimeout(() => {
+      el.style.borderColor = "";
+      el.style.boxShadow = "";
+      setFocusField(null);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [focusField]);
+
   function updateLiveStatus(form: HTMLFormElement | null = formRef.current, nextAgreed?: boolean, nextSignature = signature) {
     if (!form) return;
     const formData = new FormData(form);
@@ -454,6 +514,8 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
     const uploaded = (...names: string[]) =>
       names.some((name) => formData.getAll(name).some((value) => value instanceof File && value.size > 0));
     const acceptedAgreement = typeof nextAgreed === "boolean" ? nextAgreed : formData.get("agreementAccepted") === "on";
+    setLivePhone(String(formData.get("phone") || "").trim());
+    setLiveEmail(String(formData.get("email") || "").trim());
     setLiveStatus({
       details: detail.completion.details || ["fullName", "nationality", "phone", "dateOfBirth"].every(filled),
       documents:
@@ -535,6 +597,41 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+    setContactChannelError("");
+
+    const form = event.currentTarget;
+    const fd = new FormData(form);
+
+    if (!preferredContactMethod) {
+      setContactChannelError("Please select your preferred contact method.");
+      return;
+    }
+    if (preferredContactMethod === "phone" && !livePhone) {
+      setContactChannelError("Please add your phone number in the section above.");
+      setFocusField("phone");
+      return;
+    }
+    if (preferredContactMethod === "email" && !liveEmail) {
+      setContactChannelError("Please add your email address in the section above.");
+      setFocusField("email");
+      return;
+    }
+    if (preferredContactMethod === "whatsapp" && !whatsappNumber.trim()) {
+      setContactChannelError("Please enter your WhatsApp number.");
+      return;
+    }
+    if (preferredContactMethod === "messenger" && !String(fd.get("messengerId") || "").trim()) {
+      setContactChannelError("Please enter your Facebook Messenger username.");
+      return;
+    }
+    if (preferredContactMethod === "line" && !String(fd.get("lineId") || "").trim()) {
+      setContactChannelError("Please enter your LINE ID.");
+      return;
+    }
+    if (preferredContactMethod === "telegram" && !String(fd.get("telegramUsername") || "").trim()) {
+      setContactChannelError("Please enter your Telegram username.");
+      return;
+    }
 
     if (!agreed) {
       setError("Please confirm that you have read and agree to the rental terms.");
@@ -545,7 +642,6 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
       return;
     }
 
-    const form = event.currentTarget;
     startTransition(async () => {
       try {
         const formData = new FormData(form);
@@ -587,10 +683,10 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         {detail.completion.details ? (
           <p className="mt-3 rounded-xl bg-[#dcfce7] p-3 text-sm font-bold text-[#166534]">Your details have already been submitted. You can update them below if needed.</p>
         ) : null}
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 sm:items-start">
           <label>
             <span className="text-sm font-bold text-[#344054]">Full name</span>
-            <input className={inputClass} defaultValue={detail.customer?.full_name || ""} name="fullName" required />
+            <input className={inputClass} defaultValue={detail.customer?.full_name || ""} name="fullName" required style={fieldStyle} />
           </label>
           <label>
             <span className="text-sm font-bold text-[#344054]">Nationality</span>
@@ -598,18 +694,18 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           </label>
           <label>
             <span className="text-sm font-bold text-[#344054]">Phone</span>
-            <div className="grid grid-cols-[108px_1fr] gap-2">
+            <div style={{ display: "flex", alignItems: "stretch", width: "100%", height: 42, position: "relative", marginTop: 8 }}>
               <PhoneCountrySelect name="phoneCountryCode" onChange={setPhoneCountryCode} value={phoneCountryCode} />
-              <input className={inputClass} defaultValue={detail.customer?.phone || ""} name="phone" required type="tel" />
+              <input defaultValue={detail.customer?.phone || ""} name="phone" onClick={(e) => e.stopPropagation()} required style={{ ...fieldStyle, width: "auto", borderRadius: "0 8px 8px 0", flex: 1, minWidth: 0, borderLeft: "none", position: "relative", zIndex: 2 }} type="tel" />
             </div>
           </label>
           <label>
             <span className="text-sm font-bold text-[#344054]">Email</span>
-            <input className={inputClass} defaultValue={detail.customer?.email || ""} name="email" type="email" />
+            <input className={inputClass} defaultValue={detail.customer?.email || ""} name="email" style={fieldStyle} type="email" />
           </label>
           <label>
             <span className="text-sm font-bold text-[#344054]">Date of birth</span>
-            <input className={inputClass} defaultValue={detail.customer?.date_of_birth || ""} name="dateOfBirth" required style={{ textTransform: "uppercase" }} type="date" />
+            <input className={inputClass} defaultValue={detail.customer?.date_of_birth || ""} name="dateOfBirth" required style={{ ...fieldStyle, textTransform: "uppercase", appearance: "none" as const }} type="date" />
           </label>
           <label>
             <span className="inline-flex items-center gap-2 text-sm font-bold text-[#344054]">
@@ -623,75 +719,171 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
               Emergency contact name
               <span className="cursor-help text-[#667085]" title="Optional — add a contact if you would like us to know who to call in an emergency.">ⓘ</span>
             </span>
-            <input className={inputClass} defaultValue={detail.customer?.emergency_contact_name || ""} name="emergencyContactName" />
+            <input className={inputClass} defaultValue={detail.customer?.emergency_contact_name || ""} name="emergencyContactName" style={fieldStyle} />
           </label>
           <label>
             <span className="inline-flex items-center gap-2 text-sm font-bold text-[#344054]">
               Emergency contact phone
               <span className="cursor-help text-[#667085]" title="Optional — add an emergency contact phone number if available.">ⓘ</span>
             </span>
-            <div className="grid grid-cols-[108px_1fr] gap-2">
+            <div style={{ display: "flex", alignItems: "stretch", width: "100%", height: 42, position: "relative", marginTop: 8 }}>
               <PhoneCountrySelect name="emergencyPhoneCountryCode" onChange={setEmergencyPhoneCountryCode} value={emergencyPhoneCountryCode} />
-              <input className={inputClass} defaultValue={detail.customer?.emergency_contact_phone || ""} name="emergencyContactPhone" type="tel" />
+              <input defaultValue={detail.customer?.emergency_contact_phone || ""} name="emergencyContactPhone" onClick={(e) => e.stopPropagation()} style={{ ...fieldStyle, width: "auto", borderRadius: "0 8px 8px 0", flex: 1, minWidth: 0, borderLeft: "none", position: "relative", zIndex: 2 }} type="tel" />
             </div>
           </label>
         </div>
       </section>
 
-      {!contactChannelsSkipped ? (
-        <section className="rounded-2xl border border-[#d6e5e2] bg-white p-5 shadow-sm">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <SectionTitle icon={MessageCircle} label="How should we contact you?" />
-              <p className="mt-2 text-sm leading-6 text-[#667085]">We'll send reminders and updates to your preferred channel.</p>
+      <section className="rounded-2xl border border-[#d6e5e2] bg-white p-5 shadow-sm">
+        <SectionTitle icon={MessageCircle} label="How should we contact you?" />
+        <p className="mt-2 text-sm leading-6 text-[#667085]">
+          Choose how you&apos;d like {detail.organizationName} to contact you for payment reminders and rental updates.
+        </p>
+        {contactChannelError ? (
+          <div style={{ background: "#fffbeb", border: "0.5px solid #fde68a", borderRadius: 8, padding: "10px 14px", marginTop: 12, fontSize: 13, color: "#92400e" }}>
+            {contactChannelError}
+          </div>
+        ) : null}
+        <input name="contactChannelsSubmitted" type="hidden" value="true" />
+
+        <div className="mt-4">
+          <label>
+            <span className="text-sm font-bold text-[#344054]">Preferred contact method</span>
+            <select
+              className={inputClass}
+              name="preferredContactMethod"
+              onChange={(e) => {
+                e.stopPropagation();
+                const next = e.target.value;
+                setPreferredContactMethod(next);
+                if (next === "whatsapp" && !whatsappNumber && livePhone) {
+                  setWhatsappNumber(livePhone);
+                }
+              }}
+              onInput={(e) => e.stopPropagation()}
+              required
+              style={{ ...fieldStyle, color: preferredContactMethod ? "#0f172a" : "#94a3b8", cursor: "pointer" }}
+              value={preferredContactMethod}
+            >
+              <option disabled value="">Select your preferred channel...</option>
+              <option value="phone">Phone call</option>
+              <option value="email">Email</option>
+              <option value="whatsapp">WhatsApp</option>
+              <option value="messenger">Facebook Messenger</option>
+              <option value="line">LINE</option>
+              <option value="telegram">Telegram</option>
+            </select>
+          </label>
+        </div>
+
+        {/* Contextual confirmation / input for the selected method */}
+        {preferredContactMethod === "phone" ? (
+          livePhone ? (
+            <div style={{ background: "#f0fdf4", border: "0.5px solid #bbf7d0", borderRadius: 8, padding: "10px 14px", marginTop: 8, fontSize: 13, color: "#15803d" }}>
+              ✓ We&apos;ll contact you on {livePhone}
             </div>
-            <button className="pressable self-start rounded-xl border border-[#d6e5e2] bg-white px-3 py-2 text-xs font-black text-[#667085]" onClick={() => setContactChannelsSkipped(true)} type="button">
-              Skip this step
-            </button>
+          ) : (
+            <div style={{ background: "#fffbeb", border: "0.5px solid #fde68a", borderRadius: 8, padding: "10px 14px", marginTop: 8, fontSize: 13, color: "#92400e" }}>
+              Please add your phone number in the section above first.
+            </div>
+          )
+        ) : null}
+
+        {preferredContactMethod === "email" ? (
+          liveEmail ? (
+            <div style={{ background: "#f0fdf4", border: "0.5px solid #bbf7d0", borderRadius: 8, padding: "10px 14px", marginTop: 8, fontSize: 13, color: "#15803d" }}>
+              ✓ We&apos;ll contact you at {liveEmail}
+            </div>
+          ) : (
+            <div style={{ background: "#fffbeb", border: "0.5px solid #fde68a", borderRadius: 8, padding: "10px 14px", marginTop: 8, fontSize: 13, color: "#92400e" }}>
+              Please add your email address in the section above first.
+            </div>
+          )
+        ) : null}
+
+        {preferredContactMethod === "whatsapp" ? (
+          <div style={{ marginTop: 8 }}>
+            <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#344054" }}>WhatsApp number</label>
+            <input
+              name="whatsappNumber"
+              onChange={(e) => setWhatsappNumber(e.target.value)}
+              placeholder={livePhone || "+66812345678"}
+              style={{ ...fieldStyle, marginTop: 4 }}
+              type="tel"
+              value={whatsappNumber}
+            />
+            {livePhone && !whatsappNumber ? (
+              <button
+                onClick={() => setWhatsappNumber(livePhone)}
+                style={{ fontSize: 11, color: "#0e7490", background: "none", border: "none", cursor: "pointer", marginTop: 4, padding: 0 }}
+                type="button"
+              >
+                Use same as phone number ({livePhone})
+              </button>
+            ) : null}
           </div>
-          <input name="contactChannelsSubmitted" type="hidden" value="true" />
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <label>
-              <span className="text-sm font-bold text-[#344054]">WhatsApp number</span>
-              <input className={inputClass} defaultValue={detail.customer?.whatsapp_number || ""} name="whatsappNumber" placeholder="+66812345678 or your number with country code" type="tel" />
-            </label>
-            <label>
-              <span className="text-sm font-bold text-[#344054]">Facebook Messenger</span>
-              <input className={inputClass} defaultValue={detail.customer?.messenger_id || ""} name="messengerId" placeholder="messenger.com/username or full profile URL" />
-            </label>
-            <label>
-              <span className="text-sm font-bold text-[#344054]">LINE ID</span>
-              <input className={inputClass} defaultValue={detail.customer?.line_id || ""} name="lineId" placeholder="@lineusername" />
-            </label>
-            <label>
-              <span className="text-sm font-bold text-[#344054]">Telegram</span>
-              <input className={inputClass} defaultValue={detail.customer?.telegram_username || ""} name="telegramUsername" placeholder="@telegramusername" />
-            </label>
-            <label className="opacity-85">
-              <span className="text-sm font-bold text-[#344054]">Instagram</span>
-              <input className={inputClass} defaultValue={detail.customer?.instagram_handle || ""} name="instagramHandle" placeholder="@instagramhandle" />
-              <span className="mt-1 block text-xs text-[#667085]">Optional</span>
-            </label>
-            <label>
-              <span className="text-sm font-bold text-[#344054]">Preferred contact method</span>
-              <select className={inputClass} defaultValue={defaultContactMethod(detail.customer)} name="preferredContactMethod">
-                {CONTACT_METHODS.map((method) => (
-                  <option key={`public-contact-${method.value}`} value={method.value}>
-                    {method.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+        ) : null}
+
+        {preferredContactMethod === "messenger" ? (
+          <div style={{ marginTop: 8 }}>
+            <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#344054" }}>Messenger username</label>
+            <input defaultValue={detail.customer?.messenger_id || ""} name="messengerId" placeholder="messenger.com/username or full profile URL" style={{ ...fieldStyle, marginTop: 4 }} />
           </div>
-        </section>
-      ) : (
-        <section className="rounded-2xl border border-dashed border-[#d6e5e2] bg-white p-4 text-sm text-[#667085]">
-          Contact preferences skipped.{" "}
-          <button className="font-black text-[#0f766e]" onClick={() => setContactChannelsSkipped(false)} type="button">
-            Add contact channels
-          </button>
-        </section>
-      )}
+        ) : null}
+
+        {preferredContactMethod === "line" ? (
+          <div style={{ marginTop: 8 }}>
+            <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#344054" }}>LINE ID</label>
+            <input defaultValue={detail.customer?.line_id || ""} name="lineId" placeholder="@lineusername" style={{ ...fieldStyle, marginTop: 4 }} />
+          </div>
+        ) : null}
+
+        {preferredContactMethod === "telegram" ? (
+          <div style={{ marginTop: 8 }}>
+            <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#344054" }}>Telegram username</label>
+            <input defaultValue={detail.customer?.telegram_username || ""} name="telegramUsername" placeholder="@telegramusername" style={{ ...fieldStyle, marginTop: 4 }} />
+          </div>
+        ) : null}
+
+        {/* Secondary channels — collapsible */}
+        <details style={{ marginTop: 16 }}>
+          <summary style={{ fontSize: 13, color: "#0e7490", cursor: "pointer", fontWeight: 500, listStyle: "none", userSelect: "none" }}>
+            + Add more ways to contact you (optional)
+          </summary>
+          <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            {preferredContactMethod !== "whatsapp" ? (
+              <div>
+                <label style={{ fontSize: 13, fontWeight: 500, color: "#344054", display: "block" }}>WhatsApp</label>
+                <input name="whatsappNumber" onChange={(e) => setWhatsappNumber(e.target.value)} placeholder="+66812345678" style={{ ...fieldStyle, marginTop: 4 }} type="tel" value={whatsappNumber} />
+              </div>
+            ) : null}
+            {preferredContactMethod !== "messenger" ? (
+              <div>
+                <label style={{ fontSize: 13, fontWeight: 500, color: "#344054", display: "block" }}>Facebook Messenger</label>
+                <input defaultValue={detail.customer?.messenger_id || ""} name="messengerId" placeholder="messenger.com/username" style={{ ...fieldStyle, marginTop: 4 }} />
+              </div>
+            ) : null}
+            {preferredContactMethod !== "line" ? (
+              <div>
+                <label style={{ fontSize: 13, fontWeight: 500, color: "#344054", display: "block" }}>LINE ID</label>
+                <input defaultValue={detail.customer?.line_id || ""} name="lineId" placeholder="@lineusername" style={{ ...fieldStyle, marginTop: 4 }} />
+              </div>
+            ) : null}
+            {preferredContactMethod !== "telegram" ? (
+              <div>
+                <label style={{ fontSize: 13, fontWeight: 500, color: "#344054", display: "block" }}>Telegram</label>
+                <input defaultValue={detail.customer?.telegram_username || ""} name="telegramUsername" placeholder="@telegramusername" style={{ ...fieldStyle, marginTop: 4 }} />
+              </div>
+            ) : null}
+            <div style={{ gridColumn: "1 / 2" }}>
+              <label style={{ fontSize: 13, fontWeight: 500, color: "#344054", display: "block" }}>
+                Instagram <span style={{ fontSize: 11, color: "#94a3b8" }}>Optional</span>
+              </label>
+              <input defaultValue={detail.customer?.instagram_handle || ""} name="instagramHandle" placeholder="@instagramhandle" style={{ ...fieldStyle, marginTop: 4 }} />
+            </div>
+          </div>
+        </details>
+      </section>
 
       <section className="rounded-2xl border border-[#d6e5e2] bg-white p-5 shadow-sm">
         <SectionTitle icon={Upload} label="Documents" />
@@ -728,7 +920,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
                 <p className="mt-2 text-sm font-semibold text-[#0f766e]">Your vehicle will be ready for handover today.</p>
               </div>
             ) : (
-              <input className={inputClass} defaultValue={operatorDeliveryDateTime} min={minDateTime} name="preferredDeliveryDateTime" type="datetime-local" />
+              <input className={inputClass} defaultValue={operatorDeliveryDateTime} min={minDateTime} name="preferredDeliveryDateTime" style={fieldStyle} type="datetime-local" />
             )}
           </label>
         </div>
@@ -866,6 +1058,38 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           <input name="paymentTiming" type="hidden" value={effectiveTiming} />
         </section>
       ) : null}
+
+      {orgPayment?.upfront_discount_enabled && orgPayment.upfront_discount_rate && detail.billingPeriod === "monthly" ? (
+        <section className="rounded-2xl border border-[#d6e5e2] bg-white p-5 shadow-sm">
+          <SectionTitle icon={CreditCard} label={orgPayment.upfront_discount_label || "Pay upfront and save"} />
+          <p className="mt-2 text-sm leading-6 text-[#667085]">
+            Pay {orgPayment.upfront_discount_min_periods} months upfront at {formatMoney(orgPayment.upfront_discount_rate, currency)} per month and enjoy a discounted rate.
+          </p>
+          <div className="mt-3 flex gap-2">
+            <button
+              className={`pressable flex-1 rounded-xl border px-3 py-3 text-sm font-black transition ${upfrontAccepted === true ? "border-[#0f766e] bg-[#f0fdfa] text-[#0f766e]" : "border-[#d6e5e2] bg-white text-[#344054]"}`}
+              onClick={() => setUpfrontAccepted(true)}
+              type="button"
+            >
+              Accept offer
+            </button>
+            <button
+              className={`pressable flex-1 rounded-xl border px-3 py-3 text-sm font-black transition ${upfrontAccepted === false ? "border-[#94a3b8] bg-[#f8fafc] text-[#475569]" : "border-[#d6e5e2] bg-white text-[#344054]"}`}
+              onClick={() => setUpfrontAccepted(false)}
+              type="button"
+            >
+              No thanks
+            </button>
+          </div>
+          {upfrontAccepted === true ? (
+            <>
+              <input name="upfrontPeriods" type="hidden" value={orgPayment.upfront_discount_min_periods} />
+              <input name="upfrontRate" type="hidden" value={orgPayment.upfront_discount_rate} />
+            </>
+          ) : null}
+        </section>
+      ) : null}
+
       <section className="rounded-2xl border border-[#d6e5e2] bg-white p-5 shadow-sm">
         <SectionTitle icon={PenLine} label="Rental Agreement" />
         <div className="contract-preview mt-4 max-h-[460px] overflow-y-auto rounded-xl border border-[#d6e5e2] bg-[#fbfefd] p-4 text-sm leading-7 text-[#344054]" dangerouslySetInnerHTML={{ __html: detail.contractHtml }} />
@@ -884,7 +1108,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         </label>
         <label className="mt-4 block">
           <span className="text-sm font-bold text-[#344054]">Full name for signature</span>
-          <input className={inputClass} defaultValue={detail.customer?.full_name || ""} name="signedName" required />
+          <input className={inputClass} defaultValue={detail.customer?.full_name || ""} name="signedName" required style={fieldStyle} />
         </label>
         <div className="mt-4">
           <div className="mb-2 flex items-center justify-between">
@@ -1024,6 +1248,7 @@ function NationalitySelect({ defaultValue, name }: { defaultValue: string; name:
         onFocus={() => setOpen(true)}
         placeholder="Type nationality or country name..."
         required
+        style={fieldStyle}
         value={search}
       />
       {open && filtered.length > 0 ? (
@@ -1055,42 +1280,118 @@ function NationalitySelect({ defaultValue, name }: { defaultValue: string; name:
 
 function PhoneCountrySelect({ name, onChange, value }: { name: string; onChange: (value: string) => void; value: string }) {
   const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const searchRef = useRef<HTMLInputElement | null>(null);
   const selected = phoneCountrySvgOptions.find((country) => country.callingCode === value) || phoneCountrySvgOptions[0];
 
+  const filtered = search.trim()
+    ? phoneCountrySvgOptions.filter((c) => {
+        const q = search.toLowerCase();
+        return c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q) || c.callingCode.includes(q);
+      })
+    : phoneCountrySvgOptions;
+
+  function openDropdown() {
+    setOpen(true);
+    setSearch("");
+    setTimeout(() => searchRef.current?.focus(), 30);
+  }
+
   return (
-    <div className="relative mt-2">
+    <>
       <input name={name} type="hidden" value={selected.callingCode} />
       <button
         aria-expanded={open}
-        className="flex w-full items-center justify-between gap-2 rounded-xl border border-[#d6e5e2] bg-white px-3 py-3 text-left text-sm font-bold text-[#10252b] outline-none focus:border-[#0f766e] focus:ring-2 focus:ring-[#0f766e]/15"
-        onClick={() => setOpen((current) => !current)}
+        onClick={openDropdown}
+        style={{
+          height: 42,
+          width: 80,
+          flexShrink: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 6,
+          border: "0.5px solid #cbd5e1",
+          borderRight: "none",
+          borderRadius: "8px 0 0 8px",
+          background: "#f8fafc",
+          cursor: "pointer",
+          padding: 0,
+          position: "relative",
+          zIndex: open ? 101 : 1,
+          whiteSpace: "nowrap",
+        }}
         type="button"
       >
-        <span className="flex min-w-0 items-center gap-2">
-          <FlagSvg code={selected.flagCode} label={selected.code} />
-          <span className="truncate">{selected.callingCode}</span>
-        </span>
-        <span className="text-[#667085]">⌄</span>
+        <FlagSvg code={selected.flagCode} label={selected.code} />
+        <span style={{ fontSize: 13 }}>{selected.callingCode}</span>
       </button>
       {open ? (
-        <div className="absolute left-0 right-0 top-[calc(100%+6px)] z-30 max-h-64 overflow-y-auto rounded-xl border border-[#d6e5e2] bg-white p-1 shadow-xl">
-          {phoneCountrySvgOptions.map((country) => (
-            <button
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-bold text-[#10252b] hover:bg-[#e6fffb]"
-              key={`${name}-${country.callingCode}-${country.code}`}
-              onClick={() => {
-                onChange(country.callingCode);
-                setOpen(false);
+        <>
+          <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 20 }} />
+          <div style={{
+            position: "absolute",
+            top: "100%",
+            left: 0,
+            zIndex: 1000,
+            background: "white",
+            border: "0.5px solid var(--border)",
+            borderRadius: 8,
+            boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
+            width: 200,
+            maxHeight: 260,
+            overflowY: "auto",
+            overflowX: "hidden",
+          }}>
+            <input
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search country or code..."
+              ref={searchRef}
+              style={{
+                width: "100%",
+                padding: "7px 10px",
+                fontSize: 13,
+                border: "none",
+                borderBottom: "0.5px solid var(--border)",
+                outline: "none",
+                boxSizing: "border-box",
               }}
-              type="button"
-            >
-              <FlagSvg code={country.flagCode} label={country.code} />
-              <span>{country.code} | {country.callingCode}</span>
-            </button>
-          ))}
-        </div>
+              type="text"
+              value={search}
+            />
+            <div>
+              {filtered.length === 0 ? (
+                <p style={{ padding: 16, textAlign: "center", fontSize: 13, color: "var(--muted)" }}>No results</p>
+              ) : filtered.map((country) => (
+                <button
+                  key={`${name}-${country.callingCode}-${country.code}`}
+                  onClick={() => { onChange(country.callingCode); setOpen(false); setSearch(""); }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "7px 10px",
+                    cursor: "pointer",
+                    fontSize: 13,
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    width: "100%",
+                    border: "none",
+                    background: "transparent",
+                    textAlign: "left",
+                  }}
+                  type="button"
+                >
+                  <FlagSvg code={country.flagCode} label={country.code} />
+                  <span style={{ fontSize: 12, fontWeight: 500, color: "var(--foreground)", width: 36, flexShrink: 0 }}>{country.code}</span>
+                  <span style={{ fontSize: 12, color: "var(--muted)", flexShrink: 0 }}>{country.callingCode}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
       ) : null}
-    </div>
+    </>
   );
 }
 
@@ -1151,6 +1452,7 @@ function GoogleAddressInput({ name = "address", onChange, value }: { name?: stri
           onChange={(event) => onChange(event.target.value)}
           placeholder="Search Google Maps or enter address..."
           ref={inputRef}
+          style={fieldStyle}
           value={value}
         />
         {mapsKeyConfigured ? (

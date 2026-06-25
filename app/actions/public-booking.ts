@@ -9,6 +9,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { processCustomerPortalAction } from "@/lib/portal-notifications";
 import { notifyContractSigned } from "@/lib/line/notifications";
 import { notifyOperator } from "@/lib/notify-operator";
+import { generatePaymentSchedule } from "@/lib/payment-schedule";
 
 function requiredString(formData: FormData, key: string) {
   const value = String(formData.get(key) || "").trim();
@@ -124,69 +125,52 @@ async function logCommunicationEvent({
   });
 }
 
-async function createInitialRentalPayments({
+async function generateScheduleAfterPublicCompletion({
   supabase,
+  bookingLink,
   rental,
-  customerId,
-  dueDate,
-  timing
+  preferredDeliveryDateTime,
+  effectivePaymentTiming
 }: {
   supabase: any;
+  bookingLink: any;
   rental: any;
-  customerId: string;
-  dueDate: string;
-  timing: "now" | "on_delivery";
+  preferredDeliveryDateTime: string | null;
+  effectivePaymentTiming: "now" | "on_delivery";
 }) {
-  const rentalRate = Number(rental?.rental_rate || 0);
-  const depositAmount = Number(rental?.deposit_amount || 0);
-  const inserts = [];
+  const { data: existing } = await supabase
+    .from("rental_payments")
+    .select("id")
+    .eq("rental_id", rental.id)
+    .neq("status", "voided")
+    .limit(1);
 
-  if (rentalRate > 0) {
-    inserts.push({
-      organization_id: rental.organization_id,
-      rental_id: rental.id,
-      customer_id: customerId,
-      vehicle_id: rental.vehicle_id,
-      amount: rentalRate,
-      due_date: dueDate,
-      scheduled_date: dueDate,
-      status: "pending",
-      currency: rental.currency || "THB",
-      metadata: {
-        type: "rent",
-        description: timing === "now" ? "First rental payment - due now" : "First rental payment - payment due on delivery",
-        payment_trigger: timing
-      }
-    });
-  }
-
-  if (depositAmount > 0) {
-    inserts.push({
-      organization_id: rental.organization_id,
-      rental_id: rental.id,
-      customer_id: customerId,
-      vehicle_id: rental.vehicle_id,
-      amount: depositAmount,
-      due_date: dueDate,
-      scheduled_date: dueDate,
-      status: "pending",
-      currency: rental.currency || "THB",
-      metadata: {
-        type: "deposit",
-        description: timing === "now" ? "Security deposit - due now" : "Security deposit - collected on delivery",
-        payment_trigger: timing
-      }
-    });
-  }
-
-  if (inserts.length === 0) {
+  if (existing && existing.length > 0) {
     return;
   }
 
-  const { error } = await supabase.from("rental_payments").insert(inserts);
-  if (error) {
-    throw new Error(error.message);
-  }
+  const bookingData = (bookingLink.booking_data || {}) as Record<string, any>;
+  const deliveryDate =
+    preferredDeliveryDateTime ||
+    rental.delivery_datetime ||
+    bookingData.delivery_datetime ||
+    rental.start_date ||
+    todayDate();
+  const upfrontPeriods = Number(rental.upfront_periods || bookingData.upfront_periods || 0);
+  const upfrontRate = Number(rental.upfront_rate || bookingData.upfront_rate || 0) || null;
+
+  await generatePaymentSchedule({
+    supabase,
+    organisationId: rental.organization_id,
+    rentalId: rental.id,
+    rentalRate: Number(rental.rental_rate || 0),
+    depositAmount: Number(rental.deposit_amount || 0),
+    deliveryDate,
+    endDate: rental.end_date || null,
+    billingPeriod: rental.billing_interval || rental.pricing_model || "monthly",
+    upfrontPeriods: effectivePaymentTiming === "now" ? upfrontPeriods : 0,
+    upfrontRate
+  });
 }
 
 async function uploadPublicCustomerDocument({
@@ -483,6 +467,8 @@ export async function completePublicBooking(formData: FormData) {
   const preferredDeliveryDateTime = optionalString(formData, "preferredDeliveryDateTime");
   const preferredPaymentMethod = optionalString(formData, "preferredPaymentMethod");
   const paymentTiming = optionalString(formData, "paymentTiming");
+  const customerUpfrontPeriods = Number(formData.get("upfrontPeriods") || 0);
+  const customerUpfrontRate = Number(formData.get("upfrontRate") || 0) || null;
   const existingDeliveryDateTime = String(((bookingLink.booking_data || {}) as Record<string, unknown>).delivery_datetime || "").slice(0, 16);
 
   if (preferredDeliveryDateTime && preferredDeliveryDateTime !== existingDeliveryDateTime && new Date(preferredDeliveryDateTime).getTime() < Date.now()) {
@@ -658,7 +644,8 @@ export async function completePublicBooking(formData: FormData) {
     .update({
       ...(preferredDeliveryLocation ? { delivery_location: preferredDeliveryLocation } : {}),
       ...(preferredDeliveryDateTime ? { delivery_datetime: preferredDeliveryDateTime } : {}),
-      ...rentalPaymentUpdate
+      ...rentalPaymentUpdate,
+      ...(customerUpfrontPeriods > 0 && !rental.upfront_periods ? { upfront_periods: customerUpfrontPeriods, upfront_rate: customerUpfrontRate, upfront_accepted: true } : {})
     })
     .eq("id", bookingLink.rental_id)
     .eq("organization_id", organizationId);
@@ -700,15 +687,17 @@ export async function completePublicBooking(formData: FormData) {
     throw new Error(contractError?.message || bookingUpdateError?.message || rentalUpdateError?.message || "Unable to complete booking.");
   }
 
-  if (effectivePaymentTiming === "now") {
-    await createInitialRentalPayments({
-      supabase,
-      rental,
-      customerId,
-      dueDate: todayDate(),
-      timing: "now"
-    });
-  }
+  await generateScheduleAfterPublicCompletion({
+    supabase,
+    bookingLink,
+    rental: {
+      ...rental,
+      customer_id: customerId,
+      ...(customerUpfrontPeriods > 0 && !rental.upfront_periods ? { upfront_periods: customerUpfrontPeriods, upfront_rate: customerUpfrontRate } : {})
+    },
+    preferredDeliveryDateTime,
+    effectivePaymentTiming
+  });
 
   await Promise.all([
     recordActivityEvent(supabase, {

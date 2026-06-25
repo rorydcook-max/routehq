@@ -72,7 +72,8 @@ export async function fetchSummaryData(): Promise<SummaryData | null> {
       .from("transactions")
       .select("amount, type, transaction_date")
       .eq("organization_id", org.id)
-      .in("type", ["rental_income", "deposit"])
+      .eq("type", "rental_income")
+      .neq("voided", true)
       .gte("transaction_date", today.slice(0, 7) + "-01")
       .lte("transaction_date", today)
       .is("deleted_at", null),

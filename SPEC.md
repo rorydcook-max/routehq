@@ -1955,7 +1955,187 @@ Phase 2 completion. Build in this order:
 
 ---
 
-## 36. Transaction Data Entry — Speed and Friction Reduction
+## 37. Payment Schedule System
+
+### 37.1 Core Payment Schedule Logic
+
+Payment records are created at booking form completion using this model:
+
+**Schedule creation trigger:**
+When the customer completes the booking form (or when the operator uses "Record existing rental"), the system generates the full payment schedule based on:
+- Delivery date = Day 1 of rental = first payment due date
+- Billing period (daily/weekly/monthly)
+- Rental end date (if set) or rolling 12 months (if open-ended)
+
+**For open-ended monthly rentals:**
+Generate 12 monthly payment records from the delivery date. As each month's payment is marked paid, generate the next month's record automatically. This creates a rolling schedule that never ends until the rental is closed.
+
+**Payment record status lifecycle:**
+- `scheduled` — future dated, not yet due
+- `pending` — due date has arrived, not yet paid
+- `overdue` — past due date, not paid
+- `paid` — confirmed received
+- `voided` — cancelled/error
+- `waived` — forgiven
+
+**Status transitions (automatic):**
+- Created → `scheduled`
+- Due date arrives → `scheduled` becomes `pending` (daily cron job)
+- 1 day past due → `pending` becomes `overdue`
+- Payment recorded → becomes `paid`
+
+**Delivery date as payment due date:**
+The delivery date from the booking form is always the payment due date for the first payment and all subsequent monthly payments, regardless of whether the customer selects "pay now" or "pay on delivery". The rental period begins when the customer receives the car.
+
+**Delivery inspection due date update:**
+During the delivery inspection flow, if the actual delivery date differs from the booking form delivery date, show:
+"Delivery date: [booking form date]. Is this correct?"
+- "Yes, use this date" → keep existing payment schedule
+- "No, update to today" → update all payment records' due dates by the difference in days
+- "Choose a different date" → show date picker, then recalculate
+
+### 37.2 Payment Status Display Rules
+
+Payment records show in the booking detail page with these display states:
+
+| Status | Display | Colour |
+|---|---|---|
+| scheduled | "Due [date]" | Muted grey |
+| pending | "Due today" or "Due [date]" | Amber |
+| overdue | "Overdue by [N] days" | Red |
+| paid | "Paid [date]" | Green |
+| voided | "Voided" strikethrough | Grey |
+| waived | "Waived" | Muted |
+
+**Outstanding balance** = sum of pending + overdue rent payments only. Scheduled future payments are NOT included in outstanding balance — they are not yet due.
+
+**Deposits** are never included in the outstanding balance. They are tracked separately via `rentals.deposit_held`.
+
+### 37.3 Payment Notifications and Alerts
+
+**Immediate (when payment schedule is created):**
+- Task created: "Collect payment — [Customer] ฿[amount] due [date]" with due_date set to the payment due date
+- Calendar entry created for the payment due date
+- Dashboard alert surfaces according to existing colour system: Green (>14 days), Amber (7-14 days), Red (<7 days or overdue)
+
+**Day before or day of payment due (operator preference):**
+- In-app notification: "[Customer] — [Vehicle] payment of ฿[amount] due tomorrow/today"
+- LINE notification to operator (if LINE enabled)
+- Task urgency escalates to high
+
+**Day after payment due (overdue):**
+- Status transitions to overdue automatically via cron
+- Dashboard overdue payments card updates
+- New LINE notification to operator
+
+**Implementation:**
+Tasks and calendar entries are created immediately when payment records are generated — not deferred to the day before. This ensures the operator always has visibility of upcoming payments in their task list and calendar from the moment a booking is confirmed.
+
+A daily cron job (already set up at 01:00 UTC via vercel.json) handles:
+1. Transition `scheduled` → `pending` where due_date = today
+2. Transition `pending` → `overdue` where due_date < today
+3. Send day-before notifications for payments due tomorrow
+4. Escalate task priority for payments due today with no recorded payment
+
+### 37.4 Early Return and Open-Ended Contract Closure
+
+When an early return is recorded via the RentalAdjustmentModal:
+1. Update `rentals.end_date` to the actual return date
+2. Update `rentals.status` to `completed`
+3. **Delete or void all `rental_payment` records where:**
+   - `status` in (`scheduled`, `pending`)
+   - `due_date` > actual return date
+   - `voided` is not true
+4. If a partial period refund is due: create a refund transaction
+5. Cancel any open tasks related to future payments for this rental
+
+This ensures an unexpected return doesn't leave phantom future payment obligations on the books.
+
+### 37.5 Upfront Payment (Multiple Periods)
+
+During booking creation (Step 2 — Rental details), add an "Upfront payment" section:
+
+**Toggle: "Customer is paying multiple periods upfront"**
+
+When enabled, show:
+- "Number of periods upfront": number input (e.g. 3)
+- "Rate per period": ฿ input (pre-filled with rental_rate, editable for discount)
+- "Total upfront amount": calculated and shown (read-only): periods × rate
+- Helper: "e.g. 3 months × ฿10,000 = ฿30,000 due on delivery"
+
+**On booking creation with upfront payment:**
+1. Create N payment records for the upfront periods, all with status `paid` and `paid_date` = delivery date
+2. Create 1 transaction record for the total upfront amount
+3. Remaining monthly records (if end date set) created as `scheduled`
+4. First non-prepaid payment due date = delivery date + N periods
+
+**Example:**
+- Monthly rate: ฿11,000
+- Upfront: 3 months at ฿10,000 (discounted)
+- Delivery: June 10
+- Result: June, July, August payment records → all `paid`, ฿10,000 each
+- Next payment due: September 10, ฿11,000 (or ฿10,000 if discount continues)
+
+### 37.6 Dynamic Pricing / Upfront Discount Offer
+
+This is an entirely opt-in feature. Most operators will agree pricing with the customer beforehand and simply present that price in the booking form. The dynamic pricing offer is for operators who want to proactively incentivise upfront payment without a separate negotiation.
+
+**Operator opt-in:**
+The offer card only appears in the customer booking form if the operator has explicitly enabled it in Settings → Payment Methods → Upfront discount. It is off by default.
+
+**Upfront discount settings (Settings → Payment Methods):**
+- Enable/disable toggle: "Show upfront payment offer to customers in booking form"
+- Minimum periods for discount: number input (e.g. 3 months minimum)
+- Discounted rate per period: ฿ input (e.g. ฿10,000/month instead of ฿11,000)
+- Offer headline: text input — what the customer sees, e.g. "Save ฿3,000 when paying 3 months upfront" or "Pay annually and get 1 month free"
+- Offer description: optional longer text
+
+**In the customer booking form (only if operator enabled this):**
+A highlighted offer card appears after the payment method section. If the operator has not enabled this, the card never appears and the customer only sees standard payment method selection.
+
+```
+╔═══════════════════════════════════════╗
+║  💰 Save ฿3,000 with upfront payment  ║
+║                                       ║
+║  Pay 3 months upfront: ฿30,000        ║
+║  (instead of ฿11,000/month × 3)       ║
+║                                       ║
+║  [Accept this offer]  [No thanks]     ║
+╚═══════════════════════════════════════╝
+```
+
+If customer accepts:
+- Updates payment_timing to 'now' (upfront)
+- Records upfront_periods = 3, upfront_rate = 10000
+- Total due = ฿30,000 shown in payment section
+- On form submission: creates payment records accordingly
+
+**Database additions:**
+```sql
+alter table public.rentals
+  add column if not exists upfront_periods integer default 0,
+  add column if not exists upfront_rate numeric,
+  add column if not exists upfront_total numeric,
+  add column if not exists upfront_accepted boolean default false;
+
+alter table public.organizations
+  add column if not exists upfront_discount_enabled boolean default false,
+  add column if not exists upfront_discount_min_periods integer default 3,
+  add column if not exists upfront_discount_rate numeric,
+  add column if not exists upfront_discount_label text;
+```
+
+### 37.7 Build Phase
+
+Build in this order:
+1. Payment schedule generation at booking completion (core — needed now)
+2. Scheduled/pending/overdue status transitions via cron
+3. Day-before notifications and task creation
+4. Early return payment cleanup
+5. Upfront payment option in booking creation
+6. Dynamic pricing / upfront discount offer in customer form
+
+---
 
 ### 36.1 The Problem
 

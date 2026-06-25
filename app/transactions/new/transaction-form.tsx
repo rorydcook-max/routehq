@@ -223,7 +223,7 @@ export function TransactionForm({
 
           <label className="block">
             <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Amount (THB)</span>
-            <input className={inputClass} min="0" name="amount" onChange={(event) => setAmount(event.target.value)} required step="1" type="number" value={amount} />
+            <input className={inputClass} min="0" name="amount" onChange={(event) => setAmount(event.target.value)} required step="0.01" type="number" value={amount} />
           </label>
 
           <label className="block">

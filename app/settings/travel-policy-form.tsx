@@ -136,7 +136,7 @@ export function TravelPolicyForm({
         {travelPolicy === "deposit_required" ? (
           <label className="mt-3 block max-w-sm">
             <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Secondary deposit amount (THB)</span>
-            <input className={inputClass} defaultValue={settings.secondary_deposit_amount} min="0" name="secondaryDepositAmount" type="number" />
+            <input className={inputClass} defaultValue={settings.secondary_deposit_amount} min="0" name="secondaryDepositAmount" step="0.01" type="number" />
           </label>
         ) : (
           <input name="secondaryDepositAmount" type="hidden" value={settings.secondary_deposit_amount} />
@@ -154,11 +154,11 @@ export function TravelPolicyForm({
         <summary className="cursor-pointer text-[11px] font-semibold uppercase tracking-[0.08em] text-[#0f766e]">Contract terms</summary>
         <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <NumberField defaultValue={settings.mileage_limit} label="Monthly mileage limit (km)" name="mileageLimit" />
-          <NumberField defaultValue={settings.fuel_charge_per_increment} label="Fuel charge per 1/8 gauge increment (THB)" name="fuelChargePerIncrement" />
-          <NumberField defaultValue={settings.late_fee_percentage} label="Late return fee (% per day)" name="lateFeePercentage" />
-          <NumberField defaultValue={settings.cleaning_fee_minimum} label="Minimum cleaning fee (THB)" name="cleaningFeeMinimum" />
-          <NumberField defaultValue={settings.smoking_fee_maximum} label="Maximum smoking penalty (THB)" name="smokingFeeMaximum" />
-          <NumberField defaultValue={settings.emergency_repair_limit} label="Emergency repair authorisation limit (THB)" name="emergencyRepairLimit" />
+          <NumberField defaultValue={settings.fuel_charge_per_increment} label="Fuel charge per 1/8 gauge increment (THB)" name="fuelChargePerIncrement" step="0.01" />
+          <NumberField defaultValue={settings.late_fee_percentage} label="Late return fee (% per day)" name="lateFeePercentage" step="0.01" />
+          <NumberField defaultValue={settings.cleaning_fee_minimum} label="Minimum cleaning fee (THB)" name="cleaningFeeMinimum" step="0.01" />
+          <NumberField defaultValue={settings.smoking_fee_maximum} label="Maximum smoking penalty (THB)" name="smokingFeeMaximum" step="0.01" />
+          <NumberField defaultValue={settings.emergency_repair_limit} label="Emergency repair authorisation limit (THB)" name="emergencyRepairLimit" step="0.01" />
           <NumberField defaultValue={settings.deposit_return_days} label="Deposit return period (business days)" name="depositReturnDays" />
         </div>
       </details>
@@ -193,11 +193,11 @@ export function TravelPolicyForm({
   );
 }
 
-function NumberField({ defaultValue, label, name }: { defaultValue: number; label: string; name: string }) {
+function NumberField({ defaultValue, label, name, step = "1" }: { defaultValue: number; label: string; name: string; step?: string }) {
   return (
     <label className="block">
       <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{label}</span>
-      <input className={inputClass} defaultValue={defaultValue} min="0" name={name} type="number" />
+      <input className={inputClass} defaultValue={defaultValue} min="0" name={name} step={step} type="number" />
     </label>
   );
 }

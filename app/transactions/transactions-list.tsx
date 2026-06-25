@@ -4,7 +4,6 @@ import { useMemo, useState, useTransition } from "react";
 import { Car, Check, Pencil, ReceiptText, Search, Trash2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { bulkDeleteTransactions, deleteTransaction, updateTransaction } from "@/app/actions/transactions";
-import { Badge } from "@/components/ui";
 import { isIncomeTransactionType, TRANSACTION_TYPE_OPTIONS } from "@/lib/transaction-options";
 import type { TransactionListItem } from "@/lib/transactions";
 
@@ -110,6 +109,7 @@ function TransactionEditForm({
               className="w-full pl-8"
               min="0"
               onChange={(event) => setAmount(event.target.value)}
+              step="0.01"
               type="number"
               value={amount}
             />
@@ -381,7 +381,6 @@ export function TransactionsList({
                         <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.04em] ${badge.className}`}>
                           {badge.label}
                         </span>
-                        {transaction.voided ? <Badge tone="neutral">Voided</Badge> : null}
                       </div>
                       <p className="mt-1 truncate text-sm font-semibold text-[var(--foreground-secondary)]">{transaction.vehicleLabel}</p>
                       <p className="text-sm text-[var(--muted)]">

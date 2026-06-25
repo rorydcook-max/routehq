@@ -20,7 +20,7 @@ type AvailabilityStatus = "available_now" | "reserved" | "rented" | "blocked" | 
 type ServiceArea = "home_branch" | "all_branches";
 type RentalStatus = "draft" | "booked" | "active" | "due_soon" | "overdue" | "extended" | "completed" | "cancelled";
 type PricingModel = "hourly" | "daily" | "weekly" | "monthly" | "subscription" | "custom";
-type PaymentStatus = "scheduled" | "pending" | "paid" | "failed" | "overdue" | "cancelled" | "refunded" | "reconciled";
+type PaymentStatus = "scheduled" | "pending" | "paid" | "failed" | "overdue" | "cancelled" | "refunded" | "reconciled" | "voided" | "waived";
 type TransactionType =
   | "rental_income"
   | "repair"

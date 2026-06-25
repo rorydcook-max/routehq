@@ -27,7 +27,11 @@ function organizationPaymentSettings(organization: any) {
     bank_account_name: organization?.bank_account_name || null,
     wise_link: organization?.wise_link || null,
     revolut_link: organization?.revolut_link || null,
-    default_payment_method: acceptedMethods.includes(defaultMethod) ? defaultMethod : "cash"
+    default_payment_method: acceptedMethods.includes(defaultMethod) ? defaultMethod : "cash",
+    upfront_discount_enabled: Boolean(organization?.upfront_discount_enabled),
+    upfront_discount_min_periods: Number(organization?.upfront_discount_min_periods ?? 3),
+    upfront_discount_rate: organization?.upfront_discount_rate ? Number(organization.upfront_discount_rate) : null,
+    upfront_discount_label: organization?.upfront_discount_label || null
   };
 }
 
@@ -112,7 +116,7 @@ export async function getPublicBookingDetail(token: string) {
     ? await Promise.all([
         supabase
           .from("rental_payments")
-          .select("amount, amount_paid, status")
+          .select("amount, status")
           .eq("organization_id", bookingLink.organization_id)
           .eq("rental_id", bookingLink.rental_id)
           .is("deleted_at", null),
@@ -136,8 +140,8 @@ export async function getPublicBookingDetail(token: string) {
     : [{ data: [] }, { data: [] }, { data: [] }];
 
   const outstandingBalance = (paymentsResult.data || []).reduce((sum: number, payment: any) => {
-    if (payment.status === "paid") return sum;
-    return sum + Math.max(0, Number(payment.amount || 0) - Number(payment.amount_paid || 0));
+    if (["paid", "voided", "waived", "cancelled"].includes(payment.status)) return sum;
+    return sum + Number(payment.amount || 0);
   }, 0);
   const deliveryInspection = inspectionsResult.data?.[0] || null;
   const deliveryPhotos = Array.isArray(deliveryInspection?.photos) ? deliveryInspection.photos : [];

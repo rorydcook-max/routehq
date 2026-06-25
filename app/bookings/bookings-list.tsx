@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
-import { CalendarDays, Car, Clock, Search, UserRound } from "lucide-react";
+import { CalendarDays, Car, Clock, Search, Trash2, UserRound } from "lucide-react";
+import { deleteBooking } from "@/app/actions/bookings";
 import { RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
 import { Badge } from "@/components/ui";
 import { flagForNationality } from "@/lib/customer-options";
@@ -69,6 +70,20 @@ function canExtend(booking: any) {
 export function BookingsList({ bookings }: { bookings: any[] }) {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<(typeof filters)[number]>("all");
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  function handleDelete(bookingId: string) {
+    setDeleteError(null);
+    startTransition(async () => {
+      const result = await deleteBooking(bookingId);
+      if (!result.success) {
+        setDeleteError(result.error || "Failed to delete booking.");
+        setConfirmDeleteId(null);
+      }
+    });
+  }
 
   const filtered = useMemo(() => {
     const needle = search.toLowerCase().trim();
@@ -117,6 +132,9 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
         </div>
       </div>
 
+      {deleteError ? (
+        <p className="rounded-lg border border-[#fecaca] bg-[#fef2f2] p-3 text-sm font-semibold text-[#dc2626]">{deleteError}</p>
+      ) : null}
       {filtered.length === 0 ? (
         <div className="empty-state">
           <p className="text-lg font-black text-[#10252b]">No bookings found</p>
@@ -184,6 +202,38 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                         vehicleLabel={vehicleTitle(booking.vehicles)}
                       />
                     ) : null}
+                    {confirmDeleteId === booking.id ? (
+                      <div className="mt-1 w-full rounded-lg border border-[#fecaca] bg-[#fef2f2] p-2">
+                        <p className="mb-2 text-xs font-semibold text-[#dc2626]">Delete this booking? This cannot be undone.</p>
+                        <div className="flex gap-2">
+                          <button
+                            className="pressable inline-flex min-h-7 items-center rounded-lg bg-[#dc2626] px-3 text-xs font-bold text-white disabled:opacity-60"
+                            disabled={isPending}
+                            onClick={() => handleDelete(booking.id)}
+                            type="button"
+                          >
+                            {isPending ? "Deleting…" : "Confirm delete"}
+                          </button>
+                          <button
+                            className="pressable inline-flex min-h-7 items-center rounded-lg border border-[var(--border)] bg-white px-3 text-xs font-bold text-[var(--foreground-secondary)]"
+                            disabled={isPending}
+                            onClick={() => setConfirmDeleteId(null)}
+                            type="button"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        className="pressable inline-flex min-h-9 items-center justify-center rounded-lg border border-[#fecaca] bg-[#fef2f2] px-2 text-[#dc2626]"
+                        onClick={() => { setConfirmDeleteId(booking.id); setDeleteError(null); }}
+                        title="Delete booking"
+                        type="button"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

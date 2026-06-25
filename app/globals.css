@@ -818,6 +818,14 @@ tr:hover td {
   background: var(--panel-secondary);
 }
 
+.analytics-panel thead th {
+  background: transparent;
+}
+
+.analytics-panel tr:hover td {
+  background: rgba(255, 255, 255, 0.06);
+}
+
 /* Status badges - tighter */
 .badge {
   align-items: center;

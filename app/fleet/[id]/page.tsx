@@ -475,7 +475,7 @@ function ComplianceSection({ detail, organizationId }: { detail: VehicleDetail; 
                   </label>
                   <label className="block">
                     <span className="text-xs font-bold uppercase text-[#667085]">Cost</span>
-                    <input className={inputClass} min="0" name="cost" type="number" />
+                    <input className={inputClass} min="0" name="cost" step="0.01" type="number" />
                   </label>
                   <label className="block sm:col-span-2">
                     <span className="text-xs font-bold uppercase text-[#667085]">Document upload</span>
@@ -749,7 +749,7 @@ function MaintenanceSection({ detail, organizationId }: { detail: VehicleDetail;
           </label>
           <label className="block">
             <span className="text-xs font-bold uppercase text-[#667085]">Cost</span>
-            <input className={inputClass} min="0" name="cost" type="number" />
+            <input className={inputClass} min="0" name="cost" step="0.01" type="number" />
           </label>
           <label className="block">
             <span className="text-xs font-bold uppercase text-[#667085]">Odometer</span>

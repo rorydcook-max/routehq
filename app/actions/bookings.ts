@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { markOnboardingStep } from "@/lib/onboarding";
+import { activateRental } from "@/lib/rental-activation";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { notifyOperator } from "@/lib/notify-operator";
@@ -213,6 +214,13 @@ async function createWalkInPaymentRecords({
       throw new Error(depositError.message);
     }
   }
+
+  // Mark state machine as confirmed so delivery inspection knows payment is already done
+  await supabase
+    .from("rentals")
+    .update({ payment_due_trigger: "confirmed" })
+    .eq("id", rental.id)
+    .eq("organization_id", organizationId);
 }
 
 export async function createBooking(formData: FormData) {
@@ -253,6 +261,9 @@ export async function createBooking(formData: FormData) {
   const walkInDepositAmount = numberFromForm(formData, "walkInDepositAmount");
   const walkInPaymentMethod = String(formData.get("walkInPaymentMethod") || "cash").trim() || "cash";
   const walkInPaymentNote = optionalString(formData, "walkInPaymentNote");
+  const upfrontPeriods = Math.max(0, numberFromForm(formData, "upfrontPeriods"));
+  const upfrontRate = numberFromForm(formData, "upfrontRate");
+  const upfrontTotal = numberFromForm(formData, "upfrontTotal");
   const createsActiveRental = bookingMode === "existing_rental" || walkInFastTrack;
 
   if (!["daily", "weekly", "monthly", "custom"].includes(pricingModel)) {
@@ -364,6 +375,19 @@ export async function createBooking(formData: FormData) {
     throw new Error(rentalError?.message || "Unable to create booking.");
   }
 
+  if (upfrontPeriods > 0) {
+    await supabase
+      .from("rentals")
+      .update({
+        upfront_periods: upfrontPeriods,
+        upfront_rate: upfrontRate || null,
+        upfront_total: upfrontTotal || null,
+        upfront_accepted: true
+      })
+      .eq("id", rental.id)
+      .eq("organization_id", organizationId);
+  }
+
   const contractInsert: Record<string, any> = {
     organization_id: organizationId,
     rental_id: rental.id,
@@ -448,6 +472,9 @@ export async function createBooking(formData: FormData) {
         throw paymentError;
       }
     }
+
+    // Auto-generate payment schedule for operator-entered rentals
+    await activateRental(rental.id, supabase).catch(() => null);
 
     await recordActivityEvent(supabase, {
       organization_id: organizationId,
@@ -822,6 +849,115 @@ export async function cancelBooking(formData: FormData) {
   revalidatePath(`/fleet/${rental.vehicle_id}`);
 }
 
+export async function deleteBooking(rentalId: string): Promise<{ success: boolean; error?: string }> {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) return { success: false, error: "You must be signed in." };
+
+  const cleanId = String(rentalId || "").trim();
+  if (!cleanId) return { success: false, error: "Booking ID is required." };
+
+  const { data: rental, error: rentalError } = await supabase
+    .from("rentals")
+    .select("id, vehicle_id, customer_id, organization_id, status")
+    .eq("id", cleanId)
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (rentalError || !rental) return { success: false, error: rentalError?.message || "Booking not found." };
+
+  await ensureMembership(supabase, rental.organization_id, user.id);
+
+  // Null out receipt FKs before deleting transactions
+  const { data: txIds } = await supabase
+    .from("transactions")
+    .select("id")
+    .eq("rental_id", cleanId)
+    .eq("organization_id", rental.organization_id);
+
+  if (txIds?.length) {
+    const ids = txIds.map((t: any) => t.id);
+    await supabase.from("receipts").update({ transaction_id: null }).in("transaction_id", ids);
+    await supabase.from("rental_payments").update({ transaction_id: null }).in("transaction_id", ids);
+  }
+
+  await Promise.allSettled([
+    supabase.from("rental_payments").delete().eq("rental_id", cleanId).eq("organization_id", rental.organization_id),
+    supabase.from("transactions").delete().eq("rental_id", cleanId).eq("organization_id", rental.organization_id),
+    supabase.from("inspections").delete().eq("rental_id", cleanId).eq("organization_id", rental.organization_id),
+    supabase.from("booking_links").delete().eq("rental_id", cleanId).eq("organization_id", rental.organization_id),
+    supabase.from("contracts").delete().eq("rental_id", cleanId).eq("organization_id", rental.organization_id),
+    supabase.from("activity_events").delete().eq("rental_id", cleanId).eq("organization_id", rental.organization_id),
+  ]);
+
+  const { error: deleteError } = await supabase
+    .from("rentals")
+    .delete()
+    .eq("id", cleanId)
+    .eq("organization_id", rental.organization_id);
+
+  if (deleteError) return { success: false, error: deleteError.message };
+
+  // Free up the vehicle if it was assigned to this rental
+  await supabase
+    .from("vehicles")
+    .update({ status: "available", availability_status: "available_now", current_customer_id: null, current_rental_id: null })
+    .eq("id", rental.vehicle_id)
+    .eq("organization_id", rental.organization_id)
+    .eq("current_rental_id", cleanId);
+
+  revalidatePath("/");
+  revalidatePath("/bookings");
+  revalidatePath("/fleet");
+  if (rental.vehicle_id) revalidatePath(`/fleet/${rental.vehicle_id}`);
+
+  return { success: true };
+}
+
+export async function manuallyActivateRental(rentalId: string): Promise<{ success: boolean; error?: string }> {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) return { success: false, error: "You must be signed in." };
+
+  const cleanId = String(rentalId || "").trim();
+  if (!cleanId) return { success: false, error: "Rental ID is required." };
+
+  const { data: rental, error: rentalError } = await supabase
+    .from("rentals")
+    .select("id, organization_id, vehicle_id, customer_id")
+    .eq("id", cleanId)
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (rentalError || !rental) return { success: false, error: rentalError?.message || "Rental not found." };
+
+  await ensureMembership(supabase, rental.organization_id, user.id);
+
+  // Also set the vehicle to rented if not already
+  if (rental.vehicle_id) {
+    await supabase
+      .from("vehicles")
+      .update({ status: "rented", availability_status: "rented", current_rental_id: cleanId, current_customer_id: rental.customer_id })
+      .eq("id", rental.vehicle_id)
+      .eq("organization_id", rental.organization_id);
+  }
+
+  await activateRental(cleanId, supabase);
+
+  revalidatePath("/");
+  revalidatePath("/bookings");
+  revalidatePath(`/bookings/${cleanId}`);
+  if (rental.vehicle_id) revalidatePath(`/fleet/${rental.vehicle_id}`);
+
+  return { success: true };
+}
+
 function allStrings(formData: FormData, key: string) {
   return formData.getAll(key).map((value) => String(value || "").trim()).filter(Boolean);
 }
@@ -860,6 +996,7 @@ export async function updateBooking(formData: FormData) {
   const currency = String(formData.get("currency") || "THB").trim().toUpperCase();
   const rentalRate = numberFromForm(formData, "rentalRate");
   const depositAmount = numberFromForm(formData, "depositAmount");
+  const depositHeld = numberFromForm(formData, "depositHeld");
   const deliveryMethod = requiredString(formData, "deliveryMethod");
   const deliveryLocation = optionalString(formData, "deliveryLocation");
   const deliveryDateTime = dateTimeOrNull(formData, "deliveryDateTime");
@@ -933,6 +1070,7 @@ export async function updateBooking(formData: FormData) {
     recurring_billing: pricingModel === "monthly",
     rental_rate: rentalRate,
     deposit_amount: depositAmount,
+    deposit_held: depositHeld,
     currency,
     delivery_method: deliveryMethod,
     delivery_location: deliveryMethod === "tbd" ? null : deliveryLocation,
@@ -953,6 +1091,7 @@ export async function updateBooking(formData: FormData) {
   compare("Billing period", rental.pricing_model, pricingModel);
   compare("Rental rate", Number(rental.rental_rate || 0), rentalRate);
   compare("Deposit amount", Number(rental.deposit_amount || 0), depositAmount);
+  compare("Deposit held", Number(rental.deposit_held || 0), depositHeld);
   compare("Currency", rental.currency || "THB", currency);
   compare("Delivery method", rental.delivery_method || oldBookingData.delivery_method || "delivery", deliveryMethod);
   compare("Delivery location", rental.delivery_location || oldBookingData.delivery_location || null, rentalUpdates.delivery_location);
@@ -1391,6 +1530,44 @@ function monthYearLabel(dateString: string | null | undefined) {
   return new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${normalized}T00:00:00.000Z`));
 }
 
+function absoluteDaysBetweenDates(from: string | null | undefined, to: string | null | undefined) {
+  const start = dateOnly(from);
+  const end = dateOnly(to);
+  if (!start || !end) return Number.POSITIVE_INFINITY;
+  const startDate = new Date(`${start}T00:00:00.000Z`);
+  const endDate = new Date(`${end}T00:00:00.000Z`);
+  if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) return Number.POSITIVE_INFINITY;
+  return Math.abs(Math.round((endDate.getTime() - startDate.getTime()) / 86_400_000));
+}
+
+function amountMatchesSchedule(transactionAmount: unknown, expectedAmount: number) {
+  const amount = Number(transactionAmount || 0);
+  if (!Number.isFinite(amount) || amount <= 0) return false;
+  if (!Number.isFinite(expectedAmount) || expectedAmount <= 0) return true;
+  return Math.abs(amount - expectedAmount) <= expectedAmount * 0.2;
+}
+
+function findScheduleTransactionMatch({
+  dueDate,
+  amount,
+  transactions,
+  usedTransactionIds
+}: {
+  dueDate: string;
+  amount: number;
+  transactions: any[];
+  usedTransactionIds: Set<string>;
+}) {
+  return [...transactions]
+    .filter((transaction: any) => {
+      const transactionId = String(transaction.id || "");
+      if (!transactionId || usedTransactionIds.has(transactionId)) return false;
+      if (absoluteDaysBetweenDates(dueDate, transaction.transaction_date) > 10) return false;
+      return amountMatchesSchedule(transaction.amount, amount);
+    })
+    .sort((a: any, b: any) => absoluteDaysBetweenDates(dueDate, a.transaction_date) - absoluteDaysBetweenDates(dueDate, b.transaction_date))[0];
+}
+
 async function createNextMonthlyPaymentIfNeeded(supabase: any, payment: any) {
   const metadata = payment.metadata || {};
   const paymentType = String(metadata.type || "rent");
@@ -1451,16 +1628,367 @@ async function createNextMonthlyPaymentIfNeeded(supabase: any, payment: any) {
     vehicle_id: rental.vehicle_id,
     due_date: nextDueDate,
     scheduled_date: nextDueDate,
-    status: "pending",
+    status: "scheduled",
     amount: Number(rental.rental_rate || payment.amount || 0),
     currency: rental.currency || payment.currency || "THB",
     metadata: {
       type: "rent",
+      is_deposit: false,
+      period_label: monthYearLabel(nextDueDate),
+      auto_generated: true,
       description,
       generated_from_payment_id: payment.id,
       generated_reason: "monthly_rolling_schedule"
     }
   });
+}
+
+export async function generatePaymentScheduleForRental(rentalId: string) {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error("You must be signed in.");
+  }
+
+  const cleanRentalId = String(rentalId || "").trim();
+  if (!cleanRentalId) {
+    throw new Error("Rental is required.");
+  }
+
+  const { data: rental, error: rentalError } = await supabase
+    .from("rentals")
+    .select("id, organization_id, customer_id, vehicle_id, start_date, end_date, rental_rate, pricing_model, billing_interval, currency")
+    .eq("id", cleanRentalId)
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (rentalError || !rental) {
+    throw new Error(rentalError?.message || "Rental was not found.");
+  }
+
+  await ensureMembership(supabase, rental.organization_id, user.id);
+
+  if (!rental.customer_id || !rental.vehicle_id) {
+    throw new Error("A customer and vehicle are required before generating a payment schedule.");
+  }
+
+  const rentalRate = Number(rental.rental_rate || 0);
+  if (rentalRate <= 0) {
+    throw new Error("Set a rental rate before generating a payment schedule.");
+  }
+
+  const firstFallbackDate = dateOnly(rental.start_date);
+  if (!firstFallbackDate) {
+    throw new Error("Set a rental start date before generating a payment schedule.");
+  }
+
+  const { data: existingPayments, error: paymentsError } = await supabase
+    .from("rental_payments")
+    .select("id, due_date, status, amount, currency, voided, metadata, transaction_id")
+    .eq("organization_id", rental.organization_id)
+    .eq("rental_id", rental.id)
+    .is("deleted_at", null);
+
+  if (paymentsError) {
+    throw new Error(paymentsError.message);
+  }
+
+  const nonVoidedRentPayments = (existingPayments || []).filter((payment: any) => {
+    const metadata = payment.metadata || {};
+    const type = String(metadata.type || "rent").toLowerCase();
+    return payment.status !== "voided" && !payment.voided && !metadata.voided && !["deposit", "deposit_received", "deposit_refunded"].includes(type);
+  });
+
+  const firstPaidPayment = [...nonVoidedRentPayments]
+    .filter((payment: any) => payment.status === "paid" && dateOnly(payment.due_date))
+    .sort((a: any, b: any) => dateOnly(a.due_date).localeCompare(dateOnly(b.due_date)))[0];
+  const firstPaymentDate = dateOnly(firstPaidPayment?.due_date) || firstFallbackDate;
+
+  const generatedStatusesToReplace = new Set(["scheduled", "pending", "overdue"]);
+  const preservedDueDates = new Set(
+    nonVoidedRentPayments
+      .filter((payment: any) => !generatedStatusesToReplace.has(String(payment.status || "")) || Boolean(payment.transaction_id))
+      .map((payment: any) => dateOnly(payment.due_date))
+      .filter(Boolean)
+  );
+
+  const { error: deleteError } = await supabase
+    .from("rental_payments")
+    .delete()
+    .eq("organization_id", rental.organization_id)
+    .eq("rental_id", rental.id)
+    .in("status", ["scheduled", "pending", "overdue"])
+    .is("transaction_id", null);
+
+  if (deleteError) {
+    throw new Error(deleteError.message);
+  }
+
+  const { data: existingTransactions, error: transactionsError } = await supabase
+    .from("transactions")
+    .select("id, amount, transaction_date, voided, metadata")
+    .eq("organization_id", rental.organization_id)
+    .eq("rental_id", rental.id)
+    .eq("type", "rental_income")
+    .or("voided.is.null,voided.eq.false")
+    .order("transaction_date", { ascending: true });
+
+  if (transactionsError) {
+    throw new Error(transactionsError.message);
+  }
+
+  const endDate = dateOnly(rental.end_date);
+  const today = todayDate();
+  const records: Record<string, any>[] = [];
+  const usedTransactionIds = new Set<string>(
+    nonVoidedRentPayments.map((payment: any) => String(payment.transaction_id || "")).filter(Boolean)
+  );
+  let matchedCount = 0;
+  let overdueCount = 0;
+  let upcomingCount = 0;
+
+  for (let periodIndex = 0; periodIndex < 12; periodIndex += 1) {
+    const dueDate = addMonthsToDate(firstPaymentDate, periodIndex);
+    if (!dueDate) continue;
+    if (endDate && dueDate > endDate) break;
+    if (preservedDueDates.has(dueDate)) continue;
+
+    const matchedTransaction = findScheduleTransactionMatch({
+      dueDate,
+      amount: rentalRate,
+      transactions: existingTransactions || [],
+      usedTransactionIds
+    });
+    const matchedTransactionId = matchedTransaction?.id ? String(matchedTransaction.id) : null;
+    if (matchedTransactionId) {
+      usedTransactionIds.add(matchedTransactionId);
+    }
+
+    let status = "scheduled";
+    if (matchedTransactionId) {
+      status = "paid";
+      matchedCount += 1;
+    } else if (dueDate < today) {
+      status = "overdue";
+      overdueCount += 1;
+    } else {
+      status = dueDate === today ? "pending" : "scheduled";
+      upcomingCount += 1;
+    }
+
+    records.push({
+      organization_id: rental.organization_id,
+      rental_id: rental.id,
+      customer_id: rental.customer_id,
+      vehicle_id: rental.vehicle_id,
+      amount: rentalRate,
+      currency: rental.currency || "THB",
+      scheduled_date: dueDate,
+      due_date: dueDate,
+      status,
+      paid_at: matchedTransaction?.transaction_date ? new Date(matchedTransaction.transaction_date).toISOString() : null,
+      transaction_id: matchedTransactionId,
+      metadata: {
+        type: "rent",
+        is_deposit: false,
+        period_index: periodIndex,
+        period_label: monthYearLabel(dueDate),
+        auto_matched: Boolean(matchedTransactionId),
+        matched_transaction_id: matchedTransactionId,
+        description: `${monthYearLabel(dueDate)} rental payment`,
+        generated_by: user.id,
+        generated_source: "operator_payment_schedule_button",
+        generated_at: new Date().toISOString()
+      }
+    });
+  }
+
+  if (records.length > 0) {
+    const { error: insertError } = await supabase.from("rental_payments").insert(records);
+    if (insertError) {
+      throw new Error(insertError.message);
+    }
+  }
+
+  const message = `Payment schedule generated - ${matchedCount} matched to existing transactions, ${overdueCount} overdue, ${upcomingCount} upcoming`;
+  const detail = `${message}.`;
+  await recordActivityEvent(supabase, {
+    organization_id: rental.organization_id,
+    actor_id: user.id,
+    entity_type: "rental",
+    entity_id: rental.id,
+    vehicle_id: rental.vehicle_id,
+    rental_id: rental.id,
+    customer_id: rental.customer_id,
+    event_type: "payment_schedule_generated",
+    title: "Payment schedule generated",
+    detail,
+    metadata: {
+      content: detail,
+      count: records.length,
+      matched_count: matchedCount,
+      overdue_count: overdueCount,
+      upcoming_count: upcomingCount,
+      first_payment_date: firstPaymentDate,
+      rental_rate: rentalRate,
+      billing_period: rental.billing_interval || rental.pricing_model || "monthly"
+    }
+  });
+
+  revalidatePath("/");
+  revalidatePath("/bookings");
+  revalidatePath(`/bookings/${rental.id}`);
+  revalidatePath(`/bookings/${rental.id}/edit`);
+  revalidatePath("/calendar");
+
+  return { success: true, count: records.length, matched: matchedCount, overdue: overdueCount, upcoming: upcomingCount, message };
+}
+
+export async function matchPaymentsToTransactions(rentalId: string) {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error("You must be signed in.");
+  }
+
+  const cleanRentalId = String(rentalId || "").trim();
+  if (!cleanRentalId) {
+    throw new Error("Rental is required.");
+  }
+
+  const { data: rental, error: rentalError } = await supabase
+    .from("rentals")
+    .select("id, organization_id, customer_id, vehicle_id, rental_rate")
+    .eq("id", cleanRentalId)
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (rentalError || !rental) {
+    throw new Error(rentalError?.message || "Rental was not found.");
+  }
+
+  await ensureMembership(supabase, rental.organization_id, user.id);
+
+  const { data: payments, error: paymentsError } = await supabase
+    .from("rental_payments")
+    .select("id, amount, due_date, status, voided, metadata, transaction_id")
+    .eq("organization_id", rental.organization_id)
+    .eq("rental_id", rental.id)
+    .is("deleted_at", null)
+    .is("transaction_id", null)
+    .or("voided.is.null,voided.eq.false")
+    .order("due_date", { ascending: true });
+
+  if (paymentsError) {
+    throw new Error(paymentsError.message);
+  }
+
+  const candidatePayments = (payments || []).filter((payment: any) => {
+    const metadata = payment.metadata || {};
+    const type = String(metadata.type || "rent").toLowerCase();
+    const status = String(payment.status || "").toLowerCase();
+    return !["voided", "cancelled", "refunded"].includes(status) && !metadata.voided && !["deposit", "deposit_received", "deposit_refunded"].includes(type);
+  });
+
+  const { data: allLinkedPayments } = await supabase
+    .from("rental_payments")
+    .select("transaction_id")
+    .eq("organization_id", rental.organization_id)
+    .eq("rental_id", rental.id)
+    .is("deleted_at", null);
+
+  const usedTransactionIds = new Set<string>(
+    (allLinkedPayments || []).map((payment: any) => String(payment.transaction_id || "")).filter(Boolean)
+  );
+
+  const { data: transactions, error: transactionsError } = await supabase
+    .from("transactions")
+    .select("id, amount, transaction_date, voided, metadata")
+    .eq("organization_id", rental.organization_id)
+    .eq("rental_id", rental.id)
+    .eq("type", "rental_income")
+    .or("voided.is.null,voided.eq.false")
+    .order("transaction_date", { ascending: true });
+
+  if (transactionsError) {
+    throw new Error(transactionsError.message);
+  }
+
+  let matched = 0;
+
+  for (const payment of candidatePayments) {
+    const dueDate = dateOnly(payment.due_date);
+    if (!dueDate) continue;
+
+    const expectedAmount = Number(payment.amount || rental.rental_rate || 0);
+    const matchedTransaction = findScheduleTransactionMatch({
+      dueDate,
+      amount: expectedAmount,
+      transactions: transactions || [],
+      usedTransactionIds
+    });
+    const transactionId = matchedTransaction?.id ? String(matchedTransaction.id) : "";
+    if (!transactionId) continue;
+
+    usedTransactionIds.add(transactionId);
+    const metadata = payment.metadata || {};
+    const { error: updateError } = await supabase
+      .from("rental_payments")
+      .update({
+        status: "paid",
+        paid_at: matchedTransaction.transaction_date ? new Date(matchedTransaction.transaction_date).toISOString() : new Date().toISOString(),
+        transaction_id: transactionId,
+        metadata: {
+          ...metadata,
+          auto_matched: true,
+          matched_transaction_id: transactionId,
+          matched_at: new Date().toISOString(),
+          matched_by: user.id
+        }
+      })
+      .eq("id", payment.id)
+      .eq("organization_id", rental.organization_id);
+
+    if (updateError) {
+      throw new Error(updateError.message);
+    }
+
+    matched += 1;
+  }
+
+  const message = `Payment schedule matched - ${matched} linked to existing transactions`;
+  if (matched > 0) {
+    await recordActivityEvent(supabase, {
+      organization_id: rental.organization_id,
+      actor_id: user.id,
+      entity_type: "rental",
+      entity_id: rental.id,
+      vehicle_id: rental.vehicle_id,
+      rental_id: rental.id,
+      customer_id: rental.customer_id,
+      event_type: "payment_schedule_matched",
+      title: "Payment schedule matched",
+      detail: message,
+      metadata: {
+        content: message,
+        matched_count: matched
+      }
+    });
+  }
+
+  revalidatePath("/");
+  revalidatePath("/bookings");
+  revalidatePath(`/bookings/${rental.id}`);
+  revalidatePath(`/bookings/${rental.id}/edit`);
+  revalidatePath("/calendar");
+
+  return { success: true, matched, message };
 }
 
 export async function adjustRental(params: {
@@ -1630,6 +2158,50 @@ export async function adjustRental(params: {
       throw new Error(updateError.message);
     }
 
+    // Fetch future scheduled/pending payments past the new return date
+    const { data: futurePayments, error: futurePaymentFetchError } = await supabase
+      .from("rental_payments")
+      .select("id")
+      .eq("rental_id", rental.id)
+      .eq("organization_id", rental.organization_id)
+      .in("status", ["scheduled", "pending"])
+      .gt("due_date", cleanEndDate)
+      .or("voided.is.null,voided.eq.false");
+
+    if (futurePaymentFetchError) {
+      throw new Error(futurePaymentFetchError.message);
+    }
+
+    const futurePaymentIds = (futurePayments || []).map((p: any) => p.id);
+
+    if (futurePaymentIds.length > 0) {
+      // Delete associated payment reminder tasks first
+      await supabase
+        .from("tasks")
+        .delete()
+        .eq("organization_id", rental.organization_id)
+        .in("rental_payment_id", futurePaymentIds);
+
+      // Delete the payments themselves
+      await supabase
+        .from("rental_payments")
+        .delete()
+        .eq("rental_id", rental.id)
+        .eq("organization_id", rental.organization_id)
+        .in("id", futurePaymentIds);
+    }
+
+    // Belt-and-suspenders: delete any remaining payment reminder tasks past return date
+    await supabase
+      .from("tasks")
+      .delete()
+      .eq("organization_id", rental.organization_id)
+      .eq("rental_id", rental.id)
+      .eq("task_type", "payment_reminder")
+      .gt("due_at", `${cleanEndDate}T23:59:59.999Z`);
+
+    const futurePaymentsDeleted = futurePaymentIds.length;
+
     if (refundAmount > 0) {
       const description = `Partial refund - early return ${daysEarly} days early${refundReason ? `. ${refundReason}` : ""}`;
       const { error: transactionError } = await supabase.from("transactions").insert({
@@ -1662,7 +2234,11 @@ export async function adjustRental(params: {
       }
     }
 
-    const detail = `Early return recorded - new end date ${cleanEndDate}. ${refundAmount > 0 ? `Refund of THB ${Math.round(refundAmount).toLocaleString()} issued.` : "No refund issued."}${refundReason ? ` ${refundReason}` : ""}${cleanNote ? ` ${cleanNote}` : ""}`;
+    const voidedSentence =
+      futurePaymentsDeleted > 0
+        ? ` ${futurePaymentsDeleted} future payment ${futurePaymentsDeleted === 1 ? "record" : "records"} deleted.`
+        : " No future payment records removed.";
+    const detail = `Early return recorded - new end date ${cleanEndDate}. ${refundAmount > 0 ? `Refund of THB ${Math.round(refundAmount).toLocaleString()} issued.` : "No refund issued."}${voidedSentence}${refundReason ? ` ${refundReason}` : ""}${cleanNote ? ` ${cleanNote}` : ""}`;
 
     await Promise.all([
       recordActivityEvent(supabase, {
@@ -1693,6 +2269,7 @@ export async function adjustRental(params: {
           advance_paid_amount: advancePaidAmount,
           refund_amount: refundAmount,
           refund_reason: refundReason,
+          future_payment_records_deleted: futurePaymentsDeleted,
           note: cleanNote
         },
         created_by: user.id
@@ -2007,7 +2584,7 @@ export async function recordPaymentReceived(paymentId: string, fields: RecordPay
   return { success: true };
 }
 
-export async function voidRentalPayment(paymentId: string, reason?: string | null) {
+export async function deleteRentalPayment(paymentId: string) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -2024,7 +2601,7 @@ export async function voidRentalPayment(paymentId: string, reason?: string | nul
 
   const { data: payment, error } = await supabase
     .from("rental_payments")
-    .select("*")
+    .select("id, rental_id, organization_id, transaction_id, amount")
     .eq("id", cleanPaymentId)
     .is("deleted_at", null)
     .maybeSingle();
@@ -2033,47 +2610,108 @@ export async function voidRentalPayment(paymentId: string, reason?: string | nul
     throw new Error(error?.message || "Payment was not found.");
   }
 
-  await ensureMembership(supabase, payment.organization_id, user.id);
+  const { data: rentalForAuth } = await supabase
+    .from("rentals")
+    .select("organization_id")
+    .eq("id", payment.rental_id)
+    .maybeSingle();
 
-  const voidReason = String(reason || "").trim() || "Correction";
-  const description = payment.metadata?.description || "Scheduled payment";
-  const metadata = {
-    ...(payment.metadata || {}),
-    voided: true,
-    voided_at: new Date().toISOString(),
-    voided_by: user.id,
-    void_reason: voidReason
-  };
+  const orgId: string = rentalForAuth?.organization_id || payment.organization_id;
+  await ensureMembership(supabase, orgId, user.id);
 
-  const { error: updateError } = await supabase
-    .from("rental_payments")
-    .update({ status: "voided", metadata })
-    .eq("id", payment.id)
-    .eq("organization_id", payment.organization_id);
-
-  if (updateError) {
-    throw new Error(updateError.message);
+  // Clear the transaction link before deleting
+  if (payment.transaction_id) {
+    await supabase
+      .from("rental_payments")
+      .update({ transaction_id: null })
+      .eq("id", payment.id)
+      .eq("organization_id", orgId);
   }
 
-  const detail = `Payment voided: ${description} THB ${Math.round(Number(payment.amount || 0)).toLocaleString()} - ${voidReason}`;
-  await recordActivityEvent(supabase, {
-    organization_id: payment.organization_id,
-    actor_id: user.id,
-    entity_type: "payment",
-    entity_id: payment.id,
-    vehicle_id: payment.vehicle_id || null,
-    rental_id: payment.rental_id,
-    customer_id: payment.customer_id || null,
-    event_type: "correction",
-    title: "Payment voided",
-    detail,
-    metadata: { type: "correction", content: detail, void_reason: voidReason }
-  });
+  const { error: deleteError } = await supabase
+    .from("rental_payments")
+    .delete()
+    .eq("id", payment.id)
+    .eq("organization_id", orgId);
+
+  if (deleteError) {
+    throw new Error(deleteError.message);
+  }
 
   revalidatePath("/");
   revalidatePath("/bookings");
   revalidatePath(`/bookings/${payment.rental_id}`);
+  revalidatePath("/transactions");
   revalidatePath("/calendar");
 
   return { success: true };
+}
+
+export async function cleanupDepositPayments(rentalId: string) {
+  "use server";
+  const supabase = (await createSupabaseServerClient()) as any;
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, error: "You must be signed in." };
+  }
+
+  const cleanRentalId = String(rentalId || "").trim();
+  if (!cleanRentalId) {
+    return { success: false, error: "Rental ID is required." };
+  }
+
+  const { data: rental } = await supabase
+    .from("rentals")
+    .select("id, organization_id, deposit_held")
+    .eq("id", cleanRentalId)
+    .maybeSingle();
+
+  if (!rental) {
+    return { success: false, error: "Rental not found." };
+  }
+
+  await ensureMembership(supabase, rental.organization_id, user.id);
+
+  const { data: payments } = await supabase
+    .from("rental_payments")
+    .select("id, amount, status, voided, metadata")
+    .eq("organization_id", rental.organization_id)
+    .eq("rental_id", cleanRentalId)
+    .is("deleted_at", null);
+
+  const depositHeld = Number(rental.deposit_held || 0);
+  const depositPaymentIds = (payments || [])
+    .filter((p: any) => !p.voided && p.status !== "voided")
+    .filter((p: any) =>
+      p.metadata?.is_deposit === true ||
+      p.metadata?.type === "deposit" ||
+      (depositHeld > 0 && Number(p.amount) === depositHeld)
+    )
+    .map((p: any) => p.id);
+
+  if (depositPaymentIds.length === 0) {
+    return { success: true, voided: 0 };
+  }
+
+  const { error } = await supabase
+    .from("rental_payments")
+    .update({
+      voided: true,
+      status: "voided",
+      metadata: { voided_reason: "Deposit tracked via deposit_held — payment record not needed", voided_at: new Date().toISOString(), voided_by: user.id }
+    })
+    .in("id", depositPaymentIds)
+    .eq("organization_id", rental.organization_id);
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath(`/bookings/${cleanRentalId}`);
+  revalidatePath(`/bookings/${cleanRentalId}/edit`);
+
+  return { success: true, voided: depositPaymentIds.length };
 }

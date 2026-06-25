@@ -37,6 +37,7 @@ type DamageItem = {
 type ReceiptResult = {
   receipt_number: string;
   pdf_url: string;
+  warning?: string;
 };
 
 const inputClass =
@@ -706,7 +707,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
               <p className="font-black text-[#92400e]">Fuel deficit: approximately {deliveryFuel - fuelLevel}%</p>
               <label className="mt-2 block text-sm font-bold text-[#10252b]">
                 Apply fuel charge?
-                <input className={inputClass} min="0" onChange={(event) => setFuelDeficitCharge(Number(event.target.value || 0))} placeholder="THB" type="number" value={fuelDeficitCharge || ""} />
+                <input className={inputClass} min="0" onChange={(event) => setFuelDeficitCharge(Number(event.target.value || 0))} placeholder="THB" step="0.01" type="number" value={fuelDeficitCharge || ""} />
               </label>
             </div>
           ) : null}
@@ -801,7 +802,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
           {mode === "return" && damageItems.some((item) => !item.is_pre_existing) ? (
             <label className="mt-4 block rounded-lg border border-[#fecdd3] bg-[#fff1f2] p-3">
               <span className="text-sm font-black text-[#be123c]">New damage found — apply damage excess charge?</span>
-              <input className={inputClass} min="0" onChange={(event) => setDamageCharge(Number(event.target.value || 0))} placeholder="THB" type="number" value={damageCharge || ""} />
+              <input className={inputClass} min="0" onChange={(event) => setDamageCharge(Number(event.target.value || 0))} placeholder="THB" step="0.01" type="number" value={damageCharge || ""} />
             </label>
           ) : null}
         </StepShell>
@@ -855,7 +856,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
             <Row label="Damage excess" value={`-${money(damageCharge)}`} danger />
             <label className="block rounded-lg border border-[#d6e5e2] bg-[#f8fffd] p-3">
               <span className="text-sm font-black text-[#10252b]">Cleaning fee (optional)</span>
-              <input className={inputClass} min="0" onChange={(event) => setCleaningCharge(Number(event.target.value || 0))} placeholder="THB" type="number" value={cleaningCharge || ""} />
+              <input className={inputClass} min="0" onChange={(event) => setCleaningCharge(Number(event.target.value || 0))} placeholder="THB" step="0.01" type="number" value={cleaningCharge || ""} />
             </label>
             {requestedDeductions > availableToReconcile ? (
               <p className="rounded-lg border border-[#fbbf24] bg-[#fffbeb] px-3 py-2 text-sm font-bold text-[#92400e]">
@@ -869,7 +870,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
             </div>
             <label className="block">
               <span className="text-sm font-bold text-[#10252b]">Override refund amount if needed</span>
-              <input className={inputClass} min="0" onChange={(event) => setRefundOverride(event.target.value)} placeholder={String(calculatedRefund)} type="number" value={refundOverride} />
+              <input className={inputClass} min="0" onChange={(event) => setRefundOverride(event.target.value)} placeholder={String(calculatedRefund)} step="0.01" type="number" value={refundOverride} />
             </label>
           </div>
         </StepShell>
@@ -922,6 +923,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                       setReceiptError("");
                     }}
                     placeholder="THB"
+                    step="0.01"
                     type="number"
                     value={deliveryPaymentAmount}
                   />
@@ -937,6 +939,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                       setReceiptError("");
                     }}
                     placeholder="THB"
+                    step="0.01"
                     type="number"
                     value={deliveryDepositAmount}
                   />
@@ -962,14 +965,19 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                   <p className="mt-1 text-xs font-semibold text-[#166534]">
                     Rental payment {money(Number(deliveryPaymentAmount || 0))} · Deposit {money(Number(deliveryDepositAmount || 0))}
                   </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <button className={`${touchButton} border border-[#bbf7d0] bg-white text-[#166534]`} onClick={shareReceipt} type="button">
-                      Share receipt
-                    </button>
-                    <a className={`${touchButton} border border-[#bbf7d0] bg-white text-[#166534]`} href={receiptResult.pdf_url} rel="noreferrer" target="_blank">
-                      Download receipt
-                    </a>
-                  </div>
+                  {receiptResult.warning ? (
+                    <p className="mt-2 rounded-lg border border-[#fbbf24] bg-[#fffbeb] px-3 py-2 text-xs font-bold text-[#92400e]">{receiptResult.warning}</p>
+                  ) : null}
+                  {receiptResult.pdf_url ? (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <button className={`${touchButton} border border-[#bbf7d0] bg-white text-[#166534]`} onClick={shareReceipt} type="button">
+                        Share receipt
+                      </button>
+                      <a className={`${touchButton} border border-[#bbf7d0] bg-white text-[#166534]`} href={receiptResult.pdf_url} rel="noreferrer" target="_blank">
+                        Download receipt
+                      </a>
+                    </div>
+                  ) : null}
                 </div>
               ) : null}
             </div>

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { applyDepositDeduction, returnDeposit } from "@/app/actions/deposits";
+import { activateRental } from "@/lib/rental-activation";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { notifyOperator } from "@/lib/notify-operator";
@@ -224,7 +225,7 @@ async function reconcileReturnDeposit(formData: FormData, organizationId: string
 async function createOnDeliveryPaymentRecords(supabase: any, organizationId: string, rentalId: string) {
   const { data: rental, error } = await supabase
     .from("rentals")
-    .select("id, organization_id, customer_id, vehicle_id, currency, payment_due_after_delivery, first_payment_amount, deposit_payment_amount")
+    .select("id, organization_id, customer_id, vehicle_id, currency, payment_due_trigger, payment_due_after_delivery, first_payment_amount, deposit_payment_amount")
     .eq("id", rentalId)
     .eq("organization_id", organizationId)
     .maybeSingle();
@@ -233,12 +234,35 @@ async function createOnDeliveryPaymentRecords(supabase: any, organizationId: str
     throw new Error(error.message);
   }
 
-  if (!rental?.payment_due_after_delivery) {
+  // payment_due_trigger is the primary state machine; payment_due_after_delivery is the legacy fallback
+  const isOnDelivery =
+    rental?.payment_due_trigger === "on_delivery" ||
+    (rental?.payment_due_trigger == null && rental?.payment_due_after_delivery);
+  if (!isOnDelivery) {
     return;
   }
 
   if (!rental.customer_id || !rental.vehicle_id) {
     throw new Error("Customer and vehicle are required before creating delivery payment records.");
+  }
+
+  // Idempotency: if non-voided payment records already exist, skip creation entirely
+  const { data: existingPayments, error: existingError } = await supabase
+    .from("rental_payments")
+    .select("id, status, voided")
+    .eq("organization_id", organizationId)
+    .eq("rental_id", rentalId)
+    .is("deleted_at", null);
+
+  if (existingError) {
+    throw new Error(existingError.message);
+  }
+
+  const activePayments = (existingPayments || []).filter(
+    (p: any) => !p.voided && !["voided", "waived", "cancelled"].includes(p.status)
+  );
+  if (activePayments.length > 0) {
+    return;
   }
 
   const dueDate = todayDate();
@@ -277,6 +301,7 @@ async function createOnDeliveryPaymentRecords(supabase: any, organizationId: str
       status: "pending",
       currency: rental.currency || "THB",
       metadata: {
+        is_deposit: true,
         type: "deposit",
         description: "Security deposit - collected on delivery",
         payment_trigger: "on_delivery"
@@ -291,9 +316,10 @@ async function createOnDeliveryPaymentRecords(supabase: any, organizationId: str
     }
   }
 
+  // Advance state machine to 'confirmed' to prevent any future re-triggering
   const { error: clearError } = await supabase
     .from("rentals")
-    .update({ payment_due_after_delivery: false })
+    .update({ payment_due_after_delivery: false, payment_due_trigger: "confirmed" })
     .eq("id", rental.id)
     .eq("organization_id", rental.organization_id);
 
@@ -447,6 +473,8 @@ export async function submitInspection(formData: FormData) {
     }
 
     await createOnDeliveryPaymentRecords(supabase, organizationId, rentalId);
+    // Generate payment schedule (idempotent — skips if already exists)
+    await activateRental(rentalId, supabase).catch(() => null);
   }
 
   if (mode === "return" && rentalId) {

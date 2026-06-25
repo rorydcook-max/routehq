@@ -5,9 +5,10 @@ import Link from "next/link";
 import type { Route } from "next";
 import { useRouter } from "next/navigation";
 import { CalendarDays, Car, CheckCircle2, MapPin, Plus, Trash2 } from "lucide-react";
-import { addRentalPayment, updateBooking, updateRentalPayment, voidRentalPayment } from "@/app/actions/bookings";
+import { addRentalPayment, cleanupDepositPayments, deleteRentalPayment, updateBooking, updateRentalPayment } from "@/app/actions/bookings";
 import { CustomerSelector } from "@/components/customer-selector";
 import { Badge, Card, SectionHeader } from "@/components/ui";
+import { isMapsUrl } from "@/lib/delivery-location";
 
 type Customer = {
   id: string;
@@ -261,11 +262,43 @@ function DeliveryMethodCards({ value }: { value: string }) {
   );
 }
 
-function PaymentEditor({ payments, rentalId, currency }: { payments: any[]; rentalId: string; currency: string }) {
+function PaymentEditor({ payments, rentalId, currency, depositHeld }: { payments: any[]; rentalId: string; currency: string; depositHeld: number }) {
   const router = useRouter();
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [isPending, startTransition] = useTransition();
+  const [cleanupMessage, setCleanupMessage] = useState<string | null>(null);
+
+  const hasDepositPayments = depositHeld > 0 && payments.some(
+    (p) => !p.voided && p.status !== "voided" &&
+      (p.metadata?.is_deposit === true || p.metadata?.type === "deposit" ||
+        Number(p.amount) === depositHeld)
+  );
+  const hasUpcomingRentPayments = payments.some((payment) => {
+    const metadata = payment?.metadata || {};
+    const type = String(metadata.type || "rent").toLowerCase();
+    const status = String(payment?.status || "").toLowerCase();
+    return (
+      !payment?.voided &&
+      !metadata.voided &&
+      !["deposit", "deposit_received", "deposit_refunded"].includes(type) &&
+      !["paid", "waived", "voided", "cancelled", "refunded", "reconciled"].includes(status)
+    );
+  });
+
+  function runDepositCleanup() {
+    setCleanupMessage(null);
+    startTransition(async () => {
+      const result = await cleanupDepositPayments(rentalId);
+      if (result.success) {
+        setCleanupMessage(`Voided ${result.voided} deposit payment record${result.voided === 1 ? "" : "s"}.`);
+        router.refresh();
+      } else {
+        setCleanupMessage(result.error || "Failed to clean up deposit records.");
+      }
+    });
+  }
 
   function savePayment(payment: any, formData: FormData) {
     setMessage("");
@@ -286,16 +319,15 @@ function PaymentEditor({ payments, rentalId, currency }: { payments: any[]; rent
     });
   }
 
-  function voidPayment(payment: any) {
-    if (!window.confirm("Are you sure you want to void this payment? This cannot be undone.")) return;
-    const reason = window.prompt("Reason for voiding this payment?", "Correction");
+  function deletePayment(paymentId: string) {
     setMessage("");
     startTransition(async () => {
       try {
-        await voidRentalPayment(payment.id, reason);
+        await deleteRentalPayment(paymentId);
+        setConfirmDeleteId(null);
         router.refresh();
       } catch (error) {
-        setMessage(error instanceof Error ? error.message : "Unable to void payment.");
+        setMessage(error instanceof Error ? error.message : "Unable to delete payment.");
       }
     });
   }
@@ -319,6 +351,33 @@ function PaymentEditor({ payments, rentalId, currency }: { payments: any[]; rent
       <SectionHeader eyebrow="Payment records" title="Edit schedule and corrections" />
       <div className="card-section overflow-x-auto">
         {message ? <p className="mb-3 rounded-lg border border-[#fecaca] bg-[#fef2f2] p-2 text-xs font-bold text-[#dc2626]">{message}</p> : null}
+        {!hasUpcomingRentPayments ? (
+          <div className="mb-3 rounded-[10px] border border-[#fde68a] bg-[#fffbeb] p-3">
+            <p className="text-[13px] font-semibold text-[#92400e]">No payment schedule found</p>
+            <p className="mt-1 text-xs text-[#b45309]">
+              No upcoming payment records exist. The schedule generates automatically when the rental activates — check the main booking page.
+            </p>
+          </div>
+        ) : null}
+        {hasDepositPayments ? (
+          <div className="mb-3 flex items-center gap-3 rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
+            <div className="flex-1">
+              <p className="text-xs font-bold text-[#92400e]">Deposit payment record detected</p>
+              <p className="mt-0.5 text-xs text-[#92400e]">A ฿{depositHeld.toLocaleString()} deposit payment record exists but deposits are tracked via deposit_held. Void it to fix the outstanding balance.</p>
+            </div>
+            <button
+              className="pressable shrink-0 rounded-lg border border-[#fde68a] bg-white px-3 py-2 text-xs font-bold text-[#92400e] hover:bg-[#fef3c7]"
+              disabled={isPending}
+              onClick={runDepositCleanup}
+              type="button"
+            >
+              Fix deposit records
+            </button>
+          </div>
+        ) : null}
+        {cleanupMessage ? (
+          <p className="mb-3 rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] p-2 text-xs font-bold text-[#15803d]">{cleanupMessage}</p>
+        ) : null}
         <table className="min-w-[760px] w-full text-left">
           <thead>
             <tr>
@@ -366,12 +425,19 @@ function PaymentEditor({ payments, rentalId, currency }: { payments: any[]; rent
                   <td className={`font-mono-data text-right font-bold ${voided ? "line-through" : ""}`}>{money(payment.amount, payment.currency || currency)}</td>
                   <td>
                     {!voided ? (
-                      <div className="flex justify-end gap-2">
-                        <button className="secondary-action pressable min-h-8 px-3 text-xs" onClick={() => setEditingId(payment.id)} type="button">Edit</button>
-                        <button className="pressable inline-flex min-h-8 items-center justify-center rounded-lg border border-[#fecaca] bg-[#fef2f2] px-2 text-xs font-bold text-[#dc2626]" onClick={() => voidPayment(payment)} type="button">
-                          <Trash2 size={13} />
-                        </button>
-                      </div>
+                      confirmDeleteId === payment.id ? (
+                        <div className="flex justify-end gap-1">
+                          <button className="pressable min-h-8 rounded-lg border border-[#fecaca] bg-[#dc2626] px-3 text-xs font-bold text-white" disabled={isPending} onClick={() => deletePayment(payment.id)} type="button">Confirm delete</button>
+                          <button className="secondary-action pressable min-h-8 px-3 text-xs" onClick={() => setConfirmDeleteId(null)} type="button">Cancel</button>
+                        </div>
+                      ) : (
+                        <div className="flex justify-end gap-2">
+                          <button className="secondary-action pressable min-h-8 px-3 text-xs" onClick={() => setEditingId(payment.id)} type="button">Edit</button>
+                          <button className="pressable inline-flex min-h-8 items-center justify-center rounded-lg border border-[#fecaca] bg-[#fef2f2] px-2 text-xs font-bold text-[#dc2626]" onClick={() => setConfirmDeleteId(payment.id)} type="button">
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      )
                     ) : null}
                   </td>
                 </tr>
@@ -492,6 +558,7 @@ export function BookingEditForm({
                 </label>
                 <MoneyField label="Rental rate" name="rentalRate" required value={rental.rental_rate} />
                 <MoneyField label="Deposit amount" name="depositAmount" value={rental.deposit_amount} />
+                <MoneyField label="Deposit held (actual)" name="depositHeld" value={rental.deposit_held} />
               </div>
             </Card>
           </div>
@@ -509,6 +576,11 @@ export function BookingEditForm({
                   label={deliveryMethod === "collection" ? "Collection location" : "Delivery location"}
                   value={deliveryLocation}
                 />
+                {isMapsUrl(String(deliveryLocation)) ? (
+                  <p className="mt-1 rounded-lg bg-amber-50 px-3 py-2 text-xs font-medium text-amber-700">
+                    Location stored as coordinates. Edit this field to add a readable address.
+                  </p>
+                ) : null}
                 <label className="block">
                   <FieldLabel>Delivery / collection date and time</FieldLabel>
                   <input className="mt-1 w-full font-mono-data" defaultValue={dateTimeInput(deliveryDateTime)} name="deliveryDateTime" type="datetime-local" />
@@ -543,7 +615,7 @@ export function BookingEditForm({
         </div>
       </form>
 
-      <PaymentEditor currency={rental.currency || "THB"} payments={payments} rentalId={rental.id} />
+      <PaymentEditor currency={rental.currency || "THB"} depositHeld={Number(rental.deposit_held || 0)} payments={payments} rentalId={rental.id} />
 
       <div className="sticky bottom-0 z-20 -mx-4 flex gap-2 border-t border-[var(--border)] bg-white/95 p-3 backdrop-blur sm:mx-0 sm:rounded-lg sm:border">
         <Link className="secondary-action pressable min-h-11 flex-1 justify-center" href={`/bookings/${rental.id}` as Route}>

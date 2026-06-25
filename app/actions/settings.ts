@@ -223,6 +223,50 @@ export async function updatePaymentSettings(formData: FormData) {
   revalidatePath("/settings");
 }
 
+export async function updateUpfrontDiscountSettings(formData: FormData) {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const { data: membership, error: membershipError } = await supabase
+    .from("organization_members")
+    .select("organization_id")
+    .eq("user_id", user.id)
+    .eq("is_active", true)
+    .limit(1)
+    .maybeSingle();
+
+  if (membershipError || !membership?.organization_id) {
+    throw new Error(membershipError?.message || "Organization membership was not found.");
+  }
+
+  const enabled = String(formData.get("upfront_discount_enabled") || "") === "true";
+  const minPeriods = Math.max(1, Number(formData.get("upfront_discount_min_periods") || 3));
+  const rateValue = String(formData.get("upfront_discount_rate") || "").trim();
+  const label = String(formData.get("upfront_discount_label") || "").trim();
+
+  const { error } = await supabase
+    .from("organizations")
+    .update({
+      upfront_discount_enabled: enabled,
+      upfront_discount_min_periods: minPeriods,
+      upfront_discount_rate: rateValue ? Number(rateValue) : null,
+      upfront_discount_label: label || null
+    })
+    .eq("id", membership.organization_id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  revalidatePath("/settings");
+}
+
 export async function updateBusinessLogo(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
@@ -279,16 +323,18 @@ export async function updateBusinessLogo(formData: FormData) {
     }
 
     const storagePath = `${membership.organization_id}/branding/logo.${extension}`;
-    const { error: uploadError } = await supabase.storage.from("branding").upload(storagePath, logoFile, {
+    const buffer = Buffer.from(await logoFile.arrayBuffer());
+    const { error: uploadError } = await supabase.storage.from("documents").upload(storagePath, buffer, {
       contentType: logoFile.type || undefined,
       upsert: true
     });
 
     if (uploadError) {
+      console.error("Logo upload failed:", uploadError);
       throw new Error(uploadError.message);
     }
 
-    const { data: publicUrlData } = supabase.storage.from("branding").getPublicUrl(storagePath);
+    const { data: publicUrlData } = supabase.storage.from("documents").getPublicUrl(storagePath);
     logoUrl = publicUrlData?.publicUrl || null;
   }
 
@@ -1193,6 +1239,58 @@ export async function disconnectLine(formData: FormData) {
   if (error) throw new Error(error.message);
 
   revalidatePath("/settings");
+}
+
+export async function saveOperatorSignature(formData: FormData) {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect("/login");
+
+  const { data: membership, error: membershipError } = await supabase
+    .from("organization_members")
+    .select("organization_id")
+    .eq("user_id", user.id)
+    .eq("is_active", true)
+    .limit(1)
+    .maybeSingle();
+
+  if (membershipError || !membership?.organization_id) {
+    throw new Error(membershipError?.message || "Organization membership was not found.");
+  }
+
+  const removeSignature = String(formData.get("remove_signature") || "") === "true";
+  const signatureDataUrl = String(formData.get("signature_data_url") || "").trim();
+
+  let signatureUrl: string | null = null;
+
+  if (!removeSignature && signatureDataUrl.startsWith("data:image/png;base64,")) {
+    const base64Data = signatureDataUrl.slice("data:image/png;base64,".length);
+    const buffer = Buffer.from(base64Data, "base64");
+    const storagePath = `${membership.organization_id}/branding/operator-signature.png`;
+
+    const { error: uploadError } = await supabase.storage.from("branding").upload(storagePath, buffer, {
+      contentType: "image/png",
+      upsert: true
+    });
+
+    if (uploadError) throw new Error(uploadError.message);
+
+    const { data: publicUrlData } = supabase.storage.from("branding").getPublicUrl(storagePath);
+    signatureUrl = publicUrlData?.publicUrl ?? null;
+  }
+
+  const { error } = await supabase
+    .from("organizations")
+    .update({ owner_signature_url: signatureUrl })
+    .eq("id", membership.organization_id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/settings");
+  revalidatePath("/");
 }
 
 export async function sendTestLineSummary(): Promise<{ success: boolean; message: string }> {

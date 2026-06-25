@@ -9,18 +9,18 @@ import {
   mergeVehicleCatalogResearch,
   researchVehicleCatalogSubmission,
   rejectVehicleCatalogSubmission,
-  updateBusinessLogo,
   updateLineSettings,
-  updatePreferredLocale
+  updatePreferredLocale,
+  updateUpfrontDiscountSettings
 } from "@/app/actions/settings";
 import { BranchList } from "@/app/settings/branch-list";
+import { LogoUploadSection } from "@/app/settings/logo-upload-section";
 import { LineTestButton } from "@/app/settings/line-test-button";
 import { CopyButton } from "@/app/settings/copy-button";
 import { InviteForm } from "@/app/invite/invite-form";
 import { PaymentMethodsForm } from "@/app/settings/payment-methods-form";
 import { TravelPolicyForm } from "@/app/settings/travel-policy-form";
 import { AppShell } from "@/components/app-shell";
-import { BusinessLogoImage } from "@/components/business-logo-image";
 import { PendingButton } from "@/components/pending-button";
 import { Badge, Card, SectionHeader } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
@@ -267,52 +267,7 @@ export default async function SettingsPage() {
         <Card>
           <SectionHeader eyebrow="Organization" title={organization.name} />
           <div className="card-section">
-            {organization.logo_url ? (
-              <div className="flex flex-col gap-3 rounded-lg border border-[#dfe4ea] bg-[#fbfefd] p-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center gap-3">
-                  <BusinessLogoImage alt={`${organization.name} logo`} className="h-10 w-14 rounded-lg border border-[var(--border)] bg-white object-contain p-1.5" src={businessLogoUrl || organization.logo_url} />
-                  <div>
-                    <p className="text-[13px] font-bold text-[#172026]">Business logo</p>
-                    <p className="mt-0.5 text-[11px] leading-4 text-[#667085]">Appears on contracts, booking links and receipts.</p>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2 sm:flex-row">
-                  <form action={updateBusinessLogo}>
-                    <input name="remove_logo" type="hidden" value="true" />
-                    <PendingButton className="secondary-action w-full sm:w-auto" pendingLabel="Removing..." type="submit">
-                      Remove logo
-                    </PendingButton>
-                  </form>
-                  <form action={updateBusinessLogo} className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                    <input accept="image/png,image/jpeg,image/svg+xml,image/webp" className="max-w-52 text-xs text-[#667085] file:mr-2 file:rounded-lg file:border-0 file:bg-[#ecfeff] file:px-2.5 file:py-1.5 file:text-xs file:font-bold file:text-[#0e7490]" name="logo" required type="file" />
-                    <PendingButton className="primary-action w-full sm:w-auto" pendingLabel="Replacing..." type="submit">
-                      Replace logo
-                    </PendingButton>
-                  </form>
-                </div>
-              </div>
-            ) : (
-              <form action={updateBusinessLogo} className="flex flex-col gap-3 rounded-lg border border-[#dfe4ea] bg-[#fbfefd] p-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center gap-3">
-                <div className="flex h-10 w-14 shrink-0 items-center justify-center rounded-lg bg-[#ecfeff] text-[#0e7490]">
-                  <svg aria-hidden="true" fill="none" height="24" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" viewBox="0 0 24 24" width="24">
-                    <path d="M5 7h2l1.5-2h7L17 7h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z" />
-                    <circle cx="12" cy="14" r="4" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-[13px] font-bold text-[#172026]">Upload your business logo</p>
-                  <p className="mt-0.5 text-[11px] leading-4 text-[#667085]">PNG, JPG or SVG. Recommended 400x200px or wider. Appears on contracts, booking links and receipts.</p>
-                </div>
-                </div>
-                <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
-                  <input accept="image/png,image/jpeg,image/svg+xml,image/webp" className="max-w-52 text-xs text-[#667085] file:mr-2 file:rounded-lg file:border-0 file:bg-[#ecfeff] file:px-2.5 file:py-1.5 file:text-xs file:font-bold file:text-[#0e7490]" name="logo" required type="file" />
-                  <PendingButton className="primary-action w-full sm:w-auto" pendingLabel="Uploading..." type="submit">
-                    Upload logo
-                  </PendingButton>
-                </div>
-              </form>
-            )}
+            <LogoUploadSection logoUrl={businessLogoUrl || organization.logo_url} orgName={organization.name} />
           </div>
           <div className="card-section grid gap-3 sm:grid-cols-3">
             <div className="rounded-lg border border-[#dfe4ea] p-2">
@@ -370,6 +325,59 @@ export default async function SettingsPage() {
               default_payment_method: organization.default_payment_method
             }}
           />
+          <div className="mt-4 border-t border-[#dfe4ea] pt-4">
+            <p className="text-sm font-bold text-[#172026]">Upfront payment discount</p>
+            <p className="mt-1 text-xs text-[#667085]">Offer customers a discounted rate when they pay multiple months upfront. Only shown for monthly billing.</p>
+            <form action={updateUpfrontDiscountSettings} className="mt-3 space-y-3">
+              <label className="checkbox-label sub-surface min-h-10 font-semibold text-[var(--foreground)]" style={{ display: "flex", alignItems: "center", padding: "8px 12px" }}>
+                <input
+                  className="flex-shrink-0"
+                  defaultChecked={Boolean(organization.upfront_discount_enabled)}
+                  name="upfront_discount_enabled"
+                  type="checkbox"
+                  value="true"
+                />
+                <span>Offer upfront payment discount to customers</span>
+              </label>
+              <div className="grid gap-3 sm:grid-cols-3">
+                <label className="block">
+                  <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Minimum months required</span>
+                  <input
+                    className={inputClass}
+                    defaultValue={String(organization.upfront_discount_min_periods ?? 3)}
+                    min="1"
+                    name="upfront_discount_min_periods"
+                    type="number"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Discounted rate per month</span>
+                  <input
+                    className={inputClass}
+                    defaultValue={organization.upfront_discount_rate ? String(organization.upfront_discount_rate) : ""}
+                    min="0"
+                    name="upfront_discount_rate"
+                    placeholder="e.g. 9000"
+                    step="0.01"
+                    type="number"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Offer label / headline</span>
+                  <input
+                    className={inputClass}
+                    defaultValue={organization.upfront_discount_label || ""}
+                    name="upfront_discount_label"
+                    placeholder="e.g. Pay 3 months, save 10%"
+                    type="text"
+                  />
+                </label>
+              </div>
+              <PendingButton className="primary-action" pendingLabel="Saving..." type="submit">
+                Save upfront discount settings
+              </PendingButton>
+            </form>
+          </div>
         </Card>
       </div>
 

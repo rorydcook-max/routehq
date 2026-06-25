@@ -619,11 +619,11 @@ export function CalculatorClient({
                 <div className="grid gap-4 sm:grid-cols-3">
                   <label className="block">
                     <span className="text-sm font-semibold text-[#344054]">Down payment (฿)</span>
-                    <input className={inputCls} min="0" onChange={(e) => setDownPayment(e.target.value)} placeholder="100,000" type="number" value={downPayment} />
+                    <input className={inputCls} min="0" onChange={(e) => setDownPayment(e.target.value)} placeholder="100,000" step="0.01" type="number" value={downPayment} />
                   </label>
                   <label className="block">
                     <span className="text-sm font-semibold text-[#344054]">Monthly payment (฿)</span>
-                    <input className={inputCls} min="0" onChange={(e) => setMonthlyPayment(e.target.value)} placeholder="8,500" type="number" value={monthlyPayment} />
+                    <input className={inputCls} min="0" onChange={(e) => setMonthlyPayment(e.target.value)} placeholder="8,500" step="0.01" type="number" value={monthlyPayment} />
                   </label>
                   <label className="block">
                     <span className="text-sm font-semibold text-[#344054]">Loan term (months)</span>
@@ -640,7 +640,7 @@ export function CalculatorClient({
             <div className="mt-4 space-y-4">
               <label className="block">
                 <span className="text-sm font-semibold text-[#344054]">Estimated monthly rental rate (฿)</span>
-                <input className={inputCls} min="0" onChange={(e) => setEstimatedRate(e.target.value)} placeholder="25,000" type="number" value={estimatedRate} />
+                <input className={inputCls} min="0" onChange={(e) => setEstimatedRate(e.target.value)} placeholder="25,000" step="0.01" type="number" value={estimatedRate} />
               </label>
               <label className="block">
                 <span className="text-sm font-semibold text-[#344054]">

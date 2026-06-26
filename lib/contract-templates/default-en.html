@@ -1,481 +1,562 @@
 <!DOCTYPE html>
 <html>
 <head>
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  body { font-family: Arial, sans-serif; font-size: 12px; line-height: 1.6; color: #1a1d21; max-width: 800px; margin: 0 auto; padding: 40px; }
-  .header { text-align: center; margin-bottom: 32px; padding-bottom: 20px; border-bottom: 2px solid #0e7490; }
-  .logo { max-width: 200px; max-height: 80px; object-fit: contain; margin-bottom: 12px; }
-  .business-name { font-size: 24px; font-weight: 700; color: #0e7490; letter-spacing: 2px; text-transform: uppercase; }
-  .contract-title { font-size: 16px; font-weight: 700; margin-top: 6px; text-transform: uppercase; letter-spacing: 1px; color: #1a1d21; }
-  .contract-subtitle { font-size: 13px; color: #717d86; margin-top: 4px; font-family: 'Sarabun', 'TH Sarabun New', Tahoma, Arial, sans-serif; }
-  h2 { font-size: 13px; font-weight: 700; text-transform: uppercase; margin-top: 20px; margin-bottom: 8px; color: #0e7490; border-bottom: 0.5px solid #e3e6e8; padding-bottom: 4px; letter-spacing: 0.05em; }
-  .field-line { border-bottom: 1px solid #333; display: inline-block; min-width: 180px; margin-left: 6px; }
-  .field-block { margin-bottom: 5px; }
-  .bilingual-section { margin-bottom: 8px; }
-  .lang-en { font-size: 12px; color: #1a1d21; line-height: 1.6; }
-  .lang-th { font-size: 12px; color: #454d54; line-height: 1.6; font-family: 'Sarabun', 'TH Sarabun New', Tahoma, Arial, sans-serif; border-left: 2px solid #e3e6e8; padding-left: 8px; margin-top: 2px; }
-  .section { margin-bottom: 16px; }
-  .clause { margin-bottom: 8px; }
-  .clause-num { font-weight: 700; }
-  .highlight { font-weight: 700; }
-  .signature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 40px; }
-  .sig-block { border-top: 1px solid #333; padding-top: 8px; margin-top: 70px; }
-  .sig-image { max-width: 200px; max-height: 70px; }
-  .paid-stamp { background: #f0fdf4; border: 2px solid #16a34a; border-radius: 6px; padding: 8px 16px; display: inline-block; color: #16a34a; font-weight: 700; font-size: 14px; letter-spacing: 2px; }
-  .conditional { }
-  .page-break { page-break-before: always; }
-  .warning-box { background: #fffbeb; border: 0.5px solid #fde68a; border-radius: 6px; padding: 10px 14px; margin: 10px 0; }
-</style>
+  <meta charset="utf-8" />
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    @page { size: A4; margin: 14mm 15mm; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #ffffff;
+      color: #1a1d21;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    .header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: start;
+      margin-bottom: 14px;
+    }
+    .logo { max-width: 200px; max-height: 80px; object-fit: contain; }
+    .wordmark {
+      color: #0f172a;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .owner-details {
+      color: #454d54;
+      font-size: 10.5px;
+      line-height: 1.45;
+      text-align: right;
+    }
+    .title-band {
+      margin-bottom: 14px;
+      padding: 14px 18px;
+      border-radius: 8px;
+      background: #0f172a;
+      color: #ffffff;
+      text-align: center;
+    }
+    .title-band h1 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0.08em;
+    }
+    .title-band p {
+      margin: 4px 0 0;
+      color: #dbeafe;
+      font-family: "Sarabun", Arial, sans-serif;
+      font-size: 13px;
+    }
+    .section { margin: 0 0 14px; break-inside: avoid; }
+    .section-title {
+      padding: 7px 10px;
+      border-radius: 6px 6px 0 0;
+      background: #0f172a;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .section-body {
+      padding: 10px;
+      border: 1px solid #e3e6e8;
+      border-top: 0;
+      border-radius: 0 0 6px 6px;
+    }
+    .info-grid { display: grid; gap: 6px; margin-bottom: 10px; }
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .grid-4 { grid-template-columns: repeat(4, 1fr); }
+    .info-cell {
+      min-height: 44px;
+      padding: 7px 8px;
+      border: 1px solid #e3e6e8;
+      border-radius: 6px;
+      background: #f8f9fa;
+    }
+    .info-label {
+      margin-bottom: 2px;
+      color: #717d86;
+      font-size: 8.5px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .info-value {
+      color: #1a1d21;
+      font-size: 12px;
+      font-weight: 700;
+      word-break: break-word;
+    }
+    .bilingual-section { margin-bottom: 10px; }
+    .lang-en {
+      margin-bottom: 4px;
+      color: #1a1d21;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    .lang-th {
+      padding-left: 8px;
+      border-left: 2px solid #e3e6e8;
+      color: #454d54;
+      font-family: "Sarabun", Arial, sans-serif;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    .clause { margin-bottom: 9px; }
+    .clause-num { color: #0f172a; font-weight: 700; }
+    .warning-box {
+      margin: 12px 0;
+      padding: 10px;
+      border: 1px solid #fde68a;
+      border-radius: 6px;
+      background: #fffbeb;
+    }
+    .signature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 14px;
+    }
+    .signature-box {
+      min-height: 132px;
+      padding: 10px;
+      border: 1px solid #e3e6e8;
+      border-radius: 8px;
+    }
+    .signature-pad {
+      display: flex;
+      height: 72px;
+      align-items: center;
+      justify-content: center;
+      margin: 8px 0;
+      border: 1px dashed #c4c9cc;
+      border-radius: 6px;
+      color: #717d86;
+      font-size: 11px;
+    }
+    .sig-image { max-width: 200px; max-height: 70px; object-fit: contain; }
+    .page-break { page-break-before: always; }
+    .appendix-photo {
+      max-width: 220px;
+      max-height: 160px;
+      border: 1px solid #e3e6e8;
+      border-radius: 6px;
+      object-fit: contain;
+    }
+    ul { margin: 6px 0 0 18px; padding: 0; }
+  </style>
 </head>
 <body>
+  <div class="header">
+    <div>
+      {{#if business_logo_url}}
+      <img src="{{business_logo_url}}" class="logo" alt="{{business_name}} logo" />
+      {{else}}
+      <div class="wordmark">{{business_name}}</div>
+      {{/if}}
+    </div>
+    <div class="owner-details">
+      <strong>{{owner_name}}</strong><br />
+      {{business_address}}<br />
+      WhatsApp: {{owner_whatsapp}}<br />
+      LINE: {{owner_line_id}}<br />
+      Email: {{owner_email}}
+    </div>
+  </div>
 
-<div class="header">
-  {{#if business_logo_url}}
-  <img src="{{business_logo_url}}" class="logo" alt="{{business_name}}"/>
-  {{else}}
-  <div class="business-name">{{business_name}}</div>
-  {{/if}}
-  <div class="contract-title">Car Rental Contract / สัญญาเช่ารถยนต์</div>
-  <div class="contract-subtitle">This agreement is made between the parties listed below / สัญญานี้จัดทำขึ้นระหว่างคู่สัญญาที่ระบุไว้ด้านล่าง</div>
-</div>
+  <div class="title-band">
+    <h1>CAR RENTAL CONTRACT / สัญญาเช่ารถยนต์</h1>
+    <p>Vehicle rental agreement for use in Thailand / สัญญาเช่ายานพาหนะสำหรับการใช้งานในประเทศไทย</p>
+  </div>
 
-<div class="section">
-<h2>1. The Parties to This Agreement / คู่สัญญา</h2>
+  <section class="section">
+    <div class="section-title">1. Parties / คู่สัญญา</div>
+    <div class="section-body">
+      <div class="info-grid grid-2">
+        <div class="info-cell">
+          <div class="info-label">Owner / ผู้ให้เช่า</div>
+          <div class="info-value">{{business_name}}</div>
+        </div>
+        <div class="info-cell">
+          <div class="info-label">Renter / ผู้เช่า</div>
+          <div class="info-value">{{renter_full_name}}</div>
+        </div>
+        <div class="info-cell">
+          <div class="info-label">Renter nationality / สัญชาติ</div>
+          <div class="info-value">{{renter_nationality}}</div>
+        </div>
+        <div class="info-cell">
+          <div class="info-label">Passport / หนังสือเดินทาง</div>
+          <div class="info-value">{{renter_passport_number}}</div>
+        </div>
+      </div>
+      <div class="bilingual-section">
+        <div class="lang-en">This agreement is made on {{contract_date}} between the Owner and the Renter named above. The Renter accepts responsibility for the vehicle and all obligations in this agreement.</div>
+        <div class="lang-th">สัญญานี้ทำขึ้นเมื่อวันที่ {{contract_date}} ระหว่างผู้ให้เช่าและผู้เช่าที่ระบุไว้ข้างต้น ผู้เช่ายอมรับความรับผิดชอบต่อยานพาหนะและภาระผูกพันทั้งหมดตามสัญญานี้</div>
+      </div>
+    </div>
+  </section>
 
-<div class="clause">
-<span class="clause-num">1.1. THE OWNER / ผู้ให้เช่า:</span>
-<div class="field-block">Full Name / ชื่อ-นามสกุล: <span class="field-line">{{owner_name}}</span></div>
-<div class="field-block">Phone / โทรศัพท์: <span class="field-line">{{owner_phone}}</span></div>
-<div class="field-block">Email: <span class="field-line">{{owner_email}}</span></div>
-<div class="field-block">LINE ID: <span class="field-line">{{owner_line_id}}</span></div>
-<div class="field-block">WhatsApp: <span class="field-line">{{owner_whatsapp}}</span></div>
-</div>
+  <section class="section">
+    <div class="section-title">2. Vehicle details / รายละเอียดยานพาหนะ</div>
+    <div class="section-body">
+      <div class="info-grid grid-4">
+        <div class="info-cell"><div class="info-label">Make / ยี่ห้อ</div><div class="info-value">{{vehicle_make}}</div></div>
+        <div class="info-cell"><div class="info-label">Model / รุ่น</div><div class="info-value">{{vehicle_model}}</div></div>
+        <div class="info-cell"><div class="info-label">Year / ปี</div><div class="info-value">{{vehicle_year}}</div></div>
+        <div class="info-cell"><div class="info-label">Registration / ทะเบียน</div><div class="info-value">{{vehicle_registration}}</div></div>
+        <div class="info-cell"><div class="info-label">Colour / สี</div><div class="info-value">{{vehicle_colour}}</div></div>
+        <div class="info-cell"><div class="info-label">Fuel / เชื้อเพลิง</div><div class="info-value">{{vehicle_fuel_type}}</div></div>
+        <div class="info-cell"><div class="info-label">Home territory / พื้นที่ใช้งานหลัก</div><div class="info-value">{{home_territory}}</div></div>
+        <div class="info-cell"><div class="info-label">Delivery method / วิธีรับส่ง</div><div class="info-value">{{delivery_method}}</div></div>
+      </div>
+      <div class="bilingual-section">
+        <div class="lang-en">The Owner rents the vehicle described above to the Renter for the rental period and on the terms stated in this agreement.</div>
+        <div class="lang-th">ผู้ให้เช่าให้เช่ายานพาหนะตามรายละเอียดข้างต้นแก่ผู้เช่า ตามระยะเวลาเช่าและเงื่อนไขที่ระบุในสัญญานี้</div>
+      </div>
+    </div>
+  </section>
 
-<div class="clause">
-<span class="clause-num">1.2. THE RENTER / ผู้เช่า:</span>
-<div class="field-block">First Name(s) / ชื่อ: <span class="field-line">{{renter_first_name}}</span></div>
-<div class="field-block">Surname / นามสกุล: <span class="field-line">{{renter_surname}}</span></div>
-<div class="field-block">Nationality / สัญชาติ: <span class="field-line">{{renter_nationality}}</span></div>
-<div class="field-block">Passport Number / หมายเลขหนังสือเดินทาง: <span class="field-line">{{renter_passport_number}}</span></div>
-<div class="field-block">Driver's Licence / ใบขับขี่: <span class="field-line">{{renter_licence_number}}</span></div>
-<div class="field-block">Issuing Country / ประเทศที่ออกใบขับขี่: <span class="field-line">{{renter_licence_country}}</span></div>
-<div class="field-block">Licence Expiry / วันหมดอายุ: <span class="field-line">{{renter_licence_expiry}}</span></div>
-<div class="field-block">Phone / โทรศัพท์: <span class="field-line">{{renter_phone}}</span></div>
-<div class="field-block">Email: <span class="field-line">{{renter_email}}</span></div>
-<div class="field-block">Address / ที่อยู่: <span class="field-line" style="min-width:300px;">{{renter_address}}</span></div>
-</div>
-</div>
+  <section class="section">
+    <div class="section-title">3. Condition of vehicle / สภาพยานพาหนะ</div>
+    <div class="section-body">
+      <div class="bilingual-section">
+        <div class="lang-en">The Renter confirms that the vehicle is received in good working order except for any damage, marks, missing items, fuel level or mileage recorded in the delivery inspection report or Appendix A.</div>
+        <div class="lang-th">ผู้เช่ายืนยันว่าได้รับยานพาหนะในสภาพใช้งานได้ดี เว้นแต่ความเสียหาย รอยตำหนิ รายการขาดหาย ระดับน้ำมัน หรือเลขไมล์ที่บันทึกไว้ในรายงานตรวจรับรถหรือภาคผนวก ก.</div>
+      </div>
+      {{delivery_damage_report}}
+    </div>
+  </section>
 
-<div class="section">
-<h2>2. Vehicle Details / รายละเอียดยานพาหนะ</h2>
-<div class="field-block">Make / ยี่ห้อ: <span class="field-line">{{vehicle_make}}</span> &nbsp; Model / รุ่น: <span class="field-line">{{vehicle_model}}</span> &nbsp; Year / ปี: <span class="field-line">{{vehicle_year}}</span></div>
-<div class="field-block">Registration / ทะเบียน: <span class="field-line">{{vehicle_registration}}</span> &nbsp; Colour / สี: <span class="field-line">{{vehicle_colour}}</span></div>
-<div class="field-block">Fuel Type / ประเภทเชื้อเพลิง: <span class="field-line">{{vehicle_fuel_type}}</span></div>
-</div>
+  <section class="section">
+    <div class="section-title">4. Renter qualifications / คุณสมบัติผู้เช่า</div>
+    <div class="section-body">
+      <div class="info-grid grid-3">
+        <div class="info-cell"><div class="info-label">Licence number / เลขใบขับขี่</div><div class="info-value">{{renter_licence_number}}</div></div>
+        <div class="info-cell"><div class="info-label">Licence country / ประเทศที่ออกใบขับขี่</div><div class="info-value">{{renter_licence_country}}</div></div>
+        <div class="info-cell"><div class="info-label">Licence expiry / วันหมดอายุ</div><div class="info-value">{{renter_licence_expiry}}</div></div>
+      </div>
+      <div class="bilingual-section">
+        <div class="lang-en">The Renter confirms they hold a valid driving licence for this class of vehicle and will not allow any unauthorised person to drive or control the vehicle.</div>
+        <div class="lang-th">ผู้เช่ายืนยันว่ามีใบอนุญาตขับขี่ที่ถูกต้องสำหรับยานพาหนะประเภทนี้ และจะไม่อนุญาตให้บุคคลที่ไม่ได้รับอนุญาตขับหรือควบคุมยานพาหนะ</div>
+      </div>
+    </div>
+  </section>
 
-<div class="section">
-<h2>3. Condition of Vehicle / สภาพยานพาหนะ</h2>
-<div class="clause">
-<span class="clause-num">3.1.</span>
-<div class="bilingual-section">
-<div class="lang-en">External damage report at time of delivery:</div>
-<div class="lang-th">รายงานความเสียหายภายนอก ณ เวลาส่งมอบ:</div>
-</div>
-{{delivery_damage_report}}
-</div>
-<div class="clause">
-<span class="clause-num">3.2.</span>
-<div class="bilingual-section">
-<div class="lang-en">The Renter must notify the Owner immediately in the event that the vehicle has incurred damage of any kind, minor or major.</div>
-<div class="lang-th">ผู้เช่าต้องแจ้งให้เจ้าของทราบทันทีหากยานพาหนะได้รับความเสียหายไม่ว่าจะเล็กน้อยหรือร้ายแรง</div>
-</div>
-</div>
-</div>
+  <section class="section">
+    <div class="section-title">5. Rental period / ระยะเวลาเช่า</div>
+    <div class="section-body">
+      <div class="info-grid grid-4">
+        <div class="info-cell"><div class="info-label">Start date / วันที่เริ่ม</div><div class="info-value">{{rental_start_date}}</div></div>
+        <div class="info-cell"><div class="info-label">Start time / เวลาเริ่ม</div><div class="info-value">{{rental_start_time}}</div></div>
+        <div class="info-cell"><div class="info-label">End date / วันที่สิ้นสุด</div><div class="info-value">{{rental_end_date}}</div></div>
+        <div class="info-cell"><div class="info-label">End time / เวลาสิ้นสุด</div><div class="info-value">{{rental_end_time}}</div></div>
+      </div>
+      <div class="bilingual-section">
+        <div class="lang-en">The vehicle must be returned on or before the agreed end date and time unless the Owner confirms an extension in writing.</div>
+        <div class="lang-th">ผู้เช่าต้องคืนยานพาหนะภายในวันที่และเวลาที่ตกลงกัน เว้นแต่ผู้ให้เช่าจะยืนยันการขยายเวลาเป็นลายลักษณ์อักษร</div>
+      </div>
+      {{#if is_rolling_monthly}}
+      <div class="bilingual-section">
+        <div class="lang-en">This rental is open-ended or rolling monthly. The Renter remains liable for each billing period until the vehicle is returned and the Owner confirms completion.</div>
+        <div class="lang-th">การเช่านี้เป็นแบบไม่กำหนดวันสิ้นสุดหรือรายเดือนต่อเนื่อง ผู้เช่ายังคงรับผิดชอบค่าเช่าในแต่ละรอบบิลจนกว่าจะคืนยานพาหนะและผู้ให้เช่ายืนยันว่าการเช่าสิ้นสุดแล้ว</div>
+      </div>
+      {{/if}}
+    </div>
+  </section>
 
-<div class="section">
-<h2>4. Qualifications / คุณสมบัติผู้เช่า</h2>
-<div class="clause">
-<span class="clause-num">4.1.</span>
-<div class="bilingual-section">
-<div class="lang-en">The Renter states that he/she is physically and legally qualified to operate the above-described vehicle, including that they are in possession of the necessary, valid licences. The Renter confirms this declaration by signing this agreement.</div>
-<div class="lang-th">ผู้เช่าขอรับรองว่าตนมีคุณสมบัติครบถ้วนทั้งทางร่างกายและทางกฎหมายในการขับขี่ยานพาหนะข้างต้น รวมถึงมีใบอนุญาตขับขี่ที่ถูกต้องและยังไม่หมดอายุ ผู้เช่ายืนยันคำรับรองนี้โดยการลงนามในสัญญาฉบับนี้</div>
-</div>
-</div>
-</div>
+  <section class="section">
+    <div class="section-title">6. Rental rate and charges / ค่าเช่าและค่าใช้จ่าย</div>
+    <div class="section-body">
+      <div class="info-grid grid-4">
+        <div class="info-cell"><div class="info-label">Rate / ค่าเช่า</div><div class="info-value">฿{{rental_rate}}</div></div>
+        <div class="info-cell"><div class="info-label">Billing period / รอบบิล</div><div class="info-value">{{billing_period}}</div></div>
+        <div class="info-cell"><div class="info-label">Late fee / ค่าปรับล่าช้า</div><div class="info-value">{{late_fee_percentage}}%</div></div>
+        <div class="info-cell"><div class="info-label">Fuel charge / ค่าน้ำมัน</div><div class="info-value">฿{{fuel_charge_per_increment}}</div></div>
+      </div>
+      <div class="bilingual-section">
+        <div class="lang-en">Rental payments are due according to the agreed billing period. Late payment, early termination, fuel shortage, damage, cleaning and other charges may be deducted from the deposit or invoiced separately.</div>
+        <div class="lang-th">ค่าเช่าถึงกำหนดชำระตามรอบบิลที่ตกลงกัน การชำระล่าช้า การยกเลิกก่อนกำหนด น้ำมันไม่ครบ ความเสียหาย ค่าทำความสะอาด และค่าใช้จ่ายอื่น ๆ อาจถูกหักจากเงินประกันหรือเรียกเก็บเพิ่มเติม</div>
+      </div>
+    </div>
+  </section>
 
-<div class="section">
-<h2>5. Rental Period / ระยะเวลาเช่า</h2>
-<div class="clause">
-<span class="clause-num">5.1.</span> Starting Date / วันเริ่มต้น: <span class="field-line">{{rental_start_date}}</span> &nbsp; Time / เวลา: <span class="field-line">{{rental_start_time}}</span>
-</div>
-<div class="clause">
-<span class="clause-num">5.2.</span> Ending Date / วันสิ้นสุด: <span class="field-line">{{rental_end_date}}</span> &nbsp; Time / เวลา: <span class="field-line">{{rental_end_time}}</span>
-</div>
-<div class="clause">
-<span class="clause-num">5.3.</span>
-<div class="bilingual-section">
-<div class="lang-en">The contract may be designated as a rolling monthly agreement with no specified end date. If so, payment is due monthly on the same calendar date.</div>
-<div class="lang-th">สัญญาอาจกำหนดให้เป็นสัญญารายเดือนแบบต่อเนื่องโดยไม่มีวันสิ้นสุดที่แน่นอน ในกรณีนี้การชำระเงินจะครบกำหนดทุกเดือนในวันเดียวกัน</div>
-</div>
-</div>
-<div class="clause">
-<span class="clause-num">5.4.</span>
-<div class="bilingual-section">
-<div class="lang-en">The contract may be extended beyond the agreed return date by mutual agreement. No new contract is necessary for such extensions.</div>
-<div class="lang-th">สัญญาอาจขยายเวลาออกไปเกินกว่าวันคืนรถที่ตกลงไว้โดยความยินยอมร่วมกัน ไม่จำเป็นต้องทำสัญญาใหม่สำหรับการต่อเวลาดังกล่าว</div>
-</div>
-</div>
-</div>
+  <section class="section">
+    <div class="section-title">7. Security deposit / เงินประกัน</div>
+    <div class="section-body">
+      <div class="info-grid grid-3">
+        <div class="info-cell"><div class="info-label">Deposit / เงินประกัน</div><div class="info-value">฿{{deposit_amount}}</div></div>
+        <div class="info-cell"><div class="info-label">Return period / ระยะเวลาคืนเงิน</div><div class="info-value">{{deposit_return_days}} business days</div></div>
+        <div class="info-cell"><div class="info-label">Cleaning fee / ค่าทำความสะอาด</div><div class="info-value">from ฿{{cleaning_fee_minimum}}</div></div>
+      </div>
+      <div class="bilingual-section">
+        <div class="lang-en">The security deposit is held as security for unpaid rent, damage, fines, missing items, cleaning, fuel, late return and any other liability arising from this rental.</div>
+        <div class="lang-th">เงินประกันถูกเก็บไว้เพื่อเป็นหลักประกันสำหรับค่าเช่าค้างชำระ ความเสียหาย ค่าปรับ รายการสูญหาย ค่าทำความสะอาด ค่าน้ำมัน การคืนรถล่าช้า และความรับผิดอื่นใดจากการเช่านี้</div>
+      </div>
+    </div>
+  </section>
 
-<div class="section">
-<h2>6. Rental Rate / อัตราค่าเช่า</h2>
-<div class="clause">
-<span class="clause-num">6.1.</span>
-<div class="bilingual-section">
-<div class="lang-en">The Renter agrees to pay the Owner <span class="highlight">{{rental_rate}} Baht</span> per <span class="highlight">{{billing_period}}</span>. Payment is due on the agreed date unless paid in full upfront. Failure to make timely payment may result in vehicle repossession and forfeiture of the security deposit.</div>
-<div class="lang-th">ผู้เช่าตกลงชำระค่าเช่าให้แก่เจ้าของเป็นจำนวน <span class="highlight">{{rental_rate}} บาท</span> ต่อ <span class="highlight">{{billing_period}}</span> การชำระเงินครบกำหนดตามวันที่ตกลงไว้เว้นแต่จะชำระเต็มจำนวนล่วงหน้า การชำระล่าช้าอาจส่งผลให้ผู้ให้เช่ายึดคืนรถและริบเงินประกัน</div>
-</div>
-</div>
-<div class="clause">
-<span class="clause-num">6.2.</span>
-<div class="bilingual-section">
-<div class="lang-en">All fuel used shall be paid for by the Renter. The vehicle will be provided with <span class="highlight">{{vehicle_fuel_type}}</span> and must be returned with the same level. Only the fuel specified in the vehicle documentation may be used — incorrect fuel use makes the Renter liable for all repair costs. If a vehicle is returned with less fuel than at delivery, a charge of <span class="highlight">{{fuel_charge_per_increment}} THB</span> per 1/8 gauge increment will apply. Delivery fuel level is recorded below.</div>
-<div class="lang-th">ผู้เช่ารับผิดชอบค่าน้ำมันเชื้อเพลิงทั้งหมด ยานพาหนะจะถูกส่งมอบพร้อมน้ำมัน <span class="highlight">{{vehicle_fuel_type}}</span> และต้องคืนในระดับเดิม การใช้เชื้อเพลิงผิดประเภททำให้ผู้เช่าต้องรับผิดชอบค่าซ่อมทั้งหมด หากคืนรถโดยน้ำมันต่ำกว่าตอนรับรถจะมีค่าธรรมเนียม <span class="highlight">{{fuel_charge_per_increment}} บาท</span> ต่อ 1/8 ขีดบนมาตรวัด</div>
-</div>
-<div style="margin-top: 8px;">
-  {{#if delivery_fuel_image_url}}
-  <img src="{{delivery_fuel_image_url}}" style="max-width:140px; max-height:70px;" alt="Fuel level at delivery"/>
-  {{else}}
-  <div style="border: 1px solid #ccc; width: 140px; height: 60px; display: inline-flex; align-items: center; justify-content: center; color: #999; font-size: 11px; border-radius: 4px;">Fuel photo at delivery</div>
-  {{/if}}
-  <div style="margin-top: 4px; font-size: 11px;">Fuel level at delivery / ระดับน้ำมัน ณ วันรับรถ: <span class="field-line">{{delivery_fuel_level}}</span></div>
-</div>
-</div>
-<div class="clause">
-<span class="clause-num">6.3.</span>
-<div class="bilingual-section">
-<div class="lang-en">Late return fees are charged at <span class="highlight">{{late_fee_percentage}}%</span> of the daily rental rate per day overdue and may be deducted from the security deposit unless an extension is agreed in advance.</div>
-<div class="lang-th">ค่าปรับคืนรถล่าช้าคิดในอัตรา <span class="highlight">{{late_fee_percentage}}%</span> ของค่าเช่ารายวันต่อวันที่เกินกำหนด และอาจหักจากเงินประกันเว้นแต่จะตกลงขยายเวลาล่วงหน้า</div>
-</div>
-</div>
-</div>
+  <section class="section">
+    <div class="section-title">8. Included items / รายการที่รวมอยู่</div>
+    <div class="section-body">
+      <ul>{{included_items}}</ul>
+      <div class="bilingual-section">
+        <div class="lang-en">Only the items listed above are included. Any item not listed is excluded unless confirmed by the Owner in writing.</div>
+        <div class="lang-th">เฉพาะรายการที่ระบุข้างต้นเท่านั้นที่รวมอยู่ รายการอื่นที่ไม่ได้ระบุถือว่าไม่รวม เว้นแต่ผู้ให้เช่าจะยืนยันเป็นลายลักษณ์อักษร</div>
+      </div>
+    </div>
+  </section>
 
-<div class="section">
-<h2>7. Security Deposit / เงินประกัน</h2>
-<div class="clause">
-<span class="clause-num">7.1.</span>
-<div class="bilingual-section">
-<div class="lang-en">A security deposit of <span class="highlight">{{deposit_amount}} THB</span> is required and will be refunded in full at the end of the contract if the vehicle is returned in the same condition as rented. In the event of an insurance claim, this amount will be used to cover the insurance excess. If damage exceeds the deposit and is not covered by insurance, the Renter is liable for the balance.</div>
-<div class="lang-th">ต้องชำระเงินประกัน <span class="highlight">{{deposit_amount}} บาท</span> และจะคืนเต็มจำนวนเมื่อสิ้นสุดสัญญาหากรถอยู่ในสภาพเดิม ในกรณีที่มีการเรียกร้องประกันภัย เงินประกันจะถูกใช้เพื่อครอบคลุมค่าเสียหายส่วนแรก หากความเสียหายเกินกว่าเงินประกันและไม่ได้รับความคุ้มครองจากประกันภัย ผู้เช่าต้องรับผิดชอบส่วนต่าง</div>
-</div>
-</div>
-</div>
+  <section class="section">
+    <div class="section-title">9. Vehicle maintenance and care / การดูแลและบำรุงรักษา</div>
+    <div class="section-body">
+      <div class="bilingual-section">
+        <div class="lang-en">The Renter must use reasonable care, check warning lights, tyre condition, oil and fluids where appropriate, and immediately notify the Owner of any fault, accident, breakdown or unusual noise.</div>
+        <div class="lang-th">ผู้เช่าต้องดูแลยานพาหนะอย่างเหมาะสม ตรวจไฟเตือน สภาพยาง น้ำมันเครื่องและของเหลวตามความเหมาะสม และแจ้งผู้ให้เช่าทันทีเมื่อมีความผิดปกติ อุบัติเหตุ รถเสีย หรือเสียงผิดปกติ</div>
+      </div>
+      <div class="bilingual-section">
+        <div class="lang-en">The Renter may not authorise repairs except in an emergency and only up to ฿{{emergency_repair_limit}} without prior written approval.</div>
+        <div class="lang-th">ผู้เช่าไม่มีสิทธิอนุมัติการซ่อม เว้นแต่เป็นเหตุฉุกเฉินและไม่เกิน ฿{{emergency_repair_limit}} โดยไม่ได้รับอนุมัติเป็นลายลักษณ์อักษรล่วงหน้า</div>
+      </div>
+    </div>
+  </section>
 
-<div class="section">
-<h2>8. What Is Included / สิ่งที่รวมอยู่ในสัญญา</h2>
-<div class="clause">
-<span class="clause-num">8.1.</span>
-<div class="bilingual-section">
-<div class="lang-en">The following are included in this rental agreement:</div>
-<div class="lang-th">สิ่งต่อไปนี้รวมอยู่ในสัญญาเช่าฉบับนี้:</div>
-</div>
-<ul style="margin: 6px 0 0 16px; padding: 0;">{{included_items}}</ul>
-</div>
-</div>
+  <section class="section">
+    <div class="section-title">10. Exclusions and prohibited use / ข้อห้ามในการใช้งาน</div>
+    <div class="section-body">
+      <div class="bilingual-section">
+        <div class="lang-en">The vehicle must not be used for illegal activity, racing, towing, off-road driving unless agreed, commercial hire, driving under the influence, carrying unlawful goods, or any use outside the agreed territory.</div>
+        <div class="lang-th">ห้ามใช้ยานพาหนะเพื่อกิจกรรมผิดกฎหมาย แข่งขัน ลากจูง ขับออฟโรดเว้นแต่ตกลงไว้ ให้เช่าต่อเชิงพาณิชย์ ขับขี่ขณะมึนเมา ขนส่งสิ่งผิดกฎหมาย หรือใช้งานนอกพื้นที่ที่ตกลงกัน</div>
+      </div>
+    </div>
+  </section>
 
-<div class="section">
-<h2>9. Vehicle Maintenance / การบำรุงรักษายานพาหนะ</h2>
-<div class="clause">
-<span class="clause-num">9.1.</span>
-<div class="bilingual-section">
-<div class="lang-en">The Owner agrees to deliver the vehicle in a clean, roadworthy, and well-maintained condition. The Owner is responsible for the manufacturer-recommended service schedule including oil changes, inspections, and part replacements, and will coordinate with the Renter to arrange servicing at a mutually convenient time. Breakdown cover is included with the rental unless otherwise stated.</div>
-<div class="lang-th">เจ้าของตกลงส่งมอบรถในสภาพสะอาด ปลอดภัย และได้รับการบำรุงรักษาเป็นอย่างดี เจ้าของรับผิดชอบการบำรุงรักษาตามที่ผู้ผลิตแนะนำ รวมถึงการเปลี่ยนถ่ายน้ำมันเครื่อง การตรวจสอบ และการเปลี่ยนชิ้นส่วน และจะประสานงานกับผู้เช่าเพื่อนำรถเข้าบริการในเวลาที่สะดวกร่วมกัน บริการซ่อมรถเสียรวมอยู่ในสัญญาเช่าเว้นแต่จะระบุไว้เป็นอย่างอื่น</div>
-</div>
-</div>
-<div class="clause">
-<span class="clause-num">9.2.</span>
-<div class="bilingual-section">
-<div class="lang-en">The Renter is responsible for the day-to-day condition of the vehicle including regularly checking tyres, lights, fluids, and other essential components. The Renter must not operate the vehicle if it becomes unroadworthy and must notify the Owner immediately of any mechanical concerns or warning indicators.</div>
-<div class="lang-th">ผู้เช่ารับผิดชอบสภาพยานพาหนะในแต่ละวัน รวมถึงการตรวจสอบยาง ไฟ น้ำมัน และส่วนประกอบสำคัญอื่นๆ เป็นประจำ ผู้เช่าต้องไม่ขับรถหากรถไม่ปลอดภัยและต้องแจ้งเจ้าของทันทีหากพบปัญหาเชิงกลไกหรือสัญญาณเตือน</div>
-</div>
-</div>
-<div class="clause">
-<span class="clause-num">9.3.</span>
-<div class="bilingual-section">
-<div class="lang-en">If damage, excessive wear, or mechanical failure results from the Renter's negligent operation — including reckless driving, ignoring warning lights, or continuing to operate an unsafe vehicle — the Renter will be liable for the full cost of repair or replacement.</div>
-<div class="lang-th">หากความเสียหาย การสึกหรอเกินปกติ หรือความขัดข้องเชิงกลไกเกิดจากการขับขี่ประมาทของผู้เช่า รวมถึงการขับรถอย่างประมาท การเพิกเฉยต่อสัญญาณเตือน หรือการขับรถที่ไม่ปลอดภัยต่อไป ผู้เช่าต้องรับผิดชอบค่าซ่อมหรือเปลี่ยนชิ้นส่วนเต็มจำนวน</div>
-</div>
-</div>
-<div class="clause">
-<span class="clause-num">9.4.</span>
-<div class="bilingual-section">
-<div class="lang-en">In the event of a breakdown or malfunction, the Renter must cease operation (unless unsafe to do so) and contact the Owner immediately, following any reasonable instructions provided by the Owner or breakdown service provider.</div>
-<div class="lang-th">ในกรณีที่รถเสียหรือขัดข้อง ผู้เช่าต้องหยุดใช้งาน (เว้นแต่จะไม่ปลอดภัย) และติดต่อเจ้าของทันที โดยปฏิบัติตามคำแนะนำที่สมเหตุสมผลของเจ้าของหรือผู้ให้บริการซ่อมรถเสีย</div>
-</div>
-</div>
-</div>
+  <section class="section">
+    <div class="section-title">11. Permitted travel / พื้นที่เดินทางที่อนุญาต</div>
+    <div class="section-body">
+      <div class="bilingual-section">
+        <div class="lang-en">The normal permitted travel area is {{home_territory}}. Travel outside this area requires prior notice or written approval according to the Owner's policy.</div>
+        <div class="lang-th">พื้นที่เดินทางปกติที่อนุญาตคือ {{home_territory}} การเดินทางออกนอกพื้นที่นี้ต้องแจ้งล่วงหน้าหรือได้รับอนุมัติเป็นลายลักษณ์อักษรตามนโยบายของผู้ให้เช่า</div>
+      </div>
+      <!-- CONDITIONAL: island_travel_clause_enabled -->
+      <div class="bilingual-section">
+        <div class="lang-en">Island or ferry travel must be disclosed before travel. The Renter remains liable for ferry delays, ferry damage, missed return times and any additional recovery cost.</div>
+        <div class="lang-th">การเดินทางข้ามเกาะหรือโดยเรือเฟอร์รี่ต้องแจ้งก่อนเดินทาง ผู้เช่ารับผิดชอบต่อความล่าช้าของเรือ ความเสียหายจากการขนส่งทางเรือ การคืนรถล่าช้า และค่าใช้จ่ายในการกู้คืนเพิ่มเติม</div>
+      </div>
+      <!-- END CONDITIONAL -->
+      <!-- CONDITIONAL: secondary_deposit_enabled -->
+      <div class="bilingual-section">
+        <div class="lang-en">A secondary travel deposit of ฿{{secondary_deposit_amount}} may be required before approved inter-island or mainland travel.</div>
+        <div class="lang-th">อาจต้องชำระเงินประกันการเดินทางเพิ่มเติมจำนวน ฿{{secondary_deposit_amount}} ก่อนการเดินทางข้ามเกาะหรือไปแผ่นดินใหญ่ที่ได้รับอนุมัติ</div>
+      </div>
+      <!-- END CONDITIONAL -->
+      <!-- CONDITIONAL: geofence_monitoring_enabled -->
+      <div class="bilingual-section">
+        <div class="lang-en">The vehicle may be monitored by GPS or geofence systems for safety, compliance and recovery purposes.</div>
+        <div class="lang-th">ยานพาหนะอาจถูกติดตามด้วยระบบ GPS หรือ geofence เพื่อความปลอดภัย การปฏิบัติตามเงื่อนไข และการกู้คืนยานพาหนะ</div>
+      </div>
+      <!-- END CONDITIONAL -->
+    </div>
+  </section>
 
-<div class="section">
-<h2>10. Exclusions / ข้อห้าม</h2>
-<div class="bilingual-section">
-<div class="lang-en">The rented vehicle shall not be used to: carry passengers or property for hire; carry passengers outside the interior; tow or push another vehicle without written permission; participate in races or competitions; be used for illegal purposes; be operated negligently. If any person other than the Renter drives the vehicle, the Renter assumes full responsibility for all resulting expenses and liabilities.</div>
-<div class="lang-th">ห้ามใช้รถเช่าเพื่อ: รับจ้างขนส่งผู้โดยสารหรือสิ่งของ รับผู้โดยสารนอกห้องโดยสาร ลากหรือผลักยานพาหนะอื่นโดยไม่ได้รับอนุญาตเป็นลายลักษณ์อักษร เข้าร่วมการแข่งขันหรือการแข่งรถ ใช้เพื่อวัตถุประสงค์ที่ผิดกฎหมาย หรือขับขี่อย่างประมาท หากบุคคลอื่นนอกจากผู้เช่าขับรถ ผู้เช่ารับผิดชอบค่าใช้จ่ายและความรับผิดทั้งหมดที่เกิดขึ้น</div>
-</div>
-</div>
+  <section class="section">
+    <div class="section-title">12. Insurance and claims / ประกันภัยและการเคลม</div>
+    <div class="section-body">
+      <div class="info-grid grid-2">
+        <div class="info-cell"><div class="info-label">Insurance type / ประเภทประกัน</div><div class="info-value">{{insurance_type}}</div></div>
+        <div class="info-cell"><div class="info-label">Excess / ค่าเสียหายส่วนแรก</div><div class="info-value">฿{{insurance_excess}}</div></div>
+      </div>
+      <div class="bilingual-section">
+        <div class="lang-en">Insurance coverage is subject to the insurer's terms. The Renter remains responsible for excess, exclusions, uninsured damage, lost keys, tyres, wheels, interior damage, personal belongings and negligence.</div>
+        <div class="lang-th">ความคุ้มครองประกันเป็นไปตามเงื่อนไขของบริษัทประกัน ผู้เช่ายังคงรับผิดชอบค่าเสียหายส่วนแรก ข้อยกเว้น ความเสียหายที่ไม่คุ้มครอง กุญแจหาย ยาง ล้อ ความเสียหายภายใน ทรัพย์สินส่วนตัว และความประมาท</div>
+      </div>
+    </div>
+  </section>
 
-<div class="section">
-<h2>11. Permitted Travel / พื้นที่การใช้งาน</h2>
-<div class="clause">
-<span class="clause-num">11.1.</span>
-<div class="bilingual-section">
-<div class="lang-en">The vehicle may be operated throughout the Kingdom of Thailand on paved public roads. The Renter is not required to notify the Owner for general mainland travel.</div>
-<div class="lang-th">รถยนต์สามารถขับขี่ได้ทั่วราชอาณาจักรไทยบนถนนสาธารณะที่ลาดยาง ผู้เช่าไม่จำเป็นต้องแจ้งเจ้าของสำหรับการเดินทางบนแผ่นดินใหญ่ทั่วไป</div>
-</div>
-</div>
+  <section class="section">
+    <div class="section-title">13. Vehicle return / การคืนยานพาหนะ</div>
+    <div class="section-body">
+      <div class="bilingual-section">
+        <div class="lang-en">The vehicle must be returned clean, with the agreed fuel level, keys, accessories and documents. The Owner may inspect the vehicle on return and record mileage, fuel, photos and damage.</div>
+        <div class="lang-th">ผู้เช่าต้องคืนยานพาหนะในสภาพสะอาด พร้อมระดับน้ำมันที่ตกลงกัน กุญแจ อุปกรณ์ และเอกสาร ผู้ให้เช่าสามารถตรวจสภาพเมื่อคืนรถและบันทึกเลขไมล์ น้ำมัน รูปภาพ และความเสียหายได้</div>
+      </div>
+    </div>
+  </section>
 
-<!-- CONDITIONAL: island_travel_clause_enabled -->
-<div class="clause conditional">
-<span class="clause-num">11.2.</span>
-<div class="bilingual-section">
-<div class="lang-en"><strong>Island and Ferry Travel:</strong> If the Renter wishes to transport the vehicle to or from any island via ferry or boat, written notice must be provided to the Owner at least 24 hours in advance, including the destination and expected return date to <strong>{{home_territory}}</strong>. The Owner reserves the right to decline island travel at their discretion.</div>
-<div class="lang-th"><strong>การเดินทางไปเกาะและการข้ามเรือ:</strong> หากผู้เช่าต้องการนำรถข้ามเรือไปยังเกาะใดๆ ต้องแจ้งเจ้าของเป็นลายลักษณ์อักษรล่วงหน้าอย่างน้อย 24 ชั่วโมง โดยระบุปลายทางและวันที่คาดว่าจะกลับ<strong>{{home_territory}}</strong> เจ้าของขอสงวนสิทธิ์ปฏิเสธการเดินทางไปเกาะตามดุลยพินิจของตน</div>
-</div>
-</div>
-<!-- END CONDITIONAL -->
+  <section class="section">
+    <div class="section-title">14. Mileage and odometer / เลขไมล์</div>
+    <div class="section-body">
+      <div class="info-grid grid-3">
+        <div class="info-cell"><div class="info-label">Mileage limit / จำกัดระยะทาง</div><div class="info-value">{{mileage_limit}}</div></div>
+        <div class="info-cell"><div class="info-label">Delivery odometer / เลขไมล์ส่งมอบ</div><div class="info-value">{{delivery_odometer}}</div></div>
+        <div class="info-cell"><div class="info-label">Fuel level / ระดับน้ำมัน</div><div class="info-value">{{delivery_fuel_level}}</div></div>
+      </div>
+      <div class="bilingual-section">
+        <div class="lang-en">The Renter must not tamper with the odometer or GPS device. Any suspected tampering may result in deposit forfeiture and recovery of additional losses.</div>
+        <div class="lang-th">ผู้เช่าห้ามแก้ไขหรือรบกวนเลขไมล์หรืออุปกรณ์ GPS หากสงสัยว่ามีการแก้ไข ผู้ให้เช่าอาจริบเงินประกันและเรียกค่าเสียหายเพิ่มเติม</div>
+      </div>
+    </div>
+  </section>
 
-<!-- CONDITIONAL: secondary_deposit_enabled -->
-<div class="clause conditional">
-<span class="clause-num">11.3.</span>
-<div class="bilingual-section">
-<div class="lang-en"><strong>Secondary Deposit for Island Travel:</strong> A secondary security deposit of <strong>{{secondary_deposit_amount}} THB</strong> is required before the vehicle departs <strong>{{home_territory}}</strong> by ferry or boat. This deposit will be refunded upon confirmed return of the vehicle to <strong>{{home_territory}}</strong> and is separate from the main security deposit in Section 7.</div>
-<div class="lang-th"><strong>เงินประกันเพิ่มเติมสำหรับการเดินทางไปเกาะ:</strong> ต้องชำระเงินประกันเพิ่มเติม <strong>{{secondary_deposit_amount}} บาท</strong> ก่อนนำรถออกจาก<strong>{{home_territory}}</strong> ทางเรือ เงินประกันนี้จะคืนเมื่อรถกลับมาถึง<strong>{{home_territory}}</strong> และแยกต่างหากจากเงินประกันหลักในข้อ 7</div>
-</div>
-</div>
-<!-- END CONDITIONAL -->
+  <section class="section">
+    <div class="section-title">15. Fines and violations / ค่าปรับและการกระทำผิด</div>
+    <div class="section-body">
+      <div class="bilingual-section">
+        <div class="lang-en">The Renter is responsible for all traffic fines, parking charges, tolls, penalties, impound fees and administrative charges incurred during the rental period.</div>
+        <div class="lang-th">ผู้เช่ารับผิดชอบค่าปรับจราจร ค่าจอดรถ ค่าทางด่วน เบี้ยปรับ ค่าลากหรือยึดรถ และค่าดำเนินการที่เกิดขึ้นระหว่างระยะเวลาเช่า</div>
+      </div>
+    </div>
+  </section>
 
-<!-- CONDITIONAL: geofence_monitoring_enabled -->
-<div class="clause conditional">
-<span class="clause-num">11.4.</span>
-<div class="bilingual-section">
-<div class="lang-en"><strong>GPS Monitoring:</strong> The Renter acknowledges and consents to the vehicle being equipped with a GPS tracking device. The Owner monitors vehicle location in real time for security and recovery purposes. GPS data will not be disclosed to third parties unless required by law or insurance matters.</div>
-<div class="lang-th"><strong>การติดตาม GPS:</strong> ผู้เช่ารับทราบและยินยอมให้ยานพาหนะติดตั้งอุปกรณ์ติดตาม GPS เจ้าของติดตามตำแหน่งรถแบบเรียลไทม์เพื่อความปลอดภัยและการกู้คืน ข้อมูล GPS จะไม่เปิดเผยต่อบุคคลที่สามเว้นแต่จะมีข้อกำหนดทางกฎหมายหรือประกันภัย</div>
-</div>
-</div>
-<!-- END CONDITIONAL -->
-</div>
+  <section class="section">
+    <div class="section-title">16. Termination and repossession / การยกเลิกและการนำรถคืน</div>
+    <div class="section-body">
+      <div class="bilingual-section">
+        <div class="lang-en">The Owner may terminate this agreement and repossess the vehicle immediately if the Renter breaches this agreement, fails to pay, provides false information, abandons the vehicle, or places the vehicle at risk.</div>
+        <div class="lang-th">ผู้ให้เช่าสามารถยกเลิกสัญญาและนำยานพาหนะคืนได้ทันที หากผู้เช่าฝ่าฝืนสัญญา ไม่ชำระเงิน ให้ข้อมูลเท็จ ทิ้งยานพาหนะ หรือทำให้ยานพาหนะตกอยู่ในความเสี่ยง</div>
+      </div>
+    </div>
+  </section>
 
-<div class="section">
-<h2>12. Insurance / ประกันภัย</h2>
-<div class="clause">
-<span class="clause-num">12.1.</span>
-<div class="bilingual-section">
-<div class="lang-en">The vehicle is covered with <span class="highlight">{{insurance_type}}</span> insurance with an excess of <span class="highlight">{{insurance_excess}} THB</span>. In the event of an insurance claim, the excess will be deducted from the security deposit, which must then be replenished. The Renter will be added as a named driver on the policy.</div>
-<div class="lang-th">ยานพาหนะได้รับความคุ้มครองด้วยประกันภัย <span class="highlight">{{insurance_type}}</span> โดยมีค่าเสียหายส่วนแรก <span class="highlight">{{insurance_excess}} บาท</span> ในกรณีเรียกร้องประกันภัย ค่าเสียหายส่วนแรกจะถูกหักจากเงินประกันซึ่งต้องชำระทดแทน ผู้เช่าจะถูกเพิ่มเป็นผู้ขับขี่ที่ระบุชื่อในกรมธรรม์</div>
-</div>
-</div>
-<div class="clause">
-<span class="clause-num">12.2.</span>
-<div class="bilingual-section">
-<div class="lang-en">In the event of an accident, the Renter must: (a) not move the vehicle until photos have been taken; (b) obtain the third party's full name, phone, licence plate, and insurance details; (c) call police if any injury or significant damage has occurred; (d) contact the Owner immediately before admitting liability or making any payment to a third party. Failure to follow this procedure may void the insurance claim.</div>
-<div class="lang-th">ในกรณีเกิดอุบัติเหตุ ผู้เช่าต้อง (ก) ไม่เคลื่อนย้ายรถจนกว่าจะถ่ายภาพแล้ว (ข) รับข้อมูลของคู่กรณี ได้แก่ ชื่อ เบอร์โทร ทะเบียน และประกันภัย (ค) แจ้งตำรวจหากมีผู้บาดเจ็บหรือความเสียหายร้ายแรง (ง) ติดต่อเจ้าของทันทีก่อนยอมรับความผิดหรือชำระเงินให้คู่กรณี การไม่ปฏิบัติตามขั้นตอนนี้อาจทำให้สิทธิ์เรียกร้องประกันภัยเป็นโมฆะ</div>
-</div>
-</div>
-<div class="clause">
-<span class="clause-num">12.3.</span>
-<div class="bilingual-section">
-<div class="lang-en">If the insurance policy is void due to driver actions — such as driving under the influence of drugs or alcohol, driving without a valid licence, or violating local laws — the Renter will be liable for all damages, costs, and loss of rental revenue.</div>
-<div class="lang-th">หากกรมธรรม์ประกันภัยเป็นโมฆะเนื่องจากการกระทำของผู้ขับขี่ เช่น ขับรถขณะมึนเมา ขับโดยไม่มีใบอนุญาต หรือฝ่าฝืนกฎหมายท้องถิ่น ผู้เช่าต้องรับผิดชอบค่าเสียหาย ค่าใช้จ่าย และรายได้ค่าเช่าที่สูญเสียทั้งหมด</div>
-</div>
-</div>
-</div>
+  <section class="section">
+    <div class="section-title">17. Governing law / กฎหมายที่ใช้บังคับ</div>
+    <div class="section-body">
+      <div class="bilingual-section">
+        <div class="lang-en">This agreement is governed by the laws of {{jurisdiction}}. Any dispute must first be discussed in good faith before formal proceedings are taken.</div>
+        <div class="lang-th">สัญญานี้อยู่ภายใต้กฎหมายของ {{jurisdiction}} ข้อพิพาทใด ๆ ควรเจรจาโดยสุจริตก่อนดำเนินการทางกฎหมาย</div>
+      </div>
+    </div>
+  </section>
 
-<div class="section">
-<h2>13. Vehicle Return / การคืนรถ</h2>
-<div class="clause">
-<span class="clause-num">13.1.</span>
-<div class="bilingual-section">
-<div class="lang-en">The vehicle must be returned by the time stated in Section 5.2 unless an extension is arranged in advance.</div>
-<div class="lang-th">ต้องคืนรถภายในเวลาที่ระบุในข้อ 5.2 เว้นแต่จะมีการตกลงต่อสัญญาล่วงหน้า</div>
-</div>
-</div>
-<div class="clause">
-<span class="clause-num">13.2.</span>
-<div class="bilingual-section">
-<div class="lang-en">The vehicle must be returned in a clean and presentable condition. A cleaning fee starting from <span class="highlight">{{cleaning_fee_minimum}} THB</span> may apply if returned excessively dirty.</div>
-<div class="lang-th">ต้องคืนรถในสภาพสะอาดและเรียบร้อย อาจมีค่าทำความสะอาดเริ่มต้น <span class="highlight">{{cleaning_fee_minimum}} บาท</span> หากรถสกปรกเกินปกติ</div>
-</div>
-</div>
-</div>
+  <section class="section">
+    <div class="section-title">18. Additional terms / เงื่อนไขเพิ่มเติม</div>
+    <div class="section-body">
+      <div class="clause">
+        <div class="bilingual-section">
+          <div class="lang-en"><span class="clause-num">18.1 Deposit return.</span> Any remaining deposit will normally be returned within {{deposit_return_days}} business days after return inspection, payment reconciliation and confirmation that no further fines or charges are due.</div>
+          <div class="lang-th"><span class="clause-num">18.1 การคืนเงินประกัน.</span> เงินประกันคงเหลือจะคืนโดยปกติภายใน {{deposit_return_days}} วันทำการ หลังจากตรวจคืนรถ กระทบยอดการชำระเงิน และยืนยันว่าไม่มีค่าปรับหรือค่าใช้จ่ายเพิ่มเติม</div>
+        </div>
+      </div>
+      <div class="clause">
+        <div class="bilingual-section">
+          <div class="lang-en"><span class="clause-num">18.2 Smoking and cleaning.</span> Smoking, pets, excessive sand, stains, odour or unreasonable dirt may incur cleaning charges up to ฿{{smoking_fee_maximum}} or more where professional cleaning is required.</div>
+          <div class="lang-th"><span class="clause-num">18.2 การสูบบุหรี่และทำความสะอาด.</span> การสูบบุหรี่ สัตว์เลี้ยง ทรายมากเกินไป คราบ กลิ่น หรือความสกปรกเกินสมควร อาจมีค่าทำความสะอาดสูงสุด ฿{{smoking_fee_maximum}} หรือมากกว่านั้นหากต้องทำความสะอาดโดยผู้เชี่ยวชาญ</div>
+        </div>
+      </div>
+      <div class="clause">
+        <div class="bilingual-section">
+          <div class="lang-en"><span class="clause-num">18.3 Emergency repairs.</span> Emergency repairs require prior approval where possible and receipts must be provided. Unauthorised repairs may not be reimbursed.</div>
+          <div class="lang-th"><span class="clause-num">18.3 การซ่อมฉุกเฉิน.</span> การซ่อมฉุกเฉินควรได้รับอนุมัติก่อนเท่าที่ทำได้และต้องมีใบเสร็จ การซ่อมที่ไม่ได้รับอนุมัติอาจไม่ได้รับการชดใช้</div>
+        </div>
+      </div>
+      <div class="clause">
+        <div class="bilingual-section">
+          <div class="lang-en"><span class="clause-num">18.4 Keys and documents.</span> Lost keys, remote controls, registration documents, insurance documents or accessories are charged at replacement cost plus reasonable administration cost.</div>
+          <div class="lang-th"><span class="clause-num">18.4 กุญแจและเอกสาร.</span> กุญแจ รีโมต เอกสารทะเบียน เอกสารประกัน หรืออุปกรณ์ที่สูญหาย จะคิดตามค่าทดแทนจริงรวมถึงค่าดำเนินการที่สมเหตุสมผล</div>
+        </div>
+      </div>
+      <div class="clause">
+        <div class="bilingual-section">
+          <div class="lang-en"><span class="clause-num">18.5 Communications.</span> Notices may be sent by phone, WhatsApp, LINE, SMS, email or the customer booking portal using the contact details provided by the Renter.</div>
+          <div class="lang-th"><span class="clause-num">18.5 การติดต่อสื่อสาร.</span> การแจ้งเตือนอาจส่งทางโทรศัพท์ WhatsApp LINE SMS อีเมล หรือพอร์ทัลลูกค้า โดยใช้ข้อมูลติดต่อที่ผู้เช่าให้ไว้</div>
+        </div>
+      </div>
+      <div class="clause">
+        <div class="bilingual-section">
+          <div class="lang-en"><span class="clause-num">18.6 Photos and videos.</span> Inspection photos and videos are part of this agreement and may be used to prove vehicle condition before, during and after the rental.</div>
+          <div class="lang-th"><span class="clause-num">18.6 รูปภาพและวิดีโอ.</span> รูปภาพและวิดีโอการตรวจสภาพเป็นส่วนหนึ่งของสัญญานี้ และอาจใช้เป็นหลักฐานสภาพยานพาหนะก่อน ระหว่าง และหลังการเช่า</div>
+        </div>
+      </div>
+      <div class="clause">
+        <div class="bilingual-section">
+          <div class="lang-en"><span class="clause-num">18.7 No Sub-Leasing or Assignment.</span> The Renter may not sub-let, sub-lease, hire out, or otherwise transfer the vehicle or any rights under this agreement to any third party, whether for payment or otherwise, without the prior written consent of the Owner. Any such arrangement made without consent will constitute a material breach of this agreement and entitle the Owner to immediately repossess the vehicle and forfeit the security deposit in full.</div>
+          <div class="lang-th"><span class="clause-num">18.7 ห้ามให้เช่าช่วงหรือโอนสิทธิ.</span> ผู้เช่าห้ามให้เช่าช่วง ให้เช่าต่อ จ้างใช้ หรือโอนยานพาหนะหรือสิทธิใด ๆ ภายใต้สัญญานี้ให้แก่บุคคลภายนอก ไม่ว่าจะมีค่าตอบแทนหรือไม่ เว้นแต่ได้รับความยินยอมเป็นลายลักษณ์อักษรล่วงหน้าจากผู้ให้เช่า การกระทำดังกล่าวโดยไม่ได้รับความยินยอมถือเป็นการผิดสัญญาอย่างมีนัยสำคัญ และให้สิทธิผู้ให้เช่านำยานพาหนะคืนได้ทันทีและริบเงินประกันทั้งหมด</div>
+        </div>
+      </div>
+      {{#if special_conditions}}
+      <div class="clause">
+        <div class="bilingual-section">
+          <div class="lang-en"><span class="clause-num">18.8 Special conditions.</span> {{special_conditions}}</div>
+          <div class="lang-th"><span class="clause-num">18.8 เงื่อนไขพิเศษ.</span> เงื่อนไขพิเศษข้างต้นเป็นส่วนหนึ่งของสัญญานี้และมีผลผูกพันผู้เช่า</div>
+        </div>
+      </div>
+      {{/if}}
+    </div>
+  </section>
 
-<div class="section">
-<h2>14. Mileage / ระยะทาง</h2>
-<div class="clause">
-<span class="clause-num">14.1.</span>
-<div class="bilingual-section">
-<div class="lang-en">The rental includes mileage up to <span class="highlight">{{mileage_limit}} km per month</span>. The Renter should notify the Owner if they expect to exceed this limit. Excess mileage charges may apply and will be agreed between the parties.</div>
-<div class="lang-th">การเช่ารวมระยะทางสูงสุด <span class="highlight">{{mileage_limit}} กม. ต่อเดือน</span> ผู้เช่าควรแจ้งเจ้าของหากคาดว่าจะเกินขีดจำกัดนี้ อาจมีค่าธรรมเนียมระยะทางส่วนเกินตามที่ทั้งสองฝ่ายตกลงกัน</div>
-</div>
-</div>
-<div class="clause">
-<span class="clause-num">14.2.</span> Odometer at delivery / เลขไมล์ ณ วันรับรถ: <span class="field-line">{{delivery_odometer}} km</span>
-</div>
-</div>
+  <div class="warning-box">
+    <div class="bilingual-section">
+      <div class="lang-en"><strong>Important:</strong> By signing below, the Renter confirms they have read, understood and accepted this agreement and the vehicle condition records.</div>
+      <div class="lang-th"><strong>สำคัญ:</strong> การลงนามด้านล่างถือว่าผู้เช่าได้อ่าน เข้าใจ และยอมรับสัญญานี้รวมถึงบันทึกสภาพยานพาหนะแล้ว</div>
+    </div>
+  </div>
 
-<div class="section">
-<h2>15. Fines and Violations / ค่าปรับและการละเมิด</h2>
-<div class="clause">
-<span class="clause-num">15.1.</span>
-<div class="bilingual-section">
-<div class="lang-en">The Renter is responsible for any and all traffic violations, fines, or penalties incurred during the rental period.</div>
-<div class="lang-th">ผู้เช่ารับผิดชอบการฝ่าฝืนกฎจราจร ค่าปรับ หรือโทษทั้งหมดที่เกิดขึ้นในระหว่างระยะเวลาเช่า</div>
-</div>
-</div>
-</div>
-
-<div class="section">
-<h2>16. Termination / การบอกเลิกสัญญา</h2>
-<div class="clause">
-<span class="clause-num">16.1.</span>
-<div class="bilingual-section">
-<div class="lang-en">If payment is not made by the due date and no contact is made by the Renter, the Owner may collect the vehicle at any time and the security deposit will be forfeited.</div>
-<div class="lang-th">หากไม่ชำระเงินภายในวันครบกำหนดและผู้เช่าไม่ติดต่อ เจ้าของอาจเข้าครอบครองรถได้ทุกเมื่อและริบเงินประกัน</div>
-</div>
-</div>
-<div class="clause">
-<span class="clause-num">16.2.</span>
-<div class="bilingual-section">
-<div class="lang-en">Either party may terminate the contract with 7 days' written notice. The Renter must return the vehicle per Section 13. Pro-rata rental charges apply. If prepaid, the Owner will refund unused days minus applicable deductions.</div>
-<div class="lang-th">คู่สัญญาฝ่ายใดฝ่ายหนึ่งอาจบอกเลิกสัญญาโดยแจ้งเป็นลายลักษณ์อักษรล่วงหน้า 7 วัน ผู้เช่าต้องคืนรถตามข้อ 13 มีการคิดค่าเช่าตามสัดส่วน หากชำระล่วงหน้า เจ้าของจะคืนเงินสำหรับวันที่ไม่ได้ใช้หักด้วยค่าใช้จ่ายที่เกี่ยวข้อง</div>
-</div>
-</div>
-</div>
-
-<div class="section">
-<h2>17. Jurisdiction / เขตอำนาจศาล</h2>
-<div class="clause">
-<span class="clause-num">17.1.</span>
-<div class="bilingual-section">
-<div class="lang-en">This agreement is legally binding under the laws of <span class="highlight">{{jurisdiction}}</span>.</div>
-<div class="lang-th">สัญญาฉบับนี้มีผลผูกพันทางกฎหมายภายใต้กฎหมายของ <span class="highlight">{{jurisdiction}}</span></div>
-</div>
-</div>
-</div>
-
-<div class="section">
-<h2>18. Additional Terms / ข้อกำหนดเพิ่มเติม</h2>
-<div class="clause">
-<span class="clause-num">18.1.</span>
-<div class="bilingual-section">
-<div class="lang-en">The security deposit will be returned within <span class="highlight">{{deposit_return_days}} business days</span> after vehicle return, provided an inspection confirms the vehicle is in the same condition as when rented, less reasonable wear and tear.</div>
-<div class="lang-th">เงินประกันจะคืนภายใน <span class="highlight">{{deposit_return_days}} วันทำการ</span> หลังคืนรถ โดยต้องผ่านการตรวจสอบว่ารถอยู่ในสภาพเดิมโดยคำนึงถึงการสึกหรอตามปกติ</div>
-</div>
-</div>
-</div>
-<div class="clause">
-<span class="clause-num">18.2.</span>
-<div class="bilingual-section">
-<div class="lang-en">Smoking inside the vehicle is strictly prohibited. A cleaning fee of up to <span class="highlight">{{smoking_fee_maximum}} THB</span> may be charged if the vehicle is returned with smoke odours, ash, or burns. Pets are not permitted without prior written consent.</div>
-<div class="lang-th">ห้ามสูบบุหรี่ภายในรถโดยเด็ดขาด อาจมีค่าทำความสะอาดสูงสุด <span class="highlight">{{smoking_fee_maximum}} บาท</span> หากรถมีกลิ่นบุหรี่ เถ้า หรือรอยไหม้ ห้ามนำสัตว์เลี้ยงขึ้นรถโดยไม่ได้รับอนุญาตเป็นลายลักษณ์อักษร</div>
-</div>
-</div>
-</div>
-<div class="clause">
-<span class="clause-num">18.3.</span>
-<div class="bilingual-section">
-<div class="lang-en">If urgent repairs are required and the Owner cannot be contacted, the Renter may authorise emergency repairs up to <span class="highlight">{{emergency_repair_limit}} THB</span>. The Renter must retain all receipts for reimbursement. Unauthorised repairs above this limit will not be reimbursed.</div>
-<div class="lang-th">หากต้องซ่อมฉุกเฉินและติดต่อเจ้าของไม่ได้ ผู้เช่าอาจอนุมัติการซ่อมฉุกเฉินได้สูงสุด <span class="highlight">{{emergency_repair_limit}} บาท</span> โดยต้องเก็บใบเสร็จทั้งหมดเพื่อเบิกคืน การซ่อมที่ไม่ได้รับอนุญาตเกินวงเงินนี้จะไม่ได้รับการชดเชย</div>
-</div>
-</div>
-</div>
-<div class="clause">
-<span class="clause-num">18.4.</span>
-<div class="bilingual-section">
-<div class="lang-en">The Renter is responsible for the safekeeping of all vehicle keys. Lost, damaged, or unreturned keys will be charged at actual replacement cost including reprogramming fees.</div>
-<div class="lang-th">ผู้เช่ารับผิดชอบการดูแลรักษากุญแจรถทั้งหมด กุญแจที่สูญหาย เสียหาย หรือไม่ได้คืนจะคิดค่าใช้จ่ายตามราคาจริงรวมค่าโปรแกรมใหม่</div>
-</div>
-</div>
-</div>
-<div class="clause">
-<span class="clause-num">18.5.</span>
-<div class="bilingual-section">
-<div class="lang-en">Communication records including messages or call logs shared through LINE, WhatsApp, Messenger, or email may be used as evidence in resolving disputes.</div>
-<div class="lang-th">บันทึกการสื่อสารรวมถึงข้อความหรือบันทึกการโทรที่แชร์ผ่าน LINE, WhatsApp, Messenger หรืออีเมล อาจใช้เป็นหลักฐานในการระงับข้อพิพาท</div>
-</div>
-</div>
-</div>
-<div class="clause">
-<span class="clause-num">18.6.</span>
-<div class="bilingual-section">
-<div class="lang-en">Photo and video records made at delivery document the vehicle condition at commencement of the rental period. These records are binding in any dispute regarding damage. The Renter's signature confirms acceptance of the vehicle condition as documented.</div>
-<div class="lang-th">ภาพถ่ายและวิดีโอที่บันทึก ณ เวลาส่งมอบเป็นเอกสารยืนยันสภาพรถ ณ เริ่มต้นระยะเวลาเช่า บันทึกเหล่านี้มีผลผูกพันในข้อพิพาทเรื่องความเสียหาย การลงนามของผู้เช่ายืนยันการยอมรับสภาพรถตามที่บันทึกไว้</div>
-</div>
-</div>
-</div>
-
-<!-- CONDITIONAL: island_travel_clause_enabled -->
-<div class="clause conditional">
-<span class="clause-num">18.7.</span>
-<div class="bilingual-section">
-<div class="lang-en"><strong>Off-Territory Recovery:</strong> If the vehicle is abandoned outside of <strong>{{home_territory}}</strong> without consent, the Renter is liable for all recovery costs including ferry transport, towing, storage, and the Owner's travel expenses. These costs will be deducted from the security deposit with any excess invoiced to the Renter.</div>
-<div class="lang-th"><strong>การกู้คืนนอกพื้นที่:</strong> หากรถถูกทอดทิ้งนอก<strong>{{home_territory}}</strong> โดยไม่ได้รับความยินยอม ผู้เช่าต้องรับผิดชอบค่าใช้จ่ายการกู้คืนทั้งหมด รวมถึงค่าเรือเฟอร์รี่ ค่าลากจูง ค่าจอดรถ และค่าใช้จ่ายเดินทางของเจ้าของ ค่าใช้จ่ายเหล่านี้จะหักจากเงินประกัน และส่วนที่เกินจะแจ้งเก็บจากผู้เช่า</div>
-</div>
-</div>
-<!-- END CONDITIONAL -->
-
-{{#if special_conditions}}
-<div class="clause">
-<span class="clause-num">18.8.</span>
-<div class="bilingual-section">
-<div class="lang-en"><strong>Special Conditions / เงื่อนไขพิเศษ:</strong></div>
-</div>
-{{special_conditions}}
-</div>
-{{/if}}
-</div>
-
-<div class="warning-box">
-<div class="bilingual-section">
-<div class="lang-en" style="font-size: 11px; font-weight: 600;">⚠️ IMPORTANT: By signing this contract, the Renter confirms they have read, understood, and agree to all terms above, including confirmation that they hold a valid driving licence appropriate for this vehicle in {{jurisdiction}}.</div>
-<div class="lang-th" style="font-size: 11px; font-weight: 600;">⚠️ สำคัญ: การลงนามในสัญญาฉบับนี้ ผู้เช่ายืนยันว่าได้อ่าน เข้าใจ และยอมรับข้อกำหนดทั้งหมดข้างต้น รวมถึงยืนยันว่ามีใบขับขี่ที่ถูกต้องและเหมาะสมสำหรับยานพาหนะนี้ใน{{jurisdiction}}</div>
-</div>
-</div>
-
-<div class="page-break"></div>
-
-<div class="section">
-<h2>Signatures / ลายเซ็น</h2>
-<p style="font-size: 11px; color: #717d86;">By signing below, both parties confirm they have read, understood, and agree to the terms of this rental contract. / โดยการลงนามด้านล่าง คู่สัญญาทั้งสองฝ่ายยืนยันว่าได้อ่าน เข้าใจ และยินยอมผูกพันตามเงื่อนไขของสัญญาเช่านี้</p>
-<p><strong>Date / วันที่:</strong> <span class="field-line">{{contract_date}}</span></p>
-
-<div class="signature-grid">
-  <div>
-    <p><strong>Owner / ผู้ให้เช่า</strong></p>
-    <div style="height: 80px; border: 1px dashed #ccc; border-radius: 4px; margin: 8px 0; display: flex; align-items: center; justify-content: center;">
+  <div class="signature-grid">
+    <div class="signature-box">
+      <div class="info-label">Owner signature / ลายมือชื่อผู้ให้เช่า</div>
       {{#if owner_signature_url}}
-      <img src="{{owner_signature_url}}" class="sig-image" alt="Owner signature"/>
+      <div class="signature-pad"><img src="{{owner_signature_url}}" class="sig-image" alt="Owner signature" /></div>
       {{else}}
-      <span style="color:#999;font-size:11px;">Owner signature / ลายเซ็นเจ้าของ</span>
+      <div class="signature-pad">Owner signature to be added / รอลายมือชื่อผู้ให้เช่า</div>
       {{/if}}
+      <div class="info-value">{{owner_name}}</div>
     </div>
-    <div class="sig-block">Name (print) / ชื่อ (ตัวพิมพ์): {{owner_name}}</div>
-  </div>
-  <div>
-    <p><strong>Renter / ผู้เช่า</strong></p>
-    <div style="height: 80px; border: 1px dashed #ccc; border-radius: 4px; margin: 8px 0; display: flex; align-items: center; justify-content: center;">
+    <div class="signature-box">
+      <div class="info-label">Renter signature / ลายมือชื่อผู้เช่า</div>
       {{#if customer_signature_url}}
-      <img src="{{customer_signature_url}}" class="sig-image" alt="Renter signature"/>
+      <div class="signature-pad"><img src="{{customer_signature_url}}" class="sig-image" alt="Customer signature" /></div>
       {{else}}
-      <span style="color:#999;font-size:11px;">Renter signature / ลายเซ็นผู้เช่า</span>
+      <div class="signature-pad">Customer signature pending / รอลายมือชื่อผู้เช่า</div>
       {{/if}}
+      <div class="info-value">{{renter_full_name}}</div>
+      <div class="owner-details" style="text-align:left;">Signed: {{customer_signed_at}}</div>
     </div>
-    <div class="sig-block">Name (print) / ชื่อ (ตัวพิมพ์): {{renter_full_name}}</div>
-    {{#if customer_signed_at}}
-    <div style="font-size:10px;color:#717d86;margin-top:4px;">Signed digitally / ลงนามดิจิทัล: {{customer_signed_at}}</div>
-    {{/if}}
   </div>
-</div>
-</div>
 
+  {{#if delivery_appendix_visible}}
+  <div class="page-break"></div>
+  <section class="section">
+    <div class="section-title">Appendix A. Delivery inspection / ภาคผนวก ก. การตรวจรับรถ</div>
+    <div class="section-body">
+      <div class="info-grid grid-3">
+        <div class="info-cell"><div class="info-label">Delivery date / วันที่ส่งมอบ</div><div class="info-value">{{delivery_date}}</div></div>
+        <div class="info-cell"><div class="info-label">Odometer / เลขไมล์</div><div class="info-value">{{delivery_odometer}}</div></div>
+        <div class="info-cell"><div class="info-label">Fuel level / ระดับน้ำมัน</div><div class="info-value">{{delivery_fuel_level}}</div></div>
+      </div>
+      <div class="info-grid grid-1">
+        <div class="info-cell"><div class="info-label">Delivery location / สถานที่ส่งมอบ</div><div class="info-value">{{delivery_location}}</div></div>
+      </div>
+      <!-- CONDITIONAL: delivery_fuel_image_url -->
+      <div class="bilingual-section">
+        <div class="lang-en"><strong>Fuel level photo</strong></div>
+        <div class="lang-th"><strong>รูปภาพระดับน้ำมัน</strong></div>
+      </div>
+      <img src="{{delivery_fuel_image_url}}" class="appendix-photo" alt="Fuel level photo" />
+      <!-- END CONDITIONAL -->
+      <div class="bilingual-section" style="margin-top:12px;">
+        <div class="lang-en"><strong>Damage and condition report</strong></div>
+        <div class="lang-th"><strong>รายงานความเสียหายและสภาพยานพาหนะ</strong></div>
+      </div>
+      {{delivery_damage_report}}
+      <div class="signature-box" style="margin-top:14px;">
+        <div class="info-label">Customer delivery acceptance / ลูกค้ายอมรับสภาพรถตอนส่งมอบ</div>
+        <!-- CONDITIONAL: delivery_customer_signature_url -->
+        <div class="signature-pad"><img src="{{delivery_customer_signature_url}}" class="sig-image" alt="Delivery customer signature" /></div>
+        <!-- END CONDITIONAL -->
+        <div class="info-value">{{renter_full_name}}</div>
+        <div class="owner-details" style="text-align:left;">Signed: {{delivery_customer_signed_at}}</div>
+      </div>
+    </div>
+  </section>
+  {{/if}}
 </body>
 </html>

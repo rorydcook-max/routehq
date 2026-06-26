@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { CheckCircle2, CreditCard, FileText, IdCard, ImageIcon, MessageCircle, PenLine, Upload, UserRound, XCircle } from "lucide-react";
 import { completePublicBooking, reportPublicBookingPayment } from "@/app/actions/public-booking";
+import { extractBodyHtml } from "@/lib/contract-rendering";
 import { formatDeliveryLocation } from "@/lib/delivery-location";
 
 declare global {
@@ -68,6 +69,50 @@ const inputClass = "mt-2 focus:ring-2 focus:ring-[#0f766e]/15";
 const emojiSelectStyle = {
   fontFamily: '"Segoe UI Emoji", "Noto Color Emoji", "Apple Color Emoji", "Segoe UI", system-ui, sans-serif'
 };
+
+function buildContractPreviewDocument(contractHtml: string) {
+  const bodyHtml = extractBodyHtml(contractHtml);
+
+  return `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #fbfefd;
+        color: #344054;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        padding: 16px;
+        box-sizing: border-box;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+    </style>
+  </head>
+  <body>${bodyHtml}</body>
+</html>`;
+}
 
 // ISO 3166-1 alpha-2 code, nationality adjective, country name
 // Ordered with top Thailand tourism markets first, then alphabetical
@@ -1092,7 +1137,14 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
 
       <section className="rounded-2xl border border-[#d6e5e2] bg-white p-5 shadow-sm">
         <SectionTitle icon={PenLine} label="Rental Agreement" />
-        <div className="contract-preview mt-4 max-h-[460px] overflow-y-auto rounded-xl border border-[#d6e5e2] bg-[#fbfefd] p-4 text-sm leading-7 text-[#344054]" dangerouslySetInnerHTML={{ __html: detail.contractHtml }} />
+        <div className="routehq-contract-preview contract-preview mt-4 h-[460px] overflow-hidden rounded-xl border border-[#d6e5e2] bg-[#fbfefd]">
+          <iframe
+            className="h-full w-full border-0 bg-[#fbfefd]"
+            sandbox=""
+            srcDoc={buildContractPreviewDocument(detail.contractHtml)}
+            title="Rental agreement preview"
+          />
+        </div>
         <label className="checkbox-label mt-4 rounded-xl border border-[#d6e5e2] bg-white p-3 font-bold text-[#10252b]">
           <input
             checked={agreed}

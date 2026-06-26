@@ -132,6 +132,12 @@ export interface ContractVariables {
   delivery_date: string;
   delivery_location: string;
   delivery_damage_report: string;
+  owner_signature_url: string;
+  customer_signature_url: string;
+  customer_signed_at: string;
+  delivery_appendix_visible: boolean;
+  delivery_customer_signature_url: string;
+  delivery_customer_signed_at: string;
   island_travel_clause_enabled: boolean;
   secondary_deposit_enabled: boolean;
   geofence_monitoring_enabled: boolean;
@@ -195,6 +201,12 @@ export const contractVariableKeys = [
   "delivery_date",
   "delivery_location",
   "delivery_damage_report",
+  "owner_signature_url",
+  "customer_signature_url",
+  "customer_signed_at",
+  "delivery_appendix_visible",
+  "delivery_customer_signature_url",
+  "delivery_customer_signed_at",
   "customer_name",
   "customer_passport",
   "customer_nationality",
@@ -236,6 +248,91 @@ export function renderContractTemplate(template: string, variables: Record<strin
   });
 }
 
+/**
+ * Extracts the inner content of a full HTML document for safe inline preview.
+ *
+ * The contract template is a full HTML document (<!DOCTYPE html><html>...) which
+ * is correct for PDF generation. For inline preview inside React via
+ * dangerouslySetInnerHTML, we need only the <body> content with styles inlined,
+ * because injecting a full HTML document into the DOM breaks the page layout.
+ *
+ * Extracts:
+ *   - All <style> blocks from <head>, wrapped in a single <style> tag
+ *   - The inner content of <body>
+ *
+ * Falls back to returning the original string unchanged if no <body> tag is
+ * found (handles legacy body-fragment templates gracefully).
+ */
+export function extractBodyHtml(fullHtml: string): string {
+  const trimmed = fullHtml.trimStart();
+
+  // Already a fragment — no document wrapper to strip
+  if (
+    !trimmed.toLowerCase().startsWith("<!doctype") &&
+    !trimmed.toLowerCase().startsWith("<html")
+  ) {
+    return fullHtml;
+  }
+
+  // Extract <style> blocks from <head>
+  const styles: string[] = [];
+  const stylePattern = /<style[^>]*>([\s\S]*?)<\/style>/gi;
+  let styleMatch: RegExpExecArray | null;
+  while ((styleMatch = stylePattern.exec(fullHtml)) !== null) {
+    styles.push(styleMatch[1]);
+  }
+
+  // Scope all CSS selectors to .routehq-contract-preview so that contract
+  // styles (body {}, h2 {}, etc.) don't leak into the surrounding page when
+  // injected via dangerouslySetInnerHTML.
+  const scopedCss = styles
+    .join("\n")
+    .split(/\n/)
+    .map((line) => {
+      const trimmedLine = line.trim();
+      if (
+        !trimmedLine ||
+        trimmedLine.startsWith("//") ||
+        trimmedLine.startsWith("/*") ||
+        trimmedLine.startsWith("*") ||
+        trimmedLine.startsWith("@") ||
+        trimmedLine.startsWith("}") ||
+        !trimmedLine.includes("{")
+      ) {
+        return line;
+      }
+      const [selectorPart, ...rest] = line.split("{");
+      const scopedSelectors = selectorPart
+        .split(",")
+        .map((sel) => {
+          const s = sel.trim();
+          if (!s) return s;
+          if (s.startsWith(".routehq-contract-preview")) return s;
+          if (s === "body") return ".routehq-contract-preview";
+          return `.routehq-contract-preview ${s}`;
+        })
+        .join(", ");
+      return `${scopedSelectors} {${rest.join("{")}`;
+    })
+    .join("\n");
+
+  const styleBlock = scopedCss.trim() ? `<style>\n${scopedCss}\n</style>` : "";
+
+  // Extract <body> inner content using indexOf for reliability
+  const bodyOpen = fullHtml.toLowerCase().indexOf("<body");
+  const bodyClose = fullHtml.toLowerCase().lastIndexOf("</body>");
+
+  if (bodyOpen === -1) {
+    return fullHtml;
+  }
+
+  const bodyTagEnd = fullHtml.indexOf(">", bodyOpen) + 1;
+  const bodyContent =
+    bodyClose !== -1 ? fullHtml.slice(bodyTagEnd, bodyClose) : fullHtml.slice(bodyTagEnd);
+
+  return `${styleBlock}\n${bodyContent}`;
+}
+
 export function renderContract(template: string, variables: Record<string, unknown>) {
   return renderContractTemplate(template, variables);
 }
@@ -266,6 +363,42 @@ export function buildContractVariables({
   const vehicleSpecs = typeof vehicle?.specifications === "object" && vehicle.specifications ? vehicle.specifications : {};
   const fuelType = vehicle?.fuel_type || vehicleSpecs.fuel_type || vehicleSpecs.fuelType || "";
   const deliveryLocation = bookingData.delivery_location || rental?.delivery_location || bookingData.collection_address || "To be confirmed";
+  const deliveryOdometer = stripEmpty(bookingData.delivery_odometer || bookingData.odometer_at_delivery, "");
+  const deliveryFuelLevel = stripEmpty(bookingData.delivery_fuel_level || bookingData.fuel_level_at_delivery, "");
+  const deliveryFuelImageUrl = stripEmpty(bookingData.delivery_fuel_image_url || bookingData.fuel_photo_url, "");
+  const deliveryDamageReport = stripEmpty(bookingData.delivery_damage_report || bookingData.damage_report_html || bookingData.delivery_damage_html, "");
+  const ownerSignatureUrl = stripEmpty(
+    organization?.settings?.owner_signature_url ||
+      organization?.settings?.signature_url ||
+      organization?.owner_signature_url,
+    ""
+  );
+  const customerSignatureUrl = stripEmpty(
+    bookingData.customer_signature_url ||
+      bookingData.signature_url ||
+      bookingLink?.customer_signature_url ||
+      bookingLink?.signature_url,
+    ""
+  );
+  const customerSignedAt =
+    bookingData.customer_signed_at ||
+    bookingData.signed_at ||
+    bookingLink?.customer_signed_at ||
+    bookingLink?.signed_at ||
+    null;
+  const deliveryCustomerSignatureUrl = stripEmpty(
+    bookingData.delivery_customer_signature_url || bookingData.delivery_signature_url,
+    ""
+  );
+  const deliveryCustomerSignedAt = bookingData.delivery_customer_signed_at || null;
+  const deliveryAppendixVisible = Boolean(
+    deliveryOdometer ||
+      deliveryFuelLevel ||
+      deliveryFuelImageUrl ||
+      deliveryDamageReport ||
+      deliveryCustomerSignatureUrl ||
+      deliveryCustomerSignedAt
+  );
   const deliveryMethod =
     bookingData.delivery_method === "collection" || bookingData.delivery_method === "collect"
       ? "Customer collection"
@@ -323,12 +456,18 @@ export function buildContractVariables({
     contract_date: formatContractDate(new Date().toISOString(), locale),
     included_items: includedItemsHtml(includedItems),
     special_conditions: stripEmpty(bookingLink?.special_conditions || bookingData.special_conditions, ""),
-    delivery_odometer: "",
-    delivery_fuel_level: "",
-    delivery_fuel_image_url: "",
+    delivery_odometer: deliveryOdometer,
+    delivery_fuel_level: deliveryFuelLevel,
+    delivery_fuel_image_url: deliveryFuelImageUrl,
     delivery_date: deliveryDateTime ? formatContractDate(deliveryDateTime, locale) : "",
     delivery_location: stripEmpty(deliveryLocation),
-    delivery_damage_report: "<div style=\"border:1px solid #ccc; min-height:80px; padding:10px; color:#777;\">Delivery inspection report to be attached or completed at handover.</div>",
+    delivery_damage_report: deliveryDamageReport || "<div style=\"background:#f8f9fa;border:1px dashed #c4c9cc;border-radius:6px;padding:10px;color:#717d86;font-size:11px;\">Delivery inspection report to be attached or completed at handover.</div>",
+    owner_signature_url: ownerSignatureUrl,
+    customer_signature_url: customerSignatureUrl,
+    customer_signed_at: customerSignedAt ? formatContractDate(String(customerSignedAt), locale) : "",
+    delivery_appendix_visible: deliveryAppendixVisible,
+    delivery_customer_signature_url: deliveryCustomerSignatureUrl,
+    delivery_customer_signed_at: deliveryCustomerSignedAt ? formatContractDate(String(deliveryCustomerSignedAt), locale) : "",
     island_travel_clause_enabled: islandClauseEnabled,
     secondary_deposit_enabled: secondaryDepositEnabled,
     geofence_monitoring_enabled: settings.geofence_monitoring_enabled,

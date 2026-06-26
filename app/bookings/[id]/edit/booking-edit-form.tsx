@@ -247,14 +247,14 @@ function DeliveryMethodCards({ value }: { value: string }) {
           ["tbd", "To be determined", "Confirm later"]
         ].map(([entry, label, sub]) => (
           <label
-            className={`pressable flex min-h-16 cursor-pointer flex-col justify-center rounded-lg border px-3 py-2 ${
+            className={`pressable block min-h-16 cursor-pointer rounded-lg border px-3 py-3 ${
               method === entry ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"
             }`}
             key={entry}
           >
             <input className="sr-only" checked={method === entry} name="deliveryMethod" onChange={() => setMethod(entry)} type="radio" value={entry} />
-            <span className="text-sm font-bold">{label}</span>
-            <span className="mt-1 text-xs opacity-75">{sub}</span>
+            <span className="block text-sm font-bold">{label}</span>
+            <span className="mt-1 block text-xs opacity-75">{sub}</span>
           </label>
         ))}
       </div>

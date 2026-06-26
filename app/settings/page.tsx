@@ -15,6 +15,7 @@ import {
 } from "@/app/actions/settings";
 import { BranchList } from "@/app/settings/branch-list";
 import { LogoUploadSection } from "@/app/settings/logo-upload-section";
+import { SignatureUploadSection } from "@/app/settings/signature-upload-section";
 import { LineTestButton } from "@/app/settings/line-test-button";
 import { CopyButton } from "@/app/settings/copy-button";
 import { InviteForm } from "@/app/invite/invite-form";
@@ -204,6 +205,10 @@ export default async function SettingsPage() {
   const typedRecentTrims = (recentTrims || []) as VehicleTrimSetting[];
   const typedCatalogSubmissions = (catalogSubmissionsResult.data || []) as VehicleCatalogSubmissionSetting[];
   const businessLogoUrl = await signedLogoUrl(supabase, organization.logo_url);
+  const organizationSettings = organization.settings && typeof organization.settings === "object" && !Array.isArray(organization.settings)
+    ? (organization.settings as Record<string, unknown>)
+    : {};
+  const ownerSignatureUrl = String(organizationSettings.owner_signature_url || organization.owner_signature_url || "").trim() || null;
   const makeMap = new Map<string, VehicleMakeSetting>(typedVehicleMakes.map((make) => [make.id, make]));
   const modelMap = new Map<string, VehicleModelSetting>(typedVehicleModels.map((model) => [model.id, model]));
   const travelPolicySettings = getTravelPolicySettings(organization.settings);
@@ -268,6 +273,9 @@ export default async function SettingsPage() {
           <SectionHeader eyebrow="Organization" title={organization.name} />
           <div className="card-section">
             <LogoUploadSection logoUrl={businessLogoUrl || organization.logo_url} orgName={organization.name} />
+            <div className="mt-3">
+              <SignatureUploadSection signatureUrl={ownerSignatureUrl} />
+            </div>
           </div>
           <div className="card-section grid gap-3 sm:grid-cols-3">
             <div className="rounded-lg border border-[#dfe4ea] p-2">

@@ -884,6 +884,13 @@ export async function deleteBooking(rentalId: string): Promise<{ success: boolea
     await supabase.from("rental_payments").update({ transaction_id: null }).in("transaction_id", ids);
   }
 
+  // receipts.rental_id has no ON DELETE SET NULL, so detach receipts before deleting the rental.
+  await supabase
+    .from("receipts")
+    .update({ rental_id: null })
+    .eq("rental_id", cleanId)
+    .eq("organisation_id", rental.organization_id);
+
   await Promise.allSettled([
     supabase.from("rental_payments").delete().eq("rental_id", cleanId).eq("organization_id", rental.organization_id),
     supabase.from("transactions").delete().eq("rental_id", cleanId).eq("organization_id", rental.organization_id),
@@ -891,6 +898,7 @@ export async function deleteBooking(rentalId: string): Promise<{ success: boolea
     supabase.from("booking_links").delete().eq("rental_id", cleanId).eq("organization_id", rental.organization_id),
     supabase.from("contracts").delete().eq("rental_id", cleanId).eq("organization_id", rental.organization_id),
     supabase.from("activity_events").delete().eq("rental_id", cleanId).eq("organization_id", rental.organization_id),
+    supabase.from("communication_log").delete().eq("rental_id", cleanId).eq("organisation_id", rental.organization_id),
   ]);
 
   const { error: deleteError } = await supabase
@@ -2714,4 +2722,293 @@ export async function cleanupDepositPayments(rentalId: string) {
   revalidatePath(`/bookings/${cleanRentalId}/edit`);
 
   return { success: true, voided: depositPaymentIds.length };
+}
+
+export async function cancelBookingWithDisposition(formData: FormData) {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("You must be signed in.");
+
+  const organizationId  = String(formData.get("organizationId") || "").trim();
+  const rentalId        = String(formData.get("rentalId") || "").trim();
+  const vehicleId       = String(formData.get("vehicleId") || "").trim();
+  const reasonRaw       = String(formData.get("reason") || "").trim();
+  const reason          = reasonRaw;
+  const reasonLabel     = reasonRaw.split(",").map(r => r.replace(/_/g, " ")).join(" + ");
+  const refundOption    = String(formData.get("refundOption") || "").trim();
+  const partialRefund   = Number(formData.get("partialRefundAmount") || 0);
+  const partialDeposit  = Number(formData.get("partialDepositReturn") || 0);
+  const notes           = String(formData.get("notes") || "").trim();
+
+  if (!organizationId || !rentalId) throw new Error("Missing required fields.");
+
+  const { data: rental, error: rentalError } = await supabase
+    .from("rentals")
+    .select("*")
+    .eq("id", rentalId)
+    .eq("organization_id", organizationId)
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (rentalError || !rental) throw new Error(rentalError?.message || "Booking not found.");
+  if (["completed", "cancelled"].includes(rental.status)) {
+    throw new Error("This booking cannot be cancelled from its current status.");
+  }
+
+  const now = new Date().toISOString();
+  const today = now.slice(0, 10);
+  const currency = rental.currency || "THB";
+  const depositHeld = Number(rental.deposit_held || rental.deposit_amount || 0);
+
+  const { data: paidTransactions } = await supabase
+    .from("transactions")
+    .select("id, amount, type")
+    .eq("rental_id", rentalId)
+    .eq("organization_id", organizationId)
+    .eq("voided", false)
+    .in("type", ["rental_income", "deposit_received"])
+    .is("deleted_at", null);
+
+  const totalPaidIncome = (paidTransactions || [])
+    .filter((t: any) => t.type === "rental_income")
+    .reduce((sum: number, t: any) => sum + Number(t.amount || 0), 0);
+
+  await supabase
+    .from("rental_payments")
+    .update({ status: "cancelled" })
+    .eq("rental_id", rentalId)
+    .eq("organization_id", organizationId)
+    .in("status", ["scheduled", "pending", "overdue"]);
+
+  const transactionsToInsert: any[] = [];
+
+  if (refundOption) {
+    const isFullRefund    = refundOption.startsWith("full_refund");
+    const isPartialRefund = refundOption.startsWith("partial_refund");
+    const returnDeposit   = refundOption.endsWith("deposit_returned");
+    const retainDeposit   = refundOption.endsWith("deposit_retained");
+
+    const refundAmount = isFullRefund
+      ? totalPaidIncome
+      : isPartialRefund
+        ? partialRefund
+        : 0;
+
+    if (refundAmount > 0) {
+      transactionsToInsert.push({
+        organization_id: organizationId,
+        vehicle_id: vehicleId,
+        rental_id: rentalId,
+        customer_id: rental.customer_id,
+        type: "refund",
+        amount: -refundAmount,
+        currency,
+        transaction_date: today,
+        notes: `Rental refund on cancellation — ${reasonLabel}${notes ? `: ${notes}` : ""}`,
+        metadata: { cancellation_reason: reason, refund_option: refundOption, auto_created: true },
+        is_deposit: false,
+        created_by: user.id
+      });
+    }
+
+    if (returnDeposit && depositHeld > 0) {
+      const depositReturnAmount = isPartialRefund && partialDeposit > 0 ? partialDeposit : depositHeld;
+      transactionsToInsert.push({
+        organization_id: organizationId,
+        vehicle_id: vehicleId,
+        rental_id: rentalId,
+        customer_id: rental.customer_id,
+        type: "deposit_refunded",
+        amount: -depositReturnAmount,
+        currency,
+        transaction_date: today,
+        notes: `Deposit returned on cancellation — ${reasonLabel}`,
+        metadata: { cancellation_reason: reason, refund_option: refundOption, auto_created: true },
+        is_deposit: true,
+        deposit_rental_id: rentalId,
+        created_by: user.id
+      });
+    }
+
+    if (retainDeposit && depositHeld > 0) {
+      transactionsToInsert.push({
+        organization_id: organizationId,
+        vehicle_id: vehicleId,
+        rental_id: rentalId,
+        customer_id: rental.customer_id,
+        type: "deposit_forfeited",
+        amount: depositHeld,
+        currency,
+        transaction_date: today,
+        notes: `Deposit forfeited on cancellation — ${reasonLabel}`,
+        metadata: { cancellation_reason: reason, refund_option: refundOption, auto_created: true },
+        is_deposit: true,
+        deposit_rental_id: rentalId,
+        created_by: user.id
+      });
+    }
+  }
+
+  const depositStatus = (() => {
+    if (!refundOption || !depositHeld) return rental.deposit_status;
+    if (refundOption.endsWith("deposit_returned")) {
+      if (refundOption.startsWith("partial_refund") && partialDeposit > 0 && partialDeposit < depositHeld) {
+        return "partially_returned";
+      }
+      return "fully_returned";
+    }
+    if (refundOption.endsWith("deposit_retained")) return "forfeited";
+    return rental.deposit_status;
+  })();
+
+  const ops: Promise<any>[] = [
+    supabase
+      .from("rentals")
+      .update({
+        status: "cancelled",
+        metadata: {
+          ...(typeof rental.metadata === "object" && rental.metadata ? rental.metadata : {}),
+          cancellation_reason: reason,
+          cancellation_notes: notes || null,
+          cancellation_refund_option: refundOption || null,
+          cancelled_by: user.id,
+          cancelled_at: now
+        },
+        deposit_status: depositStatus,
+        ...(refundOption?.endsWith("deposit_returned")
+          ? {
+              deposit_refunded_amount: refundOption.startsWith("partial_refund") && partialDeposit > 0
+                ? partialDeposit
+                : depositHeld,
+              deposit_reconciled_at: now,
+              deposit_reconciled_by: user.id,
+              deposit_deduction_reason: notes || reason
+            }
+          : {}),
+        ...(refundOption?.endsWith("deposit_retained") && depositHeld > 0
+          ? {
+              deposit_forfeited_amount: depositHeld,
+              deposit_deduction_reason: notes || reason,
+              deposit_reconciled_at: now,
+              deposit_reconciled_by: user.id
+            }
+          : {})
+      })
+      .eq("id", rentalId)
+      .eq("organization_id", organizationId),
+
+    supabase
+      .from("booking_links")
+      .update({ status: "cancelled", cancelled_at: now })
+      .eq("organization_id", organizationId)
+      .eq("rental_id", rentalId),
+
+    supabase
+      .from("vehicles")
+      .update({
+        status: "available",
+        availability_status: "available_now",
+        current_customer_id: null,
+        current_rental_id: null
+      })
+      .eq("id", vehicleId)
+      .eq("organization_id", organizationId)
+      .eq("current_rental_id", rentalId),
+
+    ...(transactionsToInsert.length > 0
+      ? [supabase.from("transactions").insert(transactionsToInsert)]
+      : [])
+  ];
+
+  const results = await Promise.all(ops);
+  const firstError = results.find(r => r?.error)?.error;
+  if (firstError) throw new Error(firstError.message);
+
+  const refundLabel = refundOption ? ` — ${refundOption.replace(/_/g, " ")}` : "";
+
+  await recordActivityEvent(supabase, {
+    organization_id: organizationId,
+    actor_id: user.id,
+    entity_type: "rental",
+    entity_id: rentalId,
+    vehicle_id: vehicleId,
+    rental_id: rentalId,
+    customer_id: rental.customer_id,
+    event_type: "booking_cancelled",
+    title: "Booking cancelled",
+    detail: `${rental.reference || rental.display_code || rentalId} cancelled — ${reasonLabel}${refundLabel}.${notes ? ` Notes: ${notes}` : ""}`
+  });
+
+  revalidatePath("/");
+  revalidatePath("/bookings");
+  revalidatePath(`/bookings/${rentalId}`);
+  revalidatePath(`/fleet/${vehicleId}`);
+}
+
+export async function recordPaymentRefund(formData: FormData) {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("You must be signed in.");
+
+  const organizationId = String(formData.get("organizationId") || "").trim();
+  const rentalId = String(formData.get("rentalId") || "").trim();
+  const amount = Number(String(formData.get("amount") || "0").replace(/,/g, ""));
+  const notes = String(formData.get("notes") || "").trim();
+
+  if (!organizationId || !rentalId) throw new Error("Missing required fields.");
+  if (amount <= 0) throw new Error("Enter a refund amount greater than zero.");
+
+  const { data: rental, error: rentalError } = await supabase
+    .from("rentals")
+    .select("id, vehicle_id, customer_id, currency, organization_id")
+    .eq("id", rentalId)
+    .eq("organization_id", organizationId)
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (rentalError || !rental) throw new Error(rentalError?.message || "Booking not found.");
+
+  await ensureMembership(supabase, organizationId, user.id);
+
+  const { error } = await supabase
+    .from("transactions")
+    .insert({
+      organization_id: organizationId,
+      vehicle_id: rental.vehicle_id,
+      rental_id: rentalId,
+      customer_id: rental.customer_id,
+      type: "refund",
+      amount: -Math.abs(amount),
+      currency: rental.currency || "THB",
+      transaction_date: new Date().toISOString().slice(0, 10),
+      notes: notes || "Payment refund",
+      metadata: { description: "Payment refund", notes, created_by_operator: true },
+      is_deposit: false,
+      created_by: user.id
+    });
+
+  if (error) throw new Error(error.message);
+
+  await recordActivityEvent(supabase, {
+    organization_id: organizationId,
+    actor_id: user.id,
+    entity_type: "rental",
+    entity_id: rentalId,
+    vehicle_id: rental.vehicle_id,
+    rental_id: rentalId,
+    customer_id: rental.customer_id,
+    event_type: "payment_refunded",
+    title: "Payment refunded",
+    detail: `Refund of ${amount} ${rental.currency || "THB"} recorded.${notes ? ` Notes: ${notes}` : ""}`
+  });
+
+  revalidatePath("/");
+  revalidatePath("/bookings");
+  revalidatePath(`/bookings/${rentalId}`);
 }

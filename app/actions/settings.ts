@@ -111,6 +111,10 @@ function logoStorageReferenceFromUrl(url: string | null | undefined) {
   return null;
 }
 
+function settingsObject(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" && !Array.isArray(value) ? { ...(value as Record<string, unknown>) } : {};
+}
+
 const validPaymentMethods = new Set(["cash", "promptpay", "bank_transfer", "wise", "revolut"]);
 
 function parseAcceptedPaymentMethods(formData: FormData) {
@@ -324,7 +328,7 @@ export async function updateBusinessLogo(formData: FormData) {
 
     const storagePath = `${membership.organization_id}/branding/logo.${extension}`;
     const buffer = Buffer.from(await logoFile.arrayBuffer());
-    const { error: uploadError } = await supabase.storage.from("documents").upload(storagePath, buffer, {
+    const { error: uploadError } = await supabase.storage.from("branding").upload(storagePath, buffer, {
       contentType: logoFile.type || undefined,
       upsert: true
     });
@@ -334,7 +338,7 @@ export async function updateBusinessLogo(formData: FormData) {
       throw new Error(uploadError.message);
     }
 
-    const { data: publicUrlData } = supabase.storage.from("documents").getPublicUrl(storagePath);
+    const { data: publicUrlData } = supabase.storage.from("branding").getPublicUrl(storagePath);
     logoUrl = publicUrlData?.publicUrl || null;
   }
 
@@ -349,6 +353,96 @@ export async function updateBusinessLogo(formData: FormData) {
 
   revalidatePath("/settings");
   revalidatePath("/");
+}
+
+export async function updateOwnerSignature(formData: FormData) {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const { data: membership, error: membershipError } = await supabase
+    .from("organization_members")
+    .select("organization_id")
+    .eq("user_id", user.id)
+    .eq("is_active", true)
+    .limit(1)
+    .maybeSingle();
+
+  if (membershipError || !membership?.organization_id) {
+    throw new Error(membershipError?.message || "Organization membership was not found.");
+  }
+
+  const removeSignature = String(formData.get("remove_signature") || "") === "true";
+  const signatureFile = formData.get("signature");
+
+  const { data: organization, error: organizationError } = await supabase
+    .from("organizations")
+    .select("settings, owner_signature_url")
+    .eq("id", membership.organization_id)
+    .maybeSingle();
+
+  if (organizationError) {
+    throw new Error(organizationError.message);
+  }
+
+  const settings = settingsObject(organization?.settings);
+  let signatureUrl = String(settings.owner_signature_url || organization?.owner_signature_url || "").trim() || null;
+
+  if (removeSignature || (signatureFile instanceof File && signatureFile.size > 0)) {
+    const existingSignature = logoStorageReferenceFromUrl(signatureUrl);
+    if (existingSignature) {
+      await supabase.storage.from(existingSignature.bucket).remove([existingSignature.path]);
+    }
+    signatureUrl = null;
+  }
+
+  if (signatureFile instanceof File && signatureFile.size > 0) {
+    if (signatureFile.size > 2 * 1024 * 1024) {
+      throw new Error("Operator signature must be 2MB or smaller.");
+    }
+
+    const extension = businessLogoExtension(signatureFile);
+    if (!extension) {
+      throw new Error("Operator signature must be a PNG, JPG, SVG, or WebP image.");
+    }
+
+    const storagePath = `${membership.organization_id}/signature.${extension}`;
+    const buffer = Buffer.from(await signatureFile.arrayBuffer());
+    const { error: uploadError } = await supabase.storage.from("branding").upload(storagePath, buffer, {
+      contentType: signatureFile.type || undefined,
+      upsert: true
+    });
+
+    if (uploadError) {
+      throw new Error(uploadError.message);
+    }
+
+    const { data: publicUrlData } = supabase.storage.from("branding").getPublicUrl(storagePath);
+    signatureUrl = publicUrlData?.publicUrl || null;
+  }
+
+  const { error } = await supabase
+    .from("organizations")
+    .update({
+      owner_signature_url: signatureUrl,
+      settings: {
+        ...settings,
+        owner_signature_url: signatureUrl
+      }
+    })
+    .eq("id", membership.organization_id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  revalidatePath("/settings");
+  revalidatePath("/settings/contracts");
 }
 
 export async function updateTravelPolicySettings(formData: FormData) {

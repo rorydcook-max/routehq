@@ -1,4 +1,4 @@
-import { buildContractVariables, renderContractTemplate } from "@/lib/contract-rendering";
+import { buildContractVariables, extractBodyHtml, renderContractTemplate } from "@/lib/contract-rendering";
 import { defaultRentalContractTemplate } from "@/lib/default-contract-template";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
@@ -160,15 +160,17 @@ export async function getPublicBookingDetail(token: string) {
     ? (await supabase.storage.from("documents").createSignedUrl(signedContractPath, 60 * 60)).data?.signedUrl || null
     : null;
   const contractTemplate = template?.content_html || template?.body || contract?.content_html || defaultRentalContractTemplate;
-  const contractHtml = renderContractTemplate(
-    contractTemplate,
-    buildContractVariables({
-      organization,
-      customer,
-      vehicle,
-      rental,
-      bookingLink
-    })
+  const contractHtml = extractBodyHtml(
+    renderContractTemplate(
+      contractTemplate,
+      buildContractVariables({
+        organization,
+        customer,
+        vehicle,
+        rental,
+        bookingLink
+      })
+    )
   );
 
   const rentalStatus = rental?.status || "booked";

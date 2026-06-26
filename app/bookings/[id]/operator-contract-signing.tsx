@@ -11,6 +11,7 @@ type OperatorContractSigningProps = {
   ownerSignedAt: string | null;
   organizationId: string;
   rentalId: string;
+  ownerSignatureConfigured?: boolean;
 };
 
 export function OperatorContractSigning({
@@ -18,7 +19,8 @@ export function OperatorContractSigning({
   customerSignedAt,
   ownerSignedAt,
   organizationId,
-  rentalId
+  rentalId,
+  ownerSignatureConfigured = false
 }: OperatorContractSigningProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -115,6 +117,17 @@ export function OperatorContractSigning({
       <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
         <p className="font-black text-[#92400e]">Waiting for customer signature</p>
         <p className="mt-1 text-sm text-[#667085]">The operator can sign after the customer completes and signs the booking link.</p>
+      </div>
+    );
+  }
+
+  if (ownerSignatureConfigured) {
+    return (
+      <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
+        <p className="font-black text-[#92400e]">Operator signature not yet applied</p>
+        <p className="mt-1 text-sm text-[#667085]">
+          This booking may have been completed before auto-signing was enabled. New customer-signed bookings will use the saved operator signature automatically.
+        </p>
       </div>
     );
   }

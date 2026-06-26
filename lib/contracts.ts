@@ -12,7 +12,13 @@ const defaultTemplateMinimumLength = 5000;
 
 function isStaleDefaultTemplate(template: any) {
   const content = String(template?.content_html || template?.body || "");
-  return !content || content.length < defaultTemplateMinimumLength || !content.includes("bilingual-section") || !content.includes("lang-th");
+  return (
+    !content ||
+    content.length < defaultTemplateMinimumLength ||
+    !content.includes("bilingual-section") ||
+    !content.includes("lang-th") ||
+    !content.includes("info-grid")
+  );
 }
 
 function storageReferenceFromUrl(url: string | null | undefined) {
@@ -77,9 +83,17 @@ export async function logoUrlToDataUri(supabase: any, logoUrl: string | null | u
 }
 
 export async function embedLogoInContractVariables(supabase: any, variables: Record<string, unknown>) {
-  const businessLogoUrl = String(variables.business_logo_url || "").trim();
-  if (businessLogoUrl) {
-    variables.business_logo_url = await logoUrlToDataUri(supabase, businessLogoUrl);
+  for (const key of [
+    "business_logo_url",
+    "owner_signature_url",
+    "customer_signature_url",
+    "delivery_customer_signature_url",
+    "delivery_fuel_image_url"
+  ]) {
+    const url = String(variables[key] || "").trim();
+    if (url) {
+      variables[key] = await logoUrlToDataUri(supabase, url);
+    }
   }
   return variables;
 }

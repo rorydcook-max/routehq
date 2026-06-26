@@ -88,6 +88,10 @@ function todayDate() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function recordObject(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
+}
+
 async function logCommunicationEvent({
   supabase,
   organizationId,
@@ -573,11 +577,12 @@ export async function completePublicBooking(formData: FormData) {
 
   await supabase.from("customers").update({ document_status: customerDocumentStatus }).eq("id", customerId).eq("organization_id", organizationId);
 
-  const [{ data: organization }, { data: rental }, { data: vehicle }, { data: customer }, template] = await Promise.all([
+  const [{ data: organization }, { data: rental }, { data: vehicle }, { data: customer }, { data: contract }, template] = await Promise.all([
     supabase.from("organizations").select("*").eq("id", organizationId).maybeSingle(),
     supabase.from("rentals").select("*").eq("id", bookingLink.rental_id).maybeSingle(),
     supabase.from("vehicles").select("*").eq("id", bookingLink.vehicle_id).maybeSingle(),
     supabase.from("customers").select("*").eq("id", customerId).maybeSingle(),
+    supabase.from("contracts").select("id, metadata").eq("id", contractId).eq("organization_id", organizationId).maybeSingle(),
     ensureDefaultContractTemplate(supabase, organizationId)
   ]);
 
@@ -597,11 +602,24 @@ export async function completePublicBooking(formData: FormData) {
     })
   );
   const bodyHtml = renderContractTemplate(contractTemplate, contractVariables);
+  const organizationSettings = recordObject(organization?.settings);
+  const ownerSignatureUrl = String(organizationSettings.owner_signature_url || organization?.owner_signature_url || "").trim();
+  const ownerSignedAt = new Date().toISOString();
+  const ownerSignedName = String(organizationSettings.owner_name || organization?.name || "Operator");
+  const ownerSignatureBlock = ownerSignatureUrl
+    ? `
+    <hr />
+    <h3>Operator Signature</h3>
+    <p>Signed by ${ownerSignedName} on ${new Date(ownerSignedAt).toLocaleString("en-TH")}.</p>
+    <img alt="Operator signature" src="${ownerSignatureUrl}" style="max-width: 320px; border: 1px solid #d6e5e2; border-radius: 8px;" />
+  `
+    : "";
   const signedHtml = `${bodyHtml}
     <hr />
     <h3>Customer Signature</h3>
     <p>Signed by ${signedName} on ${new Date().toLocaleString("en-TH")}.</p>
     <img alt="Customer signature" src="${signature}" style="max-width: 320px; border: 1px solid #d6e5e2; border-radius: 8px;" />
+    ${ownerSignatureBlock}
   `;
   const headerStore = await headers();
   const customerIp = headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() || headerStore.get("x-real-ip") || null;
@@ -650,6 +668,7 @@ export async function completePublicBooking(formData: FormData) {
     .eq("id", bookingLink.rental_id)
     .eq("organization_id", organizationId);
 
+  const contractMetadata = recordObject(contract?.metadata);
   const [{ error: contractError }, { error: bookingUpdateError }, { error: rentalUpdateError }] = await Promise.all([
     supabase
       .from("contracts")
@@ -662,7 +681,19 @@ export async function completePublicBooking(formData: FormData) {
         customer_signed_at: signedAt,
         customer_signed_name: signedName,
         customer_signed_ip: customerIp,
-        signed_at: signedAt
+        signed_at: signedAt,
+        ...(ownerSignatureUrl
+          ? {
+              owner_signature: ownerSignatureUrl,
+              owner_signed_at: ownerSignedAt,
+              metadata: {
+                ...contractMetadata,
+                owner_auto_signed: true,
+                owner_signed_name: ownerSignedName,
+                owner_signature_url: ownerSignatureUrl
+              }
+            }
+          : {})
       })
       .eq("id", contractId)
       .eq("organization_id", organizationId),

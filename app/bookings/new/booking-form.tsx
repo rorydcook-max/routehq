@@ -1133,9 +1133,24 @@ function BookingLinkSharePanel({ result }: { result: BookingShareResult | null }
       }
     : {};
 
+  const [copied, setCopied] = useState(false);
+
   async function copyLink() {
     if (!bookingUrl) return;
-    await navigator.clipboard?.writeText(bookingUrl);
+    try {
+      await navigator.clipboard.writeText(bookingUrl);
+    } catch {
+      const el = document.createElement("textarea");
+      el.value = bookingUrl;
+      el.style.position = "fixed";
+      el.style.opacity = "0";
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   }
 
   function handleShare(channel: string) {
@@ -1158,13 +1173,14 @@ function BookingLinkSharePanel({ result }: { result: BookingShareResult | null }
           {bookingUrl || "Generate the booking link to see the unique URL here."}
         </div>
         <button
-          className="pressable inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-black text-[var(--foreground-secondary)] disabled:opacity-50"
+          className="pressable inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-black disabled:opacity-50"
+          style={{ color: copied ? "var(--primary)" : "var(--foreground-secondary)" }}
           disabled={!bookingUrl}
           onClick={copyLink}
           type="button"
         >
           <Copy size={17} />
-          Copy
+          {copied ? "Copied!" : "Copy"}
         </button>
       </div>
 
@@ -1207,11 +1223,6 @@ function BookingLinkSharePanel({ result }: { result: BookingShareResult | null }
         ))}
       </div>
 
-      {result ? (
-        <Link className="secondary-action pressable mt-3 w-full justify-center" href={`/bookings/${result.rentalId}`}>
-          View booking
-        </Link>
-      ) : null}
     </div>
   );
 }

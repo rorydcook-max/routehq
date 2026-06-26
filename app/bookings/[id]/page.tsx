@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { AlertTriangle, CalendarDays, Car, CheckCircle2, Clock, CreditCard, Download, FileSignature, FileText, Gauge, MapPin, ReceiptText, UserRound, XCircle } from "lucide-react";
-import { cancelBooking } from "@/app/actions/bookings";
+import { CancelBookingButton } from "@/app/bookings/[id]/cancel-booking-button";
 import { confirmCustomerPayment } from "@/app/actions/deposits";
 import { PaymentReminderButton } from "@/app/bookings/[id]/payment-reminder-button";
 import { acknowledgePortalAction, approveExtensionRequest, declinePortalAction, replyToPortalQuestion, resolvePortalAction } from "@/app/actions/portal-actions";
@@ -9,6 +9,7 @@ import { AssignCustomerModal } from "@/app/bookings/[id]/assign-customer-modal";
 import { SkipInspectionButton } from "@/app/bookings/[id]/skip-inspection-button";
 import { BookingShareActions } from "@/app/bookings/[id]/booking-share-actions";
 import { OperatorContractSigning } from "@/app/bookings/[id]/operator-contract-signing";
+import { RefundDepositPanel } from "@/app/bookings/[id]/refund-deposit-panel";
 import { AppShell } from "@/components/app-shell";
 import { AddRentalPaymentInlineForm, EditableEndDate, EditableRentalPaymentRow, EditableTransactionRow, ExistingRentalPaymentSetupCard } from "@/components/booking-correction-controls";
 import { CommunicationPanel } from "@/components/communication-panel";
@@ -275,6 +276,10 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   const { rental, bookingLink, contract, payments, transactions, inspections, documents, activityEvents, customerPortalActions, communicationTimeline } = detail;
   const vehicle = rental.vehicles;
   const customer = rental.customers;
+  const organizationSettings = organization.settings && typeof organization.settings === "object" && !Array.isArray(organization.settings)
+    ? (organization.settings as Record<string, unknown>)
+    : {};
+  const ownerSignatureConfigured = Boolean(String(organizationSettings.owner_signature_url || organization.owner_signature_url || "").trim());
   const isRetrospective = Boolean(rental.entered_by_operator) ||
     Boolean(rental.start_date && new Date(String(rental.start_date).slice(0, 10) + "T00:00:00Z") < new Date(Date.now() - 7 * 86_400_000));
   const displayStatus = (
@@ -453,6 +458,19 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   rentalId={rental.id}
                   vehicleLabel={vehicleTitle(vehicle)}
                   className="pressable inline-flex min-h-9 min-w-fit items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold text-[var(--foreground-secondary)] shadow-sm"
+                />
+              ) : null}
+              {!["completed", "cancelled"].includes(rental.status) ? (
+                <CancelBookingButton
+                  rentalId={rental.id}
+                  organizationId={organization.id}
+                  vehicleId={String(rental.vehicle_id || vehicle?.id || "")}
+                  totalPaid={totalPaid}
+                  depositHeld={Number(rental.deposit_held || rental.deposit_amount || 0)}
+                  currency={rental.currency || "THB"}
+                  rentalRate={Number(rental.rental_rate || 0)}
+                  rentalStatus={displayStatus}
+                  customerName={customer?.full_name || null}
                 />
               ) : null}
             </div>
@@ -712,6 +730,18 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 <DeliveryInfo delivery={delivery} />
                 <Info icon={MapPin} label="Return" value={rental.return_location || "Not recorded"} />
                 <Info icon={CreditCard} label="Deposit" value={formatDepositSummary(rental)} />
+                <RefundDepositPanel
+                  rentalId={rental.id}
+                  organizationId={organization.id}
+                  vehicleId={String(rental.vehicle_id || vehicle?.id || "")}
+                  depositHeld={Number(rental.deposit_held || 0)}
+                  depositRefunded={Number(rental.deposit_refunded_amount || 0)}
+                  depositForfeited={Number(rental.deposit_forfeited_amount || 0)}
+                  depositStatus={String(rental.deposit_status || "pending")}
+                  totalPaid={totalPaid}
+                  currency={rental.currency || "THB"}
+                  rentalStatus={displayStatus}
+                />
                 <PaymentInfo method={paymentMethod} timing={paymentTiming} />
                 {customerReportedPayment ? (
                   <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
@@ -757,6 +787,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                       contractId={contract.id}
                       customerSignedAt={contract.customer_signed_at}
                       organizationId={organization.id}
+                      ownerSignatureConfigured={ownerSignatureConfigured}
                       ownerSignedAt={contract.owner_signed_at}
                       rentalId={rental.id}
                     />
@@ -895,20 +926,6 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               vehicleEvents={vehicleEvents}
             />
 
-            {!["completed", "cancelled"].includes(rental.status) ? (
-              <Card>
-                <SectionHeader eyebrow="Danger zone" title="Cancel booking" />
-                <p className="mt-2 text-sm text-[#667085]">Cancelling marks the rental and booking link as cancelled. If this vehicle is still assigned to this booking, it will be released back to available.</p>
-                <form action={cancelBooking} className="mt-3">
-                  <input name="organizationId" type="hidden" value={organization.id} />
-                  <input name="rentalId" type="hidden" value={rental.id} />
-                  <PendingButton className="pressable inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[#fecdd3] bg-[#fff1f2] px-3 py-2 text-sm font-black text-[#be123c]" pendingLabel="Cancelling..." type="submit">
-                    <XCircle size={18} />
-                    Cancel booking
-                  </PendingButton>
-                </form>
-              </Card>
-            ) : null}
           </div>
         </div>
       </div>

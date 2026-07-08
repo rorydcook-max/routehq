@@ -9,11 +9,9 @@ import {
   Car,
   CheckCircle2,
   ClipboardCheck,
-  Clock,
   FileText,
   Fuel,
   Gauge,
-  History,
   MapPin,
   PenLine,
   Plus,
@@ -28,6 +26,7 @@ import { completeTask, createVehicleTask } from "@/app/actions/tasks";
 import { logVehicleMaintenance, renewVehicleCompliance } from "@/app/actions/vehicles";
 import { VehicleNotesForm } from "@/app/fleet/[id]/vehicle-notes-form";
 import { VehiclePhotoManager } from "@/app/fleet/[id]/vehicle-photo-manager";
+import { VehicleTimeline, type VehicleTimelineEvent } from "@/app/fleet/[id]/vehicle-timeline";
 import { AppShell } from "@/components/app-shell";
 import { RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
 import { InspectionViewer } from "@/components/inspection-viewer";
@@ -505,25 +504,22 @@ function TimelineSection({ detail }: { detail: VehicleDetail }) {
       id: `future-${item.key}`,
       title: `${item.name} due`,
       detail: formatDate(item.date),
-      date: item.date,
-      future: (daysUntil(item.date) || 0) >= 0,
-      icon: ShieldCheck
+      date: item.date!,
+      kind: "compliance" as const
     }));
   const reminderEvents = detail.reminders.map((reminder) => ({
     id: `reminder-${reminder.id}`,
     title: reminder.title,
     detail: reminder.type,
     date: reminder.due_date,
-    future: (daysUntil(reminder.due_date) || 0) >= 0,
-    icon: Clock
+    kind: "reminder" as const
   }));
   const activityEvents = detail.activityEvents.map((event) => ({
     id: event.id,
     title: event.title,
     detail: event.detail,
     date: event.occurred_at || event.created_at,
-    future: false,
-    icon: History
+    kind: "activity" as const
   }));
   const rentalReturns = detail.rentals
     .filter((rental) => rental.end_date)
@@ -531,51 +527,23 @@ function TimelineSection({ detail }: { detail: VehicleDetail }) {
       id: `return-${rental.id}`,
       title: `Scheduled return: ${rental.customers?.full_name || "Customer"}`,
       detail: rental.status,
-      date: rental.end_date,
-      future: (daysUntil(rental.end_date) || 0) >= 0,
-      icon: CalendarDays
+      date: rental.end_date!,
+      kind: "rental" as const
     }));
-  const events = [...complianceEvents, ...reminderEvents, ...rentalReturns, ...activityEvents].sort((left, right) => new Date(right.date || 0).getTime() - new Date(left.date || 0).getTime());
-  const future = events.filter((event) => event.future);
-  const past = events.filter((event) => !event.future);
+  const events: VehicleTimelineEvent[] = [...complianceEvents, ...reminderEvents, ...rentalReturns, ...activityEvents]
+    .filter((event) => Boolean(event.date))
+    .map((event) => ({
+      id: String(event.id),
+      title: String(event.title),
+      detail: event.detail ? String(event.detail) : null,
+      date: String(event.date),
+      kind: event.kind
+    }));
+  const today = new Date();
+  const oneYearAgo = new Date(today);
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 
-  return (
-    <Section defaultOpen eyebrow="Vehicle timeline" title="Operational history">
-      {events.length === 0 ? (
-        <EmptyState>No timeline events yet. Activity will appear here as rentals, transactions, renewals, inspections, and maintenance are recorded.</EmptyState>
-      ) : (
-        <div className="space-y-3">
-          {future.map((event) => (
-            <TimelineEvent event={event} key={event.id} />
-          ))}
-          <div className="relative py-2">
-            <div className="h-px bg-[#d6e5e2]" />
-            <span className="absolute left-0 top-1/2 -translate-y-1/2 rounded-full bg-[#0f766e] px-3 py-1 text-xs font-black uppercase text-white">Today</span>
-          </div>
-          {past.map((event) => (
-            <TimelineEvent event={event} key={event.id} />
-          ))}
-        </div>
-      )}
-    </Section>
-  );
-}
-
-function TimelineEvent({ event }: { event: { title: string; detail?: string | null; date?: string | null; icon: typeof History } }) {
-  const Icon = event.icon;
-  return (
-    <div className="relative border-l-2 border-[#0f766e] pb-4 pl-4">
-      <span className="absolute -left-[9px] top-0 flex h-4 w-4 items-center justify-center rounded-full bg-[#0f766e]" />
-      <div className="flex gap-3 rounded-lg border border-[#d6e5e2] bg-white p-3">
-        <Icon className="mt-0.5 shrink-0 text-[#0f766e]" size={18} />
-        <div>
-          <p className="font-black text-[#10252b]">{event.title}</p>
-          <p className="mt-1 text-xs font-semibold text-[#667085]">{formatDate(event.date)}</p>
-          {event.detail ? <p className="mt-1 text-sm text-[#475467]">{event.detail}</p> : null}
-        </div>
-      </div>
-    </div>
-  );
+  return <VehicleTimeline defaultFrom={oneYearAgo.toISOString().slice(0, 10)} defaultTo={today.toISOString().slice(0, 10)} events={events} />;
 }
 
 function InspectionsSection({ detail }: { detail: VehicleDetail }) {
@@ -1164,11 +1132,12 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
 
         <AtAGlance detail={detail} />
 
+        <TimelineSection detail={detail} />
+
         <div className="grid gap-3 lg:grid-cols-[minmax(0,3fr)_minmax(320px,2fr)] lg:items-start">
           <div className="space-y-3">
             <ActiveRentalCard detail={detail} />
             <ComplianceSection detail={detail} organizationId={organization.id} />
-            <TimelineSection detail={detail} />
             <InspectionsSection detail={detail} />
           </div>
 

@@ -17,7 +17,8 @@ function isStaleDefaultTemplate(template: any) {
     content.length < defaultTemplateMinimumLength ||
     !content.includes("bilingual-section") ||
     !content.includes("lang-th") ||
-    !content.includes("info-grid")
+    !content.includes("info-grid") ||
+    !content.includes("routehq-template-v3")
   );
 }
 

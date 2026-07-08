@@ -1,6 +1,7 @@
 "use server";
 
 import { headers } from "next/headers";
+import OpenAI from "openai";
 import { buildContractVariables, renderContractTemplate } from "@/lib/contract-rendering";
 import { defaultRentalContractTemplate, embedLogoInContractVariables, ensureDefaultContractTemplate } from "@/lib/contracts";
 import { htmlToPdf } from "@/lib/html-to-pdf";
@@ -227,6 +228,52 @@ async function uploadPublicCustomerDocument({
   }
 
   return data.id as string;
+}
+
+async function extractDocumentOcr(file: File, category: "passport" | "driver_license") {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey || !file.type.startsWith("image/")) {
+    return {} as Record<string, string>;
+  }
+
+  try {
+    const bytes = Buffer.from(await file.arrayBuffer());
+    const base64 = bytes.toString("base64");
+    const prompt =
+      category === "passport"
+        ? "Extract from this passport image: passport_number, full_name, nationality, date_of_birth (YYYY-MM-DD), expiry_date (YYYY-MM-DD). Respond ONLY with a JSON object with these exact keys. If a field is not visible, use null."
+        : "Extract from this driving licence image: licence_number, issuing_country, expiry_date (YYYY-MM-DD). Respond ONLY with a JSON object with these exact keys. If a field is not visible, use null.";
+    const openai = new OpenAI({ apiKey });
+    const result = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      max_tokens: 300,
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "image_url",
+              image_url: {
+                url: `data:${file.type || "image/jpeg"};base64,${base64}`,
+                detail: "high"
+              }
+            },
+            { type: "text", text: prompt }
+          ]
+        }
+      ]
+    });
+    const raw = result.choices[0]?.message?.content || "{}";
+    const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim()) as Record<string, unknown>;
+
+    return Object.fromEntries(
+      Object.entries(parsed)
+        .filter(([, value]) => typeof value === "string" && value.trim())
+        .map(([key, value]) => [key, String(value).trim()])
+    );
+  } catch {
+    return {};
+  }
 }
 
 async function uploadSignedContract({
@@ -552,6 +599,7 @@ export async function completePublicBooking(formData: FormData) {
     { keys: ["driverLicenseFile", "driverLicenseCameraFile"], category: "driver_license" },
     { keys: ["selfieFile", "selfieCameraFile"], category: "selfie" }
   ];
+  const ocrBookingData: Record<string, string> = {};
 
   for (const upload of uploads) {
     const file = upload.keys.flatMap((key) => formData.getAll(key)).find((value) => value instanceof File && value.size > 0);
@@ -563,6 +611,49 @@ export async function completePublicBooking(formData: FormData) {
         category: upload.category,
         file
       });
+
+      if (upload.category === "passport") {
+        const result = await extractDocumentOcr(file, "passport");
+        if (result.passport_number) ocrBookingData.ocr_passport_number = result.passport_number;
+        if (result.nationality) ocrBookingData.ocr_nationality = result.nationality;
+      } else if (upload.category === "driver_license") {
+        const result = await extractDocumentOcr(file, "driver_license");
+        if (result.licence_number) ocrBookingData.ocr_licence_number = result.licence_number;
+        if (result.issuing_country) ocrBookingData.ocr_licence_country = result.issuing_country;
+        if (result.expiry_date) ocrBookingData.ocr_licence_expiry = result.expiry_date;
+      }
+    }
+  }
+
+  if (Object.keys(ocrBookingData).length > 0) {
+    const { data: currentCustomer } = await supabase
+      .from("customers")
+      .select("passport_number, nationality, driver_license_number, driver_license_country, driver_license_expiry")
+      .eq("id", customerId)
+      .eq("organization_id", organizationId)
+      .maybeSingle();
+    const customerPatch: Record<string, string> = {};
+    if (!currentCustomer?.passport_number && ocrBookingData.ocr_passport_number) {
+      customerPatch.passport_number = ocrBookingData.ocr_passport_number;
+    }
+    if (!currentCustomer?.nationality && ocrBookingData.ocr_nationality) {
+      customerPatch.nationality = ocrBookingData.ocr_nationality;
+    }
+    if (!currentCustomer?.driver_license_number && ocrBookingData.ocr_licence_number) {
+      customerPatch.driver_license_number = ocrBookingData.ocr_licence_number;
+    }
+    if (!currentCustomer?.driver_license_country && ocrBookingData.ocr_licence_country) {
+      customerPatch.driver_license_country = ocrBookingData.ocr_licence_country;
+    }
+    if (!currentCustomer?.driver_license_expiry && ocrBookingData.ocr_licence_expiry) {
+      customerPatch.driver_license_expiry = ocrBookingData.ocr_licence_expiry;
+    }
+    if (Object.keys(customerPatch).length > 0) {
+      await supabase
+        .from("customers")
+        .update(customerPatch)
+        .eq("id", customerId)
+        .eq("organization_id", organizationId);
     }
   }
 
@@ -590,40 +681,43 @@ export async function completePublicBooking(formData: FormData) {
     throw new Error("Rental record was not found.");
   }
 
+  const signedAt = new Date().toISOString();
+  const bookingDataWithSignature = {
+    ...((bookingLink.booking_data || {}) as Record<string, unknown>),
+    ...ocrBookingData,
+    ...(preferredDeliveryLocation ? { delivery_location: preferredDeliveryLocation } : {}),
+    ...(preferredDeliveryDateTime ? { delivery_datetime: preferredDeliveryDateTime } : {}),
+    customer_signature_url: signature,
+    customer_signed_at: signedAt
+  };
+  const mergedBookingLink = {
+    ...bookingLink,
+    booking_data: bookingDataWithSignature
+  };
   const contractTemplate = template?.content_html || template?.body || defaultRentalContractTemplate;
-  const contractVariables = await embedLogoInContractVariables(
-    supabase,
-    buildContractVariables({
-      organization,
-      customer,
-      vehicle,
-      rental,
-      bookingLink
-    })
-  );
-  const bodyHtml = renderContractTemplate(contractTemplate, contractVariables);
+  const rawContractVariables = buildContractVariables({
+    organization,
+    customer,
+    vehicle,
+    rental,
+    bookingLink: mergedBookingLink
+  });
   const organizationSettings = recordObject(organization?.settings);
-  const ownerSignatureUrl = String(organizationSettings.owner_signature_url || organization?.owner_signature_url || "").trim();
-  const ownerSignedAt = new Date().toISOString();
+  const ownerSignatureUrl = String(
+    organizationSettings.owner_signature_url ||
+      organization?.owner_signature_url ||
+      ""
+  ).trim();
+  if (!rawContractVariables.owner_signature_url && ownerSignatureUrl) {
+    rawContractVariables.owner_signature_url = ownerSignatureUrl;
+  }
+  const contractVariables = await embedLogoInContractVariables(supabase, rawContractVariables);
+  const bodyHtml = renderContractTemplate(contractTemplate, contractVariables);
+  const ownerSignedAt = signedAt;
   const ownerSignedName = String(organizationSettings.owner_name || organization?.name || "Operator");
-  const ownerSignatureBlock = ownerSignatureUrl
-    ? `
-    <hr />
-    <h3>Operator Signature</h3>
-    <p>Signed by ${ownerSignedName} on ${new Date(ownerSignedAt).toLocaleString("en-TH")}.</p>
-    <img alt="Operator signature" src="${ownerSignatureUrl}" style="max-width: 320px; border: 1px solid #d6e5e2; border-radius: 8px;" />
-  `
-    : "";
-  const signedHtml = `${bodyHtml}
-    <hr />
-    <h3>Customer Signature</h3>
-    <p>Signed by ${signedName} on ${new Date().toLocaleString("en-TH")}.</p>
-    <img alt="Customer signature" src="${signature}" style="max-width: 320px; border: 1px solid #d6e5e2; border-radius: 8px;" />
-    ${ownerSignatureBlock}
-  `;
+  const signedHtml = bodyHtml;
   const headerStore = await headers();
   const customerIp = headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() || headerStore.get("x-real-ip") || null;
-  const signedAt = new Date().toISOString();
   const contractUpload = await uploadSignedContract({
     supabase,
     organizationId,
@@ -632,9 +726,7 @@ export async function completePublicBooking(formData: FormData) {
   });
 
   const updatedBookingData = {
-    ...((bookingLink.booking_data || {}) as Record<string, unknown>),
-    ...(preferredDeliveryLocation ? { delivery_location: preferredDeliveryLocation } : {}),
-    ...(preferredDeliveryDateTime ? { delivery_datetime: preferredDeliveryDateTime } : {}),
+    ...bookingDataWithSignature,
     ...(preferredDeliveryLocation || preferredDeliveryDateTime ? { delivery_details_submitted_by_customer: true } : {})
   };
 

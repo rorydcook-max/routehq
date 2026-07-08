@@ -711,6 +711,10 @@ input[type="time"] {
   padding-left: 40px !important;
 }
 
+.input-with-leading-symbol {
+  padding-left: 29px !important;
+}
+
 select {
   border-radius: 7px;
   font-size: 13px;

@@ -2,6 +2,8 @@ import Link from "next/link";
 import type { Route } from "next";
 import { AlertTriangle, CalendarDays, Car, CheckCircle2, Clock, CreditCard, Download, FileSignature, FileText, Gauge, MapPin, ReceiptText, UserRound, XCircle } from "lucide-react";
 import { CancelBookingButton } from "@/app/bookings/[id]/cancel-booking-button";
+import { ChangeVehicleButton } from "@/app/bookings/[id]/change-vehicle-button";
+import { UndoCancellationButton } from "@/app/bookings/[id]/undo-cancellation-button";
 import { confirmCustomerPayment } from "@/app/actions/deposits";
 import { PaymentReminderButton } from "@/app/bookings/[id]/payment-reminder-button";
 import { acknowledgePortalAction, approveExtensionRequest, declinePortalAction, replyToPortalQuestion, resolvePortalAction } from "@/app/actions/portal-actions";
@@ -273,6 +275,15 @@ export default async function BookingDetailPage({ params, searchParams }: { para
     if (refreshed) detail = refreshed;
   }
 
+  const supabaseForVehicles = (await createSupabaseServerClient()) as any;
+  const { data: availableVehicles } = await supabaseForVehicles
+    .from("vehicles")
+    .select("id, make, model, trim, year, registration_number, monthly_rate")
+    .eq("organization_id", organization.id)
+    .eq("status", "available")
+    .is("deleted_at", null)
+    .order("make");
+
   const { rental, bookingLink, contract, payments, transactions, inspections, documents, activityEvents, customerPortalActions, communicationTimeline } = detail;
   const vehicle = rental.vehicles;
   const customer = rental.customers;
@@ -440,6 +451,17 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   Start return
                 </ActionButton>
               ) : null}
+              {["active", "due_soon", "overdue", "extended"].includes(displayStatus) ? (
+                <ChangeVehicleButton
+                  rentalId={rental.id}
+                  organizationId={organization.id}
+                  currentVehicleId={String(rental.vehicle_id || vehicle?.id || "")}
+                  currentVehicleLabel={vehicleTitle(vehicle)}
+                  currentRate={Number(rental.rental_rate || 0)}
+                  currency={rental.currency || "THB"}
+                  availableVehicles={(availableVehicles || []).filter((v: any) => v.id !== (rental.vehicle_id || vehicle?.id))}
+                />
+              ) : null}
               <ActionButton href="#add-payment-row" tone="light">
                 Add payment
               </ActionButton>
@@ -460,7 +482,14 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   className="pressable inline-flex min-h-9 min-w-fit items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold text-[var(--foreground-secondary)] shadow-sm"
                 />
               ) : null}
-              {!["completed", "cancelled"].includes(rental.status) ? (
+              {rental.status === "cancelled" ? (
+                <UndoCancellationButton
+                  rentalId={rental.id}
+                  organizationId={organization.id}
+                  vehicleId={String(rental.vehicle_id || vehicle?.id || "")}
+                  customerName={customer?.full_name || null}
+                />
+              ) : !["completed"].includes(rental.status) ? (
                 <CancelBookingButton
                   rentalId={rental.id}
                   organizationId={organization.id}

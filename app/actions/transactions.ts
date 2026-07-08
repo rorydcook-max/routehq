@@ -146,8 +146,17 @@ export async function generateReceipt(input: GenerateReceiptInput) {
     throw new Error(uploadError.message);
   }
 
-  const { data: publicUrlData } = supabase.storage.from("documents").getPublicUrl(storagePath);
-  const pdfUrl = publicUrlData?.publicUrl || storagePath;
+  // NOTE: signed URLs expire after 1 year. If receipts need to remain accessible
+  // long-term, switch to storing storagePath and regenerating signed URLs on read.
+  const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+    .from("documents")
+    .createSignedUrl(storagePath, 60 * 60 * 24 * 365);
+
+  if (signedUrlError) {
+    throw new Error(`Failed to generate receipt URL: ${signedUrlError.message}`);
+  }
+
+  const pdfUrl = signedUrlData?.signedUrl || storagePath;
 
   const { error: receiptError } = await supabase.from("receipts").insert({
     id: receiptId,

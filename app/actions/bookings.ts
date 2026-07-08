@@ -2742,8 +2742,17 @@ export async function cancelBookingWithDisposition(formData: FormData) {
   const partialRefund   = Number(formData.get("partialRefundAmount") || 0);
   const partialDeposit  = Number(formData.get("partialDepositReturn") || 0);
   const notes           = String(formData.get("notes") || "").trim();
+  const cancelledAtRaw  = String(formData.get("cancelledAt") || "").trim();
+  const cancelledAt     = cancelledAtRaw || new Date().toISOString();
+  const collectionDatetime = String(formData.get("collectionDatetime") || "").trim() || null;
+  const vehicleDisposition = String(formData.get("vehicleDisposition") || "available").trim();
+  const repairNotes = String(formData.get("repairNotes") || "").trim() || null;
+  const repairExpectedEnd = String(formData.get("repairExpectedEnd") || "").trim() || null;
 
   if (!organizationId || !rentalId) throw new Error("Missing required fields.");
+  if (!["available", "repair", "keep_assigned"].includes(vehicleDisposition)) {
+    throw new Error("Choose a valid vehicle status.");
+  }
 
   const { data: rental, error: rentalError } = await supabase
     .from("rentals")
@@ -2775,13 +2784,6 @@ export async function cancelBookingWithDisposition(formData: FormData) {
   const totalPaidIncome = (paidTransactions || [])
     .filter((t: any) => t.type === "rental_income")
     .reduce((sum: number, t: any) => sum + Number(t.amount || 0), 0);
-
-  await supabase
-    .from("rental_payments")
-    .update({ status: "cancelled" })
-    .eq("rental_id", rentalId)
-    .eq("organization_id", organizationId)
-    .in("status", ["scheduled", "pending", "overdue"]);
 
   const transactionsToInsert: any[] = [];
 
@@ -2864,68 +2866,109 @@ export async function cancelBookingWithDisposition(formData: FormData) {
     return rental.deposit_status;
   })();
 
-  const ops: Promise<any>[] = [
-    supabase
-      .from("rentals")
-      .update({
-        status: "cancelled",
-        metadata: {
-          ...(typeof rental.metadata === "object" && rental.metadata ? rental.metadata : {}),
-          cancellation_reason: reason,
-          cancellation_notes: notes || null,
-          cancellation_refund_option: refundOption || null,
-          cancelled_by: user.id,
-          cancelled_at: now
-        },
-        deposit_status: depositStatus,
-        ...(refundOption?.endsWith("deposit_returned")
-          ? {
-              deposit_refunded_amount: refundOption.startsWith("partial_refund") && partialDeposit > 0
-                ? partialDeposit
-                : depositHeld,
-              deposit_reconciled_at: now,
-              deposit_reconciled_by: user.id,
-              deposit_deduction_reason: notes || reason
-            }
-          : {}),
-        ...(refundOption?.endsWith("deposit_retained") && depositHeld > 0
-          ? {
-              deposit_forfeited_amount: depositHeld,
-              deposit_deduction_reason: notes || reason,
-              deposit_reconciled_at: now,
-              deposit_reconciled_by: user.id
-            }
-          : {})
-      })
-      .eq("id", rentalId)
-      .eq("organization_id", organizationId),
+  const cancellationUpdate = {
+    status: "cancelled",
+    cancellation_reason: reason,
+    cancellation_notes: notes || null,
+    cancellation_refund_option: refundOption || null,
+    cancelled_at: cancelledAt,
+    cancelled_by: user.id,
+    collection_datetime: collectionDatetime,
+    deposit_status: depositStatus,
+    ...(refundOption?.endsWith("deposit_returned")
+      ? {
+          deposit_refunded_amount: refundOption.startsWith("partial_refund") && partialDeposit > 0
+            ? partialDeposit
+            : depositHeld,
+          deposit_reconciled_at: now,
+          deposit_reconciled_by: user.id,
+          deposit_deduction_reason: notes || reason
+        }
+      : {}),
+    ...(refundOption?.endsWith("deposit_retained") && depositHeld > 0
+      ? {
+          deposit_forfeited_amount: depositHeld,
+          deposit_deduction_reason: notes || reason,
+          deposit_reconciled_at: now,
+          deposit_reconciled_by: user.id
+        }
+      : {})
+  };
 
-    supabase
-      .from("booking_links")
-      .update({ status: "cancelled", cancelled_at: now })
-      .eq("organization_id", organizationId)
-      .eq("rental_id", rentalId),
+  const vehicleUpdate: Record<string, unknown> = {
+    current_customer_id: null,
+    current_rental_id: null
+  };
 
-    supabase
+  if (vehicleDisposition === "available") {
+    vehicleUpdate.status = "available";
+    vehicleUpdate.availability_status = "available_now";
+    vehicleUpdate.repair_started_at = null;
+    vehicleUpdate.repair_expected_end = null;
+    vehicleUpdate.repair_notes = null;
+  } else if (vehicleDisposition === "repair") {
+    vehicleUpdate.status = "maintenance";
+    vehicleUpdate.availability_status = "blocked";
+    vehicleUpdate.repair_started_at = collectionDatetime || new Date().toISOString();
+    vehicleUpdate.repair_expected_end = repairExpectedEnd;
+    vehicleUpdate.repair_notes = repairNotes;
+  }
+
+  function throwCancellationError(step: string, error: { message?: string } | null) {
+    if (!error) return;
+
+    const message = error.message || "Unknown database error.";
+    if (
+      /cancellation_reason|cancellation_notes|cancellation_refund_option|cancelled_by|collection_datetime|repair_started_at|repair_expected_end|repair_notes/i.test(
+        message
+      )
+    ) {
+      throw new Error(
+        "Cancellation fields are not available yet. Run migration 0045_rental_cancellation_fields.sql in Supabase, then try again."
+      );
+    }
+
+    throw new Error(`${step}: ${message}`);
+  }
+
+  const rentalUpdateResult = await supabase
+    .from("rentals")
+    .update(cancellationUpdate)
+    .eq("id", rentalId)
+    .eq("organization_id", organizationId);
+  throwCancellationError("Could not cancel the rental", rentalUpdateResult.error);
+
+  const bookingLinkResult = await supabase
+    .from("booking_links")
+    .update({ status: "cancelled", cancelled_at: now })
+    .eq("organization_id", organizationId)
+    .eq("rental_id", rentalId);
+  throwCancellationError("Could not cancel the booking link", bookingLinkResult.error);
+
+  if (vehicleDisposition !== "keep_assigned") {
+    const vehicleResult = await supabase
       .from("vehicles")
-      .update({
-        status: "available",
-        availability_status: "available_now",
-        current_customer_id: null,
-        current_rental_id: null
-      })
+      .update(vehicleUpdate)
       .eq("id", vehicleId)
       .eq("organization_id", organizationId)
-      .eq("current_rental_id", rentalId),
+      .eq("current_rental_id", rentalId);
+    throwCancellationError("Could not update the vehicle", vehicleResult.error);
+  }
 
-    ...(transactionsToInsert.length > 0
-      ? [supabase.from("transactions").insert(transactionsToInsert)]
-      : [])
-  ];
+  if (transactionsToInsert.length > 0) {
+    const transactionResult = await supabase
+      .from("transactions")
+      .insert(transactionsToInsert);
+    throwCancellationError("Could not record the cancellation transactions", transactionResult.error);
+  }
 
-  const results = await Promise.all(ops);
-  const firstError = results.find(r => r?.error)?.error;
-  if (firstError) throw new Error(firstError.message);
+  const paymentScheduleResult = await supabase
+    .from("rental_payments")
+    .update({ status: "cancelled" })
+    .eq("rental_id", rentalId)
+    .eq("organization_id", organizationId)
+    .in("status", ["scheduled", "pending", "overdue"]);
+  throwCancellationError("Could not cancel the payment schedule", paymentScheduleResult.error);
 
   const refundLabel = refundOption ? ` — ${refundOption.replace(/_/g, " ")}` : "";
 
@@ -2946,6 +2989,8 @@ export async function cancelBookingWithDisposition(formData: FormData) {
   revalidatePath("/bookings");
   revalidatePath(`/bookings/${rentalId}`);
   revalidatePath(`/fleet/${vehicleId}`);
+
+  return { success: true };
 }
 
 export async function recordPaymentRefund(formData: FormData) {
@@ -3011,4 +3056,266 @@ export async function recordPaymentRefund(formData: FormData) {
   revalidatePath("/");
   revalidatePath("/bookings");
   revalidatePath(`/bookings/${rentalId}`);
+}
+
+export async function changeVehicle(formData: FormData) {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("You must be signed in.");
+
+  const rentalId             = String(formData.get("rentalId") || "").trim();
+  const organizationId       = String(formData.get("organizationId") || "").trim();
+  const replacementVehicleId = String(formData.get("replacementVehicleId") || "").trim();
+  const reason               = String(formData.get("reason") || "").trim();
+  const reasonNotes          = String(formData.get("reasonNotes") || "").trim() || null;
+  const changedAt            = String(formData.get("changedAt") || "").trim() || new Date().toISOString();
+  const disposition          = String(formData.get("originalVehicleDisposition") || "available").trim();
+  const repairNotes          = String(formData.get("repairNotes") || "").trim() || null;
+  const repairExpectedEnd    = String(formData.get("repairExpectedEnd") || "").trim() || null;
+  const newRate              = formData.get("newRate") ? Number(formData.get("newRate")) : null;
+  const keepRate             = String(formData.get("keepRate") || "true") === "true";
+
+  if (!rentalId || !organizationId || !replacementVehicleId || !reason) {
+    throw new Error("Missing required fields.");
+  }
+
+  const { data: rental, error: rentalError } = await supabase
+    .from("rentals")
+    .select("id, organization_id, vehicle_id, original_vehicle_id, customer_id, rental_rate, currency, status, reference, display_code")
+    .eq("id", rentalId)
+    .eq("organization_id", organizationId)
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (rentalError || !rental) throw new Error(rentalError?.message || "Booking not found.");
+  if (["completed", "cancelled"].includes(rental.status)) throw new Error("Cannot change vehicle on a completed or cancelled booking.");
+  if (rental.vehicle_id === replacementVehicleId) throw new Error("Replacement vehicle is the same as the current vehicle.");
+
+  const { data: replacement, error: replacementError } = await supabase
+    .from("vehicles")
+    .select("id, make, model, trim, year, registration_number, status, current_rental_id, monthly_rate")
+    .eq("id", replacementVehicleId)
+    .eq("organization_id", organizationId)
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (replacementError || !replacement) throw new Error("Replacement vehicle not found.");
+  if (replacement.current_rental_id && replacement.current_rental_id !== rentalId) {
+    throw new Error("This vehicle is currently assigned to another active rental.");
+  }
+
+  const originalVehicleId = rental.vehicle_id;
+  const rateBefore = Number(rental.rental_rate || 0);
+  const rateAfter = (!keepRate && newRate != null) ? newRate : rateBefore;
+
+  const ops: Promise<any>[] = [
+    // 1. Update rental: new vehicle + rate
+    supabase
+      .from("rentals")
+      .update({
+        vehicle_id: replacementVehicleId,
+        original_vehicle_id: rental.original_vehicle_id || originalVehicleId,
+        ...(rateAfter !== rateBefore ? { rental_rate: rateAfter } : {})
+      })
+      .eq("id", rentalId)
+      .eq("organization_id", organizationId),
+
+    // 2. Log the change
+    supabase
+      .from("vehicle_changes")
+      .insert({
+        organization_id: organizationId,
+        rental_id: rentalId,
+        from_vehicle_id: originalVehicleId,
+        to_vehicle_id: replacementVehicleId,
+        reason,
+        reason_notes: reasonNotes,
+        changed_at: changedAt,
+        changed_by: user.id,
+        original_vehicle_disposition: disposition,
+        repair_notes: repairNotes,
+        repair_expected_end: repairExpectedEnd || null,
+        rate_before: rateBefore,
+        rate_after: rateAfter
+      }),
+
+    // 3. Update replacement vehicle: assign to this rental
+    supabase
+      .from("vehicles")
+      .update({
+        status: "rented",
+        availability_status: "rented",
+        current_customer_id: rental.customer_id,
+        current_rental_id: rentalId
+      })
+      .eq("id", replacementVehicleId)
+      .eq("organization_id", organizationId),
+
+    // 4. Update original vehicle status based on disposition
+    supabase
+      .from("vehicles")
+      .update(
+        disposition === "repair"
+          ? {
+              status: "maintenance",
+              availability_status: "offline",
+              current_customer_id: null,
+              current_rental_id: null,
+              repair_started_at: changedAt,
+              repair_expected_end: repairExpectedEnd || null,
+              repair_notes: repairNotes || null
+            }
+          : disposition === "available"
+          ? {
+              status: "available",
+              availability_status: "available_now",
+              current_customer_id: null,
+              current_rental_id: null
+            }
+          : {
+              current_customer_id: null,
+              current_rental_id: null
+            }
+      )
+      .eq("id", originalVehicleId)
+      .eq("organization_id", organizationId)
+  ];
+
+  // 5. If rate changed, update future scheduled payments
+  if (rateAfter !== rateBefore) {
+    ops.push(
+      supabase
+        .from("rental_payments")
+        .update({ amount: rateAfter })
+        .eq("rental_id", rentalId)
+        .eq("organization_id", organizationId)
+        .in("status", ["scheduled", "pending", "overdue"])
+        .is("deleted_at", null)
+    );
+  }
+
+  const results = await Promise.all(ops);
+  const firstError = results.find((r: any) => r?.error)?.error;
+  if (firstError) throw new Error(firstError.message);
+
+  const bookingRef = rental.reference || rental.display_code || rentalId;
+  const reasonLabel = reason.replace(/_/g, " ");
+
+  await recordActivityEvent(supabase, {
+    organization_id: organizationId,
+    actor_id: user.id,
+    entity_type: "rental",
+    entity_id: rentalId,
+    vehicle_id: replacementVehicleId,
+    rental_id: rentalId,
+    customer_id: rental.customer_id,
+    event_type: "vehicle_changed",
+    title: "Vehicle changed",
+    detail: `${bookingRef} — vehicle changed (${reasonLabel}). Replacement: ${replacement.make} ${replacement.model} ${replacement.year || ""}${rateAfter !== rateBefore ? `. Rate updated: ${rateBefore} → ${rateAfter}` : ""}.`
+  });
+
+  revalidatePath("/");
+  revalidatePath("/bookings");
+  revalidatePath(`/bookings/${rentalId}`);
+  revalidatePath("/fleet");
+  revalidatePath(`/fleet/${originalVehicleId}`);
+  revalidatePath(`/fleet/${replacementVehicleId}`);
+}
+
+export async function undoCancellation(formData: FormData) {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("You must be signed in.");
+
+  const organizationId = String(formData.get("organizationId") || "").trim();
+  const rentalId       = String(formData.get("rentalId") || "").trim();
+  const vehicleId      = String(formData.get("vehicleId") || "").trim();
+
+  if (!organizationId || !rentalId) throw new Error("Missing required fields.");
+
+  const { data: rental, error: rentalError } = await supabase
+    .from("rentals")
+    .select("id, organization_id, vehicle_id, customer_id, status, reference, display_code, delivery_datetime")
+    .eq("id", rentalId)
+    .eq("organization_id", organizationId)
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (rentalError || !rental) throw new Error(rentalError?.message || "Booking not found.");
+  if (rental.status !== "cancelled") throw new Error("This booking is not cancelled.");
+
+  await ensureMembership(supabase, organizationId, user.id);
+
+  const resolvedVehicleId = vehicleId || rental.vehicle_id;
+  const restoreStatus = rental.delivery_datetime ? "active" : "booked";
+  const today = new Date().toISOString().slice(0, 10);
+
+  const ops: Promise<any>[] = [
+    // Restore rental status and clear cancellation fields
+    supabase
+      .from("rentals")
+      .update({
+        status: restoreStatus,
+        cancellation_reason: null,
+        cancellation_notes: null,
+        cancellation_refund_option: null,
+        cancelled_at: null,
+        cancelled_by: null,
+      })
+      .eq("id", rentalId)
+      .eq("organization_id", organizationId),
+
+    // Restore booking link
+    supabase
+      .from("booking_links")
+      .update({ status: "completed", cancelled_at: null })
+      .eq("organization_id", organizationId)
+      .eq("rental_id", rentalId)
+      .eq("status", "cancelled"),
+
+    // Restore future cancelled payments to scheduled
+    supabase
+      .from("rental_payments")
+      .update({ status: "scheduled" })
+      .eq("rental_id", rentalId)
+      .eq("organization_id", organizationId)
+      .eq("status", "cancelled")
+      .gte("scheduled_date", today),
+
+    // Re-assign vehicle to this rental
+    ...(resolvedVehicleId ? [
+      supabase
+        .from("vehicles")
+        .update({
+          status: "rented",
+          availability_status: "rented",
+          current_customer_id: rental.customer_id,
+          current_rental_id: rentalId,
+        })
+        .eq("id", resolvedVehicleId)
+        .eq("organization_id", organizationId),
+    ] : []),
+  ];
+
+  const results = await Promise.all(ops);
+  const firstError = results.find((r: any) => r?.error)?.error;
+  if (firstError) throw new Error(firstError.message);
+
+  await recordActivityEvent(supabase, {
+    organization_id: organizationId,
+    actor_id: user.id,
+    entity_type: "rental",
+    entity_id: rentalId,
+    vehicle_id: resolvedVehicleId || rental.vehicle_id,
+    rental_id: rentalId,
+    customer_id: rental.customer_id,
+    event_type: "booking_restored",
+    title: "Cancellation undone",
+    detail: `${bookingReference(rental)} cancellation reversed — restored to ${restoreStatus}.`,
+  });
+
+  revalidatePath("/");
+  revalidatePath("/bookings");
+  revalidatePath(`/bookings/${rentalId}`);
+  if (resolvedVehicleId) revalidatePath(`/fleet/${resolvedVehicleId}`);
 }

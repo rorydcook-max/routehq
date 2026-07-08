@@ -1,5 +1,5 @@
 import { buildContractVariables, extractBodyHtml, renderContractTemplate } from "@/lib/contract-rendering";
-import { defaultRentalContractTemplate } from "@/lib/default-contract-template";
+import { defaultRentalContractTemplate, ensureDefaultContractTemplate } from "@/lib/contracts";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export type PublicBookingState = "not_found" | "expired" | "cancelled" | "ready" | "active" | "completed";
@@ -101,15 +101,7 @@ export async function getPublicBookingDetail(token: string) {
           .is("deleted_at", null)
           .order("created_at", { ascending: false })
       : Promise.resolve({ data: [] }),
-    supabase
-      .from("contract_templates")
-      .select("*")
-      .eq("organization_id", bookingLink.organization_id)
-      .eq("is_default", true)
-      .eq("is_active", true)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle()
+    ensureDefaultContractTemplate(supabase, bookingLink.organization_id).then((data) => ({ data }))
   ]);
 
   const [paymentsResult, portalActionsResult, inspectionsResult] = bookingLink.rental_id
@@ -160,18 +152,21 @@ export async function getPublicBookingDetail(token: string) {
     ? (await supabase.storage.from("documents").createSignedUrl(signedContractPath, 60 * 60)).data?.signedUrl || null
     : null;
   const contractTemplate = template?.content_html || template?.body || contract?.content_html || defaultRentalContractTemplate;
-  const contractHtml = extractBodyHtml(
-    renderContractTemplate(
-      contractTemplate,
-      buildContractVariables({
-        organization,
-        customer,
-        vehicle,
-        rental,
-        bookingLink
-      })
-    )
+  const renderedContract = renderContractTemplate(
+    contractTemplate,
+    buildContractVariables({
+      organization,
+      customer,
+      vehicle,
+      rental,
+      bookingLink
+    })
   );
+  const documentStart = renderedContract.search(/<!doctype\s+html|<html(?:\s|>)/i);
+  const contractDocument = documentStart >= 0
+    ? renderedContract.slice(documentStart)
+    : renderedContract;
+  const contractHtml = extractBodyHtml(contractDocument);
 
   const rentalStatus = rental?.status || "booked";
   const state = rentalStatus === "cancelled" || bookingLink.status === "cancelled"

@@ -1,3 +1,4 @@
+<!-- routehq-template-v3 -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -152,6 +153,17 @@
       border-radius: 6px;
       object-fit: contain;
     }
+    .cols-1 { grid-template-columns: 1fr; }
+    .lbl {
+      margin-bottom: 2px;
+      color: #717d86;
+      font-size: 8.5px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .val { color: #1a1d21; font-size: 12px; font-weight: 700; }
+    h2 { margin: 0 0 8px; color: #0f172a; font-size: 15px; }
     ul { margin: 6px 0 0 18px; padding: 0; }
   </style>
 </head>
@@ -230,7 +242,7 @@
     <div class="section-title">3. Condition of vehicle / สภาพยานพาหนะ</div>
     <div class="section-body">
       <div class="bilingual-section">
-        <div class="lang-en">The Renter confirms that the vehicle is received in good working order except for any damage, marks, missing items, fuel level or mileage recorded in the delivery inspection report or Appendix A.</div>
+        <div class="lang-en">The Renter confirms that the vehicle is received in good working order except for any damage, marks, missing items, fuel level or mileage recorded in the delivery inspection report.</div>
         <div class="lang-th">ผู้เช่ายืนยันว่าได้รับยานพาหนะในสภาพใช้งานได้ดี เว้นแต่ความเสียหาย รอยตำหนิ รายการขาดหาย ระดับน้ำมัน หรือเลขไมล์ที่บันทึกไว้ในรายงานตรวจรับรถหรือภาคผนวก ก.</div>
       </div>
       {{delivery_damage_report}}
@@ -279,13 +291,13 @@
     <div class="section-body">
       <div class="info-grid grid-4">
         <div class="info-cell"><div class="info-label">Rate / ค่าเช่า</div><div class="info-value">฿{{rental_rate}}</div></div>
-        <div class="info-cell"><div class="info-label">Billing period / รอบบิล</div><div class="info-value">{{billing_period}}</div></div>
+        <div class="info-cell"><div class="info-label">Billing period / รอบบิล</div><div class="info-value">{{billing_period_label}}</div></div>
+        <div class="info-cell"><div class="info-label">Payment due / วันครบกำหนด</div><div class="info-value">{{payment_due_label}}</div></div>
         <div class="info-cell"><div class="info-label">Late fee / ค่าปรับล่าช้า</div><div class="info-value">{{late_fee_percentage}}%</div></div>
-        <div class="info-cell"><div class="info-label">Fuel charge / ค่าน้ำมัน</div><div class="info-value">฿{{fuel_charge_per_increment}}</div></div>
       </div>
       <div class="bilingual-section">
-        <div class="lang-en">Rental payments are due according to the agreed billing period. Late payment, early termination, fuel shortage, damage, cleaning and other charges may be deducted from the deposit or invoiced separately.</div>
-        <div class="lang-th">ค่าเช่าถึงกำหนดชำระตามรอบบิลที่ตกลงกัน การชำระล่าช้า การยกเลิกก่อนกำหนด น้ำมันไม่ครบ ความเสียหาย ค่าทำความสะอาด และค่าใช้จ่ายอื่น ๆ อาจถูกหักจากเงินประกันหรือเรียกเก็บเพิ่มเติม</div>
+        <div class="lang-en">Rental payments are charged at ฿{{rental_rate}} per {{billing_period_label}} and are due {{payment_due_label}}. Fuel level is recorded at the time of vehicle handover. A fuel shortage may be charged at ฿{{fuel_charge_per_increment}} per one-eighth gauge increment. Late payment, early termination, damage, cleaning and other charges may be deducted from the deposit or invoiced separately.</div>
+        <div class="lang-th">ค่าเช่าคิดในอัตรา ฿{{rental_rate}} ต่อ {{billing_period_label}} และครบกำหนดชำระตามเงื่อนไข {{payment_due_label}} ระดับน้ำมันจะถูกบันทึกในขณะส่งมอบยานพาหนะ หากคืนน้ำมันต่ำกว่าเดิมอาจมีค่าธรรมเนียม ฿{{fuel_charge_per_increment}} ต่อหนึ่งในแปดขีดบนมาตรวัด การชำระล่าช้า การยกเลิกก่อนกำหนด ความเสียหาย ค่าทำความสะอาด และค่าใช้จ่ายอื่น ๆ อาจถูกหักจากเงินประกันหรือเรียกเก็บเพิ่มเติม</div>
       </div>
     </div>
   </section>
@@ -371,13 +383,9 @@
   <section class="section">
     <div class="section-title">12. Insurance and claims / ประกันภัยและการเคลม</div>
     <div class="section-body">
-      <div class="info-grid grid-2">
-        <div class="info-cell"><div class="info-label">Insurance type / ประเภทประกัน</div><div class="info-value">{{insurance_type}}</div></div>
-        <div class="info-cell"><div class="info-label">Excess / ค่าเสียหายส่วนแรก</div><div class="info-value">฿{{insurance_excess}}</div></div>
-      </div>
       <div class="bilingual-section">
-        <div class="lang-en">Insurance coverage is subject to the insurer's terms. The Renter remains responsible for excess, exclusions, uninsured damage, lost keys, tyres, wheels, interior damage, personal belongings and negligence.</div>
-        <div class="lang-th">ความคุ้มครองประกันเป็นไปตามเงื่อนไขของบริษัทประกัน ผู้เช่ายังคงรับผิดชอบค่าเสียหายส่วนแรก ข้อยกเว้น ความเสียหายที่ไม่คุ้มครอง กุญแจหาย ยาง ล้อ ความเสียหายภายใน ทรัพย์สินส่วนตัว และความประมาท</div>
+        <div class="lang-en">The vehicle is covered by full comprehensive (Type 1) insurance valid throughout the Kingdom of Thailand. The Renter will be added as a named driver on the policy. In the event of an insurance claim, any applicable costs will be drawn from the security deposit, which must then be replenished.</div>
+        <div class="lang-th">ยานพาหนะได้รับความคุ้มครองด้วยประกันภัยภาคสมัครใจประเภท 1 ที่มีผลบังคับใช้ทั่วราชอาณาจักรไทย ผู้เช่าจะถูกเพิ่มเป็นผู้ขับขี่ที่ระบุชื่อในกรมธรรม์ ในกรณีที่มีการเรียกร้องประกันภัย ค่าใช้จ่ายที่เกิดขึ้นจะถูกหักจากเงินประกัน ซึ่งต้องชำระทดแทน</div>
       </div>
     </div>
   </section>
@@ -395,10 +403,9 @@
   <section class="section">
     <div class="section-title">14. Mileage and odometer / เลขไมล์</div>
     <div class="section-body">
-      <div class="info-grid grid-3">
+      <div class="info-grid grid-2">
         <div class="info-cell"><div class="info-label">Mileage limit / จำกัดระยะทาง</div><div class="info-value">{{mileage_limit}}</div></div>
         <div class="info-cell"><div class="info-label">Delivery odometer / เลขไมล์ส่งมอบ</div><div class="info-value">{{delivery_odometer}}</div></div>
-        <div class="info-cell"><div class="info-label">Fuel level / ระดับน้ำมัน</div><div class="info-value">{{delivery_fuel_level}}</div></div>
       </div>
       <div class="bilingual-section">
         <div class="lang-en">The Renter must not tamper with the odometer or GPS device. Any suspected tampering may result in deposit forfeiture and recovery of additional losses.</div>
@@ -493,70 +500,61 @@
     </div>
   </section>
 
-  <div class="warning-box">
-    <div class="bilingual-section">
-      <div class="lang-en"><strong>Important:</strong> By signing below, the Renter confirms they have read, understood and accepted this agreement and the vehicle condition records.</div>
-      <div class="lang-th"><strong>สำคัญ:</strong> การลงนามด้านล่างถือว่าผู้เช่าได้อ่าน เข้าใจ และยอมรับสัญญานี้รวมถึงบันทึกสภาพยานพาหนะแล้ว</div>
-    </div>
-  </div>
-
-  <div class="signature-grid">
-    <div class="signature-box">
-      <div class="info-label">Owner signature / ลายมือชื่อผู้ให้เช่า</div>
-      {{#if owner_signature_url}}
-      <div class="signature-pad"><img src="{{owner_signature_url}}" class="sig-image" alt="Owner signature" /></div>
-      {{else}}
-      <div class="signature-pad">Owner signature to be added / รอลายมือชื่อผู้ให้เช่า</div>
-      {{/if}}
-      <div class="info-value">{{owner_name}}</div>
-    </div>
-    <div class="signature-box">
-      <div class="info-label">Renter signature / ลายมือชื่อผู้เช่า</div>
-      {{#if customer_signature_url}}
-      <div class="signature-pad"><img src="{{customer_signature_url}}" class="sig-image" alt="Customer signature" /></div>
-      {{else}}
-      <div class="signature-pad">Customer signature pending / รอลายมือชื่อผู้เช่า</div>
-      {{/if}}
-      <div class="info-value">{{renter_full_name}}</div>
-      <div class="owner-details" style="text-align:left;">Signed: {{customer_signed_at}}</div>
-    </div>
-  </div>
-
-  {{#if delivery_appendix_visible}}
-  <div class="page-break"></div>
-  <section class="section">
-    <div class="section-title">Appendix A. Delivery inspection / ภาคผนวก ก. การตรวจรับรถ</div>
-    <div class="section-body">
-      <div class="info-grid grid-3">
-        <div class="info-cell"><div class="info-label">Delivery date / วันที่ส่งมอบ</div><div class="info-value">{{delivery_date}}</div></div>
-        <div class="info-cell"><div class="info-label">Odometer / เลขไมล์</div><div class="info-value">{{delivery_odometer}}</div></div>
-        <div class="info-cell"><div class="info-label">Fuel level / ระดับน้ำมัน</div><div class="info-value">{{delivery_fuel_level}}</div></div>
-      </div>
-      <div class="info-grid grid-1">
-        <div class="info-cell"><div class="info-label">Delivery location / สถานที่ส่งมอบ</div><div class="info-value">{{delivery_location}}</div></div>
-      </div>
-      <!-- CONDITIONAL: delivery_fuel_image_url -->
+  <div class="section">
+    <h2>19. Vehicle Operability / ความสามารถในการใช้งานของยานพาหนะ</h2>
+    <div class="clause">
+      <span class="clause-num">19.1.</span>
       <div class="bilingual-section">
-        <div class="lang-en"><strong>Fuel level photo</strong></div>
-        <div class="lang-th"><strong>รูปภาพระดับน้ำมัน</strong></div>
-      </div>
-      <img src="{{delivery_fuel_image_url}}" class="appendix-photo" alt="Fuel level photo" />
-      <!-- END CONDITIONAL -->
-      <div class="bilingual-section" style="margin-top:12px;">
-        <div class="lang-en"><strong>Damage and condition report</strong></div>
-        <div class="lang-th"><strong>รายงานความเสียหายและสภาพยานพาหนะ</strong></div>
-      </div>
-      {{delivery_damage_report}}
-      <div class="signature-box" style="margin-top:14px;">
-        <div class="info-label">Customer delivery acceptance / ลูกค้ายอมรับสภาพรถตอนส่งมอบ</div>
-        <!-- CONDITIONAL: delivery_customer_signature_url -->
-        <div class="signature-pad"><img src="{{delivery_customer_signature_url}}" class="sig-image" alt="Delivery customer signature" /></div>
-        <!-- END CONDITIONAL -->
-        <div class="info-value">{{renter_full_name}}</div>
-        <div class="owner-details" style="text-align:left;">Signed: {{delivery_customer_signed_at}}</div>
+        <div class="lang-en">The Owner is responsible for maintaining the vehicle in a roadworthy and operable condition throughout the rental period. If the vehicle becomes inoperable due to mechanical failure or breakdown not caused by the Renter's negligence, and the Owner is unable to restore operability or provide a suitable replacement vehicle within <strong>24 hours</strong> of the Renter notifying the Owner, the Renter has the right to request cancellation of the contract and receive a pro-rata refund for the unused remaining period.</div>
+        <div class="lang-th">เจ้าของมีหน้าที่รักษายานพาหนะให้อยู่ในสภาพพร้อมใช้งานตลอดระยะเวลาเช่า หากยานพาหนะไม่สามารถใช้งานได้เนื่องจากความขัดข้องทางกลไกหรือการเสียที่ไม่ได้เกิดจากความประมาทของผู้เช่า และเจ้าของไม่สามารถแก้ไขหรือจัดหายานพาหนะทดแทนที่เหมาะสมได้ภายใน <strong>24 ชั่วโมง</strong> นับจากที่ผู้เช่าแจ้ง ผู้เช่ามีสิทธิ์ขอยกเลิกสัญญาและรับเงินคืนตามสัดส่วนสำหรับระยะเวลาที่เหลืออยู่</div>
       </div>
     </div>
-  </section>
-  {{/if}}
+    <div class="clause">
+      <span class="clause-num">19.2.</span>
+      <div class="bilingual-section">
+        <div class="lang-en">This clause does not apply where inoperability is caused by the Renter's actions including accidents, negligent operation, incorrect fuel, or damage caused by the Renter. In such cases Sections 9 and 12 apply.</div>
+        <div class="lang-th">ข้อกำหนดนี้ไม่มีผลบังคับใช้หากการไม่สามารถใช้งานได้เกิดจากการกระทำของผู้เช่า รวมถึงอุบัติเหตุ การขับขี่ประมาท การเติมเชื้อเพลิงผิดประเภท หรือความเสียหายที่เกิดจากผู้เช่า ในกรณีดังกล่าวให้ใช้บทบัญญัติในข้อ 9 และข้อ 12</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="page-break-before:always;"></div>
+
+  <h2>Signatures / ลายเซ็น</h2>
+  <p style="font-size:10px;color:#64748b;margin:6px 0 16px;">By signing below, both parties confirm they have read, understood, and agree to all terms of this rental contract. / โดยการลงนามด้านล่าง คู่สัญญาทั้งสองฝ่ายยืนยันว่าได้อ่าน เข้าใจ และยินยอมผูกพันตามเงื่อนไขทั้งหมดของสัญญาเช่านี้</p>
+
+  <div class="info-grid cols-1" style="margin-bottom:24px;">
+    <div class="info-cell"><div class="lbl">Contract Date / วันที่สัญญา</div><div class="val">{{contract_date}}</div></div>
+  </div>
+
+  <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+    <tr>
+      <td style="width:50%;padding-right:20px;vertical-align:top;">
+        <p style="font-size:10px;font-weight:800;text-transform:uppercase;color:#475569;letter-spacing:0.05em;margin:0 0 8px;">Owner / ผู้ให้เช่า</p>
+        <div style="height:80px;border:1px dashed #94a3b8;border-radius:4px;display:flex;align-items:center;justify-content:center;background:#fafafa;margin-bottom:10px;">
+          {{#if owner_signature_url}}
+          <img src="{{owner_signature_url}}" style="max-width:200px;max-height:70px;" alt="Owner signature"/>
+          {{else}}
+          <span style="color:#94a3b8;font-size:10px;font-style:italic;">Owner signature / ลายเซ็นเจ้าของ</span>
+          {{/if}}
+        </div>
+        <div style="border-top:1px solid #334155;padding-top:6px;font-size:10.5px;color:#1a1d21;">Name (print) / ชื่อ (ตัวพิมพ์): <strong>{{owner_name}}</strong></div>
+      </td>
+      <td style="width:50%;padding-left:20px;vertical-align:top;">
+        <p style="font-size:10px;font-weight:800;text-transform:uppercase;color:#475569;letter-spacing:0.05em;margin:0 0 8px;">Renter / ผู้เช่า</p>
+        <div style="height:80px;border:1px dashed #94a3b8;border-radius:4px;display:flex;align-items:center;justify-content:center;background:#fafafa;margin-bottom:10px;">
+          {{#if customer_signature_url}}
+          <img src="{{customer_signature_url}}" style="max-width:200px;max-height:70px;" alt="Renter signature"/>
+          {{else}}
+          <span style="color:#94a3b8;font-size:10px;font-style:italic;">Renter signature / ลายเซ็นผู้เช่า</span>
+          {{/if}}
+        </div>
+        <div style="border-top:1px solid #334155;padding-top:6px;font-size:10.5px;color:#1a1d21;">Name (print) / ชื่อ (ตัวพิมพ์): <strong>{{renter_full_name}}</strong></div>
+        {{#if customer_signed_at}}
+        <div style="font-size:9.5px;color:#64748b;margin-top:4px;">Signed digitally / ลงนามดิจิทัล: {{customer_signed_at}}</div>
+        {{/if}}
+      </td>
+    </tr>
+  </table>
 </body>
 </html>

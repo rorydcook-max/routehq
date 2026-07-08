@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { markOnboardingStep } from "@/lib/onboarding";
 import { recordActivityEvent } from "@/lib/supabase/activity";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 function numberFromForm(formData: FormData, key: string) {
@@ -201,6 +202,28 @@ async function requireVehicleAccess(supabase: any, vehicleId: string, organizati
 
   if (error || !vehicle) {
     throw new Error(error?.message || "Vehicle was not found.");
+  }
+
+  return vehicle;
+}
+
+async function requireVehiclePhotoManagementAccess(
+  supabase: any,
+  userId: string,
+  vehicleId: string,
+  organizationId: string
+) {
+  const vehicle = await requireVehicleAccess(supabase, vehicleId, organizationId);
+  const { data: membership, error } = await supabase
+    .from("organization_members")
+    .select("role")
+    .eq("organization_id", organizationId)
+    .eq("user_id", userId)
+    .eq("is_active", true)
+    .maybeSingle();
+
+  if (error || !membership || !["owner", "manager", "operator"].includes(membership.role)) {
+    throw new Error(error?.message || "You do not have permission to manage vehicle photos.");
   }
 
   return vehicle;
@@ -514,7 +537,8 @@ export async function uploadVehiclePhotos(formData: FormData) {
     throw new Error("Choose at least one photo to upload.");
   }
 
-  const vehicle = await requireVehicleAccess(supabase, vehicleId, organizationId);
+  const vehicle = await requireVehiclePhotoManagementAccess(supabase, user.id, vehicleId, organizationId);
+  const admin = createSupabaseAdminClient() as any;
 
   for (const file of files) {
     if (!file.type.startsWith("image/")) {
@@ -523,7 +547,7 @@ export async function uploadVehiclePhotos(formData: FormData) {
 
     const extension = file.name.split(".").pop()?.toLowerCase() || "upload";
     const storagePath = `${organizationId}/vehicle/${vehicleId}/photos/${Date.now()}-${crypto.randomUUID()}-${safeFileName(file.name || `vehicle-photo.${extension}`)}`;
-    const { error: uploadError } = await supabase.storage.from("documents").upload(storagePath, file, {
+    const { error: uploadError } = await admin.storage.from("documents").upload(storagePath, file, {
       contentType: file.type || undefined,
       upsert: false
     });
@@ -532,7 +556,7 @@ export async function uploadVehiclePhotos(formData: FormData) {
       throw new Error(uploadError.message);
     }
 
-    const { error: documentError } = await supabase.from("documents").insert({
+    const { error: documentError } = await admin.from("documents").insert({
       organization_id: organizationId,
       owner_type: "vehicle",
       owner_id: vehicleId,
@@ -548,6 +572,7 @@ export async function uploadVehiclePhotos(formData: FormData) {
     });
 
     if (documentError) {
+      await admin.storage.from("documents").remove([storagePath]);
       throw new Error(documentError.message);
     }
   }
@@ -585,8 +610,9 @@ export async function removeVehiclePhoto(formData: FormData) {
     throw new Error("Vehicle photo is required.");
   }
 
-  const vehicle = await requireVehicleAccess(supabase, vehicleId, organizationId);
-  const { data: document, error: documentError } = await supabase
+  const vehicle = await requireVehiclePhotoManagementAccess(supabase, user.id, vehicleId, organizationId);
+  const admin = createSupabaseAdminClient() as any;
+  const { data: document, error: documentError } = await admin
     .from("documents")
     .select("id, storage_bucket, storage_path, file_name")
     .eq("id", documentId)
@@ -600,9 +626,10 @@ export async function removeVehiclePhoto(formData: FormData) {
     throw new Error(documentError?.message || "Photo was not found.");
   }
 
-  const { error: updateError } = await supabase
+  const deletedAt = new Date().toISOString();
+  const { error: updateError } = await admin
     .from("documents")
-    .update({ deleted_at: new Date().toISOString() })
+    .update({ deleted_at: deletedAt })
     .eq("id", documentId)
     .eq("organization_id", organizationId);
 
@@ -610,7 +637,19 @@ export async function removeVehiclePhoto(formData: FormData) {
     throw new Error(updateError.message);
   }
 
-  await supabase.storage.from(document.storage_bucket || "documents").remove([document.storage_path]);
+  const { error: storageError } = await admin.storage
+    .from(document.storage_bucket || "documents")
+    .remove([document.storage_path]);
+
+  if (storageError) {
+    await admin
+      .from("documents")
+      .update({ deleted_at: null })
+      .eq("id", documentId)
+      .eq("organization_id", organizationId)
+      .eq("deleted_at", deletedAt);
+    throw new Error(storageError.message);
+  }
 
   await recordActivityEvent(supabase, {
     organization_id: organizationId,
@@ -645,14 +684,15 @@ export async function reorderVehiclePhotos(formData: FormData) {
     throw new Error("Vehicle is required.");
   }
 
-  await requireVehicleAccess(supabase, vehicleId, organizationId);
+  await requireVehiclePhotoManagementAccess(supabase, user.id, vehicleId, organizationId);
+  const admin = createSupabaseAdminClient() as any;
 
   const photoIds = JSON.parse(rawOrder);
   if (!Array.isArray(photoIds) || photoIds.some((id) => typeof id !== "string")) {
     throw new Error("Invalid photo order.");
   }
 
-  const { data: documents, error: documentError } = await supabase
+  const { data: documents, error: documentError } = await admin
     .from("documents")
     .select("id, extracted_data")
     .eq("organization_id", organizationId)
@@ -666,18 +706,18 @@ export async function reorderVehiclePhotos(formData: FormData) {
   }
 
   const documentById = new Map<string, { id: string; extracted_data: unknown }>((documents || []).map((document: any) => [document.id, document]));
-  await Promise.all(
+  const updateResults = await Promise.all(
     photoIds.map((photoId, index) => {
       const document = documentById.get(photoId);
       if (!document) {
-        return Promise.resolve();
+        return Promise.resolve(null);
       }
       const extractedData =
         typeof document.extracted_data === "object" && document.extracted_data !== null && !Array.isArray(document.extracted_data)
           ? document.extracted_data
           : {};
 
-      return supabase
+      return admin
         .from("documents")
         .update({
           extracted_data: {
@@ -689,6 +729,11 @@ export async function reorderVehiclePhotos(formData: FormData) {
         .eq("organization_id", organizationId);
     })
   );
+  const orderError = updateResults.find((result) => result?.error)?.error;
+
+  if (orderError) {
+    throw new Error(orderError.message);
+  }
 
   await recordActivityEvent(supabase, {
     organization_id: organizationId,

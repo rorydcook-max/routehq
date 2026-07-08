@@ -84,12 +84,17 @@ export function CancelBookingButton({
 }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [step, setStep] = useState<"reason" | "disposition" | "confirm">("reason");
+  const [step, setStep] = useState<"reason" | "disposition" | "vehicle" | "confirm">("reason");
   const [reasons, setReasons] = useState<CancelReason[]>([]);
   const [refundOption, setRefundOption] = useState<RefundOption | "">("");
   const [partialRefundAmount, setPartialRefundAmount] = useState("");
   const [partialDepositReturn, setPartialDepositReturn] = useState("");
   const [notes, setNotes] = useState("");
+  const [cancelledAt, setCancelledAt] = useState("");
+  const [collectionDatetime, setCollectionDatetime] = useState("");
+  const [vehicleDisposition, setVehicleDisposition] = useState<"available" | "repair" | "keep_assigned">("available");
+  const [repairNotes, setRepairNotes] = useState("");
+  const [repairExpectedEnd, setRepairExpectedEnd] = useState("");
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
 
@@ -105,6 +110,11 @@ export function CancelBookingButton({
     setPartialRefundAmount("");
     setPartialDepositReturn("");
     setNotes("");
+    setCancelledAt("");
+    setCollectionDatetime("");
+    setVehicleDisposition("available");
+    setRepairNotes("");
+    setRepairExpectedEnd("");
     setError("");
     setOpen(false);
   }
@@ -115,7 +125,7 @@ export function CancelBookingButton({
     if (needsFullFlow) {
       setStep("disposition");
     } else {
-      setStep("confirm");
+      setStep("vehicle");
     }
   }
 
@@ -125,7 +135,7 @@ export function CancelBookingButton({
       setError("Please enter the refund amount."); return;
     }
     setError("");
-    setStep("confirm");
+    setStep("vehicle");
   }
 
   function submit() {
@@ -141,6 +151,11 @@ export function CancelBookingButton({
         fd.set("partialRefundAmount", partialRefundAmount);
         fd.set("partialDepositReturn", partialDepositReturn);
         fd.set("notes", notes);
+        fd.set("cancelledAt", cancelledAt);
+        fd.set("collectionDatetime", collectionDatetime);
+        fd.set("vehicleDisposition", vehicleDisposition);
+        fd.set("repairNotes", repairNotes);
+        fd.set("repairExpectedEnd", repairExpectedEnd);
         await cancelBookingWithDisposition(fd);
         reset();
         router.refresh();
@@ -151,10 +166,9 @@ export function CancelBookingButton({
   }
 
   function dispositionSummary() {
-    if (!needsFullFlow) return null;
     const lines: string[] = [];
-    if (!refundOption) return null;
 
+    if (needsFullFlow && refundOption) {
     const giveBackRental = refundOption.startsWith("full_refund")
       ? totalPaid
       : refundOption.startsWith("partial_refund")
@@ -171,8 +185,11 @@ export function CancelBookingButton({
     if (giveBackDeposit > 0) lines.push(`Return deposit ${money(giveBackDeposit, currency)}`);
     if (giveBackDeposit === 0 && hasDeposit) lines.push(`Retain deposit ${money(depositHeld, currency)}`);
     if (giveBackRental === 0 && hasPayment) lines.push(`No rental refund — ${money(totalPaid, currency)} retained`);
+    }
     lines.push("Mark all unpaid scheduled payments as cancelled");
-    lines.push("Release vehicle back to available");
+    if (vehicleDisposition === "available") lines.push("Release vehicle back to available");
+    else if (vehicleDisposition === "repair") lines.push(`Send vehicle to repair${repairNotes ? `: ${repairNotes}` : ""}`);
+    else lines.push("Vehicle status unchanged - update manually");
 
     return lines;
   }
@@ -272,34 +289,27 @@ export function CancelBookingButton({
                     <p className="text-xs text-[#667085] mb-3">Select all that apply.</p>
                     <div className="space-y-2">
                       {REASONS.map(r => (
-                        <label
+                        <button
+                          aria-pressed={reasons.includes(r.value)}
                           key={r.value}
-                          className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition-colors ${
+                          className={`block w-full cursor-pointer rounded-xl border p-3 text-left transition-colors ${
                             reasons.includes(r.value)
-                              ? "border-[#be123c] bg-[#fff1f2]"
+                              ? "border-[#be123c] bg-[#fff1f2] ring-1 ring-[#be123c]/20"
                               : "border-[#e2e8f0] bg-white hover:border-[#fecdd3]"
                           }`}
+                          onClick={() => {
+                            setReasons(prev =>
+                              prev.includes(r.value)
+                                ? prev.filter(v => v !== r.value)
+                                : [...prev, r.value]
+                            );
+                            setError("");
+                          }}
+                          type="button"
                         >
-                          <input
-                            checked={reasons.includes(r.value)}
-                            className="mt-0.5 accent-[#be123c]"
-                            name="reason"
-                            onChange={() => {
-                              setReasons(prev =>
-                                prev.includes(r.value)
-                                  ? prev.filter(v => v !== r.value)
-                                  : [...prev, r.value]
-                              );
-                              setError("");
-                            }}
-                            type="checkbox"
-                            value={r.value}
-                          />
-                          <div>
-                            <p className="text-sm font-bold text-[#10252b]">{r.label}</p>
-                            <p className="text-xs text-[#667085]">{r.detail}</p>
-                          </div>
-                        </label>
+                          <span className="block text-sm font-bold text-[#10252b]">{r.label}</span>
+                          <span className="mt-0.5 block text-xs leading-5 text-[#667085]">{r.detail}</span>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -313,6 +323,32 @@ export function CancelBookingButton({
                       value={notes}
                     />
                   </label>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <label className="block">
+                      <span className="text-xs font-bold text-[#475569]">Cancellation date &amp; time</span>
+                      <p className="mb-1 text-[11px] text-[#667085]">
+                        Leave blank to use current time. Set if recording retrospectively.
+                      </p>
+                      <input
+                        className="mt-1 w-full rounded-lg border border-[#e2e8f0] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
+                        onChange={(event) => setCancelledAt(event.target.value)}
+                        type="datetime-local"
+                        value={cancelledAt}
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="text-xs font-bold text-[#475569]">Vehicle collection date &amp; time</span>
+                      <p className="mb-1 text-[11px] text-[#667085]">
+                        When was or will the vehicle be collected back?
+                      </p>
+                      <input
+                        className="mt-1 w-full rounded-lg border border-[#e2e8f0] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
+                        onChange={(event) => setCollectionDatetime(event.target.value)}
+                        type="datetime-local"
+                        value={collectionDatetime}
+                      />
+                    </label>
+                  </div>
                 </>
               )}
 
@@ -324,59 +360,128 @@ export function CancelBookingButton({
                   </p>
                   <div className="space-y-2">
                     {REFUND_OPTIONS.map(opt => (
-                      <label
+                      <div
                         key={opt.value + opt.label}
-                        className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition-colors ${
-                          refundOption === opt.value && opt.label === REFUND_OPTIONS.find(o => o.value === refundOption)?.label
-                            ? "border-[#be123c] bg-[#fff1f2]"
+                        className={`rounded-xl border transition-colors ${
+                          refundOption === opt.value
+                            ? "border-[#be123c] bg-[#fff1f2] ring-1 ring-[#be123c]/20"
                             : "border-[#e2e8f0] bg-white hover:border-[#fecdd3]"
                         }`}
                       >
-                        <input
-                          checked={refundOption === opt.value}
-                          className="mt-0.5 accent-[#be123c]"
-                          name="refundOption"
-                          onChange={() => { setRefundOption(opt.value); setError(""); }}
-                          type="radio"
-                          value={opt.value}
-                        />
-                        <div className="flex-1">
-                          <p className="text-sm font-bold text-[#10252b]">{opt.label}</p>
-                          <p className="text-xs text-[#667085]">{opt.detail}</p>
-                          {refundOption === opt.value && opt.value.startsWith("partial_refund") && (
-                            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                        <button
+                          aria-pressed={refundOption === opt.value}
+                          className="block w-full p-3 text-left"
+                          onClick={() => {
+                            setRefundOption(opt.value);
+                            setError("");
+                          }}
+                          type="button"
+                        >
+                          <span className="block text-sm font-bold text-[#10252b]">{opt.label}</span>
+                          <span className="mt-0.5 block text-xs leading-5 text-[#667085]">{opt.detail}</span>
+                        </button>
+                        {refundOption === opt.value && opt.value.startsWith("partial_refund") ? (
+                          <div className="grid gap-2 border-t border-[#fecdd3] px-3 pb-3 pt-3 sm:grid-cols-2">
+                            <label className="block">
+                              <span className="text-xs font-bold text-[#475569]">Refund amount ({currency})</span>
+                              <input
+                                className="mt-1 w-full rounded-lg border border-[#e2e8f0] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
+                                max={totalPaid}
+                                min="0"
+                                onChange={e => setPartialRefundAmount(e.target.value)}
+                                placeholder={`0 – ${totalPaid}`}
+                                step="1"
+                                type="number"
+                                value={partialRefundAmount}
+                              />
+                            </label>
+                            {opt.value === "partial_refund_deposit_retained" && hasDeposit ? (
                               <label className="block">
-                                <span className="text-xs font-bold text-[#475569]">Refund amount ({currency})</span>
+                                <span className="text-xs font-bold text-[#475569]">Deposit returned ({currency})</span>
                                 <input
                                   className="mt-1 w-full rounded-lg border border-[#e2e8f0] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
-                                  max={totalPaid}
+                                  max={depositHeld}
                                   min="0"
-                                  onChange={e => setPartialRefundAmount(e.target.value)}
-                                  placeholder={`0 – ${totalPaid}`}
+                                  onChange={e => setPartialDepositReturn(e.target.value)}
+                                  placeholder={`0 – ${depositHeld}`}
                                   step="1"
                                   type="number"
-                                  value={partialRefundAmount}
+                                  value={partialDepositReturn}
                                 />
                               </label>
-                              {opt.value === "partial_refund_deposit_retained" && hasDeposit && (
-                                <label className="block">
-                                  <span className="text-xs font-bold text-[#475569]">Deposit returned ({currency})</span>
-                                  <input
-                                    className="mt-1 w-full rounded-lg border border-[#e2e8f0] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
-                                    max={depositHeld}
-                                    min="0"
-                                    onChange={e => setPartialDepositReturn(e.target.value)}
-                                    placeholder={`0 – ${depositHeld}`}
-                                    step="1"
-                                    type="number"
-                                    value={partialDepositReturn}
-                                  />
-                                </label>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </label>
+                            ) : null}
+                          </div>
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {step === "vehicle" && (
+                <div>
+                  <p className="mb-1 text-sm font-black text-[#10252b]">What is the vehicle&apos;s status after this cancellation?</p>
+                  <p className="mb-3 text-xs text-[#667085]">This updates the vehicle&apos;s availability in your fleet.</p>
+                  <div className="space-y-2">
+                    {([
+                      {
+                        value: "available" as const,
+                        label: "Release to available",
+                        detail: "Vehicle is back in good order and available to rent."
+                      },
+                      {
+                        value: "repair" as const,
+                        label: "Send to repair / maintenance",
+                        detail: "Vehicle needs work before it can be rented again."
+                      },
+                      {
+                        value: "keep_assigned" as const,
+                        label: "Keep current status",
+                        detail: "No change to vehicle status - I will update it manually."
+                      }
+                    ]).map((option) => (
+                      <div
+                        className={`rounded-xl border transition-colors ${
+                          vehicleDisposition === option.value
+                            ? "border-[#be123c] bg-[#fff1f2] ring-1 ring-[#be123c]/20"
+                            : "border-[#e2e8f0] bg-white hover:border-[#fecdd3]"
+                        }`}
+                        key={option.value}
+                      >
+                        <button
+                          aria-pressed={vehicleDisposition === option.value}
+                          className="block w-full p-3 text-left"
+                          onClick={() => setVehicleDisposition(option.value)}
+                          type="button"
+                        >
+                          <span className="block text-sm font-bold text-[#10252b]">{option.label}</span>
+                          <span className="mt-0.5 block text-xs leading-5 text-[#667085]">{option.detail}</span>
+                        </button>
+
+                        {vehicleDisposition === "repair" && option.value === "repair" ? (
+                          <div className="grid gap-2 border-t border-[#fecdd3] px-3 pb-3 pt-3 sm:grid-cols-2">
+                            <label className="block">
+                              <span className="text-xs font-bold text-[#475569]">Expected back</span>
+                              <input
+                                className="mt-1 w-full rounded-lg border border-[#e2e8f0] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
+                                onChange={(event) => setRepairExpectedEnd(event.target.value)}
+                                type="datetime-local"
+                                value={repairExpectedEnd}
+                              />
+                            </label>
+                            <label className="block">
+                              <span className="text-xs font-bold text-[#475569]">Repair notes</span>
+                              <input
+                                className="mt-1 w-full rounded-lg border border-[#e2e8f0] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
+                                onChange={(event) => setRepairNotes(event.target.value)}
+                                placeholder="e.g. Gearbox replacement"
+                                type="text"
+                                value={repairNotes}
+                              />
+                            </label>
+                          </div>
+                        ) : null}
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -393,11 +498,11 @@ export function CancelBookingButton({
                     </ul>
                     {notes && <p className="text-xs text-[#667085]">"{notes}"</p>}
                   </div>
-                  {needsFullFlow && dispositionSummary() && (
+                  {dispositionSummary().length > 0 && (
                     <div className="rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-3">
                       <p className="text-xs font-black uppercase text-[#667085] mb-2">What will happen</p>
                       <ul className="space-y-1">
-                        {dispositionSummary()!.map((line, i) => (
+                        {dispositionSummary().map((line, i) => (
                           <li className="flex items-start gap-2 text-sm text-[#10252b]" key={i}>
                             <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#be123c]" />
                             {line}
@@ -425,7 +530,9 @@ export function CancelBookingButton({
                     disabled={isPending}
                     onClick={() => {
                       setError("");
-                      setStep(step === "confirm" ? (needsFullFlow ? "disposition" : "reason") : "reason");
+                      if (step === "confirm") setStep("vehicle");
+                      else if (step === "vehicle") setStep(needsFullFlow ? "disposition" : "reason");
+                      else setStep("reason");
                     }}
                     type="button"
                   >
@@ -456,7 +563,16 @@ export function CancelBookingButton({
                 ) : (
                   <button
                     className="pressable inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-[#be123c] px-4 text-sm font-black text-white"
-                    onClick={step === "reason" ? handleReasonNext : handleDispositionNext}
+                    onClick={
+                      step === "reason"
+                        ? handleReasonNext
+                        : step === "disposition"
+                          ? handleDispositionNext
+                          : () => {
+                              setError("");
+                              setStep("confirm");
+                            }
+                    }
                     type="button"
                   >
                     Next →

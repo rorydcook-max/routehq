@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import { updateOwnerSignature } from "@/app/actions/settings";
 
 export function SignatureUploadSection({
-  signatureUrl
+  signatureUrl,
+  orgName
 }: {
   signatureUrl: string | null | undefined;
+  orgName: string;
 }) {
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<{ text: string; type: "error" | "success" } | null>(null);
@@ -19,7 +21,7 @@ export function SignatureUploadSection({
     startTransition(async () => {
       try {
         await updateOwnerSignature(formData);
-        setMessage({ text: "Signature updated. New contracts will use this signature automatically.", type: "success" });
+        setMessage({ text: "Signature saved. All new contracts will be auto-signed.", type: "success" });
         router.refresh();
       } catch (err) {
         setMessage({ text: err instanceof Error ? err.message : "Failed to update signature.", type: "error" });
@@ -60,7 +62,7 @@ export function SignatureUploadSection({
 
   const preview = signatureUrl ? (
     <img
-      alt="Operator signature"
+      alt={`${orgName} operator signature`}
       className="h-12 w-32 rounded-lg border border-[var(--border)] bg-white object-contain p-2"
       src={signatureUrl}
     />

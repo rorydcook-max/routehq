@@ -274,7 +274,7 @@ export default async function SettingsPage() {
           <div className="card-section">
             <LogoUploadSection logoUrl={businessLogoUrl || organization.logo_url} orgName={organization.name} />
             <div className="mt-3">
-              <SignatureUploadSection signatureUrl={ownerSignatureUrl} />
+              <SignatureUploadSection orgName={organization.name} signatureUrl={ownerSignatureUrl} />
             </div>
           </div>
           <div className="card-section grid gap-3 sm:grid-cols-3">

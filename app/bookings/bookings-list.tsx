@@ -4,6 +4,8 @@ import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { CalendarDays, Car, Clock, Search, Trash2, UserRound } from "lucide-react";
 import { deleteBooking } from "@/app/actions/bookings";
+import { CancelBookingButton } from "@/app/bookings/[id]/cancel-booking-button";
+import { UndoCancellationButton } from "@/app/bookings/[id]/undo-cancellation-button";
 import { RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
 import { Badge } from "@/components/ui";
 import { flagForNationality } from "@/lib/customer-options";
@@ -202,9 +204,31 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                         vehicleLabel={vehicleTitle(booking.vehicles)}
                       />
                     ) : null}
+                    {String(booking.status || "").toLowerCase() === "cancelled" || booking.booking_link?.status === "cancelled" ? (
+                      <UndoCancellationButton
+                        rentalId={booking.id}
+                        organizationId={booking.organization_id}
+                        vehicleId={String(booking.vehicle_id || booking.vehicles?.id || "")}
+                        customerName={booking.customers?.full_name || null}
+                      />
+                    ) : !["completed", "cancelled"].includes(String(booking.status || "").toLowerCase()) ? (
+                      <CancelBookingButton
+                        rentalId={booking.id}
+                        organizationId={booking.organization_id}
+                        vehicleId={String(booking.vehicle_id || booking.vehicles?.id || "")}
+                        totalPaid={Number(booking.total_paid || 0)}
+                        depositHeld={Number(booking.deposit_held || 0)}
+                        currency={booking.currency || "THB"}
+                        rentalRate={Number(booking.rental_rate || 0)}
+                        rentalStatus={booking.status}
+                        customerName={booking.customers?.full_name || null}
+                      />
+                    ) : null}
                     {confirmDeleteId === booking.id ? (
                       <div className="mt-1 w-full rounded-lg border border-[#fecaca] bg-[#fef2f2] p-2">
-                        <p className="mb-2 text-xs font-semibold text-[#dc2626]">Delete this booking? This cannot be undone.</p>
+                        <p className="mb-2 text-xs font-semibold text-[#dc2626]">
+                          Permanently delete all records of this booking? This removes the booking, payments, and documents entirely. Use <strong>Cancel booking</strong> instead if you want to keep a record of the cancellation.
+                        </p>
                         <div className="flex gap-2">
                           <button
                             className="pressable inline-flex min-h-7 items-center rounded-lg bg-[#dc2626] px-3 text-xs font-bold text-white disabled:opacity-60"

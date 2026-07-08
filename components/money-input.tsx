@@ -53,7 +53,7 @@ export function MoneyInput({
       <input type="hidden" name={name} value={raw} />
       {/* Visible formatted input: no name so it is not submitted */}
       <input
-        className="font-mono-data w-full rounded-xl border border-[var(--border-strong)] bg-white py-3 pl-11 pr-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
+        className="input-with-leading-symbol font-mono-data w-full rounded-xl border border-[var(--border-strong)] bg-white py-3 pr-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
         inputMode="numeric"
         placeholder="0"
         required={required}

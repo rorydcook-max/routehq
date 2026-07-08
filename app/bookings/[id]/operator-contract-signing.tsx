@@ -105,7 +105,7 @@ export function OperatorContractSigning({
       <div className="rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] p-3">
         <div className="flex items-center gap-2 font-black text-[#166534]">
           <CheckCircle2 size={18} />
-          Operator signed
+          {ownerSignatureConfigured ? "Auto-signed ✓" : "Operator signed"}
         </div>
         <p className="mt-1 text-sm text-[#667085]">This contract has both required signatures.</p>
       </div>
@@ -126,7 +126,7 @@ export function OperatorContractSigning({
       <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
         <p className="font-black text-[#92400e]">Operator signature not yet applied</p>
         <p className="mt-1 text-sm text-[#667085]">
-          This booking may have been completed before auto-signing was enabled. New customer-signed bookings will use the saved operator signature automatically.
+          This booking was created before auto-signing was enabled. The signature has been auto-applied to new bookings.
         </p>
       </div>
     );

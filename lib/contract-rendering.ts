@@ -112,6 +112,8 @@ export interface ContractVariables {
   rental_end_time: string;
   rental_rate: string;
   billing_period: string;
+  billing_period_label: string;
+  payment_due_label: string;
   deposit_amount: string;
   secondary_deposit_amount: string;
   mileage_limit: string;
@@ -181,6 +183,8 @@ export const contractVariableKeys = [
   "rental_end_time",
   "rental_rate",
   "billing_period",
+  "billing_period_label",
+  "payment_due_label",
   "deposit_amount",
   "secondary_deposit_amount",
   "mileage_limit",
@@ -223,7 +227,7 @@ export const defaultRentalContractTemplate = `
   {{#if business_logo_url}}<img src="{{business_logo_url}}" alt="{{business_name}} logo" style="max-width: 200px; max-height: 80px; object-fit: contain;" />{{else}}<h1>{{business_name}}</h1>{{/if}}
   <p>This agreement is made on {{contract_date}} between <strong>{{business_name}}</strong> and <strong>{{renter_full_name}}</strong>.</p>
   <p>Vehicle: {{vehicle_year}} {{vehicle_make}} {{vehicle_model}}, registration {{vehicle_registration}}.</p>
-  <p>Rental: {{rental_start_date}} to {{rental_end_date}}, {{rental_rate}} per {{billing_period}}. Deposit: {{deposit_amount}}.</p>
+  <p>Rental: {{rental_start_date}} to {{rental_end_date}}, {{rental_rate}} per {{billing_period_label}}. Deposit: {{deposit_amount}}.</p>
   <p>Governing law: {{jurisdiction}}.</p>
 `;
 
@@ -356,7 +360,11 @@ export function buildContractVariables({
   const fullName = optionalText(customer?.full_name, "Customer");
   const name = splitName(fullName);
   const locale = customer?.preferred_locale || bookingLink?.locale || organization?.default_locale || "en";
-  const deliveryDateTime = bookingData.delivery_datetime || bookingData.deliveryDateTime || null;
+  const deliveryDateTime =
+    bookingData.delivery_datetime ||
+    bookingData.deliveryDateTime ||
+    bookingData.delivery_date ||
+    null;
   const isRollingMonthly = Boolean(rental?.is_indefinite || rental?.pricing_model === "subscription" || bookingData.open_ended);
   const islandClauseEnabled = settings.home_territory_type === "island" || settings.island_travel_policy !== "notice_only";
   const secondaryDepositEnabled = settings.island_travel_policy === "deposit_required";
@@ -422,26 +430,74 @@ export function buildContractVariables({
     renter_first_name: name.firstName,
     renter_surname: name.surname,
     renter_full_name: fullName,
-    renter_passport_number: optionalText(customer?.passport_number),
-    renter_licence_number: optionalText(customer?.driver_license_number || customer?.driving_licence_number),
-    renter_licence_country: optionalText(customer?.driver_license_country),
-    renter_licence_expiry: customer?.driver_license_expiry ? formatContractDate(customer.driver_license_expiry, locale) : "Not provided",
+    renter_passport_number: optionalText(
+      bookingData.passport_number ||
+        bookingData.ocr_passport_number ||
+        customer?.passport_number
+    ),
+    renter_licence_number: optionalText(
+      bookingData.licence_number ||
+        bookingData.driver_licence_number ||
+        bookingData.ocr_licence_number ||
+        customer?.driver_license_number ||
+        customer?.driving_licence_number
+    ),
+    renter_licence_country: optionalText(
+      bookingData.licence_country ||
+        bookingData.ocr_licence_country ||
+        customer?.driver_license_country
+    ),
+    renter_licence_expiry: (() => {
+      const expiry =
+        bookingData.licence_expiry ||
+        bookingData.ocr_licence_expiry ||
+        customer?.driver_license_expiry;
+      return expiry ? formatContractDate(String(expiry), locale) : "Not provided";
+    })(),
     renter_phone: optionalText(customer?.phone),
     renter_email: optionalText(customer?.email),
     renter_address: optionalText(customer?.address),
-    renter_nationality: optionalText(customer?.nationality),
+    renter_nationality: optionalText(
+      bookingData.nationality ||
+        bookingData.ocr_nationality ||
+        customer?.nationality
+    ),
     vehicle_make: stripEmpty(vehicle?.make),
     vehicle_model: [vehicle?.model, vehicle?.trim].filter(Boolean).join(" "),
     vehicle_year: stripEmpty(vehicle?.year),
     vehicle_registration: stripEmpty(vehicle?.registration_number),
     vehicle_colour: stripEmpty(vehicle?.color),
     vehicle_fuel_type: optionalText(fuelType, "As specified by manufacturer"),
-    rental_start_date: formatContractDate(rental?.start_date, locale),
-    rental_start_time: formatContractTime(rental?.start_date) || "To be confirmed",
-    rental_end_date: isRollingMonthly ? "Open ended" : formatContractDate(rental?.end_date, locale),
-    rental_end_time: isRollingMonthly ? "" : formatContractTime(rental?.end_date),
+    rental_start_date: deliveryDateTime
+      ? formatContractDate(deliveryDateTime, locale)
+      : formatContractDate(rental?.start_date, locale),
+    rental_start_time: deliveryDateTime
+      ? formatContractTime(deliveryDateTime) || "To be confirmed"
+      : formatContractTime(rental?.start_date) || "To be confirmed",
+    rental_end_date: isRollingMonthly
+      ? "Open ended"
+      : rental?.end_date
+        ? formatContractDate(rental.end_date, locale)
+        : "N/A",
+    rental_end_time:
+      isRollingMonthly || !rental?.end_date
+        ? ""
+        : deliveryDateTime
+          ? formatContractTime(deliveryDateTime)
+          : formatContractTime(rental?.start_date),
     rental_rate: formatAmount(rental?.rental_rate),
     billing_period: stripEmpty(rental?.pricing_model, "rental period"),
+    billing_period_label: (() => {
+      const model = stripEmpty(rental?.pricing_model, "rental period");
+      return model === "custom" || model === "once" ? "entire period" : model;
+    })(),
+    payment_due_label: (() => {
+      const model = rental?.pricing_model;
+      if (model === "custom" || model === "once") return "Paid in full upfront";
+      if (model === "monthly") return "Same date each month";
+      if (model === "weekly") return "Same day each week";
+      return "As agreed";
+    })(),
     deposit_amount: formatAmount(rental?.deposit_amount),
     secondary_deposit_amount: formatAmount(settings.secondary_deposit_amount),
     mileage_limit: formatAmount(settings.mileage_limit),

@@ -51,6 +51,33 @@ type PublicBookingDetail = {
   depositAmount?: number;
   currency?: string;
   billingPeriod?: string;
+  contractAuthorityMode?: "legacy" | "rental_document_engine" | string;
+  rentalDocumentAgreement?: {
+    eligibility: {
+      eligible: boolean;
+      blockingIssues: string[];
+      warnings: string[];
+      customerSafeMessage: string | null;
+      contentHashFragment?: string | null;
+      customerAlreadySigned: boolean;
+      fullyExecuted: boolean;
+    };
+    agreement: null | {
+      versionNumber: number;
+      contentHashFragment: string;
+      renderedHtmlSnapshot: string;
+      businessIdentity: { name: string; legalName: string | null; poweredByRouteHq: boolean };
+      rentalSummary: Record<string, string>;
+      requiredAcknowledgements: ReadonlyArray<{ type: string; textVersion: string; text: string }>;
+      businessSignatureStatus: string;
+      customerSignatureStatus: string;
+      executionStatus: string;
+    };
+  } | null;
+  executedAgreementDownloads?: {
+    originalAgreementUrl: string | null;
+    executionCertificateUrl: string | null;
+  } | null;
 };
 
 const fieldStyle = {
@@ -486,6 +513,8 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
   const [error, setError] = useState("");
   const [completed, setCompleted] = useState(detail.completion.agreement);
   const [signedContractUrl, setSignedContractUrl] = useState<string | null>(null);
+  const [executionCertificateUrl, setExecutionCertificateUrl] = useState<string | null>(detail.executedAgreementDownloads?.executionCertificateUrl || null);
+  const [originalAgreementUrl, setOriginalAgreementUrl] = useState<string | null>(detail.executedAgreementDownloads?.originalAgreementUrl || null);
   const [agreed, setAgreed] = useState(false);
   const [signature, setSignature] = useState("");
   const [phoneCountryCode, setPhoneCountryCode] = useState("+66");
@@ -532,6 +561,10 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
   const formRef = useRef<HTMLFormElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawing = useRef(false);
+  const isRentalDocumentEngine = detail.contractAuthorityMode === "rental_document_engine";
+  const publicAgreement = detail.rentalDocumentAgreement?.agreement || null;
+  const customerSigningEligibility = detail.rentalDocumentAgreement?.eligibility || null;
+  const agreementHtml = publicAgreement?.renderedHtmlSnapshot || detail.contractHtml;
   const minDateTime = new Date().toISOString().slice(0, 16);
   const operatorDeliveryDateTime = compactDateTime(detail.bookingData.delivery_datetime);
   const operatorDeliveryIsToday = isTodayDateTime(operatorDeliveryDateTime);
@@ -678,7 +711,18 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
       return;
     }
 
-    if (!agreed) {
+    if (isRentalDocumentEngine) {
+      const requiredAcknowledgements = publicAgreement?.requiredAcknowledgements || [];
+      const accepted = requiredAcknowledgements.every((ack) => fd.get(`ack_${ack.type}`) === "on");
+      if (!accepted) {
+        setError("Please accept each required acknowledgement before signing.");
+        return;
+      }
+      if (customerSigningEligibility && !customerSigningEligibility.eligible && !customerSigningEligibility.customerAlreadySigned) {
+        setError(customerSigningEligibility.customerSafeMessage || "This agreement is not ready for signing yet.");
+        return;
+      }
+    } else if (!agreed) {
       setError("Please confirm that you have read and agree to the rental terms.");
       return;
     }
@@ -693,6 +737,8 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         formData.set("signature", signature);
         const result = await completePublicBooking(formData);
         setSignedContractUrl(result.signedContractUrl || null);
+        setOriginalAgreementUrl((result as any).originalAgreementUrl || null);
+        setExecutionCertificateUrl((result as any).executionCertificateUrl || null);
         setCompleted(true);
         window.scrollTo({ top: 0, behavior: "smooth" });
       } catch (submitError) {
@@ -709,6 +755,16 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         </div>
         <h2 className="mt-4 text-2xl font-black text-[#10252b]">You're all set, {detail.customer?.full_name || "there"}.</h2>
         <p className="mt-2 text-sm leading-6 text-[#667085]">Your booking details, documents, and signed agreement have been received. {detail.organizationName} will contact you to confirm delivery time and answer any questions.</p>
+        {originalAgreementUrl ? (
+          <a className="pressable mt-5 inline-flex rounded-xl bg-[#0f766e] px-5 py-3 text-sm font-black text-white" href={originalAgreementUrl} rel="noreferrer" target="_blank">
+            Download original agreement
+          </a>
+        ) : null}
+        {executionCertificateUrl ? (
+          <a className="pressable mt-5 ml-2 inline-flex rounded-xl border border-[#0f766e] bg-white px-5 py-3 text-sm font-black text-[#0f766e]" href={executionCertificateUrl} rel="noreferrer" target="_blank">
+            Download execution certificate
+          </a>
+        ) : null}
         {signedContractUrl ? (
           <a className="pressable mt-5 inline-flex rounded-xl bg-[#0f766e] px-5 py-3 text-sm font-black text-white" href={signedContractUrl} rel="noreferrer" target="_blank">
             Download signed contract
@@ -932,6 +988,26 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
 
       <section className="rounded-2xl border border-[#d6e5e2] bg-white p-5 shadow-sm">
         <SectionTitle icon={Upload} label="Documents" />
+        {isRentalDocumentEngine ? (
+          <div className="mt-4 grid gap-4 sm:grid-cols-3">
+            <label>
+              <span className="text-sm font-bold text-[#344054]">Passport or ID number</span>
+              <input className={inputClass} defaultValue={detail.customer?.passport_number || ""} name="passportNumber" required style={fieldStyle} />
+            </label>
+            <label>
+              <span className="text-sm font-bold text-[#344054]">Driving licence number</span>
+              <input className={inputClass} defaultValue={detail.customer?.driver_license_number || ""} name="driverLicenseNumber" required style={fieldStyle} />
+            </label>
+            <label>
+              <span className="text-sm font-bold text-[#344054]">Licence expiry</span>
+              <input className={inputClass} defaultValue={detail.customer?.driver_license_expiry || ""} name="driverLicenseExpiry" required style={fieldStyle} type="date" />
+            </label>
+            <label>
+              <span className="text-sm font-bold text-[#344054]">Licence country</span>
+              <input className={inputClass} defaultValue={detail.customer?.driver_license_country || ""} name="driverLicenseCountry" required style={fieldStyle} />
+            </label>
+          </div>
+        ) : null}
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           <UploadCard cameraName="passportCameraFile" complete={detail.documentStatus.passport} icon={IdCard} label="Passport" name="passportFile" />
           <UploadCard cameraName="driverLicenseCameraFile" complete={detail.documentStatus.driver_license} icon={FileText} label="Driving licence" name="driverLicenseFile" />
@@ -1137,27 +1213,53 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
 
       <section className="rounded-2xl border border-[#d6e5e2] bg-white p-5 shadow-sm">
         <SectionTitle icon={PenLine} label="Rental Agreement" />
+        {isRentalDocumentEngine && publicAgreement ? (
+          <div className="mt-4 rounded-xl border border-[#99f6e4] bg-[#f0fdfa] p-4">
+            <p className="text-xs font-black uppercase text-[#0f766e]">Immutable agreement version #{publicAgreement.versionNumber}</p>
+            <p className="mt-1 text-sm font-bold text-[#10252b]">{publicAgreement.businessIdentity.name}</p>
+            <div className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
+              <p><span className="font-bold">Rate:</span> {publicAgreement.rentalSummary.rate} / {publicAgreement.rentalSummary.billingPeriod}</p>
+              <p><span className="font-bold">Deposit:</span> {publicAgreement.rentalSummary.deposit}</p>
+              <p><span className="font-bold">Standard daily rate:</span> {publicAgreement.rentalSummary.standardDailyRate || "As stated"}</p>
+              <p><span className="font-bold">Hash:</span> <span className="font-mono">{publicAgreement.contentHashFragment}</span></p>
+            </div>
+            {customerSigningEligibility?.customerSafeMessage ? (
+              <p className="mt-3 rounded-lg border border-[#fecaca] bg-white p-3 text-sm font-bold text-[#be123c]">{customerSigningEligibility.customerSafeMessage}</p>
+            ) : null}
+          </div>
+        ) : null}
         <div className="routehq-contract-preview contract-preview mt-4 h-[460px] overflow-hidden rounded-xl border border-[#d6e5e2] bg-[#fbfefd]">
           <iframe
             className="h-full w-full border-0 bg-[#fbfefd]"
             sandbox=""
-            srcDoc={buildContractPreviewDocument(detail.contractHtml)}
+            srcDoc={buildContractPreviewDocument(agreementHtml)}
             title="Rental agreement preview"
           />
         </div>
-        <label className="checkbox-label mt-4 rounded-xl border border-[#d6e5e2] bg-white p-3 font-bold text-[#10252b]">
-          <input
-            checked={agreed}
-            className="flex-shrink-0"
-            name="agreementAccepted"
-            onChange={(event) => {
-              setAgreed(event.target.checked);
-              updateLiveStatus(undefined, event.target.checked, signature);
-            }}
-            type="checkbox"
-          />
-          <span>I have read and agree to the rental terms and conditions.</span>
-        </label>
+        {isRentalDocumentEngine && publicAgreement ? (
+          <div className="mt-4 space-y-2">
+            {publicAgreement.requiredAcknowledgements.map((ack) => (
+              <label className="checkbox-label rounded-xl border border-[#d6e5e2] bg-white p-3 font-bold text-[#10252b]" key={ack.type}>
+                <input className="flex-shrink-0" name={`ack_${ack.type}`} type="checkbox" />
+                <span>{ack.text}</span>
+              </label>
+            ))}
+          </div>
+        ) : (
+          <label className="checkbox-label mt-4 rounded-xl border border-[#d6e5e2] bg-white p-3 font-bold text-[#10252b]">
+            <input
+              checked={agreed}
+              className="flex-shrink-0"
+              name="agreementAccepted"
+              onChange={(event) => {
+                setAgreed(event.target.checked);
+                updateLiveStatus(undefined, event.target.checked, signature);
+              }}
+              type="checkbox"
+            />
+            <span>I have read and agree to the rental terms and conditions.</span>
+          </label>
+        )}
         <label className="mt-4 block">
           <span className="text-sm font-bold text-[#344054]">Full name for signature</span>
           <input className={inputClass} defaultValue={detail.customer?.full_name || ""} name="signedName" required style={fieldStyle} />

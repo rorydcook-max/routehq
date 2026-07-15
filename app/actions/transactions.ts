@@ -74,7 +74,7 @@ export async function generateReceipt(input: GenerateReceiptInput) {
 
   const { data: organization, error: organizationError } = await supabase
     .from("organizations")
-    .select("id, name, logo_url, receipt_prefix, receipt_footer_text")
+    .select("id, name, settings, logo_url, business_logo_storage_path, receipt_prefix, receipt_footer_text")
     .eq("id", organizationId)
     .maybeSingle();
 
@@ -104,7 +104,10 @@ export async function generateReceipt(input: GenerateReceiptInput) {
   const footerHtml = organization.receipt_footer_text
     ? `<p style="font-size: 12px; color: #717d86; text-align: center; border-top: 1px solid #e3e6e8; padding-top: 12px; margin: 0;">${escapeHtml(organization.receipt_footer_text)}</p>`
     : "";
-  const logoDataUri = await logoUrlToDataUri(supabase, organization.logo_url);
+  const organizationSettings = organization.settings && typeof organization.settings === "object" && !Array.isArray(organization.settings)
+    ? (organization.settings as Record<string, unknown>)
+    : {};
+  const logoDataUri = await logoUrlToDataUri(supabase, String(organization.business_logo_storage_path || organizationSettings.business_logo_storage_path || organization.logo_url || ""));
   const receiptBrandHtml = logoDataUri
     ? `<img src="${escapeHtml(logoDataUri)}" alt="${escapeHtml(organization.name || "RouteHQ")} logo" style="max-width: 200px; max-height: 80px; object-fit: contain; margin: 0 auto 8px; display: block;" />`
     : `<p style="font-size: 20px; font-weight: 700; color: #1a1d21; margin: 4px 0;">${escapeHtml(organization.name || "RouteHQ")}</p>`;

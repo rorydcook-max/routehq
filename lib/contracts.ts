@@ -1,7 +1,16 @@
+import { createHash } from "node:crypto";
+import { browserSafeAssetUrl, createBrandingSignedUrl, parseLegacyBrandingReference } from "@/lib/branding-assets";
 import { buildContractVariables, contractVariableKeys, renderContractTemplate } from "@/lib/contract-rendering";
 import { defaultRentalContractTemplate } from "@/lib/default-contract-template";
 
 export { defaultRentalContractTemplate } from "@/lib/default-contract-template";
+
+// Hash of the current default-en.html file content.
+// Any DB template with a different hash is considered stale and replaced.
+const defaultTemplateHash = createHash("sha256")
+  .update(defaultRentalContractTemplate)
+  .digest("hex")
+  .slice(0, 16);
 
 export const contractVariables = contractVariableKeys.map((key) => ({
   key,
@@ -12,39 +21,17 @@ const defaultTemplateMinimumLength = 5000;
 
 function isStaleDefaultTemplate(template: any) {
   const content = String(template?.content_html || template?.body || "");
-  return (
-    !content ||
-    content.length < defaultTemplateMinimumLength ||
-    !content.includes("bilingual-section") ||
-    !content.includes("lang-th") ||
-    !content.includes("info-grid") ||
-    !content.includes("routehq-template-v3")
-  );
-}
 
-function storageReferenceFromUrl(url: string | null | undefined) {
-  if (!url) return null;
+  if (!content || content.length < defaultTemplateMinimumLength) return true;
+  if (!content.includes("bilingual-section")) return true;
+  if (!content.includes("lang-th")) return true;
 
-  for (const bucket of ["branding", "documents"] as const) {
-    const publicMarker = `/storage/v1/object/public/${bucket}/`;
-    const signedMarker = `/storage/v1/object/sign/${bucket}/`;
-    const marker = url.includes(publicMarker) ? publicMarker : url.includes(signedMarker) ? signedMarker : null;
+  const dbHash = createHash("sha256")
+    .update(content)
+    .digest("hex")
+    .slice(0, 16);
 
-    if (marker) {
-      const [, pathWithQuery] = url.split(marker);
-      return {
-        bucket,
-        path: decodeURIComponent(pathWithQuery.split("?")[0])
-      };
-    }
-  }
-
-  return url.startsWith("http") || url.startsWith("data:")
-    ? null
-    : {
-        bucket: "branding" as const,
-        path: url.replace(/^\/+/, "")
-      };
+  return dbHash !== defaultTemplateHash;
 }
 
 function contentTypeFromUrl(url: string, fallback = "image/png") {
@@ -64,22 +51,24 @@ export async function logoUrlToDataUri(supabase: any, logoUrl: string | null | u
 
   try {
     let fetchUrl = rawUrl;
-    const storageReference = storageReferenceFromUrl(rawUrl);
-    if (storageReference && !rawUrl.startsWith("http")) {
-      const { data } = await supabase.storage.from(storageReference.bucket).createSignedUrl(storageReference.path, 60 * 10);
-      fetchUrl = data?.signedUrl || rawUrl;
+    const parsed = parseLegacyBrandingReference(rawUrl);
+    if (parsed?.kind === "storage") {
+      fetchUrl = await createBrandingSignedUrl(supabase, parsed.reference, 60 * 10) || "";
+      if (!fetchUrl) return "";
+    } else if (parsed?.kind === "external_url") {
+      fetchUrl = parsed.url;
     }
 
     const response = await fetch(fetchUrl);
     if (!response.ok) {
-      return rawUrl;
+      return browserSafeAssetUrl(rawUrl) || "";
     }
 
     const contentType = response.headers.get("content-type") || contentTypeFromUrl(fetchUrl);
     const bytes = Buffer.from(await response.arrayBuffer());
     return `data:${contentType};base64,${bytes.toString("base64")}`;
   } catch {
-    return rawUrl;
+    return browserSafeAssetUrl(rawUrl) || "";
   }
 }
 

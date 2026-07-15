@@ -1,8 +1,9 @@
 import { customers as seedCustomers, reminders as seedReminders, rentals as seedRentals, timeline as seedTimeline, transactions as seedTransactions, vehicles as seedVehicles } from "@/lib/data";
 import { calculateDashboardMetrics } from "@/lib/metrics";
 import type { Customer, Reminder, Rental, TimelineEvent, Transaction, Vehicle, VehicleStatus } from "@/lib/types";
-import { getDefaultOrganizationSlug, hasSupabaseEnv } from "@/lib/supabase/config";
+import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getDefaultOrganization } from "@/lib/organization";
 
 type DashboardMetrics = ReturnType<typeof calculateDashboardMetrics> & {
   depositsHeld: number;
@@ -77,16 +78,7 @@ export async function getDashboardData(): Promise<DashboardData> {
   }
 
   const supabase = (await createSupabaseServerClient()) as any;
-  const { data: organization, error: organizationError } = await supabase
-    .from("organizations")
-    .select("id")
-    .eq("slug", getDefaultOrganizationSlug())
-    .is("deleted_at", null)
-    .single();
-
-  if (organizationError || !organization) {
-    throw new Error(organizationError?.message || "Default organization was not found.");
-  }
+  const organization = await getDefaultOrganization();
 
   const organizationId = organization.id;
   const [vehiclesResult, customersResult, rentalsResult, transactionsResult, remindersResult, eventsResult] = await Promise.all([

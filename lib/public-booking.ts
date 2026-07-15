@@ -1,5 +1,7 @@
 import { buildContractVariables, extractBodyHtml, renderContractTemplate } from "@/lib/contract-rendering";
-import { defaultRentalContractTemplate, ensureDefaultContractTemplate } from "@/lib/contracts";
+import { resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
+import { defaultRentalContractTemplate, embedLogoInContractVariables, ensureDefaultContractTemplate } from "@/lib/contracts";
+import { getCustomerExecutedAgreementDownload, loadPublicRentalAgreement } from "@/lib/rental-document-customer-signing";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export type PublicBookingState = "not_found" | "expired" | "cancelled" | "ready" | "active" | "completed";
@@ -147,13 +149,33 @@ export async function getPublicBookingDetail(token: string) {
   );
 
   const uploadedCategories = new Set((documents || []).map((document: any) => document.category));
+  const authorityMode = String(rental?.contract_authority_mode || "legacy");
+  const rentalDocumentAgreement = authorityMode === "rental_document_engine"
+    ? await loadPublicRentalAgreement(token)
+    : null;
+  const executedDownloads = rentalDocumentAgreement?.eligibility?.fullyExecuted
+    ? {
+        originalAgreementUrl: await getCustomerExecutedAgreementDownload(token, "original").catch(() => null),
+        executionCertificateUrl: await getCustomerExecutedAgreementDownload(token, "certificate").catch(() => null)
+      }
+    : null;
   const signedContractPath = contract?.content_pdf_url || null;
   const signedContractUrl = signedContractPath
     ? (await supabase.storage.from("documents").createSignedUrl(signedContractPath, 60 * 60)).data?.signedUrl || null
     : null;
   const contractTemplate = template?.content_html || template?.body || contract?.content_html || defaultRentalContractTemplate;
-  const renderedContract = renderContractTemplate(
-    contractTemplate,
+  const organizationBranding = organization
+    ? await resolveOrganizationBrandingDisplayUrls(supabase, organization, { allowExternalUrl: true, expiresIn: 60 * 60 })
+    : { logoUrl: null, signatureUrl: null };
+  const organizationForDisplay = organization
+    ? {
+        ...organization,
+        logo_display_url: organizationBranding.logoUrl,
+        owner_signature_display_url: organizationBranding.signatureUrl
+      }
+    : organization;
+  const contractVariables = await embedLogoInContractVariables(
+    supabase,
     buildContractVariables({
       organization,
       customer,
@@ -161,6 +183,10 @@ export async function getPublicBookingDetail(token: string) {
       rental,
       bookingLink
     })
+  );
+  const renderedContract = renderContractTemplate(
+    contractTemplate,
+    contractVariables
   );
   const documentStart = renderedContract.search(/<!doctype\s+html|<html(?:\s|>)/i);
   const contractDocument = documentStart >= 0
@@ -180,7 +206,7 @@ export async function getPublicBookingDetail(token: string) {
   return {
     state: state as PublicBookingState,
     bookingLink,
-    organization,
+    organization: organizationForDisplay,
     rental: rental
       ? {
           ...rental,
@@ -201,13 +227,18 @@ export async function getPublicBookingDetail(token: string) {
     completion: {
       details: Boolean(bookingLink.customer_details_submitted_at),
       documents: documentCategories.every((category) => uploadedCategories.has(category)),
-      agreement: bookingLink.status === "completed" || contract?.status === "signed"
+      agreement: authorityMode === "rental_document_engine"
+        ? Boolean(rentalDocumentAgreement?.eligibility?.fullyExecuted)
+        : bookingLink.status === "completed" || contract?.status === "signed"
     },
     org_payment: organizationPaymentSettings(organization),
     customerPortalActions: portalActionsResult.data || [],
     deliveryInspection,
     deliveryPhotoUrls: deliveryPhotoUrls.filter(Boolean),
     contractHtml,
-    signedContractUrl
+    signedContractUrl,
+    contractAuthorityMode: authorityMode,
+    rentalDocumentAgreement,
+    executedAgreementDownloads: executedDownloads
   };
 }

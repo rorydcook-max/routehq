@@ -27,7 +27,7 @@ type BookingTransaction = {
   metadata?: Record<string, any> | null;
 };
 
-const paymentStatusOptions = ["pending", "paid", "overdue", "waived", "scheduled", "cancelled", "refunded", "reconciled"];
+const editablePaymentStatuses = ["pending", "scheduled", "overdue", "waived", "voided"];
 const paymentMethodOptions = ["cash", "promptpay", "bank_transfer", "wise", "revolut", "other"];
 
 const transactionTypeOptions = [
@@ -138,7 +138,7 @@ export function AddRentalPaymentInlineForm({ organizationId, rentalId, currency 
         setOpen(false);
         router.refresh();
       } catch (error) {
-        setMessage(error instanceof Error ? error.message : "Unable to add this payment row.");
+        setMessage(error instanceof Error ? error.message : "Unable to add this charge.");
       }
     });
   }
@@ -147,10 +147,10 @@ export function AddRentalPaymentInlineForm({ organizationId, rentalId, currency 
     <div className="sub-surface p-3" id="add-payment-row">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <p className="font-black text-[#10252b]">Add payment row</p>
-          <p className="text-sm text-[#667085]">Create a scheduled charge or balance row for this rental.</p>
+          <p className="font-black text-[#10252b]">Add charge</p>
+          <p className="text-sm text-[#667085]">Add a new charge or scheduled amount due to this rental.</p>
         </div>
-        <ActionButton onClick={() => setOpen((current) => !current)}>{open ? "Close" : "Add payment"}</ActionButton>
+        <ActionButton onClick={() => setOpen((current) => !current)}>{open ? "Close" : "Add charge"}</ActionButton>
       </div>
       {open ? (
         <div className="mt-3 rounded-lg border border-[var(--border)] bg-white p-3">
@@ -169,7 +169,7 @@ export function AddRentalPaymentInlineForm({ organizationId, rentalId, currency 
             <label>
               Status
               <select className="mt-1 w-full" value={status} onChange={(event) => setStatus(event.target.value)}>
-                {["pending", "paid", "overdue", "waived"].map((option) => (
+                {editablePaymentStatuses.map((option) => (
                   <option key={option} value={option}>{option}</option>
                 ))}
               </select>
@@ -181,7 +181,7 @@ export function AddRentalPaymentInlineForm({ organizationId, rentalId, currency 
           </div>
           {message ? <p className="mt-3 rounded-lg bg-[#fef2f2] p-2 text-xs font-semibold text-[#dc2626]">{message}</p> : null}
           <div className="mt-3 flex flex-wrap gap-2">
-            <ActionButton disabled={isPending} onClick={save} tone="primary">{isPending ? "Saving..." : "Save payment row"}</ActionButton>
+            <ActionButton disabled={isPending} onClick={save} tone="primary">{isPending ? "Saving..." : "Save charge"}</ActionButton>
             <ActionButton disabled={isPending} onClick={() => setOpen(false)}>Cancel</ActionButton>
           </div>
         </div>
@@ -527,7 +527,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
           <SmallBadge tone={badgeTone as any}>{voided ? "voided" : payment.status || "pending"}</SmallBadge>
           {canRecordPayment ? (
             <button
-              className="pressable inline-flex min-h-8 items-center justify-center rounded-lg border border-[var(--primary)] bg-[var(--primary-light)] px-3 text-xs font-black text-[var(--primary)]"
+              className="pressable inline-flex min-h-9 items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-4 text-sm font-black text-white"
               onClick={() => {
                 setRecordAmount(amountInput(payment.amount));
                 setRecordDate(new Date().toISOString().slice(0, 10));
@@ -535,7 +535,8 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
               }}
               type="button"
             >
-              Record payment
+              <i aria-hidden="true" className="ti ti-cash text-[14px]" />
+              Record payment received
             </button>
           ) : null}
           {!voided ? (
@@ -602,10 +603,13 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
             <label>
               Status
               <select className="mt-1 w-full" value={status} onChange={(event) => setStatus(event.target.value)}>
-                {paymentStatusOptions.map((option) => (
+                {editablePaymentStatuses.map((option) => (
                   <option key={option} value={option}>{option.replace(/_/g, " ")}</option>
                 ))}
               </select>
+              <p className="mt-1 text-xs text-[var(--muted)]">
+                To record a payment as received, use "Record payment" - this correctly updates income totals.
+              </p>
             </label>
             {status === "paid" ? (
               <label>

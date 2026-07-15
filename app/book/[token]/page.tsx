@@ -197,8 +197,9 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   const bookingData = (detail.bookingLink?.booking_data || {}) as Record<string, unknown>;
   const delivery = deliveryText(rental, bookingData);
   const included = includedItems(detail.bookingLink?.included_items);
-  const logoUrl = organization?.logo_url || organization?.settings?.logo_url;
+  const logoUrl = organization?.logo_display_url || null;
   const ownerContact = organization?.settings?.phone || organization?.settings?.business_phone || organization?.owner_phone || null;
+  const executedDownloads = detail.executedAgreementDownloads || null;
 
   return (
     <main className="min-h-screen bg-[#eef7f5] px-4 py-5 text-[#10252b]">
@@ -273,6 +274,20 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
                 Contact operator
               </a>
             ) : null}
+            {executedDownloads?.originalAgreementUrl || executedDownloads?.executionCertificateUrl ? (
+              <div className="mt-5 flex flex-wrap justify-center gap-2">
+                {executedDownloads.originalAgreementUrl ? (
+                  <a className="pressable inline-flex rounded-xl bg-[#0f766e] px-5 py-3 text-sm font-black text-white" href={executedDownloads.originalAgreementUrl} rel="noreferrer" target="_blank">
+                    Download original agreement
+                  </a>
+                ) : null}
+                {executedDownloads.executionCertificateUrl ? (
+                  <a className="pressable inline-flex rounded-xl border border-[#0f766e] bg-white px-5 py-3 text-sm font-black text-[#0f766e]" href={executedDownloads.executionCertificateUrl} rel="noreferrer" target="_blank">
+                    Download execution certificate
+                  </a>
+                ) : null}
+              </div>
+            ) : null}
           </section>
         ) : (
           <BookingCompletionForm
@@ -291,6 +306,9 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
               outstandingBalance: Number(rental?.outstanding_balance || 0),
               currency: String(rental?.currency || "THB"),
               billingPeriod: String(rental?.billing_interval || rental?.pricing_model || "monthly"),
+              contractAuthorityMode: detail.contractAuthorityMode,
+              rentalDocumentAgreement: detail.rentalDocumentAgreement,
+              executedAgreementDownloads: detail.executedAgreementDownloads,
             }}
           />
         )}

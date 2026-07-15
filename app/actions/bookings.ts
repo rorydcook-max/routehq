@@ -7,6 +7,7 @@ import { activateRental } from "@/lib/rental-activation";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { notifyOperator } from "@/lib/notify-operator";
+import { isRentalDocumentCustomerSigningEnabledForOrganization } from "@/lib/rental-document-customer-signing";
 
 function requiredString(formData: FormData, key: string) {
   const value = String(formData.get(key) || "").trim();
@@ -1232,6 +1233,29 @@ export async function addRentalPayment(formData: FormData) {
   }
 
   await ensureMembership(supabase, rental.organization_id, user.id);
+
+  const { data: existingPendingPayments, error: existingPaymentsError } = await supabase
+    .from("rental_payments")
+    .select("id, amount, status")
+    .eq("organization_id", rental.organization_id)
+    .eq("rental_id", rentalId)
+    .in("status", ["pending", "scheduled", "overdue"])
+    .is("deleted_at", null);
+
+  if (existingPaymentsError) {
+    throw new Error(existingPaymentsError.message);
+  }
+
+  const duplicate = (existingPendingPayments || []).find(
+    (payment: any) => Math.round(Number(payment.amount || 0)) === Math.round(amount)
+  );
+
+  if (duplicate) {
+    throw new Error(
+      `A pending charge of ${Math.round(amount).toLocaleString()} already exists for this rental. ` +
+      "Record it as received instead of adding a duplicate."
+    );
+  }
 
   const { data: payment, error: insertError } = await supabase
     .from("rental_payments")
@@ -3055,6 +3079,94 @@ export async function recordPaymentRefund(formData: FormData) {
 
   revalidatePath("/");
   revalidatePath("/bookings");
+  revalidatePath(`/bookings/${rentalId}`);
+}
+
+export async function setRentalContractAuthorityMode(formData: FormData) {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("You must be signed in.");
+
+  const organizationId = requiredString(formData, "organizationId");
+  const rentalId = requiredString(formData, "rentalId");
+  const mode = requiredString(formData, "contractAuthorityMode");
+  if (!["legacy", "rental_document_engine"].includes(mode)) {
+    throw new Error("Choose a valid contract authority mode.");
+  }
+
+  const [{ data: rental, error: rentalError }, { data: organization, error: organizationError }] = await Promise.all([
+    supabase
+      .from("rentals")
+      .select("id, organization_id, vehicle_id, customer_id, contract_authority_mode, rental_document_executed_at")
+      .eq("id", rentalId)
+      .eq("organization_id", organizationId)
+      .is("deleted_at", null)
+      .maybeSingle(),
+    supabase
+      .from("organizations")
+      .select("*")
+      .eq("id", organizationId)
+      .is("deleted_at", null)
+      .maybeSingle()
+  ]);
+
+  if (rentalError || !rental) throw new Error(rentalError?.message || "Booking not found.");
+  if (organizationError || !organization) throw new Error(organizationError?.message || "Organization not found.");
+  await ensureMembership(supabase, organizationId, user.id);
+
+  const { data: rentalDocuments } = await supabase
+    .from("rental_documents")
+    .select("current_version_id")
+    .eq("organization_id", organizationId)
+    .eq("rental_id", rentalId);
+  const currentVersionIds = (rentalDocuments || []).map((document: any) => document.current_version_id).filter(Boolean);
+  const { data: renterSignature } = currentVersionIds.length
+    ? await supabase
+        .from("rental_document_signatures")
+        .select("id")
+        .eq("organization_id", organizationId)
+        .eq("signer_role", "renter")
+        .in("document_version_id", currentVersionIds)
+        .limit(1)
+        .maybeSingle()
+    : { data: null };
+
+  if ((rental.rental_document_executed_at || renterSignature?.id) && mode !== rental.contract_authority_mode) {
+    throw new Error("Contract authority mode cannot be switched after renter signature through the normal workflow.");
+  }
+
+  if (mode === "rental_document_engine" && !isRentalDocumentCustomerSigningEnabledForOrganization(organization)) {
+    throw new Error("Rental document customer signing is not enabled for this development organization.");
+  }
+
+  if (mode === rental.contract_authority_mode) {
+    return;
+  }
+
+  const { error } = await supabase
+    .from("rentals")
+    .update({ contract_authority_mode: mode })
+    .eq("id", rentalId)
+    .eq("organization_id", organizationId);
+  if (error) throw new Error(error.message);
+
+  await recordActivityEvent(supabase, {
+    organization_id: organizationId,
+    actor_id: user.id,
+    entity_type: "rental",
+    entity_id: rentalId,
+    vehicle_id: rental.vehicle_id,
+    rental_id: rentalId,
+    customer_id: rental.customer_id,
+    event_type: "rental_document_authority_mode_changed",
+    title: "Contract authority mode changed",
+    detail: `Contract authority mode changed from ${rental.contract_authority_mode || "legacy"} to ${mode}.`,
+    metadata: { previous_mode: rental.contract_authority_mode || "legacy", next_mode: mode }
+  });
+
   revalidatePath(`/bookings/${rentalId}`);
 }
 

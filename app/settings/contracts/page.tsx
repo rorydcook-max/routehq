@@ -2,7 +2,7 @@ import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { Badge, Card, SectionHeader } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
-import { buildSampleContractVariables, contractVariables, ensureDefaultContractTemplate } from "@/lib/contracts";
+import { buildSampleContractVariables, contractVariables, embedLogoInContractVariables, ensureDefaultContractTemplate } from "@/lib/contracts";
 import { markOnboardingStep } from "@/lib/onboarding";
 import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -12,7 +12,7 @@ export default async function ContractSettingsPage() {
   const [userEmail, organization] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization()]);
   const supabase = (await createSupabaseServerClient()) as any;
   const template = await ensureDefaultContractTemplate(supabase, organization.id);
-  const sampleData = buildSampleContractVariables(organization);
+  const sampleData = await embedLogoInContractVariables(supabase, buildSampleContractVariables(organization));
   await markOnboardingStep(supabase, organization.id, "contract_template");
 
   return (

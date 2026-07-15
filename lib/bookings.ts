@@ -9,6 +9,36 @@ async function signedPath(supabase: any, path: string | null | undefined) {
   return data?.signedUrl || null;
 }
 
+async function signedDocumentPath(supabase: any, bucket: string | null | undefined, path: string | null | undefined) {
+  if (!path || /^https?:\/\//.test(path) || path.startsWith("data:")) {
+    return path || null;
+  }
+  const { data } = await supabase.storage.from(bucket || "documents").createSignedUrl(path, 60 * 60);
+  return data?.signedUrl || null;
+}
+
+function isVehiclePhoto(document: any) {
+  return document.mime_type?.startsWith("image/") || ["photo", "photos", "vehicle_photo", "vehicle_image"].includes(document.category);
+}
+
+function vehiclePhotoOrder(document: any) {
+  const order = Number(document.extracted_data?.vehicle_photo_order);
+  return Number.isFinite(order) ? order : null;
+}
+
+function sortVehiclePhotoDocuments(documents: any[]) {
+  return documents.filter(isVehiclePhoto).sort((left, right) => {
+    const leftOrder = vehiclePhotoOrder(left);
+    const rightOrder = vehiclePhotoOrder(right);
+
+    if (leftOrder !== null && rightOrder !== null) return leftOrder - rightOrder;
+    if (leftOrder !== null) return -1;
+    if (rightOrder !== null) return 1;
+
+    return new Date(right.created_at || 0).getTime() - new Date(left.created_at || 0).getTime();
+  });
+}
+
 async function signDocument(supabase: any, document: any) {
   return {
     ...document,
@@ -88,7 +118,8 @@ export async function getBookingList(organizationId: string) {
   }
 
   const rentalIds = (rentals || []).map((rental: any) => rental.id);
-  const [linksResult, transactionsResult, paymentsResult] = rentalIds.length
+  const vehicleIds = Array.from(new Set((rentals || []).map((rental: any) => rental.vehicle_id || rental.vehicles?.id).filter(Boolean)));
+  const [linksResult, transactionsResult, paymentsResult, vehiclePhotosResult] = rentalIds.length
     ? await Promise.all([
         supabase
           .from("booking_links")
@@ -109,11 +140,20 @@ export async function getBookingList(organizationId: string) {
           .select("id, rental_id, amount, status, voided, metadata")
           .eq("organization_id", organizationId)
           .in("rental_id", rentalIds)
-          .is("deleted_at", null)
+          .is("deleted_at", null),
+        vehicleIds.length
+          ? supabase
+              .from("documents")
+              .select("id, owner_id, file_name, category, mime_type, storage_bucket, storage_path, created_at, extracted_data")
+              .eq("organization_id", organizationId)
+              .eq("owner_type", "vehicle")
+              .in("owner_id", vehicleIds)
+              .is("deleted_at", null)
+          : Promise.resolve({ data: [], error: null })
       ])
-    : [{ data: [] }, { data: [] }, { data: [] }];
+    : [{ data: [] }, { data: [] }, { data: [] }, { data: [] }];
 
-  const queryError = [linksResult, transactionsResult, paymentsResult].find((result: any) => result.error)?.error;
+  const queryError = [linksResult, transactionsResult, paymentsResult, vehiclePhotosResult].find((result: any) => result.error)?.error;
   if (queryError) {
     throw new Error(queryError.message);
   }
@@ -140,8 +180,30 @@ export async function getBookingList(organizationId: string) {
     balanceByRental.set(payment.rental_id, current + Number(payment.amount || 0));
   }
 
+  const photosByVehicle = new Map<string, any[]>();
+  for (const document of vehiclePhotosResult.data || []) {
+    if (!isVehiclePhoto(document)) continue;
+    const current = photosByVehicle.get(document.owner_id) || [];
+    current.push(document);
+    photosByVehicle.set(document.owner_id, current);
+  }
+
+  const primaryPhotoByVehicle = new Map<string, string | null>();
+  await Promise.all(
+    Array.from(photosByVehicle.entries()).map(async ([vehicleId, documents]) => {
+      const [primaryPhoto] = sortVehiclePhotoDocuments(documents);
+      primaryPhotoByVehicle.set(vehicleId, await signedDocumentPath(supabase, primaryPhoto?.storage_bucket, primaryPhoto?.storage_path));
+    })
+  );
+
   return (rentals || []).map((rental: any) => ({
     ...rental,
+    vehicles: rental.vehicles
+      ? {
+          ...rental.vehicles,
+          primary_photo_url: primaryPhotoByVehicle.get(rental.vehicle_id || rental.vehicles.id) || null
+        }
+      : rental.vehicles,
     booking_link: linkByRental.get(rental.id) || null,
     total_paid: paidByRental.get(rental.id) || 0,
     balance_due: balanceByRental.get(rental.id) || 0

@@ -10,6 +10,8 @@ type Props = {
   organizationId: string;
   vehicleId: string;
   customerName: string | null;
+  compact?: boolean;
+  label?: string;
 };
 
 export function UndoCancellationButton({
@@ -17,6 +19,8 @@ export function UndoCancellationButton({
   organizationId,
   vehicleId,
   customerName,
+  compact = false,
+  label = "Undo cancellation",
 }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -43,12 +47,16 @@ export function UndoCancellationButton({
   return (
     <>
       <button
-        className="pressable inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border border-[#d6e5e2] bg-white px-3 py-2 text-sm font-black text-[#0f766e]"
+        className={
+          compact
+            ? "pressable inline-flex min-h-8 items-center justify-center gap-1.5 rounded-md border border-[#d6e5e2] bg-white px-3 py-1.5 text-[12px] font-semibold text-[#0f766e]"
+            : "pressable inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border border-[#d6e5e2] bg-white px-3 py-2 text-sm font-black text-[#0f766e]"
+        }
         onClick={() => setOpen(true)}
         type="button"
       >
-        <RotateCcw size={15} />
-        Undo cancellation
+        <RotateCcw size={compact ? 14 : 15} />
+        {label}
       </button>
 
       {open ? (

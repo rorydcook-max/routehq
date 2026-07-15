@@ -5,5 +5,16 @@
     "outstanding": "Piutang",
     "fleetProfit": "Laba armada",
     "highAlerts": "Peringatan penting"
+  },
+  "settings": {
+    "contractsBranding": {
+      "title": "Kontrak & Branding",
+      "businessIdentity": "Identitas bisnis",
+      "documentBranding": "Branding dokumen",
+      "authorisedSignatory": "Penanda tangan berwenang",
+      "signatureAuthorisation": "Saya mengizinkan tanda tangan elektronik ini digunakan pada perjanjian sewa dan dokumen rental terkait yang diterbitkan oleh bisnis ini melalui pengguna resmi akun RouteHQ ini.",
+      "previewTitle": "Pratinjau perjanjian sewa",
+      "poweredBy": "Powered by RouteHQ"
+    }
   }
 }

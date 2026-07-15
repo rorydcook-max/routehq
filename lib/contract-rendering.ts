@@ -238,13 +238,22 @@ export function renderContractTemplate(template: string, variables: Record<strin
     return variables[key] ? content : "";
   });
 
-  rendered = rendered.replace(/\{\{#if\s+([a-zA-Z0-9_]+)\s*\}\}([\s\S]*?)\{\{else\}\}([\s\S]*?)\{\{\/if\}\}/g, (_match, key, truthyContent, fallbackContent) => {
-    return variables[key] ? truthyContent : fallbackContent;
-  });
+  const ifElsePattern = /\{\{#if\s+([a-zA-Z0-9_]+)\s*\}\}([\s\S]*?)\{\{else\}\}([\s\S]*?)\{\{\/if\}\}/g;
+  const ifPattern = /\{\{#if\s+([a-zA-Z0-9_]+)\s*\}\}([\s\S]*?)\{\{\/if\}\}/g;
 
-  rendered = rendered.replace(/\{\{#if\s+([a-zA-Z0-9_]+)\s*\}\}([\s\S]*?)\{\{\/if\}\}/g, (_match, key, content) => {
-    return variables[key] ? content : "";
-  });
+  for (let i = 0; i < 20; i += 1) {
+    const before = rendered;
+
+    rendered = rendered.replace(ifElsePattern, (_match, key, truthyContent, fallbackContent) => {
+      return variables[key] ? truthyContent : fallbackContent;
+    });
+
+    rendered = rendered.replace(ifPattern, (_match, key, content) => {
+      return variables[key] ? content : "";
+    });
+
+    if (rendered === before) break;
+  }
 
   return rendered.replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, (_match, key) => {
     const value = variables[key] ?? "";
@@ -376,7 +385,8 @@ export function buildContractVariables({
   const deliveryFuelImageUrl = stripEmpty(bookingData.delivery_fuel_image_url || bookingData.fuel_photo_url, "");
   const deliveryDamageReport = stripEmpty(bookingData.delivery_damage_report || bookingData.damage_report_html || bookingData.delivery_damage_html, "");
   const ownerSignatureUrl = stripEmpty(
-    organization?.settings?.owner_signature_url ||
+    organization?.authorised_signature_storage_path ||
+      organization?.settings?.owner_signature_url ||
       organization?.settings?.signature_url ||
       organization?.owner_signature_url,
     ""
@@ -416,7 +426,13 @@ export function buildContractVariables({
 
   const variables: ContractVariables = {
     business_name: optionalText(organization?.name, "Rental operator"),
-    business_logo_url: stripEmpty(organization?.logo_url || organization?.settings?.logo_url, ""),
+    business_logo_url: stripEmpty(
+      organization?.business_logo_storage_path ||
+        organization?.settings?.business_logo_storage_path ||
+        organization?.logo_url ||
+        organization?.settings?.logo_url,
+      ""
+    ),
     owner_name: optionalText(organization?.settings?.owner_name || organization?.settings?.business_owner_name || organization?.name, "Rental operator"),
     owner_phone: optionalText(organization?.settings?.phone || organization?.settings?.business_phone || settings.owner_whatsapp),
     owner_email: optionalText(organization?.settings?.email || organization?.settings?.business_email),

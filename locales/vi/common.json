@@ -5,5 +5,16 @@
     "outstanding": "Công nợ",
     "fleetProfit": "Lợi nhuận đội xe",
     "highAlerts": "Cảnh báo quan trọng"
+  },
+  "settings": {
+    "contractsBranding": {
+      "title": "Hop dong & Thuong hieu",
+      "businessIdentity": "Danh tinh doanh nghiep",
+      "documentBranding": "Thuong hieu tai lieu",
+      "authorisedSignatory": "Nguoi ky duoc uy quyen",
+      "signatureAuthorisation": "Toi cho phep chu ky dien tu nay duoc ap dung cho hop dong thue va cac tai lieu lien quan do doanh nghiep nay phat hanh thong qua nguoi dung duoc uy quyen cua tai khoan RouteHQ nay.",
+      "previewTitle": "Xem truoc hop dong thue",
+      "poweredBy": "Powered by RouteHQ"
+    }
   }
 }

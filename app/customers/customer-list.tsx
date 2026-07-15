@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { Plus, Search, UserRound } from "lucide-react";
-import { Badge, Card, ProgressBar, SectionHeader } from "@/components/ui";
+import { Plus, Search } from "lucide-react";
+import { Badge, Card, EmptyState, ProgressBar, SectionHeader } from "@/components/ui";
 import { flagForNationality } from "@/lib/customer-options";
 import type { CustomerListItem } from "@/lib/customer-detail";
 
@@ -110,18 +110,15 @@ export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
       </Card>
 
       {filteredCustomers.length === 0 ? (
-        <Card className="empty-state">
-          <div className="py-8 text-center">
-            <UserRound className="mx-auto text-[#0f766e]" size={40} />
-            <h2 className="mt-3 text-xl font-black text-[#10252b]">No customers yet</h2>
-            <p className="mx-auto mt-2 max-w-xl text-sm text-[#667085]">
-              Customers are created automatically when you create a booking, or you can add one manually.
-            </p>
-            <Link className="primary-action pressable mt-5" href="/customers/new">
+        <EmptyState
+          title="No customers yet"
+          description="Customers are created automatically when you create a booking, or you can add one manually."
+          action={
+            <Link className="primary-action pressable" href="/customers/new">
               Add Customer
             </Link>
-          </div>
-        </Card>
+          }
+        />
       ) : (
         <div className="grid gap-3">
           {filteredCustomers.map((item) => {

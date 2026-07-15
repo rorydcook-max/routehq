@@ -47,6 +47,24 @@ type ActivityEntityType = "vehicle" | "customer" | "rental" | "payment" | "trans
 type NotificationChannel = "whatsapp" | "line" | "messenger" | "email" | "sms" | "push" | "in_app";
 type NotificationStatus = "draft" | "queued" | "sent" | "delivered" | "failed" | "cancelled";
 type TemplateType = "notification" | "contract" | "message" | "invoice" | "inspection_form" | "onboarding_form";
+type RentalDocumentType =
+  | "rental_agreement"
+  | "agreement_amendment"
+  | "delivery_report"
+  | "return_report"
+  | "vehicle_substitution"
+  | "extension_amendment"
+  | "early_termination_statement"
+  | "incident_report"
+  | "deposit_reconciliation"
+  | "final_rental_pack";
+type RentalDocumentStatus = "draft" | "generated" | "partially_signed" | "signed" | "finalised" | "voided" | "superseded";
+type RentalDocumentVersionStatus = "draft" | "rendered" | "finalised" | "signed" | "superseded" | "voided";
+type RentalDocumentSignerRole = "authorised_business_signatory" | "operator" | "renter" | "additional_driver" | "witness";
+type ContractAuthorityMode = "legacy" | "rental_document_engine";
+type RentalAmendmentApprovalStatus = "pending" | "approved" | "rejected" | "cancelled" | "superseded";
+type DepositReconciliationStatus = "held" | "partially_refunded" | "fully_refunded" | "retained_pending_assessment" | "reconciled";
+type InspectionMediaType = "photo" | "video" | "odometer_photo" | "fuel_photo" | "damage_photo" | "walkaround_video" | "other";
 
 export type Database = {
   public: {
@@ -74,6 +92,28 @@ export type Database = {
         next_payment_due: string | null;
         payment_method: string | null;
         logo_url: string | null;
+        business_logo_storage_bucket: string | null;
+        business_logo_storage_path: string | null;
+        owner_signature_url: string | null;
+        trading_name: string | null;
+        legal_name: string | null;
+        registration_or_tax_number: string | null;
+        business_address: string | null;
+        business_phone: string | null;
+        business_email: string | null;
+        whatsapp: string | null;
+        line_id: string | null;
+        contract_accent_colour: string | null;
+        authorised_signatory_name: string | null;
+        authorised_signatory_title: string | null;
+        authorised_signature_storage_bucket: string | null;
+        authorised_signature_storage_path: string | null;
+        signature_authorised_at: string | null;
+        signature_authorisation_text_version: string | null;
+        default_contract_locale: string | null;
+        default_contract_template_id: string | null;
+        contract_footer_text: string | null;
+        powered_by_routehq_enabled: boolean;
         created_by: string | null;
         created_at: string;
         updated_at: string;
@@ -275,6 +315,16 @@ export type Database = {
         recurring_billing: boolean;
         billing_interval: string | null;
         rental_rate: number;
+        contracted_rate: number | null;
+        billing_period: string | null;
+        standard_daily_rate: number | null;
+        early_termination_minimum_days: number | null;
+        delivery_fee: number | null;
+        collection_fee: number | null;
+        cancellation_admin_fee: number | null;
+        insurance_excess: number | null;
+        mileage_allowance: number | null;
+        excess_mileage_rate: number | null;
         deposit_amount: number;
         deposit_held: number;
         deposit_status: "pending" | "received" | "partially_returned" | "fully_returned" | "forfeited" | "partially_forfeited";
@@ -291,6 +341,8 @@ export type Database = {
         delivery_datetime: string | null;
         return_location: string | null;
         contract_id: string | null;
+        contract_authority_mode: ContractAuthorityMode;
+        rental_document_executed_at: string | null;
         mileage_at_delivery: number | null;
         mileage_at_return: number | null;
         km_driven: number | null;
@@ -381,13 +433,155 @@ export type Database = {
       }>;
       invoices: TableDef<TenantRow & { rental_id: string | null; customer_id: string; invoice_number: string; locale: string; currency: string; subtotal: number; tax_amount: number; total: number; balance_due: number; due_date: string | null; status: string; document_id: string | null }>;
       documents: TableDef<TenantRow & { owner_type: DocumentOwnerType; owner_id: string | null; storage_bucket: string; storage_path: string; file_name: string; mime_type: string | null; size_bytes: number | null; category: string; locale: string | null; ocr_status: string; ocr_provider: string | null; extracted_data: Json; uploaded_by: string | null }>;
+      rental_documents: TableDef<{
+        id: string;
+        organization_id: string;
+        rental_id: string;
+        legacy_contract_id: string | null;
+        document_type: RentalDocumentType;
+        status: RentalDocumentStatus;
+        current_version_id: string | null;
+        source_event_type: string | null;
+        source_event_id: string | null;
+        created_by: string | null;
+        created_at: string;
+        updated_at: string;
+        finalised_at: string | null;
+      }>;
+      rental_document_versions: TableDef<{
+        id: string;
+        organization_id: string;
+        document_id: string;
+        version_number: number;
+        template_id: string | null;
+        template_version: number | null;
+        rendered_html_snapshot: string;
+        rendered_data_snapshot: Json;
+        business_snapshot: Json;
+        pdf_storage_bucket: string | null;
+        pdf_storage_path: string | null;
+        draft_pdf_storage_bucket: string | null;
+        draft_pdf_storage_path: string | null;
+        draft_pdf_generated_at: string | null;
+        final_pdf_storage_bucket: string | null;
+        final_pdf_storage_path: string | null;
+        final_pdf_generated_at: string | null;
+        content_hash: string;
+        status: RentalDocumentVersionStatus;
+        generated_at: string;
+        finalised_at: string | null;
+        supersedes_version_id: string | null;
+        created_by: string | null;
+        created_at: string;
+      }>;
+      rental_document_signatures: TableDef<{
+        id: string;
+        organization_id: string;
+        document_version_id: string;
+        signer_role: RentalDocumentSignerRole;
+        signer_name: string;
+        signer_user_id: string | null;
+        signature_storage_bucket: string | null;
+        signature_storage_path: string | null;
+        signature_data_url: string | null;
+        signed_at: string;
+        ip_address: string | null;
+        user_agent: string | null;
+        verification_method: string | null;
+        consent_text_version: string | null;
+        content_hash_at_signing: string;
+        metadata: Json;
+        created_at: string;
+      }>;
+      rental_document_acknowledgements: TableDef<{
+        id: string;
+        organization_id: string;
+        rental_id: string;
+        document_version_id: string;
+        booking_link_id: string | null;
+        signer_role: "renter";
+        acknowledgement_type: string;
+        acknowledgement_text_version: string;
+        acknowledgement_text_snapshot: string;
+        content_hash: string;
+        accepted_at: string;
+        metadata: Json;
+        created_at: string;
+      }>;
+      rental_document_execution_certificates: TableDef<{
+        id: string;
+        organization_id: string;
+        rental_id: string;
+        document_id: string;
+        document_version_id: string;
+        original_content_hash: string;
+        certificate_storage_bucket: string;
+        certificate_storage_path: string;
+        generated_at: string;
+        verification_reference: string;
+        metadata: Json;
+        created_at: string;
+      }>;
+      rental_amendments: TableDef<{
+        id: string;
+        organization_id: string;
+        rental_id: string;
+        document_id: string | null;
+        amendment_type: string;
+        original_values: Json;
+        amended_values: Json;
+        reason: string | null;
+        effective_at: string | null;
+        approval_status: RentalAmendmentApprovalStatus;
+        customer_signature_required: boolean;
+        approved_at: string | null;
+        created_by: string | null;
+        created_at: string;
+        updated_at: string;
+      }>;
+      deposit_reconciliations: TableDef<{
+        id: string;
+        organization_id: string;
+        rental_id: string;
+        document_id: string | null;
+        deposit_amount_held: number;
+        deductions: Json;
+        amount_refunded: number;
+        amount_retained: number;
+        pending_assessment_amount: number;
+        retention_reason: string | null;
+        status: DepositReconciliationStatus;
+        supporting_document_ids: Json;
+        finalised_at: string | null;
+        created_by: string | null;
+        created_at: string;
+        updated_at: string;
+      }>;
+      inspection_media_manifest: TableDef<{
+        id: string;
+        organization_id: string;
+        inspection_id: string;
+        document_id: string | null;
+        media_type: InspectionMediaType;
+        storage_bucket: string;
+        storage_path: string;
+        thumbnail_storage_path: string | null;
+        captured_at: string | null;
+        uploaded_by: string | null;
+        file_size_bytes: number | null;
+        duration_seconds: number | null;
+        checksum: string | null;
+        customer_visible: boolean;
+        metadata: Json;
+        created_at: string;
+      }>;
       reminders: TableDef<TenantRow & { vehicle_id: string | null; rental_id: string | null; customer_id: string | null; type: ReminderType; severity: ReminderSeverity; title_key: string | null; title: string; due_date: string; completed_at: string | null; created_by: string | null }>;
       gps_devices: TableDef<TenantRow & { vehicle_id: string | null; provider: string; external_device_id: string; imei: string | null; phone_number: string | null; status: string; last_seen_at: string | null; metadata: Json }>;
       vehicle_locations: TableDef<{ id: string; organization_id: string; vehicle_id: string; gps_device_id: string | null; latitude: number; longitude: number; speed_kph: number | null; heading: number | null; odometer: number | null; recorded_at: string; raw_payload: Json; created_at: string }>;
       notifications: TableDef<TenantRow & { customer_id: string | null; rental_id: string | null; vehicle_id: string | null; channel: NotificationChannel; provider: string | null; locale: string; template_id: string | null; status: NotificationStatus; recipient: string; subject: string | null; body: string; sent_at: string | null; delivered_at: string | null; error_message: string | null; metadata: Json }>;
       message_templates: TableDef<{ id: string; organization_id: string | null; template_type: TemplateType; template_key: string; locale: string; version: number; title: string | null; subject: string | null; body: string; variables: Json; is_active: boolean; created_at: string; updated_at: string }>;
       notification_templates: TableDef<{ id: string; organization_id: string | null; channel: NotificationChannel; template_key: string; locale: string; version: number; subject: string | null; body: string; variables: Json; provider_template_id: string | null; is_active: boolean; created_at: string; updated_at: string }>;
-      contract_templates: TableDef<{ id: string; organization_id: string | null; template_key: string; locale: string; version: number; title: string; body: string; name: string | null; content_html: string | null; is_default: boolean; language: string | null; variables: Json; jurisdiction: string | null; is_active: boolean; created_at: string; updated_at: string }>;
+      contract_templates: TableDef<{ id: string; organization_id: string | null; template_type: TemplateType; template_key: string; locale: string; version: number; title: string; body: string; name: string | null; content_html: string | null; is_default: boolean; language: string | null; variables: Json; jurisdiction: string | null; is_active: boolean; created_at: string; updated_at: string }>;
       activity_events: TableDef<{
         id: string;
         organization_id: string;

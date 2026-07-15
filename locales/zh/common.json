@@ -5,5 +5,16 @@
     "outstanding": "未收款",
     "fleetProfit": "车队利润",
     "highAlerts": "重要提醒"
+  },
+  "settings": {
+    "contractsBranding": {
+      "title": "合同与品牌",
+      "businessIdentity": "企业身份",
+      "documentBranding": "文件品牌",
+      "authorisedSignatory": "授权签署人",
+      "signatureAuthorisation": "我授权此电子签名用于由本企业通过此 RouteHQ 账户的授权用户签发的租赁协议及相关租赁文件。",
+      "previewTitle": "租赁协议预览",
+      "poweredBy": "Powered by RouteHQ"
+    }
   }
 }

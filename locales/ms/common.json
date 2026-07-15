@@ -5,5 +5,16 @@
     "outstanding": "Tunggakan",
     "fleetProfit": "Keuntungan fleet",
     "highAlerts": "Amaran penting"
+  },
+  "settings": {
+    "contractsBranding": {
+      "title": "Kontrak & Penjenamaan",
+      "businessIdentity": "Identiti perniagaan",
+      "documentBranding": "Penjenamaan dokumen",
+      "authorisedSignatory": "Penandatangan diberi kuasa",
+      "signatureAuthorisation": "Saya membenarkan tandatangan elektronik ini digunakan pada perjanjian sewaan dan dokumen berkaitan yang dikeluarkan oleh perniagaan ini melalui pengguna sah akaun RouteHQ ini.",
+      "previewTitle": "Pratonton perjanjian sewaan",
+      "poweredBy": "Powered by RouteHQ"
+    }
   }
 }

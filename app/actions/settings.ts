@@ -3,8 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import OpenAI from "openai";
+import { browserSafeAssetUrl, canonicalBrandingReferenceFromSettings, parseLegacyBrandingReference } from "@/lib/branding-assets";
 import { supportedCalendarCodes } from "@/lib/i18n/calendars";
 import { supportedLocaleCodes } from "@/lib/i18n/locales";
+import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getDefaultOrganizationSlug } from "@/lib/supabase/config";
@@ -13,6 +15,9 @@ import { buildDailySummaryMessage, sendLineMessage } from "@/services/messaging/
 
 const supportedLocales = new Set<string>(supportedLocaleCodes);
 const supportedCalendars = new Set<string>(supportedCalendarCodes);
+const signatureAuthorisationTextVersion = "business-signature-authorisation-v1";
+const signatureAuthorisationText =
+  "I authorise this electronic signature to be applied to rental agreements and related rental documents issued by this business through authorised users of this RouteHQ account.";
 
 export async function updatePreferredLocale(formData: FormData) {
   const preferredLocale = String(formData.get("preferredLocale") || "en");
@@ -76,11 +81,36 @@ function businessLogoExtension(file: File) {
   const mime = file.type || "";
   if (mime === "image/png") return "png";
   if (mime === "image/webp") return "webp";
-  if (mime === "image/svg+xml") return "svg";
   if (mime === "image/jpeg" || mime === "image/jpg") return "jpg";
   const nameExt = file.name?.split(".").pop()?.toLowerCase();
-  if (nameExt && ["png", "jpg", "jpeg", "svg", "webp"].includes(nameExt)) return nameExt === "jpeg" ? "jpg" : nameExt;
+  if (nameExt && ["png", "jpg", "jpeg", "webp"].includes(nameExt)) return nameExt === "jpeg" ? "jpg" : nameExt;
   return null;
+}
+
+function validateRasterBrandingFile(file: File, label: string) {
+  const extension = businessLogoExtension(file);
+  if (!extension || file.type === "image/svg+xml" || file.name?.toLowerCase().endsWith(".svg")) {
+    throw new Error(`${label} must be a PNG, JPG, or WebP image. SVG uploads are not accepted for document safety.`);
+  }
+  const expectedMimeByExtension: Record<string, string[]> = {
+    png: ["image/png"],
+    jpg: ["image/jpeg", "image/jpg"],
+    webp: ["image/webp"]
+  };
+  const allowedMimes = expectedMimeByExtension[extension] || [];
+  if (!allowedMimes.includes(file.type || "")) {
+    throw new Error(`${label} file type does not match a supported raster image format.`);
+  }
+  return extension;
+}
+
+function assertRasterImageBytes(buffer: Buffer, extension: string, label: string) {
+  const isPng = buffer.length > 8 && buffer.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
+  const isJpeg = buffer.length > 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
+  const isWebp = buffer.length > 12 && buffer.subarray(0, 4).toString("ascii") === "RIFF" && buffer.subarray(8, 12).toString("ascii") === "WEBP";
+  if ((extension === "png" && !isPng) || (extension === "jpg" && !isJpeg) || (extension === "webp" && !isWebp)) {
+    throw new Error(`${label} file contents do not match the selected image format.`);
+  }
 }
 
 function storagePathFromPublicUrl(url: string | null | undefined) {
@@ -91,28 +121,66 @@ function storagePathFromPublicUrl(url: string | null | undefined) {
   return decodeURIComponent(url.slice(index + marker.length).split("?")[0]);
 }
 
-function logoStorageReferenceFromUrl(url: string | null | undefined) {
-  if (!url) return null;
-
-  for (const bucket of ["branding", "documents"] as const) {
-    const publicMarker = `/storage/v1/object/public/${bucket}/`;
-    const signedMarker = `/storage/v1/object/sign/${bucket}/`;
-    const marker = url.includes(publicMarker) ? publicMarker : url.includes(signedMarker) ? signedMarker : null;
-
-    if (marker) {
-      const [, pathWithQuery] = url.split(marker);
-      return {
-        bucket,
-        path: decodeURIComponent(pathWithQuery.split("?")[0])
-      };
-    }
-  }
-
-  return null;
-}
-
 function settingsObject(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value) ? { ...(value as Record<string, unknown>) } : {};
+}
+
+function brandingStorageReference(value: string | null | undefined) {
+  const parsed = parseLegacyBrandingReference(value);
+  return parsed?.kind === "storage" ? parsed.reference : null;
+}
+
+function organizationOwnedBrandingReference(organizationId: string, reference: { bucket: string; path: string } | null) {
+  if (!reference) return null;
+  return reference.bucket === "branding" && reference.path.startsWith(`${organizationId}/`) ? reference : null;
+}
+
+async function requireActiveOrganizationMembership(supabase: any) {
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const { data: membership, error } = await supabase
+    .from("organization_members")
+    .select("organization_id")
+    .eq("user_id", user.id)
+    .eq("is_active", true)
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !membership?.organization_id) {
+    throw new Error(error?.message || "Organization membership was not found.");
+  }
+
+  return { user, organizationId: membership.organization_id as string };
+}
+
+function limitedString(formData: FormData, key: string, maxLength: number) {
+  const value = optionalStringFromForm(formData, key);
+  if (value && value.length > maxLength) {
+    throw new Error(`${key} must be ${maxLength} characters or fewer.`);
+  }
+  return value;
+}
+
+function validatedEmail(formData: FormData, key: string) {
+  const value = limitedString(formData, key, 160);
+  if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+    throw new Error("Business email must be a valid email address.");
+  }
+  return value;
+}
+
+function validatedAccentColour(value: string | null) {
+  if (!value) return "#0f766e";
+  if (!/^#[0-9a-fA-F]{6}$/.test(value)) {
+    throw new Error("Contract accent colour must be a six-digit hex colour.");
+  }
+  return value.toLowerCase();
 }
 
 const validPaymentMethods = new Set(["cash", "promptpay", "bank_transfer", "wise", "revolut"]);
@@ -282,47 +350,54 @@ export async function updateUpfrontDiscountSettings(formData: FormData) {
 
 export async function updateBusinessLogo(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
-  const { data: membership, error: membershipError } = await supabase
-    .from("organization_members")
-    .select("organization_id")
-    .eq("user_id", user.id)
-    .eq("is_active", true)
-    .limit(1)
-    .maybeSingle();
-
-  if (membershipError || !membership?.organization_id) {
-    throw new Error(membershipError?.message || "Organization membership was not found.");
-  }
+  const { user, organizationId } = await requireActiveOrganizationMembership(supabase);
 
   const removeLogo = String(formData.get("remove_logo") || "") === "true";
   const logoFile = formData.get("logo");
 
   const { data: organization, error: organizationError } = await supabase
     .from("organizations")
-    .select("logo_url")
-    .eq("id", membership.organization_id)
+    .select("settings, logo_url, business_logo_storage_bucket, business_logo_storage_path")
+    .eq("id", organizationId)
+    .is("deleted_at", null)
     .maybeSingle();
 
-  if (organizationError) {
-    throw new Error(organizationError.message);
+  if (organizationError || !organization) {
+    throw new Error(organizationError?.message || "Organization was not found.");
   }
 
-  let logoUrl = organization?.logo_url ?? null;
+  const settings = settingsObject(organization.settings);
+  const {
+    business_logo_storage_bucket: _legacyLogoBucket,
+    business_logo_storage_path: _legacyLogoPath,
+    ...settingsWithoutCanonicalLogo
+  } = settings;
+  let logoUrl = browserSafeAssetUrl(organization?.logo_url);
+  let logoBucket: string | null = String(organization.business_logo_storage_bucket || settings.business_logo_storage_bucket || "").trim() || null;
+  let logoPath: string | null = String(organization.business_logo_storage_path || settings.business_logo_storage_path || "").trim() || null;
 
-  if (removeLogo || (logoFile instanceof File && logoFile.size > 0)) {
-    const existingLogo = logoStorageReferenceFromUrl(logoUrl);
+  if (removeLogo) {
+    const canonicalLogo = logoBucket && logoPath ? { bucket: logoBucket, path: logoPath } : null;
+    const legacyLogo = brandingStorageReference(organization?.logo_url);
+    const existingLogo =
+      organizationOwnedBrandingReference(organizationId, canonicalLogo) ||
+      organizationOwnedBrandingReference(organizationId, legacyLogo);
     if (existingLogo) {
       await supabase.storage.from(existingLogo.bucket).remove([existingLogo.path]);
     }
-    logoUrl = null;
+    const legacyMatchesRemoved =
+      legacyLogo &&
+      existingLogo &&
+      legacyLogo.bucket === existingLogo.bucket &&
+      legacyLogo.path === existingLogo.path;
+    logoUrl = legacyMatchesRemoved || !canonicalLogo ? null : logoUrl;
+    logoBucket = null;
+    logoPath = null;
+  }
+
+  if (!removeLogo && logoFile instanceof File && logoFile.size > 0) {
+    logoBucket = null;
+    logoPath = null;
   }
 
   if (logoFile instanceof File && logoFile.size > 0) {
@@ -330,13 +405,11 @@ export async function updateBusinessLogo(formData: FormData) {
       throw new Error("Business logo must be 2MB or smaller.");
     }
 
-    const extension = businessLogoExtension(logoFile);
-    if (!extension) {
-      throw new Error("Business logo must be a PNG, JPG, SVG, or WebP image.");
-    }
+    const extension = validateRasterBrandingFile(logoFile, "Business logo");
 
-    const storagePath = `${membership.organization_id}/branding/logo.${extension}`;
+    const storagePath = `${organizationId}/branding/logos/${crypto.randomUUID()}.${extension}`;
     const buffer = Buffer.from(await logoFile.arrayBuffer());
+    assertRasterImageBytes(buffer, extension, "Business logo");
     const { error: uploadError } = await supabase.storage.from("branding").upload(storagePath, buffer, {
       contentType: logoFile.type || undefined,
       upsert: true
@@ -347,18 +420,33 @@ export async function updateBusinessLogo(formData: FormData) {
       throw new Error(uploadError.message);
     }
 
-    const { data: publicUrlData } = supabase.storage.from("branding").getPublicUrl(storagePath);
-    logoUrl = publicUrlData?.publicUrl || null;
+    logoBucket = "branding";
+    logoPath = storagePath;
   }
 
   const { error } = await supabase
     .from("organizations")
-    .update({ logo_url: logoUrl })
-    .eq("id", membership.organization_id);
+    .update({
+      logo_url: logoUrl,
+      business_logo_storage_bucket: logoBucket,
+      business_logo_storage_path: logoPath,
+      settings: settingsWithoutCanonicalLogo
+    })
+    .eq("id", organizationId);
 
   if (error) {
     throw new Error(error.message);
   }
+
+  await recordActivityEvent(supabase, {
+    organization_id: organizationId,
+    actor_id: user.id,
+    entity_type: "organization",
+    entity_id: organizationId,
+    event_type: "contract_branding_updated",
+    title: "Contract branding updated",
+    detail: removeLogo ? "Business logo removed." : "Business logo updated."
+  });
 
   revalidatePath("/settings");
   revalidatePath("/");
@@ -366,48 +454,44 @@ export async function updateBusinessLogo(formData: FormData) {
 
 export async function updateOwnerSignature(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
-  const { data: membership, error: membershipError } = await supabase
-    .from("organization_members")
-    .select("organization_id")
-    .eq("user_id", user.id)
-    .eq("is_active", true)
-    .limit(1)
-    .maybeSingle();
-
-  if (membershipError || !membership?.organization_id) {
-    throw new Error(membershipError?.message || "Organization membership was not found.");
-  }
+  const { user, organizationId } = await requireActiveOrganizationMembership(supabase);
 
   const removeSignature = String(formData.get("remove_signature") || "") === "true";
   const signatureFile = formData.get("signature");
+  const replacingSignature = signatureFile instanceof File && signatureFile.size > 0;
+  const acknowledgementAccepted = String(formData.get("signature_authorisation_acknowledged") || "") === "true";
+  const submittedSignatoryName = limitedString(formData, "authorised_signatory_name", 160);
+  const submittedSignatoryTitle = limitedString(formData, "authorised_signatory_title", 160);
 
   const { data: organization, error: organizationError } = await supabase
     .from("organizations")
-    .select("settings, owner_signature_url")
-    .eq("id", membership.organization_id)
+    .select("settings, owner_signature_url, authorised_signatory_name, authorised_signatory_title, authorised_signature_storage_bucket, authorised_signature_storage_path, signature_authorised_at, signature_authorisation_text_version")
+    .eq("id", organizationId)
+    .is("deleted_at", null)
     .maybeSingle();
 
-  if (organizationError) {
-    throw new Error(organizationError.message);
+  if (organizationError || !organization) {
+    throw new Error(organizationError?.message || "Organization was not found.");
   }
 
   const settings = settingsObject(organization?.settings);
-  let signatureUrl = String(settings.owner_signature_url || organization?.owner_signature_url || "").trim() || null;
+  let signatureUrl = browserSafeAssetUrl(String(settings.owner_signature_url || organization?.owner_signature_url || "").trim());
+  let signatureBucket = String(organization?.authorised_signature_storage_bucket || "").trim() || null;
+  let signaturePath = String(organization?.authorised_signature_storage_path || "").trim() || null;
+  const signatoryName = submittedSignatoryName || String(organization?.authorised_signatory_name || "").trim() || null;
+  const signatoryTitle = submittedSignatoryTitle || String(organization?.authorised_signatory_title || "").trim() || null;
+
+  if (replacingSignature && !acknowledgementAccepted) {
+    throw new Error("You must accept the signature authorisation before saving a new authorised signature.");
+  }
+  if (replacingSignature && !signatoryName) {
+    throw new Error("Authorised signatory full name is required before saving a signature.");
+  }
 
   if (removeSignature || (signatureFile instanceof File && signatureFile.size > 0)) {
-    const existingSignature = logoStorageReferenceFromUrl(signatureUrl);
-    if (existingSignature) {
-      await supabase.storage.from(existingSignature.bucket).remove([existingSignature.path]);
-    }
     signatureUrl = null;
+    signatureBucket = null;
+    signaturePath = null;
   }
 
   if (signatureFile instanceof File && signatureFile.size > 0) {
@@ -415,40 +499,155 @@ export async function updateOwnerSignature(formData: FormData) {
       throw new Error("Operator signature must be 2MB or smaller.");
     }
 
-    const extension = businessLogoExtension(signatureFile);
-    if (!extension) {
-      throw new Error("Operator signature must be a PNG, JPG, SVG, or WebP image.");
-    }
+    const extension = validateRasterBrandingFile(signatureFile, "Operator signature");
 
-    const storagePath = `${membership.organization_id}/signature.${extension}`;
+    const storagePath = `${organizationId}/branding/signatures/${crypto.randomUUID()}.${extension}`;
     const buffer = Buffer.from(await signatureFile.arrayBuffer());
+    assertRasterImageBytes(buffer, extension, "Operator signature");
     const { error: uploadError } = await supabase.storage.from("branding").upload(storagePath, buffer, {
       contentType: signatureFile.type || undefined,
-      upsert: true
+      upsert: false
     });
 
     if (uploadError) {
       throw new Error(uploadError.message);
     }
 
-    const { data: publicUrlData } = supabase.storage.from("branding").getPublicUrl(storagePath);
-    signatureUrl = publicUrlData?.publicUrl || null;
+    signatureUrl = null;
+    signatureBucket = "branding";
+    signaturePath = storagePath;
   }
 
   const { error } = await supabase
     .from("organizations")
     .update({
       owner_signature_url: signatureUrl,
+      authorised_signatory_name: signatoryName,
+      authorised_signatory_title: signatoryTitle,
+      authorised_signature_storage_bucket: signatureBucket,
+      authorised_signature_storage_path: signaturePath,
+      signature_authorised_at: removeSignature ? null : replacingSignature ? new Date().toISOString() : organization.signature_authorised_at ?? null,
+      signature_authorisation_text_version: removeSignature ? null : replacingSignature ? signatureAuthorisationTextVersion : organization.signature_authorisation_text_version ?? null,
       settings: {
         ...settings,
-        owner_signature_url: signatureUrl
+        owner_signature_url: signatureUrl,
+        signature_authorisation_text: signatureAuthorisationText,
+        signature_authorisation_text_version: removeSignature ? null : replacingSignature ? signatureAuthorisationTextVersion : settings.signature_authorisation_text_version
       }
     })
-    .eq("id", membership.organization_id);
+    .eq("id", organizationId);
 
   if (error) {
     throw new Error(error.message);
   }
+
+  await recordActivityEvent(supabase, {
+    organization_id: organizationId,
+    actor_id: user.id,
+    entity_type: "organization",
+    entity_id: organizationId,
+    event_type: replacingSignature ? "authorised_signature_updated" : "contract_branding_updated",
+    title: replacingSignature ? "Authorised signature updated" : "Contract branding updated",
+    detail: removeSignature ? "Authorised signature removed." : replacingSignature ? "Authorised business signature replaced." : "Authorised signature settings updated."
+  });
+
+  if (replacingSignature) {
+    await recordActivityEvent(supabase, {
+      organization_id: organizationId,
+      actor_id: user.id,
+      entity_type: "organization",
+      entity_id: organizationId,
+      event_type: "signature_authorisation_accepted",
+      title: "Signature authorisation accepted",
+      detail: signatureAuthorisationTextVersion
+    });
+  }
+
+  revalidatePath("/settings");
+  revalidatePath("/settings/contracts");
+}
+
+export async function updateContractBrandingSettings(formData: FormData) {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const { user, organizationId } = await requireActiveOrganizationMembership(supabase);
+
+  const defaultContractLocale = String(formData.get("default_contract_locale") || "en").trim();
+  if (!supportedLocales.has(defaultContractLocale)) {
+    throw new Error("Unsupported default contract locale.");
+  }
+
+  const tradingName = limitedString(formData, "trading_name", 160);
+  const legalName = limitedString(formData, "legal_name", 200);
+  const businessEmail = validatedEmail(formData, "business_email");
+  const accentColour = validatedAccentColour(limitedString(formData, "contract_accent_colour", 7));
+  const footerText = limitedString(formData, "contract_footer_text", 240);
+
+  const { data: organization, error: organizationError } = await supabase
+    .from("organizations")
+    .select("settings")
+    .eq("id", organizationId)
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (organizationError || !organization) {
+    throw new Error(organizationError?.message || "Organization was not found.");
+  }
+
+  const settings = settingsObject(organization.settings);
+  const updatePayload = {
+    trading_name: tradingName,
+    legal_name: legalName,
+    registration_or_tax_number: limitedString(formData, "registration_or_tax_number", 80),
+    business_address: limitedString(formData, "business_address", 500),
+    business_phone: limitedString(formData, "business_phone", 80),
+    business_email: businessEmail,
+    whatsapp: limitedString(formData, "whatsapp", 80),
+    line_id: limitedString(formData, "line_id", 80),
+    contract_accent_colour: accentColour,
+    contract_footer_text: footerText,
+    powered_by_routehq_enabled: String(formData.get("powered_by_routehq_enabled") || "") === "true",
+    default_contract_locale: defaultContractLocale,
+    default_contract_template_id: limitedString(formData, "default_contract_template_id", 80),
+    authorised_signatory_name: limitedString(formData, "authorised_signatory_name", 160),
+    authorised_signatory_title: limitedString(formData, "authorised_signatory_title", 160),
+    settings: {
+      ...settings,
+      business_phone: limitedString(formData, "business_phone", 80),
+      business_email: businessEmail,
+      owner_whatsapp: limitedString(formData, "whatsapp", 80),
+      owner_line_id: limitedString(formData, "line_id", 80)
+    }
+  };
+
+  const { error } = await supabase
+    .from("organizations")
+    .update(updatePayload)
+    .eq("id", organizationId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  await Promise.all([
+    recordActivityEvent(supabase, {
+      organization_id: organizationId,
+      actor_id: user.id,
+      entity_type: "organization",
+      entity_id: organizationId,
+      event_type: "business_identity_updated",
+      title: "Business identity updated",
+      detail: "Contracting business identity settings were updated."
+    }),
+    recordActivityEvent(supabase, {
+      organization_id: organizationId,
+      actor_id: user.id,
+      entity_type: "organization",
+      entity_id: organizationId,
+      event_type: "contract_branding_updated",
+      title: "Contract branding updated",
+      detail: "Contract branding preferences were updated."
+    })
+  ]);
 
   revalidatePath("/settings");
   revalidatePath("/settings/contracts");
@@ -1366,28 +1565,40 @@ export async function saveOperatorSignature(formData: FormData) {
 
   const removeSignature = String(formData.get("remove_signature") || "") === "true";
   const signatureDataUrl = String(formData.get("signature_data_url") || "").trim();
+  const acknowledgementAccepted = String(formData.get("signature_authorisation_acknowledged") || "") === "true";
 
-  let signatureUrl: string | null = null;
+  let signatureBucket: string | null = null;
+  let signaturePath: string | null = null;
 
   if (!removeSignature && signatureDataUrl.startsWith("data:image/png;base64,")) {
+    if (!acknowledgementAccepted) {
+      throw new Error("You must accept the signature authorisation before saving a new authorised signature.");
+    }
     const base64Data = signatureDataUrl.slice("data:image/png;base64,".length);
     const buffer = Buffer.from(base64Data, "base64");
-    const storagePath = `${membership.organization_id}/branding/operator-signature.png`;
+    assertRasterImageBytes(buffer, "png", "Operator signature");
+    const storagePath = `${membership.organization_id}/branding/signatures/${crypto.randomUUID()}.png`;
 
     const { error: uploadError } = await supabase.storage.from("branding").upload(storagePath, buffer, {
       contentType: "image/png",
-      upsert: true
+      upsert: false
     });
 
     if (uploadError) throw new Error(uploadError.message);
 
-    const { data: publicUrlData } = supabase.storage.from("branding").getPublicUrl(storagePath);
-    signatureUrl = publicUrlData?.publicUrl ?? null;
+    signatureBucket = "branding";
+    signaturePath = storagePath;
   }
 
   const { error } = await supabase
     .from("organizations")
-    .update({ owner_signature_url: signatureUrl })
+    .update({
+      owner_signature_url: null,
+      authorised_signature_storage_bucket: signatureBucket,
+      authorised_signature_storage_path: signaturePath,
+      signature_authorised_at: signaturePath ? new Date().toISOString() : null,
+      signature_authorisation_text_version: signaturePath ? signatureAuthorisationTextVersion : null
+    })
     .eq("id", membership.organization_id);
 
   if (error) throw new Error(error.message);

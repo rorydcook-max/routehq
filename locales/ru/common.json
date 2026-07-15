@@ -5,5 +5,16 @@
     "outstanding": "Задолженность",
     "fleetProfit": "Прибыль автопарка",
     "highAlerts": "Важные оповещения"
+  },
+  "settings": {
+    "contractsBranding": {
+      "title": "Договоры и бренд",
+      "businessIdentity": "Данные компании",
+      "documentBranding": "Брендинг документа",
+      "authorisedSignatory": "Уполномоченный подписант",
+      "signatureAuthorisation": "Я разрешаю применять эту электронную подпись к договорам аренды и связанным документам, выпускаемым этой компанией через уполномоченных пользователей данного аккаунта RouteHQ.",
+      "previewTitle": "Предпросмотр договора аренды",
+      "poweredBy": "Powered by RouteHQ"
+    }
   }
 }

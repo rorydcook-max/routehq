@@ -14,8 +14,7 @@ import {
   updateUpfrontDiscountSettings
 } from "@/app/actions/settings";
 import { BranchList } from "@/app/settings/branch-list";
-import { LogoUploadSection } from "@/app/settings/logo-upload-section";
-import { SignatureUploadSection } from "@/app/settings/signature-upload-section";
+import { ContractsBrandingSection } from "@/app/settings/contracts-branding-section";
 import { LineTestButton } from "@/app/settings/line-test-button";
 import { CopyButton } from "@/app/settings/copy-button";
 import { InviteForm } from "@/app/invite/invite-form";
@@ -25,6 +24,7 @@ import { AppShell } from "@/components/app-shell";
 import { PendingButton } from "@/components/pending-button";
 import { Badge, Card, SectionHeader } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
+import { resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
 import { ensureDefaultBranch } from "@/lib/branches";
 import { defaultCalendarForLocale, supportedCalendarOptions } from "@/lib/i18n/calendars";
 import { supportedLocaleOptions } from "@/lib/i18n/locales";
@@ -98,40 +98,9 @@ function candidateSpecs(candidate: any) {
     .join(" / ");
 }
 
-function logoStorageReferenceFromUrl(url: string | null | undefined) {
-  if (!url) return null;
-
-  for (const bucket of ["branding", "documents"] as const) {
-    const publicMarker = `/storage/v1/object/public/${bucket}/`;
-    const signedMarker = `/storage/v1/object/sign/${bucket}/`;
-    const marker = url.includes(publicMarker) ? publicMarker : url.includes(signedMarker) ? signedMarker : null;
-
-    if (marker) {
-      const [, pathWithQuery] = url.split(marker);
-      return {
-        bucket,
-        path: decodeURIComponent(pathWithQuery.split("?")[0])
-      };
-    }
-  }
-
-  return url.startsWith("http") || url.startsWith("data:")
-    ? null
-    : {
-        bucket: "branding" as const,
-        path: url.replace(/^\/+/, "")
-      };
-}
-
-async function signedLogoUrl(supabase: any, logoUrl: string | null) {
-  const storageReference = logoStorageReferenceFromUrl(logoUrl);
-
-  if (!storageReference) {
-    return logoUrl;
-  }
-
-  const { data } = await supabase.storage.from(storageReference.bucket).createSignedUrl(storageReference.path, 60 * 60);
-  return data?.signedUrl || logoUrl;
+function browserSafeAssetFallback(value: string | null | undefined) {
+  const rawValue = String(value || "").trim();
+  return rawValue.startsWith("http") || rawValue.startsWith("data:") ? rawValue : null;
 }
 
 export default async function SettingsPage() {
@@ -204,11 +173,17 @@ export default async function SettingsPage() {
   const typedVehicleModels = (vehicleModels || []) as VehicleModelSetting[];
   const typedRecentTrims = (recentTrims || []) as VehicleTrimSetting[];
   const typedCatalogSubmissions = (catalogSubmissionsResult.data || []) as VehicleCatalogSubmissionSetting[];
-  const businessLogoUrl = await signedLogoUrl(supabase, organization.logo_url);
+  const brandingDisplayUrls = await resolveOrganizationBrandingDisplayUrls(supabase, organization, { allowExternalUrl: true });
   const organizationSettings = organization.settings && typeof organization.settings === "object" && !Array.isArray(organization.settings)
     ? (organization.settings as Record<string, unknown>)
     : {};
   const ownerSignatureUrl = String(organizationSettings.owner_signature_url || organization.owner_signature_url || "").trim() || null;
+  const logoDisplayUrl = organization.business_logo_storage_bucket && organization.business_logo_storage_path
+    ? "/api/branding-assets/logo"
+    : brandingDisplayUrls.logoUrl || browserSafeAssetFallback(organization.logo_url);
+  const signatureDisplayUrl = organization.authorised_signature_storage_bucket && organization.authorised_signature_storage_path
+    ? "/api/branding-assets/signature"
+    : brandingDisplayUrls.signatureUrl || browserSafeAssetFallback(ownerSignatureUrl);
   const makeMap = new Map<string, VehicleMakeSetting>(typedVehicleMakes.map((make) => [make.id, make]));
   const modelMap = new Map<string, VehicleModelSetting>(typedVehicleModels.map((model) => [model.id, model]));
   const travelPolicySettings = getTravelPolicySettings(organization.settings);
@@ -271,12 +246,6 @@ export default async function SettingsPage() {
 
         <Card>
           <SectionHeader eyebrow="Organization" title={organization.name} />
-          <div className="card-section">
-            <LogoUploadSection logoUrl={businessLogoUrl || organization.logo_url} orgName={organization.name} />
-            <div className="mt-3">
-              <SignatureUploadSection orgName={organization.name} signatureUrl={ownerSignatureUrl} />
-            </div>
-          </div>
           <div className="card-section grid gap-3 sm:grid-cols-3">
             <div className="rounded-lg border border-[#dfe4ea] p-2">
               <p className="text-[9px] font-semibold uppercase tracking-[0.08em] text-[#667085]">Currency</p>
@@ -292,6 +261,14 @@ export default async function SettingsPage() {
             </div>
           </div>
         </Card>
+      </div>
+
+      <div className="mt-4">
+        <ContractsBrandingSection
+          logoDisplayUrl={logoDisplayUrl}
+          organization={organization}
+          signatureDisplayUrl={signatureDisplayUrl}
+        />
       </div>
 
       <div className="mt-4">

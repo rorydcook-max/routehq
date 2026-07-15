@@ -14,5 +14,16 @@
     "addBooking": "Add New Booking",
     "addTransaction": "Add Transaction",
     "completeTask": "Complete Task"
+  },
+  "settings": {
+    "contractsBranding": {
+      "title": "Contracts & Branding",
+      "businessIdentity": "Business identity",
+      "documentBranding": "Document branding",
+      "authorisedSignatory": "Authorised signatory",
+      "signatureAuthorisation": "I authorise this electronic signature to be applied to rental agreements and related rental documents issued by this business through authorised users of this RouteHQ account.",
+      "previewTitle": "Rental agreement preview",
+      "poweredBy": "Powered by RouteHQ"
+    }
   }
 }

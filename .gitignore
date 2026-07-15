@@ -11,6 +11,7 @@ build/
 
 *.log
 logs/
+supabase/.temp/
 
 .DS_Store
 Thumbs.db

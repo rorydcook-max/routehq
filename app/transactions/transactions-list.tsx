@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import { Car, Check, Pencil, ReceiptText, Search, Trash2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { bulkDeleteTransactions, deleteTransaction, updateTransaction } from "@/app/actions/transactions";
+import { EmptyState } from "@/components/ui";
 import { isIncomeTransactionType, TRANSACTION_TYPE_OPTIONS } from "@/lib/transaction-options";
 import type { TransactionListItem } from "@/lib/transactions";
 
@@ -345,10 +346,14 @@ export function TransactionsList({
       {error ? <p className="rounded-lg bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</p> : null}
 
       {filtered.length === 0 ? (
-        <div className="empty-state">
-          <p className="text-lg font-black text-[#10252b]">No transactions found</p>
-          <p className="mt-2 text-sm text-[#667085]">Record rental income, fuel, maintenance, or deposits from the button above.</p>
-        </div>
+        <EmptyState
+          title="No transactions found"
+          description={
+            search.trim()
+              ? `No results for "${search.trim()}". Try another search.`
+              : "Record rental income, fuel, maintenance, or deposits from the button above."
+          }
+        />
       ) : (
         <div className="space-y-3">
           {filtered.map((transaction) => {

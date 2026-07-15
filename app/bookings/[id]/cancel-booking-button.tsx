@@ -33,6 +33,8 @@ type Props = {
   rentalRate: number;
   rentalStatus: string;
   customerName: string | null;
+  compact?: boolean;
+  label?: string;
 };
 
 const REASONS: { value: CancelReason; label: string; detail: string }[] = [
@@ -80,7 +82,9 @@ export function CancelBookingButton({
   currency,
   rentalRate,
   rentalStatus,
-  customerName
+  customerName,
+  compact = false,
+  label = "Cancel booking"
 }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -244,12 +248,16 @@ export function CancelBookingButton({
   return (
     <>
       <button
-        className="pressable inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border border-[#fecdd3] bg-[#fff1f2] px-3 py-2 text-sm font-black text-[#be123c]"
+        className={
+          compact
+            ? "pressable inline-flex min-h-8 items-center justify-center gap-1.5 rounded-md border border-[#fecdd3] bg-[#fff7f7] px-3 py-1.5 text-[12px] font-semibold text-[#be123c]"
+            : "pressable inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border border-[#fecdd3] bg-[#fff1f2] px-3 py-2 text-sm font-black text-[#be123c]"
+        }
         onClick={() => setOpen(true)}
         type="button"
       >
-        <XCircle size={16} />
-        Cancel booking
+        <XCircle size={compact ? 14 : 16} />
+        {label}
       </button>
 
       {open ? (

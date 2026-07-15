@@ -6,6 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test:domain": "node scripts/domain-validation.mjs",
+    "documents:orphan-scan": "node scripts/documents-orphan-maintenance.mjs",
+    "documents:orphan-clean": "node scripts/documents-orphan-maintenance.mjs --delete",
+    "documents:security-probes": "npx supabase db query --file scripts/phase8-security-hardening-validation.sql",
+    "documents:adversarial-probes": "npx supabase db query --file scripts/phase8-adversarial-db-probes.sql",
+    "documents:phase9-probes": "npx supabase db query --file scripts/phase9-adversarial-db-probes.sql",
+    "documents:phase10-probes": "npx supabase db query --file scripts/phase10-customer-signing-db-probes.sql",
     "lint": "next lint"
   },
   "dependencies": {

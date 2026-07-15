@@ -16,7 +16,9 @@
       "Bash(sed -i 's/purchasePrice: 520000/purchasePrice: 520000,\\\\n    estimatedValue: 420000/' lib/data.ts)",
       "Bash(sed -i 's/purchasePrice: 580000/purchasePrice: 580000,\\\\n    estimatedValue: 490000/' lib/data.ts)",
       "Bash(sed -i 's/purchasePrice: 720000/purchasePrice: 720000,\\\\n    estimatedValue: 590000/' lib/data.ts)",
-      "Bash(sed -i 's/purchasePrice: 1450000/purchasePrice: 1450000,\\\\n    estimatedValue: 1250000/' lib/data.ts)"
+      "Bash(sed -i 's/purchasePrice: 1450000/purchasePrice: 1450000,\\\\n    estimatedValue: 1250000/' lib/data.ts)",
+      "Bash(timeout 60 npx tsx scratch-verify-contract.ts)",
+      "Bash(timeout 60 npx tsx scratch-verify-pdf.ts)"
     ]
   }
 }

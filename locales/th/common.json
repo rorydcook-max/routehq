@@ -23,5 +23,16 @@
     "alerts": "ดูการแจ้งเตือนแรกของคุณ",
     "line": "รับการอัปเดตประจำวันทาง LINE",
     "complete": "ตั้งค่าเสร็จแล้ว"
+  },
+  "settings": {
+    "contractsBranding": {
+      "title": "สัญญาและแบรนด์",
+      "businessIdentity": "ข้อมูลธุรกิจ",
+      "documentBranding": "แบรนด์เอกสาร",
+      "authorisedSignatory": "ผู้ลงนามที่ได้รับอนุญาต",
+      "signatureAuthorisation": "ฉันอนุญาตให้นำลายเซ็นอิเล็กทรอนิกส์นี้ไปใช้กับสัญญาเช่าและเอกสารการเช่าที่เกี่ยวข้องซึ่งออกโดยธุรกิจนี้ผ่านผู้ใช้ที่ได้รับอนุญาตของบัญชี RouteHQ นี้",
+      "previewTitle": "ตัวอย่างสัญญาเช่า",
+      "poweredBy": "Powered by RouteHQ"
+    }
   }
 }

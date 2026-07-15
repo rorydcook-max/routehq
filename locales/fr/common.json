@@ -5,5 +5,16 @@
     "outstanding": "Montants dus",
     "fleetProfit": "Profit de la flotte",
     "highAlerts": "Alertes importantes"
+  },
+  "settings": {
+    "contractsBranding": {
+      "title": "Contrats et marque",
+      "businessIdentity": "Identite de l'entreprise",
+      "documentBranding": "Marque du document",
+      "authorisedSignatory": "Signataire autorise",
+      "signatureAuthorisation": "J'autorise l'application de cette signature electronique aux contrats de location et documents associes emis par cette entreprise via les utilisateurs autorises de ce compte RouteHQ.",
+      "previewTitle": "Apercu du contrat de location",
+      "poweredBy": "Powered by RouteHQ"
+    }
   }
 }

@@ -2,6 +2,7 @@
 
 import { headers } from "next/headers";
 import OpenAI from "openai";
+import { organizationSignatureReference } from "@/lib/branding-assets";
 import { buildContractVariables, renderContractTemplate } from "@/lib/contract-rendering";
 import { defaultRentalContractTemplate, embedLogoInContractVariables, ensureDefaultContractTemplate } from "@/lib/contracts";
 import { htmlToPdf } from "@/lib/html-to-pdf";
@@ -11,6 +12,10 @@ import { processCustomerPortalAction } from "@/lib/portal-notifications";
 import { notifyContractSigned } from "@/lib/line/notifications";
 import { notifyOperator } from "@/lib/notify-operator";
 import { generatePaymentSchedule } from "@/lib/payment-schedule";
+import {
+  completeRentalDocumentCustomerSigning,
+  getCustomerExecutedAgreementDownload
+} from "@/lib/rental-document-customer-signing";
 
 function requiredString(formData: FormData, key: string) {
   const value = String(formData.get(key) || "").trim();
@@ -521,6 +526,10 @@ export async function completePublicBooking(formData: FormData) {
   const customerUpfrontPeriods = Number(formData.get("upfrontPeriods") || 0);
   const customerUpfrontRate = Number(formData.get("upfrontRate") || 0) || null;
   const existingDeliveryDateTime = String(((bookingLink.booking_data || {}) as Record<string, unknown>).delivery_datetime || "").slice(0, 16);
+  const passportNumber = optionalString(formData, "passportNumber");
+  const driverLicenseNumber = optionalString(formData, "driverLicenseNumber");
+  const driverLicenseCountry = optionalString(formData, "driverLicenseCountry");
+  const driverLicenseExpiry = optionalString(formData, "driverLicenseExpiry");
 
   if (preferredDeliveryDateTime && preferredDeliveryDateTime !== existingDeliveryDateTime && new Date(preferredDeliveryDateTime).getTime() < Date.now()) {
     throw new Error("Choose a delivery time that is not in the past.");
@@ -548,6 +557,10 @@ export async function completePublicBooking(formData: FormData) {
         ...contactFields,
         date_of_birth: optionalString(formData, "dateOfBirth"),
         address: optionalString(formData, "address"),
+        passport_number: passportNumber,
+        driver_license_number: driverLicenseNumber,
+        driver_license_country: driverLicenseCountry,
+        driver_license_expiry: driverLicenseExpiry,
         emergency_contact_name: optionalString(formData, "emergencyContactName"),
         emergency_contact_phone: emergencyPhone,
         preferred_locale: optionalString(formData, "preferredLocale") || "en",
@@ -581,6 +594,10 @@ export async function completePublicBooking(formData: FormData) {
         ...contactFields,
         date_of_birth: optionalString(formData, "dateOfBirth"),
         address: optionalString(formData, "address"),
+        ...(passportNumber ? { passport_number: passportNumber } : {}),
+        ...(driverLicenseNumber ? { driver_license_number: driverLicenseNumber } : {}),
+        ...(driverLicenseCountry ? { driver_license_country: driverLicenseCountry } : {}),
+        ...(driverLicenseExpiry ? { driver_license_expiry: driverLicenseExpiry } : {}),
         emergency_contact_name: optionalString(formData, "emergencyContactName"),
         emergency_contact_phone: emergencyPhone,
         preferred_locale: optionalString(formData, "preferredLocale") || "en"
@@ -668,6 +685,165 @@ export async function completePublicBooking(formData: FormData) {
 
   await supabase.from("customers").update({ document_status: customerDocumentStatus }).eq("id", customerId).eq("organization_id", organizationId);
 
+  const [{ data: currentRentalForAuthority }, { data: currentCustomerForSigning }] = await Promise.all([
+    supabase
+      .from("rentals")
+      .select("id, contract_authority_mode, vehicle_id, customer_id, rental_rate, deposit_amount, delivery_datetime, start_date, end_date, billing_interval, pricing_model, currency, upfront_periods, upfront_rate")
+      .eq("id", bookingLink.rental_id)
+      .eq("organization_id", organizationId)
+      .maybeSingle(),
+    supabase
+      .from("customers")
+      .select("full_name, passport_number, driver_license_number, driver_license_country, driver_license_expiry")
+      .eq("id", customerId)
+      .eq("organization_id", organizationId)
+      .maybeSingle()
+  ]);
+
+  if (currentRentalForAuthority?.contract_authority_mode === "rental_document_engine") {
+    if (customerDocumentStatus !== "complete") {
+      throw new Error("Please upload passport, driving licence and selfie documents before signing.");
+    }
+    if (
+      !currentCustomerForSigning?.passport_number ||
+      !currentCustomerForSigning?.driver_license_number ||
+      !currentCustomerForSigning?.driver_license_country ||
+      !currentCustomerForSigning?.driver_license_expiry
+    ) {
+      throw new Error("Passport or driving licence details are missing.");
+    }
+
+    const headerStore = await headers();
+    const customerIp = headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() || headerStore.get("x-real-ip") || null;
+    const userAgent = headerStore.get("user-agent") || null;
+    const acceptedAcknowledgementTypes = [
+      "agreement_reviewed",
+      "early_termination",
+      "damage_responsibility",
+      "insurance",
+      "electronic_signature_records",
+      "gps_dashcam",
+      "data_handling"
+    ].filter((type) => formData.get(`ack_${type}`) === "on");
+
+    await completeRentalDocumentCustomerSigning({
+      token,
+      signatureDataUrl: signature,
+      signerName: signedName,
+      ipAddress: customerIp,
+      userAgent,
+      acceptedAcknowledgementTypes
+    });
+
+    const updatedBookingData = {
+      ...((bookingLink.booking_data || {}) as Record<string, unknown>),
+      ...ocrBookingData,
+      ...(preferredDeliveryLocation ? { delivery_location: preferredDeliveryLocation } : {}),
+      ...(preferredDeliveryDateTime ? { delivery_datetime: preferredDeliveryDateTime } : {}),
+      ...(preferredDeliveryLocation || preferredDeliveryDateTime ? { delivery_details_submitted_by_customer: true } : {})
+    };
+    const signedAt = new Date().toISOString();
+    const requestedPaymentTiming = paymentTiming === "now" ? "now" : "on_delivery";
+    const deliveryDatetime = currentRentalForAuthority.delivery_datetime
+      ? new Date(currentRentalForAuthority.delivery_datetime)
+      : preferredDeliveryDateTime
+        ? new Date(preferredDeliveryDateTime)
+        : null;
+    const isDeliveryNowOrPast = deliveryDatetime ? deliveryDatetime.getTime() <= Date.now() : false;
+    const effectivePaymentTiming = isDeliveryNowOrPast ? "now" : requestedPaymentTiming;
+    const rentalPaymentUpdate =
+      effectivePaymentTiming === "now"
+        ? {
+            payment_due_trigger: "immediate",
+            payment_due_after_delivery: false,
+            first_payment_amount: null,
+            deposit_payment_amount: null
+          }
+        : {
+            payment_due_trigger: "on_delivery",
+            payment_due_after_delivery: true,
+            first_payment_amount: Number(currentRentalForAuthority.rental_rate || 0),
+            deposit_payment_amount: Number(currentRentalForAuthority.deposit_amount || 0)
+          };
+
+    await Promise.all([
+      supabase
+        .from("booking_links")
+        .update({
+          status: "completed",
+          booking_data: updatedBookingData,
+          preferred_payment_method: preferredPaymentMethod,
+          payment_timing: effectivePaymentTiming,
+          customer_details_submitted_at: bookingLink.customer_details_submitted_at || signedAt,
+          documents_uploaded_at: customerDocumentStatus === "complete" ? signedAt : bookingLink.documents_uploaded_at,
+          contract_signed_at: signedAt,
+          completed_at: signedAt
+        })
+        .eq("id", bookingLink.id)
+        .eq("organization_id", organizationId),
+      supabase
+        .from("rentals")
+        .update({
+          ...(preferredDeliveryLocation ? { delivery_location: preferredDeliveryLocation } : {}),
+          ...(preferredDeliveryDateTime ? { delivery_datetime: preferredDeliveryDateTime } : {}),
+          ...rentalPaymentUpdate,
+          ...(customerUpfrontPeriods > 0 && !currentRentalForAuthority.upfront_periods ? { upfront_periods: customerUpfrontPeriods, upfront_rate: customerUpfrontRate, upfront_accepted: true } : {})
+        })
+        .eq("id", bookingLink.rental_id)
+        .eq("organization_id", organizationId),
+      recordActivityEvent(supabase, {
+        organization_id: organizationId,
+        entity_type: "rental",
+        entity_id: bookingLink.rental_id,
+        vehicle_id: bookingLink.vehicle_id,
+        rental_id: bookingLink.rental_id,
+        customer_id: customerId,
+        event_type: "booking_completed",
+        title: "Booking completed",
+        detail: `${fullName} completed their details and signed the immutable rental agreement.`
+      }),
+      logCommunicationEvent({
+        supabase,
+        organizationId,
+        rentalId: bookingLink.rental_id,
+        customerId,
+        type: "booking_link_activity",
+        content: "Customer signed immutable rental document agreement",
+        metadata: { booking_link_id: bookingLink.id }
+      })
+    ]);
+
+    await generateScheduleAfterPublicCompletion({
+      supabase,
+      bookingLink,
+      rental: {
+        ...currentRentalForAuthority,
+        customer_id: customerId,
+        ...(customerUpfrontPeriods > 0 && !currentRentalForAuthority.upfront_periods ? { upfront_periods: customerUpfrontPeriods, upfront_rate: customerUpfrontRate } : {})
+      },
+      preferredDeliveryDateTime,
+      effectivePaymentTiming
+    });
+
+    const [originalAgreementUrl, executionCertificateUrl] = await Promise.all([
+      getCustomerExecutedAgreementDownload(token, "original").catch(() => null),
+      getCustomerExecutedAgreementDownload(token, "certificate").catch(() => null)
+    ]);
+
+    notifyOperator(
+      organizationId,
+      `Customer completed booking form and signed the immutable rental agreement`,
+      "contract_signed"
+    ).catch(() => null);
+
+    return {
+      success: true,
+      signedContractUrl: null,
+      originalAgreementUrl,
+      executionCertificateUrl
+    };
+  }
+
   const [{ data: organization }, { data: rental }, { data: vehicle }, { data: customer }, { data: contract }, template] = await Promise.all([
     supabase.from("organizations").select("*").eq("id", organizationId).maybeSingle(),
     supabase.from("rentals").select("*").eq("id", bookingLink.rental_id).maybeSingle(),
@@ -703,11 +879,8 @@ export async function completePublicBooking(formData: FormData) {
     bookingLink: mergedBookingLink
   });
   const organizationSettings = recordObject(organization?.settings);
-  const ownerSignatureUrl = String(
-    organizationSettings.owner_signature_url ||
-      organization?.owner_signature_url ||
-      ""
-  ).trim();
+  const ownerSignatureReference = organizationSignatureReference(organization || {});
+  const ownerSignatureUrl = String(ownerSignatureReference.canonical?.path || ownerSignatureReference.legacy || "").trim();
   if (!rawContractVariables.owner_signature_url && ownerSignatureUrl) {
     rawContractVariables.owner_signature_url = ownerSignatureUrl;
   }

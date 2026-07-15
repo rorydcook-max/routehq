@@ -5,5 +5,16 @@
     "outstanding": "未収金",
     "fleetProfit": "フリート利益",
     "highAlerts": "重要アラート"
+  },
+  "settings": {
+    "contractsBranding": {
+      "title": "契約とブランディング",
+      "businessIdentity": "事業者情報",
+      "documentBranding": "文書ブランディング",
+      "authorisedSignatory": "権限のある署名者",
+      "signatureAuthorisation": "この電子署名を、この事業者が本 RouteHQ アカウントの承認済みユーザーを通じて発行するレンタル契約書および関連文書に適用することを承認します。",
+      "previewTitle": "レンタル契約書プレビュー",
+      "poweredBy": "Powered by RouteHQ"
+    }
   }
 }

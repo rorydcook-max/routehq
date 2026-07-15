@@ -76,7 +76,7 @@ export function LogoUploadSection({
             {isPending ? "Removing..." : "Remove logo"}
           </button>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <input accept="image/png,image/jpeg,image/svg+xml,image/webp" className={fileInputClass} ref={fileRef} type="file" />
+            <input accept="image/png,image/jpeg,image/webp" className={fileInputClass} ref={fileRef} type="file" />
             <button className="primary-action w-full sm:w-auto" disabled={isPending} onClick={handleReplace} type="button">
               {isPending ? "Replacing..." : "Replace logo"}
             </button>
@@ -104,7 +104,7 @@ export function LogoUploadSection({
         </div>
       </div>
       <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
-        <input accept="image/png,image/jpeg,image/svg+xml,image/webp" className={fileInputClass} ref={fileRef} type="file" />
+        <input accept="image/png,image/jpeg,image/webp" className={fileInputClass} ref={fileRef} type="file" />
         <button className="primary-action w-full sm:w-auto" disabled={isPending} type="submit">
           {isPending ? "Uploading..." : "Upload logo"}
         </button>

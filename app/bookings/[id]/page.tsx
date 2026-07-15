@@ -290,7 +290,9 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   const organizationSettings = organization.settings && typeof organization.settings === "object" && !Array.isArray(organization.settings)
     ? (organization.settings as Record<string, unknown>)
     : {};
-  const ownerSignatureConfigured = Boolean(String(organizationSettings.owner_signature_url || organization.owner_signature_url || "").trim());
+  const ownerSignatureConfigured = Boolean(
+    String(organization.authorised_signature_storage_path || organizationSettings.owner_signature_url || organization.owner_signature_url || "").trim()
+  );
   const isRetrospective = Boolean(rental.entered_by_operator) ||
     Boolean(rental.start_date && new Date(String(rental.start_date).slice(0, 10) + "T00:00:00Z") < new Date(Date.now() - 7 * 86_400_000));
   const displayStatus = (
@@ -461,14 +463,6 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   currency={rental.currency || "THB"}
                   availableVehicles={(availableVehicles || []).filter((v: any) => v.id !== (rental.vehicle_id || vehicle?.id))}
                 />
-              ) : null}
-              <ActionButton href="#add-payment-row" tone="light">
-                Add payment
-              </ActionButton>
-              {pendingPayment ? (
-                <ActionButton href={`#record-payment-${pendingPayment.id}` as Route} tone="light">
-                  Record payment received
-                </ActionButton>
               ) : null}
               {canAdjustRental ? (
                 <RentalAdjustmentButton
@@ -869,6 +863,27 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     <p className={`font-mono-data mt-1 text-lg font-black ${outstandingBalance > 0 ? "text-[#dc2626]" : "text-[#16a34a]"}`}>{money(outstandingBalance, rental.currency)}</p>
                   </div>
                 </div>
+                {outstandingBalance > 0 && activeRentalStatus ? (
+                  <div className="flex flex-col gap-3 rounded-xl border border-[#d1fae5] bg-[#f0fdf4] p-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-sm font-black text-[#065f46]">
+                        {money(outstandingBalance, rental.currency)} outstanding
+                      </p>
+                      <p className="mt-0.5 text-xs text-[#059669]">
+                        Find the payment row below and click "Record payment received"
+                      </p>
+                    </div>
+                    {pendingPayment ? (
+                      <a
+                        className="pressable inline-flex min-h-9 shrink-0 items-center justify-center gap-2 rounded-lg bg-[#059669] px-4 text-sm font-black text-white"
+                        href={`#record-payment-${pendingPayment.id}`}
+                      >
+                        <i aria-hidden="true" className="ti ti-cash text-[14px]" />
+                        Record payment
+                      </a>
+                    ) : null}
+                  </div>
+                ) : null}
                 <div className={`rounded-lg border p-3 text-sm font-semibold ${
                   financialState.tone === "green"
                     ? "border-[#bbf7d0] bg-[#f0fdf4] text-[#166534]"
@@ -897,13 +912,12 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 ) : null}
                 {!needsExistingRentalPaymentSetup && payments.length === 0 && outstandingBalance === 0 && totalPaid === 0 ? (
                   <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3 text-sm font-semibold text-[#92400e]">
-                    No payment schedule exists yet for this booking. Add a payment row if this rental should have a balance due.
+                    No payment schedule exists yet for this booking. Add a charge if this rental should have a balance due.
                   </div>
                 ) : null}
                 {payments.length === 0 && transactions.length === 0 ? (
                   <SectionEmpty>No payments or transactions recorded yet.</SectionEmpty>
                 ) : null}
-                <AddRentalPaymentInlineForm currency={rental.currency} organizationId={organization.id} rentalId={rental.id} />
                 {overduePaymentGroup.length > 0 ? (
                   <div className="space-y-1">
                     <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[#dc2626]">Overdue — {overduePaymentGroup.length} payment{overduePaymentGroup.length !== 1 ? "s" : ""}</p>
@@ -936,6 +950,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     </div>
                   </details>
                 ) : null}
+                <AddRentalPaymentInlineForm currency={rental.currency} organizationId={organization.id} rentalId={rental.id} />
                 {transactions.length > 0 ? (
                   <div className="pt-1">
                     <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Transactions</p>

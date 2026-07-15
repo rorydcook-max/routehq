@@ -5,9 +5,13 @@ import { useRouter } from "next/navigation";
 import { updateOwnerSignature } from "@/app/actions/settings";
 
 export function SignatureUploadSection({
+  authorisedSignatoryName,
+  authorisedSignatoryTitle,
   signatureUrl,
   orgName
 }: {
+  authorisedSignatoryName?: string | null;
+  authorisedSignatoryTitle?: string | null;
   signatureUrl: string | null | undefined;
   orgName: string;
 }) {
@@ -15,6 +19,7 @@ export function SignatureUploadSection({
   const [message, setMessage] = useState<{ text: string; type: "error" | "success" } | null>(null);
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
+  const acknowledgementRef = useRef<HTMLInputElement>(null);
 
   function submit(formData: FormData) {
     setMessage(null);
@@ -41,8 +46,15 @@ export function SignatureUploadSection({
       setMessage({ text: "Please select an image file.", type: "error" });
       return;
     }
+    if (!acknowledgementRef.current?.checked) {
+      setMessage({ text: "Please accept the signature authorisation before saving a new signature.", type: "error" });
+      return;
+    }
     const fd = new FormData();
     fd.set("signature", file);
+    fd.set("signature_authorisation_acknowledged", "true");
+    fd.set("authorised_signatory_name", authorisedSignatoryName || "");
+    fd.set("authorised_signatory_title", authorisedSignatoryTitle || "");
     submit(fd);
   }
 
@@ -53,8 +65,15 @@ export function SignatureUploadSection({
       setMessage({ text: "Please select an image file.", type: "error" });
       return;
     }
+    if (!acknowledgementRef.current?.checked) {
+      setMessage({ text: "Please accept the signature authorisation before saving a new signature.", type: "error" });
+      return;
+    }
     const fd = new FormData();
     fd.set("signature", file);
+    fd.set("signature_authorisation_acknowledged", "true");
+    fd.set("authorised_signatory_name", authorisedSignatoryName || "");
+    fd.set("authorised_signatory_title", authorisedSignatoryTitle || "");
     submit(fd);
   }
 
@@ -87,11 +106,17 @@ export function SignatureUploadSection({
             {isPending ? "Removing..." : "Remove"}
           </button>
         ) : null}
-        <input accept="image/png,image/jpeg,image/svg+xml,image/webp" className={fileInputClass} ref={fileRef} type="file" />
+        <input accept="image/png,image/jpeg,image/webp" className={fileInputClass} ref={fileRef} type="file" />
         <button className="primary-action w-full sm:w-auto" disabled={isPending} onClick={signatureUrl ? handleReplace : undefined} type={signatureUrl ? "button" : "submit"}>
           {isPending ? "Uploading..." : signatureUrl ? "Replace" : "Upload signature"}
         </button>
       </div>
+      <label className="flex w-full items-start gap-2 rounded-lg border border-[#d6e5e2] bg-white p-2 text-[11px] leading-4 text-[#344054]">
+        <input className="mt-0.5" ref={acknowledgementRef} type="checkbox" />
+        <span>
+          I authorise this electronic signature to be applied to rental agreements and related rental documents issued by this business through authorised users of this RouteHQ account.
+        </span>
+      </label>
       {message ? (
         <p className={`w-full text-xs ${message.type === "error" ? "text-[#dc2626]" : "text-[#16a34a]"}`}>{message.text}</p>
       ) : null}

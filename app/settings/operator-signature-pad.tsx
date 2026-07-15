@@ -11,6 +11,7 @@ export function OperatorSignaturePad({ currentSignatureUrl }: { currentSignature
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const acknowledgementRef = useRef<HTMLInputElement>(null);
   const drawing = useRef(false);
 
   function point(event: React.PointerEvent<HTMLCanvasElement>) {
@@ -63,11 +64,16 @@ export function OperatorSignaturePad({ currentSignatureUrl }: { currentSignature
       setMessage("Please draw your signature before saving.");
       return;
     }
+    if (!acknowledgementRef.current?.checked) {
+      setMessage("Please accept the signature authorisation before saving.");
+      return;
+    }
     setMessage(null);
     startTransition(async () => {
       try {
         const fd = new FormData();
         fd.set("signature_data_url", signature);
+        fd.set("signature_authorisation_acknowledged", "true");
         await saveOperatorSignature(fd);
         setShowPad(false);
         setSignature("");
@@ -160,6 +166,12 @@ export function OperatorSignaturePad({ currentSignatureUrl }: { currentSignature
         width={560}
       />
       {message ? <p className="mt-2 text-xs text-[#dc2626]">{message}</p> : null}
+      <label className="mt-3 flex items-start gap-2 rounded-lg border border-[#d6e5e2] bg-white p-2 text-[11px] leading-4 text-[#344054]">
+        <input className="mt-0.5" ref={acknowledgementRef} type="checkbox" />
+        <span>
+          I authorise this electronic signature to be applied to rental agreements and related rental documents issued by this business through authorised users of this RouteHQ account.
+        </span>
+      </label>
       <div className="mt-3 flex gap-2">
         <button
           className="secondary-action flex-1"

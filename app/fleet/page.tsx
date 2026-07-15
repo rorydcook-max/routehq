@@ -3,7 +3,7 @@ import { Archive, FileSpreadsheet, Plus, Trash2 } from "lucide-react";
 import { archiveVehicle, bulkArchiveVehicles, bulkDeleteVehicles, deleteVehicle } from "@/app/actions/vehicles";
 import { AppShell } from "@/components/app-shell";
 import { PendingButton } from "@/components/pending-button";
-import { Badge, Card, ProgressBar, SectionHeader } from "@/components/ui";
+import { Badge, Card, EmptyState, ProgressBar, SectionHeader } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDashboardData, money } from "@/lib/dashboard";
 import { getDefaultOrganization } from "@/lib/organization";
@@ -55,7 +55,22 @@ export default async function FleetPage() {
             </PendingButton>
           </div>
         </form>
-        <div className="card-section overflow-x-auto">
+        {vehicles.length === 0 ? (
+          <div className="card-section">
+            <EmptyState
+              title="No vehicles yet"
+              description="Add your first vehicle to start tracking bookings, utilization, and profitability."
+              action={
+                <Link className="pressable inline-flex items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-bold text-white" href="/fleet/new">
+                  <Plus size={16} />
+                  Add vehicle
+                </Link>
+              }
+            />
+          </div>
+        ) : null}
+        {vehicles.length > 0 ? (
+        <div className="card-section hidden overflow-x-auto md:block">
           <table className="w-full min-w-[980px] text-left text-sm">
             <thead>
               <tr className="border-b border-[var(--border)] text-xs uppercase text-[var(--muted)]">
@@ -135,6 +150,44 @@ export default async function FleetPage() {
             </tbody>
           </table>
         </div>
+        ) : null}
+        {vehicles.length > 0 ? (
+          <div className="card-section block space-y-3 md:hidden">
+            {vehicles.map((vehicle) => (
+              <Link
+                className="block rounded-xl border border-[var(--border)] bg-white p-3 transition hover:border-[var(--primary)]"
+                href={`/fleet/${vehicle.id}`}
+                key={vehicle.id}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-base font-black text-[var(--foreground)]">
+                      {vehicle.make} {vehicle.model}
+                    </p>
+                    <p className="font-mono-data mt-1 text-xs text-[var(--muted)]">
+                      {vehicle.plate} / {vehicle.year || "Year unknown"} / {vehicle.mileage.toLocaleString()} km
+                    </p>
+                  </div>
+                  <Badge tone={statusTone[vehicle.status]}>{vehicle.status}</Badge>
+                </div>
+                <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-[var(--muted)]">
+                  <div className="rounded-lg bg-[var(--panel-secondary)] p-2">
+                    <span className="block font-semibold uppercase tracking-[0.08em]">Monthly</span>
+                    <span className="font-mono-data mt-1 block text-sm font-black text-[var(--foreground)]">{money(vehicle.monthlyRate)}</span>
+                  </div>
+                  <div className="rounded-lg bg-[var(--panel-secondary)] p-2">
+                    <span className="block font-semibold uppercase tracking-[0.08em]">Profit</span>
+                    <span className="font-mono-data mt-1 block text-sm font-black text-[var(--foreground)]">{money(vehicle.profit)}</span>
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <div className="font-mono-data mb-1 text-xs text-[var(--muted)]">{vehicle.utilization}% utilization</div>
+                  <ProgressBar value={vehicle.utilization} tone={vehicle.utilization > 80 ? "green" : "amber"} />
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : null}
       </Card>
     </AppShell>
   );

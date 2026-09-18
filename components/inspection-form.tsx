@@ -382,7 +382,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
   const [receiptResult, setReceiptResult] = useState<ReceiptResult | null>(null);
   const [receiptError, setReceiptError] = useState("");
 
-  const draftKey = `fleetos-inspection-${mode}-${context.rental?.id || context.vehicle.id}`;
+  const draftKey = `routehq-inspection-${mode}-${context.rental?.id || context.vehicle.id}`;
   const deliveryFuel = Number(context.deliveryInspection?.fuel_level || 0);
   const depositHeld = Number(context.rental?.deposit_held || 0);
   const alreadyRefunded = Number(context.rental?.deposit_refunded_amount || 0);
@@ -1003,7 +1003,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
           {typeof navigator !== "undefined" && "share" in navigator ? (
             <button
               className={`${touchButton} mt-4 border border-[#d6e5e2] bg-white text-[#344054]`}
-              onClick={() => navigator.share?.({ title: "FleetOS inspection summary", text: `${titleFor(context)} inspection summary is ready.` })}
+              onClick={() => navigator.share?.({ title: "RouteHQ inspection summary", text: `${titleFor(context)} inspection summary is ready.` })}
               type="button"
             >
               Share with customer

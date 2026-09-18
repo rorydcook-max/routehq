@@ -82,7 +82,7 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
         {normalizedVehicles.length === 0 ? (
           <Card>
             <SectionHeader eyebrow="No vehicles" title="Add a vehicle before creating bookings" />
-            <p className="mt-3 text-sm leading-6 text-[#667085]">Bookings need a vehicle record so FleetOS can connect rental dates, inspections, payments, and profitability to the right asset.</p>
+            <p className="mt-3 text-sm leading-6 text-[#667085]">Bookings need a vehicle record so RouteHQ can connect rental dates, inspections, payments, and profitability to the right asset.</p>
             <Link className="primary-action pressable mt-5" href="/fleet/new">
               Add vehicle
             </Link>

@@ -14,7 +14,7 @@ type SubscriptionPayload = {
   daysRemaining?: number | null;
 };
 
-const dismissKey = "fleetos_trial_banner_dismissed_until";
+const dismissKey = "routehq_trial_banner_dismissed_until";
 
 function toneForDays(days: number | null | undefined) {
   if (days === null || days === undefined || days > 7) {

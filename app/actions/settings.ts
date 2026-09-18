@@ -888,7 +888,7 @@ async function requirePlatformAdmin() {
     .maybeSingle();
 
   if (error || !platformAdmin) {
-    throw new Error("Only FleetOS platform admins can manage the global vehicle catalog.");
+    throw new Error("Only RouteHQ platform admins can manage the global vehicle catalog.");
   }
 
   return { supabase, user };
@@ -1302,7 +1302,7 @@ export async function researchVehicleCatalogSubmission(formData: FormData) {
 
   const client = new OpenAI({ apiKey }) as any;
   const model = process.env.OPENAI_CATALOG_RESEARCH_MODEL || process.env.OPENAI_TRIM_CATALOG_MODEL || "gpt-4o";
-  const prompt = `You are researching vehicle catalog data for FleetOS, a Southeast Asia vehicle rental operating system.
+  const prompt = `You are researching vehicle catalog data for RouteHQ, a Southeast Asia vehicle rental operating system.
 
 Research this user-submitted vehicle catalog suggestion using web search:
 - Make: ${submission.make_name || "unknown"}
@@ -1317,7 +1317,7 @@ Research this user-submitted vehicle catalog suggestion using web search:
 - Seats: ${submission.seating_capacity || "unknown"}
 - Drivetrain: ${submission.drivetrain || "unknown"}
 
-Focus on Thailand and Southeast Asia market availability. Check whether the submitted make/model/trim likely exists, whether it may be misspelled, and whether there are related trims for the same model/year range that FleetOS may be missing.
+Focus on Thailand and Southeast Asia market availability. Check whether the submitted make/model/trim likely exists, whether it may be misspelled, and whether there are related trims for the same model/year range that RouteHQ may be missing.
 
 Return only JSON with this structure:
 {

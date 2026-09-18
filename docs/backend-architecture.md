@@ -2,7 +2,7 @@
 
 ## Product Scope
 
-FleetOS is modeled as a mixed-fleet rental operating system, not a car-only product. The core asset is `vehicles`, supported by `vehicle_categories` and `vehicle_types` so each organization can operate cars, motorcycles, scooters, e-bikes, vans, ATVs, and future asset classes such as boats or jetskis.
+RouteHQ is modeled as a mixed-fleet rental operating system, not a car-only product. The core asset is `vehicles`, supported by `vehicle_categories` and `vehicle_types` so each organization can operate cars, motorcycles, scooters, e-bikes, vans, ATVs, and future asset classes such as boats or jetskis.
 
 Vehicle-specific details live in `vehicles.specifications` as JSONB. This avoids schema churn when different vehicle classes need different fields:
 

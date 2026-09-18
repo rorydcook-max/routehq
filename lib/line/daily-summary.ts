@@ -173,7 +173,7 @@ export function buildDailySummaryMessages(data: SummaryData): LineMessage[] {
   }
 
   return [
-    lineFlex("FleetOS Daily Summary", {
+    lineFlex("RouteHQ Daily Summary", {
       type: "carousel",
       contents: bubbles
     })
@@ -188,7 +188,7 @@ function buildHeaderBubble(orgName: string, dateStr: string) {
       type: "box",
       layout: "vertical",
       contents: [
-        { type: "text", text: "FleetOS", size: "xs", color: "#ffffff80", weight: "bold" },
+        { type: "text", text: "RouteHQ", size: "xs", color: "#ffffff80", weight: "bold" },
         { type: "text", text: "Good morning! 🌅", size: "xl", color: "#ffffff", weight: "bold" },
         { type: "text", text: dateStr, size: "xs", color: "#ffffff99" }
       ],

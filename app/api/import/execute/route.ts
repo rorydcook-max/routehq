@@ -7,7 +7,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type Mapping = {
   source_column: string;
-  fleetos_field: string;
+  routehq_field: string;
 };
 
 type SheetMapping = {
@@ -23,10 +23,10 @@ function compactObject(values: Record<string, unknown>) {
 function mappedRow(row: Record<string, string>, mappings: Mapping[]) {
   const output: Record<string, string> = {};
   mappings.forEach((mapping) => {
-    if (!mapping.fleetos_field || mapping.fleetos_field === "__ignore__") {
+    if (!mapping.routehq_field || mapping.routehq_field === "__ignore__") {
       return;
     }
-    output[mapping.fleetos_field] = row[mapping.source_column] || "";
+    output[mapping.routehq_field] = row[mapping.source_column] || "";
   });
   return output;
 }
@@ -37,7 +37,7 @@ function normalizeDataType(value: string, mappings: Mapping[]) {
     return cleaned;
   }
 
-  const fields = new Set(mappings.map((mapping) => mapping.fleetos_field));
+  const fields = new Set(mappings.map((mapping) => mapping.routehq_field));
   if (fields.has("amount") && fields.has("type")) return "transactions";
   if (fields.has("start_date") || fields.has("end_date") || fields.has("customer_name")) return "rentals";
   if (fields.has("full_name") || fields.has("passport_number") || fields.has("driving_licence_number")) return "customers";

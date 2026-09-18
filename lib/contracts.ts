@@ -138,7 +138,7 @@ export function buildSampleContractVariables(organization: any) {
 }
 
 export function renderSampleContract(template: string) {
-  return renderContractTemplate(template, buildSampleContractVariables({ name: "FleetOS Demo Rentals", settings: {} }));
+  return renderContractTemplate(template, buildSampleContractVariables({ name: "RouteHQ Demo Rentals", settings: {} }));
 }
 
 export async function ensureDefaultContractTemplate(supabase: any, organizationId: string) {

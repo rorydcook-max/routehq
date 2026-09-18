@@ -64,7 +64,7 @@ export default async function NotificationsPage() {
           <SectionHeader eyebrow="LINE connection" title="LINE Official Account" />
           <p className="mt-2 text-sm text-[#667085]">
             Add <strong>{lineOaId || "@your-oa"}</strong> as a friend on LINE, then send any message to connect your
-            account. FleetOS will send daily summaries and event alerts to your LINE.
+            account. RouteHQ will send daily summaries and event alerts to your LINE.
           </p>
 
           <div className="mt-5 rounded-xl border border-[#dfe4ea] bg-[#f8fafc] p-4">
@@ -83,7 +83,7 @@ export default async function NotificationsPage() {
                   </p>
                 ) : (
                   <p className="text-xs text-[#667085]">
-                    Message <strong>{lineOaId || "the FleetOS OA"}</strong> on LINE to connect
+                    Message <strong>{lineOaId || "the RouteHQ OA"}</strong> on LINE to connect
                   </p>
                 )}
               </div>
@@ -100,7 +100,7 @@ export default async function NotificationsPage() {
                 <li>Open LINE on your phone</li>
                 <li>Search for <strong>{lineOaId || "@your-oa"}</strong> and add as a friend</li>
                 <li>Send any message (e.g. "hello")</li>
-                <li>FleetOS will confirm and send you a welcome message</li>
+                <li>RouteHQ will confirm and send you a welcome message</li>
                 <li>Refresh this page to see your connection status</li>
               </ol>
             </div>
@@ -134,7 +134,7 @@ export default async function NotificationsPage() {
         <Card>
           <SectionHeader eyebrow="Daily summary" title="Morning summary settings" />
           <p className="mt-2 text-sm text-[#667085]">
-            FleetOS sends a personalised daily summary to your LINE every morning. Choose what to include and when it
+            RouteHQ sends a personalised daily summary to your LINE every morning. Choose what to include and when it
             arrives.
           </p>
 

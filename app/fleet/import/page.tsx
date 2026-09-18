@@ -16,7 +16,7 @@ export default async function ImportVehiclesPage() {
           </Link>
           <h1 className="mt-2 text-2xl font-black tracking-[-0.03em] text-[var(--foreground)] sm:text-3xl">Import vehicles</h1>
           <p className="mt-1 text-sm font-medium text-[var(--muted)]">
-            Upload a spreadsheet or paste a public Google Sheets link. FleetOS will use AI to map the columns before import.
+            Upload a spreadsheet or paste a public Google Sheets link. RouteHQ will use AI to map the columns before import.
           </p>
         </div>
 

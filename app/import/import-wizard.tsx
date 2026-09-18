@@ -70,8 +70,8 @@ const fieldOptions = [
 
 type ColumnMapping = {
   source_column: string;
-  fleetos_field: string;
-  original_fleetos_field?: string;
+  routehq_field: string;
+  original_routehq_field?: string;
   confidence?: number;
   sample_values?: string[];
 };
@@ -161,7 +161,7 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
         ...sheet,
         column_mappings: sheet.column_mappings.map((mapping) => ({
           ...mapping,
-          original_fleetos_field: mapping.original_fleetos_field || mapping.fleetos_field
+          original_routehq_field: mapping.original_routehq_field || mapping.routehq_field
         }))
       }))
     );
@@ -204,14 +204,14 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
     setStatus("done");
   }
 
-  function updateMapping(sheetIndex: number, columnIndex: number, fleetosField: string) {
+  function updateMapping(sheetIndex: number, columnIndex: number, routehqField: string) {
     setMappings((current) =>
       current.map((sheet, nextSheetIndex) =>
         nextSheetIndex === sheetIndex
           ? {
               ...sheet,
               column_mappings: sheet.column_mappings.map((mapping, nextColumnIndex) =>
-                nextColumnIndex === columnIndex ? { ...mapping, fleetos_field: fleetosField } : mapping
+                nextColumnIndex === columnIndex ? { ...mapping, routehq_field: routehqField } : mapping
               )
             }
           : sheet
@@ -229,7 +229,7 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
                 nextColumnIndex === columnIndex
                   ? {
                       ...mapping,
-                      fleetos_field: shouldImport ? mapping.original_fleetos_field || mapping.fleetos_field || "notes" : "__ignore__"
+                      routehq_field: shouldImport ? mapping.original_routehq_field || mapping.routehq_field || "notes" : "__ignore__"
                     }
                   : mapping
               )
@@ -293,7 +293,7 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
               <span className="group relative inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#e6fffb] text-xs font-black text-[#0f766e]">
                 ?
                 <span className="pointer-events-none absolute bottom-7 left-1/2 z-20 hidden w-64 -translate-x-1/2 rounded-lg border border-[#d6e5e2] bg-white p-3 text-left text-xs font-semibold text-[#475467] shadow-xl group-hover:block">
-                  The Google Sheet must be public or set to anyone with the link can view. FleetOS imports all visible worksheets/tabs from the workbook.
+                  The Google Sheet must be public or set to anyone with the link can view. RouteHQ imports all visible worksheets/tabs from the workbook.
                 </span>
               </span>
             </span>
@@ -387,7 +387,7 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
                         <th className="py-2">Import</th>
                         <th className="py-2">Source column</th>
                         <th className="py-2">Map</th>
-                        <th className="py-2">FleetOS field</th>
+                        <th className="py-2">RouteHQ field</th>
                         <th className="py-2">Confidence</th>
                         <th className="py-2">Samples</th>
                       </tr>
@@ -398,12 +398,12 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
                           <td className="py-2">
                             <label className="checkbox-label inline-flex rounded-lg border border-[#d6e5e2] bg-white px-2 py-1.5 text-xs font-bold text-[#344054]">
                               <input
-                                checked={mapping.fleetos_field !== "__ignore__"}
+                                checked={mapping.routehq_field !== "__ignore__"}
                                 className="flex-shrink-0"
                                 onChange={(event) => toggleColumnImport(sheetIndex, columnIndex, event.target.checked)}
                                 type="checkbox"
                               />
-                              <span>{mapping.fleetos_field === "__ignore__" ? "Skip" : "Import"}</span>
+                              <span>{mapping.routehq_field === "__ignore__" ? "Skip" : "Import"}</span>
                             </label>
                           </td>
                           <td className="py-2 font-semibold text-[#10252b]">{mapping.source_column}</td>
@@ -411,7 +411,7 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
                             <ArrowRight size={16} />
                           </td>
                           <td className="py-2">
-                            <select className={inputClass} onChange={(event) => updateMapping(sheetIndex, columnIndex, event.target.value)} value={mapping.fleetos_field || "__ignore__"}>
+                            <select className={inputClass} onChange={(event) => updateMapping(sheetIndex, columnIndex, event.target.value)} value={mapping.routehq_field || "__ignore__"}>
                               {fieldOptions.map((field) => (
                                 <option key={field} value={field}>
                                   {field === "__ignore__" ? "Ignore" : field}

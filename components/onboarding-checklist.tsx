@@ -45,7 +45,7 @@ export function OnboardingChecklist({
           <CheckCircle2 className="text-[#16a34a]" />
           <div>
             <h2 className="font-black text-[#10252b]">Setup complete 🎉</h2>
-            <p className="text-sm text-[#667085]">FleetOS is ready for daily operations.</p>
+            <p className="text-sm text-[#667085]">RouteHQ is ready for daily operations.</p>
           </div>
         </div>
       </section>

@@ -52,19 +52,19 @@ export async function POST(request: Request) {
     sample_rows: sheet.sampleRows
   }));
 
-  const prompt = `You are a data import assistant for FleetOS, a vehicle rental management platform.
+  const prompt = `You are a data import assistant for RouteHQ, a vehicle rental management platform.
 
-A user has uploaded a spreadsheet to import their rental business data. Analyze the column headers and sample data below and map each column to the appropriate FleetOS field.
+A user has uploaded a spreadsheet to import their rental business data. Analyze the column headers and sample data below and map each column to the appropriate RouteHQ field.
 
 Requested import type: ${importType}
 
-FleetOS vehicle fields: registration_number, make, model, trim, year, color, transmission, engine_cc, fuel_type, seating_capacity, drivetrain, body_type, vin, purchase_date, purchase_price, purchase_mileage, current_mileage, estimated_value, daily_rate, weekly_rate, monthly_rate, tax_expiry_date, tax_cost, insurance_expiry_date, insurance_cost, insurance_sum_insured, porbor_expiry_date, porbor_cost, next_service_date, finance_lender, finance_monthly_payment, finance_outstanding, finance_end_date, gps_tracker_url, notes, vehicle, vehicle_name, description
+RouteHQ vehicle fields: registration_number, make, model, trim, year, color, transmission, engine_cc, fuel_type, seating_capacity, drivetrain, body_type, vin, purchase_date, purchase_price, purchase_mileage, current_mileage, estimated_value, daily_rate, weekly_rate, monthly_rate, tax_expiry_date, tax_cost, insurance_expiry_date, insurance_cost, insurance_sum_insured, porbor_expiry_date, porbor_cost, next_service_date, finance_lender, finance_monthly_payment, finance_outstanding, finance_end_date, gps_tracker_url, notes, vehicle, vehicle_name, description
 
-FleetOS customer fields: full_name, phone, email, nationality, passport_number, driving_licence_number, emergency_contact_name, emergency_contact_phone
+RouteHQ customer fields: full_name, phone, email, nationality, passport_number, driving_licence_number, emergency_contact_name, emergency_contact_phone
 
-FleetOS rental fields: vehicle_registration, customer_name, start_date, end_date, monthly_rate, deposit_amount, mileage_at_start, mileage_at_end, next_payment_date
+RouteHQ rental fields: vehicle_registration, customer_name, start_date, end_date, monthly_rate, deposit_amount, mileage_at_start, mileage_at_end, next_payment_date
 
-FleetOS transaction fields: vehicle_registration, date, type, amount, notes
+RouteHQ transaction fields: vehicle_registration, date, type, amount, notes
 
 Sheet data: ${JSON.stringify(sheetSummary)}
 
@@ -81,7 +81,7 @@ Return ONLY a JSON object. No explanation. Structure:
       "column_mappings": [
         {
           "source_column": "License Plate",
-          "fleetos_field": "registration_number",
+          "routehq_field": "registration_number",
           "confidence": 0.99,
           "sample_values": ["4ขผ8612", "ขษ5168"]
         }

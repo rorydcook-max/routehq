@@ -39,7 +39,7 @@ export default async function TrialExpiredPage() {
           <p className="text-sm font-black uppercase text-[#be123c]">Trial ended</p>
           <h1 className="mt-2 text-3xl font-black text-[#10252b]">Your trial has ended</h1>
           <p className="mt-2 max-w-2xl text-sm text-[#667085]">
-            Your FleetOS data is safe. Subscribe to continue managing your vehicles, customers, rentals, reminders, and documents.
+            Your RouteHQ data is safe. Subscribe to continue managing your vehicles, customers, rentals, reminders, and documents.
           </p>
           <div className="mt-5 grid gap-3 sm:grid-cols-3">
             {[

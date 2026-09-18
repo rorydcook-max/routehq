@@ -40,5 +40,5 @@ const server = createServer(async (request, response) => {
 });
 
 server.listen(port, () => {
-  console.log(`FleetOS prototype available at http://localhost:${port}`);
+  console.log(`RouteHQ prototype available at http://localhost:${port}`);
 });

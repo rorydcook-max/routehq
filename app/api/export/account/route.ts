@@ -71,7 +71,7 @@ export async function GET() {
   return new Response(rows.join("\n"), {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": `attachment; filename="fleetos-export-${new Date().toISOString().slice(0, 10)}.csv"`
+      "Content-Disposition": `attachment; filename="routehq-export-${new Date().toISOString().slice(0, 10)}.csv"`
     }
   });
 }

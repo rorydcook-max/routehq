@@ -1016,7 +1016,7 @@ export async function completePublicBooking(formData: FormData) {
       rental_id: bookingLink.rental_id,
       vehicle_id: bookingLink.vehicle_id,
       channel: "in_app",
-      provider: "fleetos",
+      provider: "routehq",
       locale: "en",
       status: "queued",
       recipient: organizationId,

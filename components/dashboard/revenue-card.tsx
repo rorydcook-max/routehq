@@ -1,7 +1,7 @@
 "use client";
 
-import Chart from "chart.js/auto";
-import { useEffect, useRef, useState } from "react";
+import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { useState } from "react";
 
 const thb = (value: number) =>
   new Intl.NumberFormat("th-TH", {
@@ -9,6 +9,26 @@ const thb = (value: number) =>
     currency: "THB",
     maximumFractionDigits: 0
   }).format(value);
+
+const MONTH_LABELS = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
+
+function RevenueTooltip({ active, payload }: { active?: boolean; payload?: Array<{ value?: number }> }) {
+  if (!active || !payload?.length) return null;
+  const value = Math.round(Number(payload[0]?.value ?? 0));
+  return (
+    <div
+      style={{
+        background: "rgba(10,15,25,0.95)",
+        color: "#ffffff",
+        borderRadius: 6,
+        padding: "4px 8px",
+        fontSize: 11
+      }}
+    >
+      {`\u0e3f${value.toLocaleString()}`}
+    </div>
+  );
+}
 
 export function RevenueCard({
   monthlyRevenue,
@@ -22,70 +42,11 @@ export function RevenueCard({
   monthlyPreview: Array<{ label: string; amount: number }>;
 }) {
   const [mode, setMode] = useState<"monthly" | "daily">("monthly");
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const chartRef = useRef<Chart | null>(null);
 
-  useEffect(() => {
-    if (!canvasRef.current) return;
-
-    const months = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
-    const revenueData = months.map((_, i) => {
-      const item = monthlyPreview?.[i];
-      return item?.amount || 0;
-    });
-
-    chartRef.current?.destroy();
-    chartRef.current = new Chart(canvasRef.current, {
-      type: "bar",
-      data: {
-        labels: months,
-        datasets: [
-          {
-            label: "Revenue",
-            data: revenueData,
-            backgroundColor: "rgba(94,234,212,0.65)",
-            borderRadius: 2,
-            borderSkipped: false,
-            barPercentage: 0.75,
-            categoryPercentage: 0.8
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: { mode: "index", intersect: false },
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: "rgba(10,15,25,0.95)",
-            titleColor: "rgba(255,255,255,0.5)",
-            bodyColor: "#ffffff",
-            callbacks: {
-              label: (context) => ` ฿${Math.round(Number(context.raw)).toLocaleString()}`
-            }
-          }
-        },
-        scales: {
-          x: {
-            grid: { display: false },
-            ticks: {
-              autoSkip: false,
-              color: "rgba(255,255,255,0.25)",
-              font: { size: 9 },
-              maxRotation: 0
-            }
-          },
-          y: { display: false }
-        }
-      }
-    });
-
-    return () => {
-      chartRef.current?.destroy();
-      chartRef.current = null;
-    };
-  }, [monthlyPreview]);
+  const chartData = MONTH_LABELS.map((month, i) => ({
+    month,
+    amount: monthlyPreview?.[i]?.amount || 0
+  }));
 
   const isMonthly = mode === "monthly";
 
@@ -109,8 +70,21 @@ export function RevenueCard({
       <p className="m-0 mb-2 text-[11px] text-white/35">
         {isMonthly ? `Expenses ${thb(monthlyExpenses)} this month` : "Average revenue per day this month"}
       </p>
-      <div style={{ position: "relative", height: "56px", width: "100%" }}>
-        <canvas id="revBarChart" ref={canvasRef} role="img" aria-label="12 month revenue and expenses bar chart" />
+      <div style={{ position: "relative", height: "56px", width: "100%" }} role="img" aria-label="12 month revenue and expenses bar chart">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={chartData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }} barCategoryGap="20%">
+            <XAxis
+              dataKey="month"
+              axisLine={false}
+              tickLine={false}
+              interval={0}
+              tick={{ fill: "rgba(255,255,255,0.25)", fontSize: 9 }}
+            />
+            <YAxis hide domain={[0, "auto"]} />
+            <Tooltip cursor={false} content={<RevenueTooltip />} />
+            <Bar dataKey="amount" fill="rgba(94,234,212,0.65)" radius={[2, 2, 2, 2]} maxBarSize={18} />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
       <div className="mt-1.5 flex gap-3">
         <span className="inline-flex items-center gap-1.5 text-[10px] text-white/35">

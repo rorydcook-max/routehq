@@ -31,6 +31,25 @@ export async function signInWithEmail(_state: AuthActionState, formData: FormDat
   redirect("/");
 }
 
+export async function requestPasswordReset(_state: AuthActionState, formData: FormData): Promise<AuthActionState> {
+  const email = String(formData.get("email") || "").trim();
+  const origin = String(formData.get("origin") || "");
+
+  if (!email) {
+    return { error: "Enter your email address." };
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const redirectTo = origin ? `${origin}/auth/callback?next=/reset-password` : undefined;
+  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+
+  if (error) {
+    return { success: "If an account exists for that email, a reset link has been sent." };
+  }
+
+  return { success: "If an account exists for that email, a reset link has been sent." };
+}
+
 export async function signOut() {
   const supabase = await createSupabaseServerClient();
   await supabase.auth.signOut();

@@ -8,6 +8,8 @@ export async function middleware(request: NextRequest) {
     pathname === "/login" ||
     pathname === "/onboarding" ||
     pathname === "/accept-invite" ||
+    pathname === "/forgot-password" ||
+    pathname === "/reset-password" ||
     pathname === "/book" ||
     pathname.startsWith("/book/") ||
     pathname.startsWith("/auth/callback") ||

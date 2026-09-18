@@ -24,3 +24,7 @@ Thumbs.db
 .vercel/
 
 *.tsbuildinfo
+
+.npm-cache/
+
+.claude/settings.local.json

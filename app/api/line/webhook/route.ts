@@ -26,12 +26,12 @@ export async function POST(req: NextRequest) {
     const e = event as Record<string, unknown>;
     const source = e.source as Record<string, unknown> | undefined;
     const userId = source?.userId;
+    void userId; // reserved for future follow/message event handling
 
     if (e.type === "follow") {
-      console.log("[LINE webhook] follow event — userId:", userId);
+      // TODO: handle follow event (e.g. link LINE userId to organization)
     } else if (e.type === "message") {
-      const message = e.message as Record<string, unknown> | undefined;
-      console.log("[LINE webhook] message event — userId:", userId, "message:", message);
+      // TODO: handle inbound message event
     }
   }
 

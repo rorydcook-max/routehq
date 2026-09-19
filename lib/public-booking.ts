@@ -149,10 +149,7 @@ export async function getPublicBookingDetail(token: string) {
   );
 
   const uploadedCategories = new Set((documents || []).map((document: any) => document.category));
-  const authorityMode = String(rental?.contract_authority_mode || "legacy");
-  const rentalDocumentAgreement = authorityMode === "rental_document_engine"
-    ? await loadPublicRentalAgreement(token)
-    : null;
+  const rentalDocumentAgreement = await loadPublicRentalAgreement(token);
   const executedDownloads = rentalDocumentAgreement?.eligibility?.fullyExecuted
     ? {
         originalAgreementUrl: await getCustomerExecutedAgreementDownload(token, "original").catch(() => null),
@@ -227,9 +224,7 @@ export async function getPublicBookingDetail(token: string) {
     completion: {
       details: Boolean(bookingLink.customer_details_submitted_at),
       documents: documentCategories.every((category) => uploadedCategories.has(category)),
-      agreement: authorityMode === "rental_document_engine"
-        ? Boolean(rentalDocumentAgreement?.eligibility?.fullyExecuted)
-        : bookingLink.status === "completed" || contract?.status === "signed"
+      agreement: Boolean(rentalDocumentAgreement?.eligibility?.fullyExecuted)
     },
     org_payment: organizationPaymentSettings(organization),
     customerPortalActions: portalActionsResult.data || [],
@@ -237,7 +232,6 @@ export async function getPublicBookingDetail(token: string) {
     deliveryPhotoUrls: deliveryPhotoUrls.filter(Boolean),
     contractHtml,
     signedContractUrl,
-    contractAuthorityMode: authorityMode,
     rentalDocumentAgreement,
     executedAgreementDownloads: executedDownloads
   };

@@ -306,7 +306,6 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
               outstandingBalance: Number(rental?.outstanding_balance || 0),
               currency: String(rental?.currency || "THB"),
               billingPeriod: String(rental?.billing_interval || rental?.pricing_model || "monthly"),
-              contractAuthorityMode: detail.contractAuthorityMode,
               rentalDocumentAgreement: detail.rentalDocumentAgreement,
               executedAgreementDownloads: detail.executedAgreementDownloads,
             }}

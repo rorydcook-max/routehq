@@ -51,7 +51,6 @@ type PublicBookingDetail = {
   depositAmount?: number;
   currency?: string;
   billingPeriod?: string;
-  contractAuthorityMode?: "legacy" | "rental_document_engine" | string;
   rentalDocumentAgreement?: {
     eligibility: {
       eligible: boolean;
@@ -561,7 +560,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
   const formRef = useRef<HTMLFormElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawing = useRef(false);
-  const isRentalDocumentEngine = detail.contractAuthorityMode === "rental_document_engine";
+  const isRentalDocumentEngine = true;
   const publicAgreement = detail.rentalDocumentAgreement?.agreement || null;
   const customerSigningEligibility = detail.rentalDocumentAgreement?.eligibility || null;
   const agreementHtml = publicAgreement?.renderedHtmlSnapshot || detail.contractHtml;

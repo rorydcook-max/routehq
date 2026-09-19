@@ -688,7 +688,7 @@ export async function completePublicBooking(formData: FormData) {
   const [{ data: currentRentalForAuthority }, { data: currentCustomerForSigning }] = await Promise.all([
     supabase
       .from("rentals")
-      .select("id, contract_authority_mode, vehicle_id, customer_id, rental_rate, deposit_amount, delivery_datetime, start_date, end_date, billing_interval, pricing_model, currency, upfront_periods, upfront_rate")
+      .select("id, vehicle_id, customer_id, rental_rate, deposit_amount, delivery_datetime, start_date, end_date, billing_interval, pricing_model, currency, upfront_periods, upfront_rate")
       .eq("id", bookingLink.rental_id)
       .eq("organization_id", organizationId)
       .maybeSingle(),
@@ -700,7 +700,7 @@ export async function completePublicBooking(formData: FormData) {
       .maybeSingle()
   ]);
 
-  if (currentRentalForAuthority?.contract_authority_mode === "rental_document_engine") {
+  if (currentRentalForAuthority) {
     if (customerDocumentStatus !== "complete") {
       throw new Error("Please upload passport, driving licence and selfie documents before signing.");
     }

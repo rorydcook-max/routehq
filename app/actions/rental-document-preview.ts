@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 import { calculateFinalRentalDocumentContentHash, finaliseDocumentVersionWithRpc } from "@/lib/rental-document-finalisation-service";
 import { getDocumentFinalisationEligibility, type DocumentFinalisationEligibility } from "@/lib/rental-document-finalisation";
-import { isRentalDocumentEngineEnabledForOrganization } from "@/lib/rental-document-feature";
 import {
   buildRentalDocumentPdfPath,
   createRentalDocumentSignedUrl,
@@ -86,12 +85,6 @@ async function requireOperatorContext(supabase: any) {
   if (organizationError || !organization) {
     const failure = new Error(organizationError?.message || "Organization was not found.");
     failure.name = "wrong_organisation";
-    throw failure;
-  }
-
-  if (!isRentalDocumentEngineEnabledForOrganization(organization)) {
-    const failure = new Error("The experimental rental document engine is not enabled for this organization.");
-    failure.name = "feature_disabled";
     throw failure;
   }
 

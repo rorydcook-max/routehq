@@ -45,20 +45,8 @@ function settingsObject(value: unknown) {
   return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
 }
 
-function allowlistFromEnv() {
-  return String(process.env.RENTAL_DOCUMENT_CUSTOMER_SIGNING_ORG_IDS || process.env.ROUTEHQ_RENTAL_DOCUMENT_CUSTOMER_SIGNING_ORG_IDS || "")
-    .split(",")
-    .map((entry) => entry.trim())
-    .filter(Boolean);
-}
-
 export function isRentalDocumentCustomerSigningEnabledForOrganization(organization: any) {
-  if (!organization?.id) return false;
-  const settings = settingsObject(organization.settings);
-  const engineEnabled = settings.rental_document_engine_enabled === true || settings.experimental_rental_document_engine_enabled === true;
-  const signingEnabled = settings.rental_document_customer_signing_enabled === true;
-  const allowlisted = allowlistFromEnv().includes(organization.id) || settings.phase10_customer_signing_qa === true || settings.phase7_qa === true;
-  return engineEnabled && signingEnabled && allowlisted;
+  return Boolean(organization?.id);
 }
 
 function hashFragment(hash: string | null | undefined) {
@@ -205,7 +193,6 @@ export async function getCustomerSigningEligibility(token: string) {
   if (bookingLink.status === "cancelled") blockingIssues.push("booking_cancelled");
   if (bookingLink.status === "expired" || (bookingLink.expires_at && new Date(bookingLink.expires_at).getTime() < Date.now())) blockingIssues.push("booking_expired");
   if (!isRentalDocumentCustomerSigningEnabledForOrganization(organization)) blockingIssues.push("customer_signing_feature_disabled");
-  if (rental?.contract_authority_mode !== "rental_document_engine") blockingIssues.push("authority_mode_not_rental_document_engine");
   if (!document) blockingIssues.push("missing_rental_agreement_document");
   if (document && ["voided", "superseded"].includes(String(document.status))) blockingIssues.push("document_not_current");
   if (!version) blockingIssues.push("missing_current_version");

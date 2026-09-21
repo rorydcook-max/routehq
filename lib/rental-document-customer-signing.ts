@@ -4,6 +4,7 @@ import { buildContractVariables } from "@/lib/contract-rendering";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createRentalDocumentSignedUrl } from "@/lib/rental-document-storage";
 import { recordActivityEventOnce } from "@/lib/supabase/activity";
+import { emailExecutedDocumentToCustomer } from "@/lib/rental-document-email";
 
 export const CUSTOMER_SIGNING_ACKNOWLEDGEMENTS = [
   {
@@ -459,6 +460,29 @@ export async function completeRentalDocumentCustomerSigning({
     detail: `${normalizedSigner} signed rental agreement version ${ctx.version.version_number}.`,
     metadata: { document_id: ctx.document.id, version_id: ctx.version.id, verification_reference: verificationReference }
   }, `rental_document_fully_executed:${ctx.version.id}`);
+
+  const businessSnapshot = settingsObject(ctx.version.business_snapshot);
+  await emailExecutedDocumentToCustomer({
+    supabase: ctx.supabase,
+    organizationId: ctx.bookingLink.organization_id,
+    rentalId: ctx.rental.id,
+    vehicleId: ctx.rental.vehicle_id,
+    customerId: ctx.rental.customer_id,
+    documentId: ctx.document.id,
+    versionId: ctx.version.id,
+    documentLabel: "Rental agreement",
+    recipientEmail: ctx.customer?.email,
+    recipientName: stringValue(ctx.customer?.full_name),
+    businessName: stringValue(businessSnapshot.trading_name || businessSnapshot.legal_name),
+    files: [
+      {
+        bucket: ctx.version.final_pdf_storage_bucket || ctx.version.pdf_storage_bucket,
+        path: ctx.version.final_pdf_storage_path || ctx.version.pdf_storage_path,
+        filename: "rental-agreement.pdf"
+      },
+      { bucket: "documents", path: certPath, filename: "execution-certificate.pdf" }
+    ]
+  });
 
   return row;
 }

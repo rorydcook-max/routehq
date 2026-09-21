@@ -44,7 +44,12 @@ export function LoginForm() {
           "Sign in"
         )}
       </button>
-      <p className="text-center text-xs text-[#667085]">Accounts are created by invitation only.</p>
+      <p className="text-center text-sm text-[#667085]">
+        New to RouteHQ?{" "}
+        <a className="font-semibold text-[#0f766e]" href="/signup">
+          Create an account
+        </a>
+      </p>
     </form>
   );
 }

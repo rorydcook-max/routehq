@@ -6,6 +6,7 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const isPublicRoute =
     pathname === "/login" ||
+    pathname === "/signup" ||
     pathname === "/onboarding" ||
     pathname === "/accept-invite" ||
     pathname === "/forgot-password" ||
@@ -65,7 +66,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  if (user && pathname === "/login") {
+  if (user && (pathname === "/login" || pathname === "/signup")) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
@@ -77,6 +78,15 @@ export async function middleware(request: NextRequest) {
       .eq("is_active", true)
       .limit(1)
       .maybeSingle();
+
+    // A signed-in user with no organisation has nothing behind the dashboard:
+    // send them to set one up rather than letting pages fall back to a default.
+    if (!membership?.organization_id) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/onboarding";
+      redirectUrl.search = "";
+      return NextResponse.redirect(redirectUrl);
+    }
 
     if (membership?.organization_id) {
       const { data: organization } = await (supabase as any)

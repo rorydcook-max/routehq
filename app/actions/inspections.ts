@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { applyDepositDeduction, returnDeposit } from "@/app/actions/deposits";
 import { activateRental } from "@/lib/rental-activation";
+import { finaliseInspectionReport } from "@/lib/inspection-report";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { notifyOperator } from "@/lib/notify-operator";
@@ -540,6 +541,26 @@ export async function submitInspection(formData: FormData) {
         ? `${customerName} returned ${vehicleLabel}. ${odometerReading.toLocaleString()} km recorded.`
         : `${vehicleLabel} inspected for ${customerName}. ${odometerReading.toLocaleString()} km recorded.`
   });
+
+  if ((mode === "delivery" || mode === "return") && rentalId && customerSignature) {
+    await finaliseInspectionReport({
+      supabase,
+      organizationId,
+      inspectionId: inspection.id,
+      rentalId,
+      vehicleId,
+      customerId,
+      mode,
+      inspectedAt: now,
+      odometerReading,
+      fuelLevel,
+      fuelLevelLabel,
+      damageItems: media.damageWithPhotos,
+      notes,
+      customerSignature,
+      customerSignedName
+    });
+  }
 
   if (mode === "return") {
     notifyOperator(

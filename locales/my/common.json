@@ -140,5 +140,32 @@
     "areaRearLeft": "နောက်ဘယ်",
     "areaRearRight": "နောက်ညာ",
     "areaInterior": "ကားအတွင်း"
+  },
+  "dashboard": {
+    "title": "လုပ်ငန်းစီမံခန့်ခွဲမှုဗဟို",
+    "monthlyRevenue": "လစဉ်ဝင်ငွေ",
+    "outstanding": "ကျန်ရှိသော",
+    "fleetProfit": "ယာဉ်အစုအဖွဲ့အမြတ်",
+    "highAlerts": "အရေးကြီးသတိပေးချက်များ"
+  },
+  "vehicles": {
+    "addVehicle": "ယာဉ်အသစ်ထည့်ပါ",
+    "fleetIntelligence": "ယာဉ်အုပ်စုဗဟုသုတ"
+  },
+  "actions": {
+    "addBooking": "ဘွတ်ကင်အသစ်ထည့်ပါ",
+    "addTransaction": "ငွေစာရင်းထည့်ပါ",
+    "completeTask": "တာဝန်ပြီးစီးပါ"
+  },
+  "settings": {
+    "contractsBranding": {
+      "title": "စာချုပ်များနှင့် အမှတ်တံဆိပ်",
+      "businessIdentity": "လုပ်ငန်းအမှတ်အသား",
+      "documentBranding": "စာရွက်စာတမ်း အမှတ်တံဆိပ်",
+      "authorisedSignatory": "ခွင့်ပြုထားသော လက်မှတ်ရေးထိုးသူ",
+      "signatureAuthorisation": "ဤ RouteHQ အကောင့်ကို အသုံးပြုသည့် ခွင့်ပြုထားသော အသုံးပြုသူများမှ ထုတ်ပြန်သော ငှားရမ်းရေးစာချုပ်များနှင့် ဆက်စပ်စာရွက်စာတမ်းများတွင် ဤ အီလက်ထရောနစ် လက်မှတ်ကို အသုံးပြုရန် ကျွန်ုပ် ခွင့်ပြုပါသည်။",
+      "previewTitle": "ငှားရမ်းရေးစာချုပ် ကြိုတင်ကြည့်ရှုမှု",
+      "poweredBy": "RouteHQ မှ အားဖြည့်ထားသည်"
+    }
   }
 }

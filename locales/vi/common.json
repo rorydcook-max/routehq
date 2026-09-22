@@ -158,5 +158,14 @@
     "areaRearLeft": "Sau bên trái",
     "areaRearRight": "Sau bên phải",
     "areaInterior": "Nội thất"
+  },
+  "vehicles": {
+    "addVehicle": "Thêm xe mới",
+    "fleetIntelligence": "Thông tin đội xe"
+  },
+  "actions": {
+    "addBooking": "Thêm Đặt Chỗ Mới",
+    "addTransaction": "Thêm Giao Dịch",
+    "completeTask": "Hoàn Thành Nhiệm Vụ"
   }
 }

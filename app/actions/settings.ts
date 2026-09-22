@@ -39,10 +39,12 @@ export async function updatePreferredLocale(formData: FormData) {
     throw new Error("You must be signed in.");
   }
 
+  // Personal preference only: it changes nothing for the business or anyone
+  // else, so every role may set it. Only these two columns are written, so an
+  // existing name on the profile is never overwritten.
   const admin = createSupabaseAdminClient() as any;
   const { error } = await admin.from("users").upsert({
     id: user.id,
-    full_name: user.user_metadata?.full_name ?? null,
     preferred_locale: preferredLocale,
     preferred_calendar: preferredCalendar
   });
@@ -51,6 +53,7 @@ export async function updatePreferredLocale(formData: FormData) {
     throw new Error(error.message);
   }
 
+  revalidatePath("/account");
   revalidatePath("/settings");
 }
 

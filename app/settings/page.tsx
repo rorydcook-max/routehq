@@ -10,7 +10,6 @@ import {
   researchVehicleCatalogSubmission,
   rejectVehicleCatalogSubmission,
   updateLineSettings,
-  updatePreferredLocale,
   updateUpfrontDiscountSettings
 } from "@/app/actions/settings";
 import { BranchList } from "@/app/settings/branch-list";
@@ -26,8 +25,6 @@ import { Badge, Card, SectionHeader } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
 import { ensureDefaultBranch } from "@/lib/branches";
-import { defaultCalendarForLocale, supportedCalendarOptions } from "@/lib/i18n/calendars";
-import { supportedLocaleOptions } from "@/lib/i18n/locales";
 import { getDefaultOrganization, getTravelPolicySettings, getVehicleCategories } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -208,39 +205,19 @@ export default async function SettingsPage() {
       <div className="page-hero mb-5">
         <p className="page-eyebrow">Settings</p>
         <h1 className="page-title">Account and organization</h1>
-        <p className="page-subtitle mt-2">Manage language, locations, billing, contracts, team access, and catalog curation.</p>
+        <p className="page-subtitle mt-2">Manage locations, billing, contracts, team access, and catalog curation.</p>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
-          <SectionHeader eyebrow="Profile" title="Language preference" />
+          <SectionHeader eyebrow="Profile" title="Your language" />
           <div className="card-section">
-          <p className="text-xs text-[#667085]">Set the user language and calendar used for date fields across the app.</p>
-          <form action={updatePreferredLocale} className="mt-3 space-y-3">
-            <label className="block">
-              <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Preferred language</span>
-              <select className={inputClass} defaultValue={profile?.preferred_locale || "en"} name="preferredLocale">
-                {supportedLocaleOptions.map((locale) => (
-                  <option key={locale.code} value={locale.code}>
-                    {locale.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="block">
-              <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Calendar</span>
-              <select className={inputClass} defaultValue={profile?.preferred_calendar || defaultCalendarForLocale(profile?.preferred_locale || organization.default_locale)} name="preferredCalendar">
-                {supportedCalendarOptions.map((calendar) => (
-                  <option key={calendar.code} value={calendar.code}>
-                    {calendar.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <PendingButton className="primary-action w-full" pendingLabel="Saving..." type="submit">
-              Save preferences
-            </PendingButton>
-          </form>
+            <p className="text-xs text-[#667085]">
+              Language and calendar are personal, so each person in your business sets their own in My account.
+            </p>
+            <Link className="mt-3 inline-block text-sm font-bold text-[var(--primary)]" href="/account">
+              Open My account
+            </Link>
           </div>
         </Card>
 
@@ -677,7 +654,7 @@ export default async function SettingsPage() {
         </Card>
 
         <Card>
-          <SectionHeader eyebrow="Invite" title="Add owner user" />
+          <SectionHeader eyebrow="Invite" title="Invite a team member" />
           <p className="mt-2 text-xs text-[#667085]">For v1, invited users receive full owner-level access.</p>
           <div className="mt-3">
             <InviteForm />

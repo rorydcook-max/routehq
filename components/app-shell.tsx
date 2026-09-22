@@ -114,7 +114,12 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
         </nav>
         {userEmail ? (
           <div className="mt-4 rounded-2xl border border-white/10 bg-[var(--sidebar-darker)]/70 p-3">
-            <p className="truncate text-xs font-semibold text-[var(--sidebar-text-muted)]">{userEmail}</p>
+            <Link className="block truncate text-xs font-semibold text-[var(--sidebar-text-muted)] hover:text-white" href="/account">
+              {userEmail}
+            </Link>
+            <Link className="mt-1 block text-[11px] font-bold text-[var(--sidebar-text)] hover:text-white" href="/account">
+              My account
+            </Link>
             <form action={signOut} className="mt-3">
               <PendingButton className="inline-flex w-full items-center justify-center rounded-xl bg-white/10 px-3 py-2 text-xs font-bold text-white hover:bg-white/15" pendingLabel="" type="submit">
                 Sign out
@@ -127,9 +132,12 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
       <main className="content-area mx-auto lg:ml-[220px] lg:max-w-none">
         {userEmail ? (
           <div className="mb-4 flex items-center justify-end gap-2 lg:hidden">
-            <span className="max-w-[180px] truncate rounded-full border border-[var(--border)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--foreground-secondary)] shadow-sm sm:max-w-none">
+            <Link
+              className="max-w-[180px] truncate rounded-full border border-[var(--border)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--foreground-secondary)] shadow-sm sm:max-w-none"
+              href="/account"
+            >
               {userEmail}
-            </span>
+            </Link>
             <form action={signOut}>
               <PendingButton className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[var(--sidebar-bg)] px-3 py-1.5 text-xs font-bold text-white" pendingLabel="" type="submit">
                 Sign out

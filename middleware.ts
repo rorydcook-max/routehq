@@ -73,7 +73,7 @@ export async function middleware(request: NextRequest) {
   if (user && !isOnboardingAllowedRoute) {
     const { data: membership } = await (supabase as any)
       .from("organization_members")
-      .select("organization_id")
+      .select("organization_id, role")
       .eq("user_id", user.id)
       .eq("is_active", true)
       .limit(1)
@@ -85,6 +85,16 @@ export async function middleware(request: NextRequest) {
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = "/onboarding";
       redirectUrl.search = "";
+      return NextResponse.redirect(redirectUrl);
+    }
+
+    // Business settings and team management are owner-only. The server actions
+    // enforce this too; this just keeps teammates off pages they cannot use.
+    const isOwnerOnlyRoute = pathname === "/settings" || pathname.startsWith("/settings/") || pathname === "/invite";
+    if (isOwnerOnlyRoute && membership.role !== "owner") {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/";
+      redirectUrl.search = "?notice=owner-only";
       return NextResponse.redirect(redirectUrl);
     }
 

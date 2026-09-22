@@ -4,8 +4,8 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { supportedLocaleCodes } from "@/lib/i18n/locales";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { getDefaultOrganizationSlug } from "@/lib/supabase/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { dbRoleFromApp, getCurrentMembership, OWNER_ONLY_MESSAGE, requireOwner, type AppRole } from "@/lib/auth/roles";
 
 export type AuthActionState = {
   error?: string;
@@ -55,6 +55,12 @@ export async function signOut() {
   const supabase = await createSupabaseServerClient();
   await supabase.auth.signOut();
   redirect("/login");
+}
+
+/** Used by the app shell to decide which navigation to show. Display only - access is enforced on the server. */
+export async function getMyAppRole(): Promise<AppRole | null> {
+  const membership = await getCurrentMembership();
+  return membership?.role ?? null;
 }
 
 async function requestOrigin() {
@@ -139,32 +145,27 @@ export async function createMyOrganization(_state: AuthActionState, formData: Fo
 export async function inviteUser(_state: AuthActionState, formData: FormData): Promise<AuthActionState> {
   const email = String(formData.get("email") || "").trim().toLowerCase();
   const preferredLocale = localeFromForm(formData);
-  const origin = String(formData.get("origin") || "");
+  const role: AppRole = formData.get("role") === "owner" ? "owner" : "teammate";
 
   if (!email) {
     return { error: "Enter an email address." };
   }
 
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { error: "You must be signed in to invite a user." };
+  // Only owners manage the team, and invitees always join the inviter's own
+  // business - never a fixed default organisation.
+  let inviter;
+  try {
+    inviter = await requireOwner();
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : OWNER_ONLY_MESSAGE };
   }
 
+  if (inviter.email && inviter.email.toLowerCase() === email) {
+    return { error: "You are already a member of this business." };
+  }
+
+  const origin = await requestOrigin();
   const admin = createSupabaseAdminClient() as any;
-  const { data: organization, error: organizationError } = await admin
-    .from("organizations")
-    .select("id")
-    .eq("slug", getDefaultOrganizationSlug())
-    .single();
-
-  if (organizationError || !organization) {
-    return { error: organizationError?.message || "Default organization was not found." };
-  }
-
   const redirectTo = origin ? `${origin}/auth/callback?next=/accept-invite` : undefined;
   const { data, error } = await admin.auth.admin.inviteUserByEmail(email, {
     redirectTo,
@@ -174,7 +175,14 @@ export async function inviteUser(_state: AuthActionState, formData: FormData): P
   });
 
   if (error || !data.user) {
-    return { error: error?.message || "Unable to send invite." };
+    const message = error?.message || "";
+    if (/already been registered|already registered|already exists/i.test(message)) {
+      return {
+        error:
+          "That email already has a RouteHQ account. Adding an existing account to a second business is not supported yet."
+      };
+    }
+    return { error: message || "Unable to send invite." };
   }
 
   await admin.from("users").upsert({
@@ -182,15 +190,23 @@ export async function inviteUser(_state: AuthActionState, formData: FormData): P
     preferred_locale: preferredLocale
   });
 
-  await admin.from("organization_members").upsert({
-    organization_id: organization.id,
-    user_id: data.user.id,
-    role: "owner",
-    invited_email: email,
-    is_active: true
-  });
+  const { error: memberError } = await admin.from("organization_members").upsert(
+    {
+      organization_id: inviter.organizationId,
+      user_id: data.user.id,
+      role: dbRoleFromApp(role),
+      invited_email: email,
+      is_active: true
+    },
+    { onConflict: "organization_id,user_id" }
+  );
 
-  return { success: `Invite sent to ${email}.` };
+  if (memberError) {
+    return { error: memberError.message };
+  }
+
+  const label = role === "owner" ? "an owner" : "a teammate";
+  return { success: `Invite sent to ${email} as ${label}.` };
 }
 
 export async function completeInvite(_state: AuthActionState, formData: FormData): Promise<AuthActionState> {

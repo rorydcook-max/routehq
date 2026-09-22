@@ -15,8 +15,8 @@ import {
 import Link from "next/link";
 import type { Route } from "next";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
-import { signOut } from "@/app/actions/auth";
+import { useEffect, useState } from "react";
+import { getMyAppRole, signOut } from "@/app/actions/auth";
 import { RouteHqLogo } from "@/components/brand-logo";
 import { FastActionSheet } from "@/components/fast-action-sheet";
 import { PendingButton } from "@/components/pending-button";
@@ -48,6 +48,22 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
   const [fastActionOpen, setFastActionOpen] = useState(false);
   const pathname = usePathname();
 
+  // Teammates cannot use business settings, so the link is hidden for them.
+  // Display only: the middleware and server actions enforce the rule.
+  const [isTeammate, setIsTeammate] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    getMyAppRole()
+      .then((role) => {
+        if (!cancelled) setIsTeammate(role === "teammate");
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  const visibleMainNavItems = isTeammate ? mainNavItems.filter((item) => item.href !== "/settings") : mainNavItems;
+
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
   return (
@@ -58,7 +74,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
         </div>
         <nav className="flex-1 space-y-1">
           <p className="mb-2 px-3 text-[11px] font-black uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]">Main</p>
-          {mainNavItems.map((item) => {
+          {visibleMainNavItems.map((item) => {
             const Icon = item.icon;
             return (
               <Link
@@ -127,7 +143,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
 
       <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] lg:hidden">
         <div className="grid grid-cols-5 px-2 py-2">
-          {mainNavItems.map((item) => {
+          {visibleMainNavItems.map((item) => {
             const Icon = item.icon;
             return (
               <Link

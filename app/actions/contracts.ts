@@ -5,6 +5,7 @@ import { defaultRentalContractTemplate, ensureDefaultContractTemplate } from "@/
 import { htmlToPdf } from "@/lib/html-to-pdf";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { requireOwner } from "@/lib/auth/roles";
 
 function requiredString(formData: FormData, key: string) {
   const value = String(formData.get(key) || "").trim();
@@ -15,6 +16,7 @@ function requiredString(formData: FormData, key: string) {
 }
 
 export async function saveContractTemplate(formData: FormData) {
+  await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -60,6 +62,7 @@ export async function saveContractTemplate(formData: FormData) {
 }
 
 export async function resetContractTemplate(formData: FormData) {
+  await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }

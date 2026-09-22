@@ -12,6 +12,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getDefaultOrganizationSlug } from "@/lib/supabase/config";
 import { jurisdictionByCountry, mergeTravelPolicySettings, type HomeTerritoryType, type IslandTravelPolicy } from "@/lib/travel-policy";
 import { buildDailySummaryMessage, sendLineMessage } from "@/services/messaging/line";
+import { requireOwner } from "@/lib/auth/roles";
 
 const supportedLocales = new Set<string>(supportedLocaleCodes);
 const supportedCalendars = new Set<string>(supportedCalendarCodes);
@@ -203,6 +204,7 @@ function parseAcceptedPaymentMethods(formData: FormData) {
 }
 
 export async function updatePaymentSettings(formData: FormData) {
+  await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -305,6 +307,7 @@ export async function updatePaymentSettings(formData: FormData) {
 }
 
 export async function updateUpfrontDiscountSettings(formData: FormData) {
+  await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -349,6 +352,7 @@ export async function updateUpfrontDiscountSettings(formData: FormData) {
 }
 
 export async function updateBusinessLogo(formData: FormData) {
+  await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
   const { user, organizationId } = await requireActiveOrganizationMembership(supabase);
 
@@ -453,6 +457,7 @@ export async function updateBusinessLogo(formData: FormData) {
 }
 
 export async function updateOwnerSignature(formData: FormData) {
+  await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
   const { user, organizationId } = await requireActiveOrganizationMembership(supabase);
 
@@ -568,6 +573,7 @@ export async function updateOwnerSignature(formData: FormData) {
 }
 
 export async function updateContractBrandingSettings(formData: FormData) {
+  await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
   const { user, organizationId } = await requireActiveOrganizationMembership(supabase);
 
@@ -654,6 +660,7 @@ export async function updateContractBrandingSettings(formData: FormData) {
 }
 
 export async function updateTravelPolicySettings(formData: FormData) {
+  await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -724,6 +731,7 @@ export async function updateTravelPolicySettings(formData: FormData) {
 }
 
 export async function createBranch(formData: FormData) {
+  await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -761,6 +769,7 @@ export async function createBranch(formData: FormData) {
 }
 
 export async function updateBranch(formData: FormData) {
+  await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -801,6 +810,7 @@ export async function updateBranch(formData: FormData) {
 }
 
 export async function deleteBranch(formData: FormData) {
+  await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -1048,6 +1058,7 @@ async function findOrCreateModel(supabase: any, makeId: string, name: string, ca
 }
 
 export async function approveVehicleCatalogSubmission(formData: FormData) {
+  await requireOwner();
   const { supabase, user } = await requirePlatformAdmin();
   const submissionId = String(formData.get("submissionId") || "");
   const curatorNotes = optionalStringFromForm(formData, "curatorNotes");
@@ -1204,6 +1215,7 @@ function optionalStringFromCandidate(value: unknown) {
 }
 
 export async function mergeVehicleCatalogResearch(formData: FormData) {
+  await requireOwner();
   const { supabase, user } = await requirePlatformAdmin();
   const submissionId = String(formData.get("submissionId") || "");
 
@@ -1255,6 +1267,7 @@ export async function mergeVehicleCatalogResearch(formData: FormData) {
 }
 
 export async function rejectVehicleCatalogSubmission(formData: FormData) {
+  await requireOwner();
   const { supabase } = await requirePlatformAdmin();
   const submissionId = String(formData.get("submissionId") || "");
 
@@ -1278,6 +1291,7 @@ export async function rejectVehicleCatalogSubmission(formData: FormData) {
 }
 
 export async function researchVehicleCatalogSubmission(formData: FormData) {
+  await requireOwner();
   const { supabase, user } = await requirePlatformAdmin();
   const submissionId = String(formData.get("submissionId") || "");
 
@@ -1436,6 +1450,7 @@ const NOTIFICATION_KEYS = [
 ] as const;
 
 export async function saveNotificationSettings(formData: FormData) {
+  await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -1485,6 +1500,7 @@ export async function saveNotificationSettings(formData: FormData) {
 }
 
 export async function updateLineSettings(formData: FormData) {
+  await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -1518,6 +1534,7 @@ export async function updateLineSettings(formData: FormData) {
 }
 
 export async function disconnectLine(formData: FormData) {
+  await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -1544,6 +1561,7 @@ export async function disconnectLine(formData: FormData) {
 }
 
 export async function sendTestLineSummary(): Promise<{ success: boolean; message: string }> {
+  await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }

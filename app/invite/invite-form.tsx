@@ -3,16 +3,15 @@
 import { useActionState } from "react";
 import { inviteUser, type AuthActionState } from "@/app/actions/auth";
 import { supportedLocaleOptions } from "@/lib/i18n/locales";
+import { APP_ROLES } from "@/lib/auth/role-types";
 
 const initialState: AuthActionState = {};
 
 export function InviteForm() {
   const [state, formAction, pending] = useActionState(inviteUser, initialState);
-  const origin = typeof window !== "undefined" ? window.location.origin : "";
 
   return (
     <form action={formAction} className="space-y-4">
-      <input name="origin" type="hidden" value={origin} />
       <label className="block">
         <span className="text-sm font-semibold text-[#344054]">Email</span>
         <input
@@ -23,6 +22,23 @@ export function InviteForm() {
           required
         />
       </label>
+      <fieldset className="block">
+        <legend className="text-sm font-semibold text-[#344054]">Role</legend>
+        <div className="mt-1 space-y-2">
+          {APP_ROLES.map((role) => (
+            <label
+              className="flex cursor-pointer items-start gap-3 rounded-lg border border-[#d6e5e2] bg-white px-3 py-3 has-[:checked]:border-[#0f766e] has-[:checked]:bg-[#f0fdfa]"
+              key={role.value}
+            >
+              <input className="mt-1" defaultChecked={role.value === "teammate"} name="role" type="radio" value={role.value} />
+              <span>
+                <span className="block text-sm font-bold text-[#10252b]">{role.label}</span>
+                <span className="block text-xs text-[#667085]">{role.description}</span>
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
       <label className="block">
         <span className="text-sm font-semibold text-[#344054]">Default language</span>
         <select

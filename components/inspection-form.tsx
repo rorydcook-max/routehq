@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import type { Route } from "next";
@@ -166,6 +167,7 @@ function FuelGauge({
   value: number | null;
   onChange: (value: number, label: string) => void;
 }) {
+  const t = useTranslations("inspection");
   const displayValue = value ?? 50;
   const setValue = (nextValue: number) => {
     const safeValue = Math.max(0, Math.min(100, Math.round(nextValue)));
@@ -176,8 +178,8 @@ function FuelGauge({
     <div className="rounded-xl border border-[#d6e5e2] bg-white p-4">
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-black text-[#10252b]">Fuel percentage</p>
-          <p className="mt-1 text-xs font-semibold text-[#667085]">Drag the slider to match the gauge photo.</p>
+          <p className="text-sm font-black text-[#10252b]">{t("fuelPercentage")}</p>
+          <p className="mt-1 text-xs font-semibold text-[#667085]">{t("fuelHint")}</p>
         </div>
         <span className="rounded-full bg-[#e6fffb] px-4 py-2 text-lg font-black text-[#0f766e]">
           {value === null ? "Not set" : `${value}%`}
@@ -187,7 +189,7 @@ function FuelGauge({
         <div className="h-full rounded-full bg-[#0f766e] transition-all" style={{ width: `${value ?? 0}%` }} />
       </div>
       <input
-        aria-label="Fuel percentage full"
+        aria-label={t("fuelPercentageFull")}
         className="h-12 w-full cursor-pointer accent-[#0f766e]"
         max="100"
         min="0"
@@ -197,18 +199,18 @@ function FuelGauge({
         value={displayValue}
       />
       <div className="mt-1 flex justify-between text-xs font-bold text-[#667085]">
-        <span>Empty</span>
+        <span>{t("empty")}</span>
         <span>25%</span>
         <span>50%</span>
         <span>75%</span>
-        <span>Full</span>
+        <span>{t("full")}</span>
       </div>
       <div className="mt-4 grid grid-cols-[auto_1fr_auto] items-center gap-3">
         <button className={`${touchButton} border border-[#d6e5e2] bg-white text-[#344054]`} onClick={() => setValue((value ?? displayValue) - 5)} type="button">
           -5%
         </button>
         <input
-          aria-label="Exact fuel percentage"
+          aria-label={t("exactFuelPercentage")}
           className="w-full rounded-lg border border-[#c9dbd7] bg-white px-3 py-3 text-center text-base font-black text-[#10252b] outline-none focus:border-[#0f766e] focus:ring-2 focus:ring-[#0f766e]/15"
           inputMode="numeric"
           max="100"
@@ -216,7 +218,7 @@ function FuelGauge({
           onChange={(event) => setValue(Number(event.target.value || 0))}
           type="number"
           value={value ?? ""}
-          placeholder="Exact %"
+          placeholder={t("exactPercent")}
         />
         <button className={`${touchButton} border border-[#d6e5e2] bg-white text-[#344054]`} onClick={() => setValue((value ?? displayValue) + 5)} type="button">
           +5%
@@ -227,6 +229,7 @@ function FuelGauge({
 }
 
 function VehicleDiagram({ onSelect }: { onSelect: (location: string) => void }) {
+  const t = useTranslations("inspection");
   const areas = [
     { key: "front", label: "Front", className: "left-[34%] top-[4%] w-[32%] h-[18%]" },
     { key: "rear", label: "Rear", className: "left-[34%] bottom-[4%] w-[32%] h-[18%]" },
@@ -239,7 +242,7 @@ function VehicleDiagram({ onSelect }: { onSelect: (location: string) => void }) 
 
   return (
     <div className="relative mx-auto aspect-[3/4] max-h-[420px] max-w-sm rounded-xl border border-[#d6e5e2] bg-white p-4">
-      <svg className="h-full w-full text-[#0f766e]" viewBox="0 0 180 260" role="img" aria-label="Top down vehicle diagram">
+      <svg className="h-full w-full text-[#0f766e]" viewBox="0 0 180 260" role="img" aria-label={t("vehicleDiagram")}>
         <rect x="50" y="18" width="80" height="224" rx="35" fill="#e6fffb" stroke="currentColor" strokeWidth="3" />
         <rect x="64" y="58" width="52" height="42" rx="10" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
         <rect x="62" y="112" width="56" height="56" rx="14" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
@@ -271,6 +274,7 @@ function SignaturePad({
   value: string;
   onChange: (value: string) => void;
 }) {
+  const t = useTranslations("inspection");
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const drawing = useRef(false);
 
@@ -339,7 +343,7 @@ function SignaturePad({
           }}
           type="button"
         >
-          Clear
+          {t("clear")}
         </button>
       </div>
     </div>
@@ -347,6 +351,7 @@ function SignaturePad({
 }
 
 export function InspectionForm({ context }: { context: InspectionContext }) {
+  const t = useTranslations("inspection");
   const mode = context.mode;
   const depositAlreadyReturned = mode === "return" && context.rental?.deposit_status === "fully_returned";
   const steps = mode === "return" ? (depositAlreadyReturned ? returnSteps.filter((item) => item !== "Deposit") : returnSteps) : mode === "condition_report" ? conditionSteps : deliverySteps;
@@ -575,7 +580,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
           type="button"
         >
           <ChevronLeft size={18} />
-          Back
+          {t("back")}
         </button>
         {step < steps.length - 1 ? (
           <button
@@ -584,7 +589,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
             onClick={() => setStep((current) => Math.min(steps.length - 1, current + 1))}
             type="button"
           >
-            Next
+            {t("next")}
             <ChevronRight size={18} />
           </button>
         ) : (
@@ -660,10 +665,10 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
       ) : null}
 
       {step === 1 ? (
-        <StepShell eyebrow="Odometer" title="Take a photo of the odometer">
+        <StepShell eyebrow="Odometer" title={t("odometerPhoto")}>
           <FileCapture
             accept="image/*"
-            label="Open camera for odometer"
+            label={t("odometerCamera")}
             name="photo_odometer"
             onSelected={(file) => {
               setOdometerPhotoCaptured(true);
@@ -677,22 +682,22 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
             </p>
           ) : null}
           <label className="mt-4 block">
-            <span className="text-sm font-black text-[#10252b]">Confirm odometer reading (km)</span>
-            <input className={inputClass} inputMode="numeric" min="0" onChange={(event) => setOdometer(event.target.value)} placeholder="e.g. 90124" type="number" value={odometer} />
+            <span className="text-sm font-black text-[#10252b]">{t("confirmOdometer")}</span>
+            <input className={inputClass} inputMode="numeric" min="0" onChange={(event) => setOdometer(event.target.value)} placeholder={t("odometerExample")} type="number" value={odometer} />
           </label>
           {mode === "return" && odometer ? (
             <p className="mt-3 rounded-lg bg-white p-3 text-sm font-black text-[#10252b]">
               <span className="font-mono-data">Driven during rental: {Math.max(0, Number(odometer || 0) - Number(context.rental?.mileage_at_delivery || 0)).toLocaleString()} km</span>
             </p>
           ) : (
-            <p className="mt-3 text-sm text-[#667085]">This will update the vehicle&apos;s current mileage if it is the latest reading.</p>
+            <p className="mt-3 text-sm text-[#667085]">{t("odometerUpdatesMileage")}</p>
           )}
         </StepShell>
       ) : null}
 
       {step === 2 ? (
-        <StepShell eyebrow="Fuel level" title="Take a photo of the fuel gauge">
-          <FileCapture accept="image/*" label="Open camera for fuel gauge" name="photo_fuel" onSelected={() => setFuelPhotoCaptured(true)} />
+        <StepShell eyebrow="Fuel level" title={t("fuelPhoto")}>
+          <FileCapture accept="image/*" label={t("fuelCamera")} name="photo_fuel" onSelected={() => setFuelPhotoCaptured(true)} />
           <div className="mt-4">
             <FuelGauge
               onChange={(value, label) => {
@@ -706,7 +711,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
             <div className="mt-4 rounded-lg border border-[#fbbf24] bg-[#fffbeb] p-3">
               <p className="font-black text-[#92400e]">Fuel deficit: approximately {deliveryFuel - fuelLevel}%</p>
               <label className="mt-2 block text-sm font-bold text-[#10252b]">
-                Apply fuel charge?
+                {t("applyFuelCharge")}
                 <input className={inputClass} min="0" onChange={(event) => setFuelDeficitCharge(Number(event.target.value || 0))} placeholder="THB" step="0.01" type="number" value={fuelDeficitCharge || ""} />
               </label>
             </div>
@@ -715,8 +720,8 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
       ) : null}
 
       {step === 3 ? (
-        <StepShell eyebrow="Walkaround" title="Record the vehicle condition">
-          <FileCapture accept="video/*" icon={FileVideo} label="Record walkaround video" name="walkaroundVideo" onSelected={() => setVideoCaptured(true)} />
+        <StepShell eyebrow="Walkaround" title={t("recordCondition")}>
+          <FileCapture accept="video/*" icon={FileVideo} label={t("recordVideo")} name="walkaroundVideo" onSelected={() => setVideoCaptured(true)} />
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {[
               ["front", "Front"],
@@ -735,7 +740,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
               />
             ))}
           </div>
-          <p className="mt-3 text-sm text-[#667085]">Minimum: walkaround video or all four exterior side photos.</p>
+          <p className="mt-3 text-sm text-[#667085]">{t("conditionMinimum")}</p>
         </StepShell>
       ) : null}
 
@@ -743,7 +748,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
         <StepShell eyebrow="Damage check" title={mode === "return" ? "Check for new damage" : "Log pre-existing damage"}>
           {preExistingDamage.length > 0 ? (
             <div className="mb-4 rounded-lg border border-[#d6e5e2] bg-white p-3">
-              <p className="text-sm font-black text-[#10252b]">Pre-existing damage logged at delivery</p>
+              <p className="text-sm font-black text-[#10252b]">{t("preExistingDamage")}</p>
               <div className="mt-2 space-y-2">
                 {preExistingDamage.map((item: any) => (
                   <p className="rounded-lg bg-[#eef2f6] px-3 py-2 text-sm text-[#475467]" key={item.id}>
@@ -758,27 +763,27 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
             <p className="font-black text-[#10252b]">{selectedLocation ? `Damage at ${selectedLocation.replace(/_/g, " ")}` : "Tap a vehicle area to log damage"}</p>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <label className="block">
-                <span className="text-sm font-bold text-[#10252b]">Severity</span>
+                <span className="text-sm font-bold text-[#10252b]">{t("severity")}</span>
                 <select className={inputClass} onChange={(event) => setDamageSeverity(event.target.value)} value={damageSeverity}>
-                  <option value="scratch">Scratch</option>
-                  <option value="dent">Dent</option>
-                  <option value="crack">Crack</option>
-                  <option value="missing">Missing part</option>
-                  <option value="other">Other</option>
+                  <option value="scratch">{t("damageScratch")}</option>
+                  <option value="dent">{t("damageDent")}</option>
+                  <option value="crack">{t("damageCrack")}</option>
+                  <option value="missing">{t("damageMissingPart")}</option>
+                  <option value="other">{t("damageOther")}</option>
                 </select>
               </label>
               <label className="block sm:col-span-2">
-                <span className="text-sm font-bold text-[#10252b]">Description</span>
-                <input className={inputClass} onChange={(event) => setDamageDescription(event.target.value)} placeholder="Short description" value={damageDescription} />
+                <span className="text-sm font-bold text-[#10252b]">{t("description")}</span>
+                <input className={inputClass} onChange={(event) => setDamageDescription(event.target.value)} placeholder={t("shortDescription")} value={damageDescription} />
               </label>
             </div>
             <button className={`${touchButton} mt-3 bg-[#0f766e] text-white`} disabled={!selectedLocation || !damageDescription.trim()} onClick={addDamage} type="button">
-              Save damage item
+              {t("saveDamageItem")}
             </button>
           </div>
           <label className="checkbox-label mt-3 min-h-12 rounded-lg border border-[#d6e5e2] bg-white px-4 py-3 font-bold text-[#10252b]">
             <input checked={noDamage} className="flex-shrink-0" onChange={(event) => setNoDamage(event.target.checked)} type="checkbox" />
-            <span>No damage to report</span>
+            <span>{t("noDamageToReport")}</span>
           </label>
           <div className="mt-3 space-y-2">
             {damageItems.map((item) => (
@@ -788,7 +793,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                     <p className="font-black text-[#10252b]">{item.location.replace(/_/g, " ")} · {item.severity}</p>
                     <p className="text-sm text-[#667085]">{item.description}</p>
                     <label className="mt-2 inline-flex cursor-pointer rounded-lg bg-[#e6fffb] px-3 py-2 text-sm font-bold text-[#0f766e]">
-                      Add damage photo
+                      {t("addDamagePhoto")}
                       <input accept="image/*" capture="environment" className="sr-only" name={`damagePhoto_${item.id}`} type="file" />
                     </label>
                   </div>
@@ -801,7 +806,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
           </div>
           {mode === "return" && damageItems.some((item) => !item.is_pre_existing) ? (
             <label className="mt-4 block rounded-lg border border-[#fecdd3] bg-[#fff1f2] p-3">
-              <span className="text-sm font-black text-[#be123c]">New damage found — apply damage excess charge?</span>
+              <span className="text-sm font-black text-[#be123c]">{t("applyDamageExcess")}</span>
               <input className={inputClass} min="0" onChange={(event) => setDamageCharge(Number(event.target.value || 0))} placeholder="THB" step="0.01" type="number" value={damageCharge || ""} />
             </label>
           ) : null}
@@ -809,7 +814,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
       ) : null}
 
       {step === 5 && mode !== "return" ? (
-        <StepShell eyebrow="GPS check" title="Confirm tracker status">
+        <StepShell eyebrow="GPS check" title={t("confirmTracker")}>
           {context.gpsDevice ? (
             <div className="rounded-xl border border-[#d6e5e2] bg-white p-4">
               <div className="flex items-start gap-3">
@@ -831,31 +836,31 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
               </div>
               <label className="checkbox-label mt-4 min-h-12 rounded-lg bg-[#f8fffd] px-4 py-3 font-bold text-[#10252b]">
                 <input className="flex-shrink-0" type="checkbox" />
-                <span>I confirm the GPS tracker is installed and operational</span>
+                <span>{t("gpsConfirm")}</span>
               </label>
             </div>
           ) : (
             <div className="rounded-xl border border-[#d6e5e2] bg-white p-4 text-center">
               <Smartphone className="mx-auto text-[#667085]" size={34} />
-              <p className="mt-3 font-black text-[#10252b]">No GPS device assigned to this vehicle</p>
-              <p className="mt-1 text-sm text-[#667085]">You can continue without a GPS check.</p>
+              <p className="mt-3 font-black text-[#10252b]">{t("noGpsDevice")}</p>
+              <p className="mt-1 text-sm text-[#667085]">{t("noGpsContinue")}</p>
             </div>
           )}
         </StepShell>
       ) : null}
 
       {step === 5 && mode === "return" && !depositAlreadyReturned ? (
-        <StepShell eyebrow="Deposit reconciliation" title="Confirm deposit refund">
+        <StepShell eyebrow="Deposit reconciliation" title={t("confirmDepositRefund")}>
           <div className="space-y-3 rounded-xl border border-[#d6e5e2] bg-white p-4">
-            <Row label="Deposit held" value={money(depositHeld)} />
-            <Row label="Already refunded" value={`-${money(alreadyRefunded)}`} danger={alreadyRefunded > 0} />
-            <Row label="Already forfeited" value={`-${money(alreadyForfeited)}`} danger={alreadyForfeited > 0} />
-            <Row label="Available to reconcile" value={money(availableToReconcile)} />
-            <Row label="Outstanding rental balance" value={`-${money(outstandingBalance)}`} danger />
-            <Row label="Fuel deficit charge" value={`-${money(fuelDeficitCharge)}`} danger />
-            <Row label="Damage excess" value={`-${money(damageCharge)}`} danger />
+            <Row label={t("depositHeld")} value={money(depositHeld)} />
+            <Row label={t("alreadyRefunded")} value={`-${money(alreadyRefunded)}`} danger={alreadyRefunded > 0} />
+            <Row label={t("alreadyForfeited")} value={`-${money(alreadyForfeited)}`} danger={alreadyForfeited > 0} />
+            <Row label={t("availableToReconcile")} value={money(availableToReconcile)} />
+            <Row label={t("outstandingBalance")} value={`-${money(outstandingBalance)}`} danger />
+            <Row label={t("fuelDeficitCharge")} value={`-${money(fuelDeficitCharge)}`} danger />
+            <Row label={t("damageExcess")} value={`-${money(damageCharge)}`} danger />
             <label className="block rounded-lg border border-[#d6e5e2] bg-[#f8fffd] p-3">
-              <span className="text-sm font-black text-[#10252b]">Cleaning fee (optional)</span>
+              <span className="text-sm font-black text-[#10252b]">{t("cleaningFee")}</span>
               <input className={inputClass} min="0" onChange={(event) => setCleaningCharge(Number(event.target.value || 0))} placeholder="THB" step="0.01" type="number" value={cleaningCharge || ""} />
             </label>
             {requestedDeductions > availableToReconcile ? (
@@ -865,11 +870,11 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
             ) : null}
             <div className="border-t border-[#d6e5e2] pt-3">
               <div className="rounded-lg bg-[#e6fffb] p-3">
-                <Row label="Deposit refund" value={money(depositRefundAmount)} />
+                <Row label={t("depositRefund")} value={money(depositRefundAmount)} />
               </div>
             </div>
             <label className="block">
-              <span className="text-sm font-bold text-[#10252b]">Override refund amount if needed</span>
+              <span className="text-sm font-bold text-[#10252b]">{t("overrideRefund")}</span>
               <input className={inputClass} min="0" onChange={(event) => setRefundOverride(event.target.value)} placeholder={String(calculatedRefund)} step="0.01" type="number" value={refundOverride} />
             </label>
           </div>
@@ -881,19 +886,19 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
           <div className="grid gap-3 sm:grid-cols-2">
             <SummaryTile icon={Gauge} label="Odometer" value={odometer ? `${Number(odometer).toLocaleString()} km` : "Missing"} />
             <SummaryTile icon={Fuel} label="Fuel" value={fuelLabel || "Missing"} />
-            <SummaryTile icon={Camera} label="Photos / video" value={videoCaptured ? "Video captured" : `${Object.values(sidePhotos).filter(Boolean).length} photos`} />
+            <SummaryTile icon={Camera} label={t("photosVideo")} value={videoCaptured ? "Video captured" : `${Object.values(sidePhotos).filter(Boolean).length} photos`} />
             <SummaryTile icon={ShieldCheck} label="Damage" value={noDamage ? "No damage noted" : `${damageItems.length} item(s)`} />
           </div>
           {mode === "return" ? (
             <div className="mt-4 rounded-lg border border-[#d6e5e2] bg-white p-3">
               {depositAlreadyReturned ? (
                 <div className="rounded-lg bg-[#f0fdf4] p-3">
-                  <Row label="Deposit already returned — no reconciliation needed" value="Complete" />
+                  <Row label={t("depositAlreadyReturned")} value="Complete" />
                 </div>
               ) : (
                 <>
-                  <Row label="Deposit deductions" value={`-${money(appliedDeductions)}`} danger={appliedDeductions > 0} />
-                  <Row label="Deposit refund confirmed" value={money(depositRefundAmount)} />
+                  <Row label={t("depositDeductions")} value={`-${money(appliedDeductions)}`} danger={appliedDeductions > 0} />
+                  <Row label={t("depositRefundConfirmed")} value={money(depositRefundAmount)} />
                 </>
               )}
             </div>
@@ -902,18 +907,18 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
             <div className="mt-4 rounded-lg border border-[#d6e5e2] bg-white p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-sm font-black text-[#10252b]">Cash payment</p>
-                  <p className="mt-1 text-xs font-semibold text-[#667085]">Confirm cash received during handover and generate a receipt.</p>
+                  <p className="text-sm font-black text-[#10252b]">{t("cashPayment")}</p>
+                  <p className="mt-1 text-xs font-semibold text-[#667085]">{t("cashPaymentHint")}</p>
                 </div>
                 {receiptResult ? (
                   <span className="rounded-full bg-[#dcfce7] px-3 py-1 text-xs font-black uppercase text-[#166534]">
-                    Receipt ready
+                    {t("receiptReady")}
                   </span>
                 ) : null}
               </div>
               <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
                 <label className="block">
-                  <span className="text-sm font-bold text-[#10252b]">Rental payment received</span>
+                  <span className="text-sm font-bold text-[#10252b]">{t("rentalPaymentReceived")}</span>
                   <input
                     className={inputClass}
                     inputMode="decimal"
@@ -929,7 +934,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                   />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-bold text-[#10252b]">Deposit amount received</span>
+                  <span className="text-sm font-bold text-[#10252b]">{t("depositAmountReceived")}</span>
                   <input
                     className={inputClass}
                     inputMode="decimal"
@@ -971,10 +976,10 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                   {receiptResult.pdf_url ? (
                     <div className="mt-3 flex flex-wrap gap-2">
                       <button className={`${touchButton} border border-[#bbf7d0] bg-white text-[#166534]`} onClick={shareReceipt} type="button">
-                        Share receipt
+                        {t("shareReceipt")}
                       </button>
                       <a className={`${touchButton} border border-[#bbf7d0] bg-white text-[#166534]`} href={receiptResult.pdf_url} rel="noreferrer" target="_blank">
-                        Download receipt
+                        {t("downloadReceipt")}
                       </a>
                     </div>
                   ) : null}
@@ -985,19 +990,19 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
           {mode !== "condition_report" ? (
             <>
               <p className="mt-5 text-base font-black text-[#10252b]">Handing over to {context.customer?.full_name || "customer"}</p>
-              <p className="mt-1 text-sm text-[#667085]">Ask the customer to sign below to confirm the recorded vehicle condition.</p>
+              <p className="mt-1 text-sm text-[#667085]">{t("signPrompt")}</p>
               <div className="mt-3">
                 <SignaturePad onChange={setSignature} value={signature} />
               </div>
               <label className="mt-4 block">
-                <span className="text-sm font-black text-[#10252b]">Customer printed name</span>
+                <span className="text-sm font-black text-[#10252b]">{t("customerPrintedName")}</span>
                 <input className={inputClass} onChange={(event) => setSignedName(event.target.value)} value={signedName} />
               </label>
             </>
           ) : (
             <label className="mt-4 block">
-              <span className="text-sm font-black text-[#10252b]">Notes</span>
-              <textarea className={inputClass} name="notes" placeholder="Condition notes, reason for report, follow-up actions" rows={4} />
+              <span className="text-sm font-black text-[#10252b]">{t("notes")}</span>
+              <textarea className={inputClass} name="notes" placeholder={t("notesPlaceholder")} rows={4} />
             </label>
           )}
           {typeof navigator !== "undefined" && "share" in navigator ? (
@@ -1006,7 +1011,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
               onClick={() => navigator.share?.({ title: "RouteHQ inspection summary", text: `${titleFor(context)} inspection summary is ready.` })}
               type="button"
             >
-              Share with customer
+              {t("shareWithCustomer")}
             </button>
           ) : null}
         </StepShell>
@@ -1016,7 +1021,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
 
       <Link className="inline-flex items-center gap-2 text-sm font-bold text-[#0f766e]" href={`/fleet/${context.vehicle.id}` as Route}>
         <ChevronLeft size={16} />
-        Back to vehicle
+        {t("backToVehicle")}
       </Link>
     </form>
   );

@@ -96,13 +96,14 @@ function StepShell({
 }
 
 function Progress({ steps, step }: { steps: string[]; step: number }) {
+  const t = useTranslations("inspection");
   return (
     <div className="sticky top-0 z-20 -mx-4 border-b border-[#d6e5e2] bg-[#eef8f6]/95 px-4 py-3 backdrop-blur sm:mx-0 sm:rounded-lg sm:border">
       <div className="flex items-center justify-between text-xs font-bold text-[#667085]">
         <span>
           Step {step + 1} of {steps.length}
         </span>
-        <span>{steps[step]}</span>
+        <span>{t(`steps.${steps[step]}`)}</span>
       </div>
       <div className="mt-2 h-2 overflow-hidden rounded-full bg-white">
         <div className="h-full rounded-full bg-[#0f766e] transition-all" style={{ width: `${((step + 1) / steps.length) * 100}%` }} />
@@ -231,13 +232,13 @@ function FuelGauge({
 function VehicleDiagram({ onSelect }: { onSelect: (location: string) => void }) {
   const t = useTranslations("inspection");
   const areas = [
-    { key: "front", label: "Front", className: "left-[34%] top-[4%] w-[32%] h-[18%]" },
-    { key: "rear", label: "Rear", className: "left-[34%] bottom-[4%] w-[32%] h-[18%]" },
-    { key: "front_left", label: "Front left", className: "left-[8%] top-[17%] w-[30%] h-[27%]" },
-    { key: "front_right", label: "Front right", className: "right-[8%] top-[17%] w-[30%] h-[27%]" },
-    { key: "rear_left", label: "Rear left", className: "left-[8%] bottom-[17%] w-[30%] h-[27%]" },
-    { key: "rear_right", label: "Rear right", className: "right-[8%] bottom-[17%] w-[30%] h-[27%]" },
-    { key: "interior", label: "Interior", className: "left-[35%] top-[36%] w-[30%] h-[28%]" }
+    { key: "front", label: t("areaFront"), className: "left-[34%] top-[4%] w-[32%] h-[18%]" },
+    { key: "rear", label: t("areaRear"), className: "left-[34%] bottom-[4%] w-[32%] h-[18%]" },
+    { key: "front_left", label: t("areaFrontLeft"), className: "left-[8%] top-[17%] w-[30%] h-[27%]" },
+    { key: "front_right", label: t("areaFrontRight"), className: "right-[8%] top-[17%] w-[30%] h-[27%]" },
+    { key: "rear_left", label: t("areaRearLeft"), className: "left-[8%] bottom-[17%] w-[30%] h-[27%]" },
+    { key: "rear_right", label: t("areaRearRight"), className: "right-[8%] bottom-[17%] w-[30%] h-[27%]" },
+    { key: "interior", label: t("areaInterior"), className: "left-[35%] top-[36%] w-[30%] h-[28%]" }
   ];
 
   return (
@@ -330,7 +331,7 @@ function SignaturePad({
         width={620}
       />
       <div className="mt-3 flex items-center justify-between gap-2">
-        <p className="text-xs font-semibold text-[#667085]">{value ? "Signature captured" : "Sign in the box above"}</p>
+        <p className="text-xs font-semibold text-[#667085]">{value ? t("signatureCaptured") : t("signInBox")}</p>
         <button
           className="rounded-lg border border-[#d6e5e2] bg-white px-3 py-2 text-sm font-bold text-[#344054]"
           onClick={() => {
@@ -352,6 +353,10 @@ function SignaturePad({
 
 export function InspectionForm({ context }: { context: InspectionContext }) {
   const t = useTranslations("inspection");
+  const areaName = (location: string) => {
+    const key = `area${location.split("_").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join("")}`;
+    return t.has(key) ? t(key) : location.replace(/_/g, " ");
+  };
   const mode = context.mode;
   const depositAlreadyReturned = mode === "return" && context.rental?.deposit_status === "fully_returned";
   const steps = mode === "return" ? (depositAlreadyReturned ? returnSteps.filter((item) => item !== "Deposit") : returnSteps) : mode === "condition_report" ? conditionSteps : deliverySteps;
@@ -405,12 +410,12 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
 
   const rentalPeriod = useMemo(() => {
     if (!context.rental?.start_date) {
-      return "Rental period not set";
+      return t("rentalPeriodNotSet");
     }
     if (context.rental.end_date) {
       return `${context.rental.start_date} to ${context.rental.end_date}`;
     }
-    return `Open ended from ${context.rental.start_date}`;
+    return t("openEndedFrom", { date: context.rental.start_date });
   }, [context.rental?.end_date, context.rental?.start_date]);
 
   useEffect(() => {
@@ -458,26 +463,26 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
   }, [cleaningCharge, damageCharge, damageItems, draftKey, fuelDeficitCharge, fuelLabel, fuelLevel, noDamage, odometer, refundOverride, signature, signedName, step]);
 
   async function readOdometer(file: File) {
-    setOcrMessage("Reading odometer photo...");
+    setOcrMessage(t("ocrReading"));
     const data = new FormData();
     data.append("file", file);
     try {
       const response = await fetch("/api/ocr/odometer", { method: "POST", body: data });
       const result = await response.json();
       if (!response.ok) {
-        setOcrMessage(result.error || "Odometer OCR was not available.");
+        setOcrMessage(result.error || t("ocrUnavailable"));
         return;
       }
       if (result.odometer_reading && Number(result.confidence || 0) >= 0.65) {
         setOdometer(String(result.odometer_reading));
-        setOcrMessage(`Suggested ${Number(result.odometer_reading).toLocaleString()} km from photo.`);
+        setOcrMessage(t("ocrSuggested", { km: Number(result.odometer_reading).toLocaleString() }));
       } else if (result.odometer_reading) {
-        setOcrMessage(`Possible reading: ${Number(result.odometer_reading).toLocaleString()} km. Please confirm manually.`);
+        setOcrMessage(t("ocrPossible", { km: Number(result.odometer_reading).toLocaleString() }));
       } else {
-        setOcrMessage("Could not read the odometer clearly. Enter it manually.");
+        setOcrMessage(t("ocrUnclear"));
       }
     } catch {
-      setOcrMessage("Odometer OCR failed. Enter it manually.");
+      setOcrMessage(t("ocrFailed"));
     }
   }
 
@@ -519,7 +524,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
     const totalReceived = rentalPaymentAmount + depositAmount;
 
     if (!context.rental?.id || totalReceived <= 0) {
-      setReceiptError("Enter a positive rental payment or deposit amount first.");
+      setReceiptError(t("receiptNeedsAmount"));
       return;
     }
 
@@ -543,7 +548,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
         const result = await recordDeliveryCashPaymentAndReceipt(formData);
         setReceiptResult(result);
       } catch (error) {
-        setReceiptError(error instanceof Error ? error.message : "Unable to generate receipt.");
+        setReceiptError(error instanceof Error ? error.message : t("receiptFailed"));
       }
     });
   }
@@ -608,7 +613,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
             }}
             type="submit"
           >
-            {isPending ? "Submitting..." : mode === "return" ? "Submit Return Inspection" : mode === "condition_report" ? "Save Condition Report" : "Submit Delivery Inspection"}
+            {isPending ? t("submitting") : mode === "return" ? t("submitReturn") : mode === "condition_report" ? t("saveConditionReport") : t("submitDelivery")}
           </button>
         )}
       </div>
@@ -637,7 +642,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
       <Progress step={step} steps={steps} />
 
       {step === 0 ? (
-        <StepShell eyebrow="Vehicle confirmation" title={mode === "return" ? "Confirm vehicle return" : mode === "condition_report" ? "Start condition report" : "Confirm vehicle handover"}>
+        <StepShell eyebrow={t("eyebrowVehicleConfirmation")} title={mode === "return" ? t("titleConfirmReturn") : mode === "condition_report" ? t("titleStartCondition") : t("titleConfirmHandover")}>
           <div className="rounded-xl border border-[#d6e5e2] bg-white p-4">
             <div className="flex items-start gap-4">
               <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-[#e6fffb] text-[#0f766e]">
@@ -648,7 +653,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                 <p className="font-mono-data mt-1 text-lg font-black text-[#10252b]">{context.vehicle.registration_number}</p>
                 <p className="mt-2 text-sm text-[#667085]">
                   {context.customer?.full_name ? `${context.customer.full_name} · ` : ""}
-                  {context.rental?.start_date ? `Rental starts ${formatDate(context.rental.start_date)}` : "Standalone vehicle report"}
+                  {context.rental?.start_date ? t("rentalStarts", { date: formatDate(context.rental.start_date) }) : t("standaloneReport")}
                 </p>
                 {mode === "return" ? (
                   <p className="mt-2 rounded-lg bg-[#fef3c7] px-3 py-2 text-sm font-bold text-[#92400e]">
@@ -659,13 +664,13 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
             </div>
           </div>
           <button className={`${touchButton} mt-5 w-full bg-[#0f766e] text-white shadow-lg`} onClick={() => setStep(1)} type="button">
-            {mode === "return" ? "Start Return Inspection" : mode === "condition_report" ? "Start Condition Report" : "Start Delivery Inspection"}
+            {mode === "return" ? t("startReturn") : mode === "condition_report" ? t("startCondition") : t("startDelivery")}
           </button>
         </StepShell>
       ) : null}
 
       {step === 1 ? (
-        <StepShell eyebrow="Odometer" title={t("odometerPhoto")}>
+        <StepShell eyebrow={t("odometer")} title={t("odometerPhoto")}>
           <FileCapture
             accept="image/*"
             label={t("odometerCamera")}
@@ -696,7 +701,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
       ) : null}
 
       {step === 2 ? (
-        <StepShell eyebrow="Fuel level" title={t("fuelPhoto")}>
+        <StepShell eyebrow={t("eyebrowFuelLevel")} title={t("fuelPhoto")}>
           <FileCapture accept="image/*" label={t("fuelCamera")} name="photo_fuel" onSelected={() => setFuelPhotoCaptured(true)} />
           <div className="mt-4">
             <FuelGauge
@@ -720,16 +725,16 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
       ) : null}
 
       {step === 3 ? (
-        <StepShell eyebrow="Walkaround" title={t("recordCondition")}>
+        <StepShell eyebrow={t("eyebrowWalkaround")} title={t("recordCondition")}>
           <FileCapture accept="video/*" icon={FileVideo} label={t("recordVideo")} name="walkaroundVideo" onSelected={() => setVideoCaptured(true)} />
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {[
-              ["front", "Front"],
-              ["rear", "Rear"],
-              ["driver", "Driver Side"],
-              ["passenger", "Passenger Side"],
-              ["interior", "Interior optional"],
-              ["boot", "Boot / trunk optional"]
+              ["front", t("areaFront")],
+              ["rear", t("areaRear")],
+              ["driver", t("sideDriver")],
+              ["passenger", t("sidePassenger")],
+              ["interior", t("interiorOptional")],
+              ["boot", t("bootOptional")]
             ].map(([key, label]) => (
               <FileCapture
                 accept="image/*"
@@ -745,7 +750,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
       ) : null}
 
       {step === 4 ? (
-        <StepShell eyebrow="Damage check" title={mode === "return" ? "Check for new damage" : "Log pre-existing damage"}>
+        <StepShell eyebrow={t("eyebrowDamageCheck")} title={mode === "return" ? t("checkNewDamage") : t("logPreExistingDamage")}>
           {preExistingDamage.length > 0 ? (
             <div className="mb-4 rounded-lg border border-[#d6e5e2] bg-white p-3">
               <p className="text-sm font-black text-[#10252b]">{t("preExistingDamage")}</p>
@@ -760,7 +765,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
           ) : null}
           <VehicleDiagram onSelect={setSelectedLocation} />
           <div className="mt-4 rounded-lg border border-[#d6e5e2] bg-white p-4">
-            <p className="font-black text-[#10252b]">{selectedLocation ? `Damage at ${selectedLocation.replace(/_/g, " ")}` : "Tap a vehicle area to log damage"}</p>
+            <p className="font-black text-[#10252b]">{selectedLocation ? t("damageAt", { area: areaName(selectedLocation) }) : t("tapArea")}</p>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <label className="block">
                 <span className="text-sm font-bold text-[#10252b]">{t("severity")}</span>
@@ -814,7 +819,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
       ) : null}
 
       {step === 5 && mode !== "return" ? (
-        <StepShell eyebrow="GPS check" title={t("confirmTracker")}>
+        <StepShell eyebrow={t("eyebrowGpsCheck")} title={t("confirmTracker")}>
           {context.gpsDevice ? (
             <div className="rounded-xl border border-[#d6e5e2] bg-white p-4">
               <div className="flex items-start gap-3">
@@ -822,7 +827,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                   {context.gpsDevice.last_seen_at ? <CheckCircle2 /> : <AlertTriangle />}
                 </span>
                 <div>
-                  <p className="font-black text-[#10252b]">{context.gpsDevice.last_seen_at ? "GPS tracker is active" : "GPS tracker appears offline"}</p>
+                  <p className="font-black text-[#10252b]">{context.gpsDevice.last_seen_at ? t("gpsActive") : t("gpsOffline")}</p>
                   <p className="mt-1 text-sm text-[#667085]">
                     {context.gpsDevice.provider} · Last seen {context.gpsDevice.last_seen_at ? formatDate(context.gpsDevice.last_seen_at) : "never"}
                   </p>
@@ -850,7 +855,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
       ) : null}
 
       {step === 5 && mode === "return" && !depositAlreadyReturned ? (
-        <StepShell eyebrow="Deposit reconciliation" title={t("confirmDepositRefund")}>
+        <StepShell eyebrow={t("eyebrowDepositReconciliation")} title={t("confirmDepositRefund")}>
           <div className="space-y-3 rounded-xl border border-[#d6e5e2] bg-white p-4">
             <Row label={t("depositHeld")} value={money(depositHeld)} />
             <Row label={t("alreadyRefunded")} value={`-${money(alreadyRefunded)}`} danger={alreadyRefunded > 0} />
@@ -882,12 +887,12 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
       ) : null}
 
       {step === steps.length - 1 ? (
-        <StepShell eyebrow="Review" title={mode === "return" ? "Review return and collect signature" : mode === "condition_report" ? "Review condition report" : "Review handover and collect signature"}>
+        <StepShell eyebrow={t("eyebrowReview")} title={mode === "return" ? t("reviewReturn") : mode === "condition_report" ? t("reviewCondition") : t("reviewHandover")}>
           <div className="grid gap-3 sm:grid-cols-2">
-            <SummaryTile icon={Gauge} label="Odometer" value={odometer ? `${Number(odometer).toLocaleString()} km` : "Missing"} />
-            <SummaryTile icon={Fuel} label="Fuel" value={fuelLabel || "Missing"} />
-            <SummaryTile icon={Camera} label={t("photosVideo")} value={videoCaptured ? "Video captured" : `${Object.values(sidePhotos).filter(Boolean).length} photos`} />
-            <SummaryTile icon={ShieldCheck} label="Damage" value={noDamage ? "No damage noted" : `${damageItems.length} item(s)`} />
+            <SummaryTile icon={Gauge} label={t("odometer")} value={odometer ? `${Number(odometer).toLocaleString()} km` : t("missing")} />
+            <SummaryTile icon={Fuel} label={t("fuel")} value={fuelLabel || t("missing")} />
+            <SummaryTile icon={Camera} label={t("photosVideo")} value={videoCaptured ? t("videoCaptured") : t("photoCount", { count: Object.values(sidePhotos).filter(Boolean).length })} />
+            <SummaryTile icon={ShieldCheck} label={t("damage")} value={noDamage ? t("noDamageNoted") : t("damageCount", { count: damageItems.length })} />
           </div>
           {mode === "return" ? (
             <div className="mt-4 rounded-lg border border-[#d6e5e2] bg-white p-3">
@@ -955,7 +960,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                   onClick={generateDeliveryReceipt}
                   type="button"
                 >
-                  {isReceiptPending ? "Generating..." : receiptResult ? "Receipt generated" : "Confirm cash and generate receipt"}
+                  {isReceiptPending ? t("generating") : receiptResult ? t("receiptGenerated") : t("confirmCashReceipt")}
                 </button>
               </div>
               {receiptError ? (

@@ -13,7 +13,8 @@
     "documents:adversarial-probes": "npx supabase db query --file scripts/phase8-adversarial-db-probes.sql",
     "documents:phase9-probes": "npx supabase db query --file scripts/phase9-adversarial-db-probes.sql",
     "documents:phase10-probes": "npx supabase db query --file scripts/phase10-customer-signing-db-probes.sql",
-    "lint": "next lint"
+    "lint": "next lint",
+    "check:translations": "node scripts/check-inspection-translations.cjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.6.1",

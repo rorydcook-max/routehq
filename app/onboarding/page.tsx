@@ -5,6 +5,7 @@ import { OnboardingWizard } from "@/app/onboarding/onboarding-wizard";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getActiveMembership } from "@/lib/auth/active-organization-server";
 
 export default async function OnboardingPage() {
   await getCurrentUserEmail();
@@ -18,13 +19,7 @@ export default async function OnboardingPage() {
   if (!user) {
     redirect("/login");
   }
-  const { data: membership } = await supabase
-    .from("organization_members")
-    .select("organization_id")
-    .eq("user_id", user.id)
-    .eq("is_active", true)
-    .limit(1)
-    .maybeSingle();
+  const { data: membership } = await getActiveMembership(supabase, user.id);
 
   if (!membership?.organization_id) {
     return (

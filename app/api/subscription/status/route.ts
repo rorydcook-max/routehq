@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getActiveMembership } from "@/lib/auth/active-organization-server";
 
 export async function GET() {
   const supabase = (await createSupabaseServerClient()) as any;
@@ -11,13 +12,7 @@ export async function GET() {
     return NextResponse.json({ authenticated: false }, { status: 401 });
   }
 
-  const { data: membership, error: membershipError } = await supabase
-    .from("organization_members")
-    .select("organization_id")
-    .eq("user_id", user.id)
-    .eq("is_active", true)
-    .limit(1)
-    .maybeSingle();
+  const { data: membership, error: membershipError } = await getActiveMembership(supabase, user.id);
 
   if (membershipError || !membership?.organization_id) {
     return NextResponse.json({ authenticated: true, organization: null });

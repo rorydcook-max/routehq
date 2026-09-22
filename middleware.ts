@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/lib/supabase/database.types";
+import { ACTIVE_ORGANIZATION_COOKIE, loadActiveMembership } from "@/lib/auth/active-organization";
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -71,13 +72,11 @@ export async function middleware(request: NextRequest) {
   }
 
   if (user && !isOnboardingAllowedRoute) {
-    const { data: membership } = await (supabase as any)
-      .from("organization_members")
-      .select("organization_id, role")
-      .eq("user_id", user.id)
-      .eq("is_active", true)
-      .limit(1)
-      .maybeSingle();
+    const { data: membership } = await loadActiveMembership(
+      supabase,
+      user.id,
+      request.cookies.get(ACTIVE_ORGANIZATION_COOKIE)?.value || null
+    );
 
     // A signed-in user with no organisation has nothing behind the dashboard:
     // send them to set one up rather than letting pages fall back to a default.

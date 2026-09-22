@@ -23,6 +23,7 @@ import {
 } from "@/lib/rental-documents";
 import { recordActivityEvent, recordActivityEventOnce } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getActiveMembership } from "@/lib/auth/active-organization-server";
 
 export type RentalDocumentPreviewState = {
   ok: boolean;
@@ -55,14 +56,7 @@ async function requireOperatorContext(supabase: any) {
     throw failure;
   }
 
-  const { data: membership, error: membershipError } = await supabase
-    .from("organization_members")
-    .select("organization_id, role, is_active")
-    .eq("user_id", user.id)
-    .eq("is_active", true)
-    .order("created_at", { ascending: true })
-    .limit(1)
-    .maybeSingle();
+  const { data: membership, error: membershipError } = await getActiveMembership(supabase, user.id);
 
   if (membershipError || !membership?.organization_id) {
     const failure = new Error(membershipError?.message || "Organization membership was not found.");

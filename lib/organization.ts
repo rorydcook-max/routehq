@@ -1,5 +1,6 @@
 import { getDefaultOrganizationSlug } from "@/lib/supabase/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getActiveMembership } from "@/lib/auth/active-organization-server";
 export { getTravelPolicySettings, mergeTravelPolicySettings, jurisdictionByCountry, travelPolicyDefaults } from "@/lib/travel-policy";
 export type { HomeTerritoryType, IslandTravelPolicy, TravelPolicySettings } from "@/lib/travel-policy";
 
@@ -12,14 +13,7 @@ export async function getDefaultOrganization() {
   } = await supabase.auth.getUser();
 
   if (user) {
-    const { data: membership, error: membershipError } = await supabase
-      .from("organization_members")
-      .select("organization_id")
-      .eq("user_id", user.id)
-      .eq("is_active", true)
-      .order("created_at", { ascending: true })
-      .limit(1)
-      .maybeSingle();
+    const { data: membership, error: membershipError } = await getActiveMembership(supabase, user.id);
 
     if (membershipError) {
       throw new Error(membershipError.message);

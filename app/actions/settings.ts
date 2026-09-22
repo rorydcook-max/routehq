@@ -13,6 +13,7 @@ import { getDefaultOrganizationSlug } from "@/lib/supabase/config";
 import { jurisdictionByCountry, mergeTravelPolicySettings, type HomeTerritoryType, type IslandTravelPolicy } from "@/lib/travel-policy";
 import { buildDailySummaryMessage, sendLineMessage } from "@/services/messaging/line";
 import { requireOwner } from "@/lib/auth/roles";
+import { getActiveMembership } from "@/lib/auth/active-organization-server";
 
 const supportedLocales = new Set<string>(supportedLocaleCodes);
 const supportedCalendars = new Set<string>(supportedCalendarCodes);
@@ -148,13 +149,7 @@ async function requireActiveOrganizationMembership(supabase: any) {
     redirect("/login");
   }
 
-  const { data: membership, error } = await supabase
-    .from("organization_members")
-    .select("organization_id")
-    .eq("user_id", user.id)
-    .eq("is_active", true)
-    .limit(1)
-    .maybeSingle();
+  const { data: membership, error } = await getActiveMembership(supabase, user.id);
 
   if (error || !membership?.organization_id) {
     throw new Error(error?.message || "Organization membership was not found.");
@@ -217,13 +212,7 @@ export async function updatePaymentSettings(formData: FormData) {
     redirect("/login");
   }
 
-  const { data: membership, error: membershipError } = await supabase
-    .from("organization_members")
-    .select("organization_id")
-    .eq("user_id", user.id)
-    .eq("is_active", true)
-    .limit(1)
-    .maybeSingle();
+  const { data: membership, error: membershipError } = await getActiveMembership(supabase, user.id);
 
   if (membershipError || !membership?.organization_id) {
     throw new Error(membershipError?.message || "Organization membership was not found.");
@@ -320,13 +309,7 @@ export async function updateUpfrontDiscountSettings(formData: FormData) {
     redirect("/login");
   }
 
-  const { data: membership, error: membershipError } = await supabase
-    .from("organization_members")
-    .select("organization_id")
-    .eq("user_id", user.id)
-    .eq("is_active", true)
-    .limit(1)
-    .maybeSingle();
+  const { data: membership, error: membershipError } = await getActiveMembership(supabase, user.id);
 
   if (membershipError || !membership?.organization_id) {
     throw new Error(membershipError?.message || "Organization membership was not found.");

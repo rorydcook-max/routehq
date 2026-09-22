@@ -20,6 +20,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
  */
 
 import { appRoleFromDb, OWNER_ONLY_MESSAGE } from "@/lib/auth/role-types";
+import { getActiveMembership } from "@/lib/auth/active-organization-server";
 
 export { APP_ROLES, appRoleFromDb, dbRoleFromApp, OWNER_ONLY_MESSAGE } from "@/lib/auth/role-types";
 export type { AppRole } from "@/lib/auth/role-types";
@@ -31,14 +32,7 @@ export async function getCurrentMembership() {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data: membership } = await supabase
-    .from("organization_members")
-    .select("organization_id, role")
-    .eq("user_id", user.id)
-    .eq("is_active", true)
-    .order("created_at", { ascending: true })
-    .limit(1)
-    .maybeSingle();
+  const { data: membership } = await getActiveMembership(supabase, user.id);
 
   if (!membership?.organization_id) return null;
 

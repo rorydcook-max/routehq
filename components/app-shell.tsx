@@ -16,7 +16,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getMyAppRole, signOut } from "@/app/actions/auth";
+import { getShellContext, signOut, switchActiveOrganization, type ShellContext } from "@/app/actions/auth";
 import { RouteHqLogo } from "@/components/brand-logo";
 import { FastActionSheet } from "@/components/fast-action-sheet";
 import { PendingButton } from "@/components/pending-button";
@@ -50,18 +50,21 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
 
   // Teammates cannot use business settings, so the link is hidden for them.
   // Display only: the middleware and server actions enforce the rule.
-  const [isTeammate, setIsTeammate] = useState(false);
+  const [shell, setShell] = useState<ShellContext>({ role: null, organizations: [] });
   useEffect(() => {
     let cancelled = false;
-    getMyAppRole()
-      .then((role) => {
-        if (!cancelled) setIsTeammate(role === "teammate");
+    getShellContext()
+      .then((context) => {
+        if (!cancelled) setShell(context);
       })
       .catch(() => undefined);
     return () => {
       cancelled = true;
     };
   }, []);
+  const isTeammate = shell.role === "teammate";
+  const hasSeveralBusinesses = shell.organizations.length > 1;
+  const activeBusiness = shell.organizations.find((organization) => organization.active);
   const visibleMainNavItems = isTeammate ? mainNavItems.filter((item) => item.href !== "/settings") : mainNavItems;
 
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
@@ -114,6 +117,26 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
         </nav>
         {userEmail ? (
           <div className="mt-4 rounded-2xl border border-white/10 bg-[var(--sidebar-darker)]/70 p-3">
+            {hasSeveralBusinesses ? (
+              <form action={switchActiveOrganization} className="mb-3">
+                <label className="block text-[10px] font-black uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]" htmlFor="business-switcher">
+                  Business
+                </label>
+                <select
+                  className="mt-1 w-full rounded-lg border border-white/10 bg-white/10 px-2 py-1.5 text-xs font-semibold text-white"
+                  defaultValue={activeBusiness?.id}
+                  id="business-switcher"
+                  name="organizationId"
+                  onChange={(event) => event.currentTarget.form?.requestSubmit()}
+                >
+                  {shell.organizations.map((organization) => (
+                    <option className="text-[#10252b]" key={organization.id} value={organization.id}>
+                      {organization.name}
+                    </option>
+                  ))}
+                </select>
+              </form>
+            ) : null}
             <Link className="block truncate text-xs font-semibold text-[var(--sidebar-text-muted)] hover:text-white" href="/account">
               {userEmail}
             </Link>
@@ -132,6 +155,23 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
       <main className="content-area mx-auto lg:ml-[220px] lg:max-w-none">
         {userEmail ? (
           <div className="mb-4 flex items-center justify-end gap-2 lg:hidden">
+            {hasSeveralBusinesses ? (
+              <form action={switchActiveOrganization}>
+                <select
+                  aria-label="Business"
+                  className="max-w-[150px] truncate rounded-full border border-[var(--border)] bg-white px-2 py-1.5 text-xs font-semibold text-[var(--foreground-secondary)] shadow-sm"
+                  defaultValue={activeBusiness?.id}
+                  name="organizationId"
+                  onChange={(event) => event.currentTarget.form?.requestSubmit()}
+                >
+                  {shell.organizations.map((organization) => (
+                    <option key={organization.id} value={organization.id}>
+                      {organization.name}
+                    </option>
+                  ))}
+                </select>
+              </form>
+            ) : null}
             <Link
               className="max-w-[180px] truncate rounded-full border border-[var(--border)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--foreground-secondary)] shadow-sm sm:max-w-none"
               href="/account"

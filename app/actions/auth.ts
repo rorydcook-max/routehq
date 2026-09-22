@@ -1,11 +1,13 @@
 "use server";
 
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { supportedLocaleCodes } from "@/lib/i18n/locales";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { dbRoleFromApp, getCurrentMembership, OWNER_ONLY_MESSAGE, requireOwner, type AppRole } from "@/lib/auth/roles";
+import { ACTIVE_ORGANIZATION_COOKIE } from "@/lib/auth/active-organization";
 
 export type AuthActionState = {
   error?: string;
@@ -57,10 +59,62 @@ export async function signOut() {
   redirect("/login");
 }
 
-/** Used by the app shell to decide which navigation to show. Display only - access is enforced on the server. */
-export async function getMyAppRole(): Promise<AppRole | null> {
+export type ShellContext = {
+  role: AppRole | null;
+  organizations: { id: string; name: string; active: boolean }[];
+};
+
+/** Used by the app shell for navigation and the business switcher. Display only - access is enforced on the server. */
+export async function getShellContext(): Promise<ShellContext> {
   const membership = await getCurrentMembership();
-  return membership?.role ?? null;
+  if (!membership) return { role: null, organizations: [] };
+
+  const supabase = (await createSupabaseServerClient()) as any;
+  const { data } = await supabase
+    .from("organization_members")
+    .select("organization_id, organizations(name)")
+    .eq("user_id", membership.userId)
+    .eq("is_active", true)
+    .order("created_at", { ascending: true });
+
+  const organizations = ((data || []) as any[]).map((row) => ({
+    id: row.organization_id as string,
+    name: String(row.organizations?.name || "Business"),
+    active: row.organization_id === membership.organizationId
+  }));
+  return { role: membership.role, organizations };
+}
+
+/** Switch the business this person is working in. Only businesses they actively belong to are accepted. */
+export async function switchActiveOrganization(formData: FormData) {
+  const organizationId = String(formData.get("organizationId") || "");
+  const supabase = (await createSupabaseServerClient()) as any;
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: membership } = await supabase
+    .from("organization_members")
+    .select("organization_id")
+    .eq("user_id", user.id)
+    .eq("organization_id", organizationId)
+    .eq("is_active", true)
+    .maybeSingle();
+
+  if (membership?.organization_id) {
+    const cookieStore = await cookies();
+    cookieStore.set(ACTIVE_ORGANIZATION_COOKIE, membership.organization_id, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365
+    });
+  }
+
+  revalidatePath("/", "layout");
+  redirect("/");
 }
 
 async function requestOrigin() {
@@ -164,8 +218,52 @@ export async function inviteUser(_state: AuthActionState, formData: FormData): P
     return { error: "You are already a member of this business." };
   }
 
-  const origin = await requestOrigin();
   const admin = createSupabaseAdminClient() as any;
+  const label = role === "owner" ? "an owner" : "a teammate";
+
+  // Someone who already has a RouteHQ account - perhaps working for another
+  // business too - is added directly. There is no invite email to send them:
+  // they switch to this business from the business menu after signing in.
+  const { data: existingUserId, error: lookupError } = await admin.rpc("find_auth_user_id_by_email", { p_email: email });
+  if (lookupError) {
+    return { error: lookupError.message };
+  }
+
+  if (existingUserId) {
+    const { data: existingMembership } = await admin
+      .from("organization_members")
+      .select("id, is_active")
+      .eq("organization_id", inviter.organizationId)
+      .eq("user_id", existingUserId)
+      .maybeSingle();
+
+    if (existingMembership?.is_active) {
+      return { error: "That person is already a member of this business." };
+    }
+
+    const { error: addError } = existingMembership
+      ? await admin
+          .from("organization_members")
+          .update({ is_active: true, role: dbRoleFromApp(role), invited_email: email })
+          .eq("id", existingMembership.id)
+      : await admin.from("organization_members").insert({
+          organization_id: inviter.organizationId,
+          user_id: existingUserId,
+          role: dbRoleFromApp(role),
+          invited_email: email,
+          is_active: true
+        });
+
+    if (addError) {
+      return { error: addError.message };
+    }
+
+    return {
+      success: `${email} already has a RouteHQ account, so they have been added to your business as ${label}. They can switch to it from the business menu next time they sign in.`
+    };
+  }
+
+  const origin = await requestOrigin();
   const redirectTo = origin ? `${origin}/auth/callback?next=/accept-invite` : undefined;
   const { data, error } = await admin.auth.admin.inviteUserByEmail(email, {
     redirectTo,
@@ -205,7 +303,6 @@ export async function inviteUser(_state: AuthActionState, formData: FormData): P
     return { error: memberError.message };
   }
 
-  const label = role === "owner" ? "an owner" : "a teammate";
   return { success: `Invite sent to ${email} as ${label}.` };
 }
 

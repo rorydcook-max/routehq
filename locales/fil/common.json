@@ -167,5 +167,9 @@
     "areaInterior": "Loob",
     "photoCount": "{count, plural, one {# litrato} other {# mga litrato}}",
     "damageCount": "{count, plural, one {# item} other {# mga item}}"
+  },
+  "translation": {
+    "translatedFrom": "Isinalin mula sa {language}",
+    "showOriginal": "Ipakita ang orihinal"
   }
 }

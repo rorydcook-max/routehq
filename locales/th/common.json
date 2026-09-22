@@ -176,5 +176,9 @@
     "areaRearLeft": "หลังซ้าย",
     "areaRearRight": "หลังขวา",
     "areaInterior": "ภายในรถ"
+  },
+  "translation": {
+    "translatedFrom": "แปลจาก {language}",
+    "showOriginal": "แสดงต้นฉบับ"
   }
 }

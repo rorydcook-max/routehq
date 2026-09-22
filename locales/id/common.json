@@ -167,5 +167,9 @@
     "areaRearLeft": "Belakang kiri",
     "areaRearRight": "Belakang kanan",
     "areaInterior": "Interior"
+  },
+  "translation": {
+    "translatedFrom": "Diterjemahkan dari {language}",
+    "showOriginal": "Tampilkan asli"
   }
 }

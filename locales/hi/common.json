@@ -167,5 +167,9 @@
     "areaInterior": "अंदरूनी",
     "photoCount": "{count, plural, one {# फ़ोटो} other {# फ़ोटो}}",
     "damageCount": "{count, plural, one {# आइटम} other {# आइटम}}"
+  },
+  "translation": {
+    "translatedFrom": "{language} से अनुवादित",
+    "showOriginal": "मूल दिखाएं"
   }
 }

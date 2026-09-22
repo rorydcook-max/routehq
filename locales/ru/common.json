@@ -167,5 +167,9 @@
     "areaRearLeft": "Задний левый",
     "areaRearRight": "Задний правый",
     "areaInterior": "Интерьер"
+  },
+  "translation": {
+    "translatedFrom": "Переведено с {language}",
+    "showOriginal": "Показать оригинал"
   }
 }

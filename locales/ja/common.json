@@ -167,5 +167,9 @@
     "areaRearLeft": "左後",
     "areaRearRight": "右後",
     "areaInterior": "内部"
+  },
+  "translation": {
+    "translatedFrom": "{language}から翻訳",
+    "showOriginal": "原文を表示"
   }
 }

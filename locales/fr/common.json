@@ -167,5 +167,9 @@
     "addBooking": "Ajouter une nouvelle réservation",
     "addTransaction": "Ajouter une transaction",
     "completeTask": "Terminer la tâche"
+  },
+  "translation": {
+    "translatedFrom": "Traduit de {language}",
+    "showOriginal": "Afficher l'original"
   }
 }

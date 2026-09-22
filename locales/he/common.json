@@ -167,5 +167,9 @@
     "areaInterior": "פנים",
     "photoCount": "{count, plural, one {# תמונה} two {# תמונות} other {# תמונות}}",
     "damageCount": "{count, plural, one {# פריט} two {# פריטים} other {# פריטים}}"
+  },
+  "translation": {
+    "translatedFrom": "תורגם מ-{language}",
+    "showOriginal": "הצג מקור"
   }
 }

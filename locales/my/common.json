@@ -167,5 +167,9 @@
       "previewTitle": "ငှားရမ်းရေးစာချုပ် ကြိုတင်ကြည့်ရှုမှု",
       "poweredBy": "RouteHQ မှ အားဖြည့်ထားသည်"
     }
+  },
+  "translation": {
+    "translatedFrom": "{language} မှ ဘာသာပြန်ထားသည်",
+    "showOriginal": "မူရင်းကို ပြပါ"
   }
 }

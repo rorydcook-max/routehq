@@ -167,5 +167,9 @@
     "areaInterior": "Interiör",
     "photoCount": "{count, plural, one {# foto} other {# foton}}",
     "damageCount": "{count, plural, one {# skada} other {# skador}}"
+  },
+  "translation": {
+    "translatedFrom": "Översatt från {language}",
+    "showOriginal": "Visa original"
   }
 }

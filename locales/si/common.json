@@ -165,5 +165,9 @@
     "areaRearLeft": "පසුපස වම",
     "areaRearRight": "පසුපස දකුණ",
     "areaInterior": "අභ්‍යන්තරය"
+  },
+  "translation": {
+    "translatedFrom": "{language} වෙතින් පරිවර්තනය කරන ලදී",
+    "showOriginal": "මුල් පිටපත පෙන්වන්න"
   }
 }

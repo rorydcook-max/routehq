@@ -167,5 +167,9 @@
     "areaRearLeft": "Rear left",
     "areaRearRight": "Rear right",
     "areaInterior": "Interior"
+  },
+  "translation": {
+    "translatedFrom": "Translated from {language}",
+    "showOriginal": "Show original"
   }
 }

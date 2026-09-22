@@ -114,7 +114,12 @@ async function translateBatch(language, batch) {
   return JSON.parse(response.choices[0]?.message?.content || "{}");
 }
 
-const sample = { km: "90,124", date: "1 Oct 2026", area: "front left", count: 3 };
+// Sample values for every placeholder a string uses: numbers for counts, text otherwise.
+function sampleFor(english) {
+  const values = {};
+  for (const name of argNames(english).split(",").filter(Boolean)) values[name] = name === "count" ? 3 : "sample";
+  return values;
+}
 let totalAdded = 0;
 let totalRejected = 0;
 
@@ -148,12 +153,16 @@ for (const language of LANGUAGES) {
           rejected.push(`${ns}.${key}: plural forms dropped`);
           continue;
         }
+        const formatErrors = [];
         try {
           const probe = {};
           setDeep(probe, key, text);
-          createTranslator({ locale: language.code, messages: probe })(key, sample);
+          createTranslator({ locale: language.code, messages: probe, onError: (e) => formatErrors.push(e.message) })(key, sampleFor(en));
         } catch (error) {
-          rejected.push(`${ns}.${key}: does not format (${error.message})`);
+          formatErrors.push(error.message);
+        }
+        if (formatErrors.length) {
+          rejected.push(`${ns}.${key}: does not format (${formatErrors[0]})`);
           continue;
         }
         data[ns] = data[ns] || {};

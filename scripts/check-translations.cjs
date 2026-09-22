@@ -18,7 +18,16 @@ const flat = (o, p = "") => Object.entries(o || {}).flatMap(([k, v]) => (v && ty
 
 const english = read("en");
 const keys = flat(english);
-const values = { km: "90,124", date: "1 Oct 2026", area: "front left", count: 3 };
+const englishFlat = (function flatten(o, p = "", out = {}) {
+  for (const [k, v] of Object.entries(o || {})) v && typeof v === "object" ? flatten(v, p + k + ".", out) : (out[p + k] = v);
+  return out;
+})(english);
+// Sample values for each placeholder the English string uses: numbers for counts, text otherwise.
+const valuesFor = (key) => {
+  const values = {};
+  for (const m of String(englishFlat[key]).matchAll(/\{\s*([a-zA-Z_]\w*)\s*[,}]/g)) values[m[1]] = m[1] === "count" ? 3 : "sample";
+  return values;
+};
 let broken = 0;
 let missingTotal = 0;
 
@@ -31,7 +40,7 @@ for (const locale of codes) {
   for (const key of keys) {
     if (!present.has(key)) continue;
     try {
-      t(key, values);
+      t(key, valuesFor(key));
     } catch (e) {
       errors.push(`${key}: ${e.message}`);
     }

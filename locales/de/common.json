@@ -167,5 +167,9 @@
     "areaRearLeft": "Hinten links",
     "areaRearRight": "Hinten rechts",
     "areaInterior": "Innenraum"
+  },
+  "translation": {
+    "translatedFrom": "Übersetzt aus dem {language}",
+    "showOriginal": "Original anzeigen"
   }
 }

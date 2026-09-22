@@ -167,5 +167,9 @@
     "areaRearLeft": "ດ້ານຫຼັງຊ້າຍ",
     "areaRearRight": "ດ້ານຫຼັງຂວາ",
     "areaInterior": "ພາຍໃນ"
+  },
+  "translation": {
+    "translatedFrom": "ແປຈາກ {language}",
+    "showOriginal": "ສະແດງຕົ້ນສະບັບ"
   }
 }

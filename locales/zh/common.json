@@ -167,5 +167,9 @@
     "areaRearLeft": "左后部",
     "areaRearRight": "右后部",
     "areaInterior": "内部"
+  },
+  "translation": {
+    "translatedFrom": "翻译自{language}",
+    "showOriginal": "显示原文"
   }
 }

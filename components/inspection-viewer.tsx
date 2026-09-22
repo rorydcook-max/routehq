@@ -1,5 +1,9 @@
 import { Camera, FileVideo, Fuel, Gauge, PenLine, ShieldAlert } from "lucide-react";
+import { getLocale } from "next-intl/server";
+import { TranslatedText } from "@/components/translated-text";
 import { Badge } from "@/components/ui";
+import { getCurrentMembership } from "@/lib/auth/roles";
+import { translateForReader } from "@/lib/content-translation";
 
 function formatDate(value: string | null | undefined) {
   if (!value) {
@@ -31,11 +35,22 @@ export function FuelGaugeView({ value }: { value: number | null | undefined }) {
   );
 }
 
-export function InspectionViewer({ inspection }: { inspection: any }) {
+export async function InspectionViewer({ inspection }: { inspection: any }) {
   const type = inspection.type || inspection.inspection_type;
   const photos = Array.isArray(inspection.photos) ? inspection.photos : [];
   const damageItems = Array.isArray(inspection.damage_items) ? inspection.damage_items : [];
   const videoUrl = inspection.signed_video_url || inspection.video_url || "";
+
+  // Notes and damage descriptions are shown in the reader's language when they
+  // were written in another, with the original always available. The stored
+  // and signed text is never changed.
+  const locale = await getLocale();
+  const organizationId = inspection.organization_id || (await getCurrentMembership())?.organizationId;
+  const [notes, ...descriptions] = await translateForReader(
+    organizationId,
+    [inspection.notes, ...damageItems.map((item: any) => item.description)],
+    locale
+  );
 
   return (
     <article className="rounded-lg border border-[#d6e5e2] bg-white p-4">
@@ -102,14 +117,14 @@ export function InspectionViewer({ inspection }: { inspection: any }) {
           <p className="rounded-lg border border-[#d6e5e2] bg-[#f8fffd] p-3 text-sm font-semibold text-[#667085]">No damage items recorded.</p>
         ) : (
           <div className="space-y-2">
-            {damageItems.map((item: any) => (
+            {damageItems.map((item: any, index: number) => (
               <div className="rounded-lg border border-[#d6e5e2] bg-[#f8fffd] p-3" key={item.id}>
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="font-black text-[#10252b]">
                       {String(item.location || "vehicle").replace(/_/g, " ")} · {item.severity}
                     </p>
-                    <p className="mt-1 text-sm text-[#667085]">{item.description}</p>
+                    <TranslatedText className="mt-1 text-sm text-[#667085]" value={descriptions[index]} />
                     <Badge tone={item.is_pre_existing ? "neutral" : "red"}>{item.is_pre_existing ? "Pre-existing" : "New damage"}</Badge>
                   </div>
                   {item.photo_url ? (
@@ -137,7 +152,7 @@ export function InspectionViewer({ inspection }: { inspection: any }) {
         </div>
       ) : null}
 
-      {inspection.notes ? <p className="mt-4 rounded-lg bg-[#f8fffd] p-3 text-sm text-[#475467]">{inspection.notes}</p> : null}
+      {notes.original ? <TranslatedText className="mt-4 rounded-lg bg-[#f8fffd] p-3 text-sm text-[#475467]" value={notes} /> : null}
     </article>
   );
 }

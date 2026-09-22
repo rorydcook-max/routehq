@@ -167,5 +167,9 @@
     "areaRearLeft": "뒤 왼쪽",
     "areaRearRight": "뒤 오른쪽",
     "areaInterior": "내부"
+  },
+  "translation": {
+    "translatedFrom": "{language}에서 번역됨",
+    "showOriginal": "원본 보기"
   }
 }

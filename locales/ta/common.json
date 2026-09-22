@@ -167,5 +167,9 @@
     "areaInterior": "உள்ளமை",
     "photoCount": "{count, plural, one {# புகைப்படம்} other {# புகைப்படங்கள்}}",
     "damageCount": "{count, plural, one {# உருப்படி} other {# உருப்படிகள்}}"
+  },
+  "translation": {
+    "translatedFrom": "{language} மொழியில் இருந்து மொழிபெயர்க்கப்பட்டது",
+    "showOriginal": "அசல் வடிவத்தை காட்டு"
   }
 }

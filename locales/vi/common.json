@@ -167,5 +167,9 @@
     "addBooking": "Thêm Đặt Chỗ Mới",
     "addTransaction": "Thêm Giao Dịch",
     "completeTask": "Hoàn Thành Nhiệm Vụ"
+  },
+  "translation": {
+    "translatedFrom": "Được dịch từ {language}",
+    "showOriginal": "Hiển thị bản gốc"
   }
 }

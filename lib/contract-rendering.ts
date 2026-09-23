@@ -238,18 +238,26 @@ export function renderContractTemplate(template: string, variables: Record<strin
     return variables[key] ? content : "";
   });
 
-  const ifElsePattern = /\{\{#if\s+([a-zA-Z0-9_]+)\s*\}\}([\s\S]*?)\{\{else\}\}([\s\S]*?)\{\{\/if\}\}/g;
-  const ifPattern = /\{\{#if\s+([a-zA-Z0-9_]+)\s*\}\}([\s\S]*?)\{\{\/if\}\}/g;
+  // Resolve {{#if key}} ... {{else}} ... {{/if}} blocks innermost-first.
+  //
+  // The pattern only matches a block whose body contains no other {{#if, so a
+  // block can only ever pair with its OWN {{else}} and {{/if}}. The previous
+  // approach tried an if/else pattern first, lazily; an {{#if}} with no
+  // {{else}} (e.g. is_rolling_monthly) then ran on to the NEXT block's
+  // {{else}} and treated ~250 lines of contract as one conditional. Fixed-term
+  // rentals lost about 80% of the contract, including the signatures section,
+  // and rolling-monthly contracts showed raw {{#if}} tags. Repeating until
+  // nothing changes resolves nested blocks from the inside out.
+  const innermostIf = /\{\{#if\s+([a-zA-Z0-9_]+)\s*\}\}((?:(?!\{\{#if\b)[\s\S])*?)\{\{\/if\}\}/g;
 
-  for (let i = 0; i < 20; i += 1) {
+  for (let i = 0; i < 50; i += 1) {
     const before = rendered;
 
-    rendered = rendered.replace(ifElsePattern, (_match, key, truthyContent, fallbackContent) => {
+    rendered = rendered.replace(innermostIf, (_match, key, body) => {
+      const elseIndex = body.indexOf("{{else}}");
+      const truthyContent = elseIndex === -1 ? body : body.slice(0, elseIndex);
+      const fallbackContent = elseIndex === -1 ? "" : body.slice(elseIndex + "{{else}}".length);
       return variables[key] ? truthyContent : fallbackContent;
-    });
-
-    rendered = rendered.replace(ifPattern, (_match, key, content) => {
-      return variables[key] ? content : "";
     });
 
     if (rendered === before) break;

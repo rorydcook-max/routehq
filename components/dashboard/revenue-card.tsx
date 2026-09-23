@@ -71,7 +71,7 @@ export function RevenueCard({
         {isMonthly ? `Expenses ${thb(monthlyExpenses)} this month` : "Average revenue per day this month"}
       </p>
       <div style={{ position: "relative", height: "56px", width: "100%" }} role="img" aria-label="12 month revenue and expenses bar chart">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height={56} minWidth={0} initialDimension={{ width: 320, height: 56 }}>
           <BarChart data={chartData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }} barCategoryGap="20%">
             <XAxis
               dataKey="month"

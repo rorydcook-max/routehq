@@ -140,7 +140,10 @@ export default async function Home() {
       .map((r) => ({ type: "reminder" as const, label: r.title, sub: r.target })),
   ].slice(0, 6);
 
-  const dateLabel = now.toLocaleDateString("en-TH", { weekday: "long", day: "numeric", month: "long" });
+  // Dates on the dashboard are shown in Thai time. Without a time zone they would
+  // use the server clock - UTC once deployed - and be a day behind until 07:00.
+  const dateLabel = now.toLocaleDateString("en-TH", { weekday: "long", day: "numeric", month: "long", timeZone: "Asia/Bangkok" });
+  const headerDateLabel = now.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Bangkok" });
 
   // ── RouteHQ Value Tracker (real DB counts) ───────────────────────────────
   const valueTrackerData = await getValueTrackerData({
@@ -155,7 +158,7 @@ export default async function Home() {
       {/* Header — compact */}
       <div className="mb-3 flex flex-col gap-2 rounded-2xl border border-[var(--border)] bg-white px-4 py-3 shadow-[0_16px_38px_rgba(15,23,42,0.06)] sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-xs font-bold text-[var(--primary)]">Monday, 18 May 2026</p>
+          <p className="text-xs font-bold text-[var(--primary)]">{headerDateLabel}</p>
           <h1 className="text-xl font-black tracking-[-0.03em] text-[var(--foreground)] sm:text-2xl">Operations command center</h1>
           <p className="mt-0.5 text-xs font-medium text-[var(--muted)]">Fleet movement, payments, renewals, and operational risk.</p>
         </div>

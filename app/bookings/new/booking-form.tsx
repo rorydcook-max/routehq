@@ -1307,6 +1307,9 @@ function GooglePlaceInput({
     return () => clearTimeout(timer);
   }, [isEnabled, mapsKeyConfigured]);
 
+  const onPlaceSelectRef = useRef(onPlaceSelect);
+  onPlaceSelectRef.current = onPlaceSelect;
+
   useEffect(() => {
     let cancelled = false;
     const placesLoader = loadGooglePlaces();
@@ -1329,7 +1332,7 @@ function GooglePlaceInput({
           const address = place.formatted_address || place.name || inputRef.current?.value || "";
           const lat = place.geometry?.location?.lat() ?? null;
           const lng = place.geometry?.location?.lng() ?? null;
-          onPlaceSelect({ address, lat, lng, placeId: place.place_id });
+          onPlaceSelectRef.current({ address, lat, lng, placeId: place.place_id });
         });
         setIsEnabled(true);
 
@@ -1349,7 +1352,10 @@ function GooglePlaceInput({
     return () => {
       cancelled = true;
     };
-  }, [onPlaceSelect]);
+    // Created once. onPlaceSelect is an inline function that changes on every
+    // render, so keying on it made a new Google search box (and a new error
+    // pop-up) for every keystroke. The latest callback is read from a ref.
+  }, []);
 
   return (
     <div className="block sm:col-span-2">

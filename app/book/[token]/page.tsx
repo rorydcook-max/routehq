@@ -59,18 +59,28 @@ function deliveryText(rental: any, bookingData: Record<string, unknown>) {
   };
 }
 
+function coordinate(value: unknown, limit: number) {
+  // Number(null) and Number("") are 0, which put customers at 0,0 in the Atlantic.
+  if (value === null || value === undefined || String(value).trim() === "") return null;
+  const number = Number(value);
+  return Number.isFinite(number) && Math.abs(number) <= limit ? number : null;
+}
+
 function deliveryMapsUrl(bookingData: Record<string, unknown>, address: string) {
   const placeId = String(bookingData.delivery_place_id || "").trim();
-  const lat = Number(bookingData.delivery_lat);
-  const lng = Number(bookingData.delivery_lng);
-  if (Number.isFinite(lat) && Number.isFinite(lng)) {
+  const lat = coordinate(bookingData.delivery_lat, 90);
+  const lng = coordinate(bookingData.delivery_lng, 180);
+  if (lat !== null && lng !== null && !(lat === 0 && lng === 0)) {
     const query = `${lat},${lng}`;
     return placeId
       ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}&query_place_id=${encodeURIComponent(placeId)}`
       : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
   }
-  if (placeId && address) {
-    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}&query_place_id=${encodeURIComponent(placeId)}`;
+  if (address) {
+    // No usable coordinates: search for the address as typed.
+    return placeId
+      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}&query_place_id=${encodeURIComponent(placeId)}`
+      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
   }
   return "";
 }
@@ -94,16 +104,18 @@ function countryCode(country: string) {
     bangladesh: "BD",
     "sri lanka": "LK"
   };
-  return codes[country.toLowerCase()] || country.slice(0, 2).toUpperCase();
+  // Only real countries get a code. Guessing from the first two letters turned
+  // "Lamai Beach, Koh Samui" into "Lamai Beach / KO".
+  return codes[country.toLowerCase()] || null;
 }
 
 function formatDeliveryAddress(address: string) {
   const parts = address.split(",").map((part) => part.trim()).filter(Boolean);
   if (parts.length <= 1) return address;
 
-  const country = parts.at(-1) || "";
-  const countrySuffix = country ? countryCode(country) : "";
-  const addressParts = country ? parts.slice(0, -1) : parts;
+  // The last part is only a country if we recognise it; otherwise it is part of the address.
+  const countrySuffix = countryCode(parts.at(-1) || "") || "";
+  const addressParts = countrySuffix ? parts.slice(0, -1) : parts;
   const finalArea = addressParts.at(-1) || "";
   const postalMatch = finalArea.match(/\b\d{4,6}(?:-\d{4})?\b$/);
   const postalCode = postalMatch?.[0] || "";

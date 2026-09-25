@@ -5,6 +5,7 @@ import { CheckCircle2, CreditCard, FileText, IdCard, ImageIcon, MessageCircle, P
 import { completePublicBooking, reportPublicBookingPayment } from "@/app/actions/public-booking";
 import { extractBodyHtml } from "@/lib/contract-rendering";
 import { formatDeliveryLocation } from "@/lib/delivery-location";
+import { toWallTime } from "@/lib/business-time";
 
 declare global {
   interface Window {
@@ -364,7 +365,7 @@ function todayDateString() {
 }
 
 function compactDateTime(value: unknown) {
-  return String(value || "").slice(0, 16);
+  return toWallTime(value);
 }
 
 function isTodayDateTime(value: string) {
@@ -717,10 +718,9 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         setError("Please accept each required acknowledgement before signing.");
         return;
       }
-      if (customerSigningEligibility && !customerSigningEligibility.eligible && !customerSigningEligibility.customerAlreadySigned) {
-        setError(customerSigningEligibility.customerSafeMessage || "This agreement is not ready for signing yet.");
-        return;
-      }
+      // Readiness is decided on the server at submission, after the agreement is
+      // prepared with the customer's details. The page-load eligibility is stale
+      // by then, and blocking here meant the form was never sent and nothing saved.
     } else if (!agreed) {
       setError("Please confirm that you have read and agree to the rental terms.");
       return;

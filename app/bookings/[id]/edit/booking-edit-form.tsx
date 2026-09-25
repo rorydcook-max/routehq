@@ -9,6 +9,7 @@ import { addRentalPayment, cleanupDepositPayments, deleteRentalPayment, updateBo
 import { CustomerSelector } from "@/components/customer-selector";
 import { Badge, Card, SectionHeader } from "@/components/ui";
 import { isMapsUrl } from "@/lib/delivery-location";
+import { toWallTime } from "@/lib/business-time";
 
 type Customer = {
   id: string;
@@ -60,6 +61,8 @@ function dateInput(value: string | null | undefined) {
 
 function dateTimeInput(value: string | null | undefined) {
   if (!value) return "";
+  // Stored instants are shown in business time; zone-less values are already wall time.
+  if (/([zZ]|[+-]\d{2}:?\d{2})$/.test(String(value))) return toWallTime(value);
   const valueString = String(value);
   if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(valueString)) {
     return valueString.slice(0, 16);

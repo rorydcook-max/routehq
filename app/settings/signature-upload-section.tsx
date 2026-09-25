@@ -3,6 +3,7 @@
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { updateOwnerSignature } from "@/app/actions/settings";
+import { SIGNATURE_AUTHORISATION_TEXT } from "@/lib/signature-authorisation";
 
 export function SignatureUploadSection({
   authorisedSignatoryName,
@@ -114,7 +115,7 @@ export function SignatureUploadSection({
       <label className="flex w-full items-start gap-2 rounded-lg border border-[#d6e5e2] bg-white p-2 text-[11px] leading-4 text-[#344054]">
         <input className="mt-0.5" ref={acknowledgementRef} type="checkbox" />
         <span>
-          I authorise this electronic signature to be applied to rental agreements and related rental documents issued by this business through authorised users of this RouteHQ account.
+          {SIGNATURE_AUTHORISATION_TEXT}
         </span>
       </label>
       {message ? (

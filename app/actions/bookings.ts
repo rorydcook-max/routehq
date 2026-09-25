@@ -8,6 +8,7 @@ import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { notifyOperator } from "@/lib/notify-operator";
 import { isRentalDocumentCustomerSigningEnabledForOrganization } from "@/lib/rental-document-customer-signing";
+import { wallTimeToIso } from "@/lib/business-time";
 
 function requiredString(formData: FormData, key: string) {
   const value = String(formData.get(key) || "").trim();
@@ -358,7 +359,7 @@ export async function createBooking(formData: FormData) {
     currency,
     delivery_method: deliveryMethod,
     delivery_location: bookingData.delivery_location,
-    delivery_datetime: bookingData.delivery_datetime,
+    delivery_datetime: wallTimeToIso(bookingData.delivery_datetime),
     return_location: null,
     created_by: user.id
   };
@@ -1008,7 +1009,8 @@ export async function updateBooking(formData: FormData) {
   const depositHeld = numberFromForm(formData, "depositHeld");
   const deliveryMethod = requiredString(formData, "deliveryMethod");
   const deliveryLocation = optionalString(formData, "deliveryLocation");
-  const deliveryDateTime = dateTimeOrNull(formData, "deliveryDateTime");
+  // Business wall time from the form -> real instant (see lib/business-time.ts).
+  const deliveryDateTime = wallTimeToIso(formData.get("deliveryDateTime"));
   const deliveryPlaceId = optionalString(formData, "deliveryPlaceId");
   const deliveryLat = optionalString(formData, "deliveryLat");
   const deliveryLng = optionalString(formData, "deliveryLng");

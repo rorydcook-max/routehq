@@ -2,6 +2,7 @@ import { buildContractVariables, extractBodyHtml, renderContractTemplate } from 
 import { resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
 import { defaultRentalContractTemplate, embedLogoInContractVariables, ensureDefaultContractTemplate } from "@/lib/contracts";
 import { getCustomerExecutedAgreementDownload, loadPublicRentalAgreement } from "@/lib/rental-document-customer-signing";
+import { ensureRentalAgreementDraft } from "@/lib/rental-agreement-automation";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export type PublicBookingState = "not_found" | "expired" | "cancelled" | "ready" | "active" | "completed";
@@ -149,6 +150,11 @@ export async function getPublicBookingDetail(token: string) {
   );
 
   const uploadedCategories = new Set((documents || []).map((document: any) => document.category));
+  // Every booking needs an agreement in the document engine. Nothing else
+  // creates one, so the first time the page opens a draft is made here.
+  if (bookingLink.rental_id && bookingLink.status !== "cancelled") {
+    await ensureRentalAgreementDraft({ organizationId: bookingLink.organization_id, rentalId: bookingLink.rental_id });
+  }
   const rentalDocumentAgreement = await loadPublicRentalAgreement(token);
   const executedDownloads = rentalDocumentAgreement?.eligibility?.fullyExecuted
     ? {

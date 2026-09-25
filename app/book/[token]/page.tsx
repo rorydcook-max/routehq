@@ -5,6 +5,7 @@ import { BookingCompletionForm } from "./booking-completion-form";
 import { getPublicBookingDetail } from "@/lib/public-booking";
 import { BusinessLogoImage } from "@/components/business-logo-image";
 import { isMapsUrl, formatDeliveryLocation } from "@/lib/delivery-location";
+import { toWallTime } from "@/lib/business-time";
 
 function money(value: unknown, currency = "THB") {
   return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0));
@@ -47,7 +48,7 @@ function deliveryText(rental: any, bookingData: Record<string, unknown>) {
   const rawLocation = String(bookingData.delivery_location || rental?.delivery_location || "").trim();
   const locationWasMapsUrl = isMapsUrl(rawLocation);
   const location = locationWasMapsUrl ? formatDeliveryLocation(rawLocation) : rawLocation;
-  const dateTime = String(bookingData.delivery_datetime || rental?.delivery_datetime || "").trim();
+  const dateTime = toWallTime(bookingData.delivery_datetime || rental?.delivery_datetime || "");
   const methodLabel = method === "tbd" ? "Delivery method TBD" : method === "collection" ? "Customer collection" : "Delivery by operator";
   const mapsUrl = deliveryMapsUrl(bookingData, rawLocation);
   const displayLocation = locationWasMapsUrl ? location : formatDeliveryAddress(location);
@@ -126,7 +127,7 @@ function formatDeliveryDateTime(value: string) {
 }
 
 function paymentDueText(rental: any, bookingData: Record<string, unknown>) {
-  const deliveryDateTime = String(bookingData.delivery_datetime || rental?.delivery_datetime || rental?.start_date || "").trim();
+  const deliveryDateTime = toWallTime(bookingData.delivery_datetime || rental?.delivery_datetime || rental?.start_date || "");
   const firstDueDate = formatSummaryDate(deliveryDateTime);
   const period = String(rental?.pricing_model || "monthly").toLowerCase();
   const endDate = rental?.is_indefinite ? "" : formatSummaryDate(rental?.end_date);

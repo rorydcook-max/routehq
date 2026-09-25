@@ -7,6 +7,7 @@ import { buildContractVariables, renderContractTemplate } from "@/lib/contract-r
 import { defaultRentalContractTemplate, embedLogoInContractVariables, ensureDefaultContractTemplate } from "@/lib/contracts";
 import { htmlToPdf } from "@/lib/html-to-pdf";
 import { recordActivityEvent } from "@/lib/supabase/activity";
+import { countersignRentalAgreementForCustomer } from "@/lib/rental-agreement-automation";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { processCustomerPortalAction } from "@/lib/portal-notifications";
 import { notifyContractSigned } from "@/lib/line/notifications";
@@ -16,6 +17,7 @@ import {
   completeRentalDocumentCustomerSigning,
   getCustomerExecutedAgreementDownload
 } from "@/lib/rental-document-customer-signing";
+import { toWallTime, wallTimeToIso } from "@/lib/business-time";
 
 function requiredString(formData: FormData, key: string) {
   const value = String(formData.get(key) || "").trim();
@@ -525,13 +527,13 @@ export async function completePublicBooking(formData: FormData) {
   const paymentTiming = optionalString(formData, "paymentTiming");
   const customerUpfrontPeriods = Number(formData.get("upfrontPeriods") || 0);
   const customerUpfrontRate = Number(formData.get("upfrontRate") || 0) || null;
-  const existingDeliveryDateTime = String(((bookingLink.booking_data || {}) as Record<string, unknown>).delivery_datetime || "").slice(0, 16);
+  const existingDeliveryDateTime = toWallTime(((bookingLink.booking_data || {}) as Record<string, unknown>).delivery_datetime);
   const passportNumber = optionalString(formData, "passportNumber");
   const driverLicenseNumber = optionalString(formData, "driverLicenseNumber");
   const driverLicenseCountry = optionalString(formData, "driverLicenseCountry");
   const driverLicenseExpiry = optionalString(formData, "driverLicenseExpiry");
 
-  if (preferredDeliveryDateTime && preferredDeliveryDateTime !== existingDeliveryDateTime && new Date(preferredDeliveryDateTime).getTime() < Date.now()) {
+  if (preferredDeliveryDateTime && preferredDeliveryDateTime !== existingDeliveryDateTime && new Date(wallTimeToIso(preferredDeliveryDateTime) as string).getTime() < Date.now()) {
     throw new Error("Choose a delivery time that is not in the past.");
   }
 
@@ -700,6 +702,38 @@ export async function completePublicBooking(formData: FormData) {
       .maybeSingle()
   ]);
 
+  // The customer's details and documents are saved above. Record that now, so
+  // the operator can see the customer finished their part even if signing
+  // cannot complete yet - nothing they entered is lost.
+  if (!bookingLink.customer_details_submitted_at) {
+    await supabase
+      .from("booking_links")
+      .update({ customer_details_submitted_at: new Date().toISOString() })
+      .eq("id", bookingLink.id)
+      .is("customer_details_submitted_at", null);
+  }
+
+  // Prepare the business side of the agreement with the customer's details
+  // and apply the business's pre-authorised signature, so the customer can
+  // sign in this same visit.
+  if (currentRentalForAuthority && customerDocumentStatus === "complete") {
+    const countersigned = await countersignRentalAgreementForCustomer({
+      organizationId,
+      rentalId: bookingLink.rental_id
+    });
+    if (!countersigned.ok) {
+      console.error("[booking] agreement countersignature failed", {
+        rentalId: bookingLink.rental_id,
+        reason: countersigned.reason,
+        message: countersigned.message,
+        blockingIssues: countersigned.blockingIssues
+      });
+      throw new Error(
+        "Your details and documents have been saved, but the rental agreement could not be prepared for signing. The rental company has been notified - please contact them to complete your booking."
+      );
+    }
+  }
+
   if (currentRentalForAuthority) {
     if (customerDocumentStatus !== "complete") {
       throw new Error("Please upload passport, driving licence and selfie documents before signing.");
@@ -739,7 +773,7 @@ export async function completePublicBooking(formData: FormData) {
       ...((bookingLink.booking_data || {}) as Record<string, unknown>),
       ...ocrBookingData,
       ...(preferredDeliveryLocation ? { delivery_location: preferredDeliveryLocation } : {}),
-      ...(preferredDeliveryDateTime ? { delivery_datetime: preferredDeliveryDateTime } : {}),
+      ...(preferredDeliveryDateTime ? { delivery_datetime: wallTimeToIso(preferredDeliveryDateTime) } : {}),
       ...(preferredDeliveryLocation || preferredDeliveryDateTime ? { delivery_details_submitted_by_customer: true } : {})
     };
     const signedAt = new Date().toISOString();
@@ -747,7 +781,7 @@ export async function completePublicBooking(formData: FormData) {
     const deliveryDatetime = currentRentalForAuthority.delivery_datetime
       ? new Date(currentRentalForAuthority.delivery_datetime)
       : preferredDeliveryDateTime
-        ? new Date(preferredDeliveryDateTime)
+        ? new Date(wallTimeToIso(preferredDeliveryDateTime) as string)
         : null;
     const isDeliveryNowOrPast = deliveryDatetime ? deliveryDatetime.getTime() <= Date.now() : false;
     const effectivePaymentTiming = isDeliveryNowOrPast ? "now" : requestedPaymentTiming;
@@ -785,7 +819,7 @@ export async function completePublicBooking(formData: FormData) {
         .from("rentals")
         .update({
           ...(preferredDeliveryLocation ? { delivery_location: preferredDeliveryLocation } : {}),
-          ...(preferredDeliveryDateTime ? { delivery_datetime: preferredDeliveryDateTime } : {}),
+          ...(preferredDeliveryDateTime ? { delivery_datetime: wallTimeToIso(preferredDeliveryDateTime) } : {}),
           ...rentalPaymentUpdate,
           ...(customerUpfrontPeriods > 0 && !currentRentalForAuthority.upfront_periods ? { upfront_periods: customerUpfrontPeriods, upfront_rate: customerUpfrontRate, upfront_accepted: true } : {})
         })
@@ -862,7 +896,7 @@ export async function completePublicBooking(formData: FormData) {
     ...((bookingLink.booking_data || {}) as Record<string, unknown>),
     ...ocrBookingData,
     ...(preferredDeliveryLocation ? { delivery_location: preferredDeliveryLocation } : {}),
-    ...(preferredDeliveryDateTime ? { delivery_datetime: preferredDeliveryDateTime } : {}),
+    ...(preferredDeliveryDateTime ? { delivery_datetime: wallTimeToIso(preferredDeliveryDateTime) } : {}),
     customer_signature_url: signature,
     customer_signed_at: signedAt
   };
@@ -904,7 +938,7 @@ export async function completePublicBooking(formData: FormData) {
   };
 
   const requestedPaymentTiming = paymentTiming === "now" ? "now" : "on_delivery";
-  const deliveryDatetime = rental.delivery_datetime ? new Date(rental.delivery_datetime) : preferredDeliveryDateTime ? new Date(preferredDeliveryDateTime) : null;
+  const deliveryDatetime = rental.delivery_datetime ? new Date(rental.delivery_datetime) : preferredDeliveryDateTime ? new Date(wallTimeToIso(preferredDeliveryDateTime) as string) : null;
   const isDeliveryNowOrPast = deliveryDatetime ? deliveryDatetime.getTime() <= Date.now() : false;
   const effectivePaymentTiming = isDeliveryNowOrPast ? "now" : requestedPaymentTiming;
   const rentalPaymentUpdate =
@@ -926,7 +960,7 @@ export async function completePublicBooking(formData: FormData) {
     .from("rentals")
     .update({
       ...(preferredDeliveryLocation ? { delivery_location: preferredDeliveryLocation } : {}),
-      ...(preferredDeliveryDateTime ? { delivery_datetime: preferredDeliveryDateTime } : {}),
+      ...(preferredDeliveryDateTime ? { delivery_datetime: wallTimeToIso(preferredDeliveryDateTime) } : {}),
       ...rentalPaymentUpdate,
       ...(customerUpfrontPeriods > 0 && !rental.upfront_periods ? { upfront_periods: customerUpfrontPeriods, upfront_rate: customerUpfrontRate, upfront_accepted: true } : {})
     })

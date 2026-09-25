@@ -98,8 +98,14 @@ export function getDocumentFinalisationEligibility({
   if (!text(variables.rental_start_date)) pushIssue(blockingIssues, "rental", "missing_rental_start", "Rental start information is missing.");
   if (!text(variables.contracted_rate || variables.rental_rate)) pushIssue(blockingIssues, "rental", "missing_contracted_rate", "Contracted rate is missing.");
   if (!text(variables.billing_period || variables.billing_period_label)) pushIssue(blockingIssues, "rental", "missing_billing_period", "Billing period is missing.");
+  // A warning, not a block. No form sets rentals.standard_daily_rate and the
+  // contract template never shows it - open-ended rentals are billed per
+  // period until return - so blocking here made every open-ended rental
+  // impossible to finalise while adding nothing to the agreement. If a clause
+  // that uses a daily rate is added (e.g. pro-rata on early return), make this
+  // blocking again and add the field to the booking form.
   if (text(variables.is_rolling_monthly) === "true" && !text(variables.standard_daily_rate)) {
-    pushIssue(blockingIssues, "rental", "missing_standard_daily_rate", "Standard daily rate is required for open-ended rentals.");
+    pushIssue(warnings, "rental", "missing_standard_daily_rate", "Standard daily rate is not set for this open-ended rental.");
   }
   if (!text(authorisedSignatory.name)) pushIssue(blockingIssues, "signature", "missing_signatory_name", "Authorised signatory name is missing.");
   if (!text(authorisedSignatory.title)) pushIssue(blockingIssues, "signature", "missing_signatory_title", "Authorised signatory title is missing.");

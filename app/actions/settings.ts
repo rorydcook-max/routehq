@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { SIGNATURE_AUTHORISATION_TEXT, SIGNATURE_AUTHORISATION_TEXT_VERSION } from "@/lib/signature-authorisation";
 import { redirect } from "next/navigation";
 import OpenAI from "openai";
 import { browserSafeAssetUrl, canonicalBrandingReferenceFromSettings, parseLegacyBrandingReference } from "@/lib/branding-assets";
@@ -17,9 +18,10 @@ import { getActiveMembership } from "@/lib/auth/active-organization-server";
 
 const supportedLocales = new Set<string>(supportedLocaleCodes);
 const supportedCalendars = new Set<string>(supportedCalendarCodes);
-const signatureAuthorisationTextVersion = "business-signature-authorisation-v1";
-const signatureAuthorisationText =
-  "I authorise this electronic signature to be applied to rental agreements and related rental documents issued by this business through authorised users of this RouteHQ account.";
+// Wording and version live in lib/signature-authorisation.ts so the settings
+// page and the stored record can never drift apart.
+const signatureAuthorisationTextVersion = SIGNATURE_AUTHORISATION_TEXT_VERSION;
+const signatureAuthorisationText = SIGNATURE_AUTHORISATION_TEXT;
 
 export async function updatePreferredLocale(formData: FormData) {
   const preferredLocale = String(formData.get("preferredLocale") || "en");

@@ -26,6 +26,7 @@ import { flagForNationality } from "@/lib/customer-options";
 import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { formatDeliveryLocation } from "@/lib/delivery-location";
+import { toWallTime } from "@/lib/business-time";
 
 function money(value: unknown, currency = "THB") {
   return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0));
@@ -153,7 +154,7 @@ function deliveryDisplay(rental: any, bookingLink: any) {
   const bookingData = (bookingLink?.booking_data || {}) as Record<string, unknown>;
   const method = normalizedDeliveryMethod(rental?.delivery_method || bookingData.delivery_method);
   const location = formatDeliveryLocation(String(bookingData.delivery_location || rental?.delivery_location || "").trim());
-  const dateTime = String(bookingData.delivery_datetime || rental?.delivery_datetime || "").trim();
+  const dateTime = toWallTime(bookingData.delivery_datetime || rental?.delivery_datetime || "");
 
   if (method === "tbd") {
     return {

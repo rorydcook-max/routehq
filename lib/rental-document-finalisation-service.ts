@@ -55,7 +55,8 @@ export async function finaliseDocumentVersionWithRpc({
   finalContentHash: string;
   finalPdfPath: string;
   finalPdfGeneratedAt: string;
-  userId: string;
+  /** The operator who finalised it, or null when the server countersigns an online booking (see lib/rental-agreement-automation.ts). */
+  userId: string | null;
 }) {
   const snapshot = (version.business_snapshot || {}) as BusinessSnapshot;
   const signatureReference = signatureReferenceFromSnapshot(snapshot);

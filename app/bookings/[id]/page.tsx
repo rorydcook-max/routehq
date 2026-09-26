@@ -18,7 +18,6 @@ import { RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
 import { InspectionViewer } from "@/components/inspection-viewer";
 import { PendingButton } from "@/components/pending-button";
 import { Badge, Card, SectionHeader } from "@/components/ui";
-import { activateRental } from "@/lib/rental-activation";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getBookingDetail, getCustomersForSelector } from "@/lib/bookings";
 import { flagForNationality } from "@/lib/customer-options";
@@ -252,35 +251,10 @@ export default async function BookingDetailPage({ params, searchParams }: { para
     );
   }
 
-  // Auto-activate stale booked rentals and active rentals with no payment schedule
-  const sevenDaysAgo = new Date(Date.now() - 7 * 86_400_000);
-  const rentalStartDate = new Date(String(detail.rental.start_date || "").slice(0, 10) + "T00:00:00Z");
-  const needsAutoActivation =
-    (detail.rental.status === "booked" && (
-      detail.rental.entered_by_operator === true ||
-      rentalStartDate < sevenDaysAgo
-    )) ||
-    (detail.rental.status === "active" && detail.payments.length === 0);
-
-  if (needsAutoActivation) {
-    const supabase = (await createSupabaseServerClient()) as any;
-    // For booked rentals, update vehicle status to rented
-    if (detail.rental.status === "booked" && detail.rental.vehicles?.id) {
-      await supabase
-        .from("vehicles")
-        .update({
-          status: "rented",
-          availability_status: "rented",
-          current_rental_id: detail.rental.id,
-          current_customer_id: detail.rental.customers?.id || null
-        })
-        .eq("id", detail.rental.vehicles.id)
-        .eq("organization_id", organization.id);
-    }
-    await activateRental(detail.rental.id, supabase).catch(() => null);
-    const refreshed = await getBookingDetail(id, organization.id);
-    if (refreshed) detail = refreshed;
-  }
+  // Opening a booking never changes it. This page used to activate rentals and
+  // generate two years of rent the moment anyone viewed (or prefetched) it;
+  // activation now only happens through delivery, "Skip inspection and
+  // activate", or the payment schedule controls on this page.
 
   const supabaseForVehicles = (await createSupabaseServerClient()) as any;
   const { data: availableVehicles } = await supabaseForVehicles
@@ -870,6 +844,16 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 {!needsExistingRentalPaymentSetup && payments.length === 0 && outstandingBalance === 0 && totalPaid === 0 ? (
                   <div className="space-y-3 rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3 text-sm font-semibold text-[#92400e]">
                     <p>No payment schedule exists yet for this booking. Generate one from the rental rate and dates, or add a single charge.</p>
+                    <GeneratePaymentScheduleButton rentalId={rental.id} />
+                  </div>
+                ) : null}
+                {!needsExistingRentalPaymentSetup &&
+                payments.length > 0 &&
+                ["active", "due_soon", "overdue", "extended", "booked"].includes(String(displayStatus || "").toLowerCase()) &&
+                overduePaymentGroup.length + dueNowPaymentGroup.length + upcomingPaymentGroup.length === 0 &&
+                (!rental.end_date || String(rental.end_date).slice(0, 10) > today) ? (
+                  <div className="space-y-3 rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3 text-sm font-semibold text-[#92400e]">
+                    <p>No future rent is scheduled for this rental. Generate the rest of the schedule from the rental rate - payments already made are kept.</p>
                     <GeneratePaymentScheduleButton rentalId={rental.id} />
                   </div>
                 ) : null}

@@ -15,7 +15,10 @@ export async function middleware(request: NextRequest) {
     pathname === "/book" ||
     pathname.startsWith("/book/") ||
     pathname.startsWith("/auth/callback") ||
-    pathname === "/api/line/webhook";
+    pathname === "/api/line/webhook" ||
+    // Scheduled jobs have no user session; they check CRON_SECRET themselves.
+    pathname.startsWith("/api/cron/") ||
+    pathname === "/api/line/daily-summary";
   const isOnboardingAllowedRoute = isPublicRoute || pathname.startsWith("/api/") || pathname.startsWith("/fleet/import");
   const isSubscriptionAllowedRoute =
     isOnboardingAllowedRoute ||

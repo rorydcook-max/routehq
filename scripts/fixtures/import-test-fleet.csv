@@ -1,0 +1,5 @@
+License Plate,Vehicle Brand,Vehicle Model,Model Year,Colour,Current Mileage (KM),Purchase Date,Tax Expiry Date,Rented From Date,Rented To Date,Rental Rate P/M,Deposit Amount,Mileage at Rental Date,Renter Name,Renter Tel Number,Renter Email
+TEST-001,Toyota,Vios,2022,Silver,41250,Jul 22nd 2023,29-08-2569,01-09-2026,,9500,5000,41000,Test Renter One,+66800000011,test.renter.one@example.invalid
+TEST-002,Honda,City,2021,White,Unknown,15/03/2024,2026-12-31,,,,,,,,
+2ขฒ7536,MG,3,2019,Red,62000,,,,,,,,,,
+TEST-003,,Jazz,2020,Blue,30000,,,,,,,,,,

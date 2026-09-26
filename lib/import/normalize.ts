@@ -42,22 +42,41 @@ export function parseDateValue(value: unknown) {
 
   const cleaned = raw.replace(/(\d+)(st|nd|rd|th)/gi, "$1").replace(/\./g, "/");
   const isoMatch = cleaned.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+  // Thai documents often use the Buddhist calendar (2569 = 2026).
+  const gregorianYear = (year: string) => String(Number(year) > 2400 ? Number(year) - 543 : Number(year));
+  // Rejects impossible dates such as 31-02-2026 instead of storing them.
+  const real = (year: string, month: string, day: string) => {
+    const date = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+    return date.getUTCFullYear() === Number(year) && date.getUTCMonth() === Number(month) - 1 && date.getUTCDate() === Number(day)
+      ? [year, month.padStart(2, "0"), day.padStart(2, "0")].join("-")
+      : null;
+  };
+
   if (isoMatch) {
-    return [isoMatch[1], isoMatch[2].padStart(2, "0"), isoMatch[3].padStart(2, "0")].join("-");
+    return real(gregorianYear(isoMatch[1]), isoMatch[2], isoMatch[3]);
   }
 
   const dayFirstMatch = cleaned.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})$/);
   if (dayFirstMatch) {
-    const year = dayFirstMatch[3].length === 2 ? `20${dayFirstMatch[3]}` : dayFirstMatch[3];
-    return [year, dayFirstMatch[2].padStart(2, "0"), dayFirstMatch[1].padStart(2, "0")].join("-");
+    const year = dayFirstMatch[3].length === 2 ? `20${dayFirstMatch[3]}` : gregorianYear(dayFirstMatch[3]);
+    return real(year, dayFirstMatch[2], dayFirstMatch[1]);
   }
 
+  // Text dates like "Jul 22 2023". Read the calendar date as written: going
+  // through toISOString() would shift it a day back on a server east of UTC.
   const parsed = new Date(cleaned);
   if (Number.isNaN(parsed.getTime())) {
     return null;
   }
 
-  return parsed.toISOString().slice(0, 10);
+  return [parsed.getFullYear(), String(parsed.getMonth() + 1).padStart(2, "0"), String(parsed.getDate()).padStart(2, "0")].join("-");
+}
+
+/** Numbers like mileage where "Unknown", "-" or blank mean "not known", never zero. */
+export function parseKnownNumber(value: unknown) {
+  const text = cleanString(value).toLowerCase();
+  if (!text || ["unknown", "n/a", "na", "-", "?", "tbc", "tbd"].includes(text)) return null;
+  return parseNumberValue(value);
 }
 
 export function normalizeTransactionType(value: unknown) {

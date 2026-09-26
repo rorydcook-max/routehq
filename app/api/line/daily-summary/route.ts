@@ -8,7 +8,7 @@ export const runtime = "nodejs";
 export async function POST(req: NextRequest) {
   const authHeader = req.headers.get("authorization") ?? "";
   const cronSecret = process.env.CRON_SECRET ?? "";
-  if (authHeader !== `Bearer ${cronSecret}`) {
+  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -172,3 +172,6 @@ function vehicleLabel(v: any): string {
   const parts = [v.make, v.model].filter(Boolean).join(" ");
   return v.registration_number ? `${parts} (${v.registration_number})` : parts || "Vehicle";
 }
+
+// Vercel Cron calls with GET (see vercel.json); POST stays for manual runs.
+export const GET = POST;

@@ -302,9 +302,14 @@ export function BookingForm({
     setBaseUrl(defaultAppUrl || window.location.origin);
   }, []);
 
+  // Prefill the rate when the vehicle or pricing period changes - not when the
+  // vehicle list refreshes (after saving, the booked car drops out of the list
+  // and the review showed ฿0).
   useEffect(() => {
-    setRentalRate(rateFor(selectedVehicle, pricingModel));
-  }, [selectedVehicle, pricingModel]);
+    const vehicle = vehicles.find((item) => item.id === vehicleId) || null;
+    if (vehicle) setRentalRate(rateFor(vehicle, pricingModel));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vehicleId, pricingModel]);
 
   function canContinue() {
     if (step === 0) return Boolean(selectedVehicle && selectable(selectedVehicle));
@@ -1068,10 +1073,13 @@ export function BookingForm({
         >
           Back
         </button>
+        {/* Separate keys: otherwise React reuses the Continue button as the submit
+            button, and the click that opens the review step also submits it. */}
         {step < steps.length - 1 ? (
           <button
             className="pressable min-h-12 flex-1 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-black text-white shadow-lg disabled:bg-[#94a3b8]"
             disabled={!canContinue() || showCustomerModal}
+            key="continue"
             onClick={goNext}
             type="button"
           >
@@ -1088,6 +1096,7 @@ export function BookingForm({
           <button
             className="pressable min-h-12 flex-1 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-black text-white shadow-lg disabled:bg-[#94a3b8]"
             disabled={isPending}
+            key="submit"
             onClick={() => {
               submitIntentRef.current = walkInFastTrack ? "walk_in" : "default";
             }}

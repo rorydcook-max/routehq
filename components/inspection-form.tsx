@@ -602,6 +602,9 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
           <button
             className={`${touchButton} flex-1 bg-[#0f766e] text-white shadow-lg disabled:bg-[#94a3b8]`}
             disabled={!canAdvance()}
+            // Distinct keys stop React reusing this button as the submit button, which let the
+            // click that opened the last step also submit (condition reports need no signature).
+            key="next"
             onClick={() => setStep((current) => Math.min(steps.length - 1, current + 1))}
             type="button"
           >
@@ -613,6 +616,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
             className={`${touchButton} flex-1 bg-[#0f766e] text-white shadow-lg disabled:bg-[#94a3b8]`}
             disabled={!canAdvance() || isPending}
             form="inspectionForm"
+            key="submit"
             onClick={(event) => {
               event.preventDefault();
               const form = document.getElementById("inspectionForm") as HTMLFormElement | null;

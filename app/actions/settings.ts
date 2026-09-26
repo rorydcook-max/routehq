@@ -56,8 +56,8 @@ export async function updatePreferredLocale(formData: FormData) {
     throw new Error(error.message);
   }
 
-  revalidatePath("/account");
-  revalidatePath("/settings");
+  // The language applies to every page, so refresh the whole app, not just this one.
+  revalidatePath("/", "layout");
 }
 
 function optionalStringFromForm(formData: FormData, key: string) {

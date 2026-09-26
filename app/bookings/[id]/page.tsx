@@ -99,7 +99,9 @@ function startedAgoLabel(startDate: string | null | undefined): string {
   return `${months} month${months !== 1 ? "s" : ""} ago`;
 }
 
-function daysRemaining(value: string | null | undefined) {
+function daysRemaining(value: string | null | undefined, status?: string | null) {
+  if (status === "completed") return "Returned";
+  if (status === "cancelled") return "Cancelled";
   if (!value) return "Open-ended";
   const today = new Date();
   const target = new Date(value);
@@ -378,10 +380,10 @@ export default async function BookingDetailPage({ params, searchParams }: { para
         tone: "red" as const
       };
     }
-    if (activePayments.length > 0 && totalRentalValue > 0 && totalPaid >= totalRentalValue) {
+    if (activePayments.length > 0 && ((totalRentalValue > 0 && totalPaid >= totalRentalValue) || pendingPaymentAmount === 0)) {
       return {
         label: "Paid up to date",
-        detail: "All scheduled payment records are paid.",
+        detail: "Nothing is due right now.",
         amount: null as number | null,
         tone: "green" as const
       };
@@ -507,7 +509,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               <span>{formatDate(rental.start_date)} to</span>
               <EditableEndDate currentEndDate={rental.end_date} rentalId={rental.id} />
             </div>
-            <p className="text-sm text-[#667085]">{daysRemaining(rental.end_date)}</p>
+            <p className="text-sm text-[#667085]">{daysRemaining(rental.end_date, rental.status)}</p>
           </BookingMetricCard>
           <BookingMetricCard icon={<CreditCard size={18} />} label="Billing">
             <p className="font-mono-data text-sm font-black leading-5 text-[#10252b]">{money(rental.rental_rate, rental.currency)} / {rental.pricing_model}</p>
@@ -752,7 +754,15 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               <div className="mt-3 space-y-3 text-sm">
                 <Info icon={Car} label="Vehicle" value={`${vehicleTitle(vehicle)} / ${vehicle?.registration_number || ""}`} />
                 <DeliveryInfo delivery={delivery} />
-                <Info icon={MapPin} label="Return" value={rental.return_location || "Not recorded"} />
+                <Info
+                  icon={MapPin}
+                  label="Return"
+                  value={
+                    returnInspection
+                      ? `Returned ${formatDateTime(returnInspection.submitted_at || returnInspection.created_at)}${rental.return_location ? ` · ${rental.return_location}` : ""}`
+                      : rental.return_location || "Not arranged yet"
+                  }
+                />
                 <Info icon={CreditCard} label="Deposit" value={formatDepositSummary(rental)} />
                 <RefundDepositPanel
                   rentalId={rental.id}

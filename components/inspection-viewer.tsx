@@ -1,5 +1,5 @@
 import { Camera, FileVideo, Fuel, Gauge, PenLine, ShieldAlert } from "lucide-react";
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { TranslatedText } from "@/components/translated-text";
 import { Badge } from "@/components/ui";
 import { getCurrentMembership } from "@/lib/auth/roles";
@@ -44,7 +44,13 @@ export async function InspectionViewer({ inspection }: { inspection: any }) {
   // Notes and damage descriptions are shown in the reader's language when they
   // were written in another, with the original always available. The stored
   // and signed text is never changed.
-  const locale = await getLocale();
+  const [locale, t] = await Promise.all([getLocale(), getTranslations("inspection")]);
+  const severityKeys: Record<string, string> = { scratch: "damageScratch", dent: "damageDent", crack: "damageCrack", missing: "damageMissingPart", other: "damageOther" };
+  const areaName = (location: string) => {
+    const key = `area${location.split("_").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join("")}`;
+    return t.has(key) ? t(key) : location.replace(/_/g, " ");
+  };
+  const severityName = (severity: string) => (severityKeys[severity] ? t(severityKeys[severity]) : severity);
   const organizationId = inspection.organization_id || (await getCurrentMembership())?.organizationId;
   const [notes, ...descriptions] = await translateForReader(
     organizationId,
@@ -122,7 +128,7 @@ export async function InspectionViewer({ inspection }: { inspection: any }) {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="font-black text-[#10252b]">
-                      {String(item.location || "vehicle").replace(/_/g, " ")} · {item.severity}
+                      {areaName(String(item.location || "vehicle"))} · {severityName(String(item.severity || ""))}
                     </p>
                     <TranslatedText className="mt-1 text-sm text-[#667085]" value={descriptions[index]} />
                     <Badge tone={item.is_pre_existing ? "neutral" : "red"}>{item.is_pre_existing ? "Pre-existing" : "New damage"}</Badge>

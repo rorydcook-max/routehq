@@ -4,6 +4,7 @@ import { clsx } from "clsx";
 import Link from "next/link";
 import type { Route } from "next";
 import { X } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 type SubscriptionPayload = {
@@ -43,6 +44,7 @@ function toneForDays(days: number | null | undefined) {
 export function TrialBanner() {
   const [payload, setPayload] = useState<SubscriptionPayload | null>(null);
   const [hidden, setHidden] = useState(true);
+  const pathname = usePathname();
 
   useEffect(() => {
     const dismissedUntil = Number(window.localStorage.getItem(dismissKey) || 0);
@@ -61,7 +63,8 @@ export function TrialBanner() {
       .catch(() => null);
   }, []);
 
-  if (hidden || !payload?.organization) {
+  // Never over a handover: the inspection form keeps its buttons at the bottom of the screen.
+  if (hidden || !payload?.organization || pathname?.startsWith("/inspections")) {
     return null;
   }
 
@@ -69,7 +72,15 @@ export function TrialBanner() {
   const tone = toneForDays(days);
 
   return (
-    <div className={clsx("mb-3 flex flex-col gap-2 rounded-lg border px-3 py-2 shadow-sm sm:min-h-10 sm:flex-row sm:items-center sm:justify-between", tone.className)}>
+    // Floats over the page instead of sitting above it: it loads after the page,
+    // and pushing everything down at that moment made people tap the wrong thing.
+    <div
+      className={clsx(
+        "fixed bottom-4 left-1/2 z-40 flex w-[min(560px,calc(100%-2rem))] -translate-x-1/2 flex-col gap-2 rounded-lg border px-3 py-2 shadow-lg sm:min-h-10 sm:flex-row sm:items-center sm:justify-between",
+        tone.className
+      )}
+      role="status"
+    >
       <div className="flex items-center gap-2">
         <span aria-hidden="true" className={clsx("h-2 w-2 rounded-full", tone.dot)} />
         <div>

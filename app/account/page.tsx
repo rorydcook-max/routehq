@@ -49,7 +49,8 @@ export default async function AccountPage() {
             <p className="text-xs text-[#667085]">
               Only affects what you see. Other people in your business keep their own settings.
             </p>
-            <form action={updatePreferredLocale} className="mt-3 space-y-3">
+            {/* Keyed by the saved values so the form shows them after a save (React resets forms to their first defaults). */}
+            <form action={updatePreferredLocale} className="mt-3 space-y-3" key={`${locale}-${profile?.preferred_calendar || ""}`}>
               <label className="block">
                 <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Language</span>
                 <select className={inputClass} defaultValue={locale} name="preferredLocale">

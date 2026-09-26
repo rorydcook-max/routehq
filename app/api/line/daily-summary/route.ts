@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { businessToday } from "@/lib/business-time";
 import { buildDailySummaryMessage, sendLineMessage } from "@/services/messaging/line";
 
 export const runtime = "nodejs";
@@ -24,9 +25,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: orgsError.message }, { status: 500 });
   }
 
-  const now = new Date();
-  const today = now.toISOString().slice(0, 10);
-  const tomorrow = new Date(now.getTime() + 86_400_000).toISOString().slice(0, 10);
+  const today = businessToday();
+  const tomorrow = businessToday(1);
   const firstOfMonth = today.slice(0, 7) + "-01";
 
   const results: Array<{ org: string; success: boolean; error?: string }> = [];

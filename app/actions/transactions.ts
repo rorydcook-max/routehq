@@ -1,5 +1,6 @@
 "use server";
 
+import { businessToday } from "@/lib/business-time";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { logoUrlToDataUri } from "@/lib/contracts";
@@ -232,7 +233,7 @@ export async function recordDeliveryCashPaymentAndReceipt(formData: FormData) {
     throw new Error("A positive cash payment amount is required.");
   }
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = businessToday();
   const now = new Date().toISOString();
   const { data: rental, error: rentalError } = await supabase
     .from("rentals")
@@ -432,7 +433,7 @@ export async function createTransaction(formData: FormData) {
   const vehicleId = String(formData.get("vehicleId") || "");
   const type = normalizeTransactionType(formData.get("type"));
   const amount = numberField(formData, "amount");
-  const transactionDate = optionalString(formData, "transactionDate") || new Date().toISOString().slice(0, 10);
+  const transactionDate = optionalString(formData, "transactionDate") || businessToday();
 
   if (!organizationId || !vehicleId || amount === null || amount <= 0) {
     throw new Error("Vehicle, type, and a positive amount are required.");
@@ -591,7 +592,7 @@ export async function findTransactionMatches(formData: FormData) {
   const amountRaw = String(formData.get("amount") || "").trim();
   const amount = amountRaw ? Number(amountRaw) : null;
   const vehicleId = optionalString(formData, "vehicleId");
-  const date = optionalString(formData, "transactionDate") || new Date().toISOString().slice(0, 10);
+  const date = optionalString(formData, "transactionDate") || businessToday();
 
   return findMatchingOutstandingItems(organizationId, type, Number.isFinite(amount) ? amount : null, vehicleId, date);
 }

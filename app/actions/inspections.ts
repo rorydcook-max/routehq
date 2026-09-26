@@ -1,5 +1,6 @@
 "use server";
 
+import { businessToday } from "@/lib/business-time";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { applyDepositDeduction, returnDeposit } from "@/app/actions/deposits";
@@ -25,7 +26,7 @@ function numberField(formData: FormData, key: string) {
 }
 
 function todayDate() {
-  return new Date().toISOString().slice(0, 10);
+  return businessToday();
 }
 
 function safeJsonArray(formData: FormData, key: string) {

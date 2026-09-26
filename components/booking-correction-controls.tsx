@@ -1,5 +1,6 @@
 "use client";
 
+import { businessToday } from "@/lib/business-time";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
@@ -106,7 +107,7 @@ export function AddRentalPaymentInlineForm({ organizationId, rentalId, currency 
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState("0");
-  const [dueDate, setDueDate] = useState(new Date().toISOString().slice(0, 10));
+  const [dueDate, setDueDate] = useState(businessToday());
   const [description, setDescription] = useState("Rental payment");
   const [status, setStatus] = useState("pending");
   const [message, setMessage] = useState<string | null>(null);
@@ -208,8 +209,8 @@ export function ExistingRentalPaymentSetupCard({
   const [depositMode, setDepositMode] = useState<"collected" | "pending" | "none">(depositAmount > 0 ? "pending" : "none");
   const [firstPaymentAmount, setFirstPaymentAmount] = useState(String(Math.max(0, Math.round(rentalRate || 0))));
   const [depositPaymentAmount, setDepositPaymentAmount] = useState(String(Math.max(0, Math.round(depositAmount || 0))));
-  const [firstPaymentDate, setFirstPaymentDate] = useState(dateInput(startDate) || new Date().toISOString().slice(0, 10));
-  const [depositDate, setDepositDate] = useState(dateInput(startDate) || new Date().toISOString().slice(0, 10));
+  const [firstPaymentDate, setFirstPaymentDate] = useState(dateInput(startDate) || businessToday());
+  const [depositDate, setDepositDate] = useState(dateInput(startDate) || businessToday());
   const [firstPaymentMethod, setFirstPaymentMethod] = useState("cash");
   const [depositMethod, setDepositMethod] = useState("cash");
   const [message, setMessage] = useState<string | null>(null);
@@ -450,7 +451,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
   const [paidDate, setPaidDate] = useState(dateInput(payment.paid_at));
   const [recordingPayment, setRecordingPayment] = useState(false);
   const [recordAmount, setRecordAmount] = useState(amountInput(payment.amount));
-  const [recordDate, setRecordDate] = useState(new Date().toISOString().slice(0, 10));
+  const [recordDate, setRecordDate] = useState(businessToday());
   const [recordMethod, setRecordMethod] = useState("cash");
   const [recordNote, setRecordNote] = useState("");
   const [message, setMessage] = useState<string | null>(null);
@@ -465,7 +466,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
     function openFromHash() {
       if (window.location.hash === `#record-payment-${payment.id}`) {
         setRecordAmount(amountInput(payment.amount));
-        setRecordDate(new Date().toISOString().slice(0, 10));
+        setRecordDate(businessToday());
         setRecordingPayment(true);
       }
     }
@@ -530,7 +531,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
               className="pressable inline-flex min-h-9 items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-4 text-sm font-black text-white"
               onClick={() => {
                 setRecordAmount(amountInput(payment.amount));
-                setRecordDate(new Date().toISOString().slice(0, 10));
+                setRecordDate(businessToday());
                 setRecordingPayment(true);
               }}
               type="button"

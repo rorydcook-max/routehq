@@ -1,3 +1,4 @@
+import { businessToday } from "@/lib/business-time";
 import { addMonths, addWeeks } from "@/lib/payment-schedule";
 
 type SupabaseClient = { from: (table: string) => any };
@@ -73,7 +74,7 @@ export async function activateRental(rentalId: string, supabase: SupabaseClient)
 
   const existingRentPayments = (existingPayRows || []).filter(isNonVoidedRentPayment);
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = businessToday();
   const hasScheduledFuture = existingRentPayments.some(
     (p: any) => p.status === "scheduled" && dateOnly(p.due_date) > today
   );
@@ -118,7 +119,7 @@ async function generatePaymentScheduleInternal(
 
   const startDate = new Date(`${startDateStr}T00:00:00.000Z`);
   const endDateStr = dateOnly(rental.end_date) || null;
-  const today = new Date().toISOString().slice(0, 10);
+  const today = businessToday();
 
   // Build set of dates already covered by existing payments (within 5 days)
   const existingDates = existingPayments.map((p: any) => dateOnly(p.due_date)).filter(Boolean);

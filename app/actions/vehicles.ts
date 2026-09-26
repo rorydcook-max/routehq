@@ -1,5 +1,6 @@
 "use server";
 
+import { businessToday } from "@/lib/business-time";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { markOnboardingStep } from "@/lib/onboarding";
@@ -826,7 +827,7 @@ export async function renewVehicleCompliance(formData: FormData) {
       organization_id: organizationId,
       vehicle_id: vehicleId,
       compliance_type: complianceType,
-      effective_date: new Date().toISOString().slice(0, 10),
+      effective_date: businessToday(),
       expiry_date: newExpiryDate,
       cost,
       notes: [notes, documentId ? `Document: ${documentId}` : ""].filter(Boolean).join("\n") || null,

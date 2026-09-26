@@ -1,3 +1,4 @@
+import { businessToday } from "@/lib/business-time";
 import { NextResponse } from "next/server";
 import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization";
 import { cleanPlate, cleanString, normalizeTransactionType, parseDateValue, parseIntegerValue, parseNumberValue } from "@/lib/import/normalize";
@@ -235,7 +236,7 @@ export async function POST(request: Request) {
           const { error } = await supabase.from("transactions").insert({
             organization_id: organization.id,
             vehicle_id: vehicle.id,
-            transaction_date: parseDateValue(fields.date) || new Date().toISOString().slice(0, 10),
+            transaction_date: parseDateValue(fields.date) || businessToday(),
             type: normalizeTransactionType(fields.type),
             amount,
             currency: organization.currency || "THB",

@@ -54,6 +54,16 @@ export function wallTimeToIso(value: unknown, timeZone: string = BUSINESS_TIME_Z
   return new Date(guess - offsetMinutes(timeZone, new Date(guess)) * 60000).toISOString();
 }
 
+/**
+ * Today's date ("YYYY-MM-DD") in business time. new Date().toISOString() gives
+ * the UTC date, which in Thailand is still yesterday until 07:00 - enough to
+ * mark rent due today as overdue or date a payment on the wrong day.
+ */
+export function businessToday(offsetDays = 0, timeZone: string = BUSINESS_TIME_ZONE): string {
+  const p = zonedParts(new Date(Date.now() + offsetDays * 86_400_000), timeZone);
+  return `${p.year}-${p.month}-${p.day}`;
+}
+
 /** Any stored value -> "YYYY-MM-DDTHH:mm" in business time (or the date alone for date-only values). */
 export function toWallTime(value: unknown, timeZone: string = BUSINESS_TIME_ZONE): string {
   const text = String(value ?? "").trim();

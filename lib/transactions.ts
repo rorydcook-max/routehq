@@ -1,3 +1,4 @@
+import { businessToday } from "@/lib/business-time";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { TRANSACTION_TYPE_OPTIONS } from "@/lib/transaction-options";
 
@@ -171,14 +172,14 @@ export async function getTransactionFormPrefill({
 
     const rental = data.rentals || {};
     const vehicle = rental.vehicles || {};
-    const dueDate = String(data.due_date || "").slice(0, 10) || new Date().toISOString().slice(0, 10);
+    const dueDate = String(data.due_date || "").slice(0, 10) || businessToday();
     const vehicleName = [vehicle.make, vehicle.model].filter(Boolean).join(" ") || vehicle.registration_number || "vehicle";
     const month = new Intl.DateTimeFormat("en-TH", { month: "short" }).format(new Date(dueDate));
 
     return {
       type: "rental_income",
       amount: String(Number(data.amount || 0)),
-      transactionDate: new Date().toISOString().slice(0, 10),
+      transactionDate: businessToday(),
       notes: `${month} rental payment - ${vehicleName}`,
       vehicleId: rental.vehicle_id || "",
       rentalId: data.rental_id || rental.id || "",
@@ -210,7 +211,7 @@ export async function getTransactionFormPrefill({
     return {
       type: "rental_income",
       amount: "",
-      transactionDate: new Date().toISOString().slice(0, 10),
+      transactionDate: businessToday(),
       notes: data.title || "Payment",
       vehicleId: data.vehicle_id || "",
       rentalId: data.rental_id || "",

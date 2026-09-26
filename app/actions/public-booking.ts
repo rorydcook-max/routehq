@@ -17,7 +17,7 @@ import {
   completeRentalDocumentCustomerSigning,
   getCustomerExecutedAgreementDownload
 } from "@/lib/rental-document-customer-signing";
-import { toWallTime, wallTimeToIso } from "@/lib/business-time";
+import { toWallTime, wallTimeToIso, businessToday } from "@/lib/business-time";
 
 function requiredString(formData: FormData, key: string) {
   const value = String(formData.get(key) || "").trim();
@@ -93,7 +93,7 @@ function documentStatus(categories: string[]) {
 }
 
 function todayDate() {
-  return new Date().toISOString().slice(0, 10);
+  return businessToday();
 }
 
 function recordObject(value: unknown): Record<string, unknown> {

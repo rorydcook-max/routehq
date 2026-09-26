@@ -1,3 +1,4 @@
+import { businessToday } from "@/lib/business-time";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export type MatchResult = {
@@ -66,7 +67,7 @@ export async function findMatchingOutstandingItems(
   date: string
 ): Promise<MatchResult[]> {
   const supabase = (await createSupabaseServerClient()) as any;
-  const transactionDate = dateOnly(date) || new Date().toISOString().slice(0, 10);
+  const transactionDate = dateOnly(date) || businessToday();
   const normalizedType = String(type || "").trim();
   const parsedAmount = amount !== null && Number.isFinite(Number(amount)) ? Number(amount) : null;
 
@@ -137,7 +138,7 @@ export async function findMatchingOutstandingItems(
         amount: paymentAmount,
         vehicleId: rental.vehicle_id || null,
         description: label,
-        date: transactionDate || due || new Date().toISOString().slice(0, 10)
+        date: transactionDate || due || businessToday()
       }
     });
   }

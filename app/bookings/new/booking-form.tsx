@@ -1,5 +1,6 @@
 "use client";
 
+import { businessToday } from "@/lib/business-time";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import type { LucideIcon } from "lucide-react";
@@ -244,7 +245,7 @@ export function BookingForm({
   const [vehicleSearch, setVehicleSearch] = useState("");
   const [vehicleId, setVehicleId] = useState(validPreselectedVehicle ? preselectedVehicleId : "");
   const [selectedCustomer, setSelectedCustomer] = useState<BookingCustomer | null>(customers.find((customer) => customer.id === preselectedCustomerId) || null);
-  const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 10));
+  const [startDate, setStartDate] = useState(businessToday());
   const [endDate, setEndDate] = useState("");
   const [openEnded, setOpenEnded] = useState(false);
   const [pricingModel, setPricingModel] = useState("monthly");

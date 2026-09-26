@@ -2,6 +2,7 @@ import { MapPin } from "lucide-react";
 import Link from "next/link";
 import type { Route } from "next";
 import { AppShell } from "@/components/app-shell";
+import { businessToday } from "@/lib/business-time";
 import { ComplianceAlertsCard } from "@/components/dashboard/compliance-alerts-card";
 import { DepositsHeldCard } from "@/components/dashboard/deposits-held-card";
 import { FleetIntelligencePanel } from "@/components/dashboard/fleet-intelligence-panel";
@@ -23,7 +24,7 @@ import { getDefaultOrganization } from "@/lib/organization";
 import { getValueTrackerData } from "@/lib/value-tracker";
 import { getOnboardingStatus } from "@/lib/onboarding";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { isRawDepositTransaction, isRevenueTransaction } from "@/lib/transaction-options";
+import { isExpenseTransaction, isRawDepositTransaction, isRevenueTransaction } from "@/lib/transaction-options";
 
 const statusTone = {
   Rented: "blue",
@@ -47,8 +48,8 @@ export default async function Home() {
   const { metrics: dashboardMetrics, reminders, rentals, timeline, transactions, vehicles } = dashboardData;
 
   const now = new Date();
-  const today = now.toISOString().slice(0, 10);
-  const daysElapsed = now.getDate() || 1;
+  const today = businessToday();
+  const daysElapsed = Number(today.slice(8, 10)) || 1;
   const totalVehicles = vehicles.length;
   const rentedCount = vehicles.filter((vehicle) => ["rented", "active"].includes(String(vehicle.status).toLowerCase())).length;
   const availableCount = vehicles.filter((vehicle) => String(vehicle.status).toLowerCase() === "available").length;
@@ -56,8 +57,10 @@ export default async function Home() {
   const fleetUtilization = totalVehicles > 0 ? Math.round((rentedCount / totalVehicles) * 100) : 0;
 
   // ── Revenue / profit ──────────────────────────────────────────────────────
+  // Expenses are stored as positive amounts, so they're recognised by type (the old `amount < 0` test never matched).
   const monthlyExpenses = transactions
-    .filter((t) => t.amount < 0 && !isRawDepositTransaction({ isDeposit: t.isDeposit, type: t.rawType || t.type }))
+    .filter((t) => String(t.date || "").slice(0, 7) === today.slice(0, 7))
+    .filter((t) => isExpenseTransaction({ isDeposit: t.isDeposit, type: t.rawType || t.type }))
     .reduce((sum, t) => sum + Math.abs(t.amount), 0);
   const monthlyNetProfit = dashboardMetrics.monthlyRevenue - monthlyExpenses;
   const dailyRevenue = Math.round(dashboardMetrics.monthlyRevenue / daysElapsed);

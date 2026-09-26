@@ -1,3 +1,4 @@
+import { businessToday } from "@/lib/business-time";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { buildUpcomingPayments, buildVehicleEvents } from "@/lib/rental-upcoming";
 
@@ -228,7 +229,7 @@ export async function getBookingDetail(rentalId: string, organizationId: string)
     return null;
   }
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = businessToday();
   const [bookingLinksResult, contractsResult, paymentsResult, upcomingPaymentsResult, vehicleTasksResult, transactionsResult, inspectionsResult, documentsResult, activityResult, portalActionsResult, communicationResult] = await Promise.all([
     supabase
       .from("booking_links")

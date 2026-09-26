@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { businessToday } from "@/lib/business-time";
 
-function dateOnly(offsetDays = 0) {
-  const date = new Date(Date.now() + offsetDays * 86_400_000);
-  return date.toISOString().split("T")[0];
-}
+// Business-time dates: a UTC date would flag rent as overdue a day early for runs before 07:00 in Thailand.
+const dateOnly = (offsetDays = 0) => businessToday(offsetDays);
 
 function thb(amount: number) {
   return `THB ${Math.round(amount || 0).toLocaleString()}`;

@@ -1,5 +1,6 @@
 "use server";
 
+import { businessToday } from "@/lib/business-time";
 import { revalidatePath } from "next/cache";
 import { SIGNATURE_AUTHORISATION_TEXT, SIGNATURE_AUTHORISATION_TEXT_VERSION } from "@/lib/signature-authorisation";
 import { redirect } from "next/navigation";
@@ -1575,8 +1576,8 @@ export async function sendTestLineSummary(): Promise<{ success: boolean; message
   if (!accessToken) return { success: false, message: "No LINE Channel Access Token available." };
 
   // Fetch real data for the test message
-  const today = new Date().toISOString().slice(0, 10);
-  const tomorrow = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10);
+  const today = businessToday();
+  const tomorrow = businessToday(1);
   const firstOfMonth = today.slice(0, 7) + "-01";
 
   const [rentalsRes, vehiclesRes, txRes] = await Promise.all([

@@ -1,5 +1,6 @@
 import type { Reminder, Rental, Transaction, Vehicle } from "@/lib/types";
 import { isRevenueTransaction } from "@/lib/transaction-options";
+import { businessToday } from "@/lib/business-time";
 
 export function calculateDashboardMetrics({
   reminders,
@@ -12,8 +13,11 @@ export function calculateDashboardMetrics({
   transactions: Transaction[];
   vehicles: Vehicle[];
 }) {
+  // "This month" in business time - this used to add up every transaction ever recorded.
+  const thisMonth = businessToday().slice(0, 7);
   return {
     monthlyRevenue: transactions
+      .filter((transaction) => String(transaction.date || "").slice(0, 7) === thisMonth)
       .filter((transaction) =>
         isRevenueTransaction({
           amount: transaction.amount,

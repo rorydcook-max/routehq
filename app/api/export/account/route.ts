@@ -1,3 +1,4 @@
+import { businessToday } from "@/lib/business-time";
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getActiveMembership } from "@/lib/auth/active-organization-server";
@@ -66,7 +67,7 @@ export async function GET() {
   return new Response(rows.join("\n"), {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": `attachment; filename="routehq-export-${new Date().toISOString().slice(0, 10)}.csv"`
+      "Content-Disposition": `attachment; filename="routehq-export-${businessToday()}.csv"`
     }
   });
 }

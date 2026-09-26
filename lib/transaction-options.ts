@@ -32,6 +32,11 @@ export function isRawDepositTransaction({
   return Boolean(isDeposit) || type === "deposit" || type === "deposit_received" || type === "deposit_refunded";
 }
 
+/** Money going out of the business (repairs, fuel, insurance...). Stored as positive amounts; the type says it's a cost. */
+export function isExpenseTransaction({ isDeposit, type }: { isDeposit?: boolean | null; type: string }) {
+  return !isRawDepositTransaction({ isDeposit, type }) && !isIncomeTransactionType(type);
+}
+
 export function isRevenueTransaction({
   amount,
   isDeposit,

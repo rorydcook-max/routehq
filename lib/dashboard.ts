@@ -35,8 +35,7 @@ const rentalStatusMap: Record<string, Rental["status"]> = {
   booked: "Booked",
   due_soon: "Due Soon",
   overdue: "Overdue",
-  completed: "Active",
-  cancelled: "Booked"
+  extended: "Active"
 };
 
 const transactionTypeMap: Record<string, Transaction["type"]> = {
@@ -124,7 +123,11 @@ export async function getDashboardData(): Promise<DashboardData> {
     return status !== "completed" && status !== "cancelled" && depositStatus === "received";
   });
   const depositsHeld = depositsHeldRows.reduce((sum: number, row: any) => sum + Number(row.deposit_held || 0), 0);
-  const rentals: Rental[] = rentalRows.map(mapRental);
+  // The dashboard is about what's happening now: returned and cancelled bookings
+  // used to be mapped to "Active"/"Booked" and showed up in today's schedule.
+  const rentals: Rental[] = rentalRows
+    .filter((row: any) => !["completed", "cancelled"].includes(String(row.status || "").toLowerCase()))
+    .map(mapRental);
   const customers: Customer[] = (customersResult.data || []).map(mapCustomer);
   const transactions: Transaction[] = (transactionsResult.data || []).map(mapTransaction);
   const reminders: Reminder[] = (remindersResult.data || []).map(mapReminder);

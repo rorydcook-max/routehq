@@ -25,7 +25,7 @@ import { flagForNationality } from "@/lib/customer-options";
 import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { formatDeliveryLocation } from "@/lib/delivery-location";
-import { toWallTime } from "@/lib/business-time";
+import { toWallTime, businessToday } from "@/lib/business-time";
 import { GeneratePaymentScheduleButton } from "@/app/bookings/[id]/generate-payment-schedule-button";
 import { RentalDocumentsCard } from "@/app/bookings/[id]/rental-documents-card";
 import { businessSignatureOf, getBookingRentalDocuments, renterSignatureOf, type BookingRentalDocument } from "@/lib/booking-rental-documents";
@@ -311,7 +311,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   const totalRentalValue = Number(rental.total_scheduled ?? fallbackTotalRentalValue);
   const totalPaid = Number(rental.total_paid_income ?? fallbackTotalPaid);
   const outstandingBalance = Number(rental.balance_due ?? Math.max(0, totalRentalValue - totalPaid));
-  const today = new Date().toISOString().slice(0, 10);
+  const today = businessToday();
   const nonVoidedPayments = payments.filter((p: any) => !isVoidedPayment(p));
   const overduePaymentGroup = nonVoidedPayments.filter((p: any) => p.status !== "paid" && p.due_date && p.due_date < today);
   const dueNowPaymentGroup = nonVoidedPayments.filter((p: any) => p.status !== "paid" && (!p.due_date || p.due_date === today));

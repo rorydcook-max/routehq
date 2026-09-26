@@ -8,7 +8,7 @@ import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { notifyOperator } from "@/lib/notify-operator";
 import { isRentalDocumentCustomerSigningEnabledForOrganization } from "@/lib/rental-document-customer-signing";
-import { wallTimeToIso } from "@/lib/business-time";
+import { wallTimeToIso, businessToday } from "@/lib/business-time";
 import { getCurrentMembership } from "@/lib/auth/roles";
 
 function requiredString(formData: FormData, key: string) {
@@ -1558,7 +1558,7 @@ function daysBetweenDates(from: string | null | undefined, to: string | null | u
 }
 
 function todayDate() {
-  return new Date().toISOString().slice(0, 10);
+  return businessToday();
 }
 
 function amountFromParam(value: unknown) {
@@ -3079,7 +3079,7 @@ export async function recordPaymentRefund(formData: FormData) {
       type: "refund",
       amount: -Math.abs(amount),
       currency: rental.currency || "THB",
-      transaction_date: new Date().toISOString().slice(0, 10),
+      transaction_date: businessToday(),
       notes: notes || "Payment refund",
       metadata: { description: "Payment refund", notes, created_by_operator: true },
       is_deposit: false,
@@ -3296,7 +3296,7 @@ export async function undoCancellation(formData: FormData) {
 
   const resolvedVehicleId = vehicleId || rental.vehicle_id;
   const restoreStatus = rental.delivery_datetime ? "active" : "booked";
-  const today = new Date().toISOString().slice(0, 10);
+  const today = businessToday();
 
   const ops: Promise<any>[] = [
     // Restore rental status and clear cancellation fields

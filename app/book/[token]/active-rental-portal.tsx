@@ -1,5 +1,6 @@
 "use client";
 
+import { businessToday } from "@/lib/business-time";
 import { useMemo, useState, useTransition } from "react";
 import { AlertTriangle, CalendarCheck, CalendarPlus, CheckCircle2, FileText, ImageIcon, MessageCircle } from "lucide-react";
 import { submitCustomerPortalAction } from "@/app/actions/public-booking";
@@ -262,7 +263,7 @@ function returnCountdown(endDate: string | null | undefined) {
 }
 
 function today() {
-  return new Date().toISOString().slice(0, 10);
+  return businessToday();
 }
 
 function nextDate(value: string | null | undefined) {

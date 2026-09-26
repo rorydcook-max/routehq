@@ -29,9 +29,13 @@ export function TransactionForm({
 }) {
   const [type, setType] = useState(prefill?.type || "rental_income");
   const [amount, setAmount] = useState(prefill?.amount || "");
-  const [transactionDate, setTransactionDate] = useState(prefill?.transactionDate || new Date().toISOString().slice(0, 10));
+  // Today in business time: toISOString() is UTC, which is still "yesterday" in Thailand before 7am.
+  const [transactionDate, setTransactionDate] = useState(
+    prefill?.transactionDate || new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date())
+  );
   const [notes, setNotes] = useState(prefill?.notes || "");
-  const [vehicleId, setVehicleId] = useState(prefill?.vehicleId || defaultVehicleId || options.vehicles[0]?.id || "");
+  // No vehicle is preselected: a money entry silently booked against the first car in the list is worse than a required field.
+  const [vehicleId, setVehicleId] = useState(prefill?.vehicleId || defaultVehicleId || "");
   const [rentalId, setRentalId] = useState(prefill?.rentalId || defaultRentalId);
   const [customerId, setCustomerId] = useState(prefill?.customerId || defaultCustomerId);
   const [linkedRentalPaymentId, setLinkedRentalPaymentId] = useState(prefill?.rentalPaymentId || "");

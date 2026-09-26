@@ -9,6 +9,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { notifyOperator } from "@/lib/notify-operator";
 import { isRentalDocumentCustomerSigningEnabledForOrganization } from "@/lib/rental-document-customer-signing";
 import { wallTimeToIso } from "@/lib/business-time";
+import { getCurrentMembership } from "@/lib/auth/roles";
 
 function requiredString(formData: FormData, key: string) {
   const value = String(formData.get(key) || "").trim();
@@ -872,6 +873,27 @@ export async function deleteBooking(rentalId: string): Promise<{ success: boolea
   if (rentalError || !rental) return { success: false, error: rentalError?.message || "Booking not found." };
 
   await ensureMembership(supabase, rental.organization_id, user.id);
+
+  // Deleting is only for bookings entered by mistake. Once there is a signed
+  // document, money or a handover on record, the booking is part of the
+  // business's records (and possibly evidence), so it can only be cancelled.
+  const membership = await getCurrentMembership();
+  if (!membership || membership.organizationId !== rental.organization_id || membership.role !== "owner") {
+    return { success: false, error: "Only the business owner can delete a booking." };
+  }
+  const [documentsCheck, transactionsCheck, inspectionsCheck] = await Promise.all([
+    supabase.from("rental_documents").select("id", { count: "exact", head: true }).eq("rental_id", cleanId).eq("organization_id", rental.organization_id),
+    supabase.from("transactions").select("id", { count: "exact", head: true }).eq("rental_id", cleanId).eq("organization_id", rental.organization_id),
+    supabase.from("inspections").select("id", { count: "exact", head: true }).eq("rental_id", cleanId).eq("organization_id", rental.organization_id)
+  ]);
+  const checkError = documentsCheck.error || transactionsCheck.error || inspectionsCheck.error;
+  if (checkError) return { success: false, error: checkError.message };
+  if ((documentsCheck.count || 0) > 0 || (transactionsCheck.count || 0) > 0 || (inspectionsCheck.count || 0) > 0) {
+    return {
+      success: false,
+      error: "This booking has a rental agreement, payments or an inspection on record, so it can't be deleted. Cancel it instead - its records are kept."
+    };
+  }
 
   // Null out receipt FKs before deleting transactions
   const { data: txIds } = await supabase

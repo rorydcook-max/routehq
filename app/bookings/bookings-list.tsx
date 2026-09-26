@@ -284,7 +284,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                     {confirmDeleteId === booking.id ? (
                       <div className="mt-1 w-full rounded-lg border border-[#fecaca] bg-[#fef2f2] p-2">
                         <p className="mb-2 text-xs font-semibold text-[#dc2626]">
-                          Permanently delete all records of this booking? This removes the booking, payments, and documents entirely. Use <strong>Cancel booking</strong> instead if you want to keep a record of the cancellation.
+                          Delete this booking permanently? Only bookings entered by mistake can be deleted - once there is a signed agreement, a payment or an inspection, use <strong>Cancel booking</strong> instead so the records are kept.
                         </p>
                         <div className="flex gap-2">
                           <button
@@ -375,7 +375,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
               {confirmDeleteId === booking.id ? (
                 <div className="mt-2 rounded-lg border border-[#fecaca] bg-[#fef2f2] p-2">
                   <p className="mb-2 text-xs font-semibold text-[#dc2626]">
-                    Permanently delete all records of this booking? This removes the booking, payments, and documents entirely. Use <strong>Cancel booking</strong> instead if you want to keep a record of the cancellation.
+                    Delete this booking permanently? Only bookings entered by mistake can be deleted - once there is a signed agreement, a payment or an inspection, use <strong>Cancel booking</strong> instead so the records are kept.
                   </p>
                   <div className="flex gap-2">
                     <button

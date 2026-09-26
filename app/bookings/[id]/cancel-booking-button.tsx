@@ -521,7 +521,7 @@ export function CancelBookingButton({
                   )}
                   <div className="rounded-xl border border-[#fde68a] bg-[#fffbeb] p-3">
                     <p className="text-xs font-bold text-[#92400e]">
-                      ⚠️ This cannot be undone. The booking will be permanently cancelled.
+                      ⚠️ The customer's booking link stops working straight away. You can undo the cancellation from the booking afterwards.
                     </p>
                   </div>
                 </div>

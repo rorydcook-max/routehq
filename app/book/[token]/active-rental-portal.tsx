@@ -16,6 +16,7 @@ export function ActiveRentalPortal({
   rental,
   bookingData,
   signedContractUrl,
+  certificateUrl,
   deliveryPhotoUrls,
   ownerContact
 }: {
@@ -25,6 +26,7 @@ export function ActiveRentalPortal({
   rental: any;
   bookingData: Record<string, unknown>;
   signedContractUrl?: string | null;
+  certificateUrl?: string | null;
   deliveryPhotoUrls: string[];
   ownerContact?: string | null;
 }) {
@@ -112,7 +114,13 @@ export function ActiveRentalPortal({
           {signedContractUrl ? (
             <a className="rounded-xl border border-[#d6e5e2] bg-[#fbfefd] p-4 text-sm font-black text-[#10252b]" href={signedContractUrl} rel="noreferrer" target="_blank">
               <FileText className="mb-2 text-[#0f766e]" />
-              View signed contract
+              Signed rental agreement
+            </a>
+          ) : null}
+          {certificateUrl ? (
+            <a className="rounded-xl border border-[#d6e5e2] bg-[#fbfefd] p-4 text-sm font-black text-[#10252b]" href={certificateUrl} rel="noreferrer" target="_blank">
+              <FileText className="mb-2 text-[#0f766e]" />
+              Signing certificate
             </a>
           ) : null}
           {deliveryPhotoUrls.length ? (

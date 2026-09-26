@@ -68,22 +68,24 @@ export function BookingShareActions({
         formData.set("baseUrl", defaultAppUrl || window.location.origin);
         const result = await resendBookingLink(formData);
         setLink(result.bookingUrl);
+        const done = result.created ? "Booking link created. It works for 7 days." : "Booking link renewed for another 7 days.";
+        const copyBlocked = " Copy was blocked by the browser, so select the link above and press Ctrl+C.";
 
         if (channel === "copy") {
           const copied = await copyText(result.bookingUrl);
-          setMessage(copied ? "Booking link copied and expiry extended." : "Booking link expiry extended. Copy was blocked by the browser, so select the link above and press Ctrl+C.");
+          setMessage(copied ? `${done} Copied.` : `${done}${copyBlocked}`);
           return;
         }
 
         if (navigator.share) {
           await navigator.share({ title: "Booking link", text: result.message, url: result.bookingUrl }).catch(() => undefined);
-          setMessage("Booking link expiry extended.");
+          setMessage(done);
         } else if (result.whatsappUrl) {
           window.open(result.whatsappUrl, "_blank", "noopener,noreferrer");
-          setMessage("Booking link expiry extended.");
+          setMessage(done);
         } else {
           const copied = await copyText(result.bookingUrl);
-          setMessage(copied ? "Booking link copied and expiry extended." : "Booking link expiry extended. Copy was blocked by the browser, so select the link above and press Ctrl+C.");
+          setMessage(copied ? `${done} Copied.` : `${done}${copyBlocked}`);
         }
       } catch (error) {
         setMessage(error instanceof Error ? error.message : "Unable to resend booking link.");
@@ -102,7 +104,7 @@ export function BookingShareActions({
       <div className="flex flex-col gap-2 sm:flex-row">
         <button className="pressable inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg bg-[#0f766e] px-4 py-3 text-sm font-black text-white disabled:opacity-70" disabled={isPending} onClick={() => resend("share")} type="button">
           {isPending ? <span className="spinner" /> : <MessageCircle size={18} />}
-          Resend booking link
+          {link ? "Resend booking link" : "Create booking link"}
         </button>
         <button className="pressable inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-[#d6e5e2] bg-white px-4 py-3 text-sm font-black text-[#344054] disabled:opacity-70" disabled={isPending || !link} onClick={copyCurrentLink} type="button">
           {isPending ? <RotateCcw size={18} /> : <Copy size={18} />}

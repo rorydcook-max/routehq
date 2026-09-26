@@ -688,6 +688,56 @@ export async function assignCustomerToBooking(formData: FormData) {
   revalidatePath("/bookings");
 }
 
+async function createBookingLinkForRental(supabase: any, organizationId: string, rental: any, userId: string) {
+  if (["cancelled", "completed"].includes(String(rental.status))) {
+    throw new Error("This booking has ended, so a customer link can't be created.");
+  }
+
+  let contractId = rental.contract_id as string | null;
+  if (!contractId) {
+    const { data: contract, error: contractError } = await supabase
+      .from("contracts")
+      .insert({
+        organization_id: organizationId,
+        rental_id: rental.id,
+        customer_id: rental.customer_id || null,
+        locale: "en",
+        status: "draft",
+        metadata: {}
+      })
+      .select("id")
+      .single();
+    if (contractError || !contract) throw new Error(contractError?.message || "Unable to prepare the booking agreement.");
+    contractId = contract.id as string;
+    await supabase.from("rentals").update({ contract_id: contractId }).eq("id", rental.id).eq("organization_id", organizationId);
+  }
+
+  const { data: link, error } = await supabase
+    .from("booking_links")
+    .insert({
+      organization_id: organizationId,
+      rental_id: rental.id,
+      vehicle_id: rental.vehicle_id,
+      customer_id: rental.customer_id || null,
+      contract_id: contractId,
+      status: "pending",
+      data_type: "rental_booking",
+      delivery_method: rental.delivery_method || null,
+      booking_data: {
+        delivery_location: rental.delivery_location || null,
+        delivery_datetime: rental.delivery_datetime || null
+      },
+      expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      created_by: userId
+    })
+    .select("id, token, public_url")
+    .single();
+  if (error || !link) throw new Error(error?.message || "Unable to create the booking link.");
+
+  await supabase.from("contracts").update({ booking_link_id: link.id }).eq("id", contractId).eq("organization_id", organizationId);
+  return link;
+}
+
 export async function resendBookingLink(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
@@ -720,7 +770,7 @@ export async function resendBookingLink(formData: FormData) {
     throw new Error(organizationError?.message || "Organization was not found.");
   }
 
-  const { data: bookingLink, error: linkError } = await supabase
+  const { data: existingLink, error: linkError } = await supabase
     .from("booking_links")
     .select("id, token, public_url")
     .eq("organization_id", organizationId)
@@ -730,9 +780,12 @@ export async function resendBookingLink(formData: FormData) {
     .limit(1)
     .maybeSingle();
 
-  if (linkError || !bookingLink) {
-    throw new Error(linkError?.message || "Booking link was not found.");
+  if (linkError) {
+    throw new Error(linkError.message);
   }
+  // A booking entered by the team has no link yet: create one so the
+  // customer can add their details and sign the agreement online.
+  const bookingLink = existingLink || (await createBookingLinkForRental(supabase, organizationId, rental, user.id));
 
   const bookingUrl = bookingLink.public_url || `${baseUrl}/book/${bookingLink.token}`;
   const { error: updateError } = await supabase
@@ -763,15 +816,18 @@ export async function resendBookingLink(formData: FormData) {
     vehicle_id: rental.vehicle_id,
     rental_id: rentalId,
     customer_id: rental.customer_id,
-    event_type: "booking_link_resent",
-    title: "Booking link resent",
-    detail: `Booking link resent for ${bookingReference(rental)}.`
+    event_type: existingLink ? "booking_link_resent" : "booking_link_created",
+    title: existingLink ? "Booking link resent" : "Booking link created",
+    detail: existingLink
+      ? `Booking link resent for ${bookingReference(rental)}.`
+      : `Booking link created for ${bookingReference(rental)} so the customer can add their details and sign.`
   });
 
   revalidatePath("/bookings");
   revalidatePath(`/bookings/${rentalId}`);
 
   return {
+    created: !existingLink,
     bookingUrl,
     message,
     ...urls

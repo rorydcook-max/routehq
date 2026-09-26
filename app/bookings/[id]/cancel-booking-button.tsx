@@ -271,7 +271,7 @@ export function CancelBookingButton({
               <div className="flex-1">
                 <p className="text-xs font-black uppercase text-[#be123c]">Cancel booking</p>
                 <h3 className="text-lg font-black text-[#10252b]">
-                  {customerName || "This booking"}
+                  {customerName ? `Booking for ${customerName}` : "Booking with no customer yet"}
                 </h3>
                 <div className="mt-1 flex gap-3 text-xs text-[#667085]">
                   {hasPayment && <span>Paid: {money(totalPaid, currency)}</span>}

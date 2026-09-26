@@ -694,7 +694,7 @@ export async function completePublicBooking(formData: FormData) {
   const [{ data: currentRentalForAuthority }, { data: currentCustomerForSigning }] = await Promise.all([
     supabase
       .from("rentals")
-      .select("id, vehicle_id, customer_id, rental_rate, deposit_amount, delivery_datetime, start_date, end_date, billing_interval, pricing_model, currency, upfront_periods, upfront_rate")
+      .select("id, status, vehicle_id, customer_id, rental_rate, deposit_amount, delivery_datetime, start_date, end_date, billing_interval, pricing_model, currency, upfront_periods, upfront_rate")
       .eq("id", bookingLink.rental_id)
       .eq("organization_id", organizationId)
       .maybeSingle(),
@@ -829,9 +829,11 @@ export async function completePublicBooking(formData: FormData) {
       supabase
         .from("rentals")
         .update({
-          ...(preferredDeliveryLocation ? { delivery_location: preferredDeliveryLocation } : {}),
-          ...(preferredDeliveryDateTime ? { delivery_datetime: wallTimeToIso(preferredDeliveryDateTime) } : {}),
-          ...rentalPaymentUpdate,
+          // A rental already running (entered by the team, link sent later)
+          // keeps the delivery and payment terms it has.
+          ...(currentRentalForAuthority.status === "booked" && preferredDeliveryLocation ? { delivery_location: preferredDeliveryLocation } : {}),
+          ...(currentRentalForAuthority.status === "booked" && preferredDeliveryDateTime ? { delivery_datetime: wallTimeToIso(preferredDeliveryDateTime) } : {}),
+          ...(currentRentalForAuthority.status === "booked" ? rentalPaymentUpdate : {}),
           ...(customerUpfrontPeriods > 0 && !currentRentalForAuthority.upfront_periods ? { upfront_periods: customerUpfrontPeriods, upfront_rate: customerUpfrontRate, upfront_accepted: true } : {})
         })
         .eq("id", bookingLink.rental_id)

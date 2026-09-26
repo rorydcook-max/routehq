@@ -98,16 +98,43 @@ function startedAgoLabel(startDate: string | null | undefined): string {
   return `${months} month${months !== 1 ? "s" : ""} ago`;
 }
 
-function daysRemaining(value: string | null | undefined, status?: string | null) {
+/** Where the customer is with their booking link, in plain words. Nothing when there is no live link. */
+function bookingLinkBadge(status: string | null | undefined): { label: string; tone: "green" | "blue" | "amber" } | null {
+  switch (status) {
+    case "pending":
+      return { label: "Link not opened yet", tone: "amber" };
+    case "sent":
+      return { label: "Link sent", tone: "amber" };
+    case "viewed":
+      return { label: "Customer opened link", tone: "blue" };
+    case "details_submitted":
+      return { label: "Customer details received", tone: "blue" };
+    case "contract_signed":
+    case "completed":
+      return { label: "Customer signed", tone: "green" };
+    case "expired":
+      return { label: "Link expired", tone: "amber" };
+    default:
+      return null;
+  }
+}
+
+function daysRemaining(value: string | null | undefined, status?: string | null, startDate?: string | null) {
   if (status === "completed") return "Returned";
   if (status === "cancelled") return "Cancelled";
+  const today = businessToday();
+  const daysFromToday = (date: string) =>
+    Math.round((new Date(`${date.slice(0, 10)}T00:00:00Z`).getTime() - new Date(`${today}T00:00:00Z`).getTime()) / 86_400_000);
+  if (status === "booked" && startDate) {
+    const untilStart = daysFromToday(startDate);
+    if (untilStart > 0) return untilStart === 1 ? "Starts tomorrow" : `Starts in ${untilStart} days`;
+    if (untilStart === 0) return "Starts today";
+  }
   if (!value) return "Open-ended";
-  const today = new Date();
-  const target = new Date(value);
-  today.setHours(0, 0, 0, 0);
-  target.setHours(0, 0, 0, 0);
-  const days = Math.ceil((target.getTime() - today.getTime()) / 86_400_000);
-  return days < 0 ? `${Math.abs(days)} days overdue` : `${days} days remaining`;
+  const days = daysFromToday(value);
+  if (days === 0) return "Due back today";
+  if (days < 0) return `${Math.abs(days)} day${days === -1 ? "" : "s"} overdue`;
+  return `${days} day${days === 1 ? "" : "s"} remaining`;
 }
 
 function statusTone(status: string): "green" | "amber" | "red" | "blue" | "neutral" {
@@ -405,7 +432,9 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <Badge tone={statusTone(displayStatus)}>{String(displayStatus).replace(/_/g, " ")}</Badge>
-                <Badge tone={bookingLink?.status === "completed" ? "green" : bookingLink?.status === "viewed" ? "blue" : "amber"}>{bookingLink?.status ? String(bookingLink.status).replace(/_/g, " ") : "No booking link"}</Badge>
+                {bookingLinkBadge(bookingLink?.status) ? (
+                  <Badge tone={bookingLinkBadge(bookingLink?.status)!.tone}>{bookingLinkBadge(bookingLink?.status)!.label}</Badge>
+                ) : null}
                 {!customer ? <Badge tone="amber">Awaiting customer</Badge> : null}
                 {rental.entered_by_operator ? <Badge tone="blue">Operator entered</Badge> : null}
                 <span className="font-mono-data text-xs font-black uppercase text-[#667085]">{bookingReference(rental)}</span>
@@ -483,7 +512,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               <span>{formatDate(rental.start_date)} to</span>
               <EditableEndDate currentEndDate={rental.end_date} rentalId={rental.id} />
             </div>
-            <p className="text-sm text-[#667085]">{daysRemaining(rental.end_date, rental.status)}</p>
+            <p className="text-sm text-[#667085]">{daysRemaining(rental.end_date, rental.status, rental.start_date)}</p>
           </BookingMetricCard>
           <BookingMetricCard icon={<CreditCard size={18} />} label="Billing">
             <p className="font-mono-data text-sm font-black leading-5 text-[#10252b]">{money(rental.rental_rate, rental.currency)} / {rental.pricing_model}</p>
@@ -500,8 +529,22 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             ) : null}
           </BookingMetricCard>
           <BookingMetricCard icon={<Gauge size={18} />} label="Mileage">
-            <p className="font-mono-data text-sm font-black leading-5 text-[#10252b]">{Number(rental.km_driven || 0).toLocaleString()} km</p>
-            <p className="font-mono-data text-sm text-[#667085]">Delivery {Number(rental.mileage_at_delivery || 0).toLocaleString()} / Return {Number(rental.mileage_at_return || 0).toLocaleString()}</p>
+            {rental.mileage_at_delivery == null ? (
+              <>
+                <p className="text-sm font-black leading-5 text-[#10252b]">Not recorded yet</p>
+                <p className="text-sm text-[#667085]">Recorded at delivery</p>
+              </>
+            ) : rental.mileage_at_return == null ? (
+              <>
+                <p className="font-mono-data text-sm font-black leading-5 text-[#10252b]">{Number(rental.mileage_at_delivery).toLocaleString()} km at delivery</p>
+                <p className="text-sm text-[#667085]">Distance driven is worked out at return</p>
+              </>
+            ) : (
+              <>
+                <p className="font-mono-data text-sm font-black leading-5 text-[#10252b]">{Number(rental.km_driven ?? Number(rental.mileage_at_return) - Number(rental.mileage_at_delivery)).toLocaleString()} km driven</p>
+                <p className="font-mono-data text-sm text-[#667085]">{Number(rental.mileage_at_delivery).toLocaleString()} → {Number(rental.mileage_at_return).toLocaleString()} km</p>
+              </>
+            )}
           </BookingMetricCard>
           <BookingMetricCard icon={<UserRound size={18} />} label="Customer">
             {customer ? (
@@ -518,9 +561,14 @@ export default async function BookingDetailPage({ params, searchParams }: { para
         <div className="grid gap-3 lg:grid-cols-[minmax(0,3fr)_minmax(320px,2fr)]">
           <div className="space-y-3">
             <Card>
-              <SectionHeader eyebrow="Booking link" title="Customer completion timeline" />
+              <SectionHeader eyebrow="Booking link" title={bookingLink ? "Customer completion timeline" : "Customer booking link"} />
+              {!bookingLink ? (
+                <p className="mt-3 text-sm text-[#667085]">
+                  This booking was entered by your team. Create a link if you want the customer to add their details and sign the agreement online.
+                </p>
+              ) : null}
               <div className="mt-3 space-y-3">
-                {timelineSteps(bookingLink, rentalDocuments).map((step) => (
+                {(bookingLink ? timelineSteps(bookingLink, rentalDocuments) : []).map((step) => (
                     <div className="sub-surface flex items-start gap-3 p-3" key={step.label}>
                     <span className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${step.complete ? "bg-[#dcfce7] text-[#166534]" : "bg-[#eef2f6] text-[#667085]"}`}>
                       {step.complete ? <CheckCircle2 size={16} /> : <Clock size={16} />}

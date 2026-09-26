@@ -285,7 +285,8 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             organizationName={organization?.name || "Rental operator"}
             ownerContact={ownerContact}
             rental={rental}
-            signedContractUrl={detail.signedContractUrl}
+            signedContractUrl={executedDownloads?.originalAgreementUrl || detail.signedContractUrl}
+            certificateUrl={executedDownloads?.executionCertificateUrl || null}
             token={token}
             vehicle={vehicle}
           />

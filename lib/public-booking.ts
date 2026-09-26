@@ -198,11 +198,16 @@ export async function getPublicBookingDetail(token: string) {
   const contractHtml = extractBodyHtml(contractDocument);
 
   const rentalStatus = rental?.status || "booked";
+  const agreementSigned = Boolean(rentalDocumentAgreement?.eligibility?.fullyExecuted);
+  // A running rental shows the customer portal once the agreement is signed.
+  // One entered by the team without an agreement shows the signing form first.
+  // "Completed" means the rental has ended, not that the customer finished the
+  // form: a signed booking that hasn't started shows its confirmation.
   const state = rentalStatus === "cancelled" || bookingLink.status === "cancelled"
     ? "cancelled"
-    : rentalStatus === "active" || rentalStatus === "due_soon" || rentalStatus === "overdue" || rentalStatus === "extended"
-      ? "active"
-      : rentalStatus === "completed" || bookingLink.status === "completed"
+    : ["active", "due_soon", "overdue", "extended"].includes(rentalStatus)
+      ? agreementSigned ? "active" : "ready"
+      : rentalStatus === "completed"
         ? "completed"
         : "ready";
 

@@ -5,6 +5,7 @@ import { Card, SectionHeader } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getBookingDetail, getCustomersForSelector } from "@/lib/bookings";
 import { getDefaultOrganization } from "@/lib/organization";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { BookingEditForm } from "./booking-edit-form";
 
 export default async function EditBookingPage({ params }: { params: Promise<{ id: string }> }) {
@@ -31,6 +32,17 @@ export default async function EditBookingPage({ params }: { params: Promise<{ id
     );
   }
 
+  const supabase = (await createSupabaseServerClient()) as any;
+  const { data: signedAgreements } = await supabase
+    .from("rental_documents")
+    .select("id")
+    .eq("organization_id", organization.id)
+    .eq("rental_id", detail.rental.id)
+    .eq("document_type", "rental_agreement")
+    .eq("status", "signed")
+    .limit(1);
+  const agreementSigned = Boolean(signedAgreements?.length);
+
   const homeTerritory =
     typeof (organization as any).settings?.home_territory === "string"
       ? (organization as any).settings.home_territory
@@ -50,6 +62,7 @@ export default async function EditBookingPage({ params }: { params: Promise<{ id
         </div>
 
         <BookingEditForm
+          agreementSigned={agreementSigned}
           bookingLink={detail.bookingLink}
           customers={customers}
           homeTerritory={homeTerritory}

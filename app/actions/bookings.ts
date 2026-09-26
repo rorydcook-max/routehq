@@ -688,6 +688,18 @@ export async function assignCustomerToBooking(formData: FormData) {
   revalidatePath("/bookings");
 }
 
+async function hasSignedAgreement(supabase: any, organizationId: string, rentalId: string) {
+  const { data } = await supabase
+    .from("rental_documents")
+    .select("id")
+    .eq("organization_id", organizationId)
+    .eq("rental_id", rentalId)
+    .eq("document_type", "rental_agreement")
+    .eq("status", "signed")
+    .limit(1);
+  return Boolean(data?.length);
+}
+
 async function createBookingLinkForRental(supabase: any, organizationId: string, rental: any, userId: string) {
   if (["cancelled", "completed"].includes(String(rental.status))) {
     throw new Error("This booking has ended, so a customer link can't be created.");
@@ -1188,6 +1200,17 @@ export async function updateBooking(formData: FormData) {
   compare("Included items", previousIncludedItems, includedItems);
   compare("Special conditions", previousSpecialConditions, specialConditions);
 
+  // Once the customer has signed, these are terms of the agreement. Changing
+  // them here would leave the signed agreement saying something else.
+  const signedTerms = ["Customer", "Start date", "End date", "Open ended", "Billing period", "Rental rate", "Deposit amount", "Currency", "Included items", "Special conditions"];
+  const changedTerms = changes.filter((change) => signedTerms.includes(change.label)).map((change) => change.label.toLowerCase());
+  if (changedTerms.length && (await hasSignedAgreement(supabase, rental.organization_id, rental.id))) {
+    // Returned, not thrown: production hides thrown server-action messages.
+    return {
+      error: `The customer has signed the agreement, so these can't be changed here: ${changedTerms.join(", ")}. To change the return date, use "Adjust rental period". Other changes need a new agreement.`
+    };
+  }
+
   const { error: updateError } = await supabase
     .from("rentals")
     .update(rentalUpdates)
@@ -1275,7 +1298,8 @@ export async function updateBooking(formData: FormData) {
   revalidatePath(`/fleet/${rental.vehicle_id}`);
   revalidatePath("/calendar");
 
-  redirect(`/bookings/${rental.id}?updated=1`);
+  // The edit form navigates back to the booking itself.
+  return { error: null as string | null, rentalId: rental.id as string };
 }
 
 export async function addRentalPayment(formData: FormData) {

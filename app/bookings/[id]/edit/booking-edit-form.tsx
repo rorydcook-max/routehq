@@ -477,12 +477,14 @@ function PaymentEditor({ payments, rentalId, currency, depositHeld }: { payments
 }
 
 export function BookingEditForm({
+  agreementSigned = false,
   bookingLink,
   customers,
   homeTerritory,
   payments,
   rental
 }: {
+  agreementSigned?: boolean;
   bookingLink: any;
   customers: Customer[];
   homeTerritory: string;
@@ -496,6 +498,8 @@ export function BookingEditForm({
     return fromLink.length ? fromLink : Array.isArray(rental.included_items) ? rental.included_items : [];
   }, [bookingLink?.included_items, rental.included_items]);
   const [openEnded, setOpenEnded] = useState(Boolean(rental.is_indefinite || !rental.end_date));
+  const [saveError, setSaveError] = useState("");
+  const router = useRouter();
   const deliveryMethod = rental.delivery_method || bookingLink?.delivery_method || bookingData.delivery_method || "delivery";
   const deliveryLocation = rental.delivery_location || bookingData.delivery_location || "";
   const deliveryDateTime = rental.delivery_datetime || bookingData.delivery_datetime || "";
@@ -510,11 +514,39 @@ export function BookingEditForm({
           <div>
             <p className="font-bold text-[#92400e]">Editing an existing booking</p>
             <p className="mt-1 text-sm text-[#92400e]">This page is for correcting booking details. It will not create a new booking link or duplicate rental.</p>
+            {agreementSigned ? (
+              <p className="mt-2 text-sm font-bold text-[#92400e]">
+                The customer has signed the agreement. The customer, dates, billing, rate, deposit, currency, inclusions and
+                special conditions are part of it and can&apos;t be changed here. Delivery details, the deposit held and payment
+                records can still be corrected. To change the return date, use &quot;Adjust rental period&quot; on the booking.
+              </p>
+            ) : null}
           </div>
         </div>
       </Card>
 
-      <form action={updateBooking} className="space-y-3" id="booking-edit-form">
+      {saveError ? (
+        <p className="rounded-lg border border-[#fecaca] bg-[#fff1f2] p-3 text-sm font-bold text-[#be123c]" role="alert">{saveError}</p>
+      ) : null}
+      <form
+        action={async (formData) => {
+          setSaveError("");
+          try {
+            const result = await updateBooking(formData);
+            if (result?.error) {
+              setSaveError(result.error);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+              return;
+            }
+            router.push(`/bookings/${rental.id}?updated=1` as Route);
+          } catch (error) {
+            setSaveError(error instanceof Error ? error.message : "The booking could not be saved.");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }
+        }}
+        className="space-y-3"
+        id="booking-edit-form"
+      >
         <input name="rentalId" type="hidden" value={rental.id} />
         <div className="grid gap-3 lg:grid-cols-2">
           <div className="space-y-3">

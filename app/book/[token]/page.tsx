@@ -135,7 +135,7 @@ function formatDeliveryDateTime(value: string) {
   const normalized = value.replace(" ", "T");
   const [datePart, timePart = ""] = normalized.split("T");
   const time = timePart.slice(0, 5);
-  return time ? `${datePart}\n${time}` : datePart;
+  return time ? `${formatSummaryDate(datePart)}\n${time}` : formatSummaryDate(datePart);
 }
 
 function paymentDueText(rental: any, bookingData: Record<string, unknown>) {
@@ -151,15 +151,31 @@ function paymentDueText(rental: any, bookingData: Record<string, unknown>) {
       : `${firstDueDate}\nThen as agreed`;
   }
 
+  // A rental that fits in one billing period has one payment - don't describe a repeating schedule.
+  const firstIso = String(deliveryDateTime || "").slice(0, 10);
+  const endIso = String(rental?.end_date || "").slice(0, 10);
+  if (endIso && /^\d{4}-\d{2}-\d{2}$/.test(firstIso)) {
+    const next = new Date(`${firstIso}T00:00:00Z`);
+    if (period === "daily") next.setUTCDate(next.getUTCDate() + 1);
+    else if (period === "weekly") next.setUTCDate(next.getUTCDate() + 7);
+    else next.setUTCMonth(next.getUTCMonth() + 1);
+    if (next.toISOString().slice(0, 10) >= endIso) return `${firstDueDate} (one payment)`;
+  }
+
   return endDate && endDate !== "TBD"
-    ? `${firstDueDate}\nThen on the same day each ${frequencyLabel} until the final billing date before ${endDate}`
+    ? `${firstDueDate}\nThen on the same day each ${frequencyLabel} until ${endDate}`
     : `${firstDueDate}\nThen on the same day each ${frequencyLabel}`;
 }
 
+/** "2026-10-01" -> "1 Oct 2026" for customers; the calendar date is kept as written. */
 function formatSummaryDate(value: unknown) {
   const raw = String(value || "").trim();
   if (!raw) return "TBD";
-  return raw.split("T")[0] || raw;
+  const date = raw.split("T")[0] || raw;
+  const match = date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return date;
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return `${Number(match[3])} ${months[Number(match[2]) - 1]} ${match[1]}`;
 }
 
 function ErrorState({ title, message, contact }: { title: string; message: string; contact?: string | null }) {

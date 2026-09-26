@@ -595,7 +595,9 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
     setLivePhone(String(formData.get("phone") || "").trim());
     setLiveEmail(String(formData.get("email") || "").trim());
     setLiveStatus({
-      details: detail.completion.details || ["fullName", "nationality", "phone", "dateOfBirth"].every(filled),
+      // Always from what's in the form now: a saved "complete" flag kept the tick
+      // showing after the customer cleared a required field.
+      details: ["fullName", "nationality", "phone", "dateOfBirth"].every(filled),
       documents:
         detail.completion.documents ||
         ((detail.documentStatus.passport || uploaded("passportFile", "passportCameraFile")) &&
@@ -1214,14 +1216,19 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         <SectionTitle icon={PenLine} label="Rental Agreement" />
         {isRentalDocumentEngine && publicAgreement ? (
           <div className="mt-4 rounded-xl border border-[#99f6e4] bg-[#f0fdfa] p-4">
-            <p className="text-xs font-black uppercase text-[#0f766e]">Immutable agreement version #{publicAgreement.versionNumber}</p>
+            <p className="text-xs font-black uppercase text-[#0f766e]">Agreement version {publicAgreement.versionNumber}</p>
             <p className="mt-1 text-sm font-bold text-[#10252b]">{publicAgreement.businessIdentity.name}</p>
             <div className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
               <p><span className="font-bold">Rate:</span> {publicAgreement.rentalSummary.rate} / {publicAgreement.rentalSummary.billingPeriod}</p>
               <p><span className="font-bold">Deposit:</span> {publicAgreement.rentalSummary.deposit}</p>
-              <p><span className="font-bold">Standard daily rate:</span> {publicAgreement.rentalSummary.standardDailyRate || "As stated"}</p>
-              <p><span className="font-bold">Hash:</span> <span className="font-mono">{publicAgreement.contentHashFragment}</span></p>
+              {/* Only shown when the agreement actually states one. */}
+              {publicAgreement.rentalSummary.standardDailyRate ? (
+                <p><span className="font-bold">Standard daily rate:</span> {publicAgreement.rentalSummary.standardDailyRate}</p>
+              ) : null}
             </div>
+            <p className="mt-3 text-xs text-[#667085]">
+              This exact text is fixed once you sign. Document fingerprint: <span className="font-mono">{publicAgreement.contentHashFragment}</span>
+            </p>
             {customerSigningEligibility?.customerSafeMessage ? (
               <p className="mt-3 rounded-lg border border-[#fecaca] bg-white p-3 text-sm font-bold text-[#be123c]">{customerSigningEligibility.customerSafeMessage}</p>
             ) : null}

@@ -14,8 +14,9 @@ export const CUSTOMER_SIGNING_ACKNOWLEDGEMENTS = [
   },
   {
     type: "early_termination",
-    textVersion: "customer-ack-early-termination-v1",
-    text: "I understand that if I end the rental early, charges may be recalculated using the stated standard daily rate and minimum rental charge."
+    // v2: v1 referred to "the stated standard daily rate", which many agreements don't state.
+    textVersion: "customer-ack-early-termination-v2",
+    text: "I understand that if I end the rental early, my charges may be recalculated as set out in the agreement."
   },
   {
     type: "damage_responsibility",

@@ -166,7 +166,21 @@
     "areaRearRight": "Bak höger",
     "areaInterior": "Interiör",
     "photoCount": "{count, plural, one {# foto} other {# foton}}",
-    "damageCount": "{count, plural, one {# skada} other {# skador}}"
+    "damageCount": "{count, plural, one {# skada} other {# skador}}",
+    "stepOf": "Steg {current} av {total}",
+    "notSet": "Inte inställt",
+    "logDamageAt": "Logga skada: {area}",
+    "handingOverTo": "Överlämnar till {name}",
+    "receivingFrom": "Tar emot från {name}",
+    "theCustomer": "kunden",
+    "receiptNumberGenerated": "Kvitto {number} genererat",
+    "receiptBreakdown": "Hyresbetalning {rent} · Deposition {deposit}",
+    "odometerBelowLast": "Detta är lägre än den senaste registrerade avläsningen ({km} km). Kontrollera numret innan du fortsätter.",
+    "drivenDuringRental": "Kört under hyresperioden: {km} km",
+    "odometerAtDelivery": "Mätarställning vid leverans: {km} km",
+    "rentalLengthDays": "Hyreslängd {count, plural, one {# dag} other {# dagar}}",
+    "fuelDeficitApprox": "Brist på bränsle: ungefär {percent}%",
+    "deductionsExceedDeposit": "Avdragen överstiger den tillgängliga depositionen. Endast {amount} kan avräknas från denna deposition."
   },
   "translation": {
     "translatedFrom": "Översatt från {language}",

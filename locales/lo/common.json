@@ -166,7 +166,21 @@
     "areaFrontRight": "ດ້ານໜ້າຂວາ",
     "areaRearLeft": "ດ້ານຫຼັງຊ້າຍ",
     "areaRearRight": "ດ້ານຫຼັງຂວາ",
-    "areaInterior": "ພາຍໃນ"
+    "areaInterior": "ພາຍໃນ",
+    "stepOf": "ຂັ້ນຕອນ {current} ຂອງ {total}",
+    "notSet": "ບໍ່ຖືກຕັ້ງ",
+    "logDamageAt": "ບັນທຶກຄວາມເສຍຫາຍ: {area}",
+    "handingOverTo": "ສົ່ງມອບໃຫ້ {name}",
+    "receivingFrom": "ຮັບມາຈາກ {name}",
+    "theCustomer": "ລູກຄ້າ",
+    "receiptNumberGenerated": "ໃບຮັບເລກທີ {number} ຖືກສ້າງ",
+    "receiptBreakdown": "ຄ່າເຊົ່າ {rent} · ເງິນມັດຈຳ {deposit}",
+    "odometerBelowLast": "ຕົວເລກນີ້ຕ່ຳກວ່າການບັນທຶກຄັ້ງສຸດທ້າຍ ({km} km). ກວດສອບຕົວເລກກ່ອນທີ່ຈະດຳເນີນການຕໍ່.",
+    "drivenDuringRental": "ໄດ້ຂັບລະຫວ່າງການເຊົ່າ: {km} km",
+    "odometerAtDelivery": "ເລກຄົດລະຍະທາງຕອນສົ່ງ: {km} km",
+    "rentalLengthDays": "ລະຍະເວລາເຊົ່າ {count} ມື້",
+    "fuelDeficitApprox": "ຂາດນ້ຳມັນ: ປະມານ {percent}%",
+    "deductionsExceedDeposit": "ການຫັກລົດເກີນຈຳນວນເງິນມັດຈຳທີ່ມີ. ເຮັດໄດ້ພຽງ {amount} ຈາກເງິນມັດຈຳນີ້."
   },
   "translation": {
     "translatedFrom": "ແປຈາກ {language}",

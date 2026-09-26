@@ -175,7 +175,21 @@
     "areaFrontRight": "หน้าขวา",
     "areaRearLeft": "หลังซ้าย",
     "areaRearRight": "หลังขวา",
-    "areaInterior": "ภายในรถ"
+    "areaInterior": "ภายในรถ",
+    "stepOf": "ขั้นตอน {current} จาก {total}",
+    "notSet": "ยังไม่ได้ตั้งค่า",
+    "logDamageAt": "บันทึกความเสียหาย: {area}",
+    "handingOverTo": "ส่งมอบให้ {name}",
+    "receivingFrom": "รับคืนจาก {name}",
+    "theCustomer": "ลูกค้า",
+    "receiptNumberGenerated": "สร้างใบเสร็จ {number} แล้ว",
+    "receiptBreakdown": "ค่าเช่า {rent} · เงินมัดจำ {deposit}",
+    "odometerBelowLast": "ต่ำกว่าการอ่านครั้งสุดท้าย ({km} km) ตรวจสอบตัวเลขก่อนดำเนินการต่อ",
+    "drivenDuringRental": "ขับระหว่างการเช่า: {km} km",
+    "odometerAtDelivery": "เลขไมล์ตอนส่งมอบ: {km} km",
+    "rentalLengthDays": "ระยะเวลาเช่า {count} วัน",
+    "fuelDeficitApprox": "น้ำมันขาด: ประมาณ {percent}%",
+    "deductionsExceedDeposit": "การหักเงินเกินกว่าเงินมัดจำที่มีอยู่ สามารถหักได้เพียง {amount} จากเงินมัดจำนี้"
   },
   "translation": {
     "translatedFrom": "แปลจาก {language}",

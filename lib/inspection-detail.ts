@@ -103,6 +103,8 @@ export async function getInspectionContextByRental(
       .eq("rental_id", rentalId)
       .is("deleted_at", null)
       .in("status", ["scheduled", "pending", "failed", "overdue"])
+      // Only rent already due counts against the deposit; later months are not owed on return.
+      .lte("due_date", new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date()))
       .order("due_date", { ascending: true })
   ]);
 

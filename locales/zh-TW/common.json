@@ -166,7 +166,21 @@
     "areaFrontRight": "右前方",
     "areaRearLeft": "左後方",
     "areaRearRight": "右後方",
-    "areaInterior": "內部"
+    "areaInterior": "內部",
+    "stepOf": "步驟 {current} 共 {total} 步",
+    "notSet": "未設定",
+    "logDamageAt": "記錄損壞：{area}",
+    "handingOverTo": "交車給 {name}",
+    "receivingFrom": "從 {name} 收車",
+    "theCustomer": "顧客",
+    "receiptNumberGenerated": "已生成收據 {number}",
+    "receiptBreakdown": "租金 {rent} · 押金 {deposit}",
+    "odometerBelowLast": "這低於上次記錄的讀數（{km} 公里）。繼續前請檢查數字。",
+    "drivenDuringRental": "租賃期間行駛：{km} km",
+    "odometerAtDelivery": "交車時的里程表：{km} km",
+    "rentalLengthDays": "租期 {count} 天",
+    "fuelDeficitApprox": "燃油不足：約 {percent}%",
+    "deductionsExceedDeposit": "扣款超過可用的押金。只能從此押金中扣除 {amount}。"
   },
   "translation": {
     "translatedFrom": "翻譯自 {language}",

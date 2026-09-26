@@ -157,7 +157,21 @@
     "areaFrontRight": "Trước bên phải",
     "areaRearLeft": "Sau bên trái",
     "areaRearRight": "Sau bên phải",
-    "areaInterior": "Nội thất"
+    "areaInterior": "Nội thất",
+    "stepOf": "Bước {current} của {total}",
+    "notSet": "Chưa đặt",
+    "logDamageAt": "Ghi nhận hư hỏng: {area}",
+    "handingOverTo": "Giao xe cho {name}",
+    "receivingFrom": "Nhận xe từ {name}",
+    "theCustomer": "khách hàng",
+    "receiptNumberGenerated": "Hóa đơn {number} đã tạo",
+    "receiptBreakdown": "Thanh toán thuê xe {rent} · Tiền đặt cọc {deposit}",
+    "odometerBelowLast": "Số này thấp hơn số đọc cuối cùng đã ghi nhận ({km} km). Kiểm tra số trước khi tiếp tục.",
+    "drivenDuringRental": "Đã lái trong thời gian thuê: {km} km",
+    "odometerAtDelivery": "Số km khi giao xe: {km} km",
+    "rentalLengthDays": "Thời gian thuê {count} ngày",
+    "fuelDeficitApprox": "Thiếu nhiên liệu: khoảng {percent}%",
+    "deductionsExceedDeposit": "Khấu trừ vượt quá tiền đặt cọc có sẵn. Chỉ có thể đối chiếu {amount} từ tiền đặt cọc này."
   },
   "vehicles": {
     "addVehicle": "Thêm xe mới",

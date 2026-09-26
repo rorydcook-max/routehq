@@ -166,7 +166,21 @@
     "areaFrontRight": "右前部",
     "areaRearLeft": "左后部",
     "areaRearRight": "右后部",
-    "areaInterior": "内部"
+    "areaInterior": "内部",
+    "stepOf": "步骤 {current} / {total}",
+    "notSet": "未设置",
+    "logDamageAt": "记录损坏：{area}",
+    "handingOverTo": "交给 {name}",
+    "receivingFrom": "从 {name} 接收",
+    "theCustomer": "客户",
+    "receiptNumberGenerated": "生成收据 {number}",
+    "receiptBreakdown": "租金 {rent} · 押金 {deposit}",
+    "odometerBelowLast": "这低于上次记录的读数（{km} km）。在继续之前请检查数字。",
+    "drivenDuringRental": "租赁期间行驶：{km} km",
+    "odometerAtDelivery": "交车时的里程表读数：{km} km",
+    "rentalLengthDays": "租期 {count} 天",
+    "fuelDeficitApprox": "燃油不足：大约{percent}%",
+    "deductionsExceedDeposit": "扣款超过可用押金。只能从此押金中扣除{amount}。"
   },
   "translation": {
     "translatedFrom": "翻译自{language}",

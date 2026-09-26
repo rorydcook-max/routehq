@@ -166,7 +166,21 @@
     "areaFrontRight": "Передний правый",
     "areaRearLeft": "Задний левый",
     "areaRearRight": "Задний правый",
-    "areaInterior": "Интерьер"
+    "areaInterior": "Интерьер",
+    "stepOf": "Шаг {current} из {total}",
+    "notSet": "Не установлено",
+    "logDamageAt": "Записать повреждение: {area}",
+    "handingOverTo": "Передача {name}",
+    "receivingFrom": "Приём от {name}",
+    "theCustomer": "клиенту",
+    "receiptNumberGenerated": "Квитанция {number} создана",
+    "receiptBreakdown": "Аренда {rent} · Залог {deposit}",
+    "odometerBelowLast": "Это меньше, чем последнее записанное значение ({km} км). Проверьте число перед продолжением.",
+    "drivenDuringRental": "Проехано за время аренды: {km} км",
+    "odometerAtDelivery": "Пробег при передаче: {km} км",
+    "rentalLengthDays": "Длительность аренды {count, plural, one {# день} few {# дня} many {# дней} other {# дней}}",
+    "fuelDeficitApprox": "Недостаток топлива: примерно {percent}%",
+    "deductionsExceedDeposit": "Вычеты превышают доступный депозит. Только {amount} может быть удержано из этого депозита."
   },
   "translation": {
     "translatedFrom": "Переведено с {language}",

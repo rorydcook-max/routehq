@@ -166,7 +166,21 @@
     "areaFrontRight": "Depan kanan",
     "areaRearLeft": "Belakang kiri",
     "areaRearRight": "Belakang kanan",
-    "areaInterior": "Dalaman"
+    "areaInterior": "Dalaman",
+    "stepOf": "Langkah {current} daripada {total}",
+    "notSet": "Belum ditetapkan",
+    "logDamageAt": "Catat kerosakan: {area}",
+    "handingOverTo": "Menyerahkan kepada {name}",
+    "receivingFrom": "Menerima daripada {name}",
+    "theCustomer": "pelanggan",
+    "receiptNumberGenerated": "Resit {number} dijana",
+    "receiptBreakdown": "Bayaran sewa {rent} · Wang jaminan {deposit}",
+    "odometerBelowLast": "Ini lebih rendah daripada bacaan terakhir yang direkodkan ({km} km). Sila periksa nombor sebelum meneruskan.",
+    "drivenDuringRental": "Dijalankan semasa sewaan: {km} km",
+    "odometerAtDelivery": "Odometer semasa penghantaran: {km} km",
+    "rentalLengthDays": "Tempoh sewa {count} hari",
+    "fuelDeficitApprox": "Kekurangan bahan api: kira-kira {percent}%",
+    "deductionsExceedDeposit": "Potongan melebihi deposit yang ada. Hanya {amount} boleh diselaraskan dari deposit ini."
   },
   "translation": {
     "translatedFrom": "Diterjemah dari {language}",

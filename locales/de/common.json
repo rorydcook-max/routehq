@@ -166,7 +166,21 @@
     "areaFrontRight": "Vorne rechts",
     "areaRearLeft": "Hinten links",
     "areaRearRight": "Hinten rechts",
-    "areaInterior": "Innenraum"
+    "areaInterior": "Innenraum",
+    "stepOf": "Schritt {current} von {total}",
+    "notSet": "Nicht festgelegt",
+    "logDamageAt": "Schaden protokollieren: {area}",
+    "handingOverTo": "Übergabe an {name}",
+    "receivingFrom": "Rückgabe von {name}",
+    "theCustomer": "der Kunde",
+    "receiptNumberGenerated": "Beleg {number} erstellt",
+    "receiptBreakdown": "Mietzahlung {rent} · Kaution {deposit}",
+    "odometerBelowLast": "Dies ist niedriger als der zuletzt aufgezeichnete Stand ({km} km). Überprüfen Sie die Zahl, bevor Sie fortfahren.",
+    "drivenDuringRental": "Gefahren während der Miete: {km} km",
+    "odometerAtDelivery": "Kilometerstand bei Übergabe: {km} km",
+    "rentalLengthDays": "Mietdauer {count, plural, one {# Tag} other {# Tage}}",
+    "fuelDeficitApprox": "Kraftstoffdefizit: ungefähr {percent}%",
+    "deductionsExceedDeposit": "Abzüge übersteigen die verfügbare Kaution. Nur {amount} kann von dieser Kaution verrechnet werden."
   },
   "translation": {
     "translatedFrom": "Übersetzt aus dem {language}",

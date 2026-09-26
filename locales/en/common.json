@@ -166,7 +166,21 @@
     "areaFrontRight": "Front right",
     "areaRearLeft": "Rear left",
     "areaRearRight": "Rear right",
-    "areaInterior": "Interior"
+    "areaInterior": "Interior",
+    "stepOf": "Step {current} of {total}",
+    "notSet": "Not set",
+    "logDamageAt": "Log damage: {area}",
+    "handingOverTo": "Handing over to {name}",
+    "receivingFrom": "Receiving from {name}",
+    "theCustomer": "the customer",
+    "receiptNumberGenerated": "Receipt {number} generated",
+    "receiptBreakdown": "Rental payment {rent} · Deposit {deposit}",
+    "odometerBelowLast": "This is lower than the last recorded reading ({km} km). Check the number before continuing.",
+    "drivenDuringRental": "Driven during rental: {km} km",
+    "odometerAtDelivery": "Odometer at delivery: {km} km",
+    "rentalLengthDays": "Rental length {count, plural, one {# day} other {# days}}",
+    "fuelDeficitApprox": "Fuel deficit: approximately {percent}%",
+    "deductionsExceedDeposit": "Deductions exceed the deposit available. Only {amount} can be reconciled from this deposit."
   },
   "translation": {
     "translatedFrom": "Translated from {language}",

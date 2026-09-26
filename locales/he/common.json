@@ -166,7 +166,21 @@
     "areaRearRight": "אחורי ימני",
     "areaInterior": "פנים",
     "photoCount": "{count, plural, one {# תמונה} two {# תמונות} other {# תמונות}}",
-    "damageCount": "{count, plural, one {# פריט} two {# פריטים} other {# פריטים}}"
+    "damageCount": "{count, plural, one {# פריט} two {# פריטים} other {# פריטים}}",
+    "stepOf": "שלב {current} מתוך {total}",
+    "notSet": "לא נקבע",
+    "logDamageAt": "רישום נזק: {area}",
+    "handingOverTo": "מוסר ל{name}",
+    "receivingFrom": "מקבל מ{name}",
+    "theCustomer": "הלקוח",
+    "receiptNumberGenerated": "קבלה {number} נוצרה",
+    "receiptBreakdown": "תשלום השכרה {rent} · פיקדון {deposit}",
+    "odometerBelowLast": "זה נמוך יותר מהקריאה האחרונה שנרשמה ({km} ק\"מ). בדוק את המספר לפני שתמשיך.",
+    "drivenDuringRental": "נסע במהלך ההשכרה: {km} ק\"מ",
+    "odometerAtDelivery": "מד האוץ בעת המסירה: {km} ק\"מ",
+    "rentalLengthDays": "משך השכרה {count, plural, one {# יום} two {# ימים} other {# ימים}}",
+    "fuelDeficitApprox": "חוסר דלק: בערך {percent}%",
+    "deductionsExceedDeposit": "הניכויים עולים על סכום הפיקדון הזמין. ניתן לקזז רק {amount} מהפיקדון הזה."
   },
   "translation": {
     "translatedFrom": "תורגם מ-{language}",

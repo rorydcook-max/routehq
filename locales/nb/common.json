@@ -166,7 +166,21 @@
     "areaRearRight": "Bak høyre",
     "areaInterior": "Interiør",
     "photoCount": "{count, plural, one {# bilde} other {# bilder}}",
-    "damageCount": "{count, plural, one {# element} other {# elementer}}"
+    "damageCount": "{count, plural, one {# element} other {# elementer}}",
+    "stepOf": "Steg {current} av {total}",
+    "notSet": "Ikke satt",
+    "logDamageAt": "Logg skade: {area}",
+    "handingOverTo": "Overleverer til {name}",
+    "receivingFrom": "Mottar fra {name}",
+    "theCustomer": "kunden",
+    "receiptNumberGenerated": "Kvittering {number} generert",
+    "receiptBreakdown": "Leiebetaling {rent} · Depositum {deposit}",
+    "odometerBelowLast": "Dette er lavere enn den sist registrerte avlesningen ({km} km). Sjekk tallet før du fortsetter.",
+    "drivenDuringRental": "Kjørt under leie: {km} km",
+    "odometerAtDelivery": "Kilometerstand ved levering: {km} km",
+    "rentalLengthDays": "Leieperiode {count, plural, one {# dag} other {# dager}}",
+    "fuelDeficitApprox": "Bensinmangel: omtrent {percent}%",
+    "deductionsExceedDeposit": "Fradrag overstiger tilgjengelig depositum. Bare {amount} kan avregnes fra dette depositumet."
   },
   "translation": {
     "translatedFrom": "Oversatt fra {language}",

@@ -166,7 +166,21 @@
     "areaFrontRight": "右前",
     "areaRearLeft": "左後",
     "areaRearRight": "右後",
-    "areaInterior": "内部"
+    "areaInterior": "内部",
+    "stepOf": "ステップ {current}/{total}",
+    "notSet": "未設定",
+    "logDamageAt": "損傷記録: {area}",
+    "handingOverTo": "{name} に引き渡し",
+    "receivingFrom": "{name} から受け取り",
+    "theCustomer": "お客様",
+    "receiptNumberGenerated": "領収書 {number} が生成されました",
+    "receiptBreakdown": "レンタル料金 {rent} · デポジット {deposit}",
+    "odometerBelowLast": "これは最後に記録された読み取り値（{km} km）より低くなっています。続行する前に数値を確認してください。",
+    "drivenDuringRental": "レンタル中の走行距離: {km} km",
+    "odometerAtDelivery": "引渡し時のオドメーター: {km} km",
+    "rentalLengthDays": "レンタル期間 {count} 日",
+    "fuelDeficitApprox": "燃料不足：約{percent}%",
+    "deductionsExceedDeposit": "控除額が利用可能な預り金を超えています。この預り金からは{amount}のみを充当できます。"
   },
   "translation": {
     "translatedFrom": "{language}から翻訳",

@@ -3,6 +3,7 @@ import { htmlToPdf } from "@/lib/html-to-pdf";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { recordActivityEventOnce } from "@/lib/supabase/activity";
 import { emailExecutedDocumentToCustomer } from "@/lib/rental-document-email";
+import { translateForReader } from "@/lib/content-translation";
 
 /**
  * Delivery and return reports.
@@ -19,6 +20,14 @@ import { emailExecutedDocumentToCustomer } from "@/lib/rental-document-email";
  */
 
 export type InspectionReportMode = "delivery" | "return";
+
+/** What happened to the deposit at return, so the customer signs the settlement too. */
+export type DepositSettlement = {
+  available: number;
+  deductions: Array<{ reason: string; amount: number }>;
+  refunded: number;
+  retained: number;
+};
 
 export type InspectionReportInput = {
   /** User-scoped client: the RPC checks auth.uid() and the caller's role. */
@@ -37,6 +46,7 @@ export type InspectionReportInput = {
   notes: string | null;
   customerSignature: string;
   customerSignedName: string | null;
+  depositSettlement?: DepositSettlement | null;
 };
 
 const LABELS: Record<InspectionReportMode, string> = {
@@ -64,17 +74,67 @@ function parseSignaturePng(dataUrl: string) {
   return buffer;
 }
 
+const AREA_LABELS: Record<string, string> = {
+  front: "Front",
+  rear: "Rear",
+  front_left: "Front left",
+  front_right: "Front right",
+  rear_left: "Rear left",
+  rear_right: "Rear right",
+  interior: "Interior"
+};
+
+const SEVERITY_LABELS: Record<string, string> = {
+  scratch: "Scratch",
+  dent: "Dent",
+  crack: "Crack",
+  missing: "Missing part",
+  other: "Other"
+};
+
+function labelFor(labels: Record<string, string>, value: string) {
+  return labels[value] || value.replace(/_/g, " ");
+}
+
+/** Business wall time, e.g. "26 Sep 2026, 10:46 (Bangkok time)". Pure: formats the value given. */
+export function formatReportTime(iso: string, timeZone = "Asia/Bangkok") {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso;
+  const text = new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone
+  }).format(date);
+  return `${text} (${timeZone === "Asia/Bangkok" ? "Bangkok time" : timeZone})`;
+}
+
 function describeDamage(item: unknown) {
   const record = item && typeof item === "object" ? (item as Record<string, unknown>) : { description: item };
   const pick = (...keys: string[]) => keys.map((key) => record[key]).find((value) => typeof value === "string" && value.trim()) as string | undefined;
   const photos = [record.photos, record.photoUrls, record.photo_urls, record.photoDocumentIds].find(Array.isArray) as unknown[] | undefined;
   return {
-    where: pick("location", "area", "panel", "position", "zone") || "",
+    where: labelFor(AREA_LABELS, pick("location", "area", "panel", "position", "zone") || ""),
     what: pick("description", "label", "type", "damage_type", "name") || "Damage noted",
-    severity: pick("severity", "level") || "",
+    severity: labelFor(SEVERITY_LABELS, pick("severity", "level") || ""),
     note: pick("notes", "note", "comment") || "",
     photoCount: photos?.length || 0
   };
+}
+
+/** English reading aids for typed text, keyed by the original text. */
+export type ReportTranslations = Record<string, { english: string; sourceLanguage: string | null }>;
+
+function typedText(original: string, translations: ReportTranslations | undefined) {
+  const translation = translations?.[original];
+  if (!translation) return escapeHtml(original);
+  const language = translation.sourceLanguage ? ` (${escapeHtml(translation.sourceLanguage)})` : "";
+  return `${escapeHtml(translation.english)}<div class="muted original">Original${language}: <span lang="${escapeHtml(
+    translation.sourceLanguage || ""
+  )}">${escapeHtml(original)}</span></div>`;
 }
 
 export function renderInspectionReportHtml(input: {
@@ -90,39 +150,62 @@ export function renderInspectionReportHtml(input: {
   notes: string | null;
   signerName: string;
   signatureDataUrl: string;
+  translations?: ReportTranslations;
+  depositSettlement?: DepositSettlement | null;
+  currency?: string;
 }) {
+  const money = (value: number) =>
+    new Intl.NumberFormat("en-US", { style: "currency", currency: input.currency || "THB", maximumFractionDigits: 2 }).format(value);
+  const settlement = input.depositSettlement;
+  const depositSection =
+    input.mode === "return" && settlement
+      ? `<h2>Deposit settlement</h2><table>
+<tr><th>Deposit held at return</th><td>${escapeHtml(money(settlement.available))}</td></tr>
+${settlement.deductions.map((item) => `<tr><th>Deducted: ${escapeHtml(item.reason)}</th><td>&minus;${escapeHtml(money(item.amount))}</td></tr>`).join("")}
+<tr><th>Refunded to customer</th><td>${escapeHtml(money(settlement.refunded))}</td></tr>
+${settlement.retained > 0 ? `<tr><th>Still held</th><td>${escapeHtml(money(settlement.retained))}</td></tr>` : ""}
+</table>`
+      : "";
   const title = LABELS[input.mode];
   const damage = input.damageItems.map(describeDamage);
   const damageRows = damage.length
     ? damage
         .map(
-          (item, index) => `<tr><td>${index + 1}</td><td>${escapeHtml(item.where)}</td><td>${escapeHtml(item.what)}${
-            item.severity ? ` <span class="muted">(${escapeHtml(item.severity)})</span>` : ""
-          }${item.note ? `<div class="muted">${escapeHtml(item.note)}</div>` : ""}</td><td>${item.photoCount}</td></tr>`
+          (item, index) => `<tr><td>${index + 1}</td><td>${escapeHtml(item.where)}</td><td>${
+            item.severity ? `<strong>${escapeHtml(item.severity)}</strong><br>` : ""
+          }${typedText(item.what, input.translations)}${item.note ? `<div>${typedText(item.note, input.translations)}</div>` : ""}</td><td>${item.photoCount}</td></tr>`
         )
         .join("")
     : `<tr><td colspan="4" class="muted">No damage recorded.</td></tr>`;
   const handover = input.mode === "delivery" ? "received the vehicle" : "returned the vehicle";
+  const inspectedAt = formatReportTime(input.inspectedAt);
+  const translationNote =
+    input.translations && Object.keys(input.translations).length
+      ? `<p class="muted small">Text typed in another language is shown with an automatic English translation so every party can read it. The original wording appears beneath each translation.</p>`
+      : "";
 
   return `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(title)}</title><style>
 body{font-family:Helvetica,Arial,sans-serif;color:#10252b;font-size:12px;margin:32px}
 h1{font-size:20px;margin:0 0 4px}.muted{color:#667085}.meta{margin:0 0 20px}
 table{width:100%;border-collapse:collapse;margin:8px 0 18px}th,td{border:1px solid #d6e5e2;padding:6px 8px;text-align:left;vertical-align:top}
 th{background:#f4f8f7;font-weight:600}h2{font-size:14px;margin:18px 0 6px}.sig{height:80px;border-bottom:1px solid #10252b}
+.original{margin-top:4px;font-size:11px}.small{font-size:10px}
 </style></head><body>
 <h1>${escapeHtml(title)}</h1>
-<p class="meta muted">${escapeHtml(input.businessName)} &middot; Reference ${escapeHtml(input.reference)} &middot; ${escapeHtml(input.inspectedAt)}</p>
+<p class="meta muted">${escapeHtml(input.businessName)} &middot; Reference ${escapeHtml(input.reference)} &middot; ${escapeHtml(inspectedAt)}</p>
 <table><tr><th>Vehicle</th><td>${escapeHtml(input.vehicleLabel)}</td></tr>
 <tr><th>Customer</th><td>${escapeHtml(input.customerName)}</td></tr>
 <tr><th>Odometer</th><td>${escapeHtml(input.odometerReading.toLocaleString("en-US"))} km</td></tr>
 <tr><th>Fuel level</th><td>${escapeHtml(input.fuelLabel)}</td></tr></table>
 <h2>Condition</h2>
 <table><tr><th>#</th><th>Location</th><th>Finding</th><th>Photos</th></tr>${damageRows}</table>
-${input.notes ? `<h2>Notes</h2><p>${escapeHtml(input.notes)}</p>` : ""}
+${input.notes ? `<h2>Notes</h2><div>${typedText(input.notes, input.translations)}</div>` : ""}
+${depositSection}
+${translationNote}
 <h2>Customer acknowledgement</h2>
-<p>I confirm that I ${handover} in the condition recorded above.</p>
+<p>I confirm that I ${handover} in the condition recorded above${depositSection ? " and that I have been shown the deposit settlement above" : ""}.</p>
 <img class="sig" alt="Customer signature" src="${escapeHtml(input.signatureDataUrl)}">
-<p>${escapeHtml(input.signerName)}<br><span class="muted">Signed ${escapeHtml(input.inspectedAt)}</span></p>
+<p>${escapeHtml(input.signerName)}<br><span class="muted">Signed ${escapeHtml(inspectedAt)}</span></p>
 </body></html>`;
 }
 
@@ -153,7 +236,24 @@ export async function finaliseInspectionReport(input: InspectionReportInput) {
     if (!signerName) throw new Error("The customer's printed name is missing.");
 
     const reference = String(rental?.booking_reference || rental?.reference || rental?.reference_number || input.rentalId.slice(0, 8)).toUpperCase();
+
+    // Staff may type in their own language (Thai, Burmese...). The customer
+    // signs this report, so anything not in English gets an English reading
+    // aid next to the original. Translation failure leaves the original only.
+    const typedTexts = [
+      ...input.damageItems.map(describeDamage).flatMap((item) => [item.what, item.note]),
+      input.notes || ""
+    ].filter((text) => text.trim());
+    const readable = await translateForReader(input.organizationId, typedTexts, "en");
+    const translations: ReportTranslations = {};
+    for (const entry of readable) {
+      if (entry.translated) translations[entry.original] = { english: entry.text, sourceLanguage: entry.sourceLanguage };
+    }
+
     const html = renderInspectionReportHtml({
+      translations,
+      depositSettlement: input.depositSettlement,
+      currency: String(rental?.currency || "THB"),
       mode: input.mode,
       businessName: String(organization?.name || "Rental company"),
       reference,
@@ -198,6 +298,8 @@ export async function finaliseInspectionReport(input: InspectionReportInput) {
         fuel_level_label: input.fuelLevelLabel,
         damage_items: input.damageItems,
         notes: input.notes,
+        english_translations: translations,
+        deposit_settlement: input.depositSettlement || null,
         signer_name: signerName
       },
       p_content_hash: contentHash,

@@ -166,7 +166,21 @@
     "areaRearRight": "पीछे दायां",
     "areaInterior": "अंदरूनी",
     "photoCount": "{count, plural, one {# फ़ोटो} other {# फ़ोटो}}",
-    "damageCount": "{count, plural, one {# आइटम} other {# आइटम}}"
+    "damageCount": "{count, plural, one {# आइटम} other {# आइटम}}",
+    "stepOf": "चरण {current} का {total}",
+    "notSet": "सेट नहीं किया गया",
+    "logDamageAt": "क्षति दर्ज करें: {area}",
+    "handingOverTo": "{name} को सौंपना",
+    "receivingFrom": "{name} से प्राप्त करना",
+    "theCustomer": "ग्राहक",
+    "receiptNumberGenerated": "रसीद {number} उत्पन्न हुई",
+    "receiptBreakdown": "किराया भुगतान {rent} · जमा {deposit}",
+    "odometerBelowLast": "यह पिछली दर्ज की गई रीडिंग ({km} किमी) से कम है। जारी रखने से पहले संख्या की जांच करें।",
+    "drivenDuringRental": "किराये के दौरान चलाया गया: {km} km",
+    "odometerAtDelivery": "डिलीवरी के समय ओडोमीटर: {km} km",
+    "rentalLengthDays": "किराये की अवधि {count, plural, one {# दिन} other {# दिन}}",
+    "fuelDeficitApprox": "ईंधन की कमी: लगभग {percent}%",
+    "deductionsExceedDeposit": "कटौतियाँ उपलब्ध जमा राशि से अधिक हैं। केवल {amount} इस जमा राशि से समायोजित की जा सकती है।"
   },
   "translation": {
     "translatedFrom": "{language} से अनुवादित",

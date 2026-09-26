@@ -157,7 +157,21 @@
     "areaFrontRight": "Avant droit",
     "areaRearLeft": "Arrière gauche",
     "areaRearRight": "Arrière droit",
-    "areaInterior": "Intérieur"
+    "areaInterior": "Intérieur",
+    "stepOf": "Étape {current} sur {total}",
+    "notSet": "Non défini",
+    "logDamageAt": "Enregistrer les dommages : {area}",
+    "handingOverTo": "Remise à {name}",
+    "receivingFrom": "Réception de {name}",
+    "theCustomer": "le client",
+    "receiptNumberGenerated": "Reçu {number} généré",
+    "receiptBreakdown": "Paiement de location {rent} · Caution {deposit}",
+    "odometerBelowLast": "Ceci est inférieur à la dernière lecture enregistrée ({km} km). Vérifiez le nombre avant de continuer.",
+    "drivenDuringRental": "Parcouru pendant la location : {km} km",
+    "odometerAtDelivery": "Odomètre à la livraison : {km} km",
+    "rentalLengthDays": "Durée de location {count, plural, one {# jour} other {# jours}}",
+    "fuelDeficitApprox": "Déficit de carburant : environ {percent}%",
+    "deductionsExceedDeposit": "Les déductions dépassent la caution disponible. Seulement {amount} peut être déduit de cette caution."
   },
   "vehicles": {
     "addVehicle": "Ajouter un nouveau véhicule",

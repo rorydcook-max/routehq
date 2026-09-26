@@ -166,7 +166,21 @@
     "areaFrontRight": "Frontal derecho",
     "areaRearLeft": "Trasero izquierdo",
     "areaRearRight": "Trasero derecho",
-    "areaInterior": "Interior"
+    "areaInterior": "Interior",
+    "stepOf": "Paso {current} de {total}",
+    "notSet": "No establecido",
+    "logDamageAt": "Registrar daño: {area}",
+    "handingOverTo": "Entregando a {name}",
+    "receivingFrom": "Recibiendo de {name}",
+    "theCustomer": "el cliente",
+    "receiptNumberGenerated": "Recibo {number} generado",
+    "receiptBreakdown": "Pago de alquiler {rent} · Fianza {deposit}",
+    "odometerBelowLast": "Esto es menor que la última lectura registrada ({km} km). Verifique el número antes de continuar.",
+    "drivenDuringRental": "Conducido durante el alquiler: {km} km",
+    "odometerAtDelivery": "Odómetro al entregar: {km} km",
+    "rentalLengthDays": "Duración del alquiler {count, plural, one {# día} many {# días} other {# días}}",
+    "fuelDeficitApprox": "Déficit de combustible: aproximadamente {percent}%",
+    "deductionsExceedDeposit": "Las deducciones superan la fianza disponible. Solo se pueden reconciliar {amount} de esta fianza."
   },
   "translation": {
     "translatedFrom": "Traducido del {language}",

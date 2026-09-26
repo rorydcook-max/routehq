@@ -139,7 +139,21 @@
     "areaFrontRight": "ရှေ့ညာ",
     "areaRearLeft": "နောက်ဘယ်",
     "areaRearRight": "နောက်ညာ",
-    "areaInterior": "ကားအတွင်း"
+    "areaInterior": "ကားအတွင်း",
+    "stepOf": "အဆင့် {current} / {total}",
+    "notSet": "မသတ်မှတ်ရသေးပါ",
+    "logDamageAt": "ထိခိုက်မှု မှတ်တမ်းတင်ရန်: {area}",
+    "handingOverTo": "{name} ထံ လွှဲပြောင်းပေးခြင်း",
+    "receivingFrom": "{name} ထံမှ လက်ခံခြင်း",
+    "theCustomer": "ဖောက်သည်",
+    "receiptNumberGenerated": "ငွေလက်ခံပြေစာ {number} ထုတ်ပေးပြီး",
+    "receiptBreakdown": "ငှားရမ်းခ {rent} · เงินมัดจำ {deposit}",
+    "odometerBelowLast": "ဤသည်သည် နောက်ဆုံးမှတ်တမ်းတင်ထားသောဖတ်စာရင်း ({km} km) ထက်နိမ့်သည်။ ဆက်လက်လုပ်ဆောင်မီ နံပါတ်ကို စစ်ဆေးပါ။",
+    "drivenDuringRental": "မည်သူငှားရမ်းချိန်အတွင်း မောင်းနှင်ခဲ့သည်: {km} km",
+    "odometerAtDelivery": "အပ်နှံချိန်တွင် အဝေးပြေးမီတာ: {km} km",
+    "rentalLengthDays": "ငှားရမ်းချိန် {count} ရက်",
+    "fuelDeficitApprox": "လောင်စာဆီလက်ကျန်: ခန့်မှန်း၍ {percent}%",
+    "deductionsExceedDeposit": "ကောက်ခံငွေသည် ရရှိနိုင်သောငွေမလုံလောက်ပါ။ ဤငွေမှ {amount} သာဖြည့်ဆည်းနိုင်ပါသည်။"
   },
   "dashboard": {
     "title": "လုပ်ငန်းစီမံခန့်ခွဲမှုဗဟို",

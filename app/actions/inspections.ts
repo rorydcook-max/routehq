@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { applyDepositDeduction, returnDeposit } from "@/app/actions/deposits";
 import { activateRental } from "@/lib/rental-activation";
-import { finaliseInspectionReport } from "@/lib/inspection-report";
+import { finaliseInspectionReport, type DepositSettlement } from "@/lib/inspection-report";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { notifyOperator } from "@/lib/notify-operator";
@@ -182,13 +182,14 @@ async function reconcileReturnDeposit(formData: FormData, organizationId: string
     .maybeSingle();
 
   if (rental?.deposit_status === "fully_returned") {
-    return;
+    return null;
   }
 
   const held = Number(rental?.deposit_held || 0);
   const refunded = Number(rental?.deposit_refunded_amount || 0);
   const forfeited = Number(rental?.deposit_forfeited_amount || 0);
   let remaining = Math.max(0, held - refunded - forfeited);
+  const settlement: DepositSettlement = { available: remaining, deductions: [], refunded: 0, retained: 0 };
 
   const deductions = [
     { key: "depositOutstandingBalance", reason: "Unpaid rent" },
@@ -209,6 +210,7 @@ async function reconcileReturnDeposit(formData: FormData, organizationId: string
     deductionData.set("reason", item.reason);
     deductionData.set("notes", "Recorded from return inspection.");
     await applyDepositDeduction(deductionData);
+    settlement.deductions.push({ reason: item.reason, amount });
     remaining -= amount;
   }
 
@@ -220,7 +222,10 @@ async function reconcileReturnDeposit(formData: FormData, organizationId: string
     refundData.set("returnAmount", String(refundAmount));
     refundData.set("notes", "Recorded from return inspection.");
     await returnDeposit(refundData);
+    settlement.refunded = refundAmount;
   }
+  settlement.retained = Math.max(0, remaining - refundAmount);
+  return settlement;
 }
 
 async function createOnDeliveryPaymentRecords(supabase: any, organizationId: string, rentalId: string) {
@@ -439,6 +444,7 @@ export async function submitInspection(formData: FormData) {
     .maybeSingle();
 
   let customerName = "Customer";
+  let depositSettlement: DepositSettlement | null = null;
   if (customerId) {
     const { data: customer } = await supabase
       .from("customers")
@@ -481,7 +487,7 @@ export async function submitInspection(formData: FormData) {
   if (mode === "return" && rentalId) {
     const { data: rental, error: rentalFetchError } = await supabase
       .from("rentals")
-      .select("mileage_at_delivery")
+      .select("mileage_at_delivery, end_date")
       .eq("id", rentalId)
       .eq("organization_id", organizationId)
       .maybeSingle();
@@ -494,16 +500,38 @@ export async function submitInspection(formData: FormData) {
         ? Math.max(0, odometerReading - Number(rental.mileage_at_delivery || 0))
         : null;
 
+    // The vehicle is back, so the rental ends today (business time). An
+    // open-ended or later end date is closed off and rent scheduled after
+    // today is voided, otherwise it would show as owed and later as overdue.
+    const returnDate = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date());
+    const endDate = rental?.end_date && String(rental.end_date).slice(0, 10) < returnDate ? String(rental.end_date).slice(0, 10) : returnDate;
+
     const { error: rentalError } = await supabase
       .from("rentals")
-      .update({ mileage_at_return: odometerReading, km_driven: kmDriven, status: "completed" })
+      .update({ mileage_at_return: odometerReading, km_driven: kmDriven, status: "completed", end_date: endDate })
       .eq("id", rentalId)
       .eq("organization_id", organizationId);
     if (rentalError) {
       throw new Error(rentalError.message);
     }
 
-    await reconcileReturnDeposit(formData, organizationId, rentalId);
+    const { error: futurePaymentsError } = await supabase
+      .from("rental_payments")
+      .update({
+        voided: true,
+        status: "voided",
+        metadata: { type: "rent", voided_reason: "Vehicle returned before this payment was due", voided_at: new Date().toISOString(), voided_by: user.id }
+      })
+      .eq("organization_id", organizationId)
+      .eq("rental_id", rentalId)
+      .in("status", ["scheduled", "pending"])
+      .is("transaction_id", null)
+      .gt("due_date", endDate);
+    if (futurePaymentsError) {
+      throw new Error(futurePaymentsError.message);
+    }
+
+    depositSettlement = await reconcileReturnDeposit(formData, organizationId, rentalId);
 
     const { error: vehicleError } = await supabase
       .from("vehicles")
@@ -558,7 +586,8 @@ export async function submitInspection(formData: FormData) {
       damageItems: media.damageWithPhotos,
       notes,
       customerSignature,
-      customerSignedName
+      customerSignedName,
+      depositSettlement
     });
   }
 

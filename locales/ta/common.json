@@ -166,7 +166,21 @@
     "areaRearRight": "பின் வலது",
     "areaInterior": "உள்ளமை",
     "photoCount": "{count, plural, one {# புகைப்படம்} other {# புகைப்படங்கள்}}",
-    "damageCount": "{count, plural, one {# உருப்படி} other {# உருப்படிகள்}}"
+    "damageCount": "{count, plural, one {# உருப்படி} other {# உருப்படிகள்}}",
+    "stepOf": "படி {current} / {total}",
+    "notSet": "அமைக்கப்படவில்லை",
+    "logDamageAt": "சேதத்தை பதிவு செய்யவும்: {area}",
+    "handingOverTo": "{name} க்கு ஒப்படைக்கப்படுகிறது",
+    "receivingFrom": "{name} இலிருந்து பெறப்படுகிறது",
+    "theCustomer": "வாடிக்கையாளர்",
+    "receiptNumberGenerated": "ரசீது {number} உருவாக்கப்பட்டது",
+    "receiptBreakdown": "வாடகை கட்டணம் {rent} · เงินมัดจำ {deposit}",
+    "odometerBelowLast": "இது கடைசியாக பதிவு செய்யப்பட்ட வாசிப்பை விட குறைவாக உள்ளது ({km} km). தொடருவதற்கு முன் எண்ணிக்கையை சரிபார்க்கவும்.",
+    "drivenDuringRental": "வாடகைக்கு போது ஓட்டப்பட்டது: {km} km",
+    "odometerAtDelivery": "வாகனம் ஒப்படைக்கும் போது ஓடோமீட்டர்: {km} km",
+    "rentalLengthDays": "வாடகை காலம் {count, plural, one {# நாள்} other {# நாட்கள்}}",
+    "fuelDeficitApprox": "எரிபொருள் பற்றாக்குறை: சுமார் {percent}%",
+    "deductionsExceedDeposit": "கழிவுகள் கிடைக்கக்கூடிய நிதி {amount} ஐ மட்டுமே சமநிலைப்படுத்த முடியும்."
   },
   "translation": {
     "translatedFrom": "{language} மொழியில் இருந்து மொழிபெயர்க்கப்பட்டது",

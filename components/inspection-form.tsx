@@ -100,9 +100,7 @@ function Progress({ steps, step }: { steps: string[]; step: number }) {
   return (
     <div className="sticky top-0 z-20 -mx-4 border-b border-[#d6e5e2] bg-[#eef8f6]/95 px-4 py-3 backdrop-blur sm:mx-0 sm:rounded-lg sm:border">
       <div className="flex items-center justify-between text-xs font-bold text-[#667085]">
-        <span>
-          Step {step + 1} of {steps.length}
-        </span>
+        <span>{t("stepOf", { current: step + 1, total: steps.length })}</span>
         <span>{t(`steps.${steps[step]}`)}</span>
       </div>
       <div className="mt-2 h-2 overflow-hidden rounded-full bg-white">
@@ -183,7 +181,7 @@ function FuelGauge({
           <p className="mt-1 text-xs font-semibold text-[#667085]">{t("fuelHint")}</p>
         </div>
         <span className="rounded-full bg-[#e6fffb] px-4 py-2 text-lg font-black text-[#0f766e]">
-          {value === null ? "Not set" : `${value}%`}
+          {value === null ? t("notSet") : `${value}%`}
         </span>
       </div>
       <div className="mb-4 h-8 overflow-hidden rounded-full border border-[#c9dbd7] bg-[#eef2f6]">
@@ -255,7 +253,7 @@ function VehicleDiagram({ onSelect }: { onSelect: (location: string) => void }) 
       </svg>
       {areas.map((area) => (
         <button
-          aria-label={`Log damage: ${area.label}`}
+          aria-label={t("logDamageAt", { area: area.label })}
           className={`absolute rounded-lg border border-[#0f766e]/25 bg-[#0f766e]/5 text-[11px] font-black text-[#0f766e] ${area.className}`}
           key={area.key}
           onClick={() => onSelect(area.key)}
@@ -357,11 +355,22 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
     const key = `area${location.split("_").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join("")}`;
     return t.has(key) ? t(key) : location.replace(/_/g, " ");
   };
+  const severityKeys: Record<string, string> = {
+    scratch: "damageScratch",
+    dent: "damageDent",
+    crack: "damageCrack",
+    missing: "damageMissingPart",
+    other: "damageOther"
+  };
+  const severityName = (severity: string | null | undefined) =>
+    severity && severityKeys[severity] ? t(severityKeys[severity]) : String(severity || "");
   const mode = context.mode;
   const depositAlreadyReturned = mode === "return" && context.rental?.deposit_status === "fully_returned";
   const steps = mode === "return" ? (depositAlreadyReturned ? returnSteps.filter((item) => item !== "Deposit") : returnSteps) : mode === "condition_report" ? conditionSteps : deliverySteps;
   const [step, setStep] = useState(0);
   const [odometer, setOdometer] = useState("");
+  const odometerRef = useRef(odometer);
+  odometerRef.current = odometer;
   const [ocrMessage, setOcrMessage] = useState("");
   const [odometerPhotoCaptured, setOdometerPhotoCaptured] = useState(false);
   const [fuelPhotoCaptured, setFuelPhotoCaptured] = useState(false);
@@ -425,13 +434,15 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
     }
     try {
       const draft = JSON.parse(saved);
-      setStep(draft.step || 0);
+      // Photos and video can't be kept in a draft, so a resumed inspection goes
+      // back to the first photo step; typed values stay filled in.
+      setStep(Math.min(Number(draft.step) || 0, 1));
       setOdometer(draft.odometer || "");
       setFuelLevel(draft.fuelLevel ?? null);
       setFuelLabel(draft.fuelLabel || "");
       setDamageItems(draft.damageItems || []);
       setNoDamage(Boolean(draft.noDamage));
-      setSignature(draft.signature || "");
+      // A signature is never restored: the customer signs the report as it stands now.
       setSignedName(draft.signedName || context.customer?.full_name || "");
       setFuelDeficitCharge(Number(draft.fuelDeficitCharge || 0));
       setDamageCharge(Number(draft.damageCharge || 0));
@@ -452,7 +463,6 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
         fuelLabel,
         damageItems,
         noDamage,
-        signature,
         signedName,
         fuelDeficitCharge,
         damageCharge,
@@ -460,7 +470,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
         refundOverride
       })
     );
-  }, [cleaningCharge, damageCharge, damageItems, draftKey, fuelDeficitCharge, fuelLabel, fuelLevel, noDamage, odometer, refundOverride, signature, signedName, step]);
+  }, [cleaningCharge, damageCharge, damageItems, draftKey, fuelDeficitCharge, fuelLabel, fuelLevel, noDamage, odometer, refundOverride, signedName, step]);
 
   async function readOdometer(file: File) {
     setOcrMessage(t("ocrReading"));
@@ -473,7 +483,8 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
         setOcrMessage(result.error || t("ocrUnavailable"));
         return;
       }
-      if (result.odometer_reading && Number(result.confidence || 0) >= 0.65) {
+      // Fill the reading only when staff haven't typed one: never silently replace a number someone entered.
+      if (result.odometer_reading && Number(result.confidence || 0) >= 0.65 && !odometerRef.current.trim()) {
         setOdometer(String(result.odometer_reading));
         setOcrMessage(t("ocrSuggested", { km: Number(result.odometer_reading).toLocaleString() }));
       } else if (result.odometer_reading) {
@@ -657,7 +668,10 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                 </p>
                 {mode === "return" ? (
                   <p className="mt-2 rounded-lg bg-[#fef3c7] px-3 py-2 text-sm font-bold text-[#92400e]">
-                    <span className="font-mono-data">Delivery odometer: {Number(context.rental?.mileage_at_delivery || 0).toLocaleString()} km · Rental length {daysBetween(context.rental?.start_date)} days</span>
+                    <span className="font-mono-data">
+                      {t("odometerAtDelivery", { km: Number(context.rental?.mileage_at_delivery || 0).toLocaleString("en-US") })} ·{" "}
+                      {t("rentalLengthDays", { count: daysBetween(context.rental?.start_date) })}
+                    </span>
                   </p>
                 ) : null}
               </div>
@@ -683,7 +697,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
           {ocrMessage ? <p className="mt-3 rounded-lg bg-[#eef8f6] p-3 text-sm font-semibold text-[#0f766e]">{ocrMessage}</p> : null}
           {mode === "return" ? (
             <p className="mt-3 text-sm font-semibold text-[#667085]">
-              <span className="font-mono-data">Odometer at delivery: {Number(context.rental?.mileage_at_delivery || 0).toLocaleString()} km</span>
+              <span className="font-mono-data">{t("odometerAtDelivery", { km: Number(context.rental?.mileage_at_delivery || 0).toLocaleString("en-US") })}</span>
             </p>
           ) : null}
           <label className="mt-4 block">
@@ -692,11 +706,19 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
           </label>
           {mode === "return" && odometer ? (
             <p className="mt-3 rounded-lg bg-white p-3 text-sm font-black text-[#10252b]">
-              <span className="font-mono-data">Driven during rental: {Math.max(0, Number(odometer || 0) - Number(context.rental?.mileage_at_delivery || 0)).toLocaleString()} km</span>
+              <span className="font-mono-data">
+                {t("drivenDuringRental", { km: Math.max(0, Number(odometer || 0) - Number(context.rental?.mileage_at_delivery || 0)).toLocaleString("en-US") })}
+              </span>
             </p>
           ) : (
             <p className="mt-3 text-sm text-[#667085]">{t("odometerUpdatesMileage")}</p>
           )}
+          {odometer && Number(context.vehicle?.mileage || 0) > Number(odometer) ? (
+            <p className="mt-3 flex items-start gap-2 rounded-lg border border-[#fbbf24] bg-[#fffbeb] px-3 py-2 text-sm font-bold text-[#92400e]" role="alert">
+              <AlertTriangle className="mt-0.5 shrink-0" size={16} />
+              {t("odometerBelowLast", { km: Number(context.vehicle.mileage).toLocaleString("en-US") })}
+            </p>
+          ) : null}
         </StepShell>
       ) : null}
 
@@ -714,7 +736,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
           </div>
           {mode === "return" && deliveryFuel > 0 && fuelLevel !== null && fuelLevel < deliveryFuel ? (
             <div className="mt-4 rounded-lg border border-[#fbbf24] bg-[#fffbeb] p-3">
-              <p className="font-black text-[#92400e]">Fuel deficit: approximately {deliveryFuel - fuelLevel}%</p>
+              <p className="font-black text-[#92400e]">{t("fuelDeficitApprox", { percent: deliveryFuel - fuelLevel })}</p>
               <label className="mt-2 block text-sm font-bold text-[#10252b]">
                 {t("applyFuelCharge")}
                 <input className={inputClass} min="0" onChange={(event) => setFuelDeficitCharge(Number(event.target.value || 0))} placeholder="THB" step="0.01" type="number" value={fuelDeficitCharge || ""} />
@@ -757,7 +779,8 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
               <div className="mt-2 space-y-2">
                 {preExistingDamage.map((item: any) => (
                   <p className="rounded-lg bg-[#eef2f6] px-3 py-2 text-sm text-[#475467]" key={item.id}>
-                    {item.location?.replace(/_/g, " ")} · {item.severity} · {item.description}
+                    {areaName(String(item.location || ""))} · {severityName(item.severity)} · {item.description_translated || item.description}
+                    {item.description_translated ? <span className="mt-1 block text-xs text-[#667085]">{item.description}</span> : null}
                   </p>
                 ))}
               </div>
@@ -795,7 +818,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
               <div className="rounded-lg border border-[#d6e5e2] bg-white p-3" key={item.id}>
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-black text-[#10252b]">{item.location.replace(/_/g, " ")} · {item.severity}</p>
+                    <p className="font-black text-[#10252b]">{areaName(item.location)} · {severityName(item.severity)}</p>
                     <p className="text-sm text-[#667085]">{item.description}</p>
                     <label className="mt-2 inline-flex cursor-pointer rounded-lg bg-[#e6fffb] px-3 py-2 text-sm font-bold text-[#0f766e]">
                       {t("addDamagePhoto")}
@@ -870,7 +893,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
             </label>
             {requestedDeductions > availableToReconcile ? (
               <p className="rounded-lg border border-[#fbbf24] bg-[#fffbeb] px-3 py-2 text-sm font-bold text-[#92400e]">
-                Deductions exceed the deposit available. Only {money(availableToReconcile)} can be reconciled from this deposit.
+                {t("deductionsExceedDeposit", { amount: money(availableToReconcile) })}
               </p>
             ) : null}
             <div className="border-t border-[#d6e5e2] pt-3">
@@ -970,10 +993,10 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                 <div className="mt-3 rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] p-3">
                   <p className="flex items-center gap-2 text-sm font-black text-[#166534]">
                     <CheckCircle2 size={18} />
-                    Receipt {receiptResult.receipt_number} generated
+                    {t("receiptNumberGenerated", { number: receiptResult.receipt_number })}
                   </p>
                   <p className="mt-1 text-xs font-semibold text-[#166534]">
-                    Rental payment {money(Number(deliveryPaymentAmount || 0))} · Deposit {money(Number(deliveryDepositAmount || 0))}
+                    {t("receiptBreakdown", { rent: money(Number(deliveryPaymentAmount || 0)), deposit: money(Number(deliveryDepositAmount || 0)) })}
                   </p>
                   {receiptResult.warning ? (
                     <p className="mt-2 rounded-lg border border-[#fbbf24] bg-[#fffbeb] px-3 py-2 text-xs font-bold text-[#92400e]">{receiptResult.warning}</p>
@@ -994,7 +1017,9 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
           ) : null}
           {mode !== "condition_report" ? (
             <>
-              <p className="mt-5 text-base font-black text-[#10252b]">Handing over to {context.customer?.full_name || "customer"}</p>
+              <p className="mt-5 text-base font-black text-[#10252b]">
+                {t(mode === "return" ? "receivingFrom" : "handingOverTo", { name: context.customer?.full_name || t("theCustomer") })}
+              </p>
               <p className="mt-1 text-sm text-[#667085]">{t("signPrompt")}</p>
               <div className="mt-3">
                 <SignaturePad onChange={setSignature} value={signature} />

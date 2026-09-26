@@ -166,7 +166,21 @@
     "areaRearRight": "Likod kanan",
     "areaInterior": "Loob",
     "photoCount": "{count, plural, one {# litrato} other {# mga litrato}}",
-    "damageCount": "{count, plural, one {# item} other {# mga item}}"
+    "damageCount": "{count, plural, one {# item} other {# mga item}}",
+    "stepOf": "Hakbang {current} ng {total}",
+    "notSet": "Hindi nakatakda",
+    "logDamageAt": "I-log ang pinsala: {area}",
+    "handingOverTo": "Ipinapasa kay {name}",
+    "receivingFrom": "Tumatanggap mula kay {name}",
+    "theCustomer": "ang customer",
+    "receiptNumberGenerated": "Resibo {number} nalikha",
+    "receiptBreakdown": "Bayad sa renta {rent} · Deposito {deposit}",
+    "odometerBelowLast": "Mas mababa ito kaysa sa huling naitalang pagbasa ({km} km). Suriin ang numero bago magpatuloy.",
+    "drivenDuringRental": "Tinakbo sa panahon ng pag-upa: {km} km",
+    "odometerAtDelivery": "Odometer sa paghatid: {km} km",
+    "rentalLengthDays": "Haba ng pag-upa {count, plural, one {# araw} other {# araw}}",
+    "fuelDeficitApprox": "Kulang sa gasolina: humigit-kumulang {percent}%",
+    "deductionsExceedDeposit": "Ang mga bawas ay lumampas sa magagamit na deposito. Tanging {amount} lamang ang maaaring maayos mula sa deposito na ito."
   },
   "translation": {
     "translatedFrom": "Isinalin mula sa {language}",

@@ -71,6 +71,20 @@ export default async function Home() {
     const key = transaction.date.slice(0, 7);
     monthlyRevenueByKey.set(key, (monthlyRevenueByKey.get(key) || 0) + transaction.amount);
   });
+  // Profit per month (revenue minus costs) for the best-month and 12-month-average figures.
+  const monthlyProfitByKey = new Map<string, number>(monthlyRevenueByKey);
+  transactions.forEach((transaction) => {
+    if (!transaction.date || !isExpenseTransaction({ isDeposit: transaction.isDeposit, type: transaction.rawType || transaction.type })) return;
+    const key = transaction.date.slice(0, 7);
+    monthlyProfitByKey.set(key, (monthlyProfitByKey.get(key) || 0) - Math.abs(transaction.amount));
+  });
+  const lastTwelveMonthKeys = Array.from({ length: 12 }, (_, index) => {
+    const month = new Date(Date.UTC(Number(today.slice(0, 4)), Number(today.slice(5, 7)) - 12 + index, 1));
+    return `${month.getUTCFullYear()}-${String(month.getUTCMonth() + 1).padStart(2, "0")}`;
+  });
+  const lastTwelveProfits = lastTwelveMonthKeys.map((key) => monthlyProfitByKey.get(key) || 0);
+  const bestMonthProfit = Math.max(0, ...lastTwelveProfits);
+  const avgMonthProfit = Math.round(lastTwelveProfits.reduce((sum, value) => sum + value, 0) / 12);
   const monthlyRevenuePreview = Array.from({ length: 12 }, (_, index) => {
     const month = new Date(now.getFullYear(), now.getMonth() - 11 + index, 1);
     const key = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, "0")}`;
@@ -192,6 +206,8 @@ export default async function Home() {
           monthlyRevenue={dashboardMetrics.monthlyRevenue}
         />
         <ProfitCard
+          avgMonthProfit={avgMonthProfit}
+          bestMonthProfit={bestMonthProfit}
           dailyProfit={dailyProfit}
           monthlyProfit={monthlyNetProfit}
         />

@@ -24,6 +24,10 @@ export type Vehicle = {
   healthScore: number;
   purchasePrice: number;
   estimatedValue: number;
+  /** Soonest compliance date (tax, insurance, service), if any are recorded. */
+  complianceNext?: { label: string; date: string; daysLeft: number } | null;
+  /** How many compliance dates are expired or due within 30 days. */
+  complianceAttentionCount?: number;
 };
 
 export type Rental = {

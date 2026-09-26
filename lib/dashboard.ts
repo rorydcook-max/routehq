@@ -1,3 +1,4 @@
+import { computeVehicleFigures, type VehicleFigures } from "@/lib/fleet-metrics";
 import { customers as seedCustomers, reminders as seedReminders, rentals as seedRentals, timeline as seedTimeline, transactions as seedTransactions, vehicles as seedVehicles } from "@/lib/data";
 import { calculateDashboardMetrics } from "@/lib/metrics";
 import type { Customer, Reminder, Rental, TimelineEvent, Transaction, Vehicle, VehicleStatus } from "@/lib/types";
@@ -114,9 +115,16 @@ export async function getDashboardData(): Promise<DashboardData> {
     throw new Error(queryError.message);
   }
 
-  const vehicles: Vehicle[] = (vehiclesResult.data || []).map(mapVehicle).sort((a: Vehicle, b: Vehicle) => b.profit - a.profit);
-  const vehicleById = new Map(vehicles.map((vehicle) => [vehicle.id, vehicle]));
   const rentalRows = rentalsResult.data || [];
+  const figures = computeVehicleFigures({
+    vehicles: vehiclesResult.data || [],
+    rentals: rentalRows,
+    transactions: transactionsResult.data || []
+  });
+  const vehicles: Vehicle[] = (vehiclesResult.data || [])
+    .map((row: any) => mapVehicle(row, figures.get(row.id)))
+    .sort((a: Vehicle, b: Vehicle) => b.profit - a.profit);
+  const vehicleById = new Map(vehicles.map((vehicle) => [vehicle.id, vehicle]));
   const depositsHeldRows = rentalRows.filter((row: any) => {
     const status = String(row.status || "").toLowerCase();
     const depositStatus = String(row.deposit_status || "").toLowerCase();
@@ -172,7 +180,7 @@ function getSeedDashboardData(): DashboardData {
   };
 }
 
-function mapVehicle(row: any): Vehicle {
+function mapVehicle(row: any, figures?: VehicleFigures): Vehicle {
   const compliance = row.metadata?.compliance || {};
   const finance = row.metadata?.finance || {};
 
@@ -188,18 +196,20 @@ function mapVehicle(row: any): Vehicle {
     dailyRate: Number(row.daily_rate || 0),
     weeklyRate: Number(row.weekly_rate || 0),
     monthlyRate: Number(row.monthly_rate || 0),
-    utilization: Number(row.utilization_12_month || 0),
-    lifecycleUtilization: Number(row.utilization_lifecycle || 0),
-    revenue: Number(row.revenue_generated || 0),
-    profit: Number(row.profit_generated || 0),
+    utilization: figures ? figures.utilization12 : Number(row.utilization_12_month || 0),
+    lifecycleUtilization: figures ? figures.utilizationLifetime : Number(row.utilization_lifecycle || 0),
+    revenue: figures ? figures.revenue : Number(row.revenue_generated || 0),
+    profit: figures ? figures.profit : Number(row.profit_generated || 0),
     mileage: Number(row.mileage || 0),
     nextService: compliance.next_service_date || "",
     taxExpiry: compliance.tax_expiry_date || "",
     insuranceExpiry: compliance.insurance_expiry_date || compliance.porbor_expiry_date || "",
     financeDue: finance.end_date || "",
-    healthScore: Number(row.health_score || 0),
+    healthScore: figures ? figures.healthScore : Number(row.health_score || 0),
     purchasePrice: Number(row.purchase_price || 0),
-    estimatedValue: Number(row.estimated_value || 0)
+    estimatedValue: Number(row.estimated_value || 0),
+    complianceNext: figures?.compliance[0] || null,
+    complianceAttentionCount: figures ? figures.compliance.filter((item) => item.daysLeft <= 30).length : 0
   };
 }
 

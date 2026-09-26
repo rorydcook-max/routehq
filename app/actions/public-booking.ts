@@ -847,17 +847,40 @@ export async function completePublicBooking(formData: FormData) {
       })
     ]);
 
-    await generateScheduleAfterPublicCompletion({
-      supabase,
-      bookingLink,
-      rental: {
-        ...currentRentalForAuthority,
+    // The agreement is already fully executed at this point. A problem building
+    // the payment schedule must not tell the customer their booking failed, so
+    // it is logged for the operator instead of thrown.
+    try {
+      await generateScheduleAfterPublicCompletion({
+        supabase,
+        bookingLink,
+        rental: {
+          ...currentRentalForAuthority,
+          // Not in the select above; the schedule looks the rental up by business.
+          organization_id: organizationId,
+          customer_id: customerId,
+          ...(customerUpfrontPeriods > 0 && !currentRentalForAuthority.upfront_periods ? { upfront_periods: customerUpfrontPeriods, upfront_rate: customerUpfrontRate } : {})
+        },
+        preferredDeliveryDateTime,
+        effectivePaymentTiming
+      });
+    } catch (scheduleError) {
+      console.error("[booking] payment schedule could not be generated after signing", {
+        rentalId: bookingLink.rental_id,
+        message: scheduleError instanceof Error ? scheduleError.message : String(scheduleError)
+      });
+      await recordActivityEvent(supabase, {
+        organization_id: organizationId,
+        entity_type: "rental",
+        entity_id: bookingLink.rental_id,
+        rental_id: bookingLink.rental_id,
         customer_id: customerId,
-        ...(customerUpfrontPeriods > 0 && !currentRentalForAuthority.upfront_periods ? { upfront_periods: customerUpfrontPeriods, upfront_rate: customerUpfrontRate } : {})
-      },
-      preferredDeliveryDateTime,
-      effectivePaymentTiming
-    });
+        event_type: "payment_schedule_generation_failed",
+        title: "Payment schedule needs attention",
+        detail: "The customer signed, but the payment schedule could not be created automatically. Create it from the booking page.",
+        metadata: { message: scheduleError instanceof Error ? scheduleError.message : String(scheduleError) }
+      }).catch(() => undefined);
+    }
 
     const [originalAgreementUrl, executionCertificateUrl] = await Promise.all([
       getCustomerExecutedAgreementDownload(token, "original").catch(() => null),

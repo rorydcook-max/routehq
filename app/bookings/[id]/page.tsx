@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Route } from "next";
-import { AlertTriangle, CalendarDays, Car, CheckCircle2, Clock, CreditCard, Download, FileSignature, FileText, Gauge, MapPin, ReceiptText, UserRound, XCircle } from "lucide-react";
+import { AlertTriangle, CalendarDays, Car, CheckCircle2, Clock, CreditCard, FileText, Gauge, MapPin, ReceiptText, UserRound, XCircle } from "lucide-react";
 import { CancelBookingButton } from "@/app/bookings/[id]/cancel-booking-button";
 import { ChangeVehicleButton } from "@/app/bookings/[id]/change-vehicle-button";
 import { UndoCancellationButton } from "@/app/bookings/[id]/undo-cancellation-button";
@@ -10,7 +10,6 @@ import { acknowledgePortalAction, approveExtensionRequest, declinePortalAction, 
 import { AssignCustomerModal } from "@/app/bookings/[id]/assign-customer-modal";
 import { SkipInspectionButton } from "@/app/bookings/[id]/skip-inspection-button";
 import { BookingShareActions } from "@/app/bookings/[id]/booking-share-actions";
-import { OperatorContractSigning } from "@/app/bookings/[id]/operator-contract-signing";
 import { RefundDepositPanel } from "@/app/bookings/[id]/refund-deposit-panel";
 import { AppShell } from "@/components/app-shell";
 import { AddRentalPaymentInlineForm, EditableEndDate, EditableRentalPaymentRow, EditableTransactionRow, ExistingRentalPaymentSetupCard } from "@/components/booking-correction-controls";
@@ -27,6 +26,9 @@ import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { formatDeliveryLocation } from "@/lib/delivery-location";
 import { toWallTime } from "@/lib/business-time";
+import { GeneratePaymentScheduleButton } from "@/app/bookings/[id]/generate-payment-schedule-button";
+import { RentalDocumentsCard } from "@/app/bookings/[id]/rental-documents-card";
+import { businessSignatureOf, getBookingRentalDocuments, renterSignatureOf, type BookingRentalDocument } from "@/lib/booking-rental-documents";
 
 function money(value: unknown, currency = "THB") {
   return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0));
@@ -171,14 +173,16 @@ function deliveryDisplay(rental: any, bookingLink: any) {
   };
 }
 
-function timelineSteps(bookingLink: any, contract: any) {
+function timelineSteps(bookingLink: any, rentalDocuments: BookingRentalDocument[]) {
+  const renterSignature = renterSignatureOf(rentalDocuments);
+  const businessSignature = businessSignatureOf(rentalDocuments);
   return [
     { label: "Created", complete: Boolean(bookingLink?.created_at), at: bookingLink?.created_at },
     { label: "Sent", complete: Boolean(bookingLink?.sent_at) || ["sent", "viewed", "details_submitted", "contract_signed", "completed"].includes(bookingLink?.status), at: bookingLink?.sent_at },
     { label: "Viewed", complete: Boolean(bookingLink?.viewed_at), at: bookingLink?.viewed_at },
     { label: "Customer form submitted", complete: Boolean(bookingLink?.customer_details_submitted_at), at: bookingLink?.customer_details_submitted_at },
-    { label: "Customer signed contract", complete: Boolean(bookingLink?.contract_signed_at || contract?.customer_signed_at), at: bookingLink?.contract_signed_at || contract?.customer_signed_at },
-    { label: "Operator signed contract", complete: Boolean(contract?.owner_signed_at), at: contract?.owner_signed_at }
+    { label: "Customer signed contract", complete: Boolean(renterSignature || bookingLink?.contract_signed_at), at: renterSignature?.signedAt || bookingLink?.contract_signed_at },
+    { label: "Business signed contract", complete: Boolean(businessSignature), at: businessSignature?.signedAt }
   ];
 }
 
@@ -284,16 +288,11 @@ export default async function BookingDetailPage({ params, searchParams }: { para
     .eq("status", "available")
     .is("deleted_at", null)
     .order("make");
+  const rentalDocuments = await getBookingRentalDocuments(supabaseForVehicles, organization.id, detail.rental.id);
 
-  const { rental, bookingLink, contract, payments, transactions, inspections, documents, activityEvents, customerPortalActions, communicationTimeline } = detail;
+  const { rental, bookingLink, payments, transactions, inspections, documents, activityEvents, customerPortalActions, communicationTimeline } = detail;
   const vehicle = rental.vehicles;
   const customer = rental.customers;
-  const organizationSettings = organization.settings && typeof organization.settings === "object" && !Array.isArray(organization.settings)
-    ? (organization.settings as Record<string, unknown>)
-    : {};
-  const ownerSignatureConfigured = Boolean(
-    String(organization.authorised_signature_storage_path || organizationSettings.owner_signature_url || organization.owner_signature_url || "").trim()
-  );
   const isRetrospective = Boolean(rental.entered_by_operator) ||
     Boolean(rental.start_date && new Date(String(rental.start_date).slice(0, 10) + "T00:00:00Z") < new Date(Date.now() - 7 * 86_400_000));
   const displayStatus = (
@@ -319,7 +318,6 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   const pendingPayment = payments.find((payment: any) => !isVoidedPayment(payment) && ["pending", "overdue"].includes(String(payment.status || "pending")));
   const deliveryInspection = inspections.find((inspection: any) => inspection.type === "delivery" || inspection.inspection_type === "delivery");
   const returnInspection = inspections.find((inspection: any) => inspection.type === "return" || inspection.inspection_type === "return");
-  const contractDocuments = documents.filter((document: any) => document.owner_type === "contract");
   const customerDocuments = documents.filter((document: any) => document.owner_type === "customer");
   const delivery = deliveryDisplay(rental, bookingLink);
   const paymentMethod = bookingLink?.preferred_payment_method || null;
@@ -332,8 +330,10 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   const canAdjustRental = ["active", "booked", "due_soon", "overdue"].includes(String(rental.status || "").toLowerCase());
   const needsExistingRentalPaymentSetup = Boolean(rental.entered_by_operator) && payments.length === 0;
   const activeRentalStatus = ["active", "due_soon", "overdue", "extended"].includes(String(displayStatus || "").toLowerCase());
+  // Only what is due today or earlier counts as outstanding; future scheduled rent is not owed yet.
   const pendingPaymentAmount = activePayments
     .filter((payment: any) => ["pending", "overdue", "scheduled"].includes(String(payment.status || "pending")))
+    .filter((payment: any) => !payment.due_date || String(payment.due_date).slice(0, 10) <= today)
     .reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
   const customerFormComplete = Boolean(bookingLink?.customer_details_submitted_at || ["details_submitted", "contract_signed", "completed"].includes(String(bookingLink?.status || "")));
   const paymentDueOnDeliveryAmount = Number(rental.first_payment_amount || rental.rental_rate || 0);
@@ -544,7 +544,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             <Card>
               <SectionHeader eyebrow="Booking link" title="Customer completion timeline" />
               <div className="mt-3 space-y-3">
-                {timelineSteps(bookingLink, contract).map((step) => (
+                {timelineSteps(bookingLink, rentalDocuments).map((step) => (
                     <div className="sub-surface flex items-start gap-3 p-3" key={step.label}>
                     <span className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${step.complete ? "bg-[#dcfce7] text-[#166534]" : "bg-[#eef2f6] text-[#667085]"}`}>
                       {step.complete ? <CheckCircle2 size={16} /> : <Clock size={16} />}
@@ -789,61 +789,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               </div>
             </Card>
 
-            <Card>
-              <SectionHeader eyebrow="Contract" title="Rental agreement" />
-              <div className="mt-3 space-y-3">
-                {contract ? (
-                  <>
-          <div className="sub-surface p-3">
-                      <div className="flex items-center justify-between gap-3">
-                        <div>
-                          <p className="font-black text-[#10252b]">Contract status</p>
-                          <p className="text-sm text-[#667085]">
-                            {contract.owner_signed_at ? "Fully signed by customer and operator" : contract.customer_signed_at ? "Customer signed, operator signature pending" : contract.status}
-                          </p>
-                        </div>
-                        <Badge tone={contract.owner_signed_at ? "green" : contract.customer_signed_at ? "blue" : "amber"}>
-                          {contract.owner_signed_at ? "fully signed" : contract.customer_signed_at ? "customer signed" : contract.status}
-                        </Badge>
-                      </div>
-                    </div>
-                    <OperatorContractSigning
-                      contractId={contract.id}
-                      customerSignedAt={contract.customer_signed_at}
-                      organizationId={organization.id}
-                      ownerSignatureConfigured={ownerSignatureConfigured}
-                      ownerSignedAt={contract.owner_signed_at}
-                      rentalId={rental.id}
-                    />
-                    {contract.signed_pdf_url ? (
-        <a className="primary-action pressable w-full" href={contract.signed_pdf_url} rel="noreferrer" target="_blank">
-                        <Download size={18} />
-                        Download PDF
-                      </a>
-                    ) : contract.content_html ? (
-                      <details className="rounded-lg border border-[#d6e5e2] bg-white p-3">
-                        <summary className="cursor-pointer font-black text-[#0f766e]">View contract HTML</summary>
-                        <div className="contract-preview mt-3 max-h-72 overflow-y-auto text-sm leading-6 text-[#344054]" dangerouslySetInnerHTML={{ __html: contract.content_html }} />
-                      </details>
-                    ) : (
-                      <SectionEmpty>Contract draft exists, but no rendered document has been generated yet.</SectionEmpty>
-                    )}
-                  </>
-                ) : (
-                  <SectionEmpty>No contract has been created for this booking yet.</SectionEmpty>
-                )}
-                {contractDocuments.length > 0 ? (
-                  <div className="space-y-2">
-                    {contractDocuments.map((document: any) => (
-                      <a className="flex items-center gap-2 rounded-lg border border-[#d6e5e2] bg-white p-3 text-sm font-bold text-[#0f766e]" href={document.signed_url || "#"} key={document.id} rel="noreferrer" target="_blank">
-                        <FileSignature size={17} />
-                        {document.file_name}
-                      </a>
-                    ))}
-                  </div>
-                ) : null}
-              </div>
-            </Card>
+            <RentalDocumentsCard documents={rentalDocuments} />
 
             <Card>
               <div id="payment-schedule">
@@ -912,8 +858,9 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   />
                 ) : null}
                 {!needsExistingRentalPaymentSetup && payments.length === 0 && outstandingBalance === 0 && totalPaid === 0 ? (
-                  <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3 text-sm font-semibold text-[#92400e]">
-                    No payment schedule exists yet for this booking. Add a charge if this rental should have a balance due.
+                  <div className="space-y-3 rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3 text-sm font-semibold text-[#92400e]">
+                    <p>No payment schedule exists yet for this booking. Generate one from the rental rate and dates, or add a single charge.</p>
+                    <GeneratePaymentScheduleButton rentalId={rental.id} />
                   </div>
                 ) : null}
                 {payments.length === 0 && transactions.length === 0 ? (
@@ -1099,7 +1046,7 @@ function ComingUpCard({
                       No payment schedule found
                     </p>
                     <p style={{ fontSize: 12, color: "#b45309", margin: 0 }}>
-                      Use the &ldquo;Regenerate schedule&rdquo; option in the payment schedule panel to set one up.
+                      Use &ldquo;Generate payment schedule&rdquo; in the Payment schedule section to set one up.
                     </p>
                   </div>
                 )}

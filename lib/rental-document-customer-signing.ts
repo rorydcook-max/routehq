@@ -266,6 +266,7 @@ export async function loadPublicRentalAgreement(token: string) {
     eligibility,
     agreement: {
       reference: ctx.document.id,
+      versionId: version.id as string,
       versionNumber: version.version_number,
       contentHashFragment: hashFragment(version.content_hash),
       renderedHtmlSnapshot: version.rendered_html_snapshot,
@@ -369,7 +370,8 @@ export async function completeRentalDocumentCustomerSigning({
   signerName,
   ipAddress,
   userAgent,
-  acceptedAcknowledgementTypes
+  acceptedAcknowledgementTypes,
+  reviewedVersionId
 }: {
   token: string;
   signatureDataUrl: string;
@@ -377,10 +379,15 @@ export async function completeRentalDocumentCustomerSigning({
   ipAddress: string | null;
   userAgent: string | null;
   acceptedAcknowledgementTypes: string[];
+  /** The agreement version the customer was shown. They may only sign that exact version. */
+  reviewedVersionId: string;
 }) {
   const ctx = await loadByToken(token);
   if (ctx.state !== "found" || !ctx.document || !ctx.version || !ctx.rental) {
     throw new Error("This booking link could not be found.");
+  }
+  if (ctx.version.id !== reviewedVersionId) {
+    throw new Error("The agreement has changed since you opened it. Please reload the page, read the updated agreement and sign again.");
   }
   const eligibility = await getCustomerSigningEligibility(token);
   if (!eligibility.eligible) {

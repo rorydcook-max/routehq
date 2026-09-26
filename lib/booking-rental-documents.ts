@@ -56,7 +56,8 @@ export async function getBookingRentalDocuments(supabase: any, organizationId: s
     .from("rental_documents")
     .select("id, document_type, status, current_version_id, finalised_at")
     .eq("organization_id", organizationId)
-    .eq("rental_id", rentalId);
+    .eq("rental_id", rentalId)
+    .not("status", "in", "(voided,superseded)");
   if (error || !documents?.length) return [];
 
   const versionIds = documents.map((document: any) => document.current_version_id).filter(Boolean);

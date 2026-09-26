@@ -487,8 +487,12 @@ function portalActionCommunicationText(actionType: string, content: Record<strin
 
 export async function completePublicBooking(formData: FormData) {
   const token = requiredString(formData, "token");
-  const signature = requiredString(formData, "signature");
-  const signedName = requiredString(formData, "signedName");
+  // Two steps: "review" saves the customer's details and prepares the final
+  // agreement with them in it; "sign" signs the exact version they reviewed.
+  const intent = formData.get("intent") === "sign" ? "sign" : "review";
+  const reviewedVersionId = optionalString(formData, "reviewedVersionId");
+  const signature = intent === "sign" ? requiredString(formData, "signature") : "";
+  const signedName = intent === "sign" ? requiredString(formData, "signedName") : "";
   const supabase = createSupabaseAdminClient() as any;
 
   if (signature.length > 280_000) {
@@ -732,6 +736,12 @@ export async function completePublicBooking(formData: FormData) {
         "Your details and documents have been saved, but the rental agreement could not be prepared for signing. The rental company has been notified - please contact them to complete your booking."
       );
     }
+    // The customer must read the exact text they sign. If this is the review
+    // step, or their details changed the agreement since they opened it, send
+    // them back to read the final version first.
+    if (intent === "review" || countersigned.versionId !== reviewedVersionId) {
+      return { success: true, needsReview: true, changed: intent === "sign" } as const;
+    }
   }
 
   if (currentRentalForAuthority) {
@@ -766,7 +776,8 @@ export async function completePublicBooking(formData: FormData) {
       signerName: signedName,
       ipAddress: customerIp,
       userAgent,
-      acceptedAcknowledgementTypes
+      acceptedAcknowledgementTypes,
+      reviewedVersionId: reviewedVersionId || ""
     });
 
     const updatedBookingData = {

@@ -1,5 +1,5 @@
 import { businessToday } from "@/lib/business-time";
-import { addMonths, addWeeks } from "@/lib/payment-schedule";
+import { addMonths, addWeeks, countBillingPeriods } from "@/lib/payment-schedule";
 
 type SupabaseClient = { from: (table: string) => any };
 
@@ -172,17 +172,13 @@ async function generatePaymentScheduleInternal(
   };
 
   if (period === "monthly" || period === "month") {
-    const monthsToGenerate = endDateStr
-      ? Math.min(Math.ceil(Math.abs(daysBetween(startDateStr, endDateStr)) / 30), 24)
-      : 24;
+    const monthsToGenerate = countBillingPeriods(startDateStr, endDateStr, "monthly", 24);
     for (let i = 0; i < monthsToGenerate; i++) {
       const dueDate = addMonths(startDate, i);
       generate(dueDate.toISOString().split("T")[0], i, formatMonthLabel(dueDate));
     }
   } else if (period === "weekly" || period === "week") {
-    const weeksToGenerate = endDateStr
-      ? Math.min(Math.ceil(Math.abs(daysBetween(startDateStr, endDateStr)) / 7), 52)
-      : 12;
+    const weeksToGenerate = endDateStr ? countBillingPeriods(startDateStr, endDateStr, "weekly", 52) : 12;
     for (let i = 0; i < weeksToGenerate; i++) {
       const dueDate = addWeeks(startDate, i);
       generate(dueDate.toISOString().split("T")[0], i);

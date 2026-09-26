@@ -90,6 +90,7 @@ async function latestAgreement(admin: any, organizationId: string, rentalId: str
     .eq("organization_id", organizationId)
     .eq("rental_id", rentalId)
     .eq("document_type", "rental_agreement")
+    .not("status", "in", "(voided,superseded)")
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -103,6 +104,30 @@ async function latestAgreement(admin: any, organizationId: string, rentalId: str
     .maybeSingle();
   if (versionError) throw new Error(versionError.message);
   return { document, version: version || null };
+}
+
+/**
+ * Create the booking's agreement document. The database allows only one live
+ * agreement per rental, so if another request created it a moment earlier
+ * the insert is refused and that document is used instead.
+ */
+async function createAgreementDocument(context: Context) {
+  try {
+    return await createRentalDocument({
+      supabase: context.admin,
+      organizationId: context.organization.id,
+      rentalId: context.rental.id,
+      documentType: "rental_agreement",
+      legacyContractId: context.bookingLink?.contract_id || context.rental.contract_id || null,
+      sourceEventType: "customer_booking_link",
+      sourceEventId: context.bookingLink?.id || null,
+      createdBy: null
+    });
+  } catch (error) {
+    const existing = await latestAgreement(context.admin, context.organization.id, context.rental.id);
+    if (existing.document) return existing.document;
+    throw error;
+  }
 }
 
 async function render(context: Context) {
@@ -143,18 +168,9 @@ export async function ensureRentalAgreementDraft({ organizationId, rentalId }: {
     if (existing.version) return { documentId: existing.document.id as string, created: false };
 
     const rendered = await render(context);
-    const document =
-      existing.document ||
-      (await createRentalDocument({
-        supabase: context.admin,
-        organizationId,
-        rentalId,
-        documentType: "rental_agreement",
-        legacyContractId: context.bookingLink?.contract_id || context.rental.contract_id || null,
-        sourceEventType: "customer_booking_link",
-        sourceEventId: context.bookingLink?.id || null,
-        createdBy: null
-      }));
+    const document = existing.document || (await createAgreementDocument(context));
+    // Another request may have drafted it while this one was rendering.
+    if (document.current_version_id) return { documentId: document.id as string, created: false };
     await newDraftVersion(context, document.id, rendered);
     return { documentId: document.id as string, created: true };
   } catch {
@@ -189,16 +205,7 @@ export async function countersignRentalAgreementForCustomer({
     }
 
     if (!document) {
-      document = await createRentalDocument({
-        supabase: context.admin,
-        organizationId,
-        rentalId,
-        documentType: "rental_agreement",
-        legacyContractId: context.bookingLink?.contract_id || context.rental.contract_id || null,
-        sourceEventType: "customer_booking_link",
-        sourceEventId: context.bookingLink?.id || null,
-        createdBy: null
-      });
+      document = await createAgreementDocument(context);
     }
 
     // A draft whose content still matches can be reused; otherwise the

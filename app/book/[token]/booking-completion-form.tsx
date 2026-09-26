@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { CheckCircle2, CreditCard, FileText, IdCard, ImageIcon, MessageCircle, PenLine, Upload, UserRound, XCircle } from "lucide-react";
 import { completePublicBooking, reportPublicBookingPayment } from "@/app/actions/public-booking";
 import { extractBodyHtml } from "@/lib/contract-rendering";
@@ -63,6 +64,7 @@ type PublicBookingDetail = {
       fullyExecuted: boolean;
     };
     agreement: null | {
+      versionId: string;
       versionNumber: number;
       contentHashFragment: string;
       renderedHtmlSnapshot: string;
@@ -565,6 +567,13 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
   const publicAgreement = detail.rentalDocumentAgreement?.agreement || null;
   const customerSigningEligibility = detail.rentalDocumentAgreement?.eligibility || null;
   const agreementHtml = publicAgreement?.renderedHtmlSnapshot || detail.contractHtml;
+  // The customer signs only the final agreement: prepared with their details
+  // and already signed by the business. Until then the text is a preview.
+  const readyToSign = publicAgreement?.businessSignatureStatus === "signed";
+  const [notice, setNotice] = useState("");
+  const [submittedName, setSubmittedName] = useState("");
+  const agreementRef = useRef<HTMLElement>(null);
+  const router = useRouter();
   const minDateTime = new Date().toISOString().slice(0, 16);
   const operatorDeliveryDateTime = compactDateTime(detail.bookingData.delivery_datetime);
   const operatorDeliveryIsToday = isTodayDateTime(operatorDeliveryDateTime);
@@ -713,30 +722,44 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
       return;
     }
 
-    if (isRentalDocumentEngine) {
+    if (readyToSign) {
       const requiredAcknowledgements = publicAgreement?.requiredAcknowledgements || [];
       const accepted = requiredAcknowledgements.every((ack) => fd.get(`ack_${ack.type}`) === "on");
       if (!accepted) {
         setError("Please accept each required acknowledgement before signing.");
         return;
       }
-      // Readiness is decided on the server at submission, after the agreement is
-      // prepared with the customer's details. The page-load eligibility is stale
-      // by then, and blocking here meant the form was never sent and nothing saved.
-    } else if (!agreed) {
-      setError("Please confirm that you have read and agree to the rental terms.");
-      return;
-    }
-    if (!signature) {
-      setError("Please sign the agreement before submitting.");
-      return;
+      if (!signature) {
+        setError("Please sign the agreement before submitting.");
+        return;
+      }
     }
 
     startTransition(async () => {
       try {
         const formData = new FormData(form);
-        formData.set("signature", signature);
+        formData.set("intent", readyToSign ? "sign" : "review");
+        if (readyToSign) {
+          formData.set("signature", signature);
+          formData.set("reviewedVersionId", publicAgreement?.versionId || "");
+        }
+        setSubmittedName(String(formData.get("fullName") || "").trim());
         const result = await completePublicBooking(formData);
+        if ("needsReview" in result && result.needsReview) {
+          // Documents are saved now; don't send the same files again.
+          form.querySelectorAll<HTMLInputElement>('input[type="file"]').forEach((input) => {
+            input.value = "";
+          });
+          clearSignature();
+          setNotice(
+            result.changed
+              ? "Your changes updated the agreement. Please read the updated version below and sign again."
+              : "Your details are saved. Please read your final agreement below, then sign it."
+          );
+          router.refresh();
+          agreementRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+          return;
+        }
         setSignedContractUrl(result.signedContractUrl || null);
         setOriginalAgreementUrl((result as any).originalAgreementUrl || null);
         setExecutionCertificateUrl((result as any).executionCertificateUrl || null);
@@ -754,7 +777,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#dcfce7] text-[#166534]">
           <CheckCircle2 size={34} />
         </div>
-        <h2 className="mt-4 text-2xl font-black text-[#10252b]">You're all set, {detail.customer?.full_name || "there"}.</h2>
+        <h2 className="mt-4 text-2xl font-black text-[#10252b]">You're all set{(submittedName || detail.customer?.full_name) ? `, ${String(submittedName || detail.customer?.full_name).split(/\s+/)[0]}` : ""}.</h2>
         <p className="mt-2 text-sm leading-6 text-[#667085]">Your booking details, documents, and signed agreement have been received. {detail.organizationName} will contact you to confirm delivery time and answer any questions.</p>
         {originalAgreementUrl ? (
           <a className="pressable mt-5 inline-flex rounded-xl bg-[#0f766e] px-5 py-3 text-sm font-black text-white" href={originalAgreementUrl} rel="noreferrer" target="_blank">
@@ -1212,9 +1235,16 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         </section>
       ) : null}
 
-      <section className="rounded-2xl border border-[#d6e5e2] bg-white p-5 shadow-sm">
+      <section className="scroll-mt-4 rounded-2xl border border-[#d6e5e2] bg-white p-5 shadow-sm" ref={agreementRef}>
         <SectionTitle icon={PenLine} label="Rental Agreement" />
-        {isRentalDocumentEngine && publicAgreement ? (
+        {notice ? <p className="mt-3 rounded-xl bg-[#dcfce7] p-3 text-sm font-bold text-[#166534]">{notice}</p> : null}
+        {!readyToSign ? (
+          <p className="mt-3 rounded-xl border border-[#d6e5e2] bg-[#fbfefd] p-3 text-sm leading-6 text-[#344054]">
+            This is a preview. When you save your details, your name and document numbers are added to the agreement and
+            {" "}{detail.organizationName} signs it. You will then read the final agreement here before you sign it.
+          </p>
+        ) : null}
+        {isRentalDocumentEngine && publicAgreement && readyToSign ? (
           <div className="mt-4 rounded-xl border border-[#99f6e4] bg-[#f0fdfa] p-4">
             <p className="text-xs font-black uppercase text-[#0f766e]">Agreement version {publicAgreement.versionNumber}</p>
             <p className="mt-1 text-sm font-bold text-[#10252b]">{publicAgreement.businessIdentity.name}</p>
@@ -1242,30 +1272,16 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             title="Rental agreement preview"
           />
         </div>
-        {isRentalDocumentEngine && publicAgreement ? (
+        {readyToSign && publicAgreement ? (
+          <>
           <div className="mt-4 space-y-2">
             {publicAgreement.requiredAcknowledgements.map((ack) => (
-              <label className="checkbox-label rounded-xl border border-[#d6e5e2] bg-white p-3 font-bold text-[#10252b]" key={ack.type}>
+              <label className="checkbox-label rounded-xl border border-[#d6e5e2] bg-white p-3 font-bold text-[#10252b]" key={`${publicAgreement.versionId}-${ack.type}`}>
                 <input className="flex-shrink-0" name={`ack_${ack.type}`} type="checkbox" />
                 <span>{ack.text}</span>
               </label>
             ))}
           </div>
-        ) : (
-          <label className="checkbox-label mt-4 rounded-xl border border-[#d6e5e2] bg-white p-3 font-bold text-[#10252b]">
-            <input
-              checked={agreed}
-              className="flex-shrink-0"
-              name="agreementAccepted"
-              onChange={(event) => {
-                setAgreed(event.target.checked);
-                updateLiveStatus(undefined, event.target.checked, signature);
-              }}
-              type="checkbox"
-            />
-            <span>I have read and agree to the rental terms and conditions.</span>
-          </label>
-        )}
         <label className="mt-4 block">
           <span className="text-sm font-bold text-[#344054]">Full name for signature</span>
           <input className={inputClass} defaultValue={detail.customer?.full_name || ""} name="signedName" required style={fieldStyle} />
@@ -1289,9 +1305,17 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             width={560}
           />
         </div>
+          </>
+        ) : null}
         {error ? <p className="mt-4 rounded-xl bg-[#ffe4e6] p-3 text-sm font-bold text-[#be123c]">{error}</p> : null}
-        <button className="pressable mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-[#0f766e] px-5 py-3 text-sm font-black text-white disabled:opacity-70" disabled={isPending} type="submit">
-          {isPending ? <span className="inline-flex items-center gap-2"><span className="spinner" /> Submitting...</span> : "Complete booking and sign agreement"}
+        <button className="pressable mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-[#0f766e] px-5 py-3 text-sm font-black text-white disabled:opacity-70" disabled={isPending} key={readyToSign ? "sign" : "review"} type="submit">
+          {isPending ? (
+            <span className="inline-flex items-center gap-2"><span className="spinner" /> Submitting...</span>
+          ) : readyToSign ? (
+            "Sign agreement and complete booking"
+          ) : (
+            "Save details and review agreement"
+          )}
         </button>
       </section>
 

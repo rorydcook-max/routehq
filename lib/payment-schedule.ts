@@ -44,6 +44,21 @@ export function daysBetween(date1: string, date2: string): number {
   return Math.max(0, Math.ceil((end.getTime() - start.getTime()) / 86_400_000));
 }
 
+/**
+ * How many billing periods start before the rental ends. A rental from
+ * 1 Oct to 1 Nov is one month, not two: the return day starts no new period.
+ * A part period at the end still counts as a period.
+ */
+export function countBillingPeriods(startDate: string, endDate: string | null | undefined, period: "monthly" | "weekly", cap: number) {
+  if (!endDate) return cap;
+  const start = new Date(`${String(startDate).slice(0, 10)}T00:00:00.000Z`);
+  const end = new Date(`${String(endDate).slice(0, 10)}T00:00:00.000Z`);
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return cap;
+  let count = 0;
+  while (count < cap && (period === "monthly" ? addMonths(start, count) : addWeeks(start, count)) < end) count++;
+  return Math.max(1, count);
+}
+
 export function formatMonthLabel(date: Date): string {
   return new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric", timeZone: "UTC" }).format(date);
 }
@@ -87,7 +102,7 @@ export async function generatePaymentSchedule({
   const paidAtDate = `${normalizedDeliveryDate}T00:00:00.000Z`;
 
   if (period === "monthly" || period === "month") {
-    const monthsToGenerate = endDate ? Math.min(Math.ceil(daysBetween(normalizedDeliveryDate, endDate) / 30), 12) : 12;
+    const monthsToGenerate = countBillingPeriods(normalizedDeliveryDate, endDate, "monthly", 12);
 
     for (let i = 0; i < monthsToGenerate; i++) {
       const dueDate = addMonths(deliveryDateObj, i);
@@ -116,7 +131,7 @@ export async function generatePaymentSchedule({
       });
     }
   } else if (period === "weekly" || period === "week") {
-    const weeksToGenerate = endDate ? Math.min(Math.ceil(daysBetween(normalizedDeliveryDate, endDate) / 7), 52) : 12;
+    const weeksToGenerate = endDate ? countBillingPeriods(normalizedDeliveryDate, endDate, "weekly", 52) : 12;
 
     for (let i = 0; i < weeksToGenerate; i++) {
       const dueDate = addWeeks(deliveryDateObj, i);

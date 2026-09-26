@@ -750,6 +750,44 @@ export async function updateTransaction(transactionId: string, fields: Transacti
   return { success: true };
 }
 
+/**
+ * "Deleting" a transaction voids it: the row stays for the audit trail but is
+ * hidden from every total (readers skip rows with deleted_at set). A payment
+ * it had paid goes back to unpaid, so the money owed is shown again.
+ */
+async function voidTransactions(supabase: any, transactions: any[], userId: string) {
+  const ids = transactions.map((transaction) => transaction.id);
+  if (!ids.length) return;
+  const now = new Date().toISOString();
+
+  const { error } = await supabase
+    .from("transactions")
+    .update({ voided: true, voided_at: now, voided_by: userId, void_reason: "Deleted by a team member", deleted_at: now })
+    .in("id", ids)
+    .is("deleted_at", null);
+  if (error) throw new Error(error.message);
+
+  const paymentIds = transactions.map((transaction) => transaction.rental_payment_id).filter(Boolean);
+  const [{ data: byTransaction }, { data: byId }] = await Promise.all([
+    supabase.from("rental_payments").select("id, due_date, status").in("transaction_id", ids),
+    paymentIds.length ? supabase.from("rental_payments").select("id, due_date, status").in("id", paymentIds) : Promise.resolve({ data: [] })
+  ]);
+  const today = businessToday();
+  const payments = new Map<string, any>();
+  for (const payment of [...(byTransaction || []), ...(byId || [])]) payments.set(payment.id, payment);
+  for (const payment of payments.values()) {
+    await supabase
+      .from("rental_payments")
+      .update({
+        transaction_id: null,
+        ...(payment.status === "paid"
+          ? { status: String(payment.due_date || "").slice(0, 10) <= today ? "pending" : "scheduled", paid_at: null }
+          : {})
+      })
+      .eq("id", payment.id);
+  }
+}
+
 export async function deleteTransaction(transactionId: string) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
@@ -779,26 +817,7 @@ export async function deleteTransaction(transactionId: string) {
 
   const isDeposit = Boolean(transaction.is_deposit) || ["deposit", "deposit_received", "deposit_refunded"].includes(String(transaction.type || ""));
 
-  // Clear any linked receipt and rental_payment references before deleting
-  await supabase
-    .from("receipts")
-    .update({ transaction_id: null })
-    .eq("transaction_id", transaction.id);
-
-  await supabase
-    .from("rental_payments")
-    .update({ transaction_id: null })
-    .eq("transaction_id", transaction.id);
-
-  const { error: deleteError } = await supabase
-    .from("transactions")
-    .delete()
-    .eq("id", transaction.id)
-    .eq("organization_id", transaction.organization_id);
-
-  if (deleteError) {
-    throw new Error(deleteError.message);
-  }
+  await voidTransactions(supabase, [transaction], user.id);
 
   if (transaction.rental_id) {
     await recordActivityEvent(supabase, {
@@ -842,8 +861,9 @@ export async function bulkDeleteTransactions(ids: string[]) {
 
   const { data: transactions, error } = await supabase
     .from("transactions")
-    .select("id, organization_id, vehicle_id, rental_id")
-    .in("id", cleanIds);
+    .select("id, organization_id, vehicle_id, rental_id, rental_payment_id")
+    .in("id", cleanIds)
+    .is("deleted_at", null);
 
   if (error) {
     throw new Error(error.message);
@@ -861,25 +881,7 @@ export async function bulkDeleteTransactions(ids: string[]) {
     return { success: true, deleted: 0 };
   }
 
-  // Clear any linked receipt and rental_payment references before bulk deleting
-  await supabase
-    .from("receipts")
-    .update({ transaction_id: null })
-    .in("transaction_id", verifiedIds);
-
-  await supabase
-    .from("rental_payments")
-    .update({ transaction_id: null })
-    .in("transaction_id", verifiedIds);
-
-  const { error: deleteError } = await supabase
-    .from("transactions")
-    .delete()
-    .in("id", verifiedIds);
-
-  if (deleteError) {
-    throw new Error(deleteError.message);
-  }
+  await voidTransactions(supabase, transactions || [], user.id);
 
   revalidatePath("/transactions");
   revalidatePath("/reports");

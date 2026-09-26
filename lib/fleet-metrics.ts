@@ -50,6 +50,18 @@ export function complianceItems(metadata: any, today = businessToday()): Complia
     .sort((a, b) => a.daysLeft - b.daysLeft);
 }
 
+/** Loads what computeVehicleFigures needs for a whole business. */
+export async function loadFleetFigures(supabase: any, organizationId: string) {
+  const [vehicles, rentals, transactions] = await Promise.all([
+    supabase.from("vehicles").select("id, purchase_date, created_at, metadata").eq("organization_id", organizationId).is("deleted_at", null),
+    supabase.from("rentals").select("vehicle_id, status, start_date, end_date").eq("organization_id", organizationId).is("deleted_at", null),
+    supabase.from("transactions").select("vehicle_id, amount, type, is_deposit, voided").eq("organization_id", organizationId).is("deleted_at", null)
+  ]);
+  const error = vehicles.error || rentals.error || transactions.error;
+  if (error) throw new Error(error.message);
+  return computeVehicleFigures({ vehicles: vehicles.data || [], rentals: rentals.data || [], transactions: transactions.data || [] });
+}
+
 export function computeVehicleFigures(input: {
   vehicles: any[];
   rentals: any[];

@@ -2,6 +2,7 @@ import { AppShell } from "@/components/app-shell";
 import { SectionHeader } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDefaultOrganization } from "@/lib/organization";
+import { loadFleetFigures } from "@/lib/fleet-metrics";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { CalculatorClient } from "./calculator-client";
 import type { FleetVehicle, SavedCalc } from "./calculator-client";
@@ -15,24 +16,29 @@ export default async function RentalCalculatorPage() {
   const supabase = (await createSupabaseServerClient()) as any;
 
   // Fetch fleet vehicles for comparison and utilization pre-fill
-  const { data: vehiclesData } = await supabase
-    .from("vehicles")
-    .select("id, make, model, registration_number, utilization_12_month, profit_generated, monthly_rate")
-    .eq("organization_id", organization.id)
-    .is("deleted_at", null);
+  const [{ data: vehiclesData }, figures] = await Promise.all([
+    supabase
+      .from("vehicles")
+      .select("id, make, model, registration_number, monthly_rate")
+      .eq("organization_id", organization.id)
+      .is("deleted_at", null),
+    // Real utilisation and profit per vehicle (the stored columns were never updated).
+    loadFleetFigures(supabase, organization.id).catch(() => new Map())
+  ]);
 
   const fleetVehicles: FleetVehicle[] = (vehiclesData || []).map((v: any) => ({
     id: v.id,
     make: v.make || "",
     model: v.model || "",
     plate: v.registration_number || "",
-    utilization: Number(v.utilization_12_month || 0),
-    profit: Number(v.profit_generated || 0),
+    utilization: figures.get(v.id)?.utilization12 ?? 0,
+    profit: figures.get(v.id)?.profit ?? 0,
     monthlyRate: Number(v.monthly_rate || 0)
   }));
 
+  // Without any rental history there is nothing to average, so the calculator keeps its 70% starting assumption.
   const fleetAvgUtilization =
-    fleetVehicles.length > 0
+    fleetVehicles.length > 0 && fleetVehicles.some((v) => v.utilization > 0)
       ? Math.round(fleetVehicles.reduce((sum, v) => sum + v.utilization, 0) / fleetVehicles.length)
       : 70;
 

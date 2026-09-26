@@ -1,4 +1,5 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { loadFleetFigures } from "@/lib/fleet-metrics";
 import type { TaskListItem } from "@/lib/tasks";
 import { isRawDepositTransaction, isRevenueTransaction } from "@/lib/transaction-options";
 
@@ -372,7 +373,13 @@ export async function getVehicleDetail(vehicleId: string, organizationId: string
       .limit(10),
     supabase.from("gps_devices").select("*").eq("organization_id", organizationId).eq("vehicle_id", vehicleId).is("deleted_at", null).maybeSingle(),
     supabase.from("vehicle_locations").select("*").eq("organization_id", organizationId).eq("vehicle_id", vehicleId).order("recorded_at", { ascending: false }).limit(1).maybeSingle(),
-    supabase.from("vehicles").select("id, utilization_12_month").eq("organization_id", organizationId).is("deleted_at", null)
+    // Fleet average utilisation, worked out from rentals (the stored column was never updated).
+    loadFleetFigures(supabase, organizationId)
+      .then((figures) => ({
+        data: Array.from(figures.entries()).map(([id, item]) => ({ id, utilization_12_month: item.utilization12 })),
+        error: null
+      }))
+      .catch((error: Error) => ({ data: [], error }))
   ]);
 
   const results = [

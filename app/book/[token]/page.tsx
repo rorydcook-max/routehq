@@ -350,6 +350,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             detail={{
               token,
               organizationName: organization?.name || "Rental operator",
+              vehicleWithCustomer: ["active", "due_soon", "overdue", "extended"].includes(String(rental?.status || "")),
               customer,
               completion: detail.completion,
               documentStatus: detail.documentStatus,

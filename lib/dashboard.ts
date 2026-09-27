@@ -6,6 +6,7 @@ import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getDefaultOrganization } from "@/lib/organization";
 import { businessToday } from "@/lib/business-time";
+import { QUIET_ACTIVITY_EVENT_FILTER } from "@/lib/activity-noise";
 
 type DashboardMetrics = ReturnType<typeof calculateDashboardMetrics> & {
   depositsHeld: number;
@@ -107,6 +108,7 @@ export async function getDashboardData(): Promise<DashboardData> {
       .from("activity_events")
       .select("*")
       .eq("organization_id", organizationId)
+      .not("event_type", "in", QUIET_ACTIVITY_EVENT_FILTER)
       .order("occurred_at", { ascending: false })
       .limit(10)
   ]);

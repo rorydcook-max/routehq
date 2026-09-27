@@ -35,6 +35,8 @@ type OrgPaymentSettings = {
 type PublicBookingDetail = {
   token: string;
   organizationName: string;
+  /** The customer already has the vehicle (e.g. a rental entered after the handover). */
+  vehicleWithCustomer?: boolean;
   customer: any;
   completion: {
     details: boolean;
@@ -782,7 +784,12 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           <CheckCircle2 size={34} />
         </div>
         <h2 className="mt-4 text-2xl font-black text-[#10252b]">You're all set{(submittedName || detail.customer?.full_name) ? `, ${String(submittedName || detail.customer?.full_name).split(/\s+/)[0]}` : ""}.</h2>
-        <p className="mt-2 text-sm leading-6 text-[#667085]">Your booking details, documents, and signed agreement have been received. {detail.organizationName} will contact you to confirm delivery time and answer any questions.</p>
+        <p className="mt-2 text-sm leading-6 text-[#667085]">
+          Your booking details, documents, and signed agreement have been received.{" "}
+          {detail.vehicleWithCustomer
+            ? `${detail.organizationName} has been told. Contact them any time if you have questions about your rental.`
+            : `${detail.organizationName} will contact you to confirm delivery time and answer any questions.`}
+        </p>
         {originalAgreementUrl ? (
           <a className="pressable mt-5 inline-flex rounded-xl bg-[#0f766e] px-5 py-3 text-sm font-black text-white" href={originalAgreementUrl} rel="noreferrer" target="_blank">
             Download original agreement

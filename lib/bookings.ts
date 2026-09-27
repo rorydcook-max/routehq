@@ -1,4 +1,5 @@
 import { businessToday } from "@/lib/business-time";
+import { QUIET_ACTIVITY_EVENT_FILTER } from "@/lib/activity-noise";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { buildUpcomingPayments, buildVehicleEvents } from "@/lib/rental-upcoming";
 
@@ -301,6 +302,7 @@ export async function getBookingDetail(rentalId: string, organizationId: string)
       .select("*")
       .eq("organization_id", organizationId)
       .eq("rental_id", rentalId)
+      .not("event_type", "in", QUIET_ACTIVITY_EVENT_FILTER)
       .order("occurred_at", { ascending: false }),
     supabase
       .from("customer_portal_actions")

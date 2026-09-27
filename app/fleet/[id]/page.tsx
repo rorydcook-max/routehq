@@ -37,6 +37,8 @@ import { getDefaultOrganization } from "@/lib/organization";
 import { TASK_TYPE_OPTIONS } from "@/lib/tasks";
 import { isRevenueTransaction } from "@/lib/transaction-options";
 import { getVehicleDetail, type VehicleDetail } from "@/lib/vehicle-detail";
+import { isQuietActivityEvent } from "@/lib/activity-noise";
+import { businessToday } from "@/lib/business-time";
 
 const inputClass =
   "mt-1 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15";
@@ -514,7 +516,9 @@ function TimelineSection({ detail }: { detail: VehicleDetail }) {
     date: reminder.due_date,
     kind: "reminder" as const
   }));
-  const activityEvents = detail.activityEvents.map((event) => ({
+  // Bookkeeping steps behind a signed document ("document created", "version
+  // created") are noise on a vehicle's history; the signing itself stays.
+  const activityEvents = detail.activityEvents.filter((event: any) => !isQuietActivityEvent(event.event_type)).map((event) => ({
     id: event.id,
     title: event.title,
     detail: event.detail,
@@ -539,11 +543,11 @@ function TimelineSection({ detail }: { detail: VehicleDetail }) {
       date: String(event.date),
       kind: event.kind
     }));
-  const today = new Date();
-  const oneYearAgo = new Date(today);
-  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+  // Thai calendar dates: the server clock is UTC.
+  const todayIso = businessToday();
+  const oneYearAgo = `${Number(todayIso.slice(0, 4)) - 1}${todayIso.slice(4)}`;
 
-  return <VehicleTimeline defaultFrom={oneYearAgo.toISOString().slice(0, 10)} defaultTo={today.toISOString().slice(0, 10)} events={events} />;
+  return <VehicleTimeline defaultFrom={oneYearAgo} defaultTo={todayIso} events={events} />;
 }
 
 function InspectionsSection({ detail }: { detail: VehicleDetail }) {

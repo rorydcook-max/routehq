@@ -21,6 +21,8 @@ import {
   Trash2
 } from "lucide-react";
 import { submitInspection } from "@/app/actions/inspections";
+import { prepareInspectionUploads } from "@/app/actions/uploads";
+import { uploadFormFiles } from "@/lib/direct-upload-client";
 import { recordDeliveryCashPaymentAndReceipt } from "@/app/actions/transactions";
 import type { InspectionContext, InspectionMode } from "@/lib/inspection-detail";
 
@@ -392,6 +394,8 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
   const [cleaningCharge, setCleaningCharge] = useState(0);
   const [refundOverride, setRefundOverride] = useState("");
   const [isPending, startTransition] = useTransition();
+  const [uploadProgress, setUploadProgress] = useState("");
+  const [uploadError, setUploadError] = useState("");
   const [isReceiptPending, startReceiptTransition] = useTransition();
   const [deliveryPaymentAmount, setDeliveryPaymentAmount] = useState(() => String(Number(context.rental?.rental_rate || 0) || ""));
   const [deliveryDepositAmount, setDeliveryDepositAmount] = useState(() => {
@@ -590,6 +594,12 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
 
   function nav() {
     return (
+      <>
+      {uploadError ? (
+        <p className="mt-4 rounded-lg border border-[#fecdd3] bg-[#fff1f2] p-3 text-sm font-bold text-[#be123c]" role="alert">
+          {uploadError}
+        </p>
+      ) : null}
       <div className="sticky bottom-0 z-20 -mx-4 mt-4 flex gap-2 border-t border-[#d6e5e2] bg-white/95 p-4 backdrop-blur sm:mx-0 sm:rounded-lg sm:border">
         <button
           className={`${touchButton} flex-1 border border-[#d6e5e2] bg-white text-[#344054] disabled:opacity-50`}
@@ -623,22 +633,40 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
               event.preventDefault();
               const form = document.getElementById("inspectionForm") as HTMLFormElement | null;
               if (!form) return;
-              startTransition(() => {
-                submitInspection(new FormData(form));
-                localStorage.removeItem(draftKey);
+              setUploadError("");
+              startTransition(async () => {
+                try {
+                  // Photos and video go straight to storage first; the form then
+                  // carries only their paths (Vercel refuses bodies over 4.5 MB).
+                  const formData = await uploadFormFiles(
+                    new FormData(form),
+                    (files) => prepareInspectionUploads(context.organizationId, files),
+                    (done, total) => setUploadProgress(total ? t("uploadingPhotos", { done, total }) : "")
+                  );
+                  setUploadProgress("");
+                  localStorage.removeItem(draftKey);
+                  await submitInspection(formData);
+                } catch (error) {
+                  if (String((error as any)?.digest || "").startsWith("NEXT_REDIRECT")) throw error;
+                  setUploadProgress("");
+                  setUploadError(error instanceof Error ? error.message : t("uploadFailed"));
+                }
               });
             }}
             type="submit"
           >
-            {isPending ? t("submitting") : mode === "return" ? t("submitReturn") : mode === "condition_report" ? t("saveConditionReport") : t("submitDelivery")}
+            {isPending ? uploadProgress || t("submitting") : mode === "return" ? t("submitReturn") : mode === "condition_report" ? t("saveConditionReport") : t("submitDelivery")}
           </button>
         )}
       </div>
+      </>
     );
   }
 
   return (
-    <form action={submitInspection} className="mx-auto max-w-3xl space-y-4" encType="multipart/form-data" id="inspectionForm">
+    // Submitting only happens through the Submit button, which uploads the
+    // photos first. Pressing Enter in a field must not post the files directly.
+    <form className="mx-auto max-w-3xl space-y-4" id="inspectionForm" onSubmit={(event) => event.preventDefault()}>
       <input name="organizationId" type="hidden" value={context.organizationId} />
       <input name="mode" type="hidden" value={mode} />
       <input name="rentalId" type="hidden" value={context.rental?.id || ""} />
@@ -689,7 +717,10 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
         </StepShell>
       ) : null}
 
-      {step === 1 ? (
+      {/* Steps 1-4 hold photo inputs. They stay on the page (hidden) after the
+          user moves on: the photos are sent with the form at the end, so a
+          step that was removed from the page would lose its photos. */}
+      <div hidden={step !== 1}>
         <StepShell eyebrow={t("odometer")} title={t("odometerPhoto")}>
           <FileCapture
             accept="image/*"
@@ -726,9 +757,9 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
             </p>
           ) : null}
         </StepShell>
-      ) : null}
+      </div>
 
-      {step === 2 ? (
+      <div hidden={step !== 2}>
         <StepShell eyebrow={t("eyebrowFuelLevel")} title={t("fuelPhoto")}>
           <FileCapture accept="image/*" label={t("fuelCamera")} name="photo_fuel" onSelected={() => setFuelPhotoCaptured(true)} />
           <div className="mt-4">
@@ -750,9 +781,9 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
             </div>
           ) : null}
         </StepShell>
-      ) : null}
+      </div>
 
-      {step === 3 ? (
+      <div hidden={step !== 3}>
         <StepShell eyebrow={t("eyebrowWalkaround")} title={t("recordCondition")}>
           <FileCapture accept="video/*" icon={FileVideo} label={t("recordVideo")} name="walkaroundVideo" onSelected={() => setVideoCaptured(true)} />
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -775,9 +806,9 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
           </div>
           <p className="mt-3 text-sm text-[#667085]">{t("conditionMinimum")}</p>
         </StepShell>
-      ) : null}
+      </div>
 
-      {step === 4 ? (
+      <div hidden={step !== 4}>
         <StepShell eyebrow={t("eyebrowDamageCheck")} title={mode === "return" ? t("checkNewDamage") : t("logPreExistingDamage")}>
           {preExistingDamage.length > 0 ? (
             <div className="mb-4 rounded-lg border border-[#d6e5e2] bg-white p-3">
@@ -845,7 +876,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
             </label>
           ) : null}
         </StepShell>
-      ) : null}
+      </div>
 
       {step === 5 && mode !== "return" ? (
         <StepShell eyebrow={t("eyebrowGpsCheck")} title={t("confirmTracker")}>

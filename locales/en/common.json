@@ -121,6 +121,8 @@
     "receiptGenerated": "Receipt generated",
     "confirmCashReceipt": "Confirm cash and generate receipt",
     "submitting": "Submitting...",
+    "uploadingPhotos": "Uploading photos {done} of {total}...",
+    "uploadFailed": "The photos could not be uploaded. Check the connection and try again.",
     "submitReturn": "Submit return inspection",
     "saveConditionReport": "Save condition report",
     "submitDelivery": "Submit delivery inspection",

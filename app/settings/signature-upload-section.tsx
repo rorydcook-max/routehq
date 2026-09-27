@@ -107,7 +107,7 @@ export function SignatureUploadSection({
             {isPending ? "Removing..." : "Remove"}
           </button>
         ) : null}
-        <input accept="image/png,image/jpeg,image/webp" className={fileInputClass} ref={fileRef} type="file" />
+        <input accept="image/png,image/jpeg,image/webp" className={fileInputClass} ref={fileRef} data-keep-original type="file" />
         <button className="primary-action w-full sm:w-auto" disabled={isPending} onClick={signatureUrl ? handleReplace : undefined} type={signatureUrl ? "button" : "submit"}>
           {isPending ? "Uploading..." : signatureUrl ? "Replace" : "Upload signature"}
         </button>

@@ -6,6 +6,7 @@ import { organizationSignatureReference } from "@/lib/branding-assets";
 import { buildContractVariables, renderContractTemplate } from "@/lib/contract-rendering";
 import { defaultRentalContractTemplate, embedLogoInContractVariables, ensureDefaultContractTemplate } from "@/lib/contracts";
 import { htmlToPdf } from "@/lib/html-to-pdf";
+import { bookingLinkUploadPrefix, downloadUploadedFile, readUploadedFiles } from "@/lib/direct-uploads";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { countersignRentalAgreementForCustomer } from "@/lib/rental-agreement-automation";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -183,6 +184,47 @@ async function generateScheduleAfterPublicCompletion({
     upfrontPeriods: effectivePaymentTiming === "now" ? upfrontPeriods : 0,
     upfrontRate
   });
+}
+
+/** Record a document the customer already uploaded straight to storage. */
+async function recordPublicCustomerDocument({
+  supabase,
+  organizationId,
+  customerId,
+  category,
+  storagePath,
+  name,
+  type,
+  size
+}: {
+  supabase: any;
+  organizationId: string;
+  customerId: string;
+  category: string;
+  storagePath: string;
+  name: string;
+  type: string;
+  size: number;
+}) {
+  const { data, error } = await supabase
+    .from("documents")
+    .insert({
+      organization_id: organizationId,
+      owner_type: "customer",
+      owner_id: customerId,
+      storage_bucket: "documents",
+      storage_path: storagePath,
+      file_name: name || `${category}.upload`,
+      mime_type: type || null,
+      size_bytes: size || null,
+      category,
+      ocr_status: "queued",
+      extracted_data: {}
+    })
+    .select("id")
+    .single();
+  if (error) throw new Error(error.message);
+  return data.id as string;
 }
 
 async function uploadPublicCustomerDocument({
@@ -624,16 +666,27 @@ export async function completePublicBooking(formData: FormData) {
   ];
   const ocrBookingData: Record<string, string> = {};
 
+  // Documents arrive already in storage (the browser uploads them directly,
+  // see lib/direct-uploads.ts); small files sent inside the form still work.
+  const directUploads = await readUploadedFiles(formData, bookingLinkUploadPrefix(organizationId, bookingLink.id));
   for (const upload of uploads) {
-    const file = upload.keys.flatMap((key) => formData.getAll(key)).find((value) => value instanceof File && value.size > 0);
+    const direct = directUploads.find((item) => upload.keys.includes(item.field));
+    if (direct) {
+      await recordPublicCustomerDocument({ supabase, organizationId, customerId, category: upload.category, storagePath: direct.path, name: direct.name, type: direct.type, size: direct.size });
+    }
+    const file = direct
+      ? await downloadUploadedFile(direct)
+      : upload.keys.flatMap((key) => formData.getAll(key)).find((value) => value instanceof File && value.size > 0);
     if (file instanceof File) {
-      await uploadPublicCustomerDocument({
-        supabase,
-        organizationId,
-        customerId,
-        category: upload.category,
-        file
-      });
+      if (!direct) {
+        await uploadPublicCustomerDocument({
+          supabase,
+          organizationId,
+          customerId,
+          category: upload.category,
+          file
+        });
+      }
 
       if (upload.category === "passport") {
         const result = await extractDocumentOcr(file, "passport");

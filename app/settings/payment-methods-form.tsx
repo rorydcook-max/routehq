@@ -130,7 +130,7 @@ export function PaymentMethodsForm({
                     <div className="flex flex-wrap gap-2">
                       <label className="pressable inline-flex cursor-pointer rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-black text-[#344054]">
                         Replace
-                        <input accept="image/png,image/jpeg,image/webp" className="sr-only" name="promptpay_qr" type="file" />
+                        <input accept="image/png,image/jpeg,image/webp" className="sr-only" name="promptpay_qr" data-keep-original type="file" />
                       </label>
                       <button
                         className="pressable rounded-lg border border-[#fecdd3] bg-[#fff1f2] px-3 py-2 text-sm font-black text-[#be123c]"
@@ -146,7 +146,7 @@ export function PaymentMethodsForm({
                   </div>
                 ) : (
                   <label className="mt-3 block">
-                    <input accept="image/png,image/jpeg,image/webp" className={inputClass} name="promptpay_qr" type="file" />
+                    <input accept="image/png,image/jpeg,image/webp" className={inputClass} name="promptpay_qr" data-keep-original type="file" />
                   </label>
                 )}
               </div>

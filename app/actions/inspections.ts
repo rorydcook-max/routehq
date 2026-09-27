@@ -9,6 +9,7 @@ import { finaliseInspectionReport, type DepositSettlement } from "@/lib/inspecti
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { notifyOperator } from "@/lib/notify-operator";
+import { inspectionUploadPrefix, readUploadedFiles } from "@/lib/direct-uploads";
 
 type InspectionMode = "delivery" | "return" | "condition_report";
 
@@ -71,25 +72,42 @@ async function uploadInspectionMedia({
   let videoUrl: string | null = null;
   const damagePhotoPaths = new Map<string, string>();
 
+  // Files arrive already in storage (uploaded directly by the browser, see
+  // lib/direct-uploads.ts). Small files sent inside the form still work.
+  const media: Array<{ key: string; storagePath: string; name: string; type: string; size: number; file?: File }> = [];
+  for (const uploaded of await readUploadedFiles(formData, inspectionUploadPrefix(organizationId))) {
+    media.push({ key: uploaded.field, storagePath: uploaded.path, name: uploaded.name, type: uploaded.type, size: uploaded.size });
+  }
   for (const [key, value] of formData.entries()) {
-    if (!(value instanceof File) || value.size === 0) {
-      continue;
+    if (value instanceof File && value.size > 0) {
+      media.push({
+        key,
+        storagePath: `${organizationId}/inspections/${inspectionId}/${Date.now()}-${key}-${safeFileName(value.name)}`,
+        name: value.name,
+        type: value.type,
+        size: value.size,
+        file: value
+      });
     }
+  }
 
+  for (const item of media) {
+    const { key, storagePath } = item;
+    const value = { name: item.name, type: item.type, size: item.size };
     const isVideo = key === "walkaroundVideo" || value.type.startsWith("video/");
     const isPhoto = key.startsWith("photo_") || key.startsWith("damagePhoto_") || value.type.startsWith("image/");
     if (!isVideo && !isPhoto) {
       continue;
     }
 
-    const storagePath = `${organizationId}/inspections/${inspectionId}/${Date.now()}-${key}-${safeFileName(value.name)}`;
-    const { error: uploadError } = await supabase.storage.from("documents").upload(storagePath, value, {
-      contentType: value.type || undefined,
-      upsert: false
-    });
-
-    if (uploadError) {
-      throw new Error(uploadError.message);
+    if (item.file) {
+      const { error: uploadError } = await supabase.storage.from("documents").upload(storagePath, item.file, {
+        contentType: value.type || undefined,
+        upsert: false
+      });
+      if (uploadError) {
+        throw new Error(uploadError.message);
+      }
     }
 
     const category = isVideo ? "inspection_video" : `inspection_${mediaTypeFromField(key)}`;
@@ -137,7 +155,8 @@ async function uploadInspectionMedia({
 
   const damageWithPhotos = damageItems.map((item) => ({
     ...item,
-    photo_url: item.photo_url || (item.photo_key ? damagePhotoPaths.get(item.photo_key) : null) || null
+    // The form names each damage photo input damagePhoto_<damage item id>.
+    photo_url: item.photo_url || damagePhotoPaths.get(String(item.photo_key || item.id)) || null
   }));
 
   return { photos, photoDocumentIds, videoDocumentIds, videoUrl, damageWithPhotos };
@@ -588,7 +607,8 @@ export async function submitInspection(formData: FormData) {
       notes,
       customerSignature,
       customerSignedName,
-      depositSettlement
+      depositSettlement,
+      photos: media.photos
     });
   }
 

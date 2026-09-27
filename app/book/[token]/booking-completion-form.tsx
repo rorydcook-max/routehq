@@ -4,6 +4,8 @@ import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, CreditCard, FileText, IdCard, ImageIcon, MessageCircle, PenLine, Upload, UserRound, XCircle } from "lucide-react";
 import { completePublicBooking, reportPublicBookingPayment } from "@/app/actions/public-booking";
+import { preparePublicBookingUploads } from "@/app/actions/uploads";
+import { uploadFormFiles } from "@/lib/direct-upload-client";
 import { extractBodyHtml } from "@/lib/contract-rendering";
 import { formatDeliveryLocation } from "@/lib/delivery-location";
 import { toWallTime } from "@/lib/business-time";
@@ -737,7 +739,9 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
 
     startTransition(async () => {
       try {
-        const formData = new FormData(form);
+        // Document photos go straight to storage; the form carries only their
+        // paths (Vercel refuses request bodies over 4.5 MB).
+        const formData = await uploadFormFiles(new FormData(form), (files) => preparePublicBookingUploads(detail.token, files));
         formData.set("intent", readyToSign ? "sign" : "review");
         if (readyToSign) {
           formData.set("signature", signature);

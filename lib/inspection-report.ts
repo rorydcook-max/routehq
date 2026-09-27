@@ -47,7 +47,25 @@ export type InspectionReportInput = {
   customerSignature: string;
   customerSignedName: string | null;
   depositSettlement?: DepositSettlement | null;
+  /** Inspection photos as saved on the inspection: { type, url } with url a storage path. */
+  photos?: Array<{ type?: string; url?: string }>;
 };
+
+const PHOTO_LABELS: Record<string, string> = {
+  odometer: "Odometer",
+  fuel: "Fuel gauge",
+  front: "Front",
+  rear: "Rear",
+  driver: "Driver side",
+  passenger: "Passenger side",
+  interior: "Interior",
+  boot: "Boot / trunk"
+};
+
+export function photoLabel(type: string) {
+  if (type.startsWith("damage")) return "Damage";
+  return PHOTO_LABELS[type] || type.replace(/_/g, " ");
+}
 
 const LABELS: Record<InspectionReportMode, string> = {
   delivery: "Delivery report",
@@ -121,7 +139,7 @@ function describeDamage(item: unknown) {
     what: pick("description", "label", "type", "damage_type", "name") || "Damage noted",
     severity: labelFor(SEVERITY_LABELS, pick("severity", "level") || ""),
     note: pick("notes", "note", "comment") || "",
-    photoCount: photos?.length || 0
+    photoCount: photos?.length || (typeof record.photo_url === "string" && record.photo_url ? 1 : 0)
   };
 }
 
@@ -153,7 +171,18 @@ export function renderInspectionReportHtml(input: {
   translations?: ReportTranslations;
   depositSettlement?: DepositSettlement | null;
   currency?: string;
+  /** Photos shown in the report. `src` is a storage reference in the stored copy and a real URL in the PDF. */
+  photos?: Array<{ label: string; src: string }>;
 }) {
+  const photos = input.photos || [];
+  const photoSection = photos.length
+    ? `<h2>Photos</h2><div class="photos">${photos
+        .map(
+          (photo) =>
+            `<figure><img alt="${escapeHtml(photo.label)}" src="${escapeHtml(photo.src)}"><figcaption>${escapeHtml(photo.label)}</figcaption></figure>`
+        )
+        .join("")}</div>`
+    : "";
   const money = (value: number) =>
     new Intl.NumberFormat("en-US", { style: "currency", currency: input.currency || "THB", maximumFractionDigits: 2 }).format(value);
   const settlement = input.depositSettlement;
@@ -190,6 +219,9 @@ h1{font-size:20px;margin:0 0 4px}.muted{color:#667085}.meta{margin:0 0 20px}
 table{width:100%;border-collapse:collapse;margin:8px 0 18px}th,td{border:1px solid #d6e5e2;padding:6px 8px;text-align:left;vertical-align:top}
 th{background:#f4f8f7;font-weight:600}h2{font-size:14px;margin:18px 0 6px}.sig{height:80px;border-bottom:1px solid #10252b}
 .original{margin-top:4px;font-size:11px}.small{font-size:10px}
+.photos{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 18px}
+figure{margin:0;break-inside:avoid}figure img{width:100%;height:220px;object-fit:contain;background:#f4f8f7;border:1px solid #d6e5e2}
+figcaption{font-size:11px;color:#667085;margin-top:3px}
 </style></head><body>
 <h1>${escapeHtml(title)}</h1>
 <p class="meta muted">${escapeHtml(input.businessName)} &middot; Reference ${escapeHtml(input.reference)} &middot; ${escapeHtml(inspectedAt)}</p>
@@ -200,6 +232,7 @@ th{background:#f4f8f7;font-weight:600}h2{font-size:14px;margin:18px 0 6px}.sig{h
 <h2>Condition</h2>
 <table><tr><th>#</th><th>Location</th><th>Finding</th><th>Photos</th></tr>${damageRows}</table>
 ${input.notes ? `<h2>Notes</h2><div>${typedText(input.notes, input.translations)}</div>` : ""}
+${photoSection}
 ${depositSection}
 ${translationNote}
 <h2>Customer acknowledgement</h2>
@@ -250,7 +283,19 @@ export async function finaliseInspectionReport(input: InspectionReportInput) {
       if (entry.translated) translations[entry.original] = { english: entry.text, sourceLanguage: entry.sourceLanguage };
     }
 
-    const html = renderInspectionReportHtml({
+    // Photos: the stored, fingerprinted copy refers to each photo by its storage
+    // path; the PDF gets short-lived links so the images are drawn into it.
+    const photoPaths = (input.photos || [])
+      .filter((photo) => typeof photo?.url === "string" && photo.url)
+      .map((photo) => ({ label: photoLabel(String(photo.type || "")), path: String(photo.url) }));
+    const signedPhotos = await Promise.all(
+      photoPaths.map(async (photo) => {
+        const { data } = await admin.storage.from("documents").createSignedUrl(photo.path, 10 * 60);
+        return { label: photo.label, src: data?.signedUrl || "" };
+      })
+    );
+
+    const reportFields = {
       translations,
       depositSettlement: input.depositSettlement,
       currency: String(rental?.currency || "THB"),
@@ -266,6 +311,14 @@ export async function finaliseInspectionReport(input: InspectionReportInput) {
       notes: input.notes,
       signerName,
       signatureDataUrl: input.customerSignature
+    };
+    const html = renderInspectionReportHtml({
+      ...reportFields,
+      photos: photoPaths.map((photo) => ({ label: photo.label, src: `storage:documents/${photo.path}` }))
+    });
+    const pdfHtml = renderInspectionReportHtml({
+      ...reportFields,
+      photos: signedPhotos.filter((photo) => photo.src)
     });
     const contentHash = createHash("sha256").update(html, "utf8").digest("hex");
 
@@ -276,7 +329,7 @@ export async function finaliseInspectionReport(input: InspectionReportInput) {
     const signaturePath = `${prefix}customer-signature-${input.mode}.png`;
 
     const storage = admin.storage.from("documents");
-    const pdf = await htmlToPdf(html);
+    const pdf = await htmlToPdf(pdfHtml);
     const pdfUpload = await storage.upload(pdfPath, pdf, { contentType: "application/pdf", upsert: false });
     if (pdfUpload.error) throw new Error(pdfUpload.error.message);
     uploaded.push(pdfPath);

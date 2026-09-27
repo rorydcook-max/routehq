@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
 import { textDirection } from "@/lib/i18n/locales";
+import { ImageShrinker } from "@/components/image-shrinker";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -32,6 +33,7 @@ export default async function RootLayout({
       </head>
       <body>
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <ImageShrinker />
       </body>
     </html>
   );

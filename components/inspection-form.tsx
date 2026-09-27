@@ -232,10 +232,12 @@ function VehicleDiagram({ onSelect }: { onSelect: (location: string) => void }) 
   const areas = [
     { key: "front", label: t("areaFront"), className: "left-[34%] top-[4%] w-[32%] h-[18%]" },
     { key: "rear", label: t("areaRear"), className: "left-[34%] bottom-[4%] w-[32%] h-[18%]" },
-    { key: "front_left", label: t("areaFrontLeft"), className: "left-[8%] top-[17%] w-[30%] h-[27%]" },
-    { key: "front_right", label: t("areaFrontRight"), className: "right-[8%] top-[17%] w-[30%] h-[27%]" },
-    { key: "rear_left", label: t("areaRearLeft"), className: "left-[8%] bottom-[17%] w-[30%] h-[27%]" },
-    { key: "rear_right", label: t("areaRearRight"), className: "right-[8%] bottom-[17%] w-[30%] h-[27%]" },
+    // Side areas sit outside the wheels (drawn at 25% and 75% of the width) so
+    // their labels stay readable.
+    { key: "front_left", label: t("areaFrontLeft"), className: "left-[1%] top-[17%] w-[20%] h-[27%]" },
+    { key: "front_right", label: t("areaFrontRight"), className: "right-[1%] top-[17%] w-[20%] h-[27%]" },
+    { key: "rear_left", label: t("areaRearLeft"), className: "left-[1%] bottom-[17%] w-[20%] h-[27%]" },
+    { key: "rear_right", label: t("areaRearRight"), className: "right-[1%] bottom-[17%] w-[20%] h-[27%]" },
     { key: "interior", label: t("areaInterior"), className: "left-[35%] top-[36%] w-[30%] h-[28%]" }
   ];
 
@@ -254,7 +256,7 @@ function VehicleDiagram({ onSelect }: { onSelect: (location: string) => void }) 
       {areas.map((area) => (
         <button
           aria-label={t("logDamageAt", { area: area.label })}
-          className={`absolute rounded-lg border border-[#0f766e]/25 bg-[#0f766e]/5 text-[11px] font-black text-[#0f766e] ${area.className}`}
+          className={`absolute flex items-center justify-center rounded-lg border border-[#0f766e]/25 bg-[#0f766e]/5 px-1 text-center text-[11px] font-black leading-tight text-[#0f766e] ${area.className}`}
           key={area.key}
           onClick={() => onSelect(area.key)}
           type="button"

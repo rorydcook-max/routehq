@@ -476,9 +476,20 @@ export async function submitInspection(formData: FormData) {
   }
 
   if (mode === "delivery" && rentalId) {
+    // Handed over before the booked start date: the rental started today.
+    // (Later handovers keep the booked date; the agreement is unaffected.)
+    const { data: bookedRental } = await supabase
+      .from("rentals")
+      .select("start_date")
+      .eq("id", rentalId)
+      .eq("organization_id", organizationId)
+      .maybeSingle();
+    const handoverDate = todayDate();
+    const startsEarly = bookedRental?.start_date && handoverDate < String(bookedRental.start_date).slice(0, 10);
+
     const { error: rentalError } = await supabase
       .from("rentals")
-      .update({ mileage_at_delivery: odometerReading, status: "active" })
+      .update({ mileage_at_delivery: odometerReading, status: "active", ...(startsEarly ? { start_date: handoverDate } : {}) })
       .eq("id", rentalId)
       .eq("organization_id", organizationId);
     if (rentalError) {

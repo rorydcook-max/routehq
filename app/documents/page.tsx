@@ -13,7 +13,7 @@ export default async function DocumentsPage() {
       <div className="page-hero mb-5">
         <p className="page-eyebrow">Documents</p>
         <h1 className="page-title">File library</h1>
-        <p className="page-subtitle mt-2">Contracts, licenses, receipts, and inspection media across your fleet.</p>
+        <p className="page-subtitle mt-2">Signed agreements, reports and amendments, customer IDs, and vehicle and inspection photos.</p>
       </div>
 
       <DocumentsList documents={documents} />

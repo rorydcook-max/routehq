@@ -36,11 +36,14 @@ export default async function RentalCalculatorPage() {
     monthlyRate: Number(v.monthly_rate || 0)
   }));
 
-  // Without any rental history there is nothing to average, so the calculator keeps its 70% starting assumption.
-  const fleetAvgUtilization =
+  // Without rental history there is nothing to average. A new fleet with a few weeks of history averages a few percent, which
+  // would make every vehicle look like a loss, so below 20% the calculator
+  // starts from 70% and just shows the fleet figure for reference.
+  const measuredUtilization =
     fleetVehicles.length > 0 && fleetVehicles.some((v) => v.utilization > 0)
       ? Math.round(fleetVehicles.reduce((sum, v) => sum + v.utilization, 0) / fleetVehicles.length)
-      : 70;
+      : null;
+  const fleetAvgUtilization = measuredUtilization !== null && measuredUtilization >= 20 ? measuredUtilization : 70;
 
   // Fetch last 5 saved calculations (graceful fallback if table doesn't exist yet)
   let savedCalcs: SavedCalc[] = [];
@@ -70,6 +73,7 @@ export default async function RentalCalculatorPage() {
 
       <CalculatorClient
         fleetAvgUtilization={fleetAvgUtilization}
+        measuredUtilization={measuredUtilization}
         fleetVehicles={fleetVehicles}
         initialSavedCalcs={savedCalcs}
         organizationId={organization.id}

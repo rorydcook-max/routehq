@@ -76,7 +76,9 @@ export function TrialBanner() {
     // and pushing everything down at that moment made people tap the wrong thing.
     <div
       className={clsx(
-        "fixed bottom-4 left-1/2 z-40 flex w-[min(560px,calc(100%-2rem))] -translate-x-1/2 flex-col gap-2 rounded-lg border px-3 py-2 shadow-lg sm:min-h-10 sm:flex-row sm:items-center sm:justify-between",
+        // Phones: above the bottom navigation and clear of the + button.
+        "fixed bottom-[calc(72px+env(safe-area-inset-bottom))] left-3 right-20 z-40 flex items-center justify-between gap-2 rounded-lg border px-3 py-2 shadow-lg",
+        "lg:bottom-4 lg:left-1/2 lg:right-auto lg:min-h-10 lg:w-[min(560px,calc(100%-2rem))] lg:-translate-x-1/2",
         tone.className
       )}
       role="status"
@@ -87,10 +89,10 @@ export function TrialBanner() {
           <p className="text-xs font-bold leading-4">
             Your free trial ends in {days === null || days === undefined ? "30 days" : `${days} day${days === 1 ? "" : "s"}`}
           </p>
-          <p className="text-[11px] font-medium leading-4 opacity-80">Keep building your fleet data now. Billing can be activated manually when you are ready.</p>
+          <p className="hidden text-[11px] font-medium leading-4 opacity-80 lg:block">Keep building your fleet data now. Billing can be activated manually when you are ready.</p>
         </div>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex shrink-0 items-center gap-2">
         <Link className={clsx("pressable inline-flex min-h-7 items-center justify-center rounded-lg px-3 text-[11px] font-bold", tone.button)} href={"/settings/billing" as Route}>
           Subscribe now
         </Link>

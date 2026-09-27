@@ -2,8 +2,22 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { ExternalLink, FileText, Search } from "lucide-react";
+import { ExternalLink, FileSignature, FileText, Search } from "lucide-react";
 import type { DocumentListItem } from "@/lib/documents-hub";
+
+const OWNER_LABELS: Record<string, string> = {
+  all: "All files",
+  signed: "Signed documents",
+  customer: "Customer files",
+  vehicle: "Vehicle files",
+  inspection: "Inspection photos",
+  rental: "Booking files",
+  contract: "Older contracts"
+};
+
+function ownerFilterLabel(type: string) {
+  return OWNER_LABELS[type] || type.replace(/_/g, " ");
+}
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("en-TH", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(value));
@@ -46,7 +60,7 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
           >
             {ownerTypes.map((type) => (
               <option key={type} value={type}>
-                {type === "all" ? "All owners" : type}
+                {ownerFilterLabel(type)}
               </option>
             ))}
           </select>
@@ -63,13 +77,22 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
           {filtered.map((document) => (
             <div className="content-section flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" key={document.id}>
               <div className="flex items-start gap-3">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
-                  <FileText size={20} />
-                </span>
+                {document.mimeType?.startsWith("image/") && document.signedUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img alt="" className="h-11 w-11 shrink-0 rounded-xl border border-[var(--border)] object-cover" loading="lazy" src={document.signedUrl} />
+                ) : (
+                  <span
+                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
+                      document.ownerType === "signed" ? "bg-[#dcfce7] text-[#16a34a]" : "bg-[var(--primary-light)] text-[var(--primary)]"
+                    }`}
+                  >
+                    {document.ownerType === "signed" ? <FileSignature size={20} /> : <FileText size={20} />}
+                  </span>
+                )}
                 <div>
                   <p className="font-black text-[var(--foreground)]">{document.fileName}</p>
-                  <p className="text-sm font-semibold capitalize text-[var(--foreground-secondary)]">
-                    {document.category.replace(/_/g, " ")} · {document.ownerType}
+                  <p className="text-sm font-semibold text-[var(--foreground-secondary)]">
+                    {document.ownerType === "signed" ? "Signed PDF" : `${document.category.replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase())} · ${ownerFilterLabel(document.ownerType)}`}
                   </p>
                   <p className="text-sm text-[var(--muted)]">
                     {document.ownerLabel} · {formatDate(document.createdAt)}

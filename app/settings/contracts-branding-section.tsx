@@ -164,7 +164,7 @@ export function ContractsBrandingSection({
             <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#667085]">Agreement between</p>
             <p className="mt-2 text-base font-black text-[#10252b]">{legalName}</p>
             <p className="text-sm text-[#667085]">and</p>
-            <p className="text-base font-black text-[#10252b]">Sample Customer Name</p>
+            <p className="text-base font-black text-[#10252b]">Alex Morgan</p>
           </div>
 
           <div className="mt-4 grid gap-3 sm:grid-cols-2">

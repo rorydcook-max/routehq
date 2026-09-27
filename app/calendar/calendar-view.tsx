@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -14,16 +14,29 @@ const toneClasses: Record<CalendarEvent["tone"], string> = {
   purple: "bg-purple-100 text-purple-900 border-purple-200"
 };
 
+const dotClasses: Record<CalendarEvent["tone"], string> = {
+  blue: "bg-blue-500",
+  amber: "bg-amber-500",
+  red: "bg-red-500",
+  green: "bg-emerald-500",
+  purple: "bg-purple-500"
+};
+
 function monthKey(date: Date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 }
 
 function monthLabel(key: string) {
   const [year, month] = key.split("-").map(Number);
-  return new Intl.DateTimeFormat("en-TH", { month: "long", year: "numeric" }).format(new Date(year, month - 1, 1));
+  return new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(new Date(year, month - 1, 1));
 }
 
-export function CalendarView({ events, initialMonth }: { events: CalendarEvent[]; initialMonth: string }) {
+function dayLabel(date: string) {
+  const [year, month, day] = date.split("-").map(Number);
+  return new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short" }).format(new Date(year, month - 1, day));
+}
+
+export function CalendarView({ events, initialMonth, today }: { events: CalendarEvent[]; initialMonth: string; today: string }) {
   const router = useRouter();
   const month = initialMonth;
 
@@ -57,14 +70,24 @@ export function CalendarView({ events, initialMonth }: { events: CalendarEvent[]
     router.push(`/calendar?month=${monthKey(next)}`);
   }
 
+  const isCurrentMonth = today.slice(0, 7) === month;
+  const agenda = Array.from(eventsByDate.entries()).sort(([a], [b]) => a.localeCompare(b));
+
   return (
     <div className="space-y-4">
-      <div className="content-section flex items-center justify-between">
-        <button className="secondary-action pressable" onClick={() => shiftMonth(-1)} type="button">
+      <div className="content-section flex items-center justify-between gap-2">
+        <button aria-label="Previous month" className="secondary-action pressable" onClick={() => shiftMonth(-1)} type="button">
           <ChevronLeft size={18} />
         </button>
-        <h2 className="text-lg font-black text-[var(--foreground)]">{monthLabel(month)}</h2>
-        <button className="secondary-action pressable" onClick={() => shiftMonth(1)} type="button">
+        <div className="flex items-center gap-2">
+          <h2 className="text-lg font-black text-[var(--foreground)]">{monthLabel(month)}</h2>
+          {!isCurrentMonth ? (
+            <button className="rounded-full border border-[var(--border)] px-2.5 py-1 text-xs font-bold text-[var(--primary)]" onClick={() => router.push(`/calendar?month=${today.slice(0, 7)}`)} type="button">
+              Today
+            </button>
+          ) : null}
+        </div>
+        <button aria-label="Next month" className="secondary-action pressable" onClick={() => shiftMonth(1)} type="button">
           <ChevronRight size={18} />
         </button>
       </div>
@@ -78,32 +101,67 @@ export function CalendarView({ events, initialMonth }: { events: CalendarEvent[]
         <div className="grid grid-cols-7 gap-1">
           {days.map((cell, index) => {
             const dayEvents = cell.date ? eventsByDate.get(cell.date) || [] : [];
+            const isToday = cell.date === today;
             return (
               <div
                 key={index}
-                className={`min-h-[64px] rounded-lg p-1 ${cell.date ? "bg-[var(--panel)] border border-[var(--border)]" : ""}`}
+                className={`min-h-[52px] rounded-lg p-1 sm:min-h-[72px] ${
+                  cell.date ? `border bg-[var(--panel)] ${isToday ? "border-[var(--primary)] ring-1 ring-[var(--primary)]" : "border-[var(--border)]"}` : ""
+                }`}
               >
-                {cell.label && (
-                  <span className="text-xs font-semibold text-[var(--foreground-secondary)]">{cell.label}</span>
-                )}
-                <div className="mt-1 space-y-0.5">
+                {cell.label ? (
+                  <span className={`text-xs font-semibold ${isToday ? "rounded-full bg-[var(--primary)] px-1.5 text-white" : "text-[var(--foreground-secondary)]"}`}>
+                    {cell.label}
+                  </span>
+                ) : null}
+                {/* Phones: coloured dots; the list below has the details. */}
+                <div className="mt-1 flex flex-wrap gap-0.5 sm:hidden">
+                  {dayEvents.slice(0, 6).map((event) => (
+                    <span className={`h-1.5 w-1.5 rounded-full ${dotClasses[event.tone]}`} key={event.id} />
+                  ))}
+                </div>
+                <div className="mt-1 hidden space-y-0.5 sm:block">
                   {dayEvents.slice(0, 3).map((event) => (
                     <Link
                       key={event.id}
                       href={event.href as any}
                       className={`block truncate rounded border px-1 py-0.5 text-[10px] font-medium ${toneClasses[event.tone]}`}
+                      title={event.title}
                     >
                       {event.title}
                     </Link>
                   ))}
-                  {dayEvents.length > 3 && (
-                    <span className="text-[10px] text-[var(--muted)]">+{dayEvents.length - 3} more</span>
-                  )}
+                  {dayEvents.length > 3 ? <span className="text-[10px] text-[var(--muted)]">+{dayEvents.length - 3} more</span> : null}
                 </div>
               </div>
             );
           })}
         </div>
+      </div>
+
+      <div className="content-section">
+        <p className="mb-2 text-sm font-black text-[var(--foreground)]">This month</p>
+        {agenda.length === 0 ? (
+          <p className="text-sm text-[var(--muted)]">Nothing scheduled in {monthLabel(month)}.</p>
+        ) : (
+          <div className="space-y-3">
+            {agenda.map(([date, list]) => (
+              <div key={date}>
+                <p className={`mb-1 text-xs font-bold uppercase tracking-wide ${date === today ? "text-[var(--primary)]" : "text-[var(--muted)]"}`}>
+                  {date === today ? "Today · " : ""}
+                  {dayLabel(date)}
+                </p>
+                <div className="space-y-1">
+                  {list.map((event) => (
+                    <Link className={`block rounded-lg border px-2.5 py-1.5 text-sm font-medium ${toneClasses[event.tone]}`} href={event.href as any} key={event.id}>
+                      {event.title}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

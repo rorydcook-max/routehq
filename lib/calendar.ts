@@ -1,4 +1,5 @@
-﻿import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { businessToday } from "@/lib/business-time";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export type CalendarEvent = {
   id: string;
@@ -9,74 +10,112 @@ export type CalendarEvent = {
   type: "rental_start" | "rental_end" | "rental_due" | "compliance" | "maintenance" | "payment" | "custom";
 };
 
-export async function getCalendarEvents(
-  organisationId: string,
-  year: number,
-  month: number
-): Promise<CalendarEvent[]> {
+const COMPLIANCE_ITEMS: Array<{ key: string; label: string }> = [
+  { key: "tax_expiry_date", label: "Road tax" },
+  { key: "porbor_expiry_date", label: "พรบ" },
+  { key: "insurance_expiry_date", label: "Insurance" },
+  { key: "next_service_date", label: "Service" }
+];
+
+function lastDayOfMonth(year: number, month: number) {
+  return new Date(Date.UTC(year, month, 0)).getUTCDate();
+}
+
+function money(value: number) {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "THB", maximumFractionDigits: 0 }).format(value);
+}
+
+/**
+ * Everything dated in one month: deliveries, returns, payments due and
+ * vehicle paperwork. (This used to query an "organisation_id" column that
+ * rentals and vehicles don't have, and a "-31" date that doesn't exist in
+ * shorter months, so the calendar was always empty.)
+ */
+export async function getCalendarEvents(organizationId: string, year: number, month: number): Promise<CalendarEvent[]> {
   const supabase = (await createSupabaseServerClient()) as any;
   const events: CalendarEvent[] = [];
+  const mm = String(month).padStart(2, "0");
+  const startDate = `${year}-${mm}-01`;
+  const endDate = `${year}-${mm}-${String(lastDayOfMonth(year, month)).padStart(2, "0")}`;
+  const today = businessToday();
 
-  const startDate = `${year}-${String(month).padStart(2, "0")}-01`;
-  const endDate = `${year}-${String(month).padStart(2, "0")}-31`;
+  const [rentalsResult, paymentsResult, vehiclesResult] = await Promise.all([
+    supabase
+      .from("rentals")
+      .select("id, start_date, end_date, status, customers!rentals_customer_id_fkey(full_name), vehicles!rentals_vehicle_id_fkey(make, model, registration_number)")
+      .eq("organization_id", organizationId)
+      .is("deleted_at", null)
+      .neq("status", "cancelled")
+      .lte("start_date", endDate)
+      .or(`end_date.gte.${startDate},end_date.is.null`),
+    supabase
+      .from("rental_payments")
+      .select("id, rental_id, amount, due_date, status, voided, metadata, rentals!inner(status, customers!rentals_customer_id_fkey(full_name))")
+      .eq("organization_id", organizationId)
+      .is("deleted_at", null)
+      .in("status", ["scheduled", "pending", "overdue"])
+      .gte("due_date", startDate)
+      .lte("due_date", endDate),
+    supabase.from("vehicles").select("id, make, model, registration_number, metadata").eq("organization_id", organizationId).is("deleted_at", null)
+  ]);
 
-  // Rentals
-  const { data: rentals } = await supabase
-    .from("rentals")
-    .select("id, start_date, end_date, status, vehicles(make, model, registration_number)")
-    .eq("organisation_id", organisationId)
-    .or(`start_date.gte.${startDate},end_date.lte.${endDate}`)
-    .not("status", "in", "(cancelled,completed)");
-
-  for (const rental of rentals || []) {
+  for (const rental of rentalsResult.data || []) {
     const vehicle = rental.vehicles as any;
     const label = vehicle ? `${vehicle.make} ${vehicle.model}` : "Vehicle";
+    const customer = rental.customers?.full_name ? ` · ${rental.customers.full_name}` : "";
+    const start = String(rental.start_date || "").slice(0, 10);
+    const end = String(rental.end_date || "").slice(0, 10);
 
-    if (rental.start_date >= startDate && rental.start_date <= endDate) {
+    if (start >= startDate && start <= endDate) {
+      const notDelivered = rental.status === "booked";
       events.push({
         id: `rental-start-${rental.id}`,
-        date: rental.start_date,
-        title: `Delivery: ${label}`,
-        tone: "blue",
+        date: start,
+        title: `${notDelivered && start < today ? "Delivery overdue" : "Delivery"}: ${label}${customer}`,
+        tone: notDelivered && start < today ? "red" : "blue",
         href: `/bookings/${rental.id}`,
         type: "rental_start"
       });
     }
 
-    if (rental.end_date && rental.end_date >= startDate && rental.end_date <= endDate) {
+    if (end && end >= startDate && end <= endDate) {
+      const returned = rental.status === "completed";
+      const late = !returned && end < today;
       events.push({
         id: `rental-end-${rental.id}`,
-        date: rental.end_date,
-        title: `Return: ${label}`,
-        tone: rental.status === "overdue" ? "red" : "amber",
+        date: end,
+        title: `${returned ? "Returned" : late ? "Return overdue" : "Return"}: ${label}${customer}`,
+        tone: returned ? "green" : late ? "red" : "amber",
         href: `/bookings/${rental.id}`,
         type: "rental_end"
       });
     }
   }
 
-  // Compliance reminders
-  const { data: vehicles } = await supabase
-    .from("vehicles")
-    .select("id, make, model, tax_expiry_date, insurance_expiry_date, porbor_expiry_date, next_service_date")
-    .eq("organisation_id", organisationId)
-    .eq("is_active", true);
+  for (const payment of paymentsResult.data || []) {
+    if (payment.voided || payment.metadata?.voided || payment.rentals?.status === "cancelled") continue;
+    const due = String(payment.due_date).slice(0, 10);
+    const who = payment.rentals?.customers?.full_name || "Customer";
+    events.push({
+      id: `payment-${payment.id}`,
+      date: due,
+      title: `${due < today ? "Unpaid" : "Payment"} ${money(Number(payment.amount || 0))}: ${who}`,
+      tone: due < today ? "red" : "purple",
+      href: `/bookings/${payment.rental_id}#payment-schedule`,
+      type: "payment"
+    });
+  }
 
-  for (const vehicle of vehicles || []) {
+  for (const vehicle of vehiclesResult.data || []) {
+    const compliance = vehicle.metadata?.compliance || {};
     const label = `${vehicle.make} ${vehicle.model}`;
-    const complianceItems = [
-      { date: vehicle.tax_expiry_date, title: `Tax expiry: ${label}` },
-      { date: vehicle.insurance_expiry_date, title: `Insurance expiry: ${label}` },
-      { date: vehicle.porbor_expiry_date, title: `พรบ expiry: ${label}` },
-      { date: vehicle.next_service_date, title: `Service due: ${label}` }
-    ];
-
-    for (const item of complianceItems) {
-      if (item.date && item.date >= startDate && item.date <= endDate) {
+    for (const item of COMPLIANCE_ITEMS) {
+      const date = String(compliance[item.key] || "").slice(0, 10);
+      if (date && date >= startDate && date <= endDate) {
         events.push({
-          id: `compliance-${vehicle.id}-${item.date}`,
-          date: item.date,
-          title: item.title,
+          id: `compliance-${vehicle.id}-${item.key}`,
+          date,
+          title: `${item.label} ${date < today ? "expired" : "due"}: ${label}`,
           tone: "red",
           href: `/fleet/${vehicle.id}`,
           type: "compliance"
@@ -85,5 +124,5 @@ export async function getCalendarEvents(
     }
   }
 
-  return events.sort((a, b) => a.date.localeCompare(b.date));
+  return events.sort((a, b) => a.date.localeCompare(b.date) || a.type.localeCompare(b.type));
 }

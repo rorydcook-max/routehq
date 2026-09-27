@@ -5,6 +5,7 @@ import { getDefaultOrganization } from "@/lib/organization";
 import { getTaskList } from "@/lib/tasks";
 import { TasksList } from "@/app/tasks/tasks-list";
 import { CalendarView } from "./calendar-view";
+import { businessToday } from "@/lib/business-time";
 
 export default async function CalendarPage({
   searchParams
@@ -12,7 +13,8 @@ export default async function CalendarPage({
   searchParams: Promise<{ month?: string }>;
 }) {
   const params = await searchParams;
-  const month = params.month || new Date().toISOString().slice(0, 7);
+  const today = businessToday();
+  const month = /^\d{4}-\d{2}$/.test(String(params.month || "")) ? String(params.month) : today.slice(0, 7);
   const [userEmail, organization] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization()]);
   const [yearStr, monthStr] = month.split("-");
   const [events, tasks] = await Promise.all([
@@ -28,7 +30,7 @@ export default async function CalendarPage({
         <p className="page-subtitle mt-2">Deliveries, returns, reminders, and maintenance on one month view.</p>
       </div>
 
-      <CalendarView events={events} initialMonth={month} />
+      <CalendarView events={events} initialMonth={month} today={today} />
 
       <div className="my-6 border-t border-[var(--border)]" />
 

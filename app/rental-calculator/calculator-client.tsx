@@ -316,7 +316,7 @@ function VehicleSelectorMini({
             min="1990"
             max={new Date().getFullYear() + 1}
             onChange={selectYear}
-            placeholder="2024"
+            placeholder={`e.g. ${new Date().getFullYear() - 2}`}
             type="number"
             value={value.year}
           />
@@ -353,11 +353,14 @@ function VehicleSelectorMini({
 export function CalculatorClient({
   organizationId,
   fleetAvgUtilization,
+  measuredUtilization = null,
   fleetVehicles,
   initialSavedCalcs
 }: {
   organizationId: string;
   fleetAvgUtilization: number;
+  /** The fleet's real 12-month average, or null without history. */
+  measuredUtilization?: number | null;
   fleetVehicles: FleetVehicle[];
   initialSavedCalcs: SavedCalc[];
 }) {
@@ -373,6 +376,8 @@ export function CalculatorClient({
 
   // Rental assumptions
   const [estimatedRate, setEstimatedRate] = useState("");
+  const estimatedRateRef = useRef("");
+  estimatedRateRef.current = estimatedRate;
   const [utilization, setUtilization] = useState(String(fleetAvgUtilization));
   const [intendedUse, setIntendedUse] = useState<"long_term" | "short_term" | "mixed">("mixed");
 
@@ -432,11 +437,13 @@ export function CalculatorClient({
           });
           setAiLoaded(true);
 
-          // Pre-fill estimated rate from similar fleet vehicles if not set
-          if (!estimatedRate) {
-            const similar = fleetVehicles.filter(
-              (v) => v.make.toLowerCase() === make.toLowerCase()
-            );
+          // Suggest a rate from your own similar vehicles, only if the rate is
+          // still empty *now* (the reply can arrive after you've typed one), and
+          // only from vehicles that have a rate (a missing rate isn't ฿0).
+          if (!estimatedRateRef.current) {
+            const priced = fleetVehicles.filter((v) => v.monthlyRate > 0 && v.make.toLowerCase() === make.toLowerCase());
+            const sameModel = priced.filter((v) => v.model.toLowerCase() === model.toLowerCase());
+            const similar = sameModel.length ? sameModel : priced;
             if (similar.length > 0) {
               const avgRate = Math.round(similar.reduce((s, v) => s + v.monthlyRate, 0) / similar.length);
               if (avgRate > 0) setEstimatedRate(String(avgRate));
@@ -645,7 +652,13 @@ export function CalculatorClient({
               <label className="block">
                 <span className="text-sm font-semibold text-[#344054]">
                   Expected utilization (%)
-                  <span className="ml-2 text-xs font-normal text-[#667085]">Fleet avg: {fleetAvgUtilization}%</span>
+                  <span className="ml-2 text-xs font-normal text-[#667085]">
+                    {measuredUtilization === null
+                      ? "No fleet history yet"
+                      : measuredUtilization < 20
+                        ? `Fleet avg ${measuredUtilization}% (too little history to use)`
+                        : `Fleet avg: ${measuredUtilization}%`}
+                  </span>
                 </span>
                 <input
                   className={inputCls}

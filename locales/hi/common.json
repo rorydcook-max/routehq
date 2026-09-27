@@ -180,7 +180,9 @@
     "odometerAtDelivery": "डिलीवरी के समय ओडोमीटर: {km} km",
     "rentalLengthDays": "किराये की अवधि {count, plural, one {# दिन} other {# दिन}}",
     "fuelDeficitApprox": "ईंधन की कमी: लगभग {percent}%",
-    "deductionsExceedDeposit": "कटौतियाँ उपलब्ध जमा राशि से अधिक हैं। केवल {amount} इस जमा राशि से समायोजित की जा सकती है।"
+    "deductionsExceedDeposit": "कटौतियाँ उपलब्ध जमा राशि से अधिक हैं। केवल {amount} इस जमा राशि से समायोजित की जा सकती है।",
+    "uploadingPhotos": "तस्वीरें अपलोड हो रही हैं {done} में से {total}...",
+    "uploadFailed": "तस्वीरें अपलोड नहीं हो सकीं। कनेक्शन जांचें और फिर से प्रयास करें।"
   },
   "translation": {
     "translatedFrom": "{language} से अनुवादित",

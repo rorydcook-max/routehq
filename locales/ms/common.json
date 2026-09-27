@@ -180,7 +180,9 @@
     "odometerAtDelivery": "Odometer semasa penghantaran: {km} km",
     "rentalLengthDays": "Tempoh sewa {count} hari",
     "fuelDeficitApprox": "Kekurangan bahan api: kira-kira {percent}%",
-    "deductionsExceedDeposit": "Potongan melebihi deposit yang ada. Hanya {amount} boleh diselaraskan dari deposit ini."
+    "deductionsExceedDeposit": "Potongan melebihi deposit yang ada. Hanya {amount} boleh diselaraskan dari deposit ini.",
+    "uploadingPhotos": "Memuat naik foto {done} daripada {total}...",
+    "uploadFailed": "Foto tidak dapat dimuat naik. Sila periksa sambungan dan cuba lagi."
   },
   "translation": {
     "translatedFrom": "Diterjemah dari {language}",

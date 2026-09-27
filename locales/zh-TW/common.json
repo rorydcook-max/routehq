@@ -180,7 +180,9 @@
     "odometerAtDelivery": "交車時的里程表：{km} km",
     "rentalLengthDays": "租期 {count} 天",
     "fuelDeficitApprox": "燃油不足：約 {percent}%",
-    "deductionsExceedDeposit": "扣款超過可用的押金。只能從此押金中扣除 {amount}。"
+    "deductionsExceedDeposit": "扣款超過可用的押金。只能從此押金中扣除 {amount}。",
+    "uploadingPhotos": "正在上傳照片 {done} / {total}...",
+    "uploadFailed": "照片無法上傳。請檢查連線並重試。"
   },
   "translation": {
     "translatedFrom": "翻譯自 {language}",

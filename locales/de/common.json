@@ -180,7 +180,9 @@
     "odometerAtDelivery": "Kilometerstand bei Übergabe: {km} km",
     "rentalLengthDays": "Mietdauer {count, plural, one {# Tag} other {# Tage}}",
     "fuelDeficitApprox": "Kraftstoffdefizit: ungefähr {percent}%",
-    "deductionsExceedDeposit": "Abzüge übersteigen die verfügbare Kaution. Nur {amount} kann von dieser Kaution verrechnet werden."
+    "deductionsExceedDeposit": "Abzüge übersteigen die verfügbare Kaution. Nur {amount} kann von dieser Kaution verrechnet werden.",
+    "uploadingPhotos": "Fotos werden hochgeladen {done} von {total}...",
+    "uploadFailed": "Die Fotos konnten nicht hochgeladen werden. Überprüfen Sie die Verbindung und versuchen Sie es erneut."
   },
   "translation": {
     "translatedFrom": "Übersetzt aus dem {language}",

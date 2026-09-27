@@ -180,7 +180,9 @@
     "odometerAtDelivery": "Odometer sa paghatid: {km} km",
     "rentalLengthDays": "Haba ng pag-upa {count, plural, one {# araw} other {# araw}}",
     "fuelDeficitApprox": "Kulang sa gasolina: humigit-kumulang {percent}%",
-    "deductionsExceedDeposit": "Ang mga bawas ay lumampas sa magagamit na deposito. Tanging {amount} lamang ang maaaring maayos mula sa deposito na ito."
+    "deductionsExceedDeposit": "Ang mga bawas ay lumampas sa magagamit na deposito. Tanging {amount} lamang ang maaaring maayos mula sa deposito na ito.",
+    "uploadingPhotos": "Nag-a-upload ng mga larawan {done} sa {total}...",
+    "uploadFailed": "Hindi ma-upload ang mga larawan. Suriin ang koneksyon at subukang muli."
   },
   "translation": {
     "translatedFrom": "Isinalin mula sa {language}",

@@ -171,7 +171,9 @@
     "odometerAtDelivery": "Odomètre à la livraison : {km} km",
     "rentalLengthDays": "Durée de location {count, plural, one {# jour} other {# jours}}",
     "fuelDeficitApprox": "Déficit de carburant : environ {percent}%",
-    "deductionsExceedDeposit": "Les déductions dépassent la caution disponible. Seulement {amount} peut être déduit de cette caution."
+    "deductionsExceedDeposit": "Les déductions dépassent la caution disponible. Seulement {amount} peut être déduit de cette caution.",
+    "uploadingPhotos": "Téléchargement des photos {done} sur {total}...",
+    "uploadFailed": "Les photos n'ont pas pu être téléchargées. Vérifiez la connexion et réessayez."
   },
   "vehicles": {
     "addVehicle": "Ajouter un nouveau véhicule",

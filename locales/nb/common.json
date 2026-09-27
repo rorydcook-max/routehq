@@ -180,7 +180,9 @@
     "odometerAtDelivery": "Kilometerstand ved levering: {km} km",
     "rentalLengthDays": "Leieperiode {count, plural, one {# dag} other {# dager}}",
     "fuelDeficitApprox": "Bensinmangel: omtrent {percent}%",
-    "deductionsExceedDeposit": "Fradrag overstiger tilgjengelig depositum. Bare {amount} kan avregnes fra dette depositumet."
+    "deductionsExceedDeposit": "Fradrag overstiger tilgjengelig depositum. Bare {amount} kan avregnes fra dette depositumet.",
+    "uploadingPhotos": "Laster opp bilder {done} av {total}...",
+    "uploadFailed": "Bildene kunne ikke lastes opp. Sjekk tilkoblingen og prøv igjen."
   },
   "translation": {
     "translatedFrom": "Oversatt fra {language}",

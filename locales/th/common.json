@@ -189,7 +189,9 @@
     "odometerAtDelivery": "เลขไมล์ตอนส่งมอบ: {km} km",
     "rentalLengthDays": "ระยะเวลาเช่า {count} วัน",
     "fuelDeficitApprox": "น้ำมันขาด: ประมาณ {percent}%",
-    "deductionsExceedDeposit": "การหักเงินเกินกว่าเงินมัดจำที่มีอยู่ สามารถหักได้เพียง {amount} จากเงินมัดจำนี้"
+    "deductionsExceedDeposit": "การหักเงินเกินกว่าเงินมัดจำที่มีอยู่ สามารถหักได้เพียง {amount} จากเงินมัดจำนี้",
+    "uploadingPhotos": "กำลังอัปโหลดรูปภาพ {done} จาก {total}...",
+    "uploadFailed": "ไม่สามารถอัปโหลดรูปภาพได้ ตรวจสอบการเชื่อมต่อและลองอีกครั้ง"
   },
   "translation": {
     "translatedFrom": "แปลจาก {language}",

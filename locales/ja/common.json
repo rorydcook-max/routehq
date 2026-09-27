@@ -180,7 +180,9 @@
     "odometerAtDelivery": "引渡し時のオドメーター: {km} km",
     "rentalLengthDays": "レンタル期間 {count} 日",
     "fuelDeficitApprox": "燃料不足：約{percent}%",
-    "deductionsExceedDeposit": "控除額が利用可能な預り金を超えています。この預り金からは{amount}のみを充当できます。"
+    "deductionsExceedDeposit": "控除額が利用可能な預り金を超えています。この預り金からは{amount}のみを充当できます。",
+    "uploadingPhotos": "写真をアップロード中 {done}/{total}...",
+    "uploadFailed": "写真をアップロードできませんでした。接続を確認して再試行してください。"
   },
   "translation": {
     "translatedFrom": "{language}から翻訳",

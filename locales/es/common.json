@@ -180,7 +180,9 @@
     "odometerAtDelivery": "Odómetro al entregar: {km} km",
     "rentalLengthDays": "Duración del alquiler {count, plural, one {# día} many {# días} other {# días}}",
     "fuelDeficitApprox": "Déficit de combustible: aproximadamente {percent}%",
-    "deductionsExceedDeposit": "Las deducciones superan la fianza disponible. Solo se pueden reconciliar {amount} de esta fianza."
+    "deductionsExceedDeposit": "Las deducciones superan la fianza disponible. Solo se pueden reconciliar {amount} de esta fianza.",
+    "uploadingPhotos": "Subiendo fotos {done} de {total}...",
+    "uploadFailed": "No se pudieron subir las fotos. Verifique la conexión e intente de nuevo."
   },
   "translation": {
     "translatedFrom": "Traducido del {language}",

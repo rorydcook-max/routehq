@@ -171,7 +171,9 @@
     "odometerAtDelivery": "Số km khi giao xe: {km} km",
     "rentalLengthDays": "Thời gian thuê {count} ngày",
     "fuelDeficitApprox": "Thiếu nhiên liệu: khoảng {percent}%",
-    "deductionsExceedDeposit": "Khấu trừ vượt quá tiền đặt cọc có sẵn. Chỉ có thể đối chiếu {amount} từ tiền đặt cọc này."
+    "deductionsExceedDeposit": "Khấu trừ vượt quá tiền đặt cọc có sẵn. Chỉ có thể đối chiếu {amount} từ tiền đặt cọc này.",
+    "uploadingPhotos": "Đang tải ảnh lên {done} của {total}...",
+    "uploadFailed": "Không thể tải ảnh lên. Kiểm tra kết nối và thử lại."
   },
   "vehicles": {
     "addVehicle": "Thêm xe mới",

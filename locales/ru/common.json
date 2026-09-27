@@ -180,7 +180,9 @@
     "odometerAtDelivery": "Пробег при передаче: {km} км",
     "rentalLengthDays": "Длительность аренды {count, plural, one {# день} few {# дня} many {# дней} other {# дней}}",
     "fuelDeficitApprox": "Недостаток топлива: примерно {percent}%",
-    "deductionsExceedDeposit": "Вычеты превышают доступный депозит. Только {amount} может быть удержано из этого депозита."
+    "deductionsExceedDeposit": "Вычеты превышают доступный депозит. Только {amount} может быть удержано из этого депозита.",
+    "uploadingPhotos": "Загрузка фото {done} из {total}...",
+    "uploadFailed": "Не удалось загрузить фото. Проверьте соединение и попробуйте снова."
   },
   "translation": {
     "translatedFrom": "Переведено с {language}",

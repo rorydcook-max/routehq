@@ -182,7 +182,8 @@
     "fuelDeficitApprox": "Déficit de combustible: aproximadamente {percent}%",
     "deductionsExceedDeposit": "Las deducciones superan la fianza disponible. Solo se pueden reconciliar {amount} de esta fianza.",
     "uploadingPhotos": "Subiendo fotos {done} de {total}...",
-    "uploadFailed": "No se pudieron subir las fotos. Verifique la conexión e intente de nuevo."
+    "uploadFailed": "No se pudieron subir las fotos. Verifique la conexión e intente de nuevo.",
+    "changeDamagePhoto": "Cambiar foto"
   },
   "translation": {
     "translatedFrom": "Traducido del {language}",

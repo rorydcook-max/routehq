@@ -381,6 +381,8 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
   const [fuelLevel, setFuelLevel] = useState<number | null>(null);
   const [fuelLabel, setFuelLabel] = useState("");
   const [damageItems, setDamageItems] = useState<DamageItem[]>([]);
+  // Thumbnails of the photo chosen for each damage item, so staff can see it was added.
+  const [damagePhotoPreviews, setDamagePhotoPreviews] = useState<Record<string, string>>({});
   const [noDamage, setNoDamage] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState("");
   const [damageSeverity, setDamageSeverity] = useState("scratch");
@@ -857,10 +859,34 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                   <div>
                     <p className="font-black text-[#10252b]">{areaName(item.location)} · {severityName(item.severity)}</p>
                     <p className="text-sm text-[#667085]">{item.description}</p>
-                    <label className="mt-2 inline-flex cursor-pointer rounded-lg bg-[#e6fffb] px-3 py-2 text-sm font-bold text-[#0f766e]">
-                      {t("addDamagePhoto")}
-                      <input accept="image/*" capture="environment" className="sr-only" name={`damagePhoto_${item.id}`} type="file" />
-                    </label>
+                    <div className="mt-2 flex items-center gap-2">
+                      {damagePhotoPreviews[item.id] ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img alt="" className="h-14 w-14 rounded-lg border border-[#d6e5e2] object-cover" src={damagePhotoPreviews[item.id]} />
+                      ) : null}
+                      <label className="inline-flex cursor-pointer rounded-lg bg-[#e6fffb] px-3 py-2 text-sm font-bold text-[#0f766e]">
+                        {damagePhotoPreviews[item.id] ? t("changeDamagePhoto") : t("addDamagePhoto")}
+                        <input
+                          accept="image/*"
+                          capture="environment"
+                          className="sr-only"
+                          name={`damagePhoto_${item.id}`}
+                          onChange={(event) => {
+                            const file = event.currentTarget.files?.[0];
+                            const previous = damagePhotoPreviews[item.id];
+                            if (previous) URL.revokeObjectURL(previous);
+                            const url = file ? URL.createObjectURL(file) : null;
+                            setDamagePhotoPreviews((previews) => {
+                              const next = { ...previews };
+                              if (url) next[item.id] = url;
+                              else delete next[item.id];
+                              return next;
+                            });
+                          }}
+                          type="file"
+                        />
+                      </label>
+                    </div>
                   </div>
                   <button className="rounded-lg border border-[#fecdd3] p-2 text-[#be123c]" onClick={() => setDamageItems((items) => items.filter((entry) => entry.id !== item.id))} type="button">
                     <Trash2 size={18} />

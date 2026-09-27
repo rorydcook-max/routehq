@@ -28,6 +28,8 @@ export type Vehicle = {
   complianceNext?: { label: string; date: string; daysLeft: number } | null;
   /** How many compliance dates are expired or due within 30 days. */
   complianceAttentionCount?: number;
+  /** Every recorded compliance date, soonest first. */
+  compliance?: Array<{ key: string; label: string; date: string; daysLeft: number }>;
 };
 
 export type Rental = {
@@ -42,6 +44,12 @@ export type Rental = {
   balance: number;
   deposit: number;
   rentalRate: number;
+  /** Unpaid payments whose due date has passed. */
+  overdue?: number;
+  /** Due date of the oldest of those payments. */
+  overdueSince?: string | null;
+  /** Deposit actually received and still held. */
+  depositHeld?: number;
 };
 
 export type Customer = {

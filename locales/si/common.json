@@ -182,7 +182,8 @@
     "fuelDeficitApprox": "ඉන්ධන හිඟය: සම්මතව {percent}%",
     "deductionsExceedDeposit": "අඩුකිරීම් ලබා ගත හැකි මුදල් මට්ටම ඉක්මවයි. මෙම මුදල් මට්ටමෙන් {amount} පමණක් සමාන කළ හැක.",
     "uploadingPhotos": "ඡායාරූප {done} ක් {total} න් උඩුගත වෙමින් පවතී...",
-    "uploadFailed": "ඡායාරූප උඩුගත කළ නොහැකි විය. සම්බන්ධතාවය පරීක්ෂා කර නැවත උත්සාහ කරන්න."
+    "uploadFailed": "ඡායාරූප උඩුගත කළ නොහැකි විය. සම්බන්ධතාවය පරීක්ෂා කර නැවත උත්සාහ කරන්න.",
+    "changeDamagePhoto": "ඡායාරූපය වෙනස් කරන්න"
   },
   "translation": {
     "translatedFrom": "{language} වෙතින් පරිවර්තනය කරන ලදී",

@@ -182,7 +182,8 @@
     "fuelDeficitApprox": "Bensinmangel: omtrent {percent}%",
     "deductionsExceedDeposit": "Fradrag overstiger tilgjengelig depositum. Bare {amount} kan avregnes fra dette depositumet.",
     "uploadingPhotos": "Laster opp bilder {done} av {total}...",
-    "uploadFailed": "Bildene kunne ikke lastes opp. Sjekk tilkoblingen og prøv igjen."
+    "uploadFailed": "Bildene kunne ikke lastes opp. Sjekk tilkoblingen og prøv igjen.",
+    "changeDamagePhoto": "Endre bilde"
   },
   "translation": {
     "translatedFrom": "Oversatt fra {language}",

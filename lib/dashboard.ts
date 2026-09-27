@@ -5,6 +5,7 @@ import type { Customer, Reminder, Rental, TimelineEvent, Transaction, Vehicle, V
 import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getDefaultOrganization } from "@/lib/organization";
+import { businessToday } from "@/lib/business-time";
 
 type DashboardMetrics = ReturnType<typeof calculateDashboardMetrics> & {
   depositsHeld: number;
@@ -115,6 +116,24 @@ export async function getDashboardData(): Promise<DashboardData> {
     throw new Error(queryError.message);
   }
 
+  // Overdue = unpaid payments whose due date has passed. A rental's whole
+  // remaining balance (future rent, an extension due next month) is not overdue.
+  const { data: latePayments } = await supabase
+    .from("rental_payments")
+    .select("rental_id, amount, due_date, status, metadata, voided")
+    .eq("organization_id", organizationId)
+    .is("deleted_at", null)
+    .in("status", ["scheduled", "pending", "overdue"])
+    .lt("due_date", businessToday());
+  const overdueByRental = new Map<string, { amount: number; since: string }>();
+  for (const payment of latePayments || []) {
+    if (payment.voided || payment.metadata?.voided) continue;
+    const current = overdueByRental.get(payment.rental_id) || { amount: 0, since: payment.due_date };
+    current.amount += Number(payment.amount || 0);
+    if (payment.due_date < current.since) current.since = payment.due_date;
+    overdueByRental.set(payment.rental_id, current);
+  }
+
   const rentalRows = rentalsResult.data || [];
   const figures = computeVehicleFigures({
     vehicles: vehiclesResult.data || [],
@@ -135,7 +154,11 @@ export async function getDashboardData(): Promise<DashboardData> {
   // used to be mapped to "Active"/"Booked" and showed up in today's schedule.
   const rentals: Rental[] = rentalRows
     .filter((row: any) => !["completed", "cancelled"].includes(String(row.status || "").toLowerCase()))
-    .map(mapRental);
+    .map((row: any) => {
+      const late = overdueByRental.get(row.id);
+      const held = String(row.deposit_status || "").toLowerCase() === "received" ? Number(row.deposit_held || 0) : 0;
+      return { ...mapRental(row), overdue: late?.amount || 0, overdueSince: late?.since || null, depositHeld: held };
+    });
   const customers: Customer[] = (customersResult.data || []).map(mapCustomer);
   const transactions: Transaction[] = (transactionsResult.data || []).map(mapTransaction);
   const reminders: Reminder[] = (remindersResult.data || []).map(mapReminder);
@@ -209,7 +232,8 @@ function mapVehicle(row: any, figures?: VehicleFigures): Vehicle {
     purchasePrice: Number(row.purchase_price || 0),
     estimatedValue: Number(row.estimated_value || 0),
     complianceNext: figures?.compliance[0] || null,
-    complianceAttentionCount: figures ? figures.compliance.filter((item) => item.daysLeft <= 30).length : 0
+    complianceAttentionCount: figures ? figures.compliance.filter((item) => item.daysLeft <= 30).length : 0,
+    compliance: figures?.compliance || []
   };
 }
 

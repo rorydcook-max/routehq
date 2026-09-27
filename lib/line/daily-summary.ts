@@ -93,8 +93,24 @@ export async function fetchSummaryData(): Promise<SummaryData | null> {
   const returningTomorrow = rentals.filter((r) => r.end_date === tomorrow);
   const overdueRentals = rentals.filter((r) => r.status === "overdue" || (r.end_date && r.end_date < today && r.status !== "completed"));
 
-  // Payments expected today = rentals with balance_due > 0 and end_date = today
-  const paymentsExpectedToday = rentals.filter((r) => Number(r.balance_due || 0) > 0 && r.end_date === today);
+  // Payments expected today: unpaid payment rows due today, grouped by rental.
+  // (This used to be "rentals ending today with any balance", which missed
+  // monthly rent entirely and showed the whole remaining balance.)
+  const { data: dueTodayRows } = await supabase
+    .from("rental_payments")
+    .select("rental_id, amount, voided, metadata, rentals!inner(customers!rentals_customer_id_fkey(full_name))")
+    .eq("organization_id", org.id)
+    .eq("due_date", today)
+    .in("status", ["scheduled", "pending", "overdue"])
+    .is("deleted_at", null);
+  const dueByRental = new Map<string, any>();
+  for (const row of (dueTodayRows || []) as any[]) {
+    if (row.voided || row.metadata?.voided) continue;
+    const entry = dueByRental.get(row.rental_id) || { customers: row.rentals?.customers, balance_due: 0 };
+    entry.balance_due += Number(row.amount || 0);
+    dueByRental.set(row.rental_id, entry);
+  }
+  const paymentsExpectedToday = Array.from(dueByRental.values());
 
   // Compliance alerts: vehicles with compliance dates within 7 days
   const urgentCompliance: Array<{ vehicle: string; item: string; expiry: string }> = [];
@@ -109,7 +125,8 @@ export async function fetchSummaryData(): Promise<SummaryData | null> {
     ];
     for (const { key, item } of checks) {
       const expiry = compliance[key];
-      if (expiry && expiry >= today && expiry <= in7Days) {
+      // Already expired is the most urgent case, so it is included too.
+      if (expiry && expiry <= in7Days) {
         urgentCompliance.push({ vehicle: label, item, expiry });
       }
     }

@@ -3,18 +3,23 @@ import Link from "next/link";
 export function FleetStatusCard({
   totalVehicles,
   rentedCount,
+  reservedCount = 0,
   availableCount,
   maintenanceCount,
   fleetUtilization
 }: {
   totalVehicles: number;
   rentedCount: number;
+  /** Booked for an upcoming rental, not yet handed over. */
+  reservedCount?: number;
   availableCount: number;
   maintenanceCount: number;
   fleetUtilization: number;
 }) {
+  // Every vehicle is in exactly one tile, so the tiles add up to the total.
   const tiles = [
     { label: "Rented", value: rentedCount },
+    ...(reservedCount > 0 ? [{ label: "Booked", value: reservedCount }] : []),
     { label: "Available", value: availableCount },
     { label: "Maintenance", value: maintenanceCount },
     { label: "Utilization", value: `${fleetUtilization}%` }
@@ -34,7 +39,7 @@ export function FleetStatusCard({
           <i className="ti ti-arrow-right text-[11px]" aria-hidden="true" />
         </Link>
       </div>
-      <div className="grid grid-cols-4 gap-2">
+      <div className={`grid gap-2 ${tiles.length > 4 ? "grid-cols-3 sm:grid-cols-5" : "grid-cols-4"}`}>
         {tiles.map((tile) => (
           <div className="rounded-lg bg-white/10 p-2.5 text-center" key={tile.label}>
             <p className="m-0 text-[22px] font-medium text-white" style={{ letterSpacing: "-0.02em" }}>

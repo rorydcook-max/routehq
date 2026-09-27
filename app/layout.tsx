@@ -3,6 +3,9 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
 import { textDirection } from "@/lib/i18n/locales";
 import { ImageShrinker } from "@/components/image-shrinker";
+// Bundled with the app (was "@latest" from a CDN): icons can't change or
+// break underneath us, and they load with the page.
+import "@tabler/icons-webfont/dist/tabler-icons.min.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -28,9 +31,6 @@ export default async function RootLayout({
   const locale = await getLocale();
   return (
     <html dir={textDirection(locale)} lang={locale}>
-      <head>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
-      </head>
       <body>
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
         <ImageShrinker />

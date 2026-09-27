@@ -81,6 +81,7 @@
     "saveDamageItem": "Save damage item",
     "noDamageToReport": "No damage to report",
     "addDamagePhoto": "Add damage photo",
+    "changeDamagePhoto": "Change photo",
     "applyDamageExcess": "New damage found — apply damage excess charge?",
     "confirmTracker": "Confirm tracker status",
     "gpsConfirm": "I confirm the GPS tracker is installed and operational",

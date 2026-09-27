@@ -1,5 +1,6 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isRawDepositTransaction, isRevenueTransaction } from "@/lib/transaction-options";
+import { businessToday } from "@/lib/business-time";
 
 export type DatePreset = "this_month" | "last_month" | "last_3_months" | "last_6_months" | "this_year" | "last_year" | "custom";
 
@@ -155,9 +156,9 @@ export interface ReportsData {
   revenuePrev: number;
   expensesPrev: number;
   profitPrev: number;
-  revenueChange: number;
-  expensesChange: number;
-  profitChange: number;
+  revenueChange: number | null;
+  expensesChange: number | null;
+  profitChange: number | null;
   revenueByType: RevenueByType[];
   expensesByType: ExpenseByType[];
   depositSummary: DepositSummary;
@@ -285,7 +286,8 @@ function buildMonthlyData(transactions: any[], from: string, to: string): Monthl
   while (cursor <= toDate) {
     months.push({
       key: `${cursor.getFullYear()}-${pad(cursor.getMonth() + 1)}`,
-      label: cursor.toLocaleString("en", { month: "short", year: "2-digit" }),
+      // "Sep 2026", not "Sep 26", which reads like a day of the month.
+      label: cursor.toLocaleString("en", { month: "short", year: "numeric" }),
       revenue: 0,
       expenses: 0,
       profit: 0
@@ -312,8 +314,9 @@ function buildMonthlyData(transactions: any[], from: string, to: string): Monthl
   return months.map(({ key, ...m }) => ({ ...m, profit: m.revenue - m.expenses }));
 }
 
-function pctChange(current: number, previous: number): number {
-  if (previous === 0) return current > 0 ? 100 : 0;
+/** null when the previous period was zero: "+100%" from nothing is meaningless. */
+function pctChange(current: number, previous: number): number | null {
+  if (previous === 0) return current === 0 ? 0 : null;
   return ((current - previous) / Math.abs(previous)) * 100;
 }
 
@@ -519,24 +522,34 @@ export async function getReportsData(
     })
     .sort((a, b) => b.profit - a.profit);
 
-  // Outstanding balances by customer
-  const custBalMap = new Map<string, { name: string; phone: string; total: number; count: number; oldestDue: string | null }>();
-  for (const rental of outstandingRentals) {
-    if (!rental.customer_id) continue;
+  // Outstanding = payments due by today and not yet paid, by customer. A
+  // rental's balance_due also counts rent scheduled months ahead.
+  const { data: duePayments } = await supabase
+    .from("rental_payments")
+    .select("rental_id, amount, due_date, voided, metadata, rentals!inner(customer_id, status, customers!rentals_customer_id_fkey(full_name, phone))")
+    .eq("organization_id", organizationId)
+    .is("deleted_at", null)
+    .in("status", ["scheduled", "pending", "overdue"])
+    .lte("due_date", businessToday());
+  const custBalMap = new Map<string, { name: string; phone: string; total: number; rentals: Set<string>; oldestDue: string | null }>();
+  for (const payment of (duePayments || []) as any[]) {
+    const rental = payment.rentals;
+    if (!rental?.customer_id || payment.voided || payment.metadata?.voided || rental.status === "cancelled") continue;
     const existing = custBalMap.get(rental.customer_id) || {
       name: rental.customers?.full_name || "Unknown",
       phone: rental.customers?.phone || "",
       total: 0,
-      count: 0,
+      rentals: new Set<string>(),
       oldestDue: null
     };
-    existing.total += Number(rental.balance_due || 0);
-    existing.count += 1;
-    if (rental.end_date && (!existing.oldestDue || rental.end_date < existing.oldestDue)) {
-      existing.oldestDue = rental.end_date;
+    existing.total += Number(payment.amount || 0);
+    existing.rentals.add(payment.rental_id);
+    if (payment.due_date && (!existing.oldestDue || payment.due_date < existing.oldestDue)) {
+      existing.oldestDue = payment.due_date;
     }
     custBalMap.set(rental.customer_id, existing);
   }
+  void outstandingRentals;
 
   const outstandingBalances: OutstandingBalance[] = [...custBalMap.entries()]
     .map(([customerId, data]) => ({
@@ -544,7 +557,7 @@ export async function getReportsData(
       customerName: data.name,
       phone: data.phone,
       totalBalance: data.total,
-      rentalCount: data.count,
+      rentalCount: data.rentals.size,
       oldestDue: data.oldestDue
     }))
     .sort((a, b) => b.totalBalance - a.totalBalance);

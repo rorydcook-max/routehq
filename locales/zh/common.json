@@ -182,7 +182,8 @@
     "fuelDeficitApprox": "燃油不足：大约{percent}%",
     "deductionsExceedDeposit": "扣款超过可用押金。只能从此押金中扣除{amount}。",
     "uploadingPhotos": "正在上传照片 {done} / {total}...",
-    "uploadFailed": "照片上传失败。请检查连接并重试。"
+    "uploadFailed": "照片上传失败。请检查连接并重试。",
+    "changeDamagePhoto": "更换照片"
   },
   "translation": {
     "translatedFrom": "翻译自{language}",

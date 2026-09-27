@@ -182,7 +182,8 @@
     "fuelDeficitApprox": "Недостаток топлива: примерно {percent}%",
     "deductionsExceedDeposit": "Вычеты превышают доступный депозит. Только {amount} может быть удержано из этого депозита.",
     "uploadingPhotos": "Загрузка фото {done} из {total}...",
-    "uploadFailed": "Не удалось загрузить фото. Проверьте соединение и попробуйте снова."
+    "uploadFailed": "Не удалось загрузить фото. Проверьте соединение и попробуйте снова.",
+    "changeDamagePhoto": "Изменить фото"
   },
   "translation": {
     "translatedFrom": "Переведено с {language}",

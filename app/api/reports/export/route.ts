@@ -48,8 +48,8 @@ export async function GET(request: NextRequest) {
         data.totalRevenue,
         data.totalExpenses,
         data.netProfit,
-        data.revenueChange.toFixed(1),
-        data.profitChange.toFixed(1)
+        data.revenueChange === null ? "n/a" : data.revenueChange.toFixed(1),
+        data.profitChange === null ? "n/a" : data.profitChange.toFixed(1)
       ]
         .map(csvCell)
         .join(","),

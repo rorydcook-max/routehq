@@ -173,7 +173,8 @@
     "fuelDeficitApprox": "Thiếu nhiên liệu: khoảng {percent}%",
     "deductionsExceedDeposit": "Khấu trừ vượt quá tiền đặt cọc có sẵn. Chỉ có thể đối chiếu {amount} từ tiền đặt cọc này.",
     "uploadingPhotos": "Đang tải ảnh lên {done} của {total}...",
-    "uploadFailed": "Không thể tải ảnh lên. Kiểm tra kết nối và thử lại."
+    "uploadFailed": "Không thể tải ảnh lên. Kiểm tra kết nối và thử lại.",
+    "changeDamagePhoto": "Thay đổi ảnh"
   },
   "vehicles": {
     "addVehicle": "Thêm xe mới",

@@ -11,6 +11,9 @@ import { getCurrentUserEmail } from "@/lib/auth/session";
 import { flagForNationality } from "@/lib/customer-options";
 import { getCustomerDetail, getCustomerDocumentCompleteness } from "@/lib/customer-detail";
 import { getDefaultOrganization } from "@/lib/organization";
+import { amountDueNowByRental } from "@/lib/rental-balances";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { isRawDepositTransaction, isRevenueTransaction } from "@/lib/transaction-options";
 
 function money(value: unknown) {
   return new Intl.NumberFormat("th-TH", {
@@ -18,6 +21,23 @@ function money(value: unknown) {
     currency: "THB",
     maximumFractionDigits: 0
   }).format(Number(value || 0));
+}
+
+function depositLabel(rental: any) {
+  switch (String(rental?.deposit_status || "")) {
+    case "received":
+      return `Deposit held ${money(rental.deposit_held)}`;
+    case "fully_returned":
+      return "Deposit returned";
+    case "partially_returned":
+      return `Deposit ${money(rental.deposit_refunded_amount)} returned`;
+    case "forfeited":
+      return "Deposit kept";
+    case "partially_forfeited":
+      return `Deposit ${money(rental.deposit_forfeited_amount)} kept`;
+    default:
+      return Number(rental?.deposit_amount || 0) > 0 ? "Deposit not collected" : "No deposit";
+  }
 }
 
 function formatDate(value: string | null | undefined) {
@@ -212,7 +232,11 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
   const { customer } = detail;
   const completeness = getCustomerDocumentCompleteness(detail.documents);
   const activeRental = detail.activeRental;
-  const totalIncome = detail.transactions.reduce((sum, transaction) => sum + Math.abs(Number(transaction.amount || 0)), 0);
+  // Income only: deposits are held and returned, so they are not income.
+  const totalIncome = detail.transactions
+    .filter((transaction: any) => !transaction.voided && isRevenueTransaction({ amount: Math.abs(Number(transaction.amount || 0)), isDeposit: Boolean(transaction.is_deposit), type: transaction.type }))
+    .reduce((sum, transaction) => sum + Math.abs(Number(transaction.amount || 0)), 0);
+  const dueNow = activeRental ? (await amountDueNowByRental(await createSupabaseServerClient(), [activeRental.id])).get(activeRental.id) || 0 : 0;
   const passportDoc = completeness.hasPassport;
   const licenseDoc = completeness.hasLicense;
   const selfieDoc = completeness.hasSelfie;
@@ -326,7 +350,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                   </div>
                   <div className="mt-3 grid gap-3 sm:grid-cols-2">
                     <InfoTile label="Rental period" value={`${formatDate(activeRental.start_date)} → ${formatDate(activeRental.end_date)}`} />
-                    <InfoTile label="Outstanding balance" value={money(activeRental.balance_due)} danger={Number(activeRental.balance_due || 0) > 0} />
+                    <InfoTile label="Due now" value={dueNow > 0 ? money(dueNow) : "Nothing due"} danger={dueNow > 0} />
                   </div>
                   <div className="mt-3 flex flex-wrap gap-2">
                 <Link className="primary-action pressable px-3 py-2" href={`/bookings/${activeRental.id}` as Route}>View Rental</Link>
@@ -390,7 +414,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                     vehicle_plate: activeRental?.vehicles?.registration_number || null,
                     rental_status: activeRental?.status || null,
                     end_date: activeRental?.end_date || null,
-                    outstanding_balance: Number(activeRental?.balance_due || 0),
+                    outstanding_balance: dueNow,
                     deposit_held: Number(activeRental?.deposit_held || 0)
                   }}
                   businessName={organization.name || "RouteHQ"}
@@ -434,7 +458,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                             {rental.vehicles?.make} {rental.vehicles?.model} · <span className="font-mono-data">{rental.vehicles?.registration_number}</span>
                           </p>
                           <p className="font-mono-data text-sm text-[#667085]">{formatDate(rental.start_date)} → {formatDate(rental.end_date)} · {money(rental.rental_rate)}</p>
-                          <p className="font-mono-data mt-1 text-sm text-[#475467]">{rental.km_driven ? `${Number(rental.km_driven).toLocaleString()} km driven` : "Km not calculated"} · Deposit pending</p>
+                          <p className="font-mono-data mt-1 text-sm text-[#475467]">{rental.km_driven ? `${Number(rental.km_driven).toLocaleString()} km driven` : "Km not calculated"} · {depositLabel(rental)}</p>
                         </div>
                         <Badge tone={rental.status === "completed" ? "green" : rental.status === "active" ? "blue" : "amber"}>{rental.status}</Badge>
                       </div>
@@ -460,7 +484,13 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                           <p className="font-black text-[#10252b]">{transaction.type.replace(/_/g, " ")}</p>
                           <p className="font-mono-data text-sm text-[#667085]">{formatDate(transaction.transaction_date)} · {transaction.vehicles?.registration_number || "No vehicle"}</p>
                         </div>
-                        <span className="font-mono-data font-black text-[#0f766e]">{money(transaction.amount)}</span>
+                        <span
+                          className={`font-mono-data font-black ${
+                            isRawDepositTransaction({ isDeposit: Boolean((transaction as any).is_deposit), type: transaction.type }) ? "text-[#d97706]" : "text-[#0f766e]"
+                          }`}
+                        >
+                          {money(transaction.amount)}
+                        </span>
                       </div>
                     </div>
                   ))

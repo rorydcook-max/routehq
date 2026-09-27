@@ -360,9 +360,9 @@ export async function recordDeliveryCashPaymentAndReceipt(formData: FormData) {
   const depositTransaction = await insertPaymentTransaction("deposit_received", depositAmount, depositPaymentId);
   const receiptTransaction = rentTransaction || depositTransaction;
 
+  // balance_due follows the payment rows (trigger, migration 0075).
   const rentalUpdate: Record<string, unknown> = {
-    payment_due_after_delivery: false,
-    balance_due: Math.max(0, Number(rental.balance_due || 0) - amount)
+    payment_due_after_delivery: false
   };
   if (depositAmount > 0) {
     rentalUpdate.deposit_held = depositAmount;
@@ -922,9 +922,24 @@ export async function sendPaymentReminder(
 
   const customer = rental.customers;
   const vehicle = rental.vehicles;
-  const balanceDue = Number(rental.balance_due || 0);
-  const dueDateLabel = rental.end_date
-    ? new Date(rental.end_date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
+  // The reminder asks for what is due now (or, if nothing is, the next
+  // payment) - not the rental's whole remaining balance and not its end date.
+  const { data: unpaid } = await supabase
+    .from("rental_payments")
+    .select("amount, due_date, status, voided, metadata")
+    .eq("rental_id", rentalId)
+    .is("deleted_at", null)
+    .in("status", ["scheduled", "pending", "overdue"])
+    .order("due_date", { ascending: true });
+  const open = (unpaid || []).filter((payment: any) => !payment.voided && !payment.metadata?.voided);
+  const today = businessToday();
+  const dueNow = open.filter((payment: any) => String(payment.due_date || "") <= today);
+  const reminderRows = dueNow.length ? dueNow : open.slice(0, 1);
+  if (!reminderRows.length) return { success: false, message: "Nothing is owed on this rental." };
+  const balanceDue = reminderRows.reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
+  const firstDue = String(reminderRows[0].due_date || "");
+  const dueDateLabel = firstDue
+    ? new Date(`${firstDue}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" })
     : "your next payment date";
 
   const vLabel = vehicle

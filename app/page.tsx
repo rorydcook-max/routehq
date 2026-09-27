@@ -37,6 +37,14 @@ const statusTone = {
   "Due Soon": "amber"
 } as const;
 
+/** "2026-09-27" -> "27 Sep". */
+function shortDate(value: string) {
+  const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!match) return value;
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return `${Number(match[3])} ${months[Number(match[2]) - 1]}`;
+}
+
 export default async function Home() {
   const [userEmail, organization, dashboardData, supabase] = await Promise.all([
     getCurrentUserEmail(),
@@ -54,6 +62,7 @@ export default async function Home() {
   const rentedCount = vehicles.filter((vehicle) => ["rented", "active"].includes(String(vehicle.status).toLowerCase())).length;
   const availableCount = vehicles.filter((vehicle) => String(vehicle.status).toLowerCase() === "available").length;
   const maintenanceCount = vehicles.filter((vehicle) => String(vehicle.status).toLowerCase() === "maintenance").length;
+  const reservedCount = vehicles.filter((vehicle) => String(vehicle.status).toLowerCase() === "reserved").length;
   const fleetUtilization = totalVehicles > 0 ? Math.round((rentedCount / totalVehicles) * 100) : 0;
 
   // ── Revenue / profit ──────────────────────────────────────────────────────
@@ -95,25 +104,44 @@ export default async function Home() {
   });
 
   // ── Overdue payments ──────────────────────────────────────────────────────
-  const overdueRentals = rentals.filter((r) => r.balance > 0);
-  const overdueTotal = overdueRentals.reduce((sum, r) => sum + r.balance, 0);
+  // Only payments past their due date count: a rental's remaining balance
+  // includes rent that isn't due yet.
+  const overdueRentals = rentals.filter((r) => (r.overdue || 0) > 0).sort((a, b) => String(a.overdueSince).localeCompare(String(b.overdueSince)));
+  const overdueTotal = overdueRentals.reduce((sum, r) => sum + (r.overdue || 0), 0);
   const overduePreviewRows = overdueRentals.slice(0, 3).map((rental) => {
-    const dueDate = rental.end !== "Indefinite" ? rental.end : rental.start;
-    const ms = new Date(today).setHours(0, 0, 0, 0) - new Date(dueDate).setHours(0, 0, 0, 0);
-    const daysOverdue = Math.max(0, Math.ceil(ms / 86_400_000));
-    return { ...rental, daysOverdue };
+    const ms = new Date(`${today}T00:00:00Z`).getTime() - new Date(`${rental.overdueSince}T00:00:00Z`).getTime();
+    const daysOverdue = Math.max(0, Math.round(ms / 86_400_000));
+    return { ...rental, balance: rental.overdue || 0, daysOverdue };
   });
 
   // ── Deposits held ────────────────────────────────────────────────────────
-  const depositsHeld = dashboardMetrics.depositsHeld ?? rentals.reduce((sum, rental) => sum + (rental.deposit || 0), 0);
-  const depositsHeldCount = dashboardMetrics.depositsHeldCount ?? rentals.filter((rental) => (rental.deposit || 0) > 0).length;
+  // What has actually been received, not the deposit a booking will collect.
+  const depositsHeld = dashboardMetrics.depositsHeld ?? rentals.reduce((sum, rental) => sum + (rental.depositHeld || 0), 0);
+  const depositsHeldCount = dashboardMetrics.depositsHeldCount ?? rentals.filter((rental) => (rental.depositHeld || 0) > 0).length;
   const depositsByVehicle = rentals
-    .filter((rental) => (rental.deposit || 0) > 0)
+    .filter((rental) => (rental.depositHeld || 0) > 0)
     .slice(0, 3)
-    .map((rental) => ({ vehicle: rental.vehicle, amount: rental.deposit || 0 }));
+    .map((rental) => ({ vehicle: rental.vehicle, amount: rental.depositHeld || 0 }));
 
   // ── Alerts reclassified by days-to-due ───────────────────────────────────
-  const alertCounts = reminders.reduce(
+  // Vehicle paperwork (tax, พรบ, insurance, service) comes straight from each
+  // vehicle's dates, the same ones the Fleet page shows. Before, only manual
+  // reminders counted, so the card said "No active alerts" while Fleet listed
+  // expired insurance.
+  const complianceReminders: typeof reminders = vehicles.flatMap((vehicle) =>
+    (vehicle.compliance || [])
+      .filter((item) => item.daysLeft <= 28)
+      .map((item) => ({
+        id: `${vehicle.id}-${item.key}`,
+        title: item.daysLeft < 0 ? `${item.label} expired` : `${item.label} due`,
+        target: `${vehicle.make} ${vehicle.model} · ${vehicle.plate}`,
+        due: item.date,
+        severity: (item.daysLeft <= 7 ? "High" : item.daysLeft <= 14 ? "Medium" : "Low") as "High" | "Medium" | "Low",
+        type: "Compliance" as const
+      }))
+  );
+  const alertReminders = [...complianceReminders, ...reminders].sort((a, b) => String(a.due).localeCompare(String(b.due)));
+  const alertCounts = alertReminders.reduce(
     (acc, r) => {
       const ms = new Date(r.due).setHours(0, 0, 0, 0) - new Date(today).setHours(0, 0, 0, 0);
       const days = Math.ceil(ms / 86_400_000);
@@ -124,7 +152,7 @@ export default async function Home() {
     },
     { high: 0, medium: 0, low: 0 }
   );
-  const alertBuckets = reminders.reduce(
+  const alertBuckets = alertReminders.reduce(
     (acc, reminder) => {
       const ms = new Date(reminder.due).setHours(0, 0, 0, 0) - new Date(today).setHours(0, 0, 0, 0);
       const days = Math.ceil(ms / 86_400_000);
@@ -137,15 +165,26 @@ export default async function Home() {
   );
 
   // ── Fleet value & P&L ─────────────────────────────────────────────────────
-  const totalFleetValue = vehicles.reduce((sum, v) => sum + v.estimatedValue, 0);
+  // A vehicle without an estimated value is counted at its purchase price and
+  // left out of depreciation: treating a missing value as ฿0 showed almost
+  // the whole purchase cost as lost.
+  const valuedVehicles = vehicles.filter((v) => v.estimatedValue > 0 && v.purchasePrice > 0);
+  const totalFleetValue = vehicles.reduce((sum, v) => sum + (v.estimatedValue > 0 ? v.estimatedValue : v.purchasePrice), 0);
   const totalPurchasePrice = vehicles.reduce((sum, v) => sum + v.purchasePrice, 0);
-  const totalDepreciation = totalPurchasePrice - totalFleetValue;
+  const totalDepreciation = valuedVehicles.reduce((sum, v) => sum + (v.purchasePrice - v.estimatedValue), 0);
   const totalOperatingProfit = vehicles.reduce((sum, v) => sum + v.profit, 0);
   // Net fleet P&L: (current value - purchase price) + operating profit
-  const fleetNetPnL = (totalFleetValue - totalPurchasePrice) + totalOperatingProfit;
+  const fleetNetPnL = -totalDepreciation + totalOperatingProfit;
 
   // ── Today's agenda ────────────────────────────────────────────────────────
   const todayAgenda = [
+    // Booked rentals whose start date has passed without a handover.
+    ...rentals
+      .filter((r) => r.status === "Booked" && r.start < today)
+      .map((r) => ({ type: "start" as const, label: `${r.vehicle} — delivery overdue since ${shortDate(r.start)}`, sub: r.customer })),
+    ...rentals
+      .filter((r) => r.end !== "Indefinite" && r.end < today && r.status !== "Booked")
+      .map((r) => ({ type: "end" as const, label: `${r.vehicle} — return overdue since ${shortDate(r.end)}`, sub: r.customer })),
     ...rentals
       .filter((r) => r.start === today)
       .map((r) => ({ type: "start" as const, label: `${r.vehicle} — starts`, sub: r.customer })),
@@ -220,6 +259,7 @@ export default async function Home() {
           fleetUtilization={fleetUtilization}
           maintenanceCount={maintenanceCount}
           rentedCount={rentedCount}
+          reservedCount={reservedCount}
           totalVehicles={totalVehicles}
         />
       </div>
@@ -240,6 +280,7 @@ export default async function Home() {
           totalDepreciation={totalDepreciation}
           totalFleetValue={totalFleetValue}
           totalPurchasePrice={totalPurchasePrice}
+          valuedCount={valuedVehicles.length}
           vehicleCount={vehicles.length}
         />
         <FleetPnLCard
@@ -284,7 +325,11 @@ export default async function Home() {
                     <MapPin size={15} />
                     {rental.location}
                   </p>
-                  <p className="font-semibold">Balance {money(rental.balance)}</p>
+                  {(rental.overdue || 0) > 0 ? (
+                    <p className="font-semibold text-[#dc2626]">Overdue {money(rental.overdue || 0)}</p>
+                  ) : (
+                    <p className="font-semibold text-[#16a34a]">Nothing overdue</p>
+                  )}
                 </div>
                 {["Booked", "Active", "Due Soon", "Overdue"].includes(rental.status) ? (
                   <div className="mt-3 flex flex-wrap gap-2">

@@ -58,9 +58,24 @@ function pct(value: number) {
 
 // ── KPI Card ──────────────────────────────────────────────────────────────────
 
-function KpiCard({ label, value, change, sub }: { label: string; value: string; change: number; sub?: string }) {
+/**
+ * `change` is the % change against the previous period; null when there is
+ * nothing to compare with (the previous period was zero), and `sub` then
+ * describes the figure instead. `upIsBad` flips the colours for costs.
+ */
+function KpiCard({ label, value, change, sub, upIsBad = false }: { label: string; value: string; change: number | null; sub?: string; upIsBad?: boolean }) {
+  if (change === null || !Number.isFinite(change)) {
+    return (
+      <div className="content-section">
+        <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">{label}</p>
+        <p className="mt-1 text-2xl font-black text-[var(--foreground)]">{value}</p>
+        <p className="mt-1 text-xs text-[var(--muted)]">{sub || "Nothing to compare with last period"}</p>
+      </div>
+    );
+  }
   const isUp = change > 0;
   const isFlat = Math.abs(change) < 0.1;
+  const good = upIsBad ? !isUp : isUp;
   return (
     <div className="content-section">
       <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">{label}</p>
@@ -69,14 +84,14 @@ function KpiCard({ label, value, change, sub }: { label: string; value: string; 
         {isFlat ? (
           <Minus size={14} className="text-[var(--muted)]" />
         ) : isUp ? (
-          <ArrowUpRight size={14} className="text-emerald-600" />
+          <ArrowUpRight size={14} className={good ? "text-emerald-600" : "text-red-500"} />
         ) : (
-          <ArrowDownRight size={14} className="text-red-500" />
+          <ArrowDownRight size={14} className={good ? "text-emerald-600" : "text-red-500"} />
         )}
-        <span className={`text-xs font-semibold ${isFlat ? "text-[var(--muted)]" : isUp ? "text-emerald-600" : "text-red-500"}`}>
+        <span className={`text-xs font-semibold ${isFlat ? "text-[var(--muted)]" : good ? "text-emerald-600" : "text-red-500"}`}>
           {isFlat ? "No change" : pct(change)}
         </span>
-        {sub ? <span className="text-xs text-[var(--muted)]">vs prev. period</span> : null}
+        <span className="text-xs text-[var(--muted)]">vs prev. period</span>
       </div>
     </div>
   );
@@ -414,7 +429,7 @@ function AiInsightsPanel({ data }: { data: ReportsData }) {
             <div className="rounded-xl border border-[var(--border)] bg-amber-50/50 p-3" key={i}>
               <p className="font-semibold text-[var(--foreground)]">{insight.title}</p>
               <p className="mt-1 text-sm text-[var(--foreground-secondary)]">{insight.insight}</p>
-              <p className="mt-2 text-xs font-semibold text-[var(--primary)]">뿯↽ {insight.action}</p>
+              <p className="mt-2 text-xs font-semibold text-[var(--primary)]">→ {insight.action}</p>
             </div>
           ))}
         </div>
@@ -496,7 +511,7 @@ export function ReportsView({ data }: { data: ReportsData }) {
         className="cursor-pointer select-none whitespace-nowrap px-3 py-2 text-right text-xs uppercase text-[var(--muted)] hover:text-[var(--foreground)]"
         onClick={() => toggleSort(field)}
       >
-        {label} {active ? (sortAsc ? "뿯↽" : "뿯↽") : ""}
+        {label} {active ? (sortAsc ? "↑" : "↓") : ""}
       </th>
     );
   }
@@ -597,20 +612,24 @@ export function ReportsView({ data }: { data: ReportsData }) {
           </div>
         ) : null}
         <p className="mt-2 text-xs text-[var(--muted)]">
-          {data.dateRange.label} 뿯½ {data.dateRange.from} – {data.dateRange.to}
+          {data.dateRange.label} · {data.dateRange.from} – {data.dateRange.to}
         </p>
       </div>
 
       {/* KPI Cards */}
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <KpiCard label="Revenue" value={money(data.totalRevenue)} change={data.revenueChange} sub="vs prev" />
-        <KpiCard label="Expenses" value={money(data.totalExpenses)} change={data.expensesChange} sub="vs prev" />
-        <KpiCard label="Net Profit" value={money(data.netProfit)} change={data.profitChange} sub="vs prev" />
+        <KpiCard label="Revenue" value={money(data.totalRevenue)} change={data.revenueChange} />
+        <KpiCard label="Expenses" value={money(data.totalExpenses)} change={data.expensesChange} upIsBad />
+        <KpiCard label="Net Profit" value={money(data.netProfit)} change={data.profitChange} />
         <KpiCard
           label="Outstanding"
           value={money(totalOutstanding)}
-          change={0}
-          sub={`${data.outstandingBalances.length} customer${data.outstandingBalances.length === 1 ? "" : "s"}`}
+          change={null}
+          sub={
+            data.outstandingBalances.length
+              ? `Due now from ${data.outstandingBalances.length} customer${data.outstandingBalances.length === 1 ? "" : "s"}`
+              : "Nothing due right now"
+          }
         />
       </div>
 
@@ -725,7 +744,7 @@ export function ReportsView({ data }: { data: ReportsData }) {
                   </Link>
                   <p className="text-xs text-[var(--muted)]">
                     {bal.rentalCount} rental{bal.rentalCount === 1 ? "" : "s"}
-                    {bal.oldestDue ? ` 뿯½ due ${bal.oldestDue}` : ""}
+                    {bal.oldestDue ? ` · due ${bal.oldestDue}` : ""}
                   </p>
                 </div>
                 <p className="font-black text-red-500">{money(bal.totalBalance)}</p>
@@ -776,7 +795,7 @@ export function ReportsView({ data }: { data: ReportsData }) {
         <div className="content-section py-12 text-center">
           <p className="text-[var(--muted)]">No transactions recorded for this period.</p>
           <Link href="/transactions/new" className="mt-3 inline-block text-sm font-semibold text-[var(--primary)] hover:underline">
-            Add a transaction 뿯↽
+            Add a transaction →
           </Link>
         </div>
       ) : null}

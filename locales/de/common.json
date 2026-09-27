@@ -182,7 +182,8 @@
     "fuelDeficitApprox": "Kraftstoffdefizit: ungefähr {percent}%",
     "deductionsExceedDeposit": "Abzüge übersteigen die verfügbare Kaution. Nur {amount} kann von dieser Kaution verrechnet werden.",
     "uploadingPhotos": "Fotos werden hochgeladen {done} von {total}...",
-    "uploadFailed": "Die Fotos konnten nicht hochgeladen werden. Überprüfen Sie die Verbindung und versuchen Sie es erneut."
+    "uploadFailed": "Die Fotos konnten nicht hochgeladen werden. Überprüfen Sie die Verbindung und versuchen Sie es erneut.",
+    "changeDamagePhoto": "Foto ändern"
   },
   "translation": {
     "translatedFrom": "Übersetzt aus dem {language}",

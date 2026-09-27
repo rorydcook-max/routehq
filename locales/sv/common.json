@@ -182,7 +182,8 @@
     "fuelDeficitApprox": "Brist på bränsle: ungefär {percent}%",
     "deductionsExceedDeposit": "Avdragen överstiger den tillgängliga depositionen. Endast {amount} kan avräknas från denna deposition.",
     "uploadingPhotos": "Laddar upp foton {done} av {total}...",
-    "uploadFailed": "Foton kunde inte laddas upp. Kontrollera anslutningen och försök igen."
+    "uploadFailed": "Foton kunde inte laddas upp. Kontrollera anslutningen och försök igen.",
+    "changeDamagePhoto": "Byt foto"
   },
   "translation": {
     "translatedFrom": "Översatt från {language}",

@@ -182,7 +182,8 @@
     "fuelDeficitApprox": "Kekurangan bahan bakar: sekitar {percent}%",
     "deductionsExceedDeposit": "Potongan melebihi deposit yang tersedia. Hanya {amount} yang dapat direkonsiliasi dari deposit ini.",
     "uploadingPhotos": "Mengunggah foto {done} dari {total}...",
-    "uploadFailed": "Foto tidak dapat diunggah. Periksa koneksi dan coba lagi."
+    "uploadFailed": "Foto tidak dapat diunggah. Periksa koneksi dan coba lagi.",
+    "changeDamagePhoto": "Ubah foto"
   },
   "translation": {
     "translatedFrom": "Diterjemahkan dari {language}",

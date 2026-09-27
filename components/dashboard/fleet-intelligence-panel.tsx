@@ -112,8 +112,7 @@ export function FleetIntelligencePanel({ averageUtilization, vehicles }: { avera
       {canExpand || hasPages ? (
         <div className="mt-4 grid min-h-[56px] grid-cols-1 items-center gap-3 border-t border-white/10 pt-4 sm:grid-cols-[1fr_auto_1fr]">
           <div className="analytics-muted text-sm">
-            Showing {visibleVehicles.length} of {pageVehicles.length} vehicles on this page
-            {hasPages ? ` · Page ${safePage + 1} of ${totalPages}` : ""}
+            Showing {visibleVehicles.length === 0 ? 0 : safePage * pageSize + 1}–{safePage * pageSize + visibleVehicles.length} of {vehicles.length} vehicles
           </div>
           {canExpand ? (
             <button

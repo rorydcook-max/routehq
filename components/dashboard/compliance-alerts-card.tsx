@@ -54,14 +54,14 @@ export function ComplianceAlertsCard({
   const rows = alertBuckets.high.length > 0 ? alertBuckets.high.slice(0, 2) : alertBuckets.medium.slice(0, 2);
 
   return (
-    <Link className="block" href="/calendar">
+    <Link className="block" href="/fleet">
       <section style={{ background: "#ffffff", border: "0.5px solid #e2e8f0", borderRadius: 10, padding: "13px 14px" }}>
         <p className="m-0 mb-2.5 text-[10px] font-medium uppercase tracking-[0.08em] text-[#717d86]">Compliance alerts</p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "7px", marginBottom: "10px" }}>
           <div className="text-center" style={{ background: "#fef2f2", border: "0.5px solid #fecaca", borderRadius: "7px", padding: "9px 6px" }}>
             <p className="m-0 text-[22px] font-medium text-[#dc2626]">{alertCounts.high}</p>
             <p className="m-0 text-[10px] font-medium text-[#dc2626]">High</p>
-            <p className="m-0 text-[10px] text-[#dc2626]/65">≤7 days</p>
+            <p className="m-0 text-[10px] text-[#dc2626]/65">Expired or ≤7 days</p>
           </div>
           <div className="text-center" style={{ background: "#fffbeb", border: "0.5px solid #fde68a", borderRadius: "7px", padding: "9px 6px" }}>
             <p className="m-0 text-[22px] font-medium text-[#d97706]">{alertCounts.medium}</p>

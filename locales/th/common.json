@@ -191,7 +191,8 @@
     "fuelDeficitApprox": "น้ำมันขาด: ประมาณ {percent}%",
     "deductionsExceedDeposit": "การหักเงินเกินกว่าเงินมัดจำที่มีอยู่ สามารถหักได้เพียง {amount} จากเงินมัดจำนี้",
     "uploadingPhotos": "กำลังอัปโหลดรูปภาพ {done} จาก {total}...",
-    "uploadFailed": "ไม่สามารถอัปโหลดรูปภาพได้ ตรวจสอบการเชื่อมต่อและลองอีกครั้ง"
+    "uploadFailed": "ไม่สามารถอัปโหลดรูปภาพได้ ตรวจสอบการเชื่อมต่อและลองอีกครั้ง",
+    "changeDamagePhoto": "เปลี่ยนรูปถ่าย"
   },
   "translation": {
     "translatedFrom": "แปลจาก {language}",

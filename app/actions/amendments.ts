@@ -514,8 +514,18 @@ async function applySignedAmendment(admin: any, amendmentId: string) {
   if (changes.new_rate !== undefined && changes.new_rate !== null) {
     rentalUpdate.rental_rate = changes.new_rate;
     rentalUpdate.contracted_rate = changes.new_rate;
+    // Not delivered yet: the first payment collected at delivery is one period of rent.
+    if (Number(rental.first_payment_amount || 0) === Number(changes.previous_rate || 0) && rental.payment_due_trigger !== "confirmed") {
+      rentalUpdate.first_payment_amount = changes.new_rate;
+    }
   }
-  if (changes.new_deposit !== undefined && changes.new_deposit !== null) rentalUpdate.deposit_amount = changes.new_deposit;
+  if (changes.new_deposit !== undefined && changes.new_deposit !== null) {
+    rentalUpdate.deposit_amount = changes.new_deposit;
+    // Not collected yet: delivery collects the new amount.
+    if (Number(rental.deposit_held || 0) === 0 && Number(rental.deposit_payment_amount || 0) > 0) {
+      rentalUpdate.deposit_payment_amount = changes.new_deposit;
+    }
+  }
   if (Object.keys(rentalUpdate).length) {
     const { error } = await admin.from("rentals").update(rentalUpdate).eq("id", rental.id).eq("organization_id", rental.organization_id);
     if (error) failures.push(`rental: ${error.message}`);

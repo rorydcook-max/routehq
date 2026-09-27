@@ -54,15 +54,15 @@ function statusCardClasses(booking: any) {
   return "border-[var(--border)] bg-white";
 }
 
+/** Where the customer is with their booking link. Same wording as the booking page; nothing when there's no live link. */
 function linkLabel(status?: string | null) {
-  if (!status) return "No link";
-  if (status === "completed" || status === "contract_signed") return "Completed";
-  if (status === "viewed") return "Viewed";
-  if (status === "details_submitted") return "Details submitted";
-  if (status === "sent") return "Sent";
-  if (status === "cancelled") return "Cancelled";
-  if (status === "expired") return "Expired";
-  return "Pending";
+  if (!status || status === "cancelled") return null;
+  if (status === "completed" || status === "contract_signed") return "Customer signed";
+  if (status === "viewed") return "Customer opened link";
+  if (status === "details_submitted") return "Customer details received";
+  if (status === "sent") return "Link sent";
+  if (status === "expired") return "Link expired";
+  return "Link not opened yet";
 }
 
 function isDueSoon(booking: any) {
@@ -203,7 +203,11 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                 <div className="min-w-0 py-0.5">
                   <div className="flex flex-wrap items-center gap-1.5">
                     <Badge tone={statusTone(effectiveStatus)}>{effectiveStatus.replace(/_/g, " ")}</Badge>
-                    <Badge tone={booking.booking_link?.status === "completed" ? "green" : booking.booking_link?.status === "viewed" ? "blue" : "amber"}>{linkLabel(booking.booking_link?.status)}</Badge>
+                    {linkLabel(booking.booking_link?.status) ? (
+                    <Badge tone={["completed", "contract_signed"].includes(String(booking.booking_link?.status)) ? "green" : booking.booking_link?.status === "viewed" ? "blue" : "amber"}>
+                      {linkLabel(booking.booking_link?.status)}
+                    </Badge>
+                  ) : null}
                     {!booking.customers ? <Badge tone="amber">Awaiting details</Badge> : null}
                     <span className="font-mono-data ml-1 text-[11px] font-semibold uppercase tracking-[0.04em] text-[#64748b]">{bookingReference(booking)}</span>
                   </div>

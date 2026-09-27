@@ -187,5 +187,25 @@
   "translation": {
     "translatedFrom": "{language} से अनुवादित",
     "showOriginal": "मूल दिखाएं"
+  },
+  "nav": {
+    "main": "मुख्य",
+    "operations": "संचालन",
+    "dashboard": "डैशबोर्ड",
+    "fleet": "वाहन बेड़ा",
+    "calendar": "कैलेंडर",
+    "reports": "रिपोर्ट्स",
+    "settings": "सेटिंग्स",
+    "customers": "ग्राहक",
+    "bookings": "बुकिंग्स",
+    "transactions": "लेनदेन",
+    "documents": "दस्तावेज़",
+    "rentalCalculator": "किराया कैलकुलेटर",
+    "business": "व्यवसाय",
+    "myAccount": "मेरा खाता",
+    "signOut": "साइन आउट",
+    "more": "और",
+    "close": "बंद करें",
+    "openFastActions": "त्वरित क्रियाएँ खोलें"
   }
 }

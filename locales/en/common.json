@@ -6,6 +6,26 @@
     "fleetProfit": "Fleet profit",
     "highAlerts": "High alerts"
   },
+  "nav": {
+    "main": "Main",
+    "operations": "Operations",
+    "dashboard": "Dashboard",
+    "fleet": "Fleet",
+    "calendar": "Calendar",
+    "reports": "Reports",
+    "settings": "Settings",
+    "customers": "Customers",
+    "bookings": "Bookings",
+    "transactions": "Transactions",
+    "documents": "Documents",
+    "rentalCalculator": "Rental calculator",
+    "business": "Business",
+    "myAccount": "My account",
+    "signOut": "Sign out",
+    "more": "More",
+    "close": "Close",
+    "openFastActions": "Open fast actions"
+  },
   "vehicles": {
     "addVehicle": "Add New Vehicle",
     "fleetIntelligence": "Fleet intelligence"

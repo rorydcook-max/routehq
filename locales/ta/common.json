@@ -187,5 +187,25 @@
   "translation": {
     "translatedFrom": "{language} மொழியில் இருந்து மொழிபெயர்க்கப்பட்டது",
     "showOriginal": "அசல் வடிவத்தை காட்டு"
+  },
+  "nav": {
+    "main": "முதன்மை",
+    "operations": "செயல்பாடுகள்",
+    "dashboard": "டாஷ்போர்டு",
+    "fleet": "வாகனங்கள்",
+    "calendar": "நாட்காட்டி",
+    "reports": "அறிக்கைகள்",
+    "settings": "அமைப்புகள்",
+    "customers": "வாடிக்கையாளர்கள்",
+    "bookings": "முன்பதிவுகள்",
+    "transactions": "பரிவர்த்தனைகள்",
+    "documents": "ஆவணங்கள்",
+    "rentalCalculator": "வாடகை கணிப்பான்",
+    "business": "வணிகம்",
+    "myAccount": "என் கணக்கு",
+    "signOut": "வெளியேறு",
+    "more": "மேலும்",
+    "close": "மூடு",
+    "openFastActions": "விரைவான செயல்களை திற"
   }
 }

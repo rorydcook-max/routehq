@@ -187,5 +187,25 @@
   "translation": {
     "translatedFrom": "ແປຈາກ {language}",
     "showOriginal": "ສະແດງຕົ້ນສະບັບ"
+  },
+  "nav": {
+    "main": "ຫຼັກ",
+    "operations": "ການດໍາເນີນງານ",
+    "dashboard": "ແຜງຄວບຄຸມ",
+    "fleet": "ຍານພາຫະນະ",
+    "calendar": "ປະຕິທິນ",
+    "reports": "ລາຍງານ",
+    "settings": "ການຕັ້ງຄ່າ",
+    "customers": "ລູກຄ້າ",
+    "bookings": "ການຈອງ",
+    "transactions": "ທຸລະກໍາ",
+    "documents": "ເອກະສານ",
+    "rentalCalculator": "ເຄື່ອງຄິດໄລ່ຄ່າເຊົ່າ",
+    "business": "ທຸລະກິດ",
+    "myAccount": "ບັນຊີຂອງຂ້ອຍ",
+    "signOut": "ອອກຈາກລະບົບ",
+    "more": "ເພີ່ມເຕີມ",
+    "close": "ປິດ",
+    "openFastActions": "ເປີດການດໍາເນີນງານດ່ວນ"
   }
 }

@@ -196,5 +196,25 @@
   "translation": {
     "translatedFrom": "แปลจาก {language}",
     "showOriginal": "แสดงต้นฉบับ"
+  },
+  "nav": {
+    "main": "หลัก",
+    "operations": "การดำเนินงาน",
+    "dashboard": "แดชบอร์ด",
+    "fleet": "ยานพาหนะ",
+    "calendar": "ปฏิทิน",
+    "reports": "รายงาน",
+    "settings": "การตั้งค่า",
+    "customers": "ลูกค้า",
+    "bookings": "การจอง",
+    "transactions": "ธุรกรรม",
+    "documents": "เอกสาร",
+    "rentalCalculator": "เครื่องคำนวณค่าเช่า",
+    "business": "ธุรกิจ",
+    "myAccount": "บัญชีของฉัน",
+    "signOut": "ออกจากระบบ",
+    "more": "เพิ่มเติม",
+    "close": "ปิด",
+    "openFastActions": "เปิดการดำเนินการด่วน"
   }
 }

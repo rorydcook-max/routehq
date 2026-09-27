@@ -5,13 +5,18 @@ import {
   CalendarDays,
   Car,
   Calculator,
+  CircleUserRound,
   FileText,
   Home,
   Plus,
+  ClipboardList,
+  MoreHorizontal,
   ReceiptText,
   Settings,
-  Users
+  Users,
+  X
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import type { Route } from "next";
 import { usePathname } from "next/navigation";
@@ -22,30 +27,47 @@ import { FastActionSheet } from "@/components/fast-action-sheet";
 import { PendingButton } from "@/components/pending-button";
 import { TrialBanner } from "@/components/trial-banner";
 
+type NavKey =
+  | "dashboard"
+  | "fleet"
+  | "calendar"
+  | "reports"
+  | "settings"
+  | "customers"
+  | "bookings"
+  | "transactions"
+  | "documents"
+  | "rentalCalculator";
+
 type NavItem = {
-  label: string;
+  key: NavKey;
   href: Route;
   icon: typeof Home;
 };
 
 const mainNavItems: NavItem[] = [
-  { label: "Dashboard", href: "/", icon: Home },
-  { label: "Fleet", href: "/fleet", icon: Car },
-  { label: "Calendar", href: "/calendar", icon: CalendarDays },
-  { label: "Reports", href: "/reports", icon: BarChart3 },
-  { label: "Settings", href: "/settings", icon: Settings }
+  { key: "dashboard", href: "/", icon: Home },
+  { key: "fleet", href: "/fleet", icon: Car },
+  { key: "calendar", href: "/calendar", icon: CalendarDays },
+  { key: "reports", href: "/reports", icon: BarChart3 },
+  { key: "settings", href: "/settings", icon: Settings }
 ];
 
 const operationsItems: NavItem[] = [
-  { label: "Customers", href: "/customers", icon: Users },
-  { label: "Bookings", href: "/bookings", icon: CalendarDays },
-  { label: "Transactions", href: "/transactions", icon: ReceiptText },
-  { label: "Documents", href: "/documents", icon: FileText },
-  { label: "Rental Calculator", href: "/rental-calculator", icon: Calculator }
+  { key: "customers", href: "/customers", icon: Users },
+  { key: "bookings", href: "/bookings", icon: ClipboardList },
+  { key: "transactions", href: "/transactions", icon: ReceiptText },
+  { key: "documents", href: "/documents", icon: FileText },
+  { key: "rentalCalculator", href: "/rental-calculator", icon: Calculator }
 ];
 
+// Phones get the four places used most every day; everything else is under More.
+const mobileBarKeys: NavKey[] = ["dashboard", "bookings", "fleet", "calendar"];
+
 export function AppShell({ children, userEmail }: { children: React.ReactNode; userEmail?: string | null }) {
+  const t = useTranslations("nav");
   const [fastActionOpen, setFastActionOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const pathname = usePathname();
 
   // Teammates cannot use business settings, so the link is hidden for them.
@@ -66,8 +88,12 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
   const hasSeveralBusinesses = shell.organizations.length > 1;
   const activeBusiness = shell.organizations.find((organization) => organization.active);
   const visibleMainNavItems = isTeammate ? mainNavItems.filter((item) => item.href !== "/settings") : mainNavItems;
+  const allNavItems = [...visibleMainNavItems, ...operationsItems];
+  const mobileBarItems = mobileBarKeys.map((key) => allNavItems.find((item) => item.key === key)).filter(Boolean) as NavItem[];
+  const moreItems = allNavItems.filter((item) => !mobileBarKeys.includes(item.key));
 
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+  const moreActive = moreItems.some((item) => isActive(item.href));
 
   return (
     <div className="min-h-screen pb-24 lg:pb-0">
@@ -76,7 +102,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
           <RouteHqLogo tone="dark" />
         </div>
         <nav className="flex-1 space-y-1">
-          <p className="mb-2 px-3 text-[11px] font-black uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]">Main</p>
+          <p className="mb-2 px-3 text-[11px] font-black uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]">{t("main")}</p>
           {visibleMainNavItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -87,15 +113,15 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
                     : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-white"
                 }`}
                 href={item.href}
-                key={item.label}
+                key={item.key}
                 style={isActive(item.href) ? { background: 'linear-gradient(135deg, #12BCB8 0%, #1F6BFF 100%)' } : undefined}
               >
                 <Icon size={16} />
-                {item.label}
+                {t(item.key)}
               </Link>
             );
           })}
-          <p className="mb-2 mt-5 px-3 text-[11px] font-black uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]">Operations</p>
+          <p className="mb-2 mt-5 px-3 text-[11px] font-black uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]">{t("operations")}</p>
           {operationsItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -106,11 +132,11 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
                     : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-white"
                 }`}
                 href={item.href}
-                key={item.label}
+                key={item.key}
                 style={isActive(item.href) ? { background: 'linear-gradient(135deg, #12BCB8 0%, #1F6BFF 100%)' } : undefined}
               >
                 <Icon size={16} />
-                {item.label}
+                {t(item.key)}
               </Link>
             );
           })}
@@ -120,7 +146,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
             {hasSeveralBusinesses ? (
               <form action={switchActiveOrganization} className="mb-3">
                 <label className="block text-[10px] font-black uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]" htmlFor="business-switcher">
-                  Business
+                  {t("business")}
                 </label>
                 <select
                   className="mt-1 w-full rounded-lg border border-white/10 bg-white/10 px-2 py-1.5 text-xs font-semibold text-white"
@@ -141,11 +167,11 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
               {userEmail}
             </Link>
             <Link className="mt-1 block text-[11px] font-bold text-[var(--sidebar-text)] hover:text-white" href="/account">
-              My account
+              {t("myAccount")}
             </Link>
             <form action={signOut} className="mt-3">
               <PendingButton className="inline-flex w-full items-center justify-center rounded-xl bg-white/10 px-3 py-2 text-xs font-bold text-white hover:bg-white/15" pendingLabel="" type="submit">
-                Sign out
+                {t("signOut")}
               </PendingButton>
             </form>
           </div>
@@ -158,7 +184,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
             {hasSeveralBusinesses ? (
               <form action={switchActiveOrganization}>
                 <select
-                  aria-label="Business"
+                  aria-label={t("business")}
                   className="max-w-[150px] truncate rounded-full border border-[var(--border)] bg-white px-2 py-1.5 text-xs font-semibold text-[var(--foreground-secondary)] shadow-sm"
                   defaultValue={activeBusiness?.id}
                   name="organizationId"
@@ -180,7 +206,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
             </Link>
             <form action={signOut}>
               <PendingButton className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[var(--sidebar-bg)] px-3 py-1.5 text-xs font-bold text-white" pendingLabel="" type="submit">
-                Sign out
+                {t("signOut")}
               </PendingButton>
             </form>
           </div>
@@ -191,7 +217,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
 
       <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] lg:hidden">
         <div className="grid grid-cols-5 px-2 py-2">
-          {visibleMainNavItems.map((item) => {
+          {mobileBarItems.map((item) => {
             const Icon = item.icon;
             return (
               <Link
@@ -199,18 +225,71 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
                   isActive(item.href) ? "text-[var(--primary)]" : "text-[var(--sidebar-text)]"
                 }`}
                 href={item.href}
-                key={item.label}
+                key={item.key}
               >
                 <Icon size={16} />
-                <span className="truncate">{item.label}</span>
+                <span className="truncate">{t(item.key)}</span>
               </Link>
             );
           })}
+          <button
+            aria-expanded={moreOpen}
+            className={`flex flex-col items-center gap-1 rounded-md px-1 py-2 text-[11px] font-semibold ${
+              moreActive || moreOpen ? "text-[var(--primary)]" : "text-[var(--sidebar-text)]"
+            }`}
+            onClick={() => setMoreOpen(true)}
+            type="button"
+          >
+            <MoreHorizontal size={16} />
+            <span className="truncate">{t("more")}</span>
+          </button>
         </div>
       </nav>
 
+      {moreOpen ? (
+        <div className="fixed inset-0 z-50 flex items-end bg-[#10252b]/50 lg:hidden" onClick={() => setMoreOpen(false)}>
+          <div
+            className="w-full rounded-t-2xl bg-[var(--sidebar-bg)] p-4 pb-8 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="mb-3 flex items-center justify-between">
+              <p className="text-[11px] font-black uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]">{t("more")}</p>
+              <button aria-label={t("close")} className="rounded-lg p-1.5 text-[var(--sidebar-text)]" onClick={() => setMoreOpen(false)} type="button">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {moreItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    className={`flex flex-col items-center gap-1.5 rounded-xl px-2 py-3 text-center text-xs font-semibold ${
+                      isActive(item.href) ? "bg-white/15 text-white" : "bg-white/5 text-[var(--sidebar-text)]"
+                    }`}
+                    href={item.href}
+                    key={item.key}
+                    onClick={() => setMoreOpen(false)}
+                  >
+                    <Icon size={18} />
+                    <span>{t(item.key)}</span>
+                  </Link>
+                );
+              })}
+              <Link
+                className="flex flex-col items-center gap-1.5 rounded-xl bg-white/5 px-2 py-3 text-center text-xs font-semibold text-[var(--sidebar-text)]"
+                href="/account"
+                onClick={() => setMoreOpen(false)}
+              >
+                <CircleUserRound size={18} />
+                <span>{t("myAccount")}</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <button
-        aria-label="Open fast actions"
+        aria-label={t("openFastActions")}
         className="fixed bottom-20 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--primary)] text-white shadow-[0_18px_32px_rgba(18,184,200,0.35)] transition hover:bg-[var(--primary-hover)] lg:bottom-6 lg:right-6"
         onClick={() => setFastActionOpen(true)}
       >

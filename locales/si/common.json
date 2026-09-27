@@ -187,5 +187,25 @@
   "translation": {
     "translatedFrom": "{language} වෙතින් පරිවර්තනය කරන ලදී",
     "showOriginal": "මුල් පිටපත පෙන්වන්න"
+  },
+  "nav": {
+    "main": "ප්‍රධාන",
+    "operations": "මෙහෙයුම්",
+    "dashboard": "උපකරණ පුවරුව",
+    "fleet": "වාහන කණ්ඩායම",
+    "calendar": "දින දර්ශනය",
+    "reports": "වාර්තා",
+    "settings": "සැකසුම්",
+    "customers": "පාරිභෝගිකයින්",
+    "bookings": "වෙන්කිරීම්",
+    "transactions": "ගනුදෙනු",
+    "documents": "ලේඛන",
+    "rentalCalculator": "කිරීමේ ගණකය",
+    "business": "ව්‍යාපාරය",
+    "myAccount": "මගේ ගිණුම",
+    "signOut": "පිටවීම",
+    "more": "තවත්",
+    "close": "වසන්න",
+    "openFastActions": "ඉක්මන් ක්‍රියා විවෘත කරන්න"
   }
 }

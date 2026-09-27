@@ -187,5 +187,25 @@
   "translation": {
     "translatedFrom": "{language}から翻訳",
     "showOriginal": "原文を表示"
+  },
+  "nav": {
+    "main": "メイン",
+    "operations": "操作",
+    "dashboard": "ダッシュボード",
+    "fleet": "車両",
+    "calendar": "カレンダー",
+    "reports": "レポート",
+    "settings": "設定",
+    "customers": "顧客",
+    "bookings": "予約",
+    "transactions": "取引",
+    "documents": "書類",
+    "rentalCalculator": "レンタル計算機",
+    "business": "ビジネス",
+    "myAccount": "マイアカウント",
+    "signOut": "サインアウト",
+    "more": "もっと見る",
+    "close": "閉じる",
+    "openFastActions": "クイックアクションを開く"
   }
 }

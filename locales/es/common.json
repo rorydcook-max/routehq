@@ -187,5 +187,25 @@
   "translation": {
     "translatedFrom": "Traducido del {language}",
     "showOriginal": "Mostrar original"
+  },
+  "nav": {
+    "main": "Principal",
+    "operations": "Operaciones",
+    "dashboard": "Panel de control",
+    "fleet": "Flota",
+    "calendar": "Calendario",
+    "reports": "Informes",
+    "settings": "Configuración",
+    "customers": "Clientes",
+    "bookings": "Reservas",
+    "transactions": "Transacciones",
+    "documents": "Documentos",
+    "rentalCalculator": "Calculadora de alquiler",
+    "business": "Negocio",
+    "myAccount": "Mi cuenta",
+    "signOut": "Cerrar sesión",
+    "more": "Más",
+    "close": "Cerrar",
+    "openFastActions": "Abrir acciones rápidas"
   }
 }

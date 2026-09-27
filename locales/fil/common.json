@@ -187,5 +187,25 @@
   "translation": {
     "translatedFrom": "Isinalin mula sa {language}",
     "showOriginal": "Ipakita ang orihinal"
+  },
+  "nav": {
+    "main": "Pangunahing",
+    "operations": "Operasyon",
+    "dashboard": "Dashboard",
+    "fleet": "Flota",
+    "calendar": "Kalendaryo",
+    "reports": "Ulat",
+    "settings": "Mga Setting",
+    "customers": "Mga Customer",
+    "bookings": "Mga Booking",
+    "transactions": "Mga Transaksyon",
+    "documents": "Mga Dokumento",
+    "rentalCalculator": "Kalkulador ng Upa",
+    "business": "Negosyo",
+    "myAccount": "Aking Account",
+    "signOut": "Mag-sign out",
+    "more": "Higit pa",
+    "close": "Isara",
+    "openFastActions": "Buksan ang mabilis na aksyon"
   }
 }

@@ -187,5 +187,25 @@
   "translation": {
     "translatedFrom": "{language}에서 번역됨",
     "showOriginal": "원본 보기"
+  },
+  "nav": {
+    "main": "메인",
+    "operations": "운영",
+    "dashboard": "대시보드",
+    "fleet": "차량",
+    "calendar": "캘린더",
+    "reports": "보고서",
+    "settings": "설정",
+    "customers": "고객",
+    "bookings": "예약",
+    "transactions": "거래",
+    "documents": "문서",
+    "rentalCalculator": "대여 계산기",
+    "business": "비즈니스",
+    "myAccount": "내 계정",
+    "signOut": "로그아웃",
+    "more": "더보기",
+    "close": "닫기",
+    "openFastActions": "빠른 작업 열기"
   }
 }

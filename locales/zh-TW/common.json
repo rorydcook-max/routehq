@@ -187,5 +187,25 @@
   "translation": {
     "translatedFrom": "翻譯自 {language}",
     "showOriginal": "顯示原文"
+  },
+  "nav": {
+    "main": "主頁",
+    "operations": "操作",
+    "dashboard": "儀表板",
+    "fleet": "車隊",
+    "calendar": "日曆",
+    "reports": "報告",
+    "settings": "設定",
+    "customers": "顧客",
+    "bookings": "預訂",
+    "transactions": "交易",
+    "documents": "文件",
+    "rentalCalculator": "租賃計算器",
+    "business": "業務",
+    "myAccount": "我的帳戶",
+    "signOut": "登出",
+    "more": "更多",
+    "close": "關閉",
+    "openFastActions": "開啟快速操作"
   }
 }

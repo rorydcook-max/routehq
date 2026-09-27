@@ -187,5 +187,25 @@
   "translation": {
     "translatedFrom": "{language} မှ ဘာသာပြန်ထားသည်",
     "showOriginal": "မူရင်းကို ပြပါ"
+  },
+  "nav": {
+    "main": "ပင်မ",
+    "operations": "လုပ်ဆောင်ချက်များ",
+    "dashboard": "ဒက်ရှ်ဘုတ်",
+    "fleet": "ယာဉ်အုပ်စု",
+    "calendar": "ပြက္ခဒိန်",
+    "reports": "အစီရင်ခံစာများ",
+    "settings": "ဆက်တင်များ",
+    "customers": "ဖောက်သည်များ",
+    "bookings": "ဘွတ်ကင်များ",
+    "transactions": "ငွေကြေးလုပ်ငန်းများ",
+    "documents": "စာရွက်စာတမ်းများ",
+    "rentalCalculator": "ငှားရမ်းခတွက်စက်",
+    "business": "လုပ်ငန်း",
+    "myAccount": "အကောင့်",
+    "signOut": "ထွက်မည်",
+    "more": "နောက်ထပ်",
+    "close": "ပိတ်မည်",
+    "openFastActions": "အမြန်လုပ်ဆောင်ချက်များဖွင့်မည်"
   }
 }

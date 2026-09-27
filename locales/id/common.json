@@ -187,5 +187,25 @@
   "translation": {
     "translatedFrom": "Diterjemahkan dari {language}",
     "showOriginal": "Tampilkan asli"
+  },
+  "nav": {
+    "main": "Utama",
+    "operations": "Operasi",
+    "dashboard": "Dasbor",
+    "fleet": "Armada",
+    "calendar": "Kalender",
+    "reports": "Laporan",
+    "settings": "Pengaturan",
+    "customers": "Pelanggan",
+    "bookings": "Pemesanan",
+    "transactions": "Transaksi",
+    "documents": "Dokumen",
+    "rentalCalculator": "Kalkulator sewa",
+    "business": "Bisnis",
+    "myAccount": "Akun saya",
+    "signOut": "Keluar",
+    "more": "Lainnya",
+    "close": "Tutup",
+    "openFastActions": "Buka tindakan cepat"
   }
 }

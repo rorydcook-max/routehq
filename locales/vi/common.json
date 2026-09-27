@@ -187,5 +187,25 @@
   "translation": {
     "translatedFrom": "Được dịch từ {language}",
     "showOriginal": "Hiển thị bản gốc"
+  },
+  "nav": {
+    "main": "Chính",
+    "operations": "Hoạt động",
+    "dashboard": "Bảng điều khiển",
+    "fleet": "Đội xe",
+    "calendar": "Lịch",
+    "reports": "Báo cáo",
+    "settings": "Cài đặt",
+    "customers": "Khách hàng",
+    "bookings": "Đặt xe",
+    "transactions": "Giao dịch",
+    "documents": "Tài liệu",
+    "rentalCalculator": "Máy tính thuê xe",
+    "business": "Kinh doanh",
+    "myAccount": "Tài khoản của tôi",
+    "signOut": "Đăng xuất",
+    "more": "Thêm",
+    "close": "Đóng",
+    "openFastActions": "Mở hành động nhanh"
   }
 }

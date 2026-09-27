@@ -187,5 +187,25 @@
   "translation": {
     "translatedFrom": "Переведено с {language}",
     "showOriginal": "Показать оригинал"
+  },
+  "nav": {
+    "main": "Главная",
+    "operations": "Операции",
+    "dashboard": "Панель управления",
+    "fleet": "Автопарк",
+    "calendar": "Календарь",
+    "reports": "Отчёты",
+    "settings": "Настройки",
+    "customers": "Клиенты",
+    "bookings": "Бронирования",
+    "transactions": "Транзакции",
+    "documents": "Документы",
+    "rentalCalculator": "Калькулятор аренды",
+    "business": "Бизнес",
+    "myAccount": "Мой аккаунт",
+    "signOut": "Выйти",
+    "more": "Ещё",
+    "close": "Закрыть",
+    "openFastActions": "Открыть быстрые действия"
   }
 }

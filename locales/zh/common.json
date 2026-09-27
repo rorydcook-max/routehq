@@ -187,5 +187,25 @@
   "translation": {
     "translatedFrom": "翻译自{language}",
     "showOriginal": "显示原文"
+  },
+  "nav": {
+    "main": "主页",
+    "operations": "操作",
+    "dashboard": "仪表板",
+    "fleet": "车队",
+    "calendar": "日历",
+    "reports": "报告",
+    "settings": "设置",
+    "customers": "客户",
+    "bookings": "预订",
+    "transactions": "交易",
+    "documents": "文件",
+    "rentalCalculator": "租赁计算器",
+    "business": "业务",
+    "myAccount": "我的账户",
+    "signOut": "退出",
+    "more": "更多",
+    "close": "关闭",
+    "openFastActions": "打开快速操作"
   }
 }

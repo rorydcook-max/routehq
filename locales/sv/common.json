@@ -187,5 +187,25 @@
   "translation": {
     "translatedFrom": "Översatt från {language}",
     "showOriginal": "Visa original"
+  },
+  "nav": {
+    "main": "Huvud",
+    "operations": "Operationer",
+    "dashboard": "Instrumentpanel",
+    "fleet": "Flotta",
+    "calendar": "Kalender",
+    "reports": "Rapporter",
+    "settings": "Inställningar",
+    "customers": "Kunder",
+    "bookings": "Bokningar",
+    "transactions": "Transaktioner",
+    "documents": "Dokument",
+    "rentalCalculator": "Hyreskalkylator",
+    "business": "Företag",
+    "myAccount": "Mitt konto",
+    "signOut": "Logga ut",
+    "more": "Mer",
+    "close": "Stäng",
+    "openFastActions": "Öppna snabba åtgärder"
   }
 }

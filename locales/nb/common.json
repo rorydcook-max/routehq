@@ -187,5 +187,25 @@
   "translation": {
     "translatedFrom": "Oversatt fra {language}",
     "showOriginal": "Vis original"
+  },
+  "nav": {
+    "main": "Hoved",
+    "operations": "Operasjoner",
+    "dashboard": "Dashbord",
+    "fleet": "Flåte",
+    "calendar": "Kalender",
+    "reports": "Rapporter",
+    "settings": "Innstillinger",
+    "customers": "Kunder",
+    "bookings": "Bestillinger",
+    "transactions": "Transaksjoner",
+    "documents": "Dokumenter",
+    "rentalCalculator": "Leieberegner",
+    "business": "Virksomhet",
+    "myAccount": "Min konto",
+    "signOut": "Logg ut",
+    "more": "Mer",
+    "close": "Lukk",
+    "openFastActions": "Åpne hurtighandlinger"
   }
 }

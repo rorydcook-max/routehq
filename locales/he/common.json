@@ -187,5 +187,25 @@
   "translation": {
     "translatedFrom": "תורגם מ-{language}",
     "showOriginal": "הצג מקור"
+  },
+  "nav": {
+    "main": "ראשי",
+    "operations": "פעולות",
+    "dashboard": "לוח מחוונים",
+    "fleet": "צי רכבים",
+    "calendar": "לוח שנה",
+    "reports": "דוחות",
+    "settings": "הגדרות",
+    "customers": "לקוחות",
+    "bookings": "הזמנות",
+    "transactions": "עסקאות",
+    "documents": "מסמכים",
+    "rentalCalculator": "מחשבון השכרה",
+    "business": "עסק",
+    "myAccount": "החשבון שלי",
+    "signOut": "התנתק",
+    "more": "עוד",
+    "close": "סגור",
+    "openFastActions": "פתח פעולות מהירות"
   }
 }

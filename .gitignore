@@ -28,3 +28,6 @@ Thumbs.db
 .npm-cache/
 
 .claude/settings.local.json
+
+# Local scratch output (scripts/check-pdf.ts)
+/tmp/

@@ -5,6 +5,8 @@ import path from "node:path";
 const nextConfig: NextConfig = {
   typedRoutes: true,
   outputFileTracingRoot: path.join(__dirname),
+  // Headless Chrome for PDFs: loaded from node_modules at runtime, not bundled.
+  serverExternalPackages: ["puppeteer-core", "@sparticuz/chromium"],
   experimental: {
     serverActions: {
       // Customers upload up to 3 document photos plus a base64 signature.

@@ -27,6 +27,8 @@ import { formatDeliveryLocation } from "@/lib/delivery-location";
 import { toWallTime, businessToday } from "@/lib/business-time";
 import { GeneratePaymentScheduleButton } from "@/app/bookings/[id]/generate-payment-schedule-button";
 import { RentalDocumentsCard } from "@/app/bookings/[id]/rental-documents-card";
+import { PendingAmendmentCard } from "@/app/bookings/[id]/pending-amendment-card";
+import { amendmentRows } from "@/lib/rental-amendments";
 import { businessSignatureOf, getBookingRentalDocuments, renterSignatureOf, type BookingRentalDocument } from "@/lib/booking-rental-documents";
 
 function money(value: unknown, currency = "THB") {
@@ -291,18 +293,25 @@ export default async function BookingDetailPage({ params, searchParams }: { para
     .eq("status", "available")
     .is("deleted_at", null)
     .order("make");
-  const rentalDocuments = await getBookingRentalDocuments(supabaseForVehicles, organization.id, detail.rental.id);
+  const [rentalDocuments, { data: pendingAmendment }] = await Promise.all([
+    getBookingRentalDocuments(supabaseForVehicles, organization.id, detail.rental.id),
+    supabaseForVehicles
+      .from("rental_amendments")
+      .select("id, token, changes")
+      .eq("organization_id", organization.id)
+      .eq("rental_id", detail.rental.id)
+      .eq("status", "awaiting_signature")
+      .maybeSingle()
+  ]);
 
   const { rental, bookingLink, payments, transactions, inspections, documents, activityEvents, customerPortalActions, communicationTimeline } = detail;
   const vehicle = rental.vehicles;
   const customer = rental.customers;
   const isRetrospective = Boolean(rental.entered_by_operator) ||
     Boolean(rental.start_date && new Date(String(rental.start_date).slice(0, 10) + "T00:00:00Z") < new Date(Date.now() - 7 * 86_400_000));
-  const displayStatus = (
-    rental.status === "booked" &&
-    rental.start_date &&
-    new Date(String(rental.start_date).slice(0, 10) + "T00:00:00Z") < new Date()
-  ) ? "active" : rental.status;
+  // A booking stays "booked" until the vehicle is handed over; showing it as
+  // active on its start date offered "Start return" before any delivery.
+  const displayStatus = rental.status;
   const upcomingPayments = detail.upcoming_payments || rental.upcoming_payments || [];
   const vehicleEvents = detail.vehicle_events || rental.vehicle_events || [];
   const activePayments = payments.filter((payment: any) => !isVoidedPayment(payment));
@@ -373,11 +382,13 @@ export default async function BookingDetailPage({ params, searchParams }: { para
         tone: "amber" as const
       };
     }
-    if (activeRentalStatus && pendingPayment) {
+    // Only what is due by today is outstanding: a payment agreed for later
+    // (an extension due at the end of the month, say) is not owed yet.
+    if (activeRentalStatus && pendingPaymentAmount > 0) {
       return {
         label: "Outstanding balance",
         detail: "Active rental has unpaid scheduled payments.",
-        amount: pendingPaymentAmount || outstandingBalance,
+        amount: pendingPaymentAmount,
         tone: "red" as const
       };
     }
@@ -476,7 +487,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   currentRate={Number(rental.rental_rate || 0)}
                   currentStartDate={rental.start_date}
                   customerName={customer?.full_name || "Awaiting customer"}
-                  label="Adjust rental period"
+                  label="Extend / change terms"
                   rentalId={rental.id}
                   vehicleLabel={vehicleTitle(vehicle)}
                   className="pressable inline-flex min-h-9 min-w-fit items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold text-[var(--foreground-secondary)] shadow-sm"
@@ -522,7 +533,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             ) : (
               <p className="text-sm text-[#667085]">{financialState.detail}</p>
             )}
-            {outstandingBalance > 0 && customer ? (
+            {pendingPaymentAmount > 0 && customer ? (
               <div className="mt-3">
                 <PaymentReminderButton rentalId={rental.id} />
               </div>
@@ -640,7 +651,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                       vehicle_plate: vehicle?.registration_number || null,
                       rental_status: rental.status,
                       end_date: rental.end_date,
-                      outstanding_balance: outstandingBalance,
+                      outstanding_balance: pendingPaymentAmount,
                       deposit_held: Number(rental.deposit_held || 0)
                     }}
                     bookingPortalUrl={bookingPortalUrl}
@@ -820,6 +831,10 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 <Info icon={CreditCard} label="Total paid" value={money(totalPaid, rental.currency)} />
               </div>
             </Card>
+
+            {pendingAmendment ? (
+              <PendingAmendmentCard id={pendingAmendment.id} rows={amendmentRows(pendingAmendment.changes)} token={pendingAmendment.token} />
+            ) : null}
 
             <RentalDocumentsCard documents={rentalDocuments} />
 

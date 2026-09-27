@@ -1207,7 +1207,7 @@ export async function updateBooking(formData: FormData) {
   if (changedTerms.length && (await hasSignedAgreement(supabase, rental.organization_id, rental.id))) {
     // Returned, not thrown: production hides thrown server-action messages.
     return {
-      error: `The customer has signed the agreement, so these can't be changed here: ${changedTerms.join(", ")}. To change the return date, use "Adjust rental period". Other changes need a new agreement.`
+      error: `The customer has signed the agreement, so these can't be changed here: ${changedTerms.join(", ")}. To extend the rental or change the rate or deposit, use "Extend / change terms" on the booking: the customer signs a short amendment.`
     };
   }
 
@@ -2650,13 +2650,17 @@ export async function recordPaymentReceived(paymentId: string, fields: RecordPay
 
   const description = payment.metadata?.description || "Scheduled payment";
   const transactionNotes = `${description} - received via ${method}${note ? `. ${note}` : ""}`;
+  // A deposit (for example a top-up agreed in a signed amendment) is held,
+  // not earned: record it as deposit received and add it to the deposit held.
+  const isDepositPayment = payment.metadata?.type === "deposit" || payment.metadata?.is_deposit === true;
   const { error: transactionError } = await supabase.from("transactions").insert({
     organization_id: payment.organization_id,
     vehicle_id: payment.vehicle_id || null,
     rental_id: payment.rental_id,
     customer_id: payment.customer_id || null,
     rental_payment_id: payment.id,
-    type: "rental_income",
+    type: isDepositPayment ? "deposit_received" : "rental_income",
+    ...(isDepositPayment ? { is_deposit: true, deposit_rental_id: payment.rental_id } : {}),
     amount,
     currency: payment.currency || "THB",
     transaction_date: receivedDate,
@@ -2693,6 +2697,24 @@ export async function recordPaymentReceived(paymentId: string, fields: RecordPay
 
   if (updateError) {
     throw new Error(updateError.message);
+  }
+
+  if (isDepositPayment) {
+    const { data: depositRental } = await supabase
+      .from("rentals")
+      .select("deposit_held")
+      .eq("id", payment.rental_id)
+      .eq("organization_id", payment.organization_id)
+      .maybeSingle();
+    await supabase
+      .from("rentals")
+      .update({
+        deposit_held: Number(depositRental?.deposit_held || 0) + amount,
+        deposit_status: "received",
+        deposit_received_at: new Date().toISOString()
+      })
+      .eq("id", payment.rental_id)
+      .eq("organization_id", payment.organization_id);
   }
 
   const detail = `Payment received: ${description} THB ${Math.round(amount).toLocaleString()} via ${method}`;

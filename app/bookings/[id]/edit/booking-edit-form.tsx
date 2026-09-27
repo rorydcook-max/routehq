@@ -518,7 +518,8 @@ export function BookingEditForm({
               <p className="mt-2 text-sm font-bold text-[#92400e]">
                 The customer has signed the agreement. The customer, dates, billing, rate, deposit, currency, inclusions and
                 special conditions are part of it and can&apos;t be changed here. Delivery details, the deposit held and payment
-                records can still be corrected. To change the return date, use &quot;Adjust rental period&quot; on the booking.
+                records can still be corrected. To extend the rental or change the rate or deposit, use &quot;Extend / change
+                terms&quot; on the booking: the customer signs a short amendment.
               </p>
             ) : null}
           </div>

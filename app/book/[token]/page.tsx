@@ -6,6 +6,19 @@ import { getPublicBookingDetail } from "@/lib/public-booking";
 import { BusinessLogoImage } from "@/components/business-logo-image";
 import { isMapsUrl, formatDeliveryLocation } from "@/lib/delivery-location";
 import { toWallTime } from "@/lib/business-time";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+
+/** An amendment waiting for this customer's signature, if any. */
+async function pendingAmendmentFor(rentalId: string) {
+  const admin = createSupabaseAdminClient() as any;
+  const { data } = await admin
+    .from("rental_amendments")
+    .select("token, expires_at")
+    .eq("rental_id", rentalId)
+    .eq("status", "awaiting_signature")
+    .maybeSingle();
+  return data && new Date(data.expires_at).getTime() > Date.now() ? (data.token as string) : null;
+}
 
 function money(value: unknown, currency = "THB") {
   return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0));
@@ -229,10 +242,23 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   const logoUrl = organization?.logo_display_url || null;
   const ownerContact = organization?.settings?.phone || organization?.settings?.business_phone || organization?.owner_phone || null;
   const executedDownloads = detail.executedAgreementDownloads || null;
+  const pendingAmendmentToken = rental?.id ? await pendingAmendmentFor(String(rental.id)) : null;
 
   return (
     <main className="min-h-screen bg-[#eef7f5] px-4 py-5 text-[#10252b]">
       <div className="mx-auto max-w-3xl space-y-5">
+        {pendingAmendmentToken ? (
+          <a
+            className="pressable flex items-center justify-between gap-3 rounded-2xl border border-[#99f6e4] bg-[#ecfeff] p-4 shadow-sm"
+            href={`/amend/${pendingAmendmentToken}`}
+          >
+            <span>
+              <span className="block text-sm font-black text-[#0f766e]">A change to your rental needs your signature</span>
+              <span className="block text-xs text-[#475467]">Review the new dates or price and sign in one step.</span>
+            </span>
+            <span className="shrink-0 rounded-xl bg-[#0f766e] px-4 py-2 text-sm font-black text-white">Review</span>
+          </a>
+        ) : null}
         <header className="rounded-2xl border border-[#d6e5e2] bg-white p-5 shadow-sm">
           <div className="flex items-center gap-3">
             <BusinessLogoImage

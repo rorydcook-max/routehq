@@ -14,6 +14,7 @@ export async function middleware(request: NextRequest) {
     pathname === "/reset-password" ||
     pathname === "/book" ||
     pathname.startsWith("/book/") ||
+    pathname.startsWith("/amend/") ||
     pathname.startsWith("/auth/callback") ||
     pathname === "/api/line/webhook" ||
     // Scheduled jobs have no user session; they check CRON_SECRET themselves.

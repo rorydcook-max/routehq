@@ -4,6 +4,7 @@ import { Card, SectionHeader } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { onlineSigningGaps } from "@/lib/online-signing-readiness";
 import { BookingForm } from "./booking-form";
 
 type SearchParams = {
@@ -51,12 +52,14 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
       .eq("organization_id", organization.id)
       .is("deleted_at", null)
       .order("created_at", { ascending: false }),
-    supabase.from("organizations").select("settings").eq("id", organization.id).maybeSingle()
+    supabase.from("organizations").select("*").eq("id", organization.id).maybeSingle()
   ]);
 
   if (vehiclesError || customersError) {
     throw new Error(vehiclesError?.message || customersError?.message || "Unable to load booking data.");
   }
+
+  const signingGaps = organizationDetails ? onlineSigningGaps(organizationDetails) : [];
 
   const normalizedVehicles = (vehicles || []).map((vehicle: any) => ({
     ...vehicle,
@@ -78,6 +81,20 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
             <p className="page-subtitle mt-2">Select the vehicle, customer, dates, delivery details, then generate a customer booking link.</p>
           </div>
         </div>
+
+        {signingGaps.length ? (
+          <div className="mb-4 rounded-xl border border-[#fbbf24] bg-[#fffbeb] p-4 text-sm text-[#92400e]" role="alert">
+            <p className="font-black">Customers can&apos;t sign online yet</p>
+            <p className="mt-1 leading-6">
+              Your business signs each agreement automatically when a customer completes their booking link. Before that can
+              happen, add {signingGaps.join(", ")} in Settings. You can still create bookings; customers will be stopped at the
+              signing step until this is done.
+            </p>
+            <Link className="mt-2 inline-flex font-black text-[#0f766e] underline" href="/settings">
+              Go to Settings
+            </Link>
+          </div>
+        ) : null}
 
         {normalizedVehicles.length === 0 ? (
           <Card>

@@ -92,32 +92,50 @@ export function SignatureUploadSection({
     </div>
   );
 
+  // The signature is recorded as the saved signatory's, so their name and
+  // title must be saved first.
+  const signatoryReady = Boolean(authorisedSignatoryName?.trim() && authorisedSignatoryTitle?.trim());
+
   const content = (
     <>
       <div className="flex items-center gap-3">
         {preview}
-        <div>
-          <p className="text-[13px] font-bold text-[#172026]">Operator signature</p>
-          <p className="mt-0.5 text-[11px] leading-4 text-[#667085]">Auto-applied to all contracts. PNG, JPG, SVG or WebP, max 2MB.</p>
+        <div className="min-w-0">
+          <p className="text-[13px] font-bold text-[#172026]">Authorised signature</p>
+          <p className="mt-0.5 text-[11px] leading-4 text-[#667085]">
+            Applied automatically to each agreement when a customer signs online. PNG, JPG or WebP, max 2 MB.
+          </p>
         </div>
       </div>
-      <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
+      {signatoryReady ? (
+        <p className="text-[11px] leading-4 text-[#344054]">
+          Signing as <strong>{authorisedSignatoryName}</strong>, {authorisedSignatoryTitle}.
+        </p>
+      ) : (
+        <p className="rounded-lg border border-[#fbbf24] bg-[#fffbeb] p-2 text-[11px] font-bold leading-4 text-[#92400e]">
+          First save the authorised signatory&apos;s full name and job title above. The signature is recorded as theirs.
+        </p>
+      )}
+      <label className="flex w-full items-start gap-2 rounded-lg border border-[#d6e5e2] bg-white p-2 text-[11px] leading-4 text-[#344054]">
+        <input className="mt-0.5 shrink-0" disabled={!signatoryReady} ref={acknowledgementRef} type="checkbox" />
+        <span>{SIGNATURE_AUTHORISATION_TEXT}</span>
+      </label>
+      <div className="flex flex-wrap items-center gap-2">
+        <input accept="image/png,image/jpeg,image/webp" className={fileInputClass} data-keep-original disabled={!signatoryReady} ref={fileRef} type="file" />
+        <button
+          className="primary-action"
+          disabled={isPending || !signatoryReady}
+          onClick={signatureUrl ? handleReplace : undefined}
+          type={signatureUrl ? "button" : "submit"}
+        >
+          {isPending ? "Uploading..." : signatureUrl ? "Replace signature" : "Upload signature"}
+        </button>
         {signatureUrl ? (
-          <button className="secondary-action w-full sm:w-auto" disabled={isPending} onClick={handleRemove} type="button">
+          <button className="secondary-action" disabled={isPending} onClick={handleRemove} type="button">
             {isPending ? "Removing..." : "Remove"}
           </button>
         ) : null}
-        <input accept="image/png,image/jpeg,image/webp" className={fileInputClass} ref={fileRef} data-keep-original type="file" />
-        <button className="primary-action w-full sm:w-auto" disabled={isPending} onClick={signatureUrl ? handleReplace : undefined} type={signatureUrl ? "button" : "submit"}>
-          {isPending ? "Uploading..." : signatureUrl ? "Replace" : "Upload signature"}
-        </button>
       </div>
-      <label className="flex w-full items-start gap-2 rounded-lg border border-[#d6e5e2] bg-white p-2 text-[11px] leading-4 text-[#344054]">
-        <input className="mt-0.5" ref={acknowledgementRef} type="checkbox" />
-        <span>
-          {SIGNATURE_AUTHORISATION_TEXT}
-        </span>
-      </label>
       {message ? (
         <p className={`w-full text-xs ${message.type === "error" ? "text-[#dc2626]" : "text-[#16a34a]"}`}>{message.text}</p>
       ) : null}
@@ -125,11 +143,11 @@ export function SignatureUploadSection({
   );
 
   if (signatureUrl) {
-    return <div className="flex flex-col gap-3 rounded-lg border border-[#dfe4ea] bg-[#fbfefd] p-3 sm:flex-row sm:items-center sm:justify-between">{content}</div>;
+    return <div className="flex flex-col gap-3 rounded-lg border border-[#dfe4ea] bg-[#fbfefd] p-3">{content}</div>;
   }
 
   return (
-    <form className="flex flex-col gap-3 rounded-lg border border-[#dfe4ea] bg-[#fbfefd] p-3 sm:flex-row sm:items-center sm:justify-between" onSubmit={handleUpload}>
+    <form className="flex flex-col gap-3 rounded-lg border border-[#dfe4ea] bg-[#fbfefd] p-3" onSubmit={handleUpload}>
       {content}
     </form>
   );

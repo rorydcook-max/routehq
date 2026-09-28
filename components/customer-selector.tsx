@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState, useTransition } from "react";
 import { Plus, Search, UserRound, X } from "lucide-react";
 import { createInlineCustomer } from "@/app/actions/customers";
-import { commonCountries, countryCodes, flagForNationality } from "@/lib/customer-options";
+import { commonCountries, flagForNationality, phoneCodeOptions } from "@/lib/customer-options";
 
 type SelectorCustomer = {
   id: string;
@@ -142,11 +142,11 @@ export function CustomerSelector({
                 <form ref={formRef} className="mt-3 space-y-3 rounded-lg border border-[#d6e5e2] bg-[#fbfefd] p-3">
                   <input name="organizationId" type="hidden" value={organizationId} />
                   <input className={inputClass} name="fullName" placeholder="Full name" required />
-                  <div className="grid grid-cols-[105px_1fr] gap-2">
-                    <select className={inputClass} defaultValue="+66" name="phoneCountryCode">
-                      {countryCodes.map((code) => (
-                        <option key={`selector-${code}`} value={code}>
-                          {code}
+                  <div className="grid grid-cols-[124px_1fr] gap-2">
+                    <select aria-label="Country code" className={inputClass} defaultValue="+66" name="phoneCountryCode">
+                      {phoneCodeOptions.map((option) => (
+                        <option key={`selector-${option.code}`} value={option.code}>
+                          {option.label}
                         </option>
                       ))}
                     </select>

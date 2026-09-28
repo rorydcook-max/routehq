@@ -4,7 +4,7 @@ import { AppShell } from "@/components/app-shell";
 import { PendingButton } from "@/components/pending-button";
 import { Card, SectionHeader } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
-import { commonCountries, countryCodes, customerLanguages } from "@/lib/customer-options";
+import { commonCountries, customerLanguages, phoneCodeOptions } from "@/lib/customer-options";
 import { getDefaultOrganization } from "@/lib/organization";
 
 const inputClass =
@@ -42,11 +42,11 @@ function PhoneFields({
   required?: boolean;
 }) {
   return (
-    <div className="grid grid-cols-[120px_1fr] gap-2">
-      <select className={inputClass} defaultValue="+66" name={codeName}>
-        {countryCodes.map((code) => (
-          <option key={`${codeName}-${code}`} value={code}>
-            {code}
+    <div className="grid grid-cols-[132px_1fr] gap-2">
+      <select aria-label="Country code" className={inputClass} defaultValue="+66" name={codeName}>
+        {phoneCodeOptions.map((option) => (
+          <option key={`${codeName}-${option.code}`} value={option.code}>
+            {option.label}
           </option>
         ))}
       </select>
@@ -191,7 +191,8 @@ export default async function NewCustomerPage() {
             </div>
 
             <div className="form-section bg-[var(--success-light)]">
-              <SectionHeader eyebrow="Document uploads" title="Required files" />
+              <SectionHeader eyebrow="Document uploads" title="Passport, licence and photo (optional)" />
+              <p className="mt-2 text-sm text-[var(--muted)]">You can skip these: customers upload them on their booking link.</p>
               <div className="mt-4 grid gap-4">
                 <label className="block">
                   <span className="text-sm font-semibold text-[#344054]">Passport upload</span>
@@ -202,7 +203,7 @@ export default async function NewCustomerPage() {
                   <input accept="image/*,application/pdf" className={inputClass} name="driverLicenseFile" type="file" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Customer selfie/photo upload</span>
+                  <span className="text-sm font-semibold text-[#344054]">Customer photo</span>
                   <input accept="image/*" className={inputClass} name="selfieFile" type="file" />
                 </label>
               </div>

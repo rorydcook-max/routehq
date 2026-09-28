@@ -73,7 +73,11 @@ function amountInput(value: unknown) {
 function paymentDescription(payment: RentalPayment) {
   const metadata = payment.metadata || {};
   const isExtension = metadata.type === "extension" || metadata.adjustment_type === "extension";
-  return metadata.description || (isExtension ? `Extension ${metadata.previous_end_date || ""} to ${metadata.new_end_date || ""}` : "Scheduled payment");
+  return metadata.description || (isExtension ? `Extension ${metadata.previous_end_date || ""} to ${metadata.new_end_date || ""}` : metadata.type === "deposit" || metadata.is_deposit === true
+      ? "Deposit"
+      : metadata.period_label
+        ? `${metadata.period_label} rent`
+        : "Rent payment");
 }
 
 function isPaymentVoided(payment: RentalPayment) {

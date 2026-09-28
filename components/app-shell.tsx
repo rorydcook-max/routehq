@@ -95,6 +95,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
   const mobileBarItems = mobileBarKeys.map((key) => allNavItems.find((item) => item.key === key)).filter(Boolean) as NavItem[];
   const moreItems = allNavItems.filter((item) => !mobileBarKeys.includes(item.key));
 
+  const onFocusedFlow = !!pathname && (pathname.startsWith("/inspections") || /\/(new|edit|import)(\/|$)/.test(pathname));
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
   const moreActive = moreItems.some((item) => isActive(item.href));
 
@@ -294,13 +295,14 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
         </div>
       ) : null}
 
-      <button
+      {/* The quick-add button stays out of handovers and create/edit forms, where it only covers fields. */}
+      {onFocusedFlow ? null : <button
         aria-label={t("openFastActions")}
         className="fixed bottom-20 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--primary)] text-white shadow-[0_8px_20px_rgba(15,118,110,0.28)] transition hover:bg-[var(--primary-hover)] lg:bottom-6 lg:right-6"
         onClick={() => setFastActionOpen(true)}
       >
         <Plus size={26} />
-      </button>
+      </button>}
 
       <FastActionSheet open={fastActionOpen} onClose={() => setFastActionOpen(false)} />
     </div>

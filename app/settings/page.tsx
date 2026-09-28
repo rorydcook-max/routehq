@@ -591,11 +591,11 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         <Card>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <SectionHeader eyebrow="Notifications" title="LINE alerts and daily summary" />
-              <p className="mt-2 text-xs text-[var(--muted)]">Configure your LINE connection, daily morning summary, and event-triggered alerts.</p>
+              <SectionHeader eyebrow="Notifications" title="Which alerts you get" />
+              <p className="mt-2 text-xs text-[var(--muted)]">Pick the events that send you a LINE message: new bookings, payments, returns and more.</p>
             </div>
             <Link className="primary-action pressable" href="/settings/notifications">
-              Open notifications
+              Choose alerts
             </Link>
           </div>
         </Card>

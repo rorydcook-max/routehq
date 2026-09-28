@@ -183,7 +183,8 @@
     "deductionsExceedDeposit": "कटौतियाँ उपलब्ध जमा राशि से अधिक हैं। केवल {amount} इस जमा राशि से समायोजित की जा सकती है।",
     "uploadingPhotos": "तस्वीरें अपलोड हो रही हैं {done} में से {total}...",
     "uploadFailed": "तस्वीरें अपलोड नहीं हो सकीं। कनेक्शन जांचें और फिर से प्रयास करें।",
-    "changeDamagePhoto": "फोटो बदलें"
+    "changeDamagePhoto": "फोटो बदलें",
+    "backToBooking": "बुकिंग पर वापस जाएं"
   },
   "translation": {
     "translatedFrom": "{language} से अनुवादित",

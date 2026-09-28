@@ -156,7 +156,8 @@
     "deductionsExceedDeposit": "ကောက်ခံငွေသည် ရရှိနိုင်သောငွေမလုံလောက်ပါ။ ဤငွေမှ {amount} သာဖြည့်ဆည်းနိုင်ပါသည်။",
     "uploadingPhotos": "ဓာတ်ပုံများ {done} ခု {total} ခုတင်နေသည်...",
     "uploadFailed": "ဓာတ်ပုံများကို တင်၍မရပါ။ ချိတ်ဆက်မှုကို စစ်ဆေးပြီး ထပ်မံကြိုးစားပါ။",
-    "changeDamagePhoto": "ဓာတ်ပုံပြောင်းရန်"
+    "changeDamagePhoto": "ဓာတ်ပုံပြောင်းရန်",
+    "backToBooking": "Booking သို့ပြန်သွားရန်"
   },
   "dashboard": {
     "title": "လုပ်ငန်းစီမံခန့်ခွဲမှုဗဟို",

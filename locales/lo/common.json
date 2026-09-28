@@ -183,7 +183,8 @@
     "deductionsExceedDeposit": "ການຫັກລົດເກີນຈຳນວນເງິນມັດຈຳທີ່ມີ. ເຮັດໄດ້ພຽງ {amount} ຈາກເງິນມັດຈຳນີ້.",
     "uploadingPhotos": "ກຳລັງອັບໂຫລດຮູບ {done} ຈາກ {total}...",
     "uploadFailed": "ບໍ່ສາມາດອັບໂຫລດຮູບໄດ້. ກວດສອບການເຊື່ອມຕໍ່ແລະລອງອີກຄັ້ງ.",
-    "changeDamagePhoto": "ປ່ຽນຮູບ"
+    "changeDamagePhoto": "ປ່ຽນຮູບ",
+    "backToBooking": "ກັບໄປຫາການຈອງ"
   },
   "translation": {
     "translatedFrom": "ແປຈາກ {language}",

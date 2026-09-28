@@ -183,7 +183,8 @@
     "deductionsExceedDeposit": "Potongan melebihi deposit yang tersedia. Hanya {amount} yang dapat direkonsiliasi dari deposit ini.",
     "uploadingPhotos": "Mengunggah foto {done} dari {total}...",
     "uploadFailed": "Foto tidak dapat diunggah. Periksa koneksi dan coba lagi.",
-    "changeDamagePhoto": "Ubah foto"
+    "changeDamagePhoto": "Ubah foto",
+    "backToBooking": "Kembali ke pemesanan"
   },
   "translation": {
     "translatedFrom": "Diterjemahkan dari {language}",

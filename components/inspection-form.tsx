@@ -1112,9 +1112,9 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
 
       {nav()}
 
-      <Link className="inline-flex items-center gap-2 text-sm font-bold text-[var(--primary)]" href={`/fleet/${context.vehicle.id}` as Route}>
+      <Link className="inline-flex items-center gap-2 text-sm font-bold text-[var(--primary)]" href={(context.rental?.id ? `/bookings/${context.rental.id}` : `/fleet/${context.vehicle.id}`) as Route}>
         <ChevronLeft size={16} />
-        {t("backToVehicle")}
+        {context.rental?.id ? t("backToBooking") : t("backToVehicle")}
       </Link>
     </form>
   );

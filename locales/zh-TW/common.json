@@ -183,7 +183,8 @@
     "deductionsExceedDeposit": "扣款超過可用的押金。只能從此押金中扣除 {amount}。",
     "uploadingPhotos": "正在上傳照片 {done} / {total}...",
     "uploadFailed": "照片無法上傳。請檢查連線並重試。",
-    "changeDamagePhoto": "更換照片"
+    "changeDamagePhoto": "更換照片",
+    "backToBooking": "返回預訂"
   },
   "translation": {
     "translatedFrom": "翻譯自 {language}",

@@ -183,7 +183,8 @@
     "deductionsExceedDeposit": "控除額が利用可能な預り金を超えています。この預り金からは{amount}のみを充当できます。",
     "uploadingPhotos": "写真をアップロード中 {done}/{total}...",
     "uploadFailed": "写真をアップロードできませんでした。接続を確認して再試行してください。",
-    "changeDamagePhoto": "写真を変更"
+    "changeDamagePhoto": "写真を変更",
+    "backToBooking": "予約に戻る"
   },
   "translation": {
     "translatedFrom": "{language}から翻訳",

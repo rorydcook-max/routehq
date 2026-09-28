@@ -183,7 +183,8 @@
     "deductionsExceedDeposit": "Fradrag overstiger tilgjengelig depositum. Bare {amount} kan avregnes fra dette depositumet.",
     "uploadingPhotos": "Laster opp bilder {done} av {total}...",
     "uploadFailed": "Bildene kunne ikke lastes opp. Sjekk tilkoblingen og prøv igjen.",
-    "changeDamagePhoto": "Endre bilde"
+    "changeDamagePhoto": "Endre bilde",
+    "backToBooking": "Tilbake til bestilling"
   },
   "translation": {
     "translatedFrom": "Oversatt fra {language}",

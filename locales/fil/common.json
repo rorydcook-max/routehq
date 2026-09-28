@@ -183,7 +183,8 @@
     "deductionsExceedDeposit": "Ang mga bawas ay lumampas sa magagamit na deposito. Tanging {amount} lamang ang maaaring maayos mula sa deposito na ito.",
     "uploadingPhotos": "Nag-a-upload ng mga larawan {done} sa {total}...",
     "uploadFailed": "Hindi ma-upload ang mga larawan. Suriin ang koneksyon at subukang muli.",
-    "changeDamagePhoto": "Palitan ang larawan"
+    "changeDamagePhoto": "Palitan ang larawan",
+    "backToBooking": "Bumalik sa booking"
   },
   "translation": {
     "translatedFrom": "Isinalin mula sa {language}",

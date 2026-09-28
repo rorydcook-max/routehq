@@ -116,6 +116,7 @@
     "notesPlaceholder": "Condition notes, reason for report, follow-up actions",
     "shareWithCustomer": "Share with customer",
     "backToVehicle": "Back to vehicle",
+    "backToBooking": "Back to booking",
     "steps": {
       "Confirm": "Confirm",
       "Odometer": "Odometer",

@@ -183,7 +183,8 @@
     "deductionsExceedDeposit": "கழிவுகள் கிடைக்கக்கூடிய நிதி {amount} ஐ மட்டுமே சமநிலைப்படுத்த முடியும்.",
     "uploadingPhotos": "புகைப்படங்களை பதிவேற்றுகிறது {done} இல் {total}...",
     "uploadFailed": "புகைப்படங்களை பதிவேற்ற முடியவில்லை. இணைப்பை சரிபார்த்து மீண்டும் முயற்சிக்கவும்.",
-    "changeDamagePhoto": "புகைப்படத்தை மாற்றவும்"
+    "changeDamagePhoto": "புகைப்படத்தை மாற்றவும்",
+    "backToBooking": "மீண்டும் முன்பதிவு செய்ய"
   },
   "translation": {
     "translatedFrom": "{language} மொழியில் இருந்து மொழிபெயர்க்கப்பட்டது",

@@ -131,13 +131,25 @@ function daysRemaining(value: string | null | undefined, status?: string | null,
     const untilStart = daysFromToday(startDate);
     if (untilStart > 0) return untilStart === 1 ? "Starts tomorrow" : `Starts in ${untilStart} days`;
     if (untilStart === 0) return "Starts today";
+    return `Handover overdue by ${-untilStart} day${untilStart === -1 ? "" : "s"}`;
   }
   if (!value) return "Open-ended";
   const days = daysFromToday(value);
   if (days === 0) return "Due back today";
-  if (days < 0) return `${Math.abs(days)} day${days === -1 ? "" : "s"} overdue`;
-  return `${days} day${days === 1 ? "" : "s"} remaining`;
+  if (days < 0) return `Return ${Math.abs(days)} day${days === -1 ? "" : "s"} late`;
+  return `Due back in ${days} day${days === 1 ? "" : "s"}`;
 }
+
+const RENTAL_STATUS_LABELS: Record<string, string> = {
+  booked: "Booked",
+  active: "On rent",
+  due_soon: "Due back soon",
+  overdue: "Late return",
+  extended: "Extended",
+  completed: "Completed",
+  cancelled: "Cancelled",
+  draft: "Draft"
+};
 
 function statusTone(status: string): "green" | "amber" | "red" | "blue" | "neutral" {
   if (status === "completed") return "green";
@@ -442,7 +454,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
           <div className="card-section flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <Badge tone={statusTone(displayStatus)}>{String(displayStatus).replace(/_/g, " ")}</Badge>
+                <Badge tone={statusTone(displayStatus)}>{RENTAL_STATUS_LABELS[String(displayStatus)] || String(displayStatus).replace(/_/g, " ")}</Badge>
                 {bookingLinkBadge(bookingLink?.status) ? (
                   <Badge tone={bookingLinkBadge(bookingLink?.status)!.tone}>{bookingLinkBadge(bookingLink?.status)!.label}</Badge>
                 ) : null}
@@ -526,7 +538,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             <p className="text-sm text-[#667085]">{daysRemaining(rental.end_date, rental.status, rental.start_date)}</p>
           </BookingMetricCard>
           <BookingMetricCard icon={<CreditCard size={18} />} label="Billing">
-            <p className="font-mono-data text-sm font-black leading-5 text-[#10252b]">{money(rental.rental_rate, rental.currency)} / {rental.pricing_model}</p>
+            <p className="font-mono-data text-sm font-black leading-5 text-[#10252b]">{money(rental.rental_rate, rental.currency)} / {({ daily: "day", weekly: "week", monthly: "month" } as Record<string, string>)[String(rental.pricing_model)] || "period"}</p>
             <p className={`text-sm font-black ${financialStateClass}`}>{financialState.label}</p>
             {financialState.amount !== null ? (
               <p className={`font-mono-data text-sm ${financialStateClass}`}>{money(financialState.amount, rental.currency)}</p>

@@ -8,6 +8,8 @@ export type InspectionContext = {
   organizationId: string;
   rental: any | null;
   unpaidPayments: any[];
+  /** True when the booking has any rent/deposit rows at all. */
+  hasPaymentSchedule?: boolean;
   vehicle: any;
   customer: any | null;
   gpsDevice: any | null;
@@ -69,7 +71,7 @@ export async function getInspectionContextByRental(
     notFound();
   }
 
-  const [gpsResult, locationResult, deliveryResult, unpaidPaymentsResult] = await Promise.all([
+  const [gpsResult, locationResult, deliveryResult, unpaidPaymentsResult, scheduleCountResult] = await Promise.all([
     supabase
       .from("gps_devices")
       .select("*")
@@ -98,14 +100,20 @@ export async function getInspectionContextByRental(
       .maybeSingle(),
     supabase
       .from("rental_payments")
-      .select("id, amount, due_date, status")
+      .select("id, amount, due_date, status, metadata")
       .eq("organization_id", organizationId)
       .eq("rental_id", rentalId)
       .is("deleted_at", null)
       .in("status", ["scheduled", "pending", "failed", "overdue"])
       // Only rent already due counts against the deposit; later months are not owed on return.
       .lte("due_date", new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date()))
-      .order("due_date", { ascending: true })
+      .order("due_date", { ascending: true }),
+    supabase
+      .from("rental_payments")
+      .select("id", { count: "exact", head: true })
+      .eq("organization_id", organizationId)
+      .eq("rental_id", rentalId)
+      .is("deleted_at", null)
   ]);
 
   const queryError = [gpsResult, locationResult, deliveryResult, unpaidPaymentsResult].find((result) => result.error && result.error.code !== "PGRST116")?.error;
@@ -118,6 +126,7 @@ export async function getInspectionContextByRental(
     organizationId,
     rental,
     unpaidPayments: Array.isArray(unpaidPaymentsResult.data) ? unpaidPaymentsResult.data : unpaidPaymentsResult.data ? [unpaidPaymentsResult.data] : [],
+    hasPaymentSchedule: Number(scheduleCountResult.count || 0) > 0,
     vehicle: rental.vehicles,
     customer: rental.customers || null,
     gpsDevice: gpsResult.data || null,

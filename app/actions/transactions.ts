@@ -248,7 +248,7 @@ export async function recordDeliveryCashPaymentAndReceipt(formData: FormData) {
 
   const { data: existingPayments, error: existingPaymentsError } = await supabase
     .from("rental_payments")
-    .select("id, amount, status, metadata")
+    .select("id, amount, status, due_date, metadata")
     .eq("organization_id", organizationId)
     .eq("rental_id", rentalId)
     .is("deleted_at", null);
@@ -258,61 +258,90 @@ export async function recordDeliveryCashPaymentAndReceipt(formData: FormData) {
   }
 
   const paymentRows = Array.isArray(existingPayments) ? existingPayments : [];
-  async function upsertPaidPayment(kind: "rent" | "deposit", paymentAmount: number, description: string) {
-    if (paymentAmount <= 0) return null;
-    const existing = paymentRows.find((payment: any) => String(payment.metadata?.type || "").toLowerCase() === kind && !["paid", "voided"].includes(String(payment.status || "")));
-    const paymentPayload = {
-      amount: paymentAmount,
-      status: "paid",
-      paid_at: now,
-      paid_date: today,
-      payment_method: paymentMethod,
-      currency: rental.currency || "THB",
-      metadata: {
-        ...(existing?.metadata || {}),
-        type: kind,
-        description,
-        payment_trigger: "delivery_inspection",
-        source: "delivery_inspection"
-      }
-    };
 
-    if (existing?.id) {
-      const { data: updatedPayment, error: updatePaymentError } = await supabase
+  /**
+   * Pays unpaid rows of one kind oldest-first. A row covered in full is marked
+   * paid; a part payment is recorded against the row and the rest stays owed as
+   * a new pending row. Anything left after every row is paid is kept as its own
+   * paid row, so the schedule never loses money. Returns the first row touched.
+   */
+  async function allocatePayment(kind: "rent" | "deposit", paymentAmount: number, description: string) {
+    if (paymentAmount <= 0) return null;
+    const isKind = (payment: any) => {
+      const type = String(payment.metadata?.type || "").toLowerCase();
+      return kind === "deposit" ? type === "deposit" || payment.metadata?.is_deposit === true : type !== "deposit" && payment.metadata?.is_deposit !== true;
+    };
+    const open = paymentRows
+      .filter((payment: any) => isKind(payment) && !["paid", "voided", "refunded", "cancelled"].includes(String(payment.status || "")))
+      .sort((a: any, b: any) => String(a.due_date || "").localeCompare(String(b.due_date || "")));
+
+    let remaining = Math.round(paymentAmount * 100) / 100;
+    let firstId: string | null = null;
+    const paidFields = { status: "paid", paid_at: now, paid_date: today, payment_method: paymentMethod, currency: rental.currency || "THB" };
+
+    for (const row of open) {
+      if (remaining <= 0) break;
+      const rowAmount = Number(row.amount || 0);
+      if (rowAmount <= 0) continue;
+      const applied = Math.min(remaining, rowAmount);
+      const { error: updateError } = await supabase
         .from("rental_payments")
-        .update(paymentPayload)
-        .eq("id", existing.id)
-        .eq("organization_id", organizationId)
+        .update({
+          ...paidFields,
+          amount: applied,
+          metadata: { ...(row.metadata || {}), payment_trigger: "delivery_inspection", source: "delivery_inspection", ...(applied < rowAmount ? { scheduled_amount: rowAmount } : {}) }
+        })
+        .eq("id", row.id)
+        .eq("organization_id", organizationId);
+      if (updateError) throw new Error(updateError.message);
+      firstId = firstId || row.id;
+
+      if (applied < rowAmount) {
+        const label = row.metadata?.period_label ? `${row.metadata.period_label} rent` : kind === "deposit" ? "deposit" : "rent";
+        const { error: remainderError } = await supabase.from("rental_payments").insert({
+          organization_id: organizationId,
+          rental_id: rentalId,
+          customer_id: customerId || rental.customer_id,
+          vehicle_id: vehicleId,
+          amount: Math.round((rowAmount - applied) * 100) / 100,
+          currency: rental.currency || "THB",
+          status: "pending",
+          due_date: row.due_date || today,
+          scheduled_date: row.due_date || today,
+          metadata: { ...(row.metadata || {}), description: `Remaining balance - ${label}`, remainder_of: row.id }
+        });
+        if (remainderError) throw new Error(remainderError.message);
+      }
+      remaining = Math.round((remaining - applied) * 100) / 100;
+    }
+
+    if (remaining > 0) {
+      const { data: insertedPayment, error: insertPaymentError } = await supabase
+        .from("rental_payments")
+        .insert({
+          organization_id: organizationId,
+          rental_id: rentalId,
+          customer_id: customerId || rental.customer_id,
+          vehicle_id: vehicleId,
+          due_date: today,
+          scheduled_date: today,
+          amount: remaining,
+          ...paidFields,
+          metadata: { type: kind, is_deposit: kind === "deposit", description, payment_trigger: "delivery_inspection", source: "delivery_inspection" }
+        })
         .select("id")
         .single();
-      if (updatePaymentError || !updatedPayment) {
-        throw new Error(updatePaymentError?.message || "Unable to update payment record.");
+      if (insertPaymentError || !insertedPayment) {
+        throw new Error(insertPaymentError?.message || "Unable to create payment record.");
       }
-      return updatedPayment.id as string;
+      firstId = firstId || (insertedPayment.id as string);
     }
 
-    const { data: insertedPayment, error: insertPaymentError } = await supabase
-      .from("rental_payments")
-      .insert({
-        organization_id: organizationId,
-        rental_id: rentalId,
-        customer_id: customerId || rental.customer_id,
-        vehicle_id: vehicleId,
-        due_date: today,
-        scheduled_date: today,
-        ...paymentPayload
-      })
-      .select("id")
-      .single();
-
-    if (insertPaymentError || !insertedPayment) {
-      throw new Error(insertPaymentError?.message || "Unable to create payment record.");
-    }
-    return insertedPayment.id as string;
+    return firstId;
   }
 
-  const rentPaymentId = await upsertPaidPayment("rent", rentalPaymentAmount, "Rental payment received during delivery inspection");
-  const depositPaymentId = await upsertPaidPayment("deposit", depositAmount, "Security deposit received during delivery inspection");
+  const rentPaymentId = await allocatePayment("rent", rentalPaymentAmount, "Rental payment received during delivery inspection");
+  const depositPaymentId = await allocatePayment("deposit", depositAmount, "Security deposit received during delivery inspection");
 
   async function insertPaymentTransaction(type: "rental_income" | "deposit_received", transactionAmount: number, rentalPaymentId: string | null) {
     if (transactionAmount <= 0) return null;
@@ -365,7 +394,8 @@ export async function recordDeliveryCashPaymentAndReceipt(formData: FormData) {
     payment_due_after_delivery: false
   };
   if (depositAmount > 0) {
-    rentalUpdate.deposit_held = depositAmount;
+    // Added to anything already held (a deposit can arrive in parts).
+    rentalUpdate.deposit_held = Number(rental.deposit_held || 0) + depositAmount;
     rentalUpdate.deposit_status = "received";
     rentalUpdate.deposit_received_at = rental.deposit_received_at || now;
   }

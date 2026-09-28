@@ -1,5 +1,7 @@
 "use client";
 
+import { VehicleKindIcon } from "@/components/vehicle-kind-icon";
+import { kindFromCategory } from "@/lib/vehicle-groups";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
@@ -7,7 +9,6 @@ import type { Route } from "next";
 import {
   AlertTriangle,
   Camera,
-  Car,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
@@ -399,7 +400,16 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
   const [uploadProgress, setUploadProgress] = useState("");
   const [uploadError, setUploadError] = useState("");
   const [isReceiptPending, startReceiptTransition] = useTransition();
-  const [deliveryPaymentAmount, setDeliveryPaymentAmount] = useState(() => String(Number(context.rental?.rental_rate || 0) || ""));
+  // Pre-fill with rent that is due now and still unpaid; the full monthly rate
+  // is only a fallback when the booking has no payment schedule at all.
+  const [deliveryPaymentAmount, setDeliveryPaymentAmount] = useState(() => {
+    const unpaid = (context.unpaidPayments || []).filter((payment: any) => payment.metadata?.type !== "deposit" && payment.metadata?.is_deposit !== true);
+    if (context.hasPaymentSchedule) {
+      const due = unpaid.reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
+      return due > 0 ? String(due) : "";
+    }
+    return String(Number(context.rental?.rental_rate || 0) || "");
+  });
   const [deliveryDepositAmount, setDeliveryDepositAmount] = useState(() => {
     const expectedDeposit = Number(context.rental?.deposit_payment_amount || context.rental?.deposit_amount || 0);
     const heldDeposit = Number(context.rental?.deposit_held || 0);
@@ -693,7 +703,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
           <div className="rounded-xl border border-[var(--border)] bg-white p-4">
             <div className="flex items-start gap-4">
               <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
-                <Car size={30} />
+                <VehicleKindIcon boxed={false} kind={kindFromCategory(context.vehicle.vehicle_categories)} size={30} />
               </span>
               <div>
                 <p className="text-2xl font-semibold text-[var(--foreground)]">{titleFor(context)}</p>

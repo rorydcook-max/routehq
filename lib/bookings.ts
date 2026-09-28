@@ -1,5 +1,6 @@
 import { businessToday } from "@/lib/business-time";
 import { QUIET_ACTIVITY_EVENT_FILTER } from "@/lib/activity-noise";
+import { amountDueNowByRental } from "@/lib/rental-balances";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { buildUpcomingPayments, buildVehicleEvents } from "@/lib/rental-upcoming";
 
@@ -174,13 +175,8 @@ export async function getBookingList(organizationId: string) {
     paidByRental.set(transaction.rental_id, current + Math.abs(Number(transaction.amount || 0)));
   }
 
-  const balanceByRental = new Map<string, number>();
-  for (const payment of paymentsResult.data || []) {
-    if (payment.voided || payment.metadata?.voided || payment.metadata?.is_deposit) continue;
-    if (!["pending", "overdue"].includes(payment.status)) continue;
-    const current = balanceByRental.get(payment.rental_id) || 0;
-    balanceByRental.set(payment.rental_id, current + Number(payment.amount || 0));
-  }
+  // What each booking owes now (due today or earlier), the same figure as the dashboard.
+  const balanceByRental = await amountDueNowByRental(supabase, (rentals || []).map((rental: any) => rental.id));
 
   const photosByVehicle = new Map<string, any[]>();
   for (const document of vehiclePhotosResult.data || []) {

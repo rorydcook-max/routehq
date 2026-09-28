@@ -87,17 +87,45 @@ function canExtend(booking: any) {
   return ["active", "overdue", "due_soon"].includes(String(booking.status || "").toLowerCase());
 }
 
-function rentalTimingLabel(booking: any) {
-  if (!booking.end_date || ["completed", "cancelled"].includes(String(booking.status || "").toLowerCase())) return null;
+function daysFromToday(iso: string) {
   const today = new Date();
-  const end = new Date(booking.end_date);
+  const target = new Date(iso);
   today.setHours(0, 0, 0, 0);
-  end.setHours(0, 0, 0, 0);
-  const days = Math.ceil((end.getTime() - today.getTime()) / 86_400_000);
-  if (days < 0) return `${Math.abs(days)} days overdue`;
-  if (days === 0) return "Due today";
-  return `${days} days remaining`;
+  target.setHours(0, 0, 0, 0);
+  return Math.round((target.getTime() - today.getTime()) / 86_400_000);
 }
+
+const plural = (count: number, word: string) => `${count} ${word}${count === 1 ? "" : "s"}`;
+
+function rentalTimingLabel(booking: any) {
+  const status = String(booking.status || "").toLowerCase();
+  if (["completed", "cancelled"].includes(status)) return null;
+  // Not handed over yet: what matters is when it starts.
+  if (status === "booked" && booking.start_date) {
+    const days = daysFromToday(booking.start_date);
+    if (days > 1) return `Starts in ${plural(days, "day")}`;
+    if (days === 1) return "Starts tomorrow";
+    if (days === 0) return "Starts today";
+    return `Handover overdue by ${plural(-days, "day")}`;
+  }
+  if (!booking.end_date) return "Open ended";
+  const days = daysFromToday(booking.end_date);
+  if (days < 0) return `Return ${plural(-days, "day")} late`;
+  if (days === 0) return "Due back today";
+  if (days === 1) return "Due back tomorrow";
+  return `Due back in ${plural(days, "day")}`;
+}
+
+const STATUS_LABELS: Record<string, string> = {
+  booked: "Booked",
+  active: "On rent",
+  due_soon: "Due back soon",
+  overdue: "Late return",
+  extended: "Extended",
+  completed: "Completed",
+  cancelled: "Cancelled",
+  draft: "Draft"
+};
 
 function customerLabel(booking: any) {
   if (!booking.customers) return "Awaiting customer details";
@@ -157,12 +185,12 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
           <div className="scrollbar-none flex flex-wrap gap-1.5 xl:justify-end">
             {filters.map((entry) => (
               <button
-                className={`pressable min-h-8 min-w-fit rounded-md border px-3 py-1.5 text-[12px] font-semibold capitalize ${filter === entry ? "border-[#0e7490] bg-[#0e7490] text-white" : "border-[var(--border)] bg-[#f8fafc] text-[#475569]"}`}
+                className={`pressable min-h-8 min-w-fit rounded-md border px-3 py-1.5 text-[12px] font-semibold ${filter === entry ? "border-[#0e7490] bg-[#0e7490] text-white" : "border-[var(--border)] bg-[#f8fafc] text-[#475569]"}`}
                 key={entry}
                 onClick={() => setFilter(entry)}
                 type="button"
               >
-                {entry.replace(/_/g, " ")}
+                {entry === "all" ? "All" : STATUS_LABELS[entry] || entry.replace(/_/g, " ")}
               </button>
             ))}
           </div>
@@ -202,7 +230,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
 
                 <div className="min-w-0 py-0.5">
                   <div className="flex flex-wrap items-center gap-1.5">
-                    <Badge tone={statusTone(effectiveStatus)}>{effectiveStatus.replace(/_/g, " ")}</Badge>
+                    <Badge tone={statusTone(effectiveStatus)}>{STATUS_LABELS[effectiveStatus] || effectiveStatus.replace(/_/g, " ")}</Badge>
                     {linkLabel(booking.booking_link?.status) ? (
                     <Badge tone={["completed", "contract_signed"].includes(String(booking.booking_link?.status)) ? "green" : booking.booking_link?.status === "viewed" ? "blue" : "amber"}>
                       {linkLabel(booking.booking_link?.status)}
@@ -242,7 +270,9 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                       <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#64748b]">Paid</span>
                       <span className="font-mono-data block text-[16px] font-semibold text-[#0e7490]">{money(booking.total_paid, booking.currency)}</span>
                     </div>
-                    <span className="font-mono-data mt-0.5 block text-[11px] text-[#64748b] lg:text-right">Balance {money(booking.balance_due, booking.currency)}</span>
+                    <span className={`font-mono-data mt-0.5 block text-[11px] lg:text-right ${Number(booking.balance_due) > 0 ? "font-semibold text-[#b45309]" : "text-[#64748b]"}`}>
+                      {Number(booking.balance_due) > 0 ? `Due now ${money(booking.balance_due, booking.currency)}` : "Nothing due now"}
+                    </span>
                   </div>
                   <div className="hidden">
                     <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-md bg-[#0e7490] px-3 py-1.5 text-[12px] font-semibold text-white" href={`/bookings/${booking.id}`}>

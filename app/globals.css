@@ -729,12 +729,26 @@ textarea {
   padding: 8px 11px;
 }
 
-label {
-  color: var(--foreground-secondary);
-  display: block;
-  font-size: 11px;
-  font-weight: 500;
-  margin-bottom: 4px;
+/* In the base layer so a label's own classes win: toggle rows use
+   <label className="flex ..."> and were being forced to display: block. */
+@layer base {
+  label {
+    color: var(--foreground-secondary);
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+}
+
+/* Phones zoom the page into any field whose text is under 16px, so fields
+   use 16px on small screens. */
+@media (max-width: 640px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
 }
 
 input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):focus,

@@ -175,6 +175,17 @@ function selectable(vehicle: BookingVehicle) {
   return !["maintenance", "inactive", "retired"].includes(vehicle.status);
 }
 
+function longDay(iso: string) {
+  if (!/^\d{4}-\d{2}-\d{2}/.test(iso || "")) return "not set";
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${iso.slice(0, 10)}T00:00:00Z`));
+}
+
+/** A wall-clock "YYYY-MM-DDTHH:mm" from a datetime-local input, shown as "8 Nov 2026, 10:00". */
+function longDateTime(value: string) {
+  const time = value.slice(11, 16);
+  return time ? `${longDay(value)}, ${time}` : longDay(value);
+}
+
 function shortDay(iso: string) {
   return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${iso}T00:00:00Z`));
 }
@@ -1084,7 +1095,10 @@ export function BookingForm({
                     : "Not selected"
               }
             />
-            <SummaryRow label="Rental" mono value={`${startDate} to ${openEnded ? "Open ended" : endDate} - ${money(rentalRate, currency)} / ${pricingModel}`} />
+            <SummaryRow
+              label="Rental"
+              value={`${longDay(startDate)} – ${openEnded ? "open ended" : longDay(endDate)} · ${money(rentalRate, currency)} / ${periodLabel}`}
+            />
             {upfrontEnabled && upfrontPeriods > 0 ? (
               <SummaryRow label="Upfront" mono value={`${upfrontPeriods} ${periodLabel}${upfrontPeriods !== 1 ? "s" : ""} × ${money(upfrontRate, currency)} = ${money(upfrontPeriods * upfrontRate, currency)}`} />
             ) : null}
@@ -1095,8 +1109,8 @@ export function BookingForm({
                 deliveryMethod === "tbd"
                   ? "Delivery method, location, and time to be confirmed"
                   : deliveryMethod === "delivery"
-                    ? `${deliveryLocation || "Location TBD"} - ${deliveryDateTime || "Time TBD"}`
-                    : `${collectionAddress || "Location TBD"} - ${collectionTime || "Time TBD"}`
+                    ? `Delivery to ${deliveryLocation || "a place to be confirmed"} · ${deliveryDateTime ? longDateTime(deliveryDateTime) : "time to be confirmed"}`
+                    : `Collection from ${collectionAddress || "a place to be confirmed"} · ${collectionTime ? longDateTime(collectionTime) : "time to be confirmed"}`
               }
             />
             <SummaryRow label="Included" value={includedItems.length ? includedItems.join(", ") : "None selected"} />

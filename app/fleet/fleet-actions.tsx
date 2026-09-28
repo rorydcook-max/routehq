@@ -32,7 +32,7 @@ export function FleetBulkActions({
   }, []);
 
   return (
-    <form className={count > 0 ? "card-section hidden md:block" : "hidden"} id="fleetBulkForm">
+    <form className={count > 0 ? "sticky top-3 z-20 mb-4 hidden rounded-xl border border-[var(--border)] bg-white px-4 py-3 shadow-[var(--shadow-md)] md:block" : "hidden"} id="fleetBulkForm">
       <input name="organizationId" type="hidden" value={organizationId} />
       <div className="flex flex-wrap items-center justify-end gap-2">
         <span className="mr-auto text-sm font-semibold text-[var(--foreground-secondary)]">{count} selected</span>

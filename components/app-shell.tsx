@@ -101,8 +101,8 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
   return (
     <div className="min-h-screen pb-24 lg:pb-0">
       <aside className="fixed left-0 top-0 z-20 hidden h-screen w-[220px] flex-col border-r border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] px-3 py-4 lg:flex">
-        <div className="mb-4 flex items-center rounded-2xl border border-white/10 bg-[var(--sidebar-darker)]/70 p-3 shadow-[0_18px_35px_rgba(0,0,0,0.16)]">
-          <RouteHqLogo tone="dark" />
+        <div className="mb-5 flex items-center px-2 pt-1">
+          <RouteHqLogo />
         </div>
         <nav className="scrollbar-none min-h-0 flex-1 space-y-0.5 overflow-y-auto">
           <p className="mb-2 px-3 text-[11px] font-black uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]">{t("main")}</p>
@@ -112,12 +112,11 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
               <Link
                 className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm font-semibold transition ${
                   isActive(item.href)
-                    ? "text-white shadow-[0_12px_24px_rgba(18,184,200,0.25)]"
-                    : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-white"
+                    ? "bg-[var(--primary-light)] text-[var(--primary)]"
+                    : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--foreground)]"
                 }`}
                 href={item.href}
                 key={item.key}
-                style={isActive(item.href) ? { background: 'linear-gradient(135deg, #12BCB8 0%, #1F6BFF 100%)' } : undefined}
               >
                 <Icon size={16} />
                 {t(item.key)}
@@ -131,12 +130,11 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
               <Link
                 className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm font-semibold transition ${
                   isActive(item.href)
-                    ? "text-white shadow-[0_12px_24px_rgba(18,184,200,0.25)]"
-                    : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-white"
+                    ? "bg-[var(--primary-light)] text-[var(--primary)]"
+                    : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--foreground)]"
                 }`}
                 href={item.href}
                 key={item.key}
-                style={isActive(item.href) ? { background: 'linear-gradient(135deg, #12BCB8 0%, #1F6BFF 100%)' } : undefined}
               >
                 <Icon size={16} />
                 {t(item.key)}
@@ -146,14 +144,14 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
         </nav>
         <TrialBanner placement="sidebar" />
         {userEmail ? (
-          <div className="mt-3 rounded-2xl border border-white/10 bg-[var(--sidebar-darker)]/70 p-3">
+          <div className="mt-3 rounded-xl border border-[var(--sidebar-border)] bg-white p-3">
             {hasSeveralBusinesses ? (
               <form action={switchActiveOrganization} className="mb-3">
                 <label className="block text-[10px] font-black uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]" htmlFor="business-switcher">
                   {t("business")}
                 </label>
                 <select
-                  className="mt-1 w-full rounded-lg border border-white/10 bg-white/10 px-2 py-1.5 text-xs font-semibold text-white"
+                  className="mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-2 py-1.5 text-xs font-semibold text-[var(--foreground)]"
                   defaultValue={activeBusiness?.id}
                   id="business-switcher"
                   name="organizationId"
@@ -167,14 +165,14 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
                 </select>
               </form>
             ) : null}
-            <Link className="block truncate text-xs font-semibold text-[var(--sidebar-text-muted)] hover:text-white" href="/account">
+            <Link className="block truncate text-xs font-semibold text-[var(--muted)] hover:text-[var(--foreground)]" href="/account">
               {userEmail}
             </Link>
-            <Link className="mt-1 block text-[11px] font-bold text-[var(--sidebar-text)] hover:text-white" href="/account">
+            <Link className="mt-1 block text-[12px] font-semibold text-[var(--primary)] hover:underline" href="/account">
               {t("myAccount")}
             </Link>
             <form action={signOut} className="mt-3">
-              <PendingButton className="inline-flex w-full items-center justify-center rounded-xl bg-white/10 px-3 py-2 text-xs font-bold text-white hover:bg-white/15" pendingLabel="" type="submit">
+              <PendingButton className="inline-flex w-full items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] px-3 py-2 text-xs font-semibold text-[var(--foreground-secondary)] hover:bg-[var(--sidebar-darker)]" pendingLabel="" type="submit">
                 {t("signOut")}
               </PendingButton>
             </form>
@@ -247,7 +245,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
       {moreOpen ? (
         <div className="fixed inset-0 z-50 flex items-end bg-[#10252b]/50 lg:hidden" onClick={() => setMoreOpen(false)}>
           <div
-            className="w-full rounded-t-2xl bg-[var(--sidebar-bg)] p-4 pb-8 shadow-2xl"
+            className="w-full rounded-t-2xl bg-white p-4 pb-8 shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="mb-3 flex items-center justify-between">
@@ -262,7 +260,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
                 return (
                   <Link
                     className={`flex flex-col items-center gap-1.5 rounded-xl px-2 py-3 text-center text-xs font-semibold ${
-                      isActive(item.href) ? "bg-white/15 text-white" : "bg-white/5 text-[var(--sidebar-text)]"
+                      isActive(item.href) ? "bg-[var(--primary-light)] text-[var(--primary)]" : "bg-[var(--panel-secondary)] text-[var(--sidebar-text)]"
                     }`}
                     href={item.href}
                     key={item.key}
@@ -274,7 +272,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
                 );
               })}
               <Link
-                className="flex flex-col items-center gap-1.5 rounded-xl bg-white/5 px-2 py-3 text-center text-xs font-semibold text-[var(--sidebar-text)]"
+                className="flex flex-col items-center gap-1.5 rounded-xl bg-[var(--panel-secondary)] px-2 py-3 text-center text-xs font-semibold text-[var(--sidebar-text)]"
                 href="/account"
                 onClick={() => setMoreOpen(false)}
               >
@@ -283,10 +281,10 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
               </Link>
             </div>
             {userEmail ? (
-              <div className="mt-4 flex items-center justify-between gap-3 border-t border-white/10 pt-3">
+              <div className="mt-4 flex items-center justify-between gap-3 border-t border-[var(--border)] pt-3">
                 <span className="min-w-0 truncate text-xs font-semibold text-[var(--sidebar-text-muted)]">{userEmail}</span>
                 <form action={signOut}>
-                  <PendingButton className="inline-flex shrink-0 items-center justify-center rounded-lg bg-white/10 px-3 py-2 text-xs font-bold text-white" pendingLabel="" type="submit">
+                  <PendingButton className="inline-flex shrink-0 items-center justify-center rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground)]" pendingLabel="" type="submit">
                     {t("signOut")}
                   </PendingButton>
                 </form>
@@ -298,7 +296,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
 
       <button
         aria-label={t("openFastActions")}
-        className="fixed bottom-20 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--primary)] text-white shadow-[0_18px_32px_rgba(18,184,200,0.35)] transition hover:bg-[var(--primary-hover)] lg:bottom-6 lg:right-6"
+        className="fixed bottom-20 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--primary)] text-white shadow-[0_8px_20px_rgba(15,118,110,0.28)] transition hover:bg-[var(--primary-hover)] lg:bottom-6 lg:right-6"
         onClick={() => setFastActionOpen(true)}
       >
         <Plus size={26} />

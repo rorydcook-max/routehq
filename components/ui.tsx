@@ -44,7 +44,7 @@ export function SectionHeader({
     <div className="card-header">
       <div>
         {eyebrow ? <p className="card-header-label text-[var(--primary)]">{eyebrow}</p> : null}
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{title}</h2>
+        <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-[var(--foreground)]">{title}</h2>
       </div>
       {action}
     </div>
@@ -58,15 +58,21 @@ export function Badge({
   children: ReactNode;
   tone?: "neutral" | "green" | "amber" | "red" | "blue";
 }) {
+  // Soft fill plus a coloured dot: readable at a glance without shouting.
   const tones = {
-    neutral: "bg-[var(--panel-secondary)] text-[var(--foreground-secondary)] ring-1 ring-[var(--border)]",
-    green: "bg-[var(--success-light)] text-[var(--success)] ring-1 ring-[#bbf7d0]",
-    amber: "bg-[var(--warning-light)] text-[var(--warning)] ring-1 ring-[#fde68a]",
-    red: "bg-[var(--danger-light)] text-[var(--danger)] ring-1 ring-[#fecaca]",
-    blue: "bg-[var(--primary-blue-light)] text-[var(--primary-blue)] ring-1 ring-[#bfd1ff]"
+    neutral: "bg-[#f1efeb] text-[var(--foreground-secondary)]",
+    green: "bg-[var(--success-light)] text-[var(--success)]",
+    amber: "bg-[var(--warning-light)] text-[var(--warning)]",
+    red: "bg-[var(--danger-light)] text-[var(--danger)]",
+    blue: "bg-[var(--primary-blue-light)] text-[var(--primary-blue)]"
   };
 
-  return <span className={clsx("badge inline-flex", tones[tone])}>{children}</span>;
+  return (
+    <span className={clsx("badge inline-flex items-center gap-1.5", tones[tone])}>
+      <span aria-hidden="true" className="h-1.5 w-1.5 shrink-0 rounded-full bg-current opacity-80" />
+      {children}
+    </span>
+  );
 }
 
 export function ProgressBar({ value, tone = "green" }: { value: number; tone?: "green" | "amber" | "red" | "blue" }) {

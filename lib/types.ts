@@ -3,6 +3,7 @@ export type VehicleStatus = "Rented" | "Available" | "Maintenance" | "Reserved";
 export type Vehicle = {
   id: string;
   plate: string;
+  categoryId?: string | null;
   make: string;
   model: string;
   trim: string;

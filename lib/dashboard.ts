@@ -212,6 +212,7 @@ function mapVehicle(row: any, figures?: VehicleFigures): Vehicle {
   return {
     id: row.id,
     plate: row.registration_number,
+    categoryId: row.category_id || null,
     make: row.make,
     model: row.model,
     trim: row.trim || "",

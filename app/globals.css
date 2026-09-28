@@ -963,3 +963,275 @@ aside a[class*="bg-[var(--sidebar-active)]"] {
   border: 1px solid #fecaca;
   color: var(--danger);
 }
+
+/* =====================================================================
+   "Calm & light" design system (Sept 2026).
+   Warm off-white canvas, white surfaces with a soft shadow instead of heavy
+   borders, one deep teal accent, colour kept for meaning (status) only.
+   These override the older tokens above, so every page picks them up.
+   ===================================================================== */
+:root {
+  --background: #f6f5f2;
+  --panel: #ffffff;
+  --panel-secondary: #f9f8f6;
+  --border: #e8e6e1;
+  --border-strong: #d8d5ce;
+
+  --foreground: #1c1b18;
+  --foreground-secondary: #45423c;
+  --muted: #7a766e;
+
+  --sidebar-bg: #fbfaf8;
+  --sidebar-darker: #f1efeb;
+  --sidebar-hover: rgba(28, 27, 24, 0.05);
+  --sidebar-text: #45423c;
+  --sidebar-text-muted: #9a968e;
+  --sidebar-text-active: #0f766e;
+  --sidebar-border: #e8e6e1;
+  --sidebar-active: #0f766e;
+
+  --primary: #0f766e;
+  --primary-hover: #0b5f58;
+  --primary-light: #e7f3f1;
+  --primary-blue: #2f6fdb;
+  --primary-blue-hover: #255fc2;
+  --primary-blue-light: #eef3fc;
+
+  --gradient-brand: #0f766e;
+  --gradient-teal: #0f766e;
+
+  --success: #15803d;
+  --success-light: #ecf7ef;
+  --warning: #b45309;
+  --warning-light: #fdf5e8;
+  --danger: #c2410c;
+  --danger-light: #fdf0ea;
+  --info: #2f6fdb;
+  --info-light: #eef3fc;
+  --purple: #6d5bd0;
+  --purple-light: #f2f0fc;
+
+  --shadow-sm: 0 1px 2px rgba(28, 27, 24, 0.05);
+  --shadow-md: 0 1px 2px rgba(28, 27, 24, 0.04), 0 4px 14px rgba(28, 27, 24, 0.05);
+  --radius: 12px;
+}
+
+body {
+  font-size: 14px;
+  letter-spacing: -0.005em;
+}
+
+.content-area {
+  padding: 20px 24px 32px;
+}
+
+@media (max-width: 640px) {
+  .content-area {
+    padding: 14px 14px 24px;
+  }
+}
+
+/* Buttons: flat and quiet; the old 3D press shadow made everything look heavy. */
+button:not(.no-press),
+a.pressable,
+a[class*="rounded-lg"][class*="px-"] {
+  box-shadow: none;
+}
+button:not(.no-press):hover,
+a.pressable:hover,
+a[class*="rounded-lg"][class*="px-"]:hover {
+  box-shadow: none;
+  filter: none;
+}
+button:not(.no-press):active,
+a.pressable:active,
+a[class*="rounded-lg"][class*="px-"]:active {
+  box-shadow: none;
+  transform: scale(0.985);
+}
+
+.primary-action,
+.btn-primary {
+  background: var(--primary);
+  border: 1px solid var(--primary);
+  border-radius: 9px;
+  box-shadow: var(--shadow-sm);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  min-height: 38px;
+  padding: 8px 16px;
+}
+.primary-action:hover,
+.btn-primary:hover {
+  background: var(--primary-hover);
+  opacity: 1;
+}
+.secondary-action,
+.btn-secondary {
+  background: var(--panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 9px;
+  color: var(--foreground);
+  font-size: 13px;
+  font-weight: 600;
+  min-height: 38px;
+  padding: 8px 16px;
+}
+.secondary-action:hover,
+.btn-secondary:hover {
+  background: var(--panel-secondary);
+}
+
+/* Page headings: no shouty eyebrow above every title; the sidebar already says where you are. */
+.page-eyebrow {
+  display: none;
+}
+.page-hero {
+  margin-bottom: 18px;
+  padding: 0;
+}
+.page-title,
+.page-hero h1 {
+  font-size: 24px;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+}
+.page-subtitle,
+.page-hero p {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* Surfaces: soft shadow, hairline border, one radius. */
+.card,
+.content-section,
+.surface-panel,
+.soft-panel,
+.action-tile,
+.sub-surface,
+.kpi-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+.kpi-card-today,
+.kpi-card-profit,
+.kpi-card-danger-soft,
+.kpi-card-warning-soft,
+.kpi-card-deposit,
+.kpi-card-value,
+.kpi-card-route {
+  background: var(--panel);
+}
+.form-section {
+  background: var(--panel) !important;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.card-header {
+  border-bottom: 1px solid var(--border);
+  padding: 14px 16px;
+}
+.card-section {
+  border-bottom: 1px solid var(--border);
+  padding: 14px 16px;
+}
+.card-section:last-child {
+  border-bottom: none;
+}
+.card-header-label {
+  display: none;
+}
+.card-header h2 {
+  color: var(--foreground) !important;
+  font-size: 15px !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.01em !important;
+  text-transform: none !important;
+}
+.empty-state {
+  background: var(--panel-secondary);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+}
+
+/* Fields */
+input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),
+select,
+textarea {
+  border: 1px solid var(--border-strong);
+  border-radius: 9px;
+}
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+input[type="password"],
+input[type="date"],
+input[type="datetime-local"],
+input[type="time"],
+select {
+  height: 38px;
+}
+input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+}
+@layer base {
+  label {
+    color: var(--foreground-secondary);
+    font-size: 12px;
+    font-weight: 550;
+  }
+}
+
+/* Tables: sentence-case headers, calmer rows. */
+th {
+  background: transparent;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 550;
+  letter-spacing: 0;
+  text-transform: none;
+}
+td {
+  border-bottom: 1px solid var(--border);
+  color: var(--foreground-secondary);
+  font-size: 14px;
+  padding: 11px 12px;
+}
+
+/* Status pills */
+.badge {
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 550;
+  letter-spacing: 0;
+  padding: 2px 9px;
+}
+
+.nav-item-active,
+[data-active="true"],
+.sidebar-active-item,
+aside a[class*="bg-[var(--sidebar-active)]"] {
+  background: var(--primary-light) !important;
+  color: var(--primary) !important;
+}
+
+/* Numbers use the body font with even-width digits; monospace looked mechanical. */
+.font-mono-data {
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Centre the page in the space beside the sidebar on wide screens. */
+@media (min-width: 1024px) {
+  .content-area {
+    margin-left: max(220px, calc(50vw - 590px));
+  }
+}

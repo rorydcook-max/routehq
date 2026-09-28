@@ -63,8 +63,10 @@ export function TrialBanner() {
       .catch(() => null);
   }, []);
 
-  // Never over a handover: the inspection form keeps its buttons at the bottom of the screen.
-  if (hidden || !payload?.organization || pathname?.startsWith("/inspections")) {
+  // Never over a form: handovers and the create/edit screens keep their
+  // buttons at the bottom of the screen, where the banner floats on phones.
+  const onForm = !!pathname && (pathname.startsWith("/inspections") || /\/(new|edit)(\/|$)/.test(pathname));
+  if (hidden || !payload?.organization || onForm) {
     return null;
   }
 
@@ -78,21 +80,19 @@ export function TrialBanner() {
       className={clsx(
         // Phones: above the bottom navigation and clear of the + button.
         "fixed bottom-[calc(72px+env(safe-area-inset-bottom))] left-3 right-20 z-40 flex items-center justify-between gap-2 rounded-lg border px-3 py-2 shadow-lg",
-        "lg:bottom-4 lg:left-1/2 lg:right-auto lg:min-h-10 lg:w-[min(560px,calc(100%-2rem))] lg:-translate-x-1/2",
+        // Desktop: tucked into the sidebar above the account card, never over page content.
+        "lg:bottom-[112px] lg:left-[12px] lg:right-auto lg:w-[156px] lg:shadow-none lg:flex-col lg:items-stretch lg:gap-2 lg:p-2.5",
         tone.className
       )}
       role="status"
     >
       <div className="flex items-center gap-2">
-        <span aria-hidden="true" className={clsx("h-2 w-2 rounded-full", tone.dot)} />
-        <div>
-          <p className="text-xs font-bold leading-4">
-            Your free trial ends in {days === null || days === undefined ? "30 days" : `${days} day${days === 1 ? "" : "s"}`}
-          </p>
-          <p className="hidden text-[11px] font-medium leading-4 opacity-80 lg:block">Keep building your fleet data now. Billing can be activated manually when you are ready.</p>
-        </div>
+        <span aria-hidden="true" className={clsx("h-2 w-2 shrink-0 rounded-full", tone.dot)} />
+        <p className="text-xs font-bold leading-4">
+          Free trial: {days === null || days === undefined ? "30 days" : `${days} day${days === 1 ? "" : "s"}`} left
+        </p>
       </div>
-      <div className="flex shrink-0 items-center gap-2">
+      <div className="flex shrink-0 items-center gap-2 lg:justify-between">
         <Link className={clsx("pressable inline-flex min-h-7 items-center justify-center rounded-lg px-3 text-[11px] font-bold", tone.button)} href={"/settings/billing" as Route}>
           Subscribe now
         </Link>

@@ -5,6 +5,7 @@ import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { onlineSigningGaps } from "@/lib/online-signing-readiness";
+import { loadBusyPeriods } from "@/lib/rental-conflicts";
 import { BookingForm } from "./booking-form";
 
 type SearchParams = {
@@ -60,6 +61,7 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
   }
 
   const signingGaps = organizationDetails ? onlineSigningGaps(organizationDetails) : [];
+  const busyPeriods = await loadBusyPeriods(supabase, organization.id);
 
   const normalizedVehicles = (vehicles || []).map((vehicle: any) => ({
     ...vehicle,
@@ -106,6 +108,7 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
           </Card>
         ) : (
           <BookingForm
+            busyPeriods={busyPeriods}
             customers={customers || []}
             defaultCurrency={organization.currency || "THB"}
             homeTerritory={homeTerritoryFromSettings(organizationDetails?.settings)}

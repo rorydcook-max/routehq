@@ -9,6 +9,8 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { notifyOperator } from "@/lib/notify-operator";
 import { isRentalDocumentCustomerSigningEnabledForOrganization } from "@/lib/rental-document-customer-signing";
 import { wallTimeToIso, businessToday } from "@/lib/business-time";
+import { DOUBLE_BOOKING_MESSAGE, isDoubleBookingError, vehicleConflictMessage } from "@/lib/rental-conflicts";
+import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
 import { getCurrentMembership } from "@/lib/auth/roles";
 
 function requiredString(formData: FormData, key: string) {
@@ -226,7 +228,19 @@ async function createWalkInPaymentRecords({
     .eq("organization_id", organizationId);
 }
 
+/**
+ * Server-action errors are hidden in production, so the booking form gets the
+ * reason back as a value instead of a thrown error.
+ */
 export async function createBooking(formData: FormData) {
+  try {
+    return { ok: true as const, ...(await createBookingOrThrow(formData)) };
+  } catch (error) {
+    return { ok: false as const, error: error instanceof Error ? error.message : "Unable to create booking." };
+  }
+}
+
+async function createBookingOrThrow(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -310,8 +324,13 @@ export async function createBooking(formData: FormData) {
   if (organizationError || !organization) {
     throw new Error(organizationError?.message || "Organization was not found.");
   }
-  if (["rented", "maintenance", "inactive", "retired"].includes(vehicle.status)) {
-    throw new Error("This vehicle is not available for a new booking.");
+  if (["maintenance", "inactive", "retired"].includes(vehicle.status)) {
+    throw new Error("This vehicle is marked as unavailable (in maintenance or inactive). Change its status on the vehicle page first.");
+  }
+  // A car on rent now can still be booked for dates after it comes back.
+  const conflict = await vehicleConflictMessage(supabase, { organizationId, vehicleId, startDate, endDate });
+  if (conflict) {
+    throw new Error(conflict);
   }
 
   // Optional customer lookup
@@ -375,7 +394,7 @@ export async function createBooking(formData: FormData) {
     .single();
 
   if (rentalError || !rental) {
-    throw new Error(rentalError?.message || "Unable to create booking.");
+    throw new Error(isDoubleBookingError(rentalError) ? DOUBLE_BOOKING_MESSAGE : rentalError?.message || "Unable to create booking.");
   }
 
   if (upfrontPeriods > 0) {
@@ -539,7 +558,7 @@ export async function createBooking(formData: FormData) {
 
   const bookingUrl = `${baseUrl}/book/${bookingLink.token}`;
 
-  const [{ error: linkUpdateError }, { error: contractUpdateError }, { error: rentalUpdateError }, { error: vehicleUpdateError }] = await Promise.all([
+  const [{ error: linkUpdateError }, { error: contractUpdateError }, { error: rentalUpdateError }] = await Promise.all([
     supabase
       .from("booking_links")
       .update({ public_url: bookingUrl, contract_id: contract.id })
@@ -554,23 +573,16 @@ export async function createBooking(formData: FormData) {
       .from("rentals")
       .update({ contract_id: contract.id })
       .eq("id", rental.id)
-      .eq("organization_id", organizationId),
-    supabase
-      .from("vehicles")
-      .update({
-        status: "reserved",
-        availability_status: "reserved",
-        current_customer_id: customerId || null,
-        current_rental_id: rental.id
-      })
-      .eq("id", vehicleId)
       .eq("organization_id", organizationId)
   ]);
 
-  const updateError = linkUpdateError || contractUpdateError || rentalUpdateError || vehicleUpdateError;
+  const updateError = linkUpdateError || contractUpdateError || rentalUpdateError;
   if (updateError) {
     throw new Error(updateError.message);
   }
+
+  // A car that is out on rent stays "on rent"; a free car shows as booked.
+  await syncVehicleStatusFromBookings(supabase, organizationId, vehicleId);
 
   const vehicleLabel = [vehicle.make, vehicle.model].filter(Boolean).join(" ");
   const message = customer
@@ -900,6 +912,7 @@ export async function cancelBooking(formData: FormData) {
   if (updateError) {
     throw new Error(updateError.message);
   }
+  await syncVehicleStatusFromBookings(supabase, organizationId, rental.vehicle_id);
 
   await recordActivityEvent(supabase, {
     organization_id: organizationId,
@@ -1008,6 +1021,7 @@ export async function deleteBooking(rentalId: string): Promise<{ success: boolea
     .eq("id", rental.vehicle_id)
     .eq("organization_id", rental.organization_id)
     .eq("current_rental_id", cleanId);
+  await syncVehicleStatusFromBookings(supabase, rental.organization_id, rental.vehicle_id);
 
   revalidatePath("/");
   revalidatePath("/bookings");
@@ -1129,6 +1143,19 @@ export async function updateBooking(formData: FormData) {
   }
 
   await ensureMembership(supabase, rental.organization_id, user.id);
+
+  if (rental.vehicle_id && !["cancelled", "completed", "draft"].includes(String(rental.status))) {
+    const conflict = await vehicleConflictMessage(supabase, {
+      organizationId: rental.organization_id,
+      vehicleId: rental.vehicle_id,
+      startDate,
+      endDate,
+      excludeRentalId: rental.id
+    });
+    if (conflict) {
+      return { error: conflict };
+    }
+  }
 
   if (customerId) {
     const { data: customer, error: customerError } = await supabase
@@ -2127,7 +2154,18 @@ export async function matchPaymentsToTransactions(rentalId: string) {
   return { success: true, matched, message };
 }
 
-export async function adjustRental(params: {
+type AdjustRentalParams = Parameters<typeof adjustRentalOrThrow>[0];
+
+export async function adjustRental(params: AdjustRentalParams): Promise<{ success: boolean; error?: string }> {
+  try {
+    await adjustRentalOrThrow(params);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : "Unable to adjust rental." };
+  }
+}
+
+async function adjustRentalOrThrow(params: {
   rentalId: string;
   adjustmentType: "extension" | "early_return";
   newEndDate: string;
@@ -2188,6 +2226,19 @@ export async function adjustRental(params: {
   const originalEndDate = dateOnly(rental.end_date);
   const actor = operatorName(user);
   const nowDate = todayDate();
+
+  if (adjustmentType === "extension" && rental.vehicle_id) {
+    const conflict = await vehicleConflictMessage(supabase, {
+      organizationId: rental.organization_id,
+      vehicleId: rental.vehicle_id,
+      startDate: dateOnly(rental.start_date) || nowDate,
+      endDate: cleanEndDate,
+      excludeRentalId: rental.id
+    });
+    if (conflict) {
+      throw new Error(`Can't extend to that date. ${conflict.replace(/ Choose other dates or another vehicle\.$/, "")}`);
+    }
+  }
 
   if (adjustmentType === "extension") {
     const extensionPaymentAmount = amountFromParam(params.extensionPaymentAmount);
@@ -2451,7 +2502,16 @@ async function ensureMembership(supabase: any, organizationId: string, userId: s
   }
 }
 
-export async function updateRentalEndDate(rentalId: string, newEndDate: string) {
+export async function updateRentalEndDate(rentalId: string, newEndDate: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    await updateRentalEndDateOrThrow(rentalId, newEndDate);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : "Unable to update the end date." };
+  }
+}
+
+async function updateRentalEndDateOrThrow(rentalId: string, newEndDate: string) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -2469,7 +2529,7 @@ export async function updateRentalEndDate(rentalId: string, newEndDate: string) 
 
   const { data: rental, error } = await supabase
     .from("rentals")
-    .select("id, organization_id, vehicle_id, customer_id, end_date")
+    .select("id, organization_id, vehicle_id, customer_id, start_date, end_date")
     .eq("id", cleanRentalId)
     .is("deleted_at", null)
     .maybeSingle();
@@ -2479,6 +2539,19 @@ export async function updateRentalEndDate(rentalId: string, newEndDate: string) 
   }
 
   await ensureMembership(supabase, rental.organization_id, user.id);
+
+  if (rental.vehicle_id && rental.start_date) {
+    const conflict = await vehicleConflictMessage(supabase, {
+      organizationId: rental.organization_id,
+      vehicleId: rental.vehicle_id,
+      startDate: dateOnly(rental.start_date),
+      endDate: cleanEndDate,
+      excludeRentalId: rental.id
+    });
+    if (conflict) {
+      throw new Error(`That end date clashes with another booking. ${conflict.replace(/ Choose other dates or another vehicle\.$/, "")}`);
+    }
+  }
 
   const oldDate = dateOnly(rental.end_date) || "Open";
   const { error: updateError } = await supabase
@@ -3154,6 +3227,9 @@ export async function cancelBookingWithDisposition(formData: FormData) {
       .eq("organization_id", organizationId)
       .eq("current_rental_id", rentalId);
     throwCancellationError("Could not update the vehicle", vehicleResult.error);
+    if (vehicleDisposition === "available") {
+      await syncVehicleStatusFromBookings(supabase, organizationId, vehicleId);
+    }
   }
 
   if (transactionsToInsert.length > 0) {
@@ -3282,7 +3358,7 @@ export async function changeVehicle(formData: FormData) {
 
   const { data: rental, error: rentalError } = await supabase
     .from("rentals")
-    .select("id, organization_id, vehicle_id, original_vehicle_id, customer_id, rental_rate, currency, status, reference, display_code")
+    .select("id, organization_id, vehicle_id, original_vehicle_id, customer_id, rental_rate, currency, status, reference, display_code, start_date, end_date")
     .eq("id", rentalId)
     .eq("organization_id", organizationId)
     .is("deleted_at", null)
@@ -3303,6 +3379,19 @@ export async function changeVehicle(formData: FormData) {
   if (replacementError || !replacement) throw new Error("Replacement vehicle not found.");
   if (replacement.current_rental_id && replacement.current_rental_id !== rentalId) {
     throw new Error("This vehicle is currently assigned to another active rental.");
+  }
+  {
+    // The replacement takes over from today (or the start, if not delivered yet) to the end.
+    const today = todayDate();
+    const from = dateOnly(rental.start_date) && dateOnly(rental.start_date) > today ? dateOnly(rental.start_date) : today;
+    const conflict = await vehicleConflictMessage(supabase, {
+      organizationId,
+      vehicleId: replacementVehicleId,
+      startDate: from,
+      endDate: dateOnly(rental.end_date) || null,
+      excludeRentalId: rentalId
+    });
+    if (conflict) throw new Error(conflict.replace("This vehicle", "The replacement vehicle"));
   }
 
   const originalVehicleId = rental.vehicle_id;

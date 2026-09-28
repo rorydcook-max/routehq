@@ -313,7 +313,8 @@ export function RentalAdjustmentModal({
         });
 
         if (!result?.success) {
-          throw new Error("Unable to adjust rental.");
+          setMessage(result?.error || "Unable to adjust rental.");
+          return;
         }
 
         setMessage(adjustmentType === "extension" ? "Rental extended" : "Rental adjusted");

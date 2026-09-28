@@ -9,6 +9,7 @@ import { finaliseInspectionReport, type DepositSettlement } from "@/lib/inspecti
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { notifyOperator } from "@/lib/notify-operator";
+import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
 import { inspectionUploadPrefix, readUploadedFiles } from "@/lib/direct-uploads";
 
 type InspectionMode = "delivery" | "return" | "condition_report";
@@ -577,6 +578,8 @@ export async function submitInspection(formData: FormData) {
     if (vehicleError) {
       throw new Error(vehicleError.message);
     }
+    // If the car's next booking is already lined up, show it as booked, not free.
+    await syncVehicleStatusFromBookings(supabase, organizationId, vehicleId);
   }
 
   const vehicleLabel = [vehicle?.registration_number, vehicle?.make, vehicle?.model].filter(Boolean).join(" ");

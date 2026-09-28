@@ -9,6 +9,7 @@ import { createBooking } from "@/app/actions/bookings";
 import { CustomerSelector } from "@/components/customer-selector";
 import { Badge, ProgressBar } from "@/components/ui";
 import { flagForNationality } from "@/lib/customer-options";
+import { conflictMessage, findConflict, type BusyPeriod } from "@/lib/rental-conflicts";
 
 type BookingVehicle = {
   id: string;
@@ -168,9 +169,32 @@ function documentLabel(status?: string | null) {
   return "Missing documents";
 }
 
+// A car out on rent can still be booked for when it comes back; the dates step
+// checks for clashes. Only cars taken out of service can't be chosen.
 function selectable(vehicle: BookingVehicle) {
-  return ["available", "reserved"].includes(vehicle.status);
+  return !["maintenance", "inactive", "retired"].includes(vehicle.status);
 }
+
+function shortDay(iso: string) {
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${iso}T00:00:00Z`));
+}
+
+/** One line on when the car is taken, e.g. "Taken until 8 Nov" or "Booked from 27 Oct". */
+function availabilityNote(periods: BusyPeriod[], today: string) {
+  const current = periods.find((period) => period.startDate <= today && (!period.endDate || period.endDate >= today));
+  if (current) return current.endDate ? `Taken until ${shortDay(current.endDate)}` : "Taken, no end date";
+  const next = periods.find((period) => period.startDate > today);
+  return next ? `Booked from ${shortDay(next.startDate)}` : null;
+}
+
+const VEHICLE_STATUS_LABELS: Record<string, string> = {
+  available: "Available",
+  rented: "On rent",
+  reserved: "Booked",
+  maintenance: "In maintenance",
+  inactive: "Inactive",
+  retired: "Retired"
+};
 
 function rateFor(vehicle: BookingVehicle | null, pricingModel: string) {
   if (!vehicle) return 0;
@@ -222,12 +246,14 @@ export function BookingForm({
   preselectedVehicleId = "",
   preselectedCustomerId = "",
   defaultCurrency = "THB",
-  homeTerritory = "Koh Samui, Thailand"
+  homeTerritory = "Koh Samui, Thailand",
+  busyPeriods = {}
 }: {
   organizationId: string;
   organizationName: string;
   operatorAddress: string;
   vehicles: BookingVehicle[];
+  busyPeriods?: Record<string, BusyPeriod[]>;
   customers: BookingCustomer[];
   preselectedVehicleId?: string;
   preselectedCustomerId?: string;
@@ -279,6 +305,7 @@ export function BookingForm({
   const [isPending, startTransition] = useTransition();
 
   const selectedVehicle = vehicles.find((vehicle) => vehicle.id === vehicleId) || null;
+  const dateConflict = vehicleId ? findConflict(busyPeriods[vehicleId] || [], startDate, openEnded ? null : endDate || null) : null;
   const currencyInfo = CURRENCY_INFO[currency] ?? CURRENCY_INFO["THB"];
   const periodLabel = pricingModel === "monthly" ? "month" : pricingModel === "weekly" ? "week" : pricingModel === "daily" ? "day" : "period";
   const handoverDateTime = deliveryMethod === "delivery" ? deliveryDateTime : deliveryMethod === "collection" ? collectionTime : "";
@@ -311,10 +338,19 @@ export function BookingForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vehicleId, pricingModel]);
 
+  // Choosing a car that is out now starts the booking on the day it comes back.
+  useEffect(() => {
+    if (!vehicleId) return;
+    const today = businessToday();
+    const current = (busyPeriods[vehicleId] || []).find((period) => period.startDate <= today && period.endDate && period.endDate >= today);
+    if (current?.endDate && startDate < current.endDate) setStartDate(current.endDate);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vehicleId]);
+
   function canContinue() {
     if (step === 0) return Boolean(selectedVehicle && selectable(selectedVehicle));
     if (step === 1) return Boolean(selectedCustomer); // Only reached when not skipped
-    if (step === 2) return Boolean(startDate && rentalRate > 0 && (openEnded || endDate));
+    if (step === 2) return Boolean(startDate && rentalRate > 0 && (openEnded || endDate) && !dateConflict);
     if (step === 3) return true;
     return true;
   }
@@ -440,7 +476,11 @@ export function BookingForm({
         formData.set("walkInPaymentMethod", walkInPaymentMethod);
         formData.set("walkInPaymentNote", walkInPaymentNote);
         const result = await createBooking(formData);
-        if (result.mode === "existing_rental") {
+        if (!result.ok) {
+          setError(result.error);
+          return;
+        }
+        if ("mode" in result && result.mode === "existing_rental") {
           window.location.href = `/bookings/${result.rentalId}${fastTrack ? "?success=walk-in" : ""}`;
           return;
         }
@@ -627,8 +667,17 @@ export function BookingForm({
                       <span className="block text-lg font-black text-[#10252b]">{vehicleTitle(vehicle)}</span>
                       <span className="font-mono-data block text-sm font-bold text-[#667085]">{vehicle.registration_number}</span>
                       <span className="mt-2 flex flex-wrap gap-2">
-                        <Badge tone={disabled ? "neutral" : selected ? "green" : "blue"}>{disabled ? `Unavailable: ${vehicle.status}` : vehicle.status}</Badge>
-                        <Badge tone="neutral"><span className="font-mono-data">{money(vehicle.monthly_rate, currency)} / month</span></Badge>
+                        {(() => {
+                          const note = disabled ? null : availabilityNote(busyPeriods[vehicle.id] || [], businessToday());
+                          return (
+                            <Badge tone={disabled ? "neutral" : note ? "amber" : selected ? "green" : "blue"}>
+                              {disabled ? VEHICLE_STATUS_LABELS[vehicle.status] || vehicle.status : note || "Available"}
+                            </Badge>
+                          );
+                        })()}
+                        {vehicle.monthly_rate > 0 ? (
+                          <Badge tone="neutral"><span className="font-mono-data">{money(vehicle.monthly_rate, currency)} / month</span></Badge>
+                        ) : null}
                       </span>
                     </span>
                   </div>
@@ -724,6 +773,11 @@ export function BookingForm({
             />
             <span>Open ended / long term</span>
           </label>
+          {dateConflict ? (
+            <p className="mt-3 rounded-lg border border-[#fecaca] bg-[#fff1f2] p-3 text-sm font-bold text-[#be123c]" role="alert">
+              {conflictMessage(dateConflict)}
+            </p>
+          ) : null}
           <div className="mt-3 grid gap-3 sm:grid-cols-4">
             {["daily", "weekly", "monthly", "custom"].map((period) => (
               <button

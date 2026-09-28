@@ -399,7 +399,11 @@ export function EditableEndDate({ rentalId, currentEndDate }: { rentalId: string
     setMessage(null);
     startTransition(async () => {
       try {
-        await updateRentalEndDate(rentalId, value);
+        const result = await updateRentalEndDate(rentalId, value);
+        if (!result.success) {
+          setMessage(result.error || "Unable to update the end date.");
+          return;
+        }
         setEditing(false);
         router.refresh();
       } catch (error) {

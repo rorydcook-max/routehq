@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { DOUBLE_BOOKING_MESSAGE, isDoubleBookingError } from "@/lib/rental-conflicts";
 
 function requiredString(formData: FormData, key: string) {
   const value = String(formData.get(key) || "").trim();
@@ -43,16 +44,23 @@ export async function approveExtensionRequest(formData: FormData) {
   const action = await getPortalAction(supabase, organizationId, actionId);
   const content = { ...(action.content || {}), approved_end_date: newEndDate };
 
-  const [{ error: rentalError }, { error: actionError }] = await Promise.all([
-    supabase.from("rentals").update({ end_date: newEndDate, status: "extended" }).eq("id", rentalId).eq("organization_id", organizationId),
-    supabase
-      .from("customer_portal_actions")
-      .update({ status: "resolved", content, resolved_by: user.id, resolved_at: new Date().toISOString() })
-      .eq("id", actionId)
-      .eq("organisation_id", organizationId)
-  ]);
+  // Extend first: if the car is booked by someone else on those dates the
+  // request stays open instead of being marked approved.
+  const { error: rentalError } = await supabase
+    .from("rentals")
+    .update({ end_date: newEndDate, status: "extended" })
+    .eq("id", rentalId)
+    .eq("organization_id", organizationId);
+  if (rentalError) {
+    throw new Error(isDoubleBookingError(rentalError) ? `Can't extend to that date. ${DOUBLE_BOOKING_MESSAGE}` : rentalError.message);
+  }
 
-  if (rentalError || actionError) throw new Error(rentalError?.message || actionError?.message);
+  const { error: actionError } = await supabase
+    .from("customer_portal_actions")
+    .update({ status: "resolved", content, resolved_by: user.id, resolved_at: new Date().toISOString() })
+    .eq("id", actionId)
+    .eq("organisation_id", organizationId);
+  if (actionError) throw new Error(actionError.message);
 
   await recordActivityEvent(supabase, {
     organization_id: organizationId,

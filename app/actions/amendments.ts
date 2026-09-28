@@ -7,6 +7,7 @@ import { buildBusinessDocumentSnapshot } from "@/lib/business-document-snapshot"
 import { businessToday } from "@/lib/business-time";
 import { htmlToPdf } from "@/lib/html-to-pdf";
 import { onlineSigningGaps } from "@/lib/online-signing-readiness";
+import { vehicleConflictMessage } from "@/lib/rental-conflicts";
 import {
   amendmentHash,
   amendmentMoney,
@@ -246,6 +247,18 @@ export async function createRentalAmendment(input: {
     if (newEndDate) {
       if (rental.is_indefinite) return { ok: false, error: "This rental is open-ended, so it has no return date to extend." };
       if (previousEnd && newEndDate <= previousEnd) return { ok: false, error: "The new return date must be after the current one." };
+      if (rental.vehicle_id && rental.start_date) {
+        const conflict = await vehicleConflictMessage(admin, {
+          organizationId,
+          vehicleId: rental.vehicle_id,
+          startDate: String(rental.start_date).slice(0, 10),
+          endDate: newEndDate,
+          excludeRentalId: rental.id
+        });
+        if (conflict) {
+          return { ok: false, error: `Can't extend to that date. ${conflict.replace(/ Choose other dates or another vehicle\.$/, "")}` };
+        }
+      }
       changes.previous_end_date = previousEnd;
       changes.new_end_date = newEndDate;
       const amount = cleanAmount(input.extensionAmount);

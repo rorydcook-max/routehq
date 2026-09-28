@@ -1,119 +1,310 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import { CheckCircle2, Circle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useMemo, useState, useTransition } from "react";
+import { CheckCircle2, Circle, Wallet } from "lucide-react";
+import { recordPaymentReceived } from "@/app/actions/bookings";
 import { completeTask } from "@/app/actions/tasks";
 import { PendingButton } from "@/components/pending-button";
 import { Badge } from "@/components/ui";
+import { taskTypeLabel } from "@/lib/task-types";
 import type { TaskListItem } from "@/lib/tasks";
 
-const filters = ["open", "completed", "all"] as const;
+type Filter = "open" | "done";
 
-function formatWhen(value: string | null) {
-  if (!value) return "No due date";
-  return new Intl.DateTimeFormat("en-TH", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(value));
+const money = (value: number) => `฿${value.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
+
+function addDays(iso: string, days: number) {
+  const date = new Date(`${iso}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
 }
 
-export function TasksList({ tasks, organizationId }: { tasks: TaskListItem[]; organizationId: string }) {
-  const [filter, setFilter] = useState<(typeof filters)[number]>("open");
+function dayLabel(iso: string | null, today: string) {
+  if (!iso) return "No date";
+  if (iso === today) return "Today";
+  if (iso === addDays(today, 1)) return "Tomorrow";
+  if (iso === addDays(today, -1)) return "Yesterday";
+  const date = new Date(`${iso}T00:00:00Z`);
+  const sameYear = iso.slice(0, 4) === today.slice(0, 4);
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", ...(sameYear ? {} : { year: "numeric" }), timeZone: "UTC" }).format(date);
+}
 
-  const filtered = useMemo(() => {
-    return tasks.filter((task) => {
-      if (filter === "open") return !task.completedAt;
-      if (filter === "completed") return !!task.completedAt;
-      return true;
+function timeLabel(dueAt: string | null) {
+  if (!dueAt) return null;
+  const time = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Bangkok" }).format(new Date(dueAt));
+  // Tasks created with a date only are stored at midnight; showing "00:00" adds nothing.
+  return time === "00:00" ? null : time;
+}
+
+type Group = { key: string; title: string; tone: "red" | "amber" | "neutral"; items: TaskListItem[] };
+
+function groupOpen(items: TaskListItem[], today: string): Group[] {
+  const weekEnd = addDays(today, 7);
+  const groups: Group[] = [
+    { key: "overdue", title: "Overdue", tone: "red", items: [] },
+    { key: "today", title: "Today", tone: "amber", items: [] },
+    { key: "week", title: "Next 7 days", tone: "neutral", items: [] },
+    { key: "later", title: "Later", tone: "neutral", items: [] }
+  ];
+  for (const item of items) {
+    const due = item.dueDate;
+    if (due && due < today) groups[0].items.push(item);
+    else if (due === today) groups[1].items.push(item);
+    else if (due && due <= weekEnd) groups[2].items.push(item);
+    else groups[3].items.push(item);
+  }
+  return groups.filter((group) => group.items.length > 0);
+}
+
+const METHODS = [
+  ["cash", "Cash"],
+  ["bank_transfer", "Bank transfer"],
+  ["promptpay", "PromptPay"],
+  ["wise", "Wise"],
+  ["revolut", "Revolut"],
+  ["other", "Other"]
+] as const;
+
+function RecordPaymentPanel({ paymentId, amount, today, onClose }: { paymentId: string; amount: number; today: string; onClose: () => void }) {
+  const router = useRouter();
+  const [value, setValue] = useState(String(amount || ""));
+  const [date, setDate] = useState(today);
+  const [method, setMethod] = useState("cash");
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+  const received = Number(value || 0);
+  const remainder = Math.round((amount - received) * 100) / 100;
+
+  function save() {
+    setError(null);
+    if (!(received > 0)) {
+      setError("Enter the amount received.");
+      return;
+    }
+    startTransition(async () => {
+      try {
+        await recordPaymentReceived(paymentId, { amount: received, date, method });
+        onClose();
+        router.refresh();
+      } catch {
+        setError("Couldn't record this payment. Please try again.");
+      }
     });
-  }, [filter, tasks]);
+  }
+
+  const field = "mt-1 h-10 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-sm";
+  return (
+    <div className="mt-2 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
+      <div className="grid gap-2 sm:grid-cols-3">
+        <label className="text-xs font-semibold text-[var(--foreground-secondary)]">
+          Amount received (฿)
+          <input className={field} inputMode="decimal" min="0" onChange={(event) => setValue(event.target.value)} step="0.01" type="number" value={value} />
+        </label>
+        <label className="text-xs font-semibold text-[var(--foreground-secondary)]">
+          Date received
+          <input className={field} max={today} onChange={(event) => setDate(event.target.value)} type="date" value={date} />
+        </label>
+        <label className="text-xs font-semibold text-[var(--foreground-secondary)]">
+          Method
+          <select className={field} onChange={(event) => setMethod(event.target.value)} value={method}>
+            {METHODS.map(([key, label]) => (
+              <option key={key} value={key}>{label}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+      {remainder >= 1 && received > 0 ? (
+        <p className="mt-2 text-xs font-semibold text-[var(--warning)]">Part payment: {money(remainder)} will stay due.</p>
+      ) : null}
+      {error ? <p className="mt-2 text-xs font-semibold text-[var(--danger)]">{error}</p> : null}
+      <div className="mt-3 flex gap-2">
+        <button className="primary-action pressable min-h-9 px-4 text-xs" disabled={isPending} onClick={save} type="button">
+          {isPending ? "Saving…" : "Confirm received"}
+        </button>
+        <button className="secondary-action pressable min-h-9 px-4 text-xs" disabled={isPending} onClick={onClose} type="button">
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function TaskRow({ item, organizationId, today }: { item: TaskListItem; organizationId: string; today: string }) {
+  const [showNote, setShowNote] = useState(false);
+  const [recording, setRecording] = useState(false);
+  const overdue = !item.completedAt && !!item.dueDate && item.dueDate < today;
+  const time = item.kind === "task" ? timeLabel(item.dueAt) : null;
+  const context = [item.customerName, item.vehicleLabel, item.rentalLabel].filter(Boolean).join(" · ");
+
+  return (
+    <div className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-start">
+      <div className="flex min-w-0 flex-1 items-start gap-3">
+        {item.kind === "payment" ? (
+          <Wallet className={`mt-0.5 shrink-0 ${overdue ? "text-[var(--danger)]" : "text-[var(--primary)]"}`} size={20} />
+        ) : item.completedAt ? (
+          <CheckCircle2 className="mt-0.5 shrink-0 text-emerald-600" size={20} />
+        ) : (
+          <Circle className="mt-0.5 shrink-0 text-[var(--muted)]" size={20} />
+        )}
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <p className="font-bold text-[var(--foreground)]">{item.title}</p>
+            {item.amount != null ? <span className="font-black text-[var(--foreground)]">{money(item.amount)}</span> : null}
+            {item.kind === "task" ? <Badge tone="neutral">{taskTypeLabel(item.taskType)}</Badge> : null}
+          </div>
+          {context ? <p className="mt-0.5 text-sm sm:truncate text-[var(--foreground-secondary)]">{context}</p> : null}
+          <p className={`mt-0.5 text-xs font-semibold ${overdue ? "text-[var(--danger)]" : "text-[var(--muted)]"}`}>
+            {item.completedAt
+              ? `Done ${dayLabel(new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date(item.completedAt)), today)}`
+              : item.dueDate
+                ? `${overdue ? "Was due" : "Due"} ${dayLabel(item.dueDate, today)}${time ? ` · ${time}` : ""}`
+                : "No due date"}
+          </p>
+          {recording && item.rentalPaymentId ? (
+            <RecordPaymentPanel amount={item.amount || 0} onClose={() => setRecording(false)} paymentId={item.rentalPaymentId} today={today} />
+          ) : null}
+          {showNote && !item.completedAt ? (
+            <form action={completeTask} className="mt-2 flex flex-col gap-2 sm:flex-row">
+              <input name="organizationId" type="hidden" value={organizationId} />
+              <input name="taskId" type="hidden" value={item.id} />
+              <input
+                aria-label="Note"
+                autoFocus
+                className="min-h-10 flex-1 rounded-lg border border-[var(--border)] px-3 text-sm"
+                name="notes"
+                placeholder="What was done (optional)"
+              />
+              <PendingButton className="primary-action min-h-10 px-4 text-sm" pendingLabel="Saving…" type="submit">
+                Save & mark done
+              </PendingButton>
+            </form>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="flex shrink-0 flex-wrap items-center gap-2 pl-8 sm:pl-0">
+        {item.kind === "payment" && item.rentalPaymentId && !recording ? (
+          <button className="primary-action pressable min-h-9 px-3 text-xs" onClick={() => setRecording(true)} type="button">
+            Record payment
+          </button>
+        ) : null}
+        {item.kind === "task" && !item.completedAt && !showNote ? (
+          <>
+            <form action={completeTask}>
+              <input name="organizationId" type="hidden" value={organizationId} />
+              <input name="taskId" type="hidden" value={item.id} />
+              <PendingButton className="primary-action min-h-9 px-3 text-xs" pendingLabel="Saving…" type="submit">
+                Mark done
+              </PendingButton>
+            </form>
+            <button className="secondary-action pressable min-h-9 px-3 text-xs" onClick={() => setShowNote(true)} type="button">
+              Add note
+            </button>
+          </>
+        ) : null}
+        {item.rentalId ? (
+          <Link className="secondary-action pressable min-h-9 px-3 text-xs" href={`/bookings/${item.rentalId}`}>
+            Booking
+          </Link>
+        ) : item.vehicleId ? (
+          <Link className="secondary-action pressable min-h-9 px-3 text-xs" href={`/fleet/${item.vehicleId}`}>
+            Vehicle
+          </Link>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+export function TasksList({
+  tasks,
+  organizationId,
+  today,
+  laterLimit = 5
+}: {
+  tasks: TaskListItem[];
+  organizationId: string;
+  today: string;
+  laterLimit?: number;
+}) {
+  const [filter, setFilter] = useState<Filter>("open");
+  const [showAllLater, setShowAllLater] = useState(false);
+
+  const open = useMemo(() => tasks.filter((task) => !task.completedAt), [tasks]);
+  const done = useMemo(
+    () => tasks.filter((task) => !!task.completedAt).sort((a, b) => String(b.completedAt).localeCompare(String(a.completedAt))),
+    [tasks]
+  );
+  const groups = useMemo(() => groupOpen(open, today), [open, today]);
+
+  const toneClass = { red: "text-[var(--danger)]", amber: "text-[var(--warning)]", neutral: "text-[var(--foreground-secondary)]" };
 
   return (
     <div className="space-y-4">
       <div className="flex gap-2">
-        {filters.map((entry) => (
+        {([
+          ["open", `To do (${open.length})`],
+          ["done", "Done"]
+        ] as const).map(([value, label]) => (
           <button
-            className={`pressable min-h-11 rounded-xl border px-4 py-2 text-sm font-black capitalize ${filter === entry ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white"}`}
-            key={entry}
-            onClick={() => setFilter(entry)}
+            className={`pressable min-h-10 rounded-xl border px-4 text-sm font-bold ${filter === value ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground)]"}`}
+            key={value}
+            onClick={() => setFilter(value)}
             type="button"
           >
-            {entry}
+            {label}
           </button>
         ))}
       </div>
 
-      {filtered.length === 0 ? (
+      {filter === "open" ? (
+        groups.length === 0 ? (
+          <div className="empty-state">
+            <p className="text-lg font-black text-[var(--foreground)]">Nothing to do</p>
+            <p className="mt-2 text-sm text-[var(--muted)]">Payments due and tasks you add on a vehicle page will appear here.</p>
+          </div>
+        ) : (
+          groups.map((group) => {
+            const limited = group.key === "later" && !showAllLater && group.items.length > laterLimit;
+            const items = limited ? group.items.slice(0, laterLimit) : group.items;
+            return (
+              <section className="overflow-hidden rounded-xl border border-[var(--border)] bg-white" key={group.key}>
+                <div className="flex items-center justify-between border-b border-[var(--border)] bg-[var(--panel-secondary)] px-4 py-2">
+                  <p className={`text-xs font-black uppercase tracking-[0.08em] ${toneClass[group.tone]}`}>{group.title}</p>
+                  <p className="text-xs font-semibold text-[var(--muted)]">{group.items.length}</p>
+                </div>
+                <div className="divide-y divide-[var(--border)]">
+                  {items.map((item) => (
+                    <TaskRow item={item} key={item.id} organizationId={organizationId} today={today} />
+                  ))}
+                </div>
+                {limited ? (
+                  <button
+                    className="w-full border-t border-[var(--border)] px-4 py-2 text-left text-sm font-bold text-[var(--primary)]"
+                    onClick={() => setShowAllLater(true)}
+                    type="button"
+                  >
+                    Show {group.items.length - laterLimit} more
+                  </button>
+                ) : null}
+              </section>
+            );
+          })
+        )
+      ) : done.length === 0 ? (
         <div className="empty-state">
-          <p className="text-lg font-black text-[#10252b]">No tasks in this view</p>
-          <p className="mt-2 text-sm text-[#667085]">Delivery, pickup, and maintenance tasks will appear here when assigned.</p>
+          <p className="text-lg font-black text-[var(--foreground)]">No finished tasks yet</p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {filtered.map((task) => (
-            <div className="content-section" key={task.id}>
-              <div className="flex items-start gap-3">
-                {task.completedAt ? (
-                  <CheckCircle2 className="mt-1 text-emerald-600" size={22} />
-                ) : (
-                  <Circle className="mt-1 text-[var(--muted)]" size={22} />
-                )}
-                <div className="flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-black text-[var(--foreground)]">{task.title}</p>
-                    <Badge tone={task.completedAt ? "green" : "amber"}>{task.completedAt ? "Done" : "Open"}</Badge>
-                    <Badge tone="neutral">{task.taskType.replace(/_/g, " ")}</Badge>
-                  </div>
-                  <p className="mt-1 text-sm text-[var(--muted)]">Due {formatWhen(task.dueAt)}</p>
-                  {(task.vehicleLabel || task.rentalLabel) && (
-                    <p className="text-sm font-semibold text-[var(--foreground-secondary)]">
-                      {[task.vehicleLabel, task.rentalLabel].filter(Boolean).join(" · ")}
-                    </p>
-                  )}
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {task.rentalId ? (
-                      <Link className="text-sm font-bold text-[var(--primary)]" href={`/bookings/${task.rentalId}`}>
-                        Open booking
-                      </Link>
-                    ) : null}
-                    {task.vehicleId ? (
-                      <Link className="text-sm font-bold text-[var(--primary)]" href={`/fleet/${task.vehicleId}`}>
-                        Open vehicle
-                      </Link>
-                    ) : null}
-                  </div>
-                </div>
-              </div>
-
-              {!task.completedAt ? (
-                <div className="mt-4 border-t border-[var(--border)] pt-4">
-                  {task.rentalPaymentId ? (
-                    <div className="mb-3 rounded-lg border border-[#a5f3fc] bg-[var(--primary-light)] p-3">
-                      <p className="text-sm font-black text-[var(--foreground)]">Record the payment transaction too?</p>
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        <Link
-                          className="primary-action pressable min-h-9 px-3 text-xs"
-                          href={`/transactions/new?taskId=${task.id}&rentalPaymentId=${task.rentalPaymentId}`}
-                        >
-                          Yes - record payment
-                        </Link>
-                      </div>
-                    </div>
-                  ) : null}
-                  <form action={completeTask} className="flex flex-col gap-2 sm:flex-row sm:items-end">
-                    <input name="organizationId" type="hidden" value={organizationId} />
-                    <input name="taskId" type="hidden" value={task.id} />
-                    <label className="flex-1">
-                      <span className="text-sm font-semibold text-[#344054]">Completion notes (optional)</span>
-                      <input className="mt-1 w-full rounded-xl border border-[var(--border)] px-3 py-2 text-sm" name="notes" placeholder="Delivered to airport at 10:30" />
-                    </label>
-                    <PendingButton className="primary-action" pendingLabel="Saving..." type="submit">
-                      {task.rentalPaymentId ? "Mark complete without recording" : "Mark complete"}
-                    </PendingButton>
-                  </form>
-                </div>
-              ) : null}
-            </div>
-          ))}
-        </div>
+        <section className="overflow-hidden rounded-xl border border-[var(--border)] bg-white">
+          <div className="divide-y divide-[var(--border)]">
+            {done.slice(0, 50).map((item) => (
+              <TaskRow item={item} key={item.id} organizationId={organizationId} today={today} />
+            ))}
+          </div>
+        </section>
       )}
     </div>
   );

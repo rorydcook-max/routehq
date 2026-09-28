@@ -37,9 +37,9 @@ export default async function CalendarPage({
       <section>
         <div className="mb-4">
           <p className="page-eyebrow">Tasks</p>
-          <h2 className="text-2xl font-black tracking-[-0.03em] text-[var(--foreground)]">Tasks & Outstanding Actions</h2>
+          <h2 className="text-2xl font-black tracking-[-0.03em] text-[var(--foreground)]">To do</h2>
         </div>
-        <TasksList organizationId={organization.id} tasks={tasks} />
+        <TasksList organizationId={organization.id} tasks={tasks} today={today} />
       </section>
     </AppShell>
   );

@@ -2648,8 +2648,18 @@ export async function recordPaymentReceived(paymentId: string, fields: RecordPay
 
   await ensureMembership(supabase, payment.organization_id, user.id);
 
-  const description = payment.metadata?.description || "Scheduled payment";
-  const transactionNotes = `${description} - received via ${method}${note ? `. ${note}` : ""}`;
+  const paymentType = String(payment.metadata?.type || "");
+  const description =
+    payment.metadata?.description ||
+    (paymentType === "deposit" || payment.metadata?.is_deposit === true
+      ? "Deposit"
+      : paymentType === "extension"
+        ? "Extension payment"
+        : payment.metadata?.period_label
+          ? `${payment.metadata.period_label} rent`
+          : "Rent payment");
+  const methodLabel = method.replace(/_/g, " ");
+  const transactionNotes = `${description} - received by ${methodLabel}${note ? `. ${note}` : ""}`;
   // A deposit (for example a top-up agreed in a signed amendment) is held,
   // not earned: record it as deposit received and add it to the deposit held.
   const isDepositPayment = payment.metadata?.type === "deposit" || payment.metadata?.is_deposit === true;
@@ -2685,12 +2695,20 @@ export async function recordPaymentReceived(paymentId: string, fields: RecordPay
     payment_received_at: new Date().toISOString()
   };
 
+  // A part payment settles only what was received; the rest stays due on the
+  // same date as its own line, so the balance and reminders stay right.
+  const scheduledAmount = Number(payment.amount || 0);
+  const remainder = Math.round((scheduledAmount - amount) * 100) / 100;
+  const isPartPayment = remainder >= 1;
+
   const { error: updateError } = await supabase
     .from("rental_payments")
     .update({
       status: "paid",
       paid_at: `${receivedDate}T00:00:00.000Z`,
-      metadata
+      paid_date: receivedDate,
+      ...(isPartPayment ? { amount } : {}),
+      metadata: isPartPayment ? { ...metadata, scheduled_amount: scheduledAmount } : metadata
     })
     .eq("id", payment.id)
     .eq("organization_id", payment.organization_id);
@@ -2698,6 +2716,38 @@ export async function recordPaymentReceived(paymentId: string, fields: RecordPay
   if (updateError) {
     throw new Error(updateError.message);
   }
+
+  if (isPartPayment) {
+    const { error: remainderError } = await supabase.from("rental_payments").insert({
+      organization_id: payment.organization_id,
+      rental_id: payment.rental_id,
+      customer_id: payment.customer_id,
+      vehicle_id: payment.vehicle_id,
+      due_date: payment.due_date,
+      scheduled_date: payment.scheduled_date || payment.due_date,
+      amount: remainder,
+      currency: payment.currency || "THB",
+      status: "pending",
+      metadata: {
+        type: payment.metadata?.type || "rent",
+        is_deposit: payment.metadata?.is_deposit === true,
+        period_label: payment.metadata?.period_label || null,
+        description: `Remaining balance - ${description}`,
+        remainder_of: payment.id
+      }
+    });
+    if (remainderError) {
+      throw new Error(remainderError.message);
+    }
+  }
+
+  // Any reminder task for this payment is now done.
+  await supabase
+    .from("tasks")
+    .update({ completed_at: new Date().toISOString(), completion_notes: "Payment recorded." })
+    .eq("organization_id", payment.organization_id)
+    .eq("rental_payment_id", payment.id)
+    .is("completed_at", null);
 
   if (isDepositPayment) {
     const { data: depositRental } = await supabase
@@ -2738,6 +2788,7 @@ export async function recordPaymentReceived(paymentId: string, fields: RecordPay
   revalidatePath("/bookings");
   revalidatePath(`/bookings/${payment.rental_id}`);
   revalidatePath("/calendar");
+  revalidatePath("/tasks");
 
   return { success: true };
 }

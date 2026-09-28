@@ -459,7 +459,8 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const badgeTone = voided ? "neutral" : status === "paid" ? "green" : status === "overdue" ? "red" : status === "waived" ? "blue" : "amber";
-  const canRecordPayment = !voided && ["pending", "overdue"].includes(status);
+  // Scheduled payments can be recorded too: customers often pay early.
+  const canRecordPayment = !voided && ["scheduled", "pending", "overdue"].includes(status);
 
   useEffect(() => {
     if (!canRecordPayment) return;

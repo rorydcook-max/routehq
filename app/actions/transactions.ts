@@ -100,7 +100,7 @@ export async function generateReceipt(input: GenerateReceiptInput) {
   const prefix = String(organization.receipt_prefix || "REC").trim() || "REC";
   const receiptNumber = `${prefix}-${year}-${String((count || 0) + 1).padStart(4, "0")}`;
   const receiptId = crypto.randomUUID();
-  const receiptDate = new Intl.DateTimeFormat("en-TH", { day: "2-digit", month: "short", year: "numeric" }).format(new Date());
+  const receiptDate = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(new Date());
   const vehicle = [input.vehicleMakeModel, input.vehiclePlate].filter(Boolean).join(" - ");
   const footerHtml = organization.receipt_footer_text
     ? `<p style="font-size: 12px; color: #717d86; text-align: center; border-top: 1px solid #e3e6e8; padding-top: 12px; margin: 0;">${escapeHtml(organization.receipt_footer_text)}</p>`

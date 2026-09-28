@@ -14,18 +14,18 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
     <AppShell>
       <Card>
         <p className="text-xs font-semibold uppercase text-[#be123c]">Something went wrong</p>
-        <h1 className="mt-1 text-2xl font-extrabold text-[#10252b]">That didn&apos;t work</h1>
-        <p className="mt-2 text-sm text-[#667085]">
+        <h1 className="mt-1 text-2xl font-semibold text-[var(--foreground)]">That didn&apos;t work</h1>
+        <p className="mt-2 text-sm text-[var(--muted)]">
           {generic
             ? "This page couldn't load or your last change couldn't be saved. Check the details and try again; if it keeps happening, send us the reference below."
             : error.message}
         </p>
-        {error.digest ? <p className="mt-2 font-mono text-xs text-[#98a2b3]">Reference: {error.digest}</p> : null}
+        {error.digest ? <p className="mt-2 font-mono text-xs text-[var(--muted)]">Reference: {error.digest}</p> : null}
         <div className="mt-4 flex flex-wrap gap-2">
-          <button className="rounded-md bg-[#0f766e] px-4 py-2 text-sm font-semibold text-white" onClick={reset} type="button">
+          <button className="rounded-md bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white" onClick={reset} type="button">
             Try again
           </button>
-          <button className="rounded-md border border-[#d0d5dd] bg-white px-4 py-2 text-sm font-semibold text-[#344054]" onClick={() => window.history.back()} type="button">
+          <button className="rounded-md border border-[#d0d5dd] bg-white px-4 py-2 text-sm font-semibold text-[var(--foreground-secondary)]" onClick={() => window.history.back()} type="button">
             Go back
           </button>
         </div>

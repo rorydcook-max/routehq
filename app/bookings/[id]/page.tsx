@@ -37,12 +37,12 @@ function money(value: unknown, currency = "THB") {
 
 function formatDate(value: string | null | undefined) {
   if (!value) return "Open";
-  return new Intl.DateTimeFormat("en-TH", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(value));
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
 }
 
 function formatDateTime(value: string | null | undefined) {
   if (!value) return "Not yet";
-  return new Intl.DateTimeFormat("en-TH", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(value));
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(value));
 }
 
 function formatPaymentMethod(value: string | null | undefined) {
@@ -283,7 +283,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
       <AppShell userEmail={userEmail}>
         <Card>
           <SectionHeader eyebrow="Booking not found" title="This rental could not be opened" />
-          <p className="mt-3 text-sm text-[#667085]">It may have been cancelled, deleted, or belong to another organisation.</p>
+          <p className="mt-3 text-sm text-[var(--muted)]">It may have been cancelled, deleted, or belong to another organisation.</p>
           <Link className="primary-action pressable mt-3" href="/bookings">
             Back to bookings
           </Link>
@@ -428,7 +428,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
           ? "text-[#d97706]"
           : financialState.tone === "blue"
             ? "text-[#2563eb]"
-            : "text-[#667085]";
+            : "text-[var(--muted)]";
 
   return (
     <AppShell userEmail={userEmail}>
@@ -444,8 +444,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
           </div>
         ) : null}
 
-        <div className="flex flex-wrap items-center gap-2 text-sm font-bold text-[#667085]">
-          <Link className="text-[#0f766e]" href="/bookings">Bookings</Link>
+        <div className="flex flex-wrap items-center gap-2 text-sm font-bold text-[var(--muted)]">
+          <Link className="text-[var(--primary)]" href="/bookings">Bookings</Link>
           <span>/</span>
           <span>{bookingReference(rental)}</span>
         </div>
@@ -460,13 +460,13 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 ) : null}
                 {!customer ? <Badge tone="amber">Awaiting customer</Badge> : null}
                 {rental.entered_by_operator ? <Badge tone="blue">Operator entered</Badge> : null}
-                <span className="font-mono-data text-xs font-black uppercase text-[#667085]">{bookingReference(rental)}</span>
+                <span className="font-mono-data text-xs font-semibold uppercase text-[var(--muted)]">{bookingReference(rental)}</span>
               </div>
-              <h1 className="mt-2 truncate text-2xl font-black tracking-[-0.02em] text-[#10252b]">
+              <h1 className="mt-2 truncate text-2xl font-semibold tracking-[-0.02em] text-[var(--foreground)]">
                 {customer ? customer.full_name : "Awaiting customer details"}
               </h1>
-              <p className="mt-1 truncate text-sm font-bold text-[#475467]">{vehicleTitle(vehicle)}</p>
-              <p className="font-mono-data mt-1 text-xs font-bold text-[#667085]">{vehicle?.registration_number}</p>
+              <p className="mt-1 truncate text-sm font-bold text-[var(--foreground-secondary)]">{vehicleTitle(vehicle)}</p>
+              <p className="font-mono-data mt-1 text-xs font-bold text-[var(--muted)]">{vehicle?.registration_number}</p>
             </div>
             <div className="flex flex-wrap items-center gap-2 lg:max-w-[560px] lg:justify-end">
               <ActionButton href={`/bookings/${rental.id}/edit` as Route} tone="light">
@@ -531,19 +531,19 @@ export default async function BookingDetailPage({ params, searchParams }: { para
 
         <div className="grid gap-3 md:grid-cols-4">
           <BookingMetricCard icon={<CalendarDays size={18} />} label="Dates">
-            <div className="flex flex-wrap items-center gap-1 text-sm font-black leading-5 text-[#10252b]">
+            <div className="flex flex-wrap items-center gap-1 text-sm font-semibold leading-5 text-[var(--foreground)]">
               <span>{formatDate(rental.start_date)} to</span>
               <EditableEndDate currentEndDate={rental.end_date} rentalId={rental.id} />
             </div>
-            <p className="text-sm text-[#667085]">{daysRemaining(rental.end_date, rental.status, rental.start_date)}</p>
+            <p className="text-sm text-[var(--muted)]">{daysRemaining(rental.end_date, rental.status, rental.start_date)}</p>
           </BookingMetricCard>
           <BookingMetricCard icon={<CreditCard size={18} />} label="Billing">
-            <p className="font-mono-data text-sm font-black leading-5 text-[#10252b]">{money(rental.rental_rate, rental.currency)} / {({ daily: "day", weekly: "week", monthly: "month" } as Record<string, string>)[String(rental.pricing_model)] || "period"}</p>
-            <p className={`text-sm font-black ${financialStateClass}`}>{financialState.label}</p>
+            <p className="font-mono-data text-sm font-semibold leading-5 text-[var(--foreground)]">{money(rental.rental_rate, rental.currency)} / {({ daily: "day", weekly: "week", monthly: "month" } as Record<string, string>)[String(rental.pricing_model)] || "period"}</p>
+            <p className={`text-sm font-semibold ${financialStateClass}`}>{financialState.label}</p>
             {financialState.amount !== null ? (
               <p className={`font-mono-data text-sm ${financialStateClass}`}>{money(financialState.amount, rental.currency)}</p>
             ) : (
-              <p className="text-sm text-[#667085]">{financialState.detail}</p>
+              <p className="text-sm text-[var(--muted)]">{financialState.detail}</p>
             )}
             {pendingPaymentAmount > 0 && customer ? (
               <div className="mt-3">
@@ -554,29 +554,29 @@ export default async function BookingDetailPage({ params, searchParams }: { para
           <BookingMetricCard icon={<Gauge size={18} />} label="Mileage">
             {rental.mileage_at_delivery == null ? (
               <>
-                <p className="text-sm font-black leading-5 text-[#10252b]">Not recorded yet</p>
-                <p className="text-sm text-[#667085]">Recorded at delivery</p>
+                <p className="text-sm font-semibold leading-5 text-[var(--foreground)]">Not recorded yet</p>
+                <p className="text-sm text-[var(--muted)]">Recorded at delivery</p>
               </>
             ) : rental.mileage_at_return == null ? (
               <>
-                <p className="font-mono-data text-sm font-black leading-5 text-[#10252b]">{Number(rental.mileage_at_delivery).toLocaleString()} km at delivery</p>
-                <p className="text-sm text-[#667085]">Distance driven is worked out at return</p>
+                <p className="font-mono-data text-sm font-semibold leading-5 text-[var(--foreground)]">{Number(rental.mileage_at_delivery).toLocaleString()} km at delivery</p>
+                <p className="text-sm text-[var(--muted)]">Distance driven is worked out at return</p>
               </>
             ) : (
               <>
-                <p className="font-mono-data text-sm font-black leading-5 text-[#10252b]">{Number(rental.km_driven ?? Number(rental.mileage_at_return) - Number(rental.mileage_at_delivery)).toLocaleString()} km driven</p>
-                <p className="font-mono-data text-sm text-[#667085]">{Number(rental.mileage_at_delivery).toLocaleString()} → {Number(rental.mileage_at_return).toLocaleString()} km</p>
+                <p className="font-mono-data text-sm font-semibold leading-5 text-[var(--foreground)]">{Number(rental.km_driven ?? Number(rental.mileage_at_return) - Number(rental.mileage_at_delivery)).toLocaleString()} km driven</p>
+                <p className="font-mono-data text-sm text-[var(--muted)]">{Number(rental.mileage_at_delivery).toLocaleString()} → {Number(rental.mileage_at_return).toLocaleString()} km</p>
               </>
             )}
           </BookingMetricCard>
           <BookingMetricCard icon={<UserRound size={18} />} label="Customer">
             {customer ? (
               <>
-                <p className="truncate text-sm font-black leading-5 text-[#10252b]">{flagForNationality(customer.nationality)} {customer.nationality || "Nationality not set"}</p>
-                <p className="text-sm text-[#667085]">{customer.phone || "Phone not set"}</p>
+                <p className="truncate text-sm font-semibold leading-5 text-[var(--foreground)]">{flagForNationality(customer.nationality)} {customer.nationality || "Nationality not set"}</p>
+                <p className="text-sm text-[var(--muted)]">{customer.phone || "Phone not set"}</p>
               </>
             ) : (
-              <p className="text-sm font-black text-[#b45309]">Awaiting details</p>
+              <p className="text-sm font-semibold text-[#b45309]">Awaiting details</p>
             )}
           </BookingMetricCard>
         </div>
@@ -586,19 +586,19 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             <Card>
               <SectionHeader eyebrow="Booking link" title={bookingLink ? "Customer completion timeline" : "Customer booking link"} />
               {!bookingLink ? (
-                <p className="mt-3 text-sm text-[#667085]">
+                <p className="mt-3 text-sm text-[var(--muted)]">
                   This booking was entered by your team. Create a link if you want the customer to add their details and sign the agreement online.
                 </p>
               ) : null}
               <div className="mt-3 space-y-3">
                 {(bookingLink ? timelineSteps(bookingLink, rentalDocuments) : []).map((step) => (
                     <div className="sub-surface flex items-start gap-3 p-3" key={step.label}>
-                    <span className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${step.complete ? "bg-[#dcfce7] text-[#166534]" : "bg-[#eef2f6] text-[#667085]"}`}>
+                    <span className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${step.complete ? "bg-[#dcfce7] text-[#166534]" : "bg-[#fbfaf8] text-[var(--muted)]"}`}>
                       {step.complete ? <CheckCircle2 size={16} /> : <Clock size={16} />}
                     </span>
                     <div>
-                      <p className="font-black text-[#10252b]">{step.label}</p>
-                      <p className="text-sm text-[#667085]">{formatDateTime(step.at)}</p>
+                      <p className="font-semibold text-[var(--foreground)]">{step.label}</p>
+                      <p className="text-sm text-[var(--muted)]">{formatDateTime(step.at)}</p>
                     </div>
                   </div>
                 ))}
@@ -622,9 +622,9 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     {["passport", "driver_license", "selfie"].map((category) => {
                       const found = customerDocuments.some((document: any) => document.category === category);
                       return (
-                        <div className="flex items-center gap-2 rounded-lg border border-[#d6e5e2] bg-white p-3" key={category}>
+                        <div className="flex items-center gap-2 rounded-lg border border-[var(--border)] bg-white p-3" key={category}>
                           {found ? <CheckCircle2 className="text-[#16a34a]" size={18} /> : <AlertTriangle className="text-[#b7791f]" size={18} />}
-                          <span className="text-sm font-bold capitalize text-[#10252b]">{category.replace(/_/g, " ")}</span>
+                          <span className="text-sm font-bold capitalize text-[var(--foreground)]">{category.replace(/_/g, " ")}</span>
                         </div>
                       );
                     })}
@@ -632,12 +632,12 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 </>
               ) : (
                 <div className="mt-3 space-y-3">
-                  <div className="rounded-lg border border-[#99f6e4] bg-[#f0fdfa] p-3">
+                  <div className="rounded-lg border border-[#bfe0db] bg-[#fbfaf8] p-3">
                     <div className="flex items-center gap-2">
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#ccfbf1]">
-                        <Clock className="text-[#0f766e]" size={16} />
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)]">
+                        <Clock className="text-[var(--primary)]" size={16} />
                       </span>
-                      <p className="font-black text-[#0f766e]">Awaiting customer details</p>
+                      <p className="font-semibold text-[var(--primary)]">Awaiting customer details</p>
                     </div>
                     <p className="mt-3 text-sm leading-6 text-[#134e4a]">
                       The booking link will ask your customer to fill in their personal details, upload their passport and driving licence, and sign the rental contract. Use the share options above to send or copy the link.
@@ -697,11 +697,11 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 ) : isRetrospective && rental.status === "booked" ? (
                   // Retrospective, not yet activated: equal-weight options
                   <div className="sub-surface space-y-3 p-3">
-                    <div className="flex items-center gap-2 font-black text-[#10252b]">
+                    <div className="flex items-center gap-2 font-semibold text-[var(--foreground)]">
                       <AlertTriangle className="text-[#b7791f]" size={18} />
                       Delivery inspection
                     </div>
-                    <p className="text-sm text-[#667085]">
+                    <p className="text-sm text-[var(--muted)]">
                       No inspection on record. This rental started {startedAgoLabel(rental.start_date)}. Inspection is optional for retrospective bookings.
                     </p>
                     <div className="grid gap-2 sm:grid-cols-2">
@@ -717,7 +717,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 ) : isRetrospective ? (
                   // Retrospective, already active, no inspection: soft prompt
                   <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
-                    <div className="flex items-center gap-2 font-black text-[#92400e]">
+                    <div className="flex items-center gap-2 font-semibold text-[#92400e]">
                       <AlertTriangle className="text-[#b7791f]" size={18} />
                       No delivery inspection
                     </div>
@@ -734,7 +734,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 ) : rental.status === "booked" ? (
                   // New booking: prominent start inspection + skip
                   <div className="sub-surface space-y-2 p-3">
-                    <div className="flex items-center gap-2 font-black text-[#10252b]">
+                    <div className="flex items-center gap-2 font-semibold text-[var(--foreground)]">
                       <AlertTriangle className="text-[#b7791f]" size={18} />
                       Delivery inspection
                     </div>
@@ -746,7 +746,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 ) : (
                   // Active, not retrospective, no inspection
                   <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
-                    <div className="flex items-center gap-2 font-black text-[#92400e]">
+                    <div className="flex items-center gap-2 font-semibold text-[#92400e]">
                       <AlertTriangle className="text-[#b7791f]" size={18} />
                       No delivery inspection
                     </div>
@@ -783,9 +783,9 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 ) : (
                   activityEvents.map((event: any) => (
                   <div className="sub-surface p-3" key={event.id}>
-                      <p className="font-black text-[#10252b]">{event.title}</p>
-                      <p className="mt-1 text-sm text-[#667085]">{event.detail || event.event_type}</p>
-                      <p className="mt-2 text-xs font-bold uppercase text-[#94a3b8]">{formatDateTime(event.occurred_at)}</p>
+                      <p className="font-semibold text-[var(--foreground)]">{event.title}</p>
+                      <p className="mt-1 text-sm text-[var(--muted)]">{event.detail || event.event_type}</p>
+                      <p className="mt-2 text-xs font-bold uppercase text-[var(--muted)]">{formatDateTime(event.occurred_at)}</p>
                     </div>
                   ))
                 )}
@@ -829,10 +829,10 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                         <i aria-hidden="true" className="ti ti-alert-circle text-base" />
                       </span>
                       <div className="min-w-0 flex-1">
-                        <p className="font-black text-[#92400e]">Customer has reported making payment - awaiting your confirmation</p>
+                        <p className="font-semibold text-[#92400e]">Customer has reported making payment - awaiting your confirmation</p>
                         <p className="mt-1 text-sm text-[#b45309]">Reported {formatDateTime(bookingLink?.payment_reported_at)}</p>
                         <form action={confirmCustomerPaymentAction} className="mt-3">
-                          <PendingButton className="pressable inline-flex w-full items-center justify-center rounded-lg bg-[#d97706] px-3 py-2 text-sm font-black text-white shadow-sm" pendingLabel="Confirming..." type="submit">
+                          <PendingButton className="pressable inline-flex w-full items-center justify-center rounded-lg bg-[#d97706] px-3 py-2 text-sm font-semibold text-white shadow-sm" pendingLabel="Confirming..." type="submit">
                             Confirm payment received
                           </PendingButton>
                         </form>
@@ -858,21 +858,21 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 <div className="grid gap-2 sm:grid-cols-3">
                   <div className="rounded-lg border border-[var(--border)] bg-white p-3">
                     <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Scheduled</p>
-                    <p className="font-mono-data mt-1 text-lg font-black text-[#10252b]">{money(totalRentalValue, rental.currency)}</p>
+                    <p className="font-mono-data mt-1 text-lg font-semibold text-[var(--foreground)]">{money(totalRentalValue, rental.currency)}</p>
                   </div>
                   <div className="rounded-lg border border-[var(--border)] bg-white p-3">
                     <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Paid income</p>
-                    <p className="font-mono-data mt-1 text-lg font-black text-[#16a34a]">{money(totalPaid, rental.currency)}</p>
+                    <p className="font-mono-data mt-1 text-lg font-semibold text-[#16a34a]">{money(totalPaid, rental.currency)}</p>
                   </div>
                   <div className="rounded-lg border border-[var(--border)] bg-white p-3">
                     <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Balance</p>
-                    <p className={`font-mono-data mt-1 text-lg font-black ${outstandingBalance > 0 ? "text-[#dc2626]" : "text-[#16a34a]"}`}>{money(outstandingBalance, rental.currency)}</p>
+                    <p className={`font-mono-data mt-1 text-lg font-semibold ${outstandingBalance > 0 ? "text-[#dc2626]" : "text-[#16a34a]"}`}>{money(outstandingBalance, rental.currency)}</p>
                   </div>
                 </div>
                 {outstandingBalance > 0 && activeRentalStatus ? (
                   <div className="flex flex-col gap-3 rounded-xl border border-[#d1fae5] bg-[#f0fdf4] p-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <p className="text-sm font-black text-[#065f46]">
+                      <p className="text-sm font-semibold text-[#065f46]">
                         {money(outstandingBalance, rental.currency)} outstanding
                       </p>
                       <p className="mt-0.5 text-xs text-[#059669]">
@@ -881,7 +881,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     </div>
                     {pendingPayment ? (
                       <a
-                        className="pressable inline-flex min-h-9 shrink-0 items-center justify-center gap-2 rounded-lg bg-[#059669] px-4 text-sm font-black text-white"
+                        className="pressable inline-flex min-h-9 shrink-0 items-center justify-center gap-2 rounded-lg bg-[#059669] px-4 text-sm font-semibold text-white"
                         href={`#record-payment-${pendingPayment.id}`}
                       >
                         <i aria-hidden="true" className="ti ti-cash text-[14px]" />
@@ -997,10 +997,10 @@ export default async function BookingDetailPage({ params, searchParams }: { para
 function Info({ icon: Icon, label, value, danger = false }: { icon: typeof Car; label: string; value: string; danger?: boolean }) {
   return (
     <div className="sub-surface flex items-start gap-3 p-3">
-      <Icon className={`mt-0.5 shrink-0 ${danger ? "text-[#be123c]" : "text-[#0f766e]"}`} size={18} />
+      <Icon className={`mt-0.5 shrink-0 ${danger ? "text-[#be123c]" : "text-[var(--primary)]"}`} size={18} />
       <div>
-        <p className="text-xs font-bold uppercase text-[#667085]">{label}</p>
-        <p className={`font-mono-data mt-1 font-black ${danger ? "text-[#be123c]" : "text-[#10252b]"}`}>{value}</p>
+        <p className="text-xs font-bold uppercase text-[var(--muted)]">{label}</p>
+        <p className={`font-mono-data mt-1 font-semibold ${danger ? "text-[#be123c]" : "text-[var(--foreground)]"}`}>{value}</p>
       </div>
     </div>
   );
@@ -1009,14 +1009,14 @@ function Info({ icon: Icon, label, value, danger = false }: { icon: typeof Car; 
 function DeliveryInfo({ delivery }: { delivery: { method: unknown; title: string; detail: string } }) {
   return (
     <div className="sub-surface flex items-start gap-3 p-3">
-      <MapPin className="mt-0.5 shrink-0 text-[#0f766e]" size={18} />
+      <MapPin className="mt-0.5 shrink-0 text-[var(--primary)]" size={18} />
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
-          <p className="text-xs font-bold uppercase text-[#667085]">Delivery</p>
+          <p className="text-xs font-bold uppercase text-[var(--muted)]">Delivery</p>
           {delivery.method === "tbd" ? <Badge tone="amber">To be confirmed</Badge> : null}
         </div>
-        <p className="mt-1 font-black text-[#10252b]">{delivery.title}</p>
-        <p className="mt-1 text-sm font-semibold text-[#667085]">{delivery.detail}</p>
+        <p className="mt-1 font-semibold text-[var(--foreground)]">{delivery.title}</p>
+        <p className="mt-1 text-sm font-semibold text-[var(--muted)]">{delivery.detail}</p>
       </div>
     </div>
   );
@@ -1025,11 +1025,11 @@ function DeliveryInfo({ delivery }: { delivery: { method: unknown; title: string
 function PaymentInfo({ method, timing }: { method: string | null; timing: string | null }) {
   return (
     <div className="sub-surface flex items-start gap-3 p-3">
-      <CreditCard className="mt-0.5 shrink-0 text-[#0f766e]" size={18} />
+      <CreditCard className="mt-0.5 shrink-0 text-[var(--primary)]" size={18} />
       <div>
-        <p className="text-xs font-bold uppercase text-[#667085]">Payment</p>
-        <p className="mt-1 font-black text-[#10252b]">Payment method: {formatPaymentMethod(method)}</p>
-        <p className="mt-1 text-sm font-semibold text-[#667085]">Payment timing: {formatPaymentTiming(timing)}</p>
+        <p className="text-xs font-bold uppercase text-[var(--muted)]">Payment</p>
+        <p className="mt-1 font-semibold text-[var(--foreground)]">Payment method: {formatPaymentMethod(method)}</p>
+        <p className="mt-1 text-sm font-semibold text-[var(--muted)]">Payment timing: {formatPaymentTiming(timing)}</p>
       </div>
     </div>
   );
@@ -1046,7 +1046,7 @@ function daysUntilLabel(days: number | null | undefined) {
 function comingUpTone(severity?: string) {
   if (severity === "high") return "border-[#fecaca] bg-[#fef2f2] text-[#dc2626]";
   if (severity === "medium") return "border-[#fde68a] bg-[#fffbeb] text-[#d97706]";
-  return "border-[#d6e5e2] bg-white text-[#454d54]";
+  return "border-[var(--border)] bg-white text-[var(--foreground-secondary)]";
 }
 
 function paymentStatusTone(status?: string): "green" | "amber" | "red" | "blue" | "neutral" {
@@ -1090,14 +1090,14 @@ function ComingUpCard({
       <SectionHeader eyebrow="Upcoming" title="What's coming up" />
       <div className="card-section">
         <div className="grid gap-3 xl:grid-cols-2">
-          <div className={nextPayment ? "rounded-[11px] bg-[#141c2b] p-4 text-white" : ""}>
+          <div className={nextPayment ? "rounded-[11px] border border-[var(--border)] bg-[var(--primary-light)] p-4" : ""}>
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-white/45">Next payment</p>
+                <p className="text-[12px] font-semibold text-[var(--primary)]">Next payment</p>
                 {nextPayment ? (
                   <>
-                    <p className="font-mono-data mt-2 text-2xl font-black tracking-[-0.03em] text-white">{money(nextPayment.amount, nextPayment.currency || currency)}</p>
-                    <p className="mt-1 text-xs font-semibold text-white/55">
+                    <p className="font-mono-data mt-2 text-2xl font-semibold tracking-[-0.03em] text-[var(--foreground)]">{money(nextPayment.amount, nextPayment.currency || currency)}</p>
+                    <p className="mt-1 text-xs font-semibold text-[var(--foreground-secondary)]">
                       {formatDate(nextPayment.due_date)} · {daysUntilLabel(nextPayment.days_until)}
                     </p>
                   </>
@@ -1125,36 +1125,36 @@ function ComingUpCard({
             {nextPayment ? (
               <div className="mt-4">
                 {showRecordPayment ? (
-                  <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-lg bg-[#5eead4] px-3 text-xs font-black text-[#083344]" href={`#record-payment-${nextPayment.id}` as Route}>
+                  <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-lg bg-[var(--primary)] px-3 text-xs font-semibold text-white" href={`#record-payment-${nextPayment.id}` as Route}>
                     Record payment received
                   </Link>
                 ) : (
-                  <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-lg border border-white/15 bg-white/8 px-3 text-xs font-black text-[#5eead4]" href={"#payment-schedule" as Route}>
+                  <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-lg border border-[var(--border)] bg-white px-3 text-xs font-semibold text-[var(--primary)]" href={"#payment-schedule" as Route}>
                     View payment schedule
                   </Link>
                 )}
               </div>
             ) : null}
             {upcomingPayments.length > 1 ? (
-              <div className="mt-4 space-y-2 border-t border-white/10 pt-3">
+              <div className="mt-4 space-y-2 border-t border-[#cfe5e1] pt-3">
                 {upcomingPayments.slice(1, 4).map((payment: any) => (
                   <div className="flex items-center justify-between gap-3 text-xs" key={payment.id}>
-                    <span className="truncate text-white/55">{formatDate(payment.due_date)}</span>
-                    <span className="font-mono-data shrink-0 font-black text-white">{money(payment.amount, payment.currency || currency)}</span>
+                    <span className="truncate text-[var(--foreground-secondary)]">{formatDate(payment.due_date)}</span>
+                    <span className="font-mono-data shrink-0 font-semibold text-[var(--foreground)]">{money(payment.amount, payment.currency || currency)}</span>
                   </div>
                 ))}
               </div>
             ) : null}
           </div>
 
-          <div className="rounded-[11px] border border-[#e3e6e8] bg-white p-4">
+          <div className="rounded-[11px] border border-[var(--border)] bg-white p-4">
             <div className="mb-3 flex items-center justify-between gap-3">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Vehicle events</p>
-                <p className="mt-1 text-sm font-black text-[#10252b]">{vehicle?.registration_number || vehicleTitle(vehicle) || "Assigned vehicle"}</p>
+                <p className="mt-1 text-sm font-semibold text-[var(--foreground)]">{vehicle?.registration_number || vehicleTitle(vehicle) || "Assigned vehicle"}</p>
               </div>
               {vehicle?.id ? (
-                <Link className="text-xs font-black text-[var(--primary)]" href={`/fleet/${vehicle.id}` as Route}>
+                <Link className="text-xs font-semibold text-[var(--primary)]" href={`/fleet/${vehicle.id}` as Route}>
                   View vehicle
                 </Link>
               ) : null}
@@ -1165,10 +1165,10 @@ function ComingUpCard({
                   <div className={`rounded-lg border px-3 py-2 ${comingUpTone(event.severity)}`} key={event.id}>
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-black">{event.label}</p>
+                        <p className="truncate text-sm font-semibold">{event.label}</p>
                         <p className="mt-1 text-xs font-semibold opacity-75">{formatDate(event.due_date)}</p>
                       </div>
-                      <span className="shrink-0 rounded-full bg-white px-2 py-1 text-[10px] font-black uppercase tracking-[0.04em]">
+                      <span className="shrink-0 rounded-full bg-white px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.04em]">
                         {eventTypeLabel(event.type)}
                       </span>
                     </div>
@@ -1177,7 +1177,7 @@ function ComingUpCard({
                 ))}
               </div>
             ) : (
-              <p className="rounded-lg border border-[#e3e6e8] bg-[#f8f9fa] p-3 text-sm font-semibold text-[var(--muted)]">
+              <p className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3 text-sm font-semibold text-[var(--muted)]">
                 No compliance dates or vehicle tasks due in the next 180 days.
               </p>
             )}
@@ -1192,18 +1192,18 @@ function InspectionStatus({ label, inspection, href, available }: { label: strin
   if (inspection) {
     return (
       <div className="rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] p-3">
-        <div className="flex items-center gap-2 font-black text-[#166534]">
+        <div className="flex items-center gap-2 font-semibold text-[#166534]">
           <CheckCircle2 size={18} />
           {label}
         </div>
-        <p className="mt-1 text-sm text-[#667085]">{formatDateTime(inspection.submitted_at || inspection.created_at)}</p>
+        <p className="mt-1 text-sm text-[var(--muted)]">{formatDateTime(inspection.submitted_at || inspection.created_at)}</p>
       </div>
     );
   }
 
   return (
     <div className="sub-surface p-3">
-      <div className="flex items-center gap-2 font-black text-[#10252b]">
+      <div className="flex items-center gap-2 font-semibold text-[var(--foreground)]">
         <AlertTriangle className="text-[#b7791f]" size={18} />
         {label}
       </div>
@@ -1212,7 +1212,7 @@ function InspectionStatus({ label, inspection, href, available }: { label: strin
           Start now
         </Link>
       ) : (
-        <p className="mt-2 text-sm text-[#667085]">Not available for the current booking status.</p>
+        <p className="mt-2 text-sm text-[var(--muted)]">Not available for the current booking status.</p>
       )}
     </div>
   );
@@ -1228,24 +1228,24 @@ function relativeTime(value: string | null | undefined) {
   const diffHours = Math.floor(diffMinutes / 60);
   if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? "" : "s"} ago`;
   if (diffHours < 48) return "Yesterday";
-  return new Intl.DateTimeFormat("en-TH", { day: "2-digit", month: "short", year: "numeric" }).format(date);
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(date);
 }
 
 function communicationTypeBadge(type: string) {
   const labels: Record<string, { label: string; className: string }> = {
     automated_reminder: { label: "Auto reminder", className: "border-[#bfdbfe] bg-[#eff6ff] text-[#2563eb]" },
-    manual_note: { label: "Note", className: "border-[#e3e6e8] bg-[#f8f9fa] text-[#454d54]" },
-    customer_portal_action: { label: "Customer action", className: "border-[#99f6e4] bg-[#ecfeff] text-[#0f766e]" },
+    manual_note: { label: "Note", className: "border-[var(--border)] bg-[#fbfaf8] text-[var(--foreground-secondary)]" },
+    customer_portal_action: { label: "Customer action", className: "border-[#bfe0db] bg-[var(--primary-light)] text-[var(--primary)]" },
     booking_link_activity: { label: "Booking link", className: "border-[#ddd6fe] bg-[#f5f3ff] text-[#7c3aed]" },
-    operator_message: { label: "Message sent", className: "border-[#cbd5e1] bg-[#1a1d21] text-white" }
+    operator_message: { label: "Message sent", className: "border-[var(--border)] bg-[#f1efeb] text-[var(--foreground-secondary)]" }
   };
-  const config = labels[type] || { label: String(type || "Event").replace(/_/g, " "), className: "border-[#e3e6e8] bg-white text-[#454d54]" };
-  return <span className={`inline-flex items-center rounded-full border px-2 py-1 text-[11px] font-black uppercase tracking-[0.04em] ${config.className}`}>{config.label}</span>;
+  const config = labels[type] || { label: String(type || "Event").replace(/_/g, " "), className: "border-[var(--border)] bg-white text-[var(--foreground-secondary)]" };
+  return <span className={`inline-flex items-center rounded-full border px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.04em] ${config.className}`}>{config.label}</span>;
 }
 
 function directionIndicator(direction?: string | null) {
-  if (direction === "outbound") return <span className="font-mono-data text-sm font-black text-[#0f766e]" title="Outbound">-&gt;</span>;
-  if (direction === "inbound") return <span className="font-mono-data text-sm font-black text-[#0f766e]" title="Inbound">&lt;-</span>;
+  if (direction === "outbound") return <span className="font-mono-data text-sm font-semibold text-[var(--primary)]" title="Outbound">-&gt;</span>;
+  if (direction === "inbound") return <span className="font-mono-data text-sm font-semibold text-[var(--primary)]" title="Inbound">&lt;-</span>;
   return null;
 }
 
@@ -1263,7 +1263,7 @@ function channelIcon(channel?: string | null) {
     booking_portal: "PORTAL"
   };
   const label = labels[normalized] || (normalized ? normalized.slice(0, 6).toUpperCase() : "");
-  return label ? <span className="rounded-full border border-[#d6e5e2] bg-white px-2 py-1 text-[10px] font-black uppercase text-[#667085]">{label}</span> : null;
+  return label ? <span className="rounded-full border border-[var(--border)] bg-white px-2 py-1 text-[10px] font-semibold uppercase text-[var(--muted)]">{label}</span> : null;
 }
 
 function communicationStatusBadge(entry: any) {
@@ -1321,9 +1321,9 @@ function CommunicationTimeline({
               {channelIcon(entry.channel)}
               {communicationStatusBadge(entry)}
             </div>
-            <span className="text-xs font-bold uppercase text-[#94a3b8]">{relativeTime(entry.created_at)}</span>
+            <span className="text-xs font-bold uppercase text-[var(--muted)]">{relativeTime(entry.created_at)}</span>
           </div>
-          <p className="mt-2 text-sm font-semibold leading-6 text-[#344054]">{entry.content || "No message content recorded."}</p>
+          <p className="mt-2 text-sm font-semibold leading-6 text-[var(--foreground-secondary)]">{entry.content || "No message content recorded."}</p>
         </div>
       ))}
     </div>
@@ -1333,26 +1333,26 @@ function CommunicationTimeline({
 function CustomerPortalActionCard({ action, organizationId, rentalId, customerId }: { action: any; organizationId: string; rentalId: string; customerId: string | null }) {
   const content = action.content || {};
   return (
-    <div className="rounded-lg border border-[#d6e5e2] bg-white p-3">
+    <div className="rounded-lg border border-[var(--border)] bg-white p-3">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <Badge tone={action.action_type === "problem_report" ? "red" : action.action_type === "extension_request" ? "amber" : "blue"}>
             {String(action.action_type || "").replace(/_/g, " ")}
           </Badge>
-          <p className="mt-2 font-black text-[#10252b]">{portalActionSummary(action)}</p>
-          <p className="mt-1 text-xs font-bold uppercase text-[#94a3b8]">{formatDateTime(action.created_at)}</p>
+          <p className="mt-2 font-semibold text-[var(--foreground)]">{portalActionSummary(action)}</p>
+          <p className="mt-1 text-xs font-bold uppercase text-[var(--muted)]">{formatDateTime(action.created_at)}</p>
         </div>
       </div>
       <div className="mt-3">
         {action.action_type === "extension_request" ? (
           <div className="grid gap-3 md:grid-cols-2">
-            <form action={approveExtensionRequest} className="rounded-lg border border-[#d6e5e2] bg-[#fbfefd] p-3">
+            <form action={approveExtensionRequest} className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
               <input name="organizationId" type="hidden" value={organizationId} />
               <input name="actionId" type="hidden" value={action.id} />
               <input name="rentalId" type="hidden" value={rentalId} />
-              <label className="block text-sm font-bold text-[#344054]">
+              <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
                 Approved end date
-                <input className="mt-2 w-full rounded-lg border border-[#d6e5e2] bg-white px-3 py-2 text-sm" defaultValue={content.new_end_date || ""} name="newEndDate" required type="date" />
+                <input className="mt-2 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm" defaultValue={content.new_end_date || ""} name="newEndDate" required type="date" />
               </label>
               <PendingButton className="primary-action pressable mt-3 w-full justify-center px-3 py-2" pendingLabel="Approving..." type="submit">
                 Approve extension
@@ -1366,7 +1366,7 @@ function CustomerPortalActionCard({ action, organizationId, rentalId, customerId
                 Decline note
                 <input className="mt-2 w-full rounded-lg border border-[#fecdd3] bg-white px-3 py-2 text-sm" name="note" placeholder="Optional" />
               </label>
-              <PendingButton className="pressable mt-3 w-full rounded-lg border border-[#fecdd3] bg-white px-3 py-2 text-sm font-black text-[#be123c]" pendingLabel="Declining..." type="submit">
+              <PendingButton className="pressable mt-3 w-full rounded-lg border border-[#fecdd3] bg-white px-3 py-2 text-sm font-semibold text-[#be123c]" pendingLabel="Declining..." type="submit">
                 Decline
               </PendingButton>
             </form>
@@ -1385,7 +1385,7 @@ function CustomerPortalActionCard({ action, organizationId, rentalId, customerId
             <input name="organizationId" type="hidden" value={organizationId} />
             <input name="actionId" type="hidden" value={action.id} />
             <input name="rentalId" type="hidden" value={rentalId} />
-            <textarea className="w-full rounded-lg border border-[#d6e5e2] bg-white px-3 py-2 text-sm" name="notes" placeholder="Resolution notes" />
+            <textarea className="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm" name="notes" placeholder="Resolution notes" />
             <PendingButton className="primary-action pressable px-3 py-2" pendingLabel="Resolving..." type="submit">
               Mark resolved
             </PendingButton>
@@ -1396,7 +1396,7 @@ function CustomerPortalActionCard({ action, organizationId, rentalId, customerId
             <input name="actionId" type="hidden" value={action.id} />
             <input name="rentalId" type="hidden" value={rentalId} />
             {customerId ? <input name="customerId" type="hidden" value={customerId} /> : null}
-            <textarea className="w-full rounded-lg border border-[#d6e5e2] bg-white px-3 py-2 text-sm" name="reply" placeholder="Reply to customer" required />
+            <textarea className="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm" name="reply" placeholder="Reply to customer" required />
             <PendingButton className="primary-action pressable px-3 py-2" pendingLabel="Sending..." type="submit">
               Reply
             </PendingButton>

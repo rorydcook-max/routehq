@@ -45,8 +45,8 @@ function formatDate(value: string | null | undefined) {
     return "Not set";
   }
 
-  return new Intl.DateTimeFormat("en-TH", {
-    day: "2-digit",
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
     month: "short",
     year: "numeric"
   }).format(new Date(value));
@@ -84,8 +84,8 @@ function rentalLabel(rental: any) {
 function InfoTile({ label, value, danger = false }: { label: string; value: React.ReactNode; danger?: boolean }) {
   return (
     <div className="sub-surface p-3">
-      <p className="text-xs font-bold uppercase text-[#667085]">{label}</p>
-      <p className={`font-mono-data mt-1 font-black ${danger ? "text-[#be123c]" : "text-[#10252b]"}`}>{value}</p>
+      <p className="text-xs font-bold uppercase text-[var(--muted)]">{label}</p>
+      <p className={`font-mono-data mt-1 font-semibold ${danger ? "text-[#be123c]" : "text-[var(--foreground)]"}`}>{value}</p>
     </div>
   );
 }
@@ -112,7 +112,7 @@ function preferredContactMethod(customer: any) {
 }
 
 function ContactChannelsForm({ customer, organizationId }: { customer: any; organizationId: string }) {
-  const inputClass = "mt-1 w-full rounded-lg border border-[#d6e5e2] bg-white px-3 text-[13px] text-[#10252b] outline-none focus:border-[#0f766e] focus:ring-2 focus:ring-[#0f766e]/15";
+  const inputClass = "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15";
 
   return (
     <form action={updateCustomer} className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -137,7 +137,7 @@ function ContactChannelsForm({ customer, organizationId }: { customer: any; orga
       <label className="block opacity-85">
         <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Instagram</span>
         <input className={inputClass} defaultValue={customer.instagram_handle || ""} name="instagramHandle" placeholder="@instagramhandle" />
-        <span className="mt-1 block text-xs text-[#667085]">Optional</span>
+        <span className="mt-1 block text-xs text-[var(--muted)]">Optional</span>
       </label>
       <label className="block">
         <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Preferred contact method</span>
@@ -171,8 +171,8 @@ function DocumentCheck({
     <div className="sub-surface p-3">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="font-black text-[#10252b]">{label}</p>
-          <div className="mt-1 text-sm text-[#667085]">{detail}</div>
+          <p className="font-semibold text-[var(--foreground)]">{label}</p>
+          <div className="mt-1 text-sm text-[var(--muted)]">{detail}</div>
         </div>
         {uploaded ? <BadgeCheck className="text-[#16a34a]" size={21} /> : <AlertTriangle className="text-[#be123c]" size={21} />}
       </div>
@@ -193,13 +193,13 @@ function UploadDocumentForm({
 }) {
   return (
     <details className="sub-surface p-3">
-      <summary className="cursor-pointer text-sm font-bold text-[#0f766e]">Upload {label}</summary>
+      <summary className="cursor-pointer text-sm font-bold text-[var(--primary)]">Upload {label}</summary>
       <form action={uploadCustomerDocument} className="mt-3 space-y-3">
         <input name="customerId" type="hidden" value={customerId} />
         <input name="organizationId" type="hidden" value={organizationId} />
         <input name="category" type="hidden" value={category} />
-        <input accept={category === "selfie" ? "image/*" : "image/*,application/pdf"} className="w-full rounded-lg border border-[#d6e5e2] bg-white px-3 py-2 text-sm" name="documentFile" required type="file" />
-        <PendingButton className="inline-flex items-center gap-2 rounded-lg bg-[#0f766e] px-3 py-2 text-sm font-bold text-white" pendingLabel="Uploading..." type="submit">
+        <input accept={category === "selfie" ? "image/*" : "image/*,application/pdf"} className="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm" name="documentFile" required type="file" />
+        <PendingButton className="inline-flex items-center gap-2 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-bold text-white" pendingLabel="Uploading..." type="submit">
           <Upload size={16} />
           Upload
         </PendingButton>
@@ -219,7 +219,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
         <div className="mx-auto max-w-2xl">
           <Card>
             <SectionHeader eyebrow="Customer not found" title="This customer could not be opened" />
-            <p className="mt-3 text-sm text-[#667085]">They may have been deleted or belong to another organisation.</p>
+            <p className="mt-3 text-sm text-[var(--muted)]">They may have been deleted or belong to another organisation.</p>
             <Link className="primary-action pressable mt-3" href="/customers">
               Back to Customers
             </Link>
@@ -244,8 +244,8 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
   return (
     <AppShell userEmail={userEmail}>
       <div className="space-y-3">
-        <div className="flex flex-wrap items-center gap-2 text-sm font-bold text-[#667085]">
-          <Link className="text-[#0f766e]" href="/customers">Customers</Link>
+        <div className="flex flex-wrap items-center gap-2 text-sm font-bold text-[var(--muted)]">
+          <Link className="text-[var(--primary)]" href="/customers">Customers</Link>
           <span>/</span>
           <span>{customer.full_name}</span>
         </div>
@@ -255,22 +255,22 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             <Card className="page-hero">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-[#e6fffb] text-3xl">
+                  <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-[var(--primary-light)] text-3xl">
                     {flagForNationality(customer.nationality)}
                   </div>
-                  <h1 className="text-3xl font-black text-[#10252b]">{customer.full_name}</h1>
-                  <p className="mt-1 text-sm font-semibold text-[#667085]">
+                  <h1 className="text-3xl font-semibold text-[var(--foreground)]">{customer.full_name}</h1>
+                  <p className="mt-1 text-sm font-semibold text-[var(--muted)]">
                     {flagForNationality(customer.nationality)} {customer.nationality || "Nationality not set"}
                   </p>
                   <div className="mt-3 flex flex-wrap gap-3 text-sm font-bold">
                     {customer.phone ? (
-                      <a className="inline-flex items-center gap-2 text-[#0f766e]" href={`tel:${customer.phone}`}>
+                      <a className="inline-flex items-center gap-2 text-[var(--primary)]" href={`tel:${customer.phone}`}>
                         <Phone size={16} />
                         {customer.phone}
                       </a>
                     ) : null}
                     {customer.email ? (
-                      <a className="inline-flex items-center gap-2 text-[#0f766e]" href={`mailto:${customer.email}`}>
+                      <a className="inline-flex items-center gap-2 text-[var(--primary)]" href={`mailto:${customer.email}`}>
                         <Mail size={16} />
                         {customer.email}
                       </a>
@@ -326,7 +326,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 />
                 <DocumentCheck detail={<p>{selfieDoc ? "Customer photo is uploaded" : "No customer photo uploaded"}</p>} label="Selfie" uploaded={selfieDoc} />
                 <div>
-                  <div className="mb-1 flex justify-between text-xs font-bold text-[#667085]">
+                  <div className="mb-1 flex justify-between text-xs font-bold text-[var(--muted)]">
                     <span>Overall completeness</span>
                     <span className="font-mono-data">{completeness.percentage}%</span>
                   </div>
@@ -338,13 +338,13 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             {activeRental ? (
               <Card>
                 <SectionHeader eyebrow="Active rental" title="Currently renting" />
-                <div className="mt-3 rounded-lg border border-[#dbeafe] bg-[#f8fbff] p-3">
+                <div className="mt-3 rounded-lg border border-[#dbeafe] bg-[#fbfaf8] p-3">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="font-black text-[#10252b]">
+                      <p className="font-semibold text-[var(--foreground)]">
                         {activeRental.vehicles?.make} {activeRental.vehicles?.model}
                       </p>
-                      <p className="font-mono-data text-sm text-[#667085]">{activeRental.vehicles?.registration_number}</p>
+                      <p className="font-mono-data text-sm text-[var(--muted)]">{activeRental.vehicles?.registration_number}</p>
                     </div>
                     <Badge tone={(daysUntil(activeRental.end_date) || 0) < 0 ? "red" : "blue"}>{rentalLabel(activeRental)}</Badge>
                   </div>
@@ -366,7 +366,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 <InfoTile label="Name" value={customer.emergency_contact_name || "Not recorded"} />
                 <InfoTile
                   label="Phone"
-                  value={customer.emergency_contact_phone ? <a className="text-[#0f766e]" href={`tel:${customer.emergency_contact_phone}`}>{customer.emergency_contact_phone}</a> : "Not recorded"}
+                  value={customer.emergency_contact_phone ? <a className="text-[var(--primary)]" href={`tel:${customer.emergency_contact_phone}`}>{customer.emergency_contact_phone}</a> : "Not recorded"}
                 />
               </div>
             </Card>
@@ -377,22 +377,22 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
               <SectionHeader eyebrow="Documents" title="Uploaded files" />
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
                 {detail.documentsWithUrls.length === 0 ? (
-                  <div className="rounded-lg border border-dashed border-[#cbdcd8] bg-white/70 p-3 text-sm text-[#667085] sm:col-span-2">
+                  <div className="rounded-lg border border-dashed border-[var(--border)] bg-white/70 p-3 text-sm text-[var(--muted)] sm:col-span-2">
                     No documents uploaded yet.
                   </div>
                 ) : (
                   detail.documentsWithUrls.map((document) => (
-                    <a className="rounded-lg border border-[#d6e5e2] bg-white p-3 hover:border-[#0f766e]" href={document.url || "#"} key={document.id} target="_blank">
+                    <a className="rounded-lg border border-[var(--border)] bg-white p-3 hover:border-[var(--primary)]" href={document.url || "#"} key={document.id} target="_blank">
                       {document.mimeType?.startsWith("image/") && document.url ? (
                         <img alt={document.fileName} className="h-28 w-full rounded-md object-cover" src={document.url} />
                       ) : (
-                        <div className="flex h-28 items-center justify-center rounded-md bg-[#e6fffb] text-[#0f766e]">
+                        <div className="flex h-28 items-center justify-center rounded-md bg-[var(--primary-light)] text-[var(--primary)]">
                           <FileText size={28} />
                         </div>
                       )}
-                      <p className="mt-2 font-black text-[#10252b]">{document.fileName}</p>
-                      <p className="text-sm text-[#667085]">{document.category.replace(/_/g, " ")}</p>
-                      <p className="mt-1 text-xs text-[#667085]">Uploaded {formatDate(document.createdAt)}</p>
+                      <p className="mt-2 font-semibold text-[var(--foreground)]">{document.fileName}</p>
+                      <p className="text-sm text-[var(--muted)]">{document.category.replace(/_/g, " ")}</p>
+                      <p className="mt-1 text-xs text-[var(--muted)]">Uploaded {formatDate(document.createdAt)}</p>
                     </a>
                   ))
                 )}
@@ -448,17 +448,17 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
               </div>
               <div className="mt-3 space-y-2">
                 {detail.rentals.length === 0 ? (
-                  <div className="rounded-lg border border-dashed border-[#cbdcd8] bg-white/70 p-3 text-sm text-[#667085]">No rentals yet.</div>
+                  <div className="rounded-lg border border-dashed border-[var(--border)] bg-white/70 p-3 text-sm text-[var(--muted)]">No rentals yet.</div>
                 ) : (
                   detail.rentals.map((rental) => (
-                    <Link className="block rounded-lg border border-[#d6e5e2] bg-white p-3 hover:border-[#0f766e]" href={`/bookings/${rental.id}` as Route} key={rental.id}>
+                    <Link className="block rounded-lg border border-[var(--border)] bg-white p-3 hover:border-[var(--primary)]" href={`/bookings/${rental.id}` as Route} key={rental.id}>
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <p className="font-black text-[#10252b]">
+                          <p className="font-semibold text-[var(--foreground)]">
                             {rental.vehicles?.make} {rental.vehicles?.model} · <span className="font-mono-data">{rental.vehicles?.registration_number}</span>
                           </p>
-                          <p className="font-mono-data text-sm text-[#667085]">{formatDate(rental.start_date)} → {formatDate(rental.end_date)} · {money(rental.rental_rate)}</p>
-                          <p className="font-mono-data mt-1 text-sm text-[#475467]">{rental.km_driven ? `${Number(rental.km_driven).toLocaleString()} km driven` : "Km not calculated"} · {depositLabel(rental)}</p>
+                          <p className="font-mono-data text-sm text-[var(--muted)]">{formatDate(rental.start_date)} → {formatDate(rental.end_date)} · {money(rental.rental_rate)}</p>
+                          <p className="font-mono-data mt-1 text-sm text-[var(--foreground-secondary)]">{rental.km_driven ? `${Number(rental.km_driven).toLocaleString()} km driven` : "Km not calculated"} · {depositLabel(rental)}</p>
                         </div>
                         <Badge tone={rental.status === "completed" ? "green" : rental.status === "active" ? "blue" : "amber"}>{rental.status}</Badge>
                       </div>
@@ -475,18 +475,18 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
               </div>
               <div className="mt-3 space-y-2">
                 {detail.transactions.length === 0 ? (
-                  <div className="rounded-lg border border-dashed border-[#cbdcd8] bg-white/70 p-3 text-sm text-[#667085]">No customer transactions yet.</div>
+                  <div className="rounded-lg border border-dashed border-[var(--border)] bg-white/70 p-3 text-sm text-[var(--muted)]">No customer transactions yet.</div>
                 ) : (
                   detail.transactions.map((transaction) => (
-                    <div className="rounded-lg border border-[#d6e5e2] bg-white p-3" key={transaction.id}>
+                    <div className="rounded-lg border border-[var(--border)] bg-white p-3" key={transaction.id}>
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <p className="font-black text-[#10252b]">{transaction.type.replace(/_/g, " ")}</p>
-                          <p className="font-mono-data text-sm text-[#667085]">{formatDate(transaction.transaction_date)} · {transaction.vehicles?.registration_number || "No vehicle"}</p>
+                          <p className="font-semibold text-[var(--foreground)]">{transaction.type.replace(/_/g, " ")}</p>
+                          <p className="font-mono-data text-sm text-[var(--muted)]">{formatDate(transaction.transaction_date)} · {transaction.vehicles?.registration_number || "No vehicle"}</p>
                         </div>
                         <span
-                          className={`font-mono-data font-black ${
-                            isRawDepositTransaction({ isDeposit: Boolean((transaction as any).is_deposit), type: transaction.type }) ? "text-[#d97706]" : "text-[#0f766e]"
+                          className={`font-mono-data font-semibold ${
+                            isRawDepositTransaction({ isDeposit: Boolean((transaction as any).is_deposit), type: transaction.type }) ? "text-[#d97706]" : "text-[var(--primary)]"
                           }`}
                         >
                           {money(transaction.amount)}

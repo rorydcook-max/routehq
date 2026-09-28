@@ -7,7 +7,7 @@ import { PendingButton } from "@/components/pending-button";
 import { renderContractTemplate } from "@/lib/contract-rendering";
 
 const inputClass =
-  "mt-2 w-full rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(18,184,200,0.16)]";
+  "mt-2 w-full rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]";
 
 type Variable = {
   key: string;
@@ -66,11 +66,11 @@ export function ContractTemplateEditor({
 
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block">
-            <span className="text-sm font-bold text-[#344054]">Template name</span>
+            <span className="text-sm font-bold text-[var(--foreground-secondary)]">Template name</span>
             <input className={inputClass} name="name" onChange={(event) => setName(event.target.value)} value={name} />
           </label>
           <label className="block">
-            <span className="text-sm font-bold text-[#344054]">Language</span>
+            <span className="text-sm font-bold text-[var(--foreground-secondary)]">Language</span>
             <select className={inputClass} name="language" onChange={(event) => setLanguage(event.target.value)} value={language}>
               <option value="en">English</option>
               <option value="th">Thai</option>
@@ -83,7 +83,7 @@ export function ContractTemplateEditor({
         </div>
 
         <label className="mt-4 block">
-          <span className="text-sm font-bold text-[#344054]">Contract HTML</span>
+          <span className="text-sm font-bold text-[var(--foreground-secondary)]">Contract HTML</span>
           <textarea
             className={`${inputClass} min-h-[520px] font-mono text-sm leading-6`}
             onChange={(event) => setContent(event.target.value)}
@@ -120,10 +120,10 @@ export function ContractTemplateEditor({
       <aside className="space-y-4">
         <section className="content-section">
           <div className="flex items-center gap-2">
-            <FileText className="text-[#0f766e]" size={19} />
-            <h2 className="font-black text-[#10252b]">Variables</h2>
+            <FileText className="text-[var(--primary)]" size={19} />
+            <h2 className="font-semibold text-[var(--foreground)]">Variables</h2>
           </div>
-          <p className="mt-2 text-sm text-[#667085]">Click a variable to insert it at the cursor.</p>
+          <p className="mt-2 text-sm text-[var(--muted)]">Click a variable to insert it at the cursor.</p>
           <div className="mt-4 grid gap-2">
             {variables.map((variable) => (
               <button
@@ -144,7 +144,7 @@ export function ContractTemplateEditor({
           }
         }}>
           <input name="organizationId" type="hidden" value={organizationId} />
-          <PendingButton className="pressable inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#be123c] px-4 py-3 text-sm font-black text-white" pendingLabel="Resetting..." type="submit">
+          <PendingButton className="pressable inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#be123c] px-4 py-3 text-sm font-semibold text-white" pendingLabel="Resetting..." type="submit">
             <RotateCcw size={18} />
             Reset to comprehensive bilingual template
           </PendingButton>
@@ -155,8 +155,8 @@ export function ContractTemplateEditor({
       {previewOpen ? (
         <section className="content-section xl:col-span-2">
           <div className="flex items-center gap-2">
-            <Eye className="text-[#0f766e]" size={19} />
-            <h2 className="font-black text-[#10252b]">Preview with sample data</h2>
+            <Eye className="text-[var(--primary)]" size={19} />
+            <h2 className="font-semibold text-[var(--foreground)]">Preview with sample data</h2>
           </div>
           <div className="contract-preview sub-surface mt-4 p-5 text-sm leading-7 text-[var(--foreground-secondary)]" dangerouslySetInnerHTML={{ __html: preview }} />
         </section>

@@ -99,7 +99,7 @@ declare global {
 
 const steps = ["Vehicle", "Customer", "Rental", "Delivery", "Review"];
 const inputClass =
-  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(18,184,200,0.16)]";
+  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]";
 const defaultAppUrl = (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").replace(/\/$/, "");
 const includedOptions = [
   "Full insurance",
@@ -542,14 +542,14 @@ export function BookingForm({
           <div className="w-full max-w-lg rounded-t-3xl bg-white shadow-2xl sm:rounded-3xl">
             <div className="flex items-start justify-between gap-3 p-3 pb-3">
               <div>
-                <h2 className="text-xl font-black text-[#10252b]">Add customer details?</h2>
-                <p className="mt-2 text-sm leading-6 text-[#667085]">
+                <h2 className="text-xl font-semibold text-[var(--foreground)]">Add customer details?</h2>
+                <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
                   The booking link you generate will ask your customer to fill in their personal details, upload their passport and driving licence, and sign the rental contract. You don't need their information before sending the link.
                 </p>
               </div>
               <button
                 aria-label="Close"
-                className="pressable shrink-0 rounded-full p-2 text-[#667085] hover:bg-[#f1f5f9]"
+                className="pressable shrink-0 rounded-full p-2 text-[var(--muted)] hover:bg-[#fbfaf8]"
                 onClick={() => setShowCustomerModal(false)}
                 type="button"
               >
@@ -561,7 +561,7 @@ export function BookingForm({
               {/* Skip for now — primary / recommended */}
               {bookingMode === "booking_link" ? (
                 <button
-                  className="pressable w-full rounded-lg border-2 border-[var(--primary)] bg-[var(--primary-light)] p-3 text-left transition hover:bg-[#d0f7f3]"
+                  className="pressable w-full rounded-lg border-2 border-[var(--primary)] bg-[var(--primary-light)] p-3 text-left transition hover:bg-[var(--primary-light)]"
                   onClick={handleSkipCustomer}
                   type="button"
                 >
@@ -571,10 +571,10 @@ export function BookingForm({
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="font-black text-[#10252b]">Skip for now</p>
+                      <p className="font-semibold text-[var(--foreground)]">Skip for now</p>
                       <Badge tone="green">Recommended</Badge>
                     </div>
-                    <p className="mt-1 text-sm text-[#667085]">Your customer will complete their details via the booking link. You can assign a customer later.</p>
+                    <p className="mt-1 text-sm text-[var(--muted)]">Your customer will complete their details via the booking link. You can assign a customer later.</p>
                   </div>
                 </div>
                 </button>
@@ -591,12 +591,12 @@ export function BookingForm({
                 type="button"
               >
                 <div className="flex items-start gap-3">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#e6fffb] text-[#0f766e]">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[var(--primary-light)] text-[var(--primary)]">
                     <UserPlus size={20} />
                   </span>
                   <div className="min-w-0">
-                    <p className="font-black text-[#10252b]">Add customer now</p>
-                    <p className="mt-1 text-sm text-[#667085]">Select a returning customer or add a new one</p>
+                    <p className="font-semibold text-[var(--foreground)]">Add customer now</p>
+                    <p className="mt-1 text-sm text-[var(--muted)]">Select a returning customer or add a new one</p>
                   </div>
                 </div>
               </button>
@@ -613,8 +613,8 @@ export function BookingForm({
             onClick={() => setBookingMode("booking_link")}
             type="button"
           >
-            <p className="font-black text-[#10252b]">Create booking link</p>
-            <p className="mt-1 text-sm text-[#667085]">Customer completes details and signs online.</p>
+            <p className="font-semibold text-[var(--foreground)]">Create booking link</p>
+            <p className="mt-1 text-sm text-[var(--muted)]">Customer completes details and signs online.</p>
           </button>
           <button
             className={`pressable rounded-lg border p-3 text-left ${bookingMode === "existing_rental" ? "border-[var(--primary)] bg-[var(--primary-light)]" : "border-[var(--border)] bg-white"}`}
@@ -625,17 +625,17 @@ export function BookingForm({
             type="button"
           >
             <div className="flex flex-wrap items-center gap-2">
-              <p className="font-black text-[#10252b]">Record existing rental</p>
+              <p className="font-semibold text-[var(--foreground)]">Record existing rental</p>
               <Badge tone="amber">Fast track</Badge>
             </div>
-            <p className="mt-1 text-sm text-[#667085]">For a rental that has already started. Creates an active booking immediately.</p>
+            <p className="mt-1 text-sm text-[var(--muted)]">For a rental that has already started. Creates an active booking immediately.</p>
           </button>
         </div>
       </div>
 
       {/* Progress bar */}
       <div className="content-section bg-[var(--primary-light)]">
-        <div className="flex items-center justify-between text-xs font-black uppercase text-[#667085]">
+        <div className="flex items-center justify-between text-xs font-semibold uppercase text-[var(--muted)]">
           <span>
             Step {displayStepNumber} of {effectiveStepCount}
           </span>
@@ -671,12 +671,12 @@ export function BookingForm({
                   type="button"
                 >
                   <div className="flex items-start gap-3">
-                    <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-[#e6fffb] text-[#0f766e]">
+                    <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-[var(--primary-light)] text-[var(--primary)]">
                       <Car size={25} />
                     </span>
                     <span className="min-w-0">
-                      <span className="block text-lg font-black text-[#10252b]">{vehicleTitle(vehicle)}</span>
-                      <span className="font-mono-data block text-sm font-bold text-[#667085]">{vehicle.registration_number}</span>
+                      <span className="block text-lg font-semibold text-[var(--foreground)]">{vehicleTitle(vehicle)}</span>
+                      <span className="font-mono-data block text-sm font-bold text-[var(--muted)]">{vehicle.registration_number}</span>
                       <span className="mt-2 flex flex-wrap gap-2">
                         {(() => {
                           const note = disabled ? null : availabilityNote(busyPeriods[vehicle.id] || [], businessToday());
@@ -704,7 +704,7 @@ export function BookingForm({
           <Header icon={UserRound} eyebrow="Step 2" title="Select or create customer" />
           {/* Allow re-opening the skip modal */}
           <button
-            className="pressable mt-3 inline-flex items-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-black text-[#667085]"
+            className="pressable mt-3 inline-flex items-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--muted)]"
             onClick={() => setShowCustomerModal(true)}
             type="button"
           >
@@ -723,10 +723,10 @@ export function BookingForm({
             <div className="sub-surface mt-3 p-3">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-lg font-black text-[#10252b]">
+                  <p className="text-lg font-semibold text-[var(--foreground)]">
                     {flagForNationality(selectedCustomer.nationality)} {selectedCustomer.full_name}
                   </p>
-                  <p className="mt-1 text-sm font-semibold text-[#667085]">{selectedCustomer.phone || "No phone"}</p>
+                  <p className="mt-1 text-sm font-semibold text-[var(--muted)]">{selectedCustomer.phone || "No phone"}</p>
                 </div>
                 <Badge tone={documentTone(selectedCustomer.document_status)}>{documentLabel(selectedCustomer.document_status)}</Badge>
               </div>
@@ -757,7 +757,7 @@ export function BookingForm({
               <span className="flex items-center justify-between gap-2 text-[11px] font-medium text-[var(--foreground-secondary)]">
                 <span>Rental start date</span>
                 <button
-                  className="pressable rounded-full border border-[var(--border)] bg-white px-2 py-1 text-[10px] font-black text-[var(--primary)]"
+                  className="pressable rounded-full border border-[var(--border)] bg-white px-2 py-1 text-[10px] font-semibold text-[var(--primary)]"
                   onClick={setRentalStartToday}
                   type="button"
                 >
@@ -792,7 +792,7 @@ export function BookingForm({
           <div className="mt-3 grid gap-3 sm:grid-cols-4">
             {["daily", "weekly", "monthly", "custom"].map((period) => (
               <button
-                className={`pressable min-h-12 rounded-lg border px-3 py-2 text-sm font-black capitalize ${pricingModel === period ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
+                className={`pressable min-h-12 rounded-lg border px-3 py-2 text-sm font-semibold capitalize ${pricingModel === period ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
                 key={period}
                 onClick={() => setPricingModel(period)}
                 type="button"
@@ -805,7 +805,7 @@ export function BookingForm({
             <label className="block">
               <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Rental rate</span>
               <input
-                className="font-mono-data mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(18,184,200,0.16)]"
+                className="font-mono-data mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]"
                 inputMode="numeric"
                 onChange={(event) => setRentalRate(parseMoneyInput(event.target.value))}
                 placeholder={`${currencyInfo.symbol} 0`}
@@ -817,7 +817,7 @@ export function BookingForm({
             <label className="block">
               <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Deposit amount</span>
               <input
-                className="font-mono-data mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(18,184,200,0.16)]"
+                className="font-mono-data mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]"
                 inputMode="numeric"
                 onChange={(event) => setDepositAmount(parseMoneyInput(event.target.value))}
                 placeholder={`${currencyInfo.symbol} 0`}
@@ -863,7 +863,7 @@ export function BookingForm({
                 <label className="block">
                   <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">How many {periodLabel}s upfront?</span>
                   <input
-                    className="mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(18,184,200,0.16)]"
+                    className="mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]"
                     inputMode="numeric"
                     min={1}
                     onChange={(event) => setUpfrontPeriods(Math.max(1, Number(event.target.value) || 1))}
@@ -874,7 +874,7 @@ export function BookingForm({
                 <label className="block">
                   <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Rate per {periodLabel}</span>
                   <input
-                    className="font-mono-data mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(18,184,200,0.16)]"
+                    className="font-mono-data mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]"
                     inputMode="numeric"
                     onChange={(event) => setUpfrontRate(parseMoneyInput(event.target.value))}
                     placeholder={`${currencyInfo.symbol} 0`}
@@ -885,7 +885,7 @@ export function BookingForm({
                 </label>
                 <label className="block">
                   <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Total upfront</span>
-                  <div className="font-mono-data mt-1 flex h-10 items-center rounded-lg border border-[var(--border)] bg-[#f8fafc] px-3 text-[13px] font-bold text-[var(--foreground)]">
+                  <div className="font-mono-data mt-1 flex h-10 items-center rounded-lg border border-[var(--border)] bg-[#fbfaf8] px-3 text-[13px] font-bold text-[var(--foreground)]">
                     {money(upfrontPeriods * upfrontRate, currency)}
                   </div>
                   <p className="mt-1 text-[11px] text-[var(--muted)]">{upfrontPeriods} × {money(upfrontRate, currency)}</p>
@@ -934,7 +934,7 @@ export function BookingForm({
               ["tbd", "To be determined"]
             ].map(([value, label]) => (
               <button
-                className={`pressable min-h-12 rounded-lg border px-3 py-2 text-sm font-black ${deliveryMethod === value ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
+                className={`pressable min-h-12 rounded-lg border px-3 py-2 text-sm font-semibold ${deliveryMethod === value ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
                 key={value}
                 onClick={() => setDeliveryMethod(value as "delivery" | "collection" | "tbd")}
                 type="button"
@@ -995,7 +995,7 @@ export function BookingForm({
                   <label htmlFor="collection-datetime">Collection time</label>
                   <span className="cursor-help text-[var(--muted)]" title="Optional — leave blank if not yet confirmed. The customer cannot select a time in the past through the booking link.">ⓘ</span>
                 </div>
-                <button className="pressable min-h-10 rounded-lg border border-[var(--primary)] bg-[var(--primary)] px-4 py-2 text-sm font-black text-white" onClick={setHandoverNow} type="button">
+                <button className="pressable min-h-10 rounded-lg border border-[var(--primary)] bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white" onClick={setHandoverNow} type="button">
                   Now
                 </button>
                 <input className={inputClass} id="collection-datetime" onChange={(event) => setCollectionTime(event.target.value)} type="datetime-local" value={collectionTime} />
@@ -1018,21 +1018,21 @@ export function BookingForm({
         <section className="content-section">
           <Header icon={CheckCircle2} eyebrow={`Step ${displayStepNumber}`} title="Review and generate" />
           {isSameDayHandover ? (
-            <div className="mt-3 rounded-lg border border-[#99f6e4] bg-[#f0fdfb] p-3">
-              <p className="text-xs font-bold uppercase tracking-[0.08em] text-[#0d9488]">Walk-in fast track</p>
-              <p className="mt-1 text-sm text-[#334155]">
+            <div className="mt-3 rounded-lg border border-[#bfe0db] bg-[#fbfaf8] p-3">
+              <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--primary)]">Walk-in fast track</p>
+              <p className="mt-1 text-sm text-[var(--foreground-secondary)]">
                 This handover is scheduled for today. You can send the customer the booking link, or record payment now and create an active rental immediately.
               </p>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
                 <button
-                  className="pressable min-h-11 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-black text-[var(--foreground-secondary)]"
+                  className="pressable min-h-11 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--foreground-secondary)]"
                   onClick={submitBookingLink}
                   type="button"
                 >
                   Share booking link with customer
                 </button>
                 <button
-                  className="pressable min-h-11 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-black text-white"
+                  className="pressable min-h-11 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white"
                   onClick={() => {
                     setWalkInFastTrack(true);
                     setWalkInPaymentAmount((current) => current || rentalRate);
@@ -1048,7 +1048,7 @@ export function BookingForm({
                   <label className="block">
                     <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Payment amount</span>
                     <input
-                      className="font-mono-data mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(18,184,200,0.16)]"
+                      className="font-mono-data mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]"
                       inputMode="numeric"
                       onChange={(event) => setWalkInPaymentAmount(parseMoneyInput(event.target.value))}
                       placeholder={`${currencyInfo.symbol} 0`}
@@ -1059,7 +1059,7 @@ export function BookingForm({
                   <label className="block">
                     <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Deposit amount</span>
                     <input
-                      className="font-mono-data mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(18,184,200,0.16)]"
+                      className="font-mono-data mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]"
                       inputMode="numeric"
                       onChange={(event) => setWalkInDepositAmount(parseMoneyInput(event.target.value))}
                       placeholder={`${currencyInfo.symbol} 0`}
@@ -1116,15 +1116,15 @@ export function BookingForm({
             <SummaryRow label="Included" value={includedItems.length ? includedItems.join(", ") : "None selected"} />
           </div>
           {customerSkipped ? (
-            <div className="mt-3 rounded-lg border border-[#99f6e4] bg-[#f0fdfb] p-3">
-              <p className="text-xs font-bold uppercase text-[#0d9488]">Booking link will collect customer details</p>
-              <p className="mt-1 text-sm text-[#334155]">Your customer will be asked to fill in their personal details, upload their passport and driving licence, and sign the rental contract through the link.</p>
+            <div className="mt-3 rounded-lg border border-[#bfe0db] bg-[#fbfaf8] p-3">
+              <p className="text-xs font-bold uppercase text-[var(--primary)]">Booking link will collect customer details</p>
+              <p className="mt-1 text-sm text-[var(--foreground-secondary)]">Your customer will be asked to fill in their personal details, upload their passport and driving licence, and sign the rental contract through the link.</p>
             </div>
           ) : null}
           {bookingMode === "existing_rental" ? (
             <div className="mt-3 rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
               <p className="text-xs font-bold uppercase text-[#b45309]">Existing rental mode</p>
-              <p className="mt-1 text-sm text-[#334155]">This creates an active rental immediately, marks the contract as operator-confirmed, and skips booking link generation.</p>
+              <p className="mt-1 text-sm text-[var(--foreground-secondary)]">This creates an active rental immediately, marks the contract as operator-confirmed, and skips booking link generation.</p>
             </div>
           ) : null}
           <BookingLinkSharePanel result={shareResult} />
@@ -1134,7 +1134,7 @@ export function BookingForm({
 
       <div className="sticky bottom-0 z-20 -mx-4 flex gap-2 border-t border-[var(--border)] bg-white/95 p-3 backdrop-blur sm:mx-0 sm:rounded-lg sm:border">
         <button
-          className="pressable min-h-12 flex-1 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-black text-[var(--foreground-secondary)] disabled:opacity-50"
+          className="pressable min-h-12 flex-1 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--foreground-secondary)] disabled:opacity-50"
           disabled={backDisabled}
           onClick={goBack}
           type="button"
@@ -1145,7 +1145,7 @@ export function BookingForm({
             button, and the click that opens the review step also submits it. */}
         {step < steps.length - 1 ? (
           <button
-            className="pressable min-h-12 flex-1 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-black text-white shadow-lg disabled:bg-[#94a3b8]"
+            className="pressable min-h-12 flex-1 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white shadow-lg disabled:bg-[#94a3b8]"
             disabled={!canContinue() || showCustomerModal}
             key="continue"
             onClick={goNext}
@@ -1155,14 +1155,14 @@ export function BookingForm({
           </button>
         ) : shareResult ? (
           <Link
-            className="pressable min-h-12 flex-1 rounded-lg bg-[var(--primary)] px-3 py-2 text-center text-sm font-black text-white shadow-lg inline-flex items-center justify-center"
+            className="pressable min-h-12 flex-1 rounded-lg bg-[var(--primary)] px-3 py-2 text-center text-sm font-semibold text-white shadow-lg inline-flex items-center justify-center"
             href={`/bookings/${shareResult.rentalId}`}
           >
             View booking
           </Link>
         ) : (
           <button
-            className="pressable min-h-12 flex-1 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-black text-white shadow-lg disabled:bg-[#94a3b8]"
+            className="pressable min-h-12 flex-1 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white shadow-lg disabled:bg-[#94a3b8]"
             disabled={isPending}
             key="submit"
             onClick={() => {
@@ -1251,7 +1251,7 @@ function BookingLinkSharePanel({ result }: { result: BookingShareResult | null }
           {bookingUrl || "Generate the booking link to see the unique URL here."}
         </div>
         <button
-          className="pressable inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-black disabled:opacity-50"
+          className="pressable inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold disabled:opacity-50"
           style={{ color: copied ? "var(--primary)" : "var(--foreground-secondary)" }}
           disabled={!bookingUrl}
           onClick={copyLink}
@@ -1444,7 +1444,7 @@ function GooglePlaceInput({
       <div className="mt-2 grid gap-2 sm:grid-cols-[1fr_auto]">
         <input
           autoComplete="off"
-          className="mt-0 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(18,184,200,0.16)]"
+          className="mt-0 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]"
           onChange={(event) => onChange(event.target.value)}
           placeholder={`📍 ${placeholder}`}
           ref={inputRef}
@@ -1452,7 +1452,7 @@ function GooglePlaceInput({
         />
         {isEnabled ? (
           <button
-            className="pressable min-h-12 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-black text-[var(--foreground-secondary)]"
+            className="pressable min-h-12 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--foreground-secondary)]"
             onClick={() => setPinModalOpen(true)}
             type="button"
           >
@@ -1560,7 +1560,7 @@ function GooglePinModal({
       <div className="w-full max-w-2xl rounded-t-3xl bg-white p-3 shadow-2xl sm:rounded-3xl">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h3 className="text-lg font-black text-[var(--foreground)]">Drop a pin</h3>
+            <h3 className="text-lg font-semibold text-[var(--foreground)]">Drop a pin</h3>
             <p className="mt-1 text-sm text-[var(--muted)]">Click the map or drag the pin to set the delivery location.</p>
           </div>
           <button className="pressable rounded-full p-2 text-[var(--muted)] hover:bg-[var(--panel-secondary)]" onClick={onClose} type="button">
@@ -1570,11 +1570,11 @@ function GooglePinModal({
         <div className="mt-3 h-80 overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)]" ref={mapRef} />
         <p className="mt-3 text-sm font-semibold text-[var(--foreground-secondary)]">{address}</p>
         <div className="mt-3 flex gap-2">
-          <button className="pressable min-h-11 flex-1 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-black text-[var(--foreground-secondary)]" onClick={onClose} type="button">
+          <button className="pressable min-h-11 flex-1 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--foreground-secondary)]" onClick={onClose} type="button">
             Cancel
           </button>
           <button
-            className="pressable min-h-11 flex-1 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-black text-white"
+            className="pressable min-h-11 flex-1 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white"
             onClick={() => onConfirm({ address, lat: pin.lat, lng: pin.lng, placeId })}
             type="button"
           >
@@ -1593,8 +1593,8 @@ function Header({ icon: Icon, eyebrow, title }: { icon: LucideIcon; eyebrow: str
         <Icon size={21} />
       </span>
       <div>
-        <p className="text-xs font-black uppercase text-[var(--primary)]">{eyebrow}</p>
-        <h2 className="text-xl font-black text-[var(--foreground)]">{title}</h2>
+        <p className="text-xs font-semibold uppercase text-[var(--primary)]">{eyebrow}</p>
+        <h2 className="text-xl font-semibold text-[var(--foreground)]">{title}</h2>
       </div>
     </div>
   );
@@ -1603,7 +1603,7 @@ function Header({ icon: Icon, eyebrow, title }: { icon: LucideIcon; eyebrow: str
 function SummaryRow({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
   return (
     <div className="sub-surface p-3">
-      <p className="text-xs font-black uppercase text-[var(--muted)]">{label}</p>
+      <p className="text-xs font-semibold uppercase text-[var(--muted)]">{label}</p>
       <p className={`mt-1 font-bold text-[var(--foreground)] ${mono ? "font-mono-data" : ""}`}>{value}</p>
     </div>
   );

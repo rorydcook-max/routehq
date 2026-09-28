@@ -98,7 +98,7 @@ const fieldStyle = {
   boxSizing: "border-box" as const,
   outline: "none",
 };
-const inputClass = "mt-2 focus:ring-2 focus:ring-[#0f766e]/15";
+const inputClass = "mt-2 focus:ring-2 focus:ring-[var(--primary)]/15";
 const emojiSelectStyle = {
   fontFamily: '"Segoe UI Emoji", "Noto Color Emoji", "Apple Color Emoji", "Segoe UI", system-ui, sans-serif'
 };
@@ -783,25 +783,25 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#dcfce7] text-[#166534]">
           <CheckCircle2 size={34} />
         </div>
-        <h2 className="mt-4 text-2xl font-black text-[#10252b]">You're all set{(submittedName || detail.customer?.full_name) ? `, ${String(submittedName || detail.customer?.full_name).split(/\s+/)[0]}` : ""}.</h2>
-        <p className="mt-2 text-sm leading-6 text-[#667085]">
+        <h2 className="mt-4 text-2xl font-semibold text-[var(--foreground)]">You're all set{(submittedName || detail.customer?.full_name) ? `, ${String(submittedName || detail.customer?.full_name).split(/\s+/)[0]}` : ""}.</h2>
+        <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
           Your booking details, documents, and signed agreement have been received.{" "}
           {detail.vehicleWithCustomer
             ? `${detail.organizationName} has been told. Contact them any time if you have questions about your rental.`
             : `${detail.organizationName} will contact you to confirm delivery time and answer any questions.`}
         </p>
         {originalAgreementUrl ? (
-          <a className="pressable mt-5 inline-flex rounded-xl bg-[#0f766e] px-5 py-3 text-sm font-black text-white" href={originalAgreementUrl} rel="noreferrer" target="_blank">
+          <a className="pressable mt-5 inline-flex rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={originalAgreementUrl} rel="noreferrer" target="_blank">
             Download original agreement
           </a>
         ) : null}
         {executionCertificateUrl ? (
-          <a className="pressable mt-5 ml-2 inline-flex rounded-xl border border-[#0f766e] bg-white px-5 py-3 text-sm font-black text-[#0f766e]" href={executionCertificateUrl} rel="noreferrer" target="_blank">
+          <a className="pressable mt-5 ml-2 inline-flex rounded-xl border border-[var(--primary)] bg-white px-5 py-3 text-sm font-semibold text-[var(--primary)]" href={executionCertificateUrl} rel="noreferrer" target="_blank">
             Download execution certificate
           </a>
         ) : null}
         {signedContractUrl ? (
-          <a className="pressable mt-5 inline-flex rounded-xl bg-[#0f766e] px-5 py-3 text-sm font-black text-white" href={signedContractUrl} rel="noreferrer" target="_blank">
+          <a className="pressable mt-5 inline-flex rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={signedContractUrl} rel="noreferrer" target="_blank">
             Download signed contract
           </a>
         ) : null}
@@ -814,53 +814,53 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
       <input name="token" type="hidden" value={detail.token} />
       <input name="preferredLocale" type="hidden" value="en" />
 
-      <section className="rounded-2xl border border-[#d6e5e2] bg-white p-5 shadow-sm">
+      <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
         <SectionTitle icon={UserRound} label="Your details" />
         {detail.completion.details ? (
           <p className="mt-3 rounded-xl bg-[#dcfce7] p-3 text-sm font-bold text-[#166534]">Your details have already been submitted. You can update them below if needed.</p>
         ) : null}
         <div className="mt-4 grid gap-4 sm:grid-cols-2 sm:items-start">
           <label>
-            <span className="text-sm font-bold text-[#344054]">Full name</span>
+            <span className="text-sm font-bold text-[var(--foreground-secondary)]">Full name</span>
             <input className={inputClass} defaultValue={detail.customer?.full_name || ""} name="fullName" required style={fieldStyle} />
           </label>
           <label>
-            <span className="text-sm font-bold text-[#344054]">Nationality</span>
+            <span className="text-sm font-bold text-[var(--foreground-secondary)]">Nationality</span>
             <NationalitySelect defaultValue={String(detail.customer?.nationality || "")} name="nationality" />
           </label>
           <label>
-            <span className="text-sm font-bold text-[#344054]">Phone</span>
+            <span className="text-sm font-bold text-[var(--foreground-secondary)]">Phone</span>
             <div style={{ display: "flex", alignItems: "stretch", width: "100%", height: 42, position: "relative", marginTop: 8 }}>
               <PhoneCountrySelect name="phoneCountryCode" onChange={setPhoneCountryCode} value={phoneCountryCode} />
               <input defaultValue={detail.customer?.phone || ""} name="phone" onClick={(e) => e.stopPropagation()} required style={{ ...fieldStyle, width: "auto", borderRadius: "0 8px 8px 0", flex: 1, minWidth: 0, borderLeft: "none", position: "relative", zIndex: 2 }} type="tel" />
             </div>
           </label>
           <label>
-            <span className="text-sm font-bold text-[#344054]">Email</span>
+            <span className="text-sm font-bold text-[var(--foreground-secondary)]">Email</span>
             <input className={inputClass} defaultValue={detail.customer?.email || ""} name="email" style={fieldStyle} type="email" />
           </label>
           <label>
-            <span className="text-sm font-bold text-[#344054]">Date of birth</span>
+            <span className="text-sm font-bold text-[var(--foreground-secondary)]">Date of birth</span>
             <input className={inputClass} defaultValue={detail.customer?.date_of_birth || ""} name="dateOfBirth" required style={{ ...fieldStyle, textTransform: "uppercase", appearance: "none" as const }} type="date" />
           </label>
           <label>
-            <span className="inline-flex items-center gap-2 text-sm font-bold text-[#344054]">
+            <span className="inline-flex items-center gap-2 text-sm font-bold text-[var(--foreground-secondary)]">
               Current address
-              <span className="cursor-help text-[#667085]" title="Your current address, hotel, villa or residence">ⓘ</span>
+              <span className="cursor-help text-[var(--muted)]" title="Your current address, hotel, villa or residence">ⓘ</span>
             </span>
             <GoogleAddressInput onChange={setCurrentAddress} value={currentAddress} />
           </label>
           <label>
-            <span className="inline-flex items-center gap-2 text-sm font-bold text-[#344054]">
+            <span className="inline-flex items-center gap-2 text-sm font-bold text-[var(--foreground-secondary)]">
               Emergency contact name
-              <span className="cursor-help text-[#667085]" title="Optional — add a contact if you would like us to know who to call in an emergency.">ⓘ</span>
+              <span className="cursor-help text-[var(--muted)]" title="Optional — add a contact if you would like us to know who to call in an emergency.">ⓘ</span>
             </span>
             <input className={inputClass} defaultValue={detail.customer?.emergency_contact_name || ""} name="emergencyContactName" style={fieldStyle} />
           </label>
           <label>
-            <span className="inline-flex items-center gap-2 text-sm font-bold text-[#344054]">
+            <span className="inline-flex items-center gap-2 text-sm font-bold text-[var(--foreground-secondary)]">
               Emergency contact phone
-              <span className="cursor-help text-[#667085]" title="Optional — add an emergency contact phone number if available.">ⓘ</span>
+              <span className="cursor-help text-[var(--muted)]" title="Optional — add an emergency contact phone number if available.">ⓘ</span>
             </span>
             <div style={{ display: "flex", alignItems: "stretch", width: "100%", height: 42, position: "relative", marginTop: 8 }}>
               <PhoneCountrySelect name="emergencyPhoneCountryCode" onChange={setEmergencyPhoneCountryCode} value={emergencyPhoneCountryCode} />
@@ -870,9 +870,9 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         </div>
       </section>
 
-      <section className="rounded-2xl border border-[#d6e5e2] bg-white p-5 shadow-sm">
+      <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
         <SectionTitle icon={MessageCircle} label="How should we contact you?" />
-        <p className="mt-2 text-sm leading-6 text-[#667085]">
+        <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
           Choose how you&apos;d like {detail.organizationName} to contact you for payment reminders and rental updates.
         </p>
         {contactChannelError ? (
@@ -884,7 +884,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
 
         <div className="mt-4">
           <label>
-            <span className="text-sm font-bold text-[#344054]">Preferred contact method</span>
+            <span className="text-sm font-bold text-[var(--foreground-secondary)]">Preferred contact method</span>
             <select
               className={inputClass}
               name="preferredContactMethod"
@@ -1021,24 +1021,24 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         </details>
       </section>
 
-      <section className="rounded-2xl border border-[#d6e5e2] bg-white p-5 shadow-sm">
+      <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
         <SectionTitle icon={Upload} label="Documents" />
         {isRentalDocumentEngine ? (
           <div className="mt-4 grid gap-4 sm:grid-cols-3">
             <label>
-              <span className="text-sm font-bold text-[#344054]">Passport or ID number</span>
+              <span className="text-sm font-bold text-[var(--foreground-secondary)]">Passport or ID number</span>
               <input className={inputClass} defaultValue={detail.customer?.passport_number || ""} name="passportNumber" required style={fieldStyle} />
             </label>
             <label>
-              <span className="text-sm font-bold text-[#344054]">Driving licence number</span>
+              <span className="text-sm font-bold text-[var(--foreground-secondary)]">Driving licence number</span>
               <input className={inputClass} defaultValue={detail.customer?.driver_license_number || ""} name="driverLicenseNumber" required style={fieldStyle} />
             </label>
             <label>
-              <span className="text-sm font-bold text-[#344054]">Licence expiry</span>
+              <span className="text-sm font-bold text-[var(--foreground-secondary)]">Licence expiry</span>
               <input className={inputClass} defaultValue={detail.customer?.driver_license_expiry || ""} name="driverLicenseExpiry" required style={fieldStyle} type="date" />
             </label>
             <label>
-              <span className="text-sm font-bold text-[#344054]">Licence country</span>
+              <span className="text-sm font-bold text-[var(--foreground-secondary)]">Licence country</span>
               <input className={inputClass} defaultValue={detail.customer?.driver_license_country || ""} name="driverLicenseCountry" required style={fieldStyle} />
             </label>
           </div>
@@ -1050,30 +1050,30 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         </div>
       </section>
 
-      <section className="rounded-2xl border border-[#d6e5e2] bg-white p-5 shadow-sm">
+      <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
         <SectionTitle icon={PenLine} label="Preferred delivery details" />
-        <p className="mt-2 text-sm leading-6 text-[#667085]">Optional. Add your preferred location and time if the operator has not confirmed them yet.</p>
+        <p className="mt-2 text-sm leading-6 text-[var(--muted)]">Optional. Add your preferred location and time if the operator has not confirmed them yet.</p>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <label className="sm:col-span-2">
-            <span className="text-sm font-bold text-[#344054]">Preferred delivery or collection location</span>
+            <span className="text-sm font-bold text-[var(--foreground-secondary)]">Preferred delivery or collection location</span>
             <GoogleAddressInput name="preferredDeliveryLocation" onChange={setPreferredDeliveryLocation} value={preferredDeliveryLocation} />
           </label>
           <label className="sm:col-span-2">
-            <span className="text-sm font-bold text-[#344054]">Preferred delivery or collection time</span>
+            <span className="text-sm font-bold text-[var(--foreground-secondary)]">Preferred delivery or collection time</span>
             {operatorDeliveryIsToday ? (
-              <div className="mt-2 rounded-xl border border-[#99f6e4] bg-[#f0fdfb] p-3">
+              <div className="mt-2 rounded-xl border border-[#bfe0db] bg-[#fbfaf8] p-3">
                 <input name="preferredDeliveryDateTime" type="hidden" value={operatorDeliveryDateTime} />
                 <div className="grid gap-2 sm:grid-cols-2">
-                  <div className="rounded-lg border border-[#d6e5e2] bg-white px-3 py-2">
-                    <p className="text-[11px] font-black uppercase tracking-[0.08em] text-[#0f766e]">Date</p>
-                    <p className="mt-1 text-sm font-black text-[#10252b]">Today</p>
+                  <div className="rounded-lg border border-[var(--border)] bg-white px-3 py-2">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--primary)]">Date</p>
+                    <p className="mt-1 text-sm font-semibold text-[var(--foreground)]">Today</p>
                   </div>
-                  <div className="rounded-lg border border-[#d6e5e2] bg-white px-3 py-2">
-                    <p className="text-[11px] font-black uppercase tracking-[0.08em] text-[#0f766e]">Time</p>
-                    <p className="mt-1 text-sm font-black text-[#10252b]">{operatorDeliveryTimeLabel}</p>
+                  <div className="rounded-lg border border-[var(--border)] bg-white px-3 py-2">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--primary)]">Time</p>
+                    <p className="mt-1 text-sm font-semibold text-[var(--foreground)]">{operatorDeliveryTimeLabel}</p>
                   </div>
                 </div>
-                <p className="mt-2 text-sm font-semibold text-[#0f766e]">Your vehicle will be ready for handover today.</p>
+                <p className="mt-2 text-sm font-semibold text-[var(--primary)]">Your vehicle will be ready for handover today.</p>
               </div>
             ) : (
               <input className={inputClass} defaultValue={operatorDeliveryDateTime} min={minDateTime} name="preferredDeliveryDateTime" style={fieldStyle} type="datetime-local" />
@@ -1083,7 +1083,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
       </section>
 
       {acceptedMethods.length > 0 ? (
-        <section className="rounded-2xl border border-[#d6e5e2] bg-white p-5 shadow-sm">
+        <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
           <SectionTitle icon={CreditCard} label="How would you like to pay?" />
           <div className="mt-4 grid gap-3">
             {acceptedMethods.map((key) => {
@@ -1092,7 +1092,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
               const payNowActive = active && effectiveTiming === "now";
 
               return (
-                <div className={`rounded-2xl border p-4 transition ${active ? "border-[#0f766e] bg-[#f0fdfa]" : "border-[#d6e5e2] bg-white"}`} key={key}>
+                <div className={`rounded-2xl border p-4 transition ${active ? "border-[var(--primary)] bg-[#fbfaf8]" : "border-[var(--border)] bg-white"}`} key={key}>
                   <label className="checkbox-label cursor-pointer">
                     <input
                       checked={active}
@@ -1105,15 +1105,15 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
                       }}
                       type="radio"
                     />
-                    <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${active ? "bg-[#0f766e] text-white" : "bg-[#e6fffb] text-[#0f766e]"}`}>
+                    <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${active ? "bg-[var(--primary)] text-white" : "bg-[var(--primary-light)] text-[var(--primary)]"}`}>
                       <i className={info.iconClass} style={{ fontSize: 19 }} />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-black text-[#10252b]">{info.label}</span>
-                      <span className="mt-1 block text-sm leading-5 text-[#667085]">{info.description}</span>
+                      <span className="block text-sm font-semibold text-[var(--foreground)]">{info.label}</span>
+                      <span className="mt-1 block text-sm leading-5 text-[var(--muted)]">{info.description}</span>
                       <span className="mt-3 flex flex-wrap gap-2">
                         <button
-                          className={`pressable rounded-full px-3 py-1 text-xs font-black ${active && effectiveTiming === "on_delivery" ? "bg-[#0f766e] text-white" : "bg-white text-[#344054] ring-1 ring-[#d6e5e2]"}`}
+                          className={`pressable rounded-full px-3 py-1 text-xs font-semibold ${active && effectiveTiming === "on_delivery" ? "bg-[var(--primary)] text-white" : "bg-white text-[var(--foreground-secondary)] ring-1 ring-[var(--border)]"}`}
                           onClick={(event) => {
                             event.preventDefault();
                             setPaymentMethod(key);
@@ -1126,7 +1126,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
                         </button>
                         {!info.deliveryOnly ? (
                           <button
-                            className={`pressable rounded-full px-3 py-1 text-xs font-black ${payNowActive ? "bg-[#0f766e] text-white" : "bg-white text-[#344054] ring-1 ring-[#d6e5e2]"}`}
+                            className={`pressable rounded-full px-3 py-1 text-xs font-semibold ${payNowActive ? "bg-[var(--primary)] text-white" : "bg-white text-[var(--foreground-secondary)] ring-1 ring-[var(--border)]"}`}
                             onClick={(event) => {
                               event.preventDefault();
                               setPaymentMethod(key);
@@ -1143,34 +1143,34 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
                   </label>
 
                   {active && effectiveTiming === "now" ? (
-                    <div className="mt-4 rounded-2xl border border-[#99f6e4] bg-white p-4">
+                    <div className="mt-4 rounded-2xl border border-[#bfe0db] bg-white p-4">
                       {key === "promptpay" && (orgPayment?.promptpay_qr_url || orgPayment?.promptpay_id) ? (
                         <div>
                           {orgPayment.promptpay_qr_url ? (
                             <>
                               <img
                                 alt="PromptPay QR code"
-                                className="mx-auto block h-[220px] w-[220px] rounded-lg border border-[#e3e6e8] bg-white object-contain"
+                                className="mx-auto block h-[220px] w-[220px] rounded-lg border border-[var(--border)] bg-white object-contain"
                                 src={orgPayment.promptpay_qr_url}
                               />
-                              <p className="mt-3 text-center text-[13px] text-[#454d54]">Scan with any Thai banking app</p>
-                              <p className="mt-1 text-center text-[13px] font-semibold text-[#0e7490]">Enter the amount: {formatMoney(paymentAmount, currency)}</p>
+                              <p className="mt-3 text-center text-[13px] text-[var(--foreground-secondary)]">Scan with any Thai banking app</p>
+                              <p className="mt-1 text-center text-[13px] font-semibold text-[var(--primary)]">Enter the amount: {formatMoney(paymentAmount, currency)}</p>
                               {orgPayment.promptpay_id ? (
-                                <p className="mt-1 text-center text-[11px] text-[#717d86]">PromptPay ID: {orgPayment.promptpay_id}</p>
+                                <p className="mt-1 text-center text-[11px] text-[var(--muted)]">PromptPay ID: {orgPayment.promptpay_id}</p>
                               ) : null}
                             </>
                           ) : (
                             <div className="text-center">
-                              <p className="text-base font-semibold text-[#10252b]">PromptPay ID: {orgPayment.promptpay_id}</p>
-                              <p className="mt-2 text-sm text-[#667085]">Search for this number in your Thai banking app to pay</p>
-                              <p className="mt-2 text-sm font-semibold text-[#0e7490]">Amount to enter: {formatMoney(paymentAmount, currency)}</p>
+                              <p className="text-base font-semibold text-[var(--foreground)]">PromptPay ID: {orgPayment.promptpay_id}</p>
+                              <p className="mt-2 text-sm text-[var(--muted)]">Search for this number in your Thai banking app to pay</p>
+                              <p className="mt-2 text-sm font-semibold text-[var(--primary)]">Amount to enter: {formatMoney(paymentAmount, currency)}</p>
                             </div>
                           )}
                           <PaymentReportedButton isPending={isPaymentReportPending} onClick={handleReportPayment} reported={paymentReported} text="I've made the payment" />
                         </div>
                       ) : key === "bank_transfer" && orgPayment?.bank_account_number ? (
                         <div>
-                          <p className="text-xs font-black uppercase text-[#0f766e]">Thai Bank Transfer</p>
+                          <p className="text-xs font-semibold uppercase text-[var(--primary)]">Thai Bank Transfer</p>
                           <div className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
                             <PaymentDetail label="Bank" value={orgPayment.bank_name || "Bank details provided by operator"} />
                             <PaymentDetail label="Account number" value={orgPayment.bank_account_number} />
@@ -1182,18 +1182,18 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
                         </div>
                       ) : key === "wise" && orgPayment?.wise_link ? (
                         <div>
-                          <p className="text-xs font-black uppercase text-[#0f766e]">Wise</p>
-                          <p className="mt-2 text-sm text-[#667085]">Use Wise to pay {formatMoney(paymentAmount, currency)}.</p>
-                          <a className="pressable mt-3 inline-flex rounded-xl bg-[#0f766e] px-4 py-3 text-sm font-black text-white" href={orgPayment.wise_link} rel="noreferrer" target="_blank">
+                          <p className="text-xs font-semibold uppercase text-[var(--primary)]">Wise</p>
+                          <p className="mt-2 text-sm text-[var(--muted)]">Use Wise to pay {formatMoney(paymentAmount, currency)}.</p>
+                          <a className="pressable mt-3 inline-flex rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white" href={orgPayment.wise_link} rel="noreferrer" target="_blank">
                             Pay via Wise
                           </a>
                           <PaymentReportedButton isPending={isPaymentReportPending} onClick={handleReportPayment} reported={paymentReported} text="I've paid" />
                         </div>
                       ) : key === "revolut" && orgPayment?.revolut_link ? (
                         <div>
-                          <p className="text-xs font-black uppercase text-[#0f766e]">Revolut</p>
-                          <p className="mt-2 text-sm text-[#667085]">Use Revolut to pay {formatMoney(paymentAmount, currency)}.</p>
-                          <a className="pressable mt-3 inline-flex rounded-xl bg-[#0f766e] px-4 py-3 text-sm font-black text-white" href={orgPayment.revolut_link} rel="noreferrer" target="_blank">
+                          <p className="text-xs font-semibold uppercase text-[var(--primary)]">Revolut</p>
+                          <p className="mt-2 text-sm text-[var(--muted)]">Use Revolut to pay {formatMoney(paymentAmount, currency)}.</p>
+                          <a className="pressable mt-3 inline-flex rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white" href={orgPayment.revolut_link} rel="noreferrer" target="_blank">
                             Pay via Revolut
                           </a>
                           <PaymentReportedButton isPending={isPaymentReportPending} onClick={handleReportPayment} reported={paymentReported} text="I've paid" />
@@ -1206,7 +1206,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             })}
           </div>
 
-          <p className="mt-4 rounded-xl border border-[#d6e5e2] bg-[#f8fffd] p-3 text-sm leading-6 text-[#667085]">
+          <p className="mt-4 rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-3 text-sm leading-6 text-[var(--muted)]">
             Payment will be confirmed by {detail.organizationName} when received. You will not be charged automatically.
           </p>
 
@@ -1216,21 +1216,21 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
       ) : null}
 
       {orgPayment?.upfront_discount_enabled && orgPayment.upfront_discount_rate && detail.billingPeriod === "monthly" ? (
-        <section className="rounded-2xl border border-[#d6e5e2] bg-white p-5 shadow-sm">
+        <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
           <SectionTitle icon={CreditCard} label={orgPayment.upfront_discount_label || "Pay upfront and save"} />
-          <p className="mt-2 text-sm leading-6 text-[#667085]">
+          <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
             Pay {orgPayment.upfront_discount_min_periods} months upfront at {formatMoney(orgPayment.upfront_discount_rate, currency)} per month and enjoy a discounted rate.
           </p>
           <div className="mt-3 flex gap-2">
             <button
-              className={`pressable flex-1 rounded-xl border px-3 py-3 text-sm font-black transition ${upfrontAccepted === true ? "border-[#0f766e] bg-[#f0fdfa] text-[#0f766e]" : "border-[#d6e5e2] bg-white text-[#344054]"}`}
+              className={`pressable flex-1 rounded-xl border px-3 py-3 text-sm font-semibold transition ${upfrontAccepted === true ? "border-[var(--primary)] bg-[#fbfaf8] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
               onClick={() => setUpfrontAccepted(true)}
               type="button"
             >
               Accept offer
             </button>
             <button
-              className={`pressable flex-1 rounded-xl border px-3 py-3 text-sm font-black transition ${upfrontAccepted === false ? "border-[#94a3b8] bg-[#f8fafc] text-[#475569]" : "border-[#d6e5e2] bg-white text-[#344054]"}`}
+              className={`pressable flex-1 rounded-xl border px-3 py-3 text-sm font-semibold transition ${upfrontAccepted === false ? "border-[#94a3b8] bg-[#fbfaf8] text-[var(--foreground-secondary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
               onClick={() => setUpfrontAccepted(false)}
               type="button"
             >
@@ -1246,19 +1246,19 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         </section>
       ) : null}
 
-      <section className="scroll-mt-4 rounded-2xl border border-[#d6e5e2] bg-white p-5 shadow-sm" ref={agreementRef}>
+      <section className="scroll-mt-4 rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm" ref={agreementRef}>
         <SectionTitle icon={PenLine} label="Rental Agreement" />
         {notice ? <p className="mt-3 rounded-xl bg-[#dcfce7] p-3 text-sm font-bold text-[#166534]">{notice}</p> : null}
         {!readyToSign ? (
-          <p className="mt-3 rounded-xl border border-[#d6e5e2] bg-[#fbfefd] p-3 text-sm leading-6 text-[#344054]">
+          <p className="mt-3 rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-3 text-sm leading-6 text-[var(--foreground-secondary)]">
             This is a preview. When you save your details, your name and document numbers are added to the agreement and
             {" "}{detail.organizationName} signs it. You will then read the final agreement here before you sign it.
           </p>
         ) : null}
         {isRentalDocumentEngine && publicAgreement && readyToSign ? (
-          <div className="mt-4 rounded-xl border border-[#99f6e4] bg-[#f0fdfa] p-4">
-            <p className="text-xs font-black uppercase text-[#0f766e]">Agreement version {publicAgreement.versionNumber}</p>
-            <p className="mt-1 text-sm font-bold text-[#10252b]">{publicAgreement.businessIdentity.name}</p>
+          <div className="mt-4 rounded-xl border border-[#bfe0db] bg-[#fbfaf8] p-4">
+            <p className="text-xs font-semibold uppercase text-[var(--primary)]">Agreement version {publicAgreement.versionNumber}</p>
+            <p className="mt-1 text-sm font-bold text-[var(--foreground)]">{publicAgreement.businessIdentity.name}</p>
             <div className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
               <p><span className="font-bold">Rate:</span> {publicAgreement.rentalSummary.rate} / {publicAgreement.rentalSummary.billingPeriod}</p>
               <p><span className="font-bold">Deposit:</span> {publicAgreement.rentalSummary.deposit}</p>
@@ -1267,7 +1267,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
                 <p><span className="font-bold">Standard daily rate:</span> {publicAgreement.rentalSummary.standardDailyRate}</p>
               ) : null}
             </div>
-            <p className="mt-3 text-xs text-[#667085]">
+            <p className="mt-3 text-xs text-[var(--muted)]">
               This exact text is fixed once you sign. Document fingerprint: <span className="font-mono">{publicAgreement.contentHashFragment}</span>
             </p>
             {customerSigningEligibility?.customerSafeMessage ? (
@@ -1275,9 +1275,9 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             ) : null}
           </div>
         ) : null}
-        <div className="routehq-contract-preview contract-preview mt-4 h-[460px] overflow-hidden rounded-xl border border-[#d6e5e2] bg-[#fbfefd]">
+        <div className="routehq-contract-preview contract-preview mt-4 h-[460px] overflow-hidden rounded-xl border border-[var(--border)] bg-[#fbfaf8]">
           <iframe
-            className="h-full w-full border-0 bg-[#fbfefd]"
+            className="h-full w-full border-0 bg-[#fbfaf8]"
             sandbox=""
             srcDoc={buildContractPreviewDocument(agreementHtml)}
             title="Rental agreement preview"
@@ -1287,25 +1287,25 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           <>
           <div className="mt-4 space-y-2">
             {publicAgreement.requiredAcknowledgements.map((ack) => (
-              <label className="checkbox-label rounded-xl border border-[#d6e5e2] bg-white p-3 font-bold text-[#10252b]" key={`${publicAgreement.versionId}-${ack.type}`}>
+              <label className="checkbox-label rounded-xl border border-[var(--border)] bg-white p-3 font-bold text-[var(--foreground)]" key={`${publicAgreement.versionId}-${ack.type}`}>
                 <input className="flex-shrink-0" name={`ack_${ack.type}`} type="checkbox" />
                 <span>{ack.text}</span>
               </label>
             ))}
           </div>
         <label className="mt-4 block">
-          <span className="text-sm font-bold text-[#344054]">Full name for signature</span>
+          <span className="text-sm font-bold text-[var(--foreground-secondary)]">Full name for signature</span>
           <input className={inputClass} defaultValue={detail.customer?.full_name || ""} name="signedName" required style={fieldStyle} />
         </label>
         <div className="mt-4">
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-sm font-bold text-[#344054]">Sign below</span>
-            <button className="pressable rounded-lg border border-[#d6e5e2] bg-white px-3 py-2 text-xs font-bold text-[#344054]" onClick={clearSignature} type="button">
+            <span className="text-sm font-bold text-[var(--foreground-secondary)]">Sign below</span>
+            <button className="pressable rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-bold text-[var(--foreground-secondary)]" onClick={clearSignature} type="button">
               Clear
             </button>
           </div>
           <canvas
-            className="h-44 w-full touch-none rounded-xl border border-[#d6e5e2] bg-white"
+            className="h-44 w-full touch-none rounded-xl border border-[var(--border)] bg-white"
             height={220}
             onPointerCancel={endDraw}
             onPointerDown={startDraw}
@@ -1319,7 +1319,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           </>
         ) : null}
         {error ? <p className="mt-4 rounded-xl bg-[#ffe4e6] p-3 text-sm font-bold text-[#be123c]">{error}</p> : null}
-        <button className="pressable mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-[#0f766e] px-5 py-3 text-sm font-black text-white disabled:opacity-70" disabled={isPending} key={readyToSign ? "sign" : "review"} type="submit">
+        <button className="pressable mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white disabled:opacity-70" disabled={isPending} key={readyToSign ? "sign" : "review"} type="submit">
           {isPending ? (
             <span className="inline-flex items-center gap-2"><span className="spinner" /> Submitting...</span>
           ) : readyToSign ? (
@@ -1337,8 +1337,8 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
 
 function CompletionStatus({ status }: { status: { details: boolean; documents: boolean; agreement: boolean } }) {
   return (
-    <section className="rounded-2xl border border-[#d6e5e2] bg-white p-5 shadow-sm">
-      <p className="text-xs font-black uppercase text-[#0f766e]">Completion status</p>
+    <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
+      <p className="text-xs font-semibold uppercase text-[var(--primary)]">Completion status</p>
       <div className="mt-4 grid gap-3 sm:grid-cols-3">
         <StatusItem complete={status.details} label="Your details" />
         <StatusItem complete={status.documents} label="Documents" />
@@ -1350,18 +1350,18 @@ function CompletionStatus({ status }: { status: { details: boolean; documents: b
 
 function StatusItem({ complete, label }: { complete: boolean; label: string }) {
   return (
-    <div className={`flex items-center gap-3 rounded-xl border p-3 transition ${complete ? "border-[#bbf7d0] bg-[#f0fdf4]" : "border-[#d6e5e2] bg-[#fbfefd]"}`}>
+    <div className={`flex items-center gap-3 rounded-xl border p-3 transition ${complete ? "border-[#bbf7d0] bg-[#f0fdf4]" : "border-[var(--border)] bg-[#fbfaf8]"}`}>
       {complete ? <CheckCircle2 className="text-[#16a34a]" /> : <span className="h-5 w-5 rounded-md border border-[#94a3b8]" />}
-      <span className="text-sm font-black">{label}</span>
+      <span className="text-sm font-semibold">{label}</span>
     </div>
   );
 }
 
 function PaymentDetail({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-[#d6e5e2] bg-[#fbfefd] p-3">
-      <p className="text-[11px] font-black uppercase text-[#667085]">{label}</p>
-      <p className="font-mono-data mt-1 break-words text-sm font-black text-[#10252b]">{value}</p>
+    <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-3">
+      <p className="text-[11px] font-semibold uppercase text-[var(--muted)]">{label}</p>
+      <p className="font-mono-data mt-1 break-words text-sm font-semibold text-[var(--foreground)]">{value}</p>
     </div>
   );
 }
@@ -1387,7 +1387,7 @@ function PaymentReportedButton({
 
   return (
     <button
-      className="pressable mt-3 inline-flex rounded-xl bg-[#0f766e] px-4 py-3 text-sm font-black text-white disabled:opacity-60"
+      className="pressable mt-3 inline-flex rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white disabled:opacity-60"
       disabled={isPending}
       onClick={onClick}
       type="button"
@@ -1447,10 +1447,10 @@ function NationalitySelect({ defaultValue, name }: { defaultValue: string; name:
         value={search}
       />
       {open && filtered.length > 0 ? (
-        <div className="absolute left-0 right-0 top-[calc(100%+4px)] z-30 max-h-64 overflow-y-auto rounded-xl border border-[#d6e5e2] bg-white p-1 shadow-xl">
+        <div className="absolute left-0 right-0 top-[calc(100%+4px)] z-30 max-h-64 overflow-y-auto rounded-xl border border-[var(--border)] bg-white p-1 shadow-xl">
           {filtered.map((n) => (
             <button
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left hover:bg-[#e6fffb]"
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left hover:bg-[var(--primary-light)]"
               key={n.code}
               onMouseDown={(e) => {
                 e.preventDefault(); // keep focus so blur doesn't fire first
@@ -1462,8 +1462,8 @@ function NationalitySelect({ defaultValue, name }: { defaultValue: string; name:
             >
               <span className="text-xl leading-none">{flagEmoji(n.code)}</span>
               <span className="min-w-0">
-                <span className="block text-sm font-bold text-[#10252b]">{n.name}</span>
-                <span className="block text-xs font-medium text-[#667085]">{n.country}</span>
+                <span className="block text-sm font-bold text-[var(--foreground)]">{n.name}</span>
+                <span className="block text-xs font-medium text-[var(--muted)]">{n.country}</span>
               </span>
             </button>
           ))}
@@ -1652,7 +1652,7 @@ function GoogleAddressInput({ name = "address", onChange, value }: { name?: stri
         />
         {mapsKeyConfigured ? (
           <button
-            className="pressable mt-2 rounded-xl border border-[#d6e5e2] bg-white px-4 py-3 text-sm font-black text-[#10252b]"
+            className="pressable mt-2 rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm font-semibold text-[var(--foreground)]"
             onClick={() => setPinModalOpen(true)}
             type="button"
           >
@@ -1660,7 +1660,7 @@ function GoogleAddressInput({ name = "address", onChange, value }: { name?: stri
           </button>
         ) : null}
       </div>
-      <p className="mt-2 text-xs font-semibold text-[#667085]">
+      <p className="mt-2 text-xs font-semibold text-[var(--muted)]">
         {isEnabled ? "Search for your current address, hotel, villa, or residence." : hasError || !mapsKeyConfigured ? "Google Maps search unavailable — enter address manually." : "Loading Google Maps address search..."}
       </p>
       {pinModalOpen ? (
@@ -1742,16 +1742,16 @@ function PublicGooglePinModal({ onClose, onConfirm }: { onClose: () => void; onC
       <div className="w-full max-w-xl rounded-2xl bg-white p-4 shadow-2xl">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-black uppercase text-[#0f766e]">Google Maps</p>
-            <h3 className="text-lg font-black text-[#10252b]">Drop a pin</h3>
+            <p className="text-xs font-semibold uppercase text-[var(--primary)]">Google Maps</p>
+            <h3 className="text-lg font-semibold text-[var(--foreground)]">Drop a pin</h3>
           </div>
-          <button className="pressable rounded-xl border border-[#d6e5e2] bg-white px-3 py-2 text-sm font-bold" onClick={onClose} type="button">
+          <button className="pressable rounded-xl border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold" onClick={onClose} type="button">
             Close
           </button>
         </div>
-        <div className="mt-4 h-80 overflow-hidden rounded-xl border border-[#d6e5e2] bg-[#eef7f5]" ref={mapRef} />
-        <p className="mt-3 rounded-xl bg-[#fbfefd] p-3 text-sm font-bold text-[#344054]">{address}</p>
-        <button className="pressable mt-3 min-h-12 w-full rounded-xl bg-[#0f766e] px-4 py-3 text-sm font-black text-white" onClick={() => onConfirm(address)} type="button">
+        <div className="mt-4 h-80 overflow-hidden rounded-xl border border-[var(--border)] bg-[#fbfaf8]" ref={mapRef} />
+        <p className="mt-3 rounded-xl bg-[#fbfaf8] p-3 text-sm font-bold text-[var(--foreground-secondary)]">{address}</p>
+        <button className="pressable mt-3 min-h-12 w-full rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white" onClick={() => onConfirm(address)} type="button">
           Confirm location
         </button>
       </div>
@@ -1762,10 +1762,10 @@ function PublicGooglePinModal({ onClose, onConfirm }: { onClose: () => void; onC
 function SectionTitle({ icon: Icon, label }: { icon: typeof UserRound; label: string }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e6fffb] text-[#0f766e]">
+      <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
         <Icon size={20} />
       </span>
-      <h2 className="text-xl font-black text-[#10252b]">{label}</h2>
+      <h2 className="text-xl font-semibold text-[var(--foreground)]">{label}</h2>
     </div>
   );
 }

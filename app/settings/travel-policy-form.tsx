@@ -7,7 +7,7 @@ import { PendingButton } from "@/components/pending-button";
 import { jurisdictionByCountry, type TravelPolicySettings } from "@/lib/travel-policy";
 
 const inputClass =
-  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(18,184,200,0.16)]";
+  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]";
 
 const countries = [
   "Thailand",
@@ -63,12 +63,12 @@ export function TravelPolicyForm({
       <input name="organizationId" type="hidden" value={organizationId} />
 
       <section className="form-section bg-[var(--primary-light)]">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#0f766e]">Business location</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--primary)]">Business location</p>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <label className="block">
             <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Home territory</span>
             <input className={inputClass} defaultValue={settings.home_territory} name="homeTerritory" placeholder="Koh Samui" required />
-            <span className="mt-1 block text-xs text-[#667085]">This appears in travel clauses and becomes your default operating area.</span>
+            <span className="mt-1 block text-xs text-[var(--muted)]">This appears in travel clauses and becomes your default operating area.</span>
           </label>
           <label className="block">
             <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Country</span>
@@ -99,8 +99,8 @@ export function TravelPolicyForm({
                 type="radio"
                 value={option.value}
               />
-              <span className="font-black text-[#10252b]">{option.label}</span>
-              <span className="mt-1 block text-xs text-[#667085]">{option.helper}</span>
+              <span className="font-semibold text-[var(--foreground)]">{option.label}</span>
+              <span className="mt-1 block text-xs text-[var(--muted)]">{option.helper}</span>
             </label>
           ))}
         </div>
@@ -108,12 +108,12 @@ export function TravelPolicyForm({
         <label className="mt-3 block">
           <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Jurisdiction</span>
           <input className={inputClass} name="jurisdiction" onChange={(event) => setJurisdiction(event.target.value)} required value={jurisdiction} />
-          <span className="mt-1 block text-xs text-[#667085]">This wording appears verbatim in the governing law clause.</span>
+          <span className="mt-1 block text-xs text-[var(--muted)]">This wording appears verbatim in the governing law clause.</span>
         </label>
       </section>
 
       <section className="form-section bg-[var(--primary-blue-light)]">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#0f766e]">Inter-island travel policy</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--primary)]">Inter-island travel policy</p>
         <div className="mt-3 grid gap-3 lg:grid-cols-3">
           {policyOptions.map((option) => (
             <label
@@ -128,8 +128,8 @@ export function TravelPolicyForm({
                 type="radio"
                 value={option.value}
               />
-              <span className="font-black text-[#10252b]">{option.title}</span>
-              <span className="mt-1 block text-xs leading-5 text-[#667085]">{option.body}</span>
+              <span className="font-semibold text-[var(--foreground)]">{option.title}</span>
+              <span className="mt-1 block text-xs leading-5 text-[var(--muted)]">{option.body}</span>
             </label>
           ))}
         </div>
@@ -144,14 +144,14 @@ export function TravelPolicyForm({
         <label className="checkbox-label sub-surface mt-4 p-3">
           <input className="flex-shrink-0" defaultChecked={settings.geofence_monitoring_enabled} name="geofenceMonitoringEnabled" type="checkbox" />
           <span>
-            <span className="block font-black text-[#10252b]">GPS/geofence monitoring enabled</span>
-            <span className="mt-1 block text-xs text-[#667085]">Adds the GPS monitoring clause when enabled.</span>
+            <span className="block font-semibold text-[var(--foreground)]">GPS/geofence monitoring enabled</span>
+            <span className="mt-1 block text-xs text-[var(--muted)]">Adds the GPS monitoring clause when enabled.</span>
           </span>
         </label>
       </section>
 
       <details className="form-section bg-[var(--warning-light)]" open>
-        <summary className="cursor-pointer text-[11px] font-semibold uppercase tracking-[0.08em] text-[#0f766e]">Contract terms</summary>
+        <summary className="cursor-pointer text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--primary)]">Contract terms</summary>
         <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <NumberField defaultValue={settings.mileage_limit} label="Monthly mileage limit (km)" name="mileageLimit" />
           <NumberField defaultValue={settings.fuel_charge_per_increment} label="Fuel charge per 1/8 gauge increment (THB)" name="fuelChargePerIncrement" step="0.01" />
@@ -164,7 +164,7 @@ export function TravelPolicyForm({
       </details>
 
       <section className="form-section bg-[var(--success-light)]">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#0f766e]">Contact details for contracts</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--primary)]">Contact details for contracts</p>
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           <label className="block">
             <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">LINE ID</span>

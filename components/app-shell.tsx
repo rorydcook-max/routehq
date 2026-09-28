@@ -105,7 +105,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
           <RouteHqLogo />
         </div>
         <nav className="scrollbar-none min-h-0 flex-1 space-y-0.5 overflow-y-auto">
-          <p className="mb-2 px-3 text-[11px] font-black uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]">{t("main")}</p>
+          <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]">{t("main")}</p>
           {visibleMainNavItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -123,7 +123,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
               </Link>
             );
           })}
-          <p className="mb-2 mt-4 px-3 text-[11px] font-black uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]">{t("operations")}</p>
+          <p className="mb-2 mt-4 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]">{t("operations")}</p>
           {operationsItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -147,7 +147,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
           <div className="mt-3 rounded-xl border border-[var(--sidebar-border)] bg-white p-3">
             {hasSeveralBusinesses ? (
               <form action={switchActiveOrganization} className="mb-3">
-                <label className="block text-[10px] font-black uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]" htmlFor="business-switcher">
+                <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]" htmlFor="business-switcher">
                   {t("business")}
                 </label>
                 <select
@@ -158,7 +158,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
                   onChange={(event) => event.currentTarget.form?.requestSubmit()}
                 >
                   {shell.organizations.map((organization) => (
-                    <option className="text-[#10252b]" key={organization.id} value={organization.id}>
+                    <option className="text-[var(--foreground)]" key={organization.id} value={organization.id}>
                       {organization.name}
                     </option>
                   ))}
@@ -249,7 +249,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
             onClick={(event) => event.stopPropagation()}
           >
             <div className="mb-3 flex items-center justify-between">
-              <p className="text-[11px] font-black uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]">{t("more")}</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]">{t("more")}</p>
               <button aria-label={t("close")} className="rounded-lg p-1.5 text-[var(--sidebar-text)]" onClick={() => setMoreOpen(false)} type="button">
                 <X size={18} />
               </button>

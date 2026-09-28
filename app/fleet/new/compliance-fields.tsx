@@ -37,19 +37,19 @@ export function ComplianceFields({
       <p className="mt-2 text-sm text-[var(--muted)]">{calendarOption.helper}</p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <label className="block">
-          <span className="text-sm font-semibold text-[#344054]">Vehicle tax expiry (ต่อภาษี)</span>
+          <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Vehicle tax expiry (ต่อภาษี)</span>
           <LocalizedDateInput calendar={calendar} inputClass={inputClass} name="taxExpiryDate" onChange={(event) => setTaxExpiryDate(event.target.value)} preferredLocale={preferredLocale} value={taxExpiryDate} />
         </label>
         <label className="block">
-          <span className="text-sm font-semibold text-[#344054]">Compulsory insurance expiry (พรบ)</span>
+          <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Compulsory insurance expiry (พรบ)</span>
           <LocalizedDateInput calendar={calendar} inputClass={inputClass} name="porborExpiryDate" onChange={(event) => setPorborExpiryDate(event.target.value)} preferredLocale={preferredLocale} value={porborExpiryDate} />
         </label>
         <label className="block">
-          <span className="text-sm font-semibold text-[#344054]">Voluntary insurance expiry</span>
+          <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Voluntary insurance expiry</span>
           <LocalizedDateInput calendar={calendar} inputClass={inputClass} name="insuranceExpiryDate" onChange={(event) => setInsuranceExpiryDate(event.target.value)} preferredLocale={preferredLocale} value={insuranceExpiryDate} />
         </label>
         <label className="block">
-          <span className="text-sm font-semibold text-[#344054]">Voluntary insurance type</span>
+          <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Voluntary insurance type</span>
           <select className={inputClass} name="voluntaryInsuranceType">
             <option value="">Select cover type</option>
             <option value="class_1">Class 1 / Type 1 comprehensive</option>
@@ -62,11 +62,11 @@ export function ComplianceFields({
           </select>
         </label>
         <label className="block">
-          <span className="text-sm font-semibold text-[#344054]">Next service due</span>
+          <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Next service due</span>
           <LocalizedDateInput calendar={calendar} inputClass={inputClass} name="nextServiceDate" preferredLocale={preferredLocale} />
         </label>
         <label className="block">
-          <span className="text-sm font-semibold text-[#344054]">Oil change due</span>
+          <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Oil change due</span>
           <LocalizedDateInput calendar={calendar} inputClass={inputClass} name="oilChangeDueDate" preferredLocale={preferredLocale} />
         </label>
       </div>

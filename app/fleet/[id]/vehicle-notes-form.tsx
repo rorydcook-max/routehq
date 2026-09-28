@@ -33,12 +33,12 @@ export function VehicleNotesForm({
       <input name="vehicleId" type="hidden" value={vehicleId} />
       <input name="organizationId" type="hidden" value={organizationId} />
       <textarea
-        className="min-h-32 w-full rounded-lg border border-[#d6e5e2] bg-white px-3 py-3 text-sm text-[#10252b] outline-none focus:border-[#0f766e] focus:ring-2 focus:ring-[#0f766e]/15"
+        className="min-h-32 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-3 text-sm text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
         defaultValue={notes}
         name="notes"
         placeholder="Add operating notes, customer quirks, service reminders, or internal comments..."
       />
-      <p className="text-xs text-[#667085]">
+      <p className="text-xs text-[var(--muted)]">
         {isPending ? "Saving notes..." : updatedAt ? `Last edited ${new Date(updatedAt).toLocaleString("en-TH")}` : "Markdown-style notes are supported for simple formatting."}
       </p>
     </form>

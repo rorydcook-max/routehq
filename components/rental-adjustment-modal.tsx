@@ -24,13 +24,13 @@ export function AmendmentLinkPanel({ token, onCancel, cancelling }: { token: str
   const url = `${origin}/amend/${token}`;
   const message = `Please review and sign the change to your rental: ${url}`;
   return (
-    <div className="rounded-xl border border-[#99f6e4] bg-[#ecfeff] p-3 text-sm">
-      <p className="font-bold text-[#0f766e]">Waiting for the customer to sign</p>
+    <div className="rounded-xl border border-[#bfe0db] bg-[var(--primary-light)] p-3 text-sm">
+      <p className="font-bold text-[var(--primary)]">Waiting for the customer to sign</p>
       <p className="mt-1 text-[12px] text-[var(--foreground-secondary)]">Nothing changes on the rental until they sign. Send them this link:</p>
       <p className="font-mono-data mt-2 break-all rounded-lg bg-white px-2 py-1.5 text-[12px]">{url}</p>
       <div className="mt-2 flex flex-wrap gap-2">
         <button
-          className="pressable rounded-lg bg-[var(--primary)] px-3 py-2 text-xs font-black text-white"
+          className="pressable rounded-lg bg-[var(--primary)] px-3 py-2 text-xs font-semibold text-white"
           onClick={() => {
             navigator.clipboard?.writeText(url).then(() => setCopied(true), () => undefined);
           }}
@@ -38,14 +38,14 @@ export function AmendmentLinkPanel({ token, onCancel, cancelling }: { token: str
         >
           {copied ? "Copied" : "Copy link"}
         </button>
-        <a className="pressable rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-black text-[var(--foreground-secondary)]" href={`https://wa.me/?text=${encodeURIComponent(message)}`} rel="noreferrer" target="_blank">
+        <a className="pressable rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground-secondary)]" href={`https://wa.me/?text=${encodeURIComponent(message)}`} rel="noreferrer" target="_blank">
           Send on WhatsApp
         </a>
-        <a className="pressable rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-black text-[var(--foreground-secondary)]" href={url} rel="noreferrer" target="_blank">
+        <a className="pressable rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground-secondary)]" href={url} rel="noreferrer" target="_blank">
           Preview
         </a>
         {onCancel ? (
-          <button className="pressable rounded-lg border border-[#fecdd3] bg-white px-3 py-2 text-xs font-black text-[#be123c] disabled:opacity-60" disabled={cancelling} onClick={onCancel} type="button">
+          <button className="pressable rounded-lg border border-[#fecdd3] bg-white px-3 py-2 text-xs font-semibold text-[#be123c] disabled:opacity-60" disabled={cancelling} onClick={onCancel} type="button">
             {cancelling ? "Cancelling..." : "Cancel amendment"}
           </button>
         ) : null}
@@ -130,7 +130,7 @@ function OptionCard({
   tone: "teal" | "amber";
   onClick: () => void;
 }) {
-  const activeClass = tone === "teal" ? "border-[var(--primary)] bg-[#ecfeff]" : "border-[var(--warning)] bg-[#fffbeb]";
+  const activeClass = tone === "teal" ? "border-[var(--primary)] bg-[var(--primary-light)]" : "border-[var(--warning)] bg-[#fffbeb]";
 
   return (
     <button
@@ -138,7 +138,7 @@ function OptionCard({
       onClick={onClick}
       type="button"
     >
-      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${tone === "teal" ? "bg-[#ccfbf1] text-[var(--primary)]" : "bg-[#fef3c7] text-[var(--warning)]"}`}>
+      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${tone === "teal" ? "bg-[var(--primary-light)] text-[var(--primary)]" : "bg-[#fef3c7] text-[var(--warning)]"}`}>
         <i aria-hidden="true" className={`ti ${icon} text-base`} />
       </span>
       <span>
@@ -422,7 +422,7 @@ export function RentalAdjustmentModal({
                 Extra terms for the customer to agree (optional)
                 <textarea className="mt-1 min-h-16 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 py-2 text-[13px]" maxLength={2000} onChange={(event) => setAdditionalTerms(event.target.value)} value={additionalTerms} />
               </label>
-              <p className="rounded-xl border border-[#99f6e4] bg-[#ecfeff] p-3 text-[12px] font-bold text-[#0f766e]">
+              <p className="rounded-xl border border-[#bfe0db] bg-[var(--primary-light)] p-3 text-[12px] font-bold text-[var(--primary)]">
                 You&apos;ll get a link for the customer. The change applies once they sign.
               </p>
             </>
@@ -433,7 +433,7 @@ export function RentalAdjustmentModal({
                 <input className="mt-1 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" min={tomorrow} onChange={(event) => setExtensionEndDate(event.target.value)} type="date" value={extensionEndDate} />
               </label>
 
-              <div className="rounded-lg border border-[#d6e5e2] bg-[#f8fffd] p-3 text-sm text-[var(--foreground-secondary)]">
+              <div className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3 text-sm text-[var(--foreground-secondary)]">
                 Extension: <span className="font-mono-data font-bold">{originalEndDate || "Open"}</span> to <span className="font-mono-data font-bold">{extensionEndDate}</span> ({extensionDays} days)
               </div>
 
@@ -473,7 +473,7 @@ export function RentalAdjustmentModal({
                 </label>
               )}
 
-              <div className="rounded-xl border border-[#99f6e4] bg-[#ecfeff] p-3 text-sm font-bold text-[#0f766e]">
+              <div className="rounded-xl border border-[#bfe0db] bg-[var(--primary-light)] p-3 text-sm font-bold text-[var(--primary)]">
                 Extending {extensionDays} days - {money(parseAmount(extensionAmount))} due {extensionDueDate || "not set"}
                 {useAmendment ? <span className="mt-1 block text-[12px] font-normal">Applies when the customer signs.</span> : null}
               </div>
@@ -499,10 +499,10 @@ export function RentalAdjustmentModal({
               <div>
                 <p className="text-[11px] font-medium text-[var(--foreground-secondary)]">Was rent paid in advance for the remaining period?</p>
                 <div className="mt-1 grid grid-cols-2 gap-2">
-                  <button className={`pressable rounded-lg border px-3 py-2 text-sm font-bold ${advancePaid ? "border-[var(--primary)] bg-[#ecfeff] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`} onClick={() => setAdvancePaid(true)} type="button">
+                  <button className={`pressable rounded-lg border px-3 py-2 text-sm font-bold ${advancePaid ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`} onClick={() => setAdvancePaid(true)} type="button">
                     Yes
                   </button>
-                  <button className={`pressable rounded-lg border px-3 py-2 text-sm font-bold ${!advancePaid ? "border-[var(--primary)] bg-[#ecfeff] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`} onClick={() => setAdvancePaid(false)} type="button">
+                  <button className={`pressable rounded-lg border px-3 py-2 text-sm font-bold ${!advancePaid ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`} onClick={() => setAdvancePaid(false)} type="button">
                     No
                   </button>
                 </div>
@@ -514,7 +514,7 @@ export function RentalAdjustmentModal({
                     Amount paid that covers the remaining {earlyReturnDays} days
                     <CurrencyInput onChange={updateAdvanceAmount} value={advancePaidAmount} />
                     <span className="mt-1 block text-[11px] text-[var(--muted)]">How much did the customer pay that covered the period after the actual return date?</span>
-                    <span className="mt-1 block text-[11px] font-bold text-[#0f766e]">
+                    <span className="mt-1 block text-[11px] font-bold text-[var(--primary)]">
                       Suggestion: {money(suggestedRefund)} ({earlyReturnDays} days x {money(dailyRate)}/day at current monthly rate)
                     </span>
                   </label>
@@ -591,7 +591,7 @@ export function RentalAdjustmentButton({
   vehicleLabel,
   customerName,
   label = "Adjust",
-  className = "pressable inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-black text-[var(--foreground-secondary)]"
+  className = "pressable inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground-secondary)]"
 }: {
   rentalId: string;
   currentStartDate?: string | null;

@@ -246,16 +246,16 @@ function VehicleSelectorMini({
       {/* Make */}
       <div className="relative">
         <label className="block">
-          <span className="text-sm font-semibold text-[#344054]">Make</span>
+          <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Make</span>
           <button
             className="mt-1 flex w-full items-center justify-between gap-3 rounded-xl border border-[var(--border-strong)] bg-white px-3 py-3 text-left text-base outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
             onClick={() => setMakeOpen((o) => !o)}
             type="button"
           >
-            <span className={value.make ? "font-semibold text-[var(--foreground)]" : "text-[#98a2b3]"}>
+            <span className={value.make ? "font-semibold text-[var(--foreground)]" : "text-[var(--muted)]"}>
               {loadingMakes ? "Loading makes…" : value.make || "Select make"}
             </span>
-            <span className="text-[#667085]">▾</span>
+            <span className="text-[var(--muted)]">▾</span>
           </button>
         </label>
         {makeOpen && (
@@ -272,13 +272,13 @@ function VehicleSelectorMini({
             <div className="max-h-64 overflow-y-auto py-1">
               {filteredMakes.map((m) => (
                 <button
-                  className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm font-semibold hover:bg-[#eef8f6]"
+                  className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm font-semibold hover:bg-[#fbfaf8]"
                   key={m.id}
                   onClick={() => selectMake(m)}
                   type="button"
                 >
                   {m.name}
-                  <span className="ml-auto text-xs uppercase text-[#98a2b3]">{m.origin_country || ""}</span>
+                  <span className="ml-auto text-xs uppercase text-[var(--muted)]">{m.origin_country || ""}</span>
                 </button>
               ))}
             </div>
@@ -288,7 +288,7 @@ function VehicleSelectorMini({
 
       {/* Model */}
       <label className="block">
-        <span className="text-sm font-semibold text-[#344054]">Model</span>
+        <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Model</span>
         <select
           className={inputCls}
           disabled={!selectedMakeId}
@@ -304,7 +304,7 @@ function VehicleSelectorMini({
 
       {/* Year */}
       <label className="block">
-        <span className="text-sm font-semibold text-[#344054]">Year</span>
+        <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Year</span>
         {catalogYears.length > 0 ? (
           <select className={inputCls} onChange={selectYear} value={value.year}>
             <option value="">Select year</option>
@@ -325,7 +325,7 @@ function VehicleSelectorMini({
 
       {/* Trim */}
       <label className="block">
-        <span className="text-sm font-semibold text-[#344054]">Trim</span>
+        <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Trim</span>
         {visibleTrims.length > 0 ? (
           <select
             className={inputCls}
@@ -598,7 +598,7 @@ export function CalculatorClient({
             <SectionHeader eyebrow="Purchase" title="Acquisition cost" />
             <div className="mt-4 space-y-4">
               <label className="block">
-                <span className="text-sm font-semibold text-[#344054]">Purchase price (฿)</span>
+                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Purchase price (฿)</span>
                 <input
                   className={inputCls}
                   min="0"
@@ -619,21 +619,21 @@ export function CalculatorClient({
                     className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${financed ? "translate-x-5" : "translate-x-0.5"}`}
                   />
                 </div>
-                <span className="text-sm font-semibold text-[#344054]">Financed purchase</span>
+                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Financed purchase</span>
               </label>
 
               {financed && (
                 <div className="grid gap-4 sm:grid-cols-3">
                   <label className="block">
-                    <span className="text-sm font-semibold text-[#344054]">Down payment (฿)</span>
+                    <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Down payment (฿)</span>
                     <input className={inputCls} min="0" onChange={(e) => setDownPayment(e.target.value)} placeholder="100,000" step="0.01" type="number" value={downPayment} />
                   </label>
                   <label className="block">
-                    <span className="text-sm font-semibold text-[#344054]">Monthly payment (฿)</span>
+                    <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Monthly payment (฿)</span>
                     <input className={inputCls} min="0" onChange={(e) => setMonthlyPayment(e.target.value)} placeholder="8,500" step="0.01" type="number" value={monthlyPayment} />
                   </label>
                   <label className="block">
-                    <span className="text-sm font-semibold text-[#344054]">Loan term (months)</span>
+                    <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Loan term (months)</span>
                     <input className={inputCls} min="1" onChange={(e) => setLoanTermMonths(e.target.value)} placeholder="60" type="number" value={loanTermMonths} />
                   </label>
                 </div>
@@ -646,13 +646,13 @@ export function CalculatorClient({
             <SectionHeader eyebrow="Rental" title="Expected performance" />
             <div className="mt-4 space-y-4">
               <label className="block">
-                <span className="text-sm font-semibold text-[#344054]">Estimated monthly rental rate (฿)</span>
+                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Estimated monthly rental rate (฿)</span>
                 <input className={inputCls} min="0" onChange={(e) => setEstimatedRate(e.target.value)} placeholder="25,000" step="0.01" type="number" value={estimatedRate} />
               </label>
               <label className="block">
-                <span className="text-sm font-semibold text-[#344054]">
+                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">
                   Expected utilization (%)
-                  <span className="ml-2 text-xs font-normal text-[#667085]">
+                  <span className="ml-2 text-xs font-normal text-[var(--muted)]">
                     {measuredUtilization === null
                       ? "No fleet history yet"
                       : measuredUtilization < 20
@@ -671,7 +671,7 @@ export function CalculatorClient({
                 />
               </label>
               <label className="block">
-                <span className="text-sm font-semibold text-[#344054]">Intended use</span>
+                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Intended use</span>
                 <select className={inputCls} onChange={(e) => setIntendedUse(e.target.value as typeof intendedUse)} value={intendedUse}>
                   <option value="long_term">Long-term rental</option>
                   <option value="short_term">Short-term rental</option>
@@ -686,7 +686,7 @@ export function CalculatorClient({
             <div className="flex items-start justify-between gap-3">
               <SectionHeader eyebrow="AI-estimated costs" title="Annual running costs" />
               {aiLoading && (
-                <span className="mt-1 text-xs font-semibold text-[#0f766e] animate-pulse">Estimating…</span>
+                <span className="mt-1 text-xs font-semibold text-[var(--primary)] animate-pulse">Estimating…</span>
               )}
               {aiLoaded && !aiLoading && (
                 <span className="mt-1 rounded-full bg-[#dcfce7] px-2 py-0.5 text-xs font-semibold text-[#166534]">AI estimated</span>
@@ -713,7 +713,7 @@ export function CalculatorClient({
                 ] as Array<{ key: keyof AiEstimates; label: string }>
               ).map(({ key, label }) => (
                 <label className="block" key={key}>
-                  <span className="text-sm font-semibold text-[#344054]">
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">
                     {label}
                     {aiLoaded && <span className="ml-1 rounded-full bg-[#dcfce7] px-1.5 py-0.5 text-[10px] font-semibold text-[#166534]">AI</span>}
                   </span>
@@ -729,7 +729,7 @@ export function CalculatorClient({
                 </label>
               ))}
               <label className="block">
-                <span className="text-sm font-semibold text-[#344054]">
+                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">
                   Reliability score (0–100)
                   {aiLoaded && <span className="ml-1 rounded-full bg-[#dcfce7] px-1.5 py-0.5 text-[10px] font-semibold text-[#166534]">AI</span>}
                 </span>
@@ -753,7 +753,7 @@ export function CalculatorClient({
               <div className="flex min-h-48 items-center justify-center text-center">
                 <div>
                   <p className="text-lg font-bold text-[var(--foreground)]">Enter vehicle details</p>
-                  <p className="mt-1 text-sm text-[#667085]">Fill in purchase price and rental assumptions to see results</p>
+                  <p className="mt-1 text-sm text-[var(--muted)]">Fill in purchase price and rental assumptions to see results</p>
                 </div>
               </div>
             </Card>
@@ -762,7 +762,7 @@ export function CalculatorClient({
               {/* Recommendation card */}
               <Card>
                 <div className={`rounded-2xl border-2 p-5 text-center ${recColor[results.recommendation]}`}>
-                  <p className="text-3xl font-black tracking-tight">{recLabel[results.recommendation]}</p>
+                  <p className="text-3xl font-semibold tracking-tight">{recLabel[results.recommendation]}</p>
                   {vehicle.make && vehicle.model && (
                     <p className="mt-1 text-sm font-semibold opacity-80">{vehicle.make} {vehicle.model} {vehicle.year}</p>
                   )}
@@ -770,7 +770,7 @@ export function CalculatorClient({
                 </div>
                 <div className="mt-4">
                   <div className="mb-2 flex items-center justify-between text-sm">
-                    <span className="font-semibold text-[#344054]">Confidence score</span>
+                    <span className="font-semibold text-[var(--foreground-secondary)]">Confidence score</span>
                     <span className="font-mono-data font-bold">{results.confidence}%</span>
                   </div>
                   <ProgressBar
@@ -790,15 +790,15 @@ export function CalculatorClient({
                     { label: "Monthly net profit", value: results.monthlyNetProfit, positive: results.monthlyNetProfit >= 0 }
                   ].map(({ label, value, positive }) => (
                     <div className="flex items-center justify-between" key={label}>
-                      <span className="text-sm font-semibold text-[#344054]">{label}</span>
+                      <span className="text-sm font-semibold text-[var(--foreground-secondary)]">{label}</span>
                       <span className={`font-mono-data font-bold ${positive ? "text-emerald-600" : "text-red-500"}`}>
                         {fmt(value)}
                       </span>
                     </div>
                   ))}
-                  <div className="border-t border-[#eef2f6] pt-3">
+                  <div className="border-t border-[var(--border)] pt-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold text-[#344054]">Payback period</span>
+                      <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Payback period</span>
                       <span className="font-mono-data font-bold text-[var(--foreground)]">
                         {isFinite(results.paybackMonths)
                           ? `${Math.round(results.paybackMonths)} months (${(results.paybackMonths / 12).toFixed(1)} yrs)`
@@ -847,7 +847,7 @@ export function CalculatorClient({
                 <div className="mt-4 overflow-x-auto">
                   <table className="w-full min-w-[360px] text-left text-sm">
                     <thead>
-                      <tr className="border-b border-[#eef2f6] text-xs uppercase text-[#667085]">
+                      <tr className="border-b border-[var(--border)] text-xs uppercase text-[var(--muted)]">
                         <th className="py-2 pr-3">Utilization</th>
                         <th className="px-3 py-2">Monthly revenue</th>
                         <th className="px-3 py-2">Monthly profit</th>
@@ -856,13 +856,13 @@ export function CalculatorClient({
                     </thead>
                     <tbody>
                       {sensitivityRows.map(({ util, rev, profit, payback }) => (
-                        <tr className="border-b border-[#eef2f6] last:border-0" key={util}>
+                        <tr className="border-b border-[var(--border)] last:border-0" key={util}>
                           <td className="font-mono-data py-3 pr-3 font-semibold">{util}%</td>
                           <td className="font-mono-data px-3 py-3 text-emerald-600">{fmt(rev)}</td>
                           <td className={`font-mono-data px-3 py-3 font-semibold ${profit >= 0 ? "text-emerald-600" : "text-red-500"}`}>
                             {fmt(profit)}
                           </td>
-                          <td className="font-mono-data px-3 py-3 text-[#667085]">
+                          <td className="font-mono-data px-3 py-3 text-[var(--muted)]">
                             {payback !== null ? `${payback}mo` : "—"}
                           </td>
                         </tr>
@@ -880,12 +880,12 @@ export function CalculatorClient({
                     {similarVehicles.map((v) => {
                       const approxMonthlyProfit = v.profit / 36;
                       return (
-                        <div className="rounded-xl border border-[#eef2f6] p-3" key={v.id}>
+                        <div className="rounded-xl border border-[var(--border)] p-3" key={v.id}>
                           <div className="flex items-center justify-between gap-2">
-                            <p className="font-semibold text-[#172026]">{v.make} {v.model}</p>
-                            <span className="font-mono-data text-xs text-[#667085]">{v.plate}</span>
+                            <p className="font-semibold text-[var(--foreground)]">{v.make} {v.model}</p>
+                            <span className="font-mono-data text-xs text-[var(--muted)]">{v.plate}</span>
                           </div>
-                          <p className="mt-1 text-sm text-[#344054]">
+                          <p className="mt-1 text-sm text-[var(--foreground-secondary)]">
                             Your {v.make} {v.model} achieves{" "}
                             <span className="font-mono-data font-semibold">{v.utilization}%</span> utilization and generates{" "}
                             <span className="font-mono-data font-semibold text-emerald-600">{fmt(approxMonthlyProfit)}</span> avg monthly net profit
@@ -939,7 +939,7 @@ export function CalculatorClient({
 
               return (
                 <div
-                  className="flex cursor-pointer items-start justify-between gap-3 rounded-xl border border-[#eef2f6] p-4 hover:border-[var(--primary)] hover:bg-[var(--primary-light)] transition-colors"
+                  className="flex cursor-pointer items-start justify-between gap-3 rounded-xl border border-[var(--border)] p-4 hover:border-[var(--primary)] hover:bg-[var(--primary-light)] transition-colors"
                   key={calc.id}
                   onClick={() => loadSaved(calc)}
                   role="button"
@@ -947,11 +947,11 @@ export function CalculatorClient({
                   onKeyDown={(e) => e.key === "Enter" && loadSaved(calc)}
                 >
                   <div>
-                    <p className="font-semibold text-[#172026]">
+                    <p className="font-semibold text-[var(--foreground)]">
                       {[calc.vehicle_make, calc.vehicle_model, calc.vehicle_year].filter(Boolean).join(" ") || "Unknown vehicle"}
-                      {calc.vehicle_trim && <span className="ml-2 text-xs text-[#667085]">{calc.vehicle_trim}</span>}
+                      {calc.vehicle_trim && <span className="ml-2 text-xs text-[var(--muted)]">{calc.vehicle_trim}</span>}
                     </p>
-                    <div className="mt-1 flex flex-wrap gap-3 text-sm text-[#667085]">
+                    <div className="mt-1 flex flex-wrap gap-3 text-sm text-[var(--muted)]">
                       {calc.purchase_price && <span>Price: {fmt(Number(calc.purchase_price))}</span>}
                       {monthlyProfit !== null && (
                         <span className={Number(monthlyProfit) >= 0 ? "text-emerald-600 font-semibold" : "text-red-500 font-semibold"}>
@@ -967,7 +967,7 @@ export function CalculatorClient({
                   <div className="flex shrink-0 flex-col items-end gap-2">
                     {calc.recommendation && <Badge tone={recBadgeTone as "green" | "amber" | "red"}>{recBadgeLabel}</Badge>}
                     {calc.confidence_score !== null && (
-                      <span className="font-mono-data text-xs text-[#667085]">{calc.confidence_score}% conf.</span>
+                      <span className="font-mono-data text-xs text-[var(--muted)]">{calc.confidence_score}% conf.</span>
                     )}
                   </div>
                 </div>

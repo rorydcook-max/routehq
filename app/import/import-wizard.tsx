@@ -6,7 +6,7 @@ import { useMemo, useState } from "react";
 import { IMPORT_FIELD_GROUPS, IMPORT_FIELDS } from "@/lib/import/fields";
 
 const inputClass =
-  "mt-1 w-full rounded-lg border border-[#d6e5e2] bg-white px-3 py-3 text-base text-[#10252b] outline-none focus:border-[#0f766e] focus:ring-2 focus:ring-[#0f766e]/15";
+  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15";
 
 type ColumnMapping = {
   source_column: string;
@@ -53,17 +53,17 @@ function IssueList({ title, items, tone }: { title: string; items: string[]; ton
   if (!items.length) return null;
   const shown = showAll ? items : items.slice(0, 12);
   return (
-    <div className={`mt-4 rounded-lg border p-3 ${tone === "amber" ? "border-[#fed7aa] bg-[#fff7ed]" : "border-[#bfdbfe] bg-[#f8fbff]"}`}>
+    <div className={`mt-4 rounded-lg border p-3 ${tone === "amber" ? "border-[#fed7aa] bg-[#fff7ed]" : "border-[#bfdbfe] bg-[#fbfaf8]"}`}>
       <p className={`font-bold ${tone === "amber" ? "text-[#92400e]" : "text-[#1e40af]"}`}>
         {title} ({items.length})
       </p>
-      <ul className="mt-2 space-y-1 text-sm text-[#475467]">
+      <ul className="mt-2 space-y-1 text-sm text-[var(--foreground-secondary)]">
         {shown.map((item, index) => (
           <li key={`${index}-${item}`}>{item}</li>
         ))}
       </ul>
       {items.length > 12 ? (
-        <button className="mt-2 text-sm font-bold text-[#0f766e]" onClick={() => setShowAll((value) => !value)} type="button">
+        <button className="mt-2 text-sm font-bold text-[var(--primary)]" onClick={() => setShowAll((value) => !value)} type="button">
           {showAll ? "Show fewer" : `Show all ${items.length}`}
         </button>
       ) : null}
@@ -185,21 +185,21 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
 
   return (
     <div className="space-y-5">
-      <section className="rounded-lg border border-[#bfdbfe] bg-[#f8fbff] p-4">
+      <section className="rounded-lg border border-[#bfdbfe] bg-[#fbfaf8] p-4">
         <div className="flex items-start gap-3">
           <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#dbeafe] text-[#2563eb]">
             <FileSpreadsheet size={22} />
           </span>
           <div>
-            <p className="text-xs font-extrabold uppercase text-[#0f766e]">Step 1</p>
-            <h2 className="text-xl font-extrabold text-[#10252b]">Choose your spreadsheet</h2>
-            <p className="mt-1 text-sm text-[#667085]">A CSV or Excel file, or a Google Sheet shared as “anyone with the link can view”. Every tab is read.</p>
+            <p className="text-xs font-semibold uppercase text-[var(--primary)]">Step 1</p>
+            <h2 className="text-xl font-semibold text-[var(--foreground)]">Choose your spreadsheet</h2>
+            <p className="mt-1 text-sm text-[var(--muted)]">A CSV or Excel file, or a Google Sheet shared as “anyone with the link can view”. Every tab is read.</p>
           </div>
         </div>
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           <label className="block">
-            <span className="text-sm font-semibold text-[#344054]">Spreadsheet file</span>
+            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Spreadsheet file</span>
             <input
               accept=".csv,.xlsx,.xls,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
               className={inputClass}
@@ -212,7 +212,7 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
             />
           </label>
           <label className="block">
-            <span className="text-sm font-semibold text-[#344054]">What's in it?</span>
+            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">What's in it?</span>
             <select className={inputClass} onChange={(event) => setImportType(event.target.value)} value={importType}>
               <option value="mixed">Work it out for me</option>
               <option value="vehicles">Vehicles</option>
@@ -223,8 +223,8 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
           </label>
         </div>
 
-        <label className="mt-4 block rounded-lg border border-[#d6e5e2] bg-white p-3">
-          <span className="text-sm font-semibold text-[#344054]">Or a Google Sheets link</span>
+        <label className="mt-4 block rounded-lg border border-[var(--border)] bg-white p-3">
+          <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Or a Google Sheets link</span>
           <input
             className={inputClass}
             onChange={(event) => {
@@ -239,7 +239,7 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
         </label>
 
         <button
-          className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#0f766e] px-4 py-3 text-sm font-bold text-white disabled:opacity-60 sm:w-auto"
+          className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-3 text-sm font-bold text-white disabled:opacity-60 sm:w-auto"
           disabled={status === "analyzing" || (!file && !sheetUrl.trim())}
           onClick={analyzeFile}
           type="button"
@@ -258,20 +258,20 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
 
       {(status === "review" || status === "importing") && analysis ? (
         <section className="rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] p-4">
-          <p className="text-xs font-extrabold uppercase text-[#0f766e]">Step 2</p>
-          <h2 className="text-xl font-extrabold text-[#10252b]">Check where each column goes</h2>
-          <p className="mt-2 text-sm text-[#667085]">
+          <p className="text-xs font-semibold uppercase text-[var(--primary)]">Step 2</p>
+          <h2 className="text-xl font-semibold text-[var(--foreground)]">Check where each column goes</h2>
+          <p className="mt-2 text-sm text-[var(--muted)]">
             Every column is listed. Columns set to “Don't import” are left out - pick a field for any you want to keep.
           </p>
           {notice ? <p className="mt-3 rounded-lg bg-[#fffbeb] px-3 py-2 text-sm font-semibold text-[#92400e]">{notice}</p> : null}
 
           <div className="mt-5 space-y-4">
             {mappings.map((sheet, sheetIndex) => (
-              <div className="rounded-lg border border-[#d6e5e2] bg-white p-3" key={sheet.sheet_name}>
+              <div className="rounded-lg border border-[var(--border)] bg-white p-3" key={sheet.sheet_name}>
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p className="font-extrabold text-[#10252b]">{sheet.sheet_name}</p>
-                    <p className="text-sm text-[#667085]">
+                    <p className="font-semibold text-[var(--foreground)]">{sheet.sheet_name}</p>
+                    <p className="text-sm text-[var(--muted)]">
                       {sheet.row_count ?? 0} row{sheet.row_count === 1 ? "" : "s"}
                     </p>
                   </div>
@@ -297,7 +297,7 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
                 <div className="mt-3 overflow-x-auto">
                   <table className="w-full min-w-[640px] text-left text-sm">
                     <thead>
-                      <tr className="border-b border-[#edf2f7] text-xs uppercase text-[#667085]">
+                      <tr className="border-b border-[var(--border)] text-xs uppercase text-[var(--muted)]">
                         <th className="py-2">Column in your sheet</th>
                         <th className="py-2">Examples</th>
                         <th className="py-2">Import as</th>
@@ -308,9 +308,9 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
                         const ignored = !mapping.routehq_field || mapping.routehq_field === "__ignore__";
                         const clash = clashes[sheetIndex]?.has(mapping.routehq_field);
                         return (
-                          <tr className={`border-b border-[#edf2f7] last:border-0 ${ignored ? "text-[#98a2b3]" : ""}`} key={`${sheet.sheet_name}-${columnIndex}`}>
+                          <tr className={`border-b border-[var(--border)] last:border-0 ${ignored ? "text-[var(--muted)]" : ""}`} key={`${sheet.sheet_name}-${columnIndex}`}>
                             <td className="py-2 pr-3 font-semibold">{mapping.source_column}</td>
-                            <td className="max-w-[240px] truncate py-2 pr-3 text-[#667085]">{(mapping.sample_values || []).slice(0, 3).join(", ")}</td>
+                            <td className="max-w-[240px] truncate py-2 pr-3 text-[var(--muted)]">{(mapping.sample_values || []).slice(0, 3).join(", ")}</td>
                             <td className="py-2">
                               <div className="flex items-center gap-2">
                                 {!ignored ? <span className={`inline-flex h-2.5 w-2.5 shrink-0 rounded-full ${confidenceTone(mapping.confidence)}`} title="How sure the suggestion is" /> : null}
@@ -351,12 +351,12 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
           ) : null}
 
           <div className="mt-5 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-            <button className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#d6e5e2] bg-white px-4 py-3 text-sm font-bold text-[#344054]" onClick={reset} type="button">
+            <button className="inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-4 py-3 text-sm font-bold text-[var(--foreground-secondary)]" onClick={reset} type="button">
               <RotateCcw size={17} />
               Start again
             </button>
             <button
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#0f766e] px-4 py-3 text-sm font-bold text-white disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-3 text-sm font-bold text-white disabled:opacity-60"
               disabled={status === "importing" || hasClashes}
               onClick={executeImport}
               type="button"
@@ -373,25 +373,25 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
           <div className="flex items-start gap-3">
             <CheckCircle2 className="text-[#16a34a]" size={28} />
             <div>
-              <p className="text-xs font-extrabold uppercase text-[#0f766e]">Step 3</p>
-              <h2 className="text-xl font-extrabold text-[#10252b]">Import finished</h2>
+              <p className="text-xs font-semibold uppercase text-[var(--primary)]">Step 3</p>
+              <h2 className="text-xl font-semibold text-[var(--foreground)]">Import finished</h2>
             </div>
           </div>
           <div className="mt-4 grid gap-3 sm:grid-cols-4">
             {Object.entries(result.imported).map(([key, value]) => (
-              <div className="rounded-lg border border-[#d6e5e2] bg-white p-3" key={key}>
-                <p className="text-xs font-bold uppercase text-[#667085]">{key === "transactions" ? "payments & expenses" : key}</p>
-                <p className="text-2xl font-extrabold text-[#10252b]">{value}</p>
+              <div className="rounded-lg border border-[var(--border)] bg-white p-3" key={key}>
+                <p className="text-xs font-bold uppercase text-[var(--muted)]">{key === "transactions" ? "payments & expenses" : key}</p>
+                <p className="text-2xl font-semibold text-[var(--foreground)]">{value}</p>
               </div>
             ))}
           </div>
           <IssueList items={result.skipped} title="Not imported" tone="amber" />
           <IssueList items={result.warnings || []} title="Check these" tone="blue" />
           <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-end">
-            <button className="inline-flex justify-center rounded-lg border border-[#d6e5e2] bg-white px-4 py-3 text-sm font-bold text-[#344054]" onClick={reset} type="button">
+            <button className="inline-flex justify-center rounded-lg border border-[var(--border)] bg-white px-4 py-3 text-sm font-bold text-[var(--foreground-secondary)]" onClick={reset} type="button">
               Import another file
             </button>
-            <Link className="inline-flex justify-center rounded-lg bg-[#0f766e] px-4 py-3 text-sm font-bold text-white" href="/fleet">
+            <Link className="inline-flex justify-center rounded-lg bg-[var(--primary)] px-4 py-3 text-sm font-bold text-white" href="/fleet">
               View fleet
             </Link>
           </div>

@@ -36,9 +36,9 @@ export default async function TrialExpiredPage() {
     <AppShell userEmail={userEmail}>
       <div className="mx-auto max-w-4xl">
         <Card className="border-[#fecdd3] bg-[#fff7f8]">
-          <p className="text-sm font-black uppercase text-[#be123c]">Trial ended</p>
-          <h1 className="mt-2 text-3xl font-black text-[#10252b]">Your trial has ended</h1>
-          <p className="mt-2 max-w-2xl text-sm text-[#667085]">
+          <p className="text-sm font-semibold uppercase text-[#be123c]">Trial ended</p>
+          <h1 className="mt-2 text-3xl font-semibold text-[var(--foreground)]">Your trial has ended</h1>
+          <p className="mt-2 max-w-2xl text-sm text-[var(--muted)]">
             Your RouteHQ data is safe. Subscribe to continue managing your vehicles, customers, rentals, reminders, and documents.
           </p>
           <div className="mt-5 grid gap-3 sm:grid-cols-3">
@@ -48,8 +48,8 @@ export default async function TrialExpiredPage() {
               ["Rentals", summary.rentals]
             ].map(([label, value]) => (
               <div className="rounded-lg border border-white bg-white/80 p-4 shadow-sm" key={String(label)}>
-                <p className="text-xs font-bold uppercase text-[#667085]">{label}</p>
-                <p className="mt-1 text-3xl font-black text-[#10252b]">{value}</p>
+                <p className="text-xs font-bold uppercase text-[var(--muted)]">{label}</p>
+                <p className="mt-1 text-3xl font-semibold text-[var(--foreground)]">{value}</p>
               </div>
             ))}
           </div>
@@ -58,23 +58,23 @@ export default async function TrialExpiredPage() {
         <div className="mt-4 grid gap-4 md:grid-cols-4">
           {tiers.map((tier) => (
             <Card className="bg-white" key={tier.name}>
-              <p className="font-black text-[#10252b]">{tier.name}</p>
-              <p className="mt-2 text-2xl font-black text-[#0f766e]">{tier.price}</p>
-              <p className="mt-1 text-xs font-semibold text-[#667085]">per month</p>
-              <p className="mt-3 text-sm text-[#667085]">{tier.note}</p>
+              <p className="font-semibold text-[var(--foreground)]">{tier.name}</p>
+              <p className="mt-2 text-2xl font-semibold text-[var(--primary)]">{tier.price}</p>
+              <p className="mt-1 text-xs font-semibold text-[var(--muted)]">per month</p>
+              <p className="mt-3 text-sm text-[var(--muted)]">{tier.note}</p>
             </Card>
           ))}
         </div>
 
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-          <Link className="pressable inline-flex min-h-12 flex-1 items-center justify-center rounded-xl bg-[#0f766e] px-5 py-3 text-sm font-black text-white" href={"/settings/billing" as Route}>
+          <Link className="pressable inline-flex min-h-12 flex-1 items-center justify-center rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={"/settings/billing" as Route}>
             Subscribe to continue
           </Link>
-          <a className="pressable inline-flex min-h-12 flex-1 items-center justify-center rounded-xl border border-[#d6e5e2] bg-white px-5 py-3 text-sm font-black text-[#344054]" href="/api/export/account">
+          <a className="pressable inline-flex min-h-12 flex-1 items-center justify-center rounded-xl border border-[var(--border)] bg-white px-5 py-3 text-sm font-semibold text-[var(--foreground-secondary)]" href="/api/export/account">
             Export my data
           </a>
           {process.env.LINE_OA_ID ? (
-            <a className="pressable inline-flex min-h-12 flex-1 items-center justify-center rounded-xl border border-[#d6e5e2] bg-white px-5 py-3 text-sm font-black text-[#344054]" href={`https://line.me/R/ti/p/${encodeURIComponent(process.env.LINE_OA_ID)}`} rel="noreferrer" target="_blank">
+            <a className="pressable inline-flex min-h-12 flex-1 items-center justify-center rounded-xl border border-[var(--border)] bg-white px-5 py-3 text-sm font-semibold text-[var(--foreground-secondary)]" href={`https://line.me/R/ti/p/${encodeURIComponent(process.env.LINE_OA_ID)}`} rel="noreferrer" target="_blank">
               Need more time? Contact us
             </a>
           ) : null}

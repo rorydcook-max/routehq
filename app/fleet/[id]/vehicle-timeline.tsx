@@ -21,8 +21,8 @@ const iconByKind = {
 };
 
 function formatTimelineDate(value: string) {
-  return new Intl.DateTimeFormat("en-TH", {
-    day: "2-digit",
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
     month: "short",
     year: "numeric"
   }).format(new Date(value));

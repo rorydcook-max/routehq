@@ -78,7 +78,7 @@ export function SignatureUploadSection({
     submit(fd);
   }
 
-  const fileInputClass = "max-w-52 text-xs text-[#667085] file:mr-2 file:rounded-lg file:border-0 file:bg-[#ecfeff] file:px-2.5 file:py-1.5 file:text-xs file:font-bold file:text-[#0e7490]";
+  const fileInputClass = "max-w-52 text-xs text-[var(--muted)] file:mr-2 file:rounded-lg file:border-0 file:bg-[var(--primary-light)] file:px-2.5 file:py-1.5 file:text-xs file:font-bold file:text-[var(--primary)]";
 
   const preview = signatureUrl ? (
     <img
@@ -87,7 +87,7 @@ export function SignatureUploadSection({
       src={signatureUrl}
     />
   ) : (
-    <div className="flex h-12 w-32 shrink-0 items-center justify-center rounded-lg bg-[#ecfeff] text-[#0e7490]">
+    <div className="flex h-12 w-32 shrink-0 items-center justify-center rounded-lg bg-[var(--primary-light)] text-[var(--primary)]">
       <span className="ti ti-signature text-lg" aria-hidden="true" />
     </div>
   );
@@ -101,14 +101,14 @@ export function SignatureUploadSection({
       <div className="flex items-center gap-3">
         {preview}
         <div className="min-w-0">
-          <p className="text-[13px] font-bold text-[#172026]">Authorised signature</p>
-          <p className="mt-0.5 text-[11px] leading-4 text-[#667085]">
+          <p className="text-[13px] font-bold text-[var(--foreground)]">Authorised signature</p>
+          <p className="mt-0.5 text-[11px] leading-4 text-[var(--muted)]">
             Applied automatically to each agreement when a customer signs online. PNG, JPG or WebP, max 2 MB.
           </p>
         </div>
       </div>
       {signatoryReady ? (
-        <p className="text-[11px] leading-4 text-[#344054]">
+        <p className="text-[11px] leading-4 text-[var(--foreground-secondary)]">
           Signing as <strong>{authorisedSignatoryName}</strong>, {authorisedSignatoryTitle}.
         </p>
       ) : (
@@ -116,7 +116,7 @@ export function SignatureUploadSection({
           First save the authorised signatory&apos;s full name and job title above. The signature is recorded as theirs.
         </p>
       )}
-      <label className="flex w-full items-start gap-2 rounded-lg border border-[#d6e5e2] bg-white p-2 text-[11px] leading-4 text-[#344054]">
+      <label className="flex w-full items-start gap-2 rounded-lg border border-[var(--border)] bg-white p-2 text-[11px] leading-4 text-[var(--foreground-secondary)]">
         <input className="mt-0.5 shrink-0" disabled={!signatoryReady} ref={acknowledgementRef} type="checkbox" />
         <span>{SIGNATURE_AUTHORISATION_TEXT}</span>
       </label>
@@ -143,11 +143,11 @@ export function SignatureUploadSection({
   );
 
   if (signatureUrl) {
-    return <div className="flex flex-col gap-3 rounded-lg border border-[#dfe4ea] bg-[#fbfefd] p-3">{content}</div>;
+    return <div className="flex flex-col gap-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">{content}</div>;
   }
 
   return (
-    <form className="flex flex-col gap-3 rounded-lg border border-[#dfe4ea] bg-[#fbfefd] p-3" onSubmit={handleUpload}>
+    <form className="flex flex-col gap-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3" onSubmit={handleUpload}>
       {content}
     </form>
   );

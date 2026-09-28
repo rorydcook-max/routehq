@@ -30,7 +30,7 @@ import { getDefaultOrganization, getTravelPolicySettings, getVehicleCategories }
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const inputClass =
-  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(18,184,200,0.16)]";
+  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]";
 
 type VehicleMakeSetting = {
   id: string;
@@ -213,7 +213,7 @@ export default async function SettingsPage() {
         <Card>
           <SectionHeader eyebrow="Profile" title="Your language" />
           <div className="card-section">
-            <p className="text-xs text-[#667085]">
+            <p className="text-xs text-[var(--muted)]">
               Language and calendar are personal, so each person in your business sets their own in My account.
             </p>
             <Link className="mt-3 inline-block text-sm font-bold text-[var(--primary)]" href="/account">
@@ -225,16 +225,16 @@ export default async function SettingsPage() {
         <Card>
           <SectionHeader eyebrow="Organization" title={organization.name} />
           <div className="card-section grid gap-3 sm:grid-cols-3">
-            <div className="rounded-lg border border-[#dfe4ea] p-2">
-              <p className="text-[9px] font-semibold uppercase tracking-[0.08em] text-[#667085]">Currency</p>
+            <div className="rounded-lg border border-[var(--border)] p-2">
+              <p className="text-[9px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">Currency</p>
               <p className="mt-0.5 text-[13px] font-bold">{organization.currency}</p>
             </div>
-            <div className="rounded-lg border border-[#dfe4ea] p-2">
-              <p className="text-[9px] font-semibold uppercase tracking-[0.08em] text-[#667085]">Timezone</p>
+            <div className="rounded-lg border border-[var(--border)] p-2">
+              <p className="text-[9px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">Timezone</p>
               <p className="mt-0.5 text-[13px] font-bold">{organization.timezone}</p>
             </div>
-            <div className="rounded-lg border border-[#dfe4ea] p-2">
-              <p className="text-[9px] font-semibold uppercase tracking-[0.08em] text-[#667085]">Default language</p>
+            <div className="rounded-lg border border-[var(--border)] p-2">
+              <p className="text-[9px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">Default language</p>
               <p className="mt-0.5 text-[13px] font-bold">
                 {supportedLocaleOptions.find((option) => option.code === organization.default_locale)?.english || organization.default_locale.toUpperCase()}
               </p>
@@ -261,7 +261,7 @@ export default async function SettingsPage() {
       <div className="mt-4">
         <Card>
           <SectionHeader eyebrow="Travel policy" title="Rental territory and contract terms" />
-          <p className="mt-2 text-xs leading-5 text-[#667085]">
+          <p className="mt-2 text-xs leading-5 text-[var(--muted)]">
             Configure where vehicles are normally allowed to travel, deposits for island crossings, and the default terms used in rental contracts.
           </p>
           <TravelPolicyForm organizationId={organization.id} settings={travelPolicySettings} />
@@ -271,7 +271,7 @@ export default async function SettingsPage() {
       <div className="mt-4">
         <Card>
           <SectionHeader eyebrow="Payments & receipts" title="Payment Methods" />
-          <p className="mt-2 text-xs leading-5 text-[#667085]">
+          <p className="mt-2 text-xs leading-5 text-[var(--muted)]">
             Choose which payment methods you accept. Only enabled methods will be shown to customers in the booking link.
           </p>
           <PaymentMethodsForm
@@ -290,9 +290,9 @@ export default async function SettingsPage() {
               default_payment_method: organization.default_payment_method
             }}
           />
-          <div className="mt-4 border-t border-[#dfe4ea] pt-4">
-            <p className="text-sm font-bold text-[#172026]">Upfront payment discount</p>
-            <p className="mt-1 text-xs text-[#667085]">Offer customers a discounted rate when they pay multiple months upfront. Only shown for monthly billing.</p>
+          <div className="mt-4 border-t border-[var(--border)] pt-4">
+            <p className="text-sm font-bold text-[var(--foreground)]">Upfront payment discount</p>
+            <p className="mt-1 text-xs text-[var(--muted)]">Offer customers a discounted rate when they pay multiple months upfront. Only shown for monthly billing.</p>
             <form action={updateUpfrontDiscountSettings} className="mt-3 space-y-3">
               <label className="checkbox-label sub-surface min-h-10 font-semibold text-[var(--foreground)]" style={{ display: "flex", alignItems: "center", padding: "8px 12px" }}>
                 <input
@@ -350,22 +350,22 @@ export default async function SettingsPage() {
       <div className="mt-4">
         <Card>
           <SectionHeader eyebrow="LINE" title="LINE Notifications" />
-          <p className="mt-2 text-xs text-[#667085]">
+          <p className="mt-2 text-xs text-[var(--muted)]">
             Receive daily fleet summaries and real-time alerts directly in LINE.
           </p>
 
           {/* Connection status */}
-          <div className="mt-3 flex flex-col gap-3 rounded-lg border border-[#dfe4ea] bg-[#f8fafc] p-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-3 flex flex-col gap-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
               <div className={`h-3 w-3 flex-shrink-0 rounded-full ${lineUserId ? "bg-[#16a34a]" : "bg-[#d97706]"}`} />
               <div>
-                <p className="text-sm font-semibold text-[#172026]">
+                <p className="text-sm font-semibold text-[var(--foreground)]">
                   {lineUserId ? "Connected" : "Not connected"}
                 </p>
                 {lineUserId && maskedLineUserId ? (
-                  <p className="text-xs text-[#667085]">LINE User ID: {maskedLineUserId}</p>
+                  <p className="text-xs text-[var(--muted)]">LINE User ID: {maskedLineUserId}</p>
                 ) : (
-                  <p className="text-xs text-[#667085]">Follow the steps below to connect your LINE account.</p>
+                  <p className="text-xs text-[var(--muted)]">Follow the steps below to connect your LINE account.</p>
                 )}
               </div>
             </div>
@@ -403,10 +403,10 @@ export default async function SettingsPage() {
               <input name="line_user_id" type="hidden" value={lineUserId} />
 
               {/* Master toggle */}
-              <label className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-[#dfe4ea] p-3">
+              <label className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-[var(--border)] p-3">
                 <div>
-                  <p className="text-sm font-semibold text-[#172026]">Enable LINE notifications</p>
-                  <p className="mt-0.5 text-xs text-[#667085]">Master switch — turn off to pause all LINE messages.</p>
+                  <p className="text-sm font-semibold text-[var(--foreground)]">Enable LINE notifications</p>
+                  <p className="mt-0.5 text-xs text-[var(--muted)]">Master switch — turn off to pause all LINE messages.</p>
                 </div>
                 <div className="relative flex-shrink-0">
                   <input
@@ -416,17 +416,17 @@ export default async function SettingsPage() {
                     type="checkbox"
                     value="on"
                   />
-                  <div className="h-6 w-11 rounded-full bg-[#cbd5e1] transition-colors peer-checked:bg-[#0f766e]" />
+                  <div className="h-6 w-11 rounded-full bg-[#cbd5e1] transition-colors peer-checked:bg-[var(--primary)]" />
                   <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
                 </div>
               </label>
 
               {/* Daily summary sub-settings */}
-              <div className="ml-2 space-y-3 border-l-2 border-[#dfe4ea] pl-4">
-                <label className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-[#dfe4ea] p-3">
+              <div className="ml-2 space-y-3 border-l-2 border-[var(--border)] pl-4">
+                <label className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-[var(--border)] p-3">
                   <div>
-                    <p className="text-sm font-semibold text-[#172026]">Daily morning summary</p>
-                    <p className="mt-0.5 text-xs text-[#667085]">Around 8:00 each morning (Thailand time): rentals out, returns, payments due, expiring documents and this month&apos;s rent.</p>
+                    <p className="text-sm font-semibold text-[var(--foreground)]">Daily morning summary</p>
+                    <p className="mt-0.5 text-xs text-[var(--muted)]">Around 8:00 each morning (Thailand time): rentals out, returns, payments due, expiring documents and this month&apos;s rent.</p>
                   </div>
                   <div className="relative flex-shrink-0">
                     <input
@@ -436,7 +436,7 @@ export default async function SettingsPage() {
                       type="checkbox"
                       value="on"
                     />
-                    <div className="h-6 w-11 rounded-full bg-[#cbd5e1] transition-colors peer-checked:bg-[#0f766e]" />
+                    <div className="h-6 w-11 rounded-full bg-[#cbd5e1] transition-colors peer-checked:bg-[var(--primary)]" />
                     <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
                   </div>
                 </label>
@@ -453,9 +453,9 @@ export default async function SettingsPage() {
 
           {/* Test button */}
           {lineUserId && (
-            <div className="mt-3 rounded-lg border border-[#dfe4ea] p-3">
-              <p className="text-sm font-semibold text-[#172026]">Send test summary</p>
-              <p className="mt-1 text-xs text-[#667085]">Sends the daily summary to your LINE right now using live data.</p>
+            <div className="mt-3 rounded-lg border border-[var(--border)] p-3">
+              <p className="text-sm font-semibold text-[var(--foreground)]">Send test summary</p>
+              <p className="mt-1 text-xs text-[var(--muted)]">Sends the daily summary to your LINE right now using live data.</p>
               <div className="mt-3">
                 <LineTestButton />
               </div>
@@ -464,25 +464,25 @@ export default async function SettingsPage() {
 
           {/* Message log */}
           <div className="mt-3">
-            <p className="text-sm font-semibold text-[#172026]">Recent messages</p>
+            <p className="text-sm font-semibold text-[var(--foreground)]">Recent messages</p>
             {typedLineMessages.length === 0 ? (
-              <p className="mt-3 rounded-lg border border-dashed border-[#cbd5e1] p-3 text-sm text-[#667085]">
+              <p className="mt-3 rounded-lg border border-dashed border-[var(--border)] p-3 text-sm text-[var(--muted)]">
                 No messages sent yet.
               </p>
             ) : (
-              <div className="mt-3 overflow-x-auto rounded-lg border border-[#dfe4ea]">
+              <div className="mt-3 overflow-x-auto rounded-lg border border-[var(--border)]">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-[#dfe4ea] bg-[#f8fafc] text-left text-xs font-semibold uppercase text-[#667085]">
+                    <tr className="border-b border-[var(--border)] bg-[#fbfaf8] text-left text-xs font-semibold uppercase text-[var(--muted)]">
                       <th className="px-4 py-2">Type</th>
                       <th className="px-4 py-2">Status</th>
                       <th className="px-4 py-2">Sent at</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#dfe4ea]">
+                  <tbody className="divide-y divide-[var(--border)]">
                     {typedLineMessages.map((msg) => (
                       <tr key={msg.id}>
-                        <td className="px-4 py-2 font-medium text-[#172026]">
+                        <td className="px-4 py-2 font-medium text-[var(--foreground)]">
                           {msg.type.replace(/_/g, " ")}
                         </td>
                         <td className="px-4 py-2">
@@ -493,7 +493,7 @@ export default async function SettingsPage() {
                             <p className="mt-0.5 text-xs text-[#dc2626]">{msg.error.slice(0, 60)}</p>
                           )}
                         </td>
-                        <td className="px-4 py-2 text-[#667085]">
+                        <td className="px-4 py-2 text-[var(--muted)]">
                           {msg.sent_at
                             ? new Date(msg.sent_at).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })
                             : new Date(msg.created_at).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
@@ -513,7 +513,7 @@ export default async function SettingsPage() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <SectionHeader eyebrow="Fleet import" title="Smart vehicle import" />
-              <p className="mt-2 text-xs text-[#667085]">Use AI to map vehicle spreadsheets, Excel files, and public Google Sheets into your fleet.</p>
+              <p className="mt-2 text-xs text-[var(--muted)]">Use AI to map vehicle spreadsheets, Excel files, and public Google Sheets into your fleet.</p>
             </div>
             <Link className="primary-action pressable" href="/fleet/import">
               Open fleet importer
@@ -527,7 +527,7 @@ export default async function SettingsPage() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <SectionHeader eyebrow="Contracts" title="Rental agreement template" />
-              <p className="mt-2 text-xs text-[#667085]">Edit the default customer-facing rental contract and preview the variables used during booking.</p>
+              <p className="mt-2 text-xs text-[var(--muted)]">Edit the default customer-facing rental contract and preview the variables used during booking.</p>
             </div>
             <Link className="primary-action pressable" href="/settings/contracts">
               Open contract editor
@@ -541,7 +541,7 @@ export default async function SettingsPage() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <SectionHeader eyebrow="Notifications" title="LINE alerts and daily summary" />
-              <p className="mt-2 text-xs text-[#667085]">Configure your LINE connection, daily morning summary, and event-triggered alerts.</p>
+              <p className="mt-2 text-xs text-[var(--muted)]">Configure your LINE connection, daily morning summary, and event-triggered alerts.</p>
             </div>
             <Link className="primary-action pressable" href="/settings/notifications">
               Open notifications
@@ -555,7 +555,7 @@ export default async function SettingsPage() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <SectionHeader eyebrow="Billing" title="Plan and subscription" />
-              <p className="mt-2 text-xs text-[#667085]">View your free trial, pricing tiers, and manual subscription instructions.</p>
+              <p className="mt-2 text-xs text-[var(--muted)]">View your free trial, pricing tiers, and manual subscription instructions.</p>
             </div>
             <Link className="primary-action pressable" href={"/settings/billing" as Route}>
               Open billing
@@ -569,10 +569,10 @@ export default async function SettingsPage() {
           <SectionHeader eyebrow="Users" title="Organization members" />
           <div className="mt-4 space-y-3">
             {(members || []).map((member: any) => (
-              <div className="flex flex-col gap-3 rounded-lg border border-[#dfe4ea] p-3 sm:flex-row sm:items-center sm:justify-between" key={member.id}>
+              <div className="flex flex-col gap-3 rounded-lg border border-[var(--border)] p-3 sm:flex-row sm:items-center sm:justify-between" key={member.id}>
                 <div>
-                  <p className="font-bold text-[#172026]">{member.display_name || member.invited_email || (member.user_id === user?.id ? userEmail : "User")}</p>
-                  <p className="text-sm text-[#667085]">{member.invited_email || "Active account"}</p>
+                  <p className="font-bold text-[var(--foreground)]">{member.display_name || member.invited_email || (member.user_id === user?.id ? userEmail : "User")}</p>
+                  <p className="text-sm text-[var(--muted)]">{member.invited_email || "Active account"}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge tone="green">{member.role === "owner" ? "Owner" : "Teammate"}</Badge>
@@ -585,11 +585,11 @@ export default async function SettingsPage() {
 
         <Card>
           <SectionHeader eyebrow="Invite" title="Invite a team member" />
-          <p className="mt-2 text-xs text-[#667085]">Choose Owner for a business partner, Teammate for staff who handle bookings and handovers.</p>
+          <p className="mt-2 text-xs text-[var(--muted)]">Choose Owner for a business partner, Teammate for staff who handle bookings and handovers.</p>
           <div className="mt-3">
             <InviteForm />
           </div>
-          <Link className="mt-4 inline-flex text-sm font-bold text-[#0f766e]" href="/invite">
+          <Link className="mt-4 inline-flex text-sm font-bold text-[var(--primary)]" href="/invite">
             Open invite page
           </Link>
         </Card>
@@ -599,28 +599,28 @@ export default async function SettingsPage() {
       <div className="mt-4">
         <Card>
           <SectionHeader eyebrow="Vehicle catalog" title="Makes, models, and trims" />
-          <p className="mt-2 text-xs text-[#667085]">
+          <p className="mt-2 text-xs text-[var(--muted)]">
             Platform admin tools for reviewing user submissions and curating the global vehicle catalog.
           </p>
 
           <div className="mt-3">
-            <div className="rounded-lg border border-[#dfe4ea] bg-white p-3">
+            <div className="rounded-lg border border-[var(--border)] bg-white p-3">
               <SectionHeader eyebrow="Review queue" title="Recent suggestions" />
-              <p className="mt-2 text-xs text-[#667085]">
+              <p className="mt-2 text-xs text-[var(--muted)]">
                 These are captured automatically when an operator saves a vehicle using a custom make, model, or trim.
               </p>
               <div className="mt-4 space-y-3">
                 {typedCatalogSubmissions.length === 0 ? (
-                  <p className="rounded-lg border border-dashed border-[#cbd5e1] p-3 text-sm text-[#667085]">No catalog suggestions yet.</p>
+                  <p className="rounded-lg border border-dashed border-[var(--border)] p-3 text-sm text-[var(--muted)]">No catalog suggestions yet.</p>
                 ) : (
                   typedCatalogSubmissions.map((submission) => (
-                    <div className="rounded-lg border border-[#edf2f7] p-3" key={submission.id}>
+                    <div className="rounded-lg border border-[var(--border)] p-3" key={submission.id}>
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <p className="font-bold text-[#10252b]">
+                          <p className="font-bold text-[var(--foreground)]">
                             {[submission.make_name, submission.model_name, submission.trim_name].filter(Boolean).join(" ")}
                           </p>
-                          <p className="text-sm text-[#667085]">
+                          <p className="text-sm text-[var(--muted)]">
                             {[submission.category_code, submission.year_from ? `${submission.year_from}${submission.year_to ? `-${submission.year_to}` : "+"}` : null]
                               .filter(Boolean)
                               .join(" / ") || "Details pending"}
@@ -628,15 +628,15 @@ export default async function SettingsPage() {
                         </div>
                         <Badge tone={submission.status === "pending_review" ? "amber" : "green"}>{submission.status.replace(/_/g, " ")}</Badge>
                       </div>
-                      {submission.notes ? <p className="mt-2 text-xs text-[#667085]">{submission.notes}</p> : null}
+                      {submission.notes ? <p className="mt-2 text-xs text-[var(--muted)]">{submission.notes}</p> : null}
                       {submission.status === "pending_review" ? (
                         <div className="mt-3 space-y-3">
                           <form action={researchVehicleCatalogSubmission} className="rounded-lg border border-[#bfdbfe] bg-[#eff6ff] p-3">
                             <input name="submissionId" type="hidden" value={submission.id} />
                             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                               <div>
-                                <p className="text-sm font-bold text-[#10252b]">AI catalog research</p>
-                                <p className="text-sm text-[#667085]">Searches for likely matches, misspellings, and related missing trims. Nothing is added automatically.</p>
+                                <p className="text-sm font-bold text-[var(--foreground)]">AI catalog research</p>
+                                <p className="text-sm text-[var(--muted)]">Searches for likely matches, misspellings, and related missing trims. Nothing is added automatically.</p>
                               </div>
                               <PendingButton className="rounded-lg bg-[#2563eb] px-4 py-2 text-sm font-bold text-white" pendingLabel="Researching..." type="submit">
                                 Research with AI
@@ -657,8 +657,8 @@ export default async function SettingsPage() {
                             <div className="rounded-lg border border-[#dbeafe] bg-white p-3">
                               <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                                 <div>
-                                  <p className="text-sm font-bold text-[#10252b]">Research result</p>
-                                  <p className="mt-1 text-sm text-[#667085]">{submission.research_payload.summary || "No summary returned."}</p>
+                                  <p className="text-sm font-bold text-[var(--foreground)]">Research result</p>
+                                  <p className="mt-1 text-sm text-[var(--muted)]">{submission.research_payload.summary || "No summary returned."}</p>
                                 </div>
                                 <Badge tone={submission.research_payload.status === "found" ? "green" : submission.research_payload.status === "not_found" ? "red" : "amber"}>
                                   {submission.research_payload.review_recommendation || submission.research_payload.status || "review"}
@@ -667,12 +667,12 @@ export default async function SettingsPage() {
 
                               {Array.isArray(submission.research_payload.likely_matches) && submission.research_payload.likely_matches.length > 0 ? (
                                 <div className="mt-3">
-                                  <p className="text-xs font-semibold uppercase text-[#0f766e]">Likely matches</p>
+                                  <p className="text-xs font-semibold uppercase text-[var(--primary)]">Likely matches</p>
                                   <div className="mt-2 space-y-2">
                                     {submission.research_payload.likely_matches.slice(0, 4).map((candidate: any, index: number) => (
-                                      <div className="rounded-lg border border-[#edf2f7] p-3" key={`${candidateLabel(candidate)}-${index}`}>
-                                        <p className="font-bold text-[#10252b]">{candidateLabel(candidate) || "Candidate vehicle"}</p>
-                                        <p className="text-sm text-[#667085]">{candidateSpecs(candidate) || candidate.rationale || "Specs pending"}</p>
+                                      <div className="rounded-lg border border-[var(--border)] p-3" key={`${candidateLabel(candidate)}-${index}`}>
+                                        <p className="font-bold text-[var(--foreground)]">{candidateLabel(candidate) || "Candidate vehicle"}</p>
+                                        <p className="text-sm text-[var(--muted)]">{candidateSpecs(candidate) || candidate.rationale || "Specs pending"}</p>
                                         {Array.isArray(candidate.source_urls) && candidate.source_urls.length > 0 ? (
                                           <div className="mt-2 flex flex-wrap gap-2">
                                             {candidate.source_urls.slice(0, 3).map((url: string) => (
@@ -690,12 +690,12 @@ export default async function SettingsPage() {
 
                               {Array.isArray(submission.research_payload.missing_related_trims) && submission.research_payload.missing_related_trims.length > 0 ? (
                                 <div className="mt-3">
-                                  <p className="text-xs font-semibold uppercase text-[#0f766e]">Related trims to consider adding</p>
+                                  <p className="text-xs font-semibold uppercase text-[var(--primary)]">Related trims to consider adding</p>
                                   <div className="mt-2 grid gap-2 sm:grid-cols-2">
                                     {submission.research_payload.missing_related_trims.slice(0, 8).map((candidate: any, index: number) => (
-                                      <div className="rounded-lg border border-[#edf2f7] p-3" key={`${candidateLabel(candidate)}-related-${index}`}>
-                                        <p className="font-bold text-[#10252b]">{candidateLabel(candidate) || "Related trim"}</p>
-                                        <p className="text-sm text-[#667085]">{candidateSpecs(candidate) || "Specs pending"}</p>
+                                      <div className="rounded-lg border border-[var(--border)] p-3" key={`${candidateLabel(candidate)}-related-${index}`}>
+                                        <p className="font-bold text-[var(--foreground)]">{candidateLabel(candidate) || "Related trim"}</p>
+                                        <p className="text-sm text-[var(--muted)]">{candidateSpecs(candidate) || "Specs pending"}</p>
                                       </div>
                                     ))}
                                   </div>
@@ -707,7 +707,7 @@ export default async function SettingsPage() {
                                 <form action={mergeVehicleCatalogResearch} className="mt-3 rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] p-3">
                                   <input name="submissionId" type="hidden" value={submission.id} />
                                   <p className="text-sm font-bold text-[#166534]">Merge researched candidates</p>
-                                  <p className="mt-1 text-sm text-[#667085]">
+                                  <p className="mt-1 text-sm text-[var(--muted)]">
                                     Adds the AI-researched candidates to the global catalog as verified admin-reviewed data.
                                   </p>
                                   <PendingButton className="mt-3 w-full rounded-lg bg-[#16a34a] px-3 py-2 text-sm font-bold text-white" pendingLabel="Adding..." type="submit">
@@ -750,8 +750,8 @@ export default async function SettingsPage() {
           </div>
 
           <div className="mt-3 grid gap-3 xl:grid-cols-3">
-            <form action={createVehicleMake} className="rounded-lg border border-[#d6e5e2] bg-[#f8fffd] p-3">
-              <p className="text-sm font-extrabold uppercase text-[#0f766e]">New make</p>
+            <form action={createVehicleMake} className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
+              <p className="text-sm font-semibold uppercase text-[var(--primary)]">New make</p>
               <label className="mt-4 block">
                 <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Make name</span>
                 <input className={inputClass} name="name" placeholder="Chery" required />
@@ -775,8 +775,8 @@ export default async function SettingsPage() {
               </PendingButton>
             </form>
 
-            <form action={createVehicleModel} className="rounded-lg border border-[#d6e5e2] bg-[#f8fffd] p-3">
-              <p className="text-sm font-extrabold uppercase text-[#0f766e]">New model</p>
+            <form action={createVehicleModel} className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
+              <p className="text-sm font-semibold uppercase text-[var(--primary)]">New model</p>
               <label className="mt-4 block">
                 <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Make</span>
                 <select className={inputClass} name="makeId" required>
@@ -814,8 +814,8 @@ export default async function SettingsPage() {
               </PendingButton>
             </form>
 
-            <form action={createVehicleTrim} className="rounded-lg border border-[#d6e5e2] bg-[#f8fffd] p-3">
-              <p className="text-sm font-extrabold uppercase text-[#0f766e]">New trim</p>
+            <form action={createVehicleTrim} className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
+              <p className="text-sm font-semibold uppercase text-[var(--primary)]">New trim</p>
               <label className="mt-4 block">
                 <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Model</span>
                 <select className={inputClass} name="modelId" required>
@@ -873,8 +873,8 @@ export default async function SettingsPage() {
           </div>
 
           <div className="mt-3 grid gap-3 lg:grid-cols-[0.8fr_1.2fr]">
-            <div className="rounded-lg border border-[#dfe4ea] bg-white p-3">
-              <p className="text-sm font-extrabold text-[#10252b]">Active makes</p>
+            <div className="rounded-lg border border-[var(--border)] bg-white p-3">
+              <p className="text-sm font-semibold text-[var(--foreground)]">Active makes</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {typedVehicleMakes.slice(0, 28).map((make) => (
                   <Badge key={make.id} tone="blue">
@@ -883,18 +883,18 @@ export default async function SettingsPage() {
                 ))}
               </div>
             </div>
-            <div className="rounded-lg border border-[#dfe4ea] bg-white p-3">
-              <p className="text-sm font-extrabold text-[#10252b]">Recent trims</p>
+            <div className="rounded-lg border border-[var(--border)] bg-white p-3">
+              <p className="text-sm font-semibold text-[var(--foreground)]">Recent trims</p>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
                 {typedRecentTrims.map((trim) => {
                   const model = modelMap.get(trim.model_id);
                   const make = model ? makeMap.get(model.make_id) : null;
                   return (
-                    <div className="rounded-lg border border-[#edf2f7] p-3" key={trim.id}>
-                      <p className="font-bold text-[#10252b]">
+                    <div className="rounded-lg border border-[var(--border)] p-3" key={trim.id}>
+                      <p className="font-bold text-[var(--foreground)]">
                         {make?.name || "Make"} {model?.name || "Model"}
                       </p>
-                      <p className="text-sm text-[#667085]">
+                      <p className="text-sm text-[var(--muted)]">
                         {trim.name} / {trim.year_from}
                         {trim.year_to ? `-${trim.year_to}` : "+"}
                       </p>

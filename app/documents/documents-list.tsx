@@ -20,7 +20,7 @@ function ownerFilterLabel(type: string) {
 }
 
 function formatDate(value: string) {
-  return new Intl.DateTimeFormat("en-TH", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(value));
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(value));
 }
 
 export function DocumentsList({ documents }: { documents: DocumentListItem[] }) {
@@ -45,9 +45,9 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
       <div className="content-section">
         <div className="grid gap-3 lg:grid-cols-[1fr_auto]">
           <label className="relative block">
-            <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#667085]" size={16} />
+            <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" size={16} />
             <input
-              className="input-with-leading-icon w-full rounded-xl border border-[var(--border)] bg-white pr-4 text-sm font-semibold text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(18,184,200,0.16)]"
+              className="input-with-leading-icon w-full rounded-xl border border-[var(--border)] bg-white pr-4 text-sm font-semibold text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]"
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Search file name, category, owner"
               value={search}
@@ -69,8 +69,8 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
 
       {filtered.length === 0 ? (
         <div className="empty-state">
-          <p className="text-lg font-black text-[#10252b]">No documents yet</p>
-          <p className="mt-2 text-sm text-[#667085]">Uploads from customers, vehicles, bookings, and receipts appear here.</p>
+          <p className="text-lg font-semibold text-[var(--foreground)]">No documents yet</p>
+          <p className="mt-2 text-sm text-[var(--muted)]">Uploads from customers, vehicles, bookings, and receipts appear here.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -90,7 +90,7 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
                   </span>
                 )}
                 <div>
-                  <p className="font-black text-[var(--foreground)]">{document.fileName}</p>
+                  <p className="font-semibold text-[var(--foreground)]">{document.fileName}</p>
                   <p className="text-sm font-semibold text-[var(--foreground-secondary)]">
                     {document.ownerType === "signed" ? "Signed PDF" : `${document.category.replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase())} · ${ownerFilterLabel(document.ownerType)}`}
                   </p>

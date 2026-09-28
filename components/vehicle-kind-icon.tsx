@@ -26,7 +26,7 @@ function Scooter({ size = 18 }: { size?: number }) {
 }
 
 const TINT: Record<VehicleKind, string> = {
-  car: "bg-[#e7f3f1] text-[#0f766e]",
+  car: "bg-[#e7f3f1] text-[var(--primary)]",
   van: "bg-[#eef2fb] text-[#2f6fdb]",
   motorbike: "bg-[#fdf1e7] text-[#c2621a]",
   scooter: "bg-[#f4effb] text-[#7a4fc4]",

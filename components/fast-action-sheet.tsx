@@ -39,7 +39,7 @@ export function FastActionSheet({ open, onClose }: { open: boolean; onClose: () 
         <div className="mb-4 flex items-center justify-between">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--primary)]">Fast mobile workflow</p>
-            <h2 className="text-xl font-black tracking-[-0.02em] text-[var(--foreground)]">What are we adding?</h2>
+            <h2 className="text-xl font-semibold tracking-[-0.02em] text-[var(--foreground)]">What are we adding?</h2>
           </div>
           <button className="rounded-xl border border-[var(--border)] bg-white px-3 py-1.5 text-sm font-semibold text-[var(--foreground-secondary)]" onClick={onClose}>
             Close
@@ -65,7 +65,7 @@ export function FastActionSheet({ open, onClose }: { open: boolean; onClose: () 
               </Link>
             );
           })}
-          <p className="mt-3 px-1 text-xs font-black uppercase tracking-[0.08em] text-[var(--muted)]">Setup</p>
+          <p className="mt-3 px-1 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">Setup</p>
           {setupActions.map((action) => {
             const Icon = action.icon;
             return (

@@ -227,7 +227,7 @@ function SummaryItem({ label, value, tone }: { label: string; value: string; ton
   return (
     <div className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] px-3 py-2">
       <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--muted)]">{label}</p>
-      <p className={`font-mono-data mt-1 text-sm font-black ${tones[tone]}`}>{value}</p>
+      <p className={`font-mono-data mt-1 text-sm font-semibold ${tones[tone]}`}>{value}</p>
     </div>
   );
 }

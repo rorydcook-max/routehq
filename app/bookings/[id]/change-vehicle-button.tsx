@@ -153,7 +153,7 @@ export function ChangeVehicleButton({
   return (
     <>
       <button
-        className="pressable inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-black text-[var(--foreground-secondary)]"
+        className="pressable inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--foreground-secondary)]"
         onClick={() => setOpen(true)}
         type="button"
       >
@@ -163,21 +163,21 @@ export function ChangeVehicleButton({
 
       {open ? (
         <div className="fixed inset-0 z-50 flex items-end bg-[#10252b]/60 p-3 sm:items-center sm:justify-center">
-          <div className="w-full max-w-lg rounded-2xl border border-[#d6e5e2] bg-white shadow-2xl">
+          <div className="w-full max-w-lg rounded-2xl border border-[var(--border)] bg-white shadow-2xl">
 
             {/* Header */}
-            <div className="flex items-start gap-3 rounded-t-2xl border-b border-[#d6e5e2] bg-[#f0fdf9] p-4">
-              <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#ccfbf1] text-[#0d9488]">
+            <div className="flex items-start gap-3 rounded-t-2xl border-b border-[var(--border)] bg-[#fbfaf8] p-4">
+              <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)] text-[var(--primary)]">
                 <RefreshCw size={17} />
               </div>
               <div className="flex-1">
-                <p className="text-xs font-black uppercase text-[#0d9488]">Change vehicle</p>
-                <p className="text-lg font-black text-[#10252b]">{currentVehicleLabel}</p>
-                <p className="text-xs text-[#667085]">
+                <p className="text-xs font-semibold uppercase text-[var(--primary)]">Change vehicle</p>
+                <p className="text-lg font-semibold text-[var(--foreground)]">{currentVehicleLabel}</p>
+                <p className="text-xs text-[var(--muted)]">
                   Step {STEPS.indexOf(step) + 1} of {STEPS.length}
                 </p>
               </div>
-              <button className="pressable rounded-lg p-1.5 text-[#667085]" onClick={reset} type="button">
+              <button className="pressable rounded-lg p-1.5 text-[var(--muted)]" onClick={reset} type="button">
                 <X size={16} />
               </button>
             </div>
@@ -188,11 +188,11 @@ export function ChangeVehicleButton({
               {step === "reason" && (
                 <>
                   <div>
-                    <p className="mb-1 text-sm font-black text-[#10252b]">Why is the vehicle being changed?</p>
-                    <p className="mb-3 text-xs text-[#667085]">Select all that apply.</p>
+                    <p className="mb-1 text-sm font-semibold text-[var(--foreground)]">Why is the vehicle being changed?</p>
+                    <p className="mb-3 text-xs text-[var(--muted)]">Select all that apply.</p>
                     <div className="space-y-2">
                       {REASONS.map((r) => (
-                        <label key={r.value} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition-colors ${reasons.includes(r.value) ? "border-[#0d9488] bg-[#f0fdf9]" : "border-[#e2e8f0] bg-white hover:border-[#99f6e4]"}`}>
+                        <label key={r.value} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition-colors ${reasons.includes(r.value) ? "border-[var(--primary)] bg-[#fbfaf8]" : "border-[var(--border)] bg-white hover:border-[#bfe0db]"}`}>
                           <input
                             checked={reasons.includes(r.value)}
                             className="mt-0.5 accent-[#0d9488]"
@@ -200,8 +200,8 @@ export function ChangeVehicleButton({
                             type="checkbox"
                           />
                           <div>
-                            <p className="text-sm font-bold text-[#10252b]">{r.label}</p>
-                            <p className="text-xs text-[#667085]">{r.detail}</p>
+                            <p className="text-sm font-bold text-[var(--foreground)]">{r.label}</p>
+                            <p className="text-xs text-[var(--muted)]">{r.detail}</p>
                           </div>
                         </label>
                       ))}
@@ -209,13 +209,13 @@ export function ChangeVehicleButton({
                   </div>
                   <div className="grid gap-3 sm:grid-cols-2">
                     <label className="block">
-                      <span className="text-xs font-bold text-[#475569]">Date & time of change</span>
-                      <p className="text-[11px] text-[#667085]">Leave blank for now. Set if recording retrospectively.</p>
-                      <input className="mt-1 w-full rounded-xl border border-[#e2e8f0] px-3 py-2 text-sm outline-none focus:border-[#0d9488]" onChange={(e) => setChangedAt(e.target.value)} type="datetime-local" value={changedAt} />
+                      <span className="text-xs font-bold text-[var(--foreground-secondary)]">Date & time of change</span>
+                      <p className="text-[11px] text-[var(--muted)]">Leave blank for now. Set if recording retrospectively.</p>
+                      <input className="mt-1 w-full rounded-xl border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[var(--primary)]" onChange={(e) => setChangedAt(e.target.value)} type="datetime-local" value={changedAt} />
                     </label>
                     <label className="block">
-                      <span className="text-xs font-bold text-[#475569]">Notes (optional)</span>
-                      <textarea className="mt-1 w-full rounded-xl border border-[#e2e8f0] px-3 py-2 text-sm outline-none focus:border-[#0d9488]" onChange={(e) => setReasonNotes(e.target.value)} placeholder="Any additional context..." rows={3} value={reasonNotes} />
+                      <span className="text-xs font-bold text-[var(--foreground-secondary)]">Notes (optional)</span>
+                      <textarea className="mt-1 w-full rounded-xl border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[var(--primary)]" onChange={(e) => setReasonNotes(e.target.value)} placeholder="Any additional context..." rows={3} value={reasonNotes} />
                     </label>
                   </div>
                 </>
@@ -224,24 +224,24 @@ export function ChangeVehicleButton({
               {/* Step 2 — Original vehicle disposition */}
               {step === "disposition" && (
                 <div>
-                  <p className="mb-1 text-sm font-black text-[#10252b]">What happens to <span className="text-[#0d9488]">{currentVehicleLabel}</span>?</p>
-                  <p className="mb-3 text-xs text-[#667085]">This updates its status in your fleet.</p>
+                  <p className="mb-1 text-sm font-semibold text-[var(--foreground)]">What happens to <span className="text-[var(--primary)]">{currentVehicleLabel}</span>?</p>
+                  <p className="mb-3 text-xs text-[var(--muted)]">This updates its status in your fleet.</p>
                   <div className="space-y-2">
                     {DISPOSITIONS.map((d) => (
-                      <label key={d.value} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition-colors ${disposition === d.value ? "border-[#0d9488] bg-[#f0fdf9]" : "border-[#e2e8f0] bg-white hover:border-[#99f6e4]"}`}>
+                      <label key={d.value} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition-colors ${disposition === d.value ? "border-[var(--primary)] bg-[#fbfaf8]" : "border-[var(--border)] bg-white hover:border-[#bfe0db]"}`}>
                         <input checked={disposition === d.value} className="mt-0.5 accent-[#0d9488]" onChange={() => setDisposition(d.value)} type="radio" />
                         <div className="flex-1">
-                          <p className="text-sm font-bold text-[#10252b]">{d.label}</p>
-                          <p className="text-xs text-[#667085]">{d.detail}</p>
+                          <p className="text-sm font-bold text-[var(--foreground)]">{d.label}</p>
+                          <p className="text-xs text-[var(--muted)]">{d.detail}</p>
                           {disposition === "repair" && d.value === "repair" && (
                             <div className="mt-3 grid gap-2 sm:grid-cols-2">
                               <label className="block">
-                                <span className="text-xs font-bold text-[#475569]">Expected back</span>
-                                <input className="mt-1 w-full rounded-lg border border-[#e2e8f0] px-3 py-2 text-sm outline-none focus:border-[#0d9488]" onChange={(e) => setRepairExpectedEnd(e.target.value)} type="datetime-local" value={repairExpectedEnd} />
+                                <span className="text-xs font-bold text-[var(--foreground-secondary)]">Expected back</span>
+                                <input className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[var(--primary)]" onChange={(e) => setRepairExpectedEnd(e.target.value)} type="datetime-local" value={repairExpectedEnd} />
                               </label>
                               <label className="block">
-                                <span className="text-xs font-bold text-[#475569]">Repair notes</span>
-                                <input className="mt-1 w-full rounded-lg border border-[#e2e8f0] px-3 py-2 text-sm outline-none" onChange={(e) => setRepairNotes(e.target.value)} placeholder="e.g. Gearbox replacement" type="text" value={repairNotes} />
+                                <span className="text-xs font-bold text-[var(--foreground-secondary)]">Repair notes</span>
+                                <input className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none" onChange={(e) => setRepairNotes(e.target.value)} placeholder="e.g. Gearbox replacement" type="text" value={repairNotes} />
                               </label>
                             </div>
                           )}
@@ -255,21 +255,21 @@ export function ChangeVehicleButton({
               {/* Step 3 — Select replacement */}
               {step === "replacement" && (
                 <div>
-                  <p className="mb-1 text-sm font-black text-[#10252b]">Select replacement vehicle</p>
-                  <p className="mb-3 text-xs text-[#667085]">Showing vehicles not currently on active rentals.</p>
+                  <p className="mb-1 text-sm font-semibold text-[var(--foreground)]">Select replacement vehicle</p>
+                  <p className="mb-3 text-xs text-[var(--muted)]">Showing vehicles not currently on active rentals.</p>
                   {availableVehicles.length === 0 ? (
                     <div className="rounded-xl border border-[#fde68a] bg-[#fffbeb] p-3">
                       <p className="text-sm font-bold text-[#92400e]">No available vehicles</p>
-                      <p className="mt-1 text-xs text-[#667085]">All other vehicles are currently assigned. Return a vehicle to available first.</p>
+                      <p className="mt-1 text-xs text-[var(--muted)]">All other vehicles are currently assigned. Return a vehicle to available first.</p>
                     </div>
                   ) : (
                     <div className="max-h-64 space-y-2 overflow-y-auto">
                       {availableVehicles.map((v) => (
-                        <label key={v.id} className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition-colors ${replacementId === v.id ? "border-[#0d9488] bg-[#f0fdf9]" : "border-[#e2e8f0] bg-white hover:border-[#99f6e4]"}`}>
+                        <label key={v.id} className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition-colors ${replacementId === v.id ? "border-[var(--primary)] bg-[#fbfaf8]" : "border-[var(--border)] bg-white hover:border-[#bfe0db]"}`}>
                           <input checked={replacementId === v.id} className="accent-[#0d9488]" onChange={() => setReplacementId(v.id)} type="radio" />
                           <div className="flex-1">
-                            <p className="text-sm font-bold text-[#10252b]">{vehicleLabel(v)}</p>
-                            <p className="text-xs text-[#667085]">฿{Number(v.monthly_rate || 0).toLocaleString()}/month</p>
+                            <p className="text-sm font-bold text-[var(--foreground)]">{vehicleLabel(v)}</p>
+                            <p className="text-xs text-[var(--muted)]">฿{Number(v.monthly_rate || 0).toLocaleString()}/month</p>
                           </div>
                         </label>
                       ))}
@@ -281,26 +281,26 @@ export function ChangeVehicleButton({
               {/* Step 4 — Rate */}
               {step === "rate" && (
                 <div>
-                  <p className="mb-1 text-sm font-black text-[#10252b]">Rental rate for the replacement</p>
-                  <p className="mb-3 text-xs text-[#667085]">Current rate: <strong>฿{currentRate.toLocaleString()} {currency}</strong></p>
+                  <p className="mb-1 text-sm font-semibold text-[var(--foreground)]">Rental rate for the replacement</p>
+                  <p className="mb-3 text-xs text-[var(--muted)]">Current rate: <strong>฿{currentRate.toLocaleString()} {currency}</strong></p>
                   <div className="space-y-2">
-                    <label className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition-colors ${keepRate ? "border-[#0d9488] bg-[#f0fdf9]" : "border-[#e2e8f0] bg-white hover:border-[#99f6e4]"}`}>
+                    <label className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition-colors ${keepRate ? "border-[var(--primary)] bg-[#fbfaf8]" : "border-[var(--border)] bg-white hover:border-[#bfe0db]"}`}>
                       <input checked={keepRate} className="mt-0.5 accent-[#0d9488]" onChange={() => setKeepRate(true)} type="radio" />
                       <div>
-                        <p className="text-sm font-bold text-[#10252b]">Keep existing rate — ฿{currentRate.toLocaleString()} {currency}</p>
-                        <p className="text-xs text-[#667085]">Rate stays the same. Typical for breakdown replacements.</p>
+                        <p className="text-sm font-bold text-[var(--foreground)]">Keep existing rate — ฿{currentRate.toLocaleString()} {currency}</p>
+                        <p className="text-xs text-[var(--muted)]">Rate stays the same. Typical for breakdown replacements.</p>
                       </div>
                     </label>
-                    <label className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition-colors ${!keepRate ? "border-[#0d9488] bg-[#f0fdf9]" : "border-[#e2e8f0] bg-white hover:border-[#99f6e4]"}`}>
+                    <label className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition-colors ${!keepRate ? "border-[var(--primary)] bg-[#fbfaf8]" : "border-[var(--border)] bg-white hover:border-[#bfe0db]"}`}>
                       <input checked={!keepRate} className="mt-0.5 accent-[#0d9488]" onChange={() => setKeepRate(false)} type="radio" />
                       <div className="flex-1">
-                        <p className="text-sm font-bold text-[#10252b]">Update rate</p>
-                        <p className="text-xs text-[#667085]">Adjust for upgrade, downgrade, or different vehicle class.</p>
+                        <p className="text-sm font-bold text-[var(--foreground)]">Update rate</p>
+                        <p className="text-xs text-[var(--muted)]">Adjust for upgrade, downgrade, or different vehicle class.</p>
                         {!keepRate && (
                           <div className="mt-2 flex items-center gap-2">
-                            <span className="text-sm text-[#475569]">฿</span>
+                            <span className="text-sm text-[var(--foreground-secondary)]">฿</span>
                             <input
-                              className="w-36 rounded-lg border border-[#e2e8f0] px-3 py-2 text-sm outline-none focus:border-[#0d9488]"
+                              className="w-36 rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[var(--primary)]"
                               min="0"
                               onChange={(e) => setNewRate(e.target.value)}
                               placeholder="New rate"
@@ -308,7 +308,7 @@ export function ChangeVehicleButton({
                               type="number"
                               value={newRate}
                             />
-                            <span className="text-sm text-[#475569]">{currency}</span>
+                            <span className="text-sm text-[var(--foreground-secondary)]">{currency}</span>
                           </div>
                         )}
                       </div>
@@ -320,33 +320,33 @@ export function ChangeVehicleButton({
               {/* Step 5 — Confirm */}
               {step === "confirm" && (
                 <div className="space-y-3">
-                  <div className="space-y-2 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-3">
-                    <p className="text-xs font-black uppercase text-[#667085]">Summary</p>
+                  <div className="space-y-2 rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-3">
+                    <p className="text-xs font-semibold uppercase text-[var(--muted)]">Summary</p>
                     <ul className="space-y-1.5">
-                      <li className="flex items-start gap-2 text-sm text-[#10252b]">
-                        <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0d9488]" />
+                      <li className="flex items-start gap-2 text-sm text-[var(--foreground)]">
+                        <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--primary)]" />
                         Remove <strong>{currentVehicleLabel}</strong> from this booking
                       </li>
-                      <li className="flex items-start gap-2 text-sm text-[#10252b]">
-                        <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0d9488]" />
+                      <li className="flex items-start gap-2 text-sm text-[var(--foreground)]">
+                        <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--primary)]" />
                         {disposition === "repair"
                           ? `Send ${currentVehicleLabel} to repair${repairNotes ? `: ${repairNotes}` : ""}`
                           : disposition === "available"
                           ? `Return ${currentVehicleLabel} to available`
                           : `${currentVehicleLabel} — status unchanged`}
                       </li>
-                      <li className="flex items-start gap-2 text-sm text-[#10252b]">
-                        <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0d9488]" />
+                      <li className="flex items-start gap-2 text-sm text-[var(--foreground)]">
+                        <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--primary)]" />
                         Assign <strong>{replacement ? vehicleLabel(replacement) : replacementId}</strong> to this booking
                       </li>
                       {rateAfter !== currentRate && (
-                        <li className="flex items-start gap-2 text-sm text-[#10252b]">
-                          <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0d9488]" />
+                        <li className="flex items-start gap-2 text-sm text-[var(--foreground)]">
+                          <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--primary)]" />
                           Update future payments: ฿{currentRate.toLocaleString()} → ฿{rateAfter.toLocaleString()} {currency}
                         </li>
                       )}
-                      <li className="flex items-start gap-2 text-sm text-[#10252b]">
-                        <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0d9488]" />
+                      <li className="flex items-start gap-2 text-sm text-[var(--foreground)]">
+                        <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--primary)]" />
                         Reason: {reasons.map((r) => REASONS.find((x) => x.value === r)?.label).join(" + ")}
                       </li>
                     </ul>
@@ -361,16 +361,16 @@ export function ChangeVehicleButton({
               {/* Footer */}
               <div className="flex gap-2 pt-1">
                 {step !== "reason" && (
-                  <button className="pressable inline-flex min-h-10 flex-1 items-center justify-center rounded-xl border border-[#e2e8f0] bg-white px-4 text-sm font-bold text-[#475569]" disabled={isPending} onClick={back} type="button">
+                  <button className="pressable inline-flex min-h-10 flex-1 items-center justify-center rounded-xl border border-[var(--border)] bg-white px-4 text-sm font-bold text-[var(--foreground-secondary)]" disabled={isPending} onClick={back} type="button">
                     Back
                   </button>
                 )}
-                <button className="pressable inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl border border-[#e2e8f0] bg-white px-4 text-sm font-bold text-[#475569]" disabled={isPending} onClick={reset} type="button">
+                <button className="pressable inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-white px-4 text-sm font-bold text-[var(--foreground-secondary)]" disabled={isPending} onClick={reset} type="button">
                   Cancel
                 </button>
                 {step === "confirm" ? (
                   <button
-                    className="pressable inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-[#0d9488] px-4 text-sm font-black text-white disabled:opacity-70"
+                    className="pressable inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--primary)] px-4 text-sm font-semibold text-white disabled:opacity-70"
                     disabled={isPending}
                     onClick={submit}
                     type="button"
@@ -379,7 +379,7 @@ export function ChangeVehicleButton({
                   </button>
                 ) : (
                   <button
-                    className="pressable inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-[#0d9488] px-4 text-sm font-black text-white"
+                    className="pressable inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--primary)] px-4 text-sm font-semibold text-white"
                     disabled={availableVehicles.length === 0 && step === "replacement"}
                     onClick={next}
                     type="button"

@@ -12,7 +12,7 @@ function formatDate(value: string | null | undefined) {
   if (!value) {
     return "Open";
   }
-  return new Intl.DateTimeFormat("en-TH", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(value));
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
 }
 
 export default async function StartInspectionPage({ params }: { params: Promise<{ type: string }> }) {
@@ -45,12 +45,12 @@ export default async function StartInspectionPage({ params }: { params: Promise<
       <div className="mx-auto max-w-3xl space-y-4">
         <Card>
           <div className="flex items-start gap-3">
-            <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#e6fffb] text-[#0f766e]">
+            <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-[var(--primary-light)] text-[var(--primary)]">
               <Icon />
             </span>
             <div>
               <SectionHeader eyebrow="Inspection selector" title={title} />
-              <p className="mt-2 text-sm text-[#667085]">Choose the rental you are handing over or collecting.</p>
+              <p className="mt-2 text-sm text-[var(--muted)]">Choose the rental you are handing over or collecting.</p>
             </div>
           </div>
         </Card>
@@ -58,8 +58,8 @@ export default async function StartInspectionPage({ params }: { params: Promise<
         <div className="space-y-3">
           {(data || []).length === 0 ? (
             <Card>
-              <p className="text-sm font-semibold text-[#667085]">{empty}</p>
-              <Link className="mt-4 inline-flex rounded-lg bg-[#0f766e] px-4 py-3 text-sm font-bold text-white" href="/fleet">
+              <p className="text-sm font-semibold text-[var(--muted)]">{empty}</p>
+              <Link className="mt-4 inline-flex rounded-lg bg-[var(--primary)] px-4 py-3 text-sm font-bold text-white" href="/fleet">
                 Back to Fleet
               </Link>
             </Card>
@@ -69,18 +69,18 @@ export default async function StartInspectionPage({ params }: { params: Promise<
               const customer = rental.customers;
               return (
                 <Link
-                  className="pressable block rounded-lg border border-[#d6e5e2] bg-white p-4 shadow-[0_10px_24px_rgba(25,63,72,0.06)] hover:border-[#0f766e]"
+                  className="pressable block rounded-lg border border-[var(--border)] bg-white p-4 shadow-[0_10px_24px_rgba(25,63,72,0.06)] hover:border-[var(--primary)]"
                   href={`/inspections/${type}/${rental.id}` as Route}
                   key={rental.id}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-lg font-black text-[#10252b]">
+                      <p className="text-lg font-semibold text-[var(--foreground)]">
                         {vehicle?.make} {vehicle?.model}
                       </p>
-                      <p className="text-sm font-bold text-[#667085]">{vehicle?.registration_number}</p>
-                      <p className="mt-2 text-sm text-[#475467]">{customer?.full_name || "Unknown customer"} · {customer?.phone || "No phone"}</p>
-                      <p className="mt-1 text-sm text-[#667085]">{formatDate(rental.start_date)} → {formatDate(rental.end_date)}</p>
+                      <p className="text-sm font-bold text-[var(--muted)]">{vehicle?.registration_number}</p>
+                      <p className="mt-2 text-sm text-[var(--foreground-secondary)]">{customer?.full_name || "Unknown customer"} · {customer?.phone || "No phone"}</p>
+                      <p className="mt-1 text-sm text-[var(--muted)]">{formatDate(rental.start_date)} → {formatDate(rental.end_date)}</p>
                     </div>
                     <Badge tone={type === "delivery" ? "blue" : "green"}>{rental.status}</Badge>
                   </div>

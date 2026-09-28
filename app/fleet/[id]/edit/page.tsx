@@ -53,7 +53,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
           <Link className="text-sm font-bold text-[var(--primary)]" href={`/fleet/${vehicle.id}`}>
             Back to vehicle
           </Link>
-          <h1 className="mt-2 text-2xl font-black tracking-[-0.03em] text-[var(--foreground)] sm:text-3xl">
+          <h1 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-3xl">
             Edit {vehicle.make} {vehicle.model}
           </h1>
           <p className="font-mono-data mt-1 text-sm text-[var(--muted)]">{vehicle.registration_number}</p>
@@ -69,7 +69,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
               <SectionHeader eyebrow="Identity" title="Core details" />
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Vehicle category</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Vehicle category</span>
                   <select className={inputClass} defaultValue={vehicle.category_id} name="categoryId" required>
                     {categories.map((category) => (
                       <option key={category.id} value={category.id}>
@@ -79,19 +79,19 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
                   </select>
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Make</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Make</span>
                   <input className={inputClass} defaultValue={vehicle.make} name="make" required />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Model</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Model</span>
                   <input className={inputClass} defaultValue={vehicle.model} name="model" required />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Year</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Year</span>
                   <input className={inputClass} defaultValue={valueOrEmpty(vehicle.year)} min="1900" name="year" type="number" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Trim</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Trim</span>
                   <input className={inputClass} defaultValue={valueOrEmpty(vehicle.trim)} name="trim" />
                 </label>
               </div>
@@ -101,43 +101,43 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
               <SectionHeader eyebrow="Vehicle details" title="Registration and specs" />
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Registration number</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Registration number</span>
                   <input className={`${inputClass} font-mono-data`} defaultValue={vehicle.registration_number} name="registrationNumber" required />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">VIN / frame number</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">VIN / frame number</span>
                   <input className={`${inputClass} font-mono-data`} defaultValue={valueOrEmpty(vehicle.vin)} name="vin" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Colour</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Colour</span>
                   <input className={inputClass} defaultValue={valueOrEmpty(vehicle.color)} name="color" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Current mileage</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Current mileage</span>
                   <input className={`${inputClass} font-mono-data`} defaultValue={valueOrEmpty(vehicle.mileage)} min="0" name="mileage" type="number" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Transmission</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Transmission</span>
                   <input className={inputClass} defaultValue={valueOrEmpty(specifications.transmission)} name="transmission" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Fuel type</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Fuel type</span>
                   <input className={inputClass} defaultValue={valueOrEmpty(specifications.fuel_type)} name="fuelType" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Seating capacity</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Seating capacity</span>
                   <input className={`${inputClass} font-mono-data`} defaultValue={valueOrEmpty(specifications.seating_capacity)} min="0" name="seatingCapacity" type="number" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Engine CC</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Engine CC</span>
                   <input className={`${inputClass} font-mono-data`} defaultValue={valueOrEmpty(specifications.engine_cc)} min="0" name="engineCc" type="number" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Drivetrain</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Drivetrain</span>
                   <input className={inputClass} defaultValue={valueOrEmpty(specifications.drivetrain)} name="drivetrain" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Body class</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Body class</span>
                   <input className={inputClass} defaultValue={valueOrEmpty(specifications.body_class)} name="bodyClass" placeholder="Scooter / sedan / pickup" />
                 </label>
               </div>
@@ -147,15 +147,15 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
               <SectionHeader eyebrow="Acquisition" title="Mileage and value" />
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Purchase mileage</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Purchase mileage</span>
                   <input className={`${inputClass} font-mono-data`} defaultValue={valueOrEmpty(acquisition.purchase_mileage)} min="0" name="purchaseMileage" type="number" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Purchase price</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Purchase price</span>
                   <MoneyInput currency={organization.currency || "THB"} defaultValue={valueOrEmpty(vehicle.purchase_price)} name="purchasePrice" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Estimated value</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Estimated value</span>
                   <MoneyInput currency={organization.currency || "THB"} defaultValue={valueOrEmpty(vehicle.estimated_value)} name="estimatedValue" />
                 </label>
               </div>
@@ -165,15 +165,15 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
               <SectionHeader eyebrow="Rental pricing" title="Default rates" />
               <div className="mt-4 grid gap-4 sm:grid-cols-3">
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Daily rate</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Daily rate</span>
                   <MoneyInput currency={organization.currency || "THB"} defaultValue={valueOrEmpty(vehicle.daily_rate)} name="dailyRate" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Weekly rate</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Weekly rate</span>
                   <MoneyInput currency={organization.currency || "THB"} defaultValue={valueOrEmpty(vehicle.weekly_rate)} name="weeklyRate" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Monthly rate</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Monthly rate</span>
                   <MoneyInput currency={organization.currency || "THB"} defaultValue={valueOrEmpty(vehicle.monthly_rate)} name="monthlyRate" />
                 </label>
               </div>
@@ -183,7 +183,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
               <SectionHeader eyebrow="Location" title="Branch assignment" />
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Home branch</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Home branch</span>
                   <select className={inputClass} defaultValue={valueOrEmpty(vehicle.home_branch_id)} name="homeBranchId">
                     <option value="">No branch</option>
                     {branches.map((branch) => (
@@ -194,7 +194,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
                   </select>
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Service area</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Service area</span>
                   <select className={inputClass} defaultValue={vehicle.service_area || "home_branch"} name="serviceArea">
                     <option value="home_branch">Home branch only</option>
                     <option value="all_branches">All branches</option>
@@ -207,19 +207,19 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
               <SectionHeader eyebrow="Compliance & Renewals" title="Critical dates" />
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Vehicle tax expiry</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Vehicle tax expiry</span>
                   <LocalizedDateInput calendar={preferredCalendar} defaultValue={valueOrEmpty(compliance.tax_expiry_date)} inputClass={inputClass} name="taxExpiryDate" preferredLocale={preferredLocale} />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Compulsory insurance expiry</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Compulsory insurance expiry</span>
                   <LocalizedDateInput calendar={preferredCalendar} defaultValue={valueOrEmpty(compliance.porbor_expiry_date)} inputClass={inputClass} name="porborExpiryDate" preferredLocale={preferredLocale} />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Voluntary insurance expiry</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Voluntary insurance expiry</span>
                   <LocalizedDateInput calendar={preferredCalendar} defaultValue={valueOrEmpty(compliance.insurance_expiry_date)} inputClass={inputClass} name="insuranceExpiryDate" preferredLocale={preferredLocale} />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Voluntary insurance type</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Voluntary insurance type</span>
                   <select className={inputClass} defaultValue={valueOrEmpty(compliance.voluntary_insurance_type)} name="voluntaryInsuranceType">
                     <option value="">Select cover type</option>
                     <option value="class_1">Class 1 / Type 1 comprehensive</option>
@@ -232,11 +232,11 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
                   </select>
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Next service due</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Next service due</span>
                   <LocalizedDateInput calendar={preferredCalendar} defaultValue={valueOrEmpty(compliance.next_service_date)} inputClass={inputClass} name="nextServiceDate" preferredLocale={preferredLocale} />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Oil change due</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Oil change due</span>
                   <LocalizedDateInput calendar={preferredCalendar} defaultValue={valueOrEmpty(compliance.oil_change_due_date)} inputClass={inputClass} name="oilChangeDueDate" preferredLocale={preferredLocale} />
                 </label>
               </div>
@@ -246,19 +246,19 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
               <SectionHeader eyebrow="Finance" title="Loan details" />
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Finance provider</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Finance provider</span>
                   <input className={inputClass} defaultValue={valueOrEmpty(finance.lender)} name="financeLender" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Monthly payment</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Monthly payment</span>
                   <MoneyInput currency={organization.currency || "THB"} defaultValue={valueOrEmpty(finance.monthly_payment)} name="financeMonthlyPayment" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Outstanding balance</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Outstanding balance</span>
                   <MoneyInput currency={organization.currency || "THB"} defaultValue={valueOrEmpty(finance.outstanding_balance)} name="financeOutstanding" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Finance end date</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Finance end date</span>
                   <LocalizedDateInput calendar={preferredCalendar} defaultValue={valueOrEmpty(finance.end_date)} inputClass={inputClass} name="financeEndDate" preferredLocale={preferredLocale} />
                 </label>
               </div>
@@ -268,7 +268,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
               <Link className="inline-flex justify-center rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm font-bold text-[var(--foreground-secondary)]" href={`/fleet/${vehicle.id}`}>
                 Cancel
               </Link>
-              <PendingButton className="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-bold text-white shadow-[0_14px_28px_rgba(18,184,200,0.24)] hover:bg-[var(--primary-hover)]" pendingLabel="Saving..." type="submit">
+              <PendingButton className="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-bold text-white shadow-sm hover:bg-[var(--primary-hover)]" pendingLabel="Saving..." type="submit">
                 Save changes
               </PendingButton>
             </div>

@@ -11,7 +11,7 @@ export default async function InvitePage() {
       <div className="mx-auto max-w-xl">
         <Card>
           <SectionHeader eyebrow="Settings" title="Invite a team member" />
-          <p className="mt-2 text-sm text-[#667085]">Invite someone to your business. Owners have full control; teammates can run day-to-day work but cannot change business settings, billing or the team.</p>
+          <p className="mt-2 text-sm text-[var(--muted)]">Invite someone to your business. Owners have full control; teammates can run day-to-day work but cannot change business settings, billing or the team.</p>
           <div className="mt-5">
             <InviteForm />
           </div>

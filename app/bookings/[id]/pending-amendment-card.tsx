@@ -14,10 +14,10 @@ export function PendingAmendmentCard({ id, token, rows }: { id: string; token: s
   return (
     <Card>
       <SectionHeader eyebrow="Amendment" title="Waiting for the customer to sign" />
-      <ul className="mt-3 space-y-1 text-sm text-[#344054]">
+      <ul className="mt-3 space-y-1 text-sm text-[var(--foreground-secondary)]">
         {rows.map((row) => (
           <li className="flex items-start gap-2" key={row.label}>
-            <FilePen className="mt-0.5 shrink-0 text-[#0f766e]" size={14} />
+            <FilePen className="mt-0.5 shrink-0 text-[var(--primary)]" size={14} />
             <span>
               <span className="font-bold">{row.label}:</span> {row.before !== "-" ? `${row.before} → ` : ""}
               <span className="font-bold">{row.after}</span>

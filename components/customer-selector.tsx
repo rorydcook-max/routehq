@@ -14,7 +14,7 @@ type SelectorCustomer = {
 };
 
 const inputClass =
-  "w-full rounded-lg border border-[#d6e5e2] bg-white px-3 py-3 text-sm text-[#10252b] outline-none focus:border-[#0f766e] focus:ring-2 focus:ring-[#0f766e]/15";
+  "w-full rounded-lg border border-[var(--border)] bg-white px-3 py-3 text-sm text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15";
 
 const contactMethodOptions = [
   { value: "whatsapp", label: "WhatsApp" },
@@ -85,28 +85,28 @@ export function CustomerSelector({
     <div className="relative">
       <input name={name} type="hidden" value={selectedId} />
       <button
-        className="flex w-full items-center justify-between gap-3 rounded-lg border border-[#d6e5e2] bg-white px-3 py-3 text-left text-sm text-[#10252b]"
+        className="flex w-full items-center justify-between gap-3 rounded-lg border border-[var(--border)] bg-white px-3 py-3 text-left text-sm text-[var(--foreground)]"
         onClick={() => setOpen(true)}
         type="button"
       >
         <span className="flex min-w-0 items-center gap-3">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#e6fffb] text-lg">
-            {selectedCustomer ? flagForNationality(selectedCustomer.nationality) : <UserRound className="text-[#0f766e]" size={18} />}
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)] text-lg">
+            {selectedCustomer ? flagForNationality(selectedCustomer.nationality) : <UserRound className="text-[var(--primary)]" size={18} />}
           </span>
           <span className="min-w-0">
             <span className="block truncate font-bold">{selectedCustomer?.full_name || "Select customer"}</span>
-            <span className="block truncate text-xs text-[#667085]">{selectedCustomer?.phone || "Search by name or phone"}</span>
+            <span className="block truncate text-xs text-[var(--muted)]">{selectedCustomer?.phone || "Search by name or phone"}</span>
           </span>
         </span>
-        <Search className="text-[#667085]" size={18} />
+        <Search className="text-[var(--muted)]" size={18} />
       </button>
 
       {open ? (
         <div className="fixed inset-0 z-50 bg-[#10252b]/30 sm:absolute sm:inset-auto sm:top-full sm:z-30 sm:mt-2 sm:w-full sm:bg-transparent">
-          <div className="absolute bottom-0 left-0 right-0 max-h-[80vh] overflow-hidden rounded-t-2xl border border-[#d6e5e2] bg-white shadow-2xl sm:relative sm:max-h-[420px] sm:rounded-lg">
-            <div className="flex items-center justify-between border-b border-[#edf2f7] p-3">
-              <p className="font-black text-[#10252b]">Select customer</p>
-              <button className="rounded-full p-2 text-[#667085]" onClick={() => setOpen(false)} type="button">
+          <div className="absolute bottom-0 left-0 right-0 max-h-[80vh] overflow-hidden rounded-t-2xl border border-[var(--border)] bg-white shadow-2xl sm:relative sm:max-h-[420px] sm:rounded-lg">
+            <div className="flex items-center justify-between border-b border-[var(--border)] p-3">
+              <p className="font-semibold text-[var(--foreground)]">Select customer</p>
+              <button className="rounded-full p-2 text-[var(--muted)]" onClick={() => setOpen(false)} type="button">
                 <X size={18} />
               </button>
             </div>
@@ -116,7 +116,7 @@ export function CustomerSelector({
             <div className="max-h-64 overflow-y-auto px-3 pb-3">
               {filteredCustomers.map((customer) => (
                 <button
-                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left hover:bg-[#eef8f6]"
+                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left hover:bg-[#fbfaf8]"
                   key={customer.id}
                   onClick={() => {
                     setSelectedId(customer.id);
@@ -127,19 +127,19 @@ export function CustomerSelector({
                 >
                   <span className="text-xl">{flagForNationality(customer.nationality)}</span>
                   <span>
-                    <span className="block font-bold text-[#10252b]">{customer.full_name}</span>
-                    <span className="text-xs text-[#667085]">{customer.phone || "No phone"}</span>
+                    <span className="block font-bold text-[var(--foreground)]">{customer.full_name}</span>
+                    <span className="text-xs text-[var(--muted)]">{customer.phone || "No phone"}</span>
                   </span>
                 </button>
               ))}
 
-              <button className="mt-2 flex w-full items-center gap-2 rounded-lg border border-[#d6e5e2] bg-[#f8fffd] px-3 py-2 text-left text-sm font-bold text-[#0f766e]" onClick={() => setCreating((value) => !value)} type="button">
+              <button className="mt-2 flex w-full items-center gap-2 rounded-lg border border-[var(--border)] bg-[#fbfaf8] px-3 py-2 text-left text-sm font-bold text-[var(--primary)]" onClick={() => setCreating((value) => !value)} type="button">
                 <Plus size={16} />
                 Create new customer
               </button>
 
               {creating ? (
-                <form ref={formRef} className="mt-3 space-y-3 rounded-lg border border-[#d6e5e2] bg-[#fbfefd] p-3">
+                <form ref={formRef} className="mt-3 space-y-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
                   <input name="organizationId" type="hidden" value={organizationId} />
                   <input className={inputClass} name="fullName" placeholder="Full name" required />
                   <div className="grid grid-cols-[124px_1fr] gap-2">
@@ -159,9 +159,9 @@ export function CustomerSelector({
                       </option>
                     ))}
                   </select>
-                  <div className="rounded-lg border border-[#d6e5e2] bg-white p-3">
-                    <p className="text-xs font-bold uppercase text-[#0f766e]">Contact channels</p>
-                    <p className="mt-1 text-xs leading-5 text-[#667085]">Add the channels you've been chatting on so you can reach the customer quickly from their booking.</p>
+                  <div className="rounded-lg border border-[var(--border)] bg-white p-3">
+                    <p className="text-xs font-bold uppercase text-[var(--primary)]">Contact channels</p>
+                    <p className="mt-1 text-xs leading-5 text-[var(--muted)]">Add the channels you've been chatting on so you can reach the customer quickly from their booking.</p>
                     <div className="mt-3 grid gap-2">
                       <input className={inputClass} name="email" placeholder="Email" type="email" />
                       <input className={inputClass} name="whatsappNumber" placeholder="+66812345678 or your number with country code" type="tel" />
@@ -179,7 +179,7 @@ export function CustomerSelector({
                     </div>
                   </div>
                   {error ? <p className="rounded-lg bg-[#ffe4e6] px-3 py-2 text-sm font-semibold text-[#be123c]">{error}</p> : null}
-                  <button className="inline-flex w-full justify-center rounded-lg bg-[#0f766e] px-3 py-2 text-sm font-bold text-white disabled:opacity-70" disabled={isPending} onClick={handleCreateCustomer} type="button">
+                  <button className="inline-flex w-full justify-center rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-bold text-white disabled:opacity-70" disabled={isPending} onClick={handleCreateCustomer} type="button">
                     {isPending ? "Creating..." : "Create and select"}
                   </button>
                 </form>

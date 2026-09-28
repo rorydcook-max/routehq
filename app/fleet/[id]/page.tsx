@@ -71,8 +71,8 @@ function formatDate(value: string | null | undefined) {
     return "Not set";
   }
 
-  return new Intl.DateTimeFormat("en-TH", {
-    day: "2-digit",
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
     month: "short",
     year: "numeric"
   }).format(new Date(value));
@@ -92,7 +92,7 @@ function daysUntil(value: string | null | undefined) {
 
 function urgency(days: number | null) {
   if (days === null) {
-    return { label: "No date", className: "bg-[#eef2f6] text-[#475467]", tone: "neutral" as const };
+    return { label: "No date", className: "bg-[#fbfaf8] text-[var(--foreground-secondary)]", tone: "neutral" as const };
   }
   if (days < 0) {
     return { label: `${Math.abs(days)}d overdue`, className: "compliance-expired", tone: "red" as const };
@@ -295,7 +295,7 @@ function QuickActions({ vehicleId, status }: { vehicleId: string; status: string
           );
         })}
       </div>
-      <Link className="pressable fixed bottom-36 right-4 z-30 inline-flex items-center gap-2 rounded-full bg-[#0f766e] px-3 py-2 text-sm font-black text-white shadow-lg lg:hidden" href={primary.href as Route}>
+      <Link className="pressable fixed bottom-36 right-4 z-30 inline-flex items-center gap-2 rounded-full bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white shadow-lg lg:hidden" href={primary.href as Route}>
         <PrimaryIcon size={18} />
         {primary.label}
       </Link>
@@ -323,14 +323,14 @@ function AtAGlance({ detail }: { detail: VehicleDetail }) {
       label: "Current odometer",
       value: `${Number(detail.vehicle.mileage || 0).toLocaleString()} km`,
       sub: latestInspection?.inspected_at ? `Recorded ${formatDate(latestInspection.inspected_at)}` : "From vehicle profile",
-      className: "bg-[#e6fffb] text-[#0f766e]",
+      className: "bg-[var(--primary-light)] text-[var(--primary)]",
       icon: Gauge
     },
     {
       label: "GPS status",
       value: gps ? (gps.last_seen_at ? "Online" : "Offline") : "No device",
       sub: gps?.last_seen_at ? `Last seen ${formatDate(gps.last_seen_at)}` : "Assign a tracker",
-      className: gps ? (gps.last_seen_at ? "bg-[#dcfce7] text-[#166534]" : "bg-[#ffe4e6] text-[#be123c]") : "bg-[#eef2f6] text-[#475467]",
+      className: gps ? (gps.last_seen_at ? "bg-[#dcfce7] text-[#166534]" : "bg-[#ffe4e6] text-[#be123c]") : "bg-[#fbfaf8] text-[var(--foreground-secondary)]",
       icon: Smartphone
     },
     {
@@ -350,11 +350,11 @@ function AtAGlance({ detail }: { detail: VehicleDetail }) {
           <div className="soft-panel p-3" key={tile.label}>
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-xs font-bold uppercase text-[#667085]">{tile.label}</p>
-                <p className={`mt-1 text-base font-black text-[#10252b] ${tile.label === "Current odometer" ? "font-mono-data" : ""}`}>{tile.value}</p>
+                <p className="text-xs font-bold uppercase text-[var(--muted)]">{tile.label}</p>
+                <p className={`mt-1 text-base font-semibold text-[var(--foreground)] ${tile.label === "Current odometer" ? "font-mono-data" : ""}`}>{tile.value}</p>
                 <span className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${tile.className}`}>{tile.sub}</span>
               </div>
-              <Icon className="text-[#0f766e]" size={20} />
+              <Icon className="text-[var(--primary)]" size={20} />
             </div>
           </div>
         );
@@ -385,10 +385,10 @@ function ActiveRentalCard({ detail }: { detail: VehicleDetail }) {
         <div className="rounded-lg border border-[#bfd1ff] bg-[var(--primary-blue-light)] p-3">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <p className="text-xl font-black text-[#10252b]">{customer.full_name || "Unknown customer"}</p>
-              <p className="text-sm text-[#667085]">{customer.nationality || "Nationality not set"}</p>
+              <p className="text-xl font-semibold text-[var(--foreground)]">{customer.full_name || "Unknown customer"}</p>
+              <p className="text-sm text-[var(--muted)]">{customer.nationality || "Nationality not set"}</p>
               {customer.phone ? (
-                <a className="mt-2 inline-flex font-bold text-[#0f766e]" href={`tel:${customer.phone}`}>
+                <a className="mt-2 inline-flex font-bold text-[var(--primary)]" href={`tel:${customer.phone}`}>
                   {customer.phone}
                 </a>
               ) : null}
@@ -436,8 +436,8 @@ function ActiveRentalCard({ detail }: { detail: VehicleDetail }) {
 function InfoRow({ label, value, danger = false }: { label: string; value: React.ReactNode; danger?: boolean }) {
   return (
     <div className="rounded-lg border border-[var(--border)] bg-white p-3">
-      <p className="text-xs font-bold uppercase text-[#667085]">{label}</p>
-      <p className={`font-mono-data mt-1 font-black ${danger ? "text-[#be123c]" : "text-[#10252b]"}`}>{value}</p>
+      <p className="text-xs font-bold uppercase text-[var(--muted)]">{label}</p>
+      <p className={`font-mono-data mt-1 font-semibold ${danger ? "text-[#be123c]" : "text-[var(--foreground)]"}`}>{value}</p>
     </div>
   );
 }
@@ -457,9 +457,9 @@ function ComplianceSection({ detail, organizationId }: { detail: VehicleDetail; 
                     <Icon size={19} />
                   </span>
                   <div>
-                    <p className="font-black text-[#10252b]">{item.name}</p>
-                    <p className="mt-1 text-sm text-[#667085]">Expiry: {formatDate(item.date)}</p>
-                    <p className="mt-1 text-sm text-[#667085]">Last cost: {item.cost ? money(item.cost) : "Not recorded"}</p>
+                    <p className="font-semibold text-[var(--foreground)]">{item.name}</p>
+                    <p className="mt-1 text-sm text-[var(--muted)]">Expiry: {formatDate(item.date)}</p>
+                    <p className="mt-1 text-sm text-[var(--muted)]">Last cost: {item.cost ? money(item.cost) : "Not recorded"}</p>
                   </div>
                 </div>
                 <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${state.className}`}>{state.label}</span>
@@ -471,19 +471,19 @@ function ComplianceSection({ detail, organizationId }: { detail: VehicleDetail; 
                   <input name="organizationId" type="hidden" value={organizationId} />
                   <input name="complianceType" type="hidden" value={item.key} />
                   <label className="block">
-                    <span className="text-xs font-bold uppercase text-[#667085]">New expiry date</span>
+                    <span className="text-xs font-bold uppercase text-[var(--muted)]">New expiry date</span>
                     <input className={inputClass} name="newExpiryDate" required type="date" />
                   </label>
                   <label className="block">
-                    <span className="text-xs font-bold uppercase text-[#667085]">Cost</span>
+                    <span className="text-xs font-bold uppercase text-[var(--muted)]">Cost</span>
                     <input className={inputClass} min="0" name="cost" step="0.01" type="number" />
                   </label>
                   <label className="block sm:col-span-2">
-                    <span className="text-xs font-bold uppercase text-[#667085]">Document upload</span>
+                    <span className="text-xs font-bold uppercase text-[var(--muted)]">Document upload</span>
                     <input className={inputClass} name="documentFile" type="file" />
                   </label>
                   <label className="block sm:col-span-2">
-                    <span className="text-xs font-bold uppercase text-[#667085]">Notes</span>
+                    <span className="text-xs font-bold uppercase text-[var(--muted)]">Notes</span>
                     <input className={inputClass} name="notes" />
                   </label>
                   <PendingButton className="inline-flex justify-center rounded-lg bg-[var(--primary)] px-3 py-2.5 text-sm font-bold text-white sm:col-span-2" pendingLabel="Saving..." type="submit">
@@ -556,15 +556,15 @@ function InspectionsSection({ detail }: { detail: VehicleDetail }) {
   return (
     <Section eyebrow="Inspections" id="inspections" title="Deliveries & Returns">
       {!latest ? (
-        <EmptyState action={<Link className="font-bold text-[#0f766e]" href={`/inspections/condition/${detail.vehicle.id}` as Route}>Start a condition report</Link>}>
+        <EmptyState action={<Link className="font-bold text-[var(--primary)]" href={`/inspections/condition/${detail.vehicle.id}` as Route}>Start a condition report</Link>}>
           No delivery or return inspections yet.
         </EmptyState>
       ) : (
         <div className="space-y-3">
           <InspectionViewer inspection={latest} />
           {older.map((inspection) => (
-            <details className="rounded-lg border border-[#d6e5e2] bg-white p-3" key={inspection.id}>
-              <summary className="cursor-pointer font-bold text-[#10252b]">
+            <details className="rounded-lg border border-[var(--border)] bg-white p-3" key={inspection.id}>
+              <summary className="cursor-pointer font-bold text-[var(--foreground)]">
                 {(inspection.type || inspection.inspection_type).toUpperCase()} · {formatDate(inspection.inspected_at)} · {Number(inspection.odometer_reading || inspection.mileage || 0).toLocaleString()} km
               </summary>
               <div className="mt-3">
@@ -583,20 +583,20 @@ function InspectionCard({ inspection, expanded = false }: { inspection: any; exp
   const isReturn = inspection.inspection_type === "return";
 
   return (
-    <article className="rounded-lg border border-[#d6e5e2] bg-white p-3">
+    <article className="rounded-lg border border-[var(--border)] bg-white p-3">
       <div className="flex items-start justify-between gap-3">
         <div>
           <Badge tone={isReturn ? "red" : "green"}>{inspection.inspection_type.toUpperCase()}</Badge>
-          <p className="mt-2 font-black text-[#10252b]">{inspection.customers?.full_name || "Customer not linked"}</p>
-          <p className="text-sm text-[#667085]">{formatDate(inspection.inspected_at)}</p>
+          <p className="mt-2 font-semibold text-[var(--foreground)]">{inspection.customers?.full_name || "Customer not linked"}</p>
+          <p className="text-sm text-[var(--muted)]">{formatDate(inspection.inspected_at)}</p>
         </div>
-        <Gauge className="text-[#0f766e]" size={22} />
+        <Gauge className="text-[var(--primary)]" size={22} />
       </div>
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <InfoRow label="Odometer" value={`${Number(inspection.mileage || 0).toLocaleString()} km`} />
-        <div className="rounded-lg border border-[#edf2f7] bg-white p-3">
-          <p className="text-xs font-bold uppercase text-[#667085]">Fuel level</p>
-          <p className="mt-1 font-black text-[#10252b]">{inspection.fuel_level || "Not recorded"}</p>
+        <div className="rounded-lg border border-[var(--border)] bg-white p-3">
+          <p className="text-xs font-bold uppercase text-[var(--muted)]">Fuel level</p>
+          <p className="mt-1 font-semibold text-[var(--foreground)]">{inspection.fuel_level || "Not recorded"}</p>
           <div className="mt-2">
             <ProgressBar tone={fuel < 25 ? "red" : fuel < 50 ? "amber" : "green"} value={fuel} />
           </div>
@@ -609,16 +609,16 @@ function InspectionCard({ inspection, expanded = false }: { inspection: any; exp
           <MediaPlaceholder icon={PenLine} label="Signature pending" />
         </div>
       ) : null}
-      {inspection.notes ? <p className="mt-3 rounded-lg bg-[#f8fffd] p-3 text-sm text-[#475467]">{inspection.notes}</p> : null}
+      {inspection.notes ? <p className="mt-3 rounded-lg bg-[#fbfaf8] p-3 text-sm text-[var(--foreground-secondary)]">{inspection.notes}</p> : null}
     </article>
   );
 }
 
 function MediaPlaceholder({ icon: Icon, label }: { icon: typeof Camera; label: string }) {
   return (
-    <div className="flex h-24 items-center justify-center rounded-lg border border-dashed border-[#cbdcd8] bg-[#f8fffd] text-center text-sm font-bold text-[#667085]">
+    <div className="flex h-24 items-center justify-center rounded-lg border border-dashed border-[var(--border)] bg-[#fbfaf8] text-center text-sm font-bold text-[var(--muted)]">
       <div>
-        <Icon className="mx-auto text-[#0f766e]" size={20} />
+        <Icon className="mx-auto text-[var(--primary)]" size={20} />
         <p className="mt-1">{label}</p>
       </div>
     </div>
@@ -640,20 +640,20 @@ function FinancialSection({ detail }: { detail: VehicleDetail }) {
         <InfoRow label="Depreciation" value={money(detail.financials.depreciation)} />
         <InfoRow label="ROI" value={percent(detail.financials.roi)} danger={detail.financials.roi < 0} />
       </div>
-      <div className="mt-3 rounded-lg border border-[#d6e5e2] bg-white p-3">
-        <p className="text-sm font-black text-[#10252b]">Last 12 months revenue vs expenses</p>
+      <div className="mt-3 rounded-lg border border-[var(--border)] bg-white p-3">
+        <p className="text-sm font-semibold text-[var(--foreground)]">Last 12 months revenue vs expenses</p>
         <div className="mt-3 flex h-44 items-end gap-2 overflow-x-auto">
           {detail.financials.monthlyChart.map((month) => (
             <div className="flex min-w-10 flex-1 flex-col items-center justify-end gap-1" key={month.label}>
               <div className="flex h-32 items-end gap-1">
-                <div className="w-3 rounded-t bg-[#0f766e]" style={{ height: `${Math.max(4, (month.revenue / chartMax) * 128)}px` }} title={`Revenue ${money(month.revenue)}`} />
+                <div className="w-3 rounded-t bg-[var(--primary)]" style={{ height: `${Math.max(4, (month.revenue / chartMax) * 128)}px` }} title={`Revenue ${money(month.revenue)}`} />
                 <div className="w-3 rounded-t bg-[#be123c]" style={{ height: `${Math.max(4, (month.expenses / chartMax) * 128)}px` }} title={`Expenses ${money(month.expenses)}`} />
               </div>
-              <span className="text-[10px] font-bold text-[#667085]">{month.label}</span>
+              <span className="text-[10px] font-bold text-[var(--muted)]">{month.label}</span>
             </div>
           ))}
         </div>
-        <p className="mt-2 text-xs text-[#667085]">Teal = revenue, red = expenses.</p>
+        <p className="mt-2 text-xs text-[var(--muted)]">Teal = revenue, red = expenses.</p>
       </div>
     </Section>
   );
@@ -681,12 +681,12 @@ function UtilizationSection({ detail }: { detail: VehicleDetail }) {
 function MetricBar({ label, value, compare, tone = "green" }: { label: string; value: number; compare?: number; tone?: "green" | "blue" }) {
   return (
     <div>
-      <div className="mb-1 flex items-center justify-between text-sm font-bold text-[#344054]">
+      <div className="mb-1 flex items-center justify-between text-sm font-bold text-[var(--foreground-secondary)]">
         <span>{label}</span>
         <span>{percent(value)}</span>
       </div>
       <ProgressBar tone={tone} value={value} />
-      {compare !== undefined ? <p className="mt-1 text-xs text-[#667085]">Fleet average: {percent(compare)}</p> : null}
+      {compare !== undefined ? <p className="mt-1 text-xs text-[var(--muted)]">Fleet average: {percent(compare)}</p> : null}
     </div>
   );
 }
@@ -696,17 +696,17 @@ function MaintenanceSection({ detail, organizationId }: { detail: VehicleDetail;
 
   return (
     <Section eyebrow="Maintenance" id="maintenance" title="Service history">
-      <div className="rounded-lg border border-[#d6e5e2] bg-white p-3">
-        <p className="text-sm font-bold text-[#10252b]">Next service: {formatDate(compliance.next_service_date)}</p>
-        <p className="mt-1 text-sm text-[#667085]">Estimated km: {compliance.next_service_mileage ? `${Number(compliance.next_service_mileage).toLocaleString()} km` : "Not set"}</p>
+      <div className="rounded-lg border border-[var(--border)] bg-white p-3">
+        <p className="text-sm font-bold text-[var(--foreground)]">Next service: {formatDate(compliance.next_service_date)}</p>
+        <p className="mt-1 text-sm text-[var(--muted)]">Estimated km: {compliance.next_service_mileage ? `${Number(compliance.next_service_mileage).toLocaleString()} km` : "Not set"}</p>
       </div>
-      <details className="mt-3 rounded-lg border border-[#d6e5e2] bg-[#f8fffd] p-3">
-        <summary className="cursor-pointer font-bold text-[#0f766e]">Log Maintenance</summary>
+      <details className="mt-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
+        <summary className="cursor-pointer font-bold text-[var(--primary)]">Log Maintenance</summary>
         <form action={logVehicleMaintenance} className="mt-3 grid gap-3 sm:grid-cols-2">
           <input name="vehicleId" type="hidden" value={detail.vehicle.id} />
           <input name="organizationId" type="hidden" value={organizationId} />
           <label className="block">
-            <span className="text-xs font-bold uppercase text-[#667085]">Type</span>
+            <span className="text-xs font-bold uppercase text-[var(--muted)]">Type</span>
             <select className={inputClass} name="eventType" required>
               <option value="service">Service</option>
               <option value="oil_change">Oil change</option>
@@ -716,38 +716,38 @@ function MaintenanceSection({ detail, organizationId }: { detail: VehicleDetail;
             </select>
           </label>
           <label className="block">
-            <span className="text-xs font-bold uppercase text-[#667085]">Date</span>
+            <span className="text-xs font-bold uppercase text-[var(--muted)]">Date</span>
             <input className={inputClass} name="serviceDate" required type="date" />
           </label>
           <label className="block">
-            <span className="text-xs font-bold uppercase text-[#667085]">Cost</span>
+            <span className="text-xs font-bold uppercase text-[var(--muted)]">Cost</span>
             <input className={inputClass} min="0" name="cost" step="0.01" type="number" />
           </label>
           <label className="block">
-            <span className="text-xs font-bold uppercase text-[#667085]">Odometer</span>
+            <span className="text-xs font-bold uppercase text-[var(--muted)]">Odometer</span>
             <input className={inputClass} min="0" name="mileage" type="number" />
           </label>
           <label className="block">
-            <span className="text-xs font-bold uppercase text-[#667085]">Garage / mechanic</span>
+            <span className="text-xs font-bold uppercase text-[var(--muted)]">Garage / mechanic</span>
             <input className={inputClass} name="supplier" />
           </label>
           <label className="block">
-            <span className="text-xs font-bold uppercase text-[#667085]">Next due date</span>
+            <span className="text-xs font-bold uppercase text-[var(--muted)]">Next due date</span>
             <input className={inputClass} name="nextDueDate" type="date" />
           </label>
           <label className="block">
-            <span className="text-xs font-bold uppercase text-[#667085]">Next due km</span>
+            <span className="text-xs font-bold uppercase text-[var(--muted)]">Next due km</span>
             <input className={inputClass} min="0" name="nextDueMileage" type="number" />
           </label>
           <label className="block">
-            <span className="text-xs font-bold uppercase text-[#667085]">Receipt photo</span>
+            <span className="text-xs font-bold uppercase text-[var(--muted)]">Receipt photo</span>
             <input className={inputClass} name="receiptFile" type="file" />
           </label>
           <label className="block sm:col-span-2">
-            <span className="text-xs font-bold uppercase text-[#667085]">Notes</span>
+            <span className="text-xs font-bold uppercase text-[var(--muted)]">Notes</span>
             <textarea className={inputClass} name="notes" />
           </label>
-          <PendingButton className="inline-flex justify-center rounded-lg bg-[#0f766e] px-3 py-2.5 text-sm font-bold text-white sm:col-span-2" pendingLabel="Logging..." type="submit">
+          <PendingButton className="inline-flex justify-center rounded-lg bg-[var(--primary)] px-3 py-2.5 text-sm font-bold text-white sm:col-span-2" pendingLabel="Logging..." type="submit">
             Save maintenance
           </PendingButton>
         </form>
@@ -757,16 +757,16 @@ function MaintenanceSection({ detail, organizationId }: { detail: VehicleDetail;
           <EmptyState>No maintenance events yet.</EmptyState>
         ) : (
           detail.maintenanceEvents.map((event) => (
-            <div className="rounded-lg border border-[#d6e5e2] bg-white p-3" key={event.id}>
+            <div className="rounded-lg border border-[var(--border)] bg-white p-3" key={event.id}>
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="font-black text-[#10252b]">{event.event_type}</p>
-                  <p className="text-sm text-[#667085]">{formatDate(event.service_date)} · {event.mileage ? `${Number(event.mileage).toLocaleString()} km` : "Mileage not set"}</p>
-                  <p className="mt-1 text-sm text-[#475467]">{event.supplier || "Garage not recorded"}</p>
+                  <p className="font-semibold text-[var(--foreground)]">{event.event_type}</p>
+                  <p className="text-sm text-[var(--muted)]">{formatDate(event.service_date)} · {event.mileage ? `${Number(event.mileage).toLocaleString()} km` : "Mileage not set"}</p>
+                  <p className="mt-1 text-sm text-[var(--foreground-secondary)]">{event.supplier || "Garage not recorded"}</p>
                 </div>
-                <span className="font-mono-data font-black text-[#be123c]">{event.cost ? money(event.cost) : ""}</span>
+                <span className="font-mono-data font-semibold text-[#be123c]">{event.cost ? money(event.cost) : ""}</span>
               </div>
-              {event.notes ? <p className="mt-2 text-sm text-[#667085]">{event.notes}</p> : null}
+              {event.notes ? <p className="mt-2 text-sm text-[var(--muted)]">{event.notes}</p> : null}
             </div>
           ))
         )}
@@ -781,24 +781,24 @@ function TasksSection({ detail, organizationId }: { detail: VehicleDetail; organ
 
   return (
     <Section eyebrow="Tasks" title="Open tasks">
-      <div className="mb-3 rounded-lg border border-[#d6e5e2] bg-[#f8fffd] p-3">
+      <div className="mb-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
         <details>
-          <summary className="inline-flex cursor-pointer rounded-lg border border-[#d6e5e2] bg-white px-3 py-2 text-sm font-black text-[#0f766e]">
+          <summary className="inline-flex cursor-pointer rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--primary)]">
             + Add task
           </summary>
           <form action={createVehicleTask} className="mt-3 grid gap-3 sm:grid-cols-2">
             <input name="vehicleId" type="hidden" value={detail.vehicle.id} />
             <input name="organizationId" type="hidden" value={organizationId} />
             <label className="block sm:col-span-2">
-              <span className="text-xs font-bold uppercase text-[#667085]">Task title</span>
+              <span className="text-xs font-bold uppercase text-[var(--muted)]">Task title</span>
               <input className={inputClass} name="title" placeholder="Chase payment, inspect tyres, renew tax..." required />
             </label>
             <label className="block">
-              <span className="text-xs font-bold uppercase text-[#667085]">Due date</span>
+              <span className="text-xs font-bold uppercase text-[var(--muted)]">Due date</span>
               <input className={inputClass} name="dueDate" type="date" />
             </label>
             <label className="block">
-              <span className="text-xs font-bold uppercase text-[#667085]">Task type</span>
+              <span className="text-xs font-bold uppercase text-[var(--muted)]">Task type</span>
               <select className={inputClass} name="taskType">
                 {TASK_TYPE_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -807,7 +807,7 @@ function TasksSection({ detail, organizationId }: { detail: VehicleDetail; organ
                 ))}
               </select>
             </label>
-            <PendingButton className="inline-flex justify-center rounded-lg bg-[#0f766e] px-3 py-2.5 text-sm font-bold text-white sm:col-span-2" pendingLabel="Adding..." type="submit">
+            <PendingButton className="inline-flex justify-center rounded-lg bg-[var(--primary)] px-3 py-2.5 text-sm font-bold text-white sm:col-span-2" pendingLabel="Adding..." type="submit">
               Add task
             </PendingButton>
           </form>
@@ -821,11 +821,11 @@ function TasksSection({ detail, organizationId }: { detail: VehicleDetail; organ
           {visibleTasks.map((task) => {
             const due = taskDueState(task.dueAt);
             return (
-              <div className="rounded-lg border border-[#d6e5e2] bg-white p-3" key={task.id}>
+              <div className="rounded-lg border border-[var(--border)] bg-white p-3" key={task.id}>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="min-w-0">
                     <div className="flex min-w-0 flex-wrap items-center gap-2">
-                      <p className="truncate font-black text-[#10252b]">{task.title}</p>
+                      <p className="truncate font-semibold text-[var(--foreground)]">{task.title}</p>
                       <Badge tone="neutral">{task.taskType.replace(/_/g, " ")}</Badge>
                     </div>
                     <p className={`mt-1 text-xs font-bold ${due.className}`}>{due.label}</p>
@@ -834,7 +834,7 @@ function TasksSection({ detail, organizationId }: { detail: VehicleDetail; organ
                     <input name="organizationId" type="hidden" value={organizationId} />
                     <input name="taskId" type="hidden" value={task.id} />
                     <input name="vehicleId" type="hidden" value={detail.vehicle.id} />
-                    <PendingButton className="inline-flex rounded-lg border border-[#d6e5e2] bg-white px-3 py-2 text-xs font-black text-[#344054] hover:border-[#0f766e] hover:text-[#0f766e]" pendingLabel="Saving..." type="submit">
+                    <PendingButton className="inline-flex rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground-secondary)] hover:border-[var(--primary)] hover:text-[var(--primary)]" pendingLabel="Saving..." type="submit">
                       Mark complete
                     </PendingButton>
                   </form>
@@ -843,7 +843,7 @@ function TasksSection({ detail, organizationId }: { detail: VehicleDetail; organ
             );
           })}
           {extraCount > 0 ? (
-            <Link className="inline-flex text-sm font-black text-[#0f766e]" href="/calendar">
+            <Link className="inline-flex text-sm font-semibold text-[var(--primary)]" href="/calendar">
               View all {detail.vehicleTasks.length} tasks →
             </Link>
           ) : null}
@@ -869,7 +869,7 @@ function TransactionsSection({ detail }: { detail: VehicleDetail }) {
     <Section eyebrow="Transactions" title="Money history">
       <div className="scrollbar-none flex gap-2 overflow-x-auto">
         {["All", "Income", "Expense", "Date range"].map((item) => (
-          <button className="min-w-fit rounded-lg border border-[#d6e5e2] bg-white px-3 py-2 text-sm font-bold text-[#344054]" key={item} type="button">
+          <button className="min-w-fit rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold text-[var(--foreground-secondary)]" key={item} type="button">
             {item}
           </button>
         ))}
@@ -881,22 +881,22 @@ function TransactionsSection({ detail }: { detail: VehicleDetail }) {
       </div>
       <div className="mt-3 space-y-2">
         {detail.transactions.length === 0 ? (
-          <EmptyState action={<Link className="font-bold text-[#0f766e]" href={detailUrl("/transactions/new", detail.vehicle.id)}>Add your first transaction</Link>}>
+          <EmptyState action={<Link className="font-bold text-[var(--primary)]" href={detailUrl("/transactions/new", detail.vehicle.id)}>Add your first transaction</Link>}>
             No transactions yet.
           </EmptyState>
         ) : (
           detail.transactions.map((transaction) => {
             const expense = expenseTypes.has(transaction.type);
             return (
-              <details className="rounded-lg border border-[#d6e5e2] bg-white p-3" key={transaction.id}>
+              <details className="rounded-lg border border-[var(--border)] bg-white p-3" key={transaction.id}>
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
                   <span>
-                    <span className="font-black text-[#10252b]">{transaction.type.replace(/_/g, " ")}</span>
-                    <span className="block text-sm text-[#667085]">{formatDate(transaction.transaction_date)} · {transaction.notes || "No description"}</span>
+                    <span className="font-semibold text-[var(--foreground)]">{transaction.type.replace(/_/g, " ")}</span>
+                    <span className="block text-sm text-[var(--muted)]">{formatDate(transaction.transaction_date)} · {transaction.notes || "No description"}</span>
                   </span>
-                  <span className={`font-mono-data font-black ${expense ? "text-[#be123c]" : "text-[#0f766e]"}`}>{expense ? "-" : "+"}{money(transaction.amount)}</span>
+                  <span className={`font-mono-data font-semibold ${expense ? "text-[#be123c]" : "text-[var(--primary)]"}`}>{expense ? "-" : "+"}{money(transaction.amount)}</span>
                 </summary>
-                <div className="mt-3 text-sm text-[#667085]">
+                <div className="mt-3 text-sm text-[var(--muted)]">
                   <p>Supplier: {transaction.supplier || "Not recorded"}</p>
                   <p>Mileage: {transaction.mileage ? `${Number(transaction.mileage).toLocaleString()} km` : "Not recorded"}</p>
                   <p>Receipt: {transaction.receipt_document_id ? "Attached" : "No receipt"}</p>
@@ -926,12 +926,12 @@ function RentalHistorySection({ detail }: { detail: VehicleDetail }) {
           <EmptyState>No rentals recorded for this vehicle yet.</EmptyState>
         ) : (
           detail.rentals.map((rental) => (
-            <Link className="block rounded-lg border border-[#d6e5e2] bg-white p-3 hover:border-[#0f766e]" href={`/bookings/${rental.id}` as Route} key={rental.id}>
+            <Link className="block rounded-lg border border-[var(--border)] bg-white p-3 hover:border-[var(--primary)]" href={`/bookings/${rental.id}` as Route} key={rental.id}>
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="font-black text-[#10252b]">{rental.customers?.full_name || "Unknown customer"}</p>
-                  <p className="text-sm text-[#667085]">{rental.customers?.nationality || "Nationality not set"} · {formatDate(rental.start_date)} → {rental.end_date ? formatDate(rental.end_date) : "Ongoing"}</p>
-                  <p className="mt-1 text-sm text-[#475467]">{rental.km_driven ? `${Number(rental.km_driven).toLocaleString()} km driven` : "Km not calculated"} · Deposit pending</p>
+                  <p className="font-semibold text-[var(--foreground)]">{rental.customers?.full_name || "Unknown customer"}</p>
+                  <p className="text-sm text-[var(--muted)]">{rental.customers?.nationality || "Nationality not set"} · {formatDate(rental.start_date)} → {rental.end_date ? formatDate(rental.end_date) : "Ongoing"}</p>
+                  <p className="mt-1 text-sm text-[var(--foreground-secondary)]">{rental.km_driven ? `${Number(rental.km_driven).toLocaleString()} km driven` : "Km not calculated"} · Deposit pending</p>
                 </div>
                 <Badge tone={rental.status === "active" ? "blue" : rental.status === "completed" ? "green" : "amber"}>{rental.status}</Badge>
               </div>
@@ -948,19 +948,19 @@ function DocumentsSection({ detail }: { detail: VehicleDetail }) {
     <Section eyebrow="Documents" title="Vehicle files">
       <div className="grid gap-3 sm:grid-cols-2">
         {detail.documents.length === 0 ? (
-          <EmptyState action={<span className="font-bold text-[#0f766e]">Upload support will open from this card.</span>}>No documents uploaded yet.</EmptyState>
+          <EmptyState action={<span className="font-bold text-[var(--primary)]">Upload support will open from this card.</span>}>No documents uploaded yet.</EmptyState>
         ) : (
           detail.documents.map((document) => (
-            <a className="rounded-lg border border-[#d6e5e2] bg-white p-3 hover:border-[#0f766e]" href={document.url || "#"} key={document.id} target="_blank">
-              <FileText className="text-[#0f766e]" size={20} />
-              <p className="mt-2 font-black text-[#10252b]">{document.fileName}</p>
-              <p className="text-sm text-[#667085]">{document.category.replace(/_/g, " ")}</p>
-              <p className="mt-1 text-xs text-[#667085]">Uploaded {formatDate(document.createdAt)}</p>
+            <a className="rounded-lg border border-[var(--border)] bg-white p-3 hover:border-[var(--primary)]" href={document.url || "#"} key={document.id} target="_blank">
+              <FileText className="text-[var(--primary)]" size={20} />
+              <p className="mt-2 font-semibold text-[var(--foreground)]">{document.fileName}</p>
+              <p className="text-sm text-[var(--muted)]">{document.category.replace(/_/g, " ")}</p>
+              <p className="mt-1 text-xs text-[var(--muted)]">Uploaded {formatDate(document.createdAt)}</p>
             </a>
           ))
         )}
       </div>
-      <button className="mt-3 inline-flex items-center gap-2 rounded-lg border border-[#d6e5e2] bg-white px-3 py-2 text-sm font-bold text-[#344054]" type="button">
+      <button className="mt-3 inline-flex items-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold text-[var(--foreground-secondary)]" type="button">
         <Upload size={16} />
         Upload Document
       </button>
@@ -972,7 +972,7 @@ function GpsSection({ detail }: { detail: VehicleDetail }) {
   if (!detail.gpsDevice) {
     return (
       <Section eyebrow="GPS & tracking" title="Tracker">
-        <EmptyState action={<Link className="font-bold text-[#0f766e]" href="/settings">Assign device</Link>}>No GPS device assigned.</EmptyState>
+        <EmptyState action={<Link className="font-bold text-[var(--primary)]" href="/settings">Assign device</Link>}>No GPS device assigned.</EmptyState>
       </Section>
     );
   }
@@ -981,15 +981,15 @@ function GpsSection({ detail }: { detail: VehicleDetail }) {
 
   return (
     <Section eyebrow="GPS & tracking" title="Tracker">
-      <div className="rounded-lg border border-[#d6e5e2] bg-white p-3">
+      <div className="rounded-lg border border-[var(--border)] bg-white p-3">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="font-black text-[#10252b]">{detail.gpsDevice.provider}</p>
-            <p className="text-sm text-[#667085]">IMEI {detail.gpsDevice.imei || "Not recorded"} · SIM {detail.gpsDevice.phone_number || "Not recorded"}</p>
+            <p className="font-semibold text-[var(--foreground)]">{detail.gpsDevice.provider}</p>
+            <p className="text-sm text-[var(--muted)]">IMEI {detail.gpsDevice.imei || "Not recorded"} · SIM {detail.gpsDevice.phone_number || "Not recorded"}</p>
           </div>
           <Badge tone={offline ? "red" : "green"}>{offline ? "Offline" : "Online"}</Badge>
         </div>
-        <div className="mt-3 flex h-36 items-center justify-center rounded-lg bg-[#e6fffb] text-center text-sm font-bold text-[#0f766e]">
+        <div className="mt-3 flex h-36 items-center justify-center rounded-lg bg-[var(--primary-light)] text-center text-sm font-bold text-[var(--primary)]">
           <div>
             <MapPin className="mx-auto" />
             {detail.latestLocation ? (
@@ -999,8 +999,8 @@ function GpsSection({ detail }: { detail: VehicleDetail }) {
             )}
           </div>
         </div>
-        <p className={`mt-2 text-sm font-semibold ${offline ? "text-[#be123c]" : "text-[#667085]"}`}>Last seen {detail.gpsDevice.last_seen_at ? formatDate(detail.gpsDevice.last_seen_at) : "never"}</p>
-        <Link className="mt-3 inline-flex font-bold text-[#0f766e]" href="#gps">
+        <p className={`mt-2 text-sm font-semibold ${offline ? "text-[#be123c]" : "text-[var(--muted)]"}`}>Last seen {detail.gpsDevice.last_seen_at ? formatDate(detail.gpsDevice.last_seen_at) : "never"}</p>
+        <Link className="mt-3 inline-flex font-bold text-[var(--primary)]" href="#gps">
           View trip history
         </Link>
       </div>
@@ -1032,9 +1032,9 @@ function SpecsSection({ detail }: { detail: VehicleDetail }) {
     <Section eyebrow="Specifications" title="Vehicle profile">
       <div className="grid gap-2 sm:grid-cols-2">
         {rows.map(([label, value]) => (
-          <Link className="rounded-lg border border-[#d6e5e2] bg-white p-3 hover:border-[#0f766e]" href={`/fleet/${detail.vehicle.id}/edit`} key={label}>
-            <p className="text-xs font-bold uppercase text-[#667085]">{label}</p>
-            <p className={`mt-1 font-black text-[#10252b] ${["VIN", "Engine CC", "Purchase price", "Estimated value"].includes(String(label)) ? "font-mono-data" : ""}`}>{value || "Not set"}</p>
+          <Link className="rounded-lg border border-[var(--border)] bg-white p-3 hover:border-[var(--primary)]" href={`/fleet/${detail.vehicle.id}/edit`} key={label}>
+            <p className="text-xs font-bold uppercase text-[var(--muted)]">{label}</p>
+            <p className={`mt-1 font-semibold text-[var(--foreground)] ${["VIN", "Engine CC", "Purchase price", "Estimated value"].includes(String(label)) ? "font-mono-data" : ""}`}>{value || "Not set"}</p>
           </Link>
         ))}
       </div>
@@ -1083,8 +1083,8 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
         <div className="mx-auto max-w-2xl">
           <Card>
             <SectionHeader eyebrow="Vehicle not found" title="This vehicle could not be opened" />
-            <p className="mt-3 text-sm text-[#667085]">It may have been deleted, archived, or belong to another organisation.</p>
-            <Link className="mt-3 inline-flex rounded-lg bg-[#0f766e] px-3 py-2 text-sm font-bold text-white" href="/fleet">
+            <p className="mt-3 text-sm text-[var(--muted)]">It may have been deleted, archived, or belong to another organisation.</p>
+            <Link className="mt-3 inline-flex rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-bold text-white" href="/fleet">
               Back to Fleet
             </Link>
           </Card>
@@ -1118,10 +1118,10 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
               <div className="flex min-w-0 flex-col justify-between gap-4 rounded-lg bg-[var(--panel-secondary)] p-3">
                 <div className="min-w-0">
                   <div className="mb-2 flex flex-wrap items-center gap-2">
-                    <span className={`rounded-full px-3 py-1 text-xs font-black uppercase ${statusClass}`}>{vehicle.status}</span>
+                    <span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase ${statusClass}`}>{vehicle.status}</span>
                     {detail.category ? <Badge tone="neutral">{detail.category.name}</Badge> : null}
                   </div>
-                  <h1 className="max-w-full text-2xl font-black leading-tight tracking-[-0.03em] text-[var(--foreground)] sm:text-3xl">{title}</h1>
+                  <h1 className="max-w-full text-2xl font-semibold leading-tight tracking-[-0.03em] text-[var(--foreground)] sm:text-3xl">{title}</h1>
                   <div className="mt-4">
                     <Plate registration={vehicle.registration_number} province={vehicle.metadata?.registration_province} />
                   </div>

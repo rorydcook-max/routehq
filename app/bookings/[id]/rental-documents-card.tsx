@@ -36,15 +36,15 @@ export function RentalDocumentsCard({ documents }: { documents: BookingRentalDoc
           return (
             <div className="sub-surface space-y-2 p-3" key={document.id}>
               <div className="flex items-center justify-between gap-3">
-                <p className="flex items-center gap-2 font-black text-[#10252b]">
+                <p className="flex items-center gap-2 font-semibold text-[var(--foreground)]">
                   <FileSignature size={16} />
                   {document.label}
-                  {document.versionNumber ? <span className="text-xs font-semibold text-[#667085]">v{document.versionNumber}</span> : null}
+                  {document.versionNumber ? <span className="text-xs font-semibold text-[var(--muted)]">v{document.versionNumber}</span> : null}
                 </p>
                 <Badge tone={badge.tone}>{badge.label}</Badge>
               </div>
               {document.signatures.length > 0 ? (
-                <ul className="space-y-1 text-sm text-[#344054]">
+                <ul className="space-y-1 text-sm text-[var(--foreground-secondary)]">
                   {document.signatures.map((signature) => (
                     <li key={`${signature.role}-${signature.signedAt}`}>
                       <span className="font-bold">{signature.roleLabel}:</span> {signature.name} · {formatSignedAt(signature.signedAt)}
@@ -52,12 +52,12 @@ export function RentalDocumentsCard({ documents }: { documents: BookingRentalDoc
                   ))}
                 </ul>
               ) : document.status === "finalised" ? (
-                <p className="text-sm text-[#667085]">Finalised {document.finalisedAt ? formatSignedAt(document.finalisedAt) : ""}</p>
+                <p className="text-sm text-[var(--muted)]">Finalised {document.finalisedAt ? formatSignedAt(document.finalisedAt) : ""}</p>
               ) : (
-                <p className="text-sm text-[#667085]">Not signed yet.</p>
+                <p className="text-sm text-[var(--muted)]">Not signed yet.</p>
               )}
               {document.contentHash ? (
-                <p className="break-all font-mono text-[11px] text-[#667085]" title="SHA-256 of the signed content">
+                <p className="break-all font-mono text-[11px] text-[var(--muted)]" title="SHA-256 of the signed content">
                   SHA-256 {document.contentHash}
                 </p>
               ) : null}

@@ -49,18 +49,18 @@ export default async function BillingPage() {
         <Card>
           <SectionHeader eyebrow="Current plan" title={baseOrganization.name} />
           <div className="mt-5 space-y-3">
-            <div className="flex items-center justify-between rounded-lg border border-[#d6e5e2] bg-white p-3">
-              <span className="text-sm font-bold text-[#344054]">Status</span>
+            <div className="flex items-center justify-between rounded-lg border border-[var(--border)] bg-white p-3">
+              <span className="text-sm font-bold text-[var(--foreground-secondary)]">Status</span>
               <Badge tone={status === "active" ? "green" : status === "trial" ? "blue" : "red"}>{status.replace(/_/g, " ")}</Badge>
             </div>
-            <div className="flex items-center justify-between rounded-lg border border-[#d6e5e2] bg-white p-3">
-              <span className="text-sm font-bold text-[#344054]">Tier</span>
-              <span className="font-black capitalize text-[#10252b]">{currentTier}</span>
+            <div className="flex items-center justify-between rounded-lg border border-[var(--border)] bg-white p-3">
+              <span className="text-sm font-bold text-[var(--foreground-secondary)]">Tier</span>
+              <span className="font-semibold capitalize text-[var(--foreground)]">{currentTier}</span>
             </div>
             {status === "trial" ? (
               <div className="rounded-lg border border-[#b7e2dc] bg-[#e8faf7] p-3">
-                <p className="text-sm font-black text-[#0f766e]">Trial status</p>
-                <p className="mt-1 text-sm text-[#344054]">{trialDays === null ? "Trial date not set" : `${trialDays} day${trialDays === 1 ? "" : "s"} remaining`}</p>
+                <p className="text-sm font-semibold text-[var(--primary)]">Trial status</p>
+                <p className="mt-1 text-sm text-[var(--foreground-secondary)]">{trialDays === null ? "Trial date not set" : `${trialDays} day${trialDays === 1 ? "" : "s"} remaining`}</p>
               </div>
             ) : null}
           </div>
@@ -68,12 +68,12 @@ export default async function BillingPage() {
 
         <Card>
           <SectionHeader eyebrow="Manual billing" title="Subscribe with local support" />
-          <p className="mt-2 text-sm leading-6 text-[#667085]">
+          <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
             Subscriptions are set up personally for now: pay by bank transfer or PromptPay and we switch your plan on, usually the same day. Card payments are coming soon.
           </p>
-          <div className="mt-4 rounded-lg border border-[#d6e5e2] bg-white p-4">
-            <p className="font-black text-[#10252b]">How to activate</p>
-            <p className="mt-2 text-sm text-[#667085]">Send payment confirmation to LINE or WhatsApp and we will activate your account within 24 hours.</p>
+          <div className="mt-4 rounded-lg border border-[var(--border)] bg-white p-4">
+            <p className="font-semibold text-[var(--foreground)]">How to activate</p>
+            <p className="mt-2 text-sm text-[var(--muted)]">Send payment confirmation to LINE or WhatsApp and we will activate your account within 24 hours.</p>
             {/* Support channels come from the environment so no placeholder number or address ships. */}
             <div className="mt-4 flex flex-col gap-2 sm:flex-row">
               {supportLine ? (
@@ -98,17 +98,17 @@ export default async function BillingPage() {
 
       <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {tiers.map((tier) => (
-          <Card className={tier.tier === currentTier ? "border-[#0f766e] bg-[#f0fdfa]" : "bg-white"} key={tier.tier}>
+          <Card className={tier.tier === currentTier ? "border-[var(--primary)] bg-[#fbfaf8]" : "bg-white"} key={tier.tier}>
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-lg font-black text-[#10252b]">{tier.name}</p>
-                <p className="mt-1 text-xs font-semibold text-[#667085]">{tier.bestFor}</p>
+                <p className="text-lg font-semibold text-[var(--foreground)]">{tier.name}</p>
+                <p className="mt-1 text-xs font-semibold text-[var(--muted)]">{tier.bestFor}</p>
               </div>
               {tier.tier === currentTier ? <Badge tone="green">Current</Badge> : null}
             </div>
-            <p className="mt-4 text-3xl font-black text-[#0f766e]">{tier.price}</p>
-            <p className="text-xs font-semibold text-[#667085]">per month</p>
-            <ul className="mt-4 space-y-2 text-sm text-[#344054]">
+            <p className="mt-4 text-3xl font-semibold text-[var(--primary)]">{tier.price}</p>
+            <p className="text-xs font-semibold text-[var(--muted)]">per month</p>
+            <ul className="mt-4 space-y-2 text-sm text-[var(--foreground-secondary)]">
               {tier.features.map((feature) => (
                 <li key={feature}>- {feature}</li>
               ))}

@@ -18,7 +18,18 @@ function money(value: unknown, currency = "THB") {
 
 function formatDate(value: string | null | undefined) {
   if (!value) return "Open";
-  return new Intl.DateTimeFormat("en-TH", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(value));
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(value));
+}
+
+/** "27 Sep – 28 Oct 2026"; the year is shown once when both dates share it. */
+function formatRange(start: string | null | undefined, end: string | null | undefined) {
+  if (!start) return formatDate(end);
+  if (!end) return `From ${formatDate(start)} · open-ended`;
+  const sameYear = start.slice(0, 4) === end.slice(0, 4);
+  const first = sameYear
+    ? new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(start))
+    : formatDate(start);
+  return `${first} – ${formatDate(end)}`;
 }
 
 function vehicleTitle(vehicle: any) {
@@ -43,15 +54,16 @@ function isCancelledBooking(booking: any) {
 
 function statusCardClasses(booking: any) {
   const status = String(booking.status || "").toLowerCase();
-  if (isCancelledBooking(booking)) return "border-[#fecaca] bg-[#fff7f7]";
-  if (status === "completed") return "border-[#bfdbfe] bg-[#eff6ff]";
-  if (status === "active" || status === "extended") return "border-[#bbf7d0] bg-[#f0fdf4]";
-  if (status === "due_soon") return "border-[#fde68a] bg-[#fffbeb]";
-  if (status === "overdue") return "border-[#fecaca] bg-[#fff7f7]";
-  if (status === "booked") {
-    return booking.customers ? "border-[#fde68a] bg-[#fffbeb]" : "border-[#fed7aa] bg-[#fff7ed]";
-  }
-  return "border-[var(--border)] bg-white";
+  // White cards with a thin coloured edge: status reads at a glance without
+  // washing the whole list in colour.
+  const base = "border-[var(--border)] bg-white shadow-[var(--shadow-sm)] border-l-[3px]";
+  if (isCancelledBooking(booking)) return `${base} border-l-[#d9d6d0] opacity-80`;
+  if (status === "completed") return `${base} border-l-[#b9c7e6]`;
+  if (status === "active" || status === "extended") return `${base} border-l-[#16a34a]`;
+  if (status === "due_soon") return `${base} border-l-[#d4a017]`;
+  if (status === "overdue") return `${base} border-l-[var(--danger)]`;
+  if (status === "booked") return `${base} border-l-[var(--primary)]`;
+  return base;
 }
 
 /** Where the customer is with their booking link. Same wording as the booking page; nothing when there's no live link. */
@@ -174,9 +186,9 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
       <div className="rounded-[10px] border border-[var(--border)] bg-white p-3">
         <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
           <label className="relative block min-w-0 flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#667085]" size={16} />
+            <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" size={16} />
             <input
-              className="input-with-leading-icon h-9 w-full rounded-lg border border-[var(--border)] bg-white pr-3 text-[13px] font-medium text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(18,184,200,0.16)]"
+              className="input-with-leading-icon h-9 w-full rounded-lg border border-[var(--border)] bg-white pr-3 text-[13px] font-medium text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]"
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Search customer, plate, or booking reference"
               value={search}
@@ -185,7 +197,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
           <div className="scrollbar-none flex flex-wrap gap-1.5 xl:justify-end">
             {filters.map((entry) => (
               <button
-                className={`pressable min-h-8 min-w-fit rounded-md border px-3 py-1.5 text-[12px] font-semibold ${filter === entry ? "border-[#0e7490] bg-[#0e7490] text-white" : "border-[var(--border)] bg-[#f8fafc] text-[#475569]"}`}
+                className={`pressable min-h-8 min-w-fit rounded-md border px-3 py-1.5 text-[12px] font-semibold ${filter === entry ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-[#fbfaf8] text-[var(--foreground-secondary)]"}`}
                 key={entry}
                 onClick={() => setFilter(entry)}
                 type="button"
@@ -212,9 +224,9 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
             const photoUrl = booking.vehicles?.primary_photo_url;
             const effectiveStatus = isCancelledBooking(booking) ? "cancelled" : String(booking.status || "");
             return (
-            <article className={`rounded-[10px] border p-2 transition hover:border-[#0e7490] hover:shadow-[0_16px_30px_rgba(15,23,42,0.06)] ${statusCardClasses(booking)}`} key={booking.id}>
+            <article className={`rounded-[10px] border p-2 transition hover:border-[var(--primary)] hover:shadow-[0_16px_30px_rgba(15,23,42,0.06)] ${statusCardClasses(booking)}`} key={booking.id}>
               <div className="grid gap-2.5 lg:grid-cols-[104px_minmax(0,1fr)_136px] lg:items-center">
-                <Link className="group relative block h-[68px] overflow-hidden rounded-lg border border-[var(--border)] bg-[#f1f5f9]" href={`/bookings/${booking.id}`}>
+                <Link className="group relative block h-[68px] overflow-hidden rounded-lg border border-[var(--border)] bg-[#fbfaf8]" href={`/bookings/${booking.id}`}>
                   {photoUrl ? (
                     <img
                       alt={`${vehicleTitle(booking.vehicles) || "Vehicle"} booking`}
@@ -222,7 +234,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                       src={photoUrl}
                     />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center text-[#0e7490]">
+                    <div className="flex h-full w-full items-center justify-center text-[var(--primary)]">
                       <Car size={28} strokeWidth={1.8} />
                     </div>
                   )}
@@ -237,53 +249,53 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                     </Badge>
                   ) : null}
                     {!booking.customers ? <Badge tone="amber">Awaiting details</Badge> : null}
-                    <span className="font-mono-data ml-1 text-[11px] font-semibold uppercase tracking-[0.04em] text-[#64748b]">{bookingReference(booking)}</span>
+                    <span className="font-mono-data ml-1 text-[11px] font-semibold uppercase tracking-[0.04em] text-[var(--muted)]">{bookingReference(booking)}</span>
                   </div>
 
-                  <Link className="mt-1 block truncate text-[15px] font-semibold leading-tight text-[#0f172a] hover:text-[#0e7490]" href={`/bookings/${booking.id}`}>
+                  <Link className="mt-1 block truncate text-[15px] font-semibold leading-tight text-[var(--foreground)] hover:text-[var(--primary)]" href={`/bookings/${booking.id}`}>
                     {booking.customers ? customerLabel(booking) : <span className="inline-flex items-center gap-1.5 text-[#92400e]"><Clock size={15} /> Awaiting customer details</span>}
                   </Link>
 
-                  <div className="mt-1 grid gap-1 text-[12px] text-[#475569] sm:grid-cols-2 xl:grid-cols-3">
+                  <div className="mt-1 grid gap-1 text-[12px] text-[var(--foreground-secondary)] sm:grid-cols-2 xl:grid-cols-3">
                     <span className="flex min-w-0 items-center gap-2">
-                      <Car size={15} className="shrink-0 text-[#0e7490]" />
+                      <Car size={15} className="shrink-0 text-[var(--primary)]" />
                       <span className="truncate">
-                        <strong className="font-semibold text-[#334155]">{vehicleTitle(booking.vehicles) || "Vehicle"}</strong>
-                        {booking.vehicles?.registration_number ? <span className="font-mono-data ml-2 text-[#64748b]">{booking.vehicles.registration_number}</span> : null}
+                        <strong className="font-semibold text-[var(--foreground-secondary)]">{vehicleTitle(booking.vehicles) || "Vehicle"}</strong>
+                        {booking.vehicles?.registration_number ? <span className="font-mono-data ml-2 text-[var(--muted)]">{booking.vehicles.registration_number}</span> : null}
                       </span>
                     </span>
                     <span className="flex min-w-0 items-center gap-2">
-                      <CalendarDays size={15} className="shrink-0 text-[#0e7490]" />
-                      <span className="truncate">{formatDate(booking.start_date)} to {formatDate(booking.end_date)}</span>
+                      <CalendarDays size={15} className="shrink-0 text-[var(--primary)]" />
+                      <span className="truncate">{formatRange(booking.start_date, booking.end_date)}</span>
                     </span>
                     <span className="flex min-w-0 items-center gap-2">
-                      <UserRound size={15} className="shrink-0 text-[#0e7490]" />
+                      <UserRound size={15} className="shrink-0 text-[var(--primary)]" />
                       <span className="truncate">{booking.customers?.phone || "No phone"}</span>
                     </span>
                   </div>
-                  {timingLabel ? <p className="mt-1 text-[12px] font-medium text-[#64748b]">{timingLabel}</p> : null}
+                  {timingLabel ? <p className="mt-1 text-[12px] font-medium text-[var(--muted)]">{timingLabel}</p> : null}
                 </div>
 
                 <div className="lg:justify-self-end">
                   <div className="w-full rounded-lg border border-[var(--border)] bg-white/80 px-3 py-1.5 lg:w-[136px]">
                     <div className="flex items-center justify-between gap-3 lg:block lg:text-right">
-                      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#64748b]">Paid</span>
-                      <span className="font-mono-data block text-[16px] font-semibold text-[#0e7490]">{money(booking.total_paid, booking.currency)}</span>
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">Paid</span>
+                      <span className="font-mono-data block text-[16px] font-semibold text-[var(--primary)]">{money(booking.total_paid, booking.currency)}</span>
                     </div>
-                    <span className={`font-mono-data mt-0.5 block text-[11px] lg:text-right ${Number(booking.balance_due) > 0 ? "font-semibold text-[#b45309]" : "text-[#64748b]"}`}>
+                    <span className={`font-mono-data mt-0.5 block text-[11px] lg:text-right ${Number(booking.balance_due) > 0 ? "font-semibold text-[#b45309]" : "text-[var(--muted)]"}`}>
                       {Number(booking.balance_due) > 0 ? `Due now ${money(booking.balance_due, booking.currency)}` : "Nothing due now"}
                     </span>
                   </div>
                   <div className="hidden">
-                    <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-md bg-[#0e7490] px-3 py-1.5 text-[12px] font-semibold text-white" href={`/bookings/${booking.id}`}>
+                    <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-md bg-[var(--primary)] px-3 py-1.5 text-[12px] font-semibold text-white" href={`/bookings/${booking.id}`}>
                       View
                     </Link>
-                    <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-md border border-[var(--border)] bg-white px-3 py-1.5 text-[12px] font-semibold text-[#475569]" href={`/bookings/${booking.id}/edit`}>
+                    <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-md border border-[var(--border)] bg-white px-3 py-1.5 text-[12px] font-semibold text-[var(--foreground-secondary)]" href={`/bookings/${booking.id}/edit`}>
                       Edit
                     </Link>
                     {canExtend(booking) ? (
                       <RentalAdjustmentButton
-                        className="pressable inline-flex min-h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border)] bg-white px-3 py-1.5 text-[12px] font-semibold text-[#475569]"
+                        className="pressable inline-flex min-h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border)] bg-white px-3 py-1.5 text-[12px] font-semibold text-[var(--foreground-secondary)]"
                         currentEndDate={booking.end_date}
                         currentRate={Number(booking.rental_rate || 0)}
                         currentStartDate={booking.start_date}
@@ -353,15 +365,15 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                 </div>
               </div>
               <div className="mt-2 flex flex-wrap items-center justify-end gap-1.5 border-t border-[rgba(15,23,42,0.08)] pt-2">
-                <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-md bg-[#0e7490] px-3 py-1.5 text-[12px] font-semibold text-white" href={`/bookings/${booking.id}`}>
+                <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-md bg-[var(--primary)] px-3 py-1.5 text-[12px] font-semibold text-white" href={`/bookings/${booking.id}`}>
                   View
                 </Link>
-                <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-md border border-[var(--border)] bg-white px-3 py-1.5 text-[12px] font-semibold text-[#475569]" href={`/bookings/${booking.id}/edit`}>
+                <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-md border border-[var(--border)] bg-white px-3 py-1.5 text-[12px] font-semibold text-[var(--foreground-secondary)]" href={`/bookings/${booking.id}/edit`}>
                   Edit
                 </Link>
                 {canExtend(booking) ? (
                   <RentalAdjustmentButton
-                    className="pressable inline-flex min-h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border)] bg-white px-3 py-1.5 text-[12px] font-semibold text-[#475569]"
+                    className="pressable inline-flex min-h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border)] bg-white px-3 py-1.5 text-[12px] font-semibold text-[var(--foreground-secondary)]"
                     currentEndDate={booking.end_date}
                     currentRate={Number(booking.rental_rate || 0)}
                     currentStartDate={booking.start_date}

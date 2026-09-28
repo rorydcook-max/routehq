@@ -68,7 +68,7 @@ function KpiCard({ label, value, change, sub, upIsBad = false }: { label: string
     return (
       <div className="content-section">
         <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">{label}</p>
-        <p className="mt-1 text-2xl font-black text-[var(--foreground)]">{value}</p>
+        <p className="mt-1 text-2xl font-semibold text-[var(--foreground)]">{value}</p>
         <p className="mt-1 text-xs text-[var(--muted)]">{sub || "Nothing to compare with last period"}</p>
       </div>
     );
@@ -79,7 +79,7 @@ function KpiCard({ label, value, change, sub, upIsBad = false }: { label: string
   return (
     <div className="content-section">
       <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">{label}</p>
-      <p className="mt-1 text-2xl font-black text-[var(--foreground)]">{value}</p>
+      <p className="mt-1 text-2xl font-semibold text-[var(--foreground)]">{value}</p>
       <div className="mt-1 flex items-center gap-1">
         {isFlat ? (
           <Minus size={14} className="text-[var(--muted)]" />
@@ -120,7 +120,7 @@ function DepositsCard({ data }: { data: ReportsData["depositSummary"] }) {
         {rows.map((row) => (
           <div key={row.label} className="rounded-xl border border-amber-100 bg-white/80 p-3">
             <p className="text-xs font-semibold text-[var(--muted)]">{row.label}</p>
-            <p className={`mt-1 text-lg font-black ${row.valueClass}`}>{row.value}</p>
+            <p className={`mt-1 text-lg font-semibold ${row.valueClass}`}>{row.value}</p>
           </div>
         ))}
       </div>
@@ -241,7 +241,7 @@ function VehicleTableRow({
         </td>
         <td className="px-3 py-3 text-right font-semibold text-emerald-600">{money(vehicle.income)}</td>
         <td className="px-3 py-3 text-right text-[var(--foreground-secondary)]">{money(vehicle.expenses)}</td>
-        <td className={`px-3 py-3 text-right font-black ${vehicle.profit >= 0 ? "text-emerald-600" : "text-red-500"}`}>{money(vehicle.profit)}</td>
+        <td className={`px-3 py-3 text-right font-semibold ${vehicle.profit >= 0 ? "text-emerald-600" : "text-red-500"}`}>{money(vehicle.profit)}</td>
         <td className="px-3 py-3 text-right text-[var(--foreground-secondary)]">{vehicle.rentalCount}</td>
         <td className="px-3 py-3 text-right text-[var(--foreground-secondary)]">{vehicle.utilizationRate.toFixed(0)}%</td>
         <td className="px-3 py-3 text-right text-[var(--foreground-secondary)]">{money(vehicle.avgDailyRate)}/d</td>
@@ -747,7 +747,7 @@ export function ReportsView({ data }: { data: ReportsData }) {
                     {bal.oldestDue ? ` · due ${bal.oldestDue}` : ""}
                   </p>
                 </div>
-                <p className="font-black text-red-500">{money(bal.totalBalance)}</p>
+                <p className="font-semibold text-red-500">{money(bal.totalBalance)}</p>
               </div>
             ))}
           </div>

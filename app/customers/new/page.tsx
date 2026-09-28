@@ -8,7 +8,7 @@ import { commonCountries, customerLanguages, phoneCodeOptions } from "@/lib/cust
 import { getDefaultOrganization } from "@/lib/organization";
 
 const inputClass =
-  "mt-1 w-full rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(18,184,200,0.16)]";
+  "mt-1 w-full rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]";
 
 const contactMethodOptions = [
   { value: "whatsapp", label: "WhatsApp" },
@@ -61,28 +61,28 @@ function ContactChannelsSection() {
       <SectionHeader eyebrow="Contact channels" title="Messaging and preferred contact" />
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <label className="block">
-          <span className="text-sm font-semibold text-[#344054]">WhatsApp number</span>
+          <span className="text-sm font-semibold text-[var(--foreground-secondary)]">WhatsApp number</span>
           <input className={inputClass} name="whatsappNumber" placeholder="+66812345678 or your number with country code" type="tel" />
         </label>
         <label className="block">
-          <span className="text-sm font-semibold text-[#344054]">Facebook Messenger</span>
+          <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Facebook Messenger</span>
           <input className={inputClass} name="messengerId" placeholder="messenger.com/username or full profile URL" />
         </label>
         <label className="block">
-          <span className="text-sm font-semibold text-[#344054]">LINE ID</span>
+          <span className="text-sm font-semibold text-[var(--foreground-secondary)]">LINE ID</span>
           <input className={inputClass} name="lineId" placeholder="@lineusername" />
         </label>
         <label className="block">
-          <span className="text-sm font-semibold text-[#344054]">Telegram</span>
+          <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Telegram</span>
           <input className={inputClass} name="telegramUsername" placeholder="@telegramusername" />
         </label>
         <label className="block opacity-85">
-          <span className="text-sm font-semibold text-[#344054]">Instagram</span>
+          <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Instagram</span>
           <input className={inputClass} name="instagramHandle" placeholder="@instagramhandle" />
           <span className="mt-1 block text-xs text-[var(--muted)]">Optional</span>
         </label>
         <label className="block">
-          <span className="text-sm font-semibold text-[#344054]">Preferred contact method</span>
+          <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Preferred contact method</span>
           <select className={inputClass} defaultValue="whatsapp" name="preferredContactMethod">
             {contactMethodOptions.map((method) => (
               <option key={method.value} value={method.value}>
@@ -120,23 +120,23 @@ export default async function NewCustomerPage() {
               <SectionHeader eyebrow="Personal details" title="Customer identity" />
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Full name</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Full name</span>
                   <input className={inputClass} name="fullName" required />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Phone number</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Phone number</span>
                   <PhoneFields codeName="phoneCountryCode" inputName="phone" required />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Email</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Email</span>
                   <input className={inputClass} name="email" type="email" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Nationality</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Nationality</span>
                   <input className={inputClass} list="nationality-options" name="nationality" placeholder="Thai" required />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Preferred language</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Preferred language</span>
                   <select className={inputClass} defaultValue="en" name="preferredLocale">
                     {customerLanguages.map((language) => (
                       <option key={language.code} value={language.code}>
@@ -154,23 +154,23 @@ export default async function NewCustomerPage() {
               <SectionHeader eyebrow="ID & documents" title="Identity records" />
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Passport number</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Passport number</span>
                   <input className={inputClass} name="passportNumber" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Passport expiry date</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Passport expiry date</span>
                   <input className={inputClass} name="passportExpiry" type="date" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Driving licence number</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Driving licence number</span>
                   <input className={inputClass} name="driverLicenseNumber" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Driving licence expiry date</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Driving licence expiry date</span>
                   <input className={inputClass} name="driverLicenseExpiry" type="date" />
                 </label>
                 <label className="block sm:col-span-2">
-                  <span className="text-sm font-semibold text-[#344054]">Driving licence country of issue</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Driving licence country of issue</span>
                   <input className={inputClass} list="licence-country-options" name="driverLicenseCountry" placeholder="Thailand" />
                 </label>
               </div>
@@ -180,11 +180,11 @@ export default async function NewCustomerPage() {
               <SectionHeader eyebrow="Emergency contact" title="Backup contact" />
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Emergency contact name</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Emergency contact name</span>
                   <input className={inputClass} name="emergencyContactName" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Emergency contact phone</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Emergency contact phone</span>
                   <PhoneFields codeName="emergencyPhoneCountryCode" inputName="emergencyContactPhone" />
                 </label>
               </div>
@@ -195,15 +195,15 @@ export default async function NewCustomerPage() {
               <p className="mt-2 text-sm text-[var(--muted)]">You can skip these: customers upload them on their booking link.</p>
               <div className="mt-4 grid gap-4">
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Passport upload</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Passport upload</span>
                   <input accept="image/*,application/pdf" className={inputClass} name="passportFile" type="file" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Driving licence upload</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Driving licence upload</span>
                   <input accept="image/*,application/pdf" className={inputClass} name="driverLicenseFile" type="file" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Customer photo</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Customer photo</span>
                   <input accept="image/*" className={inputClass} name="selfieFile" type="file" />
                 </label>
               </div>
@@ -212,7 +212,7 @@ export default async function NewCustomerPage() {
             <div className="form-section bg-[var(--panel-secondary)]">
               <SectionHeader eyebrow="Notes" title="Internal notes" />
               <label className="mt-4 block">
-                <span className="text-sm font-semibold text-[#344054]">Notes</span>
+                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Notes</span>
                 <textarea className={`${inputClass} min-h-32`} name="notes" />
               </label>
             </div>

@@ -7,7 +7,7 @@ import { Card, SectionHeader } from "@/components/ui";
 import { supportedLocaleOptions } from "@/lib/i18n/locales";
 
 const inputClass =
-  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(18,184,200,0.16)]";
+  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]";
 
 export type ContractsBrandingOrganization = {
   id: string;
@@ -51,7 +51,7 @@ export function ContractsBrandingSection({
   return (
     <Card>
       <SectionHeader eyebrow="Contracts" title="Contracts & Branding" />
-      <p className="mt-2 text-xs leading-5 text-[#667085]">
+      <p className="mt-2 text-xs leading-5 text-[var(--muted)]">
         Configure the rental business identity that will appear on future rental documents. RouteHQ is not the contracting party.
       </p>
 
@@ -143,52 +143,52 @@ export function ContractsBrandingSection({
               signatureUrl={signatureDisplayUrl}
             />
             {organization.signature_authorised_at ? (
-              <p className="text-[11px] text-[#667085]">Signature authorisation recorded on {new Date(organization.signature_authorised_at).toLocaleDateString("en-GB")}.</p>
+              <p className="text-[11px] text-[var(--muted)]">Signature authorisation recorded on {new Date(organization.signature_authorised_at).toLocaleDateString("en-GB")}.</p>
             ) : null}
           </div>
         </div>
 
-        <div className="rounded-lg border border-[#dfe4ea] bg-white p-4">
-          <div className="flex items-start justify-between gap-4 border-b border-[#edf2f7] pb-4">
-            <BusinessLogoImage alt={`${tradingName} logo`} className="h-16 w-28 rounded-lg border border-[#dfe4ea] bg-white object-contain p-2" src={logoDisplayUrl} />
+        <div className="rounded-lg border border-[var(--border)] bg-white p-4">
+          <div className="flex items-start justify-between gap-4 border-b border-[var(--border)] pb-4">
+            <BusinessLogoImage alt={`${tradingName} logo`} className="h-16 w-28 rounded-lg border border-[var(--border)] bg-white object-contain p-2" src={logoDisplayUrl} />
             <div className="text-right">
-              <p className="text-[11px] font-black uppercase tracking-[0.08em]" style={{ color: accentColour }}>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.08em]" style={{ color: accentColour }}>
                 Rental agreement preview
               </p>
-              <p className="mt-1 text-lg font-black text-[#10252b]">{tradingName}</p>
-              <p className="text-xs text-[#667085]">{legalName}</p>
+              <p className="mt-1 text-lg font-semibold text-[var(--foreground)]">{tradingName}</p>
+              <p className="text-xs text-[var(--muted)]">{legalName}</p>
             </div>
           </div>
 
-          <div className="mt-4 rounded-lg border-l-4 bg-[#f8fafc] p-3" style={{ borderColor: accentColour }}>
-            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#667085]">Agreement between</p>
-            <p className="mt-2 text-base font-black text-[#10252b]">{legalName}</p>
-            <p className="text-sm text-[#667085]">and</p>
-            <p className="text-base font-black text-[#10252b]">Alex Morgan</p>
+          <div className="mt-4 rounded-lg border-l-4 bg-[#fbfaf8] p-3" style={{ borderColor: accentColour }}>
+            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">Agreement between</p>
+            <p className="mt-2 text-base font-semibold text-[var(--foreground)]">{legalName}</p>
+            <p className="text-sm text-[var(--muted)]">and</p>
+            <p className="text-base font-semibold text-[var(--foreground)]">Alex Morgan</p>
           </div>
 
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-lg border border-[#edf2f7] p-3">
-              <p className="text-[11px] font-bold uppercase text-[#667085]">Customer</p>
-              <p className="mt-1 text-sm font-bold text-[#10252b]">Alex Morgan</p>
-              <p className="text-xs text-[#667085]">Passport verified</p>
+            <div className="rounded-lg border border-[var(--border)] p-3">
+              <p className="text-[11px] font-bold uppercase text-[var(--muted)]">Customer</p>
+              <p className="mt-1 text-sm font-bold text-[var(--foreground)]">Alex Morgan</p>
+              <p className="text-xs text-[var(--muted)]">Passport verified</p>
             </div>
-            <div className="rounded-lg border border-[#edf2f7] p-3">
-              <p className="text-[11px] font-bold uppercase text-[#667085]">Vehicle</p>
-              <p className="mt-1 text-sm font-bold text-[#10252b]">Toyota Yaris Ativ</p>
-              <p className="text-xs text-[#667085]">กข 1234 Bangkok</p>
+            <div className="rounded-lg border border-[var(--border)] p-3">
+              <p className="text-[11px] font-bold uppercase text-[var(--muted)]">Vehicle</p>
+              <p className="mt-1 text-sm font-bold text-[var(--foreground)]">Toyota Yaris Ativ</p>
+              <p className="text-xs text-[var(--muted)]">กข 1234 Bangkok</p>
             </div>
           </div>
 
-          <div className="mt-4 flex items-end justify-between gap-3 border-t border-[#edf2f7] pt-4">
+          <div className="mt-4 flex items-end justify-between gap-3 border-t border-[var(--border)] pt-4">
             <div>
-              <p className="text-xs font-bold text-[#10252b]">{organization.authorised_signatory_name || "Authorised signatory"}</p>
-              <p className="text-[11px] text-[#667085]">{organization.authorised_signatory_title || "Business representative"}</p>
+              <p className="text-xs font-bold text-[var(--foreground)]">{organization.authorised_signatory_name || "Authorised signatory"}</p>
+              <p className="text-[11px] text-[var(--muted)]">{organization.authorised_signatory_title || "Business representative"}</p>
             </div>
-            <BusinessLogoImage alt="Authorised signature" className="h-14 w-36 rounded-lg border border-[#dfe4ea] bg-white object-contain p-2" src={signatureDisplayUrl} fallback={<div className="h-14 w-36 rounded-lg border border-dashed border-[#cbd5e1] bg-white p-2 text-center text-[11px] text-[#667085]">Signature</div>} />
+            <BusinessLogoImage alt="Authorised signature" className="h-14 w-36 rounded-lg border border-[var(--border)] bg-white object-contain p-2" src={signatureDisplayUrl} fallback={<div className="h-14 w-36 rounded-lg border border-dashed border-[var(--border)] bg-white p-2 text-center text-[11px] text-[var(--muted)]">Signature</div>} />
           </div>
 
-          <div className="mt-4 border-t border-[#edf2f7] pt-3 text-center text-[11px] text-[#667085]">
+          <div className="mt-4 border-t border-[var(--border)] pt-3 text-center text-[11px] text-[var(--muted)]">
             <p>{footerText}</p>
             {poweredByRouteHq ? <p className="mt-1 font-semibold">Powered by RouteHQ</p> : null}
           </div>

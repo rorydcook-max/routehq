@@ -18,7 +18,7 @@ function money(value: number, currency = "THB") {
 }
 
 function formatDate(value: string) {
-  return new Intl.DateTimeFormat("en-TH", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(value));
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
 }
 
 function inputDate(value: string) {
@@ -299,15 +299,15 @@ export function TransactionsList({
       <div className="grid items-stretch gap-3 sm:grid-cols-3">
         <div className="content-section flex min-h-[84px] flex-col justify-center">
           <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Income</p>
-          <p className="mt-1 text-2xl font-black text-emerald-600">{money(totals.income)}</p>
+          <p className="mt-1 text-2xl font-semibold text-emerald-600">{money(totals.income)}</p>
         </div>
         <div className="content-section flex min-h-[84px] flex-col justify-center">
           <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Expenses</p>
-          <p className="mt-1 text-2xl font-black text-red-600">{money(totals.expense)}</p>
+          <p className="mt-1 text-2xl font-semibold text-red-600">{money(totals.expense)}</p>
         </div>
         <div className="content-section flex min-h-[84px] flex-col justify-center">
           <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Net</p>
-          <p className="mt-1 text-2xl font-black text-[var(--primary)]">{money(totals.income - totals.expense)}</p>
+          <p className="mt-1 text-2xl font-semibold text-[var(--primary)]">{money(totals.income - totals.expense)}</p>
         </div>
       </div>
 
@@ -319,9 +319,9 @@ export function TransactionsList({
               <span>Select all</span>
             </label>
             <label className="relative block flex-1">
-              <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#667085]" size={16} />
+              <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" size={16} />
               <input
-                className="input-with-leading-icon w-full rounded-xl border border-[var(--border)] bg-white pr-4 text-sm font-semibold text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(18,184,200,0.16)]"
+                className="input-with-leading-icon w-full rounded-xl border border-[var(--border)] bg-white pr-4 text-sm font-semibold text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]"
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="Search type, vehicle, supplier, notes"
                 value={search}
@@ -331,7 +331,7 @@ export function TransactionsList({
           <div className="flex flex-wrap gap-2">
             {filters.map((entry) => (
               <button
-                className={`pressable min-h-9 rounded-xl border px-4 py-2 text-sm font-black capitalize ${filter === entry ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
+                className={`pressable min-h-9 rounded-xl border px-4 py-2 text-sm font-semibold capitalize ${filter === entry ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
                 key={entry}
                 onClick={() => setFilter(entry)}
                 type="button"
@@ -382,7 +382,7 @@ export function TransactionsList({
                     </span>
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
-                        <p className="font-black text-[var(--foreground)]">{transaction.typeLabel}</p>
+                        <p className="font-semibold text-[var(--foreground)]">{transaction.typeLabel}</p>
                         <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.04em] ${badge.className}`}>
                           {badge.label}
                         </span>
@@ -398,7 +398,7 @@ export function TransactionsList({
                   </div>
 
                   <div className="flex items-center justify-between gap-3 sm:justify-end">
-                    <p className={`text-xl font-black tabular-nums ${amount.className}`}>
+                    <p className={`text-xl font-semibold tabular-nums ${amount.className}`}>
                       {amount.prefix}
                       {money(transaction.amount, transaction.currency)}
                     </p>
@@ -470,7 +470,7 @@ export function TransactionsList({
         <div className="fixed inset-x-4 bottom-4 z-40 mx-auto max-w-3xl rounded-2xl border border-[var(--border)] bg-white p-3 shadow-2xl">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm font-black text-[var(--foreground)]">
+              <p className="text-sm font-semibold text-[var(--foreground)]">
                 {selectedIds.size} transaction{selectedIds.size === 1 ? "" : "s"} selected
               </p>
               {bulkConfirm ? <p className="mt-1 text-xs text-red-600">Delete selected transactions? This cannot be undone.</p> : null}

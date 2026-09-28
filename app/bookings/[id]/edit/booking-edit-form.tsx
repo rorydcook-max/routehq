@@ -559,7 +559,7 @@ export function BookingEditForm({
                     <Car size={21} />
                   </span>
                   <div>
-                    <p className="text-lg font-black text-[var(--foreground)]">{vehicleTitle(vehicle)}</p>
+                    <p className="text-lg font-semibold text-[var(--foreground)]">{vehicleTitle(vehicle)}</p>
                     <p className="font-mono-data mt-1 text-sm font-bold text-[var(--muted)]">{vehicle?.registration_number || "No plate"}</p>
                     <p className="mt-2 text-xs text-[var(--muted)]">Vehicle changes should be handled by cancelling or creating a replacement booking.</p>
                   </div>

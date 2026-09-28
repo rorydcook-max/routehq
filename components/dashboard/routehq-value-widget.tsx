@@ -21,7 +21,7 @@ function TooltipIcon({ text }: { text: string }) {
       <button
         aria-label="More information"
         className="ml-1 inline-flex h-3.5 w-3.5 cursor-help items-center justify-center rounded-full border text-[10px]"
-        style={{ borderColor: "#0e7490", color: "#0e7490" }}
+        style={{ borderColor: "#0f766e", color: "#0f766e" }}
         onBlur={() => setVisible(false)}
         onClick={() => setVisible((value) => !value)}
         onFocus={() => setVisible(true)}
@@ -33,7 +33,7 @@ function TooltipIcon({ text }: { text: string }) {
         i
       </button>
       {visible ? (
-        <span className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1.5 w-60 -translate-x-1/2 rounded-xl border border-[#e3e6e8] bg-white p-2.5 text-[10px] leading-4 text-[#717d86] shadow-xl">
+        <span className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1.5 w-60 -translate-x-1/2 rounded-xl border border-[var(--border)] bg-white p-2.5 text-[10px] leading-4 text-[var(--muted)] shadow-xl">
           {text}
         </span>
       ) : null}
@@ -67,14 +67,14 @@ function MetricRow({
             flexShrink: 0
           }}
         >
-          <i className={`ti ${icon}`} style={{ fontSize: "14px", color: "#0e7490" }} aria-hidden="true" />
+          <i className={`ti ${icon}`} style={{ fontSize: "14px", color: "#0f766e" }} aria-hidden="true" />
         </span>
-        <span className="flex min-w-0 items-center text-[12px] text-[#454d54]">
+        <span className="flex min-w-0 items-center text-[12px] text-[var(--foreground-secondary)]">
           <span className="truncate">{label}</span>
           {tooltip ? <TooltipIcon text={tooltip} /> : null}
         </span>
       </div>
-      <span className="shrink-0 text-[16px] font-medium text-[#1a1d21]">{value}</span>
+      <span className="shrink-0 text-[16px] font-medium text-[var(--foreground)]">{value}</span>
     </div>
   );
 }
@@ -87,10 +87,10 @@ export function RouteHQValueWidget({ data, className = "" }: { data: RouteHQSavi
     return (
       <div
         className={`flex min-h-[180px] flex-col items-center justify-center text-center ${className}`}
-        style={{ background: "#ffffff", border: "0.5px solid #e2e8f0", borderRadius: 10, padding: "13px 14px" }}
+        style={{ background: "#ffffff", border: "1px solid var(--border)", borderRadius: 12, boxShadow: "var(--shadow-sm)", padding: "13px 14px" }}
       >
-        <i className="ti ti-clock text-[22px] text-[#0e7490]" aria-hidden="true" />
-        <p className="mt-2 max-w-xs text-[12px] leading-5 text-[#717d86]">
+        <i className="ti ti-clock text-[22px] text-[var(--primary)]" aria-hidden="true" />
+        <p className="mt-2 max-w-xs text-[12px] leading-5 text-[var(--muted)]">
           Start recording transactions and bookings to see your RouteHQ savings.
         </p>
       </div>
@@ -100,9 +100,9 @@ export function RouteHQValueWidget({ data, className = "" }: { data: RouteHQSavi
   return (
     <div
       className={`flex flex-col ${className}`}
-      style={{ background: "#ffffff", border: "0.5px solid #e2e8f0", borderRadius: 10, padding: "13px 14px" }}
+      style={{ background: "#ffffff", border: "1px solid var(--border)", borderRadius: 12, boxShadow: "var(--shadow-sm)", padding: "13px 14px" }}
     >
-      <p className="m-0 mb-2.5 text-[10px] font-medium uppercase tracking-[0.08em] text-[#0e7490]">RouteHQ is saving you</p>
+      <p className="m-0 mb-2.5 text-[10px] font-medium uppercase tracking-[0.08em] text-[var(--primary)]">RouteHQ is saving you</p>
 
       <div className="flex flex-1 flex-col gap-2">
         <MetricRow icon="ti-clock" label="Time saved this month" value={`${data.totalHoursSaved.toFixed(1)} hrs`} />
@@ -113,18 +113,18 @@ export function RouteHQValueWidget({ data, className = "" }: { data: RouteHQSavi
       <div className="my-2.5 h-px bg-[#e3e6e8]" />
 
       {data.hasPositiveAhead ? (
-        <div className="flex items-center justify-between gap-3 rounded-lg border border-[#a5f3fc] bg-[#ecfeff] px-[13px] py-[9px]">
-          <span className="text-[12px] font-medium text-[#0e7490]">You&apos;re ahead by</span>
-          <span className="text-[20px] font-medium tracking-[-0.02em] text-[#0e7490]">
+        <div className="flex items-center justify-between gap-3 rounded-lg border border-[#bfe0db] bg-[var(--primary-light)] px-[13px] py-[9px]">
+          <span className="text-[12px] font-medium text-[var(--primary)]">You&apos;re ahead by</span>
+          <span className="text-[20px] font-medium tracking-[-0.02em] text-[var(--primary)]">
             {thb(data.aheadByThb)}
             <span className="text-[12px] font-normal">/mo</span>
           </span>
         </div>
       ) : (
-        <p className="m-0 text-center text-[11px] text-[#717d86]">Keep recording activity to see your full ROI.</p>
+        <p className="m-0 text-center text-[11px] text-[var(--muted)]">Keep recording activity to see your full ROI.</p>
       )}
 
-      <p className="m-0 mt-[7px] text-center text-[10px] text-[#717d86]">
+      <p className="m-0 mt-[7px] text-center text-[10px] text-[var(--muted)]">
         RouteHQ {thb(data.subscriptionCostThb)} · Total value {thb(data.totalValueThb)}/month
       </p>
     </div>

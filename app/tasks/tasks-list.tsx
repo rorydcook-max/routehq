@@ -151,7 +151,7 @@ function TaskRow({ item, organizationId, today }: { item: TaskListItem; organiza
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
             <p className="font-bold text-[var(--foreground)]">{item.title}</p>
-            {item.amount != null ? <span className="font-black text-[var(--foreground)]">{money(item.amount)}</span> : null}
+            {item.amount != null ? <span className="font-semibold text-[var(--foreground)]">{money(item.amount)}</span> : null}
             {item.kind === "task" ? <Badge tone="neutral">{taskTypeLabel(item.taskType)}</Badge> : null}
           </div>
           {context ? <p className="mt-0.5 text-sm sm:truncate text-[var(--foreground-secondary)]">{context}</p> : null}
@@ -262,7 +262,7 @@ export function TasksList({
       {filter === "open" ? (
         groups.length === 0 ? (
           <div className="empty-state">
-            <p className="text-lg font-black text-[var(--foreground)]">Nothing to do</p>
+            <p className="text-lg font-semibold text-[var(--foreground)]">Nothing to do</p>
             <p className="mt-2 text-sm text-[var(--muted)]">Payments due and tasks you add on a vehicle page will appear here.</p>
           </div>
         ) : (
@@ -272,7 +272,7 @@ export function TasksList({
             return (
               <section className="overflow-hidden rounded-xl border border-[var(--border)] bg-white" key={group.key}>
                 <div className="flex items-center justify-between border-b border-[var(--border)] bg-[var(--panel-secondary)] px-4 py-2">
-                  <p className={`text-xs font-black uppercase tracking-[0.08em] ${toneClass[group.tone]}`}>{group.title}</p>
+                  <p className={`text-xs font-semibold uppercase tracking-[0.08em] ${toneClass[group.tone]}`}>{group.title}</p>
                   <p className="text-xs font-semibold text-[var(--muted)]">{group.items.length}</p>
                 </div>
                 <div className="divide-y divide-[var(--border)]">
@@ -295,7 +295,7 @@ export function TasksList({
         )
       ) : done.length === 0 ? (
         <div className="empty-state">
-          <p className="text-lg font-black text-[var(--foreground)]">No finished tasks yet</p>
+          <p className="text-lg font-semibold text-[var(--foreground)]">No finished tasks yet</p>
         </div>
       ) : (
         <section className="overflow-hidden rounded-xl border border-[var(--border)] bg-white">

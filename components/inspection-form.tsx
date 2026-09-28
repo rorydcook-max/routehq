@@ -44,10 +44,10 @@ type ReceiptResult = {
 };
 
 const inputClass =
-  "mt-2 w-full rounded-lg border border-[#c9dbd7] bg-white px-4 py-3 text-base text-[#10252b] outline-none focus:border-[#0f766e] focus:ring-2 focus:ring-[#0f766e]/15";
+  "mt-2 w-full rounded-lg border border-[var(--border)] bg-white px-4 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15";
 
 const touchButton =
-  "pressable inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-black";
+  "pressable inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold";
 
 const deliverySteps = ["Confirm", "Odometer", "Fuel", "Walkaround", "Damage", "GPS", "Signature"];
 const returnSteps = ["Confirm", "Odometer", "Fuel", "Walkaround", "Damage", "Deposit", "Signature"];
@@ -61,7 +61,7 @@ function formatDate(value: string | null | undefined) {
   if (!value) {
     return "Not set";
   }
-  return new Intl.DateTimeFormat("en-TH", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(value));
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
 }
 
 function money(value: unknown) {
@@ -89,9 +89,9 @@ function StepShell({
   children: React.ReactNode;
 }) {
   return (
-    <section className="min-h-[56vh] rounded-xl border border-[#d6e5e2] bg-[#fbfefd] p-4 shadow-[0_14px_32px_rgba(25,63,72,0.08)] sm:p-6">
-      <p className="text-xs font-black uppercase text-[#0f766e]">{eyebrow}</p>
-      <h2 className="mt-1 text-2xl font-black text-[#10252b]">{title}</h2>
+    <section className="min-h-[56vh] rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-4 shadow-[0_14px_32px_rgba(25,63,72,0.08)] sm:p-6">
+      <p className="text-xs font-semibold uppercase text-[var(--primary)]">{eyebrow}</p>
+      <h2 className="mt-1 text-2xl font-semibold text-[var(--foreground)]">{title}</h2>
       <div className="mt-5">{children}</div>
     </section>
   );
@@ -100,13 +100,13 @@ function StepShell({
 function Progress({ steps, step }: { steps: string[]; step: number }) {
   const t = useTranslations("inspection");
   return (
-    <div className="sticky top-0 z-20 -mx-4 border-b border-[#d6e5e2] bg-[#eef8f6]/95 px-4 py-3 backdrop-blur sm:mx-0 sm:rounded-lg sm:border">
-      <div className="flex items-center justify-between text-xs font-bold text-[#667085]">
+    <div className="sticky top-0 z-20 -mx-4 border-b border-[var(--border)] bg-[#fbfaf8]/95 px-4 py-3 backdrop-blur sm:mx-0 sm:rounded-lg sm:border">
+      <div className="flex items-center justify-between text-xs font-bold text-[var(--muted)]">
         <span>{t("stepOf", { current: step + 1, total: steps.length })}</span>
         <span>{t(`steps.${steps[step]}`)}</span>
       </div>
       <div className="mt-2 h-2 overflow-hidden rounded-full bg-white">
-        <div className="h-full rounded-full bg-[#0f766e] transition-all" style={{ width: `${((step + 1) / steps.length) * 100}%` }} />
+        <div className="h-full rounded-full bg-[var(--primary)] transition-all" style={{ width: `${((step + 1) / steps.length) * 100}%` }} />
       </div>
     </div>
   );
@@ -131,7 +131,7 @@ function FileCapture({
 
   return (
     <label className="block rounded-lg border border-dashed border-[#b8d4ce] bg-white p-4">
-      <span className="flex min-h-14 items-center justify-center gap-3 rounded-lg bg-[#e6fffb] px-4 py-3 text-base font-black text-[#0f766e]">
+      <span className="flex min-h-14 items-center justify-center gap-3 rounded-lg bg-[var(--primary-light)] px-4 py-3 text-base font-semibold text-[var(--primary)]">
         <Icon size={22} />
         {label}
       </span>
@@ -152,9 +152,9 @@ function FileCapture({
       />
       {preview ? (
         accept.startsWith("video") ? (
-          <video className="mt-3 max-h-52 w-full rounded-lg border border-[#d6e5e2] object-cover" controls src={preview} />
+          <video className="mt-3 max-h-52 w-full rounded-lg border border-[var(--border)] object-cover" controls src={preview} />
         ) : (
-          <img alt="" className="mt-3 max-h-52 w-full rounded-lg border border-[#d6e5e2] object-cover" src={preview} />
+          <img alt="" className="mt-3 max-h-52 w-full rounded-lg border border-[var(--border)] object-cover" src={preview} />
         )
       ) : null}
     </label>
@@ -176,18 +176,18 @@ function FuelGauge({
   };
 
   return (
-    <div className="rounded-xl border border-[#d6e5e2] bg-white p-4">
+    <div className="rounded-xl border border-[var(--border)] bg-white p-4">
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-black text-[#10252b]">{t("fuelPercentage")}</p>
-          <p className="mt-1 text-xs font-semibold text-[#667085]">{t("fuelHint")}</p>
+          <p className="text-sm font-semibold text-[var(--foreground)]">{t("fuelPercentage")}</p>
+          <p className="mt-1 text-xs font-semibold text-[var(--muted)]">{t("fuelHint")}</p>
         </div>
-        <span className="rounded-full bg-[#e6fffb] px-4 py-2 text-lg font-black text-[#0f766e]">
+        <span className="rounded-full bg-[var(--primary-light)] px-4 py-2 text-lg font-semibold text-[var(--primary)]">
           {value === null ? t("notSet") : `${value}%`}
         </span>
       </div>
-      <div className="mb-4 h-8 overflow-hidden rounded-full border border-[#c9dbd7] bg-[#eef2f6]">
-        <div className="h-full rounded-full bg-[#0f766e] transition-all" style={{ width: `${value ?? 0}%` }} />
+      <div className="mb-4 h-8 overflow-hidden rounded-full border border-[var(--border)] bg-[#fbfaf8]">
+        <div className="h-full rounded-full bg-[var(--primary)] transition-all" style={{ width: `${value ?? 0}%` }} />
       </div>
       <input
         aria-label={t("fuelPercentageFull")}
@@ -199,7 +199,7 @@ function FuelGauge({
         type="range"
         value={displayValue}
       />
-      <div className="mt-1 flex justify-between text-xs font-bold text-[#667085]">
+      <div className="mt-1 flex justify-between text-xs font-bold text-[var(--muted)]">
         <span>{t("empty")}</span>
         <span>25%</span>
         <span>50%</span>
@@ -207,12 +207,12 @@ function FuelGauge({
         <span>{t("full")}</span>
       </div>
       <div className="mt-4 grid grid-cols-[auto_1fr_auto] items-center gap-3">
-        <button className={`${touchButton} border border-[#d6e5e2] bg-white text-[#344054]`} onClick={() => setValue((value ?? displayValue) - 5)} type="button">
+        <button className={`${touchButton} border border-[var(--border)] bg-white text-[var(--foreground-secondary)]`} onClick={() => setValue((value ?? displayValue) - 5)} type="button">
           -5%
         </button>
         <input
           aria-label={t("exactFuelPercentage")}
-          className="w-full rounded-lg border border-[#c9dbd7] bg-white px-3 py-3 text-center text-base font-black text-[#10252b] outline-none focus:border-[#0f766e] focus:ring-2 focus:ring-[#0f766e]/15"
+          className="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-3 text-center text-base font-semibold text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
           inputMode="numeric"
           max="100"
           min="0"
@@ -221,7 +221,7 @@ function FuelGauge({
           value={value ?? ""}
           placeholder={t("exactPercent")}
         />
-        <button className={`${touchButton} border border-[#d6e5e2] bg-white text-[#344054]`} onClick={() => setValue((value ?? displayValue) + 5)} type="button">
+        <button className={`${touchButton} border border-[var(--border)] bg-white text-[var(--foreground-secondary)]`} onClick={() => setValue((value ?? displayValue) + 5)} type="button">
           +5%
         </button>
       </div>
@@ -244,8 +244,8 @@ function VehicleDiagram({ onSelect }: { onSelect: (location: string) => void }) 
   ];
 
   return (
-    <div className="relative mx-auto aspect-[3/4] max-h-[420px] max-w-sm rounded-xl border border-[#d6e5e2] bg-white p-4">
-      <svg className="h-full w-full text-[#0f766e]" viewBox="0 0 180 260" role="img" aria-label={t("vehicleDiagram")}>
+    <div className="relative mx-auto aspect-[3/4] max-h-[420px] max-w-sm rounded-xl border border-[var(--border)] bg-white p-4">
+      <svg className="h-full w-full text-[var(--primary)]" viewBox="0 0 180 260" role="img" aria-label={t("vehicleDiagram")}>
         <rect x="50" y="18" width="80" height="224" rx="35" fill="#e6fffb" stroke="currentColor" strokeWidth="3" />
         <rect x="64" y="58" width="52" height="42" rx="10" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
         <rect x="62" y="112" width="56" height="56" rx="14" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
@@ -258,7 +258,7 @@ function VehicleDiagram({ onSelect }: { onSelect: (location: string) => void }) 
       {areas.map((area) => (
         <button
           aria-label={t("logDamageAt", { area: area.label })}
-          className={`absolute flex items-center justify-center rounded-lg border border-[#0f766e]/25 bg-[#0f766e]/5 px-1 text-center text-[11px] font-black leading-tight text-[#0f766e] ${area.className}`}
+          className={`absolute flex items-center justify-center rounded-lg border border-[var(--primary)]/25 bg-[var(--primary)]/5 px-1 text-center text-[11px] font-semibold leading-tight text-[var(--primary)] ${area.className}`}
           key={area.key}
           onClick={() => onSelect(area.key)}
           type="button"
@@ -301,9 +301,9 @@ function SignaturePad({
   }
 
   return (
-    <div className="rounded-xl border border-[#d6e5e2] bg-white p-3">
+    <div className="rounded-xl border border-[var(--border)] bg-white p-3">
       <canvas
-        className="h-48 w-full touch-none rounded-lg bg-[#f8fffd]"
+        className="h-48 w-full touch-none rounded-lg bg-[#fbfaf8]"
         height={220}
         onPointerDown={(event) => {
           const canvas = canvasRef.current;
@@ -333,9 +333,9 @@ function SignaturePad({
         width={620}
       />
       <div className="mt-3 flex items-center justify-between gap-2">
-        <p className="text-xs font-semibold text-[#667085]">{value ? t("signatureCaptured") : t("signInBox")}</p>
+        <p className="text-xs font-semibold text-[var(--muted)]">{value ? t("signatureCaptured") : t("signInBox")}</p>
         <button
-          className="rounded-lg border border-[#d6e5e2] bg-white px-3 py-2 text-sm font-bold text-[#344054]"
+          className="rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold text-[var(--foreground-secondary)]"
           onClick={() => {
             const canvas = canvasRef.current;
             const context = canvas?.getContext("2d");
@@ -602,9 +602,9 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
           {uploadError}
         </p>
       ) : null}
-      <div className="sticky bottom-0 z-20 -mx-4 mt-4 flex gap-2 border-t border-[#d6e5e2] bg-white/95 p-4 backdrop-blur sm:mx-0 sm:rounded-lg sm:border">
+      <div className="sticky bottom-0 z-20 -mx-4 mt-4 flex gap-2 border-t border-[var(--border)] bg-white/95 p-4 backdrop-blur sm:mx-0 sm:rounded-lg sm:border">
         <button
-          className={`${touchButton} flex-1 border border-[#d6e5e2] bg-white text-[#344054] disabled:opacity-50`}
+          className={`${touchButton} flex-1 border border-[var(--border)] bg-white text-[var(--foreground-secondary)] disabled:opacity-50`}
           disabled={step === 0}
           onClick={() => setStep((current) => Math.max(0, current - 1))}
           type="button"
@@ -614,7 +614,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
         </button>
         {step < steps.length - 1 ? (
           <button
-            className={`${touchButton} flex-1 bg-[#0f766e] text-white shadow-lg disabled:bg-[#94a3b8]`}
+            className={`${touchButton} flex-1 bg-[var(--primary)] text-white shadow-lg disabled:bg-[#94a3b8]`}
             disabled={!canAdvance()}
             // Distinct keys stop React reusing this button as the submit button, which let the
             // click that opened the last step also submit (condition reports need no signature).
@@ -627,7 +627,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
           </button>
         ) : (
           <button
-            className={`${touchButton} flex-1 bg-[#0f766e] text-white shadow-lg disabled:bg-[#94a3b8]`}
+            className={`${touchButton} flex-1 bg-[var(--primary)] text-white shadow-lg disabled:bg-[#94a3b8]`}
             disabled={!canAdvance() || isPending}
             form="inspectionForm"
             key="submit"
@@ -690,15 +690,15 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
 
       {step === 0 ? (
         <StepShell eyebrow={t("eyebrowVehicleConfirmation")} title={mode === "return" ? t("titleConfirmReturn") : mode === "condition_report" ? t("titleStartCondition") : t("titleConfirmHandover")}>
-          <div className="rounded-xl border border-[#d6e5e2] bg-white p-4">
+          <div className="rounded-xl border border-[var(--border)] bg-white p-4">
             <div className="flex items-start gap-4">
-              <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-[#e6fffb] text-[#0f766e]">
+              <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
                 <Car size={30} />
               </span>
               <div>
-                <p className="text-2xl font-black text-[#10252b]">{titleFor(context)}</p>
-                <p className="font-mono-data mt-1 text-lg font-black text-[#10252b]">{context.vehicle.registration_number}</p>
-                <p className="mt-2 text-sm text-[#667085]">
+                <p className="text-2xl font-semibold text-[var(--foreground)]">{titleFor(context)}</p>
+                <p className="font-mono-data mt-1 text-lg font-semibold text-[var(--foreground)]">{context.vehicle.registration_number}</p>
+                <p className="mt-2 text-sm text-[var(--muted)]">
                   {context.customer?.full_name ? `${context.customer.full_name} · ` : ""}
                   {context.rental?.start_date ? t("rentalStarts", { date: formatDate(context.rental.start_date) }) : t("standaloneReport")}
                 </p>
@@ -713,7 +713,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
               </div>
             </div>
           </div>
-          <button className={`${touchButton} mt-5 w-full bg-[#0f766e] text-white shadow-lg`} onClick={() => setStep(1)} type="button">
+          <button className={`${touchButton} mt-5 w-full bg-[var(--primary)] text-white shadow-lg`} onClick={() => setStep(1)} type="button">
             {mode === "return" ? t("startReturn") : mode === "condition_report" ? t("startCondition") : t("startDelivery")}
           </button>
         </StepShell>
@@ -733,24 +733,24 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
               readOdometer(file);
             }}
           />
-          {ocrMessage ? <p className="mt-3 rounded-lg bg-[#eef8f6] p-3 text-sm font-semibold text-[#0f766e]">{ocrMessage}</p> : null}
+          {ocrMessage ? <p className="mt-3 rounded-lg bg-[#fbfaf8] p-3 text-sm font-semibold text-[var(--primary)]">{ocrMessage}</p> : null}
           {mode === "return" ? (
-            <p className="mt-3 text-sm font-semibold text-[#667085]">
+            <p className="mt-3 text-sm font-semibold text-[var(--muted)]">
               <span className="font-mono-data">{t("odometerAtDelivery", { km: Number(context.rental?.mileage_at_delivery || 0).toLocaleString("en-US") })}</span>
             </p>
           ) : null}
           <label className="mt-4 block">
-            <span className="text-sm font-black text-[#10252b]">{t("confirmOdometer")}</span>
+            <span className="text-sm font-semibold text-[var(--foreground)]">{t("confirmOdometer")}</span>
             <input className={inputClass} inputMode="numeric" min="0" onChange={(event) => setOdometer(event.target.value)} placeholder={t("odometerExample")} type="number" value={odometer} />
           </label>
           {mode === "return" && odometer ? (
-            <p className="mt-3 rounded-lg bg-white p-3 text-sm font-black text-[#10252b]">
+            <p className="mt-3 rounded-lg bg-white p-3 text-sm font-semibold text-[var(--foreground)]">
               <span className="font-mono-data">
                 {t("drivenDuringRental", { km: Math.max(0, Number(odometer || 0) - Number(context.rental?.mileage_at_delivery || 0)).toLocaleString("en-US") })}
               </span>
             </p>
           ) : (
-            <p className="mt-3 text-sm text-[#667085]">{t("odometerUpdatesMileage")}</p>
+            <p className="mt-3 text-sm text-[var(--muted)]">{t("odometerUpdatesMileage")}</p>
           )}
           {odometer && Number(context.vehicle?.mileage || 0) > Number(odometer) ? (
             <p className="mt-3 flex items-start gap-2 rounded-lg border border-[#fbbf24] bg-[#fffbeb] px-3 py-2 text-sm font-bold text-[#92400e]" role="alert">
@@ -775,8 +775,8 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
           </div>
           {mode === "return" && deliveryFuel > 0 && fuelLevel !== null && fuelLevel < deliveryFuel ? (
             <div className="mt-4 rounded-lg border border-[#fbbf24] bg-[#fffbeb] p-3">
-              <p className="font-black text-[#92400e]">{t("fuelDeficitApprox", { percent: deliveryFuel - fuelLevel })}</p>
-              <label className="mt-2 block text-sm font-bold text-[#10252b]">
+              <p className="font-semibold text-[#92400e]">{t("fuelDeficitApprox", { percent: deliveryFuel - fuelLevel })}</p>
+              <label className="mt-2 block text-sm font-bold text-[var(--foreground)]">
                 {t("applyFuelCharge")}
                 <input className={inputClass} min="0" onChange={(event) => setFuelDeficitCharge(Number(event.target.value || 0))} placeholder="THB" step="0.01" type="number" value={fuelDeficitCharge || ""} />
               </label>
@@ -806,31 +806,31 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
               />
             ))}
           </div>
-          <p className="mt-3 text-sm text-[#667085]">{t("conditionMinimum")}</p>
+          <p className="mt-3 text-sm text-[var(--muted)]">{t("conditionMinimum")}</p>
         </StepShell>
       </div>
 
       <div hidden={step !== 4}>
         <StepShell eyebrow={t("eyebrowDamageCheck")} title={mode === "return" ? t("checkNewDamage") : t("logPreExistingDamage")}>
           {preExistingDamage.length > 0 ? (
-            <div className="mb-4 rounded-lg border border-[#d6e5e2] bg-white p-3">
-              <p className="text-sm font-black text-[#10252b]">{t("preExistingDamage")}</p>
+            <div className="mb-4 rounded-lg border border-[var(--border)] bg-white p-3">
+              <p className="text-sm font-semibold text-[var(--foreground)]">{t("preExistingDamage")}</p>
               <div className="mt-2 space-y-2">
                 {preExistingDamage.map((item: any) => (
-                  <p className="rounded-lg bg-[#eef2f6] px-3 py-2 text-sm text-[#475467]" key={item.id}>
+                  <p className="rounded-lg bg-[#fbfaf8] px-3 py-2 text-sm text-[var(--foreground-secondary)]" key={item.id}>
                     {areaName(String(item.location || ""))} · {severityName(item.severity)} · {item.description_translated || item.description}
-                    {item.description_translated ? <span className="mt-1 block text-xs text-[#667085]">{item.description}</span> : null}
+                    {item.description_translated ? <span className="mt-1 block text-xs text-[var(--muted)]">{item.description}</span> : null}
                   </p>
                 ))}
               </div>
             </div>
           ) : null}
           <VehicleDiagram onSelect={setSelectedLocation} />
-          <div className="mt-4 rounded-lg border border-[#d6e5e2] bg-white p-4">
-            <p className="font-black text-[#10252b]">{selectedLocation ? t("damageAt", { area: areaName(selectedLocation) }) : t("tapArea")}</p>
+          <div className="mt-4 rounded-lg border border-[var(--border)] bg-white p-4">
+            <p className="font-semibold text-[var(--foreground)]">{selectedLocation ? t("damageAt", { area: areaName(selectedLocation) }) : t("tapArea")}</p>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <label className="block">
-                <span className="text-sm font-bold text-[#10252b]">{t("severity")}</span>
+                <span className="text-sm font-bold text-[var(--foreground)]">{t("severity")}</span>
                 <select className={inputClass} onChange={(event) => setDamageSeverity(event.target.value)} value={damageSeverity}>
                   <option value="scratch">{t("damageScratch")}</option>
                   <option value="dent">{t("damageDent")}</option>
@@ -840,31 +840,31 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                 </select>
               </label>
               <label className="block sm:col-span-2">
-                <span className="text-sm font-bold text-[#10252b]">{t("description")}</span>
+                <span className="text-sm font-bold text-[var(--foreground)]">{t("description")}</span>
                 <input className={inputClass} onChange={(event) => setDamageDescription(event.target.value)} placeholder={t("shortDescription")} value={damageDescription} />
               </label>
             </div>
-            <button className={`${touchButton} mt-3 bg-[#0f766e] text-white`} disabled={!selectedLocation || !damageDescription.trim()} onClick={addDamage} type="button">
+            <button className={`${touchButton} mt-3 bg-[var(--primary)] text-white`} disabled={!selectedLocation || !damageDescription.trim()} onClick={addDamage} type="button">
               {t("saveDamageItem")}
             </button>
           </div>
-          <label className="checkbox-label mt-3 min-h-12 rounded-lg border border-[#d6e5e2] bg-white px-4 py-3 font-bold text-[#10252b]">
+          <label className="checkbox-label mt-3 min-h-12 rounded-lg border border-[var(--border)] bg-white px-4 py-3 font-bold text-[var(--foreground)]">
             <input checked={noDamage} className="flex-shrink-0" onChange={(event) => setNoDamage(event.target.checked)} type="checkbox" />
             <span>{t("noDamageToReport")}</span>
           </label>
           <div className="mt-3 space-y-2">
             {damageItems.map((item) => (
-              <div className="rounded-lg border border-[#d6e5e2] bg-white p-3" key={item.id}>
+              <div className="rounded-lg border border-[var(--border)] bg-white p-3" key={item.id}>
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-black text-[#10252b]">{areaName(item.location)} · {severityName(item.severity)}</p>
-                    <p className="text-sm text-[#667085]">{item.description}</p>
+                    <p className="font-semibold text-[var(--foreground)]">{areaName(item.location)} · {severityName(item.severity)}</p>
+                    <p className="text-sm text-[var(--muted)]">{item.description}</p>
                     <div className="mt-2 flex items-center gap-2">
                       {damagePhotoPreviews[item.id] ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img alt="" className="h-14 w-14 rounded-lg border border-[#d6e5e2] object-cover" src={damagePhotoPreviews[item.id]} />
+                        <img alt="" className="h-14 w-14 rounded-lg border border-[var(--border)] object-cover" src={damagePhotoPreviews[item.id]} />
                       ) : null}
-                      <label className="inline-flex cursor-pointer rounded-lg bg-[#e6fffb] px-3 py-2 text-sm font-bold text-[#0f766e]">
+                      <label className="inline-flex cursor-pointer rounded-lg bg-[var(--primary-light)] px-3 py-2 text-sm font-bold text-[var(--primary)]">
                         {damagePhotoPreviews[item.id] ? t("changeDamagePhoto") : t("addDamagePhoto")}
                         <input
                           accept="image/*"
@@ -897,7 +897,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
           </div>
           {mode === "return" && damageItems.some((item) => !item.is_pre_existing) ? (
             <label className="mt-4 block rounded-lg border border-[#fecdd3] bg-[#fff1f2] p-3">
-              <span className="text-sm font-black text-[#be123c]">{t("applyDamageExcess")}</span>
+              <span className="text-sm font-semibold text-[#be123c]">{t("applyDamageExcess")}</span>
               <input className={inputClass} min="0" onChange={(event) => setDamageCharge(Number(event.target.value || 0))} placeholder="THB" step="0.01" type="number" value={damageCharge || ""} />
             </label>
           ) : null}
@@ -907,34 +907,34 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
       {step === 5 && mode !== "return" ? (
         <StepShell eyebrow={t("eyebrowGpsCheck")} title={t("confirmTracker")}>
           {context.gpsDevice ? (
-            <div className="rounded-xl border border-[#d6e5e2] bg-white p-4">
+            <div className="rounded-xl border border-[var(--border)] bg-white p-4">
               <div className="flex items-start gap-3">
                 <span className={`flex h-12 w-12 items-center justify-center rounded-lg ${context.gpsDevice.last_seen_at ? "bg-[#dcfce7] text-[#166534]" : "bg-[#fef3c7] text-[#92400e]"}`}>
                   {context.gpsDevice.last_seen_at ? <CheckCircle2 /> : <AlertTriangle />}
                 </span>
                 <div>
-                  <p className="font-black text-[#10252b]">{context.gpsDevice.last_seen_at ? t("gpsActive") : t("gpsOffline")}</p>
-                  <p className="mt-1 text-sm text-[#667085]">
+                  <p className="font-semibold text-[var(--foreground)]">{context.gpsDevice.last_seen_at ? t("gpsActive") : t("gpsOffline")}</p>
+                  <p className="mt-1 text-sm text-[var(--muted)]">
                     {context.gpsDevice.provider} · Last seen {context.gpsDevice.last_seen_at ? formatDate(context.gpsDevice.last_seen_at) : "never"}
                   </p>
                   {context.latestLocation ? (
-                    <p className="mt-1 flex items-center gap-1 text-sm text-[#667085]">
+                    <p className="mt-1 flex items-center gap-1 text-sm text-[var(--muted)]">
                       <MapPin size={14} />
                       {context.latestLocation.latitude}, {context.latestLocation.longitude}
                     </p>
                   ) : null}
                 </div>
               </div>
-              <label className="checkbox-label mt-4 min-h-12 rounded-lg bg-[#f8fffd] px-4 py-3 font-bold text-[#10252b]">
+              <label className="checkbox-label mt-4 min-h-12 rounded-lg bg-[#fbfaf8] px-4 py-3 font-bold text-[var(--foreground)]">
                 <input className="flex-shrink-0" type="checkbox" />
                 <span>{t("gpsConfirm")}</span>
               </label>
             </div>
           ) : (
-            <div className="rounded-xl border border-[#d6e5e2] bg-white p-4 text-center">
-              <Smartphone className="mx-auto text-[#667085]" size={34} />
-              <p className="mt-3 font-black text-[#10252b]">{t("noGpsDevice")}</p>
-              <p className="mt-1 text-sm text-[#667085]">{t("noGpsContinue")}</p>
+            <div className="rounded-xl border border-[var(--border)] bg-white p-4 text-center">
+              <Smartphone className="mx-auto text-[var(--muted)]" size={34} />
+              <p className="mt-3 font-semibold text-[var(--foreground)]">{t("noGpsDevice")}</p>
+              <p className="mt-1 text-sm text-[var(--muted)]">{t("noGpsContinue")}</p>
             </div>
           )}
         </StepShell>
@@ -942,7 +942,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
 
       {step === 5 && mode === "return" && !depositAlreadyReturned ? (
         <StepShell eyebrow={t("eyebrowDepositReconciliation")} title={t("confirmDepositRefund")}>
-          <div className="space-y-3 rounded-xl border border-[#d6e5e2] bg-white p-4">
+          <div className="space-y-3 rounded-xl border border-[var(--border)] bg-white p-4">
             <Row label={t("depositHeld")} value={money(depositHeld)} />
             <Row label={t("alreadyRefunded")} value={`-${money(alreadyRefunded)}`} danger={alreadyRefunded > 0} />
             <Row label={t("alreadyForfeited")} value={`-${money(alreadyForfeited)}`} danger={alreadyForfeited > 0} />
@@ -950,8 +950,8 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
             <Row label={t("outstandingBalance")} value={`-${money(outstandingBalance)}`} danger />
             <Row label={t("fuelDeficitCharge")} value={`-${money(fuelDeficitCharge)}`} danger />
             <Row label={t("damageExcess")} value={`-${money(damageCharge)}`} danger />
-            <label className="block rounded-lg border border-[#d6e5e2] bg-[#f8fffd] p-3">
-              <span className="text-sm font-black text-[#10252b]">{t("cleaningFee")}</span>
+            <label className="block rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
+              <span className="text-sm font-semibold text-[var(--foreground)]">{t("cleaningFee")}</span>
               <input className={inputClass} min="0" onChange={(event) => setCleaningCharge(Number(event.target.value || 0))} placeholder="THB" step="0.01" type="number" value={cleaningCharge || ""} />
             </label>
             {requestedDeductions > availableToReconcile ? (
@@ -959,13 +959,13 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                 {t("deductionsExceedDeposit", { amount: money(availableToReconcile) })}
               </p>
             ) : null}
-            <div className="border-t border-[#d6e5e2] pt-3">
-              <div className="rounded-lg bg-[#e6fffb] p-3">
+            <div className="border-t border-[var(--border)] pt-3">
+              <div className="rounded-lg bg-[var(--primary-light)] p-3">
                 <Row label={t("depositRefund")} value={money(depositRefundAmount)} />
               </div>
             </div>
             <label className="block">
-              <span className="text-sm font-bold text-[#10252b]">{t("overrideRefund")}</span>
+              <span className="text-sm font-bold text-[var(--foreground)]">{t("overrideRefund")}</span>
               <input className={inputClass} min="0" onChange={(event) => setRefundOverride(event.target.value)} placeholder={String(calculatedRefund)} step="0.01" type="number" value={refundOverride} />
             </label>
           </div>
@@ -981,7 +981,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
             <SummaryTile icon={ShieldCheck} label={t("damage")} value={noDamage ? t("noDamageNoted") : t("damageCount", { count: damageItems.length })} />
           </div>
           {mode === "return" ? (
-            <div className="mt-4 rounded-lg border border-[#d6e5e2] bg-white p-3">
+            <div className="mt-4 rounded-lg border border-[var(--border)] bg-white p-3">
               {depositAlreadyReturned ? (
                 <div className="rounded-lg bg-[#f0fdf4] p-3">
                   <Row label={t("depositAlreadyReturned")} value="Complete" />
@@ -995,21 +995,21 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
             </div>
           ) : null}
           {mode === "delivery" && context.rental?.id ? (
-            <div className="mt-4 rounded-lg border border-[#d6e5e2] bg-white p-4">
+            <div className="mt-4 rounded-lg border border-[var(--border)] bg-white p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-sm font-black text-[#10252b]">{t("cashPayment")}</p>
-                  <p className="mt-1 text-xs font-semibold text-[#667085]">{t("cashPaymentHint")}</p>
+                  <p className="text-sm font-semibold text-[var(--foreground)]">{t("cashPayment")}</p>
+                  <p className="mt-1 text-xs font-semibold text-[var(--muted)]">{t("cashPaymentHint")}</p>
                 </div>
                 {receiptResult ? (
-                  <span className="rounded-full bg-[#dcfce7] px-3 py-1 text-xs font-black uppercase text-[#166534]">
+                  <span className="rounded-full bg-[#dcfce7] px-3 py-1 text-xs font-semibold uppercase text-[#166534]">
                     {t("receiptReady")}
                   </span>
                 ) : null}
               </div>
               <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
                 <label className="block">
-                  <span className="text-sm font-bold text-[#10252b]">{t("rentalPaymentReceived")}</span>
+                  <span className="text-sm font-bold text-[var(--foreground)]">{t("rentalPaymentReceived")}</span>
                   <input
                     className={inputClass}
                     inputMode="decimal"
@@ -1025,7 +1025,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                   />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-bold text-[#10252b]">{t("depositAmountReceived")}</span>
+                  <span className="text-sm font-bold text-[var(--foreground)]">{t("depositAmountReceived")}</span>
                   <input
                     className={inputClass}
                     inputMode="decimal"
@@ -1041,7 +1041,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                   />
                 </label>
                 <button
-                  className={`${touchButton} self-end bg-[#0f766e] text-white disabled:bg-[#94a3b8]`}
+                  className={`${touchButton} self-end bg-[var(--primary)] text-white disabled:bg-[#94a3b8]`}
                   disabled={isReceiptPending || Boolean(receiptResult)}
                   onClick={generateDeliveryReceipt}
                   type="button"
@@ -1054,7 +1054,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
               ) : null}
               {receiptResult ? (
                 <div className="mt-3 rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] p-3">
-                  <p className="flex items-center gap-2 text-sm font-black text-[#166534]">
+                  <p className="flex items-center gap-2 text-sm font-semibold text-[#166534]">
                     <CheckCircle2 size={18} />
                     {t("receiptNumberGenerated", { number: receiptResult.receipt_number })}
                   </p>
@@ -1080,27 +1080,27 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
           ) : null}
           {mode !== "condition_report" ? (
             <>
-              <p className="mt-5 text-base font-black text-[#10252b]">
+              <p className="mt-5 text-base font-semibold text-[var(--foreground)]">
                 {t(mode === "return" ? "receivingFrom" : "handingOverTo", { name: context.customer?.full_name || t("theCustomer") })}
               </p>
-              <p className="mt-1 text-sm text-[#667085]">{t("signPrompt")}</p>
+              <p className="mt-1 text-sm text-[var(--muted)]">{t("signPrompt")}</p>
               <div className="mt-3">
                 <SignaturePad onChange={setSignature} value={signature} />
               </div>
               <label className="mt-4 block">
-                <span className="text-sm font-black text-[#10252b]">{t("customerPrintedName")}</span>
+                <span className="text-sm font-semibold text-[var(--foreground)]">{t("customerPrintedName")}</span>
                 <input className={inputClass} onChange={(event) => setSignedName(event.target.value)} value={signedName} />
               </label>
             </>
           ) : (
             <label className="mt-4 block">
-              <span className="text-sm font-black text-[#10252b]">{t("notes")}</span>
+              <span className="text-sm font-semibold text-[var(--foreground)]">{t("notes")}</span>
               <textarea className={inputClass} name="notes" placeholder={t("notesPlaceholder")} rows={4} />
             </label>
           )}
           {typeof navigator !== "undefined" && "share" in navigator ? (
             <button
-              className={`${touchButton} mt-4 border border-[#d6e5e2] bg-white text-[#344054]`}
+              className={`${touchButton} mt-4 border border-[var(--border)] bg-white text-[var(--foreground-secondary)]`}
               onClick={() => navigator.share?.({ title: "RouteHQ inspection summary", text: `${titleFor(context)} inspection summary is ready.` })}
               type="button"
             >
@@ -1112,7 +1112,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
 
       {nav()}
 
-      <Link className="inline-flex items-center gap-2 text-sm font-bold text-[#0f766e]" href={`/fleet/${context.vehicle.id}` as Route}>
+      <Link className="inline-flex items-center gap-2 text-sm font-bold text-[var(--primary)]" href={`/fleet/${context.vehicle.id}` as Route}>
         <ChevronLeft size={16} />
         {t("backToVehicle")}
       </Link>
@@ -1123,18 +1123,18 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
 function Row({ label, value, danger = false }: { label: string; value: string; danger?: boolean }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <span className="text-sm font-bold text-[#667085]">{label}</span>
-      <span className={`font-mono-data text-base font-black ${danger ? "text-[#be123c]" : "text-[#10252b]"}`}>{value}</span>
+      <span className="text-sm font-bold text-[var(--muted)]">{label}</span>
+      <span className={`font-mono-data text-base font-semibold ${danger ? "text-[#be123c]" : "text-[var(--foreground)]"}`}>{value}</span>
     </div>
   );
 }
 
 function SummaryTile({ icon: Icon, label, value }: { icon: typeof Gauge; label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-[#d6e5e2] bg-white p-3">
-      <Icon className="text-[#0f766e]" size={20} />
-      <p className="mt-2 text-xs font-bold uppercase text-[#667085]">{label}</p>
-      <p className="font-mono-data mt-1 font-black text-[#10252b]">{value}</p>
+    <div className="rounded-lg border border-[var(--border)] bg-white p-3">
+      <Icon className="text-[var(--primary)]" size={20} />
+      <p className="mt-2 text-xs font-bold uppercase text-[var(--muted)]">{label}</p>
+      <p className="font-mono-data mt-1 font-semibold text-[var(--foreground)]">{value}</p>
     </div>
   );
 }

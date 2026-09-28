@@ -563,7 +563,7 @@ const thaiLocationLabels: Record<string, string> = {
 };
 const fleetSizes = ["1-5", "6-15", "16-50", "50+"];
 
-const fieldClass = "mt-1 w-full rounded-lg border border-[#cfe2de] bg-white px-3 text-[13px] font-semibold text-[#10252b] outline-none focus:border-[#0f766e] focus:ring-2 focus:ring-[#0f766e]/15";
+const fieldClass = "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] font-semibold text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15";
 
 const currencyOptionsByCountry: Record<string, string[]> = {
   Thailand: ["THB", "USD"],
@@ -1206,28 +1206,28 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,#d9f7f0,transparent_38%),linear-gradient(135deg,#f8fffd,#eef7f5)] px-4 py-5 text-[#10252b]">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,#d9f7f0,transparent_38%),linear-gradient(135deg,#f8fffd,#eef7f5)] px-4 py-5 text-[var(--foreground)]">
       <div className="mx-auto flex min-h-[calc(100vh-40px)] max-w-xl flex-col">
         <header className="mb-5 flex items-center justify-between">
           <div>
-            <p className="text-xs font-black uppercase tracking-wide text-[#0f766e]">{t.setupEyebrow}</p>
-            <h1 className="text-2xl font-black">{t.setupTitle}</h1>
+            <p className="text-xs font-semibold uppercase tracking-wide text-[var(--primary)]">{t.setupEyebrow}</p>
+            <h1 className="text-2xl font-semibold">{t.setupTitle}</h1>
           </div>
           <div className="flex gap-2">
             {[1, 2, 3, 4].map((entry) => (
-              <span className={`h-3 w-3 rounded-full ${entry <= step ? "bg-[#0f766e]" : "bg-[#cfe2de]"}`} key={entry} />
+              <span className={`h-3 w-3 rounded-full ${entry <= step ? "bg-[var(--primary)]" : "bg-[#cfe2de]"}`} key={entry} />
             ))}
           </div>
         </header>
 
-        <section className="flex-1 rounded-lg border border-[#cfe2de] bg-white/92 p-3 shadow-[0_18px_60px_rgba(16,37,43,0.08)] sm:p-7">
+        <section className="flex-1 rounded-lg border border-[var(--border)] bg-white/92 p-3 shadow-[0_18px_60px_rgba(16,37,43,0.08)] sm:p-7">
           {success ? (
             <div className="flex min-h-[520px] flex-col items-center justify-center text-center">
               <div className="success-pop flex h-24 w-24 items-center justify-center rounded-full bg-[#dcfce7] text-[#166534]">
                 <CheckCircle2 size={52} />
               </div>
-              <h2 className="mt-5 text-3xl font-black">{t.setupComplete}</h2>
-              <p className="mt-2 max-w-md text-sm leading-6 text-[#667085]">{t.setupCompleteBody}</p>
+              <h2 className="mt-5 text-3xl font-semibold">{t.setupComplete}</h2>
+              <p className="mt-2 max-w-md text-sm leading-6 text-[var(--muted)]">{t.setupCompleteBody}</p>
               <div className="confetti mt-6" />
             </div>
           ) : null}
@@ -1238,19 +1238,19 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
               <div className="mt-6 grid gap-3">
                 <ChoiceGrid label={t.primaryLanguage} options={languageOptions} value={profile.language} onChange={(language) => setProfile({ ...profile, language })} />
                 <label>
-                  <span className="text-sm font-black">{t.businessName}</span>
+                  <span className="text-sm font-semibold">{t.businessName}</span>
                   <input className={fieldClass} onChange={(event) => setProfile({ ...profile, businessName: event.target.value })} required value={profile.businessName} />
                 </label>
-                <div className="rounded-lg border border-[#cfe2de] bg-[#f8fffd] p-3">
+                <div className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
                   <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                    <p className="text-sm font-black">{t.mainLocation}</p>
-                    <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[#667085]" title={t.mainLocationHint}>
+                    <p className="text-sm font-semibold">{t.mainLocation}</p>
+                    <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[var(--muted)]" title={t.mainLocationHint}>
                       {t.mainLocationHint}
                     </span>
                   </div>
                   <div className="mt-3 grid gap-3 sm:grid-cols-3">
                     <label>
-                      <span className="text-xs font-black uppercase text-[#667085]">{t.country}</span>
+                      <span className="text-xs font-semibold uppercase text-[var(--muted)]">{t.country}</span>
                       <select
                         className={fieldClass}
                         onChange={(event) => {
@@ -1266,7 +1266,7 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
                       </select>
                     </label>
                     <label>
-                      <span className="text-xs font-black uppercase text-[#667085]">{t.region}</span>
+                      <span className="text-xs font-semibold uppercase text-[var(--muted)]">{t.region}</span>
                       <select
                         className={fieldClass}
                         onChange={(event) => {
@@ -1280,7 +1280,7 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
                       </select>
                     </label>
                     <label>
-                      <span className="text-xs font-black uppercase text-[#667085]">{t.town}</span>
+                      <span className="text-xs font-semibold uppercase text-[var(--muted)]">{t.town}</span>
                       <select className={fieldClass} onChange={(event) => setProfile({ ...profile, town: event.target.value })} value={profile.town}>
                         {currentTowns.map((town) => <option key={town} value={town}>{localizedLocationLabel(town, profile.language)}</option>)}
                       </select>
@@ -1305,7 +1305,7 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
             <div className="mx-auto max-w-xl">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <StepTitle icon={ScanLine} title={t.step2Title} subtitle={t.step2Subtitle} />
-                <button className="pressable rounded-lg border border-[#cfe2de] bg-white px-4 py-3 text-sm font-black text-[#0f766e]" onClick={skipVehicle} type="button">
+                <button className="pressable rounded-lg border border-[var(--border)] bg-white px-4 py-3 text-sm font-semibold text-[var(--primary)]" onClick={skipVehicle} type="button">
                   {t.addVehiclesLater}
                 </button>
               </div>
@@ -1329,39 +1329,39 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
                 type="file"
               />
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                <button className="pressable rounded-lg bg-[#0f766e] p-3 text-left text-white shadow-lg" onClick={() => fileRef.current?.click()} type="button">
+                <button className="pressable rounded-lg bg-[var(--primary)] p-3 text-left text-white shadow-lg" onClick={() => fileRef.current?.click()} type="button">
                   <Camera size={28} />
-                  <p className="mt-3 text-lg font-black">{t.scanBlueBook}</p>
+                  <p className="mt-3 text-lg font-semibold">{t.scanBlueBook}</p>
                   <p className="mt-1 text-sm text-white/85">{t.scanBlueBookBody}</p>
                 </button>
-                <button className="pressable rounded-lg border border-[#cfe2de] bg-[#f8fffd] p-3 text-left" onClick={() => router.push("/fleet/import?from=onboarding")} type="button">
-                  <FileSpreadsheet className="text-[#0f766e]" size={28} />
-                  <p className="mt-3 text-lg font-black">{t.importVehicles}</p>
-                  <p className="mt-1 text-sm text-[#667085]">{t.importVehiclesBody}</p>
+                <button className="pressable rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3 text-left" onClick={() => router.push("/fleet/import?from=onboarding")} type="button">
+                  <FileSpreadsheet className="text-[var(--primary)]" size={28} />
+                  <p className="mt-3 text-lg font-semibold">{t.importVehicles}</p>
+                  <p className="mt-1 text-sm text-[var(--muted)]">{t.importVehiclesBody}</p>
                 </button>
               </div>
-              <div className="mt-4 rounded-lg border border-[#cfe2de] bg-[#f8fffd] p-3">
+              <div className="mt-4 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-start gap-3">
-                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-[#e6fffb] text-[#0f766e]">
+                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-[var(--primary-light)] text-[var(--primary)]">
                       <ImagePlus size={24} />
                     </span>
                     <div>
-                      <p className="text-lg font-black text-[#10252b]">{t.uploadPhotos}</p>
-                      <p className="mt-1 text-sm text-[#667085]">{vehiclePhotoCount ? t.photosSelected(vehiclePhotoCount) : t.uploadPhotosBody}</p>
+                      <p className="text-lg font-semibold text-[var(--foreground)]">{t.uploadPhotos}</p>
+                      <p className="mt-1 text-sm text-[var(--muted)]">{vehiclePhotoCount ? t.photosSelected(vehiclePhotoCount) : t.uploadPhotosBody}</p>
                     </div>
                   </div>
-                  <button className="pressable rounded-lg bg-white px-4 py-3 text-sm font-black text-[#0f766e] shadow-sm ring-1 ring-[#cfe2de]" onClick={() => photoRef.current?.click()} type="button">
+                  <button className="pressable rounded-lg bg-white px-4 py-3 text-sm font-semibold text-[var(--primary)] shadow-sm ring-1 ring-[#cfe2de]" onClick={() => photoRef.current?.click()} type="button">
                     {t.uploadPhotos}
                   </button>
                 </div>
               </div>
               {vehiclePhotoPreviews.length > 0 ? (
-                <div className="mt-4 rounded-lg border border-[#cfe2de] bg-white p-3">
-                  <p className="text-sm font-black text-[#10252b]">{t.photosSelected(vehiclePhotoPreviews.length)}</p>
+                <div className="mt-4 rounded-lg border border-[var(--border)] bg-white p-3">
+                  <p className="text-sm font-semibold text-[var(--foreground)]">{t.photosSelected(vehiclePhotoPreviews.length)}</p>
                   <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4">
                     {vehiclePhotoPreviews.map((photo) => (
-                      <div className="relative overflow-hidden rounded-lg border border-[#d7e5e1] bg-[#f8fffd]" key={photo.id}>
+                      <div className="relative overflow-hidden rounded-lg border border-[#d7e5e1] bg-[#fbfaf8]" key={photo.id}>
                         <button
                           aria-label={`Remove ${photo.name}`}
                           className="pressable absolute right-1 top-1 z-10 grid h-7 w-7 place-items-center rounded-full bg-white/95 text-[#be123c] shadow-sm"
@@ -1371,15 +1371,15 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
                           <X size={15} strokeWidth={3} />
                         </button>
                         <img alt={photo.name} className="aspect-square w-full object-cover" src={photo.url} />
-                        <p className="truncate px-2 py-1 text-[11px] font-bold text-[#667085]">{photo.name}</p>
+                        <p className="truncate px-2 py-1 text-[11px] font-bold text-[var(--muted)]">{photo.name}</p>
                       </div>
                     ))}
                   </div>
                 </div>
               ) : null}
-              {ocrLoading ? <p className="mt-4 rounded-lg bg-[#e6fffb] p-3 text-sm font-bold text-[#0f766e]">{t.readingBlueBook}</p> : null}
+              {ocrLoading ? <p className="mt-4 rounded-lg bg-[var(--primary-light)] p-3 text-sm font-bold text-[var(--primary)]">{t.readingBlueBook}</p> : null}
               <VehicleFields categories={categories} fields={vehicleFields} labels={t.fields} language={profile.language} onChange={updateVehicle} selectedCountry={selectedCountry} />
-              <p className="mt-4 rounded-lg border border-[#cfe2de] bg-[#f8fffd] p-3 text-sm font-semibold text-[#667085]">
+              <p className="mt-4 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3 text-sm font-semibold text-[var(--muted)]">
                 {t.renewalHelp}
               </p>
               <FooterActions
@@ -1395,31 +1395,31 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
           {!success && step === 3 ? (
             <div className="mx-auto flex min-h-[520px] max-w-xl flex-col justify-center">
               <StepTitle icon={LineChart} title={t.step3Title} subtitle={t.step3Subtitle} />
-              <div className="mt-6 rounded-lg border border-[#cfe2de] bg-[#f8fffd] p-3">
+              <div className="mt-6 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
                 {vehicle && compliance ? (
                   <div>
-                    <p className={`text-sm font-black uppercase ${Number(compliance.days) <= 60 ? "text-[#b7791f]" : "text-[#16a34a]"}`}>
+                    <p className={`text-sm font-semibold uppercase ${Number(compliance.days) <= 60 ? "text-[#b7791f]" : "text-[#16a34a]"}`}>
                       {Number(compliance.days) <= 60 ? t.attentionSoon : t.complianceGood}
                     </p>
-                    <h3 className="mt-2 text-2xl font-black">
+                    <h3 className="mt-2 text-2xl font-semibold">
                       {Number(compliance.days) <= 60
                         ? t.expiresInDays(compliance.label, Number(compliance.days))
                         : t.allComplianceGood(`${vehicle.make} ${vehicle.model}`)}
                     </h3>
-                    <p className="mt-2 text-sm text-[#667085]">{t.nextUpcoming(compliance.label, String(compliance.date))}</p>
+                    <p className="mt-2 text-sm text-[var(--muted)]">{t.nextUpcoming(compliance.label, String(compliance.date))}</p>
                   </div>
                 ) : vehicle ? (
-                  <h3 className="text-2xl font-black">{t.allComplianceGood(`${vehicle.make} ${vehicle.model}`)}</h3>
+                  <h3 className="text-2xl font-semibold">{t.allComplianceGood(`${vehicle.make} ${vehicle.model}`)}</h3>
                 ) : (
                   <div>
-                    <p className="text-sm font-black uppercase text-[#0f766e]">{t.sampleAlert}</p>
-                    <h3 className="mt-2 text-2xl font-black">{t.sampleAlertTitle}</h3>
-                    <p className="mt-2 text-sm text-[#667085]">{t.sampleAlertBody}</p>
+                    <p className="text-sm font-semibold uppercase text-[var(--primary)]">{t.sampleAlert}</p>
+                    <h3 className="mt-2 text-2xl font-semibold">{t.sampleAlertTitle}</h3>
+                    <p className="mt-2 text-sm text-[var(--muted)]">{t.sampleAlertBody}</p>
                   </div>
                 )}
-                {vehicleSkipped ? <p className="mt-4 rounded-lg bg-white p-3 text-sm font-bold text-[#667085]">{t.vehicleLater}</p> : null}
+                {vehicleSkipped ? <p className="mt-4 rounded-lg bg-white p-3 text-sm font-bold text-[var(--muted)]">{t.vehicleLater}</p> : null}
               </div>
-              <p className="mt-5 text-sm leading-6 text-[#667085]">{t.alertSchedule}</p>
+              <p className="mt-5 text-sm leading-6 text-[var(--muted)]">{t.alertSchedule}</p>
               <FooterActions error={error} pending={false} primaryLabel={t.continue} savingLabel={t.saving} onPrimary={() => setStep(4)} />
             </div>
           ) : null}
@@ -1430,27 +1430,27 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
               <div className="mt-6 grid gap-3 md:grid-cols-[1fr_220px]">
                 <div className="space-y-3">
                   {t.lineBenefits.map((item) => (
-                    <div className="rounded-lg border border-[#cfe2de] bg-[#f8fffd] p-3 text-sm font-bold text-[#344054]" key={item}>{item}</div>
+                    <div className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3 text-sm font-bold text-[var(--foreground-secondary)]" key={item}>{item}</div>
                   ))}
                   <label className="block">
-                    <span className="text-sm font-black">{t.lineId}</span>
+                    <span className="text-sm font-semibold">{t.lineId}</span>
                     <input className={fieldClass} id="lineId" placeholder="@yourlineid" />
                   </label>
                 </div>
-                <div className="rounded-lg border border-[#cfe2de] bg-white p-3 text-center">
+                <div className="rounded-lg border border-[var(--border)] bg-white p-3 text-center">
                   <div className="mx-auto grid h-44 w-44 grid-cols-6 gap-1 rounded-lg bg-white p-3 shadow-inner">
                     {Array.from({ length: 36 }).map((_, index) => (
-                      <span className={`${[0, 1, 2, 6, 12, 13, 14, 5, 11, 17, 23, 29, 35, 30, 31, 32, 18, 20, 21, 26, 27].includes(index) ? "bg-[#10252b]" : "bg-[#e6fffb]"} rounded-sm`} key={index} />
+                      <span className={`${[0, 1, 2, 6, 12, 13, 14, 5, 11, 17, 23, 29, 35, 30, 31, 32, 18, 20, 21, 26, 27].includes(index) ? "bg-[#10252b]" : "bg-[var(--primary-light)]"} rounded-sm`} key={index} />
                     ))}
                   </div>
-                  <p className="mt-3 text-sm font-bold text-[#667085]">{t.scanLine}</p>
+                  <p className="mt-3 text-sm font-bold text-[var(--muted)]">{t.scanLine}</p>
                 </div>
               </div>
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                <button className="pressable min-h-12 rounded-lg bg-[#0f766e] px-5 py-3 text-sm font-black text-white disabled:opacity-70" disabled={isPending} onClick={() => complete(true)} type="button">
+                <button className="pressable min-h-12 rounded-lg bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white disabled:opacity-70" disabled={isPending} onClick={() => complete(true)} type="button">
                   {isPending ? t.finishing : t.connectedLine}
                 </button>
-                <button className="pressable min-h-12 rounded-lg border border-[#cfe2de] bg-white px-5 py-3 text-sm font-black text-[#344054]" disabled={isPending} onClick={() => complete(false)} type="button">
+                <button className="pressable min-h-12 rounded-lg border border-[var(--border)] bg-white px-5 py-3 text-sm font-semibold text-[var(--foreground-secondary)]" disabled={isPending} onClick={() => complete(false)} type="button">
                   {t.skipNow}
                 </button>
               </div>
@@ -1466,11 +1466,11 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
 function StepTitle({ icon: Icon, title, subtitle }: { icon: typeof Car; title: string; subtitle: string }) {
   return (
     <div>
-      <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#e6fffb] text-[#0f766e]">
+      <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-[var(--primary-light)] text-[var(--primary)]">
         <Icon size={24} />
       </span>
-      <h2 className="mt-4 text-3xl font-black text-[#10252b]">{title}</h2>
-      <p className="mt-2 text-sm leading-6 text-[#667085]">{subtitle}</p>
+      <h2 className="mt-4 text-3xl font-semibold text-[var(--foreground)]">{title}</h2>
+      <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{subtitle}</p>
     </div>
   );
 }
@@ -1478,11 +1478,11 @@ function StepTitle({ icon: Icon, title, subtitle }: { icon: typeof Car; title: s
 function ChoiceGrid({ label, options, value, onChange }: { label: string; options: Array<{ value: string; label: string }>; value: string; onChange: (value: string) => void }) {
   return (
     <div>
-      <p className="mb-2 text-sm font-black">{label}</p>
+      <p className="mb-2 text-sm font-semibold">{label}</p>
       <div className="grid gap-2 sm:grid-cols-2">
         {options.map((option) => (
           <button
-            className={`pressable min-h-12 rounded-lg border px-4 py-3 text-left text-sm font-black ${value === option.value ? "border-[#0f766e] bg-[#e6fffb] text-[#0f766e]" : "border-[#cfe2de] bg-white text-[#344054]"}`}
+            className={`pressable min-h-12 rounded-lg border px-4 py-3 text-left text-sm font-semibold ${value === option.value ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
             key={option.value}
             onClick={() => onChange(option.value)}
             type="button"
@@ -1682,10 +1682,10 @@ function VehicleFields({
 
   return (
     <div className="mt-6 space-y-3">
-      <div className="rounded-lg border border-[#cfe2de] bg-[#f8fffd] p-3">
+      <div className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <label>
-            <span className="text-sm font-black">{labels.category}</span>
+            <span className="text-sm font-semibold">{labels.category}</span>
             <select
               className={fieldClass}
               onChange={(event) => {
@@ -1708,10 +1708,10 @@ function VehicleFields({
           </label>
           <TextField label={labels.vin} name="vin" value={fields.vin} onChange={onChange} />
           <div>
-            <span className="text-sm font-black">{labels.make}</span>
+            <span className="text-sm font-semibold">{labels.make}</span>
             <div className="relative mt-2">
               <button
-                className="pressable flex min-h-12 w-full items-center justify-between gap-3 rounded-lg border border-[#cfe2de] bg-white px-4 py-3 text-left text-[#10252b] outline-none focus:border-[#0f766e] focus:ring-2 focus:ring-[#0f766e]/15"
+                className="pressable flex min-h-12 w-full items-center justify-between gap-3 rounded-lg border border-[var(--border)] bg-white px-4 py-3 text-left text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
                 onClick={() => setMakeDropdownOpen((open) => !open)}
                 type="button"
               >
@@ -1722,23 +1722,23 @@ function VehicleFields({
                       return selected?.logo_url ? (
                         <img alt="" className="h-7 w-7 shrink-0 rounded bg-white object-contain" src={selected.logo_url} />
                       ) : (
-                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[#dff9f4] text-xs font-bold text-[#0f766e]">{selected?.name.slice(0, 2) || "?"}</span>
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[var(--primary-light)] text-xs font-bold text-[var(--primary)]">{selected?.name.slice(0, 2) || "?"}</span>
                       );
                     })()
                   ) : (
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[#eef8f6] text-xs font-bold text-[#0f766e]">+</span>
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[#fbfaf8] text-xs font-bold text-[var(--primary)]">+</span>
                   )}
-                  <span className={fields.make ? "truncate font-semibold" : "truncate text-[#98a2b3]"}>
+                  <span className={fields.make ? "truncate font-semibold" : "truncate text-[var(--muted)]"}>
                     {manualMake ? "Other / custom make" : fields.make || (makes.length ? `Select ${selectedCategory?.name || "vehicle"} brand` : "Loading makes...")}
                   </span>
                 </span>
-                <span className="text-[#667085]">v</span>
+                <span className="text-[var(--muted)]">v</span>
               </button>
               {makeDropdownOpen ? (
-                <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-lg border border-[#cfe2de] bg-white shadow-xl shadow-[#10252b]/10">
-                  <div className="border-b border-[#edf2f7] p-3">
+                <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-lg border border-[var(--border)] bg-white shadow-xl shadow-[#10252b]/10">
+                  <div className="border-b border-[var(--border)] p-3">
                     <input
-                      className="w-full rounded-lg border border-[#d6e5e2] bg-white px-3 py-2 text-sm text-[#10252b] outline-none focus:border-[#0f766e] focus:ring-2 focus:ring-[#0f766e]/15"
+                      className="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
                       onChange={(event) => setMakeSearch(event.target.value)}
                       placeholder={`Search ${selectedCategory?.name?.toLowerCase() || "vehicle"} brand`}
                       value={makeSearch}
@@ -1747,7 +1747,7 @@ function VehicleFields({
                   <div className="max-h-72 overflow-y-auto py-1">
                     {searchedMakes.map((make) => (
                       <button
-                        className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm hover:bg-[#eef8f6]"
+                        className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm hover:bg-[#fbfaf8]"
                         key={make.id}
                         onClick={() => handleMakeChange(make.id)}
                         type="button"
@@ -1755,14 +1755,14 @@ function VehicleFields({
                         {make.logo_url ? (
                           <img alt="" className="h-7 w-7 shrink-0 rounded bg-white object-contain" src={make.logo_url} />
                         ) : (
-                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[#dff9f4] text-xs font-bold text-[#0f766e]">{make.name.slice(0, 2)}</span>
+                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[var(--primary-light)] text-xs font-bold text-[var(--primary)]">{make.name.slice(0, 2)}</span>
                         )}
-                        <span className="font-semibold text-[#10252b]">{make.name}</span>
-                        <span className="ml-auto text-xs uppercase text-[#98a2b3]">{make.origin_country || ""}</span>
+                        <span className="font-semibold text-[var(--foreground)]">{make.name}</span>
+                        <span className="ml-auto text-xs uppercase text-[var(--muted)]">{make.origin_country || ""}</span>
                       </button>
                     ))}
                     <button
-                      className="flex w-full items-center gap-3 border-t border-[#edf2f7] px-3 py-2 text-left text-sm font-semibold text-[#0f766e] hover:bg-[#eef8f6]"
+                      className="flex w-full items-center gap-3 border-t border-[var(--border)] px-3 py-2 text-left text-sm font-semibold text-[var(--primary)] hover:bg-[#fbfaf8]"
                       onClick={() => handleMakeChange("__manual__")}
                       type="button"
                     >
@@ -1776,7 +1776,7 @@ function VehicleFields({
           </div>
           <div>
             <label>
-              <span className="text-sm font-black">{labels.model}</span>
+              <span className="text-sm font-semibold">{labels.model}</span>
               <select className={fieldClass} disabled={!selectedMakeId && !manualMake} onChange={(event) => handleModelChange(event.target.value)} value={manualModel ? "__manual__" : (models.find((model) => normalizeCatalogMatch(model.name) === normalizeCatalogMatch(fields.model))?.id || "")}>
                 <option value="">{selectedMakeId ? "Select model" : "Select make first"}</option>
                 {models.map((model) => <option key={model.id} value={model.id}>{model.name}</option>)}
@@ -1786,7 +1786,7 @@ function VehicleFields({
             {manualModel || manualMake ? <TextField label="" name="model" required value={fields.model} onChange={onChange} placeholder="Model" /> : null}
           </div>
           <label>
-            <span className="text-sm font-black">{labels.year}</span>
+            <span className="text-sm font-semibold">{labels.year}</span>
             {yearOptions.length > 0 ? (
               <select className={fieldClass} onChange={(event) => onChange({ year: event.target.value, trim: "" })} value={fields.year}>
                 <option value="">Select year</option>
@@ -1798,7 +1798,7 @@ function VehicleFields({
           </label>
           <div>
             <label>
-              <span className="text-sm font-black">{labels.trim}</span>
+              <span className="text-sm font-semibold">{labels.trim}</span>
               {visibleTrims.length > 0 ? (
                 <select className={fieldClass} onChange={(event) => handleTrimChange(event.target.value)} value={manualTrim ? "__manual__" : selectedTrimId}>
                   <option value="">Select trim</option>
@@ -1827,13 +1827,13 @@ function VehicleFields({
       </div>
 
       <div className="rounded-lg border border-[#fde7c3] bg-[#fffbeb] p-3">
-        <span className="text-sm font-black">{labels.rate}</span>
+        <span className="text-sm font-semibold">{labels.rate}</span>
         <div className="mt-2 grid gap-2 sm:grid-cols-[1fr_1fr_1fr_112px]">
           <CompactRateField label={labels.dailyShort} name="dailyRate" value={fields.dailyRate} onChange={onChange} />
           <CompactRateField label={labels.weeklyShort} name="weeklyRate" value={fields.weeklyRate} onChange={onChange} />
           <CompactRateField label={labels.monthlyShort} name="monthlyRate" value={fields.monthlyRate} onChange={onChange} />
           <label>
-            <span className="text-xs font-black text-[#667085]">{labels.currency}</span>
+            <span className="text-xs font-semibold text-[var(--muted)]">{labels.currency}</span>
             <select className={`${fieldClass} mt-1`} onChange={(event) => onChange({ currency: event.target.value })} value={fields.currency}>
               {currencyOptionsForCountry(selectedCountry).map((currency) => <option key={currency} value={currency}>{currency}</option>)}
             </select>
@@ -1881,7 +1881,7 @@ function DateField({
 
   return (
     <label>
-      <span className="text-sm font-black">{label}</span>
+      <span className="text-sm font-semibold">{label}</span>
       <div className="relative mt-2">
         <input
           className={`${fieldClass} mt-0 pr-12`}
@@ -1891,7 +1891,7 @@ function DateField({
         />
         <button
           aria-label={`Choose ${label}`}
-          className="pressable absolute right-2 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-lg bg-[#e6fffb] text-[#0f766e]"
+          className="pressable absolute right-2 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-lg bg-[var(--primary-light)] text-[var(--primary)]"
           onClick={openPicker}
           type="button"
         >
@@ -1914,7 +1914,7 @@ function DateField({
 function CompactRateField({ label, name, onChange, value }: { label: string; name: string; onChange: (updates: any) => void; value: string }) {
   return (
     <label>
-      <span className="text-xs font-black text-[#667085]">{label}</span>
+      <span className="text-xs font-semibold text-[var(--muted)]">{label}</span>
       <input
         className={`${fieldClass} mt-1`}
         inputMode="decimal"
@@ -1945,7 +1945,7 @@ function TextField({
 }) {
   return (
     <label>
-      {label ? <span className="text-sm font-black">{label}</span> : null}
+      {label ? <span className="text-sm font-semibold">{label}</span> : null}
       <input className={fieldClass} onChange={(event) => onChange({ [name]: event.target.value })} placeholder={placeholder} required={required} type={type} value={value} />
     </label>
   );
@@ -1973,11 +1973,11 @@ function FooterActions({
       {error ? <p className="mb-3 rounded-lg bg-[#ffe4e6] p-3 text-sm font-bold text-[#be123c]">{error}</p> : null}
       <div className="flex flex-col gap-3 sm:flex-row">
         {onSecondary && secondaryLabel ? (
-          <button className="pressable min-h-12 rounded-lg border border-[#cfe2de] bg-white px-5 py-3 text-sm font-black text-[#344054]" disabled={pending} onClick={onSecondary} type="button">
+          <button className="pressable min-h-12 rounded-lg border border-[var(--border)] bg-white px-5 py-3 text-sm font-semibold text-[var(--foreground-secondary)]" disabled={pending} onClick={onSecondary} type="button">
             {secondaryLabel}
           </button>
         ) : null}
-        <button className="pressable min-h-12 flex-1 rounded-lg bg-[#0f766e] px-5 py-3 text-sm font-black text-white disabled:opacity-70" disabled={pending} onClick={onPrimary} type="button">
+        <button className="pressable min-h-12 flex-1 rounded-lg bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white disabled:opacity-70" disabled={pending} onClick={onPrimary} type="button">
           {pending ? savingLabel : primaryLabel}
         </button>
       </div>

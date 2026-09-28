@@ -57,7 +57,7 @@ export default async function NewVehiclePage() {
           </Link>
           <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <h1 className="text-2xl font-black tracking-[-0.03em] text-[var(--foreground)] sm:text-3xl">Add vehicle</h1>
+              <h1 className="text-2xl font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-3xl">Add vehicle</h1>
               <p className="mt-1 text-sm font-medium text-[var(--muted)]">Add a car, motorbike or van. Only the make, model and registration are needed now; fill in the rest any time.</p>
             </div>
             <Link className="pressable inline-flex justify-center rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm font-bold text-[var(--foreground-secondary)] hover:border-[var(--primary-blue)] hover:text-[var(--primary-blue)]" href="/fleet/import">
@@ -77,19 +77,19 @@ export default async function NewVehiclePage() {
               <SectionHeader eyebrow="Acquisition" title="Mileage and value" />
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Current mileage</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Current mileage</span>
                   <input className={`${inputClass} font-mono-data`} min="0" name="mileage" placeholder="0" type="number" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Purchase mileage</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Purchase mileage</span>
                   <input className={`${inputClass} font-mono-data`} min="0" name="purchaseMileage" placeholder="0" type="number" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Purchase price</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Purchase price</span>
                   <MoneyInput currency={organization.currency || "THB"} name="purchasePrice" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Estimated value</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Estimated value</span>
                   <MoneyInput currency={organization.currency || "THB"} name="estimatedValue" />
                 </label>
               </div>
@@ -99,15 +99,15 @@ export default async function NewVehiclePage() {
               <SectionHeader eyebrow="Rental pricing" title="Default rates" />
               <div className="mt-4 grid gap-4 sm:grid-cols-3">
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Daily rate</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Daily rate</span>
                   <MoneyInput currency={organization.currency || "THB"} name="dailyRate" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Weekly rate</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Weekly rate</span>
                   <MoneyInput currency={organization.currency || "THB"} name="weeklyRate" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Monthly rate</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Monthly rate</span>
                   <MoneyInput currency={organization.currency || "THB"} name="monthlyRate" />
                 </label>
               </div>
@@ -117,7 +117,7 @@ export default async function NewVehiclePage() {
               <SectionHeader eyebrow="Location" title="Branch assignment" />
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Home branch</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Home branch</span>
                   <select className={inputClass} defaultValue={defaultBranch?.id} name="homeBranchId">
                     {branches.map((branch) => (
                       <option key={branch.id} value={branch.id}>
@@ -127,7 +127,7 @@ export default async function NewVehiclePage() {
                   </select>
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Service area</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Service area</span>
                   <select className={inputClass} defaultValue="home_branch" name="serviceArea">
                     <option value="home_branch">Home branch only</option>
                     <option value="all_branches">All branches</option>
@@ -142,19 +142,19 @@ export default async function NewVehiclePage() {
               <SectionHeader eyebrow="Finance" title="Loan details" />
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Finance provider</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Finance provider</span>
                   <input className={inputClass} name="financeLender" type="text" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Monthly payment</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Monthly payment</span>
                   <MoneyInput currency={organization.currency || "THB"} name="financeMonthlyPayment" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Outstanding balance</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Outstanding balance</span>
                   <MoneyInput currency={organization.currency || "THB"} name="financeOutstanding" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[#344054]">Finance end date</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Finance end date</span>
                   <LocalizedDateInput calendar={preferredCalendar} inputClass={inputClass} name="financeEndDate" preferredLocale={preferredLocale} />
                 </label>
               </div>
@@ -164,7 +164,7 @@ export default async function NewVehiclePage() {
               <Link className="inline-flex justify-center rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm font-bold text-[var(--foreground-secondary)]" href="/fleet">
                 Cancel
               </Link>
-              <PendingButton className="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-bold text-white shadow-[0_14px_28px_rgba(18,184,200,0.24)] hover:bg-[var(--primary-hover)]" pendingLabel="Saving..." type="submit">
+              <PendingButton className="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-bold text-white shadow-sm hover:bg-[var(--primary-hover)]" pendingLabel="Saving..." type="submit">
                 Save vehicle
               </PendingButton>
             </div>

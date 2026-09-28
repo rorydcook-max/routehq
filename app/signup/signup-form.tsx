@@ -6,7 +6,7 @@ import { signUpWithEmail, type AuthActionState } from "@/app/actions/auth";
 const initialState: AuthActionState = {};
 
 const inputClass =
-  "mt-1 w-full rounded-lg border border-[#d6e5e2] bg-white px-3 py-3 text-base text-[#10252b] outline-none focus:border-[#0f766e] focus:ring-2 focus:ring-[#0f766e]/15";
+  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15";
 
 export function SignupForm() {
   const [state, formAction, pending] = useActionState(signUpWithEmail, initialState);
@@ -15,9 +15,9 @@ export function SignupForm() {
     return (
       <div className="space-y-4">
         <p className="rounded-lg bg-[#ecfdf5] px-3 py-3 text-sm font-semibold text-[#047857]">{state.success}</p>
-        <p className="text-center text-sm text-[#667085]">
+        <p className="text-center text-sm text-[var(--muted)]">
           Already confirmed?{" "}
-          <a className="font-semibold text-[#0f766e]" href="/login">
+          <a className="font-semibold text-[var(--primary)]" href="/login">
             Sign in
           </a>
         </p>
@@ -28,25 +28,25 @@ export function SignupForm() {
   return (
     <form action={formAction} className="space-y-4">
       <label className="block">
-        <span className="text-sm font-semibold text-[#344054]">Business name</span>
+        <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Business name</span>
         <input className={inputClass} name="businessName" type="text" autoComplete="organization" maxLength={120} required />
       </label>
       <label className="block">
-        <span className="text-sm font-semibold text-[#344054]">Your name</span>
+        <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Your name</span>
         <input className={inputClass} name="fullName" type="text" autoComplete="name" required />
       </label>
       <label className="block">
-        <span className="text-sm font-semibold text-[#344054]">Email</span>
+        <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Email</span>
         <input className={inputClass} name="email" type="email" autoComplete="email" required />
       </label>
       <label className="block">
-        <span className="text-sm font-semibold text-[#344054]">Password</span>
+        <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Password</span>
         <input className={inputClass} name="password" type="password" autoComplete="new-password" minLength={8} required />
-        <span className="mt-1 block text-xs text-[#667085]">At least 8 characters.</span>
+        <span className="mt-1 block text-xs text-[var(--muted)]">At least 8 characters.</span>
       </label>
       {state.error ? <p className="rounded-lg bg-[#ffe4e6] px-3 py-2 text-sm font-semibold text-[#be123c]">{state.error}</p> : null}
       <button
-        className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#0f766e] px-4 py-3 font-bold text-white disabled:opacity-60"
+        className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-3 font-bold text-white disabled:opacity-60"
         disabled={pending}
       >
         {pending ? (
@@ -58,9 +58,9 @@ export function SignupForm() {
           "Create account"
         )}
       </button>
-      <p className="text-center text-sm text-[#667085]">
+      <p className="text-center text-sm text-[var(--muted)]">
         Already have an account?{" "}
-        <a className="font-semibold text-[#0f766e]" href="/login">
+        <a className="font-semibold text-[var(--primary)]" href="/login">
           Sign in
         </a>
       </p>

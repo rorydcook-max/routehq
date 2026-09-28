@@ -26,8 +26,8 @@ export default async function CalendarPage({
     <AppShell userEmail={userEmail}>
       <div className="page-hero mb-5">
         <p className="page-eyebrow">Calendar</p>
-        <h1 className="page-title">Scheduling</h1>
-        <p className="page-subtitle mt-2">Deliveries, returns, reminders, and maintenance on one month view.</p>
+        <h1 className="page-title">Calendar</h1>
+        <p className="page-subtitle mt-1">Handovers, returns, payments and renewals by day.</p>
       </div>
 
       <CalendarView events={events} initialMonth={month} today={today} />
@@ -37,7 +37,7 @@ export default async function CalendarPage({
       <section>
         <div className="mb-4">
           <p className="page-eyebrow">Tasks</p>
-          <h2 className="text-2xl font-black tracking-[-0.03em] text-[var(--foreground)]">To do</h2>
+          <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[var(--foreground)]">To do</h2>
         </div>
         <TasksList organizationId={organization.id} tasks={tasks} today={today} />
       </section>

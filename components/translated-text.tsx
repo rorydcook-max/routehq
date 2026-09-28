@@ -19,11 +19,11 @@ export async function TranslatedText({ value, className }: { value: ReadableText
   return (
     <div className={className}>
       <p>{value.text}</p>
-      <details className="mt-1 text-xs text-[#667085]">
+      <details className="mt-1 text-xs text-[var(--muted)]">
         <summary className="cursor-pointer select-none font-semibold">
           {t("translatedFrom", { language })} · {t("showOriginal")}
         </summary>
-        <p className="mt-1 whitespace-pre-wrap text-[#475467]" lang={value.sourceLanguage || undefined}>
+        <p className="mt-1 whitespace-pre-wrap text-[var(--foreground-secondary)]" lang={value.sourceLanguage || undefined}>
           {value.original}
         </p>
       </details>

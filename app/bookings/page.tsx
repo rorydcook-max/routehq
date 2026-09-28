@@ -15,8 +15,8 @@ export default async function BookingsPage() {
       <div className="page-hero mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="page-eyebrow">Bookings</p>
-          <h1 className="page-title">Rental bookings</h1>
-          <p className="page-subtitle mt-2">Track booking links, customer completion, payments, inspections, and rental status.</p>
+          <h1 className="page-title">Bookings</h1>
+          <p className="page-subtitle mt-1">Every rental, from booking link to return.</p>
         </div>
         <Link className="primary-action pressable" href="/bookings/new">
           <Plus size={18} />

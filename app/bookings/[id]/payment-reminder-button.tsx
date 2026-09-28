@@ -22,7 +22,7 @@ export function PaymentReminderButton({ rentalId }: { rentalId: string }) {
   return (
     <div className="flex flex-col gap-2">
       <button
-        className="pressable inline-flex min-h-9 w-full items-center justify-center gap-2 rounded-xl border border-[#0f766e] bg-white px-3 py-2 text-sm font-bold text-[#0f766e] hover:bg-[#f0fdf4]"
+        className="pressable inline-flex min-h-9 w-full items-center justify-center gap-2 rounded-xl border border-[var(--primary)] bg-white px-3 py-2 text-sm font-bold text-[var(--primary)] hover:bg-[#f0fdf4]"
         disabled={isPending}
         onClick={handleClick}
         type="button"

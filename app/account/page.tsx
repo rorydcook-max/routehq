@@ -10,7 +10,7 @@ import { supportedLocaleOptions } from "@/lib/i18n/locales";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const inputClass =
-  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2.5 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(18,184,200,0.16)]";
+  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2.5 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]";
 
 /**
  * Personal settings for whoever is signed in, whatever their role. Nothing on
@@ -46,7 +46,7 @@ export default async function AccountPage() {
         <Card>
           <SectionHeader eyebrow="Language" title="Language and dates" />
           <div className="card-section">
-            <p className="text-xs text-[#667085]">
+            <p className="text-xs text-[var(--muted)]">
               Only affects what you see. Other people in your business keep their own settings.
             </p>
             {/* Keyed by the saved values so the form shows them after a save (React resets forms to their first defaults). */}
@@ -86,11 +86,11 @@ export default async function AccountPage() {
           <SectionHeader eyebrow="Sign-in" title="Account details" />
           <div className="card-section space-y-2 text-sm">
             <p>
-              <span className="text-[#667085]">Email: </span>
+              <span className="text-[var(--muted)]">Email: </span>
               {membership.email}
             </p>
             <p>
-              <span className="text-[#667085]">Role: </span>
+              <span className="text-[var(--muted)]">Role: </span>
               {roleLabel}
             </p>
             <p className="pt-1">

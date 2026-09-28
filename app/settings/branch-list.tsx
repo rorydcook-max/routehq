@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui";
 import type { Branch } from "@/lib/branches";
 
 const inputClass =
-  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(18,184,200,0.16)]";
+  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]";
 
 function EditIcon() {
   return (
@@ -43,7 +43,7 @@ export function BranchList({ branches, organizationId }: { branches: Branch[]; o
       </div>
 
       {isAddingBranch ? (
-        <form action={createBranch} className="grid gap-3 rounded-lg border border-[#dfe4ea] bg-[#fbfefd] p-3 sm:grid-cols-2">
+        <form action={createBranch} className="grid gap-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3 sm:grid-cols-2">
           <input name="organizationId" type="hidden" value={organizationId} />
           <label className="block">
             <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Branch name</span>
@@ -98,7 +98,7 @@ export function BranchList({ branches, organizationId }: { branches: Branch[]; o
                 <button
                   aria-expanded={isEditing}
                   aria-label={`Edit ${branch.name}`}
-                  className="pressable flex h-9 w-9 items-center justify-center rounded-lg border border-[#dfe4ea] bg-white text-[#0e7490] shadow-sm transition hover:border-[#0e7490] hover:bg-[#ecfeff]"
+                  className="pressable flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--border)] bg-white text-[var(--primary)] shadow-sm transition hover:border-[var(--primary)] hover:bg-[var(--primary-light)]"
                   onClick={() => setEditingBranchId(isEditing ? null : branch.id)}
                   title="Edit branch"
                   type="button"
@@ -127,7 +127,7 @@ export function BranchList({ branches, organizationId }: { branches: Branch[]; o
             </div>
 
             {isEditing ? (
-              <form action={updateBranch} className="mx-[14px] mb-3 grid gap-3 rounded-lg border border-[#dfe4ea] bg-[#fbfefd] p-3 sm:grid-cols-2">
+              <form action={updateBranch} className="mx-[14px] mb-3 grid gap-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3 sm:grid-cols-2">
                 <input name="organizationId" type="hidden" value={organizationId} />
                 <input name="branchId" type="hidden" value={branch.id} />
                 <label className="block">
@@ -154,7 +154,7 @@ export function BranchList({ branches, organizationId }: { branches: Branch[]; o
                   <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Longitude</span>
                   <input className={inputClass} defaultValue={branch.longitude ?? ""} name="longitude" step="any" type="number" />
                 </label>
-                <label className="checkbox-label rounded-lg border border-[#dfe4ea] bg-white px-3 py-2 font-semibold text-[#344054]">
+                <label className="checkbox-label rounded-lg border border-[var(--border)] bg-white px-3 py-2 font-semibold text-[var(--foreground-secondary)]">
                   <input className="flex-shrink-0" defaultChecked={branch.is_active} name="isActive" type="checkbox" />
                   <span>Active branch</span>
                 </label>

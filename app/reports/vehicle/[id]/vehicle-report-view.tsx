@@ -44,14 +44,14 @@ function money(value: number) {
 }
 
 function fmtDate(value: string) {
-  return new Intl.DateTimeFormat("en-TH", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(value));
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
 }
 
 function KpiCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div className="content-section">
       <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">{label}</p>
-      <p className="mt-1 text-2xl font-black text-[var(--foreground)]">{value}</p>
+      <p className="mt-1 text-2xl font-semibold text-[var(--foreground)]">{value}</p>
       {sub && <p className="mt-0.5 text-xs text-[var(--muted)]">{sub}</p>}
     </div>
   );
@@ -87,7 +87,7 @@ export function VehicleReportView({ data }: { data: VehicleReportData }) {
         <div className="flex flex-wrap gap-2">
           {PRESETS.map((p) => (
             <button
-              className={`pressable min-h-9 rounded-xl border px-3 py-1.5 text-sm font-black ${currentPreset === p.value && !isCustom ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
+              className={`pressable min-h-9 rounded-xl border px-3 py-1.5 text-sm font-semibold ${currentPreset === p.value && !isCustom ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
               key={p.value}
               onClick={() => applyPreset(p.value)}
               type="button"
@@ -96,7 +96,7 @@ export function VehicleReportView({ data }: { data: VehicleReportData }) {
             </button>
           ))}
           <button
-            className={`pressable min-h-9 rounded-xl border px-3 py-1.5 text-sm font-black ${isCustom ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
+            className={`pressable min-h-9 rounded-xl border px-3 py-1.5 text-sm font-semibold ${isCustom ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
             onClick={() => applyPreset("custom")}
             type="button"
           >
@@ -118,7 +118,7 @@ export function VehicleReportView({ data }: { data: VehicleReportData }) {
               type="date"
             />
             <button
-              className="pressable rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-black text-white"
+              className="pressable rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white"
               onClick={() => {
                 const f = (document.getElementById("from-date") as HTMLInputElement)?.value;
                 const t = (document.getElementById("to-date") as HTMLInputElement)?.value;
@@ -212,19 +212,19 @@ export function VehicleReportView({ data }: { data: VehicleReportData }) {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Daily Rate</p>
-            <p className="mt-1 font-black text-[var(--foreground)]">{vehicle.dailyRate > 0 ? money(vehicle.dailyRate) : "—"}</p>
+            <p className="mt-1 font-semibold text-[var(--foreground)]">{vehicle.dailyRate > 0 ? money(vehicle.dailyRate) : "—"}</p>
           </div>
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Purchase Price</p>
-            <p className="mt-1 font-black text-[var(--foreground)]">{vehicle.purchasePrice > 0 ? money(vehicle.purchasePrice) : "—"}</p>
+            <p className="mt-1 font-semibold text-[var(--foreground)]">{vehicle.purchasePrice > 0 ? money(vehicle.purchasePrice) : "—"}</p>
           </div>
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Est. Current Value</p>
-            <p className="mt-1 font-black text-[var(--foreground)]">{vehicle.estimatedValue > 0 ? money(vehicle.estimatedValue) : "—"}</p>
+            <p className="mt-1 font-semibold text-[var(--foreground)]">{vehicle.estimatedValue > 0 ? money(vehicle.estimatedValue) : "—"}</p>
           </div>
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Depreciation</p>
-            <p className={`mt-1 font-black ${depreciation > 0 ? "text-red-600" : "text-[var(--foreground)]"}`}>
+            <p className={`mt-1 font-semibold ${depreciation > 0 ? "text-red-600" : "text-[var(--foreground)]"}`}>
               {depreciation > 0 ? `-${money(depreciation)}` : "—"}
             </p>
           </div>
@@ -334,7 +334,7 @@ export function VehicleReportView({ data }: { data: VehicleReportData }) {
                     <td className="py-2.5 pr-3 text-[var(--foreground-secondary)]">{fmtDate(tx.date)}</td>
                     <td className="py-2.5 pr-3 font-semibold text-[var(--foreground)]">{tx.typeLabel}</td>
                     <td className="py-2.5 pr-3 text-[var(--foreground-secondary)]">{tx.notes || tx.supplier || "—"}</td>
-                    <td className={`py-2.5 text-right font-black tabular-nums ${tx.isIncome ? "text-emerald-600" : "text-[var(--foreground)]"}`}>
+                    <td className={`py-2.5 text-right font-semibold tabular-nums ${tx.isIncome ? "text-emerald-600" : "text-[var(--foreground)]"}`}>
                       {tx.isIncome ? "+" : "-"}
                       {money(tx.amount)}
                     </td>

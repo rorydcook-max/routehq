@@ -20,7 +20,7 @@ const dismissKey = "routehq_trial_banner_dismissed_until";
 function toneForDays(days: number | null | undefined) {
   if (days === null || days === undefined || days > 7) {
     return {
-      className: "border-[#a7edf4] bg-[var(--primary-light)] text-[#087887]",
+      className: "border-[#bfe0db] bg-[var(--primary-light)] text-[#087887]",
       dot: "bg-[var(--primary)]",
       button: "bg-[var(--primary)] text-white"
     };

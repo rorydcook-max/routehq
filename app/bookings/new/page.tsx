@@ -86,13 +86,13 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
 
         {signingGaps.length ? (
           <div className="mb-4 rounded-xl border border-[#fbbf24] bg-[#fffbeb] p-4 text-sm text-[#92400e]" role="alert">
-            <p className="font-black">Customers can&apos;t sign online yet</p>
+            <p className="font-semibold">Customers can&apos;t sign online yet</p>
             <p className="mt-1 leading-6">
               Your business signs each agreement automatically when a customer completes their booking link. Before that can
               happen, add {signingGaps.join(", ")} in Settings. You can still create bookings; customers will be stopped at the
               signing step until this is done.
             </p>
-            <Link className="mt-2 inline-flex font-black text-[#0f766e] underline" href="/settings">
+            <Link className="mt-2 inline-flex font-semibold text-[var(--primary)] underline" href="/settings">
               Go to Settings
             </Link>
           </div>
@@ -101,7 +101,7 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
         {normalizedVehicles.length === 0 ? (
           <Card>
             <SectionHeader eyebrow="No vehicles" title="Add a vehicle before creating bookings" />
-            <p className="mt-3 text-sm leading-6 text-[#667085]">Bookings need a vehicle record so RouteHQ can connect rental dates, inspections, payments, and profitability to the right asset.</p>
+            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">Bookings need a vehicle record so RouteHQ can connect rental dates, inspections, payments, and profitability to the right asset.</p>
             <Link className="primary-action pressable mt-5" href="/fleet/new">
               Add vehicle
             </Link>

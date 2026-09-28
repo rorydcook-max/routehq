@@ -251,7 +251,7 @@ export function CancelBookingButton({
         className={
           compact
             ? "pressable inline-flex min-h-8 items-center justify-center gap-1.5 rounded-md border border-[#fecdd3] bg-[#fff7f7] px-3 py-1.5 text-[12px] font-semibold text-[#be123c]"
-            : "pressable inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border border-[#fecdd3] bg-[#fff1f2] px-3 py-2 text-sm font-black text-[#be123c]"
+            : "pressable inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border border-[#fecdd3] bg-[#fff1f2] px-3 py-2 text-sm font-semibold text-[#be123c]"
         }
         onClick={() => setOpen(true)}
         type="button"
@@ -269,11 +269,11 @@ export function CancelBookingButton({
                 <AlertTriangle size={18} />
               </div>
               <div className="flex-1">
-                <p className="text-xs font-black uppercase text-[#be123c]">Cancel booking</p>
-                <h3 className="text-lg font-black text-[#10252b]">
+                <p className="text-xs font-semibold uppercase text-[#be123c]">Cancel booking</p>
+                <h3 className="text-lg font-semibold text-[var(--foreground)]">
                   {customerName ? `Booking for ${customerName}` : "Booking with no customer yet"}
                 </h3>
-                <div className="mt-1 flex gap-3 text-xs text-[#667085]">
+                <div className="mt-1 flex gap-3 text-xs text-[var(--muted)]">
                   {hasPayment && <span>Paid: {money(totalPaid, currency)}</span>}
                   {hasDeposit && <span>Deposit held: {money(depositHeld, currency)}</span>}
                   {!hasPayment && !hasDeposit && <span>No payment recorded</span>}
@@ -293,8 +293,8 @@ export function CancelBookingButton({
               {step === "reason" && (
                 <>
                   <div>
-                    <p className="text-sm font-black text-[#10252b] mb-1">Why is this booking being cancelled?</p>
-                    <p className="text-xs text-[#667085] mb-3">Select all that apply.</p>
+                    <p className="text-sm font-semibold text-[var(--foreground)] mb-1">Why is this booking being cancelled?</p>
+                    <p className="text-xs text-[var(--muted)] mb-3">Select all that apply.</p>
                     <div className="space-y-2">
                       {REASONS.map(r => (
                         <button
@@ -303,7 +303,7 @@ export function CancelBookingButton({
                           className={`block w-full cursor-pointer rounded-xl border p-3 text-left transition-colors ${
                             reasons.includes(r.value)
                               ? "border-[#be123c] bg-[#fff1f2] ring-1 ring-[#be123c]/20"
-                              : "border-[#e2e8f0] bg-white hover:border-[#fecdd3]"
+                              : "border-[var(--border)] bg-white hover:border-[#fecdd3]"
                           }`}
                           onClick={() => {
                             setReasons(prev =>
@@ -315,16 +315,16 @@ export function CancelBookingButton({
                           }}
                           type="button"
                         >
-                          <span className="block text-sm font-bold text-[#10252b]">{r.label}</span>
-                          <span className="mt-0.5 block text-xs leading-5 text-[#667085]">{r.detail}</span>
+                          <span className="block text-sm font-bold text-[var(--foreground)]">{r.label}</span>
+                          <span className="mt-0.5 block text-xs leading-5 text-[var(--muted)]">{r.detail}</span>
                         </button>
                       ))}
                     </div>
                   </div>
                   <label className="block">
-                    <span className="text-xs font-bold text-[#475569]">Notes (optional)</span>
+                    <span className="text-xs font-bold text-[var(--foreground-secondary)]">Notes (optional)</span>
                     <textarea
-                      className="mt-1 w-full rounded-xl border border-[#e2e8f0] bg-white px-3 py-2 text-sm text-[#10252b] outline-none focus:border-[#be123c] focus:ring-2 focus:ring-[#be123c]/10"
+                      className="mt-1 w-full rounded-xl border border-[var(--border)] bg-white px-3 py-2 text-sm text-[var(--foreground)] outline-none focus:border-[#be123c] focus:ring-2 focus:ring-[#be123c]/10"
                       onChange={e => setNotes(e.target.value)}
                       placeholder="Any additional context about this cancellation..."
                       rows={2}
@@ -333,24 +333,24 @@ export function CancelBookingButton({
                   </label>
                   <div className="grid gap-3 sm:grid-cols-2">
                     <label className="block">
-                      <span className="text-xs font-bold text-[#475569]">Cancellation date &amp; time</span>
-                      <p className="mb-1 text-[11px] text-[#667085]">
+                      <span className="text-xs font-bold text-[var(--foreground-secondary)]">Cancellation date &amp; time</span>
+                      <p className="mb-1 text-[11px] text-[var(--muted)]">
                         Leave blank to use current time. Set if recording retrospectively.
                       </p>
                       <input
-                        className="mt-1 w-full rounded-lg border border-[#e2e8f0] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
+                        className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
                         onChange={(event) => setCancelledAt(event.target.value)}
                         type="datetime-local"
                         value={cancelledAt}
                       />
                     </label>
                     <label className="block">
-                      <span className="text-xs font-bold text-[#475569]">Vehicle collection date &amp; time</span>
-                      <p className="mb-1 text-[11px] text-[#667085]">
+                      <span className="text-xs font-bold text-[var(--foreground-secondary)]">Vehicle collection date &amp; time</span>
+                      <p className="mb-1 text-[11px] text-[var(--muted)]">
                         When was or will the vehicle be collected back?
                       </p>
                       <input
-                        className="mt-1 w-full rounded-lg border border-[#e2e8f0] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
+                        className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
                         onChange={(event) => setCollectionDatetime(event.target.value)}
                         type="datetime-local"
                         value={collectionDatetime}
@@ -362,8 +362,8 @@ export function CancelBookingButton({
 
               {step === "disposition" && (
                 <div>
-                  <p className="text-sm font-black text-[#10252b] mb-1">How should payments be handled?</p>
-                  <p className="text-xs text-[#667085] mb-3">
+                  <p className="text-sm font-semibold text-[var(--foreground)] mb-1">How should payments be handled?</p>
+                  <p className="text-xs text-[var(--muted)] mb-3">
                     This records the financial outcome. Actual refund transfers happen outside RouteHQ — this just updates the records.
                   </p>
                   <div className="space-y-2">
@@ -373,7 +373,7 @@ export function CancelBookingButton({
                         className={`rounded-xl border transition-colors ${
                           refundOption === opt.value
                             ? "border-[#be123c] bg-[#fff1f2] ring-1 ring-[#be123c]/20"
-                            : "border-[#e2e8f0] bg-white hover:border-[#fecdd3]"
+                            : "border-[var(--border)] bg-white hover:border-[#fecdd3]"
                         }`}
                       >
                         <button
@@ -385,15 +385,15 @@ export function CancelBookingButton({
                           }}
                           type="button"
                         >
-                          <span className="block text-sm font-bold text-[#10252b]">{opt.label}</span>
-                          <span className="mt-0.5 block text-xs leading-5 text-[#667085]">{opt.detail}</span>
+                          <span className="block text-sm font-bold text-[var(--foreground)]">{opt.label}</span>
+                          <span className="mt-0.5 block text-xs leading-5 text-[var(--muted)]">{opt.detail}</span>
                         </button>
                         {refundOption === opt.value && opt.value.startsWith("partial_refund") ? (
                           <div className="grid gap-2 border-t border-[#fecdd3] px-3 pb-3 pt-3 sm:grid-cols-2">
                             <label className="block">
-                              <span className="text-xs font-bold text-[#475569]">Refund amount ({currency})</span>
+                              <span className="text-xs font-bold text-[var(--foreground-secondary)]">Refund amount ({currency})</span>
                               <input
-                                className="mt-1 w-full rounded-lg border border-[#e2e8f0] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
+                                className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
                                 max={totalPaid}
                                 min="0"
                                 onChange={e => setPartialRefundAmount(e.target.value)}
@@ -405,9 +405,9 @@ export function CancelBookingButton({
                             </label>
                             {opt.value === "partial_refund_deposit_retained" && hasDeposit ? (
                               <label className="block">
-                                <span className="text-xs font-bold text-[#475569]">Deposit returned ({currency})</span>
+                                <span className="text-xs font-bold text-[var(--foreground-secondary)]">Deposit returned ({currency})</span>
                                 <input
-                                  className="mt-1 w-full rounded-lg border border-[#e2e8f0] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
+                                  className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
                                   max={depositHeld}
                                   min="0"
                                   onChange={e => setPartialDepositReturn(e.target.value)}
@@ -428,8 +428,8 @@ export function CancelBookingButton({
 
               {step === "vehicle" && (
                 <div>
-                  <p className="mb-1 text-sm font-black text-[#10252b]">What is the vehicle&apos;s status after this cancellation?</p>
-                  <p className="mb-3 text-xs text-[#667085]">This updates the vehicle&apos;s availability in your fleet.</p>
+                  <p className="mb-1 text-sm font-semibold text-[var(--foreground)]">What is the vehicle&apos;s status after this cancellation?</p>
+                  <p className="mb-3 text-xs text-[var(--muted)]">This updates the vehicle&apos;s availability in your fleet.</p>
                   <div className="space-y-2">
                     {([
                       {
@@ -452,7 +452,7 @@ export function CancelBookingButton({
                         className={`rounded-xl border transition-colors ${
                           vehicleDisposition === option.value
                             ? "border-[#be123c] bg-[#fff1f2] ring-1 ring-[#be123c]/20"
-                            : "border-[#e2e8f0] bg-white hover:border-[#fecdd3]"
+                            : "border-[var(--border)] bg-white hover:border-[#fecdd3]"
                         }`}
                         key={option.value}
                       >
@@ -462,25 +462,25 @@ export function CancelBookingButton({
                           onClick={() => setVehicleDisposition(option.value)}
                           type="button"
                         >
-                          <span className="block text-sm font-bold text-[#10252b]">{option.label}</span>
-                          <span className="mt-0.5 block text-xs leading-5 text-[#667085]">{option.detail}</span>
+                          <span className="block text-sm font-bold text-[var(--foreground)]">{option.label}</span>
+                          <span className="mt-0.5 block text-xs leading-5 text-[var(--muted)]">{option.detail}</span>
                         </button>
 
                         {vehicleDisposition === "repair" && option.value === "repair" ? (
                           <div className="grid gap-2 border-t border-[#fecdd3] px-3 pb-3 pt-3 sm:grid-cols-2">
                             <label className="block">
-                              <span className="text-xs font-bold text-[#475569]">Expected back</span>
+                              <span className="text-xs font-bold text-[var(--foreground-secondary)]">Expected back</span>
                               <input
-                                className="mt-1 w-full rounded-lg border border-[#e2e8f0] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
+                                className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
                                 onChange={(event) => setRepairExpectedEnd(event.target.value)}
                                 type="datetime-local"
                                 value={repairExpectedEnd}
                               />
                             </label>
                             <label className="block">
-                              <span className="text-xs font-bold text-[#475569]">Repair notes</span>
+                              <span className="text-xs font-bold text-[var(--foreground-secondary)]">Repair notes</span>
                               <input
-                                className="mt-1 w-full rounded-lg border border-[#e2e8f0] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
+                                className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
                                 onChange={(event) => setRepairNotes(event.target.value)}
                                 placeholder="e.g. Gearbox replacement"
                                 type="text"
@@ -497,21 +497,21 @@ export function CancelBookingButton({
 
               {step === "confirm" && (
                 <div className="space-y-3">
-                  <div className="rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-3 space-y-2">
-                    <p className="text-xs font-black uppercase text-[#667085]">Reason</p>
+                  <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-3 space-y-2">
+                    <p className="text-xs font-semibold uppercase text-[var(--muted)]">Reason</p>
                     <ul className="space-y-0.5">
                       {selectedReasons.map(r => (
-                        <li className="text-sm font-bold text-[#10252b]" key={r.value}>• {r.label}</li>
+                        <li className="text-sm font-bold text-[var(--foreground)]" key={r.value}>• {r.label}</li>
                       ))}
                     </ul>
-                    {notes && <p className="text-xs text-[#667085]">"{notes}"</p>}
+                    {notes && <p className="text-xs text-[var(--muted)]">"{notes}"</p>}
                   </div>
                   {dispositionSummary().length > 0 && (
-                    <div className="rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-3">
-                      <p className="text-xs font-black uppercase text-[#667085] mb-2">What will happen</p>
+                    <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-3">
+                      <p className="text-xs font-semibold uppercase text-[var(--muted)] mb-2">What will happen</p>
                       <ul className="space-y-1">
                         {dispositionSummary().map((line, i) => (
-                          <li className="flex items-start gap-2 text-sm text-[#10252b]" key={i}>
+                          <li className="flex items-start gap-2 text-sm text-[var(--foreground)]" key={i}>
                             <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#be123c]" />
                             {line}
                           </li>
@@ -534,7 +534,7 @@ export function CancelBookingButton({
               <div className="flex gap-2 pt-1">
                 {step !== "reason" && (
                   <button
-                    className="pressable inline-flex min-h-10 flex-1 items-center justify-center rounded-xl border border-[#e2e8f0] bg-white px-4 text-sm font-bold text-[#475569]"
+                    className="pressable inline-flex min-h-10 flex-1 items-center justify-center rounded-xl border border-[var(--border)] bg-white px-4 text-sm font-bold text-[var(--foreground-secondary)]"
                     disabled={isPending}
                     onClick={() => {
                       setError("");
@@ -548,7 +548,7 @@ export function CancelBookingButton({
                   </button>
                 )}
                 <button
-                  className="pressable inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl border border-[#e2e8f0] bg-white px-4 text-sm font-bold text-[#475569]"
+                  className="pressable inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-white px-4 text-sm font-bold text-[var(--foreground-secondary)]"
                   disabled={isPending}
                   onClick={reset}
                   type="button"
@@ -557,7 +557,7 @@ export function CancelBookingButton({
                 </button>
                 {step === "confirm" ? (
                   <button
-                    className="pressable inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-[#be123c] px-4 text-sm font-black text-white disabled:opacity-70"
+                    className="pressable inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-[#be123c] px-4 text-sm font-semibold text-white disabled:opacity-70"
                     disabled={isPending}
                     onClick={submit}
                     type="button"
@@ -570,7 +570,7 @@ export function CancelBookingButton({
                   </button>
                 ) : (
                   <button
-                    className="pressable inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-[#be123c] px-4 text-sm font-black text-white"
+                    className="pressable inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-[#be123c] px-4 text-sm font-semibold text-white"
                     onClick={
                       step === "reason"
                         ? handleReasonNext

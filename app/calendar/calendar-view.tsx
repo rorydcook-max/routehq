@@ -80,7 +80,7 @@ export function CalendarView({ events, initialMonth, today }: { events: Calendar
           <ChevronLeft size={18} />
         </button>
         <div className="flex items-center gap-2">
-          <h2 className="text-lg font-black text-[var(--foreground)]">{monthLabel(month)}</h2>
+          <h2 className="text-lg font-semibold text-[var(--foreground)]">{monthLabel(month)}</h2>
           {!isCurrentMonth ? (
             <button className="rounded-full border border-[var(--border)] px-2.5 py-1 text-xs font-bold text-[var(--primary)]" onClick={() => router.push(`/calendar?month=${today.slice(0, 7)}`)} type="button">
               Today
@@ -140,7 +140,7 @@ export function CalendarView({ events, initialMonth, today }: { events: Calendar
       </div>
 
       <div className="content-section">
-        <p className="mb-2 text-sm font-black text-[var(--foreground)]">This month</p>
+        <p className="mb-2 text-sm font-semibold text-[var(--foreground)]">This month</p>
         {agenda.length === 0 ? (
           <p className="text-sm text-[var(--muted)]">Nothing scheduled in {monthLabel(month)}.</p>
         ) : (

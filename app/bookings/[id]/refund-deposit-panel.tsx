@@ -85,21 +85,21 @@ export function RefundDepositPanel({
 
   return (
     <div
-      className="rounded-xl border border-[#e2e8f0] bg-white p-3"
+      className="rounded-xl border border-[var(--border)] bg-white p-3"
       data-rental-status={rentalStatus}
       data-vehicle-id={vehicleId}
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs font-bold uppercase tracking-[0.08em] text-[#667085]">Refunds & deposit</p>
-          <p className="mt-1 text-sm font-black text-[#10252b]">
-            Deposit held: {money(depositHeld, currency)} <span className="text-[#94a3b8]">·</span> Returned: {money(depositRefunded, currency)}{" "}
-            <span className="text-[#94a3b8]">·</span> Available: {money(available, currency)}
+          <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Refunds & deposit</p>
+          <p className="mt-1 text-sm font-semibold text-[var(--foreground)]">
+            Deposit held: {money(depositHeld, currency)} <span className="text-[var(--muted)]">·</span> Returned: {money(depositRefunded, currency)}{" "}
+            <span className="text-[var(--muted)]">·</span> Available: {money(available, currency)}
           </p>
-          <p className="mt-1 text-xs font-semibold capitalize text-[#667085]">Deposit status: {statusLabel(depositStatus)}</p>
+          <p className="mt-1 text-xs font-semibold capitalize text-[var(--muted)]">Deposit status: {statusLabel(depositStatus)}</p>
         </div>
         <button
-          className="pressable rounded-lg border border-[#e2e8f0] bg-white px-3 py-2 text-xs font-black text-[#475467]"
+          className="pressable rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground-secondary)]"
           type="button"
           onClick={() => setCollapsed((value) => !value)}
         >
@@ -113,14 +113,14 @@ export function RefundDepositPanel({
             {canUseDeposit ? (
               <>
                 <button
-                  className="pressable rounded-lg bg-[#12BCB8] px-3 py-2 text-xs font-black text-white"
+                  className="pressable rounded-lg bg-[var(--primary)] px-3 py-2 text-xs font-semibold text-white"
                   type="button"
                   onClick={() => openForm("return")}
                 >
                   Return deposit
                 </button>
                 <button
-                  className="pressable rounded-lg border border-[#e2e8f0] bg-white px-3 py-2 text-xs font-black text-[#10252b]"
+                  className="pressable rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground)]"
                   type="button"
                   onClick={() => openForm("deduction")}
                 >
@@ -130,7 +130,7 @@ export function RefundDepositPanel({
             ) : null}
             {canRefundPayment ? (
               <button
-                className="pressable rounded-lg border border-[#e2e8f0] bg-white px-3 py-2 text-xs font-black text-[#10252b]"
+                className="pressable rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground)]"
                 type="button"
                 onClick={() => openForm("refund")}
               >
@@ -138,19 +138,19 @@ export function RefundDepositPanel({
               </button>
             ) : null}
             {!canUseDeposit && !canRefundPayment ? (
-              <p className="text-sm font-semibold text-[#667085]">No deposit balance or rental payment is available to refund.</p>
+              <p className="text-sm font-semibold text-[var(--muted)]">No deposit balance or rental payment is available to refund.</p>
             ) : null}
           </div>
 
           {activeForm === "return" ? (
             <form
-              className="mt-3 rounded-lg border border-[#d6e5e2] bg-[#f8fafc] p-3"
+              className="mt-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3"
               onSubmit={(event) => {
                 event.preventDefault();
                 submit(new FormData(event.currentTarget), "Deposit returned", returnDeposit);
               }}
             >
-              <label className="block text-xs font-bold text-[#475467]">
+              <label className="block text-xs font-bold text-[var(--foreground-secondary)]">
                 Amount to return
                 <input
                   className="mt-1 w-full"
@@ -162,7 +162,7 @@ export function RefundDepositPanel({
                   type="number"
                 />
               </label>
-              <label className="mt-3 block text-xs font-bold text-[#475467]">
+              <label className="mt-3 block text-xs font-bold text-[var(--foreground-secondary)]">
                 Notes
                 <textarea className="mt-1 w-full" name="notes" placeholder="Optional notes" />
               </label>
@@ -172,13 +172,13 @@ export function RefundDepositPanel({
 
           {activeForm === "deduction" ? (
             <form
-              className="mt-3 rounded-lg border border-[#d6e5e2] bg-[#f8fafc] p-3"
+              className="mt-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3"
               onSubmit={(event) => {
                 event.preventDefault();
                 submit(new FormData(event.currentTarget), "Deduction recorded", applyDepositDeduction);
               }}
             >
-              <label className="block text-xs font-bold text-[#475467]">
+              <label className="block text-xs font-bold text-[var(--foreground-secondary)]">
                 Deduction amount
                 <input
                   className="mt-1 w-full"
@@ -189,11 +189,11 @@ export function RefundDepositPanel({
                   type="number"
                 />
               </label>
-              <label className="mt-3 block text-xs font-bold text-[#475467]">
+              <label className="mt-3 block text-xs font-bold text-[var(--foreground-secondary)]">
                 Reason
                 <input className="mt-1 w-full" name="reason" placeholder="Damage, late return, unpaid rent..." required type="text" />
               </label>
-              <label className="mt-3 block text-xs font-bold text-[#475467]">
+              <label className="mt-3 block text-xs font-bold text-[var(--foreground-secondary)]">
                 Notes
                 <textarea className="mt-1 w-full" name="notes" placeholder="Optional notes" />
               </label>
@@ -203,13 +203,13 @@ export function RefundDepositPanel({
 
           {activeForm === "refund" ? (
             <form
-              className="mt-3 rounded-lg border border-[#d6e5e2] bg-[#f8fafc] p-3"
+              className="mt-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3"
               onSubmit={(event) => {
                 event.preventDefault();
                 submit(new FormData(event.currentTarget), "Refund recorded", recordPaymentRefund);
               }}
             >
-              <label className="block text-xs font-bold text-[#475467]">
+              <label className="block text-xs font-bold text-[var(--foreground-secondary)]">
                 Refund amount
                 <input
                   className="mt-1 w-full"
@@ -221,7 +221,7 @@ export function RefundDepositPanel({
                   type="number"
                 />
               </label>
-              <label className="mt-3 block text-xs font-bold text-[#475467]">
+              <label className="mt-3 block text-xs font-bold text-[var(--foreground-secondary)]">
                 Reason / notes
                 <textarea className="mt-1 w-full" name="notes" placeholder="Optional reason for this refund" />
               </label>
@@ -229,8 +229,8 @@ export function RefundDepositPanel({
             </form>
           ) : null}
 
-          {message ? <p className="mt-3 rounded-lg bg-[#ecfdf3] px-3 py-2 text-sm font-black text-[#027a48]">{message}</p> : null}
-          {error ? <p className="mt-3 rounded-lg bg-[#fef2f2] px-3 py-2 text-sm font-black text-[#be123c]">{error}</p> : null}
+          {message ? <p className="mt-3 rounded-lg bg-[#ecfdf3] px-3 py-2 text-sm font-semibold text-[#027a48]">{message}</p> : null}
+          {error ? <p className="mt-3 rounded-lg bg-[#fef2f2] px-3 py-2 text-sm font-semibold text-[#be123c]">{error}</p> : null}
         </>
       ) : null}
     </div>
@@ -249,14 +249,14 @@ function FormActions({
   return (
     <div className="mt-3 flex flex-wrap gap-2">
       <button
-        className="pressable rounded-lg bg-[#12BCB8] px-3 py-2 text-xs font-black text-white disabled:cursor-not-allowed disabled:opacity-60"
+        className="pressable rounded-lg bg-[var(--primary)] px-3 py-2 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
         disabled={isPending}
         type="submit"
       >
         {isPending ? "Saving..." : label}
       </button>
       <button
-        className="pressable rounded-lg border border-[#e2e8f0] bg-white px-3 py-2 text-xs font-black text-[#475467]"
+        className="pressable rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground-secondary)]"
         disabled={isPending}
         type="button"
         onClick={onCancel}

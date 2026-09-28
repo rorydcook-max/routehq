@@ -193,15 +193,15 @@ function formatSummaryDate(value: unknown) {
 
 function ErrorState({ title, message, contact }: { title: string; message: string; contact?: string | null }) {
   return (
-    <main className="min-h-screen bg-[#eef7f5] px-4 py-8">
-      <section className="mx-auto max-w-xl rounded-2xl border border-[#d6e5e2] bg-white p-6 text-center shadow-sm">
+    <main className="min-h-screen bg-[#fbfaf8] px-4 py-8">
+      <section className="mx-auto max-w-xl rounded-2xl border border-[var(--border)] bg-white p-6 text-center shadow-sm">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#ffe4e6] text-[#be123c]">
           <AlertTriangle />
         </div>
-        <h1 className="mt-4 text-2xl font-black text-[#10252b]">{title}</h1>
-        <p className="mt-2 text-sm leading-6 text-[#667085]">{message}</p>
+        <h1 className="mt-4 text-2xl font-semibold text-[var(--foreground)]">{title}</h1>
+        <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{message}</p>
         {contact ? (
-          <a className="pressable mt-5 inline-flex rounded-xl bg-[#0f766e] px-5 py-3 text-sm font-black text-white" href={contact}>
+          <a className="pressable mt-5 inline-flex rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={contact}>
             Contact operator
           </a>
         ) : null}
@@ -245,42 +245,42 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   const pendingAmendmentToken = rental?.id ? await pendingAmendmentFor(String(rental.id)) : null;
 
   return (
-    <main className="min-h-screen bg-[#eef7f5] px-4 py-5 text-[#10252b]">
+    <main className="min-h-screen bg-[#fbfaf8] px-4 py-5 text-[var(--foreground)]">
       <div className="mx-auto max-w-3xl space-y-5">
         {pendingAmendmentToken ? (
           <a
-            className="pressable flex items-center justify-between gap-3 rounded-2xl border border-[#99f6e4] bg-[#ecfeff] p-4 shadow-sm"
+            className="pressable flex items-center justify-between gap-3 rounded-2xl border border-[#bfe0db] bg-[var(--primary-light)] p-4 shadow-sm"
             href={`/amend/${pendingAmendmentToken}`}
           >
             <span>
-              <span className="block text-sm font-black text-[#0f766e]">A change to your rental needs your signature</span>
-              <span className="block text-xs text-[#475467]">Review the new dates or price and sign in one step.</span>
+              <span className="block text-sm font-semibold text-[var(--primary)]">A change to your rental needs your signature</span>
+              <span className="block text-xs text-[var(--foreground-secondary)]">Review the new dates or price and sign in one step.</span>
             </span>
-            <span className="shrink-0 rounded-xl bg-[#0f766e] px-4 py-2 text-sm font-black text-white">Review</span>
+            <span className="shrink-0 rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white">Review</span>
           </a>
         ) : null}
-        <header className="rounded-2xl border border-[#d6e5e2] bg-white p-5 shadow-sm">
+        <header className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
           <div className="flex items-center gap-3">
             <BusinessLogoImage
               alt={`${organization.name} logo`}
               className="max-h-[60px] max-w-[160px] object-contain"
-              fallback={<span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#0f766e] text-lg font-black text-white">{String(organization?.name || "F").slice(0, 1)}</span>}
+              fallback={<span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--primary)] text-lg font-semibold text-white">{String(organization?.name || "F").slice(0, 1)}</span>}
               src={logoUrl}
             />
             <div>
-              <p className="text-xs font-black uppercase text-[#0f766e]">Rental booking</p>
-              {logoUrl ? null : <h1 className="text-xl font-black">{organization?.name || "Rental operator"}</h1>}
+              <p className="text-xs font-semibold uppercase text-[var(--primary)]">Rental booking</p>
+              {logoUrl ? null : <h1 className="text-xl font-semibold">{organization?.name || "Rental operator"}</h1>}
             </div>
           </div>
 
-          <div className="mt-5 rounded-2xl border border-[#d6e5e2] bg-[#fbfefd] p-4">
+          <div className="mt-5 rounded-2xl border border-[var(--border)] bg-[#fbfaf8] p-4">
             <div className="flex items-start gap-3">
-              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[#e6fffb] text-[#0f766e]">
+              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
                 <Car size={28} />
               </span>
               <div>
-                <h2 className="text-2xl font-black">{vehicleTitle(vehicle)}</h2>
-                <p className="mt-1 text-sm font-bold text-[#667085]">{vehicle.registration_number || "Plate pending"} {vehicle.color ? `- ${vehicle.color}` : ""}</p>
+                <h2 className="text-2xl font-semibold">{vehicleTitle(vehicle)}</h2>
+                <p className="mt-1 text-sm font-bold text-[var(--muted)]">{vehicle.registration_number || "Plate pending"} {vehicle.color ? `- ${vehicle.color}` : ""}</p>
               </div>
             </div>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -295,7 +295,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
           {included.length ? (
             <div className="mt-4 flex flex-wrap gap-2">
               {included.map((item) => (
-                <span className="inline-flex items-center gap-1 rounded-full bg-[#e6fffb] px-3 py-1.5 text-xs font-bold text-[#0f766e]" key={item}>
+                <span className="inline-flex items-center gap-1 rounded-full bg-[var(--primary-light)] px-3 py-1.5 text-xs font-bold text-[var(--primary)]" key={item}>
                   <ShieldCheck size={14} />
                   {item}
                 </span>
@@ -317,28 +317,28 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             vehicle={vehicle}
           />
         ) : detail.state === "completed" ? (
-          <section className="rounded-2xl border border-[#d6e5e2] bg-white p-5 text-center shadow-sm">
+          <section className="rounded-2xl border border-[var(--border)] bg-white p-5 text-center shadow-sm">
             <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#f0fdf4] text-[#16a34a]">
               <ShieldCheck size={28} />
             </span>
-            <h2 className="mt-4 text-2xl font-black text-[#10252b]">Rental completed</h2>
-            <p className="mt-2 text-sm leading-6 text-[#667085]">
+            <h2 className="mt-4 text-2xl font-semibold text-[var(--foreground)]">Rental completed</h2>
+            <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
               Thank you for renting with {organization?.name || "us"}. We would really appreciate a quick review of your experience.
             </p>
             {contact ? (
-              <a className="pressable mt-5 inline-flex rounded-xl bg-[#0f766e] px-5 py-3 text-sm font-black text-white" href={contact}>
+              <a className="pressable mt-5 inline-flex rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={contact}>
                 Contact operator
               </a>
             ) : null}
             {executedDownloads?.originalAgreementUrl || executedDownloads?.executionCertificateUrl ? (
               <div className="mt-5 flex flex-wrap justify-center gap-2">
                 {executedDownloads.originalAgreementUrl ? (
-                  <a className="pressable inline-flex rounded-xl bg-[#0f766e] px-5 py-3 text-sm font-black text-white" href={executedDownloads.originalAgreementUrl} rel="noreferrer" target="_blank">
+                  <a className="pressable inline-flex rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={executedDownloads.originalAgreementUrl} rel="noreferrer" target="_blank">
                     Download original agreement
                   </a>
                 ) : null}
                 {executedDownloads.executionCertificateUrl ? (
-                  <a className="pressable inline-flex rounded-xl border border-[#0f766e] bg-white px-5 py-3 text-sm font-black text-[#0f766e]" href={executedDownloads.executionCertificateUrl} rel="noreferrer" target="_blank">
+                  <a className="pressable inline-flex rounded-xl border border-[var(--primary)] bg-white px-5 py-3 text-sm font-semibold text-[var(--primary)]" href={executedDownloads.executionCertificateUrl} rel="noreferrer" target="_blank">
                     Download execution certificate
                   </a>
                 ) : null}
@@ -376,19 +376,19 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
 function Info({ className = "", icon: Icon, label, value }: { className?: string; icon: typeof Car; label: string; value: string }) {
   const lines = value.split("\n");
   return (
-    <div className={`rounded-xl border border-[#d6e5e2] bg-white p-3 ${className}`}>
-      <div className="flex items-center gap-2 text-xs font-black uppercase text-[#667085]">
-        <Icon className="text-[#0f766e]" size={15} />
+    <div className={`rounded-xl border border-[var(--border)] bg-white p-3 ${className}`}>
+      <div className="flex items-center gap-2 text-xs font-semibold uppercase text-[var(--muted)]">
+        <Icon className="text-[var(--primary)]" size={15} />
         {label}
       </div>
-      <p className="mt-1 whitespace-pre-line text-sm font-bold text-[#10252b]">
+      <p className="mt-1 whitespace-pre-line text-sm font-bold text-[var(--foreground)]">
         {lines.map((line, index) => (
           line.startsWith("https://www.google.com/maps") ? (
-            <a className="text-[#0f766e] underline underline-offset-2" href={line} key={`${line}-${index}`} rel="noreferrer" target="_blank">
+            <a className="text-[var(--primary)] underline underline-offset-2" href={line} key={`${line}-${index}`} rel="noreferrer" target="_blank">
               View on map →
             </a>
           ) : line.startsWith("https://") ? (
-            <a className="break-all text-[#0f766e] underline underline-offset-2" href={line} key={`${line}-${index}`} rel="noreferrer" target="_blank">
+            <a className="break-all text-[var(--primary)] underline underline-offset-2" href={line} key={`${line}-${index}`} rel="noreferrer" target="_blank">
               {line}
             </a>
           ) : (

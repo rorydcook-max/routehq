@@ -16,14 +16,14 @@ type NotificationToggleProps = {
 
 function NotificationToggle({ name, label, description, defaultChecked }: NotificationToggleProps) {
   return (
-    <label className="flex cursor-pointer items-start justify-between gap-4 rounded-xl border border-[#dfe4ea] p-4">
+    <label className="flex cursor-pointer items-start justify-between gap-4 rounded-xl border border-[var(--border)] p-4">
       <div className="flex-1">
-        <p className="text-sm font-semibold text-[#172026]">{label}</p>
-        <p className="mt-0.5 text-xs text-[#667085]">{description}</p>
+        <p className="text-sm font-semibold text-[var(--foreground)]">{label}</p>
+        <p className="mt-0.5 text-xs text-[var(--muted)]">{description}</p>
       </div>
       <div className="relative mt-0.5 flex-shrink-0">
         <input className="peer sr-only" defaultChecked={defaultChecked} name={name} type="checkbox" value="on" />
-        <div className="h-6 w-11 rounded-full bg-[#cbd5e1] transition-colors peer-checked:bg-[#0f766e]" />
+        <div className="h-6 w-11 rounded-full bg-[#cbd5e1] transition-colors peer-checked:bg-[var(--primary)]" />
         <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
       </div>
     </label>
@@ -55,8 +55,8 @@ export default async function NotificationsPage() {
       <Card>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-sm font-semibold text-[#172026]">{connected ? "LINE is connected" : "LINE is not connected yet"}</p>
-            <p className="mt-0.5 text-xs text-[#667085]">
+            <p className="text-sm font-semibold text-[var(--foreground)]">{connected ? "LINE is connected" : "LINE is not connected yet"}</p>
+            <p className="mt-0.5 text-xs text-[var(--muted)]">
               {connected ? "Alerts and the morning summary go to the LINE account you connected." : "Connect LINE in Settings first; it takes a minute."}
             </p>
           </div>

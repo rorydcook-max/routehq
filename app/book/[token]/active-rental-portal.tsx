@@ -7,7 +7,7 @@ import { submitCustomerPortalAction } from "@/app/actions/public-booking";
 
 type ActionType = "extension_request" | "return_confirmation" | "problem_report" | "question";
 
-const inputClass = "mt-2 w-full rounded-xl border border-[#d6e5e2] bg-white px-4 py-3 text-base text-[#10252b] outline-none focus:border-[#0f766e] focus:ring-2 focus:ring-[#0f766e]/15";
+const inputClass = "mt-2 w-full rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15";
 
 export function ActiveRentalPortal({
   token,
@@ -59,14 +59,14 @@ export function ActiveRentalPortal({
 
   return (
     <div className="space-y-5">
-      <section className="rounded-2xl border border-[#d6e5e2] bg-white p-5 shadow-sm">
+      <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
         <div className="flex gap-4">
           <VehiclePhoto vehicle={vehicle} />
           <div className="min-w-0 flex-1">
-            <span className="inline-flex rounded-full bg-[#f0fdf4] px-3 py-1 text-xs font-black uppercase text-[#16a34a]">Your rental is active</span>
-            <h2 className="mt-3 text-2xl font-black text-[#10252b]">{vehicleName || "Your vehicle"}</h2>
-            <p className="font-mono-data mt-1 text-sm font-bold text-[#667085]">{vehicle?.registration_number || "Plate pending"}</p>
-            <p className={`mt-3 text-sm font-black ${countdown.overdue ? "text-[#dc2626]" : countdown.today ? "text-[#d97706]" : "text-[#475467]"}`}>
+            <span className="inline-flex rounded-full bg-[#f0fdf4] px-3 py-1 text-xs font-semibold uppercase text-[#16a34a]">Your rental is active</span>
+            <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">{vehicleName || "Your vehicle"}</h2>
+            <p className="font-mono-data mt-1 text-sm font-bold text-[var(--muted)]">{vehicle?.registration_number || "Plate pending"}</p>
+            <p className={`mt-3 text-sm font-semibold ${countdown.overdue ? "text-[#dc2626]" : countdown.today ? "text-[#d97706]" : "text-[var(--foreground-secondary)]"}`}>
               {countdown.label}
             </p>
           </div>
@@ -81,14 +81,14 @@ export function ActiveRentalPortal({
         {actionCards.map((card) => {
           const Icon = card.icon;
           return (
-            <div className="rounded-2xl border border-[#d6e5e2] bg-white p-4 shadow-sm" key={card.type}>
+            <div className="rounded-2xl border border-[var(--border)] bg-white p-4 shadow-sm" key={card.type}>
               <button className="flex w-full items-start gap-3 text-left" onClick={() => setOpenAction(openAction === card.type ? null : card.type)} type="button">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#e6fffb] text-[#0f766e]">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
                   <Icon size={22} />
                 </span>
                 <span>
-                  <span className="block text-base font-black text-[#10252b]">{card.title}</span>
-                  <span className="mt-1 block text-sm leading-5 text-[#667085]">{card.description}</span>
+                  <span className="block text-base font-semibold text-[var(--foreground)]">{card.title}</span>
+                  <span className="mt-1 block text-sm leading-5 text-[var(--muted)]">{card.description}</span>
                 </span>
               </button>
               {openAction === card.type ? (
@@ -108,30 +108,30 @@ export function ActiveRentalPortal({
         })}
       </section>
 
-      <section className="rounded-2xl border border-[#d6e5e2] bg-white p-5 shadow-sm">
-        <p className="text-xs font-black uppercase text-[#0f766e]">Your rental documents</p>
+      <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
+        <p className="text-xs font-semibold uppercase text-[var(--primary)]">Your rental documents</p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {signedContractUrl ? (
-            <a className="rounded-xl border border-[#d6e5e2] bg-[#fbfefd] p-4 text-sm font-black text-[#10252b]" href={signedContractUrl} rel="noreferrer" target="_blank">
-              <FileText className="mb-2 text-[#0f766e]" />
+            <a className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-4 text-sm font-semibold text-[var(--foreground)]" href={signedContractUrl} rel="noreferrer" target="_blank">
+              <FileText className="mb-2 text-[var(--primary)]" />
               Signed rental agreement
             </a>
           ) : null}
           {certificateUrl ? (
-            <a className="rounded-xl border border-[#d6e5e2] bg-[#fbfefd] p-4 text-sm font-black text-[#10252b]" href={certificateUrl} rel="noreferrer" target="_blank">
-              <FileText className="mb-2 text-[#0f766e]" />
+            <a className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-4 text-sm font-semibold text-[var(--foreground)]" href={certificateUrl} rel="noreferrer" target="_blank">
+              <FileText className="mb-2 text-[var(--primary)]" />
               Signing certificate
             </a>
           ) : null}
           {deliveryPhotoUrls.length ? (
             deliveryPhotoUrls.map((url, index) => (
-              <a className="rounded-xl border border-[#d6e5e2] bg-[#fbfefd] p-4 text-sm font-black text-[#10252b]" href={url} key={url} rel="noreferrer" target="_blank">
-                <ImageIcon className="mb-2 text-[#0f766e]" />
+              <a className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-4 text-sm font-semibold text-[var(--foreground)]" href={url} key={url} rel="noreferrer" target="_blank">
+                <ImageIcon className="mb-2 text-[var(--primary)]" />
                 Delivery photo {index + 1}
               </a>
             ))
           ) : null}
-          {!signedContractUrl && deliveryPhotoUrls.length === 0 ? <p className="text-sm text-[#667085]">Documents will appear here when available.</p> : null}
+          {!signedContractUrl && deliveryPhotoUrls.length === 0 ? <p className="text-sm text-[var(--muted)]">Documents will appear here when available.</p> : null}
         </div>
       </section>
     </div>
@@ -161,11 +161,11 @@ function ActionForm({
     return (
       <form action={(formData) => onSubmit(formData, "Extension request sent - your owner will confirm shortly.")} className="mt-4 space-y-3">
         <input name="actionType" type="hidden" value="extension_request" />
-        <label className="block text-sm font-bold text-[#344054]">
+        <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
           New return date
           <input className={inputClass} min={minExtensionDate} name="newEndDate" required type="date" />
         </label>
-        <label className="block text-sm font-bold text-[#344054]">
+        <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
           Note to owner
           <textarea className={inputClass} name="note" placeholder="Optional" />
         </label>
@@ -178,19 +178,19 @@ function ActionForm({
     return (
       <form action={(formData) => onSubmit(formData, `Return confirmed - we'll see you on ${String(formData.get("returnDate") || endDate)} at ${String(formData.get("returnLocation") || deliveryLocation || "the agreed location")}.`)} className="mt-4 space-y-3">
         <input name="actionType" type="hidden" value="return_confirmation" />
-        <label className="block text-sm font-bold text-[#344054]">
+        <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
           Return date
           <input className={inputClass} defaultValue={endDate || today()} min={today()} name="returnDate" required type="date" />
         </label>
-        <label className="block text-sm font-bold text-[#344054]">
+        <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
           Return time
           <input className={inputClass} name="returnTime" required type="time" />
         </label>
-        <label className="block text-sm font-bold text-[#344054]">
+        <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
           Return location
           <input className={inputClass} defaultValue={deliveryLocation} name="returnLocation" placeholder="Return location" />
         </label>
-        <label className="block text-sm font-bold text-[#344054]">
+        <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
           Note
           <textarea className={inputClass} name="note" placeholder="Optional" />
         </label>
@@ -203,7 +203,7 @@ function ActionForm({
     return (
       <form action={(formData) => onSubmit(formData, `Problem report sent. ${ownerContact ? `Contact ${organizationName} at ${ownerContact} if this is urgent.` : "The owner has been notified."}`)} className="mt-4 space-y-3">
         <input name="actionType" type="hidden" value="problem_report" />
-        <label className="block text-sm font-bold text-[#344054]">
+        <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
           Category
           <select className={inputClass} name="category" required>
             <option>Breakdown</option>
@@ -213,11 +213,11 @@ function ActionForm({
             <option>Other</option>
           </select>
         </label>
-        <label className="block text-sm font-bold text-[#344054]">
+        <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
           Description
           <textarea className={inputClass} name="description" required />
         </label>
-        <label className="block text-sm font-bold text-[#344054]">
+        <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
           Photo
           <input accept="image/*" className={inputClass} name="photo" type="file" />
         </label>
@@ -229,7 +229,7 @@ function ActionForm({
   return (
     <form action={(formData) => onSubmit(formData, "Question sent - we'll get back to you shortly.")} className="mt-4 space-y-3">
       <input name="actionType" type="hidden" value="question" />
-      <label className="block text-sm font-bold text-[#344054]">
+      <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
         Question
         <textarea className={inputClass} name="question" required />
       </label>
@@ -240,7 +240,7 @@ function ActionForm({
 
 function SubmitButton({ isPending, label }: { isPending: boolean; label: string }) {
   return (
-    <button className="pressable min-h-12 w-full rounded-xl bg-[#0f766e] px-4 py-3 text-sm font-black text-white disabled:opacity-60" disabled={isPending} type="submit">
+    <button className="pressable min-h-12 w-full rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white disabled:opacity-60" disabled={isPending} type="submit">
       {isPending ? "Sending..." : label}
     </button>
   );
@@ -252,7 +252,7 @@ function VehiclePhoto({ vehicle }: { vehicle: any }) {
     return <img alt="Vehicle" className="h-24 w-24 rounded-2xl object-cover" src={typeof photo === "string" ? photo : photo.url} />;
   }
   return (
-    <span className="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl bg-[#e6fffb] text-[#0f766e]">
+    <span className="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl bg-[var(--primary-light)] text-[var(--primary)]">
       <ImageIcon size={32} />
     </span>
   );

@@ -70,9 +70,9 @@ export function AmendmentSignForm({ token, contentHash, renterName }: { token: s
   const ready = accepted && Boolean(signature) && name.trim().length > 1;
 
   return (
-    <section className="rounded-2xl border border-[#d6e5e2] bg-white p-5 shadow-sm">
-      <h2 className="text-lg font-black">Sign to agree</h2>
-      <label className="mt-3 flex items-start gap-3 rounded-xl border border-[#d6e5e2] p-3 text-sm">
+    <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
+      <h2 className="text-lg font-semibold">Sign to agree</h2>
+      <label className="mt-3 flex items-start gap-3 rounded-xl border border-[var(--border)] p-3 text-sm">
         <input checked={accepted} className="mt-1 h-4 w-4" onChange={(event) => setAccepted(event.target.checked)} type="checkbox" />
         <span>I have read this amendment and agree to the changes. I consent to signing it electronically.</span>
       </label>
@@ -80,7 +80,7 @@ export function AmendmentSignForm({ token, contentHash, renterName }: { token: s
         Your full name
         <input
           autoComplete="name"
-          className="mt-1 h-11 w-full rounded-xl border border-[#cbd5d3] px-3 text-base font-normal"
+          className="mt-1 h-11 w-full rounded-xl border border-[var(--border)] px-3 text-base font-normal"
           onChange={(event) => setName(event.target.value)}
           value={name}
         />
@@ -88,12 +88,12 @@ export function AmendmentSignForm({ token, contentHash, renterName }: { token: s
       <div className="mt-3">
         <div className="flex items-center justify-between text-sm font-bold">
           <span>Your signature</span>
-          <button className="text-xs font-black text-[#0f766e]" onClick={clear} type="button">
+          <button className="text-xs font-semibold text-[var(--primary)]" onClick={clear} type="button">
             Clear
           </button>
         </div>
         <canvas
-          className="mt-1 h-40 w-full touch-none rounded-xl border border-dashed border-[#94a3a0] bg-[#fbfefd]"
+          className="mt-1 h-40 w-full touch-none rounded-xl border border-dashed border-[#94a3a0] bg-[#fbfaf8]"
           height={200}
           onPointerCancel={end}
           onPointerDown={start}
@@ -106,7 +106,7 @@ export function AmendmentSignForm({ token, contentHash, renterName }: { token: s
       </div>
       {error ? <p className="mt-3 rounded-xl bg-[#fff1f2] px-3 py-2 text-sm font-bold text-[#be123c]">{error}</p> : null}
       <button
-        className="pressable mt-4 min-h-12 w-full rounded-xl bg-[#0f766e] px-5 py-3 text-base font-black text-white disabled:opacity-50"
+        className="pressable mt-4 min-h-12 w-full rounded-xl bg-[var(--primary)] px-5 py-3 text-base font-semibold text-white disabled:opacity-50"
         disabled={!ready || isPending}
         onClick={submit}
         type="button"

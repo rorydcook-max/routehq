@@ -12,7 +12,7 @@ import type { TransactionFormOptions, TransactionFormPrefill } from "@/lib/trans
 const MONEY_IN: string[] = ["rental_income", "deposit_received", "deposit_forfeited", "deposit_deduction"];
 
 const inputClass =
-  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(18,184,200,0.16)]";
+  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]";
 
 export function TransactionForm({
   organizationId,
@@ -116,7 +116,7 @@ export function TransactionForm({
       <input name="taskId" type="hidden" value={linkedTaskId} />
 
       {linkedBadge ? (
-        <div className="rounded-xl border border-[#bbf7d0] bg-[#f0fdf4] px-4 py-3 text-sm font-black text-[#166534]">
+        <div className="rounded-xl border border-[#bbf7d0] bg-[#f0fdf4] px-4 py-3 text-sm font-semibold text-[#166534]">
           {linkedBadge}
         </div>
       ) : null}
@@ -125,7 +125,7 @@ export function TransactionForm({
         <div className="rounded-xl border border-[var(--primary)] bg-[var(--primary-light)] p-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.08em] text-[var(--primary)]">Match found</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--primary)]">Match found</p>
               <p className="mt-1 text-sm font-bold text-[var(--foreground)]">
                 {matches.length === 1 && matches[0].confidence === "high"
                   ? "Looks like this might be for:"
@@ -136,10 +136,10 @@ export function TransactionForm({
           </div>
           <div className="mt-3 space-y-2">
             {matches.map((match) => (
-              <div className="rounded-lg border border-[#a5f3fc] bg-white p-3" key={match.id}>
+              <div className="rounded-lg border border-[#bfe0db] bg-white p-3" key={match.id}>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p className="font-black text-[var(--foreground)]">{match.label}</p>
+                    <p className="font-semibold text-[var(--foreground)]">{match.label}</p>
                     <p className="mt-1 text-sm text-[var(--muted)]">
                       {[match.customerName, match.subLabel].filter(Boolean).join(" - ")}
                     </p>
@@ -152,7 +152,7 @@ export function TransactionForm({
             ))}
           </div>
           <button
-            className="mt-3 text-sm font-black text-[var(--primary)]"
+            className="mt-3 text-sm font-semibold text-[var(--primary)]"
             onClick={() => {
               setDismissedMatches(true);
               setMatches([]);

@@ -22,7 +22,7 @@ export function EmptyState({
 }) {
   return (
     <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--border-strong)] bg-[var(--panel-secondary)] px-6 py-12 text-center">
-      <p className="text-base font-black text-[var(--foreground)]">{title}</p>
+      <p className="text-base font-semibold text-[var(--foreground)]">{title}</p>
       {description ? (
         <p className="mt-1.5 max-w-sm text-sm text-[var(--muted)]">{description}</p>
       ) : null}

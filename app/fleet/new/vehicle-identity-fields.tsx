@@ -474,13 +474,13 @@ export function VehicleIdentityFields({
 
   return (
     <>
-      <div className="rounded-2xl border border-[#a7edf4] bg-[var(--primary-light)] p-4">
+      <div className="rounded-2xl border border-[#bfe0db] bg-[var(--primary-light)] p-4">
         <SectionHeader eyebrow="Quick start (optional)" title="Scan the blue book" />
-        <p className="mt-2 text-sm text-[#667085]">
+        <p className="mt-2 text-sm text-[var(--muted)]">
           Take a photo of the Thai blue book (เล่มทะเบียน) or another registration document and we&apos;ll fill in what we can read. Check the details before saving.
         </p>
         <label className="mt-4 block">
-          <span className="text-sm font-semibold text-[#344054]">Photo or PDF of the blue book</span>
+          <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Photo or PDF of the blue book</span>
           <input
             accept="image/*,application/pdf"
             capture="environment"
@@ -497,7 +497,7 @@ export function VehicleIdentityFields({
                 ? "bg-[#ffe4e6] text-[#be123c]"
                 : ocrStatus === "done"
                   ? "bg-[#dcfce7] text-[#166534]"
-                  : "bg-[#e6fffb] text-[#0f766e]"
+                  : "bg-[var(--primary-light)] text-[var(--primary)]"
             }`}
           >
             {ocrStatus === "reading" ? "Reading the document…" : ocrMessage}
@@ -507,7 +507,7 @@ export function VehicleIdentityFields({
 
       <div className="rounded-2xl border border-[#bfd1ff] bg-[var(--primary-blue-light)] p-4">
         <SectionHeader eyebrow="Vehicle" title="Make and model" />
-        {catalogStatus === "loading" ? <p className="mt-3 text-sm font-semibold text-[#0f766e]">Loading makes and models…</p> : null}
+        {catalogStatus === "loading" ? <p className="mt-3 text-sm font-semibold text-[var(--primary)]">Loading makes and models…</p> : null}
         {catalogStatus === "error" ? <p className="mt-3 rounded-lg bg-[#ffe4e6] px-3 py-2 text-sm font-semibold text-[#be123c]">{catalogMessage}</p> : null}
 
         <input name="make" type="hidden" value={make} />
@@ -524,7 +524,7 @@ export function VehicleIdentityFields({
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <label className="block">
-            <span className="text-sm font-semibold text-[#344054]">Vehicle category</span>
+            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Vehicle category</span>
             <select
               className={inputClass}
               name="categoryId"
@@ -541,7 +541,7 @@ export function VehicleIdentityFields({
             </select>
           </label>
           <label className="block">
-            <span className="text-sm font-semibold text-[#344054]">Make</span>
+            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Make</span>
             <div className="relative mt-1">
               <button
                 className="flex w-full items-center justify-between gap-3 rounded-xl border border-[var(--border-strong)] bg-white px-3 py-3 text-left text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
@@ -552,20 +552,20 @@ export function VehicleIdentityFields({
                   {selectedMakeId ? (
                     (() => {
                       const selected = makes.find((item) => item.id === selectedMakeId);
-                      return selected?.logo_url ? <img alt="" className="h-7 w-7 shrink-0 rounded bg-white object-contain" src={selected.logo_url} /> : <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[#dff9f4] text-xs font-bold text-[#0f766e]">{selected?.name.slice(0, 2) || "?"}</span>;
+                      return selected?.logo_url ? <img alt="" className="h-7 w-7 shrink-0 rounded bg-white object-contain" src={selected.logo_url} /> : <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[var(--primary-light)] text-xs font-bold text-[var(--primary)]">{selected?.name.slice(0, 2) || "?"}</span>;
                     })()
                   ) : (
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[#eef8f6] text-xs font-bold text-[#0f766e]">+</span>
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[#fbfaf8] text-xs font-bold text-[var(--primary)]">+</span>
                   )}
-                  <span className={make ? "truncate font-semibold" : "truncate text-[#98a2b3]"}>
+                  <span className={make ? "truncate font-semibold" : "truncate text-[var(--muted)]"}>
                     {manualMake ? "Other / custom make" : make || `Select ${selectedCategory?.name || "vehicle"} brand`}
                   </span>
                 </span>
-                <span className="text-[#667085]">v</span>
+                <span className="text-[var(--muted)]">v</span>
               </button>
               {makeDropdownOpen ? (
                 <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-2xl border border-[var(--border)] bg-white shadow-xl shadow-[#10252b]/10">
-                  <div className="border-b border-[#edf2f7] p-3">
+                  <div className="border-b border-[var(--border)] p-3">
                     <input
                       className="w-full rounded-xl border border-[var(--border-strong)] bg-white px-3 py-2 text-sm text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
                       onChange={(event) => setMakeSearch(event.target.value)}
@@ -576,18 +576,18 @@ export function VehicleIdentityFields({
                   <div className="max-h-72 overflow-y-auto py-1">
                     {searchedMakes.map((item) => (
                       <button
-                        className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm hover:bg-[#eef8f6]"
+                        className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm hover:bg-[#fbfaf8]"
                         key={item.id}
                         onClick={() => handleMakeSelect(item.id)}
                         type="button"
                       >
-                        {item.logo_url ? <img alt="" className="h-7 w-7 shrink-0 rounded bg-white object-contain" src={item.logo_url} /> : <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[#dff9f4] text-xs font-bold text-[#0f766e]">{item.name.slice(0, 2)}</span>}
-                        <span className="font-semibold text-[#10252b]">{item.name}</span>
-                        <span className="ml-auto text-xs uppercase text-[#98a2b3]">{item.origin_country || ""}</span>
+                        {item.logo_url ? <img alt="" className="h-7 w-7 shrink-0 rounded bg-white object-contain" src={item.logo_url} /> : <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[var(--primary-light)] text-xs font-bold text-[var(--primary)]">{item.name.slice(0, 2)}</span>}
+                        <span className="font-semibold text-[var(--foreground)]">{item.name}</span>
+                        <span className="ml-auto text-xs uppercase text-[var(--muted)]">{item.origin_country || ""}</span>
                       </button>
                     ))}
                     <button
-                      className="flex w-full items-center gap-3 border-t border-[#edf2f7] px-3 py-2 text-left text-sm font-semibold text-[#0f766e] hover:bg-[#eef8f6]"
+                      className="flex w-full items-center gap-3 border-t border-[var(--border)] px-3 py-2 text-left text-sm font-semibold text-[var(--primary)] hover:bg-[#fbfaf8]"
                       onClick={() => handleMakeSelect("__manual__")}
                       type="button"
                     >
@@ -599,7 +599,7 @@ export function VehicleIdentityFields({
             </div>
           </label>
           <label className="block">
-            <span className="text-sm font-semibold text-[#344054]">Model</span>
+            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Model</span>
             <select className={inputClass} disabled={!selectedMakeId && !manualMake} onChange={(event) => handleModelSelect(event.target.value)} value={manualModel ? "__manual__" : selectedModelId}>
               <option value="">{selectedMakeId ? "Select model" : "Select make first"}</option>
               {models.map((item) => (
@@ -616,13 +616,13 @@ export function VehicleIdentityFields({
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             {manualMake ? (
               <label className="block">
-                <span className="text-sm font-semibold text-[#344054]">Custom make</span>
+                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Custom make</span>
                 <input className={inputClass} onChange={(event) => setMake(event.target.value)} placeholder="Enter make" value={make} />
               </label>
             ) : null}
             {manualModel ? (
               <label className="block">
-                <span className="text-sm font-semibold text-[#344054]">Custom model</span>
+                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Custom model</span>
                 <input className={inputClass} onChange={(event) => setModel(event.target.value)} placeholder="Enter model" value={model} />
               </label>
             ) : null}
@@ -631,7 +631,7 @@ export function VehicleIdentityFields({
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <label className="block">
-            <span className="text-sm font-semibold text-[#344054]">Year</span>
+            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Year</span>
             {catalogYears.length > 0 ? (
               <select className={inputClass} onChange={(event) => setYear(event.target.value)} value={year}>
                 <option value="">Select year</option>
@@ -646,7 +646,7 @@ export function VehicleIdentityFields({
             )}
           </label>
           <label className="block">
-            <span className="text-sm font-semibold text-[#344054]">Trim</span>
+            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Trim</span>
             {visibleTrims.length > 0 ? (
               <select
                 className={inputClass}
@@ -675,24 +675,24 @@ export function VehicleIdentityFields({
         <SectionHeader eyebrow="Vehicle details" title="Registration and specs" />
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <label className="block">
-            <span className="text-sm font-semibold text-[#344054]">Registration number</span>
+            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Registration number</span>
             <input className={`${inputClass} font-mono-data`} name="registrationNumber" onChange={(event) => setRegistrationNumber(event.target.value)} placeholder="BKK-1234" required value={registrationNumber} />
           </label>
           <label className="block">
-            <span className="text-sm font-semibold text-[#344054]">VIN / frame number</span>
+            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">VIN / frame number</span>
             <input className={`${inputClass} font-mono-data`} name="vin" onChange={(event) => setVin(event.target.value.trim().toUpperCase())} placeholder="VIN or chassis/frame number" value={vin} />
           </label>
           <label className="block">
-            <span className="text-sm font-semibold text-[#344054]">Colour</span>
+            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Colour</span>
             <input className={inputClass} name="color" onChange={(event) => setColor(event.target.value)} placeholder="Pearl White" value={color} />
           </label>
           <label className="block">
-            <span className="text-sm font-semibold text-[#344054]">Transmission</span>
+            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Transmission</span>
             <input className={inputClass} name="transmission" onChange={(event) => setTransmission(event.target.value)} placeholder="Automatic" value={transmission} />
           </label>
           {showMotorcycleFields ? (
             <label className="block">
-              <span className="text-sm font-semibold text-[#344054]">Fuel type</span>
+              <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Fuel type</span>
               <select className={inputClass} name="fuelType" onChange={(event) => setFuelType(event.target.value)} value={fuelType}>
                 <option value="">Select fuel type</option>
                 <option value="petrol">Petrol</option>
@@ -704,19 +704,19 @@ export function VehicleIdentityFields({
             <input name="fuelType" type="hidden" value={fuelType} />
           )}
           <label className="block">
-            <span className="text-sm font-semibold text-[#344054]">Seating capacity</span>
+            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Seating capacity</span>
             <input className={`${inputClass} font-mono-data`} min="0" name="seatingCapacity" onChange={(event) => setSeatingCapacity(event.target.value)} placeholder="5" type="number" value={seatingCapacity} />
           </label>
           <label className="block">
-            <span className="text-sm font-semibold text-[#344054]">Engine CC</span>
+            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Engine CC</span>
             <input className={`${inputClass} font-mono-data`} min="0" name="engineCc" onChange={(event) => setEngineCc(event.target.value)} placeholder="125" type="number" value={engineCc} />
           </label>
           <label className="block">
-            <span className="text-sm font-semibold text-[#344054]">Drivetrain</span>
+            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Drivetrain</span>
             <input className={inputClass} name="drivetrain" onChange={(event) => setDrivetrain(event.target.value)} placeholder="FWD / RWD / 4WD" value={drivetrain} />
           </label>
           <label className="block">
-            <span className="text-sm font-semibold text-[#344054]">Body class</span>
+            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Body class</span>
             <input className={inputClass} name="bodyClass" onChange={(event) => setBodyClass(event.target.value)} placeholder="Sedan/Saloon" value={bodyClass} />
           </label>
         </div>

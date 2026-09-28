@@ -10,13 +10,13 @@ export function CreateOrganizationForm({ defaultBusinessName }: { defaultBusines
 
   return (
     <form action={formAction} className="space-y-4">
-      <p className="text-sm text-[#667085]">
+      <p className="text-sm text-[var(--muted)]">
         Create your business on RouteHQ. You can add your address, logo and contract details in the next steps.
       </p>
       <label className="block">
-        <span className="text-sm font-semibold text-[#344054]">Business name</span>
+        <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Business name</span>
         <input
-          className="mt-1 w-full rounded-lg border border-[#d6e5e2] bg-white px-3 py-3 text-base text-[#10252b] outline-none focus:border-[#0f766e] focus:ring-2 focus:ring-[#0f766e]/15"
+          className="mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
           defaultValue={defaultBusinessName}
           maxLength={120}
           name="businessName"
@@ -26,7 +26,7 @@ export function CreateOrganizationForm({ defaultBusinessName }: { defaultBusines
       </label>
       {state.error ? <p className="rounded-lg bg-[#ffe4e6] px-3 py-2 text-sm font-semibold text-[#be123c]">{state.error}</p> : null}
       <button
-        className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#0f766e] px-4 py-3 font-bold text-white disabled:opacity-60"
+        className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-3 font-bold text-white disabled:opacity-60"
         disabled={pending}
       >
         {pending ? (

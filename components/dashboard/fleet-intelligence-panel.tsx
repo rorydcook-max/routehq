@@ -43,13 +43,13 @@ export function FleetIntelligencePanel({ averageUtilization, vehicles }: { avera
   };
 
   return (
-    <Card className="analytics-panel self-start">
-      <SectionHeader eyebrow="Fleet intelligence" title="Profitability, utilization and readiness" action={<Badge tone="blue">{averageUtilization}% avg utilization</Badge>} />
+    <Card className="self-start">
+      <SectionHeader title="Profit and use per vehicle" action={<Badge tone="blue">{averageUtilization}% avg utilization</Badge>} />
       <div className="relative mt-4 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[880px] border-collapse text-left text-sm">
             <thead>
-              <tr className="border-b text-xs uppercase">
+              <tr className="border-b border-[var(--border)] text-[var(--muted)]">
                 <th className="py-2 pr-3">Vehicle</th>
                 <th className="px-3 py-2">Status</th>
                 <th className="px-3 py-2">Monthly</th>
@@ -62,12 +62,12 @@ export function FleetIntelligencePanel({ averageUtilization, vehicles }: { avera
             </thead>
             <tbody>
               {visibleVehicles.map((vehicle) => (
-                <tr className="border-b last:border-0" key={vehicle.id}>
+                <tr className="border-b border-[var(--border)] last:border-0" key={vehicle.id}>
                   <td className="py-3 pr-3">
-                    <div className="font-semibold text-white">
+                    <div className="font-semibold text-[var(--foreground)]">
                       {vehicle.make} {vehicle.model}
                     </div>
-                    <div className="analytics-muted">
+                    <div className="text-[var(--muted)]">
                       {vehicle.plate} · {vehicle.year} · {vehicle.mileage.toLocaleString()} km
                     </div>
                   </td>
@@ -77,7 +77,7 @@ export function FleetIntelligencePanel({ averageUtilization, vehicles }: { avera
                   <td className="px-3 py-3 font-semibold">{money(vehicle.monthlyRate)}</td>
                   <td className="px-3 py-3">
                     <div className="min-w-28">
-                      <div className="analytics-muted mb-1 flex justify-between text-xs">
+                      <div className="text-[var(--muted)] mb-1 flex justify-between text-xs">
                         <span>{vehicle.utilization}%</span>
                       </div>
                       <ProgressBar value={vehicle.utilization} tone={vehicle.utilization > 80 ? "green" : "amber"} />
@@ -85,7 +85,7 @@ export function FleetIntelligencePanel({ averageUtilization, vehicles }: { avera
                   </td>
                   <td className="px-3 py-3">
                     <div className="min-w-28">
-                      <div className="analytics-muted mb-1 text-xs">{vehicle.lifecycleUtilization}%</div>
+                      <div className="text-[var(--muted)] mb-1 text-xs">{vehicle.lifecycleUtilization}%</div>
                       <ProgressBar value={vehicle.lifecycleUtilization} tone="blue" />
                     </div>
                   </td>
@@ -106,18 +106,18 @@ export function FleetIntelligencePanel({ averageUtilization, vehicles }: { avera
             </tbody>
           </table>
         </div>
-        {!expanded && canExpand ? <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#071b35] to-transparent" /> : null}
+        {!expanded && canExpand ? <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white to-transparent" /> : null}
       </div>
 
       {canExpand || hasPages ? (
-        <div className="mt-4 grid min-h-[56px] grid-cols-1 items-center gap-3 border-t border-white/10 pt-4 sm:grid-cols-[1fr_auto_1fr]">
-          <div className="analytics-muted text-sm">
+        <div className="mt-4 grid min-h-[56px] grid-cols-1 items-center gap-3 border-t border-[var(--border)] pt-4 sm:grid-cols-[1fr_auto_1fr]">
+          <div className="text-[var(--muted)] text-sm">
             Showing {visibleVehicles.length === 0 ? 0 : safePage * pageSize + 1}–{safePage * pageSize + visibleVehicles.length} of {vehicles.length} vehicles
           </div>
           {canExpand ? (
             <button
               aria-label={expanded ? "Collapse fleet intelligence" : "Expand fleet intelligence"}
-              className="pressable mx-auto inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/12 text-white shadow-[0_12px_26px_rgba(0,0,0,0.22)] hover:bg-white/18"
+              className="pressable mx-auto inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border)] bg-white text-[var(--foreground-secondary)] hover:border-[var(--primary)] hover:text-[var(--primary)]"
               onClick={() => setExpanded((current) => !current)}
               type="button"
             >
@@ -131,7 +131,7 @@ export function FleetIntelligencePanel({ averageUtilization, vehicles }: { avera
               <div className="flex items-center gap-2">
                 <button
                   aria-label="Previous vehicle page"
-                  className="pressable inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-white/10 text-white disabled:opacity-40"
+                  className="pressable inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border)] bg-white text-[var(--foreground-secondary)] disabled:opacity-40"
                   disabled={safePage === 0}
                   onClick={() => goToPage(safePage - 1)}
                   type="button"
@@ -140,7 +140,7 @@ export function FleetIntelligencePanel({ averageUtilization, vehicles }: { avera
                 </button>
                 <button
                   aria-label="Next vehicle page"
-                  className="pressable inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-white/10 text-white disabled:opacity-40"
+                  className="pressable inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border)] bg-white text-[var(--foreground-secondary)] disabled:opacity-40"
                   disabled={safePage >= totalPages - 1}
                   onClick={() => goToPage(safePage + 1)}
                   type="button"

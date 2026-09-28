@@ -49,8 +49,8 @@ export function UndoCancellationButton({
       <button
         className={
           compact
-            ? "pressable inline-flex min-h-8 items-center justify-center gap-1.5 rounded-md border border-[#d6e5e2] bg-white px-3 py-1.5 text-[12px] font-semibold text-[#0f766e]"
-            : "pressable inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border border-[#d6e5e2] bg-white px-3 py-2 text-sm font-black text-[#0f766e]"
+            ? "pressable inline-flex min-h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border)] bg-white px-3 py-1.5 text-[12px] font-semibold text-[var(--primary)]"
+            : "pressable inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--primary)]"
         }
         onClick={() => setOpen(true)}
         type="button"
@@ -61,20 +61,20 @@ export function UndoCancellationButton({
 
       {open ? (
         <div className="fixed inset-0 z-50 flex items-end bg-[#10252b]/60 p-3 sm:items-center sm:justify-center">
-          <div className="w-full max-w-md rounded-2xl border border-[#d6e5e2] bg-white shadow-2xl">
+          <div className="w-full max-w-md rounded-2xl border border-[var(--border)] bg-white shadow-2xl">
 
-            <div className="flex items-start gap-3 rounded-t-2xl border-b border-[#d6e5e2] bg-[#f0fdf9] p-4">
-              <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#ccfbf1] text-[#0d9488]">
+            <div className="flex items-start gap-3 rounded-t-2xl border-b border-[var(--border)] bg-[#fbfaf8] p-4">
+              <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)] text-[var(--primary)]">
                 <RotateCcw size={17} />
               </div>
               <div className="flex-1">
-                <p className="text-xs font-black uppercase text-[#0d9488]">Undo cancellation</p>
-                <h3 className="text-lg font-black text-[#10252b]">
+                <p className="text-xs font-semibold uppercase text-[var(--primary)]">Undo cancellation</p>
+                <h3 className="text-lg font-semibold text-[var(--foreground)]">
                   {customerName || "This booking"}
                 </h3>
               </div>
               <button
-                className="pressable rounded-lg p-1.5 text-[#667085]"
+                className="pressable rounded-lg p-1.5 text-[var(--muted)]"
                 onClick={() => setOpen(false)}
                 type="button"
               >
@@ -83,16 +83,16 @@ export function UndoCancellationButton({
             </div>
 
             <div className="space-y-4 p-4">
-              <div className="space-y-1.5 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-3">
-                <p className="text-xs font-black uppercase text-[#667085]">This will restore:</p>
+              <div className="space-y-1.5 rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-3">
+                <p className="text-xs font-semibold uppercase text-[var(--muted)]">This will restore:</p>
                 {[
                   "Booking status → active",
                   "Vehicle re-assigned to this booking",
                   "Future scheduled payments reinstated",
                   "Booking link restored to active",
                 ].map((line, i) => (
-                  <div className="flex items-start gap-2 text-sm text-[#10252b]" key={i}>
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0d9488]" />
+                  <div className="flex items-start gap-2 text-sm text-[var(--foreground)]" key={i}>
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--primary)]" />
                     {line}
                   </div>
                 ))}
@@ -113,7 +113,7 @@ export function UndoCancellationButton({
 
               <div className="flex gap-2">
                 <button
-                  className="pressable inline-flex min-h-10 flex-1 items-center justify-center rounded-xl border border-[#e2e8f0] bg-white px-4 text-sm font-bold text-[#475569]"
+                  className="pressable inline-flex min-h-10 flex-1 items-center justify-center rounded-xl border border-[var(--border)] bg-white px-4 text-sm font-bold text-[var(--foreground-secondary)]"
                   disabled={isPending}
                   onClick={() => setOpen(false)}
                   type="button"
@@ -121,7 +121,7 @@ export function UndoCancellationButton({
                   Back
                 </button>
                 <button
-                  className="pressable inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-[#0d9488] px-4 text-sm font-black text-white disabled:opacity-70"
+                  className="pressable inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--primary)] px-4 text-sm font-semibold text-white disabled:opacity-70"
                   disabled={isPending}
                   onClick={submit}
                   type="button"

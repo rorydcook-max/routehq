@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { updatePaymentSettings } from "@/app/actions/settings";
 
 const inputClass =
-  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(18,184,200,0.16)]";
+  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]";
 
 type PaymentSettings = {
   accepted_payment_methods?: string[] | null;
@@ -94,7 +94,7 @@ export function PaymentMethodsForm({
       <input name="promptpay_qr_remove" type="hidden" value={removePromptPayQr ? "true" : "false"} />
 
       <section className="form-section bg-[var(--primary-light)]">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#0f766e]">Accepted methods</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--primary)]">Accepted methods</p>
         <div className="mt-3 grid gap-3 md:grid-cols-2">
           <MethodCard
             checked
@@ -114,26 +114,26 @@ export function PaymentMethodsForm({
               <label className="block">
                 <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">PromptPay ID</span>
                 <input className={inputClass} defaultValue={settings.promptpay_id || ""} name="promptpay_id" placeholder="Phone number (e.g. 0812345678) or national ID" />
-                <span className="mt-1 block text-xs leading-5 text-[#667085]">
+                <span className="mt-1 block text-xs leading-5 text-[var(--muted)]">
                   Displayed as text below your QR code so customers can also pay by searching your number manually.
                 </span>
               </label>
 
-              <div className="rounded-lg border border-[var(--border)] bg-[#f8fafc] p-3">
+              <div className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
                 <p className="text-[11px] font-medium text-[var(--foreground-secondary)]">PromptPay QR Code</p>
-                <p className="mt-1 text-xs leading-5 text-[#667085]">
+                <p className="mt-1 text-xs leading-5 text-[var(--muted)]">
                   Upload a screenshot or photo of your PromptPay QR code. Customers will scan this in their Thai banking app to pay. You can find your QR code in your banking app under 'Receive money' or 'My QR code'.
                 </p>
                 {promptPayQrUrl && !removePromptPayQr ? (
                   <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
                     <img alt="PromptPay QR code preview" className="h-28 w-28 rounded-lg border border-[var(--border)] bg-white object-contain p-1" src={promptPayQrUrl} />
                     <div className="flex flex-wrap gap-2">
-                      <label className="pressable inline-flex cursor-pointer rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-black text-[#344054]">
+                      <label className="pressable inline-flex cursor-pointer rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--foreground-secondary)]">
                         Replace
                         <input accept="image/png,image/jpeg,image/webp" className="sr-only" name="promptpay_qr" data-keep-original type="file" />
                       </label>
                       <button
-                        className="pressable rounded-lg border border-[#fecdd3] bg-[#fff1f2] px-3 py-2 text-sm font-black text-[#be123c]"
+                        className="pressable rounded-lg border border-[#fecdd3] bg-[#fff1f2] px-3 py-2 text-sm font-semibold text-[#be123c]"
                         onClick={() => {
                           setRemovePromptPayQr(true);
                           setPromptPayQrUrl("");
@@ -198,13 +198,13 @@ export function PaymentMethodsForm({
               <input className={inputClass} defaultValue={settings.revolut_link || ""} name="revolut_link" placeholder="e.g. revolut.me/yourname" />
             </label>
           </MethodCard>
-          <div className="rounded-lg border border-[var(--border)] bg-[#f8fafc] p-3 opacity-75">
+          <div className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3 opacity-75">
             <div className="flex items-start justify-between gap-3">
               <label className="checkbox-label">
                 <input className="flex-shrink-0" disabled type="checkbox" />
                 <span>
-                  <span className="block font-black text-[#64748b]">Credit / Debit Card</span>
-                  <span className="mt-1 block text-xs leading-5 text-[#667085]">Card payments via Stripe</span>
+                  <span className="block font-semibold text-[var(--muted)]">Credit / Debit Card</span>
+                  <span className="mt-1 block text-xs leading-5 text-[var(--muted)]">Card payments via Stripe</span>
                 </span>
               </label>
               <span className="rounded-full border border-[#fde68a] bg-[#fffbeb] px-2 py-1 text-xs font-bold uppercase text-[#d97706]">
@@ -216,7 +216,7 @@ export function PaymentMethodsForm({
       </section>
 
       <section className="form-section bg-[var(--warning-light)]">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#0f766e]">Receipt settings</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--primary)]">Receipt settings</p>
         <div className="mt-3 grid gap-3 lg:grid-cols-2">
           <label className="block">
             <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Receipt number prefix</span>
@@ -227,7 +227,7 @@ export function PaymentMethodsForm({
               onChange={(event) => setReceiptPrefix(event.target.value)}
               value={receiptPrefix}
             />
-            <span className="mt-1 block text-xs text-[#667085]">Next receipt will be: {previewPrefix}-2026-0001</span>
+            <span className="mt-1 block text-xs text-[var(--muted)]">Next receipt will be: {previewPrefix}-2026-0001</span>
           </label>
           <label className="block">
             <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Default payment method</span>
@@ -302,8 +302,8 @@ function MethodCard({
           type="checkbox"
         />
         <span>
-          <span className="block font-black text-[#10252b]">{label}</span>
-          <span className="mt-1 block text-xs leading-5 text-[#667085]">{description}</span>
+          <span className="block font-semibold text-[var(--foreground)]">{label}</span>
+          <span className="mt-1 block text-xs leading-5 text-[var(--muted)]">{description}</span>
         </span>
       </label>
       {checked ? children : null}

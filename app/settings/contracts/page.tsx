@@ -32,7 +32,7 @@ export default async function ContractSettingsPage() {
 
       <Card className="mb-4">
         <SectionHeader eyebrow="Default template" title={template.name || template.title || "Standard rental agreement"} />
-        <p className="mt-2 text-sm leading-6 text-[#667085]">
+        <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
           This stage supports one default template. The database already supports multiple templates by language and vehicle type for the next contract phase.
         </p>
       </Card>

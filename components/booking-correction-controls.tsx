@@ -62,7 +62,7 @@ function dateInput(value: string | null | undefined) {
 function dateLabel(value: string | null | undefined) {
   const normalized = dateInput(value);
   if (!normalized) return "Open";
-  return new Intl.DateTimeFormat("en-TH", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(normalized));
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(new Date(normalized));
 }
 
 function amountInput(value: unknown) {
@@ -152,8 +152,8 @@ export function AddRentalPaymentInlineForm({ organizationId, rentalId, currency 
     <div className="sub-surface p-3" id="add-payment-row">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <p className="font-black text-[#10252b]">Add charge</p>
-          <p className="text-sm text-[#667085]">Add a new charge or scheduled amount due to this rental.</p>
+          <p className="font-semibold text-[var(--foreground)]">Add charge</p>
+          <p className="text-sm text-[var(--muted)]">Add a new charge or scheduled amount due to this rental.</p>
         </div>
         <ActionButton onClick={() => setOpen((current) => !current)}>{open ? "Close" : "Add charge"}</ActionButton>
       </div>
@@ -163,7 +163,7 @@ export function AddRentalPaymentInlineForm({ organizationId, rentalId, currency 
             <label>
               Amount
               <div className="mt-1 flex items-center rounded-lg border border-[var(--border-strong)] bg-white">
-                <span className="font-mono-data px-3 text-sm font-black text-[var(--muted)]">{currency === "THB" ? "฿" : currency}</span>
+                <span className="font-mono-data px-3 text-sm font-semibold text-[var(--muted)]">{currency === "THB" ? "฿" : currency}</span>
                 <input className="font-mono-data h-9 min-w-0 flex-1 border-0 bg-transparent px-0 pr-3 text-sm outline-none" min="0" step="0.01" type="number" value={amount} onChange={(event) => setAmount(event.target.value)} />
               </div>
             </label>
@@ -246,12 +246,12 @@ export function ExistingRentalPaymentSetupCard({
     <div className="rounded-xl border border-[#fde68a] bg-[#fffbeb] p-3">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="font-black text-[#92400e]">Set up payment records for this rental</p>
+          <p className="font-semibold text-[#92400e]">Set up payment records for this rental</p>
           <p className="mt-1 text-sm leading-5 text-[#b45309]">
             Since this rental was entered directly, payment records were not auto-generated. Choose how to set up the first rent payment and security deposit.
           </p>
         </div>
-        <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-lg border border-[#fde68a] bg-white px-3 text-xs font-black text-[#92400e]" href={`/bookings/${rentalId}/edit#payments`}>
+        <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-lg border border-[#fde68a] bg-white px-3 text-xs font-semibold text-[#92400e]" href={`/bookings/${rentalId}/edit#payments`}>
           Set up manually
         </Link>
       </div>
@@ -261,14 +261,14 @@ export function ExistingRentalPaymentSetupCard({
           <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#b45309]">First rental payment</p>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             <button
-              className={`pressable rounded-lg border px-3 py-2 text-left text-xs font-black ${firstPaymentMode === "collected" ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
+              className={`pressable rounded-lg border px-3 py-2 text-left text-xs font-semibold ${firstPaymentMode === "collected" ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
               onClick={() => setFirstPaymentMode("collected")}
               type="button"
             >
               First payment already collected
             </button>
             <button
-              className={`pressable rounded-lg border px-3 py-2 text-left text-xs font-black ${firstPaymentMode === "outstanding" ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
+              className={`pressable rounded-lg border px-3 py-2 text-left text-xs font-semibold ${firstPaymentMode === "outstanding" ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
               onClick={() => setFirstPaymentMode("outstanding")}
               type="button"
             >
@@ -279,7 +279,7 @@ export function ExistingRentalPaymentSetupCard({
             <label>
               Amount
               <div className="mt-1 flex items-center rounded-lg border border-[var(--border-strong)] bg-white">
-                <span className="font-mono-data px-3 text-sm font-black text-[var(--muted)]">{currency === "THB" ? "฿" : currency}</span>
+                <span className="font-mono-data px-3 text-sm font-semibold text-[var(--muted)]">{currency === "THB" ? "฿" : currency}</span>
                 <input className="font-mono-data h-9 min-w-0 flex-1 border-0 bg-transparent px-0 pr-3 text-sm outline-none" min="0" step="0.01" type="number" value={firstPaymentAmount} onChange={(event) => setFirstPaymentAmount(event.target.value)} />
               </div>
             </label>
@@ -309,7 +309,7 @@ export function ExistingRentalPaymentSetupCard({
               ["none", "No deposit for this rental"]
             ].map(([value, label]) => (
               <button
-                className={`pressable rounded-lg border px-3 py-2 text-left text-xs font-black ${depositMode === value ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
+                className={`pressable rounded-lg border px-3 py-2 text-left text-xs font-semibold ${depositMode === value ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
                 key={value}
                 onClick={() => setDepositMode(value as "collected" | "pending" | "none")}
                 type="button"
@@ -323,7 +323,7 @@ export function ExistingRentalPaymentSetupCard({
               <label>
                 Deposit amount
                 <div className="mt-1 flex items-center rounded-lg border border-[var(--border-strong)] bg-white">
-                  <span className="font-mono-data px-3 text-sm font-black text-[var(--muted)]">{currency === "THB" ? "฿" : currency}</span>
+                  <span className="font-mono-data px-3 text-sm font-semibold text-[var(--muted)]">{currency === "THB" ? "฿" : currency}</span>
                   <input className="font-mono-data h-9 min-w-0 flex-1 border-0 bg-transparent px-0 pr-3 text-sm outline-none" min="0" step="0.01" type="number" value={depositPaymentAmount} onChange={(event) => setDepositPaymentAmount(event.target.value)} />
                 </div>
               </label>
@@ -378,7 +378,7 @@ function ActionButton({
 
   return (
     <button
-      className={`pressable inline-flex min-h-8 items-center justify-center rounded-lg px-3 text-xs font-black disabled:cursor-not-allowed disabled:opacity-60 ${className}`}
+      className={`pressable inline-flex min-h-8 items-center justify-center rounded-lg px-3 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-60 ${className}`}
       disabled={disabled}
       onClick={onClick}
       type={type}
@@ -419,7 +419,7 @@ export function EditableEndDate({ rentalId, currentEndDate }: { rentalId: string
   if (editing) {
     return (
       <span className="inline-flex flex-wrap items-center gap-2">
-        <input className="font-mono-data h-8 rounded-lg border border-[var(--border)] bg-white px-2 text-xs font-black" type="date" value={value} onChange={(event) => setValue(event.target.value)} />
+        <input className="font-mono-data h-8 rounded-lg border border-[var(--border)] bg-white px-2 text-xs font-semibold" type="date" value={value} onChange={(event) => setValue(event.target.value)} />
         <ActionButton disabled={isPending} onClick={save} tone="primary">
           {isPending ? "Saving..." : "Save"}
         </ActionButton>
@@ -526,18 +526,18 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <p className={`font-mono-data font-black ${voided ? "text-[var(--muted)] line-through" : "text-[#10252b]"}`}>{money(payment.amount, payment.currency || "THB")}</p>
+            <p className={`font-mono-data font-semibold ${voided ? "text-[var(--muted)] line-through" : "text-[var(--foreground)]"}`}>{money(payment.amount, payment.currency || "THB")}</p>
             {isExtension ? <SmallBadge tone="blue">Extension</SmallBadge> : null}
             {voided ? <SmallBadge tone="neutral">Voided</SmallBadge> : null}
           </div>
-          <p className={`text-sm ${voided ? "text-[var(--muted)]" : "text-[#667085]"}`}>{paymentDescription(payment)}</p>
-          <p className="text-sm text-[#667085]">Due {dateLabel(payment.due_date)}</p>
+          <p className={`text-sm ${voided ? "text-[var(--muted)]" : "text-[var(--muted)]"}`}>{paymentDescription(payment)}</p>
+          <p className="text-sm text-[var(--muted)]">Due {dateLabel(payment.due_date)}</p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <SmallBadge tone={badgeTone as any}>{voided ? "voided" : payment.status || "pending"}</SmallBadge>
           {canRecordPayment ? (
             <button
-              className="pressable inline-flex min-h-9 items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-4 text-sm font-black text-white"
+              className="pressable inline-flex min-h-9 items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-4 text-sm font-semibold text-white"
               onClick={() => {
                 setRecordAmount(amountInput(payment.amount));
                 setRecordDate(businessToday());
@@ -563,7 +563,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
             <label>
               Amount received
               <div className="mt-1 flex items-center rounded-lg border border-[var(--border-strong)] bg-white">
-                <span className="font-mono-data px-3 text-sm font-black text-[var(--muted)]">฿</span>
+                <span className="font-mono-data px-3 text-sm font-semibold text-[var(--muted)]">฿</span>
                 <input className="font-mono-data h-9 min-w-0 flex-1 border-0 bg-transparent px-0 pr-3 text-sm outline-none" min="0" step="0.01" type="number" value={recordAmount} onChange={(event) => setRecordAmount(event.target.value)} />
               </div>
             </label>
@@ -598,7 +598,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
             <label>
               Amount
               <div className="mt-1 flex items-center rounded-lg border border-[var(--border-strong)] bg-white">
-                <span className="font-mono-data px-3 text-sm font-black text-[var(--muted)]">฿</span>
+                <span className="font-mono-data px-3 text-sm font-semibold text-[var(--muted)]">฿</span>
                 <input className="font-mono-data h-9 min-w-0 flex-1 border-0 bg-transparent px-0 pr-3 text-sm outline-none" min="0" step="0.01" type="number" value={amount} onChange={(event) => setAmount(event.target.value)} />
               </div>
             </label>
@@ -737,15 +737,15 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <p className={`font-black ${voided ? "text-[var(--muted)]" : "text-[#10252b]"}`}>{String(transaction.type || "other").replace(/_/g, " ")}</p>
+            <p className={`font-semibold ${voided ? "text-[var(--muted)]" : "text-[var(--foreground)]"}`}>{String(transaction.type || "other").replace(/_/g, " ")}</p>
             {isRefund ? <SmallBadge tone="amber">Refund</SmallBadge> : null}
             {voided ? <SmallBadge tone="neutral">Voided</SmallBadge> : null}
           </div>
-          <p className={`text-sm ${voided ? "text-[var(--muted)]" : "text-[#667085]"}`}>{dateLabel(transaction.transaction_date)} {transaction.notes ? `/ ${transaction.notes}` : ""}</p>
+          <p className={`text-sm ${voided ? "text-[var(--muted)]" : "text-[var(--muted)]"}`}>{dateLabel(transaction.transaction_date)} {transaction.notes ? `/ ${transaction.notes}` : ""}</p>
           {isRefund && transaction.metadata?.refund_reason ? <p className="mt-1 text-sm font-semibold text-[#b45309]">{transaction.metadata.refund_reason}</p> : null}
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          <span className={`font-mono-data font-black ${amountClass}`}>{money(transaction.amount, transaction.currency || "THB")}</span>
+          <span className={`font-mono-data font-semibold ${amountClass}`}>{money(transaction.amount, transaction.currency || "THB")}</span>
           {!voided ? (
             <button className="pressable inline-flex h-8 w-8 items-center justify-center rounded-full text-[var(--muted)] hover:bg-[var(--panel-secondary)] hover:text-[var(--primary)]" onClick={() => setEditing((open) => !open)} type="button">
               <i aria-hidden="true" className="ti ti-pencil text-[13px]" />
@@ -760,7 +760,7 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
             <label>
               Amount
               <div className="mt-1 flex items-center rounded-lg border border-[var(--border-strong)] bg-white">
-                <span className="font-mono-data px-3 text-sm font-black text-[var(--muted)]">฿</span>
+                <span className="font-mono-data px-3 text-sm font-semibold text-[var(--muted)]">฿</span>
                 <input className="font-mono-data h-9 min-w-0 flex-1 border-0 bg-transparent px-0 pr-3 text-sm outline-none" step="0.01" type="number" value={amount} onChange={(event) => setAmount(event.target.value)} />
               </div>
             </label>

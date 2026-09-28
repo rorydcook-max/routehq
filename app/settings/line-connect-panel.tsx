@@ -46,10 +46,10 @@ export function LineConnectPanel({ organizationId, lineOaId }: { organizationId:
   const sendUrl = code ? `https://line.me/R/oaMessage/${encodeURIComponent(oa)}/?${encodeURIComponent(code)}` : "";
 
   return (
-    <div className="mt-3 space-y-4 rounded-lg border border-[#dfe4ea] p-3">
+    <div className="mt-3 space-y-4 rounded-lg border border-[var(--border)] p-3">
       <div className="space-y-2">
-        <p className="text-xs font-bold uppercase tracking-wide text-[#0f766e]">Step 1 · Add RouteHQ on LINE</p>
-        <p className="text-sm text-[#344054]">
+        <p className="text-xs font-bold uppercase tracking-wide text-[var(--primary)]">Step 1 · Add RouteHQ on LINE</p>
+        <p className="text-sm text-[var(--foreground-secondary)]">
           Add <span className="font-mono font-semibold">{oa}</span> as a friend in LINE.
         </p>
         <a
@@ -63,13 +63,13 @@ export function LineConnectPanel({ organizationId, lineOaId }: { organizationId:
       </div>
 
       <div className="space-y-2">
-        <p className="text-xs font-bold uppercase tracking-wide text-[#0f766e]">Step 2 · Send your connection code</p>
+        <p className="text-xs font-bold uppercase tracking-wide text-[var(--primary)]">Step 2 · Send your connection code</p>
         {code ? (
           <>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-lg border border-[#dfe4ea] bg-[#f8fafc] px-3 py-2 font-mono text-lg font-bold tracking-wider text-[#172026]">{code}</span>
+              <span className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] px-3 py-2 font-mono text-lg font-bold tracking-wider text-[var(--foreground)]">{code}</span>
               <button
-                className="rounded-lg border border-[#dfe4ea] bg-white px-3 py-2 text-sm font-semibold text-[#344054]"
+                className="rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--foreground-secondary)]"
                 onClick={() => {
                   navigator.clipboard?.writeText(code).then(() => setCopied(true)).catch(() => null);
                 }}
@@ -81,7 +81,7 @@ export function LineConnectPanel({ organizationId, lineOaId }: { organizationId:
                 Send in LINE
               </a>
             </div>
-            <p className="text-xs text-[#667085]">
+            <p className="text-xs text-[var(--muted)]">
               Send this code to {oa} in LINE (the button opens the chat with it filled in). This page updates by itself once it arrives. The code works for 30 minutes.
             </p>
           </>

@@ -9,6 +9,8 @@ import { TRANSACTION_TYPE_OPTIONS } from "@/lib/transaction-options";
 import type { MatchResult } from "@/lib/transaction-matching";
 import type { TransactionFormOptions, TransactionFormPrefill } from "@/lib/transactions";
 
+const MONEY_IN: string[] = ["rental_income", "deposit_received", "deposit_forfeited", "deposit_deduction"];
+
 const inputClass =
   "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(18,184,200,0.16)]";
 
@@ -104,6 +106,7 @@ export function TransactionForm({
     setMatches([]);
   }
 
+  const isMoneyIn = MONEY_IN.includes(type);
   const linkedBadge = linkedRentalPaymentId ? "Linked to rental payment" : linkedTaskId ? "Linked to task" : "";
 
   return (
@@ -167,11 +170,20 @@ export function TransactionForm({
           <label className="block sm:col-span-2">
             <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Type</span>
             <select className={inputClass} name="type" onChange={(event) => setType(event.target.value)} required value={type}>
-              {TRANSACTION_TYPE_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
+              <optgroup label="Money in">
+                {TRANSACTION_TYPE_OPTIONS.filter((option) => MONEY_IN.includes(option.value)).map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label="Money out">
+                {TRANSACTION_TYPE_OPTIONS.filter((option) => !MONEY_IN.includes(option.value) && option.value !== "deposit").map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </optgroup>
             </select>
           </label>
 
@@ -235,15 +247,19 @@ export function TransactionForm({
             <input className={inputClass} name="transactionDate" onChange={(event) => setTransactionDate(event.target.value)} required type="date" value={transactionDate} />
           </label>
 
-          <label className="block">
-            <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Supplier</span>
-            <input className={inputClass} name="supplier" placeholder="Garage, fuel station, insurer" />
-          </label>
+          {isMoneyIn ? null : (
+            <>
+              <label className="block">
+                <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Paid to (optional)</span>
+                <input className={inputClass} name="supplier" placeholder="Garage, fuel station, insurer" />
+              </label>
 
-          <label className="block">
-            <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Mileage (optional)</span>
-            <input className={inputClass} min="0" name="mileage" type="number" />
-          </label>
+              <label className="block">
+                <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Mileage (optional)</span>
+                <input className={inputClass} min="0" name="mileage" type="number" />
+              </label>
+            </>
+          )}
 
           <label className="block sm:col-span-2">
             <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Notes</span>

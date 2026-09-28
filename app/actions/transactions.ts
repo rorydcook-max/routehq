@@ -505,6 +505,7 @@ export async function createTransaction(formData: FormData) {
       mileage: numberField(formData, "mileage"),
       notes: optionalString(formData, "notes"),
       receipt_document_id: receiptDocumentId,
+      ...(type === "deposit_received" && rentalId ? { is_deposit: true, deposit_rental_id: rentalId } : {}),
       created_by: user.id
     })
     .select("id")
@@ -512,6 +513,37 @@ export async function createTransaction(formData: FormData) {
 
   if (error) {
     throw new Error(error.message);
+  }
+
+  // A deposit taken for a booking is held against it (as when recorded from the booking page).
+  if (type === "deposit_received" && rentalId) {
+    const { data: depositRental } = await supabase
+      .from("rentals")
+      .select("deposit_held")
+      .eq("id", rentalId)
+      .eq("organization_id", organizationId)
+      .maybeSingle();
+    if (depositRental) {
+      await supabase
+        .from("rentals")
+        .update({
+          deposit_held: Number(depositRental.deposit_held || 0) + amount,
+          deposit_status: "received",
+          deposit_received_at: new Date().toISOString()
+        })
+        .eq("id", rentalId)
+        .eq("organization_id", organizationId);
+    }
+  }
+
+  if (rentalPaymentId) {
+    // The payment's reminder task, if one was created, is done too.
+    await supabase
+      .from("tasks")
+      .update({ completed_at: new Date().toISOString(), completion_notes: "Payment recorded." })
+      .eq("organization_id", organizationId)
+      .eq("rental_payment_id", rentalPaymentId)
+      .is("completed_at", null);
   }
 
   if (rentalPaymentId) {

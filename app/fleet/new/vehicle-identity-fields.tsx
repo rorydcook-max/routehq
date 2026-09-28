@@ -465,7 +465,7 @@ export function VehicleIdentityFields({
       }
 
       setOcrStatus("done");
-      setOcrMessage(`Fields populated from logbook${extracted.confidence ? ` (${Math.round(extracted.confidence * 100)}% confidence)` : ""}.`);
+      setOcrMessage("Filled in what we could read from the document. Please check each field before saving.");
     } catch (error) {
       setOcrStatus("error");
       setOcrMessage(error instanceof Error ? error.message : "Unable to read this document.");
@@ -475,12 +475,12 @@ export function VehicleIdentityFields({
   return (
     <>
       <div className="rounded-2xl border border-[#a7edf4] bg-[var(--primary-light)] p-4">
-        <SectionHeader eyebrow="Blue book OCR" title="Scan or upload logbook" />
+        <SectionHeader eyebrow="Quick start (optional)" title="Scan the blue book" />
         <p className="mt-2 text-sm text-[#667085]">
-          Upload a car title, logbook, or Thai blue book photo/PDF. OCR will try to populate the form before you save, then decode the VIN if one is found.
+          Take a photo of the Thai blue book (เล่มทะเบียน) or another registration document and we&apos;ll fill in what we can read. Check the details before saving.
         </p>
         <label className="mt-4 block">
-          <span className="text-sm font-semibold text-[#344054]">Logbook image or PDF</span>
+          <span className="text-sm font-semibold text-[#344054]">Photo or PDF of the blue book</span>
           <input
             accept="image/*,application/pdf"
             capture="environment"
@@ -500,14 +500,14 @@ export function VehicleIdentityFields({
                   : "bg-[#e6fffb] text-[#0f766e]"
             }`}
           >
-            {ocrStatus === "reading" ? "Reading logbook..." : ocrMessage}
+            {ocrStatus === "reading" ? "Reading the document…" : ocrMessage}
           </p>
         ) : null}
       </div>
 
       <div className="rounded-2xl border border-[#bfd1ff] bg-[var(--primary-blue-light)] p-4">
-        <SectionHeader eyebrow="Catalog fallback" title="Vehicle identity" />
-        {catalogStatus === "loading" ? <p className="mt-3 text-sm font-semibold text-[#0f766e]">Loading vehicle catalog...</p> : null}
+        <SectionHeader eyebrow="Vehicle" title="Make and model" />
+        {catalogStatus === "loading" ? <p className="mt-3 text-sm font-semibold text-[#0f766e]">Loading makes and models…</p> : null}
         {catalogStatus === "error" ? <p className="mt-3 rounded-lg bg-[#ffe4e6] px-3 py-2 text-sm font-semibold text-[#be123c]">{catalogMessage}</p> : null}
 
         <input name="make" type="hidden" value={make} />

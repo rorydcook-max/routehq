@@ -159,7 +159,7 @@ export async function getTransactionFormPrefill({
   if (rentalPaymentId) {
     const { data, error } = await supabase
       .from("rental_payments")
-      .select("id, rental_id, amount, due_date, rentals!inner(id, vehicle_id, customer_id, vehicles!rentals_vehicle_id_fkey(registration_number, make, model), customers!rentals_customer_id_fkey(full_name))")
+      .select("id, rental_id, amount, due_date, metadata, rentals!inner(id, vehicle_id, customer_id, vehicles!rentals_vehicle_id_fkey(registration_number, make, model), customers!rentals_customer_id_fkey(full_name))")
       .eq("organization_id", organizationId)
       .eq("id", rentalPaymentId)
       .maybeSingle();
@@ -176,11 +176,17 @@ export async function getTransactionFormPrefill({
     const vehicleName = [vehicle.make, vehicle.model].filter(Boolean).join(" ") || vehicle.registration_number || "vehicle";
     const month = new Intl.DateTimeFormat("en-TH", { month: "short" }).format(new Date(dueDate));
 
+    const isDeposit = data.metadata?.type === "deposit" || data.metadata?.is_deposit === true;
+    const isExtension = data.metadata?.type === "extension";
     return {
-      type: "rental_income",
+      type: isDeposit ? "deposit_received" : "rental_income",
       amount: String(Number(data.amount || 0)),
       transactionDate: businessToday(),
-      notes: `${month} rental payment - ${vehicleName}`,
+      notes: isDeposit
+        ? `Deposit - ${vehicleName}`
+        : isExtension
+          ? `Extension payment - ${vehicleName}`
+          : `${data.metadata?.period_label || month} rent - ${vehicleName}`,
       vehicleId: rental.vehicle_id || "",
       rentalId: data.rental_id || rental.id || "",
       customerId: rental.customer_id || "",

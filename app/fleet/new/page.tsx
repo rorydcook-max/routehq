@@ -58,7 +58,7 @@ export default async function NewVehiclePage() {
           <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <h1 className="text-2xl font-black tracking-[-0.03em] text-[var(--foreground)] sm:text-3xl">Add vehicle</h1>
-              <p className="mt-1 text-sm font-medium text-[var(--muted)]">Create a real Supabase vehicle asset. It will appear on Fleet and the dashboard immediately.</p>
+              <p className="mt-1 text-sm font-medium text-[var(--muted)]">Add a car, motorbike or van. Only the make, model and registration are needed now; fill in the rest any time.</p>
             </div>
             <Link className="pressable inline-flex justify-center rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm font-bold text-[var(--foreground-secondary)] hover:border-[var(--primary-blue)] hover:text-[var(--primary-blue)]" href="/fleet/import">
               Import vehicles
@@ -67,7 +67,7 @@ export default async function NewVehiclePage() {
         </div>
 
         <Card>
-          <SectionHeader eyebrow="Vehicle asset" title="Core details" />
+          <SectionHeader eyebrow="New vehicle" title="Vehicle details" />
           <form action={createVehicle} className="mt-5 space-y-5">
             <input name="organizationId" type="hidden" value={organization.id} />
 

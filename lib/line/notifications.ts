@@ -1,5 +1,4 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { getDefaultOrganizationSlug } from "@/lib/supabase/config";
 import { sendLinePushMessage, lineText, lineFlex } from "@/lib/providers/messaging/line";
 
 const THB = (n: number) =>
@@ -10,17 +9,20 @@ type OrgLineSettings = {
   notifications: Record<string, boolean>;
 };
 
-async function getOrgLineSettings(): Promise<OrgLineSettings | null> {
+/** The LINE account alerts for this business go to, or null when LINE is off / not connected. */
+async function getOrgLineSettings(organizationId: string): Promise<OrgLineSettings | null> {
+  if (!organizationId) return null;
   try {
     const supabase = createSupabaseAdminClient() as any;
     const { data: org } = await supabase
       .from("organizations")
-      .select("settings")
-      .eq("slug", getDefaultOrganizationSlug())
+      .select("settings, line_user_id, line_notifications_enabled")
+      .eq("id", organizationId)
       .is("deleted_at", null)
-      .single();
+      .maybeSingle();
 
-    const lineUserId = org?.settings?.line_user_id;
+    if (!org || org.line_notifications_enabled === false) return null;
+    const lineUserId = org.line_user_id || org.settings?.line_user_id;
     if (!lineUserId) return null;
 
     return {
@@ -61,11 +63,12 @@ function buildEventBubble(emoji: string, title: string, body: string, color = "#
 }
 
 export async function notifyPaymentReceived(params: {
+  organizationId: string;
   amount: number;
   customerName: string;
   vehicleLabel: string;
 }): Promise<void> {
-  const settings = await getOrgLineSettings();
+  const settings = await getOrgLineSettings(params.organizationId);
   if (!settings || !isEnabled(settings.notifications, "event_payment_received")) return;
 
   const msg = buildEventBubble(
@@ -79,10 +82,11 @@ export async function notifyPaymentReceived(params: {
 }
 
 export async function notifyContractSigned(params: {
+  organizationId: string;
   customerName: string;
   vehicleLabel: string;
 }): Promise<void> {
-  const settings = await getOrgLineSettings();
+  const settings = await getOrgLineSettings(params.organizationId);
   if (!settings || !isEnabled(settings.notifications, "event_contract_signed")) return;
 
   const msg = buildEventBubble(
@@ -94,8 +98,8 @@ export async function notifyContractSigned(params: {
   await sendLinePushMessage(settings.lineUserId, [msg]).catch(() => null);
 }
 
-export async function notifyGpsOffline(params: { vehicleLabel: string }): Promise<void> {
-  const settings = await getOrgLineSettings();
+export async function notifyGpsOffline(params: { organizationId: string; vehicleLabel: string }): Promise<void> {
+  const settings = await getOrgLineSettings(params.organizationId);
   if (!settings || !isEnabled(settings.notifications, "event_gps_offline")) return;
 
   const msg = buildEventBubble(
@@ -109,12 +113,13 @@ export async function notifyGpsOffline(params: { vehicleLabel: string }): Promis
 }
 
 export async function notifyComplianceExpiringSoon(params: {
+  organizationId: string;
   vehicleLabel: string;
   item: string;
   expiryDate: string;
   daysUntilExpiry: number;
 }): Promise<void> {
-  const settings = await getOrgLineSettings();
+  const settings = await getOrgLineSettings(params.organizationId);
   if (!settings || !isEnabled(settings.notifications, "event_compliance_expiry")) return;
 
   const urgency = params.daysUntilExpiry <= 1 ? "#dc2626" : "#d97706";
@@ -131,11 +136,12 @@ export async function notifyComplianceExpiringSoon(params: {
 }
 
 export async function notifyRentalOverdue(params: {
+  organizationId: string;
   customerName: string;
   vehicleLabel: string;
   endDate: string;
 }): Promise<void> {
-  const settings = await getOrgLineSettings();
+  const settings = await getOrgLineSettings(params.organizationId);
   if (!settings || !isEnabled(settings.notifications, "event_rental_overdue")) return;
 
   const msg = buildEventBubble(
@@ -149,10 +155,11 @@ export async function notifyRentalOverdue(params: {
 }
 
 export async function notifyNewBookingRequest(params: {
+  organizationId: string;
   customerName: string;
   vehicleLabel: string;
 }): Promise<void> {
-  const settings = await getOrgLineSettings();
+  const settings = await getOrgLineSettings(params.organizationId);
   if (!settings || !isEnabled(settings.notifications, "event_new_booking")) return;
 
   const msg = buildEventBubble(

@@ -11,7 +11,6 @@ import { recordActivityEvent } from "@/lib/supabase/activity";
 import { countersignRentalAgreementForCustomer } from "@/lib/rental-agreement-automation";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { processCustomerPortalAction } from "@/lib/portal-notifications";
-import { notifyContractSigned } from "@/lib/line/notifications";
 import { notifyOperator } from "@/lib/notify-operator";
 import { generatePaymentSchedule } from "@/lib/payment-schedule";
 import {
@@ -900,7 +899,7 @@ export async function completePublicBooking(formData: FormData) {
         customer_id: customerId,
         event_type: "booking_completed",
         title: "Booking completed",
-        detail: `${fullName} completed their details and signed the immutable rental agreement.`
+        detail: `${fullName} completed their details and signed the rental agreement.`
       }),
       logCommunicationEvent({
         supabase,
@@ -908,7 +907,7 @@ export async function completePublicBooking(formData: FormData) {
         rentalId: bookingLink.rental_id,
         customerId,
         type: "booking_link_activity",
-        content: "Customer signed immutable rental document agreement",
+        content: "Customer signed the rental agreement",
         metadata: { booking_link_id: bookingLink.id }
       })
     ]);
@@ -955,7 +954,7 @@ export async function completePublicBooking(formData: FormData) {
 
     notifyOperator(
       organizationId,
-      `Customer completed booking form and signed the immutable rental agreement`,
+      `✍️ ${fullName || signedName || "Your customer"} completed their booking and signed the rental agreement.`,
       "contract_signed"
     ).catch(() => null);
 
@@ -1170,17 +1169,10 @@ export async function completePublicBooking(formData: FormData) {
   const vehicleLabel = vehicle ? `${vehicle.make} ${vehicle.model} (${vehicle.registration_number})` : "";
   const customerDisplayName = customer?.full_name || signedName;
 
-  notifyContractSigned({ customerName: customerDisplayName, vehicleLabel }).catch(() => null);
-
+  // One message for the whole step: filling in the form and signing happen together.
   notifyOperator(
     organizationId,
-    `✅ ${customerDisplayName} completed booking form for ${vehicleLabel || "their vehicle"}`,
-    "booking_form_completed"
-  ).catch(() => null);
-
-  notifyOperator(
-    organizationId,
-    `✍️ ${customerDisplayName} signed the rental contract for ${vehicleLabel || "their vehicle"}`,
+    `✍️ ${customerDisplayName} completed their booking and signed the rental agreement for ${vehicleLabel || "their vehicle"}.`,
     "contract_signed"
   ).catch(() => null);
 

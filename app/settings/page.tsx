@@ -15,7 +15,8 @@ import {
 import { BranchList } from "@/app/settings/branch-list";
 import { ContractsBrandingSection } from "@/app/settings/contracts-branding-section";
 import { LineTestButton } from "@/app/settings/line-test-button";
-import { CopyButton } from "@/app/settings/copy-button";
+import { LineConnectPanel } from "@/app/settings/line-connect-panel";
+import { supportedLocaleOptions } from "@/lib/i18n/locales";
 import { InviteForm } from "@/app/invite/invite-form";
 import { PaymentMethodsForm } from "@/app/settings/payment-methods-form";
 import { TravelPolicyForm } from "@/app/settings/travel-policy-form";
@@ -205,7 +206,7 @@ export default async function SettingsPage() {
       <div className="page-hero mb-5">
         <p className="page-eyebrow">Settings</p>
         <h1 className="page-title">Account and organization</h1>
-        <p className="page-subtitle mt-2">Manage locations, billing, contracts, team access, and catalog curation.</p>
+        <p className="page-subtitle mt-2">Your business details, contracts, payments, LINE alerts, team and billing.</p>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
@@ -234,7 +235,9 @@ export default async function SettingsPage() {
             </div>
             <div className="rounded-lg border border-[#dfe4ea] p-2">
               <p className="text-[9px] font-semibold uppercase tracking-[0.08em] text-[#667085]">Default language</p>
-              <p className="mt-0.5 text-[13px] font-bold">{organization.default_locale.toUpperCase()}</p>
+              <p className="mt-0.5 text-[13px] font-bold">
+                {supportedLocaleOptions.find((option) => option.code === organization.default_locale)?.english || organization.default_locale.toUpperCase()}
+              </p>
             </div>
           </div>
         </Card>
@@ -379,80 +382,19 @@ export default async function SettingsPage() {
             </div>
           </div>
 
-          {/* Setup instructions — shown when NOT connected */}
-          {!lineUserId && (
-            <div className="mt-3 space-y-3 rounded-lg border border-[#dfe4ea] p-3">
-              <p className="text-sm font-semibold text-[#172026]">How to connect</p>
+          {/* Not connected: add the RouteHQ LINE account, then send a one-time code. */}
+          {!lineUserId && <LineConnectPanel lineOaId={lineOaId} organizationId={organization.id} />}
 
-              {/* Step 1 */}
-              <div className="space-y-2">
-                <p className="text-xs font-bold uppercase tracking-wide text-[#0f766e]">Step 1 — Add RouteHQ on LINE</p>
-                <p className="text-sm text-[#344054]">
-                  Search for <span className="font-mono font-semibold">{lineOaId || "@routehq"}</span> in LINE and add as a friend.
-                </p>
-                {lineOaId && (
-                  <a
-                    className="inline-flex items-center gap-2 rounded-lg border border-[#0f766e] px-3 py-2 text-sm font-semibold text-[#0f766e] hover:bg-[#f0fdf4]"
-                    href={`https://line.me/ti/p/${lineOaId}`}
-                    rel="noreferrer"
-                    target="_blank"
-                  >
-                    Open LINE to add
-                  </a>
-                )}
-              </div>
-
-              {/* Step 2 */}
-              <div className="space-y-2">
-                <p className="text-xs font-bold uppercase tracking-wide text-[#0f766e]">Step 2 — Enter your LINE User ID</p>
-                <form action={updateLineSettings} className="space-y-3">
-                  <input name="organizationId" type="hidden" value={organization.id} />
-                  <input name="line_notifications_enabled" type="hidden" value="on" />
-                  <input name="line_daily_summary_enabled" type="hidden" value="on" />
-                  <input name="line_daily_summary_time" type="hidden" value="08:00" />
-                  <label className="block">
-                    <input
-                      className={inputClass}
-                      name="line_user_id"
-                      placeholder="U1234567890abcdef…"
-                      type="text"
-                    />
-                  </label>
-                  <p className="text-xs text-[#667085]">
-                    Find this in LINE app → Profile → Your LINE ID, or in the LINE Developers Console → your channel → Basic Settings → Your user ID at the bottom of the page.
-                  </p>
-                  <PendingButton className="primary-action w-full sm:w-auto" pendingLabel="Saving…" type="submit">
-                    Save and connect
-                  </PendingButton>
-                </form>
-              </div>
+          {/* Developers only: where LINE should send messages. Operators never need this. */}
+          {process.env.NODE_ENV === "development" ? (
+            <div className="mt-3 rounded-lg border border-[#fef3c7] bg-[#fffbeb] p-3 text-xs text-[#78350f]">
+              <p className="font-semibold">Development: LINE webhook</p>
+              <p className="mt-1">
+                Set the channel's webhook URL to <code>{(process.env.NEXT_PUBLIC_APP_URL || "https://your-domain.com").replace(/\/$/, "")}/api/line/webhook</code>{" "}
+                (or an ngrok URL when testing locally).
+              </p>
             </div>
-          )}
-
-          {/* Webhook configuration card — always shown */}
-          {(() => {
-            const appUrl = (process.env.NEXT_PUBLIC_APP_URL || "https://your-domain.com").replace(/\/$/, "");
-            const webhookUrl = `${appUrl}/api/line/webhook`;
-            return (
-              <div className="mt-3 rounded-lg border border-[#dfe4ea] bg-[#f8fafc] p-3">
-                <p className="text-sm font-semibold text-[#172026]">Webhook configuration</p>
-                <p className="mt-1 text-xs text-[#667085]">
-                  Copy this URL and paste it into your LINE Developers Console → your channel → Messaging API → Webhook URL. Then click <strong>Verify</strong>.
-                </p>
-                <div className="mt-3 flex flex-wrap items-center gap-3">
-                  <code className="flex-1 rounded-lg border border-[#dfe4ea] bg-white px-3 py-2 text-xs font-mono text-[#334155] break-all">
-                    {webhookUrl}
-                  </code>
-                  <CopyButton text={webhookUrl} />
-                </div>
-                <p className="mt-3 rounded-lg border border-[#fef3c7] bg-[#fffbeb] px-3 py-2 text-xs text-[#78350f]">
-                  <strong>Local development:</strong> Use your ngrok URL instead:{" "}
-                  <code>ngrok http 3000</code>, then set{" "}
-                  <code>https://[ngrok-url]/api/line/webhook</code> as the webhook URL.
-                </p>
-              </div>
-            );
-          })()}
+          ) : null}
 
           {/* Notification settings — shown when connected */}
           {lineUserId && (
@@ -484,7 +426,7 @@ export default async function SettingsPage() {
                 <label className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-[#dfe4ea] p-3">
                   <div>
                     <p className="text-sm font-semibold text-[#172026]">Daily morning summary</p>
-                    <p className="mt-0.5 text-xs text-[#667085]">Sent each morning with active rentals, returns, compliance alerts, and revenue.</p>
+                    <p className="mt-0.5 text-xs text-[#667085]">Around 8:00 each morning (Thailand time): rentals out, returns, payments due, expiring documents and this month&apos;s rent.</p>
                   </div>
                   <div className="relative flex-shrink-0">
                     <input
@@ -499,20 +441,8 @@ export default async function SettingsPage() {
                   </div>
                 </label>
 
-                <label className="block rounded-lg border border-[#dfe4ea] p-3">
-                  <p className="text-sm font-semibold text-[#172026]">Send at</p>
-                  <input
-                    className={`${inputClass} max-w-[160px]`}
-                    defaultValue={organization.line_daily_summary_time ?? "08:00"}
-                    max="23:59"
-                    min="00:00"
-                    name="line_daily_summary_time"
-                    type="time"
-                  />
-                  <p className="mt-1 text-xs text-[#667085]">
-                    Your local time ({organization.timezone || "Asia/Bangkok"}). The server converts to UTC automatically.
-                  </p>
-                </label>
+                {/* The summary goes out once a day at 08:00 Bangkok (vercel.json); the time is kept as is. */}
+                <input name="line_daily_summary_time" type="hidden" value={organization.line_daily_summary_time ?? "08:00"} />
               </div>
 
               <PendingButton className="primary-action w-full sm:w-auto" pendingLabel="Saving…" type="submit">
@@ -645,7 +575,7 @@ export default async function SettingsPage() {
                   <p className="text-sm text-[#667085]">{member.invited_email || "Active account"}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge tone="green">{member.role}</Badge>
+                  <Badge tone="green">{member.role === "owner" ? "Owner" : "Teammate"}</Badge>
                   <Badge tone={member.is_active ? "blue" : "neutral"}>{member.is_active ? "Active" : "Inactive"}</Badge>
                 </div>
               </div>
@@ -655,7 +585,7 @@ export default async function SettingsPage() {
 
         <Card>
           <SectionHeader eyebrow="Invite" title="Invite a team member" />
-          <p className="mt-2 text-xs text-[#667085]">For v1, invited users receive full owner-level access.</p>
+          <p className="mt-2 text-xs text-[#667085]">Choose Owner for a business partner, Teammate for staff who handle bookings and handovers.</p>
           <div className="mt-3">
             <InviteForm />
           </div>

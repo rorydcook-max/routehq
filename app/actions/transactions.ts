@@ -394,7 +394,7 @@ export async function recordDeliveryCashPaymentAndReceipt(formData: FormData) {
 
   if (rentalPaymentAmount > 0) {
     const vehicleLabel = [vehicleMakeModel, vehiclePlate].filter(Boolean).join(" ");
-    notifyPaymentReceived({ amount: rentalPaymentAmount, customerName, vehicleLabel }).catch(() => null);
+    notifyPaymentReceived({ organizationId, amount: rentalPaymentAmount, customerName, vehicleLabel }).catch(() => null);
   }
 
   try {
@@ -599,7 +599,7 @@ export async function createTransaction(formData: FormData) {
     const v = vehicleRes.data;
     const vehicleLabel = v ? `${v.make} ${v.model} (${v.registration_number})` : vehicleId;
     const customerName = customerRes.data?.full_name || "Customer";
-    notifyPaymentReceived({ amount, customerName, vehicleLabel }).catch(() => null);
+    notifyPaymentReceived({ organizationId, amount, customerName, vehicleLabel }).catch(() => null);
   }
 
   revalidatePath("/");

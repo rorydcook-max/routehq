@@ -1,5 +1,4 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { getDefaultOrganizationSlug } from "@/lib/supabase/config";
 import { lineFlex, lineText, sendLinePushMessage, type LineMessage } from "@/lib/providers/messaging/line";
 
 const THB = (n: number) =>
@@ -41,19 +40,19 @@ export type SummaryData = {
   monthRevenue: number;
 };
 
-export async function fetchSummaryData(): Promise<SummaryData | null> {
+export async function fetchSummaryData(organizationId: string): Promise<SummaryData | null> {
   const supabase = createSupabaseAdminClient() as any;
 
   const { data: org } = await supabase
     .from("organizations")
-    .select("id, name, settings, timezone, currency")
-    .eq("slug", getDefaultOrganizationSlug())
+    .select("id, name, trading_name, settings, timezone, currency, line_user_id")
+    .eq("id", organizationId)
     .is("deleted_at", null)
-    .single();
+    .maybeSingle();
 
   if (!org) return null;
 
-  const lineUserId: string = org.settings?.line_user_id || "";
+  const lineUserId: string = org.line_user_id || org.settings?.line_user_id || "";
   if (!lineUserId) return null;
 
   const timezone: string = org.timezone || "Asia/Bangkok";
@@ -135,7 +134,7 @@ export async function fetchSummaryData(): Promise<SummaryData | null> {
   const monthRevenue = transactions.reduce((sum: number, t: any) => sum + Number(t.amount || 0), 0);
 
   return {
-    orgName: org.name,
+    orgName: org.trading_name || org.name,
     lineUserId,
     timezone,
     currency: org.currency || "THB",
@@ -371,7 +370,7 @@ function buildRevenueBubble(monthRevenue: number) {
       contents: [
         { type: "text", text: "📈 This Month So Far", weight: "bold", size: "sm", color: "#172026" },
         { type: "text", text: THB(monthRevenue), size: "xxl", weight: "bold", color: "#0f766e", margin: "md" },
-        { type: "text", text: "Fleet revenue (income + deposits)", size: "xs", color: "#667085", margin: "sm" }
+        { type: "text", text: "Rent received this month (deposits not included)", size: "xs", color: "#667085", margin: "sm" }
       ],
       paddingAll: "16px",
       spacing: "sm"
@@ -379,20 +378,19 @@ function buildRevenueBubble(monthRevenue: number) {
   };
 }
 
-export async function sendDailySummary(lineUserId?: string): Promise<{ sent: boolean; reason?: string }> {
-  const data = await fetchSummaryData();
+export async function sendDailySummary(organizationId: string): Promise<{ sent: boolean; reason?: string; messages?: LineMessage[]; lineUserId?: string }> {
+  const data = await fetchSummaryData(organizationId);
 
   if (!data) {
-    return { sent: false, reason: "Organization not found or LINE not connected." };
-  }
-
-  const targetUserId = lineUserId || data.lineUserId;
-  if (!targetUserId) {
-    return { sent: false, reason: "No LINE userId stored. Operator must message the OA first." };
+    return { sent: false, reason: "LINE is not connected for this business." };
   }
 
   const messages = buildDailySummaryMessages(data);
-  await sendLinePushMessage(targetUserId, messages);
+  try {
+    await sendLinePushMessage(data.lineUserId, messages);
+  } catch (error) {
+    return { sent: false, reason: error instanceof Error ? error.message : "LINE message failed.", messages, lineUserId: data.lineUserId };
+  }
 
-  return { sent: true };
+  return { sent: true, messages, lineUserId: data.lineUserId };
 }

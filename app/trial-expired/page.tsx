@@ -73,9 +73,11 @@ export default async function TrialExpiredPage() {
           <a className="pressable inline-flex min-h-12 flex-1 items-center justify-center rounded-xl border border-[#d6e5e2] bg-white px-5 py-3 text-sm font-black text-[#344054]" href="/api/export/account">
             Export my data
           </a>
-          <a className="pressable inline-flex min-h-12 flex-1 items-center justify-center rounded-xl border border-[#d6e5e2] bg-white px-5 py-3 text-sm font-black text-[#344054]" href="https://line.me/R/ti/p/@fleetos" rel="noreferrer" target="_blank">
-            Need more time? Contact us
-          </a>
+          {process.env.LINE_OA_ID ? (
+            <a className="pressable inline-flex min-h-12 flex-1 items-center justify-center rounded-xl border border-[#d6e5e2] bg-white px-5 py-3 text-sm font-black text-[#344054]" href={`https://line.me/R/ti/p/${encodeURIComponent(process.env.LINE_OA_ID)}`} rel="noreferrer" target="_blank">
+              Need more time? Contact us
+            </a>
+          ) : null}
         </div>
       </div>
     </AppShell>

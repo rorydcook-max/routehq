@@ -15,6 +15,7 @@ import { getDefaultOrganizationSlug } from "@/lib/supabase/config";
 import { jurisdictionByCountry, mergeTravelPolicySettings, type HomeTerritoryType, type IslandTravelPolicy } from "@/lib/travel-policy";
 import { buildDailySummaryMessage, sendLineMessage } from "@/services/messaging/line";
 import { requireOwner } from "@/lib/auth/roles";
+import { sendDailySummary } from "@/lib/line/daily-summary";
 import { getActiveMembership } from "@/lib/auth/active-organization-server";
 
 const supportedLocales = new Set<string>(supportedLocaleCodes);
@@ -1432,10 +1433,8 @@ const NOTIFICATION_KEYS = [
   "daily_revenue",
   "event_payment_received",
   "event_contract_signed",
-  "event_gps_offline",
-  "event_compliance_expiry",
-  "event_rental_overdue",
-  "event_new_booking"
+  "event_return_inspection",
+  "event_portal_action"
 ] as const;
 
 export async function saveNotificationSettings(formData: FormData) {
@@ -1465,7 +1464,8 @@ export async function saveNotificationSettings(formData: FormData) {
   }
 
   const dailySummaryTime = String(formData.get("daily_summary_time") || "08:00");
-  const notifications: Record<string, boolean> = {};
+  // Keep any switches this form doesn't show; set the ones it does.
+  const notifications: Record<string, boolean> = { ...(organization.settings?.line_notifications || {}) };
   for (const key of NOTIFICATION_KEYS) {
     notifications[key] = formData.get(key) === "on";
   }
@@ -1522,6 +1522,35 @@ export async function updateLineSettings(formData: FormData) {
   revalidatePath("/settings");
 }
 
+/**
+ * A short code the owner sends to the RouteHQ LINE account to connect it
+ * (see app/api/line/webhook). Valid for 30 minutes; a new code replaces the old.
+ */
+export async function createLineLinkCode(organizationId: string): Promise<{ ok: true; code: string } | { ok: false; error: string }> {
+  try {
+    await requireOwner();
+    const supabase = (await createSupabaseServerClient()) as any;
+    const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    const bytes = crypto.getRandomValues(new Uint8Array(6));
+    const code = `RHQ-${Array.from(bytes, (byte) => alphabet[byte % alphabet.length]).join("")}`;
+    const { error } = await supabase
+      .from("organizations")
+      .update({ line_link_code: code, line_link_code_expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString() })
+      .eq("id", organizationId);
+    if (error) return { ok: false, error: "Couldn't create a code. Please try again." };
+    return { ok: true, code };
+  } catch {
+    return { ok: false, error: "Only the business owner can connect LINE." };
+  }
+}
+
+/** Whether LINE is connected yet, for the settings page to check after the code is sent. */
+export async function lineConnectionStatus(organizationId: string): Promise<{ connected: boolean }> {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const { data } = await supabase.from("organizations").select("line_user_id").eq("id", organizationId).maybeSingle();
+  return { connected: Boolean(data?.line_user_id) };
+}
+
 export async function disconnectLine(formData: FormData) {
   await requireOwner();
   const supabase = (await createSupabaseServerClient()) as any;
@@ -1550,137 +1579,11 @@ export async function disconnectLine(formData: FormData) {
 }
 
 export async function sendTestLineSummary(): Promise<{ success: boolean; message: string }> {
-  await requireOwner();
-  const supabase = (await createSupabaseServerClient()) as any;
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-
-  if (!user) return { success: false, message: "Not authenticated." };
-
-  const admin = createSupabaseAdminClient() as any;
-  const { data: org } = await admin
-    .from("organizations")
-    .select("id, name, line_user_id, line_channel_access_token, promptpay_id")
-    .eq("slug", getDefaultOrganizationSlug())
-    .is("deleted_at", null)
-    .single();
-
-  if (!org) return { success: false, message: "Organization not found." };
-
-  const lineUserId: string = org.line_user_id ?? "";
-  if (!lineUserId) return { success: false, message: "No LINE User ID configured. Add it below and save first." };
-
-  const accessToken: string =
-    org.line_channel_access_token ?? process.env.LINE_CHANNEL_ACCESS_TOKEN ?? "";
-  if (!accessToken) return { success: false, message: "No LINE Channel Access Token available." };
-
-  // Fetch real data for the test message
-  const today = businessToday();
-  const tomorrow = businessToday(1);
-  const firstOfMonth = today.slice(0, 7) + "-01";
-
-  const [rentalsRes, vehiclesRes, txRes] = await Promise.all([
-    admin
-      .from("rentals")
-      .select("id, end_date, status, customers!rentals_customer_id_fkey(full_name, phone), vehicles!rentals_vehicle_id_fkey(make, model, registration_number)")
-      .eq("organization_id", org.id)
-      .in("status", ["active", "overdue", "due_soon", "booked"])
-      .is("deleted_at", null),
-    admin
-      .from("vehicles")
-      .select("id, make, model, registration_number, metadata")
-      .eq("organization_id", org.id)
-      .eq("is_active", true)
-      .is("deleted_at", null),
-    admin
-      .from("transactions")
-      .select("amount")
-      .eq("organization_id", org.id)
-      .not("type", "in", '("deposit_received","deposit_refunded")')
-      .neq("is_deposit", true)
-      .gte("transaction_date", firstOfMonth)
-      .lte("transaction_date", today)
-      .is("deleted_at", null)
-  ]);
-
-  const rentals: any[] = rentalsRes.data ?? [];
-  const vehicles: any[] = vehiclesRes.data ?? [];
-  const monthlyRevenue = (txRes.data ?? []).reduce((s: number, t: any) => s + Number(t.amount ?? 0), 0);
-
-  function vLabel(v: any) {
-    if (!v) return "Vehicle";
-    const parts = [v.make, v.model].filter(Boolean).join(" ");
-    return v.registration_number ? `${parts} (${v.registration_number})` : parts || "Vehicle";
+  const membership = await requireOwner();
+  // The summary for the business this person is working in, sent the same way as the morning one.
+  const result = await sendDailySummary(membership.organizationId);
+  if (!result.sent) {
+    return { success: false, message: result.reason || "The summary could not be sent." };
   }
-
-  const complianceChecks = [
-    { key: "tax_expiry_date", label: "Vehicle Tax (ต่อภาษี)" },
-    { key: "porbor_expiry_date", label: "Compulsory Insurance (พรบ)" },
-    { key: "insurance_expiry_date", label: "Full Insurance" },
-    { key: "next_service_date", label: "Scheduled Service" }
-  ];
-
-  const urgentCompliance: Array<{ vehicleLabel: string; item: string; daysUntil: number }> = [];
-  for (const v of vehicles) {
-    const compliance = v.metadata?.compliance ?? {};
-    for (const { key, label } of complianceChecks) {
-      const dateStr: string | undefined = compliance[key];
-      if (!dateStr) continue;
-      const daysUntil = Math.ceil((new Date(dateStr).getTime() - Date.now()) / 86_400_000);
-      if (daysUntil >= 0 && daysUntil <= 14) {
-        urgentCompliance.push({ vehicleLabel: vLabel(v), item: label, daysUntil });
-      }
-    }
-  }
-
-  const message = buildDailySummaryMessage({
-    businessName: org.name,
-    activeRentals: rentals.map((r: any) => ({
-      customerName: r.customers?.full_name ?? "Customer",
-      vehicleLabel: vLabel(r.vehicles),
-      returnDate: r.end_date ?? null,
-      daysRemaining: r.end_date ? Math.ceil((new Date(r.end_date).getTime() - Date.now()) / 86_400_000) : null
-    })),
-    returnsToday: rentals.filter((r: any) => r.end_date === today).map((r: any) => ({
-      customerName: r.customers?.full_name ?? "Customer",
-      vehicleLabel: vLabel(r.vehicles),
-      phone: r.customers?.phone ?? ""
-    })),
-    returnsTomorrow: rentals.filter((r: any) => r.end_date === tomorrow).map((r: any) => ({
-      customerName: r.customers?.full_name ?? "Customer",
-      vehicleLabel: vLabel(r.vehicles)
-    })),
-    overdueRentals: rentals.filter((r: any) => r.status === "overdue" || (r.end_date && r.end_date < today)).map((r: any) => ({
-      customerName: r.customers?.full_name ?? "Customer",
-      vehicleLabel: vLabel(r.vehicles),
-      daysOverdue: r.end_date ? Math.ceil((Date.now() - new Date(r.end_date).getTime()) / 86_400_000) : 1
-    })),
-    urgentCompliance,
-    monthlyRevenue
-  });
-
-  const result = await sendLineMessage(accessToken, lineUserId, [message]);
-
-  if (result.success) {
-    await admin.from("line_messages").insert({
-      organisation_id: org.id,
-      type: "test_summary",
-      recipient_line_id: lineUserId,
-      message_content: message,
-      status: "sent",
-      sent_at: new Date().toISOString()
-    });
-    return { success: true, message: "Test summary sent to your LINE!" };
-  }
-
-  await admin.from("line_messages").insert({
-    organisation_id: org.id,
-    type: "test_summary",
-    recipient_line_id: lineUserId,
-    message_content: message,
-    status: "failed",
-    error: result.error ?? "Unknown error"
-  });
-  return { success: false, message: result.error ?? "Failed to send message." };
+  return { success: true, message: "Sent. Check LINE." };
 }

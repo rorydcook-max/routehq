@@ -15,12 +15,14 @@ export async function notifyOperator(
 
     const { data: org } = await supabase
       .from("organizations")
-      .select("line_user_id, line_channel_access_token, line_notifications_enabled")
+      .select("line_user_id, line_channel_access_token, line_notifications_enabled, settings")
       .eq("id", organisationId)
       .maybeSingle();
 
     if (!org?.line_user_id) return;
     if (org.line_notifications_enabled === false) return;
+    // Per-alert switches from Settings → Notifications (all on unless turned off).
+    if (org.settings?.line_notifications?.[`event_${type}`] === false) return;
 
     const accessToken: string =
       org.line_channel_access_token ?? process.env.LINE_CHANNEL_ACCESS_TOKEN ?? "";

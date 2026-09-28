@@ -28,6 +28,9 @@ export default async function BillingPage() {
     .maybeSingle();
 
   const trialDays = daysUntil(organization?.trial_ends_at);
+  const supportLine = process.env.LINE_OA_ID || "";
+  const supportWhatsApp = (process.env.SUPPORT_WHATSAPP || "").replace(/\D/g, "");
+  const supportEmail = process.env.SUPPORT_EMAIL || "";
   const status = organization?.subscription_status || "trial";
   const currentTier = organization?.subscription_tier || "growth";
 
@@ -66,21 +69,28 @@ export default async function BillingPage() {
         <Card>
           <SectionHeader eyebrow="Manual billing" title="Subscribe with local support" />
           <p className="mt-2 text-sm leading-6 text-[#667085]">
-            Automated billing is coming soon. For v1, we currently process subscriptions manually, which works well for Thai operators using bank transfer, PromptPay, LINE, and WhatsApp.
+            Subscriptions are set up personally for now: pay by bank transfer or PromptPay and we switch your plan on, usually the same day. Card payments are coming soon.
           </p>
           <div className="mt-4 rounded-lg border border-[#d6e5e2] bg-white p-4">
             <p className="font-black text-[#10252b]">How to activate</p>
             <p className="mt-2 text-sm text-[#667085]">Send payment confirmation to LINE or WhatsApp and we will activate your account within 24 hours.</p>
+            {/* Support channels come from the environment so no placeholder number or address ships. */}
             <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-              <a className="primary-action pressable flex-1" href="https://line.me/R/ti/p/@fleetos" rel="noreferrer" target="_blank">
-                Contact on LINE
-              </a>
-              <a className="secondary-action pressable flex-1" href="https://wa.me/66900000000" rel="noreferrer" target="_blank">
-                WhatsApp
-              </a>
-              <a className="secondary-action pressable flex-1" href="mailto:billing@fleetos.app">
-                Email
-              </a>
+              {supportLine ? (
+                <a className="primary-action pressable flex-1" href={`https://line.me/R/ti/p/${encodeURIComponent(supportLine)}`} rel="noreferrer" target="_blank">
+                  Contact on LINE
+                </a>
+              ) : null}
+              {supportWhatsApp ? (
+                <a className="secondary-action pressable flex-1" href={`https://wa.me/${supportWhatsApp}`} rel="noreferrer" target="_blank">
+                  WhatsApp
+                </a>
+              ) : null}
+              {supportEmail ? (
+                <a className="secondary-action pressable flex-1" href={`mailto:${supportEmail}?subject=${encodeURIComponent("RouteHQ subscription")}`}>
+                  Email
+                </a>
+              ) : null}
             </div>
           </div>
         </Card>

@@ -227,8 +227,8 @@ export async function getCustomerSigningEligibility(token: string) {
         rental_id: rental.id,
         customer_id: rental.customer_id,
         event_type: "rental_document_material_change_blocked",
-        title: "Rental document signing blocked by material change",
-        detail: `Customer signing blocked because current booking values differ from the immutable agreement snapshot: ${materialIssues.join(", ")}.`,
+        title: "Signing paused: booking changed",
+        detail: `The customer couldn't sign because the booking changed after the agreement was prepared (${materialIssues.join(", ")}). Send them the booking link again so they sign the updated terms.`,
         metadata: { document_id: document?.id || null, version_id: version.id, material_issues: materialIssues }
       }, `rental_document_material_change_blocked:${version.id}:${createHash("sha256").update(materialIssues.join("|")).digest("hex")}`);
     }

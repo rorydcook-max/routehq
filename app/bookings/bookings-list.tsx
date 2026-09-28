@@ -288,7 +288,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                         currentRate={Number(booking.rental_rate || 0)}
                         currentStartDate={booking.start_date}
                         customerName={booking.customers?.full_name || "Awaiting customer"}
-                        label="Period"
+                        label="Extend"
                         rentalId={booking.id}
                         vehicleLabel={vehicleTitle(booking.vehicles)}
                       />
@@ -366,7 +366,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                     currentRate={Number(booking.rental_rate || 0)}
                     currentStartDate={booking.start_date}
                     customerName={booking.customers?.full_name || "Awaiting customer"}
-                    label="Period"
+                    label="Extend"
                     rentalId={booking.id}
                     vehicleLabel={vehicleTitle(booking.vehicles)}
                   />

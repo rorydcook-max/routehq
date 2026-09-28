@@ -10,6 +10,7 @@ import {
   Home,
   Plus,
   ClipboardList,
+  ListChecks,
   MoreHorizontal,
   ReceiptText,
   Settings,
@@ -35,6 +36,7 @@ type NavKey =
   | "settings"
   | "customers"
   | "bookings"
+  | "tasks"
   | "transactions"
   | "documents"
   | "rentalCalculator";
@@ -56,6 +58,7 @@ const mainNavItems: NavItem[] = [
 const operationsItems: NavItem[] = [
   { key: "customers", href: "/customers", icon: Users },
   { key: "bookings", href: "/bookings", icon: ClipboardList },
+  { key: "tasks", href: "/tasks", icon: ListChecks },
   { key: "transactions", href: "/transactions", icon: ReceiptText },
   { key: "documents", href: "/documents", icon: FileText },
   { key: "rentalCalculator", href: "/rental-calculator", icon: Calculator }
@@ -98,16 +101,16 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
   return (
     <div className="min-h-screen pb-24 lg:pb-0">
       <aside className="fixed left-0 top-0 z-20 hidden h-screen w-[220px] flex-col border-r border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] px-3 py-4 lg:flex">
-        <div className="mb-6 flex items-center rounded-2xl border border-white/10 bg-[var(--sidebar-darker)]/70 p-3 shadow-[0_18px_35px_rgba(0,0,0,0.16)]">
+        <div className="mb-4 flex items-center rounded-2xl border border-white/10 bg-[var(--sidebar-darker)]/70 p-3 shadow-[0_18px_35px_rgba(0,0,0,0.16)]">
           <RouteHqLogo tone="dark" />
         </div>
-        <nav className="flex-1 space-y-1">
+        <nav className="scrollbar-none min-h-0 flex-1 space-y-0.5 overflow-y-auto">
           <p className="mb-2 px-3 text-[11px] font-black uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]">{t("main")}</p>
           {visibleMainNavItems.map((item) => {
             const Icon = item.icon;
             return (
               <Link
-                className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition ${
+                className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm font-semibold transition ${
                   isActive(item.href)
                     ? "text-white shadow-[0_12px_24px_rgba(18,184,200,0.25)]"
                     : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-white"
@@ -121,12 +124,12 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
               </Link>
             );
           })}
-          <p className="mb-2 mt-5 px-3 text-[11px] font-black uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]">{t("operations")}</p>
+          <p className="mb-2 mt-4 px-3 text-[11px] font-black uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]">{t("operations")}</p>
           {operationsItems.map((item) => {
             const Icon = item.icon;
             return (
               <Link
-                className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition ${
+                className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm font-semibold transition ${
                   isActive(item.href)
                     ? "text-white shadow-[0_12px_24px_rgba(18,184,200,0.25)]"
                     : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-white"
@@ -141,8 +144,9 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
             );
           })}
         </nav>
+        <TrialBanner placement="sidebar" />
         {userEmail ? (
-          <div className="mt-4 rounded-2xl border border-white/10 bg-[var(--sidebar-darker)]/70 p-3">
+          <div className="mt-3 rounded-2xl border border-white/10 bg-[var(--sidebar-darker)]/70 p-3">
             {hasSeveralBusinesses ? (
               <form action={switchActiveOrganization} className="mb-3">
                 <label className="block text-[10px] font-black uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]" htmlFor="business-switcher">
@@ -180,7 +184,12 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
 
       <main className="content-area mx-auto lg:ml-[220px] lg:max-w-none">
         {userEmail ? (
-          <div className="mb-4 flex items-center justify-end gap-2 lg:hidden">
+          // Phones: logo and (for people in several businesses) the switcher.
+          // Account and sign-out live under More, away from thumbs.
+          <div className="mb-3 flex items-center justify-between gap-2 lg:hidden">
+            <Link aria-label="RouteHQ dashboard" href="/">
+              <RouteHqLogo className="h-7 w-auto" showDescriptor={false} />
+            </Link>
             {hasSeveralBusinesses ? (
               <form action={switchActiveOrganization}>
                 <select
@@ -198,17 +207,6 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
                 </select>
               </form>
             ) : null}
-            <Link
-              className="max-w-[180px] truncate rounded-full border border-[var(--border)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--foreground-secondary)] shadow-sm sm:max-w-none"
-              href="/account"
-            >
-              {userEmail}
-            </Link>
-            <form action={signOut}>
-              <PendingButton className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[var(--sidebar-bg)] px-3 py-1.5 text-xs font-bold text-white" pendingLabel="" type="submit">
-                {t("signOut")}
-              </PendingButton>
-            </form>
           </div>
         ) : null}
         <TrialBanner />
@@ -284,6 +282,16 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
                 <span>{t("myAccount")}</span>
               </Link>
             </div>
+            {userEmail ? (
+              <div className="mt-4 flex items-center justify-between gap-3 border-t border-white/10 pt-3">
+                <span className="min-w-0 truncate text-xs font-semibold text-[var(--sidebar-text-muted)]">{userEmail}</span>
+                <form action={signOut}>
+                  <PendingButton className="inline-flex shrink-0 items-center justify-center rounded-lg bg-white/10 px-3 py-2 text-xs font-bold text-white" pendingLabel="" type="submit">
+                    {t("signOut")}
+                  </PendingButton>
+                </form>
+              </div>
+            ) : null}
           </div>
         </div>
       ) : null}

@@ -6,6 +6,7 @@ import { PendingButton } from "@/components/pending-button";
 import { Badge, Card, EmptyState, ProgressBar, SectionHeader } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDashboardData, money } from "@/lib/dashboard";
+import { ConfirmDeleteVehicleButton, FleetBulkActions } from "@/app/fleet/fleet-actions";
 import { getDefaultOrganization } from "@/lib/organization";
 
 const statusTone = {
@@ -14,6 +15,13 @@ const statusTone = {
   Maintenance: "red",
   Reserved: "amber"
 } as const;
+
+/** Plain names for vehicle statuses. */
+function statusLabel(status: string) {
+  if (status === "Rented") return "On rent";
+  if (status === "Reserved") return "Booked";
+  return status;
+}
 
 function ComplianceBadge({ item, attention = 0 }: { item?: { label: string; date: string; daysLeft: number } | null; attention?: number }) {
   if (!item) return <span className="text-xs text-[var(--muted)]">No dates recorded</span>;
@@ -33,7 +41,8 @@ function ComplianceBadge({ item, attention = 0 }: { item?: { label: string; date
   return <Badge tone={tone}>{text + more}</Badge>;
 }
 
-export default async function FleetPage() {
+export default async function FleetPage({ searchParams }: { searchParams: Promise<{ notice?: string }> }) {
+  const { notice } = await searchParams;
   const userEmail = await getCurrentUserEmail();
   const organization = await getDefaultOrganization();
   const { vehicles } = await getDashboardData();
@@ -43,8 +52,8 @@ export default async function FleetPage() {
       <div className="page-hero mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="page-eyebrow">Fleet</p>
-          <h1 className="page-title">Vehicle assets</h1>
-          <p className="page-subtitle mt-1">Manage vehicles, utilization, lifecycle health, and operating actions.</p>
+          <h1 className="page-title">Your fleet</h1>
+          <p className="page-subtitle mt-1">Every vehicle with its rate, how often it's rented, paperwork and profit.</p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">
           <Link className="pressable inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold text-[var(--foreground-secondary)] shadow-sm hover:border-[var(--primary-blue)] hover:text-[var(--primary-blue)]" href="/fleet/import">
@@ -58,21 +67,15 @@ export default async function FleetPage() {
         </div>
       </div>
 
+      {notice === "vehicle-has-bookings" ? (
+        <p className="mb-4 rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3 text-sm font-semibold text-[#92400e]" role="alert">
+          That vehicle is out on rent or has a booking coming up, so it wasn&apos;t deleted. Finish or cancel its bookings first, or archive it instead.
+        </p>
+      ) : null}
+
       <Card>
         <SectionHeader eyebrow="Live fleet" title={`${vehicles.length} vehicles`} />
-        <form className="card-section" id="fleetBulkForm">
-          <input name="organizationId" type="hidden" value={organization.id} />
-          <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:justify-end">
-            <PendingButton className="inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold text-[var(--foreground-secondary)] disabled:opacity-70" formAction={bulkArchiveVehicles} pendingLabel="Archiving..." type="submit">
-              <Archive size={16} />
-              Archive selected
-            </PendingButton>
-            <PendingButton className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#fecaca] bg-white px-3 py-2 text-sm font-bold text-[var(--danger)] disabled:opacity-70" formAction={bulkDeleteVehicles} pendingLabel="Deleting..." type="submit">
-              <Trash2 size={16} />
-              Delete selected
-            </PendingButton>
-          </div>
-        </form>
+        <FleetBulkActions archiveAction={bulkArchiveVehicles} deleteAction={bulkDeleteVehicles} organizationId={organization.id} />
         {vehicles.length === 0 ? (
           <div className="card-section">
             <EmptyState
@@ -120,11 +123,11 @@ export default async function FleetPage() {
                   </td>
                   <td className="px-3 py-3">
                     <Link className="block rounded-md outline-none focus:ring-2 focus:ring-[var(--primary)]/25" href={`/fleet/${vehicle.id}`}>
-                      <Badge tone={statusTone[vehicle.status]}>{vehicle.status}</Badge>
+                      <Badge tone={statusTone[vehicle.status]}>{statusLabel(vehicle.status)}</Badge>
                     </Link>
                   </td>
                   <td className="px-3 py-3 font-semibold">
-                    <Link className="font-mono-data block rounded-md outline-none focus:ring-2 focus:ring-[var(--primary)]/25" href={`/fleet/${vehicle.id}`}>{money(vehicle.monthlyRate)}</Link>
+                    <Link className="font-mono-data block rounded-md outline-none focus:ring-2 focus:ring-[var(--primary)]/25" href={`/fleet/${vehicle.id}`}>{vehicle.monthlyRate > 0 ? money(vehicle.monthlyRate) : "Not set"}</Link>
                   </td>
                   <td className="px-3 py-3">
                     <Link className="block min-w-32 rounded-md outline-none focus:ring-2 focus:ring-[var(--primary)]/25" href={`/fleet/${vehicle.id}`}>
@@ -149,13 +152,7 @@ export default async function FleetPage() {
                           <Archive size={16} />
                         </PendingButton>
                       </form>
-                      <form action={deleteVehicle}>
-                        <input name="vehicleId" type="hidden" value={vehicle.id} />
-                        <input name="organizationId" type="hidden" value={organization.id} />
-                        <PendingButton aria-label={`Delete ${vehicle.make} ${vehicle.model}`} className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[#fecaca] bg-white text-[var(--danger)] hover:bg-[var(--danger-light)]" title="Delete vehicle" type="submit">
-                          <Trash2 size={16} />
-                        </PendingButton>
-                      </form>
+                      <ConfirmDeleteVehicleButton deleteAction={deleteVehicle} label={`${vehicle.make} ${vehicle.model}`} organizationId={organization.id} vehicleId={vehicle.id} />
                     </div>
                   </td>
                 </tr>
@@ -181,12 +178,12 @@ export default async function FleetPage() {
                       {vehicle.plate} / {vehicle.year || "Year unknown"} / {vehicle.mileage.toLocaleString()} km
                     </p>
                   </div>
-                  <Badge tone={statusTone[vehicle.status]}>{vehicle.status}</Badge>
+                  <Badge tone={statusTone[vehicle.status]}>{statusLabel(vehicle.status)}</Badge>
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-[var(--muted)]">
                   <div className="rounded-lg bg-[var(--panel-secondary)] p-2">
                     <span className="block font-semibold uppercase tracking-[0.08em]">Monthly</span>
-                    <span className="font-mono-data mt-1 block text-sm font-black text-[var(--foreground)]">{money(vehicle.monthlyRate)}</span>
+                    <span className="font-mono-data mt-1 block text-sm font-black text-[var(--foreground)]">{vehicle.monthlyRate > 0 ? money(vehicle.monthlyRate) : "Not set"}</span>
                   </div>
                   <div className="rounded-lg bg-[var(--panel-secondary)] p-2">
                     <span className="block font-semibold uppercase tracking-[0.08em]">Profit</span>

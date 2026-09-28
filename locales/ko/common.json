@@ -207,6 +207,7 @@
     "signOut": "로그아웃",
     "more": "더보기",
     "close": "닫기",
-    "openFastActions": "빠른 작업 열기"
+    "openFastActions": "빠른 작업 열기",
+    "tasks": "할 일"
   }
 }

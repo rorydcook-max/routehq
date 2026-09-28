@@ -1026,6 +1026,18 @@ export async function deleteVehicle(formData: FormData) {
     throw new Error("Vehicle is required.");
   }
 
+  // A vehicle out on rent or booked can't be deleted from under its booking.
+  const { count: liveBookings } = await supabase
+    .from("rentals")
+    .select("id", { count: "exact", head: true })
+    .eq("organization_id", organizationId)
+    .eq("vehicle_id", vehicleId)
+    .is("deleted_at", null)
+    .in("status", ["booked", "active", "due_soon", "overdue", "extended"]);
+  if ((liveBookings || 0) > 0) {
+    redirect("/fleet?notice=vehicle-has-bookings");
+  }
+
   const { error } = await supabase
     .from("vehicles")
     .update({
@@ -1116,6 +1128,17 @@ export async function bulkDeleteVehicles(formData: FormData) {
 
   if (!organizationId || vehicleIds.length === 0) {
     throw new Error("Select at least one vehicle.");
+  }
+
+  const { count: liveBookings } = await supabase
+    .from("rentals")
+    .select("id", { count: "exact", head: true })
+    .eq("organization_id", organizationId)
+    .in("vehicle_id", vehicleIds)
+    .is("deleted_at", null)
+    .in("status", ["booked", "active", "due_soon", "overdue", "extended"]);
+  if ((liveBookings || 0) > 0) {
+    redirect("/fleet?notice=vehicle-has-bookings");
   }
 
   const { error } = await supabase

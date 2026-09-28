@@ -207,6 +207,7 @@
     "signOut": "退出",
     "more": "更多",
     "close": "关闭",
-    "openFastActions": "打开快速操作"
+    "openFastActions": "打开快速操作",
+    "tasks": "待办事项"
   }
 }

@@ -207,6 +207,7 @@
     "signOut": "登出",
     "more": "更多",
     "close": "關閉",
-    "openFastActions": "開啟快速操作"
+    "openFastActions": "開啟快速操作",
+    "tasks": "待辦事項"
   }
 }

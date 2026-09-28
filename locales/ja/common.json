@@ -207,6 +207,7 @@
     "signOut": "サインアウト",
     "more": "もっと見る",
     "close": "閉じる",
-    "openFastActions": "クイックアクションを開く"
+    "openFastActions": "クイックアクションを開く",
+    "tasks": "やること"
   }
 }

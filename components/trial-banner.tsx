@@ -41,7 +41,7 @@ function toneForDays(days: number | null | undefined) {
   };
 }
 
-export function TrialBanner() {
+export function TrialBanner({ placement = "floating" }: { placement?: "floating" | "sidebar" }) {
   const [payload, setPayload] = useState<SubscriptionPayload | null>(null);
   const [hidden, setHidden] = useState(true);
   const pathname = usePathname();
@@ -66,7 +66,8 @@ export function TrialBanner() {
   // Never over a form: handovers and the create/edit screens keep their
   // buttons at the bottom of the screen, where the banner floats on phones.
   const onForm = !!pathname && (pathname.startsWith("/inspections") || /\/(new|edit)(\/|$)/.test(pathname));
-  if (hidden || !payload?.organization || onForm) {
+  // The sidebar copy sits in the page flow, so it never covers anything.
+  if (hidden || !payload?.organization || (onForm && placement === "floating")) {
     return null;
   }
 
@@ -78,10 +79,11 @@ export function TrialBanner() {
     // and pushing everything down at that moment made people tap the wrong thing.
     <div
       className={clsx(
-        // Phones: above the bottom navigation and clear of the + button.
-        "fixed bottom-[calc(72px+env(safe-area-inset-bottom))] left-3 right-20 z-40 flex items-center justify-between gap-2 rounded-lg border px-3 py-2 shadow-lg",
-        // Desktop: tucked into the sidebar above the account card, never over page content.
-        "lg:bottom-[112px] lg:left-[12px] lg:right-auto lg:w-[156px] lg:shadow-none lg:flex-col lg:items-stretch lg:gap-2 lg:p-2.5",
+        placement === "sidebar"
+          ? // Desktop: a card in the sidebar, above the account card.
+            "mt-3 hidden flex-col items-stretch gap-2 rounded-lg border p-2.5 lg:flex"
+          : // Phones: floats above the bottom navigation, clear of the + button.
+            "fixed bottom-[calc(72px+env(safe-area-inset-bottom))] left-3 right-20 z-40 flex items-center justify-between gap-2 rounded-lg border px-3 py-2 shadow-lg lg:hidden",
         tone.className
       )}
       role="status"
@@ -92,7 +94,7 @@ export function TrialBanner() {
           Free trial: {days === null || days === undefined ? "30 days" : `${days} day${days === 1 ? "" : "s"}`} left
         </p>
       </div>
-      <div className="flex shrink-0 items-center gap-2 lg:justify-between">
+      <div className={clsx("flex shrink-0 items-center gap-2", placement === "sidebar" && "justify-between")}>
         <Link className={clsx("pressable inline-flex min-h-7 items-center justify-center rounded-lg px-3 text-[11px] font-bold", tone.button)} href={"/settings/billing" as Route}>
           Subscribe now
         </Link>

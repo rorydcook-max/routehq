@@ -67,7 +67,7 @@ export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
       <div className="page-hero flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="page-eyebrow">Customers</p>
-          <h1 className="page-title">Customer CRM</h1>
+          <h1 className="page-title">Customers</h1>
           <p className="page-subtitle mt-2">Find renters, document status, active rentals, and lifetime value.</p>
         </div>
         <Link className="primary-action pressable" href="/customers/new">

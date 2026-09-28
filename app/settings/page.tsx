@@ -101,7 +101,19 @@ function browserSafeAssetFallback(value: string | null | undefined) {
   return rawValue.startsWith("http") || rawValue.startsWith("data:") ? rawValue : null;
 }
 
-export default async function SettingsPage() {
+const SETTINGS_TABS = [
+  { key: "business", label: "Business" },
+  { key: "rentals", label: "Rentals & payments" },
+  { key: "notifications", label: "LINE alerts" },
+  { key: "team", label: "Team" },
+  { key: "more", label: "Plan & tools" }
+] as const;
+
+type SettingsTab = (typeof SETTINGS_TABS)[number]["key"];
+
+export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
+  const requestedTab = (await searchParams).tab;
+  const tab: SettingsTab = SETTINGS_TABS.some((entry) => entry.key === requestedTab) ? (requestedTab as SettingsTab) : "business";
   const userEmail = await getCurrentUserEmail();
   const organization = await getDefaultOrganization();
   const supabase = (await createSupabaseServerClient()) as any;
@@ -205,10 +217,24 @@ export default async function SettingsPage() {
     <AppShell userEmail={userEmail}>
       <div className="page-hero mb-5">
         <p className="page-eyebrow">Settings</p>
-        <h1 className="page-title">Account and organization</h1>
-        <p className="page-subtitle mt-2">Your business details, contracts, payments, LINE alerts, team and billing.</p>
+        <h1 className="page-title">Settings</h1>
       </div>
 
+      <nav aria-label="Settings sections" className="scrollbar-none -mx-4 mb-5 flex gap-1 overflow-x-auto border-b border-[var(--border)] px-4 sm:mx-0 sm:px-0">
+        {SETTINGS_TABS.map((entry) => (
+          <Link
+            aria-current={tab === entry.key ? "page" : undefined}
+            className={`-mb-px whitespace-nowrap border-b-2 px-3 py-2.5 text-sm font-semibold transition ${tab === entry.key ? "border-[var(--primary)] text-[var(--primary)]" : "border-transparent text-[var(--muted)] hover:text-[var(--foreground)]"}`}
+            href={`/settings?tab=${entry.key}` as Route}
+            key={entry.key}
+          >
+            {entry.label}
+          </Link>
+        ))}
+      </nav>
+
+      {tab === "business" ? (
+        <>
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <SectionHeader eyebrow="Profile" title="Your language" />
@@ -242,7 +268,10 @@ export default async function SettingsPage() {
           </div>
         </Card>
       </div>
-
+        </>
+      ) : null}
+      {tab === "business" ? (
+        <>
       <div className="mt-4">
         <ContractsBrandingSection
           logoDisplayUrl={logoDisplayUrl}
@@ -250,14 +279,20 @@ export default async function SettingsPage() {
           signatureDisplayUrl={signatureDisplayUrl}
         />
       </div>
-
+        </>
+      ) : null}
+      {tab === "business" ? (
+        <>
       <div className="mt-4">
         <Card>
           <SectionHeader eyebrow="Branches" title="Operating locations" />
           <BranchList branches={branches} organizationId={organization.id} />
         </Card>
       </div>
-
+        </>
+      ) : null}
+      {tab === "rentals" ? (
+        <>
       <div className="mt-4">
         <Card>
           <SectionHeader eyebrow="Travel policy" title="Rental territory and contract terms" />
@@ -267,7 +302,10 @@ export default async function SettingsPage() {
           <TravelPolicyForm organizationId={organization.id} settings={travelPolicySettings} />
         </Card>
       </div>
-
+        </>
+      ) : null}
+      {tab === "rentals" ? (
+        <>
       <div className="mt-4">
         <Card>
           <SectionHeader eyebrow="Payments & receipts" title="Payment Methods" />
@@ -347,6 +385,10 @@ export default async function SettingsPage() {
       </div>
 
       {/* ── LINE NOTIFICATIONS ── */}
+        </>
+      ) : null}
+      {tab === "notifications" ? (
+        <>
       <div className="mt-4">
         <Card>
           <SectionHeader eyebrow="LINE" title="LINE Notifications" />
@@ -507,7 +549,10 @@ export default async function SettingsPage() {
           </div>
         </Card>
       </div>
-
+        </>
+      ) : null}
+      {tab === "more" ? (
+        <>
       <div className="mt-4">
         <Card>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -521,7 +566,10 @@ export default async function SettingsPage() {
           </div>
         </Card>
       </div>
-
+        </>
+      ) : null}
+      {tab === "business" ? (
+        <>
       <div className="mt-4">
         <Card>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -535,7 +583,10 @@ export default async function SettingsPage() {
           </div>
         </Card>
       </div>
-
+        </>
+      ) : null}
+      {tab === "notifications" ? (
+        <>
       <div className="mt-4">
         <Card>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -549,7 +600,10 @@ export default async function SettingsPage() {
           </div>
         </Card>
       </div>
-
+        </>
+      ) : null}
+      {tab === "more" ? (
+        <>
       <div className="mt-4">
         <Card>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -563,7 +617,10 @@ export default async function SettingsPage() {
           </div>
         </Card>
       </div>
-
+        </>
+      ) : null}
+      {tab === "team" ? (
+        <>
       <div className="mt-4 grid gap-3 xl:grid-cols-[1.15fr_0.85fr]">
         <Card>
           <SectionHeader eyebrow="Users" title="Organization members" />
@@ -594,7 +651,10 @@ export default async function SettingsPage() {
           </Link>
         </Card>
       </div>
-
+        </>
+      ) : null}
+      {tab === "more" ? (
+        <>
       {isPlatformAdmin ? (
       <div className="mt-4">
         <Card>
@@ -906,6 +966,8 @@ export default async function SettingsPage() {
           </div>
         </Card>
       </div>
+      ) : null}
+        </>
       ) : null}
     </AppShell>
   );

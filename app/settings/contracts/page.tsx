@@ -1,3 +1,4 @@
+import type { Route } from "next";
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { Badge, Card, SectionHeader } from "@/components/ui";
@@ -19,7 +20,7 @@ export default async function ContractSettingsPage() {
     <AppShell userEmail={userEmail}>
       <div className="page-hero mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <Link className="text-sm font-bold text-[var(--primary)]" href="/settings">
+          <Link className="text-sm font-bold text-[var(--primary)]" href={"/settings?tab=business" as Route}>
             Back to settings
           </Link>
           <h1 className="page-title mt-2">Contract templates</h1>

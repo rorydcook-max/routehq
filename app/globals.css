@@ -1235,3 +1235,19 @@ aside a[class*="bg-[var(--sidebar-active)]"] {
     margin-left: max(220px, calc(50vw - 590px));
   }
 }
+
+/* Phones: a stray wide element must never make the whole page slide sideways. */
+@media (max-width: 1023px) {
+  .content-area {
+    overflow-x: clip;
+  }
+}
+
+/* Grid children may shrink below their content's width, so a long line
+   (a URL, an email) can't push a one-column phone layout off screen.
+   In the base layer so an explicit min-w-* utility still wins. */
+@layer base {
+  .grid > * {
+    min-width: 0;
+  }
+}

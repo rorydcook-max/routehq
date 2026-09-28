@@ -272,33 +272,32 @@ function Plate({ registration, province }: { registration: string; province?: st
 }
 
 function QuickActions({ vehicleId, status }: { vehicleId: string; status: string }) {
-  const primary = status === "available" ? { href: detailUrl("/bookings/new", vehicleId), label: "New Booking", icon: CalendarDays } : { href: detailUrl("/transactions/new", vehicleId), label: "Add Transaction", icon: ReceiptText };
-  const PrimaryIcon = primary.icon;
+  const primary = status === "available" ? { href: detailUrl("/bookings/new", vehicleId), label: "New booking", icon: CalendarDays } : { href: detailUrl("/transactions/new", vehicleId), label: "Add transaction", icon: ReceiptText };
+  // The most likely next step comes first and stands out; the rest follow.
   const actions = [
-    { href: detailUrl("/transactions/new", vehicleId), label: "Add Transaction", icon: ReceiptText },
-    { href: detailUrl("/bookings/new", vehicleId), label: "New Booking", icon: CalendarDays },
-    { href: "#maintenance", label: "Log Maintenance", icon: Wrench },
-    { href: `/inspections/condition/${vehicleId}`, label: "Condition Report", icon: ClipboardCheck },
-    { href: `/fleet/${vehicleId}/edit`, label: "Edit", icon: PenLine }
+    primary,
+    ...[
+      { href: detailUrl("/transactions/new", vehicleId), label: "Add transaction", icon: ReceiptText },
+      { href: detailUrl("/bookings/new", vehicleId), label: "New booking", icon: CalendarDays },
+      { href: "#maintenance", label: "Log maintenance", icon: Wrench },
+      { href: `/inspections/condition/${vehicleId}`, label: "Condition report", icon: ClipboardCheck },
+      { href: `/fleet/${vehicleId}/edit`, label: "Edit", icon: PenLine }
+    ].filter((action) => action.label !== primary.label)
   ];
 
   return (
     <>
-      <div className="flex flex-wrap gap-2 py-1">
-        {actions.map((action) => {
+      <div className="grid grid-cols-2 gap-2 py-1 sm:flex sm:flex-wrap">
+        {actions.map((action, index) => {
           const Icon = action.icon;
           return (
-            <Link className="pressable inline-flex min-w-fit items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2.5 text-sm font-bold text-[var(--foreground-secondary)] hover:border-[var(--primary)] hover:text-[var(--primary)]" href={action.href as Route} key={action.label}>
+            <Link className={`pressable inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold ${index === 0 ? "bg-[var(--primary)] text-white hover:bg-[var(--primary-hover)]" : "border border-[var(--border)] bg-white text-[var(--foreground-secondary)] hover:border-[var(--primary)] hover:text-[var(--primary)]"}`} href={action.href as Route} key={action.label}>
               <Icon size={17} />
               {action.label}
             </Link>
           );
         })}
       </div>
-      <Link className="pressable fixed bottom-36 right-4 z-30 inline-flex items-center gap-2 rounded-full bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white shadow-lg lg:hidden" href={primary.href as Route}>
-        <PrimaryIcon size={18} />
-        {primary.label}
-      </Link>
     </>
   );
 }

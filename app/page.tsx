@@ -79,8 +79,11 @@ function AgendaRow({ item }: { item: AgendaItem }) {
       <Link className="group flex items-center gap-3 px-4 py-3 transition hover:bg-[#fbfaf8]" href={item.href as Route}>
         <span className={`inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[10px] ${TONE_CLASSES[item.tone]}`}>{item.icon}</span>
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-[14px] font-semibold text-[var(--foreground)]">{item.title}</span>
-          <span className="block truncate text-[13px] text-[var(--muted)]">{item.detail}</span>
+          <span className="block text-[14px] font-semibold leading-snug text-[var(--foreground)] sm:truncate">{item.title}</span>
+          <span className="line-clamp-2 block text-[13px] text-[var(--muted)] sm:truncate">
+            {item.detail}
+            {item.when ? <span className="sm:hidden"> · {item.when}</span> : null}
+          </span>
         </span>
         {item.when ? <span className="hidden flex-shrink-0 text-[13px] text-[var(--muted)] sm:block">{item.when}</span> : null}
         <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-[8px] border border-[var(--border)] bg-white px-2.5 py-1.5 text-[13px] font-semibold text-[var(--foreground-secondary)] transition group-hover:border-[var(--primary)] group-hover:text-[var(--primary)]">

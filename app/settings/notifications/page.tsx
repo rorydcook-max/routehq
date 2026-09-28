@@ -1,3 +1,4 @@
+import type { Route } from "next";
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { PendingButton } from "@/components/pending-button";
@@ -44,7 +45,7 @@ export default async function NotificationsPage() {
   return (
     <AppShell userEmail={userEmail}>
       <div className="page-hero mb-5">
-        <Link className="text-sm font-bold text-[var(--primary)]" href="/settings">
+        <Link className="text-sm font-bold text-[var(--primary)]" href={"/settings?tab=notifications" as Route}>
           Back to settings
         </Link>
         <p className="page-eyebrow mt-4">Settings</p>
@@ -63,7 +64,7 @@ export default async function NotificationsPage() {
           {connected ? (
             <Badge tone="green">Connected</Badge>
           ) : (
-            <Link className="primary-action pressable min-h-10 px-4 text-sm" href="/settings">
+            <Link className="primary-action pressable min-h-10 px-4 text-sm" href={"/settings?tab=notifications" as Route}>
               Connect LINE
             </Link>
           )}

@@ -108,10 +108,10 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
             >
               <VehicleKindIcon kind={group.kind} size={20} />
               <span className="min-w-0">
-                <span className="block text-[15px] font-semibold text-[var(--foreground)]">
-                  {group.vehicles.length} {kindLabel(group.kind, group.vehicles.length).toLowerCase()}
+                <span className="block text-[15px] font-semibold leading-tight text-[var(--foreground)]">
+                  {group.vehicles.length} <span className="font-normal text-[var(--foreground-secondary)]">{kindLabel(group.kind, group.vehicles.length).toLowerCase()}</span>
                 </span>
-                <OutFreeSummary free={group.free} out={group.out} />
+                <span className="mt-0.5 block text-[12px] text-[var(--muted)]">{group.out} out · {group.free} free</span>
               </span>
             </a>
           ))}

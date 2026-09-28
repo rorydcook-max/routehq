@@ -1,3 +1,4 @@
+import type { Route } from "next";
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { Badge, Card, SectionHeader } from "@/components/ui";
@@ -37,7 +38,7 @@ export default async function BillingPage() {
   return (
     <AppShell userEmail={userEmail}>
       <div className="page-hero mb-5">
-        <Link className="text-sm font-bold text-[var(--primary)]" href="/settings">
+        <Link className="text-sm font-bold text-[var(--primary)]" href={"/settings?tab=more" as Route}>
           Back to settings
         </Link>
         <p className="page-eyebrow mt-4">Billing</p>

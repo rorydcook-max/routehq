@@ -279,19 +279,26 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 </div>
                 {statusBadge(detail.documentStatus)}
               </div>
-              <div className="scrollbar-none mt-3 flex gap-2 overflow-x-auto">
-                <Link className="secondary-action pressable min-w-fit px-3 py-2" href="#notes">
-                  <PenLine size={16} />
-                  Edit
-                </Link>
+              <div className="mt-3 flex flex-wrap gap-2">
                 <Link className="primary-action pressable min-w-fit px-3 py-2" href={`/bookings/new?customerId=${customer.id}` as Route}>
                   <Plus size={16} />
-                  Add Rental
+                  New booking
                 </Link>
-                <button className="secondary-action min-w-fit px-3 py-2" type="button">
-                  <MessageCircle className="mr-1 inline" size={16} />
-                  Send Message
-                </button>
+                {String(customer.phone || "").replace(/\D/g, "").length >= 8 ? (
+                  <a
+                    className="secondary-action pressable min-w-fit px-3 py-2"
+                    href={`https://wa.me/${String(customer.phone).replace(/\D/g, "")}`}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    <MessageCircle size={16} />
+                    WhatsApp
+                  </a>
+                ) : null}
+                <Link className="secondary-action pressable min-w-fit px-3 py-2" href="#notes">
+                  <PenLine size={16} />
+                  Notes
+                </Link>
               </div>
             </Card>
 

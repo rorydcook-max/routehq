@@ -581,7 +581,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
           </BookingMetricCard>
         </div>
 
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,3fr)_minmax(320px,2fr)]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[minmax(0,3fr)_minmax(320px,2fr)]">
           <div className="space-y-3">
             <Card>
               <SectionHeader eyebrow="Booking link" title={bookingLink ? "Customer completion timeline" : "Customer booking link"} />

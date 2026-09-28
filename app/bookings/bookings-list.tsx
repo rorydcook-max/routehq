@@ -194,7 +194,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
               value={search}
             />
           </label>
-          <div className="scrollbar-none flex flex-wrap gap-1.5 xl:justify-end">
+          <div className="scrollbar-none -mx-3 flex gap-1.5 overflow-x-auto px-3 sm:mx-0 sm:flex-wrap sm:px-0 xl:justify-end">
             {filters.map((entry) => (
               <button
                 className={`pressable min-h-8 min-w-fit rounded-md border px-3 py-1.5 text-[12px] font-semibold ${filter === entry ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-[#fbfaf8] text-[var(--foreground-secondary)]"}`}
@@ -226,7 +226,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
             return (
             <article className={`rounded-[10px] border p-2 transition hover:border-[var(--primary)] hover:shadow-[0_16px_30px_rgba(15,23,42,0.06)] ${statusCardClasses(booking)}`} key={booking.id}>
               <div className="grid gap-2.5 lg:grid-cols-[104px_minmax(0,1fr)_136px] lg:items-center">
-                <Link className="group relative block h-[68px] overflow-hidden rounded-lg border border-[var(--border)] bg-[#fbfaf8]" href={`/bookings/${booking.id}`}>
+                <Link className={`group relative h-[68px] overflow-hidden ${photoUrl ? "block" : "hidden lg:block"} rounded-lg border border-[var(--border)] bg-[#fbfaf8]`} href={`/bookings/${booking.id}`}>
                   {photoUrl ? (
                     <img
                       alt={`${vehicleTitle(booking.vehicles) || "Vehicle"} booking`}

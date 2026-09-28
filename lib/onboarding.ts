@@ -5,7 +5,7 @@ export const onboardingSteps = [
   { step: "first_customer", label: "First customer added", href: "/customers/new" },
   { step: "first_booking", label: "First booking created", href: "/bookings/new" },
   { step: "contract_template", label: "Contract template reviewed", href: "/settings/contracts" },
-  { step: "line_connected", label: "LINE notifications connected", href: "/settings" },
+  { step: "line_connected", label: "LINE notifications connected", href: "/settings?tab=notifications" },
   { step: "team_invited", label: "Team member invited", href: "/invite" }
 ] as const;
 

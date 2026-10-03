@@ -1,3 +1,4 @@
+import { receiptOf, signedReceiptUrls } from "@/lib/payment-receipts";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export { TASK_TYPE_OPTIONS, taskTypeLabel } from "@/lib/task-types";
@@ -19,6 +20,8 @@ export type TaskListItem = {
   rentalId: string | null;
   rentalPaymentId: string | null;
   amount: number | null;
+  /** A receipt the customer sent for this payment, waiting to be checked. */
+  receipt: { url: string | null; submittedAt: string; method: string; note: string | null } | null;
 };
 
 const bangkokDate = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" });
@@ -69,6 +72,8 @@ export async function getTaskList(organizationId: string): Promise<TaskListItem[
   const tasks = tasksResult.data || [];
   const payments = (paymentsResult.data || []).filter((payment: any) => !isVoided(payment) && payment.rentals);
 
+  const receiptUrls = await signedReceiptUrls(payments.map((row: any) => receiptOf(row.metadata)?.path).filter(Boolean));
+
   const vehicleIds = [
     ...new Set([
       ...tasks.map((row: any) => row.vehicle_id),
@@ -109,12 +114,14 @@ export async function getTaskList(organizationId: string): Promise<TaskListItem[
       vehicleLabel: row.vehicle_id ? vehicleLabels.get(row.vehicle_id) || null : null,
       rentalLabel: rental?.label || null,
       customerName: rental?.customer || null,
-      amount: null
+      amount: null,
+      receipt: null
     };
   });
 
   const paymentItems: TaskListItem[] = payments.map((row: any) => {
     const vehicleId = row.vehicle_id || row.rentals?.vehicle_id || null;
+    const receipt = receiptOf(row.metadata);
     return {
       id: `payment-${row.id}`,
       kind: "payment",
@@ -129,7 +136,10 @@ export async function getTaskList(organizationId: string): Promise<TaskListItem[
       vehicleLabel: vehicleId ? vehicleLabels.get(vehicleId) || null : null,
       rentalLabel: row.rentals?.display_code || row.rentals?.reference || null,
       customerName: row.rentals?.customers?.full_name || null,
-      amount: Number(row.amount || 0)
+      amount: Number(row.amount || 0),
+      receipt: receipt
+        ? { url: receiptUrls.get(receipt.path) || null, submittedAt: receipt.submitted_at, method: receipt.method || "other", note: receipt.note || null }
+        : null
     };
   });
 

@@ -1,6 +1,7 @@
 "use server";
 
 import { headers } from "next/headers";
+import { revalidatePath } from "next/cache";
 import OpenAI from "openai";
 import { organizationSignatureReference } from "@/lib/branding-assets";
 import { buildContractVariables, renderContractTemplate } from "@/lib/contract-rendering";
@@ -1181,4 +1182,105 @@ export async function completePublicBooking(formData: FormData) {
     success: true,
     signedContractUrl: signedUrl?.signedUrl || null
   };
+}
+
+
+/**
+ * The customer has paid outside the app (PromptPay, transfer...) and sends the
+ * receipt from their booking page. Nothing is marked as paid here: the receipt
+ * waits on the scheduled payment until someone at the business confirms it.
+ */
+export async function submitPaymentReceipt(formData: FormData) {
+  const token = requiredString(formData, "token");
+  const paymentId = requiredString(formData, "paymentId");
+  const rawMethod = optionalString(formData, "method") || "promptpay";
+  const method = ["promptpay", "bank_transfer", "wise", "revolut", "other"].includes(rawMethod) ? rawMethod : "other";
+  const note = (optionalString(formData, "note") || "").slice(0, 300) || null;
+  const file = formData.get("receipt");
+  const supabase = createSupabaseAdminClient() as any;
+
+  if (!(file instanceof File) || file.size === 0) {
+    return { success: false, error: "Please add a photo or screenshot of your receipt." };
+  }
+  const isImage = file.type.startsWith("image/");
+  if (!isImage && file.type !== "application/pdf") {
+    return { success: false, error: "Please send a photo, a screenshot or a PDF." };
+  }
+  if (file.size > 4 * 1024 * 1024) {
+    return { success: false, error: "That file is too large. Please send a screenshot instead." };
+  }
+
+  const { data: bookingLink } = await supabase
+    .from("booking_links")
+    .select("id, organization_id, rental_id, customer_id, status")
+    .eq("token", token)
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (!bookingLink?.rental_id || bookingLink.status === "cancelled") {
+    return { success: false, error: "This booking link could not be found." };
+  }
+
+  // The payment must belong to the rental behind this link.
+  const { data: payment } = await supabase
+    .from("rental_payments")
+    .select("id, amount, currency, status, voided, metadata")
+    .eq("id", paymentId)
+    .eq("rental_id", bookingLink.rental_id)
+    .eq("organization_id", bookingLink.organization_id)
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (!payment) {
+    return { success: false, error: "This payment could not be found." };
+  }
+  if (["paid", "voided", "waived", "cancelled"].includes(String(payment.status)) || payment.voided === true) {
+    return { success: false, error: "This payment is already settled." };
+  }
+
+  const extension = file.type === "application/pdf" ? "pdf" : file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
+  const storagePath = `${bookingLink.organization_id}/payment-receipts/${bookingLink.rental_id}/${payment.id}-${crypto.randomUUID()}.${extension}`;
+  const { error: uploadError } = await supabase.storage.from("documents").upload(storagePath, file, {
+    contentType: file.type,
+    upsert: false
+  });
+  if (uploadError) {
+    return { success: false, error: "We couldn't upload your receipt. Please try again." };
+  }
+
+  const previous = recordObject(recordObject(payment.metadata).receipt);
+  const submittedAt = new Date().toISOString();
+  const { receipt_declined_at: _declined, ...keptMetadata } = recordObject(payment.metadata);
+  const { error: updateError } = await supabase
+    .from("rental_payments")
+    .update({ metadata: { ...keptMetadata, receipt: { path: storagePath, submitted_at: submittedAt, method, note } } })
+    .eq("id", payment.id)
+    .eq("organization_id", bookingLink.organization_id);
+
+  if (updateError) {
+    await supabase.storage.from("documents").remove([storagePath]);
+    return { success: false, error: "We couldn't save your receipt. Please try again." };
+  }
+  // A newer receipt replaces the one sent before.
+  if (typeof previous.path === "string" && previous.path) {
+    await supabase.storage.from("documents").remove([previous.path]);
+  }
+
+  const amountText = `${payment.currency === "THB" || !payment.currency ? "฿" : `${payment.currency} `}${Number(payment.amount || 0).toLocaleString("en-US")}`;
+  await logCommunicationEvent({
+    supabase,
+    organizationId: bookingLink.organization_id,
+    rentalId: bookingLink.rental_id,
+    customerId: bookingLink.customer_id,
+    type: "customer_portal_action",
+    content: `Customer sent a payment receipt for ${amountText} (${method.replace(/_/g, " ")})`,
+    metadata: { booking_link_id: bookingLink.id, rental_payment_id: payment.id, payment_method: method }
+  });
+  notifyOperator(bookingLink.organization_id, `🧾 A customer sent a payment receipt for ${amountText}. Open To do to check it and confirm.`, "portal_action").catch(() => null);
+
+  revalidatePath("/tasks");
+  revalidatePath("/");
+  revalidatePath(`/book/${token}`);
+
+  return { success: true, submittedAt };
 }

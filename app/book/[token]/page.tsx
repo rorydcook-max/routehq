@@ -9,6 +9,7 @@ import { BusinessLogoImage } from "@/components/business-logo-image";
 import { isMapsUrl, formatDeliveryLocation } from "@/lib/delivery-location";
 import { toWallTime } from "@/lib/business-time";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { getPortalPayments } from "@/lib/payment-receipts";
 
 /** An amendment waiting for this customer's signature, if any. */
 async function pendingAmendmentFor(rentalId: string) {
@@ -245,6 +246,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   const ownerContact = organization?.settings?.phone || organization?.settings?.business_phone || organization?.owner_phone || null;
   const executedDownloads = detail.executedAgreementDownloads || null;
   const pendingAmendmentToken = rental?.id ? await pendingAmendmentFor(String(rental.id)) : null;
+  const portalPayments = detail.state === "active" && rental?.id ? await getPortalPayments(String(rental.id), detail.org_payment?.promptpay_id) : [];
 
   return (
     <main className="min-h-screen bg-[#fbfaf8] px-4 py-5 text-[var(--foreground)]">
@@ -311,7 +313,9 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             bookingData={bookingData}
             deliveryPhotoUrls={detail.deliveryPhotoUrls || []}
             organizationName={organization?.name || "Rental operator"}
+            orgPayment={detail.org_payment}
             ownerContact={ownerContact}
+            payments={portalPayments}
             rental={rental}
             signedContractUrl={executedDownloads?.originalAgreementUrl || detail.signedContractUrl}
             certificateUrl={executedDownloads?.executionCertificateUrl || null}

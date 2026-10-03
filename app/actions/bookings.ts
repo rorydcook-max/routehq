@@ -3609,3 +3609,54 @@ export async function undoCancellation(formData: FormData) {
   revalidatePath(`/bookings/${rentalId}`);
   if (resolvedVehicleId) revalidatePath(`/fleet/${resolvedVehicleId}`);
 }
+
+
+/**
+ * The receipt a customer sent doesn't match money received. The payment stays
+ * due and the customer's booking page asks them to get in touch or send it again.
+ */
+export async function declinePaymentReceipt(paymentId: string) {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("You must be signed in.");
+
+  const { data: payment, error } = await supabase
+    .from("rental_payments")
+    .select("id, organization_id, rental_id, customer_id, vehicle_id, amount, metadata")
+    .eq("id", String(paymentId || "").trim())
+    .is("deleted_at", null)
+    .maybeSingle();
+  if (error || !payment) throw new Error(error?.message || "Payment was not found.");
+
+  await ensureMembership(supabase, payment.organization_id, user.id);
+
+  const { receipt, ...rest } = (payment.metadata || {}) as Record<string, any>;
+  if (!receipt) return { success: true };
+
+  const { error: updateError } = await supabase
+    .from("rental_payments")
+    .update({ metadata: { ...rest, receipt_declined_at: new Date().toISOString(), receipt_declined_path: receipt.path || null } })
+    .eq("id", payment.id)
+    .eq("organization_id", payment.organization_id);
+  if (updateError) throw new Error(updateError.message);
+
+  await recordActivityEvent(supabase, {
+    organization_id: payment.organization_id,
+    actor_id: user.id,
+    entity_type: "payment",
+    entity_id: payment.id,
+    vehicle_id: payment.vehicle_id || null,
+    rental_id: payment.rental_id,
+    customer_id: payment.customer_id || null,
+    event_type: "payment_receipt_declined",
+    title: "Receipt not accepted",
+    detail: `The receipt sent for THB ${Math.round(Number(payment.amount || 0)).toLocaleString()} did not match a payment received.`
+  });
+
+  revalidatePath("/");
+  revalidatePath("/tasks");
+  revalidatePath(`/bookings/${payment.rental_id}`);
+  return { success: true };
+}

@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
-import { CheckCircle2, Circle, Wallet } from "lucide-react";
-import { recordPaymentReceived } from "@/app/actions/bookings";
+import { CheckCircle2, Circle, ReceiptText, Wallet } from "lucide-react";
+import { declinePaymentReceipt, recordPaymentReceived } from "@/app/actions/bookings";
 import { completeTask } from "@/app/actions/tasks";
 import { PendingButton } from "@/components/pending-button";
 import { Badge } from "@/components/ui";
@@ -38,11 +38,12 @@ function timeLabel(dueAt: string | null) {
   return time === "00:00" ? null : time;
 }
 
-type Group = { key: string; title: string; tone: "red" | "amber" | "neutral"; items: TaskListItem[] };
+type Group = { key: string; title: string; tone: "red" | "amber" | "neutral" | "teal"; items: TaskListItem[] };
 
 function groupOpen(items: TaskListItem[], today: string): Group[] {
   const weekEnd = addDays(today, 7);
   const groups: Group[] = [
+    { key: "receipts", title: "Receipts to check", tone: "teal", items: [] },
     { key: "overdue", title: "Overdue", tone: "red", items: [] },
     { key: "today", title: "Today", tone: "amber", items: [] },
     { key: "week", title: "Next 7 days", tone: "neutral", items: [] },
@@ -50,10 +51,12 @@ function groupOpen(items: TaskListItem[], today: string): Group[] {
   ];
   for (const item of items) {
     const due = item.dueDate;
-    if (due && due < today) groups[0].items.push(item);
-    else if (due === today) groups[1].items.push(item);
-    else if (due && due <= weekEnd) groups[2].items.push(item);
-    else groups[3].items.push(item);
+    // A customer is waiting on these, whenever the payment falls due.
+    if (item.receipt) groups[0].items.push(item);
+    else if (due && due < today) groups[1].items.push(item);
+    else if (due === today) groups[2].items.push(item);
+    else if (due && due <= weekEnd) groups[3].items.push(item);
+    else groups[4].items.push(item);
   }
   return groups.filter((group) => group.items.length > 0);
 }
@@ -67,11 +70,15 @@ const METHODS = [
   ["other", "Other"]
 ] as const;
 
-function RecordPaymentPanel({ paymentId, amount, today, onClose }: { paymentId: string; amount: number; today: string; onClose: () => void }) {
+function methodLabel(method: string) {
+  return METHODS.find(([key]) => key === method)?.[1] || "Other";
+}
+
+function RecordPaymentPanel({ paymentId, amount, today, onClose, defaultMethod = "cash" }: { paymentId: string; amount: number; today: string; onClose: () => void; defaultMethod?: string }) {
   const router = useRouter();
   const [value, setValue] = useState(String(amount || ""));
   const [date, setDate] = useState(today);
-  const [method, setMethod] = useState("cash");
+  const [method, setMethod] = useState(defaultMethod);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const received = Number(value || 0);
@@ -134,6 +141,36 @@ function RecordPaymentPanel({ paymentId, amount, today, onClose }: { paymentId: 
 function TaskRow({ item, organizationId, today }: { item: TaskListItem; organizationId: string; today: string }) {
   const [showNote, setShowNote] = useState(false);
   const [recording, setRecording] = useState(false);
+  const router = useRouter();
+  const [receiptError, setReceiptError] = useState<string | null>(null);
+  const [isConfirming, startConfirm] = useTransition();
+  const receipt = item.kind === "payment" ? item.receipt : null;
+
+  function confirmReceipt() {
+    if (!item.rentalPaymentId || !receipt) return;
+    setReceiptError(null);
+    startConfirm(async () => {
+      try {
+        await recordPaymentReceived(item.rentalPaymentId as string, { amount: item.amount || 0, date: today, method: receipt.method, note: "Receipt checked" });
+        router.refresh();
+      } catch {
+        setReceiptError("Couldn't confirm this payment. Please try again.");
+      }
+    });
+  }
+
+  function declineReceipt() {
+    if (!item.rentalPaymentId) return;
+    setReceiptError(null);
+    startConfirm(async () => {
+      try {
+        await declinePaymentReceipt(item.rentalPaymentId as string);
+        router.refresh();
+      } catch {
+        setReceiptError("Couldn't update this payment. Please try again.");
+      }
+    });
+  }
   const overdue = !item.completedAt && !!item.dueDate && item.dueDate < today;
   const time = item.kind === "task" ? timeLabel(item.dueAt) : null;
   const context = [item.customerName, item.vehicleLabel, item.rentalLabel].filter(Boolean).join(" · ");
@@ -141,7 +178,9 @@ function TaskRow({ item, organizationId, today }: { item: TaskListItem; organiza
   return (
     <div className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-start">
       <div className="flex min-w-0 flex-1 items-start gap-3">
-        {item.kind === "payment" ? (
+        {receipt ? (
+          <ReceiptText className="mt-0.5 shrink-0 text-[var(--primary)]" size={20} />
+        ) : item.kind === "payment" ? (
           <Wallet className={`mt-0.5 shrink-0 ${overdue ? "text-[var(--danger)]" : "text-[var(--primary)]"}`} size={20} />
         ) : item.completedAt ? (
           <CheckCircle2 className="mt-0.5 shrink-0 text-emerald-600" size={20} />
@@ -162,8 +201,14 @@ function TaskRow({ item, organizationId, today }: { item: TaskListItem; organiza
                 ? `${overdue ? "Was due" : "Due"} ${dayLabel(item.dueDate, today)}${time ? ` · ${time}` : ""}`
                 : "No due date"}
           </p>
+          {receipt ? (
+            <p className="mt-1 text-sm font-semibold text-[var(--primary)]">
+              Customer sent a receipt · {methodLabel(receipt.method)} · {dayLabel(new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date(receipt.submittedAt)), today)}
+            </p>
+          ) : null}
+          {receiptError ? <p className="mt-1 text-xs font-semibold text-[var(--danger)]">{receiptError}</p> : null}
           {recording && item.rentalPaymentId ? (
-            <RecordPaymentPanel amount={item.amount || 0} onClose={() => setRecording(false)} paymentId={item.rentalPaymentId} today={today} />
+            <RecordPaymentPanel amount={item.amount || 0} defaultMethod={receipt?.method || "cash"} onClose={() => setRecording(false)} paymentId={item.rentalPaymentId} today={today} />
           ) : null}
           {showNote && !item.completedAt ? (
             <form action={completeTask} className="mt-2 flex flex-col gap-2 sm:flex-row">
@@ -185,7 +230,24 @@ function TaskRow({ item, organizationId, today }: { item: TaskListItem; organiza
       </div>
 
       <div className="flex shrink-0 flex-wrap items-center gap-2 pl-8 sm:pl-0">
-        {item.kind === "payment" && item.rentalPaymentId && !recording ? (
+        {receipt && !recording ? (
+          <>
+            {receipt.url ? (
+              <a className="secondary-action pressable min-h-9 px-3 text-xs" href={receipt.url} rel="noreferrer" target="_blank">
+                View receipt
+              </a>
+            ) : null}
+            <button className="primary-action pressable min-h-9 px-3 text-xs" disabled={isConfirming} onClick={confirmReceipt} type="button">
+              {isConfirming ? "Saving…" : "Confirm received"}
+            </button>
+            <button className="secondary-action pressable min-h-9 px-3 text-xs" disabled={isConfirming} onClick={declineReceipt} type="button">
+              Not received
+            </button>
+            <button className="secondary-action pressable min-h-9 px-3 text-xs" disabled={isConfirming} onClick={() => setRecording(true)} type="button">
+              Different amount
+            </button>
+          </>
+        ) : item.kind === "payment" && item.rentalPaymentId && !recording ? (
           <button className="primary-action pressable min-h-9 px-3 text-xs" onClick={() => setRecording(true)} type="button">
             Record payment
           </button>
@@ -239,7 +301,7 @@ export function TasksList({
   );
   const groups = useMemo(() => groupOpen(open, today), [open, today]);
 
-  const toneClass = { red: "text-[var(--danger)]", amber: "text-[var(--warning)]", neutral: "text-[var(--foreground-secondary)]" };
+  const toneClass = { red: "text-[var(--danger)]", amber: "text-[var(--warning)]", neutral: "text-[var(--foreground-secondary)]", teal: "text-[var(--primary)]" };
 
   return (
     <div className="space-y-4">

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 import type { ReactNode } from "react";
-import { ArrowRight, Bell, CalendarClock, CheckCircle2, FileWarning, KeyRound, Plus, RotateCcw, Wallet } from "lucide-react";
+import { ArrowRight, Bell, CalendarClock, CheckCircle2, FileWarning, KeyRound, Plus, ReceiptText, RotateCcw, Wallet } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { businessToday } from "@/lib/business-time";
 import { FleetIntelligencePanel } from "@/components/dashboard/fleet-intelligence-panel";
@@ -16,6 +16,7 @@ import { getDashboardData, money } from "@/lib/dashboard";
 import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization";
 import { getValueTrackerData } from "@/lib/value-tracker";
 import { getOnboardingStatus } from "@/lib/onboarding";
+import { getReceiptsWaiting } from "@/lib/payment-receipts";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isExpenseTransaction, isRevenueTransaction } from "@/lib/transaction-options";
 import { groupVehiclesByKind } from "@/lib/vehicle-groups";
@@ -133,6 +134,7 @@ export default async function Home() {
     })
   ]);
   const { metrics, reminders, rentals, timeline, transactions, vehicles } = dashboardData;
+  const receiptsWaiting = await getReceiptsWaiting(organization.id);
 
   const now = new Date();
   const today = businessToday();
@@ -214,6 +216,17 @@ export default async function Home() {
       detail: `${r.customer} · ${r.vehicle}${since > 0 ? ` · ${plural(since, "day")} late` : ""}`,
       href: `/bookings/${r.id}`,
       action: "Collect"
+    });
+  }
+  for (const r of receiptsWaiting) {
+    todayItems.push({
+      key: `receipt-${r.id}`,
+      tone: "teal",
+      icon: <ReceiptText size={17} />,
+      title: `Receipt to check · ${money(r.amount)}`,
+      detail: [r.customer, r.vehicle].filter(Boolean).join(" · ") || "Customer says they have paid",
+      href: "/tasks",
+      action: "Check"
     });
   }
   for (const v of vehicles) {

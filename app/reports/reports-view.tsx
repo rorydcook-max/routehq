@@ -37,12 +37,12 @@ import {
 import type { DatePreset, ReportsData, VehicleMetrics } from "@/lib/reports";
 
 const PRESETS: Array<{ value: DatePreset; label: string }> = [
-  { value: "this_month", label: "This Month" },
-  { value: "last_month", label: "Last Month" },
-  { value: "last_3_months", label: "Last 3 Months" },
-  { value: "last_6_months", label: "Last 6 Months" },
-  { value: "this_year", label: "This Year" },
-  { value: "last_year", label: "Last Year" },
+  { value: "this_month", label: "This month" },
+  { value: "last_month", label: "Last month" },
+  { value: "last_3_months", label: "Last 3 months" },
+  { value: "last_6_months", label: "Last 6 months" },
+  { value: "this_year", label: "This year" },
+  { value: "last_year", label: "Last year" },
   { value: "custom", label: "Custom" }
 ];
 
@@ -50,6 +50,13 @@ const CHART_COLORS = ["#0f766e", "#2563eb", "#d97706", "#dc2626", "#7c3aed", "#0
 
 function money(value: number) {
   return new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB", maximumFractionDigits: 0 }).format(value);
+}
+
+/** "2026-10-01" -> "1 Oct 2026". */
+function plainDate(iso: string) {
+  const date = new Date(`${String(iso).slice(0, 10)}T00:00:00Z`);
+  if (Number.isNaN(date.getTime())) return iso;
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(date);
 }
 
 function pct(value: number) {
@@ -64,12 +71,12 @@ function pct(value: number) {
  * describes the figure instead. `upIsBad` flips the colours for costs.
  */
 function KpiCard({ label, value, change, sub, upIsBad = false }: { label: string; value: string; change: number | null; sub?: string; upIsBad?: boolean }) {
-  if (change === null || !Number.isFinite(change)) {
+  if (change === null || !Number.isFinite(change) || change <= -99.95) {
     return (
       <div className="content-section">
-        <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">{label}</p>
+        <p className="text-[12px] text-[var(--muted)]">{label}</p>
         <p className="mt-1 text-2xl font-semibold text-[var(--foreground)]">{value}</p>
-        <p className="mt-1 text-xs text-[var(--muted)]">{sub || "Nothing to compare with last period"}</p>
+        <p className="mt-1 text-xs text-[var(--muted)]">{sub || (change !== null && change <= -99.95 ? "Nothing recorded yet this period" : "Nothing to compare with last period")}</p>
       </div>
     );
   }
@@ -78,7 +85,7 @@ function KpiCard({ label, value, change, sub, upIsBad = false }: { label: string
   const good = upIsBad ? !isUp : isUp;
   return (
     <div className="content-section">
-      <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">{label}</p>
+      <p className="text-[12px] text-[var(--muted)]">{label}</p>
       <p className="mt-1 text-2xl font-semibold text-[var(--foreground)]">{value}</p>
       <div className="mt-1 flex items-center gap-1">
         {isFlat ? (
@@ -543,10 +550,10 @@ export function ReportsView({ data }: { data: ReportsData }) {
               key={p.value}
               onClick={() => setPreset(p.value)}
               type="button"
-              className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+              className={`rounded-[8px] px-3 py-1.5 text-[13px] font-semibold transition ${
                 preset === p.value
-                  ? "bg-[var(--primary)] text-white"
-                  : "bg-[var(--panel-secondary)] text-[var(--foreground-secondary)] hover:bg-[var(--border)]"
+                  ? "bg-[var(--primary-light)] text-[var(--primary)]"
+                  : "text-[var(--muted)] hover:bg-[#f1efeb] hover:text-[var(--foreground)]"
               }`}
             >
               {p.label}
@@ -612,15 +619,15 @@ export function ReportsView({ data }: { data: ReportsData }) {
           </div>
         ) : null}
         <p className="mt-2 text-xs text-[var(--muted)]">
-          {data.dateRange.label} · {data.dateRange.from} – {data.dateRange.to}
+          {plainDate(data.dateRange.from)} – {plainDate(data.dateRange.to)}
         </p>
       </div>
 
       {/* KPI Cards */}
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <KpiCard label="Revenue" value={money(data.totalRevenue)} change={data.revenueChange} />
-        <KpiCard label="Expenses" value={money(data.totalExpenses)} change={data.expensesChange} upIsBad />
-        <KpiCard label="Net Profit" value={money(data.netProfit)} change={data.profitChange} />
+        <KpiCard label="Money in" value={money(data.totalRevenue)} change={data.revenueChange} />
+        <KpiCard label="Money out" value={money(data.totalExpenses)} change={data.expensesChange} upIsBad />
+        <KpiCard label="Profit" value={money(data.netProfit)} change={data.profitChange} />
         <KpiCard
           label="Outstanding"
           value={money(totalOutstanding)}

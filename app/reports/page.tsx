@@ -23,8 +23,8 @@ export default async function ReportsPage({
     <AppShell userEmail={userEmail}>
       <div className="page-hero mb-5">
         <p className="page-eyebrow">Reports</p>
-        <h1 className="page-title">Financial Overview</h1>
-        <p className="page-subtitle mt-2">Real income and expenses from recorded transactions — no estimates.</p>
+        <h1 className="page-title">Reports</h1>
+        <p className="page-subtitle mt-1">How the business is doing, from what you&apos;ve actually recorded.</p>
       </div>
       <ReportsView data={data} />
     </AppShell>

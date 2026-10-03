@@ -1,3 +1,4 @@
+import { customerPaymentLabel } from "@/lib/payment-labels";
 import { receiptOf, signedReceiptUrls } from "@/lib/payment-receipts";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -21,7 +22,20 @@ export type TaskListItem = {
   rentalPaymentId: string | null;
   amount: number | null;
   /** A receipt the customer sent for this payment, waiting to be checked. */
-  receipt: { url: string | null; submittedAt: string; method: string; note: string | null } | null;
+  receipt: {
+    url: string | null;
+    submittedAt: string;
+    method: string;
+    note: string | null;
+    /** Every scheduled payment the customer says this receipt is for. */
+    paymentIds: string[];
+    /** The total of those payments. */
+    total: number;
+  } | null;
+  /** This payment is part of another row's receipt, so it isn't listed on its own. */
+  coveredBy: string | null;
+  /** Short name for a payment, e.g. "Rent · October 2026" or "Deposit". */
+  paymentLabel: string | null;
 };
 
 const bangkokDate = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" });
@@ -115,13 +129,31 @@ export async function getTaskList(organizationId: string): Promise<TaskListItem[
       rentalLabel: rental?.label || null,
       customerName: rental?.customer || null,
       amount: null,
-      receipt: null
+      receipt: null,
+      coveredBy: null,
+      paymentLabel: null
     };
   });
+
+  // One receipt can cover several payments (rent and deposit in one transfer).
+  // It is shown once, on the payment the customer picked.
+  const receiptGroups = new Map<string, any[]>();
+  for (const row of payments) {
+    const path = receiptOf(row.metadata)?.path;
+    if (path) receiptGroups.set(path, [...(receiptGroups.get(path) || []), row]);
+  }
+  const leadOf = (path: string) => {
+    const rows = receiptGroups.get(path) || [];
+    const wanted = receiptOf(rows[0]?.metadata)?.primary;
+    return rows.find((row) => row.id === wanted) || rows[0];
+  };
 
   const paymentItems: TaskListItem[] = payments.map((row: any) => {
     const vehicleId = row.vehicle_id || row.rentals?.vehicle_id || null;
     const receipt = receiptOf(row.metadata);
+    const group = receipt ? receiptGroups.get(receipt.path) || [row] : [];
+    const lead = receipt ? leadOf(receipt.path) : null;
+    const isLead = !!receipt && lead?.id === row.id;
     return {
       id: `payment-${row.id}`,
       kind: "payment",
@@ -137,9 +169,18 @@ export async function getTaskList(organizationId: string): Promise<TaskListItem[
       rentalLabel: row.rentals?.display_code || row.rentals?.reference || null,
       customerName: row.rentals?.customers?.full_name || null,
       amount: Number(row.amount || 0),
-      receipt: receipt
-        ? { url: receiptUrls.get(receipt.path) || null, submittedAt: receipt.submitted_at, method: receipt.method || "other", note: receipt.note || null }
-        : null
+      receipt: receipt && isLead
+        ? {
+            url: receiptUrls.get(receipt.path) || null,
+            submittedAt: receipt.submitted_at,
+            method: receipt.method || "other",
+            note: receipt.note || null,
+            paymentIds: group.map((item: any) => item.id),
+            total: group.reduce((sum: number, item: any) => sum + Number(item.amount || 0), 0)
+          }
+        : null,
+      coveredBy: receipt && !isLead && lead ? `payment-${lead.id}` : null,
+      paymentLabel: customerPaymentLabel(row.metadata)
     };
   });
 

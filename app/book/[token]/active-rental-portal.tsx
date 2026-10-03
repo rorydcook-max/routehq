@@ -4,7 +4,7 @@ import { businessToday } from "@/lib/business-time";
 import { useMemo, useState, useTransition } from "react";
 import { AlertTriangle, CalendarCheck, CalendarPlus, CheckCircle2, FileText, ImageIcon, MessageCircle } from "lucide-react";
 import { submitCustomerPortalAction } from "@/app/actions/public-booking";
-import type { PortalPayment } from "@/lib/payment-receipts";
+import type { PortalBundle, PortalPayment } from "@/lib/payment-receipts";
 import { PortalPayments } from "./portal-payments";
 
 type ActionType = "extension_request" | "return_confirmation" | "problem_report" | "question";
@@ -22,6 +22,7 @@ export function ActiveRentalPortal({
   deliveryPhotoUrls,
   ownerContact,
   payments = [],
+  paymentBundle = null,
   orgPayment = null
 }: {
   token: string;
@@ -34,6 +35,7 @@ export function ActiveRentalPortal({
   deliveryPhotoUrls: string[];
   ownerContact?: string | null;
   payments?: PortalPayment[];
+  paymentBundle?: PortalBundle | null;
   orgPayment?: any;
 }) {
   const [openAction, setOpenAction] = useState<ActionType | null>(null);
@@ -79,7 +81,7 @@ export function ActiveRentalPortal({
         </div>
       </section>
 
-      <PortalPayments orgPayment={orgPayment} organizationName={organizationName} payments={payments} token={token} />
+      <PortalPayments bundle={paymentBundle} orgPayment={orgPayment} organizationName={organizationName} payments={payments} token={token} />
 
       {confirmation ? (
         <p className="rounded-2xl border border-[#bbf7d0] bg-[#f0fdf4] p-4 text-sm font-bold text-[#166534]">{confirmation}</p>

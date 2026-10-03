@@ -25,6 +25,7 @@ import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { formatDeliveryLocation } from "@/lib/delivery-location";
 import { toWallTime, businessToday } from "@/lib/business-time";
+import { signedReceiptUrls } from "@/lib/payment-receipts";
 import { GeneratePaymentScheduleButton } from "@/app/bookings/[id]/generate-payment-schedule-button";
 import { RentalDocumentsCard } from "@/app/bookings/[id]/rental-documents-card";
 import { PendingAmendmentCard } from "@/app/bookings/[id]/pending-amendment-card";
@@ -319,6 +320,12 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   const { rental, bookingLink, payments, transactions, inspections, documents, activityEvents, customerPortalActions, communicationTimeline } = detail;
   const vehicle = rental.vehicles;
   const customer = rental.customers;
+  // Receipts customers sent stay with their payment; staff open them from the schedule.
+  const receiptUrls = await signedReceiptUrls(payments.map((payment: any) => payment.metadata?.receipt?.path).filter(Boolean));
+  for (const payment of payments as any[]) {
+    const path = payment.metadata?.receipt?.path;
+    if (path) payment.receipt_url = receiptUrls.get(path) || null;
+  }
   const isRetrospective = Boolean(rental.entered_by_operator) ||
     Boolean(rental.start_date && new Date(String(rental.start_date).slice(0, 10) + "T00:00:00Z") < new Date(Date.now() - 7 * 86_400_000));
   // A booking stays "booked" until the vehicle is handed over; showing it as

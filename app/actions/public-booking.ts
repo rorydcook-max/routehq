@@ -1221,21 +1221,22 @@ export async function submitPaymentReceipt(formData: FormData) {
     return { success: false, error: "This booking link could not be found." };
   }
 
-  // The payment must belong to the rental behind this link.
-  const { data: payment } = await supabase
+  // Every payment the receipt is for must belong to the rental behind this link and still be open.
+  const coverIds = String(formData.get("covers") || "").split(",").map((id) => id.trim()).filter(Boolean);
+  const targetIds = [...new Set([paymentId, ...coverIds])].slice(0, 12);
+  const { data: openRows } = await supabase
     .from("rental_payments")
     .select("id, amount, currency, status, voided, metadata")
-    .eq("id", paymentId)
     .eq("rental_id", bookingLink.rental_id)
     .eq("organization_id", bookingLink.organization_id)
     .is("deleted_at", null)
-    .maybeSingle();
+    .not("status", "in", "(paid,voided,waived,cancelled)");
+  const open = ((openRows || []) as any[]).filter((row) => row.voided !== true);
+  const targets = targetIds.map((id) => open.find((row) => row.id === id)).filter(Boolean) as any[];
+  const payment = targets.find((row) => row.id === paymentId);
 
-  if (!payment) {
-    return { success: false, error: "This payment could not be found." };
-  }
-  if (["paid", "voided", "waived", "cancelled"].includes(String(payment.status)) || payment.voided === true) {
-    return { success: false, error: "This payment is already settled." };
+  if (!payment || targets.length !== targetIds.length) {
+    return { success: false, error: "This payment is already settled or could not be found." };
   }
 
   const extension = file.type === "application/pdf" ? "pdf" : file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
@@ -1248,25 +1249,34 @@ export async function submitPaymentReceipt(formData: FormData) {
     return { success: false, error: "We couldn't upload your receipt. Please try again." };
   }
 
-  const previous = recordObject(recordObject(payment.metadata).receipt);
   const submittedAt = new Date().toISOString();
-  const { receipt_declined_at: _declined, ...keptMetadata } = recordObject(payment.metadata);
-  const { error: updateError } = await supabase
-    .from("rental_payments")
-    .update({ metadata: { ...keptMetadata, receipt: { path: storagePath, submitted_at: submittedAt, method, note } } })
-    .eq("id", payment.id)
-    .eq("organization_id", bookingLink.organization_id);
+  const totalAmount = targets.reduce((sum, row) => sum + Number(row.amount || 0), 0);
+  const receipt = { path: storagePath, submitted_at: submittedAt, method, note, primary: payment.id, covers: targets.map((row) => row.id), amount: totalAmount };
+  const replacedPaths = new Set<string>(targets.map((row) => recordObject(recordObject(row.metadata).receipt).path).filter((path) => typeof path === "string" && path) as string[]);
 
-  if (updateError) {
-    await supabase.storage.from("documents").remove([storagePath]);
-    return { success: false, error: "We couldn't save your receipt. Please try again." };
+  for (const row of targets) {
+    const { receipt_declined_at: _declined, receipt_declined_path: _declinedPath, ...kept } = recordObject(row.metadata);
+    const { error: updateError } = await supabase
+      .from("rental_payments")
+      .update({ metadata: { ...kept, receipt } })
+      .eq("id", row.id)
+      .eq("organization_id", bookingLink.organization_id);
+    if (updateError) {
+      return { success: false, error: "We couldn't save your receipt. Please try again." };
+    }
   }
-  // A newer receipt replaces the one sent before.
-  if (typeof previous.path === "string" && previous.path) {
-    await supabase.storage.from("documents").remove([previous.path]);
+  // A newer receipt replaces the one sent before, on every payment that one covered.
+  for (const row of open) {
+    const oldPath = recordObject(recordObject(row.metadata).receipt).path;
+    if (targets.includes(row) || typeof oldPath !== "string" || !replacedPaths.has(oldPath)) continue;
+    const { receipt: _old, ...rest } = recordObject(row.metadata);
+    await supabase.from("rental_payments").update({ metadata: rest }).eq("id", row.id).eq("organization_id", bookingLink.organization_id);
+  }
+  if (replacedPaths.size) {
+    await supabase.storage.from("documents").remove([...replacedPaths]);
   }
 
-  const amountText = `${payment.currency === "THB" || !payment.currency ? "฿" : `${payment.currency} `}${Number(payment.amount || 0).toLocaleString("en-US")}`;
+  const amountText = `${payment.currency === "THB" || !payment.currency ? "฿" : `${payment.currency} `}${totalAmount.toLocaleString("en-US")}`;
   await logCommunicationEvent({
     supabase,
     organizationId: bookingLink.organization_id,
@@ -1274,7 +1284,7 @@ export async function submitPaymentReceipt(formData: FormData) {
     customerId: bookingLink.customer_id,
     type: "customer_portal_action",
     content: `Customer sent a payment receipt for ${amountText} (${method.replace(/_/g, " ")})`,
-    metadata: { booking_link_id: bookingLink.id, rental_payment_id: payment.id, payment_method: method }
+    metadata: { booking_link_id: bookingLink.id, rental_payment_id: payment.id, rental_payment_ids: receipt.covers, payment_method: method }
   });
   notifyOperator(bookingLink.organization_id, `🧾 A customer sent a payment receipt for ${amountText}. Open To do to check it and confirm.`, "portal_action").catch(() => null);
 

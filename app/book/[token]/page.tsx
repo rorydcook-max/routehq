@@ -246,7 +246,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   const ownerContact = organization?.settings?.phone || organization?.settings?.business_phone || organization?.owner_phone || null;
   const executedDownloads = detail.executedAgreementDownloads || null;
   const pendingAmendmentToken = rental?.id ? await pendingAmendmentFor(String(rental.id)) : null;
-  const portalPayments = detail.state === "active" && rental?.id ? await getPortalPayments(String(rental.id), detail.org_payment?.promptpay_id) : [];
+  const portal = detail.state === "active" && rental?.id ? await getPortalPayments(String(rental.id), detail.org_payment?.promptpay_id) : { payments: [], bundle: null };
 
   return (
     <main className="min-h-screen bg-[#fbfaf8] px-4 py-5 text-[var(--foreground)]">
@@ -315,7 +315,8 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             organizationName={organization?.name || "Rental operator"}
             orgPayment={detail.org_payment}
             ownerContact={ownerContact}
-            payments={portalPayments}
+            paymentBundle={portal.bundle}
+            payments={portal.payments}
             rental={rental}
             signedContractUrl={executedDownloads?.originalAgreementUrl || detail.signedContractUrl}
             certificateUrl={executedDownloads?.executionCertificateUrl || null}

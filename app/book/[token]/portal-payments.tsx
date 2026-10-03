@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { CheckCircle2, Clock, Copy, Wallet } from "lucide-react";
 import { submitPaymentReceipt } from "@/app/actions/public-booking";
-import type { PortalPayment } from "@/lib/payment-receipts";
+import type { PortalBundle, PortalPayment } from "@/lib/payment-receipts";
 
 type OrgPayment = {
   promptpay_id?: string | null;
@@ -47,11 +47,13 @@ async function shrinkImage(file: File): Promise<File> {
 export function PortalPayments({
   token,
   payments,
+  bundle = null,
   orgPayment,
   organizationName
 }: {
   token: string;
   payments: PortalPayment[];
+  bundle?: PortalBundle | null;
   orgPayment: OrgPayment;
   organizationName: string;
 }) {
@@ -62,6 +64,28 @@ export function PortalPayments({
     <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
       <p className="text-xs font-semibold uppercase text-[var(--primary)]">Payments</p>
       <div className="mt-3 divide-y divide-[var(--border)]">
+        {bundle ? (
+          <PaymentRow
+            covers={bundle.ids}
+            isOpen={openId === "all"}
+            key={`all-${bundle.ids.join("-")}`}
+            onToggle={() => setOpenId(openId === "all" ? null : "all")}
+            orgPayment={orgPayment}
+            organizationName={organizationName}
+            payment={{
+              id: bundle.ids[0],
+              label: `All ${bundle.ids.length} payments together`,
+              amount: bundle.amount,
+              currency: bundle.currency,
+              dueDate: "",
+              overdue: false,
+              qrSvg: bundle.qrSvg,
+              receiptSentAt: null,
+              receiptDeclined: false
+            }}
+            token={token}
+          />
+        ) : null}
         {payments.map((payment) => (
           <PaymentRow
             isOpen={openId === payment.id}
@@ -85,7 +109,8 @@ function PaymentRow({
   orgPayment,
   organizationName,
   isOpen,
-  onToggle
+  onToggle,
+  covers
 }: {
   token: string;
   payment: PortalPayment;
@@ -93,9 +118,13 @@ function PaymentRow({
   organizationName: string;
   isOpen: boolean;
   onToggle: () => void;
+  /** Set on the "everything together" row: the payments one receipt will cover. */
+  covers?: string[];
 }) {
   const router = useRouter();
-  const [sentAt, setSentAt] = useState<string | null>(payment.receiptSentAt);
+  // The page reloads its data after a receipt is sent (possibly from another row).
+  const [justSentAt, setSentAt] = useState<string | null>(null);
+  const sentAt = payment.receiptSentAt || (covers ? null : justSentAt);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const hasBank = !!orgPayment?.bank_account_number;
@@ -113,6 +142,7 @@ function PaymentRow({
         formData.set("receipt", await shrinkImage(file));
         formData.set("token", token);
         formData.set("paymentId", payment.id);
+        if (covers?.length) formData.set("covers", covers.join(","));
         const result = await submitPaymentReceipt(formData);
         if (!result.success) {
           setError(result.error || "We couldn't send your receipt. Please try again.");
@@ -140,9 +170,11 @@ function PaymentRow({
           <p className={`text-sm ${sentAt ? "text-[#166534]" : payment.overdue ? "font-semibold text-[#dc2626]" : "text-[var(--muted)]"}`}>
             {sentAt
               ? `Receipt sent · waiting for ${organizationName} to confirm`
-              : payment.overdue
-                ? `Was due ${shortDate(payment.dueDate)}`
-                : `Due ${shortDate(payment.dueDate)}`}
+              : covers
+                ? "One transfer, one receipt"
+                : payment.overdue
+                  ? `Was due ${shortDate(payment.dueDate)}`
+                  : `Due ${shortDate(payment.dueDate)}`}
           </p>
         </div>
         <button

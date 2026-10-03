@@ -1,4 +1,5 @@
 import { businessToday } from "@/lib/business-time";
+import { customerPaymentLabel } from "@/lib/payment-labels";
 import { promptPayQrSvg } from "@/lib/promptpay";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -16,6 +17,19 @@ export type PaymentReceipt = {
   submitted_at: string;
   method: string;
   note: string | null;
+  /** The payment the customer picked; the receipt may cover more (see covers). */
+  primary?: string;
+  covers?: string[];
+  /** Total of the payments the customer says this receipt is for. */
+  amount?: number;
+};
+
+/** Several payments paid in one go: one QR for the total, one receipt for all. */
+export type PortalBundle = {
+  ids: string[];
+  amount: number;
+  currency: string;
+  qrSvg: string | null;
 };
 
 export type PortalPayment = {
@@ -39,14 +53,6 @@ export function receiptOf(metadata: any): PaymentReceipt | null {
   return receipt && typeof receipt === "object" && typeof receipt.path === "string" && receipt.path ? (receipt as PaymentReceipt) : null;
 }
 
-export function customerPaymentLabel(metadata: any) {
-  const type = String(metadata?.type || "");
-  if (type === "deposit" || metadata?.is_deposit === true) return "Deposit";
-  if (type === "deposit_top_up") return "Deposit top-up";
-  if (type === "extension") return "Extension";
-  return metadata?.period_label ? `Rent · ${metadata.period_label}` : "Rent";
-}
-
 function isVoided(payment: any) {
   return payment.voided === true || String(payment.metadata?.voided || "") === "true";
 }
@@ -61,8 +67,11 @@ function addDays(iso: string, days: number) {
  * What the customer can pay from their booking page: anything overdue, anything
  * due in the next five weeks, and otherwise just the next payment.
  */
-export async function getPortalPayments(rentalId: string, promptPayId: string | null | undefined): Promise<PortalPayment[]> {
-  if (!rentalId) return [];
+export async function getPortalPayments(
+  rentalId: string,
+  promptPayId: string | null | undefined
+): Promise<{ payments: PortalPayment[]; bundle: PortalBundle | null }> {
+  if (!rentalId) return { payments: [], bundle: null };
   const admin = createSupabaseAdminClient() as any;
   const { data } = await admin
     .from("rental_payments")
@@ -78,7 +87,7 @@ export async function getPortalPayments(rentalId: string, promptPayId: string | 
   const soon = open.filter((row) => String(row.due_date || "").slice(0, 10) <= horizon);
   const shown = (soon.length ? soon : open.slice(0, 1)).slice(0, 6);
 
-  return Promise.all(
+  const payments = await Promise.all(
     shown.map(async (row) => {
       const amount = Number(row.amount || 0);
       const dueDate = String(row.due_date || "").slice(0, 10);
@@ -98,11 +107,28 @@ export async function getPortalPayments(rentalId: string, promptPayId: string | 
       };
     })
   );
+
+  // Rent and deposit due together are usually sent as one transfer.
+  const unpaid = payments.filter((payment) => !payment.receiptSentAt);
+  const sameCurrency = unpaid.every((payment) => payment.currency === unpaid[0]?.currency);
+  const total = Math.round(unpaid.reduce((sum, payment) => sum + payment.amount, 0) * 100) / 100;
+  const bundle: PortalBundle | null =
+    unpaid.length >= 2 && sameCurrency
+      ? {
+          ids: unpaid.map((payment) => payment.id),
+          amount: total,
+          currency: unpaid[0].currency,
+          qrSvg: promptPayId && unpaid[0].currency === "THB" ? await promptPayQrSvg(promptPayId, total) : null
+        }
+      : null;
+
+  return { payments, bundle };
 }
 
 /** A link staff can open to look at a receipt. Lasts an hour. */
 export async function signedReceiptUrls(paths: string[]) {
   const urls = new Map<string, string>();
+  paths = [...new Set(paths)];
   if (!paths.length) return urls;
   const admin = createSupabaseAdminClient() as any;
   const { data } = await admin.storage.from("documents").createSignedUrls(paths, 3600);

@@ -532,6 +532,12 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
           </div>
           <p className={`text-sm ${voided ? "text-[var(--muted)]" : "text-[var(--muted)]"}`}>{paymentDescription(payment)}</p>
           <p className="text-sm text-[var(--muted)]">Due {dateLabel(payment.due_date)}</p>
+          {(payment as any).receipt_url ? (
+            <a className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-[var(--primary)] hover:underline" href={(payment as any).receipt_url} rel="noreferrer" target="_blank">
+              <i aria-hidden="true" className="ti ti-receipt text-[14px]" />
+              {status === "paid" ? "View receipt" : "Customer sent a receipt · view"}
+            </a>
+          ) : null}
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <SmallBadge tone={badgeTone as any}>{voided ? "voided" : payment.status || "pending"}</SmallBadge>

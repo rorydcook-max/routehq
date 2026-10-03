@@ -1,5 +1,7 @@
 "use server";
 
+import { allocatePayment, type OpenPayment } from "@/lib/payment-allocation";
+import { customerPaymentLabel } from "@/lib/payment-labels";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { markOnboardingStep } from "@/lib/onboarding";
@@ -2752,7 +2754,9 @@ export async function recordPaymentReceived(paymentId: string, fields: RecordPay
       source: "payment_schedule",
       payment_method: method,
       payment_description: description,
-      note
+      note,
+      // The customer's receipt, when they sent one, stays with the money it proves.
+      ...(payment.metadata?.receipt?.path ? { receipt_path: payment.metadata.receipt.path } : {})
     },
     created_by: user.id
   });
@@ -3611,9 +3615,108 @@ export async function undoCancellation(formData: FormData) {
 }
 
 
+type ConfirmReceiptInput = {
+  /** The payment the receipt was sent for. */
+  paymentId: string;
+  /** What actually arrived. */
+  amount: number;
+  date: string;
+  method: string;
+  /** Every payment this money is for (the one above is always included). */
+  paymentIds?: string[];
+};
+
+async function openPaymentsForRental(supabase: any, organizationId: string, rentalId: string) {
+  const { data, error } = await supabase
+    .from("rental_payments")
+    .select("id, amount, due_date, status, voided, metadata")
+    .eq("organization_id", organizationId)
+    .eq("rental_id", rentalId)
+    .is("deleted_at", null)
+    .not("status", "in", "(paid,voided,waived,cancelled)")
+    .order("due_date", { ascending: true });
+  if (error) throw new Error(error.message);
+  return ((data || []) as any[]).filter((row) => row.voided !== true && String(row.metadata?.voided || "") !== "true");
+}
+
 /**
- * The receipt a customer sent doesn't match money received. The payment stays
- * due and the customer's booking page asks them to get in touch or send it again.
+ * Records money a customer sent, however it lines up with the schedule: the
+ * exact amount, less (the rest stays due), more (the extra goes to the next
+ * payment), or one transfer for several payments such as rent plus deposit.
+ * The receipt is kept on every payment it settles.
+ */
+export async function confirmReceiptPayment(input: ConfirmReceiptInput) {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("You must be signed in.");
+
+  const amount = amountFromParam(input.amount);
+  if (amount <= 0) throw new Error("Enter the amount received.");
+
+  const { data: primary, error } = await supabase
+    .from("rental_payments")
+    .select("id, organization_id, rental_id, metadata")
+    .eq("id", String(input.paymentId || "").trim())
+    .is("deleted_at", null)
+    .maybeSingle();
+  if (error || !primary) throw new Error(error?.message || "Payment was not found.");
+  await ensureMembership(supabase, primary.organization_id, user.id);
+
+  const receipt = primary.metadata?.receipt?.path ? primary.metadata.receipt : null;
+  const open = await openPaymentsForRental(supabase, primary.organization_id, primary.rental_id);
+  if (!open.some((row) => row.id === primary.id)) throw new Error("This payment is already settled.");
+
+  const wanted = new Set<string>([primary.id, ...(input.paymentIds || []).map(String)]);
+  const asOpenPayment = (row: any): OpenPayment => ({
+    id: row.id,
+    label: customerPaymentLabel(row.metadata),
+    amount: Number(row.amount || 0),
+    dueDate: String(row.due_date || "").slice(0, 10)
+  });
+  const chosen = open.filter((row) => wanted.has(row.id)).map(asOpenPayment);
+  const others = open.filter((row) => !wanted.has(row.id)).map(asOpenPayment);
+  const lines = allocatePayment(amount, chosen, others).filter((line) => line.paid > 0);
+  const split = lines.length > 1;
+  const settled = new Set(lines.map((line) => line.id));
+
+  for (const line of lines) {
+    const row = open.find((item) => item.id === line.id);
+    if (receipt && row?.metadata?.receipt?.path !== receipt.path) {
+      await supabase
+        .from("rental_payments")
+        .update({ metadata: { ...(row?.metadata || {}), receipt } })
+        .eq("id", line.id)
+        .eq("organization_id", primary.organization_id);
+    }
+    const notes = [
+      receipt ? "Receipt checked" : null,
+      split ? `Part of one payment of THB ${amount.toLocaleString("en-US")}` : null,
+      line.extra > 0 ? `Includes THB ${line.extra.toLocaleString("en-US")} more than was due` : null
+    ].filter(Boolean);
+    await recordPaymentReceived(line.id, { amount: line.paid, date: input.date, method: input.method, note: notes.join(". ") || null });
+  }
+
+  // Payments the receipt was meant for but the money didn't reach stay due, without the receipt.
+  if (receipt) {
+    for (const row of open) {
+      if (settled.has(row.id) || row.metadata?.receipt?.path !== receipt.path) continue;
+      const { receipt: _receipt, ...rest } = row.metadata || {};
+      await supabase.from("rental_payments").update({ metadata: rest }).eq("id", row.id).eq("organization_id", primary.organization_id);
+    }
+  }
+
+  revalidatePath("/");
+  revalidatePath("/tasks");
+  revalidatePath(`/bookings/${primary.rental_id}`);
+  return { success: true, lines };
+}
+
+/**
+ * The receipt a customer sent doesn't match money received. Every payment it
+ * was sent for stays due, and the customer's booking page asks them to get in
+ * touch or send it again.
  */
 export async function declinePaymentReceipt(paymentId: string) {
   const supabase = (await createSupabaseServerClient()) as any;
@@ -3632,15 +3735,21 @@ export async function declinePaymentReceipt(paymentId: string) {
 
   await ensureMembership(supabase, payment.organization_id, user.id);
 
-  const { receipt, ...rest } = (payment.metadata || {}) as Record<string, any>;
-  if (!receipt) return { success: true };
+  const path = payment.metadata?.receipt?.path;
+  if (!path) return { success: true };
 
-  const { error: updateError } = await supabase
-    .from("rental_payments")
-    .update({ metadata: { ...rest, receipt_declined_at: new Date().toISOString(), receipt_declined_path: receipt.path || null } })
-    .eq("id", payment.id)
-    .eq("organization_id", payment.organization_id);
-  if (updateError) throw new Error(updateError.message);
+  const declinedAt = new Date().toISOString();
+  const open = await openPaymentsForRental(supabase, payment.organization_id, payment.rental_id);
+  for (const row of open) {
+    if (row.metadata?.receipt?.path !== path) continue;
+    const { receipt: _receipt, ...rest } = row.metadata || {};
+    const { error: updateError } = await supabase
+      .from("rental_payments")
+      .update({ metadata: { ...rest, receipt_declined_at: declinedAt, receipt_declined_path: path } })
+      .eq("id", row.id)
+      .eq("organization_id", payment.organization_id);
+    if (updateError) throw new Error(updateError.message);
+  }
 
   await recordActivityEvent(supabase, {
     organization_id: payment.organization_id,
@@ -3652,7 +3761,7 @@ export async function declinePaymentReceipt(paymentId: string) {
     customer_id: payment.customer_id || null,
     event_type: "payment_receipt_declined",
     title: "Receipt not accepted",
-    detail: `The receipt sent for THB ${Math.round(Number(payment.amount || 0)).toLocaleString()} did not match a payment received.`
+    detail: "The receipt the customer sent did not match a payment received."
   });
 
   revalidatePath("/");

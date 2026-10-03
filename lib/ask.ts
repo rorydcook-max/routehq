@@ -3,10 +3,25 @@ import { businessToday } from "@/lib/business-time";
 import { getDashboardData } from "@/lib/dashboard";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isExpenseTransaction, isRevenueTransaction } from "@/lib/transaction-options";
+import { ASSISTANT_TOOLS, checkAction, type AssistantRecords, type ProposedAction } from "@/lib/assistant-actions";
+import { getVehicleCategories } from "@/lib/organization";
 
 const MODEL = process.env.OPENAI_ASSISTANT_MODEL || "gpt-4o";
 
-export type AskAnswer = { ok: true; answer: string; links: Array<{ label: string; href: string }> } | { ok: false; error: string };
+export type AskAnswer = { ok: true; answer: string; links: Array<{ label: string; href: string }>; proposal?: ProposedAction } | { ok: false; error: string };
+export type AskTurn = { role: "user" | "assistant"; content: string };
+
+/** The records an action is checked against: real vehicles, customers and vehicle types. */
+export async function assistantRecords(): Promise<AssistantRecords> {
+  const data = await getDashboardData();
+  const categories = data.organizationId ? await getVehicleCategories(data.organizationId) : [];
+  return {
+    today: businessToday(),
+    vehicles: data.vehicles.map((vehicle) => ({ id: vehicle.id, name: `${vehicle.make} ${vehicle.model}${vehicle.year ? ` ${vehicle.year}` : ""}`, plate: vehicle.plate })),
+    customers: data.customers.map((customer) => ({ id: customer.id, name: customer.name })),
+    categories
+  };
+}
 
 const PAGE_LABELS: Record<string, string> = {
   "/reports": "Open reports",
@@ -90,6 +105,7 @@ async function businessSnapshot() {
       id: vehicle.id,
       name: `${vehicle.make} ${vehicle.model}${vehicle.year ? ` ${vehicle.year}` : ""}`,
       plate: vehicle.plate,
+      colour: vehicle.color || undefined,
       status: vehicle.status,
       monthlyRate: vehicle.monthlyRate || null,
       incomeToDate: Math.round(vehicle.revenue),
@@ -114,12 +130,14 @@ async function businessSnapshot() {
     // Added up here so the total is never left to the model's arithmetic.
     next6MonthsRentTotal: projection.reduce((sum, month) => sum + month.total, 0),
     overdueIncludedInFirstMonth: Math.round(data.rentals.reduce((sum, rental) => sum + (rental.overdue || 0), 0)),
+    customers: data.customers.map((customer) => ({ id: customer.id, name: customer.name })),
+    vehicleTypes: data.organizationId ? await getVehicleCategories(data.organizationId) : [],
     totals: { depositsHeld: Math.round(data.metrics.depositsHeld || 0), customers: data.customers.length }
   };
 }
 
 /** Answers a plain-language question about the business from its own records. */
-export async function answerQuestion(question: string, language = "English"): Promise<AskAnswer> {
+export async function answerQuestion(question: string, language = "English", history: AskTurn[] = []): Promise<AskAnswer> {
   const asked = String(question || "").trim().slice(0, 500);
   if (asked.length < 3) return { ok: false, error: "Type a question first." };
   if (!process.env.OPENAI_API_KEY) return { ok: false, error: "The assistant isn't switched on for this account yet." };
@@ -136,7 +154,7 @@ export async function answerQuestion(question: string, language = "English"): Pr
     const completion = await openai.chat.completions.create({
       model: MODEL,
       max_tokens: 600,
-      temperature: 0.2,
+      temperature: 0,
       response_format: { type: "json_object" },
       messages: [
         {
@@ -149,14 +167,40 @@ export async function answerQuestion(question: string, language = "English"): Pr
             "Never show field names from the records (like profitToDate); describe them in everyday words.",
             "For 'worst' or 'best' vehicles, judge by profitToDate and percentOfLast12MonthsRented, and say which measure you used. A vehicle with no rentals yet is 'not earning yet', not 'worst'.",
             "For upcoming costs or renewals, use upcomingRenewals: negative daysFromToday means it is already overdue. If any are overdue, say how many first, then give the next ones coming up.",
-            "This tool only reads records. If asked to change, delete, send or book something, say you can't do that from here and name the page where they can.",
+            "You can also make four kinds of change for the owner, by calling a function: add a vehicle, record a payment or cost, create a booking link, and mark paperwork (tax, insurance, service) as renewed. Call the function only when the owner asks for that change and has given what it needs; match vehicles and customers to the records by name, plate or colour and use their ids. IMPORTANT: when the owner's message contains every required parameter of a function, call it immediately in this same reply. Do not ask them to confirm, and do not ask about optional parameters (the customer, the date, notes, colour, an end date): leave those out or use today. The app shows them a card to check and confirm. Ask a question only if a required parameter is truly missing or two records match equally well. The owner confirms before anything is saved, so don't say it is done.",
+            "Work out dates from today's date in the records: 'Oct 14th' means the next 14 October, and 'renewed for 1 year' means one year from today.",
+            "For anything else that changes data (deleting, editing, cancelling, sending messages), say you can't do that from here yet and name the page where they can.",
             'Reply as JSON: {"answer": string, "links": [{"label": string, "href": string}]}. In "answer", use plain text with line breaks; start list lines with "• ". "links" holds up to 3 pages worth opening, chosen only from: /fleet/{vehicle id}, /bookings/{rental id}, /reports, /transactions, /tasks, /fleet, /bookings, /calendar. Use ids exactly as given.',
             `Records: ${JSON.stringify(snapshot)}`
           ].join("\n")
         },
+        ...history.slice(-6).map((turn) => ({ role: turn.role, content: String(turn.content || "").slice(0, 1500) })),
         { role: "user", content: asked }
-      ]
+      ],
+      tools: ASSISTANT_TOOLS,
+      tool_choice: "auto"
     });
+
+    // The model asked to make a change: check it against the real records and
+    // hand it back as a proposal. Nothing is saved here.
+    const call = completion.choices[0]?.message?.tool_calls?.[0];
+    if (call && call.type === "function") {
+      let raw: Record<string, unknown> = {};
+      try {
+        raw = JSON.parse(call.function.arguments || "{}");
+      } catch {
+        raw = {};
+      }
+      const records: AssistantRecords = {
+        today: snapshot.today,
+        vehicles: snapshot.vehicles.map((vehicle) => ({ id: vehicle.id, name: vehicle.name, plate: vehicle.plate })),
+        customers: snapshot.customers,
+        categories: snapshot.vehicleTypes
+      };
+      const checked = checkAction(call.function.name, raw, records);
+      if (!checked.ok) return { ok: true, answer: checked.error, links: [] };
+      return { ok: true, answer: "Here's what I'll save. Check it and confirm.", links: [], proposal: checked.action };
+    }
 
     const parsed = JSON.parse(completion.choices[0]?.message?.content || "{}");
     const answer = typeof parsed.answer === "string" ? parsed.answer.trim() : "";

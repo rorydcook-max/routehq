@@ -109,7 +109,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
         <div className="mb-4 flex items-center px-2 pt-1">
           <RouteHqLogo />
         </div>
-        {shell.role === "owner" ? <AskBox variant="sidebar" /> : null}
+        {!isTeammate ? <AskBox variant="sidebar" /> : null}
         <nav className="scrollbar-none min-h-0 flex-1 space-y-0.5 overflow-y-auto">
           <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]">{t("main")}</p>
           {visibleMainNavItems.map((item) => {
@@ -197,7 +197,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
             <Link aria-label="RouteHQ dashboard" href="/">
               <RouteHqLogo className="h-7 w-auto" showDescriptor={false} />
             </Link>
-            <span className="ml-auto">{shell.role === "owner" ? <AskBox variant="icon" /> : null}</span>
+            <span className="ml-auto">{!isTeammate ? <AskBox variant="icon" /> : null}</span>
             {hasSeveralBusinesses ? (
               <form action={switchActiveOrganization}>
                 <select

@@ -184,7 +184,9 @@
     "uploadingPhotos": "ກຳລັງອັບໂຫລດຮູບ {done} ຈາກ {total}...",
     "uploadFailed": "ບໍ່ສາມາດອັບໂຫລດຮູບໄດ້. ກວດສອບການເຊື່ອມຕໍ່ແລະລອງອີກຄັ້ງ.",
     "changeDamagePhoto": "ປ່ຽນຮູບ",
-    "backToBooking": "ກັບໄປຫາການຈອງ"
+    "backToBooking": "ກັບໄປຫາການຈອງ",
+    "sideLeft": "ດ້ານຊ້າຍ",
+    "sideRight": "ດ້ານຂວາ"
   },
   "translation": {
     "translatedFrom": "ແປຈາກ {language}",

@@ -184,7 +184,9 @@
     "uploadingPhotos": "Laster opp bilder {done} av {total}...",
     "uploadFailed": "Bildene kunne ikke lastes opp. Sjekk tilkoblingen og prøv igjen.",
     "changeDamagePhoto": "Endre bilde",
-    "backToBooking": "Tilbake til bestilling"
+    "backToBooking": "Tilbake til bestilling",
+    "sideLeft": "Venstre side",
+    "sideRight": "Høyre side"
   },
   "translation": {
     "translatedFrom": "Oversatt fra {language}",

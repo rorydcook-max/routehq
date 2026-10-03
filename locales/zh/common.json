@@ -184,7 +184,9 @@
     "uploadingPhotos": "正在上传照片 {done} / {total}...",
     "uploadFailed": "照片上传失败。请检查连接并重试。",
     "changeDamagePhoto": "更换照片",
-    "backToBooking": "返回预订"
+    "backToBooking": "返回预订",
+    "sideLeft": "左侧",
+    "sideRight": "右侧"
   },
   "translation": {
     "translatedFrom": "翻译自{language}",

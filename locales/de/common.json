@@ -184,7 +184,9 @@
     "uploadingPhotos": "Fotos werden hochgeladen {done} von {total}...",
     "uploadFailed": "Die Fotos konnten nicht hochgeladen werden. Überprüfen Sie die Verbindung und versuchen Sie es erneut.",
     "changeDamagePhoto": "Foto ändern",
-    "backToBooking": "Zurück zur Buchung"
+    "backToBooking": "Zurück zur Buchung",
+    "sideLeft": "Linke Seite",
+    "sideRight": "Rechte Seite"
   },
   "translation": {
     "translatedFrom": "Übersetzt aus dem {language}",

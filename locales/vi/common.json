@@ -175,7 +175,9 @@
     "uploadingPhotos": "Đang tải ảnh lên {done} của {total}...",
     "uploadFailed": "Không thể tải ảnh lên. Kiểm tra kết nối và thử lại.",
     "changeDamagePhoto": "Thay đổi ảnh",
-    "backToBooking": "Quay lại đặt xe"
+    "backToBooking": "Quay lại đặt xe",
+    "sideLeft": "Bên trái",
+    "sideRight": "Bên phải"
   },
   "vehicles": {
     "addVehicle": "Thêm xe mới",

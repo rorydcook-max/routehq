@@ -184,7 +184,9 @@
     "uploadingPhotos": "ඡායාරූප {done} ක් {total} න් උඩුගත වෙමින් පවතී...",
     "uploadFailed": "ඡායාරූප උඩුගත කළ නොහැකි විය. සම්බන්ධතාවය පරීක්ෂා කර නැවත උත්සාහ කරන්න.",
     "changeDamagePhoto": "ඡායාරූපය වෙනස් කරන්න",
-    "backToBooking": "ආපසු වෙන්කිරීමට"
+    "backToBooking": "ආපසු වෙන්කිරීමට",
+    "sideLeft": "වම පැත්ත",
+    "sideRight": "දකුණ පැත්ත"
   },
   "translation": {
     "translatedFrom": "{language} වෙතින් පරිවර්තනය කරන ලදී",

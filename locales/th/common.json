@@ -193,7 +193,9 @@
     "uploadingPhotos": "กำลังอัปโหลดรูปภาพ {done} จาก {total}...",
     "uploadFailed": "ไม่สามารถอัปโหลดรูปภาพได้ ตรวจสอบการเชื่อมต่อและลองอีกครั้ง",
     "changeDamagePhoto": "เปลี่ยนรูปถ่าย",
-    "backToBooking": "กลับไปที่การจอง"
+    "backToBooking": "กลับไปที่การจอง",
+    "sideLeft": "ด้านซ้าย",
+    "sideRight": "ด้านขวา"
   },
   "translation": {
     "translatedFrom": "แปลจาก {language}",

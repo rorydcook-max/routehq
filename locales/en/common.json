@@ -159,6 +159,8 @@
     "startDelivery": "Start delivery inspection",
     "sideDriver": "Driver side",
     "sidePassenger": "Passenger side",
+    "sideLeft": "Left side",
+    "sideRight": "Right side",
     "interiorOptional": "Interior (optional)",
     "bootOptional": "Boot / trunk (optional)",
     "checkNewDamage": "Check for new damage",

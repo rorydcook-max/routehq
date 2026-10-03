@@ -184,7 +184,9 @@
     "uploadingPhotos": "Nag-a-upload ng mga larawan {done} sa {total}...",
     "uploadFailed": "Hindi ma-upload ang mga larawan. Suriin ang koneksyon at subukang muli.",
     "changeDamagePhoto": "Palitan ang larawan",
-    "backToBooking": "Bumalik sa booking"
+    "backToBooking": "Bumalik sa booking",
+    "sideLeft": "Kaliwang bahagi",
+    "sideRight": "Kanang bahagi"
   },
   "translation": {
     "translatedFrom": "Isinalin mula sa {language}",

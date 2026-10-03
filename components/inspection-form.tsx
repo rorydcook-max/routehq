@@ -1,7 +1,7 @@
 "use client";
 
 import { VehicleKindIcon } from "@/components/vehicle-kind-icon";
-import { kindFromCategory } from "@/lib/vehicle-groups";
+import { isTwoWheeler, kindFromCategory } from "@/lib/vehicle-groups";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
@@ -371,7 +371,12 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
     severity && severityKeys[severity] ? t(severityKeys[severity]) : String(severity || "");
   const mode = context.mode;
   const depositAlreadyReturned = mode === "return" && context.rental?.deposit_status === "fully_returned";
-  const steps = mode === "return" ? (depositAlreadyReturned ? returnSteps.filter((item) => item !== "Deposit") : returnSteps) : mode === "condition_report" ? conditionSteps : deliverySteps;
+  // No tracker fitted: skip the GPS step rather than show an empty screen.
+  const hasGps = Boolean(context.gpsDevice);
+  const withoutGps = (list: string[]) => (hasGps ? list : list.filter((item) => item !== "GPS"));
+  const steps = mode === "return" ? (depositAlreadyReturned ? returnSteps.filter((item) => item !== "Deposit") : returnSteps) : withoutGps(mode === "condition_report" ? conditionSteps : deliverySteps);
+  // Bikes have a left and right side, and no cabin or boot to photograph.
+  const isBike = isTwoWheeler(kindFromCategory(context.vehicle.vehicle_categories));
   const [step, setStep] = useState(0);
   const [odometer, setOdometer] = useState("");
   const odometerRef = useRef(odometer);
@@ -612,7 +617,8 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
           {uploadError}
         </p>
       ) : null}
-      <div className="sticky bottom-0 z-20 -mx-4 mt-4 flex gap-2 border-t border-[var(--border)] bg-white/95 p-4 backdrop-blur sm:mx-0 sm:rounded-lg sm:border">
+      {/* The first screen has its own "Start" button; Back and Next begin on step 2. */}
+      <div className={`sticky bottom-0 z-20 -mx-4 mt-4 gap-2 border-t ${step === 0 ? "hidden" : "flex"} border-[var(--border)] bg-white/95 p-4 backdrop-blur sm:mx-0 sm:rounded-lg sm:border`}>
         <button
           className={`${touchButton} flex-1 border border-[var(--border)] bg-white text-[var(--foreground-secondary)] disabled:opacity-50`}
           disabled={step === 0}
@@ -802,10 +808,9 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
             {[
               ["front", t("areaFront")],
               ["rear", t("areaRear")],
-              ["driver", t("sideDriver")],
-              ["passenger", t("sidePassenger")],
-              ["interior", t("interiorOptional")],
-              ["boot", t("bootOptional")]
+              ["driver", isBike ? t("sideLeft") : t("sideDriver")],
+              ["passenger", isBike ? t("sideRight") : t("sidePassenger")],
+              ...(isBike ? [] : [["interior", t("interiorOptional")], ["boot", t("bootOptional")]])
             ].map(([key, label]) => (
               <FileCapture
                 accept="image/*"
@@ -914,7 +919,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
         </StepShell>
       </div>
 
-      {step === 5 && mode !== "return" ? (
+      {step === 5 && mode !== "return" && hasGps ? (
         <StepShell eyebrow={t("eyebrowGpsCheck")} title={t("confirmTracker")}>
           {context.gpsDevice ? (
             <div className="rounded-xl border border-[var(--border)] bg-white p-4">

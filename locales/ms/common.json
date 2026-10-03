@@ -184,7 +184,9 @@
     "uploadingPhotos": "Memuat naik foto {done} daripada {total}...",
     "uploadFailed": "Foto tidak dapat dimuat naik. Sila periksa sambungan dan cuba lagi.",
     "changeDamagePhoto": "Tukar foto",
-    "backToBooking": "Kembali ke tempahan"
+    "backToBooking": "Kembali ke tempahan",
+    "sideLeft": "Bahagian kiri",
+    "sideRight": "Bahagian kanan"
   },
   "translation": {
     "translatedFrom": "Diterjemah dari {language}",

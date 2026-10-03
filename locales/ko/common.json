@@ -184,7 +184,9 @@
     "uploadingPhotos": "사진 업로드 중 {done} / {total}...",
     "uploadFailed": "사진을 업로드할 수 없습니다. 연결을 확인하고 다시 시도하세요.",
     "changeDamagePhoto": "사진 변경",
-    "backToBooking": "예약으로 돌아가기"
+    "backToBooking": "예약으로 돌아가기",
+    "sideLeft": "왼쪽",
+    "sideRight": "오른쪽"
   },
   "translation": {
     "translatedFrom": "{language}에서 번역됨",

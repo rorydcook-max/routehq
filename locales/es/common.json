@@ -184,7 +184,9 @@
     "uploadingPhotos": "Subiendo fotos {done} de {total}...",
     "uploadFailed": "No se pudieron subir las fotos. Verifique la conexión e intente de nuevo.",
     "changeDamagePhoto": "Cambiar foto",
-    "backToBooking": "Volver a la reserva"
+    "backToBooking": "Volver a la reserva",
+    "sideLeft": "Lado izquierdo",
+    "sideRight": "Lado derecho"
   },
   "translation": {
     "translatedFrom": "Traducido del {language}",

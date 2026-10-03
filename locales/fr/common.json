@@ -175,7 +175,9 @@
     "uploadingPhotos": "Téléchargement des photos {done} sur {total}...",
     "uploadFailed": "Les photos n'ont pas pu être téléchargées. Vérifiez la connexion et réessayez.",
     "changeDamagePhoto": "Changer la photo",
-    "backToBooking": "Retour à la réservation"
+    "backToBooking": "Retour à la réservation",
+    "sideLeft": "Côté gauche",
+    "sideRight": "Côté droit"
   },
   "vehicles": {
     "addVehicle": "Ajouter un nouveau véhicule",

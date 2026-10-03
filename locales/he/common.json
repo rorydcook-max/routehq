@@ -184,7 +184,9 @@
     "uploadingPhotos": "מעלה תמונות {done} מתוך {total}...",
     "uploadFailed": "לא ניתן להעלות את התמונות. בדוק את החיבור ונסה שוב.",
     "changeDamagePhoto": "שנה תמונה",
-    "backToBooking": "חזרה להזמנה"
+    "backToBooking": "חזרה להזמנה",
+    "sideLeft": "צד שמאל",
+    "sideRight": "צד ימין"
   },
   "translation": {
     "translatedFrom": "תורגם מ-{language}",

@@ -184,7 +184,9 @@
     "uploadingPhotos": "तस्वीरें अपलोड हो रही हैं {done} में से {total}...",
     "uploadFailed": "तस्वीरें अपलोड नहीं हो सकीं। कनेक्शन जांचें और फिर से प्रयास करें।",
     "changeDamagePhoto": "फोटो बदलें",
-    "backToBooking": "बुकिंग पर वापस जाएं"
+    "backToBooking": "बुकिंग पर वापस जाएं",
+    "sideLeft": "बाईं ओर",
+    "sideRight": "दाईं ओर"
   },
   "translation": {
     "translatedFrom": "{language} से अनुवादित",

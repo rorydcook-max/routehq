@@ -184,7 +184,9 @@
     "uploadingPhotos": "Laddar upp foton {done} av {total}...",
     "uploadFailed": "Foton kunde inte laddas upp. Kontrollera anslutningen och försök igen.",
     "changeDamagePhoto": "Byt foto",
-    "backToBooking": "Tillbaka till bokning"
+    "backToBooking": "Tillbaka till bokning",
+    "sideLeft": "Vänster sida",
+    "sideRight": "Höger sida"
   },
   "translation": {
     "translatedFrom": "Översatt från {language}",

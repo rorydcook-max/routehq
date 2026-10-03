@@ -184,7 +184,9 @@
     "uploadingPhotos": "Загрузка фото {done} из {total}...",
     "uploadFailed": "Не удалось загрузить фото. Проверьте соединение и попробуйте снова.",
     "changeDamagePhoto": "Изменить фото",
-    "backToBooking": "Назад к бронированию"
+    "backToBooking": "Назад к бронированию",
+    "sideLeft": "Левая сторона",
+    "sideRight": "Правая сторона"
   },
   "translation": {
     "translatedFrom": "Переведено с {language}",

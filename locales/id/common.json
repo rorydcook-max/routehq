@@ -184,7 +184,9 @@
     "uploadingPhotos": "Mengunggah foto {done} dari {total}...",
     "uploadFailed": "Foto tidak dapat diunggah. Periksa koneksi dan coba lagi.",
     "changeDamagePhoto": "Ubah foto",
-    "backToBooking": "Kembali ke pemesanan"
+    "backToBooking": "Kembali ke pemesanan",
+    "sideLeft": "Sisi kiri",
+    "sideRight": "Sisi kanan"
   },
   "translation": {
     "translatedFrom": "Diterjemahkan dari {language}",

@@ -65,7 +65,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
             <input name="vehicleId" type="hidden" value={vehicle.id} />
             <input name="organizationId" type="hidden" value={organization.id} />
 
-            <div className="rounded-2xl border border-[#bfd1ff] bg-[var(--primary-blue-light)] p-4">
+            <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-4">
               <SectionHeader eyebrow="Identity" title="Core details" />
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <label className="block">
@@ -143,7 +143,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
               </div>
             </div>
 
-            <div className="rounded-2xl border border-[#fed7aa] bg-[var(--warning-light)] p-4">
+            <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-4">
               <SectionHeader eyebrow="Acquisition" title="Mileage and value" />
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <label className="block">
@@ -161,7 +161,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
               </div>
             </div>
 
-            <div className="rounded-2xl border border-[#bbf7d0] bg-[var(--success-light)] p-4">
+            <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-4">
               <SectionHeader eyebrow="Rental pricing" title="Default rates" />
               <div className="mt-4 grid gap-4 sm:grid-cols-3">
                 <label className="block">
@@ -179,7 +179,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
               </div>
             </div>
 
-            <div className="rounded-2xl border border-[#bfd1ff] bg-[var(--primary-blue-light)] p-4">
+            <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-4">
               <SectionHeader eyebrow="Location" title="Branch assignment" />
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <label className="block">
@@ -242,7 +242,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
               </div>
             </div>
 
-            <div className="rounded-2xl border border-[#ddd6fe] bg-[var(--purple-light)] p-4">
+            <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-4">
               <SectionHeader eyebrow="Finance" title="Loan details" />
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <label className="block">

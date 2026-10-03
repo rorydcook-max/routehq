@@ -505,7 +505,7 @@ export function VehicleIdentityFields({
         ) : null}
       </div>
 
-      <div className="rounded-2xl border border-[#bfd1ff] bg-[var(--primary-blue-light)] p-4">
+      <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-4">
         <SectionHeader eyebrow="Vehicle" title="Make and model" />
         {catalogStatus === "loading" ? <p className="mt-3 text-sm font-semibold text-[var(--primary)]">Loading makes and models…</p> : null}
         {catalogStatus === "error" ? <p className="mt-3 rounded-lg bg-[#ffe4e6] px-3 py-2 text-sm font-semibold text-[#be123c]">{catalogMessage}</p> : null}

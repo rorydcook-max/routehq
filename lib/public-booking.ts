@@ -91,7 +91,7 @@ export async function getPublicBookingDetail(token: string) {
   const [{ data: organization }, { data: rental }, { data: vehicle }, { data: customer }, { data: contract }, { data: documents }, { data: template }] = await Promise.all([
     supabase.from("organizations").select("*").eq("id", bookingLink.organization_id).maybeSingle(),
     bookingLink.rental_id ? supabase.from("rentals").select("*").eq("id", bookingLink.rental_id).maybeSingle() : Promise.resolve({ data: null }),
-    bookingLink.vehicle_id ? supabase.from("vehicles").select("*").eq("id", bookingLink.vehicle_id).maybeSingle() : Promise.resolve({ data: null }),
+    bookingLink.vehicle_id ? supabase.from("vehicles").select("*, vehicle_categories(code, name)").eq("id", bookingLink.vehicle_id).maybeSingle() : Promise.resolve({ data: null }),
     bookingLink.customer_id ? supabase.from("customers").select("*").eq("id", bookingLink.customer_id).maybeSingle() : Promise.resolve({ data: null }),
     bookingLink.contract_id ? supabase.from("contracts").select("*").eq("id", bookingLink.contract_id).maybeSingle() : Promise.resolve({ data: null }),
     bookingLink.customer_id

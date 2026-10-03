@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
-import { AlertTriangle, CalendarDays, Car, Clock, CreditCard, MapPin, ReceiptText, ShieldCheck } from "lucide-react";
+import { AlertTriangle, CalendarDays, Clock, CreditCard, MapPin, ReceiptText, ShieldCheck } from "lucide-react";
+import { VehicleKindIcon } from "@/components/vehicle-kind-icon";
+import { kindFromCategory } from "@/lib/vehicle-groups";
 import { ActiveRentalPortal } from "./active-rental-portal";
 import { BookingCompletionForm } from "./booking-completion-form";
 import { getPublicBookingDetail } from "@/lib/public-booking";
@@ -62,12 +64,12 @@ function deliveryText(rental: any, bookingData: Record<string, unknown>) {
   const locationWasMapsUrl = isMapsUrl(rawLocation);
   const location = locationWasMapsUrl ? formatDeliveryLocation(rawLocation) : rawLocation;
   const dateTime = toWallTime(bookingData.delivery_datetime || rental?.delivery_datetime || "");
-  const methodLabel = method === "tbd" ? "Delivery method TBD" : method === "collection" ? "Customer collection" : "Delivery by operator";
+  const methodLabel = method === "tbd" ? "Handover to be arranged" : method === "collection" ? "You collect the vehicle" : "We deliver to you";
   const mapsUrl = deliveryMapsUrl(bookingData, rawLocation);
   const displayLocation = locationWasMapsUrl ? location : formatDeliveryAddress(location);
 
   return {
-    location: location ? `${methodLabel}:\n${displayLocation}${mapsUrl ? `\n${mapsUrl}` : ""}` : `${methodLabel}:\nLocation TBD`,
+    location: location ? `${methodLabel}:\n${displayLocation}${mapsUrl ? `\n${mapsUrl}` : ""}` : method === "tbd" ? methodLabel : `${methodLabel}\nPlace to be confirmed`,
     time: formatDeliveryDateTime(dateTime)
   };
 }
@@ -144,7 +146,7 @@ function formatDeliveryAddress(address: string) {
 }
 
 function formatDeliveryDateTime(value: string) {
-  if (!value) return "Time TBD";
+  if (!value) return "To be confirmed";
   const normalized = value.replace(" ", "T");
   const [datePart, timePart = ""] = normalized.split("T");
   const time = timePart.slice(0, 5);
@@ -276,7 +278,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
           <div className="mt-5 rounded-2xl border border-[var(--border)] bg-[#fbfaf8] p-4">
             <div className="flex items-start gap-3">
               <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
-                <Car size={28} />
+                <VehicleKindIcon boxed={false} kind={kindFromCategory(vehicle.vehicle_categories)} size={28} />
               </span>
               <div>
                 <h2 className="text-2xl font-semibold">{vehicleTitle(vehicle)}</h2>
@@ -285,10 +287,10 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             </div>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <Info icon={CalendarDays} label="Rental period" value={rental.is_indefinite ? `Open ended from ${formatSummaryDate(rental.start_date)}` : `${formatSummaryDate(rental.start_date)} to ${formatSummaryDate(rental.end_date)}`} />
-              <Info icon={CreditCard} label="Rate and deposit" value={`${rateLabel(rental)}\nDeposit: ${money(rental.deposit_amount, rental.currency || "THB")}`} />
-              <Info className="sm:row-span-2" icon={MapPin} label="Delivery" value={delivery.location} />
-              <Info icon={ReceiptText} label="Payment due date" value={paymentDueText(rental, bookingData)} />
-              <Info icon={Clock} label="Delivery time" value={delivery.time} />
+              <Info icon={CreditCard} label="Rate and deposit" value={`${rateLabel(rental)}\n${Number(rental.deposit_amount || 0) > 0 ? `Deposit: ${money(rental.deposit_amount, rental.currency || "THB")}` : "No deposit"}`} />
+              <Info className="sm:row-span-2" icon={MapPin} label="Handover" value={delivery.location} />
+              <Info icon={ReceiptText} label="First payment due" value={paymentDueText(rental, bookingData)} />
+              <Info icon={Clock} label="Handover time" value={delivery.time} />
             </div>
           </div>
 
@@ -373,7 +375,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   );
 }
 
-function Info({ className = "", icon: Icon, label, value }: { className?: string; icon: typeof Car; label: string; value: string }) {
+function Info({ className = "", icon: Icon, label, value }: { className?: string; icon: typeof Clock; label: string; value: string }) {
   const lines = value.split("\n");
   return (
     <div className={`rounded-xl border border-[var(--border)] bg-white p-3 ${className}`}>

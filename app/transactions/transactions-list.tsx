@@ -1,14 +1,11 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-import { Car, Check, Pencil, ReceiptText, Search, Trash2, X } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Check, ChevronLeft, ChevronRight, Pencil, Search, Trash2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { bulkDeleteTransactions, deleteTransaction, updateTransaction } from "@/app/actions/transactions";
-import { EmptyState } from "@/components/ui";
 import { isIncomeTransactionType, TRANSACTION_TYPE_OPTIONS } from "@/lib/transaction-options";
 import type { TransactionListItem } from "@/lib/transactions";
-
-const filters = ["all", "income", "expense"] as const;
 
 type VehicleOption = { id: string; label: string };
 type TransactionKind = "income" | "expense" | "deposit_received" | "deposit_refunded";
@@ -42,15 +39,15 @@ function badgeForKind(kind: TransactionKind) {
 function amountPresentation(transaction: TransactionListItem) {
   const kind = transactionKind(transaction);
   if (kind === "deposit_received") {
-    return { prefix: "", className: "text-amber-600" };
+    return { prefix: "", className: "text-[var(--warning)]" };
   }
   if (kind === "deposit_refunded") {
-    return { prefix: "-", className: "text-amber-600" };
+    return { prefix: "-", className: "text-[var(--warning)]" };
   }
   if (kind === "income") {
-    return { prefix: "+", className: "text-emerald-600" };
+    return { prefix: "+", className: "text-[var(--success)]" };
   }
-  return { prefix: "-", className: "text-red-600" };
+  return { prefix: "−", className: "text-[var(--foreground)]" };
 }
 
 function vehicleLabelFromId(vehicles: VehicleOption[], id: string | null | undefined, fallback: string) {
@@ -163,16 +160,95 @@ function TransactionEditForm({
   );
 }
 
+// ── Period helpers (plain YYYY-MM-DD strings, no time zones involved) ─────────
+
+type PeriodMode = "day" | "week" | "month" | "year" | "custom";
+
+const PERIOD_MODES: Array<{ key: PeriodMode; label: string }> = [
+  { key: "day", label: "Day" },
+  { key: "week", label: "Week" },
+  { key: "month", label: "Month" },
+  { key: "year", label: "Year" },
+  { key: "custom", label: "Custom" }
+];
+
+function toIso(date: Date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function fromIso(iso: string) {
+  return new Date(`${iso}T00:00:00Z`);
+}
+
+function shiftDays(iso: string, days: number) {
+  const date = fromIso(iso);
+  date.setUTCDate(date.getUTCDate() + days);
+  return toIso(date);
+}
+
+function periodRange(mode: PeriodMode, anchor: string, custom: { from: string; to: string }) {
+  const date = fromIso(anchor);
+  if (mode === "day") return { from: anchor, to: anchor };
+  if (mode === "week") {
+    const mondayOffset = (date.getUTCDay() + 6) % 7;
+    const from = shiftDays(anchor, -mondayOffset);
+    return { from, to: shiftDays(from, 6) };
+  }
+  if (mode === "month") {
+    const from = toIso(new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1)));
+    const to = toIso(new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0)));
+    return { from, to };
+  }
+  if (mode === "year") return { from: `${date.getUTCFullYear()}-01-01`, to: `${date.getUTCFullYear()}-12-31` };
+  return custom.from <= custom.to ? custom : { from: custom.to, to: custom.from };
+}
+
+function shiftAnchor(mode: PeriodMode, anchor: string, direction: 1 | -1) {
+  const date = fromIso(anchor);
+  if (mode === "day") return shiftDays(anchor, direction);
+  if (mode === "week") return shiftDays(anchor, 7 * direction);
+  if (mode === "month") return toIso(new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + direction, 1)));
+  return toIso(new Date(Date.UTC(date.getUTCFullYear() + direction, 0, 1)));
+}
+
+function fmt(iso: string, options: Intl.DateTimeFormatOptions) {
+  return new Intl.DateTimeFormat("en-GB", { timeZone: "UTC", ...options }).format(fromIso(iso));
+}
+
+function periodLabel(mode: PeriodMode, range: { from: string; to: string }, today: string) {
+  if (mode === "day") {
+    if (range.from === today) return "Today";
+    if (range.from === shiftDays(today, -1)) return "Yesterday";
+    return fmt(range.from, { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+  }
+  if (mode === "month") return fmt(range.from, { month: "long", year: "numeric" });
+  if (mode === "year") return range.from.slice(0, 4);
+  const sameYear = range.from.slice(0, 4) === range.to.slice(0, 4);
+  return `${fmt(range.from, sameYear ? { day: "numeric", month: "short" } : { day: "numeric", month: "short", year: "numeric" })} – ${fmt(range.to, { day: "numeric", month: "short", year: "numeric" })}`;
+}
+
+function dayHeading(iso: string, today: string) {
+  if (iso === today) return "Today";
+  if (iso === shiftDays(today, -1)) return "Yesterday";
+  return fmt(iso, { weekday: "short", day: "numeric", month: "short" });
+}
+
 export function TransactionsList({
+  today,
   transactions,
   vehicles
 }: {
+  today: string;
   transactions: TransactionListItem[];
   vehicles: VehicleOption[];
 }) {
   const router = useRouter();
+  const [mode, setMode] = useState<PeriodMode>("month");
+  const [anchor, setAnchor] = useState(today);
+  const [custom, setCustom] = useState({ from: `${today.slice(0, 8)}01`, to: today });
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<(typeof filters)[number]>("all");
+  const [phoneSide, setPhoneSide] = useState<"in" | "out">("in");
+  const [selecting, setSelecting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
@@ -183,42 +259,39 @@ export function TransactionsList({
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const visibleTransactions = useMemo(() => transactions.filter((transaction) => !hiddenIds.has(transaction.id)), [hiddenIds, transactions]);
+  const range = useMemo(() => periodRange(mode, anchor, custom), [mode, anchor, custom]);
+  const isCurrentPeriod = mode !== "custom" && range.from <= today && today <= range.to;
 
-  const filtered = useMemo(() => {
+  const inPeriod = useMemo(() => {
     const needle = search.toLowerCase().trim();
-    return visibleTransactions.filter((transaction) => {
-      const kind = transactionKind(transaction);
-      if (filter === "income" && kind !== "income") return false;
-      if (filter === "expense" && kind !== "expense") return false;
-      const haystack = [
-        transaction.typeLabel,
-        transaction.vehicleLabel,
-        transaction.customerName,
-        transaction.notes,
-        transaction.supplier,
-        transaction.displayCode
-      ]
+    return transactions.filter((transaction) => {
+      if (hiddenIds.has(transaction.id)) return false;
+      const day = inputDate(transaction.transactionDate);
+      if (day < range.from || day > range.to) return false;
+      if (!needle) return true;
+      return [transaction.typeLabel, transaction.vehicleLabel, transaction.customerName, transaction.notes, transaction.supplier, transaction.displayCode]
         .filter(Boolean)
         .join(" ")
-        .toLowerCase();
-      return !needle || haystack.includes(needle);
+        .toLowerCase()
+        .includes(needle);
     });
-  }, [filter, search, visibleTransactions]);
+  }, [hiddenIds, range, search, transactions]);
 
-  const totals = useMemo(() => {
-    return filtered.reduce(
-      (acc, transaction) => {
-        const kind = transactionKind(transaction);
-        if (kind === "income") acc.income += Math.abs(transaction.amount);
-        if (kind === "expense") acc.expense += Math.abs(transaction.amount);
-        return acc;
-      },
-      { income: 0, expense: 0 }
-    );
-  }, [filtered]);
+  const { income, expenses, deposits } = useMemo(() => {
+    const byDateDesc = (a: TransactionListItem, b: TransactionListItem) => String(b.transactionDate).localeCompare(String(a.transactionDate));
+    return {
+      income: inPeriod.filter((transaction) => transactionKind(transaction) === "income").sort(byDateDesc),
+      expenses: inPeriod.filter((transaction) => transactionKind(transaction) === "expense").sort(byDateDesc),
+      deposits: inPeriod.filter((transaction) => transactionKind(transaction).startsWith("deposit")).sort(byDateDesc)
+    };
+  }, [inPeriod]);
 
-  const allFilteredSelected = filtered.length > 0 && filtered.every((transaction) => selectedIds.has(transaction.id));
+  const sum = (items: TransactionListItem[]) => items.reduce((total, transaction) => total + Math.abs(transaction.amount), 0);
+  const incomeTotal = sum(income);
+  const expenseTotal = sum(expenses);
+  const profit = incomeTotal - expenseTotal;
+  const depositsIn = sum(deposits.filter((transaction) => transactionKind(transaction) === "deposit_received"));
+  const depositsOut = sum(deposits.filter((transaction) => transactionKind(transaction) === "deposit_refunded"));
 
   function showToast(message: string) {
     setToast(message);
@@ -234,16 +307,10 @@ export function TransactionsList({
     });
   }
 
-  function toggleAllFiltered() {
-    setSelectedIds((current) => {
-      const next = new Set(current);
-      if (allFilteredSelected) {
-        filtered.forEach((transaction) => next.delete(transaction.id));
-      } else {
-        filtered.forEach((transaction) => next.add(transaction.id));
-      }
-      return next;
-    });
+  function stopSelecting() {
+    setSelecting(false);
+    setSelectedIds(new Set());
+    setBulkConfirm(false);
   }
 
   function handleDelete(id: string) {
@@ -253,11 +320,6 @@ export function TransactionsList({
       try {
         await deleteTransaction(id);
         setHiddenIds((current) => new Set(current).add(id));
-        setSelectedIds((current) => {
-          const next = new Set(current);
-          next.delete(id);
-          return next;
-        });
         setConfirmDeleteId(null);
         showToast("Transaction deleted");
         router.refresh();
@@ -282,8 +344,7 @@ export function TransactionsList({
       try {
         const result = await bulkDeleteTransactions(ids);
         setHiddenIds((current) => new Set([...Array.from(current), ...ids]));
-        setSelectedIds(new Set());
-        setBulkConfirm(false);
+        stopSelecting();
         showToast(`${result.deleted} transaction${result.deleted === 1 ? "" : "s"} deleted`);
         router.refresh();
       } catch (caught) {
@@ -294,223 +355,278 @@ export function TransactionsList({
     });
   }
 
-  return (
-    <div className="space-y-4">
-      <div className="grid items-stretch gap-3 sm:grid-cols-3">
-        <div className="content-section flex min-h-[84px] flex-col justify-center">
-          <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Income</p>
-          <p className="mt-1 text-2xl font-semibold text-emerald-600">{money(totals.income)}</p>
-        </div>
-        <div className="content-section flex min-h-[84px] flex-col justify-center">
-          <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Expenses</p>
-          <p className="mt-1 text-2xl font-semibold text-red-600">{money(totals.expense)}</p>
-        </div>
-        <div className="content-section flex min-h-[84px] flex-col justify-center">
-          <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Net</p>
-          <p className="mt-1 text-2xl font-semibold text-[var(--primary)]">{money(totals.income - totals.expense)}</p>
-        </div>
-      </div>
-
-      <div className="content-section">
-        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-          <div className="flex flex-1 flex-col gap-3 md:flex-row md:items-center">
-            <label className="checkbox-label rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground-secondary)] md:self-stretch">
-              <input checked={allFilteredSelected} className="flex-shrink-0" onChange={toggleAllFiltered} type="checkbox" />
-              <span>Select all</span>
-            </label>
-            <label className="relative block flex-1">
-              <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" size={16} />
-              <input
-                className="input-with-leading-icon w-full rounded-xl border border-[var(--border)] bg-white pr-4 text-sm font-semibold text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]"
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search type, vehicle, supplier, notes"
-                value={search}
-              />
-            </label>
+  function renderRow(transaction: TransactionListItem) {
+    const kind = transactionKind(transaction);
+    const amount = amountPresentation(transaction);
+    const deleting = deletingIds.has(transaction.id);
+    const selected = selectedIds.has(transaction.id);
+    const who = [transaction.vehicleLabel, transaction.customerName, transaction.supplier].filter(Boolean).join(" · ");
+    return (
+      <li className={`group px-4 py-2.5 transition ${deleting ? "opacity-40" : ""} ${selected ? "bg-[var(--primary-light)]" : "hover:bg-[#fbfaf8]"}`} key={transaction.id}>
+        <div className="flex items-center gap-3">
+          {selecting ? (
+            <input
+              aria-label={`Select ${transaction.typeLabel}`}
+              checked={selected}
+              className="flex-shrink-0"
+              onChange={() => toggleSelected(transaction.id)}
+              type="checkbox"
+            />
+          ) : null}
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[14px] font-semibold text-[var(--foreground)]">
+              {transaction.typeLabel}
+              {kind.startsWith("deposit") ? <span className="ml-2 text-[12px] font-normal text-[var(--muted)]">{kind === "deposit_refunded" ? "returned" : "held"}</span> : null}
+            </p>
+            {who ? <p className="truncate text-[13px] text-[var(--muted)]">{who}</p> : null}
+            {transaction.notes ? <p className="truncate text-[12px] text-[var(--muted)]">{transaction.notes}</p> : null}
           </div>
-          <div className="flex flex-wrap gap-2">
-            {filters.map((entry) => (
+          <p className={`flex-shrink-0 text-[15px] font-semibold tabular-nums ${amount.className}`}>
+            {amount.prefix}
+            {money(transaction.amount, transaction.currency)}
+          </p>
+          <div className="flex flex-shrink-0 items-center gap-0.5 sm:opacity-0 sm:transition sm:group-hover:opacity-100 sm:focus-within:opacity-100">
+            <button
+              aria-label="Edit transaction"
+              className="pressable flex h-8 w-8 items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[#f1efeb] hover:text-[var(--primary)]"
+              onClick={() => {
+                setEditingId(editingId === transaction.id ? null : transaction.id);
+                setConfirmDeleteId(null);
+              }}
+              type="button"
+            >
+              <Pencil size={14} />
+            </button>
+            <button
+              aria-label="Delete transaction"
+              className="pressable flex h-8 w-8 items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[var(--danger-light)] hover:text-[var(--danger)]"
+              onClick={() => {
+                setConfirmDeleteId(confirmDeleteId === transaction.id ? null : transaction.id);
+                setEditingId(null);
+              }}
+              type="button"
+            >
+              <Trash2 size={14} />
+            </button>
+          </div>
+        </div>
+
+        {editingId === transaction.id ? (
+          <TransactionEditForm
+            onCancel={() => setEditingId(null)}
+            onSaved={(message) => {
+              setEditingId(null);
+              showToast(message);
+            }}
+            transaction={transaction}
+            vehicles={vehicles}
+          />
+        ) : null}
+
+        {confirmDeleteId === transaction.id ? (
+          <div className="mt-2 rounded-lg border border-[#f3d2cc] bg-[var(--danger-light)] p-3">
+            <p className="text-sm font-semibold text-[var(--danger)]">Delete this transaction?</p>
+            <p className="mt-1 text-xs text-[var(--foreground-secondary)]">It comes out of your totals. A deposit is also removed from the deposit history.</p>
+            <div className="mt-3 flex justify-end gap-2">
+              <button className="secondary-action pressable min-h-9 px-3 text-xs" onClick={() => setConfirmDeleteId(null)} type="button">
+                Keep it
+              </button>
               <button
-                className={`pressable min-h-9 rounded-xl border px-4 py-2 text-sm font-semibold capitalize ${filter === entry ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
-                key={entry}
-                onClick={() => setFilter(entry)}
+                className="pressable min-h-9 rounded-lg bg-[var(--danger)] px-3 text-xs font-semibold text-white"
+                disabled={isPending}
+                onClick={() => handleDelete(transaction.id)}
                 type="button"
               >
-                {entry}
+                Delete
+              </button>
+            </div>
+          </div>
+        ) : null}
+      </li>
+    );
+  }
+
+  function renderDays(items: TransactionListItem[]) {
+    const days: Array<{ day: string; items: TransactionListItem[] }> = [];
+    for (const transaction of items) {
+      const day = inputDate(transaction.transactionDate);
+      const last = days[days.length - 1];
+      if (last && last.day === day) last.items.push(transaction);
+      else days.push({ day, items: [transaction] });
+    }
+    return days.map((group) => (
+      <div key={group.day}>
+        {mode !== "day" ? (
+          <p className="flex items-center justify-between border-y border-[var(--border)] bg-[#fbfaf8] px-4 py-1.5 text-[12px] font-semibold text-[var(--muted)]">
+            <span>{dayHeading(group.day, today)}</span>
+            {group.items.length > 1 ? <span className="tabular-nums">{money(sum(group.items))}</span> : null}
+          </p>
+        ) : null}
+        <ul className="divide-y divide-[var(--border)]">{group.items.map(renderRow)}</ul>
+      </div>
+    ));
+  }
+
+  function renderColumn(side: "in" | "out") {
+    const items = side === "in" ? income : expenses;
+    const total = side === "in" ? incomeTotal : expenseTotal;
+    return (
+      <section className={`overflow-hidden rounded-xl border border-[var(--border)] bg-white shadow-[var(--shadow-sm)] ${phoneSide === side ? "" : "hidden lg:block"}`}>
+        <header className="flex items-center justify-between gap-3 px-4 py-3">
+          <div className="flex items-center gap-2.5">
+            <span className={`inline-flex h-8 w-8 items-center justify-center rounded-[9px] ${side === "in" ? "bg-[var(--success-light)] text-[var(--success)]" : "bg-[var(--danger-light)] text-[var(--danger)]"}`}>
+              {side === "in" ? <ArrowDownLeft size={17} /> : <ArrowUpRight size={17} />}
+            </span>
+            <div>
+              <h2 className="text-[15px] font-semibold text-[var(--foreground)]">{side === "in" ? "Money in" : "Money out"}</h2>
+              <p className="text-[12px] text-[var(--muted)]">{items.length === 0 ? "Nothing yet" : `${items.length} ${items.length === 1 ? "entry" : "entries"}`}</p>
+            </div>
+          </div>
+          <p className={`text-[18px] font-semibold tabular-nums ${side === "in" ? "text-[var(--success)]" : "text-[var(--danger)]"}`}>{money(total)}</p>
+        </header>
+        {items.length === 0 ? (
+          <p className="border-t border-[var(--border)] px-4 py-6 text-center text-sm text-[var(--muted)]">
+            {search.trim() ? "Nothing matches your search." : side === "in" ? "No income recorded for this period." : "No costs recorded for this period."}
+          </p>
+        ) : (
+          renderDays(items)
+        )}
+      </section>
+    );
+  }
+
+  const chip = (active: boolean) =>
+    `pressable whitespace-nowrap rounded-[8px] px-3 py-1.5 text-[13px] font-semibold transition ${active ? "bg-white text-[var(--foreground)] shadow-[var(--shadow-sm)]" : "text-[var(--muted)] hover:text-[var(--foreground)]"}`;
+
+  return (
+    <div className="space-y-4">
+      {/* Period picker */}
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="scrollbar-none -mx-1 flex overflow-x-auto px-1">
+          <div className="inline-flex gap-0.5 rounded-[10px] bg-[#eeece7] p-1">
+            {PERIOD_MODES.map((entry) => (
+              <button aria-pressed={mode === entry.key} className={chip(mode === entry.key)} key={entry.key} onClick={() => setMode(entry.key)} type="button">
+                {entry.label}
               </button>
             ))}
           </div>
         </div>
+
+        {mode === "custom" ? (
+          <div className="flex flex-wrap items-center gap-2 text-sm text-[var(--foreground-secondary)]">
+            <input aria-label="From date" className="w-auto" max={custom.to} onChange={(event) => event.target.value && setCustom({ ...custom, from: event.target.value })} type="date" value={custom.from} />
+            <span>to</span>
+            <input aria-label="To date" className="w-auto" min={custom.from} onChange={(event) => event.target.value && setCustom({ ...custom, to: event.target.value })} type="date" value={custom.to} />
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <button aria-label="Earlier" className="pressable flex h-9 w-9 items-center justify-center rounded-[9px] border border-[var(--border)] bg-white text-[var(--foreground-secondary)] hover:border-[var(--primary)] hover:text-[var(--primary)]" onClick={() => setAnchor(shiftAnchor(mode, anchor, -1))} type="button">
+              <ChevronLeft size={17} />
+            </button>
+            <p className="min-w-[150px] flex-1 text-center text-[15px] font-semibold text-[var(--foreground)] lg:flex-none">{periodLabel(mode, range, today)}</p>
+            <button aria-label="Later" className="pressable flex h-9 w-9 items-center justify-center rounded-[9px] border border-[var(--border)] bg-white text-[var(--foreground-secondary)] hover:border-[var(--primary)] hover:text-[var(--primary)]" onClick={() => setAnchor(shiftAnchor(mode, anchor, 1))} type="button">
+              <ChevronRight size={17} />
+            </button>
+            {!isCurrentPeriod ? (
+              <button className="pressable rounded-[9px] border border-[var(--border)] bg-white px-3 py-2 text-[13px] font-semibold text-[var(--primary)]" onClick={() => setAnchor(today)} type="button">
+                {mode === "day" ? "Today" : `This ${mode}`}
+              </button>
+            ) : null}
+          </div>
+        )}
       </div>
 
-      {error ? <p className="rounded-lg bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</p> : null}
-
-      {filtered.length === 0 ? (
-        <EmptyState
-          title="No transactions found"
-          description={
-            search.trim()
-              ? `No results for "${search.trim()}". Try another search.`
-              : "Record rental income, fuel, maintenance, or deposits from the button above."
-          }
-        />
-      ) : (
-        <div className="space-y-3">
-          {filtered.map((transaction) => {
-            const kind = transactionKind(transaction);
-            const badge = badgeForKind(kind);
-            const amount = amountPresentation(transaction);
-            const deleting = deletingIds.has(transaction.id);
-            const selected = selectedIds.has(transaction.id);
-
-            return (
-              <div
-                className={`content-section transition duration-150 ${deleting ? "scale-[0.99] opacity-40" : "opacity-100"} ${selected ? "ring-2 ring-[rgba(14,116,144,0.18)]" : ""}`}
-                key={transaction.id}
-              >
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex min-w-0 items-start gap-3">
-                    <input
-                      aria-label={`Select transaction ${transaction.typeLabel}`}
-                      checked={selected}
-                      className="mt-[14px] flex-shrink-0"
-                      onChange={() => toggleSelected(transaction.id)}
-                      type="checkbox"
-                    />
-                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
-                      {kind === "income" || kind === "deposit_received" ? <ReceiptText size={20} /> : <Car size={20} />}
-                    </span>
-                    <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className="font-semibold text-[var(--foreground)]">{transaction.typeLabel}</p>
-                        <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.04em] ${badge.className}`}>
-                          {badge.label}
-                        </span>
-                      </div>
-                      <p className="mt-1 truncate text-sm font-semibold text-[var(--foreground-secondary)]">{transaction.vehicleLabel}</p>
-                      <p className="text-sm text-[var(--muted)]">
-                        {formatDate(transaction.transactionDate)}
-                        {transaction.customerName ? ` - ${transaction.customerName}` : ""}
-                        {transaction.supplier ? ` - ${transaction.supplier}` : ""}
-                      </p>
-                      {transaction.notes ? <p className="mt-1 text-sm text-[var(--muted)]">{transaction.notes}</p> : null}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-3 sm:justify-end">
-                    <p className={`text-xl font-semibold tabular-nums ${amount.className}`}>
-                      {amount.prefix}
-                      {money(transaction.amount, transaction.currency)}
-                    </p>
-                    <div className="flex items-center gap-1">
-                      <button
-                        aria-label="Edit transaction"
-                        className="pressable flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--border)] bg-white text-[var(--muted)] hover:border-[var(--primary)] hover:text-[var(--primary)]"
-                        onClick={() => {
-                          setEditingId(editingId === transaction.id ? null : transaction.id);
-                          setConfirmDeleteId(null);
-                        }}
-                        type="button"
-                      >
-                        <Pencil size={14} />
-                      </button>
-                      <button
-                        aria-label="Delete transaction"
-                        className="pressable flex h-8 w-8 items-center justify-center rounded-lg border border-red-100 bg-white text-red-500 hover:bg-red-50"
-                        onClick={() => {
-                          setConfirmDeleteId(confirmDeleteId === transaction.id ? null : transaction.id);
-                          setEditingId(null);
-                        }}
-                        type="button"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {editingId === transaction.id ? (
-                  <TransactionEditForm
-                    onCancel={() => setEditingId(null)}
-                    onSaved={(message) => {
-                      setEditingId(null);
-                      showToast(message);
-                    }}
-                    transaction={transaction}
-                    vehicles={vehicles}
-                  />
-                ) : null}
-
-                {confirmDeleteId === transaction.id ? (
-                  <div className="mt-3 rounded-lg border border-red-100 bg-red-50 p-3">
-                    <p className="text-sm font-semibold text-red-700">Delete this transaction?</p>
-                    <p className="mt-1 text-xs text-red-600">This removes the transaction from totals. Deposit transactions will also be removed from deposit history.</p>
-                    <div className="mt-3 flex justify-end gap-2">
-                      <button className="secondary-action pressable min-h-9 px-3 text-xs" onClick={() => setConfirmDeleteId(null)} type="button">
-                        Cancel
-                      </button>
-                      <button
-                        className="pressable min-h-9 rounded-lg bg-red-600 px-3 text-xs font-bold text-white hover:bg-red-700"
-                        disabled={isPending}
-                        onClick={() => handleDelete(transaction.id)}
-                        type="button"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                ) : null}
-              </div>
-            );
-          })}
+      {/* Totals for the period */}
+      <div className="grid grid-cols-3 divide-x divide-[var(--border)] overflow-hidden rounded-xl border border-[var(--border)] bg-white shadow-[var(--shadow-sm)]">
+        <div className="px-3 py-3 sm:px-4">
+          <p className="text-[12px] text-[var(--muted)]">Money in</p>
+          <p className="text-[17px] font-semibold tabular-nums text-[var(--success)] sm:text-[22px]">{money(incomeTotal)}</p>
         </div>
-      )}
+        <div className="px-3 py-3 sm:px-4">
+          <p className="text-[12px] text-[var(--muted)]">Money out</p>
+          <p className="text-[17px] font-semibold tabular-nums text-[var(--danger)] sm:text-[22px]">{money(expenseTotal)}</p>
+        </div>
+        <div className="px-3 py-3 sm:px-4">
+          <p className="text-[12px] text-[var(--muted)]">{profit < 0 ? "Loss" : "Profit"}</p>
+          <p className={`text-[17px] font-semibold tabular-nums sm:text-[22px] ${profit < 0 ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{money(profit)}</p>
+        </div>
+      </div>
 
-      {selectedIds.size > 0 ? (
-        <div className="fixed inset-x-4 bottom-4 z-40 mx-auto max-w-3xl rounded-2xl border border-[var(--border)] bg-white p-3 shadow-2xl">
+      {/* Search, and select-to-delete */}
+      <div className="flex items-center gap-2">
+        <label className="relative block min-w-0 flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" size={16} />
+          <input className="input-with-leading-icon w-full" onChange={(event) => setSearch(event.target.value)} placeholder="Search vehicle, customer, supplier or note" value={search} />
+        </label>
+        <button className="secondary-action pressable min-h-[38px] px-3 text-[13px]" onClick={() => (selecting ? stopSelecting() : setSelecting(true))} type="button">
+          {selecting ? "Done" : "Select"}
+        </button>
+      </div>
+
+      {/* Phones show one side at a time */}
+      <div className="grid grid-cols-2 gap-0.5 rounded-[10px] bg-[#eeece7] p-1 lg:hidden">
+        <button aria-pressed={phoneSide === "in"} className={chip(phoneSide === "in")} onClick={() => setPhoneSide("in")} type="button">
+          Money in · {income.length}
+        </button>
+        <button aria-pressed={phoneSide === "out"} className={chip(phoneSide === "out")} onClick={() => setPhoneSide("out")} type="button">
+          Money out · {expenses.length}
+        </button>
+      </div>
+
+      {error ? <p className="rounded-lg bg-[var(--danger-light)] px-4 py-3 text-sm font-semibold text-[var(--danger)]">{error}</p> : null}
+
+      <div className="grid items-start gap-4 lg:grid-cols-2">
+        {renderColumn("in")}
+        {renderColumn("out")}
+      </div>
+
+      {deposits.length > 0 ? (
+        <details className="group overflow-hidden rounded-xl border border-[var(--border)] bg-white shadow-[var(--shadow-sm)]">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3">
+            <div>
+              <h2 className="text-[15px] font-semibold text-[var(--foreground)]">Deposits · {deposits.length}</h2>
+              <p className="text-[12px] text-[var(--muted)]">Held for customers, so not counted as income or cost.</p>
+            </div>
+            <p className="text-right text-[13px] text-[var(--foreground-secondary)]">
+              <span className="block tabular-nums">{money(depositsIn)} taken</span>
+              <span className="block tabular-nums">{money(depositsOut)} returned</span>
+            </p>
+          </summary>
+          <div className="border-t border-[var(--border)]">{renderDays(deposits)}</div>
+        </details>
+      ) : null}
+
+      {selecting ? (
+        <div className="fixed inset-x-4 bottom-24 z-40 mx-auto max-w-2xl rounded-xl border border-[var(--border)] bg-white p-3 shadow-[var(--shadow-md)] lg:bottom-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-sm font-semibold text-[var(--foreground)]">
-                {selectedIds.size} transaction{selectedIds.size === 1 ? "" : "s"} selected
+                {selectedIds.size === 0 ? "Tick the transactions you want to delete" : `${selectedIds.size} selected`}
               </p>
-              {bulkConfirm ? <p className="mt-1 text-xs text-red-600">Delete selected transactions? This cannot be undone.</p> : null}
+              {bulkConfirm ? <p className="mt-1 text-xs text-[var(--danger)]">Delete them? This can&apos;t be undone.</p> : null}
             </div>
             <div className="flex flex-wrap justify-end gap-2">
-              <button className="secondary-action pressable min-h-9 px-3 text-xs" onClick={() => setSelectedIds(new Set())} type="button">
+              <button className="secondary-action pressable min-h-9 px-3 text-xs" onClick={stopSelecting} type="button">
                 <X size={14} />
-                Clear
+                Cancel
               </button>
-              {bulkConfirm ? (
-                <>
-                  <button className="secondary-action pressable min-h-9 px-3 text-xs" onClick={() => setBulkConfirm(false)} type="button">
-                    Cancel
-                  </button>
-                  <button
-                    className="pressable flex min-h-9 items-center gap-2 rounded-lg bg-red-600 px-3 text-xs font-bold text-white hover:bg-red-700"
-                    disabled={isPending}
-                    onClick={handleBulkDelete}
-                    type="button"
-                  >
-                    <Check size={14} />
-                    Confirm delete
-                  </button>
-                </>
-              ) : (
+              {selectedIds.size > 0 ? (
                 <button
-                  className="pressable flex min-h-9 items-center gap-2 rounded-lg bg-red-600 px-3 text-xs font-bold text-white hover:bg-red-700"
-                  onClick={() => setBulkConfirm(true)}
+                  className="pressable flex min-h-9 items-center gap-2 rounded-lg bg-[var(--danger)] px-3 text-xs font-semibold text-white"
+                  disabled={isPending}
+                  onClick={() => (bulkConfirm ? handleBulkDelete() : setBulkConfirm(true))}
                   type="button"
                 >
-                  <Trash2 size={14} />
-                  Delete selected
+                  {bulkConfirm ? <Check size={14} /> : <Trash2 size={14} />}
+                  {bulkConfirm ? "Yes, delete" : "Delete selected"}
                 </button>
-              )}
+              ) : null}
             </div>
           </div>
         </div>
       ) : null}
 
-      {toast ? <div className="fixed bottom-4 right-4 z-50 rounded-xl bg-[var(--foreground)] px-4 py-3 text-sm font-semibold text-white shadow-xl">{toast}</div> : null}
+      {toast ? <div className="fixed bottom-24 right-4 z-50 rounded-xl bg-[var(--foreground)] px-4 py-3 text-sm font-semibold text-white shadow-xl lg:bottom-6">{toast}</div> : null}
     </div>
   );
 }

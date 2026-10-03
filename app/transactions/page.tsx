@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { getCurrentUserEmail } from "@/lib/auth/session";
+import { businessToday } from "@/lib/business-time";
 import { getDefaultOrganization } from "@/lib/organization";
 import { getTransactionFormOptions, getTransactionList } from "@/lib/transactions";
 import { TransactionsList } from "./transactions-list";
@@ -23,8 +24,8 @@ export default async function TransactionsPage({
       <div className="page-hero mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="page-eyebrow">Transactions</p>
-          <h1 className="page-title">Income & expenses</h1>
-          <p className="page-subtitle mt-2">Every payment and cost tied to vehicles, rentals, and customers.</p>
+          <h1 className="page-title">Money in & out</h1>
+          <p className="page-subtitle mt-1">Every payment you&apos;ve received and every cost, side by side.</p>
         </div>
         <Link className="primary-action pressable" href="/transactions/new">
           <Plus size={18} />
@@ -38,7 +39,7 @@ export default async function TransactionsPage({
         </div>
       ) : null}
 
-      <TransactionsList transactions={transactions} vehicles={options.vehicles} />
+      <TransactionsList today={businessToday()} transactions={transactions} vehicles={options.vehicles} />
     </AppShell>
   );
 }

@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import { getCurrentMembership } from "@/lib/auth/roles";
 
 export async function POST(request: NextRequest) {
   try {
+    // Signed-in members only: this spends the AI allowance.
+    if (!(await getCurrentMembership())) return NextResponse.json({ insights: [] }, { status: 401 });
     const body = await request.json();
     const { data } = body;
 

@@ -11,6 +11,7 @@ import {
   Plus,
   ClipboardList,
   ListChecks,
+  MessagesSquare,
   MoreHorizontal,
   ReceiptText,
   Settings,
@@ -23,6 +24,7 @@ import type { Route } from "next";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getShellContext, signOut, switchActiveOrganization, type ShellContext } from "@/app/actions/auth";
+import { AskBox } from "@/components/ask-box";
 import { RouteHqLogo } from "@/components/brand-logo";
 import { FastActionSheet } from "@/components/fast-action-sheet";
 import { PendingButton } from "@/components/pending-button";
@@ -36,6 +38,7 @@ type NavKey =
   | "settings"
   | "customers"
   | "bookings"
+  | "inbox"
   | "tasks"
   | "transactions"
   | "documents"
@@ -56,6 +59,7 @@ const mainNavItems: NavItem[] = [
 ];
 
 const operationsItems: NavItem[] = [
+  { key: "inbox", href: "/inbox", icon: MessagesSquare },
   { key: "customers", href: "/customers", icon: Users },
   { key: "bookings", href: "/bookings", icon: ClipboardList },
   { key: "tasks", href: "/tasks", icon: ListChecks },
@@ -75,7 +79,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
 
   // Teammates cannot use business settings, so the link is hidden for them.
   // Display only: the middleware and server actions enforce the rule.
-  const [shell, setShell] = useState<ShellContext>({ role: null, organizations: [] });
+  const [shell, setShell] = useState<ShellContext>({ role: null, organizations: [], unreadChats: 0 });
   useEffect(() => {
     let cancelled = false;
     getShellContext()
@@ -102,9 +106,10 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
   return (
     <div className="min-h-screen pb-24 lg:pb-0">
       <aside className="fixed left-0 top-0 z-20 hidden h-screen w-[220px] flex-col border-r border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] px-3 py-4 lg:flex">
-        <div className="mb-5 flex items-center px-2 pt-1">
+        <div className="mb-4 flex items-center px-2 pt-1">
           <RouteHqLogo />
         </div>
+        {shell.role === "owner" ? <AskBox variant="sidebar" /> : null}
         <nav className="scrollbar-none min-h-0 flex-1 space-y-0.5 overflow-y-auto">
           <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]">{t("main")}</p>
           {visibleMainNavItems.map((item) => {
@@ -139,6 +144,9 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
               >
                 <Icon size={16} />
                 {t(item.key)}
+                {item.key === "inbox" && shell.unreadChats > 0 ? (
+                  <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--primary)] px-1.5 text-[11px] font-semibold text-white">{shell.unreadChats}</span>
+                ) : null}
               </Link>
             );
           })}
@@ -189,6 +197,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
             <Link aria-label="RouteHQ dashboard" href="/">
               <RouteHqLogo className="h-7 w-auto" showDescriptor={false} />
             </Link>
+            <span className="ml-auto">{shell.role === "owner" ? <AskBox variant="icon" /> : null}</span>
             {hasSeveralBusinesses ? (
               <form action={switchActiveOrganization}>
                 <select

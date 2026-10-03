@@ -62,12 +62,14 @@ export async function signOut() {
 export type ShellContext = {
   role: AppRole | null;
   organizations: { id: string; name: string; active: boolean }[];
+  /** Customer chats with unread messages, shown as a badge on Inbox. */
+  unreadChats: number;
 };
 
 /** Used by the app shell for navigation and the business switcher. Display only - access is enforced on the server. */
 export async function getShellContext(): Promise<ShellContext> {
   const membership = await getCurrentMembership();
-  if (!membership) return { role: null, organizations: [] };
+  if (!membership) return { role: null, organizations: [], unreadChats: 0 };
 
   const supabase = (await createSupabaseServerClient()) as any;
   const { data } = await supabase
@@ -82,7 +84,13 @@ export async function getShellContext(): Promise<ShellContext> {
     name: String(row.organizations?.name || "Business"),
     active: row.organization_id === membership.organizationId
   }));
-  return { role: membership.role, organizations };
+  const { count } = await supabase
+    .from("conversations")
+    .select("id", { count: "exact", head: true })
+    .eq("organization_id", membership.organizationId)
+    .eq("status", "open")
+    .gt("unread_count", 0);
+  return { role: membership.role, organizations, unreadChats: count || 0 };
 }
 
 /** Switch the business this person is working in. Only businesses they actively belong to are accepted. */

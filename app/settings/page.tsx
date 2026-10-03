@@ -14,6 +14,8 @@ import {
 } from "@/app/actions/settings";
 import { BranchList } from "@/app/settings/branch-list";
 import { ContractsBrandingSection } from "@/app/settings/contracts-branding-section";
+import { MessagingPanel } from "@/app/settings/messaging-panel";
+import { webhookReachable, webhookUrl } from "@/lib/inbox/store";
 import { LineTestButton } from "@/app/settings/line-test-button";
 import { LineConnectPanel } from "@/app/settings/line-connect-panel";
 import { supportedLocaleOptions } from "@/lib/i18n/locales";
@@ -104,6 +106,7 @@ function browserSafeAssetFallback(value: string | null | undefined) {
 const SETTINGS_TABS = [
   { key: "business", label: "Business" },
   { key: "rentals", label: "Rentals & payments" },
+  { key: "messaging", label: "Messaging" },
   { key: "notifications", label: "LINE alerts" },
   { key: "team", label: "Team" },
   { key: "more", label: "Plan & tools" }
@@ -179,6 +182,12 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
       .limit(10)
   ]);
 
+  const { data: messagingChannels } = await supabase
+    .from("messaging_channels")
+    .select("id, provider, display_name, status, last_error, webhook_key")
+    .eq("organization_id", organization.id)
+    .neq("status", "disconnected")
+    .order("created_at", { ascending: true });
   const typedVehicleMakes = (vehicleMakes || []) as VehicleMakeSetting[];
   const typedVehicleModels = (vehicleModels || []) as VehicleModelSetting[];
   const typedRecentTrims = (recentTrims || []) as VehicleTrimSetting[];
@@ -290,6 +299,29 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         </Card>
       </div>
         </>
+      ) : null}
+      {tab === "messaging" ? (
+        <Card>
+          <SectionHeader eyebrow="Messaging" title="Customer chats in one inbox" />
+          <p className="mb-4 mt-2 text-[13px] text-[var(--muted)]">
+            Connect the accounts your customers already message you on. Their chats arrive in your{" "}
+            <Link className="font-semibold text-[var(--primary)]" href="/inbox">
+              Inbox
+            </Link>
+            , and you reply from RouteHQ.
+          </p>
+          <MessagingPanel
+            channels={((messagingChannels || []) as any[]).map((channel) => ({
+              id: channel.id,
+              provider: channel.provider,
+              display_name: channel.display_name,
+              status: channel.status,
+              last_error: channel.last_error,
+              webhook: webhookUrl(channel.provider, channel.webhook_key)
+            }))}
+            publicUrl={webhookReachable()}
+          />
+        </Card>
       ) : null}
       {tab === "rentals" ? (
         <>

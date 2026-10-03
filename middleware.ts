@@ -17,6 +17,8 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/amend/") ||
     pathname.startsWith("/auth/callback") ||
     pathname === "/api/line/webhook" ||
+    // Customer messages arriving from each business's own LINE / Telegram account.
+    pathname.startsWith("/api/inbox/") ||
     // Scheduled jobs have no user session; they check CRON_SECRET themselves.
     pathname.startsWith("/api/cron/") ||
     pathname === "/api/line/daily-summary";

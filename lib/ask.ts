@@ -1,0 +1,190 @@
+import OpenAI from "openai";
+import { businessToday } from "@/lib/business-time";
+import { getDashboardData } from "@/lib/dashboard";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { isExpenseTransaction, isRevenueTransaction } from "@/lib/transaction-options";
+
+const MODEL = process.env.OPENAI_ASSISTANT_MODEL || "gpt-4o";
+
+export type AskAnswer = { ok: true; answer: string; links: Array<{ label: string; href: string }> } | { ok: false; error: string };
+
+const PAGE_LABELS: Record<string, string> = {
+  "/reports": "Open reports",
+  "/transactions": "See transactions",
+  "/tasks": "Open to-do list",
+  "/fleet": "See your fleet",
+  "/bookings": "See bookings",
+  "/calendar": "Open calendar"
+};
+
+function monthKey(iso: string) {
+  return String(iso || "").slice(0, 7);
+}
+
+function addMonths(isoMonth: string, count: number) {
+  const date = new Date(Date.UTC(Number(isoMonth.slice(0, 4)), Number(isoMonth.slice(5, 7)) - 1 + count, 1));
+  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
+}
+
+/**
+ * Everything the assistant is allowed to know, worked out by the app rather
+ * than by the model: the model reads figures, it doesn't do the bookkeeping.
+ */
+async function businessSnapshot() {
+  const data = await getDashboardData();
+  const today = businessToday();
+  const thisMonth = monthKey(today);
+  const supabase = (await createSupabaseServerClient()) as any;
+
+  // Rent already scheduled for the months ahead.
+  const horizon = `${addMonths(thisMonth, 6)}-01`;
+  const { data: upcoming } = data.organizationId
+    ? await supabase
+        .from("rental_payments")
+        .select("rental_id, amount, due_date, status, voided, metadata")
+        .eq("organization_id", data.organizationId)
+        .is("deleted_at", null)
+        .in("status", ["scheduled", "pending", "overdue"])
+        .lt("due_date", horizon)
+    : { data: [] };
+  const scheduledByMonth = new Map<string, number>();
+  const scheduledRentalMonths = new Set<string>();
+  for (const payment of upcoming || []) {
+    if (payment.voided || payment.metadata?.voided) continue;
+    // Anything still unpaid from earlier months is owed now, so it counts in this month.
+    const key = monthKey(payment.due_date) < thisMonth ? thisMonth : monthKey(payment.due_date);
+    scheduledByMonth.set(key, (scheduledByMonth.get(key) || 0) + Number(payment.amount || 0));
+    scheduledRentalMonths.add(`${payment.rental_id}|${key}`);
+  }
+
+  // An open-ended rental may have no payment scheduled for a later month. Where
+  // it doesn't, the month is filled in at its current rate and kept apart as an
+  // assumption, so nothing is counted twice.
+  const openEnded = data.rentals.filter((rental) => rental.end === "Indefinite" && rental.status !== "Booked");
+  const projection = Array.from({ length: 6 }, (_, index) => {
+    const month = addMonths(thisMonth, index);
+    const scheduled = Math.round(scheduledByMonth.get(month) || 0);
+    const assumed = index === 0 ? 0 : Math.round(openEnded.filter((rental) => !scheduledRentalMonths.has(`${rental.id}|${month}`)).reduce((sum, rental) => sum + Number(rental.rentalRate || 0), 0));
+    return { month, scheduled, assumedIfOpenEndedRentalsContinue: assumed, total: scheduled + assumed };
+  });
+
+  const incomeByMonth = new Map<string, number>();
+  const costsByMonth = new Map<string, number>();
+  for (const transaction of data.transactions) {
+    const key = monthKey(transaction.date);
+    const type = transaction.rawType || transaction.type;
+    if (isRevenueTransaction({ amount: transaction.amount, isDeposit: transaction.isDeposit, type })) incomeByMonth.set(key, (incomeByMonth.get(key) || 0) + transaction.amount);
+    else if (isExpenseTransaction({ isDeposit: transaction.isDeposit, type })) costsByMonth.set(key, (costsByMonth.get(key) || 0) + Math.abs(transaction.amount));
+  }
+  const history = Array.from({ length: 12 }, (_, index) => {
+    const month = addMonths(thisMonth, index - 11);
+    const income = Math.round(incomeByMonth.get(month) || 0);
+    const costs = Math.round(costsByMonth.get(month) || 0);
+    return { month, income, costs, profit: income - costs };
+  });
+
+  return {
+    today,
+    currency: "THB",
+    vehicles: data.vehicles.map((vehicle) => ({
+      id: vehicle.id,
+      name: `${vehicle.make} ${vehicle.model}${vehicle.year ? ` ${vehicle.year}` : ""}`,
+      plate: vehicle.plate,
+      status: vehicle.status,
+      monthlyRate: vehicle.monthlyRate || null,
+      incomeToDate: Math.round(vehicle.revenue),
+      profitToDate: Math.round(vehicle.profit),
+      percentOfLast12MonthsRented: vehicle.utilization,
+      purchasePrice: vehicle.purchasePrice || null,
+      upcomingRenewals: (vehicle.compliance || []).map((item) => ({ what: item.label, date: item.date, daysFromToday: item.daysLeft }))
+    })),
+    currentRentals: data.rentals.map((rental) => ({
+      id: rental.id,
+      customer: rental.customer,
+      vehicle: rental.vehicle,
+      status: rental.status,
+      from: rental.start,
+      until: rental.end === "Indefinite" ? "open-ended" : rental.end,
+      rate: rental.rentalRate,
+      overdueNow: Math.round(rental.overdue || 0),
+      depositHeld: Math.round(rental.depositHeld || 0)
+    })),
+    last12Months: history,
+    next6MonthsRent: projection,
+    // Added up here so the total is never left to the model's arithmetic.
+    next6MonthsRentTotal: projection.reduce((sum, month) => sum + month.total, 0),
+    overdueIncludedInFirstMonth: Math.round(data.rentals.reduce((sum, rental) => sum + (rental.overdue || 0), 0)),
+    totals: { depositsHeld: Math.round(data.metrics.depositsHeld || 0), customers: data.customers.length }
+  };
+}
+
+/** Answers a plain-language question about the business from its own records. */
+export async function answerQuestion(question: string, language = "English"): Promise<AskAnswer> {
+  const asked = String(question || "").trim().slice(0, 500);
+  if (asked.length < 3) return { ok: false, error: "Type a question first." };
+  if (!process.env.OPENAI_API_KEY) return { ok: false, error: "The assistant isn't switched on for this account yet." };
+
+  let snapshot: Awaited<ReturnType<typeof businessSnapshot>>;
+  try {
+    snapshot = await businessSnapshot();
+  } catch {
+    return { ok: false, error: "Couldn't read your records just now. Try again in a moment." };
+  }
+
+  try {
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const completion = await openai.chat.completions.create({
+      model: MODEL,
+      max_tokens: 600,
+      temperature: 0.2,
+      response_format: { type: "json_object" },
+      messages: [
+        {
+          role: "system",
+          content: [
+            "You answer questions for the owner of a small vehicle rental business in Thailand, using only the JSON records below. They are not an accountant: answer like a sharp, friendly assistant would, in plain words.",
+            `Answer in ${language}. Lead with the answer itself. Keep it to a few short sentences, or a short list when comparing several things. Write amounts like ฿12,500. Write dates like 14 Oct 2026.`,
+            "Use only the figures given. Never invent a vehicle, customer, amount or date. If the records can't answer the question, say what's missing in one sentence and suggest where to add it.",
+            "For income forecasts: use next6MonthsRent. Give each month's total, then next6MonthsRentTotal as the six-month sum (never add figures up yourself; use totals given in the records). Mention how much of the first month is already overdue. If any month includes an assumed amount, say how much of the total assumes open-ended rentals continue. Say it's a projection from current bookings, not a promise.",
+            "Never show field names from the records (like profitToDate); describe them in everyday words.",
+            "For 'worst' or 'best' vehicles, judge by profitToDate and percentOfLast12MonthsRented, and say which measure you used. A vehicle with no rentals yet is 'not earning yet', not 'worst'.",
+            "For upcoming costs or renewals, use upcomingRenewals: negative daysFromToday means it is already overdue. If any are overdue, say how many first, then give the next ones coming up.",
+            "This tool only reads records. If asked to change, delete, send or book something, say you can't do that from here and name the page where they can.",
+            'Reply as JSON: {"answer": string, "links": [{"label": string, "href": string}]}. In "answer", use plain text with line breaks; start list lines with "• ". "links" holds up to 3 pages worth opening, chosen only from: /fleet/{vehicle id}, /bookings/{rental id}, /reports, /transactions, /tasks, /fleet, /bookings, /calendar. Use ids exactly as given.',
+            `Records: ${JSON.stringify(snapshot)}`
+          ].join("\n")
+        },
+        { role: "user", content: asked }
+      ]
+    });
+
+    const parsed = JSON.parse(completion.choices[0]?.message?.content || "{}");
+    const answer = typeof parsed.answer === "string" ? parsed.answer.trim() : "";
+    if (!answer) return { ok: false, error: "Couldn't work out an answer to that. Try asking it another way." };
+
+    // Only links to real pages and real records are passed on.
+    const vehicleIds = new Set(snapshot.vehicles.map((vehicle) => vehicle.id));
+    const rentalIds = new Set(snapshot.currentRentals.map((rental) => rental.id));
+    const plain = new Set(["/reports", "/transactions", "/tasks", "/fleet", "/bookings", "/calendar"]);
+    const links = (Array.isArray(parsed.links) ? parsed.links : [])
+      .filter((link: any) => {
+        const href = String(link?.href || "");
+        if (plain.has(href)) return true;
+        const match = href.match(/^\/(fleet|bookings)\/([0-9a-f-]{36})$/);
+        return Boolean(match && (match[1] === "fleet" ? vehicleIds.has(match[2]) : rentalIds.has(match[2])));
+      })
+      .slice(0, 3)
+      .map((link: any) => {
+        const href = String(link.href);
+        const id = href.split("/")[2];
+        const vehicle = href.startsWith("/fleet/") ? snapshot.vehicles.find((entry) => entry.id === id) : null;
+        const rental = href.startsWith("/bookings/") ? snapshot.currentRentals.find((entry) => entry.id === id) : null;
+        const label = vehicle ? vehicle.name : rental ? `${rental.customer}'s booking` : PAGE_LABELS[href] || "Open";
+        return { label, href };
+      });
+
+    return { ok: true, answer, links };
+  } catch {
+    return { ok: false, error: "Couldn't reach the assistant just now. Try again in a moment." };
+  }
+}

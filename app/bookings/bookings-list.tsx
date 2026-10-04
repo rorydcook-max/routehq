@@ -140,6 +140,26 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 /** Where an unsigned booking stands: still held, or its hold has ended. */
+/** The rental still out on this booking's vehicle past its return date, when this booking starts within a week. */
+function lateBefore(booking: any, all: any[]) {
+  if (String(booking.status) !== "booked" || !booking.start_date) return null;
+  const vehicleId = booking.vehicle_id || booking.vehicles?.id;
+  if (!vehicleId) return null;
+  const today = new Date().toISOString().slice(0, 10);
+  const weekAhead = new Date(Date.now() + 7 * 86_400_000).toISOString().slice(0, 10);
+  if (String(booking.start_date).slice(0, 10) > weekAhead) return null;
+  return (
+    all.find(
+      (other) =>
+        other.id !== booking.id &&
+        (other.vehicle_id || other.vehicles?.id) === vehicleId &&
+        ["active", "due_soon", "overdue", "extended"].includes(String(other.status)) &&
+        other.end_date &&
+        String(other.end_date).slice(0, 10) < today
+    ) || null
+  );
+}
+
 function holdState(booking: any): { ended: boolean; text: string } | null {
   const link = booking.booking_link;
   if (!link || ["completed", "cancelled"].includes(String(link.status))) return null;
@@ -257,6 +277,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
           {filtered.map((booking) => {
             const timingLabel = rentalTimingLabel(booking);
             const hold = holdState(booking);
+            const waitingOn = lateBefore(booking, bookings);
             const photoUrl = booking.vehicles?.primary_photo_url;
             const effectiveStatus = isCancelledBooking(booking) ? "cancelled" : String(booking.status || "");
             return (
@@ -310,6 +331,14 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                     </span>
                   </div>
                   {timingLabel ? <p className="mt-1 text-[12px] font-medium text-[var(--muted)]">{timingLabel}</p> : null}
+                  {waitingOn ? (
+                    <p className="mt-1 text-[12px] font-semibold text-[#dc2626]">
+                      Vehicle not back yet: {waitingOn.customers?.full_name || "the current customer"} was due to return it {new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${String(waitingOn.end_date).slice(0, 10)}T00:00:00Z`))}.{" "}
+                      <Link className="underline underline-offset-2" href={`/bookings/${waitingOn.id}`}>
+                        Open that rental
+                      </Link>
+                    </p>
+                  ) : null}
                   {hold ? (
                     <p className={`mt-1 text-[12px] font-medium ${hold.ended ? "text-[#b45309]" : "text-[var(--primary)]"}`}>
                       {hold.text}

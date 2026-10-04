@@ -17,6 +17,8 @@ import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization
 import { getValueTrackerData } from "@/lib/value-tracker";
 import { getOnboardingStatus } from "@/lib/onboarding";
 import { getReceiptsWaiting } from "@/lib/payment-receipts";
+import { releaseExpiredHolds } from "@/lib/booking-holds";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isExpenseTransaction, isRevenueTransaction } from "@/lib/transaction-options";
 import { groupVehiclesByKind } from "@/lib/vehicle-groups";
@@ -117,6 +119,8 @@ function PanelLink({ href, children }: { href: string; children: ReactNode }) {
 }
 
 export default async function Home() {
+  // Holds that ran out without a signature give their dates back before anything is counted.
+  await getDefaultOrganization().then((org) => releaseExpiredHolds(createSupabaseAdminClient(), org.id)).catch(() => null);
   const [userEmail, organization, dashboardData, supabase] = await Promise.all([
     getCurrentUserEmail(),
     getDefaultOrganization(),

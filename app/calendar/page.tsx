@@ -1,3 +1,5 @@
+import { releaseExpiredHolds } from "@/lib/booking-holds";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import Link from "next/link";
 import type { Route } from "next";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -32,6 +34,7 @@ export default async function CalendarPage({
   const month = /^\d{4}-\d{2}$/.test(String(params.month || "")) ? String(params.month) : today.slice(0, 7);
   const byVehicle = params.view === "vehicles";
   const [userEmail, organization] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization()]);
+  await releaseExpiredHolds(createSupabaseAdminClient(), organization.id).catch(() => null);
   const [yearStr, monthStr] = month.split("-");
   const [events, tasks, availability] = await Promise.all([
     byVehicle ? Promise.resolve([]) : getCalendarEvents(organization.id, Number(yearStr), Number(monthStr)),

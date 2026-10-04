@@ -44,7 +44,7 @@ export function PublicBookingPanel({ slug, enabled, holdHours, deposit, pricedVe
         <span>
           <span className="block text-sm font-semibold text-[var(--foreground)]">Let customers book online</span>
           <span className="block text-xs leading-5 text-[var(--muted)]">
-            Anyone with your link sees your vehicles, prices and which dates are free, and can book one at the listed price. The vehicle is taken for those dates straight away and the customer fills in their details and signs. You don&apos;t need to approve anything.
+            Anyone with your link sees your vehicles, prices and which dates are free, and can book one at the listed price. The vehicle is held for them while they fill in their details and sign, and booked once they have. You don&apos;t need to approve anything.
           </span>
         </span>
       </label>
@@ -96,15 +96,6 @@ export function PublicBookingPanel({ slug, enabled, holdHours, deposit, pricedVe
                 value={depositValue}
               />
               <span className="mt-1 block font-normal text-[var(--muted)]">Shown on the page and added to the booking. Leave empty for no deposit.</span>
-            </label>
-            <label className="block text-xs font-semibold text-[var(--foreground-secondary)]">
-              Time to start the booking form
-              <select className="mt-1 block h-10 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-sm" disabled={isPending} onChange={(event) => save({ enabled: on, holdHours: Number(event.target.value) })} value={hours}>
-                {[6, 12, 24, 48, 72].map((value) => (
-                  <option key={value} value={value}>{value} hours</option>
-                ))}
-              </select>
-              <span className="mt-1 block font-normal text-[var(--muted)]">If a customer books and never fills anything in, the booking is cancelled after this and the dates open up again.</span>
             </label>
           </div>
         </>

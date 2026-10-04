@@ -3,7 +3,7 @@
 import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { CalendarDays, Car, Clock, Search, Trash2, UserRound } from "lucide-react";
-import { deleteBooking } from "@/app/actions/bookings";
+import { deleteBooking, extendBookingHold } from "@/app/actions/bookings";
 import { CancelBookingButton } from "@/app/bookings/[id]/cancel-booking-button";
 import { UndoCancellationButton } from "@/app/bookings/[id]/undo-cancellation-button";
 import { RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
@@ -136,8 +136,43 @@ const STATUS_LABELS: Record<string, string> = {
   extended: "Extended",
   completed: "Completed",
   cancelled: "Cancelled",
-  draft: "Draft"
+  draft: "Not confirmed"
 };
+
+/** Where an unsigned booking stands: still held, or its hold has ended. */
+function holdState(booking: any): { ended: boolean; text: string } | null {
+  const link = booking.booking_link;
+  if (!link || ["completed", "cancelled"].includes(String(link.status))) return null;
+  if (link.hold_released_at && booking.status === "draft") return { ended: true, text: "Hold ended · dates are open to others. The customer's link still works if the vehicle is free." };
+  if (booking.status !== "booked" || !link.hold_until) return null;
+  const until = new Date(link.hold_until);
+  const when = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Bangkok" }).format(until);
+  return { ended: false, text: `Held for the customer until ${when}` };
+}
+
+function ExtendHoldButton({ rentalId, ended }: { rentalId: string; ended: boolean }) {
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+  return (
+    <>
+      <button
+        className="pressable ml-2 rounded-md border border-[var(--border)] bg-white px-2 py-0.5 text-[11px] font-semibold text-[var(--primary)] disabled:opacity-60"
+        disabled={isPending}
+        onClick={() => {
+          setError(null);
+          startTransition(async () => {
+            const result = await extendBookingHold(rentalId);
+            if (!result.success) setError(result.error || "Couldn't update the hold.");
+          });
+        }}
+        type="button"
+      >
+        {isPending ? "Saving…" : ended ? "Hold again" : "Extend hold"}
+      </button>
+      {error ? <span className="ml-2 text-[11px] font-semibold text-[var(--danger)]">{error}</span> : null}
+    </>
+  );
+}
 
 function customerLabel(booking: any) {
   if (!booking.customers) return "Awaiting customer details";
@@ -221,6 +256,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
         <div className="grid gap-3">
           {filtered.map((booking) => {
             const timingLabel = rentalTimingLabel(booking);
+            const hold = holdState(booking);
             const photoUrl = booking.vehicles?.primary_photo_url;
             const effectiveStatus = isCancelledBooking(booking) ? "cancelled" : String(booking.status || "");
             return (
@@ -274,6 +310,12 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                     </span>
                   </div>
                   {timingLabel ? <p className="mt-1 text-[12px] font-medium text-[var(--muted)]">{timingLabel}</p> : null}
+                  {hold ? (
+                    <p className={`mt-1 text-[12px] font-medium ${hold.ended ? "text-[#b45309]" : "text-[var(--primary)]"}`}>
+                      {hold.text}
+                      <ExtendHoldButton ended={hold.ended} rentalId={booking.id} />
+                    </p>
+                  ) : null}
                 </div>
 
                 <div className="lg:justify-self-end">

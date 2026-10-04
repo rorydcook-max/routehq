@@ -1,3 +1,5 @@
+import { releaseExpiredHolds } from "@/lib/booking-holds";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { Card, SectionHeader } from "@/components/ui";
@@ -40,6 +42,7 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
     getCurrentUserEmail(),
     getDefaultOrganization()
   ]);
+  await releaseExpiredHolds(createSupabaseAdminClient(), organization.id).catch(() => null);
   const supabase = (await createSupabaseServerClient()) as any;
 
   const [{ data: vehicles, error: vehiclesError }, { data: customers, error: customersError }, { data: organizationDetails }] = await Promise.all([

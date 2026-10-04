@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { BusinessLogoImage } from "@/components/business-logo-image";
-import { businessToday } from "@/lib/business-time";
 import { getPublicCatalog } from "@/lib/public-catalog";
 import { Catalog } from "./catalog";
 
@@ -46,7 +45,7 @@ export default async function PublicCatalogPage({ params }: { params: Promise<{ 
           </div>
         </header>
 
-        <Catalog currency={catalog.currency} deposit={catalog.deposit} holdHours={catalog.holdHours} organizationName={catalog.name} slug={slug} today={businessToday()} vehicles={catalog.vehicles} />
+        <Catalog currency={catalog.currency} deposit={catalog.deposit} holdHours={catalog.holdHours} organizationName={catalog.name} slug={slug} gapDays={catalog.gapDays} today={catalog.minStart} vehicles={catalog.vehicles} />
       </div>
     </main>
   );

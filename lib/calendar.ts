@@ -45,7 +45,7 @@ export async function getCalendarEvents(organizationId: string, year: number, mo
       .select("id, start_date, end_date, status, customers!rentals_customer_id_fkey(full_name), vehicles!rentals_vehicle_id_fkey(make, model, registration_number)")
       .eq("organization_id", organizationId)
       .is("deleted_at", null)
-      .neq("status", "cancelled")
+      .not("status", "in", "(cancelled,draft)")
       .lte("start_date", endDate)
       .or(`end_date.gte.${startDate},end_date.is.null`),
     supabase
@@ -171,7 +171,7 @@ export async function getAvailability(organizationId: string, year: number, mont
       .select("id, vehicle_id, start_date, end_date, status, customers!rentals_customer_id_fkey(full_name)")
       .eq("organization_id", organizationId)
       .is("deleted_at", null)
-      .neq("status", "cancelled")
+      .not("status", "in", "(cancelled,draft)")
       .lte("start_date", endDate)
       .order("start_date", { ascending: true })
   ]);

@@ -1,8 +1,9 @@
 import { resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
 import { BLOCKING_RENTAL_STATUSES } from "@/lib/rental-conflicts";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { recordActivityEvent } from "@/lib/supabase/activity";
-import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
+import { releaseExpiredHolds } from "@/lib/booking-holds";
+import { bookingRules, earliestStart } from "@/lib/booking-rules";
+import { businessToday } from "@/lib/business-time";
 import { kindFromCategory, type VehicleKind } from "@/lib/vehicle-groups";
 
 /**
@@ -42,41 +43,6 @@ export function publicBookingSettings(settings: any): PublicBookingSettings {
 
 const HIDDEN_STATUS = /sold|retired|inactive|archived|written|maintenance/i;
 
-/**
- * A booking made on the public page holds the vehicle straight away. If the
- * customer never starts the booking form before the link runs out, the booking
- * is cancelled so the dates open up again. Bookings where the customer has
- * filled in their details are left for the business to decide.
- */
-export async function releaseAbandonedOnlineBookings(admin: any, organizationId: string) {
-  const { data: stale } = await admin
-    .from("booking_links")
-    .select("id, rental_id, vehicle_id, rentals!inner(status)")
-    .eq("organization_id", organizationId)
-    .eq("booking_data->>source", "public_page")
-    .in("status", ["pending", "viewed"])
-    .is("customer_details_submitted_at", null)
-    .lt("expires_at", new Date().toISOString())
-    .eq("rentals.status", "booked");
-  for (const link of stale || []) {
-    const now = new Date().toISOString();
-    await admin.from("rentals").update({ status: "cancelled" }).eq("id", link.rental_id).eq("organization_id", organizationId).eq("status", "booked");
-    await admin.from("booking_links").update({ status: "cancelled", cancelled_at: now }).eq("id", link.id);
-    await syncVehicleStatusFromBookings(admin, organizationId, link.vehicle_id).catch(() => null);
-    await recordActivityEvent(admin, {
-      organization_id: organizationId,
-      entity_type: "rental",
-      entity_id: link.rental_id,
-      vehicle_id: link.vehicle_id,
-      rental_id: link.rental_id,
-      event_type: "booking_cancelled",
-      title: "Online booking released",
-      detail: "The customer did not start the booking form in time, so the dates were opened up again."
-    } as any).catch(() => null);
-  }
-  return (stale || []).length;
-}
-
 export async function getPublicCatalog(slug: string) {
   const admin = createSupabaseAdminClient() as any;
   const { data: organization } = await admin
@@ -89,7 +55,8 @@ export async function getPublicCatalog(slug: string) {
 
   const settings = publicBookingSettings(organization.settings);
   if (!settings.enabled) return { enabled: false as const, name: String(organization.name || "") };
-  await releaseAbandonedOnlineBookings(admin, organization.id).catch(() => null);
+  await releaseExpiredHolds(admin, organization.id).catch(() => null);
+  const rules = bookingRules(organization.settings);
 
   const [vehiclesResult, rentalsResult, photosResult, branding] = await Promise.all([
     admin
@@ -168,7 +135,11 @@ export async function getPublicCatalog(slug: string) {
     location: String(orgSettings.main_location?.label || orgSettings.location || ""),
     phone: String(orgSettings.business_phone || orgSettings.phone || ""),
     currency: String(organization.currency || "THB"),
-    holdHours: settings.holdHours,
+    holdHours: rules.holdHours,
+    /** First date a booking may start, from the lead-time rule. */
+    minStart: earliestStart(businessToday(), rules.leadHours),
+    /** Days kept free around other bookings. */
+    gapDays: rules.gapDays,
     deposit: settings.deposit,
     vehicles
   };

@@ -10,6 +10,7 @@ import { isMapsUrl, formatDeliveryLocation } from "@/lib/delivery-location";
 import { toWallTime } from "@/lib/business-time";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getPortalPayments } from "@/lib/payment-receipts";
+import { bookingRules } from "@/lib/booking-rules";
 import { promptPayQrSvg } from "@/lib/promptpay";
 import { PortalPayments } from "./portal-payments";
 
@@ -196,7 +197,7 @@ function formatSummaryDate(value: unknown) {
   return `${Number(match[3])} ${months[Number(match[2]) - 1]} ${match[1]}`;
 }
 
-function ErrorState({ title, message, contact }: { title: string; message: string; contact?: string | null }) {
+function ErrorState({ title, message, contact, rebookHref }: { title: string; message: string; contact?: string | null; rebookHref?: string | null }) {
   return (
     <main className="min-h-screen bg-[#fbfaf8] px-4 py-8">
       <section className="mx-auto max-w-xl rounded-2xl border border-[var(--border)] bg-white p-6 text-center shadow-sm">
@@ -205,8 +206,13 @@ function ErrorState({ title, message, contact }: { title: string; message: strin
         </div>
         <h1 className="mt-4 text-2xl font-semibold text-[var(--foreground)]">{title}</h1>
         <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{message}</p>
+        {rebookHref ? (
+          <a className="pressable mt-5 inline-flex rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={rebookHref}>
+            Choose other dates
+          </a>
+        ) : null}
         {contact ? (
-          <a className="pressable mt-5 inline-flex rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={contact}>
+          <a className={`pressable mt-5 inline-flex rounded-xl px-5 py-3 text-sm font-semibold ${rebookHref ? "ml-2 border border-[var(--border)] bg-white text-[var(--foreground)]" : "bg-[var(--primary)] text-white"}`} href={contact}>
             Contact operator
           </a>
         ) : null}
@@ -229,6 +235,18 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
 
   if (detail.state === "expired") {
     return <ErrorState contact={contact} message={`This booking link has expired. Please contact ${organization?.name || "the rental operator"} for a new link.`} title="This booking link has expired" />;
+  }
+
+  if (detail.state === "taken") {
+    const onlineBooking = organization?.settings?.public_booking?.enabled === true && organization?.slug;
+    return (
+      <ErrorState
+        contact={contact}
+        message={`Your booking wasn't completed in time and someone else has since booked this vehicle for those dates. ${onlineBooking ? "You can choose other dates or another vehicle" : `Please contact ${organization?.name || "the rental business"} to choose other dates or another vehicle`}.`}
+        rebookHref={onlineBooking ? `/rent/${organization.slug}` : null}
+        title="These dates have been taken"
+      />
+    );
   }
 
   if (detail.state === "cancelled") {
@@ -324,6 +342,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             bookingData={bookingData}
             deliveryPhotoUrls={detail.deliveryPhotoUrls || []}
             organizationName={organization?.name || "Rental operator"}
+            endNoticeDays={bookingRules(organization?.settings).endNoticeDays}
             orgPayment={detail.org_payment}
             ownerContact={ownerContact}
             paymentBundle={portal.bundle}

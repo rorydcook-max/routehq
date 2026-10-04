@@ -14,6 +14,9 @@ import { wallTimeToIso, businessToday } from "@/lib/business-time";
 import { DOUBLE_BOOKING_MESSAGE, isDoubleBookingError, vehicleConflictMessage } from "@/lib/rental-conflicts";
 import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
 import { getCurrentMembership } from "@/lib/auth/roles";
+import { holdDeadline, retakeHold } from "@/lib/booking-holds";
+import { bookingRules } from "@/lib/booking-rules";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 function requiredString(formData: FormData, key: string) {
   const value = String(formData.get(key) || "").trim();
@@ -314,7 +317,7 @@ async function createBookingOrThrow(formData: FormData) {
       .eq("organization_id", organizationId)
       .is("deleted_at", null)
       .maybeSingle(),
-    supabase.from("organizations").select("name").eq("id", organizationId).maybeSingle()
+    supabase.from("organizations").select("name, settings").eq("id", organizationId).maybeSingle()
   ]);
 
   const { data: vehicle, error: vehicleError } = vehicleResult;
@@ -548,7 +551,9 @@ async function createBookingOrThrow(formData: FormData) {
       included_items: includedItems,
       special_conditions: bookingData.special_conditions,
       share_channels: [shareChannel],
-      expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      // The vehicle is held for the customer for a limited time; the link itself lasts much longer.
+      hold_until: holdDeadline(bookingRules(organization.settings).holdHours),
+      expires_at: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString(),
       created_by: user.id
     })
     .select("id, token")
@@ -3767,5 +3772,29 @@ export async function declinePaymentReceipt(paymentId: string) {
   revalidatePath("/");
   revalidatePath("/tasks");
   revalidatePath(`/bookings/${payment.rental_id}`);
+  return { success: true };
+}
+
+/** Gives a customer more time: the hold on their booking restarts from now. */
+export async function extendBookingHold(rentalId: string): Promise<{ success: boolean; error?: string }> {
+  const membership = await getCurrentMembership();
+  if (!membership) return { success: false, error: "Please sign in again." };
+  const admin = createSupabaseAdminClient() as any;
+  const [{ data: link }, { data: organization }] = await Promise.all([
+    admin.from("booking_links").select("id, status, hold_released_at").eq("rental_id", String(rentalId || "")).eq("organization_id", membership.organizationId).is("deleted_at", null).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+    admin.from("organizations").select("settings").eq("id", membership.organizationId).maybeSingle()
+  ]);
+  if (!link) return { success: false, error: "This booking has no booking link." };
+  if (["completed", "cancelled"].includes(String(link.status))) return { success: false, error: "This booking no longer needs a hold." };
+  if (link.hold_released_at) {
+    // The dates were opened up: take them back if they are still free.
+    const retaken = await retakeHold(admin, { id: link.id, rental_id: rentalId });
+    if (!retaken) return { success: false, error: "Those dates have since been booked by someone else." };
+  } else {
+    await admin.from("booking_links").update({ hold_until: holdDeadline(bookingRules(organization?.settings).holdHours) }).eq("id", link.id);
+  }
+  revalidatePath("/");
+  revalidatePath("/bookings");
+  revalidatePath(`/bookings/${rentalId}`);
   return { success: true };
 }

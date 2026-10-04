@@ -4,14 +4,14 @@ import { AppShell } from "@/components/app-shell";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getBookingList } from "@/lib/bookings";
 import { getDefaultOrganization } from "@/lib/organization";
-import { releaseAbandonedOnlineBookings } from "@/lib/public-catalog";
+import { releaseExpiredHolds } from "@/lib/booking-holds";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { BookingsList } from "./bookings-list";
 
 export default async function BookingsPage() {
   const [userEmail, organization] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization()]);
-  // Online bookings nobody followed through on give their dates back.
-  await releaseAbandonedOnlineBookings(createSupabaseAdminClient(), organization.id).catch(() => null);
+  // Holds that ran out without a signature give their dates back.
+  await releaseExpiredHolds(createSupabaseAdminClient(), organization.id).catch(() => null);
   const bookings = await getBookingList(organization.id);
 
   return (

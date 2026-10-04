@@ -126,7 +126,7 @@ export async function getBookingList(organizationId: string) {
     ? await Promise.all([
         supabase
           .from("booking_links")
-          .select("id, rental_id, token, status, public_url, viewed_at, customer_details_submitted_at, contract_signed_at, completed_at, expires_at")
+          .select("id, rental_id, token, status, public_url, viewed_at, customer_details_submitted_at, contract_signed_at, completed_at, expires_at, hold_until, hold_released_at")
           .eq("organization_id", organizationId)
           .in("rental_id", rentalIds)
           .is("deleted_at", null)

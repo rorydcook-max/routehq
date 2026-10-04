@@ -2,6 +2,7 @@
 
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
+import { retakeHold } from "@/lib/booking-holds";
 import OpenAI from "openai";
 import { organizationSignatureReference } from "@/lib/branding-assets";
 import { buildContractVariables, renderContractTemplate } from "@/lib/contract-rendering";
@@ -505,18 +506,21 @@ export async function submitCustomerPortalAction(formData: FormData) {
     metadata: { booking_link_id: bookingLink.id, customer_portal_action_id: action.id, action_type: actionType }
   });
 
-  await processCustomerPortalAction(supabase, action.id);
+  const processed = await processCustomerPortalAction(supabase, action.id);
+  const extension = processed.extension;
 
   const portalActionMessages: Record<string, string> = {
-    extension_request: `📅 Extension requested — customer wants to extend their rental`,
+    extension_request: `📅 Extension requested — it needs your answer${extension && !extension.applied ? ` (${extension.reason})` : ""}`,
     return_confirmation: `✅ Customer confirmed their return date`,
     problem_report: `⚠️ Customer reported a problem with their rental`,
     question: `💬 Customer asked a question via the booking portal`
   };
   const notifyMsg = portalActionMessages[actionType] ?? `📣 Customer submitted a portal action: ${actionType}`;
-  notifyOperator(bookingLink.organization_id, notifyMsg, "portal_action").catch(() => null);
+  // An extension applied automatically sends its own notice.
+  if (!extension?.applied) notifyOperator(bookingLink.organization_id, notifyMsg, "portal_action").catch(() => null);
+  revalidatePath(`/book/${token}`);
 
-  return { success: true, actionType };
+  return { success: true, actionType, extension: extension || null };
 }
 
 function portalActionCommunicationText(actionType: string, content: Record<string, unknown>) {
@@ -557,6 +561,11 @@ export async function completePublicBooking(formData: FormData) {
   if (bookingLink.expires_at && new Date(bookingLink.expires_at).getTime() < Date.now()) {
     await supabase.from("booking_links").update({ status: "expired" }).eq("id", bookingLink.id);
     throw new Error("This booking link has expired.");
+  }
+  // The hold may have run out while the form was open: take the vehicle back, or stop here.
+  if (bookingLink.hold_released_at && bookingLink.status !== "completed") {
+    const retaken = await retakeHold(supabase, bookingLink);
+    if (!retaken) throw new Error("Sorry, these dates were booked by someone else while your booking was waiting. Please contact us to choose other dates.");
   }
   // customer_id may be null when the booking was created without a customer —
   // we create the customer record from the submitted form data in that case.

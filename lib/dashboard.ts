@@ -155,7 +155,7 @@ export async function getDashboardData(): Promise<DashboardData> {
   // The dashboard is about what's happening now: returned and cancelled bookings
   // used to be mapped to "Active"/"Booked" and showed up in today's schedule.
   const rentals: Rental[] = rentalRows
-    .filter((row: any) => !["completed", "cancelled"].includes(String(row.status || "").toLowerCase()))
+    .filter((row: any) => !["completed", "cancelled", "draft"].includes(String(row.status || "").toLowerCase()))
     .map((row: any) => {
       const late = overdueByRental.get(row.id);
       const held = String(row.deposit_status || "").toLowerCase() === "received" ? Number(row.deposit_held || 0) : 0;

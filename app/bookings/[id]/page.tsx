@@ -149,7 +149,7 @@ const RENTAL_STATUS_LABELS: Record<string, string> = {
   extended: "Extended",
   completed: "Completed",
   cancelled: "Cancelled",
-  draft: "Draft"
+  draft: "Not confirmed"
 };
 
 function statusTone(status: string): "green" | "amber" | "red" | "blue" | "neutral" {

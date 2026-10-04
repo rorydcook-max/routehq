@@ -1,3 +1,4 @@
+import { tryAutoExtend, type ExtensionOutcome } from "@/lib/auto-extension";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 
 function actionLabel(type: string) {
@@ -36,13 +37,20 @@ export async function processCustomerPortalAction(supabase: any, actionId: strin
     created_by: null
   };
 
+  let extension: ExtensionOutcome | null = null;
   if (action.action_type === "extension_request") {
-    await supabase.from("tasks").insert({
-      ...taskBase,
-      title: `Customer requesting extension - ${customerName} - ${vehicleLabel}`,
-      task_type: "admin",
-      due_at: content.new_end_date || null
-    });
+    // Applied on the spot when nothing is in the way; otherwise it becomes a job for the team.
+    extension = await tryAutoExtend(supabase, action.rental_id, content.new_end_date).catch(() => ({ applied: false as const, reason: "it could not be applied automatically" }));
+    if (extension.applied) {
+      await supabase.from("customer_portal_actions").update({ status: "resolved" }).eq("id", action.id);
+    } else {
+      await supabase.from("tasks").insert({
+        ...taskBase,
+        title: `Extension to ${content.new_end_date || "a new date"} needs your answer - ${customerName} - ${vehicleLabel} (${extension.reason})`,
+        task_type: "admin",
+        due_at: content.new_end_date || null
+      });
+    }
   }
 
   if (action.action_type === "return_confirmation") {
@@ -125,5 +133,5 @@ export async function processCustomerPortalAction(supabase: any, actionId: strin
     })
   ]);
 
-  return { success: true };
+  return { success: true, extension };
 }

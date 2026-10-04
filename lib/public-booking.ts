@@ -1,11 +1,13 @@
 import { buildContractVariables, extractBodyHtml, renderContractTemplate } from "@/lib/contract-rendering";
+import { holdDeadline, retakeHold } from "@/lib/booking-holds";
+import { bookingRules } from "@/lib/booking-rules";
 import { resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
 import { defaultRentalContractTemplate, embedLogoInContractVariables, ensureDefaultContractTemplate } from "@/lib/contracts";
 import { getCustomerExecutedAgreementDownload, loadPublicRentalAgreement } from "@/lib/rental-document-customer-signing";
 import { ensureRentalAgreementDraft } from "@/lib/rental-agreement-automation";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
-export type PublicBookingState = "not_found" | "expired" | "cancelled" | "ready" | "active" | "completed";
+export type PublicBookingState = "not_found" | "expired" | "cancelled" | "taken" | "ready" | "active" | "completed";
 
 const documentCategories = ["passport", "driver_license", "selfie"];
 
@@ -74,6 +76,23 @@ export async function getPublicBookingDetail(token: string) {
   if (expiresAt && expiresAt.getTime() < Date.now() && bookingLink.status !== "completed") {
     await supabase.from("booking_links").update({ status: "expired" }).eq("id", bookingLink.id);
     return { state: "expired" as PublicBookingState, bookingLink };
+  }
+
+  // Holds: a customer who comes back after their hold ran out gets the vehicle
+  // again if it is still free; otherwise they are told the dates have gone.
+  if (bookingLink.status !== "completed") {
+    if (bookingLink.hold_released_at) {
+      const retaken = await retakeHold(supabase, bookingLink);
+      if (!retaken) {
+        // Enough about the business to tell the customer who to contact and where to rebook.
+        const { data: takenOrg } = await supabase.from("organizations").select("name, slug, settings").eq("id", bookingLink.organization_id).maybeSingle();
+        return { state: "taken" as PublicBookingState, bookingLink, organization: takenOrg };
+      }
+    } else if (bookingLink.hold_until && new Date(bookingLink.hold_until).getTime() < Date.now()) {
+      // Out of time but nobody has released it yet: they are here now, so give them a fresh hold.
+      const { data: holdOrg } = await supabase.from("organizations").select("settings").eq("id", bookingLink.organization_id).maybeSingle();
+      await supabase.from("booking_links").update({ hold_until: holdDeadline(bookingRules(holdOrg?.settings).holdHours) }).eq("id", bookingLink.id);
+    }
   }
 
   const shouldLogOpen = ["pending", "sent"].includes(bookingLink.status) && !bookingLink.viewed_at;

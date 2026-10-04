@@ -6,7 +6,7 @@ import { CalendarDays } from "lucide-react";
 import { bookOnline } from "@/app/actions/online-booking";
 import { VehicleKindIcon } from "@/components/vehicle-kind-icon";
 import type { CatalogVehicle } from "@/lib/public-catalog";
-import { overlaps } from "@/lib/rental-conflicts";
+import { clashes } from "@/lib/booking-rules";
 import { daysBetween, estimateRental, headlineRate, minimumStay, planFor } from "@/lib/rental-estimate";
 
 const inputClass = "mt-1.5 w-full rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15";
@@ -28,6 +28,7 @@ export function Catalog({
   currency,
   deposit,
   holdHours,
+  gapDays,
   today
 }: {
   slug: string;
@@ -36,6 +37,8 @@ export function Catalog({
   currency: string;
   deposit: number;
   holdHours: number;
+  gapDays: number;
+  /** The first date a booking may start (today, or later when the business needs notice). */
   today: string;
 }) {
   const router = useRouter();
@@ -55,13 +58,13 @@ export function Catalog({
     () =>
       vehicles
         .map((vehicle) => {
-          const clash = datesReady ? vehicle.busy.find((period) => overlaps(startDate, end, period)) : null;
+          const clash = datesReady ? vehicle.busy.find((period) => clashes(startDate, end, period, gapDays)) : null;
           // When it is taken, say when it next comes free (if it has an end date).
           const freeFrom = clash?.endDate && clash.endDate > startDate ? clash.endDate : null;
           return { vehicle, free: !clash, freeFrom, openEndedClash: !!clash && !clash.endDate };
         })
         .sort((a, b) => Number(b.free) - Number(a.free)),
-    [vehicles, startDate, end, datesReady]
+    [vehicles, startDate, end, datesReady, gapDays]
   );
   const freeCount = rows.filter((row) => row.free).length;
 
@@ -203,7 +206,7 @@ export function Catalog({
                   </button>
                   <p className="text-xs leading-5 text-[var(--muted)]">
                     {deposit > 0 ? `A ${money(deposit)} deposit applies. ` : ""}No payment is taken now: you can pay online or when you get the vehicle. Next you add your details and sign the
-                    agreement. Please start within {holdHours} hours or the booking is released.
+                    agreement. The vehicle is held for you for {holdHours} hours while you do that.
                   </p>
                 </form>
               ) : null}

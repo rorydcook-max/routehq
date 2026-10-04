@@ -7,7 +7,9 @@ import { businessToday } from "@/lib/business-time";
 import { notifyOperator } from "@/lib/notify-operator";
 import { getPublicCatalog, publicBookingSettings } from "@/lib/public-catalog";
 import { daysBetween, minimumStay, planFor } from "@/lib/rental-estimate";
-import { isDoubleBookingError, overlaps } from "@/lib/rental-conflicts";
+import { clashes, holdDeadline } from "@/lib/booking-holds";
+import { bookingRules, type BookingRules } from "@/lib/booking-rules";
+import { isDoubleBookingError } from "@/lib/rental-conflicts";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
@@ -25,8 +27,8 @@ function shortDate(iso: string) {
  * A customer books a vehicle from the public page. No sign-in and no approval
  * step: the booking is made at the listed price, the vehicle is taken for
  * those dates at once, and the customer goes straight to the booking form to
- * add their details and sign. If they never start the form, the booking is
- * released when the link runs out (see releaseAbandonedOnlineBookings).
+ * add their details and sign. The vehicle is held for a limited time (see
+ * lib/booking-holds.ts); signing confirms the booking.
  */
 export async function bookOnline(formData: FormData): Promise<Result<{ href: string }>> {
   const slug = String(formData.get("slug") || "").trim();
@@ -49,7 +51,8 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
   if (!catalog || !catalog.enabled) return { ok: false, error: "Online booking isn't available for this business right now." };
   const vehicle = catalog.vehicles.find((item) => item.id === vehicleId);
   if (!vehicle) return { ok: false, error: "That vehicle is no longer available. Please choose another." };
-  if (vehicle.busy.some((period) => overlaps(startDate, endDate, period))) return { ok: false, error: TAKEN };
+  if (startDate < catalog.minStart) return { ok: false, error: `The earliest start date is ${shortDate(catalog.minStart)}. Please choose a later date.` };
+  if (vehicle.busy.some((period) => clashes(startDate, endDate, period, catalog.gapDays))) return { ok: false, error: TAKEN };
 
   const plan = planFor(vehicle, endDate ? daysBetween(startDate, endDate) : null);
   if (!plan) return { ok: false, error: `${minimumStay(vehicle) || "This vehicle can't be booked online for those dates"}. Please choose a longer stay or another vehicle.` };
@@ -134,8 +137,9 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
       booking_data: bookingData,
       included_items: [],
       share_channels: ["public_page"],
-      // Time to start the form before the dates are released again.
-      expires_at: new Date(Date.now() + catalog.holdHours * 3_600_000).toISOString()
+      // Held for a limited time; the link itself lasts much longer.
+      hold_until: holdDeadline(catalog.holdHours),
+      expires_at: new Date(Date.now() + 60 * 24 * 3_600_000).toISOString()
     })
     .select("id, token")
     .single();
@@ -189,6 +193,35 @@ export async function savePublicBookingSettings(input: { enabled: boolean; holdH
   const { error } = await admin
     .from("organizations")
     .update({ settings: { ...settings, public_booking: { enabled: !!input.enabled, hold_hours: holdHours, deposit } } })
+    .eq("id", membership.organizationId);
+  if (error) return { ok: false, error: "Couldn't save. Please try again." };
+  revalidatePath("/settings");
+  revalidatePath(`/rent/${organization.slug}`);
+  return { ok: true };
+}
+
+/** Holds and notice periods for the business (owner only). */
+export async function saveBookingRules(input: BookingRules): Promise<Result> {
+  const membership = await getCurrentMembership();
+  if (!membership) return { ok: false, error: "Please sign in again." };
+  if (membership.role !== "owner") return { ok: false, error: OWNER_ONLY_MESSAGE };
+
+  const admin = createSupabaseAdminClient() as any;
+  const { data: organization } = await admin.from("organizations").select("settings, slug").eq("id", membership.organizationId).maybeSingle();
+  if (!organization) return { ok: false, error: "Business not found." };
+  const settings = organization.settings && typeof organization.settings === "object" ? organization.settings : {};
+  // Run the values through the same reader the rest of the app uses, so only allowed options are stored.
+  const clean = bookingRules({
+    booking_rules: { hold_hours: input.holdHours, lead_hours: input.leadHours, end_notice_days: input.endNoticeDays, extend_notice_days: input.extendNoticeDays, gap_days: input.gapDays }
+  });
+  const { error } = await admin
+    .from("organizations")
+    .update({
+      settings: {
+        ...settings,
+        booking_rules: { hold_hours: clean.holdHours, lead_hours: clean.leadHours, end_notice_days: clean.endNoticeDays, extend_notice_days: clean.extendNoticeDays, gap_days: clean.gapDays }
+      }
+    })
     .eq("id", membership.organizationId);
   if (error) return { ok: false, error: "Couldn't save. Please try again." };
   revalidatePath("/settings");

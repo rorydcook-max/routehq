@@ -1,6 +1,7 @@
 "use client";
 
 import { businessToday } from "@/lib/business-time";
+import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { AlertTriangle, CalendarCheck, CalendarPlus, CheckCircle2, FileText, ImageIcon, MessageCircle } from "lucide-react";
 import { submitCustomerPortalAction } from "@/app/actions/public-booking";
@@ -23,7 +24,8 @@ export function ActiveRentalPortal({
   ownerContact,
   payments = [],
   paymentBundle = null,
-  orgPayment = null
+  orgPayment = null,
+  endNoticeDays = 0
 }: {
   token: string;
   organizationName: string;
@@ -36,8 +38,11 @@ export function ActiveRentalPortal({
   ownerContact?: string | null;
   payments?: PortalPayment[];
   paymentBundle?: PortalBundle | null;
+  /** Days of notice the business asks for before a return. */
+  endNoticeDays?: number;
   orgPayment?: any;
 }) {
+  const router = useRouter();
   const [openAction, setOpenAction] = useState<ActionType | null>(null);
   const [confirmation, setConfirmation] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -59,8 +64,15 @@ export function ActiveRentalPortal({
   function submitAction(formData: FormData, successMessage: string) {
     startTransition(async () => {
       formData.set("token", token);
-      await submitCustomerPortalAction(formData);
-      setConfirmation(successMessage);
+      const result = await submitCustomerPortalAction(formData);
+      const extension = result.extension;
+      if (extension?.applied) {
+        const amount = `${extension.currency === "THB" ? "฿" : `${extension.currency} `}${extension.amount.toLocaleString("en-US")}`;
+        setConfirmation(`Done. Your rental now runs until ${niceDate(extension.newEndDate)}.${extension.amount > 0 ? ` ${amount} for the extra days is due on ${niceDate(extension.dueDate)}; you can pay it from this page.` : ""}`);
+        router.refresh();
+      } else {
+        setConfirmation(successMessage);
+      }
       setOpenAction(null);
     });
   }
@@ -106,6 +118,7 @@ export function ActiveRentalPortal({
                   deliveryLocation={deliveryLocation}
                   endDate={endDate}
                   isPending={isPending}
+                  endNoticeDays={endNoticeDays}
                   minExtensionDate={minExtensionDate}
                   onSubmit={submitAction}
                   organizationName={organizationName}
@@ -152,6 +165,7 @@ function ActionForm({
   type,
   endDate,
   minExtensionDate,
+  endNoticeDays = 0,
   deliveryLocation,
   isPending,
   onSubmit,
@@ -161,6 +175,7 @@ function ActionForm({
   type: ActionType;
   endDate: string;
   minExtensionDate: string;
+  endNoticeDays?: number;
   deliveryLocation: string;
   isPending: boolean;
   organizationName: string;
@@ -169,7 +184,7 @@ function ActionForm({
 }) {
   if (type === "extension_request") {
     return (
-      <form action={(formData) => onSubmit(formData, "Extension request sent - your owner will confirm shortly.")} className="mt-4 space-y-3">
+      <form action={(formData) => onSubmit(formData, `Extension request sent. ${organizationName} will confirm shortly.`)} className="mt-4 space-y-3">
         <input name="actionType" type="hidden" value="extension_request" />
         <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
           New return date
@@ -185,12 +200,15 @@ function ActionForm({
   }
 
   if (type === "return_confirmation") {
+    // A return date already agreed stays available even inside the notice period.
+    const earliestReturn = addDaysLocal(today(), endNoticeDays);
     return (
       <form action={(formData) => onSubmit(formData, `Return confirmed - we'll see you on ${String(formData.get("returnDate") || endDate)} at ${String(formData.get("returnLocation") || deliveryLocation || "the agreed location")}.`)} className="mt-4 space-y-3">
         <input name="actionType" type="hidden" value="return_confirmation" />
         <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
           Return date
-          <input className={inputClass} defaultValue={endDate || today()} min={today()} name="returnDate" required type="date" />
+          <input className={inputClass} defaultValue={endDate && endDate >= earliestReturn ? endDate : earliestReturn} min={endDate && endDate < earliestReturn ? endDate : earliestReturn} name="returnDate" required type="date" />
+          {endNoticeDays > 0 ? <span className="mt-1 block text-xs font-normal text-[var(--muted)]">Please give at least {endNoticeDays} {endNoticeDays === 1 ? "day" : "days"} notice before returning.</span> : null}
         </label>
         <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
           Return time
@@ -282,6 +300,17 @@ function returnCountdown(endDate: string | null | undefined) {
 
 function today() {
   return businessToday();
+}
+
+/** "2026-11-04" -> "4 Nov 2026". */
+function niceDate(iso: string) {
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${iso}T00:00:00Z`));
+}
+
+function addDaysLocal(iso: string, days: number) {
+  const date = new Date(`${iso}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
 }
 
 function nextDate(value: string | null | undefined) {

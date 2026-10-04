@@ -1,3 +1,4 @@
+import { niceDate } from "@/lib/nice-date";
 import { bookingRules, clashes } from "@/lib/booking-rules";
 import { businessToday } from "@/lib/business-time";
 import { notifyOperator } from "@/lib/notify-operator";
@@ -98,8 +99,8 @@ export async function tryAutoExtend(admin: any, rentalId: string, newEndDateRaw:
 
     outcome = { applied: true, openEnded: true, newEndDate: null, amount: card.monthlyRate, dueDate: firstDue, currency, explain: `${baht(card.monthlyRate)} a month` };
     title = "Rental changed to no end date";
-    detail = `${who} asked to keep the ${vehicle} with no end date (was due back ${currentEnd}). Nothing was in the way, so it was changed automatically. ${baht(card.monthlyRate)} is due each month from ${firstDue}.`;
-    alert = `📅 Now open-ended: ${who} keeps the ${vehicle} with no end date. ${baht(card.monthlyRate)} a month from ${firstDue}.`;
+    detail = `${who} asked to keep the ${vehicle} with no end date (was due back ${niceDate(currentEnd)}). Nothing was in the way, so it was changed automatically. ${baht(card.monthlyRate)} is due each month from ${niceDate(firstDue)}.`;
+    alert = `📅 Now open-ended: ${who} keeps the ${vehicle} with no end date. ${baht(card.monthlyRate)} a month from ${niceDate(firstDue)}.`;
     logMetadata = { adjustment_type: "extension", open_ended: true, previous_end_date: currentEnd, new_end_date: null, monthly_rate: card.monthlyRate, first_due: firstDue, source: "customer_request_auto" };
   } else {
     const endDate = String(newEndDate);
@@ -124,7 +125,7 @@ export async function tryAutoExtend(admin: any, rentalId: string, newEndDateRaw:
         currency,
         metadata: {
           type: "extension",
-          description: `Extension - ${currentEnd} to ${endDate}`,
+          description: `Extension - ${niceDate(currentEnd)} to ${niceDate(endDate)}`,
           adjustment_type: "extension",
           previous_end_date: currentEnd,
           new_end_date: endDate,
@@ -141,9 +142,9 @@ export async function tryAutoExtend(admin: any, rentalId: string, newEndDateRaw:
     }
 
     outcome = { applied: true, openEnded: false, newEndDate: endDate, amount, dueDate: currentEnd, currency, explain: quote?.explain || null };
-    title = `Rental extended to ${endDate}`;
-    detail = `${who} asked to keep the ${vehicle} until ${endDate} (was ${currentEnd}). Nothing was in the way, so it was extended automatically. ${baht(amount)} is due on ${currentEnd}${quote ? ` (${quote.explain})` : ""}.`;
-    alert = `📅 Extended automatically: ${who} keeps the ${vehicle} until ${endDate}. ${baht(amount)} due on ${currentEnd}.`;
+    title = `Rental extended to ${niceDate(endDate)}`;
+    detail = `${who} asked to keep the ${vehicle} until ${niceDate(endDate)} (was ${niceDate(currentEnd)}). Nothing was in the way, so it was extended automatically. ${baht(amount)} is due on ${niceDate(currentEnd)}${quote ? ` (${quote.explain})` : ""}.`;
+    alert = `📅 Extended automatically: ${who} keeps the ${vehicle} until ${niceDate(endDate)}. ${baht(amount)} due on ${niceDate(currentEnd)}.`;
     logMetadata = { adjustment_type: "extension", previous_end_date: currentEnd, new_end_date: endDate, extension_payment_amount: amount, source: "customer_request_auto" };
   }
 

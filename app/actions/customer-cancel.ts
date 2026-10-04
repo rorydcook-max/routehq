@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { niceDate } from "@/lib/nice-date";
 import { notifyOperator } from "@/lib/notify-operator";
 import { receiptOf } from "@/lib/payment-receipts";
 import { recordActivityEvent } from "@/lib/supabase/activity";
@@ -59,7 +60,7 @@ export async function cancelBookingByCustomer(formData: FormData): Promise<Resul
 
   const vehicle = [rental.vehicles?.make, rental.vehicles?.model].filter(Boolean).join(" ") || "vehicle";
   const who = rental.customers?.full_name || "The customer";
-  const when = rental.end_date ? `${String(rental.start_date).slice(0, 10)} to ${String(rental.end_date).slice(0, 10)}` : `from ${String(rental.start_date).slice(0, 10)}`;
+  const when = rental.end_date ? `${niceDate(rental.start_date)} to ${niceDate(rental.end_date)}` : `from ${niceDate(rental.start_date)}, monthly`;
   const currency = String(rental.currency || "THB");
   const money = `${currency === "THB" ? "฿" : `${currency} `}${paid.toLocaleString("en-US")}`;
   const settle = paid > 0 ? ` They have paid ${money}: decide what to refund.` : receiptWaiting ? " They sent a payment receipt that has not been checked yet." : "";

@@ -219,7 +219,7 @@ function deliveryDisplay(rental: any, bookingLink: any) {
 function timelineSteps(bookingLink: any, rentalDocuments: BookingRentalDocument[]) {
   const renterSignature = renterSignatureOf(rentalDocuments);
   const businessSignature = businessSignatureOf(rentalDocuments);
-  return [
+  const steps = [
     { label: "Created", complete: Boolean(bookingLink?.created_at), at: bookingLink?.created_at },
     { label: "Sent", complete: Boolean(bookingLink?.sent_at) || ["sent", "viewed", "details_submitted", "contract_signed", "completed"].includes(bookingLink?.status), at: bookingLink?.sent_at },
     { label: "Viewed", complete: Boolean(bookingLink?.viewed_at), at: bookingLink?.viewed_at },
@@ -227,6 +227,13 @@ function timelineSteps(bookingLink: any, rentalDocuments: BookingRentalDocument[
     { label: "Customer signed contract", complete: Boolean(renterSignature || bookingLink?.contract_signed_at), at: renterSignature?.signedAt || bookingLink?.contract_signed_at },
     { label: "Business signed contract", complete: Boolean(businessSignature), at: businessSignature?.signedAt }
   ];
+  // A customer who booked online, or opened the link without it being sent from here, never had a "Sent" step.
+  const bookedOnline = (bookingLink?.booking_data as any)?.source === "public_page";
+  const shown = steps.filter((step) => step.label !== "Sent" || (!bookedOnline && (step.complete || !bookingLink?.viewed_at)));
+  if (bookedOnline) shown[0] = { ...shown[0], label: "Booked online by the customer" };
+  // Finished steps in the order they happened, then what is still to come.
+  const done = shown.filter((step) => step.complete && step.at).sort((a, b) => String(a.at).localeCompare(String(b.at)));
+  return [...done, ...shown.filter((step) => !(step.complete && step.at))];
 }
 
 function ActionButton({ href, children, tone = "primary" }: { href: Route; children: React.ReactNode; tone?: "primary" | "light" }) {
@@ -342,9 +349,14 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   const outstandingBalance = Number(rental.balance_due ?? Math.max(0, totalRentalValue - totalPaid));
   const today = businessToday();
   const nonVoidedPayments = payments.filter((p: any) => !isVoidedPayment(p));
-  const overduePaymentGroup = nonVoidedPayments.filter((p: any) => p.status !== "paid" && p.due_date && p.due_date < today);
-  const dueNowPaymentGroup = nonVoidedPayments.filter((p: any) => p.status !== "paid" && (!p.due_date || p.due_date === today));
-  const upcomingPaymentGroup = nonVoidedPayments.filter((p: any) => p.status !== "paid" && p.due_date && p.due_date > today);
+  // Payments that were cancelled or waived are history, not money to collect.
+  const isOpenPayment = (p: any) => !["paid", "cancelled", "waived", "refunded"].includes(String(p.status || ""));
+  const overduePaymentGroup = nonVoidedPayments.filter((p: any) => isOpenPayment(p) && p.due_date && p.due_date < today);
+  const dueNowPaymentGroup = nonVoidedPayments.filter((p: any) => isOpenPayment(p) && (!p.due_date || p.due_date === today));
+  const upcomingPaymentGroup = nonVoidedPayments.filter((p: any) => isOpenPayment(p) && p.due_date && p.due_date > today);
+  const cancelledPaymentGroup = nonVoidedPayments.filter((p: any) => ["cancelled", "waived"].includes(String(p.status || "")));
+  const isCancelled = String(rental.status || "") === "cancelled";
+  const isClosed = isCancelled || String(rental.status || "") === "completed";
   const paidPaymentGroup = nonVoidedPayments.filter((p: any) => p.status === "paid");
   const pendingPayment = payments.find((payment: any) => !isVoidedPayment(payment) && ["pending", "overdue"].includes(String(payment.status || "pending")));
   const deliveryInspection = inspections.find((inspection: any) => inspection.type === "delivery" || inspection.inspection_type === "delivery");
@@ -368,7 +380,16 @@ export default async function BookingDetailPage({ params, searchParams }: { para
     .reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
   const customerFormComplete = Boolean(bookingLink?.customer_details_submitted_at || ["details_submitted", "contract_signed", "completed"].includes(String(bookingLink?.status || "")));
   const paymentDueOnDeliveryAmount = Number(rental.first_payment_amount || rental.rental_rate || 0);
+  const paidInAll = activePayments.filter((payment: any) => payment.status === "paid").reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
   const financialState = (() => {
+    if (isCancelled) {
+      return {
+        label: "Booking cancelled",
+        detail: paidInAll > 0 ? `${money(paidInAll, rental.currency)} was paid before it was cancelled. Record any refund under Refunds & deposit.` : "Nothing was paid and nothing is owed.",
+        amount: null as number | null,
+        tone: paidInAll > 0 ? ("amber" as const) : ("neutral" as const)
+      };
+    }
     if (needsExistingRentalPaymentSetup) {
       return {
         label: "Payment setup needed",
@@ -561,8 +582,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
           <BookingMetricCard icon={<Gauge size={18} />} label="Mileage">
             {rental.mileage_at_delivery == null ? (
               <>
-                <p className="text-sm font-semibold leading-5 text-[var(--foreground)]">Not recorded yet</p>
-                <p className="text-sm text-[var(--muted)]">Recorded at delivery</p>
+                <p className="text-sm font-semibold leading-5 text-[var(--foreground)]">{isCancelled ? "Never handed over" : "Not recorded yet"}</p>
+                <p className="text-sm text-[var(--muted)]">{isCancelled ? "No mileage to record" : "Recorded at delivery"}</p>
               </>
             ) : rental.mileage_at_return == null ? (
               <>
@@ -591,28 +612,50 @@ export default async function BookingDetailPage({ params, searchParams }: { para
         <div className="grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[minmax(0,3fr)_minmax(320px,2fr)]">
           <div className="space-y-3">
             <Card>
-              <SectionHeader eyebrow="Booking link" title={bookingLink ? "Customer completion timeline" : "Customer booking link"} />
+              <SectionHeader eyebrow="Booking link" title={bookingLink ? "Customer's booking form" : "Customer booking link"} />
               {!bookingLink ? (
                 <p className="mt-3 text-sm text-[var(--muted)]">
                   This booking was entered by your team. Create a link if you want the customer to add their details and sign the agreement online.
                 </p>
               ) : null}
-              <div className="mt-3 space-y-3">
-                {(bookingLink ? timelineSteps(bookingLink, rentalDocuments) : []).map((step) => (
-                    <div className="sub-surface flex items-start gap-3 p-3" key={step.label}>
-                    <span className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${step.complete ? "bg-[#dcfce7] text-[#166534]" : "bg-[#fbfaf8] text-[var(--muted)]"}`}>
-                      {step.complete ? <CheckCircle2 size={16} /> : <Clock size={16} />}
-                    </span>
-                    <div>
-                      <p className="font-semibold text-[var(--foreground)]">{step.label}</p>
-                      <p className="text-sm text-[var(--muted)]">{formatDateTime(step.at)}</p>
-                    </div>
+              {(() => {
+                const steps = bookingLink ? timelineSteps(bookingLink, rentalDocuments) : [];
+                if (steps.length === 0) return null;
+                const allDone = steps.every((step) => step.complete);
+                const list = (
+                  <div className="mt-3 space-y-3">
+                    {steps.map((step) => (
+                      <div className="sub-surface flex items-start gap-3 p-3" key={step.label}>
+                        <span className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${step.complete ? "bg-[#dcfce7] text-[#166534]" : "bg-[#fbfaf8] text-[var(--muted)]"}`}>
+                          {step.complete ? <CheckCircle2 size={16} /> : <Clock size={16} />}
+                        </span>
+                        <div>
+                          <p className="font-semibold text-[var(--foreground)]">{step.label}</p>
+                          <p className="text-sm text-[var(--muted)]">{step.at ? formatDateTime(step.at) : "Not yet"}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-              <div className="mt-3">
-                <BookingShareActions currentUrl={bookingLink?.public_url || null} organizationId={organization.id} rentalId={rental.id} />
-              </div>
+                );
+                // Once the customer has done everything, the steps are history: one line, open on request.
+                return allDone ? (
+                  <details className="mt-3">
+                    <summary className="flex cursor-pointer items-center gap-2 rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] p-3 text-sm font-semibold text-[#166534]">
+                      <CheckCircle2 size={16} />
+                      The customer finished everything on {formatDate(String(steps[steps.length - 1].at || ""))}. Show the steps
+                    </summary>
+                    {list}
+                  </details>
+                ) : (
+                  list
+                );
+              })()}
+              {/* A cancelled booking's link only tells the customer it was cancelled: nothing to send. */}
+              {isCancelled ? null : (
+                <div className="mt-3">
+                  <BookingShareActions currentUrl={bookingLink?.public_url || null} organizationId={organization.id} rentalId={rental.id} />
+                </div>
+              )}
             </Card>
 
             <Card>
@@ -750,6 +793,11 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     </Link>
                     <SkipInspectionButton rentalId={rental.id} />
                   </div>
+                ) : isCancelled ? (
+                  <div className="sub-surface p-3">
+                    <p className="font-semibold text-[var(--foreground)]">Never handed over</p>
+                    <p className="mt-1 text-sm text-[var(--muted)]">The booking was cancelled before the vehicle went out.</p>
+                  </div>
                 ) : (
                   // Active, not retrospective, no inspection
                   <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
@@ -760,11 +808,13 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     <p className="mt-2 text-sm text-[#b45309]">This rental was activated without a delivery inspection on record.</p>
                   </div>
                 )}
-                <InspectionStatus label="Return inspection" inspection={returnInspection} href={`/inspections/return/${rental.id}` as Route} available={["active", "due_soon", "overdue", "extended"].includes(displayStatus)} />
+                {isCancelled && !deliveryInspection ? null : (
+                  <InspectionStatus label="Return inspection" inspection={returnInspection} href={`/inspections/return/${rental.id}` as Route} available={["active", "due_soon", "overdue", "extended"].includes(displayStatus)} />
+                )}
               </div>
               <div className="mt-3 space-y-3">
                 {inspections.length === 0 ? (
-                  <SectionEmpty>No inspections completed yet.</SectionEmpty>
+                  isCancelled ? null : <SectionEmpty>No inspections completed yet.</SectionEmpty>
                 ) : (
                   inspections.map((inspection: any) => <InspectionViewer inspection={inspection} key={inspection.id} />)
                 )}
@@ -805,16 +855,22 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               <SectionHeader eyebrow="Rental details" title="Summary" />
               <div className="mt-3 space-y-3 text-sm">
                 <Info icon={Car} label="Vehicle" value={`${vehicleTitle(vehicle)} / ${vehicle?.registration_number || ""}`} />
-                <DeliveryInfo delivery={delivery} />
-                <Info
-                  icon={MapPin}
-                  label="Return"
-                  value={
-                    returnInspection
-                      ? `Returned ${formatDateTime(returnInspection.submitted_at || returnInspection.created_at)}${rental.return_location ? ` · ${rental.return_location}` : ""}`
-                      : rental.return_location || "Not arranged yet"
-                  }
-                />
+                {deliveryInspection ? (
+                  <Info icon={MapPin} label="Handover" value={`Handed over ${formatDateTime(deliveryInspection.submitted_at || deliveryInspection.created_at)}`} />
+                ) : isCancelled ? null : (
+                  <DeliveryInfo delivery={delivery} />
+                )}
+                {isCancelled && !deliveryInspection ? null : (
+                  <Info
+                    icon={MapPin}
+                    label="Return"
+                    value={
+                      returnInspection
+                        ? `Returned ${formatDateTime(returnInspection.submitted_at || returnInspection.created_at)}${rental.return_location ? ` · ${rental.return_location}` : ""}`
+                        : rental.return_location || (rental.end_date ? "Not arranged yet" : "No return date: monthly, open-ended")
+                    }
+                  />
+                )}
                 <Info icon={CreditCard} label="Deposit" value={formatDepositSummary(rental)} />
                 <RefundDepositPanel
                   rentalId={rental.id}
@@ -847,7 +903,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     </div>
                   </div>
                 ) : null}
-                <Info icon={CreditCard} label="Total paid" value={money(totalPaid, rental.currency)} />
+                <Info icon={CreditCard} label="Rent paid" value={money(totalPaid, rental.currency)} />
               </div>
             </Card>
 
@@ -923,7 +979,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     startDate={rental.start_date}
                   />
                 ) : null}
-                {!needsExistingRentalPaymentSetup && payments.length === 0 && outstandingBalance === 0 && totalPaid === 0 ? (
+                {!isClosed && !needsExistingRentalPaymentSetup && payments.length === 0 && outstandingBalance === 0 && totalPaid === 0 ? (
                   <div className="space-y-3 rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3 text-sm font-semibold text-[#92400e]">
                     <p>No payment schedule exists yet for this booking. Generate one from the rental rate and dates, or add a single charge.</p>
                     <GeneratePaymentScheduleButton rentalId={rental.id} />
@@ -964,6 +1020,16 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     </div>
                   </details>
                 ) : null}
+                {cancelledPaymentGroup.length > 0 ? (
+                  <details>
+                    <summary className="cursor-pointer text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--muted)] hover:text-[var(--foreground)]">
+                      Cancelled — {cancelledPaymentGroup.length} payment{cancelledPaymentGroup.length !== 1 ? "s" : ""} no longer due
+                    </summary>
+                    <div className="mt-2 space-y-1">
+                      {cancelledPaymentGroup.map((payment: any) => <EditableRentalPaymentRow key={payment.id} payment={payment} />)}
+                    </div>
+                  </details>
+                ) : null}
                 {paidPaymentGroup.length > 0 ? (
                   <details>
                     <summary className="cursor-pointer text-[10px] font-bold uppercase tracking-[0.08em] text-[#16a34a] hover:text-[#166534]">
@@ -986,6 +1052,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               </div>
             </Card>
 
+            {isClosed ? null : (
             <ComingUpCard
               currency={rental.currency}
               rentalId={rental.id}
@@ -993,6 +1060,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               vehicle={vehicle}
               vehicleEvents={vehicleEvents}
             />
+            )}
 
           </div>
         </div>

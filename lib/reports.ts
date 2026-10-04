@@ -379,11 +379,11 @@ export async function getReportsData(
 
     supabase
       .from("rentals")
-      .select("id, vehicle_id, start_date, end_date, status, balance_due, daily_rate, customer_id, customers!rentals_customer_id_fkey(full_name, phone)")
+      .select("id, vehicle_id, start_date, end_date, status, balance_due, rental_rate, pricing_model, billing_interval, customer_id, customers!rentals_customer_id_fkey(full_name, phone)")
       .eq("organization_id", organizationId)
       .is("deleted_at", null)
-      .gte("start_date", dateRange.from)
-      .lte("start_date", dateRange.to),
+      .lte("start_date", dateRange.to)
+      .or(`end_date.is.null,end_date.gte.${dateRange.from}`),
 
     supabase
       .from("rentals")
@@ -467,16 +467,31 @@ export async function getReportsData(
   // Per-vehicle rental counts and utilization
   const vRentalCountMap = new Map<string, number>();
   const vRentalDaysMap = new Map<string, number>();
+  const vRateDaysMap = new Map<string, number>();
 
-  const rangeDays = Math.max(1, Math.ceil((new Date(dateRange.to).getTime() - new Date(dateRange.from).getTime()) / 86400000) + 1);
+  // Days are counted only up to today: a month that is four days old has four days to fill, not thirty-one.
+  const dayMs = 86400000;
+  const todayIso = businessToday();
+  const periodEnd = dateRange.to < todayIso ? dateRange.to : todayIso;
+  const daysInclusive = (from: string, to: string) => Math.round((new Date(`${to}T00:00:00Z`).getTime() - new Date(`${from}T00:00:00Z`).getTime()) / dayMs) + 1;
+  const rangeDays = Math.max(1, daysInclusive(dateRange.from, periodEnd));
 
   for (const rental of rentals) {
-    if (!rental.vehicle_id || rental.status === "cancelled") continue;
+    // Only rentals where the customer actually had the vehicle.
+    if (!rental.vehicle_id || !["active", "due_soon", "overdue", "extended", "completed"].includes(String(rental.status))) continue;
+    const start = String(rental.start_date || "").slice(0, 10);
+    if (!start || start > periodEnd) continue;
+    const end = rental.end_date ? String(rental.end_date).slice(0, 10) : periodEnd;
+    const from = start > dateRange.from ? start : dateRange.from;
+    const to = end < periodEnd ? end : periodEnd;
+    if (to < from) continue;
     vRentalCountMap.set(rental.vehicle_id, (vRentalCountMap.get(rental.vehicle_id) || 0) + 1);
-    if (rental.start_date && rental.end_date) {
-      const days = Math.max(1, Math.ceil((new Date(rental.end_date).getTime() - new Date(rental.start_date).getTime()) / 86400000) + 1);
-      vRentalDaysMap.set(rental.vehicle_id, (vRentalDaysMap.get(rental.vehicle_id) || 0) + days);
-    }
+    const days = daysInclusive(from, to);
+    vRentalDaysMap.set(rental.vehicle_id, (vRentalDaysMap.get(rental.vehicle_id) || 0) + days);
+    // The agreed rate per day, so a month paid up front doesn't look like a huge daily rate.
+    const period = String(rental.billing_interval || rental.pricing_model || "monthly").toLowerCase();
+    const perDay = Number(rental.rental_rate || 0) / (period === "daily" ? 1 : period === "weekly" ? 7 : 30);
+    vRateDaysMap.set(rental.vehicle_id, (vRateDaysMap.get(rental.vehicle_id) || 0) + perDay * days);
   }
 
   // Build per-vehicle metrics for vehicles that have transactions
@@ -493,8 +508,9 @@ export async function getReportsData(
       const purchasePrice = Number(vehicle?.purchase_price || 0);
       const estimatedValue = Number(vehicle?.estimated_value || 0);
       const depreciation = Math.max(0, purchasePrice - estimatedValue);
-      const roi = purchasePrice > 0 ? ((profit - depreciation) / purchasePrice) * 100 : 0;
-      const avgDailyRate = rentalDays > 0 ? income / rentalDays : 0;
+      void depreciation;
+      const roi = purchasePrice > 0 ? (profit / purchasePrice) * 100 : 0;
+      const avgDailyRate = rentalDays > 0 ? (vRateDaysMap.get(vehicleId) || 0) / rentalDays : 0;
       const utilizationRate = Math.min(100, (rentalDays / rangeDays) * 100);
 
       const bd = vExpBreakMap.get(vehicleId) || new Map<string, number>();

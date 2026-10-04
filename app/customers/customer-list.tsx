@@ -155,12 +155,12 @@ export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
                       <p className="mt-1 text-sm font-semibold text-[var(--foreground)]">
                         {activeRental ? `${activeRental.vehicles?.make || ""} ${activeRental.vehicles?.model || ""}`.trim() : "Not renting"}
                       </p>
-                      <p className="mt-1 text-xs text-[var(--muted)]">{activeRental?.end_date ? `Return ${formatDate(activeRental.end_date)}` : "No return due"}</p>
+                      <p className="mt-1 text-xs text-[var(--muted)]">{activeRental?.end_date ? `Return ${formatDate(activeRental.end_date)}` : activeRental ? "Monthly, open-ended" : "No vehicle out"}</p>
                     </div>
                     <div className="sub-surface p-3">
                       <p className="text-xs font-bold uppercase text-[var(--muted)]">Lifetime value</p>
                       <p className="font-mono-data mt-1 text-sm font-semibold text-[var(--foreground)]">{money(item.lifetimeRevenue)}</p>
-                      <p className="font-mono-data mt-1 text-xs text-[var(--muted)]">{item.totalRentals} rentals</p>
+                      <p className="font-mono-data mt-1 text-xs text-[var(--muted)]">{item.totalRentals} {item.totalRentals === 1 ? "rental" : "rentals"}</p>
                     </div>
                     <div className="sub-surface p-3">
                       <p className="text-xs font-bold uppercase text-[var(--muted)]">Last rental</p>

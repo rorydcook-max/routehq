@@ -1,3 +1,4 @@
+import { businessToday } from "@/lib/business-time";
 import { customerPaymentLabel } from "@/lib/payment-labels";
 import { receiptOf, signedReceiptUrls } from "@/lib/payment-receipts";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -84,7 +85,12 @@ export async function getTaskList(organizationId: string): Promise<TaskListItem[
   if (paymentsResult.error) throw new Error(paymentsResult.error.message);
 
   const tasks = tasksResult.data || [];
-  const payments = (paymentsResult.data || []).filter((payment: any) => !isVoided(payment) && payment.rentals);
+  // Rent is scheduled a year ahead; only what is overdue or due in the next five weeks is a job.
+  // A payment the customer has already sent a receipt for always shows, whenever it is due.
+  const horizon = businessToday(35);
+  const payments = (paymentsResult.data || []).filter(
+    (payment: any) => !isVoided(payment) && payment.rentals && (!payment.due_date || String(payment.due_date).slice(0, 10) <= horizon || receiptOf(payment.metadata))
+  );
 
   const receiptUrls = await signedReceiptUrls(payments.map((row: any) => receiptOf(row.metadata)?.path).filter(Boolean));
 

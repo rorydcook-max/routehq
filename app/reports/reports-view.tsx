@@ -1,5 +1,6 @@
 "use client";
 
+import { niceDate } from "@/lib/nice-date";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -751,7 +752,7 @@ export function ReportsView({ data }: { data: ReportsData }) {
                   </Link>
                   <p className="text-xs text-[var(--muted)]">
                     {bal.rentalCount} rental{bal.rentalCount === 1 ? "" : "s"}
-                    {bal.oldestDue ? ` · due ${bal.oldestDue}` : ""}
+                    {bal.oldestDue ? ` · due ${niceDate(bal.oldestDue)}` : ""}
                   </p>
                 </div>
                 <p className="font-semibold text-red-500">{money(bal.totalBalance)}</p>
@@ -779,12 +780,13 @@ export function ReportsView({ data }: { data: ReportsData }) {
               <tbody>
                 {data.recentTransactions.map((tx) => (
                   <tr key={tx.id} className="border-b border-[var(--border)] last:border-0">
-                    <td className="py-2.5 pr-3 text-[var(--muted)]">{tx.date}</td>
+                    <td className="whitespace-nowrap py-2.5 pr-3 text-[var(--muted)]">{niceDate(tx.date)}</td>
                     <td className="px-3 py-2.5 font-semibold text-[var(--foreground)]">{tx.typeLabel}</td>
                     <td className="px-3 py-2.5 text-[var(--foreground-secondary)]">{tx.vehicleLabel}</td>
                     <td className="px-3 py-2.5 text-[var(--foreground-secondary)]">{tx.customerName || "—"}</td>
-                    <td className={`px-3 py-2.5 text-right font-bold ${tx.isIncome ? "text-emerald-600" : "text-red-500"}`}>
-                      {tx.isIncome ? "+" : "-"}{money(tx.amount)}
+                    <td className={`px-3 py-2.5 text-right font-bold ${tx.isIncome ? "text-emerald-600" : tx.type === "deposit_received" ? "text-amber-600" : "text-red-500"}`}>
+                      {/* A deposit coming in is money received, held for the customer: not a cost. */}
+                        {tx.isIncome || tx.type === "deposit_received" ? "+" : "-"}{money(tx.amount)}
                     </td>
                   </tr>
                 ))}

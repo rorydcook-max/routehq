@@ -1,3 +1,4 @@
+import { niceDate } from "@/lib/nice-date";
 import { tryAutoExtend, type ExtensionOutcome } from "@/lib/auto-extension";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 
@@ -46,7 +47,7 @@ export async function processCustomerPortalAction(supabase: any, actionId: strin
     } else {
       await supabase.from("tasks").insert({
         ...taskBase,
-        title: `${content.open_ended ? "Request to keep the vehicle with no end date" : `Extension to ${content.new_end_date || "a new date"}`} needs your answer - ${customerName} - ${vehicleLabel} (${extension.reason})`,
+        title: `${content.open_ended ? "Request to switch to monthly, open-ended" : `Extension to ${content.new_end_date ? niceDate(content.new_end_date) : "a new date"}`} needs your answer - ${customerName} - ${vehicleLabel} (${extension.reason})`,
         task_type: "admin",
         due_at: content.new_end_date || null
       });

@@ -62,7 +62,7 @@ export function ActiveRentalPortal({
   const actionCards = useMemo(
     () => [
       // A rental with no end date has nothing to extend.
-      ...(endDate ? [{ type: "extension_request" as const, title: "Keep it longer", icon: CalendarPlus, description: "Choose a new return date, or keep it with no end date." }] : []),
+      ...(endDate ? [{ type: "extension_request" as const, title: "Keep it longer", icon: CalendarPlus, description: "Choose a new return date, or switch to a monthly open-ended rental." }] : []),
       { type: "return_confirmation" as const, title: "Confirm return", icon: CalendarCheck, description: "Tell us when and where you will return." },
       { type: "problem_report" as const, title: "Report a problem", icon: AlertTriangle, description: "Breakdown, damage, or a rental issue." },
       { type: "question" as const, title: "Ask a question", icon: MessageCircle, description: "Send a quick question to the operator." }
@@ -77,7 +77,7 @@ export function ActiveRentalPortal({
       const extension = result.extension;
       if (extension?.applied && extension.openEnded) {
         const amount = `${extension.currency === "THB" ? "฿" : `${extension.currency} `}${extension.amount.toLocaleString("en-US")}`;
-        setConfirmation(`Done. Your rental now has no end date. ${amount} is due each month from ${niceDate(extension.dueDate)}; you can pay it from this page.`);
+        setConfirmation(`Done. Your rental is now monthly and open-ended. ${amount} is due each month from ${niceDate(extension.dueDate)}; you can pay it from this page.`);
         router.refresh();
       } else if (extension?.applied) {
         const amount = `${extension.currency === "THB" ? "฿" : `${extension.currency} `}${extension.amount.toLocaleString("en-US")}`;
@@ -215,7 +215,7 @@ function ActionForm({
               Until a date
             </button>
             <button className={`min-h-11 rounded-lg px-2 ${noEnd ? "bg-white text-[var(--foreground)] shadow-sm" : "text-[var(--muted)]"}`} onClick={() => setNoEnd(true)} type="button">
-              No end date
+              Monthly, open-ended
             </button>
           </div>
         ) : null}
@@ -223,7 +223,7 @@ function ActionForm({
           <>
             <input name="openEnded" type="hidden" value="true" />
             <p className="rounded-xl bg-[var(--primary-light)] p-3 text-sm leading-6 text-[var(--foreground)]">
-              <span className="font-semibold">฿{openEndedOffer.monthlyRate.toLocaleString("en-US")} a month</span>, from {niceDate(openEndedOffer.firstDue)}. It renews each month until you tell us you are returning the vehicle
+              <span className="font-semibold">฿{openEndedOffer.monthlyRate.toLocaleString("en-US")} a month</span>, from {niceDate(openEndedOffer.firstDue)}. No return date: it renews each month until you tell us you are returning the vehicle
               {endNoticeDays > 0 ? `, with at least ${endNoticeDays} ${endNoticeDays === 1 ? "day" : "days"} notice` : ""}.
             </p>
           </>

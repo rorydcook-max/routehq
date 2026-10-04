@@ -99,21 +99,31 @@ export function Catalog({
           <CalendarDays className="text-[var(--primary)]" size={18} />
           When do you need it?
         </div>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <div aria-label="Type of rental" className="mt-3 grid grid-cols-2 gap-1 rounded-xl bg-[#f5f4f1] p-1 text-sm font-semibold" role="group">
+          <button aria-pressed={longTerm} className={`min-h-11 rounded-lg px-2 ${longTerm ? "bg-white text-[var(--foreground)] shadow-sm" : "text-[var(--muted)]"}`} onClick={() => setLongTerm(true)} type="button">
+            Monthly
+          </button>
+          <button aria-pressed={!longTerm} className={`min-h-11 rounded-lg px-2 ${!longTerm ? "bg-white text-[var(--foreground)] shadow-sm" : "text-[var(--muted)]"}`} onClick={() => setLongTerm(false)} type="button">
+            Set dates
+          </button>
+        </div>
+        <p className="mt-2 text-xs leading-5 text-[var(--muted)]">
+          {longTerm
+            ? "Open-ended: pay the monthly rate each month and keep the vehicle for as long as you like. Tell us when you want to return it."
+            : "Choose your return date. Priced by the day, week or month depending on how long you stay."}
+        </p>
+        <div className={`mt-3 grid gap-3 ${longTerm ? "" : "sm:grid-cols-2"}`}>
           <label className="block text-sm font-semibold text-[var(--foreground-secondary)]">
-            From
+            {longTerm ? "Starting" : "From"}
             <input className={inputClass} min={today} onChange={(event) => setStartDate(event.target.value || today)} type="date" value={startDate} />
           </label>
-          <label className={`block text-sm font-semibold text-[var(--foreground-secondary)] ${longTerm ? "opacity-50" : ""}`}>
-            Until
-            <input className={inputClass} disabled={longTerm} min={addDays(startDate, 1)} onChange={(event) => setEndDate(event.target.value)} type="date" value={longTerm ? "" : endDate} />
-          </label>
+          {longTerm ? null : (
+            <label className="block text-sm font-semibold text-[var(--foreground-secondary)]">
+              Until
+              <input className={inputClass} min={addDays(startDate, 1)} onChange={(event) => setEndDate(event.target.value)} type="date" value={endDate} />
+            </label>
+          )}
         </div>
-        <label className="mt-3 flex min-h-11 cursor-pointer items-center gap-2 text-sm text-[var(--foreground)]">
-          <input checked={longTerm} className="h-4 w-4" onChange={(event) => setLongTerm(event.target.checked)} type="checkbox" />
-          No end date: monthly rate, renews each month
-        </label>
-        {longTerm ? <p className="mt-1 text-xs leading-5 text-[var(--muted)]">Keep the vehicle for as long as you like and pay month by month. Untick to choose a return date and see daily or weekly prices.</p> : null}
       </section>
 
       <p className="px-1 text-sm font-semibold text-[var(--foreground-secondary)]">
@@ -121,7 +131,7 @@ export function Catalog({
           ? "No vehicles are listed yet."
           : !datesReady
             ? "Choose your dates to see what is free."
-            : `${freeCount} of ${vehicles.length} free${end ? ` · ${shortDate(startDate)} to ${shortDate(end)}` : ` from ${shortDate(startDate)}`}`}
+            : `${freeCount} of ${vehicles.length} free${end ? ` · ${shortDate(startDate)} to ${shortDate(end)}` : ` monthly from ${shortDate(startDate)}`}`}
       </p>
 
       <section className="space-y-3">
@@ -130,7 +140,7 @@ export function Catalog({
           const estimate = days ? estimateRental(vehicle, days) : null;
           // A monthly-only vehicle can't be booked for a weekend.
           const bookable = !!planFor(vehicle, days);
-          const tooShort = datesReady && free && !bookable ? (longTerm ? "Choose a return date to book this one: it has no monthly rate" : minimumStay(vehicle)) : null;
+          const tooShort = datesReady && free && !bookable ? (longTerm ? "Not offered monthly: choose Set dates to book this one" : minimumStay(vehicle)) : null;
           const otherRates = [
             vehicle.dailyRate > 0 && headline?.per !== "day" ? `${money(vehicle.dailyRate)} / day` : null,
             vehicle.weeklyRate > 0 && headline?.per !== "week" ? `${money(vehicle.weeklyRate)} / week` : null
@@ -167,7 +177,7 @@ export function Catalog({
                     </p>
                   ) : null}
                   {tooShort ? <p className="mt-1 text-sm font-semibold text-[#b45309]">{longTerm ? tooShort : `${tooShort} for this vehicle`}</p> : null}
-                  {free && longTerm && bookable && vehicle.monthlyRate > 0 ? <p className="mt-1 text-sm text-[var(--primary)]">{money(vehicle.monthlyRate)} each month, no end date</p> : null}
+
                   {!free ? (
                     <p className="mt-1 text-sm font-semibold text-[#b45309]">
                       {freeFrom ? `Taken for these dates · free from ${shortDate(freeFrom)}` : openEndedClash ? "On a long-term rental" : "Taken for these dates"}

@@ -109,7 +109,11 @@ export async function getPortalPayments(
   );
 
   // Rent and deposit due together are usually sent as one transfer.
-  const unpaid = payments.filter((payment) => !payment.receiptSentAt);
+  // Only what is due now: anything overdue, and whatever falls due with the next payment.
+  const waiting = payments.filter((payment) => !payment.receiptSentAt);
+  const firstDue = waiting[0]?.dueDate || today;
+  const together = addDays(firstDue > today ? firstDue : today, 3);
+  const unpaid = waiting.filter((payment) => payment.dueDate <= together);
   const sameCurrency = unpaid.every((payment) => payment.currency === unpaid[0]?.currency);
   const total = Math.round(unpaid.reduce((sum, payment) => sum + payment.amount, 0) * 100) / 100;
   const bundle: PortalBundle | null =

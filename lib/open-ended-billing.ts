@@ -32,7 +32,8 @@ async function rentPayments(admin: any, rentalId: string) {
  */
 export async function nextMonthlyDue(admin: any, rentalId: string, currentEnd: string, alreadyMonthly: boolean): Promise<string> {
   if (!alreadyMonthly) return currentEnd;
-  const last = (await rentPayments(admin, rentalId))[0];
+  // Only rent that falls inside the rental counts; anything scheduled past the return date is left over from an earlier plan.
+  const last = (await rentPayments(admin, rentalId)).find((payment: any) => String(payment.due_date).slice(0, 10) < currentEnd);
   if (!last?.due_date) return currentEnd;
   const coveredTo = iso(addMonths(asDate(last.due_date), 1));
   return coveredTo > currentEnd ? coveredTo : currentEnd;
@@ -66,7 +67,11 @@ export async function addMonthlyPayments(
       metadata: { type: "rent", is_deposit: false, period_label: formatMonthLabel(due), is_upfront: false, open_ended: true, ...extra }
     };
   });
-  const { error } = await admin.from("rental_payments").insert(records);
+  // A month that already has rent scheduled is not added twice.
+  const existing = new Set((await rentPayments(admin, rental.id)).map((payment: any) => String(payment.due_date).slice(0, 10)));
+  const fresh = records.filter((record) => !existing.has(record.due_date));
+  if (fresh.length === 0) return true;
+  const { error } = await admin.from("rental_payments").insert(fresh);
   return !error;
 }
 

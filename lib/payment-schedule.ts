@@ -68,6 +68,7 @@ export async function generatePaymentSchedule({
   organisationId,
   rentalId,
   rentalRate,
+  depositAmount = 0,
   deliveryDate,
   endDate,
   billingPeriod,
@@ -155,6 +156,23 @@ export async function generatePaymentSchedule({
         }
       });
     }
+  }
+
+  // The deposit is due with the first rent. Collected at handover, it is marked paid there.
+  if (records.length > 0 && depositAmount > 0) {
+    records.unshift({
+      organization_id: organisationId,
+      rental_id: rentalId,
+      customer_id: rental.customer_id,
+      vehicle_id: rental.vehicle_id,
+      amount: depositAmount,
+      currency,
+      scheduled_date: normalizedDeliveryDate,
+      due_date: normalizedDeliveryDate,
+      status: "scheduled",
+      paid_at: null,
+      metadata: { type: "deposit", is_deposit: true, description: "Security deposit" }
+    });
   }
 
   if (records.length > 0) {

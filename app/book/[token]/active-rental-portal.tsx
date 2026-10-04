@@ -207,7 +207,7 @@ function ActionForm({
   const extensionQuote = extensionRates && extraDays > 0 ? quoteStay(extensionRates, extraDays) : null;
   if (type === "extension_request") {
     return (
-      <form action={(formData) => onSubmit(formData, `Extension request sent. ${organizationName} will confirm shortly.`)} className="mt-4 space-y-3">
+      <form action={(formData) => onSubmit(formData, `Request sent. ${organizationName} will confirm shortly.`)} className="mt-4 space-y-3">
         <input name="actionType" type="hidden" value="extension_request" />
         {openEndedOffer ? (
           <div className="grid grid-cols-2 gap-2 rounded-xl bg-[#f5f4f1] p-1 text-sm font-semibold">

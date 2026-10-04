@@ -37,7 +37,7 @@ export async function cancelBookingByCustomer(formData: FormData): Promise<Resul
   const { data: payments } = await admin.from("rental_payments").select("amount, status, voided, metadata").eq("rental_id", rental.id);
   const live = (payments || []).filter((payment: any) => !payment.voided);
   const paid = live.filter((payment: any) => payment.status === "paid").reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
-  const receiptWaiting = live.some((payment: any) => payment.status !== "paid" && receiptOf(payment));
+  const receiptWaiting = live.some((payment: any) => payment.status !== "paid" && receiptOf(payment.metadata));
 
   const now = new Date().toISOString();
   const { error: rentalError } = await admin.from("rentals").update({ status: "cancelled" }).eq("id", rental.id).in("status", ["booked", "draft"]);
@@ -47,6 +47,8 @@ export async function cancelBookingByCustomer(formData: FormData): Promise<Resul
       .from("booking_links")
       .update({ status: "cancelled", cancelled_at: now, booking_data: { ...(link.booking_data || {}), cancelled_by_customer: { at: now, reason: reason || null } } })
       .eq("rental_id", rental.id),
+    // Nothing more is owed on a cancelled booking.
+    admin.from("rental_payments").update({ status: "cancelled" }).eq("rental_id", rental.id).in("status", ["scheduled", "pending", "overdue"]),
     admin
       .from("vehicles")
       .update({ status: "available", availability_status: "available_now", current_customer_id: null, current_rental_id: null })

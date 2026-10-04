@@ -437,6 +437,18 @@ const phoneCountryOptions = [
   { flag: "🇮🇳", code: "IN", callingCode: "+91" }
 ];
 
+/** A saved number like "+66812345678" shown as its country code and the rest, so the code isn't shown twice. */
+function splitSavedPhone(value: unknown): { code: string; local: string } {
+  const raw = String(value || "").replace(/[\s\-().]/g, "");
+  if (!raw.startsWith("+")) return { code: "+66", local: raw };
+  const match = phoneCountrySvgOptions
+    .map((option) => option.callingCode)
+    .sort((a, b) => b.length - a.length)
+    .find((code) => raw.startsWith(code));
+  // An unlisted country: leave the full number in the box, where the server accepts it as written.
+  return match ? { code: match, local: raw.slice(match.length) } : { code: "+66", local: raw };
+}
+
 const phoneCountrySvgOptions = [
   { flagCode: "th", code: "TH", callingCode: "+66", name: "Thailand" },
   { flagCode: "gb", code: "GB", callingCode: "+44", name: "United Kingdom" },
@@ -525,7 +537,8 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
   const [originalAgreementUrl, setOriginalAgreementUrl] = useState<string | null>(detail.executedAgreementDownloads?.originalAgreementUrl || null);
   const [agreed, setAgreed] = useState(false);
   const [signature, setSignature] = useState("");
-  const [phoneCountryCode, setPhoneCountryCode] = useState("+66");
+  const savedPhone = splitSavedPhone(detail.customer?.phone);
+  const [phoneCountryCode, setPhoneCountryCode] = useState(savedPhone.code);
   const [emergencyPhoneCountryCode, setEmergencyPhoneCountryCode] = useState("+66");
   const [currentAddress, setCurrentAddress] = useState(String(detail.customer?.address || ""));
   const [contactChannelError, setContactChannelError] = useState("");
@@ -773,6 +786,8 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         setOriginalAgreementUrl((result as any).originalAgreementUrl || null);
         setExecutionCertificateUrl((result as any).executionCertificateUrl || null);
         setCompleted(true);
+        // The payments for this booking exist now; show them without a reload.
+        router.refresh();
         window.scrollTo({ top: 0, behavior: "smooth" });
       } catch (submitError) {
         setError(submitError instanceof Error ? submitError.message : "Unable to complete booking.");
@@ -835,7 +850,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             <span className="text-sm font-bold text-[var(--foreground-secondary)]">Phone</span>
             <div style={{ display: "flex", alignItems: "stretch", width: "100%", height: 42, position: "relative", marginTop: 8 }}>
               <PhoneCountrySelect name="phoneCountryCode" onChange={setPhoneCountryCode} value={phoneCountryCode} />
-              <input defaultValue={detail.customer?.phone || ""} name="phone" onClick={(e) => e.stopPropagation()} required style={{ ...fieldStyle, width: "auto", borderRadius: "0 8px 8px 0", flex: 1, minWidth: 0, borderLeft: "none", position: "relative", zIndex: 2 }} type="tel" />
+              <input defaultValue={savedPhone.local} name="phone" onClick={(e) => e.stopPropagation()} required style={{ ...fieldStyle, width: "auto", borderRadius: "0 8px 8px 0", flex: 1, minWidth: 0, borderLeft: "none", position: "relative", zIndex: 2 }} type="tel" />
             </div>
           </label>
           <label>

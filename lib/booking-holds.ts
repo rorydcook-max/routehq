@@ -58,6 +58,21 @@ export async function releaseExpiredHolds(admin: any, organizationId: string) {
   return (stale || []).length;
 }
 
+/** The same, for every business at once. Run by the daily job so holds end even when nobody opens a page. */
+export async function releaseExpiredHoldsEverywhere(admin: any) {
+  const { data: stale } = await admin
+    .from("booking_links")
+    .select("organization_id")
+    .in("status", OPEN_LINK_STATUSES)
+    .is("hold_released_at", null)
+    .not("hold_until", "is", null)
+    .lt("hold_until", new Date().toISOString());
+  const organizations = Array.from(new Set<string>((stale || []).map((row: any) => String(row.organization_id))));
+  let released = 0;
+  for (const organizationId of organizations) released += await releaseExpiredHolds(admin, organizationId).catch(() => 0);
+  return released;
+}
+
 /**
  * A customer comes back to a link whose hold ran out. Takes the vehicle again
  * if nothing else has been booked for those dates. Returns false when the

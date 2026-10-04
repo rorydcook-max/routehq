@@ -1,5 +1,6 @@
 "use server";
 
+import { completeRentalJobs, tellRentalCustomer } from "@/lib/customer-messages";
 import { revalidatePath } from "next/cache";
 import { niceDate } from "@/lib/nice-date";
 import { notifyOperator } from "@/lib/notify-operator";
@@ -97,13 +98,20 @@ export async function cancelBookingByCustomer(formData: FormData): Promise<Resul
           created_by: null,
           title: paid > 0 ? `Refund to decide - ${who} cancelled the ${vehicle} (${money} paid)` : `Receipt to check - ${who} cancelled the ${vehicle} after sending a payment receipt`,
           task_type: "admin",
+          action: paid > 0 ? "refund" : null,
           due_at: now
         })
       : Promise.resolve(null)
   ]);
   notifyOperator(rental.organization_id, `❌ Booking cancelled by the customer: ${who}, ${vehicle}, ${when}. The dates are free again.${settle}`, "operator_notification").catch(() => null);
 
+  await tellRentalCustomer(admin, rental.id, ({ firstName }) =>
+    `Hi ${firstName}, your booking for the ${vehicle} (${when}) is cancelled, as you asked.${paid > 0 ? ` We'll be in touch about the ${money} you paid.` : ""}`,
+    { withLink: false }
+  );
+
   revalidatePath("/");
+  revalidatePath("/tasks");
   revalidatePath("/bookings");
   revalidatePath("/calendar");
   revalidatePath(`/bookings/${rental.id}`);

@@ -1,9 +1,19 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getCurrentMembership } from "@/lib/auth/roles";
+import { tryAutoExtend } from "@/lib/auto-extension";
+import { completeRentalJobs, tellRentalCustomer } from "@/lib/customer-messages";
+import { niceDate } from "@/lib/nice-date";
 import { recordActivityEvent } from "@/lib/supabase/activity";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { DOUBLE_BOOKING_MESSAGE, isDoubleBookingError } from "@/lib/rental-conflicts";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+
+/**
+ * Answers to what customers ask from their booking page: extend, switch to
+ * monthly, confirm a return, report a problem, ask a question. Every answer
+ * closes the job it created on the to-do list and tells the customer on the
+ * chat they first used (see lib/customer-messages.ts).
+ */
 
 function requiredString(formData: FormData, key: string) {
   const value = String(formData.get(key) || "").trim();
@@ -15,151 +25,109 @@ function optionalString(formData: FormData, key: string) {
   return String(formData.get(key) || "").trim() || null;
 }
 
-async function currentUser(supabase: any) {
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("You must be signed in.");
-  return user;
-}
-
-async function getPortalAction(supabase: any, organizationId: string, actionId: string) {
-  const { data, error } = await supabase
-    .from("customer_portal_actions")
-    .select("*")
-    .eq("id", actionId)
-    .eq("organisation_id", organizationId)
-    .maybeSingle();
-  if (error || !data) throw new Error(error?.message || "Customer request not found.");
-  return data;
-}
-
-export async function approveExtensionRequest(formData: FormData) {
-  const supabase = (await createSupabaseServerClient()) as any;
-  const user = await currentUser(supabase);
-  const organizationId = requiredString(formData, "organizationId");
+/** The signed-in member, the request, and a client allowed to act on it. */
+async function load(formData: FormData) {
+  const membership = await getCurrentMembership();
+  if (!membership) throw new Error("You must be signed in.");
   const actionId = requiredString(formData, "actionId");
   const rentalId = requiredString(formData, "rentalId");
-  const newEndDate = requiredString(formData, "newEndDate");
-  const action = await getPortalAction(supabase, organizationId, actionId);
-  const content = { ...(action.content || {}), approved_end_date: newEndDate };
+  const admin = createSupabaseAdminClient() as any;
+  const { data: action } = await admin.from("customer_portal_actions").select("*").eq("id", actionId).eq("organisation_id", membership.organizationId).eq("rental_id", rentalId).maybeSingle();
+  if (!action) throw new Error("Customer request not found.");
+  return { membership, admin, action, actionId, rentalId, organizationId: membership.organizationId as string };
+}
 
-  // Extend first: if the car is booked by someone else on those dates the
-  // request stays open instead of being marked approved.
-  const { error: rentalError } = await supabase
-    .from("rentals")
-    .update({ end_date: newEndDate, status: "extended" })
-    .eq("id", rentalId)
-    .eq("organization_id", organizationId);
-  if (rentalError) {
-    throw new Error(isDoubleBookingError(rentalError) ? `Can't extend to that date. ${DOUBLE_BOOKING_MESSAGE}` : rentalError.message);
-  }
-
-  const { error: actionError } = await supabase
+async function resolve(admin: any, action: any, userId: string, content: Record<string, unknown>, status: "resolved" | "acknowledged" = "resolved") {
+  const { error } = await admin
     .from("customer_portal_actions")
-    .update({ status: "resolved", content, resolved_by: user.id, resolved_at: new Date().toISOString() })
-    .eq("id", actionId)
-    .eq("organisation_id", organizationId);
-  if (actionError) throw new Error(actionError.message);
+    .update({ status, content: { ...(action.content || {}), ...content }, resolved_by: userId, resolved_at: new Date().toISOString() })
+    .eq("id", action.id);
+  if (error) throw new Error(error.message);
+}
 
-  await recordActivityEvent(supabase, {
+function refresh(rentalId: string) {
+  revalidatePath(`/bookings/${rentalId}`);
+  revalidatePath("/tasks");
+  revalidatePath("/");
+  revalidatePath("/calendar");
+}
+
+/**
+ * Approves an extension, or a switch to monthly open-ended, that could not be
+ * applied automatically. Uses the same rules as the automatic path (priced from
+ * the rate card, payment created, no double booking) but skips the notice
+ * period: the owner is saying yes.
+ */
+export async function approveExtensionRequest(formData: FormData) {
+  const { membership, admin, action, actionId, rentalId, organizationId } = await load(formData);
+  const openEnded = String(formData.get("openEnded") || "") === "true";
+  const newEndDate = openEnded ? null : requiredString(formData, "newEndDate");
+
+  const outcome = await tryAutoExtend(admin, rentalId, newEndDate, { openEnded, byStaff: true });
+  if (!outcome.applied) throw new Error(`Can't approve this yet: ${outcome.reason}.`);
+
+  await resolve(admin, action, membership.userId, { outcome: "approved", approved_end_date: newEndDate, approved_open_ended: openEnded });
+  await completeRentalJobs(admin, rentalId, "request", "Approved", actionId);
+  await recordActivityEvent(admin, {
     organization_id: organizationId,
-    actor_id: user.id,
+    actor_id: membership.userId,
     entity_type: "rental",
     entity_id: rentalId,
     rental_id: rentalId,
     customer_id: action.customer_id,
     event_type: "extension_request_approved",
-    title: "Extension request approved",
-    detail: `Rental extended to ${newEndDate}.`,
-    metadata: { customer_portal_action_id: actionId, new_end_date: newEndDate }
-  });
-
-  revalidatePath(`/bookings/${rentalId}`);
-  revalidatePath("/");
-  revalidatePath("/calendar");
+    title: openEnded ? "Switch to monthly approved" : "Extension request approved",
+    detail: openEnded ? "Rental changed to monthly, open-ended." : `Rental extended to ${niceDate(newEndDate)}.`,
+    metadata: { customer_portal_action_id: actionId, new_end_date: newEndDate, open_ended: openEnded }
+  } as any).catch(() => null);
+  refresh(rentalId);
 }
 
 export async function declinePortalAction(formData: FormData) {
-  const supabase = (await createSupabaseServerClient()) as any;
-  const user = await currentUser(supabase);
-  const organizationId = requiredString(formData, "organizationId");
-  const actionId = requiredString(formData, "actionId");
-  const rentalId = requiredString(formData, "rentalId");
+  const { membership, admin, action, actionId, rentalId } = await load(formData);
   const note = optionalString(formData, "note");
-  const action = await getPortalAction(supabase, organizationId, actionId);
-
-  const { error } = await supabase
-    .from("customer_portal_actions")
-    .update({ status: "resolved", content: { ...(action.content || {}), operator_note: note, outcome: "declined" }, resolved_by: user.id, resolved_at: new Date().toISOString() })
-    .eq("id", actionId)
-    .eq("organisation_id", organizationId);
-
-  if (error) throw new Error(error.message);
-  revalidatePath(`/bookings/${rentalId}`);
+  await resolve(admin, action, membership.userId, { operator_note: note, outcome: "declined" });
+  await completeRentalJobs(admin, rentalId, "request", "Declined", actionId);
+  const openEnded = !!action.content?.open_ended;
+  await tellRentalCustomer(
+    admin,
+    rentalId,
+    ({ firstName, vehicle }) =>
+      `Hi ${firstName}, sorry, we can't ${openEnded ? `change your rental of the ${vehicle} to monthly with no end date` : `extend your rental of the ${vehicle}${action.content?.new_end_date ? ` to ${niceDate(action.content.new_end_date)}` : ""}`}.${note ? ` ${note}` : ""} Your return date stays as it is. Message us if you'd like to talk it through.`,
+    { sentBy: membership.userId }
+  );
+  refresh(rentalId);
 }
 
 export async function acknowledgePortalAction(formData: FormData) {
-  const supabase = (await createSupabaseServerClient()) as any;
-  await currentUser(supabase);
-  const organizationId = requiredString(formData, "organizationId");
-  const actionId = requiredString(formData, "actionId");
-  const rentalId = requiredString(formData, "rentalId");
-  const { error } = await supabase
-    .from("customer_portal_actions")
-    .update({ status: "acknowledged" })
-    .eq("id", actionId)
-    .eq("organisation_id", organizationId);
-  if (error) throw new Error(error.message);
-  revalidatePath(`/bookings/${rentalId}`);
-  revalidatePath("/calendar");
+  const { membership, admin, action, actionId, rentalId } = await load(formData);
+  await resolve(admin, action, membership.userId, { outcome: "acknowledged" }, "acknowledged");
+  await completeRentalJobs(admin, rentalId, "request", "Acknowledged", actionId);
+  const content = action.content || {};
+  await tellRentalCustomer(
+    admin,
+    rentalId,
+    ({ firstName, vehicle }) =>
+      `Hi ${firstName}, thanks. We've noted the return of the ${vehicle}${content.return_date ? ` on ${niceDate(content.return_date)}` : ""}${content.return_time ? ` at ${content.return_time}` : ""}${content.return_location ? `, ${content.return_location}` : ""}. See you then.`,
+    { sentBy: membership.userId }
+  );
+  refresh(rentalId);
 }
 
 export async function resolvePortalAction(formData: FormData) {
-  const supabase = (await createSupabaseServerClient()) as any;
-  const user = await currentUser(supabase);
-  const organizationId = requiredString(formData, "organizationId");
-  const actionId = requiredString(formData, "actionId");
-  const rentalId = requiredString(formData, "rentalId");
+  const { membership, admin, action, actionId, rentalId } = await load(formData);
   const notes = optionalString(formData, "notes");
-  const action = await getPortalAction(supabase, organizationId, actionId);
-  const { error } = await supabase
-    .from("customer_portal_actions")
-    .update({ status: "resolved", content: { ...(action.content || {}), resolution_notes: notes }, resolved_by: user.id, resolved_at: new Date().toISOString() })
-    .eq("id", actionId)
-    .eq("organisation_id", organizationId);
-  if (error) throw new Error(error.message);
-  revalidatePath(`/bookings/${rentalId}`);
+  await resolve(admin, action, membership.userId, { resolution_notes: notes });
+  await completeRentalJobs(admin, rentalId, "request", notes || "Resolved", actionId);
+  refresh(rentalId);
 }
 
+/** Sends the answer to the customer's question; if they have no chat, it is kept on the booking marked "not sent". */
 export async function replyToPortalQuestion(formData: FormData) {
-  const supabase = (await createSupabaseServerClient()) as any;
-  const user = await currentUser(supabase);
-  const organizationId = requiredString(formData, "organizationId");
-  const actionId = requiredString(formData, "actionId");
-  const rentalId = requiredString(formData, "rentalId");
-  const customerId = optionalString(formData, "customerId");
+  const { membership, admin, action, actionId, rentalId } = await load(formData);
   const reply = requiredString(formData, "reply");
-  const action = await getPortalAction(supabase, organizationId, actionId);
-
-  const [{ error: logError }, { error: actionError }] = await Promise.all([
-    supabase.from("communication_log").insert({
-      organisation_id: organizationId,
-      rental_id: rentalId,
-      customer_id: customerId || action.customer_id,
-      type: "operator_message",
-      direction: "outbound",
-      content: reply,
-      status: "sent",
-      created_by: user.id
-    }),
-    supabase
-      .from("customer_portal_actions")
-      .update({ status: "resolved", content: { ...(action.content || {}), reply }, resolved_by: user.id, resolved_at: new Date().toISOString() })
-      .eq("id", actionId)
-      .eq("organisation_id", organizationId)
-  ]);
-
-  if (logError || actionError) throw new Error(logError?.message || actionError?.message);
-  revalidatePath(`/bookings/${rentalId}`);
+  await resolve(admin, action, membership.userId, { reply });
+  await completeRentalJobs(admin, rentalId, "request", "Answered", actionId);
+  await tellRentalCustomer(admin, rentalId, ({ firstName }) => `Hi ${firstName}, ${reply}`, { sentBy: membership.userId });
+  refresh(rentalId);
 }

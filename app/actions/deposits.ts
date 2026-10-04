@@ -1,5 +1,7 @@
 "use server";
 
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { completeRentalJobs, tellRentalCustomer } from "@/lib/customer-messages";
 import { revalidatePath } from "next/cache";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -295,6 +297,12 @@ export async function returnDeposit(formData: FormData) {
     detail: `Deposit of ${money(returnAmount)} returned to customer.`,
     metadata: { transaction_id: transaction.id, amount: returnAmount, notes }
   });
+  {
+    const admin = createSupabaseAdminClient() as any;
+    await completeRentalJobs(admin, rentalId, "refund", `Deposit of ${money(returnAmount)} returned`);
+    await tellRentalCustomer(admin, rentalId, ({ firstName, money: baht }) => `Hi ${firstName}, we've returned ${baht(returnAmount)} of your deposit. Thank you.`, { sentBy: user.id, withLink: false });
+  }
+  revalidatePath("/tasks");
 
   revalidatePath("/");
   revalidatePath("/bookings");

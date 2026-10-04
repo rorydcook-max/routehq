@@ -35,7 +35,10 @@ export async function processCustomerPortalAction(supabase: any, actionId: strin
     vehicle_id: rental.vehicle_id || null,
     rental_id: action.rental_id,
     title_key: null,
-    created_by: null
+    created_by: null,
+    // Lets the to-do list offer "Answer" and lets the job close itself when the request is answered.
+    action: "request",
+    portal_action_id: action.id
   };
 
   let extension: ExtensionOutcome | null = null;
@@ -49,7 +52,8 @@ export async function processCustomerPortalAction(supabase: any, actionId: strin
         ...taskBase,
         title: `${content.open_ended ? "Request to switch to monthly, open-ended" : `Extension to ${content.new_end_date ? niceDate(content.new_end_date) : "a new date"}`} needs your answer - ${customerName} - ${vehicleLabel} (${extension.reason})`,
         task_type: "admin",
-        due_at: content.new_end_date || null
+        // Needs an answer now, not on the date they asked for.
+        due_at: new Date().toISOString()
       });
     }
   }

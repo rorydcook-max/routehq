@@ -328,13 +328,19 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
             Record payment
           </button>
         ) : null}
+        {/* A job with a next step of its own goes straight to it; doing that step closes the job. */}
+        {item.kind === "task" && !item.completedAt && item.rentalId && (item.action === "refund" || item.action === "request") ? (
+          <Link className="primary-action pressable min-h-9 px-3 text-xs" href={`/bookings/${item.rentalId}#${item.action === "refund" ? "refunds" : "customer-requests"}`}>
+            {item.action === "refund" ? "Record refund" : "Answer"}
+          </Link>
+        ) : null}
         {item.kind === "task" && !item.completedAt && !showNote ? (
           <>
             <form action={completeTask}>
               <input name="organizationId" type="hidden" value={organizationId} />
               <input name="taskId" type="hidden" value={item.id} />
-              <PendingButton className="primary-action min-h-9 px-3 text-xs" pendingLabel="Saving…" type="submit">
-                Mark done
+              <PendingButton className={`${item.action === "refund" || item.action === "request" ? "secondary-action" : "primary-action"} min-h-9 px-3 text-xs`} pendingLabel="Saving…" type="submit">
+                {item.action === "refund" ? "No refund" : "Mark done"}
               </PendingButton>
             </form>
             <button className="secondary-action pressable min-h-9 px-3 text-xs" onClick={() => setShowNote(true)} type="button">

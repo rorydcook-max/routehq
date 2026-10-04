@@ -557,6 +557,19 @@ export default async function BookingDetailPage({ params, searchParams }: { para
           </div>
         </Card>
 
+        {pendingPortalActions.length > 0 ? (
+          <div className="scroll-mt-4 rounded-xl border border-[#fde68a] bg-[#fffbeb] p-3" id="customer-requests">
+            <p className="text-sm font-semibold text-[#92400e]">
+              {customer?.full_name || "The customer"} is waiting for your answer
+            </p>
+            <div className="mt-3 space-y-3">
+              {pendingPortalActions.map((action: any) => (
+                <CustomerPortalActionCard action={action} customerId={customer?.id || null} key={action.id} organizationId={organization.id} rentalId={rental.id} />
+              ))}
+            </div>
+          </div>
+        ) : null}
+
         <div className="grid gap-3 md:grid-cols-4">
           <BookingMetricCard icon={<CalendarDays size={18} />} label="Dates">
             <div className="flex flex-wrap items-center gap-1 text-sm font-semibold leading-5 text-[var(--foreground)]">
@@ -827,7 +840,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 customerId={customer?.id || null}
                 entries={communicationTimeline || []}
                 organizationId={organization.id}
-                pendingActions={pendingPortalActions}
+                pendingActions={[]}
+                hiddenActionIds={pendingPortalActions.map((action: any) => action.id)}
                 rentalId={rental.id}
               />
             </Card>
@@ -872,6 +886,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   />
                 )}
                 <Info icon={CreditCard} label="Deposit" value={formatDepositSummary(rental)} />
+                <div className="scroll-mt-4" id="refunds" />
                 <RefundDepositPanel
                   rentalId={rental.id}
                   organizationId={organization.id}
@@ -1308,7 +1323,7 @@ function relativeTime(value: string | null | undefined) {
 
 function communicationTypeBadge(type: string) {
   const labels: Record<string, { label: string; className: string }> = {
-    automated_reminder: { label: "Auto reminder", className: "border-[#bfdbfe] bg-[#eff6ff] text-[#2563eb]" },
+    automated_reminder: { label: "Message to customer", className: "border-[#bfdbfe] bg-[#eff6ff] text-[#2563eb]" },
     manual_note: { label: "Note", className: "border-[var(--border)] bg-[#fbfaf8] text-[var(--foreground-secondary)]" },
     customer_portal_action: { label: "Customer action", className: "border-[#bfe0db] bg-[var(--primary-light)] text-[var(--primary)]" },
     booking_link_activity: { label: "Booking link", className: "border-[#ddd6fe] bg-[#f5f3ff] text-[#7c3aed]" },
@@ -1343,24 +1358,29 @@ function channelIcon(channel?: string | null) {
 
 function communicationStatusBadge(entry: any) {
   if (entry.timeline_type !== "automated_reminder" && entry.type !== "automated_reminder") return null;
-  if (entry.status === "failed") return <Badge tone="red">Failed</Badge>;
+  if (entry.status === "failed") return <Badge tone="red">Not delivered</Badge>;
+  // No chat with this customer yet: the text is here to copy and send yourself.
+  if (entry.status === "pending") return <Badge tone="amber">Not sent: no chat with this customer</Badge>;
   return <Badge tone="green">Sent</Badge>;
 }
 
 function CommunicationTimeline({
   entries,
   pendingActions,
+  hiddenActionIds = [],
   organizationId,
   rentalId,
   customerId
 }: {
   entries: any[];
   pendingActions: any[];
+  /** Requests shown at the top of the page, so not repeated in the history. */
+  hiddenActionIds?: string[];
   organizationId: string;
   rentalId: string;
   customerId: string | null;
 }) {
-  const pendingIds = new Set((pendingActions || []).map((action: any) => action.id));
+  const pendingIds = new Set([...(pendingActions || []).map((action: any) => action.id), ...hiddenActionIds]);
   const historyEntries = (entries || []).filter((entry: any) => !(entry.source === "customer_portal_action" && pendingIds.has(entry.id)));
   const hasHistory = pendingActions.length > 0 || historyEntries.length > 0;
 
@@ -1425,12 +1445,20 @@ function CustomerPortalActionCard({ action, organizationId, rentalId, customerId
               <input name="organizationId" type="hidden" value={organizationId} />
               <input name="actionId" type="hidden" value={action.id} />
               <input name="rentalId" type="hidden" value={rentalId} />
-              <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
-                Approved end date
-                <input className="mt-2 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm" defaultValue={content.new_end_date || ""} name="newEndDate" required type="date" />
-              </label>
+              {content.open_ended ? (
+                <>
+                  <input name="openEnded" type="hidden" value="true" />
+                  <p className="text-sm text-[var(--foreground-secondary)]">Changes the rental to monthly with no end date and schedules the monthly rent. The customer is told.</p>
+                </>
+              ) : (
+                <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
+                  Approved end date
+                  <input className="mt-2 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm" defaultValue={content.new_end_date || ""} name="newEndDate" required type="date" />
+                  <span className="mt-1 block text-xs font-normal text-[var(--muted)]">The extra days are priced from your rates and added as a payment. The customer is told.</span>
+                </label>
+              )}
               <PendingButton className="primary-action pressable mt-3 w-full justify-center px-3 py-2" pendingLabel="Approving..." type="submit">
-                Approve extension
+                {content.open_ended ? "Approve monthly, open-ended" : "Approve extension"}
               </PendingButton>
             </form>
             <form action={declinePortalAction} className="rounded-lg border border-[#fecdd3] bg-[#fff1f2] p-3">
@@ -1438,8 +1466,8 @@ function CustomerPortalActionCard({ action, organizationId, rentalId, customerId
               <input name="actionId" type="hidden" value={action.id} />
               <input name="rentalId" type="hidden" value={rentalId} />
               <label className="block text-sm font-bold text-[#9f1239]">
-                Decline note
-                <input className="mt-2 w-full rounded-lg border border-[#fecdd3] bg-white px-3 py-2 text-sm" name="note" placeholder="Optional" />
+                Reason for the customer
+                <input className="mt-2 w-full rounded-lg border border-[#fecdd3] bg-white px-3 py-2 text-sm" name="note" placeholder="Optional. Sent to the customer with the answer." />
               </label>
               <PendingButton className="pressable mt-3 w-full rounded-lg border border-[#fecdd3] bg-white px-3 py-2 text-sm font-semibold text-[#be123c]" pendingLabel="Declining..." type="submit">
                 Decline
@@ -1484,7 +1512,7 @@ function CustomerPortalActionCard({ action, organizationId, rentalId, customerId
 
 function portalActionSummary(action: any) {
   const content = action.content || {};
-  if (action.action_type === "extension_request") return `${content.open_ended ? "Asked to keep the vehicle with no end date" : `Requested new return date: ${content.new_end_date || "not specified"}`}${content.note ? ` - ${content.note}` : ""}`;
+  if (action.action_type === "extension_request") return `${content.open_ended ? "Asked to switch to monthly, open-ended" : `Requested new return date: ${content.new_end_date || "not specified"}`}${content.note ? ` - ${content.note}` : ""}`;
   if (action.action_type === "return_confirmation") return `Return ${content.return_date || ""} ${content.return_time || ""}${content.return_location ? ` at ${content.return_location}` : ""}`.trim();
   if (action.action_type === "problem_report") return `${content.category || "Problem"}: ${content.description || "No description"}`;
   if (action.action_type === "question") return content.question || "Customer question";

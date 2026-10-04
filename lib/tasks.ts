@@ -20,6 +20,8 @@ export type TaskListItem = {
   customerName: string | null;
   vehicleId: string | null;
   rentalId: string | null;
+  /** What the job is about, when it has a next step of its own: "refund" or "request". */
+  action?: string | null;
   rentalPaymentId: string | null;
   amount: number | null;
   /** A receipt the customer sent for this payment, waiting to be checked. */
@@ -66,7 +68,7 @@ export async function getTaskList(organizationId: string): Promise<TaskListItem[
   const [tasksResult, paymentsResult] = await Promise.all([
     supabase
       .from("tasks")
-      .select("id, title, task_type, due_at, completed_at, vehicle_id, rental_id, rental_payment_id")
+      .select("id, title, task_type, due_at, completed_at, vehicle_id, rental_id, rental_payment_id, action")
       .eq("organization_id", organizationId)
       .is("deleted_at", null)
       .neq("task_type", "payment_reminder")
@@ -130,6 +132,7 @@ export async function getTaskList(organizationId: string): Promise<TaskListItem[
       completedAt: row.completed_at,
       vehicleId: row.vehicle_id,
       rentalId: row.rental_id,
+      action: row.action || null,
       rentalPaymentId: row.rental_payment_id || null,
       vehicleLabel: row.vehicle_id ? vehicleLabels.get(row.vehicle_id) || null : null,
       rentalLabel: rental?.label || null,

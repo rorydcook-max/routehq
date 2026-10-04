@@ -1,5 +1,6 @@
 "use server";
 
+import { completeRentalJobs, tellRentalCustomer } from "@/lib/customer-messages";
 import { businessToday } from "@/lib/business-time";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -1017,6 +1018,13 @@ export async function sendPaymentReminder(
     ownerName: org.name,
     ownerPhone: ""
   });
+
+  // The chat the customer first wrote to the business on comes first.
+  const viaChat = await tellRentalCustomer(admin, rentalId, ({ firstName, money }) =>
+    `Hi ${firstName}, a reminder that ${money(balanceDue)} for the ${vLabel} ${firstDue && firstDue < today ? "was" : "is"} due on ${dueDateLabel}. You can pay and send your receipt from your booking page. Thank you.`,
+    { sentBy: user.id }
+  );
+  if (viaChat.sent) return { success: true, message: `Reminder sent on ${viaChat.via}` };
 
   let lineSent = false;
   if (customer?.line_id) {

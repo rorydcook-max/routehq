@@ -3,7 +3,7 @@
 import { quoteStay, type Rates } from "@/lib/rental-estimate";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { adjustRental } from "@/app/actions/bookings";
-import { cancelRentalAmendment, createRentalAmendment, getRentalAmendmentContext, type AmendmentSummary } from "@/app/actions/amendments";
+import { cancelRentalAmendment, createRentalAmendment, getRentalAmendmentContext, makeRentalOpenEnded, type AmendmentSummary } from "@/app/actions/amendments";
 
 type AdjustmentType = "extension" | "early_return" | "terms";
 
@@ -278,6 +278,22 @@ export function RentalAdjustmentModal({
     });
   }
 
+  function makeOpenEnded() {
+    setMessage("");
+    startTransition(async () => {
+      const result = await makeRentalOpenEnded(rentalId).catch(() => ({ ok: false as const, error: "Unable to change the rental." }));
+      if (!result.ok) {
+        setMessage(result.error);
+        return;
+      }
+      setMessage("Now monthly, open-ended");
+      setTimeout(() => {
+        onSuccess?.();
+        onClose();
+      }, 1000);
+    });
+  }
+
   const tomorrow = useMemo(() => isoDate(tomorrowDate()), []);
   const startDate = dateInputValue(currentStartDate);
   const originalEndDate = dateInputValue(currentEndDate);
@@ -435,6 +451,16 @@ export function RentalAdjustmentModal({
                 New return date
                 <input className="mt-1 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" min={tomorrow} onChange={(event) => setExtensionEndDate(event.target.value)} type="date" value={extensionEndDate} />
               </label>
+              {originalEndDate && (context?.rates?.monthlyRate || 0) > 0 ? (
+                <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[var(--border)] bg-white p-3 text-[13px] text-[var(--foreground-secondary)]">
+                  <span>
+                    No return date in mind? Make it <span className="font-semibold text-[var(--foreground)]">monthly, open-ended</span> at {money(context?.rates?.monthlyRate || 0)} a month. Applies now and the customer is told.
+                  </span>
+                  <button className="rounded-md border border-[var(--border)] bg-white px-3 py-1.5 text-[12px] font-semibold text-[var(--primary)] disabled:opacity-60" disabled={isPending} onClick={makeOpenEnded} type="button">
+                    Make it monthly
+                  </button>
+                </div>
+              ) : null}
 
               <div className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3 text-sm text-[var(--foreground-secondary)]">
                 Extension: <span className="font-mono-data font-bold">{originalEndDate || "Open"}</span> to <span className="font-mono-data font-bold">{extensionEndDate}</span> ({extensionDays} days)

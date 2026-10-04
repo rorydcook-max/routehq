@@ -23,6 +23,8 @@ import { InviteForm } from "@/app/invite/invite-form";
 import { PaymentMethodsForm } from "@/app/settings/payment-methods-form";
 import { PublicBookingPanel } from "@/app/settings/public-booking-panel";
 import { BookingRulesPanel } from "@/app/settings/booking-rules-panel";
+import { CustomerMessagesPanel } from "@/app/settings/customer-messages-panel";
+import { customerMessagesOn } from "@/lib/customer-messages";
 import { bookingRules } from "@/lib/booking-rules";
 import { publicBookingSettings } from "@/lib/public-catalog";
 import { TravelPolicyForm } from "@/app/settings/travel-policy-form";
@@ -335,6 +337,19 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             publicUrl={webhookReachable()}
           />
         </Card>
+      ) : null}
+      {tab === "messaging" ? (
+        <div className="mt-4">
+          <Card>
+            <SectionHeader eyebrow="Messaging" title="Messages to customers" />
+            <div className="mt-3">
+              <CustomerMessagesPanel
+                enabled={customerMessagesOn(organization.settings)}
+                hasChannel={((messagingChannels || []) as any[]).some((channel) => channel.status !== "disconnected")}
+              />
+            </div>
+          </Card>
+        </div>
       ) : null}
       {tab === "rentals" ? (
         <div className="mt-4">

@@ -497,9 +497,6 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               <p className="font-mono-data mt-1 text-xs font-bold text-[var(--muted)]">{vehicle?.registration_number}</p>
             </div>
             <div className="flex flex-wrap items-center gap-2 lg:max-w-[560px] lg:justify-end">
-              <ActionButton href={`/bookings/${rental.id}/edit` as Route} tone="light">
-                Edit booking
-              </ActionButton>
               {rental.status === "booked" ? (
                 <ActionButton href={`/inspections/delivery/${rental.id}` as Route}>
                   Start delivery
@@ -509,17 +506,6 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 <ActionButton href={`/inspections/return/${rental.id}` as Route}>
                   Start return
                 </ActionButton>
-              ) : null}
-              {["active", "due_soon", "overdue", "extended"].includes(displayStatus) ? (
-                <ChangeVehicleButton
-                  rentalId={rental.id}
-                  organizationId={organization.id}
-                  currentVehicleId={String(rental.vehicle_id || vehicle?.id || "")}
-                  currentVehicleLabel={vehicleTitle(vehicle)}
-                  currentRate={Number(rental.rental_rate || 0)}
-                  currency={rental.currency || "THB"}
-                  availableVehicles={(availableVehicles || []).filter((v: any) => v.id !== (rental.vehicle_id || vehicle?.id))}
-                />
               ) : null}
               {canAdjustRental ? (
                 <RentalAdjustmentButton
@@ -540,7 +526,27 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   vehicleId={String(rental.vehicle_id || vehicle?.id || "")}
                   customerName={customer?.full_name || null}
                 />
-              ) : !["completed"].includes(rental.status) ? (
+              ) : null}
+              <details className="text-right">
+                <summary className="pressable inline-flex min-h-9 cursor-pointer list-none items-center justify-center gap-1 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold text-[var(--foreground-secondary)] shadow-sm">
+                  More
+                </summary>
+                <div className="mt-2 flex flex-wrap justify-end gap-2">
+              <ActionButton href={`/bookings/${rental.id}/edit` as Route} tone="light">
+                Edit booking
+              </ActionButton>
+              {["active", "due_soon", "overdue", "extended"].includes(displayStatus) ? (
+                <ChangeVehicleButton
+                  rentalId={rental.id}
+                  organizationId={organization.id}
+                  currentVehicleId={String(rental.vehicle_id || vehicle?.id || "")}
+                  currentVehicleLabel={vehicleTitle(vehicle)}
+                  currentRate={Number(rental.rental_rate || 0)}
+                  currency={rental.currency || "THB"}
+                  availableVehicles={(availableVehicles || []).filter((v: any) => v.id !== (rental.vehicle_id || vehicle?.id))}
+                />
+              ) : null}
+              {!["completed", "cancelled"].includes(rental.status) ? (
                 <CancelBookingButton
                   rentalId={rental.id}
                   organizationId={organization.id}
@@ -553,6 +559,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   customerName={customer?.full_name || null}
                 />
               ) : null}
+                </div>
+              </details>
             </div>
           </div>
         </Card>
@@ -666,7 +674,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               {/* A cancelled booking's link only tells the customer it was cancelled: nothing to send. */}
               {isCancelled ? null : (
                 <div className="mt-3">
-                  <BookingShareActions currentUrl={bookingLink?.public_url || null} organizationId={organization.id} rentalId={rental.id} />
+                  <BookingShareActions currentUrl={bookingLink?.public_url || null} formDone={String(bookingLink?.status || "") === "completed"} organizationId={organization.id} rentalId={rental.id} />
                 </div>
               )}
             </Card>
@@ -835,7 +843,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             </Card>
 
             <Card>
-              <SectionHeader eyebrow="Communication" title="Messages and customer portal activity" />
+              <SectionHeader eyebrow="Communication" title="Messages and customer activity" />
               <CommunicationTimeline
                 customerId={customer?.id || null}
                 entries={communicationTimeline || []}
@@ -847,7 +855,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             </Card>
 
             <Card>
-              <SectionHeader eyebrow="Activity" title="Booking timeline" />
+              <details>
+              <summary className="cursor-pointer text-sm font-semibold text-[var(--foreground)]">Full history · {activityEvents.length} {activityEvents.length === 1 ? "entry" : "entries"}</summary>
               <div className="mt-3 space-y-3">
                 {activityEvents.length === 0 ? (
                   <SectionEmpty>No activity recorded yet.</SectionEmpty>
@@ -861,6 +870,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   ))
                 )}
               </div>
+              </details>
             </Card>
           </div>
 
@@ -935,7 +945,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               <div className="card-section space-y-3">
                 <div className="grid gap-2 sm:grid-cols-3">
                   <div className="rounded-lg border border-[var(--border)] bg-white p-3">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Scheduled</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--muted)]">{rental.end_date ? "Scheduled" : "Scheduled, next 12 months"}</p>
                     <p className="font-mono-data mt-1 text-lg font-semibold text-[var(--foreground)]">{money(totalRentalValue, rental.currency)}</p>
                   </div>
                   <div className="rounded-lg border border-[var(--border)] bg-white p-3">

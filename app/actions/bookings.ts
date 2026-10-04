@@ -1226,7 +1226,7 @@ export async function updateBooking(formData: FormData) {
   compare("Customer", rental.customer_id || null, customerId || null);
   compare("Start date", dateOnly(rental.start_date), startDate);
   compare("End date", dateOnly(rental.end_date), endDate);
-  compare("Open ended", Boolean(rental.is_indefinite), openEnded);
+  compare("Open-ended", Boolean(rental.is_indefinite), openEnded);
   compare("Billing period", rental.pricing_model, pricingModel);
   compare("Rental rate", Number(rental.rental_rate || 0), rentalRate);
   compare("Deposit amount", Number(rental.deposit_amount || 0), depositAmount);
@@ -1240,7 +1240,7 @@ export async function updateBooking(formData: FormData) {
 
   // Once the customer has signed, these are terms of the agreement. Changing
   // them here would leave the signed agreement saying something else.
-  const signedTerms = ["Customer", "Start date", "End date", "Open ended", "Billing period", "Rental rate", "Deposit amount", "Currency", "Included items", "Special conditions"];
+  const signedTerms = ["Customer", "Start date", "End date", "Open-ended", "Billing period", "Rental rate", "Deposit amount", "Currency", "Included items", "Special conditions"];
   const changedTerms = changes.filter((change) => signedTerms.includes(change.label)).map((change) => change.label.toLowerCase());
   if (changedTerms.length && (await hasSignedAgreement(supabase, rental.organization_id, rental.id))) {
     // Returned, not thrown: production hides thrown server-action messages.

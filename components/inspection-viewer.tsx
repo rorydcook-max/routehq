@@ -95,12 +95,13 @@ export async function InspectionViewer({ inspection }: { inspection: any }) {
       ) : null}
 
       {photos.length > 0 ? (
-        <div className="mt-4">
-          <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-[var(--foreground)]">
+        <details className="mt-4">
+          <summary className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-[var(--foreground)]">
             <Camera size={17} className="text-[var(--primary)]" />
-            Photos
-          </div>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {photos.length} {photos.length === 1 ? "photo" : "photos"}
+            <span className="font-normal text-[var(--muted)]">Show</span>
+          </summary>
+          <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
             {photos.map((photo: any) => {
               const url = photoUrl(photo);
               return (
@@ -111,7 +112,7 @@ export async function InspectionViewer({ inspection }: { inspection: any }) {
               );
             })}
           </div>
-        </div>
+        </details>
       ) : null}
 
       <div className="mt-4">

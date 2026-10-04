@@ -1,6 +1,8 @@
 "use server";
 
 import { rentalRateCard, type Rates } from "@/lib/rental-estimate";
+import { tryAutoExtend } from "@/lib/auto-extension";
+import { getCurrentMembership } from "@/lib/auth/roles";
 import { randomUUID } from "node:crypto";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
@@ -636,4 +638,25 @@ async function applySignedAmendment(admin: any, amendmentId: string) {
     })
     .then(() => undefined, () => undefined);
   revalidatePath(`/bookings/${rental.id}`);
+}
+
+/**
+ * Staff change a rental with a return date to monthly, open-ended. Same rules
+ * as when a customer asks from their page: monthly rate, a year of rent
+ * scheduled from when the paid-for period ends, nothing booked after it. The
+ * customer is told.
+ */
+export async function makeRentalOpenEnded(rentalId: string): Promise<{ ok: true; monthlyRate: number; firstDue: string } | { ok: false; error: string }> {
+  const membership = await getCurrentMembership();
+  if (!membership) return { ok: false, error: "Please sign in again." };
+  const admin = createSupabaseAdminClient() as any;
+  const { data: rental } = await admin.from("rentals").select("id").eq("id", rentalId).eq("organization_id", membership.organizationId).is("deleted_at", null).maybeSingle();
+  if (!rental) return { ok: false, error: "Booking not found." };
+  const outcome = await tryAutoExtend(admin, rentalId, null, { openEnded: true, byStaff: true });
+  if (!outcome.applied) return { ok: false, error: `Can't make this monthly yet: ${outcome.reason}.` };
+  revalidatePath(`/bookings/${rentalId}`);
+  revalidatePath("/bookings");
+  revalidatePath("/calendar");
+  revalidatePath("/");
+  return { ok: true, monthlyRate: outcome.amount, firstDue: outcome.dueDate };
 }

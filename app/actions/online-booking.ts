@@ -200,6 +200,21 @@ export async function savePublicBookingSettings(input: { enabled: boolean; holdH
   return { ok: true };
 }
 
+/** Turns the automatic messages to customers on or off (owner only). */
+export async function saveCustomerMessages(enabled: boolean): Promise<Result> {
+  const membership = await getCurrentMembership();
+  if (!membership) return { ok: false, error: "Please sign in again." };
+  if (membership.role !== "owner") return { ok: false, error: OWNER_ONLY_MESSAGE };
+  const admin = createSupabaseAdminClient() as any;
+  const { data: organization } = await admin.from("organizations").select("settings").eq("id", membership.organizationId).maybeSingle();
+  if (!organization) return { ok: false, error: "Business not found." };
+  const settings = organization.settings && typeof organization.settings === "object" ? organization.settings : {};
+  const { error } = await admin.from("organizations").update({ settings: { ...settings, customer_messages: { enabled: !!enabled } } }).eq("id", membership.organizationId);
+  if (error) return { ok: false, error: "Couldn't save. Please try again." };
+  revalidatePath("/settings");
+  return { ok: true };
+}
+
 /** Holds and notice periods for the business (owner only). */
 export async function saveBookingRules(input: BookingRules): Promise<Result> {
   const membership = await getCurrentMembership();

@@ -40,6 +40,29 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
     });
   }, [documents, ownerFilter, search]);
 
+  // One handover or return is one row, however many photos it has.
+  type Row = { kind: "file"; document: DocumentListItem } | { kind: "photos"; key: string; documents: DocumentListItem[] };
+  const rows = useMemo(() => {
+    const result: Row[] = [];
+    const groups = new Map<string, DocumentListItem[]>();
+    for (const document of filtered) {
+      if (document.ownerType !== "inspection") {
+        result.push({ kind: "file", document });
+        continue;
+      }
+      const key = `${document.ownerLabel}|${document.href || ""}`;
+      const existing = groups.get(key);
+      if (existing) {
+        existing.push(document);
+      } else {
+        const documents = [document];
+        groups.set(key, documents);
+        result.push({ kind: "photos", key, documents });
+      }
+    }
+    return result;
+  }, [filtered]);
+
   return (
     <div className="space-y-4">
       <div className="content-section">
@@ -74,7 +97,41 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
         </div>
       ) : (
         <div className="space-y-3">
-          {filtered.map((document) => (
+          {rows.map((row) => {
+            if (row.kind === "photos") {
+              const first = row.documents[0];
+              return (
+                <div className="content-section" key={row.key}>
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="font-semibold text-[var(--foreground)]">
+                        {row.documents.length} inspection {row.documents.length === 1 ? "photo" : "photos"}
+                      </p>
+                      <p className="text-sm text-[var(--muted)]">
+                        {first.ownerLabel} · {formatDate(first.createdAt)}
+                      </p>
+                    </div>
+                    {first.href ? (
+                      <Link className="secondary-action pressable" href={first.href as any}>
+                        Open record
+                      </Link>
+                    ) : null}
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {row.documents.map((document) =>
+                      document.signedUrl ? (
+                        <a href={document.signedUrl} key={document.id} rel="noreferrer" target="_blank" title={document.category.replace(/_/g, " ")}>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img alt={document.category.replace(/_/g, " ")} className="h-16 w-24 rounded-lg border border-[var(--border)] bg-[#fbfaf8] object-cover" loading="lazy" src={document.signedUrl} />
+                        </a>
+                      ) : null
+                    )}
+                  </div>
+                </div>
+              );
+            }
+            const document = row.document;
+            return (
             <div className="content-section flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" key={document.id}>
               <div className="flex items-start gap-3">
                 {document.mimeType?.startsWith("image/") && document.signedUrl ? (
@@ -113,7 +170,8 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
                 ) : null}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

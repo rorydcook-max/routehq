@@ -56,11 +56,6 @@ export function RentalDocumentsCard({ documents }: { documents: BookingRentalDoc
               ) : (
                 <p className="text-sm text-[var(--muted)]">Not signed yet.</p>
               )}
-              {document.contentHash ? (
-                <p className="break-all font-mono text-[11px] text-[var(--muted)]" title="SHA-256 of the signed content">
-                  SHA-256 {document.contentHash}
-                </p>
-              ) : null}
               {document.pdfUrl || document.certificateUrl ? (
                 <div className="flex flex-wrap gap-2">
                   {document.pdfUrl ? (

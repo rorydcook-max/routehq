@@ -22,7 +22,8 @@ function lastDayOfMonth(year: number, month: number) {
 }
 
 function money(value: number) {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "THB", maximumFractionDigits: 0 }).format(value);
+  // The same ฿9,000 as everywhere else, not "THB 9,000".
+  return `฿${Math.round(value).toLocaleString("en-US")}`;
 }
 
 /**
@@ -71,8 +72,8 @@ export async function getCalendarEvents(organizationId: string, year: number, mo
       events.push({
         id: `rental-start-${rental.id}`,
         date: start,
-        title: `${notDelivered && start < today ? "Delivery overdue" : "Delivery"}: ${label}${customer}`,
-        tone: notDelivered && start < today ? "red" : "blue",
+        title: `${notDelivered && start < today ? "Handover overdue" : notDelivered ? "Handover" : "Handed over"}: ${label}${customer}`,
+        tone: notDelivered && start < today ? "red" : notDelivered ? "blue" : "green",
         href: `/bookings/${rental.id}`,
         type: "rental_start"
       });

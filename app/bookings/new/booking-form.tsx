@@ -788,7 +788,7 @@ export function BookingForm({
               onChange={(event) => setOpenEnded(event.target.checked)}
               type="checkbox"
             />
-            <span>Open ended / long term</span>
+            <span>Open-ended / long term</span>
           </label>
           {dateConflict ? (
             <p className="mt-3 rounded-lg border border-[#fecaca] bg-[#fff1f2] p-3 text-sm font-bold text-[#be123c]" role="alert">
@@ -1103,7 +1103,7 @@ export function BookingForm({
             />
             <SummaryRow
               label="Rental"
-              value={`${longDay(startDate)} – ${openEnded ? "open ended" : longDay(endDate)} · ${money(rentalRate, currency)} / ${periodLabel}`}
+              value={`${longDay(startDate)} – ${openEnded ? "open-ended" : longDay(endDate)} · ${money(rentalRate, currency)} / ${periodLabel}`}
             />
             {upfrontEnabled && upfrontPeriods > 0 ? (
               <SummaryRow label="Upfront" mono value={`${upfrontPeriods} ${periodLabel}${upfrontPeriods !== 1 ? "s" : ""} × ${money(upfrontRate, currency)} = ${money(upfrontPeriods * upfrontRate, currency)}`} />

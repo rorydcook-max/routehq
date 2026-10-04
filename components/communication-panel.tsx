@@ -64,7 +64,7 @@ export function CommunicationPanel({
 
   const channels = useMemo(() => buildChannels(customer), [customer]);
   const returnTone = returnDateTone(booking.end_date);
-  const returnLabel = booking.end_date ? formatDate(booking.end_date) : "Open ended";
+  const returnLabel = booking.end_date ? formatDate(booking.end_date) : "Open-ended";
   const outstanding = Number(booking.outstanding_balance || 0);
   const depositHeld = Number(booking.deposit_held || 0);
   const preferred = customer.preferred_contact_method;
@@ -343,5 +343,7 @@ function statusTone(status?: string | null): "neutral" | "green" | "amber" | "re
 }
 
 function formatStatus(status?: string | null) {
-  return status ? status.replace(/_/g, " ") : "No status";
+  // The words owners see everywhere else, not the database's.
+  const labels: Record<string, string> = { booked: "Booked", active: "On rent", due_soon: "Due back soon", overdue: "Late return", extended: "Extended", completed: "Completed", cancelled: "Cancelled", draft: "Not confirmed" };
+  return status ? labels[status] || status.replace(/_/g, " ") : "No status";
 }

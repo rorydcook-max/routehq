@@ -120,7 +120,7 @@ function rentalTimingLabel(booking: any) {
     if (days === 0) return "Starts today";
     return `Handover overdue by ${plural(-days, "day")}`;
   }
-  if (!booking.end_date) return "Open ended";
+  if (!booking.end_date) return "Open-ended";
   const days = daysFromToday(booking.end_date);
   if (days < 0) return `Return ${plural(-days, "day")} late`;
   if (days === 0) return "Due back today";

@@ -111,8 +111,9 @@ export function Catalog({
         </div>
         <label className="mt-3 flex min-h-11 cursor-pointer items-center gap-2 text-sm text-[var(--foreground)]">
           <input checked={longTerm} className="h-4 w-4" onChange={(event) => setLongTerm(event.target.checked)} type="checkbox" />
-          Long term, no fixed return date yet
+          No end date: monthly rate, renews each month
         </label>
+        {longTerm ? <p className="mt-1 text-xs leading-5 text-[var(--muted)]">Keep the vehicle for as long as you like and pay month by month. Untick to choose a return date and see daily or weekly prices.</p> : null}
       </section>
 
       <p className="px-1 text-sm font-semibold text-[var(--foreground-secondary)]">
@@ -129,7 +130,7 @@ export function Catalog({
           const estimate = days ? estimateRental(vehicle, days) : null;
           // A monthly-only vehicle can't be booked for a weekend.
           const bookable = !!planFor(vehicle, days);
-          const tooShort = datesReady && free && !bookable ? minimumStay(vehicle) : null;
+          const tooShort = datesReady && free && !bookable ? (longTerm ? "Choose a return date to book this one: it has no monthly rate" : minimumStay(vehicle)) : null;
           const otherRates = [
             vehicle.dailyRate > 0 && headline?.per !== "day" ? `${money(vehicle.dailyRate)} / day` : null,
             vehicle.weeklyRate > 0 && headline?.per !== "week" ? `${money(vehicle.weeklyRate)} / week` : null
@@ -165,7 +166,8 @@ export function Catalog({
                       About {money(estimate)} for {days} {days === 1 ? "day" : "days"}
                     </p>
                   ) : null}
-                  {tooShort ? <p className="mt-1 text-sm font-semibold text-[#b45309]">{tooShort} for this vehicle</p> : null}
+                  {tooShort ? <p className="mt-1 text-sm font-semibold text-[#b45309]">{longTerm ? tooShort : `${tooShort} for this vehicle`}</p> : null}
+                  {free && longTerm && bookable && vehicle.monthlyRate > 0 ? <p className="mt-1 text-sm text-[var(--primary)]">{money(vehicle.monthlyRate)} each month, no end date</p> : null}
                   {!free ? (
                     <p className="mt-1 text-sm font-semibold text-[#b45309]">
                       {freeFrom ? `Taken for these dates · free from ${shortDate(freeFrom)}` : openEndedClash ? "On a long-term rental" : "Taken for these dates"}

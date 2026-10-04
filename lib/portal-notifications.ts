@@ -7,7 +7,7 @@ function actionLabel(type: string) {
 
 function contentText(content: any) {
   if (!content || typeof content !== "object") return "";
-  return content.description || content.question || content.note || content.return_location || content.new_end_date || "";
+  return content.description || content.question || content.note || content.return_location || content.new_end_date || (content.open_ended ? "Keep the vehicle with no end date" : "");
 }
 
 export async function processCustomerPortalAction(supabase: any, actionId: string) {
@@ -40,13 +40,13 @@ export async function processCustomerPortalAction(supabase: any, actionId: strin
   let extension: ExtensionOutcome | null = null;
   if (action.action_type === "extension_request") {
     // Applied on the spot when nothing is in the way; otherwise it becomes a job for the team.
-    extension = await tryAutoExtend(supabase, action.rental_id, content.new_end_date).catch(() => ({ applied: false as const, reason: "it could not be applied automatically" }));
+    extension = await tryAutoExtend(supabase, action.rental_id, content.new_end_date, { openEnded: !!content.open_ended }).catch(() => ({ applied: false as const, reason: "it could not be applied automatically" }));
     if (extension.applied) {
       await supabase.from("customer_portal_actions").update({ status: "resolved" }).eq("id", action.id);
     } else {
       await supabase.from("tasks").insert({
         ...taskBase,
-        title: `Extension to ${content.new_end_date || "a new date"} needs your answer - ${customerName} - ${vehicleLabel} (${extension.reason})`,
+        title: `${content.open_ended ? "Request to keep the vehicle with no end date" : `Extension to ${content.new_end_date || "a new date"}`} needs your answer - ${customerName} - ${vehicleLabel} (${extension.reason})`,
         task_type: "admin",
         due_at: content.new_end_date || null
       });

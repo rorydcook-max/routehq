@@ -72,7 +72,7 @@ async function signInspection(supabase: any, inspection: any) {
 
 function portalActionSummary(action: any) {
   const content = action.content || {};
-  if (action.action_type === "extension_request") return `Customer requested extension to ${content.new_end_date || "a new return date"}${content.note ? `: ${content.note}` : ""}`;
+  if (action.action_type === "extension_request") return `Customer requested ${content.open_ended ? "to keep the vehicle with no end date" : `extension to ${content.new_end_date || "a new return date"}`}${content.note ? `: ${content.note}` : ""}`;
   if (action.action_type === "return_confirmation") return `Customer confirmed return ${content.return_date || ""} ${content.return_time || ""}${content.return_location ? ` at ${content.return_location}` : ""}`.trim();
   if (action.action_type === "problem_report") return `${content.category || "Problem report"}: ${content.description || "No description provided"}`;
   if (action.action_type === "question") return content.question || "Customer asked a question";

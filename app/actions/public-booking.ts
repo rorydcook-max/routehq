@@ -452,7 +452,8 @@ export async function submitCustomerPortalAction(formData: FormData) {
 
   const content: Record<string, unknown> = {};
   if (actionType === "extension_request") {
-    content.new_end_date = requiredString(formData, "newEndDate");
+    if (String(formData.get("openEnded") || "") === "true") content.open_ended = true;
+    else content.new_end_date = requiredString(formData, "newEndDate");
     content.note = optionalString(formData, "note");
   } else if (actionType === "return_confirmation") {
     content.return_date = requiredString(formData, "returnDate");
@@ -524,7 +525,7 @@ export async function submitCustomerPortalAction(formData: FormData) {
 }
 
 function portalActionCommunicationText(actionType: string, content: Record<string, unknown>) {
-  if (actionType === "extension_request") return `Customer requested an extension to ${content.new_end_date || "a new return date"}`;
+  if (actionType === "extension_request") return content.open_ended ? "Customer asked to keep the vehicle with no end date" : `Customer requested an extension to ${content.new_end_date || "a new return date"}`;
   if (actionType === "return_confirmation") return `Customer confirmed return ${content.return_date || ""} ${content.return_time || ""}${content.return_location ? ` at ${content.return_location}` : ""}`.trim();
   if (actionType === "problem_report") return `Customer reported a problem: ${content.category || "Other"}`;
   if (actionType === "question") return "Customer asked a question through the booking portal";

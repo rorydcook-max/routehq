@@ -1416,7 +1416,7 @@ function CustomerPortalActionCard({ action, organizationId, rentalId, customerId
 
 function portalActionSummary(action: any) {
   const content = action.content || {};
-  if (action.action_type === "extension_request") return `Requested new return date: ${content.new_end_date || "not specified"}${content.note ? ` - ${content.note}` : ""}`;
+  if (action.action_type === "extension_request") return `${content.open_ended ? "Asked to keep the vehicle with no end date" : `Requested new return date: ${content.new_end_date || "not specified"}`}${content.note ? ` - ${content.note}` : ""}`;
   if (action.action_type === "return_confirmation") return `Return ${content.return_date || ""} ${content.return_time || ""}${content.return_location ? ` at ${content.return_location}` : ""}`.trim();
   if (action.action_type === "problem_report") return `${content.category || "Problem"}: ${content.description || "No description"}`;
   if (action.action_type === "question") return content.question || "Customer question";

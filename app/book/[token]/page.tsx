@@ -12,6 +12,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getPortalPayments } from "@/lib/payment-receipts";
 import { bookingRules } from "@/lib/booking-rules";
 import { rentalRateCard } from "@/lib/rental-estimate";
+import { nextMonthlyDue } from "@/lib/open-ended-billing";
 import { promptPayQrSvg } from "@/lib/promptpay";
 import { PortalPayments } from "./portal-payments";
 
@@ -345,6 +346,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             organizationName={organization?.name || "Rental operator"}
             endNoticeDays={bookingRules(organization?.settings).endNoticeDays}
             extensionRates={rentalRateCard(vehicle, rental)}
+            openEndedOffer={await openEndedOffer(vehicle, rental)}
             orgPayment={detail.org_payment}
             ownerContact={ownerContact}
             paymentBundle={portal.bundle}
@@ -443,4 +445,14 @@ function Info({ className = "", icon: Icon, label, value }: { className?: string
       </p>
     </div>
   );
+}
+
+/** What keeping the vehicle with no end date would cost, when it can be offered. */
+async function openEndedOffer(vehicle: any, rental: any) {
+  const end = rental?.end_date ? String(rental.end_date).slice(0, 10) : null;
+  const monthlyRate = rentalRateCard(vehicle, rental || {}).monthlyRate;
+  if (!end || !(monthlyRate > 0)) return null;
+  const monthly = String(rental.billing_interval || rental.pricing_model || "").toLowerCase() === "monthly";
+  const firstDue = await nextMonthlyDue(createSupabaseAdminClient() as any, String(rental.id), end, monthly).catch(() => end);
+  return { monthlyRate, firstDue };
 }

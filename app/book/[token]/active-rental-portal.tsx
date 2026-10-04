@@ -9,6 +9,7 @@ import type { PortalBundle, PortalPayment } from "@/lib/payment-receipts";
 import { quoteStay, type Rates } from "@/lib/rental-estimate";
 import { PortalPayments } from "./portal-payments";
 
+type OpenEndedOffer = { monthlyRate: number; firstDue: string };
 type ActionType = "extension_request" | "return_confirmation" | "problem_report" | "question";
 
 const inputClass = "mt-2 w-full rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15";
@@ -27,7 +28,8 @@ export function ActiveRentalPortal({
   paymentBundle = null,
   orgPayment = null,
   endNoticeDays = 0,
-  extensionRates = null
+  extensionRates = null,
+  openEndedOffer = null
 }: {
   token: string;
   organizationName: string;
@@ -44,6 +46,8 @@ export function ActiveRentalPortal({
   endNoticeDays?: number;
   /** Rates used to price extra days. */
   extensionRates?: Rates | null;
+  /** Set when the customer can switch to no end date at the monthly rate. */
+  openEndedOffer?: OpenEndedOffer | null;
   orgPayment?: any;
 }) {
   const router = useRouter();
@@ -57,12 +61,13 @@ export function ActiveRentalPortal({
   const vehicleName = [vehicle?.make, vehicle?.model, vehicle?.trim].filter(Boolean).join(" ");
   const actionCards = useMemo(
     () => [
-      { type: "extension_request" as const, title: "Request extension", icon: CalendarPlus, description: "Ask to keep the vehicle longer." },
+      // A rental with no end date has nothing to extend.
+      ...(endDate ? [{ type: "extension_request" as const, title: "Keep it longer", icon: CalendarPlus, description: "Choose a new return date, or keep it with no end date." }] : []),
       { type: "return_confirmation" as const, title: "Confirm return", icon: CalendarCheck, description: "Tell us when and where you will return." },
       { type: "problem_report" as const, title: "Report a problem", icon: AlertTriangle, description: "Breakdown, damage, or a rental issue." },
       { type: "question" as const, title: "Ask a question", icon: MessageCircle, description: "Send a quick question to the operator." }
     ],
-    []
+    [endDate]
   );
 
   function submitAction(formData: FormData, successMessage: string) {
@@ -70,7 +75,11 @@ export function ActiveRentalPortal({
       formData.set("token", token);
       const result = await submitCustomerPortalAction(formData);
       const extension = result.extension;
-      if (extension?.applied) {
+      if (extension?.applied && extension.openEnded) {
+        const amount = `${extension.currency === "THB" ? "฿" : `${extension.currency} `}${extension.amount.toLocaleString("en-US")}`;
+        setConfirmation(`Done. Your rental now has no end date. ${amount} is due each month from ${niceDate(extension.dueDate)}; you can pay it from this page.`);
+        router.refresh();
+      } else if (extension?.applied) {
         const amount = `${extension.currency === "THB" ? "฿" : `${extension.currency} `}${extension.amount.toLocaleString("en-US")}`;
         setConfirmation(`Done. Your rental now runs until ${niceDate(extension.newEndDate)}.${extension.amount > 0 ? ` ${amount} for the extra days is due on ${niceDate(extension.dueDate)}; you can pay it from this page.` : ""}`);
         router.refresh();
@@ -124,6 +133,7 @@ export function ActiveRentalPortal({
                   isPending={isPending}
                   endNoticeDays={endNoticeDays}
                   extensionRates={extensionRates}
+                  openEndedOffer={openEndedOffer}
                   minExtensionDate={minExtensionDate}
                   onSubmit={submitAction}
                   organizationName={organizationName}
@@ -172,6 +182,7 @@ function ActionForm({
   minExtensionDate,
   endNoticeDays = 0,
   extensionRates = null,
+  openEndedOffer = null,
   deliveryLocation,
   isPending,
   onSubmit,
@@ -183,6 +194,7 @@ function ActionForm({
   minExtensionDate: string;
   endNoticeDays?: number;
   extensionRates?: Rates | null;
+  openEndedOffer?: OpenEndedOffer | null;
   deliveryLocation: string;
   isPending: boolean;
   organizationName: string;
@@ -190,17 +202,38 @@ function ActionForm({
   onSubmit: (formData: FormData, successMessage: string) => void;
 }) {
   const [newEnd, setNewEnd] = useState("");
+  const [noEnd, setNoEnd] = useState(false);
   const extraDays = endDate && newEnd > endDate ? Math.round((new Date(`${newEnd}T00:00:00Z`).getTime() - new Date(`${String(endDate).slice(0, 10)}T00:00:00Z`).getTime()) / 86_400_000) : 0;
   const extensionQuote = extensionRates && extraDays > 0 ? quoteStay(extensionRates, extraDays) : null;
   if (type === "extension_request") {
     return (
       <form action={(formData) => onSubmit(formData, `Extension request sent. ${organizationName} will confirm shortly.`)} className="mt-4 space-y-3">
         <input name="actionType" type="hidden" value="extension_request" />
-        <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
-          New return date
-          <input className={inputClass} min={minExtensionDate} name="newEndDate" onChange={(event) => setNewEnd(event.target.value)} required type="date" value={newEnd} />
-        </label>
-        {extensionQuote ? (
+        {openEndedOffer ? (
+          <div className="grid grid-cols-2 gap-2 rounded-xl bg-[#f5f4f1] p-1 text-sm font-semibold">
+            <button className={`min-h-11 rounded-lg px-2 ${!noEnd ? "bg-white text-[var(--foreground)] shadow-sm" : "text-[var(--muted)]"}`} onClick={() => setNoEnd(false)} type="button">
+              Until a date
+            </button>
+            <button className={`min-h-11 rounded-lg px-2 ${noEnd ? "bg-white text-[var(--foreground)] shadow-sm" : "text-[var(--muted)]"}`} onClick={() => setNoEnd(true)} type="button">
+              No end date
+            </button>
+          </div>
+        ) : null}
+        {noEnd && openEndedOffer ? (
+          <>
+            <input name="openEnded" type="hidden" value="true" />
+            <p className="rounded-xl bg-[var(--primary-light)] p-3 text-sm leading-6 text-[var(--foreground)]">
+              <span className="font-semibold">฿{openEndedOffer.monthlyRate.toLocaleString("en-US")} a month</span>, from {niceDate(openEndedOffer.firstDue)}. It renews each month until you tell us you are returning the vehicle
+              {endNoticeDays > 0 ? `, with at least ${endNoticeDays} ${endNoticeDays === 1 ? "day" : "days"} notice` : ""}.
+            </p>
+          </>
+        ) : (
+          <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
+            New return date
+            <input className={inputClass} min={minExtensionDate} name="newEndDate" onChange={(event) => setNewEnd(event.target.value)} required type="date" value={newEnd} />
+          </label>
+        )}
+        {!noEnd && extensionQuote ? (
           <p className="rounded-xl bg-[var(--primary-light)] p-3 text-sm text-[var(--foreground)]">
             <span className="font-semibold">฿{extensionQuote.amount.toLocaleString("en-US")}</span> for {extensionQuote.explain}.
           </p>

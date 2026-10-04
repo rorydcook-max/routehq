@@ -91,15 +91,13 @@ export type RentalPlan = { pricingModel: "daily" | "weekly" | "monthly"; rate: n
 
 /**
  * The billing period and price a booking made online gets. `days` is null for
- * a long-term rental with no end date. Returns null when the stay is shorter
- * than anything the vehicle is priced for (a monthly-only car for a weekend).
+ * a rental with no end date, which needs a monthly rate. Returns null when the
+ * stay is shorter than anything the vehicle is priced for (a monthly-only car
+ * for a weekend) or it has no monthly rate for an open-ended rental.
  */
 export function planFor(rates: Rates, days: number | null): RentalPlan | null {
-  if (days === null) {
-    if (rates.monthlyRate > 0) return { pricingModel: "monthly", rate: rates.monthlyRate };
-    if (rates.weeklyRate > 0) return { pricingModel: "weekly", rate: rates.weeklyRate };
-    return rates.dailyRate > 0 ? { pricingModel: "daily", rate: rates.dailyRate } : null;
-  }
+  // No end date always means the monthly rate, renewing each month.
+  if (days === null) return rates.monthlyRate > 0 ? { pricingModel: "monthly", rate: rates.monthlyRate } : null;
   if (days >= 28 && rates.monthlyRate > 0) return { pricingModel: "monthly", rate: rates.monthlyRate };
   if (days >= 7 && rates.weeklyRate > 0) return { pricingModel: "weekly", rate: rates.weeklyRate };
   return rates.dailyRate > 0 ? { pricingModel: "daily", rate: rates.dailyRate } : null;

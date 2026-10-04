@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { businessToday } from "@/lib/business-time";
+import { topUpOpenEndedRent } from "@/lib/open-ended-billing";
 
 // Business-time dates: a UTC date would flag rent as overdue a day early for runs before 07:00 in Thailand.
 const dateOnly = (offsetDays = 0) => businessToday(offsetDays);
@@ -20,6 +21,9 @@ export async function GET(req: NextRequest) {
   const supabase = createSupabaseAdminClient() as any;
   const today = dateOnly();
   const tomorrow = dateOnly(1);
+
+  // Open-ended rentals are billed a year ahead at handover; keep adding months after that.
+  const openEndedToppedUp = await topUpOpenEndedRent(supabase).catch(() => 0);
 
   const scheduledResult = await supabase
     .from("rental_payments")
@@ -97,6 +101,7 @@ export async function GET(req: NextRequest) {
     success: true,
     scheduledToPending: scheduledResult.data?.length || 0,
     pendingToOverdue: overdueResult.data?.length || 0,
-    tasksCreated
+    tasksCreated,
+    openEndedToppedUp
   });
 }

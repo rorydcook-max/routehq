@@ -19,6 +19,8 @@ export type CatalogVehicle = {
   year: number | null;
   color: string | null;
   kind: VehicleKind;
+  /** The vehicle's first photo, when one has been uploaded. */
+  photoUrl: string | null;
   details: string[];
   dailyRate: number;
   weeklyRate: number;
@@ -89,7 +91,7 @@ export async function getPublicCatalog(slug: string) {
   if (!settings.enabled) return { enabled: false as const, name: String(organization.name || "") };
   await releaseAbandonedOnlineBookings(admin, organization.id).catch(() => null);
 
-  const [vehiclesResult, rentalsResult, branding] = await Promise.all([
+  const [vehiclesResult, rentalsResult, photosResult, branding] = await Promise.all([
     admin
       .from("vehicles")
       .select("id, make, model, trim, year, color, status, daily_rate, weekly_rate, monthly_rate, specifications, vehicle_categories(code, name)")
@@ -102,6 +104,13 @@ export async function getPublicCatalog(slug: string) {
       .eq("organization_id", organization.id)
       .is("deleted_at", null)
       .in("status", BLOCKING_RENTAL_STATUSES as unknown as string[]),
+    admin
+      .from("documents")
+      .select("owner_id, storage_path, extracted_data, created_at")
+      .eq("organization_id", organization.id)
+      .eq("owner_type", "vehicle")
+      .eq("category", "vehicle_photo")
+      .order("created_at", { ascending: true }),
     resolveOrganizationBrandingDisplayUrls(admin, organization, { allowExternalUrl: true, expiresIn: 60 * 60 }).catch(() => null)
   ]);
 
@@ -111,6 +120,21 @@ export async function getPublicCatalog(slug: string) {
     const list = busy.get(row.vehicle_id) || [];
     list.push({ startDate: String(row.start_date).slice(0, 10), endDate: row.end_date ? String(row.end_date).slice(0, 10) : null });
     busy.set(row.vehicle_id, list);
+  }
+
+  // Each vehicle's lead photo: the first in the order set on the vehicle page.
+  const leadPhoto = new Map<string, { path: string; order: number }>();
+  for (const row of (photosResult.data || []) as any[]) {
+    if (!row.owner_id || !row.storage_path) continue;
+    const order = Number(row.extracted_data?.vehicle_photo_order ?? 9999);
+    const current = leadPhoto.get(row.owner_id);
+    if (!current || order < current.order) leadPhoto.set(row.owner_id, { path: row.storage_path, order });
+  }
+  const photoPaths = [...leadPhoto.values()].map((photo) => photo.path);
+  const photoUrls = new Map<string, string>();
+  if (photoPaths.length) {
+    const { data: signed } = await admin.storage.from("documents").createSignedUrls(photoPaths, 6 * 3600);
+    for (const row of signed || []) if (row?.path && row?.signedUrl) photoUrls.set(row.path, row.signedUrl);
   }
 
   const vehicles: CatalogVehicle[] = ((vehiclesResult.data || []) as any[])
@@ -124,6 +148,7 @@ export async function getPublicCatalog(slug: string) {
         year: vehicle.year ? Number(vehicle.year) : null,
         color: vehicle.color || null,
         kind: kindFromCategory(vehicle.vehicle_categories),
+        photoUrl: photoUrls.get(leadPhoto.get(vehicle.id)?.path || "") || null,
         details: [specs.transmission, specs.fuel_type, seats > 0 ? `${seats} seats` : null].filter(Boolean).map(String),
         dailyRate: Number(vehicle.daily_rate || 0),
         weeklyRate: Number(vehicle.weekly_rate || 0),

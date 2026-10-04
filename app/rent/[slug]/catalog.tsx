@@ -134,10 +134,19 @@ export function Catalog({
           const isOpen = openId === vehicle.id;
           return (
             <article className={`rounded-2xl border bg-white p-4 shadow-sm ${free ? "border-[var(--border)]" : "border-[var(--border)] opacity-70"}`} key={vehicle.id}>
+              {vehicle.photoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img alt={vehicle.name} className="mb-3 aspect-[16/9] w-full rounded-xl object-cover sm:hidden" src={vehicle.photoUrl} />
+              ) : null}
               <div className="flex items-start gap-3">
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
-                  <VehicleKindIcon boxed={false} kind={vehicle.kind} size={26} />
-                </span>
+                {vehicle.photoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img alt="" className="hidden h-24 w-36 shrink-0 rounded-xl object-cover sm:block" src={vehicle.photoUrl} />
+                ) : (
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
+                    <VehicleKindIcon boxed={false} kind={vehicle.kind} size={26} />
+                  </span>
+                )}
                 <div className="min-w-0 flex-1">
                   <h3 className="text-lg font-semibold leading-tight">{vehicle.name}</h3>
                   <p className="mt-0.5 text-sm text-[var(--muted)]">{[vehicle.year, vehicle.color, ...vehicle.details].filter(Boolean).join(" · ")}</p>

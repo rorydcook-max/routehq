@@ -112,7 +112,7 @@ export function AvailabilityView({ vehicles, month, today }: { vehicles: Availab
                       <Link
                         aria-label={`Book ${vehicle.name} from ${cell.day}`}
                         className={`h-full border-r border-[var(--border)] last:border-r-0 hover:bg-[var(--primary-light)] ${cell.date === today ? "bg-[var(--primary-light)]" : cell.weekend ? "bg-[var(--panel-secondary)]" : ""}`}
-                        href={`/bookings/new?vehicleId=${vehicle.id}` as Route}
+                        href={`/bookings/new?vehicleId=${vehicle.id}${cell.date >= today ? `&startDate=${cell.date}` : ""}` as Route}
                         key={cell.date}
                         style={{ gridColumn: cell.day, gridRow: 1 }}
                         title={`Free · tap to book ${vehicle.name}`}

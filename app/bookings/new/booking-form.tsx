@@ -255,6 +255,7 @@ export function BookingForm({
   vehicles,
   customers,
   preselectedVehicleId = "",
+  preselectedStartDate = "",
   preselectedCustomerId = "",
   defaultCurrency = "THB",
   homeTerritory = "Koh Samui, Thailand",
@@ -267,6 +268,8 @@ export function BookingForm({
   busyPeriods?: Record<string, BusyPeriod[]>;
   customers: BookingCustomer[];
   preselectedVehicleId?: string;
+  /** A day picked on the calendar; ignored if it is in the past. */
+  preselectedStartDate?: string;
   preselectedCustomerId?: string;
   defaultCurrency?: string;
   homeTerritory?: string;
@@ -282,7 +285,7 @@ export function BookingForm({
   const [vehicleSearch, setVehicleSearch] = useState("");
   const [vehicleId, setVehicleId] = useState(validPreselectedVehicle ? preselectedVehicleId : "");
   const [selectedCustomer, setSelectedCustomer] = useState<BookingCustomer | null>(customers.find((customer) => customer.id === preselectedCustomerId) || null);
-  const [startDate, setStartDate] = useState(businessToday());
+  const [startDate, setStartDate] = useState(/^\d{4}-\d{2}-\d{2}$/.test(preselectedStartDate) && preselectedStartDate >= businessToday() ? preselectedStartDate : businessToday());
   const [endDate, setEndDate] = useState("");
   const [openEnded, setOpenEnded] = useState(false);
   const [pricingModel, setPricingModel] = useState("monthly");

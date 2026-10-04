@@ -369,6 +369,8 @@ export async function getVehicleDetail(vehicleId: string, organizationId: string
       .eq("vehicle_id", vehicleId)
       .is("completed_at", null)
       .is("deleted_at", null)
+      // Payments are read from the payment schedule, not from these older reminder rows.
+      .neq("task_type", "payment_reminder")
       .order("due_at", { ascending: true, nullsFirst: false })
       .limit(10),
     supabase.from("gps_devices").select("*").eq("organization_id", organizationId).eq("vehicle_id", vehicleId).is("deleted_at", null).maybeSingle(),

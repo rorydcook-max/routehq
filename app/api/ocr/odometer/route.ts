@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
+import { getCurrentMembership } from "@/lib/auth/roles";
 
 export async function POST(request: Request) {
   try {
+    // Staff only: each call costs money.
+    if (!(await getCurrentMembership())) return NextResponse.json({ error: "Sign in first." }, { status: 401 });
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
       return NextResponse.json({ error: "OpenAI API key is not configured." }, { status: 400 });
@@ -24,7 +27,7 @@ export async function POST(request: Request) {
         {
           role: "system",
           content:
-            "You read vehicle odometer photos. Return only JSON with odometer_reading as an integer or null, confidence from 0 to 1, and note."
+            "You check photos taken at a vehicle handover. Return only JSON with: describes (a few words on what the photo actually shows), shows_odometer (true only if a dashboard odometer display with readable digits is visible), odometer_reading (integer, or null when shows_odometer is false), confidence (0 to 1), and note. If the photo is blank, a plain colour, blurred, or shows anything other than an odometer, shows_odometer is false, odometer_reading is null and confidence is 0. Never guess or make up a number."
         },
         {
           role: "user",
@@ -32,7 +35,7 @@ export async function POST(request: Request) {
             {
               type: "text",
               text:
-                "Read the odometer value in kilometers from this image. If there are multiple numbers, choose the main odometer, not trip meter."
+                "Say what this photo shows. Only if it clearly shows an odometer, read the value in kilometres; with several numbers choose the main odometer, not the trip meter."
             },
             { type: "image_url", image_url: { url: dataUrl } }
           ]
@@ -43,9 +46,10 @@ export async function POST(request: Request) {
 
     const raw = response.choices[0]?.message?.content || "{}";
     const parsed = JSON.parse(raw);
+    const seen = parsed.shows_odometer === true && typeof parsed.odometer_reading === "number";
     return NextResponse.json({
-      odometer_reading: typeof parsed.odometer_reading === "number" ? parsed.odometer_reading : null,
-      confidence: typeof parsed.confidence === "number" ? parsed.confidence : 0,
+      odometer_reading: seen ? parsed.odometer_reading : null,
+      confidence: seen && typeof parsed.confidence === "number" ? parsed.confidence : 0,
       note: typeof parsed.note === "string" ? parsed.note : ""
     });
   } catch (error) {

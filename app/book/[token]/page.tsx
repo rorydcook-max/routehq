@@ -280,8 +280,9 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   const ownerContact = organization?.settings?.phone || organization?.settings?.business_phone || organization?.owner_phone || null;
   const executedDownloads = detail.executedAgreementDownloads || null;
   const pendingAmendmentToken = rental?.id ? await pendingAmendmentFor(String(rental.id)) : null;
-  // Payments can be made from this page as soon as the agreement is signed, before and after handover.
-  const canPayHere = rental?.id && (detail.state === "active" || (detail.state === "ready" && detail.completion?.agreement));
+  // Payments can be made from this page as soon as the agreement is signed: before handover, on rent,
+  // and after the return if anything is still owed.
+  const canPayHere = rental?.id && (detail.state === "active" || detail.state === "completed" || (detail.state === "ready" && detail.completion?.agreement));
   const portal = canPayHere ? await getPortalPayments(String(rental.id), detail.org_payment?.promptpay_id) : { payments: [], bundle: null };
   // Before signing, "pay now" shows one QR for what is due at the start.
   // What is due at the start: the first rent and the deposit.
@@ -336,11 +337,11 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
               </div>
             </div>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <Info icon={CalendarDays} label="Rental period" value={rental.is_indefinite ? `Monthly, open-ended from ${formatSummaryDate(rental.start_date)}` : `${formatSummaryDate(rental.start_date)} to ${formatSummaryDate(rental.end_date)}`} />
+              <Info icon={CalendarDays} label="Rental period" value={rental.is_indefinite && detail.state !== "completed" ? `Monthly, open-ended from ${formatSummaryDate(rental.start_date)}` : `${formatSummaryDate(rental.start_date)} to ${formatSummaryDate(rental.end_date)}`} />
               <Info icon={CreditCard} label="Rate and deposit" value={`${rateLabel(rental)}\n${Number(rental.deposit_amount || 0) > 0 ? `Deposit: ${money(rental.deposit_amount, rental.currency || "THB")}` : "No deposit"}`} />
               {/* Once the customer has the vehicle, where and when it was to be handed over is old news. */}
               {handedOver ? null : <Info className="sm:row-span-2" icon={MapPin} label="Handover" value={delivery.location} />}
-              <Info icon={ReceiptText} label="First payment due" value={paymentDueText(rental, bookingData)} />
+              {detail.state === "completed" ? null : <Info icon={ReceiptText} label="First payment due" value={paymentDueText(rental, bookingData)} />}
               {handedOver ? null : <Info icon={Clock} label="Handover time" value={delivery.time} />}
             </div>
           </div>
@@ -357,7 +358,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
           ) : null}
         </header>
 
-        {invites.length > 0 ? (
+        {invites.length > 0 && detail.state !== "completed" ? (
           <section className="rounded-2xl border border-[#bfe0db] bg-[var(--primary-light)] p-4 shadow-sm">
             <p className="text-sm font-semibold text-[var(--foreground)]">Get updates about your rental</p>
             <p className="mt-1 text-sm leading-6 text-[var(--foreground-secondary)]">
@@ -392,34 +393,56 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             vehicle={vehicle}
           />
         ) : detail.state === "completed" ? (
+          <>
+          {portal.payments.length > 0 ? (
+            <PortalPayments bundle={portal.bundle} orgPayment={detail.org_payment} organizationName={organization?.name || "Rental operator"} payments={portal.payments} token={token} />
+          ) : null}
           <section className="rounded-2xl border border-[var(--border)] bg-white p-5 text-center shadow-sm">
             <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#f0fdf4] text-[#16a34a]">
               <ShieldCheck size={28} />
             </span>
             <h2 className="mt-4 text-2xl font-semibold text-[var(--foreground)]">Rental completed</h2>
             <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-              Thank you for renting with {organization?.name || "us"}. We would really appreciate a quick review of your experience.
+              The vehicle is back with {organization?.name || "us"}. {portal.payments.length > 0 ? "There is still something to pay, shown above." : "Thank you for renting with us."}
             </p>
+            {(() => {
+              const held = Number(rental.deposit_held || 0);
+              if (held <= 0) return null;
+              const returned = Number(rental.deposit_refunded_amount || 0);
+              const kept = Number(rental.deposit_forfeited_amount || 0);
+              const left = Math.max(0, held - returned - kept);
+              const reason = String(rental.deposit_deduction_reason || "").split(" — ")[0].trim().toLowerCase();
+              const currency = rental.currency || "THB";
+              return (
+                <div className="mx-auto mt-4 max-w-sm rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-3 text-left text-sm text-[var(--foreground-secondary)]">
+                  <p className="font-semibold text-[var(--foreground)]">Your {money(held, currency)} deposit</p>
+                  {returned > 0 ? <p className="mt-1">{money(returned, currency)} returned to you</p> : null}
+                  {kept > 0 ? <p className="mt-1">{money(kept, currency)} kept{reason ? ` (${reason})` : ""}</p> : null}
+                  {left > 0 ? <p className="mt-1">{money(left, currency)} still to be settled</p> : null}
+                </div>
+              );
+            })()}
             {contact ? (
-              <a className="pressable mt-5 inline-flex rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={contact}>
-                Contact operator
+              <a className="pressable mt-5 inline-flex rounded-xl border border-[var(--primary)] bg-white px-5 py-3 text-sm font-semibold text-[var(--primary)]" href={contact}>
+                Contact {organization?.name || "us"}
               </a>
             ) : null}
             {executedDownloads?.originalAgreementUrl || executedDownloads?.executionCertificateUrl ? (
               <div className="mt-5 flex flex-wrap justify-center gap-2">
                 {executedDownloads.originalAgreementUrl ? (
                   <a className="pressable inline-flex rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={executedDownloads.originalAgreementUrl} rel="noreferrer" target="_blank">
-                    Download original agreement
+                    Download your agreement
                   </a>
                 ) : null}
                 {executedDownloads.executionCertificateUrl ? (
                   <a className="pressable inline-flex rounded-xl border border-[var(--primary)] bg-white px-5 py-3 text-sm font-semibold text-[var(--primary)]" href={executedDownloads.executionCertificateUrl} rel="noreferrer" target="_blank">
-                    Download execution certificate
+                    Download signing certificate
                   </a>
                 ) : null}
               </div>
             ) : null}
           </section>
+          </>
         ) : (
           <>
           {detail.state === "ready" ? (

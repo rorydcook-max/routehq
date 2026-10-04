@@ -80,11 +80,13 @@ function formatDepositSummary(rental: any) {
   }
 
   if (status === "forfeited") {
-    return "Forfeited";
+    return "Kept in full";
   }
 
   if (status === "partially_forfeited") {
-    return `${money(rental?.deposit_forfeited_amount, currency)} forfeited`;
+    return Number(rental?.deposit_refunded_amount || 0) > 0
+      ? `${money(rental?.deposit_refunded_amount, currency)} returned, ${money(rental?.deposit_forfeited_amount, currency)} kept`
+      : `${money(rental?.deposit_forfeited_amount, currency)} kept`;
   }
 
   if (status === "partially_returned") {
@@ -756,6 +758,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                       preferred_contact_method: customer.preferred_contact_method
                     }}
                     customerId={customer.id}
+                    hideSummary
                     organisationId={organization.id}
                     rentalId={rental.id}
                     revalidatePathname={`/bookings/${rental.id}`}

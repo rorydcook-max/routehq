@@ -45,7 +45,8 @@ export function CommunicationPanel({
   businessName = "RouteHQ",
   bookingPortalUrl,
   customerId,
-  revalidatePathname
+  revalidatePathname,
+  hideSummary = false
 }: {
   customer: Customer;
   booking: Booking;
@@ -55,6 +56,8 @@ export function CommunicationPanel({
   bookingPortalUrl?: string | null;
   customerId?: string | null;
   revalidatePathname?: string;
+  /** The booking page already shows the vehicle, return date, balance and deposit. */
+  hideSummary?: boolean;
 }) {
   const [activePopover, setActivePopover] = useState<"whatsapp" | "line" | null>(null);
   const [customMessage, setCustomMessage] = useState("");
@@ -136,7 +139,7 @@ export function CommunicationPanel({
 
   return (
     <div className="space-y-3">
-      <div className="rounded-xl border border-[var(--border)] bg-[var(--panel)] p-3">
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--panel)] p-3" hidden={hideSummary}>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Vehicle</p>

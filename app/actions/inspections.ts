@@ -9,6 +9,8 @@ import { finaliseInspectionReport, type DepositSettlement } from "@/lib/inspecti
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { notifyOperator } from "@/lib/notify-operator";
+import { tellRentalCustomer } from "@/lib/customer-messages";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
 import { inspectionUploadPrefix, readUploadedFiles } from "@/lib/direct-uploads";
 
@@ -194,6 +196,50 @@ async function updateVehicleMileageIfHigher(supabase: any, organizationId: strin
   }
 }
 
+const UNPAID = ["pending", "overdue", "scheduled", "failed"];
+const isDepositRow = (payment: any) => payment.metadata?.is_deposit === true || ["deposit", "deposit_top_up"].includes(String(payment.metadata?.type || ""));
+
+/**
+ * Deposit kept for unpaid rent pays that rent off, oldest first, so the money
+ * isn't counted once as deposit kept and again as rent still owed. A payment
+ * only part covered is split: the covered part is marked paid, the rest stays
+ * owed.
+ */
+async function payRentFromDeposit(admin: any, organizationId: string, rentalId: string, amount: number) {
+  const { data: rows } = await admin
+    .from("rental_payments")
+    .select("*")
+    .eq("organization_id", organizationId)
+    .eq("rental_id", rentalId)
+    .in("status", UNPAID)
+    .is("deleted_at", null)
+    .order("due_date", { ascending: true });
+  let left = amount;
+  const now = new Date().toISOString();
+  for (const payment of (rows || []).filter((row: any) => !row.voided && !isDepositRow(row))) {
+    if (left <= 0) break;
+    const due = Number(payment.amount || 0);
+    if (due <= 0) continue;
+    const metadata = { ...(payment.metadata || {}), paid_from_deposit: true };
+    if (left >= due) {
+      await admin.from("rental_payments").update({ status: "paid", paid_at: now, metadata }).eq("id", payment.id);
+      left -= due;
+    } else {
+      // Part covered: a paid row for the covered part, and the original keeps what is still owed.
+      const { id: _id, created_at: _created, updated_at: _updated, ...copy } = payment;
+      await admin.from("rental_payments").insert({ ...copy, amount: left, status: "paid", paid_at: now, metadata: { ...metadata, split_from: payment.id } });
+      await admin.from("rental_payments").update({ amount: due - left, metadata: { ...(payment.metadata || {}), part_paid_from_deposit: left } }).eq("id", payment.id);
+      left = 0;
+    }
+  }
+}
+
+/** Rent and charges still unpaid on a rental, deposit rows left out. */
+async function stillOwed(admin: any, organizationId: string, rentalId: string) {
+  const { data: rows } = await admin.from("rental_payments").select("amount, status, voided, metadata").eq("organization_id", organizationId).eq("rental_id", rentalId).in("status", UNPAID).is("deleted_at", null);
+  return (rows || []).filter((row: any) => !row.voided && !isDepositRow(row)).reduce((sum: number, row: any) => sum + Number(row.amount || 0), 0);
+}
+
 async function reconcileReturnDeposit(formData: FormData, organizationId: string, rentalId: string) {
   const { data: rental } = await ((await createSupabaseServerClient()) as any)
     .from("rentals")
@@ -231,6 +277,7 @@ async function reconcileReturnDeposit(formData: FormData, organizationId: string
     deductionData.set("reason", item.reason);
     deductionData.set("notes", "Recorded from return inspection.");
     await applyDepositDeduction(deductionData);
+    if (item.key === "depositOutstandingBalance") await payRentFromDeposit(createSupabaseAdminClient() as any, organizationId, rentalId, amount);
     settlement.deductions.push({ reason: item.reason, amount });
     remaining -= amount;
   }
@@ -242,6 +289,7 @@ async function reconcileReturnDeposit(formData: FormData, organizationId: string
     refundData.set("rentalId", rentalId);
     refundData.set("returnAmount", String(refundAmount));
     refundData.set("notes", "Recorded from return inspection.");
+    refundData.set("quiet", "true");
     await returnDeposit(refundData);
     settlement.refunded = refundAmount;
   }
@@ -564,6 +612,29 @@ export async function submitInspection(formData: FormData) {
     }
 
     depositSettlement = await reconcileReturnDeposit(formData, organizationId, rentalId);
+
+    // One message to the customer: the vehicle is back, what happened to the deposit, and anything still to pay.
+    {
+      const settlement = depositSettlement;
+      const owed = await stillOwed(createSupabaseAdminClient() as any, organizationId, rentalId).catch(() => 0);
+      await supabase.from("rentals").update({ balance_due: owed }).eq("id", rentalId).eq("organization_id", organizationId);
+      await tellRentalCustomer(
+        createSupabaseAdminClient() as any,
+        rentalId,
+        ({ firstName, vehicle, money }) => {
+          const lines = [`Hi ${firstName}, thanks for returning the ${vehicle}. Your rental is now closed.`];
+          if (settlement && settlement.available > 0) {
+            const kept = settlement.deductions.reduce((sum, item) => sum + item.amount, 0);
+            if (kept > 0) lines.push(`From your ${money(settlement.available)} deposit we kept ${money(kept)} (${settlement.deductions.map((item) => `${item.reason.toLowerCase()} ${money(item.amount)}`).join(", ")}).`);
+            if (settlement.refunded > 0) lines.push(kept > 0 ? `${money(settlement.refunded)} has been returned to you.` : `Your ${money(settlement.refunded)} deposit has been returned in full.`);
+            if (settlement.retained > 0) lines.push(`${money(settlement.retained)} of the deposit is still to be settled; we'll be in touch.`);
+          }
+          if (owed > 0) lines.push(`${money(owed)} is still to pay.`);
+          return lines.join(" ");
+        },
+        { sentBy: user.id, withLink: owed > 0 }
+      );
+    }
 
     const { error: vehicleError } = await supabase
       .from("vehicles")

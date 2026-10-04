@@ -28,10 +28,6 @@ function money(value: number, currency = "THB") {
   }).format(Number(value || 0));
 }
 
-function statusLabel(status: string) {
-  return String(status || "pending").replace(/_/g, " ");
-}
-
 export function RefundDepositPanel({
   rentalId,
   organizationId,
@@ -39,7 +35,6 @@ export function RefundDepositPanel({
   depositHeld,
   depositRefunded,
   depositForfeited,
-  depositStatus,
   totalPaid,
   currency,
   rentalStatus
@@ -93,10 +88,18 @@ export function RefundDepositPanel({
         <div className="min-w-0">
           <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Refunds & deposit</p>
           <p className="mt-1 text-sm font-semibold text-[var(--foreground)]">
-            Deposit held: {money(depositHeld, currency)} <span className="text-[var(--muted)]">·</span> Returned: {money(depositRefunded, currency)}{" "}
-            <span className="text-[var(--muted)]">·</span> Available: {money(available, currency)}
+            {depositHeld > 0
+              ? [
+                  `Deposit taken: ${money(depositHeld, currency)}`,
+                  depositRefunded > 0 ? `Returned: ${money(depositRefunded, currency)}` : null,
+                  depositForfeited > 0 ? `Kept: ${money(depositForfeited, currency)}` : null,
+                  `Still held: ${money(available, currency)}`
+                ]
+                  .filter(Boolean)
+                  .join(" · ")
+              : "No deposit held"}
           </p>
-          <p className="mt-1 text-xs font-semibold capitalize text-[var(--muted)]">Deposit status: {statusLabel(depositStatus)}</p>
+          {depositHeld > 0 && available === 0 ? <p className="mt-1 text-xs font-semibold text-[var(--muted)]">Deposit settled. Nothing left to return.</p> : null}
         </div>
         <button
           className="pressable rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground-secondary)]"

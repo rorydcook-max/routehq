@@ -58,7 +58,7 @@ function isVoided(payment: any) {
 
 /**
  * Open work for the team: tasks people created, plus every unpaid payment on a
- * live booking. Payments come straight from the payment schedule (the one
+ * booking that wasn't cancelled. Payments come straight from the payment schedule (the one
  * source of truth), so an extension or a rate change shows up without anyone
  * creating a reminder, and a recorded payment disappears at once. The older
  * auto-created "payment reminder" task rows are left out for the same reason.
@@ -79,7 +79,8 @@ export async function getTaskList(organizationId: string): Promise<TaskListItem[
       .eq("organization_id", organizationId)
       .is("deleted_at", null)
       .not("status", "in", "(paid,voided,waived,cancelled)")
-      .not("rentals.status", "in", "(cancelled,completed)")
+      // A returned rental can still owe money; rent scheduled past the return is voided at return.
+      .not("rentals.status", "in", "(cancelled)")
       .order("due_date", { ascending: true })
   ]);
 

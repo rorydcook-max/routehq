@@ -1,0 +1,197 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { getCurrentMembership } from "@/lib/auth/roles";
+import { OWNER_ONLY_MESSAGE } from "@/lib/auth/role-types";
+import { businessToday } from "@/lib/business-time";
+import { notifyOperator } from "@/lib/notify-operator";
+import { getPublicCatalog, publicBookingSettings } from "@/lib/public-catalog";
+import { daysBetween, minimumStay, planFor } from "@/lib/rental-estimate";
+import { isDoubleBookingError, overlaps } from "@/lib/rental-conflicts";
+import { recordActivityEvent } from "@/lib/supabase/activity";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
+
+type Result<T = {}> = ({ ok: true } & T) | { ok: false; error: string };
+
+const isDate = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value);
+const TAKEN = "Someone has just taken those dates. Please choose other dates or another vehicle.";
+
+function shortDate(iso: string) {
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${iso}T00:00:00Z`));
+}
+
+/**
+ * A customer books a vehicle from the public page. No sign-in and no approval
+ * step: the booking is made at the listed price, the vehicle is taken for
+ * those dates at once, and the customer goes straight to the booking form to
+ * add their details and sign. If they never start the form, the booking is
+ * released when the link runs out (see releaseAbandonedOnlineBookings).
+ */
+export async function bookOnline(formData: FormData): Promise<Result<{ href: string }>> {
+  const slug = String(formData.get("slug") || "").trim();
+  const vehicleId = String(formData.get("vehicleId") || "").trim();
+  const startDate = String(formData.get("startDate") || "").trim();
+  const endDate = String(formData.get("endDate") || "").trim() || null;
+  const name = String(formData.get("name") || "").trim().slice(0, 120);
+  // Stored without spaces, the way the booking form and WhatsApp links expect.
+  const phone = String(formData.get("phone") || "").replace(/[\s\-().]/g, "").slice(0, 24);
+
+  // Bots fill every field; people never see this one.
+  if (String(formData.get("website") || "").trim()) return { ok: false, error: "Please try again." };
+
+  if (name.length < 2) return { ok: false, error: "Please tell us your name." };
+  if (phone.replace(/\D/g, "").length < 7) return { ok: false, error: "Please add a phone or WhatsApp number we can reach you on." };
+  if (!isDate(startDate) || startDate < businessToday()) return { ok: false, error: "Please choose a start date from today onwards." };
+  if (endDate && (!isDate(endDate) || endDate <= startDate)) return { ok: false, error: "The return date must be after the start date." };
+
+  const catalog = await getPublicCatalog(slug);
+  if (!catalog || !catalog.enabled) return { ok: false, error: "Online booking isn't available for this business right now." };
+  const vehicle = catalog.vehicles.find((item) => item.id === vehicleId);
+  if (!vehicle) return { ok: false, error: "That vehicle is no longer available. Please choose another." };
+  if (vehicle.busy.some((period) => overlaps(startDate, endDate, period))) return { ok: false, error: TAKEN };
+
+  const plan = planFor(vehicle, endDate ? daysBetween(startDate, endDate) : null);
+  if (!plan) return { ok: false, error: `${minimumStay(vehicle) || "This vehicle can't be booked online for those dates"}. Please choose a longer stay or another vehicle.` };
+
+  const admin = createSupabaseAdminClient() as any;
+  const organizationId = catalog.organizationId;
+
+  // One person can't tie up the fleet: a couple of unfinished online bookings at most.
+  const { data: unfinished } = await admin
+    .from("booking_links")
+    .select("id, customers!inner(phone)")
+    .eq("organization_id", organizationId)
+    .eq("booking_data->>source", "public_page")
+    .in("status", ["pending", "viewed"])
+    .is("customer_details_submitted_at", null)
+    .eq("customers.phone", phone);
+  if ((unfinished || []).length >= 2) return { ok: false, error: "You already have bookings waiting for your details. Please finish those first, or contact the business." };
+
+  // A returning customer keeps their record (matched by phone).
+  const { data: existing } = await admin.from("customers").select("id").eq("organization_id", organizationId).eq("phone", phone).is("deleted_at", null).limit(1).maybeSingle();
+  let customerId = existing?.id as string | undefined;
+  if (!customerId) {
+    const { data: created, error } = await admin.from("customers").insert({ organization_id: organizationId, full_name: name, phone }).select("id").single();
+    if (error || !created) return { ok: false, error: "We couldn't start your booking. Please try again." };
+    customerId = created.id;
+  }
+
+  const { data: rental, error: rentalError } = await admin
+    .from("rentals")
+    .insert({
+      organization_id: organizationId,
+      customer_id: customerId,
+      vehicle_id: vehicle.id,
+      start_date: startDate,
+      end_date: endDate,
+      is_indefinite: !endDate,
+      status: "booked",
+      pricing_model: plan.pricingModel,
+      recurring_billing: plan.pricingModel === "monthly",
+      billing_interval: plan.pricingModel,
+      rental_rate: plan.rate,
+      deposit_amount: catalog.deposit,
+      balance_due: plan.rate + catalog.deposit,
+      currency: catalog.currency,
+      delivery_method: "tbd",
+      delivery_location: null,
+      delivery_datetime: null,
+      return_location: null
+    })
+    .select("id, display_code, reference")
+    .single();
+  if (rentalError || !rental) return { ok: false, error: isDoubleBookingError(rentalError) ? TAKEN : "We couldn't start your booking. Please try again." };
+
+  const undo = async () => {
+    await admin.from("booking_links").delete().eq("rental_id", rental.id);
+    await admin.from("contracts").delete().eq("rental_id", rental.id);
+    await admin.from("rentals").delete().eq("id", rental.id);
+  };
+
+  const { data: contract, error: contractError } = await admin
+    .from("contracts")
+    .insert({ organization_id: organizationId, rental_id: rental.id, customer_id: customerId, locale: "en", status: "draft", metadata: { included_items: [], special_conditions: null } })
+    .select("id")
+    .single();
+  if (contractError || !contract) {
+    await undo();
+    return { ok: false, error: "We couldn't start your booking. Please try again." };
+  }
+
+  const bookingData = { delivery_method: "tbd", delivery_location: null, delivery_datetime: null, special_conditions: null, share_channel: "public_page", source: "public_page" };
+  const { data: link, error: linkError } = await admin
+    .from("booking_links")
+    .insert({
+      organization_id: organizationId,
+      rental_id: rental.id,
+      vehicle_id: vehicle.id,
+      customer_id: customerId,
+      contract_id: contract.id,
+      status: "pending",
+      data_type: "rental_booking",
+      delivery_method: "tbd",
+      booking_data: bookingData,
+      included_items: [],
+      share_channels: ["public_page"],
+      // Time to start the form before the dates are released again.
+      expires_at: new Date(Date.now() + catalog.holdHours * 3_600_000).toISOString()
+    })
+    .select("id, token")
+    .single();
+  if (linkError || !link) {
+    await undo();
+    return { ok: false, error: "We couldn't start your booking. Please try again." };
+  }
+
+  const baseUrl = String(process.env.NEXT_PUBLIC_APP_URL || "").replace(/\/$/, "");
+  await Promise.all([
+    admin.from("booking_links").update({ public_url: baseUrl ? `${baseUrl}/book/${link.token}` : null }).eq("id", link.id),
+    admin.from("contracts").update({ booking_link_id: link.id }).eq("id", contract.id),
+    admin.from("rentals").update({ contract_id: contract.id }).eq("id", rental.id)
+  ]);
+  await syncVehicleStatusFromBookings(admin, organizationId, vehicle.id).catch(() => null);
+
+  const when = endDate ? `${shortDate(startDate)} to ${shortDate(endDate)}` : `from ${shortDate(startDate)}, no end date`;
+  await recordActivityEvent(admin, {
+    organization_id: organizationId,
+    entity_type: "rental",
+    entity_id: rental.id,
+    vehicle_id: vehicle.id,
+    rental_id: rental.id,
+    customer_id: customerId,
+    event_type: "booking_created",
+    title: "Booked online",
+    detail: `${name} booked the ${vehicle.name} ${when} from your booking page.`
+  } as any).catch(() => null);
+  notifyOperator(organizationId, `🚗 New online booking: ${name} booked the ${vehicle.name} ${when}. They are filling in their details now.`, "operator_notification").catch(() => null);
+
+  revalidatePath("/");
+  revalidatePath("/bookings");
+  revalidatePath("/calendar");
+  revalidatePath(`/rent/${slug}`);
+  return { ok: true, href: `/book/${link.token}` };
+}
+
+/** Turns the public booking page on or off and sets its terms. */
+export async function savePublicBookingSettings(input: { enabled: boolean; holdHours: number; deposit: number }): Promise<Result> {
+  const membership = await getCurrentMembership();
+  if (!membership) return { ok: false, error: "Please sign in again." };
+  if (membership.role !== "owner") return { ok: false, error: OWNER_ONLY_MESSAGE };
+
+  const admin = createSupabaseAdminClient() as any;
+  const { data: organization } = await admin.from("organizations").select("settings, slug").eq("id", membership.organizationId).maybeSingle();
+  if (!organization) return { ok: false, error: "Business not found." };
+  const settings = organization.settings && typeof organization.settings === "object" ? organization.settings : {};
+  const current = publicBookingSettings(settings);
+  const holdHours = [6, 12, 24, 48, 72].includes(Number(input.holdHours)) ? Number(input.holdHours) : current.holdHours;
+  const deposit = Number.isFinite(Number(input.deposit)) && Number(input.deposit) >= 0 ? Math.round(Number(input.deposit)) : current.deposit;
+  const { error } = await admin
+    .from("organizations")
+    .update({ settings: { ...settings, public_booking: { enabled: !!input.enabled, hold_hours: holdHours, deposit } } })
+    .eq("id", membership.organizationId);
+  if (error) return { ok: false, error: "Couldn't save. Please try again." };
+  revalidatePath("/settings");
+  revalidatePath(`/rent/${organization.slug}`);
+  return { ok: true };
+}

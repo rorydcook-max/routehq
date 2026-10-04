@@ -340,6 +340,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             <SectionHeader eyebrow="Online booking" title="Your booking page" />
             <PublicBookingPanel
               enabled={publicBookingSettings(organization.settings).enabled}
+              deposit={publicBookingSettings(organization.settings).deposit}
               holdHours={publicBookingSettings(organization.settings).holdHours}
               pricedVehicles={publicVehicleCounts.priced}
               slug={organization.slug}

@@ -2,12 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
-import { CalendarDays, CheckCircle2 } from "lucide-react";
-import { submitBookingRequest } from "@/app/actions/booking-requests";
+import { CalendarDays } from "lucide-react";
+import { bookOnline } from "@/app/actions/online-booking";
 import { VehicleKindIcon } from "@/components/vehicle-kind-icon";
 import type { CatalogVehicle } from "@/lib/public-catalog";
 import { overlaps } from "@/lib/rental-conflicts";
-import { daysBetween, estimateRental, headlineRate } from "@/lib/rental-estimate";
+import { daysBetween, estimateRental, headlineRate, minimumStay, planFor } from "@/lib/rental-estimate";
 
 const inputClass = "mt-1.5 w-full rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15";
 
@@ -26,6 +26,7 @@ export function Catalog({
   organizationName,
   vehicles,
   currency,
+  deposit,
   holdHours,
   today
 }: {
@@ -33,6 +34,7 @@ export function Catalog({
   organizationName: string;
   vehicles: CatalogVehicle[];
   currency: string;
+  deposit: number;
   holdHours: number;
   today: string;
 }) {
@@ -41,7 +43,6 @@ export function Catalog({
   const [endDate, setEndDate] = useState("");
   const [longTerm, setLongTerm] = useState(true);
   const [openId, setOpenId] = useState<string | null>(null);
-  const [sent, setSent] = useState<{ vehicle: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -72,39 +73,20 @@ export function Catalog({
         formData.set("vehicleId", vehicle.id);
         formData.set("startDate", startDate);
         formData.set("endDate", end || "");
-        const result = await submitBookingRequest(formData);
+        const result = await bookOnline(formData);
         if (!result.ok) {
           setError(result.error);
+          // Someone else may have taken it meanwhile: show what is free now.
+          router.refresh();
           return;
         }
-        setSent({ vehicle: vehicle.name });
-        // Reload what is free: the vehicle just requested is now held.
-        router.refresh();
-        setOpenId(null);
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        // Straight on to their details and the agreement. A full page load, so the
+        // customer never sees the staff app's loading screen in between.
+        window.location.assign(result.href);
       } catch {
-        setError("We couldn't send your request. Please try again.");
+        setError("We couldn't start your booking. Please try again.");
       }
     });
-  }
-
-  if (sent) {
-    return (
-      <section className="rounded-2xl border border-[var(--border)] bg-white p-6 text-center shadow-sm">
-        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#f0fdf4] text-[#16a34a]">
-          <CheckCircle2 size={28} />
-        </span>
-        <h2 className="mt-4 text-2xl font-semibold">Request sent</h2>
-        <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-          {organizationName} has your request for the {sent.vehicle}
-          {end ? ` from ${shortDate(startDate)} to ${shortDate(end)}` : ` from ${shortDate(startDate)}`}. It is held for you for {holdHours} hours while they confirm. They will contact you
-          on the number you gave.
-        </p>
-        <button className="pressable mt-5 inline-flex min-h-11 items-center rounded-xl border border-[var(--border)] bg-white px-5 text-sm font-semibold text-[var(--foreground)]" onClick={() => setSent(null)} type="button">
-          Look at other vehicles
-        </button>
-      </section>
-    );
   }
 
   return (
@@ -142,6 +124,9 @@ export function Catalog({
         {rows.map(({ vehicle, free, freeFrom, openEndedClash }) => {
           const headline = headlineRate(vehicle);
           const estimate = days ? estimateRental(vehicle, days) : null;
+          // A monthly-only vehicle can't be booked for a weekend.
+          const bookable = !!planFor(vehicle, days);
+          const tooShort = datesReady && free && !bookable ? minimumStay(vehicle) : null;
           const otherRates = [
             vehicle.dailyRate > 0 && headline?.per !== "day" ? `${money(vehicle.dailyRate)} / day` : null,
             vehicle.weeklyRate > 0 && headline?.per !== "week" ? `${money(vehicle.weeklyRate)} / week` : null
@@ -162,18 +147,20 @@ export function Catalog({
                       {otherRates.length ? <span className="ml-2 text-sm font-medium text-[var(--muted)]">{otherRates.join(" · ")}</span> : null}
                     </p>
                   ) : null}
+                  {deposit > 0 ? <p className="mt-0.5 text-sm text-[var(--muted)]">{money(deposit)} deposit, returned at the end</p> : null}
                   {free && estimate && days ? (
                     <p className="mt-1 text-sm text-[var(--primary)]">
                       About {money(estimate)} for {days} {days === 1 ? "day" : "days"}
                     </p>
                   ) : null}
+                  {tooShort ? <p className="mt-1 text-sm font-semibold text-[#b45309]">{tooShort} for this vehicle</p> : null}
                   {!free ? (
                     <p className="mt-1 text-sm font-semibold text-[#b45309]">
                       {freeFrom ? `Taken for these dates · free from ${shortDate(freeFrom)}` : openEndedClash ? "On a long-term rental" : "Taken for these dates"}
                     </p>
                   ) : null}
                 </div>
-                {free && datesReady ? (
+                {free && datesReady && bookable ? (
                   <button
                     className={`pressable min-h-11 shrink-0 rounded-xl px-4 text-sm font-semibold ${isOpen ? "border border-[var(--border)] bg-white text-[var(--foreground)]" : "bg-[var(--primary)] text-white"}`}
                     onClick={() => {
@@ -182,7 +169,7 @@ export function Catalog({
                     }}
                     type="button"
                   >
-                    {isOpen ? "Close" : "Request"}
+                    {isOpen ? "Close" : "Book"}
                   </button>
                 ) : null}
               </div>
@@ -199,18 +186,15 @@ export function Catalog({
                       <input autoComplete="tel" className={inputClass} inputMode="tel" name="phone" placeholder="+66 ..." required />
                     </label>
                   </div>
-                  <label className="block text-sm font-semibold text-[var(--foreground-secondary)]">
-                    Anything we should know? <span className="font-normal text-[var(--muted)]">(optional)</span>
-                    <textarea className={inputClass} name="message" placeholder="Where you are staying, delivery time, questions..." rows={2} />
-                  </label>
                   {/* Hidden from people; bots fill it in and are ignored. */}
                   <input aria-hidden="true" autoComplete="off" className="hidden" name="website" tabIndex={-1} />
                   {error ? <p className="text-sm font-semibold text-[#dc2626]">{error}</p> : null}
                   <button className="pressable min-h-12 w-full rounded-xl bg-[var(--primary)] px-4 text-sm font-semibold text-white disabled:opacity-60" disabled={isPending} type="submit">
-                    {isPending ? "Sending…" : "Send request"}
+                    {isPending ? "Booking…" : "Book and continue"}
                   </button>
                   <p className="text-xs leading-5 text-[var(--muted)]">
-                    No payment now. {organizationName} will confirm the price and send you a booking link. The vehicle is held for you for {holdHours} hours.
+                    {deposit > 0 ? `A ${money(deposit)} deposit applies. ` : ""}No payment is taken now: you can pay online or when you get the vehicle. Next you add your details and sign the
+                    agreement. Please start within {holdHours} hours or the booking is released.
                   </p>
                 </form>
               ) : null}

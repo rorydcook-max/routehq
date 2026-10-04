@@ -1,16 +1,17 @@
 import { resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
 import { BLOCKING_RENTAL_STATUSES } from "@/lib/rental-conflicts";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { recordActivityEvent } from "@/lib/supabase/activity";
+import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
 import { kindFromCategory, type VehicleKind } from "@/lib/vehicle-groups";
 
 /**
  * The public booking page: anyone with the link sees a business's vehicles,
- * what is free for their dates, and can send a request. Nothing here exposes
+ * what is free for their dates, and can book one. Nothing here exposes
  * customer names or plates - only "busy from / to".
  */
 
-export type PublicBookingSettings = { enabled: boolean; holdHours: number };
+export type PublicBookingSettings = { enabled: boolean; holdHours: number; deposit: number };
 
 export type CatalogVehicle = {
   id: string;
@@ -26,27 +27,53 @@ export type CatalogVehicle = {
   busy: Array<{ startDate: string; endDate: string | null }>;
 };
 
-export type BookingRequestRow = {
-  id: string;
-  vehicleId: string;
-  vehicleName: string;
-  startDate: string;
-  endDate: string | null;
-  customerName: string;
-  phone: string;
-  message: string | null;
-  estimatedTotal: number | null;
-  holdUntil: string;
-  createdAt: string;
-};
-
 export function publicBookingSettings(settings: any): PublicBookingSettings {
   const raw = settings && typeof settings === "object" ? settings.public_booking : null;
   const hours = Number(raw?.hold_hours);
-  return { enabled: raw?.enabled === true, holdHours: Number.isFinite(hours) && hours > 0 ? Math.min(hours, 168) : 24 };
+  const deposit = Number(raw?.deposit);
+  return {
+    enabled: raw?.enabled === true,
+    holdHours: Number.isFinite(hours) && hours > 0 ? Math.min(hours, 168) : 24,
+    deposit: Number.isFinite(deposit) && deposit > 0 ? deposit : 0
+  };
 }
 
-const HIDDEN_STATUS = /sold|retired|inactive|archived|written/i;
+const HIDDEN_STATUS = /sold|retired|inactive|archived|written|maintenance/i;
+
+/**
+ * A booking made on the public page holds the vehicle straight away. If the
+ * customer never starts the booking form before the link runs out, the booking
+ * is cancelled so the dates open up again. Bookings where the customer has
+ * filled in their details are left for the business to decide.
+ */
+export async function releaseAbandonedOnlineBookings(admin: any, organizationId: string) {
+  const { data: stale } = await admin
+    .from("booking_links")
+    .select("id, rental_id, vehicle_id, rentals!inner(status)")
+    .eq("organization_id", organizationId)
+    .eq("booking_data->>source", "public_page")
+    .in("status", ["pending", "viewed"])
+    .is("customer_details_submitted_at", null)
+    .lt("expires_at", new Date().toISOString())
+    .eq("rentals.status", "booked");
+  for (const link of stale || []) {
+    const now = new Date().toISOString();
+    await admin.from("rentals").update({ status: "cancelled" }).eq("id", link.rental_id).eq("organization_id", organizationId).eq("status", "booked");
+    await admin.from("booking_links").update({ status: "cancelled", cancelled_at: now }).eq("id", link.id);
+    await syncVehicleStatusFromBookings(admin, organizationId, link.vehicle_id).catch(() => null);
+    await recordActivityEvent(admin, {
+      organization_id: organizationId,
+      entity_type: "rental",
+      entity_id: link.rental_id,
+      vehicle_id: link.vehicle_id,
+      rental_id: link.rental_id,
+      event_type: "booking_cancelled",
+      title: "Online booking released",
+      detail: "The customer did not start the booking form in time, so the dates were opened up again."
+    } as any).catch(() => null);
+  }
+  return (stale || []).length;
+}
 
 export async function getPublicCatalog(slug: string) {
   const admin = createSupabaseAdminClient() as any;
@@ -60,8 +87,9 @@ export async function getPublicCatalog(slug: string) {
 
   const settings = publicBookingSettings(organization.settings);
   if (!settings.enabled) return { enabled: false as const, name: String(organization.name || "") };
+  await releaseAbandonedOnlineBookings(admin, organization.id).catch(() => null);
 
-  const [vehiclesResult, rentalsResult, holdsResult, branding] = await Promise.all([
+  const [vehiclesResult, rentalsResult, branding] = await Promise.all([
     admin
       .from("vehicles")
       .select("id, make, model, trim, year, color, status, daily_rate, weekly_rate, monthly_rate, specifications, vehicle_categories(code, name)")
@@ -74,17 +102,11 @@ export async function getPublicCatalog(slug: string) {
       .eq("organization_id", organization.id)
       .is("deleted_at", null)
       .in("status", BLOCKING_RENTAL_STATUSES as unknown as string[]),
-    admin
-      .from("booking_requests")
-      .select("vehicle_id, start_date, end_date")
-      .eq("organization_id", organization.id)
-      .eq("status", "pending")
-      .gt("hold_until", new Date().toISOString()),
     resolveOrganizationBrandingDisplayUrls(admin, organization, { allowExternalUrl: true, expiresIn: 60 * 60 }).catch(() => null)
   ]);
 
   const busy = new Map<string, CatalogVehicle["busy"]>();
-  for (const row of [...(rentalsResult.data || []), ...(holdsResult.data || [])]) {
+  for (const row of rentalsResult.data || []) {
     if (!row.vehicle_id || !row.start_date) continue;
     const list = busy.get(row.vehicle_id) || [];
     list.push({ startDate: String(row.start_date).slice(0, 10), endDate: row.end_date ? String(row.end_date).slice(0, 10) : null });
@@ -122,34 +144,8 @@ export async function getPublicCatalog(slug: string) {
     phone: String(orgSettings.business_phone || orgSettings.phone || ""),
     currency: String(organization.currency || "THB"),
     holdHours: settings.holdHours,
+    deposit: settings.deposit,
     vehicles
   };
 }
 
-/** Requests waiting for an answer, for the signed-in member's business. */
-export async function getPendingBookingRequests(organizationId: string): Promise<BookingRequestRow[]> {
-  const supabase = (await createSupabaseServerClient()) as any;
-  const { data, error } = await supabase
-    .from("booking_requests")
-    .select("id, vehicle_id, start_date, end_date, customer_name, phone, message, estimated_total, hold_until, created_at, vehicles(make, model)")
-    .eq("organization_id", organizationId)
-    .eq("status", "pending")
-    .order("created_at", { ascending: true });
-  if (error) {
-    console.error("getPendingBookingRequests", error.message);
-    return [];
-  }
-  return ((data || []) as any[]).map((row) => ({
-    id: row.id,
-    vehicleId: row.vehicle_id,
-    vehicleName: [row.vehicles?.make, row.vehicles?.model].filter(Boolean).join(" ") || "Vehicle",
-    startDate: String(row.start_date).slice(0, 10),
-    endDate: row.end_date ? String(row.end_date).slice(0, 10) : null,
-    customerName: row.customer_name,
-    phone: row.phone,
-    message: row.message || null,
-    estimatedTotal: row.estimated_total != null ? Number(row.estimated_total) : null,
-    holdUntil: row.hold_until,
-    createdAt: row.created_at
-  }));
-}

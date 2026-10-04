@@ -2,30 +2,22 @@ import { bookingRules, clashes } from "@/lib/booking-rules";
 import { businessToday } from "@/lib/business-time";
 import { notifyOperator } from "@/lib/notify-operator";
 import { BLOCKING_RENTAL_STATUSES } from "@/lib/rental-conflicts";
+import { quoteStay, rentalRateCard } from "@/lib/rental-estimate";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 
 /**
  * A customer asks, from their booking page, to keep the vehicle longer. When
- * nothing stands in the way the rental is extended on the spot at the rate
- * they already pay, with a payment for the extra days. Otherwise the request
+ * nothing stands in the way the rental is extended on the spot, with a payment for
+ * the extra days priced from the vehicle's daily, weekly and monthly rates. Otherwise the request
  * goes to the business with the reason.
  */
 
 export type ExtensionOutcome =
-  | { applied: true; newEndDate: string; amount: number; dueDate: string; currency: string }
+  | { applied: true; newEndDate: string; amount: number; dueDate: string; currency: string; explain: string | null }
   | { applied: false; reason: string };
 
 function daysBetween(from: string, to: string) {
   return Math.round((new Date(`${to}T00:00:00Z`).getTime() - new Date(`${from}T00:00:00Z`).getTime()) / 86_400_000);
-}
-
-/** The price of extra days at the rental's own rate. */
-export function extensionAmount(rental: { rental_rate: unknown; pricing_model?: unknown; billing_interval?: unknown }, days: number) {
-  const rate = Number(rental.rental_rate || 0);
-  const period = String(rental.billing_interval || rental.pricing_model || "monthly").toLowerCase();
-  const perDay = period === "daily" ? rate : period === "weekly" ? rate / 7 : rate / 30;
-  // To the nearest 10, the way a person would quote it.
-  return Math.max(0, Math.round((perDay * days) / 10) * 10);
 }
 
 export async function tryAutoExtend(admin: any, rentalId: string, newEndDateRaw: unknown): Promise<ExtensionOutcome> {
@@ -34,7 +26,7 @@ export async function tryAutoExtend(admin: any, rentalId: string, newEndDateRaw:
 
   const { data: rental } = await admin
     .from("rentals")
-    .select("id, organization_id, vehicle_id, customer_id, start_date, end_date, status, rental_rate, pricing_model, billing_interval, currency, vehicles!rentals_vehicle_id_fkey(make, model), customers!rentals_customer_id_fkey(full_name)")
+    .select("id, organization_id, vehicle_id, customer_id, start_date, end_date, status, rental_rate, pricing_model, billing_interval, currency, vehicles!rentals_vehicle_id_fkey(make, model, daily_rate, weekly_rate, monthly_rate), customers!rentals_customer_id_fkey(full_name)")
     .eq("id", rentalId)
     .is("deleted_at", null)
     .maybeSingle();
@@ -68,7 +60,8 @@ export async function tryAutoExtend(admin: any, rentalId: string, newEndDateRaw:
   if (blocked) return { applied: false, reason: "another booking for this vehicle is in the way" };
 
   const extraDays = daysBetween(currentEnd, newEndDate);
-  const amount = extensionAmount(rental, extraDays);
+  const quote = quoteStay(rentalRateCard(rental.vehicles, rental), extraDays);
+  const amount = quote?.amount ?? 0;
   const currency = String(rental.currency || "THB");
 
   // The database refuses the change if another booking slipped in meanwhile.
@@ -93,6 +86,7 @@ export async function tryAutoExtend(admin: any, rentalId: string, newEndDateRaw:
         previous_end_date: currentEnd,
         new_end_date: newEndDate,
         extension_days: extraDays,
+        priced_as: quote?.explain || null,
         source: "customer_request_auto"
       }
     });
@@ -106,7 +100,7 @@ export async function tryAutoExtend(admin: any, rentalId: string, newEndDateRaw:
   const vehicle = [rental.vehicles?.make, rental.vehicles?.model].filter(Boolean).join(" ") || "vehicle";
   const who = rental.customers?.full_name || "The customer";
   const money = `${currency === "THB" ? "฿" : `${currency} `}${amount.toLocaleString("en-US")}`;
-  const detail = `${who} asked to keep the ${vehicle} until ${newEndDate} (was ${currentEnd}). Nothing was in the way, so it was extended automatically. ${money} is due on ${currentEnd}.`;
+  const detail = `${who} asked to keep the ${vehicle} until ${newEndDate} (was ${currentEnd}). Nothing was in the way, so it was extended automatically. ${money} is due on ${currentEnd}${quote ? ` (${quote.explain})` : ""}.`;
   await Promise.all([
     recordActivityEvent(admin, {
       organization_id: rental.organization_id,
@@ -132,5 +126,5 @@ export async function tryAutoExtend(admin: any, rentalId: string, newEndDateRaw:
   ]);
   notifyOperator(rental.organization_id, `📅 Extended automatically: ${who} keeps the ${vehicle} until ${newEndDate}. ${money} due on ${currentEnd}.`, "portal_action").catch(() => null);
 
-  return { applied: true, newEndDate, amount, dueDate: currentEnd, currency };
+  return { applied: true, newEndDate, amount, dueDate: currentEnd, currency, explain: quote?.explain || null };
 }

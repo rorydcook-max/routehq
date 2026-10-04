@@ -1,5 +1,6 @@
 "use client";
 
+import { quoteStay, type Rates } from "@/lib/rental-estimate";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { adjustRental } from "@/app/actions/bookings";
 import { cancelRentalAmendment, createRentalAmendment, getRentalAmendmentContext, type AmendmentSummary } from "@/app/actions/amendments";
@@ -14,6 +15,7 @@ type AmendmentContext = {
   currentDeposit: number;
   currency: string;
   billingPeriod: string;
+  rates?: Rates;
 };
 
 /** The link the customer signs, with ways to send it. */
@@ -281,6 +283,7 @@ export function RentalAdjustmentModal({
   const originalEndDate = dateInputValue(currentEndDate);
   const extensionDays = daysBetween(currentEndDate, extensionEndDate);
   const earlyReturnDays = daysBetween(earlyReturnDate, currentEndDate);
+  const extensionQuote = context?.rates && extensionDays > 0 ? quoteStay(context.rates, extensionDays) : null;
   const dailyRate = Math.round(Number(currentRate || 0) / 30);
   const suggestedRefund = Math.round(earlyReturnDays * (Number(currentRate || 0) / 30));
 
@@ -440,6 +443,14 @@ export function RentalAdjustmentModal({
               <label className="block">
                 Agreed payment for this extension
                 <CurrencyInput onChange={setExtensionAmount} value={extensionAmount} />
+                {extensionQuote ? (
+                  <span className="mt-1 flex flex-wrap items-center gap-2 text-[12px] text-[var(--foreground-secondary)]">
+                    From your rates: <span className="font-semibold text-[var(--foreground)]">{money(extensionQuote.amount)}</span> ({extensionQuote.explain})
+                    <button className="rounded-md border border-[var(--border)] bg-white px-2 py-0.5 text-[11px] font-semibold text-[var(--primary)]" onClick={() => setExtensionAmount(String(extensionQuote.amount))} type="button">
+                      Use this
+                    </button>
+                  </span>
+                ) : null}
                 <span className="mt-1 block text-[11px] text-[var(--muted)]">Total amount agreed for this specific period - not a recurring rate. If 0 or blank, no payment record is created.</span>
               </label>
 

@@ -11,6 +11,7 @@ import { toWallTime } from "@/lib/business-time";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getPortalPayments } from "@/lib/payment-receipts";
 import { bookingRules } from "@/lib/booking-rules";
+import { rentalRateCard } from "@/lib/rental-estimate";
 import { promptPayQrSvg } from "@/lib/promptpay";
 import { PortalPayments } from "./portal-payments";
 
@@ -343,6 +344,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             deliveryPhotoUrls={detail.deliveryPhotoUrls || []}
             organizationName={organization?.name || "Rental operator"}
             endNoticeDays={bookingRules(organization?.settings).endNoticeDays}
+            extensionRates={rentalRateCard(vehicle, rental)}
             orgPayment={detail.org_payment}
             ownerContact={ownerContact}
             paymentBundle={portal.bundle}

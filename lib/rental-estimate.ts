@@ -11,15 +11,72 @@ export function daysBetween(startDate: string, endDate: string) {
   return Math.max(1, Math.round((end - start) / 86_400_000));
 }
 
-/** Cheapest way to cover the days with the rates the vehicle has; null when none fits. */
+export type StayQuote = {
+  amount: number;
+  /** Which rate the price is worked out from. */
+  basis: "daily" | "weekly" | "monthly";
+  /** In plain words, e.g. "5 days at ฿500 a day". */
+  explain: string;
+};
+
+const baht = (value: number) => `฿${Math.round(value).toLocaleString("en-US")}`;
+
+/**
+ * The price of a number of days from a rate card, the way a rental desk
+ * quotes it: under a week uses the daily rate, a week up to a month uses the
+ * weekly rate pro rata, a month or more uses the monthly rate pro rata. A
+ * missing rate falls back to the nearest one the vehicle does have. A short
+ * stay never costs more than the next longer rate (six days at the daily rate
+ * is capped at the weekly rate, three weeks at the monthly rate).
+ */
+export function quoteStay(rates: Rates, days: number): StayQuote | null {
+  if (!(days > 0)) return null;
+  const order: Array<StayQuote["basis"]> = days >= 28 ? ["monthly", "weekly", "daily"] : days >= 7 ? ["weekly", "monthly", "daily"] : ["daily", "weekly", "monthly"];
+  const rateOf = { daily: rates.dailyRate, weekly: rates.weeklyRate, monthly: rates.monthlyRate };
+  const basis = order.find((key) => rateOf[key] > 0);
+  if (!basis) return null;
+
+  const dayWord = days === 1 ? "day" : "days";
+  let amount = basis === "daily" ? days * rates.dailyRate : basis === "weekly" ? (days / 7) * rates.weeklyRate : (days / 30) * rates.monthlyRate;
+  let explain =
+    basis === "daily"
+      ? `${days} ${dayWord} at ${baht(rates.dailyRate)} a day`
+      : basis === "weekly"
+        ? `${days} ${dayWord} at the weekly rate of ${baht(rates.weeklyRate)}`
+        : `${days} ${dayWord} at the monthly rate of ${baht(rates.monthlyRate)}`;
+
+  if (days < 7 && basis === "daily" && rates.weeklyRate > 0 && amount > rates.weeklyRate) {
+    amount = rates.weeklyRate;
+    explain = `${days} ${dayWord}, charged as one week (${baht(rates.weeklyRate)})`;
+  }
+  if (days < 28 && basis !== "monthly" && rates.monthlyRate > 0 && amount > rates.monthlyRate) {
+    amount = rates.monthlyRate;
+    explain = `${days} ${dayWord}, charged as one month (${baht(rates.monthlyRate)})`;
+  }
+  // To the nearest 10, the way a person would quote it.
+  return { amount: Math.max(0, Math.round(amount / 10) * 10), basis, explain };
+}
+
+/**
+ * The rate card to price extra days on a rental: the vehicle's rates, with the
+ * rate this customer actually agreed standing in for its own period (someone
+ * paying a negotiated monthly rate keeps it).
+ */
+export function rentalRateCard(vehicle: { daily_rate?: unknown; weekly_rate?: unknown; monthly_rate?: unknown } | null | undefined, rental: { rental_rate?: unknown; pricing_model?: unknown; billing_interval?: unknown }): Rates {
+  const card: Rates = { dailyRate: Number(vehicle?.daily_rate || 0), weeklyRate: Number(vehicle?.weekly_rate || 0), monthlyRate: Number(vehicle?.monthly_rate || 0) };
+  const agreed = Number(rental.rental_rate || 0);
+  const period = String(rental.billing_interval || rental.pricing_model || "monthly").toLowerCase();
+  if (agreed > 0) {
+    if (period === "daily") card.dailyRate = agreed;
+    else if (period === "weekly") card.weeklyRate = agreed;
+    else card.monthlyRate = agreed;
+  }
+  return card;
+}
+
+/** A rough price for a stay; null when the vehicle has no rates at all. */
 export function estimateRental(rates: Rates, days: number): number | null {
-  const options: number[] = [];
-  if (rates.dailyRate > 0) options.push(days * rates.dailyRate);
-  if (rates.weeklyRate > 0 && days >= 7) options.push((days / 7) * rates.weeklyRate);
-  if (rates.monthlyRate > 0 && days >= 28) options.push((days / 30) * rates.monthlyRate);
-  if (options.length === 0) return null;
-  // Round to the nearest 10 so an estimate doesn't look like an exact quote.
-  return Math.round(Math.min(...options) / 10) * 10;
+  return quoteStay(rates, days)?.amount ?? null;
 }
 
 /** The headline price for a card: the longest period the vehicle is priced for. */

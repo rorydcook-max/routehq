@@ -6,6 +6,7 @@ import { useMemo, useState, useTransition } from "react";
 import { AlertTriangle, CalendarCheck, CalendarPlus, CheckCircle2, FileText, ImageIcon, MessageCircle } from "lucide-react";
 import { submitCustomerPortalAction } from "@/app/actions/public-booking";
 import type { PortalBundle, PortalPayment } from "@/lib/payment-receipts";
+import { quoteStay, type Rates } from "@/lib/rental-estimate";
 import { PortalPayments } from "./portal-payments";
 
 type ActionType = "extension_request" | "return_confirmation" | "problem_report" | "question";
@@ -25,7 +26,8 @@ export function ActiveRentalPortal({
   payments = [],
   paymentBundle = null,
   orgPayment = null,
-  endNoticeDays = 0
+  endNoticeDays = 0,
+  extensionRates = null
 }: {
   token: string;
   organizationName: string;
@@ -40,6 +42,8 @@ export function ActiveRentalPortal({
   paymentBundle?: PortalBundle | null;
   /** Days of notice the business asks for before a return. */
   endNoticeDays?: number;
+  /** Rates used to price extra days. */
+  extensionRates?: Rates | null;
   orgPayment?: any;
 }) {
   const router = useRouter();
@@ -119,6 +123,7 @@ export function ActiveRentalPortal({
                   endDate={endDate}
                   isPending={isPending}
                   endNoticeDays={endNoticeDays}
+                  extensionRates={extensionRates}
                   minExtensionDate={minExtensionDate}
                   onSubmit={submitAction}
                   organizationName={organizationName}
@@ -166,6 +171,7 @@ function ActionForm({
   endDate,
   minExtensionDate,
   endNoticeDays = 0,
+  extensionRates = null,
   deliveryLocation,
   isPending,
   onSubmit,
@@ -176,20 +182,29 @@ function ActionForm({
   endDate: string;
   minExtensionDate: string;
   endNoticeDays?: number;
+  extensionRates?: Rates | null;
   deliveryLocation: string;
   isPending: boolean;
   organizationName: string;
   ownerContact?: string | null;
   onSubmit: (formData: FormData, successMessage: string) => void;
 }) {
+  const [newEnd, setNewEnd] = useState("");
+  const extraDays = endDate && newEnd > endDate ? Math.round((new Date(`${newEnd}T00:00:00Z`).getTime() - new Date(`${String(endDate).slice(0, 10)}T00:00:00Z`).getTime()) / 86_400_000) : 0;
+  const extensionQuote = extensionRates && extraDays > 0 ? quoteStay(extensionRates, extraDays) : null;
   if (type === "extension_request") {
     return (
       <form action={(formData) => onSubmit(formData, `Extension request sent. ${organizationName} will confirm shortly.`)} className="mt-4 space-y-3">
         <input name="actionType" type="hidden" value="extension_request" />
         <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
           New return date
-          <input className={inputClass} min={minExtensionDate} name="newEndDate" required type="date" />
+          <input className={inputClass} min={minExtensionDate} name="newEndDate" onChange={(event) => setNewEnd(event.target.value)} required type="date" value={newEnd} />
         </label>
+        {extensionQuote ? (
+          <p className="rounded-xl bg-[var(--primary-light)] p-3 text-sm text-[var(--foreground)]">
+            <span className="font-semibold">฿{extensionQuote.amount.toLocaleString("en-US")}</span> for {extensionQuote.explain}.
+          </p>
+        ) : null}
         <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
           Note to owner
           <textarea className={inputClass} name="note" placeholder="Optional" />

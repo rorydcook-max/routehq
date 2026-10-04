@@ -1,5 +1,6 @@
 "use server";
 
+import { rentalRateCard, type Rates } from "@/lib/rental-estimate";
 import { randomUUID } from "node:crypto";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
@@ -142,6 +143,8 @@ export async function getRentalAmendmentContext(rentalId: string): Promise<
     billingPeriod: string;
     endDate: string | null;
     isIndefinite: boolean;
+    /** Rates for pricing extra days (the vehicle's, with this rental's own agreed rate). */
+    rates: Rates;
   }>
 > {
   try {
@@ -154,6 +157,9 @@ export async function getRentalAmendmentContext(rentalId: string): Promise<
       .eq("rental_id", rentalId)
       .eq("status", "awaiting_signature")
       .maybeSingle();
+    const { data: vehicleRates } = rental.vehicle_id
+      ? await admin.from("vehicles").select("daily_rate, weekly_rate, monthly_rate").eq("id", rental.vehicle_id).maybeSingle()
+      : { data: null };
     return {
       ok: true,
       agreementSigned: Boolean(signedAgreement),
@@ -164,7 +170,8 @@ export async function getRentalAmendmentContext(rentalId: string): Promise<
       currency: String(rental.currency || "THB"),
       billingPeriod: String(rental.billing_interval || rental.pricing_model || "monthly"),
       endDate: cleanDate(rental.end_date),
-      isIndefinite: Boolean(rental.is_indefinite)
+      isIndefinite: Boolean(rental.is_indefinite),
+      rates: rentalRateCard(vehicleRates, rental)
     };
   } catch (error) {
     return { ok: false, error: errorMessage(error) };

@@ -341,7 +341,15 @@ function AtAGlance({ detail }: { detail: VehicleDetail }) {
     }
   ];
 
+  const rateCard: Array<[string, number]> = [
+    ["day", Number(detail.vehicle.daily_rate || 0)],
+    ["week", Number(detail.vehicle.weekly_rate || 0)],
+    ["month", Number(detail.vehicle.monthly_rate || 0)]
+  ];
+  const ratesSet = rateCard.filter(([, value]) => value > 0).length;
+
   return (
+    <div className="space-y-3">
     <div className="grid gap-3 sm:grid-cols-2">
       {tiles.map((tile) => {
         const Icon = tile.icon;
@@ -358,6 +366,23 @@ function AtAGlance({ detail }: { detail: VehicleDetail }) {
           </div>
         );
       })}
+    </div>
+    <div className="soft-panel flex flex-wrap items-center gap-x-6 gap-y-2 p-3">
+      <p className="text-xs font-bold uppercase text-[var(--muted)]">Rental rates</p>
+      {rateCard.map(([period, value]) => (
+        <p className="text-sm text-[var(--foreground-secondary)]" key={period}>
+          <span className={`font-mono-data text-base font-semibold ${value > 0 ? "text-[var(--foreground)]" : "text-[var(--muted)]"}`}>{value > 0 ? money(value) : "Not set"}</span> / {period}
+        </p>
+      ))}
+      <Link className="ml-auto text-sm font-semibold text-[var(--primary)] hover:underline" href={`/fleet/${detail.vehicle.id}/edit` as Route}>
+        {ratesSet === 3 ? "Edit rates" : ratesSet === 0 ? "Add rates" : "Add the missing rates"}
+      </Link>
+      {ratesSet < 3 ? (
+        <p className="basis-full text-xs text-[var(--muted)]">
+          Daily, weekly and monthly rates are used to price bookings and short extensions. A missing rate is worked out from the nearest one you have set.
+        </p>
+      ) : null}
+    </div>
     </div>
   );
 }

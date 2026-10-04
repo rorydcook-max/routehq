@@ -430,7 +430,10 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
   const alreadyRefunded = Number(context.rental?.deposit_refunded_amount || 0);
   const alreadyForfeited = Number(context.rental?.deposit_forfeited_amount || 0);
   const availableToReconcile = Math.max(0, depositHeld - alreadyRefunded - alreadyForfeited);
-  const outstandingBalance = (context.unpaidPayments || []).reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
+  // A deposit that was never collected is not money owed for the rental.
+  const outstandingBalance = (context.unpaidPayments || [])
+    .filter((payment: any) => payment.metadata?.type !== "deposit" && payment.metadata?.is_deposit !== true)
+    .reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
   const requestedDeductions = outstandingBalance + fuelDeficitCharge + damageCharge + cleaningCharge;
   const appliedDeductions = Math.min(availableToReconcile, requestedDeductions);
   const calculatedRefund = Math.max(0, availableToReconcile - appliedDeductions);

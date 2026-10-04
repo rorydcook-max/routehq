@@ -919,6 +919,8 @@ export async function cancelBooking(formData: FormData) {
   if (updateError) {
     throw new Error(updateError.message);
   }
+  // Nothing more is owed on a cancelled booking (the full cancel dialog does the same).
+  await supabase.from("rental_payments").update({ status: "cancelled" }).eq("rental_id", rentalId).eq("organization_id", organizationId).in("status", ["scheduled", "pending", "overdue"]);
   await syncVehicleStatusFromBookings(supabase, organizationId, rental.vehicle_id);
 
   await recordActivityEvent(supabase, {

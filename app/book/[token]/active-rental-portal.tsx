@@ -335,7 +335,7 @@ function VehiclePhoto({ vehicle }: { vehicle: any }) {
 }
 
 function returnCountdown(endDate: string | null | undefined) {
-  if (!endDate) return { label: "Open ended", overdue: false, today: false };
+  if (!endDate) return { label: "Monthly, no return date set", overdue: false, today: false };
   const todayDate = new Date();
   const target = new Date(endDate);
   todayDate.setHours(0, 0, 0, 0);

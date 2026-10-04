@@ -273,6 +273,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   const rental = detail.rental || {};
   const bookingData = (detail.bookingLink?.booking_data || {}) as Record<string, unknown>;
   const delivery = deliveryText(rental, bookingData);
+  const handedOver = detail.state === "active" || detail.state === "completed";
   const included = includedItems(detail.bookingLink?.included_items);
   const logoUrl = organization?.logo_display_url || null;
   const ownerContact = organization?.settings?.phone || organization?.settings?.business_phone || organization?.owner_phone || null;
@@ -329,11 +330,12 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
               </div>
             </div>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <Info icon={CalendarDays} label="Rental period" value={rental.is_indefinite ? `Open ended from ${formatSummaryDate(rental.start_date)}` : `${formatSummaryDate(rental.start_date)} to ${formatSummaryDate(rental.end_date)}`} />
+              <Info icon={CalendarDays} label="Rental period" value={rental.is_indefinite ? `Monthly, open-ended from ${formatSummaryDate(rental.start_date)}` : `${formatSummaryDate(rental.start_date)} to ${formatSummaryDate(rental.end_date)}`} />
               <Info icon={CreditCard} label="Rate and deposit" value={`${rateLabel(rental)}\n${Number(rental.deposit_amount || 0) > 0 ? `Deposit: ${money(rental.deposit_amount, rental.currency || "THB")}` : "No deposit"}`} />
-              <Info className="sm:row-span-2" icon={MapPin} label="Handover" value={delivery.location} />
+              {/* Once the customer has the vehicle, where and when it was to be handed over is old news. */}
+              {handedOver ? null : <Info className="sm:row-span-2" icon={MapPin} label="Handover" value={delivery.location} />}
               <Info icon={ReceiptText} label="First payment due" value={paymentDueText(rental, bookingData)} />
-              <Info icon={Clock} label="Handover time" value={delivery.time} />
+              {handedOver ? null : <Info icon={Clock} label="Handover time" value={delivery.time} />}
             </div>
           </div>
 

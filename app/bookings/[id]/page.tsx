@@ -6,7 +6,11 @@ import { ChangeVehicleButton } from "@/app/bookings/[id]/change-vehicle-button";
 import { UndoCancellationButton } from "@/app/bookings/[id]/undo-cancellation-button";
 import { confirmCustomerPayment } from "@/app/actions/deposits";
 import { PaymentReminderButton } from "@/app/bookings/[id]/payment-reminder-button";
-import { acknowledgePortalAction, approveExtensionRequest, declinePortalAction, replyToPortalQuestion, resolvePortalAction } from "@/app/actions/portal-actions";
+import { acknowledgePortalAction, declinePortalAction, replyToPortalQuestion, resolvePortalAction } from "@/app/actions/portal-actions";
+import { ExtensionRequestAnswer } from "@/app/bookings/[id]/extension-request-answer";
+import { extensionPicture } from "@/lib/extension-picture";
+import { niceDate } from "@/lib/nice-date";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { AssignCustomerModal } from "@/app/bookings/[id]/assign-customer-modal";
 import { SkipInspectionButton } from "@/app/bookings/[id]/skip-inspection-button";
 import { BookingShareActions } from "@/app/bookings/[id]/booking-share-actions";
@@ -1413,7 +1417,8 @@ function CommunicationTimeline({
             </div>
             <span className="text-xs font-bold uppercase text-[#b45309]">{relativeTime(action.created_at)}</span>
           </div>
-          <CustomerPortalActionCard action={action} customerId={customerId} organizationId={organizationId} rentalId={rentalId} />
+          <p className="text-sm font-semibold text-[var(--foreground)]">{portalActionSummary(action)}</p>
+          <a className="mt-1 inline-block text-sm font-semibold text-[var(--primary)]" href="#customer-requests">Answer it at the top of this page</a>
         </div>
       ))}
 
@@ -1444,8 +1449,9 @@ function CommunicationTimeline({
   );
 }
 
-function CustomerPortalActionCard({ action, organizationId, rentalId, customerId }: { action: any; organizationId: string; rentalId: string; customerId: string | null }) {
+async function CustomerPortalActionCard({ action, organizationId, rentalId, customerId }: { action: any; organizationId: string; rentalId: string; customerId: string | null }) {
   const content = action.content || {};
+  const picture = action.action_type === "extension_request" ? await extensionPicture(createSupabaseAdminClient() as any, organizationId, rentalId, content).catch(() => null) : null;
   return (
     <div className="rounded-lg border border-[var(--border)] bg-white p-3">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -1459,27 +1465,8 @@ function CustomerPortalActionCard({ action, organizationId, rentalId, customerId
       </div>
       <div className="mt-3">
         {action.action_type === "extension_request" ? (
-          <div className="grid gap-3 md:grid-cols-2">
-            <form action={approveExtensionRequest} className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
-              <input name="organizationId" type="hidden" value={organizationId} />
-              <input name="actionId" type="hidden" value={action.id} />
-              <input name="rentalId" type="hidden" value={rentalId} />
-              {content.open_ended ? (
-                <>
-                  <input name="openEnded" type="hidden" value="true" />
-                  <p className="text-sm text-[var(--foreground-secondary)]">Changes the rental to monthly with no end date and schedules the monthly rent. The customer is told.</p>
-                </>
-              ) : (
-                <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
-                  Approved end date
-                  <input className="mt-2 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm" defaultValue={content.new_end_date || ""} name="newEndDate" required type="date" />
-                  <span className="mt-1 block text-xs font-normal text-[var(--muted)]">The extra days are priced from your rates and added as a payment. The customer is told.</span>
-                </label>
-              )}
-              <PendingButton className="primary-action pressable mt-3 w-full justify-center px-3 py-2" pendingLabel="Approving..." type="submit">
-                {content.open_ended ? "Approve monthly, open-ended" : "Approve extension"}
-              </PendingButton>
-            </form>
+          <div className="grid items-start gap-3 md:grid-cols-[1.6fr_1fr]">
+            <ExtensionRequestAnswer actionId={action.id} picture={picture} rentalId={rentalId} requestedEnd={content.new_end_date || null} openEnded={!!content.open_ended} />
             <form action={declinePortalAction} className="rounded-lg border border-[#fecdd3] bg-[#fff1f2] p-3">
               <input name="organizationId" type="hidden" value={organizationId} />
               <input name="actionId" type="hidden" value={action.id} />
@@ -1531,7 +1518,7 @@ function CustomerPortalActionCard({ action, organizationId, rentalId, customerId
 
 function portalActionSummary(action: any) {
   const content = action.content || {};
-  if (action.action_type === "extension_request") return `${content.open_ended ? "Asked to switch to monthly, open-ended" : `Requested new return date: ${content.new_end_date || "not specified"}`}${content.note ? ` - ${content.note}` : ""}`;
+  if (action.action_type === "extension_request") return `${content.open_ended ? "Asked to switch to monthly, open-ended" : `Asked to keep it until ${content.new_end_date ? niceDate(content.new_end_date) : "a later date"}`}${content.note ? ` - ${content.note}` : ""}`;
   if (action.action_type === "return_confirmation") return `Return ${content.return_date || ""} ${content.return_time || ""}${content.return_location ? ` at ${content.return_location}` : ""}`.trim();
   if (action.action_type === "problem_report") return `${content.category || "Problem"}: ${content.description || "No description"}`;
   if (action.action_type === "question") return content.question || "Customer question";

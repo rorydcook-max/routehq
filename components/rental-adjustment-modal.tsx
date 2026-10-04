@@ -16,6 +16,7 @@ type AmendmentContext = {
   currency: string;
   billingPeriod: string;
   rates?: Rates;
+  onRent?: boolean;
 };
 
 /** The link the customer signs, with ways to send it. */
@@ -451,7 +452,7 @@ export function RentalAdjustmentModal({
                 New return date
                 <input className="mt-1 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" min={tomorrow} onChange={(event) => setExtensionEndDate(event.target.value)} type="date" value={extensionEndDate} />
               </label>
-              {originalEndDate && (context?.rates?.monthlyRate || 0) > 0 ? (
+              {originalEndDate && context?.onRent && (context?.rates?.monthlyRate || 0) > 0 ? (
                 <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[var(--border)] bg-white p-3 text-[13px] text-[var(--foreground-secondary)]">
                   <span>
                     No return date in mind? Make it <span className="font-semibold text-[var(--foreground)]">monthly, open-ended</span> at {money(context?.rates?.monthlyRate || 0)} a month. Applies now and the customer is told.

@@ -145,6 +145,8 @@ export async function getRentalAmendmentContext(rentalId: string): Promise<
     billingPeriod: string;
     endDate: string | null;
     isIndefinite: boolean;
+    /** The vehicle is out with the customer. */
+    onRent: boolean;
     /** Rates for pricing extra days (the vehicle's, with this rental's own agreed rate). */
     rates: Rates;
   }>
@@ -173,6 +175,7 @@ export async function getRentalAmendmentContext(rentalId: string): Promise<
       billingPeriod: String(rental.billing_interval || rental.pricing_model || "monthly"),
       endDate: cleanDate(rental.end_date),
       isIndefinite: Boolean(rental.is_indefinite),
+      onRent: ["active", "due_soon", "overdue", "extended"].includes(String(rental.status)),
       rates: rentalRateCard(vehicleRates, rental)
     };
   } catch (error) {

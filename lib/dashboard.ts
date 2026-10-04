@@ -243,6 +243,7 @@ function mapVehicle(row: any, figures?: VehicleFigures): Vehicle {
 function mapRental(row: any): Rental {
   return {
     id: row.id,
+    vehicleId: row.vehicle_id || null,
     customer: row.customers?.full_name || "Unknown customer",
     vehicle: [row.vehicles?.make, row.vehicles?.model].filter(Boolean).join(" ") || "Unknown vehicle",
     plate: row.vehicles?.registration_number || "",

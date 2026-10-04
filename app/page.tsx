@@ -190,9 +190,26 @@ export default async function Home() {
   const todayItems: AgendaItem[] = [];
   const paperwork: AgendaItem[] = [];
   const upcomingItems: Array<AgendaItem & { sort: string }> = [];
+  // A vehicle that is late back puts the next booking for it at risk.
+  const sameVehicle = (a: (typeof rentals)[number], b: (typeof rentals)[number]) => (a.vehicleId && b.vehicleId ? a.vehicleId === b.vehicleId : !!a.plate && a.plate === b.plate);
+  const lateBack = rentals.filter((r) => r.status !== "Booked" && r.end && r.end !== "Indefinite" && r.end < today);
+  const nextBookingFor = (late: (typeof rentals)[number]) =>
+    rentals.filter((r) => r.status === "Booked" && r.id !== late.id && sameVehicle(r, late) && r.start <= weekAhead).sort((a, b) => a.start.localeCompare(b.start))[0] || null;
+  const blockedBy = (booking: (typeof rentals)[number]) => lateBack.find((late) => late.id !== booking.id && sameVehicle(late, booking)) || null;
   for (const r of rentals) {
     const who = r.customer || "Walk-in customer";
-    if (r.status === "Booked") {
+    if (r.status === "Booked" && r.start <= weekAhead && blockedBy(r)) {
+      const late = blockedBy(r)!;
+      todayItems.push({
+        key: `at-risk-${r.id}`,
+        tone: "red",
+        icon: <KeyRound size={17} />,
+        title: `Vehicle not back for ${who}`,
+        detail: `${r.vehicle} · ${r.start <= today ? "handover was due" : "handover"} ${r.start === today ? "today" : shortDate(r.start)} · ${late.customer} was due back ${shortDate(late.end)}`,
+        href: `/bookings/${r.id}`,
+        action: "View"
+      });
+    } else if (r.status === "Booked") {
       if (r.start < today) {
         todayItems.push({ key: `late-out-${r.id}`, tone: "red", icon: <KeyRound size={17} />, title: `Handover late · ${r.vehicle}`, detail: `${who} · was due ${shortDate(r.start)}`, href: `/inspections/delivery/${r.id}`, action: "Hand over" });
       } else if (r.start === today) {
@@ -202,7 +219,7 @@ export default async function Home() {
       }
     } else if (r.end && r.end !== "Indefinite") {
       if (r.end < today) {
-        todayItems.push({ key: `late-in-${r.id}`, tone: "red", icon: <RotateCcw size={17} />, title: `Return late · ${r.vehicle}`, detail: `${who} · was due back ${shortDate(r.end)}`, href: `/inspections/return/${r.id}`, action: "Check in" });
+        todayItems.push({ key: `late-in-${r.id}`, tone: "red", icon: <RotateCcw size={17} />, title: `Return late · ${r.vehicle}`, detail: `${who} · was due back ${shortDate(r.end)}${nextBookingFor(r) ? ` · ${nextBookingFor(r)!.customer} has it booked from ${shortDate(nextBookingFor(r)!.start)}` : ""}`, href: `/inspections/return/${r.id}`, action: "Check in" });
       } else if (r.end === today) {
         todayItems.push({ key: `in-${r.id}`, tone: "blue", icon: <RotateCcw size={17} />, title: `${r.vehicle} coming back`, detail: who, href: `/inspections/return/${r.id}`, action: "Check in" });
       } else if (r.end <= weekAhead) {

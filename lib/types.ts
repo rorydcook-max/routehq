@@ -34,6 +34,7 @@ export type Vehicle = {
 };
 
 export type Rental = {
+  vehicleId?: string | null;
   id: string;
   customer: string;
   vehicle: string;

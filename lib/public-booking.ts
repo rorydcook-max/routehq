@@ -69,7 +69,9 @@ export async function getPublicBookingDetail(token: string) {
   }
 
   if (bookingLink.status === "cancelled") {
-    return { state: "cancelled" as PublicBookingState, bookingLink };
+    // Enough about the business to tell the customer who to contact and where to book again.
+    const { data: cancelledOrg } = await supabase.from("organizations").select("name, slug, settings").eq("id", bookingLink.organization_id).maybeSingle();
+    return { state: "cancelled" as PublicBookingState, bookingLink, organization: cancelledOrg };
   }
 
   const expiresAt = bookingLink.expires_at ? new Date(bookingLink.expires_at) : null;

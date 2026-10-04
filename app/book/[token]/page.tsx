@@ -3,6 +3,7 @@ import { AlertTriangle, CalendarDays, Clock, CreditCard, MapPin, ReceiptText, Sh
 import { VehicleKindIcon } from "@/components/vehicle-kind-icon";
 import { kindFromCategory } from "@/lib/vehicle-groups";
 import { ActiveRentalPortal } from "./active-rental-portal";
+import { CancelBooking } from "./cancel-booking";
 import { BookingCompletionForm } from "./booking-completion-form";
 import { getPublicBookingDetail } from "@/lib/public-booking";
 import { BusinessLogoImage } from "@/components/business-logo-image";
@@ -199,7 +200,7 @@ function formatSummaryDate(value: unknown) {
   return `${Number(match[3])} ${months[Number(match[2]) - 1]} ${match[1]}`;
 }
 
-function ErrorState({ title, message, contact, rebookHref }: { title: string; message: string; contact?: string | null; rebookHref?: string | null }) {
+function ErrorState({ title, message, contact, rebookHref, rebookLabel = "Choose other dates" }: { title: string; message: string; contact?: string | null; rebookHref?: string | null; rebookLabel?: string }) {
   return (
     <main className="min-h-screen bg-[#fbfaf8] px-4 py-8">
       <section className="mx-auto max-w-xl rounded-2xl border border-[var(--border)] bg-white p-6 text-center shadow-sm">
@@ -210,7 +211,7 @@ function ErrorState({ title, message, contact, rebookHref }: { title: string; me
         <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{message}</p>
         {rebookHref ? (
           <a className="pressable mt-5 inline-flex rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={rebookHref}>
-            Choose other dates
+            {rebookLabel}
           </a>
         ) : null}
         {contact ? (
@@ -252,7 +253,16 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   }
 
   if (detail.state === "cancelled") {
-    return <ErrorState contact={contact} message={`This booking has been cancelled. Please contact ${organization?.name || "the rental operator"} if you have questions.`} title="This booking has been cancelled" />;
+    const onlineBooking = organization?.settings?.public_booking?.enabled === true && organization?.slug;
+    return (
+      <ErrorState
+        contact={contact}
+        message={`This booking has been cancelled. Please contact ${organization?.name || "the rental operator"} if you have questions.`}
+        rebookHref={onlineBooking ? `/rent/${organization.slug}` : null}
+        rebookLabel="Book again"
+        title="This booking has been cancelled"
+      />
+    );
   }
 
   if (!detail.completion || !detail.documentStatus || !detail.bookingLink) {
@@ -413,6 +423,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
               executedAgreementDownloads: detail.executedAgreementDownloads,
             }}
           />
+          {["booked", "draft"].includes(String(rental?.status || "")) ? <CancelBooking organizationName={organization?.name || "the rental business"} token={token} /> : null}
           </>
         )}
       </div>

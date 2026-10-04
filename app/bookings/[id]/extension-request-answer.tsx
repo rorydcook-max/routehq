@@ -116,7 +116,7 @@ export function ExtensionRequestAnswer({ actionId, rentalId, picture, requestedE
           ) : (
             <p className="text-sm text-[var(--foreground-secondary)]">
               {blockers.length > 1
-                ? "With more than one booking in the way, change their vehicles from their own booking pages first, then come back."
+                ? "With more than one booking in the way, open each one and use More > Change vehicle, then come back."
                 : blocker && blocker.options.length === 0
                   ? "No other vehicle is free for all of that booking's dates, so it can't be moved."
                   : ""}

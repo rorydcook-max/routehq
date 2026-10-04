@@ -33,3 +33,16 @@ export async function syncVehicleStatusFromBookings(supabase: any, organizationI
 
   await supabase.from("vehicles").update(update).eq("id", vehicleId).eq("organization_id", organizationId);
 }
+
+/**
+ * Puts every vehicle's status back in line with its bookings. Run by the daily
+ * job so a status left behind by an edit made elsewhere corrects itself.
+ * Returns how many vehicles were checked.
+ */
+export async function syncAllVehicleStatuses(admin: any) {
+  const { data: vehicles } = await admin.from("vehicles").select("id, organization_id").is("deleted_at", null).in("status", ["available", "reserved", "rented"]).limit(2000);
+  for (const vehicle of vehicles || []) {
+    await syncVehicleStatusFromBookings(admin, vehicle.organization_id, vehicle.id).catch(() => null);
+  }
+  return (vehicles || []).length;
+}

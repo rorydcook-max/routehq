@@ -8,7 +8,8 @@ import { confirmCustomerPayment } from "@/app/actions/deposits";
 import { PaymentReminderButton } from "@/app/bookings/[id]/payment-reminder-button";
 import { acknowledgePortalAction, declinePortalAction, replyToPortalQuestion, resolvePortalAction } from "@/app/actions/portal-actions";
 import { ExtensionRequestAnswer } from "@/app/bookings/[id]/extension-request-answer";
-import { extensionPicture } from "@/lib/extension-picture";
+import { extensionPicture, moveOptionsFor } from "@/lib/extension-picture";
+import { MoveBookingButton } from "@/app/bookings/[id]/move-booking-button";
 import { niceDate } from "@/lib/nice-date";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { AssignCustomerModal } from "@/app/bookings/[id]/assign-customer-modal";
@@ -384,6 +385,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   // A booking link that is out but not signed yet: the next step is the customer's, not a handover.
   const awaitingSignature = rental.status === "booked" && !!bookingLink && !bookingLink.contract_signed_at && !renterSignatureOf(rentalDocuments);
   const holdUntil = awaitingSignature && bookingLink?.hold_until && !bookingLink?.hold_released_at ? String(bookingLink.hold_until) : null;
+  const moveOptions = rental.status === "booked" ? await moveOptionsFor(createSupabaseAdminClient() as any, organization.id, rental.id).catch(() => []) : [];
   const canAdjustRental = !awaitingSignature && ["active", "booked", "due_soon", "overdue"].includes(String(rental.status || "").toLowerCase());
   const needsExistingRentalPaymentSetup = Boolean(rental.entered_by_operator) && payments.length === 0;
   const activeRentalStatus = ["active", "due_soon", "overdue", "extended"].includes(String(displayStatus || "").toLowerCase());
@@ -573,6 +575,15 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   currentRate={Number(rental.rental_rate || 0)}
                   currency={rental.currency || "THB"}
                   availableVehicles={(availableVehicles || []).filter((v: any) => v.id !== (rental.vehicle_id || vehicle?.id))}
+                />
+              ) : null}
+              {rental.status === "booked" ? (
+                <MoveBookingButton
+                  currentVehicleLabel={vehicleTitle(vehicle)}
+                  hasCustomer={Boolean(customer)}
+                  options={moveOptions}
+                  rentalId={rental.id}
+                  signed={Boolean(bookingLink?.contract_signed_at || renterSignatureOf(rentalDocuments))}
                 />
               ) : null}
               {!["completed", "cancelled"].includes(rental.status) ? (

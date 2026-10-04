@@ -3510,6 +3510,27 @@ export async function changeVehicle(formData: FormData) {
   const firstError = results.find((r: any) => r?.error)?.error;
   if (firstError) throw new Error(firstError.message);
 
+  // Rent still to come belongs to the vehicle the customer now has, so each vehicle's income stays right.
+  await supabase
+    .from("rental_payments")
+    .update({ vehicle_id: replacementVehicleId })
+    .eq("rental_id", rentalId)
+    .eq("organization_id", organizationId)
+    .in("status", ["scheduled", "pending", "overdue"])
+    .then(() => null, () => null);
+  await supabase.from("booking_links").update({ vehicle_id: replacementVehicleId }).eq("rental_id", rentalId).eq("organization_id", organizationId).then(() => null, () => null);
+  // A vehicle handed back as available may already have its next booking lined up.
+  if (disposition === "available") await syncVehicleStatusFromBookings(supabase, organizationId, originalVehicleId).catch(() => null);
+  {
+    const swapped = [replacement.make, replacement.model].filter(Boolean).join(" ");
+    await tellRentalCustomer(
+      createSupabaseAdminClient() as any,
+      rentalId,
+      ({ firstName }) => `Hi ${firstName}, your rental vehicle has been changed to the ${swapped}${replacement.registration_number ? ` (${replacement.registration_number})` : ""}.${rateAfter !== rateBefore ? ` Your rate from now on is ${rateAfter.toLocaleString("en-US")}.` : " Your dates and price stay the same."}`,
+      { sentBy: user.id }
+    );
+  }
+
   const bookingRef = rental.reference || rental.display_code || rentalId;
   const reasonLabel = reason.replace(/_/g, " ");
 

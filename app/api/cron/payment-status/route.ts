@@ -5,6 +5,7 @@ import { businessToday } from "@/lib/business-time";
 import { topUpOpenEndedRent } from "@/lib/open-ended-billing";
 import { releaseExpiredHoldsEverywhere } from "@/lib/booking-holds";
 import { alertLateReturns } from "@/lib/late-returns";
+import { syncAllVehicleStatuses } from "@/lib/vehicle-status";
 
 // Business-time dates: a UTC date would flag rent as overdue a day early for runs before 07:00 in Thailand.
 const dateOnly = (offsetDays = 0) => businessToday(offsetDays);
@@ -30,6 +31,8 @@ export async function GET(req: NextRequest) {
 
   const holdsReleased = await releaseExpiredHoldsEverywhere(supabase).catch(() => 0);
   const lateReturnAlerts = await alertLateReturns(supabase).catch(() => 0);
+  // After holds are released: each vehicle shows as on rent, booked or available to match its bookings.
+  await syncAllVehicleStatuses(supabase).catch(() => 0);
   // Handover tomorrow, return coming up, rent due or late, service due: each sent once.
   const customerReminders = await sendDailyCustomerReminders(supabase).catch(() => null);
 

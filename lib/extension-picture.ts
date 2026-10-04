@@ -141,6 +141,19 @@ export async function extensionPicture(admin: any, organizationId: string, renta
   return { openEnded, currency: String(rental.currency || "THB"), currentEnd, requestedEnd, worth, freeUntil, blockers };
 }
 
+/** Vehicles a booking that hasn't been handed over could move to: free for all of its dates. */
+export async function moveOptionsFor(admin: any, organizationId: string, rentalId: string): Promise<MoveOption[]> {
+  const { data: booking } = await admin
+    .from("rentals")
+    .select("vehicle_id, status, start_date, end_date, vehicles!rentals_vehicle_id_fkey(category_id)")
+    .eq("id", rentalId)
+    .eq("organization_id", organizationId)
+    .maybeSingle();
+  if (!booking || booking.status !== "booked" || !booking.start_date) return [];
+  const { data: organization } = await admin.from("organizations").select("settings").eq("id", organizationId).maybeSingle();
+  return freeVehiclesFor(admin, organizationId, { vehicleId: booking.vehicle_id, startDate: String(booking.start_date).slice(0, 10), endDate: iso(booking.end_date), categoryId: booking.vehicles?.category_id || null }, bookingRules(organization?.settings).gapDays);
+}
+
 /**
  * Moves a booking that hasn't been handed over to another vehicle, keeping its
  * dates and price. Refuses if the new vehicle isn't free for those dates.

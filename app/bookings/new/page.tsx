@@ -116,6 +116,7 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
             busyPeriods={busyPeriods}
             customers={customers || []}
             defaultCurrency={organization.currency || "THB"}
+            defaultDeposit={Number((organizationDetails?.settings as any)?.public_booking?.deposit || 0)}
             homeTerritory={homeTerritoryFromSettings(organizationDetails?.settings)}
             operatorAddress={operatorAddressFromSettings(organizationDetails?.settings)}
             organizationId={organization.id}

@@ -376,7 +376,10 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   const confirmCustomerPaymentAction = confirmCustomerPayment.bind(null, rental.id, paymentConfirmationAmount, paymentMethod);
   const bookingPortalUrl = bookingLink?.public_url || (bookingLink?.token ? `/book/${bookingLink.token}` : null);
   const pendingPortalActions = (customerPortalActions || []).filter((action: any) => action.status === "pending");
-  const canAdjustRental = ["active", "booked", "due_soon", "overdue"].includes(String(rental.status || "").toLowerCase());
+  // A booking link that is out but not signed yet: the next step is the customer's, not a handover.
+  const awaitingSignature = rental.status === "booked" && !!bookingLink && !bookingLink.contract_signed_at && !renterSignatureOf(rentalDocuments);
+  const holdUntil = awaitingSignature && bookingLink?.hold_until && !bookingLink?.hold_released_at ? String(bookingLink.hold_until) : null;
+  const canAdjustRental = !awaitingSignature && ["active", "booked", "due_soon", "overdue"].includes(String(rental.status || "").toLowerCase());
   const needsExistingRentalPaymentSetup = Boolean(rental.entered_by_operator) && payments.length === 0;
   const activeRentalStatus = ["active", "due_soon", "overdue", "extended"].includes(String(displayStatus || "").toLowerCase());
   // Only what is due today or earlier counts as outstanding; future scheduled rent is not owed yet.
@@ -501,10 +504,25 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               </h1>
               <p className="mt-1 truncate text-sm font-bold text-[var(--foreground-secondary)]">{vehicleTitle(vehicle)}</p>
               <p className="font-mono-data mt-1 text-xs font-bold text-[var(--muted)]">{vehicle?.registration_number}</p>
+              {awaitingSignature ? (
+                <p className="mt-2 text-sm text-[var(--foreground-secondary)]">
+                  Waiting for the customer to fill in the form and sign.{" "}
+                  {holdUntil
+                    ? new Date(holdUntil).getTime() > Date.now()
+                      ? `The vehicle is held for them until ${formatDateTime(holdUntil)}; after that the dates open up, and the link still works if the vehicle is free.`
+                      : `The hold ended ${formatDateTime(holdUntil)}, so the dates are open to others.`
+                    : ""}
+                </p>
+              ) : null}
             </div>
             <div className="flex flex-wrap items-center gap-2 lg:max-w-[560px] lg:justify-end">
+              {awaitingSignature ? (
+                <a className="pressable inline-flex min-h-9 min-w-fit items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-bold text-white shadow-sm" href="#send-link">
+                  Send the link
+                </a>
+              ) : null}
               {rental.status === "booked" ? (
-                <ActionButton href={`/inspections/delivery/${rental.id}` as Route}>
+                <ActionButton href={`/inspections/delivery/${rental.id}` as Route} tone={awaitingSignature ? "light" : "primary"}>
                   Start delivery
                 </ActionButton>
               ) : null}
@@ -587,7 +605,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
         <div className="grid gap-3 md:grid-cols-4">
           <BookingMetricCard icon={<CalendarDays size={18} />} label="Dates">
             <div className="flex flex-wrap items-center gap-1 text-sm font-semibold leading-5 text-[var(--foreground)]">
-              <span>{formatDate(rental.start_date)} to</span>
+              <span>{rental.end_date ? `${formatDate(rental.start_date)} to` : `From ${formatDate(rental.start_date)}, open-ended`}</span>
               <EditableEndDate currentEndDate={rental.end_date} rentalId={rental.id} />
             </div>
             <p className="text-sm text-[var(--muted)]">{daysRemaining(rental.end_date, rental.status, rental.start_date)}</p>
@@ -680,7 +698,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               {/* A cancelled booking's link only tells the customer it was cancelled: nothing to send. */}
               {isCancelled ? null : (
                 <div className="mt-3">
-                  <BookingShareActions currentUrl={bookingLink?.public_url || null} formDone={String(bookingLink?.status || "") === "completed"} organizationId={organization.id} rentalId={rental.id} />
+                  <div className="scroll-mt-4" id="send-link" />
+                <BookingShareActions currentUrl={bookingLink?.public_url || null} formDone={String(bookingLink?.status || "") === "completed"} organizationId={organization.id} rentalId={rental.id} />
                 </div>
               )}
             </Card>

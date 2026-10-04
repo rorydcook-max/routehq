@@ -259,6 +259,7 @@ export function BookingForm({
   preselectedEndDate = "",
   preselectedCustomerId = "",
   defaultCurrency = "THB",
+  defaultDeposit = 0,
   homeTerritory = "Koh Samui, Thailand",
   busyPeriods = {}
 }: {
@@ -274,16 +275,21 @@ export function BookingForm({
   preselectedEndDate?: string;
   preselectedCustomerId?: string;
   defaultCurrency?: string;
+  /** The deposit the business usually takes, from Settings. */
+  defaultDeposit?: number;
   homeTerritory?: string;
 }) {
   const validPreselectedVehicle = vehicles.some((vehicle) => vehicle.id === preselectedVehicleId && selectable(vehicle));
-  const firstStep = validPreselectedVehicle ? 1 : 0;
+  const preselectedCustomer = customers.some((customer) => customer.id === preselectedCustomerId);
+  // With a vehicle already picked (from its page or the calendar) the form opens on the rental details.
+  const firstStep = validPreselectedVehicle ? (preselectedCustomer ? 1 : 2) : 0;
 
   const [step, setStep] = useState(firstStep);
   // Show modal immediately when a vehicle is preselected (operator came from vehicle profile)
   // Arriving with both a vehicle and a customer (an accepted request) skips the "add customer?" question.
-  const [showCustomerModal, setShowCustomerModal] = useState(validPreselectedVehicle && !customers.some((customer) => customer.id === preselectedCustomerId));
-  const [customerSkipped, setCustomerSkipped] = useState(false);
+  const [showCustomerModal, setShowCustomerModal] = useState(false);
+  // A booking link needs no customer: they fill in their own details. Choosing one is optional.
+  const [customerSkipped, setCustomerSkipped] = useState(!preselectedCustomer);
   const [bookingMode, setBookingMode] = useState<"booking_link" | "existing_rental">("booking_link");
   const [vehicleSearch, setVehicleSearch] = useState("");
   const [vehicleId, setVehicleId] = useState(validPreselectedVehicle ? preselectedVehicleId : "");
@@ -294,7 +300,7 @@ export function BookingForm({
   const [pricingModel, setPricingModel] = useState("monthly");
   const [currency, setCurrency] = useState(CURRENCY_INFO[defaultCurrency] ? defaultCurrency : "THB");
   const [rentalRate, setRentalRate] = useState(0);
-  const [depositAmount, setDepositAmount] = useState(0);
+  const [depositAmount, setDepositAmount] = useState(defaultDeposit > 0 ? defaultDeposit : 0);
   const [includedItems, setIncludedItems] = useState<string[]>([includedOptions[1]]);
   const [deliveryMethod, setDeliveryMethod] = useState<"delivery" | "collection" | "tbd">("delivery");
   const [deliveryLocation, setDeliveryLocation] = useState("");
@@ -375,7 +381,11 @@ export function BookingForm({
   function goNext() {
     // After vehicle selection, show the customer modal instead of advancing directly
     if (step === 0 && canContinue()) {
-      setShowCustomerModal(true);
+      if (bookingMode === "existing_rental") handleAddCustomer();
+      else if (selectedCustomer) {
+        setCustomerSkipped(false);
+        setStep(2);
+      } else handleSkipCustomer();
       return;
     }
     if (step < steps.length - 1 && canContinue()) {
@@ -388,25 +398,13 @@ export function BookingForm({
 
     if (step === 1) {
       // Going back from customer step: go to vehicle or show modal again (if preselected)
-      if (firstStep === 0) {
-        setStep(0);
-      } else {
-        setShowCustomerModal(true); // Preselected vehicle — re-show the choice modal
-      }
-      setCustomerSkipped(false);
+      setStep(0);
       return;
     }
 
     if (customerSkipped && step === 2) {
       // Going back from rental when customer was skipped
-      if (firstStep === 0) {
-        setStep(0); // Go back to vehicle selection
-      } else {
-        // Preselected vehicle — re-show the choice modal
-        setCustomerSkipped(false);
-        setShowCustomerModal(true);
-        setStep(1);
-      }
+      setStep(0); // Go back to vehicle selection
       return;
     }
 
@@ -627,6 +625,8 @@ export function BookingForm({
             onClick={() => {
               setBookingMode("existing_rental");
               setCustomerSkipped(false);
+              // A rental already under way needs its customer chosen first.
+              if (!selectedCustomer) setStep((current) => (current >= 2 ? 1 : current));
             }}
             type="button"
           >
@@ -711,11 +711,12 @@ export function BookingForm({
           {/* Allow re-opening the skip modal */}
           <button
             className="pressable mt-3 inline-flex items-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--muted)]"
-            onClick={() => setShowCustomerModal(true)}
+            hidden={bookingMode === "existing_rental"}
+            onClick={handleSkipCustomer}
             type="button"
           >
             <Send size={14} />
-            Send link without customer instead
+            Send the link without choosing a customer
           </button>
           <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-stretch">
             <div className="min-w-0 flex-1">
@@ -747,6 +748,14 @@ export function BookingForm({
       {step === 2 ? (
         <section className="content-section">
           <Header icon={CalendarDays} eyebrow={`Step ${displayStepNumber}`} title="Rental details" />
+          {bookingMode === "booking_link" ? (
+            <p className="mt-2 text-sm text-[var(--muted)]">
+              {selectedCustomer && !customerSkipped ? `For ${selectedCustomer.full_name}. ` : "The customer fills in their own details from the link. "}
+              <button className="font-semibold text-[var(--primary)] underline" onClick={handleAddCustomer} type="button">
+                {selectedCustomer && !customerSkipped ? "Change customer" : "Choose a returning customer instead"}
+              </button>
+            </p>
+          ) : null}
           {bookingMode === "existing_rental" ? (
             <label className="checkbox-label sub-surface mt-3 min-h-12 font-bold text-[var(--foreground)]" style={{ display: "flex", alignItems: "center", padding: "10px 12px" }}>
               <input
@@ -788,7 +797,7 @@ export function BookingForm({
               onChange={(event) => setOpenEnded(event.target.checked)}
               type="checkbox"
             />
-            <span>Open-ended / long term</span>
+            <span>Open-ended (no return date yet)</span>
           </label>
           {dateConflict ? (
             <p className="mt-3 rounded-lg border border-[#fecaca] bg-[#fff1f2] p-3 text-sm font-bold text-[#be123c]" role="alert">
@@ -1249,9 +1258,12 @@ function BookingLinkSharePanel({ result }: { result: BookingShareResult | null }
     window.open(href, "_blank", "noopener,noreferrer");
   }
 
+  // Nothing to share until the link exists.
+  if (!bookingUrl) return null;
+
   return (
     <div className="mt-3 rounded-lg border border-[var(--border)] bg-white p-3">
-      <p className="text-[13px] font-semibold text-[var(--foreground)]">Share Booking Link</p>
+      <p className="text-[13px] font-semibold text-[var(--foreground)]">Share the booking link</p>
       <div className="mt-3 flex flex-col gap-2 sm:flex-row">
         <div className="font-mono-data min-h-12 flex-1 break-all rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] px-3 py-2 text-sm font-bold text-[var(--foreground-secondary)]">
           {bookingUrl || "Generate the booking link to see the unique URL here."}

@@ -61,7 +61,7 @@ function dateInput(value: string | null | undefined) {
 
 function dateLabel(value: string | null | undefined) {
   const normalized = dateInput(value);
-  if (!normalized) return "Open";
+  if (!normalized) return "";
   return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(new Date(normalized));
 }
 

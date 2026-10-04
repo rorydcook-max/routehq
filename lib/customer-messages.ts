@@ -1,12 +1,22 @@
+import { isEmailConfigured, sendEmail } from "@/lib/email";
 import { linePush, PROVIDER_LABELS, telegramSend } from "@/lib/inbox/providers";
 
 /**
  * Messages the business sends its customers automatically: an extension was
- * applied, a request was answered, a payment was received, a booking was
- * cancelled. They go out on the chat the customer first wrote to the business
- * on (their original conversation in the inbox). A customer with no chat gets
- * nothing sent; the message is kept on the booking, marked "not sent", so the
- * owner can pass it on themselves.
+ * applied, a request was answered, a payment is due or was received, a
+ * booking was cancelled.
+ *
+ * Where a message goes, in order:
+ *   1. The chat the customer first wrote to the business on (their original
+ *      conversation in the inbox).
+ *   2. Email, when the customer gave one and an email provider is connected.
+ *   3. Nowhere automatically. LINE, Telegram and WhatsApp don't let a business
+ *      start a chat with someone who hasn't messaged it first, so the message
+ *      is kept on the booking as "not sent", with a one-tap link that opens the
+ *      customer's preferred app with the text filled in for the owner to send.
+ *
+ * The customer's booking page invites them to open a chat (see
+ * lib/customer-chat-link.ts); once they do, route 1 applies from then on.
  *
  * Takes a service-role client: these are sent from customer actions and the
  * daily job as well as by signed-in staff.
@@ -23,6 +33,8 @@ type Input = {
   withLink?: boolean;
   /** Staff member who triggered it, when there is one. */
   sentBy?: string | null;
+  /** Extra details kept with the record, e.g. the key that stops a reminder going twice. */
+  metadata?: Record<string, unknown>;
 };
 
 export function customerMessagesOn(settings: any) {
@@ -50,6 +62,44 @@ async function originalConversation(admin: any, organizationId: string, customer
   return (conversations || [])[0] || null;
 }
 
+const digitsOf = (value: unknown) => String(value || "").replace(/\D/g, "");
+
+/**
+ * A link the owner can tap to send the message themselves in the app the
+ * customer said they prefer, with the text already filled in where the app
+ * allows it.
+ */
+export function handoffFor(customer: any, body: string): { channel: string; label: string; url: string | null } {
+  const text = encodeURIComponent(body);
+  const phone = digitsOf(customer?.whatsapp_number || customer?.phone);
+  const options: Record<string, () => { channel: string; label: string; url: string | null } | null> = {
+    whatsapp: () => (phone ? { channel: "whatsapp", label: "Send on WhatsApp", url: `https://wa.me/${phone.startsWith("0") ? `66${phone.slice(1)}` : phone}?text=${text}` } : null),
+    telegram: () => (customer?.telegram_username ? { channel: "telegram", label: "Send on Telegram", url: `https://t.me/${String(customer.telegram_username).replace(/^@/, "")}?text=${text}` } : null),
+    email: () => (customer?.email ? { channel: "email", label: "Send by email", url: `mailto:${customer.email}?body=${text}` } : null),
+    // LINE and Messenger can't be opened to a person with text filled in.
+    line: () => (customer?.line_id ? { channel: "line", label: `Copy and send on LINE (${customer.line_id})`, url: null } : null),
+    messenger: () => (customer?.messenger_id ? { channel: "messenger", label: `Copy and send on Messenger (${customer.messenger_id})`, url: null } : null),
+    sms: () => (digitsOf(customer?.phone) ? { channel: "sms", label: "Send by text message", url: `sms:+${digitsOf(customer.phone)}?body=${text}` } : null),
+    phone: () => (digitsOf(customer?.phone) ? { channel: "sms", label: "Send by text message", url: `sms:+${digitsOf(customer.phone)}?body=${text}` } : null)
+  };
+  const preferred = String(customer?.preferred_contact_method || "").toLowerCase();
+  const order = [preferred, "whatsapp", "telegram", "line", "email", "sms"].filter((key, index, all) => key && all.indexOf(key) === index);
+  for (const key of order) {
+    const found = options[key]?.();
+    if (found) return found;
+  }
+  return { channel: "none", label: "Copy and send it yourself", url: null };
+}
+
+async function customerContact(admin: any, customerId: string) {
+  const { data } = await admin
+    .from("customers")
+    .select("full_name, email, phone, whatsapp_number, line_id, telegram_username, messenger_id, preferred_contact_method")
+    .eq("id", customerId)
+    .maybeSingle();
+  return data;
+}
+
 export async function messageCustomer(admin: any, input: Input): Promise<CustomerMessageResult> {
   const text = String(input.text || "").trim();
   if (!input.customerId || !text) return { sent: false, reason: "no_customer" };
@@ -73,45 +123,65 @@ export async function messageCustomer(admin: any, input: Input): Promise<Custome
         content: body,
         status,
         created_by: input.sentBy || null,
-        metadata: { automatic: true, ...metadata }
+        metadata: { automatic: true, ...(input.metadata || {}), ...metadata }
       })
       .then(() => null, () => null);
 
+  // 1. Their own chat with the business.
   const conversation = await originalConversation(admin, input.organizationId, input.customerId).catch(() => null);
-  if (!conversation) {
-    await log("pending", null, { not_sent_reason: "no_chat" });
-    return { sent: false, reason: "no_chat" };
+  if (conversation) {
+    const { data: secrets } = await admin.from("messaging_channel_secrets").select("access_token").eq("channel_id", conversation.channel_id).maybeSingle();
+    const token = String(secrets?.access_token || "");
+    const result = !token
+      ? { ok: false as const, error: "The messaging account is not connected." }
+      : conversation.provider === "line"
+        ? await linePush(token, conversation.external_user_id, body)
+        : conversation.provider === "telegram"
+          ? await telegramSend(token, conversation.external_user_id, body)
+          : { ok: false as const, error: "Sending on this platform isn't supported yet." };
+
+    const via = PROVIDER_LABELS[conversation.provider] || conversation.provider;
+    const now = new Date().toISOString();
+    await admin
+      .from("conversation_messages")
+      .insert({
+        organization_id: input.organizationId,
+        conversation_id: conversation.id,
+        direction: "out",
+        body,
+        sent_by: input.sentBy || null,
+        status: result.ok ? "sent" : "failed",
+        error: result.ok ? null : result.error || "Not delivered"
+      })
+      .then(() => null, () => null);
+    if (result.ok) {
+      await admin.from("conversations").update({ last_message_at: now, last_message_preview: body.slice(0, 140), last_message_direction: "out" }).eq("id", conversation.id).then(() => null, () => null);
+    }
+    if (result.ok) {
+      await log("sent", conversation.provider, { conversation_id: conversation.id });
+      return { sent: true, via };
+    }
+    const fallback = handoffFor(await customerContact(admin, input.customerId), body);
+    await log("failed", conversation.provider, { conversation_id: conversation.id, error: result.error, handoff_label: fallback.label, handoff_url: fallback.url });
+    return { sent: false, reason: "failed", detail: result.error };
   }
 
-  const { data: secrets } = await admin.from("messaging_channel_secrets").select("access_token").eq("channel_id", conversation.channel_id).maybeSingle();
-  const token = String(secrets?.access_token || "");
-  const result = !token
-    ? { ok: false as const, error: "The messaging account is not connected." }
-    : conversation.provider === "line"
-      ? await linePush(token, conversation.external_user_id, body)
-      : conversation.provider === "telegram"
-        ? await telegramSend(token, conversation.external_user_id, body)
-        : { ok: false as const, error: "Sending on this platform isn't supported yet." };
+  const customer = await customerContact(admin, input.customerId);
 
-  const via = PROVIDER_LABELS[conversation.provider] || conversation.provider;
-  const now = new Date().toISOString();
-  await admin
-    .from("conversation_messages")
-    .insert({
-      organization_id: input.organizationId,
-      conversation_id: conversation.id,
-      direction: "out",
-      body,
-      sent_by: input.sentBy || null,
-      status: result.ok ? "sent" : "failed",
-      error: result.ok ? null : result.error || "Not delivered"
-    })
-    .then(() => null, () => null);
-  if (result.ok) {
-    await admin.from("conversations").update({ last_message_at: now, last_message_preview: body.slice(0, 140), last_message_direction: "out" }).eq("id", conversation.id).then(() => null, () => null);
+  // 2. Email, the one channel a business can start a conversation on.
+  if (customer?.email && isEmailConfigured()) {
+    const result = await sendEmail({ to: customer.email, subject: `${organization?.name || "Your rental"}: an update on your booking`, text: body });
+    if (result.status === "sent") {
+      await log("sent", "email", { provider: result.provider });
+      return { sent: true, via: "email" };
+    }
+    if (result.status === "failed") await log("failed", "email", { error: result.error });
   }
-  await log(result.ok ? "sent" : "failed", conversation.provider, { conversation_id: conversation.id, ...(result.ok ? {} : { error: result.error }) });
-  return result.ok ? { sent: true, via } : { sent: false, reason: "failed", detail: result.error };
+
+  // 3. Ready for the owner to send in the app the customer prefers.
+  const handoff = handoffFor(customer, body);
+  await log("pending", handoff.channel === "none" ? null : handoff.channel, { not_sent_reason: "no_chat", handoff_label: handoff.label, handoff_url: handoff.url });
+  return { sent: false, reason: "no_chat" };
 }
 
 /** Closes the open jobs of one kind on a rental, e.g. the "Refund to decide" job once a refund is recorded. */
@@ -136,7 +206,12 @@ export type RentalMessageContext = {
  * hand. Never throws: a message that can't be sent must not undo the action
  * that caused it.
  */
-export async function tellRentalCustomer(admin: any, rentalId: string, build: (context: RentalMessageContext) => string, options: { sentBy?: string | null; withLink?: boolean } = {}): Promise<CustomerMessageResult> {
+export async function tellRentalCustomer(
+  admin: any,
+  rentalId: string,
+  build: (context: RentalMessageContext) => string,
+  options: { sentBy?: string | null; withLink?: boolean; metadata?: Record<string, unknown> } = {}
+): Promise<CustomerMessageResult> {
   try {
     const { data: rental } = await admin
       .from("rentals")
@@ -154,8 +229,33 @@ export async function tellRentalCustomer(admin: any, rentalId: string, build: (c
       currency,
       money: (amount: number) => `${currency === "THB" ? "฿" : `${currency} `}${Math.round(amount).toLocaleString("en-US")}`
     };
-    return await messageCustomer(admin, { organizationId: rental.organization_id, customerId: rental.customer_id, rentalId, text: build(context), sentBy: options.sentBy, withLink: options.withLink });
+    return await messageCustomer(admin, {
+      organizationId: rental.organization_id,
+      customerId: rental.customer_id,
+      rentalId,
+      text: build(context),
+      sentBy: options.sentBy,
+      withLink: options.withLink,
+      metadata: options.metadata
+    });
   } catch {
     return { sent: false, reason: "failed" };
   }
+}
+
+/**
+ * The same, but at most once per key for a rental: the daily job can run it
+ * every day and each reminder still goes out a single time.
+ */
+export async function remindRentalCustomerOnce(admin: any, rentalId: string, key: string, build: (context: RentalMessageContext) => string, options: { withLink?: boolean } = {}): Promise<boolean> {
+  // Claim the reminder first: the table's primary key lets only one run through, even if two start together.
+  const { error: claimed } = await admin.from("customer_reminders").insert({ rental_id: rentalId, reminder_key: key });
+  if (claimed) return false;
+  const result = await tellRentalCustomer(admin, rentalId, build, { withLink: options.withLink, metadata: { reminder_key: key } });
+  if (!result.sent && (result.reason === "off" || result.reason === "no_customer")) {
+    // Nothing was sent or recorded, so let it be tried again once messages are on or the customer is known.
+    await admin.from("customer_reminders").delete().eq("rental_id", rentalId).eq("reminder_key", key);
+    return false;
+  }
+  return true;
 }

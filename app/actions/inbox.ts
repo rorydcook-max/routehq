@@ -29,6 +29,7 @@ export async function connectChannel(input: { provider: "line" | "telegram"; acc
 
   let externalId = "";
   let name = "";
+  let publicHandle: string | null = null;
   let signingSecret = channelSecret;
 
   if (input.provider === "line") {
@@ -37,11 +38,13 @@ export async function connectChannel(input: { provider: "line" | "telegram"; acc
     if (!info.ok) return { ok: false, error: `LINE didn't accept that access token. ${info.error}` };
     externalId = info.data.userId;
     name = info.data.displayName || info.data.basicId || "LINE Official Account";
+    publicHandle = info.data.basicId || null;
   } else {
     const me = await telegramGetMe(accessToken);
     if (!me.ok) return { ok: false, error: `Telegram didn't accept that bot token. ${me.error}` };
     externalId = String(me.data.result.id);
     name = me.data.result.username ? `@${me.data.result.username}` : me.data.result.first_name || "Telegram bot";
+    publicHandle = me.data.result.username || null;
     signingSecret = crypto.randomBytes(24).toString("hex");
   }
 
@@ -54,6 +57,7 @@ export async function connectChannel(input: { provider: "line" | "telegram"; acc
         provider: input.provider,
         display_name: name,
         external_id: externalId,
+        public_handle: publicHandle,
         status: "connected",
         last_error: null,
         connected_by: membership.userId,

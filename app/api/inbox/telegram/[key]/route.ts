@@ -1,6 +1,9 @@
 import crypto from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { channelByWebhookKey, describeNonText, recordInbound } from "@/lib/inbox/store";
+import { chatLinkedReply, linkChatFromCode } from "@/lib/customer-chat-link";
+import { telegramSend } from "@/lib/inbox/providers";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
 
@@ -35,16 +38,27 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const body = kind === "text" ? String(message.text) : `${describeNonText(kind)}${caption}`;
   // "/start" is what Telegram sends when someone first opens the bot; it isn't a message from them.
   if (body.trim() === "/start") return NextResponse.json({ ok: true });
+  // "/start <code>" means they came from their booking page: the code is their booking.
+  const startCode = body.trim().match(/^\/start\s+(\S+)/)?.[1] || null;
 
   const name = [message.from?.first_name, message.from?.last_name].filter(Boolean).join(" ") || (message.from?.username ? `@${message.from.username}` : null);
   await recordInbound({
     channel,
     externalUserId: String(message.chat.id),
     displayName: name,
-    body,
+    body: startCode ? "Opened this chat from their booking page" : body,
     messageType: kind,
     externalId: String(message.message_id)
   });
+
+  if (startCode) {
+    const admin = createSupabaseAdminClient() as any;
+    const firstName = await linkChatFromCode(admin, { channel, externalUserId: String(message.chat.id), text: startCode }).catch(() => null);
+    if (firstName) {
+      const { data: organization } = await admin.from("organizations").select("name").eq("id", channel.organization_id).maybeSingle();
+      await telegramSend(channel.accessToken, String(message.chat.id), chatLinkedReply(firstName, organization?.name));
+    }
+  }
 
   return NextResponse.json({ ok: true });
 }

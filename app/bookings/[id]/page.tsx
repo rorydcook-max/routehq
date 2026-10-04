@@ -1370,7 +1370,7 @@ function communicationStatusBadge(entry: any) {
   if (entry.timeline_type !== "automated_reminder" && entry.type !== "automated_reminder") return null;
   if (entry.status === "failed") return <Badge tone="red">Not delivered</Badge>;
   // No chat with this customer yet: the text is here to copy and send yourself.
-  if (entry.status === "pending") return <Badge tone="amber">Not sent: no chat with this customer</Badge>;
+  if (entry.status === "pending") return <Badge tone="amber">Not sent yet: no chat with this customer</Badge>;
   return <Badge tone="green">Sent</Badge>;
 }
 
@@ -1428,7 +1428,16 @@ function CommunicationTimeline({
             </div>
             <span className="text-xs font-bold uppercase text-[var(--muted)]">{relativeTime(entry.created_at)}</span>
           </div>
-          <p className="mt-2 text-sm font-semibold leading-6 text-[var(--foreground-secondary)]">{entry.content || "No message content recorded."}</p>
+          <p className="mt-2 whitespace-pre-line text-sm font-semibold leading-6 text-[var(--foreground-secondary)]">{entry.content || "No message content recorded."}</p>
+          {(entry.status === "pending" || entry.status === "failed") && entry.metadata?.handoff_label ? (
+            entry.metadata?.handoff_url ? (
+              <a className="pressable mt-2 inline-flex min-h-9 items-center rounded-lg bg-[var(--primary)] px-3 text-xs font-semibold text-white" href={entry.metadata.handoff_url} rel="noreferrer" target="_blank">
+                {entry.metadata.handoff_label}
+              </a>
+            ) : (
+              <p className="mt-2 text-xs font-semibold text-[#92400e]">{entry.metadata.handoff_label}</p>
+            )
+          ) : null}
         </div>
       ))}
     </div>

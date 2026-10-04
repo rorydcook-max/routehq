@@ -14,6 +14,7 @@ import { getPortalPayments } from "@/lib/payment-receipts";
 import { bookingRules } from "@/lib/booking-rules";
 import { rentalRateCard } from "@/lib/rental-estimate";
 import { nextMonthlyDue } from "@/lib/open-ended-billing";
+import { chatInvites } from "@/lib/customer-chat-link";
 import { promptPayQrSvg } from "@/lib/promptpay";
 import { PortalPayments } from "./portal-payments";
 
@@ -285,6 +286,11 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   // Before signing, "pay now" shows one QR for what is due at the start.
   // What is due at the start: the first rent and the deposit.
   const firstPaymentAmount = Number(rental?.outstanding_balance || 0) > 0 ? Number(rental.outstanding_balance) : Number(rental?.rental_rate || 0) + Number(rental?.deposit_amount || 0);
+  // Until they have a chat with the business, updates can't reach them: offer one.
+  const invites =
+    rental?.id && customer?.id && (detail.state === "active" || (detail.state === "ready" && detail.completion?.agreement))
+      ? await chatInvites(createSupabaseAdminClient() as any, { organizationId: String(rental.organization_id || organization?.id || ""), customerId: String(customer.id), token }).catch(() => [])
+      : [];
   const firstPaymentQr =
     detail.state === "ready" && !detail.completion?.agreement && detail.org_payment?.promptpay_id && String(rental?.currency || "THB") === "THB"
       ? await promptPayQrSvg(detail.org_payment.promptpay_id, firstPaymentAmount)
@@ -350,6 +356,22 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             </div>
           ) : null}
         </header>
+
+        {invites.length > 0 ? (
+          <section className="rounded-2xl border border-[#bfe0db] bg-[var(--primary-light)] p-4 shadow-sm">
+            <p className="text-sm font-semibold text-[var(--foreground)]">Get updates about your rental</p>
+            <p className="mt-1 text-sm leading-6 text-[var(--foreground-secondary)]">
+              Payment reminders, return dates and answers from {organization?.name || "us"}, sent to you. Tap, then send the message that appears.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {invites.map((invite) => (
+                <a className="pressable inline-flex min-h-11 items-center justify-center rounded-xl bg-[var(--primary)] px-4 text-sm font-semibold text-white" href={invite.url} key={invite.provider} rel="noreferrer" target="_blank">
+                  Get updates on {invite.label}
+                </a>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         {detail.state === "active" ? (
           <ActiveRentalPortal

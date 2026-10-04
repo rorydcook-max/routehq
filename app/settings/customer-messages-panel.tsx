@@ -32,8 +32,9 @@ export function CustomerMessagesPanel({ enabled, hasChannel }: { enabled: boolea
         <span>
           <span className="block text-sm font-semibold text-[var(--foreground)]">Tell customers automatically</span>
           <span className="mt-1 block text-[13px] leading-5 text-[var(--muted)]">
-            When an extension is applied, a request is answered, a payment is received, a refund is made, a booking is cancelled, a hold ends, or rent is due tomorrow. Each message goes to the chat that customer
-            first messaged you on.
+            Reminders before a handover, a return and a rent payment, a nudge when rent is late, and a heads-up when their vehicle is due a service or renewal. Plus what just happened: an extension applied, a
+            request answered, a payment received, a refund, a cancellation. Each goes to the chat that customer first messaged you on; without one, by email if they gave it, otherwise it waits on the booking for
+            you to send in one tap.
           </span>
         </span>
       </label>
@@ -44,7 +45,7 @@ export function CustomerMessagesPanel({ enabled, hasChannel }: { enabled: boolea
       ) : null}
       {on && hasChannel ? (
         <p className="mt-3 text-[13px] leading-5 text-[var(--muted)]">
-          A customer who has never messaged you has no chat to send to. Their messages are kept on the booking marked "not sent". Link a chat to a customer from the Inbox.
+          LINE and Telegram only let you message someone who has messaged you first. Each customer's booking page invites them to open a chat with you, and it connects itself to their booking when they do.
         </p>
       ) : null}
       {error ? <p className="mt-2 text-sm font-semibold text-[#dc2626]">{error}</p> : null}

@@ -1,4 +1,4 @@
-import { completeRentalJobs, tellRentalCustomer } from "@/lib/customer-messages";
+import { sendDailyCustomerReminders } from "@/lib/customer-reminders";
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { businessToday } from "@/lib/business-time";
@@ -30,6 +30,8 @@ export async function GET(req: NextRequest) {
 
   const holdsReleased = await releaseExpiredHoldsEverywhere(supabase).catch(() => 0);
   const lateReturnAlerts = await alertLateReturns(supabase).catch(() => 0);
+  // Handover tomorrow, return coming up, rent due or late, service due: each sent once.
+  const customerReminders = await sendDailyCustomerReminders(supabase).catch(() => null);
 
   const scheduledResult = await supabase
     .from("rental_payments")
@@ -100,10 +102,6 @@ export async function GET(req: NextRequest) {
 
     if (!taskError) {
       tasksCreated += 1;
-      // Once per payment: the job row above is what stops a second reminder.
-      await tellRentalCustomer(supabase, rental.id, ({ firstName, money }) =>
-        `Hi ${firstName}, a reminder that ${money(Number(payment.amount || 0))} for the ${vehicleLabel} is due tomorrow. You can pay and send your receipt from your booking page. Thank you.`
-      );
     }
   }
 
@@ -114,6 +112,7 @@ export async function GET(req: NextRequest) {
     tasksCreated,
     openEndedToppedUp,
     holdsReleased,
-    lateReturnAlerts
+    lateReturnAlerts,
+    customerReminders
   });
 }

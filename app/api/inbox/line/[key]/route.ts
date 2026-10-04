@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { lineProfile, lineSignatureValid } from "@/lib/inbox/providers";
+import { linePush, lineProfile, lineSignatureValid } from "@/lib/inbox/providers";
+import { chatLinkedReply, linkChatFromCode } from "@/lib/customer-chat-link";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { channelByWebhookKey, describeNonText, recordInbound } from "@/lib/inbox/store";
 
 export const runtime = "nodejs";
@@ -46,6 +48,16 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       externalId: typeof message.id === "string" ? message.id : null,
       replyToken: typeof event.replyToken === "string" ? event.replyToken : null
     });
+
+    // "Booking 1a2b3c4d5e6f", sent from their booking page, ties this chat to their booking.
+    if (message.type === "text" && /booking\s+[0-9a-f]{12}/i.test(body)) {
+      const admin = createSupabaseAdminClient() as any;
+      const firstName = await linkChatFromCode(admin, { channel, externalUserId: userId, text: body }).catch(() => null);
+      if (firstName) {
+        const { data: organization } = await admin.from("organizations").select("name").eq("id", channel.organization_id).maybeSingle();
+        await linePush(channel.accessToken, userId, chatLinkedReply(firstName, organization?.name));
+      }
+    }
   }
 
   return NextResponse.json({ ok: true });

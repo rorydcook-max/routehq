@@ -75,76 +75,13 @@ function methodLabel(method: string) {
   return METHODS.find(([key]) => key === method)?.[1] || "Other";
 }
 
-function RecordPaymentPanel({ paymentId, amount, today, onClose, defaultMethod = "cash" }: { paymentId: string; amount: number; today: string; onClose: () => void; defaultMethod?: string }) {
-  const router = useRouter();
-  const [value, setValue] = useState(String(amount || ""));
-  const [date, setDate] = useState(today);
-  const [method, setMethod] = useState(defaultMethod);
-  const [error, setError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
-  const received = Number(value || 0);
-  const remainder = Math.round((amount - received) * 100) / 100;
-
-  function save() {
-    setError(null);
-    if (!(received > 0)) {
-      setError("Enter the amount received.");
-      return;
-    }
-    startTransition(async () => {
-      try {
-        await recordPaymentReceived(paymentId, { amount: received, date, method });
-        onClose();
-        router.refresh();
-      } catch {
-        setError("Couldn't record this payment. Please try again.");
-      }
-    });
-  }
-
-  const field = "mt-1 h-10 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-sm";
-  return (
-    <div className="mt-2 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
-      <div className="grid gap-2 sm:grid-cols-3">
-        <label className="text-xs font-semibold text-[var(--foreground-secondary)]">
-          Amount received (฿)
-          <input className={field} inputMode="decimal" min="0" onChange={(event) => setValue(event.target.value)} step="0.01" type="number" value={value} />
-        </label>
-        <label className="text-xs font-semibold text-[var(--foreground-secondary)]">
-          Date received
-          <input className={field} max={today} onChange={(event) => setDate(event.target.value)} type="date" value={date} />
-        </label>
-        <label className="text-xs font-semibold text-[var(--foreground-secondary)]">
-          Method
-          <select className={field} onChange={(event) => setMethod(event.target.value)} value={method}>
-            {METHODS.map(([key, label]) => (
-              <option key={key} value={key}>{label}</option>
-            ))}
-          </select>
-        </label>
-      </div>
-      {remainder >= 1 && received > 0 ? (
-        <p className="mt-2 text-xs font-semibold text-[var(--warning)]">Part payment: {money(remainder)} will stay due.</p>
-      ) : null}
-      {error ? <p className="mt-2 text-xs font-semibold text-[var(--danger)]">{error}</p> : null}
-      <div className="mt-3 flex gap-2">
-        <button className="primary-action pressable min-h-9 px-4 text-xs" disabled={isPending} onClick={save} type="button">
-          {isPending ? "Saving…" : "Confirm received"}
-        </button>
-        <button className="secondary-action pressable min-h-9 px-4 text-xs" disabled={isPending} onClick={onClose} type="button">
-          Cancel
-        </button>
-      </div>
-    </div>
-  );
-}
-
 /**
- * For a receipt that isn't simply "the exact amount for one payment": the money
- * was short, too much, or one transfer for several payments. Staff say what
- * arrived and what it is for, and see where every baht goes before confirming.
+ * Recording money received, with or without a receipt from the customer. Covers
+ * the cases that aren't "the exact amount for one payment": short, too much, or
+ * one transfer for several payments. Staff say what arrived and what it is for,
+ * and see where every baht goes before confirming.
  */
-function ReceiptPanel({ item, siblings, today, onClose }: { item: TaskListItem; siblings: TaskListItem[]; today: string; onClose: () => void }) {
+function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskListItem; siblings: TaskListItem[]; today: string; onClose: () => void }) {
   const router = useRouter();
   const receipt = item.receipt;
   const openPayments: OpenPayment[] = useMemo(
@@ -164,6 +101,9 @@ function ReceiptPanel({ item, siblings, today, onClose }: { item: TaskListItem; 
   const received = Number(value || 0);
   const chosen = openPayments.filter((payment) => chosenIds.includes(payment.id));
   const others = openPayments.filter((payment) => !chosenIds.includes(payment.id));
+  // A long rental has a year of payments; only the near ones are worth offering.
+  const horizon = addDays(today, 35);
+  const offered = openPayments.filter((payment) => payment.dueDate <= horizon || chosenIds.includes(payment.id));
   const lines = received > 0 ? allocatePayment(received, chosen, others) : [];
 
   function toggle(id: string) {
@@ -224,11 +164,11 @@ function ReceiptPanel({ item, siblings, today, onClose }: { item: TaskListItem; 
         </label>
       </div>
 
-      {openPayments.length > 1 ? (
+      {offered.length > 1 ? (
         <div className="mt-3">
           <p className="text-xs font-semibold text-[var(--foreground-secondary)]">What is it for?</p>
           <div className="mt-1 space-y-1">
-            {openPayments.map((payment) => (
+            {offered.map((payment) => (
               <label className="flex min-h-9 items-center gap-2 rounded-lg bg-white px-3 text-sm" key={payment.id}>
                 <input checked={chosenIds.includes(payment.id)} disabled={payment.id === item.rentalPaymentId} onChange={() => toggle(payment.id)} type="checkbox" />
                 <span className="min-w-0 flex-1 truncate">{payment.label}</span>
@@ -273,9 +213,11 @@ function ReceiptPanel({ item, siblings, today, onClose }: { item: TaskListItem; 
         <button className="secondary-action pressable min-h-9 px-4 text-xs" disabled={isPending} onClick={onClose} type="button">
           Cancel
         </button>
-        <button className="pressable ml-auto min-h-9 px-2 text-xs font-semibold text-[var(--danger)]" disabled={isPending} onClick={decline} type="button">
-          Nothing arrived
-        </button>
+        {receipt ? (
+          <button className="pressable ml-auto min-h-9 px-2 text-xs font-semibold text-[var(--danger)]" disabled={isPending} onClick={decline} type="button">
+            Nothing arrived
+          </button>
+        ) : null}
       </div>
     </div>
   );
@@ -345,11 +287,7 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
           ) : null}
           {receiptError ? <p className="mt-1 text-xs font-semibold text-[var(--danger)]">{receiptError}</p> : null}
           {recording && item.rentalPaymentId ? (
-            receipt ? (
-              <ReceiptPanel item={item} onClose={() => setRecording(false)} siblings={siblings} today={today} />
-            ) : (
-              <RecordPaymentPanel amount={item.amount || 0} onClose={() => setRecording(false)} paymentId={item.rentalPaymentId} today={today} />
-            )
+            <ReceivePaymentPanel item={item} onClose={() => setRecording(false)} siblings={siblings} today={today} />
           ) : null}
           {showNote && !item.completedAt ? (
             <form action={completeTask} className="mt-2 flex flex-col gap-2 sm:flex-row">
@@ -485,7 +423,7 @@ export function TasksList({
                 </div>
                 <div className="divide-y divide-[var(--border)]">
                   {items.map((item) => (
-                    <TaskRow item={item} key={item.id} organizationId={organizationId} siblings={item.receipt ? siblingsOf(item) : []} today={today} />
+                    <TaskRow item={item} key={item.id} organizationId={organizationId} siblings={item.kind === "payment" ? siblingsOf(item) : []} today={today} />
                   ))}
                 </div>
                 {limited ? (

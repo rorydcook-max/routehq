@@ -10,6 +10,8 @@ import { isMapsUrl, formatDeliveryLocation } from "@/lib/delivery-location";
 import { toWallTime } from "@/lib/business-time";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getPortalPayments } from "@/lib/payment-receipts";
+import { promptPayQrSvg } from "@/lib/promptpay";
+import { PortalPayments } from "./portal-payments";
 
 /** An amendment waiting for this customer's signature, if any. */
 async function pendingAmendmentFor(rentalId: string) {
@@ -246,7 +248,15 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   const ownerContact = organization?.settings?.phone || organization?.settings?.business_phone || organization?.owner_phone || null;
   const executedDownloads = detail.executedAgreementDownloads || null;
   const pendingAmendmentToken = rental?.id ? await pendingAmendmentFor(String(rental.id)) : null;
-  const portal = detail.state === "active" && rental?.id ? await getPortalPayments(String(rental.id), detail.org_payment?.promptpay_id) : { payments: [], bundle: null };
+  // Payments can be made from this page as soon as the agreement is signed, before and after handover.
+  const canPayHere = rental?.id && (detail.state === "active" || (detail.state === "ready" && detail.completion?.agreement));
+  const portal = canPayHere ? await getPortalPayments(String(rental.id), detail.org_payment?.promptpay_id) : { payments: [], bundle: null };
+  // Before signing, "pay now" shows one QR for what is due at the start.
+  const firstPaymentAmount = Number(rental?.outstanding_balance || 0) > 0 ? Number(rental.outstanding_balance) : Number(rental?.rental_rate || 0);
+  const firstPaymentQr =
+    detail.state === "ready" && !detail.completion?.agreement && detail.org_payment?.promptpay_id && String(rental?.currency || "THB") === "THB"
+      ? await promptPayQrSvg(detail.org_payment.promptpay_id, firstPaymentAmount)
+      : null;
 
   return (
     <main className="min-h-screen bg-[#fbfaf8] px-4 py-5 text-[var(--foreground)]">
@@ -353,6 +363,10 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             ) : null}
           </section>
         ) : (
+          <>
+          {detail.state === "ready" ? (
+            <PortalPayments bundle={portal.bundle} orgPayment={detail.org_payment} organizationName={organization?.name || "Rental operator"} payments={portal.payments} token={token} />
+          ) : null}
           <BookingCompletionForm
             detail={{
               token,
@@ -364,6 +378,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
               bookingData,
               contractHtml: detail.contractHtml,
               orgPayment: detail.org_payment,
+              promptPayQrSvg: firstPaymentQr,
               bookingReference: String(detail.bookingLink?.reference || detail.bookingLink?.reference_number || detail.bookingLink?.id || token).slice(0, 18),
               rentalRate: Number(rental?.rental_rate || 0),
               depositAmount: Number(rental?.deposit_amount || 0),
@@ -374,6 +389,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
               executedAgreementDownloads: detail.executedAgreementDownloads,
             }}
           />
+          </>
         )}
       </div>
     </main>

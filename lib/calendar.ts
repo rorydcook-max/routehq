@@ -126,3 +126,86 @@ export async function getCalendarEvents(organizationId: string, year: number, mo
 
   return events.sort((a, b) => a.date.localeCompare(b.date) || a.type.localeCompare(b.type));
 }
+
+export type AvailabilityBooking = {
+  id: string;
+  /** First and last day shown in this month (the rental may run beyond it). */
+  from: string;
+  to: string;
+  customer: string;
+  state: "booked" | "out" | "late" | "returned";
+  startsBefore: boolean;
+  /** Runs past the end of the month, or has no end date. */
+  runsOn: boolean;
+};
+
+export type AvailabilityVehicle = {
+  id: string;
+  name: string;
+  plate: string;
+  category: { code: string; name: string } | null;
+  inShop: boolean;
+  bookings: AvailabilityBooking[];
+};
+
+/**
+ * One row per vehicle with its bookings across the month, so gaps (days a
+ * vehicle is free) can be seen at a glance.
+ */
+export async function getAvailability(organizationId: string, year: number, month: number): Promise<AvailabilityVehicle[]> {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const mm = String(month).padStart(2, "0");
+  const startDate = `${year}-${mm}-01`;
+  const endDate = `${year}-${mm}-${String(lastDayOfMonth(year, month)).padStart(2, "0")}`;
+  const today = businessToday();
+
+  const [vehiclesResult, rentalsResult] = await Promise.all([
+    supabase
+      .from("vehicles")
+      .select("id, make, model, registration_number, status, availability_status, vehicle_categories(code, name)")
+      .eq("organization_id", organizationId)
+      .is("deleted_at", null)
+      .order("make", { ascending: true }),
+    supabase
+      .from("rentals")
+      .select("id, vehicle_id, start_date, end_date, status, customers!rentals_customer_id_fkey(full_name)")
+      .eq("organization_id", organizationId)
+      .is("deleted_at", null)
+      .neq("status", "cancelled")
+      .lte("start_date", endDate)
+      .order("start_date", { ascending: true })
+  ]);
+  if (vehiclesResult.error) throw new Error(vehiclesResult.error.message);
+
+  const byVehicle = new Map<string, AvailabilityBooking[]>();
+  for (const rental of rentalsResult.data || []) {
+    const start = String(rental.start_date || "").slice(0, 10);
+    const plannedEnd = String(rental.end_date || "").slice(0, 10);
+    const returned = rental.status === "completed";
+    const stillOut = !returned && rental.status !== "booked";
+    // A vehicle that hasn't come back is still out today, whatever the end date said.
+    const late = stillOut && !!plannedEnd && plannedEnd < today;
+    const end = !plannedEnd ? "9999-12-31" : late ? (today > plannedEnd ? today : plannedEnd) : plannedEnd;
+    if (!start || end < startDate) continue;
+    const list = byVehicle.get(rental.vehicle_id) || [];
+    list.push({
+      id: rental.id,
+      from: start < startDate ? startDate : start,
+      to: end > endDate ? endDate : end,
+      customer: rental.customers?.full_name || "Booking link sent",
+      state: returned ? "returned" : late ? "late" : rental.status === "booked" ? "booked" : "out",
+      startsBefore: start < startDate,
+      runsOn: end > endDate
+    });
+    byVehicle.set(rental.vehicle_id, list);
+  }
+
+  return ((vehiclesResult.data || []) as any[]).map((vehicle) => ({
+    id: vehicle.id,
+    name: [vehicle.make, vehicle.model].filter(Boolean).join(" ") || "Vehicle",
+    plate: vehicle.registration_number || "",
+    category: vehicle.vehicle_categories || null,
+    inShop: /maint|repair|shop|service/i.test(`${vehicle.status || ""} ${vehicle.availability_status || ""}`),
+    bookings: byVehicle.get(vehicle.id) || []
+  }));
+}

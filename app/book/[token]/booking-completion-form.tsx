@@ -51,6 +51,8 @@ type PublicBookingDetail = {
   bookingData: Record<string, unknown>;
   contractHtml: string;
   orgPayment?: OrgPaymentSettings;
+  /** PromptPay QR that already carries the first payment's amount. */
+  promptPayQrSvg?: string | null;
   bookingReference?: string;
   rentalRate?: number;
   outstandingBalance?: number;
@@ -1146,7 +1148,14 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
                     <div className="mt-4 rounded-2xl border border-[#bfe0db] bg-white p-4">
                       {key === "promptpay" && (orgPayment?.promptpay_qr_url || orgPayment?.promptpay_id) ? (
                         <div>
-                          {orgPayment.promptpay_qr_url ? (
+                          {detail.promptPayQrSvg ? (
+                            <>
+                              <div aria-label="PromptPay QR code" className="mx-auto w-[220px] max-w-full rounded-lg border border-[var(--border)] bg-white p-2 [&>svg]:h-auto [&>svg]:w-full" dangerouslySetInnerHTML={{ __html: detail.promptPayQrSvg }} role="img" />
+                              <p className="mt-3 text-center text-[13px] text-[var(--foreground-secondary)]">Scan with any Thai banking app</p>
+                              <p className="mt-1 text-center text-[13px] font-semibold text-[var(--primary)]">{formatMoney(paymentAmount, currency)} is already filled in</p>
+                              <p className="mt-1 text-center text-[11px] text-[var(--muted)]">Once you have signed, you can send your receipt from this page.</p>
+                            </>
+                          ) : orgPayment.promptpay_qr_url ? (
                             <>
                               <img
                                 alt="PromptPay QR code"

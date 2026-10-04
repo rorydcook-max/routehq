@@ -2,14 +2,13 @@ import Link from "next/link";
 import type { Route } from "next";
 import { AlertTriangle, CalendarDays, Car, CheckCircle2, Clock, CreditCard, FileText, Gauge, MapPin, ReceiptText, UserRound, XCircle } from "lucide-react";
 import { CancelBookingButton } from "@/app/bookings/[id]/cancel-booking-button";
-import { ChangeVehicleButton } from "@/app/bookings/[id]/change-vehicle-button";
+import { VehicleChangeButton } from "@/app/bookings/[id]/vehicle-change-button";
 import { UndoCancellationButton } from "@/app/bookings/[id]/undo-cancellation-button";
 import { confirmCustomerPayment } from "@/app/actions/deposits";
 import { PaymentReminderButton } from "@/app/bookings/[id]/payment-reminder-button";
 import { acknowledgePortalAction, declinePortalAction, replyToPortalQuestion, resolvePortalAction } from "@/app/actions/portal-actions";
 import { ExtensionRequestAnswer } from "@/app/bookings/[id]/extension-request-answer";
-import { extensionPicture, moveOptionsFor } from "@/lib/extension-picture";
-import { MoveBookingButton } from "@/app/bookings/[id]/move-booking-button";
+import { extensionPicture } from "@/lib/extension-picture";
 import { niceDate } from "@/lib/nice-date";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { AssignCustomerModal } from "@/app/bookings/[id]/assign-customer-modal";
@@ -318,13 +317,28 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   // activate", or the payment schedule controls on this page.
 
   const supabaseForVehicles = (await createSupabaseServerClient()) as any;
-  const { data: availableVehicles } = await supabaseForVehicles
-    .from("vehicles")
-    .select("id, make, model, trim, year, registration_number, monthly_rate")
-    .eq("organization_id", organization.id)
-    .eq("status", "available")
-    .is("deleted_at", null)
-    .order("make");
+  // After a signed change of vehicle: the handover and collection forms still to be completed,
+  // and an exchange this customer has signed that is waiting on the other customer.
+  const [{ data: swapForms }, { data: waitingExchange }] = await Promise.all([
+    supabaseForVehicles
+      .from("tasks")
+      .select("id, title, action, vehicle_id")
+      .eq("organization_id", organization.id)
+      .eq("rental_id", detail.rental.id)
+      .in("action", ["swap_handover", "swap_collection"])
+      .is("completed_at", null)
+      .is("deleted_at", null),
+    supabaseForVehicles
+      .from("rental_amendments")
+      .select("id, changes")
+      .eq("organization_id", organization.id)
+      .eq("rental_id", detail.rental.id)
+      .eq("status", "signed")
+      .is("applied_at", null)
+      .not("changes->>swap_group", "is", null)
+      .limit(1)
+      .maybeSingle()
+  ]);
   const [rentalDocuments, { data: pendingAmendment }] = await Promise.all([
     getBookingRentalDocuments(supabaseForVehicles, organization.id, detail.rental.id),
     supabaseForVehicles
@@ -371,8 +385,12 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   const isClosed = isCancelled || String(rental.status || "") === "completed";
   const paidPaymentGroup = nonVoidedPayments.filter((p: any) => p.status === "paid");
   const pendingPayment = payments.find((payment: any) => !isVoidedPayment(payment) && ["pending", "overdue"].includes(String(payment.status || "pending")));
-  const deliveryInspection = inspections.find((inspection: any) => inspection.type === "delivery" || inspection.inspection_type === "delivery");
-  const returnInspection = inspections.find((inspection: any) => inspection.type === "return" || inspection.inspection_type === "return");
+  // After a change of vehicle a rental has forms for more than one vehicle: the handover that counts is
+  // the current vehicle's, and a collection form for a vehicle given up is not the end of the rental.
+  const formType = (inspection: any) => inspection.type || inspection.inspection_type;
+  const onCurrentVehicle = (inspection: any) => !inspection.vehicle_id || inspection.vehicle_id === rental.vehicle_id;
+  const deliveryInspection = inspections.find((inspection: any) => formType(inspection) === "delivery" && onCurrentVehicle(inspection)) || inspections.find((inspection: any) => formType(inspection) === "delivery");
+  const returnInspection = inspections.find((inspection: any) => formType(inspection) === "return" && (rental.status === "completed" || onCurrentVehicle(inspection)));
   const customerDocuments = documents.filter((document: any) => document.owner_type === "customer");
   const delivery = deliveryDisplay(rental, bookingLink);
   const paymentMethod = bookingLink?.preferred_payment_method || null;
@@ -385,7 +403,6 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   // A booking link that is out but not signed yet: the next step is the customer's, not a handover.
   const awaitingSignature = rental.status === "booked" && !!bookingLink && !bookingLink.contract_signed_at && !renterSignatureOf(rentalDocuments);
   const holdUntil = awaitingSignature && bookingLink?.hold_until && !bookingLink?.hold_released_at ? String(bookingLink.hold_until) : null;
-  const moveOptions = rental.status === "booked" ? await moveOptionsFor(createSupabaseAdminClient() as any, organization.id, rental.id).catch(() => []) : [];
   const canAdjustRental = !awaitingSignature && ["active", "booked", "due_soon", "overdue"].includes(String(rental.status || "").toLowerCase());
   const needsExistingRentalPaymentSetup = Boolean(rental.entered_by_operator) && payments.length === 0;
   const activeRentalStatus = ["active", "due_soon", "overdue", "extended"].includes(String(displayStatus || "").toLowerCase());
@@ -566,26 +583,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               <ActionButton href={`/bookings/${rental.id}/edit` as Route} tone="light">
                 Edit booking
               </ActionButton>
-              {["active", "due_soon", "overdue", "extended"].includes(displayStatus) ? (
-                <ChangeVehicleButton
-                  rentalId={rental.id}
-                  organizationId={organization.id}
-                  currentVehicleId={String(rental.vehicle_id || vehicle?.id || "")}
-                  currentVehicleLabel={vehicleTitle(vehicle)}
-                  currentRate={Number(rental.rental_rate || 0)}
-                  currency={rental.currency || "THB"}
-                  availableVehicles={(availableVehicles || []).filter((v: any) => v.id !== (rental.vehicle_id || vehicle?.id))}
-                />
-              ) : null}
-              {rental.status === "booked" ? (
-                <MoveBookingButton
-                  currentVehicleLabel={vehicleTitle(vehicle)}
-                  hasCustomer={Boolean(customer)}
-                  options={moveOptions}
-                  rentalId={rental.id}
-                  signed={Boolean(bookingLink?.contract_signed_at || renterSignatureOf(rentalDocuments))}
-                />
-              ) : null}
+              {!["completed", "cancelled", "draft"].includes(rental.status) ? <VehicleChangeButton rentalId={rental.id} /> : null}
               {!["completed", "cancelled"].includes(rental.status) ? (
                 <CancelBookingButton
                   rentalId={rental.id}
@@ -604,6 +602,28 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             </div>
           </div>
         </Card>
+
+        {(swapForms || []).length > 0 ? (
+          <div className="scroll-mt-4 rounded-xl border border-[#fde68a] bg-[#fffbeb] p-3" id="vehicle-change-forms">
+            <p className="text-sm font-semibold text-[#92400e]">The vehicle change is signed. Complete these with {customer?.full_name || "the customer"}:</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {(swapForms || []).map((form: any) => (
+                <Link
+                  className="pressable inline-flex min-h-9 items-center justify-center rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-bold text-white shadow-sm"
+                  href={(form.action === "swap_handover" ? `/inspections/delivery/${rental.id}?swap=1` : `/inspections/return/${rental.id}?swap=1&vehicle=${form.vehicle_id}`) as Route}
+                  key={form.id}
+                >
+                  {form.title.split(" to ")[0].split(" from ")[0]}
+                </Link>
+              ))}
+            </div>
+          </div>
+        ) : null}
+        {waitingExchange ? (
+          <div className="rounded-xl border border-[var(--border)] bg-white p-3 text-sm text-[var(--foreground-secondary)]">
+            {customer?.full_name || "The customer"} has signed the exchange for the {waitingExchange.changes?.new_vehicle_label || "other vehicle"}. It happens once the other customer has signed too.
+          </div>
+        ) : null}
 
         {pendingPortalActions.length > 0 ? (
           <div className="scroll-mt-4 rounded-xl border border-[#fde68a] bg-[#fffbeb] p-3" id="customer-requests">

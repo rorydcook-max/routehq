@@ -426,6 +426,8 @@ export async function submitInspection(formData: FormData) {
   const notes = optionalStringField(formData, "notes");
   const customerSignature = optionalStringField(formData, "customerSignature");
   const customerSignedName = optionalStringField(formData, "customerSignedName");
+  // A change of vehicle during a rental: record the form without starting or ending the rental.
+  const isSwap = String(formData.get("swap") || "") === "1";
 
   if (!organizationId || !vehicleId || !["delivery", "return", "condition_report"].includes(mode)) {
     throw new Error("Inspection context is missing.");
@@ -525,7 +527,37 @@ export async function submitInspection(formData: FormData) {
     customerName = customer?.full_name || customerName;
   }
 
-  if (mode === "delivery" && rentalId) {
+  if (isSwap && rentalId) {
+    const admin = createSupabaseAdminClient() as any;
+    if (mode === "delivery") {
+      // Distance on this rental is now counted from the replacement vehicle's reading.
+      await supabase.from("rentals").update({ mileage_at_delivery: odometerReading }).eq("id", rentalId).eq("organization_id", organizationId);
+      await syncVehicleStatusFromBookings(supabase, organizationId, vehicleId);
+    } else {
+      // Charges for the vehicle given up (fuel, damage) come off the deposit; nothing is refunded and the rental carries on.
+      const charges = new FormData();
+      for (const key of ["depositFuelDeficitCharge", "depositDamageCharge"]) charges.set(key, String(formData.get(key) || "0"));
+      await reconcileReturnDeposit(charges, organizationId, rentalId).catch(() => null);
+      const { data: change } = await admin.from("vehicle_changes").select("original_vehicle_disposition, repair_notes").eq("rental_id", rentalId).eq("from_vehicle_id", vehicleId).order("changed_at", { ascending: false }).limit(1).maybeSingle();
+      if (change?.original_vehicle_disposition === "repair") {
+        await supabase.from("vehicles").update({ status: "maintenance", availability_status: "offline", current_rental_id: null, current_customer_id: null, repair_started_at: now }).eq("id", vehicleId).eq("organization_id", organizationId);
+      } else {
+        await supabase.from("vehicles").update({ status: "available", availability_status: "available_now", current_rental_id: null, current_customer_id: null }).eq("id", vehicleId).eq("organization_id", organizationId);
+        // It may be out with another customer (an exchange) or booked next.
+        await syncVehicleStatusFromBookings(supabase, organizationId, vehicleId);
+      }
+    }
+    await admin
+      .from("tasks")
+      .update({ completed_at: now, completion_notes: "Form completed" })
+      .eq("rental_id", rentalId)
+      .eq("vehicle_id", vehicleId)
+      .eq("action", mode === "delivery" ? "swap_handover" : "swap_collection")
+      .is("completed_at", null);
+    revalidatePath("/tasks");
+  }
+
+  if (mode === "delivery" && rentalId && !isSwap) {
     // Handed over before the booked start date: the rental started today.
     // (Later handovers keep the booked date; the agreement is unaffected.)
     const { data: bookedRental } = await supabase
@@ -565,7 +597,7 @@ export async function submitInspection(formData: FormData) {
     await activateRental(rentalId, supabase).catch(() => null);
   }
 
-  if (mode === "return" && rentalId) {
+  if (mode === "return" && rentalId && !isSwap) {
     const { data: rental, error: rentalFetchError } = await supabase
       .from("rentals")
       .select("mileage_at_delivery, end_date, billing_interval, pricing_model, currency")
@@ -725,7 +757,7 @@ export async function submitInspection(formData: FormData) {
     });
   }
 
-  if (mode === "return") {
+  if (mode === "return" && !isSwap) {
     notifyOperator(
       organizationId,
       `🔄 Return inspection complete — ${vehicleLabel} returned by ${customerName}`,

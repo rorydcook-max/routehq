@@ -60,7 +60,7 @@ export default async function AmendmentPage({ params }: { params: Promise<{ toke
     return (
       <Message title="Amendment signed" tone="green">
         <p>
-          Thank you{amendment.signerName ? `, ${amendment.signerName}` : ""}. The changes to your rental are confirmed and {amendment.businessName} has been told.
+          Thank you{amendment.signerName ? `, ${amendment.signerName}` : ""}. Your signature is recorded and {amendment.businessName} has been told.
         </p>
         {amendment.pdfUrl ? (
           <a className="pressable mt-5 inline-flex items-center gap-2 rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={amendment.pdfUrl} rel="noreferrer" target="_blank">

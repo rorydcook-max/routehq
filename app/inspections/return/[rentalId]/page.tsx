@@ -6,10 +6,12 @@ import { translateForReader } from "@/lib/content-translation";
 import { getInspectionContextByRental } from "@/lib/inspection-detail";
 import { getDefaultOrganization } from "@/lib/organization";
 
-export default async function ReturnInspectionPage({ params }: { params: Promise<{ rentalId: string }> }) {
+export default async function ReturnInspectionPage({ params, searchParams }: { params: Promise<{ rentalId: string }>; searchParams: Promise<{ swap?: string; vehicle?: string }> }) {
   const { rentalId } = await params;
+  const query = await searchParams;
   const [userEmail, organization, locale] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization(), getLocale()]);
-  const context = await getInspectionContextByRental(rentalId, organization.id, "return");
+  // ?swap=1&vehicle=...: collecting the original vehicle after a change of vehicle; the rental carries on.
+  const context = await getInspectionContextByRental(rentalId, organization.id, "return", query.swap === "1" ? { vehicleId: query.vehicle || null } : undefined);
 
   // Damage noted at delivery may have been typed in another language; show it
   // to whoever does the return in theirs (the original stays alongside).

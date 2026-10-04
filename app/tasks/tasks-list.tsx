@@ -334,12 +334,20 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
             {item.action === "refund" ? "Record refund" : "Answer"}
           </Link>
         ) : null}
+        {item.kind === "task" && !item.completedAt && item.rentalId && (item.action === "swap_handover" || item.action === "swap_collection") ? (
+          <Link
+            className="primary-action pressable min-h-9 px-3 text-xs"
+            href={item.action === "swap_handover" ? `/inspections/delivery/${item.rentalId}?swap=1` : `/inspections/return/${item.rentalId}?swap=1&vehicle=${item.vehicleId}`}
+          >
+            Open form
+          </Link>
+        ) : null}
         {item.kind === "task" && !item.completedAt && !showNote ? (
           <>
             <form action={completeTask}>
               <input name="organizationId" type="hidden" value={organizationId} />
               <input name="taskId" type="hidden" value={item.id} />
-              <PendingButton className={`${item.action === "refund" || item.action === "request" ? "secondary-action" : "primary-action"} min-h-9 px-3 text-xs`} pendingLabel="Saving…" type="submit">
+              <PendingButton className={`${item.action ? "secondary-action" : "primary-action"} min-h-9 px-3 text-xs`} pendingLabel="Saving…" type="submit">
                 {item.action === "refund" ? "No refund" : "Mark done"}
               </PendingButton>
             </form>

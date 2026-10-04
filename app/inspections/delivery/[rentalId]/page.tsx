@@ -4,10 +4,12 @@ import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getInspectionContextByRental } from "@/lib/inspection-detail";
 import { getDefaultOrganization } from "@/lib/organization";
 
-export default async function DeliveryInspectionPage({ params }: { params: Promise<{ rentalId: string }> }) {
+export default async function DeliveryInspectionPage({ params, searchParams }: { params: Promise<{ rentalId: string }>; searchParams: Promise<{ swap?: string; vehicle?: string }> }) {
   const { rentalId } = await params;
+  const query = await searchParams;
   const [userEmail, organization] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization()]);
-  const context = await getInspectionContextByRental(rentalId, organization.id, "delivery");
+  // ?swap=1: a change of vehicle during the rental (see lib/inspection-detail.ts).
+  const context = await getInspectionContextByRental(rentalId, organization.id, "delivery", query.swap === "1" ? { vehicleId: query.vehicle || null } : undefined);
 
   return (
     <AppShell userEmail={userEmail}>

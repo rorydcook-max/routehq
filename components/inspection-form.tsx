@@ -370,11 +370,14 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
   const severityName = (severity: string | null | undefined) =>
     severity && severityKeys[severity] ? t(severityKeys[severity]) : String(severity || "");
   const mode = context.mode;
-  const depositAlreadyReturned = mode === "return" && context.rental?.deposit_status === "fully_returned";
+  const isSwap = Boolean(context.swap);
+  // A vehicle collected in a swap doesn't settle the deposit: the rental carries on.
+  const depositAlreadyReturned = mode === "return" && !isSwap && context.rental?.deposit_status === "fully_returned";
+  const skipDepositStep = depositAlreadyReturned || (mode === "return" && isSwap);
   // No tracker fitted: skip the GPS step rather than show an empty screen.
   const hasGps = Boolean(context.gpsDevice);
   const withoutGps = (list: string[]) => (hasGps ? list : list.filter((item) => item !== "GPS"));
-  const steps = mode === "return" ? (depositAlreadyReturned ? returnSteps.filter((item) => item !== "Deposit") : returnSteps) : withoutGps(mode === "condition_report" ? conditionSteps : deliverySteps);
+  const steps = mode === "return" ? (skipDepositStep ? returnSteps.filter((item) => item !== "Deposit") : returnSteps) : withoutGps(mode === "condition_report" ? conditionSteps : deliverySteps);
   // Bikes have a left and right side, and no cabin or boot to photograph.
   const isBike = isTwoWheeler(kindFromCategory(context.vehicle.vehicle_categories));
   const [step, setStep] = useState(0);
@@ -424,7 +427,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
   const [receiptResult, setReceiptResult] = useState<ReceiptResult | null>(null);
   const [receiptError, setReceiptError] = useState("");
 
-  const draftKey = `routehq-inspection-${mode}-${context.rental?.id || context.vehicle.id}`;
+  const draftKey = `routehq-inspection-${mode}-${context.rental?.id || context.vehicle.id}${isSwap ? `-swap-${context.vehicle.id}` : ""}`;
   const deliveryFuel = Number(context.deliveryInspection?.fuel_level || 0);
   const depositHeld = Number(context.rental?.deposit_held || 0);
   const alreadyRefunded = Number(context.rental?.deposit_refunded_amount || 0);
@@ -690,6 +693,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
     <form className="mx-auto max-w-3xl space-y-4" id="inspectionForm" onSubmit={(event) => event.preventDefault()}>
       <input name="organizationId" type="hidden" value={context.organizationId} />
       <input name="mode" type="hidden" value={mode} />
+      <input name="swap" type="hidden" value={isSwap ? "1" : ""} />
       <input name="rentalId" type="hidden" value={context.rental?.id || ""} />
       <input name="vehicleId" type="hidden" value={context.vehicle.id} />
       <input name="customerId" type="hidden" value={context.customer?.id || ""} />
@@ -958,7 +962,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
         </StepShell>
       ) : null}
 
-      {step === 5 && mode === "return" && !depositAlreadyReturned ? (
+      {step === 5 && mode === "return" && !skipDepositStep ? (
         <StepShell eyebrow={t("eyebrowDepositReconciliation")} title={t("confirmDepositRefund")}>
           <div className="space-y-3 rounded-xl border border-[var(--border)] bg-white p-4">
             <Row label={t("depositHeld")} value={money(depositHeld)} />
@@ -998,7 +1002,13 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
             <SummaryTile icon={Camera} label={t("photosVideo")} value={videoCaptured ? t("videoCaptured") : t("photoCount", { count: Object.values(sidePhotos).filter(Boolean).length })} />
             <SummaryTile icon={ShieldCheck} label={t("damage")} value={noDamage ? t("noDamageNoted") : t("damageCount", { count: damageItems.length })} />
           </div>
-          {mode === "return" ? (
+          {mode === "return" && isSwap ? (
+            fuelDeficitCharge + damageCharge > 0 ? (
+              <div className="mt-4 rounded-lg border border-[var(--border)] bg-white p-3">
+                <Row label={t("depositDeductions")} value={`-${money(fuelDeficitCharge + damageCharge)}`} danger />
+              </div>
+            ) : null
+          ) : mode === "return" ? (
             <div className="mt-4 rounded-lg border border-[var(--border)] bg-white p-3">
               {depositAlreadyReturned ? (
                 <div className="rounded-lg bg-[#f0fdf4] p-3">
@@ -1012,7 +1022,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
               )}
             </div>
           ) : null}
-          {mode === "delivery" && context.rental?.id ? (
+          {mode === "delivery" && context.rental?.id && !isSwap ? (
             <div className="mt-4 rounded-lg border border-[var(--border)] bg-white p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>

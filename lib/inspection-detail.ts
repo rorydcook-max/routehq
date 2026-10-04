@@ -15,6 +15,11 @@ export type InspectionContext = {
   gpsDevice: any | null;
   latestLocation: any | null;
   deliveryInspection: any | null;
+  /**
+   * A change of vehicle during a rental: the form records the replacement being
+   * handed over, or the original being collected, without starting or ending the rental.
+   */
+  swap?: boolean;
 };
 
 async function addSignedInspectionUrls(supabase: any, inspection: any | null) {
@@ -49,7 +54,8 @@ async function addSignedInspectionUrls(supabase: any, inspection: any | null) {
 export async function getInspectionContextByRental(
   rentalId: string,
   organizationId: string,
-  mode: "delivery" | "return"
+  mode: "delivery" | "return",
+  swap?: { vehicleId?: string | null }
 ): Promise<InspectionContext> {
   const supabase = (await createSupabaseServerClient()) as any;
 
@@ -119,6 +125,40 @@ export async function getInspectionContextByRental(
   const queryError = [gpsResult, locationResult, deliveryResult, unpaidPaymentsResult].find((result) => result.error && result.error.code !== "PGRST116")?.error;
   if (queryError) {
     throw new Error(queryError.message);
+  }
+
+  if (swap) {
+    // Collecting the original vehicle: the form is about that vehicle, not the one the rental is on now.
+    let vehicle = rental.vehicles;
+    let deliveryInspection = deliveryResult.data || null;
+    let rentalForForm = rental;
+    if (mode === "return") {
+      const originalId = String(swap.vehicleId || "");
+      const { data: change } = await supabase.from("vehicle_changes").select("id").eq("organization_id", organizationId).eq("rental_id", rentalId).eq("from_vehicle_id", originalId).limit(1).maybeSingle();
+      if (!originalId || !change) notFound();
+      const [{ data: original }, { data: handover }] = await Promise.all([
+        supabase.from("vehicles").select("*, vehicle_categories!vehicles_category_id_fkey(id, code, name)").eq("id", originalId).eq("organization_id", organizationId).maybeSingle(),
+        supabase.from("inspections").select("*").eq("organization_id", organizationId).eq("rental_id", rentalId).eq("vehicle_id", originalId).eq("type", "delivery").eq("status", "submitted").is("deleted_at", null).order("submitted_at", { ascending: false }).limit(1).maybeSingle()
+      ]);
+      if (!original) notFound();
+      vehicle = original;
+      deliveryInspection = handover || null;
+      // "Driven during rental" is measured from when this vehicle was handed over.
+      rentalForForm = { ...rental, mileage_at_delivery: handover?.odometer_reading ?? (rental.vehicle_id === originalId ? rental.mileage_at_delivery : null) };
+    }
+    return {
+      mode,
+      organizationId,
+      rental: rentalForForm,
+      unpaidPayments: [],
+      hasPaymentSchedule: true,
+      vehicle,
+      customer: rental.customers || null,
+      gpsDevice: mode === "delivery" ? gpsResult.data || null : null,
+      latestLocation: mode === "delivery" ? locationResult.data || null : null,
+      deliveryInspection: await addSignedInspectionUrls(supabase, deliveryInspection),
+      swap: true
+    };
   }
 
   return {

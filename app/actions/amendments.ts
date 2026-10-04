@@ -10,7 +10,11 @@ import { buildBusinessDocumentSnapshot } from "@/lib/business-document-snapshot"
 import { businessToday } from "@/lib/business-time";
 import { htmlToPdf } from "@/lib/html-to-pdf";
 import { onlineSigningGaps } from "@/lib/online-signing-readiness";
-import { vehicleConflictMessage } from "@/lib/rental-conflicts";
+import { loadBusyPeriods, vehicleConflictMessage } from "@/lib/rental-conflicts";
+import { bookingRules, clashes } from "@/lib/booking-rules";
+import { moveBookingToVehicle } from "@/lib/extension-picture";
+import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
+import { notifyOperator } from "@/lib/notify-operator";
 import {
   amendmentHash,
   amendmentMoney,
@@ -348,6 +352,7 @@ export async function createRentalAmendment(input: {
 
 function describeChanges(changes: AmendmentChanges) {
   const parts: string[] = [];
+  if (changes.new_vehicle_id) parts.push(`Vehicle ${changes.previous_vehicle_label || "current"} to ${changes.new_vehicle_label || "replacement"}`);
   if (changes.new_end_date) {
     parts.push(
       `Return date ${amendmentDate(changes.previous_end_date)} to ${amendmentDate(changes.new_end_date)}` +
@@ -376,6 +381,16 @@ export async function cancelRentalAmendment(amendmentId: string): Promise<Result
       .eq("id", amendmentId)
       .eq("status", "awaiting_signature");
     if (error) throw new Error(error.message);
+    if (amendment.changes?.swap_group && amendment.changes?.swap_with_rental_id) {
+      // An exchange needs both customers: cancelling one side cancels the other.
+      await admin
+        .from("rental_amendments")
+        .update({ status: "cancelled", cancelled_at: new Date().toISOString(), cancelled_by: user.id })
+        .eq("rental_id", amendment.changes.swap_with_rental_id)
+        .eq("changes->>swap_group", String(amendment.changes.swap_group))
+        .eq("status", "awaiting_signature");
+      revalidatePath(`/bookings/${amendment.changes.swap_with_rental_id}`);
+    }
     await recordActivityEvent(admin, {
       organization_id: amendment.organization_id,
       actor_id: user.id,
@@ -522,8 +537,32 @@ async function applySignedAmendment(admin: any, amendmentId: string) {
   if (!claimed) return;
 
   const changes = claimed.changes as AmendmentChanges;
-  const { data: rental } = await admin.from("rentals").select("*").eq("id", claimed.rental_id).maybeSingle();
+  let { data: rental } = await admin.from("rentals").select("*").eq("id", claimed.rental_id).maybeSingle();
   if (!rental) return;
+  const vehicleFailures: string[] = [];
+  if (changes.new_vehicle_id) {
+    const outcome = await applyVehicleChange(admin, claimed, rental);
+    if (outcome === "waiting") {
+      // An exchange between two rentals happens when both customers have signed.
+      await admin.from("rental_amendments").update({ applied_at: null }).eq("id", claimed.id);
+      await recordActivityEvent(admin, {
+        organization_id: rental.organization_id,
+        entity_type: "rental",
+        entity_id: rental.id,
+        rental_id: rental.id,
+        customer_id: rental.customer_id,
+        event_type: "rental_amendment_signed",
+        title: "Customer signed the vehicle exchange",
+        detail: `${claimed.signer_name} signed. The exchange happens once the other customer has signed too.`,
+        metadata: { amendment_id: claimed.id }
+      }).catch(() => undefined);
+      revalidatePath(`/bookings/${rental.id}`);
+      return;
+    }
+    if (outcome !== "done") vehicleFailures.push(`vehicle: ${outcome}`);
+    const reloaded = await admin.from("rentals").select("*").eq("id", claimed.rental_id).maybeSingle();
+    if (reloaded.data) rental = reloaded.data;
+  }
   const currency = changes.currency || rental.currency || "THB";
   const base = {
     organization_id: rental.organization_id,
@@ -532,7 +571,7 @@ async function applySignedAmendment(admin: any, amendmentId: string) {
     vehicle_id: rental.vehicle_id,
     currency
   };
-  const failures: string[] = [];
+  const failures: string[] = [...vehicleFailures];
 
   const rentalUpdate: Record<string, unknown> = {};
   if (changes.new_end_date) rentalUpdate.end_date = changes.new_end_date;
@@ -662,4 +701,300 @@ export async function makeRentalOpenEnded(rentalId: string): Promise<{ ok: true;
   revalidatePath("/calendar");
   revalidatePath("/");
   return { ok: true, monthlyRate: outcome.amount, firstDue: outcome.dueDate };
+}
+
+/* ------------------------------------------------------------------ */
+/* Changing the vehicle on a rental                                    */
+/* ------------------------------------------------------------------ */
+
+const ON_RENT = ["active", "due_soon", "overdue", "extended"];
+
+/**
+ * Carries out a signed change of vehicle. Returns "done", "waiting" (an
+ * exchange whose other customer hasn't signed yet) or the reason it could not
+ * be applied.
+ */
+async function applyVehicleChange(admin: any, amendment: any, rental: any): Promise<string> {
+  const changes = amendment.changes as AmendmentChanges;
+  const newVehicleId = String(changes.new_vehicle_id);
+  const oldVehicleId = String(changes.previous_vehicle_id || rental.vehicle_id);
+  const organizationId = rental.organization_id as string;
+  const handedOver = ON_RENT.includes(String(rental.status));
+  const today = businessToday();
+
+  if (rental.vehicle_id !== newVehicleId) {
+    if (changes.swap_with_rental_id) {
+      const { data: partner } = await admin
+        .from("rental_amendments")
+        .select("id, status")
+        .eq("rental_id", changes.swap_with_rental_id)
+        .eq("changes->>swap_group", String(changes.swap_group || ""))
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (!partner || partner.status === "cancelled") return "the other customer's change was cancelled, so the exchange can't happen";
+      if (partner.status !== "signed") return "waiting";
+      const { error } = await admin.rpc("swap_rental_vehicles", { p_rental_a: rental.id, p_rental_b: changes.swap_with_rental_id });
+      if (error) return "the vehicles could not be exchanged because another booking is in the way";
+      // The other rental's own paperwork (forms, payments) is finished from its amendment.
+      await applySignedAmendment(admin, partner.id);
+    } else if (!handedOver) {
+      const moved = await moveBookingToVehicle(admin, { organizationId, rentalId: rental.id, vehicleId: newVehicleId });
+      if (!moved.ok) return moved.error;
+    } else {
+      const from = rental.start_date && String(rental.start_date).slice(0, 10) > today ? String(rental.start_date).slice(0, 10) : today;
+      const conflict = await vehicleConflictMessage(admin, { organizationId, vehicleId: newVehicleId, startDate: from, endDate: rental.end_date ? String(rental.end_date).slice(0, 10) : null, excludeRentalId: rental.id });
+      if (conflict) return "the replacement vehicle has been booked by someone else since this was prepared";
+      const { error } = await admin.from("rentals").update({ vehicle_id: newVehicleId, original_vehicle_id: rental.original_vehicle_id || oldVehicleId }).eq("id", rental.id).eq("vehicle_id", oldVehicleId);
+      if (error) return "the replacement vehicle has been booked by someone else since this was prepared";
+    }
+  }
+
+  const quiet = (query: any) => query.then(() => null, () => null);
+  await Promise.all([
+    // Rent still to come belongs to the vehicle the customer now has.
+    quiet(admin.from("rental_payments").update({ vehicle_id: newVehicleId }).eq("rental_id", rental.id).in("status", ["scheduled", "pending", "overdue"])),
+    quiet(admin.from("booking_links").update({ vehicle_id: newVehicleId }).eq("rental_id", rental.id)),
+    quiet(
+      admin.from("vehicle_changes").insert({
+        organization_id: organizationId,
+        rental_id: rental.id,
+        from_vehicle_id: oldVehicleId,
+        to_vehicle_id: newVehicleId,
+        reason: "other",
+        reason_notes: changes.vehicle_change_reason || (changes.swap_with_rental_id ? "Exchange with another rental" : "Vehicle changed"),
+        changed_at: new Date().toISOString(),
+        changed_by: amendment.created_by,
+        original_vehicle_disposition: changes.original_vehicle_disposition === "repair" ? "repair" : "available",
+        rate_before: changes.previous_rate ?? rental.rental_rate,
+        rate_after: changes.new_rate ?? rental.rental_rate
+      })
+    )
+  ]);
+  await syncVehicleStatusFromBookings(admin, organizationId, newVehicleId).catch(() => null);
+
+  if (handedOver) {
+    // The customer has a vehicle in their hands: record the one they receive and the one they give back.
+    const { data: customer } = rental.customer_id ? await admin.from("customers").select("full_name").eq("id", rental.customer_id).maybeSingle() : { data: null };
+    const who = customer?.full_name || "the customer";
+    const now = new Date().toISOString();
+    await admin.from("tasks").insert([
+      { organization_id: organizationId, vehicle_id: newVehicleId, rental_id: rental.id, title_key: null, created_by: null, title: `Handover form - ${changes.new_vehicle_label || "replacement vehicle"} to ${who}`, task_type: "admin", action: "swap_handover", due_at: now },
+      { organization_id: organizationId, vehicle_id: oldVehicleId, rental_id: rental.id, title_key: null, created_by: null, title: `Collection form - ${changes.previous_vehicle_label || "original vehicle"} from ${who}`, task_type: "admin", action: "swap_collection", due_at: now }
+    ]);
+    notifyOperator(organizationId, `🔁 ${who} signed the vehicle change: ${changes.previous_vehicle_label} to ${changes.new_vehicle_label}. Complete the handover and collection forms.`, "portal_action").catch(() => null);
+  } else {
+    await syncVehicleStatusFromBookings(admin, organizationId, oldVehicleId).catch(() => null);
+  }
+  revalidatePath("/tasks");
+  revalidatePath("/fleet");
+  revalidatePath("/calendar");
+  return "done";
+}
+
+export type VehicleChangeOptions = {
+  handedOver: boolean;
+  /** False when the customer hasn't signed anything yet: the vehicle is simply changed. */
+  needsSignature: boolean;
+  signingGaps: string[];
+  hasCustomer: boolean;
+  currentVehicleLabel: string;
+  currentRate: number;
+  currency: string;
+  free: Array<{ vehicleId: string; label: string; plate: string | null; monthlyRate: number }>;
+  /** Vehicles out with other customers that could be exchanged for this one. */
+  swaps: Array<{ rentalId: string; vehicleId: string; label: string; plate: string | null; customerName: string }>;
+};
+
+function freeFrom(rental: any) {
+  const today = businessToday();
+  const start = String(rental.start_date || today).slice(0, 10);
+  return start > today ? start : today;
+}
+
+/** What the "Change vehicle" dialog offers for a rental. */
+export async function getVehicleChangeOptions(rentalId: string): Promise<Result<VehicleChangeOptions>> {
+  try {
+    const { organizationId } = await operatorFor(rentalId);
+    const admin = createSupabaseAdminClient() as any;
+    const ctx = await loadRental(admin, organizationId, rentalId);
+    const { rental, organization } = ctx;
+    const handedOver = ON_RENT.includes(String(rental.status));
+    const gapDays = bookingRules(organization.settings).gapDays;
+    const from = freeFrom(rental);
+    const end = cleanDate(rental.end_date);
+
+    const [{ data: vehicles }, busy, { data: others }] = await Promise.all([
+      admin.from("vehicles").select("id, make, model, year, registration_number, status, monthly_rate").eq("organization_id", organizationId).is("deleted_at", null),
+      loadBusyPeriods(admin, organizationId),
+      handedOver
+        ? admin
+            .from("rentals")
+            .select("id, vehicle_id, start_date, end_date, status, customers!rentals_customer_id_fkey(full_name)")
+            .eq("organization_id", organizationId)
+            .in("status", ON_RENT)
+            .neq("id", rentalId)
+            .is("deleted_at", null)
+        : Promise.resolve({ data: [] })
+    ]);
+    const label = (vehicle: any) => [vehicle?.make, vehicle?.model].filter(Boolean).join(" ") || "Vehicle";
+    const byId = new Map<string, any>((vehicles || []).map((vehicle: any) => [vehicle.id, vehicle]));
+    const clear = (vehicleId: string, startDate: string, endDate: string | null, ignore: string[]) =>
+      !(busy[vehicleId] || []).some((period) => !ignore.includes(period.rentalId) && clashes(startDate, endDate, period, gapDays));
+
+    const free = ((vehicles || []) as any[])
+      .filter((vehicle) => vehicle.id !== rental.vehicle_id && !/sold|retired|inactive|archived|written|maintenance/i.test(String(vehicle.status || "")))
+      .filter((vehicle) => clear(vehicle.id, from, end, [rentalId]))
+      .map((vehicle) => ({ vehicleId: String(vehicle.id), label: label(vehicle), plate: vehicle.registration_number || null, monthlyRate: Number(vehicle.monthly_rate || 0) }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+
+    const swaps = ((others || []) as any[])
+      .filter((other) => other.customers?.full_name && byId.has(other.vehicle_id))
+      // Each vehicle must be free for the other rental's remaining time, ignoring the two rentals themselves.
+      .filter((other) => clear(other.vehicle_id, from, end, [rentalId, other.id]) && clear(rental.vehicle_id, businessToday(), cleanDate(other.end_date), [rentalId, other.id]))
+      .map((other) => ({ rentalId: String(other.id), vehicleId: String(other.vehicle_id), label: label(byId.get(other.vehicle_id)), plate: byId.get(other.vehicle_id)?.registration_number || null, customerName: String(other.customers.full_name) }));
+
+    return {
+      ok: true,
+      handedOver,
+      needsSignature: handedOver || Boolean(ctx.signedAgreement),
+      signingGaps: onlineSigningGaps(organization),
+      hasCustomer: Boolean(ctx.customer),
+      currentVehicleLabel: label(ctx.vehicle),
+      currentRate: Number(rental.rental_rate || 0),
+      currency: String(rental.currency || "THB"),
+      free,
+      swaps
+    };
+  } catch (error) {
+    return { ok: false, error: errorMessage(error) };
+  }
+}
+
+async function insertVehicleAmendment(admin: any, organizationId: string, rentalId: string, userId: string, changes: AmendmentChanges) {
+  const ctx = await loadRental(admin, organizationId, rentalId);
+  const snapshot = buildBusinessDocumentSnapshot(ctx.organization);
+  const html = renderAmendmentHtml(renderInput(ctx, snapshot, changes, businessToday()));
+  const { data, error } = await admin
+    .from("rental_amendments")
+    .insert({ organization_id: organizationId, rental_id: rentalId, changes, rendered_html: html, content_hash: amendmentHash(html), business_snapshot: snapshot, created_by: userId })
+    .select("*")
+    .single();
+  if (error) {
+    if (String(error.code) === "23505") throw new Error(`${ctx.customer?.full_name || "This rental"} already has a change waiting to be signed. Cancel it first.`);
+    throw new Error(error.message);
+  }
+  await recordActivityEvent(admin, {
+    organization_id: organizationId,
+    actor_id: userId,
+    entity_type: "rental",
+    entity_id: rentalId,
+    vehicle_id: ctx.rental.vehicle_id,
+    rental_id: rentalId,
+    customer_id: ctx.rental.customer_id,
+    event_type: "rental_amendment_created",
+    title: "Vehicle change sent for signature",
+    detail: describeChanges(changes),
+    metadata: { amendment_id: data.id }
+  }).catch(() => undefined);
+  revalidatePath(`/bookings/${rentalId}`);
+  return { token: data.token as string, id: data.id as string, customerName: String(ctx.customer?.full_name || "Customer") };
+}
+
+/**
+ * Change the vehicle on a rental. Once the customer has signed anything, the
+ * change is a short document they sign (only what changes), and nothing moves
+ * until they do. After a handover it is followed by a handover form for the
+ * replacement and a collection form for the original. With `swapRentalId`
+ * two rentals exchange vehicles: each customer signs, and the exchange happens
+ * when both have.
+ */
+export async function createVehicleChange(input: {
+  rentalId: string;
+  vehicleId: string;
+  swapRentalId?: string | null;
+  reason?: string | null;
+  disposition?: "available" | "repair";
+  newRate?: number | string | null;
+}): Promise<Result<{ applied: boolean; links: Array<{ token: string; customerName: string }> }>> {
+  const admin = createSupabaseAdminClient() as any;
+  try {
+    const rentalId = String(input.rentalId || "").trim();
+    const { user, organizationId } = await operatorFor(rentalId);
+    const options = await getVehicleChangeOptions(rentalId);
+    if (!options.ok) return options;
+    const ctx = await loadRental(admin, organizationId, rentalId);
+    const { rental } = ctx;
+    if (["completed", "cancelled"].includes(String(rental.status))) return { ok: false, error: "This rental has ended." };
+
+    const swap = input.swapRentalId ? options.swaps.find((item) => item.rentalId === input.swapRentalId && item.vehicleId === input.vehicleId) : null;
+    const target = swap || options.free.find((item) => item.vehicleId === input.vehicleId);
+    if (!target) return { ok: false, error: "That vehicle is no longer free for this rental's dates. Pick another." };
+
+    // Nothing signed yet: the customer will sign the agreement with the new vehicle on it.
+    if (!options.needsSignature) {
+      const moved = await moveBookingToVehicle(admin, { organizationId, rentalId, vehicleId: input.vehicleId });
+      if (!moved.ok) return { ok: false, error: moved.error.replace("the other booking's", "this booking's").replace("The other booking", "This booking") };
+      await recordActivityEvent(admin, { organization_id: organizationId, actor_id: user.id, entity_type: "rental", entity_id: rentalId, rental_id: rentalId, vehicle_id: input.vehicleId, customer_id: rental.customer_id, event_type: "vehicle_changed", title: "Vehicle changed", detail: `Moved from the ${moved.from} to the ${moved.to} before the customer signed. Dates and price unchanged.` } as any).catch(() => undefined);
+      revalidatePath(`/bookings/${rentalId}`);
+      revalidatePath("/bookings");
+      revalidatePath("/calendar");
+      return { ok: true, applied: true, links: [] };
+    }
+
+    if (!options.hasCustomer) return { ok: false, error: "Assign a customer to this rental first." };
+    if (options.signingGaps.length) return { ok: false, error: `Customers can't sign online until your business adds ${options.signingGaps.join(", ")} in Settings.` };
+
+    const plateOf = (label: string, plate: string | null) => (plate ? `${label} (${plate})` : label);
+    const reason = String(input.reason || "").trim().slice(0, 200) || null;
+    const currency = String(rental.currency || "THB");
+    const base: AmendmentChanges = { currency, billing_period: String(rental.billing_interval || rental.pricing_model || "monthly") };
+    const mine: AmendmentChanges = {
+      ...base,
+      previous_vehicle_id: rental.vehicle_id,
+      previous_vehicle_label: plateOf(options.currentVehicleLabel, ctx.vehicle?.registration_number || null),
+      new_vehicle_id: target.vehicleId,
+      new_vehicle_label: plateOf(target.label, target.plate),
+      vehicle_handed_over: options.handedOver,
+      vehicle_change_reason: reason,
+      original_vehicle_disposition: swap ? null : input.disposition === "repair" ? "repair" : "available"
+    };
+    const newRate = cleanAmount(input.newRate);
+    if (newRate !== null && newRate > 0 && newRate !== Number(rental.rental_rate || 0)) {
+      mine.previous_rate = Number(rental.rental_rate || 0);
+      mine.new_rate = newRate;
+      mine.rate_from = businessToday();
+    }
+
+    if (!swap) {
+      const created = await insertVehicleAmendment(admin, organizationId, rentalId, user.id, mine);
+      return { ok: true, applied: false, links: [{ token: created.token, customerName: created.customerName }] };
+    }
+
+    // An exchange: one short document for each customer.
+    const group = randomUUID();
+    const otherCtx = await loadRental(admin, organizationId, swap.rentalId);
+    const theirs: AmendmentChanges = {
+      currency: String(otherCtx.rental.currency || "THB"),
+      billing_period: String(otherCtx.rental.billing_interval || otherCtx.rental.pricing_model || "monthly"),
+      previous_vehicle_id: otherCtx.rental.vehicle_id,
+      previous_vehicle_label: plateOf(swap.label, swap.plate),
+      new_vehicle_id: rental.vehicle_id,
+      new_vehicle_label: mine.previous_vehicle_label,
+      vehicle_handed_over: true,
+      vehicle_change_reason: reason,
+      swap_with_rental_id: rentalId,
+      swap_group: group
+    };
+    const first = await insertVehicleAmendment(admin, organizationId, rentalId, user.id, { ...mine, swap_with_rental_id: swap.rentalId, swap_group: group });
+    try {
+      const second = await insertVehicleAmendment(admin, organizationId, swap.rentalId, user.id, theirs);
+      return { ok: true, applied: false, links: [{ token: first.token, customerName: first.customerName }, { token: second.token, customerName: second.customerName }] };
+    } catch (error) {
+      await admin.from("rental_amendments").update({ status: "cancelled", cancelled_at: new Date().toISOString(), cancelled_by: user.id }).eq("id", first.id);
+      throw error;
+    }
+  } catch (error) {
+    return { ok: false, error: errorMessage(error) };
+  }
 }

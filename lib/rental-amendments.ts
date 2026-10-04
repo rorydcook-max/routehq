@@ -4,7 +4,7 @@ import { createHash } from "node:crypto";
  * Signed amendments to a rental agreement (migration 0074).
  *
  * An amendment changes the return date (with the agreed extension charge),
- * the rate from a given date, or the deposit. The business prepares it, the
+ * the rate from a given date, the deposit, or the vehicle. The business prepares it, the
  * customer signs it through a short link, and only then are the changes
  * applied to the rental. Everything else in the original agreement stays in
  * force, and the amendment says so.
@@ -26,6 +26,19 @@ export type AmendmentChanges = {
   previous_deposit?: number | null;
   new_deposit?: number | null;
   deposit_due_date?: string | null;
+  /** A change of vehicle: the one being given up and the one taking its place. */
+  previous_vehicle_id?: string | null;
+  previous_vehicle_label?: string | null;
+  new_vehicle_id?: string | null;
+  new_vehicle_label?: string | null;
+  /** True once the customer has the vehicle: handover and collection forms follow the signing. */
+  vehicle_handed_over?: boolean;
+  /** What happens to the vehicle given up: "available" or "repair". */
+  original_vehicle_disposition?: string | null;
+  vehicle_change_reason?: string | null;
+  /** When two rentals exchange vehicles: the other rental, and the amendment its customer signs. */
+  swap_with_rental_id?: string | null;
+  swap_group?: string | null;
   /** Extra wording the business wants the customer to agree to. */
   additional_terms?: string | null;
 };
@@ -96,6 +109,9 @@ export type AmendmentRow = { label: string; before: string; after: string };
 export function amendmentRows(changes: AmendmentChanges): AmendmentRow[] {
   const rows: AmendmentRow[] = [];
   const currency = changes.currency || "THB";
+  if (changes.new_vehicle_id) {
+    rows.push({ label: "Vehicle", before: changes.previous_vehicle_label || "Current vehicle", after: changes.new_vehicle_label || "Replacement vehicle" });
+  }
   if (changes.new_end_date) {
     rows.push({ label: "Return date", before: amendmentDate(changes.previous_end_date), after: amendmentDate(changes.new_end_date) });
     if (Number(changes.extension_amount || 0) > 0) {
@@ -171,6 +187,16 @@ export function renderAmendmentHtml(input: AmendmentRenderInput) {
     changes.new_rate !== null && changes.new_rate !== undefined
       ? `<li>The new rate applies to rent payments due on or after ${escapeHtml(amendmentDate(changes.rate_from))}. Payments due before that date are unchanged.</li>`
       : "";
+  const vehicleClause = changes.new_vehicle_id
+    ? `<li>The renter gives up the ${escapeHtml(changes.previous_vehicle_label || "current vehicle")} and takes the ${escapeHtml(changes.new_vehicle_label || "replacement vehicle")} in its place${
+        changes.vehicle_change_reason ? ` (${escapeHtml(changes.vehicle_change_reason)})` : ""
+      }. From the change, every term of the agreement that refers to the vehicle applies to the replacement vehicle.</li>` +
+      (changes.vehicle_handed_over
+        ? `<li>The condition of the replacement vehicle is recorded on a handover form, and the condition of the vehicle given up on a collection form, each signed by the renter. Both forms are part of the agreement. Any charge for the vehicle given up (damage, fuel) is settled on the terms of the agreement.</li>`
+        : "") +
+      `<li>The security deposit and the rental dates carry over unchanged unless this amendment says otherwise.</li>` +
+      (changes.swap_with_rental_id ? `<li>The replacement vehicle is currently on another rental. This change takes effect once that vehicle is released by its renter signing their own change.</li>` : "")
+    : "";
   const depositClause =
     changes.new_deposit !== null && changes.new_deposit !== undefined
       ? `<li>The security deposit is held and returned on the terms of the agreement, using the new amount.</li>`
@@ -195,7 +221,7 @@ th{background:#f4f8f7;font-weight:600}.sigs{display:grid;grid-template-columns:1
 ${rows.map((row) => `<tr><td>${escapeHtml(row.label)}</td><td>${escapeHtml(row.before)}</td><td><strong>${escapeHtml(row.after)}</strong></td></tr>`).join("")}
 </table>
 <ol>
-${extensionClause}${rateClause}${depositClause}
+${vehicleClause}${extensionClause}${rateClause}${depositClause}
 <li>All other terms of the rental agreement remain unchanged and continue to apply, including to any extended period.</li>
 <li>This amendment takes effect when signed by the renter. Both parties agree to sign it electronically.</li>
 </ol>

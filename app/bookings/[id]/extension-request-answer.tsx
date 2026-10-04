@@ -87,7 +87,15 @@ export function ExtensionRequestAnswer({ actionId, rentalId, picture, requestedE
             ))}
           </div>
 
-          {blocker && blocker.options.length > 0 ? (
+          {blocker && blocker.signed ? (
+            <p className="rounded-lg border border-[var(--border)] bg-white p-3 text-sm text-[var(--foreground-secondary)]">
+              {blocker.customerName || "That customer"} has signed for the {blocker.vehicle}, so moving them needs their signature.{" "}
+              <Link className="font-semibold text-[var(--primary)] underline" href={`/bookings/${blocker.rentalId}` as Route}>
+                Open their booking
+              </Link>{" "}
+              and use More &gt; Change vehicle. Once they have signed, come back and approve this.
+            </p>
+          ) : blocker && blocker.options.length > 0 ? (
             <div className="rounded-lg border border-[var(--border)] bg-white p-3">
               <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
                 Move {blocker.customerName || "the other booking"} to another vehicle
@@ -101,7 +109,6 @@ export function ExtensionRequestAnswer({ actionId, rentalId, picture, requestedE
                 </select>
                 <span className="mt-1 block text-xs font-normal text-[var(--muted)]">
                   These are free for all of their dates. {blocker.customerName ? "They keep their dates and price, and both customers are told." : "The booking keeps its dates and price."}
-                  {blocker.signed ? ` Their signed agreement names the ${blocker.vehicle}, so check they are happy with the change.` : ""}
                 </span>
               </label>
               <button

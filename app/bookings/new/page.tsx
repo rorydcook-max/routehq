@@ -48,7 +48,7 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
   const [{ data: vehicles, error: vehiclesError }, { data: customers, error: customersError }, { data: organizationDetails }] = await Promise.all([
     supabase
       .from("vehicles")
-      .select("id, make, model, trim, year, registration_number, status, availability_status, daily_rate, weekly_rate, monthly_rate, color")
+      .select("id, make, model, trim, year, registration_number, status, availability_status, daily_rate, weekly_rate, monthly_rate, deposit_amount, color")
       .eq("organization_id", organization.id)
       .is("deleted_at", null)
       .order("created_at", { ascending: false }),
@@ -73,6 +73,7 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
     year: vehicle.year ? Number(vehicle.year) : null,
     daily_rate: Number(vehicle.daily_rate || 0),
     weekly_rate: Number(vehicle.weekly_rate || 0),
+    deposit_amount: vehicle.deposit_amount === null || vehicle.deposit_amount === undefined ? null : Number(vehicle.deposit_amount),
     monthly_rate: Number(vehicle.monthly_rate || 0)
   }));
 

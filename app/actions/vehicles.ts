@@ -275,6 +275,8 @@ export async function createVehicle(formData: FormData) {
       daily_rate: numberFromForm(formData, "dailyRate"),
       weekly_rate: numberFromForm(formData, "weeklyRate"),
       monthly_rate: numberFromForm(formData, "monthlyRate"),
+      // Empty means "use the business's usual deposit".
+      deposit_amount: String(formData.get("depositAmount") || "").trim() ? numberFromForm(formData, "depositAmount") : null,
       utilization_12_month: 0,
       utilization_lifecycle: 0,
       revenue_generated: 0,
@@ -432,6 +434,8 @@ export async function updateVehicle(formData: FormData) {
       daily_rate: numberFromForm(formData, "dailyRate"),
       weekly_rate: numberFromForm(formData, "weeklyRate"),
       monthly_rate: numberFromForm(formData, "monthlyRate"),
+      // Empty means "use the business's usual deposit".
+      deposit_amount: String(formData.get("depositAmount") || "").trim() ? numberFromForm(formData, "depositAmount") : null,
       specifications,
       metadata: {
         acquisition,

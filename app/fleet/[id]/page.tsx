@@ -374,6 +374,12 @@ function AtAGlance({ detail }: { detail: VehicleDetail }) {
           <span className={`font-mono-data text-base font-semibold ${value > 0 ? "text-[var(--foreground)]" : "text-[var(--muted)]"}`}>{value > 0 ? money(value) : "Not set"}</span> / {period}
         </p>
       ))}
+      <p className="text-sm text-[var(--foreground-secondary)]">
+        Deposit{" "}
+        <span className="font-mono-data text-base font-semibold text-[var(--foreground)]">
+          {(detail.vehicle as any).deposit_amount === null || (detail.vehicle as any).deposit_amount === undefined ? "your usual" : money(Number((detail.vehicle as any).deposit_amount))}
+        </span>
+      </p>
       <Link className="ml-auto text-sm font-semibold text-[var(--primary)] hover:underline" href={`/fleet/${detail.vehicle.id}/edit` as Route}>
         {ratesSet === 3 ? "Edit rates" : ratesSet === 0 ? "Add rates" : "Add the missing rates"}
       </Link>

@@ -9,6 +9,7 @@ import { finaliseInspectionReport, type DepositSettlement } from "@/lib/inspecti
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { notifyOperator } from "@/lib/notify-operator";
+import { earlyReturnSuggestion } from "@/lib/early-return";
 import { tellRentalCustomer } from "@/lib/customer-messages";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
@@ -567,7 +568,7 @@ export async function submitInspection(formData: FormData) {
   if (mode === "return" && rentalId) {
     const { data: rental, error: rentalFetchError } = await supabase
       .from("rentals")
-      .select("mileage_at_delivery, end_date")
+      .select("mileage_at_delivery, end_date, billing_interval, pricing_model, currency")
       .eq("id", rentalId)
       .eq("organization_id", organizationId)
       .maybeSingle();
@@ -634,6 +635,33 @@ export async function submitInspection(formData: FormData) {
         },
         { sentBy: user.id, withLink: owed > 0 }
       );
+
+      // Back before the time already paid for ran out: a job for the owner with the pro-rata figure.
+      // Whether to refund, and how much, is theirs to decide.
+      if (owed <= 0) {
+        const admin = createSupabaseAdminClient() as any;
+        const { data: allPayments } = await admin.from("rental_payments").select("id, amount, status, due_date, metadata").eq("rental_id", rentalId).is("deleted_at", null);
+        const previousEnd = rental?.end_date ? String(rental.end_date).slice(0, 10) : null;
+        const suggestion = earlyReturnSuggestion({ payments: allPayments || [], returnDate, previousEnd: previousEnd && previousEnd > returnDate ? previousEnd : null, interval: String(rental?.billing_interval || rental?.pricing_model || "monthly") });
+        if (suggestion) {
+          const lastPaid = (allPayments || [])
+            .filter((payment: any) => ["paid", "reconciled"].includes(String(payment.status)) && payment.metadata?.type !== "deposit" && payment.metadata?.is_deposit !== true)
+            .sort((a: any, b: any) => String(b.due_date).localeCompare(String(a.due_date)))[0];
+          if (lastPaid) await admin.from("rental_payments").update({ metadata: { ...(lastPaid.metadata || {}), early_return: { ...suggestion, return_date: returnDate } } }).eq("id", lastPaid.id);
+          const symbol = String(rental?.currency || "THB") === "THB" ? "฿" : `${rental?.currency} `;
+          await admin.from("tasks").insert({
+            organization_id: organizationId,
+            vehicle_id: vehicleId,
+            rental_id: rentalId,
+            title_key: null,
+            created_by: null,
+            title: `Refund to decide - returned ${suggestion.unusedDays} ${suggestion.unusedDays === 1 ? "day" : "days"} before the paid time ran out (pro rata ${symbol}${suggestion.amount.toLocaleString("en-US")})`,
+            task_type: "admin",
+            action: "refund",
+            due_at: new Date().toISOString()
+          });
+        }
+      }
     }
 
     const { error: vehicleError } = await supabase

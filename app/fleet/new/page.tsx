@@ -96,7 +96,7 @@ export default async function NewVehiclePage() {
             </div>
 
             <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-4">
-              <SectionHeader eyebrow="Rental pricing" title="Default rates" />
+              <SectionHeader eyebrow="Rental pricing" title="Rates and deposit" />
               <div className="mt-4 grid gap-4 sm:grid-cols-3">
                 <label className="block">
                   <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Daily rate</span>
@@ -111,6 +111,11 @@ export default async function NewVehiclePage() {
                   <MoneyInput currency={organization.currency || "THB"} name="monthlyRate" />
                 </label>
               </div>
+              <label className="mt-4 block sm:max-w-xs">
+                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Deposit for this vehicle</span>
+                <MoneyInput currency={organization.currency || "THB"} name="depositAmount" />
+                <span className="mt-1 block text-xs text-[var(--muted)]">Leave empty to use your usual deposit from Settings.</span>
+              </label>
             </div>
 
             <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-4">

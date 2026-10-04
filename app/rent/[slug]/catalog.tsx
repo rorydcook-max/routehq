@@ -170,7 +170,7 @@ export function Catalog({
                       {otherRates.length ? <span className="ml-2 text-sm font-medium text-[var(--muted)]">{otherRates.join(" · ")}</span> : null}
                     </p>
                   ) : null}
-                  {deposit > 0 ? <p className="mt-0.5 text-sm text-[var(--muted)]">{money(deposit)} deposit, returned at the end</p> : null}
+                  {vehicle.deposit > 0 ? <p className="mt-0.5 text-sm text-[var(--muted)]">{money(vehicle.deposit)} deposit, returned at the end</p> : null}
                   {free && estimate && days ? (
                     <p className="mt-1 text-sm text-[var(--primary)]">
                       About {money(estimate)} for {days} {days === 1 ? "day" : "days"}
@@ -217,7 +217,7 @@ export function Catalog({
                     {isPending ? "Booking…" : "Book and continue"}
                   </button>
                   <p className="text-xs leading-5 text-[var(--muted)]">
-                    {deposit > 0 ? `A ${money(deposit)} deposit applies. ` : ""}No payment is taken now: you can pay online or when you get the vehicle. Next you add your details and sign the
+                    {vehicle.deposit > 0 ? `A ${money(vehicle.deposit)} deposit applies. ` : ""}No payment is taken now: you can pay online or when you get the vehicle. Next you add your details and sign the
                     agreement. The vehicle is held for you for {holdHours} hours while you do that.
                   </p>
                 </form>

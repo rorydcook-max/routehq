@@ -26,6 +26,8 @@ export type CatalogVehicle = {
   dailyRate: number;
   weeklyRate: number;
   monthlyRate: number;
+  /** The deposit for this vehicle: its own, or the business's usual one. */
+  deposit: number;
   /** Dates the vehicle is taken (end is exclusive; null = no end date yet). */
   busy: Array<{ startDate: string; endDate: string | null }>;
 };
@@ -61,7 +63,7 @@ export async function getPublicCatalog(slug: string) {
   const [vehiclesResult, rentalsResult, photosResult, branding] = await Promise.all([
     admin
       .from("vehicles")
-      .select("id, make, model, trim, year, color, status, daily_rate, weekly_rate, monthly_rate, specifications, vehicle_categories(code, name)")
+      .select("id, make, model, trim, year, color, status, daily_rate, weekly_rate, monthly_rate, deposit_amount, specifications, vehicle_categories(code, name)")
       .eq("organization_id", organization.id)
       .is("deleted_at", null)
       .order("monthly_rate", { ascending: true }),
@@ -120,6 +122,7 @@ export async function getPublicCatalog(slug: string) {
         dailyRate: Number(vehicle.daily_rate || 0),
         weeklyRate: Number(vehicle.weekly_rate || 0),
         monthlyRate: Number(vehicle.monthly_rate || 0),
+        deposit: vehicle.deposit_amount === null || vehicle.deposit_amount === undefined ? settings.deposit : Math.max(0, Number(vehicle.deposit_amount) || 0),
         busy: busy.get(vehicle.id) || []
       };
     })

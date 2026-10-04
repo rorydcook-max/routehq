@@ -950,6 +950,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   totalPaid={totalPaid}
                   currency={rental.currency || "THB"}
                   rentalStatus={displayStatus}
+                  earlyReturn={(payments as any[]).map((payment) => payment.metadata?.early_return).find((item) => item && !item.settled) || null}
                 />
                 <PaymentInfo method={paymentMethod} timing={paymentTiming} />
                 {customerReportedPayment ? (

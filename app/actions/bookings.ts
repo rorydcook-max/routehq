@@ -86,6 +86,92 @@ function operatorName(user: any) {
   return user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email || "operator";
 }
 
+/**
+ * A rental recorded after it started: mark what the customer has already paid.
+ * Rent due before `paidBefore` is recorded as paid on the day it fell due
+ * (with its income), and the deposit, if held, is recorded as received at the
+ * start. Anything else due so far stays owed.
+ */
+async function settleExistingRental(supabase: any, input: { rental: any; organizationId: string; userId: string; paidBefore: string | null; depositHeld: number; currency: string }) {
+  const { rental, organizationId, userId, paidBefore, depositHeld, currency } = input;
+  const startDate = String(rental.start_date || "").slice(0, 10);
+
+  if (paidBefore) {
+    const { data: rows } = await supabase
+      .from("rental_payments")
+      .select("id, amount, due_date, metadata, voided")
+      .eq("organization_id", organizationId)
+      .eq("rental_id", rental.id)
+      .in("status", ["pending", "overdue", "scheduled"])
+      .lt("due_date", paidBefore)
+      .is("deleted_at", null)
+      .order("due_date", { ascending: true });
+    for (const payment of (rows || []).filter((row: any) => !row.voided && row.metadata?.type !== "deposit" && row.metadata?.is_deposit !== true)) {
+      const due = String(payment.due_date).slice(0, 10);
+      const { data: transaction } = await supabase
+        .from("transactions")
+        .insert({
+          organization_id: organizationId,
+          vehicle_id: rental.vehicle_id,
+          rental_id: rental.id,
+          customer_id: rental.customer_id,
+          rental_payment_id: payment.id,
+          type: "rental_income",
+          amount: Number(payment.amount || 0),
+          currency,
+          transaction_date: due,
+          notes: "Rent already paid when the rental was recorded",
+          metadata: { source: "existing_rental_setup" },
+          created_by: userId
+        })
+        .select("id")
+        .single();
+      await supabase
+        .from("rental_payments")
+        .update({ status: "paid", paid_at: `${due}T00:00:00.000Z`, transaction_id: transaction?.id || null, metadata: { ...(payment.metadata || {}), setup_source: "operator_existing_rental" } })
+        .eq("id", payment.id);
+    }
+  }
+
+  if (depositHeld > 0) {
+    const received = `${startDate}T00:00:00.000Z`;
+    const { data: depositPayment } = await supabase
+      .from("rental_payments")
+      .insert({
+        organization_id: organizationId,
+        rental_id: rental.id,
+        customer_id: rental.customer_id,
+        vehicle_id: rental.vehicle_id,
+        due_date: startDate,
+        scheduled_date: startDate,
+        paid_at: received,
+        status: "paid",
+        amount: depositHeld,
+        currency,
+        metadata: { type: "deposit", is_deposit: true, description: "Security deposit - already held", setup_source: "operator_existing_rental" }
+      })
+      .select("id")
+      .single();
+    await supabase.from("transactions").insert({
+      organization_id: organizationId,
+      vehicle_id: rental.vehicle_id,
+      rental_id: rental.id,
+      customer_id: rental.customer_id,
+      rental_payment_id: depositPayment?.id || null,
+      type: "deposit_received",
+      amount: depositHeld,
+      currency,
+      transaction_date: startDate,
+      notes: "Security deposit already held when the rental was recorded",
+      is_deposit: true,
+      deposit_rental_id: rental.id,
+      metadata: { source: "existing_rental_setup" },
+      created_by: userId
+    });
+    await supabase.from("rentals").update({ deposit_held: depositHeld, deposit_status: "received", deposit_received_at: received }).eq("id", rental.id).eq("organization_id", organizationId);
+  }
+}
+
 async function createWalkInPaymentRecords({
   supabase,
   rental,
@@ -503,6 +589,17 @@ async function createBookingOrThrow(formData: FormData) {
 
     // Auto-generate payment schedule for operator-entered rentals
     await activateRental(rental.id, supabase).catch(() => null);
+
+    if (!walkInFastTrack) {
+      // What the owner said has been paid already: up to date, until a date, or nothing.
+      const paidMode = String(formData.get("existingPaid") || "up_to_date");
+      const paidUntil = dateOnly(String(formData.get("existingPaidUntil") || ""));
+      const tomorrow = new Date(`${todayDate()}T00:00:00Z`);
+      tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+      const paidBefore = paidMode === "none" ? null : paidMode === "until" && paidUntil ? paidUntil : tomorrow.toISOString().slice(0, 10);
+      const depositHeld = String(formData.get("existingDepositHeld") || "") === "true" ? depositAmount : 0;
+      await settleExistingRental(supabase, { rental: { ...rental, vehicle_id: vehicleId, customer_id: customerId, start_date: startDate }, organizationId, userId: user.id, paidBefore, depositHeld, currency }).catch(() => null);
+    }
 
     await recordActivityEvent(supabase, {
       organization_id: organizationId,
@@ -3348,6 +3445,11 @@ export async function recordPaymentRefund(formData: FormData) {
   {
     const admin = createSupabaseAdminClient() as any;
     await completeRentalJobs(admin, rentalId, "refund", `Refund of ${amount.toLocaleString("en-US")} recorded`);
+    // The early-return suggestion has been dealt with; stop showing it.
+    const { data: flagged } = await admin.from("rental_payments").select("id, metadata").eq("rental_id", rentalId).not("metadata->early_return", "is", null);
+    for (const row of flagged || []) {
+      await admin.from("rental_payments").update({ metadata: { ...(row.metadata || {}), early_return: { ...(row.metadata?.early_return || {}), settled: true } } }).eq("id", row.id);
+    }
     await tellRentalCustomer(admin, rentalId, ({ firstName, money }) => `Hi ${firstName}, we've refunded ${money(amount)} to you. Thank you.`, { sentBy: user.id, withLink: false });
   }
   revalidatePath("/tasks");

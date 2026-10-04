@@ -16,6 +16,8 @@ type Props = {
   totalPaid: number;
   currency: string;
   rentalStatus: string;
+  /** Returned before the paid time ran out: the pro-rata refund to consider. */
+  earlyReturn?: { amount: number; unusedDays: number; periodDays: number; paid: number } | null;
 };
 
 type ActiveForm = "return" | "deduction" | "refund" | null;
@@ -37,7 +39,8 @@ export function RefundDepositPanel({
   depositForfeited,
   totalPaid,
   currency,
-  rentalStatus
+  rentalStatus,
+  earlyReturn = null
 }: Props) {
   const router = useRouter();
   const [activeForm, setActiveForm] = useState<ActiveForm>(null);
@@ -112,6 +115,17 @@ export function RefundDepositPanel({
 
       {!collapsed ? (
         <>
+          {earlyReturn && canRefundPayment ? (
+            <div className="mt-3 rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3 text-sm text-[#92400e]">
+              <p>
+                Returned {earlyReturn.unusedDays} {earlyReturn.unusedDays === 1 ? "day" : "days"} before the paid time ran out. Pro rata that is{" "}
+                <span className="font-semibold">{money(earlyReturn.amount, currency)}</span> of the {money(earlyReturn.paid, currency)} paid ({earlyReturn.unusedDays} of {earlyReturn.periodDays} days). Refunding it, or part of it, is up to you.
+              </p>
+              <button className="pressable mt-2 rounded-lg border border-[#fbbf24] bg-white px-3 py-1.5 text-xs font-semibold text-[#92400e]" onClick={() => openForm("refund")} type="button">
+                Refund {money(earlyReturn.amount, currency)} or another amount
+              </button>
+            </div>
+          ) : null}
           <div className="mt-3 flex flex-wrap gap-2">
             {canUseDeposit ? (
               <>
@@ -216,7 +230,7 @@ export function RefundDepositPanel({
                 Refund amount
                 <input
                   className="mt-1 w-full"
-                  defaultValue={totalPaid}
+                  defaultValue={earlyReturn ? Math.min(earlyReturn.amount, totalPaid) : totalPaid}
                   max={totalPaid}
                   min={0.01}
                   name="amount"
@@ -226,7 +240,7 @@ export function RefundDepositPanel({
               </label>
               <label className="mt-3 block text-xs font-bold text-[var(--foreground-secondary)]">
                 Reason / notes
-                <textarea className="mt-1 w-full" name="notes" placeholder="Optional reason for this refund" />
+                <textarea className="mt-1 w-full" defaultValue={earlyReturn ? `Unused days after early return (${earlyReturn.unusedDays} of ${earlyReturn.periodDays})` : ""} name="notes" placeholder="Optional reason for this refund" />
               </label>
               <FormActions isPending={isPending} label="Confirm refund" onCancel={() => setActiveForm(null)} />
             </form>

@@ -242,6 +242,10 @@ async function createPaymentTasks(
   payments: any[],
   supabase: SupabaseClient
 ): Promise<void> {
+  // To do reads unpaid payments straight from the payment schedule, so a
+  // reminder row per payment is no longer written (it was up to 24 unread rows
+  // per rental). Kept as a function so callers don't change.
+  if (rental) return;
   for (const payment of payments) {
     const status = String(payment.status || "");
     if (!["scheduled", "pending", "overdue"].includes(status)) continue;

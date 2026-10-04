@@ -22,6 +22,8 @@ type BookingVehicle = {
   availability_status: string;
   daily_rate: number;
   weekly_rate: number;
+  /** This vehicle's own deposit; null means the business's usual one. */
+  deposit_amount?: number | null;
   monthly_rate: number;
   color: string | null;
 };
@@ -301,6 +303,10 @@ export function BookingForm({
   const [currency, setCurrency] = useState(CURRENCY_INFO[defaultCurrency] ? defaultCurrency : "THB");
   const [rentalRate, setRentalRate] = useState(0);
   const [depositAmount, setDepositAmount] = useState(defaultDeposit > 0 ? defaultDeposit : 0);
+  // For a rental that has already started: what the customer has paid so far.
+  const [existingPaid, setExistingPaid] = useState<"up_to_date" | "until" | "none">("up_to_date");
+  const [existingPaidUntil, setExistingPaidUntil] = useState("");
+  const [existingDepositHeld, setExistingDepositHeld] = useState(true);
   const [includedItems, setIncludedItems] = useState<string[]>([includedOptions[1]]);
   const [deliveryMethod, setDeliveryMethod] = useState<"delivery" | "collection" | "tbd">("delivery");
   const [deliveryLocation, setDeliveryLocation] = useState("");
@@ -363,6 +369,13 @@ export function BookingForm({
     if (vehicle) setRentalRate(rateFor(vehicle, pricingModel));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vehicleId, pricingModel]);
+
+  // The deposit follows the vehicle: its own if set, otherwise the business's usual one.
+  useEffect(() => {
+    const vehicle = vehicles.find((item) => item.id === vehicleId) || null;
+    if (vehicle) setDepositAmount(vehicle.deposit_amount ?? (defaultDeposit > 0 ? defaultDeposit : 0));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vehicleId]);
 
   // Choosing a car that is out now starts the booking on the day it comes back.
   useEffect(() => {
@@ -493,6 +506,9 @@ export function BookingForm({
         formData.set("walkInDepositAmount", String(walkInDepositAmount || depositAmount || 0));
         formData.set("walkInPaymentMethod", walkInPaymentMethod);
         formData.set("walkInPaymentNote", walkInPaymentNote);
+        formData.set("existingPaid", existingPaid);
+        formData.set("existingPaidUntil", existingPaidUntil);
+        formData.set("existingDepositHeld", String(existingDepositHeld));
         const result = await createBooking(formData);
         if (!result.ok) {
           setError(result.error);
@@ -1137,10 +1153,37 @@ export function BookingForm({
               <p className="mt-1 text-sm text-[var(--foreground-secondary)]">Your customer will be asked to fill in their personal details, upload their passport and driving licence, and sign the rental contract through the link.</p>
             </div>
           ) : null}
-          {bookingMode === "existing_rental" ? (
-            <div className="mt-3 rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
-              <p className="text-xs font-bold uppercase text-[#b45309]">Existing rental mode</p>
-              <p className="mt-1 text-sm text-[var(--foreground-secondary)]">This creates an active rental immediately, marks the contract as operator-confirmed, and skips booking link generation.</p>
+          {bookingMode === "existing_rental" && !walkInFastTrack ? (
+            <div className="mt-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
+              <p className="text-sm font-semibold text-[var(--foreground)]">What has the customer paid so far?</p>
+              <p className="mt-1 text-xs text-[var(--muted)]">Rent is worked out from the start date and the rate. Anything marked as paid is recorded on the date it fell due.</p>
+              <div className="mt-3 space-y-2">
+                {(
+                  [
+                    ["up_to_date", "Up to date", "Every payment due so far has been paid."],
+                    ["until", "Paid until a date", "Payments due before that date are paid; anything due since shows as owed."],
+                    ["none", "Nothing paid yet", "Everything due so far shows as owed."]
+                  ] as const
+                ).map(([value, label, hint]) => (
+                  <label className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 ${existingPaid === value ? "border-[var(--primary)] bg-white" : "border-[var(--border)] bg-white"}`} key={value}>
+                    <input checked={existingPaid === value} className="mt-1 accent-[#0d9488]" onChange={() => setExistingPaid(value)} type="radio" />
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-semibold text-[var(--foreground)]">{label}</span>
+                      <span className="block text-xs text-[var(--muted)]">{hint}</span>
+                      {value === "until" && existingPaid === "until" ? (
+                        <input className={`${inputClass} mt-2 max-w-[200px]`} min={startDate} onChange={(event) => setExistingPaidUntil(event.target.value)} type="date" value={existingPaidUntil} />
+                      ) : null}
+                    </span>
+                  </label>
+                ))}
+              </div>
+              {depositAmount > 0 ? (
+                <label className="mt-3 flex cursor-pointer items-center gap-3 rounded-lg border border-[var(--border)] bg-white p-3">
+                  <input checked={existingDepositHeld} className="accent-[#0d9488]" onChange={(event) => setExistingDepositHeld(event.target.checked)} type="checkbox" />
+                  <span className="text-sm font-semibold text-[var(--foreground)]">You are holding the {money(depositAmount, currency)} deposit</span>
+                </label>
+              ) : null}
+              <p className="mt-3 text-xs text-[var(--muted)]">The rental starts as on rent straight away, with no booking link. You can still send the customer a link to sign from the booking.</p>
             </div>
           ) : null}
           <BookingLinkSharePanel result={shareResult} />

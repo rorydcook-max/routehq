@@ -140,7 +140,12 @@ function daysRemaining(value: string | null | undefined, status?: string | null,
     if (untilStart === 0) return "Starts today";
     return `Handover overdue by ${-untilStart} day${untilStart === -1 ? "" : "s"}`;
   }
-  if (!value) return "Open-ended";
+  if (!value) {
+    // The dates line already says open-ended; say how long it has been out instead.
+    if (!startDate) return "";
+    const out = -daysFromToday(startDate);
+    return out > 0 ? `${out} day${out === 1 ? "" : "s"} so far` : "Started today";
+  }
   const days = daysFromToday(value);
   if (days === 0) return "Due back today";
   if (days < 0) return `Return ${Math.abs(days)} day${days === -1 ? "" : "s"} late`;

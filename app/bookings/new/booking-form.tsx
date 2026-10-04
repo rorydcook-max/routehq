@@ -342,11 +342,14 @@ export function BookingForm({
   }, [vehicleSearch, vehicles]);
 
   // Display logic: when customer is skipped, there are 4 effective steps instead of 5
-  const effectiveStepCount = customerSkipped ? steps.length - 1 : steps.length;
+  // A rental that has already started has no handover to arrange, so that step is left out.
+  const skipDelivery = bookingMode === "existing_rental";
+  const effectiveStepCount = steps.length - (customerSkipped ? 1 : 0) - (skipDelivery ? 1 : 0);
   // Map internal step index to display number (1-based), accounting for the skipped customer step
-  const displayStepNumber = customerSkipped
+  const displayStepNumber = (customerSkipped
     ? step === 0 ? 1 : step       // 0→1, 2→2, 3→3, 4→4
-    : step + 1;                    // 0→1, 1→2, 2→3, 3→4, 4→5
+    : step + 1)                    // 0→1, 1→2, 2→3, 3→4, 4→5
+    - (skipDelivery && step === 4 ? 1 : 0);
 
   useEffect(() => {
     setBaseUrl(defaultAppUrl || window.location.origin);
@@ -389,7 +392,7 @@ export function BookingForm({
       return;
     }
     if (step < steps.length - 1 && canContinue()) {
-      setStep((current) => current + 1);
+      setStep((current) => (current === 2 && skipDelivery ? 4 : current + 1));
     }
   }
 
@@ -408,7 +411,7 @@ export function BookingForm({
       return;
     }
 
-    setStep((current) => current - 1);
+    setStep((current) => (current === 4 && skipDelivery ? 2 : current - 1));
   }
 
   function handleSkipCustomer() {
@@ -722,9 +725,7 @@ export function BookingForm({
             <div className="min-w-0 flex-1">
               <CustomerSelector customers={customers} defaultCustomerId={preselectedCustomerId} name="customerSelectorId" onSelect={setSelectedCustomer} organizationId={organizationId} />
             </div>
-            <Link className="secondary-action pressable min-h-12 justify-center whitespace-nowrap text-sm sm:self-stretch" href="/customers/new">
-              Add New Customer
-            </Link>
+
           </div>
           {selectedCustomer ? (
             <div className="sub-surface mt-3 p-3">

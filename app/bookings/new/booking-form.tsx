@@ -256,6 +256,7 @@ export function BookingForm({
   customers,
   preselectedVehicleId = "",
   preselectedStartDate = "",
+  preselectedEndDate = "",
   preselectedCustomerId = "",
   defaultCurrency = "THB",
   homeTerritory = "Koh Samui, Thailand",
@@ -270,6 +271,7 @@ export function BookingForm({
   preselectedVehicleId?: string;
   /** A day picked on the calendar; ignored if it is in the past. */
   preselectedStartDate?: string;
+  preselectedEndDate?: string;
   preselectedCustomerId?: string;
   defaultCurrency?: string;
   homeTerritory?: string;
@@ -279,14 +281,15 @@ export function BookingForm({
 
   const [step, setStep] = useState(firstStep);
   // Show modal immediately when a vehicle is preselected (operator came from vehicle profile)
-  const [showCustomerModal, setShowCustomerModal] = useState(validPreselectedVehicle);
+  // Arriving with both a vehicle and a customer (an accepted request) skips the "add customer?" question.
+  const [showCustomerModal, setShowCustomerModal] = useState(validPreselectedVehicle && !customers.some((customer) => customer.id === preselectedCustomerId));
   const [customerSkipped, setCustomerSkipped] = useState(false);
   const [bookingMode, setBookingMode] = useState<"booking_link" | "existing_rental">("booking_link");
   const [vehicleSearch, setVehicleSearch] = useState("");
   const [vehicleId, setVehicleId] = useState(validPreselectedVehicle ? preselectedVehicleId : "");
   const [selectedCustomer, setSelectedCustomer] = useState<BookingCustomer | null>(customers.find((customer) => customer.id === preselectedCustomerId) || null);
   const [startDate, setStartDate] = useState(/^\d{4}-\d{2}-\d{2}$/.test(preselectedStartDate) && preselectedStartDate >= businessToday() ? preselectedStartDate : businessToday());
-  const [endDate, setEndDate] = useState("");
+  const [endDate, setEndDate] = useState(/^\d{4}-\d{2}-\d{2}$/.test(preselectedEndDate) && preselectedEndDate > businessToday() ? preselectedEndDate : "");
   const [openEnded, setOpenEnded] = useState(false);
   const [pricingModel, setPricingModel] = useState("monthly");
   const [currency, setCurrency] = useState(CURRENCY_INFO[defaultCurrency] ? defaultCurrency : "THB");

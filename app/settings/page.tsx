@@ -21,6 +21,8 @@ import { LineConnectPanel } from "@/app/settings/line-connect-panel";
 import { supportedLocaleOptions } from "@/lib/i18n/locales";
 import { InviteForm } from "@/app/invite/invite-form";
 import { PaymentMethodsForm } from "@/app/settings/payment-methods-form";
+import { PublicBookingPanel } from "@/app/settings/public-booking-panel";
+import { publicBookingSettings } from "@/lib/public-catalog";
 import { TravelPolicyForm } from "@/app/settings/travel-policy-form";
 import { AppShell } from "@/components/app-shell";
 import { PendingButton } from "@/components/pending-button";
@@ -119,6 +121,15 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const tab: SettingsTab = SETTINGS_TABS.some((entry) => entry.key === requestedTab) ? (requestedTab as SettingsTab) : "business";
   const userEmail = await getCurrentUserEmail();
   const organization = await getDefaultOrganization();
+  const { data: vehicleRates } = await ((await createSupabaseServerClient()) as any)
+    .from("vehicles")
+    .select("daily_rate, weekly_rate, monthly_rate")
+    .eq("organization_id", organization.id)
+    .is("deleted_at", null);
+  const publicVehicleCounts = {
+    total: (vehicleRates || []).length,
+    priced: (vehicleRates || []).filter((v: any) => Number(v.daily_rate) > 0 || Number(v.weekly_rate) > 0 || Number(v.monthly_rate) > 0).length
+  };
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -322,6 +333,20 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             publicUrl={webhookReachable()}
           />
         </Card>
+      ) : null}
+      {tab === "rentals" ? (
+        <div className="mt-4">
+          <Card>
+            <SectionHeader eyebrow="Online booking" title="Your booking page" />
+            <PublicBookingPanel
+              enabled={publicBookingSettings(organization.settings).enabled}
+              holdHours={publicBookingSettings(organization.settings).holdHours}
+              pricedVehicles={publicVehicleCounts.priced}
+              slug={organization.slug}
+              totalVehicles={publicVehicleCounts.total}
+            />
+          </Card>
+        </div>
       ) : null}
       {tab === "rentals" ? (
         <>

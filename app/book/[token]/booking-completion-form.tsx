@@ -560,7 +560,8 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
   const selectedMethodInfo = PAYMENT_METHODS.find((m) => m.key === paymentMethod) ?? null;
   const effectiveTiming = selectedMethodInfo?.deliveryOnly ? "on_delivery" : paymentTiming;
   const rentalRate = detail.rentalRate ?? 0;
-  const paymentAmount = detail.outstandingBalance && detail.outstandingBalance > 0 ? detail.outstandingBalance : rentalRate;
+  // What is due at the start: the first rent and the deposit.
+  const paymentAmount = detail.outstandingBalance && detail.outstandingBalance > 0 ? detail.outstandingBalance : rentalRate + (detail.depositAmount ?? 0);
   const currency = detail.currency ?? "THB";
   const [upfrontAccepted, setUpfrontAccepted] = useState<boolean | null>(null);
   const [isPending, startTransition] = useTransition();

@@ -12,6 +12,7 @@ type SearchParams = {
   vehicleId?: string;
   customerId?: string;
   startDate?: string;
+  endDate?: string;
 };
 
 function operatorAddressFromSettings(settings: unknown) {
@@ -34,7 +35,7 @@ function homeTerritoryFromSettings(settings: unknown) {
 }
 
 export default async function NewBookingPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
-  const [{ vehicleId = "", customerId = "", startDate = "" }, userEmail, organization] = await Promise.all([
+  const [{ vehicleId = "", customerId = "", startDate = "", endDate = "" }, userEmail, organization] = await Promise.all([
     searchParams,
     getCurrentUserEmail(),
     getDefaultOrganization()
@@ -117,7 +118,8 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
             organizationId={organization.id}
             organizationName={organization.name}
             preselectedCustomerId={customerId}
-            preselectedStartDate={startDate}
+            preselectedEndDate={endDate}
+          preselectedStartDate={startDate}
           preselectedVehicleId={vehicleId}
             vehicles={normalizedVehicles}
           />

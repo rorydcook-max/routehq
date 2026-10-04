@@ -15,6 +15,8 @@ export async function middleware(request: NextRequest) {
     pathname === "/book" ||
     pathname.startsWith("/book/") ||
     pathname.startsWith("/amend/") ||
+    // Each business's public booking page.
+    pathname.startsWith("/rent/") ||
     pathname.startsWith("/auth/callback") ||
     pathname === "/api/line/webhook" ||
     // Customer messages arriving from each business's own LINE / Telegram account.

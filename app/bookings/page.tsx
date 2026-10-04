@@ -4,11 +4,13 @@ import { AppShell } from "@/components/app-shell";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getBookingList } from "@/lib/bookings";
 import { getDefaultOrganization } from "@/lib/organization";
+import { getPendingBookingRequests } from "@/lib/public-catalog";
+import { BookingRequests } from "./booking-requests";
 import { BookingsList } from "./bookings-list";
 
 export default async function BookingsPage() {
   const [userEmail, organization] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization()]);
-  const bookings = await getBookingList(organization.id);
+  const [bookings, requests] = await Promise.all([getBookingList(organization.id), getPendingBookingRequests(organization.id)]);
 
   return (
     <AppShell userEmail={userEmail}>
@@ -24,6 +26,7 @@ export default async function BookingsPage() {
         </Link>
       </div>
 
+      <BookingRequests requests={requests} />
       <BookingsList bookings={bookings} />
     </AppShell>
   );

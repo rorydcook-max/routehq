@@ -252,7 +252,8 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   const canPayHere = rental?.id && (detail.state === "active" || (detail.state === "ready" && detail.completion?.agreement));
   const portal = canPayHere ? await getPortalPayments(String(rental.id), detail.org_payment?.promptpay_id) : { payments: [], bundle: null };
   // Before signing, "pay now" shows one QR for what is due at the start.
-  const firstPaymentAmount = Number(rental?.outstanding_balance || 0) > 0 ? Number(rental.outstanding_balance) : Number(rental?.rental_rate || 0);
+  // What is due at the start: the first rent and the deposit.
+  const firstPaymentAmount = Number(rental?.outstanding_balance || 0) > 0 ? Number(rental.outstanding_balance) : Number(rental?.rental_rate || 0) + Number(rental?.deposit_amount || 0);
   const firstPaymentQr =
     detail.state === "ready" && !detail.completion?.agreement && detail.org_payment?.promptpay_id && String(rental?.currency || "THB") === "THB"
       ? await promptPayQrSvg(detail.org_payment.promptpay_id, firstPaymentAmount)

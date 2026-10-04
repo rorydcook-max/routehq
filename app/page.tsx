@@ -17,6 +17,7 @@ import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization
 import { getValueTrackerData } from "@/lib/value-tracker";
 import { getOnboardingStatus } from "@/lib/onboarding";
 import { getReceiptsWaiting } from "@/lib/payment-receipts";
+import { getPendingBookingRequests } from "@/lib/public-catalog";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isExpenseTransaction, isRevenueTransaction } from "@/lib/transaction-options";
 import { groupVehiclesByKind } from "@/lib/vehicle-groups";
@@ -134,7 +135,7 @@ export default async function Home() {
     })
   ]);
   const { metrics, reminders, rentals, timeline, transactions, vehicles } = dashboardData;
-  const receiptsWaiting = await getReceiptsWaiting(organization.id);
+  const [receiptsWaiting, bookingRequests] = await Promise.all([getReceiptsWaiting(organization.id), getPendingBookingRequests(organization.id)]);
 
   const now = new Date();
   const today = businessToday();
@@ -216,6 +217,17 @@ export default async function Home() {
       detail: `${r.customer} · ${r.vehicle}${since > 0 ? ` · ${plural(since, "day")} late` : ""}`,
       href: `/bookings/${r.id}`,
       action: "Collect"
+    });
+  }
+  for (const request of bookingRequests) {
+    todayItems.push({
+      key: `request-${request.id}`,
+      tone: "teal",
+      icon: <CalendarClock size={17} />,
+      title: `Booking request · ${request.vehicleName}`,
+      detail: `${request.customerName} · ${request.endDate ? `${shortDate(request.startDate)} to ${shortDate(request.endDate)}` : `from ${shortDate(request.startDate)}`}`,
+      href: "/bookings",
+      action: "Answer"
     });
   }
   for (const r of receiptsWaiting) {

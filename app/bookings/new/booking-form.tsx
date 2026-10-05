@@ -209,12 +209,27 @@ const VEHICLE_STATUS_LABELS: Record<string, string> = {
   retired: "Retired"
 };
 
+/**
+ * The vehicle's rate for a pricing period. When it has no rate for that period,
+ * the price is worked out from whichever rate it does have (nearest period
+ * first): a monthly-only vehicle still gets a daily and weekly price, and a
+ * daily-only vehicle a weekly and monthly one. `from` names the rate used.
+ */
+function rateWithSource(vehicle: BookingVehicle | null, pricingModel: string): { rate: number; from: "daily" | "weekly" | "monthly" | null } {
+  if (!vehicle) return { rate: 0, from: null };
+  const saved = { daily: Number(vehicle.daily_rate || 0), weekly: Number(vehicle.weekly_rate || 0), monthly: Number(vehicle.monthly_rate || 0) };
+  const days = { daily: 1, weekly: 7, monthly: 30 };
+  if (pricingModel !== "daily" && pricingModel !== "weekly" && pricingModel !== "monthly") return { rate: 0, from: null };
+  if (saved[pricingModel] > 0) return { rate: saved[pricingModel], from: null };
+  const order: Array<"daily" | "weekly" | "monthly"> = pricingModel === "daily" ? ["weekly", "monthly"] : pricingModel === "weekly" ? ["daily", "monthly"] : ["weekly", "daily"];
+  const from = order.find((key) => saved[key] > 0);
+  if (!from) return { rate: 0, from: null };
+  // To the nearest 10, the way a person would quote it.
+  return { rate: Math.max(10, Math.round(((saved[from] / days[from]) * days[pricingModel]) / 10) * 10), from };
+}
+
 function rateFor(vehicle: BookingVehicle | null, pricingModel: string) {
-  if (!vehicle) return 0;
-  if (pricingModel === "daily") return Number(vehicle.daily_rate || 0);
-  if (pricingModel === "weekly") return Number(vehicle.weekly_rate || 0);
-  if (pricingModel === "monthly") return Number(vehicle.monthly_rate || 0);
-  return 0;
+  return rateWithSource(vehicle, pricingModel).rate;
 }
 
 function loadGooglePlaces() {
@@ -906,9 +921,20 @@ export function BookingForm({
               />
             </label>
           </div>
+          {(() => {
+            const source = rateWithSource(selectedVehicle, pricingModel);
+            if (!source.from || rentalRate !== source.rate) return null;
+            const per = source.from === "daily" ? "day" : source.from === "weekly" ? "week" : "month";
+            const savedRate = Number((source.from === "daily" ? selectedVehicle?.daily_rate : source.from === "weekly" ? selectedVehicle?.weekly_rate : selectedVehicle?.monthly_rate) || 0);
+            return (
+              <p className="mt-2 text-xs text-[var(--muted)]">
+                Worked out from this vehicle&apos;s rate of {money(savedRate, currency)} a {per}. Change it if you agreed something else.
+              </p>
+            );
+          })()}
           {!(rentalRate > 0) ? (
             <p className="mt-2 text-xs font-semibold text-[#b45309]">
-              {pricingModel === "custom" ? "Enter the rate to continue." : `No ${pricingModel} rate is saved for this vehicle. Enter the rate per ${periodLabel} to continue.`}
+              {pricingModel === "custom" ? "Enter the rate to continue." : `This vehicle has no rates saved. Enter the rate per ${periodLabel} to continue.`}
             </p>
           ) : null}
           <div className="mt-3">

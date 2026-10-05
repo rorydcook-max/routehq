@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
-import { CheckCircle2, Circle, ReceiptText, Wallet } from "lucide-react";
+import { CheckCircle2, Circle, ReceiptText, Wallet, MoreHorizontal } from "lucide-react";
 import { confirmReceiptPayment, declinePaymentReceipt, recordPaymentReceived } from "@/app/actions/bookings";
 import { completeTask } from "@/app/actions/tasks";
 import { PendingButton } from "@/components/pending-button";
@@ -225,6 +225,7 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
 
 function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskListItem; organizationId: string; today: string; siblings?: TaskListItem[] }) {
   const [showNote, setShowNote] = useState(false);
+  const [showMore, setShowMore] = useState(false);
   const [recording, setRecording] = useState(false);
   const router = useRouter();
   const [receiptError, setReceiptError] = useState<string | null>(null);
@@ -263,11 +264,19 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
         )}
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            <p className="font-bold text-[var(--foreground)]">{coversSeveral ? `Receipt for ${receipt.paymentIds.length} payments` : receipt ? item.paymentLabel || item.title : item.title}</p>
+            <p className="font-bold text-[var(--foreground)]">{coversSeveral ? `Receipt for ${receipt.paymentIds.length} payments` : receipt ? item.paymentLabel || item.title : item.action === "swap_handover" || item.action === "swap_collection" ? item.title.split(" to ")[0].split(" from ")[0] : item.title}</p>
             {item.amount != null ? <span className="font-semibold text-[var(--foreground)]">{money(receipt ? receipt.total : item.amount)}</span> : null}
-            {item.kind === "task" ? <Badge tone="neutral">{taskTypeLabel(item.taskType)}</Badge> : null}
+            {item.kind === "task" && !item.action && String(item.taskType || "") !== "admin" ? <Badge tone="neutral">{taskTypeLabel(item.taskType)}</Badge> : null}
           </div>
-          {context ? <p className="mt-0.5 text-sm sm:truncate text-[var(--foreground-secondary)]">{context}</p> : null}
+          {context ? (
+            item.rentalId || item.vehicleId ? (
+              <Link className="mt-0.5 block text-sm text-[var(--foreground-secondary)] underline decoration-[var(--border-strong)] underline-offset-2 sm:truncate" href={item.rentalId ? `/bookings/${item.rentalId}` : `/fleet/${item.vehicleId}`}>
+                {context}
+              </Link>
+            ) : (
+              <p className="mt-0.5 text-sm text-[var(--foreground-secondary)] sm:truncate">{context}</p>
+            )
+          ) : null}
           <p className={`mt-0.5 text-xs font-semibold ${overdue ? "text-[var(--danger)]" : "text-[var(--muted)]"}`}>
             {item.completedAt
               ? `Done ${dayLabel(new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date(item.completedAt)), today)}`
@@ -349,25 +358,30 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
         ) : null}
         {item.kind === "task" && !item.completedAt && !showNote ? (
           <>
-            <form action={completeTask}>
-              <input name="organizationId" type="hidden" value={organizationId} />
-              <input name="taskId" type="hidden" value={item.id} />
-              <PendingButton className={`${item.action ? "secondary-action" : "primary-action"} min-h-9 px-3 text-xs`} pendingLabel="Saving…" type="submit">
-                {item.action === "refund" ? "No refund" : "Mark done"}
-              </PendingButton>
-            </form>
-            <button className="secondary-action pressable min-h-9 px-3 text-xs" onClick={() => setShowNote(true)} type="button">
-              Add note
-            </button>
+            {/* One main button per row. A job with its own next step keeps "mark done" and notes behind the dots. */}
+            {!item.action || item.action === "refund" || showMore ? (
+              <form action={completeTask}>
+                <input name="organizationId" type="hidden" value={organizationId} />
+                <input name="taskId" type="hidden" value={item.id} />
+                <PendingButton className={`${item.action ? "secondary-action" : "primary-action"} min-h-9 px-3 text-xs`} pendingLabel="Saving…" type="submit">
+                  {item.action === "refund" ? "No refund" : "Mark done"}
+                </PendingButton>
+              </form>
+            ) : null}
+            {showMore ? (
+              <button className="secondary-action pressable min-h-9 px-3 text-xs" onClick={() => setShowNote(true)} type="button">
+                Add note
+              </button>
+            ) : (
+              <button aria-label="More options" className="secondary-action pressable flex min-h-9 items-center px-2.5 text-xs" onClick={() => setShowMore(true)} type="button">
+                <MoreHorizontal size={16} />
+              </button>
+            )}
           </>
         ) : null}
-        {item.rentalId ? (
+        {!context && item.rentalId ? (
           <Link className="secondary-action pressable min-h-9 px-3 text-xs" href={`/bookings/${item.rentalId}`}>
             Booking
-          </Link>
-        ) : item.vehicleId ? (
-          <Link className="secondary-action pressable min-h-9 px-3 text-xs" href={`/fleet/${item.vehicleId}`}>
-            Vehicle
           </Link>
         ) : null}
       </div>

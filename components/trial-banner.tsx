@@ -72,6 +72,10 @@ export function TrialBanner({ placement = "floating" }: { placement?: "floating"
   }
 
   const days = payload.daysRemaining;
+  // Phones have no room to spare: the reminder stays on the dashboard until the last week.
+  if (placement === "floating" && pathname !== "/" && (days === null || days === undefined || days > 7)) {
+    return null;
+  }
   const tone = toneForDays(days);
 
   return (

@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
-import { CalendarDays, Car, Clock, Search, Trash2, UserRound } from "lucide-react";
+import { CalendarDays, Car, Clock, Search, Trash2, UserRound, MoreHorizontal } from "lucide-react";
 import { deleteBooking, extendBookingHold } from "@/app/actions/bookings";
 import { CancelBookingButton } from "@/app/bookings/[id]/cancel-booking-button";
 import { UndoCancellationButton } from "@/app/bookings/[id]/undo-cancellation-button";
@@ -281,7 +281,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
             const photoUrl = booking.vehicles?.primary_photo_url;
             const effectiveStatus = isCancelledBooking(booking) ? "cancelled" : String(booking.status || "");
             return (
-            <article className={`rounded-[10px] border p-2 transition hover:border-[var(--primary)] hover:shadow-[0_16px_30px_rgba(15,23,42,0.06)] ${statusCardClasses(booking)}`} key={booking.id}>
+            <article className={`relative rounded-[10px] border p-2 transition hover:border-[var(--primary)] hover:shadow-[0_16px_30px_rgba(15,23,42,0.06)] ${statusCardClasses(booking)}`} key={booking.id}>
               <div className="grid gap-2.5 lg:grid-cols-[104px_minmax(0,1fr)_136px] lg:items-center">
                 <Link className={`group relative h-[68px] overflow-hidden ${photoUrl ? "block" : "hidden lg:block"} rounded-lg border border-[var(--border)] bg-[#fbfaf8]`} href={`/bookings/${booking.id}`}>
                   {photoUrl ? (
@@ -307,138 +307,12 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                   ) : null}
                     {!booking.customers ? <Badge tone="amber">Awaiting details</Badge> : null}
                     <span className="font-mono-data ml-1 text-[11px] font-semibold uppercase tracking-[0.04em] text-[var(--muted)]">{bookingReference(booking)}</span>
-                  </div>
-
-                  <Link className="mt-1 block truncate text-[15px] font-semibold leading-tight text-[var(--foreground)] hover:text-[var(--primary)]" href={`/bookings/${booking.id}`}>
-                    {booking.customers ? customerLabel(booking) : <span className="inline-flex items-center gap-1.5 text-[#92400e]"><Clock size={15} /> Awaiting customer details</span>}
-                  </Link>
-
-                  <div className="mt-1 grid gap-1 text-[12px] text-[var(--foreground-secondary)] sm:grid-cols-2 xl:grid-cols-3">
-                    <span className="flex min-w-0 items-center gap-2">
-                      <Car size={15} className="shrink-0 text-[var(--primary)]" />
-                      <span className="truncate">
-                        <strong className="font-semibold text-[var(--foreground-secondary)]">{vehicleTitle(booking.vehicles) || "Vehicle"}</strong>
-                        {booking.vehicles?.registration_number ? <span className="font-mono-data ml-2 text-[var(--muted)]">{booking.vehicles.registration_number}</span> : null}
-                      </span>
-                    </span>
-                    <span className="flex min-w-0 items-center gap-2">
-                      <CalendarDays size={15} className="shrink-0 text-[var(--primary)]" />
-                      <span className="truncate">{formatRange(booking.start_date, booking.end_date)}</span>
-                    </span>
-                    <span className="flex min-w-0 items-center gap-2">
-                      <UserRound size={15} className="shrink-0 text-[var(--primary)]" />
-                      <span className="truncate">{booking.customers?.phone || "No phone"}</span>
-                    </span>
-                  </div>
-                  {timingLabel ? <p className="mt-1 text-[12px] font-medium text-[var(--muted)]">{timingLabel}</p> : null}
-                  {waitingOn ? (
-                    <p className="mt-1 text-[12px] font-semibold text-[#dc2626]">
-                      Vehicle not back yet: {waitingOn.customers?.full_name || "the current customer"} was due to return it {new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${String(waitingOn.end_date).slice(0, 10)}T00:00:00Z`))}.{" "}
-                      <Link className="underline underline-offset-2" href={`/bookings/${waitingOn.id}`}>
-                        Open that rental
-                      </Link>
-                    </p>
-                  ) : null}
-                  {hold ? (
-                    <p className={`mt-1 text-[12px] font-medium ${hold.ended ? "text-[#b45309]" : "text-[var(--primary)]"}`}>
-                      {hold.text}
-                      <ExtendHoldButton ended={hold.ended} rentalId={booking.id} />
-                    </p>
-                  ) : null}
-                </div>
-
-                <div className="lg:justify-self-end">
-                  <div className="w-full rounded-lg border border-[var(--border)] bg-white/80 px-3 py-1.5 lg:w-[136px]">
-                    <div className="flex items-center justify-between gap-3 lg:block lg:text-right">
-                      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">Paid</span>
-                      <span className="font-mono-data block text-[16px] font-semibold text-[var(--primary)]">{money(booking.total_paid, booking.currency)}</span>
-                    </div>
-                    <span className={`font-mono-data mt-0.5 block text-[11px] lg:text-right ${Number(booking.balance_due) > 0 ? "font-semibold text-[#b45309]" : "text-[var(--muted)]"}`}>
-                      {Number(booking.balance_due) > 0 ? `Due now ${money(booking.balance_due, booking.currency)}` : "Nothing due now"}
-                    </span>
-                  </div>
-                  <div className="hidden">
-                    <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-md bg-[var(--primary)] px-3 py-1.5 text-[12px] font-semibold text-white" href={`/bookings/${booking.id}`}>
-                      View
-                    </Link>
-                    <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-md border border-[var(--border)] bg-white px-3 py-1.5 text-[12px] font-semibold text-[var(--foreground-secondary)]" href={`/bookings/${booking.id}/edit`}>
-                      Edit
-                    </Link>
-                    {canExtend(booking) ? (
-                      <RentalAdjustmentButton
-                        className="pressable inline-flex min-h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border)] bg-white px-3 py-1.5 text-[12px] font-semibold text-[var(--foreground-secondary)]"
-                        currentEndDate={booking.end_date}
-                        currentRate={Number(booking.rental_rate || 0)}
-                        currentStartDate={booking.start_date}
-                        customerName={booking.customers?.full_name || "Awaiting customer"}
-                        label="Extend"
-                        rentalId={booking.id}
-                        vehicleLabel={vehicleTitle(booking.vehicles)}
-                      />
-                    ) : null}
-                    {String(booking.status || "").toLowerCase() === "cancelled" || booking.booking_link?.status === "cancelled" ? (
-                      <UndoCancellationButton
-                        rentalId={booking.id}
-                        organizationId={booking.organization_id}
-                        vehicleId={String(booking.vehicle_id || booking.vehicles?.id || "")}
-                        customerName={booking.customers?.full_name || null}
-                        compact
-                      />
-                    ) : !["completed", "cancelled"].includes(String(booking.status || "").toLowerCase()) ? (
-                      <CancelBookingButton
-                        rentalId={booking.id}
-                        organizationId={booking.organization_id}
-                        vehicleId={String(booking.vehicle_id || booking.vehicles?.id || "")}
-                        totalPaid={Number(booking.total_paid || 0)}
-                        depositHeld={Number(booking.deposit_held || 0)}
-                        currency={booking.currency || "THB"}
-                        rentalRate={Number(booking.rental_rate || 0)}
-                        rentalStatus={booking.status}
-                        customerName={booking.customers?.full_name || null}
-                        compact
-                      />
-                    ) : null}
-                    {confirmDeleteId === booking.id ? (
-                      <div className="mt-1 w-full rounded-lg border border-[#fecaca] bg-[#fef2f2] p-2">
-                        <p className="mb-2 text-xs font-semibold text-[#dc2626]">
-                          Delete this booking permanently? Only bookings entered by mistake can be deleted - once there is a signed agreement, a payment or an inspection, use <strong>Cancel booking</strong> instead so the records are kept.
-                        </p>
-                        <div className="flex gap-2">
-                          <button
-                            className="pressable inline-flex min-h-7 items-center rounded-lg bg-[#dc2626] px-3 text-xs font-bold text-white disabled:opacity-60"
-                            disabled={isPending}
-                            onClick={() => handleDelete(booking.id)}
-                            type="button"
-                          >
-                            {isPending ? "Deleting…" : "Confirm delete"}
-                          </button>
-                          <button
-                            className="pressable inline-flex min-h-7 items-center rounded-lg border border-[var(--border)] bg-white px-3 text-xs font-bold text-[var(--foreground-secondary)]"
-                            disabled={isPending}
-                            onClick={() => setConfirmDeleteId(null)}
-                            type="button"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <button
-                        className="pressable inline-flex min-h-8 items-center justify-center rounded-md border border-[#fecaca] bg-[#fff7f7] px-2 text-[#dc2626]"
-                        onClick={() => { setConfirmDeleteId(booking.id); setDeleteError(null); }}
-                        title="Delete booking"
-                        type="button"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="mt-2 flex flex-wrap items-center justify-end gap-1.5 border-t border-[rgba(15,23,42,0.08)] pt-2">
-                <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-md bg-[var(--primary)] px-3 py-1.5 text-[12px] font-semibold text-white" href={`/bookings/${booking.id}`}>
-                  View
-                </Link>
+                    {/* Edit, extend, cancel and delete stay one tap away without crowding every card. */}
+                    <details className="relative z-10 ml-auto">
+                      <summary aria-label="More options" className="pressable flex h-8 w-8 cursor-pointer list-none items-center justify-center rounded-full text-[var(--muted)] hover:bg-[var(--panel-secondary)] [&::-webkit-details-marker]:hidden">
+                        <MoreHorizontal size={18} />
+                      </summary>
+                      <div className="absolute right-0 top-full z-20 mt-1 flex min-w-[150px] flex-col items-stretch gap-1.5 rounded-lg border border-[var(--border)] bg-white p-2 text-left shadow-lg">
                 <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-md border border-[var(--border)] bg-white px-3 py-1.5 text-[12px] font-semibold text-[var(--foreground-secondary)]" href={`/bookings/${booking.id}/edit`}>
                   Edit
                 </Link>
@@ -489,8 +363,61 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                   </button>
                 )}
               </div>
+                    </details>
+                  </div>
+
+                  <Link className="mt-1 block truncate text-[15px] font-semibold leading-tight text-[var(--foreground)] after:absolute after:inset-0 after:content-[''] hover:text-[var(--primary)]" href={`/bookings/${booking.id}`}>
+                    {booking.customers ? customerLabel(booking) : <span className="inline-flex items-center gap-1.5 text-[#92400e]"><Clock size={15} /> Awaiting customer details</span>}
+                  </Link>
+
+                  <div className="mt-1 grid gap-1 text-[12px] text-[var(--foreground-secondary)] sm:grid-cols-2 xl:grid-cols-3">
+                    <span className="flex min-w-0 items-center gap-2">
+                      <Car size={15} className="shrink-0 text-[var(--primary)]" />
+                      <span className="truncate">
+                        <strong className="font-semibold text-[var(--foreground-secondary)]">{vehicleTitle(booking.vehicles) || "Vehicle"}</strong>
+                        {booking.vehicles?.registration_number ? <span className="font-mono-data ml-2 text-[var(--muted)]">{booking.vehicles.registration_number}</span> : null}
+                      </span>
+                    </span>
+                    <span className="flex min-w-0 items-center gap-2">
+                      <CalendarDays size={15} className="shrink-0 text-[var(--primary)]" />
+                      <span className="truncate">{formatRange(booking.start_date, booking.end_date)}</span>
+                    </span>
+                    <span className="hidden min-w-0 items-center gap-2 sm:flex">
+                      <UserRound size={15} className="shrink-0 text-[var(--primary)]" />
+                      <span className="truncate">{booking.customers?.phone || "No phone"}</span>
+                    </span>
+                  </div>
+                  {timingLabel ? <p className="mt-1 text-[12px] font-medium text-[var(--muted)]">{timingLabel}</p> : null}
+                  {waitingOn ? (
+                    <p className="mt-1 text-[12px] font-semibold text-[#dc2626]">
+                      Vehicle not back yet: {waitingOn.customers?.full_name || "the current customer"} was due to return it {new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${String(waitingOn.end_date).slice(0, 10)}T00:00:00Z`))}.{" "}
+                      <Link className="relative z-10 underline underline-offset-2" href={`/bookings/${waitingOn.id}`}>
+                        Open that rental
+                      </Link>
+                    </p>
+                  ) : null}
+                  {hold ? (
+                    <p className={`relative z-10 mt-1 w-fit text-[12px] font-medium ${hold.ended ? "text-[#b45309]" : "text-[var(--primary)]"}`}>
+                      {hold.text}
+                      <ExtendHoldButton ended={hold.ended} rentalId={booking.id} />
+                    </p>
+                  ) : null}
+                </div>
+
+                <div className="lg:justify-self-end">
+                  <div className="w-full rounded-lg border border-[var(--border)] bg-white/80 px-3 py-1.5 lg:w-[136px]">
+                    <div className="flex items-center justify-between gap-3 lg:block lg:text-right">
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">Paid</span>
+                      <span className="font-mono-data block text-[16px] font-semibold text-[var(--primary)]">{money(booking.total_paid, booking.currency)}</span>
+                    </div>
+                    <span className={`font-mono-data mt-0.5 block text-[11px] lg:text-right ${Number(booking.balance_due) > 0 ? "font-semibold text-[#b45309]" : "text-[var(--muted)]"}`}>
+                      {Number(booking.balance_due) > 0 ? `Due now ${money(booking.balance_due, booking.currency)}` : "Nothing due now"}
+                    </span>
+                  </div>
+                </div>
+              </div>
               {confirmDeleteId === booking.id ? (
-                <div className="mt-2 rounded-lg border border-[#fecaca] bg-[#fef2f2] p-2">
+                <div className="relative z-10 mt-2 rounded-lg border border-[#fecaca] bg-[#fef2f2] p-2">
                   <p className="mb-2 text-xs font-semibold text-[#dc2626]">
                     Delete this booking permanently? Only bookings entered by mistake can be deleted - once there is a signed agreement, a payment or an inspection, use <strong>Cancel booking</strong> instead so the records are kept.
                   </p>

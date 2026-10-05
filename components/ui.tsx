@@ -1,4 +1,5 @@
 import { clsx } from "clsx";
+import { ChevronDown } from "lucide-react";
 import type { ReactNode } from "react";
 
 export function Card({
@@ -9,6 +10,45 @@ export function Card({
   className?: string;
 }) {
   return <section className={clsx("card", className)}>{children}</section>;
+}
+
+/**
+ * A section that stays one line until someone opens it. Pages lead with what
+ * needs doing; the rest is one tap away instead of a long scroll.
+ */
+export function Fold({
+  title,
+  summary,
+  tone = "neutral",
+  open = false,
+  id,
+  children
+}: {
+  title: string;
+  summary?: ReactNode;
+  tone?: "neutral" | "red" | "green" | "amber";
+  open?: boolean;
+  id?: string;
+  children: ReactNode;
+}) {
+  const tones = {
+    neutral: "text-[var(--muted)]",
+    red: "font-semibold text-[#dc2626]",
+    green: "font-semibold text-[#16a34a]",
+    amber: "font-semibold text-[#b45309]"
+  };
+  return (
+    <details className="group scroll-mt-4 overflow-hidden rounded-[10px] border-[0.5px] border-[var(--border)] bg-[var(--panel)]" id={id} open={open}>
+      <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-2.5 [&::-webkit-details-marker]:hidden">
+        <span className="min-w-0">
+          <span className="block text-[15px] font-semibold tracking-[-0.01em] text-[var(--foreground)]">{title}</span>
+          {summary ? <span className={clsx("mt-0.5 block truncate text-sm", tones[tone])}>{summary}</span> : null}
+        </span>
+        <ChevronDown className="shrink-0 text-[var(--muted)] transition-transform group-open:rotate-180" size={18} />
+      </summary>
+      <div className="border-t-[0.5px] border-[var(--border)] px-3.5 pb-3.5 pt-3">{children}</div>
+    </details>
+  );
 }
 
 export function EmptyState({

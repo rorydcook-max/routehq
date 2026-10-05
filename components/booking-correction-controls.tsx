@@ -523,12 +523,13 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
 
   return (
     <div className={`sub-surface p-3 ${voided ? "opacity-70" : ""}`} id={`record-payment-${payment.id}`}>
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
+      {/* On a phone the button drops under the details instead of squeezing them. */}
+      <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
+        <div className="min-w-[60%] flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <p className={`font-mono-data font-semibold ${voided ? "text-[var(--muted)] line-through" : "text-[var(--foreground)]"}`}>{money(payment.amount, payment.currency || "THB")}</p>
+            <SmallBadge tone={badgeTone as any}>{voided ? "voided" : payment.status || "pending"}</SmallBadge>
             {isExtension ? <SmallBadge tone="blue">Extension</SmallBadge> : null}
-            {voided ? <SmallBadge tone="neutral">Voided</SmallBadge> : null}
           </div>
           <p className={`text-sm ${voided ? "text-[var(--muted)]" : "text-[var(--muted)]"}`}>{paymentDescription(payment)}</p>
           <p className="text-sm text-[var(--muted)]">Due {dateLabel(payment.due_date)}</p>
@@ -539,8 +540,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
             </a>
           ) : null}
         </div>
-        <div className="flex shrink-0 items-center gap-2">
-          <SmallBadge tone={badgeTone as any}>{voided ? "voided" : payment.status || "pending"}</SmallBadge>
+        <div className="flex items-center gap-2">
           {canRecordPayment ? (
             <button
               className="pressable inline-flex min-h-9 items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-4 text-sm font-semibold text-white"
@@ -552,7 +552,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
               type="button"
             >
               <i aria-hidden="true" className="ti ti-cash text-[14px]" />
-              Record payment received
+              Record payment
             </button>
           ) : null}
           {!voided ? (

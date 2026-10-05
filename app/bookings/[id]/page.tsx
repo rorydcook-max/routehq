@@ -21,7 +21,8 @@ import { CommunicationPanel } from "@/components/communication-panel";
 import { RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
 import { InspectionViewer } from "@/components/inspection-viewer";
 import { PendingButton } from "@/components/pending-button";
-import { Badge, Card, SectionHeader } from "@/components/ui";
+import { Badge, Card, Fold, SectionHeader } from "@/components/ui";
+import { OpenOnHash } from "@/components/open-on-hash";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getBookingDetail, getCustomersForSelector } from "@/lib/bookings";
 import { flagForNationality } from "@/lib/customer-options";
@@ -493,6 +494,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
 
   return (
     <AppShell userEmail={userEmail}>
+      <OpenOnHash />
       <div className="space-y-3">
         {resolvedSearchParams.updated === "1" ? (
           <div className="rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] px-3 py-2 text-sm font-bold text-[#166534]">
@@ -638,7 +640,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
           </div>
         ) : null}
 
-        <div className="grid gap-3 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           <BookingMetricCard icon={<CalendarDays size={18} />} label="Dates">
             <div className="flex flex-wrap items-center gap-1 text-sm font-semibold leading-5 text-[var(--foreground)]">
               <span>{rental.end_date ? `${formatDate(rental.start_date)} to` : `From ${formatDate(rental.start_date)}, open-ended`}</span>
@@ -663,8 +665,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
           <BookingMetricCard icon={<Gauge size={18} />} label="Mileage">
             {rental.mileage_at_delivery == null ? (
               <>
-                <p className="text-sm font-semibold leading-5 text-[var(--foreground)]">{isCancelled ? "Never handed over" : "Not recorded yet"}</p>
-                <p className="text-sm text-[var(--muted)]">{isCancelled ? "No mileage to record" : "Recorded at delivery"}</p>
+                <p className="text-sm font-semibold leading-5 text-[var(--foreground)]">{isCancelled ? "Never handed over" : isClosed ? "Not recorded" : "Not recorded yet"}</p>
+                <p className="text-sm text-[var(--muted)]">{isCancelled ? "No mileage to record" : isClosed ? "No handover form was completed" : "Recorded at delivery"}</p>
               </>
             ) : rental.mileage_at_return == null ? (
               <>
@@ -692,10 +694,15 @@ export default async function BookingDetailPage({ params, searchParams }: { para
 
         <div className="grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[minmax(0,3fr)_minmax(320px,2fr)]">
           <div className="space-y-3">
-            <Card>
-              <SectionHeader eyebrow="Booking link" title={bookingLink ? "Customer's booking form" : "Customer booking link"} />
+            <Fold
+              id="booking-link"
+              open={Boolean(bookingLink) && String(bookingLink?.status || "") !== "completed" && !isClosed}
+              summary={!bookingLink ? "Not created: this booking was entered by your team" : String(bookingLink.status || "") === "completed" ? "The customer has finished and signed" : "Waiting for the customer"}
+              title="Customer's link"
+              tone={bookingLink && String(bookingLink.status || "") !== "completed" && !isClosed ? "amber" : "neutral"}
+            >
               {!bookingLink ? (
-                <p className="mt-3 text-sm text-[var(--muted)]">
+                <p className="text-sm text-[var(--muted)]">
                   This booking was entered by your team. Create a link if you want the customer to add their details and sign the agreement online.
                 </p>
               ) : null}
@@ -738,13 +745,17 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 <BookingShareActions currentUrl={bookingLink?.public_url || null} formDone={String(bookingLink?.status || "") === "completed"} organizationId={organization.id} rentalId={rental.id} />
                 </div>
               )}
-            </Card>
+            </Fold>
 
-            <Card>
-              <SectionHeader eyebrow="Customer" title="Details and documents" />
+            <Fold
+              open={!customer || customer.document_status !== "complete"}
+              summary={customer ? `${customer.full_name} · ${documentLabel(customer.document_status)}` : "Awaiting customer details"}
+              title="Customer and documents"
+              tone={!customer || customer.document_status !== "complete" ? "amber" : "neutral"}
+            >
               {customer ? (
                 <>
-                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  <div className="grid gap-3 sm:grid-cols-2">
                     <Info icon={UserRound} label="Name" value={customer?.full_name || "Not recorded"} />
                     <Info icon={UserRound} label="Phone" value={customer?.phone || "Not recorded"} />
                     <Info icon={UserRound} label="Email" value={customer?.email || "Not recorded"} />
@@ -763,7 +774,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   </div>
                 </>
               ) : (
-                <div className="mt-3 space-y-3">
+                <div className="space-y-3">
                   <div className="rounded-lg border border-[#bfe0db] bg-[#fbfaf8] p-3">
                     <div className="flex items-center gap-2">
                       <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)]">
@@ -782,7 +793,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   />
                 </div>
               )}
-            </Card>
+            </Fold>
 
             {customer ? (
               <Card>
@@ -895,17 +906,28 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   <InspectionStatus label="Return inspection" inspection={returnInspection} href={`/inspections/return/${rental.id}` as Route} available={["active", "due_soon", "overdue", "extended"].includes(displayStatus)} />
                 )}
               </div>
-              <div className="mt-3 space-y-3">
-                {inspections.length === 0 ? (
-                  isCancelled ? null : <SectionEmpty>No inspections completed yet.</SectionEmpty>
-                ) : (
-                  inspections.map((inspection: any) => <InspectionViewer inspection={inspection} key={inspection.id} />)
-                )}
-              </div>
+              {inspections.length === 0 ? (
+                isCancelled ? null : (
+                  <div className="mt-3">
+                    <SectionEmpty>No forms completed yet.</SectionEmpty>
+                  </div>
+                )
+              ) : (
+                <details className="mt-3">
+                  <summary className="cursor-pointer py-1 text-sm font-semibold text-[var(--primary)]">
+                    Show the {inspections.length === 1 ? "completed form" : `${inspections.length} completed forms`} (photos, fuel, signatures)
+                  </summary>
+                  <div className="mt-3 space-y-3">
+                    {inspections.map((inspection: any) => <InspectionViewer inspection={inspection} key={inspection.id} />)}
+                  </div>
+                </details>
+              )}
             </Card>
 
-            <Card>
-              <SectionHeader eyebrow="Communication" title="Messages and customer activity" />
+            <Fold
+              summary={(communicationTimeline || []).length === 0 ? "Nothing yet" : `${(communicationTimeline || []).length} ${(communicationTimeline || []).length === 1 ? "entry" : "entries"}`}
+              title="Messages and customer activity"
+            >
               <CommunicationTimeline
                 customerId={customer?.id || null}
                 entries={communicationTimeline || []}
@@ -914,12 +936,10 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 hiddenActionIds={pendingPortalActions.map((action: any) => action.id)}
                 rentalId={rental.id}
               />
-            </Card>
+            </Fold>
 
-            <Card>
-              <details>
-              <summary className="cursor-pointer text-sm font-semibold text-[var(--foreground)]">Full history · {activityEvents.length} {activityEvents.length === 1 ? "entry" : "entries"}</summary>
-              <div className="mt-3 space-y-3">
+            <Fold summary={`${activityEvents.length} ${activityEvents.length === 1 ? "entry" : "entries"}`} title="Full history">
+              <div className="space-y-3">
                 {activityEvents.length === 0 ? (
                   <SectionEmpty>No activity recorded yet.</SectionEmpty>
                 ) : (
@@ -932,14 +952,17 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   ))
                 )}
               </div>
-              </details>
-            </Card>
+            </Fold>
           </div>
 
-          <div className="space-y-3">
-            <Card>
-              <SectionHeader eyebrow="Rental details" title="Summary" />
-              <div className="mt-3 space-y-3 text-sm">
+          {/* Phones read top to bottom: money and deposit come before the paperwork. */}
+          <div className="order-first space-y-3 lg:order-none">
+            <Fold
+              open={Boolean(customerReportedPayment) || (isClosed && !isCancelled && Number(rental.deposit_held || 0) - Number(rental.deposit_refunded_amount || 0) - Number(rental.deposit_forfeited_amount || 0) > 0) || (payments as any[]).some((payment) => payment.metadata?.early_return && !payment.metadata.early_return.settled)}
+              summary={`${vehicleTitle(vehicle)} · Deposit: ${formatDepositSummary(rental)}`}
+              title="Vehicle, handover and deposit"
+            >
+              <div className="space-y-3 text-sm">
                 <Info icon={Car} label="Vehicle" value={`${vehicleTitle(vehicle)} / ${vehicle?.registration_number || ""}`} />
                 {deliveryInspection ? (
                   <Info icon={MapPin} label="Handover" value={`Handed over ${formatDateTime(deliveryInspection.submitted_at || deliveryInspection.created_at)}`} />
@@ -993,7 +1016,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 ) : null}
                 <Info icon={CreditCard} label="Rent paid" value={money(totalPaid, rental.currency)} />
               </div>
-            </Card>
+            </Fold>
 
             {pendingAmendment ? (
           <div className="scroll-mt-4" id="amendment" />
@@ -1004,63 +1027,17 @@ export default async function BookingDetailPage({ params, searchParams }: { para
 
             <RentalDocumentsCard documents={rentalDocuments} />
 
-            <Card>
-              <div id="payment-schedule">
-                <SectionHeader eyebrow="Payments" title="Payment schedule" />
-              </div>
-              <div className="card-section space-y-3">
-                <div className="grid gap-2 sm:grid-cols-3">
-                  <div className="rounded-lg border border-[var(--border)] bg-white p-3">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--muted)]">{rental.end_date ? "Scheduled" : "Scheduled, next 12 months"}</p>
-                    <p className="font-mono-data mt-1 text-lg font-semibold text-[var(--foreground)]">{money(totalRentalValue, rental.currency)}</p>
-                  </div>
-                  <div className="rounded-lg border border-[var(--border)] bg-white p-3">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Paid income</p>
-                    <p className="font-mono-data mt-1 text-lg font-semibold text-[#16a34a]">{money(totalPaid, rental.currency)}</p>
-                  </div>
-                  <div className="rounded-lg border border-[var(--border)] bg-white p-3">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Balance</p>
-                    <p className={`font-mono-data mt-1 text-lg font-semibold ${outstandingBalance > 0 ? "text-[#dc2626]" : "text-[#16a34a]"}`}>{money(outstandingBalance, rental.currency)}</p>
-                  </div>
-                </div>
-                {outstandingBalance > 0 && activeRentalStatus ? (
-                  <div className="flex flex-col gap-3 rounded-xl border border-[#d1fae5] bg-[#f0fdf4] p-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <p className="text-sm font-semibold text-[#065f46]">
-                        {money(outstandingBalance, rental.currency)} outstanding
-                      </p>
-                      <p className="mt-0.5 text-xs text-[#059669]">
-                        Find the payment row below and click "Record payment received"
-                      </p>
-                    </div>
-                    {pendingPayment ? (
-                      <a
-                        className="pressable inline-flex min-h-9 shrink-0 items-center justify-center gap-2 rounded-lg bg-[#059669] px-4 text-sm font-semibold text-white"
-                        href={`#record-payment-${pendingPayment.id}`}
-                      >
-                        <i aria-hidden="true" className="ti ti-cash text-[14px]" />
-                        Record payment
-                      </a>
-                    ) : null}
-                  </div>
-                ) : null}
-                <div className={`rounded-lg border p-3 text-sm font-semibold ${
-                  financialState.tone === "green"
-                    ? "border-[#bbf7d0] bg-[#f0fdf4] text-[#166534]"
-                    : financialState.tone === "red"
-                      ? "border-[#fecaca] bg-[#fef2f2] text-[#991b1b]"
-                      : financialState.tone === "amber"
-                        ? "border-[#fde68a] bg-[#fffbeb] text-[#92400e]"
-                        : financialState.tone === "blue"
-                          ? "border-[#bfdbfe] bg-[#eff6ff] text-[#1d4ed8]"
-                          : "border-[var(--border)] bg-[var(--panel-secondary)] text-[var(--foreground-secondary)]"
-                }`}>
-                  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                    <span>{financialState.label}</span>
-                    {financialState.amount !== null ? <span className="font-mono-data">{money(financialState.amount, rental.currency)}</span> : null}
-                  </div>
-                  <p className="mt-1 text-xs font-medium opacity-80">{financialState.detail}</p>
-                </div>
+            <Fold
+              id="payment-schedule"
+              open={overduePaymentGroup.length + dueNowPaymentGroup.length > 0 || (payments.length === 0 && !isClosed && !awaitingSignature)}
+              summary={`${financialState.label}${financialState.amount !== null ? ` · ${money(financialState.amount, rental.currency)}` : ""}`}
+              title="Payments"
+              tone={financialState.tone === "red" ? "red" : financialState.tone === "green" ? "green" : financialState.tone === "amber" ? "amber" : "neutral"}
+            >
+              <div className="space-y-3">
+                <p className="text-sm text-[var(--muted)]">
+                  <span className="font-semibold text-[var(--foreground)]">{money(totalPaid, rental.currency)}</span> paid so far. {financialState.detail}
+                </p>
                 {needsExistingRentalPaymentSetup ? (
                   <ExistingRentalPaymentSetupCard
                     currency={rental.currency}
@@ -1070,7 +1047,10 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     startDate={rental.start_date}
                   />
                 ) : null}
-                {!isClosed && !needsExistingRentalPaymentSetup && payments.length === 0 && outstandingBalance === 0 && totalPaid === 0 ? (
+                {awaitingSignature && payments.length === 0 ? (
+                  <p className="text-sm text-[var(--muted)]">The payments are set up automatically when the customer signs.</p>
+                ) : null}
+                {!isClosed && !awaitingSignature && !needsExistingRentalPaymentSetup && payments.length === 0 && outstandingBalance === 0 && totalPaid === 0 ? (
                   <div className="space-y-3 rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3 text-sm font-semibold text-[#92400e]">
                     <p>No payment schedule exists yet for this booking. Generate one from the rental rate and dates, or add a single charge.</p>
                     <GeneratePaymentScheduleButton rentalId={rental.id} />
@@ -1086,7 +1066,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     <GeneratePaymentScheduleButton rentalId={rental.id} />
                   </div>
                 ) : null}
-                {payments.length === 0 && transactions.length === 0 ? (
+                {payments.length === 0 && transactions.length === 0 && !awaitingSignature ? (
                   <SectionEmpty>No payments or transactions recorded yet.</SectionEmpty>
                 ) : null}
                 {overduePaymentGroup.length > 0 ? (
@@ -1133,15 +1113,17 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 ) : null}
                 <AddRentalPaymentInlineForm currency={rental.currency} organizationId={organization.id} rentalId={rental.id} />
                 {transactions.length > 0 ? (
-                  <div className="pt-1">
-                    <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Transactions</p>
-                    <div className="space-y-3">
+                  <details>
+                    <summary className="cursor-pointer text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--muted)] hover:text-[var(--foreground)]">
+                      Money in and out — {transactions.length} {transactions.length === 1 ? "entry" : "entries"}
+                    </summary>
+                    <div className="mt-2 space-y-3">
                       {transactions.map((transaction: any) => <EditableTransactionRow key={transaction.id} transaction={transaction} />)}
                     </div>
-                  </div>
+                  </details>
                 ) : null}
               </div>
-            </Card>
+            </Fold>
 
             {isClosed ? null : (
             <ComingUpCard
@@ -1252,9 +1234,11 @@ function ComingUpCard({
   const visibleEvents = vehicleEvents.slice(0, 5);
 
   return (
-    <Card>
-      <SectionHeader eyebrow="Upcoming" title="What's coming up" />
-      <div className="card-section">
+    <Fold
+      summary={nextPayment ? `Next payment ${money(nextPayment.amount, nextPayment.currency || currency)} · ${formatDate(nextPayment.due_date)}` : "No payment scheduled"}
+      title="What's coming up"
+    >
+      <div>
         <div className="grid gap-3 xl:grid-cols-2">
           <div className={nextPayment ? "rounded-[11px] border border-[var(--border)] bg-[var(--primary-light)] p-4" : ""}>
             <div className="flex items-start justify-between gap-3">
@@ -1350,7 +1334,7 @@ function ComingUpCard({
           </div>
         </div>
       </div>
-    </Card>
+    </Fold>
   );
 }
 

@@ -1,5 +1,5 @@
 import { Download, FileSignature, ShieldCheck } from "lucide-react";
-import { Badge, Card, SectionHeader } from "@/components/ui";
+import { Badge, Fold } from "@/components/ui";
 import type { BookingRentalDocument } from "@/lib/booking-rental-documents";
 
 function formatSignedAt(value: string) {
@@ -25,9 +25,11 @@ export function RentalDocumentsCard({ documents }: { documents: BookingRentalDoc
   const hasAgreement = documents.some((document) => document.type === "rental_agreement");
 
   return (
-    <Card>
-      <SectionHeader eyebrow="Documents" title="Agreement and reports" />
-      <div className="mt-3 space-y-3">
+    <Fold
+      summary={documents.length === 0 ? "Nothing yet" : `${documents.length} ${documents.length === 1 ? "document" : "documents"} to view or download`}
+      title="Agreement and forms"
+    >
+      <div className="space-y-3">
         {!hasAgreement ? (
           <p className="empty-state text-sm">The rental agreement is prepared when the customer opens their booking link, and signed when they complete it.</p>
         ) : null}
@@ -76,6 +78,6 @@ export function RentalDocumentsCard({ documents }: { documents: BookingRentalDoc
           );
         })}
       </div>
-    </Card>
+    </Fold>
   );
 }

@@ -3,7 +3,7 @@ import { holdDeadline, retakeHold } from "@/lib/booking-holds";
 import { bookingRules } from "@/lib/booking-rules";
 import { resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
 import { defaultRentalContractTemplate, embedLogoInContractVariables, ensureDefaultContractTemplate } from "@/lib/contracts";
-import { getCustomerExecutedAgreementDownload, loadPublicRentalAgreement } from "@/lib/rental-document-customer-signing";
+import { loadPublicRentalAgreementForPage } from "@/lib/rental-document-customer-signing";
 import { ensureRentalAgreementDraft } from "@/lib/rental-agreement-automation";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
@@ -142,18 +142,12 @@ export async function getPublicBookingDetail(token: string) {
   // Every booking needs an agreement in the document engine. Nothing else
   // creates one, so the first time the page opens a draft is made here.
   const agreementReads = (async () => {
-    if (bookingLink.rental_id && bookingLink.status !== "cancelled") {
+    // Once the customer has signed there is nothing to prepare.
+    if (bookingLink.rental_id && bookingLink.status !== "cancelled" && !bookingLink.contract_signed_at) {
       await ensureRentalAgreementDraft({ organizationId: bookingLink.organization_id, rentalId: bookingLink.rental_id });
     }
-    const agreement = await loadPublicRentalAgreement(token);
-    // One after the other: the two downloads share work and fail when started together.
-    const downloads = agreement?.eligibility?.fullyExecuted
-      ? {
-          originalAgreementUrl: await getCustomerExecutedAgreementDownload(token, "original").catch(() => null),
-          executionCertificateUrl: await getCustomerExecutedAgreementDownload(token, "certificate").catch(() => null)
-        }
-      : null;
-    return { agreement, downloads };
+    // One load of the agreement records answers everything the page asks about it.
+    return loadPublicRentalAgreementForPage(token);
   })();
 
   const [{ data: organization }, { data: rental }, { data: vehicle }, { data: customer }, { data: contract }, { data: documents }, { data: template }] = await Promise.all([

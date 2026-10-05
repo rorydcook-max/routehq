@@ -150,28 +150,33 @@ async function loadByToken(token: string) {
         .maybeSingle()
     : { data: null };
 
-  const { data: signatures } = version?.id
-    ? await supabase
-        .from("rental_document_signatures")
-        .select("id, signer_role, signer_name, signed_at, content_hash_at_signing, signature_storage_bucket, signature_storage_path")
-        .eq("organization_id", bookingLink.organization_id)
-        .eq("document_version_id", version.id)
-    : { data: [] };
-
-  const { data: certificate } = version?.id
-    ? await supabase
-        .from("rental_document_execution_certificates")
-        .select("id, certificate_storage_bucket, certificate_storage_path, verification_reference, generated_at")
-        .eq("organization_id", bookingLink.organization_id)
-        .eq("document_version_id", version.id)
-        .maybeSingle()
-    : { data: null };
+  const [{ data: signatures }, { data: certificate }] = version?.id
+    ? await Promise.all([
+        supabase
+          .from("rental_document_signatures")
+          .select("id, signer_role, signer_name, signed_at, content_hash_at_signing, signature_storage_bucket, signature_storage_path")
+          .eq("organization_id", bookingLink.organization_id)
+          .eq("document_version_id", version.id),
+        supabase
+          .from("rental_document_execution_certificates")
+          .select("id, certificate_storage_bucket, certificate_storage_path, verification_reference, generated_at")
+          .eq("organization_id", bookingLink.organization_id)
+          .eq("document_version_id", version.id)
+          .maybeSingle()
+      ])
+    : [{ data: [] }, { data: null }];
 
   return { supabase, state: "found" as const, bookingLink, organization, rental, vehicle, customer, documents: documents || [], document, version, signatures: signatures || [], certificate };
 }
 
+type LoadedContext = Awaited<ReturnType<typeof loadByToken>>;
+
 export async function getCustomerSigningEligibility(token: string) {
-  const ctx = await loadByToken(token);
+  return eligibilityFor(await loadByToken(token));
+}
+
+/** The same check, for records already loaded: loading them again for every question made the customer's page slow. */
+async function eligibilityFor(ctx: LoadedContext) {
   if (ctx.state !== "found") {
     return {
       eligible: false,
@@ -251,7 +256,28 @@ export async function getCustomerSigningEligibility(token: string) {
 export async function loadPublicRentalAgreement(token: string) {
   const ctx = await loadByToken(token);
   if (ctx.state !== "found") return null;
-  const eligibility = await getCustomerSigningEligibility(token);
+  return agreementFor(ctx, await eligibilityFor(ctx));
+}
+
+/**
+ * Everything the customer's booking page needs about the agreement, from one
+ * load of the records: the agreement itself and, once it is fully signed, the
+ * two download links.
+ */
+export async function loadPublicRentalAgreementForPage(token: string) {
+  const ctx = await loadByToken(token);
+  if (ctx.state !== "found") return { agreement: null, downloads: null };
+  const eligibility = await eligibilityFor(ctx);
+  const agreement = agreementFor(ctx, eligibility);
+  if (!eligibility.fullyExecuted || !ctx.version || !ctx.certificate) return { agreement, downloads: null };
+  const [originalAgreementUrl, executionCertificateUrl] = await Promise.all([
+    downloadFor(ctx, "original").catch(() => null),
+    downloadFor(ctx, "certificate").catch(() => null)
+  ]);
+  return { agreement, downloads: { originalAgreementUrl, executionCertificateUrl } };
+}
+
+function agreementFor(ctx: Extract<LoadedContext, { state: "found" }>, eligibility: Awaited<ReturnType<typeof eligibilityFor>>) {
   const version = ctx.version;
   const variables = version ? variablesFromVersion(version) : {};
   const business = dataSnapshot(version?.business_snapshot);
@@ -389,7 +415,7 @@ export async function completeRentalDocumentCustomerSigning({
   if (ctx.version.id !== reviewedVersionId) {
     throw new Error("The agreement has changed since you opened it. Please reload the page, read the updated agreement and sign again.");
   }
-  const eligibility = await getCustomerSigningEligibility(token);
+  const eligibility = await eligibilityFor(ctx);
   if (!eligibility.eligible) {
     throw new Error(eligibility.customerSafeMessage || "This agreement is not ready for customer signing.");
   }
@@ -498,8 +524,13 @@ export async function completeRentalDocumentCustomerSigning({
 export async function getCustomerExecutedAgreementDownload(token: string, kind: "original" | "certificate") {
   const ctx = await loadByToken(token);
   if (ctx.state !== "found" || !ctx.version || !ctx.certificate) throw new Error("Executed agreement is not available.");
-  const eligibility = await getCustomerSigningEligibility(token);
+  const eligibility = await eligibilityFor(ctx);
   if (!eligibility.fullyExecuted) throw new Error("Agreement execution is not complete.");
+  return downloadFor(ctx, kind);
+}
+
+async function downloadFor(ctx: Extract<LoadedContext, { state: "found" }>, kind: "original" | "certificate") {
+  if (!ctx.version || !ctx.certificate) throw new Error("Executed agreement is not available.");
   const bucket = kind === "certificate" ? ctx.certificate.certificate_storage_bucket : (ctx.version.final_pdf_storage_bucket || ctx.version.pdf_storage_bucket);
   const path = kind === "certificate" ? ctx.certificate.certificate_storage_path : (ctx.version.final_pdf_storage_path || ctx.version.pdf_storage_path);
   if (!bucket || !path) throw new Error("Download is not available.");

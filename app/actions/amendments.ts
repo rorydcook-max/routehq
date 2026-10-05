@@ -375,6 +375,9 @@ export async function cancelRentalAmendment(amendmentId: string): Promise<Result
     if (!amendment) return { ok: false, error: "Amendment was not found." };
     const { user } = await operatorFor(amendment.rental_id);
     if (amendment.status !== "awaiting_signature") return { ok: false, error: "Only an amendment waiting for a signature can be cancelled." };
+    if (amendment.changes?.applied_before_signature) {
+      return { ok: false, error: "The vehicle has already been changed, so this still needs the customer's signature. To undo it, change the vehicle back." };
+    }
     const { error } = await admin
       .from("rental_amendments")
       .update({ status: "cancelled", cancelled_at: new Date().toISOString(), cancelled_by: user.id })
@@ -721,6 +724,12 @@ async function applyVehicleChange(admin: any, amendment: any, rental: any): Prom
   const organizationId = rental.organization_id as string;
   const handedOver = ON_RENT.includes(String(rental.status));
   const today = businessToday();
+  const early = Boolean(changes.applied_before_signature);
+  // Changed ahead of the signature: the vehicle, forms and records were done then.
+  if (early && amendment.signed_at) {
+    await admin.from("tasks").update({ completed_at: new Date().toISOString(), completion_notes: "Signed" }).eq("rental_id", rental.id).eq("action", "swap_signature").is("completed_at", null);
+    return "done";
+  }
 
   if (rental.vehicle_id !== newVehicleId) {
     if (changes.swap_with_rental_id) {
@@ -782,7 +791,11 @@ async function applyVehicleChange(admin: any, amendment: any, rental: any): Prom
       { organization_id: organizationId, vehicle_id: newVehicleId, rental_id: rental.id, title_key: null, created_by: null, title: `Handover form - ${changes.new_vehicle_label || "replacement vehicle"} to ${who}`, task_type: "admin", action: "swap_handover", due_at: now },
       { organization_id: organizationId, vehicle_id: oldVehicleId, rental_id: rental.id, title_key: null, created_by: null, title: `Collection form - ${changes.previous_vehicle_label || "original vehicle"} from ${who}`, task_type: "admin", action: "swap_collection", due_at: now }
     ]);
-    notifyOperator(organizationId, `🔁 ${who} signed the vehicle change: ${changes.previous_vehicle_label} to ${changes.new_vehicle_label}. Complete the handover and collection forms.`, "portal_action").catch(() => null);
+    if (early) {
+      await admin.from("tasks").insert({ organization_id: organizationId, vehicle_id: newVehicleId, rental_id: rental.id, title_key: null, created_by: null, title: `Signature needed - ${who} to sign the change to the ${changes.new_vehicle_label || "replacement vehicle"}`, task_type: "admin", action: "swap_signature", due_at: now });
+    } else {
+      notifyOperator(organizationId, `🔁 ${who} signed the vehicle change: ${changes.previous_vehicle_label} to ${changes.new_vehicle_label}. Complete the handover and collection forms.`, "portal_action").catch(() => null);
+    }
   } else {
     await syncVehicleStatusFromBookings(admin, organizationId, oldVehicleId).catch(() => null);
   }
@@ -800,8 +813,11 @@ export type VehicleChangeOptions = {
   hasCustomer: boolean;
   currentVehicleLabel: string;
   currentRate: number;
+  /** The deposit agreed on this rental. */
+  currentDeposit: number;
   currency: string;
-  free: Array<{ vehicleId: string; label: string; plate: string | null; monthlyRate: number }>;
+  /** `deposit` is what the business normally takes for that vehicle. */
+  free: Array<{ vehicleId: string; label: string; plate: string | null; monthlyRate: number; deposit: number }>;
   /** Vehicles out with other customers that could be exchanged for this one. */
   swaps: Array<{ rentalId: string; vehicleId: string; label: string; plate: string | null; customerName: string }>;
 };
@@ -821,11 +837,12 @@ export async function getVehicleChangeOptions(rentalId: string): Promise<Result<
     const { rental, organization } = ctx;
     const handedOver = ON_RENT.includes(String(rental.status));
     const gapDays = bookingRules(organization.settings).gapDays;
+    const usualDeposit = Math.max(0, Number((organization.settings as any)?.public_booking?.deposit || 0));
     const from = freeFrom(rental);
     const end = cleanDate(rental.end_date);
 
     const [{ data: vehicles }, busy, { data: others }] = await Promise.all([
-      admin.from("vehicles").select("id, make, model, year, registration_number, status, monthly_rate").eq("organization_id", organizationId).is("deleted_at", null),
+      admin.from("vehicles").select("id, make, model, year, registration_number, status, monthly_rate, deposit_amount").eq("organization_id", organizationId).is("deleted_at", null),
       loadBusyPeriods(admin, organizationId),
       handedOver
         ? admin
@@ -845,7 +862,13 @@ export async function getVehicleChangeOptions(rentalId: string): Promise<Result<
     const free = ((vehicles || []) as any[])
       .filter((vehicle) => vehicle.id !== rental.vehicle_id && !/sold|retired|inactive|archived|written|maintenance/i.test(String(vehicle.status || "")))
       .filter((vehicle) => clear(vehicle.id, from, end, [rentalId]))
-      .map((vehicle) => ({ vehicleId: String(vehicle.id), label: label(vehicle), plate: vehicle.registration_number || null, monthlyRate: Number(vehicle.monthly_rate || 0) }))
+      .map((vehicle) => ({
+        vehicleId: String(vehicle.id),
+        label: label(vehicle),
+        plate: vehicle.registration_number || null,
+        monthlyRate: Number(vehicle.monthly_rate || 0),
+        deposit: vehicle.deposit_amount === null || vehicle.deposit_amount === undefined ? usualDeposit : Math.max(0, Number(vehicle.deposit_amount) || 0)
+      }))
       .sort((a, b) => a.label.localeCompare(b.label));
 
     const swaps = ((others || []) as any[])
@@ -862,6 +885,7 @@ export async function getVehicleChangeOptions(rentalId: string): Promise<Result<
       hasCustomer: Boolean(ctx.customer),
       currentVehicleLabel: label(ctx.vehicle),
       currentRate: Number(rental.rental_rate || 0),
+      currentDeposit: Number(rental.deposit_amount || 0),
       currency: String(rental.currency || "THB"),
       free,
       swaps
@@ -916,6 +940,10 @@ export async function createVehicleChange(input: {
   reason?: string | null;
   disposition?: "available" | "repair";
   newRate?: number | string | null;
+  /** A bigger deposit for the replacement vehicle; leave out to keep (waive the difference). */
+  newDeposit?: number | string | null;
+  /** The customer can't sign now: change the vehicle straight away and collect the signature after. */
+  signLater?: boolean;
 }): Promise<Result<{ applied: boolean; links: Array<{ token: string; customerName: string }> }>> {
   const admin = createSupabaseAdminClient() as any;
   try {
@@ -965,9 +993,27 @@ export async function createVehicleChange(input: {
       mine.new_rate = newRate;
       mine.rate_from = businessToday();
     }
+    const newDeposit = cleanAmount(input.newDeposit);
+    if (!swap && newDeposit !== null && newDeposit > Number(rental.deposit_amount || 0)) {
+      mine.previous_deposit = Number(rental.deposit_amount || 0);
+      mine.new_deposit = newDeposit;
+      mine.deposit_due_date = businessToday();
+    }
 
     if (!swap) {
+      const signLater = Boolean(input.signLater) && options.handedOver;
+      if (signLater) mine.applied_before_signature = businessToday();
       const created = await insertVehicleAmendment(admin, organizationId, rentalId, user.id, mine);
+      if (signLater) {
+        // The vehicle changes now; the rate and deposit on the form still wait for the signature.
+        const outcome = await applyVehicleChange(admin, { changes: mine, created_by: user.id, signed_at: null }, rental);
+        if (outcome !== "done") {
+          await admin.from("rental_amendments").update({ status: "cancelled", cancelled_at: new Date().toISOString(), cancelled_by: user.id }).eq("id", created.id);
+          return { ok: false, error: `Couldn't change the vehicle: ${outcome}.` };
+        }
+        await recordActivityEvent(admin, { organization_id: organizationId, actor_id: user.id, entity_type: "rental", entity_id: rentalId, rental_id: rentalId, vehicle_id: target.vehicleId, customer_id: rental.customer_id, event_type: "vehicle_changed", title: "Vehicle changed ahead of the signature", detail: `${mine.previous_vehicle_label} to ${mine.new_vehicle_label}. The customer still has to sign the change.` } as any).catch(() => undefined);
+        revalidatePath(`/bookings/${rentalId}`);
+      }
       return { ok: true, applied: false, links: [{ token: created.token, customerName: created.customerName }] };
     }
 

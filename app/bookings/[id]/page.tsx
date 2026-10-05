@@ -996,7 +996,10 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             </Card>
 
             {pendingAmendment ? (
-              <PendingAmendmentCard id={pendingAmendment.id} rows={amendmentRows(pendingAmendment.changes)} token={pendingAmendment.token} />
+          <div className="scroll-mt-4" id="amendment" />
+        ) : null}
+        {pendingAmendment ? (
+              <PendingAmendmentCard changedAlready={Boolean(pendingAmendment.changes?.applied_before_signature)} id={pendingAmendment.id} rows={amendmentRows(pendingAmendment.changes)} token={pendingAmendment.token} />
             ) : null}
 
             <RentalDocumentsCard documents={rentalDocuments} />

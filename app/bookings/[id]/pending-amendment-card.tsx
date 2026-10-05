@@ -7,7 +7,7 @@ import { cancelRentalAmendment } from "@/app/actions/amendments";
 import { AmendmentLinkPanel } from "@/components/rental-adjustment-modal";
 import { Card, SectionHeader } from "@/components/ui";
 
-export function PendingAmendmentCard({ id, token, rows }: { id: string; token: string; rows: Array<{ label: string; before: string; after: string }> }) {
+export function PendingAmendmentCard({ id, token, rows, changedAlready = false }: { id: string; token: string; rows: Array<{ label: string; before: string; after: string }>; changedAlready?: boolean }) {
   const router = useRouter();
   const [cancelling, startCancel] = useTransition();
 
@@ -28,11 +28,16 @@ export function PendingAmendmentCard({ id, token, rows }: { id: string; token: s
       <div className="mt-3">
         <AmendmentLinkPanel
           cancelling={cancelling}
-          onCancel={() =>
-            startCancel(async () => {
-              const result = await cancelRentalAmendment(id);
-              if (result.ok) router.refresh();
-            })
+          changedAlready={changedAlready}
+          // Once the vehicle has changed, the form can't be withdrawn: it records what happened.
+          onCancel={
+            changedAlready
+              ? undefined
+              : () =>
+                  startCancel(async () => {
+                    const result = await cancelRentalAmendment(id);
+                    if (result.ok) router.refresh();
+                  })
           }
           token={token}
         />

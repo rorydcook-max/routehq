@@ -20,7 +20,7 @@ type AmendmentContext = {
 };
 
 /** The link the customer signs, with ways to send it. */
-export function AmendmentLinkPanel({ token, onCancel, cancelling }: { token: string; onCancel?: () => void; cancelling?: boolean }) {
+export function AmendmentLinkPanel({ token, onCancel, cancelling, changedAlready = false }: { token: string; onCancel?: () => void; cancelling?: boolean; /** The vehicle was changed ahead of the signature. */ changedAlready?: boolean }) {
   const [copied, setCopied] = useState(false);
   const [origin, setOrigin] = useState("");
   useEffect(() => setOrigin(window.location.origin), []);
@@ -29,7 +29,7 @@ export function AmendmentLinkPanel({ token, onCancel, cancelling }: { token: str
   return (
     <div className="rounded-xl border border-[#bfe0db] bg-[var(--primary-light)] p-3 text-sm">
       <p className="font-bold text-[var(--primary)]">Waiting for the customer to sign</p>
-      <p className="mt-1 text-[12px] text-[var(--foreground-secondary)]">Nothing changes on the rental until they sign. Send them this link:</p>
+      <p className="mt-1 text-[12px] text-[var(--foreground-secondary)]">{changedAlready ? "The vehicle has already been changed; they still need to sign for it. Send them this link:" : "Nothing changes on the rental until they sign. Send them this link:"}</p>
       <p className="font-mono-data mt-2 break-all rounded-lg bg-white px-2 py-1.5 text-[12px]">{url}</p>
       <div className="mt-2 flex flex-wrap gap-2">
         <button

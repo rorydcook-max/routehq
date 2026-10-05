@@ -23,6 +23,8 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
   const [reason, setReason] = useState("");
   const [disposition, setDisposition] = useState<"available" | "repair">("available");
   const [newRate, setNewRate] = useState("");
+  const [topUp, setTopUp] = useState<"require" | "waive">("require");
+  const [signLater, setSignLater] = useState(false);
   const [links, setLinks] = useState<Array<{ token: string; customerName: string }>>([]);
   const [error, setError] = useState("");
   const [pending, startTransition] = useTransition();
@@ -52,6 +54,9 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
   const free = choice.startsWith("free:") ? options?.free.find((item) => item.vehicleId === choice.slice(5)) : null;
   const money = (amount: number) => `${!options || options.currency === "THB" ? "฿" : `${options.currency} `}${Math.round(amount).toLocaleString("en-US")}`;
 
+  // The replacement normally carries a bigger deposit than this rental has.
+  const depositGap = options && free && options.needsSignature ? Math.max(0, free.deposit - options.currentDeposit) : 0;
+
   function submit() {
     if (!options || (!swap && !free)) return;
     setError("");
@@ -62,7 +67,9 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
         swapRentalId: swap ? swap.rentalId : null,
         reason: reason || (swap ? "Exchange between customers" : null),
         disposition,
-        newRate: newRate ? Number(newRate) : null
+        newRate: newRate ? Number(newRate) : null,
+        newDeposit: depositGap > 0 && topUp === "require" ? free!.deposit : null,
+        signLater: signLater && !swap
       });
       if (!result.ok) {
         setError(result.error);
@@ -110,14 +117,16 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
                 <p className="text-sm text-[var(--foreground-secondary)]">
                   {links.length > 1
                     ? "Each customer signs a short change form. The vehicles are exchanged in RouteHQ once both have signed; then you complete a handover and a collection form with each of them."
-                    : options?.handedOver
+                    : signLater
+                      ? "The vehicle has been changed. Complete the handover and collection forms now, and send the customer this form to sign when they can."
+                      : options?.handedOver
                       ? "The customer signs a short change form. Once they have, you complete a handover form for the replacement and a collection form for the original."
                       : "The customer signs a short change form. The booking moves to the new vehicle once they have."}
                 </p>
                 {links.map((link) => (
                   <div key={link.token}>
                     <p className="mb-1 text-xs font-bold uppercase text-[var(--muted)]">For {link.customerName}</p>
-                    <AmendmentLinkPanel token={link.token} />
+                    <AmendmentLinkPanel changedAlready={signLater && links.length === 1} token={link.token} />
                   </div>
                 ))}
                 <button className="secondary-action pressable w-full justify-center px-3 py-2" onClick={close} type="button">
@@ -188,8 +197,28 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
                           <input className={field} inputMode="numeric" min="0" onChange={(event) => setNewRate(event.target.value)} placeholder={String(options.currentRate)} type="number" value={newRate} />
                         </label>
                       ) : null}
+                      {depositGap > 0 && free ? (
+                        <label className={labelClass}>
+                          Deposit: the {free.label} normally has {money(free.deposit)}, this rental has {money(options.currentDeposit)}
+                          <select className={field} onChange={(event) => setTopUp(event.target.value as "require" | "waive")} value={topUp}>
+                            <option value="require">Ask for the {money(depositGap)} top-up</option>
+                            <option value="waive">Waive it and keep {money(options.currentDeposit)}</option>
+                          </select>
+                        </label>
+                      ) : null}
+                      {options.handedOver && !swap ? (
+                        <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
+                          <input checked={signLater} className="mt-1 accent-[#0d9488]" onChange={(event) => setSignLater(event.target.checked)} type="checkbox" />
+                          <span className="text-sm text-[var(--foreground-secondary)]">
+                            <span className="block font-semibold text-[var(--foreground)]">The customer can&apos;t sign right now</span>
+                            Change the vehicle straight away (a breakdown, say) and get the signature afterwards. It stays on To do until they sign.
+                          </span>
+                        </label>
+                      ) : null}
                       <p className="mt-3 text-xs leading-5 text-[var(--muted)]">
-                        {options.handedOver
+                        {signLater && !swap
+                          ? "The vehicle changes now and the handover and collection forms appear on To do. The customer signs the short change form when they can; a new rate or deposit starts when they sign."
+                          : options.handedOver
                           ? "The customer signs a short form with only this change on it. Nothing changes until they sign. Then a handover form for the replacement and a collection form for the original appear on To do."
                           : "The customer has signed for the current vehicle, so they sign a short form with only this change on it. The booking moves once they sign."}
                       </p>
@@ -199,7 +228,7 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
                   )}
 
                   <button className="primary-action pressable mt-4 w-full justify-center px-3 py-2 disabled:opacity-60" disabled={pending || (!swap && !free)} onClick={submit} type="button">
-                    {pending ? "Working..." : options.needsSignature ? (swap ? "Prepare the two change forms" : "Prepare the change form") : "Move booking"}
+                    {pending ? "Working..." : options.needsSignature ? (swap ? "Prepare the two change forms" : signLater ? "Change the vehicle now" : "Prepare the change form") : "Move booking"}
                   </button>
                 </>
               )

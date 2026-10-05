@@ -39,6 +39,11 @@ export type AmendmentChanges = {
   /** When two rentals exchange vehicles: the other rental, and the amendment its customer signs. */
   swap_with_rental_id?: string | null;
   swap_group?: string | null;
+  /**
+   * The customer couldn't sign on the spot (a breakdown, say), so the vehicle was
+   * changed first and this is signed afterwards. Holds the date it was changed.
+   */
+  applied_before_signature?: string | null;
   /** Extra wording the business wants the customer to agree to. */
   additional_terms?: string | null;
 };
@@ -195,6 +200,9 @@ export function renderAmendmentHtml(input: AmendmentRenderInput) {
         ? `<li>The condition of the replacement vehicle is recorded on a handover form, and the condition of the vehicle given up on a collection form, each signed by the renter. Both forms are part of the agreement. Any charge for the vehicle given up (damage, fuel) is settled on the terms of the agreement.</li>`
         : "") +
       `<li>The security deposit and the rental dates carry over unchanged unless this amendment says otherwise.</li>` +
+      (changes.applied_before_signature
+        ? `<li>The vehicles were changed on ${escapeHtml(amendmentDate(changes.applied_before_signature))}, before this amendment was signed. By signing, the renter confirms that change.</li>`
+        : "") +
       (changes.swap_with_rental_id ? `<li>The replacement vehicle is currently on another rental. This change takes effect once that vehicle is released by its renter signing their own change.</li>` : "")
     : "";
   const depositClause =

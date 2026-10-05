@@ -334,6 +334,11 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
             {item.action === "refund" ? "Record refund" : "Answer"}
           </Link>
         ) : null}
+        {item.kind === "task" && !item.completedAt && item.rentalId && item.action === "swap_signature" ? (
+          <Link className="primary-action pressable min-h-9 px-3 text-xs" href={`/bookings/${item.rentalId}#amendment`}>
+            Send the form
+          </Link>
+        ) : null}
         {item.kind === "task" && !item.completedAt && item.rentalId && (item.action === "swap_handover" || item.action === "swap_collection") ? (
           <Link
             className="primary-action pressable min-h-9 px-3 text-xs"

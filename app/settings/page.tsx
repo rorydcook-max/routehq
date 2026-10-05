@@ -32,6 +32,7 @@ import { AppShell } from "@/components/app-shell";
 import { PendingButton } from "@/components/pending-button";
 import { Badge, Card, Fold, SectionHeader } from "@/components/ui";
 import { OpenOnHash } from "@/components/open-on-hash";
+import { freshPromptPayQrUrl } from "@/lib/promptpay-qr";
 import { PushToggle } from "@/components/push-toggle";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
@@ -239,6 +240,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     recipient_line_id: string | null;
   }>;
 
+  const promptPayQrDisplayUrl = tab === "rentals" ? await freshPromptPayQrUrl(await createSupabaseServerClient(), organization.promptpay_qr_url, 60 * 60) : organization.promptpay_qr_url;
   const paymentNames: Record<string, string> = { cash: "Cash", promptpay: "PromptPay", bank_transfer: "Bank transfer", wise: "Wise", revolut: "Revolut" };
   const acceptedMethods = Array.from(new Set(["cash", ...((organization.accepted_payment_methods as unknown as string[] | null) || [])])).filter((method) => method in paymentNames);
   const paymentSummary = acceptedMethods.map((method) => paymentNames[method]).join(", ");
@@ -341,7 +343,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             settings={{
               accepted_payment_methods: organization.accepted_payment_methods,
               promptpay_id: organization.promptpay_id,
-              promptpay_qr_url: organization.promptpay_qr_url,
+              promptpay_qr_url: promptPayQrDisplayUrl,
               bank_name: organization.bank_name,
               bank_account_number: organization.bank_account_number,
               bank_account_name: organization.bank_account_name,

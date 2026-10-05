@@ -1,5 +1,6 @@
 "use server";
 
+import { promptPayQrPath } from "@/lib/promptpay-qr";
 import { businessToday } from "@/lib/business-time";
 import { revalidatePath } from "next/cache";
 import { SIGNATURE_AUTHORISATION_TEXT, SIGNATURE_AUTHORISATION_TEXT_VERSION } from "@/lib/signature-authorisation";
@@ -242,7 +243,7 @@ export async function updatePaymentSettings(formData: FormData) {
   let promptPayQrUrl = organization?.promptpay_qr_url ?? null;
 
   if (removePromptPayQr) {
-    const existingPath = storagePathFromPublicUrl(promptPayQrUrl);
+    const existingPath = promptPayQrPath(promptPayQrUrl);
     if (existingPath) {
       await supabase.storage.from("documents").remove([existingPath]);
     }

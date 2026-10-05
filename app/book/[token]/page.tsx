@@ -344,7 +344,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
           >
             <span>
               <span className="block text-sm font-semibold text-[var(--primary)]">A change to your rental needs your signature</span>
-              <span className="block text-xs text-[var(--foreground-secondary)]">Review the new dates or price and sign in one step.</span>
+              <span className="block text-xs text-[var(--foreground-secondary)]">See what is changing and sign in one step.</span>
             </span>
             <span className="shrink-0 rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white">Review</span>
           </a>

@@ -6,6 +6,7 @@ import { defaultRentalContractTemplate, embedLogoInContractVariables, ensureDefa
 import { loadPublicRentalAgreementForPage } from "@/lib/rental-document-customer-signing";
 import { ensureRentalAgreementDraft } from "@/lib/rental-agreement-automation";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { freshPromptPayQrUrl } from "@/lib/promptpay-qr";
 
 export type PublicBookingState = "not_found" | "expired" | "cancelled" | "taken" | "ready" | "active" | "completed";
 
@@ -194,7 +195,8 @@ export async function getPublicBookingDetail(token: string) {
     ? resolveOrganizationBrandingDisplayUrls(supabase, organization, { allowExternalUrl: true, expiresIn: 60 * 60 })
     : Promise.resolve({ logoUrl: null, signatureUrl: null });
   // The remaining lookups don't depend on each other, so they run together.
-  const [deliveryPhotoUrls, agreementResult, signedContractUrl, organizationBranding, contractVariables] = await Promise.all([
+  const [promptPayQrUrl, deliveryPhotoUrls, agreementResult, signedContractUrl, organizationBranding, contractVariables] = await Promise.all([
+    freshPromptPayQrUrl(supabase, organization?.promptpay_qr_url),
     deliveryPhotoUrlsPending,
     agreementReads,
     signedContractPath
@@ -274,7 +276,7 @@ export async function getPublicBookingDetail(token: string) {
       documents: documentCategories.every((category) => uploadedCategories.has(category)),
       agreement: Boolean(rentalDocumentAgreement?.eligibility?.fullyExecuted)
     },
-    org_payment: organizationPaymentSettings(organization),
+    org_payment: { ...organizationPaymentSettings(organization), promptpay_qr_url: promptPayQrUrl },
     customerPortalActions: portalActionsResult.data || [],
     deliveryInspection,
     deliveryPhotoUrls: deliveryPhotoUrls.filter(Boolean),

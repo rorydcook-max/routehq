@@ -80,7 +80,7 @@ function escapeHtml(value: unknown) {
 }
 
 export function amendmentMoney(value: number | null | undefined, currency = "THB") {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: currency || "THB", maximumFractionDigits: 2 }).format(Number(value || 0));
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: currency || "THB", minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(Number(value || 0));
 }
 
 /** "2026-10-01" -> "1 Oct 2026". */

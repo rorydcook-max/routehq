@@ -24,17 +24,37 @@ type AmendmentContext = {
 export function AmendmentLinkPanel({ token, onCancel, cancelling, changedAlready = false }: { token: string; onCancel?: () => void; cancelling?: boolean; /** The vehicle was changed ahead of the signature. */ changedAlready?: boolean }) {
   const [copied, setCopied] = useState(false);
   const [origin, setOrigin] = useState("");
-  useEffect(() => setOrigin(window.location.origin), []);
+  const [canNativeShare, setCanNativeShare] = useState(false);
+  useEffect(() => {
+    setOrigin(window.location.origin);
+    setCanNativeShare(typeof navigator !== "undefined" && typeof navigator.share === "function");
+  }, []);
   const url = `${origin}/amend/${token}`;
   const message = `Please review and sign the change to your rental: ${url}`;
   return (
     <div className="rounded-xl border border-[#bfe0db] bg-[var(--primary-light)] p-3 text-sm">
       <p className="font-bold text-[var(--primary)]">Waiting for the customer to sign</p>
       <p className="mt-1 text-[12px] text-[var(--foreground-secondary)]">{changedAlready ? "The vehicle has already been changed; they still need to sign for it. Send them this link:" : "Nothing changes on the rental until they sign. Send them this link:"}</p>
-      <p className="font-mono-data mt-2 break-all rounded-lg bg-white px-2 py-1.5 text-[12px]">{url}</p>
-      <div className="mt-2 flex flex-wrap gap-2">
+      {canNativeShare ? (
         <button
-          className="pressable rounded-lg bg-[var(--primary)] px-3 py-2 text-xs font-semibold text-white"
+          className="pressable mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white"
+          onClick={() => {
+            navigator.share({ text: message }).catch(() => undefined);
+          }}
+          type="button"
+        >
+          Send to customer
+        </button>
+      ) : null}
+      <div className="mt-2 grid grid-cols-3 gap-2">
+        <a className="pressable inline-flex min-h-11 items-center justify-center rounded-lg border border-[var(--border)] bg-white px-2 text-xs font-semibold text-[var(--foreground-secondary)]" href={`https://wa.me/?text=${encodeURIComponent(message)}`} rel="noreferrer" target="_blank">
+          WhatsApp
+        </a>
+        <a className="pressable inline-flex min-h-11 items-center justify-center rounded-lg border border-[var(--border)] bg-white px-2 text-xs font-semibold text-[var(--foreground-secondary)]" href={`https://line.me/R/share?text=${encodeURIComponent(message)}`} rel="noreferrer" target="_blank">
+          LINE
+        </a>
+        <button
+          className="pressable inline-flex min-h-11 items-center justify-center rounded-lg border border-[var(--border)] bg-white px-2 text-xs font-semibold text-[var(--foreground-secondary)]"
           onClick={() => {
             navigator.clipboard?.writeText(url).then(() => setCopied(true), () => undefined);
           }}
@@ -42,15 +62,14 @@ export function AmendmentLinkPanel({ token, onCancel, cancelling, changedAlready
         >
           {copied ? "Copied" : "Copy link"}
         </button>
-        <a className="pressable rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground-secondary)]" href={`https://wa.me/?text=${encodeURIComponent(message)}`} rel="noreferrer" target="_blank">
-          Send on WhatsApp
-        </a>
-        <a className="pressable rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground-secondary)]" href={url} rel="noreferrer" target="_blank">
-          Preview
+      </div>
+      <div className="mt-2 flex flex-wrap gap-2">
+        <a className="pressable inline-flex min-h-10 items-center rounded-lg px-2 text-xs font-semibold text-[var(--primary)] underline" href={url} rel="noreferrer" target="_blank">
+          See what they will see
         </a>
         {onCancel ? (
-          <button className="pressable rounded-lg border border-[#fecdd3] bg-white px-3 py-2 text-xs font-semibold text-[#be123c] disabled:opacity-60" disabled={cancelling} onClick={onCancel} type="button">
-            {cancelling ? "Cancelling..." : "Cancel amendment"}
+          <button className="pressable ml-auto inline-flex min-h-10 items-center rounded-lg px-2 text-xs font-semibold text-[#be123c] underline disabled:opacity-60" disabled={cancelling} onClick={onCancel} type="button">
+            {cancelling ? "Cancelling..." : "Cancel this change"}
           </button>
         ) : null}
       </div>
@@ -146,7 +165,7 @@ function OptionCard({
 
   return (
     <button
-      className={`pressable flex min-h-24 flex-1 items-start gap-3 rounded-xl border p-3 text-left transition ${selected ? activeClass : "border-[var(--border)] bg-white hover:border-[var(--border-strong)]"}`}
+      className={`pressable flex min-h-12 flex-1 items-center gap-3 rounded-xl border px-3 py-2 text-left transition sm:min-h-24 sm:items-start sm:py-3 ${selected ? activeClass : "border-[var(--border)] bg-white hover:border-[var(--border-strong)]"}`}
       onClick={onClick}
       type="button"
     >
@@ -155,7 +174,7 @@ function OptionCard({
       </span>
       <span>
         <span className="block text-[13px] font-bold text-[var(--foreground)]">{title}</span>
-        <span className="mt-1 block text-[11px] leading-5 text-[var(--muted)]">{description}</span>
+        <span className={`mt-0.5 text-[11px] leading-4 text-[var(--muted)] sm:mt-1 sm:block sm:leading-5 ${selected ? "block" : "hidden"}`}>{description}</span>
       </span>
     </button>
   );
@@ -395,7 +414,7 @@ export function RentalAdjustmentModal({
           </button>
         </div>
 
-        <div className={`mt-4 grid gap-3 ${agreementSigned && !openEnded ? "sm:grid-cols-3" : agreementSigned || !openEnded ? "sm:grid-cols-2" : ""}`}>
+        <div className={`mt-4 grid gap-2 sm:gap-3 ${agreementSigned && !openEnded ? "sm:grid-cols-3" : agreementSigned || !openEnded ? "sm:grid-cols-2" : ""}`}>
           {openEnded ? null : (
             <OptionCard
               description="Move the return date further out and record an extension payment"

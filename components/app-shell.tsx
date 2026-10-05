@@ -50,26 +50,28 @@ type NavItem = {
   icon: typeof Home;
 };
 
-const mainNavItems: NavItem[] = [
+// What an owner opens every day, in the order the day goes.
+const dailyItems: NavItem[] = [
   { key: "dashboard", href: "/", icon: Home },
-  { key: "fleet", href: "/fleet", icon: Car },
+  { key: "tasks", href: "/tasks", icon: ListChecks },
+  { key: "inbox", href: "/inbox", icon: MessagesSquare },
+  { key: "bookings", href: "/bookings", icon: ClipboardList },
   { key: "calendar", href: "/calendar", icon: CalendarDays },
+  { key: "fleet", href: "/fleet", icon: Car },
+  { key: "customers", href: "/customers", icon: Users }
+];
+
+// Looked at now and then: money, paperwork and set-up.
+const recordItems: NavItem[] = [
+  { key: "transactions", href: "/transactions", icon: ReceiptText },
   { key: "reports", href: "/reports", icon: BarChart3 },
+  { key: "documents", href: "/documents", icon: FileText },
+  { key: "rentalCalculator", href: "/rental-calculator", icon: Calculator },
   { key: "settings", href: "/settings", icon: Settings }
 ];
 
-const operationsItems: NavItem[] = [
-  { key: "inbox", href: "/inbox", icon: MessagesSquare },
-  { key: "customers", href: "/customers", icon: Users },
-  { key: "bookings", href: "/bookings", icon: ClipboardList },
-  { key: "tasks", href: "/tasks", icon: ListChecks },
-  { key: "transactions", href: "/transactions", icon: ReceiptText },
-  { key: "documents", href: "/documents", icon: FileText },
-  { key: "rentalCalculator", href: "/rental-calculator", icon: Calculator }
-];
-
 // Phones get the four places used most every day; everything else is under More.
-const mobileBarKeys: NavKey[] = ["dashboard", "bookings", "fleet", "calendar"];
+const mobileBarKeys: NavKey[] = ["dashboard", "tasks", "inbox", "bookings"];
 
 export function AppShell({ children, userEmail }: { children: React.ReactNode; userEmail?: string | null }) {
   const t = useTranslations("nav");
@@ -94,8 +96,8 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
   const isTeammate = shell.role === "teammate";
   const hasSeveralBusinesses = shell.organizations.length > 1;
   const activeBusiness = shell.organizations.find((organization) => organization.active);
-  const visibleMainNavItems = isTeammate ? mainNavItems.filter((item) => item.href !== "/settings") : mainNavItems;
-  const allNavItems = [...visibleMainNavItems, ...operationsItems];
+  const visibleRecordItems = isTeammate ? recordItems.filter((item) => item.href !== "/settings") : recordItems;
+  const allNavItems = [...dailyItems, ...visibleRecordItems];
   const mobileBarItems = mobileBarKeys.map((key) => allNavItems.find((item) => item.key === key)).filter(Boolean) as NavItem[];
   const moreItems = allNavItems.filter((item) => !mobileBarKeys.includes(item.key));
 
@@ -111,30 +113,13 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
         </div>
         {!isTeammate ? <AskBox variant="sidebar" /> : null}
         <nav className="scrollbar-none min-h-0 flex-1 space-y-0.5 overflow-y-auto">
-          <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]">{t("main")}</p>
-          {visibleMainNavItems.map((item) => {
+          {allNavItems.map((item, index) => {
             const Icon = item.icon;
             return (
               <Link
                 className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm font-semibold transition ${
-                  isActive(item.href)
-                    ? "bg-[var(--primary-light)] text-[var(--primary)]"
-                    : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--foreground)]"
-                }`}
-                href={item.href}
-                key={item.key}
-              >
-                <Icon size={16} />
-                {t(item.key)}
-              </Link>
-            );
-          })}
-          <p className="mb-2 mt-4 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]">{t("operations")}</p>
-          {operationsItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link
-                className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm font-semibold transition ${
+                  index === dailyItems.length ? "!mt-3 " : ""
+                }${
                   isActive(item.href)
                     ? "bg-[var(--primary-light)] text-[var(--primary)]"
                     : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--foreground)]"
@@ -233,7 +218,12 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
                 href={item.href}
                 key={item.key}
               >
-                <Icon size={16} />
+                <span className="relative">
+                  <Icon size={18} />
+                  {item.key === "inbox" && shell.unreadChats > 0 ? (
+                    <span className="absolute -right-2.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--primary)] px-1 text-[10px] font-semibold text-white">{shell.unreadChats}</span>
+                  ) : null}
+                </span>
                 <span className="truncate">{t(item.key)}</span>
               </Link>
             );

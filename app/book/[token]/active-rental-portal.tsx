@@ -6,7 +6,7 @@ import { useMemo, useState, useTransition } from "react";
 import { AlertTriangle, CalendarCheck, CalendarPlus, CheckCircle2, FileText, ImageIcon, MessageCircle } from "lucide-react";
 import { submitCustomerPortalAction } from "@/app/actions/public-booking";
 import type { PortalBundle, PortalPayment } from "@/lib/payment-receipts";
-import { quoteStay, type Rates } from "@/lib/rental-estimate";
+import { planFor, quoteStay, type Rates } from "@/lib/rental-estimate";
 import { PortalPayments } from "./portal-payments";
 
 type OpenEndedOffer = { monthlyRate: number; firstDue: string };
@@ -233,9 +233,14 @@ function ActionForm({
             <input className={inputClass} min={minExtensionDate} name="newEndDate" onChange={(event) => setNewEnd(event.target.value)} required type="date" value={newEnd} />
           </label>
         )}
-        {!noEnd && extensionQuote ? (
+        {!noEnd && extensionQuote && extensionRates && planFor(extensionRates, extraDays) ? (
           <p className="rounded-xl bg-[var(--primary-light)] p-3 text-sm text-[var(--foreground)]">
             <span className="font-semibold">฿{extensionQuote.amount.toLocaleString("en-US")}</span> for {extensionQuote.explain}.
+          </p>
+        ) : !noEnd && extraDays > 0 ? (
+          // No rate meant for a stay this short (or no rates at all): the business sets the price, so none is promised here.
+          <p className="rounded-xl bg-[#f5f4f1] p-3 text-sm text-[var(--foreground-secondary)]">
+            {organizationName} will confirm the price for {extraDays} extra {extraDays === 1 ? "day" : "days"} before anything changes.
           </p>
         ) : null}
         <label className="block text-sm font-bold text-[var(--foreground-secondary)]">

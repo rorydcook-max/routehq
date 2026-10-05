@@ -69,7 +69,8 @@ export function rentalRateCard(vehicle: { daily_rate?: unknown; weekly_rate?: un
   if (agreed > 0) {
     if (period === "daily") card.dailyRate = agreed;
     else if (period === "weekly") card.weeklyRate = agreed;
-    else card.monthlyRate = agreed;
+    // A one-off agreed price ("custom") is for that whole rental, not a monthly rate to price more days from.
+    else if (period === "monthly") card.monthlyRate = agreed;
   }
   return card;
 }

@@ -5,7 +5,7 @@ import { businessToday } from "@/lib/business-time";
 import { notifyOperator } from "@/lib/notify-operator";
 import { addMonthlyPayments, nextMonthlyDue } from "@/lib/open-ended-billing";
 import { BLOCKING_RENTAL_STATUSES } from "@/lib/rental-conflicts";
-import { quoteStay, rentalRateCard } from "@/lib/rental-estimate";
+import { planFor, quoteStay, rentalRateCard } from "@/lib/rental-estimate";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 
 /**
@@ -109,6 +109,16 @@ export async function tryAutoExtend(admin: any, rentalId: string, newEndDateRaw:
     const extraDays = daysBetween(currentEnd, endDate);
     const quote = quoteStay(card, extraDays);
     const amount = quote?.amount ?? 0;
+    // With nobody looking, extra days are only added at a rate meant for a stay of that length
+    // (the same rule as booking online). A few days on a monthly-only vehicle, or a vehicle with
+    // no rates at all, goes to the business to price - never through at a slice of the monthly
+    // rate, and never for nothing.
+    if (!(amount > 0)) {
+      return { applied: false, reason: "there are no rates to price the extra days from. Use Extend on the booking to set the price yourself" };
+    }
+    if (!options.byStaff && !planFor(card, extraDays)) {
+      return { applied: false, reason: `there is no daily or weekly rate for a short extension. From the rate you do have it comes to ${baht(amount)} (${quote?.explain}); approve to accept that, or use Extend on the booking to set another price` };
+    }
 
     // The database refuses the change if another booking slipped in meanwhile.
     const { error: updateError } = await admin.from("rentals").update({ end_date: endDate }).eq("id", rental.id).eq("end_date", rental.end_date);

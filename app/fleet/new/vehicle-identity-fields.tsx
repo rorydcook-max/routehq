@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { SectionHeader } from "@/components/ui";
+import { Fold, SectionHeader } from "@/components/ui";
 import {
   fetchVehicleMakesForCategory,
   fetchVehicleModels,
@@ -475,7 +475,7 @@ export function VehicleIdentityFields({
   return (
     <>
       <div className="rounded-2xl border border-[#bfe0db] bg-[var(--primary-light)] p-4">
-        <SectionHeader eyebrow="Quick start (optional)" title="Scan the blue book" />
+        <SectionHeader eyebrow="Quickest way" title="Take a photo of the blue book" />
         <p className="mt-2 text-sm text-[var(--muted)]">
           Take a photo of the Thai blue book (เล่มทะเบียน) or another registration document and we&apos;ll fill in what we can read. Check the details before saving.
         </p>
@@ -672,19 +672,24 @@ export function VehicleIdentityFields({
       </div>
 
       <div className="rounded-2xl border border-[var(--border)] bg-white p-4">
-        <SectionHeader eyebrow="Vehicle details" title="Registration and specs" />
+        <SectionHeader eyebrow="Vehicle details" title="Registration" />
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <label className="block">
-            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Registration number</span>
+            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Number plate</span>
             <input className={`${inputClass} font-mono-data`} name="registrationNumber" onChange={(event) => setRegistrationNumber(event.target.value)} placeholder="BKK-1234" required value={registrationNumber} />
-          </label>
-          <label className="block">
-            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">VIN / frame number</span>
-            <input className={`${inputClass} font-mono-data`} name="vin" onChange={(event) => setVin(event.target.value.trim().toUpperCase())} placeholder="VIN or chassis/frame number" value={vin} />
           </label>
           <label className="block">
             <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Colour</span>
             <input className={inputClass} name="color" onChange={(event) => setColor(event.target.value)} placeholder="Pearl White" value={color} />
+          </label>
+        </div>
+        {/* Nice to have, never needed to rent the vehicle out. Opens by itself when the blue book filled it in, so it gets checked. */}
+        <div className="mt-4">
+          <Fold open={ocrStatus === "done"} summary="Frame number, gearbox, seats, engine" title="More about the vehicle">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="block">
+            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">VIN / frame number</span>
+            <input className={`${inputClass} font-mono-data`} name="vin" onChange={(event) => setVin(event.target.value.trim().toUpperCase())} placeholder="VIN or chassis/frame number" value={vin} />
           </label>
           <label className="block">
             <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Transmission</span>
@@ -719,6 +724,8 @@ export function VehicleIdentityFields({
             <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Body class</span>
             <input className={inputClass} name="bodyClass" onChange={(event) => setBodyClass(event.target.value)} placeholder="Sedan/Saloon" value={bodyClass} />
           </label>
+        </div>
+          </Fold>
         </div>
       </div>
     </>

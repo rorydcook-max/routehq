@@ -16,12 +16,12 @@ export default async function ImportVehiclesPage() {
           </Link>
           <h1 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-3xl">Import vehicles</h1>
           <p className="mt-1 text-sm font-medium text-[var(--muted)]">
-            Upload a spreadsheet or paste a public Google Sheets link. RouteHQ will use AI to map the columns before import.
+            Have your vehicles in a spreadsheet? RouteHQ reads it and works out which column is which. You check everything before anything is added.
           </p>
         </div>
 
         <Card>
-          <SectionHeader eyebrow="Fleet import" title="AI-assisted vehicle import" />
+          <SectionHeader eyebrow="Fleet import" title="Add many vehicles at once" />
           <div className="mt-5">
             <ImportWizard defaultImportType="vehicles" />
           </div>

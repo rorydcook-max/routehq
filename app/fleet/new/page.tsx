@@ -6,7 +6,7 @@ import { AppShell } from "@/components/app-shell";
 import { LocalizedDateInput } from "@/components/localized-date-input";
 import { MoneyInput } from "@/components/money-input";
 import { PendingButton } from "@/components/pending-button";
-import { Card, SectionHeader } from "@/components/ui";
+import { Card, Fold, SectionHeader } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { ensureDefaultBranch } from "@/lib/branches";
 import { defaultCalendarForLocale } from "@/lib/i18n/calendars";
@@ -58,7 +58,7 @@ export default async function NewVehiclePage() {
           <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <h1 className="text-2xl font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-3xl">Add vehicle</h1>
-              <p className="mt-1 text-sm font-medium text-[var(--muted)]">Add a car, motorbike or van. Only the make, model and registration are needed now; fill in the rest any time.</p>
+              <p className="mt-1 text-sm font-medium text-[var(--muted)]">Add a car, motorbike or van. Only the make, model and number plate are needed now. Fill in the rest any time.</p>
             </div>
             <Link className="pressable inline-flex justify-center rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm font-bold text-[var(--foreground-secondary)] hover:border-[var(--primary-blue)] hover:text-[var(--primary-blue)]" href="/fleet/import">
               Import vehicles
@@ -72,28 +72,6 @@ export default async function NewVehiclePage() {
             <input name="organizationId" type="hidden" value={organization.id} />
 
             <VehicleIdentityFields categories={categories} initialMakes={vehicleMakes || []} inputClass={inputClass} />
-
-            <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-4">
-              <SectionHeader eyebrow="Acquisition" title="Mileage and value" />
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Current mileage</span>
-                  <input className={`${inputClass} font-mono-data`} min="0" name="mileage" placeholder="0" type="number" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Purchase mileage</span>
-                  <input className={`${inputClass} font-mono-data`} min="0" name="purchaseMileage" placeholder="0" type="number" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Purchase price</span>
-                  <MoneyInput currency={organization.currency || "THB"} name="purchasePrice" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Estimated value</span>
-                  <MoneyInput currency={organization.currency || "THB"} name="estimatedValue" />
-                </label>
-              </div>
-            </div>
 
             <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-4">
               <SectionHeader eyebrow="Rental pricing" title="Rates and deposit" />
@@ -118,34 +96,60 @@ export default async function NewVehiclePage() {
               </label>
             </div>
 
-            <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-4">
-              <SectionHeader eyebrow="Location" title="Branch assignment" />
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            {/* Everything below can wait: one tap away, filled in any time. */}
+            <Fold summary="So you are reminded before they run out" title="Tax, insurance and service dates">
+              <ComplianceFields calendar={preferredCalendar} inputClass={inputClass} preferredLocale={preferredLocale} />
+            </Fold>
+            <Fold summary="Kilometres now, what you paid, what it is worth" title="Mileage and value">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Home branch</span>
-                  <select className={inputClass} defaultValue={defaultBranch?.id} name="homeBranchId">
-                    {branches.map((branch) => (
-                      <option key={branch.id} value={branch.id}>
-                        {branch.name}
-                      </option>
-                    ))}
-                  </select>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Current mileage</span>
+                  <input className={`${inputClass} font-mono-data`} min="0" name="mileage" placeholder="0" type="number" />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Service area</span>
-                  <select className={inputClass} defaultValue="home_branch" name="serviceArea">
-                    <option value="home_branch">Home branch only</option>
-                    <option value="all_branches">All branches</option>
-                  </select>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Purchase mileage</span>
+                  <input className={`${inputClass} font-mono-data`} min="0" name="purchaseMileage" placeholder="0" type="number" />
+                </label>
+                <label className="block">
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Purchase price</span>
+                  <MoneyInput currency={organization.currency || "THB"} name="purchasePrice" />
+                </label>
+                <label className="block">
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Estimated value</span>
+                  <MoneyInput currency={organization.currency || "THB"} name="estimatedValue" />
                 </label>
               </div>
-            </div>
-
-            <ComplianceFields calendar={preferredCalendar} inputClass={inputClass} preferredLocale={preferredLocale} />
-
-            <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-4">
-              <SectionHeader eyebrow="Finance" title="Loan details" />
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            </Fold>
+            {branches.length > 1 ? (
+              <Fold summary={defaultBranch?.name || "Choose a location"} title="Location">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className="block">
+                    <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Home branch</span>
+                    <select className={inputClass} defaultValue={defaultBranch?.id} name="homeBranchId">
+                      {branches.map((branch) => (
+                        <option key={branch.id} value={branch.id}>
+                          {branch.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="block">
+                    <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Service area</span>
+                    <select className={inputClass} defaultValue="home_branch" name="serviceArea">
+                      <option value="home_branch">Home branch only</option>
+                      <option value="all_branches">All branches</option>
+                    </select>
+                  </label>
+                </div>
+              </Fold>
+            ) : (
+              <>
+                <input name="homeBranchId" type="hidden" value={defaultBranch?.id || ""} />
+                <input name="serviceArea" type="hidden" value="home_branch" />
+              </>
+            )}
+            <Fold summary="If the vehicle is on finance" title="Loan">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block">
                   <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Finance provider</span>
                   <input className={inputClass} name="financeLender" type="text" />
@@ -163,7 +167,7 @@ export default async function NewVehiclePage() {
                   <LocalizedDateInput calendar={preferredCalendar} inputClass={inputClass} name="financeEndDate" preferredLocale={preferredLocale} />
                 </label>
               </div>
-            </div>
+            </Fold>
 
             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <Link className="inline-flex justify-center rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm font-bold text-[var(--foreground-secondary)]" href="/fleet">

@@ -1418,7 +1418,8 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             <p className="text-xs font-semibold uppercase text-[var(--primary)]">Agreement version {publicAgreement.versionNumber}</p>
             <p className="mt-1 text-sm font-bold text-[var(--foreground)]">{publicAgreement.businessIdentity.name}</p>
             <div className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
-              <p><span className="font-bold">Rate:</span> {publicAgreement.rentalSummary.rate} / {publicAgreement.rentalSummary.billingPeriod}</p>
+              <p><span className="font-bold">Rate:</span> {publicAgreement.rentalSummary.rate}{" "}
+                {({ daily: "a day", day: "a day", weekly: "a week", week: "a week", monthly: "a month", month: "a month", custom: "for the rental", "entire period": "for the rental" } as Record<string, string>)[String(publicAgreement.rentalSummary.billingPeriod || "").toLowerCase()] || `/ ${publicAgreement.rentalSummary.billingPeriod}`}</p>
               <p><span className="font-bold">Deposit:</span> {publicAgreement.rentalSummary.deposit}</p>
               {/* Only shown when the agreement actually states one. */}
               {publicAgreement.rentalSummary.standardDailyRate ? (

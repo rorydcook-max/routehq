@@ -38,9 +38,15 @@ function rateLabel(rental: any) {
   const currency = String(rental?.currency || "THB");
   const rate = money(rental?.rental_rate, currency);
   const period = String(rental?.pricing_model || "monthly").toLowerCase().replace(/_/g, " ").trim();
-  if (period === "daily") return `${rate} / day`;
+  if (period === "daily") {
+    // Daily rent is paid in one go, so say what the whole stay comes to.
+    const start = String(rental?.start_date || "").slice(0, 10);
+    const end = String(rental?.end_date || "").slice(0, 10);
+    const days = start && end ? Math.round((new Date(`${end}T00:00:00Z`).getTime() - new Date(`${start}T00:00:00Z`).getTime()) / 86_400_000) : 0;
+    return days > 1 ? `${rate} / day\n${money(Number(rental?.rental_rate || 0) * days, currency)} for ${days} days` : `${rate} / day`;
+  }
   if (period === "weekly") return `${rate} / week`;
-  if (period === "custom") return `${rate} (custom rate)`;
+  if (period === "custom") return `${rate} for the rental`;
   return `${rate} / month`;
 }
 
@@ -168,11 +174,8 @@ function paymentDueText(rental: any, bookingData: Record<string, unknown>) {
   const endDate = rental?.is_indefinite ? "" : formatSummaryDate(rental?.end_date);
   const frequencyLabel = period === "daily" ? "day" : period === "weekly" ? "week" : period === "custom" ? "custom billing period" : "month";
 
-  if (period === "custom") {
-    return endDate && endDate !== "TBD"
-      ? `${firstDueDate}\nThen as agreed until ${endDate}`
-      : `${firstDueDate}\nThen as agreed`;
-  }
+  // Daily and one-off agreed prices are a single payment for the whole rental.
+  if (period === "custom" || period === "daily") return `${firstDueDate} (one payment)`;
 
   // A rental that fits in one billing period has one payment - don't describe a repeating schedule.
   const firstIso = String(deliveryDateTime || "").slice(0, 10);

@@ -113,6 +113,8 @@ export interface ContractVariables {
   rental_rate: string;
   billing_period: string;
   billing_period_label: string;
+  billing_period_label_th: string;
+  payment_due_label_th: string;
   payment_due_label: string;
   deposit_amount: string;
   secondary_deposit_amount: string;
@@ -184,6 +186,8 @@ export const contractVariableKeys = [
   "rental_rate",
   "billing_period",
   "billing_period_label",
+  "billing_period_label_th",
+  "payment_due_label_th",
   "payment_due_label",
   "deposit_amount",
   "secondary_deposit_amount",
@@ -513,16 +517,39 @@ export function buildContractVariables({
           : formatContractTime(rental?.start_date),
     rental_rate: formatAmount(rental?.rental_rate),
     billing_period: stripEmpty(rental?.pricing_model, "rental period"),
+    // These read inside a sentence ("... per month and are due on the same date each month"),
+    // so they are a noun and a phrase, not the stored code ("monthly").
     billing_period_label: (() => {
       const model = stripEmpty(rental?.pricing_model, "rental period");
-      return model === "custom" || model === "once" ? "entire period" : model;
+      if (model === "custom" || model === "once") return "entire period";
+      if (model === "monthly") return "month";
+      if (model === "weekly") return "week";
+      if (model === "daily") return "day";
+      return model;
+    })(),
+    billing_period_label_th: (() => {
+      const model = rental?.pricing_model;
+      if (model === "custom" || model === "once") return "ตลอดระยะเวลาเช่า";
+      if (model === "weekly") return "สัปดาห์";
+      if (model === "daily") return "วัน";
+      return "เดือน";
     })(),
     payment_due_label: (() => {
       const model = rental?.pricing_model;
-      if (model === "custom" || model === "once") return "Paid in full upfront";
-      if (model === "monthly") return "Same date each month";
-      if (model === "weekly") return "Same day each week";
-      return "As agreed";
+      if (model === "custom" || model === "once") return "in full upfront";
+      if (model === "monthly") return "on the same date each month";
+      if (model === "weekly") return "on the same day each week";
+      // Daily rent is one payment for the whole stay.
+      if (model === "daily") return "in full at handover";
+      return "as agreed";
+    })(),
+    payment_due_label_th: (() => {
+      const model = rental?.pricing_model;
+      if (model === "custom" || model === "once") return "เต็มจำนวนล่วงหน้า";
+      if (model === "monthly") return "วันเดียวกันของทุกเดือน";
+      if (model === "weekly") return "วันเดียวกันของทุกสัปดาห์";
+      if (model === "daily") return "เต็มจำนวนเมื่อรับรถ";
+      return "ตามที่ตกลงกัน";
     })(),
     deposit_amount: formatAmount(rental?.deposit_amount),
     secondary_deposit_amount: formatAmount(settings.secondary_deposit_amount),

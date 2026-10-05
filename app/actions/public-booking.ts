@@ -684,8 +684,15 @@ export async function completePublicBooking(formData: FormData) {
     if (direct) {
       await recordPublicCustomerDocument({ supabase, organizationId, customerId, category: upload.category, storagePath: direct.path, name: direct.name, type: direct.type, size: direct.size });
     }
+    // Read on the customer's page already (see identity-ocr.ts): don't fetch and read the same photo again.
+    const alreadyRead =
+      upload.category === "selfie" ||
+      (upload.category === "passport" && (bookingLink.booking_data as any)?.ocr_passport_read === true) ||
+      (upload.category === "driver_license" && (bookingLink.booking_data as any)?.ocr_licence_read === true);
     const file = direct
-      ? await downloadUploadedFile(direct)
+      ? alreadyRead
+        ? null
+        : await downloadUploadedFile(direct)
       : upload.keys.flatMap((key) => formData.getAll(key)).find((value) => value instanceof File && value.size > 0);
     if (file instanceof File) {
       if (!direct) {
@@ -698,7 +705,9 @@ export async function completePublicBooking(formData: FormData) {
         });
       }
 
-      if (upload.category === "passport") {
+      if (alreadyRead) {
+        // Nothing to read.
+      } else if (upload.category === "passport") {
         const result = await extractDocumentOcr(file, "passport");
         if (result.passport_number) ocrBookingData.ocr_passport_number = result.passport_number;
         if (result.nationality) ocrBookingData.ocr_nationality = result.nationality;

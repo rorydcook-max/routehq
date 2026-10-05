@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { CheckCircle2, CreditCard, FileText, IdCard, ImageIcon, MessageCircle, PenLine, Upload, UserRound, XCircle } from "lucide-react";
 import { completePublicBooking, reportPublicBookingPayment } from "@/app/actions/public-booking";
 import { preparePublicBookingUploads } from "@/app/actions/uploads";
+import { readIdentityDocument } from "@/app/actions/identity-ocr";
 import { uploadFormFiles } from "@/lib/direct-upload-client";
 import { extractBodyHtml } from "@/lib/contract-rendering";
 import { formatDeliveryLocation } from "@/lib/delivery-location";
@@ -104,6 +105,26 @@ const inputClass = "mt-2 focus:ring-2 focus:ring-[var(--primary)]/15";
 const emojiSelectStyle = {
   fontFamily: '"Segoe UI Emoji", "Noto Color Emoji", "Apple Color Emoji", "Segoe UI", system-ui, sans-serif'
 };
+
+type DocKind = "passport" | "driver_license";
+type DocReadState = "reading" | "read" | "unreadable" | null;
+const ID_FIELDS = ["passportNumber", "driverLicenseNumber", "driverLicenseExpiry", "driverLicenseCountry"] as const;
+
+/** Phone photos are several megabytes; a copy this size reads just as well and sends in a moment. */
+async function shrinkImage(file: File, maxSide = 1600): Promise<File> {
+  try {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+    canvas.getContext("2d")?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.82));
+    return blob ? new File([blob], "document.jpg", { type: "image/jpeg" }) : file;
+  } catch {
+    return file;
+  }
+}
 
 function buildContractPreviewDocument(contractHtml: string) {
   const bodyHtml = extractBodyHtml(contractHtml);
@@ -593,6 +614,81 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
   const [paymentReported, setPaymentReported] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  // Photos first: the passport and licence are read and the form fills itself in.
+  const [docRead, setDocRead] = useState<Record<DocKind, DocReadState>>({ passport: null, driver_license: null });
+  const [photoNationality, setPhotoNationality] = useState("");
+  const [idOpen, setIdOpen] = useState(false);
+  const filledByPhoto = useRef<Record<string, string>>({});
+  const readQueue = useRef<Promise<void>>(Promise.resolve());
+
+  function fieldValue(name: string) {
+    return formRef.current?.querySelector<HTMLInputElement>(`input[name="${name}"]`)?.value.trim() || "";
+  }
+
+  function fillField(name: string, value: string | null) {
+    const input = formRef.current?.querySelector<HTMLInputElement>(`input[name="${name}"]`);
+    if (!input || !value) return;
+    const current = input.value.trim();
+    // What the customer typed themselves is never replaced.
+    if (current && current !== filledByPhoto.current[name]) return;
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set?.call(input, value);
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    filledByPhoto.current[name] = value;
+  }
+
+  function readDocument(kind: DocKind, picked: File) {
+    if (!picked.type.startsWith("image/")) {
+      // A PDF can't be read here: they type the numbers.
+      setIdOpen(true);
+      return;
+    }
+    setDocRead((state) => ({ ...state, [kind]: "reading" }));
+    // One at a time, so two photos picked quickly don't trip over each other.
+    readQueue.current = readQueue.current.then(async () => {
+      try {
+        const body = new FormData();
+        body.set("token", detail.token);
+        body.set("kind", kind);
+        body.set("file", await shrinkImage(picked));
+        const result = await readIdentityDocument(body);
+        if (!result.ok) {
+          setDocRead((state) => ({ ...state, [kind]: result.reason === "unreadable" ? "unreadable" : null }));
+          setIdOpen(true);
+          return;
+        }
+        const fields = result.fields;
+        if (kind === "passport") {
+          fillField("fullName", fields.fullName);
+          fillField("dateOfBirth", fields.dateOfBirth);
+          fillField("passportNumber", fields.passportNumber);
+          if (fields.nationalityCode) setPhotoNationality(fields.nationalityCode);
+        } else {
+          // The passport is the better source for the name; the licence only fills gaps.
+          if (!filledByPhoto.current.fullName) fillField("fullName", fields.fullName);
+          if (!filledByPhoto.current.dateOfBirth) fillField("dateOfBirth", fields.dateOfBirth);
+          fillField("driverLicenseNumber", fields.licenceNumber);
+          fillField("driverLicenseExpiry", fields.licenceExpiry);
+          fillField("driverLicenseCountry", fields.licenceCountry);
+        }
+        setDocRead((state) => ({ ...state, [kind]: "read" }));
+        // Anything the photo didn't give is shown so they can add it.
+        const mine = kind === "passport" ? ["passportNumber"] : ["driverLicenseNumber", "driverLicenseExpiry", "driverLicenseCountry"];
+        if (mine.some((name) => !fieldValue(name))) setIdOpen(true);
+      } catch {
+        setDocRead((state) => ({ ...state, [kind]: "unreadable" }));
+        setIdOpen(true);
+      }
+    });
+  }
+
+  const readNote = (kind: DocKind) =>
+    docRead[kind] === "reading"
+      ? "Reading your details…"
+      : docRead[kind] === "read"
+        ? "Details read. Please check them below."
+        : docRead[kind] === "unreadable"
+          ? "We couldn't read this photo. Try a clearer one, or type your details below."
+          : null;
   const drawing = useRef(false);
   const isRentalDocumentEngine = true;
   const publicAgreement = detail.rentalDocumentAgreement?.agreement || null;
@@ -753,6 +849,13 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
       return;
     }
 
+    if (ID_FIELDS.some((name) => !String(fd.get(name) || "").trim())) {
+      setIdOpen(true);
+      setError("Please add your passport and driving licence details. Take a photo of each document, or type them in.");
+      document.getElementById("document-numbers")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+
     if (readyToSign) {
       const requiredAcknowledgements = publicAgreement?.requiredAcknowledgements || [];
       const accepted = requiredAcknowledgements.every((ack) => fd.get(`ack_${ack.type}`) === "on");
@@ -844,9 +947,48 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
       <input name="preferredLocale" type="hidden" value="en" />
 
       <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
+        <SectionTitle icon={Upload} label="Your documents" />
+        <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+          Take a clear photo of your passport and driving licence. We read them and fill in your details for you.
+        </p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          <UploadCard cameraName="passportCameraFile" complete={detail.documentStatus.passport} icon={IdCard} label="Passport or ID card" name="passportFile" note={readNote("passport")} noteTone={docRead.passport} onPicked={(picked) => readDocument("passport", picked)} />
+          <UploadCard cameraName="driverLicenseCameraFile" complete={detail.documentStatus.driver_license} icon={FileText} label="Driving licence" name="driverLicenseFile" note={readNote("driver_license")} noteTone={docRead.driver_license} onPicked={(picked) => readDocument("driver_license", picked)} />
+          <UploadCard cameraCapture="user" cameraName="selfieCameraFile" complete={detail.documentStatus.selfie} icon={ImageIcon} label="Selfie photo" name="selfieFile" />
+        </div>
+        {/* The numbers stay folded away: the photos fill them in. They open by themselves when something is missing. */}
+        <details className="mt-2" id="document-numbers" onToggle={(event) => setIdOpen(event.currentTarget.open)} open={idOpen}>
+          <summary className="cursor-pointer py-1 text-sm font-semibold text-[var(--primary)]">
+            {docRead.passport === "read" || docRead.driver_license === "read" ? "Check your passport and licence numbers" : "Type your passport and licence numbers instead"}
+          </summary>
+          <div className="mt-3 grid gap-4 sm:grid-cols-2">
+            <label>
+              <span className="text-sm font-bold text-[var(--foreground-secondary)]">Passport or ID number</span>
+              <input className={inputClass} defaultValue={detail.customer?.passport_number || ""} name="passportNumber" style={fieldStyle} />
+            </label>
+            <label>
+              <span className="text-sm font-bold text-[var(--foreground-secondary)]">Driving licence number</span>
+              <input className={inputClass} defaultValue={detail.customer?.driver_license_number || ""} name="driverLicenseNumber" style={fieldStyle} />
+            </label>
+            <label>
+              <span className="text-sm font-bold text-[var(--foreground-secondary)]">Licence expiry</span>
+              <input className={inputClass} defaultValue={detail.customer?.driver_license_expiry || ""} name="driverLicenseExpiry" style={fieldStyle} type="date" />
+            </label>
+            <label>
+              <span className="text-sm font-bold text-[var(--foreground-secondary)]">Licence country</span>
+              <input className={inputClass} defaultValue={detail.customer?.driver_license_country || ""} name="driverLicenseCountry" style={fieldStyle} />
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
         <SectionTitle icon={UserRound} label="Your details" />
         {detail.completion.details ? (
           <p className="mt-3 rounded-xl bg-[#dcfce7] p-3 text-sm font-bold text-[#166534]">Your details have already been submitted. You can update them below if needed.</p>
+        ) : null}
+        {docRead.passport === "read" || docRead.driver_license === "read" ? (
+          <p className="mt-3 rounded-xl bg-[var(--primary-light)] p-3 text-sm font-semibold text-[var(--primary)]">We filled in what we could read from your documents. Please check it, then add your phone number.</p>
         ) : null}
         <div className="mt-4 grid gap-4 sm:grid-cols-2 sm:items-start">
           <label>
@@ -855,7 +997,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           </label>
           <label>
             <span className="text-sm font-bold text-[var(--foreground-secondary)]">Nationality</span>
-            <NationalitySelect defaultValue={String(detail.customer?.nationality || "")} name="nationality" />
+            <NationalitySelect defaultValue={String(detail.customer?.nationality || "")} fill={photoNationality} name="nationality" />
           </label>
           <label>
             <span className="text-sm font-bold text-[var(--foreground-secondary)]">Phone</span>
@@ -1050,35 +1192,6 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             </div>
           </div>
         </details>
-      </section>
-
-      <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
-        <SectionTitle icon={Upload} label="Documents" />
-        {isRentalDocumentEngine ? (
-          <div className="mt-4 grid gap-4 sm:grid-cols-3">
-            <label>
-              <span className="text-sm font-bold text-[var(--foreground-secondary)]">Passport or ID number</span>
-              <input className={inputClass} defaultValue={detail.customer?.passport_number || ""} name="passportNumber" required style={fieldStyle} />
-            </label>
-            <label>
-              <span className="text-sm font-bold text-[var(--foreground-secondary)]">Driving licence number</span>
-              <input className={inputClass} defaultValue={detail.customer?.driver_license_number || ""} name="driverLicenseNumber" required style={fieldStyle} />
-            </label>
-            <label>
-              <span className="text-sm font-bold text-[var(--foreground-secondary)]">Licence expiry</span>
-              <input className={inputClass} defaultValue={detail.customer?.driver_license_expiry || ""} name="driverLicenseExpiry" required style={fieldStyle} type="date" />
-            </label>
-            <label>
-              <span className="text-sm font-bold text-[var(--foreground-secondary)]">Licence country</span>
-              <input className={inputClass} defaultValue={detail.customer?.driver_license_country || ""} name="driverLicenseCountry" required style={fieldStyle} />
-            </label>
-          </div>
-        ) : null}
-        <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          <UploadCard cameraName="passportCameraFile" complete={detail.documentStatus.passport} icon={IdCard} label="Passport" name="passportFile" />
-          <UploadCard cameraName="driverLicenseCameraFile" complete={detail.documentStatus.driver_license} icon={FileText} label="Driving licence" name="driverLicenseFile" />
-          <UploadCard cameraCapture="user" cameraName="selfieCameraFile" complete={detail.documentStatus.selfie} icon={ImageIcon} label="Selfie photo" name="selfieFile" />
-        </div>
       </section>
 
       <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
@@ -1435,12 +1548,22 @@ function PaymentReportedButton({
   );
 }
 
-function NationalitySelect({ defaultValue, name }: { defaultValue: string; name: string }) {
+function NationalitySelect({ defaultValue, fill, name }: { defaultValue: string; fill?: string; name: string }) {
   const initial = resolveNationality(defaultValue);
   const [search, setSearch] = useState(initial ? `${initial.name} — ${initial.country}` : defaultValue);
   const [selected, setSelected] = useState(initial?.name || defaultValue);
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const selectedRef = useRef(selected);
+  selectedRef.current = selected;
+
+  // A nationality read from the passport fills the picker, unless they already chose one.
+  useEffect(() => {
+    const match = fill ? resolveNationality(fill) : null;
+    if (!match || selectedRef.current) return;
+    setSelected(match.name);
+    setSearch(`${match.name} — ${match.country}`);
+  }, [fill]);
 
   const filtered = useMemo(() => {
     const needle = search.toLowerCase().trim();
@@ -1813,7 +1936,10 @@ function UploadCard({
   complete,
   icon: Icon,
   label,
-  name
+  name,
+  note,
+  noteTone,
+  onPicked
 }: {
   accept?: string;
   cameraCapture?: "user" | "environment";
@@ -1822,6 +1948,9 @@ function UploadCard({
   icon: typeof UserRound;
   label: string;
   name: string;
+  note?: string | null;
+  noteTone?: DocReadState;
+  onPicked?: (file: File) => void;
 }) {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [cameraFile, setCameraFile] = useState<File | null>(null);
@@ -1886,7 +2015,10 @@ function UploadCard({
                 name={name}
                 onChange={(event) => {
                   setUploadFile(event.target.files?.[0] ?? null);
-                  if (event.target.files?.[0]) setCameraFile(null);
+                  if (event.target.files?.[0]) {
+                    setCameraFile(null);
+                    onPicked?.(event.target.files[0]);
+                  }
                 }}
                 type="file"
               />
@@ -1920,7 +2052,10 @@ function UploadCard({
                 name={cameraName}
                 onChange={(event) => {
                   setCameraFile(event.target.files?.[0] ?? null);
-                  if (event.target.files?.[0]) setUploadFile(null);
+                  if (event.target.files?.[0]) {
+                    setUploadFile(null);
+                    onPicked?.(event.target.files[0]);
+                  }
                 }}
                 type="file"
               />
@@ -1954,11 +2089,19 @@ function UploadCard({
             accept={accept}
             className="sr-only"
             name={name}
-            onChange={(event) => setUploadFile(event.target.files?.[0] ?? null)}
+            onChange={(event) => {
+              setUploadFile(event.target.files?.[0] ?? null);
+              if (event.target.files?.[0]) onPicked?.(event.target.files[0]);
+            }}
             type="file"
           />
         </label>
       )}
+      {note ? (
+        <p aria-live="polite" style={{ fontSize: 12, fontWeight: 600, margin: "8px 0 0", color: noteTone === "unreadable" ? "#b45309" : noteTone === "read" ? "#16a34a" : "var(--primary)" }}>
+          {note}
+        </p>
+      ) : null}
     </div>
   );
 }

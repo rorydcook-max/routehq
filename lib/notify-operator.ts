@@ -1,5 +1,14 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { sendLineMessage } from "@/services/messaging/line";
+import { sendPushToOrganization } from "@/lib/push";
+
+const PUSH_TITLES: Record<string, string> = {
+  portal_action: "Customer request",
+  payment_received: "Payment",
+  contract_signed: "Booking signed",
+  return_inspection: "Vehicle returned",
+  new_message: "New message"
+};
 
 /**
  * Sends a text notification to the operator's LINE account.
@@ -8,7 +17,9 @@ import { sendLineMessage } from "@/services/messaging/line";
 export async function notifyOperator(
   organisationId: string,
   message: string,
-  type: string
+  type: string,
+  /** Where tapping the alert on a phone opens. */
+  url = "/tasks"
 ): Promise<void> {
   try {
     const supabase = createSupabaseAdminClient() as any;
@@ -18,6 +29,15 @@ export async function notifyOperator(
       .select("line_user_id, line_channel_access_token, line_notifications_enabled, settings")
       .eq("id", organisationId)
       .maybeSingle();
+
+    // Per-alert switches apply to both the phone alert and LINE.
+    if (org?.settings?.line_notifications?.[`event_${type}`] === false) return;
+    // Phones and computers that asked for alerts. Emoji that lead LINE messages are dropped from the alert text.
+    await sendPushToOrganization(supabase, organisationId, {
+      title: PUSH_TITLES[type] || "RouteHQ",
+      body: message.replace(/^[^\p{L}\p{N}฿]+/u, ""),
+      url
+    });
 
     if (!org?.line_user_id) return;
     if (org.line_notifications_enabled === false) return;

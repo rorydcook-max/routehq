@@ -1,6 +1,6 @@
 "use server";
 
-import OpenAI from "openai";
+import { readFileAsJson, visionProvider } from "@/lib/ai-vision";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 /**
@@ -40,8 +40,7 @@ export async function readIdentityDocument(formData: FormData): Promise<Identity
     if (!token || (kind !== "passport" && kind !== "driver_license")) return { ok: false, reason: "unavailable" };
     if (!(file instanceof File) || file.size === 0 || file.size > MAX_BYTES || !file.type.startsWith("image/")) return { ok: false, reason: "unavailable" };
 
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) return { ok: false, reason: "unavailable" };
+    if (!visionProvider()) return { ok: false, reason: "unavailable" };
 
     const admin = createSupabaseAdminClient() as any;
     const { data: link } = await admin.from("booking_links").select("id, status, booking_data").eq("token", token).maybeSingle();
@@ -50,35 +49,18 @@ export async function readIdentityDocument(formData: FormData): Promise<Identity
     const reads = Number(bookingData.ocr_reads || 0);
     if (reads >= MAX_READS_PER_LINK) return { ok: false, reason: "unavailable" };
 
-    const bytes = Buffer.from(await file.arrayBuffer());
-    const dataUrl = `data:${file.type || "image/jpeg"};base64,${bytes.toString("base64")}`;
     const wanted =
       kind === "passport"
         ? "is_document (true only if this is a passport or a national identity card with readable text), full_name (given names then family name, in Latin letters, normal capitalisation such as \"Anna Maria Schmidt\"), nationality (the adjective in English, such as \"German\"), nationality_country_code (ISO 3166-1 alpha-2), date_of_birth (YYYY-MM-DD), document_number, expiry_date (YYYY-MM-DD)"
         : "is_document (true only if this is a driving licence or international driving permit with readable text), full_name (given names then family name, in Latin letters, normal capitalisation), licence_number, expiry_date (YYYY-MM-DD, or null if the licence shows no expiry), issuing_country (in English), date_of_birth (YYYY-MM-DD)";
-    const client = new OpenAI({ apiKey });
-    const response = await client.chat.completions.create({
-      model: process.env.OPENAI_VISION_MODEL || "gpt-4o",
-      response_format: { type: "json_object" },
-      temperature: 0,
-      max_tokens: 400,
-      messages: [
-        {
-          role: "system",
-          content:
-            "You read identity documents for a vehicle rental form. Return only JSON. Copy what is printed; never guess, complete or correct anything. Use null for any field you cannot read clearly. If the photo is blurred, cropped, a plain colour, or not the document asked for, is_document is false and every other field is null."
-        },
-        {
-          role: "user",
-          content: [
-            { type: "text", text: `Return JSON with: ${wanted}.` },
-            { type: "image_url", image_url: { url: dataUrl, detail: "high" } }
-          ]
-        }
-      ]
+    const parsed = await readFileAsJson({
+      system:
+        "You read identity documents for a vehicle rental form. Copy what is printed; never guess, complete or correct anything. Use null for any field you cannot read clearly. If the photo is blurred, cropped, a plain colour, or not the document asked for, is_document is false and every other field is null.",
+      prompt: `Return JSON with: ${wanted}.`,
+      bytes: Buffer.from(await file.arrayBuffer()),
+      mediaType: file.type || "image/jpeg",
+      maxTokens: 400
     });
-
-    const parsed = JSON.parse(response.choices[0]?.message?.content || "{}") as Record<string, unknown>;
     const fields: IdentityFields = {
       fullName: text(parsed.full_name),
       nationalityCode: kind === "passport" ? countryCode(parsed.nationality_country_code) : null,

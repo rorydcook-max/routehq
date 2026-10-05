@@ -18,6 +18,7 @@ import { getValueTrackerData } from "@/lib/value-tracker";
 import { getOnboardingStatus } from "@/lib/onboarding";
 import { getReceiptsWaiting } from "@/lib/payment-receipts";
 import { getTaskList } from "@/lib/tasks";
+import { PushToggle } from "@/components/push-toggle";
 import { releaseExpiredHolds } from "@/lib/booking-holds";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -321,6 +322,7 @@ export default async function Home() {
 
   return (
     <AppShell userEmail={userEmail}>
+      <PushToggle variant="prompt" />
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-[13px] font-medium text-[var(--muted)]">{headerDate}</p>

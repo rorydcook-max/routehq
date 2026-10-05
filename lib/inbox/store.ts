@@ -1,3 +1,4 @@
+import { sendPushToOrganization } from "@/lib/push";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export type InboxChannel = {
@@ -152,6 +153,14 @@ export async function recordInbound(input: {
       reply_token_at: input.replyToken ? now : null
     })
     .eq("id", conversationId);
+
+  // Tapping the alert opens the Inbox. One alert per chat at a time: a burst of messages replaces itself.
+  await sendPushToOrganization(supabase, input.channel.organization_id, {
+    title: input.displayName || existing?.display_name || "New message",
+    body: input.body.slice(0, 140),
+    url: "/inbox",
+    tag: `chat-${conversationId}`
+  });
 
   return { ok: true as const, isNew: !existing, conversationId };
 }

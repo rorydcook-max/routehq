@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { updatePreferredLocale } from "@/app/actions/settings";
 import { AppShell } from "@/components/app-shell";
 import { PendingButton } from "@/components/pending-button";
+import { PushToggle } from "@/components/push-toggle";
 import { Card, SectionHeader } from "@/components/ui";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { APP_ROLES } from "@/lib/auth/role-types";
@@ -79,6 +80,13 @@ export default async function AccountPage() {
                 Save
               </PendingButton>
             </form>
+          </div>
+        </Card>
+
+        <Card>
+          <SectionHeader eyebrow="Alerts" title="Alerts on this device" />
+          <div className="card-section">
+            <PushToggle />
           </div>
         </Card>
 

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
 import { textDirection } from "@/lib/i18n/locales";
@@ -19,8 +19,14 @@ export const metadata: Metadata = {
   icons: {
     icon: "/routehq-icon.svg",
     shortcut: "/routehq-icon.svg",
-    apple: "/routehq-icon.svg"
-  }
+    apple: "/apple-touch-icon.png"
+  },
+  // Opens full screen, like an app, when added to a phone's home screen.
+  appleWebApp: { capable: true, title: "RouteHQ", statusBarStyle: "default" }
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0f766e"
 };
 
 export default async function RootLayout({

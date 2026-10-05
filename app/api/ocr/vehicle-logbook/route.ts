@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { readFileAsJson, visionProvider } from "@/lib/ai-vision";
 
 const extractionSchema = {
   type: "object",
@@ -62,8 +63,8 @@ function getOutputText(response: any) {
 export async function POST(request: Request) {
   const apiKey = process.env.OPENAI_API_KEY;
 
-  if (!apiKey) {
-    return NextResponse.json({ error: "OPENAI_API_KEY is not set in .env.local." }, { status: 400 });
+  if (!visionProvider()) {
+    return NextResponse.json({ error: "Photo reading is not set up." }, { status: 400 });
   }
 
   const formData = await request.formData();
@@ -78,6 +79,21 @@ export async function POST(request: Request) {
   }
 
   const bytes = Buffer.from(await file.arrayBuffer());
+  if (visionProvider() === "anthropic") {
+    try {
+      const extracted = await readFileAsJson({
+        system:
+          "Extract vehicle registration/logbook fields from Thai blue books, car titles, registration books, and vehicle logbooks. If a field is unreadable, return null. Dates must be ISO YYYY-MM-DD when possible. Preserve Thai registration text if shown.",
+        prompt: `Read this vehicle title/logbook/blue book and extract fields for a fleet management vehicle form. Return JSON with exactly these keys: ${extractionSchema.required.join(", ")}. year, engine_cc and seating_capacity are integers or null; confidence is a number from 0 to 1; everything else is a string or null.`,
+        bytes,
+        mediaType: file.type,
+        maxTokens: 1200
+      });
+      return NextResponse.json({ extracted });
+    } catch (error) {
+      return NextResponse.json({ error: error instanceof Error ? error.message : "The document could not be read." }, { status: 502 });
+    }
+  }
   const base64 = bytes.toString("base64");
   const filePart =
     file.type === "application/pdf"

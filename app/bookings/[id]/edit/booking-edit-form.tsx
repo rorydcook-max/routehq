@@ -649,7 +649,7 @@ export function BookingEditForm({
 
       <PaymentEditor currency={rental.currency || "THB"} depositHeld={Number(rental.deposit_held || 0)} payments={payments} rentalId={rental.id} />
 
-      <div className="sticky bottom-0 z-20 -mx-4 flex gap-2 border-t border-[var(--border)] bg-white/95 p-3 backdrop-blur sm:mx-0 sm:rounded-lg sm:border">
+      <div className="sticky-actions sticky z-20 -mx-4 flex gap-2 border-t border-[var(--border)] bg-white/95 p-3 backdrop-blur sm:mx-0 sm:rounded-lg sm:border">
         <Link className="secondary-action pressable min-h-11 flex-1 justify-center" href={`/bookings/${rental.id}` as Route}>
           Cancel
         </Link>

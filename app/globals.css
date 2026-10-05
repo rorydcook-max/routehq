@@ -1251,3 +1251,8 @@ aside a[class*="bg-[var(--sidebar-active)]"] {
     min-width: 0;
   }
 }
+
+/* Back / Continue bars: on phones they sit just above the bottom menu, which
+   would otherwise cover them until the very end of the page. */
+.sticky-actions { bottom: 73px; }
+@media (min-width: 1024px) { .sticky-actions { bottom: 0; } }

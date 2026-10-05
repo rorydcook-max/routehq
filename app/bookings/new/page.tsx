@@ -86,7 +86,7 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
               Back to bookings
             </Link>
             <h1 className="page-title mt-2">Create booking</h1>
-            <p className="page-subtitle mt-2">Select the vehicle, customer, dates, delivery details, then generate a customer booking link.</p>
+            <p className="page-subtitle mt-2 hidden sm:block">Select the vehicle, customer, dates, delivery details, then generate a customer booking link.</p>
           </div>
         </div>
 

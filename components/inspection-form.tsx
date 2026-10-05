@@ -632,7 +632,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
         </p>
       ) : null}
       {/* The first screen has its own "Start" button; Back and Next begin on step 2. */}
-      <div className={`sticky bottom-0 z-20 -mx-4 mt-4 gap-2 border-t ${step === 0 ? "hidden" : "flex"} border-[var(--border)] bg-white/95 p-4 backdrop-blur sm:mx-0 sm:rounded-lg sm:border`}>
+      <div className={`sticky-actions sticky z-20 -mx-4 mt-4 gap-2 border-t ${step === 0 ? "hidden" : "flex"} border-[var(--border)] bg-white/95 p-4 backdrop-blur sm:mx-0 sm:rounded-lg sm:border`}>
         <button
           className={`${touchButton} flex-1 border border-[var(--border)] bg-white text-[var(--foreground-secondary)] disabled:opacity-50`}
           disabled={step === 0}

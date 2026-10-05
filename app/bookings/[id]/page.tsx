@@ -463,6 +463,23 @@ export default async function BookingDetailPage({ params, searchParams }: { para
         tone: "red" as const
       };
     }
+    // Before handover, with money still to come: say what is coming and when,
+    // rather than "paid up to date" on a booking nobody has paid for yet.
+    const upcomingUnpaid = activePayments
+      .filter((payment: any) => ["pending", "scheduled"].includes(String(payment.status || "pending")))
+      .filter((payment: any) => payment.due_date && String(payment.due_date).slice(0, 10) > today);
+    if (!activeRentalStatus && pendingPaymentAmount === 0 && upcomingUnpaid.length > 0) {
+      const firstDue = upcomingUnpaid.map((payment: any) => String(payment.due_date).slice(0, 10)).sort()[0];
+      const dueThen = upcomingUnpaid
+        .filter((payment: any) => String(payment.due_date).slice(0, 10) === firstDue)
+        .reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
+      return {
+        label: paidInAll > 0 ? "Paid so far - more to come" : "Nothing paid yet",
+        detail: `${money(dueThen, rental.currency)} due ${new Date(`${firstDue}T00:00:00`).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}.`,
+        amount: null as number | null,
+        tone: "neutral" as const
+      };
+    }
     if (activePayments.length > 0 && ((totalRentalValue > 0 && totalPaid >= totalRentalValue) || pendingPaymentAmount === 0)) {
       return {
         label: "Paid up to date",

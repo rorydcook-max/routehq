@@ -300,6 +300,8 @@ export function BookingForm({
   const [endDate, setEndDate] = useState(/^\d{4}-\d{2}-\d{2}$/.test(preselectedEndDate) && preselectedEndDate > businessToday() ? preselectedEndDate : "");
   const [openEnded, setOpenEnded] = useState(false);
   const [pricingModel, setPricingModel] = useState("monthly");
+  // Until the operator picks a period themselves, it follows the length of the rental.
+  const pricingChosenByHand = useRef(false);
   const [currency, setCurrency] = useState(CURRENCY_INFO[defaultCurrency] ? defaultCurrency : "THB");
   // Filled from the start when the vehicle is already chosen, so the rate never shows as empty while the page loads.
   const [rentalRate, setRentalRate] = useState(() => {
@@ -364,6 +366,15 @@ export function BookingForm({
   useEffect(() => {
     setBaseUrl(defaultAppUrl || window.location.origin);
   }, []);
+
+  useEffect(() => {
+    if (pricingChosenByHand.current) return;
+    if (openEnded) return setPricingModel("monthly");
+    if (!startDate || !endDate) return;
+    const days = Math.round((new Date(`${endDate}T00:00:00`).getTime() - new Date(`${startDate}T00:00:00`).getTime()) / 86400000);
+    if (!(days > 0)) return;
+    setPricingModel(days >= 28 ? "monthly" : days >= 7 ? "weekly" : "daily");
+  }, [startDate, endDate, openEnded]);
 
   // Prefill the rate when the vehicle or pricing period changes - not when the
   // vehicle list refreshes (after saving, the booked car drops out of the list
@@ -529,7 +540,7 @@ export function BookingForm({
     });
   }
 
-  const backDisabled = step === 0 || showCustomerModal;
+  const backDisabled = step === 0 || showCustomerModal || Boolean(shareResult);
 
   return (
     <form className="space-y-3" onSubmit={handleSubmit} ref={formRef}>
@@ -653,15 +664,14 @@ export function BookingForm({
         </div>
       ) : null}
       <div className={step === 0 ? "content-section" : "hidden"}>
-        <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Booking mode</p>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-2 gap-2">
           <button
             className={`pressable rounded-lg border p-3 text-left ${bookingMode === "booking_link" ? "border-[var(--primary)] bg-[var(--primary-light)]" : "border-[var(--border)] bg-white"}`}
             onClick={() => setBookingMode("booking_link")}
             type="button"
           >
-            <p className="font-semibold text-[var(--foreground)]">Create booking link</p>
-            <p className="mt-1 text-sm text-[var(--muted)]">Customer completes details and signs online.</p>
+            <p className="font-semibold text-[var(--foreground)]">New booking</p>
+            <p className="mt-1 text-xs leading-5 text-[var(--muted)]">Send a link. The customer fills in and signs on their phone.</p>
           </button>
           <button
             className={`pressable rounded-lg border p-3 text-left ${bookingMode === "existing_rental" ? "border-[var(--primary)] bg-[var(--primary-light)]" : "border-[var(--border)] bg-white"}`}
@@ -673,24 +683,21 @@ export function BookingForm({
             }}
             type="button"
           >
-            <div className="flex flex-wrap items-center gap-2">
-              <p className="font-semibold text-[var(--foreground)]">Record existing rental</p>
-              <Badge tone="amber">Fast track</Badge>
-            </div>
-            <p className="mt-1 text-sm text-[var(--muted)]">For a rental that has already started. Creates an active booking immediately.</p>
+            <p className="font-semibold text-[var(--foreground)]">Already out</p>
+            <p className="mt-1 text-xs leading-5 text-[var(--muted)]">The customer has the vehicle now. Just record it.</p>
           </button>
         </div>
       </div>
 
       {/* Progress bar */}
-      <div className="content-section bg-[var(--primary-light)]">
+      <div className="px-1">
         <div className="flex items-center justify-between text-xs font-semibold uppercase text-[var(--muted)]">
           <span>
             Step {displayStepNumber} of {effectiveStepCount}
           </span>
           <span>{steps[step]}</span>
         </div>
-        <div className="mt-3">
+        <div className="mt-1.5">
           <ProgressBar value={(displayStepNumber / effectiveStepCount) * 100} />
         </div>
       </div>
@@ -708,7 +715,10 @@ export function BookingForm({
             />
           </label>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
-            {filteredVehicles.map((vehicle) => {
+            {[...filteredVehicles]
+              .map((vehicle) => ({ vehicle, rank: !selectable(vehicle) ? 2 : availabilityNote(busyPeriods[vehicle.id] || [], businessToday()) ? 1 : 0 }))
+              .sort((a, b) => a.rank - b.rank)
+              .map(({ vehicle }) => {
               const disabled = !selectable(vehicle);
               const selected = vehicle.id === vehicleId;
               return (
@@ -861,7 +871,10 @@ export function BookingForm({
               <button
                 className={`pressable min-h-11 rounded-lg border px-1 py-2 text-sm font-semibold capitalize ${pricingModel === period ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
                 key={period}
-                onClick={() => setPricingModel(period)}
+                onClick={() => {
+                  pricingChosenByHand.current = true;
+                  setPricingModel(period);
+                }}
                 type="button"
               >
                 {period}
@@ -870,7 +883,7 @@ export function BookingForm({
           </div>
           <div className="mt-3 grid grid-cols-2 gap-3">
             <label className="block">
-              <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Rental rate</span>
+              <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{pricingModel === "custom" ? "Rental rate" : `Rate per ${periodLabel}`}</span>
               <input
                 className="font-mono-data mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]"
                 inputMode="numeric"
@@ -893,6 +906,11 @@ export function BookingForm({
               />
             </label>
           </div>
+          {!(rentalRate > 0) ? (
+            <p className="mt-2 text-xs font-semibold text-[#b45309]">
+              {pricingModel === "custom" ? "Enter the rate to continue." : `No ${pricingModel} rate is saved for this vehicle. Enter the rate per ${periodLabel} to continue.`}
+            </p>
+          ) : null}
           <div className="mt-3">
             <p className="text-[13px] font-semibold text-[var(--foreground)]">What is included</p>
             <div className="mt-3 grid grid-cols-2 gap-2">
@@ -999,15 +1017,15 @@ export function BookingForm({
 
       {step === 3 ? (
         <section className="content-section">
-          <Header icon={MapPin} eyebrow={`Step ${displayStepNumber}`} title="Delivery details" />
-          <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          <Header icon={MapPin} eyebrow={`Step ${displayStepNumber}`} title="Handing over the vehicle" />
+          <div className="mt-3 grid grid-cols-3 gap-2">
             {[
-              ["delivery", "I will deliver"],
-              ["collection", "Customer collects"],
-              ["tbd", "To be determined"]
+              ["delivery", "I deliver"],
+              ["collection", "They collect"],
+              ["tbd", "Decide later"]
             ].map(([value, label]) => (
               <button
-                className={`pressable min-h-12 rounded-lg border px-3 py-2 text-sm font-semibold ${deliveryMethod === value ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
+                className={`pressable min-h-12 rounded-lg border px-1 py-2 text-sm font-semibold ${deliveryMethod === value ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
                 key={value}
                 onClick={() => setDeliveryMethod(value as "delivery" | "collection" | "tbd")}
                 type="button"
@@ -1018,8 +1036,8 @@ export function BookingForm({
           </div>
           {deliveryMethod === "tbd" ? (
             <div className="mt-3 flex items-start gap-3 rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3 text-sm leading-6 text-[#92400e]">
-              <span aria-label="Information" title="To be determined">ⓘ</span>
-              <p>The delivery method, location, and time can be confirmed later. Your customer will be able to provide their preferred delivery details through the booking link.</p>
+              <span aria-label="Information" title="Decide later">ⓘ</span>
+              <p>Nothing to fill in now. The customer can say where and when they would like it on their booking link, and you can set it later from the booking.</p>
             </div>
           ) : deliveryMethod === "delivery" ? (
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -1047,9 +1065,6 @@ export function BookingForm({
                   Now
                 </button>
                 <input className={inputClass} id="delivery-datetime" onChange={(event) => setDeliveryDateTime(event.target.value)} type="datetime-local" value={deliveryDateTime} />
-                <p style={{ fontSize: 11, color: "#94a3b8", marginTop: 3 }}>
-                  You can set a past date when recording a historical booking.
-                </p>
                 <p className="mt-2 text-xs font-semibold text-[var(--muted)]">Leave blank if not yet agreed.</p>
               </div>
             </div>
@@ -1072,9 +1087,6 @@ export function BookingForm({
                   Now
                 </button>
                 <input className={inputClass} id="collection-datetime" onChange={(event) => setCollectionTime(event.target.value)} type="datetime-local" value={collectionTime} />
-                <p style={{ fontSize: 11, color: "#94a3b8", marginTop: 3 }}>
-                  You can set a past date when recording a historical booking.
-                </p>
                 <p className="mt-2 text-xs font-semibold text-[var(--muted)]">Leave blank if not yet agreed.</p>
               </div>
             </div>
@@ -1089,7 +1101,8 @@ export function BookingForm({
 
       {step === 4 ? (
         <section className="content-section">
-          <Header icon={CheckCircle2} eyebrow={`Step ${displayStepNumber}`} title="Review and generate" />
+          <Header icon={CheckCircle2} eyebrow={`Step ${displayStepNumber}`} title={shareResult ? "All done" : "Check and send"} />
+          <BookingLinkSharePanel result={shareResult} />
           {isSameDayHandover ? (
             <div className="mt-3 rounded-lg border border-[#bfe0db] bg-[#fbfaf8] p-3">
               <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--primary)]">Walk-in fast track</p>
@@ -1162,7 +1175,7 @@ export function BookingForm({
               label="Customer"
               value={
                 customerSkipped
-                  ? "No customer — they will complete their details via the booking link"
+                  ? "They add their own details, ID photos and signature on the link"
                   : selectedCustomer
                     ? `${selectedCustomer.full_name} - ${selectedCustomer.nationality || "Nationality not set"}`
                     : "Not selected"
@@ -1177,10 +1190,10 @@ export function BookingForm({
             ) : null}
             <SummaryRow label="Deposit" mono value={money(depositAmount, currency)} />
             <SummaryRow
-              label="Delivery"
+              label="Handover"
               value={
                 deliveryMethod === "tbd"
-                  ? "Delivery method, location, and time to be confirmed"
+                  ? "To be arranged"
                   : deliveryMethod === "delivery"
                     ? `Delivery to ${deliveryLocation || "a place to be confirmed"} · ${deliveryDateTime ? longDateTime(deliveryDateTime) : "time to be confirmed"}`
                     : `Collection from ${collectionAddress || "a place to be confirmed"} · ${collectionTime ? longDateTime(collectionTime) : "time to be confirmed"}`
@@ -1188,12 +1201,6 @@ export function BookingForm({
             />
             <SummaryRow label="Included" value={includedItems.length ? includedItems.join(", ") : "None selected"} />
           </div>
-          {customerSkipped ? (
-            <div className="mt-3 rounded-lg border border-[#bfe0db] bg-[#fbfaf8] p-3">
-              <p className="text-xs font-bold uppercase text-[var(--primary)]">Booking link will collect customer details</p>
-              <p className="mt-1 text-sm text-[var(--foreground-secondary)]">Your customer will be asked to fill in their personal details, upload their passport and driving licence, and sign the rental contract through the link.</p>
-            </div>
-          ) : null}
           {bookingMode === "existing_rental" && !walkInFastTrack ? (
             <div className="mt-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
               <p className="text-sm font-semibold text-[var(--foreground)]">What has the customer paid so far?</p>
@@ -1227,12 +1234,11 @@ export function BookingForm({
               <p className="mt-3 text-xs text-[var(--muted)]">The rental starts as on rent straight away, with no booking link. You can still send the customer a link to sign from the booking.</p>
             </div>
           ) : null}
-          <BookingLinkSharePanel result={shareResult} />
           {error ? <p className="mt-3 rounded-lg bg-[#ffe4e6] p-3 text-sm font-bold text-[#be123c]">{error}</p> : null}
         </section>
       ) : null}
 
-      <div className="sticky bottom-0 z-20 -mx-4 flex gap-2 border-t border-[var(--border)] bg-white/95 p-3 backdrop-blur sm:mx-0 sm:rounded-lg sm:border">
+      <div className="sticky-actions sticky z-20 -mx-4 flex gap-2 border-t border-[var(--border)] bg-white/95 p-3 backdrop-blur sm:mx-0 sm:rounded-lg sm:border">
         <button
           className="pressable min-h-12 flex-1 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--foreground-secondary)] disabled:opacity-50"
           disabled={backDisabled}
@@ -1293,7 +1299,33 @@ function BookingLinkSharePanel({ result }: { result: BookingShareResult | null }
   const bookingUrl = result?.bookingUrl || "";
   const encodedUrl = encodeURIComponent(bookingUrl);
   const encodedMessage = encodeURIComponent(result?.message || bookingUrl);
-  const qrUrl = bookingUrl ? `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodedUrl}&margin=8` : "";
+  // The QR code is drawn here on the device, so the customer's link is never sent to an outside service.
+  const [qrUrl, setQrUrl] = useState("");
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const [canNativeShare, setCanNativeShare] = useState(false);
+  useEffect(() => {
+    if (!bookingUrl) return;
+    let cancelled = false;
+    import("qrcode")
+      .then((QRCode) => QRCode.toDataURL(bookingUrl, { width: 400, margin: 2 }))
+      .then((url) => {
+        if (!cancelled) setQrUrl(url);
+      })
+      .catch(() => undefined);
+    setCanNativeShare(typeof navigator !== "undefined" && typeof navigator.share === "function");
+    panelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    return () => {
+      cancelled = true;
+    };
+  }, [bookingUrl]);
+
+  async function nativeShare() {
+    try {
+      await navigator.share({ text: result?.message || bookingUrl, url: result?.message?.includes(bookingUrl) ? undefined : bookingUrl });
+    } catch {
+      // Closed without sharing: nothing to do.
+    }
+  }
   const shareChannels = [
     { key: "whatsapp", label: "WhatsApp", title: "Share via WhatsApp", icon: <WhatsAppLogo /> },
     { key: "line", label: "LINE", title: "Share via LINE", icon: <LineLogo /> },
@@ -1347,63 +1379,57 @@ function BookingLinkSharePanel({ result }: { result: BookingShareResult | null }
   if (!bookingUrl) return null;
 
   return (
-    <div className="mt-3 rounded-lg border border-[var(--border)] bg-white p-3">
-      <p className="text-[13px] font-semibold text-[var(--foreground)]">Share the booking link</p>
-      <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-        <div className="font-mono-data min-h-12 flex-1 break-all rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] px-3 py-2 text-sm font-bold text-[var(--foreground-secondary)]">
-          {bookingUrl || "Generate the booking link to see the unique URL here."}
-        </div>
-        <button
-          className="pressable inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold disabled:opacity-50"
-          style={{ color: copied ? "var(--primary)" : "var(--foreground-secondary)" }}
-          disabled={!bookingUrl}
-          onClick={copyLink}
-          type="button"
-        >
-          <Copy size={17} />
-          {copied ? "Copied!" : "Copy"}
+    <div className="mt-3 scroll-mt-4 rounded-xl border border-[#bbf7d0] bg-[#f0fdf4] p-4" ref={panelRef}>
+      <p className="flex items-center gap-2 text-base font-semibold text-[#166534]">
+        <CheckCircle2 size={20} />
+        Booking created
+      </p>
+      <p className="mt-1 text-sm leading-6 text-[var(--foreground-secondary)]">Now send the link to your customer. They fill in their details and sign on their phone.</p>
+
+      {canNativeShare ? (
+        <button className="pressable mt-3 inline-flex min-h-12 w-full items-center justify-center rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white" onClick={nativeShare} type="button">
+          Send to customer
         </button>
-      </div>
+      ) : null}
 
-      <div className="my-5 h-px bg-[var(--border)]" />
-
-      <div className="flex justify-center">
-        {qrUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            alt="Booking link QR code"
-            height={200}
-            src={qrUrl}
-            style={{ borderRadius: 8, border: "0.5px solid #e2e8f0" }}
-            width={200}
-          />
-        ) : (
-          <div className="flex h-44 w-44 items-center justify-center rounded-lg border border-dashed border-[var(--border-strong)] bg-[var(--panel-secondary)] p-3 text-center text-xs font-bold text-[var(--muted)]">
-            QR code appears after generation.
-          </div>
-        )}
-      </div>
-
-      <div className="my-5 h-px bg-[var(--border)]" />
-
-      <p className="text-[13px] font-semibold text-[var(--foreground)]">or share via</p>
-      <div className="mt-3 flex flex-wrap justify-center gap-2">
+      <div className="mt-3 grid grid-cols-5 gap-1 rounded-lg border border-[var(--border)] bg-white p-1">
         {shareChannels.map(({ icon, key, label, title }) => (
           <button
             aria-label={title}
-            className="flex min-w-[64px] flex-col items-center gap-1.5 rounded-lg p-2 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={!result}
+            className="pressable flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-lg px-0.5 py-2 hover:bg-gray-50"
             key={key}
             onClick={() => handleShare(key)}
             title={title}
             type="button"
           >
             {icon}
-            <span style={{ fontSize: "11px", color: "#64748b", fontWeight: 500 }}>{label}</span>
+            <span className="max-w-full truncate" style={{ fontSize: "11px", color: "#64748b", fontWeight: 500 }}>{label}</span>
           </button>
         ))}
       </div>
 
+      <button
+        className="pressable mt-2 flex min-h-12 w-full items-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-left text-sm font-semibold"
+        onClick={copyLink}
+        style={{ color: copied ? "var(--primary)" : "var(--foreground-secondary)" }}
+        type="button"
+      >
+        <Copy className="shrink-0" size={17} />
+        <span className="shrink-0">{copied ? "Copied" : "Copy link"}</span>
+        <span className="font-mono-data min-w-0 flex-1 truncate text-xs font-normal text-[var(--muted)]">{bookingUrl.replace(/^https?:\/\//, "")}</span>
+      </button>
+
+      <details className="mt-2 rounded-lg border border-[var(--border)] bg-white">
+        <summary className="cursor-pointer px-3 py-3 text-sm font-semibold text-[var(--foreground-secondary)]">Customer is with you? Show a code to scan</summary>
+        <div className="flex justify-center px-3 pb-4">
+          {qrUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img alt="Booking link QR code" height={220} src={qrUrl} style={{ borderRadius: 8, border: "0.5px solid #e2e8f0" }} width={220} />
+          ) : (
+            <span className="spinner" />
+          )}
+        </div>
+      </details>
     </div>
   );
 }

@@ -24,18 +24,18 @@ const countries = [
 const policyOptions = [
   {
     value: "deposit_required",
-    title: "Secondary deposit required",
-    body: "Customer pays an additional deposit before taking the vehicle to another island."
+    title: "Extra deposit",
+    body: "The customer pays an extra deposit before going."
   },
   {
     value: "notice_only",
-    title: "Notice only",
-    body: "Customer must notify before inter-island travel, but no additional deposit is required."
+    title: "Tell you first",
+    body: "The customer must tell you before going. No extra deposit."
   },
   {
     value: "not_permitted",
-    title: "Not permitted",
-    body: "Vehicle may not leave the home island or territory."
+    title: "Not allowed",
+    body: "The vehicle stays in your home area."
   }
 ];
 
@@ -63,12 +63,12 @@ export function TravelPolicyForm({
       <input name="organizationId" type="hidden" value={organizationId} />
 
       <section className="form-section bg-[var(--primary-light)]">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--primary)]">Business location</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--primary)]">Where you are based</p>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <label className="block">
-            <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Home territory</span>
+            <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Home area</span>
             <input className={inputClass} defaultValue={settings.home_territory} name="homeTerritory" placeholder="Koh Samui" required />
-            <span className="mt-1 block text-xs text-[var(--muted)]">This appears in travel clauses and becomes your default operating area.</span>
+            <span className="mt-1 block text-xs text-[var(--muted)]">Named in your agreements as where the vehicle is normally used.</span>
           </label>
           <label className="block">
             <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Country</span>
@@ -84,8 +84,8 @@ export function TravelPolicyForm({
 
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           {[
-            { value: "island", label: "Island", helper: "Island mode enables the ferry/boat travel clause in contracts." },
-            { value: "mainland", label: "Mainland region", helper: "Mainland mode permits general travel. Island crossings still require notice." }
+            { value: "island", label: "Island", helper: "Your agreements include the rule below about taking the vehicle off the island." },
+            { value: "mainland", label: "Mainland", helper: "Vehicles travel freely on the mainland. Taking one to an island follows the rule below." }
           ].map((option) => (
             <label
               className={`block rounded-lg border p-3 ${territoryType === option.value ? "border-[var(--primary)] bg-white shadow-[0_12px_26px_rgba(18,184,200,0.12)]" : "border-[var(--border)] bg-white"}`}
@@ -106,14 +106,14 @@ export function TravelPolicyForm({
         </div>
 
         <label className="mt-3 block">
-          <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Jurisdiction</span>
+          <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Whose law applies</span>
           <input className={inputClass} name="jurisdiction" onChange={(event) => setJurisdiction(event.target.value)} required value={jurisdiction} />
-          <span className="mt-1 block text-xs text-[var(--muted)]">This wording appears verbatim in the governing law clause.</span>
+          <span className="mt-1 block text-xs text-[var(--muted)]">Used word for word in your agreements.</span>
         </label>
       </section>
 
       <section className="form-section bg-[var(--primary-blue-light)]">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--primary)]">Inter-island travel policy</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--primary)]">Taking the vehicle to another island</p>
         <div className="mt-3 grid gap-3 lg:grid-cols-3">
           {policyOptions.map((option) => (
             <label
@@ -135,7 +135,7 @@ export function TravelPolicyForm({
         </div>
         {travelPolicy === "deposit_required" ? (
           <label className="mt-3 block max-w-sm">
-            <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Secondary deposit amount (THB)</span>
+            <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Extra deposit amount (THB)</span>
             <input className={inputClass} defaultValue={settings.secondary_deposit_amount} min="0" name="secondaryDepositAmount" step="0.01" type="number" />
           </label>
         ) : (
@@ -144,27 +144,27 @@ export function TravelPolicyForm({
         <label className="checkbox-label sub-surface mt-4 p-3">
           <input className="flex-shrink-0" defaultChecked={settings.geofence_monitoring_enabled} name="geofenceMonitoringEnabled" type="checkbox" />
           <span>
-            <span className="block font-semibold text-[var(--foreground)]">GPS/geofence monitoring enabled</span>
-            <span className="mt-1 block text-xs text-[var(--muted)]">Adds the GPS monitoring clause when enabled.</span>
+            <span className="block font-semibold text-[var(--foreground)]">Vehicles are tracked by GPS</span>
+            <span className="mt-1 block text-xs text-[var(--muted)]">Adds a line to agreements telling the customer.</span>
           </span>
         </label>
       </section>
 
       <details className="form-section bg-[var(--warning-light)]" open>
-        <summary className="cursor-pointer text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--primary)]">Contract terms</summary>
+        <summary className="cursor-pointer text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--primary)]">Fees and limits</summary>
         <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <NumberField defaultValue={settings.mileage_limit} label="Monthly mileage limit (km)" name="mileageLimit" />
-          <NumberField defaultValue={settings.fuel_charge_per_increment} label="Fuel charge per 1/8 gauge increment (THB)" name="fuelChargePerIncrement" step="0.01" />
+          <NumberField defaultValue={settings.mileage_limit} label="Distance allowed per month (km)" name="mileageLimit" />
+          <NumberField defaultValue={settings.fuel_charge_per_increment} label="Fuel charge per 1/8 tank missing (THB)" name="fuelChargePerIncrement" step="0.01" />
           <NumberField defaultValue={settings.late_fee_percentage} label="Late return fee (% per day)" name="lateFeePercentage" step="0.01" />
-          <NumberField defaultValue={settings.cleaning_fee_minimum} label="Minimum cleaning fee (THB)" name="cleaningFeeMinimum" step="0.01" />
-          <NumberField defaultValue={settings.smoking_fee_maximum} label="Maximum smoking penalty (THB)" name="smokingFeeMaximum" step="0.01" />
-          <NumberField defaultValue={settings.emergency_repair_limit} label="Emergency repair authorisation limit (THB)" name="emergencyRepairLimit" step="0.01" />
-          <NumberField defaultValue={settings.deposit_return_days} label="Deposit return period (business days)" name="depositReturnDays" />
+          <NumberField defaultValue={settings.cleaning_fee_minimum} label="Cleaning fee, from (THB)" name="cleaningFeeMinimum" step="0.01" />
+          <NumberField defaultValue={settings.smoking_fee_maximum} label="Smoking fee, up to (THB)" name="smokingFeeMaximum" step="0.01" />
+          <NumberField defaultValue={settings.emergency_repair_limit} label="Emergency repairs the customer may approve, up to (THB)" name="emergencyRepairLimit" step="0.01" />
+          <NumberField defaultValue={settings.deposit_return_days} label="Deposit returned within (working days)" name="depositReturnDays" />
         </div>
       </details>
 
       <section className="form-section bg-[var(--success-light)]">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--primary)]">Contact details for contracts</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--primary)]">Contact details shown in agreements</p>
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           <label className="block">
             <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">LINE ID</span>
@@ -182,11 +182,11 @@ export function TravelPolicyForm({
       </section>
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        <PendingButton className="primary-action flex-1" pendingLabel="Saving..." type="submit">
-          Save travel policy
+        <PendingButton className="primary-action flex-1" pendingLabel="Saving..." savedLabel="Saved" type="submit">
+          Save
         </PendingButton>
         <Link className="secondary-action pressable flex-1 text-[var(--primary)]" href="/settings/contracts">
-          Preview contract template
+          See the agreement wording
         </Link>
       </div>
     </form>

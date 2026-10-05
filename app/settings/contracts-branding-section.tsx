@@ -3,7 +3,7 @@ import { LogoUploadSection } from "@/app/settings/logo-upload-section";
 import { SignatureUploadSection } from "@/app/settings/signature-upload-section";
 import { BusinessLogoImage } from "@/components/business-logo-image";
 import { PendingButton } from "@/components/pending-button";
-import { Card, SectionHeader } from "@/components/ui";
+import { Card, Fold, SectionHeader } from "@/components/ui";
 import { supportedLocaleOptions } from "@/lib/i18n/locales";
 
 const inputClass =
@@ -50,104 +50,101 @@ export function ContractsBrandingSection({
 
   return (
     <Card>
-      <SectionHeader eyebrow="Contracts" title="Contracts & Branding" />
-      <p className="mt-2 text-xs leading-5 text-[var(--muted)]">
-        Configure the rental business identity that will appear on future rental documents. RouteHQ is not the contracting party.
-      </p>
+      <SectionHeader eyebrow="Business" title="Your business" />
+      <p className="mt-2 text-xs leading-5 text-[var(--muted)]">Customers see these details on agreements, booking links and receipts.</p>
 
-      <div className="mt-4 grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
-        <div className="space-y-4">
-          <form action={updateContractBrandingSettings} className="space-y-4">
-            <div className="grid gap-3 sm:grid-cols-2">
-              <label className="block">
-                <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Trading name</span>
-                <input className={inputClass} defaultValue={organization.trading_name || organization.name} name="trading_name" />
-              </label>
-              <label className="block">
-                <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Legal contracting name</span>
-                <input className={inputClass} defaultValue={organization.legal_name || ""} name="legal_name" />
-              </label>
-              <label className="block">
-                <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Registration or tax number</span>
-                <input className={inputClass} defaultValue={organization.registration_or_tax_number || ""} name="registration_or_tax_number" />
-              </label>
-              <label className="block">
-                <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Business phone</span>
-                <input className={inputClass} defaultValue={organization.business_phone || ""} name="business_phone" type="tel" />
-              </label>
-              <label className="block">
-                <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Business email</span>
-                <input className={inputClass} defaultValue={organization.business_email || ""} name="business_email" type="email" />
-              </label>
-              <label className="block">
-                <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">WhatsApp</span>
-                <input className={inputClass} defaultValue={organization.whatsapp || ""} name="whatsapp" />
-              </label>
-              <label className="block">
-                <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">LINE ID</span>
-                <input className={inputClass} defaultValue={organization.line_id || ""} name="line_id" />
-              </label>
-              <label className="block sm:col-span-2">
-                <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Business address</span>
-                <textarea className={`${inputClass} min-h-20 py-2`} defaultValue={organization.business_address || ""} name="business_address" />
-              </label>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              <label className="block">
-                <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Contract accent colour</span>
-                <input className={`${inputClass} h-10`} defaultValue={accentColour} name="contract_accent_colour" type="color" />
-              </label>
-              <label className="block">
-                <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Default contract locale</span>
-                <select className={inputClass} defaultValue={organization.default_contract_locale || organization.default_locale || "en"} name="default_contract_locale">
-                  {supportedLocaleOptions.map((locale) => (
-                    <option key={locale.code} value={locale.code}>
-                      {locale.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="block sm:col-span-2">
-                <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Contract footer text</span>
-                <input className={inputClass} defaultValue={organization.contract_footer_text || ""} name="contract_footer_text" />
-              </label>
-              <label className="checkbox-label sub-surface min-h-10 font-semibold text-[var(--foreground)]" style={{ display: "flex", alignItems: "center", padding: "8px 12px" }}>
-                <input defaultChecked={poweredByRouteHq} name="powered_by_routehq_enabled" type="checkbox" value="true" />
-                <span>Show Powered by RouteHQ footer attribution</span>
-              </label>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              <label className="block">
-                <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Authorised signatory full name</span>
-                <input className={inputClass} defaultValue={organization.authorised_signatory_name || ""} name="authorised_signatory_name" />
-              </label>
-              <label className="block">
-                <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Signatory job title</span>
-                <input className={inputClass} defaultValue={organization.authorised_signatory_title || ""} name="authorised_signatory_title" />
-              </label>
-            </div>
-
-            <PendingButton className="primary-action" pendingLabel="Saving..." type="submit">
-              Save contracts and branding settings
-            </PendingButton>
-          </form>
-
-          <div className="space-y-3">
-            <LogoUploadSection logoUrl={logoDisplayUrl} orgName={tradingName} />
-            <SignatureUploadSection
-              authorisedSignatoryName={organization.authorised_signatory_name}
-              authorisedSignatoryTitle={organization.authorised_signatory_title}
-              orgName={tradingName}
-              signatureUrl={signatureDisplayUrl}
-            />
-            {organization.signature_authorised_at ? (
-              <p className="text-[11px] text-[var(--muted)]">Signature authorisation recorded on {new Date(organization.signature_authorised_at).toLocaleDateString("en-GB")}.</p>
-            ) : null}
-          </div>
+      <form action={updateContractBrandingSettings} className="mt-4 space-y-4">
+        <div className="grid gap-3 sm:grid-cols-2">
+            <label className="block">
+              <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Business name</span>
+              <input className={inputClass} defaultValue={organization.trading_name || organization.name} name="trading_name" />
+            </label>
+            <label className="block">
+              <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Phone</span>
+              <input className={inputClass} defaultValue={organization.business_phone || ""} name="business_phone" type="tel" />
+            </label>
+            <label className="block">
+              <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">WhatsApp</span>
+              <input className={inputClass} defaultValue={organization.whatsapp || ""} name="whatsapp" />
+            </label>
+            <label className="block">
+              <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">LINE ID</span>
+              <input className={inputClass} defaultValue={organization.line_id || ""} name="line_id" />
+            </label>
+            <label className="block">
+              <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Email</span>
+              <input className={inputClass} defaultValue={organization.business_email || ""} name="business_email" type="email" />
+            </label>
+            <label className="block sm:col-span-2">
+              <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Address</span>
+              <textarea className={`${inputClass} min-h-20 py-2`} defaultValue={organization.business_address || ""} name="business_address" />
+            </label>
         </div>
 
+        {/* Set once, rarely touched: kept one tap away so the everyday details stay a short screen. */}
+        <Fold summary="Legal name, tax number, who signs, language and colour" title="Agreement details">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="block">
+              <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Legal name, if different from the business name</span>
+              <input className={inputClass} defaultValue={organization.legal_name || ""} name="legal_name" />
+            </label>
+            <label className="block">
+              <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Registration or tax number</span>
+              <input className={inputClass} defaultValue={organization.registration_or_tax_number || ""} name="registration_or_tax_number" />
+            </label>
+            <label className="block">
+              <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Who signs for the business</span>
+              <input className={inputClass} defaultValue={organization.authorised_signatory_name || ""} name="authorised_signatory_name" />
+            </label>
+            <label className="block">
+              <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Their job title</span>
+              <input className={inputClass} defaultValue={organization.authorised_signatory_title || ""} name="authorised_signatory_title" />
+            </label>
+            <label className="block">
+              <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Language of agreements</span>
+              <select className={inputClass} defaultValue={organization.default_contract_locale || organization.default_locale || "en"} name="default_contract_locale">
+                {supportedLocaleOptions.map((locale) => (
+                  <option key={locale.code} value={locale.code}>
+                    {locale.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="block">
+              <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Colour on agreements</span>
+              <input className={`${inputClass} h-10`} defaultValue={accentColour} name="contract_accent_colour" type="color" />
+            </label>
+            <label className="block sm:col-span-2">
+              <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Line at the bottom of agreements</span>
+              <input className={inputClass} defaultValue={organization.contract_footer_text || ""} name="contract_footer_text" />
+            </label>
+            <label className="checkbox-label sub-surface min-h-10 font-semibold text-[var(--foreground)] sm:col-span-2" style={{ display: "flex", alignItems: "center", padding: "8px 12px" }}>
+              <input defaultChecked={poweredByRouteHq} name="powered_by_routehq_enabled" type="checkbox" value="true" />
+              <span>Show &quot;Powered by RouteHQ&quot; at the bottom</span>
+            </label>
+          </div>
+        </Fold>
+
+        <PendingButton className="primary-action w-full sm:w-auto" pendingLabel="Saving..." savedLabel="Saved" type="submit">
+          Save
+        </PendingButton>
+      </form>
+
+      <div className="mt-4 space-y-3">
+        <LogoUploadSection logoUrl={logoDisplayUrl} orgName={tradingName} />
+        <SignatureUploadSection
+          authorisedSignatoryName={organization.authorised_signatory_name}
+          authorisedSignatoryTitle={organization.authorised_signatory_title}
+          orgName={tradingName}
+          signatureUrl={signatureDisplayUrl}
+        />
+        {organization.signature_authorised_at ? (
+          <p className="text-[11px] text-[var(--muted)]">Signature authorisation recorded on {new Date(organization.signature_authorised_at).toLocaleDateString("en-GB")}.</p>
+        ) : null}
+      </div>
+
+      <div className="mt-4">
+        <Fold summary="A sample with your name, logo and signature" title="See how your agreement looks">
         <div className="rounded-lg border border-[var(--border)] bg-white p-4">
           <div className="flex items-start justify-between gap-4 border-b border-[var(--border)] pb-4">
             <BusinessLogoImage alt={`${tradingName} logo`} className="h-16 w-28 rounded-lg border border-[var(--border)] bg-white object-contain p-2" src={logoDisplayUrl} />
@@ -193,6 +190,7 @@ export function ContractsBrandingSection({
             {poweredByRouteHq ? <p className="mt-1 font-semibold">Powered by RouteHQ</p> : null}
           </div>
         </div>
+        </Fold>
       </div>
     </Card>
   );

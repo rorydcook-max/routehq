@@ -30,7 +30,9 @@ import { publicBookingSettings } from "@/lib/public-catalog";
 import { TravelPolicyForm } from "@/app/settings/travel-policy-form";
 import { AppShell } from "@/components/app-shell";
 import { PendingButton } from "@/components/pending-button";
-import { Badge, Card, SectionHeader } from "@/components/ui";
+import { Badge, Card, Fold, SectionHeader } from "@/components/ui";
+import { OpenOnHash } from "@/components/open-on-hash";
+import { PushToggle } from "@/components/push-toggle";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
 import { ensureDefaultBranch } from "@/lib/branches";
@@ -111,11 +113,11 @@ function browserSafeAssetFallback(value: string | null | undefined) {
 
 const SETTINGS_TABS = [
   { key: "business", label: "Business" },
-  { key: "rentals", label: "Rentals & payments" },
+  { key: "rentals", label: "Rentals and payments" },
   { key: "messaging", label: "Messaging" },
-  { key: "notifications", label: "LINE alerts" },
+  { key: "notifications", label: "Alerts" },
   { key: "team", label: "Team" },
-  { key: "more", label: "Plan & tools" }
+  { key: "more", label: "Plan and tools" }
 ] as const;
 
 type SettingsTab = (typeof SETTINGS_TABS)[number]["key"];
@@ -237,18 +239,26 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     recipient_line_id: string | null;
   }>;
 
+  const paymentNames: Record<string, string> = { cash: "Cash", promptpay: "PromptPay", bank_transfer: "Bank transfer", wise: "Wise", revolut: "Revolut" };
+  const acceptedMethods = Array.from(new Set(["cash", ...((organization.accepted_payment_methods as unknown as string[] | null) || [])])).filter((method) => method in paymentNames);
+  const paymentSummary = acceptedMethods.map((method) => paymentNames[method]).join(", ");
+  const travelSummary = `${travelPolicySettings.home_territory || "Home area not set"} · ${
+    travelPolicySettings.island_travel_policy === "not_permitted" ? "may not leave" : travelPolicySettings.island_travel_policy === "notice_only" ? "must tell you before leaving" : "extra deposit to leave"
+  }`;
+
   return (
     <AppShell userEmail={userEmail}>
+      <OpenOnHash />
       <div className="page-hero mb-5">
         <p className="page-eyebrow">Settings</p>
         <h1 className="page-title">Settings</h1>
       </div>
 
-      <nav aria-label="Settings sections" className="scrollbar-none -mx-4 mb-5 flex gap-1 overflow-x-auto border-b border-[var(--border)] px-4 sm:mx-0 sm:px-0">
+      <nav aria-label="Settings sections" className="mb-5 grid grid-cols-3 gap-1.5 sm:flex sm:gap-1 sm:border-b sm:border-[var(--border)]">
         {SETTINGS_TABS.map((entry) => (
           <Link
             aria-current={tab === entry.key ? "page" : undefined}
-            className={`-mb-px whitespace-nowrap border-b-2 px-3 py-2.5 text-sm font-semibold transition ${tab === entry.key ? "border-[var(--primary)] text-[var(--primary)]" : "border-transparent text-[var(--muted)] hover:text-[var(--foreground)]"}`}
+            className={`flex min-h-11 items-center justify-center rounded-lg border px-2 py-1.5 text-center text-[13px] font-semibold leading-tight transition sm:-mb-px sm:min-h-0 sm:whitespace-nowrap sm:rounded-none sm:border-0 sm:border-b-2 sm:px-3 sm:py-2.5 sm:text-sm ${tab === entry.key ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)] sm:bg-transparent" : "border-[var(--border)] bg-[var(--panel)] text-[var(--muted)] hover:text-[var(--foreground)] sm:border-transparent sm:bg-transparent"}`}
             href={`/settings?tab=${entry.key}` as Route}
             key={entry.key}
           >
@@ -259,49 +269,19 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
 
       {tab === "business" ? (
         <>
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <SectionHeader eyebrow="Profile" title="Your language" />
-          <div className="card-section">
-            <p className="text-xs text-[var(--muted)]">
-              Language and calendar are personal, so each person in your business sets their own in My account.
-            </p>
-            <Link className="mt-3 inline-block text-sm font-bold text-[var(--primary)]" href="/account">
-              Open My account
-            </Link>
-          </div>
-        </Card>
-
-        <Card>
-          <SectionHeader eyebrow="Organization" title={organization.name} />
-          <div className="card-section grid gap-3 sm:grid-cols-3">
-            <div className="rounded-lg border border-[var(--border)] p-2">
-              <p className="text-[9px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">Currency</p>
-              <p className="mt-0.5 text-[13px] font-bold">{organization.currency}</p>
-            </div>
-            <div className="rounded-lg border border-[var(--border)] p-2">
-              <p className="text-[9px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">Timezone</p>
-              <p className="mt-0.5 text-[13px] font-bold">{organization.timezone}</p>
-            </div>
-            <div className="rounded-lg border border-[var(--border)] p-2">
-              <p className="text-[9px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">Default language</p>
-              <p className="mt-0.5 text-[13px] font-bold">
-                {supportedLocaleOptions.find((option) => option.code === organization.default_locale)?.english || organization.default_locale.toUpperCase()}
-              </p>
-            </div>
-          </div>
-        </Card>
-      </div>
-        </>
-      ) : null}
-      {tab === "business" ? (
-        <>
-      <div className="mt-4">
+      <div>
         <ContractsBrandingSection
           logoDisplayUrl={logoDisplayUrl}
           organization={organization}
           signatureDisplayUrl={signatureDisplayUrl}
         />
+        <p className="mt-3 px-1 text-xs leading-5 text-[var(--muted)]">
+          Prices are in {organization.currency} and times follow {organization.timezone.replace("_", " ")}. Your own language is set in{" "}
+          <Link className="font-semibold text-[var(--primary)]" href="/account">
+            My account
+          </Link>
+          .
+        </p>
       </div>
         </>
       ) : null}
@@ -309,7 +289,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         <>
       <div className="mt-4">
         <Card>
-          <SectionHeader eyebrow="Branches" title="Operating locations" />
+          <SectionHeader eyebrow="Locations" title="Where you operate" />
           <BranchList branches={branches} organizationId={organization.id} />
         </Card>
       </div>
@@ -352,50 +332,11 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         </div>
       ) : null}
       {tab === "rentals" ? (
-        <div className="mt-4">
-          <Card>
-            <SectionHeader eyebrow="Bookings" title="Holds and notice periods" />
-            <BookingRulesPanel rules={bookingRules(organization.settings)} />
-          </Card>
-        </div>
-      ) : null}
-      {tab === "rentals" ? (
-        <div className="mt-4">
-          <Card>
-            <SectionHeader eyebrow="Online booking" title="Your booking page" />
-            <PublicBookingPanel
-              enabled={publicBookingSettings(organization.settings).enabled}
-              deposit={publicBookingSettings(organization.settings).deposit}
-              holdHours={bookingRules(organization.settings).holdHours}
-              pricedVehicles={publicVehicleCounts.priced}
-              slug={organization.slug}
-              totalVehicles={publicVehicleCounts.total}
-            />
-          </Card>
-        </div>
-      ) : null}
-      {tab === "rentals" ? (
-        <>
-      <div className="mt-4">
-        <Card>
-          <SectionHeader eyebrow="Travel policy" title="Rental territory and contract terms" />
-          <p className="mt-2 text-xs leading-5 text-[var(--muted)]">
-            Configure where vehicles are normally allowed to travel, deposits for island crossings, and the default terms used in rental contracts.
-          </p>
-          <TravelPolicyForm organizationId={organization.id} settings={travelPolicySettings} />
-        </Card>
-      </div>
-        </>
-      ) : null}
-      {tab === "rentals" ? (
-        <>
-      <div className="mt-4">
-        <Card>
-          <SectionHeader eyebrow="Payments & receipts" title="Payment Methods" />
-          <p className="mt-2 text-xs leading-5 text-[var(--muted)]">
-            Choose which payment methods you accept. Only enabled methods will be shown to customers in the booking link.
-          </p>
-          <PaymentMethodsForm
+        <div className="space-y-3">
+          {/* Each section says what is set now, and opens with one tap. Getting paid comes first. */}
+          <Fold id="payment-methods" summary={paymentSummary} title="How customers pay you">
+            <p className="mb-3 text-xs leading-5 text-[var(--muted)]">Tick the ways you take money. Customers only see the ones you tick.</p>
+            <PaymentMethodsForm
             businessName={organization.name}
             settings={{
               accepted_payment_methods: organization.accepted_payment_methods,
@@ -411,9 +352,22 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               default_payment_method: organization.default_payment_method
             }}
           />
-          <div className="mt-4 border-t border-[var(--border)] pt-4">
-            <p className="text-sm font-bold text-[var(--foreground)]">Upfront payment discount</p>
-            <p className="mt-1 text-xs text-[var(--muted)]">Offer customers a discounted rate when they pay multiple months upfront. Only shown for monthly billing.</p>
+          </Fold>
+          <Fold id="booking-page" summary={publicBookingSettings(organization.settings).enabled ? "On. Customers can book from your link" : "Off. Only you create bookings"} title="Your booking page">
+            <PublicBookingPanel
+              enabled={publicBookingSettings(organization.settings).enabled}
+              deposit={publicBookingSettings(organization.settings).deposit}
+              holdHours={bookingRules(organization.settings).holdHours}
+              pricedVehicles={publicVehicleCounts.priced}
+              slug={organization.slug}
+              totalVehicles={publicVehicleCounts.total}
+            />
+          </Fold>
+          <Fold id="holds" summary={`Vehicle held ${bookingRules(organization.settings).holdHours} hours until the customer signs`} title="Holds and notice">
+            <BookingRulesPanel rules={bookingRules(organization.settings)} />
+          </Fold>
+          <Fold id="paying-ahead" summary={organization.upfront_discount_enabled ? "On. Lower price for paying months ahead" : "Off"} title="Discount for paying ahead">
+            <p className="mb-3 text-xs leading-5 text-[var(--muted)]">Give a lower monthly price to customers who pay several months at once. Monthly rentals only.</p>
             <form action={updateUpfrontDiscountSettings} className="mt-3 space-y-3">
               <label className="checkbox-label sub-surface min-h-10 font-semibold text-[var(--foreground)]" style={{ display: "flex", alignItems: "center", padding: "8px 12px" }}>
                 <input
@@ -423,11 +377,11 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                   type="checkbox"
                   value="true"
                 />
-                <span>Offer upfront payment discount to customers</span>
+                <span>Offer a lower price for paying ahead</span>
               </label>
               <div className="grid gap-3 sm:grid-cols-3">
                 <label className="block">
-                  <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Minimum months required</span>
+                  <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Months paid at once, at least</span>
                   <input
                     className={inputClass}
                     defaultValue={String(organization.upfront_discount_min_periods ?? 3)}
@@ -437,7 +391,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                   />
                 </label>
                 <label className="block">
-                  <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Discounted rate per month</span>
+                  <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Lower price per month</span>
                   <input
                     className={inputClass}
                     defaultValue={organization.upfront_discount_rate ? String(organization.upfront_discount_rate) : ""}
@@ -449,7 +403,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                   />
                 </label>
                 <label className="block">
-                  <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Offer label / headline</span>
+                  <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">What the customer sees</span>
                   <input
                     className={inputClass}
                     defaultValue={organization.upfront_discount_label || ""}
@@ -459,24 +413,30 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                   />
                 </label>
               </div>
-              <PendingButton className="primary-action" pendingLabel="Saving..." type="submit">
-                Save upfront discount settings
+              <PendingButton className="primary-action" pendingLabel="Saving..." savedLabel="Saved" type="submit">
+                Save
               </PendingButton>
             </form>
-          </div>
-        </Card>
-      </div>
-
-      {/* ── LINE NOTIFICATIONS ── */}
-        </>
+          </Fold>
+          <Fold id="travel" summary={travelSummary} title="Where vehicles can go, fees and limits">
+            <p className="text-xs leading-5 text-[var(--muted)]">These go into your rental agreements: where the vehicle may be taken, and what you charge for extras.</p>
+            <TravelPolicyForm organizationId={organization.id} settings={travelPolicySettings} />
+          </Fold>
+        </div>
       ) : null}
       {tab === "notifications" ? (
         <>
+      <Card>
+        <SectionHeader eyebrow="Alerts" title="Alerts on this device" />
+        <div className="card-section">
+          <PushToggle />
+        </div>
+      </Card>
       <div className="mt-4">
         <Card>
-          <SectionHeader eyebrow="LINE" title="LINE Notifications" />
+          <SectionHeader eyebrow="LINE" title="Alerts in LINE" />
           <p className="mt-2 text-xs text-[var(--muted)]">
-            Receive daily fleet summaries and real-time alerts directly in LINE.
+            Get a morning summary and alerts as things happen, in your LINE.
           </p>
 
           {/* Connection status */}
@@ -640,11 +600,11 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         <Card>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <SectionHeader eyebrow="Fleet import" title="Smart vehicle import" />
-              <p className="mt-2 text-xs text-[var(--muted)]">Use AI to map vehicle spreadsheets, Excel files, and public Google Sheets into your fleet.</p>
+              <SectionHeader eyebrow="Fleet" title="Add many vehicles at once" />
+              <p className="mt-2 text-xs text-[var(--muted)]">Have a list of your vehicles in a spreadsheet or Google Sheet? Bring them all in together.</p>
             </div>
             <Link className="primary-action pressable" href="/fleet/import">
-              Open fleet importer
+              Import vehicles
             </Link>
           </div>
         </Card>
@@ -657,11 +617,11 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         <Card>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <SectionHeader eyebrow="Contracts" title="Rental agreement template" />
-              <p className="mt-2 text-xs text-[var(--muted)]">Edit the default customer-facing rental contract and preview the variables used during booking.</p>
+              <SectionHeader eyebrow="Agreements" title="Rental agreement wording" />
+              <p className="mt-2 text-xs text-[var(--muted)]">The terms your customers read and sign. Change the wording here.</p>
             </div>
             <Link className="primary-action pressable" href="/settings/contracts">
-              Open contract editor
+              Edit the wording
             </Link>
           </div>
         </Card>
@@ -675,7 +635,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <SectionHeader eyebrow="Notifications" title="Which alerts you get" />
-              <p className="mt-2 text-xs text-[var(--muted)]">Pick the events that send you a LINE message: new bookings, payments, returns and more.</p>
+              <p className="mt-2 text-xs text-[var(--muted)]">Pick what you are told about: new bookings, payments, returns and more.</p>
             </div>
             <Link className="primary-action pressable" href="/settings/notifications">
               Choose alerts
@@ -692,10 +652,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <SectionHeader eyebrow="Billing" title="Plan and subscription" />
-              <p className="mt-2 text-xs text-[var(--muted)]">View your free trial, pricing tiers, and manual subscription instructions.</p>
+              <p className="mt-2 text-xs text-[var(--muted)]">Your free trial, the plans and how to pay.</p>
             </div>
             <Link className="primary-action pressable" href={"/settings/billing" as Route}>
-              Open billing
+              See plans
             </Link>
           </div>
         </Card>
@@ -706,7 +666,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         <>
       <div className="mt-4 grid gap-3 xl:grid-cols-[1.15fr_0.85fr]">
         <Card>
-          <SectionHeader eyebrow="Users" title="Organization members" />
+          <SectionHeader eyebrow="Team" title="People in your business" />
           <div className="mt-4 space-y-3">
             {(members || []).map((member: any) => (
               <div className="flex flex-col gap-3 rounded-lg border border-[var(--border)] p-3 sm:flex-row sm:items-center sm:justify-between" key={member.id}>

@@ -5,7 +5,7 @@ import { AppShell } from "@/components/app-shell";
 import { LocalizedDateInput } from "@/components/localized-date-input";
 import { MoneyInput } from "@/components/money-input";
 import { PendingButton } from "@/components/pending-button";
-import { Card, SectionHeader } from "@/components/ui";
+import { Card, Fold, SectionHeader } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { ensureDefaultBranch } from "@/lib/branches";
 import { defaultCalendarForLocale } from "@/lib/i18n/calendars";
@@ -46,6 +46,12 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
   const preferredLocale = profile?.preferred_locale || organization.default_locale || "en";
   const preferredCalendar = profile?.preferred_calendar || defaultCalendarForLocale(preferredLocale);
 
+  const money = (value: unknown) => (value == null || value === "" || Number(value) === 0 ? null : `${organization.currency === "THB" ? "฿" : ""}${Number(value).toLocaleString("en-US")}`);
+  const ratesSummary =
+    [money(vehicle.daily_rate) ? `${money(vehicle.daily_rate)} a day` : null, money(vehicle.weekly_rate) ? `${money(vehicle.weekly_rate)} a week` : null, money(vehicle.monthly_rate) ? `${money(vehicle.monthly_rate)} a month` : null]
+      .filter(Boolean)
+      .join(" · ") || "No prices set yet";
+
   return (
     <AppShell userEmail={userEmail}>
       <div className="mx-auto max-w-3xl">
@@ -65,9 +71,30 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
             <input name="vehicleId" type="hidden" value={vehicle.id} />
             <input name="organizationId" type="hidden" value={organization.id} />
 
-            <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-4">
-              <SectionHeader eyebrow="Identity" title="Core details" />
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            {/* Most changed first. Everything else is one tap away. */}
+            <Fold open summary={ratesSummary} title="Rates and deposit">
+              <div className="grid gap-4 sm:grid-cols-3">
+                <label className="block">
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Daily rate</span>
+                  <MoneyInput currency={organization.currency || "THB"} defaultValue={valueOrEmpty(vehicle.daily_rate)} name="dailyRate" />
+                </label>
+                <label className="block">
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Weekly rate</span>
+                  <MoneyInput currency={organization.currency || "THB"} defaultValue={valueOrEmpty(vehicle.weekly_rate)} name="weeklyRate" />
+                </label>
+                <label className="block">
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Monthly rate</span>
+                  <MoneyInput currency={organization.currency || "THB"} defaultValue={valueOrEmpty(vehicle.monthly_rate)} name="monthlyRate" />
+                </label>
+              </div>
+              <label className="mt-4 block sm:max-w-xs">
+                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Deposit for this vehicle</span>
+                <MoneyInput currency={organization.currency || "THB"} defaultValue={valueOrEmpty((vehicle as any).deposit_amount)} name="depositAmount" />
+                <span className="mt-1 block text-xs text-[var(--muted)]">Leave empty to use your usual deposit from Settings.</span>
+              </label>
+            </Fold>
+            <Fold summary={`${vehicle.make} ${vehicle.model} · ${vehicle.registration_number}`} title="Make, model and number plate">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block">
                   <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Vehicle category</span>
                   <select className={inputClass} defaultValue={vehicle.category_id} name="categoryId" required>
@@ -94,19 +121,9 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
                   <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Trim</span>
                   <input className={inputClass} defaultValue={valueOrEmpty(vehicle.trim)} name="trim" />
                 </label>
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-[var(--border)] bg-white p-4">
-              <SectionHeader eyebrow="Vehicle details" title="Registration and specs" />
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Registration number</span>
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Number plate</span>
                   <input className={`${inputClass} font-mono-data`} defaultValue={vehicle.registration_number} name="registrationNumber" required />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">VIN / frame number</span>
-                  <input className={`${inputClass} font-mono-data`} defaultValue={valueOrEmpty(vehicle.vin)} name="vin" />
                 </label>
                 <label className="block">
                   <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Colour</span>
@@ -115,6 +132,51 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
                 <label className="block">
                   <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Current mileage</span>
                   <input className={`${inputClass} font-mono-data`} defaultValue={valueOrEmpty(vehicle.mileage)} min="0" name="mileage" type="number" />
+                </label>
+              </div>
+            </Fold>
+            <Fold summary="So you are reminded before they run out" title="Tax, insurance and service dates">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="block">
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Road tax runs out</span>
+                  <LocalizedDateInput calendar={preferredCalendar} defaultValue={valueOrEmpty(compliance.tax_expiry_date)} inputClass={inputClass} name="taxExpiryDate" preferredLocale={preferredLocale} />
+                </label>
+                <label className="block">
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Compulsory insurance runs out</span>
+                  <LocalizedDateInput calendar={preferredCalendar} defaultValue={valueOrEmpty(compliance.porbor_expiry_date)} inputClass={inputClass} name="porborExpiryDate" preferredLocale={preferredLocale} />
+                </label>
+                <label className="block">
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Your own insurance runs out</span>
+                  <LocalizedDateInput calendar={preferredCalendar} defaultValue={valueOrEmpty(compliance.insurance_expiry_date)} inputClass={inputClass} name="insuranceExpiryDate" preferredLocale={preferredLocale} />
+                </label>
+                <label className="block">
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Type of cover</span>
+                  <select className={inputClass} defaultValue={valueOrEmpty(compliance.voluntary_insurance_type)} name="voluntaryInsuranceType">
+                    <option value="">Select cover type</option>
+                    <option value="class_1">Class 1 / Type 1 comprehensive</option>
+                    <option value="class_2_plus">Class 2+ / Type 2+</option>
+                    <option value="class_2">Class 2 / Type 2</option>
+                    <option value="class_3_plus">Class 3+ / Type 3+</option>
+                    <option value="class_3">Class 3 / Type 3 third-party</option>
+                    <option value="rental_commercial">Rental/commercial policy</option>
+                    <option value="unknown">Unknown / check policy</option>
+                  </select>
+                </label>
+                <label className="block">
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Next service due</span>
+                  <LocalizedDateInput calendar={preferredCalendar} defaultValue={valueOrEmpty(compliance.next_service_date)} inputClass={inputClass} name="nextServiceDate" preferredLocale={preferredLocale} />
+                </label>
+                <label className="block">
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Oil change due</span>
+                  <LocalizedDateInput calendar={preferredCalendar} defaultValue={valueOrEmpty(compliance.oil_change_due_date)} inputClass={inputClass} name="oilChangeDueDate" preferredLocale={preferredLocale} />
+                </label>
+              </div>
+            </Fold>
+            <Fold summary="Frame number, gearbox, seats, engine" title="More about the vehicle">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="block">
+                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">VIN / frame number</span>
+                  <input className={`${inputClass} font-mono-data`} defaultValue={valueOrEmpty(vehicle.vin)} name="vin" />
                 </label>
                 <label className="block">
                   <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Transmission</span>
@@ -141,11 +203,9 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
                   <input className={inputClass} defaultValue={valueOrEmpty(specifications.body_class)} name="bodyClass" placeholder="Scooter / sedan / pickup" />
                 </label>
               </div>
-            </div>
-
-            <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-4">
-              <SectionHeader eyebrow="Acquisition" title="Mileage and value" />
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            </Fold>
+            <Fold summary="Purchase price, value, kilometres when bought" title="What you paid and what it is worth">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block">
                   <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Purchase mileage</span>
                   <input className={`${inputClass} font-mono-data`} defaultValue={valueOrEmpty(acquisition.purchase_mileage)} min="0" name="purchaseMileage" type="number" />
@@ -159,97 +219,38 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
                   <MoneyInput currency={organization.currency || "THB"} defaultValue={valueOrEmpty(vehicle.estimated_value)} name="estimatedValue" />
                 </label>
               </div>
-            </div>
-
-            <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-4">
-              <SectionHeader eyebrow="Rental pricing" title="Rates and deposit" />
-              <div className="mt-4 grid gap-4 sm:grid-cols-3">
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Daily rate</span>
-                  <MoneyInput currency={organization.currency || "THB"} defaultValue={valueOrEmpty(vehicle.daily_rate)} name="dailyRate" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Weekly rate</span>
-                  <MoneyInput currency={organization.currency || "THB"} defaultValue={valueOrEmpty(vehicle.weekly_rate)} name="weeklyRate" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Monthly rate</span>
-                  <MoneyInput currency={organization.currency || "THB"} defaultValue={valueOrEmpty(vehicle.monthly_rate)} name="monthlyRate" />
-                </label>
-              </div>
-              <label className="mt-4 block sm:max-w-xs">
-                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Deposit for this vehicle</span>
-                <MoneyInput currency={organization.currency || "THB"} defaultValue={valueOrEmpty((vehicle as any).deposit_amount)} name="depositAmount" />
-                <span className="mt-1 block text-xs text-[var(--muted)]">Leave empty to use your usual deposit from Settings.</span>
-              </label>
-            </div>
-
-            <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-4">
-              <SectionHeader eyebrow="Location" title="Branch assignment" />
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Home branch</span>
-                  <select className={inputClass} defaultValue={valueOrEmpty(vehicle.home_branch_id)} name="homeBranchId">
-                    <option value="">No branch</option>
-                    {branches.map((branch) => (
-                      <option key={branch.id} value={branch.id}>
-                        {branch.name}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Service area</span>
-                  <select className={inputClass} defaultValue={vehicle.service_area || "home_branch"} name="serviceArea">
-                    <option value="home_branch">Home branch only</option>
-                    <option value="all_branches">All branches</option>
-                  </select>
-                </label>
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-[#fecaca] bg-[var(--danger-light)] p-4">
-              <SectionHeader eyebrow="Compliance & Renewals" title="Critical dates" />
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Vehicle tax expiry</span>
-                  <LocalizedDateInput calendar={preferredCalendar} defaultValue={valueOrEmpty(compliance.tax_expiry_date)} inputClass={inputClass} name="taxExpiryDate" preferredLocale={preferredLocale} />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Compulsory insurance expiry</span>
-                  <LocalizedDateInput calendar={preferredCalendar} defaultValue={valueOrEmpty(compliance.porbor_expiry_date)} inputClass={inputClass} name="porborExpiryDate" preferredLocale={preferredLocale} />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Voluntary insurance expiry</span>
-                  <LocalizedDateInput calendar={preferredCalendar} defaultValue={valueOrEmpty(compliance.insurance_expiry_date)} inputClass={inputClass} name="insuranceExpiryDate" preferredLocale={preferredLocale} />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Voluntary insurance type</span>
-                  <select className={inputClass} defaultValue={valueOrEmpty(compliance.voluntary_insurance_type)} name="voluntaryInsuranceType">
-                    <option value="">Select cover type</option>
-                    <option value="class_1">Class 1 / Type 1 comprehensive</option>
-                    <option value="class_2_plus">Class 2+ / Type 2+</option>
-                    <option value="class_2">Class 2 / Type 2</option>
-                    <option value="class_3_plus">Class 3+ / Type 3+</option>
-                    <option value="class_3">Class 3 / Type 3 third-party</option>
-                    <option value="rental_commercial">Rental/commercial policy</option>
-                    <option value="unknown">Unknown / check policy</option>
-                  </select>
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Next service due</span>
-                  <LocalizedDateInput calendar={preferredCalendar} defaultValue={valueOrEmpty(compliance.next_service_date)} inputClass={inputClass} name="nextServiceDate" preferredLocale={preferredLocale} />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Oil change due</span>
-                  <LocalizedDateInput calendar={preferredCalendar} defaultValue={valueOrEmpty(compliance.oil_change_due_date)} inputClass={inputClass} name="oilChangeDueDate" preferredLocale={preferredLocale} />
-                </label>
-              </div>
-            </div>
-
-            <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-4">
-              <SectionHeader eyebrow="Finance" title="Loan details" />
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            </Fold>
+            {branches.length > 1 ? (
+              <Fold summary="Which of your locations it belongs to" title="Location">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className="block">
+                    <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Home branch</span>
+                    <select className={inputClass} defaultValue={valueOrEmpty(vehicle.home_branch_id)} name="homeBranchId">
+                      <option value="">No branch</option>
+                      {branches.map((branch) => (
+                        <option key={branch.id} value={branch.id}>
+                          {branch.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="block">
+                    <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Service area</span>
+                    <select className={inputClass} defaultValue={vehicle.service_area || "home_branch"} name="serviceArea">
+                      <option value="home_branch">Home branch only</option>
+                      <option value="all_branches">All branches</option>
+                    </select>
+                  </label>
+                </div>
+              </Fold>
+            ) : (
+              <>
+                <input name="homeBranchId" type="hidden" value={valueOrEmpty(vehicle.home_branch_id)} />
+                <input name="serviceArea" type="hidden" value={vehicle.service_area || "home_branch"} />
+              </>
+            )}
+            <Fold summary="If the vehicle is on finance" title="Loan">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block">
                   <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Finance provider</span>
                   <input className={inputClass} defaultValue={valueOrEmpty(finance.lender)} name="financeLender" />
@@ -267,7 +268,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
                   <LocalizedDateInput calendar={preferredCalendar} defaultValue={valueOrEmpty(finance.end_date)} inputClass={inputClass} name="financeEndDate" preferredLocale={preferredLocale} />
                 </label>
               </div>
-            </div>
+            </Fold>
 
             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <Link className="inline-flex justify-center rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm font-bold text-[var(--foreground-secondary)]" href={`/fleet/${vehicle.id}`}>

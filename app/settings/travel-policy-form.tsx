@@ -163,24 +163,6 @@ export function TravelPolicyForm({
         </div>
       </details>
 
-      <section className="form-section bg-[var(--success-light)]">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--primary)]">Contact details shown in agreements</p>
-        <div className="mt-3 grid gap-3 sm:grid-cols-3">
-          <label className="block">
-            <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">LINE ID</span>
-            <input className={inputClass} defaultValue={settings.owner_line_id} name="ownerLineId" />
-          </label>
-          <label className="block">
-            <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">WhatsApp number</span>
-            <input className={inputClass} defaultValue={settings.owner_whatsapp} name="ownerWhatsapp" />
-          </label>
-          <label className="block">
-            <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">PromptPay ID</span>
-            <input className={inputClass} defaultValue={settings.promptpay_id} name="promptpayId" />
-          </label>
-        </div>
-      </section>
-
       <div className="flex flex-col gap-3 sm:flex-row">
         <PendingButton className="primary-action flex-1" pendingLabel="Saving..." savedLabel="Saved" type="submit">
           Save

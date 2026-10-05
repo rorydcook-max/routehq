@@ -162,7 +162,7 @@ export function BranchList({ branches, organizationId }: { branches: Branch[]; o
                   <button className="secondary-action flex-1" onClick={() => setEditingBranchId(null)} type="button">
                     Cancel
                   </button>
-                  <PendingButton className="primary-action flex-1" pendingLabel="Saving..." type="submit">
+                  <PendingButton className="primary-action flex-1" pendingLabel="Saving..." savedLabel="Saved" type="submit">
                     Save
                   </PendingButton>
                 </div>

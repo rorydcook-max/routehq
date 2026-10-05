@@ -530,7 +530,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                 <input name="line_daily_summary_time" type="hidden" value={organization.line_daily_summary_time ?? "08:00"} />
               </div>
 
-              <PendingButton className="primary-action w-full sm:w-auto" pendingLabel="Saving…" type="submit">
+              <PendingButton className="primary-action w-full sm:w-auto" pendingLabel="Saving…" savedLabel="Saved" type="submit">
                 Save LINE settings
               </PendingButton>
             </form>

@@ -94,7 +94,7 @@ export function ContractTemplateEditor({
         </label>
 
         <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-          <PendingButton className="primary-action flex-1" pendingLabel="Saving..." type="submit">
+          <PendingButton className="primary-action flex-1" pendingLabel="Saving..." savedLabel="Saved" type="submit">
             <Save size={18} />
             Save template
           </PendingButton>

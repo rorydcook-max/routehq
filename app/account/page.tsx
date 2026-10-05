@@ -76,7 +76,7 @@ export default async function AccountPage() {
                   ))}
                 </select>
               </label>
-              <PendingButton className="primary-action w-full" pendingLabel="Saving..." type="submit">
+              <PendingButton className="primary-action w-full" pendingLabel="Saving..." savedLabel="Saved" type="submit">
                 Save
               </PendingButton>
             </form>

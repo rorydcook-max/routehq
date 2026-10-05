@@ -104,7 +104,7 @@ export default async function NotificationsPage() {
         </div>
 
         <div className="mt-4">
-          <PendingButton className="primary-action w-full sm:w-auto" pendingLabel="Saving…">
+          <PendingButton className="primary-action w-full sm:w-auto" pendingLabel="Saving…" savedLabel="Saved">
             Save
           </PendingButton>
         </div>

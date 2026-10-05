@@ -231,7 +231,7 @@ export async function updatePaymentSettings(formData: FormData) {
 
   const { data: organization, error: organizationError } = await supabase
     .from("organizations")
-    .select("promptpay_qr_url")
+    .select("promptpay_qr_url, settings")
     .eq("id", membership.organization_id)
     .maybeSingle();
 
@@ -283,6 +283,8 @@ export async function updatePaymentSettings(formData: FormData) {
     .update({
       accepted_payment_methods: acceptedPaymentMethods,
       promptpay_id: optionalStringFromForm(formData, "promptpay_id"),
+      // Agreements read the PromptPay number from settings: keep the two the same.
+      settings: { ...((organization?.settings as Record<string, unknown> | null) || {}), promptpay_id: optionalStringFromForm(formData, "promptpay_id") || "" },
       promptpay_qr_url: promptPayQrUrl,
       bank_name: optionalStringFromForm(formData, "bank_name"),
       bank_account_number: optionalStringFromForm(formData, "bank_account_number"),
@@ -679,7 +681,7 @@ export async function updateTravelPolicySettings(formData: FormData) {
 
   const { data: organization, error: organizationError } = await supabase
     .from("organizations")
-    .select("settings")
+    .select("settings, line_id, whatsapp, promptpay_id")
     .eq("id", organizationId)
     .maybeSingle();
 
@@ -702,9 +704,10 @@ export async function updateTravelPolicySettings(formData: FormData) {
     smoking_fee_maximum: requiredNumberFromForm(formData, "smokingFeeMaximum", 2000),
     emergency_repair_limit: requiredNumberFromForm(formData, "emergencyRepairLimit", 2000),
     deposit_return_days: requiredNumberFromForm(formData, "depositReturnDays", 5),
-    owner_line_id: String(formData.get("ownerLineId") || "").trim(),
-    owner_whatsapp: String(formData.get("ownerWhatsapp") || "").trim(),
-    promptpay_id: String(formData.get("promptpayId") || "").trim()
+    // One place for contact details: Business (LINE, WhatsApp) and payment methods (PromptPay).
+    owner_line_id: String(organization.line_id || ""),
+    owner_whatsapp: String(organization.whatsapp || ""),
+    promptpay_id: String(organization.promptpay_id || "")
   });
 
   const { error } = await supabase

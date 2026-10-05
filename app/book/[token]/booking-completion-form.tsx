@@ -143,6 +143,17 @@ function buildContractPreviewDocument(contractHtml: string) {
         width: 100%;
         border-collapse: collapse;
       }
+
+      /* On a phone the agreement must read top to bottom: nothing may push it sideways. */
+      html,
+      body {
+        overflow-x: hidden;
+      }
+
+      body * {
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
     </style>
   </head>
   <body>${bodyHtml}</body>
@@ -1302,7 +1313,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             ) : null}
           </div>
         ) : null}
-        <div className="routehq-contract-preview contract-preview mt-4 h-[460px] overflow-hidden rounded-xl border border-[var(--border)] bg-[#fbfaf8]">
+        <div className="routehq-contract-preview contract-preview mt-4 h-[70vh] min-h-[460px] overflow-hidden rounded-xl border border-[var(--border)] bg-[#fbfaf8]">
           <iframe
             className="h-full w-full border-0 bg-[#fbfaf8]"
             sandbox=""

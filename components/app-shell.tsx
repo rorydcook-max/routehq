@@ -81,7 +81,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
 
   // Teammates cannot use business settings, so the link is hidden for them.
   // Display only: the middleware and server actions enforce the rule.
-  const [shell, setShell] = useState<ShellContext>({ role: null, organizations: [], unreadChats: 0 });
+  const [shell, setShell] = useState<ShellContext>({ role: null, organizations: [], unreadChats: 0, dueTasks: 0 });
   useEffect(() => {
     let cancelled = false;
     getShellContext()
@@ -104,6 +104,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
   const onFocusedFlow = !!pathname && (pathname.startsWith("/inspections") || /\/(new|edit|import)(\/|$)/.test(pathname));
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
   const moreActive = moreItems.some((item) => isActive(item.href));
+  const badgeFor = (key: NavKey) => (key === "inbox" ? shell.unreadChats : key === "tasks" ? shell.dueTasks : 0);
 
   return (
     <div className="min-h-screen pb-24 lg:pb-0">
@@ -129,8 +130,8 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
               >
                 <Icon size={16} />
                 {t(item.key)}
-                {item.key === "inbox" && shell.unreadChats > 0 ? (
-                  <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--primary)] px-1.5 text-[11px] font-semibold text-white">{shell.unreadChats}</span>
+                {badgeFor(item.key) > 0 ? (
+                  <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--primary)] px-1.5 text-[11px] font-semibold text-white">{badgeFor(item.key)}</span>
                 ) : null}
               </Link>
             );
@@ -220,8 +221,8 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
               >
                 <span className="relative">
                   <Icon size={18} />
-                  {item.key === "inbox" && shell.unreadChats > 0 ? (
-                    <span className="absolute -right-2.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--primary)] px-1 text-[10px] font-semibold text-white">{shell.unreadChats}</span>
+                  {badgeFor(item.key) > 0 ? (
+                    <span className="absolute -right-2.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--primary)] px-1 text-[10px] font-semibold text-white">{badgeFor(item.key)}</span>
                   ) : null}
                 </span>
                 <span className="truncate">{t(item.key)}</span>

@@ -64,12 +64,14 @@ export type ShellContext = {
   organizations: { id: string; name: string; active: boolean }[];
   /** Customer chats with unread messages, shown as a badge on Inbox. */
   unreadChats: number;
+  /** Payments and jobs due today or overdue, shown as a badge on To do. */
+  dueTasks: number;
 };
 
 /** Used by the app shell for navigation and the business switcher. Display only - access is enforced on the server. */
 export async function getShellContext(): Promise<ShellContext> {
   const membership = await getCurrentMembership();
-  if (!membership) return { role: null, organizations: [], unreadChats: 0 };
+  if (!membership) return { role: null, organizations: [], unreadChats: 0, dueTasks: 0 };
 
   const supabase = (await createSupabaseServerClient()) as any;
   const { data } = await supabase
@@ -90,7 +92,17 @@ export async function getShellContext(): Promise<ShellContext> {
     .eq("organization_id", membership.organizationId)
     .eq("status", "open")
     .gt("unread_count", 0);
-  return { role: membership.role, organizations, unreadChats: count || 0 };
+  // Only what needs doing now counts: later jobs would make the badge permanent noise.
+  let dueTasks = 0;
+  try {
+    const { getTaskList } = await import("@/lib/tasks");
+    const { businessToday } = await import("@/lib/business-time");
+    const today = businessToday();
+    dueTasks = (await getTaskList(membership.organizationId)).filter((task) => !task.completedAt && !task.coveredBy && !!task.dueDate && task.dueDate <= today).length;
+  } catch {
+    dueTasks = 0;
+  }
+  return { role: membership.role, organizations, unreadChats: count || 0, dueTasks };
 }
 
 /** Switch the business this person is working in. Only businesses they actively belong to are accepted. */

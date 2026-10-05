@@ -124,7 +124,7 @@ function DepositsCard({ data }: { data: ReportsData["depositSummary"] }) {
         <div className="rounded-full border border-amber-200 bg-white px-3 py-1 text-xs font-bold text-amber-700">Liability</div>
       </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-5">
         {rows.map((row) => (
           <div key={row.label} className="rounded-xl border border-amber-100 bg-white/80 p-3">
             <p className="text-xs font-semibold text-[var(--muted)]">{row.label}</p>
@@ -625,7 +625,7 @@ export function ReportsView({ data }: { data: ReportsData }) {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
         <KpiCard label="Money in" value={money(data.totalRevenue)} change={data.revenueChange} />
         <KpiCard label="Money out" value={money(data.totalExpenses)} change={data.expensesChange} upIsBad />
         <KpiCard label="Profit" value={money(data.netProfit)} change={data.profitChange} />

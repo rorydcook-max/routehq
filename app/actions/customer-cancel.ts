@@ -103,7 +103,7 @@ export async function cancelBookingByCustomer(formData: FormData): Promise<Resul
         })
       : Promise.resolve(null)
   ]);
-  notifyOperator(rental.organization_id, `❌ Booking cancelled by the customer: ${who}, ${vehicle}, ${when}. The dates are free again.${settle}`, "operator_notification").catch(() => null);
+  notifyOperator(rental.organization_id, `❌ Booking cancelled by the customer: ${who}, ${vehicle}, ${when}. The dates are free again.${settle}`, "operator_notification", `/bookings/${rental.id}`).catch(() => null);
 
   await tellRentalCustomer(admin, rental.id, ({ firstName }) =>
     `Hi ${firstName}, your booking for the ${vehicle} (${when}) is cancelled, as you asked.${paid > 0 ? ` We'll be in touch about the ${money} you paid.` : ""}`,

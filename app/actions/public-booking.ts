@@ -518,7 +518,7 @@ export async function submitCustomerPortalAction(formData: FormData) {
   };
   const notifyMsg = portalActionMessages[actionType] ?? `📣 Customer submitted a portal action: ${actionType}`;
   // An extension applied automatically sends its own notice.
-  if (!extension?.applied) notifyOperator(bookingLink.organization_id, notifyMsg, "portal_action").catch(() => null);
+  if (!extension?.applied) notifyOperator(bookingLink.organization_id, notifyMsg, "portal_action", bookingLink.rental_id ? `/bookings/${bookingLink.rental_id}#customer-requests` : "/tasks").catch(() => null);
   revalidatePath(`/book/${token}`);
 
   return { success: true, actionType, extension: extension || null };
@@ -975,7 +975,8 @@ export async function completePublicBooking(formData: FormData) {
     notifyOperator(
       organizationId,
       `✍️ ${fullName || signedName || "Your customer"} completed their booking and signed the rental agreement.`,
-      "contract_signed"
+      "contract_signed",
+      bookingLink.rental_id ? `/bookings/${bookingLink.rental_id}` : "/bookings"
     ).catch(() => null);
 
     return {
@@ -1193,7 +1194,8 @@ export async function completePublicBooking(formData: FormData) {
   notifyOperator(
     organizationId,
     `✍️ ${customerDisplayName} completed their booking and signed the rental agreement for ${vehicleLabel || "their vehicle"}.`,
-    "contract_signed"
+    "contract_signed",
+    bookingLink.rental_id ? `/bookings/${bookingLink.rental_id}` : "/bookings"
   ).catch(() => null);
 
   const { data: signedUrl } = await supabase.storage.from("documents").createSignedUrl(contractUpload.storagePath, 60 * 60);

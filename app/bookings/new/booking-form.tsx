@@ -301,7 +301,11 @@ export function BookingForm({
   const [openEnded, setOpenEnded] = useState(false);
   const [pricingModel, setPricingModel] = useState("monthly");
   const [currency, setCurrency] = useState(CURRENCY_INFO[defaultCurrency] ? defaultCurrency : "THB");
-  const [rentalRate, setRentalRate] = useState(0);
+  // Filled from the start when the vehicle is already chosen, so the rate never shows as empty while the page loads.
+  const [rentalRate, setRentalRate] = useState(() => {
+    const preselected = validPreselectedVehicle ? vehicles.find((vehicle) => vehicle.id === preselectedVehicleId) : null;
+    return preselected ? rateFor(preselected, "monthly") : 0;
+  });
   const [depositAmount, setDepositAmount] = useState(defaultDeposit > 0 ? defaultDeposit : 0);
   // For a rental that has already started: what the customer has paid so far.
   const [existingPaid, setExistingPaid] = useState<"up_to_date" | "until" | "none">("up_to_date");
@@ -628,7 +632,27 @@ export function BookingForm({
         </div>
       ) : null}
 
-      <div className="content-section">
+      {step !== 0 ? (
+        <div className="content-section flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-sm">
+          <span className="font-semibold text-[var(--foreground)]">{bookingMode === "booking_link" ? "Booking link for the customer" : "Recording a rental that has already started"}</span>
+          <button
+            className="font-semibold text-[var(--primary)] underline"
+            onClick={() => {
+              if (bookingMode === "booking_link") {
+                setBookingMode("existing_rental");
+                setCustomerSkipped(false);
+                if (!selectedCustomer) setStep((current) => (current >= 2 ? 1 : current));
+              } else {
+                setBookingMode("booking_link");
+              }
+            }}
+            type="button"
+          >
+            {bookingMode === "booking_link" ? "It has already started" : "Send a booking link instead"}
+          </button>
+        </div>
+      ) : null}
+      <div className={step === 0 ? "content-section" : "hidden"}>
         <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Booking mode</p>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <button
@@ -765,6 +789,15 @@ export function BookingForm({
       {step === 2 ? (
         <section className="content-section">
           <Header icon={CalendarDays} eyebrow={`Step ${displayStepNumber}`} title="Rental details" />
+          {selectedVehicle ? (
+            <p className="mt-2 text-sm font-semibold text-[var(--foreground)]">
+              {[selectedVehicle.make, selectedVehicle.model].filter(Boolean).join(" ")}
+              {selectedVehicle.registration_number ? <span className="font-mono-data ml-2 text-[var(--muted)]">{selectedVehicle.registration_number}</span> : null}{" "}
+              <button className="ml-1 font-semibold text-[var(--primary)] underline" onClick={() => setStep(0)} type="button">
+                Change
+              </button>
+            </p>
+          ) : null}
           {bookingMode === "booking_link" ? (
             <p className="mt-2 text-sm text-[var(--muted)]">
               {selectedCustomer && !customerSkipped ? `For ${selectedCustomer.full_name}. ` : "The customer fills in their own details from the link. "}
@@ -803,9 +836,11 @@ export function BookingForm({
               <input className={inputClass} disabled={openEnded} onChange={(event) => setEndDate(event.target.value)} type="date" value={endDate} />
             </label>
           </div>
-          <p style={{ fontSize: 11, color: "#94a3b8", marginTop: 3 }}>
-            You can set a past date when recording a historical booking.
-          </p>
+          {bookingMode === "existing_rental" ? (
+            <p style={{ fontSize: 11, color: "#94a3b8", marginTop: 3 }}>
+              Use the date the rental actually started.
+            </p>
+          ) : null}
           <label className="checkbox-label sub-surface mt-3 min-h-12 font-bold text-[var(--foreground)]" style={{ display: "flex", alignItems: "center", padding: "10px 12px" }}>
             <input
               checked={openEnded}
@@ -821,10 +856,10 @@ export function BookingForm({
               {conflictMessage(dateConflict)}
             </p>
           ) : null}
-          <div className="mt-3 grid gap-3 sm:grid-cols-4">
+          <div className="mt-3 grid grid-cols-4 gap-2 sm:gap-3">
             {["daily", "weekly", "monthly", "custom"].map((period) => (
               <button
-                className={`pressable min-h-12 rounded-lg border px-3 py-2 text-sm font-semibold capitalize ${pricingModel === period ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
+                className={`pressable min-h-11 rounded-lg border px-1 py-2 text-sm font-semibold capitalize ${pricingModel === period ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
                 key={period}
                 onClick={() => setPricingModel(period)}
                 type="button"
@@ -833,7 +868,7 @@ export function BookingForm({
               </button>
             ))}
           </div>
-          <div className="mt-3 grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_10rem]">
+          <div className="mt-3 grid grid-cols-2 gap-3">
             <label className="block">
               <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Rental rate</span>
               <input
@@ -857,17 +892,34 @@ export function BookingForm({
                 value={moneyInput(depositAmount, currencyInfo, true)}
               />
             </label>
-            <label className="block">
-              <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Currency</span>
-              <select className={inputClass} onChange={(event) => setCurrency(event.target.value)} value={currency}>
-                {Object.entries(CURRENCY_INFO).map(([code, info]) => (
-                  <option key={code} value={code}>
-                    {info.symbol} - {code}
-                  </option>
-                ))}
-              </select>
-            </label>
           </div>
+          <div className="mt-3">
+            <p className="text-[13px] font-semibold text-[var(--foreground)]">What is included</p>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              {includedOptions.map((item) => (
+                <label
+                  className="checkbox-label sub-surface min-h-12 font-bold text-[var(--foreground-secondary)]"
+                  key={item}
+                  style={{ display: "flex", alignItems: "center", padding: "10px 12px" }}
+                >
+                  <input
+                    checked={includedItems.includes(item)}
+                    className="flex-shrink-0"
+                    name="includedItem"
+                    onChange={(event) => {
+                      setIncludedItems((current) => (event.target.checked ? [...current, item] : current.filter((entry) => entry !== item)));
+                    }}
+                    type="checkbox"
+                    value={item}
+                  />
+                  <span>{item}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          {/* Rarely needed: kept one tap away so the usual booking is a short screen. */}
+          <details className="mt-3" open={upfrontEnabled || Boolean(specialConditions) || currency !== (CURRENCY_INFO[defaultCurrency] ? defaultCurrency : "THB")}>
+            <summary className="cursor-pointer py-1 text-sm font-semibold text-[var(--primary)]">More options: paying ahead, currency, special conditions</summary>
           <div className="mt-3">
             <label
               className="checkbox-label sub-surface min-h-12 font-bold text-[var(--foreground)]"
@@ -925,34 +977,23 @@ export function BookingForm({
               </div>
             ) : null}
           </div>
-          <div className="mt-3">
-            <p className="text-[13px] font-semibold text-[var(--foreground)]">What is included</p>
-            <div className="mt-3 grid gap-2 sm:grid-cols-2">
-              {includedOptions.map((item) => (
-                <label
-                  className="checkbox-label sub-surface min-h-12 font-bold text-[var(--foreground-secondary)]"
-                  key={item}
-                  style={{ display: "flex", alignItems: "center", padding: "10px 12px" }}
-                >
-                  <input
-                    checked={includedItems.includes(item)}
-                    className="flex-shrink-0"
-                    name="includedItem"
-                    onChange={(event) => {
-                      setIncludedItems((current) => (event.target.checked ? [...current, item] : current.filter((entry) => entry !== item)));
-                    }}
-                    type="checkbox"
-                    value={item}
-                  />
-                  <span>{item}</span>
-                </label>
-              ))}
-            </div>
+          <div className="mt-3 max-w-[12rem]">
+            <label className="block">
+              <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Currency</span>
+              <select className={inputClass} onChange={(event) => setCurrency(event.target.value)} value={currency}>
+                {Object.entries(CURRENCY_INFO).map(([code, info]) => (
+                  <option key={code} value={code}>
+                    {info.symbol} - {code}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
           <label className="mt-3 block">
             <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Special conditions</span>
             <textarea className={inputClass} onChange={(event) => setSpecialConditions(event.target.value)} placeholder="Optional terms that should appear in the contract" rows={4} value={specialConditions} />
           </label>
+          </details>
         </section>
       ) : null}
 

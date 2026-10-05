@@ -805,7 +805,7 @@ async function applyVehicleChange(admin: any, amendment: any, rental: any): Prom
     if (early) {
       await admin.from("tasks").insert({ organization_id: organizationId, vehicle_id: newVehicleId, rental_id: rental.id, title_key: null, created_by: null, title: `Signature needed - ${who} to sign the change to the ${changes.new_vehicle_label || "replacement vehicle"}`, task_type: "admin", action: "swap_signature", due_at: now });
     } else {
-      notifyOperator(organizationId, `🔁 ${who} signed the vehicle change: ${changes.previous_vehicle_label} to ${changes.new_vehicle_label}. Complete the handover and collection forms.`, "portal_action").catch(() => null);
+      notifyOperator(organizationId, `🔁 ${who} signed the vehicle change: ${changes.previous_vehicle_label} to ${changes.new_vehicle_label}. Complete the handover and collection forms.`, "portal_action", `/bookings/${rental.id}#vehicle-change-forms`).catch(() => null);
     }
   } else {
     await syncVehicleStatusFromBookings(admin, organizationId, oldVehicleId).catch(() => null);

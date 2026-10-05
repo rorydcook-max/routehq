@@ -173,7 +173,7 @@ export async function tryAutoExtend(admin: any, rentalId: string, newEndDateRaw:
       metadata: logMetadata
     })
   ]);
-  if (!options.byStaff) notifyOperator(rental.organization_id, alert, "portal_action").catch(() => null);
+  if (!options.byStaff) notifyOperator(rental.organization_id, alert, "portal_action", `/bookings/${rental.id}`).catch(() => null);
 
   await tellRentalCustomer(admin, rental.id, ({ firstName, money }) =>
     outcome.applied && outcome.openEnded

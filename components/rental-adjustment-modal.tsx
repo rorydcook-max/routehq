@@ -1,7 +1,7 @@
 "use client";
 
 import { quoteStay, type Rates } from "@/lib/rental-estimate";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition, useRef } from "react";
 import { adjustRental } from "@/app/actions/bookings";
 import { niceDate } from "@/lib/nice-date";
 import { cancelRentalAmendment, createRentalAmendment, getRentalAmendmentContext, makeRentalOpenEnded, type AmendmentSummary } from "@/app/actions/amendments";
@@ -103,12 +103,19 @@ function daysBetween(from: string | null | undefined, to: string | null | undefi
   return Math.max(0, Math.round((end.getTime() - start.getTime()) / 86_400_000));
 }
 
-function defaultExtensionEndDate(currentEndDate?: string | null) {
+function defaultExtensionEndDate(currentEndDate?: string | null, days = 30) {
   const current = currentEndDate ? new Date(currentEndDate) : new Date();
   const base = Number.isNaN(current.getTime()) ? new Date() : current;
-  const next = addDays(base, 30);
+  const next = addDays(base, days);
   return isoDate(next < tomorrowDate() ? tomorrowDate() : next);
 }
+
+const EXTENSION_PICKS = [
+  { days: 1, label: "+1 day" },
+  { days: 3, label: "+3 days" },
+  { days: 7, label: "+1 week" },
+  { days: 30, label: "+1 month" }
+];
 
 function defaultEarlyReturnDate(currentStartDate?: string | null, currentEndDate?: string | null) {
   // A planned date, so never today or earlier (a vehicle already back goes through Start return).
@@ -164,7 +171,7 @@ function CurrencyInput({
   placeholder?: string;
 }) {
   return (
-    <div className="mt-1 flex h-9 items-center rounded-lg border border-[var(--border-strong)] bg-white focus-within:border-[var(--primary)] focus-within:ring-2 focus-within:ring-[rgba(14,116,144,0.12)]">
+    <div className="mt-1 flex h-11 items-center rounded-lg border border-[var(--border-strong)] bg-white focus-within:border-[var(--primary)] focus-within:ring-2 focus-within:ring-[rgba(14,116,144,0.12)]">
       <span className="shrink-0 pl-3 pr-1 font-mono-data text-[13px] font-bold text-[var(--foreground-secondary)]">THB</span>
       <input
         className="font-mono-data h-full min-w-0 flex-1 border-0 bg-transparent px-1 text-[13px] text-[var(--foreground)] outline-none"
@@ -203,6 +210,9 @@ export function RentalAdjustmentModal({
   const [extensionEndDate, setExtensionEndDate] = useState(() => defaultExtensionEndDate(currentEndDate));
   const [earlyReturnDate, setEarlyReturnDate] = useState(() => defaultEarlyReturnDate(currentStartDate, currentEndDate));
   const [extensionAmount, setExtensionAmount] = useState("");
+  // Until the operator changes them, the date follows the pricing period and the price follows the rates.
+  const dateChosenByHand = useRef(false);
+  const amountTypedByHand = useRef(false);
   const [extensionDueDate, setExtensionDueDate] = useState(() => dateInputValue(currentEndDate) || isoDate(new Date()));
   const [advancePaid, setAdvancePaid] = useState(false);
   const [advancePaidAmount, setAdvancePaidAmount] = useState("");
@@ -227,6 +237,10 @@ export function RentalAdjustmentModal({
     getRentalAmendmentContext(rentalId).then((result) => {
       if (!live || !result.ok) return;
       setContext(result);
+      if (!dateChosenByHand.current) {
+        const period = String(result.billingPeriod || "").toLowerCase();
+        setExtensionEndDate(defaultExtensionEndDate(currentEndDate, period.startsWith("da") ? 1 : period.startsWith("week") ? 7 : 30));
+      }
       if (result.pending) {
         setPendingToken(result.pending.token);
         setPendingId(result.pending.id);
@@ -306,6 +320,11 @@ export function RentalAdjustmentModal({
   const earlyReturnDays = daysBetween(earlyReturnDate, currentEndDate);
   const extensionQuote = context?.rates && extensionDays > 0 ? quoteStay(context.rates, extensionDays) : null;
   const dailyRate = Math.round(Number(currentRate || 0) / 30);
+  const quotedAmount = extensionQuote?.amount ?? null;
+  useEffect(() => {
+    if (amountTypedByHand.current || quotedAmount === null) return;
+    setExtensionAmount(quotedAmount > 0 ? quotedAmount.toLocaleString("en-US") : "");
+  }, [quotedAmount]);
   const suggestedRefund = Math.round(earlyReturnDays * (Number(currentRate || 0) / 30));
 
   function updateAdvanceAmount(value: string) {
@@ -428,7 +447,7 @@ export function RentalAdjustmentModal({
               {newRate.trim() ? (
                 <label className="block">
                   New rate applies to payments due from
-                  <input className="mt-1 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" onChange={(event) => setRateFrom(event.target.value)} type="date" value={rateFrom} />
+                  <input className="mt-1 min-h-11 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" onChange={(event) => setRateFrom(event.target.value)} type="date" value={rateFrom} />
                 </label>
               ) : null}
               <label className="block">
@@ -441,7 +460,7 @@ export function RentalAdjustmentModal({
               {parseAmount(newDeposit) > Number(context?.currentDeposit || 0) ? (
                 <label className="block">
                   Extra deposit due
-                  <input className="mt-1 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" onChange={(event) => setDepositDueDate(event.target.value)} type="date" value={depositDueDate} />
+                  <input className="mt-1 min-h-11 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" onChange={(event) => setDepositDueDate(event.target.value)} type="date" value={depositDueDate} />
                 </label>
               ) : null}
               <label className="block">
@@ -456,7 +475,28 @@ export function RentalAdjustmentModal({
             <>
               <label className="block">
                 New return date
-                <input className="mt-1 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" min={tomorrow} onChange={(event) => setExtensionEndDate(event.target.value)} type="date" value={extensionEndDate} />
+                <input className="mt-1 min-h-11 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" min={tomorrow} onChange={(event) => {
+                  dateChosenByHand.current = true;
+                  setExtensionEndDate(event.target.value);
+                }} type="date" value={extensionEndDate} />
+                <span className="mt-2 grid grid-cols-4 gap-1.5">
+                  {EXTENSION_PICKS.map((pick) => {
+                    const target = defaultExtensionEndDate(currentEndDate, pick.days);
+                    return (
+                      <button
+                        className={`pressable min-h-10 rounded-lg border px-1 text-[12px] font-semibold ${extensionEndDate === target ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
+                        key={pick.days}
+                        onClick={() => {
+                          dateChosenByHand.current = true;
+                          setExtensionEndDate(target);
+                        }}
+                        type="button"
+                      >
+                        {pick.label}
+                      </button>
+                    );
+                  })}
+                </span>
               </label>
               {originalEndDate && context?.onRent && (context?.rates?.monthlyRate || 0) > 0 ? (
                 <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[var(--border)] bg-white p-3 text-[13px] text-[var(--foreground-secondary)]">
@@ -475,21 +515,30 @@ export function RentalAdjustmentModal({
 
               <label className="block">
                 Agreed payment for this extension
-                <CurrencyInput onChange={setExtensionAmount} value={extensionAmount} />
+                <CurrencyInput
+                  onChange={(value) => {
+                    amountTypedByHand.current = true;
+                    setExtensionAmount(value);
+                  }}
+                  value={extensionAmount}
+                />
                 {extensionQuote ? (
                   <span className="mt-1 flex flex-wrap items-center gap-2 text-[12px] text-[var(--foreground-secondary)]">
                     From your rates: <span className="font-semibold text-[var(--foreground)]">{money(extensionQuote.amount)}</span> ({extensionQuote.explain})
-                    <button className="rounded-md border border-[var(--border)] bg-white px-2 py-0.5 text-[11px] font-semibold text-[var(--primary)]" onClick={() => setExtensionAmount(String(extensionQuote.amount))} type="button">
+                    <button className={`rounded-md border border-[var(--border)] bg-white px-2 py-1 text-[11px] font-semibold text-[var(--primary)] ${parseAmount(extensionAmount) === extensionQuote.amount ? "hidden" : ""}`} onClick={() => {
+                      amountTypedByHand.current = false;
+                      setExtensionAmount(extensionQuote.amount.toLocaleString("en-US"));
+                    }} type="button">
                       Use this
                     </button>
                   </span>
                 ) : null}
-                <span className="mt-1 block text-[11px] text-[var(--muted)]">Total amount agreed for this specific period - not a recurring rate. If 0 or blank, no payment record is created.</span>
+                <span className="mt-1 block text-[11px] text-[var(--muted)]">One price for these extra days. Change it if you agreed something different. If left at 0, no payment is added.</span>
               </label>
 
               <label className="block">
                 Payment due
-                <input className="mt-1 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" onChange={(event) => setExtensionDueDate(event.target.value)} type="date" value={extensionDueDate} />
+                <input className="mt-1 min-h-11 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" onChange={(event) => setExtensionDueDate(event.target.value)} type="date" value={extensionDueDate} />
                 <span className="mt-1 block text-[11px] text-[var(--muted)]">Typically the day the current period ends.</span>
               </label>
 
@@ -513,7 +562,7 @@ export function RentalAdjustmentModal({
               ) : (
                 <label className="block">
                   Internal note
-                  <input className="mt-1 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" onChange={(event) => setNote(event.target.value)} placeholder="Optional" type="text" value={note} />
+                  <input className="mt-1 min-h-11 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" onChange={(event) => setNote(event.target.value)} placeholder="Optional" type="text" value={note} />
                 </label>
               )}
 
@@ -527,7 +576,7 @@ export function RentalAdjustmentModal({
               <label className="block">
                 {openEnded ? "Return date" : "New return date"}
                 <input
-                  className="mt-1 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]"
+                  className="mt-1 min-h-11 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]"
                   max={originalEndDate || undefined}
                   min={tomorrow}
                   onChange={(event) => setEarlyReturnDate(event.target.value)}
@@ -547,7 +596,7 @@ export function RentalAdjustmentModal({
 
               <label className="block">
                 Internal note
-                <input className="mt-1 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" onChange={(event) => setNote(event.target.value)} placeholder="Optional" type="text" value={note} />
+                <input className="mt-1 min-h-11 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" onChange={(event) => setNote(event.target.value)} placeholder="Optional" type="text" value={note} />
               </label>
             </>
           )}

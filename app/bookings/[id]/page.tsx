@@ -483,7 +483,15 @@ export default async function BookingDetailPage({ params, searchParams }: { para
     if (activePayments.length > 0 && ((totalRentalValue > 0 && totalPaid >= totalRentalValue) || pendingPaymentAmount === 0)) {
       return {
         label: "Paid up to date",
-        detail: "Nothing is due right now.",
+        detail: (() => {
+          // Say what comes next, so "nothing due" never hides a payment a few days away.
+          if (upcomingUnpaid.length === 0) return "Nothing is due right now.";
+          const nextDue = upcomingUnpaid.map((payment: any) => String(payment.due_date).slice(0, 10)).sort()[0];
+          const nextAmount = upcomingUnpaid
+            .filter((payment: any) => String(payment.due_date).slice(0, 10) === nextDue)
+            .reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
+          return `Next: ${money(nextAmount, rental.currency)} due ${new Date(`${nextDue}T00:00:00`).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}.`;
+        })(),
         amount: null as number | null,
         tone: "green" as const
       };

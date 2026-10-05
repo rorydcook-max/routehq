@@ -31,7 +31,7 @@ const baht = (value: number) => `฿${Math.round(value).toLocaleString("en-US")}
  */
 export function quoteStay(rates: Rates, days: number): StayQuote | null {
   if (!(days > 0)) return null;
-  const order: Array<StayQuote["basis"]> = days >= 28 ? ["monthly", "weekly", "daily"] : days >= 7 ? ["weekly", "monthly", "daily"] : ["daily", "weekly", "monthly"];
+  const order: Array<StayQuote["basis"]> = days >= 28 ? ["monthly", "weekly", "daily"] : days >= 7 ? ["weekly", "daily", "monthly"] : ["daily", "weekly", "monthly"];
   const rateOf = { daily: rates.dailyRate, weekly: rates.weeklyRate, monthly: rates.monthlyRate };
   const basis = order.find((key) => rateOf[key] > 0);
   if (!basis) return null;

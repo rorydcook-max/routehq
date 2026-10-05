@@ -3,6 +3,7 @@
 import { quoteStay, type Rates } from "@/lib/rental-estimate";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { adjustRental } from "@/app/actions/bookings";
+import { niceDate } from "@/lib/nice-date";
 import { cancelRentalAmendment, createRentalAmendment, getRentalAmendmentContext, makeRentalOpenEnded, type AmendmentSummary } from "@/app/actions/amendments";
 
 type AdjustmentType = "extension" | "early_return" | "terms";
@@ -110,7 +111,8 @@ function defaultExtensionEndDate(currentEndDate?: string | null) {
 }
 
 function defaultEarlyReturnDate(currentStartDate?: string | null, currentEndDate?: string | null) {
-  const today = isoDate(new Date());
+  // A planned date, so never today or earlier (a vehicle already back goes through Start return).
+  const today = isoDate(tomorrowDate());
   const start = dateInputValue(currentStartDate);
   const end = dateInputValue(currentEndDate);
   if (end && today > end) return end;
@@ -195,7 +197,9 @@ export function RentalAdjustmentModal({
   onClose: () => void;
   onSuccess?: () => void;
 }) {
-  const [adjustmentType, setAdjustmentType] = useState<AdjustmentType>("extension");
+  // An open-ended rental has no return date to extend; the useful change is to set one.
+  const openEnded = !currentEndDate;
+  const [adjustmentType, setAdjustmentType] = useState<AdjustmentType>(openEnded ? "early_return" : "extension");
   const [extensionEndDate, setExtensionEndDate] = useState(() => defaultExtensionEndDate(currentEndDate));
   const [earlyReturnDate, setEarlyReturnDate] = useState(() => defaultEarlyReturnDate(currentStartDate, currentEndDate));
   const [extensionAmount, setExtensionAmount] = useState("");
@@ -372,21 +376,23 @@ export function RentalAdjustmentModal({
           </button>
         </div>
 
-        <div className={`mt-4 grid gap-3 ${agreementSigned ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
+        <div className={`mt-4 grid gap-3 ${agreementSigned && !openEnded ? "sm:grid-cols-3" : agreementSigned || !openEnded ? "sm:grid-cols-2" : ""}`}>
+          {openEnded ? null : (
+            <OptionCard
+              description="Move the return date further out and record an extension payment"
+              icon="ti-calendar-plus"
+              onClick={() => setAdjustmentType("extension")}
+              selected={isExtension}
+              title="Extend rental"
+              tone="teal"
+            />
+          )}
           <OptionCard
-            description="Move the return date further out and record an extension payment"
-            icon="ti-calendar-plus"
-            onClick={() => setAdjustmentType("extension")}
-            selected={isExtension}
-            title="Extend rental"
-            tone="teal"
-          />
-          <OptionCard
-            description="Return the vehicle early and issue a partial refund if applicable"
+            description={openEnded ? "The customer has told you when the vehicle is coming back" : "The customer will bring the vehicle back sooner than agreed"}
             icon="ti-calendar-minus"
             onClick={() => setAdjustmentType("early_return")}
             selected={adjustmentType === "early_return"}
-            title="Early return / Reduce period"
+            title={openEnded ? "Set the return date" : "Bring the return date forward"}
             tone="amber"
           />
           {agreementSigned ? (
@@ -464,7 +470,7 @@ export function RentalAdjustmentModal({
               ) : null}
 
               <div className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3 text-sm text-[var(--foreground-secondary)]">
-                Extension: <span className="font-mono-data font-bold">{originalEndDate || "Open"}</span> to <span className="font-mono-data font-bold">{extensionEndDate}</span> ({extensionDays} days)
+                Extension: <span className="font-bold">{originalEndDate ? niceDate(originalEndDate) : "open-ended"}</span> to <span className="font-bold">{extensionEndDate ? niceDate(extensionEndDate) : "a new date"}</span> ({extensionDays} {extensionDays === 1 ? "day" : "days"})
               </div>
 
               <label className="block">
@@ -512,18 +518,18 @@ export function RentalAdjustmentModal({
               )}
 
               <div className="rounded-xl border border-[#bfe0db] bg-[var(--primary-light)] p-3 text-sm font-bold text-[var(--primary)]">
-                Extending {extensionDays} days - {money(parseAmount(extensionAmount))} due {extensionDueDate || "not set"}
+                Extending {extensionDays} {extensionDays === 1 ? "day" : "days"} - {money(parseAmount(extensionAmount))} due {extensionDueDate ? niceDate(extensionDueDate) : "not set"}
                 {useAmendment ? <span className="mt-1 block text-[12px] font-normal">Applies when the customer signs.</span> : null}
               </div>
             </>
           ) : (
             <>
               <label className="block">
-                Actual return date
+                {openEnded ? "Return date" : "New return date"}
                 <input
                   className="mt-1 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]"
                   max={originalEndDate || undefined}
-                  min={startDate || undefined}
+                  min={tomorrow}
                   onChange={(event) => setEarlyReturnDate(event.target.value)}
                   type="date"
                   value={earlyReturnDate}
@@ -531,53 +537,18 @@ export function RentalAdjustmentModal({
               </label>
 
               <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3 text-sm text-[#92400e]">
-                Returning {earlyReturnDays} days early ({originalEndDate || "Open"} to {earlyReturnDate})
+                {openEnded
+                  ? `The rental ends on ${earlyReturnDate ? niceDate(earlyReturnDate) : "the date you choose"}. Rent due after that date comes off the schedule, and the customer is told.`
+                  : `${earlyReturnDays} ${earlyReturnDays === 1 ? "day" : "days"} sooner: ${niceDate(originalEndDate)} becomes ${earlyReturnDate ? niceDate(earlyReturnDate) : "the date you choose"}. Rent due after that date comes off the schedule, and the customer is told.`}
+                <span className="mt-1 block text-[12px]">
+                  If time already paid for goes unused, the refund to consider is worked out when the vehicle comes back. Is it back already? Close this and use Start return.
+                </span>
               </div>
-
-              <div>
-                <p className="text-[11px] font-medium text-[var(--foreground-secondary)]">Was rent paid in advance for the remaining period?</p>
-                <div className="mt-1 grid grid-cols-2 gap-2">
-                  <button className={`pressable rounded-lg border px-3 py-2 text-sm font-bold ${advancePaid ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`} onClick={() => setAdvancePaid(true)} type="button">
-                    Yes
-                  </button>
-                  <button className={`pressable rounded-lg border px-3 py-2 text-sm font-bold ${!advancePaid ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`} onClick={() => setAdvancePaid(false)} type="button">
-                    No
-                  </button>
-                </div>
-              </div>
-
-              {advancePaid ? (
-                <>
-                  <label className="block">
-                    Amount paid that covers the remaining {earlyReturnDays} days
-                    <CurrencyInput onChange={updateAdvanceAmount} value={advancePaidAmount} />
-                    <span className="mt-1 block text-[11px] text-[var(--muted)]">How much did the customer pay that covered the period after the actual return date?</span>
-                    <span className="mt-1 block text-[11px] font-bold text-[var(--primary)]">
-                      Suggestion: {money(suggestedRefund)} ({earlyReturnDays} days x {money(dailyRate)}/day at current monthly rate)
-                    </span>
-                  </label>
-
-                  <label className="block">
-                    Refund to customer
-                    <CurrencyInput onChange={setRefundAmount} value={refundAmount} />
-                    <span className="mt-1 block text-[11px] text-[var(--muted)]">Amount to return to the customer. Can be less than the advance payment if deductions apply.</span>
-                  </label>
-
-                  <label className="block">
-                    Reason or deductions note
-                    <input className="mt-1 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" onChange={(event) => setRefundReason(event.target.value)} placeholder="e.g. Full refund for unused period / Kept THB 2,000 early termination fee" type="text" value={refundReason} />
-                  </label>
-                </>
-              ) : null}
 
               <label className="block">
                 Internal note
                 <input className="mt-1 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" onChange={(event) => setNote(event.target.value)} placeholder="Optional" type="text" value={note} />
               </label>
-
-              <div className="rounded-xl border border-[#fde68a] bg-[#fffbeb] p-3 text-sm font-bold text-[#92400e]">
-                Returning {earlyReturnDays} days early - {advancePaid && parseAmount(refundAmount) > 0 ? `Refunding ${money(parseAmount(refundAmount))} to customer` : "No refund"}
-              </div>
             </>
           )}
         </div>
@@ -611,7 +582,7 @@ export function RentalAdjustmentModal({
                 onClick={submit}
                 type="button"
               >
-                {isPending ? "Saving..." : useAmendment ? "Create link for customer to sign" : isExtension ? "Extend rental" : "Record early return"}
+                {isPending ? "Saving..." : useAmendment ? "Create link for customer to sign" : isExtension ? "Extend rental" : "Set return date"}
               </button>
             </>
           )}

@@ -1,5 +1,6 @@
 "use server";
 
+import { niceDate } from "@/lib/nice-date";
 import { completeRentalJobs, tellRentalCustomer } from "@/lib/customer-messages";
 import { allocatePayment, type OpenPayment } from "@/lib/payment-allocation";
 import { customerPaymentLabel } from "@/lib/payment-labels";
@@ -2438,14 +2439,15 @@ async function adjustRentalOrThrow(params: {
     const advancePaidAmount = amountFromParam(params.advancePaidAmount);
     const refundReason = String(params.refundReason || "").trim() || null;
     const daysEarly = daysBetweenDates(cleanEndDate, originalEndDate);
-    const completed = cleanEndDate <= nowDate;
+    // A vehicle that is already back goes through "Start return", which records its
+    // condition, settles the deposit and frees the vehicle. This only moves the planned date.
+    if (cleanEndDate <= nowDate) {
+      throw new Error("If the vehicle is back already, use Start return: it records the condition and settles the deposit.");
+    }
 
     const { error: updateError } = await supabase
       .from("rentals")
-      .update({
-        end_date: cleanEndDate,
-        ...(completed ? { status: "completed" } : {})
-      })
+      .update({ end_date: cleanEndDate, is_indefinite: false })
       .eq("id", rental.id)
       .eq("organization_id", rental.organization_id);
 
@@ -2453,13 +2455,14 @@ async function adjustRentalOrThrow(params: {
       throw new Error(updateError.message);
     }
 
-    // Fetch future scheduled/pending payments past the new return date
+    // Rent that would have fallen due after the new return date is no longer owed.
     const { data: futurePayments, error: futurePaymentFetchError } = await supabase
       .from("rental_payments")
-      .select("id")
+      .select("id, metadata")
       .eq("rental_id", rental.id)
       .eq("organization_id", rental.organization_id)
       .in("status", ["scheduled", "pending"])
+      .is("transaction_id", null)
       .gt("due_date", cleanEndDate)
       .or("voided.is.null,voided.eq.false");
 
@@ -2468,32 +2471,12 @@ async function adjustRentalOrThrow(params: {
     }
 
     const futurePaymentIds = (futurePayments || []).map((p: any) => p.id);
-
-    if (futurePaymentIds.length > 0) {
-      // Delete associated payment reminder tasks first
-      await supabase
-        .from("tasks")
-        .delete()
-        .eq("organization_id", rental.organization_id)
-        .in("rental_payment_id", futurePaymentIds);
-
-      // Delete the payments themselves
+    for (const payment of futurePayments || []) {
       await supabase
         .from("rental_payments")
-        .delete()
-        .eq("rental_id", rental.id)
-        .eq("organization_id", rental.organization_id)
-        .in("id", futurePaymentIds);
+        .update({ voided: true, status: "voided", metadata: { ...(payment.metadata || {}), voided_reason: "Return date brought forward", voided_at: new Date().toISOString(), voided_by: user.id } })
+        .eq("id", payment.id);
     }
-
-    // Belt-and-suspenders: delete any remaining payment reminder tasks past return date
-    await supabase
-      .from("tasks")
-      .delete()
-      .eq("organization_id", rental.organization_id)
-      .eq("rental_id", rental.id)
-      .eq("task_type", "payment_reminder")
-      .gt("due_at", `${cleanEndDate}T23:59:59.999Z`);
 
     const futurePaymentsDeleted = futurePaymentIds.length;
 
@@ -2531,9 +2514,10 @@ async function adjustRentalOrThrow(params: {
 
     const voidedSentence =
       futurePaymentsDeleted > 0
-        ? ` ${futurePaymentsDeleted} future payment ${futurePaymentsDeleted === 1 ? "record" : "records"} deleted.`
-        : " No future payment records removed.";
-    const detail = `Early return recorded - new end date ${cleanEndDate}. ${refundAmount > 0 ? `Refund of THB ${Math.round(refundAmount).toLocaleString()} issued.` : "No refund issued."}${voidedSentence}${refundReason ? ` ${refundReason}` : ""}${cleanNote ? ` ${cleanNote}` : ""}`;
+        ? ` ${futurePaymentsDeleted} later ${futurePaymentsDeleted === 1 ? "payment" : "payments"} removed from the schedule.`
+        : "";
+    const detail = `Return date set to ${cleanEndDate}${originalEndDate ? ` (was ${originalEndDate})` : " (was open-ended)"}.`;
+    const legacyDetail = `Early return recorded - new end date ${cleanEndDate}. ${refundAmount > 0 ? `Refund of THB ${Math.round(refundAmount).toLocaleString()} issued.` : "No refund issued."}${voidedSentence}${refundReason ? ` ${refundReason}` : ""}${cleanNote ? ` ${cleanNote}` : ""}`;
 
     await Promise.all([
       recordActivityEvent(supabase, {
@@ -2545,8 +2529,8 @@ async function adjustRentalOrThrow(params: {
         rental_id: rental.id,
         customer_id: rental.customer_id,
         event_type: "rental_early_return",
-        title: "Early return recorded",
-        detail: `${detail} Adjusted by ${actor}.`
+        title: "Return date changed",
+        detail: `${detail}${voidedSentence}${cleanNote ? ` ${cleanNote}` : ""} Changed by ${actor}.`
       }),
       supabase.from("communication_log").insert({
         organisation_id: rental.organization_id,
@@ -2570,6 +2554,14 @@ async function adjustRentalOrThrow(params: {
         created_by: user.id
       })
     ]);
+    void legacyDetail;
+    await tellRentalCustomer(
+      createSupabaseAdminClient() as any,
+      rental.id,
+      ({ firstName, vehicle }) => `Hi ${firstName}, the return date for the ${vehicle} is now ${niceDate(cleanEndDate)}. Message us if that isn't right.`,
+      { sentBy: user.id }
+    );
+    revalidatePath("/calendar");
   }
 
   revalidatePath("/");

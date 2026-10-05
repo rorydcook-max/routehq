@@ -325,13 +325,17 @@ function AtAGlance({ detail }: { detail: VehicleDetail }) {
       className: "bg-[var(--primary-light)] text-[var(--primary)]",
       icon: Gauge
     },
-    {
-      label: "GPS status",
-      value: gps ? (gps.last_seen_at ? "Online" : "Offline") : "No device",
-      sub: gps?.last_seen_at ? `Last seen ${formatDate(gps.last_seen_at)}` : "Assign a tracker",
-      className: gps ? (gps.last_seen_at ? "bg-[#dcfce7] text-[#166534]" : "bg-[#ffe4e6] text-[#be123c]") : "bg-[#fbfaf8] text-[var(--foreground-secondary)]",
-      icon: Smartphone
-    },
+    ...(gps
+      ? [
+          {
+            label: "GPS status",
+            value: gps.last_seen_at ? "Online" : "Offline",
+            sub: gps.last_seen_at ? `Last seen ${formatDate(gps.last_seen_at)}` : "Not seen yet",
+            className: gps.last_seen_at ? "bg-[#dcfce7] text-[#166534]" : "bg-[#ffe4e6] text-[#be123c]",
+            icon: Smartphone
+          }
+        ]
+      : []),
     {
       label: "Active rental",
       value: activeRental?.customers?.full_name || "Available",
@@ -350,7 +354,7 @@ function AtAGlance({ detail }: { detail: VehicleDetail }) {
 
   return (
     <div className="space-y-3">
-    <div className="grid gap-3 sm:grid-cols-2">
+    <div className="grid grid-cols-2 gap-3">
       {tiles.map((tile) => {
         const Icon = tile.icon;
         return (
@@ -999,13 +1003,7 @@ function DocumentsSection({ detail }: { detail: VehicleDetail }) {
 }
 
 function GpsSection({ detail }: { detail: VehicleDetail }) {
-  if (!detail.gpsDevice) {
-    return (
-      <Section eyebrow="GPS & tracking" title="Tracker">
-        <EmptyState action={<Link className="font-bold text-[var(--primary)]" href="/settings">Assign device</Link>}>No GPS device assigned.</EmptyState>
-      </Section>
-    );
-  }
+  if (!detail.gpsDevice) return null;
 
   const offline = !detail.gpsDevice.last_seen_at;
 

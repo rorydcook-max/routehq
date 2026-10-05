@@ -279,19 +279,21 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   const logoUrl = organization?.logo_display_url || null;
   const ownerContact = organization?.settings?.phone || organization?.settings?.business_phone || organization?.owner_phone || null;
   const executedDownloads = detail.executedAgreementDownloads || null;
-  const pendingAmendmentToken = rental?.id ? await pendingAmendmentFor(String(rental.id)) : null;
   // Payments can be made from this page as soon as the agreement is signed: before handover, on rent,
   // and after the return if anything is still owed.
   const canPayHere = rental?.id && (detail.state === "active" || detail.state === "completed" || (detail.state === "ready" && detail.completion?.agreement));
-  const portal = canPayHere ? await getPortalPayments(String(rental.id), detail.org_payment?.promptpay_id) : { payments: [], bundle: null };
+  const wantsInvites = rental?.id && customer?.id && (detail.state === "active" || (detail.state === "ready" && detail.completion?.agreement));
+  // These don't depend on each other: fetch them together.
+  const [pendingAmendmentToken, portal, invites] = await Promise.all([
+    rental?.id ? pendingAmendmentFor(String(rental.id)) : Promise.resolve(null),
+    canPayHere ? getPortalPayments(String(rental.id), detail.org_payment?.promptpay_id) : Promise.resolve({ payments: [], bundle: null } as Awaited<ReturnType<typeof getPortalPayments>>),
+    wantsInvites
+      ? chatInvites(createSupabaseAdminClient() as any, { organizationId: String(rental.organization_id || organization?.id || ""), customerId: String(customer.id), token }).catch(() => [])
+      : Promise.resolve([])
+  ]);
   // Before signing, "pay now" shows one QR for what is due at the start.
   // What is due at the start: the first rent and the deposit.
   const firstPaymentAmount = Number(rental?.outstanding_balance || 0) > 0 ? Number(rental.outstanding_balance) : Number(rental?.rental_rate || 0) + Number(rental?.deposit_amount || 0);
-  // Until they have a chat with the business, updates can't reach them: offer one.
-  const invites =
-    rental?.id && customer?.id && (detail.state === "active" || (detail.state === "ready" && detail.completion?.agreement))
-      ? await chatInvites(createSupabaseAdminClient() as any, { organizationId: String(rental.organization_id || organization?.id || ""), customerId: String(customer.id), token }).catch(() => [])
-      : [];
   const firstPaymentQr =
     detail.state === "ready" && !detail.completion?.agreement && detail.org_payment?.promptpay_id && String(rental?.currency || "THB") === "THB"
       ? await promptPayQrSvg(detail.org_payment.promptpay_id, firstPaymentAmount)

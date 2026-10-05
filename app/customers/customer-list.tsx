@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { Plus, Search } from "lucide-react";
-import { Badge, Card, EmptyState, ProgressBar, SectionHeader } from "@/components/ui";
+import { ChevronRight, Plus, Search } from "lucide-react";
+import { Badge, Card, EmptyState, SectionHeader } from "@/components/ui";
 import { flagForNationality } from "@/lib/customer-options";
 import type { CustomerListItem } from "@/lib/customer-detail";
 
@@ -32,9 +32,9 @@ function documentBadge(status: CustomerListItem["documentStatus"]) {
     return <Badge tone="green">Complete</Badge>;
   }
   if (status === "missing") {
-    return <Badge tone="amber">Missing Documents</Badge>;
+    return <Badge tone="amber">Documents missing</Badge>;
   }
-  return <Badge tone="red">No Documents</Badge>;
+  return <Badge tone="red">No documents</Badge>;
 }
 
 export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
@@ -78,8 +78,8 @@ export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
 
       <Card>
         <SectionHeader eyebrow="Directory" title={`${filteredCustomers.length} customers`} />
-        <div className="mt-4 grid gap-3 lg:grid-cols-[1fr_auto_auto]">
-          <label className="relative block">
+        <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-[1fr_auto_auto]">
+          <label className="relative col-span-2 block lg:col-span-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" size={16} />
             <input
               className="input-with-leading-icon w-full rounded-xl border border-[var(--border)] bg-white pr-3 text-sm text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]"
@@ -89,22 +89,22 @@ export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
             />
           </label>
           <select
-            className="rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-sm font-semibold text-[var(--foreground-secondary)]"
+            className="min-w-0 rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-sm font-semibold text-[var(--foreground-secondary)]"
             onChange={(event) => setDocumentFilter(event.target.value)}
             value={documentFilter}
           >
-            <option value="all">All document statuses</option>
+            <option value="all">All documents</option>
             <option value="complete">Complete</option>
             <option value="incomplete">Incomplete</option>
           </select>
           <select
-            className="rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-sm font-semibold text-[var(--foreground-secondary)]"
+            className="min-w-0 rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-sm font-semibold text-[var(--foreground-secondary)]"
             onChange={(event) => setRentalFilter(event.target.value)}
             value={rentalFilter}
           >
-            <option value="all">All rental statuses</option>
-            <option value="renting">Currently Renting</option>
-            <option value="not_renting">Not Renting</option>
+            <option value="all">Everyone</option>
+            <option value="renting">Renting now</option>
+            <option value="not_renting">Not renting</option>
           </select>
         </div>
       </Card>
@@ -120,56 +120,33 @@ export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
           }
         />
       ) : (
-        <div className="grid gap-3">
+        // One line per person: who they are, what they have now, what they're worth. Everything else is on their page.
+        <div className="divide-y divide-[var(--border)] overflow-hidden rounded-[10px] border-[0.5px] border-[var(--border)] bg-[var(--panel)]">
           {filteredCustomers.map((item) => {
             const activeRental = item.activeRental;
+            const vehicle = activeRental ? `${activeRental.vehicles?.make || ""} ${activeRental.vehicles?.model || ""}`.trim() : "";
+            const line = activeRental
+              ? `Renting the ${vehicle || "vehicle"} · ${activeRental.end_date ? `back ${formatDate(activeRental.end_date)}` : "open-ended"}`
+              : item.lastRentalDate
+                ? `Last rental ${formatDate(item.lastRentalDate)}`
+                : "No rentals yet";
             return (
-              <div className="sub-surface p-4 transition hover:border-[var(--primary)] hover:shadow-[0_18px_36px_rgba(15,23,42,0.08)]" key={item.customer.id}>
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Link className="text-xl font-semibold text-[var(--foreground)] hover:text-[var(--primary)]" href={`/customers/${item.customer.id}`}>
-                        {item.customer.full_name}
-                      </Link>
-                      {documentBadge(item.documentStatus)}
-                    </div>
-                    <p className="mt-1 text-sm font-semibold text-[var(--muted)]">
-                      {flagForNationality(item.customer.nationality)} {item.customer.nationality || "Nationality not set"}
+              <Link className="flex items-center gap-3 px-3.5 py-3 transition hover:bg-[var(--panel-secondary)]" href={`/customers/${item.customer.id}`} key={item.customer.id}>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <p className="truncate text-[15px] font-semibold text-[var(--foreground)]">
+                      {flagForNationality(item.customer.nationality)} {item.customer.full_name}
                     </p>
-                    {item.customer.phone ? (
-                      <a className="mt-2 inline-flex text-sm font-bold text-[var(--primary)]" href={`tel:${item.customer.phone}`}>{item.customer.phone}</a>
-                    ) : (
-                      <p className="mt-2 text-sm text-[var(--muted)]">No phone number</p>
-                    )}
-                    <div className="mt-3 max-w-sm">
-                      <div className="mb-1 flex justify-between text-xs font-bold text-[var(--muted)]">
-                        <span>Document completeness</span>
-                        <span className="font-mono-data">{item.documentCompleteness}%</span>
-                      </div>
-                      <ProgressBar tone={item.documentStatus === "complete" ? "green" : item.documentStatus === "missing" ? "amber" : "red"} value={item.documentCompleteness} />
-                    </div>
+                    {item.documentStatus === "complete" ? null : documentBadge(item.documentStatus)}
                   </div>
-                  <div className="grid gap-3 sm:grid-cols-3 lg:min-w-[520px]">
-                    <div className="sub-surface p-3">
-                      <p className="text-xs font-bold uppercase text-[var(--muted)]">Active rental</p>
-                      <p className="mt-1 text-sm font-semibold text-[var(--foreground)]">
-                        {activeRental ? `${activeRental.vehicles?.make || ""} ${activeRental.vehicles?.model || ""}`.trim() : "Not renting"}
-                      </p>
-                      <p className="mt-1 text-xs text-[var(--muted)]">{activeRental?.end_date ? `Return ${formatDate(activeRental.end_date)}` : activeRental ? "Monthly, open-ended" : "No vehicle out"}</p>
-                    </div>
-                    <div className="sub-surface p-3">
-                      <p className="text-xs font-bold uppercase text-[var(--muted)]">Lifetime value</p>
-                      <p className="font-mono-data mt-1 text-sm font-semibold text-[var(--foreground)]">{money(item.lifetimeRevenue)}</p>
-                      <p className="font-mono-data mt-1 text-xs text-[var(--muted)]">{item.totalRentals} {item.totalRentals === 1 ? "rental" : "rentals"}</p>
-                    </div>
-                    <div className="sub-surface p-3">
-                      <p className="text-xs font-bold uppercase text-[var(--muted)]">Last rental</p>
-                      <p className="mt-1 text-sm font-semibold text-[var(--foreground)]">{formatDate(item.lastRentalDate)}</p>
-                      <p className="font-mono-data mt-1 text-xs text-[var(--muted)]">{item.activeRentals.length} active</p>
-                    </div>
-                  </div>
+                  <p className={`mt-0.5 truncate text-sm ${activeRental ? "font-semibold text-[var(--primary)]" : "text-[var(--muted)]"}`}>{line}</p>
                 </div>
-              </div>
+                <div className="shrink-0 text-right">
+                  <p className="font-mono-data text-sm font-semibold text-[var(--foreground)]">{money(item.lifetimeRevenue)}</p>
+                  <p className="text-xs text-[var(--muted)]">{item.totalRentals} {item.totalRentals === 1 ? "rental" : "rentals"}</p>
+                </div>
+                <ChevronRight className="shrink-0 text-[var(--muted)]" size={16} />
+              </Link>
             );
           })}
         </div>

@@ -98,38 +98,23 @@ export async function getPublicBookingDetail(token: string) {
   }
 
   const shouldLogOpen = ["pending", "sent"].includes(bookingLink.status) && !bookingLink.viewed_at;
-  if (["pending", "sent"].includes(bookingLink.status)) {
-    await supabase
-      .from("booking_links")
-      .update({ status: "viewed", viewed_at: new Date().toISOString() })
-      .eq("id", bookingLink.id)
-      .is("viewed_at", null);
-  }
-  if (shouldLogOpen) {
-    await logBookingLinkActivity(supabase, bookingLink, "Customer opened booking link");
-  }
+  // Marking the link as opened runs alongside the reads below instead of ahead of them.
+  const markOpened = (async () => {
+    if (["pending", "sent"].includes(bookingLink.status)) {
+      await supabase
+        .from("booking_links")
+        .update({ status: "viewed", viewed_at: new Date().toISOString() })
+        .eq("id", bookingLink.id)
+        .is("viewed_at", null);
+    }
+    if (shouldLogOpen) {
+      await logBookingLinkActivity(supabase, bookingLink, "Customer opened booking link");
+    }
+  })().catch(() => null);
 
-  const [{ data: organization }, { data: rental }, { data: vehicle }, { data: customer }, { data: contract }, { data: documents }, { data: template }] = await Promise.all([
-    supabase.from("organizations").select("*").eq("id", bookingLink.organization_id).maybeSingle(),
-    bookingLink.rental_id ? supabase.from("rentals").select("*").eq("id", bookingLink.rental_id).maybeSingle() : Promise.resolve({ data: null }),
-    bookingLink.vehicle_id ? supabase.from("vehicles").select("*, vehicle_categories(code, name)").eq("id", bookingLink.vehicle_id).maybeSingle() : Promise.resolve({ data: null }),
-    bookingLink.customer_id ? supabase.from("customers").select("*").eq("id", bookingLink.customer_id).maybeSingle() : Promise.resolve({ data: null }),
-    bookingLink.contract_id ? supabase.from("contracts").select("*").eq("id", bookingLink.contract_id).maybeSingle() : Promise.resolve({ data: null }),
-    bookingLink.customer_id
-      ? supabase
-          .from("documents")
-          .select("*")
-          .eq("organization_id", bookingLink.organization_id)
-          .eq("owner_type", "customer")
-          .eq("owner_id", bookingLink.customer_id)
-          .is("deleted_at", null)
-          .order("created_at", { ascending: false })
-      : Promise.resolve({ data: [] }),
-    ensureDefaultContractTemplate(supabase, bookingLink.organization_id).then((data) => ({ data }))
-  ]);
-
-  const [paymentsResult, portalActionsResult, inspectionsResult] = bookingLink.rental_id
-    ? await Promise.all([
+  // Everything that only needs the link is fetched in one go: the customer is waiting on a phone.
+  const rentalReads = bookingLink.rental_id
+    ? Promise.all([
         supabase
           .from("rental_payments")
           .select("amount, status")
@@ -153,7 +138,44 @@ export async function getPublicBookingDetail(token: string) {
           .order("created_at", { ascending: false })
           .limit(1)
       ])
-    : [{ data: [] }, { data: [] }, { data: [] }];
+    : Promise.resolve([{ data: [] }, { data: [] }, { data: [] }] as any[]);
+  // Every booking needs an agreement in the document engine. Nothing else
+  // creates one, so the first time the page opens a draft is made here.
+  const agreementReads = (async () => {
+    if (bookingLink.rental_id && bookingLink.status !== "cancelled") {
+      await ensureRentalAgreementDraft({ organizationId: bookingLink.organization_id, rentalId: bookingLink.rental_id });
+    }
+    const agreement = await loadPublicRentalAgreement(token);
+    // One after the other: the two downloads share work and fail when started together.
+    const downloads = agreement?.eligibility?.fullyExecuted
+      ? {
+          originalAgreementUrl: await getCustomerExecutedAgreementDownload(token, "original").catch(() => null),
+          executionCertificateUrl: await getCustomerExecutedAgreementDownload(token, "certificate").catch(() => null)
+        }
+      : null;
+    return { agreement, downloads };
+  })();
+
+  const [{ data: organization }, { data: rental }, { data: vehicle }, { data: customer }, { data: contract }, { data: documents }, { data: template }] = await Promise.all([
+    supabase.from("organizations").select("*").eq("id", bookingLink.organization_id).maybeSingle(),
+    bookingLink.rental_id ? supabase.from("rentals").select("*").eq("id", bookingLink.rental_id).maybeSingle() : Promise.resolve({ data: null }),
+    bookingLink.vehicle_id ? supabase.from("vehicles").select("*, vehicle_categories(code, name)").eq("id", bookingLink.vehicle_id).maybeSingle() : Promise.resolve({ data: null }),
+    bookingLink.customer_id ? supabase.from("customers").select("*").eq("id", bookingLink.customer_id).maybeSingle() : Promise.resolve({ data: null }),
+    bookingLink.contract_id ? supabase.from("contracts").select("*").eq("id", bookingLink.contract_id).maybeSingle() : Promise.resolve({ data: null }),
+    bookingLink.customer_id
+      ? supabase
+          .from("documents")
+          .select("*")
+          .eq("organization_id", bookingLink.organization_id)
+          .eq("owner_type", "customer")
+          .eq("owner_id", bookingLink.customer_id)
+          .is("deleted_at", null)
+          .order("created_at", { ascending: false })
+      : Promise.resolve({ data: [] }),
+    ensureDefaultContractTemplate(supabase, bookingLink.organization_id).then((data) => ({ data }))
+  ]);
+
+  const [paymentsResult, portalActionsResult, inspectionsResult] = await rentalReads;
 
   const outstandingBalance = (paymentsResult.data || []).reduce((sum: number, payment: any) => {
     if (["paid", "voided", "waived", "cancelled"].includes(payment.status)) return sum;
@@ -161,7 +183,7 @@ export async function getPublicBookingDetail(token: string) {
   }, 0);
   const deliveryInspection = inspectionsResult.data?.[0] || null;
   const deliveryPhotos = Array.isArray(deliveryInspection?.photos) ? deliveryInspection.photos : [];
-  const deliveryPhotoUrls = await Promise.all(
+  const deliveryPhotoUrlsPending = Promise.all(
     deliveryPhotos.map(async (photo: any) => {
       const path = photo?.url || photo?.storage_path || photo?.path;
       if (!path) return null;
@@ -171,26 +193,36 @@ export async function getPublicBookingDetail(token: string) {
   );
 
   const uploadedCategories = new Set((documents || []).map((document: any) => document.category));
-  // Every booking needs an agreement in the document engine. Nothing else
-  // creates one, so the first time the page opens a draft is made here.
-  if (bookingLink.rental_id && bookingLink.status !== "cancelled") {
-    await ensureRentalAgreementDraft({ organizationId: bookingLink.organization_id, rentalId: bookingLink.rental_id });
-  }
-  const rentalDocumentAgreement = await loadPublicRentalAgreement(token);
-  const executedDownloads = rentalDocumentAgreement?.eligibility?.fullyExecuted
-    ? {
-        originalAgreementUrl: await getCustomerExecutedAgreementDownload(token, "original").catch(() => null),
-        executionCertificateUrl: await getCustomerExecutedAgreementDownload(token, "certificate").catch(() => null)
-      }
-    : null;
   const signedContractPath = contract?.content_pdf_url || null;
-  const signedContractUrl = signedContractPath
-    ? (await supabase.storage.from("documents").createSignedUrl(signedContractPath, 60 * 60)).data?.signedUrl || null
-    : null;
   const contractTemplate = template?.content_html || template?.body || contract?.content_html || defaultRentalContractTemplate;
-  const organizationBranding = organization
-    ? await resolveOrganizationBrandingDisplayUrls(supabase, organization, { allowExternalUrl: true, expiresIn: 60 * 60 })
-    : { logoUrl: null, signatureUrl: null };
+  // The agreement text is built after the branding lookup, as before: it relies on what that lookup resolves.
+  const brandingPending: Promise<{ logoUrl: string | null; signatureUrl: string | null }> = organization
+    ? resolveOrganizationBrandingDisplayUrls(supabase, organization, { allowExternalUrl: true, expiresIn: 60 * 60 })
+    : Promise.resolve({ logoUrl: null, signatureUrl: null });
+  // The remaining lookups don't depend on each other, so they run together.
+  const [deliveryPhotoUrls, agreementResult, signedContractUrl, organizationBranding, contractVariables] = await Promise.all([
+    deliveryPhotoUrlsPending,
+    agreementReads,
+    signedContractPath
+      ? supabase.storage.from("documents").createSignedUrl(signedContractPath, 60 * 60).then((result: any) => result.data?.signedUrl || null)
+      : Promise.resolve(null),
+    brandingPending,
+    brandingPending.then(() =>
+      embedLogoInContractVariables(
+        supabase,
+        buildContractVariables({
+          organization,
+          customer,
+          vehicle,
+          rental,
+          bookingLink
+        })
+      )
+    ),
+    markOpened
+  ]);
+  const rentalDocumentAgreement = agreementResult.agreement;
+  const executedDownloads = agreementResult.downloads;
   const organizationForDisplay = organization
     ? {
         ...organization,
@@ -198,16 +230,6 @@ export async function getPublicBookingDetail(token: string) {
         owner_signature_display_url: organizationBranding.signatureUrl
       }
     : organization;
-  const contractVariables = await embedLogoInContractVariables(
-    supabase,
-    buildContractVariables({
-      organization,
-      customer,
-      vehicle,
-      rental,
-      bookingLink
-    })
-  );
   const renderedContract = renderContractTemplate(
     contractTemplate,
     contractVariables

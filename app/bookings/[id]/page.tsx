@@ -605,7 +605,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
 
         {(swapForms || []).length > 0 ? (
           <div className="scroll-mt-4 rounded-xl border border-[#fde68a] bg-[#fffbeb] p-3" id="vehicle-change-forms">
-            <p className="text-sm font-semibold text-[#92400e]">The vehicle change is signed. Complete these with {customer?.full_name || "the customer"}:</p>
+            <p className="text-sm font-semibold text-[#92400e]">The vehicle has changed. Complete these with {customer?.full_name || "the customer"}:</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {(swapForms || []).map((form: any) => (
                 <Link

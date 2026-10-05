@@ -10,6 +10,7 @@ import { niceDate } from "@/lib/nice-date";
  *   - return in three days, and tomorrow (with how to keep the vehicle longer)
  *   - rent due tomorrow, and rent three days overdue
  *   - the vehicle they have is due a service or a paperwork renewal this week
+ *   - a change to their rental is still waiting for their signature
  *
  * Each goes out once (see remindRentalCustomerOnce) on the customer's own
  * chat, or is left on the booking for the owner when they have none.
@@ -22,7 +23,7 @@ export async function sendDailyCustomerReminders(admin: any): Promise<Record<str
   const tomorrow = businessToday(1);
   const inThreeDays = businessToday(3);
   const threeDaysAgo = businessToday(-3);
-  const sent = { handover: 0, returnSoon: 0, rentDue: 0, rentOverdue: 0, vehicleDue: 0 };
+  const sent = { handover: 0, returnSoon: 0, rentDue: 0, rentOverdue: 0, vehicleDue: 0, signature: 0 };
 
   // ── Handover tomorrow ────────────────────────────────────────────────────
   const { data: starting } = await admin
@@ -97,6 +98,33 @@ export async function sendDailyCustomerReminders(admin: any): Promise<Record<str
       );
       if (ok) sent.vehicleDue += 1;
     }
+  }
+
+  // ── A change is waiting for their signature ──────────────────────────────
+  // The day after it was sent, then every three days, until it is signed or cancelled.
+  const { data: unsigned } = await admin
+    .from("rental_amendments")
+    .select("id, rental_id, token, changes, created_at, expires_at")
+    .eq("status", "awaiting_signature");
+  const base = String(process.env.NEXT_PUBLIC_APP_URL || "").replace(/\/$/, "");
+  for (const amendment of unsigned || []) {
+    if (amendment.expires_at && new Date(amendment.expires_at).getTime() < Date.now()) continue;
+    const days = Math.floor((Date.now() - new Date(amendment.created_at).getTime()) / 86_400_000);
+    if (days < 1 || (days - 1) % 3 !== 0) continue;
+    const link = `${base}/amend/${amendment.token}`;
+    const already = Boolean(amendment.changes?.applied_before_signature);
+    const replacement = amendment.changes?.new_vehicle_label ? String(amendment.changes.new_vehicle_label) : "";
+    const ok = await remindRentalCustomerOnce(
+      admin,
+      amendment.rental_id,
+      `amendment:${amendment.id}:${days}`,
+      ({ firstName, vehicle }) =>
+        already
+          ? `Hi ${firstName}, you now have the ${replacement || vehicle}, and we still need your signature to confirm the change. It takes a minute: ${link}`
+          : `Hi ${firstName}, a change to your rental of the ${vehicle} is waiting for your signature. Please check it and sign here: ${link}`,
+      { withLink: false }
+    );
+    if (ok) sent.signature += 1;
   }
 
   return sent;

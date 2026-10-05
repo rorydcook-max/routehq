@@ -787,6 +787,17 @@ async function applyVehicleChange(admin: any, amendment: any, rental: any): Prom
     const { data: customer } = rental.customer_id ? await admin.from("customers").select("full_name").eq("id", rental.customer_id).maybeSingle() : { data: null };
     const who = customer?.full_name || "the customer";
     const now = new Date().toISOString();
+    // Forms still open from an earlier change on this rental no longer describe what the customer has: close them.
+    const { data: stale } = await admin
+      .from("tasks")
+      .update({ completed_at: now, completion_notes: "Replaced by a later vehicle change" })
+      .eq("organization_id", organizationId)
+      .eq("rental_id", rental.id)
+      .in("action", ["swap_handover", "swap_collection"])
+      .is("completed_at", null)
+      .select("vehicle_id, action");
+    const left = new Set<string>((stale || []).filter((task: any) => task.action === "swap_collection" && task.vehicle_id && task.vehicle_id !== newVehicleId && task.vehicle_id !== oldVehicleId).map((task: any) => String(task.vehicle_id)));
+    for (const vehicleId of left) await syncVehicleStatusFromBookings(admin, organizationId, vehicleId).catch(() => null);
     await admin.from("tasks").insert([
       { organization_id: organizationId, vehicle_id: newVehicleId, rental_id: rental.id, title_key: null, created_by: null, title: `Handover form - ${changes.new_vehicle_label || "replacement vehicle"} to ${who}`, task_type: "admin", action: "swap_handover", due_at: now },
       { organization_id: organizationId, vehicle_id: oldVehicleId, rental_id: rental.id, title_key: null, created_by: null, title: `Collection form - ${changes.previous_vehicle_label || "original vehicle"} from ${who}`, task_type: "admin", action: "swap_collection", due_at: now }

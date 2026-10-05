@@ -911,7 +911,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
 
   if (completed) {
     return (
-      <section className="rounded-2xl border border-[#bbf7d0] bg-white p-5 text-center shadow-sm">
+      <section className="-order-1 rounded-2xl border border-[#bbf7d0] bg-white p-5 text-center shadow-sm">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#dcfce7] text-[#166534]">
           <CheckCircle2 size={34} />
         </div>
@@ -922,21 +922,23 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             ? `${detail.organizationName} has been told. Contact them any time if you have questions about your rental.`
             : `${detail.organizationName} will contact you to confirm delivery time and answer any questions.`}
         </p>
+        <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-center">
         {originalAgreementUrl ? (
-          <a className="pressable mt-5 inline-flex rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={originalAgreementUrl} rel="noreferrer" target="_blank">
-            Download original agreement
-          </a>
-        ) : null}
-        {executionCertificateUrl ? (
-          <a className="pressable mt-5 ml-2 inline-flex rounded-xl border border-[var(--primary)] bg-white px-5 py-3 text-sm font-semibold text-[var(--primary)]" href={executionCertificateUrl} rel="noreferrer" target="_blank">
-            Download execution certificate
+          <a className="pressable inline-flex min-h-[44px] items-center justify-center rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={originalAgreementUrl} rel="noreferrer" target="_blank">
+            Download your agreement
           </a>
         ) : null}
         {signedContractUrl ? (
-          <a className="pressable mt-5 inline-flex rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={signedContractUrl} rel="noreferrer" target="_blank">
+          <a className="pressable inline-flex min-h-[44px] items-center justify-center rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={signedContractUrl} rel="noreferrer" target="_blank">
             Download signed contract
           </a>
         ) : null}
+        {executionCertificateUrl ? (
+          <a className="pressable inline-flex min-h-[44px] items-center justify-center rounded-xl border border-[var(--border)] bg-white px-5 py-3 text-sm font-semibold text-[var(--primary)]" href={executionCertificateUrl} rel="noreferrer" target="_blank">
+            Proof of signing
+          </a>
+        ) : null}
+        </div>
       </section>
     );
   }
@@ -946,6 +948,9 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
       <input name="token" type="hidden" value={detail.token} />
       <input name="preferredLocale" type="hidden" value="en" />
 
+      {/* Once the details are saved, the only thing left is to read and sign. Everything already
+          filled in folds away so the agreement is the first thing on the screen, not the ninth. */}
+      <SavedDetails folded={readyToSign}>
       <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
         <SectionTitle icon={Upload} label="Your documents" />
         <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
@@ -1396,6 +1401,8 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           ) : null}
         </section>
       ) : null}
+
+      </SavedDetails>
 
       <section className="scroll-mt-4 rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm" ref={agreementRef}>
         <SectionTitle icon={PenLine} label="Rental Agreement" />
@@ -1918,6 +1925,23 @@ function PublicGooglePinModal({ onClose, onConfirm }: { onClose: () => void; onC
   );
 }
 
+/** The filled-in sections. Shown in full while they are being completed; folded to one line once saved. */
+function SavedDetails({ folded, children }: { folded: boolean; children: React.ReactNode }) {
+  if (!folded) return <>{children}</>;
+  return (
+    <details className="group rounded-2xl border border-[#bbf7d0] bg-white shadow-sm">
+      <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-5 py-3 [&::-webkit-details-marker]:hidden">
+        <span>
+          <span className="block text-base font-semibold text-[#166534]">✓ Your details are saved</span>
+          <span className="block text-sm text-[var(--muted)]">Tap to see or change them</span>
+        </span>
+        <span aria-hidden="true" className="text-[var(--muted)] transition-transform group-open:rotate-180">▾</span>
+      </summary>
+      <div className="space-y-5 border-t border-[var(--border)] p-3">{children}</div>
+    </details>
+  );
+}
+
 function SectionTitle({ icon: Icon, label }: { icon: typeof UserRound; label: string }) {
   return (
     <div className="flex items-center gap-3">
@@ -1971,18 +1995,12 @@ function UploadCard({
         {complete || selectedFile ? (
           <span style={{ fontSize: 11, color: "#16a34a", fontWeight: 500, flexShrink: 0 }}>
             {"✓ "}
-            {selectedFile?.name || "Uploaded"}
+            {selectedFile ? "Added" : "Uploaded"}
           </span>
         ) : (
           <span style={{ fontSize: 11, color: "#d97706", flexShrink: 0 }}>Required</span>
         )}
       </div>
-
-      {selectedFile ? (
-        <p style={{ fontSize: 11, color: "#64748b", margin: "0 0 8px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-          {selectedFile.name} selected
-        </p>
-      ) : null}
 
       {!complete ? (
         <>
@@ -1993,13 +2011,14 @@ function UploadCard({
                 alignItems: "center",
                 justifyContent: "center",
                 gap: 6,
-                padding: "8px 12px",
+                padding: "12px 12px",
+                minHeight: 44,
                 borderRadius: 7,
                 cursor: "pointer",
                 border: "0.5px solid #cbd5e1",
                 background: "#ffffff",
-                fontSize: 12,
-                fontWeight: 500,
+                fontSize: 14,
+                fontWeight: 600,
                 color: "#334155"
               }}
             >
@@ -2030,13 +2049,14 @@ function UploadCard({
                 alignItems: "center",
                 justifyContent: "center",
                 gap: 6,
-                padding: "8px 12px",
+                padding: "12px 12px",
+                minHeight: 44,
                 borderRadius: 7,
                 cursor: "pointer",
                 border: "0.5px solid var(--primary)",
                 background: "var(--primary-light)",
-                fontSize: 12,
-                fontWeight: 500,
+                fontSize: 14,
+                fontWeight: 600,
                 color: "var(--primary)"
               }}
             >

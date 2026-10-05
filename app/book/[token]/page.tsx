@@ -311,12 +311,12 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
                 <p className="mt-1 text-sm font-bold text-[var(--muted)]">{vehicle.registration_number || "Plate pending"} {vehicle.color ? `- ${vehicle.color}` : ""}</p>
               </div>
             </div>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <Info icon={CalendarDays} label="Rental period" value={rental.is_indefinite && detail.state !== "completed" ? `Monthly, open-ended from ${formatSummaryDate(rental.start_date)}` : `${formatSummaryDate(rental.start_date)} to ${formatSummaryDate(rental.end_date)}`} />
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <Info className="col-span-2 sm:col-span-1" icon={CalendarDays} label="Rental period" value={rental.is_indefinite && detail.state !== "completed" ? `Monthly, open-ended from ${formatSummaryDate(rental.start_date)}` : `${formatSummaryDate(rental.start_date)} to ${formatSummaryDate(rental.end_date)}`} />
               <Info icon={CreditCard} label="Rate and deposit" value={`${rateLabel(rental)}\n${Number(rental.deposit_amount || 0) > 0 ? `Deposit: ${money(rental.deposit_amount, rental.currency || "THB")}` : "No deposit"}`} />
               {/* Once the customer has the vehicle, where and when it was to be handed over is old news. */}
-              {handedOver ? null : <Info className="sm:row-span-2" icon={MapPin} label="Handover" value={delivery.location} />}
               {handedOver ? null : <Info icon={ReceiptText} label="First payment due" value={paymentDueText(rental, bookingData)} />}
+              {handedOver ? null : <Info icon={MapPin} label="Handover" value={delivery.location} />}
               {handedOver ? null : <Info icon={Clock} label="Handover time" value={delivery.time} />}
             </div>
           </div>
@@ -460,7 +460,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
           </section>
           </>
         ) : (
-          <>
+          <div className="flex flex-col gap-5">
           {detail.state === "ready" ? (
             <PortalPayments bundle={portal.bundle} orgPayment={detail.org_payment} organizationName={organization?.name || "Rental operator"} payments={portal.payments} token={token} />
           ) : null}
@@ -487,7 +487,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             }}
           />
           {["booked", "draft"].includes(String(rental?.status || "")) ? <CancelBooking organizationName={organization?.name || "the rental business"} token={token} /> : null}
-          </>
+          </div>
         )}
       </div>
     </main>

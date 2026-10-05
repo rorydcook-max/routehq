@@ -454,37 +454,39 @@ export function buildContractVariables({
     renter_first_name: name.firstName,
     renter_surname: name.surname,
     renter_full_name: fullName,
+    // What the customer confirmed on the form (saved to their record) is the truth. A value read
+    // from a photo is only a first guess and must never override a number corrected by hand.
     renter_passport_number: optionalText(
-      bookingData.passport_number ||
-        bookingData.ocr_passport_number ||
-        customer?.passport_number
+      customer?.passport_number ||
+        bookingData.passport_number ||
+        bookingData.ocr_passport_number
     ),
     renter_licence_number: optionalText(
-      bookingData.licence_number ||
+      customer?.driver_license_number ||
+        customer?.driving_licence_number ||
+        bookingData.licence_number ||
         bookingData.driver_licence_number ||
-        bookingData.ocr_licence_number ||
-        customer?.driver_license_number ||
-        customer?.driving_licence_number
+        bookingData.ocr_licence_number
     ),
     renter_licence_country: optionalText(
-      bookingData.licence_country ||
-        bookingData.ocr_licence_country ||
-        customer?.driver_license_country
+      customer?.driver_license_country ||
+        bookingData.licence_country ||
+        bookingData.ocr_licence_country
     ),
     renter_licence_expiry: (() => {
       const expiry =
+        customer?.driver_license_expiry ||
         bookingData.licence_expiry ||
-        bookingData.ocr_licence_expiry ||
-        customer?.driver_license_expiry;
+        bookingData.ocr_licence_expiry;
       return expiry ? formatContractDate(String(expiry), locale) : "Not provided";
     })(),
     renter_phone: optionalText(customer?.phone),
     renter_email: optionalText(customer?.email),
     renter_address: optionalText(customer?.address),
     renter_nationality: optionalText(
-      bookingData.nationality ||
-        bookingData.ocr_nationality ||
-        customer?.nationality
+      customer?.nationality ||
+        bookingData.nationality ||
+        bookingData.ocr_nationality
     ),
     vehicle_make: stripEmpty(vehicle?.make),
     vehicle_model: [vehicle?.model, vehicle?.trim].filter(Boolean).join(" "),

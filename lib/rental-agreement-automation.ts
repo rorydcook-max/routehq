@@ -165,7 +165,25 @@ export async function ensureRentalAgreementDraft({ organizationId, rentalId }: {
   try {
     const context = await loadContext(organizationId, rentalId);
     const existing = await latestAgreement(context.admin, organizationId, rentalId);
-    if (existing.version) return { documentId: existing.document.id as string, created: false };
+    if (existing.version) {
+      // A draft is only a preview, and the booking can change before the customer signs (another
+      // vehicle, new dates, a new price, the business's details). A preview naming the wrong
+      // vehicle is worse than none, so a draft older than those changes is drawn up again.
+      const version = existing.version;
+      const draftedAt = Date.parse(String(version.generated_at || version.created_at || "")) || 0;
+      const changedSince = [context.rental?.updated_at, context.organization?.updated_at, context.vehicle?.updated_at, context.customer?.updated_at].some(
+        (stamp) => stamp && Date.parse(String(stamp)) > draftedAt
+      );
+      const otherVehicle = (version.rendered_data_snapshot?.vehicle_id || null) !== (context.rental?.vehicle_id || null);
+      if (version.status === "draft" && (otherVehicle || changedSince)) {
+        const fresh = await render(context);
+        if (fresh.renderedHtml !== version.rendered_html_snapshot) {
+          await newDraftVersion(context, existing.document.id, fresh);
+          return { documentId: existing.document.id as string, created: true };
+        }
+      }
+      return { documentId: existing.document.id as string, created: false };
+    }
 
     const rendered = await render(context);
     const document = existing.document || (await createAgreementDocument(context));

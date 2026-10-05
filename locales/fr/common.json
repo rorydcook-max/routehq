@@ -68,6 +68,7 @@
     "cleaningFee": "Frais de nettoyage (optionnel)",
     "depositRefund": "Remboursement de la caution",
     "overrideRefund": "Modifier le montant du remboursement si nécessaire",
+    "changeRefund": "Take something off, or give back a different amount",
     "photosVideo": "Photos / vidéo",
     "depositAlreadyReturned": "Caution déjà retournée — aucune réconciliation nécessaire",
     "depositDeductions": "Déductions sur la caution",

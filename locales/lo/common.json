@@ -77,6 +77,7 @@
     "cleaningFee": "ຄ່າທໍາຄວາມສະອາດ (ບໍ່ບັງຄັບ)",
     "depositRefund": "ຄືນເງິນມັດຈໍາ",
     "overrideRefund": "ປ່ຽນແປງຈໍານວນເງິນຄືນຖ້າຈໍາເປັນ",
+    "changeRefund": "Take something off, or give back a different amount",
     "photosVideo": "ຮູບພາບ / ວິດີໂອ",
     "depositAlreadyReturned": "ເງິນມັດຈໍາຄືນແລ້ວ — ບໍ່ຈໍາເປັນຕ້ອງປະນີປະນອມ",
     "depositDeductions": "ການຫັກເງິນມັດຈໍາ",

@@ -77,6 +77,7 @@
     "cleaningFee": "清掃料金（オプション）",
     "depositRefund": "保証金の返金",
     "overrideRefund": "必要に応じて返金額を上書き",
+    "changeRefund": "Take something off, or give back a different amount",
     "photosVideo": "写真 / ビデオ",
     "depositAlreadyReturned": "保証金はすでに返金済み — 調整不要",
     "depositDeductions": "保証金の控除",

@@ -86,6 +86,7 @@
     "cleaningFee": "ค่าทำความสะอาด (ไม่บังคับ)",
     "depositRefund": "เงินมัดจำที่คืน",
     "overrideRefund": "แก้ไขยอดคืนเงินหากจำเป็น",
+    "changeRefund": "หักเงิน หรือคืนจำนวนอื่น",
     "photosVideo": "รูป / วิดีโอ",
     "depositAlreadyReturned": "คืนเงินมัดจำแล้ว — ไม่ต้องหักยอด",
     "depositDeductions": "รายการหักเงินมัดจำ",

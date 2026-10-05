@@ -50,6 +50,7 @@
     "cleaningFee": "သန့်ရှင်းရေးခ (မဖြစ်မနေ မဟုတ်)",
     "depositRefund": "ပြန်အမ်းမည့် စရံငွေ",
     "overrideRefund": "လိုအပ်ပါက ပြန်အမ်းငွေ ပြင်ပါ",
+    "changeRefund": "Take something off, or give back a different amount",
     "photosVideo": "ဓာတ်ပုံ / ဗီဒီယို",
     "depositAlreadyReturned": "စရံငွေ ပြန်အမ်းပြီး — နုတ်ယူရန် မလိုပါ",
     "depositDeductions": "စရံငွေမှ နုတ်ယူမှုများ",

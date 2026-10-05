@@ -600,7 +600,7 @@ export async function submitInspection(formData: FormData) {
   if (mode === "return" && rentalId && !isSwap) {
     const { data: rental, error: rentalFetchError } = await supabase
       .from("rentals")
-      .select("mileage_at_delivery, end_date, billing_interval, pricing_model, currency")
+      .select("mileage_at_delivery, end_date, billing_interval, pricing_model, currency, vehicle_id, original_vehicle_id")
       .eq("id", rentalId)
       .eq("organization_id", organizationId)
       .maybeSingle();
@@ -608,8 +608,26 @@ export async function submitInspection(formData: FormData) {
       throw new Error(rentalFetchError.message);
     }
 
+    // After a change of vehicle the handover reading on the rental may still be the first vehicle's
+  // (the handover form for the replacement was never completed). Distance is then unknown, not
+  // "this vehicle's whole odometer minus the other vehicle's reading".
+    let handoverReadingIsForThisVehicle = true;
+    if (rental?.original_vehicle_id && rental.original_vehicle_id !== rental.vehicle_id) {
+      const { data: handoverOfThisVehicle } = await supabase
+        .from("inspections")
+        .select("id")
+        .eq("organization_id", organizationId)
+        .eq("rental_id", rentalId)
+        .eq("vehicle_id", rental.vehicle_id)
+        .eq("type", "delivery")
+        .eq("status", "submitted")
+        .is("deleted_at", null)
+        .limit(1)
+        .maybeSingle();
+      handoverReadingIsForThisVehicle = Boolean(handoverOfThisVehicle);
+    }
     const kmDriven =
-      odometerReading !== null && rental?.mileage_at_delivery !== null && rental?.mileage_at_delivery !== undefined
+      handoverReadingIsForThisVehicle && odometerReading !== null && rental?.mileage_at_delivery !== null && rental?.mileage_at_delivery !== undefined
         ? Math.max(0, odometerReading - Number(rental.mileage_at_delivery || 0))
         : null;
 

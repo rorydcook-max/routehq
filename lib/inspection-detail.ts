@@ -161,17 +161,26 @@ export async function getInspectionContextByRental(
     };
   }
 
+  // After a change of vehicle, the latest handover on file may be for the vehicle the customer no
+  // longer has. Comparing this vehicle's odometer and damage against that one gives nonsense
+  // ("driven 71,650 km"), so only a handover of the vehicle now on the rental counts.
+  const latestHandover = deliveryResult.data || null;
+  const handoverIsForThisVehicle = !latestHandover?.vehicle_id || latestHandover.vehicle_id === rental.vehicle_id;
+  const handover = handoverIsForThisVehicle ? latestHandover : null;
+  const vehicleWasChanged = Boolean(rental.original_vehicle_id && rental.original_vehicle_id !== rental.vehicle_id);
+  const rentalForForm = vehicleWasChanged ? { ...rental, mileage_at_delivery: handover?.odometer_reading ?? null } : rental;
+
   return {
     mode,
     organizationId,
-    rental,
+    rental: rentalForForm,
     unpaidPayments: Array.isArray(unpaidPaymentsResult.data) ? unpaidPaymentsResult.data : unpaidPaymentsResult.data ? [unpaidPaymentsResult.data] : [],
     hasPaymentSchedule: Number(scheduleCountResult.count || 0) > 0,
     vehicle: rental.vehicles,
     customer: rental.customers || null,
     gpsDevice: gpsResult.data || null,
     latestLocation: locationResult.data || null,
-    deliveryInspection: await addSignedInspectionUrls(supabase, deliveryResult.data || null)
+    deliveryInspection: await addSignedInspectionUrls(supabase, handover)
   };
 }
 

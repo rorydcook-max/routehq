@@ -77,6 +77,7 @@
     "cleaningFee": "सफाई शुल्क (वैकल्पिक)",
     "depositRefund": "जमा राशि की वापसी",
     "overrideRefund": "आवश्यक होने पर वापसी राशि को अधिलेखित करें",
+    "changeRefund": "Take something off, or give back a different amount",
     "photosVideo": "फोटो / वीडियो",
     "depositAlreadyReturned": "जमा राशि पहले ही लौटाई गई — कोई समाधान आवश्यक नहीं",
     "depositDeductions": "जमा कटौतियाँ",

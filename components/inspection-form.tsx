@@ -505,9 +505,13 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
     setOcrMessage(t("ocrReading"));
     const data = new FormData();
     data.append("file", file);
+    // Never leave "Reading…" on screen for good: after 20 seconds give up and ask for the number to be typed.
+    const giveUp = new AbortController();
+    const timer = setTimeout(() => giveUp.abort(), 20000);
     try {
-      const response = await fetch("/api/ocr/odometer", { method: "POST", body: data });
+      const response = await fetch("/api/ocr/odometer", { method: "POST", body: data, signal: giveUp.signal });
       const result = await response.json();
+      clearTimeout(timer);
       if (!response.ok) {
         setOcrMessage(result.error || t("ocrUnavailable"));
         return;
@@ -522,9 +526,13 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
         setOcrMessage(t("ocrUnclear"));
       }
     } catch {
+      clearTimeout(timer);
       setOcrMessage(t("ocrFailed"));
     }
   }
+
+  // The reading taken when this vehicle was handed over. Unknown (not zero) when there is none on file.
+  const handoverKm = context.rental?.mileage_at_delivery != null ? Number(context.rental.mileage_at_delivery) : null;
 
   function canAdvance() {
     if (step === 1) return Boolean(odometer && odometerPhotoCaptured);
@@ -722,13 +730,14 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                 <p className="text-2xl font-semibold text-[var(--foreground)]">{titleFor(context)}</p>
                 <p className="font-mono-data mt-1 text-lg font-semibold text-[var(--foreground)]">{context.vehicle.registration_number}</p>
                 <p className="mt-2 text-sm text-[var(--muted)]">
-                  {context.customer?.full_name ? `${context.customer.full_name} · ` : ""}
-                  {context.rental?.start_date ? t("rentalStarts", { date: formatDate(context.rental.start_date) }) : t("standaloneReport")}
+                  {mode === "return" && context.customer?.full_name ? context.customer.full_name : null}
+                  {mode !== "return" && context.customer?.full_name ? `${context.customer.full_name} · ` : ""}
+                  {mode === "return" ? null : context.rental?.start_date ? t("rentalStarts", { date: formatDate(context.rental.start_date) }) : t("standaloneReport")}
                 </p>
                 {mode === "return" ? (
                   <p className="mt-2 rounded-lg bg-[#fef3c7] px-3 py-2 text-sm font-bold text-[#92400e]">
                     <span className="font-mono-data">
-                      {t("odometerAtDelivery", { km: Number(context.rental?.mileage_at_delivery || 0).toLocaleString("en-US") })} ·{" "}
+                      {handoverKm != null ? `${t("odometerAtDelivery", { km: handoverKm.toLocaleString("en-US") })} · ` : ""}
                       {t("rentalLengthDays", { count: daysBetween(context.rental?.start_date) })}
                     </span>
                   </p>
@@ -757,19 +766,19 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
             }}
           />
           {ocrMessage ? <p className="mt-3 rounded-lg bg-[#fbfaf8] p-3 text-sm font-semibold text-[var(--primary)]">{ocrMessage}</p> : null}
-          {mode === "return" ? (
+          {mode === "return" && handoverKm != null ? (
             <p className="mt-3 text-sm font-semibold text-[var(--muted)]">
-              <span className="font-mono-data">{t("odometerAtDelivery", { km: Number(context.rental?.mileage_at_delivery || 0).toLocaleString("en-US") })}</span>
+              <span className="font-mono-data">{t("odometerAtDelivery", { km: handoverKm.toLocaleString("en-US") })}</span>
             </p>
           ) : null}
           <label className="mt-4 block">
             <span className="text-sm font-semibold text-[var(--foreground)]">{t("confirmOdometer")}</span>
             <input className={inputClass} inputMode="numeric" min="0" onChange={(event) => setOdometer(event.target.value)} placeholder={t("odometerExample")} type="number" value={odometer} />
           </label>
-          {mode === "return" && odometer ? (
+          {mode === "return" && odometer && handoverKm != null ? (
             <p className="mt-3 rounded-lg bg-white p-3 text-sm font-semibold text-[var(--foreground)]">
               <span className="font-mono-data">
-                {t("drivenDuringRental", { km: Math.max(0, Number(odometer || 0) - Number(context.rental?.mileage_at_delivery || 0)).toLocaleString("en-US") })}
+                {t("drivenDuringRental", { km: Math.max(0, Number(odometer || 0) - handoverKm).toLocaleString("en-US") })}
               </span>
             </p>
           ) : (
@@ -810,8 +819,9 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
 
       <div hidden={step !== 3}>
         <StepShell eyebrow={t("eyebrowWalkaround")} title={t("recordCondition")}>
+          <p className="mb-3 text-sm text-[var(--muted)]">{t("conditionMinimum")}</p>
           <FileCapture accept="video/*" icon={FileVideo} label={t("recordVideo")} name="walkaroundVideo" onSelected={() => setVideoCaptured(true)} />
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <div className="mt-4 grid grid-cols-2 gap-3">
             {[
               ["front", t("areaFront")],
               ["rear", t("areaRear")],
@@ -828,7 +838,6 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
               />
             ))}
           </div>
-          <p className="mt-3 text-sm text-[var(--muted)]">{t("conditionMinimum")}</p>
         </StepShell>
       </div>
 
@@ -847,33 +856,37 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
               </div>
             </div>
           ) : null}
-          <VehicleDiagram onSelect={setSelectedLocation} />
-          <div className="mt-4 rounded-lg border border-[var(--border)] bg-white p-4">
-            <p className="font-semibold text-[var(--foreground)]">{selectedLocation ? t("damageAt", { area: areaName(selectedLocation) }) : t("tapArea")}</p>
-            <div className="mt-3 grid gap-3 sm:grid-cols-2">
-              <label className="block">
-                <span className="text-sm font-bold text-[var(--foreground)]">{t("severity")}</span>
-                <select className={inputClass} onChange={(event) => setDamageSeverity(event.target.value)} value={damageSeverity}>
-                  <option value="scratch">{t("damageScratch")}</option>
-                  <option value="dent">{t("damageDent")}</option>
-                  <option value="crack">{t("damageCrack")}</option>
-                  <option value="missing">{t("damageMissingPart")}</option>
-                  <option value="other">{t("damageOther")}</option>
-                </select>
-              </label>
-              <label className="block sm:col-span-2">
-                <span className="text-sm font-bold text-[var(--foreground)]">{t("description")}</span>
-                <input className={inputClass} onChange={(event) => setDamageDescription(event.target.value)} placeholder={t("shortDescription")} value={damageDescription} />
-              </label>
-            </div>
-            <button className={`${touchButton} mt-3 bg-[var(--primary)] text-white`} disabled={!selectedLocation || !damageDescription.trim()} onClick={addDamage} type="button">
-              {t("saveDamageItem")}
-            </button>
-          </div>
-          <label className="checkbox-label mt-3 min-h-12 rounded-lg border border-[var(--border)] bg-white px-4 py-3 font-bold text-[var(--foreground)]">
+          <label className="checkbox-label mb-3 min-h-12 rounded-lg border border-[var(--border)] bg-white px-4 py-3 font-bold text-[var(--foreground)]">
             <input checked={noDamage} className="flex-shrink-0" onChange={(event) => setNoDamage(event.target.checked)} type="checkbox" />
             <span>{t("noDamageToReport")}</span>
           </label>
+          {noDamage && damageItems.length === 0 ? null : (
+            <>
+            <VehicleDiagram onSelect={setSelectedLocation} />
+            <div className="mt-4 rounded-lg border border-[var(--border)] bg-white p-4">
+              <p className="font-semibold text-[var(--foreground)]">{selectedLocation ? t("damageAt", { area: areaName(selectedLocation) }) : t("tapArea")}</p>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                <label className="block">
+                  <span className="text-sm font-bold text-[var(--foreground)]">{t("severity")}</span>
+                  <select className={inputClass} onChange={(event) => setDamageSeverity(event.target.value)} value={damageSeverity}>
+                    <option value="scratch">{t("damageScratch")}</option>
+                    <option value="dent">{t("damageDent")}</option>
+                    <option value="crack">{t("damageCrack")}</option>
+                    <option value="missing">{t("damageMissingPart")}</option>
+                    <option value="other">{t("damageOther")}</option>
+                  </select>
+                </label>
+                <label className="block sm:col-span-2">
+                  <span className="text-sm font-bold text-[var(--foreground)]">{t("description")}</span>
+                  <input className={inputClass} onChange={(event) => setDamageDescription(event.target.value)} placeholder={t("shortDescription")} value={damageDescription} />
+                </label>
+              </div>
+              <button className={`${touchButton} mt-3 bg-[var(--primary)] text-white`} disabled={!selectedLocation || !damageDescription.trim()} onClick={addDamage} type="button">
+                {t("saveDamageItem")}
+              </button>
+            </div>
+            </>
+          )}
           <div className="mt-3 space-y-2">
             {damageItems.map((item) => (
               <div className="rounded-lg border border-[var(--border)] bg-white p-3" key={item.id}>
@@ -966,16 +979,13 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
         <StepShell eyebrow={t("eyebrowDepositReconciliation")} title={t("confirmDepositRefund")}>
           <div className="space-y-3 rounded-xl border border-[var(--border)] bg-white p-4">
             <Row label={t("depositHeld")} value={money(depositHeld)} />
-            <Row label={t("alreadyRefunded")} value={`-${money(alreadyRefunded)}`} danger={alreadyRefunded > 0} />
-            <Row label={t("alreadyForfeited")} value={`-${money(alreadyForfeited)}`} danger={alreadyForfeited > 0} />
-            <Row label={t("availableToReconcile")} value={money(availableToReconcile)} />
-            <Row label={t("outstandingBalance")} value={`-${money(outstandingBalance)}`} danger />
-            <Row label={t("fuelDeficitCharge")} value={`-${money(fuelDeficitCharge)}`} danger />
-            <Row label={t("damageExcess")} value={`-${money(damageCharge)}`} danger />
-            <label className="block rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
-              <span className="text-sm font-semibold text-[var(--foreground)]">{t("cleaningFee")}</span>
-              <input className={inputClass} min="0" onChange={(event) => setCleaningCharge(Number(event.target.value || 0))} placeholder="THB" step="0.01" type="number" value={cleaningCharge || ""} />
-            </label>
+            {alreadyRefunded > 0 ? <Row label={t("alreadyRefunded")} value={`-${money(alreadyRefunded)}`} danger /> : null}
+            {alreadyForfeited > 0 ? <Row label={t("alreadyForfeited")} value={`-${money(alreadyForfeited)}`} danger /> : null}
+            {availableToReconcile !== depositHeld ? <Row label={t("availableToReconcile")} value={money(availableToReconcile)} /> : null}
+            {outstandingBalance > 0 ? <Row label={t("outstandingBalance")} value={`-${money(outstandingBalance)}`} danger /> : null}
+            {fuelDeficitCharge > 0 ? <Row label={t("fuelDeficitCharge")} value={`-${money(fuelDeficitCharge)}`} danger /> : null}
+            {damageCharge > 0 ? <Row label={t("damageExcess")} value={`-${money(damageCharge)}`} danger /> : null}
+            {cleaningCharge > 0 ? <Row label={t("cleaningFee")} value={`-${money(cleaningCharge)}`} danger /> : null}
             {requestedDeductions > availableToReconcile ? (
               <p className="rounded-lg border border-[#fbbf24] bg-[#fffbeb] px-3 py-2 text-sm font-bold text-[#92400e]">
                 {t("deductionsExceedDeposit", { amount: money(availableToReconcile) })}
@@ -986,17 +996,27 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                 <Row label={t("depositRefund")} value={money(depositRefundAmount)} />
               </div>
             </div>
-            <label className="block">
-              <span className="text-sm font-bold text-[var(--foreground)]">{t("overrideRefund")}</span>
-              <input className={inputClass} min="0" onChange={(event) => setRefundOverride(event.target.value)} placeholder={String(calculatedRefund)} step="0.01" type="number" value={refundOverride} />
-            </label>
+            {/* Usually the whole deposit goes back, so the two adjustments stay one tap away. */}
+            <details open={cleaningCharge > 0 || Boolean(refundOverride)}>
+              <summary className="cursor-pointer py-1 text-sm font-semibold text-[var(--primary)]">{t("changeRefund")}</summary>
+              <div className="mt-3 space-y-3">
+                <label className="block">
+                  <span className="text-sm font-semibold text-[var(--foreground)]">{t("cleaningFee")}</span>
+                  <input className={inputClass} min="0" onChange={(event) => setCleaningCharge(Number(event.target.value || 0))} placeholder="THB" step="0.01" type="number" value={cleaningCharge || ""} />
+                </label>
+                <label className="block">
+                  <span className="text-sm font-semibold text-[var(--foreground)]">{t("overrideRefund")}</span>
+                  <input className={inputClass} min="0" onChange={(event) => setRefundOverride(event.target.value)} placeholder={String(calculatedRefund)} step="0.01" type="number" value={refundOverride} />
+                </label>
+              </div>
+            </details>
           </div>
         </StepShell>
       ) : null}
 
       {step === steps.length - 1 ? (
         <StepShell eyebrow={t("eyebrowReview")} title={mode === "return" ? t("reviewReturn") : mode === "condition_report" ? t("reviewCondition") : t("reviewHandover")}>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-2 gap-3">
             <SummaryTile icon={Gauge} label={t("odometer")} value={odometer ? `${Number(odometer).toLocaleString()} km` : t("missing")} />
             <SummaryTile icon={Fuel} label={t("fuel")} value={fuelLabel || t("missing")} />
             <SummaryTile icon={Camera} label={t("photosVideo")} value={videoCaptured ? t("videoCaptured") : t("photoCount", { count: Object.values(sidePhotos).filter(Boolean).length })} />

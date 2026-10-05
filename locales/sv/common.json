@@ -77,6 +77,7 @@
     "cleaningFee": "Städavgift (valfritt)",
     "depositRefund": "Återbetalning av deposition",
     "overrideRefund": "Åsidosätt återbetalningsbelopp vid behov",
+    "changeRefund": "Take something off, or give back a different amount",
     "photosVideo": "Foton / video",
     "depositAlreadyReturned": "Deposition redan återlämnad — ingen avstämning behövs",
     "depositDeductions": "Deposition avdrag",

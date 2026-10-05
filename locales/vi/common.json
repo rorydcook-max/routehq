@@ -68,6 +68,7 @@
     "cleaningFee": "Phí vệ sinh (không bắt buộc)",
     "depositRefund": "Tiền cọc hoàn lại",
     "overrideRefund": "Điều chỉnh số tiền hoàn nếu cần",
+    "changeRefund": "Take something off, or give back a different amount",
     "photosVideo": "Ảnh / video",
     "depositAlreadyReturned": "Đã hoàn tiền cọc — không cần trừ",
     "depositDeductions": "Các khoản trừ tiền cọc",

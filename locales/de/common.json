@@ -77,6 +77,7 @@
     "cleaningFee": "Reinigungsgebühr (optional)",
     "depositRefund": "Kautionserstattung",
     "overrideRefund": "Erstattungsbetrag bei Bedarf überschreiben",
+    "changeRefund": "Take something off, or give back a different amount",
     "photosVideo": "Fotos / Video",
     "depositAlreadyReturned": "Kaution bereits zurückgegeben – keine Abstimmung erforderlich",
     "depositDeductions": "Kautionsabzüge",

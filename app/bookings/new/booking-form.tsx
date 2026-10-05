@@ -1101,7 +1101,7 @@ export function BookingForm({
 
       {step === 4 ? (
         <section className="content-section">
-          <Header icon={CheckCircle2} eyebrow={`Step ${displayStepNumber}`} title={shareResult ? "All done" : "Check and send"} />
+          <Header icon={CheckCircle2} eyebrow={`Step ${displayStepNumber}`} title={shareResult ? "All done" : bookingMode === "existing_rental" ? "Check and save" : "Check and send"} />
           <BookingLinkSharePanel result={shareResult} />
           {isSameDayHandover ? (
             <div className="mt-3 rounded-lg border border-[#bfe0db] bg-[#fbfaf8] p-3">
@@ -1189,7 +1189,32 @@ export function BookingForm({
               <SummaryRow label="Upfront" mono value={`${upfrontPeriods} ${periodLabel}${upfrontPeriods !== 1 ? "s" : ""} × ${money(upfrontRate, currency)} = ${money(upfrontPeriods * upfrontRate, currency)}`} />
             ) : null}
             <SummaryRow label="Deposit" mono value={money(depositAmount, currency)} />
-            <SummaryRow
+            {bookingMode === "booking_link" && rentalRate > 0
+              ? (() => {
+                  const rentalDays = !openEnded && startDate && endDate ? Math.max(1, Math.round((new Date(`${endDate}T00:00:00`).getTime() - new Date(`${startDate}T00:00:00`).getTime()) / 86400000)) : 1;
+                  const firstRent =
+                    pricingModel === "daily"
+                      ? rentalRate * rentalDays
+                      : upfrontEnabled && upfrontPeriods > 0
+                        ? upfrontPeriods * upfrontRate
+                        : rentalRate;
+                  const rentWords =
+                    pricingModel === "daily"
+                      ? `${rentalDays} ${rentalDays === 1 ? "day" : "days"} rent`
+                      : upfrontEnabled && upfrontPeriods > 0
+                        ? `${upfrontPeriods} ${periodLabel}${upfrontPeriods !== 1 ? "s" : ""} rent`
+                        : pricingModel === "custom"
+                          ? "rent"
+                          : `first ${periodLabel}'s rent`;
+                  return (
+                    <SummaryRow
+                      label="Customer pays first"
+                      value={`${money(firstRent + depositAmount, currency)} · ${money(firstRent, currency)} ${rentWords}${depositAmount > 0 ? ` + ${money(depositAmount, currency)} deposit` : ""}`}
+                    />
+                  );
+                })()
+              : null}
+            {skipDelivery ? null : <SummaryRow
               label="Handover"
               value={
                 deliveryMethod === "tbd"
@@ -1198,7 +1223,7 @@ export function BookingForm({
                     ? `Delivery to ${deliveryLocation || "a place to be confirmed"} · ${deliveryDateTime ? longDateTime(deliveryDateTime) : "time to be confirmed"}`
                     : `Collection from ${collectionAddress || "a place to be confirmed"} · ${collectionTime ? longDateTime(collectionTime) : "time to be confirmed"}`
               }
-            />
+            />}
             <SummaryRow label="Included" value={includedItems.length ? includedItems.join(", ") : "None selected"} />
           </div>
           {bookingMode === "existing_rental" && !walkInFastTrack ? (
@@ -1284,7 +1309,7 @@ export function BookingForm({
             ) : walkInFastTrack ? (
               "Record walk-in rental"
             ) : bookingMode === "existing_rental" ? (
-              "Record existing rental"
+              "Save rental"
             ) : (
               "Generate booking link"
             )}
@@ -1403,7 +1428,7 @@ function BookingLinkSharePanel({ result }: { result: BookingShareResult | null }
             type="button"
           >
             {icon}
-            <span className="max-w-full truncate" style={{ fontSize: "11px", color: "#64748b", fontWeight: 500 }}>{label}</span>
+            <span className="max-w-full truncate tracking-tight" style={{ fontSize: "10px", color: "#64748b", fontWeight: 500 }}>{label}</span>
           </button>
         ))}
       </div>

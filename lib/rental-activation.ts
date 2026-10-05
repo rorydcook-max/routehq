@@ -105,7 +105,6 @@ async function generatePaymentScheduleInternal(
   if (!startDateStr) return [];
 
   const period = String(rental.billing_interval || rental.pricing_model || "monthly").toLowerCase();
-  if (!["monthly", "month", "weekly", "week"].includes(period)) return [];
 
   const { data: txRows } = await (supabase as any)
     .from("transactions")
@@ -135,7 +134,7 @@ async function generatePaymentScheduleInternal(
 
   const records: any[] = [];
 
-  const generate = (dueDateStr: string, index: number, monthLabel?: string) => {
+  const generate = (dueDateStr: string, index: number, monthLabel?: string, amount: number = rentalRate) => {
     if (isDateCovered(dueDateStr)) return;
 
     const matched = bestMatchTransaction(incomeTransactions, usedTransactionIds, dueDateStr);
@@ -154,7 +153,7 @@ async function generatePaymentScheduleInternal(
       rental_id: rental.id,
       customer_id: rental.customer_id,
       vehicle_id: rental.vehicle_id,
-      amount: rentalRate,
+      amount,
       currency: rental.currency || "THB",
       scheduled_date: dueDateStr,
       due_date: dueDateStr,
@@ -183,6 +182,12 @@ async function generatePaymentScheduleInternal(
       const dueDate = addWeeks(startDate, i);
       generate(dueDate.toISOString().split("T")[0], i);
     }
+  } else {
+    // Daily and one-off prices: the whole rent is one payment on the first day.
+    // (Without this a short rental had no rent recorded at all.)
+    const isDaily = period === "daily" || period === "day";
+    const days = isDaily && endDateStr ? Math.max(1, daysBetween(startDateStr, endDateStr)) : 1;
+    generate(startDateStr, 0, isDaily ? `${days} ${days === 1 ? "day" : "days"}` : "Whole rental", isDaily ? rentalRate * days : rentalRate);
   }
 
   if (records.length === 0) return [];

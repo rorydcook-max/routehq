@@ -156,6 +156,30 @@ export async function generatePaymentSchedule({
         }
       });
     }
+  } else {
+    // Daily and one-off prices: the whole rent is one payment, due at handover.
+    // (Without this a short rental had no payments at all, and no deposit either.)
+    const isDaily = period === "daily" || period === "day";
+    const days = isDaily && endDate ? Math.max(1, daysBetween(normalizedDeliveryDate, endDate)) : 1;
+    records.push({
+      organization_id: organisationId,
+      rental_id: rentalId,
+      customer_id: rental.customer_id,
+      vehicle_id: rental.vehicle_id,
+      amount: isDaily ? rentalRate * days : rentalRate,
+      currency,
+      scheduled_date: normalizedDeliveryDate,
+      due_date: normalizedDeliveryDate,
+      status: "scheduled",
+      paid_at: null,
+      metadata: {
+        type: "rent",
+        is_deposit: false,
+        period_index: 0,
+        period_label: isDaily ? `${days} ${days === 1 ? "day" : "days"}` : "Whole rental",
+        is_upfront: false
+      }
+    });
   }
 
   // The deposit is due with the first rent. Collected at handover, it is marked paid there.

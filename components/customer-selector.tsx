@@ -114,26 +114,7 @@ export function CustomerSelector({
               <input className={inputClass} onChange={(event) => setSearch(event.target.value)} placeholder="Search by name or phone" value={search} />
             </div>
             <div className="max-h-64 overflow-y-auto px-3 pb-3">
-              {filteredCustomers.map((customer) => (
-                <button
-                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left hover:bg-[#fbfaf8]"
-                  key={customer.id}
-                  onClick={() => {
-                    setSelectedId(customer.id);
-                    onSelect?.(customer);
-                    setOpen(false);
-                  }}
-                  type="button"
-                >
-                  <span className="text-xl">{flagForNationality(customer.nationality)}</span>
-                  <span>
-                    <span className="block font-bold text-[var(--foreground)]">{customer.full_name}</span>
-                    <span className="text-xs text-[var(--muted)]">{customer.phone || "No phone"}</span>
-                  </span>
-                </button>
-              ))}
-
-              <button className="mt-2 flex w-full items-center gap-2 rounded-lg border border-[var(--border)] bg-[#fbfaf8] px-3 py-2 text-left text-sm font-bold text-[var(--primary)]" onClick={() => setCreating((value) => !value)} type="button">
+              <button className="mb-2 flex min-h-11 w-full items-center gap-2 rounded-lg border border-[var(--border)] bg-[#fbfaf8] px-3 py-2 text-left text-sm font-bold text-[var(--primary)]" onClick={() => setCreating((value) => !value)} type="button">
                 <Plus size={16} />
                 Create new customer
               </button>
@@ -184,6 +165,28 @@ export function CustomerSelector({
                   </button>
                 </form>
               ) : null}
+              {creating ? null : (
+                <>
+              {filteredCustomers.map((customer) => (
+                <button
+                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left hover:bg-[#fbfaf8]"
+                  key={customer.id}
+                  onClick={() => {
+                    setSelectedId(customer.id);
+                    onSelect?.(customer);
+                    setOpen(false);
+                  }}
+                  type="button"
+                >
+                  <span className="text-xl">{flagForNationality(customer.nationality)}</span>
+                  <span>
+                    <span className="block font-bold text-[var(--foreground)]">{customer.full_name}</span>
+                    <span className="text-xs text-[var(--muted)]">{customer.phone || "No phone"}</span>
+                  </span>
+                </button>
+              ))}
+                </>
+              )}
             </div>
           </div>
         </div>

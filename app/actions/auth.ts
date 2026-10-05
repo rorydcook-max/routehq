@@ -74,34 +74,39 @@ export async function getShellContext(): Promise<ShellContext> {
   if (!membership) return { role: null, organizations: [], unreadChats: 0, dueTasks: 0 };
 
   const supabase = (await createSupabaseServerClient()) as any;
-  const { data } = await supabase
-    .from("organization_members")
-    .select("organization_id, organizations(name)")
-    .eq("user_id", membership.userId)
-    .eq("is_active", true)
-    .order("created_at", { ascending: true });
+  // Only what needs doing now counts: later jobs would make the badge permanent noise.
+  const countDueTasks = async () => {
+    try {
+      const { getTaskList } = await import("@/lib/tasks");
+      const { businessToday } = await import("@/lib/business-time");
+      const today = businessToday();
+      return (await getTaskList(membership.organizationId)).filter((task) => !task.completedAt && !task.coveredBy && !!task.dueDate && task.dueDate <= today).length;
+    } catch {
+      return 0;
+    }
+  };
+  // The three lookups do not depend on each other, so they run together.
+  const [{ data }, { count }, dueTasks] = await Promise.all([
+    supabase
+      .from("organization_members")
+      .select("organization_id, organizations(name)")
+      .eq("user_id", membership.userId)
+      .eq("is_active", true)
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("conversations")
+      .select("id", { count: "exact", head: true })
+      .eq("organization_id", membership.organizationId)
+      .eq("status", "open")
+      .gt("unread_count", 0),
+    countDueTasks()
+  ]);
 
   const organizations = ((data || []) as any[]).map((row) => ({
     id: row.organization_id as string,
     name: String(row.organizations?.name || "Business"),
     active: row.organization_id === membership.organizationId
   }));
-  const { count } = await supabase
-    .from("conversations")
-    .select("id", { count: "exact", head: true })
-    .eq("organization_id", membership.organizationId)
-    .eq("status", "open")
-    .gt("unread_count", 0);
-  // Only what needs doing now counts: later jobs would make the badge permanent noise.
-  let dueTasks = 0;
-  try {
-    const { getTaskList } = await import("@/lib/tasks");
-    const { businessToday } = await import("@/lib/business-time");
-    const today = businessToday();
-    dueTasks = (await getTaskList(membership.organizationId)).filter((task) => !task.completedAt && !task.coveredBy && !!task.dueDate && task.dueDate <= today).length;
-  } catch {
-    dueTasks = 0;
-  }
   return { role: membership.role, organizations, unreadChats: count || 0, dueTasks };
 }
 

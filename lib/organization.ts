@@ -1,5 +1,5 @@
 import { getDefaultOrganizationSlug } from "@/lib/supabase/config";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseServerClient, getRequestUser } from "@/lib/supabase/server";
 import { getActiveMembership } from "@/lib/auth/active-organization-server";
 export { getTravelPolicySettings, mergeTravelPolicySettings, jurisdictionByCountry, travelPolicyDefaults } from "@/lib/travel-policy";
 export type { HomeTerritoryType, IslandTravelPolicy, TravelPolicySettings } from "@/lib/travel-policy";
@@ -7,10 +7,7 @@ export type { HomeTerritoryType, IslandTravelPolicy, TravelPolicySettings } from
 const organizationColumns = "id, name, slug, default_locale, currency, timezone, settings, subscription_tier, created_at, logo_url, business_logo_storage_bucket, business_logo_storage_path, owner_signature_url, trading_name, legal_name, registration_or_tax_number, business_address, business_phone, business_email, whatsapp, line_id, contract_accent_colour, authorised_signatory_name, authorised_signatory_title, authorised_signature_storage_bucket, authorised_signature_storage_path, signature_authorised_at, signature_authorisation_text_version, default_contract_locale, default_contract_template_id, contract_footer_text, powered_by_routehq_enabled, accepted_payment_methods, promptpay_id, promptpay_qr_url, bank_name, bank_account_number, bank_account_name, wise_link, revolut_link, receipt_prefix, receipt_footer_text, default_payment_method, line_user_id, line_notifications_enabled, line_daily_summary_enabled, line_daily_summary_time, line_channel_access_token, upfront_discount_enabled, upfront_discount_min_periods, upfront_discount_rate, upfront_discount_label";
 
 export async function getDefaultOrganization() {
-  const supabase = (await createSupabaseServerClient()) as any;
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
+  const [supabase, user] = (await Promise.all([createSupabaseServerClient(), getRequestUser()])) as [any, Awaited<ReturnType<typeof getRequestUser>>];
 
   if (user) {
     const { data: membership, error: membershipError } = await getActiveMembership(supabase, user.id);

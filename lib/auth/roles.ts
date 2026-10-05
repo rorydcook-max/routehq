@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseServerClient, getRequestUser } from "@/lib/supabase/server";
 
 /**
  * RouteHQ has two roles for now:
@@ -26,10 +26,7 @@ export { APP_ROLES, appRoleFromDb, dbRoleFromApp, OWNER_ONLY_MESSAGE } from "@/l
 export type { AppRole } from "@/lib/auth/role-types";
 
 export async function getCurrentMembership() {
-  const supabase = (await createSupabaseServerClient()) as any;
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
+  const [supabase, user] = (await Promise.all([createSupabaseServerClient(), getRequestUser()])) as [any, Awaited<ReturnType<typeof getRequestUser>>];
   if (!user) return null;
 
   const { data: membership } = await getActiveMembership(supabase, user.id);

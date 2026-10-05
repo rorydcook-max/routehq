@@ -293,9 +293,39 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   const { id } = await params;
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const [userEmail, organization] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization()]);
-  let [detail, allCustomers] = await Promise.all([
+  const supabaseForVehicles = (await createSupabaseServerClient()) as any;
+  // Everything this page needs is asked for together. The second group is: the handover and
+  // collection forms still to do after a signed change of vehicle, an exchange waiting on the
+  // other customer, the agreement and forms, and a change waiting for the customer's signature.
+  let [detail, allCustomers, { data: swapForms }, { data: waitingExchange }, rentalDocuments, { data: pendingAmendment }] = await Promise.all([
     getBookingDetail(id, organization.id),
-    getCustomersForSelector(organization.id)
+    getCustomersForSelector(organization.id),
+    supabaseForVehicles
+      .from("tasks")
+      .select("id, title, action, vehicle_id")
+      .eq("organization_id", organization.id)
+      .eq("rental_id", id)
+      .in("action", ["swap_handover", "swap_collection"])
+      .is("completed_at", null)
+      .is("deleted_at", null),
+    supabaseForVehicles
+      .from("rental_amendments")
+      .select("id, changes")
+      .eq("organization_id", organization.id)
+      .eq("rental_id", id)
+      .eq("status", "signed")
+      .is("applied_at", null)
+      .not("changes->>swap_group", "is", null)
+      .limit(1)
+      .maybeSingle(),
+    getBookingRentalDocuments(supabaseForVehicles, organization.id, id),
+    supabaseForVehicles
+      .from("rental_amendments")
+      .select("id, token, changes")
+      .eq("organization_id", organization.id)
+      .eq("rental_id", id)
+      .eq("status", "awaiting_signature")
+      .maybeSingle()
   ]);
 
   if (!detail) {
@@ -317,39 +347,6 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   // activation now only happens through delivery, "Skip inspection and
   // activate", or the payment schedule controls on this page.
 
-  const supabaseForVehicles = (await createSupabaseServerClient()) as any;
-  // After a signed change of vehicle: the handover and collection forms still to be completed,
-  // and an exchange this customer has signed that is waiting on the other customer.
-  const [{ data: swapForms }, { data: waitingExchange }] = await Promise.all([
-    supabaseForVehicles
-      .from("tasks")
-      .select("id, title, action, vehicle_id")
-      .eq("organization_id", organization.id)
-      .eq("rental_id", detail.rental.id)
-      .in("action", ["swap_handover", "swap_collection"])
-      .is("completed_at", null)
-      .is("deleted_at", null),
-    supabaseForVehicles
-      .from("rental_amendments")
-      .select("id, changes")
-      .eq("organization_id", organization.id)
-      .eq("rental_id", detail.rental.id)
-      .eq("status", "signed")
-      .is("applied_at", null)
-      .not("changes->>swap_group", "is", null)
-      .limit(1)
-      .maybeSingle()
-  ]);
-  const [rentalDocuments, { data: pendingAmendment }] = await Promise.all([
-    getBookingRentalDocuments(supabaseForVehicles, organization.id, detail.rental.id),
-    supabaseForVehicles
-      .from("rental_amendments")
-      .select("id, token, changes")
-      .eq("organization_id", organization.id)
-      .eq("rental_id", detail.rental.id)
-      .eq("status", "awaiting_signature")
-      .maybeSingle()
-  ]);
 
   const { rental, bookingLink, payments, transactions, inspections, documents, activityEvents, customerPortalActions, communicationTimeline } = detail;
   const vehicle = rental.vehicles;

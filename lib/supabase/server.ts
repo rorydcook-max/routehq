@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
+import { cache } from "react";
 import { cookies } from "next/headers";
 import type { Database } from "@/lib/supabase/database.types";
 
@@ -24,3 +25,16 @@ export async function createSupabaseServerClient() {
     }
   );
 }
+
+/**
+ * Who is signed in, checked once per request. A page asks this several times
+ * (the page itself, the business lookup, the role check); each one used to be
+ * its own trip to the sign-in service.
+ */
+export const getRequestUser = cache(async () => {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+  return user;
+});

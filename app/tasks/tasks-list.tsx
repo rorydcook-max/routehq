@@ -356,7 +356,7 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
             Open form
           </Link>
         ) : null}
-        {item.kind === "task" && !item.completedAt && !showNote ? (
+        {item.kind === "task" && !item.completedAt && !showNote && !item.id.startsWith("request-") ? (
           <>
             {/* One main button per row. A job with its own next step keeps "mark done" and notes behind the dots. */}
             {!item.action || item.action === "refund" || showMore ? (

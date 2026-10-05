@@ -17,6 +17,7 @@ import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization
 import { getValueTrackerData } from "@/lib/value-tracker";
 import { getOnboardingStatus } from "@/lib/onboarding";
 import { getReceiptsWaiting } from "@/lib/payment-receipts";
+import { getTaskList } from "@/lib/tasks";
 import { releaseExpiredHolds } from "@/lib/booking-holds";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -138,7 +139,7 @@ export default async function Home() {
     })
   ]);
   const { metrics, reminders, rentals, timeline, transactions, vehicles } = dashboardData;
-  const receiptsWaiting = await getReceiptsWaiting(organization.id);
+  const [receiptsWaiting, taskList] = await Promise.all([getReceiptsWaiting(organization.id), getTaskList(organization.id).catch(() => [])]);
 
   const now = new Date();
   const today = businessToday();
@@ -285,6 +286,26 @@ export default async function Home() {
       href: "/fleet",
       action: "Review"
     });
+  }
+  // Jobs from To do that are due now: a customer waiting for an answer, a refund to decide, forms to complete.
+  // The first few are listed; the rest are one row, so the dashboard and To do never tell different stories.
+  const jobsDue = taskList
+    .filter((task) => task.kind === "task" && !task.completedAt && !task.coveredBy && !!task.dueDate && task.dueDate <= today)
+    .sort((a, b) => Number(b.action === "request") - Number(a.action === "request") || String(a.dueDate).localeCompare(String(b.dueDate)));
+  for (const job of jobsDue.slice(0, 3)) {
+    const waiting = job.action === "request";
+    todayItems.push({
+      key: `job-${job.id}`,
+      tone: waiting ? "red" : job.dueDate && job.dueDate < today ? "amber" : "neutral",
+      icon: <Bell size={17} />,
+      title: waiting ? `${job.customerName || "A customer"} is waiting for your answer` : job.action === "swap_handover" || job.action === "swap_collection" ? job.title.split(" to ")[0].split(" from ")[0] : job.title.split(" - ")[0],
+      detail: [job.customerName, job.vehicleLabel].filter(Boolean).join(" · ") || "On To do",
+      href: waiting && job.rentalId ? `/bookings/${job.rentalId}#customer-requests` : "/tasks",
+      action: waiting ? "Answer" : "Open"
+    });
+  }
+  if (jobsDue.length > 3) {
+    todayItems.push({ key: "jobs-more", tone: "neutral", icon: <Bell size={17} />, title: `${plural(jobsDue.length - 3, "more job")} on To do`, detail: "Forms, refunds and follow-ups due now", href: "/tasks", action: "Open" });
   }
   for (const reminder of reminders) {
     if (reminder.due && reminder.due <= today) {

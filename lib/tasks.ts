@@ -65,10 +65,10 @@ function isVoided(payment: any) {
  */
 export async function getTaskList(organizationId: string): Promise<TaskListItem[]> {
   const supabase = (await createSupabaseServerClient()) as any;
-  const [tasksResult, paymentsResult] = await Promise.all([
+  const [tasksResult, paymentsResult, requestsResult] = await Promise.all([
     supabase
       .from("tasks")
-      .select("id, title, task_type, due_at, completed_at, vehicle_id, rental_id, rental_payment_id, action")
+      .select("id, title, task_type, due_at, completed_at, vehicle_id, rental_id, rental_payment_id, action, portal_action_id")
       .eq("organization_id", organizationId)
       .is("deleted_at", null)
       .neq("task_type", "payment_reminder")
@@ -81,13 +81,23 @@ export async function getTaskList(organizationId: string): Promise<TaskListItem[
       .not("status", "in", "(paid,voided,waived,cancelled)")
       // A returned rental can still owe money; rent scheduled past the return is voided at return.
       .not("rentals.status", "in", "(cancelled)")
-      .order("due_date", { ascending: true })
+      .order("due_date", { ascending: true }),
+    // Anything a customer asked for that nobody has answered yet.
+    supabase
+      .from("customer_portal_actions")
+      .select("id, action_type, created_at, rental_id")
+      .eq("organisation_id", organizationId)
+      .eq("status", "pending")
+      .order("created_at", { ascending: true })
   ]);
 
   if (tasksResult.error) throw new Error(tasksResult.error.message);
   if (paymentsResult.error) throw new Error(paymentsResult.error.message);
 
   const tasks = tasksResult.data || [];
+  // A waiting request must always be on the list, even when no job was created for it.
+  const withJob = new Set(tasks.filter((row: any) => !row.completed_at).map((row: any) => row.portal_action_id).filter(Boolean));
+  const requests = ((requestsResult.data || []) as any[]).filter((row) => row.rental_id && !withJob.has(row.id));
   // Rent is scheduled a year ahead; only what is overdue or due in the next five weeks is a job.
   // A payment the customer has already sent a receipt for always shows, whenever it is due.
   const horizon = businessToday(35);
@@ -103,23 +113,60 @@ export async function getTaskList(organizationId: string): Promise<TaskListItem[
       ...payments.map((row: any) => row.vehicle_id || row.rentals?.vehicle_id)
     ].filter(Boolean))
   ];
-  const rentalIds = [...new Set(tasks.map((row: any) => row.rental_id).filter(Boolean))];
+  const rentalIds = [...new Set([...tasks.map((row: any) => row.rental_id), ...requests.map((row) => row.rental_id)].filter(Boolean))];
 
   const [vehiclesResult, rentalsResult] = await Promise.all([
     vehicleIds.length
       ? supabase.from("vehicles").select("id, registration_number, make, model").in("id", vehicleIds)
       : Promise.resolve({ data: [] }),
     rentalIds.length
-      ? supabase.from("rentals").select("id, reference, display_code, customers!rentals_customer_id_fkey(full_name)").in("id", rentalIds)
+      ? supabase.from("rentals").select("id, reference, display_code, vehicle_id, customers!rentals_customer_id_fkey(full_name), vehicles!rentals_vehicle_id_fkey(make, model, registration_number)").in("id", rentalIds)
       : Promise.resolve({ data: [] })
   ]);
 
   const vehicleLabels = new Map<string, string>(
     (vehiclesResult.data || []).map((row: any) => [row.id, [row.make, row.model].filter(Boolean).join(" ") + (row.registration_number ? ` · ${row.registration_number}` : "")])
   );
-  const rentalInfo = new Map<string, { label: string | null; customer: string | null }>(
-    (rentalsResult.data || []).map((row: any) => [row.id, { label: row.display_code || row.reference || null, customer: row.customers?.full_name || null }])
+  const rentalInfo = new Map<string, { label: string | null; customer: string | null; vehicleId: string | null; vehicle: string | null }>(
+    (rentalsResult.data || []).map((row: any) => [
+      row.id,
+      {
+        label: row.display_code || row.reference || null,
+        customer: row.customers?.full_name || null,
+        vehicleId: row.vehicle_id || null,
+        vehicle: row.vehicles ? [row.vehicles.make, row.vehicles.model].filter(Boolean).join(" ") + (row.vehicles.registration_number ? ` · ${row.vehicles.registration_number}` : "") : null
+      }
+    ])
   );
+  const requestTitles: Record<string, string> = {
+    extension_request: "Wants to keep the vehicle longer",
+    return_confirmation: "Wants to arrange the return",
+    problem_report: "Reported a problem",
+    question: "Asked a question"
+  };
+  const requestItems: TaskListItem[] = requests.map((row) => {
+    const rental = rentalInfo.get(row.rental_id);
+    return {
+      id: `request-${row.id}`,
+      kind: "task",
+      title: requestTitles[String(row.action_type)] || "Customer request",
+      taskType: "admin",
+      dueAt: row.created_at,
+      dueDate: row.created_at ? bangkokDate.format(new Date(row.created_at)) : null,
+      completedAt: null,
+      vehicleId: rental?.vehicleId || null,
+      rentalId: row.rental_id,
+      action: "request",
+      rentalPaymentId: null,
+      vehicleLabel: rental?.vehicle || null,
+      rentalLabel: rental?.label || null,
+      customerName: rental?.customer || null,
+      amount: null,
+      receipt: null,
+      coveredBy: null,
+      paymentLabel: null
+    };
+  });
 
   const taskItems: TaskListItem[] = tasks.map((row: any) => {
     const rental = row.rental_id ? rentalInfo.get(row.rental_id) : undefined;
@@ -194,7 +241,7 @@ export async function getTaskList(organizationId: string): Promise<TaskListItem[
     };
   });
 
-  return [...taskItems, ...paymentItems].sort((a, b) => {
+  return [...requestItems, ...taskItems, ...paymentItems].sort((a, b) => {
     const left = a.dueDate || "9999-12-31";
     const right = b.dueDate || "9999-12-31";
     if (left !== right) return left < right ? -1 : 1;

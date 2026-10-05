@@ -506,25 +506,12 @@ export function BookingEditForm({
 
   return (
     <>
-      <Card className="border-[#fde68a] bg-[#fffbeb]">
-        <div className="card-section flex items-start gap-3">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#fef3c7] text-[#d97706]">
-            <i className="ti ti-alert-triangle" />
-          </span>
-          <div>
-            <p className="font-bold text-[#92400e]">Editing an existing booking</p>
-            <p className="mt-1 text-sm text-[#92400e]">This page is for correcting booking details. It will not create a new booking link or duplicate rental.</p>
-            {agreementSigned ? (
-              <p className="mt-2 text-sm font-bold text-[#92400e]">
-                The customer has signed the agreement. The customer, dates, billing, rate, deposit, currency, inclusions and
-                special conditions are part of it and can&apos;t be changed here. Delivery details, the deposit held and payment
-                records can still be corrected. To extend the rental or change the rate or deposit, use &quot;Extend / change
-                terms&quot; on the booking: the customer signs a short amendment.
-              </p>
-            ) : null}
-          </div>
-        </div>
-      </Card>
+      {/* One calm line: what this page is for, and where the signed terms are changed. */}
+      {agreementSigned ? (
+        <p className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] px-3 py-2 text-sm text-[var(--foreground-secondary)]">
+          The customer has signed, so the dates, rate and deposit are fixed here. To change them use <span className="font-semibold">Extend / change terms</span> on the booking, and <span className="font-semibold">More &gt; Change vehicle</span> for the vehicle. Handover details and payment records can be corrected below.
+        </p>
+      ) : null}
 
       {saveError ? (
         <p className="rounded-lg border border-[#fecaca] bg-[#fff1f2] p-3 text-sm font-bold text-[#be123c]" role="alert">{saveError}</p>
@@ -561,7 +548,7 @@ export function BookingEditForm({
                   <div>
                     <p className="text-lg font-semibold text-[var(--foreground)]">{vehicleTitle(vehicle)}</p>
                     <p className="font-mono-data mt-1 text-sm font-bold text-[var(--muted)]">{vehicle?.registration_number || "No plate"}</p>
-                    <p className="mt-2 text-xs text-[var(--muted)]">Vehicle changes should be handled by cancelling or creating a replacement booking.</p>
+                    <p className="mt-2 text-xs text-[var(--muted)]">To change the vehicle, use More, then Change vehicle, on the booking.</p>
                   </div>
                 </div>
               </div>

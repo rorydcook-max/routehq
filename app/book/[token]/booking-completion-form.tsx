@@ -854,7 +854,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             </div>
           </label>
           <label>
-            <span className="text-sm font-bold text-[var(--foreground-secondary)]">Email</span>
+            <span className="text-sm font-bold text-[var(--foreground-secondary)]">Email <span className="font-normal text-[var(--muted)]">(optional)</span></span>
             <input className={inputClass} defaultValue={detail.customer?.email || ""} name="email" style={fieldStyle} type="email" />
           </label>
           <label>
@@ -863,28 +863,30 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           </label>
           <label>
             <span className="inline-flex items-center gap-2 text-sm font-bold text-[var(--foreground-secondary)]">
-              Current address
-              <span className="cursor-help text-[var(--muted)]" title="Your current address, hotel, villa or residence">ⓘ</span>
+              Where you're staying <span className="font-normal text-[var(--muted)]">(optional)</span>
             </span>
             <GoogleAddressInput onChange={setCurrentAddress} value={currentAddress} />
           </label>
+          <details className="sm:col-span-2" open={Boolean(detail.customer?.emergency_contact_name || detail.customer?.emergency_contact_phone)}>
+            <summary className="cursor-pointer text-sm font-semibold text-[var(--primary)]">+ Add an emergency contact (optional)</summary>
+            <div className="mt-3 grid gap-4 sm:grid-cols-2">
           <label>
             <span className="inline-flex items-center gap-2 text-sm font-bold text-[var(--foreground-secondary)]">
               Emergency contact name
-              <span className="cursor-help text-[var(--muted)]" title="Optional — add a contact if you would like us to know who to call in an emergency.">ⓘ</span>
             </span>
             <input className={inputClass} defaultValue={detail.customer?.emergency_contact_name || ""} name="emergencyContactName" style={fieldStyle} />
           </label>
           <label>
             <span className="inline-flex items-center gap-2 text-sm font-bold text-[var(--foreground-secondary)]">
               Emergency contact phone
-              <span className="cursor-help text-[var(--muted)]" title="Optional — add an emergency contact phone number if available.">ⓘ</span>
             </span>
             <div style={{ display: "flex", alignItems: "stretch", width: "100%", height: 42, position: "relative", marginTop: 8 }}>
               <PhoneCountrySelect name="emergencyPhoneCountryCode" onChange={setEmergencyPhoneCountryCode} value={emergencyPhoneCountryCode} />
               <input defaultValue={detail.customer?.emergency_contact_phone || ""} name="emergencyContactPhone" onClick={(e) => e.stopPropagation()} style={{ ...fieldStyle, width: "auto", borderRadius: "0 8px 8px 0", flex: 1, minWidth: 0, borderLeft: "none", position: "relative", zIndex: 2 }} type="tel" />
             </div>
           </label>
+            </div>
+          </details>
         </div>
       </section>
 
@@ -1670,12 +1672,12 @@ function GoogleAddressInput({ name = "address", onChange, value }: { name?: stri
           className={inputClass}
           name={name}
           onChange={(event) => onChange(event.target.value)}
-          placeholder="Search Google Maps or enter address..."
+          placeholder="Hotel, villa or address"
           ref={inputRef}
           style={fieldStyle}
           value={value}
         />
-        {mapsKeyConfigured ? (
+        {mapsKeyConfigured && isEnabled ? (
           <button
             className="pressable mt-2 rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm font-semibold text-[var(--foreground)]"
             onClick={() => setPinModalOpen(true)}
@@ -1685,9 +1687,7 @@ function GoogleAddressInput({ name = "address", onChange, value }: { name?: stri
           </button>
         ) : null}
       </div>
-      <p className="mt-2 text-xs font-semibold text-[var(--muted)]">
-        {isEnabled ? "Search for your current address, hotel, villa, or residence." : hasError || !mapsKeyConfigured ? "Google Maps search unavailable — enter address manually." : "Loading Google Maps address search..."}
-      </p>
+      {isEnabled ? <p className="mt-2 text-xs text-[var(--muted)]">Start typing and pick from the list, or drop a pin.</p> : null}
       {pinModalOpen ? (
         <PublicGooglePinModal
           onClose={() => setPinModalOpen(false)}

@@ -677,7 +677,12 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             ) : null}
           </BookingMetricCard>
           <BookingMetricCard icon={<Gauge size={18} />} label="Mileage">
-            {rental.mileage_at_delivery == null ? (
+            {rental.mileage_at_delivery == null && rental.mileage_at_return != null ? (
+              <>
+                <p className="font-mono-data text-sm font-semibold leading-5 text-[var(--foreground)]">{Number(rental.mileage_at_return).toLocaleString()} km at return</p>
+                <p className="text-sm text-[var(--muted)]">No reading was taken at handover</p>
+              </>
+            ) : rental.mileage_at_delivery == null ? (
               <>
                 <p className="text-sm font-semibold leading-5 text-[var(--foreground)]">{isCancelled ? "Never handed over" : isClosed ? "Not recorded" : "Not recorded yet"}</p>
                 <p className="text-sm text-[var(--muted)]">{isCancelled ? "No mileage to record" : isClosed ? "No handover form was completed" : "Recorded at delivery"}</p>
@@ -980,7 +985,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 <Info icon={Car} label="Vehicle" value={`${vehicleTitle(vehicle)} / ${vehicle?.registration_number || ""}`} />
                 {deliveryInspection ? (
                   <Info icon={MapPin} label="Handover" value={`Handed over ${formatDateTime(deliveryInspection.submitted_at || deliveryInspection.created_at)}`} />
-                ) : isCancelled ? null : (
+                ) : isCancelled || (rental.entered_by_operator && /TBD$/.test(delivery.detail)) ? null : (
                   <DeliveryInfo delivery={delivery} />
                 )}
                 {isCancelled && !deliveryInspection ? null : (
@@ -1009,7 +1014,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   rentalStatus={displayStatus}
                   earlyReturn={(payments as any[]).map((payment) => payment.metadata?.early_return).find((item) => item && !item.settled) || null}
                 />
-                <PaymentInfo method={paymentMethod} timing={paymentTiming} />
+                {paymentMethod || paymentTiming ? <PaymentInfo method={paymentMethod} timing={paymentTiming} /> : null}
                 {customerReportedPayment ? (
                   <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
                     <div className="flex items-start gap-3">

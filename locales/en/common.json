@@ -50,11 +50,11 @@
   },
   "inspection": {
     "fuelPercentage": "How full is the tank?",
-    "fuelHint": "Slide to match the gauge in your photo.",
+    "fuelHint": "Tap the level that matches your photo.",
     "fuelPercentageFull": "Fuel percentage full",
     "empty": "Empty",
     "full": "Full",
-    "exactFuelPercentage": "Exact fuel percentage",
+    "exactFuelPercentage": "Set an exact level",
     "exactPercent": "Exact %",
     "vehicleDiagram": "Top down vehicle diagram",
     "clear": "Clear",

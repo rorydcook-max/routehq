@@ -187,27 +187,39 @@ function FuelGauge({
           {value === null ? t("notSet") : `${value}%`}
         </span>
       </div>
-      <div className="mb-4 h-8 overflow-hidden rounded-full border border-[var(--border)] bg-[#fbfaf8]">
-        <div className="h-full rounded-full bg-[var(--primary)] transition-all" style={{ width: `${value ?? 0}%` }} />
+      {/* Five big taps cover nearly every handover; the slider and exact figure are one tap away. */}
+      <div className="grid grid-cols-5 gap-1.5">
+        {[
+          { level: 0, label: t("empty") },
+          { level: 25, label: "¼" },
+          { level: 50, label: "½" },
+          { level: 75, label: "¾" },
+          { level: 100, label: t("full") }
+        ].map(({ level, label }) => (
+          <button
+            aria-pressed={value === level}
+            className={`pressable min-h-12 rounded-lg border px-0.5 text-sm font-semibold ${value === level ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
+            key={level}
+            onClick={() => setValue(level)}
+            type="button"
+          >
+            {label}
+          </button>
+        ))}
       </div>
-      <input
-        aria-label={t("fuelPercentageFull")}
-        className="h-12 w-full cursor-pointer accent-[#0f766e]"
-        max="100"
-        min="0"
-        onChange={(event) => setValue(Number(event.target.value))}
-        step="1"
-        type="range"
-        value={displayValue}
-      />
-      <div className="mt-1 flex justify-between text-xs font-bold text-[var(--muted)]">
-        <span>{t("empty")}</span>
-        <span>25%</span>
-        <span>50%</span>
-        <span>75%</span>
-        <span>{t("full")}</span>
-      </div>
-      <div className="mt-4 grid grid-cols-[auto_1fr_auto] items-center gap-3">
+      <details className="mt-3">
+        <summary className="cursor-pointer py-2 text-sm font-semibold text-[var(--primary)]">{t("exactFuelPercentage")}</summary>
+        <input
+          aria-label={t("fuelPercentageFull")}
+          className="h-12 w-full cursor-pointer accent-[#0f766e]"
+          max="100"
+          min="0"
+          onChange={(event) => setValue(Number(event.target.value))}
+          step="1"
+          type="range"
+          value={displayValue}
+        />
+      <div className="mt-2 grid grid-cols-[auto_1fr_auto] items-center gap-3">
         <button className={`${touchButton} border border-[var(--border)] bg-white text-[var(--foreground-secondary)]`} onClick={() => setValue((value ?? displayValue) - 5)} type="button">
           -5%
         </button>
@@ -226,6 +238,7 @@ function FuelGauge({
           +5%
         </button>
       </div>
+      </details>
     </div>
   );
 }

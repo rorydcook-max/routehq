@@ -37,11 +37,11 @@
   },
   "inspection": {
     "fuelPercentage": "ระดับน้ำมัน (%)",
-    "fuelHint": "เลื่อนแถบให้ตรงกับเกจในรูปถ่าย",
+    "fuelHint": "แตะระดับที่ตรงกับในรูป",
     "fuelPercentageFull": "ระดับน้ำมันเต็ม",
     "empty": "หมด",
     "full": "เต็ม",
-    "exactFuelPercentage": "ระดับน้ำมันที่แน่นอน",
+    "exactFuelPercentage": "ระบุระดับที่แน่นอน",
     "exactPercent": "% ที่แน่นอน",
     "vehicleDiagram": "แผนผังรถมุมมองด้านบน",
     "clear": "ล้าง",

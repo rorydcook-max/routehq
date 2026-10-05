@@ -299,6 +299,41 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
       ? await promptPayQrSvg(detail.org_payment.promptpay_id, firstPaymentAmount)
       : null;
 
+  const bookingSummary = (
+    <>
+          <div className="mt-5 rounded-2xl border border-[var(--border)] bg-[#fbfaf8] p-4">
+            <div className="flex items-start gap-3">
+              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
+                <VehicleKindIcon boxed={false} kind={kindFromCategory(vehicle.vehicle_categories)} size={28} />
+              </span>
+              <div>
+                <h2 className="text-2xl font-semibold">{vehicleTitle(vehicle)}</h2>
+                <p className="mt-1 text-sm font-bold text-[var(--muted)]">{vehicle.registration_number || "Plate pending"} {vehicle.color ? `- ${vehicle.color}` : ""}</p>
+              </div>
+            </div>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <Info icon={CalendarDays} label="Rental period" value={rental.is_indefinite && detail.state !== "completed" ? `Monthly, open-ended from ${formatSummaryDate(rental.start_date)}` : `${formatSummaryDate(rental.start_date)} to ${formatSummaryDate(rental.end_date)}`} />
+              <Info icon={CreditCard} label="Rate and deposit" value={`${rateLabel(rental)}\n${Number(rental.deposit_amount || 0) > 0 ? `Deposit: ${money(rental.deposit_amount, rental.currency || "THB")}` : "No deposit"}`} />
+              {/* Once the customer has the vehicle, where and when it was to be handed over is old news. */}
+              {handedOver ? null : <Info className="sm:row-span-2" icon={MapPin} label="Handover" value={delivery.location} />}
+              {handedOver ? null : <Info icon={ReceiptText} label="First payment due" value={paymentDueText(rental, bookingData)} />}
+              {handedOver ? null : <Info icon={Clock} label="Handover time" value={delivery.time} />}
+            </div>
+          </div>
+
+          {included.length ? (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {included.map((item) => (
+                <span className="inline-flex items-center gap-1 rounded-full bg-[var(--primary-light)] px-3 py-1.5 text-xs font-bold text-[var(--primary)]" key={item}>
+                  <ShieldCheck size={14} />
+                  {item}
+                </span>
+              ))}
+            </div>
+          ) : null}
+    </>
+  );
+
   return (
     <main className="min-h-screen bg-[#fbfaf8] px-4 py-5 text-[var(--foreground)]">
       <div className="mx-auto max-w-3xl space-y-5">
@@ -328,36 +363,15 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             </div>
           </div>
 
-          <div className="mt-5 rounded-2xl border border-[var(--border)] bg-[#fbfaf8] p-4">
-            <div className="flex items-start gap-3">
-              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
-                <VehicleKindIcon boxed={false} kind={kindFromCategory(vehicle.vehicle_categories)} size={28} />
-              </span>
-              <div>
-                <h2 className="text-2xl font-semibold">{vehicleTitle(vehicle)}</h2>
-                <p className="mt-1 text-sm font-bold text-[var(--muted)]">{vehicle.registration_number || "Plate pending"} {vehicle.color ? `- ${vehicle.color}` : ""}</p>
-              </div>
-            </div>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <Info icon={CalendarDays} label="Rental period" value={rental.is_indefinite && detail.state !== "completed" ? `Monthly, open-ended from ${formatSummaryDate(rental.start_date)}` : `${formatSummaryDate(rental.start_date)} to ${formatSummaryDate(rental.end_date)}`} />
-              <Info icon={CreditCard} label="Rate and deposit" value={`${rateLabel(rental)}\n${Number(rental.deposit_amount || 0) > 0 ? `Deposit: ${money(rental.deposit_amount, rental.currency || "THB")}` : "No deposit"}`} />
-              {/* Once the customer has the vehicle, where and when it was to be handed over is old news. */}
-              {handedOver ? null : <Info className="sm:row-span-2" icon={MapPin} label="Handover" value={delivery.location} />}
-              {detail.state === "completed" ? null : <Info icon={ReceiptText} label="First payment due" value={paymentDueText(rental, bookingData)} />}
-              {handedOver ? null : <Info icon={Clock} label="Handover time" value={delivery.time} />}
-            </div>
-          </div>
-
-          {included.length ? (
-            <div className="mt-4 flex flex-wrap gap-2">
-              {included.map((item) => (
-                <span className="inline-flex items-center gap-1 rounded-full bg-[var(--primary-light)] px-3 py-1.5 text-xs font-bold text-[var(--primary)]" key={item}>
-                  <ShieldCheck size={14} />
-                  {item}
-                </span>
-              ))}
-            </div>
-          ) : null}
+          {/* On rent, the page leads with the rental itself; what was booked is one tap away. */}
+          {detail.state === "active" ? (
+            <details className="mt-4">
+              <summary className="cursor-pointer text-sm font-semibold text-[var(--primary)]">Your booking details</summary>
+              {bookingSummary}
+            </details>
+          ) : (
+            bookingSummary
+          )}
         </header>
 
         {invites.length > 0 && detail.state !== "completed" ? (

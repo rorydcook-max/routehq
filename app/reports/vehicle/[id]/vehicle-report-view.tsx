@@ -147,7 +147,7 @@ export function VehicleReportView({ data }: { data: VehicleReportData }) {
       <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
         {/* Monthly revenue vs expenses */}
         <div className="content-section">
-          <p className="mb-4 text-sm font-bold text-[var(--foreground)]">Monthly Revenue vs Expenses</p>
+          <p className="mb-4 text-sm font-bold text-[var(--foreground)]">Money in and out, month by month</p>
           {data.monthlyData.length === 0 ? (
             <p className="py-8 text-center text-sm text-[var(--muted)]">No data for this period</p>
           ) : (

@@ -6,7 +6,7 @@ import { CustomerNotesForm } from "@/app/customers/[id]/customer-notes-form";
 import { AppShell } from "@/components/app-shell";
 import { CommunicationPanel } from "@/components/communication-panel";
 import { PendingButton } from "@/components/pending-button";
-import { Badge, Card, ProgressBar, SectionHeader } from "@/components/ui";
+import { Badge, Card, Fold, ProgressBar, SectionHeader } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { flagForNationality } from "@/lib/customer-options";
 import { getCustomerDetail, getCustomerDocumentCompleteness } from "@/lib/customer-detail";
@@ -302,14 +302,33 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
               </div>
             </Card>
 
-            <Card>
-              <SectionHeader eyebrow="Contact channels" title="Messaging and preferred contact" />
-              <ContactChannelsForm customer={customer} organizationId={organization.id} />
-            </Card>
+            {activeRental ? (
+              <Card>
+                <SectionHeader eyebrow="Active rental" title="Currently renting" />
+                <div className="mt-3 rounded-lg border border-[#dbeafe] bg-[#fbfaf8] p-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-semibold text-[var(--foreground)]">
+                        {activeRental.vehicles?.make} {activeRental.vehicles?.model}
+                      </p>
+                      <p className="font-mono-data text-sm text-[var(--muted)]">{activeRental.vehicles?.registration_number}</p>
+                    </div>
+                    <Badge tone={(daysUntil(activeRental.end_date) || 0) < 0 ? "red" : "blue"}>{rentalLabel(activeRental)}</Badge>
+                  </div>
+                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                    <InfoTile label="Rental period" value={`${formatDate(activeRental.start_date)} → ${formatDate(activeRental.end_date)}`} />
+                    <InfoTile label="Due now" value={dueNow > 0 ? money(dueNow) : "Nothing due"} danger={dueNow > 0} />
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                <Link className="primary-action pressable px-3 py-2" href={`/bookings/${activeRental.id}` as Route}>Open booking</Link>
+                    <Link className="secondary-action pressable px-3 py-2" href={`/transactions/new?customerId=${customer.id}` as Route}>Record payment</Link>
+                  </div>
+                </div>
+              </Card>
+            ) : null}
 
-            <Card>
-              <SectionHeader eyebrow="Document status" title="Required identity checks" />
-              <div className="mt-3 space-y-3">
+            <Fold open={completeness.status !== "complete"} summary={completeness.status === "complete" ? "All here" : `${completeness.percentage}% complete. Something is missing`} title="Passport, licence and photo" tone={completeness.status === "complete" ? "green" : "amber"}>
+              <div className="space-y-3">
                 <DocumentCheck
                   detail={
                     <>
@@ -340,49 +359,26 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                   <ProgressBar tone={completeness.status === "complete" ? "green" : completeness.status === "missing" ? "amber" : "red"} value={completeness.percentage} />
                 </div>
               </div>
-            </Card>
+            </Fold>
 
-            {activeRental ? (
-              <Card>
-                <SectionHeader eyebrow="Active rental" title="Currently renting" />
-                <div className="mt-3 rounded-lg border border-[#dbeafe] bg-[#fbfaf8] p-3">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="font-semibold text-[var(--foreground)]">
-                        {activeRental.vehicles?.make} {activeRental.vehicles?.model}
-                      </p>
-                      <p className="font-mono-data text-sm text-[var(--muted)]">{activeRental.vehicles?.registration_number}</p>
-                    </div>
-                    <Badge tone={(daysUntil(activeRental.end_date) || 0) < 0 ? "red" : "blue"}>{rentalLabel(activeRental)}</Badge>
-                  </div>
-                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                    <InfoTile label="Rental period" value={`${formatDate(activeRental.start_date)} → ${formatDate(activeRental.end_date)}`} />
-                    <InfoTile label="Due now" value={dueNow > 0 ? money(dueNow) : "Nothing due"} danger={dueNow > 0} />
-                  </div>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                <Link className="primary-action pressable px-3 py-2" href={`/bookings/${activeRental.id}` as Route}>View Rental</Link>
-                    <Link className="secondary-action pressable px-3 py-2" href={`/transactions/new?customerId=${customer.id}` as Route}>Add Payment</Link>
-                  </div>
-                </div>
-              </Card>
-            ) : null}
+            <Fold summary="WhatsApp, LINE, Messenger, Telegram, Instagram" title="Other ways to reach them">
+              <ContactChannelsForm customer={customer} organizationId={organization.id} />
+            </Fold>
 
-            <Card>
-              <SectionHeader eyebrow="Emergency contact" title="Backup contact" />
-              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <Fold summary={customer.emergency_contact_name || "Not recorded"} title="Emergency contact">
+              <div className="grid gap-3 sm:grid-cols-2">
                 <InfoTile label="Name" value={customer.emergency_contact_name || "Not recorded"} />
                 <InfoTile
                   label="Phone"
                   value={customer.emergency_contact_phone ? <a className="text-[var(--primary)]" href={`tel:${customer.emergency_contact_phone}`}>{customer.emergency_contact_phone}</a> : "Not recorded"}
                 />
               </div>
-            </Card>
+            </Fold>
           </div>
 
           <div className="space-y-3">
-            <Card>
-              <SectionHeader eyebrow="Documents" title="Uploaded files" />
-              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <Fold summary={detail.documentsWithUrls.length === 0 ? "Nothing uploaded yet" : `${detail.documentsWithUrls.length} ${detail.documentsWithUrls.length === 1 ? "file" : "files"}. Tap to see or add`} title="Photos of their documents">
+              <div className="grid gap-3 sm:grid-cols-2">
                 {detail.documentsWithUrls.length === 0 ? (
                   <div className="rounded-lg border border-dashed border-[var(--border)] bg-white/70 p-3 text-sm text-[var(--muted)] sm:col-span-2">
                     No documents uploaded yet.
@@ -409,10 +405,10 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 <UploadDocumentForm category="driver_license" customerId={customer.id} label="licence" organizationId={organization.id} />
                 <UploadDocumentForm category="selfie" customerId={customer.id} label="selfie" organizationId={organization.id} />
               </div>
-            </Card>
+            </Fold>
 
             <Card>
-              <SectionHeader eyebrow="Communication" title="Customer messaging" />
+              <SectionHeader eyebrow="Communication" title="Message them" />
               <div className="mt-3">
                 <CommunicationPanel
                   booking={{
@@ -447,7 +443,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
 
             <Card>
               <SectionHeader eyebrow="Rental history" title="All rentals" />
-              <div className="mt-3 grid gap-3 sm:grid-cols-4">
+              <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
                 <InfoTile label="Total rentals" value={detail.rentals.length} />
                 <InfoTile label="Days rented" value={detail.totalRentalDays} />
                 <InfoTile label="Total spent" value={money(detail.lifetimeRevenue)} />
@@ -476,7 +472,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             </Card>
 
             <Card>
-              <SectionHeader eyebrow="Transactions" title="Customer income" />
+              <SectionHeader eyebrow="Transactions" title="What they have paid" />
               <div className="mt-3">
                 <InfoTile label="Total income from customer" value={money(totalIncome)} />
               </div>

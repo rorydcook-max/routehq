@@ -107,24 +107,22 @@ function KpiCard({ label, value, change, sub, upIsBad = false }: { label: string
 
 function DepositsCard({ data }: { data: ReportsData["depositSummary"] }) {
   const rows = [
-    { label: "Currently held", value: money(data.totalDepositsCurrentlyHeld), valueClass: "text-amber-600" },
-    { label: "Received this period", value: money(data.totalDepositsReceivedInPeriod), valueClass: "text-[var(--foreground)]" },
-    { label: "Returned this period", value: money(data.totalDepositsReturnedInPeriod), valueClass: "text-[var(--foreground)]" },
-    { label: "Converted to revenue", value: money(data.totalDepositsForfeitedInPeriod), valueClass: "text-[var(--primary)]" },
-    { label: "Net liability", value: money(data.netDepositLiability), valueClass: "text-amber-600" }
+    { label: "Holding now", value: money(data.totalDepositsCurrentlyHeld), valueClass: "text-amber-600" },
+    { label: "Taken in", value: money(data.totalDepositsReceivedInPeriod), valueClass: "text-[var(--foreground)]" },
+    { label: "Given back", value: money(data.totalDepositsReturnedInPeriod), valueClass: "text-[var(--foreground)]" },
+    { label: "Kept for damage or unpaid rent", value: money(data.totalDepositsForfeitedInPeriod), valueClass: "text-[var(--primary)]" }
   ];
 
   return (
     <div className="content-section border-amber-200 bg-amber-50/50">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.08em] text-amber-700">Security Deposits</p>
-          <p className="mt-1 text-sm text-[var(--foreground-secondary)]">Deposit liability and movements for this report period.</p>
+          <p className="text-xs font-bold uppercase tracking-[0.08em] text-amber-700">Deposits</p>
+          <p className="mt-1 text-sm text-[var(--foreground-secondary)]">Customers' money you are holding until their rental ends.</p>
         </div>
-        <div className="rounded-full border border-amber-200 bg-white px-3 py-1 text-xs font-bold text-amber-700">Liability</div>
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-5">
+      <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {rows.map((row) => (
           <div key={row.label} className="rounded-xl border border-amber-100 bg-white/80 p-3">
             <p className="text-xs font-semibold text-[var(--muted)]">{row.label}</p>
@@ -134,7 +132,7 @@ function DepositsCard({ data }: { data: ReportsData["depositSummary"] }) {
       </div>
 
       <p className="mt-3 rounded-lg border border-amber-100 bg-white/70 px-3 py-2 text-xs text-[var(--foreground-secondary)]">
-        Deposits held are not included in revenue figures. Only forfeited deposits appear in your profit calculations.
+        Deposits are not counted as income. Only the part you keep is.
       </p>
     </div>
   );
@@ -265,7 +263,7 @@ function VehicleTableRow({
           <td colSpan={isCompareMode ? 10 : 9} className="px-6 py-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[var(--muted)]">Expense Breakdown</p>
+                <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[var(--muted)]">Where the money went</p>
                 {vehicle.expenseBreakdown.length === 0 ? (
                   <p className="text-sm text-[var(--muted)]">No expenses recorded</p>
                 ) : (
@@ -280,14 +278,14 @@ function VehicleTableRow({
                 )}
               </div>
               <div>
-                <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[var(--muted)]">Quick Stats</p>
+                <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[var(--muted)]">At a glance</p>
                 <div className="space-y-1 text-sm">
                   <div className="flex justify-between">
                     <span className="text-[var(--foreground-secondary)]">Rentals in period</span>
                     <span className="font-semibold">{vehicle.rentalCount}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[var(--foreground-secondary)]">Avg daily rate</span>
+                    <span className="text-[var(--foreground-secondary)]">Average price per day</span>
                     <span className="font-semibold">{money(vehicle.avgDailyRate)}</span>
                   </div>
                   <div className="flex justify-between">
@@ -336,7 +334,7 @@ function ComparisonPanel({ vehicles }: { vehicles: VehicleMetrics[] }) {
       <p className="text-sm font-bold text-[var(--foreground)]">Vehicle Comparison — {vehicles.map((v) => v.plate || v.make).join(" vs ")}</p>
       <div className="grid gap-6 lg:grid-cols-2">
         <div>
-          <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[var(--muted)]">Revenue / Expenses / Profit</p>
+          <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[var(--muted)]">Money in, money out, profit</p>
           <div className="overflow-x-auto">
             <div className="min-w-[300px] h-52">
               <ResponsiveContainer width="100%" height="100%">
@@ -355,7 +353,7 @@ function ComparisonPanel({ vehicles }: { vehicles: VehicleMetrics[] }) {
           </div>
         </div>
         <div>
-          <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[var(--muted)]">Performance Radar</p>
+          <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[var(--muted)]">Compared side by side</p>
           <div className="h-52">
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart data={radarData}>
@@ -414,7 +412,7 @@ function AiInsightsPanel({ data }: { data: ReportsData }) {
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <Lightbulb size={18} className="text-amber-500" />
-          <p className="text-sm font-bold text-[var(--foreground)]">AI Insights</p>
+          <p className="text-sm font-bold text-[var(--foreground)]">What stands out</p>
         </div>
         {!fetched ? (
           <button
@@ -648,7 +646,7 @@ export function ReportsView({ data }: { data: ReportsData }) {
         <div className="content-section">
           <div className="mb-3 flex items-center gap-2">
             <TrendingUp size={16} className="text-[var(--primary)]" />
-            <p className="text-sm font-bold text-[var(--foreground)]">Monthly Revenue vs Expenses</p>
+            <p className="text-sm font-bold text-[var(--foreground)]">Money in and out, month by month</p>
           </div>
           <div className="overflow-x-auto">
             <div className="min-w-[480px] h-64">
@@ -672,8 +670,8 @@ export function ReportsView({ data }: { data: ReportsData }) {
       {/* Donut Charts */}
       {(data.revenueByType.length > 0 || data.expensesByType.length > 0) ? (
         <div className="grid gap-4 sm:grid-cols-2">
-          <DonutChart title="Revenue by Type" data={data.revenueByType} />
-          <DonutChart title="Expenses by Type" data={data.expensesByType} />
+          <DonutChart title="Where the money came from" data={data.revenueByType} />
+          <DonutChart title="Where the money went" data={data.expensesByType} />
         </div>
       ) : null}
 
@@ -681,7 +679,7 @@ export function ReportsView({ data }: { data: ReportsData }) {
       {data.vehicleMetrics.length > 0 ? (
         <div className="content-section">
           <div className="mb-3 flex items-center justify-between gap-3">
-            <p className="text-sm font-bold text-[var(--foreground)]">Fleet Performance</p>
+            <p className="text-sm font-bold text-[var(--foreground)]">How each vehicle is doing</p>
             <button
               onClick={() => {
                 setCompareMode((v) => !v);
@@ -711,7 +709,7 @@ export function ReportsView({ data }: { data: ReportsData }) {
                   <SortTh label="Profit" field="profit" />
                   <SortTh label="Rentals" field="rentals" />
                   <SortTh label="Utilization" field="utilization" />
-                  <th className="px-3 py-2 text-right text-xs uppercase text-[var(--muted)]">Avg Rate</th>
+                  <th className="px-3 py-2 text-right text-xs uppercase text-[var(--muted)]">Avg price</th>
                   <SortTh label="ROI" field="roi" />
                   <th className="px-3 py-2 text-right text-xs uppercase text-[var(--muted)]" />
                 </tr>
@@ -739,7 +737,7 @@ export function ReportsView({ data }: { data: ReportsData }) {
       {/* Outstanding Balances */}
       {data.outstandingBalances.length > 0 ? (
         <div className="content-section">
-          <p className="mb-3 text-sm font-bold text-[var(--foreground)]">Outstanding Balances</p>
+          <p className="mb-3 text-sm font-bold text-[var(--foreground)]">Who owes you money</p>
           <div className="space-y-2">
             {data.outstandingBalances.map((bal) => (
               <div
@@ -765,7 +763,7 @@ export function ReportsView({ data }: { data: ReportsData }) {
       {/* Recent Transactions */}
       {data.recentTransactions.length > 0 ? (
         <div className="content-section">
-          <p className="mb-3 text-sm font-bold text-[var(--foreground)]">Recent Transactions</p>
+          <p className="mb-3 text-sm font-bold text-[var(--foreground)]">Latest money in and out</p>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[480px] text-sm">
               <thead>

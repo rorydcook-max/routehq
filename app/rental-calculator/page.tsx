@@ -64,10 +64,10 @@ export default async function RentalCalculatorPage() {
       <div className="mb-5 rounded-3xl border border-[var(--border)] bg-white px-5 py-4 shadow-[0_16px_38px_rgba(15,23,42,0.06)]">
         <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--primary)]">Calculator</p>
         <h1 className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-3xl">
-          Vehicle acquisition calculator
+          Should you buy this vehicle?
         </h1>
         <p className="mt-1 text-sm font-medium text-[var(--muted)]">
-          AI-assisted decision tool. Enter the vehicle and purchase details, then let your fleet data and AI market estimates guide a buy recommendation.
+          Enter the vehicle and what it would cost. RouteHQ uses your own rental history and market prices to estimate whether it would pay for itself.
         </p>
       </div>
 

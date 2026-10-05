@@ -201,7 +201,7 @@ export function CommunicationPanel({
             <StickyNote size={16} />
           </span>
           <input
-            className="min-h-10 flex-1 rounded-lg border border-[var(--border-strong)] bg-white px-3 py-2 text-sm outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
+            className="min-h-10 min-w-0 flex-1 rounded-lg border border-[var(--border-strong)] bg-white px-3 py-2 text-sm outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
             onChange={(event) => setNote(event.target.value)}
             onKeyDown={(event) => {
               if ((event.metaKey || event.ctrlKey) && event.key === "Enter") saveNote();
@@ -209,7 +209,7 @@ export function CommunicationPanel({
             placeholder="Add a note..."
             value={note}
           />
-          <button className="btn-primary min-h-10" disabled={isPending || !note.trim()} onClick={saveNote} type="button">
+          <button className="btn-primary min-h-10 shrink-0" disabled={isPending || !note.trim()} onClick={saveNote} type="button">
             {isPending ? "Saving..." : "Save"}
           </button>
         </label>

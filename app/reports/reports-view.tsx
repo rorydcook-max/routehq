@@ -549,10 +549,10 @@ export function ReportsView({ data }: { data: ReportsData }) {
               key={p.value}
               onClick={() => setPreset(p.value)}
               type="button"
-              className={`rounded-[8px] px-3 py-1.5 text-[13px] font-semibold transition ${
+              className={`pressable min-h-10 rounded-full px-4 font-bold transition ${
                 preset === p.value
-                  ? "bg-[var(--primary-light)] text-[var(--primary)]"
-                  : "text-[var(--muted)] hover:bg-[var(--panel-tertiary)] hover:text-[var(--foreground)]"
+                  ? "bg-[var(--primary)] text-white"
+                  : "bg-[var(--panel-secondary)] text-[var(--foreground)] hover:bg-[var(--panel-tertiary)]"
               }`}
             >
               {p.label}

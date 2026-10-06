@@ -271,11 +271,11 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         <h1 className="page-title">Settings</h1>
       </div>
 
-      <nav aria-label="Settings sections" className="mb-5 grid grid-cols-3 gap-1.5 sm:flex sm:gap-1 sm:border-b sm:border-[var(--border)]">
+      <nav aria-label="Settings sections" className="mb-5 flex flex-wrap gap-2">
         {SETTINGS_TABS.map((entry) => (
           <Link
             aria-current={tab === entry.key ? "page" : undefined}
-            className={`flex min-h-11 items-center justify-center rounded-lg border px-2 py-1.5 text-center text-[13px] font-semibold leading-tight transition sm:-mb-px sm:min-h-0 sm:whitespace-nowrap sm:rounded-none sm:border-0 sm:border-b-2 sm:px-3 sm:py-2.5 sm:text-sm ${tab === entry.key ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)] sm:bg-transparent" : "border-[var(--border)] bg-[var(--panel)] text-[var(--muted)] hover:text-[var(--foreground)] sm:border-transparent sm:bg-transparent"}`}
+            className={`pressable flex min-h-11 items-center justify-center rounded-full px-4 py-2 text-center font-bold leading-tight transition ${tab === entry.key ? "bg-[var(--primary)] text-white" : "bg-white text-[var(--foreground)]"}`}
             href={`/settings?tab=${entry.key}` as Route}
             key={entry.key}
           >

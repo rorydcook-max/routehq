@@ -1183,6 +1183,10 @@ a[class*="rounded-lg"][class*="px-"]:active {
   font-size: 15px;
   font-weight: 500;
 }
+/* A line explaining what the screen is for says nothing the title did not; a line with a figure in it keeps its place. */
+.page-subtitle:not(.page-subtitle-keep) {
+  display: none;
+}
 
 /* Surfaces: plain white on the grey canvas, no border; the canvas does the separating. */
 .card,

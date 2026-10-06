@@ -29,7 +29,7 @@ export default async function VehicleReportPage({
         </Link>
         <p className="page-eyebrow mt-1">Vehicle</p>
         <h1 className="page-title">{data.vehicle.label}</h1>
-        <p className="page-subtitle mt-2">{data.vehicle.plate} &mdash; per-vehicle financial overview</p>
+        <p className="page-subtitle page-subtitle-keep mt-2">{data.vehicle.plate} &mdash; per-vehicle financial overview</p>
       </div>
       <VehicleReportView data={data} />
     </AppShell>

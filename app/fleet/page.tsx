@@ -40,8 +40,8 @@ function ComplianceBadge({ item, attention = 0 }: { item?: { key?: string; label
   return <Badge tone={tone}>{text + more}</Badge>;
 }
 
-const primaryButton = "pressable inline-flex items-center justify-center gap-2 rounded-[9px] bg-[var(--primary)] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[var(--primary-hover)]";
-const secondaryButton = "pressable inline-flex items-center justify-center gap-2 rounded-[9px] border border-[var(--border)] bg-white px-3.5 py-2 text-sm font-semibold text-[var(--foreground-secondary)] hover:border-[var(--primary)] hover:text-[var(--primary)]";
+const primaryButton = "primary-action pressable";
+const secondaryButton = "secondary-action pressable";
 
 export default async function FleetPage({ searchParams }: { searchParams: Promise<{ notice?: string }> }) {
   const { notice } = await searchParams;
@@ -59,7 +59,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="page-title">{t("title")}</h1>
-          <p className="mt-1 text-sm text-[var(--muted)]">
+          <p className="mt-1 font-semibold text-[var(--foreground-secondary)]">
             {t("summary", { count: vehicles.length, out: totalOut, free: totalFree })}
           </p>
         </div>
@@ -100,16 +100,15 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
         <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
           {groups.map((group) => (
             <a
-              className="pressable flex items-center gap-3 rounded-xl border border-[var(--border)] bg-white p-3.5 shadow-[var(--shadow-sm)] transition hover:border-[var(--primary)]"
+              className="card pressable flex items-start gap-3 p-4 transition"
               href={`#${group.kind}`}
               key={group.kind}
             >
               <VehicleKindIcon kind={group.kind} size={20} />
-              <span className="min-w-0">
-                <span className="block text-[15px] font-semibold leading-tight text-[var(--foreground)]">
-                  {group.vehicles.length} <span className="font-normal text-[var(--foreground-secondary)]">{locale === "en" ? kindLabel(group.kind, group.vehicles.length).toLowerCase() : kindName(group)}</span>
-                </span>
-                <span className="mt-0.5 block text-[12px] text-[var(--muted)]">{t("outFree", { out: group.out, free: group.free })}</span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[22px] font-bold leading-none text-[var(--foreground)]">{group.vehicles.length}</span>
+                <span className="mt-1 block truncate font-semibold text-[var(--foreground)]">{locale === "en" ? kindLabel(group.kind, group.vehicles.length).toLowerCase() : kindName(group)}</span>
+                <span className="block font-medium text-[var(--foreground-secondary)]">{t("outFree", { out: group.out, free: group.free })}</span>
               </span>
             </a>
           ))}
@@ -120,12 +119,12 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
 
       <div className="space-y-5">
         {groups.map((group) => (
-          <section className="scroll-mt-4 overflow-hidden rounded-xl border border-[var(--border)] bg-white shadow-[var(--shadow-sm)]" id={group.kind} key={group.kind}>
-            <header className="flex flex-wrap items-center gap-3 border-b border-[var(--border)] bg-[var(--panel-secondary)] px-4 py-3">
+          <section className="card scroll-mt-4 overflow-hidden" id={group.kind} key={group.kind}>
+            <header className="flex items-center gap-3 border-b border-[var(--border)] px-4 py-3.5">
               <VehicleKindIcon kind={group.kind} />
-              <div className="min-w-0">
-                <h2 className="text-[16px] font-semibold tracking-[-0.01em] text-[var(--foreground)]">
-                  {kindName(group)} <span className="font-normal text-[var(--muted)]">· {group.vehicles.length}</span>
+              <div className="min-w-0 flex-1">
+                <h2 className="text-[18px] font-bold tracking-[-0.01em] text-[var(--foreground)]">
+                  {kindName(group)} <span className="font-semibold text-[var(--muted)]">· {group.vehicles.length}</span>
                 </h2>
                 <OutFreeSummary free={group.free} other={group.other} out={group.out} />
               </div>
@@ -191,12 +190,12 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
             <ul className="divide-y divide-[var(--border)] lg:hidden">
               {group.vehicles.map((vehicle) => (
                 <li key={vehicle.id}>
-                  <Link className="flex items-center gap-3 px-4 py-3 active:bg-[var(--panel-secondary)]" href={`/fleet/${vehicle.id}`}>
+                  <Link className="flex items-center gap-3 px-4 py-3.5 active:bg-[var(--panel-secondary)]" href={`/fleet/${vehicle.id}`}>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-[15px] font-semibold text-[var(--foreground)]">
+                      <p className="truncate text-[17px] font-bold text-[var(--foreground)]">
                         {vehicle.make} {vehicle.model}
                       </p>
-                      <p className="mt-0.5 truncate text-[13px] text-[var(--muted)]">
+                      <p className="mt-0.5 truncate font-medium text-[var(--foreground-secondary)]">
                         <span className="font-mono-data">{vehicle.plate}</span>
                         {vehicle.monthlyRate > 0 ? <> · {t("perMo", { amount: money(vehicle.monthlyRate) })}</> : null}
                       </p>

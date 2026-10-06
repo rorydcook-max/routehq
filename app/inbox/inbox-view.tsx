@@ -22,7 +22,7 @@ const PROVIDER: Record<string, { label: string; className: string }> = {
 
 function ProviderTag({ provider }: { provider: string }) {
   const tag = PROVIDER[provider] || { label: provider, className: "bg-[var(--panel-tertiary)] text-[var(--muted)]" };
-  return <span className={`inline-flex flex-shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold ${tag.className}`}>{tag.label}</span>;
+  return <span className={`badge inline-flex flex-shrink-0 ${tag.className}`}>{tag.label}</span>;
 }
 
 /** Why a message did not go, in words that say what to do about it. */
@@ -146,13 +146,13 @@ export function InboxView({
   let previousDay = "";
 
   return (
-    <div className="grid overflow-hidden rounded-xl border border-[var(--border)] bg-white shadow-[var(--shadow-sm)] lg:h-[calc(100vh-150px)] lg:min-h-[480px] lg:grid-cols-[320px_minmax(0,1fr)]">
+    <div className="grid overflow-hidden rounded-[var(--radius)] bg-white lg:h-[calc(100vh-150px)] lg:min-h-[480px] lg:grid-cols-[320px_minmax(0,1fr)]">
       {/* Conversation list */}
       <aside className={`min-h-0 flex-col border-[var(--border)] lg:flex lg:border-r ${selected ? "hidden" : "flex"}`}>
-        <div className="flex gap-0.5 border-b border-[var(--border)] p-2">
+        <div className="flex gap-2 border-b border-[var(--border)] p-3">
           {(["open", "closed"] as const).map((entry) => (
             <Link
-              className={`flex-1 rounded-[8px] px-3 py-1.5 text-center text-[13px] font-semibold ${filter === entry ? "bg-[var(--primary-light)] text-[var(--primary)]" : "text-[var(--muted)] hover:text-[var(--foreground)]"}`}
+              className={`pressable min-h-10 flex-1 rounded-full px-4 py-2 text-center font-bold ${filter === entry ? "bg-[var(--primary)] text-white" : "bg-[var(--panel-secondary)] text-[var(--foreground)]"}`}
               href={href(null, entry)}
               key={entry}
             >
@@ -170,22 +170,22 @@ export function InboxView({
               return (
                 <li key={conversation.id}>
                   <Link className={`flex items-center gap-3 px-3 py-3 ${active ? "bg-[var(--primary-light)]" : "hover:bg-[var(--panel-secondary)]"}`} href={href(conversation.id)}>
-                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--panel-secondary)] text-[13px] font-semibold text-[var(--foreground-secondary)]">
+                    <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--kind-message-bg)] font-bold text-[var(--kind-message)]">
                       {conversation.avatar_url ? <img alt="" className="h-full w-full object-cover" src={conversation.avatar_url} /> : initials(nameOf(conversation))}
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="flex items-center gap-2">
-                        <span className={`truncate text-[14px] ${unread ? "font-semibold text-[var(--foreground)]" : "font-medium text-[var(--foreground)]"}`}>{nameOf(conversation)}</span>
+                        <span className={`truncate text-[16px] ${unread ? "font-bold text-[var(--foreground)]" : "font-semibold text-[var(--foreground)]"}`}>{nameOf(conversation)}</span>
                         <ProviderTag provider={conversation.provider} />
                       </span>
-                      <span className={`block truncate text-[13px] ${unread ? "font-medium text-[var(--foreground)]" : "text-[var(--muted)]"}`}>
+                      <span className={`block truncate ${unread ? "font-semibold text-[var(--foreground)]" : "font-medium text-[var(--foreground-secondary)]"}`}>
                         {conversation.last_message_direction === "out" ? `${say("you")} ` : ""}
                         {conversation.last_message_preview || ""}
                       </span>
                     </span>
                     <span className="flex flex-shrink-0 flex-col items-end gap-1">
-                      <span className="text-[11px] text-[var(--muted)]">{when(conversation.last_message_at, say, locale)}</span>
-                      {unread ? <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--primary)] px-1.5 text-[11px] font-semibold text-white">{conversation.unread_count}</span> : null}
+                      <span className="font-medium text-[var(--muted)]">{when(conversation.last_message_at, say, locale)}</span>
+                      {unread ? <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-[var(--danger)] px-2 font-bold text-white">{conversation.unread_count}</span> : null}
                     </span>
                   </Link>
                 </li>

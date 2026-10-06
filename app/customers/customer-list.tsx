@@ -77,20 +77,19 @@ export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
         </Link>
       </div>
 
-      <Card>
-        <SectionHeader eyebrow={say("directory")} title={say("count", { count: filteredCustomers.length })} />
-        <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-[1fr_auto_auto]">
+      <div>
+        <div className="grid grid-cols-2 gap-2 lg:grid-cols-[1fr_auto_auto]">
           <label className="relative col-span-2 block lg:col-span-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" size={16} />
+            <Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted)]" size={18} />
             <input
-              className="input-with-leading-icon w-full rounded-xl border border-[var(--border)] bg-white pr-3 text-sm text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]"
+              className="input-with-leading-icon w-full rounded-full border-0 bg-white pr-4 font-medium text-[var(--foreground)] outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
               onChange={(event) => setSearch(event.target.value)}
               placeholder={say("search")}
               value={search}
             />
           </label>
           <select
-            className="min-w-0 rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-sm font-semibold text-[var(--foreground-secondary)]"
+            className="min-w-0 rounded-full border-0 bg-white px-4 font-bold text-[var(--foreground)]"
             onChange={(event) => setDocumentFilter(event.target.value)}
             value={documentFilter}
           >
@@ -99,7 +98,7 @@ export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
             <option value="incomplete">{say("incomplete")}</option>
           </select>
           <select
-            className="min-w-0 rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-sm font-semibold text-[var(--foreground-secondary)]"
+            className="min-w-0 rounded-full border-0 bg-white px-4 font-bold text-[var(--foreground)]"
             onChange={(event) => setRentalFilter(event.target.value)}
             value={rentalFilter}
           >
@@ -108,7 +107,8 @@ export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
             <option value="not_renting">{say("notRenting")}</option>
           </select>
         </div>
-      </Card>
+        <p className="mt-3 px-1 text-[18px] font-bold text-[var(--foreground)]">{say("count", { count: filteredCustomers.length })}</p>
+      </div>
 
       {filteredCustomers.length === 0 ? (
         <EmptyState
@@ -122,7 +122,7 @@ export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
         />
       ) : (
         // One line per person: who they are, what they have now, what they're worth. Everything else is on their page.
-        <div className="divide-y divide-[var(--border)] overflow-hidden rounded-[10px] border-[0.5px] border-[var(--border)] bg-[var(--panel)]">
+        <div className="card divide-y divide-[var(--border)] overflow-hidden">
           {filteredCustomers.map((item) => {
             const activeRental = item.activeRental;
             const vehicle = activeRental ? `${activeRental.vehicles?.make || ""} ${activeRental.vehicles?.model || ""}`.trim() : "";
@@ -134,21 +134,21 @@ export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
                 ? say("lastRental", { date: formatDate(item.lastRentalDate, say, locale) })
                 : say("noRentals");
             return (
-              <Link className="flex items-center gap-3 px-3.5 py-3 transition hover:bg-[var(--panel-secondary)]" href={`/customers/${item.customer.id}`} key={item.customer.id}>
+              <Link className="flex items-center gap-3 px-4 py-3.5 transition hover:bg-[var(--panel-secondary)]" href={`/customers/${item.customer.id}`} key={item.customer.id}>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                    <p className="truncate text-[15px] font-semibold text-[var(--foreground)]">
+                    <p className="truncate text-[17px] font-bold text-[var(--foreground)]">
                       {flagForNationality(item.customer.nationality)} {item.customer.full_name}
                     </p>
                     {item.documentStatus === "complete" ? null : documentBadge(item.documentStatus, say)}
                   </div>
-                  <p className={`mt-0.5 truncate text-sm ${activeRental ? "font-semibold text-[var(--primary)]" : "text-[var(--muted)]"}`}>{line}</p>
+                  <p className={`mt-0.5 truncate font-medium ${activeRental ? "font-bold text-[var(--foreground)]" : "text-[var(--foreground-secondary)]"}`}>{line}</p>
                 </div>
-                <div className="shrink-0 text-right">
-                  <p className="font-mono-data text-sm font-semibold text-[var(--foreground)]">{money(item.lifetimeRevenue)}</p>
-                  <p className="text-xs text-[var(--muted)]">{say("rentals", { count: item.totalRentals })}</p>
-                </div>
-                <ChevronRight className="shrink-0 text-[var(--muted)]" size={16} />
+                {/* Money only when there is some; "฿0 · 1 rental" said nothing. */}
+                {item.lifetimeRevenue > 0 ? (
+                  <p className="shrink-0 text-right font-bold tabular-nums text-[var(--foreground)]">{money(item.lifetimeRevenue)}</p>
+                ) : null}
+                <ChevronRight className="shrink-0 text-[var(--foreground-secondary)]" size={20} strokeWidth={2.2} />
               </Link>
             );
           })}

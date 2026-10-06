@@ -520,12 +520,12 @@ async function Info({ className = "", icon: Icon, label, value }: { className?: 
   const t = await getTranslations("customer");
   const lines = value.split("\n");
   return (
-    <div className={`rounded-xl border border-[var(--border)] bg-white p-3 ${className}`}>
-      <div className="flex items-center gap-2 text-xs font-semibold uppercase text-[var(--muted)]">
-        <Icon className="text-[var(--primary)]" size={15} />
+    <div className={`rounded-xl bg-[var(--background)] p-3.5 ${className}`}>
+      <div className="flex items-center gap-2 font-semibold text-[var(--muted)]">
+        <Icon className="text-[var(--primary)]" size={16} />
         {label}
       </div>
-      <p className="mt-1 whitespace-pre-line text-sm font-bold text-[var(--foreground)]">
+      <p className="mt-1 whitespace-pre-line text-[16px] font-bold leading-snug text-[var(--foreground)]">
         {lines.map((line, index) => (
           line.startsWith("https://www.google.com/maps") ? (
             <a className="text-[var(--primary)] underline underline-offset-2" href={line} key={`${line}-${index}`} rel="noreferrer" target="_blank">

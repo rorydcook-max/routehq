@@ -155,7 +155,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
           <div className="mt-3 rounded-xl border border-[var(--sidebar-border)] bg-white p-3">
             {hasSeveralBusinesses ? (
               <form action={switchActiveOrganization} className="mb-3">
-                <label className="block text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]" htmlFor="business-switcher">
+                <label className="block font-semibold text-[var(--sidebar-text-muted)]" htmlFor="business-switcher">
                   {t("business")}
                 </label>
                 <select

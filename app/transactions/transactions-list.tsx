@@ -369,9 +369,13 @@ export function TransactionsList({
     const amount = amountPresentation(transaction);
     const deleting = deletingIds.has(transaction.id);
     const selected = selectedIds.has(transaction.id);
-    const who = [transaction.vehicleLabel, transaction.customerName, transaction.supplier].filter(Boolean).join(" · ");
+    // One line under the title. Money in: who and which vehicle. Money out: the vehicle and what it was for; the plate stays on the vehicle page.
+    const vehicleName = transaction.vehicleLabel.replace(/^\S*\d\S*\s+/, "");
+    const who = kind === "expense"
+      ? [vehicleName, transaction.notes || transaction.supplier].filter(Boolean).join(" · ")
+      : [transaction.customerName || transaction.supplier, vehicleName].filter(Boolean).join(" · ");
     return (
-      <li className={`group px-4 py-2.5 transition ${deleting ? "opacity-40" : ""} ${selected ? "bg-[var(--primary-light)]" : "hover:bg-[var(--panel-secondary)]"}`} key={transaction.id}>
+      <li className={`group px-4 py-3.5 transition ${deleting ? "opacity-40" : ""} ${selected ? "bg-[var(--primary-light)]" : "hover:bg-[var(--panel-secondary)]"}`} key={transaction.id}>
         <div className="flex items-center gap-3">
           {selecting ? (
             <input
@@ -383,14 +387,13 @@ export function TransactionsList({
             />
           ) : null}
           <div className="min-w-0 flex-1">
-            <p className="truncate text-[14px] font-semibold text-[var(--foreground)]">
+            <p className="truncate text-[16px] font-bold text-[var(--foreground)]">
               {tx.typeName(transaction.type, transaction.typeLabel)}
-              {kind.startsWith("deposit") ? <span className="ml-2 text-[12px] font-normal text-[var(--muted)]">{kind === "deposit_refunded" ? tx.say("returned") : tx.say("held")}</span> : null}
+              {kind.startsWith("deposit") ? <span className="ml-2 font-medium text-[var(--muted)]">{kind === "deposit_refunded" ? tx.say("returned") : tx.say("held")}</span> : null}
             </p>
-            {who ? <p className="truncate text-[13px] text-[var(--muted)]">{who}</p> : null}
-            {transaction.notes ? <p className="truncate text-[12px] text-[var(--muted)]">{transaction.notes}</p> : null}
+            {who ? <p className="truncate font-medium text-[var(--foreground-secondary)]">{who}</p> : null}
           </div>
-          <p className={`flex-shrink-0 text-[15px] font-semibold tabular-nums ${amount.className}`}>
+          <p className={`flex-shrink-0 text-[17px] font-bold tabular-nums ${amount.className}`}>
             {amount.prefix}
             {money(transaction.amount, transaction.currency)}
           </p>

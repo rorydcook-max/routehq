@@ -78,6 +78,7 @@
     "depositRefund": "押金退還",
     "overrideRefund": "如有需要，覆蓋退款金額",
     "changeRefund": "Take something off, or give back a different amount",
+    "startsLaterNote": "This rental is not due to start until {date}. Carry on only if the customer is taking the vehicle now.",
     "photosVideo": "照片 / 視頻",
     "depositAlreadyReturned": "押金已退還 — 無需對賬",
     "depositDeductions": "押金扣除",

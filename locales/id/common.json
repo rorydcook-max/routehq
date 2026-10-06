@@ -78,6 +78,7 @@
     "depositRefund": "Pengembalian uang jaminan",
     "overrideRefund": "Ganti jumlah pengembalian jika diperlukan",
     "changeRefund": "Take something off, or give back a different amount",
+    "startsLaterNote": "This rental is not due to start until {date}. Carry on only if the customer is taking the vehicle now.",
     "photosVideo": "Foto / video",
     "depositAlreadyReturned": "Uang jaminan sudah dikembalikan — tidak perlu rekonsiliasi",
     "depositDeductions": "Potongan uang jaminan",

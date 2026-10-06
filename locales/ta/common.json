@@ -78,6 +78,7 @@
     "depositRefund": "முன்பணம் திருப்பி வழங்கல்",
     "overrideRefund": "தேவையானால் திருப்பி வழங்கும் தொகையை மீறவும்",
     "changeRefund": "Take something off, or give back a different amount",
+    "startsLaterNote": "This rental is not due to start until {date}. Carry on only if the customer is taking the vehicle now.",
     "photosVideo": "புகைப்படங்கள் / வீடியோ",
     "depositAlreadyReturned": "முன்பணம் ஏற்கனவே திருப்பி வழங்கப்பட்டது — சமரசம் தேவையில்லை",
     "depositDeductions": "முன்பணம் கழிப்புகள்",

@@ -101,6 +101,7 @@
     "depositRefund": "Give back to the customer",
     "overrideRefund": "Give back a different amount",
     "changeRefund": "Take something off, or give back a different amount",
+    "startsLaterNote": "This rental is not due to start until {date}. Carry on only if the customer is taking the vehicle now.",
     "photosVideo": "Photos / video",
     "depositAlreadyReturned": "Deposit already returned — no reconciliation needed",
     "depositDeductions": "Deposit deductions",

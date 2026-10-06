@@ -78,6 +78,7 @@
     "depositRefund": "ຄືນເງິນມັດຈໍາ",
     "overrideRefund": "ປ່ຽນແປງຈໍານວນເງິນຄືນຖ້າຈໍາເປັນ",
     "changeRefund": "Take something off, or give back a different amount",
+    "startsLaterNote": "This rental is not due to start until {date}. Carry on only if the customer is taking the vehicle now.",
     "photosVideo": "ຮູບພາບ / ວິດີໂອ",
     "depositAlreadyReturned": "ເງິນມັດຈໍາຄືນແລ້ວ — ບໍ່ຈໍາເປັນຕ້ອງປະນີປະນອມ",
     "depositDeductions": "ການຫັກເງິນມັດຈໍາ",

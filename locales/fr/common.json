@@ -69,6 +69,7 @@
     "depositRefund": "Remboursement de la caution",
     "overrideRefund": "Modifier le montant du remboursement si nécessaire",
     "changeRefund": "Take something off, or give back a different amount",
+    "startsLaterNote": "This rental is not due to start until {date}. Carry on only if the customer is taking the vehicle now.",
     "photosVideo": "Photos / vidéo",
     "depositAlreadyReturned": "Caution déjà retournée — aucune réconciliation nécessaire",
     "depositDeductions": "Déductions sur la caution",

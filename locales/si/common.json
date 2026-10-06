@@ -78,6 +78,7 @@
     "depositRefund": "මුදල් ආපසු ගෙවීම",
     "overrideRefund": "අවශ්‍ය නම් ආපසු ගෙවීමේ මුදල වෙනස් කරන්න",
     "changeRefund": "Take something off, or give back a different amount",
+    "startsLaterNote": "This rental is not due to start until {date}. Carry on only if the customer is taking the vehicle now.",
     "photosVideo": "ඡායාරූප / වීඩියෝ",
     "depositAlreadyReturned": "මුදල් දැනටමත් ආපසු ගෙවා ඇත — සමාවෙන්නට අවශ්‍ය නැත",
     "depositDeductions": "මුදල් අඩු කිරීම්",

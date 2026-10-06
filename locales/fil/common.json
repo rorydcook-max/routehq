@@ -78,6 +78,7 @@
     "depositRefund": "Pag-refund ng deposito",
     "overrideRefund": "Palitan ang halaga ng refund kung kinakailangan",
     "changeRefund": "Take something off, or give back a different amount",
+    "startsLaterNote": "This rental is not due to start until {date}. Carry on only if the customer is taking the vehicle now.",
     "photosVideo": "Mga litrato / video",
     "depositAlreadyReturned": "Naibalik na ang deposito — walang kinakailangang pagkakasundo",
     "depositDeductions": "Mga bawas sa deposito",

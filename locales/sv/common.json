@@ -78,6 +78,7 @@
     "depositRefund": "Återbetalning av deposition",
     "overrideRefund": "Åsidosätt återbetalningsbelopp vid behov",
     "changeRefund": "Take something off, or give back a different amount",
+    "startsLaterNote": "This rental is not due to start until {date}. Carry on only if the customer is taking the vehicle now.",
     "photosVideo": "Foton / video",
     "depositAlreadyReturned": "Deposition redan återlämnad — ingen avstämning behövs",
     "depositDeductions": "Deposition avdrag",

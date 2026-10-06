@@ -243,7 +243,7 @@ function FuelGauge({
   );
 }
 
-function VehicleDiagram({ onSelect }: { onSelect: (location: string) => void }) {
+function VehicleDiagram({ onSelect, selected, marked }: { onSelect: (location: string) => void; /** The area being described now. */ selected?: string; /** Areas that already have damage logged. */ marked?: string[] }) {
   const t = useTranslations("inspection");
   const areas = [
     { key: "front", label: t("areaFront"), className: "left-[34%] top-[4%] w-[32%] h-[18%]" },
@@ -272,7 +272,7 @@ function VehicleDiagram({ onSelect }: { onSelect: (location: string) => void }) 
       {areas.map((area) => (
         <button
           aria-label={t("logDamageAt", { area: area.label })}
-          className={`absolute flex items-center justify-center rounded-lg border border-[var(--primary)]/25 bg-[var(--primary)]/5 px-1 text-center text-[11px] font-semibold leading-tight text-[var(--primary)] ${area.className}`}
+          className={`absolute flex items-center justify-center rounded-lg border px-1 text-center text-[11px] font-semibold leading-tight ${selected === area.key ? "border-[var(--primary)] bg-[var(--primary)] text-white" : marked?.includes(area.key) ? "border-[#be123c] bg-[#fff1f2] text-[#be123c]" : "border-[var(--primary)]/25 bg-[var(--primary)]/5 text-[var(--primary)]"} ${area.className}`}
           key={area.key}
           onClick={() => onSelect(area.key)}
           type="button"
@@ -747,6 +747,9 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                   {mode !== "return" && context.customer?.full_name ? `${context.customer.full_name} · ` : ""}
                   {mode === "return" ? null : context.rental?.start_date ? t("rentalStarts", { date: formatDate(context.rental.start_date) }) : t("standaloneReport")}
                 </p>
+                {mode === "delivery" && context.rental?.start_date && String(context.rental.start_date).slice(0, 10) > new Date(Date.now() + 86_400_000).toISOString().slice(0, 10) ? (
+                  <p className="mt-2 rounded-lg bg-[#fef3c7] px-3 py-2 text-sm font-semibold text-[#92400e]">{t("startsLaterNote", { date: formatDate(context.rental.start_date) })}</p>
+                ) : null}
                 {mode === "return" ? (
                   <p className="mt-2 rounded-lg bg-[#fef3c7] px-3 py-2 text-sm font-bold text-[#92400e]">
                     <span className="font-mono-data">
@@ -875,7 +878,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
           </label>
           {noDamage && damageItems.length === 0 ? null : (
             <>
-            <VehicleDiagram onSelect={setSelectedLocation} />
+            <VehicleDiagram marked={damageItems.map((item) => item.location)} onSelect={setSelectedLocation} selected={selectedLocation} />
             <div className="mt-4 rounded-lg border border-[var(--border)] bg-white p-4">
               <p className="font-semibold text-[var(--foreground)]">{selectedLocation ? t("damageAt", { area: areaName(selectedLocation) }) : t("tapArea")}</p>
               <div className="mt-3 grid gap-3 sm:grid-cols-2">

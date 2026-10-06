@@ -78,6 +78,7 @@
     "depositRefund": "החזר פיקדון",
     "overrideRefund": "עקוף סכום החזר אם נדרש",
     "changeRefund": "Take something off, or give back a different amount",
+    "startsLaterNote": "This rental is not due to start until {date}. Carry on only if the customer is taking the vehicle now.",
     "photosVideo": "תמונות / וידאו",
     "depositAlreadyReturned": "פיקדון כבר הוחזר — אין צורך בהתאמה",
     "depositDeductions": "ניכויי פיקדון",

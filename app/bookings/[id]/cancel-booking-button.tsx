@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { AlertTriangle, XCircle } from "lucide-react";
 import { cancelBookingWithDisposition } from "@/app/actions/bookings";
 
@@ -37,32 +38,13 @@ type Props = {
   label?: string;
 };
 
-const REASONS: { value: CancelReason; label: string; detail: string }[] = [
-  {
-    value: "customer_cancelled_before_delivery",
-    label: "Customer cancelled before delivery",
-    detail: "Car never collected or delivered — rental did not start."
-  },
-  {
-    value: "customer_cancelled_early",
-    label: "Customer ended rental early",
-    detail: "Car was returned before the agreed end date."
-  },
-  {
-    value: "vehicle_breakdown",
-    label: "Vehicle breakdown or mechanical issue",
-    detail: "Rental cut short due to vehicle fault — not the customer's fault."
-  },
-  {
-    value: "operator_cancelled",
-    label: "Operator cancelled",
-    detail: "Cancelled at the operator's discretion."
-  },
-  {
-    value: "other",
-    label: "Other reason",
-    detail: "Specify in the notes field below."
-  }
+// The words for each reason are in the language files (cn_r_<value> and cn_r_<value>_d).
+const REASONS: { value: CancelReason }[] = [
+  { value: "customer_cancelled_before_delivery" },
+  { value: "customer_cancelled_early" },
+  { value: "vehicle_breakdown" },
+  { value: "operator_cancelled" },
+  { value: "other" }
 ];
 
 function money(amount: number, currency = "THB") {
@@ -84,9 +66,10 @@ export function CancelBookingButton({
   rentalStatus,
   customerName,
   compact = false,
-  label = "Cancel booking"
+  label
 }: Props) {
   const router = useRouter();
+  const say = useTranslations("booking") as unknown as (key: string, values?: Record<string, string | number>) => string;
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<"reason" | "disposition" | "vehicle" | "confirm">("reason");
   const [reasons, setReasons] = useState<CancelReason[]>([]);
@@ -124,7 +107,7 @@ export function CancelBookingButton({
   }
 
   function handleReasonNext() {
-    if (reasons.length === 0) { setError("Please select at least one reason."); return; }
+    if (reasons.length === 0) { setError(say("cn_pickReason")); return; }
     setError("");
     if (needsFullFlow) {
       setStep("disposition");
@@ -134,9 +117,9 @@ export function CancelBookingButton({
   }
 
   function handleDispositionNext() {
-    if (!refundOption) { setError("Please select a refund option."); return; }
+    if (!refundOption) { setError(say("cn_pickRefund")); return; }
     if (refundOption.startsWith("partial_refund") && !partialRefundAmount) {
-      setError("Please enter the refund amount."); return;
+      setError(say("cn_enterRefund")); return;
     }
     setError("");
     setStep("vehicle");
@@ -164,7 +147,7 @@ export function CancelBookingButton({
         reset();
         router.refresh();
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Cancellation failed.");
+        setError(err instanceof Error ? err.message : say("cn_failed"));
       }
     });
   }
@@ -185,15 +168,15 @@ export function CancelBookingButton({
           : depositHeld)
       : 0;
 
-    if (giveBackRental > 0) lines.push(`Refund ${money(giveBackRental, currency)} to customer`);
-    if (giveBackDeposit > 0) lines.push(`Return deposit ${money(giveBackDeposit, currency)}`);
-    if (giveBackDeposit === 0 && hasDeposit) lines.push(`Retain deposit ${money(depositHeld, currency)}`);
-    if (giveBackRental === 0 && hasPayment) lines.push(`No rental refund — ${money(totalPaid, currency)} retained`);
+    if (giveBackRental > 0) lines.push(say("cn_s_refund", { amount: money(giveBackRental, currency) }));
+    if (giveBackDeposit > 0) lines.push(say("cn_s_returnDeposit", { amount: money(giveBackDeposit, currency) }));
+    if (giveBackDeposit === 0 && hasDeposit) lines.push(say("cn_s_keepDeposit", { amount: money(depositHeld, currency) }));
+    if (giveBackRental === 0 && hasPayment) lines.push(say("cn_s_noRefund", { amount: money(totalPaid, currency) }));
     }
-    lines.push("Mark all unpaid scheduled payments as cancelled");
-    if (vehicleDisposition === "available") lines.push("Release vehicle back to available");
-    else if (vehicleDisposition === "repair") lines.push(`Send vehicle to repair${repairNotes ? `: ${repairNotes}` : ""}`);
-    else lines.push("Vehicle status unchanged - update manually");
+    lines.push(say("cn_s_cancelPayments"));
+    if (vehicleDisposition === "available") lines.push(say("cn_s_release"));
+    else if (vehicleDisposition === "repair") lines.push(`${say("cn_s_repair")}${repairNotes ? `: ${repairNotes}` : ""}`);
+    else lines.push(say("cn_s_unchanged"));
 
     return lines;
   }
@@ -203,44 +186,44 @@ export function CancelBookingButton({
   const REFUND_OPTIONS = ([
     {
       value: "full_refund_deposit_returned",
-      label: "Full refund + deposit returned",
-      detail: `Customer receives ${money(totalPaid, currency)} refund and ${money(depositHeld, currency)} deposit back.`,
+      label: say("cn_o1"),
+      detail: say("cn_o1_d", { paid: money(totalPaid, currency), deposit: money(depositHeld, currency) }),
       show: hasPayment || hasDeposit
     },
     {
       value: "full_refund_deposit_retained",
-      label: "Full refund, retain deposit",
-      detail: `Customer receives ${money(totalPaid, currency)} refund. Deposit ${money(depositHeld, currency)} kept by operator.`,
+      label: say("cn_o2"),
+      detail: say("cn_o2_d", { paid: money(totalPaid, currency), deposit: money(depositHeld, currency) }),
       show: hasPayment && hasDeposit
     },
     {
       value: "partial_refund_deposit_returned",
-      label: "Partial refund + deposit returned",
-      detail: "Operator retains part of the rental payment. Deposit returned in full.",
+      label: say("cn_o3"),
+      detail: say("cn_o3_d"),
       show: hasPayment || hasDeposit
     },
     {
       value: "partial_refund_deposit_retained",
-      label: "Partial refund, partial/no deposit return",
-      detail: "Operator retains part of rental and part or all of deposit.",
+      label: say("cn_o4"),
+      detail: say("cn_o4_d"),
       show: hasPayment && hasDeposit
     },
     {
       value: "no_refund_deposit_returned",
-      label: "No refund, deposit returned",
-      detail: `No rental refund. Deposit ${money(depositHeld, currency)} returned to customer.`,
+      label: say("cn_o5"),
+      detail: say("cn_o5_d", { deposit: money(depositHeld, currency) }),
       show: hasDeposit
     },
     {
       value: "no_refund_deposit_retained",
-      label: "No refund, deposit retained",
-      detail: `Customer receives nothing back. All funds retained by operator.`,
+      label: say("cn_o6"),
+      detail: say("cn_o6_d"),
       show: hasPayment || hasDeposit
     },
     {
       value: "no_refund_deposit_returned",
-      label: "No payment to refund — just cancel",
-      detail: "No financial transactions to process. Cancel booking and release vehicle.",
+      label: say("cn_o7"),
+      detail: say("cn_o7_d"),
       show: !hasPayment && !hasDeposit
     },
   ] as { value: RefundOption; label: string; detail: string; show: boolean }[]).filter((o, i, arr) => o.show && arr.findIndex(x => x.value === o.value && x.label === o.label) === i);
@@ -257,7 +240,7 @@ export function CancelBookingButton({
         type="button"
       >
         <XCircle size={compact ? 14 : 16} />
-        {label}
+        {label || say("cn_label")}
       </button>
 
       {open ? (
@@ -269,14 +252,14 @@ export function CancelBookingButton({
                 <AlertTriangle size={18} />
               </div>
               <div className="flex-1">
-                <p className="text-xs font-semibold uppercase text-[#be123c]">Cancel booking</p>
+                <p className="text-xs font-semibold uppercase text-[#be123c]">{say("cn_label")}</p>
                 <h3 className="text-lg font-semibold text-[var(--foreground)]">
-                  {customerName ? `Booking for ${customerName}` : "Booking with no customer yet"}
+                  {customerName ? say("cn_for", { name: customerName }) : say("cn_noCustomer")}
                 </h3>
                 <div className="mt-1 flex gap-3 text-xs text-[var(--muted)]">
-                  {hasPayment && <span>Paid: {money(totalPaid, currency)}</span>}
-                  {hasDeposit && <span>Deposit held: {money(depositHeld, currency)}</span>}
-                  {!hasPayment && !hasDeposit && <span>No payment recorded</span>}
+                  {hasPayment && <span>{say("cn_paid", { amount: money(totalPaid, currency) })}</span>}
+                  {hasDeposit && <span>{say("cn_depositHeld", { amount: money(depositHeld, currency) })}</span>}
+                  {!hasPayment && !hasDeposit && <span>{say("cn_noPayment")}</span>}
                 </div>
               </div>
               <button
@@ -293,8 +276,8 @@ export function CancelBookingButton({
               {step === "reason" && (
                 <>
                   <div>
-                    <p className="text-sm font-semibold text-[var(--foreground)] mb-1">Why is this booking being cancelled?</p>
-                    <p className="text-xs text-[var(--muted)] mb-3">Select all that apply.</p>
+                    <p className="text-sm font-semibold text-[var(--foreground)] mb-1">{say("cn_why")}</p>
+                    <p className="text-xs text-[var(--muted)] mb-3">{say("cn_selectAll")}</p>
                     <div className="space-y-2">
                       {REASONS.map(r => (
                         <button
@@ -315,27 +298,27 @@ export function CancelBookingButton({
                           }}
                           type="button"
                         >
-                          <span className="block text-sm font-bold text-[var(--foreground)]">{r.label}</span>
-                          <span className="mt-0.5 block text-xs leading-5 text-[var(--muted)]">{r.detail}</span>
+                          <span className="block text-sm font-bold text-[var(--foreground)]">{say(`cn_r_${r.value}`)}</span>
+                          <span className="mt-0.5 block text-xs leading-5 text-[var(--muted)]">{say(`cn_r_${r.value}_d`)}</span>
                         </button>
                       ))}
                     </div>
                   </div>
                   <label className="block">
-                    <span className="text-xs font-bold text-[var(--foreground-secondary)]">Notes (optional)</span>
+                    <span className="text-xs font-bold text-[var(--foreground-secondary)]">{say("cn_notes")}</span>
                     <textarea
                       className="mt-1 w-full rounded-xl border border-[var(--border)] bg-white px-3 py-2 text-sm text-[var(--foreground)] outline-none focus:border-[#be123c] focus:ring-2 focus:ring-[#be123c]/10"
                       onChange={e => setNotes(e.target.value)}
-                      placeholder="Any additional context about this cancellation..."
+                      placeholder={say("cn_notesPlaceholder")}
                       rows={2}
                       value={notes}
                     />
                   </label>
                   <div className="grid gap-3 sm:grid-cols-2">
                     <label className="block">
-                      <span className="text-xs font-bold text-[var(--foreground-secondary)]">Cancellation date &amp; time</span>
+                      <span className="text-xs font-bold text-[var(--foreground-secondary)]">{say("cn_when")}</span>
                       <p className="mb-1 text-[11px] text-[var(--muted)]">
-                        Leave blank to use current time. Set if recording retrospectively.
+                        {say("cn_whenHint")}
                       </p>
                       <input
                         className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
@@ -345,9 +328,9 @@ export function CancelBookingButton({
                       />
                     </label>
                     <label className="block">
-                      <span className="text-xs font-bold text-[var(--foreground-secondary)]">Vehicle collection date &amp; time</span>
+                      <span className="text-xs font-bold text-[var(--foreground-secondary)]">{say("cn_collect")}</span>
                       <p className="mb-1 text-[11px] text-[var(--muted)]">
-                        When was or will the vehicle be collected back?
+                        {say("cn_collectHint")}
                       </p>
                       <input
                         className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
@@ -362,9 +345,9 @@ export function CancelBookingButton({
 
               {step === "disposition" && (
                 <div>
-                  <p className="text-sm font-semibold text-[var(--foreground)] mb-1">How should payments be handled?</p>
+                  <p className="text-sm font-semibold text-[var(--foreground)] mb-1">{say("cn_how")}</p>
                   <p className="text-xs text-[var(--muted)] mb-3">
-                    This records the financial outcome. Actual refund transfers happen outside RouteHQ — this just updates the records.
+                    {say("cn_howHint")}
                   </p>
                   <div className="space-y-2">
                     {REFUND_OPTIONS.map(opt => (
@@ -391,7 +374,7 @@ export function CancelBookingButton({
                         {refundOption === opt.value && opt.value.startsWith("partial_refund") ? (
                           <div className="grid gap-2 border-t border-[#fecdd3] px-3 pb-3 pt-3 sm:grid-cols-2">
                             <label className="block">
-                              <span className="text-xs font-bold text-[var(--foreground-secondary)]">Refund amount ({currency})</span>
+                              <span className="text-xs font-bold text-[var(--foreground-secondary)]">{say("cn_refundAmount", { currency })}</span>
                               <input
                                 className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
                                 max={totalPaid}
@@ -405,7 +388,7 @@ export function CancelBookingButton({
                             </label>
                             {opt.value === "partial_refund_deposit_retained" && hasDeposit ? (
                               <label className="block">
-                                <span className="text-xs font-bold text-[var(--foreground-secondary)]">Deposit returned ({currency})</span>
+                                <span className="text-xs font-bold text-[var(--foreground-secondary)]">{say("cn_depositReturned", { currency })}</span>
                                 <input
                                   className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
                                   max={depositHeld}
@@ -428,24 +411,24 @@ export function CancelBookingButton({
 
               {step === "vehicle" && (
                 <div>
-                  <p className="mb-1 text-sm font-semibold text-[var(--foreground)]">What is the vehicle&apos;s status after this cancellation?</p>
-                  <p className="mb-3 text-xs text-[var(--muted)]">This updates the vehicle&apos;s availability in your fleet.</p>
+                  <p className="mb-1 text-sm font-semibold text-[var(--foreground)]">{say("cn_vehQ")}</p>
+                  <p className="mb-3 text-xs text-[var(--muted)]">{say("cn_vehHint")}</p>
                   <div className="space-y-2">
                     {([
                       {
                         value: "available" as const,
-                        label: "Release to available",
-                        detail: "Vehicle is back in good order and available to rent."
+                        label: say("cn_v_available"),
+                        detail: say("cn_v_available_d")
                       },
                       {
                         value: "repair" as const,
-                        label: "Send to repair / maintenance",
-                        detail: "Vehicle needs work before it can be rented again."
+                        label: say("cn_v_repair"),
+                        detail: say("cn_v_repair_d")
                       },
                       {
                         value: "keep_assigned" as const,
-                        label: "Keep current status",
-                        detail: "No change to vehicle status - I will update it manually."
+                        label: say("cn_v_keep_assigned"),
+                        detail: say("cn_v_keep_assigned_d")
                       }
                     ]).map((option) => (
                       <div
@@ -469,7 +452,7 @@ export function CancelBookingButton({
                         {vehicleDisposition === "repair" && option.value === "repair" ? (
                           <div className="grid gap-2 border-t border-[#fecdd3] px-3 pb-3 pt-3 sm:grid-cols-2">
                             <label className="block">
-                              <span className="text-xs font-bold text-[var(--foreground-secondary)]">Expected back</span>
+                              <span className="text-xs font-bold text-[var(--foreground-secondary)]">{say("cn_expectedBack")}</span>
                               <input
                                 className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
                                 onChange={(event) => setRepairExpectedEnd(event.target.value)}
@@ -478,11 +461,11 @@ export function CancelBookingButton({
                               />
                             </label>
                             <label className="block">
-                              <span className="text-xs font-bold text-[var(--foreground-secondary)]">Repair notes</span>
+                              <span className="text-xs font-bold text-[var(--foreground-secondary)]">{say("cn_repairNotes")}</span>
                               <input
                                 className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
                                 onChange={(event) => setRepairNotes(event.target.value)}
-                                placeholder="e.g. Gearbox replacement"
+                                placeholder={say("cn_repairPlaceholder")}
                                 type="text"
                                 value={repairNotes}
                               />
@@ -498,17 +481,17 @@ export function CancelBookingButton({
               {step === "confirm" && (
                 <div className="space-y-3">
                   <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-3 space-y-2">
-                    <p className="text-xs font-semibold uppercase text-[var(--muted)]">Reason</p>
+                    <p className="text-xs font-semibold uppercase text-[var(--muted)]">{say("cn_reason")}</p>
                     <ul className="space-y-0.5">
                       {selectedReasons.map(r => (
-                        <li className="text-sm font-bold text-[var(--foreground)]" key={r.value}>• {r.label}</li>
+                        <li className="text-sm font-bold text-[var(--foreground)]" key={r.value}>• {say(`cn_r_${r.value}`)}</li>
                       ))}
                     </ul>
                     {notes && <p className="text-xs text-[var(--muted)]">"{notes}"</p>}
                   </div>
                   {dispositionSummary().length > 0 && (
                     <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-3">
-                      <p className="text-xs font-semibold uppercase text-[var(--muted)] mb-2">What will happen</p>
+                      <p className="text-xs font-semibold uppercase text-[var(--muted)] mb-2">{say("cn_whatHappens")}</p>
                       <ul className="space-y-1">
                         {dispositionSummary().map((line, i) => (
                           <li className="flex items-start gap-2 text-sm text-[var(--foreground)]" key={i}>
@@ -521,7 +504,7 @@ export function CancelBookingButton({
                   )}
                   <div className="rounded-xl border border-[#fde68a] bg-[#fffbeb] p-3">
                     <p className="text-xs font-bold text-[#92400e]">
-                      ⚠️ The customer's booking link stops working straight away. You can undo the cancellation from the booking afterwards.
+                      ⚠️ {say("cn_warning")}
                     </p>
                   </div>
                 </div>
@@ -544,7 +527,7 @@ export function CancelBookingButton({
                     }}
                     type="button"
                   >
-                    Back
+                    {say("cn_back")}
                   </button>
                 )}
                 <button
@@ -553,7 +536,7 @@ export function CancelBookingButton({
                   onClick={reset}
                   type="button"
                 >
-                  Keep booking
+                  {say("cn_keep")}
                 </button>
                 {step === "confirm" ? (
                   <button
@@ -563,9 +546,9 @@ export function CancelBookingButton({
                     type="button"
                   >
                     {isPending ? (
-                      <><span className="spinner" /> Cancelling…</>
+                      <><span className="spinner" /> {say("cn_cancelling")}</>
                     ) : (
-                      "Confirm cancellation"
+                      say("cn_confirm")
                     )}
                   </button>
                 ) : (
@@ -583,7 +566,7 @@ export function CancelBookingButton({
                     }
                     type="button"
                   >
-                    Next →
+                    {say("cn_next")}
                   </button>
                 )}
               </div>

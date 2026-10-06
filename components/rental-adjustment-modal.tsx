@@ -3,7 +3,10 @@
 import { quoteStay, type Rates } from "@/lib/rental-estimate";
 import { useEffect, useMemo, useState, useTransition, useRef } from "react";
 import { adjustRental } from "@/app/actions/bookings";
-import { niceDate } from "@/lib/nice-date";
+import { useLocale, useTranslations } from "next-intl";
+import { longDate } from "@/lib/i18n/dates";
+
+type Say = (key: string, values?: Record<string, string | number>) => string;
 import { cancelRentalAmendment, createRentalAmendment, getRentalAmendmentContext, makeRentalOpenEnded, type AmendmentSummary } from "@/app/actions/amendments";
 
 type AdjustmentType = "extension" | "early_return" | "terms";
@@ -22,6 +25,7 @@ type AmendmentContext = {
 
 /** The link the customer signs, with ways to send it. */
 export function AmendmentLinkPanel({ token, onCancel, cancelling, changedAlready = false }: { token: string; onCancel?: () => void; cancelling?: boolean; /** The vehicle was changed ahead of the signature. */ changedAlready?: boolean }) {
+  const say = useTranslations("booking") as unknown as Say;
   const [copied, setCopied] = useState(false);
   const [origin, setOrigin] = useState("");
   const [canNativeShare, setCanNativeShare] = useState(false);
@@ -30,11 +34,12 @@ export function AmendmentLinkPanel({ token, onCancel, cancelling, changedAlready
     setCanNativeShare(typeof navigator !== "undefined" && typeof navigator.share === "function");
   }, []);
   const url = `${origin}/amend/${token}`;
+  // Sent to the customer, so not in the staff language. It stays in English until the customer's language is known here.
   const message = `Please review and sign the change to your rental: ${url}`;
   return (
     <div className="rounded-xl border border-[#bfe0db] bg-[var(--primary-light)] p-3 text-sm">
-      <p className="font-bold text-[var(--primary)]">Waiting for the customer to sign</p>
-      <p className="mt-1 text-[12px] text-[var(--foreground-secondary)]">{changedAlready ? "The vehicle has already been changed; they still need to sign for it. Send them this link:" : "Nothing changes on the rental until they sign. Send them this link:"}</p>
+      <p className="font-bold text-[var(--primary)]">{say("al_waiting")}</p>
+      <p className="mt-1 text-[12px] text-[var(--foreground-secondary)]">{changedAlready ? say("al_changed") : say("al_nothing")}</p>
       {canNativeShare ? (
         <button
           className="pressable mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white"
@@ -43,7 +48,7 @@ export function AmendmentLinkPanel({ token, onCancel, cancelling, changedAlready
           }}
           type="button"
         >
-          Send to customer
+          {say("al_send")}
         </button>
       ) : null}
       <div className="mt-2 grid grid-cols-3 gap-2">
@@ -60,16 +65,16 @@ export function AmendmentLinkPanel({ token, onCancel, cancelling, changedAlready
           }}
           type="button"
         >
-          {copied ? "Copied" : "Copy link"}
+          {copied ? say("al_copied") : say("al_copy")}
         </button>
       </div>
       <div className="mt-2 flex flex-wrap gap-2">
         <a className="pressable inline-flex min-h-10 items-center rounded-lg px-2 text-xs font-semibold text-[var(--primary)] underline" href={url} rel="noreferrer" target="_blank">
-          See what they will see
+          {say("al_preview")}
         </a>
         {onCancel ? (
           <button className="pressable ml-auto inline-flex min-h-10 items-center rounded-lg px-2 text-xs font-semibold text-[#be123c] underline disabled:opacity-60" disabled={cancelling} onClick={onCancel} type="button">
-            {cancelling ? "Cancelling..." : "Cancel this change"}
+            {cancelling ? say("al_cancelling") : say("al_cancel")}
           </button>
         ) : null}
       </div>
@@ -129,12 +134,8 @@ function defaultExtensionEndDate(currentEndDate?: string | null, days = 30) {
   return isoDate(next < tomorrowDate() ? tomorrowDate() : next);
 }
 
-const EXTENSION_PICKS = [
-  { days: 1, label: "+1 day" },
-  { days: 3, label: "+3 days" },
-  { days: 7, label: "+1 week" },
-  { days: 30, label: "+1 month" }
-];
+// The words for each are in the language files (adj_pick_<days>).
+const EXTENSION_PICKS = [{ days: 1 }, { days: 3 }, { days: 7 }, { days: 30 }];
 
 function defaultEarlyReturnDate(currentStartDate?: string | null, currentEndDate?: string | null) {
   // A planned date, so never today or earlier (a vehicle already back goes through Start return).
@@ -225,6 +226,12 @@ export function RentalAdjustmentModal({
 }) {
   // An open-ended rental has no return date to extend; the useful change is to set one.
   const openEnded = !currentEndDate;
+  const t = useTranslations("booking");
+  const say = t as unknown as Say;
+  const locale = useLocale();
+  const niceDate = (value: string | null | undefined) => (value ? longDate(String(value).slice(0, 10), locale) : "");
+  const strong = (chunks: React.ReactNode) => <span className="font-semibold text-[var(--foreground)]">{chunks}</span>;
+  const bold = (chunks: React.ReactNode) => <span className="font-bold">{chunks}</span>;
   const [adjustmentType, setAdjustmentType] = useState<AdjustmentType>(openEnded ? "early_return" : "extension");
   const [extensionEndDate, setExtensionEndDate] = useState(() => defaultExtensionEndDate(currentEndDate));
   const [earlyReturnDate, setEarlyReturnDate] = useState(() => defaultEarlyReturnDate(currentStartDate, currentEndDate));
@@ -319,12 +326,12 @@ export function RentalAdjustmentModal({
   function makeOpenEnded() {
     setMessage("");
     startTransition(async () => {
-      const result = await makeRentalOpenEnded(rentalId).catch(() => ({ ok: false as const, error: "Unable to change the rental." }));
+      const result = await makeRentalOpenEnded(rentalId).catch(() => ({ ok: false as const, error: say("adj_failedChange") }));
       if (!result.ok) {
         setMessage(result.error);
         return;
       }
-      setMessage("Now monthly, open-ended");
+      setMessage(say("adj_nowOpen"));
       setTimeout(() => {
         onSuccess?.();
         onClose();
@@ -375,17 +382,17 @@ export function RentalAdjustmentModal({
         });
 
         if (!result?.success) {
-          setMessage(result?.error || "Unable to adjust rental.");
+          setMessage(result?.error || say("adj_failed"));
           return;
         }
 
-        setMessage(adjustmentType === "extension" ? "Rental extended" : "Rental adjusted");
+        setMessage(adjustmentType === "extension" ? say("adj_extended") : say("adj_adjusted"));
         setTimeout(() => {
           onSuccess?.();
           onClose();
         }, 1000);
       } catch (error) {
-        setMessage(error instanceof Error ? error.message : "Unable to adjust rental.");
+        setMessage(error instanceof Error ? error.message : say("adj_failed"));
       }
     });
   }
@@ -404,42 +411,42 @@ export function RentalAdjustmentModal({
       <div className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-[var(--border)] bg-white p-4 shadow-[0_24px_80px_rgba(15,23,42,0.22)]">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-[15px] font-medium text-[var(--foreground)]">{agreementSigned ? "Change rental" : "Adjust rental period"}</h2>
+            <h2 className="text-[15px] font-medium text-[var(--foreground)]">{agreementSigned ? say("adj_titleSigned") : say("adj_title")}</h2>
             <p className="mt-1 text-xs text-[var(--muted)]">
-              {customerName || "Customer"} - {vehicleLabel || "Vehicle"}
+              {customerName || say("adj_customer")} - {vehicleLabel || say("adj_vehicle")}
             </p>
           </div>
           <button className="pressable rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold text-[var(--muted)]" onClick={onClose} type="button">
-            Close
+            {say("adj_close")}
           </button>
         </div>
 
         <div className={`mt-4 grid gap-2 sm:gap-3 ${agreementSigned && !openEnded ? "sm:grid-cols-3" : agreementSigned || !openEnded ? "sm:grid-cols-2" : ""}`}>
           {openEnded ? null : (
             <OptionCard
-              description="Move the return date further out and record an extension payment"
+              description={say("adj_extendDesc")}
               icon="ti-calendar-plus"
               onClick={() => setAdjustmentType("extension")}
               selected={isExtension}
-              title="Extend rental"
+              title={say("adj_extendTitle")}
               tone="teal"
             />
           )}
           <OptionCard
-            description={openEnded ? "The customer has told you when the vehicle is coming back" : "The customer will bring the vehicle back sooner than agreed"}
+            description={openEnded ? say("adj_setDesc") : say("adj_earlyDesc")}
             icon="ti-calendar-minus"
             onClick={() => setAdjustmentType("early_return")}
             selected={adjustmentType === "early_return"}
-            title={openEnded ? "Set the return date" : "Bring the return date forward"}
+            title={openEnded ? say("adj_setTitle") : say("adj_earlyTitle")}
             tone="amber"
           />
           {agreementSigned ? (
             <OptionCard
-              description="Change the rate or deposit. The customer signs an amendment"
+              description={say("adj_termsDesc")}
               icon="ti-file-pencil"
               onClick={() => setAdjustmentType("terms")}
               selected={isTerms}
-              title="Change rate or deposit"
+              title={say("adj_termsTitle")}
               tone="teal"
             />
           ) : null}
@@ -447,7 +454,7 @@ export function RentalAdjustmentModal({
 
         {signingBlocked && adjustmentType !== "early_return" ? (
           <p className="mt-3 rounded-lg border border-[#fde68a] bg-[#fffbeb] px-3 py-2 text-[12px] font-bold text-[#92400e]">
-            Customers can&apos;t sign online until you add {context?.signingGaps.join(", ")} in Settings.
+            {say("adj_cantSign", { gaps: (context?.signingGaps || []).join(", ") })}
           </p>
         ) : null}
 
@@ -457,43 +464,43 @@ export function RentalAdjustmentModal({
           ) : isTerms ? (
             <>
               <label className="block">
-                New rate ({context?.billingPeriod || "monthly"})
+                {say("adj_newRate", { period: ["daily", "weekly", "monthly"].includes(String(context?.billingPeriod || "monthly")) ? say(`adj_period_${context?.billingPeriod || "monthly"}`) : String(context?.billingPeriod) })}
                 <CurrencyInput onChange={setNewRate} placeholder={String(context?.currentRate ?? currentRate ?? "")} value={newRate} />
                 <span className="mt-1 block text-[11px] text-[var(--muted)]">
-                  Now {money(context?.currentRate ?? currentRate)}. Leave blank to keep it.
+                  {say("adj_nowKeep", { amount: money(context?.currentRate ?? currentRate) })}
                 </span>
               </label>
               {newRate.trim() ? (
                 <label className="block">
-                  New rate applies to payments due from
+                  {say("adj_rateFrom")}
                   <input className="mt-1 min-h-11 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" onChange={(event) => setRateFrom(event.target.value)} type="date" value={rateFrom} />
                 </label>
               ) : null}
               <label className="block">
-                New deposit
+                {say("adj_newDeposit")}
                 <CurrencyInput onChange={setNewDeposit} placeholder={String(context?.currentDeposit ?? "")} value={newDeposit} />
                 <span className="mt-1 block text-[11px] text-[var(--muted)]">
-                  Now {money(context?.currentDeposit)}. Leave blank to keep it. An increase is added as a payment due; a decrease is returned at the end of the rental.
+                  {say("adj_depositNow", { amount: money(context?.currentDeposit) })}
                 </span>
               </label>
               {parseAmount(newDeposit) > Number(context?.currentDeposit || 0) ? (
                 <label className="block">
-                  Extra deposit due
+                  {say("adj_extraDepositDue")}
                   <input className="mt-1 min-h-11 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" onChange={(event) => setDepositDueDate(event.target.value)} type="date" value={depositDueDate} />
                 </label>
               ) : null}
               <label className="block">
-                Extra terms for the customer to agree (optional)
+                {say("adj_extraTerms")}
                 <textarea className="mt-1 min-h-16 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 py-2 text-[13px]" maxLength={2000} onChange={(event) => setAdditionalTerms(event.target.value)} value={additionalTerms} />
               </label>
               <p className="rounded-xl border border-[#bfe0db] bg-[var(--primary-light)] p-3 text-[12px] font-bold text-[var(--primary)]">
-                You&apos;ll get a link for the customer. The change applies once they sign.
+                {say("adj_linkNote")}
               </p>
             </>
           ) : isExtension ? (
             <>
               <label className="block">
-                New return date
+                {say("adj_newReturn")}
                 <input className="mt-1 min-h-11 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" min={tomorrow} onChange={(event) => {
                   dateChosenByHand.current = true;
                   setExtensionEndDate(event.target.value);
@@ -511,7 +518,7 @@ export function RentalAdjustmentModal({
                         }}
                         type="button"
                       >
-                        {pick.label}
+                        {say(`adj_pick_${pick.days}`)}
                       </button>
                     );
                   })}
@@ -520,20 +527,20 @@ export function RentalAdjustmentModal({
               {originalEndDate && context?.onRent && (context?.rates?.monthlyRate || 0) > 0 ? (
                 <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[var(--border)] bg-white p-3 text-[13px] text-[var(--foreground-secondary)]">
                   <span>
-                    No return date in mind? Make it <span className="font-semibold text-[var(--foreground)]">monthly, open-ended</span> at {money(context?.rates?.monthlyRate || 0)} a month. Applies now and the customer is told.
+                    {t.rich("adj_noDate", { amount: money(context?.rates?.monthlyRate || 0), b: strong })}
                   </span>
                   <button className="rounded-md border border-[var(--border)] bg-white px-3 py-1.5 text-[12px] font-semibold text-[var(--primary)] disabled:opacity-60" disabled={isPending} onClick={makeOpenEnded} type="button">
-                    Make it monthly
+                    {say("adj_makeMonthly")}
                   </button>
                 </div>
               ) : null}
 
               <div className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3 text-sm text-[var(--foreground-secondary)]">
-                Extension: <span className="font-bold">{originalEndDate ? niceDate(originalEndDate) : "open-ended"}</span> to <span className="font-bold">{extensionEndDate ? niceDate(extensionEndDate) : "a new date"}</span> ({extensionDays} {extensionDays === 1 ? "day" : "days"})
+                {t.rich("adj_extensionLine", { from: originalEndDate ? niceDate(originalEndDate) : say("adj_openEnded"), to: extensionEndDate ? niceDate(extensionEndDate) : say("adj_newDate"), days: extensionDays, b: bold })}
               </div>
 
               <label className="block">
-                Agreed payment for this extension
+                {say("adj_agreed")}
                 <CurrencyInput
                   onChange={(value) => {
                     amountTypedByHand.current = true;
@@ -543,31 +550,31 @@ export function RentalAdjustmentModal({
                 />
                 {extensionQuote ? (
                   <span className="mt-1 flex flex-wrap items-center gap-2 text-[12px] text-[var(--foreground-secondary)]">
-                    From your rates: <span className="font-semibold text-[var(--foreground)]">{money(extensionQuote.amount)}</span> ({extensionQuote.explain})
+                    {t.rich("adj_fromRates", { amount: money(extensionQuote.amount), explain: extensionQuote.explain, b: strong })}
                     <button className={`rounded-md border border-[var(--border)] bg-white px-2 py-1 text-[11px] font-semibold text-[var(--primary)] ${parseAmount(extensionAmount) === extensionQuote.amount ? "hidden" : ""}`} onClick={() => {
                       amountTypedByHand.current = false;
                       setExtensionAmount(extensionQuote.amount.toLocaleString("en-US"));
                     }} type="button">
-                      Use this
+                      {say("adj_useThis")}
                     </button>
                   </span>
                 ) : null}
-                <span className="mt-1 block text-[11px] text-[var(--muted)]">One price for these extra days. Change it if you agreed something different. If left at 0, no payment is added.</span>
+                <span className="mt-1 block text-[11px] text-[var(--muted)]">{say("adj_onePrice")}</span>
               </label>
 
               <label className="block">
-                Payment due
+                {say("adj_paymentDue")}
                 <input className="mt-1 min-h-11 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" onChange={(event) => setExtensionDueDate(event.target.value)} type="date" value={extensionDueDate} />
-                <span className="mt-1 block text-[11px] text-[var(--muted)]">Typically the day the current period ends.</span>
+                <span className="mt-1 block text-[11px] text-[var(--muted)]">{say("adj_typically")}</span>
               </label>
 
               {agreementSigned ? (
                 <label className="flex items-start gap-3 rounded-lg border border-[var(--border)] p-3 text-[13px]">
                   <input checked={needsSignature} className="mt-0.5 h-4 w-4" onChange={(event) => setNeedsSignature(event.target.checked)} type="checkbox" />
                   <span>
-                    <span className="block font-bold">Customer signs an amendment (recommended)</span>
+                    <span className="block font-bold">{say("adj_signs")}</span>
                     <span className="block text-[11px] text-[var(--muted)]">
-                      They get a short link showing the new return date and price. The extension applies once they sign. Untick to just record it.
+                      {say("adj_signsHint")}
                     </span>
                   </span>
                 </label>
@@ -575,25 +582,25 @@ export function RentalAdjustmentModal({
 
               {useAmendment ? (
                 <label className="block">
-                  Extra terms for the customer to agree (optional)
+                  {say("adj_extraTerms")}
                   <textarea className="mt-1 min-h-16 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 py-2 text-[13px]" maxLength={2000} onChange={(event) => setAdditionalTerms(event.target.value)} value={additionalTerms} />
                 </label>
               ) : (
                 <label className="block">
-                  Internal note
-                  <input className="mt-1 min-h-11 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" onChange={(event) => setNote(event.target.value)} placeholder="Optional" type="text" value={note} />
+                  {say("adj_internalNote")}
+                  <input className="mt-1 min-h-11 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" onChange={(event) => setNote(event.target.value)} placeholder={say("adj_optional")} type="text" value={note} />
                 </label>
               )}
 
               <div className="rounded-xl border border-[#bfe0db] bg-[var(--primary-light)] p-3 text-sm font-bold text-[var(--primary)]">
-                Extending {extensionDays} {extensionDays === 1 ? "day" : "days"} - {money(parseAmount(extensionAmount))} due {extensionDueDate ? niceDate(extensionDueDate) : "not set"}
-                {useAmendment ? <span className="mt-1 block text-[12px] font-normal">Applies when the customer signs.</span> : null}
+                {say("adj_summary", { days: extensionDays, amount: money(parseAmount(extensionAmount)), date: extensionDueDate ? niceDate(extensionDueDate) : say("adj_notSet") })}
+                {useAmendment ? <span className="mt-1 block text-[12px] font-normal">{say("adj_appliesWhen")}</span> : null}
               </div>
             </>
           ) : (
             <>
               <label className="block">
-                {openEnded ? "Return date" : "New return date"}
+                {openEnded ? say("adj_returnDate") : say("adj_newReturn")}
                 <input
                   className="mt-1 min-h-11 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]"
                   max={originalEndDate || undefined}
@@ -606,23 +613,23 @@ export function RentalAdjustmentModal({
 
               <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3 text-sm text-[#92400e]">
                 {openEnded
-                  ? `The rental ends on ${earlyReturnDate ? niceDate(earlyReturnDate) : "the date you choose"}. Rent due after that date comes off the schedule, and the customer is told.`
-                  : `${earlyReturnDays} ${earlyReturnDays === 1 ? "day" : "days"} sooner: ${niceDate(originalEndDate)} becomes ${earlyReturnDate ? niceDate(earlyReturnDate) : "the date you choose"}. Rent due after that date comes off the schedule, and the customer is told.`}
+                  ? say("adj_endsOn", { date: earlyReturnDate ? niceDate(earlyReturnDate) : say("adj_dateYouChoose") })
+                  : say("adj_sooner", { days: earlyReturnDays, from: niceDate(originalEndDate), to: earlyReturnDate ? niceDate(earlyReturnDate) : say("adj_dateYouChoose") })}
                 <span className="mt-1 block text-[12px]">
-                  If time already paid for goes unused, the refund to consider is worked out when the vehicle comes back. Is it back already? Close this and use Start return.
+                  {say("adj_unused")}
                 </span>
               </div>
 
               <label className="block">
-                Internal note
-                <input className="mt-1 min-h-11 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" onChange={(event) => setNote(event.target.value)} placeholder="Optional" type="text" value={note} />
+                {say("adj_internalNote")}
+                <input className="mt-1 min-h-11 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" onChange={(event) => setNote(event.target.value)} placeholder={say("adj_optional")} type="text" value={note} />
               </label>
             </>
           )}
         </div>
 
         {message ? (
-          <p className={`mt-3 rounded-lg px-3 py-2 text-sm font-bold ${message.includes("extended") || message.includes("adjusted") ? "bg-[var(--success-light)] text-[var(--success)]" : "bg-[var(--danger-light)] text-[var(--danger)]"}`}>
+          <p className={`mt-3 rounded-lg px-3 py-2 text-sm font-bold ${[say("adj_extended"), say("adj_adjusted"), say("adj_nowOpen")].includes(message) ? "bg-[var(--success-light)] text-[var(--success)]" : "bg-[var(--danger-light)] text-[var(--danger)]"}`}>
             {message}
           </p>
         ) : null}
@@ -637,12 +644,12 @@ export function RentalAdjustmentModal({
               }}
               type="button"
             >
-              Done
+              {say("adj_done")}
             </button>
           ) : (
             <>
               <button className="pressable min-h-11 flex-1 rounded-xl border border-[var(--border)] bg-white px-4 py-2 text-sm font-bold text-[var(--foreground-secondary)]" onClick={onClose} type="button">
-                Cancel
+                {say("cancelBtn")}
               </button>
               <button
                 className="pressable min-h-11 flex-1 rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-bold text-white disabled:opacity-60"
@@ -650,7 +657,7 @@ export function RentalAdjustmentModal({
                 onClick={submit}
                 type="button"
               >
-                {isPending ? "Saving..." : useAmendment ? "Create link for customer to sign" : isExtension ? "Extend rental" : "Set return date"}
+                {isPending ? say("saving") : useAmendment ? say("adj_createLink") : isExtension ? say("adj_extendTitle") : say("adj_setReturn")}
               </button>
             </>
           )}
@@ -667,7 +674,7 @@ export function RentalAdjustmentButton({
   currentRate,
   vehicleLabel,
   customerName,
-  label = "Adjust",
+  label,
   className = "pressable inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground-secondary)]"
 }: {
   rentalId: string;
@@ -680,12 +687,13 @@ export function RentalAdjustmentButton({
   className?: string;
 }) {
   const [open, setOpen] = useState(false);
+  const say = useTranslations("booking") as unknown as Say;
 
   return (
     <>
       <button className={className} onClick={() => setOpen(true)} type="button">
         <i aria-hidden="true" className="ti ti-calendar-event text-sm" />
-        {label}
+        {label || say("adj_defaultLabel")}
       </button>
       {open ? (
         <RentalAdjustmentModal

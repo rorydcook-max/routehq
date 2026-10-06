@@ -1,6 +1,10 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { longDate } from "@/lib/i18n/dates";
+
+type Say = (key: string, values?: Record<string, string | number>) => string;
 import { AtSign, Copy, Instagram, Mail, MessageCircle, Phone, Send, Smartphone, StickyNote } from "lucide-react";
 import { addCommunicationNote } from "@/app/actions/communication";
 import { Badge } from "@/components/ui";
@@ -59,14 +63,22 @@ export function CommunicationPanel({
   /** The booking page already shows the vehicle, return date, balance and deposit. */
   hideSummary?: boolean;
 }) {
+  const say = useTranslations("booking") as unknown as Say;
+  const statusWords = useTranslations("bookings");
+  const locale = useLocale();
   const [activePopover, setActivePopover] = useState<"whatsapp" | "line" | null>(null);
   const [customMessage, setCustomMessage] = useState("");
   const [note, setNote] = useState("");
   const [toast, setToast] = useState("");
   const [isPending, startTransition] = useTransition();
 
-  const channels = useMemo(() => buildChannels(customer), [customer]);
+  const channels = useMemo(
+    () => buildChannels(customer).map((channel) => (channel.key === "phone" ? { ...channel, label: say("cp_phone") } : channel.key === "email" ? { ...channel, label: say("cp_email") } : channel)),
+    [customer, say]
+  );
   const returnTone = returnDateTone(booking.end_date);
+  // On screen the date is in the reader's language; in a message to the customer it stays as written below.
+  const returnShown = booking.end_date ? longDate(booking.end_date.slice(0, 10), locale) : say("cp_noEnd");
   const returnLabel = booking.end_date ? formatDate(booking.end_date) : "No end date";
   const outstanding = Number(booking.outstanding_balance || 0);
   const depositHeld = Number(booking.deposit_held || 0);
@@ -107,7 +119,7 @@ export function CommunicationPanel({
 
     if (channel.key === "messenger" || channel.key === "telegram") {
       await copyText(defaultTemplate);
-      showToast(`Opening ${channel.label} - your message has been copied to clipboard`);
+      showToast(say("cp_opening", { channel: channel.label }));
     }
 
     const url = channelUrl(channel);
@@ -133,7 +145,7 @@ export function CommunicationPanel({
       if (revalidatePathname) formData.set("revalidatePathname", revalidatePathname);
       await addCommunicationNote(formData);
       setNote("");
-      showToast("Note saved");
+      showToast(say("cp_noteSaved"));
     });
   }
 
@@ -142,24 +154,24 @@ export function CommunicationPanel({
       <div className="rounded-xl border border-[var(--border)] bg-[var(--panel)] p-3" hidden={hideSummary}>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Vehicle</p>
+            <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">{say("vehicle")}</p>
             <p className="font-semibold text-[var(--foreground)]">
-              {booking.vehicle_make_model || "Vehicle not set"} {booking.vehicle_plate ? <span className="font-mono-data text-[var(--muted)]">· {booking.vehicle_plate}</span> : null}
+              {booking.vehicle_make_model || say("cp_vehicleNotSet")} {booking.vehicle_plate ? <span className="font-mono-data text-[var(--muted)]">· {booking.vehicle_plate}</span> : null}
             </p>
           </div>
-          <Badge tone={statusTone(booking.rental_status)}>{formatStatus(booking.rental_status)}</Badge>
+          <Badge tone={statusTone(booking.rental_status)}>{booking.rental_status ? (statusWords.has(`status_${booking.rental_status}`) ? statusWords(`status_${booking.rental_status}`) : booking.rental_status.replace(/_/g, " ")) : say("cp_noStatus")}</Badge>
         </div>
         <div className="mt-3 grid gap-2 sm:grid-cols-3">
-          <SummaryItem label="Due back" tone={returnTone} value={returnLabel} />
-          <SummaryItem label="Due now" tone={outstanding > 0 ? "red" : "green"} value={outstanding > 0 ? formatMoney(outstanding) : "Nothing"} />
-          <SummaryItem label="Deposit held" tone={depositHeld > 0 ? "amber" : "neutral"} value={depositHeld > 0 ? formatMoney(depositHeld) : "None"} />
+          <SummaryItem label={say("cp_dueBack")} tone={returnTone} value={returnShown} />
+          <SummaryItem label={say("cp_dueNow")} tone={outstanding > 0 ? "red" : "green"} value={outstanding > 0 ? formatMoney(outstanding) : say("cp_nothing")} />
+          <SummaryItem label={say("cp_depositHeld")} tone={depositHeld > 0 ? "amber" : "neutral"} value={depositHeld > 0 ? formatMoney(depositHeld) : say("cp_none")} />
         </div>
       </div>
 
       <div className="rounded-xl border border-[var(--border)] bg-[var(--panel)] p-3">
         <div className="flex flex-wrap items-center gap-2">
           {channels.length === 0 ? (
-            <p className="text-sm text-[var(--muted)]">No phone number or chat app saved for this customer yet.</p>
+            <p className="text-sm text-[var(--muted)]">{say("cp_noChannels")}</p>
           ) : (
             channels.map((channel) => (
               <div className="relative" key={channel.key}>
@@ -174,7 +186,7 @@ export function CommunicationPanel({
                 >
                   {channel.icon}
                   {/* A name beside the picture: a lone icon left people guessing what it did. */}
-                  <span>{channel.key === "phone" ? `Call ${channel.handle}` : channel.label}</span>
+                  <span>{channel.key === "phone" ? say("cp_call", { number: channel.handle }) : channel.label}</span>
                 </button>
                 {(activePopover === "whatsapp" && channel.key === "whatsapp") || (activePopover === "line" && channel.key === "line") ? (
                   <TemplatePopover
@@ -182,7 +194,7 @@ export function CommunicationPanel({
                     customMessage={customMessage}
                     onCopyPortal={async () => {
                       await copyText(portalLink());
-                      showToast("Link copied - paste into your message");
+                      showToast(say("cp_linkCopied"));
                       setActivePopover(null);
                     }}
                     onCustomChange={setCustomMessage}
@@ -208,11 +220,11 @@ export function CommunicationPanel({
             onKeyDown={(event) => {
               if ((event.metaKey || event.ctrlKey) && event.key === "Enter") saveNote();
             }}
-            placeholder="Add a note..."
+            placeholder={say("cp_addNote")}
             value={note}
           />
           <button className="btn-primary min-h-10 shrink-0" disabled={isPending || !note.trim()} onClick={saveNote} type="button">
-            {isPending ? "Saving..." : "Save"}
+            {isPending ? say("saving") : say("cp_save")}
           </button>
         </label>
       </div>
@@ -254,30 +266,31 @@ function TemplatePopover({
   onOpen: (text: string) => void;
   onCopyPortal: () => void;
 }) {
+  const say = useTranslations("booking") as unknown as Say;
   return (
     <div className="absolute left-0 top-12 z-30 w-[min(320px,calc(100vw-48px))] rounded-xl border border-[var(--border)] bg-white p-3 shadow-xl">
-      <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--primary)]">{channel} message</p>
+      <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--primary)]">{say("cp_messageTitle", { channel })}</p>
       <div className="mt-2 space-y-2">
         <button className="secondary-action w-full justify-start px-3 py-2 text-left" onClick={() => onOpen(paymentTemplate)} type="button">
-          Payment reminder
+          {say("cp_payReminder")}
         </button>
         <button className="secondary-action w-full justify-start px-3 py-2 text-left" onClick={() => onOpen(returnTemplate)} type="button">
-          Return reminder
+          {say("cp_returnReminder")}
         </button>
         <div>
           <textarea
             className="min-h-20 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
             onChange={(event) => onCustomChange(event.target.value)}
-            placeholder="Custom message"
+            placeholder={say("cp_custom")}
             value={customMessage}
           />
           <button className="primary-action mt-2 w-full justify-center px-3 py-2" disabled={!customMessage.trim()} onClick={() => onOpen(customMessage)} type="button">
-            Open in {channel}
+            {say("cp_openIn", { channel })}
           </button>
         </div>
         <button className="secondary-action w-full justify-start px-3 py-2 text-left" onClick={onCopyPortal} type="button">
           <Copy size={15} />
-          Copy the customer's link
+          {say("cp_copyLink")}
         </button>
       </div>
     </div>
@@ -350,8 +363,4 @@ function statusTone(status?: string | null): "neutral" | "green" | "amber" | "re
   return "neutral";
 }
 
-function formatStatus(status?: string | null) {
-  // The words owners see everywhere else, not the database's.
-  const labels: Record<string, string> = { booked: "Booked", active: "On rent", due_soon: "Due back soon", overdue: "Late return", extended: "Extended", completed: "Completed", cancelled: "Cancelled", draft: "Not confirmed" };
-  return status ? labels[status] || status.replace(/_/g, " ") : "No status";
-}
+// Status words come from the language files (bookings.status_*), the same as on the bookings list.

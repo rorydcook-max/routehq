@@ -4,6 +4,9 @@ import { businessToday } from "@/lib/business-time";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
+import { longDate } from "@/lib/i18n/dates";
+import { monthPeriod } from "@/lib/i18n/period";
 import { addRentalPayment, deleteRentalPayment, recordPaymentReceived, setupExistingRentalPayments, updateRentalEndDate, updateRentalPayment } from "@/app/actions/bookings";
 import { deleteTransaction, updateTransaction } from "@/app/actions/transactions";
 
@@ -51,6 +54,22 @@ const transactionTypeOptions = [
   "other"
 ];
 
+type Say = (key: string, values?: Record<string, string | number>) => string;
+/** The words for these controls in the reader's language, and the language itself for dates. */
+type Ctl = { say: Say; optionName: (option: string) => string; typeName: (type: string) => string; locale: string };
+
+function useCtl(): Ctl {
+  const t = useTranslations("booking");
+  const m = useTranslations("money");
+  const locale = useLocale();
+  const say = t as unknown as Say;
+  const typeName = (type: string) => (m.has(`type_${type}`) ? m(`type_${type}`) : type.replace(/_/g, " "));
+  // One name for every choice in the lists below: a payment's status, how it was paid, or what a money entry was for.
+  const optionName = (option: string) =>
+    editablePaymentStatuses.includes(option) || option === "paid" ? say(`pc_st_${option}`) : paymentMethodOptions.includes(option) ? say(`pm_${option}`) : typeName(option);
+  return { say, optionName, typeName, locale };
+}
+
 function money(value: unknown, currency = "THB") {
   return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0));
 }
@@ -59,10 +78,10 @@ function dateInput(value: string | null | undefined) {
   return String(value || "").slice(0, 10);
 }
 
-function dateLabel(value: string | null | undefined) {
+function dateLabel(value: string | null | undefined, locale: string) {
   const normalized = dateInput(value);
   if (!normalized) return "";
-  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(new Date(normalized));
+  return longDate(normalized, locale);
 }
 
 function amountInput(value: unknown) {
@@ -70,14 +89,14 @@ function amountInput(value: unknown) {
   return Number.isFinite(parsed) ? String(parsed) : "0";
 }
 
-function paymentDescription(payment: RentalPayment) {
+/** What a payment is for. Words someone typed are shown as typed; otherwise it is named from what the payment is. */
+function paymentDescription(payment: RentalPayment, tx: Ctl) {
   const metadata = payment.metadata || {};
+  if (metadata.description) return String(metadata.description);
   const isExtension = metadata.type === "extension" || metadata.adjustment_type === "extension";
-  return metadata.description || (isExtension ? `Extension ${metadata.previous_end_date || ""} to ${metadata.new_end_date || ""}` : metadata.type === "deposit" || metadata.is_deposit === true
-      ? "Deposit"
-      : metadata.period_label
-        ? `${metadata.period_label} rent`
-        : "Rent payment");
+  if (isExtension) return tx.say("pc_extensionDesc", { from: dateLabel(metadata.previous_end_date, tx.locale), to: dateLabel(metadata.new_end_date, tx.locale) });
+  if (metadata.type === "deposit" || metadata.is_deposit === true) return tx.say("pc_deposit");
+  return metadata.period_label ? tx.say("pc_rentFor", { period: monthPeriod(metadata.period_label, tx.locale) }) : tx.say("pc_rent");
 }
 
 function isPaymentVoided(payment: RentalPayment) {
@@ -109,10 +128,11 @@ function SmallBadge({ children, tone = "neutral" }: { children: React.ReactNode;
 
 export function AddRentalPaymentInlineForm({ organizationId, rentalId, currency = "THB" }: { organizationId: string; rentalId: string; currency?: string | null }) {
   const router = useRouter();
+  const tx = useCtl();
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState("0");
   const [dueDate, setDueDate] = useState(businessToday());
-  const [description, setDescription] = useState("Rental payment");
+  const [description, setDescription] = useState(tx.say("pc_defaultDesc"));
   const [status, setStatus] = useState("pending");
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -143,7 +163,7 @@ export function AddRentalPaymentInlineForm({ organizationId, rentalId, currency 
         setOpen(false);
         router.refresh();
       } catch (error) {
-        setMessage(error instanceof Error ? error.message : "Unable to add this charge.");
+        setMessage(error instanceof Error ? error.message : tx.say("pc_addFailed"));
       }
     });
   }
@@ -152,42 +172,42 @@ export function AddRentalPaymentInlineForm({ organizationId, rentalId, currency 
     <div className="sub-surface p-3" id="add-payment-row">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <p className="font-semibold text-[var(--foreground)]">Add charge</p>
-          <p className="text-sm text-[var(--muted)]">Add a new charge or scheduled amount due to this rental.</p>
+          <p className="font-semibold text-[var(--foreground)]">{tx.say("pc_addCharge")}</p>
+          <p className="text-sm text-[var(--muted)]">{tx.say("pc_addChargeHint")}</p>
         </div>
-        <ActionButton onClick={() => setOpen((current) => !current)}>{open ? "Close" : "Add charge"}</ActionButton>
+        <ActionButton onClick={() => setOpen((current) => !current)}>{open ? tx.say("pc_close") : tx.say("pc_addCharge")}</ActionButton>
       </div>
       {open ? (
         <div className="mt-3 rounded-lg border border-[var(--border)] bg-white p-3">
           <div className="grid gap-3 sm:grid-cols-2">
             <label>
-              Amount
+              {tx.say("pc_amount")}
               <div className="mt-1 flex items-center rounded-lg border border-[var(--border-strong)] bg-white">
                 <span className="font-mono-data px-3 text-sm font-semibold text-[var(--muted)]">{currency === "THB" ? "฿" : currency}</span>
                 <input className="font-mono-data h-9 min-w-0 flex-1 border-0 bg-transparent px-0 pr-3 text-sm outline-none" min="0" step="0.01" type="number" value={amount} onChange={(event) => setAmount(event.target.value)} />
               </div>
             </label>
             <label>
-              Due date
+              {tx.say("pc_dueDate")}
               <input className="mt-1 w-full" type="date" value={dueDate} onChange={(event) => setDueDate(event.target.value)} />
             </label>
             <label>
-              Status
+              {tx.say("pc_status")}
               <select className="mt-1 w-full" value={status} onChange={(event) => setStatus(event.target.value)}>
                 {editablePaymentStatuses.map((option) => (
-                  <option key={option} value={option}>{option}</option>
+                  <option key={option} value={option}>{tx.optionName(option)}</option>
                 ))}
               </select>
             </label>
             <label>
-              Description
+              {tx.say("pc_description")}
               <input className="mt-1 w-full" type="text" value={description} onChange={(event) => setDescription(event.target.value)} />
             </label>
           </div>
           {message ? <p className="mt-3 rounded-lg bg-[#fef2f2] p-2 text-xs font-semibold text-[#dc2626]">{message}</p> : null}
           <div className="mt-3 flex flex-wrap gap-2">
-            <ActionButton disabled={isPending} onClick={save} tone="primary">{isPending ? "Saving..." : "Save charge"}</ActionButton>
-            <ActionButton disabled={isPending} onClick={() => setOpen(false)}>Cancel</ActionButton>
+            <ActionButton disabled={isPending} onClick={save} tone="primary">{isPending ? tx.say("saving") : tx.say("pc_saveCharge")}</ActionButton>
+            <ActionButton disabled={isPending} onClick={() => setOpen(false)}>{tx.say("cancelBtn")}</ActionButton>
           </div>
         </div>
       ) : null}
@@ -209,6 +229,7 @@ export function ExistingRentalPaymentSetupCard({
   startDate?: string | null;
 }) {
   const router = useRouter();
+  const tx = useCtl();
   const [firstPaymentMode, setFirstPaymentMode] = useState<"collected" | "outstanding">("outstanding");
   const [depositMode, setDepositMode] = useState<"collected" | "pending" | "none">(depositAmount > 0 ? "pending" : "none");
   const [firstPaymentAmount, setFirstPaymentAmount] = useState(String(Math.max(0, Math.round(rentalRate || 0))));
@@ -237,7 +258,7 @@ export function ExistingRentalPaymentSetupCard({
         await setupExistingRentalPayments(formData);
         router.refresh();
       } catch (error) {
-        setMessage(error instanceof Error ? error.message : "Unable to set up payment records.");
+        setMessage(error instanceof Error ? error.message : tx.say("pc_setupFailed"));
       }
     });
   }
@@ -246,53 +267,53 @@ export function ExistingRentalPaymentSetupCard({
     <div className="rounded-xl border border-[#fde68a] bg-[#fffbeb] p-3">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="font-semibold text-[#92400e]">Set up payment records for this rental</p>
+          <p className="font-semibold text-[#92400e]">{tx.say("pc_setupTitle")}</p>
           <p className="mt-1 text-sm leading-5 text-[#b45309]">
-            Since this rental was entered directly, payment records were not auto-generated. Choose how to set up the first rent payment and security deposit.
+            {tx.say("pc_setupBody")}
           </p>
         </div>
         <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-lg border border-[#fde68a] bg-white px-3 text-xs font-semibold text-[#92400e]" href={`/bookings/${rentalId}/edit#payments`}>
-          Set up manually
+          {tx.say("pc_setupManual")}
         </Link>
       </div>
 
       <div className="mt-3 grid gap-3 lg:grid-cols-2">
         <div className="rounded-lg border border-[#fde68a] bg-white p-3">
-          <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#b45309]">First rental payment</p>
+          <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#b45309]">{tx.say("pc_firstPayment")}</p>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             <button
               className={`pressable rounded-lg border px-3 py-2 text-left text-xs font-semibold ${firstPaymentMode === "collected" ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
               onClick={() => setFirstPaymentMode("collected")}
               type="button"
             >
-              First payment already collected
+              {tx.say("pc_firstCollected")}
             </button>
             <button
               className={`pressable rounded-lg border px-3 py-2 text-left text-xs font-semibold ${firstPaymentMode === "outstanding" ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
               onClick={() => setFirstPaymentMode("outstanding")}
               type="button"
             >
-              First payment is outstanding
+              {tx.say("pc_firstOutstanding")}
             </button>
           </div>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             <label>
-              Amount
+              {tx.say("pc_amount")}
               <div className="mt-1 flex items-center rounded-lg border border-[var(--border-strong)] bg-white">
                 <span className="font-mono-data px-3 text-sm font-semibold text-[var(--muted)]">{currency === "THB" ? "฿" : currency}</span>
                 <input className="font-mono-data h-9 min-w-0 flex-1 border-0 bg-transparent px-0 pr-3 text-sm outline-none" min="0" step="0.01" type="number" value={firstPaymentAmount} onChange={(event) => setFirstPaymentAmount(event.target.value)} />
               </div>
             </label>
             <label>
-              {firstPaymentMode === "collected" ? "Date collected" : "Due date"}
+              {firstPaymentMode === "collected" ? tx.say("pc_dateCollected") : tx.say("pc_dueDate")}
               <input className="mt-1 w-full" type="date" value={firstPaymentDate} onChange={(event) => setFirstPaymentDate(event.target.value)} />
             </label>
             {firstPaymentMode === "collected" ? (
               <label className="sm:col-span-2">
-                Payment method
+                {tx.say("pc_method")}
                 <select className="mt-1 w-full" value={firstPaymentMethod} onChange={(event) => setFirstPaymentMethod(event.target.value)}>
                   {paymentMethodOptions.map((option) => (
-                    <option key={option} value={option}>{option.replace(/_/g, " ")}</option>
+                    <option key={option} value={option}>{tx.optionName(option)}</option>
                   ))}
                 </select>
               </label>
@@ -301,12 +322,12 @@ export function ExistingRentalPaymentSetupCard({
         </div>
 
         <div className="rounded-lg border border-[#fde68a] bg-white p-3">
-          <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#b45309]">Security deposit</p>
+          <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#b45309]">{tx.say("pc_securityDeposit")}</p>
           <div className="mt-3 grid gap-2">
             {[
-              ["collected", "Deposit already collected"],
-              ["pending", "Deposit not yet collected"],
-              ["none", "No deposit for this rental"]
+              ["collected", tx.say("pc_depCollected")],
+              ["pending", tx.say("pc_depPending")],
+              ["none", tx.say("pc_depNone")]
             ].map(([value, label]) => (
               <button
                 className={`pressable rounded-lg border px-3 py-2 text-left text-xs font-semibold ${depositMode === value ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
@@ -321,22 +342,22 @@ export function ExistingRentalPaymentSetupCard({
           {depositMode !== "none" ? (
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <label>
-                Deposit amount
+                {tx.say("pc_depositAmount")}
                 <div className="mt-1 flex items-center rounded-lg border border-[var(--border-strong)] bg-white">
                   <span className="font-mono-data px-3 text-sm font-semibold text-[var(--muted)]">{currency === "THB" ? "฿" : currency}</span>
                   <input className="font-mono-data h-9 min-w-0 flex-1 border-0 bg-transparent px-0 pr-3 text-sm outline-none" min="0" step="0.01" type="number" value={depositPaymentAmount} onChange={(event) => setDepositPaymentAmount(event.target.value)} />
                 </div>
               </label>
               <label>
-                {depositMode === "collected" ? "Date collected" : "Due date"}
+                {depositMode === "collected" ? tx.say("pc_dateCollected") : tx.say("pc_dueDate")}
                 <input className="mt-1 w-full" type="date" value={depositDate} onChange={(event) => setDepositDate(event.target.value)} />
               </label>
               {depositMode === "collected" ? (
                 <label className="sm:col-span-2">
-                  Payment method
+                  {tx.say("pc_method")}
                   <select className="mt-1 w-full" value={depositMethod} onChange={(event) => setDepositMethod(event.target.value)}>
                     {paymentMethodOptions.map((option) => (
-                      <option key={option} value={option}>{option.replace(/_/g, " ")}</option>
+                      <option key={option} value={option}>{tx.optionName(option)}</option>
                     ))}
                   </select>
                 </label>
@@ -349,7 +370,7 @@ export function ExistingRentalPaymentSetupCard({
       {message ? <p className="mt-3 rounded-lg bg-[#fef2f2] p-2 text-xs font-semibold text-[#dc2626]">{message}</p> : null}
       <div className="mt-3 flex justify-end">
         <ActionButton disabled={isPending} onClick={submit} tone="primary">
-          {isPending ? "Setting up..." : "Create payment records"}
+          {isPending ? tx.say("pc_settingUp") : tx.say("pc_createRecords")}
         </ActionButton>
       </div>
     </div>
@@ -390,6 +411,7 @@ function ActionButton({
 
 export function EditableEndDate({ rentalId, currentEndDate }: { rentalId: string; currentEndDate?: string | null }) {
   const router = useRouter();
+  const tx = useCtl();
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(dateInput(currentEndDate));
   const [message, setMessage] = useState<string | null>(null);
@@ -397,7 +419,7 @@ export function EditableEndDate({ rentalId, currentEndDate }: { rentalId: string
 
   function save() {
     if (!value) {
-      setMessage("Choose an end date.");
+      setMessage(tx.say("pc_chooseEnd"));
       return;
     }
     setMessage(null);
@@ -405,13 +427,13 @@ export function EditableEndDate({ rentalId, currentEndDate }: { rentalId: string
       try {
         const result = await updateRentalEndDate(rentalId, value);
         if (!result.success) {
-          setMessage(result.error || "Unable to update the end date.");
+          setMessage(result.error || tx.say("pc_endFailed"));
           return;
         }
         setEditing(false);
         router.refresh();
       } catch (error) {
-        setMessage(error instanceof Error ? error.message : "Unable to update the end date.");
+        setMessage(error instanceof Error ? error.message : tx.say("pc_endFailed"));
       }
     });
   }
@@ -421,10 +443,10 @@ export function EditableEndDate({ rentalId, currentEndDate }: { rentalId: string
       <span className="inline-flex flex-wrap items-center gap-2">
         <input className="font-mono-data h-8 rounded-lg border border-[var(--border)] bg-white px-2 text-xs font-semibold" type="date" value={value} onChange={(event) => setValue(event.target.value)} />
         <ActionButton disabled={isPending} onClick={save} tone="primary">
-          {isPending ? "Saving..." : "Save"}
+          {isPending ? tx.say("saving") : tx.say("pc_save")}
         </ActionButton>
         <ActionButton disabled={isPending} onClick={() => { setValue(dateInput(currentEndDate)); setMessage(null); setEditing(false); }}>
-          Cancel
+          {tx.say("cancelBtn")}
         </ActionButton>
         {message ? <span className="basis-full text-xs font-semibold text-[#dc2626]">{message}</span> : null}
       </span>
@@ -433,9 +455,9 @@ export function EditableEndDate({ rentalId, currentEndDate }: { rentalId: string
 
   return (
     <span className="inline-flex items-center gap-1">
-      <span>{dateLabel(currentEndDate)}</span>
+      <span>{dateLabel(currentEndDate, tx.locale)}</span>
       <button
-        aria-label="Edit rental end date"
+        aria-label={tx.say("pc_editEnd")}
         className="pressable inline-flex h-6 w-6 items-center justify-center rounded-full text-[var(--muted)] hover:bg-[var(--panel-secondary)] hover:text-[var(--primary)]"
         onClick={() => setEditing(true)}
         type="button"
@@ -448,13 +470,14 @@ export function EditableEndDate({ rentalId, currentEndDate }: { rentalId: string
 
 export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }) {
   const router = useRouter();
+  const tx = useCtl();
   const metadata = payment.metadata || {};
   const isExtension = metadata.type === "extension" || metadata.adjustment_type === "extension";
   const voided = isPaymentVoided(payment);
   const [editing, setEditing] = useState(false);
   const [amount, setAmount] = useState(amountInput(payment.amount));
   const [dueDate, setDueDate] = useState(dateInput(payment.due_date));
-  const [description, setDescription] = useState(paymentDescription(payment));
+  const [description, setDescription] = useState(String(metadata.description || ""));
   const [status, setStatus] = useState(String(payment.status || "pending"));
   const [paidDate, setPaidDate] = useState(dateInput(payment.paid_at));
   const [recordingPayment, setRecordingPayment] = useState(false);
@@ -498,7 +521,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
         setEditing(false);
         router.refresh();
       } catch (error) {
-        setMessage(error instanceof Error ? error.message : "Unable to update this payment.");
+        setMessage(error instanceof Error ? error.message : tx.say("pc_updateFailed"));
       }
     });
   }
@@ -516,7 +539,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
         setRecordingPayment(false);
         router.refresh();
       } catch (error) {
-        setMessage(error instanceof Error ? error.message : "Unable to record this payment.");
+        setMessage(error instanceof Error ? error.message : tx.say("pc_recordFailed"));
       }
     });
   }
@@ -531,25 +554,25 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
             <SmallBadge tone={badgeTone as any}>
               {(() => {
                 // Say where the payment stands in plain words, not the stored status.
-                if (voided) return "Cancelled";
-                if (status === "paid") return "Paid";
-                if (status === "waived") return "Waived";
+                if (voided) return tx.say("pc_b_cancelled");
+                if (status === "paid") return tx.say("pc_b_paid");
+                if (status === "waived") return tx.say("pc_b_waived");
                 const due = String(payment.due_date || "").slice(0, 10);
                 const todayHere = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date());
-                if (!due) return "No date";
-                if (due < todayHere) return "Overdue";
-                if (due === todayHere) return "Due today";
-                return "Not due yet";
+                if (!due) return tx.say("pc_b_noDate");
+                if (due < todayHere) return tx.say("pc_b_overdue");
+                if (due === todayHere) return tx.say("pc_b_dueToday");
+                return tx.say("pc_b_notDue");
               })()}
             </SmallBadge>
-            {isExtension ? <SmallBadge tone="blue">Extension</SmallBadge> : null}
+            {isExtension ? <SmallBadge tone="blue">{tx.say("pc_extension")}</SmallBadge> : null}
           </div>
-          <p className={`text-sm ${voided ? "text-[var(--muted)]" : "text-[var(--muted)]"}`}>{paymentDescription(payment)}</p>
-          <p className="text-sm text-[var(--muted)]">Due {dateLabel(payment.due_date)}</p>
+          <p className={`text-sm ${voided ? "text-[var(--muted)]" : "text-[var(--muted)]"}`}>{paymentDescription(payment, tx)}</p>
+          <p className="text-sm text-[var(--muted)]">{tx.say("pc_due", { date: dateLabel(payment.due_date, tx.locale) })}</p>
           {(payment as any).receipt_url ? (
             <a className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-[var(--primary)] hover:underline" href={(payment as any).receipt_url} rel="noreferrer" target="_blank">
               <i aria-hidden="true" className="ti ti-receipt text-[14px]" />
-              {status === "paid" ? "View receipt" : "Customer sent a receipt · view"}
+              {status === "paid" ? tx.say("pc_viewReceipt") : tx.say("pc_receiptSent")}
             </a>
           ) : null}
         </div>
@@ -565,7 +588,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
               type="button"
             >
               <i aria-hidden="true" className="ti ti-cash text-[14px]" />
-              Record payment
+              {tx.say("pc_record")}
             </button>
           ) : null}
           {!voided ? (
@@ -580,33 +603,33 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
         <div className="mt-3 rounded-lg border border-[var(--border)] bg-white p-3">
           <div className="grid gap-3 sm:grid-cols-2">
             <label>
-              Amount received
+              {tx.say("pc_amountReceived")}
               <div className="mt-1 flex items-center rounded-lg border border-[var(--border-strong)] bg-white">
                 <span className="font-mono-data px-3 text-sm font-semibold text-[var(--muted)]">฿</span>
                 <input className="font-mono-data h-9 min-w-0 flex-1 border-0 bg-transparent px-0 pr-3 text-sm outline-none" min="0" step="0.01" type="number" value={recordAmount} onChange={(event) => setRecordAmount(event.target.value)} />
               </div>
             </label>
             <label>
-              Date received
+              {tx.say("pc_dateReceived")}
               <input className="mt-1 w-full" type="date" value={recordDate} onChange={(event) => setRecordDate(event.target.value)} />
             </label>
             <label>
-              Payment method
+              {tx.say("pc_method")}
               <select className="mt-1 w-full" value={recordMethod} onChange={(event) => setRecordMethod(event.target.value)}>
                 {paymentMethodOptions.map((option) => (
-                  <option key={option} value={option}>{option.replace(/_/g, " ")}</option>
+                  <option key={option} value={option}>{tx.optionName(option)}</option>
                 ))}
               </select>
             </label>
             <label>
-              Note
-              <input className="mt-1 w-full" placeholder="Optional receipt or reference note" type="text" value={recordNote} onChange={(event) => setRecordNote(event.target.value)} />
+              {tx.say("pc_note")}
+              <input className="mt-1 w-full" placeholder={tx.say("pc_notePlaceholder")} type="text" value={recordNote} onChange={(event) => setRecordNote(event.target.value)} />
             </label>
           </div>
           {message ? <p className="mt-3 rounded-lg bg-[#fef2f2] p-2 text-xs font-semibold text-[#dc2626]">{message}</p> : null}
           <div className="mt-3 flex flex-wrap gap-2">
-            <ActionButton disabled={isPending} onClick={saveReceivedPayment} tone="primary">{isPending ? "Recording..." : "Confirm received"}</ActionButton>
-            <ActionButton disabled={isPending} onClick={() => setRecordingPayment(false)}>Cancel</ActionButton>
+            <ActionButton disabled={isPending} onClick={saveReceivedPayment} tone="primary">{isPending ? tx.say("pc_recording") : tx.say("pc_confirmReceived")}</ActionButton>
+            <ActionButton disabled={isPending} onClick={() => setRecordingPayment(false)}>{tx.say("cancelBtn")}</ActionButton>
           </div>
         </div>
       ) : null}
@@ -615,42 +638,42 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
         <div className="mt-3 rounded-lg border border-[var(--border)] bg-white p-3">
           <div className="grid gap-3 sm:grid-cols-2">
             <label>
-              Amount
+              {tx.say("pc_amount")}
               <div className="mt-1 flex items-center rounded-lg border border-[var(--border-strong)] bg-white">
                 <span className="font-mono-data px-3 text-sm font-semibold text-[var(--muted)]">฿</span>
                 <input className="font-mono-data h-9 min-w-0 flex-1 border-0 bg-transparent px-0 pr-3 text-sm outline-none" min="0" step="0.01" type="number" value={amount} onChange={(event) => setAmount(event.target.value)} />
               </div>
             </label>
             <label>
-              Due date
+              {tx.say("pc_dueDate")}
               <input className="mt-1 w-full" type="date" value={dueDate} onChange={(event) => setDueDate(event.target.value)} />
             </label>
             <label className="sm:col-span-2">
-              Description
+              {tx.say("pc_description")}
               <input className="mt-1 w-full" type="text" value={description} onChange={(event) => setDescription(event.target.value)} />
             </label>
             <label>
-              Status
+              {tx.say("pc_status")}
               <select className="mt-1 w-full" value={status} onChange={(event) => setStatus(event.target.value)}>
                 {editablePaymentStatuses.map((option) => (
-                  <option key={option} value={option}>{option.replace(/_/g, " ")}</option>
+                  <option key={option} value={option}>{tx.optionName(option)}</option>
                 ))}
               </select>
               <p className="mt-1 text-xs text-[var(--muted)]">
-                To record a payment as received, use "Record payment" - this correctly updates income totals.
+                {tx.say("pc_statusHint")}
               </p>
             </label>
             {status === "paid" ? (
               <label>
-                Paid date
+                {tx.say("pc_paidDate")}
                 <input className="mt-1 w-full" type="date" value={paidDate} onChange={(event) => setPaidDate(event.target.value)} />
               </label>
             ) : null}
           </div>
           {message ? <p className="mt-3 rounded-lg bg-[#fef2f2] p-2 text-xs font-semibold text-[#dc2626]">{message}</p> : null}
           <div className="mt-3 flex flex-wrap gap-2">
-            <ActionButton disabled={isPending} onClick={save} tone="primary">{isPending ? "Saving..." : "Save changes"}</ActionButton>
-            <ActionButton disabled={isPending} onClick={() => setEditing(false)}>Cancel</ActionButton>
+            <ActionButton disabled={isPending} onClick={save} tone="primary">{isPending ? tx.say("saving") : tx.say("pc_saveChanges")}</ActionButton>
+            <ActionButton disabled={isPending} onClick={() => setEditing(false)}>{tx.say("cancelBtn")}</ActionButton>
           </div>
           {!showDeleteConfirm ? (
             <div style={{ marginTop: 8 }}>
@@ -662,7 +685,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
                   color: "#dc2626", cursor: "pointer", fontWeight: 500
                 }}
               >
-                Delete this payment
+                {tx.say("pc_deletePayment")}
               </button>
             </div>
           ) : (
@@ -671,7 +694,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
               borderRadius: 7, padding: "10px 12px", marginTop: 8
             }}>
               <p style={{ fontSize: 12, color: "#dc2626", fontWeight: 500, margin: "0 0 6px" }}>
-                Delete this payment? This cannot be undone.
+                {tx.say("pc_deletePaymentConfirm")}
               </p>
               <div style={{ display: "flex", gap: 6 }}>
                 <button
@@ -682,7 +705,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
                     color: "#64748b", cursor: "pointer"
                   }}
                 >
-                  Cancel
+                  {tx.say("cancelBtn")}
                 </button>
                 <button
                   onClick={() => {
@@ -693,7 +716,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
                         setEditing(false);
                         router.refresh();
                       } catch (error) {
-                        setMessage(error instanceof Error ? error.message : "Failed to delete payment");
+                        setMessage(error instanceof Error ? error.message : tx.say("pc_deletePaymentFailed"));
                       }
                     });
                   }}
@@ -703,7 +726,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
                     color: "#fff", cursor: "pointer", fontWeight: 500
                   }}
                 >
-                  Confirm delete
+                  {tx.say("pc_confirmDelete")}
                 </button>
               </div>
             </div>
@@ -716,6 +739,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
 
 export function EditableTransactionRow({ transaction }: { transaction: BookingTransaction }) {
   const router = useRouter();
+  const tx = useCtl();
   const isRefund = transaction.type === "refund" || transaction.metadata?.adjustment_type === "early_return";
   const voided = isTransactionVoided(transaction);
   const [editing, setEditing] = useState(false);
@@ -746,7 +770,7 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
         setEditing(false);
         router.refresh();
       } catch (error) {
-        setMessage(error instanceof Error ? error.message : "Unable to update this transaction.");
+        setMessage(error instanceof Error ? error.message : tx.say("pc_txFailed"));
       }
     });
   }
@@ -756,11 +780,11 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <p className={`font-semibold ${voided ? "text-[var(--muted)]" : "text-[var(--foreground)]"}`}>{String(transaction.type || "other").replace(/_/g, " ")}</p>
-            {isRefund ? <SmallBadge tone="amber">Refund</SmallBadge> : null}
-            {voided ? <SmallBadge tone="neutral">Voided</SmallBadge> : null}
+            <p className={`font-semibold ${voided ? "text-[var(--muted)]" : "text-[var(--foreground)]"}`}>{tx.typeName(String(transaction.type || "other"))}</p>
+            {isRefund ? <SmallBadge tone="amber">{tx.say("pc_refund")}</SmallBadge> : null}
+            {voided ? <SmallBadge tone="neutral">{tx.say("pc_voided")}</SmallBadge> : null}
           </div>
-          <p className={`text-sm ${voided ? "text-[var(--muted)]" : "text-[var(--muted)]"}`}>{dateLabel(transaction.transaction_date)} {transaction.notes ? `/ ${transaction.notes}` : ""}</p>
+          <p className={`text-sm ${voided ? "text-[var(--muted)]" : "text-[var(--muted)]"}`}>{dateLabel(transaction.transaction_date, tx.locale)} {transaction.notes ? `/ ${transaction.notes}` : ""}</p>
           {isRefund && transaction.metadata?.refund_reason ? <p className="mt-1 text-sm font-semibold text-[#b45309]">{transaction.metadata.refund_reason}</p> : null}
         </div>
         <div className="flex shrink-0 items-center gap-2">
@@ -777,33 +801,33 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
         <div className="mt-3 rounded-lg border border-[var(--border)] bg-white p-3">
           <div className="grid gap-3 sm:grid-cols-2">
             <label>
-              Amount
+              {tx.say("pc_amount")}
               <div className="mt-1 flex items-center rounded-lg border border-[var(--border-strong)] bg-white">
                 <span className="font-mono-data px-3 text-sm font-semibold text-[var(--muted)]">฿</span>
                 <input className="font-mono-data h-9 min-w-0 flex-1 border-0 bg-transparent px-0 pr-3 text-sm outline-none" step="0.01" type="number" value={amount} onChange={(event) => setAmount(event.target.value)} />
               </div>
             </label>
             <label>
-              Date
+              {tx.say("pc_date")}
               <input className="mt-1 w-full" type="date" value={transactionDate} onChange={(event) => setTransactionDate(event.target.value)} />
             </label>
             <label>
-              Type
+              {tx.say("pc_type")}
               <select className="mt-1 w-full" value={type} onChange={(event) => setType(event.target.value)}>
                 {transactionTypeOptions.map((option) => (
-                  <option key={option} value={option}>{option.replace(/_/g, " ")}</option>
+                  <option key={option} value={option}>{tx.optionName(option)}</option>
                 ))}
               </select>
             </label>
             <label className="sm:col-span-2">
-              Description
+              {tx.say("pc_description")}
               <input className="mt-1 w-full" type="text" value={description} onChange={(event) => setDescription(event.target.value)} />
             </label>
           </div>
           {message ? <p className="mt-3 rounded-lg bg-[#fef2f2] p-2 text-xs font-semibold text-[#dc2626]">{message}</p> : null}
           <div className="mt-3 flex flex-wrap gap-2">
-            <ActionButton disabled={isPending} onClick={save} tone="primary">{isPending ? "Saving..." : "Save changes"}</ActionButton>
-            <ActionButton disabled={isPending} onClick={() => setEditing(false)}>Cancel</ActionButton>
+            <ActionButton disabled={isPending} onClick={save} tone="primary">{isPending ? tx.say("saving") : tx.say("pc_saveChanges")}</ActionButton>
+            <ActionButton disabled={isPending} onClick={() => setEditing(false)}>{tx.say("cancelBtn")}</ActionButton>
           </div>
           {!showDeleteConfirm ? (
             <div style={{ marginTop: 8 }}>
@@ -815,7 +839,7 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
                   color: "#dc2626", cursor: "pointer", fontWeight: 500
                 }}
               >
-                Delete this transaction
+                {tx.say("pc_deleteTx")}
               </button>
             </div>
           ) : (
@@ -824,7 +848,7 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
               borderRadius: 7, padding: "10px 12px", marginTop: 8
             }}>
               <p style={{ fontSize: 12, color: "#dc2626", fontWeight: 500, margin: "0 0 6px" }}>
-                Delete this transaction? This cannot be undone.
+                {tx.say("pc_deleteTxConfirm")}
               </p>
               <div style={{ display: "flex", gap: 6 }}>
                 <button
@@ -835,7 +859,7 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
                     color: "#64748b", cursor: "pointer"
                   }}
                 >
-                  Cancel
+                  {tx.say("cancelBtn")}
                 </button>
                 <button
                   onClick={() => {
@@ -846,7 +870,7 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
                         setEditing(false);
                         router.refresh();
                       } catch (error) {
-                        setMessage(error instanceof Error ? error.message : "Failed to delete transaction");
+                        setMessage(error instanceof Error ? error.message : tx.say("pc_deleteTxFailed"));
                       }
                     });
                   }}
@@ -856,7 +880,7 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
                     color: "#fff", cursor: "pointer", fontWeight: 500
                   }}
                 >
-                  Confirm delete
+                  {tx.say("pc_confirmDelete")}
                 </button>
               </div>
             </div>

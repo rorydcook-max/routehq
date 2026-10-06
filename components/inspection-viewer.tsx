@@ -1,15 +1,17 @@
 import { Camera, FileVideo, Fuel, Gauge, PenLine, ShieldAlert } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
+import { intlLocale } from "@/lib/i18n/dates";
 import { TranslatedText } from "@/components/translated-text";
 import { Badge } from "@/components/ui";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { translateForReader } from "@/lib/content-translation";
 
-function formatDate(value: string | null | undefined) {
+function formatDate(value: string | null | undefined, locale: string, notSet: string) {
   if (!value) {
-    return "Not set";
+    return notSet;
   }
-  return new Intl.DateTimeFormat("en-GB", {
+  return new Intl.DateTimeFormat(intlLocale(locale), {
     dateStyle: "medium",
     timeStyle: "short"
   }).format(new Date(value));
@@ -21,11 +23,12 @@ function photoUrl(photo: any) {
 
 export function FuelGaugeView({ value }: { value: number | null | undefined }) {
   const safeValue = Math.max(0, Math.min(100, Number(value || 0)));
+  const t = useTranslations("inspection");
 
   return (
     <div className="rounded-lg border border-[var(--border)] bg-white p-3">
       <div className="mb-2 flex items-center justify-between text-sm font-bold text-[var(--foreground-secondary)]">
-        <span>Fuel level</span>
+        <span>{t("viewFuel")}</span>
         <span>{safeValue}%</span>
       </div>
       <div className="h-3 overflow-hidden rounded-full bg-[#fbfaf8]">
@@ -63,9 +66,9 @@ export async function InspectionViewer({ inspection }: { inspection: any }) {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <Badge tone={type === "return" ? "red" : type === "condition_report" ? "amber" : "green"}>
-            {type === "condition_report" ? "CONDITION REPORT" : String(type || "inspection").toUpperCase()}
+            {t.has(`viewType_${type}`) ? t(`viewType_${type}`) : String(type || "inspection").toUpperCase()}
           </Badge>
-          <p className="mt-2 text-sm font-semibold text-[var(--muted)]">{formatDate(inspection.submitted_at || inspection.inspected_at || inspection.created_at)}</p>
+          <p className="mt-2 text-sm font-semibold text-[var(--muted)]">{formatDate(inspection.submitted_at || inspection.inspected_at || inspection.created_at, locale, t("viewNotSet"))}</p>
           {inspection.customers?.full_name ? <p className="mt-1 font-semibold text-[var(--foreground)]">{inspection.customers.full_name}</p> : null}
         </div>
         <div className="grid grid-cols-2 gap-2 text-right">
@@ -88,7 +91,7 @@ export async function InspectionViewer({ inspection }: { inspection: any }) {
         <div className="mt-4 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
           <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-[var(--foreground)]">
             <FileVideo size={17} className="text-[var(--primary)]" />
-            Walkaround video
+            {t("viewVideo")}
           </div>
           <video className="max-h-80 w-full rounded-lg bg-black" controls src={videoUrl} />
         </div>
@@ -98,15 +101,15 @@ export async function InspectionViewer({ inspection }: { inspection: any }) {
         <details className="mt-4">
           <summary className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-[var(--foreground)]">
             <Camera size={17} className="text-[var(--primary)]" />
-            {photos.length} {photos.length === 1 ? "photo" : "photos"}
-            <span className="font-normal text-[var(--muted)]">Show</span>
+            {t("viewPhotos", { count: photos.length })}
+            <span className="font-normal text-[var(--muted)]">{t("viewShow")}</span>
           </summary>
           <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
             {photos.map((photo: any) => {
               const url = photoUrl(photo);
               return (
                 <a className="block overflow-hidden rounded-lg border border-[var(--border)] bg-[#fbfaf8]" href={url || "#"} key={photo.id} target="_blank">
-                  {url ? <img alt={photo.type || "Inspection photo"} className="h-28 w-full object-cover" src={url} /> : <div className="h-28" />}
+                  {url ? <img alt={photo.type || t("viewPhotoAlt")} className="h-28 w-full object-cover" src={url} /> : <div className="h-28" />}
                   <p className="px-2 py-1 text-xs font-bold text-[var(--foreground-secondary)]">{String(photo.type || "photo").replace(/_/g, " ")}</p>
                 </a>
               );
@@ -118,10 +121,10 @@ export async function InspectionViewer({ inspection }: { inspection: any }) {
       <div className="mt-4">
         <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-[var(--foreground)]">
           <ShieldAlert size={17} className="text-[var(--primary)]" />
-          Damage
+          {t("viewDamage")}
         </div>
         {damageItems.length === 0 ? (
-          <p className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3 text-sm font-semibold text-[var(--muted)]">No damage items recorded.</p>
+          <p className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3 text-sm font-semibold text-[var(--muted)]">{t("viewNoDamage")}</p>
         ) : (
           <div className="space-y-2">
             {damageItems.map((item: any, index: number) => (
@@ -132,11 +135,11 @@ export async function InspectionViewer({ inspection }: { inspection: any }) {
                       {areaName(String(item.location || "vehicle"))} · {severityName(String(item.severity || ""))}
                     </p>
                     <TranslatedText className="mt-1 text-sm text-[var(--muted)]" value={descriptions[index]} />
-                    <Badge tone={item.is_pre_existing ? "neutral" : "red"}>{item.is_pre_existing ? "Pre-existing" : "New damage"}</Badge>
+                    <Badge tone={item.is_pre_existing ? "neutral" : "red"}>{item.is_pre_existing ? t("viewPreExisting") : t("viewNew")}</Badge>
                   </div>
                   {item.photo_url ? (
                     <a className="text-sm font-bold text-[var(--primary)]" href={item.photo_url} target="_blank">
-                      Photo
+                      {t("viewPhoto")}
                     </a>
                   ) : null}
                 </div>
@@ -150,11 +153,11 @@ export async function InspectionViewer({ inspection }: { inspection: any }) {
         <div className="mt-4 rounded-lg border border-[var(--border)] bg-white p-3">
           <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-[var(--foreground)]">
             <PenLine size={17} className="text-[var(--primary)]" />
-            Customer signature
+            {t("viewSignature")}
           </div>
-          <img alt="Customer signature" className="max-h-40 rounded-lg border border-[var(--border)] bg-[#fbfaf8]" src={inspection.customer_signature} />
+          <img alt={t("viewSignature")} className="max-h-40 rounded-lg border border-[var(--border)] bg-[#fbfaf8]" src={inspection.customer_signature} />
           <p className="mt-2 text-sm text-[var(--muted)]">
-            Signed by {inspection.customer_signed_name || "customer"} · {formatDate(inspection.customer_signed_at)}
+            {t("viewSignedBy", { name: inspection.customer_signed_name || t("viewCustomer"), when: formatDate(inspection.customer_signed_at, locale, t("viewNotSet")) })}
           </p>
         </div>
       ) : null}

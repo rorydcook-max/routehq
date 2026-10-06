@@ -71,7 +71,8 @@ const recordItems: NavItem[] = [
 ];
 
 // Phones get the four places used most every day; everything else is under More.
-const mobileBarKeys: NavKey[] = ["dashboard", "bookings", "inbox"];
+// Rory, 6 Oct: To do and Inbox earn a place in the bar; Bookings is one tap away under More.
+const mobileBarKeys: NavKey[] = ["dashboard", "tasks", "inbox"];
 
 export function AppShell({ children, userEmail }: { children: React.ReactNode; userEmail?: string | null }) {
   const t = useTranslations("nav");
@@ -99,7 +100,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
   const visibleRecordItems = isTeammate ? recordItems.filter((item) => item.href !== "/settings") : recordItems;
   const allNavItems = [...dailyItems, ...visibleRecordItems];
   const mobileBarItems = mobileBarKeys.map((key) => allNavItems.find((item) => item.key === key)).filter(Boolean) as NavItem[];
-  const moreItems = allNavItems.filter((item) => !mobileBarKeys.includes(item.key)).sort((a, b) => Number(b.key === "tasks") - Number(a.key === "tasks"));
+  const moreItems = allNavItems.filter((item) => !mobileBarKeys.includes(item.key)).sort((a, b) => Number(b.key === "bookings") - Number(a.key === "bookings"));
 
   const onFocusedFlow = !!pathname && (pathname.startsWith("/inspections") || /\/(new|edit|import)(\/|$)/.test(pathname));
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
@@ -227,9 +228,9 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
             return (
               <Fragment key={item.key}>
               {index === 2 && !onFocusedFlow ? (
-                <button aria-label={t("openFastActions")} className="flex items-start justify-center" onClick={() => setFastActionOpen(true)} type="button">
-                  {/* Centred on the same line as the icons either side of it. */}
-                  <span className="-mt-[3px] flex h-10 w-10 items-center justify-center rounded-full bg-[var(--primary)] text-white shadow-[0_4px_12px_rgba(15,118,110,0.28)]">
+                <button aria-label={t("openFastActions")} className="flex items-center justify-center" onClick={() => setFastActionOpen(true)} type="button">
+                  {/* Centred in the bar: its middle sits level with the middle of each icon-and-label pair. */}
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--primary)] text-white shadow-[0_4px_12px_rgba(15,118,110,0.28)]">
                     <Plus size={22} />
                   </span>
                 </button>
@@ -262,11 +263,12 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
           >
             <span className="relative">
               <MoreHorizontal size={18} />
-              {shell.dueTasks > 0 ? (
+              {shell.dueTasks > 0 && !mobileBarKeys.includes("tasks") ? (
                 <span className="absolute -right-2.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--primary)] px-1 text-[10px] font-semibold text-white">{shell.dueTasks}</span>
               ) : null}
             </span>
-            <span className="truncate">{t("more")}</span>
+            {/* Same size as the other labels: buttons otherwise take the page's larger default. */}
+            <span className="max-w-full truncate text-[11px] leading-[16.5px]">{t("more")}</span>
           </button>
         </div>
       </nav>

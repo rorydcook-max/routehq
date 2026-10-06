@@ -1295,8 +1295,8 @@ textarea:focus {
 @layer base {
   label {
     color: var(--foreground-secondary);
-    font-size: 12px;
-    font-weight: 550;
+    font-size: 14px;
+    font-weight: 600;
   }
 }
 
@@ -1305,8 +1305,8 @@ th {
   background: transparent;
   border-bottom: 1px solid var(--border);
   color: var(--muted);
-  font-size: 12px;
-  font-weight: 550;
+  font-size: 14px;
+  font-weight: 600;
   letter-spacing: 0;
   text-transform: none;
 }

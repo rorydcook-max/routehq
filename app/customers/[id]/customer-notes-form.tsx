@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { updateCustomer } from "@/app/actions/customers";
 
 export function CustomerNotesForm({
@@ -12,6 +13,7 @@ export function CustomerNotesForm({
   organizationId: string;
   notes: string;
 }) {
+  const say = useTranslations("customerPage") as unknown as (key: string) => string;
   const formRef = useRef<HTMLFormElement>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -27,13 +29,8 @@ export function CustomerNotesForm({
     >
       <input name="customerId" type="hidden" value={customerId} />
       <input name="organizationId" type="hidden" value={organizationId} />
-      <textarea
-        className="min-h-32 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-3 text-sm text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
-        defaultValue={notes}
-        name="notes"
-        placeholder="Customer notes, preferences, payment habits, document reminders..."
-      />
-      <p className="mt-2 text-xs text-[var(--muted)]">{isPending ? "Saving notes..." : "Saves automatically when you leave the notes field."}</p>
+      <textarea className="min-h-32 w-full" defaultValue={notes} name="notes" placeholder={say("n_placeholder")} />
+      <p className="mt-2 font-medium text-[var(--foreground-secondary)]">{isPending ? say("saving") : say("n_auto")}</p>
     </form>
   );
 }

@@ -122,7 +122,7 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
                       document.signedUrl ? (
                         <a href={document.signedUrl} key={document.id} rel="noreferrer" target="_blank" title={document.category.replace(/_/g, " ")}>
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img alt={document.category.replace(/_/g, " ")} className="h-16 w-24 rounded-lg border border-[var(--border)] bg-[#fbfaf8] object-cover" loading="lazy" src={document.signedUrl} />
+                          <img alt={document.category.replace(/_/g, " ")} className="h-16 w-24 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] object-cover" loading="lazy" src={document.signedUrl} />
                         </a>
                       ) : null
                     )}
@@ -140,7 +140,7 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
                 ) : (
                   <span
                     className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
-                      document.ownerType === "signed" ? "bg-[#dcfce7] text-[#16a34a]" : "bg-[var(--primary-light)] text-[var(--primary)]"
+                      document.ownerType === "signed" ? "bg-[var(--success-light)] text-[var(--success)]" : "bg-[var(--primary-light)] text-[var(--primary)]"
                     }`}
                   >
                     {document.ownerType === "signed" ? <FileSignature size={20} /> : <FileText size={20} />}

@@ -43,7 +43,7 @@ export function BranchList({ branches, organizationId }: { branches: Branch[]; o
       </div>
 
       {isAddingBranch ? (
-        <form action={createBranch} className="grid gap-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3 sm:grid-cols-2">
+        <form action={createBranch} className="grid gap-3 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3 sm:grid-cols-2">
           <input name="organizationId" type="hidden" value={organizationId} />
           <label className="block">
             <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Branch name</span>
@@ -110,7 +110,7 @@ export function BranchList({ branches, organizationId }: { branches: Branch[]; o
                   <input name="branchId" type="hidden" value={branch.id} />
                   <PendingButton
                     aria-label={`Delete ${branch.name}`}
-                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#fecaca] bg-white p-0 text-[#dc2626] shadow-sm transition hover:bg-[#fef2f2]"
+                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--danger-line)] bg-white p-0 text-[var(--danger)] shadow-sm transition hover:bg-[var(--danger-light)]"
                     onClick={(event) => {
                       if (!window.confirm(`Delete ${branch.name}? Vehicles assigned to this branch will keep their records but no longer have this home branch.`)) {
                         event.preventDefault();
@@ -127,7 +127,7 @@ export function BranchList({ branches, organizationId }: { branches: Branch[]; o
             </div>
 
             {isEditing ? (
-              <form action={updateBranch} className="mx-[14px] mb-3 grid gap-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3 sm:grid-cols-2">
+              <form action={updateBranch} className="mx-[14px] mb-3 grid gap-3 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3 sm:grid-cols-2">
                 <input name="organizationId" type="hidden" value={organizationId} />
                 <input name="branchId" type="hidden" value={branch.id} />
                 <label className="block">

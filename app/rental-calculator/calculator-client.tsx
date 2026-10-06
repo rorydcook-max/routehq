@@ -272,7 +272,7 @@ function VehicleSelectorMini({
             <div className="max-h-64 overflow-y-auto py-1">
               {filteredMakes.map((m) => (
                 <button
-                  className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm font-semibold hover:bg-[#fbfaf8]"
+                  className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm font-semibold hover:bg-[var(--panel-secondary)]"
                   key={m.id}
                   onClick={() => selectMake(m)}
                   type="button"
@@ -612,7 +612,7 @@ export function CalculatorClient({
               {/* Finance toggle */}
               <label className="flex cursor-pointer items-center gap-3">
                 <div
-                  className={`relative h-6 w-11 rounded-full transition-colors ${financed ? "bg-[var(--primary)]" : "bg-[#d1d5db]"}`}
+                  className={`relative h-6 w-11 rounded-full transition-colors ${financed ? "bg-[var(--primary)]" : "bg-[var(--border)]"}`}
                   onClick={() => setFinanced((f) => !f)}
                 >
                   <span
@@ -689,17 +689,17 @@ export function CalculatorClient({
                 <span className="mt-1 text-xs font-semibold text-[var(--primary)] animate-pulse">Estimating…</span>
               )}
               {aiLoaded && !aiLoading && (
-                <span className="mt-1 rounded-full bg-[#dcfce7] px-2 py-0.5 text-xs font-semibold text-[#166534]">AI estimated</span>
+                <span className="mt-1 rounded-full bg-[var(--success-light)] px-2 py-0.5 text-xs font-semibold text-[var(--success)]">AI estimated</span>
               )}
             </div>
 
             {!vehicleIdentified && (
-              <p className="mt-3 rounded-lg bg-[#fffbeb] px-3 py-2 text-sm text-[#92400e]">
+              <p className="mt-3 rounded-lg bg-[var(--warning-light)] px-3 py-2 text-sm text-[var(--warning)]">
                 Select make, model, and year above to get AI cost estimates for this vehicle.
               </p>
             )}
             {aiError && (
-              <p className="mt-3 rounded-lg bg-[#ffe4e6] px-3 py-2 text-sm font-semibold text-[#be123c]">{aiError}</p>
+              <p className="mt-3 rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">{aiError}</p>
             )}
 
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -715,7 +715,7 @@ export function CalculatorClient({
                 <label className="block" key={key}>
                   <span className="text-sm font-semibold text-[var(--foreground-secondary)]">
                     {label}
-                    {aiLoaded && <span className="ml-1 rounded-full bg-[#dcfce7] px-1.5 py-0.5 text-[10px] font-semibold text-[#166534]">AI</span>}
+                    {aiLoaded && <span className="ml-1 rounded-full bg-[var(--success-light)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--success)]">AI</span>}
                   </span>
                   <input
                     className={inputCls}
@@ -731,7 +731,7 @@ export function CalculatorClient({
               <label className="block">
                 <span className="text-sm font-semibold text-[var(--foreground-secondary)]">
                   Reliability score (0–100)
-                  {aiLoaded && <span className="ml-1 rounded-full bg-[#dcfce7] px-1.5 py-0.5 text-[10px] font-semibold text-[#166534]">AI</span>}
+                  {aiLoaded && <span className="ml-1 rounded-full bg-[var(--success-light)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--success)]">AI</span>}
                 </span>
                 <input
                   className={inputCls}
@@ -830,7 +830,7 @@ export function CalculatorClient({
                         labelFormatter={(l: unknown) => `Month ${l}`}
                       />
                       <ReferenceLine
-                        label={{ value: "Break even", position: "right", fontSize: 11, fill: "#be123c" }}
+                        label={{ value: "Break even", position: "right", fontSize: 11, fill: "var(--danger)" }}
                         stroke="#a04b36"
                         strokeDasharray="4 4"
                         y={0}

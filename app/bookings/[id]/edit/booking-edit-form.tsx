@@ -362,23 +362,23 @@ function PaymentEditor({ payments, rentalId, currency, depositHeld }: { payments
     <Card>
       <SectionHeader eyebrow="Payment records" title="Edit schedule and corrections" />
       <div className="card-section overflow-x-auto">
-        {message ? <p className="mb-3 rounded-lg border border-[#fecaca] bg-[#fef2f2] p-2 text-xs font-bold text-[#dc2626]">{message}</p> : null}
+        {message ? <p className="mb-3 rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-2 text-xs font-bold text-[var(--danger)]">{message}</p> : null}
         {!hasUpcomingRentPayments ? (
-          <div className="mb-3 rounded-[10px] border border-[#fde68a] bg-[#fffbeb] p-3">
-            <p className="text-[13px] font-semibold text-[#92400e]">No payment schedule found</p>
-            <p className="mt-1 text-xs text-[#b45309]">
+          <div className="mb-3 rounded-[10px] border border-[var(--warning-line)] bg-[var(--warning-light)] p-3">
+            <p className="text-[13px] font-semibold text-[var(--warning)]">No payment schedule found</p>
+            <p className="mt-1 text-xs text-[var(--warning)]">
               No upcoming payment records exist. The schedule generates automatically when the rental activates — check the main booking page.
             </p>
           </div>
         ) : null}
         {hasDepositPayments ? (
-          <div className="mb-3 flex items-center gap-3 rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
+          <div className="mb-3 flex items-center gap-3 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3">
             <div className="flex-1">
-              <p className="text-xs font-bold text-[#92400e]">Deposit payment record detected</p>
-              <p className="mt-0.5 text-xs text-[#92400e]">A ฿{depositHeld.toLocaleString()} deposit payment record exists but deposits are tracked via deposit_held. Void it to fix the outstanding balance.</p>
+              <p className="text-xs font-bold text-[var(--warning)]">Deposit payment record detected</p>
+              <p className="mt-0.5 text-xs text-[var(--warning)]">A ฿{depositHeld.toLocaleString()} deposit payment record exists but deposits are tracked via deposit_held. Void it to fix the outstanding balance.</p>
             </div>
             <button
-              className="pressable shrink-0 rounded-lg border border-[#fde68a] bg-white px-3 py-2 text-xs font-bold text-[#92400e] hover:bg-[#fef3c7]"
+              className="pressable shrink-0 rounded-lg border border-[var(--warning-line)] bg-white px-3 py-2 text-xs font-bold text-[var(--warning)] hover:bg-[var(--warning-light)]"
               disabled={isPending}
               onClick={runDepositCleanup}
               type="button"
@@ -388,7 +388,7 @@ function PaymentEditor({ payments, rentalId, currency, depositHeld }: { payments
           </div>
         ) : null}
         {cleanupMessage ? (
-          <p className="mb-3 rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] p-2 text-xs font-bold text-[#15803d]">{cleanupMessage}</p>
+          <p className="mb-3 rounded-lg border border-[var(--success-line)] bg-[var(--success-light)] p-2 text-xs font-bold text-[var(--success)]">{cleanupMessage}</p>
         ) : null}
         <table className="min-w-[760px] w-full text-left">
           <thead>
@@ -439,13 +439,13 @@ function PaymentEditor({ payments, rentalId, currency, depositHeld }: { payments
                     {!voided ? (
                       confirmDeleteId === payment.id ? (
                         <div className="flex justify-end gap-1">
-                          <button className="pressable min-h-8 rounded-lg border border-[#fecaca] bg-[#dc2626] px-3 text-xs font-bold text-white" disabled={isPending} onClick={() => deletePayment(payment.id)} type="button">Confirm delete</button>
+                          <button className="pressable min-h-8 rounded-lg border border-[var(--danger-line)] bg-[var(--danger)] px-3 text-xs font-bold text-white" disabled={isPending} onClick={() => deletePayment(payment.id)} type="button">Confirm delete</button>
                           <button className="secondary-action pressable min-h-8 px-3 text-xs" onClick={() => setConfirmDeleteId(null)} type="button">Cancel</button>
                         </div>
                       ) : (
                         <div className="flex justify-end gap-2">
                           <button className="secondary-action pressable min-h-8 px-3 text-xs" onClick={() => setEditingId(payment.id)} type="button">Edit</button>
-                          <button className="pressable inline-flex min-h-8 items-center justify-center rounded-lg border border-[#fecaca] bg-[#fef2f2] px-2 text-xs font-bold text-[#dc2626]" onClick={() => setConfirmDeleteId(payment.id)} type="button">
+                          <button className="pressable inline-flex min-h-8 items-center justify-center rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] px-2 text-xs font-bold text-[var(--danger)]" onClick={() => setConfirmDeleteId(payment.id)} type="button">
                             <Trash2 size={13} />
                           </button>
                         </div>
@@ -514,7 +514,7 @@ export function BookingEditForm({
       ) : null}
 
       {saveError ? (
-        <p className="rounded-lg border border-[#fecaca] bg-[#fff1f2] p-3 text-sm font-bold text-[#be123c]" role="alert">{saveError}</p>
+        <p className="rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-3 text-sm font-bold text-[var(--danger)]" role="alert">{saveError}</p>
       ) : null}
       <form
         action={async (formData) => {

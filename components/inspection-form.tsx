@@ -90,7 +90,7 @@ function StepShell({
   children: React.ReactNode;
 }) {
   return (
-    <section className="min-h-[56vh] rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-4 shadow-[0_14px_32px_rgba(25,63,72,0.08)] sm:p-6">
+    <section className="min-h-[56vh] rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-4 shadow-[0_14px_32px_rgba(25,63,72,0.08)] sm:p-6">
       <p className="text-xs font-semibold uppercase text-[var(--primary)]">{eyebrow}</p>
       <h2 className="mt-1 text-2xl font-semibold text-[var(--foreground)]">{title}</h2>
       <div className="mt-5">{children}</div>
@@ -101,7 +101,7 @@ function StepShell({
 function Progress({ steps, step }: { steps: string[]; step: number }) {
   const t = useTranslations("inspection");
   return (
-    <div className="sticky top-0 z-20 -mx-4 border-b border-[var(--border)] bg-[#fbfaf8]/95 px-4 py-3 backdrop-blur sm:mx-0 sm:rounded-lg sm:border">
+    <div className="sticky top-0 z-20 -mx-4 border-b border-[var(--border)] bg-[var(--panel-secondary)]/95 px-4 py-3 backdrop-blur sm:mx-0 sm:rounded-lg sm:border">
       <div className="flex items-center justify-between text-xs font-bold text-[var(--muted)]">
         <span>{t("stepOf", { current: step + 1, total: steps.length })}</span>
         <span>{t(`steps.${steps[step]}`)}</span>
@@ -131,7 +131,7 @@ function FileCapture({
   const [preview, setPreview] = useState<string | null>(null);
 
   return (
-    <label className="block rounded-lg border border-dashed border-[#b8d4ce] bg-white p-4">
+    <label className="block rounded-lg border border-dashed border-[var(--info-line)] bg-white p-4">
       <span className="flex min-h-14 items-center justify-center gap-3 rounded-lg bg-[var(--primary-light)] px-4 py-3 text-base font-semibold text-[var(--primary)]">
         <Icon size={22} />
         {label}
@@ -272,7 +272,7 @@ function VehicleDiagram({ onSelect, selected, marked }: { onSelect: (location: s
       {areas.map((area) => (
         <button
           aria-label={t("logDamageAt", { area: area.label })}
-          className={`absolute flex items-center justify-center rounded-lg border px-1 text-center text-[11px] font-semibold leading-tight ${selected === area.key ? "border-[var(--primary)] bg-[var(--primary)] text-white" : marked?.includes(area.key) ? "border-[#be123c] bg-[#fff1f2] text-[#be123c]" : "border-[var(--primary)]/25 bg-[var(--primary)]/5 text-[var(--primary)]"} ${area.className}`}
+          className={`absolute flex items-center justify-center rounded-lg border px-1 text-center text-[11px] font-semibold leading-tight ${selected === area.key ? "border-[var(--primary)] bg-[var(--primary)] text-white" : marked?.includes(area.key) ? "border-[var(--danger)] bg-[var(--danger-light)] text-[var(--danger)]" : "border-[var(--primary)]/25 bg-[var(--primary)]/5 text-[var(--primary)]"} ${area.className}`}
           key={area.key}
           onClick={() => onSelect(area.key)}
           type="button"
@@ -317,7 +317,7 @@ function SignaturePad({
   return (
     <div className="rounded-xl border border-[var(--border)] bg-white p-3">
       <canvas
-        className="h-48 w-full touch-none rounded-lg bg-[#fbfaf8]"
+        className="h-48 w-full touch-none rounded-lg bg-[var(--panel-secondary)]"
         height={220}
         onPointerDown={(event) => {
           const canvas = canvasRef.current;
@@ -327,7 +327,7 @@ function SignaturePad({
           const { x, y } = point(event);
           context.lineWidth = 3;
           context.lineCap = "round";
-          context.strokeStyle = "#10252b";
+          context.strokeStyle = "#1b2430";
           context.beginPath();
           context.moveTo(x, y);
         }}
@@ -640,7 +640,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
     return (
       <>
       {uploadError ? (
-        <p className="mt-4 rounded-lg border border-[#fecdd3] bg-[#fff1f2] p-3 text-sm font-bold text-[#be123c]" role="alert">
+        <p className="mt-4 rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-3 text-sm font-bold text-[var(--danger)]" role="alert">
           {uploadError}
         </p>
       ) : null}
@@ -657,7 +657,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
         </button>
         {step < steps.length - 1 ? (
           <button
-            className={`${touchButton} flex-1 bg-[var(--primary)] text-white shadow-lg disabled:bg-[#94a3b8]`}
+            className={`${touchButton} flex-1 bg-[var(--primary)] text-white shadow-lg disabled:bg-[var(--muted)]`}
             disabled={!canAdvance()}
             // Distinct keys stop React reusing this button as the submit button, which let the
             // click that opened the last step also submit (condition reports need no signature).
@@ -670,7 +670,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
           </button>
         ) : (
           <button
-            className={`${touchButton} flex-1 bg-[var(--primary)] text-white shadow-lg disabled:bg-[#94a3b8]`}
+            className={`${touchButton} flex-1 bg-[var(--primary)] text-white shadow-lg disabled:bg-[var(--muted)]`}
             disabled={!canAdvance() || isPending}
             form="inspectionForm"
             key="submit"
@@ -748,10 +748,10 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                   {mode === "return" ? null : context.rental?.start_date ? t("rentalStarts", { date: formatDate(context.rental.start_date) }) : t("standaloneReport")}
                 </p>
                 {mode === "delivery" && context.rental?.start_date && String(context.rental.start_date).slice(0, 10) > new Date(Date.now() + 86_400_000).toISOString().slice(0, 10) ? (
-                  <p className="mt-2 rounded-lg bg-[#fef3c7] px-3 py-2 text-sm font-semibold text-[#92400e]">{t("startsLaterNote", { date: formatDate(context.rental.start_date) })}</p>
+                  <p className="mt-2 rounded-lg bg-[var(--warning-light)] px-3 py-2 text-sm font-semibold text-[var(--warning)]">{t("startsLaterNote", { date: formatDate(context.rental.start_date) })}</p>
                 ) : null}
                 {mode === "return" ? (
-                  <p className="mt-2 rounded-lg bg-[#fef3c7] px-3 py-2 text-sm font-bold text-[#92400e]">
+                  <p className="mt-2 rounded-lg bg-[var(--warning-light)] px-3 py-2 text-sm font-bold text-[var(--warning)]">
                     <span className="font-mono-data">
                       {handoverKm != null ? `${t("odometerAtDelivery", { km: handoverKm.toLocaleString("en-US") })} · ` : ""}
                       {t("rentalLengthDays", { count: daysBetween(context.rental?.start_date) })}
@@ -781,7 +781,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
               readOdometer(file);
             }}
           />
-          {ocrMessage ? <p className="mt-3 rounded-lg bg-[#fbfaf8] p-3 text-sm font-semibold text-[var(--primary)]">{ocrMessage}</p> : null}
+          {ocrMessage ? <p className="mt-3 rounded-lg bg-[var(--panel-secondary)] p-3 text-sm font-semibold text-[var(--primary)]">{ocrMessage}</p> : null}
           {mode === "return" && handoverKm != null ? (
             <p className="mt-3 text-sm font-semibold text-[var(--muted)]">
               <span className="font-mono-data">{t("odometerAtDelivery", { km: handoverKm.toLocaleString("en-US") })}</span>
@@ -801,7 +801,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
             <p className="mt-3 text-sm text-[var(--muted)]">{t("odometerUpdatesMileage")}</p>
           )}
           {odometer && Number(context.vehicle?.mileage || 0) > Number(odometer) ? (
-            <p className="mt-3 flex items-start gap-2 rounded-lg border border-[#fbbf24] bg-[#fffbeb] px-3 py-2 text-sm font-bold text-[#92400e]" role="alert">
+            <p className="mt-3 flex items-start gap-2 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] px-3 py-2 text-sm font-bold text-[var(--warning)]" role="alert">
               <AlertTriangle className="mt-0.5 shrink-0" size={16} />
               {t("odometerBelowLast", { km: Number(context.vehicle.mileage).toLocaleString("en-US") })}
             </p>
@@ -822,8 +822,8 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
             />
           </div>
           {mode === "return" && deliveryFuel > 0 && fuelLevel !== null && fuelLevel < deliveryFuel ? (
-            <div className="mt-4 rounded-lg border border-[#fbbf24] bg-[#fffbeb] p-3">
-              <p className="font-semibold text-[#92400e]">{t("fuelDeficitApprox", { percent: deliveryFuel - fuelLevel })}</p>
+            <div className="mt-4 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3">
+              <p className="font-semibold text-[var(--warning)]">{t("fuelDeficitApprox", { percent: deliveryFuel - fuelLevel })}</p>
               <label className="mt-2 block text-sm font-bold text-[var(--foreground)]">
                 {t("applyFuelCharge")}
                 <input className={inputClass} min="0" onChange={(event) => setFuelDeficitCharge(Number(event.target.value || 0))} placeholder="THB" step="0.01" type="number" value={fuelDeficitCharge || ""} />
@@ -864,7 +864,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
               <p className="text-sm font-semibold text-[var(--foreground)]">{t("preExistingDamage")}</p>
               <div className="mt-2 space-y-2">
                 {preExistingDamage.map((item: any) => (
-                  <p className="rounded-lg bg-[#fbfaf8] px-3 py-2 text-sm text-[var(--foreground-secondary)]" key={item.id}>
+                  <p className="rounded-lg bg-[var(--panel-secondary)] px-3 py-2 text-sm text-[var(--foreground-secondary)]" key={item.id}>
                     {areaName(String(item.location || ""))} · {severityName(item.severity)} · {item.description_translated || item.description}
                     {item.description_translated ? <span className="mt-1 block text-xs text-[var(--muted)]">{item.description}</span> : null}
                   </p>
@@ -939,7 +939,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                       </label>
                     </div>
                   </div>
-                  <button className="rounded-lg border border-[#fecdd3] p-2 text-[#be123c]" onClick={() => setDamageItems((items) => items.filter((entry) => entry.id !== item.id))} type="button">
+                  <button className="rounded-lg border border-[var(--danger-line)] p-2 text-[var(--danger)]" onClick={() => setDamageItems((items) => items.filter((entry) => entry.id !== item.id))} type="button">
                     <Trash2 size={18} />
                   </button>
                 </div>
@@ -947,8 +947,8 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
             ))}
           </div>
           {mode === "return" && damageItems.some((item) => !item.is_pre_existing) ? (
-            <label className="mt-4 block rounded-lg border border-[#fecdd3] bg-[#fff1f2] p-3">
-              <span className="text-sm font-semibold text-[#be123c]">{t("applyDamageExcess")}</span>
+            <label className="mt-4 block rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-3">
+              <span className="text-sm font-semibold text-[var(--danger)]">{t("applyDamageExcess")}</span>
               <input className={inputClass} min="0" onChange={(event) => setDamageCharge(Number(event.target.value || 0))} placeholder="THB" step="0.01" type="number" value={damageCharge || ""} />
             </label>
           ) : null}
@@ -960,7 +960,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
           {context.gpsDevice ? (
             <div className="rounded-xl border border-[var(--border)] bg-white p-4">
               <div className="flex items-start gap-3">
-                <span className={`flex h-12 w-12 items-center justify-center rounded-lg ${context.gpsDevice.last_seen_at ? "bg-[#dcfce7] text-[#166534]" : "bg-[#fef3c7] text-[#92400e]"}`}>
+                <span className={`flex h-12 w-12 items-center justify-center rounded-lg ${context.gpsDevice.last_seen_at ? "bg-[var(--success-light)] text-[var(--success)]" : "bg-[var(--warning-light)] text-[var(--warning)]"}`}>
                   {context.gpsDevice.last_seen_at ? <CheckCircle2 /> : <AlertTriangle />}
                 </span>
                 <div>
@@ -976,7 +976,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                   ) : null}
                 </div>
               </div>
-              <label className="checkbox-label mt-4 min-h-12 rounded-lg bg-[#fbfaf8] px-4 py-3 font-bold text-[var(--foreground)]">
+              <label className="checkbox-label mt-4 min-h-12 rounded-lg bg-[var(--panel-secondary)] px-4 py-3 font-bold text-[var(--foreground)]">
                 <input className="flex-shrink-0" type="checkbox" />
                 <span>{t("gpsConfirm")}</span>
               </label>
@@ -1003,7 +1003,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
             {damageCharge > 0 ? <Row label={t("damageExcess")} value={`-${money(damageCharge)}`} danger /> : null}
             {cleaningCharge > 0 ? <Row label={t("cleaningFee")} value={`-${money(cleaningCharge)}`} danger /> : null}
             {requestedDeductions > availableToReconcile ? (
-              <p className="rounded-lg border border-[#fbbf24] bg-[#fffbeb] px-3 py-2 text-sm font-bold text-[#92400e]">
+              <p className="rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] px-3 py-2 text-sm font-bold text-[var(--warning)]">
                 {t("deductionsExceedDeposit", { amount: money(availableToReconcile) })}
               </p>
             ) : null}
@@ -1047,7 +1047,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
           ) : mode === "return" ? (
             <div className="mt-4 rounded-lg border border-[var(--border)] bg-white p-3">
               {depositAlreadyReturned ? (
-                <div className="rounded-lg bg-[#f0fdf4] p-3">
+                <div className="rounded-lg bg-[var(--success-light)] p-3">
                   <Row label={t("depositAlreadyReturned")} value="Complete" />
                 </div>
               ) : (
@@ -1066,7 +1066,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                   <p className="mt-1 text-xs font-semibold text-[var(--muted)]">{t("cashPaymentHint")}</p>
                 </div>
                 {receiptResult ? (
-                  <span className="rounded-full bg-[#dcfce7] px-3 py-1 text-xs font-semibold uppercase text-[#166534]">
+                  <span className="rounded-full bg-[var(--success-light)] px-3 py-1 text-xs font-semibold uppercase text-[var(--success)]">
                     {t("receiptReady")}
                   </span>
                 ) : null}
@@ -1105,7 +1105,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                   />
                 </label>
                 <button
-                  className={`${touchButton} self-end bg-[var(--primary)] text-white disabled:bg-[#94a3b8]`}
+                  className={`${touchButton} self-end bg-[var(--primary)] text-white disabled:bg-[var(--muted)]`}
                   disabled={isReceiptPending || Boolean(receiptResult)}
                   onClick={generateDeliveryReceipt}
                   type="button"
@@ -1114,26 +1114,26 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                 </button>
               </div>
               {receiptError ? (
-                <p className="mt-3 rounded-lg border border-[#fecdd3] bg-[#fff1f2] px-3 py-2 text-sm font-bold text-[#be123c]">{receiptError}</p>
+                <p className="mt-3 rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] px-3 py-2 text-sm font-bold text-[var(--danger)]">{receiptError}</p>
               ) : null}
               {receiptResult ? (
-                <div className="mt-3 rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] p-3">
-                  <p className="flex items-center gap-2 text-sm font-semibold text-[#166534]">
+                <div className="mt-3 rounded-lg border border-[var(--success-line)] bg-[var(--success-light)] p-3">
+                  <p className="flex items-center gap-2 text-sm font-semibold text-[var(--success)]">
                     <CheckCircle2 size={18} />
                     {t("receiptNumberGenerated", { number: receiptResult.receipt_number })}
                   </p>
-                  <p className="mt-1 text-xs font-semibold text-[#166534]">
+                  <p className="mt-1 text-xs font-semibold text-[var(--success)]">
                     {t("receiptBreakdown", { rent: money(Number(deliveryPaymentAmount || 0)), deposit: money(Number(deliveryDepositAmount || 0)) })}
                   </p>
                   {receiptResult.warning ? (
-                    <p className="mt-2 rounded-lg border border-[#fbbf24] bg-[#fffbeb] px-3 py-2 text-xs font-bold text-[#92400e]">{receiptResult.warning}</p>
+                    <p className="mt-2 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] px-3 py-2 text-xs font-bold text-[var(--warning)]">{receiptResult.warning}</p>
                   ) : null}
                   {receiptResult.pdf_url ? (
                     <div className="mt-3 flex flex-wrap gap-2">
-                      <button className={`${touchButton} border border-[#bbf7d0] bg-white text-[#166534]`} onClick={shareReceipt} type="button">
+                      <button className={`${touchButton} border border-[var(--success-line)] bg-white text-[var(--success)]`} onClick={shareReceipt} type="button">
                         {t("shareReceipt")}
                       </button>
-                      <a className={`${touchButton} border border-[#bbf7d0] bg-white text-[#166534]`} href={receiptResult.pdf_url} rel="noreferrer" target="_blank">
+                      <a className={`${touchButton} border border-[var(--success-line)] bg-white text-[var(--success)]`} href={receiptResult.pdf_url} rel="noreferrer" target="_blank">
                         {t("downloadReceipt")}
                       </a>
                     </div>
@@ -1188,7 +1188,7 @@ function Row({ label, value, danger = false }: { label: string; value: string; d
   return (
     <div className="flex items-center justify-between gap-3">
       <span className="text-sm font-bold text-[var(--muted)]">{label}</span>
-      <span className={`font-mono-data text-base font-semibold ${danger ? "text-[#be123c]" : "text-[var(--foreground)]"}`}>{value}</span>
+      <span className={`font-mono-data text-base font-semibold ${danger ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{value}</span>
     </div>
   );
 }

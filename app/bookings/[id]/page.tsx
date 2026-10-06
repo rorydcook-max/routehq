@@ -515,13 +515,13 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   })();
   const financialStateClass =
     financialState.tone === "green"
-      ? "text-[#16a34a]"
+      ? "text-[var(--success)]"
       : financialState.tone === "red"
-        ? "text-[#dc2626]"
+        ? "text-[var(--danger)]"
         : financialState.tone === "amber"
-          ? "text-[#d97706]"
+          ? "text-[var(--warning)]"
           : financialState.tone === "blue"
-            ? "text-[#2563eb]"
+            ? "text-[var(--info)]"
             : "text-[var(--muted)]";
 
   return (
@@ -529,12 +529,12 @@ export default async function BookingDetailPage({ params, searchParams }: { para
       <OpenOnHash />
       <div className="space-y-3">
         {resolvedSearchParams.updated === "1" ? (
-          <div className="rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] px-3 py-2 text-sm font-bold text-[#166534]">
+          <div className="rounded-lg border border-[var(--success-line)] bg-[var(--success-light)] px-3 py-2 text-sm font-bold text-[var(--success)]">
             {tx.say("saved")}
           </div>
         ) : null}
         {resolvedSearchParams.success === "walk-in" ? (
-          <div className="rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] px-3 py-2 text-sm font-bold text-[#166534]">
+          <div className="rounded-lg border border-[var(--success-line)] bg-[var(--success-light)] px-3 py-2 text-sm font-bold text-[var(--success)]">
             {tx.say("walkIn", { amount: money(totalPaid || rental.rental_rate, rental.currency) })}
           </div>
         ) : null}
@@ -638,8 +638,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
         </Card>
 
         {(swapForms || []).length > 0 ? (
-          <div className="scroll-mt-4 rounded-xl border border-[#fde68a] bg-[#fffbeb] p-3" id="vehicle-change-forms">
-            <p className="text-sm font-semibold text-[#92400e]">{tx.say("vehicleChanged", { name: customer?.full_name || tx.say("theCustomer") })}</p>
+          <div className="scroll-mt-4 rounded-xl border border-[var(--warning-line)] bg-[var(--warning-light)] p-3" id="vehicle-change-forms">
+            <p className="text-sm font-semibold text-[var(--warning)]">{tx.say("vehicleChanged", { name: customer?.full_name || tx.say("theCustomer") })}</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {(swapForms || []).map((form: any) => (
                 <Link
@@ -660,8 +660,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
         ) : null}
 
         {pendingPortalActions.length > 0 ? (
-          <div className="scroll-mt-4 rounded-xl border border-[#fde68a] bg-[#fffbeb] p-3" id="customer-requests">
-            <p className="text-sm font-semibold text-[#92400e]">
+          <div className="scroll-mt-4 rounded-xl border border-[var(--warning-line)] bg-[var(--warning-light)] p-3" id="customer-requests">
+            <p className="text-sm font-semibold text-[var(--warning)]">
               {tx.say("waitingAnswer", { name: customer?.full_name || tx.say("theCustomerCap") })}
             </p>
             <div className="mt-3 space-y-3">
@@ -724,7 +724,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 <p className="text-sm text-[var(--muted)]">{customer.phone || tx.say("phoneNotSet")}</p>
               </>
             ) : (
-              <p className="text-sm font-semibold text-[#b45309]">{tx.say("awaitingDetails")}</p>
+              <p className="text-sm font-semibold text-[var(--warning)]">{tx.say("awaitingDetails")}</p>
             )}
           </BookingMetricCard>
         </div>
@@ -751,7 +751,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   <div className="mt-3 space-y-3">
                     {steps.map((step) => (
                       <div className="sub-surface flex items-start gap-3 p-3" key={step.key}>
-                        <span className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${step.complete ? "bg-[#dcfce7] text-[#166534]" : "bg-[#fbfaf8] text-[var(--muted)]"}`}>
+                        <span className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${step.complete ? "bg-[var(--success-light)] text-[var(--success)]" : "bg-[var(--panel-secondary)] text-[var(--muted)]"}`}>
                           {step.complete ? <CheckCircle2 size={16} /> : <Clock size={16} />}
                         </span>
                         <div>
@@ -765,7 +765,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 // Once the customer has done everything, the steps are history: one line, open on request.
                 return allDone ? (
                   <details className="mt-3">
-                    <summary className="flex cursor-pointer items-center gap-2 rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] p-3 text-sm font-semibold text-[#166534]">
+                    <summary className="flex cursor-pointer items-center gap-2 rounded-lg border border-[var(--success-line)] bg-[var(--success-light)] p-3 text-sm font-semibold text-[var(--success)]">
                       <CheckCircle2 size={16} />
                       {tx.say("allDone", { date: formatDate(String(steps[steps.length - 1].at || ""), tx) })}
                     </summary>
@@ -803,7 +803,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                       const found = customerDocuments.some((document: any) => document.category === category);
                       return (
                         <div className="flex items-center gap-2 rounded-lg border border-[var(--border)] bg-white p-3" key={category}>
-                          {found ? <CheckCircle2 className="text-[#16a34a]" size={18} /> : <AlertTriangle className="text-[#b7791f]" size={18} />}
+                          {found ? <CheckCircle2 className="text-[var(--success)]" size={18} /> : <AlertTriangle className="text-[var(--warning)]" size={18} />}
                           <span className="text-sm font-bold text-[var(--foreground)]">{tx.say(`doc_${category}`)}</span>
                         </div>
                       );
@@ -812,14 +812,14 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 </>
               ) : (
                 <div className="space-y-3">
-                  <div className="rounded-lg border border-[#bfe0db] bg-[#fbfaf8] p-3">
+                  <div className="rounded-lg border border-[var(--info-line)] bg-[var(--panel-secondary)] p-3">
                     <div className="flex items-center gap-2">
                       <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)]">
                         <Clock className="text-[var(--primary)]" size={16} />
                       </span>
                       <p className="font-semibold text-[var(--primary)]">{tx.list("awaitingCustomer")}</p>
                     </div>
-                    <p className="mt-3 text-sm leading-6 text-[#134e4a]">
+                    <p className="mt-3 text-sm leading-6 text-[var(--primary)]">
                       {tx.say("awaitingBody")}
                     </p>
                   </div>
@@ -879,7 +879,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   // Retrospective, not yet activated: equal-weight options
                   <div className="sub-surface space-y-3 p-3">
                     <div className="flex items-center gap-2 font-semibold text-[var(--foreground)]">
-                      <AlertTriangle className="text-[#b7791f]" size={18} />
+                      <AlertTriangle className="text-[var(--warning)]" size={18} />
                       {tx.say("handoverForm")}
                     </div>
                     <p className="text-sm text-[var(--muted)]">
@@ -897,16 +897,16 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   </div>
                 ) : isRetrospective ? (
                   // Retrospective, already active, no inspection: soft prompt
-                  <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
-                    <div className="flex items-center gap-2 font-semibold text-[#92400e]">
-                      <AlertTriangle className="text-[#b7791f]" size={18} />
+                  <div className="rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3">
+                    <div className="flex items-center gap-2 font-semibold text-[var(--warning)]">
+                      <AlertTriangle className="text-[var(--warning)]" size={18} />
                       {tx.say("noHandoverForm")}
                     </div>
-                    <p className="mt-1 text-sm text-[#b45309]">
+                    <p className="mt-1 text-sm text-[var(--warning)]">
                       {tx.say("startedOptional", { ago: startedAgoLabel(rental.start_date, tx) })}
                     </p>
                     <Link
-                      className="pressable mt-2 inline-flex items-center rounded-lg border border-[#fde68a] bg-white px-3 py-2 text-xs font-bold text-[#92400e]"
+                      className="pressable mt-2 inline-flex items-center rounded-lg border border-[var(--warning-line)] bg-white px-3 py-2 text-xs font-bold text-[var(--warning)]"
                       href={`/inspections/delivery/${rental.id}` as Route}
                     >
                       {tx.say("fillHandoverOptional")}
@@ -916,7 +916,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   // New booking: prominent start inspection + skip
                   <div className="sub-surface space-y-2 p-3">
                     <div className="flex items-center gap-2 font-semibold text-[var(--foreground)]">
-                      <AlertTriangle className="text-[#b7791f]" size={18} />
+                      <AlertTriangle className="text-[var(--warning)]" size={18} />
                       {tx.say("handoverForm")}
                     </div>
                     <Link className="primary-action pressable block w-full px-3 py-2 text-center" href={`/inspections/delivery/${rental.id}` as Route}>
@@ -931,12 +931,12 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   </div>
                 ) : (
                   // Active, not retrospective, no inspection
-                  <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
-                    <div className="flex items-center gap-2 font-semibold text-[#92400e]">
-                      <AlertTriangle className="text-[#b7791f]" size={18} />
+                  <div className="rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3">
+                    <div className="flex items-center gap-2 font-semibold text-[var(--warning)]">
+                      <AlertTriangle className="text-[var(--warning)]" size={18} />
                       {tx.say("noHandoverForm")}
                     </div>
-                    <p className="mt-2 text-sm text-[#b45309]">{tx.say("wentOutWithout")}</p>
+                    <p className="mt-2 text-sm text-[var(--warning)]">{tx.say("wentOutWithout")}</p>
                   </div>
                 )}
                 {/* Before the handover there is no return to talk about: a warning sign on a form that can't be opened yet was noise. */}
@@ -1031,16 +1031,16 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 />
                 {paymentMethod || paymentTiming ? <PaymentInfo method={paymentMethod} timing={paymentTiming} /> : null}
                 {customerReportedPayment ? (
-                  <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
+                  <div className="rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3">
                     <div className="flex items-start gap-3">
-                      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-[#d97706]">
+                      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-[var(--warning)]">
                         <i aria-hidden="true" className="ti ti-alert-circle text-base" />
                       </span>
                       <div className="min-w-0 flex-1">
-                        <p className="font-semibold text-[#92400e]">{tx.say("reportedPay")}</p>
-                        <p className="mt-1 text-sm text-[#b45309]">{tx.say("reportedAt", { when: formatDateTime(bookingLink?.payment_reported_at, tx) })}</p>
+                        <p className="font-semibold text-[var(--warning)]">{tx.say("reportedPay")}</p>
+                        <p className="mt-1 text-sm text-[var(--warning)]">{tx.say("reportedAt", { when: formatDateTime(bookingLink?.payment_reported_at, tx) })}</p>
                         <form action={confirmCustomerPaymentAction} className="mt-3">
-                          <PendingButton className="pressable inline-flex w-full items-center justify-center rounded-lg bg-[#d97706] px-3 py-2 text-sm font-semibold text-white shadow-sm" pendingLabel={tx.say("confirming")} type="submit">
+                          <PendingButton className="pressable inline-flex w-full items-center justify-center rounded-lg bg-[var(--warning)] px-3 py-2 text-sm font-semibold text-white shadow-sm" pendingLabel={tx.say("confirming")} type="submit">
                             {tx.say("confirmPay")}
                           </PendingButton>
                         </form>
@@ -1091,7 +1091,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   <p className="text-sm text-[var(--muted)]">{tx.say("autoSetup")}</p>
                 ) : null}
                 {!isClosed && !awaitingSignature && !needsExistingRentalPaymentSetup && payments.length === 0 && outstandingBalance === 0 && totalPaid === 0 ? (
-                  <div className="space-y-3 rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3 text-sm font-semibold text-[#92400e]">
+                  <div className="space-y-3 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3 text-sm font-semibold text-[var(--warning)]">
                     <p>{tx.say("noSchedule")}</p>
                     <GeneratePaymentScheduleButton rentalId={rental.id} />
                   </div>
@@ -1101,7 +1101,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 ["active", "due_soon", "overdue", "extended", "booked"].includes(String(displayStatus || "").toLowerCase()) &&
                 overduePaymentGroup.length + dueNowPaymentGroup.length + upcomingPaymentGroup.length === 0 &&
                 (!rental.end_date || String(rental.end_date).slice(0, 10) > today) ? (
-                  <div className="space-y-3 rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3 text-sm font-semibold text-[#92400e]">
+                  <div className="space-y-3 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3 text-sm font-semibold text-[var(--warning)]">
                     <p>{tx.say("noFuture")}</p>
                     <GeneratePaymentScheduleButton rentalId={rental.id} />
                   </div>
@@ -1111,13 +1111,13 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 ) : null}
                 {overduePaymentGroup.length > 0 ? (
                   <div className="space-y-1">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[#dc2626]">{tx.say("grp_overdue", { count: overduePaymentGroup.length })}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--danger)]">{tx.say("grp_overdue", { count: overduePaymentGroup.length })}</p>
                     {overduePaymentGroup.map((payment: any) => <EditableRentalPaymentRow key={payment.id} payment={payment} />)}
                   </div>
                 ) : null}
                 {dueNowPaymentGroup.length > 0 ? (
                   <div className="space-y-1">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[#92400e]">{tx.say("grp_dueNow", { count: dueNowPaymentGroup.length })}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--warning)]">{tx.say("grp_dueNow", { count: dueNowPaymentGroup.length })}</p>
                     {dueNowPaymentGroup.map((payment: any) => <EditableRentalPaymentRow key={payment.id} payment={payment} />)}
                   </div>
                 ) : null}
@@ -1155,7 +1155,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 ) : null}
                 {paidPaymentGroup.length > 0 ? (
                   <details>
-                    <summary className="cursor-pointer text-[10px] font-bold uppercase tracking-[0.08em] text-[#16a34a] hover:text-[#166534]">
+                    <summary className="cursor-pointer text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--success)] hover:text-[var(--success)]">
                       {tx.say("grp_paid", { count: paidPaymentGroup.length })}
                     </summary>
                     <div className="mt-2 space-y-1">
@@ -1197,10 +1197,10 @@ export default async function BookingDetailPage({ params, searchParams }: { para
 function Info({ icon: Icon, label, value, danger = false }: { icon: typeof Car; label: string; value: string; danger?: boolean }) {
   return (
     <div className="sub-surface flex items-start gap-3 p-3">
-      <Icon className={`mt-0.5 shrink-0 ${danger ? "text-[#be123c]" : "text-[var(--primary)]"}`} size={18} />
+      <Icon className={`mt-0.5 shrink-0 ${danger ? "text-[var(--danger)]" : "text-[var(--primary)]"}`} size={18} />
       <div>
         <p className="text-xs font-bold uppercase text-[var(--muted)]">{label}</p>
-        <p className={`font-mono-data mt-1 font-semibold ${danger ? "text-[#be123c]" : "text-[var(--foreground)]"}`}>{value}</p>
+        <p className={`font-mono-data mt-1 font-semibold ${danger ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{value}</p>
       </div>
     </div>
   );
@@ -1246,8 +1246,8 @@ function daysUntilLabel(days: number | null | undefined, tx: Tx) {
 }
 
 function comingUpTone(severity?: string) {
-  if (severity === "high") return "border-[#fecaca] bg-[#fef2f2] text-[#dc2626]";
-  if (severity === "medium") return "border-[#fde68a] bg-[#fffbeb] text-[#d97706]";
+  if (severity === "high") return "border-[var(--danger-line)] bg-[var(--danger-light)] text-[var(--danger)]";
+  if (severity === "medium") return "border-[var(--warning-line)] bg-[var(--warning-light)] text-[var(--warning)]";
   return "border-[var(--border)] bg-white text-[var(--foreground-secondary)]";
 }
 
@@ -1303,16 +1303,16 @@ function ComingUpCard({
                   <div
                     className="w-full"
                     style={{
-                      background: "#fffbeb",
-                      border: "0.5px solid #fde68a",
+                      background: "var(--warning-light)",
+                      border: "0.5px solid var(--warning-line)",
                       borderRadius: 10,
                       padding: "14px 16px"
                     }}
                   >
-                    <p style={{ fontSize: 13, fontWeight: 500, color: "#92400e", margin: "0 0 4px" }}>
+                    <p style={{ fontSize: 13, fontWeight: 500, color: "var(--warning)", margin: "0 0 4px" }}>
                       {tx.say("noScheduleFound")}
                     </p>
-                    <p style={{ fontSize: 12, color: "#b45309", margin: 0 }}>
+                    <p style={{ fontSize: 12, color: "var(--warning)", margin: 0 }}>
                       {tx.say("useGenerate")}
                     </p>
                   </div>
@@ -1334,7 +1334,7 @@ function ComingUpCard({
               </div>
             ) : null}
             {upcomingPayments.length > 1 ? (
-              <div className="mt-4 space-y-2 border-t border-[#cfe5e1] pt-3">
+              <div className="mt-4 space-y-2 border-t border-[var(--info-line)] pt-3">
                 {upcomingPayments.slice(1, 4).map((payment: any) => (
                   <div className="flex items-center justify-between gap-3 text-xs" key={payment.id}>
                     <span className="truncate text-[var(--foreground-secondary)]">{formatDate(payment.due_date, tx)}</span>
@@ -1375,7 +1375,7 @@ function ComingUpCard({
                 ))}
               </div>
             ) : (
-              <p className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3 text-sm font-semibold text-[var(--muted)]">
+              <p className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3 text-sm font-semibold text-[var(--muted)]">
                 {tx.say("noEvents")}
               </p>
             )}
@@ -1390,8 +1390,8 @@ function InspectionStatus({ label, inspection, href, available }: { label: strin
   const tx = useTx();
   if (inspection) {
     return (
-      <div className="rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] p-3">
-        <div className="flex items-center gap-2 font-semibold text-[#166534]">
+      <div className="rounded-lg border border-[var(--success-line)] bg-[var(--success-light)] p-3">
+        <div className="flex items-center gap-2 font-semibold text-[var(--success)]">
           <CheckCircle2 size={18} />
           {label}
         </div>
@@ -1403,7 +1403,7 @@ function InspectionStatus({ label, inspection, href, available }: { label: strin
   return (
     <div className="sub-surface p-3">
       <div className="flex items-center gap-2 font-semibold text-[var(--foreground)]">
-        <AlertTriangle className="text-[#b7791f]" size={18} />
+        <AlertTriangle className="text-[var(--warning)]" size={18} />
         {label}
       </div>
       {available ? (
@@ -1432,11 +1432,11 @@ function relativeTime(value: string | null | undefined, tx: Tx) {
 
 function communicationTypeBadge(type: string, tx: Tx) {
   const labels: Record<string, { label: string; className: string }> = {
-    automated_reminder: { label: tx.say("ct_automated_reminder"), className: "border-[#bfdbfe] bg-[#eff6ff] text-[#2563eb]" },
-    manual_note: { label: tx.say("ct_manual_note"), className: "border-[var(--border)] bg-[#fbfaf8] text-[var(--foreground-secondary)]" },
-    customer_portal_action: { label: tx.say("ct_customer_portal_action"), className: "border-[#bfe0db] bg-[var(--primary-light)] text-[var(--primary)]" },
-    booking_link_activity: { label: tx.say("ct_booking_link_activity"), className: "border-[#ddd6fe] bg-[#f5f3ff] text-[#7c3aed]" },
-    operator_message: { label: tx.say("ct_operator_message"), className: "border-[var(--border)] bg-[#f1efeb] text-[var(--foreground-secondary)]" }
+    automated_reminder: { label: tx.say("ct_automated_reminder"), className: "border-[var(--info-line)] bg-[var(--info-light)] text-[var(--info)]" },
+    manual_note: { label: tx.say("ct_manual_note"), className: "border-[var(--border)] bg-[var(--panel-secondary)] text-[var(--foreground-secondary)]" },
+    customer_portal_action: { label: tx.say("ct_customer_portal_action"), className: "border-[var(--info-line)] bg-[var(--primary-light)] text-[var(--primary)]" },
+    booking_link_activity: { label: tx.say("ct_booking_link_activity"), className: "border-[var(--purple-line)] bg-[var(--purple-light)] text-[var(--purple)]" },
+    operator_message: { label: tx.say("ct_operator_message"), className: "border-[var(--border)] bg-[var(--panel-tertiary)] text-[var(--foreground-secondary)]" }
   };
   const config = labels[type] || { label: String(type || "Event").replace(/_/g, " "), className: "border-[var(--border)] bg-white text-[var(--foreground-secondary)]" };
   return <span className={`inline-flex items-center rounded-full border px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.04em] ${config.className}`}>{config.label}</span>;
@@ -1505,13 +1505,13 @@ function CommunicationTimeline({
   return (
     <div className="mt-3 space-y-3">
       {pendingActions.map((action: any) => (
-        <div key={`pending-${action.id}`} className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
+        <div key={`pending-${action.id}`} className="rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2">
               {communicationTypeBadge("customer_portal_action", tx)}
               <Badge tone="amber">{tx.say("awaitingResponse")}</Badge>
             </div>
-            <span className="text-xs font-bold uppercase text-[#b45309]">{relativeTime(action.created_at, tx)}</span>
+            <span className="text-xs font-bold uppercase text-[var(--warning)]">{relativeTime(action.created_at, tx)}</span>
           </div>
           <p className="text-sm font-semibold text-[var(--foreground)]">{portalActionSummary(action, tx)}</p>
           <a className="mt-1 inline-block text-sm font-semibold text-[var(--primary)]" href="#customer-requests">{tx.say("answerTop")}</a>
@@ -1536,7 +1536,7 @@ function CommunicationTimeline({
                 {entry.metadata.handoff_label}
               </a>
             ) : (
-              <p className="mt-2 text-xs font-semibold text-[#92400e]">{entry.metadata.handoff_label}</p>
+              <p className="mt-2 text-xs font-semibold text-[var(--warning)]">{entry.metadata.handoff_label}</p>
             )
           ) : null}
         </div>
@@ -1569,7 +1569,7 @@ async function CustomerPortalActionCard({ action, organizationId, rentalId, cust
       <div className="mt-3">
         {alreadyCovered ? (
           // An older request the rental has since outgrown: nothing to approve, and no need to message the customer.
-          <form action={resolvePortalAction} className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
+          <form action={resolvePortalAction} className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
             <input name="organizationId" type="hidden" value={organizationId} />
             <input name="actionId" type="hidden" value={action.id} />
             <input name="rentalId" type="hidden" value={rentalId} />
@@ -1582,15 +1582,15 @@ async function CustomerPortalActionCard({ action, organizationId, rentalId, cust
         ) : action.action_type === "extension_request" ? (
           <div className="grid items-start gap-3 md:grid-cols-[1.6fr_1fr]">
             <ExtensionRequestAnswer actionId={action.id} picture={picture} rentalId={rentalId} requestedEnd={content.new_end_date || null} openEnded={!!content.open_ended} />
-            <form action={declinePortalAction} className="rounded-lg border border-[#fecdd3] bg-[#fff1f2] p-3">
+            <form action={declinePortalAction} className="rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-3">
               <input name="organizationId" type="hidden" value={organizationId} />
               <input name="actionId" type="hidden" value={action.id} />
               <input name="rentalId" type="hidden" value={rentalId} />
-              <label className="block text-sm font-bold text-[#9f1239]">
+              <label className="block text-sm font-bold text-[var(--danger)]">
                 {tx.say("reasonLabel")}
-                <input className="mt-2 w-full rounded-lg border border-[#fecdd3] bg-white px-3 py-2 text-sm" name="note" placeholder={tx.say("reasonPlaceholder")} />
+                <input className="mt-2 w-full rounded-lg border border-[var(--danger-line)] bg-white px-3 py-2 text-sm" name="note" placeholder={tx.say("reasonPlaceholder")} />
               </label>
-              <PendingButton className="pressable mt-3 w-full rounded-lg border border-[#fecdd3] bg-white px-3 py-2 text-sm font-semibold text-[#be123c]" pendingLabel={tx.say("declining")} type="submit">
+              <PendingButton className="pressable mt-3 w-full rounded-lg border border-[var(--danger-line)] bg-white px-3 py-2 text-sm font-semibold text-[var(--danger)]" pendingLabel={tx.say("declining")} type="submit">
                 {tx.say("decline")}
               </PendingButton>
             </form>

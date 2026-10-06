@@ -133,7 +133,7 @@ export function AskBox({ variant }: { variant: "sidebar" | "icon" }) {
       )}
 
       {open ? (
-        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-[#1c1b18]/40 p-0 sm:items-start sm:p-6 sm:pt-[10vh]" onClick={() => setOpen(false)} role="presentation">
+        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-[var(--foreground)]/40 p-0 sm:items-start sm:p-6 sm:pt-[10vh]" onClick={() => setOpen(false)} role="presentation">
           <div aria-label={t("askTitle")} aria-modal="true" className="flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl sm:rounded-2xl" onClick={(event) => event.stopPropagation()} role="dialog">
             <form
               className="flex items-center gap-2 border-b border-[var(--border)] px-4 py-3"
@@ -154,7 +154,7 @@ export function AskBox({ variant }: { variant: "sidebar" | "icon" }) {
               <button className="primary-action pressable min-h-9 px-3 text-[13px] disabled:opacity-60" disabled={isPending || !question.trim()} type="submit">
                 {t("ask")}
               </button>
-              <button aria-label={t("close")} className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[#f1efeb]" onClick={() => setOpen(false)} type="button">
+              <button aria-label={t("close")} className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[var(--panel-tertiary)]" onClick={() => setOpen(false)} type="button">
                 <X size={18} />
               </button>
             </form>
@@ -165,7 +165,7 @@ export function AskBox({ variant }: { variant: "sidebar" | "icon" }) {
                   <p className="text-[13px] text-[var(--muted)]">{t("askIntro")}</p>
                   <div className="mt-3 grid gap-2 sm:grid-cols-2">
                     {EXAMPLES.map((example) => (
-                      <button className="pressable rounded-xl border border-[var(--border)] bg-[#fbfaf8] px-3 py-2.5 text-left text-[13px] font-medium text-[var(--foreground-secondary)] hover:border-[var(--primary)] hover:text-[var(--primary)]" key={example} onClick={() => ask(example)} type="button">
+                      <button className="pressable rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] px-3 py-2.5 text-left text-[13px] font-medium text-[var(--foreground-secondary)] hover:border-[var(--primary)] hover:text-[var(--primary)]" key={example} onClick={() => ask(example)} type="button">
                         {example}
                       </button>
                     ))}
@@ -183,7 +183,7 @@ export function AskBox({ variant }: { variant: "sidebar" | "icon" }) {
                           <p className="mt-2 whitespace-pre-line text-[14px] leading-relaxed text-[var(--foreground-secondary)]">{turn.answer}</p>
                           {turn.proposal ? (
                             <div className="mt-3 overflow-hidden rounded-xl border border-[var(--border)]">
-                              <p className="border-b border-[var(--border)] bg-[#fbfaf8] px-3 py-2 text-[13px] font-semibold text-[var(--foreground)]">{turn.proposal.title}</p>
+                              <p className="border-b border-[var(--border)] bg-[var(--panel-secondary)] px-3 py-2 text-[13px] font-semibold text-[var(--foreground)]">{turn.proposal.title}</p>
                               <dl className="divide-y divide-[var(--border)]">
                                 {turn.proposal.rows.map((row) => (
                                   <div className="flex gap-3 px-3 py-2 text-[13px]" key={row.label}>
@@ -192,7 +192,7 @@ export function AskBox({ variant }: { variant: "sidebar" | "icon" }) {
                                   </div>
                                 ))}
                               </dl>
-                              <div className="border-t border-[var(--border)] bg-[#fbfaf8] px-3 py-2.5">
+                              <div className="border-t border-[var(--border)] bg-[var(--panel-secondary)] px-3 py-2.5">
                                 {turn.proposalState === "done" && turn.result ? (
                                   <div>
                                     <p className="flex items-center gap-1.5 text-[13px] font-semibold text-[var(--success)]">

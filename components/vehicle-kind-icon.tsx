@@ -27,13 +27,13 @@ function Scooter({ size = 18 }: { size?: number }) {
 }
 
 const TINT: Record<VehicleKind, string> = {
-  car: "bg-[#e7f3f1] text-[var(--primary)]",
-  van: "bg-[#eef2fb] text-[#2f6fdb]",
-  motorbike: "bg-[#fdf1e7] text-[#c2621a]",
-  scooter: "bg-[#f4effb] text-[#7a4fc4]",
-  ebike: "bg-[#ecf7ee] text-[#2f8a4a]",
-  atv: "bg-[#f7f1e6] text-[#8a6a2f]",
-  other: "bg-[#f1efeb] text-[#6b675f]"
+  car: "bg-[var(--primary-light)] text-[var(--primary)]",
+  van: "bg-[var(--info-light)] text-[var(--info)]",
+  motorbike: "bg-[var(--warning-light)] text-[var(--warning)]",
+  scooter: "bg-[var(--purple-light)] text-[var(--purple)]",
+  ebike: "bg-[var(--success-light)] text-[var(--success)]",
+  atv: "bg-[var(--warning-light)] text-[var(--warning)]",
+  other: "bg-[var(--panel-tertiary)] text-[var(--muted)]"
 };
 
 export function VehicleKindIcon({ kind, size = 18, boxed = true }: { kind: VehicleKind; size?: number; boxed?: boolean }) {
@@ -54,9 +54,9 @@ export function OutFreeSummary({ out, free, other = 0 }: { out: number; free: nu
   const t = useTranslations("common");
   return (
     <span className="inline-flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-[var(--muted)]">
-      <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#2f6fdb]" />{t("countOut", { count: out })}</span>
-      <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#16a34a]" />{t("countFree", { count: free })}</span>
-      {other > 0 ? <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#d4a017]" />{t("countBookedOrShop", { count: other })}</span> : null}
+      <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[var(--info)]" />{t("countOut", { count: out })}</span>
+      <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[var(--success)]" />{t("countFree", { count: free })}</span>
+      {other > 0 ? <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[var(--warning)]" />{t("countBookedOrShop", { count: other })}</span> : null}
     </span>
   );
 }

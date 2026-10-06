@@ -24,7 +24,7 @@ function NotificationToggle({ name, label, description, defaultChecked }: Notifi
       </div>
       <div className="relative mt-0.5 flex-shrink-0">
         <input className="peer sr-only" defaultChecked={defaultChecked} name={name} type="checkbox" value="on" />
-        <div className="h-6 w-11 rounded-full bg-[#cbd5e1] transition-colors peer-checked:bg-[var(--primary)]" />
+        <div className="h-6 w-11 rounded-full bg-[var(--border)] transition-colors peer-checked:bg-[var(--primary)]" />
         <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
       </div>
     </label>

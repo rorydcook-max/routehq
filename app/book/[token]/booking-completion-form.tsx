@@ -95,10 +95,10 @@ const fieldStyle = {
   width: "100%",
   fontSize: 14,
   padding: "0 12px",
-  border: "0.5px solid #cbd5e1",
+  border: "0.5px solid var(--border)",
   borderRadius: 8,
   background: "#ffffff",
-  color: "#0f172a",
+  color: "var(--foreground)",
   boxSizing: "border-box" as const,
   outline: "none",
 };
@@ -140,8 +140,8 @@ function buildContractPreviewDocument(contractHtml: string) {
       body {
         margin: 0;
         padding: 0;
-        background: #fbfefd;
-        color: #344054;
+        background: var(--primary-light);
+        color: var(--foreground);
         font-family: Arial, sans-serif;
       }
 
@@ -714,8 +714,8 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
     const el = formRef.current.querySelector(`[name="${focusField}"]`) as HTMLElement | null;
     if (!el) return;
     el.scrollIntoView({ behavior: "smooth", block: "center" });
-    el.style.borderColor = "#dc2626";
-    el.style.boxShadow = "0 0 0 2px #fecaca";
+    el.style.borderColor = "var(--danger)";
+    el.style.boxShadow = "0 0 0 2px var(--danger-line)";
     const timer = setTimeout(() => {
       el.style.borderColor = "";
       el.style.boxShadow = "";
@@ -775,7 +775,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
     if (!context) return;
     context.lineWidth = 3;
     context.lineCap = "round";
-    context.strokeStyle = "#10252b";
+    context.strokeStyle = "#1b2430";
     context.lineTo(point.x, point.y);
     context.stroke();
   }
@@ -914,8 +914,8 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
 
   if (completed) {
     return (
-      <section className="-order-1 rounded-2xl border border-[#bbf7d0] bg-white p-5 text-center shadow-sm">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#dcfce7] text-[#166534]">
+      <section className="-order-1 rounded-2xl border border-[var(--success-line)] bg-white p-5 text-center shadow-sm">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--success-light)] text-[var(--success)]">
           <CheckCircle2 size={34} />
         </div>
         <h2 className="mt-4 text-2xl font-semibold text-[var(--foreground)]">{(submittedName || detail.customer?.full_name) ? t("allSetNamed", { name: String(submittedName || detail.customer?.full_name).split(/\s+/)[0] }) : t("allSet")}</h2>
@@ -994,7 +994,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
       <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
         <SectionTitle icon={UserRound} label={t("yourDetails")} />
         {detail.completion.details ? (
-          <p className="mt-3 rounded-xl bg-[#dcfce7] p-3 text-sm font-bold text-[#166534]">{t("detailsAlreadySent")}</p>
+          <p className="mt-3 rounded-xl bg-[var(--success-light)] p-3 text-sm font-bold text-[var(--success)]">{t("detailsAlreadySent")}</p>
         ) : null}
         {docRead.passport === "read" || docRead.driver_license === "read" ? (
           <p className="mt-3 rounded-xl bg-[var(--primary-light)] p-3 text-sm font-semibold text-[var(--primary)]">{t("filledFromDocuments")}</p>
@@ -1058,7 +1058,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           {t("contactIntro", { business: detail.organizationName })}
         </p>
         {contactChannelError ? (
-          <div style={{ background: "#fffbeb", border: "0.5px solid #fde68a", borderRadius: 8, padding: "10px 14px", marginTop: 12, fontSize: 13, color: "#92400e" }}>
+          <div style={{ background: "var(--warning-light)", border: "0.5px solid var(--warning-line)", borderRadius: 8, padding: "10px 14px", marginTop: 12, fontSize: 13, color: "var(--warning)" }}>
             {contactChannelError}
           </div>
         ) : null}
@@ -1080,7 +1080,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
               }}
               onInput={(e) => e.stopPropagation()}
               required
-              style={{ ...fieldStyle, color: preferredContactMethod ? "#0f172a" : "#94a3b8", cursor: "pointer" }}
+              style={{ ...fieldStyle, color: preferredContactMethod ? "var(--foreground)" : "var(--muted)", cursor: "pointer" }}
               value={preferredContactMethod}
             >
               <option disabled value="">{t("choose")}</option>
@@ -1097,11 +1097,11 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         {/* Contextual confirmation / input for the selected method */}
         {preferredContactMethod === "phone" ? (
           livePhone ? (
-            <div style={{ background: "#f0fdf4", border: "0.5px solid #bbf7d0", borderRadius: 8, padding: "10px 14px", marginTop: 8, fontSize: 13, color: "#15803d" }}>
+            <div style={{ background: "var(--success-light)", border: "0.5px solid var(--success-line)", borderRadius: 8, padding: "10px 14px", marginTop: 8, fontSize: 13, color: "var(--success)" }}>
               ✓ {t("wellContactOn", { contact: livePhone })}
             </div>
           ) : (
-            <div style={{ background: "#fffbeb", border: "0.5px solid #fde68a", borderRadius: 8, padding: "10px 14px", marginTop: 8, fontSize: 13, color: "#92400e" }}>
+            <div style={{ background: "var(--warning-light)", border: "0.5px solid var(--warning-line)", borderRadius: 8, padding: "10px 14px", marginTop: 8, fontSize: 13, color: "var(--warning)" }}>
               {t("addPhoneAbove")}
             </div>
           )
@@ -1109,11 +1109,11 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
 
         {preferredContactMethod === "email" ? (
           liveEmail ? (
-            <div style={{ background: "#f0fdf4", border: "0.5px solid #bbf7d0", borderRadius: 8, padding: "10px 14px", marginTop: 8, fontSize: 13, color: "#15803d" }}>
+            <div style={{ background: "var(--success-light)", border: "0.5px solid var(--success-line)", borderRadius: 8, padding: "10px 14px", marginTop: 8, fontSize: 13, color: "var(--success)" }}>
               ✓ {t("wellContactOn", { contact: liveEmail })}
             </div>
           ) : (
-            <div style={{ background: "#fffbeb", border: "0.5px solid #fde68a", borderRadius: 8, padding: "10px 14px", marginTop: 8, fontSize: 13, color: "#92400e" }}>
+            <div style={{ background: "var(--warning-light)", border: "0.5px solid var(--warning-line)", borderRadius: 8, padding: "10px 14px", marginTop: 8, fontSize: 13, color: "var(--warning)" }}>
               {t("addEmailAbove")}
             </div>
           )
@@ -1121,7 +1121,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
 
         {preferredContactMethod === "whatsapp" ? (
           <div style={{ marginTop: 8 }}>
-            <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#344054" }}>{t("whatsappNumber")}</label>
+            <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "var(--foreground)" }}>{t("whatsappNumber")}</label>
             <input
               name="whatsappNumber"
               onChange={(e) => setWhatsappNumber(e.target.value)}
@@ -1133,7 +1133,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             {livePhone && !whatsappNumber ? (
               <button
                 onClick={() => setWhatsappNumber(livePhone)}
-                style={{ fontSize: 11, color: "#0e7490", background: "none", border: "none", cursor: "pointer", marginTop: 4, padding: 0 }}
+                style={{ fontSize: 11, color: "var(--primary)", background: "none", border: "none", cursor: "pointer", marginTop: 4, padding: 0 }}
                 type="button"
               >
                 {t("sameAsPhone", { phone: livePhone })}
@@ -1144,57 +1144,57 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
 
         {preferredContactMethod === "messenger" ? (
           <div style={{ marginTop: 8 }}>
-            <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#344054" }}>{t("messengerUsername")}</label>
+            <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "var(--foreground)" }}>{t("messengerUsername")}</label>
             <input defaultValue={detail.customer?.messenger_id || ""} name="messengerId" placeholder="messenger.com/username" style={{ ...fieldStyle, marginTop: 4 }} />
           </div>
         ) : null}
 
         {preferredContactMethod === "line" ? (
           <div style={{ marginTop: 8 }}>
-            <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#344054" }}>LINE ID</label>
+            <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "var(--foreground)" }}>LINE ID</label>
             <input defaultValue={detail.customer?.line_id || ""} name="lineId" placeholder="@lineusername" style={{ ...fieldStyle, marginTop: 4 }} />
           </div>
         ) : null}
 
         {preferredContactMethod === "telegram" ? (
           <div style={{ marginTop: 8 }}>
-            <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#344054" }}>{t("telegramUsername")}</label>
+            <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "var(--foreground)" }}>{t("telegramUsername")}</label>
             <input defaultValue={detail.customer?.telegram_username || ""} name="telegramUsername" placeholder="@telegramusername" style={{ ...fieldStyle, marginTop: 4 }} />
           </div>
         ) : null}
 
         {/* Secondary channels — collapsible */}
         <details style={{ marginTop: 16 }}>
-          <summary style={{ fontSize: 13, color: "#0e7490", cursor: "pointer", fontWeight: 500, listStyle: "none", userSelect: "none" }}>
+          <summary style={{ fontSize: 13, color: "var(--primary)", cursor: "pointer", fontWeight: 500, listStyle: "none", userSelect: "none" }}>
             {t("moreWaysToContact")}
           </summary>
           <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             {preferredContactMethod !== "whatsapp" ? (
               <div>
-                <label style={{ fontSize: 13, fontWeight: 500, color: "#344054", display: "block" }}>WhatsApp</label>
+                <label style={{ fontSize: 13, fontWeight: 500, color: "var(--foreground)", display: "block" }}>WhatsApp</label>
                 <input name="whatsappNumber" onChange={(e) => setWhatsappNumber(e.target.value)} placeholder="+66812345678" style={{ ...fieldStyle, marginTop: 4 }} type="tel" value={whatsappNumber} />
               </div>
             ) : null}
             {preferredContactMethod !== "messenger" ? (
               <div>
-                <label style={{ fontSize: 13, fontWeight: 500, color: "#344054", display: "block" }}>Facebook Messenger</label>
+                <label style={{ fontSize: 13, fontWeight: 500, color: "var(--foreground)", display: "block" }}>Facebook Messenger</label>
                 <input defaultValue={detail.customer?.messenger_id || ""} name="messengerId" placeholder="messenger.com/username" style={{ ...fieldStyle, marginTop: 4 }} />
               </div>
             ) : null}
             {preferredContactMethod !== "line" ? (
               <div>
-                <label style={{ fontSize: 13, fontWeight: 500, color: "#344054", display: "block" }}>LINE ID</label>
+                <label style={{ fontSize: 13, fontWeight: 500, color: "var(--foreground)", display: "block" }}>LINE ID</label>
                 <input defaultValue={detail.customer?.line_id || ""} name="lineId" placeholder="@lineusername" style={{ ...fieldStyle, marginTop: 4 }} />
               </div>
             ) : null}
             {preferredContactMethod !== "telegram" ? (
               <div>
-                <label style={{ fontSize: 13, fontWeight: 500, color: "#344054", display: "block" }}>Telegram</label>
+                <label style={{ fontSize: 13, fontWeight: 500, color: "var(--foreground)", display: "block" }}>Telegram</label>
                 <input defaultValue={detail.customer?.telegram_username || ""} name="telegramUsername" placeholder="@telegramusername" style={{ ...fieldStyle, marginTop: 4 }} />
               </div>
             ) : null}
             <div style={{ gridColumn: "1 / 2" }}>
-              <label style={{ fontSize: 13, fontWeight: 500, color: "#344054", display: "block" }}>
+              <label style={{ fontSize: 13, fontWeight: 500, color: "var(--foreground)", display: "block" }}>
                 Instagram
               </label>
               <input defaultValue={detail.customer?.instagram_handle || ""} name="instagramHandle" placeholder="@instagramhandle" style={{ ...fieldStyle, marginTop: 4 }} />
@@ -1214,7 +1214,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           <label className="sm:col-span-2">
             <span className="text-sm font-bold text-[var(--foreground-secondary)]">{t("preferredTime")}</span>
             {operatorDeliveryIsToday ? (
-              <div className="mt-2 rounded-xl border border-[#bfe0db] bg-[#fbfaf8] p-3">
+              <div className="mt-2 rounded-xl border border-[var(--info-line)] bg-[var(--panel-secondary)] p-3">
                 <input name="preferredDeliveryDateTime" type="hidden" value={operatorDeliveryDateTime} />
                 <div className="grid gap-2 sm:grid-cols-2">
                   <div className="rounded-lg border border-[var(--border)] bg-white px-3 py-2">
@@ -1245,7 +1245,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
               const payNowActive = active && effectiveTiming === "now";
 
               return (
-                <div className={`rounded-2xl border p-4 transition ${active ? "border-[var(--primary)] bg-[#fbfaf8]" : "border-[var(--border)] bg-white"}`} key={key}>
+                <div className={`rounded-2xl border p-4 transition ${active ? "border-[var(--primary)] bg-[var(--panel-secondary)]" : "border-[var(--border)] bg-white"}`} key={key}>
                   <label className="checkbox-label cursor-pointer">
                     <input
                       checked={active}
@@ -1296,7 +1296,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
                   </label>
 
                   {active && effectiveTiming === "now" ? (
-                    <div className="mt-4 rounded-2xl border border-[#bfe0db] bg-white p-4">
+                    <div className="mt-4 rounded-2xl border border-[var(--info-line)] bg-white p-4">
                       {key === "promptpay" && (orgPayment?.promptpay_qr_url || orgPayment?.promptpay_id) ? (
                         <div>
                           {detail.promptPayQrSvg ? (
@@ -1366,7 +1366,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             })}
           </div>
 
-          <p className="mt-4 rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-3 text-sm leading-6 text-[var(--muted)]">
+          <p className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3 text-sm leading-6 text-[var(--muted)]">
             {t("paymentConfirmedBy", { business: detail.organizationName })}
           </p>
 
@@ -1383,14 +1383,14 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           </p>
           <div className="mt-3 flex gap-2">
             <button
-              className={`pressable flex-1 rounded-xl border px-3 py-3 text-sm font-semibold transition ${upfrontAccepted === true ? "border-[var(--primary)] bg-[#fbfaf8] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
+              className={`pressable flex-1 rounded-xl border px-3 py-3 text-sm font-semibold transition ${upfrontAccepted === true ? "border-[var(--primary)] bg-[var(--panel-secondary)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
               onClick={() => setUpfrontAccepted(true)}
               type="button"
             >
               {t("acceptOffer")}
             </button>
             <button
-              className={`pressable flex-1 rounded-xl border px-3 py-3 text-sm font-semibold transition ${upfrontAccepted === false ? "border-[#94a3b8] bg-[#fbfaf8] text-[var(--foreground-secondary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
+              className={`pressable flex-1 rounded-xl border px-3 py-3 text-sm font-semibold transition ${upfrontAccepted === false ? "border-[var(--muted)] bg-[var(--panel-secondary)] text-[var(--foreground-secondary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
               onClick={() => setUpfrontAccepted(false)}
               type="button"
             >
@@ -1410,14 +1410,14 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
 
       <section className="scroll-mt-4 rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm" ref={agreementRef}>
         <SectionTitle icon={PenLine} label={t("rentalAgreement")} />
-        {notice ? <p className="mt-3 rounded-xl bg-[#dcfce7] p-3 text-sm font-bold text-[#166534]">{notice}</p> : null}
+        {notice ? <p className="mt-3 rounded-xl bg-[var(--success-light)] p-3 text-sm font-bold text-[var(--success)]">{notice}</p> : null}
         {!readyToSign ? (
-          <p className="mt-3 rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-3 text-sm leading-6 text-[var(--foreground-secondary)]">
+          <p className="mt-3 rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3 text-sm leading-6 text-[var(--foreground-secondary)]">
             {t("previewExplain", { business: detail.organizationName })}
           </p>
         ) : null}
         {isRentalDocumentEngine && publicAgreement && readyToSign ? (
-          <div className="mt-4 rounded-xl border border-[#bfe0db] bg-[#fbfaf8] p-4">
+          <div className="mt-4 rounded-xl border border-[var(--info-line)] bg-[var(--panel-secondary)] p-4">
             <p className="text-xs font-semibold uppercase text-[var(--primary)]">{t("agreementVersion", { number: publicAgreement.versionNumber })}</p>
             <p className="mt-1 text-sm font-bold text-[var(--foreground)]">{publicAgreement.businessIdentity.name}</p>
             <div className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
@@ -1436,13 +1436,13 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
               {t("textFixedOnceSigned")} <span className="font-mono">{publicAgreement.contentHashFragment}</span>
             </p>
             {customerSigningEligibility?.customerSafeMessage ? (
-              <p className="mt-3 rounded-lg border border-[#fecaca] bg-white p-3 text-sm font-bold text-[#be123c]">{customerSigningEligibility.customerSafeMessage}</p>
+              <p className="mt-3 rounded-lg border border-[var(--danger-line)] bg-white p-3 text-sm font-bold text-[var(--danger)]">{customerSigningEligibility.customerSafeMessage}</p>
             ) : null}
           </div>
         ) : null}
-        <div className="routehq-contract-preview contract-preview mt-4 h-[70vh] min-h-[460px] overflow-hidden rounded-xl border border-[var(--border)] bg-[#fbfaf8]">
+        <div className="routehq-contract-preview contract-preview mt-4 h-[70vh] min-h-[460px] overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)]">
           <iframe
-            className="h-full w-full border-0 bg-[#fbfaf8]"
+            className="h-full w-full border-0 bg-[var(--panel-secondary)]"
             sandbox=""
             srcDoc={buildContractPreviewDocument(agreementHtml)}
             title={t("rentalAgreement")}
@@ -1483,7 +1483,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         </div>
           </>
         ) : null}
-        {error ? <p className="mt-4 rounded-xl bg-[#ffe4e6] p-3 text-sm font-bold text-[#be123c]">{error}</p> : null}
+        {error ? <p className="mt-4 rounded-xl bg-[var(--danger-light)] p-3 text-sm font-bold text-[var(--danger)]">{error}</p> : null}
         <button className="pressable mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white disabled:opacity-70" disabled={isPending} key={readyToSign ? "sign" : "review"} type="submit">
           {isPending ? (
             <span className="inline-flex items-center gap-2"><span className="spinner" /> {t("sending")}</span>
@@ -1516,8 +1516,8 @@ function CompletionStatus({ status }: { status: { details: boolean; documents: b
 
 function StatusItem({ complete, label }: { complete: boolean; label: string }) {
   return (
-    <div className={`flex items-center gap-3 rounded-xl border p-3 transition ${complete ? "border-[#bbf7d0] bg-[#f0fdf4]" : "border-[var(--border)] bg-[#fbfaf8]"}`}>
-      {complete ? <CheckCircle2 className="text-[#16a34a]" /> : <span className="h-5 w-5 rounded-md border border-[#94a3b8]" />}
+    <div className={`flex items-center gap-3 rounded-xl border p-3 transition ${complete ? "border-[var(--success-line)] bg-[var(--success-light)]" : "border-[var(--border)] bg-[var(--panel-secondary)]"}`}>
+      {complete ? <CheckCircle2 className="text-[var(--success)]" /> : <span className="h-5 w-5 rounded-md border border-[var(--muted)]" />}
       <span className="text-sm font-semibold">{label}</span>
     </div>
   );
@@ -1525,7 +1525,7 @@ function StatusItem({ complete, label }: { complete: boolean; label: string }) {
 
 function PaymentDetail({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-3">
+    <div className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
       <p className="text-[11px] font-semibold uppercase text-[var(--muted)]">{label}</p>
       <p className="font-mono-data mt-1 break-words text-sm font-semibold text-[var(--foreground)]">{value}</p>
     </div>
@@ -1546,7 +1546,7 @@ function PaymentReportedButton({
   const t = useTranslations("customer");
   if (reported) {
     return (
-      <p className="mt-3 rounded-xl border border-[#bbf7d0] bg-[#f0fdf4] p-3 text-sm font-bold text-[#166534]">
+      <p className="mt-3 rounded-xl border border-[var(--success-line)] bg-[var(--success-light)] p-3 text-sm font-bold text-[var(--success)]">
         {t("paymentReported")}
       </p>
     );
@@ -1699,10 +1699,10 @@ function PhoneCountrySelect({ name, onChange, value }: { name: string; onChange:
           alignItems: "center",
           justifyContent: "center",
           gap: 6,
-          border: "0.5px solid #cbd5e1",
+          border: "0.5px solid var(--border)",
           borderRight: "none",
           borderRadius: "8px 0 0 8px",
-          background: "#f8fafc",
+          background: "var(--panel-secondary)",
           cursor: "pointer",
           padding: 0,
           position: "relative",
@@ -1942,8 +1942,8 @@ function PublicGooglePinModal({ onClose, onConfirm }: { onClose: () => void; onC
             {t("close")}
           </button>
         </div>
-        <div className="mt-4 h-80 overflow-hidden rounded-xl border border-[var(--border)] bg-[#fbfaf8]" ref={mapRef} />
-        <p className="mt-3 rounded-xl bg-[#fbfaf8] p-3 text-sm font-bold text-[var(--foreground-secondary)]">{address}</p>
+        <div className="mt-4 h-80 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)]" ref={mapRef} />
+        <p className="mt-3 rounded-xl bg-[var(--panel-secondary)] p-3 text-sm font-bold text-[var(--foreground-secondary)]">{address}</p>
         <button className="pressable mt-3 min-h-12 w-full rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white" onClick={() => onConfirm(address)} type="button">
           {t("usePlace")}
         </button>
@@ -1957,10 +1957,10 @@ function SavedDetails({ folded, children }: { folded: boolean; children: React.R
   const t = useTranslations("customer");
   if (!folded) return <>{children}</>;
   return (
-    <details className="group rounded-2xl border border-[#bbf7d0] bg-white shadow-sm">
+    <details className="group rounded-2xl border border-[var(--success-line)] bg-white shadow-sm">
       <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-5 py-3 [&::-webkit-details-marker]:hidden">
         <span>
-          <span className="block text-base font-semibold text-[#166534]">✓ {t("detailsSaved")}</span>
+          <span className="block text-base font-semibold text-[var(--success)]">✓ {t("detailsSaved")}</span>
           <span className="block text-sm text-[var(--muted)]">{t("tapToChange")}</span>
         </span>
         <span aria-hidden="true" className="text-[var(--muted)] transition-transform group-open:rotate-180">▾</span>
@@ -2015,19 +2015,19 @@ function UploadCard({
   }, []);
 
   return (
-    <div style={{ borderRadius: 10, border: "0.5px solid #e2e8f0", background: "#ffffff", padding: "12px 14px", marginBottom: 8 }}>
+    <div style={{ borderRadius: 10, border: "0.5px solid var(--border)", background: "#ffffff", padding: "12px 14px", marginBottom: 8 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 6 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
           <Icon size={16} style={{ color: "var(--primary)", flexShrink: 0 }} />
-          <span style={{ fontSize: 13, fontWeight: 600, color: "#0f172a", lineHeight: 1.3 }}>{label}</span>
+          <span style={{ fontSize: 13, fontWeight: 600, color: "var(--foreground)", lineHeight: 1.3 }}>{label}</span>
         </div>
         {complete || selectedFile ? (
-          <span style={{ fontSize: 11, color: "#16a34a", fontWeight: 500, flexShrink: 0 }}>
+          <span style={{ fontSize: 11, color: "var(--success)", fontWeight: 500, flexShrink: 0 }}>
             {"✓ "}
             {selectedFile ? t("added") : t("received")}
           </span>
         ) : (
-          <span style={{ fontSize: 11, color: "#d97706", flexShrink: 0 }}>{t("needed")}</span>
+          <span style={{ fontSize: 11, color: "var(--warning)", flexShrink: 0 }}>{t("needed")}</span>
         )}
       </div>
 
@@ -2045,11 +2045,11 @@ function UploadCard({
                 minHeight: 44,
                 borderRadius: 7,
                 cursor: "pointer",
-                border: "0.5px solid #cbd5e1",
+                border: "0.5px solid var(--border)",
                 background: "#ffffff",
                 fontSize: 14,
                 fontWeight: 600,
-                color: "#334155"
+                color: "var(--foreground)"
               }}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -2113,7 +2113,7 @@ function UploadCard({
             </label>
           </div>
           {!isMobile ? (
-            <p style={{ fontSize: 10, color: "#94a3b8", margin: "4px 0 0", textAlign: "center" }}>
+            <p style={{ fontSize: 10, color: "var(--muted)", margin: "4px 0 0", textAlign: "center" }}>
               {t("takePhotoHint")}
             </p>
           ) : null}
@@ -2128,11 +2128,11 @@ function UploadCard({
             padding: "7px 12px",
             borderRadius: 7,
             cursor: "pointer",
-            border: "0.5px solid #e2e8f0",
-            background: "#f8fafc",
+            border: "0.5px solid var(--border)",
+            background: "var(--panel-secondary)",
             fontSize: 11,
             fontWeight: 500,
-            color: "#64748b"
+            color: "var(--muted)"
           }}
         >
           {t("replace")}
@@ -2149,7 +2149,7 @@ function UploadCard({
         </label>
       )}
       {note ? (
-        <p aria-live="polite" style={{ fontSize: 12, fontWeight: 600, margin: "8px 0 0", color: noteTone === "unreadable" ? "#b45309" : noteTone === "read" ? "#16a34a" : "var(--primary)" }}>
+        <p aria-live="polite" style={{ fontSize: 12, fontWeight: 600, margin: "8px 0 0", color: noteTone === "unreadable" ? "var(--warning)" : noteTone === "read" ? "var(--success)" : "var(--primary)" }}>
           {note}
         </p>
       ) : null}

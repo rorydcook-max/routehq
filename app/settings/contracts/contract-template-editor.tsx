@@ -138,17 +138,17 @@ export function ContractTemplateEditor({
           </div>
         </section>
 
-        <form action={resetContractTemplate} className="rounded-lg border border-[#fecdd3] bg-[#fff1f2] p-4" onSubmit={(event) => {
+        <form action={resetContractTemplate} className="rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-4" onSubmit={(event) => {
           if (!window.confirm("This will replace your current template with the comprehensive bilingual English/Thai default. Are you sure?")) {
             event.preventDefault();
           }
         }}>
           <input name="organizationId" type="hidden" value={organizationId} />
-          <PendingButton className="pressable inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#be123c] px-4 py-3 text-sm font-semibold text-white" pendingLabel="Resetting..." type="submit">
+          <PendingButton className="pressable inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--danger)] px-4 py-3 text-sm font-semibold text-white" pendingLabel="Resetting..." type="submit">
             <RotateCcw size={18} />
             Reset to comprehensive bilingual template
           </PendingButton>
-          <p className="mt-2 text-xs text-[#9f1239]">This replaces the current template with the comprehensive bilingual English/Thai default.</p>
+          <p className="mt-2 text-xs text-[var(--danger)]">This replaces the current template with the comprehensive bilingual English/Thai default.</p>
         </form>
       </aside>
 

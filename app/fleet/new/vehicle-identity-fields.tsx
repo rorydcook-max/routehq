@@ -474,7 +474,7 @@ export function VehicleIdentityFields({
 
   return (
     <>
-      <div className="rounded-2xl border border-[#bfe0db] bg-[var(--primary-light)] p-4">
+      <div className="rounded-2xl border border-[var(--info-line)] bg-[var(--primary-light)] p-4">
         <SectionHeader eyebrow="Quickest way" title="Take a photo of the blue book" />
         <p className="mt-2 text-sm text-[var(--muted)]">
           Take a photo of the Thai blue book (เล่มทะเบียน) or another registration document and we&apos;ll fill in what we can read. Check the details before saving.
@@ -494,9 +494,9 @@ export function VehicleIdentityFields({
           <p
             className={`mt-3 rounded-lg px-3 py-2 text-sm font-semibold ${
               ocrStatus === "error"
-                ? "bg-[#ffe4e6] text-[#be123c]"
+                ? "bg-[var(--danger-light)] text-[var(--danger)]"
                 : ocrStatus === "done"
-                  ? "bg-[#dcfce7] text-[#166534]"
+                  ? "bg-[var(--success-light)] text-[var(--success)]"
                   : "bg-[var(--primary-light)] text-[var(--primary)]"
             }`}
           >
@@ -505,10 +505,10 @@ export function VehicleIdentityFields({
         ) : null}
       </div>
 
-      <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-4">
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-4">
         <SectionHeader eyebrow="Vehicle" title="Make and model" />
         {catalogStatus === "loading" ? <p className="mt-3 text-sm font-semibold text-[var(--primary)]">Loading makes and models…</p> : null}
-        {catalogStatus === "error" ? <p className="mt-3 rounded-lg bg-[#ffe4e6] px-3 py-2 text-sm font-semibold text-[#be123c]">{catalogMessage}</p> : null}
+        {catalogStatus === "error" ? <p className="mt-3 rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">{catalogMessage}</p> : null}
 
         <input name="make" type="hidden" value={make} />
         <input name="model" type="hidden" value={model} />
@@ -555,7 +555,7 @@ export function VehicleIdentityFields({
                       return selected?.logo_url ? <img alt="" className="h-7 w-7 shrink-0 rounded bg-white object-contain" src={selected.logo_url} /> : <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[var(--primary-light)] text-xs font-bold text-[var(--primary)]">{selected?.name.slice(0, 2) || "?"}</span>;
                     })()
                   ) : (
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[#fbfaf8] text-xs font-bold text-[var(--primary)]">+</span>
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[var(--panel-secondary)] text-xs font-bold text-[var(--primary)]">+</span>
                   )}
                   <span className={make ? "truncate font-semibold" : "truncate text-[var(--muted)]"}>
                     {manualMake ? "Other / custom make" : make || `Select ${selectedCategory?.name || "vehicle"} brand`}
@@ -564,7 +564,7 @@ export function VehicleIdentityFields({
                 <span className="text-[var(--muted)]">v</span>
               </button>
               {makeDropdownOpen ? (
-                <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-2xl border border-[var(--border)] bg-white shadow-xl shadow-[#10252b]/10">
+                <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-2xl border border-[var(--border)] bg-white shadow-xl shadow-[var(--foreground)]/10">
                   <div className="border-b border-[var(--border)] p-3">
                     <input
                       className="w-full rounded-xl border border-[var(--border-strong)] bg-white px-3 py-2 text-sm text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
@@ -576,7 +576,7 @@ export function VehicleIdentityFields({
                   <div className="max-h-72 overflow-y-auto py-1">
                     {searchedMakes.map((item) => (
                       <button
-                        className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm hover:bg-[#fbfaf8]"
+                        className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm hover:bg-[var(--panel-secondary)]"
                         key={item.id}
                         onClick={() => handleMakeSelect(item.id)}
                         type="button"
@@ -587,7 +587,7 @@ export function VehicleIdentityFields({
                       </button>
                     ))}
                     <button
-                      className="flex w-full items-center gap-3 border-t border-[var(--border)] px-3 py-2 text-left text-sm font-semibold text-[var(--primary)] hover:bg-[#fbfaf8]"
+                      className="flex w-full items-center gap-3 border-t border-[var(--border)] px-3 py-2 text-left text-sm font-semibold text-[var(--primary)] hover:bg-[var(--panel-secondary)]"
                       onClick={() => handleMakeSelect("__manual__")}
                       type="button"
                     >

@@ -59,16 +59,16 @@ export function LogoUploadSection({
     submit(fd);
   }
 
-  const fileInputClass = "max-w-52 text-xs text-[#667085] file:mr-2 file:rounded-lg file:border-0 file:bg-[#ecfeff] file:px-2.5 file:py-1.5 file:text-xs file:font-bold file:text-[#0e7490]";
+  const fileInputClass = "max-w-52 text-xs text-[var(--muted)] file:mr-2 file:rounded-lg file:border-0 file:bg-[var(--primary-light)] file:px-2.5 file:py-1.5 file:text-xs file:font-bold file:text-[var(--primary)]";
 
   if (logoUrl) {
     return (
-      <div className="flex flex-col gap-3 rounded-lg border border-[#dfe4ea] bg-[#fbfefd] p-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 rounded-lg border border-[var(--border)] bg-[var(--primary-light)] p-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <BusinessLogoImage alt={`${orgName} logo`} className="h-10 w-14 rounded-lg border border-[var(--border)] bg-white object-contain p-1.5" src={logoUrl} />
           <div>
-            <p className="text-[13px] font-bold text-[#172026]">Business logo</p>
-            <p className="mt-0.5 text-[11px] leading-4 text-[#667085]">Appears on contracts, booking links and receipts.</p>
+            <p className="text-[13px] font-bold text-[var(--foreground)]">Business logo</p>
+            <p className="mt-0.5 text-[11px] leading-4 text-[var(--muted)]">Appears on contracts, booking links and receipts.</p>
           </div>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">
@@ -83,24 +83,24 @@ export function LogoUploadSection({
           </div>
         </div>
         {message ? (
-          <p className={`mt-1 w-full text-xs ${message.type === "error" ? "text-[#dc2626]" : "text-[#16a34a]"}`}>{message.text}</p>
+          <p className={`mt-1 w-full text-xs ${message.type === "error" ? "text-[var(--danger)]" : "text-[var(--success)]"}`}>{message.text}</p>
         ) : null}
       </div>
     );
   }
 
   return (
-    <form className="flex flex-col gap-3 rounded-lg border border-[#dfe4ea] bg-[#fbfefd] p-3 sm:flex-row sm:items-center sm:justify-between" onSubmit={handleUpload}>
+    <form className="flex flex-col gap-3 rounded-lg border border-[var(--border)] bg-[var(--primary-light)] p-3 sm:flex-row sm:items-center sm:justify-between" onSubmit={handleUpload}>
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-14 shrink-0 items-center justify-center rounded-lg bg-[#ecfeff] text-[#0e7490]">
+        <div className="flex h-10 w-14 shrink-0 items-center justify-center rounded-lg bg-[var(--primary-light)] text-[var(--primary)]">
           <svg aria-hidden="true" fill="none" height="24" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" viewBox="0 0 24 24" width="24">
             <path d="M5 7h2l1.5-2h7L17 7h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z" />
             <circle cx="12" cy="14" r="4" />
           </svg>
         </div>
         <div>
-          <p className="text-[13px] font-bold text-[#172026]">Upload your business logo</p>
-          <p className="mt-0.5 text-[11px] leading-4 text-[#667085]">PNG, JPG or SVG. Recommended 400x200px or wider. Appears on contracts, booking links and receipts.</p>
+          <p className="text-[13px] font-bold text-[var(--foreground)]">Upload your business logo</p>
+          <p className="mt-0.5 text-[11px] leading-4 text-[var(--muted)]">PNG, JPG or SVG. Recommended 400x200px or wider. Appears on contracts, booking links and receipts.</p>
         </div>
       </div>
       <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
@@ -110,7 +110,7 @@ export function LogoUploadSection({
         </button>
       </div>
       {message ? (
-        <p className={`mt-1 w-full text-xs ${message.type === "error" ? "text-[#dc2626]" : "text-[#16a34a]"}`}>{message.text}</p>
+        <p className={`mt-1 w-full text-xs ${message.type === "error" ? "text-[var(--danger)]" : "text-[var(--success)]"}`}>{message.text}</p>
       ) : null}
     </form>
   );

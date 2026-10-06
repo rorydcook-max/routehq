@@ -37,7 +37,7 @@ export function AmendmentLinkPanel({ token, onCancel, cancelling, changedAlready
   // Sent to the customer, so not in the staff language. It stays in English until the customer's language is known here.
   const message = `Please review and sign the change to your rental: ${url}`;
   return (
-    <div className="rounded-xl border border-[#bfe0db] bg-[var(--primary-light)] p-3 text-sm">
+    <div className="rounded-xl border border-[var(--info-line)] bg-[var(--primary-light)] p-3 text-sm">
       <p className="font-bold text-[var(--primary)]">{say("al_waiting")}</p>
       <p className="mt-1 text-[12px] text-[var(--foreground-secondary)]">{changedAlready ? say("al_changed") : say("al_nothing")}</p>
       {canNativeShare ? (
@@ -73,7 +73,7 @@ export function AmendmentLinkPanel({ token, onCancel, cancelling, changedAlready
           {say("al_preview")}
         </a>
         {onCancel ? (
-          <button className="pressable ml-auto inline-flex min-h-10 items-center rounded-lg px-2 text-xs font-semibold text-[#be123c] underline disabled:opacity-60" disabled={cancelling} onClick={onCancel} type="button">
+          <button className="pressable ml-auto inline-flex min-h-10 items-center rounded-lg px-2 text-xs font-semibold text-[var(--danger)] underline disabled:opacity-60" disabled={cancelling} onClick={onCancel} type="button">
             {cancelling ? say("al_cancelling") : say("al_cancel")}
           </button>
         ) : null}
@@ -162,7 +162,7 @@ function OptionCard({
   tone: "teal" | "amber";
   onClick: () => void;
 }) {
-  const activeClass = tone === "teal" ? "border-[var(--primary)] bg-[var(--primary-light)]" : "border-[var(--warning)] bg-[#fffbeb]";
+  const activeClass = tone === "teal" ? "border-[var(--primary)] bg-[var(--primary-light)]" : "border-[var(--warning)] bg-[var(--warning-light)]";
 
   return (
     <button
@@ -170,7 +170,7 @@ function OptionCard({
       onClick={onClick}
       type="button"
     >
-      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${tone === "teal" ? "bg-[var(--primary-light)] text-[var(--primary)]" : "bg-[#fef3c7] text-[var(--warning)]"}`}>
+      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${tone === "teal" ? "bg-[var(--primary-light)] text-[var(--primary)]" : "bg-[var(--warning-light)] text-[var(--warning)]"}`}>
         <i aria-hidden="true" className={`ti ${icon} text-base`} />
       </span>
       <span>
@@ -407,7 +407,7 @@ export function RentalAdjustmentModal({
     (isTerms ? !newRate.trim() && !newDeposit.trim() : isExtension ? !extensionEndDate : !earlyReturnDate);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0f172a]/35 px-4 py-6" role="dialog" aria-modal="true">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--foreground)]/35 px-4 py-6" role="dialog" aria-modal="true">
       <div className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-[var(--border)] bg-white p-4 shadow-[0_24px_80px_rgba(15,23,42,0.22)]">
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -453,7 +453,7 @@ export function RentalAdjustmentModal({
         </div>
 
         {signingBlocked && adjustmentType !== "early_return" ? (
-          <p className="mt-3 rounded-lg border border-[#fde68a] bg-[#fffbeb] px-3 py-2 text-[12px] font-bold text-[#92400e]">
+          <p className="mt-3 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] px-3 py-2 text-[12px] font-bold text-[var(--warning)]">
             {say("adj_cantSign", { gaps: (context?.signingGaps || []).join(", ") })}
           </p>
         ) : null}
@@ -493,7 +493,7 @@ export function RentalAdjustmentModal({
                 {say("adj_extraTerms")}
                 <textarea className="mt-1 min-h-16 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 py-2 text-[13px]" maxLength={2000} onChange={(event) => setAdditionalTerms(event.target.value)} value={additionalTerms} />
               </label>
-              <p className="rounded-xl border border-[#bfe0db] bg-[var(--primary-light)] p-3 text-[12px] font-bold text-[var(--primary)]">
+              <p className="rounded-xl border border-[var(--info-line)] bg-[var(--primary-light)] p-3 text-[12px] font-bold text-[var(--primary)]">
                 {say("adj_linkNote")}
               </p>
             </>
@@ -535,7 +535,7 @@ export function RentalAdjustmentModal({
                 </div>
               ) : null}
 
-              <div className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3 text-sm text-[var(--foreground-secondary)]">
+              <div className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3 text-sm text-[var(--foreground-secondary)]">
                 {t.rich("adj_extensionLine", { from: originalEndDate ? niceDate(originalEndDate) : say("adj_openEnded"), to: extensionEndDate ? niceDate(extensionEndDate) : say("adj_newDate"), days: extensionDays, b: bold })}
               </div>
 
@@ -592,7 +592,7 @@ export function RentalAdjustmentModal({
                 </label>
               )}
 
-              <div className="rounded-xl border border-[#bfe0db] bg-[var(--primary-light)] p-3 text-sm font-bold text-[var(--primary)]">
+              <div className="rounded-xl border border-[var(--info-line)] bg-[var(--primary-light)] p-3 text-sm font-bold text-[var(--primary)]">
                 {say("adj_summary", { days: extensionDays, amount: money(parseAmount(extensionAmount)), date: extensionDueDate ? niceDate(extensionDueDate) : say("adj_notSet") })}
                 {useAmendment ? <span className="mt-1 block text-[12px] font-normal">{say("adj_appliesWhen")}</span> : null}
               </div>
@@ -611,7 +611,7 @@ export function RentalAdjustmentModal({
                 />
               </label>
 
-              <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3 text-sm text-[#92400e]">
+              <div className="rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3 text-sm text-[var(--warning)]">
                 {openEnded
                   ? say("adj_endsOn", { date: earlyReturnDate ? niceDate(earlyReturnDate) : say("adj_dateYouChoose") })
                   : say("adj_sooner", { days: earlyReturnDays, from: niceDate(originalEndDate), to: earlyReturnDate ? niceDate(earlyReturnDate) : say("adj_dateYouChoose") })}

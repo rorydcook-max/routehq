@@ -119,7 +119,7 @@ export function PaymentMethodsForm({
                 </span>
               </label>
 
-              <div className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
+              <div className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
                 <p className="text-[11px] font-medium text-[var(--foreground-secondary)]">PromptPay QR Code</p>
                 <p className="mt-1 text-xs leading-5 text-[var(--muted)]">
                   Upload a screenshot or photo of your PromptPay QR code. Customers will scan this in their Thai banking app to pay. You can find your QR code in your banking app under 'Receive money' or 'My QR code'.
@@ -133,7 +133,7 @@ export function PaymentMethodsForm({
                         <input accept="image/png,image/jpeg,image/webp" className="sr-only" name="promptpay_qr" data-keep-original type="file" />
                       </label>
                       <button
-                        className="pressable rounded-lg border border-[#fecdd3] bg-[#fff1f2] px-3 py-2 text-sm font-semibold text-[#be123c]"
+                        className="pressable rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]"
                         onClick={() => {
                           setRemovePromptPayQr(true);
                           setPromptPayQrUrl("");
@@ -198,7 +198,7 @@ export function PaymentMethodsForm({
               <input className={inputClass} defaultValue={settings.revolut_link || ""} name="revolut_link" placeholder="e.g. revolut.me/yourname" />
             </label>
           </MethodCard>
-          <div className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3 opacity-75">
+          <div className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3 opacity-75">
             <div className="flex items-start justify-between gap-3">
               <label className="checkbox-label">
                 <input className="flex-shrink-0" disabled type="checkbox" />
@@ -207,7 +207,7 @@ export function PaymentMethodsForm({
                   <span className="mt-1 block text-xs leading-5 text-[var(--muted)]">Card payments via Stripe</span>
                 </span>
               </label>
-              <span className="rounded-full border border-[#fde68a] bg-[#fffbeb] px-2 py-1 text-xs font-bold uppercase text-[#d97706]">
+              <span className="rounded-full border border-[var(--warning-line)] bg-[var(--warning-light)] px-2 py-1 text-xs font-bold uppercase text-[var(--warning)]">
                 Coming soon
               </span>
             </div>
@@ -255,8 +255,8 @@ export function PaymentMethodsForm({
         <p
           className={`rounded-lg border px-3 py-2 text-xs font-semibold ${
             message.tone === "success"
-              ? "border-[#bbf7d0] bg-[#f0fdf4] text-[#166534]"
-              : "border-[#fecdd3] bg-[#fff1f2] text-[#be123c]"
+              ? "border-[var(--success-line)] bg-[var(--success-light)] text-[var(--success)]"
+              : "border-[var(--danger-line)] bg-[var(--danger-light)] text-[var(--danger)]"
           }`}
         >
           {message.text}

@@ -213,12 +213,12 @@ function formatSummaryDate(value: unknown, t: T, locale: string) {
 async function ErrorState({ title, message, contact, rebookHref, rebookLabel }: { title: string; message: string; contact?: string | null; rebookHref?: string | null; rebookLabel?: string }) {
   const t = await getTranslations("customer");
   return (
-    <main className="min-h-screen bg-[#fbfaf8] px-4 py-8">
+    <main className="min-h-screen bg-[var(--panel-secondary)] px-4 py-8">
       <div className="mx-auto mb-3 flex max-w-xl justify-end">
         <CustomerLanguagePicker />
       </div>
       <section className="mx-auto max-w-xl rounded-2xl border border-[var(--border)] bg-white p-6 text-center shadow-sm">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#ffe4e6] text-[#be123c]">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[var(--danger-light)] text-[var(--danger)]">
           <AlertTriangle />
         </div>
         <h1 className="mt-4 text-2xl font-semibold text-[var(--foreground)]">{title}</h1>
@@ -320,7 +320,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
 
   const bookingSummary = (
     <>
-          <div className="mt-5 rounded-2xl border border-[var(--border)] bg-[#fbfaf8] p-4">
+          <div className="mt-5 rounded-2xl border border-[var(--border)] bg-[var(--panel-secondary)] p-4">
             <div className="flex items-start gap-3">
               <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
                 <VehicleKindIcon boxed={false} kind={kindFromCategory(vehicle.vehicle_categories)} size={28} />
@@ -354,11 +354,11 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   );
 
   return (
-    <main className="min-h-screen bg-[#fbfaf8] px-4 py-5 text-[var(--foreground)]">
+    <main className="min-h-screen bg-[var(--panel-secondary)] px-4 py-5 text-[var(--foreground)]">
       <div className="mx-auto max-w-3xl space-y-5">
         {pendingAmendmentToken ? (
           <a
-            className="pressable flex items-center justify-between gap-3 rounded-2xl border border-[#bfe0db] bg-[var(--primary-light)] p-4 shadow-sm"
+            className="pressable flex items-center justify-between gap-3 rounded-2xl border border-[var(--info-line)] bg-[var(--primary-light)] p-4 shadow-sm"
             href={`/amend/${pendingAmendmentToken}`}
           >
             <span>
@@ -397,7 +397,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
         </header>
 
         {invites.length > 0 && detail.state !== "completed" ? (
-          <section className="rounded-2xl border border-[#bfe0db] bg-[var(--primary-light)] p-4 shadow-sm">
+          <section className="rounded-2xl border border-[var(--info-line)] bg-[var(--primary-light)] p-4 shadow-sm">
             <p className="text-sm font-semibold text-[var(--foreground)]">{t("updatesTitle")}</p>
             <p className="mt-1 text-sm leading-6 text-[var(--foreground-secondary)]">
               {t("updatesBody", { business: businessName })}
@@ -436,7 +436,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             <PortalPayments bundle={portal.bundle} orgPayment={detail.org_payment} organizationName={businessName} payments={portal.payments} token={token} />
           ) : null}
           <section className="rounded-2xl border border-[var(--border)] bg-white p-5 text-center shadow-sm">
-            <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#f0fdf4] text-[#16a34a]">
+            <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[var(--success-light)] text-[var(--success)]">
               <ShieldCheck size={28} />
             </span>
             <h2 className="mt-4 text-2xl font-semibold text-[var(--foreground)]">{t("completedTitle")}</h2>
@@ -452,7 +452,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
               const reason = String(rental.deposit_deduction_reason || "").split(" — ")[0].trim().toLowerCase();
               const currency = rental.currency || "THB";
               return (
-                <div className="mx-auto mt-4 max-w-sm rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-3 text-left text-sm text-[var(--foreground-secondary)]">
+                <div className="mx-auto mt-4 max-w-sm rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3 text-left text-sm text-[var(--foreground-secondary)]">
                   <p className="font-semibold text-[var(--foreground)]">{t("yourDeposit", { amount: money(held, currency) })}</p>
                   {returned > 0 ? <p className="mt-1">{t("depositReturned", { amount: money(returned, currency) })}</p> : null}
                   {kept > 0 ? <p className="mt-1">{t("depositKept", { amount: money(kept, currency) })}{reason ? ` (${reason})` : ""}</p> : null}

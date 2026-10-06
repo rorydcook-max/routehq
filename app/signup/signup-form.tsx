@@ -14,7 +14,7 @@ export function SignupForm() {
   if (state.success) {
     return (
       <div className="space-y-4">
-        <p className="rounded-lg bg-[#ecfdf5] px-3 py-3 text-sm font-semibold text-[#047857]">{state.success}</p>
+        <p className="rounded-lg bg-[var(--success-light)] px-3 py-3 text-sm font-semibold text-[var(--success)]">{state.success}</p>
         <p className="text-center text-sm text-[var(--muted)]">
           Already confirmed?{" "}
           <a className="font-semibold text-[var(--primary)]" href="/login">
@@ -44,7 +44,7 @@ export function SignupForm() {
         <input className={inputClass} name="password" type="password" autoComplete="new-password" minLength={8} required />
         <span className="mt-1 block text-xs text-[var(--muted)]">At least 8 characters.</span>
       </label>
-      {state.error ? <p className="rounded-lg bg-[#ffe4e6] px-3 py-2 text-sm font-semibold text-[#be123c]">{state.error}</p> : null}
+      {state.error ? <p className="rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">{state.error}</p> : null}
       <button
         className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-3 font-bold text-white disabled:opacity-60"
         disabled={pending}

@@ -35,8 +35,8 @@ export default async function TrialExpiredPage() {
   return (
     <AppShell userEmail={userEmail}>
       <div className="mx-auto max-w-4xl">
-        <Card className="border-[#fecdd3] bg-[#fff7f8]">
-          <p className="text-sm font-semibold uppercase text-[#be123c]">Trial ended</p>
+        <Card className="border-[var(--danger-line)] bg-[var(--danger-light)]">
+          <p className="text-sm font-semibold uppercase text-[var(--danger)]">Trial ended</p>
           <h1 className="mt-2 text-3xl font-semibold text-[var(--foreground)]">Your trial has ended</h1>
           <p className="mt-2 max-w-2xl text-sm text-[var(--muted)]">
             Your RouteHQ data is safe. Subscribe to continue managing your vehicles, customers, rentals, reminders, and documents.

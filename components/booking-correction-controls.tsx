@@ -109,10 +109,10 @@ function isTransactionVoided(transaction: BookingTransaction) {
 
 function toneClass(tone: "green" | "amber" | "red" | "blue" | "neutral") {
   const tones = {
-    green: "bg-[var(--success-light)] text-[var(--success)] ring-[#bbf7d0]",
-    amber: "bg-[var(--warning-light)] text-[var(--warning)] ring-[#fde68a]",
-    red: "bg-[var(--danger-light)] text-[var(--danger)] ring-[#fecaca]",
-    blue: "bg-[var(--primary-light)] text-[var(--primary)] ring-[#a5f3fc]",
+    green: "bg-[var(--success-light)] text-[var(--success)] ring-[var(--success-line)]",
+    amber: "bg-[var(--warning-light)] text-[var(--warning)] ring-[var(--warning-line)]",
+    red: "bg-[var(--danger-light)] text-[var(--danger)] ring-[var(--danger-line)]",
+    blue: "bg-[var(--primary-light)] text-[var(--primary)] ring-[var(--primary-light)]",
     neutral: "bg-[var(--panel-secondary)] text-[var(--foreground-secondary)] ring-[var(--border)]"
   };
   return tones[tone];
@@ -204,7 +204,7 @@ export function AddRentalPaymentInlineForm({ organizationId, rentalId, currency 
               <input className="mt-1 w-full" type="text" value={description} onChange={(event) => setDescription(event.target.value)} />
             </label>
           </div>
-          {message ? <p className="mt-3 rounded-lg bg-[#fef2f2] p-2 text-xs font-semibold text-[#dc2626]">{message}</p> : null}
+          {message ? <p className="mt-3 rounded-lg bg-[var(--danger-light)] p-2 text-xs font-semibold text-[var(--danger)]">{message}</p> : null}
           <div className="mt-3 flex flex-wrap gap-2">
             <ActionButton disabled={isPending} onClick={save} tone="primary">{isPending ? tx.say("saving") : tx.say("pc_saveCharge")}</ActionButton>
             <ActionButton disabled={isPending} onClick={() => setOpen(false)}>{tx.say("cancelBtn")}</ActionButton>
@@ -264,22 +264,22 @@ export function ExistingRentalPaymentSetupCard({
   }
 
   return (
-    <div className="rounded-xl border border-[#fde68a] bg-[#fffbeb] p-3">
+    <div className="rounded-xl border border-[var(--warning-line)] bg-[var(--warning-light)] p-3">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="font-semibold text-[#92400e]">{tx.say("pc_setupTitle")}</p>
-          <p className="mt-1 text-sm leading-5 text-[#b45309]">
+          <p className="font-semibold text-[var(--warning)]">{tx.say("pc_setupTitle")}</p>
+          <p className="mt-1 text-sm leading-5 text-[var(--warning)]">
             {tx.say("pc_setupBody")}
           </p>
         </div>
-        <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-lg border border-[#fde68a] bg-white px-3 text-xs font-semibold text-[#92400e]" href={`/bookings/${rentalId}/edit#payments`}>
+        <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-lg border border-[var(--warning-line)] bg-white px-3 text-xs font-semibold text-[var(--warning)]" href={`/bookings/${rentalId}/edit#payments`}>
           {tx.say("pc_setupManual")}
         </Link>
       </div>
 
       <div className="mt-3 grid gap-3 lg:grid-cols-2">
-        <div className="rounded-lg border border-[#fde68a] bg-white p-3">
-          <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#b45309]">{tx.say("pc_firstPayment")}</p>
+        <div className="rounded-lg border border-[var(--warning-line)] bg-white p-3">
+          <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--warning)]">{tx.say("pc_firstPayment")}</p>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             <button
               className={`pressable rounded-lg border px-3 py-2 text-left text-xs font-semibold ${firstPaymentMode === "collected" ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
@@ -321,8 +321,8 @@ export function ExistingRentalPaymentSetupCard({
           </div>
         </div>
 
-        <div className="rounded-lg border border-[#fde68a] bg-white p-3">
-          <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#b45309]">{tx.say("pc_securityDeposit")}</p>
+        <div className="rounded-lg border border-[var(--warning-line)] bg-white p-3">
+          <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--warning)]">{tx.say("pc_securityDeposit")}</p>
           <div className="mt-3 grid gap-2">
             {[
               ["collected", tx.say("pc_depCollected")],
@@ -367,7 +367,7 @@ export function ExistingRentalPaymentSetupCard({
         </div>
       </div>
 
-      {message ? <p className="mt-3 rounded-lg bg-[#fef2f2] p-2 text-xs font-semibold text-[#dc2626]">{message}</p> : null}
+      {message ? <p className="mt-3 rounded-lg bg-[var(--danger-light)] p-2 text-xs font-semibold text-[var(--danger)]">{message}</p> : null}
       <div className="mt-3 flex justify-end">
         <ActionButton disabled={isPending} onClick={submit} tone="primary">
           {isPending ? tx.say("pc_settingUp") : tx.say("pc_createRecords")}
@@ -394,7 +394,7 @@ function ActionButton({
     tone === "primary"
       ? "bg-[var(--primary)] text-white"
       : tone === "danger"
-        ? "border border-[#fecaca] bg-[#fef2f2] text-[#dc2626]"
+        ? "border border-[var(--danger-line)] bg-[var(--danger-light)] text-[var(--danger)]"
         : "border border-[var(--border)] bg-white text-[var(--foreground-secondary)]";
 
   return (
@@ -448,7 +448,7 @@ export function EditableEndDate({ rentalId, currentEndDate }: { rentalId: string
         <ActionButton disabled={isPending} onClick={() => { setValue(dateInput(currentEndDate)); setMessage(null); setEditing(false); }}>
           {tx.say("cancelBtn")}
         </ActionButton>
-        {message ? <span className="basis-full text-xs font-semibold text-[#dc2626]">{message}</span> : null}
+        {message ? <span className="basis-full text-xs font-semibold text-[var(--danger)]">{message}</span> : null}
       </span>
     );
   }
@@ -626,7 +626,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
               <input className="mt-1 w-full" placeholder={tx.say("pc_notePlaceholder")} type="text" value={recordNote} onChange={(event) => setRecordNote(event.target.value)} />
             </label>
           </div>
-          {message ? <p className="mt-3 rounded-lg bg-[#fef2f2] p-2 text-xs font-semibold text-[#dc2626]">{message}</p> : null}
+          {message ? <p className="mt-3 rounded-lg bg-[var(--danger-light)] p-2 text-xs font-semibold text-[var(--danger)]">{message}</p> : null}
           <div className="mt-3 flex flex-wrap gap-2">
             <ActionButton disabled={isPending} onClick={saveReceivedPayment} tone="primary">{isPending ? tx.say("pc_recording") : tx.say("pc_confirmReceived")}</ActionButton>
             <ActionButton disabled={isPending} onClick={() => setRecordingPayment(false)}>{tx.say("cancelBtn")}</ActionButton>
@@ -670,7 +670,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
               </label>
             ) : null}
           </div>
-          {message ? <p className="mt-3 rounded-lg bg-[#fef2f2] p-2 text-xs font-semibold text-[#dc2626]">{message}</p> : null}
+          {message ? <p className="mt-3 rounded-lg bg-[var(--danger-light)] p-2 text-xs font-semibold text-[var(--danger)]">{message}</p> : null}
           <div className="mt-3 flex flex-wrap gap-2">
             <ActionButton disabled={isPending} onClick={save} tone="primary">{isPending ? tx.say("saving") : tx.say("pc_saveChanges")}</ActionButton>
             <ActionButton disabled={isPending} onClick={() => setEditing(false)}>{tx.say("cancelBtn")}</ActionButton>
@@ -681,8 +681,8 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
                 onClick={() => setShowDeleteConfirm(true)}
                 style={{
                   fontSize: 11, padding: "4px 10px", borderRadius: 5,
-                  border: "0.5px solid #fecaca", background: "#fef2f2",
-                  color: "#dc2626", cursor: "pointer", fontWeight: 500
+                  border: "0.5px solid var(--danger-line)", background: "var(--danger-light)",
+                  color: "var(--danger)", cursor: "pointer", fontWeight: 500
                 }}
               >
                 {tx.say("pc_deletePayment")}
@@ -690,10 +690,10 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
             </div>
           ) : (
             <div style={{
-              background: "#fef2f2", border: "0.5px solid #fecaca",
+              background: "var(--danger-light)", border: "0.5px solid var(--danger-line)",
               borderRadius: 7, padding: "10px 12px", marginTop: 8
             }}>
-              <p style={{ fontSize: 12, color: "#dc2626", fontWeight: 500, margin: "0 0 6px" }}>
+              <p style={{ fontSize: 12, color: "var(--danger)", fontWeight: 500, margin: "0 0 6px" }}>
                 {tx.say("pc_deletePaymentConfirm")}
               </p>
               <div style={{ display: "flex", gap: 6 }}>
@@ -701,8 +701,8 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
                   onClick={() => setShowDeleteConfirm(false)}
                   style={{
                     fontSize: 11, padding: "4px 10px", borderRadius: 5,
-                    border: "0.5px solid #e2e8f0", background: "#fff",
-                    color: "#64748b", cursor: "pointer"
+                    border: "0.5px solid var(--border)", background: "#fff",
+                    color: "var(--muted)", cursor: "pointer"
                   }}
                 >
                   {tx.say("cancelBtn")}
@@ -722,7 +722,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
                   }}
                   style={{
                     fontSize: 11, padding: "4px 10px", borderRadius: 5,
-                    border: "none", background: "#dc2626",
+                    border: "none", background: "var(--danger)",
                     color: "#fff", cursor: "pointer", fontWeight: 500
                   }}
                 >
@@ -753,8 +753,8 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
 
   const amountClass = useMemo(() => {
     if (voided) return "text-[var(--muted)] line-through";
-    if (isRefund) return "text-[#d97706]";
-    return Number(transaction.amount) >= 0 ? "text-[#16a34a]" : "text-[#be123c]";
+    if (isRefund) return "text-[var(--warning)]";
+    return Number(transaction.amount) >= 0 ? "text-[var(--success)]" : "text-[var(--danger)]";
   }, [isRefund, transaction.amount, voided]);
 
   function save() {
@@ -785,7 +785,7 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
             {voided ? <SmallBadge tone="neutral">{tx.say("pc_voided")}</SmallBadge> : null}
           </div>
           <p className={`text-sm ${voided ? "text-[var(--muted)]" : "text-[var(--muted)]"}`}>{dateLabel(transaction.transaction_date, tx.locale)} {transaction.notes ? `/ ${transaction.notes}` : ""}</p>
-          {isRefund && transaction.metadata?.refund_reason ? <p className="mt-1 text-sm font-semibold text-[#b45309]">{transaction.metadata.refund_reason}</p> : null}
+          {isRefund && transaction.metadata?.refund_reason ? <p className="mt-1 text-sm font-semibold text-[var(--warning)]">{transaction.metadata.refund_reason}</p> : null}
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <span className={`font-mono-data font-semibold ${amountClass}`}>{money(transaction.amount, transaction.currency || "THB")}</span>
@@ -824,7 +824,7 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
               <input className="mt-1 w-full" type="text" value={description} onChange={(event) => setDescription(event.target.value)} />
             </label>
           </div>
-          {message ? <p className="mt-3 rounded-lg bg-[#fef2f2] p-2 text-xs font-semibold text-[#dc2626]">{message}</p> : null}
+          {message ? <p className="mt-3 rounded-lg bg-[var(--danger-light)] p-2 text-xs font-semibold text-[var(--danger)]">{message}</p> : null}
           <div className="mt-3 flex flex-wrap gap-2">
             <ActionButton disabled={isPending} onClick={save} tone="primary">{isPending ? tx.say("saving") : tx.say("pc_saveChanges")}</ActionButton>
             <ActionButton disabled={isPending} onClick={() => setEditing(false)}>{tx.say("cancelBtn")}</ActionButton>
@@ -835,8 +835,8 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
                 onClick={() => setShowDeleteConfirm(true)}
                 style={{
                   fontSize: 11, padding: "4px 10px", borderRadius: 5,
-                  border: "0.5px solid #fecaca", background: "#fef2f2",
-                  color: "#dc2626", cursor: "pointer", fontWeight: 500
+                  border: "0.5px solid var(--danger-line)", background: "var(--danger-light)",
+                  color: "var(--danger)", cursor: "pointer", fontWeight: 500
                 }}
               >
                 {tx.say("pc_deleteTx")}
@@ -844,10 +844,10 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
             </div>
           ) : (
             <div style={{
-              background: "#fef2f2", border: "0.5px solid #fecaca",
+              background: "var(--danger-light)", border: "0.5px solid var(--danger-line)",
               borderRadius: 7, padding: "10px 12px", marginTop: 8
             }}>
-              <p style={{ fontSize: 12, color: "#dc2626", fontWeight: 500, margin: "0 0 6px" }}>
+              <p style={{ fontSize: 12, color: "var(--danger)", fontWeight: 500, margin: "0 0 6px" }}>
                 {tx.say("pc_deleteTxConfirm")}
               </p>
               <div style={{ display: "flex", gap: 6 }}>
@@ -855,8 +855,8 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
                   onClick={() => setShowDeleteConfirm(false)}
                   style={{
                     fontSize: 11, padding: "4px 10px", borderRadius: 5,
-                    border: "0.5px solid #e2e8f0", background: "#fff",
-                    color: "#64748b", cursor: "pointer"
+                    border: "0.5px solid var(--border)", background: "#fff",
+                    color: "var(--muted)", cursor: "pointer"
                   }}
                 >
                   {tx.say("cancelBtn")}
@@ -876,7 +876,7 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
                   }}
                   style={{
                     fontSize: 11, padding: "4px 10px", borderRadius: 5,
-                    border: "none", background: "#dc2626",
+                    border: "none", background: "var(--danger)",
                     color: "#fff", cursor: "pointer", fontWeight: 500
                   }}
                 >

@@ -10,8 +10,8 @@ export default async function SubscriptionRequiredPage() {
   return (
     <AppShell userEmail={userEmail}>
       <div className="mx-auto max-w-3xl">
-        <Card className="border-[#fecdd3] bg-[#fff7f8]">
-          <p className="text-sm font-semibold uppercase text-[#be123c]">Subscription required</p>
+        <Card className="border-[var(--danger-line)] bg-[var(--danger-light)]">
+          <p className="text-sm font-semibold uppercase text-[var(--danger)]">Subscription required</p>
           <h1 className="mt-2 text-3xl font-semibold text-[var(--foreground)]">Reactivate your RouteHQ account</h1>
           <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
             This account needs an active subscription before the workspace can be used again. Your data remains in place, and we can reactivate access after confirming payment.

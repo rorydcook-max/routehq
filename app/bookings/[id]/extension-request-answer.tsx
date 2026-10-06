@@ -50,7 +50,7 @@ export function ExtensionRequestAnswer({ actionId, rentalId, picture, requestedE
   const worth = picture?.worth;
 
   return (
-    <div className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
+    <div className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
       {worth ? (
         <p className="text-sm text-[var(--foreground-secondary)]">
           {t.rich(worth.perMonth ? "ext_worthMonthly" : worth.explain ? "ext_worthExplained" : "ext_worth", { amount: money(worth.amount), explain: String(worth.explain || ""), b: strong })}
@@ -74,8 +74,8 @@ export function ExtensionRequestAnswer({ actionId, rentalId, picture, requestedE
         </div>
       ) : (
         <div className="mt-3 space-y-3">
-          <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
-            <p className="text-xs font-bold uppercase text-[#92400e]">{blockers.length === 1 ? say("ext_blockOne") : say("ext_blockMany", { count: blockers.length })}</p>
+          <div className="rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3">
+            <p className="text-xs font-bold uppercase text-[var(--warning)]">{blockers.length === 1 ? say("ext_blockOne") : say("ext_blockMany", { count: blockers.length })}</p>
             {blockers.map((item) => (
               <div className="mt-2 text-sm text-[var(--foreground)]" key={item.rentalId}>
                 <Link className="font-semibold text-[var(--primary)]" href={`/bookings/${item.rentalId}` as Route}>
@@ -154,7 +154,7 @@ export function ExtensionRequestAnswer({ actionId, rentalId, picture, requestedE
         </div>
       )}
 
-      {error ? <p className="mt-3 rounded-lg bg-[#ffe4e6] px-3 py-2 text-sm font-semibold text-[#be123c]">{error}</p> : null}
+      {error ? <p className="mt-3 rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">{error}</p> : null}
     </div>
   );
 }

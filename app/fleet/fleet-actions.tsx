@@ -48,7 +48,7 @@ export function FleetBulkActions({
             {t("deleteForGood", { count })}
           </PendingButton>
         ) : (
-          <button className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#fecaca] bg-white px-3 py-2 text-sm font-bold text-[var(--danger)]" onClick={() => setConfirming(true)} type="button">
+          <button className="inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--danger-line)] bg-white px-3 py-2 text-sm font-bold text-[var(--danger)]" onClick={() => setConfirming(true)} type="button">
             <Trash2 size={16} />
             {t("delete")}
           </button>
@@ -76,7 +76,7 @@ export function ConfirmDeleteVehicleButton({
     return (
       <button
         aria-label={t("deleteAria", { label })}
-        className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[#fecaca] bg-white text-[var(--danger)] hover:bg-[var(--danger-light)]"
+        className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--danger-line)] bg-white text-[var(--danger)] hover:bg-[var(--danger-light)]"
         onClick={() => setConfirming(true)}
         title={t("deleteVehicle")}
         type="button"

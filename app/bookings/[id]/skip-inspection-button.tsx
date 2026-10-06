@@ -23,13 +23,13 @@ export function SkipInspectionButton({ rentalId }: { rentalId: string }) {
 
   if (showConfirm) {
     return (
-      <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
-        <p className="mb-2 text-xs font-semibold text-[#92400e]">
+      <div className="rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3">
+        <p className="mb-2 text-xs font-semibold text-[var(--warning)]">
           {say("skip_confirm")}
         </p>
         <div className="flex gap-2">
           <button
-            className="pressable inline-flex min-h-7 items-center rounded-lg bg-[#d97706] px-3 text-xs font-bold text-white disabled:opacity-60"
+            className="pressable inline-flex min-h-7 items-center rounded-lg bg-[var(--warning)] px-3 text-xs font-bold text-white disabled:opacity-60"
             disabled={isPending}
             onClick={handleConfirm}
             type="button"
@@ -58,7 +58,7 @@ export function SkipInspectionButton({ rentalId }: { rentalId: string }) {
       >
         {say("skip_button")}
       </button>
-      {error ? <p className="mt-1 text-xs font-semibold text-[#dc2626]">{error}</p> : null}
+      {error ? <p className="mt-1 text-xs font-semibold text-[var(--danger)]">{error}</p> : null}
     </>
   );
 }

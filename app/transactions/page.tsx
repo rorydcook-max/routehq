@@ -36,7 +36,7 @@ export default async function TransactionsPage({
       </div>
 
       {resolvedSearchParams.linked ? (
-        <div className="mb-4 rounded-xl border border-[#bbf7d0] bg-[#f0fdf4] px-4 py-3 text-sm font-semibold text-[#166534]">
+        <div className="mb-4 rounded-xl border border-[var(--success-line)] bg-[var(--success-light)] px-4 py-3 text-sm font-semibold text-[var(--success)]">
           {resolvedSearchParams.linked === "payment" ? t("savedPayment") : t("savedTask")}
         </div>
       ) : null}

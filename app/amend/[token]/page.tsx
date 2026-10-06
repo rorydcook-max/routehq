@@ -19,12 +19,12 @@ function contactHref(phone: string | null) {
 
 function Message({ tone, title, children }: { tone: "red" | "green"; title: string; children: React.ReactNode }) {
   return (
-    <main className="min-h-screen bg-[#fbfaf8] px-4 py-8 text-[var(--foreground)]">
+    <main className="min-h-screen bg-[var(--panel-secondary)] px-4 py-8 text-[var(--foreground)]">
       <div className="mx-auto mb-3 flex max-w-xl justify-end">
         <CustomerLanguagePicker />
       </div>
       <section className="mx-auto max-w-xl rounded-2xl border border-[var(--border)] bg-white p-6 text-center shadow-sm">
-        <div className={`mx-auto flex h-14 w-14 items-center justify-center rounded-full ${tone === "red" ? "bg-[#ffe4e6] text-[#be123c]" : "bg-[#f0fdf4] text-[#16a34a]"}`}>
+        <div className={`mx-auto flex h-14 w-14 items-center justify-center rounded-full ${tone === "red" ? "bg-[var(--danger-light)] text-[var(--danger)]" : "bg-[var(--success-light)] text-[var(--success)]"}`}>
           {tone === "red" ? <AlertTriangle /> : <CheckCircle2 />}
         </div>
         <h1 className="mt-4 text-2xl font-semibold">{title}</h1>
@@ -75,7 +75,7 @@ export default async function AmendmentPage({ params }: { params: Promise<{ toke
         {amendment.rows.length ? (
           <div className="mt-4 space-y-2 text-left">
             {amendment.rows.map((row) => (
-              <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-3" key={row.label}>
+              <div className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3" key={row.label}>
                 <p className="text-xs font-semibold uppercase text-[var(--muted)]">{({ Vehicle: t("rowVehicle"), "Return date": t("rowReturnDate"), "Charge for the extension": t("rowExtensionCharge"), "Rental rate": t("rowRentalRate"), "Security deposit": t("rowDeposit") } as Record<string, string>)[row.label] || row.label}</p>
                 <p className="mt-1 text-sm font-semibold text-[var(--foreground)]"><bdi>{row.after}</bdi></p>
               </div>
@@ -92,7 +92,7 @@ export default async function AmendmentPage({ params }: { params: Promise<{ toke
   }
 
   return (
-    <main className="min-h-screen bg-[#fbfaf8] px-4 py-5 text-[var(--foreground)]">
+    <main className="min-h-screen bg-[var(--panel-secondary)] px-4 py-5 text-[var(--foreground)]">
       <div className="mx-auto max-w-2xl space-y-4">
         <div className="flex justify-end">
           <CustomerLanguagePicker />
@@ -103,7 +103,7 @@ export default async function AmendmentPage({ params }: { params: Promise<{ toke
           <p className="mt-1 text-sm font-bold text-[var(--muted)]">{amendment.vehicleLabel}</p>
           <div className="mt-4 space-y-2">
             {amendment.rows.map((row) => (
-              <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-3" key={row.label}>
+              <div className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3" key={row.label}>
                 <p className="text-xs font-semibold uppercase text-[var(--muted)]">{({ Vehicle: t("rowVehicle"), "Return date": t("rowReturnDate"), "Charge for the extension": t("rowExtensionCharge"), "Rental rate": t("rowRentalRate"), "Security deposit": t("rowDeposit") } as Record<string, string>)[row.label] || row.label}</p>
                 <p className="mt-1 text-sm">
                   {row.before !== "-" ? <span className="text-[var(--muted)] line-through">{row.before}</span> : null}

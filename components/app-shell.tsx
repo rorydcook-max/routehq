@@ -275,7 +275,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
       </nav>
 
       {moreOpen ? (
-        <div className="fixed inset-0 z-50 flex items-end bg-[#10252b]/50 lg:hidden" onClick={() => setMoreOpen(false)}>
+        <div className="fixed inset-0 z-50 flex items-end bg-[var(--foreground)]/50 lg:hidden" onClick={() => setMoreOpen(false)}>
           <div
             className="w-full rounded-t-2xl bg-white p-4 pb-8 shadow-2xl"
             onClick={(event) => event.stopPropagation()}

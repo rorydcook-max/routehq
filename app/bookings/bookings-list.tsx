@@ -71,10 +71,10 @@ function statusCardClasses(booking: any) {
   // White cards with a thin coloured edge: status reads at a glance without
   // washing the whole list in colour.
   const base = "border-[var(--border)] bg-white shadow-[var(--shadow-sm)] border-l-[3px]";
-  if (isCancelledBooking(booking)) return `${base} border-l-[#d9d6d0] opacity-80`;
-  if (status === "completed") return `${base} border-l-[#b9c7e6]`;
-  if (status === "active" || status === "extended") return `${base} border-l-[#16a34a]`;
-  if (status === "due_soon") return `${base} border-l-[#d4a017]`;
+  if (isCancelledBooking(booking)) return `${base} border-l-[var(--border)] opacity-80`;
+  if (status === "completed") return `${base} border-l-[var(--info-line)]`;
+  if (status === "active" || status === "extended") return `${base} border-l-[var(--success)]`;
+  if (status === "due_soon") return `${base} border-l-[var(--warning)]`;
   if (status === "overdue") return `${base} border-l-[var(--danger)]`;
   if (status === "booked") return `${base} border-l-[var(--primary)]`;
   return base;
@@ -262,7 +262,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
           <div className="flex flex-wrap gap-1.5 xl:justify-end">
             {filters.map((entry) => (
               <button
-                className={`pressable min-h-8 min-w-fit rounded-md border px-3 py-1.5 text-[12px] font-semibold ${filter === entry ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-[#fbfaf8] text-[var(--foreground-secondary)]"}`}
+                className={`pressable min-h-8 min-w-fit rounded-md border px-3 py-1.5 text-[12px] font-semibold ${filter === entry ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-[var(--panel-secondary)] text-[var(--foreground-secondary)]"}`}
                 key={entry}
                 onClick={() => setFilter(entry)}
                 type="button"
@@ -275,7 +275,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
       </div>
 
       {deleteError ? (
-        <p className="rounded-lg border border-[#fecaca] bg-[#fef2f2] p-3 text-sm font-semibold text-[#dc2626]">{deleteError}</p>
+        <p className="rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-3 text-sm font-semibold text-[var(--danger)]">{deleteError}</p>
       ) : null}
       {filtered.length === 0 ? (
         <EmptyState
@@ -294,7 +294,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
             <article className={`relative rounded-[10px] border p-2 transition hover:border-[var(--primary)] hover:shadow-[0_16px_30px_rgba(15,23,42,0.06)] ${statusCardClasses(booking)}`} key={booking.id}>
               {/* Photo beside the details from tablet width up. On phones a photo squeezed into a strip showed a slice of bonnet, so it is left out there. */}
               <div className="grid gap-2.5 md:grid-cols-[104px_minmax(0,1fr)_136px] md:items-center">
-                <Link className={`group relative h-[68px] overflow-hidden hidden md:block rounded-lg border border-[var(--border)] bg-[#fbfaf8]`} href={`/bookings/${booking.id}`}>
+                <Link className={`group relative h-[68px] overflow-hidden hidden md:block rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)]`} href={`/bookings/${booking.id}`}>
                   {photoUrl ? (
                     <img
                       alt={tx.say("photoAlt", { vehicle: vehicleTitle(booking.vehicles) || tx.say("vehicle") })}
@@ -367,7 +367,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                 ) : null}
                 {confirmDeleteId === booking.id ? null : (
                   <button
-                    className="pressable inline-flex min-h-8 items-center justify-center rounded-md border border-[#fecaca] bg-[#fff7f7] px-2 text-[#dc2626]"
+                    className="pressable inline-flex min-h-8 items-center justify-center rounded-md border border-[var(--danger-line)] bg-[var(--danger-light)] px-2 text-[var(--danger)]"
                     onClick={() => { setConfirmDeleteId(booking.id); setDeleteError(null); }}
                     title={tx.say("deleteBooking")}
                     type="button"
@@ -380,7 +380,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                   </div>
 
                   <Link className="mt-1 block truncate text-[15px] font-semibold leading-tight text-[var(--foreground)] after:absolute after:inset-0 after:content-[''] hover:text-[var(--primary)]" href={`/bookings/${booking.id}`}>
-                    {booking.customers ? customerLabel(booking, tx) : <span className="inline-flex items-center gap-1.5 text-[#92400e]"><Clock size={15} /> {tx.say("awaitingCustomer")}</span>}
+                    {booking.customers ? customerLabel(booking, tx) : <span className="inline-flex items-center gap-1.5 text-[var(--warning)]"><Clock size={15} /> {tx.say("awaitingCustomer")}</span>}
                   </Link>
 
                   <div className="mt-1 grid gap-1 text-[12px] text-[var(--foreground-secondary)] sm:grid-cols-2 xl:grid-cols-3">
@@ -402,7 +402,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                   </div>
                   {timingLabel ? <p className="mt-1 text-[12px] font-medium text-[var(--muted)]">{timingLabel}</p> : null}
                   {waitingOn ? (
-                    <p className="mt-1 text-[12px] font-semibold text-[#dc2626]">
+                    <p className="mt-1 text-[12px] font-semibold text-[var(--danger)]">
                       {tx.say("notBack", { name: waitingOn.customers?.full_name || tx.say("currentCustomer"), date: shortDate(String(waitingOn.end_date).slice(0, 10), tx.locale) })}{" "}
                       <Link className="relative z-10 underline underline-offset-2" href={`/bookings/${waitingOn.id}`}>
                         {tx.say("openThatRental")}
@@ -410,7 +410,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                     </p>
                   ) : null}
                   {hold ? (
-                    <p className={`relative z-10 mt-1 w-fit text-[12px] font-medium ${hold.ended ? "text-[#b45309]" : "text-[var(--primary)]"}`}>
+                    <p className={`relative z-10 mt-1 w-fit text-[12px] font-medium ${hold.ended ? "text-[var(--warning)]" : "text-[var(--primary)]"}`}>
                       {hold.text}
                       <ExtendHoldButton ended={hold.ended} rentalId={booking.id} />
                     </p>
@@ -423,20 +423,20 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                       <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{tx.say("paid")}</span>
                       <span className="font-mono-data block text-[16px] font-semibold text-[var(--primary)]">{money(booking.total_paid, booking.currency)}</span>
                     </div>
-                    <span className={`font-mono-data mt-0.5 block text-[11px] md:text-right ${Number(booking.balance_due) > 0 ? "font-semibold text-[#b45309]" : "text-[var(--muted)]"}`}>
+                    <span className={`font-mono-data mt-0.5 block text-[11px] md:text-right ${Number(booking.balance_due) > 0 ? "font-semibold text-[var(--warning)]" : "text-[var(--muted)]"}`}>
                       {Number(booking.balance_due) > 0 ? tx.say("dueNow", { amount: money(booking.balance_due, booking.currency) }) : tx.say("nothingDue")}
                     </span>
                   </div>
                 </div>
               </div>
               {confirmDeleteId === booking.id ? (
-                <div className="relative z-10 mt-2 rounded-lg border border-[#fecaca] bg-[#fef2f2] p-2">
-                  <p className="mb-2 text-xs font-semibold text-[#dc2626]">
+                <div className="relative z-10 mt-2 rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-2">
+                  <p className="mb-2 text-xs font-semibold text-[var(--danger)]">
                     {tx.rich("deleteConfirm", { b: (chunks: React.ReactNode) => <strong>{chunks}</strong> })}
                   </p>
                   <div className="flex gap-2">
                     <button
-                      className="pressable inline-flex min-h-7 items-center rounded-lg bg-[#dc2626] px-3 text-xs font-bold text-white disabled:opacity-60"
+                      className="pressable inline-flex min-h-7 items-center rounded-lg bg-[var(--danger)] px-3 text-xs font-bold text-white disabled:opacity-60"
                       disabled={isPending}
                       onClick={() => handleDelete(booking.id)}
                       type="button"

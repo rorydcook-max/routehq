@@ -13,7 +13,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
   return (
     <AppShell>
       <Card>
-        <p className="text-xs font-semibold uppercase text-[#be123c]">Something went wrong</p>
+        <p className="text-xs font-semibold uppercase text-[var(--danger)]">Something went wrong</p>
         <h1 className="mt-1 text-2xl font-semibold text-[var(--foreground)]">That didn&apos;t work</h1>
         <p className="mt-2 text-sm text-[var(--muted)]">
           {generic
@@ -25,7 +25,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
           <button className="rounded-md bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white" onClick={reset} type="button">
             Try again
           </button>
-          <button className="rounded-md border border-[#d0d5dd] bg-white px-4 py-2 text-sm font-semibold text-[var(--foreground-secondary)]" onClick={() => window.history.back()} type="button">
+          <button className="rounded-md border border-[var(--border)] bg-white px-4 py-2 text-sm font-semibold text-[var(--foreground-secondary)]" onClick={() => window.history.back()} type="button">
             Go back
           </button>
         </div>

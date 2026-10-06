@@ -1001,6 +1001,7 @@ aside a[class*="bg-[var(--sidebar-active)]"] {
   --background: #f0f4f8;
   --panel: #ffffff;
   --panel-secondary: #f6f8fa;
+  --panel-tertiary: #eaeff4;
   --border: #dce3eb;
   --border-strong: #c9d3de;
 

@@ -552,7 +552,7 @@ export function ReportsView({ data }: { data: ReportsData }) {
               className={`rounded-[8px] px-3 py-1.5 text-[13px] font-semibold transition ${
                 preset === p.value
                   ? "bg-[var(--primary-light)] text-[var(--primary)]"
-                  : "text-[var(--muted)] hover:bg-[#f1efeb] hover:text-[var(--foreground)]"
+                  : "text-[var(--muted)] hover:bg-[var(--panel-tertiary)] hover:text-[var(--foreground)]"
               }`}
             >
               {p.label}

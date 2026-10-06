@@ -53,7 +53,7 @@ export function LineConnectPanel({ organizationId, lineOaId }: { organizationId:
           Add <span className="font-mono font-semibold">{oa}</span> as a friend in LINE.
         </p>
         <a
-          className="inline-flex items-center gap-2 rounded-lg border border-[#06c755] px-3 py-2 text-sm font-semibold text-[#06a347] hover:bg-[#f0fdf4]"
+          className="inline-flex items-center gap-2 rounded-lg border border-[#06c755] px-3 py-2 text-sm font-semibold text-[var(--success)] hover:bg-[var(--success-light)]"
           href={`https://line.me/R/ti/p/${encodeURIComponent(oa)}`}
           rel="noreferrer"
           target="_blank"
@@ -67,7 +67,7 @@ export function LineConnectPanel({ organizationId, lineOaId }: { organizationId:
         {code ? (
           <>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] px-3 py-2 font-mono text-lg font-bold tracking-wider text-[var(--foreground)]">{code}</span>
+              <span className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] px-3 py-2 font-mono text-lg font-bold tracking-wider text-[var(--foreground)]">{code}</span>
               <button
                 className="rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--foreground-secondary)]"
                 onClick={() => {
@@ -90,7 +90,7 @@ export function LineConnectPanel({ organizationId, lineOaId }: { organizationId:
             {isPending ? "Creating code…" : "Get a connection code"}
           </button>
         )}
-        {error ? <p className="text-xs font-semibold text-[#dc2626]">{error}</p> : null}
+        {error ? <p className="text-xs font-semibold text-[var(--danger)]">{error}</p> : null}
       </div>
     </div>
   );

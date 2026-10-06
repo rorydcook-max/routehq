@@ -89,7 +89,7 @@ export function AssignCustomerModal({
                 onSelect={(customer) => { setSelectedCustomer(customer); setError(""); }}
               />
               {error ? (
-                <p className="rounded-xl bg-[#ffe4e6] px-4 py-3 text-sm font-semibold text-[#be123c]">{error}</p>
+                <p className="rounded-xl bg-[var(--danger-light)] px-4 py-3 text-sm font-semibold text-[var(--danger)]">{error}</p>
               ) : null}
               <button
                 className="pressable inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white disabled:opacity-70"

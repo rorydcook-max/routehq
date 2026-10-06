@@ -31,7 +31,7 @@ export function FuelGaugeView({ value }: { value: number | null | undefined }) {
         <span>{t("viewFuel")}</span>
         <span>{safeValue}%</span>
       </div>
-      <div className="h-3 overflow-hidden rounded-full bg-[#fbfaf8]">
+      <div className="h-3 overflow-hidden rounded-full bg-[var(--panel-secondary)]">
         <div className="h-full rounded-full bg-[var(--primary)]" style={{ width: `${safeValue}%` }} />
       </div>
     </div>
@@ -72,11 +72,11 @@ export async function InspectionViewer({ inspection }: { inspection: any }) {
           {inspection.customers?.full_name ? <p className="mt-1 font-semibold text-[var(--foreground)]">{inspection.customers.full_name}</p> : null}
         </div>
         <div className="grid grid-cols-2 gap-2 text-right">
-          <div className="rounded-lg bg-[#fbfaf8] px-3 py-2">
+          <div className="rounded-lg bg-[var(--panel-secondary)] px-3 py-2">
             <Gauge className="ml-auto text-[var(--primary)]" size={16} />
             <p className="font-mono-data mt-1 text-sm font-semibold text-[var(--foreground)]">{Number(inspection.odometer_reading || inspection.mileage || 0).toLocaleString()} km</p>
           </div>
-          <div className="rounded-lg bg-[#fbfaf8] px-3 py-2">
+          <div className="rounded-lg bg-[var(--panel-secondary)] px-3 py-2">
             <Fuel className="ml-auto text-[var(--primary)]" size={16} />
             <p className="font-mono-data mt-1 text-sm font-semibold text-[var(--foreground)]">{inspection.fuel_level_label || `${Number(inspection.fuel_level || 0)}%`}</p>
           </div>
@@ -88,7 +88,7 @@ export async function InspectionViewer({ inspection }: { inspection: any }) {
       </div>
 
       {videoUrl ? (
-        <div className="mt-4 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
+        <div className="mt-4 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
           <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-[var(--foreground)]">
             <FileVideo size={17} className="text-[var(--primary)]" />
             {t("viewVideo")}
@@ -108,7 +108,7 @@ export async function InspectionViewer({ inspection }: { inspection: any }) {
             {photos.map((photo: any) => {
               const url = photoUrl(photo);
               return (
-                <a className="block overflow-hidden rounded-lg border border-[var(--border)] bg-[#fbfaf8]" href={url || "#"} key={photo.id} target="_blank">
+                <a className="block overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)]" href={url || "#"} key={photo.id} target="_blank">
                   {url ? <img alt={photo.type || t("viewPhotoAlt")} className="h-28 w-full object-cover" src={url} /> : <div className="h-28" />}
                   <p className="px-2 py-1 text-xs font-bold text-[var(--foreground-secondary)]">{String(photo.type || "photo").replace(/_/g, " ")}</p>
                 </a>
@@ -124,11 +124,11 @@ export async function InspectionViewer({ inspection }: { inspection: any }) {
           {t("viewDamage")}
         </div>
         {damageItems.length === 0 ? (
-          <p className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3 text-sm font-semibold text-[var(--muted)]">{t("viewNoDamage")}</p>
+          <p className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3 text-sm font-semibold text-[var(--muted)]">{t("viewNoDamage")}</p>
         ) : (
           <div className="space-y-2">
             {damageItems.map((item: any, index: number) => (
-              <div className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3" key={item.id}>
+              <div className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3" key={item.id}>
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="font-semibold text-[var(--foreground)]">
@@ -155,14 +155,14 @@ export async function InspectionViewer({ inspection }: { inspection: any }) {
             <PenLine size={17} className="text-[var(--primary)]" />
             {t("viewSignature")}
           </div>
-          <img alt={t("viewSignature")} className="max-h-40 rounded-lg border border-[var(--border)] bg-[#fbfaf8]" src={inspection.customer_signature} />
+          <img alt={t("viewSignature")} className="max-h-40 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)]" src={inspection.customer_signature} />
           <p className="mt-2 text-sm text-[var(--muted)]">
             {t("viewSignedBy", { name: inspection.customer_signed_name || t("viewCustomer"), when: formatDate(inspection.customer_signed_at, locale, t("viewNotSet")) })}
           </p>
         </div>
       ) : null}
 
-      {notes.original ? <TranslatedText className="mt-4 rounded-lg bg-[#fbfaf8] p-3 text-sm text-[var(--foreground-secondary)]" value={notes} /> : null}
+      {notes.original ? <TranslatedText className="mt-4 rounded-lg bg-[var(--panel-secondary)] p-3 text-sm text-[var(--foreground-secondary)]" value={notes} /> : null}
     </article>
   );
 }

@@ -175,7 +175,7 @@ export function TransactionForm({
       </div>
 
       {linkedBadge ? (
-        <div className="rounded-xl border border-[#bbf7d0] bg-[#f0fdf4] px-4 py-3 text-sm font-semibold text-[#166534]">
+        <div className="rounded-xl border border-[var(--success-line)] bg-[var(--success-light)] px-4 py-3 text-sm font-semibold text-[var(--success)]">
           {linkedBadge}
         </div>
       ) : null}
@@ -193,7 +193,7 @@ export function TransactionForm({
           </div>
           <div className="mt-3 space-y-2">
             {(showAllMatches ? matches : matches.slice(0, 5)).map((match) => (
-              <div className="rounded-lg border border-[#bfe0db] bg-white p-3" key={match.id}>
+              <div className="rounded-lg border border-[var(--info-line)] bg-white p-3" key={match.id}>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="font-semibold text-[var(--foreground)]">{matchLabel(match)}</p>

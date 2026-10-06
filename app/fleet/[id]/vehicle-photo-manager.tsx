@@ -224,7 +224,7 @@ export function VehiclePhotoManager({ organizationId, vehicleId, vehicleLabel, p
                           <input name="vehicleId" type="hidden" value={vehicleId} />
                           <input name="organizationId" type="hidden" value={organizationId} />
                           <input name="documentId" type="hidden" value={photo.id} />
-                          <button className="inline-flex items-center gap-1.5 rounded-lg border border-[#fecaca] bg-[var(--danger-light)] px-3 py-2 text-xs font-semibold text-[var(--danger)]" disabled={isPending} type="submit">
+                          <button className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] px-3 py-2 text-xs font-semibold text-[var(--danger)]" disabled={isPending} type="submit">
                             <Trash2 size={14} />
                             Remove
                           </button>

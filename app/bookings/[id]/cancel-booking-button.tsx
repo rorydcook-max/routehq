@@ -233,8 +233,8 @@ export function CancelBookingButton({
       <button
         className={
           compact
-            ? "pressable inline-flex min-h-8 items-center justify-center gap-1.5 rounded-md border border-[#fecdd3] bg-[#fff7f7] px-3 py-1.5 text-[12px] font-semibold text-[#be123c]"
-            : "pressable inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border border-[#fecdd3] bg-[#fff1f2] px-3 py-2 text-sm font-semibold text-[#be123c]"
+            ? "pressable inline-flex min-h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--danger-line)] bg-[var(--danger-light)] px-3 py-1.5 text-[12px] font-semibold text-[var(--danger)]"
+            : "pressable inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]"
         }
         onClick={() => setOpen(true)}
         type="button"
@@ -244,15 +244,15 @@ export function CancelBookingButton({
       </button>
 
       {open ? (
-        <div className="fixed inset-0 z-50 flex items-end bg-[#10252b]/60 p-3 sm:items-center sm:justify-center">
-          <div className="w-full max-w-lg rounded-2xl border border-[#fecdd3] bg-white shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-end bg-[var(--foreground)]/60 p-3 sm:items-center sm:justify-center">
+          <div className="w-full max-w-lg rounded-2xl border border-[var(--danger-line)] bg-white shadow-2xl">
 
-            <div className="flex items-start gap-3 border-b border-[#fecdd3] bg-[#fff1f2] p-4 rounded-t-2xl">
-              <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#fecdd3] text-[#be123c]">
+            <div className="flex items-start gap-3 border-b border-[var(--danger-line)] bg-[var(--danger-light)] p-4 rounded-t-2xl">
+              <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--danger-line)] text-[var(--danger)]">
                 <AlertTriangle size={18} />
               </div>
               <div className="flex-1">
-                <p className="text-xs font-semibold uppercase text-[#be123c]">{say("cn_label")}</p>
+                <p className="text-xs font-semibold uppercase text-[var(--danger)]">{say("cn_label")}</p>
                 <h3 className="text-lg font-semibold text-[var(--foreground)]">
                   {customerName ? say("cn_for", { name: customerName }) : say("cn_noCustomer")}
                 </h3>
@@ -263,7 +263,7 @@ export function CancelBookingButton({
                 </div>
               </div>
               <button
-                className="pressable rounded-lg border border-[#fecdd3] bg-white p-1.5 text-[#be123c]"
+                className="pressable rounded-lg border border-[var(--danger-line)] bg-white p-1.5 text-[var(--danger)]"
                 onClick={reset}
                 type="button"
               >
@@ -285,8 +285,8 @@ export function CancelBookingButton({
                           key={r.value}
                           className={`block w-full cursor-pointer rounded-xl border p-3 text-left transition-colors ${
                             reasons.includes(r.value)
-                              ? "border-[#be123c] bg-[#fff1f2] ring-1 ring-[#be123c]/20"
-                              : "border-[var(--border)] bg-white hover:border-[#fecdd3]"
+                              ? "border-[var(--danger)] bg-[var(--danger-light)] ring-1 ring-[var(--danger)]/20"
+                              : "border-[var(--border)] bg-white hover:border-[var(--danger-line)]"
                           }`}
                           onClick={() => {
                             setReasons(prev =>
@@ -307,7 +307,7 @@ export function CancelBookingButton({
                   <label className="block">
                     <span className="text-xs font-bold text-[var(--foreground-secondary)]">{say("cn_notes")}</span>
                     <textarea
-                      className="mt-1 w-full rounded-xl border border-[var(--border)] bg-white px-3 py-2 text-sm text-[var(--foreground)] outline-none focus:border-[#be123c] focus:ring-2 focus:ring-[#be123c]/10"
+                      className="mt-1 w-full rounded-xl border border-[var(--border)] bg-white px-3 py-2 text-sm text-[var(--foreground)] outline-none focus:border-[var(--danger)] focus:ring-2 focus:ring-[var(--danger)]/10"
                       onChange={e => setNotes(e.target.value)}
                       placeholder={say("cn_notesPlaceholder")}
                       rows={2}
@@ -321,7 +321,7 @@ export function CancelBookingButton({
                         {say("cn_whenHint")}
                       </p>
                       <input
-                        className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
+                        className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[var(--danger)]"
                         onChange={(event) => setCancelledAt(event.target.value)}
                         type="datetime-local"
                         value={cancelledAt}
@@ -333,7 +333,7 @@ export function CancelBookingButton({
                         {say("cn_collectHint")}
                       </p>
                       <input
-                        className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
+                        className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[var(--danger)]"
                         onChange={(event) => setCollectionDatetime(event.target.value)}
                         type="datetime-local"
                         value={collectionDatetime}
@@ -355,8 +355,8 @@ export function CancelBookingButton({
                         key={opt.value + opt.label}
                         className={`rounded-xl border transition-colors ${
                           refundOption === opt.value
-                            ? "border-[#be123c] bg-[#fff1f2] ring-1 ring-[#be123c]/20"
-                            : "border-[var(--border)] bg-white hover:border-[#fecdd3]"
+                            ? "border-[var(--danger)] bg-[var(--danger-light)] ring-1 ring-[var(--danger)]/20"
+                            : "border-[var(--border)] bg-white hover:border-[var(--danger-line)]"
                         }`}
                       >
                         <button
@@ -372,11 +372,11 @@ export function CancelBookingButton({
                           <span className="mt-0.5 block text-xs leading-5 text-[var(--muted)]">{opt.detail}</span>
                         </button>
                         {refundOption === opt.value && opt.value.startsWith("partial_refund") ? (
-                          <div className="grid gap-2 border-t border-[#fecdd3] px-3 pb-3 pt-3 sm:grid-cols-2">
+                          <div className="grid gap-2 border-t border-[var(--danger-line)] px-3 pb-3 pt-3 sm:grid-cols-2">
                             <label className="block">
                               <span className="text-xs font-bold text-[var(--foreground-secondary)]">{say("cn_refundAmount", { currency })}</span>
                               <input
-                                className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
+                                className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[var(--danger)]"
                                 max={totalPaid}
                                 min="0"
                                 onChange={e => setPartialRefundAmount(e.target.value)}
@@ -390,7 +390,7 @@ export function CancelBookingButton({
                               <label className="block">
                                 <span className="text-xs font-bold text-[var(--foreground-secondary)]">{say("cn_depositReturned", { currency })}</span>
                                 <input
-                                  className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
+                                  className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[var(--danger)]"
                                   max={depositHeld}
                                   min="0"
                                   onChange={e => setPartialDepositReturn(e.target.value)}
@@ -434,8 +434,8 @@ export function CancelBookingButton({
                       <div
                         className={`rounded-xl border transition-colors ${
                           vehicleDisposition === option.value
-                            ? "border-[#be123c] bg-[#fff1f2] ring-1 ring-[#be123c]/20"
-                            : "border-[var(--border)] bg-white hover:border-[#fecdd3]"
+                            ? "border-[var(--danger)] bg-[var(--danger-light)] ring-1 ring-[var(--danger)]/20"
+                            : "border-[var(--border)] bg-white hover:border-[var(--danger-line)]"
                         }`}
                         key={option.value}
                       >
@@ -450,11 +450,11 @@ export function CancelBookingButton({
                         </button>
 
                         {vehicleDisposition === "repair" && option.value === "repair" ? (
-                          <div className="grid gap-2 border-t border-[#fecdd3] px-3 pb-3 pt-3 sm:grid-cols-2">
+                          <div className="grid gap-2 border-t border-[var(--danger-line)] px-3 pb-3 pt-3 sm:grid-cols-2">
                             <label className="block">
                               <span className="text-xs font-bold text-[var(--foreground-secondary)]">{say("cn_expectedBack")}</span>
                               <input
-                                className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
+                                className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[var(--danger)]"
                                 onChange={(event) => setRepairExpectedEnd(event.target.value)}
                                 type="datetime-local"
                                 value={repairExpectedEnd}
@@ -463,7 +463,7 @@ export function CancelBookingButton({
                             <label className="block">
                               <span className="text-xs font-bold text-[var(--foreground-secondary)]">{say("cn_repairNotes")}</span>
                               <input
-                                className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[#be123c]"
+                                className="mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2 text-sm outline-none focus:border-[var(--danger)]"
                                 onChange={(event) => setRepairNotes(event.target.value)}
                                 placeholder={say("cn_repairPlaceholder")}
                                 type="text"
@@ -480,7 +480,7 @@ export function CancelBookingButton({
 
               {step === "confirm" && (
                 <div className="space-y-3">
-                  <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-3 space-y-2">
+                  <div className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3 space-y-2">
                     <p className="text-xs font-semibold uppercase text-[var(--muted)]">{say("cn_reason")}</p>
                     <ul className="space-y-0.5">
                       {selectedReasons.map(r => (
@@ -490,20 +490,20 @@ export function CancelBookingButton({
                     {notes && <p className="text-xs text-[var(--muted)]">"{notes}"</p>}
                   </div>
                   {dispositionSummary().length > 0 && (
-                    <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-3">
+                    <div className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
                       <p className="text-xs font-semibold uppercase text-[var(--muted)] mb-2">{say("cn_whatHappens")}</p>
                       <ul className="space-y-1">
                         {dispositionSummary().map((line, i) => (
                           <li className="flex items-start gap-2 text-sm text-[var(--foreground)]" key={i}>
-                            <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#be123c]" />
+                            <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--danger)]" />
                             {line}
                           </li>
                         ))}
                       </ul>
                     </div>
                   )}
-                  <div className="rounded-xl border border-[#fde68a] bg-[#fffbeb] p-3">
-                    <p className="text-xs font-bold text-[#92400e]">
+                  <div className="rounded-xl border border-[var(--warning-line)] bg-[var(--warning-light)] p-3">
+                    <p className="text-xs font-bold text-[var(--warning)]">
                       ⚠️ {say("cn_warning")}
                     </p>
                   </div>
@@ -511,7 +511,7 @@ export function CancelBookingButton({
               )}
 
               {error && (
-                <p className="rounded-xl bg-[#ffe4e6] px-3 py-2 text-sm font-bold text-[#be123c]">{error}</p>
+                <p className="rounded-xl bg-[var(--danger-light)] px-3 py-2 text-sm font-bold text-[var(--danger)]">{error}</p>
               )}
 
               <div className="flex gap-2 pt-1">
@@ -540,7 +540,7 @@ export function CancelBookingButton({
                 </button>
                 {step === "confirm" ? (
                   <button
-                    className="pressable inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-[#be123c] px-4 text-sm font-semibold text-white disabled:opacity-70"
+                    className="pressable inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--danger)] px-4 text-sm font-semibold text-white disabled:opacity-70"
                     disabled={isPending}
                     onClick={submit}
                     type="button"
@@ -553,7 +553,7 @@ export function CancelBookingButton({
                   </button>
                 ) : (
                   <button
-                    className="pressable inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-[#be123c] px-4 text-sm font-semibold text-white"
+                    className="pressable inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--danger)] px-4 text-sm font-semibold text-white"
                     onClick={
                       step === "reason"
                         ? handleReasonNext

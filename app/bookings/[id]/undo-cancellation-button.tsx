@@ -62,10 +62,10 @@ export function UndoCancellationButton({
       </button>
 
       {open ? (
-        <div className="fixed inset-0 z-50 flex items-end bg-[#10252b]/60 p-3 sm:items-center sm:justify-center">
+        <div className="fixed inset-0 z-50 flex items-end bg-[var(--foreground)]/60 p-3 sm:items-center sm:justify-center">
           <div className="w-full max-w-md rounded-2xl border border-[var(--border)] bg-white shadow-2xl">
 
-            <div className="flex items-start gap-3 rounded-t-2xl border-b border-[var(--border)] bg-[#fbfaf8] p-4">
+            <div className="flex items-start gap-3 rounded-t-2xl border-b border-[var(--border)] bg-[var(--panel-secondary)] p-4">
               <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)] text-[var(--primary)]">
                 <RotateCcw size={17} />
               </div>
@@ -85,7 +85,7 @@ export function UndoCancellationButton({
             </div>
 
             <div className="space-y-4 p-4">
-              <div className="space-y-1.5 rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-3">
+              <div className="space-y-1.5 rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
                 <p className="text-xs font-semibold uppercase text-[var(--muted)]">{say("undo_restores")}</p>
                 {[
                   say("undo_l1"),
@@ -100,14 +100,14 @@ export function UndoCancellationButton({
                 ))}
               </div>
 
-              <div className="rounded-xl border border-[#fde68a] bg-[#fffbeb] p-3">
-                <p className="text-xs font-bold text-[#92400e]">
+              <div className="rounded-xl border border-[var(--warning-line)] bg-[var(--warning-light)] p-3">
+                <p className="text-xs font-bold text-[var(--warning)]">
                   ⚠️ {say("undo_warning")}
                 </p>
               </div>
 
               {error && (
-                <p className="rounded-xl bg-[#ffe4e6] px-3 py-2 text-sm font-bold text-[#be123c]">
+                <p className="rounded-xl bg-[var(--danger-light)] px-3 py-2 text-sm font-bold text-[var(--danger)]">
                   {error}
                 </p>
               )}

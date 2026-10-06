@@ -162,7 +162,7 @@ function PaymentRow({
   return (
     <div className="py-3 first:pt-0 last:pb-0">
       <div className="flex items-center gap-3">
-        <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${sentAt ? "bg-[#f0fdf4] text-[#16a34a]" : payment.overdue ? "bg-[#fef2f2] text-[#dc2626]" : "bg-[var(--primary-light)] text-[var(--primary)]"}`}>
+        <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${sentAt ? "bg-[var(--success-light)] text-[var(--success)]" : payment.overdue ? "bg-[var(--danger-light)] text-[var(--danger)]" : "bg-[var(--primary-light)] text-[var(--primary)]"}`}>
           {sentAt ? <Clock size={20} /> : <Wallet size={20} />}
         </span>
         <div className="min-w-0 flex-1">
@@ -172,7 +172,7 @@ function PaymentRow({
               · {payment.kind ? `${t(`payKind_${payment.kind}`)}${payment.kind === "rent" && payment.periodLabel && locale === "en" ? ` · ${payment.periodLabel}` : ""}` : payment.label}
             </span>
           </p>
-          <p className={`text-sm ${sentAt ? "text-[#166534]" : payment.overdue ? "font-semibold text-[#dc2626]" : "text-[var(--muted)]"}`}>
+          <p className={`text-sm ${sentAt ? "text-[var(--success)]" : payment.overdue ? "font-semibold text-[var(--danger)]" : "text-[var(--muted)]"}`}>
             {sentAt
               ? t("receiptSentWaiting", { business: organizationName })
               : covers
@@ -192,7 +192,7 @@ function PaymentRow({
       </div>
 
       {payment.receiptDeclined && !sentAt ? (
-        <p className="mt-2 rounded-xl bg-[#fffbeb] p-3 text-sm text-[#92400e]">
+        <p className="mt-2 rounded-xl bg-[var(--warning-light)] p-3 text-sm text-[var(--warning)]">
           {t("receiptDeclined", { business: organizationName })}
         </p>
       ) : null}
@@ -200,7 +200,7 @@ function PaymentRow({
       {isOpen ? (
         <div className="mt-4 space-y-4">
           {payment.qrSvg ? (
-            <div className="rounded-2xl border border-[var(--border)] bg-[#fbfaf8] p-4 text-center">
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--panel-secondary)] p-4 text-center">
               <p className="text-sm font-semibold text-[var(--foreground)]">{t("scanWithBankingApp")}</p>
               <div aria-label="PromptPay QR code" className="mx-auto mt-3 w-52 max-w-full rounded-xl bg-white p-2 [&>svg]:h-auto [&>svg]:w-full" dangerouslySetInnerHTML={{ __html: payment.qrSvg }} role="img" />
               <p className="mt-3 text-sm text-[var(--foreground-secondary)]">
@@ -237,7 +237,7 @@ function PaymentRow({
           ) : null}
 
           {!payment.qrSvg && !hasBank && !orgPayment?.promptpay_id && !orgPayment?.wise_link && !orgPayment?.revolut_link ? (
-            <p className="rounded-xl bg-[#fbfaf8] p-3 text-sm text-[var(--foreground-secondary)]">
+            <p className="rounded-xl bg-[var(--panel-secondary)] p-3 text-sm text-[var(--foreground-secondary)]">
               {t("askWhereToPay", { business: organizationName })}
             </p>
           ) : null}
@@ -258,7 +258,7 @@ function PaymentRow({
                 <option value="other">{t("anotherWay")}</option>
               </select>
             </label>
-            {error ? <p className="text-sm font-semibold text-[#dc2626]">{error}</p> : null}
+            {error ? <p className="text-sm font-semibold text-[var(--danger)]">{error}</p> : null}
             <button className="pressable min-h-12 w-full rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white disabled:opacity-60" disabled={isPending} type="submit">
               {isPending ? t("sending") : t("sendReceipt")}
             </button>

@@ -33,9 +33,9 @@ export function Fold({
 }) {
   const tones = {
     neutral: "text-[var(--muted)]",
-    red: "font-semibold text-[#dc2626]",
-    green: "font-semibold text-[#16a34a]",
-    amber: "font-semibold text-[#b45309]"
+    red: "font-semibold text-[var(--danger)]",
+    green: "font-semibold text-[var(--success)]",
+    amber: "font-semibold text-[var(--warning)]"
   };
   return (
     <details className="group scroll-mt-4 overflow-hidden rounded-[10px] border-[0.5px] border-[var(--border)] bg-[var(--panel)]" id={id} open={open}>
@@ -100,7 +100,7 @@ export function Badge({
 }) {
   // Soft fill plus a coloured dot: readable at a glance without shouting.
   const tones = {
-    neutral: "bg-[#f1efeb] text-[var(--foreground-secondary)]",
+    neutral: "bg-[var(--panel-tertiary)] text-[var(--foreground-secondary)]",
     green: "bg-[var(--success-light)] text-[var(--success)]",
     amber: "bg-[var(--warning-light)] text-[var(--warning)]",
     red: "bg-[var(--danger-light)] text-[var(--danger)]",

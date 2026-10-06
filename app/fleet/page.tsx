@@ -76,7 +76,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
       </div>
 
       {notice === "vehicle-has-bookings" ? (
-        <p className="mb-4 rounded-xl border border-[#f3dfb0] bg-[#fdf7e9] p-3 text-sm font-medium text-[#8a5a12]" role="alert">
+        <p className="mb-4 rounded-xl border border-[var(--warning-line)] bg-[var(--warning-light)] p-3 text-sm font-medium text-[var(--warning)]" role="alert">
           {t("noticeBookings")}
         </p>
       ) : null}
@@ -121,7 +121,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
       <div className="space-y-5">
         {groups.map((group) => (
           <section className="scroll-mt-4 overflow-hidden rounded-xl border border-[var(--border)] bg-white shadow-[var(--shadow-sm)]" id={group.kind} key={group.kind}>
-            <header className="flex flex-wrap items-center gap-3 border-b border-[var(--border)] bg-[#fbfaf8] px-4 py-3">
+            <header className="flex flex-wrap items-center gap-3 border-b border-[var(--border)] bg-[var(--panel-secondary)] px-4 py-3">
               <VehicleKindIcon kind={group.kind} />
               <div className="min-w-0">
                 <h2 className="text-[16px] font-semibold tracking-[-0.01em] text-[var(--foreground)]">
@@ -149,7 +149,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                   {group.vehicles.map((vehicle) => {
                     const href = `/fleet/${vehicle.id}` as const;
                     return (
-                      <tr className="group border-b border-[var(--border)] last:border-0 hover:bg-[#fbfaf8]" key={vehicle.id}>
+                      <tr className="group border-b border-[var(--border)] last:border-0 hover:bg-[var(--panel-secondary)]" key={vehicle.id}>
                         <td className="py-3 pl-4 pr-2">
                           <input aria-label={t("selectAria", { vehicle: `${vehicle.make} ${vehicle.model}` })} className="flex-shrink-0" form="fleetBulkForm" name="vehicleIds" type="checkbox" value={vehicle.id} />
                         </td>
@@ -191,7 +191,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
             <ul className="divide-y divide-[var(--border)] lg:hidden">
               {group.vehicles.map((vehicle) => (
                 <li key={vehicle.id}>
-                  <Link className="flex items-center gap-3 px-4 py-3 active:bg-[#fbfaf8]" href={`/fleet/${vehicle.id}`}>
+                  <Link className="flex items-center gap-3 px-4 py-3 active:bg-[var(--panel-secondary)]" href={`/fleet/${vehicle.id}`}>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-[15px] font-semibold text-[var(--foreground)]">
                         {vehicle.make} {vehicle.model}

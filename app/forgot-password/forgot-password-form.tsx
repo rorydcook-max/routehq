@@ -26,8 +26,8 @@ export function ForgotPasswordForm() {
           required
         />
       </label>
-      {state.error ? <p className="rounded-lg bg-[#ffe4e6] px-3 py-2 text-sm font-semibold text-[#be123c]">{state.error}</p> : null}
-      {state.success ? <p className="rounded-lg bg-[#f0fdf4] px-3 py-2 text-sm font-semibold text-[#166534]">{state.success}</p> : null}
+      {state.error ? <p className="rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">{state.error}</p> : null}
+      {state.success ? <p className="rounded-lg bg-[var(--success-light)] px-3 py-2 text-sm font-semibold text-[var(--success)]">{state.success}</p> : null}
       <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-3 font-bold text-white disabled:opacity-60" disabled={pending}>
         {pending ? (
           <>

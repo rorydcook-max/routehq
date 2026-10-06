@@ -93,7 +93,7 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
         </div>
 
         {signingGaps.length ? (
-          <div className="mb-4 rounded-xl border border-[#fbbf24] bg-[#fffbeb] p-4 text-sm text-[#92400e]" role="alert">
+          <div className="mb-4 rounded-xl border border-[var(--warning-line)] bg-[var(--warning-light)] p-4 text-sm text-[var(--warning)]" role="alert">
             <p className="font-semibold">{t("signTitle")}</p>
             <p className="mt-1 leading-6">
               {t("signBody", { gaps: signingGaps.join(", ") })}

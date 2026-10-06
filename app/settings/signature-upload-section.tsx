@@ -112,7 +112,7 @@ export function SignatureUploadSection({
           Signing as <strong>{authorisedSignatoryName}</strong>, {authorisedSignatoryTitle}.
         </p>
       ) : (
-        <p className="rounded-lg border border-[#fbbf24] bg-[#fffbeb] p-2 text-[11px] font-bold leading-4 text-[#92400e]">
+        <p className="rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-2 text-[11px] font-bold leading-4 text-[var(--warning)]">
           First save the authorised signatory&apos;s full name and job title above. The signature is recorded as theirs.
         </p>
       )}
@@ -137,17 +137,17 @@ export function SignatureUploadSection({
         ) : null}
       </div>
       {message ? (
-        <p className={`w-full text-xs ${message.type === "error" ? "text-[#dc2626]" : "text-[#16a34a]"}`}>{message.text}</p>
+        <p className={`w-full text-xs ${message.type === "error" ? "text-[var(--danger)]" : "text-[var(--success)]"}`}>{message.text}</p>
       ) : null}
     </>
   );
 
   if (signatureUrl) {
-    return <div className="flex flex-col gap-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">{content}</div>;
+    return <div className="flex flex-col gap-3 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">{content}</div>;
   }
 
   return (
-    <form className="flex flex-col gap-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3" onSubmit={handleUpload}>
+    <form className="flex flex-col gap-3 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3" onSubmit={handleUpload}>
       {content}
     </form>
   );

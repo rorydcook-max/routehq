@@ -121,7 +121,7 @@ export function RefundDepositPanel({
       {!collapsed ? (
         <>
           {earlyReturn && canRefundPayment ? (
-            <div className="mt-3 rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3 text-sm text-[#92400e]">
+            <div className="mt-3 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3 text-sm text-[var(--warning)]">
               <p>
                 {t.rich("ref_early", {
                   days: earlyReturn.unusedDays,
@@ -132,7 +132,7 @@ export function RefundDepositPanel({
                   b: (chunks: React.ReactNode) => <span className="font-semibold">{chunks}</span>
                 })}
               </p>
-              <button className="pressable mt-2 rounded-lg border border-[#fbbf24] bg-white px-3 py-1.5 text-xs font-semibold text-[#92400e]" onClick={() => openForm("refund")} type="button">
+              <button className="pressable mt-2 rounded-lg border border-[var(--warning-line)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--warning)]" onClick={() => openForm("refund")} type="button">
                 {say("ref_earlyButton", { amount: money(earlyReturn.amount, currency) })}
               </button>
             </div>
@@ -172,7 +172,7 @@ export function RefundDepositPanel({
 
           {activeForm === "return" ? (
             <form
-              className="mt-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3"
+              className="mt-3 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3"
               onSubmit={(event) => {
                 event.preventDefault();
                 submit(new FormData(event.currentTarget), say("ref_depositReturned"), returnDeposit);
@@ -200,7 +200,7 @@ export function RefundDepositPanel({
 
           {activeForm === "deduction" ? (
             <form
-              className="mt-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3"
+              className="mt-3 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3"
               onSubmit={(event) => {
                 event.preventDefault();
                 submit(new FormData(event.currentTarget), say("ref_deductionRecorded"), applyDepositDeduction);
@@ -231,7 +231,7 @@ export function RefundDepositPanel({
 
           {activeForm === "refund" ? (
             <form
-              className="mt-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3"
+              className="mt-3 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3"
               onSubmit={(event) => {
                 event.preventDefault();
                 submit(new FormData(event.currentTarget), say("ref_refundRecorded"), recordPaymentRefund);
@@ -257,8 +257,8 @@ export function RefundDepositPanel({
             </form>
           ) : null}
 
-          {message ? <p className="mt-3 rounded-lg bg-[#ecfdf3] px-3 py-2 text-sm font-semibold text-[#027a48]">{message}</p> : null}
-          {error ? <p className="mt-3 rounded-lg bg-[#fef2f2] px-3 py-2 text-sm font-semibold text-[#be123c]">{error}</p> : null}
+          {message ? <p className="mt-3 rounded-lg bg-[var(--success-light)] px-3 py-2 text-sm font-semibold text-[var(--success)]">{message}</p> : null}
+          {error ? <p className="mt-3 rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">{error}</p> : null}
         </>
       ) : null}
     </div>

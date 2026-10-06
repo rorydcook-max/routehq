@@ -36,7 +36,7 @@ export function LineTestButton() {
       {result && (
         <p
           className={`text-sm font-semibold ${
-            result.success ? "text-[#16a34a]" : "text-[#dc2626]"
+            result.success ? "text-[var(--success)]" : "text-[var(--danger)]"
           }`}
         >
           {result.success ? "✓ " : "✕ "}

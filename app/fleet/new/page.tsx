@@ -73,7 +73,7 @@ export default async function NewVehiclePage() {
 
             <VehicleIdentityFields categories={categories} initialMakes={vehicleMakes || []} inputClass={inputClass} />
 
-            <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-4">
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-4">
               <SectionHeader eyebrow="Rental pricing" title="Rates and deposit" />
               <div className="mt-4 grid gap-4 sm:grid-cols-3">
                 <label className="block">

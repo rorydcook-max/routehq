@@ -43,9 +43,9 @@ const dataTypeLabels: Record<string, string> = {
 };
 
 function confidenceTone(confidence = 0) {
-  if (confidence >= 0.85) return "bg-[#16a34a]";
-  if (confidence >= 0.65) return "bg-[#b7791f]";
-  return "bg-[#be123c]";
+  if (confidence >= 0.85) return "bg-[var(--success)]";
+  if (confidence >= 0.65) return "bg-[var(--warning)]";
+  return "bg-[var(--danger)]";
 }
 
 function IssueList({ title, items, tone }: { title: string; items: string[]; tone: "amber" | "blue" }) {
@@ -53,8 +53,8 @@ function IssueList({ title, items, tone }: { title: string; items: string[]; ton
   if (!items.length) return null;
   const shown = showAll ? items : items.slice(0, 12);
   return (
-    <div className={`mt-4 rounded-lg border p-3 ${tone === "amber" ? "border-[#fed7aa] bg-[#fff7ed]" : "border-[#bfdbfe] bg-[#fbfaf8]"}`}>
-      <p className={`font-bold ${tone === "amber" ? "text-[#92400e]" : "text-[#1e40af]"}`}>
+    <div className={`mt-4 rounded-lg border p-3 ${tone === "amber" ? "border-[var(--warning-line)] bg-[var(--warning-light)]" : "border-[var(--info-line)] bg-[var(--panel-secondary)]"}`}>
+      <p className={`font-bold ${tone === "amber" ? "text-[var(--warning)]" : "text-[var(--info)]"}`}>
         {title} ({items.length})
       </p>
       <ul className="mt-2 space-y-1 text-sm text-[var(--foreground-secondary)]">
@@ -185,9 +185,9 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
 
   return (
     <div className="space-y-5">
-      <section className="rounded-lg border border-[#bfdbfe] bg-[#fbfaf8] p-4">
+      <section className="rounded-lg border border-[var(--info-line)] bg-[var(--panel-secondary)] p-4">
         <div className="flex items-start gap-3">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#dbeafe] text-[#2563eb]">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[var(--info-line)] text-[var(--info)]">
             <FileSpreadsheet size={22} />
           </span>
           <div>
@@ -247,7 +247,7 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
           {status === "analyzing" ? <Loader2 className="animate-spin" size={18} /> : null}
           {status === "analyzing" ? "Reading the spreadsheet..." : "Read spreadsheet"}
         </button>
-        {error ? <p className="mt-3 rounded-lg bg-[#ffe4e6] px-3 py-2 text-sm font-semibold text-[#be123c]">{error}</p> : null}
+        {error ? <p className="mt-3 rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">{error}</p> : null}
         {status === "error" && result ? (
           <>
             <IssueList items={result.skipped} title="Not imported" tone="amber" />
@@ -257,13 +257,13 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
       </section>
 
       {(status === "review" || status === "importing") && analysis ? (
-        <section className="rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] p-4">
+        <section className="rounded-lg border border-[var(--success-line)] bg-[var(--success-light)] p-4">
           <p className="text-xs font-semibold uppercase text-[var(--primary)]">Step 2</p>
           <h2 className="text-xl font-semibold text-[var(--foreground)]">Check where each column goes</h2>
           <p className="mt-2 text-sm text-[var(--muted)]">
             Every column is listed. Columns set to “Don't import” are left out - pick a field for any you want to keep.
           </p>
-          {notice ? <p className="mt-3 rounded-lg bg-[#fffbeb] px-3 py-2 text-sm font-semibold text-[#92400e]">{notice}</p> : null}
+          {notice ? <p className="mt-3 rounded-lg bg-[var(--warning-light)] px-3 py-2 text-sm font-semibold text-[var(--warning)]">{notice}</p> : null}
 
           <div className="mt-5 space-y-4">
             {mappings.map((sheet, sheetIndex) => (
@@ -316,7 +316,7 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
                                 {!ignored ? <span className={`inline-flex h-2.5 w-2.5 shrink-0 rounded-full ${confidenceTone(mapping.confidence)}`} title="How sure the suggestion is" /> : null}
                                 <select
                                   aria-label={`Import ${mapping.source_column} as`}
-                                  className={`${inputClass} ${clash ? "border-[#be123c]" : ""}`}
+                                  className={`${inputClass} ${clash ? "border-[var(--danger)]" : ""}`}
                                   onChange={(event) => updateMapping(sheetIndex, columnIndex, event.target.value)}
                                   value={mapping.routehq_field || "__ignore__"}
                                 >
@@ -332,7 +332,7 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
                                   ))}
                                 </select>
                               </div>
-                              {clash ? <p className="mt-1 text-xs font-semibold text-[#be123c]">Another column is also going here - choose one.</p> : null}
+                              {clash ? <p className="mt-1 text-xs font-semibold text-[var(--danger)]">Another column is also going here - choose one.</p> : null}
                             </td>
                           </tr>
                         );
@@ -345,7 +345,7 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
           </div>
 
           {hasClashes ? (
-            <p className="mt-4 flex items-center gap-2 rounded-lg bg-[#ffe4e6] px-3 py-2 text-sm font-semibold text-[#be123c]">
+            <p className="mt-4 flex items-center gap-2 rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">
               <AlertTriangle size={16} /> Two columns are set to the same field. Change one before importing.
             </p>
           ) : null}
@@ -369,9 +369,9 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
       ) : null}
 
       {status === "done" && result ? (
-        <section className="rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] p-4">
+        <section className="rounded-lg border border-[var(--success-line)] bg-[var(--success-light)] p-4">
           <div className="flex items-start gap-3">
-            <CheckCircle2 className="text-[#16a34a]" size={28} />
+            <CheckCircle2 className="text-[var(--success)]" size={28} />
             <div>
               <p className="text-xs font-semibold uppercase text-[var(--primary)]">Step 3</p>
               <h2 className="text-xl font-semibold text-[var(--foreground)]">Import finished</h2>

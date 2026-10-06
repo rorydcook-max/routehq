@@ -21,7 +21,7 @@ const dismissKey = "routehq_trial_banner_dismissed_until";
 function toneForDays(days: number | null | undefined) {
   if (days === null || days === undefined || days > 7) {
     return {
-      className: "border-[#bfe0db] bg-[var(--primary-light)] text-[#087887]",
+      className: "border-[var(--info-line)] bg-[var(--primary-light)] text-[var(--primary)]",
       dot: "bg-[var(--primary)]",
       button: "bg-[var(--primary)] text-white"
     };
@@ -29,14 +29,14 @@ function toneForDays(days: number | null | undefined) {
 
   if (days >= 3) {
     return {
-      className: "border-[#fde68a] bg-[var(--warning-light)] text-[#b45309]",
+      className: "border-[var(--warning-line)] bg-[var(--warning-light)] text-[var(--warning)]",
       dot: "bg-[var(--warning)]",
       button: "bg-[var(--warning)] text-white"
     };
   }
 
   return {
-    className: "border-[#fecaca] bg-[var(--danger-light)] text-[var(--danger)]",
+    className: "border-[var(--danger-line)] bg-[var(--danger-light)] text-[var(--danger)]",
     dot: "bg-[var(--danger)] animate-pulse",
     button: "bg-[var(--danger)] text-white"
   };

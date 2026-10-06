@@ -60,7 +60,7 @@ function MetricRow({
             width: "30px",
             height: "30px",
             borderRadius: "7px",
-            background: "#ecfeff",
+            background: "var(--primary-light)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -110,10 +110,10 @@ export function RouteHQValueWidget({ data, className = "" }: { data: RouteHQSavi
         <MetricRow icon="ti-receipt" label="Direct costs saved" value={thb(data.hardSavingsThb)} />
       </div>
 
-      <div className="my-2.5 h-px bg-[#e3e6e8]" />
+      <div className="my-2.5 h-px bg-[var(--border)]" />
 
       {data.hasPositiveAhead ? (
-        <div className="flex items-center justify-between gap-3 rounded-lg border border-[#bfe0db] bg-[var(--primary-light)] px-[13px] py-[9px]">
+        <div className="flex items-center justify-between gap-3 rounded-lg border border-[var(--info-line)] bg-[var(--primary-light)] px-[13px] py-[9px]">
           <span className="text-[12px] font-medium text-[var(--primary)]">You&apos;re ahead by</span>
           <span className="text-[20px] font-medium tracking-[-0.02em] text-[var(--primary)]">
             {thb(data.aheadByThb)}

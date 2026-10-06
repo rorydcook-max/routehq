@@ -47,10 +47,10 @@ const inputClass =
   "mt-1 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15";
 
 const statusClasses: Record<string, string> = {
-  available: "bg-[var(--success-light)] text-[var(--success)] ring-1 ring-[#bbf7d0]",
-  rented: "bg-[var(--primary-blue-light)] text-[var(--primary-blue)] ring-1 ring-[#bfd1ff]",
-  maintenance: "bg-[var(--warning-light)] text-[var(--warning)] ring-1 ring-[#fde68a]",
-  reserved: "bg-[var(--purple-light)] text-[var(--purple)] ring-1 ring-[#ddd6fe]",
+  available: "bg-[var(--success-light)] text-[var(--success)] ring-1 ring-[var(--success-line)]",
+  rented: "bg-[var(--primary-blue-light)] text-[var(--primary-blue)] ring-1 ring-[var(--info-line)]",
+  maintenance: "bg-[var(--warning-light)] text-[var(--warning)] ring-1 ring-[var(--warning-line)]",
+  reserved: "bg-[var(--purple-light)] text-[var(--purple)] ring-1 ring-[var(--purple-line)]",
   inactive: "bg-[var(--panel-secondary)] text-[var(--foreground-secondary)] ring-1 ring-[var(--border)]",
   retired: "bg-[var(--panel-secondary)] text-[var(--foreground-secondary)] ring-1 ring-[var(--border)]"
 };
@@ -95,7 +95,7 @@ function daysUntil(value: string | null | undefined) {
 
 function urgency(days: number | null) {
   if (days === null) {
-    return { label: "No date", className: "bg-[#fbfaf8] text-[var(--foreground-secondary)]", tone: "neutral" as const };
+    return { label: "No date", className: "bg-[var(--panel-secondary)] text-[var(--foreground-secondary)]", tone: "neutral" as const };
   }
   if (days < 0) {
     return { label: `${Math.abs(days)}d overdue`, className: "compliance-expired", tone: "red" as const };
@@ -343,7 +343,7 @@ function AtAGlance({ detail }: { detail: VehicleDetail }) {
             label: "GPS status",
             value: gps.last_seen_at ? "Online" : "Offline",
             sub: gps.last_seen_at ? `Last seen ${formatDate(gps.last_seen_at)}` : "Not seen yet",
-            className: gps.last_seen_at ? "bg-[#dcfce7] text-[#166534]" : "bg-[#ffe4e6] text-[#be123c]",
+            className: gps.last_seen_at ? "bg-[var(--success-light)] text-[var(--success)]" : "bg-[var(--danger-light)] text-[var(--danger)]",
             icon: Smartphone
           }
         ]
@@ -352,7 +352,7 @@ function AtAGlance({ detail }: { detail: VehicleDetail }) {
       label: activeRental ? "On rent to" : "Right now",
       value: activeRental?.customers?.full_name || "Free",
       sub: activeRental?.end_date ? `Due back ${formatDate(activeRental.end_date)}` : activeRental ? "No end date" : "Nobody is renting it",
-      className: activeRental ? "bg-[#dbeafe] text-[#1d4ed8]" : "bg-[#dcfce7] text-[#166534]",
+      className: activeRental ? "bg-[var(--info-line)] text-[var(--info)]" : "bg-[var(--success-light)] text-[var(--success)]",
       icon: CalendarDays
     }
   ];
@@ -428,7 +428,7 @@ function ActiveRentalCard({ detail, dueNow }: { detail: VehicleDetail; dueNow: n
   return (
     <Section defaultOpen eyebrow="Active rental" title={rental.status === "booked" ? "Booked by" : "On rent to"}>
       <div className="space-y-3">
-        <div className="rounded-lg border border-[#bfd1ff] bg-[var(--primary-blue-light)] p-3">
+        <div className="rounded-lg border border-[var(--info-line)] bg-[var(--primary-blue-light)] p-3">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="text-xl font-semibold text-[var(--foreground)]">{customer.full_name || "Customer not added yet"}</p>
@@ -483,7 +483,7 @@ function InfoRow({ label, value, danger = false }: { label: string; value: React
   return (
     <div className="rounded-lg border border-[var(--border)] bg-white p-3">
       <p className="text-xs font-bold uppercase text-[var(--muted)]">{label}</p>
-      <p className={`font-mono-data mt-1 font-semibold ${danger ? "text-[#be123c]" : "text-[var(--foreground)]"}`}>{value}</p>
+      <p className={`font-mono-data mt-1 font-semibold ${danger ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{value}</p>
     </div>
   );
 }
@@ -664,14 +664,14 @@ function InspectionCard({ inspection, expanded = false }: { inspection: any; exp
           <MediaPlaceholder icon={PenLine} label="Signature pending" />
         </div>
       ) : null}
-      {inspection.notes ? <p className="mt-3 rounded-lg bg-[#fbfaf8] p-3 text-sm text-[var(--foreground-secondary)]">{inspection.notes}</p> : null}
+      {inspection.notes ? <p className="mt-3 rounded-lg bg-[var(--panel-secondary)] p-3 text-sm text-[var(--foreground-secondary)]">{inspection.notes}</p> : null}
     </article>
   );
 }
 
 function MediaPlaceholder({ icon: Icon, label }: { icon: typeof Camera; label: string }) {
   return (
-    <div className="flex h-24 items-center justify-center rounded-lg border border-dashed border-[var(--border)] bg-[#fbfaf8] text-center text-sm font-bold text-[var(--muted)]">
+    <div className="flex h-24 items-center justify-center rounded-lg border border-dashed border-[var(--border)] bg-[var(--panel-secondary)] text-center text-sm font-bold text-[var(--muted)]">
       <div>
         <Icon className="mx-auto text-[var(--primary)]" size={20} />
         <p className="mt-1">{label}</p>
@@ -702,7 +702,7 @@ function FinancialSection({ detail }: { detail: VehicleDetail }) {
             <div className="flex min-w-10 flex-1 flex-col items-center justify-end gap-1" key={month.label}>
               <div className="flex h-32 items-end gap-1">
                 <div className="w-3 rounded-t bg-[var(--primary)]" style={{ height: `${Math.max(4, (month.revenue / chartMax) * 128)}px` }} title={`Revenue ${money(month.revenue)}`} />
-                <div className="w-3 rounded-t bg-[#be123c]" style={{ height: `${Math.max(4, (month.expenses / chartMax) * 128)}px` }} title={`Expenses ${money(month.expenses)}`} />
+                <div className="w-3 rounded-t bg-[var(--danger)]" style={{ height: `${Math.max(4, (month.expenses / chartMax) * 128)}px` }} title={`Expenses ${money(month.expenses)}`} />
               </div>
               <span className="text-[10px] font-bold text-[var(--muted)]">{month.label}</span>
             </div>
@@ -755,7 +755,7 @@ function MaintenanceSection({ detail, organizationId }: { detail: VehicleDetail;
         <p className="text-sm font-bold text-[var(--foreground)]">Next service: {formatDate(compliance.next_service_date)}</p>
         <p className="mt-1 text-sm text-[var(--muted)]">Estimated km: {compliance.next_service_mileage ? `${Number(compliance.next_service_mileage).toLocaleString()} km` : "Not set"}</p>
       </div>
-      <details className="mt-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
+      <details className="mt-3 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
         <summary className="cursor-pointer font-bold text-[var(--primary)]">Log maintenance</summary>
         <form action={logVehicleMaintenance} className="mt-3 grid gap-3 sm:grid-cols-2">
           <input name="vehicleId" type="hidden" value={detail.vehicle.id} />
@@ -819,7 +819,7 @@ function MaintenanceSection({ detail, organizationId }: { detail: VehicleDetail;
                   <p className="text-sm text-[var(--muted)]">{formatDate(event.service_date)} · {event.mileage ? `${Number(event.mileage).toLocaleString()} km` : "Mileage not set"}</p>
                   <p className="mt-1 text-sm text-[var(--foreground-secondary)]">{event.supplier || "Garage not recorded"}</p>
                 </div>
-                <span className="font-mono-data font-semibold text-[#be123c]">{event.cost ? money(event.cost) : ""}</span>
+                <span className="font-mono-data font-semibold text-[var(--danger)]">{event.cost ? money(event.cost) : ""}</span>
               </div>
               {event.notes ? <p className="mt-2 text-sm text-[var(--muted)]">{event.notes}</p> : null}
             </div>
@@ -836,7 +836,7 @@ function TasksSection({ detail, organizationId }: { detail: VehicleDetail; organ
 
   return (
     <Section eyebrow="Tasks" title="Jobs to do">
-      <div className="mb-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
+      <div className="mb-3 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
         <details>
           <summary className="inline-flex cursor-pointer rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--primary)]">
             + Add task
@@ -949,7 +949,7 @@ function TransactionsSection({ detail }: { detail: VehicleDetail }) {
                     <span className="font-semibold text-[var(--foreground)]">{transaction.type.replace(/_/g, " ")}</span>
                     <span className="block text-sm text-[var(--muted)]">{formatDate(transaction.transaction_date)} · {transaction.notes || "No description"}</span>
                   </span>
-                  <span className={`font-mono-data font-semibold ${expense ? "text-[#be123c]" : "text-[var(--primary)]"}`}>{expense ? "-" : "+"}{money(transaction.amount)}</span>
+                  <span className={`font-mono-data font-semibold ${expense ? "text-[var(--danger)]" : "text-[var(--primary)]"}`}>{expense ? "-" : "+"}{money(transaction.amount)}</span>
                 </summary>
                 <div className="mt-3 text-sm text-[var(--muted)]">
                   <p>Supplier: {transaction.supplier || "Not recorded"}</p>
@@ -1048,7 +1048,7 @@ function GpsSection({ detail }: { detail: VehicleDetail }) {
             )}
           </div>
         </div>
-        <p className={`mt-2 text-sm font-semibold ${offline ? "text-[#be123c]" : "text-[var(--muted)]"}`}>Last seen {detail.gpsDevice.last_seen_at ? formatDate(detail.gpsDevice.last_seen_at) : "never"}</p>
+        <p className={`mt-2 text-sm font-semibold ${offline ? "text-[var(--danger)]" : "text-[var(--muted)]"}`}>Last seen {detail.gpsDevice.last_seen_at ? formatDate(detail.gpsDevice.last_seen_at) : "never"}</p>
         <Link className="mt-3 inline-flex font-bold text-[var(--primary)]" href="#gps">
           View trip history
         </Link>

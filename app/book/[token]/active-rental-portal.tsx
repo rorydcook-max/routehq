@@ -100,10 +100,10 @@ export function ActiveRentalPortal({
         <div className="flex gap-4">
           <VehiclePhoto vehicle={vehicle} />
           <div className="min-w-0 flex-1">
-            <span className="inline-flex rounded-full bg-[#f0fdf4] px-3 py-1 text-xs font-semibold uppercase text-[#16a34a]">{t("rentalIsActive")}</span>
+            <span className="inline-flex rounded-full bg-[var(--success-light)] px-3 py-1 text-xs font-semibold uppercase text-[var(--success)]">{t("rentalIsActive")}</span>
             <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">{vehicleName || t("yourVehicle")}</h2>
             <p className="font-mono-data mt-1 text-sm font-bold text-[var(--muted)]">{vehicle?.registration_number || t("platePending")}</p>
-            <p className={`mt-3 text-sm font-semibold ${countdown.overdue ? "text-[#dc2626]" : countdown.today ? "text-[#d97706]" : "text-[var(--foreground-secondary)]"}`}>
+            <p className={`mt-3 text-sm font-semibold ${countdown.overdue ? "text-[var(--danger)]" : countdown.today ? "text-[var(--warning)]" : "text-[var(--foreground-secondary)]"}`}>
               {countdown.label}
             </p>
           </div>
@@ -113,7 +113,7 @@ export function ActiveRentalPortal({
       <PortalPayments bundle={paymentBundle} orgPayment={orgPayment} organizationName={organizationName} payments={payments} token={token} />
 
       {confirmation ? (
-        <p className="rounded-2xl border border-[#bbf7d0] bg-[#f0fdf4] p-4 text-sm font-bold text-[#166534]">{confirmation}</p>
+        <p className="rounded-2xl border border-[var(--success-line)] bg-[var(--success-light)] p-4 text-sm font-bold text-[var(--success)]">{confirmation}</p>
       ) : null}
 
       <section className="grid gap-3 sm:grid-cols-2">
@@ -154,20 +154,20 @@ export function ActiveRentalPortal({
         <p className="text-xs font-semibold uppercase text-[var(--primary)]">{t("yourRentalDocuments")}</p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {signedContractUrl ? (
-            <a className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-4 text-sm font-semibold text-[var(--foreground)]" href={signedContractUrl} rel="noreferrer" target="_blank">
+            <a className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-4 text-sm font-semibold text-[var(--foreground)]" href={signedContractUrl} rel="noreferrer" target="_blank">
               <FileText className="mb-2 text-[var(--primary)]" />
               {t("signedAgreement")}
             </a>
           ) : null}
           {certificateUrl ? (
-            <a className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-4 text-sm font-semibold text-[var(--foreground)]" href={certificateUrl} rel="noreferrer" target="_blank">
+            <a className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-4 text-sm font-semibold text-[var(--foreground)]" href={certificateUrl} rel="noreferrer" target="_blank">
               <FileText className="mb-2 text-[var(--primary)]" />
               {t("proofOfSigning")}
             </a>
           ) : null}
           {deliveryPhotoUrls.length ? (
             deliveryPhotoUrls.map((url, index) => (
-              <a className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-4 text-sm font-semibold text-[var(--foreground)]" href={url} key={url} rel="noreferrer" target="_blank">
+              <a className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-4 text-sm font-semibold text-[var(--foreground)]" href={url} key={url} rel="noreferrer" target="_blank">
                 <ImageIcon className="mb-2 text-[var(--primary)]" />
                 {t("handoverPhoto", { number: index + 1 })}
               </a>
@@ -216,7 +216,7 @@ function ActionForm({
       <form action={(formData) => onSubmit(formData, t("requestSent", { business: organizationName }))} className="mt-4 space-y-3">
         <input name="actionType" type="hidden" value="extension_request" />
         {openEndedOffer ? (
-          <div className="grid grid-cols-2 gap-2 rounded-xl bg-[#f5f4f1] p-1 text-sm font-semibold">
+          <div className="grid grid-cols-2 gap-2 rounded-xl bg-[var(--panel-secondary)] p-1 text-sm font-semibold">
             <button className={`min-h-11 rounded-lg px-2 ${!noEnd ? "bg-white text-[var(--foreground)] shadow-sm" : "text-[var(--muted)]"}`} onClick={() => setNoEnd(false)} type="button">
               {t("untilADate")}
             </button>
@@ -244,7 +244,7 @@ function ActionForm({
           </p>
         ) : !noEnd && extraDays > 0 ? (
           // No rate meant for a stay this short (or no rates at all): the business sets the price, so none is promised here.
-          <p className="rounded-xl bg-[#f5f4f1] p-3 text-sm text-[var(--foreground-secondary)]">
+          <p className="rounded-xl bg-[var(--panel-secondary)] p-3 text-sm text-[var(--foreground-secondary)]">
             {t("priceToBeConfirmed", { business: organizationName, days: extraDays })}
           </p>
         ) : null}

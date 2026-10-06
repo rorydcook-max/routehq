@@ -116,7 +116,7 @@ export function BookingShareActions({
           {say("share_copy")}
         </button>
       </div>
-      {message ? <p className="rounded-lg bg-[#fbfaf8] p-3 text-sm font-bold text-[var(--primary)]">{message}</p> : null}
+      {message ? <p className="rounded-lg bg-[var(--panel-secondary)] p-3 text-sm font-bold text-[var(--primary)]">{message}</p> : null}
     </div>
   );
 }

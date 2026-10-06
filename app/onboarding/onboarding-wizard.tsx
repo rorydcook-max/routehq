@@ -1215,7 +1215,7 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
           </div>
           <div className="flex gap-2">
             {[1, 2, 3, 4].map((entry) => (
-              <span className={`h-3 w-3 rounded-full ${entry <= step ? "bg-[var(--primary)]" : "bg-[#cfe2de]"}`} key={entry} />
+              <span className={`h-3 w-3 rounded-full ${entry <= step ? "bg-[var(--primary)]" : "bg-[var(--border-strong)]"}`} key={entry} />
             ))}
           </div>
         </header>
@@ -1223,7 +1223,7 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
         <section className="flex-1 rounded-lg border border-[var(--border)] bg-white/92 p-3 shadow-[0_18px_60px_rgba(16,37,43,0.08)] sm:p-7">
           {success ? (
             <div className="flex min-h-[520px] flex-col items-center justify-center text-center">
-              <div className="success-pop flex h-24 w-24 items-center justify-center rounded-full bg-[#dcfce7] text-[#166534]">
+              <div className="success-pop flex h-24 w-24 items-center justify-center rounded-full bg-[var(--success-light)] text-[var(--success)]">
                 <CheckCircle2 size={52} />
               </div>
               <h2 className="mt-5 text-3xl font-semibold">{t.setupComplete}</h2>
@@ -1241,7 +1241,7 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
                   <span className="text-sm font-semibold">{t.businessName}</span>
                   <input className={fieldClass} onChange={(event) => setProfile({ ...profile, businessName: event.target.value })} required value={profile.businessName} />
                 </label>
-                <div className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
+                <div className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
                   <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                     <p className="text-sm font-semibold">{t.mainLocation}</p>
                     <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[var(--muted)]" title={t.mainLocationHint}>
@@ -1334,13 +1334,13 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
                   <p className="mt-3 text-lg font-semibold">{t.scanBlueBook}</p>
                   <p className="mt-1 text-sm text-white/85">{t.scanBlueBookBody}</p>
                 </button>
-                <button className="pressable rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3 text-left" onClick={() => router.push("/fleet/import?from=onboarding")} type="button">
+                <button className="pressable rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3 text-left" onClick={() => router.push("/fleet/import?from=onboarding")} type="button">
                   <FileSpreadsheet className="text-[var(--primary)]" size={28} />
                   <p className="mt-3 text-lg font-semibold">{t.importVehicles}</p>
                   <p className="mt-1 text-sm text-[var(--muted)]">{t.importVehiclesBody}</p>
                 </button>
               </div>
-              <div className="mt-4 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
+              <div className="mt-4 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-start gap-3">
                     <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-[var(--primary-light)] text-[var(--primary)]">
@@ -1351,7 +1351,7 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
                       <p className="mt-1 text-sm text-[var(--muted)]">{vehiclePhotoCount ? t.photosSelected(vehiclePhotoCount) : t.uploadPhotosBody}</p>
                     </div>
                   </div>
-                  <button className="pressable rounded-lg bg-white px-4 py-3 text-sm font-semibold text-[var(--primary)] shadow-sm ring-1 ring-[#cfe2de]" onClick={() => photoRef.current?.click()} type="button">
+                  <button className="pressable rounded-lg bg-white px-4 py-3 text-sm font-semibold text-[var(--primary)] shadow-sm ring-1 ring-[var(--border-strong)]" onClick={() => photoRef.current?.click()} type="button">
                     {t.uploadPhotos}
                   </button>
                 </div>
@@ -1361,10 +1361,10 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
                   <p className="text-sm font-semibold text-[var(--foreground)]">{t.photosSelected(vehiclePhotoPreviews.length)}</p>
                   <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4">
                     {vehiclePhotoPreviews.map((photo) => (
-                      <div className="relative overflow-hidden rounded-lg border border-[#d7e5e1] bg-[#fbfaf8]" key={photo.id}>
+                      <div className="relative overflow-hidden rounded-lg border border-[var(--info-line)] bg-[var(--panel-secondary)]" key={photo.id}>
                         <button
                           aria-label={`Remove ${photo.name}`}
-                          className="pressable absolute right-1 top-1 z-10 grid h-7 w-7 place-items-center rounded-full bg-white/95 text-[#be123c] shadow-sm"
+                          className="pressable absolute right-1 top-1 z-10 grid h-7 w-7 place-items-center rounded-full bg-white/95 text-[var(--danger)] shadow-sm"
                           onClick={() => removeVehiclePhoto(photo.id)}
                           type="button"
                         >
@@ -1379,7 +1379,7 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
               ) : null}
               {ocrLoading ? <p className="mt-4 rounded-lg bg-[var(--primary-light)] p-3 text-sm font-bold text-[var(--primary)]">{t.readingBlueBook}</p> : null}
               <VehicleFields categories={categories} fields={vehicleFields} labels={t.fields} language={profile.language} onChange={updateVehicle} selectedCountry={selectedCountry} />
-              <p className="mt-4 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3 text-sm font-semibold text-[var(--muted)]">
+              <p className="mt-4 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3 text-sm font-semibold text-[var(--muted)]">
                 {t.renewalHelp}
               </p>
               <FooterActions
@@ -1395,10 +1395,10 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
           {!success && step === 3 ? (
             <div className="mx-auto flex min-h-[520px] max-w-xl flex-col justify-center">
               <StepTitle icon={LineChart} title={t.step3Title} subtitle={t.step3Subtitle} />
-              <div className="mt-6 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
+              <div className="mt-6 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
                 {vehicle && compliance ? (
                   <div>
-                    <p className={`text-sm font-semibold uppercase ${Number(compliance.days) <= 60 ? "text-[#b7791f]" : "text-[#16a34a]"}`}>
+                    <p className={`text-sm font-semibold uppercase ${Number(compliance.days) <= 60 ? "text-[var(--warning)]" : "text-[var(--success)]"}`}>
                       {Number(compliance.days) <= 60 ? t.attentionSoon : t.complianceGood}
                     </p>
                     <h3 className="mt-2 text-2xl font-semibold">
@@ -1430,7 +1430,7 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
               <div className="mt-6 grid gap-3 md:grid-cols-[1fr_220px]">
                 <div className="space-y-3">
                   {t.lineBenefits.map((item) => (
-                    <div className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3 text-sm font-bold text-[var(--foreground-secondary)]" key={item}>{item}</div>
+                    <div className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3 text-sm font-bold text-[var(--foreground-secondary)]" key={item}>{item}</div>
                   ))}
                   <label className="block">
                     <span className="text-sm font-semibold">{t.lineId}</span>
@@ -1440,7 +1440,7 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
                 <div className="rounded-lg border border-[var(--border)] bg-white p-3 text-center">
                   <div className="mx-auto grid h-44 w-44 grid-cols-6 gap-1 rounded-lg bg-white p-3 shadow-inner">
                     {Array.from({ length: 36 }).map((_, index) => (
-                      <span className={`${[0, 1, 2, 6, 12, 13, 14, 5, 11, 17, 23, 29, 35, 30, 31, 32, 18, 20, 21, 26, 27].includes(index) ? "bg-[#10252b]" : "bg-[var(--primary-light)]"} rounded-sm`} key={index} />
+                      <span className={`${[0, 1, 2, 6, 12, 13, 14, 5, 11, 17, 23, 29, 35, 30, 31, 32, 18, 20, 21, 26, 27].includes(index) ? "bg-[var(--foreground)]" : "bg-[var(--primary-light)]"} rounded-sm`} key={index} />
                     ))}
                   </div>
                   <p className="mt-3 text-sm font-bold text-[var(--muted)]">{t.scanLine}</p>
@@ -1454,7 +1454,7 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
                   {t.skipNow}
                 </button>
               </div>
-              {error ? <p className="mt-4 rounded-lg bg-[#ffe4e6] p-3 text-sm font-bold text-[#be123c]">{error}</p> : null}
+              {error ? <p className="mt-4 rounded-lg bg-[var(--danger-light)] p-3 text-sm font-bold text-[var(--danger)]">{error}</p> : null}
             </div>
           ) : null}
         </section>
@@ -1682,7 +1682,7 @@ function VehicleFields({
 
   return (
     <div className="mt-6 space-y-3">
-      <div className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
+      <div className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <label>
             <span className="text-sm font-semibold">{labels.category}</span>
@@ -1726,7 +1726,7 @@ function VehicleFields({
                       );
                     })()
                   ) : (
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[#fbfaf8] text-xs font-bold text-[var(--primary)]">+</span>
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[var(--panel-secondary)] text-xs font-bold text-[var(--primary)]">+</span>
                   )}
                   <span className={fields.make ? "truncate font-semibold" : "truncate text-[var(--muted)]"}>
                     {manualMake ? "Other / custom make" : fields.make || (makes.length ? `Select ${selectedCategory?.name || "vehicle"} brand` : "Loading makes...")}
@@ -1735,7 +1735,7 @@ function VehicleFields({
                 <span className="text-[var(--muted)]">v</span>
               </button>
               {makeDropdownOpen ? (
-                <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-lg border border-[var(--border)] bg-white shadow-xl shadow-[#10252b]/10">
+                <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-lg border border-[var(--border)] bg-white shadow-xl shadow-[var(--foreground)]/10">
                   <div className="border-b border-[var(--border)] p-3">
                     <input
                       className="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
@@ -1747,7 +1747,7 @@ function VehicleFields({
                   <div className="max-h-72 overflow-y-auto py-1">
                     {searchedMakes.map((make) => (
                       <button
-                        className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm hover:bg-[#fbfaf8]"
+                        className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm hover:bg-[var(--panel-secondary)]"
                         key={make.id}
                         onClick={() => handleMakeChange(make.id)}
                         type="button"
@@ -1762,7 +1762,7 @@ function VehicleFields({
                       </button>
                     ))}
                     <button
-                      className="flex w-full items-center gap-3 border-t border-[var(--border)] px-3 py-2 text-left text-sm font-semibold text-[var(--primary)] hover:bg-[#fbfaf8]"
+                      className="flex w-full items-center gap-3 border-t border-[var(--border)] px-3 py-2 text-left text-sm font-semibold text-[var(--primary)] hover:bg-[var(--panel-secondary)]"
                       onClick={() => handleMakeChange("__manual__")}
                       type="button"
                     >
@@ -1816,7 +1816,7 @@ function VehicleFields({
         </div>
       </div>
 
-      <div className="rounded-lg border border-[#d7e5ff] bg-[#f5f8ff] p-3">
+      <div className="rounded-lg border border-[var(--info-line)] bg-[var(--info-light)] p-3">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <TextField label={labels.transmission} name="transmission" value={fields.transmission} onChange={onChange} />
           <TextField label={labels.fuelType} name="fuelType" value={fields.fuelType} onChange={onChange} />
@@ -1826,7 +1826,7 @@ function VehicleFields({
         </div>
       </div>
 
-      <div className="rounded-lg border border-[#fde7c3] bg-[#fffbeb] p-3">
+      <div className="rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3">
         <span className="text-sm font-semibold">{labels.rate}</span>
         <div className="mt-2 grid gap-2 sm:grid-cols-[1fr_1fr_1fr_112px]">
           <CompactRateField label={labels.dailyShort} name="dailyRate" value={fields.dailyRate} onChange={onChange} />
@@ -1841,7 +1841,7 @@ function VehicleFields({
         </div>
       </div>
 
-      <div className="rounded-lg border border-[#d7f2df] bg-[#f0fdf4] p-3">
+      <div className="rounded-lg border border-[var(--success-line)] bg-[var(--success-light)] p-3">
         <div className="grid gap-3 sm:grid-cols-2">
           <DateField label={labels.taxExpiry} language={language} name="taxExpiryDate" value={fields.taxExpiryDate} onChange={onChange} />
           <DateField label={labels.porborExpiry} language={language} name="porborExpiryDate" value={fields.porborExpiryDate} onChange={onChange} />
@@ -1970,7 +1970,7 @@ function FooterActions({
 }) {
   return (
     <div className="mt-6">
-      {error ? <p className="mb-3 rounded-lg bg-[#ffe4e6] p-3 text-sm font-bold text-[#be123c]">{error}</p> : null}
+      {error ? <p className="mb-3 rounded-lg bg-[var(--danger-light)] p-3 text-sm font-bold text-[var(--danger)]">{error}</p> : null}
       <div className="flex flex-col gap-3 sm:flex-row">
         {onSecondary && secondaryLabel ? (
           <button className="pressable min-h-12 rounded-lg border border-[var(--border)] bg-white px-5 py-3 text-sm font-semibold text-[var(--foreground-secondary)]" disabled={pending} onClick={onSecondary} type="button">

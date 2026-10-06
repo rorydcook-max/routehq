@@ -39,7 +39,7 @@ export function CustomerMessagesPanel({ enabled, hasChannel }: { enabled: boolea
         </span>
       </label>
       {on && !hasChannel ? (
-        <p className="mt-3 rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3 text-[13px] text-[#92400e]">
+        <p className="mt-3 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3 text-[13px] text-[var(--warning)]">
           No messaging account is connected yet, so nothing can be sent. Until one is, each message is kept on the booking marked "not sent" for you to pass on.
         </p>
       ) : null}
@@ -48,7 +48,7 @@ export function CustomerMessagesPanel({ enabled, hasChannel }: { enabled: boolea
           LINE and Telegram only let you message someone who has messaged you first. Each customer's booking page invites them to open a chat with you, and it connects itself to their booking when they do.
         </p>
       ) : null}
-      {error ? <p className="mt-2 text-sm font-semibold text-[#dc2626]">{error}</p> : null}
+      {error ? <p className="mt-2 text-sm font-semibold text-[var(--danger)]">{error}</p> : null}
     </div>
   );
 }

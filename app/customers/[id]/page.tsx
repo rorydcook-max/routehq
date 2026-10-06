@@ -100,7 +100,7 @@ function InfoTile({ label, value, danger = false }: { label: string; value: Reac
   return (
     <div className="sub-surface p-3">
       <p className="text-xs font-bold uppercase text-[var(--muted)]">{label}</p>
-      <p className={`font-mono-data mt-1 font-semibold ${danger ? "text-[#be123c]" : "text-[var(--foreground)]"}`}>{value}</p>
+      <p className={`font-mono-data mt-1 font-semibold ${danger ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{value}</p>
     </div>
   );
 }
@@ -189,7 +189,7 @@ function DocumentCheck({
           <p className="font-semibold text-[var(--foreground)]">{label}</p>
           <div className="mt-1 text-sm text-[var(--muted)]">{detail}</div>
         </div>
-        {uploaded ? <BadgeCheck className="text-[#16a34a]" size={21} /> : <AlertTriangle className="text-[#be123c]" size={21} />}
+        {uploaded ? <BadgeCheck className="text-[var(--success)]" size={21} /> : <AlertTriangle className="text-[var(--danger)]" size={21} />}
       </div>
     </div>
   );
@@ -320,7 +320,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             {activeRental ? (
               <Card>
                 <SectionHeader eyebrow="Active rental" title="Currently renting" />
-                <div className="mt-3 rounded-lg border border-[#dbeafe] bg-[#fbfaf8] p-3">
+                <div className="mt-3 rounded-lg border border-[var(--info-line)] bg-[var(--panel-secondary)] p-3">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="font-semibold text-[var(--foreground)]">
@@ -504,7 +504,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                         </div>
                         <span
                           className={`font-mono-data font-semibold ${
-                            isRawDepositTransaction({ isDeposit: Boolean((transaction as any).is_deposit), type: transaction.type }) ? "text-[#d97706]" : "text-[var(--primary)]"
+                            isRawDepositTransaction({ isDeposit: Boolean((transaction as any).is_deposit), type: transaction.type }) ? "text-[var(--warning)]" : "text-[var(--primary)]"
                           }`}
                         >
                           {money(transaction.amount)}

@@ -590,7 +590,7 @@ export function BookingForm({
               </div>
               <button
                 aria-label={say("close")}
-                className="pressable shrink-0 rounded-full p-2 text-[var(--muted)] hover:bg-[#fbfaf8]"
+                className="pressable shrink-0 rounded-full p-2 text-[var(--muted)] hover:bg-[var(--panel-secondary)]"
                 onClick={() => setShowCustomerModal(false)}
                 type="button"
               >
@@ -620,7 +620,7 @@ export function BookingForm({
                 </div>
                 </button>
               ) : (
-                <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3 text-sm font-semibold text-[#92400e]">
+                <div className="rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3 text-sm font-semibold text-[var(--warning)]">
                   {say("existingNeeds")}
                 </div>
               )}
@@ -792,7 +792,7 @@ export function BookingForm({
                 <Badge tone={documentTone(selectedCustomer.document_status)}>{documentLabel(selectedCustomer.document_status)}</Badge>
               </div>
               {selectedCustomer.document_status !== "complete" ? (
-                <p className="mt-3 rounded-lg bg-[#fffbeb] p-3 text-sm font-semibold text-[#92400e]">{say("missingDocs")}</p>
+                <p className="mt-3 rounded-lg bg-[var(--warning-light)] p-3 text-sm font-semibold text-[var(--warning)]">{say("missingDocs")}</p>
               ) : null}
             </div>
           ) : null}
@@ -850,7 +850,7 @@ export function BookingForm({
             </label>
           </div>
           {bookingMode === "existing_rental" ? (
-            <p style={{ fontSize: 11, color: "#94a3b8", marginTop: 3 }}>
+            <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 3 }}>
               {say("useActualStart")}
             </p>
           ) : null}
@@ -865,7 +865,7 @@ export function BookingForm({
             <span>{say("openEnded")}</span>
           </label>
           {dateConflict ? (
-            <p className="mt-3 rounded-lg border border-[#fecaca] bg-[#fff1f2] p-3 text-sm font-bold text-[#be123c]" role="alert">
+            <p className="mt-3 rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-3 text-sm font-bold text-[var(--danger)]" role="alert">
               {conflictMessage(dateConflict)}
             </p>
           ) : null}
@@ -1023,7 +1023,7 @@ export function BookingForm({
                 </label>
                 <label className="block">
                   <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("totalUpfront")}</span>
-                  <div className="font-mono-data mt-1 flex h-10 items-center rounded-lg border border-[var(--border)] bg-[#fbfaf8] px-3 text-[13px] font-bold text-[var(--foreground)]">
+                  <div className="font-mono-data mt-1 flex h-10 items-center rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] px-3 text-[13px] font-bold text-[var(--foreground)]">
                     {money(upfrontPeriods * upfrontRate, currency)}
                   </div>
                   <p className="mt-1 text-[11px] text-[var(--muted)]">{upfrontPeriods} × {money(upfrontRate, currency)}</p>
@@ -1071,7 +1071,7 @@ export function BookingForm({
             ))}
           </div>
           {deliveryMethod === "tbd" ? (
-            <div className="mt-3 flex items-start gap-3 rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3 text-sm leading-6 text-[#92400e]">
+            <div className="mt-3 flex items-start gap-3 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3 text-sm leading-6 text-[var(--warning)]">
               <span aria-label={say("information")} title={say("del_tbd")}>ⓘ</span>
               <p>{say("tbdBody")}</p>
             </div>
@@ -1128,7 +1128,7 @@ export function BookingForm({
             </div>
           )}
           {isSameDayHandover ? (
-            <div className="mt-3 rounded-lg border border-[#fde68a] bg-[#fffbeb] px-3 py-2 text-xs font-bold text-[#92400e]">
+            <div className="mt-3 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] px-3 py-2 text-xs font-bold text-[var(--warning)]">
               {say("sameDay")}
             </div>
           ) : null}
@@ -1140,7 +1140,7 @@ export function BookingForm({
           <Header icon={CheckCircle2} eyebrow={say("stepN", { n: displayStepNumber })} title={shareResult ? say("allDone") : bookingMode === "existing_rental" ? say("checkSave") : say("checkSend")} />
           <BookingLinkSharePanel result={shareResult} />
           {isSameDayHandover ? (
-            <div className="mt-3 rounded-lg border border-[#bfe0db] bg-[#fbfaf8] p-3">
+            <div className="mt-3 rounded-lg border border-[var(--info-line)] bg-[var(--panel-secondary)] p-3">
               <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--primary)]">{say("fastTrack")}</p>
               <p className="mt-1 text-sm text-[var(--foreground-secondary)]">
                 {say("fastTrackBody")}
@@ -1264,7 +1264,7 @@ export function BookingForm({
             <SummaryRow label={say("s_included")} value={includedItems.length ? includedItems.map((item) => (includedOptions.includes(item) ? say(`inc_${includedOptions.indexOf(item)}`) : item)).join(", ") : say("noneSelected")} />
           </div>
           {bookingMode === "existing_rental" && !walkInFastTrack ? (
-            <div className="mt-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
+            <div className="mt-3 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
               <p className="text-sm font-semibold text-[var(--foreground)]">{say("paidQ")}</p>
               <p className="mt-1 text-xs text-[var(--muted)]">{say("paidHint")}</p>
               <div className="mt-3 space-y-2">
@@ -1290,7 +1290,7 @@ export function BookingForm({
               <p className="mt-3 text-xs text-[var(--muted)]">{say("startsOnRent")}</p>
             </div>
           ) : null}
-          {error ? <p className="mt-3 rounded-lg bg-[#ffe4e6] p-3 text-sm font-bold text-[#be123c]">{error}</p> : null}
+          {error ? <p className="mt-3 rounded-lg bg-[var(--danger-light)] p-3 text-sm font-bold text-[var(--danger)]">{error}</p> : null}
         </section>
       ) : null}
 
@@ -1307,7 +1307,7 @@ export function BookingForm({
             button, and the click that opens the review step also submits it. */}
         {step < steps.length - 1 ? (
           <button
-            className="pressable min-h-12 flex-1 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white shadow-lg disabled:bg-[#94a3b8]"
+            className="pressable min-h-12 flex-1 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white shadow-lg disabled:bg-[var(--muted)]"
             disabled={!canContinue() || showCustomerModal}
             key="continue"
             onClick={goNext}
@@ -1324,7 +1324,7 @@ export function BookingForm({
           </Link>
         ) : (
           <button
-            className="pressable min-h-12 flex-1 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white shadow-lg disabled:bg-[#94a3b8]"
+            className="pressable min-h-12 flex-1 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white shadow-lg disabled:bg-[var(--muted)]"
             disabled={isPending}
             key="submit"
             onClick={() => {
@@ -1436,8 +1436,8 @@ function BookingLinkSharePanel({ result }: { result: BookingShareResult | null }
   if (!bookingUrl) return null;
 
   return (
-    <div className="mt-3 scroll-mt-4 rounded-xl border border-[#bbf7d0] bg-[#f0fdf4] p-4" ref={panelRef}>
-      <p className="flex items-center gap-2 text-base font-semibold text-[#166534]">
+    <div className="mt-3 scroll-mt-4 rounded-xl border border-[var(--success-line)] bg-[var(--success-light)] p-4" ref={panelRef}>
+      <p className="flex items-center gap-2 text-base font-semibold text-[var(--success)]">
         <CheckCircle2 size={20} />
         {say("created")}
       </p>
@@ -1460,7 +1460,7 @@ function BookingLinkSharePanel({ result }: { result: BookingShareResult | null }
             type="button"
           >
             {icon}
-            <span className="max-w-full truncate tracking-tight" style={{ fontSize: "10px", color: "#64748b", fontWeight: 500 }}>{label}</span>
+            <span className="max-w-full truncate tracking-tight" style={{ fontSize: "10px", color: "var(--muted)", fontWeight: 500 }}>{label}</span>
           </button>
         ))}
       </div>
@@ -1481,7 +1481,7 @@ function BookingLinkSharePanel({ result }: { result: BookingShareResult | null }
         <div className="flex justify-center px-3 pb-4">
           {qrUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img alt={say("qrAlt")} height={220} src={qrUrl} style={{ borderRadius: 8, border: "0.5px solid #e2e8f0" }} width={220} />
+            <img alt={say("qrAlt")} height={220} src={qrUrl} style={{ borderRadius: 8, border: "0.5px solid var(--border)" }} width={220} />
           ) : (
             <span className="spinner" />
           )}

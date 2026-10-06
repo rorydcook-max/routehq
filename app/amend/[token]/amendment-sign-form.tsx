@@ -40,7 +40,7 @@ export function AmendmentSignForm({ token, contentHash, renterName }: { token: s
     const { x, y } = point(event);
     context.lineWidth = 3;
     context.lineCap = "round";
-    context.strokeStyle = "#10252b";
+    context.strokeStyle = "#1b2430";
     context.lineTo(x, y);
     context.stroke();
   }
@@ -95,7 +95,7 @@ export function AmendmentSignForm({ token, contentHash, renterName }: { token: s
           </button>
         </div>
         <canvas
-          className="mt-1 h-40 w-full touch-none rounded-xl border border-dashed border-[#94a3a0] bg-[#fbfaf8]"
+          className="mt-1 h-40 w-full touch-none rounded-xl border border-dashed border-[var(--muted)] bg-[var(--panel-secondary)]"
           height={200}
           onPointerCancel={end}
           onPointerDown={start}
@@ -106,7 +106,7 @@ export function AmendmentSignForm({ token, contentHash, renterName }: { token: s
           width={600}
         />
       </div>
-      {error ? <p className="mt-3 rounded-xl bg-[#fff1f2] px-3 py-2 text-sm font-bold text-[#be123c]">{error}</p> : null}
+      {error ? <p className="mt-3 rounded-xl bg-[var(--danger-light)] px-3 py-2 text-sm font-bold text-[var(--danger)]">{error}</p> : null}
       <button
         className="pressable mt-4 min-h-12 w-full rounded-xl bg-[var(--primary)] px-5 py-3 text-base font-semibold text-white disabled:opacity-50"
         disabled={!ready || isPending}

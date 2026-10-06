@@ -59,7 +59,7 @@ export default async function BillingPage() {
               <span className="font-semibold capitalize text-[var(--foreground)]">{currentTier}</span>
             </div>
             {status === "trial" ? (
-              <div className="rounded-lg border border-[#b7e2dc] bg-[#e8faf7] p-3">
+              <div className="rounded-lg border border-[var(--success-line)] bg-[var(--success-light)] p-3">
                 <p className="text-sm font-semibold text-[var(--primary)]">Trial status</p>
                 <p className="mt-1 text-sm text-[var(--foreground-secondary)]">{trialDays === null ? "Trial date not set" : `${trialDays} day${trialDays === 1 ? "" : "s"} remaining`}</p>
               </div>
@@ -99,7 +99,7 @@ export default async function BillingPage() {
 
       <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {tiers.map((tier) => (
-          <Card className={tier.tier === currentTier ? "border-[var(--primary)] bg-[#fbfaf8]" : "bg-white"} key={tier.tier}>
+          <Card className={tier.tier === currentTier ? "border-[var(--primary)] bg-[var(--panel-secondary)]" : "bg-white"} key={tier.tier}>
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-lg font-semibold text-[var(--foreground)]">{tier.name}</p>

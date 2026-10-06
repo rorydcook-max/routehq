@@ -101,7 +101,7 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
         {say("vc_button")}
       </button>
       {open ? (
-        <div className="fixed inset-0 z-50 flex items-end overflow-y-auto bg-[#10252b]/60 p-3 text-left sm:items-center sm:justify-center">
+        <div className="fixed inset-0 z-50 flex items-end overflow-y-auto bg-[var(--foreground)]/60 p-3 text-left sm:items-center sm:justify-center">
           <div className="w-full max-w-lg rounded-2xl border border-[var(--border)] bg-white p-4 shadow-2xl">
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -138,7 +138,7 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
               </div>
             ) : options ? (
               options.free.length === 0 && options.swaps.length === 0 ? (
-                <p className="mt-4 rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3 text-sm text-[#92400e]">{say("vc_noneFree")}</p>
+                <p className="mt-4 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3 text-sm text-[var(--warning)]">{say("vc_noneFree")}</p>
               ) : (
                 <>
                   <label className={labelClass}>
@@ -167,7 +167,7 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
                     </select>
                   </label>
                   {swap ? (
-                    <p className="mt-2 rounded-lg bg-[#fbfaf8] p-3 text-xs leading-5 text-[var(--foreground-secondary)]">
+                    <p className="mt-2 rounded-lg bg-[var(--panel-secondary)] p-3 text-xs leading-5 text-[var(--foreground-secondary)]">
                       {say("vc_swapNote", { name: swap.customerName, current: options.currentVehicleLabel, other: swap.label })}
                     </p>
                   ) : null}
@@ -210,7 +210,7 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
                         </label>
                       ) : null}
                       {options.handedOver && !swap ? (
-                        <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
+                        <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
                           <input checked={signLater} className="mt-1 accent-[var(--primary)]" onChange={(event) => setSignLater(event.target.checked)} type="checkbox" />
                           <span className="text-sm text-[var(--foreground-secondary)]">
                             <span className="block font-semibold text-[var(--foreground)]">{say("vc_cantSign")}</span>
@@ -236,7 +236,7 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
                 </>
               )
             ) : null}
-            {error ? <p className="mt-3 rounded-lg bg-[#ffe4e6] px-3 py-2 text-sm font-semibold text-[#be123c]">{error}</p> : null}
+            {error ? <p className="mt-3 rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">{error}</p> : null}
           </div>
         </div>
       ) : null}

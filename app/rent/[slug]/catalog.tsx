@@ -103,7 +103,7 @@ export function Catalog({
           <CalendarDays className="text-[var(--primary)]" size={18} />
           {t("whenDoYouNeedIt")}
         </div>
-        <div aria-label={t("typeOfRental")} className="mt-3 grid grid-cols-2 gap-1 rounded-xl bg-[#f5f4f1] p-1 text-sm font-semibold" role="group">
+        <div aria-label={t("typeOfRental")} className="mt-3 grid grid-cols-2 gap-1 rounded-xl bg-[var(--panel-secondary)] p-1 text-sm font-semibold" role="group">
           <button aria-pressed={longTerm} className={`min-h-11 rounded-lg px-2 ${longTerm ? "bg-white text-[var(--foreground)] shadow-sm" : "text-[var(--muted)]"}`} onClick={() => setLongTerm(true)} type="button">
             {t("monthly")}
           </button>
@@ -183,10 +183,10 @@ export function Catalog({
                       {t("aboutForDays", { amount: money(estimate), days })}
                     </p>
                   ) : null}
-                  {tooShort ? <p className="mt-1 text-sm font-semibold text-[#b45309]">{tooShort}</p> : null}
+                  {tooShort ? <p className="mt-1 text-sm font-semibold text-[var(--warning)]">{tooShort}</p> : null}
 
                   {!free ? (
-                    <p className="mt-1 text-sm font-semibold text-[#b45309]">
+                    <p className="mt-1 text-sm font-semibold text-[var(--warning)]">
                       {freeFrom ? t("takenFreeFrom", { date: shortDate(freeFrom, locale) }) : openEndedClash ? t("onLongTermRental") : t("takenForDates")}
                     </p>
                   ) : null}
@@ -219,7 +219,7 @@ export function Catalog({
                   </div>
                   {/* Hidden from people; bots fill it in and are ignored. */}
                   <input aria-hidden="true" autoComplete="off" className="hidden" name="website" tabIndex={-1} />
-                  {error ? <p className="text-sm font-semibold text-[#dc2626]">{error}</p> : null}
+                  {error ? <p className="text-sm font-semibold text-[var(--danger)]">{error}</p> : null}
                   <button className="pressable min-h-12 w-full rounded-xl bg-[var(--primary)] px-4 text-sm font-semibold text-white disabled:opacity-60" disabled={isPending} type="submit">
                     {isPending ? t("booking") : t("bookAndContinue")}
                   </button>

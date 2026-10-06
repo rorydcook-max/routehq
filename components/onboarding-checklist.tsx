@@ -59,20 +59,20 @@ export function OnboardingChecklist({
             <h2 className="text-[15px] font-semibold text-[var(--foreground)]">{t("setupTitle")}</h2>
             <span className="text-[13px] text-[var(--muted)]">{t("setupProgress", { done: completedCount, total: totalCount })}</span>
           </div>
-          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#eeece7]">
+          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[var(--panel-secondary)]">
             <div className="h-full rounded-full bg-[var(--primary)]" style={{ width: `${progress}%` }} />
           </div>
         </div>
         <form action={dismissChecklist}>
           <input name="organizationId" type="hidden" value={organizationId} />
-          <button aria-label={t("setupHide")} className="pressable rounded-lg p-1.5 text-[var(--muted)] hover:bg-[#f1efeb]" title={t("setupHide")} type="submit">
+          <button aria-label={t("setupHide")} className="pressable rounded-lg p-1.5 text-[var(--muted)] hover:bg-[var(--panel-tertiary)]" title={t("setupHide")} type="submit">
             <X size={16} />
           </button>
         </form>
       </div>
       <div className="mt-3 flex flex-wrap gap-2">
         {remaining.map((item) => (
-          <Link className="pressable inline-flex items-center gap-1.5 rounded-full border border-[var(--border)] bg-[#fbfaf8] px-3 py-1.5 text-[13px] font-semibold text-[var(--foreground-secondary)] hover:border-[var(--primary)] hover:text-[var(--primary)]" href={item.href as Route} key={item.step}>
+          <Link className="pressable inline-flex items-center gap-1.5 rounded-full border border-[var(--border)] bg-[var(--panel-secondary)] px-3 py-1.5 text-[13px] font-semibold text-[var(--foreground-secondary)] hover:border-[var(--primary)] hover:text-[var(--primary)]" href={item.href as Route} key={item.step}>
             {t.has(`setup_${item.step}`) ? t(`setup_${item.step}`) : item.label}
             <ChevronRight size={14} />
           </Link>

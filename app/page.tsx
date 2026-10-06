@@ -58,14 +58,14 @@ const TONE_CLASSES: Record<Tone, string> = {
   red: "bg-[var(--danger-light)] text-[var(--danger)]",
   amber: "bg-[var(--warning-light)] text-[var(--warning)]",
   teal: "bg-[var(--primary-light)] text-[var(--primary)]",
-  blue: "bg-[#eef2fb] text-[#2f6fdb]",
-  neutral: "bg-[#f1efeb] text-[#6b675f]"
+  blue: "bg-[var(--info-light)] text-[var(--info)]",
+  neutral: "bg-[var(--panel-tertiary)] text-[var(--muted)]"
 };
 
 function AgendaRow({ item }: { item: AgendaItem }) {
   return (
     <li>
-      <Link className="group flex items-center gap-3 px-4 py-3 transition hover:bg-[#fbfaf8]" href={item.href as Route}>
+      <Link className="group flex items-center gap-3 px-4 py-3 transition hover:bg-[var(--panel-secondary)]" href={item.href as Route}>
         <span className={`inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[10px] ${TONE_CLASSES[item.tone]}`}>{item.icon}</span>
         <span className="min-w-0 flex-1">
           <span className="block text-[14px] font-semibold leading-snug text-[var(--foreground)] sm:truncate">{item.title}</span>
@@ -401,7 +401,7 @@ export default async function Home() {
                   const late = r.end !== "Indefinite" && r.end < today;
                   return (
                     <li key={r.id}>
-                      <Link className="flex items-center gap-3 px-4 py-3 transition hover:bg-[#fbfaf8]" href={`/bookings/${r.id}` as Route}>
+                      <Link className="flex items-center gap-3 px-4 py-3 transition hover:bg-[var(--panel-secondary)]" href={`/bookings/${r.id}` as Route}>
                         <span className="min-w-0 flex-1">
                           <span className="block truncate text-[14px] font-semibold text-[var(--foreground)]">{r.vehicle}</span>
                           <span className="block truncate text-[13px] text-[var(--muted)]">{r.customer}</span>
@@ -439,17 +439,17 @@ export default async function Home() {
             ) : (
               <div className="space-y-1 px-2 pb-3">
                 {groups.map((group) => (
-                  <Link className="flex items-center gap-3 rounded-[10px] px-2 py-2.5 transition hover:bg-[#fbfaf8]" href={`/fleet#${group.kind}` as Route} key={group.kind}>
+                  <Link className="flex items-center gap-3 rounded-[10px] px-2 py-2.5 transition hover:bg-[var(--panel-secondary)]" href={`/fleet#${group.kind}` as Route} key={group.kind}>
                     <VehicleKindIcon kind={group.kind} />
                     <span className="min-w-0 flex-1">
                       <span className="flex items-baseline justify-between gap-2">
                         <span className="text-[14px] font-semibold text-[var(--foreground)]">{c(`kinds_${group.kind}`)}</span>
                         <span className="font-mono-data text-[14px] font-semibold text-[var(--foreground)]">{group.vehicles.length}</span>
                       </span>
-                      <span className="mt-1 flex h-1.5 overflow-hidden rounded-full bg-[#eeece7]">
-                        <span className="bg-[#2f6fdb]" style={{ width: `${(group.out / group.vehicles.length) * 100}%` }} />
-                        <span className="bg-[#16a34a]" style={{ width: `${(group.free / group.vehicles.length) * 100}%` }} />
-                        <span className="bg-[#d4a017]" style={{ width: `${(group.other / group.vehicles.length) * 100}%` }} />
+                      <span className="mt-1 flex h-1.5 overflow-hidden rounded-full bg-[var(--panel-secondary)]">
+                        <span className="bg-[var(--info)]" style={{ width: `${(group.out / group.vehicles.length) * 100}%` }} />
+                        <span className="bg-[var(--success)]" style={{ width: `${(group.free / group.vehicles.length) * 100}%` }} />
+                        <span className="bg-[var(--warning)]" style={{ width: `${(group.other / group.vehicles.length) * 100}%` }} />
                       </span>
                       <span className="mt-1 block"><OutFreeSummary free={group.free} other={group.other} out={group.out} /></span>
                     </span>
@@ -470,7 +470,7 @@ export default async function Home() {
                 {lastSixMonths.map((month) => (
                   <div className="flex flex-1 flex-col items-center gap-1" key={month.key}>
                     <div
-                      className={`w-full rounded-t-[5px] ${month.key === thisMonth ? "bg-[var(--primary)]" : "bg-[#d9ebe8]"}`}
+                      className={`w-full rounded-t-[5px] ${month.key === thisMonth ? "bg-[var(--primary)]" : "bg-[var(--info-line)]"}`}
                       style={{ height: `${Math.max(4, Math.round((month.amount / maxMonth) * 64))}px` }}
                       title={`${month.label}: ${money(month.amount)}`}
                     />
@@ -480,12 +480,12 @@ export default async function Home() {
               </div>
             </div>
             <dl className="grid grid-cols-2 border-t border-[var(--border)]">
-              <Link className="border-r border-[var(--border)] px-4 py-3 transition hover:bg-[#fbfaf8]" href="/tasks">
+              <Link className="border-r border-[var(--border)] px-4 py-3 transition hover:bg-[var(--panel-secondary)]" href="/tasks">
                 <dt className="text-[12px] text-[var(--muted)]">{t("overdue")}</dt>
                 <dd className={`font-mono-data text-[16px] font-semibold ${overdueTotal > 0 ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{money(overdueTotal)}</dd>
                 <dd className="text-[12px] text-[var(--muted)]">{overdueRentals.length === 0 ? t("allPaid") : t("rentalsCount", { count: overdueRentals.length })}</dd>
               </Link>
-              <Link className="px-4 py-3 transition hover:bg-[#fbfaf8]" href="/bookings">
+              <Link className="px-4 py-3 transition hover:bg-[var(--panel-secondary)]" href="/bookings">
                 <dt className="text-[12px] text-[var(--muted)]">{t("depositsHeld")}</dt>
                 <dd className="font-mono-data text-[16px] font-semibold text-[var(--foreground)]">{money(depositsHeld)}</dd>
                 <dd className="text-[12px] text-[var(--muted)]">{t("customersCount", { count: depositsHeldCount })}</dd>

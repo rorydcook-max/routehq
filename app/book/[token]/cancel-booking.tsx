@@ -50,12 +50,12 @@ export function CancelBooking({ token, organizationName }: { token: string; orga
         {t("reasonOptional")}
         <textarea className="mt-2 w-full rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)]" maxLength={500} name="reason" rows={2} />
       </label>
-      {error ? <p className="text-sm font-semibold text-[#dc2626]">{error}</p> : null}
+      {error ? <p className="text-sm font-semibold text-[var(--danger)]">{error}</p> : null}
       <div className="grid gap-2 sm:grid-cols-2">
         <button className="pressable min-h-12 rounded-xl border border-[var(--border)] bg-white px-4 text-sm font-semibold text-[var(--foreground)]" disabled={isPending} onClick={() => setOpen(false)} type="button">
           {t("keepMyBooking")}
         </button>
-        <button className="pressable min-h-12 rounded-xl bg-[#dc2626] px-4 text-sm font-semibold text-white disabled:opacity-60" disabled={isPending} type="submit">
+        <button className="pressable min-h-12 rounded-xl bg-[var(--danger)] px-4 text-sm font-semibold text-white disabled:opacity-60" disabled={isPending} type="submit">
           {isPending ? t("cancelling") : t("yesCancelIt")}
         </button>
       </div>

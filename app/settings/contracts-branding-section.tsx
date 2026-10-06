@@ -157,7 +157,7 @@ export function ContractsBrandingSection({
             </div>
           </div>
 
-          <div className="mt-4 rounded-lg border-l-4 bg-[#fbfaf8] p-3" style={{ borderColor: accentColour }}>
+          <div className="mt-4 rounded-lg border-l-4 bg-[var(--panel-secondary)] p-3" style={{ borderColor: accentColour }}>
             <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">Agreement between</p>
             <p className="mt-2 text-base font-semibold text-[var(--foreground)]">{legalName}</p>
             <p className="text-sm text-[var(--muted)]">and</p>

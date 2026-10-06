@@ -81,14 +81,14 @@ export default async function StartInspectionPage({ params }: { params: Promise<
               const when = timing(type, rental);
               return (
                 <li className="border-b border-[var(--border)] last:border-0" key={rental.id}>
-                  <Link className="pressable flex min-h-16 items-center gap-3 px-4 py-3 hover:bg-[#fbfaf8]" href={`/inspections/${type}/${rental.id}` as Route}>
+                  <Link className="pressable flex min-h-16 items-center gap-3 px-4 py-3 hover:bg-[var(--panel-secondary)]" href={`/inspections/${type}/${rental.id}` as Route}>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-[15px] font-semibold text-[var(--foreground)]">
                         {rental.vehicles?.make} {rental.vehicles?.model}
                         {rental.vehicles?.registration_number ? <span className="font-mono-data ml-2 text-[13px] font-medium text-[var(--muted)]">{rental.vehicles.registration_number}</span> : null}
                       </p>
                       <p className="mt-0.5 truncate text-[13px] text-[var(--foreground-secondary)]">{rental.customers?.full_name || "Customer not added yet"}</p>
-                      <p className={`mt-0.5 text-[13px] font-medium ${when.tone === "late" ? "text-[#dc2626]" : when.tone === "today" ? "text-[var(--primary)]" : "text-[var(--muted)]"}`}>{when.text}</p>
+                      <p className={`mt-0.5 text-[13px] font-medium ${when.tone === "late" ? "text-[var(--danger)]" : when.tone === "today" ? "text-[var(--primary)]" : "text-[var(--muted)]"}`}>{when.text}</p>
                     </div>
                     <ChevronRight className="shrink-0 text-[var(--muted)]" size={18} />
                   </Link>
@@ -104,7 +104,7 @@ export default async function StartInspectionPage({ params }: { params: Promise<
             <ul className="overflow-hidden rounded-xl border border-[var(--border)] bg-white">
               {waiting.map((rental) => (
                 <li className="border-b border-[var(--border)] last:border-0" key={rental.id}>
-                  <Link className="pressable flex min-h-14 items-center gap-3 px-4 py-3 hover:bg-[#fbfaf8]" href={`/bookings/${rental.id}` as Route}>
+                  <Link className="pressable flex min-h-14 items-center gap-3 px-4 py-3 hover:bg-[var(--panel-secondary)]" href={`/bookings/${rental.id}` as Route}>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-[14px] font-semibold text-[var(--foreground-secondary)]">
                         {rental.vehicles?.make} {rental.vehicles?.model}

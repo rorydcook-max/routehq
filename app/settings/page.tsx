@@ -459,9 +459,9 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           </p>
 
           {/* Connection status */}
-          <div className="mt-3 flex flex-col gap-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-3 flex flex-col gap-3 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
-              <div className={`h-3 w-3 flex-shrink-0 rounded-full ${lineUserId ? "bg-[#16a34a]" : "bg-[#d97706]"}`} />
+              <div className={`h-3 w-3 flex-shrink-0 rounded-full ${lineUserId ? "bg-[var(--success)]" : "bg-[var(--warning)]"}`} />
               <div>
                 <p className="text-sm font-semibold text-[var(--foreground)]">
                   {lineUserId ? "Connected" : "Not connected"}
@@ -478,7 +478,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               {lineUserId && (
                 <form action={disconnectLine}>
                   <input name="organizationId" type="hidden" value={organization.id} />
-                  <PendingButton className="rounded-lg border border-[#fecdd3] bg-white px-3 py-1.5 text-sm font-semibold text-[#dc2626] hover:bg-[#fff1f2]" pendingLabel="Disconnecting…" type="submit">
+                  <PendingButton className="rounded-lg border border-[var(--danger-line)] bg-white px-3 py-1.5 text-sm font-semibold text-[var(--danger)] hover:bg-[var(--danger-light)]" pendingLabel="Disconnecting…" type="submit">
                     Disconnect
                   </PendingButton>
                 </form>
@@ -491,7 +491,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
 
           {/* Developers only: where LINE should send messages. Operators never need this. */}
           {process.env.NODE_ENV === "development" ? (
-            <div className="mt-3 rounded-lg border border-[#fef3c7] bg-[#fffbeb] p-3 text-xs text-[#78350f]">
+            <div className="mt-3 rounded-lg border border-[var(--warning-light)] bg-[var(--warning-light)] p-3 text-xs text-[var(--warning)]">
               <p className="font-semibold">Development: LINE webhook</p>
               <p className="mt-1">
                 Set the channel's webhook URL to <code>{(process.env.NEXT_PUBLIC_APP_URL || "https://your-domain.com").replace(/\/$/, "")}/api/line/webhook</code>{" "}
@@ -520,7 +520,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                     type="checkbox"
                     value="on"
                   />
-                  <div className="h-6 w-11 rounded-full bg-[#cbd5e1] transition-colors peer-checked:bg-[var(--primary)]" />
+                  <div className="h-6 w-11 rounded-full bg-[var(--border)] transition-colors peer-checked:bg-[var(--primary)]" />
                   <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
                 </div>
               </label>
@@ -540,7 +540,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                       type="checkbox"
                       value="on"
                     />
-                    <div className="h-6 w-11 rounded-full bg-[#cbd5e1] transition-colors peer-checked:bg-[var(--primary)]" />
+                    <div className="h-6 w-11 rounded-full bg-[var(--border)] transition-colors peer-checked:bg-[var(--primary)]" />
                     <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
                   </div>
                 </label>
@@ -577,7 +577,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               <div className="mt-3 overflow-x-auto rounded-lg border border-[var(--border)]">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-[var(--border)] bg-[#fbfaf8] text-left text-xs font-semibold uppercase text-[var(--muted)]">
+                    <tr className="border-b border-[var(--border)] bg-[var(--panel-secondary)] text-left text-xs font-semibold uppercase text-[var(--muted)]">
                       <th className="px-4 py-2">Type</th>
                       <th className="px-4 py-2">Status</th>
                       <th className="px-4 py-2">Sent at</th>
@@ -594,7 +594,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                             {msg.status}
                           </Badge>
                           {msg.status === "failed" && msg.error && (
-                            <p className="mt-0.5 text-xs text-[#dc2626]">{msg.error.slice(0, 60)}</p>
+                            <p className="mt-0.5 text-xs text-[var(--danger)]">{msg.error.slice(0, 60)}</p>
                           )}
                         </td>
                         <td className="px-4 py-2 text-[var(--muted)]">
@@ -753,21 +753,21 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                       {submission.notes ? <p className="mt-2 text-xs text-[var(--muted)]">{submission.notes}</p> : null}
                       {submission.status === "pending_review" ? (
                         <div className="mt-3 space-y-3">
-                          <form action={researchVehicleCatalogSubmission} className="rounded-lg border border-[#bfdbfe] bg-[#eff6ff] p-3">
+                          <form action={researchVehicleCatalogSubmission} className="rounded-lg border border-[var(--info-line)] bg-[var(--info-light)] p-3">
                             <input name="submissionId" type="hidden" value={submission.id} />
                             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                               <div>
                                 <p className="text-sm font-bold text-[var(--foreground)]">AI catalog research</p>
                                 <p className="text-sm text-[var(--muted)]">Searches for likely matches, misspellings, and related missing trims. Nothing is added automatically.</p>
                               </div>
-                              <PendingButton className="rounded-lg bg-[#2563eb] px-4 py-2 text-sm font-bold text-white" pendingLabel="Researching..." type="submit">
+                              <PendingButton className="rounded-lg bg-[var(--info)] px-4 py-2 text-sm font-bold text-white" pendingLabel="Researching..." type="submit">
                                 Research with AI
                               </PendingButton>
                             </div>
                           </form>
 
                           {submission.research_status === "failed" ? (
-                            <div className="rounded-lg border border-[#fecdd3] bg-[#fff1f2] p-3 text-sm text-[#be123c]">
+                            <div className="rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-3 text-sm text-[var(--danger)]">
                               <p className="font-bold">Research failed</p>
                               <p className="mt-1">
                                 {submission.research_payload?.error || "Check API quota, model access, or try again."}
@@ -776,7 +776,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                           ) : null}
 
                           {submission.research_payload ? (
-                            <div className="rounded-lg border border-[#dbeafe] bg-white p-3">
+                            <div className="rounded-lg border border-[var(--info-line)] bg-white p-3">
                               <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                                 <div>
                                   <p className="text-sm font-bold text-[var(--foreground)]">Research result</p>
@@ -798,7 +798,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                                         {Array.isArray(candidate.source_urls) && candidate.source_urls.length > 0 ? (
                                           <div className="mt-2 flex flex-wrap gap-2">
                                             {candidate.source_urls.slice(0, 3).map((url: string) => (
-                                              <a className="text-xs font-bold text-[#2563eb]" href={url} key={url} rel="noreferrer" target="_blank">
+                                              <a className="text-xs font-bold text-[var(--info)]" href={url} key={url} rel="noreferrer" target="_blank">
                                                 Source
                                               </a>
                                             ))}
@@ -826,13 +826,13 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
 
                               {((Array.isArray(submission.research_payload.likely_matches) && submission.research_payload.likely_matches.length > 0) ||
                                 (Array.isArray(submission.research_payload.missing_related_trims) && submission.research_payload.missing_related_trims.length > 0)) ? (
-                                <form action={mergeVehicleCatalogResearch} className="mt-3 rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] p-3">
+                                <form action={mergeVehicleCatalogResearch} className="mt-3 rounded-lg border border-[var(--success-line)] bg-[var(--success-light)] p-3">
                                   <input name="submissionId" type="hidden" value={submission.id} />
-                                  <p className="text-sm font-bold text-[#166534]">Merge researched candidates</p>
+                                  <p className="text-sm font-bold text-[var(--success)]">Merge researched candidates</p>
                                   <p className="mt-1 text-sm text-[var(--muted)]">
                                     Adds the AI-researched candidates to the global catalog as verified admin-reviewed data.
                                   </p>
-                                  <PendingButton className="mt-3 w-full rounded-lg bg-[#16a34a] px-3 py-2 text-sm font-bold text-white" pendingLabel="Adding..." type="submit">
+                                  <PendingButton className="mt-3 w-full rounded-lg bg-[var(--success)] px-3 py-2 text-sm font-bold text-white" pendingLabel="Adding..." type="submit">
                                     Add AI candidates to global catalog
                                   </PendingButton>
                                 </form>
@@ -841,23 +841,23 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                           ) : null}
 
                           <div className="grid gap-3 lg:grid-cols-2">
-                          <form action={approveVehicleCatalogSubmission} className="rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] p-3">
+                          <form action={approveVehicleCatalogSubmission} className="rounded-lg border border-[var(--success-line)] bg-[var(--success-light)] p-3">
                             <input name="submissionId" type="hidden" value={submission.id} />
                             <label className="block">
-                              <span className="text-xs font-semibold uppercase text-[#166534]">Approval note</span>
+                              <span className="text-xs font-semibold uppercase text-[var(--success)]">Approval note</span>
                               <input className={inputClass} name="curatorNotes" placeholder="Verified from manufacturer source" />
                             </label>
-                            <PendingButton className="mt-3 w-full rounded-lg bg-[#16a34a] px-3 py-2 text-sm font-bold text-white" pendingLabel="Adding..." type="submit">
+                            <PendingButton className="mt-3 w-full rounded-lg bg-[var(--success)] px-3 py-2 text-sm font-bold text-white" pendingLabel="Adding..." type="submit">
                               Add to global catalog
                             </PendingButton>
                           </form>
-                          <form action={rejectVehicleCatalogSubmission} className="rounded-lg border border-[#fecdd3] bg-[#fff1f2] p-3">
+                          <form action={rejectVehicleCatalogSubmission} className="rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-3">
                             <input name="submissionId" type="hidden" value={submission.id} />
                             <label className="block">
-                              <span className="text-xs font-semibold uppercase text-[#be123c]">Rejection note</span>
+                              <span className="text-xs font-semibold uppercase text-[var(--danger)]">Rejection note</span>
                               <input className={inputClass} name="curatorNotes" placeholder="Duplicate, unclear, or incorrect" />
                             </label>
-                            <PendingButton className="mt-3 w-full rounded-lg bg-[#be123c] px-3 py-2 text-sm font-bold text-white" pendingLabel="Rejecting..." type="submit">
+                            <PendingButton className="mt-3 w-full rounded-lg bg-[var(--danger)] px-3 py-2 text-sm font-bold text-white" pendingLabel="Rejecting..." type="submit">
                               Reject suggestion
                             </PendingButton>
                           </form>
@@ -872,7 +872,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           </div>
 
           <div className="mt-3 grid gap-3 xl:grid-cols-3">
-            <form action={createVehicleMake} className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
+            <form action={createVehicleMake} className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
               <p className="text-sm font-semibold uppercase text-[var(--primary)]">New make</p>
               <label className="mt-4 block">
                 <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Make name</span>
@@ -897,7 +897,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               </PendingButton>
             </form>
 
-            <form action={createVehicleModel} className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
+            <form action={createVehicleModel} className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
               <p className="text-sm font-semibold uppercase text-[var(--primary)]">New model</p>
               <label className="mt-4 block">
                 <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Make</span>
@@ -936,7 +936,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               </PendingButton>
             </form>
 
-            <form action={createVehicleTrim} className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
+            <form action={createVehicleTrim} className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
               <p className="text-sm font-semibold uppercase text-[var(--primary)]">New trim</p>
               <label className="mt-4 block">
                 <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Model</span>

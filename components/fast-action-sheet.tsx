@@ -59,7 +59,7 @@ export function FastActionSheet({ open, onClose }: { open: boolean; onClose: () 
 
   return (
     // Phones: slides up from the bottom, by the thumb. Computers: a box in the middle of the screen.
-    <div className="fixed inset-0 z-50 flex items-end bg-[#10252b]/40 lg:items-center lg:justify-center" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-end bg-[var(--foreground)]/40 lg:items-center lg:justify-center" onClick={onClose}>
       <div
         aria-label={t("quickTitle")}
         aria-modal="true"

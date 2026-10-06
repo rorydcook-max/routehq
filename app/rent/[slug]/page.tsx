@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 function Notice({ title, message }: { title: string; message: string }) {
   return (
-    <main className="min-h-screen bg-[#fbfaf8] px-4 py-10">
+    <main className="min-h-screen bg-[var(--panel-secondary)] px-4 py-10">
       <div className="mx-auto mb-3 flex max-w-xl justify-end">
         <CustomerLanguagePicker />
       </div>
@@ -37,7 +37,7 @@ export default async function PublicCatalogPage({ params }: { params: Promise<{ 
   if (!catalog.enabled) return <Notice message={t("catalogOffMessage", { business: catalog.name })} title={t("catalogOffTitle")} />;
 
   return (
-    <main className="min-h-screen bg-[#fbfaf8] px-4 py-5 text-[var(--foreground)]">
+    <main className="min-h-screen bg-[var(--panel-secondary)] px-4 py-5 text-[var(--foreground)]">
       <div className="mx-auto max-w-3xl space-y-5">
         <div className="flex justify-end">
           <CustomerLanguagePicker />

@@ -13,15 +13,15 @@ import { intlLocale, shortDate as dateInWords } from "@/lib/i18n/dates";
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
 const PROVIDER: Record<string, { label: string; className: string }> = {
-  line: { label: "LINE", className: "bg-[#e6f6ea] text-[#12813a]" },
-  telegram: { label: "Telegram", className: "bg-[#e7f1fb] text-[#1c6fb5]" },
-  whatsapp: { label: "WhatsApp", className: "bg-[#e6f6ea] text-[#12813a]" },
-  messenger: { label: "Messenger", className: "bg-[#eef0fd] text-[#4252d6]" },
+  line: { label: "LINE", className: "bg-[var(--success-light)] text-[var(--success)]" },
+  telegram: { label: "Telegram", className: "bg-[var(--info-light)] text-[var(--info)]" },
+  whatsapp: { label: "WhatsApp", className: "bg-[var(--success-light)] text-[var(--success)]" },
+  messenger: { label: "Messenger", className: "bg-[var(--info-light)] text-[#4252d6]" },
   instagram: { label: "Instagram", className: "bg-[#fbeaf3] text-[#b02a73]" }
 };
 
 function ProviderTag({ provider }: { provider: string }) {
-  const tag = PROVIDER[provider] || { label: provider, className: "bg-[#f1efeb] text-[#6b675f]" };
+  const tag = PROVIDER[provider] || { label: provider, className: "bg-[var(--panel-tertiary)] text-[var(--muted)]" };
   return <span className={`inline-flex flex-shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold ${tag.className}`}>{tag.label}</span>;
 }
 
@@ -169,8 +169,8 @@ export function InboxView({
               const unread = conversation.unread_count > 0 && !active;
               return (
                 <li key={conversation.id}>
-                  <Link className={`flex items-center gap-3 px-3 py-3 ${active ? "bg-[var(--primary-light)]" : "hover:bg-[#fbfaf8]"}`} href={href(conversation.id)}>
-                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#eeece7] text-[13px] font-semibold text-[var(--foreground-secondary)]">
+                  <Link className={`flex items-center gap-3 px-3 py-3 ${active ? "bg-[var(--primary-light)]" : "hover:bg-[var(--panel-secondary)]"}`} href={href(conversation.id)}>
+                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--panel-secondary)] text-[13px] font-semibold text-[var(--foreground-secondary)]">
                       {conversation.avatar_url ? <img alt="" className="h-full w-full object-cover" src={conversation.avatar_url} /> : initials(nameOf(conversation))}
                     </span>
                     <span className="min-w-0 flex-1">
@@ -202,7 +202,7 @@ export function InboxView({
         ) : (
           <>
             <header className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[var(--border)] px-3 py-2.5">
-              <Link aria-label={say("backToChats")} className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--foreground-secondary)] hover:bg-[#f1efeb] lg:hidden" href={href(null)}>
+              <Link aria-label={say("backToChats")} className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--foreground-secondary)] hover:bg-[var(--panel-tertiary)] lg:hidden" href={href(null)}>
                 <ArrowLeft size={18} />
               </Link>
               {/* On a phone the name keeps the first line to itself; linking and "done" drop to the line below. */}
@@ -255,7 +255,7 @@ export function InboxView({
             </header>
 
             {bookings.length > 0 ? (
-              <div className="scrollbar-none flex gap-2 overflow-x-auto border-b border-[var(--border)] bg-[#fbfaf8] px-3 py-2">
+              <div className="scrollbar-none flex gap-2 overflow-x-auto border-b border-[var(--border)] bg-[var(--panel-secondary)] px-3 py-2">
                 {bookings.map((booking) => (
                   <Link className="flex-shrink-0 rounded-lg border border-[var(--border)] bg-white px-3 py-1.5 text-[12px] hover:border-[var(--primary)]" href={`/bookings/${booking.id}` as Route} key={booking.id}>
                     <span className="block font-semibold text-[var(--foreground)]">
@@ -270,7 +270,7 @@ export function InboxView({
               </div>
             ) : null}
 
-            <div className="min-h-0 flex-1 space-y-2 overflow-y-auto bg-[#fbfaf8] px-3 py-4">
+            <div className="min-h-0 flex-1 space-y-2 overflow-y-auto bg-[var(--panel-secondary)] px-3 py-4">
               {messages.map((message) => {
                 const day = dayLabel(message.created_at, say, locale);
                 const showDay = day !== previousDay;

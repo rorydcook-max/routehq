@@ -371,7 +371,7 @@ export function TransactionsList({
     const selected = selectedIds.has(transaction.id);
     const who = [transaction.vehicleLabel, transaction.customerName, transaction.supplier].filter(Boolean).join(" · ");
     return (
-      <li className={`group px-4 py-2.5 transition ${deleting ? "opacity-40" : ""} ${selected ? "bg-[var(--primary-light)]" : "hover:bg-[#fbfaf8]"}`} key={transaction.id}>
+      <li className={`group px-4 py-2.5 transition ${deleting ? "opacity-40" : ""} ${selected ? "bg-[var(--primary-light)]" : "hover:bg-[var(--panel-secondary)]"}`} key={transaction.id}>
         <div className="flex items-center gap-3">
           {selecting ? (
             <input
@@ -397,7 +397,7 @@ export function TransactionsList({
           <div className="flex flex-shrink-0 items-center gap-0.5 sm:opacity-0 sm:transition sm:group-hover:opacity-100 sm:focus-within:opacity-100">
             <button
               aria-label={tx.say("editAria")}
-              className="pressable flex h-8 w-8 items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[#f1efeb] hover:text-[var(--primary)]"
+              className="pressable flex h-8 w-8 items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[var(--panel-tertiary)] hover:text-[var(--primary)]"
               onClick={() => {
                 setEditingId(editingId === transaction.id ? null : transaction.id);
                 setConfirmDeleteId(null);
@@ -433,7 +433,7 @@ export function TransactionsList({
         ) : null}
 
         {confirmDeleteId === transaction.id ? (
-          <div className="mt-2 rounded-lg border border-[#f3d2cc] bg-[var(--danger-light)] p-3">
+          <div className="mt-2 rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-3">
             <p className="text-sm font-semibold text-[var(--danger)]">{tx.say("deleteQ")}</p>
             <p className="mt-1 text-xs text-[var(--foreground-secondary)]">{tx.say("deleteBody")}</p>
             <div className="mt-3 flex justify-end gap-2">
@@ -466,7 +466,7 @@ export function TransactionsList({
     return days.map((group) => (
       <div key={group.day}>
         {mode !== "day" ? (
-          <p className="flex items-center justify-between border-y border-[var(--border)] bg-[#fbfaf8] px-4 py-1.5 text-[12px] font-semibold text-[var(--muted)]">
+          <p className="flex items-center justify-between border-y border-[var(--border)] bg-[var(--panel-secondary)] px-4 py-1.5 text-[12px] font-semibold text-[var(--muted)]">
             <span>{dayHeading(group.day, today, tx)}</span>
             {group.items.length > 1 ? <span className="tabular-nums">{money(sum(group.items))}</span> : null}
           </p>
@@ -512,7 +512,7 @@ export function TransactionsList({
       {/* Period picker */}
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="scrollbar-none -mx-1 flex overflow-x-auto px-1">
-          <div className="inline-flex gap-0.5 rounded-[10px] bg-[#eeece7] p-1">
+          <div className="inline-flex gap-0.5 rounded-[10px] bg-[var(--panel-secondary)] p-1">
             {PERIOD_MODES.map((entry) => (
               <button aria-pressed={mode === entry} className={chip(mode === entry)} key={entry} onClick={() => setMode(entry)} type="button">
                 {tx.say(`mode_${entry}`)}
@@ -573,7 +573,7 @@ export function TransactionsList({
       </div>
 
       {/* Phones show one side at a time */}
-      <div className="grid grid-cols-2 gap-0.5 rounded-[10px] bg-[#eeece7] p-1 lg:hidden">
+      <div className="grid grid-cols-2 gap-0.5 rounded-[10px] bg-[var(--panel-secondary)] p-1 lg:hidden">
         <button aria-pressed={phoneSide === "in"} className={chip(phoneSide === "in")} onClick={() => setPhoneSide("in")} type="button">
           {tx.say("inCount", { count: income.length })}
         </button>

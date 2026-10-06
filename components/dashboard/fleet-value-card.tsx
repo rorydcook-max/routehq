@@ -36,13 +36,13 @@ export function FleetValueCard({
         </div>
         <div className="flex justify-between gap-2">
           <span className="text-[var(--muted)]">{totalDepreciation < 0 ? "Gain in value" : "Depreciation"}</span>
-          <span className={`font-medium ${totalDepreciation > 0 ? "text-[#dc2626]" : totalDepreciation < 0 ? "text-[#16a34a]" : "text-[var(--foreground-secondary)]"}`}>
+          <span className={`font-medium ${totalDepreciation > 0 ? "text-[var(--danger)]" : totalDepreciation < 0 ? "text-[var(--success)]" : "text-[var(--foreground-secondary)]"}`}>
             {totalDepreciation > 0 ? `−${thb(totalDepreciation)}` : totalDepreciation < 0 ? `+${thb(Math.abs(totalDepreciation))}` : thb(0)}
           </span>
         </div>
       </div>
       {valuedCount < vehicleCount ? (
-        <a className="mt-2 block text-[11px] font-medium text-[#b45309] underline-offset-2 hover:underline" href="/fleet">
+        <a className="mt-2 block text-[11px] font-medium text-[var(--warning)] underline-offset-2 hover:underline" href="/fleet">
           {valuedCount === 0 ? "No vehicle has a current value yet" : `Current value set for ${valuedCount} of ${vehicleCount} vehicles`} - others count at cost
         </a>
       ) : null}

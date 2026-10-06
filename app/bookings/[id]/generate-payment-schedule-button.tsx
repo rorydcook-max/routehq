@@ -50,11 +50,11 @@ export function GeneratePaymentScheduleButton({ rentalId }: { rentalId: string }
         {isPending ? say("gen_busy") : say("gen_button")}
       </button>
       {message ? (
-        <div className="fixed right-4 top-4 z-[100] max-w-sm rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] px-4 py-3 text-xs font-semibold text-[#166534] shadow-lg" role="status">
+        <div className="fixed right-4 top-4 z-[100] max-w-sm rounded-lg border border-[var(--success-line)] bg-[var(--success-light)] px-4 py-3 text-xs font-semibold text-[var(--success)] shadow-lg" role="status">
           {message}
         </div>
       ) : null}
-      {error ? <p className="mt-2 text-xs font-semibold text-[#dc2626]">{error}</p> : null}
+      {error ? <p className="mt-2 text-xs font-semibold text-[var(--danger)]">{error}</p> : null}
     </div>
   );
 }

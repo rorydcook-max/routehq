@@ -21,6 +21,16 @@ function ProviderTag({ provider }: { provider: string }) {
   return <span className={`inline-flex flex-shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold ${tag.className}`}>{tag.label}</span>;
 }
 
+/** Why a message did not go, in words that say what to do about it. */
+function plainSendError(error: string | null | undefined, provider: string | null | undefined) {
+  const app = provider === "line" ? "LINE" : provider === "telegram" ? "Telegram" : "the chat app";
+  const text = String(error || "").toLowerCase();
+  if (/auth|token|unauthor|401|403|credential/.test(text)) return `Your ${app} connection has stopped working. Reconnect it in Settings, under Messaging.`;
+  if (/block|not found|404|friend|deactivat/.test(text)) return "The customer may have blocked or removed your account.";
+  if (/limit|quota|429/.test(text)) return `${app === "the chat app" ? "The chat app" : app} has reached its message limit for now. Try again later.`;
+  return "Please try sending it again.";
+}
+
 function initials(name: string | null) {
   const parts = String(name || "Customer").trim().split(/\s+/);
   return (parts[0]?.[0] || "?").toUpperCase() + (parts[1]?.[0] || "").toUpperCase();
@@ -75,6 +85,9 @@ export function InboxView({
   const [isSuggesting, startSuggesting] = useTransition();
   const [, startQuiet] = useTransition();
   const threadEnd = useRef<HTMLDivElement>(null);
+  // A chat linked to a customer shows that customer's name, even when the chat app gave us none.
+  const nameOf = (conversation: InboxConversation) =>
+    conversation.display_name || customers.find((entry) => entry.id === conversation.customer_id)?.full_name || "Customer";
 
   // New messages arrive without a reload: check every few seconds while the tab is in view.
   useEffect(() => {
@@ -106,7 +119,7 @@ export function InboxView({
     startSending(async () => {
       const result = await sendInboxMessage(selected.id, draft);
       if (result.ok) setDraft("");
-      else setError(result.error);
+      else setError(`Not sent. ${plainSendError(result.error, selected.provider)}`);
       router.refresh();
     });
   }
@@ -153,11 +166,11 @@ export function InboxView({
                 <li key={conversation.id}>
                   <Link className={`flex items-center gap-3 px-3 py-3 ${active ? "bg-[var(--primary-light)]" : "hover:bg-[#fbfaf8]"}`} href={href(conversation.id)}>
                     <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#eeece7] text-[13px] font-semibold text-[var(--foreground-secondary)]">
-                      {conversation.avatar_url ? <img alt="" className="h-full w-full object-cover" src={conversation.avatar_url} /> : initials(conversation.display_name)}
+                      {conversation.avatar_url ? <img alt="" className="h-full w-full object-cover" src={conversation.avatar_url} /> : initials(nameOf(conversation))}
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="flex items-center gap-2">
-                        <span className={`truncate text-[14px] ${unread ? "font-semibold text-[var(--foreground)]" : "font-medium text-[var(--foreground)]"}`}>{conversation.display_name || "Customer"}</span>
+                        <span className={`truncate text-[14px] ${unread ? "font-semibold text-[var(--foreground)]" : "font-medium text-[var(--foreground)]"}`}>{nameOf(conversation)}</span>
                         <ProviderTag provider={conversation.provider} />
                       </span>
                       <span className={`block truncate text-[13px] ${unread ? "font-medium text-[var(--foreground)]" : "text-[var(--muted)]"}`}>
@@ -187,9 +200,10 @@ export function InboxView({
               <Link aria-label="Back to chats" className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--foreground-secondary)] hover:bg-[#f1efeb] lg:hidden" href={href(null)}>
                 <ArrowLeft size={18} />
               </Link>
-              <div className="min-w-0 flex-1">
+              {/* On a phone the name keeps the first line to itself; linking and "done" drop to the line below. */}
+              <div className="min-w-[70%] flex-1 sm:min-w-0">
                 <p className="flex items-center gap-2">
-                  <span className="truncate text-[15px] font-semibold text-[var(--foreground)]">{selected.display_name || "Customer"}</span>
+                  <span className="truncate text-[15px] font-semibold text-[var(--foreground)]">{nameOf(selected)}</span>
                   <ProviderTag provider={selected.provider} />
                 </p>
                 {customer ? (
@@ -268,7 +282,7 @@ export function InboxView({
                     </div>
                     {message.status === "failed" ? (
                       <p className="mt-1 flex items-center justify-end gap-1 text-[12px] text-[var(--danger)]">
-                        <AlertCircle size={13} /> Not delivered{message.error ? `: ${message.error}` : ""}
+                        <AlertCircle size={13} /> Not delivered. {plainSendError(message.error, selected?.provider)}
                       </p>
                     ) : null}
                   </div>
@@ -290,7 +304,7 @@ export function InboxView({
                 onKeyDown={(event) => {
                   if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) send();
                 }}
-                placeholder={`Reply to ${selected.display_name || "the customer"}…`}
+                placeholder={`Reply to ${selected.display_name || customers.find((entry) => entry.id === selected.customer_id)?.full_name || "the customer"}…`}
                 value={draft}
               />
               <div className="mt-2 flex items-center justify-between gap-2">

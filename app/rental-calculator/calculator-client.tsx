@@ -150,19 +150,19 @@ function buildRationale(
 ) {
   const vehicleName = [vehicle.make, vehicle.model].filter(Boolean).join(" ") || "this vehicle";
   const paybackYears = (paybackMonths / 12).toFixed(1);
-  const rel = reliability >= 80 ? "excellent reliability" : reliability >= 60 ? "good reliability" : "below-average reliability";
+  const rel = reliability >= 80 ? "it is very reliable" : reliability >= 60 ? "it is reliable" : "it is less reliable than most";
 
   switch (rec) {
     case "strong_buy":
-      return `Strong ROI at current market rates with ${rel} — payback in ${paybackYears} years`;
+      return `It should earn well at today's prices and ${rel}. It pays for itself in about ${paybackYears} years.`;
     case "buy":
-      return `${vehicleName} shows positive returns with ${rel} and a ${paybackYears}-year payback`;
+      return `The ${vehicleName} should make money and ${rel}. It pays for itself in about ${paybackYears} years.`;
     case "marginal":
-      return `Marginal returns — consider negotiating a lower purchase price or increasing rental rate`;
+      return `It only just makes money. Try to buy it for less, or check you could charge more for it.`;
     case "dont_buy":
       return score <= 0
-        ? `Projected losses at current rates — this ${vehicleName} is not recommended`
-        : `Long payback period (${paybackYears} years) makes this acquisition difficult to justify`;
+        ? `At these prices the ${vehicleName} would lose money.`
+        : `It would take about ${paybackYears} years to pay for itself, which is too long.`;
   }
 }
 
@@ -587,7 +587,7 @@ export function CalculatorClient({
         <div className="space-y-5">
           {/* Vehicle identity */}
           <Card>
-            <SectionHeader eyebrow="Vehicle" title="Select the vehicle you want to assess" />
+            <SectionHeader eyebrow="Vehicle" title="Which vehicle are you thinking of buying?" />
             <div className="mt-4">
               <VehicleSelectorMini value={vehicle} onChange={setVehicle} />
             </div>
@@ -595,7 +595,7 @@ export function CalculatorClient({
 
           {/* Purchase details */}
           <Card>
-            <SectionHeader eyebrow="Purchase" title="Acquisition cost" />
+            <SectionHeader eyebrow="Purchase" title="What it costs to buy" />
             <div className="mt-4 space-y-4">
               <label className="block">
                 <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Purchase price (฿)</span>
@@ -619,7 +619,7 @@ export function CalculatorClient({
                     className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${financed ? "translate-x-5" : "translate-x-0.5"}`}
                   />
                 </div>
-                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Financed purchase</span>
+                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Paying with a loan</span>
               </label>
 
               {financed && (
@@ -643,21 +643,21 @@ export function CalculatorClient({
 
           {/* Rental assumptions */}
           <Card>
-            <SectionHeader eyebrow="Rental" title="Expected performance" />
+            <SectionHeader eyebrow="Rental" title="What you expect it to earn" />
             <div className="mt-4 space-y-4">
               <label className="block">
-                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Estimated monthly rental rate (฿)</span>
+                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Monthly price you would charge (฿)</span>
                 <input className={inputCls} min="0" onChange={(e) => setEstimatedRate(e.target.value)} placeholder="25,000" step="0.01" type="number" value={estimatedRate} />
               </label>
               <label className="block">
                 <span className="text-sm font-semibold text-[var(--foreground-secondary)]">
-                  Expected utilization (%)
+                  How much of the time it will be rented (%)
                   <span className="ml-2 text-xs font-normal text-[var(--muted)]">
                     {measuredUtilization === null
-                      ? "No fleet history yet"
+                      ? "No history from your vehicles yet"
                       : measuredUtilization < 20
-                        ? `Fleet avg ${measuredUtilization}% (too little history to use)`
-                        : `Fleet avg: ${measuredUtilization}%`}
+                        ? `Your vehicles so far: ${measuredUtilization}% (too little history to rely on)`
+                        : `Your vehicles average ${measuredUtilization}%`}
                   </span>
                 </span>
                 <input
@@ -671,7 +671,7 @@ export function CalculatorClient({
                 />
               </label>
               <label className="block">
-                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Intended use</span>
+                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">How you will rent it out</span>
                 <select className={inputCls} onChange={(e) => setIntendedUse(e.target.value as typeof intendedUse)} value={intendedUse}>
                   <option value="long_term">Long-term rental</option>
                   <option value="short_term">Short-term rental</option>
@@ -684,7 +684,7 @@ export function CalculatorClient({
           {/* AI estimates panel */}
           <Card>
             <div className="flex items-start justify-between gap-3">
-              <SectionHeader eyebrow="AI-estimated costs" title="Annual running costs" />
+              <SectionHeader eyebrow="AI-estimated costs" title="Yearly running costs" />
               {aiLoading && (
                 <span className="mt-1 text-xs font-semibold text-[var(--primary)] animate-pulse">Estimating…</span>
               )}
@@ -705,11 +705,11 @@ export function CalculatorClient({
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               {(
                 [
-                  { key: "insurance_annual", label: "Type 1 insurance (annual)" },
-                  { key: "porbor_annual", label: "PorBor insurance (annual)" },
-                  { key: "tax_annual", label: "Vehicle tax (annual)" },
-                  { key: "maintenance_annual", label: "Maintenance (annual)" },
-                  { key: "depreciation_annual", label: "Depreciation (annual)" }
+                  { key: "insurance_annual", label: "Type 1 insurance (a year)" },
+                  { key: "porbor_annual", label: "Compulsory insurance, Por Ror Bor (a year)" },
+                  { key: "tax_annual", label: "Road tax (a year)" },
+                  { key: "maintenance_annual", label: "Servicing and repairs (a year)" },
+                  { key: "depreciation_annual", label: "Value it loses (a year)" }
                 ] as Array<{ key: keyof AiEstimates; label: string }>
               ).map(({ key, label }) => (
                 <label className="block" key={key}>
@@ -782,12 +782,12 @@ export function CalculatorClient({
 
               {/* Detailed breakdown */}
               <Card>
-                <SectionHeader eyebrow="Breakdown" title="Monthly financials" />
+                <SectionHeader eyebrow="Breakdown" title="Each month" />
                 <div className="mt-4 space-y-3">
                   {[
-                    { label: "Monthly revenue", value: results.monthlyRevenue, positive: true },
-                    { label: "Monthly expenses", value: results.monthlyExpenses, positive: false },
-                    { label: "Monthly net profit", value: results.monthlyNetProfit, positive: results.monthlyNetProfit >= 0 }
+                    { label: "Money in", value: results.monthlyRevenue, positive: true },
+                    { label: "Money out", value: results.monthlyExpenses, positive: false },
+                    { label: "Profit", value: results.monthlyNetProfit, positive: results.monthlyNetProfit >= 0 }
                   ].map(({ label, value, positive }) => (
                     <div className="flex items-center justify-between" key={label}>
                       <span className="text-sm font-semibold text-[var(--foreground-secondary)]">{label}</span>
@@ -798,11 +798,11 @@ export function CalculatorClient({
                   ))}
                   <div className="border-t border-[var(--border)] pt-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Payback period</span>
+                      <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Pays for itself in</span>
                       <span className="font-mono-data font-bold text-[var(--foreground)]">
                         {isFinite(results.paybackMonths)
                           ? `${Math.round(results.paybackMonths)} months (${(results.paybackMonths / 12).toFixed(1)} yrs)`
-                          : "N/A — negative profit"}
+                          : "Never at these prices"}
                       </span>
                     </div>
                   </div>
@@ -843,15 +843,15 @@ export function CalculatorClient({
 
               {/* Sensitivity table */}
               <Card>
-                <SectionHeader eyebrow="Sensitivity" title="Utilization impact" />
+                <SectionHeader eyebrow="Sensitivity" title="If it is rented more or less often" />
                 <div className="mt-4 overflow-x-auto">
                   <table className="w-full min-w-[360px] text-left text-sm">
                     <thead>
                       <tr className="border-b border-[var(--border)] text-xs uppercase text-[var(--muted)]">
-                        <th className="py-2 pr-3">Utilization</th>
-                        <th className="px-3 py-2">Monthly revenue</th>
-                        <th className="px-3 py-2">Monthly profit</th>
-                        <th className="px-3 py-2">Payback</th>
+                        <th className="py-2 pr-3">Time rented</th>
+                        <th className="px-3 py-2">Money in a month</th>
+                        <th className="px-3 py-2">Profit a month</th>
+                        <th className="px-3 py-2">Pays for itself in</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -863,7 +863,7 @@ export function CalculatorClient({
                             {fmt(profit)}
                           </td>
                           <td className="font-mono-data px-3 py-3 text-[var(--muted)]">
-                            {payback !== null ? `${payback}mo` : "—"}
+                            {payback !== null ? `${payback} months` : "Never"}
                           </td>
                         </tr>
                       ))}
@@ -886,9 +886,9 @@ export function CalculatorClient({
                             <span className="font-mono-data text-xs text-[var(--muted)]">{v.plate}</span>
                           </div>
                           <p className="mt-1 text-sm text-[var(--foreground-secondary)]">
-                            Your {v.make} {v.model} achieves{" "}
-                            <span className="font-mono-data font-semibold">{v.utilization}%</span> utilization and generates{" "}
-                            <span className="font-mono-data font-semibold text-emerald-600">{fmt(approxMonthlyProfit)}</span> avg monthly net profit
+                            Your {v.make} {v.model} is rented{" "}
+                            <span className="font-mono-data font-semibold">{v.utilization}%</span> of the time and makes about{" "}
+                            <span className="font-mono-data font-semibold text-emerald-600">{fmt(approxMonthlyProfit)}</span> profit a month
                           </p>
                         </div>
                       );
@@ -959,7 +959,7 @@ export function CalculatorClient({
                         </span>
                       )}
                       {payback !== null && isFinite(Number(payback)) && (
-                        <span>{Math.round(Number(payback))} mo payback</span>
+                        <span>pays for itself in {Math.round(Number(payback))} months</span>
                       )}
                       <span>{new Date(calc.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</span>
                     </div>

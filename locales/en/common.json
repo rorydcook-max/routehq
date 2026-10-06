@@ -2477,6 +2477,23 @@
     "n_title": "Notes",
     "n_none": "None yet",
     "n_placeholder": "Anything worth remembering: preferences, payment habits, reminders",
-    "n_auto": "Saves when you tap away"
+    "n_auto": "Saves when you tap away",
+    "new_title": "Add customer",
+    "new_subtitle": "A name and phone number are enough. Add the rest now or later.",
+    "new_countryCode": "Country code",
+    "new_chatTitle": "Chat apps and email",
+    "new_chatSummary": "WhatsApp, LINE, Messenger, Telegram, Instagram, email",
+    "new_whatsappHint": "Leave empty if it is the same as their phone.",
+    "new_docsTitle": "Passport and driving licence",
+    "new_docsSummary": "Optional. Customers add these on their booking link",
+    "new_photoPassport": "Photo of passport",
+    "new_photoLicence": "Photo of driving licence",
+    "new_emTitle": "Emergency contact",
+    "new_emSummary": "Someone to call if you cannot reach them",
+    "new_emName": "Name",
+    "new_emPhone": "Phone",
+    "new_notesSummary": "Only you and your team see these",
+    "new_cancel": "Cancel",
+    "new_save": "Save customer"
   }
 }

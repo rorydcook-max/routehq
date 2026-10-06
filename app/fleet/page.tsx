@@ -107,7 +107,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
               <VehicleKindIcon kind={group.kind} size={20} />
               <span className="min-w-0 flex-1">
                 <span className="block text-[22px] font-bold leading-none text-[var(--foreground)]">{group.vehicles.length}</span>
-                <span className="mt-1 block truncate font-semibold text-[var(--foreground)]">{locale === "en" ? kindLabel(group.kind, group.vehicles.length).toLowerCase() : kindName(group)}</span>
+                <span className="mt-1 block font-semibold leading-tight text-[var(--foreground)]">{locale === "en" ? kindLabel(group.kind, group.vehicles.length).toLowerCase() : kindName(group)}</span>
                 <span className="block font-medium text-[var(--foreground-secondary)]">{t("outFree", { out: group.out, free: group.free })}</span>
               </span>
             </a>

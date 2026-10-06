@@ -1,6 +1,7 @@
 import { releaseExpiredHolds } from "@/lib/booking-holds";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/app-shell";
 import { Card, SectionHeader } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
@@ -66,6 +67,7 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
   }
 
   const signingGaps = organizationDetails ? onlineSigningGaps(organizationDetails) : [];
+  const t = await getTranslations("newBooking");
   const busyPeriods = await loadBusyPeriods(supabase, organization.id);
 
   const normalizedVehicles = (vehicles || []).map((vehicle: any) => ({
@@ -83,33 +85,31 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
         <div className="page-hero mb-5">
           <div>
             <Link className="text-sm font-bold text-[var(--primary)]" href="/bookings">
-              Back to bookings
+              {t("pageBack")}
             </Link>
-            <h1 className="page-title mt-2">Create booking</h1>
-            <p className="page-subtitle mt-2 hidden sm:block">Select the vehicle, customer, dates, delivery details, then generate a customer booking link.</p>
+            <h1 className="page-title mt-2">{t("pageTitle")}</h1>
+            <p className="page-subtitle mt-2 hidden sm:block">{t("pageSubtitle")}</p>
           </div>
         </div>
 
         {signingGaps.length ? (
           <div className="mb-4 rounded-xl border border-[#fbbf24] bg-[#fffbeb] p-4 text-sm text-[#92400e]" role="alert">
-            <p className="font-semibold">Customers can&apos;t sign online yet</p>
+            <p className="font-semibold">{t("signTitle")}</p>
             <p className="mt-1 leading-6">
-              Your business signs each agreement automatically when a customer completes their booking link. Before that can
-              happen, add {signingGaps.join(", ")} in Settings. You can still create bookings; customers will be stopped at the
-              signing step until this is done.
+              {t("signBody", { gaps: signingGaps.join(", ") })}
             </p>
             <Link className="mt-2 inline-flex font-semibold text-[var(--primary)] underline" href="/settings">
-              Go to Settings
+              {t("goSettings")}
             </Link>
           </div>
         ) : null}
 
         {normalizedVehicles.length === 0 ? (
           <Card>
-            <SectionHeader eyebrow="No vehicles" title="Add a vehicle before creating bookings" />
-            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">Bookings need a vehicle record so RouteHQ can connect rental dates, inspections, payments, and profitability to the right asset.</p>
+            <SectionHeader eyebrow={t("noVehiclesEyebrow")} title={t("noVehiclesTitle")} />
+            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{t("noVehiclesBody")}</p>
             <Link className="primary-action pressable mt-5" href="/fleet/new">
-              Add vehicle
+              {t("addVehicle")}
             </Link>
           </Card>
         ) : (

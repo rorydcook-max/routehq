@@ -62,6 +62,17 @@ export default async function AmendmentPage({ params }: { params: Promise<{ toke
         <p>
           Thank you{amendment.signerName ? `, ${amendment.signerName}` : ""}. Your signature is recorded and {amendment.businessName} has been told.
         </p>
+        {/* Say what is now agreed, so nobody has to open the PDF to check. */}
+        {amendment.rows.length ? (
+          <div className="mt-4 space-y-2 text-left">
+            {amendment.rows.map((row) => (
+              <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-3" key={row.label}>
+                <p className="text-xs font-semibold uppercase text-[var(--muted)]">{row.label}</p>
+                <p className="mt-1 text-sm font-semibold text-[var(--foreground)]">{row.after}</p>
+              </div>
+            ))}
+          </div>
+        ) : null}
         {amendment.pdfUrl ? (
           <a className="pressable mt-5 inline-flex items-center gap-2 rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={amendment.pdfUrl} rel="noreferrer" target="_blank">
             <FileText size={16} /> Download signed amendment

@@ -171,7 +171,8 @@ export function Catalog({
                     </p>
                   ) : null}
                   {vehicle.deposit > 0 ? <p className="mt-0.5 text-sm text-[var(--muted)]">{money(vehicle.deposit)} deposit, returned at the end</p> : null}
-                  {free && estimate && days ? (
+                  {/* No price for a stay the vehicle can't be booked for: a slice of the monthly rate is not on offer. */}
+                {free && estimate && days && !tooShort ? (
                     <p className="mt-1 text-sm text-[var(--primary)]">
                       About {money(estimate)} for {days} {days === 1 ? "day" : "days"}
                     </p>

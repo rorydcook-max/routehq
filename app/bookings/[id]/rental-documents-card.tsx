@@ -1,9 +1,14 @@
 import { Download, FileSignature, ShieldCheck } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { intlLocale } from "@/lib/i18n/dates";
+
+type Say = (key: string, values?: Record<string, string | number>) => string;
 import { Badge, Fold } from "@/components/ui";
 import type { BookingRentalDocument } from "@/lib/booking-rental-documents";
 
-function formatSignedAt(value: string) {
-  return new Intl.DateTimeFormat("en-GB", {
+function formatSignedAt(value: string, locale: string) {
+  return new Intl.DateTimeFormat(intlLocale(locale), {
+    hour12: false,
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -13,28 +18,30 @@ function formatSignedAt(value: string) {
   }).format(new Date(value));
 }
 
-function statusBadge(document: BookingRentalDocument) {
-  if (document.status === "signed") return { tone: "green" as const, label: "Signed" };
-  if (document.status === "finalised") return { tone: "green" as const, label: "Final" };
-  if (document.status === "partially_signed") return { tone: "blue" as const, label: "Partly signed" };
-  if (document.status === "void") return { tone: "neutral" as const, label: "Void" };
-  return { tone: "amber" as const, label: "Awaiting customer" };
+function statusBadge(document: BookingRentalDocument, say: Say) {
+  if (document.status === "signed") return { tone: "green" as const, label: say("docs_signed") };
+  if (document.status === "finalised") return { tone: "green" as const, label: say("docs_final") };
+  if (document.status === "partially_signed") return { tone: "blue" as const, label: say("docs_partly") };
+  if (document.status === "void") return { tone: "neutral" as const, label: say("docs_void") };
+  return { tone: "amber" as const, label: say("docs_awaiting") };
 }
 
 export function RentalDocumentsCard({ documents }: { documents: BookingRentalDocument[] }) {
   const hasAgreement = documents.some((document) => document.type === "rental_agreement");
+  const say = useTranslations("booking") as unknown as Say;
+  const locale = useLocale();
 
   return (
     <Fold
-      summary={documents.length === 0 ? "Nothing yet" : `${documents.length} ${documents.length === 1 ? "document" : "documents"} to view or download`}
-      title="Agreement and forms"
+      summary={documents.length === 0 ? say("nothingYet") : say("docs_count", { count: documents.length })}
+      title={say("docs_title")}
     >
       <div className="space-y-3">
         {!hasAgreement ? (
-          <p className="empty-state text-sm">The rental agreement is prepared when the customer opens their booking link, and signed when they complete it.</p>
+          <p className="empty-state text-sm">{say("docs_prepared")}</p>
         ) : null}
         {documents.map((document) => {
-          const badge = statusBadge(document);
+          const badge = statusBadge(document, say);
           return (
             <div className="sub-surface space-y-2 p-3" key={document.id}>
               <div className="flex items-center justify-between gap-3">
@@ -49,14 +56,14 @@ export function RentalDocumentsCard({ documents }: { documents: BookingRentalDoc
                 <ul className="space-y-1 text-sm text-[var(--foreground-secondary)]">
                   {document.signatures.map((signature) => (
                     <li key={`${signature.role}-${signature.signedAt}`}>
-                      <span className="font-bold">{signature.roleLabel}:</span> {signature.name} · {formatSignedAt(signature.signedAt)}
+                      <span className="font-bold">{signature.roleLabel}:</span> {signature.name} · {formatSignedAt(signature.signedAt, locale)}
                     </li>
                   ))}
                 </ul>
               ) : document.status === "finalised" ? (
-                <p className="text-sm text-[var(--muted)]">Finalised {document.finalisedAt ? formatSignedAt(document.finalisedAt) : ""}</p>
+                <p className="text-sm text-[var(--muted)]">{say("docs_finalised", { when: document.finalisedAt ? formatSignedAt(document.finalisedAt, locale) : "" })}</p>
               ) : (
-                <p className="text-sm text-[var(--muted)]">Not signed yet.</p>
+                <p className="text-sm text-[var(--muted)]">{say("docs_notSigned")}</p>
               )}
               {document.pdfUrl || document.certificateUrl ? (
                 <div className="flex flex-wrap gap-2">
@@ -69,7 +76,7 @@ export function RentalDocumentsCard({ documents }: { documents: BookingRentalDoc
                   {document.certificateUrl ? (
                     <a className="secondary-action pressable inline-flex items-center gap-2" href={document.certificateUrl} rel="noreferrer" target="_blank">
                       <ShieldCheck size={16} />
-                      Signing certificate
+                      {say("docs_certificate")}
                     </a>
                   ) : null}
                 </div>

@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { RotateCcw, X } from "lucide-react";
 import { undoCancellation } from "@/app/actions/bookings";
 
@@ -20,9 +21,10 @@ export function UndoCancellationButton({
   vehicleId,
   customerName,
   compact = false,
-  label = "Undo cancellation",
+  label,
 }: Props) {
   const router = useRouter();
+  const say = useTranslations("booking") as unknown as (key: string) => string;
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState("");
@@ -39,7 +41,7 @@ export function UndoCancellationButton({
         setOpen(false);
         router.refresh();
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to undo cancellation.");
+        setError(err instanceof Error ? err.message : say("undo_failed"));
       }
     });
   }
@@ -56,7 +58,7 @@ export function UndoCancellationButton({
         type="button"
       >
         <RotateCcw size={compact ? 14 : 15} />
-        {label}
+        {label || say("undo_label")}
       </button>
 
       {open ? (
@@ -68,9 +70,9 @@ export function UndoCancellationButton({
                 <RotateCcw size={17} />
               </div>
               <div className="flex-1">
-                <p className="text-xs font-semibold uppercase text-[var(--primary)]">Undo cancellation</p>
+                <p className="text-xs font-semibold uppercase text-[var(--primary)]">{say("undo_label")}</p>
                 <h3 className="text-lg font-semibold text-[var(--foreground)]">
-                  {customerName || "This booking"}
+                  {customerName || say("undo_thisBooking")}
                 </h3>
               </div>
               <button
@@ -84,12 +86,12 @@ export function UndoCancellationButton({
 
             <div className="space-y-4 p-4">
               <div className="space-y-1.5 rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-3">
-                <p className="text-xs font-semibold uppercase text-[var(--muted)]">This will restore:</p>
+                <p className="text-xs font-semibold uppercase text-[var(--muted)]">{say("undo_restores")}</p>
                 {[
-                  "Booking status → active",
-                  "Vehicle re-assigned to this booking",
-                  "Future scheduled payments reinstated",
-                  "Booking link restored to active",
+                  say("undo_l1"),
+                  say("undo_l2"),
+                  say("undo_l3"),
+                  say("undo_l4"),
                 ].map((line, i) => (
                   <div className="flex items-start gap-2 text-sm text-[var(--foreground)]" key={i}>
                     <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--primary)]" />
@@ -100,8 +102,7 @@ export function UndoCancellationButton({
 
               <div className="rounded-xl border border-[#fde68a] bg-[#fffbeb] p-3">
                 <p className="text-xs font-bold text-[#92400e]">
-                  ⚠️ Any refund transactions created during cancellation will remain in your
-                  transaction records — reverse those manually if needed.
+                  ⚠️ {say("undo_warning")}
                 </p>
               </div>
 
@@ -118,7 +119,7 @@ export function UndoCancellationButton({
                   onClick={() => setOpen(false)}
                   type="button"
                 >
-                  Back
+                  {say("undo_back")}
                 </button>
                 <button
                   className="pressable inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--primary)] px-4 text-sm font-semibold text-white disabled:opacity-70"
@@ -126,7 +127,7 @@ export function UndoCancellationButton({
                   onClick={submit}
                   type="button"
                 >
-                  {isPending ? "Restoring…" : "Confirm — restore booking"}
+                  {isPending ? say("undo_restoring") : say("undo_confirm")}
                 </button>
               </div>
             </div>

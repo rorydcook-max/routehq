@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Route } from "next";
+import { getTranslations } from "next-intl/server";
 import { MessagesSquare } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { InboxView } from "@/app/inbox/inbox-view";
@@ -58,12 +59,13 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
   ]);
 
   const hasChannel = (channels || []).length > 0;
+  const t = await getTranslations("inbox");
 
   return (
     <AppShell userEmail={userEmail}>
       <div className="mb-4">
-        <h1 className="page-title">Inbox</h1>
-        <p className="page-subtitle mt-1">Customer chats from all your messaging apps, in one place.</p>
+        <h1 className="page-title">{t("title")}</h1>
+        <p className="page-subtitle mt-1">{t("subtitle")}</p>
       </div>
 
       {!hasChannel && list.length === 0 ? (
@@ -71,16 +73,16 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
           <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
             <MessagesSquare size={22} />
           </span>
-          <h2 className="mt-4 text-[17px] font-semibold text-[var(--foreground)]">Bring your customer chats here</h2>
+          <h2 className="mt-4 text-[17px] font-semibold text-[var(--foreground)]">{t("emptyTitle")}</h2>
           <p className="mx-auto mt-1 max-w-md text-sm text-[var(--muted)]">
-            Connect your LINE Official Account or a Telegram bot and every message lands in this inbox, next to the customer&apos;s bookings. You reply from here.
+            {t("emptyBody")}
           </p>
           {membership?.role === "owner" ? (
             <Link className="primary-action pressable mt-5 inline-flex" href={"/settings?tab=messaging" as Route}>
-              Connect a messaging app
+              {t("connect")}
             </Link>
           ) : (
-            <p className="mt-4 text-sm text-[var(--muted)]">Ask the business owner to connect one in Settings.</p>
+            <p className="mt-4 text-sm text-[var(--muted)]">{t("askOwner")}</p>
           )}
         </div>
       ) : (

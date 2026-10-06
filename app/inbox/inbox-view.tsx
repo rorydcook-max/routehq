@@ -4,9 +4,13 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import type { Route } from "next";
 import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { AlertCircle, ArrowLeft, Check, RotateCcw, Send, Sparkles } from "lucide-react";
 import { linkConversationCustomer, markConversationRead, sendInboxMessage, setConversationStatus, suggestInboxReply } from "@/app/actions/inbox";
 import type { InboxConversation, InboxMessage } from "@/lib/inbox/store";
+import { intlLocale, shortDate as dateInWords } from "@/lib/i18n/dates";
+
+type Say = (key: string, values?: Record<string, string | number>) => string;
 
 const PROVIDER: Record<string, { label: string; className: string }> = {
   line: { label: "LINE", className: "bg-[#e6f6ea] text-[#12813a]" },
@@ -22,13 +26,13 @@ function ProviderTag({ provider }: { provider: string }) {
 }
 
 /** Why a message did not go, in words that say what to do about it. */
-function plainSendError(error: string | null | undefined, provider: string | null | undefined) {
-  const app = provider === "line" ? "LINE" : provider === "telegram" ? "Telegram" : "the chat app";
+function plainSendError(error: string | null | undefined, provider: string | null | undefined, say: Say) {
+  const app = provider === "line" ? "LINE" : provider === "telegram" ? "Telegram" : null;
   const text = String(error || "").toLowerCase();
-  if (/auth|token|unauthor|401|403|credential/.test(text)) return `Your ${app} connection has stopped working. Reconnect it in Settings, under Messaging.`;
-  if (/block|not found|404|friend|deactivat/.test(text)) return "The customer may have blocked or removed your account.";
-  if (/limit|quota|429/.test(text)) return `${app === "the chat app" ? "The chat app" : app} has reached its message limit for now. Try again later.`;
-  return "Please try sending it again.";
+  if (/auth|token|unauthor|401|403|credential/.test(text)) return say("err_auth", { app: app || say("chatApp") });
+  if (/block|not found|404|friend|deactivat/.test(text)) return say("err_blocked");
+  if (/limit|quota|429/.test(text)) return say("err_limit", { app: app || say("chatAppCap") });
+  return say("err_retry");
 }
 
 function initials(name: string | null) {
@@ -37,7 +41,7 @@ function initials(name: string | null) {
 }
 
 /** "14:05" today, "Yesterday", or "28 Sep" for older. */
-function when(iso: string | null) {
+function when(iso: string | null, say: Say, locale: string) {
   if (!iso) return "";
   const date = new Date(iso);
   const now = new Date();
@@ -45,23 +49,21 @@ function when(iso: string | null) {
   if (sameDay) return date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
   const yesterday = new Date(now);
   yesterday.setDate(now.getDate() - 1);
-  if (date.toDateString() === yesterday.toDateString()) return "Yesterday";
-  return date.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+  if (date.toDateString() === yesterday.toDateString()) return say("yesterday");
+  return date.toLocaleDateString(intlLocale(locale), { day: "numeric", month: "short" });
 }
 
-function dayLabel(iso: string) {
+function dayLabel(iso: string, say: Say, locale: string) {
   const date = new Date(iso);
   const now = new Date();
-  if (date.toDateString() === now.toDateString()) return "Today";
-  return date.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
+  if (date.toDateString() === now.toDateString()) return say("today");
+  return date.toLocaleDateString(intlLocale(locale), { weekday: "short", day: "numeric", month: "short" });
 }
 
-function shortDate(value: string | null) {
-  if (!value) return "open-ended";
-  return new Date(`${value.slice(0, 10)}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+function shortDate(value: string | null, say: Say, locale: string) {
+  if (!value) return say("openEnded");
+  return dateInWords(value.slice(0, 10), locale);
 }
-
-const BOOKING_STATUS: Record<string, string> = { booked: "Booked", active: "On rent", due_soon: "Due back soon", overdue: "Late return", completed: "Completed", cancelled: "Cancelled", extended: "On rent" };
 
 export function InboxView({
   bookings,
@@ -79,6 +81,9 @@ export function InboxView({
   selected: InboxConversation | null;
 }) {
   const router = useRouter();
+  const t = useTranslations("inbox");
+  const say = t as unknown as Say;
+  const locale = useLocale();
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSending, startSending] = useTransition();
@@ -87,7 +92,7 @@ export function InboxView({
   const threadEnd = useRef<HTMLDivElement>(null);
   // A chat linked to a customer shows that customer's name, even when the chat app gave us none.
   const nameOf = (conversation: InboxConversation) =>
-    conversation.display_name || customers.find((entry) => entry.id === conversation.customer_id)?.full_name || "Customer";
+    conversation.display_name || customers.find((entry) => entry.id === conversation.customer_id)?.full_name || say("customer");
 
   // New messages arrive without a reload: check every few seconds while the tab is in view.
   useEffect(() => {
@@ -119,7 +124,7 @@ export function InboxView({
     startSending(async () => {
       const result = await sendInboxMessage(selected.id, draft);
       if (result.ok) setDraft("");
-      else setError(`Not sent. ${plainSendError(result.error, selected.provider)}`);
+      else setError(say("notSent", { reason: plainSendError(result.error, selected.provider, say) }));
       router.refresh();
     });
   }
@@ -151,12 +156,12 @@ export function InboxView({
               href={href(null, entry)}
               key={entry}
             >
-              {entry === "open" ? "Open" : "Done"}
+              {entry === "open" ? say("tabOpen") : say("tabDone")}
             </Link>
           ))}
         </div>
         {conversations.length === 0 ? (
-          <p className="p-6 text-center text-sm text-[var(--muted)]">{filter === "open" ? "No open chats. New messages will appear here." : "Nothing marked done yet."}</p>
+          <p className="p-6 text-center text-sm text-[var(--muted)]">{filter === "open" ? say("noOpen") : say("noDone")}</p>
         ) : (
           <ul className="min-h-0 flex-1 divide-y divide-[var(--border)] overflow-y-auto">
             {conversations.map((conversation) => {
@@ -174,12 +179,12 @@ export function InboxView({
                         <ProviderTag provider={conversation.provider} />
                       </span>
                       <span className={`block truncate text-[13px] ${unread ? "font-medium text-[var(--foreground)]" : "text-[var(--muted)]"}`}>
-                        {conversation.last_message_direction === "out" ? "You: " : ""}
+                        {conversation.last_message_direction === "out" ? `${say("you")} ` : ""}
                         {conversation.last_message_preview || ""}
                       </span>
                     </span>
                     <span className="flex flex-shrink-0 flex-col items-end gap-1">
-                      <span className="text-[11px] text-[var(--muted)]">{when(conversation.last_message_at)}</span>
+                      <span className="text-[11px] text-[var(--muted)]">{when(conversation.last_message_at, say, locale)}</span>
                       {unread ? <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--primary)] px-1.5 text-[11px] font-semibold text-white">{conversation.unread_count}</span> : null}
                     </span>
                   </Link>
@@ -193,11 +198,11 @@ export function InboxView({
       {/* Thread */}
       <section className={`min-h-0 flex-col lg:flex ${selected ? "flex h-[calc(100vh-230px)] min-h-[420px] lg:h-auto" : "hidden"}`}>
         {!selected ? (
-          <p className="m-auto p-8 text-center text-sm text-[var(--muted)]">Choose a chat to read and reply.</p>
+          <p className="m-auto p-8 text-center text-sm text-[var(--muted)]">{say("chooseChat")}</p>
         ) : (
           <>
             <header className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[var(--border)] px-3 py-2.5">
-              <Link aria-label="Back to chats" className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--foreground-secondary)] hover:bg-[#f1efeb] lg:hidden" href={href(null)}>
+              <Link aria-label={say("backToChats")} className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--foreground-secondary)] hover:bg-[#f1efeb] lg:hidden" href={href(null)}>
                 <ArrowLeft size={18} />
               </Link>
               {/* On a phone the name keeps the first line to itself; linking and "done" drop to the line below. */}
@@ -208,14 +213,14 @@ export function InboxView({
                 </p>
                 {customer ? (
                   <Link className="text-[13px] font-medium text-[var(--primary)] hover:underline" href={`/customers/${customer.id}` as Route}>
-                    {customer.full_name || "Customer record"}
+                    {customer.full_name || say("customerRecord")}
                   </Link>
                 ) : (
-                  <p className="text-[13px] text-[var(--muted)]">Not linked to a customer yet</p>
+                  <p className="text-[13px] text-[var(--muted)]">{say("notLinked")}</p>
                 )}
               </div>
               <select
-                aria-label="Link this chat to a customer"
+                aria-label={say("linkAria")}
                 className="h-9 w-auto max-w-[190px] text-[13px]"
                 onChange={(event) => {
                   const value = event.target.value || null;
@@ -226,10 +231,10 @@ export function InboxView({
                 }}
                 value={selected.customer_id || ""}
               >
-                <option value="">{selected.customer_id ? "Unlink customer" : "Link to a customer…"}</option>
+                <option value="">{selected.customer_id ? say("unlink") : say("linkTo")}</option>
                 {customers.map((entry) => (
                   <option key={entry.id} value={entry.id}>
-                    {entry.full_name || entry.phone || "Customer"}
+                    {entry.full_name || entry.phone || say("customer")}
                   </option>
                 ))}
               </select>
@@ -245,7 +250,7 @@ export function InboxView({
                 type="button"
               >
                 {selected.status === "open" ? <Check size={15} /> : <RotateCcw size={15} />}
-                {selected.status === "open" ? "Mark done" : "Reopen"}
+                {selected.status === "open" ? say("markDone") : say("reopen")}
               </button>
             </header>
 
@@ -254,11 +259,11 @@ export function InboxView({
                 {bookings.map((booking) => (
                   <Link className="flex-shrink-0 rounded-lg border border-[var(--border)] bg-white px-3 py-1.5 text-[12px] hover:border-[var(--primary)]" href={`/bookings/${booking.id}` as Route} key={booking.id}>
                     <span className="block font-semibold text-[var(--foreground)]">
-                      {[booking.vehicles?.make, booking.vehicles?.model].filter(Boolean).join(" ") || "Booking"} · {BOOKING_STATUS[booking.status] || booking.status}
+                      {[booking.vehicles?.make, booking.vehicles?.model].filter(Boolean).join(" ") || say("booking")} · {t.has(`status_${booking.status}`) ? say(`status_${booking.status}`) : booking.status}
                     </span>
                     <span className="block text-[var(--muted)]">
-                      {shortDate(booking.start_date)} – {shortDate(booking.end_date)}
-                      {Number(booking.balance_due || 0) > 0 ? ` · ฿${Number(booking.balance_due).toLocaleString("en-US")} owed` : ""}
+                      {shortDate(booking.start_date, say, locale)} – {shortDate(booking.end_date, say, locale)}
+                      {Number(booking.balance_due || 0) > 0 ? ` · ${say("owed", { amount: `฿${Number(booking.balance_due).toLocaleString("en-US")}` })}` : ""}
                     </span>
                   </Link>
                 ))}
@@ -267,7 +272,7 @@ export function InboxView({
 
             <div className="min-h-0 flex-1 space-y-2 overflow-y-auto bg-[#fbfaf8] px-3 py-4">
               {messages.map((message) => {
-                const day = dayLabel(message.created_at);
+                const day = dayLabel(message.created_at, say, locale);
                 const showDay = day !== previousDay;
                 previousDay = day;
                 const mine = message.direction === "out";
@@ -282,10 +287,10 @@ export function InboxView({
                     </div>
                     {message.status === "failed" ? (
                       <p className="mt-1 flex items-center justify-end gap-1 text-[12px] text-[var(--danger)]">
-                        <AlertCircle size={13} /> Not delivered. {plainSendError(message.error, selected?.provider)}
+                        <AlertCircle size={13} /> {say("notDelivered", { reason: plainSendError(message.error, selected?.provider, say) })}
                         {/auth|token|unauthor|401|403|credential/i.test(String(message.error || "")) ? (
                           <a className="font-semibold underline" href="/settings?tab=messaging">
-                            Open Messaging
+                            {say("openMessaging")}
                           </a>
                         ) : null}
                       </p>
@@ -303,13 +308,13 @@ export function InboxView({
                 </p>
               ) : null}
               <textarea
-                aria-label="Your reply"
+                aria-label={say("replyAria")}
                 className="block max-h-40 min-h-[72px] w-full resize-y"
                 onChange={(event) => setDraft(event.target.value)}
                 onKeyDown={(event) => {
                   if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) send();
                 }}
-                placeholder={`Reply to ${selected.display_name || customers.find((entry) => entry.id === selected.customer_id)?.full_name || "the customer"}…`}
+                placeholder={say("replyTo", { name: selected.display_name || customers.find((entry) => entry.id === selected.customer_id)?.full_name || say("theCustomer") })}
                 value={draft}
               />
               <div className="mt-2 flex items-center justify-between gap-2">
@@ -317,15 +322,15 @@ export function InboxView({
                   className="pressable inline-flex min-h-9 items-center gap-1.5 rounded-[9px] border border-[var(--border)] bg-white px-3 text-[13px] font-semibold text-[var(--primary)] hover:border-[var(--primary)] disabled:opacity-60"
                   disabled={isSuggesting || !lastInbound}
                   onClick={suggest}
-                  title="Drafts a reply from your vehicles, rates and this customer's bookings. You check it before sending."
+                  title={say("suggestTitle")}
                   type="button"
                 >
                   <Sparkles size={15} />
-                  {isSuggesting ? "Thinking…" : draft ? "Suggest again" : "Suggest a reply"}
+                  {isSuggesting ? say("thinking") : draft ? say("suggestAgain") : say("suggest")}
                 </button>
                 <button className="primary-action pressable min-h-9 px-4 text-[13px] disabled:opacity-60" disabled={isSending || !draft.trim()} onClick={send} type="button">
                   <Send size={15} />
-                  {isSending ? "Sending…" : "Send"}
+                  {isSending ? say("sending") : say("send")}
                 </button>
               </div>
             </footer>

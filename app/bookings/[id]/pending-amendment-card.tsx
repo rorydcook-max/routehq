@@ -2,6 +2,7 @@
 
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { FilePen } from "lucide-react";
 import { cancelRentalAmendment } from "@/app/actions/amendments";
 import { AmendmentLinkPanel } from "@/components/rental-adjustment-modal";
@@ -10,10 +11,11 @@ import { Card, SectionHeader } from "@/components/ui";
 export function PendingAmendmentCard({ id, token, rows, changedAlready = false }: { id: string; token: string; rows: Array<{ label: string; before: string; after: string }>; changedAlready?: boolean }) {
   const router = useRouter();
   const [cancelling, startCancel] = useTransition();
+  const say = useTranslations("booking") as unknown as (key: string) => string;
 
   return (
     <Card>
-      <SectionHeader eyebrow="Amendment" title="Waiting for the customer to sign" />
+      <SectionHeader eyebrow={say("amend_eyebrow")} title={say("amend_title")} />
       <ul className="mt-3 space-y-1 text-sm text-[var(--foreground-secondary)]">
         {rows.map((row) => (
           <li className="flex items-start gap-2" key={row.label}>

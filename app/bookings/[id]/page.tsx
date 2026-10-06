@@ -9,7 +9,9 @@ import { PaymentReminderButton } from "@/app/bookings/[id]/payment-reminder-butt
 import { acknowledgePortalAction, declinePortalAction, replyToPortalQuestion, resolvePortalAction } from "@/app/actions/portal-actions";
 import { ExtensionRequestAnswer } from "@/app/bookings/[id]/extension-request-answer";
 import { extensionPicture } from "@/lib/extension-picture";
-import { niceDate } from "@/lib/nice-date";
+import { getLocale, getTranslations } from "next-intl/server";
+import { useLocale, useTranslations } from "next-intl";
+import { intlLocale, longDate, shortDate } from "@/lib/i18n/dates";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { AssignCustomerModal } from "@/app/bookings/[id]/assign-customer-modal";
 import { SkipInspectionButton } from "@/app/bookings/[id]/skip-inspection-button";
@@ -41,34 +43,40 @@ function money(value: unknown, currency = "THB") {
   return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0));
 }
 
-function formatDate(value: string | null | undefined) {
-  if (!value) return "Open";
-  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
+type Say = (key: string, values?: Record<string, string | number>) => string;
+/** The words for this page (say), the words shared with the bookings list (list), and the language for dates. */
+type Tx = { say: Say; list: Say; locale: string };
+
+/** For the parts of this page that are not async. */
+function useTx(): Tx {
+  return { say: useTranslations("booking") as unknown as Say, list: useTranslations("bookings") as unknown as Say, locale: useLocale() };
 }
 
-function formatDateTime(value: string | null | undefined) {
-  if (!value) return "Not yet";
-  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(value));
+function formatDate(value: string | null | undefined, tx: Tx) {
+  if (!value) return tx.say("open");
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+  const iso = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  return longDate(iso, tx.locale);
 }
 
-function formatPaymentMethod(value: string | null | undefined) {
-  const labels: Record<string, string> = {
-    cash: "Cash",
-    promptpay: "PromptPay / QR",
-    bank_transfer: "Thai Bank Transfer",
-    wise: "Wise",
-    revolut: "Revolut"
-  };
-  return value ? labels[value] || String(value).replace(/_/g, " ") : "Not yet selected";
+function formatDateTime(value: string | null | undefined, tx: Tx) {
+  if (!value) return tx.say("notYet");
+  return new Intl.DateTimeFormat(intlLocale(tx.locale), { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(value));
 }
 
-function formatPaymentTiming(value: string | null | undefined) {
-  if (value === "now") return "Pay now";
-  if (value === "on_delivery") return "Pays at handover";
+function formatPaymentMethod(value: string | null | undefined, tx: Tx) {
+  if (!value) return tx.say("pm_none");
+  return ["cash", "promptpay", "bank_transfer", "wise", "revolut"].includes(value) ? tx.say(`pm_${value}`) : String(value).replace(/_/g, " ");
+}
+
+function formatPaymentTiming(value: string | null | undefined, tx: Tx) {
+  if (value === "now") return tx.say("timing_now");
+  if (value === "on_delivery") return tx.say("timing_on_delivery");
   return "—";
 }
 
-function formatDepositSummary(rental: any) {
+function formatDepositSummary(rental: any, tx: Tx) {
   const status = String(rental?.deposit_status || "pending");
   const currency = rental?.currency || "THB";
 
@@ -77,92 +85,85 @@ function formatDepositSummary(rental: any) {
   }
 
   if (status === "fully_returned") {
-    return "Returned";
+    return tx.say("dep_returned");
   }
 
   if (status === "forfeited") {
-    return "Kept in full";
+    return tx.say("dep_kept");
   }
 
   if (status === "partially_forfeited") {
     return Number(rental?.deposit_refunded_amount || 0) > 0
-      ? `${money(rental?.deposit_refunded_amount, currency)} returned, ${money(rental?.deposit_forfeited_amount, currency)} kept`
-      : `${money(rental?.deposit_forfeited_amount, currency)} kept`;
+      ? tx.say("dep_returnedKept", { returned: money(rental?.deposit_refunded_amount, currency), kept: money(rental?.deposit_forfeited_amount, currency) })
+      : tx.say("dep_keptPart", { kept: money(rental?.deposit_forfeited_amount, currency) });
   }
 
   if (status === "partially_returned") {
-    return `${money(rental?.deposit_refunded_amount, currency)} returned`;
+    return tx.say("dep_returnedPart", { returned: money(rental?.deposit_refunded_amount, currency) });
   }
 
-  return `${money(rental?.deposit_amount, currency)} - not yet collected`;
+  return tx.say("dep_notCollected", { amount: money(rental?.deposit_amount, currency) });
 }
 
-function startedAgoLabel(startDate: string | null | undefined): string {
-  if (!startDate) return "recently";
+function startedAgoLabel(startDate: string | null | undefined, tx: Tx): string {
+  if (!startDate) return tx.say("ago_recently");
   const start = new Date(String(startDate).slice(0, 10) + "T00:00:00Z");
   const diffDays = Math.round((Date.now() - start.getTime()) / 86_400_000);
-  if (diffDays < 1) return "today";
-  if (diffDays === 1) return "yesterday";
-  if (diffDays < 30) return `${diffDays} days ago`;
-  const months = Math.round(diffDays / 30);
-  return `${months} month${months !== 1 ? "s" : ""} ago`;
+  if (diffDays < 1) return tx.say("ago_today");
+  if (diffDays === 1) return tx.say("ago_yesterday");
+  if (diffDays < 30) return tx.say("ago_days", { count: diffDays });
+  return tx.say("ago_months", { count: Math.round(diffDays / 30) });
 }
 
 /** Where the customer is with their booking link, in plain words. Nothing when there is no live link. */
-function bookingLinkBadge(status: string | null | undefined): { label: string; tone: "green" | "blue" | "amber" } | null {
+function bookingLinkBadge(status: string | null | undefined, tx: Tx): { label: string; tone: "green" | "blue" | "amber" } | null {
   switch (status) {
     case "pending":
-      return { label: "Link not opened yet", tone: "amber" };
+      return { label: tx.list("link_notOpened"), tone: "amber" };
     case "sent":
-      return { label: "Link sent", tone: "amber" };
+      return { label: tx.list("link_sent"), tone: "amber" };
     case "viewed":
-      return { label: "Customer opened link", tone: "blue" };
+      return { label: tx.list("link_viewed"), tone: "blue" };
     case "details_submitted":
-      return { label: "Customer details received", tone: "blue" };
+      return { label: tx.list("link_details"), tone: "blue" };
     case "contract_signed":
     case "completed":
-      return { label: "Customer signed", tone: "green" };
+      return { label: tx.list("link_signed"), tone: "green" };
     case "expired":
-      return { label: "Link expired", tone: "amber" };
+      return { label: tx.list("link_expired"), tone: "amber" };
     default:
       return null;
   }
 }
 
-function daysRemaining(value: string | null | undefined, status?: string | null, startDate?: string | null) {
-  if (status === "completed") return "Returned";
-  if (status === "cancelled") return "Cancelled";
+function daysRemaining(value: string | null | undefined, status: string | null | undefined, startDate: string | null | undefined, tx: Tx) {
+  if (status === "completed") return tx.say("returned");
+  if (status === "cancelled") return tx.say("cancelled");
   const today = businessToday();
   const daysFromToday = (date: string) =>
     Math.round((new Date(`${date.slice(0, 10)}T00:00:00Z`).getTime() - new Date(`${today}T00:00:00Z`).getTime()) / 86_400_000);
   if (status === "booked" && startDate) {
     const untilStart = daysFromToday(startDate);
-    if (untilStart > 0) return untilStart === 1 ? "Starts tomorrow" : `Starts in ${untilStart} days`;
-    if (untilStart === 0) return "Starts today";
-    return `Handover overdue by ${-untilStart} day${untilStart === -1 ? "" : "s"}`;
+    if (untilStart > 0) return untilStart === 1 ? tx.list("startsTomorrow") : tx.list("startsIn", { days: untilStart });
+    if (untilStart === 0) return tx.list("startsToday");
+    return tx.list("handoverOverdue", { days: -untilStart });
   }
   if (!value) {
     // The dates line already says open-ended; say how long it has been out instead.
     if (!startDate) return "";
     const out = -daysFromToday(startDate);
-    return out > 0 ? `${out} day${out === 1 ? "" : "s"} so far` : "Started today";
+    return out > 0 ? tx.say("daysSoFar", { days: out }) : tx.say("startedToday");
   }
   const days = daysFromToday(value);
-  if (days === 0) return "Due back today";
-  if (days < 0) return `Return ${Math.abs(days)} day${days === -1 ? "" : "s"} late`;
-  return `Due back in ${days} day${days === 1 ? "" : "s"}`;
+  if (days === 0) return tx.list("dueBackToday");
+  if (days < 0) return tx.list("returnLate", { days: -days });
+  if (days === 1) return tx.list("dueBackTomorrow");
+  return tx.list("dueBackIn", { days });
 }
 
-const RENTAL_STATUS_LABELS: Record<string, string> = {
-  booked: "Booked",
-  active: "On rent",
-  due_soon: "Due back soon",
-  overdue: "Late return",
-  extended: "Extended",
-  completed: "Completed",
-  cancelled: "Cancelled",
-  draft: "Not confirmed"
-};
+function statusLabel(status: string, tx: Tx) {
+  return ["booked", "active", "due_soon", "overdue", "extended", "completed", "cancelled", "draft"].includes(status) ? tx.list(`status_${status}`) : status.replace(/_/g, " ");
+}
 
 function statusTone(status: string): "green" | "amber" | "red" | "blue" | "neutral" {
   if (status === "completed") return "green";
@@ -178,10 +179,10 @@ function documentTone(status?: string | null): "green" | "amber" | "red" {
   return "amber";
 }
 
-function documentLabel(status?: string | null) {
-  if (status === "complete") return "Documents complete";
-  if (status === "no_documents") return "No documents";
-  return "Missing documents";
+function documentLabel(status: string | null | undefined, tx: Tx) {
+  if (status === "complete") return tx.say("doc_complete");
+  if (status === "no_documents") return tx.say("doc_none");
+  return tx.say("doc_missing");
 }
 
 function isVoidedPayment(payment: any) {
@@ -207,24 +208,18 @@ function normalizedDeliveryMethod(value: unknown) {
   return "delivery";
 }
 
-function deliveryDisplay(rental: any, bookingLink: any) {
+function deliveryDisplay(rental: any, bookingLink: any, tx: Tx) {
   const bookingData = (bookingLink?.booking_data || {}) as Record<string, unknown>;
   const method = normalizedDeliveryMethod(rental?.delivery_method || bookingData.delivery_method);
   const location = formatDeliveryLocation(String(bookingData.delivery_location || rental?.delivery_location || "").trim());
   const dateTime = toWallTime(bookingData.delivery_datetime || rental?.delivery_datetime || "");
 
-  if (method === "tbd") {
-    return {
-      method,
-      title: "Delivery method TBD",
-      detail: location ? `${location} · ${dateTime ? formatDateTime(dateTime) : "Time TBD"}` : "Location and time TBD"
-    };
-  }
-
   return {
     method,
-    title: method === "collection" ? "Customer collection" : "Delivery by operator",
-    detail: location ? `${location} · ${dateTime ? formatDateTime(dateTime) : "Time TBD"}` : "Location and time TBD"
+    /** The place or the time has not been agreed yet. */
+    undecided: !location || !dateTime,
+    title: method === "tbd" ? tx.say("del_tbdTitle") : method === "collection" ? tx.say("del_collection") : tx.say("del_delivery"),
+    detail: location ? `${location} · ${dateTime ? formatDateTime(dateTime, tx) : tx.say("timeTbd")}` : tx.say("locTimeTbd")
   };
 }
 
@@ -232,17 +227,17 @@ function timelineSteps(bookingLink: any, rentalDocuments: BookingRentalDocument[
   const renterSignature = renterSignatureOf(rentalDocuments);
   const businessSignature = businessSignatureOf(rentalDocuments);
   const steps = [
-    { label: "Created", complete: Boolean(bookingLink?.created_at), at: bookingLink?.created_at },
-    { label: "Sent", complete: Boolean(bookingLink?.sent_at) || ["sent", "viewed", "details_submitted", "contract_signed", "completed"].includes(bookingLink?.status), at: bookingLink?.sent_at },
-    { label: "Viewed", complete: Boolean(bookingLink?.viewed_at), at: bookingLink?.viewed_at },
-    { label: "Customer form submitted", complete: Boolean(bookingLink?.customer_details_submitted_at), at: bookingLink?.customer_details_submitted_at },
-    { label: "Customer signed contract", complete: Boolean(renterSignature || bookingLink?.contract_signed_at), at: renterSignature?.signedAt || bookingLink?.contract_signed_at },
-    { label: "Business signed contract", complete: Boolean(businessSignature), at: businessSignature?.signedAt }
+    { key: "created", complete: Boolean(bookingLink?.created_at), at: bookingLink?.created_at },
+    { key: "sent", complete: Boolean(bookingLink?.sent_at) || ["sent", "viewed", "details_submitted", "contract_signed", "completed"].includes(bookingLink?.status), at: bookingLink?.sent_at },
+    { key: "viewed", complete: Boolean(bookingLink?.viewed_at), at: bookingLink?.viewed_at },
+    { key: "form", complete: Boolean(bookingLink?.customer_details_submitted_at), at: bookingLink?.customer_details_submitted_at },
+    { key: "customerSigned", complete: Boolean(renterSignature || bookingLink?.contract_signed_at), at: renterSignature?.signedAt || bookingLink?.contract_signed_at },
+    { key: "businessSigned", complete: Boolean(businessSignature), at: businessSignature?.signedAt }
   ];
   // A customer who booked online, or opened the link without it being sent from here, never had a "Sent" step.
   const bookedOnline = (bookingLink?.booking_data as any)?.source === "public_page";
-  const shown = steps.filter((step) => step.label !== "Sent" || (!bookedOnline && (step.complete || !bookingLink?.viewed_at)));
-  if (bookedOnline) shown[0] = { ...shown[0], label: "Booked online by the customer" };
+  const shown = steps.filter((step) => step.key !== "sent" || (!bookedOnline && (step.complete || !bookingLink?.viewed_at)));
+  if (bookedOnline) shown[0] = { ...shown[0], key: "bookedOnline" };
   // Finished steps in the order they happened, then what is still to come.
   const done = shown.filter((step) => step.complete && step.at).sort((a, b) => String(a.at).localeCompare(String(b.at)));
   return [...done, ...shown.filter((step) => !(step.complete && step.at))];
@@ -293,6 +288,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   const { id } = await params;
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const [userEmail, organization] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization()]);
+  const t = await getTranslations("booking");
+  const tx: Tx = { say: t as unknown as Say, list: (await getTranslations("bookings")) as unknown as Say, locale: await getLocale() };
   const supabaseForVehicles = (await createSupabaseServerClient()) as any;
   // Everything this page needs is asked for together. The second group is: the handover and
   // collection forms still to do after a signed change of vehicle, an exchange waiting on the
@@ -332,10 +329,10 @@ export default async function BookingDetailPage({ params, searchParams }: { para
     return (
       <AppShell userEmail={userEmail}>
         <Card>
-          <SectionHeader eyebrow="Booking not found" title="This rental could not be opened" />
-          <p className="mt-3 text-sm text-[var(--muted)]">It may have been cancelled, deleted, or belong to another organisation.</p>
+          <SectionHeader eyebrow={tx.say("nf_eyebrow")} title={tx.say("nf_title")} />
+          <p className="mt-3 text-sm text-[var(--muted)]">{tx.say("nf_body")}</p>
           <Link className="primary-action pressable mt-3" href="/bookings">
-            Back to bookings
+            {tx.say("backToBookings")}
           </Link>
         </Card>
       </AppShell>
@@ -393,7 +390,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   const deliveryInspection = inspections.find((inspection: any) => formType(inspection) === "delivery" && onCurrentVehicle(inspection)) || inspections.find((inspection: any) => formType(inspection) === "delivery");
   const returnInspection = inspections.find((inspection: any) => formType(inspection) === "return" && (rental.status === "completed" || onCurrentVehicle(inspection)));
   const customerDocuments = documents.filter((document: any) => document.owner_type === "customer");
-  const delivery = deliveryDisplay(rental, bookingLink);
+  const delivery = deliveryDisplay(rental, bookingLink, tx);
   const paymentMethod = bookingLink?.preferred_payment_method || null;
   const paymentTiming = bookingLink?.payment_timing || null;
   const customerReportedPayment = Boolean(bookingLink?.payment_reported_by_customer);
@@ -418,40 +415,40 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   const financialState = (() => {
     if (isCancelled) {
       return {
-        label: "Booking cancelled",
-        detail: paidInAll > 0 ? `${money(paidInAll, rental.currency)} was paid before it was cancelled. Record any refund under Refunds & deposit.` : "Nothing was paid and nothing is owed.",
+        label: tx.say("fin_cancelled"),
+        detail: paidInAll > 0 ? tx.say("fin_cancelledPaid", { amount: money(paidInAll, rental.currency) }) : tx.say("fin_cancelledNothing"),
         amount: null as number | null,
         tone: paidInAll > 0 ? ("amber" as const) : ("neutral" as const)
       };
     }
     if (needsExistingRentalPaymentSetup) {
       return {
-        label: "Payment setup needed",
-        detail: "Set up payment records for this operator-entered rental.",
+        label: tx.say("fin_setup"),
+        detail: tx.say("fin_setupDetail"),
         amount: null as number | null,
         tone: "amber" as const
       };
     }
     if (String(rental.status || "").toLowerCase() === "booked" && activePayments.length === 0 && !customerFormComplete) {
       return {
-        label: "Awaiting customer - no payment due yet",
-        detail: "The customer has not completed the booking form.",
+        label: tx.say("fin_awaiting"),
+        detail: tx.say("fin_awaitingDetail"),
         amount: null as number | null,
         tone: "neutral" as const
       };
     }
     if (paymentTiming === "on_delivery" && !activeRentalStatus && activePayments.length === 0) {
       return {
-        label: "To collect at handover",
-        detail: `${money(paymentDueOnDeliveryAmount, rental.currency)} due when you hand the vehicle over.`,
+        label: tx.say("fin_atHandover"),
+        detail: tx.say("fin_atHandoverDetail", { amount: money(paymentDueOnDeliveryAmount, rental.currency) }),
         amount: paymentDueOnDeliveryAmount,
         tone: "blue" as const
       };
     }
     if (pendingPayment && paymentTiming === "now" && !activeRentalStatus) {
       return {
-        label: "Payment due",
-        detail: "Customer selected pay now. Record payment when received.",
+        label: tx.say("fin_due"),
+        detail: tx.say("fin_dueDetail"),
         amount: pendingPaymentAmount || outstandingBalance,
         tone: "amber" as const
       };
@@ -460,8 +457,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
     // (an extension due at the end of the month, say) is not owed yet.
     if (activeRentalStatus && pendingPaymentAmount > 0) {
       return {
-        label: "Outstanding balance",
-        detail: "Active rental has unpaid scheduled payments.",
+        label: tx.say("fin_outstanding"),
+        detail: tx.say("fin_outstandingActive"),
         amount: pendingPaymentAmount,
         tone: "red" as const
       };
@@ -470,8 +467,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
     // show the same total the payment list and the bookings list show.
     if (!activeRentalStatus && pendingPaymentAmount > 0) {
       return {
-        label: "Due now",
-        detail: "Record each payment as you receive it.",
+        label: tx.say("fin_dueNow"),
+        detail: tx.say("fin_dueNowDetail"),
         amount: pendingPaymentAmount,
         tone: "amber" as const
       };
@@ -487,31 +484,31 @@ export default async function BookingDetailPage({ params, searchParams }: { para
         .filter((payment: any) => String(payment.due_date).slice(0, 10) === firstDue)
         .reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
       return {
-        label: paidInAll > 0 ? "Paid so far - more to come" : "Nothing paid yet",
-        detail: `${money(dueThen, rental.currency)} due ${new Date(`${firstDue}T00:00:00`).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}.`,
+        label: paidInAll > 0 ? tx.say("fin_moreToCome") : tx.say("fin_nothingPaid"),
+        detail: tx.say("fin_dueThen", { amount: money(dueThen, rental.currency), date: shortDate(firstDue, tx.locale) }),
         amount: null as number | null,
         tone: "neutral" as const
       };
     }
     if (activePayments.length > 0 && ((totalRentalValue > 0 && totalPaid >= totalRentalValue) || pendingPaymentAmount === 0)) {
       return {
-        label: "Paid up to date",
+        label: tx.say("fin_upToDate"),
         detail: (() => {
           // Say what comes next, so "nothing due" never hides a payment a few days away.
-          if (upcomingUnpaid.length === 0) return "Nothing is due right now.";
+          if (upcomingUnpaid.length === 0) return tx.say("fin_nothingDue");
           const nextDue = upcomingUnpaid.map((payment: any) => String(payment.due_date).slice(0, 10)).sort()[0];
           const nextAmount = upcomingUnpaid
             .filter((payment: any) => String(payment.due_date).slice(0, 10) === nextDue)
             .reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
-          return `Next: ${money(nextAmount, rental.currency)} due ${new Date(`${nextDue}T00:00:00`).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}.`;
+          return tx.say("fin_next", { amount: money(nextAmount, rental.currency), date: shortDate(nextDue, tx.locale) });
         })(),
         amount: null as number | null,
         tone: "green" as const
       };
     }
     return {
-      label: outstandingBalance > 0 ? "Outstanding balance" : "No payment schedule yet",
-      detail: outstandingBalance > 0 ? "Payment remains outstanding." : "Add a payment row when this rental should have a balance due.",
+      label: outstandingBalance > 0 ? tx.say("fin_outstanding") : tx.say("fin_noSchedule"),
+      detail: outstandingBalance > 0 ? tx.say("fin_remains") : tx.say("fin_addRow"),
       amount: outstandingBalance > 0 ? outstandingBalance : null,
       tone: outstandingBalance > 0 ? ("red" as const) : ("neutral" as const)
     };
@@ -533,17 +530,17 @@ export default async function BookingDetailPage({ params, searchParams }: { para
       <div className="space-y-3">
         {resolvedSearchParams.updated === "1" ? (
           <div className="rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] px-3 py-2 text-sm font-bold text-[#166534]">
-            Booking changes saved.
+            {tx.say("saved")}
           </div>
         ) : null}
         {resolvedSearchParams.success === "walk-in" ? (
           <div className="rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] px-3 py-2 text-sm font-bold text-[#166534]">
-            Walk-in rental recorded. Payment of {money(totalPaid || rental.rental_rate, rental.currency)} collected.
+            {tx.say("walkIn", { amount: money(totalPaid || rental.rental_rate, rental.currency) })}
           </div>
         ) : null}
 
         <div className="flex flex-wrap items-center gap-2 text-sm font-bold text-[var(--muted)]">
-          <Link className="text-[var(--primary)]" href="/bookings">Bookings</Link>
+          <Link className="text-[var(--primary)]" href="/bookings">{tx.list("title")}</Link>
           <span>/</span>
           <span>{bookingReference(rental)}</span>
         </div>
@@ -552,26 +549,26 @@ export default async function BookingDetailPage({ params, searchParams }: { para
           <div className="card-section flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <Badge tone={statusTone(displayStatus)}>{RENTAL_STATUS_LABELS[String(displayStatus)] || String(displayStatus).replace(/_/g, " ")}</Badge>
-                {bookingLinkBadge(bookingLink?.status) ? (
-                  <Badge tone={bookingLinkBadge(bookingLink?.status)!.tone}>{bookingLinkBadge(bookingLink?.status)!.label}</Badge>
+                <Badge tone={statusTone(displayStatus)}>{statusLabel(String(displayStatus), tx)}</Badge>
+                {bookingLinkBadge(bookingLink?.status, tx) ? (
+                  <Badge tone={bookingLinkBadge(bookingLink?.status, tx)!.tone}>{bookingLinkBadge(bookingLink?.status, tx)!.label}</Badge>
                 ) : null}
-                {!customer ? <Badge tone="amber">Awaiting customer</Badge> : null}
-                {rental.entered_by_operator ? <Badge tone="blue">Entered by your team</Badge> : null}
+                {!customer ? <Badge tone="amber">{tx.list("awaitingCustomerShort")}</Badge> : null}
+                {rental.entered_by_operator ? <Badge tone="blue">{tx.say("enteredByTeam")}</Badge> : null}
                 <span className="font-mono-data text-xs font-semibold uppercase text-[var(--muted)]">{bookingReference(rental)}</span>
               </div>
               <h1 className="mt-2 truncate text-2xl font-semibold tracking-[-0.02em] text-[var(--foreground)]">
-                {customer ? customer.full_name : "Awaiting customer details"}
+                {customer ? customer.full_name : tx.list("awaitingCustomer")}
               </h1>
               <p className="mt-1 truncate text-sm font-bold text-[var(--foreground-secondary)]">{vehicleTitle(vehicle)}</p>
               <p className="font-mono-data mt-1 text-xs font-bold text-[var(--muted)]">{vehicle?.registration_number}</p>
               {awaitingSignature ? (
                 <p className="mt-2 text-sm text-[var(--foreground-secondary)]">
-                  Waiting for the customer to fill in the form and sign.{" "}
+                  {tx.say("waitingSign")}{" "}
                   {holdUntil
                     ? new Date(holdUntil).getTime() > Date.now()
-                      ? `The vehicle is held for them until ${formatDateTime(holdUntil)}; after that the dates open up, and the link still works if the vehicle is free.`
-                      : `The hold ended ${formatDateTime(holdUntil)}, so the dates are open to others.`
+                      ? tx.say("heldUntil", { when: formatDateTime(holdUntil, tx) })
+                      : tx.say("holdEnded", { when: formatDateTime(holdUntil, tx) })
                     : ""}
                 </p>
               ) : null}
@@ -579,17 +576,17 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             <div className="flex flex-wrap items-center gap-2 lg:max-w-[560px] lg:justify-end">
               {awaitingSignature ? (
                 <a className="pressable inline-flex min-h-9 min-w-fit items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-bold text-white shadow-sm" href="#send-link">
-                  Send the link
+                  {tx.say("sendLink")}
                 </a>
               ) : null}
               {rental.status === "booked" ? (
                 <ActionButton href={`/inspections/delivery/${rental.id}` as Route} tone={awaitingSignature ? "light" : "primary"}>
-                  Start handover
+                  {tx.say("startHandover")}
                 </ActionButton>
               ) : null}
               {["active", "due_soon", "overdue", "extended"].includes(displayStatus) ? (
                 <ActionButton href={`/inspections/return/${rental.id}` as Route}>
-                  Start return
+                  {tx.say("startReturn")}
                 </ActionButton>
               ) : null}
               {canAdjustRental ? (
@@ -597,8 +594,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   currentEndDate={rental.end_date}
                   currentRate={Number(rental.rental_rate || 0)}
                   currentStartDate={rental.start_date}
-                  customerName={customer?.full_name || "Awaiting customer"}
-                  label="Extend / change terms"
+                  customerName={customer?.full_name || tx.list("awaitingCustomerShort")}
+                  label={tx.say("extendChange")}
                   rentalId={rental.id}
                   vehicleLabel={vehicleTitle(vehicle)}
                   className="pressable inline-flex min-h-9 min-w-fit items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold text-[var(--foreground-secondary)] shadow-sm"
@@ -614,11 +611,11 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               ) : null}
               <details className="text-right">
                 <summary className="pressable inline-flex min-h-9 cursor-pointer list-none items-center justify-center gap-1 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold text-[var(--foreground-secondary)] shadow-sm">
-                  More
+                  {tx.say("more")}
                 </summary>
                 <div className="mt-2 flex flex-wrap justify-end gap-2">
               <ActionButton href={`/bookings/${rental.id}/edit` as Route} tone="light">
-                Edit booking
+                {tx.say("editBooking")}
               </ActionButton>
               {!["completed", "cancelled", "draft"].includes(rental.status) ? <VehicleChangeButton rentalId={rental.id} /> : null}
               {!["completed", "cancelled"].includes(rental.status) ? (
@@ -642,7 +639,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
 
         {(swapForms || []).length > 0 ? (
           <div className="scroll-mt-4 rounded-xl border border-[#fde68a] bg-[#fffbeb] p-3" id="vehicle-change-forms">
-            <p className="text-sm font-semibold text-[#92400e]">The vehicle has changed. Complete these with {customer?.full_name || "the customer"}:</p>
+            <p className="text-sm font-semibold text-[#92400e]">{tx.say("vehicleChanged", { name: customer?.full_name || tx.say("theCustomer") })}</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {(swapForms || []).map((form: any) => (
                 <Link
@@ -650,7 +647,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   href={(form.action === "swap_handover" ? `/inspections/delivery/${rental.id}?swap=1` : `/inspections/return/${rental.id}?swap=1&vehicle=${form.vehicle_id}`) as Route}
                   key={form.id}
                 >
-                  {form.title.split(" to ")[0].split(" from ")[0]}
+                  {form.action === "swap_handover" ? tx.say("handoverForm") : tx.say("collectionForm")}
                 </Link>
               ))}
             </div>
@@ -658,14 +655,14 @@ export default async function BookingDetailPage({ params, searchParams }: { para
         ) : null}
         {waitingExchange ? (
           <div className="rounded-xl border border-[var(--border)] bg-white p-3 text-sm text-[var(--foreground-secondary)]">
-            {customer?.full_name || "The customer"} has signed the exchange for the {waitingExchange.changes?.new_vehicle_label || "other vehicle"}. It happens once the other customer has signed too.
+            {tx.say("exchangeSigned", { name: customer?.full_name || tx.say("theCustomerCap"), vehicle: waitingExchange.changes?.new_vehicle_label || tx.say("otherVehicle") })}
           </div>
         ) : null}
 
         {pendingPortalActions.length > 0 ? (
           <div className="scroll-mt-4 rounded-xl border border-[#fde68a] bg-[#fffbeb] p-3" id="customer-requests">
             <p className="text-sm font-semibold text-[#92400e]">
-              {customer?.full_name || "The customer"} is waiting for your answer
+              {tx.say("waitingAnswer", { name: customer?.full_name || tx.say("theCustomerCap") })}
             </p>
             <div className="mt-3 space-y-3">
               {pendingPortalActions.map((action: any) => (
@@ -676,15 +673,15 @@ export default async function BookingDetailPage({ params, searchParams }: { para
         ) : null}
 
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          <BookingMetricCard icon={<CalendarDays size={18} />} label="Dates">
+          <BookingMetricCard icon={<CalendarDays size={18} />} label={tx.say("dates")}>
             <div className="flex flex-wrap items-center gap-1 text-sm font-semibold leading-5 text-[var(--foreground)]">
-              <span>{rental.end_date ? `${formatDate(rental.start_date)} to` : `From ${formatDate(rental.start_date)}, open-ended`}</span>
+              <span>{rental.end_date ? tx.say("dateTo", { date: formatDate(rental.start_date, tx) }) : tx.say("fromOpenEnded", { date: formatDate(rental.start_date, tx) })}</span>
               <EditableEndDate currentEndDate={rental.end_date} rentalId={rental.id} />
             </div>
-            <p className="text-sm text-[var(--muted)]">{daysRemaining(rental.end_date, rental.status, rental.start_date)}</p>
+            <p className="text-sm text-[var(--muted)]">{daysRemaining(rental.end_date, rental.status, rental.start_date, tx)}</p>
           </BookingMetricCard>
-          <BookingMetricCard icon={<CreditCard size={18} />} label="Billing">
-            <p className="font-mono-data text-sm font-semibold leading-5 text-[var(--foreground)]">{money(rental.rental_rate, rental.currency)} / {({ daily: "day", weekly: "week", monthly: "month" } as Record<string, string>)[String(rental.pricing_model)] || "period"}</p>
+          <BookingMetricCard icon={<CreditCard size={18} />} label={tx.say("billing")}>
+            <p className="font-mono-data text-sm font-semibold leading-5 text-[var(--foreground)]">{tx.say(`ratePer_${["daily", "weekly", "monthly"].includes(String(rental.pricing_model)) ? rental.pricing_model : "other"}`, { amount: money(rental.rental_rate, rental.currency) })}</p>
             <p className={`text-sm font-semibold ${financialStateClass}`}>{financialState.label}</p>
             {financialState.amount !== null ? (
               <p className={`font-mono-data text-sm ${financialStateClass}`}>{money(financialState.amount, rental.currency)}</p>
@@ -697,37 +694,37 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               </div>
             ) : null}
           </BookingMetricCard>
-          <BookingMetricCard icon={<Gauge size={18} />} label="Mileage">
+          <BookingMetricCard icon={<Gauge size={18} />} label={tx.say("mileage")}>
             {rental.mileage_at_delivery == null && rental.mileage_at_return != null ? (
               <>
-                <p className="font-mono-data text-sm font-semibold leading-5 text-[var(--foreground)]">{Number(rental.mileage_at_return).toLocaleString()} km at return</p>
-                <p className="text-sm text-[var(--muted)]">No reading was taken at handover</p>
+                <p className="font-mono-data text-sm font-semibold leading-5 text-[var(--foreground)]">{tx.say("kmAtReturn", { km: Number(rental.mileage_at_return).toLocaleString("en-US") })}</p>
+                <p className="text-sm text-[var(--muted)]">{tx.say("noReadingHandover")}</p>
               </>
             ) : rental.mileage_at_delivery == null ? (
               <>
-                <p className="text-sm font-semibold leading-5 text-[var(--foreground)]">{isCancelled ? "Never handed over" : isClosed ? "Not recorded" : "Not recorded yet"}</p>
-                <p className="text-sm text-[var(--muted)]">{isCancelled ? "No mileage to record" : isClosed ? "No handover form was completed" : "Recorded at handover"}</p>
+                <p className="text-sm font-semibold leading-5 text-[var(--foreground)]">{isCancelled ? tx.say("neverHandedOver") : isClosed ? tx.say("notRecorded") : tx.say("notRecordedYet")}</p>
+                <p className="text-sm text-[var(--muted)]">{isCancelled ? tx.say("noMileage") : isClosed ? tx.say("noHandoverFormDone") : tx.say("recordedAtHandover")}</p>
               </>
             ) : rental.mileage_at_return == null ? (
               <>
-                <p className="font-mono-data text-sm font-semibold leading-5 text-[var(--foreground)]">{Number(rental.mileage_at_delivery).toLocaleString()} km at handover</p>
-                <p className="text-sm text-[var(--muted)]">Distance driven is worked out at return</p>
+                <p className="font-mono-data text-sm font-semibold leading-5 text-[var(--foreground)]">{tx.say("kmAtHandover", { km: Number(rental.mileage_at_delivery).toLocaleString("en-US") })}</p>
+                <p className="text-sm text-[var(--muted)]">{tx.say("distanceAtReturn")}</p>
               </>
             ) : (
               <>
-                <p className="font-mono-data text-sm font-semibold leading-5 text-[var(--foreground)]">{Number(rental.km_driven ?? Number(rental.mileage_at_return) - Number(rental.mileage_at_delivery)).toLocaleString()} km driven</p>
+                <p className="font-mono-data text-sm font-semibold leading-5 text-[var(--foreground)]">{tx.say("kmDriven", { km: Number(rental.km_driven ?? Number(rental.mileage_at_return) - Number(rental.mileage_at_delivery)).toLocaleString("en-US") })}</p>
                 <p className="font-mono-data text-sm text-[var(--muted)]">{Number(rental.mileage_at_delivery).toLocaleString()} → {Number(rental.mileage_at_return).toLocaleString()} km</p>
               </>
             )}
           </BookingMetricCard>
-          <BookingMetricCard icon={<UserRound size={18} />} label="Customer">
+          <BookingMetricCard icon={<UserRound size={18} />} label={tx.say("customer")}>
             {customer ? (
               <>
-                <p className="truncate text-sm font-semibold leading-5 text-[var(--foreground)]">{flagForNationality(customer.nationality)} {customer.nationality || "Nationality not set"}</p>
-                <p className="text-sm text-[var(--muted)]">{customer.phone || "Phone not set"}</p>
+                <p className="truncate text-sm font-semibold leading-5 text-[var(--foreground)]">{flagForNationality(customer.nationality)} {customer.nationality || tx.say("nationalityNotSet")}</p>
+                <p className="text-sm text-[var(--muted)]">{customer.phone || tx.say("phoneNotSet")}</p>
               </>
             ) : (
-              <p className="text-sm font-semibold text-[#b45309]">Awaiting details</p>
+              <p className="text-sm font-semibold text-[#b45309]">{tx.say("awaitingDetails")}</p>
             )}
           </BookingMetricCard>
         </div>
@@ -737,13 +734,13 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             <Fold
               id="booking-link"
               open={Boolean(bookingLink) && String(bookingLink?.status || "") !== "completed" && !isClosed}
-              summary={!bookingLink ? "Not created: this booking was entered by your team" : String(bookingLink.status || "") === "completed" ? "The customer has finished and signed" : "Waiting for the customer"}
-              title="Customer's link"
+              summary={!bookingLink ? tx.say("link_notCreated") : String(bookingLink.status || "") === "completed" ? tx.say("link_finished") : tx.say("link_waiting")}
+              title={tx.say("linkTitle")}
               tone={bookingLink && String(bookingLink.status || "") !== "completed" && !isClosed ? "amber" : "neutral"}
             >
               {!bookingLink ? (
                 <p className="text-sm text-[var(--muted)]">
-                  This booking was entered by your team. Create a link if you want the customer to add their details and sign the agreement online.
+                  {tx.say("link_teamBody")}
                 </p>
               ) : null}
               {(() => {
@@ -753,13 +750,13 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 const list = (
                   <div className="mt-3 space-y-3">
                     {steps.map((step) => (
-                      <div className="sub-surface flex items-start gap-3 p-3" key={step.label}>
+                      <div className="sub-surface flex items-start gap-3 p-3" key={step.key}>
                         <span className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${step.complete ? "bg-[#dcfce7] text-[#166534]" : "bg-[#fbfaf8] text-[var(--muted)]"}`}>
                           {step.complete ? <CheckCircle2 size={16} /> : <Clock size={16} />}
                         </span>
                         <div>
-                          <p className="font-semibold text-[var(--foreground)]">{step.label}</p>
-                          <p className="text-sm text-[var(--muted)]">{step.at ? formatDateTime(step.at) : "Not yet"}</p>
+                          <p className="font-semibold text-[var(--foreground)]">{tx.say(`step_${step.key}`)}</p>
+                          <p className="text-sm text-[var(--muted)]">{step.at ? formatDateTime(step.at, tx) : tx.say("notYet")}</p>
                         </div>
                       </div>
                     ))}
@@ -770,7 +767,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   <details className="mt-3">
                     <summary className="flex cursor-pointer items-center gap-2 rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] p-3 text-sm font-semibold text-[#166534]">
                       <CheckCircle2 size={16} />
-                      The customer finished everything on {formatDate(String(steps[steps.length - 1].at || ""))}. Show the steps
+                      {tx.say("allDone", { date: formatDate(String(steps[steps.length - 1].at || ""), tx) })}
                     </summary>
                     {list}
                   </details>
@@ -789,17 +786,17 @@ export default async function BookingDetailPage({ params, searchParams }: { para
 
             <Fold
               open={!customer || customer.document_status !== "complete"}
-              summary={customer ? `${customer.full_name} · ${documentLabel(customer.document_status)}` : "Awaiting customer details"}
-              title="Customer and documents"
+              summary={customer ? `${customer.full_name} · ${documentLabel(customer.document_status, tx)}` : tx.list("awaitingCustomer")}
+              title={tx.say("custDocsTitle")}
               tone={!customer || customer.document_status !== "complete" ? "amber" : "neutral"}
             >
               {customer ? (
                 <>
                   <div className="grid gap-3 sm:grid-cols-2">
-                    <Info icon={UserRound} label="Name" value={customer?.full_name || "Not recorded"} />
-                    <Info icon={UserRound} label="Phone" value={customer?.phone || "Not recorded"} />
-                    <Info icon={UserRound} label="Email" value={customer?.email || "Not recorded"} />
-                    <Info icon={FileText} label="Documents" value={documentLabel(customer?.document_status)} danger={customer?.document_status !== "complete"} />
+                    <Info icon={UserRound} label={tx.say("name")} value={customer?.full_name || tx.say("notRecorded")} />
+                    <Info icon={UserRound} label={tx.say("phone")} value={customer?.phone || tx.say("notRecorded")} />
+                    <Info icon={UserRound} label={tx.say("email")} value={customer?.email || tx.say("notRecorded")} />
+                    <Info icon={FileText} label={tx.say("documents")} value={documentLabel(customer?.document_status, tx)} danger={customer?.document_status !== "complete"} />
                   </div>
                   <div className="mt-3 grid gap-2 sm:grid-cols-3">
                     {["passport", "driver_license", "selfie"].map((category) => {
@@ -807,7 +804,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                       return (
                         <div className="flex items-center gap-2 rounded-lg border border-[var(--border)] bg-white p-3" key={category}>
                           {found ? <CheckCircle2 className="text-[#16a34a]" size={18} /> : <AlertTriangle className="text-[#b7791f]" size={18} />}
-                          <span className="text-sm font-bold capitalize text-[var(--foreground)]">{category.replace(/_/g, " ")}</span>
+                          <span className="text-sm font-bold text-[var(--foreground)]">{tx.say(`doc_${category}`)}</span>
                         </div>
                       );
                     })}
@@ -820,10 +817,10 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                       <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)]">
                         <Clock className="text-[var(--primary)]" size={16} />
                       </span>
-                      <p className="font-semibold text-[var(--primary)]">Awaiting customer details</p>
+                      <p className="font-semibold text-[var(--primary)]">{tx.list("awaitingCustomer")}</p>
                     </div>
                     <p className="mt-3 text-sm leading-6 text-[#134e4a]">
-                      The booking link will ask your customer to fill in their personal details, upload their passport and driving licence, and sign the rental contract. Use the share options above to send or copy the link.
+                      {tx.say("awaitingBody")}
                     </p>
                   </div>
                   <AssignCustomerModal
@@ -837,7 +834,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
 
             {customer ? (
               <Card>
-                <SectionHeader eyebrow="Communication" title="Contact and notes" />
+                <SectionHeader eyebrow={tx.say("commEyebrow")} title={tx.say("commTitle")} />
                 <div className="mt-3">
                   <CommunicationPanel
                     booking={{
@@ -874,26 +871,26 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             ) : null}
 
             <Card>
-              <SectionHeader eyebrow="Inspections" title="Handover and return" />
+              <SectionHeader eyebrow={tx.say("inspEyebrow")} title={tx.say("inspTitle")} />
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
                 {deliveryInspection ? (
-                  <InspectionStatus label="Handover form" inspection={deliveryInspection} href={`/inspections/delivery/${rental.id}` as Route} available={false} />
+                  <InspectionStatus label={tx.say("handoverForm")} inspection={deliveryInspection} href={`/inspections/delivery/${rental.id}` as Route} available={false} />
                 ) : isRetrospective && rental.status === "booked" ? (
                   // Retrospective, not yet activated: equal-weight options
                   <div className="sub-surface space-y-3 p-3">
                     <div className="flex items-center gap-2 font-semibold text-[var(--foreground)]">
                       <AlertTriangle className="text-[#b7791f]" size={18} />
-                      Handover form
+                      {tx.say("handoverForm")}
                     </div>
                     <p className="text-sm text-[var(--muted)]">
-                      No handover form on record. This rental started {startedAgoLabel(rental.start_date)}, so the form is optional.
+                      {tx.say("noFormOptional", { ago: startedAgoLabel(rental.start_date, tx) })}
                     </p>
                     <div className="grid gap-2 sm:grid-cols-2">
                       <Link
                         className="pressable flex items-center justify-center rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-center text-sm font-bold text-[var(--foreground-secondary)]"
                         href={`/inspections/delivery/${rental.id}` as Route}
                       >
-                        Fill in the handover form
+                        {tx.say("fillHandover")}
                       </Link>
                       <SkipInspectionButton rentalId={rental.id} />
                     </div>
@@ -903,16 +900,16 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
                     <div className="flex items-center gap-2 font-semibold text-[#92400e]">
                       <AlertTriangle className="text-[#b7791f]" size={18} />
-                      No handover form
+                      {tx.say("noHandoverForm")}
                     </div>
                     <p className="mt-1 text-sm text-[#b45309]">
-                      Started {startedAgoLabel(rental.start_date)}. The form is optional for a rental that was already out.
+                      {tx.say("startedOptional", { ago: startedAgoLabel(rental.start_date, tx) })}
                     </p>
                     <Link
                       className="pressable mt-2 inline-flex items-center rounded-lg border border-[#fde68a] bg-white px-3 py-2 text-xs font-bold text-[#92400e]"
                       href={`/inspections/delivery/${rental.id}` as Route}
                     >
-                      Fill in the handover form (optional)
+                      {tx.say("fillHandoverOptional")}
                     </Link>
                   </div>
                 ) : rental.status === "booked" ? (
@@ -920,31 +917,31 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   <div className="sub-surface space-y-2 p-3">
                     <div className="flex items-center gap-2 font-semibold text-[var(--foreground)]">
                       <AlertTriangle className="text-[#b7791f]" size={18} />
-                      Handover form
+                      {tx.say("handoverForm")}
                     </div>
                     <Link className="primary-action pressable block w-full px-3 py-2 text-center" href={`/inspections/delivery/${rental.id}` as Route}>
-                      Start handover
+                      {tx.say("startHandover")}
                     </Link>
                     <SkipInspectionButton rentalId={rental.id} />
                   </div>
                 ) : isCancelled ? (
                   <div className="sub-surface p-3">
-                    <p className="font-semibold text-[var(--foreground)]">Never handed over</p>
-                    <p className="mt-1 text-sm text-[var(--muted)]">The booking was cancelled before the vehicle went out.</p>
+                    <p className="font-semibold text-[var(--foreground)]">{tx.say("neverHandedOver")}</p>
+                    <p className="mt-1 text-sm text-[var(--muted)]">{tx.say("cancelledBefore")}</p>
                   </div>
                 ) : (
                   // Active, not retrospective, no inspection
                   <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
                     <div className="flex items-center gap-2 font-semibold text-[#92400e]">
                       <AlertTriangle className="text-[#b7791f]" size={18} />
-                      No handover form
+                      {tx.say("noHandoverForm")}
                     </div>
-                    <p className="mt-2 text-sm text-[#b45309]">The vehicle went out without a handover form.</p>
+                    <p className="mt-2 text-sm text-[#b45309]">{tx.say("wentOutWithout")}</p>
                   </div>
                 )}
                 {/* Before the handover there is no return to talk about: a warning sign on a form that can't be opened yet was noise. */}
                 {(isCancelled && !deliveryInspection) || (rental.status === "booked" && !returnInspection) ? null : (
-                  <InspectionStatus label="Return form" inspection={returnInspection} href={`/inspections/return/${rental.id}` as Route} available={["active", "due_soon", "overdue", "extended"].includes(displayStatus)} />
+                  <InspectionStatus label={tx.say("returnForm")} inspection={returnInspection} href={`/inspections/return/${rental.id}` as Route} available={["active", "due_soon", "overdue", "extended"].includes(displayStatus)} />
                 )}
               </div>
               {inspections.length === 0 ? (
@@ -952,7 +949,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               ) : (
                 <details className="mt-3">
                   <summary className="cursor-pointer py-1 text-sm font-semibold text-[var(--primary)]">
-                    Show the {inspections.length === 1 ? "completed form" : `${inspections.length} completed forms`} (photos, fuel, signatures)
+                    {tx.say("showForms", { count: inspections.length })}
                   </summary>
                   <div className="mt-3 space-y-3">
                     {inspections.map((inspection: any) => <InspectionViewer inspection={inspection} key={inspection.id} />)}
@@ -962,8 +959,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             </Card>
 
             <Fold
-              summary={(communicationTimeline || []).length === 0 ? "Nothing yet" : `${(communicationTimeline || []).length} ${(communicationTimeline || []).length === 1 ? "entry" : "entries"}`}
-              title="Messages and customer activity"
+              summary={(communicationTimeline || []).length === 0 ? tx.say("nothingYet") : tx.say("entries", { count: (communicationTimeline || []).length })}
+              title={tx.say("msgsTitle")}
             >
               <CommunicationTimeline
                 customerId={customer?.id || null}
@@ -975,16 +972,16 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               />
             </Fold>
 
-            <Fold summary={`${activityEvents.length} ${activityEvents.length === 1 ? "entry" : "entries"}`} title="Full history">
+            <Fold summary={tx.say("entries", { count: activityEvents.length })} title={tx.say("historyTitle")}>
               <div className="space-y-3">
                 {activityEvents.length === 0 ? (
-                  <SectionEmpty>No activity recorded yet.</SectionEmpty>
+                  <SectionEmpty>{tx.say("noActivity")}</SectionEmpty>
                 ) : (
                   activityEvents.map((event: any) => (
                   <div className="sub-surface p-3" key={event.id}>
                       <p className="font-semibold text-[var(--foreground)]">{event.title}</p>
                       <p className="mt-1 text-sm text-[var(--muted)]">{event.detail || event.event_type}</p>
-                      <p className="mt-2 text-xs font-bold uppercase text-[var(--muted)]">{formatDateTime(event.occurred_at)}</p>
+                      <p className="mt-2 text-xs font-bold uppercase text-[var(--muted)]">{formatDateTime(event.occurred_at, tx)}</p>
                     </div>
                   ))
                 )}
@@ -996,28 +993,28 @@ export default async function BookingDetailPage({ params, searchParams }: { para
           <div className="order-first space-y-3 lg:order-none">
             <Fold
               open={Boolean(customerReportedPayment) || (isClosed && !isCancelled && Number(rental.deposit_held || 0) - Number(rental.deposit_refunded_amount || 0) - Number(rental.deposit_forfeited_amount || 0) > 0) || (payments as any[]).some((payment) => payment.metadata?.early_return && !payment.metadata.early_return.settled)}
-              summary={`${vehicleTitle(vehicle)} · Deposit: ${formatDepositSummary(rental)}`}
-              title="Vehicle, handover and deposit"
+              summary={tx.say("vehDepSummary", { vehicle: vehicleTitle(vehicle), deposit: formatDepositSummary(rental, tx) })}
+              title={tx.say("vehDepTitle")}
             >
               <div className="space-y-3 text-sm">
-                <Info icon={Car} label="Vehicle" value={`${vehicleTitle(vehicle)} / ${vehicle?.registration_number || ""}`} />
+                <Info icon={Car} label={tx.say("vehicle")} value={`${vehicleTitle(vehicle)} / ${vehicle?.registration_number || ""}`} />
                 {deliveryInspection ? (
-                  <Info icon={MapPin} label="Handover" value={`Handed over ${formatDateTime(deliveryInspection.submitted_at || deliveryInspection.created_at)}`} />
-                ) : isCancelled || (rental.entered_by_operator && /TBD$/.test(delivery.detail)) ? null : (
+                  <Info icon={MapPin} label={tx.say("handover")} value={tx.say("handedOver", { when: formatDateTime(deliveryInspection.submitted_at || deliveryInspection.created_at, tx) })} />
+                ) : isCancelled || (rental.entered_by_operator && delivery.undecided) ? null : (
                   <DeliveryInfo delivery={delivery} />
                 )}
                 {isCancelled && !deliveryInspection ? null : (
                   <Info
                     icon={MapPin}
-                    label="Return"
+                    label={tx.say("return")}
                     value={
                       returnInspection
-                        ? `Returned ${formatDateTime(returnInspection.submitted_at || returnInspection.created_at)}${rental.return_location ? ` · ${rental.return_location}` : ""}`
-                        : rental.return_location || (rental.end_date ? "Not arranged yet" : "No return date: monthly, open-ended")
+                        ? `${tx.say("returnedAt", { when: formatDateTime(returnInspection.submitted_at || returnInspection.created_at, tx) })}${rental.return_location ? ` · ${rental.return_location}` : ""}`
+                        : rental.return_location || (rental.end_date ? tx.say("notArranged") : tx.say("noReturnDate"))
                     }
                   />
                 )}
-                <Info icon={CreditCard} label="Deposit" value={formatDepositSummary(rental)} />
+                <Info icon={CreditCard} label={tx.say("deposit")} value={formatDepositSummary(rental, tx)} />
                 <div className="scroll-mt-4" id="refunds" />
                 <RefundDepositPanel
                   rentalId={rental.id}
@@ -1040,18 +1037,18 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                         <i aria-hidden="true" className="ti ti-alert-circle text-base" />
                       </span>
                       <div className="min-w-0 flex-1">
-                        <p className="font-semibold text-[#92400e]">Customer has reported making payment - awaiting your confirmation</p>
-                        <p className="mt-1 text-sm text-[#b45309]">Reported {formatDateTime(bookingLink?.payment_reported_at)}</p>
+                        <p className="font-semibold text-[#92400e]">{tx.say("reportedPay")}</p>
+                        <p className="mt-1 text-sm text-[#b45309]">{tx.say("reportedAt", { when: formatDateTime(bookingLink?.payment_reported_at, tx) })}</p>
                         <form action={confirmCustomerPaymentAction} className="mt-3">
-                          <PendingButton className="pressable inline-flex w-full items-center justify-center rounded-lg bg-[#d97706] px-3 py-2 text-sm font-semibold text-white shadow-sm" pendingLabel="Confirming..." type="submit">
-                            Confirm payment received
+                          <PendingButton className="pressable inline-flex w-full items-center justify-center rounded-lg bg-[#d97706] px-3 py-2 text-sm font-semibold text-white shadow-sm" pendingLabel={tx.say("confirming")} type="submit">
+                            {tx.say("confirmPay")}
                           </PendingButton>
                         </form>
                       </div>
                     </div>
                   </div>
                 ) : null}
-                <Info icon={CreditCard} label="Rent paid" value={money(totalPaid, rental.currency)} />
+                <Info icon={CreditCard} label={tx.say("rentPaid")} value={money(totalPaid, rental.currency)} />
               </div>
             </Fold>
 
@@ -1068,20 +1065,18 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               id="payment-schedule"
               open={overduePaymentGroup.length + dueNowPaymentGroup.length > 0 || (payments.length === 0 && !isClosed && !awaitingSignature)}
               summary={`${financialState.label}${financialState.amount !== null ? ` · ${money(financialState.amount, rental.currency)}` : ""}`}
-              title="Payments"
+              title={tx.say("payTitle")}
               tone={financialState.tone === "red" ? "red" : financialState.tone === "green" ? "green" : financialState.tone === "amber" ? "amber" : "neutral"}
             >
               <div className="space-y-3">
                 <p className="text-sm text-[var(--muted)]">
                   {/* Rent and deposit are said separately: "฿0 paid so far" beside a paid deposit read as a mistake. */}
-                  <span className="font-semibold text-[var(--foreground)]">{money(totalPaid, rental.currency)}</span> rent paid so far
-                  {paidInAll - totalPaid > 0 ? (
-                    <>
-                      {" · "}
-                      <span className="font-semibold text-[var(--foreground)]">{money(paidInAll - totalPaid, rental.currency)}</span> deposit paid
-                    </>
-                  ) : null}
-                  . {financialState.detail}
+                  {t.rich(paidInAll - totalPaid > 0 ? "paidLineDeposit" : "paidLine", {
+                    rent: money(totalPaid, rental.currency),
+                    deposit: money(paidInAll - totalPaid, rental.currency),
+                    b: (chunks: React.ReactNode) => <span className="font-semibold text-[var(--foreground)]">{chunks}</span>
+                  })}{" "}
+                  {financialState.detail}
                 </p>
                 {needsExistingRentalPaymentSetup ? (
                   <ExistingRentalPaymentSetupCard
@@ -1093,11 +1088,11 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   />
                 ) : null}
                 {awaitingSignature && payments.length === 0 ? (
-                  <p className="text-sm text-[var(--muted)]">The payments are set up automatically when the customer signs.</p>
+                  <p className="text-sm text-[var(--muted)]">{tx.say("autoSetup")}</p>
                 ) : null}
                 {!isClosed && !awaitingSignature && !needsExistingRentalPaymentSetup && payments.length === 0 && outstandingBalance === 0 && totalPaid === 0 ? (
                   <div className="space-y-3 rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3 text-sm font-semibold text-[#92400e]">
-                    <p>No payment schedule exists yet for this booking. Generate one from the rental rate and dates, or add a single charge.</p>
+                    <p>{tx.say("noSchedule")}</p>
                     <GeneratePaymentScheduleButton rentalId={rental.id} />
                   </div>
                 ) : null}
@@ -1107,22 +1102,22 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 overduePaymentGroup.length + dueNowPaymentGroup.length + upcomingPaymentGroup.length === 0 &&
                 (!rental.end_date || String(rental.end_date).slice(0, 10) > today) ? (
                   <div className="space-y-3 rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3 text-sm font-semibold text-[#92400e]">
-                    <p>No future rent is scheduled for this rental. Generate the rest of the schedule from the rental rate - payments already made are kept.</p>
+                    <p>{tx.say("noFuture")}</p>
                     <GeneratePaymentScheduleButton rentalId={rental.id} />
                   </div>
                 ) : null}
                 {payments.length === 0 && transactions.length === 0 && !awaitingSignature ? (
-                  <SectionEmpty>No payments or transactions recorded yet.</SectionEmpty>
+                  <SectionEmpty>{tx.say("noPayments")}</SectionEmpty>
                 ) : null}
                 {overduePaymentGroup.length > 0 ? (
                   <div className="space-y-1">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[#dc2626]">Overdue — {overduePaymentGroup.length} payment{overduePaymentGroup.length !== 1 ? "s" : ""}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[#dc2626]">{tx.say("grp_overdue", { count: overduePaymentGroup.length })}</p>
                     {overduePaymentGroup.map((payment: any) => <EditableRentalPaymentRow key={payment.id} payment={payment} />)}
                   </div>
                 ) : null}
                 {dueNowPaymentGroup.length > 0 ? (
                   <div className="space-y-1">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[#92400e]">Due now / pending — {dueNowPaymentGroup.length} payment{dueNowPaymentGroup.length !== 1 ? "s" : ""}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[#92400e]">{tx.say("grp_dueNow", { count: dueNowPaymentGroup.length })}</p>
                     {dueNowPaymentGroup.map((payment: any) => <EditableRentalPaymentRow key={payment.id} payment={payment} />)}
                   </div>
                 ) : null}
@@ -1130,15 +1125,15 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   <details>
                     <summary className="cursor-pointer text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--muted)] hover:text-[var(--foreground)]">
                       {upcomingLater.length > 0
-                        ? `Upcoming — next ${upcomingShown.length} of ${upcomingPaymentGroup.length} scheduled payments`
-                        : `Upcoming — ${upcomingPaymentGroup.length} scheduled payment${upcomingPaymentGroup.length !== 1 ? "s" : ""}`}
+                        ? tx.say("grp_upcomingSome", { shown: upcomingShown.length, total: upcomingPaymentGroup.length })
+                        : tx.say("grp_upcoming", { count: upcomingPaymentGroup.length })}
                     </summary>
                     <div className="mt-2 space-y-1">
                       {upcomingShown.map((payment: any) => <EditableRentalPaymentRow key={payment.id} payment={payment} />)}
                       {upcomingLater.length > 0 ? (
                         <details>
                           <summary className="cursor-pointer py-1 text-[13px] font-semibold text-[var(--primary)]">
-                            Show {upcomingLater.length} later payment{upcomingLater.length !== 1 ? "s" : ""}
+                            {tx.say("showLater", { count: upcomingLater.length })}
                           </summary>
                           <div className="mt-1 space-y-1">
                             {upcomingLater.map((payment: any) => <EditableRentalPaymentRow key={payment.id} payment={payment} />)}
@@ -1151,7 +1146,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 {cancelledPaymentGroup.length > 0 ? (
                   <details>
                     <summary className="cursor-pointer text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--muted)] hover:text-[var(--foreground)]">
-                      Cancelled — {cancelledPaymentGroup.length} payment{cancelledPaymentGroup.length !== 1 ? "s" : ""} no longer due
+                      {tx.say("grp_cancelled", { count: cancelledPaymentGroup.length })}
                     </summary>
                     <div className="mt-2 space-y-1">
                       {cancelledPaymentGroup.map((payment: any) => <EditableRentalPaymentRow key={payment.id} payment={payment} />)}
@@ -1161,7 +1156,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 {paidPaymentGroup.length > 0 ? (
                   <details>
                     <summary className="cursor-pointer text-[10px] font-bold uppercase tracking-[0.08em] text-[#16a34a] hover:text-[#166534]">
-                      Paid — {paidPaymentGroup.length} payment{paidPaymentGroup.length !== 1 ? "s" : ""}
+                      {tx.say("grp_paid", { count: paidPaymentGroup.length })}
                     </summary>
                     <div className="mt-2 space-y-1">
                       {paidPaymentGroup.map((payment: any) => <EditableRentalPaymentRow key={payment.id} payment={payment} />)}
@@ -1172,7 +1167,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 {transactions.length > 0 ? (
                   <details>
                     <summary className="cursor-pointer text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--muted)] hover:text-[var(--foreground)]">
-                      Money in and out — {transactions.length} {transactions.length === 1 ? "entry" : "entries"}
+                      {tx.say("grp_money", { count: transactions.length })}
                     </summary>
                     <div className="mt-2 space-y-3">
                       {transactions.map((transaction: any) => <EditableTransactionRow key={transaction.id} transaction={transaction} />)}
@@ -1212,13 +1207,14 @@ function Info({ icon: Icon, label, value, danger = false }: { icon: typeof Car; 
 }
 
 function DeliveryInfo({ delivery }: { delivery: { method: unknown; title: string; detail: string } }) {
+  const tx = useTx();
   return (
     <div className="sub-surface flex items-start gap-3 p-3">
       <MapPin className="mt-0.5 shrink-0 text-[var(--primary)]" size={18} />
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
-          <p className="text-xs font-bold uppercase text-[var(--muted)]">Delivery</p>
-          {delivery.method === "tbd" ? <Badge tone="amber">To be confirmed</Badge> : null}
+          <p className="text-xs font-bold uppercase text-[var(--muted)]">{tx.say("delivery")}</p>
+          {delivery.method === "tbd" ? <Badge tone="amber">{tx.say("toBeConfirmed")}</Badge> : null}
         </div>
         <p className="mt-1 font-semibold text-[var(--foreground)]">{delivery.title}</p>
         <p className="mt-1 text-sm font-semibold text-[var(--muted)]">{delivery.detail}</p>
@@ -1228,24 +1224,25 @@ function DeliveryInfo({ delivery }: { delivery: { method: unknown; title: string
 }
 
 function PaymentInfo({ method, timing }: { method: string | null; timing: string | null }) {
+  const tx = useTx();
   return (
     <div className="sub-surface flex items-start gap-3 p-3">
       <CreditCard className="mt-0.5 shrink-0 text-[var(--primary)]" size={18} />
       <div>
-        <p className="text-xs font-bold uppercase text-[var(--muted)]">Payment</p>
-        <p className="mt-1 font-semibold text-[var(--foreground)]">Payment method: {formatPaymentMethod(method)}</p>
-        <p className="mt-1 text-sm font-semibold text-[var(--muted)]">Payment timing: {formatPaymentTiming(timing)}</p>
+        <p className="text-xs font-bold uppercase text-[var(--muted)]">{tx.say("payment")}</p>
+        <p className="mt-1 font-semibold text-[var(--foreground)]">{tx.say("payMethod", { method: formatPaymentMethod(method, tx) })}</p>
+        <p className="mt-1 text-sm font-semibold text-[var(--muted)]">{tx.say("payTiming", { timing: formatPaymentTiming(timing, tx) })}</p>
       </div>
     </div>
   );
 }
 
-function daysUntilLabel(days: number | null | undefined) {
-  if (days === null || days === undefined) return "Date not set";
-  if (days < 0) return `${Math.abs(days)} days overdue`;
-  if (days === 0) return "Due today";
-  if (days === 1) return "Due tomorrow";
-  return `Due in ${days} days`;
+function daysUntilLabel(days: number | null | undefined, tx: Tx) {
+  if (days === null || days === undefined) return tx.say("dateNotSet");
+  if (days < 0) return tx.say("daysOverdue", { days: Math.abs(days) });
+  if (days === 0) return tx.say("dueToday");
+  if (days === 1) return tx.say("dueTomorrow");
+  return tx.say("dueInDays", { days });
 }
 
 function comingUpTone(severity?: string) {
@@ -1261,15 +1258,8 @@ function paymentStatusTone(status?: string): "green" | "amber" | "red" | "blue" 
   return "neutral";
 }
 
-function eventTypeLabel(type?: string) {
-  const labels: Record<string, string> = {
-    tax: "Tax",
-    insurance: "Insurance",
-    porbor: "Compulsory insurance",
-    service: "Service",
-    task: "Task"
-  };
-  return labels[String(type || "")] || "Event";
+function eventTypeLabel(type: string | undefined, tx: Tx) {
+  return tx.say(["tax", "insurance", "porbor", "service", "task"].includes(String(type || "")) ? `ev_${type}` : "ev_other");
 }
 
 function ComingUpCard({
@@ -1289,23 +1279,24 @@ function ComingUpCard({
   const nextPaymentStatus = String(nextPayment?.status || "scheduled").toLowerCase();
   const showRecordPayment = nextPayment && ["pending", "overdue"].includes(nextPaymentStatus);
   const visibleEvents = vehicleEvents.slice(0, 5);
+  const tx = useTx();
 
   return (
     <Fold
-      summary={nextPayment ? `Next payment ${money(nextPayment.amount, nextPayment.currency || currency)} · ${formatDate(nextPayment.due_date)}` : "No payment scheduled"}
-      title="What's coming up"
+      summary={nextPayment ? tx.say("nextPaySummary", { amount: money(nextPayment.amount, nextPayment.currency || currency), date: formatDate(nextPayment.due_date, tx) }) : tx.say("noPayScheduled")}
+      title={tx.say("comingTitle")}
     >
       <div>
         <div className="grid gap-3 xl:grid-cols-2">
           <div className={nextPayment ? "rounded-[11px] border border-[var(--border)] bg-[var(--primary-light)] p-4" : ""}>
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-[12px] font-semibold text-[var(--primary)]">Next payment</p>
+                <p className="text-[12px] font-semibold text-[var(--primary)]">{tx.say("nextPayment")}</p>
                 {nextPayment ? (
                   <>
                     <p className="font-mono-data mt-2 text-2xl font-semibold tracking-[-0.03em] text-[var(--foreground)]">{money(nextPayment.amount, nextPayment.currency || currency)}</p>
                     <p className="mt-1 text-xs font-semibold text-[var(--foreground-secondary)]">
-                      {formatDate(nextPayment.due_date)} · {daysUntilLabel(nextPayment.days_until)}
+                      {formatDate(nextPayment.due_date, tx)} · {daysUntilLabel(nextPayment.days_until, tx)}
                     </p>
                   </>
                 ) : (
@@ -1319,25 +1310,25 @@ function ComingUpCard({
                     }}
                   >
                     <p style={{ fontSize: 13, fontWeight: 500, color: "#92400e", margin: "0 0 4px" }}>
-                      No payment schedule found
+                      {tx.say("noScheduleFound")}
                     </p>
                     <p style={{ fontSize: 12, color: "#b45309", margin: 0 }}>
-                      Use &ldquo;Generate payment schedule&rdquo; in the Payment schedule section to set one up.
+                      {tx.say("useGenerate")}
                     </p>
                   </div>
                 )}
               </div>
-              {nextPayment ? <Badge tone={paymentStatusTone(nextPaymentStatus)}>{({ scheduled: "Not due yet", pending: "Waiting to be paid", overdue: "Overdue" } as Record<string, string>)[nextPaymentStatus] || nextPaymentStatus}</Badge> : null}
+              {nextPayment ? <Badge tone={paymentStatusTone(nextPaymentStatus)}>{["scheduled", "pending", "overdue"].includes(nextPaymentStatus) ? tx.say(`ps_${nextPaymentStatus}`) : nextPaymentStatus}</Badge> : null}
             </div>
             {nextPayment ? (
               <div className="mt-4">
                 {showRecordPayment ? (
                   <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-lg bg-[var(--primary)] px-3 text-xs font-semibold text-white" href={`#record-payment-${nextPayment.id}` as Route}>
-                    Record payment received
+                    {tx.say("recordReceived")}
                   </Link>
                 ) : (
                   <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-lg border border-[var(--border)] bg-white px-3 text-xs font-semibold text-[var(--primary)]" href={"#payment-schedule" as Route}>
-                    View payment schedule
+                    {tx.say("viewSchedule")}
                   </Link>
                 )}
               </div>
@@ -1346,7 +1337,7 @@ function ComingUpCard({
               <div className="mt-4 space-y-2 border-t border-[#cfe5e1] pt-3">
                 {upcomingPayments.slice(1, 4).map((payment: any) => (
                   <div className="flex items-center justify-between gap-3 text-xs" key={payment.id}>
-                    <span className="truncate text-[var(--foreground-secondary)]">{formatDate(payment.due_date)}</span>
+                    <span className="truncate text-[var(--foreground-secondary)]">{formatDate(payment.due_date, tx)}</span>
                     <span className="font-mono-data shrink-0 font-semibold text-[var(--foreground)]">{money(payment.amount, payment.currency || currency)}</span>
                   </div>
                 ))}
@@ -1357,12 +1348,12 @@ function ComingUpCard({
           <div className="rounded-[11px] border border-[var(--border)] bg-white p-4">
             <div className="mb-3 flex items-center justify-between gap-3">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Vehicle events</p>
-                <p className="mt-1 text-sm font-semibold text-[var(--foreground)]">{vehicle?.registration_number || vehicleTitle(vehicle) || "Assigned vehicle"}</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--muted)]">{tx.say("vehicleEvents")}</p>
+                <p className="mt-1 text-sm font-semibold text-[var(--foreground)]">{vehicle?.registration_number || vehicleTitle(vehicle) || tx.say("assignedVehicle")}</p>
               </div>
               {vehicle?.id ? (
                 <Link className="text-xs font-semibold text-[var(--primary)]" href={`/fleet/${vehicle.id}` as Route}>
-                  View vehicle
+                  {tx.say("viewVehicle")}
                 </Link>
               ) : null}
             </div>
@@ -1373,19 +1364,19 @@ function ComingUpCard({
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="truncate text-sm font-semibold">{event.label}</p>
-                        <p className="mt-1 text-xs font-semibold opacity-75">{formatDate(event.due_date)}</p>
+                        <p className="mt-1 text-xs font-semibold opacity-75">{formatDate(event.due_date, tx)}</p>
                       </div>
                       <span className="shrink-0 rounded-full bg-white px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.04em]">
-                        {eventTypeLabel(event.type)}
+                        {eventTypeLabel(event.type, tx)}
                       </span>
                     </div>
-                    <p className="mt-2 text-xs font-bold opacity-80">{daysUntilLabel(event.days_until)}</p>
+                    <p className="mt-2 text-xs font-bold opacity-80">{daysUntilLabel(event.days_until, tx)}</p>
                   </div>
                 ))}
               </div>
             ) : (
               <p className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3 text-sm font-semibold text-[var(--muted)]">
-                No compliance dates or vehicle tasks due in the next 180 days.
+                {tx.say("noEvents")}
               </p>
             )}
           </div>
@@ -1396,6 +1387,7 @@ function ComingUpCard({
 }
 
 function InspectionStatus({ label, inspection, href, available }: { label: string; inspection: any; href: Route; available: boolean }) {
+  const tx = useTx();
   if (inspection) {
     return (
       <div className="rounded-lg border border-[#bbf7d0] bg-[#f0fdf4] p-3">
@@ -1403,7 +1395,7 @@ function InspectionStatus({ label, inspection, href, available }: { label: strin
           <CheckCircle2 size={18} />
           {label}
         </div>
-        <p className="mt-1 text-sm text-[var(--muted)]">{formatDateTime(inspection.submitted_at || inspection.created_at)}</p>
+        <p className="mt-1 text-sm text-[var(--muted)]">{formatDateTime(inspection.submitted_at || inspection.created_at, tx)}</p>
       </div>
     );
   }
@@ -1416,43 +1408,43 @@ function InspectionStatus({ label, inspection, href, available }: { label: strin
       </div>
       {available ? (
         <Link className="primary-action pressable mt-3 px-3 py-2" href={href}>
-          Start now
+          {tx.say("startNow")}
         </Link>
       ) : (
-        <p className="mt-2 text-sm text-[var(--muted)]">Opens once the vehicle has been handed over.</p>
+        <p className="mt-2 text-sm text-[var(--muted)]">{tx.say("opensAfter")}</p>
       )}
     </div>
   );
 }
 
-function relativeTime(value: string | null | undefined) {
-  if (!value) return "Unknown time";
+function relativeTime(value: string | null | undefined, tx: Tx) {
+  if (!value) return tx.say("unknownTime");
   const date = new Date(value);
   const diffMs = Date.now() - date.getTime();
   const diffMinutes = Math.floor(diffMs / 60_000);
-  if (diffMinutes < 1) return "Just now";
-  if (diffMinutes < 60) return `${diffMinutes} minute${diffMinutes === 1 ? "" : "s"} ago`;
+  if (diffMinutes < 1) return tx.say("justNow");
+  if (diffMinutes < 60) return tx.say("minutesAgo", { count: diffMinutes });
   const diffHours = Math.floor(diffMinutes / 60);
-  if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? "" : "s"} ago`;
-  if (diffHours < 48) return "Yesterday";
-  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(date);
+  if (diffHours < 24) return tx.say("hoursAgo", { count: diffHours });
+  if (diffHours < 48) return tx.say("yesterday");
+  return formatDate(value, tx);
 }
 
-function communicationTypeBadge(type: string) {
+function communicationTypeBadge(type: string, tx: Tx) {
   const labels: Record<string, { label: string; className: string }> = {
-    automated_reminder: { label: "Message to customer", className: "border-[#bfdbfe] bg-[#eff6ff] text-[#2563eb]" },
-    manual_note: { label: "Note", className: "border-[var(--border)] bg-[#fbfaf8] text-[var(--foreground-secondary)]" },
-    customer_portal_action: { label: "Customer action", className: "border-[#bfe0db] bg-[var(--primary-light)] text-[var(--primary)]" },
-    booking_link_activity: { label: "Booking link", className: "border-[#ddd6fe] bg-[#f5f3ff] text-[#7c3aed]" },
-    operator_message: { label: "Message sent", className: "border-[var(--border)] bg-[#f1efeb] text-[var(--foreground-secondary)]" }
+    automated_reminder: { label: tx.say("ct_automated_reminder"), className: "border-[#bfdbfe] bg-[#eff6ff] text-[#2563eb]" },
+    manual_note: { label: tx.say("ct_manual_note"), className: "border-[var(--border)] bg-[#fbfaf8] text-[var(--foreground-secondary)]" },
+    customer_portal_action: { label: tx.say("ct_customer_portal_action"), className: "border-[#bfe0db] bg-[var(--primary-light)] text-[var(--primary)]" },
+    booking_link_activity: { label: tx.say("ct_booking_link_activity"), className: "border-[#ddd6fe] bg-[#f5f3ff] text-[#7c3aed]" },
+    operator_message: { label: tx.say("ct_operator_message"), className: "border-[var(--border)] bg-[#f1efeb] text-[var(--foreground-secondary)]" }
   };
   const config = labels[type] || { label: String(type || "Event").replace(/_/g, " "), className: "border-[var(--border)] bg-white text-[var(--foreground-secondary)]" };
   return <span className={`inline-flex items-center rounded-full border px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.04em] ${config.className}`}>{config.label}</span>;
 }
 
-function directionIndicator(direction?: string | null) {
-  if (direction === "outbound") return <span className="font-mono-data text-sm font-semibold text-[var(--primary)]" title="Outbound">-&gt;</span>;
-  if (direction === "inbound") return <span className="font-mono-data text-sm font-semibold text-[var(--primary)]" title="Inbound">&lt;-</span>;
+function directionIndicator(direction: string | null | undefined, tx: Tx) {
+  if (direction === "outbound") return <span className="font-mono-data text-sm font-semibold text-[var(--primary)]" title={tx.say("dirOut")}>-&gt;</span>;
+  if (direction === "inbound") return <span className="font-mono-data text-sm font-semibold text-[var(--primary)]" title={tx.say("dirIn")}>&lt;-</span>;
   return null;
 }
 
@@ -1473,12 +1465,12 @@ function channelIcon(channel?: string | null) {
   return label ? <span className="rounded-full border border-[var(--border)] bg-white px-2 py-1 text-[10px] font-semibold uppercase text-[var(--muted)]">{label}</span> : null;
 }
 
-function communicationStatusBadge(entry: any) {
+function communicationStatusBadge(entry: any, tx: Tx) {
   if (entry.timeline_type !== "automated_reminder" && entry.type !== "automated_reminder") return null;
-  if (entry.status === "failed") return <Badge tone="red">Not delivered</Badge>;
+  if (entry.status === "failed") return <Badge tone="red">{tx.say("cs_failed")}</Badge>;
   // No chat with this customer yet: the text is here to copy and send yourself.
-  if (entry.status === "pending") return <Badge tone="amber">Not sent yet: no chat with this customer</Badge>;
-  return <Badge tone="green">Sent</Badge>;
+  if (entry.status === "pending") return <Badge tone="amber">{tx.say("cs_pending")}</Badge>;
+  return <Badge tone="green">{tx.say("cs_sent")}</Badge>;
 }
 
 function CommunicationTimeline({
@@ -1497,6 +1489,7 @@ function CommunicationTimeline({
   rentalId: string;
   customerId: string | null;
 }) {
+  const tx = useTx();
   const pendingIds = new Set([...(pendingActions || []).map((action: any) => action.id), ...hiddenActionIds]);
   const historyEntries = (entries || []).filter((entry: any) => !(entry.source === "customer_portal_action" && pendingIds.has(entry.id)));
   const hasHistory = pendingActions.length > 0 || historyEntries.length > 0;
@@ -1504,7 +1497,7 @@ function CommunicationTimeline({
   if (!hasHistory) {
     return (
       <p className="empty-state mt-3 text-sm">
-        No communication history yet. Messages sent via RouteHQ and customer portal activity will appear here.
+        {tx.say("noComms")}
       </p>
     );
   }
@@ -1515,13 +1508,13 @@ function CommunicationTimeline({
         <div key={`pending-${action.id}`} className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2">
-              {communicationTypeBadge("customer_portal_action")}
-              <Badge tone="amber">Awaiting response</Badge>
+              {communicationTypeBadge("customer_portal_action", tx)}
+              <Badge tone="amber">{tx.say("awaitingResponse")}</Badge>
             </div>
-            <span className="text-xs font-bold uppercase text-[#b45309]">{relativeTime(action.created_at)}</span>
+            <span className="text-xs font-bold uppercase text-[#b45309]">{relativeTime(action.created_at, tx)}</span>
           </div>
-          <p className="text-sm font-semibold text-[var(--foreground)]">{portalActionSummary(action)}</p>
-          <a className="mt-1 inline-block text-sm font-semibold text-[var(--primary)]" href="#customer-requests">Answer it at the top of this page</a>
+          <p className="text-sm font-semibold text-[var(--foreground)]">{portalActionSummary(action, tx)}</p>
+          <a className="mt-1 inline-block text-sm font-semibold text-[var(--primary)]" href="#customer-requests">{tx.say("answerTop")}</a>
         </div>
       ))}
 
@@ -1529,14 +1522,14 @@ function CommunicationTimeline({
         <div className="sub-surface p-3" key={entry.timeline_id || entry.id}>
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2">
-              {communicationTypeBadge(entry.timeline_type || entry.type)}
-              {directionIndicator(entry.direction)}
+              {communicationTypeBadge(entry.timeline_type || entry.type, tx)}
+              {directionIndicator(entry.direction, tx)}
               {channelIcon(entry.channel)}
-              {communicationStatusBadge(entry)}
+              {communicationStatusBadge(entry, tx)}
             </div>
-            <span className="text-xs font-bold uppercase text-[var(--muted)]">{relativeTime(entry.created_at)}</span>
+            <span className="text-xs font-bold uppercase text-[var(--muted)]">{relativeTime(entry.created_at, tx)}</span>
           </div>
-          <p className="mt-2 whitespace-pre-line text-sm font-semibold leading-6 text-[var(--foreground-secondary)]">{entry.content || "No message content recorded."}</p>
+          <p className="mt-2 whitespace-pre-line text-sm font-semibold leading-6 text-[var(--foreground-secondary)]">{entry.content || tx.say("noContent")}</p>
           {(entry.status === "pending" || entry.status === "failed") && entry.metadata?.handoff_label ? (
             entry.metadata?.handoff_url ? (
               <a className="pressable mt-2 inline-flex min-h-9 items-center rounded-lg bg-[var(--primary)] px-3 text-xs font-semibold text-white" href={entry.metadata.handoff_url} rel="noreferrer" target="_blank">
@@ -1553,6 +1546,7 @@ function CommunicationTimeline({
 }
 
 async function CustomerPortalActionCard({ action, organizationId, rentalId, customerId }: { action: any; organizationId: string; rentalId: string; customerId: string | null }) {
+  const tx: Tx = { say: (await getTranslations("booking")) as unknown as Say, list: (await getTranslations("bookings")) as unknown as Say, locale: await getLocale() };
   const content = action.content || {};
   const picture = action.action_type === "extension_request" ? await extensionPicture(createSupabaseAdminClient() as any, organizationId, rentalId, content).catch(() => null) : null;
   const alreadyCovered =
@@ -1566,10 +1560,10 @@ async function CustomerPortalActionCard({ action, organizationId, rentalId, cust
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <Badge tone={action.action_type === "problem_report" ? "red" : action.action_type === "extension_request" ? "amber" : "blue"}>
-            {({ extension_request: "Wants to keep it longer", return_confirmation: "Return arranged", problem_report: "Problem reported", question: "Question" } as Record<string, string>)[String(action.action_type)] || String(action.action_type || "").replace(/_/g, " ")}
+            {["extension_request", "return_confirmation", "problem_report", "question"].includes(String(action.action_type)) ? tx.say(`req_${action.action_type}`) : String(action.action_type || "").replace(/_/g, " ")}
           </Badge>
-          <p className="mt-2 font-semibold text-[var(--foreground)]">{portalActionSummary(action)}</p>
-          <p className="mt-1 text-xs font-bold uppercase text-[var(--muted)]">{formatDateTime(action.created_at)}</p>
+          <p className="mt-2 font-semibold text-[var(--foreground)]">{portalActionSummary(action, tx)}</p>
+          <p className="mt-1 text-xs font-bold uppercase text-[var(--muted)]">{formatDateTime(action.created_at, tx)}</p>
         </div>
       </div>
       <div className="mt-3">
@@ -1580,9 +1574,9 @@ async function CustomerPortalActionCard({ action, organizationId, rentalId, cust
             <input name="actionId" type="hidden" value={action.id} />
             <input name="rentalId" type="hidden" value={rentalId} />
             <input name="notes" type="hidden" value="Already covered: the rental was extended past this date." />
-            <p className="text-sm text-[var(--foreground-secondary)]">The rental already runs to {niceDate(String(picture?.currentEnd))}, so there is nothing left to approve.</p>
-            <PendingButton className="secondary-action pressable mt-3 px-3 py-2" pendingLabel="Clearing..." type="submit">
-              Clear this request
+            <p className="text-sm text-[var(--foreground-secondary)]">{tx.say("alreadyRuns", { date: longDate(String(picture?.currentEnd).slice(0, 10), tx.locale) })}</p>
+            <PendingButton className="secondary-action pressable mt-3 px-3 py-2" pendingLabel={tx.say("clearing")} type="submit">
+              {tx.say("clearRequest")}
             </PendingButton>
           </form>
         ) : action.action_type === "extension_request" ? (
@@ -1593,11 +1587,11 @@ async function CustomerPortalActionCard({ action, organizationId, rentalId, cust
               <input name="actionId" type="hidden" value={action.id} />
               <input name="rentalId" type="hidden" value={rentalId} />
               <label className="block text-sm font-bold text-[#9f1239]">
-                Reason for the customer
-                <input className="mt-2 w-full rounded-lg border border-[#fecdd3] bg-white px-3 py-2 text-sm" name="note" placeholder="Optional. Sent to the customer with the answer." />
+                {tx.say("reasonLabel")}
+                <input className="mt-2 w-full rounded-lg border border-[#fecdd3] bg-white px-3 py-2 text-sm" name="note" placeholder={tx.say("reasonPlaceholder")} />
               </label>
-              <PendingButton className="pressable mt-3 w-full rounded-lg border border-[#fecdd3] bg-white px-3 py-2 text-sm font-semibold text-[#be123c]" pendingLabel="Declining..." type="submit">
-                Decline
+              <PendingButton className="pressable mt-3 w-full rounded-lg border border-[#fecdd3] bg-white px-3 py-2 text-sm font-semibold text-[#be123c]" pendingLabel={tx.say("declining")} type="submit">
+                {tx.say("decline")}
               </PendingButton>
             </form>
           </div>
@@ -1606,8 +1600,8 @@ async function CustomerPortalActionCard({ action, organizationId, rentalId, cust
             <input name="organizationId" type="hidden" value={organizationId} />
             <input name="actionId" type="hidden" value={action.id} />
             <input name="rentalId" type="hidden" value={rentalId} />
-            <PendingButton className="primary-action pressable px-3 py-2" pendingLabel="Confirming..." type="submit">
-              Confirm to the customer
+            <PendingButton className="primary-action pressable px-3 py-2" pendingLabel={tx.say("confirming")} type="submit">
+              {tx.say("confirmToCustomer")}
             </PendingButton>
           </form>
         ) : action.action_type === "problem_report" ? (
@@ -1615,9 +1609,9 @@ async function CustomerPortalActionCard({ action, organizationId, rentalId, cust
             <input name="organizationId" type="hidden" value={organizationId} />
             <input name="actionId" type="hidden" value={action.id} />
             <input name="rentalId" type="hidden" value={rentalId} />
-            <textarea className="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm" name="notes" placeholder="What you did about it (only you and your team see this)" />
-            <PendingButton className="primary-action pressable px-3 py-2" pendingLabel="Saving..." type="submit">
-              Mark as sorted
+            <textarea className="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm" name="notes" placeholder={tx.say("whatYouDid")} />
+            <PendingButton className="primary-action pressable px-3 py-2" pendingLabel={tx.say("saving")} type="submit">
+              {tx.say("markSorted")}
             </PendingButton>
           </form>
         ) : (
@@ -1626,9 +1620,9 @@ async function CustomerPortalActionCard({ action, organizationId, rentalId, cust
             <input name="actionId" type="hidden" value={action.id} />
             <input name="rentalId" type="hidden" value={rentalId} />
             {customerId ? <input name="customerId" type="hidden" value={customerId} /> : null}
-            <textarea className="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm" name="reply" placeholder="Your answer, sent to the customer" required />
-            <PendingButton className="primary-action pressable px-3 py-2" pendingLabel="Sending..." type="submit">
-              Send answer
+            <textarea className="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm" name="reply" placeholder={tx.say("answerPlaceholder")} required />
+            <PendingButton className="primary-action pressable px-3 py-2" pendingLabel={tx.say("sending")} type="submit">
+              {tx.say("sendAnswer")}
             </PendingButton>
           </form>
         )}
@@ -1637,11 +1631,22 @@ async function CustomerPortalActionCard({ action, organizationId, rentalId, cust
   );
 }
 
-function portalActionSummary(action: any) {
+function portalActionSummary(action: any, tx: Tx) {
   const content = action.content || {};
-  if (action.action_type === "extension_request") return `${content.open_ended ? "Asked to switch to monthly, open-ended" : `Asked to keep it until ${content.new_end_date ? niceDate(content.new_end_date) : "a later date"}`}${content.note ? ` - ${content.note}` : ""}`;
-  if (action.action_type === "return_confirmation") return `Return ${content.return_date || ""} ${content.return_time || ""}${content.return_location ? ` at ${content.return_location}` : ""}`.trim();
-  if (action.action_type === "problem_report") return `${content.category || "Problem"}: ${content.description || "No description"}`;
-  if (action.action_type === "question") return content.question || "Customer question";
-  return "Request from the customer";
+  if (action.action_type === "extension_request") {
+    const asked = content.open_ended
+      ? tx.say("sum_openEnded")
+      : content.new_end_date
+        ? tx.say("sum_until", { date: longDate(String(content.new_end_date).slice(0, 10), tx.locale) })
+        : tx.say("sum_later");
+    return `${asked}${content.note ? ` - ${content.note}` : ""}`;
+  }
+  if (action.action_type === "return_confirmation") {
+    const day = /^\d{4}-\d{2}-\d{2}/.test(String(content.return_date || "")) ? longDate(String(content.return_date).slice(0, 10), tx.locale) : String(content.return_date || "");
+    const when = `${day} ${content.return_time || ""}`.trim();
+    return content.return_location ? tx.say("sum_returnAt", { when, place: String(content.return_location) }) : tx.say("sum_return", { when });
+  }
+  if (action.action_type === "problem_report") return `${content.category || tx.say("problem")}: ${content.description || tx.say("noDescription")}`;
+  if (action.action_type === "question") return content.question || tx.say("sum_question");
+  return tx.say("sum_other");
 }

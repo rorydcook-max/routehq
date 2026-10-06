@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/app-shell";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDefaultOrganization } from "@/lib/organization";
@@ -12,6 +13,7 @@ export default async function NewTransactionPage({
   searchParams: Promise<{ vehicleId?: string; rentalId?: string; customerId?: string; rentalPaymentId?: string; taskId?: string }>;
 }) {
   const params = await searchParams;
+  const t = await getTranslations("money");
   const [userEmail, organization] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization()]);
   const [waiting, options, prefill] = await Promise.all([
     listPaymentsWaiting(organization.id).catch(() => []),
@@ -28,10 +30,10 @@ export default async function NewTransactionPage({
       <div className="mx-auto max-w-xl">
         <div className="page-hero mb-5">
           <Link className="text-sm font-bold text-[var(--primary)]" href="/transactions">
-            Back to money in & out
+            {t("back")}
           </Link>
-          <h1 className="page-title mt-2">Record money in or out</h1>
-          <p className="page-subtitle mt-2">A payment you received, or something you paid for.</p>
+          <h1 className="page-title mt-2">{t("recordTitle")}</h1>
+          <p className="page-subtitle mt-2">{t("recordSubtitle")}</p>
         </div>
 
         <TransactionForm

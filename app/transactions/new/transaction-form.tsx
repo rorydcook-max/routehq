@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState, useTransition } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { shortDate } from "@/lib/i18n/dates";
 import { createTransaction, findTransactionMatches } from "@/app/actions/transactions";
 import { PendingButton } from "@/components/pending-button";
 import { Card } from "@/components/ui";
@@ -32,6 +34,21 @@ export function TransactionForm({
   /** Payments the business is waiting for, shown first so the usual case is one tap. */
   waiting?: MatchResult[];
 }) {
+  const t = useTranslations("money");
+  const say = t as unknown as (key: string, values?: Record<string, string | number>) => string;
+  const locale = useLocale();
+  const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date());
+  // A scheduled payment is named here, in the reader's language; anything else keeps the name it came with.
+  const matchLabel = (match: MatchResult) =>
+    match.kind ? say(`match_${match.kind}`, { amount: `฿${Math.round(match.amount || 0).toLocaleString("en-US")}`, vehicle: match.vehicleName || match.vehicleLabel || "" }) : match.label;
+  const matchWhen = (match: MatchResult) =>
+    !match.kind
+      ? match.subLabel
+      : !match.dueDate
+        ? ""
+        : match.dueDate === today
+          ? say("dueToday")
+          : say(match.dueDate < today ? "wasDueOn" : "dueOn", { date: shortDate(match.dueDate, locale) });
   const [type, setType] = useState(prefill?.type || "rental_income");
   const [amount, setAmount] = useState(prefill?.amount || "");
   // Today in business time: toISOString() is UTC, which is still "yesterday" in Thailand before 7am.
@@ -124,7 +141,7 @@ export function TransactionForm({
   }
 
   const isMoneyIn = MONEY_IN.includes(type);
-  const linkedBadge = linkedRentalPaymentId ? "Check the amount and date, then save. That payment is marked as paid on the booking." : linkedTaskId ? "Saving this ticks off the matching job on your To do list." : "";
+  const linkedBadge = linkedRentalPaymentId ? say("linkedPayment") : linkedTaskId ? say("linkedTask") : "";
   const chooseDirection = (moneyIn: boolean) => {
     if (moneyIn === isMoneyIn) return;
     setType(moneyIn ? "rental_income" : "repair");
@@ -148,7 +165,7 @@ export function TransactionForm({
             onClick={() => chooseDirection(moneyIn)}
             type="button"
           >
-            {moneyIn ? "Money in" : "Money out"}
+            {moneyIn ? say("moneyIn") : say("moneyOut")}
           </button>
         ))}
       </div>
@@ -164,24 +181,24 @@ export function TransactionForm({
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="text-[15px] font-semibold text-[var(--foreground)]">
-                {matches.length === 1 ? "Is it this payment you are waiting for?" : "Is it one of these payments you are waiting for?"}
+                {matches.length === 1 ? say("matchOne") : say("matchMany")}
               </p>
-              <p className="mt-0.5 text-[13px] text-[var(--foreground-secondary)]">Choose it and the booking is marked as paid too.</p>
+              <p className="mt-0.5 text-[13px] text-[var(--foreground-secondary)]">{say("matchHint")}</p>
             </div>
-            {isMatching ? <span className="text-xs font-semibold text-[var(--muted)]">Checking...</span> : null}
+            {isMatching ? <span className="text-xs font-semibold text-[var(--muted)]">{say("checking")}</span> : null}
           </div>
           <div className="mt-3 space-y-2">
             {(showAllMatches ? matches : matches.slice(0, 5)).map((match) => (
               <div className="rounded-lg border border-[#bfe0db] bg-white p-3" key={match.id}>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p className="font-semibold text-[var(--foreground)]">{match.label}</p>
+                    <p className="font-semibold text-[var(--foreground)]">{matchLabel(match)}</p>
                     <p className="mt-1 text-sm text-[var(--muted)]">
-                      {[match.customerName, match.subLabel].filter(Boolean).join(" · ")}
+                      {[match.customerName, matchWhen(match)].filter(Boolean).join(" · ")}
                     </p>
                   </div>
                   <button className="primary-action pressable min-h-9 px-3 text-xs" onClick={() => acceptMatch(match)} type="button">
-                    Yes, this one
+                    {say("yesThis")}
                   </button>
                 </div>
               </div>
@@ -189,7 +206,7 @@ export function TransactionForm({
           </div>
           {!showAllMatches && matches.length > 5 ? (
             <button className="mt-3 block text-sm font-semibold text-[var(--primary)]" onClick={() => setShowAllMatches(true)} type="button">
-              Show {matches.length - 5} more
+              {say("showMore", { count: matches.length - 5 })}
             </button>
           ) : null}
           <button
@@ -200,7 +217,7 @@ export function TransactionForm({
             }}
             type="button"
           >
-            No, it is something else
+            {say("somethingElse")}
           </button>
         </div>
       ) : null}
@@ -208,18 +225,18 @@ export function TransactionForm({
       <Card>
         <div className="card-section grid gap-3 sm:grid-cols-2">
           <label className="block sm:col-span-2">
-            <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">What was it for?</span>
+            <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("whatFor")}</span>
             <select className={inputClass} name="type" onChange={(event) => setType(event.target.value)} required value={type}>
               {TRANSACTION_TYPE_OPTIONS.filter((option) => option.value !== "deposit" && MONEY_IN.includes(option.value) === isMoneyIn).map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.label}
+                  {t.has(`type_${option.value}`) ? say(`type_${option.value}`) : option.label}
                 </option>
               ))}
             </select>
           </label>
 
           <label className="block sm:col-span-2">
-            <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">Vehicle</span>
+            <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("vehicle")}</span>
             <select
               className={inputClass}
               name="vehicleId"
@@ -230,7 +247,7 @@ export function TransactionForm({
               required
               value={vehicleId}
             >
-              <option value="">Select vehicle</option>
+              <option value="">{say("selectVehicle")}</option>
               {options.vehicles.map((vehicle) => (
                 <option key={vehicle.id} value={vehicle.id}>
                   {vehicle.label}
@@ -240,14 +257,14 @@ export function TransactionForm({
           </label>
 
           <label className="block">
-            <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">Booking (optional)</span>
+            <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("booking")}</span>
             <select
               className={inputClass}
               name="rentalId"
               onChange={(event) => handleRentalChange(event.target.value)}
               value={rentalId}
             >
-              <option value="">No booking</option>
+              <option value="">{say("noBooking")}</option>
               {rentalsForVehicle.map((rental) => (
                 <option key={rental.id} value={rental.id}>
                   {rental.label}
@@ -257,9 +274,9 @@ export function TransactionForm({
           </label>
 
           <label className="block">
-            <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">Customer (optional)</span>
+            <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("customer")}</span>
             <select className={inputClass} name="customerId" onChange={(event) => setCustomerId(event.target.value)} value={customerId}>
-              <option value="">No customer</option>
+              <option value="">{say("noCustomer")}</option>
               {options.customers.map((customer) => (
                 <option key={customer.id} value={customer.id}>
                   {customer.label}
@@ -269,36 +286,36 @@ export function TransactionForm({
           </label>
 
           <label className="block">
-            <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">Amount (฿)</span>
+            <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("amount")}</span>
             <input className={inputClass} inputMode="decimal" min="0" name="amount" onChange={(event) => setAmount(event.target.value)} required step="0.01" type="number" value={amount} />
           </label>
 
           <label className="block">
-            <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">Date</span>
+            <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("date")}</span>
             <input className={inputClass} name="transactionDate" onChange={(event) => setTransactionDate(event.target.value)} required type="date" value={transactionDate} />
           </label>
 
           {isMoneyIn ? null : (
             <>
               <label className="block">
-                <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">Paid to (optional)</span>
-                <input className={inputClass} name="supplier" placeholder="Garage, fuel station, insurer" />
+                <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("paidTo")}</span>
+                <input className={inputClass} name="supplier" placeholder={say("paidToPlaceholder")} />
               </label>
 
               <label className="block">
-                <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">Mileage (optional)</span>
+                <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("mileage")}</span>
                 <input className={inputClass} min="0" name="mileage" type="number" />
               </label>
             </>
           )}
 
           <label className="block sm:col-span-2">
-            <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">Notes (optional)</span>
-            <textarea className={inputClass} name="notes" onChange={(event) => setNotes(event.target.value)} placeholder="Anything worth remembering" rows={3} value={notes} />
+            <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("notes")}</span>
+            <textarea className={inputClass} name="notes" onChange={(event) => setNotes(event.target.value)} placeholder={say("notesPlaceholder")} rows={3} value={notes} />
           </label>
 
           <label className="block sm:col-span-2">
-            <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">Receipt photo (optional)</span>
+            <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("receipt")}</span>
             {/* No forced camera: a receipt is as often a screenshot or a photo taken earlier. The phone offers camera or library. */}
             <input accept="image/*,application/pdf" className={`${inputClass} file:mr-3 file:rounded-md file:border-0 file:bg-[var(--primary-light)] file:px-3 file:py-1.5 file:text-[13px] file:font-semibold file:text-[var(--primary)]`} name="receipt" type="file" />
           </label>
@@ -307,10 +324,10 @@ export function TransactionForm({
 
       <div className="sticky-actions sticky z-10 -mx-1 flex flex-col-reverse gap-2 bg-[var(--background)] px-1 py-3 sm:flex-row sm:justify-end">
         <Link className="secondary-action pressable justify-center text-center" href="/transactions">
-          Cancel
+          {say("cancel")}
         </Link>
-        <PendingButton className="primary-action justify-center" pendingLabel="Saving…" type="submit">
-          Save
+        <PendingButton className="primary-action justify-center" pendingLabel={say("saving")} type="submit">
+          {say("save")}
         </PendingButton>
       </div>
     </form>

@@ -2,6 +2,9 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+
+type Say = (key: string, values?: Record<string, string | number>) => string;
 import { applyDepositDeduction, returnDeposit } from "@/app/actions/deposits";
 import { recordPaymentRefund } from "@/app/actions/bookings";
 
@@ -43,6 +46,8 @@ export function RefundDepositPanel({
   earlyReturn = null
 }: Props) {
   const router = useRouter();
+  const t = useTranslations("booking");
+  const say = t as unknown as Say;
   const [activeForm, setActiveForm] = useState<ActiveForm>(null);
   const [collapsed, setCollapsed] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -76,7 +81,7 @@ export function RefundDepositPanel({
         setMessage(successMessage);
         router.refresh();
       } catch (caught) {
-        setError(caught instanceof Error ? caught.message : "Something went wrong.");
+        setError(caught instanceof Error ? caught.message : say("ref_wrong"));
       }
     });
   }
@@ -89,27 +94,27 @@ export function RefundDepositPanel({
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Refunds & deposit</p>
+          <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">{say("ref_title")}</p>
           <p className="mt-1 text-sm font-semibold text-[var(--foreground)]">
             {depositHeld > 0
               ? [
-                  `Deposit taken: ${money(depositHeld, currency)}`,
-                  depositRefunded > 0 ? `Returned: ${money(depositRefunded, currency)}` : null,
-                  depositForfeited > 0 ? `Kept: ${money(depositForfeited, currency)}` : null,
-                  `Still held: ${money(available, currency)}`
+                  say("ref_taken", { amount: money(depositHeld, currency) }),
+                  depositRefunded > 0 ? say("ref_returned", { amount: money(depositRefunded, currency) }) : null,
+                  depositForfeited > 0 ? say("ref_kept", { amount: money(depositForfeited, currency) }) : null,
+                  say("ref_held", { amount: money(available, currency) })
                 ]
                   .filter(Boolean)
                   .join(" · ")
-              : "No deposit held"}
+              : say("ref_none")}
           </p>
-          {depositHeld > 0 && available === 0 ? <p className="mt-1 text-xs font-semibold text-[var(--muted)]">Deposit settled. Nothing left to return.</p> : null}
+          {depositHeld > 0 && available === 0 ? <p className="mt-1 text-xs font-semibold text-[var(--muted)]">{say("ref_settled")}</p> : null}
         </div>
         <button
           className="pressable rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground-secondary)]"
           type="button"
           onClick={() => setCollapsed((value) => !value)}
         >
-          {collapsed ? "Manage" : "Hide"}
+          {collapsed ? say("ref_manage") : say("ref_hide")}
         </button>
       </div>
 
@@ -118,11 +123,17 @@ export function RefundDepositPanel({
           {earlyReturn && canRefundPayment ? (
             <div className="mt-3 rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3 text-sm text-[#92400e]">
               <p>
-                Returned {earlyReturn.unusedDays} {earlyReturn.unusedDays === 1 ? "day" : "days"} before the paid time ran out. Pro rata that is{" "}
-                <span className="font-semibold">{money(earlyReturn.amount, currency)}</span> of the {money(earlyReturn.paid, currency)} paid ({earlyReturn.unusedDays} of {earlyReturn.periodDays} days). Refunding it, or part of it, is up to you.
+                {t.rich("ref_early", {
+                  days: earlyReturn.unusedDays,
+                  amount: money(earlyReturn.amount, currency),
+                  paid: money(earlyReturn.paid, currency),
+                  unused: earlyReturn.unusedDays,
+                  period: earlyReturn.periodDays,
+                  b: (chunks: React.ReactNode) => <span className="font-semibold">{chunks}</span>
+                })}
               </p>
               <button className="pressable mt-2 rounded-lg border border-[#fbbf24] bg-white px-3 py-1.5 text-xs font-semibold text-[#92400e]" onClick={() => openForm("refund")} type="button">
-                Refund {money(earlyReturn.amount, currency)} or another amount
+                {say("ref_earlyButton", { amount: money(earlyReturn.amount, currency) })}
               </button>
             </div>
           ) : null}
@@ -134,14 +145,14 @@ export function RefundDepositPanel({
                   type="button"
                   onClick={() => openForm("return")}
                 >
-                  Return deposit
+                  {say("ref_returnDeposit")}
                 </button>
                 <button
                   className="pressable rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground)]"
                   type="button"
                   onClick={() => openForm("deduction")}
                 >
-                  Record deduction
+                  {say("ref_recordDeduction")}
                 </button>
               </>
             ) : null}
@@ -151,11 +162,11 @@ export function RefundDepositPanel({
                 type="button"
                 onClick={() => openForm("refund")}
               >
-                Refund payment
+                {say("ref_refundPayment")}
               </button>
             ) : null}
             {!canUseDeposit && !canRefundPayment ? (
-              <p className="text-sm font-semibold text-[var(--muted)]">No deposit balance or rental payment is available to refund.</p>
+              <p className="text-sm font-semibold text-[var(--muted)]">{say("ref_nothing")}</p>
             ) : null}
           </div>
 
@@ -164,11 +175,11 @@ export function RefundDepositPanel({
               className="mt-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3"
               onSubmit={(event) => {
                 event.preventDefault();
-                submit(new FormData(event.currentTarget), "Deposit returned", returnDeposit);
+                submit(new FormData(event.currentTarget), say("ref_depositReturned"), returnDeposit);
               }}
             >
               <label className="block text-xs font-bold text-[var(--foreground-secondary)]">
-                Amount to return
+                {say("ref_amountReturn")}
                 <input
                   className="mt-1 w-full"
                   defaultValue={available}
@@ -180,10 +191,10 @@ export function RefundDepositPanel({
                 />
               </label>
               <label className="mt-3 block text-xs font-bold text-[var(--foreground-secondary)]">
-                Notes
-                <textarea className="mt-1 w-full" name="notes" placeholder="Optional notes" />
+                {say("ref_notes")}
+                <textarea className="mt-1 w-full" name="notes" placeholder={say("ref_optionalNotes")} />
               </label>
-              <FormActions isPending={isPending} label="Confirm return" onCancel={() => setActiveForm(null)} />
+              <FormActions isPending={isPending} label={say("ref_confirmReturn")} onCancel={() => setActiveForm(null)} />
             </form>
           ) : null}
 
@@ -192,11 +203,11 @@ export function RefundDepositPanel({
               className="mt-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3"
               onSubmit={(event) => {
                 event.preventDefault();
-                submit(new FormData(event.currentTarget), "Deduction recorded", applyDepositDeduction);
+                submit(new FormData(event.currentTarget), say("ref_deductionRecorded"), applyDepositDeduction);
               }}
             >
               <label className="block text-xs font-bold text-[var(--foreground-secondary)]">
-                Deduction amount
+                {say("ref_deductionAmount")}
                 <input
                   className="mt-1 w-full"
                   max={available}
@@ -207,14 +218,14 @@ export function RefundDepositPanel({
                 />
               </label>
               <label className="mt-3 block text-xs font-bold text-[var(--foreground-secondary)]">
-                Reason
-                <input className="mt-1 w-full" name="reason" placeholder="Damage, late return, unpaid rent..." required type="text" />
+                {say("ref_reason")}
+                <input className="mt-1 w-full" name="reason" placeholder={say("ref_reasonPlaceholder")} required type="text" />
               </label>
               <label className="mt-3 block text-xs font-bold text-[var(--foreground-secondary)]">
-                Notes
-                <textarea className="mt-1 w-full" name="notes" placeholder="Optional notes" />
+                {say("ref_notes")}
+                <textarea className="mt-1 w-full" name="notes" placeholder={say("ref_optionalNotes")} />
               </label>
-              <FormActions isPending={isPending} label="Confirm deduction" onCancel={() => setActiveForm(null)} />
+              <FormActions isPending={isPending} label={say("ref_confirmDeduction")} onCancel={() => setActiveForm(null)} />
             </form>
           ) : null}
 
@@ -223,11 +234,11 @@ export function RefundDepositPanel({
               className="mt-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3"
               onSubmit={(event) => {
                 event.preventDefault();
-                submit(new FormData(event.currentTarget), "Refund recorded", recordPaymentRefund);
+                submit(new FormData(event.currentTarget), say("ref_refundRecorded"), recordPaymentRefund);
               }}
             >
               <label className="block text-xs font-bold text-[var(--foreground-secondary)]">
-                Refund amount
+                {say("ref_refundAmount")}
                 <input
                   className="mt-1 w-full"
                   defaultValue={earlyReturn ? Math.min(earlyReturn.amount, totalPaid) : totalPaid}
@@ -239,10 +250,10 @@ export function RefundDepositPanel({
                 />
               </label>
               <label className="mt-3 block text-xs font-bold text-[var(--foreground-secondary)]">
-                Reason / notes
-                <textarea className="mt-1 w-full" defaultValue={earlyReturn ? `Unused days after early return (${earlyReturn.unusedDays} of ${earlyReturn.periodDays})` : ""} name="notes" placeholder="Optional reason for this refund" />
+                {say("ref_reasonNotes")}
+                <textarea className="mt-1 w-full" defaultValue={earlyReturn ? say("ref_unusedNote", { unused: earlyReturn.unusedDays, period: earlyReturn.periodDays }) : ""} name="notes" placeholder={say("ref_refundReason")} />
               </label>
-              <FormActions isPending={isPending} label="Confirm refund" onCancel={() => setActiveForm(null)} />
+              <FormActions isPending={isPending} label={say("ref_confirmRefund")} onCancel={() => setActiveForm(null)} />
             </form>
           ) : null}
 
@@ -263,6 +274,7 @@ function FormActions({
   label: string;
   onCancel: () => void;
 }) {
+  const say = useTranslations("booking") as unknown as Say;
   return (
     <div className="mt-3 flex flex-wrap gap-2">
       <button
@@ -270,7 +282,7 @@ function FormActions({
         disabled={isPending}
         type="submit"
       >
-        {isPending ? "Saving..." : label}
+        {isPending ? say("saving") : label}
       </button>
       <button
         className="pressable rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground-secondary)]"
@@ -278,7 +290,7 @@ function FormActions({
         type="button"
         onClick={onCancel}
       >
-        Cancel
+        {say("cancelBtn")}
       </button>
     </div>
   );

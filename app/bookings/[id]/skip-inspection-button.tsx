@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { manuallyActivateRental } from "@/app/actions/bookings";
 
 export function SkipInspectionButton({ rentalId }: { rentalId: string }) {
+  const say = useTranslations("booking") as unknown as (key: string) => string;
   const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -13,7 +15,7 @@ export function SkipInspectionButton({ rentalId }: { rentalId: string }) {
     startTransition(async () => {
       const result = await manuallyActivateRental(rentalId);
       if (!result.success) {
-        setError(result.error || "That did not save. Please try again.");
+        setError(result.error || say("skip_failed"));
         setShowConfirm(false);
       }
     });
@@ -23,7 +25,7 @@ export function SkipInspectionButton({ rentalId }: { rentalId: string }) {
     return (
       <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
         <p className="mb-2 text-xs font-semibold text-[#92400e]">
-          Mark the vehicle as handed over without the form? You will have no photos, fuel level or signature to rely on if there is a dispute. The form can still be filled in later.
+          {say("skip_confirm")}
         </p>
         <div className="flex gap-2">
           <button
@@ -32,7 +34,7 @@ export function SkipInspectionButton({ rentalId }: { rentalId: string }) {
             onClick={handleConfirm}
             type="button"
           >
-            {isPending ? "Saving…" : "Yes, hand over without it"}
+            {isPending ? say("saving") : say("skip_yes")}
           </button>
           <button
             className="pressable inline-flex min-h-7 items-center rounded-lg border border-[var(--border)] bg-white px-3 text-xs font-bold text-[var(--foreground-secondary)]"
@@ -40,7 +42,7 @@ export function SkipInspectionButton({ rentalId }: { rentalId: string }) {
             onClick={() => setShowConfirm(false)}
             type="button"
           >
-            Cancel
+            {say("cancelBtn")}
           </button>
         </div>
       </div>
@@ -54,7 +56,7 @@ export function SkipInspectionButton({ rentalId }: { rentalId: string }) {
         onClick={() => setShowConfirm(true)}
         type="button"
       >
-        Hand over without the form
+        {say("skip_button")}
       </button>
       {error ? <p className="mt-1 text-xs font-semibold text-[#dc2626]">{error}</p> : null}
     </>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Plus } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { getCurrentUserEmail } from "@/lib/auth/session";
@@ -13,18 +14,19 @@ export default async function BookingsPage() {
   // Holds that ran out without a signature give their dates back.
   await releaseExpiredHolds(createSupabaseAdminClient(), organization.id).catch(() => null);
   const bookings = await getBookingList(organization.id);
+  const t = await getTranslations("bookings");
 
   return (
     <AppShell userEmail={userEmail}>
       <div className="page-hero mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="page-eyebrow">Bookings</p>
-          <h1 className="page-title">Bookings</h1>
-          <p className="page-subtitle mt-1">Every rental, from booking link to return.</p>
+          <p className="page-eyebrow">{t("eyebrow")}</p>
+          <h1 className="page-title">{t("title")}</h1>
+          <p className="page-subtitle mt-1">{t("subtitle")}</p>
         </div>
         <Link className="primary-action pressable" href="/bookings/new">
           <Plus size={18} />
-          Create booking
+          {t("create")}
         </Link>
       </div>
 

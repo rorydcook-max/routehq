@@ -1,9 +1,11 @@
 "use client";
 
 import { useTransition, useState } from "react";
+import { useTranslations } from "next-intl";
 import { sendPaymentReminder } from "@/app/actions/transactions";
 
 export function PaymentReminderButton({ rentalId }: { rentalId: string }) {
+  const say = useTranslations("booking") as unknown as (key: string) => string;
   const [isPending, startTransition] = useTransition();
   const [toast, setToast] = useState<{ success: boolean; message: string } | null>(null);
 
@@ -14,7 +16,7 @@ export function PaymentReminderButton({ rentalId }: { rentalId: string }) {
       if (res.whatsappUrl) {
         window.open(res.whatsappUrl, "_blank", "noopener,noreferrer");
       }
-      setToast({ success: res.success, message: res.message ?? (res.success ? "Reminder sent" : "No contact channel available") });
+      setToast({ success: res.success, message: res.message ?? (res.success ? say("remind_sent") : say("remind_noChannel")) });
       setTimeout(() => setToast(null), 5000);
     });
   }
@@ -30,10 +32,10 @@ export function PaymentReminderButton({ rentalId }: { rentalId: string }) {
         {isPending ? (
           <>
             <span aria-hidden="true" className="spinner" />
-            <span>Sending…</span>
+            <span>{say("sending")}</span>
           </>
         ) : (
-          "Send payment reminder"
+          say("remind_send")
         )}
       </button>
 

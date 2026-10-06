@@ -6,7 +6,8 @@ import Link from "next/link";
 import type { Route } from "next";
 import { answerExtensionRequest } from "@/app/actions/portal-actions";
 import type { ExtensionPicture } from "@/lib/extension-picture";
-import { niceDate } from "@/lib/nice-date";
+import { useLocale, useTranslations } from "next-intl";
+import { longDate } from "@/lib/i18n/dates";
 
 /**
  * The owner's side of a request to stay longer. When nothing is in the way it
@@ -16,6 +17,11 @@ import { niceDate } from "@/lib/nice-date";
  */
 export function ExtensionRequestAnswer({ actionId, rentalId, picture, requestedEnd, openEnded }: { actionId: string; rentalId: string; picture: ExtensionPicture | null; requestedEnd: string | null; openEnded: boolean }) {
   const router = useRouter();
+  const t = useTranslations("booking");
+  const say = t as unknown as (key: string, values?: Record<string, string | number>) => string;
+  const locale = useLocale();
+  const niceDate = (value: string | null | undefined) => (value ? longDate(String(value).slice(0, 10), locale) : "");
+  const strong = (chunks: React.ReactNode) => <span className="font-semibold text-[var(--foreground)]">{chunks}</span>;
   const [pending, startTransition] = useTransition();
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -47,41 +53,40 @@ export function ExtensionRequestAnswer({ actionId, rentalId, picture, requestedE
     <div className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
       {worth ? (
         <p className="text-sm text-[var(--foreground-secondary)]">
-          Saying yes is worth <span className="font-semibold text-[var(--foreground)]">{worth.perMonth ? `${money(worth.amount)} a month, for as long as they stay` : money(worth.amount)}</span>
-          {!worth.perMonth && worth.explain ? ` (${worth.explain})` : ""}.
+          {t.rich(worth.perMonth ? "ext_worthMonthly" : worth.explain ? "ext_worthExplained" : "ext_worth", { amount: money(worth.amount), explain: String(worth.explain || ""), b: strong })}
         </p>
       ) : null}
 
       {!blocked ? (
         <div className="mt-3">
           {openEnded ? (
-            <p className="text-sm text-[var(--foreground-secondary)]">Changes the rental to monthly with no end date and schedules the monthly rent. The customer is told.</p>
+            <p className="text-sm text-[var(--foreground-secondary)]">{say("ext_openEndedNote")}</p>
           ) : (
             <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
-              New return date
+              {say("ext_newReturn")}
               <input className="mt-2 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm" min={picture?.currentEnd || undefined} onChange={(event) => setEndDate(event.target.value)} type="date" value={endDate} />
-              <span className="mt-1 block text-xs font-normal text-[var(--muted)]">The extra days are priced from your rates and added as a payment. The customer is told.</span>
+              <span className="mt-1 block text-xs font-normal text-[var(--muted)]">{say("ext_priced")}</span>
             </label>
           )}
           <button className={`${primary} mt-3`} disabled={pending || (!openEnded && !endDate)} onClick={() => answer("approve", openEnded ? { openEnded: true } : { newEndDate: endDate })} type="button">
-            {busy === "approve" ? "Approving..." : openEnded ? "Approve monthly, open-ended" : "Approve extension"}
+            {busy === "approve" ? say("ext_approving") : openEnded ? say("ext_approveOpen") : say("ext_approve")}
           </button>
         </div>
       ) : (
         <div className="mt-3 space-y-3">
           <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
-            <p className="text-xs font-bold uppercase text-[#92400e]">{blockers.length === 1 ? "Another booking is in the way" : `${blockers.length} bookings are in the way`}</p>
+            <p className="text-xs font-bold uppercase text-[#92400e]">{blockers.length === 1 ? say("ext_blockOne") : say("ext_blockMany", { count: blockers.length })}</p>
             {blockers.map((item) => (
               <div className="mt-2 text-sm text-[var(--foreground)]" key={item.rentalId}>
                 <Link className="font-semibold text-[var(--primary)]" href={`/bookings/${item.rentalId}` as Route}>
-                  {item.customerName || "No customer yet"}
+                  {item.customerName || say("ext_noCustomer")}
                   {item.code ? ` (${item.code})` : ""}
                 </Link>
                 <span className="text-[var(--foreground-secondary)]">
                   {" "}
-                  has the {item.vehicle} from {niceDate(item.startDate)} {item.endDate ? `to ${niceDate(item.endDate)}` : "with no end date"}.{" "}
-                  {item.total > 0 ? `Worth ${money(item.total)}${item.paid > 0 ? `, ${money(item.paid)} paid` : ", nothing paid yet"}. ` : "No price set. "}
-                  {item.signed ? "Agreement signed." : "Not signed yet."}
+                  {item.endDate ? say("ext_hasTo", { vehicle: item.vehicle, start: niceDate(item.startDate), end: niceDate(item.endDate) }) : say("ext_hasOpen", { vehicle: item.vehicle, start: niceDate(item.startDate) })}{" "}
+                  {item.total > 0 ? (item.paid > 0 ? say("ext_worthPaid", { total: money(item.total), paid: money(item.paid) }) : say("ext_worthUnpaid", { total: money(item.total) })) : say("ext_noPrice")}{" "}
+                  {item.signed ? say("ext_signed") : say("ext_notSigned")}
                 </span>
               </div>
             ))}
@@ -89,16 +94,20 @@ export function ExtensionRequestAnswer({ actionId, rentalId, picture, requestedE
 
           {blocker && blocker.signed ? (
             <p className="rounded-lg border border-[var(--border)] bg-white p-3 text-sm text-[var(--foreground-secondary)]">
-              {blocker.customerName || "That customer"} has signed for the {blocker.vehicle}, so moving them needs their signature.{" "}
-              <Link className="font-semibold text-[var(--primary)] underline" href={`/bookings/${blocker.rentalId}` as Route}>
-                Open their booking
-              </Link>{" "}
-              and use More &gt; Change vehicle. Once they have signed, come back and approve this.
+              {t.rich("ext_signedMove", {
+                name: blocker.customerName || say("ext_thatCustomer"),
+                vehicle: blocker.vehicle,
+                link: (chunks: React.ReactNode) => (
+                  <Link className="font-semibold text-[var(--primary)] underline" href={`/bookings/${blocker.rentalId}` as Route}>
+                    {chunks}
+                  </Link>
+                )
+              })}
             </p>
           ) : blocker && blocker.options.length > 0 ? (
             <div className="rounded-lg border border-[var(--border)] bg-white p-3">
               <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
-                Move {blocker.customerName || "the other booking"} to another vehicle
+                {say("ext_moveLabel", { name: blocker.customerName || say("ext_otherBooking") })}
                 <select className="mt-2 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-normal" onChange={(event) => setMoveTo(event.target.value)} value={moveTo}>
                   {blocker.options.map((option) => (
                     <option key={option.vehicleId} value={option.vehicleId}>
@@ -108,7 +117,7 @@ export function ExtensionRequestAnswer({ actionId, rentalId, picture, requestedE
                   ))}
                 </select>
                 <span className="mt-1 block text-xs font-normal text-[var(--muted)]">
-                  These are free for all of their dates. {blocker.customerName ? "They keep their dates and price, and both customers are told." : "The booking keeps its dates and price."}
+                  {blocker.customerName ? say("ext_freeAllKeep") : say("ext_freeAllBooking")}
                 </span>
               </label>
               <button
@@ -117,15 +126,15 @@ export function ExtensionRequestAnswer({ actionId, rentalId, picture, requestedE
                 onClick={() => answer("move", { ...(openEnded ? { openEnded: true } : { newEndDate: requestedEnd }), move: { rentalId: blocker.rentalId, vehicleId: moveTo } })}
                 type="button"
               >
-                {busy === "move" ? "Moving and approving..." : `Move it and approve ${openEnded ? "monthly, open-ended" : `to ${niceDate(requestedEnd)}`}`}
+                {busy === "move" ? say("ext_moving") : openEnded ? say("ext_moveApproveOpen") : say("ext_moveApproveTo", { date: niceDate(requestedEnd) })}
               </button>
             </div>
           ) : (
             <p className="text-sm text-[var(--foreground-secondary)]">
               {blockers.length > 1
-                ? "With more than one booking in the way, open each one and use More > Change vehicle, then come back."
+                ? say("ext_manyBlock")
                 : blocker && blocker.options.length === 0
-                  ? "No other vehicle is free for all of that booking's dates, so it can't be moved."
+                  ? say("ext_noFree")
                   : ""}
             </p>
           )}
@@ -133,12 +142,12 @@ export function ExtensionRequestAnswer({ actionId, rentalId, picture, requestedE
           {freeUntil ? (
             <div className="rounded-lg border border-[var(--border)] bg-white p-3">
               <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
-                Or extend only as far as the vehicle is free
+                {say("ext_partialLabel")}
                 <input className="mt-2 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-normal" max={freeUntil} min={picture?.currentEnd || undefined} onChange={(event) => setEndDate(event.target.value)} type="date" value={endDate} />
-                <span className="mt-1 block text-xs font-normal text-[var(--muted)]">Free until {niceDate(freeUntil)}. Nothing else changes.</span>
+                <span className="mt-1 block text-xs font-normal text-[var(--muted)]">{say("ext_freeUntil", { date: niceDate(freeUntil) })}</span>
               </label>
               <button className={`${secondary} mt-3`} disabled={pending || !endDate} onClick={() => answer("partial", { newEndDate: endDate })} type="button">
-                {busy === "partial" ? "Extending..." : `Extend to ${endDate ? niceDate(endDate) : "this date"}`}
+                {busy === "partial" ? say("ext_extending") : say("ext_extendTo", { date: endDate ? niceDate(endDate) : say("ext_thisDate") })}
               </button>
             </div>
           ) : null}

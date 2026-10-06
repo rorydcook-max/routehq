@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { Copy, MessageCircle, RotateCcw } from "lucide-react";
 import { resendBookingLink } from "@/app/actions/bookings";
 
@@ -18,6 +19,7 @@ export function BookingShareActions({
   /** The customer has finished the booking form, so the link is now their own page (payments, extending, returning). */
   formDone?: boolean;
 }) {
+  const say = useTranslations("booking") as unknown as (key: string, values?: Record<string, string | number>) => string;
   const [message, setMessage] = useState("");
   const [link, setLink] = useState(currentUrl || "");
   const [isPending, startTransition] = useTransition();
@@ -58,7 +60,7 @@ export function BookingShareActions({
     }
 
     const copied = await copyText(link);
-    setMessage(copied ? "Booking link copied." : "Copy was blocked by the browser. Select the booking link above and press Ctrl+C.");
+    setMessage(copied ? say("share_copied") : say("share_copyBlocked"));
   }
 
   function resend(channel: "share" | "copy") {
@@ -71,27 +73,27 @@ export function BookingShareActions({
         formData.set("baseUrl", defaultAppUrl || window.location.origin);
         const result = await resendBookingLink(formData);
         setLink(result.bookingUrl);
-        const done = result.created ? "Booking link created. It works for 7 days." : "Booking link renewed for another 7 days.";
-        const copyBlocked = " Copy was blocked by the browser, so select the link above and press Ctrl+C.";
+        const done = result.created ? say("share_created") : say("share_renewed");
+        const copyBlocked = ` ${say("share_blockedShort")}`;
 
         if (channel === "copy") {
           const copied = await copyText(result.bookingUrl);
-          setMessage(copied ? `${done} Copied.` : `${done}${copyBlocked}`);
+          setMessage(copied ? `${done} ${say("share_copiedShort")}` : `${done}${copyBlocked}`);
           return;
         }
 
         if (navigator.share) {
-          await navigator.share({ title: "Booking link", text: result.message, url: result.bookingUrl }).catch(() => undefined);
+          await navigator.share({ title: say("share_title"), text: result.message, url: result.bookingUrl }).catch(() => undefined);
           setMessage(done);
         } else if (result.whatsappUrl) {
           window.open(result.whatsappUrl, "_blank", "noopener,noreferrer");
           setMessage(done);
         } else {
           const copied = await copyText(result.bookingUrl);
-          setMessage(copied ? `${done} Copied.` : `${done}${copyBlocked}`);
+          setMessage(copied ? `${done} ${say("share_copiedShort")}` : `${done}${copyBlocked}`);
         }
       } catch (error) {
-        setMessage(error instanceof Error ? error.message : "Unable to resend booking link.");
+        setMessage(error instanceof Error ? error.message : say("share_failed"));
       }
     });
   }
@@ -100,18 +102,18 @@ export function BookingShareActions({
     <div className="space-y-3">
       {link ? (
         <div className="rounded-lg border border-[var(--border)] bg-white p-3">
-          <p className="text-xs font-bold uppercase text-[var(--muted)]">{formDone ? "Customer's page (pay, extend, return)" : "Customer booking link"}</p>
+          <p className="text-xs font-bold uppercase text-[var(--muted)]">{formDone ? say("share_pageLabel") : say("share_linkLabel")}</p>
           <p className="mt-1 break-all text-sm font-bold text-[var(--foreground)]">{link}</p>
         </div>
       ) : null}
       <div className="flex flex-col gap-2 sm:flex-row">
         <button className={`pressable inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold disabled:opacity-70 ${formDone ? "border border-[var(--border)] bg-white text-[var(--foreground-secondary)]" : "bg-[var(--primary)] text-white"}`} disabled={isPending} onClick={() => resend("share")} type="button">
           {isPending ? <span className="spinner" /> : <MessageCircle size={18} />}
-          {!link ? "Create booking link" : formDone ? "Send the customer their page" : "Resend booking link"}
+          {!link ? say("share_create") : formDone ? say("share_sendPage") : say("share_resend")}
         </button>
         <button className="pressable inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-4 py-3 text-sm font-semibold text-[var(--foreground-secondary)] disabled:opacity-70" disabled={isPending || !link} onClick={copyCurrentLink} type="button">
           {isPending ? <RotateCcw size={18} /> : <Copy size={18} />}
-          Copy link
+          {say("share_copy")}
         </button>
       </div>
       {message ? <p className="rounded-lg bg-[#fbfaf8] p-3 text-sm font-bold text-[var(--primary)]">{message}</p> : null}

@@ -16,6 +16,10 @@ export type MatchResult = {
   customerId?: string;
   customerName?: string;
   vehicleLabel?: string;
+  /** For a scheduled payment: what it is, for which vehicle and when it is due, so the screen can say it in the reader's language. */
+  kind?: "deposit" | "rent";
+  vehicleName?: string;
+  dueDate?: string;
   prefilledData: {
     amount: number;
     vehicleId: string | null;
@@ -107,6 +111,9 @@ export async function listPaymentsWaiting(orgId: string): Promise<MatchResult[]>
         customerId: rental.customer_id || undefined,
         customerName: rental.customers?.full_name || undefined,
         vehicleLabel: vehicleLabel(vehicle),
+        kind: isDeposit ? ("deposit" as const) : ("rent" as const),
+        vehicleName: name,
+        dueDate: due || undefined,
         prefilledData: { amount, vehicleId: rental.vehicle_id || null, description: label, date: today }
       };
     });
@@ -194,6 +201,9 @@ export async function findMatchingOutstandingItems(
       customerId: rental.customer_id || undefined,
       customerName: customer.full_name || undefined,
       vehicleLabel: vehicleLabel(vehicle),
+      kind: isDeposit ? "deposit" : "rent",
+      vehicleName: [vehicle?.make, vehicle?.model].filter(Boolean).join(" ") || vehicleLabel(vehicle),
+      dueDate: due || undefined,
       prefilledData: {
         amount: paymentAmount,
         vehicleId: rental.vehicle_id || null,

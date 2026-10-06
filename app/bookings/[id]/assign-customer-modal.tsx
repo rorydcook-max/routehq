@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { UserPlus, X } from "lucide-react";
 import { assignCustomerToBooking } from "@/app/actions/bookings";
 import { CustomerSelector } from "@/components/customer-selector";
@@ -28,10 +29,11 @@ export function AssignCustomerModal({
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const say = useTranslations("booking") as unknown as (key: string) => string;
 
   function handleSubmit() {
     if (!selectedCustomer) {
-      setError("Please select a customer first.");
+      setError(say("assign_pick"));
       return;
     }
     setError("");
@@ -45,7 +47,7 @@ export function AssignCustomerModal({
         setOpen(false);
         router.refresh();
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Unable to assign customer.");
+        setError(err instanceof Error ? err.message : say("assign_failed"));
       }
     });
   }
@@ -58,7 +60,7 @@ export function AssignCustomerModal({
         type="button"
       >
         <UserPlus size={16} />
-        Assign customer manually
+        {say("assign_open")}
       </button>
 
       {open ? (
@@ -66,9 +68,9 @@ export function AssignCustomerModal({
           <div className="w-full max-w-lg rounded-t-3xl bg-white shadow-2xl sm:rounded-3xl">
             <div className="flex items-start justify-between gap-3 p-6 pb-3">
               <div>
-                <h2 className="text-xl font-semibold text-[var(--foreground)]">Assign customer</h2>
+                <h2 className="text-xl font-semibold text-[var(--foreground)]">{say("assign_title")}</h2>
                 <p className="mt-1 text-sm leading-6 text-[var(--muted)]">
-                  Select an existing customer to link to this booking. Their details will be pre-populated when they open the booking link.
+                  {say("assign_body")}
                 </p>
               </div>
               <button
@@ -96,7 +98,7 @@ export function AssignCustomerModal({
                 type="button"
               >
                 {isPending ? <span className="spinner" /> : <UserPlus size={16} />}
-                {isPending ? "Assigning..." : "Assign customer"}
+                {isPending ? say("assign_busy") : say("assign_submit")}
               </button>
             </div>
           </div>

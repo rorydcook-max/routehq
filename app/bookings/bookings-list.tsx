@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import { CalendarDays, Car, Clock, Search, Trash2, UserRound, MoreHorizontal } from "lucide-react";
 import { deleteBooking, extendBookingHold } from "@/app/actions/bookings";
 import { CancelBookingButton } from "@/app/bookings/[id]/cancel-booking-button";
@@ -9,6 +10,21 @@ import { UndoCancellationButton } from "@/app/bookings/[id]/undo-cancellation-bu
 import { RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
 import { Badge, EmptyState } from "@/components/ui";
 import { flagForNationality } from "@/lib/customer-options";
+import { intlLocale, longDate, shortDate } from "@/lib/i18n/dates";
+
+type Say = (key: string, values?: Record<string, string | number>) => string;
+/** The words for this screen in the reader's language, and the language itself for dates. */
+type Tx = { say: Say; rich: (key: string, values: Record<string, any>) => React.ReactNode; has: (key: string) => boolean; locale: string };
+
+function useTx(): Tx {
+  const t = useTranslations("bookings");
+  const locale = useLocale();
+  return { say: t as unknown as Say, rich: (key, values) => (t as any).rich(key, values), has: (key) => (t as any).has(key), locale };
+}
+
+function statusLabel(status: string, tx: Tx) {
+  return tx.has(`status_${status}`) ? tx.say(`status_${status}`) : status.replace(/_/g, " ");
+}
 
 const filters = ["all", "booked", "active", "due_soon", "overdue", "completed", "cancelled"] as const;
 
@@ -16,20 +32,18 @@ function money(value: unknown, currency = "THB") {
   return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0));
 }
 
-function formatDate(value: string | null | undefined) {
-  if (!value) return "Open";
-  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(value));
+function formatDate(value: string | null | undefined, tx: Tx) {
+  if (!value) return tx.say("open");
+  return longDate(String(value).slice(0, 10), tx.locale);
 }
 
 /** "27 Sep – 28 Oct 2026"; the year is shown once when both dates share it. */
-function formatRange(start: string | null | undefined, end: string | null | undefined) {
-  if (!start) return formatDate(end);
-  if (!end) return `From ${formatDate(start)} · open-ended`;
+function formatRange(start: string | null | undefined, end: string | null | undefined, tx: Tx) {
+  if (!start) return formatDate(end, tx);
+  if (!end) return tx.say("rangeOpenEnded", { date: formatDate(start, tx) });
   const sameYear = start.slice(0, 4) === end.slice(0, 4);
-  const first = sameYear
-    ? new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(start))
-    : formatDate(start);
-  return `${first} – ${formatDate(end)}`;
+  const first = sameYear ? shortDate(String(start).slice(0, 10), tx.locale) : formatDate(start, tx);
+  return `${first} – ${formatDate(end, tx)}`;
 }
 
 function vehicleTitle(vehicle: any) {
@@ -67,14 +81,14 @@ function statusCardClasses(booking: any) {
 }
 
 /** Where the customer is with their booking link. Same wording as the booking page; nothing when there's no live link. */
-function linkLabel(status?: string | null) {
+function linkLabel(status: string | null | undefined, tx: Tx) {
   if (!status || status === "cancelled") return null;
-  if (status === "completed" || status === "contract_signed") return "Customer signed";
-  if (status === "viewed") return "Customer opened link";
-  if (status === "details_submitted") return "Customer details received";
-  if (status === "sent") return "Link sent";
-  if (status === "expired") return "Link expired";
-  return "Link not opened yet";
+  if (status === "completed" || status === "contract_signed") return tx.say("link_signed");
+  if (status === "viewed") return tx.say("link_viewed");
+  if (status === "details_submitted") return tx.say("link_details");
+  if (status === "sent") return tx.say("link_sent");
+  if (status === "expired") return tx.say("link_expired");
+  return tx.say("link_notOpened");
 }
 
 function isDueSoon(booking: any) {
@@ -107,37 +121,24 @@ function daysFromToday(iso: string) {
   return Math.round((target.getTime() - today.getTime()) / 86_400_000);
 }
 
-const plural = (count: number, word: string) => `${count} ${word}${count === 1 ? "" : "s"}`;
-
-function rentalTimingLabel(booking: any) {
+function rentalTimingLabel(booking: any, tx: Tx) {
   const status = String(booking.status || "").toLowerCase();
   if (["completed", "cancelled"].includes(status)) return null;
   // Not handed over yet: what matters is when it starts.
   if (status === "booked" && booking.start_date) {
     const days = daysFromToday(booking.start_date);
-    if (days > 1) return `Starts in ${plural(days, "day")}`;
-    if (days === 1) return "Starts tomorrow";
-    if (days === 0) return "Starts today";
-    return `Handover overdue by ${plural(-days, "day")}`;
+    if (days > 1) return tx.say("startsIn", { days });
+    if (days === 1) return tx.say("startsTomorrow");
+    if (days === 0) return tx.say("startsToday");
+    return tx.say("handoverOverdue", { days: -days });
   }
-  if (!booking.end_date) return "Open-ended";
+  if (!booking.end_date) return tx.say("openEnded");
   const days = daysFromToday(booking.end_date);
-  if (days < 0) return `Return ${plural(-days, "day")} late`;
-  if (days === 0) return "Due back today";
-  if (days === 1) return "Due back tomorrow";
-  return `Due back in ${plural(days, "day")}`;
+  if (days < 0) return tx.say("returnLate", { days: -days });
+  if (days === 0) return tx.say("dueBackToday");
+  if (days === 1) return tx.say("dueBackTomorrow");
+  return tx.say("dueBackIn", { days });
 }
-
-const STATUS_LABELS: Record<string, string> = {
-  booked: "Booked",
-  active: "On rent",
-  due_soon: "Due back soon",
-  overdue: "Late return",
-  extended: "Extended",
-  completed: "Completed",
-  cancelled: "Cancelled",
-  draft: "Not confirmed"
-};
 
 /** Where an unsigned booking stands: still held, or its hold has ended. */
 /** The rental still out on this booking's vehicle past its return date, when this booking starts within a week. */
@@ -160,17 +161,18 @@ function lateBefore(booking: any, all: any[]) {
   );
 }
 
-function holdState(booking: any): { ended: boolean; text: string } | null {
+function holdState(booking: any, tx: Tx): { ended: boolean; text: string } | null {
   const link = booking.booking_link;
   if (!link || ["completed", "cancelled"].includes(String(link.status))) return null;
-  if (link.hold_released_at && booking.status === "draft") return { ended: true, text: "Hold ended · dates are open to others. The customer's link still works if the vehicle is free." };
+  if (link.hold_released_at && booking.status === "draft") return { ended: true, text: tx.say("holdEnded") };
   if (booking.status !== "booked" || !link.hold_until) return null;
   const until = new Date(link.hold_until);
-  const when = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Bangkok" }).format(until);
-  return { ended: false, text: `Held for the customer until ${when}` };
+  const when = new Intl.DateTimeFormat(intlLocale(tx.locale), { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Bangkok" }).format(until);
+  return { ended: false, text: tx.say("heldUntil", { when }) };
 }
 
 function ExtendHoldButton({ rentalId, ended }: { rentalId: string; ended: boolean }) {
+  const tx = useTx();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   return (
@@ -182,24 +184,25 @@ function ExtendHoldButton({ rentalId, ended }: { rentalId: string; ended: boolea
           setError(null);
           startTransition(async () => {
             const result = await extendBookingHold(rentalId);
-            if (!result.success) setError(result.error || "Couldn't update the hold.");
+            if (!result.success) setError(result.error || tx.say("holdError"));
           });
         }}
         type="button"
       >
-        {isPending ? "Saving…" : ended ? "Hold again" : "Extend hold"}
+        {isPending ? tx.say("saving") : ended ? tx.say("holdAgain") : tx.say("extendHold")}
       </button>
       {error ? <span className="ml-2 text-[11px] font-semibold text-[var(--danger)]">{error}</span> : null}
     </>
   );
 }
 
-function customerLabel(booking: any) {
-  if (!booking.customers) return "Awaiting customer details";
+function customerLabel(booking: any, tx: Tx) {
+  if (!booking.customers) return tx.say("awaitingCustomer");
   return `${flagForNationality(booking.customers.nationality)} ${booking.customers.full_name}`;
 }
 
 export function BookingsList({ bookings }: { bookings: any[] }) {
+  const tx = useTx();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<(typeof filters)[number]>("all");
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
@@ -217,7 +220,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
     startTransition(async () => {
       const result = await deleteBooking(bookingId);
       if (!result.success) {
-        setDeleteError(result.error || "Failed to delete booking.");
+        setDeleteError(result.error || tx.say("deleteFailed"));
         setConfirmDeleteId(null);
       }
     });
@@ -251,7 +254,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
             <input
               className="input-with-leading-icon h-9 w-full rounded-lg border border-[var(--border)] bg-white pr-3 text-[13px] font-medium text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]"
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search customer, plate, or booking reference"
+              placeholder={tx.say("searchPlaceholder")}
               value={search}
             />
           </label>
@@ -264,7 +267,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                 onClick={() => setFilter(entry)}
                 type="button"
               >
-                {entry === "all" ? "All" : STATUS_LABELS[entry] || entry.replace(/_/g, " ")}
+                {entry === "all" ? tx.say("filterAll") : statusLabel(entry, tx)}
               </button>
             ))}
           </div>
@@ -276,14 +279,14 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
       ) : null}
       {filtered.length === 0 ? (
         <EmptyState
-          title="No bookings found"
-          description="Try another filter, or create a booking from the button above."
+          title={tx.say("emptyTitle")}
+          description={tx.say("emptyBody")}
         />
       ) : (
         <div className="grid gap-3">
           {filtered.map((booking) => {
-            const timingLabel = rentalTimingLabel(booking);
-            const hold = holdState(booking);
+            const timingLabel = rentalTimingLabel(booking, tx);
+            const hold = holdState(booking, tx);
             const waitingOn = lateBefore(booking, bookings);
             const photoUrl = booking.vehicles?.primary_photo_url;
             const effectiveStatus = isCancelledBooking(booking) ? "cancelled" : String(booking.status || "");
@@ -294,7 +297,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                 <Link className={`group relative h-[68px] overflow-hidden hidden md:block rounded-lg border border-[var(--border)] bg-[#fbfaf8]`} href={`/bookings/${booking.id}`}>
                   {photoUrl ? (
                     <img
-                      alt={`${vehicleTitle(booking.vehicles) || "Vehicle"} booking`}
+                      alt={tx.say("photoAlt", { vehicle: vehicleTitle(booking.vehicles) || tx.say("vehicle") })}
                       className="h-full w-full object-cover transition duration-200 group-hover:scale-[1.03]"
                       src={photoUrl}
                     />
@@ -309,22 +312,22 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                   {/* One badge for where the booking is, and one more only while it waits on the customer's link. The dots stay in the corner however the badges wrap. */}
                   <div className="flex items-start gap-1.5">
                   <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
-                    <Badge tone={statusTone(effectiveStatus)}>{STATUS_LABELS[effectiveStatus] || effectiveStatus.replace(/_/g, " ")}</Badge>
-                    {["booked", "draft"].includes(effectiveStatus) && linkLabel(booking.booking_link?.status) ? (
+                    <Badge tone={statusTone(effectiveStatus)}>{statusLabel(effectiveStatus, tx)}</Badge>
+                    {["booked", "draft"].includes(effectiveStatus) && linkLabel(booking.booking_link?.status, tx) ? (
                     <Badge tone={["completed", "contract_signed"].includes(String(booking.booking_link?.status)) ? "green" : booking.booking_link?.status === "viewed" ? "blue" : "amber"}>
-                      {linkLabel(booking.booking_link?.status)}
+                      {linkLabel(booking.booking_link?.status, tx)}
                     </Badge>
                   ) : null}
                     <span className="font-mono-data ml-1 hidden text-[11px] font-semibold uppercase tracking-[0.04em] text-[var(--muted)] sm:inline">{bookingReference(booking)}</span>
                   </div>
                     {/* Edit, extend, cancel and delete stay one tap away without crowding every card. */}
                     <details className="relative z-10 ml-auto shrink-0">
-                      <summary aria-label="More options" className="pressable flex h-8 w-8 cursor-pointer list-none items-center justify-center rounded-full text-[var(--muted)] hover:bg-[var(--panel-secondary)] [&::-webkit-details-marker]:hidden">
+                      <summary aria-label={tx.say("moreOptions")} className="pressable flex h-8 w-8 cursor-pointer list-none items-center justify-center rounded-full text-[var(--muted)] hover:bg-[var(--panel-secondary)] [&::-webkit-details-marker]:hidden">
                         <MoreHorizontal size={18} />
                       </summary>
                       <div className="absolute right-0 top-full z-20 mt-1 flex min-w-[150px] flex-col items-stretch gap-1.5 rounded-lg border border-[var(--border)] bg-white p-2 text-left shadow-lg">
                 <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-md border border-[var(--border)] bg-white px-3 py-1.5 text-[12px] font-semibold text-[var(--foreground-secondary)]" href={`/bookings/${booking.id}/edit`}>
-                  Edit
+                  {tx.say("edit")}
                 </Link>
                 {canExtend(booking) ? (
                   <RentalAdjustmentButton
@@ -332,8 +335,8 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                     currentEndDate={booking.end_date}
                     currentRate={Number(booking.rental_rate || 0)}
                     currentStartDate={booking.start_date}
-                    customerName={booking.customers?.full_name || "Awaiting customer"}
-                    label="Extend"
+                    customerName={booking.customers?.full_name || tx.say("awaitingCustomerShort")}
+                    label={tx.say("extend")}
                     rentalId={booking.id}
                     vehicleLabel={vehicleTitle(booking.vehicles)}
                   />
@@ -345,7 +348,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                     vehicleId={String(booking.vehicle_id || booking.vehicles?.id || "")}
                     customerName={booking.customers?.full_name || null}
                     compact
-                    label="Undo"
+                    label={tx.say("undo")}
                   />
                 ) : !["completed", "cancelled"].includes(String(booking.status || "").toLowerCase()) ? (
                   <CancelBookingButton
@@ -359,14 +362,14 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                     rentalStatus={booking.status}
                     customerName={booking.customers?.full_name || null}
                     compact
-                    label="Cancel"
+                    label={tx.say("cancel")}
                   />
                 ) : null}
                 {confirmDeleteId === booking.id ? null : (
                   <button
                     className="pressable inline-flex min-h-8 items-center justify-center rounded-md border border-[#fecaca] bg-[#fff7f7] px-2 text-[#dc2626]"
                     onClick={() => { setConfirmDeleteId(booking.id); setDeleteError(null); }}
-                    title="Delete booking"
+                    title={tx.say("deleteBooking")}
                     type="button"
                   >
                     <Trash2 size={14} />
@@ -377,32 +380,32 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                   </div>
 
                   <Link className="mt-1 block truncate text-[15px] font-semibold leading-tight text-[var(--foreground)] after:absolute after:inset-0 after:content-[''] hover:text-[var(--primary)]" href={`/bookings/${booking.id}`}>
-                    {booking.customers ? customerLabel(booking) : <span className="inline-flex items-center gap-1.5 text-[#92400e]"><Clock size={15} /> Awaiting customer details</span>}
+                    {booking.customers ? customerLabel(booking, tx) : <span className="inline-flex items-center gap-1.5 text-[#92400e]"><Clock size={15} /> {tx.say("awaitingCustomer")}</span>}
                   </Link>
 
                   <div className="mt-1 grid gap-1 text-[12px] text-[var(--foreground-secondary)] sm:grid-cols-2 xl:grid-cols-3">
                     <span className="flex min-w-0 items-center gap-2">
                       <Car size={15} className="shrink-0 text-[var(--primary)]" />
                       <span className="truncate">
-                        <strong className="font-semibold text-[var(--foreground-secondary)]">{vehicleTitle(booking.vehicles) || "Vehicle"}</strong>
+                        <strong className="font-semibold text-[var(--foreground-secondary)]">{vehicleTitle(booking.vehicles) || tx.say("vehicle")}</strong>
                         {booking.vehicles?.registration_number ? <span className="font-mono-data ml-2 text-[var(--muted)]">{booking.vehicles.registration_number}</span> : null}
                       </span>
                     </span>
                     <span className="flex min-w-0 items-center gap-2">
                       <CalendarDays size={15} className="shrink-0 text-[var(--primary)]" />
-                      <span className="truncate">{formatRange(booking.start_date, booking.end_date)}</span>
+                      <span className="truncate">{formatRange(booking.start_date, booking.end_date, tx)}</span>
                     </span>
                     <span className="hidden min-w-0 items-center gap-2 sm:flex">
                       <UserRound size={15} className="shrink-0 text-[var(--primary)]" />
-                      <span className="truncate">{booking.customers?.phone || "No phone"}</span>
+                      <span className="truncate">{booking.customers?.phone || tx.say("noPhone")}</span>
                     </span>
                   </div>
                   {timingLabel ? <p className="mt-1 text-[12px] font-medium text-[var(--muted)]">{timingLabel}</p> : null}
                   {waitingOn ? (
                     <p className="mt-1 text-[12px] font-semibold text-[#dc2626]">
-                      Vehicle not back yet: {waitingOn.customers?.full_name || "the current customer"} was due to return it {new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${String(waitingOn.end_date).slice(0, 10)}T00:00:00Z`))}.{" "}
+                      {tx.say("notBack", { name: waitingOn.customers?.full_name || tx.say("currentCustomer"), date: shortDate(String(waitingOn.end_date).slice(0, 10), tx.locale) })}{" "}
                       <Link className="relative z-10 underline underline-offset-2" href={`/bookings/${waitingOn.id}`}>
-                        Open that rental
+                        {tx.say("openThatRental")}
                       </Link>
                     </p>
                   ) : null}
@@ -417,11 +420,11 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                 <div className="md:justify-self-end">
                   <div className="w-full rounded-lg border border-[var(--border)] bg-white/80 px-3 py-1.5 md:w-[136px]">
                     <div className="flex items-center justify-between gap-3 md:block md:text-right">
-                      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">Paid</span>
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{tx.say("paid")}</span>
                       <span className="font-mono-data block text-[16px] font-semibold text-[var(--primary)]">{money(booking.total_paid, booking.currency)}</span>
                     </div>
                     <span className={`font-mono-data mt-0.5 block text-[11px] md:text-right ${Number(booking.balance_due) > 0 ? "font-semibold text-[#b45309]" : "text-[var(--muted)]"}`}>
-                      {Number(booking.balance_due) > 0 ? `Due now ${money(booking.balance_due, booking.currency)}` : "Nothing due now"}
+                      {Number(booking.balance_due) > 0 ? tx.say("dueNow", { amount: money(booking.balance_due, booking.currency) }) : tx.say("nothingDue")}
                     </span>
                   </div>
                 </div>
@@ -429,7 +432,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
               {confirmDeleteId === booking.id ? (
                 <div className="relative z-10 mt-2 rounded-lg border border-[#fecaca] bg-[#fef2f2] p-2">
                   <p className="mb-2 text-xs font-semibold text-[#dc2626]">
-                    Delete this booking permanently? Only bookings entered by mistake can be deleted - once there is a signed agreement, a payment or an inspection, use <strong>Cancel booking</strong> instead so the records are kept.
+                    {tx.rich("deleteConfirm", { b: (chunks: React.ReactNode) => <strong>{chunks}</strong> })}
                   </p>
                   <div className="flex gap-2">
                     <button
@@ -438,7 +441,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                       onClick={() => handleDelete(booking.id)}
                       type="button"
                     >
-                      {isPending ? "Deleting..." : "Confirm delete"}
+                      {isPending ? tx.say("deleting") : tx.say("confirmDelete")}
                     </button>
                     <button
                       className="pressable inline-flex min-h-7 items-center rounded-lg border border-[var(--border)] bg-white px-3 text-xs font-bold text-[var(--foreground-secondary)]"
@@ -446,7 +449,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                       onClick={() => setConfirmDeleteId(null)}
                       type="button"
                     >
-                      Cancel
+                      {tx.say("back")}
                     </button>
                   </div>
                 </div>

@@ -2,10 +2,12 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { RefreshCw, X } from "lucide-react";
 import { createVehicleChange, getVehicleChangeOptions, type VehicleChangeOptions } from "@/app/actions/amendments";
 import { AmendmentLinkPanel } from "@/components/rental-adjustment-modal";
 
+// These are saved on the form the customer signs, so the saved text stays as it is; only what staff see is translated.
 const REASONS = ["Breakdown or fault", "Customer asked for a different vehicle", "Service or repair due", "Exchange between customers", "Other"];
 
 /**
@@ -17,6 +19,7 @@ const REASONS = ["Breakdown or fault", "Customer asked for a different vehicle",
  */
 export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
   const router = useRouter();
+  const say = useTranslations("booking") as unknown as (key: string, values?: Record<string, string | number>) => string;
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<VehicleChangeOptions | null>(null);
   const [choice, setChoice] = useState("");
@@ -95,54 +98,54 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
         type="button"
       >
         <RefreshCw size={15} />
-        Change vehicle
+        {say("vc_button")}
       </button>
       {open ? (
         <div className="fixed inset-0 z-50 flex items-end overflow-y-auto bg-[#10252b]/60 p-3 text-left sm:items-center sm:justify-center">
           <div className="w-full max-w-lg rounded-2xl border border-[var(--border)] bg-white p-4 shadow-2xl">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-lg font-semibold text-[var(--foreground)]">Change vehicle</p>
-                {options ? <p className="mt-1 text-sm text-[var(--muted)]">Currently the {options.currentVehicleLabel}.</p> : null}
+                <p className="text-lg font-semibold text-[var(--foreground)]">{say("vc_button")}</p>
+                {options ? <p className="mt-1 text-sm text-[var(--muted)]">{say("vc_current", { vehicle: options.currentVehicleLabel })}</p> : null}
               </div>
-              <button aria-label="Close" className="pressable rounded-lg p-1.5 text-[var(--muted)]" onClick={close} type="button">
+              <button aria-label={say("vc_close")} className="pressable rounded-lg p-1.5 text-[var(--muted)]" onClick={close} type="button">
                 <X size={16} />
               </button>
             </div>
 
-            {!options && !error ? <p className="mt-4 text-sm text-[var(--muted)]">Checking which vehicles are free...</p> : null}
+            {!options && !error ? <p className="mt-4 text-sm text-[var(--muted)]">{say("vc_checking")}</p> : null}
 
             {links.length > 0 ? (
               <div className="mt-4 space-y-3">
                 <p className="text-sm text-[var(--foreground-secondary)]">
                   {links.length > 1
-                    ? "Each customer signs a short change form. The vehicles are exchanged in RouteHQ once both have signed; then you complete a handover and a collection form with each of them."
+                    ? say("vc_doneBoth")
                     : signLater
-                      ? "The vehicle has been changed. Complete the handover and collection forms now, and send the customer this form to sign when they can."
+                      ? say("vc_doneLater")
                       : options?.handedOver
-                      ? "The customer signs a short change form. Once they have, you complete a handover form for the replacement and a collection form for the original."
-                      : "The customer signs a short change form. The booking moves to the new vehicle once they have."}
+                      ? say("vc_doneHanded")
+                      : say("vc_doneBooked")}
                 </p>
                 {links.map((link) => (
                   <div key={link.token}>
-                    <p className="mb-1 text-xs font-bold uppercase text-[var(--muted)]">For {link.customerName}</p>
+                    <p className="mb-1 text-xs font-bold uppercase text-[var(--muted)]">{say("vc_for", { name: link.customerName })}</p>
                     <AmendmentLinkPanel changedAlready={signLater && links.length === 1} token={link.token} />
                   </div>
                 ))}
                 <button className="secondary-action pressable w-full justify-center px-3 py-2" onClick={close} type="button">
-                  Done
+                  {say("vc_done")}
                 </button>
               </div>
             ) : options ? (
               options.free.length === 0 && options.swaps.length === 0 ? (
-                <p className="mt-4 rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3 text-sm text-[#92400e]">No other vehicle is free for all of this rental&apos;s dates.</p>
+                <p className="mt-4 rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3 text-sm text-[#92400e]">{say("vc_noneFree")}</p>
               ) : (
                 <>
                   <label className={labelClass}>
-                    Replacement
+                    {say("vc_replacement")}
                     <select className={field} onChange={(event) => setChoice(event.target.value)} value={choice}>
                       {options.free.length ? (
-                        <optgroup label="Free for these dates">
+                        <optgroup label={say("vc_groupFree")}>
                           {options.free.map((item) => (
                             <option key={item.vehicleId} value={`free:${item.vehicleId}`}>
                               {item.label}
@@ -152,11 +155,11 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
                         </optgroup>
                       ) : null}
                       {options.swaps.length ? (
-                        <optgroup label="Exchange with another customer">
+                        <optgroup label={say("vc_groupSwap")}>
                           {options.swaps.map((item) => (
                             <option key={item.rentalId} value={`swap:${item.rentalId}`}>
                               {item.label}
-                              {item.plate ? ` · ${item.plate}` : ""} (with {item.customerName})
+                              {item.plate ? ` · ${item.plate}` : ""} {say("vc_with", { name: item.customerName })}
                             </option>
                           ))}
                         </optgroup>
@@ -165,44 +168,44 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
                   </label>
                   {swap ? (
                     <p className="mt-2 rounded-lg bg-[#fbfaf8] p-3 text-xs leading-5 text-[var(--foreground-secondary)]">
-                      {swap.customerName} gets the {options.currentVehicleLabel} and this customer gets the {swap.label}. Both keep their dates and prices, and both sign.
+                      {say("vc_swapNote", { name: swap.customerName, current: options.currentVehicleLabel, other: swap.label })}
                     </p>
                   ) : null}
 
                   {options.needsSignature ? (
                     <>
                       <label className={labelClass}>
-                        Reason (shown on the form the customer signs)
+                        {say("vc_reasonLabel")}
                         <select className={field} onChange={(event) => setReason(event.target.value)} value={reason}>
-                          <option value="">Not stated</option>
+                          <option value="">{say("vc_notStated")}</option>
                           {REASONS.filter((item) => (swap ? true : item !== "Exchange between customers")).map((item) => (
                             <option key={item} value={item}>
-                              {item}
+                              {say(`vc_reason_${REASONS.indexOf(item)}`)}
                             </option>
                           ))}
                         </select>
                       </label>
                       {options.handedOver && !swap ? (
                         <label className={labelClass}>
-                          The {options.currentVehicleLabel}, once collected
+                          {say("vc_onceCollected", { vehicle: options.currentVehicleLabel })}
                           <select className={field} onChange={(event) => setDisposition(event.target.value as "available" | "repair")} value={disposition}>
-                            <option value="available">Is available to rent again</option>
-                            <option value="repair">Goes for repair</option>
+                            <option value="available">{say("vc_available")}</option>
+                            <option value="repair">{say("vc_repair")}</option>
                           </select>
                         </label>
                       ) : null}
                       {!swap ? (
                         <label className={labelClass}>
-                          Rate from now on (leave empty to keep {money(options.currentRate)})
+                          {say("vc_rateLabel", { amount: money(options.currentRate) })}
                           <input className={field} inputMode="numeric" min="0" onChange={(event) => setNewRate(event.target.value)} placeholder={String(options.currentRate)} type="number" value={newRate} />
                         </label>
                       ) : null}
                       {depositGap > 0 && free ? (
                         <label className={labelClass}>
-                          Deposit: the {free.label} normally has {money(free.deposit)}, this rental has {money(options.currentDeposit)}
+                          {say("vc_depositLabel", { vehicle: free.label, normal: money(free.deposit), current: money(options.currentDeposit) })}
                           <select className={field} onChange={(event) => setTopUp(event.target.value as "require" | "waive")} value={topUp}>
-                            <option value="require">Ask for the {money(depositGap)} top-up</option>
-                            <option value="waive">Waive it and keep {money(options.currentDeposit)}</option>
+                            <option value="require">{say("vc_askTopUp", { amount: money(depositGap) })}</option>
+                            <option value="waive">{say("vc_waive", { amount: money(options.currentDeposit) })}</option>
                           </select>
                         </label>
                       ) : null}
@@ -210,25 +213,25 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
                         <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
                           <input checked={signLater} className="mt-1 accent-[#0d9488]" onChange={(event) => setSignLater(event.target.checked)} type="checkbox" />
                           <span className="text-sm text-[var(--foreground-secondary)]">
-                            <span className="block font-semibold text-[var(--foreground)]">The customer can&apos;t sign right now</span>
-                            Change the vehicle straight away (a breakdown, say) and get the signature afterwards. It stays on To do until they sign.
+                            <span className="block font-semibold text-[var(--foreground)]">{say("vc_cantSign")}</span>
+                            {say("vc_cantSignBody")}
                           </span>
                         </label>
                       ) : null}
                       <p className="mt-3 text-xs leading-5 text-[var(--muted)]">
                         {signLater && !swap
-                          ? "The vehicle changes now and the handover and collection forms appear on To do. The customer signs the short change form when they can; a new rate or deposit starts when they sign."
+                          ? say("vc_noteLater")
                           : options.handedOver
-                          ? "The customer signs a short form with only this change on it. Nothing changes until they sign. Then a handover form for the replacement and a collection form for the original appear on To do."
-                          : "The customer has signed for the current vehicle, so they sign a short form with only this change on it. The booking moves once they sign."}
+                          ? say("vc_noteHanded")
+                          : say("vc_noteBooked")}
                       </p>
                     </>
                   ) : (
-                    <p className="mt-3 text-xs leading-5 text-[var(--muted)]">Nothing has been signed yet, so the booking simply moves. Dates and price stay the same.</p>
+                    <p className="mt-3 text-xs leading-5 text-[var(--muted)]">{say("vc_noteUnsigned")}</p>
                   )}
 
                   <button className="primary-action pressable mt-4 w-full justify-center px-3 py-2 disabled:opacity-60" disabled={pending || (!swap && !free)} onClick={submit} type="button">
-                    {pending ? "Working..." : options.needsSignature ? (swap ? "Prepare the two change forms" : signLater ? "Change the vehicle now" : "Prepare the change form") : "Move booking"}
+                    {pending ? say("vc_working") : options.needsSignature ? (swap ? say("vc_prepareTwo") : signLater ? say("vc_changeNow") : say("vc_prepare")) : say("vc_move")}
                   </button>
                 </>
               )

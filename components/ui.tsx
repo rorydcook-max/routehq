@@ -32,21 +32,21 @@ export function Fold({
   children: ReactNode;
 }) {
   const tones = {
-    neutral: "text-[var(--muted)]",
-    red: "font-semibold text-[var(--danger)]",
-    green: "font-semibold text-[var(--success)]",
-    amber: "font-semibold text-[var(--warning)]"
+    neutral: "font-medium text-[var(--foreground-secondary)]",
+    red: "font-bold text-[var(--danger)]",
+    green: "font-bold text-[var(--success)]",
+    amber: "font-bold text-[var(--warning)]"
   };
   return (
-    <details className="group scroll-mt-4 overflow-hidden rounded-[10px] border-[0.5px] border-[var(--border)] bg-[var(--panel)]" id={id} open={open}>
-      <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-2.5 [&::-webkit-details-marker]:hidden">
+    <details className="card group scroll-mt-4 overflow-hidden" id={id} open={open}>
+      <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3.5 [&::-webkit-details-marker]:hidden">
         <span className="min-w-0">
-          <span className="block text-[15px] font-semibold tracking-[-0.01em] text-[var(--foreground)]">{title}</span>
-          {summary ? <span className={clsx("mt-0.5 block truncate text-sm", tones[tone])}>{summary}</span> : null}
+          <span className="block text-[16px] font-bold tracking-[-0.01em] text-[var(--foreground)]">{title}</span>
+          {summary ? <span className={clsx("mt-0.5 block truncate", tones[tone])}>{summary}</span> : null}
         </span>
-        <ChevronDown className="shrink-0 text-[var(--muted)] transition-transform group-open:rotate-180" size={18} />
+        <ChevronDown className="shrink-0 text-[var(--foreground-secondary)] transition-transform group-open:rotate-180" size={22} strokeWidth={2.2} />
       </summary>
-      <div className="border-t-[0.5px] border-[var(--border)] px-3.5 pb-3.5 pt-3">{children}</div>
+      <div className="border-t border-[var(--border)] px-4 pb-4 pt-3.5">{children}</div>
     </details>
   );
 }
@@ -84,7 +84,7 @@ export function SectionHeader({
     <div className="card-header">
       <div>
         {eyebrow ? <p className="card-header-label text-[var(--primary)]">{eyebrow}</p> : null}
-        <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-[var(--foreground)]">{title}</h2>
+        <h2 className="text-[16px] font-bold tracking-[-0.01em] text-[var(--foreground)]">{title}</h2>
       </div>
       {action}
     </div>
@@ -98,21 +98,16 @@ export function Badge({
   children: ReactNode;
   tone?: "neutral" | "green" | "amber" | "red" | "blue";
 }) {
-  // Soft fill plus a coloured dot: readable at a glance without shouting.
+  // One solid pill for the thing that is happening now (blue), soft fills for the rest.
   const tones = {
-    neutral: "bg-[var(--panel-tertiary)] text-[var(--foreground-secondary)]",
+    neutral: "bg-[var(--panel-tertiary)] text-[var(--foreground)]",
     green: "bg-[var(--success-light)] text-[var(--success)]",
     amber: "bg-[var(--warning-light)] text-[var(--warning)]",
     red: "bg-[var(--danger-light)] text-[var(--danger)]",
-    blue: "bg-[var(--primary-blue-light)] text-[var(--primary-blue)]"
+    blue: "bg-[var(--primary)] text-white"
   };
 
-  return (
-    <span className={clsx("badge inline-flex items-center gap-1.5", tones[tone])}>
-      <span aria-hidden="true" className="h-1.5 w-1.5 shrink-0 rounded-full bg-current opacity-80" />
-      {children}
-    </span>
-  );
+  return <span className={clsx("badge inline-flex items-center", tones[tone])}>{children}</span>;
 }
 
 export function ProgressBar({ value, tone = "green" }: { value: number; tone?: "green" | "amber" | "red" | "blue" }) {

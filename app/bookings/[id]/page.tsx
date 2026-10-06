@@ -246,8 +246,8 @@ function timelineSteps(bookingLink: any, rentalDocuments: BookingRentalDocument[
 function ActionButton({ href, children, tone = "primary" }: { href: Route; children: React.ReactNode; tone?: "primary" | "light" }) {
   return (
     <Link
-      className={`pressable inline-flex min-h-9 min-w-fit items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-bold shadow-sm ${
-        tone === "primary" ? "bg-[var(--primary)] text-white" : "border border-[var(--border)] bg-white text-[var(--foreground-secondary)]"
+      className={`pressable inline-flex min-h-11 min-w-fit items-center justify-center gap-2 rounded-full px-3 py-2 text-center font-bold leading-tight ${
+        tone === "primary" ? "bg-[var(--primary)] text-white" : "border-2 border-[var(--border-strong)] bg-white text-[var(--foreground)]"
       }`}
       href={href}
     >
@@ -546,34 +546,56 @@ export default async function BookingDetailPage({ params, searchParams }: { para
         </div>
 
         <Card>
-          <div className="card-section flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge tone={statusTone(displayStatus)}>{statusLabel(String(displayStatus), tx)}</Badge>
-                {/* One badge for where the booking stands, and one more only while it waits on the customer's link. */}
-                {["booked", "draft"].includes(String(displayStatus)) && bookingLinkBadge(bookingLink?.status, tx) ? (
-                  <Badge tone={bookingLinkBadge(bookingLink?.status, tx)!.tone}>{bookingLinkBadge(bookingLink?.status, tx)!.label}</Badge>
-                ) : null}
-                {/* "Awaiting customer" is the heading below, and who entered the booking is said under "Customer's link". */}
-                <span className="font-mono-data text-xs font-semibold uppercase text-[var(--muted)]">{bookingReference(rental)}</span>
+          <div className="card-section flex flex-col gap-4">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="flex flex-wrap items-center gap-2">
+                  <Badge tone={statusTone(displayStatus)}>{statusLabel(String(displayStatus), tx)}</Badge>
+                  {/* One badge for where the booking stands, and one more only while it waits on the customer's link. */}
+                  {["booked", "draft"].includes(String(displayStatus)) && bookingLinkBadge(bookingLink?.status, tx) ? (
+                    <Badge tone={bookingLinkBadge(bookingLink?.status, tx)!.tone}>{bookingLinkBadge(bookingLink?.status, tx)!.label}</Badge>
+                  ) : null}
+                </span>
+                {/* Where the money stands, in one phrase, at the top. The reference is in the breadcrumb and the plate under Vehicle. */}
+                {!awaitingSignature ? <span className={`font-bold ${financialStateClass}`}>{financialState.label}</span> : null}
               </div>
-              <h1 className="mt-2 truncate text-2xl font-semibold tracking-[-0.02em] text-[var(--foreground)]">
+              <h1 className="mt-3 text-[28px] font-bold leading-tight tracking-[-0.01em] text-[var(--foreground)]">
                 {customer ? customer.full_name : tx.list("awaitingCustomer")}
               </h1>
-              <p className="mt-1 truncate text-sm font-bold text-[var(--foreground-secondary)]">{vehicleTitle(vehicle)}</p>
-              <p className="font-mono-data mt-1 text-xs font-bold text-[var(--muted)]">{vehicle?.registration_number}</p>
-              {awaitingSignature ? (
-                <p className="mt-2 text-sm text-[var(--foreground-secondary)]">
-                  {tx.say("waitingSign")}{" "}
-                  {holdUntil
-                    ? new Date(holdUntil).getTime() > Date.now()
-                      ? tx.say("heldUntil", { when: formatDateTime(holdUntil, tx) })
-                      : tx.say("holdEnded", { when: formatDateTime(holdUntil, tx) })
-                    : ""}
+              <p className="mt-1 text-[17px] font-semibold text-[var(--foreground-secondary)]">{vehicleTitle(vehicle)}</p>
+              {awaitingSignature && holdUntil ? (
+                <p className="mt-2 font-semibold text-[var(--warning)]">
+                  {new Date(holdUntil).getTime() > Date.now()
+                    ? tx.say("heldUntil", { when: formatDateTime(holdUntil, tx) })
+                    : tx.say("holdEnded", { when: formatDateTime(holdUntil, tx) })}
                 </p>
               ) : null}
             </div>
-            <div className="flex flex-wrap items-center gap-2 lg:max-w-[560px] lg:justify-end">
+            {/* The two numbers you check first. */}
+            <div className="grid grid-cols-2 gap-2.5">
+              <div className="rounded-xl bg-[var(--background)] px-3.5 py-3">
+                <p className="font-semibold text-[var(--muted)]">{tx.say("dates")}</p>
+                <p className="mt-0.5 text-[20px] font-bold leading-tight text-[var(--foreground)]">{daysRemaining(rental.end_date, rental.status, rental.start_date, tx)}</p>
+                <p className="flex flex-wrap items-center gap-1 font-medium text-[var(--foreground-secondary)]">
+                  <span>{rental.end_date ? tx.say("dateTo", { date: formatDate(rental.start_date, tx) }) : tx.say("fromOpenEnded", { date: formatDate(rental.start_date, tx) })}</span>
+                  <EditableEndDate currentEndDate={rental.end_date} rentalId={rental.id} />
+                </p>
+              </div>
+              <div className="rounded-xl bg-[var(--background)] px-3.5 py-3">
+                <p className="font-semibold text-[var(--muted)]">{tx.say("billing")}</p>
+                <p className={`mt-0.5 text-[20px] font-bold leading-tight tabular-nums ${financialState.amount !== null ? financialStateClass : "text-[var(--foreground)]"}`}>
+                  {financialState.amount !== null ? money(financialState.amount, rental.currency) : tx.say(`ratePer_${["daily", "weekly", "monthly"].includes(String(rental.pricing_model)) ? rental.pricing_model : "other"}`, { amount: money(rental.rental_rate, rental.currency) })}
+                </p>
+                <p className="font-medium text-[var(--foreground-secondary)]">{financialState.amount !== null ? tx.say(`ratePer_${["daily", "weekly", "monthly"].includes(String(rental.pricing_model)) ? rental.pricing_model : "other"}`, { amount: money(rental.rental_rate, rental.currency) }) : financialState.detail}</p>
+                {pendingPaymentAmount > 0 && customer ? (
+                  <div className="mt-2">
+                    <PaymentReminderButton rentalId={rental.id} />
+                  </div>
+                ) : null}
+              </div>
+            </div>
+            {/* Two main actions side by side, More underneath: nothing wraps onto a second line. */}
+            <div className="grid grid-cols-2 gap-2 [&>*]:min-w-0 [&>a]:flex [&>a]:w-full [&>details]:col-span-2 [&_button]:w-full">
               {awaitingSignature ? (
                 <a className="pressable inline-flex min-h-9 min-w-fit items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-bold text-white shadow-sm" href="#send-link">
                   {tx.say("sendLink")}
@@ -598,7 +620,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   label={tx.say("extendChange")}
                   rentalId={rental.id}
                   vehicleLabel={vehicleTitle(vehicle)}
-                  className="pressable inline-flex min-h-9 min-w-fit items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold text-[var(--foreground-secondary)] shadow-sm"
+                  className="pressable inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-full border-2 border-[var(--border-strong)] bg-white px-3 py-2 font-bold leading-tight text-[var(--foreground)]"
                 />
               ) : null}
               {rental.status === "cancelled" ? (
@@ -609,11 +631,11 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   customerName={customer?.full_name || null}
                 />
               ) : null}
-              <details className="text-right">
-                <summary className="pressable inline-flex min-h-9 cursor-pointer list-none items-center justify-center gap-1 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold text-[var(--foreground-secondary)] shadow-sm">
+              <details className="basis-full">
+                <summary className="pressable inline-flex min-h-11 w-full cursor-pointer list-none items-center justify-center gap-1 rounded-full bg-[var(--background)] px-4 py-2 font-bold text-[var(--foreground)] [&::-webkit-details-marker]:hidden">
                   {tx.say("more")}
                 </summary>
-                <div className="mt-2 flex flex-wrap justify-end gap-2">
+                <div className="mt-2 flex flex-wrap gap-2 [&>*]:flex-1 [&_a]:w-full [&_button]:w-full">
               <ActionButton href={`/bookings/${rental.id}/edit` as Route} tone="light">
                 {tx.say("editBooking")}
               </ActionButton>
@@ -672,62 +694,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
           </div>
         ) : null}
 
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          <BookingMetricCard icon={<CalendarDays size={18} />} label={tx.say("dates")}>
-            <div className="flex flex-wrap items-center gap-1 text-sm font-semibold leading-5 text-[var(--foreground)]">
-              <span>{rental.end_date ? tx.say("dateTo", { date: formatDate(rental.start_date, tx) }) : tx.say("fromOpenEnded", { date: formatDate(rental.start_date, tx) })}</span>
-              <EditableEndDate currentEndDate={rental.end_date} rentalId={rental.id} />
-            </div>
-            <p className="text-sm text-[var(--muted)]">{daysRemaining(rental.end_date, rental.status, rental.start_date, tx)}</p>
-          </BookingMetricCard>
-          <BookingMetricCard icon={<CreditCard size={18} />} label={tx.say("billing")}>
-            <p className="font-mono-data text-sm font-semibold leading-5 text-[var(--foreground)]">{tx.say(`ratePer_${["daily", "weekly", "monthly"].includes(String(rental.pricing_model)) ? rental.pricing_model : "other"}`, { amount: money(rental.rental_rate, rental.currency) })}</p>
-            <p className={`text-sm font-semibold ${financialStateClass}`}>{financialState.label}</p>
-            {financialState.amount !== null ? (
-              <p className={`font-mono-data text-sm ${financialStateClass}`}>{money(financialState.amount, rental.currency)}</p>
-            ) : (
-              <p className="text-sm text-[var(--muted)]">{financialState.detail}</p>
-            )}
-            {pendingPaymentAmount > 0 && customer ? (
-              <div className="mt-3">
-                <PaymentReminderButton rentalId={rental.id} />
-              </div>
-            ) : null}
-          </BookingMetricCard>
-          <BookingMetricCard icon={<Gauge size={18} />} label={tx.say("mileage")}>
-            {rental.mileage_at_delivery == null && rental.mileage_at_return != null ? (
-              <>
-                <p className="font-mono-data text-sm font-semibold leading-5 text-[var(--foreground)]">{tx.say("kmAtReturn", { km: Number(rental.mileage_at_return).toLocaleString("en-US") })}</p>
-                <p className="text-sm text-[var(--muted)]">{tx.say("noReadingHandover")}</p>
-              </>
-            ) : rental.mileage_at_delivery == null ? (
-              <>
-                <p className="text-sm font-semibold leading-5 text-[var(--foreground)]">{isCancelled ? tx.say("neverHandedOver") : isClosed ? tx.say("notRecorded") : tx.say("notRecordedYet")}</p>
-                <p className="text-sm text-[var(--muted)]">{isCancelled ? tx.say("noMileage") : isClosed ? tx.say("noHandoverFormDone") : tx.say("recordedAtHandover")}</p>
-              </>
-            ) : rental.mileage_at_return == null ? (
-              <>
-                <p className="font-mono-data text-sm font-semibold leading-5 text-[var(--foreground)]">{tx.say("kmAtHandover", { km: Number(rental.mileage_at_delivery).toLocaleString("en-US") })}</p>
-                <p className="text-sm text-[var(--muted)]">{tx.say("distanceAtReturn")}</p>
-              </>
-            ) : (
-              <>
-                <p className="font-mono-data text-sm font-semibold leading-5 text-[var(--foreground)]">{tx.say("kmDriven", { km: Number(rental.km_driven ?? Number(rental.mileage_at_return) - Number(rental.mileage_at_delivery)).toLocaleString("en-US") })}</p>
-                <p className="font-mono-data text-sm text-[var(--muted)]">{Number(rental.mileage_at_delivery).toLocaleString()} → {Number(rental.mileage_at_return).toLocaleString()} km</p>
-              </>
-            )}
-          </BookingMetricCard>
-          <BookingMetricCard icon={<UserRound size={18} />} label={tx.say("customer")}>
-            {customer ? (
-              <>
-                <p className="truncate text-sm font-semibold leading-5 text-[var(--foreground)]">{flagForNationality(customer.nationality)} {customer.nationality || tx.say("nationalityNotSet")}</p>
-                <p className="text-sm text-[var(--muted)]">{customer.phone || tx.say("phoneNotSet")}</p>
-              </>
-            ) : (
-              <p className="text-sm font-semibold text-[var(--warning)]">{tx.say("awaitingDetails")}</p>
-            )}
-          </BookingMetricCard>
-        </div>
+        {/* Mileage moved under Vehicle and the customer's details under Customer; the header carries the two numbers that matter. */}
 
         <div className="grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[minmax(0,3fr)_minmax(320px,2fr)]">
           <div className="space-y-3">
@@ -998,6 +965,19 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             >
               <div className="space-y-3 text-sm">
                 <Info icon={Car} label={tx.say("vehicle")} value={`${vehicleTitle(vehicle)} / ${vehicle?.registration_number || ""}`} />
+                <Info
+                  icon={Gauge}
+                  label={tx.say("mileage")}
+                  value={
+                    rental.mileage_at_delivery == null && rental.mileage_at_return != null
+                      ? tx.say("kmAtReturn", { km: Number(rental.mileage_at_return).toLocaleString("en-US") })
+                      : rental.mileage_at_delivery == null
+                        ? isCancelled ? tx.say("neverHandedOver") : isClosed ? tx.say("notRecorded") : tx.say("recordedAtHandover")
+                        : rental.mileage_at_return == null
+                          ? tx.say("kmAtHandover", { km: Number(rental.mileage_at_delivery).toLocaleString("en-US") })
+                          : `${tx.say("kmDriven", { km: Number(rental.km_driven ?? Number(rental.mileage_at_return) - Number(rental.mileage_at_delivery)).toLocaleString("en-US") })} · ${Number(rental.mileage_at_delivery).toLocaleString()} → ${Number(rental.mileage_at_return).toLocaleString()} km`
+                  }
+                />
                 {deliveryInspection ? (
                   <Info icon={MapPin} label={tx.say("handover")} value={tx.say("handedOver", { when: formatDateTime(deliveryInspection.submitted_at || deliveryInspection.created_at, tx) })} />
                 ) : isCancelled || (rental.entered_by_operator && delivery.undecided) ? null : (

@@ -55,10 +55,11 @@ function bookingReference(booking: any) {
 }
 
 function statusTone(status: string): "green" | "amber" | "red" | "blue" | "neutral" {
-  if (status === "completed") return "blue";
-  if (status === "active" || status === "extended") return "green";
+  // Same as the booking page: the solid pill is for a vehicle that is out right now.
+  if (status === "completed") return "green";
+  if (status === "active" || status === "extended" || status === "due_soon") return "blue";
   if (status === "overdue" || status === "cancelled") return "red";
-  if (status === "booked" || status === "due_soon") return "amber";
+  if (status === "booked") return "amber";
   return "neutral";
 }
 
@@ -66,18 +67,9 @@ function isCancelledBooking(booking: any) {
   return String(booking.status || "").toLowerCase() === "cancelled" || String(booking.booking_link?.status || "").toLowerCase() === "cancelled";
 }
 
+/** The status pill says where the booking is; the card itself stays plain. Cancelled ones fade. */
 function statusCardClasses(booking: any) {
-  const status = String(booking.status || "").toLowerCase();
-  // White cards with a thin coloured edge: status reads at a glance without
-  // washing the whole list in colour.
-  const base = "border-[var(--border)] bg-white shadow-[var(--shadow-sm)] border-l-[3px]";
-  if (isCancelledBooking(booking)) return `${base} border-l-[var(--border)] opacity-80`;
-  if (status === "completed") return `${base} border-l-[var(--info-line)]`;
-  if (status === "active" || status === "extended") return `${base} border-l-[var(--success)]`;
-  if (status === "due_soon") return `${base} border-l-[var(--warning)]`;
-  if (status === "overdue") return `${base} border-l-[var(--danger)]`;
-  if (status === "booked") return `${base} border-l-[var(--primary)]`;
-  return base;
+  return isCancelledBooking(booking) ? "opacity-70" : "";
 }
 
 /** Where the customer is with their booking link. Same wording as the booking page; nothing when there's no live link. */
@@ -247,22 +239,22 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-[10px] border border-[var(--border)] bg-white p-3">
+      <div className="space-y-3">
         <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
           <label className="relative block min-w-0 flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" size={16} />
+            <Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted)]" size={18} />
             <input
-              className="input-with-leading-icon h-9 w-full rounded-lg border border-[var(--border)] bg-white pr-3 text-[13px] font-medium text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]"
+              className="input-with-leading-icon w-full rounded-full border-0 bg-white pr-4 font-medium text-[var(--foreground)] outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
               onChange={(event) => setSearch(event.target.value)}
               placeholder={tx.say("searchPlaceholder")}
               value={search}
             />
           </label>
           {/* Wraps onto a second row on a phone: scrolling sideways hid half the filters with no sign they were there. */}
-          <div className="flex flex-wrap gap-1.5 xl:justify-end">
+          <div className="flex flex-wrap gap-2 xl:justify-end">
             {filters.map((entry) => (
               <button
-                className={`pressable min-h-8 min-w-fit rounded-md border px-3 py-1.5 text-[12px] font-semibold ${filter === entry ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-[var(--panel-secondary)] text-[var(--foreground-secondary)]"}`}
+                className={`pressable min-h-10 min-w-fit rounded-full px-4 font-bold ${filter === entry ? "bg-[var(--primary)] text-white" : "bg-white text-[var(--foreground)]"}`}
                 key={entry}
                 onClick={() => setFilter(entry)}
                 type="button"
@@ -291,10 +283,10 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
             const photoUrl = booking.vehicles?.primary_photo_url;
             const effectiveStatus = isCancelledBooking(booking) ? "cancelled" : String(booking.status || "");
             return (
-            <article className={`relative rounded-[10px] border p-2 transition hover:border-[var(--primary)] hover:shadow-[0_16px_30px_rgba(15,23,42,0.06)] ${statusCardClasses(booking)}`} key={booking.id}>
+            <article className={`card relative p-4 transition ${statusCardClasses(booking)}`} key={booking.id}>
               {/* Photo beside the details from tablet width up. On phones a photo squeezed into a strip showed a slice of bonnet, so it is left out there. */}
-              <div className="grid gap-2.5 md:grid-cols-[104px_minmax(0,1fr)_136px] md:items-center">
-                <Link className={`group relative h-[68px] overflow-hidden hidden md:block rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)]`} href={`/bookings/${booking.id}`}>
+              <div className="grid gap-3 md:grid-cols-[104px_minmax(0,1fr)_auto] md:items-center">
+                <Link className={`group relative h-[72px] overflow-hidden hidden md:block rounded-xl bg-[var(--panel-secondary)]`} href={`/bookings/${booking.id}`}>
                   {photoUrl ? (
                     <img
                       alt={tx.say("photoAlt", { vehicle: vehicleTitle(booking.vehicles) || tx.say("vehicle") })}
@@ -318,7 +310,6 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                       {linkLabel(booking.booking_link?.status, tx)}
                     </Badge>
                   ) : null}
-                    <span className="font-mono-data ml-1 hidden text-[11px] font-semibold uppercase tracking-[0.04em] text-[var(--muted)] sm:inline">{bookingReference(booking)}</span>
                   </div>
                     {/* Edit, extend, cancel and delete stay one tap away without crowding every card. */}
                     <details className="relative z-10 ml-auto shrink-0">
@@ -379,30 +370,17 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                     </details>
                   </div>
 
-                  <Link className="mt-1 block truncate text-[15px] font-semibold leading-tight text-[var(--foreground)] after:absolute after:inset-0 after:content-[''] hover:text-[var(--primary)]" href={`/bookings/${booking.id}`}>
-                    {booking.customers ? customerLabel(booking, tx) : <span className="inline-flex items-center gap-1.5 text-[var(--warning)]"><Clock size={15} /> {tx.say("awaitingCustomer")}</span>}
+                  <Link className="mt-2 block text-[19px] font-bold leading-tight text-[var(--foreground)] after:absolute after:inset-0 after:content-[''] hover:text-[var(--primary)]" href={`/bookings/${booking.id}`}>
+                    {booking.customers ? customerLabel(booking, tx) : <span className="inline-flex items-center gap-1.5 text-[var(--warning)]"><Clock size={18} /> {tx.say("awaitingCustomer")}</span>}
                   </Link>
 
-                  <div className="mt-1 grid gap-1 text-[12px] text-[var(--foreground-secondary)] sm:grid-cols-2 xl:grid-cols-3">
-                    <span className="flex min-w-0 items-center gap-2">
-                      <Car size={15} className="shrink-0 text-[var(--primary)]" />
-                      <span className="truncate">
-                        <strong className="font-semibold text-[var(--foreground-secondary)]">{vehicleTitle(booking.vehicles) || tx.say("vehicle")}</strong>
-                        {booking.vehicles?.registration_number ? <span className="font-mono-data ml-2 text-[var(--muted)]">{booking.vehicles.registration_number}</span> : null}
-                      </span>
-                    </span>
-                    <span className="flex min-w-0 items-center gap-2">
-                      <CalendarDays size={15} className="shrink-0 text-[var(--primary)]" />
-                      <span className="truncate">{formatRange(booking.start_date, booking.end_date, tx)}</span>
-                    </span>
-                    <span className="hidden min-w-0 items-center gap-2 sm:flex">
-                      <UserRound size={15} className="shrink-0 text-[var(--primary)]" />
-                      <span className="truncate">{booking.customers?.phone || tx.say("noPhone")}</span>
-                    </span>
-                  </div>
-                  {timingLabel ? <p className="mt-1 text-[12px] font-medium text-[var(--muted)]">{timingLabel}</p> : null}
+                  {/* One line: the vehicle and the dates. The plate and the phone are on the booking. */}
+                  <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">
+                    {vehicleTitle(booking.vehicles) || tx.say("vehicle")} · {formatRange(booking.start_date, booking.end_date, tx)}
+                  </p>
+                  {timingLabel ? <p className="mt-1 font-bold text-[var(--foreground)]">{timingLabel}</p> : null}
                   {waitingOn ? (
-                    <p className="mt-1 text-[12px] font-semibold text-[var(--danger)]">
+                    <p className="mt-1 font-bold text-[var(--danger)]">
                       {tx.say("notBack", { name: waitingOn.customers?.full_name || tx.say("currentCustomer"), date: shortDate(String(waitingOn.end_date).slice(0, 10), tx.locale) })}{" "}
                       <Link className="relative z-10 underline underline-offset-2" href={`/bookings/${waitingOn.id}`}>
                         {tx.say("openThatRental")}
@@ -410,24 +388,19 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                     </p>
                   ) : null}
                   {hold ? (
-                    <p className={`relative z-10 mt-1 w-fit text-[12px] font-medium ${hold.ended ? "text-[var(--warning)]" : "text-[var(--primary)]"}`}>
+                    <p className={`relative z-10 mt-1 w-fit font-semibold ${hold.ended ? "text-[var(--warning)]" : "text-[var(--foreground-secondary)]"}`}>
                       {hold.text}
                       <ExtendHoldButton ended={hold.ended} rentalId={booking.id} />
                     </p>
                   ) : null}
                 </div>
 
-                <div className="md:justify-self-end">
-                  <div className="w-full rounded-lg border border-[var(--border)] bg-white/80 px-3 py-1.5 md:w-[136px]">
-                    <div className="flex items-center justify-between gap-3 md:block md:text-right">
-                      <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{tx.say("paid")}</span>
-                      <span className="font-mono-data block text-[16px] font-semibold text-[var(--primary)]">{money(booking.total_paid, booking.currency)}</span>
-                    </div>
-                    <span className={`font-mono-data mt-0.5 block text-[11px] md:text-right ${Number(booking.balance_due) > 0 ? "font-semibold text-[var(--warning)]" : "text-[var(--muted)]"}`}>
-                      {Number(booking.balance_due) > 0 ? tx.say("dueNow", { amount: money(booking.balance_due, booking.currency) }) : tx.say("nothingDue")}
-                    </span>
-                  </div>
-                </div>
+                {/* Money only when there is something to say: what is due now in brick, otherwise what has been paid. */}
+                {Number(booking.balance_due) > 0 ? (
+                  <p className="text-[17px] font-bold tabular-nums text-[var(--danger)] md:text-right">{tx.say("dueNow", { amount: money(booking.balance_due, booking.currency) })}</p>
+                ) : Number(booking.total_paid) > 0 ? (
+                  <p className="font-bold tabular-nums text-[var(--success)] md:text-right">{tx.say("paid")} {money(booking.total_paid, booking.currency)}</p>
+                ) : null}
               </div>
               {confirmDeleteId === booking.id ? (
                 <div className="relative z-10 mt-2 rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-2">

@@ -674,7 +674,7 @@ export function BookingForm({
             }}
             type="button"
           >
-            {bookingMode === "booking_link" ? "It has already started" : "Send a booking link instead"}
+            {bookingMode === "booking_link" ? "Vehicle already with the customer?" : "Send a booking link instead"}
           </button>
         </div>
       ) : null}
@@ -933,10 +933,32 @@ export function BookingForm({
             );
           })()}
           {!(rentalRate > 0) ? (
-            <p className="mt-2 text-xs font-semibold text-[#b45309]">
-              {pricingModel === "custom" ? "Enter the rate to continue." : `This vehicle has no rates saved. Enter the rate per ${periodLabel} to continue.`}
+            // A hint, not a warning: nothing has gone wrong, the price just hasn't been typed yet.
+            <p className="mt-2 text-xs text-[var(--muted)]">
+              {pricingModel === "custom" ? "Enter the price you agreed." : `No price is saved for this vehicle yet. Enter the price per ${periodLabel}.`}
             </p>
-          ) : null}
+          ) : (
+            (() => {
+              // The sum the customer is asked for first, shown as it is typed rather than only on the last step.
+              const rentalDays = !openEnded && startDate && endDate ? Math.max(1, Math.round((new Date(`${endDate}T00:00:00`).getTime() - new Date(`${startDate}T00:00:00`).getTime()) / 86400000)) : 1;
+              if (pricingModel === "daily" && (openEnded || !endDate)) return null;
+              const firstRent = pricingModel === "daily" ? rentalRate * rentalDays : rentalRate;
+              const rentWords =
+                pricingModel === "daily"
+                  ? `${rentalDays} ${rentalDays === 1 ? "day" : "days"} × ${money(rentalRate, currency)}`
+                  : pricingModel === "custom"
+                    ? "rent"
+                    : `first ${periodLabel}`;
+              return (
+                <p className="mt-2 rounded-lg bg-[var(--panel-secondary)] px-3 py-2 text-[13px] text-[var(--foreground-secondary)]">
+                  <span className="font-semibold text-[var(--foreground)]">{money(firstRent + depositAmount, currency)} to start</span>
+                  {" · "}
+                  {money(firstRent, currency)} {rentWords}
+                  {depositAmount > 0 ? ` + ${money(depositAmount, currency)} deposit` : ""}
+                </p>
+              );
+            })()
+          )}
           <div className="mt-3">
             <p className="text-[13px] font-semibold text-[var(--foreground)]">What is included</p>
             <div className="mt-3 grid grid-cols-2 gap-2">

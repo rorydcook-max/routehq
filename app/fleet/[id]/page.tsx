@@ -278,8 +278,13 @@ function Plate({ registration, province }: { registration: string; province?: st
   );
 }
 
-function QuickActions({ vehicleId, status }: { vehicleId: string; status: string }) {
-  const primary = status === "available" ? { href: detailUrl("/bookings/new", vehicleId), label: "New booking", icon: CalendarDays } : { href: detailUrl("/transactions/new", vehicleId), label: "Record money", icon: ReceiptText };
+function QuickActions({ vehicleId, status, rentalId }: { vehicleId: string; status: string; rentalId?: string | null }) {
+  // The main button follows what the vehicle is doing: out with a customer, the next thing wanted is that booking.
+  const primary = rentalId
+    ? { href: `/bookings/${rentalId}`, label: "Open the booking", icon: CalendarDays }
+    : status === "available"
+      ? { href: detailUrl("/bookings/new", vehicleId), label: "New booking", icon: CalendarDays }
+      : { href: detailUrl("/transactions/new", vehicleId), label: "Record money", icon: ReceiptText };
   // The most likely next step comes first and stands out; the rest follow.
   const actions = [
     primary,
@@ -751,7 +756,7 @@ function MaintenanceSection({ detail, organizationId }: { detail: VehicleDetail;
         <p className="mt-1 text-sm text-[var(--muted)]">Estimated km: {compliance.next_service_mileage ? `${Number(compliance.next_service_mileage).toLocaleString()} km` : "Not set"}</p>
       </div>
       <details className="mt-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
-        <summary className="cursor-pointer font-bold text-[var(--primary)]">Log Maintenance</summary>
+        <summary className="cursor-pointer font-bold text-[var(--primary)]">Log maintenance</summary>
         <form action={logVehicleMaintenance} className="mt-3 grid gap-3 sm:grid-cols-2">
           <input name="vehicleId" type="hidden" value={detail.vehicle.id} />
           <input name="organizationId" type="hidden" value={organizationId} />
@@ -1173,7 +1178,7 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
                   </div>
                 </div>
                 <div>
-                  <QuickActions status={vehicle.status} vehicleId={vehicle.id} />
+                  <QuickActions rentalId={detail.activeRental?.id || null} status={vehicle.status} vehicleId={vehicle.id} />
                 </div>
               </div>
             </div>

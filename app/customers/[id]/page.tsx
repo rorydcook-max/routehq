@@ -423,7 +423,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             </Fold>
 
             <Card>
-              <SectionHeader eyebrow="Communication" title="Message them" />
+              <SectionHeader eyebrow="Communication" title="Contact and notes" />
               <div className="mt-3">
                 <CommunicationPanel
                   booking={{

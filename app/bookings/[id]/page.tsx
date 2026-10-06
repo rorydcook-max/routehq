@@ -557,7 +557,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   <Badge tone={bookingLinkBadge(bookingLink?.status)!.tone}>{bookingLinkBadge(bookingLink?.status)!.label}</Badge>
                 ) : null}
                 {!customer ? <Badge tone="amber">Awaiting customer</Badge> : null}
-                {rental.entered_by_operator ? <Badge tone="blue">Operator entered</Badge> : null}
+                {rental.entered_by_operator ? <Badge tone="blue">Entered by your team</Badge> : null}
                 <span className="font-mono-data text-xs font-semibold uppercase text-[var(--muted)]">{bookingReference(rental)}</span>
               </div>
               <h1 className="mt-2 truncate text-2xl font-semibold tracking-[-0.02em] text-[var(--foreground)]">
@@ -837,7 +837,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
 
             {customer ? (
               <Card>
-                <SectionHeader eyebrow="Communication" title="Customer messaging" />
+                <SectionHeader eyebrow="Communication" title="Contact and notes" />
                 <div className="mt-3">
                   <CommunicationPanel
                     booking={{
@@ -942,16 +942,13 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     <p className="mt-2 text-sm text-[#b45309]">The vehicle went out without a handover form.</p>
                   </div>
                 )}
-                {isCancelled && !deliveryInspection ? null : (
+                {/* Before the handover there is no return to talk about: a warning sign on a form that can't be opened yet was noise. */}
+                {(isCancelled && !deliveryInspection) || (rental.status === "booked" && !returnInspection) ? null : (
                   <InspectionStatus label="Return form" inspection={returnInspection} href={`/inspections/return/${rental.id}` as Route} available={["active", "due_soon", "overdue", "extended"].includes(displayStatus)} />
                 )}
               </div>
               {inspections.length === 0 ? (
-                isCancelled ? null : (
-                  <div className="mt-3">
-                    <SectionEmpty>No forms completed yet.</SectionEmpty>
-                  </div>
-                )
+                null
               ) : (
                 <details className="mt-3">
                   <summary className="cursor-pointer py-1 text-sm font-semibold text-[var(--primary)]">

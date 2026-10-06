@@ -156,6 +156,21 @@ export function CalendarView({ events, initialMonth, today }: { events: Calendar
             );
           })}
         </div>
+        {/* What the dots mean, for phones where a day only has room for dots. */}
+        <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-[var(--muted)] sm:hidden">
+          {([
+            ["blue", "Handover"],
+            ["amber", "Return"],
+            ["purple", "Payment"],
+            ["red", "Late or due"],
+            ["green", "Done"]
+          ] as const).map(([tone, label]) => (
+            <span className="inline-flex items-center gap-1" key={tone}>
+              <span className={`h-1.5 w-1.5 rounded-full ${dotClasses[tone]}`} />
+              {label}
+            </span>
+          ))}
+        </div>
       </div>
 
       <div className="content-section">

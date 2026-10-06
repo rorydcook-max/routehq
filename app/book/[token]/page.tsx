@@ -17,6 +17,11 @@ import { nextMonthlyDue } from "@/lib/open-ended-billing";
 import { chatInvites } from "@/lib/customer-chat-link";
 import { promptPayQrSvg } from "@/lib/promptpay";
 import { PortalPayments } from "./portal-payments";
+import { getLocale, getTranslations } from "next-intl/server";
+import { CustomerLanguagePicker } from "@/components/customer-language-picker";
+
+/** The page's words in the customer's language. Passed to the helpers below so they stay plain functions. */
+type T = Awaited<ReturnType<typeof getTranslations>>;
 
 /** An amendment waiting for this customer's signature, if any. */
 async function pendingAmendmentFor(rentalId: string) {
@@ -34,7 +39,7 @@ function money(value: unknown, currency = "THB") {
   return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0));
 }
 
-function rateLabel(rental: any) {
+function rateLabel(rental: any, t: T) {
   const currency = String(rental?.currency || "THB");
   const rate = money(rental?.rental_rate, currency);
   const period = String(rental?.pricing_model || "monthly").toLowerCase().replace(/_/g, " ").trim();
@@ -43,11 +48,11 @@ function rateLabel(rental: any) {
     const start = String(rental?.start_date || "").slice(0, 10);
     const end = String(rental?.end_date || "").slice(0, 10);
     const days = start && end ? Math.round((new Date(`${end}T00:00:00Z`).getTime() - new Date(`${start}T00:00:00Z`).getTime()) / 86_400_000) : 0;
-    return days > 1 ? `${rate} / day\n${money(Number(rental?.rental_rate || 0) * days, currency)} for ${days} days` : `${rate} / day`;
+    return days > 1 ? `${t("perDay", { rate })}\n${t("totalForDays", { total: money(Number(rental?.rental_rate || 0) * days, currency), days })}` : t("perDay", { rate });
   }
-  if (period === "weekly") return `${rate} / week`;
-  if (period === "custom") return `${rate} for the rental`;
-  return `${rate} / month`;
+  if (period === "weekly") return t("perWeek", { rate });
+  if (period === "custom") return t("forTheRental", { rate });
+  return t("perMonth", { rate });
 }
 
 function vehicleTitle(vehicle: any) {
@@ -72,19 +77,19 @@ function normalizedDeliveryMethod(value: unknown) {
   return "delivery";
 }
 
-function deliveryText(rental: any, bookingData: Record<string, unknown>) {
+function deliveryText(rental: any, bookingData: Record<string, unknown>, t: T, locale: string) {
   const method = normalizedDeliveryMethod(rental?.delivery_method || bookingData.delivery_method);
   const rawLocation = String(bookingData.delivery_location || rental?.delivery_location || "").trim();
   const locationWasMapsUrl = isMapsUrl(rawLocation);
   const location = locationWasMapsUrl ? formatDeliveryLocation(rawLocation) : rawLocation;
   const dateTime = toWallTime(bookingData.delivery_datetime || rental?.delivery_datetime || "");
-  const methodLabel = method === "tbd" ? "Handover to be arranged" : method === "collection" ? "You collect the vehicle" : "We deliver to you";
+  const methodLabel = method === "tbd" ? t("handoverToBeArranged") : method === "collection" ? t("youCollect") : t("weDeliver");
   const mapsUrl = deliveryMapsUrl(bookingData, rawLocation);
   const displayLocation = locationWasMapsUrl ? location : formatDeliveryAddress(location);
 
   return {
-    location: location ? `${methodLabel}:\n${displayLocation}${mapsUrl ? `\n${mapsUrl}` : ""}` : method === "tbd" ? methodLabel : `${methodLabel}\nPlace to be confirmed`,
-    time: formatDeliveryDateTime(dateTime)
+    location: location ? `${methodLabel}:\n${displayLocation}${mapsUrl ? `\n${mapsUrl}` : ""}` : method === "tbd" ? methodLabel : `${methodLabel}\n${t("placeToBeConfirmed")}`,
+    time: formatDeliveryDateTime(dateTime, t, locale)
   };
 }
 
@@ -159,23 +164,22 @@ function formatDeliveryAddress(address: string) {
   return lines.join("\n");
 }
 
-function formatDeliveryDateTime(value: string) {
-  if (!value) return "To be confirmed";
+function formatDeliveryDateTime(value: string, t: T, locale: string) {
+  if (!value) return t("toBeConfirmed");
   const normalized = value.replace(" ", "T");
   const [datePart, timePart = ""] = normalized.split("T");
   const time = timePart.slice(0, 5);
-  return time ? `${formatSummaryDate(datePart)}\n${time}` : formatSummaryDate(datePart);
+  return time ? `${formatSummaryDate(datePart, t, locale)}\n${time}` : formatSummaryDate(datePart, t, locale);
 }
 
-function paymentDueText(rental: any, bookingData: Record<string, unknown>) {
+function paymentDueText(rental: any, bookingData: Record<string, unknown>, t: T, locale: string) {
   const deliveryDateTime = toWallTime(bookingData.delivery_datetime || rental?.delivery_datetime || rental?.start_date || "");
-  const firstDueDate = formatSummaryDate(deliveryDateTime);
+  const firstDueDate = formatSummaryDate(deliveryDateTime, t, locale);
   const period = String(rental?.pricing_model || "monthly").toLowerCase();
-  const endDate = rental?.is_indefinite ? "" : formatSummaryDate(rental?.end_date);
-  const frequencyLabel = period === "daily" ? "day" : period === "weekly" ? "week" : period === "custom" ? "custom billing period" : "month";
+  const endDate = rental?.is_indefinite || !rental?.end_date ? "" : formatSummaryDate(rental?.end_date, t, locale);
 
   // Daily and one-off agreed prices are a single payment for the whole rental.
-  if (period === "custom" || period === "daily") return `${firstDueDate} (one payment)`;
+  if (period === "custom" || period === "daily") return t("onePayment", { date: firstDueDate });
 
   // A rental that fits in one billing period has one payment - don't describe a repeating schedule.
   const firstIso = String(deliveryDateTime || "").slice(0, 10);
@@ -185,28 +189,33 @@ function paymentDueText(rental: any, bookingData: Record<string, unknown>) {
     if (period === "daily") next.setUTCDate(next.getUTCDate() + 1);
     else if (period === "weekly") next.setUTCDate(next.getUTCDate() + 7);
     else next.setUTCMonth(next.getUTCMonth() + 1);
-    if (next.toISOString().slice(0, 10) >= endIso) return `${firstDueDate} (one payment)`;
+    if (next.toISOString().slice(0, 10) >= endIso) return t("onePayment", { date: firstDueDate });
   }
 
-  return endDate && endDate !== "TBD"
-    ? `${firstDueDate}\nThen on the same day each ${frequencyLabel} until ${endDate}`
-    : `${firstDueDate}\nThen on the same day each ${frequencyLabel}`;
+  const weekly = period === "weekly";
+  return endDate
+    ? `${firstDueDate}\n${t(weekly ? "thenEachWeekUntil" : "thenEachMonthUntil", { end: endDate })}`
+    : `${firstDueDate}\n${t(weekly ? "thenEachWeek" : "thenEachMonth")}`;
 }
 
-/** "2026-10-01" -> "1 Oct 2026" for customers; the calendar date is kept as written. */
-function formatSummaryDate(value: unknown) {
+/** "2026-10-01" -> "1 Oct 2026" in the customer's language; the calendar date is kept as written. */
+function formatSummaryDate(value: unknown, t: T, locale: string) {
   const raw = String(value || "").trim();
-  if (!raw) return "TBD";
+  if (!raw) return t("toBeConfirmed");
   const date = raw.split("T")[0] || raw;
   const match = date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (!match) return date;
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  return `${Number(match[3])} ${months[Number(match[2]) - 1]} ${match[1]}`;
+  // Western year numbering everywhere, so a date on this page matches the same date on the agreement.
+  return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : `${locale}-u-ca-gregory`, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]))));
 }
 
-function ErrorState({ title, message, contact, rebookHref, rebookLabel = "Choose other dates" }: { title: string; message: string; contact?: string | null; rebookHref?: string | null; rebookLabel?: string }) {
+async function ErrorState({ title, message, contact, rebookHref, rebookLabel }: { title: string; message: string; contact?: string | null; rebookHref?: string | null; rebookLabel?: string }) {
+  const t = await getTranslations("customer");
   return (
     <main className="min-h-screen bg-[#fbfaf8] px-4 py-8">
+      <div className="mx-auto mb-3 flex max-w-xl justify-end">
+        <CustomerLanguagePicker />
+      </div>
       <section className="mx-auto max-w-xl rounded-2xl border border-[var(--border)] bg-white p-6 text-center shadow-sm">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#ffe4e6] text-[#be123c]">
           <AlertTriangle />
@@ -215,12 +224,12 @@ function ErrorState({ title, message, contact, rebookHref, rebookLabel = "Choose
         <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{message}</p>
         {rebookHref ? (
           <a className="pressable mt-5 inline-flex rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={rebookHref}>
-            {rebookLabel}
+            {rebookLabel || t("chooseOtherDates")}
           </a>
         ) : null}
         {contact ? (
           <a className={`pressable mt-5 inline-flex rounded-xl px-5 py-3 text-sm font-semibold ${rebookHref ? "ml-2 border border-[var(--border)] bg-white text-[var(--foreground)]" : "bg-[var(--primary)] text-white"}`} href={contact}>
-            Contact operator
+            {t("contactBusiness")}
           </a>
         ) : null}
       </section>
@@ -231,9 +240,10 @@ function ErrorState({ title, message, contact, rebookHref, rebookLabel = "Choose
 export default async function PublicBookingPage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
   const detail = await getPublicBookingDetail(token);
+  const [t, locale] = await Promise.all([getTranslations("customer"), getLocale()]);
 
   if (detail.state === "not_found") {
-    return <ErrorState message="Please check the link or contact the rental operator for a new booking link." title="Booking link not found" />;
+    return <ErrorState message={t("notFoundMessage")} title={t("notFoundTitle")} />;
   }
 
   const organization = detail.organization || {};
@@ -241,7 +251,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   const contact = contactHref(organization?.settings?.phone || organization?.settings?.business_phone || customer?.phone);
 
   if (detail.state === "expired") {
-    return <ErrorState contact={contact} message={`This booking link has expired. Please contact ${organization?.name || "the rental operator"} for a new link.`} title="This booking link has expired" />;
+    return <ErrorState contact={contact} message={t("expiredMessage", { business: organization?.name || t("theRentalBusiness") })} title={t("expiredTitle")} />;
   }
 
   if (detail.state === "taken") {
@@ -249,9 +259,9 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
     return (
       <ErrorState
         contact={contact}
-        message={`Your booking wasn't completed in time and someone else has since booked this vehicle for those dates. ${onlineBooking ? "You can choose other dates or another vehicle" : `Please contact ${organization?.name || "the rental business"} to choose other dates or another vehicle`}.`}
+        message={onlineBooking ? t("takenMessageOnline") : t("takenMessageContact", { business: organization?.name || t("theRentalBusiness") })}
         rebookHref={onlineBooking ? `/rent/${organization.slug}` : null}
-        title="These dates have been taken"
+        title={t("takenTitle")}
       />
     );
   }
@@ -261,22 +271,23 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
     return (
       <ErrorState
         contact={contact}
-        message={`This booking has been cancelled. Please contact ${organization?.name || "the rental operator"} if you have questions.`}
+        message={t("cancelledMessage", { business: organization?.name || t("theRentalBusiness") })}
         rebookHref={onlineBooking ? `/rent/${organization.slug}` : null}
-        rebookLabel="Book again"
-        title="This booking has been cancelled"
+        rebookLabel={t("bookAgain")}
+        title={t("cancelledTitle")}
       />
     );
   }
 
   if (!detail.completion || !detail.documentStatus || !detail.bookingLink) {
-    return <ErrorState contact={contact} message="This booking link is missing required booking details. Please contact the rental operator for a new link." title="Booking link incomplete" />;
+    return <ErrorState contact={contact} message={t("incompleteMessage")} title={t("incompleteTitle")} />;
   }
 
   const vehicle = detail.vehicle || {};
   const rental = detail.rental || {};
   const bookingData = (detail.bookingLink?.booking_data || {}) as Record<string, unknown>;
-  const delivery = deliveryText(rental, bookingData);
+  const delivery = deliveryText(rental, bookingData, t, locale);
+  const businessName = organization?.name || t("theRentalBusiness");
   const handedOver = detail.state === "active" || detail.state === "completed";
   const included = includedItems(detail.bookingLink?.included_items);
   const logoUrl = organization?.logo_display_url || null;
@@ -311,16 +322,16 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
               </span>
               <div>
                 <h2 className="text-2xl font-semibold">{vehicleTitle(vehicle)}</h2>
-                <p className="mt-1 text-sm font-bold text-[var(--muted)]">{vehicle.registration_number || "Plate pending"} {vehicle.color ? `- ${vehicle.color}` : ""}</p>
+                <p className="mt-1 text-sm font-bold text-[var(--muted)]">{vehicle.registration_number || t("platePending")} {vehicle.color ? `- ${vehicle.color}` : ""}</p>
               </div>
             </div>
             <div className="mt-4 grid grid-cols-2 gap-3">
-              <Info className="col-span-2 sm:col-span-1" icon={CalendarDays} label="Rental period" value={rental.is_indefinite && detail.state !== "completed" ? `Monthly, open-ended from ${formatSummaryDate(rental.start_date)}` : `${formatSummaryDate(rental.start_date)} to ${formatSummaryDate(rental.end_date)}`} />
-              <Info icon={CreditCard} label="Rate and deposit" value={`${rateLabel(rental)}\n${Number(rental.deposit_amount || 0) > 0 ? `Deposit: ${money(rental.deposit_amount, rental.currency || "THB")}` : "No deposit"}`} />
+              <Info className="col-span-2 sm:col-span-1" icon={CalendarDays} label={t("rentalPeriod")} value={rental.is_indefinite && detail.state !== "completed" ? t("openEndedFrom", { date: formatSummaryDate(rental.start_date, t, locale) }) : t("dateRange", { start: formatSummaryDate(rental.start_date, t, locale), end: formatSummaryDate(rental.end_date, t, locale) })} />
+              <Info icon={CreditCard} label={t("rateAndDeposit")} value={`${rateLabel(rental, t)}\n${Number(rental.deposit_amount || 0) > 0 ? t("depositAmount", { amount: money(rental.deposit_amount, rental.currency || "THB") }) : t("noDeposit")}`} />
               {/* Once the customer has the vehicle, where and when it was to be handed over is old news. */}
-              {handedOver ? null : <Info icon={ReceiptText} label="First payment due" value={paymentDueText(rental, bookingData)} />}
-              {handedOver ? null : <Info icon={MapPin} label="Handover" value={delivery.location} />}
-              {handedOver ? null : <Info icon={Clock} label="Handover time" value={delivery.time} />}
+              {handedOver ? null : <Info icon={ReceiptText} label={t("firstPaymentDue")} value={paymentDueText(rental, bookingData, t, locale)} />}
+              {handedOver ? null : <Info icon={MapPin} label={t("handover")} value={delivery.location} />}
+              {handedOver ? null : <Info icon={Clock} label={t("handoverTime")} value={delivery.time} />}
             </div>
           </div>
 
@@ -346,12 +357,15 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             href={`/amend/${pendingAmendmentToken}`}
           >
             <span>
-              <span className="block text-sm font-semibold text-[var(--primary)]">A change to your rental needs your signature</span>
-              <span className="block text-xs text-[var(--foreground-secondary)]">See what is changing and sign in one step.</span>
+              <span className="block text-sm font-semibold text-[var(--primary)]">{t("changeNeedsSignature")}</span>
+              <span className="block text-xs text-[var(--foreground-secondary)]">{t("changeSeeAndSign")}</span>
             </span>
-            <span className="shrink-0 rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white">Review</span>
+            <span className="shrink-0 rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white">{t("review")}</span>
           </a>
         ) : null}
+        <div className="flex justify-end">
+          <CustomerLanguagePicker />
+        </div>
         <header className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
           <div className="flex items-center gap-3">
             <BusinessLogoImage
@@ -361,15 +375,15 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
               src={logoUrl}
             />
             <div>
-              <p className="text-xs font-semibold uppercase text-[var(--primary)]">Rental booking</p>
-              {logoUrl ? null : <h1 className="text-xl font-semibold">{organization?.name || "Rental operator"}</h1>}
+              <p className="text-xs font-semibold uppercase text-[var(--primary)]">{t("rentalBooking")}</p>
+              {logoUrl ? null : <h1 className="text-xl font-semibold">{organization?.name || ""}</h1>}
             </div>
           </div>
 
           {/* On rent, the page leads with the rental itself; what was booked is one tap away. */}
           {detail.state === "active" ? (
             <details className="mt-4">
-              <summary className="cursor-pointer text-sm font-semibold text-[var(--primary)]">Your booking details</summary>
+              <summary className="cursor-pointer text-sm font-semibold text-[var(--primary)]">{t("yourBookingDetails")}</summary>
               {bookingSummary}
             </details>
           ) : (
@@ -379,14 +393,14 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
 
         {invites.length > 0 && detail.state !== "completed" ? (
           <section className="rounded-2xl border border-[#bfe0db] bg-[var(--primary-light)] p-4 shadow-sm">
-            <p className="text-sm font-semibold text-[var(--foreground)]">Get updates about your rental</p>
+            <p className="text-sm font-semibold text-[var(--foreground)]">{t("updatesTitle")}</p>
             <p className="mt-1 text-sm leading-6 text-[var(--foreground-secondary)]">
-              Payment reminders, return dates and answers from {organization?.name || "us"}, sent to you. Tap, then send the message that appears.
+              {t("updatesBody", { business: businessName })}
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {invites.map((invite) => (
                 <a className="pressable inline-flex min-h-11 items-center justify-center rounded-xl bg-[var(--primary)] px-4 text-sm font-semibold text-white" href={invite.url} key={invite.provider} rel="noreferrer" target="_blank">
-                  Get updates on {invite.label}
+                  {t("updatesOn", { app: invite.label })}
                 </a>
               ))}
             </div>
@@ -397,7 +411,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
           <ActiveRentalPortal
             bookingData={bookingData}
             deliveryPhotoUrls={detail.deliveryPhotoUrls || []}
-            organizationName={organization?.name || "Rental operator"}
+            organizationName={businessName}
             endNoticeDays={bookingRules(organization?.settings).endNoticeDays}
             extensionRates={rentalRateCard(vehicle, rental)}
             openEndedOffer={await openEndedOffer(vehicle, rental)}
@@ -414,15 +428,15 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
         ) : detail.state === "completed" ? (
           <>
           {portal.payments.length > 0 ? (
-            <PortalPayments bundle={portal.bundle} orgPayment={detail.org_payment} organizationName={organization?.name || "Rental operator"} payments={portal.payments} token={token} />
+            <PortalPayments bundle={portal.bundle} orgPayment={detail.org_payment} organizationName={businessName} payments={portal.payments} token={token} />
           ) : null}
           <section className="rounded-2xl border border-[var(--border)] bg-white p-5 text-center shadow-sm">
             <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#f0fdf4] text-[#16a34a]">
               <ShieldCheck size={28} />
             </span>
-            <h2 className="mt-4 text-2xl font-semibold text-[var(--foreground)]">Rental completed</h2>
+            <h2 className="mt-4 text-2xl font-semibold text-[var(--foreground)]">{t("completedTitle")}</h2>
             <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-              The vehicle is back with {organization?.name || "us"}. {portal.payments.length > 0 ? "There is still something to pay, shown above." : "Thank you for renting with us."}
+              {t("vehicleIsBack", { business: businessName })} {portal.payments.length > 0 ? t("stillSomethingToPay") : t("thankYouForRenting")}
             </p>
             {(() => {
               const held = Number(rental.deposit_held || 0);
@@ -434,28 +448,28 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
               const currency = rental.currency || "THB";
               return (
                 <div className="mx-auto mt-4 max-w-sm rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-3 text-left text-sm text-[var(--foreground-secondary)]">
-                  <p className="font-semibold text-[var(--foreground)]">Your {money(held, currency)} deposit</p>
-                  {returned > 0 ? <p className="mt-1">{money(returned, currency)} returned to you</p> : null}
-                  {kept > 0 ? <p className="mt-1">{money(kept, currency)} kept{reason ? ` (${reason})` : ""}</p> : null}
-                  {left > 0 ? <p className="mt-1">{money(left, currency)} still to be settled</p> : null}
+                  <p className="font-semibold text-[var(--foreground)]">{t("yourDeposit", { amount: money(held, currency) })}</p>
+                  {returned > 0 ? <p className="mt-1">{t("depositReturned", { amount: money(returned, currency) })}</p> : null}
+                  {kept > 0 ? <p className="mt-1">{t("depositKept", { amount: money(kept, currency) })}{reason ? ` (${reason})` : ""}</p> : null}
+                  {left > 0 ? <p className="mt-1">{t("depositStillToSettle", { amount: money(left, currency) })}</p> : null}
                 </div>
               );
             })()}
             {contact ? (
               <a className="pressable mt-5 inline-flex rounded-xl border border-[var(--primary)] bg-white px-5 py-3 text-sm font-semibold text-[var(--primary)]" href={contact}>
-                Contact {organization?.name || "us"}
+                {t("contactNamed", { business: businessName })}
               </a>
             ) : null}
             {executedDownloads?.originalAgreementUrl || executedDownloads?.executionCertificateUrl ? (
               <div className="mt-5 flex flex-wrap justify-center gap-2">
                 {executedDownloads.originalAgreementUrl ? (
                   <a className="pressable inline-flex rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={executedDownloads.originalAgreementUrl} rel="noreferrer" target="_blank">
-                    Download your agreement
+                    {t("downloadAgreement")}
                   </a>
                 ) : null}
                 {executedDownloads.executionCertificateUrl ? (
                   <a className="pressable inline-flex rounded-xl border border-[var(--primary)] bg-white px-5 py-3 text-sm font-semibold text-[var(--primary)]" href={executedDownloads.executionCertificateUrl} rel="noreferrer" target="_blank">
-                    Download signing certificate
+                    {t("proofOfSigning")}
                   </a>
                 ) : null}
               </div>
@@ -465,12 +479,12 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
         ) : (
           <div className="flex flex-col gap-5">
           {detail.state === "ready" ? (
-            <PortalPayments bundle={portal.bundle} orgPayment={detail.org_payment} organizationName={organization?.name || "Rental operator"} payments={portal.payments} token={token} />
+            <PortalPayments bundle={portal.bundle} orgPayment={detail.org_payment} organizationName={businessName} payments={portal.payments} token={token} />
           ) : null}
           <BookingCompletionForm
             detail={{
               token,
-              organizationName: organization?.name || "Rental operator",
+              organizationName: businessName,
               vehicleWithCustomer: ["active", "due_soon", "overdue", "extended"].includes(String(rental?.status || "")),
               customer,
               completion: detail.completion,
@@ -489,7 +503,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
               executedAgreementDownloads: detail.executedAgreementDownloads,
             }}
           />
-          {["booked", "draft"].includes(String(rental?.status || "")) ? <CancelBooking organizationName={organization?.name || "the rental business"} token={token} /> : null}
+          {["booked", "draft"].includes(String(rental?.status || "")) ? <CancelBooking organizationName={businessName} token={token} /> : null}
           </div>
         )}
       </div>
@@ -497,7 +511,8 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   );
 }
 
-function Info({ className = "", icon: Icon, label, value }: { className?: string; icon: typeof Clock; label: string; value: string }) {
+async function Info({ className = "", icon: Icon, label, value }: { className?: string; icon: typeof Clock; label: string; value: string }) {
+  const t = await getTranslations("customer");
   const lines = value.split("\n");
   return (
     <div className={`rounded-xl border border-[var(--border)] bg-white p-3 ${className}`}>
@@ -509,7 +524,7 @@ function Info({ className = "", icon: Icon, label, value }: { className?: string
         {lines.map((line, index) => (
           line.startsWith("https://www.google.com/maps") ? (
             <a className="text-[var(--primary)] underline underline-offset-2" href={line} key={`${line}-${index}`} rel="noreferrer" target="_blank">
-              View on map →
+              {t("viewOnMap")}
             </a>
           ) : line.startsWith("https://") ? (
             <a className="break-all text-[var(--primary)] underline underline-offset-2" href={line} key={`${line}-${index}`} rel="noreferrer" target="_blank">

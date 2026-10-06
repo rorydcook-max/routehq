@@ -24,6 +24,10 @@ export async function middleware(request: NextRequest) {
     // Scheduled jobs have no user session; they check CRON_SECRET themselves.
     pathname.startsWith("/api/cron/") ||
     pathname === "/api/line/daily-summary";
+  // Customer pages take their language from the customer (their choice, or their phone's language), never from whoever is signed in.
+  if (pathname.startsWith("/book/") || pathname.startsWith("/amend/") || pathname.startsWith("/rent/")) {
+    request.headers.set("x-routehq-customer-page", "1");
+  }
   const isOnboardingAllowedRoute = isPublicRoute || pathname.startsWith("/api/") || pathname.startsWith("/fleet/import");
   const isSubscriptionAllowedRoute =
     isOnboardingAllowedRoute ||

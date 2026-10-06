@@ -35,6 +35,10 @@ export type PortalBundle = {
 export type PortalPayment = {
   id: string;
   label: string;
+  /** What the payment is for, so the customer's page can name it in their language. */
+  kind?: "rent" | "deposit" | "deposit_top_up" | "extension";
+  /** "October 2026", "3 days": the stretch of rent it covers, as written when it was scheduled. */
+  periodLabel?: string | null;
   amount: number;
   currency: string;
   dueDate: string;
@@ -96,6 +100,8 @@ export async function getPortalPayments(
       return {
         id: String(row.id),
         label: customerPaymentLabel(row.metadata),
+      kind: (row.metadata?.type === "deposit" || row.metadata?.is_deposit === true ? "deposit" : row.metadata?.type === "deposit_top_up" ? "deposit_top_up" : row.metadata?.type === "extension" ? "extension" : "rent") as PortalPayment["kind"],
+      periodLabel: row.metadata?.period_label ? String(row.metadata.period_label) : null,
         amount,
         currency,
         dueDate,

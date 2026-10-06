@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { CalendarDays } from "lucide-react";
@@ -17,8 +18,8 @@ function addDays(iso: string, days: number) {
   return date.toISOString().slice(0, 10);
 }
 
-function shortDate(iso: string) {
-  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${iso}T00:00:00Z`));
+function shortDate(iso: string, locale = "en") {
+  return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : locale, { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${iso}T00:00:00Z`));
 }
 
 export function Catalog({
@@ -41,6 +42,8 @@ export function Catalog({
   /** The first date a booking may start (today, or later when the business needs notice). */
   today: string;
 }) {
+  const t = useTranslations("customer");
+  const locale = useLocale();
   const router = useRouter();
   const [startDate, setStartDate] = useState(today);
   const [endDate, setEndDate] = useState("");
@@ -87,7 +90,7 @@ export function Catalog({
         // customer never sees the staff app's loading screen in between.
         window.location.assign(result.href);
       } catch {
-        setError("We couldn't start your booking. Please try again.");
+        setError(t("bookingFailed"));
       }
     });
   }
@@ -97,29 +100,29 @@ export function Catalog({
       <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
         <div className="flex items-center gap-2 text-sm font-semibold text-[var(--foreground)]">
           <CalendarDays className="text-[var(--primary)]" size={18} />
-          When do you need it?
+          {t("whenDoYouNeedIt")}
         </div>
-        <div aria-label="Type of rental" className="mt-3 grid grid-cols-2 gap-1 rounded-xl bg-[#f5f4f1] p-1 text-sm font-semibold" role="group">
+        <div aria-label={t("typeOfRental")} className="mt-3 grid grid-cols-2 gap-1 rounded-xl bg-[#f5f4f1] p-1 text-sm font-semibold" role="group">
           <button aria-pressed={longTerm} className={`min-h-11 rounded-lg px-2 ${longTerm ? "bg-white text-[var(--foreground)] shadow-sm" : "text-[var(--muted)]"}`} onClick={() => setLongTerm(true)} type="button">
-            Monthly
+            {t("monthly")}
           </button>
           <button aria-pressed={!longTerm} className={`min-h-11 rounded-lg px-2 ${!longTerm ? "bg-white text-[var(--foreground)] shadow-sm" : "text-[var(--muted)]"}`} onClick={() => setLongTerm(false)} type="button">
-            Set dates
+            {t("setDates")}
           </button>
         </div>
         <p className="mt-2 text-xs leading-5 text-[var(--muted)]">
           {longTerm
-            ? "Open-ended: pay the monthly rate each month and keep the vehicle for as long as you like. Tell us when you want to return it."
-            : "Choose your return date. Priced by the day, week or month depending on how long you stay."}
+            ? t("monthlyExplain")
+            : t("setDatesExplain")}
         </p>
         <div className={`mt-3 grid gap-3 ${longTerm ? "" : "sm:grid-cols-2"}`}>
           <label className="block text-sm font-semibold text-[var(--foreground-secondary)]">
-            {longTerm ? "Starting" : "From"}
+            {longTerm ? t("starting") : t("from")}
             <input className={inputClass} min={today} onChange={(event) => setStartDate(event.target.value || today)} type="date" value={startDate} />
           </label>
           {longTerm ? null : (
             <label className="block text-sm font-semibold text-[var(--foreground-secondary)]">
-              Until
+              {t("until")}
               <input className={inputClass} min={addDays(startDate, 1)} onChange={(event) => setEndDate(event.target.value)} type="date" value={endDate} />
             </label>
           )}
@@ -128,10 +131,12 @@ export function Catalog({
 
       <p className="px-1 text-sm font-semibold text-[var(--foreground-secondary)]">
         {vehicles.length === 0
-          ? "No vehicles are listed yet."
+          ? t("noVehiclesListed")
           : !datesReady
-            ? "Choose your dates to see what is free."
-            : `${freeCount} of ${vehicles.length} free${end ? ` · ${shortDate(startDate)} to ${shortDate(end)}` : ` monthly from ${shortDate(startDate)}`}`}
+            ? t("chooseDatesToSee")
+            : end
+              ? t("freeCountDates", { free: freeCount, total: vehicles.length, start: shortDate(startDate, locale), end: shortDate(end, locale) })
+              : t("freeCountMonthly", { free: freeCount, total: vehicles.length, start: shortDate(startDate, locale) })}
       </p>
 
       <section className="space-y-3">
@@ -140,10 +145,10 @@ export function Catalog({
           const estimate = days ? estimateRental(vehicle, days) : null;
           // A monthly-only vehicle can't be booked for a weekend.
           const bookable = !!planFor(vehicle, days);
-          const tooShort = datesReady && free && !bookable ? (longTerm ? "Not offered monthly: choose Set dates to book this one" : minimumStay(vehicle)) : null;
+          const tooShort = datesReady && free && !bookable ? (longTerm ? t("notOfferedMonthly") : minimumStay(vehicle) === "Minimum 1 week" ? t("minimumOneWeek") : minimumStay(vehicle) ? t("minimumOneMonth") : null) : null;
           const otherRates = [
-            vehicle.dailyRate > 0 && headline?.per !== "day" ? `${money(vehicle.dailyRate)} / day` : null,
-            vehicle.weeklyRate > 0 && headline?.per !== "week" ? `${money(vehicle.weeklyRate)} / week` : null
+            vehicle.dailyRate > 0 && headline?.per !== "day" ? t("perDay", { rate: money(vehicle.dailyRate) }) : null,
+            vehicle.weeklyRate > 0 && headline?.per !== "week" ? t("perWeek", { rate: money(vehicle.weeklyRate) }) : null
           ].filter(Boolean);
           const isOpen = openId === vehicle.id;
           return (
@@ -166,22 +171,22 @@ export function Catalog({
                   <p className="mt-0.5 text-sm text-[var(--muted)]">{[vehicle.year, vehicle.color, ...vehicle.details].filter(Boolean).join(" · ")}</p>
                   {headline ? (
                     <p className="mt-2 text-base font-semibold text-[var(--foreground)]">
-                      {money(headline.amount)} <span className="text-sm font-medium text-[var(--muted)]">/ {headline.per}</span>
+                      {t(headline.per === "day" ? "perDay" : headline.per === "week" ? "perWeek" : "perMonth", { rate: money(headline.amount) })}
                       {otherRates.length ? <span className="ml-2 text-sm font-medium text-[var(--muted)]">{otherRates.join(" · ")}</span> : null}
                     </p>
                   ) : null}
-                  {vehicle.deposit > 0 ? <p className="mt-0.5 text-sm text-[var(--muted)]">{money(vehicle.deposit)} deposit, returned at the end</p> : null}
+                  {vehicle.deposit > 0 ? <p className="mt-0.5 text-sm text-[var(--muted)]">{t("depositReturnedAtEnd", { amount: money(vehicle.deposit) })}</p> : null}
                   {/* No price for a stay the vehicle can't be booked for: a slice of the monthly rate is not on offer. */}
                 {free && estimate && days && !tooShort ? (
                     <p className="mt-1 text-sm text-[var(--primary)]">
-                      About {money(estimate)} for {days} {days === 1 ? "day" : "days"}
+                      {t("aboutForDays", { amount: money(estimate), days })}
                     </p>
                   ) : null}
-                  {tooShort ? <p className="mt-1 text-sm font-semibold text-[#b45309]">{longTerm ? tooShort : `${tooShort} for this vehicle`}</p> : null}
+                  {tooShort ? <p className="mt-1 text-sm font-semibold text-[#b45309]">{tooShort}</p> : null}
 
                   {!free ? (
                     <p className="mt-1 text-sm font-semibold text-[#b45309]">
-                      {freeFrom ? `Taken for these dates · free from ${shortDate(freeFrom)}` : openEndedClash ? "On a long-term rental" : "Taken for these dates"}
+                      {freeFrom ? t("takenFreeFrom", { date: shortDate(freeFrom, locale) }) : openEndedClash ? t("onLongTermRental") : t("takenForDates")}
                     </p>
                   ) : null}
                 </div>
@@ -194,7 +199,7 @@ export function Catalog({
                     }}
                     type="button"
                   >
-                    {isOpen ? "Close" : "Book"}
+                    {isOpen ? t("close") : t("book")}
                   </button>
                 ) : null}
               </div>
@@ -203,11 +208,11 @@ export function Catalog({
                 <form action={(formData) => send(formData, vehicle)} className="mt-4 space-y-3 border-t border-[var(--border)] pt-4">
                   <div className="grid gap-3 sm:grid-cols-2">
                     <label className="block text-sm font-semibold text-[var(--foreground-secondary)]">
-                      Your name
+                      {t("yourName")}
                       <input autoComplete="name" className={inputClass} name="name" required />
                     </label>
                     <label className="block text-sm font-semibold text-[var(--foreground-secondary)]">
-                      Phone or WhatsApp
+                      {t("phoneOrWhatsApp")}
                       <input autoComplete="tel" className={inputClass} inputMode="tel" name="phone" placeholder="+66 ..." required />
                     </label>
                   </div>
@@ -215,11 +220,10 @@ export function Catalog({
                   <input aria-hidden="true" autoComplete="off" className="hidden" name="website" tabIndex={-1} />
                   {error ? <p className="text-sm font-semibold text-[#dc2626]">{error}</p> : null}
                   <button className="pressable min-h-12 w-full rounded-xl bg-[var(--primary)] px-4 text-sm font-semibold text-white disabled:opacity-60" disabled={isPending} type="submit">
-                    {isPending ? "Booking…" : "Book and continue"}
+                    {isPending ? t("booking") : t("bookAndContinue")}
                   </button>
                   <p className="text-xs leading-5 text-[var(--muted)]">
-                    {vehicle.deposit > 0 ? `A ${money(vehicle.deposit)} deposit applies. ` : ""}No payment is taken now: you can pay online or when you get the vehicle. Next you add your details and sign the
-                    agreement. The vehicle is held for you for {holdHours} hours while you do that.
+                    {vehicle.deposit > 0 ? `${t("depositApplies", { amount: money(vehicle.deposit) })} ` : ""}{t("noPaymentNow", { hours: holdHours })}
                   </p>
                 </form>
               ) : null}

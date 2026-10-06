@@ -1,4 +1,6 @@
 import { getRequestConfig } from "next-intl/server";
+import { cookies, headers } from "next/headers";
+import { CUSTOMER_LOCALE_COOKIE, pickLocale } from "@/lib/i18n/customer-locale";
 import { supportedLocaleCodes, type SupportedLocale } from "@/lib/i18n/locales";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -8,7 +10,10 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
  *
  * The language comes from the signed-in person's own profile (My account), not
  * from the URL or the business: two people in the same business can each see
- * the app in their own language. Signed-out pages use English.
+ * the app in their own language. Signed-out staff pages use English.
+ *
+ * Customer pages (booking link, change to sign, online booking) are separate:
+ * they follow the customer's own choice or their phone's language.
  *
  * Translations are layered over English, so any string not yet translated into
  * a language shows in English rather than as a blank or a raw key.
@@ -31,6 +36,16 @@ function merge(base: Messages, override: Messages): Messages {
 }
 
 async function resolveLocale(): Promise<SupportedLocale> {
+  // Customer pages: the language the customer picked, else the first language their phone asks for that we have.
+  try {
+    const requestHeaders = await headers();
+    if (requestHeaders.get("x-routehq-customer-page")) {
+      const chosen = (await cookies()).get(CUSTOMER_LOCALE_COOKIE)?.value;
+      return pickLocale(chosen, requestHeaders.get("accept-language"));
+    }
+  } catch {
+    // No request to read (a build-time render): fall through to the signed-in person's language.
+  }
   if (!hasSupabaseEnv()) return "en";
   try {
     const supabase = (await createSupabaseServerClient()) as any;

@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { CheckCircle2, Clock, Copy, Wallet } from "lucide-react";
@@ -15,11 +16,10 @@ type OrgPayment = {
   revolut_link?: string | null;
 } | null;
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-function shortDate(iso: string) {
+function shortDate(iso: string, locale: string) {
   const match = iso.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  return match ? `${Number(match[3])} ${MONTHS[Number(match[2]) - 1]}` : iso;
+  if (!match) return iso;
+  return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : locale, { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]))));
 }
 
 function money(amount: number, currency: string) {
@@ -57,12 +57,13 @@ export function PortalPayments({
   orgPayment: OrgPayment;
   organizationName: string;
 }) {
+  const t = useTranslations("customer");
   const [openId, setOpenId] = useState<string | null>(null);
   if (payments.length === 0) return null;
 
   return (
     <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
-      <p className="text-xs font-semibold uppercase text-[var(--primary)]">Payments</p>
+      <p className="text-xs font-semibold uppercase text-[var(--primary)]">{t("payments")}</p>
       <div className="mt-3 divide-y divide-[var(--border)]">
         {bundle ? (
           <PaymentRow
@@ -74,7 +75,7 @@ export function PortalPayments({
             organizationName={organizationName}
             payment={{
               id: bundle.ids[0],
-              label: `All ${bundle.ids.length} payments together`,
+              label: t("allPaymentsTogether", { count: bundle.ids.length }),
               amount: bundle.amount,
               currency: bundle.currency,
               dueDate: "",
@@ -98,7 +99,7 @@ export function PortalPayments({
           />
         ))}
       </div>
-      <p className="mt-3 text-xs leading-5 text-[var(--muted)]">Paying in cash? Just hand it to {organizationName} — there is nothing to send here.</p>
+      <p className="mt-3 text-xs leading-5 text-[var(--muted)]">{t("payingInCash", { business: organizationName })}</p>
     </section>
   );
 }
@@ -121,6 +122,8 @@ function PaymentRow({
   /** Set on the "everything together" row: the payments one receipt will cover. */
   covers?: string[];
 }) {
+  const t = useTranslations("customer");
+  const locale = useLocale();
   const router = useRouter();
   // The page reloads its data after a receipt is sent (possibly from another row).
   const [justSentAt, setSentAt] = useState<string | null>(null);
@@ -136,7 +139,7 @@ function PaymentRow({
       try {
         const file = formData.get("receipt");
         if (!(file instanceof File) || file.size === 0) {
-          setError("Please add a photo or screenshot of your receipt.");
+          setError(t("addReceiptPhoto"));
           return;
         }
         formData.set("receipt", await shrinkImage(file));
@@ -145,14 +148,14 @@ function PaymentRow({
         if (covers?.length) formData.set("covers", covers.join(","));
         const result = await submitPaymentReceipt(formData);
         if (!result.success) {
-          setError(result.error || "We couldn't send your receipt. Please try again.");
+          setError(result.error || t("receiptFailed"));
           return;
         }
         setSentAt(result.submittedAt || new Date().toISOString());
         onToggle();
         router.refresh();
       } catch {
-        setError("We couldn't send your receipt. Please try again.");
+        setError(t("receiptFailed"));
       }
     });
   }
@@ -165,16 +168,19 @@ function PaymentRow({
         </span>
         <div className="min-w-0 flex-1">
           <p className="text-base font-semibold text-[var(--foreground)]">
-            {money(payment.amount, payment.currency)} <span className="text-sm font-medium text-[var(--muted)]">· {payment.label}</span>
+            {money(payment.amount, payment.currency)}{" "}
+            <span className="text-sm font-medium text-[var(--muted)]">
+              · {payment.kind ? `${t(`payKind_${payment.kind}`)}${payment.kind === "rent" && payment.periodLabel && locale === "en" ? ` · ${payment.periodLabel}` : ""}` : payment.label}
+            </span>
           </p>
           <p className={`text-sm ${sentAt ? "text-[#166534]" : payment.overdue ? "font-semibold text-[#dc2626]" : "text-[var(--muted)]"}`}>
             {sentAt
-              ? `Receipt sent · waiting for ${organizationName} to confirm`
+              ? t("receiptSentWaiting", { business: organizationName })
               : covers
-                ? "One transfer, one receipt"
+                ? t("oneTransferOneReceipt")
                 : payment.overdue
-                  ? `Was due ${shortDate(payment.dueDate)}`
-                  : `Due ${shortDate(payment.dueDate)}`}
+                  ? t("wasDue", { date: shortDate(payment.dueDate, locale) })
+                  : t("dueOn", { date: shortDate(payment.dueDate, locale) })}
           </p>
         </div>
         <button
@@ -182,13 +188,13 @@ function PaymentRow({
           onClick={onToggle}
           type="button"
         >
-          {isOpen ? "Close" : sentAt ? "Change" : "Pay"}
+          {isOpen ? t("close") : sentAt ? t("change") : t("pay")}
         </button>
       </div>
 
       {payment.receiptDeclined && !sentAt ? (
         <p className="mt-2 rounded-xl bg-[#fffbeb] p-3 text-sm text-[#92400e]">
-          {organizationName} couldn&apos;t match the receipt you sent to a payment. Please send it again or get in touch with them.
+          {t("receiptDeclined", { business: organizationName })}
         </p>
       ) : null}
 
@@ -196,35 +202,35 @@ function PaymentRow({
         <div className="mt-4 space-y-4">
           {payment.qrSvg ? (
             <div className="rounded-2xl border border-[var(--border)] bg-[#fbfaf8] p-4 text-center">
-              <p className="text-sm font-semibold text-[var(--foreground)]">Scan with any Thai banking app</p>
+              <p className="text-sm font-semibold text-[var(--foreground)]">{t("scanWithBankingApp")}</p>
               <div aria-label="PromptPay QR code" className="mx-auto mt-3 w-52 max-w-full rounded-xl bg-white p-2 [&>svg]:h-auto [&>svg]:w-full" dangerouslySetInnerHTML={{ __html: payment.qrSvg }} role="img" />
               <p className="mt-3 text-sm text-[var(--foreground-secondary)]">
-                PromptPay · <span className="font-semibold text-[var(--foreground)]">{money(payment.amount, payment.currency)}</span> is already filled in
+                {t.rich("promptPayFilledIn", { amount: money(payment.amount, payment.currency), b: (chunks) => <span className="font-semibold text-[var(--foreground)]">{chunks}</span> })}
               </p>
-              <p className="mt-1 text-xs text-[var(--muted)]">On this phone? Take a screenshot, then open it from your banking app&apos;s scan screen.</p>
+              <p className="mt-1 text-xs text-[var(--muted)]">{t("onThisPhone")}</p>
             </div>
           ) : null}
 
           {hasBank || orgPayment?.wise_link || orgPayment?.revolut_link || (!payment.qrSvg && orgPayment?.promptpay_id) ? (
             <div className="space-y-2">
-              {payment.qrSvg ? <p className="text-xs font-semibold uppercase text-[var(--muted)]">Or pay another way</p> : null}
+              {payment.qrSvg ? <p className="text-xs font-semibold uppercase text-[var(--muted)]">{t("orPayAnotherWay")}</p> : null}
               {!payment.qrSvg && orgPayment?.promptpay_id ? <CopyLine label="PromptPay" value={String(orgPayment.promptpay_id)} /> : null}
               {hasBank ? (
                 <CopyLine
                   detail={[orgPayment?.bank_name, orgPayment?.bank_account_name].filter(Boolean).join(" · ")}
-                  label="Bank transfer"
+                  label={t("bankTransfer")}
                   value={String(orgPayment?.bank_account_number)}
                 />
               ) : null}
               <div className="flex flex-wrap gap-2">
                 {orgPayment?.wise_link ? (
                   <a className="pressable inline-flex min-h-10 items-center rounded-xl border border-[var(--border)] bg-white px-4 text-sm font-semibold text-[var(--foreground)]" href={orgPayment.wise_link} rel="noreferrer" target="_blank">
-                    Pay with Wise
+                    {t("payWith", { app: "Wise" })}
                   </a>
                 ) : null}
                 {orgPayment?.revolut_link ? (
                   <a className="pressable inline-flex min-h-10 items-center rounded-xl border border-[var(--border)] bg-white px-4 text-sm font-semibold text-[var(--foreground)]" href={orgPayment.revolut_link} rel="noreferrer" target="_blank">
-                    Pay with Revolut
+                    {t("payWith", { app: "Revolut" })}
                   </a>
                 ) : null}
               </div>
@@ -233,33 +239,33 @@ function PaymentRow({
 
           {!payment.qrSvg && !hasBank && !orgPayment?.promptpay_id && !orgPayment?.wise_link && !orgPayment?.revolut_link ? (
             <p className="rounded-xl bg-[#fbfaf8] p-3 text-sm text-[var(--foreground-secondary)]">
-              Ask {organizationName} where to send the payment, then send your receipt here.
+              {t("askWhereToPay", { business: organizationName })}
             </p>
           ) : null}
 
           <form action={send} className="space-y-3 rounded-2xl border border-[var(--border)] p-4">
-            <p className="text-sm font-semibold text-[var(--foreground)]">Paid? Send your receipt</p>
+            <p className="text-sm font-semibold text-[var(--foreground)]">{t("paidSendReceipt")}</p>
             <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
-              Photo or screenshot of the receipt
+              {t("receiptPhoto")}
               <input accept="image/*,application/pdf" className="mt-2 w-full rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-sm" name="receipt" required type="file" />
             </label>
             <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
-              How did you pay?
+              {t("howDidYouPay")}
               <select className="mt-2 w-full rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-base" defaultValue={defaultMethod} name="method">
                 <option value="promptpay">PromptPay / QR</option>
-                <option value="bank_transfer">Bank transfer</option>
+                <option value="bank_transfer">{t("bankTransfer")}</option>
                 <option value="wise">Wise</option>
                 <option value="revolut">Revolut</option>
-                <option value="other">Another way</option>
+                <option value="other">{t("anotherWay")}</option>
               </select>
             </label>
             {error ? <p className="text-sm font-semibold text-[#dc2626]">{error}</p> : null}
             <button className="pressable min-h-12 w-full rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white disabled:opacity-60" disabled={isPending} type="submit">
-              {isPending ? "Sending…" : "Send receipt"}
+              {isPending ? t("sending") : t("sendReceipt")}
             </button>
             <p className="flex items-start gap-2 text-xs leading-5 text-[var(--muted)]">
               <CheckCircle2 className="mt-0.5 shrink-0 text-[var(--primary)]" size={14} />
-              {organizationName} will check it and mark this payment as received.
+              {t("willCheckReceipt", { business: organizationName })}
             </p>
           </form>
         </div>
@@ -269,6 +275,7 @@ function PaymentRow({
 }
 
 function CopyLine({ label, value, detail }: { label: string; value: string; detail?: string }) {
+  const t = useTranslations("customer");
   const [copied, setCopied] = useState(false);
   return (
     <div className="flex items-center justify-between gap-3 rounded-xl border border-[var(--border)] bg-white p-3">
@@ -288,7 +295,7 @@ function CopyLine({ label, value, detail }: { label: string; value: string; deta
         type="button"
       >
         <Copy size={15} />
-        {copied ? "Copied" : "Copy"}
+        {copied ? t("copied") : t("copy")}
       </button>
     </div>
   );

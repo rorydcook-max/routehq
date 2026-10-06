@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { CheckCircle2, CreditCard, FileText, IdCard, ImageIcon, MessageCircle, PenLine, Upload, UserRound, XCircle } from "lucide-react";
 import { completePublicBooking, reportPublicBookingPayment } from "@/app/actions/public-booking";
 import { preparePublicBookingUploads } from "@/app/actions/uploads";
@@ -562,6 +563,8 @@ function loadPublicGooglePlaces() {
 }
 
 export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail }) {
+  const t = useTranslations("customer");
+  const locale = useLocale();
   const [error, setError] = useState("");
   const [completed, setCompleted] = useState(detail.completion.agreement);
   const [signedContractUrl, setSignedContractUrl] = useState<string | null>(null);
@@ -683,11 +686,11 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
 
   const readNote = (kind: DocKind) =>
     docRead[kind] === "reading"
-      ? "Reading your details…"
+      ? t("readingDetails")
       : docRead[kind] === "read"
-        ? "Details read. Please check them below."
+        ? t("detailsRead")
         : docRead[kind] === "unreadable"
-          ? "We couldn't read this photo. Try a clearer one, or type your details below."
+          ? t("photoUnreadable")
           : null;
   const drawing = useRef(false);
   const isRentalDocumentEngine = true;
@@ -805,7 +808,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         await reportPublicBookingPayment(formData);
         setPaymentReported(true);
       } catch (reportError) {
-        setError(reportError instanceof Error ? reportError.message : "Unable to report payment.");
+        setError(reportError instanceof Error ? reportError.message : t("reportPaymentFailed"));
       }
     });
   }
@@ -819,39 +822,39 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
     const fd = new FormData(form);
 
     if (!preferredContactMethod) {
-      setContactChannelError("Please select your preferred contact method.");
+      setContactChannelError(t("chooseContactMethod"));
       return;
     }
     if (preferredContactMethod === "phone" && !livePhone) {
-      setContactChannelError("Please add your phone number in the section above.");
+      setContactChannelError(t("addPhoneAbove"));
       setFocusField("phone");
       return;
     }
     if (preferredContactMethod === "email" && !liveEmail) {
-      setContactChannelError("Please add your email address in the section above.");
+      setContactChannelError(t("addEmailAbove"));
       setFocusField("email");
       return;
     }
     if (preferredContactMethod === "whatsapp" && !whatsappNumber.trim()) {
-      setContactChannelError("Please enter your WhatsApp number.");
+      setContactChannelError(t("enterWhatsApp"));
       return;
     }
     if (preferredContactMethod === "messenger" && !String(fd.get("messengerId") || "").trim()) {
-      setContactChannelError("Please enter your Facebook Messenger username.");
+      setContactChannelError(t("enterMessenger"));
       return;
     }
     if (preferredContactMethod === "line" && !String(fd.get("lineId") || "").trim()) {
-      setContactChannelError("Please enter your LINE ID.");
+      setContactChannelError(t("enterLine"));
       return;
     }
     if (preferredContactMethod === "telegram" && !String(fd.get("telegramUsername") || "").trim()) {
-      setContactChannelError("Please enter your Telegram username.");
+      setContactChannelError(t("enterTelegram"));
       return;
     }
 
     if (ID_FIELDS.some((name) => !String(fd.get(name) || "").trim())) {
       setIdOpen(true);
-      setError("Please add your passport and driving licence details. Take a photo of each document, or type them in.");
+      setError(t("addDocumentDetails"));
       document.getElementById("document-numbers")?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
@@ -860,11 +863,11 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
       const requiredAcknowledgements = publicAgreement?.requiredAcknowledgements || [];
       const accepted = requiredAcknowledgements.every((ack) => fd.get(`ack_${ack.type}`) === "on");
       if (!accepted) {
-        setError("Please accept each required acknowledgement before signing.");
+        setError(t("tickEachBox"));
         return;
       }
       if (!signature) {
-        setError("Please sign the agreement before submitting.");
+        setError(t("pleaseSign"));
         return;
       }
     }
@@ -889,8 +892,8 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           clearSignature();
           setNotice(
             result.changed
-              ? "Your changes updated the agreement. Please read the updated version below and sign again."
-              : "Your details are saved. Please read your final agreement below, then sign it."
+              ? t("agreementUpdated")
+              : t("detailsSavedReadAgreement")
           );
           router.refresh();
           agreementRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -904,7 +907,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         router.refresh();
         window.scrollTo({ top: 0, behavior: "smooth" });
       } catch (submitError) {
-        setError(submitError instanceof Error ? submitError.message : "Unable to complete booking.");
+        setError(submitError instanceof Error ? submitError.message : t("completeFailed"));
       }
     });
   }
@@ -915,27 +918,27 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#dcfce7] text-[#166534]">
           <CheckCircle2 size={34} />
         </div>
-        <h2 className="mt-4 text-2xl font-semibold text-[var(--foreground)]">You're all set{(submittedName || detail.customer?.full_name) ? `, ${String(submittedName || detail.customer?.full_name).split(/\s+/)[0]}` : ""}.</h2>
+        <h2 className="mt-4 text-2xl font-semibold text-[var(--foreground)]">{(submittedName || detail.customer?.full_name) ? t("allSetNamed", { name: String(submittedName || detail.customer?.full_name).split(/\s+/)[0] }) : t("allSet")}</h2>
         <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-          Your booking details, documents, and signed agreement have been received.{" "}
+          {t("everythingReceived")}{" "}
           {detail.vehicleWithCustomer
-            ? `${detail.organizationName} has been told. Contact them any time if you have questions about your rental.`
-            : `${detail.organizationName} will contact you to confirm delivery time and answer any questions.`}
+            ? t("businessToldContact", { business: detail.organizationName })
+            : t("businessWillContact", { business: detail.organizationName })}
         </p>
         <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-center">
         {originalAgreementUrl ? (
           <a className="pressable inline-flex min-h-[44px] items-center justify-center rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={originalAgreementUrl} rel="noreferrer" target="_blank">
-            Download your agreement
+            {t("downloadAgreement")}
           </a>
         ) : null}
         {signedContractUrl ? (
           <a className="pressable inline-flex min-h-[44px] items-center justify-center rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={signedContractUrl} rel="noreferrer" target="_blank">
-            Download signed contract
+            {t("downloadAgreement")}
           </a>
         ) : null}
         {executionCertificateUrl ? (
           <a className="pressable inline-flex min-h-[44px] items-center justify-center rounded-xl border border-[var(--border)] bg-white px-5 py-3 text-sm font-semibold text-[var(--primary)]" href={executionCertificateUrl} rel="noreferrer" target="_blank">
-            Proof of signing
+            {t("proofOfSigning")}
           </a>
         ) : null}
         </div>
@@ -946,41 +949,42 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
   return (
     <form className="space-y-5" encType="multipart/form-data" onChange={(event) => updateLiveStatus(event.currentTarget)} onInput={(event) => updateLiveStatus(event.currentTarget)} onSubmit={handleSubmit} ref={formRef}>
       <input name="token" type="hidden" value={detail.token} />
-      <input name="preferredLocale" type="hidden" value="en" />
+      {/* The language they are reading this in is the language their messages and agreement use. */}
+      <input name="preferredLocale" type="hidden" value={locale} />
 
       {/* Once the details are saved, the only thing left is to read and sign. Everything already
           filled in folds away so the agreement is the first thing on the screen, not the ninth. */}
       <SavedDetails folded={readyToSign}>
       <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
-        <SectionTitle icon={Upload} label="Your documents" />
+        <SectionTitle icon={Upload} label={t("yourDocuments")} />
         <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-          Take a clear photo of your passport and driving licence. We read them and fill in your details for you.
+          {t("documentsIntro")}
         </p>
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          <UploadCard cameraName="passportCameraFile" complete={detail.documentStatus.passport} icon={IdCard} label="Passport or ID card" name="passportFile" note={readNote("passport")} noteTone={docRead.passport} onPicked={(picked) => readDocument("passport", picked)} />
-          <UploadCard cameraName="driverLicenseCameraFile" complete={detail.documentStatus.driver_license} icon={FileText} label="Driving licence" name="driverLicenseFile" note={readNote("driver_license")} noteTone={docRead.driver_license} onPicked={(picked) => readDocument("driver_license", picked)} />
-          <UploadCard cameraCapture="user" cameraName="selfieCameraFile" complete={detail.documentStatus.selfie} icon={ImageIcon} label="Selfie photo" name="selfieFile" />
+          <UploadCard cameraName="passportCameraFile" complete={detail.documentStatus.passport} icon={IdCard} label={t("passportOrId")} name="passportFile" note={readNote("passport")} noteTone={docRead.passport} onPicked={(picked) => readDocument("passport", picked)} />
+          <UploadCard cameraName="driverLicenseCameraFile" complete={detail.documentStatus.driver_license} icon={FileText} label={t("drivingLicence")} name="driverLicenseFile" note={readNote("driver_license")} noteTone={docRead.driver_license} onPicked={(picked) => readDocument("driver_license", picked)} />
+          <UploadCard cameraCapture="user" cameraName="selfieCameraFile" complete={detail.documentStatus.selfie} icon={ImageIcon} label={t("selfiePhoto")} name="selfieFile" />
         </div>
         {/* The numbers stay folded away: the photos fill them in. They open by themselves when something is missing. */}
         <details className="mt-2" id="document-numbers" onToggle={(event) => setIdOpen(event.currentTarget.open)} open={idOpen}>
           <summary className="cursor-pointer py-1 text-sm font-semibold text-[var(--primary)]">
-            {docRead.passport === "read" || docRead.driver_license === "read" ? "Check your passport and licence numbers" : "Type your passport and licence numbers instead"}
+            {docRead.passport === "read" || docRead.driver_license === "read" ? t("checkNumbers") : t("typeNumbersInstead")}
           </summary>
           <div className="mt-3 grid gap-4 sm:grid-cols-2">
             <label>
-              <span className="text-sm font-bold text-[var(--foreground-secondary)]">Passport or ID number</span>
+              <span className="text-sm font-bold text-[var(--foreground-secondary)]">{t("passportNumber")}</span>
               <input className={inputClass} defaultValue={detail.customer?.passport_number || ""} name="passportNumber" style={fieldStyle} />
             </label>
             <label>
-              <span className="text-sm font-bold text-[var(--foreground-secondary)]">Driving licence number</span>
+              <span className="text-sm font-bold text-[var(--foreground-secondary)]">{t("licenceNumber")}</span>
               <input className={inputClass} defaultValue={detail.customer?.driver_license_number || ""} name="driverLicenseNumber" style={fieldStyle} />
             </label>
             <label>
-              <span className="text-sm font-bold text-[var(--foreground-secondary)]">Licence expiry</span>
+              <span className="text-sm font-bold text-[var(--foreground-secondary)]">{t("licenceExpiry")}</span>
               <input className={inputClass} defaultValue={detail.customer?.driver_license_expiry || ""} name="driverLicenseExpiry" style={fieldStyle} type="date" />
             </label>
             <label>
-              <span className="text-sm font-bold text-[var(--foreground-secondary)]">Licence country</span>
+              <span className="text-sm font-bold text-[var(--foreground-secondary)]">{t("licenceCountry")}</span>
               <input className={inputClass} defaultValue={detail.customer?.driver_license_country || ""} name="driverLicenseCountry" style={fieldStyle} />
             </label>
           </div>
@@ -988,55 +992,55 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
       </section>
 
       <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
-        <SectionTitle icon={UserRound} label="Your details" />
+        <SectionTitle icon={UserRound} label={t("yourDetails")} />
         {detail.completion.details ? (
-          <p className="mt-3 rounded-xl bg-[#dcfce7] p-3 text-sm font-bold text-[#166534]">Your details have already been submitted. You can update them below if needed.</p>
+          <p className="mt-3 rounded-xl bg-[#dcfce7] p-3 text-sm font-bold text-[#166534]">{t("detailsAlreadySent")}</p>
         ) : null}
         {docRead.passport === "read" || docRead.driver_license === "read" ? (
-          <p className="mt-3 rounded-xl bg-[var(--primary-light)] p-3 text-sm font-semibold text-[var(--primary)]">We filled in what we could read from your documents. Please check it, then add your phone number.</p>
+          <p className="mt-3 rounded-xl bg-[var(--primary-light)] p-3 text-sm font-semibold text-[var(--primary)]">{t("filledFromDocuments")}</p>
         ) : null}
         <div className="mt-4 grid gap-4 sm:grid-cols-2 sm:items-start">
           <label>
-            <span className="text-sm font-bold text-[var(--foreground-secondary)]">Full name</span>
+            <span className="text-sm font-bold text-[var(--foreground-secondary)]">{t("fullName")}</span>
             <input className={inputClass} defaultValue={detail.customer?.full_name || ""} name="fullName" required style={fieldStyle} />
           </label>
           <label>
-            <span className="text-sm font-bold text-[var(--foreground-secondary)]">Nationality</span>
+            <span className="text-sm font-bold text-[var(--foreground-secondary)]">{t("nationality")}</span>
             <NationalitySelect defaultValue={String(detail.customer?.nationality || "")} fill={photoNationality} name="nationality" />
           </label>
           <label>
-            <span className="text-sm font-bold text-[var(--foreground-secondary)]">Phone</span>
+            <span className="text-sm font-bold text-[var(--foreground-secondary)]">{t("phone")}</span>
             <div style={{ display: "flex", alignItems: "stretch", width: "100%", height: 42, position: "relative", marginTop: 8 }}>
               <PhoneCountrySelect name="phoneCountryCode" onChange={setPhoneCountryCode} value={phoneCountryCode} />
               <input defaultValue={savedPhone.local} name="phone" onClick={(e) => e.stopPropagation()} required style={{ ...fieldStyle, width: "auto", borderRadius: "0 8px 8px 0", flex: 1, minWidth: 0, borderLeft: "none", position: "relative", zIndex: 2 }} type="tel" />
             </div>
           </label>
           <label>
-            <span className="text-sm font-bold text-[var(--foreground-secondary)]">Email <span className="font-normal text-[var(--muted)]">(optional)</span></span>
+            <span className="text-sm font-bold text-[var(--foreground-secondary)]">{t("email")} <span className="font-normal text-[var(--muted)]">{t("optionalBrackets")}</span></span>
             <input className={inputClass} defaultValue={detail.customer?.email || ""} name="email" style={fieldStyle} type="email" />
           </label>
           <label>
-            <span className="text-sm font-bold text-[var(--foreground-secondary)]">Date of birth</span>
+            <span className="text-sm font-bold text-[var(--foreground-secondary)]">{t("dateOfBirth")}</span>
             <input className={inputClass} defaultValue={detail.customer?.date_of_birth || ""} name="dateOfBirth" required style={{ ...fieldStyle, textTransform: "uppercase", appearance: "none" as const }} type="date" />
           </label>
           <label>
             <span className="inline-flex items-center gap-2 text-sm font-bold text-[var(--foreground-secondary)]">
-              Where you're staying <span className="font-normal text-[var(--muted)]">(optional)</span>
+              {t("whereStaying")} <span className="font-normal text-[var(--muted)]">{t("optionalBrackets")}</span>
             </span>
             <GoogleAddressInput onChange={setCurrentAddress} value={currentAddress} />
           </label>
           <details className="sm:col-span-2" open={Boolean(detail.customer?.emergency_contact_name || detail.customer?.emergency_contact_phone)}>
-            <summary className="cursor-pointer text-sm font-semibold text-[var(--primary)]">+ Add an emergency contact (optional)</summary>
+            <summary className="cursor-pointer text-sm font-semibold text-[var(--primary)]">{t("addEmergencyContact")}</summary>
             <div className="mt-3 grid gap-4 sm:grid-cols-2">
           <label>
             <span className="inline-flex items-center gap-2 text-sm font-bold text-[var(--foreground-secondary)]">
-              Emergency contact name
+              {t("emergencyName")}
             </span>
             <input className={inputClass} defaultValue={detail.customer?.emergency_contact_name || ""} name="emergencyContactName" style={fieldStyle} />
           </label>
           <label>
             <span className="inline-flex items-center gap-2 text-sm font-bold text-[var(--foreground-secondary)]">
-              Emergency contact phone
+              {t("emergencyPhone")}
             </span>
             <div style={{ display: "flex", alignItems: "stretch", width: "100%", height: 42, position: "relative", marginTop: 8 }}>
               <PhoneCountrySelect name="emergencyPhoneCountryCode" onChange={setEmergencyPhoneCountryCode} value={emergencyPhoneCountryCode} />
@@ -1049,9 +1053,9 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
       </section>
 
       <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
-        <SectionTitle icon={MessageCircle} label="How should we contact you?" />
+        <SectionTitle icon={MessageCircle} label={t("howContactYou")} />
         <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-          Choose how you&apos;d like {detail.organizationName} to contact you for payment reminders and rental updates.
+          {t("contactIntro", { business: detail.organizationName })}
         </p>
         {contactChannelError ? (
           <div style={{ background: "#fffbeb", border: "0.5px solid #fde68a", borderRadius: 8, padding: "10px 14px", marginTop: 12, fontSize: 13, color: "#92400e" }}>
@@ -1062,7 +1066,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
 
         <div className="mt-4">
           <label>
-            <span className="text-sm font-bold text-[var(--foreground-secondary)]">Preferred contact method</span>
+            <span className="text-sm font-bold text-[var(--foreground-secondary)]">{t("preferredContact")}</span>
             <select
               className={inputClass}
               name="preferredContactMethod"
@@ -1079,9 +1083,9 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
               style={{ ...fieldStyle, color: preferredContactMethod ? "#0f172a" : "#94a3b8", cursor: "pointer" }}
               value={preferredContactMethod}
             >
-              <option disabled value="">Select your preferred channel...</option>
-              <option value="phone">Phone call</option>
-              <option value="email">Email</option>
+              <option disabled value="">{t("choose")}</option>
+              <option value="phone">{t("phoneCall")}</option>
+              <option value="email">{t("email")}</option>
               <option value="whatsapp">WhatsApp</option>
               <option value="messenger">Facebook Messenger</option>
               <option value="line">LINE</option>
@@ -1094,11 +1098,11 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         {preferredContactMethod === "phone" ? (
           livePhone ? (
             <div style={{ background: "#f0fdf4", border: "0.5px solid #bbf7d0", borderRadius: 8, padding: "10px 14px", marginTop: 8, fontSize: 13, color: "#15803d" }}>
-              ✓ We&apos;ll contact you on {livePhone}
+              ✓ {t("wellContactOn", { contact: livePhone })}
             </div>
           ) : (
             <div style={{ background: "#fffbeb", border: "0.5px solid #fde68a", borderRadius: 8, padding: "10px 14px", marginTop: 8, fontSize: 13, color: "#92400e" }}>
-              Please add your phone number in the section above first.
+              {t("addPhoneAbove")}
             </div>
           )
         ) : null}
@@ -1106,18 +1110,18 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         {preferredContactMethod === "email" ? (
           liveEmail ? (
             <div style={{ background: "#f0fdf4", border: "0.5px solid #bbf7d0", borderRadius: 8, padding: "10px 14px", marginTop: 8, fontSize: 13, color: "#15803d" }}>
-              ✓ We&apos;ll contact you at {liveEmail}
+              ✓ {t("wellContactOn", { contact: liveEmail })}
             </div>
           ) : (
             <div style={{ background: "#fffbeb", border: "0.5px solid #fde68a", borderRadius: 8, padding: "10px 14px", marginTop: 8, fontSize: 13, color: "#92400e" }}>
-              Please add your email address in the section above first.
+              {t("addEmailAbove")}
             </div>
           )
         ) : null}
 
         {preferredContactMethod === "whatsapp" ? (
           <div style={{ marginTop: 8 }}>
-            <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#344054" }}>WhatsApp number</label>
+            <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#344054" }}>{t("whatsappNumber")}</label>
             <input
               name="whatsappNumber"
               onChange={(e) => setWhatsappNumber(e.target.value)}
@@ -1132,7 +1136,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
                 style={{ fontSize: 11, color: "#0e7490", background: "none", border: "none", cursor: "pointer", marginTop: 4, padding: 0 }}
                 type="button"
               >
-                Use same as phone number ({livePhone})
+                {t("sameAsPhone", { phone: livePhone })}
               </button>
             ) : null}
           </div>
@@ -1140,8 +1144,8 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
 
         {preferredContactMethod === "messenger" ? (
           <div style={{ marginTop: 8 }}>
-            <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#344054" }}>Messenger username</label>
-            <input defaultValue={detail.customer?.messenger_id || ""} name="messengerId" placeholder="messenger.com/username or full profile URL" style={{ ...fieldStyle, marginTop: 4 }} />
+            <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#344054" }}>{t("messengerUsername")}</label>
+            <input defaultValue={detail.customer?.messenger_id || ""} name="messengerId" placeholder="messenger.com/username" style={{ ...fieldStyle, marginTop: 4 }} />
           </div>
         ) : null}
 
@@ -1154,7 +1158,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
 
         {preferredContactMethod === "telegram" ? (
           <div style={{ marginTop: 8 }}>
-            <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#344054" }}>Telegram username</label>
+            <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "#344054" }}>{t("telegramUsername")}</label>
             <input defaultValue={detail.customer?.telegram_username || ""} name="telegramUsername" placeholder="@telegramusername" style={{ ...fieldStyle, marginTop: 4 }} />
           </div>
         ) : null}
@@ -1162,7 +1166,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         {/* Secondary channels — collapsible */}
         <details style={{ marginTop: 16 }}>
           <summary style={{ fontSize: 13, color: "#0e7490", cursor: "pointer", fontWeight: 500, listStyle: "none", userSelect: "none" }}>
-            + Add more ways to contact you (optional)
+            {t("moreWaysToContact")}
           </summary>
           <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             {preferredContactMethod !== "whatsapp" ? (
@@ -1191,7 +1195,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             ) : null}
             <div style={{ gridColumn: "1 / 2" }}>
               <label style={{ fontSize: 13, fontWeight: 500, color: "#344054", display: "block" }}>
-                Instagram <span style={{ fontSize: 11, color: "#94a3b8" }}>Optional</span>
+                Instagram
               </label>
               <input defaultValue={detail.customer?.instagram_handle || ""} name="instagramHandle" placeholder="@instagramhandle" style={{ ...fieldStyle, marginTop: 4 }} />
             </div>
@@ -1200,29 +1204,29 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
       </section>
 
       <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
-        <SectionTitle icon={PenLine} label="Preferred delivery details" />
-        <p className="mt-2 text-sm leading-6 text-[var(--muted)]">Optional. Add your preferred location and time if the operator has not confirmed them yet.</p>
+        <SectionTitle icon={PenLine} label={t("handoverPreferences")} />
+        <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{t("handoverPreferencesIntro")}</p>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <label className="sm:col-span-2">
-            <span className="text-sm font-bold text-[var(--foreground-secondary)]">Preferred delivery or collection location</span>
+            <span className="text-sm font-bold text-[var(--foreground-secondary)]">{t("preferredPlace")}</span>
             <GoogleAddressInput name="preferredDeliveryLocation" onChange={setPreferredDeliveryLocation} value={preferredDeliveryLocation} />
           </label>
           <label className="sm:col-span-2">
-            <span className="text-sm font-bold text-[var(--foreground-secondary)]">Preferred delivery or collection time</span>
+            <span className="text-sm font-bold text-[var(--foreground-secondary)]">{t("preferredTime")}</span>
             {operatorDeliveryIsToday ? (
               <div className="mt-2 rounded-xl border border-[#bfe0db] bg-[#fbfaf8] p-3">
                 <input name="preferredDeliveryDateTime" type="hidden" value={operatorDeliveryDateTime} />
                 <div className="grid gap-2 sm:grid-cols-2">
                   <div className="rounded-lg border border-[var(--border)] bg-white px-3 py-2">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--primary)]">Date</p>
-                    <p className="mt-1 text-sm font-semibold text-[var(--foreground)]">Today</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--primary)]">{t("date")}</p>
+                    <p className="mt-1 text-sm font-semibold text-[var(--foreground)]">{t("today")}</p>
                   </div>
                   <div className="rounded-lg border border-[var(--border)] bg-white px-3 py-2">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--primary)]">Time</p>
-                    <p className="mt-1 text-sm font-semibold text-[var(--foreground)]">{operatorDeliveryTimeLabel}</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--primary)]">{t("time")}</p>
+                    <p className="mt-1 text-sm font-semibold text-[var(--foreground)]">{operatorDeliveryTimeLabel === "As agreed" ? t("asAgreed") : operatorDeliveryTimeLabel}</p>
                   </div>
                 </div>
-                <p className="mt-2 text-sm font-semibold text-[var(--primary)]">Your vehicle will be ready for handover today.</p>
+                <p className="mt-2 text-sm font-semibold text-[var(--primary)]">{t("readyToday")}</p>
               </div>
             ) : (
               <input className={inputClass} defaultValue={operatorDeliveryDateTime} min={minDateTime} name="preferredDeliveryDateTime" style={fieldStyle} type="datetime-local" />
@@ -1233,7 +1237,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
 
       {acceptedMethods.length > 0 ? (
         <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
-          <SectionTitle icon={CreditCard} label="How would you like to pay?" />
+          <SectionTitle icon={CreditCard} label={t("howPay")} />
           <div className="mt-4 grid gap-3">
             {acceptedMethods.map((key) => {
               const info = PAYMENT_METHODS.find((m) => m.key === key)!;
@@ -1258,8 +1262,8 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
                       <i className={info.iconClass} style={{ fontSize: 19 }} />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-semibold text-[var(--foreground)]">{info.label}</span>
-                      <span className="mt-1 block text-sm leading-5 text-[var(--muted)]">{info.description}</span>
+                      <span className="block text-sm font-semibold text-[var(--foreground)]">{t(`method_${key}`)}</span>
+                      <span className="mt-1 block text-sm leading-5 text-[var(--muted)]">{t(`method_${key}_hint`)}</span>
                       <span className="mt-3 flex flex-wrap gap-2">
                         <button
                           className={`pressable rounded-full px-3 py-1 text-xs font-semibold ${active && effectiveTiming === "on_delivery" ? "bg-[var(--primary)] text-white" : "bg-white text-[var(--foreground-secondary)] ring-1 ring-[var(--border)]"}`}
@@ -1271,7 +1275,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
                           }}
                           type="button"
                         >
-                          Pay on delivery / collection
+                          {t("payAtHandover")}
                         </button>
                         {!info.deliveryOnly ? (
                           <button
@@ -1284,7 +1288,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
                             }}
                             type="button"
                           >
-                            Pay now
+                            {t("payNow")}
                           </button>
                         ) : null}
                       </span>
@@ -1298,9 +1302,9 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
                           {detail.promptPayQrSvg ? (
                             <>
                               <div aria-label="PromptPay QR code" className="mx-auto w-[220px] max-w-full rounded-lg border border-[var(--border)] bg-white p-2 [&>svg]:h-auto [&>svg]:w-full" dangerouslySetInnerHTML={{ __html: detail.promptPayQrSvg }} role="img" />
-                              <p className="mt-3 text-center text-[13px] text-[var(--foreground-secondary)]">Scan with any Thai banking app</p>
-                              <p className="mt-1 text-center text-[13px] font-semibold text-[var(--primary)]">{formatMoney(paymentAmount, currency)} is already filled in</p>
-                              <p className="mt-1 text-center text-[11px] text-[var(--muted)]">Once you have signed, you can send your receipt from this page.</p>
+                              <p className="mt-3 text-center text-[13px] text-[var(--foreground-secondary)]">{t("scanWithBankingApp")}</p>
+                              <p className="mt-1 text-center text-[13px] font-semibold text-[var(--primary)]">{t("amountFilledIn", { amount: formatMoney(paymentAmount, currency) })}</p>
+                              <p className="mt-1 text-center text-[11px] text-[var(--muted)]">{t("sendReceiptAfterSigning")}</p>
                             </>
                           ) : orgPayment.promptpay_qr_url ? (
                             <>
@@ -1309,8 +1313,8 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
                                 className="mx-auto block h-[220px] w-[220px] rounded-lg border border-[var(--border)] bg-white object-contain"
                                 src={orgPayment.promptpay_qr_url}
                               />
-                              <p className="mt-3 text-center text-[13px] text-[var(--foreground-secondary)]">Scan with any Thai banking app</p>
-                              <p className="mt-1 text-center text-[13px] font-semibold text-[var(--primary)]">Enter the amount: {formatMoney(paymentAmount, currency)}</p>
+                              <p className="mt-3 text-center text-[13px] text-[var(--foreground-secondary)]">{t("scanWithBankingApp")}</p>
+                              <p className="mt-1 text-center text-[13px] font-semibold text-[var(--primary)]">{t("enterAmount", { amount: formatMoney(paymentAmount, currency) })}</p>
                               {orgPayment.promptpay_id ? (
                                 <p className="mt-1 text-center text-[11px] text-[var(--muted)]">PromptPay ID: {orgPayment.promptpay_id}</p>
                               ) : null}
@@ -1318,39 +1322,39 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
                           ) : (
                             <div className="text-center">
                               <p className="text-base font-semibold text-[var(--foreground)]">PromptPay ID: {orgPayment.promptpay_id}</p>
-                              <p className="mt-2 text-sm text-[var(--muted)]">Search for this number in your Thai banking app to pay</p>
-                              <p className="mt-2 text-sm font-semibold text-[var(--primary)]">Amount to enter: {formatMoney(paymentAmount, currency)}</p>
+                              <p className="mt-2 text-sm text-[var(--muted)]">{t("searchPromptPayNumber")}</p>
+                              <p className="mt-2 text-sm font-semibold text-[var(--primary)]">{t("enterAmount", { amount: formatMoney(paymentAmount, currency) })}</p>
                             </div>
                           )}
-                          <PaymentReportedButton isPending={isPaymentReportPending} onClick={handleReportPayment} reported={paymentReported} text="I've made the payment" />
+                          <PaymentReportedButton isPending={isPaymentReportPending} onClick={handleReportPayment} reported={paymentReported} text={t("iHavePaid")} />
                         </div>
                       ) : key === "bank_transfer" && orgPayment?.bank_account_number ? (
                         <div>
-                          <p className="text-xs font-semibold uppercase text-[var(--primary)]">Thai Bank Transfer</p>
+                          <p className="text-xs font-semibold uppercase text-[var(--primary)]">{t("method_bank_transfer")}</p>
                           <div className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
-                            <PaymentDetail label="Bank" value={orgPayment.bank_name || "Bank details provided by operator"} />
-                            <PaymentDetail label="Account number" value={orgPayment.bank_account_number} />
-                            <PaymentDetail label="Account name" value={orgPayment.bank_account_name || detail.organizationName} />
-                            <PaymentDetail label="Reference" value={detail.bookingReference || detail.token.slice(0, 10)} />
-                            <PaymentDetail label="Exact amount" value={formatMoney(paymentAmount, currency)} />
+                            <PaymentDetail label={t("bank")} value={orgPayment.bank_name || "-"} />
+                            <PaymentDetail label={t("accountNumber")} value={orgPayment.bank_account_number} />
+                            <PaymentDetail label={t("accountName")} value={orgPayment.bank_account_name || detail.organizationName} />
+                            <PaymentDetail label={t("reference")} value={detail.bookingReference || detail.token.slice(0, 10)} />
+                            <PaymentDetail label={t("exactAmount")} value={formatMoney(paymentAmount, currency)} />
                           </div>
-                          <PaymentReportedButton isPending={isPaymentReportPending} onClick={handleReportPayment} reported={paymentReported} text="I've made the transfer" />
+                          <PaymentReportedButton isPending={isPaymentReportPending} onClick={handleReportPayment} reported={paymentReported} text={t("iHavePaid")} />
                         </div>
                       ) : key === "wise" && orgPayment?.wise_link ? (
                         <div>
                           <p className="text-xs font-semibold uppercase text-[var(--primary)]">Wise</p>
-                          <p className="mt-2 text-sm text-[var(--muted)]">Use Wise to pay {formatMoney(paymentAmount, currency)}.</p>
+                          <p className="mt-2 text-sm text-[var(--muted)]">{t("useAppToPay", { app: "Wise", amount: formatMoney(paymentAmount, currency) })}</p>
                           <a className="pressable mt-3 inline-flex rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white" href={orgPayment.wise_link} rel="noreferrer" target="_blank">
-                            Pay via Wise
+                            {t("payWith", { app: "Wise" })}
                           </a>
                           <PaymentReportedButton isPending={isPaymentReportPending} onClick={handleReportPayment} reported={paymentReported} text="I've paid" />
                         </div>
                       ) : key === "revolut" && orgPayment?.revolut_link ? (
                         <div>
                           <p className="text-xs font-semibold uppercase text-[var(--primary)]">Revolut</p>
-                          <p className="mt-2 text-sm text-[var(--muted)]">Use Revolut to pay {formatMoney(paymentAmount, currency)}.</p>
+                          <p className="mt-2 text-sm text-[var(--muted)]">{t("useAppToPay", { app: "Revolut", amount: formatMoney(paymentAmount, currency) })}</p>
                           <a className="pressable mt-3 inline-flex rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white" href={orgPayment.revolut_link} rel="noreferrer" target="_blank">
-                            Pay via Revolut
+                            {t("payWith", { app: "Revolut" })}
                           </a>
                           <PaymentReportedButton isPending={isPaymentReportPending} onClick={handleReportPayment} reported={paymentReported} text="I've paid" />
                         </div>
@@ -1363,7 +1367,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           </div>
 
           <p className="mt-4 rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-3 text-sm leading-6 text-[var(--muted)]">
-            Payment will be confirmed by {detail.organizationName} when received. You will not be charged automatically.
+            {t("paymentConfirmedBy", { business: detail.organizationName })}
           </p>
 
           <input name="preferredPaymentMethod" type="hidden" value={paymentMethod} />
@@ -1373,9 +1377,9 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
 
       {orgPayment?.upfront_discount_enabled && orgPayment.upfront_discount_rate && detail.billingPeriod === "monthly" ? (
         <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
-          <SectionTitle icon={CreditCard} label={orgPayment.upfront_discount_label || "Pay upfront and save"} />
+          <SectionTitle icon={CreditCard} label={orgPayment.upfront_discount_label || t("payUpfrontTitle")} />
           <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-            Pay {orgPayment.upfront_discount_min_periods} months upfront at {formatMoney(orgPayment.upfront_discount_rate, currency)} per month and enjoy a discounted rate.
+            {t("payUpfrontBody", { months: orgPayment.upfront_discount_min_periods, rate: formatMoney(orgPayment.upfront_discount_rate, currency) })}
           </p>
           <div className="mt-3 flex gap-2">
             <button
@@ -1383,14 +1387,14 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
               onClick={() => setUpfrontAccepted(true)}
               type="button"
             >
-              Accept offer
+              {t("acceptOffer")}
             </button>
             <button
               className={`pressable flex-1 rounded-xl border px-3 py-3 text-sm font-semibold transition ${upfrontAccepted === false ? "border-[#94a3b8] bg-[#fbfaf8] text-[var(--foreground-secondary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
               onClick={() => setUpfrontAccepted(false)}
               type="button"
             >
-              No thanks
+              {t("noThanks")}
             </button>
           </div>
           {upfrontAccepted === true ? (
@@ -1405,29 +1409,31 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
       </SavedDetails>
 
       <section className="scroll-mt-4 rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm" ref={agreementRef}>
-        <SectionTitle icon={PenLine} label="Rental Agreement" />
+        <SectionTitle icon={PenLine} label={t("rentalAgreement")} />
         {notice ? <p className="mt-3 rounded-xl bg-[#dcfce7] p-3 text-sm font-bold text-[#166534]">{notice}</p> : null}
         {!readyToSign ? (
           <p className="mt-3 rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-3 text-sm leading-6 text-[var(--foreground-secondary)]">
-            This is a preview. When you save your details, your name and document numbers are added to the agreement and
-            {" "}{detail.organizationName} signs it. You will then read the final agreement here before you sign it.
+            {t("previewExplain", { business: detail.organizationName })}
           </p>
         ) : null}
         {isRentalDocumentEngine && publicAgreement && readyToSign ? (
           <div className="mt-4 rounded-xl border border-[#bfe0db] bg-[#fbfaf8] p-4">
-            <p className="text-xs font-semibold uppercase text-[var(--primary)]">Agreement version {publicAgreement.versionNumber}</p>
+            <p className="text-xs font-semibold uppercase text-[var(--primary)]">{t("agreementVersion", { number: publicAgreement.versionNumber })}</p>
             <p className="mt-1 text-sm font-bold text-[var(--foreground)]">{publicAgreement.businessIdentity.name}</p>
             <div className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
-              <p><span className="font-bold">Rate:</span> {publicAgreement.rentalSummary.rate}{" "}
-                {({ daily: "a day", day: "a day", weekly: "a week", week: "a week", monthly: "a month", month: "a month", custom: "for the rental", "entire period": "for the rental" } as Record<string, string>)[String(publicAgreement.rentalSummary.billingPeriod || "").toLowerCase()] || `/ ${publicAgreement.rentalSummary.billingPeriod}`}</p>
-              <p><span className="font-bold">Deposit:</span> {publicAgreement.rentalSummary.deposit}</p>
+              <p><span className="font-bold">{t("rateLabel")}</span>{" "}
+                {(() => {
+                  const per = ({ daily: "perDay", day: "perDay", weekly: "perWeek", week: "perWeek", monthly: "perMonth", month: "perMonth", custom: "forTheRental", "entire period": "forTheRental" } as Record<string, string>)[String(publicAgreement.rentalSummary.billingPeriod || "").toLowerCase()];
+                  return per ? t(per, { rate: publicAgreement.rentalSummary.rate }) : `${publicAgreement.rentalSummary.rate} / ${publicAgreement.rentalSummary.billingPeriod}`;
+                })()}</p>
+              <p><span className="font-bold">{t("depositLabel")}</span> {publicAgreement.rentalSummary.deposit}</p>
               {/* Only shown when the agreement actually states one. */}
               {publicAgreement.rentalSummary.standardDailyRate ? (
-                <p><span className="font-bold">Standard daily rate:</span> {publicAgreement.rentalSummary.standardDailyRate}</p>
+                <p><span className="font-bold">{t("standardDailyRateLabel")}</span> {publicAgreement.rentalSummary.standardDailyRate}</p>
               ) : null}
             </div>
             <p className="mt-3 text-xs text-[var(--muted)]">
-              This exact text is fixed once you sign. Document fingerprint: <span className="font-mono">{publicAgreement.contentHashFragment}</span>
+              {t("textFixedOnceSigned")} <span className="font-mono">{publicAgreement.contentHashFragment}</span>
             </p>
             {customerSigningEligibility?.customerSafeMessage ? (
               <p className="mt-3 rounded-lg border border-[#fecaca] bg-white p-3 text-sm font-bold text-[#be123c]">{customerSigningEligibility.customerSafeMessage}</p>
@@ -1439,7 +1445,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             className="h-full w-full border-0 bg-[#fbfaf8]"
             sandbox=""
             srcDoc={buildContractPreviewDocument(agreementHtml)}
-            title="Rental agreement preview"
+            title={t("rentalAgreement")}
           />
         </div>
         {readyToSign && publicAgreement ? (
@@ -1453,14 +1459,14 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             ))}
           </div>
         <label className="mt-4 block">
-          <span className="text-sm font-bold text-[var(--foreground-secondary)]">Full name for signature</span>
+          <span className="text-sm font-bold text-[var(--foreground-secondary)]">{t("yourFullName")}</span>
           <input className={inputClass} defaultValue={detail.customer?.full_name || ""} name="signedName" required style={fieldStyle} />
         </label>
         <div className="mt-4">
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-sm font-bold text-[var(--foreground-secondary)]">Sign below</span>
+            <span className="text-sm font-bold text-[var(--foreground-secondary)]">{t("signBelow")}</span>
             <button className="pressable rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-bold text-[var(--foreground-secondary)]" onClick={clearSignature} type="button">
-              Clear
+              {t("clear")}
             </button>
           </div>
           <canvas
@@ -1480,11 +1486,11 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         {error ? <p className="mt-4 rounded-xl bg-[#ffe4e6] p-3 text-sm font-bold text-[#be123c]">{error}</p> : null}
         <button className="pressable mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white disabled:opacity-70" disabled={isPending} key={readyToSign ? "sign" : "review"} type="submit">
           {isPending ? (
-            <span className="inline-flex items-center gap-2"><span className="spinner" /> Submitting...</span>
+            <span className="inline-flex items-center gap-2"><span className="spinner" /> {t("sending")}</span>
           ) : readyToSign ? (
-            "Sign agreement and complete booking"
+            t("signAndComplete")
           ) : (
-            "Save details and review agreement"
+            t("saveAndReview")
           )}
         </button>
       </section>
@@ -1495,13 +1501,14 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
 }
 
 function CompletionStatus({ status }: { status: { details: boolean; documents: boolean; agreement: boolean } }) {
+  const t = useTranslations("customer");
   return (
     <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
-      <p className="text-xs font-semibold uppercase text-[var(--primary)]">Completion status</p>
+      <p className="text-xs font-semibold uppercase text-[var(--primary)]">{t("progress")}</p>
       <div className="mt-4 grid gap-3 sm:grid-cols-3">
-        <StatusItem complete={status.details} label="Your details" />
-        <StatusItem complete={status.documents} label="Documents" />
-        <StatusItem complete={status.agreement} label="Agreement" />
+        <StatusItem complete={status.details} label={t("yourDetails")} />
+        <StatusItem complete={status.documents} label={t("documents")} />
+        <StatusItem complete={status.agreement} label={t("agreement")} />
       </div>
     </section>
   );
@@ -1536,10 +1543,11 @@ function PaymentReportedButton({
   reported: boolean;
   text: string;
 }) {
+  const t = useTranslations("customer");
   if (reported) {
     return (
       <p className="mt-3 rounded-xl border border-[#bbf7d0] bg-[#f0fdf4] p-3 text-sm font-bold text-[#166534]">
-        Payment reported - your booking will be confirmed shortly.
+        {t("paymentReported")}
       </p>
     );
   }
@@ -1551,14 +1559,26 @@ function PaymentReportedButton({
       onClick={onClick}
       type="button"
     >
-      {isPending ? "Reporting..." : text}
+      {isPending ? t("sending") : text}
     </button>
   );
 }
 
 function NationalitySelect({ defaultValue, fill, name }: { defaultValue: string; fill?: string; name: string }) {
+  const t = useTranslations("customer");
+  const locale = useLocale();
+  // Countries are shown in the customer's language; what is saved stays in English for the business.
+  const regionNames = useMemo(() => {
+    try {
+      return locale === "en" ? null : new Intl.DisplayNames([locale], { type: "region" });
+    } catch {
+      return null;
+    }
+  }, [locale]);
+  const countryName = (n: { code: string; country: string }) => regionNames?.of(n.code) || n.country;
+  const shown = (n: { code: string; name: string; country: string }) => (regionNames ? countryName(n) : `${n.name} — ${n.country}`);
   const initial = resolveNationality(defaultValue);
-  const [search, setSearch] = useState(initial ? `${initial.name} — ${initial.country}` : defaultValue);
+  const [search, setSearch] = useState(initial ? shown(initial) : defaultValue);
   const [selected, setSelected] = useState(initial?.name || defaultValue);
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -1570,7 +1590,8 @@ function NationalitySelect({ defaultValue, fill, name }: { defaultValue: string;
     const match = fill ? resolveNationality(fill) : null;
     if (!match || selectedRef.current) return;
     setSelected(match.name);
-    setSearch(`${match.name} — ${match.country}`);
+    setSearch(shown(match));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fill]);
 
   const filtered = useMemo(() => {
@@ -1580,9 +1601,11 @@ function NationalitySelect({ defaultValue, fill, name }: { defaultValue: string;
       (n) =>
         n.name.toLowerCase().includes(needle) ||
         n.country.toLowerCase().includes(needle) ||
+        countryName(n).toLowerCase().includes(needle) ||
         n.code.toLowerCase().includes(needle)
     ).slice(0, 40);
-  }, [search]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, regionNames]);
 
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
@@ -1610,7 +1633,7 @@ function NationalitySelect({ defaultValue, fill, name }: { defaultValue: string;
           setOpen(true);
         }}
         onFocus={() => setOpen(true)}
-        placeholder="Type nationality or country name..."
+        placeholder={t("typeCountry")}
         required
         style={fieldStyle}
         value={search}
@@ -1624,15 +1647,15 @@ function NationalitySelect({ defaultValue, fill, name }: { defaultValue: string;
               onMouseDown={(e) => {
                 e.preventDefault(); // keep focus so blur doesn't fire first
                 setSelected(n.name);
-                setSearch(`${n.name} — ${n.country}`);
+                setSearch(shown(n));
                 setOpen(false);
               }}
               type="button"
             >
               <span className="text-xl leading-none">{flagEmoji(n.code)}</span>
               <span className="min-w-0">
-                <span className="block text-sm font-bold text-[var(--foreground)]">{n.name}</span>
-                <span className="block text-xs font-medium text-[var(--muted)]">{n.country}</span>
+                <span className="block text-sm font-bold text-[var(--foreground)]">{regionNames ? countryName(n) : n.name}</span>
+                {regionNames ? null : <span className="block text-xs font-medium text-[var(--muted)]">{n.country}</span>}
               </span>
             </button>
           ))}
@@ -1643,6 +1666,7 @@ function NationalitySelect({ defaultValue, fill, name }: { defaultValue: string;
 }
 
 function PhoneCountrySelect({ name, onChange, value }: { name: string; onChange: (value: string) => void; value: string }) {
+  const t = useTranslations("customer");
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const searchRef = useRef<HTMLInputElement | null>(null);
@@ -1709,7 +1733,7 @@ function PhoneCountrySelect({ name, onChange, value }: { name: string; onChange:
           }}>
             <input
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search country or code..."
+              placeholder={t("searchCountryCode")}
               ref={searchRef}
               style={{
                 width: "100%",
@@ -1725,7 +1749,7 @@ function PhoneCountrySelect({ name, onChange, value }: { name: string; onChange:
             />
             <div>
               {filtered.length === 0 ? (
-                <p style={{ padding: 16, textAlign: "center", fontSize: 13, color: "var(--muted)" }}>No results</p>
+                <p style={{ padding: 16, textAlign: "center", fontSize: 13, color: "var(--muted)" }}>{t("noResults")}</p>
               ) : filtered.map((country) => (
                 <button
                   key={`${name}-${country.callingCode}-${country.code}`}
@@ -1770,6 +1794,7 @@ function FlagSvg({ code, label }: { code: string; label: string }) {
 }
 
 function GoogleAddressInput({ name = "address", onChange, value }: { name?: string; onChange: (value: string) => void; value: string }) {
+  const t = useTranslations("customer");
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isEnabled, setIsEnabled] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -1814,7 +1839,7 @@ function GoogleAddressInput({ name = "address", onChange, value }: { name?: stri
           className={inputClass}
           name={name}
           onChange={(event) => onChange(event.target.value)}
-          placeholder="Hotel, villa or address"
+          placeholder={t("hotelVillaAddress")}
           ref={inputRef}
           style={fieldStyle}
           value={value}
@@ -1825,11 +1850,11 @@ function GoogleAddressInput({ name = "address", onChange, value }: { name?: stri
             onClick={() => setPinModalOpen(true)}
             type="button"
           >
-            Drop a pin
+            {t("dropPin")}
           </button>
         ) : null}
       </div>
-      {isEnabled ? <p className="mt-2 text-xs text-[var(--muted)]">Start typing and pick from the list, or drop a pin.</p> : null}
+      {isEnabled ? <p className="mt-2 text-xs text-[var(--muted)]">{t("addressHint")}</p> : null}
       {pinModalOpen ? (
         <PublicGooglePinModal
           onClose={() => setPinModalOpen(false)}
@@ -1844,6 +1869,7 @@ function GoogleAddressInput({ name = "address", onChange, value }: { name?: stri
 }
 
 function PublicGooglePinModal({ onClose, onConfirm }: { onClose: () => void; onConfirm: (address: string) => void }) {
+  const t = useTranslations("customer");
   const mapRef = useRef<HTMLDivElement | null>(null);
   const markerRef = useRef<any>(null);
   const [address, setAddress] = useState("Koh Samui, Thailand");
@@ -1910,16 +1936,16 @@ function PublicGooglePinModal({ onClose, onConfirm }: { onClose: () => void; onC
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase text-[var(--primary)]">Google Maps</p>
-            <h3 className="text-lg font-semibold text-[var(--foreground)]">Drop a pin</h3>
+            <h3 className="text-lg font-semibold text-[var(--foreground)]">{t("dropPin")}</h3>
           </div>
           <button className="pressable rounded-xl border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold" onClick={onClose} type="button">
-            Close
+            {t("close")}
           </button>
         </div>
         <div className="mt-4 h-80 overflow-hidden rounded-xl border border-[var(--border)] bg-[#fbfaf8]" ref={mapRef} />
         <p className="mt-3 rounded-xl bg-[#fbfaf8] p-3 text-sm font-bold text-[var(--foreground-secondary)]">{address}</p>
         <button className="pressable mt-3 min-h-12 w-full rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white" onClick={() => onConfirm(address)} type="button">
-          Confirm location
+          {t("usePlace")}
         </button>
       </div>
     </div>
@@ -1928,13 +1954,14 @@ function PublicGooglePinModal({ onClose, onConfirm }: { onClose: () => void; onC
 
 /** The filled-in sections. Shown in full while they are being completed; folded to one line once saved. */
 function SavedDetails({ folded, children }: { folded: boolean; children: React.ReactNode }) {
+  const t = useTranslations("customer");
   if (!folded) return <>{children}</>;
   return (
     <details className="group rounded-2xl border border-[#bbf7d0] bg-white shadow-sm">
       <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-5 py-3 [&::-webkit-details-marker]:hidden">
         <span>
-          <span className="block text-base font-semibold text-[#166534]">✓ Your details are saved</span>
-          <span className="block text-sm text-[var(--muted)]">Tap to see or change them</span>
+          <span className="block text-base font-semibold text-[#166534]">✓ {t("detailsSaved")}</span>
+          <span className="block text-sm text-[var(--muted)]">{t("tapToChange")}</span>
         </span>
         <span aria-hidden="true" className="text-[var(--muted)] transition-transform group-open:rotate-180">▾</span>
       </summary>
@@ -1977,6 +2004,7 @@ function UploadCard({
   noteTone?: DocReadState;
   onPicked?: (file: File) => void;
 }) {
+  const t = useTranslations("customer");
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [cameraFile, setCameraFile] = useState<File | null>(null);
   const [isMobile, setIsMobile] = useState(false);
@@ -1996,10 +2024,10 @@ function UploadCard({
         {complete || selectedFile ? (
           <span style={{ fontSize: 11, color: "#16a34a", fontWeight: 500, flexShrink: 0 }}>
             {"✓ "}
-            {selectedFile ? "Added" : "Uploaded"}
+            {selectedFile ? t("added") : t("received")}
           </span>
         ) : (
-          <span style={{ fontSize: 11, color: "#d97706", flexShrink: 0 }}>Required</span>
+          <span style={{ fontSize: 11, color: "#d97706", flexShrink: 0 }}>{t("needed")}</span>
         )}
       </div>
 
@@ -2028,7 +2056,7 @@ function UploadCard({
                 <polyline points="17 8 12 3 7 8" />
                 <line x1="12" y1="3" x2="12" y2="15" />
               </svg>
-              Upload file
+              {t("chooseFile")}
               <input
                 accept={accept}
                 className="sr-only"
@@ -2065,7 +2093,7 @@ function UploadCard({
                 <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
                 <circle cx="12" cy="13" r="4" />
               </svg>
-              Take photo
+              {t("takePhoto")}
               <input
                 accept="image/*"
                 capture={cameraCapture}
@@ -2084,7 +2112,7 @@ function UploadCard({
           </div>
           {!isMobile ? (
             <p style={{ fontSize: 10, color: "#94a3b8", margin: "4px 0 0", textAlign: "center" }}>
-              On mobile, "Take photo" opens your camera directly
+              {t("takePhotoHint")}
             </p>
           ) : null}
         </>
@@ -2105,7 +2133,7 @@ function UploadCard({
             color: "#64748b"
           }}
         >
-          Replace document
+          {t("replace")}
           <input
             accept={accept}
             className="sr-only"

@@ -2,9 +2,11 @@
 
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { signRentalAmendment } from "@/app/actions/amendments";
 
 export function AmendmentSignForm({ token, contentHash, renterName }: { token: string; contentHash: string; renterName: string }) {
+  const t = useTranslations("customer");
   const router = useRouter();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawing = useRef(false);
@@ -71,13 +73,13 @@ export function AmendmentSignForm({ token, contentHash, renterName }: { token: s
 
   return (
     <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
-      <h2 className="text-lg font-semibold">Sign to agree</h2>
+      <h2 className="text-lg font-semibold">{t("signToAgree")}</h2>
       <label className="mt-3 flex items-start gap-3 rounded-xl border border-[var(--border)] p-3 text-sm">
         <input checked={accepted} className="mt-1 h-4 w-4" onChange={(event) => setAccepted(event.target.checked)} type="checkbox" />
-        <span>I have read this amendment and agree to the changes. I consent to signing it electronically.</span>
+        <span>{t("amendConsent")}</span>
       </label>
       <label className="mt-3 block text-sm font-bold">
-        Your full name
+        {t("yourFullName")}
         <input
           autoComplete="name"
           className="mt-1 h-11 w-full rounded-xl border border-[var(--border)] px-3 text-base font-normal"
@@ -87,9 +89,9 @@ export function AmendmentSignForm({ token, contentHash, renterName }: { token: s
       </label>
       <div className="mt-3">
         <div className="flex items-center justify-between text-sm font-bold">
-          <span>Your signature</span>
+          <span>{t("yourSignature")}</span>
           <button className="text-xs font-semibold text-[var(--primary)]" onClick={clear} type="button">
-            Clear
+            {t("clear")}
           </button>
         </div>
         <canvas
@@ -111,7 +113,7 @@ export function AmendmentSignForm({ token, contentHash, renterName }: { token: s
         onClick={submit}
         type="button"
       >
-        {isPending ? "Signing..." : "Sign amendment"}
+        {isPending ? t("signing") : t("signTheChange")}
       </button>
     </section>
   );

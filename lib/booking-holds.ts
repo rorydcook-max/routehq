@@ -54,9 +54,7 @@ export async function releaseExpiredHolds(admin: any, organizationId: string) {
       title: "Hold ended",
       detail: `${who} did not finish the booking form in time, so the ${vehicle} is open for those dates again. Their link still works if it is free when they come back.`
     } as any).catch(() => null);
-    await tellRentalCustomer(admin, link.rental_id, ({ firstName }) =>
-      `Hi ${firstName}, we were holding the ${vehicle} for you, but the booking wasn't finished in time so the dates are open again. Your link still works: finish the booking while the vehicle is free and it's yours.`
-    );
+    await tellRentalCustomer(admin, link.rental_id, ({ say }) => say("holdReleased", { vehicle }));
     notifyOperator(organizationId, `⏳ Hold ended: ${who} hasn't finished the booking form for the ${vehicle}. The dates are open again; their link still works if the vehicle is free.`, "operator_notification").catch(() => null);
   }
   return (stale || []).length;

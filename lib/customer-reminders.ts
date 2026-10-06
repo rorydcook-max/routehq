@@ -33,8 +33,8 @@ export async function sendDailyCustomerReminders(admin: any): Promise<Record<str
     .eq("status", "booked")
     .eq("start_date", tomorrow);
   for (const rental of starting || []) {
-    const ok = await remindRentalCustomerOnce(admin, rental.id, `handover:${tomorrow}`, ({ firstName, vehicle }) =>
-      `Hi ${firstName}, your rental of the ${vehicle} starts tomorrow, ${niceDate(tomorrow)}.${rental.delivery_location ? ` Handover: ${rental.delivery_location}.` : ""} If you haven't yet, please finish your details and sign the agreement from your booking page so the handover is quick.`
+    const ok = await remindRentalCustomerOnce(admin, rental.id, `handover:${tomorrow}`, ({ say, t, vehicle, date }) =>
+      `${say("handoverTomorrow", { vehicle, date: date(tomorrow) })}${rental.delivery_location ? ` ${t("handoverPlace", { place: rental.delivery_location })}` : ""} ${t("finishDetails")}`
     );
     if (ok) sent.handover += 1;
   }
@@ -48,8 +48,8 @@ export async function sendDailyCustomerReminders(admin: any): Promise<Record<str
     .in("end_date", [tomorrow, inThreeDays]);
   for (const rental of ending || []) {
     const end = String(rental.end_date).slice(0, 10);
-    const ok = await remindRentalCustomerOnce(admin, rental.id, `return:${end}:${end === tomorrow ? "1" : "3"}`, ({ firstName, vehicle }) =>
-      `Hi ${firstName}, the ${vehicle} is due back ${end === tomorrow ? "tomorrow" : "in three days"}, ${niceDate(end)}. Want to keep it longer? Choose a new date, or switch to monthly, from your booking page. To arrange the return, tap "Confirm return" there.`
+    const ok = await remindRentalCustomerOnce(admin, rental.id, `return:${end}:${end === tomorrow ? "1" : "3"}`, ({ say, t, label, vehicle, date }) =>
+      `${say(end === tomorrow ? "dueBackTomorrow" : "dueBackThreeDays", { vehicle, date: date(end) })} ${t("keepLonger", { button: label("confirmReturn") })}`
     );
     if (ok) sent.returnSoon += 1;
   }
@@ -68,10 +68,8 @@ export async function sendDailyCustomerReminders(admin: any): Promise<Record<str
     if (payment.metadata?.receipt?.path) continue;
     const due = String(payment.due_date).slice(0, 10);
     const late = due === threeDaysAgo;
-    const ok = await remindRentalCustomerOnce(admin, payment.rental_id, `${late ? "rent-late" : "rent-due"}:${payment.id}`, ({ firstName, vehicle, money }) =>
-      late
-        ? `Hi ${firstName}, ${money(Number(payment.amount || 0))} for the ${vehicle} was due on ${niceDate(due)} and we haven't recorded it yet. You can pay and send your receipt from your booking page. If you've already paid, please send the receipt and we'll update it.`
-        : `Hi ${firstName}, a reminder that ${money(Number(payment.amount || 0))} for the ${vehicle} is due tomorrow, ${niceDate(due)}. You can pay and send your receipt from your booking page. Thank you.`
+    const ok = await remindRentalCustomerOnce(admin, payment.rental_id, `${late ? "rent-late" : "rent-due"}:${payment.id}`, ({ say, vehicle, money, date }) =>
+      say(late ? "rentLate" : "rentDueTomorrow", { amount: money(Number(payment.amount || 0)), vehicle, date: date(due) })
     );
     if (ok) sent[late ? "rentOverdue" : "rentDue"] += 1;
   }
@@ -90,10 +88,7 @@ export async function sendDailyCustomerReminders(admin: any): Promise<Record<str
         admin,
         rental.id,
         `vehicle:${item.key}:${item.date}`,
-        ({ firstName, vehicle }) =>
-          service
-            ? `Hi ${firstName}, the ${vehicle} is due a service on ${niceDate(item.date)}. We'll be in touch to arrange a time that suits you; it usually takes a few hours.`
-            : `Hi ${firstName}, the ${item.label.toLowerCase()} on the ${vehicle} is being renewed around ${niceDate(item.date)}. We may need the vehicle or its documents briefly and will be in touch to arrange it.`,
+        ({ say, vehicle, date }) => say(service ? "serviceDue" : "renewalDue", { vehicle, date: date(item.date) }),
         { withLink: false }
       );
       if (ok) sent.vehicleDue += 1;
@@ -118,10 +113,7 @@ export async function sendDailyCustomerReminders(admin: any): Promise<Record<str
       admin,
       amendment.rental_id,
       `amendment:${amendment.id}:${days}`,
-      ({ firstName, vehicle }) =>
-        already
-          ? `Hi ${firstName}, you now have the ${replacement || vehicle}, and we still need your signature to confirm the change. It takes a minute: ${link}`
-          : `Hi ${firstName}, a change to your rental of the ${vehicle} is waiting for your signature. Please check it and sign here: ${link}`,
+      ({ say, vehicle }) => (already ? say("signStillNeeded", { vehicle: replacement || vehicle, link }) : say("signWaiting", { vehicle, link })),
       { withLink: false }
     );
     if (ok) sent.signature += 1;

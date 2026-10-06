@@ -1018,7 +1018,7 @@ export async function cancelBooking(formData: FormData) {
   if (updateError) {
     throw new Error(updateError.message);
   }
-  await tellRentalCustomer(createSupabaseAdminClient() as any, rentalId, ({ firstName, vehicle }) => `Hi ${firstName}, your booking for the ${vehicle} has been cancelled. Message us if you have any questions.`, { sentBy: user.id, withLink: false });
+  await tellRentalCustomer(createSupabaseAdminClient() as any, rentalId, ({ say, t, vehicle }) => `${say("bookingCancelled", { vehicle })} ${t("anyQuestions")}`, { sentBy: user.id, withLink: false });
   // Nothing more is owed on a cancelled booking (the full cancel dialog does the same).
   await supabase.from("rental_payments").update({ status: "cancelled" }).eq("rental_id", rentalId).eq("organization_id", organizationId).in("status", ["scheduled", "pending", "overdue"]);
   await syncVehicleStatusFromBookings(supabase, organizationId, rental.vehicle_id);
@@ -2558,7 +2558,7 @@ async function adjustRentalOrThrow(params: {
     await tellRentalCustomer(
       createSupabaseAdminClient() as any,
       rental.id,
-      ({ firstName, vehicle }) => `Hi ${firstName}, the return date for the ${vehicle} is now ${niceDate(cleanEndDate)}. Message us if that isn't right.`,
+      ({ say, vehicle, date }) => say("returnDateChanged", { vehicle, date: date(cleanEndDate) }),
       { sentBy: user.id }
     );
     revalidatePath("/calendar");
@@ -3350,7 +3350,7 @@ export async function cancelBookingWithDisposition(formData: FormData) {
   throwCancellationError("Could not cancel the payment schedule", paymentScheduleResult.error);
   // Any refund chosen in this dialog settles a "Refund to decide" job.
   if (refundOption) await completeRentalJobs(createSupabaseAdminClient() as any, rentalId, "refund", "Settled when the booking was cancelled");
-  await tellRentalCustomer(createSupabaseAdminClient() as any, rentalId, ({ firstName, vehicle }) => `Hi ${firstName}, your rental of the ${vehicle} has been cancelled. Message us if you have any questions.`, { sentBy: user.id, withLink: false });
+  await tellRentalCustomer(createSupabaseAdminClient() as any, rentalId, ({ say, t, vehicle }) => `${say("rentalCancelled", { vehicle })} ${t("anyQuestions")}`, { sentBy: user.id, withLink: false });
 
   const refundLabel = refundOption ? ` — ${refundOption.replace(/_/g, " ")}` : "";
 
@@ -3442,7 +3442,7 @@ export async function recordPaymentRefund(formData: FormData) {
     for (const row of flagged || []) {
       await admin.from("rental_payments").update({ metadata: { ...(row.metadata || {}), early_return: { ...(row.metadata?.early_return || {}), settled: true } } }).eq("id", row.id);
     }
-    await tellRentalCustomer(admin, rentalId, ({ firstName, money }) => `Hi ${firstName}, we've refunded ${money(amount)} to you. Thank you.`, { sentBy: user.id, withLink: false });
+    await tellRentalCustomer(admin, rentalId, ({ say, money }) => say("refunded", { amount: money(amount) }), { sentBy: user.id, withLink: false });
   }
   revalidatePath("/tasks");
 
@@ -3644,8 +3644,8 @@ export async function confirmReceiptPayment(input: ConfirmReceiptInput) {
 
   {
     const stillDue = lines.reduce((sum, line) => sum + line.stillDue, 0);
-    await tellRentalCustomer(createSupabaseAdminClient() as any, primary.rental_id, ({ firstName, money }) =>
-      `Hi ${firstName}, we've received your payment of ${money(amount)}. Thank you.${stillDue > 0 ? ` ${money(stillDue)} is still to pay.` : ""}`,
+    await tellRentalCustomer(createSupabaseAdminClient() as any, primary.rental_id, ({ say, t, money }) =>
+      `${say("paymentReceived", { amount: money(amount) })}${stillDue > 0 ? ` ${t("stillToPay", { amount: money(stillDue) })}` : ""}`,
       { sentBy: user.id }
     );
   }
@@ -3706,8 +3706,7 @@ export async function declinePaymentReceipt(paymentId: string) {
     title: "Receipt not accepted",
     detail: "The receipt the customer sent did not match a payment received."
   });
-  await tellRentalCustomer(createSupabaseAdminClient() as any, payment.rental_id, ({ firstName }) =>
-    `Hi ${firstName}, we couldn't match the receipt you sent to a payment we've received. Please check it and send it again from your booking page, or message us.`,
+  await tellRentalCustomer(createSupabaseAdminClient() as any, payment.rental_id, ({ say }) => say("receiptNotMatched"),
     { sentBy: user.id }
   );
 

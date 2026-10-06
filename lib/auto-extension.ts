@@ -185,11 +185,11 @@ export async function tryAutoExtend(admin: any, rentalId: string, newEndDateRaw:
   ]);
   if (!options.byStaff) notifyOperator(rental.organization_id, alert, "portal_action", `/bookings/${rental.id}`).catch(() => null);
 
-  await tellRentalCustomer(admin, rental.id, ({ firstName, money }) =>
+  await tellRentalCustomer(admin, rental.id, ({ say, t, money, date }) =>
     outcome.applied && outcome.openEnded
-      ? `Hi ${firstName}, your rental of the ${vehicle} is now monthly with no end date. ${money(outcome.amount)} is due each month from ${niceDate(outcome.dueDate)}. Tell us when you'd like to return it.`
+      ? say("nowMonthly", { vehicle, amount: money(outcome.amount), date: date(outcome.dueDate) })
       : outcome.applied
-        ? `Hi ${firstName}, your rental of the ${vehicle} is extended to ${niceDate(outcome.newEndDate)}.${outcome.amount > 0 ? ` ${money(outcome.amount)} for the extra days is due on ${niceDate(outcome.dueDate)}.` : ""}`
+        ? `${say("extended", { vehicle, date: date(outcome.newEndDate) })}${outcome.amount > 0 ? ` ${t("extraDaysDue", { amount: money(outcome.amount), date: date(outcome.dueDate) })}` : ""}`
         : ""
   );
 

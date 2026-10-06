@@ -1,4 +1,6 @@
 import { isEmailConfigured, sendEmail } from "@/lib/email";
+import { customerDate } from "@/lib/i18n/customer-dates";
+import { customerMessageText } from "@/lib/i18n/customer-message-text";
 import { linePush, PROVIDER_LABELS, telegramSend } from "@/lib/inbox/providers";
 
 /**
@@ -29,6 +31,8 @@ type Input = {
   customerId: string | null | undefined;
   rentalId?: string | null;
   text: string;
+  /** The customer's language, for the line that introduces the link and the email subject. */
+  locale?: string | null;
   /** Adds the link to the customer's own booking page. On by default. */
   withLink?: boolean;
   /** Staff member who triggered it, when there is one. */
@@ -108,7 +112,8 @@ export async function messageCustomer(admin: any, input: Input): Promise<Custome
   if (!customerMessagesOn(organization?.settings)) return { sent: false, reason: "off" };
 
   const link = input.withLink === false ? null : await bookingPageUrl(admin, input.rentalId);
-  const body = `${text}${link ? `\n\nYour booking: ${link}` : ""}\n\n${organization?.name || ""}`.trim();
+  const wording = await customerMessageText(input.locale);
+  const body = `${text}${link ? `\n\n${wording.t("yourBooking", { link })}` : ""}\n\n${organization?.name || ""}`.trim();
 
   const log = (status: "sent" | "failed" | "pending", channel: string | null, metadata: Record<string, unknown>) =>
     admin
@@ -170,7 +175,7 @@ export async function messageCustomer(admin: any, input: Input): Promise<Custome
 
   // 2. Email, the one channel a business can start a conversation on.
   if (customer?.email && isEmailConfigured()) {
-    const result = await sendEmail({ to: customer.email, subject: `${organization?.name || "Your rental"}: an update on your booking`, text: body });
+    const result = await sendEmail({ to: customer.email, subject: wording.t("emailSubject", { business: organization?.name || "RouteHQ" }), text: body });
     if (result.status === "sent") {
       await log("sent", "email", { provider: result.provider });
       return { sent: true, via: "email" };
@@ -199,6 +204,18 @@ export type RentalMessageContext = {
   vehicle: string;
   currency: string;
   money: (amount: number) => string;
+  /** The customer's language. */
+  locale: string;
+  /** One sentence of a message, in the customer's language (see "customerMessages" in the locale files). */
+  t: (key: string, values?: Record<string, string | number>) => string;
+  /** The same, opened with "Hi <first name>,". */
+  say: (key: string, values?: Record<string, string | number>) => string;
+  /** "Hi <first name>," on its own, for a message the owner wrote themselves. */
+  hi: string;
+  /** A button or heading exactly as it reads on the customer's booking page. */
+  label: (key: string) => string;
+  /** "2026-11-04" -> "4 Nov 2026" in the customer's language. */
+  date: (iso: unknown) => string;
 };
 
 /**
@@ -215,12 +232,21 @@ export async function tellRentalCustomer(
   try {
     const { data: rental } = await admin
       .from("rentals")
-      .select("id, organization_id, customer_id, currency, vehicles!rentals_vehicle_id_fkey(make, model), customers!rentals_customer_id_fkey(full_name)")
+      .select("id, organization_id, customer_id, currency, vehicles!rentals_vehicle_id_fkey(make, model), customers!rentals_customer_id_fkey(full_name, preferred_locale)")
       .eq("id", rentalId)
       .maybeSingle();
     if (!rental?.customer_id) return { sent: false, reason: "no_customer" };
     const currency = String(rental.currency || "THB");
+    const wording = await customerMessageText(rental.customers?.preferred_locale);
+    const givenName = String(rental.customers?.full_name || "").trim().split(/\s+/)[0] || "";
+    const hi = givenName ? wording.t("hi", { name: givenName }) : wording.t("hiNoName");
     const context: RentalMessageContext = {
+      locale: wording.locale,
+      t: wording.t,
+      say: (key, values) => `${hi} ${wording.t(key, values)}`,
+      hi,
+      label: wording.label,
+      date: (iso) => customerDate(String(iso || "").slice(0, 10), wording.locale),
       rentalId,
       organizationId: rental.organization_id,
       customerId: rental.customer_id,
@@ -234,6 +260,7 @@ export async function tellRentalCustomer(
       customerId: rental.customer_id,
       rentalId,
       text: build(context),
+      locale: wording.locale,
       sentBy: options.sentBy,
       withLink: options.withLink,
       metadata: options.metadata

@@ -132,7 +132,7 @@ export async function answerExtensionRequest(input: { actionId: string; rentalId
       await tellRentalCustomer(
         admin,
         moved.rentalId,
-        ({ firstName }) => `Hi ${firstName}, a change to your booking: you'll have the ${to} instead of the ${from}. Your dates and price stay the same. Message us if that doesn't suit you.`,
+        ({ say }) => say("vehicleMoved", { to, from }),
         { sentBy: membership.userId }
       );
       revalidatePath(`/bookings/${moved.rentalId}`);
@@ -155,8 +155,8 @@ export async function declinePortalAction(formData: FormData) {
   await tellRentalCustomer(
     admin,
     rentalId,
-    ({ firstName, vehicle }) =>
-      `Hi ${firstName}, sorry, we can't ${openEnded ? `change your rental of the ${vehicle} to monthly with no end date` : `extend your rental of the ${vehicle}${action.content?.new_end_date ? ` to ${niceDate(action.content.new_end_date)}` : ""}`}.${note ? ` ${note}` : ""} Your return date stays as it is. Message us if you'd like to talk it through.`,
+    ({ say, t, vehicle, date }) =>
+      `${openEnded ? say("cantMonthly", { vehicle }) : action.content?.new_end_date ? say("cantExtendTo", { vehicle, date: date(action.content.new_end_date) }) : say("cantExtend", { vehicle })}${note ? ` ${note}` : ""} ${t("returnDateStays")}`,
     { sentBy: membership.userId }
   );
   refresh(rentalId);
@@ -170,8 +170,10 @@ export async function acknowledgePortalAction(formData: FormData) {
   await tellRentalCustomer(
     admin,
     rentalId,
-    ({ firstName, vehicle }) =>
-      `Hi ${firstName}, thanks. We've noted the return of the ${vehicle}${content.return_date ? ` on ${niceDate(content.return_date)}` : ""}${content.return_time ? ` at ${content.return_time}` : ""}${content.return_location ? `, ${content.return_location}` : ""}. See you then.`,
+    ({ say, vehicle, date }) => {
+      const details = [content.return_date ? date(content.return_date) : "", content.return_time || "", content.return_location || ""].filter(Boolean).join(", ");
+      return details ? say("returnNotedDetails", { vehicle, details }) : say("returnNoted", { vehicle });
+    },
     { sentBy: membership.userId }
   );
   refresh(rentalId);
@@ -191,6 +193,6 @@ export async function replyToPortalQuestion(formData: FormData) {
   const reply = requiredString(formData, "reply");
   await resolve(admin, action, membership.userId, { reply });
   await completeRentalJobs(admin, rentalId, "request", "Answered", actionId);
-  await tellRentalCustomer(admin, rentalId, ({ firstName }) => `Hi ${firstName}, ${reply}`, { sentBy: membership.userId });
+  await tellRentalCustomer(admin, rentalId, ({ hi }) => `${hi} ${reply}`, { sentBy: membership.userId });
   refresh(rentalId);
 }

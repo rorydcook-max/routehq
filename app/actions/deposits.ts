@@ -305,10 +305,10 @@ export async function returnDeposit(formData: FormData) {
       await tellRentalCustomer(
         admin,
         rentalId,
-        ({ firstName, money: baht }) =>
+        ({ say, t, money: baht }) =>
           nextRefunded >= held
-            ? `Hi ${firstName}, we've returned your ${baht(held)} deposit in full. Thank you.`
-            : `Hi ${firstName}, we've returned ${baht(returnAmount)} of your ${baht(held)} deposit.${forfeited > 0 ? ` ${baht(forfeited)} was kept for charges on the rental.` : ""} Message us if you have any questions.`,
+            ? say("depositReturnedFull", { amount: baht(held) })
+            : `${say("depositReturnedPart", { returned: baht(returnAmount), held: baht(held) })}${forfeited > 0 ? ` ${t("depositKeptForCharges", { amount: baht(forfeited) })}` : ""} ${t("anyQuestions")}`,
         { sentBy: user.id, withLink: false }
       );
     }

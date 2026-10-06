@@ -306,6 +306,10 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
       ? chatInvites(createSupabaseAdminClient() as any, { organizationId: String(rental.organization_id || organization?.id || ""), customerId: String(customer.id), token }).catch(() => [])
       : Promise.resolve([])
   ]);
+  // Messages to this customer (reminders, receipts) go out in the language they read this page in.
+  if (customer?.id) {
+    await (createSupabaseAdminClient() as any).from("customers").update({ preferred_locale: locale }).eq("id", customer.id).neq("preferred_locale", locale).then(() => null, () => null);
+  }
   // Before signing, "pay now" shows one QR for what is due at the start.
   // What is due at the start: the first rent and the deposit.
   const firstPaymentAmount = Number(rental?.outstanding_balance || 0) > 0 ? Number(rental.outstanding_balance) : Number(rental?.rental_rate || 0) + Number(rental?.deposit_amount || 0);

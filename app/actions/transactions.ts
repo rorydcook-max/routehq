@@ -1020,8 +1020,8 @@ export async function sendPaymentReminder(
   });
 
   // The chat the customer first wrote to the business on comes first.
-  const viaChat = await tellRentalCustomer(admin, rentalId, ({ firstName, money }) =>
-    `Hi ${firstName}, a reminder that ${money(balanceDue)} for the ${vLabel} ${firstDue && firstDue < today ? "was" : "is"} due on ${dueDateLabel}. You can pay and send your receipt from your booking page. Thank you.`,
+  const viaChat = await tellRentalCustomer(admin, rentalId, ({ say, money, date, vehicle: vehicleName }) =>
+    say(!firstDue ? "paymentReminderNoDate" : firstDue < today ? "paymentReminderWas" : "paymentReminderIs", { amount: money(balanceDue), vehicle: vehicle ? vLabel : vehicleName, date: firstDue ? date(firstDue) : "" }),
     { sentBy: user.id }
   );
   if (viaChat.sent) return { success: true, message: `Reminder sent on ${viaChat.via}` };

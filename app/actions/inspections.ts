@@ -672,15 +672,15 @@ export async function submitInspection(formData: FormData) {
       await tellRentalCustomer(
         createSupabaseAdminClient() as any,
         rentalId,
-        ({ firstName, vehicle, money }) => {
-          const lines = [`Hi ${firstName}, thanks for returning the ${vehicle}. Your rental is now closed.`];
+        ({ say, t, vehicle, money }) => {
+          const lines = [say("returnedThanks", { vehicle })];
           if (settlement && settlement.available > 0) {
             const kept = settlement.deductions.reduce((sum, item) => sum + item.amount, 0);
-            if (kept > 0) lines.push(`From your ${money(settlement.available)} deposit we kept ${money(kept)} (${settlement.deductions.map((item) => `${item.reason.toLowerCase()} ${money(item.amount)}`).join(", ")}).`);
-            if (settlement.refunded > 0) lines.push(kept > 0 ? `${money(settlement.refunded)} has been returned to you.` : `Your ${money(settlement.refunded)} deposit has been returned in full.`);
-            if (settlement.retained > 0) lines.push(`${money(settlement.retained)} of the deposit is still to be settled; we'll be in touch.`);
+            if (kept > 0) lines.push(t("depositKept", { deposit: money(settlement.available), kept: money(kept), reasons: settlement.deductions.map((item) => `${item.reason.toLowerCase()} ${money(item.amount)}`).join(", ") }));
+            if (settlement.refunded > 0) lines.push(kept > 0 ? t("amountReturned", { amount: money(settlement.refunded) }) : t("depositReturnedInFull", { amount: money(settlement.refunded) }));
+            if (settlement.retained > 0) lines.push(t("depositStillToSettle", { amount: money(settlement.retained) }));
           }
-          if (owed > 0) lines.push(`${money(owed)} is still to pay.`);
+          if (owed > 0) lines.push(t("stillToPay", { amount: money(owed) }));
           return lines.join(" ");
         },
         { sentBy: user.id, withLink: owed > 0 }

@@ -282,8 +282,9 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
             const effectiveStatus = isCancelledBooking(booking) ? "cancelled" : String(booking.status || "");
             return (
             <article className={`relative rounded-[10px] border p-2 transition hover:border-[var(--primary)] hover:shadow-[0_16px_30px_rgba(15,23,42,0.06)] ${statusCardClasses(booking)}`} key={booking.id}>
-              <div className="grid gap-2.5 lg:grid-cols-[104px_minmax(0,1fr)_136px] lg:items-center">
-                <Link className={`group relative h-[68px] overflow-hidden ${photoUrl ? "block" : "hidden lg:block"} rounded-lg border border-[var(--border)] bg-[#fbfaf8]`} href={`/bookings/${booking.id}`}>
+              {/* Photo beside the details from tablet width up. On phones a photo squeezed into a strip showed a slice of bonnet, so it is left out there. */}
+              <div className="grid gap-2.5 md:grid-cols-[104px_minmax(0,1fr)_136px] md:items-center">
+                <Link className={`group relative h-[68px] overflow-hidden hidden md:block rounded-lg border border-[var(--border)] bg-[#fbfaf8]`} href={`/bookings/${booking.id}`}>
                   {photoUrl ? (
                     <img
                       alt={`${vehicleTitle(booking.vehicles) || "Vehicle"} booking`}
@@ -404,13 +405,13 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                   ) : null}
                 </div>
 
-                <div className="lg:justify-self-end">
-                  <div className="w-full rounded-lg border border-[var(--border)] bg-white/80 px-3 py-1.5 lg:w-[136px]">
-                    <div className="flex items-center justify-between gap-3 lg:block lg:text-right">
+                <div className="md:justify-self-end">
+                  <div className="w-full rounded-lg border border-[var(--border)] bg-white/80 px-3 py-1.5 md:w-[136px]">
+                    <div className="flex items-center justify-between gap-3 md:block md:text-right">
                       <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">Paid</span>
                       <span className="font-mono-data block text-[16px] font-semibold text-[var(--primary)]">{money(booking.total_paid, booking.currency)}</span>
                     </div>
-                    <span className={`font-mono-data mt-0.5 block text-[11px] lg:text-right ${Number(booking.balance_due) > 0 ? "font-semibold text-[#b45309]" : "text-[var(--muted)]"}`}>
+                    <span className={`font-mono-data mt-0.5 block text-[11px] md:text-right ${Number(booking.balance_due) > 0 ? "font-semibold text-[#b45309]" : "text-[var(--muted)]"}`}>
                       {Number(booking.balance_due) > 0 ? `Due now ${money(booking.balance_due, booking.currency)}` : "Nothing due now"}
                     </span>
                   </div>

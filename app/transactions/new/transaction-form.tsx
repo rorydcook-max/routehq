@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { createTransaction, findTransactionMatches } from "@/app/actions/transactions";
 import { PendingButton } from "@/components/pending-button";
-import { Card, SectionHeader } from "@/components/ui";
+import { Card } from "@/components/ui";
 import { TRANSACTION_TYPE_OPTIONS } from "@/lib/transaction-options";
 import type { MatchResult } from "@/lib/transaction-matching";
 import type { TransactionFormOptions, TransactionFormPrefill } from "@/lib/transactions";
@@ -12,7 +12,7 @@ import type { TransactionFormOptions, TransactionFormPrefill } from "@/lib/trans
 const MONEY_IN: string[] = ["rental_income", "deposit_received", "deposit_forfeited", "deposit_deduction"];
 
 const inputClass =
-  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]";
+  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2.5 text-[15px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]";
 
 export function TransactionForm({
   organizationId,
@@ -52,7 +52,8 @@ export function TransactionForm({
   );
 
   useEffect(() => {
-    if (!type || linkedRentalPaymentId || linkedTaskId || dismissedMatches) {
+    // Only money coming in can be a payment a customer owes.
+    if (!type || !MONEY_IN.includes(type) || linkedRentalPaymentId || linkedTaskId || dismissedMatches) {
       setMatches([]);
       return;
     }
@@ -101,19 +102,41 @@ export function TransactionForm({
     if (match.customerId) {
       setCustomerId(match.customerId);
     }
+    if (match.suggestedType) setType(match.suggestedType);
     setLinkedRentalPaymentId(match.rentalPaymentId || "");
     setLinkedTaskId(match.taskId || "");
     setMatches([]);
   }
 
   const isMoneyIn = MONEY_IN.includes(type);
-  const linkedBadge = linkedRentalPaymentId ? "Linked to rental payment" : linkedTaskId ? "Linked to task" : "";
+  const linkedBadge = linkedRentalPaymentId ? "Saving this marks that payment as paid on the booking." : linkedTaskId ? "Saving this ticks off the matching job on your To do list." : "";
+  const chooseDirection = (moneyIn: boolean) => {
+    if (moneyIn === isMoneyIn) return;
+    setType(moneyIn ? "rental_income" : "repair");
+    setLinkedRentalPaymentId("");
+    setLinkedTaskId("");
+  };
 
   return (
     <form action={createTransaction} className="space-y-3">
       <input name="organizationId" type="hidden" value={organizationId} />
       <input name="rentalPaymentId" type="hidden" value={linkedRentalPaymentId} />
       <input name="taskId" type="hidden" value={linkedTaskId} />
+
+      {/* The first question is the simplest one: did money come in or go out? */}
+      <div className="grid grid-cols-2 gap-2 rounded-xl bg-[var(--panel-secondary)] p-1">
+        {[true, false].map((moneyIn) => (
+          <button
+            aria-pressed={isMoneyIn === moneyIn}
+            className={`min-h-11 rounded-lg text-[15px] font-semibold transition ${isMoneyIn === moneyIn ? "bg-white text-[var(--foreground)] shadow-[var(--shadow-sm)]" : "text-[var(--muted)]"}`}
+            key={String(moneyIn)}
+            onClick={() => chooseDirection(moneyIn)}
+            type="button"
+          >
+            {moneyIn ? "Money in" : "Money out"}
+          </button>
+        ))}
+      </div>
 
       {linkedBadge ? (
         <div className="rounded-xl border border-[#bbf7d0] bg-[#f0fdf4] px-4 py-3 text-sm font-semibold text-[#166534]">
@@ -125,12 +148,10 @@ export function TransactionForm({
         <div className="rounded-xl border border-[var(--primary)] bg-[var(--primary-light)] p-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--primary)]">Match found</p>
-              <p className="mt-1 text-sm font-bold text-[var(--foreground)]">
-                {matches.length === 1 && matches[0].confidence === "high"
-                  ? "Looks like this might be for:"
-                  : "Possible outstanding payments:"}
+              <p className="text-[15px] font-semibold text-[var(--foreground)]">
+                {matches.length === 1 ? "Is it this payment you are waiting for?" : "Is it one of these payments you are waiting for?"}
               </p>
+              <p className="mt-0.5 text-[13px] text-[var(--foreground-secondary)]">Choose it and the booking is marked as paid too.</p>
             </div>
             {isMatching ? <span className="text-xs font-semibold text-[var(--muted)]">Checking...</span> : null}
           </div>
@@ -145,7 +166,7 @@ export function TransactionForm({
                     </p>
                   </div>
                   <button className="primary-action pressable min-h-9 px-3 text-xs" onClick={() => acceptMatch(match)} type="button">
-                    {match.matchType === "rental_payment" ? "Link this payment" : "Link this task"}
+                    Yes, this one
                   </button>
                 </div>
               </div>
@@ -159,36 +180,26 @@ export function TransactionForm({
             }}
             type="button"
           >
-            None of these
+            No, it is something else
           </button>
         </div>
       ) : null}
 
       <Card>
-        <SectionHeader eyebrow="Transaction" title="Record payment or expense" />
-        <div className="card-section grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2">
           <label className="block sm:col-span-2">
-            <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Type</span>
+            <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">What was it for?</span>
             <select className={inputClass} name="type" onChange={(event) => setType(event.target.value)} required value={type}>
-              <optgroup label="Money in">
-                {TRANSACTION_TYPE_OPTIONS.filter((option) => MONEY_IN.includes(option.value)).map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </optgroup>
-              <optgroup label="Money out">
-                {TRANSACTION_TYPE_OPTIONS.filter((option) => !MONEY_IN.includes(option.value) && option.value !== "deposit").map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </optgroup>
+              {TRANSACTION_TYPE_OPTIONS.filter((option) => option.value !== "deposit" && MONEY_IN.includes(option.value) === isMoneyIn).map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </label>
 
           <label className="block sm:col-span-2">
-            <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Vehicle</span>
+            <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">Vehicle</span>
             <select
               className={inputClass}
               name="vehicleId"
@@ -209,7 +220,7 @@ export function TransactionForm({
           </label>
 
           <label className="block">
-            <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Booking (optional)</span>
+            <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">Booking (optional)</span>
             <select
               className={inputClass}
               name="rentalId"
@@ -226,7 +237,7 @@ export function TransactionForm({
           </label>
 
           <label className="block">
-            <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Customer (optional)</span>
+            <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">Customer (optional)</span>
             <select className={inputClass} name="customerId" onChange={(event) => setCustomerId(event.target.value)} value={customerId}>
               <option value="">No customer</option>
               {options.customers.map((customer) => (
@@ -238,47 +249,47 @@ export function TransactionForm({
           </label>
 
           <label className="block">
-            <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Amount (THB)</span>
-            <input className={inputClass} min="0" name="amount" onChange={(event) => setAmount(event.target.value)} required step="0.01" type="number" value={amount} />
+            <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">Amount (฿)</span>
+            <input className={inputClass} inputMode="decimal" min="0" name="amount" onChange={(event) => setAmount(event.target.value)} required step="0.01" type="number" value={amount} />
           </label>
 
           <label className="block">
-            <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Date</span>
+            <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">Date</span>
             <input className={inputClass} name="transactionDate" onChange={(event) => setTransactionDate(event.target.value)} required type="date" value={transactionDate} />
           </label>
 
           {isMoneyIn ? null : (
             <>
               <label className="block">
-                <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Paid to (optional)</span>
+                <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">Paid to (optional)</span>
                 <input className={inputClass} name="supplier" placeholder="Garage, fuel station, insurer" />
               </label>
 
               <label className="block">
-                <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Mileage (optional)</span>
+                <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">Mileage (optional)</span>
                 <input className={inputClass} min="0" name="mileage" type="number" />
               </label>
             </>
           )}
 
           <label className="block sm:col-span-2">
-            <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Notes</span>
-            <textarea className={inputClass} name="notes" onChange={(event) => setNotes(event.target.value)} placeholder="What was this payment for?" rows={3} value={notes} />
+            <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">Notes (optional)</span>
+            <textarea className={inputClass} name="notes" onChange={(event) => setNotes(event.target.value)} placeholder="Anything worth remembering" rows={3} value={notes} />
           </label>
 
           <label className="block sm:col-span-2">
-            <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Receipt photo (optional)</span>
+            <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">Receipt photo (optional)</span>
             <input accept="image/*,application/pdf" capture="environment" className={inputClass} name="receipt" type="file" />
           </label>
         </div>
       </Card>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-        <Link className="secondary-action pressable text-center" href="/transactions">
+      <div className="sticky-actions sticky z-10 -mx-1 flex flex-col-reverse gap-2 bg-[var(--background)] px-1 py-3 sm:flex-row sm:justify-end">
+        <Link className="secondary-action pressable justify-center text-center" href="/transactions">
           Cancel
         </Link>
-        <PendingButton className="primary-action" pendingLabel="Saving…" type="submit">
-          Save transaction
+        <PendingButton className="primary-action justify-center" pendingLabel="Saving…" type="submit">
+          Save
         </PendingButton>
       </div>
     </form>

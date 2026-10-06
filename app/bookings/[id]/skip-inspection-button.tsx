@@ -13,7 +13,7 @@ export function SkipInspectionButton({ rentalId }: { rentalId: string }) {
     startTransition(async () => {
       const result = await manuallyActivateRental(rentalId);
       if (!result.success) {
-        setError(result.error || "Failed to activate rental.");
+        setError(result.error || "That did not save. Please try again.");
         setShowConfirm(false);
       }
     });
@@ -23,7 +23,7 @@ export function SkipInspectionButton({ rentalId }: { rentalId: string }) {
     return (
       <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
         <p className="mb-2 text-xs font-semibold text-[#92400e]">
-          Activate rental without a delivery inspection? The inspection can still be completed later.
+          Mark the vehicle as handed over without the form? You will have no photos, fuel level or signature to rely on if there is a dispute. The form can still be filled in later.
         </p>
         <div className="flex gap-2">
           <button
@@ -32,7 +32,7 @@ export function SkipInspectionButton({ rentalId }: { rentalId: string }) {
             onClick={handleConfirm}
             type="button"
           >
-            {isPending ? "Activating…" : "Confirm, skip inspection"}
+            {isPending ? "Saving…" : "Yes, hand over without it"}
           </button>
           <button
             className="pressable inline-flex min-h-7 items-center rounded-lg border border-[var(--border)] bg-white px-3 text-xs font-bold text-[var(--foreground-secondary)]"
@@ -54,7 +54,7 @@ export function SkipInspectionButton({ rentalId }: { rentalId: string }) {
         onClick={() => setShowConfirm(true)}
         type="button"
       >
-        Skip inspection and activate rental
+        Hand over without the form
       </button>
       {error ? <p className="mt-1 text-xs font-semibold text-[#dc2626]">{error}</p> : null}
     </>

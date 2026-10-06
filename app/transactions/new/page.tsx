@@ -26,10 +26,10 @@ export default async function NewTransactionPage({
       <div className="mx-auto max-w-xl">
         <div className="page-hero mb-5">
           <Link className="text-sm font-bold text-[var(--primary)]" href="/transactions">
-            Back to transactions
+            Back to money in & out
           </Link>
-          <h1 className="page-title mt-2">Add transaction</h1>
-          <p className="page-subtitle mt-2">Record rental income, deposits, fuel, maintenance, or any fleet expense.</p>
+          <h1 className="page-title mt-2">Record money in or out</h1>
+          <p className="page-subtitle mt-2">A payment you received, or something you paid for.</p>
         </div>
 
         <TransactionForm

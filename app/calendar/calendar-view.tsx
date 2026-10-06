@@ -73,6 +73,25 @@ export function CalendarView({ events, initialMonth, today }: { events: Calendar
   const isCurrentMonth = today.slice(0, 7) === month;
   const agenda = Array.from(eventsByDate.entries()).sort(([a], [b]) => a.localeCompare(b));
 
+  // This month: lead with today; other months: the whole month in order.
+  const earlier = isCurrentMonth ? agenda.filter(([date]) => date < today) : [];
+  const comingUp = isCurrentMonth ? agenda.filter(([date]) => date >= today) : agenda;
+  const dayGroup = ([date, list]: [string, typeof events]) => (
+    <div className="scroll-mt-4" id={`day-${date}`} key={date}>
+      <p className={`mb-1 text-xs font-bold uppercase tracking-wide ${date === today ? "text-[var(--primary)]" : "text-[var(--muted)]"}`}>
+        {date === today ? "Today · " : ""}
+        {dayLabel(date)}
+      </p>
+      <div className="space-y-1">
+        {list.map((event) => (
+          <Link className={`block rounded-lg border px-2.5 py-2 text-sm font-medium ${toneClasses[event.tone]}`} href={event.href as any} key={event.id}>
+            {event.title}
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-4">
       <div className="content-section flex items-center justify-between gap-2">
@@ -140,26 +159,22 @@ export function CalendarView({ events, initialMonth, today }: { events: Calendar
       </div>
 
       <div className="content-section">
-        <p className="mb-2 text-sm font-semibold text-[var(--foreground)]">This month</p>
+        <p className="mb-2 text-sm font-semibold text-[var(--foreground)]">{isCurrentMonth ? "Today and coming up" : monthLabel(month)}</p>
         {agenda.length === 0 ? (
           <p className="text-sm text-[var(--muted)]">Nothing scheduled in {monthLabel(month)}.</p>
         ) : (
           <div className="space-y-3">
-            {agenda.map(([date, list]) => (
-              <div key={date}>
-                <p className={`mb-1 text-xs font-bold uppercase tracking-wide ${date === today ? "text-[var(--primary)]" : "text-[var(--muted)]"}`}>
-                  {date === today ? "Today · " : ""}
-                  {dayLabel(date)}
-                </p>
-                <div className="space-y-1">
-                  {list.map((event) => (
-                    <Link className={`block rounded-lg border px-2.5 py-1.5 text-sm font-medium ${toneClasses[event.tone]}`} href={event.href as any} key={event.id}>
-                      {event.title}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            ))}
+            {comingUp.length === 0 ? <p className="text-sm text-[var(--muted)]">Nothing else scheduled this month.</p> : comingUp.map(dayGroup)}
+            {/* What already happened stays one tap away, so today is the first thing on the list. */}
+            {earlier.length > 0 ? (
+              <details className="group rounded-lg border border-[var(--border)]">
+                <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 px-3 text-sm font-semibold text-[var(--foreground-secondary)] [&::-webkit-details-marker]:hidden">
+                  Earlier this month · {earlier.reduce((sum, [, list]) => sum + list.length, 0)}
+                  <ChevronRight className="shrink-0 text-[var(--muted)] transition-transform group-open:rotate-90" size={16} />
+                </summary>
+                <div className="space-y-3 border-t border-[var(--border)] p-3">{earlier.map(dayGroup)}</div>
+              </details>
+            ) : null}
           </div>
         )}
       </div>

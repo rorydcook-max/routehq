@@ -7,6 +7,8 @@ export type MatchResult = {
   confidence: "high" | "medium";
   label: string;
   subLabel: string;
+  /** What kind of money this is, so choosing it sets the right type. */
+  suggestedType?: string;
   amount: number;
   rentalId?: string;
   rentalPaymentId?: string;
@@ -28,6 +30,13 @@ function money(value: number) {
 
 function dateOnly(value: string | null | undefined) {
   return String(value || "").slice(0, 10);
+}
+
+/** "1 Oct" rather than 2026-10-01. */
+function shortDate(value: string | null | undefined) {
+  const day = dateOnly(value);
+  if (!day) return "";
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${day}T00:00:00Z`));
 }
 
 function dayDistance(left: string | null | undefined, right: string | null | undefined) {
@@ -76,9 +85,9 @@ export async function findMatchingOutstandingItems(
   const [paymentsResult, tasksResult] = await Promise.all([
     supabase
       .from("rental_payments")
-      .select("id, rental_id, amount, due_date, status, rentals!inner(id, vehicle_id, customer_id, vehicles!rentals_vehicle_id_fkey(registration_number, make, model), customers!rentals_customer_id_fkey(full_name))")
+      .select("id, rental_id, amount, due_date, status, metadata, rentals!inner(id, vehicle_id, customer_id, vehicles!rentals_vehicle_id_fkey(registration_number, make, model), customers!rentals_customer_id_fkey(full_name))")
       .eq("organization_id", orgId)
-      .in("status", ["pending", "overdue"])
+      .in("status", ["pending", "overdue", "scheduled"])
       .is("deleted_at", null)
       .order("due_date", { ascending: true })
       .limit(20),
@@ -120,14 +129,17 @@ export async function findMatchingOutstandingItems(
 
     if (!confidence) continue;
 
-    const label = paymentDescription(row, vehicle);
+    // A deposit is not rent: name it as one, and record it as one when chosen.
+    const isDeposit = String(row.metadata?.type || "") === "deposit";
+    const label = isDeposit ? `Deposit - ${[vehicle?.make, vehicle?.model].filter(Boolean).join(" ") || vehicleLabel(vehicle)}` : paymentDescription(row, vehicle);
     const due = dateOnly(row.due_date);
     matches.push({
       id: `payment-${row.id}`,
       matchType: "rental_payment",
       confidence,
       label,
-      subLabel: `Due ${due || "not set"} - ${money(paymentAmount)} outstanding`,
+      subLabel: `${money(paymentAmount)}${due ? ` due ${shortDate(due)}` : ""}`,
+      suggestedType: isDeposit ? "deposit_received" : "rental_income",
       amount: paymentAmount,
       rentalId: row.rental_id,
       rentalPaymentId: row.id,
@@ -159,7 +171,7 @@ export async function findMatchingOutstandingItems(
         matchType: "task",
         confidence: "high",
         label: title,
-        subLabel: `Due ${dateOnly(task.due_at) || "not set"}`,
+        subLabel: dateOnly(task.due_at) ? `Due ${shortDate(task.due_at)}` : "",
         amount: parsedAmount || 0,
         rentalId: task.rental_id || undefined,
         rentalPaymentId: task.rental_payment_id || undefined,

@@ -214,6 +214,7 @@
     "close": "閉じる",
     "openFastActions": "クイックアクションを開く",
     "tasks": "やること",
-    "inbox": "受信箱"
+    "inbox": "受信箱",
+    "quickAdd": "クイック追加"
   }
 }

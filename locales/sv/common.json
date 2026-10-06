@@ -214,6 +214,7 @@
     "close": "Stäng",
     "openFastActions": "Öppna snabba åtgärder",
     "tasks": "Att göra",
-    "inbox": "Inkorg"
+    "inbox": "Inkorg",
+    "quickAdd": "Snabblägg till"
   }
 }

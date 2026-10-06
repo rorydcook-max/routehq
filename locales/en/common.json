@@ -26,7 +26,8 @@
     "signOut": "Sign out",
     "more": "More",
     "close": "Close",
-    "openFastActions": "Open fast actions"
+    "openFastActions": "Open fast actions",
+    "quickAdd": "Quick add"
   },
   "vehicles": {
     "addVehicle": "Add New Vehicle",

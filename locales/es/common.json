@@ -214,6 +214,7 @@
     "close": "Cerrar",
     "openFastActions": "Abrir acciones rápidas",
     "tasks": "Por hacer",
-    "inbox": "Bandeja de entrada"
+    "inbox": "Bandeja de entrada",
+    "quickAdd": "Añadir rápido"
   }
 }

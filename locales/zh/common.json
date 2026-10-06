@@ -214,6 +214,7 @@
     "close": "关闭",
     "openFastActions": "打开快速操作",
     "tasks": "待办事项",
-    "inbox": "收件箱"
+    "inbox": "收件箱",
+    "quickAdd": "快速添加"
   }
 }

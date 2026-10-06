@@ -214,6 +214,7 @@
     "close": "Fermer",
     "openFastActions": "Ouvrir actions rapides",
     "tasks": "À faire",
-    "inbox": "Boîte de réception"
+    "inbox": "Boîte de réception",
+    "quickAdd": "Ajout rapide"
   }
 }

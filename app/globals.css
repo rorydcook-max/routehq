@@ -505,6 +505,11 @@ button:disabled {
   margin-top: 12px;
 }
 
+/* Side by side in a grid the gap already spaces them; the extra margin pushed every card but the first down. */
+.grid > .content-section + .content-section {
+  margin-top: 0;
+}
+
 .content-section:last-child {
   border-bottom: none;
 }

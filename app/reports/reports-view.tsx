@@ -313,16 +313,16 @@ function VehicleTableRow({
 function ComparisonPanel({ vehicles }: { vehicles: VehicleMetrics[] }) {
   const barData = vehicles.map((v) => ({
     name: v.plate || v.label.split(" ")[0],
-    Revenue: v.income,
-    Expenses: v.expenses,
+    "Money in": v.income,
+    "Money out": v.expenses,
     Profit: Math.max(0, v.profit)
   }));
 
   const maxRevenue = Math.max(...vehicles.map((v) => v.income), 1);
   const radarData = [
-    { metric: "Revenue", ...Object.fromEntries(vehicles.map((v) => [v.plate || v.label.split(" ")[0], Math.round((v.income / maxRevenue) * 100)])) },
-    { metric: "Utilization", ...Object.fromEntries(vehicles.map((v) => [v.plate || v.label.split(" ")[0], Math.round(v.utilizationRate)])) },
-    { metric: "ROI", ...Object.fromEntries(vehicles.map((v) => [v.plate || v.label.split(" ")[0], Math.max(0, Math.min(100, v.roi))])) },
+    { metric: "Money in", ...Object.fromEntries(vehicles.map((v) => [v.plate || v.label.split(" ")[0], Math.round((v.income / maxRevenue) * 100)])) },
+    { metric: "Time rented", ...Object.fromEntries(vehicles.map((v) => [v.plate || v.label.split(" ")[0], Math.round(v.utilizationRate)])) },
+    { metric: "Return on cost", ...Object.fromEntries(vehicles.map((v) => [v.plate || v.label.split(" ")[0], Math.max(0, Math.min(100, v.roi))])) },
     {
       metric: "Margin",
       ...Object.fromEntries(vehicles.map((v) => [v.plate || v.label.split(" ")[0], v.income > 0 ? Math.round((v.profit / v.income) * 100) : 0]))
@@ -344,8 +344,8 @@ function ComparisonPanel({ vehicles }: { vehicles: VehicleMetrics[] }) {
                   <YAxis tickFormatter={(v) => `฿${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} />
                   <Tooltip formatter={(v) => money(Number(v))} />
                   <Legend />
-                  <Bar dataKey="Revenue" fill="#0f766e" radius={[2, 2, 0, 0]} />
-                  <Bar dataKey="Expenses" fill="#dc2626" radius={[2, 2, 0, 0]} />
+                  <Bar dataKey="Money in" fill="#0f766e" radius={[2, 2, 0, 0]} />
+                  <Bar dataKey="Money out" fill="#dc2626" radius={[2, 2, 0, 0]} />
                   <Bar dataKey="Profit" fill="#2563eb" radius={[2, 2, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -657,9 +657,9 @@ export function ReportsView({ data }: { data: ReportsData }) {
                   <YAxis tickFormatter={(v) => `฿${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} />
                   <Tooltip formatter={(v) => money(Number(v))} />
                   <Legend />
-                  <Bar dataKey="revenue" name="Revenue" fill="#0f766e" radius={[2, 2, 0, 0]} />
-                  <Bar dataKey="expenses" name="Expenses" fill="#fca5a5" radius={[2, 2, 0, 0]} />
-                  <Line type="monotone" dataKey="profit" name="Net Profit" stroke="#2563eb" strokeWidth={2} dot={{ r: 3 }} />
+                  <Bar dataKey="revenue" name="Money in" fill="#0f766e" radius={[2, 2, 0, 0]} />
+                  <Bar dataKey="expenses" name="Money out" fill="#fca5a5" radius={[2, 2, 0, 0]} />
+                  <Line type="monotone" dataKey="profit" name="Profit" stroke="#2563eb" strokeWidth={2} dot={{ r: 3 }} />
                 </ComposedChart>
               </ResponsiveContainer>
             </div>
@@ -704,13 +704,13 @@ export function ReportsView({ data }: { data: ReportsData }) {
                 <tr className="border-b border-[var(--border)]">
                   {compareMode ? <th className="py-2 pl-3 pr-2 w-8" /> : null}
                   <th className="py-2 pr-3 text-xs uppercase text-[var(--muted)]">Vehicle</th>
-                  <SortTh label="Revenue" field="income" />
-                  <SortTh label="Expenses" field="expenses" />
+                  <SortTh label="Money in" field="income" />
+                  <SortTh label="Money out" field="expenses" />
                   <SortTh label="Profit" field="profit" />
                   <SortTh label="Rentals" field="rentals" />
-                  <SortTh label="Utilization" field="utilization" />
-                  <th className="px-3 py-2 text-right text-xs uppercase text-[var(--muted)]">Avg price</th>
-                  <SortTh label="ROI" field="roi" />
+                  <SortTh label="Time rented" field="utilization" />
+                  <th className="px-3 py-2 text-right text-xs uppercase text-[var(--muted)]">Avg per day</th>
+                  <SortTh label="Return on cost" field="roi" />
                   <th className="px-3 py-2 text-right text-xs uppercase text-[var(--muted)]" />
                 </tr>
               </thead>

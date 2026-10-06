@@ -113,6 +113,17 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
           <RouteHqLogo />
         </div>
         {!isTeammate ? <AskBox variant="sidebar" /> : null}
+        {/* Quick add sits in the side menu on computers: floating over the page it covered the buttons at the end of each row. */}
+        {onFocusedFlow ? null : (
+          <button
+            className="mb-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--primary)] px-3 py-2.5 text-sm font-semibold text-white shadow-[var(--shadow-sm)] transition hover:bg-[var(--primary-hover)]"
+            onClick={() => setFastActionOpen(true)}
+            type="button"
+          >
+            <Plus size={16} />
+            {t("quickAdd")}
+          </button>
+        )}
         <nav className="scrollbar-none min-h-0 flex-1 space-y-0.5 overflow-y-auto">
           {allNavItems.map((item, index) => {
             const Icon = item.icon;
@@ -316,15 +327,6 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
           </div>
         </div>
       ) : null}
-
-      {/* The quick-add button stays out of handovers and create/edit forms, where it only covers fields. */}
-      {onFocusedFlow ? null : <button
-        aria-label={t("openFastActions")}
-        className="fixed bottom-6 right-6 z-40 hidden h-14 w-14 items-center justify-center rounded-full bg-[var(--primary)] text-white shadow-[0_8px_20px_rgba(15,118,110,0.28)] transition hover:bg-[var(--primary-hover)] lg:flex"
-        onClick={() => setFastActionOpen(true)}
-      >
-        <Plus size={26} />
-      </button>}
 
       <FastActionSheet open={fastActionOpen} onClose={() => setFastActionOpen(false)} />
     </div>

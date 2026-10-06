@@ -133,18 +133,19 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
               </div>
             </header>
 
-            <div className="hidden overflow-x-auto md:block">
-              <table className="w-full min-w-[860px] text-left text-sm">
+            {/* The full table needs a laptop's width. Tablets get the same tidy list as phones, and narrow laptops drop the two "nice to know" columns rather than scroll sideways. */}
+            <div className="hidden overflow-x-auto lg:block">
+              <table className="w-full text-left text-sm">
                 <thead>
                   <tr className="border-b border-[var(--border)] text-[var(--muted)]">
                     <th className="w-10 py-2.5 pl-4 pr-2"><span className="sr-only">Select</span></th>
                     <th className="py-2.5 pr-3">Vehicle</th>
                     <th className="px-3 py-2.5">Status</th>
                     <th className="px-3 py-2.5">Monthly rate</th>
-                    <th className="px-3 py-2.5">Rented (12 mo)</th>
+                    <th className="hidden px-3 py-2.5 xl:table-cell">Rented (12 mo)</th>
                     <th className="px-3 py-2.5">Paperwork</th>
-                    <th className="px-3 py-2.5">Profit</th>
-                    <th className="px-3 py-2.5 pr-4"><span className="sr-only">Actions</span></th>
+                    <th className="hidden px-3 py-2.5 xl:table-cell">Profit</th>
+                    <th className="hidden px-3 py-2.5 pr-4 xl:table-cell"><span className="sr-only">Actions</span></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -157,10 +158,10 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                         </td>
                         <td className="py-3 pr-3">
                           <Link className="block rounded-md outline-none focus:ring-2 focus:ring-[var(--primary)]/25" href={href}>
-                            <span className="font-semibold text-[var(--foreground)] group-hover:text-[var(--primary)]">
+                            <span className="whitespace-nowrap font-semibold text-[var(--foreground)] group-hover:text-[var(--primary)]">
                               {vehicle.make} {vehicle.model}
                             </span>
-                            <span className="block text-[13px] text-[var(--muted)]">
+                            <span className="block whitespace-nowrap text-[13px] text-[var(--muted)]">
                               <span className="font-mono-data">{vehicle.plate}</span> · {vehicle.year || "Year unknown"} · {vehicle.mileage.toLocaleString()} km
                             </span>
                           </Link>
@@ -171,7 +172,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                         <td className="px-3 py-3">
                           <Link className="font-mono-data block" href={href}>{vehicle.monthlyRate > 0 ? money(vehicle.monthlyRate) : <span className="text-[var(--muted)]">Not set</span>}</Link>
                         </td>
-                        <td className="px-3 py-3">
+                        <td className="hidden px-3 py-3 xl:table-cell">
                           <div className="min-w-28">
                             <div className="font-mono-data mb-1 text-xs text-[var(--muted)]">{vehicle.utilization}%</div>
                             <ProgressBar value={vehicle.utilization} tone={vehicle.utilization > 80 ? "green" : "amber"} />
@@ -180,10 +181,10 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                         <td className="px-3 py-3">
                           <ComplianceBadge attention={vehicle.complianceAttentionCount} item={vehicle.complianceNext} />
                         </td>
-                        <td className="px-3 py-3">
+                        <td className="hidden px-3 py-3 xl:table-cell">
                           <span className={`font-mono-data ${vehicle.profit < 0 ? "text-[var(--danger)]" : ""}`}>{money(vehicle.profit)}</span>
                         </td>
-                        <td className="px-3 py-3 pr-4">
+                        <td className="hidden px-3 py-3 pr-4 xl:table-cell">
                           <div className="flex justify-end gap-1.5 opacity-60 transition group-hover:opacity-100">
                             <form action={archiveVehicle}>
                               <input name="vehicleId" type="hidden" value={vehicle.id} />
@@ -202,7 +203,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
               </table>
             </div>
 
-            <ul className="divide-y divide-[var(--border)] md:hidden">
+            <ul className="divide-y divide-[var(--border)] lg:hidden">
               {group.vehicles.map((vehicle) => (
                 <li key={vehicle.id}>
                   <Link className="flex items-center gap-3 px-4 py-3 active:bg-[#fbfaf8]" href={`/fleet/${vehicle.id}`}>

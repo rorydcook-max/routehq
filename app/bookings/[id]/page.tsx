@@ -463,6 +463,16 @@ export default async function BookingDetailPage({ params, searchParams }: { para
         tone: "red" as const
       };
     }
+    // Booked and payments have fallen due (rent and deposit on the first day, say):
+    // show the same total the payment list and the bookings list show.
+    if (!activeRentalStatus && pendingPaymentAmount > 0) {
+      return {
+        label: "Due now",
+        detail: "Record each payment as you receive it.",
+        amount: pendingPaymentAmount,
+        tone: "amber" as const
+      };
+    }
     // Before handover, with money still to come: say what is coming and when,
     // rather than "paid up to date" on a booking nobody has paid for yet.
     const upcomingUnpaid = activePayments
@@ -571,7 +581,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               ) : null}
               {rental.status === "booked" ? (
                 <ActionButton href={`/inspections/delivery/${rental.id}` as Route} tone={awaitingSignature ? "light" : "primary"}>
-                  Start delivery
+                  Start handover
                 </ActionButton>
               ) : null}
               {["active", "due_soon", "overdue", "extended"].includes(displayStatus) ? (
@@ -861,26 +871,26 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             ) : null}
 
             <Card>
-              <SectionHeader eyebrow="Inspections" title="Delivery and return" />
+              <SectionHeader eyebrow="Inspections" title="Handover and return" />
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
                 {deliveryInspection ? (
-                  <InspectionStatus label="Delivery inspection" inspection={deliveryInspection} href={`/inspections/delivery/${rental.id}` as Route} available={false} />
+                  <InspectionStatus label="Handover form" inspection={deliveryInspection} href={`/inspections/delivery/${rental.id}` as Route} available={false} />
                 ) : isRetrospective && rental.status === "booked" ? (
                   // Retrospective, not yet activated: equal-weight options
                   <div className="sub-surface space-y-3 p-3">
                     <div className="flex items-center gap-2 font-semibold text-[var(--foreground)]">
                       <AlertTriangle className="text-[#b7791f]" size={18} />
-                      Delivery inspection
+                      Handover form
                     </div>
                     <p className="text-sm text-[var(--muted)]">
-                      No inspection on record. This rental started {startedAgoLabel(rental.start_date)}. Inspection is optional for retrospective bookings.
+                      No handover form on record. This rental started {startedAgoLabel(rental.start_date)}, so the form is optional.
                     </p>
                     <div className="grid gap-2 sm:grid-cols-2">
                       <Link
                         className="pressable flex items-center justify-center rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-center text-sm font-bold text-[var(--foreground-secondary)]"
                         href={`/inspections/delivery/${rental.id}` as Route}
                       >
-                        Complete inspection
+                        Fill in the handover form
                       </Link>
                       <SkipInspectionButton rentalId={rental.id} />
                     </div>
@@ -890,16 +900,16 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
                     <div className="flex items-center gap-2 font-semibold text-[#92400e]">
                       <AlertTriangle className="text-[#b7791f]" size={18} />
-                      No delivery inspection
+                      No handover form
                     </div>
                     <p className="mt-1 text-sm text-[#b45309]">
-                      Started {startedAgoLabel(rental.start_date)}. Inspection is optional for retrospective bookings.
+                      Started {startedAgoLabel(rental.start_date)}. The form is optional for a rental that was already out.
                     </p>
                     <Link
                       className="pressable mt-2 inline-flex items-center rounded-lg border border-[#fde68a] bg-white px-3 py-2 text-xs font-bold text-[#92400e]"
                       href={`/inspections/delivery/${rental.id}` as Route}
                     >
-                      Complete inspection (optional)
+                      Fill in the handover form (optional)
                     </Link>
                   </div>
                 ) : rental.status === "booked" ? (
@@ -907,10 +917,10 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   <div className="sub-surface space-y-2 p-3">
                     <div className="flex items-center gap-2 font-semibold text-[var(--foreground)]">
                       <AlertTriangle className="text-[#b7791f]" size={18} />
-                      Delivery inspection
+                      Handover form
                     </div>
                     <Link className="primary-action pressable block w-full px-3 py-2 text-center" href={`/inspections/delivery/${rental.id}` as Route}>
-                      Start delivery inspection
+                      Start handover
                     </Link>
                     <SkipInspectionButton rentalId={rental.id} />
                   </div>
@@ -924,13 +934,13 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   <div className="rounded-lg border border-[#fde68a] bg-[#fffbeb] p-3">
                     <div className="flex items-center gap-2 font-semibold text-[#92400e]">
                       <AlertTriangle className="text-[#b7791f]" size={18} />
-                      No delivery inspection
+                      No handover form
                     </div>
-                    <p className="mt-2 text-sm text-[#b45309]">This rental was activated without a delivery inspection on record.</p>
+                    <p className="mt-2 text-sm text-[#b45309]">The vehicle went out without a handover form.</p>
                   </div>
                 )}
                 {isCancelled && !deliveryInspection ? null : (
-                  <InspectionStatus label="Return inspection" inspection={returnInspection} href={`/inspections/return/${rental.id}` as Route} available={["active", "due_soon", "overdue", "extended"].includes(displayStatus)} />
+                  <InspectionStatus label="Return form" inspection={returnInspection} href={`/inspections/return/${rental.id}` as Route} available={["active", "due_soon", "overdue", "extended"].includes(displayStatus)} />
                 )}
               </div>
               {inspections.length === 0 ? (
@@ -1389,7 +1399,7 @@ function InspectionStatus({ label, inspection, href, available }: { label: strin
           Start now
         </Link>
       ) : (
-        <p className="mt-2 text-sm text-[var(--muted)]">Not available for the current booking status.</p>
+        <p className="mt-2 text-sm text-[var(--muted)]">Opens once the vehicle has been handed over.</p>
       )}
     </div>
   );

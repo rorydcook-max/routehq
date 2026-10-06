@@ -214,6 +214,7 @@
     "close": "닫기",
     "openFastActions": "빠른 작업 열기",
     "tasks": "할 일",
-    "inbox": "받은 편지함"
+    "inbox": "받은 편지함",
+    "quickAdd": "빠른 추가"
   }
 }

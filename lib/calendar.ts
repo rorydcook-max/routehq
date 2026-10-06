@@ -45,7 +45,7 @@ export async function getCalendarEvents(organizationId: string, year: number, mo
   const [rentalsResult, paymentsResult, vehiclesResult] = await Promise.all([
     supabase
       .from("rentals")
-      .select("id, start_date, end_date, status, customers!rentals_customer_id_fkey(full_name), vehicles!rentals_vehicle_id_fkey(make, model, registration_number)")
+      .select("id, start_date, end_date, status, rental_rate, billing_interval, pricing_model, customers!rentals_customer_id_fkey(full_name), vehicles!rentals_vehicle_id_fkey(make, model, registration_number)")
       .eq("organization_id", organizationId)
       .is("deleted_at", null)
       .not("status", "in", "(cancelled,draft)")
@@ -110,6 +110,56 @@ export async function getCalendarEvents(organizationId: string, year: number, mo
       type: "payment",
       say: { key: due < today ? "unpaid" : "payment", subject: who, amount: money(Number(payment.amount || 0)) }
     });
+  }
+
+  // Rentals with no end date only have rent scheduled two months ahead. Looking
+  // further on, the calendar still shows the rent that will fall due if the
+  // rental carries on, so a later month never looks empty by mistake.
+  const openEnded = ((rentalsResult.data || []) as any[]).filter(
+    (rental) =>
+      !rental.end_date &&
+      ["active", "due_soon", "overdue", "extended"].includes(String(rental.status)) &&
+      String(rental.billing_interval || rental.pricing_model || "").toLowerCase() === "monthly" &&
+      Number(rental.rental_rate || 0) > 0
+  );
+  if (openEnded.length > 0 && endDate > today) {
+    const { data: rentRows } = await supabase
+      .from("rental_payments")
+      .select("rental_id, due_date, status, voided, metadata")
+      .in("rental_id", openEnded.map((rental) => rental.id))
+      .is("deleted_at", null);
+    const lastDue = new Map<string, string>();
+    for (const row of (rentRows || []) as any[]) {
+      if (row.voided || row.metadata?.voided || row.status === "cancelled") continue;
+      if (row.metadata?.type !== "rent" || row.metadata?.is_deposit) continue;
+      const due = String(row.due_date).slice(0, 10);
+      if (due > (lastDue.get(row.rental_id) || "")) lastDue.set(row.rental_id, due);
+    }
+    for (const rental of openEnded) {
+      const last = lastDue.get(rental.id);
+      if (!last) continue;
+      const anchor = new Date(`${last}T00:00:00.000Z`);
+      const day = anchor.getUTCDate();
+      for (let step = 1; step <= 36; step++) {
+        // The same day each month, pulled back to the month's last day when it is shorter.
+        const target = new Date(Date.UTC(anchor.getUTCFullYear(), anchor.getUTCMonth() + step, 1));
+        target.setUTCDate(Math.min(day, lastDayOfMonth(target.getUTCFullYear(), target.getUTCMonth() + 1)));
+        const due = target.toISOString().slice(0, 10);
+        if (due > endDate) break;
+        if (due < startDate) continue;
+        const who = rental.customers?.full_name || "Customer";
+        const amount = money(Number(rental.rental_rate || 0));
+        events.push({
+          id: `expected-${rental.id}-${due}`,
+          date: due,
+          title: `Expected ${amount}: ${who}`,
+          tone: "purple",
+          href: `/bookings/${rental.id}#payment-schedule`,
+          type: "payment",
+          say: { key: "expected", subject: who, amount }
+        });
+      }
+    }
   }
 
   for (const vehicle of vehiclesResult.data || []) {

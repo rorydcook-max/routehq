@@ -2131,6 +2131,7 @@
     "inShop": "In the shop",
     "bookAria": "Book {vehicle} from {day}",
     "freeTap": "Free · tap to book {vehicle}",
-    "tapHint": "Tap a booking to open it, or an empty day to book that vehicle."
+    "tapHint": "Tap a booking to open it, or an empty day to book that vehicle.",
+    "ev_expected": "Expected {amount}: {subject}"
   }
 }

@@ -69,19 +69,19 @@ export default async function CalendarPage({
       {byVehicle ? (
         <div className="space-y-4">
           <div className="content-section flex items-center justify-between gap-2">
-            <Link aria-label={t("prevMonth")} className="secondary-action pressable" href={`/calendar?view=vehicles&month=${shiftMonth(month, -1)}` as Route}>
-              <ChevronLeft size={18} />
+            <Link aria-label={t("prevMonth")} className="secondary-action pressable !w-11 !px-0 shrink-0" href={`/calendar?view=vehicles&month=${shiftMonth(month, -1)}` as Route}>
+              <ChevronLeft size={20} />
             </Link>
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg font-semibold text-[var(--foreground)]">{monthLabel(month, locale)}</h2>
+            <div className="flex min-w-0 flex-col items-center">
+              <h2 className="whitespace-nowrap text-[18px] font-bold text-[var(--foreground)]">{monthLabel(month, locale)}</h2>
               {today.slice(0, 7) !== month ? (
-                <Link className="rounded-full border border-[var(--border)] px-2.5 py-1 text-xs font-bold text-[var(--primary)]" href={`/calendar?view=vehicles&month=${today.slice(0, 7)}` as Route}>
+                <Link className="font-bold text-[var(--primary)] underline underline-offset-2" href={`/calendar?view=vehicles&month=${today.slice(0, 7)}` as Route}>
                   {t("today")}
                 </Link>
               ) : null}
             </div>
-            <Link aria-label={t("nextMonth")} className="secondary-action pressable" href={`/calendar?view=vehicles&month=${shiftMonth(month, 1)}` as Route}>
-              <ChevronRight size={18} />
+            <Link aria-label={t("nextMonth")} className="secondary-action pressable !w-11 !px-0 shrink-0" href={`/calendar?view=vehicles&month=${shiftMonth(month, 1)}` as Route}>
+              <ChevronRight size={20} />
             </Link>
           </div>
           <AvailabilityView month={month} today={today} vehicles={availability} />

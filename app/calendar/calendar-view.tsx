@@ -119,19 +119,19 @@ export function CalendarView({ events, initialMonth, today }: { events: Calendar
   return (
     <div className="space-y-4">
       <div className="content-section flex items-center justify-between gap-2">
-        <button aria-label={t("prevMonth")} className="secondary-action pressable" onClick={() => shiftMonth(-1)} type="button">
-          <ChevronLeft size={18} />
+        <button aria-label={t("prevMonth")} className="secondary-action pressable !w-11 !px-0 shrink-0" onClick={() => shiftMonth(-1)} type="button">
+          <ChevronLeft size={20} />
         </button>
-        <div className="flex items-center gap-2">
-          <h2 className="text-lg font-semibold text-[var(--foreground)]">{monthLabel(month, locale)}</h2>
+        <div className="flex min-w-0 flex-col items-center">
+          <h2 className="whitespace-nowrap text-[18px] font-bold text-[var(--foreground)]">{monthLabel(month, locale)}</h2>
           {!isCurrentMonth ? (
-            <button className="rounded-full border border-[var(--border)] px-2.5 py-1 text-xs font-bold text-[var(--primary)]" onClick={() => router.push(`/calendar?month=${today.slice(0, 7)}`)} type="button">
+            <button className="font-bold text-[var(--primary)] underline underline-offset-2" onClick={() => router.push(`/calendar?month=${today.slice(0, 7)}`)} type="button">
               {t("today")}
             </button>
           ) : null}
         </div>
-        <button aria-label={t("nextMonth")} className="secondary-action pressable" onClick={() => shiftMonth(1)} type="button">
-          <ChevronRight size={18} />
+        <button aria-label={t("nextMonth")} className="secondary-action pressable !w-11 !px-0 shrink-0" onClick={() => shiftMonth(1)} type="button">
+          <ChevronRight size={20} />
         </button>
       </div>
 

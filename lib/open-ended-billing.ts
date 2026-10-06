@@ -21,6 +21,8 @@ async function rentPayments(admin: any, rentalId: string) {
     .from("rental_payments")
     .select("due_date, status, voided, metadata")
     .eq("rental_id", rentalId)
+    // A payment someone removed is not part of the schedule; counting it stopped the monthly top-up.
+    .is("deleted_at", null)
     .order("due_date", { ascending: false });
   return (data || []).filter((payment: any) => !payment.voided && payment.status !== "cancelled" && isRent(payment));
 }

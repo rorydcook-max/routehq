@@ -163,13 +163,17 @@ function calculateFinancials(vehicle: any, transactions: any[]) {
 
 function calculateUtilization(vehicle: any, rentals: any[], transactions: any[], fleetVehicles: any[]) {
   const today = startOfDay(new Date());
-  const yearStart = new Date(today.getFullYear(), 0, 1);
   const twelveMonthStart = new Date(today);
   twelveMonthStart.setDate(today.getDate() - 365);
   const ownedSince = dateFromIso(vehicle.purchase_date) || dateFromIso(vehicle.created_at) || today;
+  // "This year" starts when you got the vehicle if that was after 1 January,
+  // so a car added last week does not show hundreds of idle days.
+  const januaryFirst = new Date(today.getFullYear(), 0, 1);
+  const yearStart = ownedSince > januaryFirst ? ownedSince : januaryFirst;
 
   const rentalWindows = rentals
-    .filter((rental) => rental.status !== "cancelled")
+    // A booking that has not been handed over yet is not time on rent.
+    .filter((rental) => rental.status !== "cancelled" && rental.status !== "booked")
     .map((rental) => {
       const start = dateFromIso(rental.start_date) || today;
       const end = dateFromIso(rental.end_date) || today;
@@ -197,9 +201,14 @@ function calculateUtilization(vehicle: any, rentals: any[], transactions: any[],
       ? fleetVehicles.reduce((sum, item) => sum + toNumber(item.utilization_12_month), 0) / fleetVehicles.length
       : toNumber(vehicle.utilization_12_month);
 
+  // The fleet list and this page must agree, so both use the fleet figures:
+  // days on rent out of the days you have had the vehicle (at most the last
+  // 12 months). Dividing by 365 made a car added last week look idle.
+  const own = fleetVehicles.find((item) => item.id === vehicle.id);
+
   return {
-    twelveMonth: Math.min(100, (daysRentedLast365 / 365) * 100),
-    lifecycle: Math.min(100, (daysRentedLifecycle / lifecycleDays) * 100),
+    twelveMonth: own ? toNumber(own.utilization_12_month) : Math.min(100, (daysRentedLast365 / 365) * 100),
+    lifecycle: own ? toNumber(own.utilization_lifecycle) : Math.min(100, (daysRentedLifecycle / lifecycleDays) * 100),
     fleetAverage,
     daysRentedThisYear,
     daysAvailableThisYear: Math.max(0, daysInYearSoFar - daysRentedThisYear - maintenanceThisYear),
@@ -378,7 +387,7 @@ export async function getVehicleDetail(vehicleId: string, organizationId: string
     // Fleet average utilisation, worked out from rentals (the stored column was never updated).
     loadFleetFigures(supabase, organizationId)
       .then((figures) => ({
-        data: Array.from(figures.entries()).map(([id, item]) => ({ id, utilization_12_month: item.utilization12 })),
+        data: Array.from(figures.entries()).map(([id, item]) => ({ id, utilization_12_month: item.utilization12, utilization_lifecycle: item.utilizationLifetime })),
         error: null
       }))
       .catch((error: Error) => ({ data: [], error }))

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { createVehicle } from "@/app/actions/vehicles";
 import { ComplianceFields } from "@/app/fleet/new/compliance-fields";
 import { VehicleIdentityFields } from "@/app/fleet/new/vehicle-identity-fields";
@@ -6,19 +7,23 @@ import { AppShell } from "@/components/app-shell";
 import { LocalizedDateInput } from "@/components/localized-date-input";
 import { MoneyInput } from "@/components/money-input";
 import { PendingButton } from "@/components/pending-button";
-import { Card, Fold, SectionHeader } from "@/components/ui";
+import { Fold } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { ensureDefaultBranch } from "@/lib/branches";
 import { defaultCalendarForLocale } from "@/lib/i18n/calendars";
 import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-const inputClass =
-  "mt-1 w-full rounded-xl border border-[var(--border-strong)] bg-white px-3 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15";
+// The wording for this page is in locales/<language>/common.json under "vehicleForm".
+type Say = (key: string, values?: Record<string, string | number>) => string;
+
+const inputClass = "mt-1 w-full";
+const labelClass = "font-semibold text-[var(--foreground-secondary)]";
 
 export default async function NewVehiclePage() {
   const userEmail = await getCurrentUserEmail();
   const organization = await getDefaultOrganization();
+  const say = (await getTranslations("vehicleForm")) as unknown as Say;
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -47,138 +52,134 @@ export default async function NewVehiclePage() {
         .order("name", { ascending: true })
     : { data: [] };
   const defaultBranch = branches.find((branch) => branch.is_active) || branches[0];
+  const currency = organization.currency || "THB";
 
   return (
     <AppShell userEmail={userEmail}>
       <div className="mx-auto max-w-3xl">
-        <div className="mb-5 rounded-3xl border border-[var(--border)] bg-white px-5 py-4 shadow-[0_16px_38px_rgba(15,23,42,0.06)]">
-          <Link className="text-sm font-bold text-[var(--primary)]" href="/fleet">
-            Back to fleet
+        <div className="page-hero mb-4">
+          <Link className="font-bold text-[var(--primary)]" href="/fleet">
+            {say("backToFleet")}
           </Link>
-          <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-3xl">Add vehicle</h1>
-              <p className="mt-1 text-sm font-medium text-[var(--muted)]">Add a car, motorbike or van. Only the make, model and number plate are needed now. Fill in the rest any time.</p>
-            </div>
-            <Link className="pressable inline-flex justify-center rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm font-bold text-[var(--foreground-secondary)] hover:border-[var(--primary-blue)] hover:text-[var(--primary-blue)]" href="/fleet/import">
-              Import vehicles
+          <div className="mt-2 flex items-start justify-between gap-3">
+            <h1 className="page-title">{say("addTitle")}</h1>
+            <Link className="secondary-action pressable shrink-0" href="/fleet/import">
+              {say("import")}
             </Link>
           </div>
+          <p className="page-subtitle page-subtitle-keep mt-1">{say("addSubtitle")}</p>
         </div>
 
-        <Card>
-          <SectionHeader eyebrow="New vehicle" title="Vehicle details" />
-          <form action={createVehicle} className="mt-5 space-y-5">
-            <input name="organizationId" type="hidden" value={organization.id} />
+        <form action={createVehicle} className="space-y-3">
+          <input name="organizationId" type="hidden" value={organization.id} />
 
-            <VehicleIdentityFields categories={categories} initialMakes={vehicleMakes || []} inputClass={inputClass} />
+          <VehicleIdentityFields categories={categories} initialMakes={vehicleMakes || []} inputClass={inputClass} />
 
-            <div className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-4">
-              <SectionHeader eyebrow="Rental pricing" title="Rates and deposit" />
-              <div className="mt-4 grid gap-4 sm:grid-cols-3">
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Daily rate</span>
-                  <MoneyInput currency={organization.currency || "THB"} name="dailyRate" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Weekly rate</span>
-                  <MoneyInput currency={organization.currency || "THB"} name="weeklyRate" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Monthly rate</span>
-                  <MoneyInput currency={organization.currency || "THB"} name="monthlyRate" />
-                </label>
-              </div>
-              <label className="mt-4 block sm:max-w-xs">
-                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Deposit for this vehicle</span>
-                <MoneyInput currency={organization.currency || "THB"} name="depositAmount" />
-                <span className="mt-1 block text-xs text-[var(--muted)]">Leave empty to use your usual deposit from Settings.</span>
+          <div className="card p-4">
+            <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("ratesTitle")}</h2>
+            <div className="mt-3 grid gap-4 sm:grid-cols-3">
+              <label className="block">
+                <span className={labelClass}>{say("daily")}</span>
+                <MoneyInput currency={currency} name="dailyRate" />
+              </label>
+              <label className="block">
+                <span className={labelClass}>{say("weekly")}</span>
+                <MoneyInput currency={currency} name="weeklyRate" />
+              </label>
+              <label className="block">
+                <span className={labelClass}>{say("monthly")}</span>
+                <MoneyInput currency={currency} name="monthlyRate" />
               </label>
             </div>
+            <label className="mt-4 block sm:max-w-xs">
+              <span className={labelClass}>{say("deposit")}</span>
+              <MoneyInput currency={currency} name="depositAmount" />
+              <span className="mt-1 block font-medium text-[var(--muted)]">{say("depositHint")}</span>
+            </label>
+          </div>
 
-            {/* Everything below can wait: one tap away, filled in any time. */}
-            <Fold summary="So you are reminded before they run out" title="Tax, insurance and service dates">
-              <ComplianceFields calendar={preferredCalendar} inputClass={inputClass} preferredLocale={preferredLocale} />
-            </Fold>
-            <Fold summary="Kilometres now, what you paid, what it is worth" title="Mileage and value">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Current mileage</span>
-                  <input className={`${inputClass} font-mono-data`} min="0" name="mileage" placeholder="0" type="number" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Purchase mileage</span>
-                  <input className={`${inputClass} font-mono-data`} min="0" name="purchaseMileage" placeholder="0" type="number" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Purchase price</span>
-                  <MoneyInput currency={organization.currency || "THB"} name="purchasePrice" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Estimated value</span>
-                  <MoneyInput currency={organization.currency || "THB"} name="estimatedValue" />
-                </label>
-              </div>
-            </Fold>
-            {branches.length > 1 ? (
-              <Fold summary={defaultBranch?.name || "Choose a location"} title="Location">
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <label className="block">
-                    <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Home branch</span>
-                    <select className={inputClass} defaultValue={defaultBranch?.id} name="homeBranchId">
-                      {branches.map((branch) => (
-                        <option key={branch.id} value={branch.id}>
-                          {branch.name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="block">
-                    <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Service area</span>
-                    <select className={inputClass} defaultValue="home_branch" name="serviceArea">
-                      <option value="home_branch">Home branch only</option>
-                      <option value="all_branches">All branches</option>
-                    </select>
-                  </label>
-                </div>
-              </Fold>
-            ) : (
-              <>
-                <input name="homeBranchId" type="hidden" value={defaultBranch?.id || ""} />
-                <input name="serviceArea" type="hidden" value="home_branch" />
-              </>
-            )}
-            <Fold summary="If the vehicle is on finance" title="Loan">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Finance provider</span>
-                  <input className={inputClass} name="financeLender" type="text" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Monthly payment</span>
-                  <MoneyInput currency={organization.currency || "THB"} name="financeMonthlyPayment" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Outstanding balance</span>
-                  <MoneyInput currency={organization.currency || "THB"} name="financeOutstanding" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Finance end date</span>
-                  <LocalizedDateInput calendar={preferredCalendar} inputClass={inputClass} name="financeEndDate" preferredLocale={preferredLocale} />
-                </label>
-              </div>
-            </Fold>
-
-            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-              <Link className="inline-flex justify-center rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm font-bold text-[var(--foreground-secondary)]" href="/fleet">
-                Cancel
-              </Link>
-              <PendingButton className="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-bold text-white shadow-sm hover:bg-[var(--primary-hover)]" pendingLabel="Saving..." type="submit">
-                Save vehicle
-              </PendingButton>
+          {/* Everything below can wait: one tap away, filled in any time. */}
+          <Fold summary={say("datesSummary")} title={say("datesTitle")}>
+            <ComplianceFields calendar={preferredCalendar} inputClass={inputClass} preferredLocale={preferredLocale} />
+          </Fold>
+          <Fold summary={say("valueSummary")} title={say("valueTitle")}>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="block">
+                <span className={labelClass}>{say("mileage")}</span>
+                <input className={inputClass} inputMode="numeric" min="0" name="mileage" placeholder="0" type="number" />
+              </label>
+              <label className="block">
+                <span className={labelClass}>{say("purchaseMileage")}</span>
+                <input className={inputClass} inputMode="numeric" min="0" name="purchaseMileage" placeholder="0" type="number" />
+              </label>
+              <label className="block">
+                <span className={labelClass}>{say("purchasePrice")}</span>
+                <MoneyInput currency={currency} name="purchasePrice" />
+              </label>
+              <label className="block">
+                <span className={labelClass}>{say("estimatedValue")}</span>
+                <MoneyInput currency={currency} name="estimatedValue" />
+              </label>
             </div>
-          </form>
-        </Card>
+          </Fold>
+          {branches.length > 1 ? (
+            <Fold summary={defaultBranch?.name || say("locSummary")} title={say("locTitle")}>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="block">
+                  <span className={labelClass}>{say("homeBranch")}</span>
+                  <select className={inputClass} defaultValue={defaultBranch?.id} name="homeBranchId">
+                    {branches.map((branch) => (
+                      <option key={branch.id} value={branch.id}>
+                        {branch.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block">
+                  <span className={labelClass}>{say("serviceArea")}</span>
+                  <select className={inputClass} defaultValue="home_branch" name="serviceArea">
+                    <option value="home_branch">{say("areaHome")}</option>
+                    <option value="all_branches">{say("areaAll")}</option>
+                  </select>
+                </label>
+              </div>
+            </Fold>
+          ) : (
+            <>
+              <input name="homeBranchId" type="hidden" value={defaultBranch?.id || ""} />
+              <input name="serviceArea" type="hidden" value="home_branch" />
+            </>
+          )}
+          <Fold summary={say("loanSummary")} title={say("loanTitle")}>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="block">
+                <span className={labelClass}>{say("lender")}</span>
+                <input className={inputClass} name="financeLender" type="text" />
+              </label>
+              <label className="block">
+                <span className={labelClass}>{say("loanMonthly")}</span>
+                <MoneyInput currency={currency} name="financeMonthlyPayment" />
+              </label>
+              <label className="block">
+                <span className={labelClass}>{say("loanOutstanding")}</span>
+                <MoneyInput currency={currency} name="financeOutstanding" />
+              </label>
+              <label className="block">
+                <span className={labelClass}>{say("loanEnd")}</span>
+                <LocalizedDateInput calendar={preferredCalendar} inputClass={inputClass} name="financeEndDate" preferredLocale={preferredLocale} />
+              </label>
+            </div>
+          </Fold>
+
+          <div className="sticky-actions sticky z-10 -mx-1 flex gap-2 bg-[var(--background)] px-1 py-3 sm:justify-end [&>*:last-child]:flex-1 sm:[&>*:last-child]:flex-none">
+            <Link className="secondary-action pressable justify-center" href="/fleet">
+              {say("cancel")}
+            </Link>
+            <PendingButton className="primary-action justify-center" pendingLabel={say("saving")} type="submit">
+              {say("save")}
+            </PendingButton>
+          </div>
+        </form>
       </div>
     </AppShell>
   );

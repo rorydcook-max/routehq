@@ -39,7 +39,9 @@ export function MoneyInput({
   required?: boolean;
 }) {
   const info = CURRENCY_INFO[currency] ?? CURRENCY_INFO["THB"];
-  const initialDigits = String(defaultValue ?? "").replace(/[^0-9]/g, "");
+  // "1200.50" must start as 1,201, not 120,050: round first, then keep the digits.
+  const startNumber = Number(String(defaultValue ?? "").replace(/,/g, ""));
+  const initialDigits = String(defaultValue ?? "").trim() !== "" && Number.isFinite(startNumber) ? String(Math.round(startNumber)).replace(/[^0-9]/g, "") : String(defaultValue ?? "").replace(/[^0-9]/g, "");
   const [raw, setRaw] = useState(initialDigits);
   const [display, setDisplay] = useState(formatAmount(initialDigits, info.locale));
 

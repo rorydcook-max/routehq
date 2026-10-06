@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { LocalizedDateInput } from "@/components/localized-date-input";
-import { getCalendarOption } from "@/lib/i18n/calendars";
+
+export const COVER_TYPES = ["class_1", "class_2_plus", "class_2", "class_3_plus", "class_3", "rental_commercial", "unknown"];
 
 export function ComplianceFields({
   calendar,
@@ -13,11 +15,13 @@ export function ComplianceFields({
   inputClass: string;
   preferredLocale?: string | null;
 }) {
+  const say = useTranslations("vehicleForm") as unknown as (key: string) => string;
   const [taxExpiryDate, setTaxExpiryDate] = useState("");
   const [porborExpiryDate, setPorborExpiryDate] = useState("");
   const [insuranceExpiryDate, setInsuranceExpiryDate] = useState("");
-  const calendarOption = getCalendarOption(calendar, preferredLocale);
+  const labelClass = "font-semibold text-[var(--foreground-secondary)]";
 
+  // The blue-book reader fills these in when it finds them.
   useEffect(() => {
     function handleOcr(event: Event) {
       const detail = (event as CustomEvent).detail || {};
@@ -31,43 +35,38 @@ export function ComplianceFields({
   }, []);
 
   return (
-    <div>
-      <p className="text-sm text-[var(--muted)]">{calendarOption.helper}</p>
-      <div className="mt-3 grid gap-4 sm:grid-cols-2">
-        <label className="block">
-          <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Road tax runs out (ต่อภาษี)</span>
-          <LocalizedDateInput calendar={calendar} inputClass={inputClass} name="taxExpiryDate" onChange={(event) => setTaxExpiryDate(event.target.value)} preferredLocale={preferredLocale} value={taxExpiryDate} />
-        </label>
-        <label className="block">
-          <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Compulsory insurance runs out (พรบ)</span>
-          <LocalizedDateInput calendar={calendar} inputClass={inputClass} name="porborExpiryDate" onChange={(event) => setPorborExpiryDate(event.target.value)} preferredLocale={preferredLocale} value={porborExpiryDate} />
-        </label>
-        <label className="block">
-          <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Your own insurance runs out</span>
-          <LocalizedDateInput calendar={calendar} inputClass={inputClass} name="insuranceExpiryDate" onChange={(event) => setInsuranceExpiryDate(event.target.value)} preferredLocale={preferredLocale} value={insuranceExpiryDate} />
-        </label>
-        <label className="block">
-          <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Type of cover</span>
-          <select className={inputClass} name="voluntaryInsuranceType">
-            <option value="">Select cover type</option>
-            <option value="class_1">Class 1 / Type 1 comprehensive</option>
-            <option value="class_2_plus">Class 2+ / Type 2+</option>
-            <option value="class_2">Class 2 / Type 2</option>
-            <option value="class_3_plus">Class 3+ / Type 3+</option>
-            <option value="class_3">Class 3 / Type 3 third-party</option>
-            <option value="rental_commercial">Rental/commercial policy</option>
-            <option value="unknown">Unknown / check policy</option>
-          </select>
-        </label>
-        <label className="block">
-          <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Next service due</span>
-          <LocalizedDateInput calendar={calendar} inputClass={inputClass} name="nextServiceDate" preferredLocale={preferredLocale} />
-        </label>
-        <label className="block">
-          <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Oil change due</span>
-          <LocalizedDateInput calendar={calendar} inputClass={inputClass} name="oilChangeDueDate" preferredLocale={preferredLocale} />
-        </label>
-      </div>
+    <div className="grid gap-4 sm:grid-cols-2">
+      <label className="block">
+        <span className={labelClass}>{say("tax")}</span>
+        <LocalizedDateInput calendar={calendar} inputClass={inputClass} name="taxExpiryDate" onChange={(event) => setTaxExpiryDate(event.target.value)} preferredLocale={preferredLocale} value={taxExpiryDate} />
+      </label>
+      <label className="block">
+        <span className={labelClass}>{say("porbor")}</span>
+        <LocalizedDateInput calendar={calendar} inputClass={inputClass} name="porborExpiryDate" onChange={(event) => setPorborExpiryDate(event.target.value)} preferredLocale={preferredLocale} value={porborExpiryDate} />
+      </label>
+      <label className="block">
+        <span className={labelClass}>{say("insurance")}</span>
+        <LocalizedDateInput calendar={calendar} inputClass={inputClass} name="insuranceExpiryDate" onChange={(event) => setInsuranceExpiryDate(event.target.value)} preferredLocale={preferredLocale} value={insuranceExpiryDate} />
+      </label>
+      <label className="block">
+        <span className={labelClass}>{say("cover")}</span>
+        <select className={inputClass} name="voluntaryInsuranceType">
+          <option value="">{say("choose")}</option>
+          {COVER_TYPES.map((type) => (
+            <option key={type} value={type}>
+              {say(`cover_${type}`)}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="block">
+        <span className={labelClass}>{say("service")}</span>
+        <LocalizedDateInput calendar={calendar} inputClass={inputClass} name="nextServiceDate" preferredLocale={preferredLocale} />
+      </label>
+      <label className="block">
+        <span className={labelClass}>{say("oil")}</span>
+        <LocalizedDateInput calendar={calendar} inputClass={inputClass} name="oilChangeDueDate" preferredLocale={preferredLocale} />
+      </label>
     </div>
   );
 }

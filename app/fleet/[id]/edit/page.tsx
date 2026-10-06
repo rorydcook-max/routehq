@@ -1,20 +1,25 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { archiveVehicle, deleteVehicle, updateVehicle } from "@/app/actions/vehicles";
 import { ConfirmDeleteVehicleButton } from "@/app/fleet/fleet-actions";
 import { AppShell } from "@/components/app-shell";
 import { LocalizedDateInput } from "@/components/localized-date-input";
 import { MoneyInput } from "@/components/money-input";
 import { PendingButton } from "@/components/pending-button";
-import { Card, Fold, SectionHeader } from "@/components/ui";
+import { Fold } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { ensureDefaultBranch } from "@/lib/branches";
 import { defaultCalendarForLocale } from "@/lib/i18n/calendars";
 import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-const inputClass =
-  "mt-1 w-full rounded-xl border border-[var(--border-strong)] bg-white px-3 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15";
+// The wording for this page is in locales/<language>/common.json under "vehicleForm".
+type Say = (key: string, values?: Record<string, string | number>) => string;
+
+const inputClass = "mt-1 w-full";
+const labelClass = "font-semibold text-[var(--foreground-secondary)]";
+const coverTypes = ["class_1", "class_2_plus", "class_2", "class_3_plus", "class_3", "rental_commercial", "unknown"];
 
 function valueOrEmpty(value: unknown) {
   return value === null || value === undefined ? "" : String(value);
@@ -24,6 +29,8 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
   const { id } = await params;
   const userEmail = await getCurrentUserEmail();
   const organization = await getDefaultOrganization();
+  const t = await getTranslations("vehicleForm");
+  const say = t as unknown as Say;
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -46,258 +53,189 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
   const finance = vehicle.metadata?.finance || {};
   const preferredLocale = profile?.preferred_locale || organization.default_locale || "en";
   const preferredCalendar = profile?.preferred_calendar || defaultCalendarForLocale(preferredLocale);
+  const currency = organization.currency || "THB";
+  const categoryName = (category: { code: string; name: string }) => (t.has(`cat_${category.code}` as never) ? say(`cat_${category.code}`) : category.name);
 
-  const money = (value: unknown) => (value == null || value === "" || Number(value) === 0 ? null : `${organization.currency === "THB" ? "฿" : ""}${Number(value).toLocaleString("en-US")}`);
+  const money = (value: unknown) => (value == null || value === "" || Number(value) === 0 ? null : `${currency === "THB" ? "฿" : ""}${Number(value).toLocaleString("en-US")}`);
   const ratesSummary =
-    [money(vehicle.daily_rate) ? `${money(vehicle.daily_rate)} a day` : null, money(vehicle.weekly_rate) ? `${money(vehicle.weekly_rate)} a week` : null, money(vehicle.monthly_rate) ? `${money(vehicle.monthly_rate)} a month` : null]
+    [
+      money(vehicle.daily_rate) ? say("perDay", { amount: money(vehicle.daily_rate)! }) : null,
+      money(vehicle.weekly_rate) ? say("perWeek", { amount: money(vehicle.weekly_rate)! }) : null,
+      money(vehicle.monthly_rate) ? say("perMonth", { amount: money(vehicle.monthly_rate)! }) : null
+    ]
       .filter(Boolean)
-      .join(" · ") || "No prices set yet";
+      .join(" · ") || say("noPrices");
+  const dateField = (labelKey: string, name: string, value: unknown) => (
+    <label className="block">
+      <span className={labelClass}>{say(labelKey)}</span>
+      <LocalizedDateInput calendar={preferredCalendar} defaultValue={valueOrEmpty(value)} inputClass={inputClass} name={name} preferredLocale={preferredLocale} />
+    </label>
+  );
+  const textField = (labelKey: string, name: string, value: unknown, extra: { type?: string; required?: boolean } = {}) => (
+    <label className="block">
+      <span className={labelClass}>{say(labelKey)}</span>
+      <input className={inputClass} defaultValue={valueOrEmpty(value)} inputMode={extra.type === "number" ? "numeric" : undefined} min={extra.type === "number" ? "0" : undefined} name={name} required={extra.required} type={extra.type || "text"} />
+    </label>
+  );
+  const moneyField = (labelKey: string, name: string, value: unknown) => (
+    <label className="block">
+      <span className={labelClass}>{say(labelKey)}</span>
+      <MoneyInput currency={currency} defaultValue={valueOrEmpty(value)} name={name} />
+    </label>
+  );
 
   return (
     <AppShell userEmail={userEmail}>
       <div className="mx-auto max-w-3xl">
-        <div className="mb-5 rounded-3xl border border-[var(--border)] bg-white px-5 py-4 shadow-[0_16px_38px_rgba(15,23,42,0.06)]">
-          <Link className="text-sm font-bold text-[var(--primary)]" href={`/fleet/${vehicle.id}`}>
-            Back to vehicle
+        <div className="page-hero mb-4">
+          <Link className="font-bold text-[var(--primary)]" href={`/fleet/${vehicle.id}`}>
+            {say("backToVehicle")}
           </Link>
-          <h1 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-3xl">
-            Edit {vehicle.make} {vehicle.model}
-          </h1>
-          <p className="font-mono-data mt-1 text-sm text-[var(--muted)]">{vehicle.registration_number}</p>
+          <h1 className="page-title mt-2">{say("editTitle", { name: `${vehicle.make} ${vehicle.model}` })}</h1>
+          <p className="page-subtitle page-subtitle-keep mt-1">{vehicle.registration_number}</p>
         </div>
 
-        <Card>
-          <SectionHeader eyebrow="Vehicle asset" title="Edit vehicle" />
-          <form action={updateVehicle} className="mt-5 space-y-5">
-            <input name="vehicleId" type="hidden" value={vehicle.id} />
-            <input name="organizationId" type="hidden" value={organization.id} />
+        <form action={updateVehicle} className="space-y-3">
+          <input name="vehicleId" type="hidden" value={vehicle.id} />
+          <input name="organizationId" type="hidden" value={organization.id} />
 
-            {/* Most changed first. Everything else is one tap away. */}
-            <Fold open summary={ratesSummary} title="Rates and deposit">
-              <div className="grid gap-4 sm:grid-cols-3">
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Daily rate</span>
-                  <MoneyInput currency={organization.currency || "THB"} defaultValue={valueOrEmpty(vehicle.daily_rate)} name="dailyRate" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Weekly rate</span>
-                  <MoneyInput currency={organization.currency || "THB"} defaultValue={valueOrEmpty(vehicle.weekly_rate)} name="weeklyRate" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Monthly rate</span>
-                  <MoneyInput currency={organization.currency || "THB"} defaultValue={valueOrEmpty(vehicle.monthly_rate)} name="monthlyRate" />
-                </label>
-              </div>
-              <label className="mt-4 block sm:max-w-xs">
-                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Deposit for this vehicle</span>
-                <MoneyInput currency={organization.currency || "THB"} defaultValue={valueOrEmpty((vehicle as any).deposit_amount)} name="depositAmount" />
-                <span className="mt-1 block text-xs text-[var(--muted)]">Leave empty to use your usual deposit from Settings.</span>
+          {/* Most changed first. Everything else is one tap away. */}
+          <Fold open summary={ratesSummary} title={say("ratesTitle")}>
+            <div className="grid gap-4 sm:grid-cols-3">
+              {moneyField("daily", "dailyRate", vehicle.daily_rate)}
+              {moneyField("weekly", "weeklyRate", vehicle.weekly_rate)}
+              {moneyField("monthly", "monthlyRate", vehicle.monthly_rate)}
+            </div>
+            <label className="mt-4 block sm:max-w-xs">
+              <span className={labelClass}>{say("deposit")}</span>
+              <MoneyInput currency={currency} defaultValue={valueOrEmpty((vehicle as any).deposit_amount)} name="depositAmount" />
+              <span className="mt-1 block font-medium text-[var(--muted)]">{say("depositHint")}</span>
+            </label>
+          </Fold>
+          <Fold summary={`${vehicle.make} ${vehicle.model} · ${vehicle.registration_number}`} title={say("identTitle")}>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="block">
+                <span className={labelClass}>{say("category")}</span>
+                <select className={inputClass} defaultValue={vehicle.category_id} name="categoryId" required>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {categoryName(category)}
+                    </option>
+                  ))}
+                </select>
               </label>
-            </Fold>
-            <Fold summary={`${vehicle.make} ${vehicle.model} · ${vehicle.registration_number}`} title="Make, model and number plate">
+              {textField("make", "make", vehicle.make, { required: true })}
+              {textField("model", "model", vehicle.model, { required: true })}
+              {textField("year", "year", vehicle.year, { type: "number" })}
+              {textField("trim", "trim", vehicle.trim)}
+              {textField("plate", "registrationNumber", vehicle.registration_number, { required: true })}
+              {textField("colour", "color", vehicle.color)}
+              {textField("mileage", "mileage", vehicle.mileage, { type: "number" })}
+            </div>
+          </Fold>
+          <Fold summary={say("datesSummary")} title={say("datesTitle")}>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {dateField("tax", "taxExpiryDate", compliance.tax_expiry_date)}
+              {dateField("porbor", "porborExpiryDate", compliance.porbor_expiry_date)}
+              {dateField("insurance", "insuranceExpiryDate", compliance.insurance_expiry_date)}
+              <label className="block">
+                <span className={labelClass}>{say("cover")}</span>
+                <select className={inputClass} defaultValue={valueOrEmpty(compliance.voluntary_insurance_type)} name="voluntaryInsuranceType">
+                  <option value="">{say("choose")}</option>
+                  {coverTypes.map((type) => (
+                    <option key={type} value={type}>
+                      {say(`cover_${type}`)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {dateField("service", "nextServiceDate", compliance.next_service_date)}
+              {dateField("oil", "oilChangeDueDate", compliance.oil_change_due_date)}
+            </div>
+          </Fold>
+          <Fold summary={say("moreSummary")} title={say("moreTitle")}>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {textField("vin", "vin", vehicle.vin)}
+              {textField("transmission", "transmission", specifications.transmission)}
+              {textField("fuel", "fuelType", specifications.fuel_type)}
+              {textField("seats", "seatingCapacity", specifications.seating_capacity, { type: "number" })}
+              {textField("engine", "engineCc", specifications.engine_cc, { type: "number" })}
+              {textField("drivetrain", "drivetrain", specifications.drivetrain)}
+              {textField("body", "bodyClass", specifications.body_class)}
+            </div>
+          </Fold>
+          <Fold summary={say("valueSummaryEdit")} title={say("valueTitleEdit")}>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {textField("purchaseMileage", "purchaseMileage", acquisition.purchase_mileage, { type: "number" })}
+              {moneyField("purchasePrice", "purchasePrice", vehicle.purchase_price)}
+              {moneyField("estimatedValue", "estimatedValue", vehicle.estimated_value)}
+            </div>
+          </Fold>
+          {branches.length > 1 ? (
+            <Fold summary={say("locSummary")} title={say("locTitle")}>
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Vehicle category</span>
-                  <select className={inputClass} defaultValue={vehicle.category_id} name="categoryId" required>
-                    {categories.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
+                  <span className={labelClass}>{say("homeBranch")}</span>
+                  <select className={inputClass} defaultValue={valueOrEmpty(vehicle.home_branch_id)} name="homeBranchId">
+                    <option value="">{say("noBranch")}</option>
+                    {branches.map((branch) => (
+                      <option key={branch.id} value={branch.id}>
+                        {branch.name}
                       </option>
                     ))}
                   </select>
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Make</span>
-                  <input className={inputClass} defaultValue={vehicle.make} name="make" required />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Model</span>
-                  <input className={inputClass} defaultValue={vehicle.model} name="model" required />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Year</span>
-                  <input className={inputClass} defaultValue={valueOrEmpty(vehicle.year)} min="1900" name="year" type="number" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Trim</span>
-                  <input className={inputClass} defaultValue={valueOrEmpty(vehicle.trim)} name="trim" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Number plate</span>
-                  <input className={`${inputClass} font-mono-data`} defaultValue={vehicle.registration_number} name="registrationNumber" required />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Colour</span>
-                  <input className={inputClass} defaultValue={valueOrEmpty(vehicle.color)} name="color" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Current mileage</span>
-                  <input className={`${inputClass} font-mono-data`} defaultValue={valueOrEmpty(vehicle.mileage)} min="0" name="mileage" type="number" />
-                </label>
-              </div>
-            </Fold>
-            <Fold summary="So you are reminded before they run out" title="Tax, insurance and service dates">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Road tax runs out</span>
-                  <LocalizedDateInput calendar={preferredCalendar} defaultValue={valueOrEmpty(compliance.tax_expiry_date)} inputClass={inputClass} name="taxExpiryDate" preferredLocale={preferredLocale} />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Compulsory insurance runs out</span>
-                  <LocalizedDateInput calendar={preferredCalendar} defaultValue={valueOrEmpty(compliance.porbor_expiry_date)} inputClass={inputClass} name="porborExpiryDate" preferredLocale={preferredLocale} />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Your own insurance runs out</span>
-                  <LocalizedDateInput calendar={preferredCalendar} defaultValue={valueOrEmpty(compliance.insurance_expiry_date)} inputClass={inputClass} name="insuranceExpiryDate" preferredLocale={preferredLocale} />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Type of cover</span>
-                  <select className={inputClass} defaultValue={valueOrEmpty(compliance.voluntary_insurance_type)} name="voluntaryInsuranceType">
-                    <option value="">Select cover type</option>
-                    <option value="class_1">Class 1 / Type 1 comprehensive</option>
-                    <option value="class_2_plus">Class 2+ / Type 2+</option>
-                    <option value="class_2">Class 2 / Type 2</option>
-                    <option value="class_3_plus">Class 3+ / Type 3+</option>
-                    <option value="class_3">Class 3 / Type 3 third-party</option>
-                    <option value="rental_commercial">Rental/commercial policy</option>
-                    <option value="unknown">Unknown / check policy</option>
+                  <span className={labelClass}>{say("serviceArea")}</span>
+                  <select className={inputClass} defaultValue={vehicle.service_area || "home_branch"} name="serviceArea">
+                    <option value="home_branch">{say("areaHome")}</option>
+                    <option value="all_branches">{say("areaAll")}</option>
                   </select>
                 </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Next service due</span>
-                  <LocalizedDateInput calendar={preferredCalendar} defaultValue={valueOrEmpty(compliance.next_service_date)} inputClass={inputClass} name="nextServiceDate" preferredLocale={preferredLocale} />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Oil change due</span>
-                  <LocalizedDateInput calendar={preferredCalendar} defaultValue={valueOrEmpty(compliance.oil_change_due_date)} inputClass={inputClass} name="oilChangeDueDate" preferredLocale={preferredLocale} />
-                </label>
               </div>
             </Fold>
-            <Fold summary="Frame number, gearbox, seats, engine" title="More about the vehicle">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">VIN / frame number</span>
-                  <input className={`${inputClass} font-mono-data`} defaultValue={valueOrEmpty(vehicle.vin)} name="vin" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Transmission</span>
-                  <input className={inputClass} defaultValue={valueOrEmpty(specifications.transmission)} name="transmission" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Fuel type</span>
-                  <input className={inputClass} defaultValue={valueOrEmpty(specifications.fuel_type)} name="fuelType" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Seating capacity</span>
-                  <input className={`${inputClass} font-mono-data`} defaultValue={valueOrEmpty(specifications.seating_capacity)} min="0" name="seatingCapacity" type="number" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Engine CC</span>
-                  <input className={`${inputClass} font-mono-data`} defaultValue={valueOrEmpty(specifications.engine_cc)} min="0" name="engineCc" type="number" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Drivetrain</span>
-                  <input className={inputClass} defaultValue={valueOrEmpty(specifications.drivetrain)} name="drivetrain" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Body class</span>
-                  <input className={inputClass} defaultValue={valueOrEmpty(specifications.body_class)} name="bodyClass" placeholder="Scooter / sedan / pickup" />
-                </label>
-              </div>
-            </Fold>
-            <Fold summary="Purchase price, value, kilometres when bought" title="What you paid and what it is worth">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Purchase mileage</span>
-                  <input className={`${inputClass} font-mono-data`} defaultValue={valueOrEmpty(acquisition.purchase_mileage)} min="0" name="purchaseMileage" type="number" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Purchase price</span>
-                  <MoneyInput currency={organization.currency || "THB"} defaultValue={valueOrEmpty(vehicle.purchase_price)} name="purchasePrice" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Estimated value</span>
-                  <MoneyInput currency={organization.currency || "THB"} defaultValue={valueOrEmpty(vehicle.estimated_value)} name="estimatedValue" />
-                </label>
-              </div>
-            </Fold>
-            {branches.length > 1 ? (
-              <Fold summary="Which of your locations it belongs to" title="Location">
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <label className="block">
-                    <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Home branch</span>
-                    <select className={inputClass} defaultValue={valueOrEmpty(vehicle.home_branch_id)} name="homeBranchId">
-                      <option value="">No branch</option>
-                      {branches.map((branch) => (
-                        <option key={branch.id} value={branch.id}>
-                          {branch.name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="block">
-                    <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Service area</span>
-                    <select className={inputClass} defaultValue={vehicle.service_area || "home_branch"} name="serviceArea">
-                      <option value="home_branch">Home branch only</option>
-                      <option value="all_branches">All branches</option>
-                    </select>
-                  </label>
-                </div>
-              </Fold>
-            ) : (
-              <>
-                <input name="homeBranchId" type="hidden" value={valueOrEmpty(vehicle.home_branch_id)} />
-                <input name="serviceArea" type="hidden" value={vehicle.service_area || "home_branch"} />
-              </>
-            )}
-            <Fold summary="If the vehicle is on finance" title="Loan">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Finance provider</span>
-                  <input className={inputClass} defaultValue={valueOrEmpty(finance.lender)} name="financeLender" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Monthly payment</span>
-                  <MoneyInput currency={organization.currency || "THB"} defaultValue={valueOrEmpty(finance.monthly_payment)} name="financeMonthlyPayment" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Outstanding balance</span>
-                  <MoneyInput currency={organization.currency || "THB"} defaultValue={valueOrEmpty(finance.outstanding_balance)} name="financeOutstanding" />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Finance end date</span>
-                  <LocalizedDateInput calendar={preferredCalendar} defaultValue={valueOrEmpty(finance.end_date)} inputClass={inputClass} name="financeEndDate" preferredLocale={preferredLocale} />
-                </label>
-              </div>
-            </Fold>
-
-            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-              <Link className="inline-flex justify-center rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm font-bold text-[var(--foreground-secondary)]" href={`/fleet/${vehicle.id}`}>
-                Cancel
-              </Link>
-              <PendingButton className="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-bold text-white shadow-sm hover:bg-[var(--primary-hover)]" pendingLabel="Saving..." type="submit">
-                Save changes
-              </PendingButton>
+          ) : (
+            <>
+              <input name="homeBranchId" type="hidden" value={valueOrEmpty(vehicle.home_branch_id)} />
+              <input name="serviceArea" type="hidden" value={vehicle.service_area || "home_branch"} />
+            </>
+          )}
+          <Fold summary={say("loanSummary")} title={say("loanTitle")}>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {textField("lender", "financeLender", finance.lender)}
+              {moneyField("loanMonthly", "financeMonthlyPayment", finance.monthly_payment)}
+              {moneyField("loanOutstanding", "financeOutstanding", finance.outstanding_balance)}
+              {dateField("loanEnd", "financeEndDate", finance.end_date)}
             </div>
-          </form>
-        </Card>
+          </Fold>
+
+          <div className="sticky-actions sticky z-10 -mx-1 flex gap-2 bg-[var(--background)] px-1 py-3 sm:justify-end [&>*:last-child]:flex-1 sm:[&>*:last-child]:flex-none">
+            <Link className="secondary-action pressable justify-center" href={`/fleet/${vehicle.id}`}>
+              {say("cancel")}
+            </Link>
+            <PendingButton className="primary-action justify-center" pendingLabel={say("saving")} type="submit">
+              {say("saveChanges")}
+            </PendingButton>
+          </div>
+        </form>
+
         {/* Archiving and deleting live here, one step away from the list, so neither happens by a slip of the thumb. */}
-        <div className="mt-4">
-          <Fold summary="Archive it, or delete it if it was added by mistake" title="No longer renting this vehicle?">
+        <div className="mt-3">
+          <Fold summary={say("goneSummary")} title={say("goneTitle")}>
             <div className="space-y-4">
               <form action={archiveVehicle} className="flex flex-wrap items-center justify-between gap-3">
                 <input name="vehicleId" type="hidden" value={vehicle.id} />
                 <input name="organizationId" type="hidden" value={organization.id} />
-                <p className="min-w-0 flex-1 text-sm text-[var(--foreground-secondary)]">
-                  <span className="font-semibold text-[var(--foreground)]">Archive</span>: takes it off your fleet and out of new bookings. Its past rentals and money stay in your records.
+                <p className="min-w-0 flex-1 basis-60 font-medium text-[var(--foreground-secondary)]">
+                  <span className="font-bold text-[var(--foreground)]">{say("archiveLead")}</span>: {say("archiveBody")}
                 </p>
-                <PendingButton className="secondary-action pressable min-h-10 px-4 text-sm" pendingLabel="Archiving..." type="submit">
-                  Archive vehicle
+                <PendingButton className="secondary-action pressable" pendingLabel={say("archiving")} type="submit">
+                  {say("archiveBtn")}
                 </PendingButton>
               </form>
               <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--border)] pt-4">
-                <p className="min-w-0 flex-1 text-sm text-[var(--foreground-secondary)]">
-                  <span className="font-semibold text-[var(--foreground)]">Delete</span>: removes it for good. Only for a vehicle added by mistake; it can&apos;t be deleted while it is on rent or booked.
+                <p className="min-w-0 flex-1 basis-60 font-medium text-[var(--foreground-secondary)]">
+                  <span className="font-bold text-[var(--foreground)]">{say("deleteLead")}</span>: {say("deleteBody")}
                 </p>
                 <ConfirmDeleteVehicleButton deleteAction={deleteVehicle} label={`${vehicle.make} ${vehicle.model}`} organizationId={organization.id} vehicleId={vehicle.id} />
               </div>

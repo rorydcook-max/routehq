@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Fold, SectionHeader } from "@/components/ui";
+import { useTranslations } from "next-intl";
+import { ChevronDown } from "lucide-react";
+import { Fold } from "@/components/ui";
 import {
   fetchVehicleMakesForCategory,
   fetchVehicleModels,
@@ -116,6 +118,10 @@ export function VehicleIdentityFields({
   initialMakes: VehicleMake[];
   inputClass: string;
 }) {
+  const t = useTranslations("vehicleForm");
+  const say = t as unknown as (key: string) => string;
+  const labelClass = "font-semibold text-[var(--foreground-secondary)]";
+  const categoryLabel = (category: Category) => (t.has(`cat_${category.code}` as never) ? say(`cat_${category.code}`) : category.name);
   const [categoryId, setCategoryId] = useState(categories[0]?.id || "");
   const [make, setMake] = useState("");
   const [model, setModel] = useState("");
@@ -148,6 +154,7 @@ export function VehicleIdentityFields({
   const [manualTrim, setManualTrim] = useState(false);
   const [makeDropdownOpen, setMakeDropdownOpen] = useState(false);
   const [makeSearch, setMakeSearch] = useState("");
+  const [needMake, setNeedMake] = useState(false);
 
   const selectedCategory = categories.find((category) => category.id === categoryId);
   const categoryCode = selectedCategory?.code || categories[0]?.code || "car";
@@ -182,7 +189,7 @@ export function VehicleIdentityFields({
           return;
         }
         setCatalogStatus("error");
-        setCatalogMessage(error instanceof Error ? error.message : "Unable to load vehicle catalog.");
+        setCatalogMessage(say("catFailed"));
       });
 
     return () => {
@@ -215,7 +222,7 @@ export function VehicleIdentityFields({
           return;
         }
         setCatalogStatus("error");
-        setCatalogMessage(error instanceof Error ? error.message : "Unable to load models.");
+        setCatalogMessage(say("catFailed"));
       });
 
     return () => {
@@ -244,7 +251,7 @@ export function VehicleIdentityFields({
           return;
         }
         setCatalogStatus("error");
-        setCatalogMessage(error instanceof Error ? error.message : "Unable to load trims.");
+        setCatalogMessage(say("catFailed"));
       });
 
     return () => {
@@ -423,7 +430,7 @@ export function VehicleIdentityFields({
       const payload = await response.json();
 
       if (!response.ok) {
-        throw new Error(payload.error || "Unable to read this document.");
+        throw new Error("unreadable");
       }
 
       const extracted = payload.extracted || {};
@@ -465,26 +472,24 @@ export function VehicleIdentityFields({
       }
 
       setOcrStatus("done");
-      setOcrMessage("Filled in what we could read from the document. Please check each field before saving.");
+      setOcrMessage(say("bookDone"));
     } catch (error) {
       setOcrStatus("error");
-      setOcrMessage(error instanceof Error ? error.message : "Unable to read this document.");
+      setOcrMessage(say("bookFailed"));
     }
   }
 
   return (
     <>
-      <div className="rounded-2xl border border-[var(--info-line)] bg-[var(--primary-light)] p-4">
-        <SectionHeader eyebrow="Quickest way" title="Take a photo of the blue book" />
-        <p className="mt-2 text-sm text-[var(--muted)]">
-          Take a photo of the Thai blue book (เล่มทะเบียน) or another registration document and we&apos;ll fill in what we can read. Check the details before saving.
-        </p>
-        <label className="mt-4 block">
-          <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Photo or PDF of the blue book</span>
+      <div className="card p-4">
+        <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("bookTitle")}</h2>
+        <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("bookBody")}</p>
+        <label className="mt-3 block">
+          <span className={labelClass}>{say("bookLabel")}</span>
           <input
             accept="image/*,application/pdf"
             capture="environment"
-            className={inputClass}
+            className="mt-1 w-full"
             name="logbookFile"
             onChange={(event) => handleOcrFileChange(event.target.files?.[0] || null)}
             type="file"
@@ -500,15 +505,18 @@ export function VehicleIdentityFields({
                   : "bg-[var(--primary-light)] text-[var(--primary)]"
             }`}
           >
-            {ocrStatus === "reading" ? "Reading the document…" : ocrMessage}
+            {ocrStatus === "reading" ? say("bookReading") : ocrMessage}
           </p>
         ) : null}
       </div>
 
-      <div className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-4">
-        <SectionHeader eyebrow="Vehicle" title="Make and model" />
-        {catalogStatus === "loading" ? <p className="mt-3 text-sm font-semibold text-[var(--primary)]">Loading makes and models…</p> : null}
+      {/* overflow visible: the make list drops below the card and must not be cut off. */}
+      <div className="card p-4" style={{ overflow: "visible" }}>
+        <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("identTitle")}</h2>
+        {catalogStatus === "loading" ? <p className="mt-3 text-sm font-semibold text-[var(--primary)]">{say("catLoading")}</p> : null}
         {catalogStatus === "error" ? <p className="mt-3 rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">{catalogMessage}</p> : null}
+
+        {needMake && !(make && model) ? <p className="mt-3 rounded-xl bg-[var(--danger-light)] px-4 py-3 font-bold text-[var(--danger)]">{say("needMake")}</p> : null}
 
         <input name="make" type="hidden" value={make} />
         <input name="model" type="hidden" value={model} />
@@ -524,7 +532,7 @@ export function VehicleIdentityFields({
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <label className="block">
-            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Vehicle category</span>
+            <span className={labelClass}>{say("category")}</span>
             <select
               className={inputClass}
               name="categoryId"
@@ -535,16 +543,27 @@ export function VehicleIdentityFields({
             >
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
-                  {category.name}
+                  {categoryLabel(category)}
                 </option>
               ))}
             </select>
           </label>
           <label className="block">
-            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Make</span>
+            <span className={labelClass}>{say("make")}</span>
             <div className="relative mt-1">
+              {/* Lets the browser stop the form and point here when no make or model was chosen. */}
+              <input aria-hidden="true" className="pointer-events-none absolute bottom-0 left-4 h-px w-px opacity-0" onChange={() => undefined}
+                onInvalid={(event) => {
+                  event.preventDefault();
+                  setNeedMake(true);
+                  event.currentTarget.parentElement?.scrollIntoView({ block: "center", behavior: "smooth" });
+                }}
+                required
+                tabIndex={-1}
+                value={make && model ? "ok" : ""}
+              />
               <button
-                className="flex w-full items-center justify-between gap-3 rounded-xl border border-[var(--border-strong)] bg-white px-3 py-3 text-left text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
+                className="flex min-h-[44px] w-full items-center justify-between gap-3 rounded-xl border border-[var(--border-strong)] bg-white px-3 py-2 text-left text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)]"
                 onClick={() => setMakeDropdownOpen((open) => !open)}
                 type="button"
               >
@@ -558,40 +577,40 @@ export function VehicleIdentityFields({
                     <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[var(--panel-secondary)] text-xs font-bold text-[var(--primary)]">+</span>
                   )}
                   <span className={make ? "truncate font-semibold" : "truncate text-[var(--muted)]"}>
-                    {manualMake ? "Other / custom make" : make || `Select ${selectedCategory?.name || "vehicle"} brand`}
+                    {manualMake ? say("makeOther") : make || say("makeSelect")}
                   </span>
                 </span>
-                <span className="text-[var(--muted)]">v</span>
+                <ChevronDown className="shrink-0 text-[var(--muted)]" size={18} />
               </button>
               {makeDropdownOpen ? (
                 <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-2xl border border-[var(--border)] bg-white shadow-xl shadow-[var(--foreground)]/10">
                   <div className="border-b border-[var(--border)] p-3">
                     <input
-                      className="w-full rounded-xl border border-[var(--border-strong)] bg-white px-3 py-2 text-sm text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
+                      autoFocus
+                      className="w-full"
                       onChange={(event) => setMakeSearch(event.target.value)}
-                      placeholder={`Search ${selectedCategory?.name?.toLowerCase() || "vehicle"} brand`}
+                      placeholder={say("makeSearch")}
                       value={makeSearch}
                     />
                   </div>
                   <div className="max-h-72 overflow-y-auto py-1">
                     {searchedMakes.map((item) => (
                       <button
-                        className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm hover:bg-[var(--panel-secondary)]"
+                        className="flex min-h-[44px] w-full items-center gap-3 px-3 py-2 text-left hover:bg-[var(--panel-secondary)]"
                         key={item.id}
                         onClick={() => handleMakeSelect(item.id)}
                         type="button"
                       >
                         {item.logo_url ? <img alt="" className="h-7 w-7 shrink-0 rounded bg-white object-contain" src={item.logo_url} /> : <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[var(--primary-light)] text-xs font-bold text-[var(--primary)]">{item.name.slice(0, 2)}</span>}
                         <span className="font-semibold text-[var(--foreground)]">{item.name}</span>
-                        <span className="ml-auto text-xs uppercase text-[var(--muted)]">{item.origin_country || ""}</span>
                       </button>
                     ))}
                     <button
-                      className="flex w-full items-center gap-3 border-t border-[var(--border)] px-3 py-2 text-left text-sm font-semibold text-[var(--primary)] hover:bg-[var(--panel-secondary)]"
+                      className="flex min-h-[44px] w-full items-center gap-3 border-t border-[var(--border)] px-3 py-2 text-left font-bold text-[var(--primary)] hover:bg-[var(--panel-secondary)]"
                       onClick={() => handleMakeSelect("__manual__")}
                       type="button"
                     >
-                      Other / custom make
+                      {say("makeOther")}
                     </button>
                   </div>
                 </div>
@@ -599,15 +618,15 @@ export function VehicleIdentityFields({
             </div>
           </label>
           <label className="block">
-            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Model</span>
+            <span className={labelClass}>{say("model")}</span>
             <select className={inputClass} disabled={!selectedMakeId && !manualMake} onChange={(event) => handleModelSelect(event.target.value)} value={manualModel ? "__manual__" : selectedModelId}>
-              <option value="">{selectedMakeId ? "Select model" : "Select make first"}</option>
+              <option value="">{selectedMakeId ? say("modelSelect") : say("modelFirst")}</option>
               {models.map((item) => (
                 <option key={item.id} value={item.id}>
                   {item.name}
                 </option>
               ))}
-              <option value="__manual__">Other / custom model</option>
+              <option value="__manual__">{say("modelOther")}</option>
             </select>
           </label>
         </div>
@@ -616,14 +635,14 @@ export function VehicleIdentityFields({
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             {manualMake ? (
               <label className="block">
-                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Custom make</span>
-                <input className={inputClass} onChange={(event) => setMake(event.target.value)} placeholder="Enter make" value={make} />
+                <span className={labelClass}>{say("makeCustom")}</span>
+                <input className={inputClass} onChange={(event) => setMake(event.target.value)} value={make} />
               </label>
             ) : null}
             {manualModel ? (
               <label className="block">
-                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Custom model</span>
-                <input className={inputClass} onChange={(event) => setModel(event.target.value)} placeholder="Enter model" value={model} />
+                <span className={labelClass}>{say("modelCustom")}</span>
+                <input className={inputClass} onChange={(event) => setModel(event.target.value)} value={model} />
               </label>
             ) : null}
           </div>
@@ -631,10 +650,10 @@ export function VehicleIdentityFields({
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <label className="block">
-            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Year</span>
+            <span className={labelClass}>{say("year")}</span>
             {catalogYears.length > 0 ? (
               <select className={inputClass} onChange={(event) => setYear(event.target.value)} value={year}>
-                <option value="">Select year</option>
+                <option value="">{say("yearSelect")}</option>
                 {catalogYears.map((item) => (
                   <option key={item} value={item}>
                     {item}
@@ -646,88 +665,83 @@ export function VehicleIdentityFields({
             )}
           </label>
           <label className="block">
-            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Trim</span>
+            <span className={labelClass}>{say("trim")}</span>
             {visibleTrims.length > 0 ? (
               <select
                 className={inputClass}
                 onChange={(event) => handleTrimSelect(event.target.value)}
                 value={manualTrim ? "__manual__" : selectedTrimId}
               >
-                <option value="">Select trim</option>
+                <option value="">{say("trimSelect")}</option>
                 {visibleTrims.map((item) => (
                   <option key={item.id} value={item.id}>
                     {item.name}
                   </option>
                 ))}
-                <option value="__manual__">Other / custom trim</option>
+                <option value="__manual__">{say("trimOther")}</option>
               </select>
             ) : (
-              <input className={inputClass} onChange={(event) => setTrim(event.target.value)} placeholder="Smart" value={trim} />
+              <input className={inputClass} onChange={(event) => setTrim(event.target.value)} value={trim} />
             )}
             {manualTrim && visibleTrims.length > 0 ? (
-              <input className={inputClass} onChange={(event) => setTrim(event.target.value)} placeholder="Enter custom trim" value={trim} />
+              <input className={inputClass} onChange={(event) => setTrim(event.target.value)} placeholder={say("trimCustom")} value={trim} />
             ) : null}
           </label>
         </div>
-      </div>
 
-      <div className="rounded-2xl border border-[var(--border)] bg-white p-4">
-        <SectionHeader eyebrow="Vehicle details" title="Registration" />
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <label className="block">
-            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Number plate</span>
-            <input className={`${inputClass} font-mono-data`} name="registrationNumber" onChange={(event) => setRegistrationNumber(event.target.value)} placeholder="BKK-1234" required value={registrationNumber} />
+            <span className={labelClass}>{say("plate")}</span>
+            <input className={`${inputClass} font-mono-data`} name="registrationNumber" onChange={(event) => setRegistrationNumber(event.target.value)} required value={registrationNumber} />
           </label>
           <label className="block">
-            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Colour</span>
-            <input className={inputClass} name="color" onChange={(event) => setColor(event.target.value)} placeholder="Pearl White" value={color} />
+            <span className={labelClass}>{say("colour")}</span>
+            <input className={inputClass} name="color" onChange={(event) => setColor(event.target.value)} value={color} />
           </label>
         </div>
         {/* Nice to have, never needed to rent the vehicle out. Opens by itself when the blue book filled it in, so it gets checked. */}
-        <div className="mt-4">
-          <Fold open={ocrStatus === "done"} summary="Frame number, gearbox, seats, engine" title="More about the vehicle">
+      </div>
+          <Fold open={ocrStatus === "done"} summary={say("moreSummary")} title={say("moreTitle")}>
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block">
-            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">VIN / frame number</span>
-            <input className={`${inputClass} font-mono-data`} name="vin" onChange={(event) => setVin(event.target.value.trim().toUpperCase())} placeholder="VIN or chassis/frame number" value={vin} />
+            <span className={labelClass}>{say("vin")}</span>
+            <input className={`${inputClass} font-mono-data`} name="vin" onChange={(event) => setVin(event.target.value.trim().toUpperCase())} value={vin} />
           </label>
           <label className="block">
-            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Transmission</span>
-            <input className={inputClass} name="transmission" onChange={(event) => setTransmission(event.target.value)} placeholder="Automatic" value={transmission} />
+            <span className={labelClass}>{say("transmission")}</span>
+            <input className={inputClass} name="transmission" onChange={(event) => setTransmission(event.target.value)} value={transmission} />
           </label>
           {showMotorcycleFields ? (
             <label className="block">
-              <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Fuel type</span>
+              <span className={labelClass}>{say("fuel")}</span>
               <select className={inputClass} name="fuelType" onChange={(event) => setFuelType(event.target.value)} value={fuelType}>
-                <option value="">Select fuel type</option>
-                <option value="petrol">Petrol</option>
-                <option value="electric">Electric</option>
-                <option value="hybrid">Hybrid</option>
+                <option value="">{say("choose")}</option>
+                <option value="petrol">{say("fuel_petrol")}</option>
+                <option value="electric">{say("fuel_electric")}</option>
+                <option value="hybrid">{say("fuel_hybrid")}</option>
               </select>
             </label>
           ) : (
             <input name="fuelType" type="hidden" value={fuelType} />
           )}
           <label className="block">
-            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Seating capacity</span>
+            <span className={labelClass}>{say("seats")}</span>
             <input className={`${inputClass} font-mono-data`} min="0" name="seatingCapacity" onChange={(event) => setSeatingCapacity(event.target.value)} placeholder="5" type="number" value={seatingCapacity} />
           </label>
           <label className="block">
-            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Engine CC</span>
+            <span className={labelClass}>{say("engine")}</span>
             <input className={`${inputClass} font-mono-data`} min="0" name="engineCc" onChange={(event) => setEngineCc(event.target.value)} placeholder="125" type="number" value={engineCc} />
           </label>
           <label className="block">
-            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Drivetrain</span>
-            <input className={inputClass} name="drivetrain" onChange={(event) => setDrivetrain(event.target.value)} placeholder="FWD / RWD / 4WD" value={drivetrain} />
+            <span className={labelClass}>{say("drivetrain")}</span>
+            <input className={inputClass} name="drivetrain" onChange={(event) => setDrivetrain(event.target.value)} value={drivetrain} />
           </label>
           <label className="block">
-            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Body class</span>
-            <input className={inputClass} name="bodyClass" onChange={(event) => setBodyClass(event.target.value)} placeholder="Sedan/Saloon" value={bodyClass} />
+            <span className={labelClass}>{say("body")}</span>
+            <input className={inputClass} name="bodyClass" onChange={(event) => setBodyClass(event.target.value)} value={bodyClass} />
           </label>
         </div>
           </Fold>
-        </div>
-      </div>
     </>
   );
 }

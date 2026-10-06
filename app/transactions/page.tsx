@@ -29,13 +29,13 @@ export default async function TransactionsPage({
         </div>
         <Link className="primary-action pressable" href="/transactions/new">
           <Plus size={18} />
-          Add transaction
+          Record money
         </Link>
       </div>
 
       {resolvedSearchParams.linked ? (
         <div className="mb-4 rounded-xl border border-[#bbf7d0] bg-[#f0fdf4] px-4 py-3 text-sm font-semibold text-[#166534]">
-          Transaction saved and {resolvedSearchParams.linked === "payment" ? "rental payment marked as received" : "linked task completed"}.
+          Saved. {resolvedSearchParams.linked === "payment" ? "The payment is marked as paid on the booking." : "The matching job on your To do list is ticked off."}
         </div>
       ) : null}
 

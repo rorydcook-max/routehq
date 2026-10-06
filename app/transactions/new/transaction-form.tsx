@@ -186,7 +186,7 @@ export function TransactionForm({
       ) : null}
 
       <Card>
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="card-section grid gap-3 sm:grid-cols-2">
           <label className="block sm:col-span-2">
             <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">What was it for?</span>
             <select className={inputClass} name="type" onChange={(event) => setType(event.target.value)} required value={type}>

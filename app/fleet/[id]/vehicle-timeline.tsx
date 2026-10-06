@@ -87,9 +87,9 @@ export function VehicleTimeline({
       <div className="flex flex-col gap-3 border-b border-[var(--border)] px-4 py-3 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="card-header-label">Vehicle timeline</p>
-          <h2 className="card-header-title">Operational history</h2>
+          <h2 className="card-header-title">What has happened with this vehicle</h2>
           <p className="mt-1 text-[11px] text-[var(--muted)]">
-            {visibleEvents.length} {visibleEvents.length === 1 ? "event" : "events"} from {from ? formatTimelineDate(from) : "the beginning"} to {formatTimelineDate(to)}
+            {visibleEvents.length} {visibleEvents.length === 1 ? "entry" : "entries"} from {from ? formatTimelineDate(from) : "the beginning"} to {formatTimelineDate(to)}
           </p>
         </div>
 
@@ -99,7 +99,7 @@ export function VehicleTimeline({
             <select className="mt-1 w-full" onChange={(event) => changePreset(event.target.value as RangePreset)} value={preset}>
               <option value="year">Previous 12 months</option>
               <option value="quarter">Previous 3 months</option>
-              <option value="all">All events</option>
+              <option value="all">Everything</option>
               <option value="custom">Custom period</option>
             </select>
           </label>
@@ -121,7 +121,7 @@ export function VehicleTimeline({
 
       {visibleEvents.length === 0 ? (
         <div className="px-4 py-8 text-center text-sm text-[var(--muted)]">
-          No events fall within this period. Choose a wider or custom date range to see more history.
+          Nothing recorded in this period. Choose a longer one to see more.
         </div>
       ) : (
         <div className="overflow-x-auto px-3 pb-3 pt-4">

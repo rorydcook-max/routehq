@@ -67,7 +67,7 @@ export function CommunicationPanel({
 
   const channels = useMemo(() => buildChannels(customer), [customer]);
   const returnTone = returnDateTone(booking.end_date);
-  const returnLabel = booking.end_date ? formatDate(booking.end_date) : "Open-ended";
+  const returnLabel = booking.end_date ? formatDate(booking.end_date) : "No end date";
   const outstanding = Number(booking.outstanding_balance || 0);
   const depositHeld = Number(booking.deposit_held || 0);
   const preferred = customer.preferred_contact_method;
@@ -150,8 +150,8 @@ export function CommunicationPanel({
           <Badge tone={statusTone(booking.rental_status)}>{formatStatus(booking.rental_status)}</Badge>
         </div>
         <div className="mt-3 grid gap-2 sm:grid-cols-3">
-          <SummaryItem label="Return" tone={returnTone} value={returnLabel} />
-          <SummaryItem label="Outstanding" tone={outstanding > 0 ? "red" : "green"} value={outstanding > 0 ? formatMoney(outstanding) : "No balance"} />
+          <SummaryItem label="Due back" tone={returnTone} value={returnLabel} />
+          <SummaryItem label="Due now" tone={outstanding > 0 ? "red" : "green"} value={outstanding > 0 ? formatMoney(outstanding) : "Nothing"} />
           <SummaryItem label="Deposit held" tone={depositHeld > 0 ? "amber" : "neutral"} value={depositHeld > 0 ? formatMoney(depositHeld) : "None"} />
         </div>
       </div>
@@ -324,7 +324,10 @@ function formatMoney(value: number) {
 }
 
 function formatDate(value: string) {
-  return value.includes("T") ? value.slice(0, 10) : value;
+  const day = value.slice(0, 10);
+  const parsed = new Date(`${day}T00:00:00Z`);
+  if (Number.isNaN(parsed.getTime())) return day;
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(parsed);
 }
 
 function returnDateTone(value: string | null | undefined): "green" | "amber" | "red" | "neutral" {

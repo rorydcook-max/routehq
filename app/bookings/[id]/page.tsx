@@ -64,7 +64,7 @@ function formatPaymentMethod(value: string | null | undefined) {
 
 function formatPaymentTiming(value: string | null | undefined) {
   if (value === "now") return "Pay now";
-  if (value === "on_delivery") return "Pay on delivery";
+  if (value === "on_delivery") return "Pays at handover";
   return "—";
 }
 
@@ -439,8 +439,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
     }
     if (paymentTiming === "on_delivery" && !activeRentalStatus && activePayments.length === 0) {
       return {
-        label: "Payment due on delivery",
-        detail: `${money(paymentDueOnDeliveryAmount, rental.currency)} due at delivery.`,
+        label: "To collect at handover",
+        detail: `${money(paymentDueOnDeliveryAmount, rental.currency)} due when you hand the vehicle over.`,
         amount: paymentDueOnDeliveryAmount,
         tone: "blue" as const
       };
@@ -703,11 +703,11 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             ) : rental.mileage_at_delivery == null ? (
               <>
                 <p className="text-sm font-semibold leading-5 text-[var(--foreground)]">{isCancelled ? "Never handed over" : isClosed ? "Not recorded" : "Not recorded yet"}</p>
-                <p className="text-sm text-[var(--muted)]">{isCancelled ? "No mileage to record" : isClosed ? "No handover form was completed" : "Recorded at delivery"}</p>
+                <p className="text-sm text-[var(--muted)]">{isCancelled ? "No mileage to record" : isClosed ? "No handover form was completed" : "Recorded at handover"}</p>
               </>
             ) : rental.mileage_at_return == null ? (
               <>
-                <p className="font-mono-data text-sm font-semibold leading-5 text-[var(--foreground)]">{Number(rental.mileage_at_delivery).toLocaleString()} km at delivery</p>
+                <p className="font-mono-data text-sm font-semibold leading-5 text-[var(--foreground)]">{Number(rental.mileage_at_delivery).toLocaleString()} km at handover</p>
                 <p className="text-sm text-[var(--muted)]">Distance driven is worked out at return</p>
               </>
             ) : (
@@ -1535,19 +1535,37 @@ function CommunicationTimeline({
 async function CustomerPortalActionCard({ action, organizationId, rentalId, customerId }: { action: any; organizationId: string; rentalId: string; customerId: string | null }) {
   const content = action.content || {};
   const picture = action.action_type === "extension_request" ? await extensionPicture(createSupabaseAdminClient() as any, organizationId, rentalId, content).catch(() => null) : null;
+  const alreadyCovered =
+    action.action_type === "extension_request" &&
+    !content.open_ended &&
+    !!content.new_end_date &&
+    !!picture?.currentEnd &&
+    String(content.new_end_date).slice(0, 10) <= String(picture.currentEnd).slice(0, 10);
   return (
     <div className="rounded-lg border border-[var(--border)] bg-white p-3">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <Badge tone={action.action_type === "problem_report" ? "red" : action.action_type === "extension_request" ? "amber" : "blue"}>
-            {String(action.action_type || "").replace(/_/g, " ")}
+            {({ extension_request: "Wants to keep it longer", return_confirmation: "Return arranged", problem_report: "Problem reported", question: "Question" } as Record<string, string>)[String(action.action_type)] || String(action.action_type || "").replace(/_/g, " ")}
           </Badge>
           <p className="mt-2 font-semibold text-[var(--foreground)]">{portalActionSummary(action)}</p>
           <p className="mt-1 text-xs font-bold uppercase text-[var(--muted)]">{formatDateTime(action.created_at)}</p>
         </div>
       </div>
       <div className="mt-3">
-        {action.action_type === "extension_request" ? (
+        {alreadyCovered ? (
+          // An older request the rental has since outgrown: nothing to approve, and no need to message the customer.
+          <form action={resolvePortalAction} className="rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
+            <input name="organizationId" type="hidden" value={organizationId} />
+            <input name="actionId" type="hidden" value={action.id} />
+            <input name="rentalId" type="hidden" value={rentalId} />
+            <input name="notes" type="hidden" value="Already covered: the rental was extended past this date." />
+            <p className="text-sm text-[var(--foreground-secondary)]">The rental already runs to {niceDate(String(picture?.currentEnd))}, so there is nothing left to approve.</p>
+            <PendingButton className="secondary-action pressable mt-3 px-3 py-2" pendingLabel="Clearing..." type="submit">
+              Clear this request
+            </PendingButton>
+          </form>
+        ) : action.action_type === "extension_request" ? (
           <div className="grid items-start gap-3 md:grid-cols-[1.6fr_1fr]">
             <ExtensionRequestAnswer actionId={action.id} picture={picture} rentalId={rentalId} requestedEnd={content.new_end_date || null} openEnded={!!content.open_ended} />
             <form action={declinePortalAction} className="rounded-lg border border-[#fecdd3] bg-[#fff1f2] p-3">
@@ -1568,8 +1586,8 @@ async function CustomerPortalActionCard({ action, organizationId, rentalId, cust
             <input name="organizationId" type="hidden" value={organizationId} />
             <input name="actionId" type="hidden" value={action.id} />
             <input name="rentalId" type="hidden" value={rentalId} />
-            <PendingButton className="primary-action pressable px-3 py-2" pendingLabel="Acknowledging..." type="submit">
-              Acknowledge
+            <PendingButton className="primary-action pressable px-3 py-2" pendingLabel="Confirming..." type="submit">
+              Confirm to the customer
             </PendingButton>
           </form>
         ) : action.action_type === "problem_report" ? (
@@ -1577,9 +1595,9 @@ async function CustomerPortalActionCard({ action, organizationId, rentalId, cust
             <input name="organizationId" type="hidden" value={organizationId} />
             <input name="actionId" type="hidden" value={action.id} />
             <input name="rentalId" type="hidden" value={rentalId} />
-            <textarea className="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm" name="notes" placeholder="Resolution notes" />
-            <PendingButton className="primary-action pressable px-3 py-2" pendingLabel="Resolving..." type="submit">
-              Mark resolved
+            <textarea className="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm" name="notes" placeholder="What you did about it (only you and your team see this)" />
+            <PendingButton className="primary-action pressable px-3 py-2" pendingLabel="Saving..." type="submit">
+              Mark as sorted
             </PendingButton>
           </form>
         ) : (
@@ -1588,9 +1606,9 @@ async function CustomerPortalActionCard({ action, organizationId, rentalId, cust
             <input name="actionId" type="hidden" value={action.id} />
             <input name="rentalId" type="hidden" value={rentalId} />
             {customerId ? <input name="customerId" type="hidden" value={customerId} /> : null}
-            <textarea className="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm" name="reply" placeholder="Reply to customer" required />
+            <textarea className="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm" name="reply" placeholder="Your answer, sent to the customer" required />
             <PendingButton className="primary-action pressable px-3 py-2" pendingLabel="Sending..." type="submit">
-              Reply
+              Send answer
             </PendingButton>
           </form>
         )}
@@ -1605,5 +1623,5 @@ function portalActionSummary(action: any) {
   if (action.action_type === "return_confirmation") return `Return ${content.return_date || ""} ${content.return_time || ""}${content.return_location ? ` at ${content.return_location}` : ""}`.trim();
   if (action.action_type === "problem_report") return `${content.category || "Problem"}: ${content.description || "No description"}`;
   if (action.action_type === "question") return content.question || "Customer question";
-  return "Customer portal request";
+  return "Request from the customer";
 }

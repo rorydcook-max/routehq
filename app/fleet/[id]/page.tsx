@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 import {
+  ChevronDown,
   AlertTriangle,
   Archive,
   Banknote,
@@ -32,6 +33,8 @@ import { RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
 import { InspectionViewer } from "@/components/inspection-viewer";
 import { PendingButton } from "@/components/pending-button";
 import { Badge, Card, ProgressBar, SectionHeader } from "@/components/ui";
+import { amountDueNowByRental } from "@/lib/rental-balances";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDefaultOrganization } from "@/lib/organization";
 import { TASK_TYPE_OPTIONS } from "@/lib/tasks";
@@ -205,24 +208,28 @@ function getSoonestCompliance(detail: VehicleDetail) {
 function Section({
   id,
   title,
-  eyebrow,
+  summary,
   children,
   defaultOpen = false
 }: {
   id?: string;
   title: string;
+  /** Kept so existing callers compile; the heading alone is shown. */
   eyebrow?: string;
+  summary?: string;
   children: React.ReactNode;
   defaultOpen?: boolean;
 }) {
   return (
-    <details className="surface-panel group p-3" id={id} open={defaultOpen}>
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
-        <SectionHeader eyebrow={eyebrow} title={title} />
-        <span className="rounded-full bg-[var(--primary-light)] px-2.5 py-1 text-xs font-bold text-[var(--primary)] group-open:hidden">Open</span>
-        <span className="hidden rounded-full bg-[var(--primary-light)] px-2.5 py-1 text-xs font-bold text-[var(--primary)] group-open:inline-flex">Close</span>
+    <details className="group scroll-mt-4 overflow-hidden rounded-[10px] border-[0.5px] border-[var(--border)] bg-[var(--panel)]" id={id} open={defaultOpen}>
+      <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-2.5 [&::-webkit-details-marker]:hidden">
+        <span className="min-w-0">
+          <span className="block text-[15px] font-semibold tracking-[-0.01em] text-[var(--foreground)]">{title}</span>
+          {summary ? <span className="mt-0.5 block truncate text-sm text-[var(--muted)]">{summary}</span> : null}
+        </span>
+        <ChevronDown className="shrink-0 text-[var(--muted)] transition-transform group-open:rotate-180" size={18} />
       </summary>
-      <div className="mt-3">{children}</div>
+      <div className="border-t-[0.5px] border-[var(--border)] px-3.5 pb-3.5 pt-3">{children}</div>
     </details>
   );
 }
@@ -272,12 +279,12 @@ function Plate({ registration, province }: { registration: string; province?: st
 }
 
 function QuickActions({ vehicleId, status }: { vehicleId: string; status: string }) {
-  const primary = status === "available" ? { href: detailUrl("/bookings/new", vehicleId), label: "New booking", icon: CalendarDays } : { href: detailUrl("/transactions/new", vehicleId), label: "Add transaction", icon: ReceiptText };
+  const primary = status === "available" ? { href: detailUrl("/bookings/new", vehicleId), label: "New booking", icon: CalendarDays } : { href: detailUrl("/transactions/new", vehicleId), label: "Record money", icon: ReceiptText };
   // The most likely next step comes first and stands out; the rest follow.
   const actions = [
     primary,
     ...[
-      { href: detailUrl("/transactions/new", vehicleId), label: "Add transaction", icon: ReceiptText },
+      { href: detailUrl("/transactions/new", vehicleId), label: "Record money", icon: ReceiptText },
       { href: detailUrl("/bookings/new", vehicleId), label: "New booking", icon: CalendarDays },
       { href: "#maintenance", label: "Log maintenance", icon: Wrench },
       { href: `/inspections/condition/${vehicleId}`, label: "Condition report", icon: ClipboardCheck },
@@ -312,16 +319,16 @@ function AtAGlance({ detail }: { detail: VehicleDetail }) {
 
   const tiles = [
     {
-      label: "Next compliance",
+      label: "Paperwork due next",
       value: soonest ? soonest.name : "No dates set",
       sub: soonest ? soonestUrgency.label : "Add renewal dates",
       className: soonestUrgency.className,
       icon: ShieldCheck
     },
     {
-      label: "Current odometer",
+      label: "Mileage",
       value: `${Number(detail.vehicle.mileage || 0).toLocaleString()} km`,
-      sub: latestInspection?.inspected_at ? `Recorded ${formatDate(latestInspection.inspected_at)}` : "From vehicle profile",
+      sub: latestInspection?.inspected_at ? `Recorded ${formatDate(latestInspection.inspected_at)}` : "As entered on the vehicle",
       className: "bg-[var(--primary-light)] text-[var(--primary)]",
       icon: Gauge
     },
@@ -337,9 +344,9 @@ function AtAGlance({ detail }: { detail: VehicleDetail }) {
         ]
       : []),
     {
-      label: "Active rental",
-      value: activeRental?.customers?.full_name || "Available",
-      sub: activeRental?.end_date ? `Return ${formatDate(activeRental.end_date)}` : "No active renter",
+      label: activeRental ? "On rent to" : "Right now",
+      value: activeRental?.customers?.full_name || "Free",
+      sub: activeRental?.end_date ? `Due back ${formatDate(activeRental.end_date)}` : activeRental ? "No end date" : "Nobody is renting it",
       className: activeRental ? "bg-[#dbeafe] text-[#1d4ed8]" : "bg-[#dcfce7] text-[#166534]",
       icon: CalendarDays
     }
@@ -354,7 +361,7 @@ function AtAGlance({ detail }: { detail: VehicleDetail }) {
 
   return (
     <div className="space-y-3">
-    <div className="grid grid-cols-2 gap-3">
+    <div className={`grid grid-cols-2 gap-3 ${tiles.length === 3 ? "lg:grid-cols-3 max-lg:[&>*:last-child]:col-span-2" : "lg:grid-cols-4"}`}>
       {tiles.map((tile) => {
         const Icon = tile.icon;
         return (
@@ -362,7 +369,7 @@ function AtAGlance({ detail }: { detail: VehicleDetail }) {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-bold uppercase text-[var(--muted)]">{tile.label}</p>
-                <p className={`mt-1 text-base font-semibold text-[var(--foreground)] ${tile.label === "Current odometer" ? "font-mono-data" : ""}`}>{tile.value}</p>
+                <p className={`mt-1 text-base font-semibold text-[var(--foreground)] ${tile.label === "Mileage" ? "font-mono-data" : ""}`}>{tile.value}</p>
                 <span className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${tile.className}`}>{tile.sub}</span>
               </div>
               <Icon className="text-[var(--primary)]" size={20} />
@@ -397,7 +404,7 @@ function AtAGlance({ detail }: { detail: VehicleDetail }) {
   );
 }
 
-function ActiveRentalCard({ detail }: { detail: VehicleDetail }) {
+function ActiveRentalCard({ detail, dueNow }: { detail: VehicleDetail; dueNow: number }) {
   const rental = detail.activeRental;
 
   if (!rental || !["rented", "reserved"].includes(detail.vehicle.status)) {
@@ -408,19 +415,19 @@ function ActiveRentalCard({ detail }: { detail: VehicleDetail }) {
   const overdue = (daysUntil(rental.end_date) || 0) < 0;
   const inspectionAction =
     rental.status === "booked"
-      ? { href: `/inspections/delivery/${rental.id}`, label: "Start Delivery" }
+      ? { href: `/inspections/delivery/${rental.id}`, label: "Start handover" }
       : ["active", "due_soon", "overdue", "extended"].includes(rental.status)
-        ? { href: `/inspections/return/${rental.id}`, label: "Start Return" }
+        ? { href: `/inspections/return/${rental.id}`, label: "Start return" }
         : null;
 
   return (
-    <Section defaultOpen eyebrow="Active rental" title="Current customer">
+    <Section defaultOpen eyebrow="Active rental" title={rental.status === "booked" ? "Booked by" : "On rent to"}>
       <div className="space-y-3">
         <div className="rounded-lg border border-[#bfd1ff] bg-[var(--primary-blue-light)] p-3">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <p className="text-xl font-semibold text-[var(--foreground)]">{customer.full_name || "Unknown customer"}</p>
-              <p className="text-sm text-[var(--muted)]">{customer.nationality || "Nationality not set"}</p>
+              <p className="text-xl font-semibold text-[var(--foreground)]">{customer.full_name || "Customer not added yet"}</p>
+              {customer.nationality ? <p className="text-sm text-[var(--muted)]">{customer.nationality}</p> : null}
               {customer.phone ? (
                 <a className="mt-2 inline-flex font-bold text-[var(--primary)]" href={`tel:${customer.phone}`}>
                   {customer.phone}
@@ -430,28 +437,28 @@ function ActiveRentalCard({ detail }: { detail: VehicleDetail }) {
             <Badge tone={overdue ? "red" : "blue"}>{rentalDaysRemaining(rental)}</Badge>
           </div>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
-            <InfoRow label="Rental period" value={`${formatDate(rental.start_date)} → ${formatDate(rental.end_date)}`} />
-            <InfoRow label="Monthly rate" value={`${money(rental.rental_rate)} / ${rental.pricing_model}`} />
+            <InfoRow label="Rental period" value={`${formatDate(rental.start_date)} to ${rental.end_date ? formatDate(rental.end_date) : "no end date"}`} />
+            <InfoRow label="Price" value={`${money(rental.rental_rate)} ${({ daily: "a day", weekly: "a week", monthly: "a month" } as Record<string, string>)[String(rental.pricing_model)] || "for the rental"}`} />
             <InfoRow label="Deposit held" value={money(rental.deposit_amount)} />
-            <InfoRow label="Outstanding balance" value={money(rental.balance_due)} danger={Number(rental.balance_due || 0) > 0} />
+            <InfoRow label="Due now" value={dueNow > 0 ? money(dueNow) : "Nothing"} danger={dueNow > 0} />
           </div>
         </div>
         <div className="scrollbar-none flex gap-2 overflow-x-auto">
           <Link className="pressable min-w-fit rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-bold text-white" href={`/bookings/${rental.id}` as Route}>
-            View Rental
+            Open booking
           </Link>
           <Link className="pressable min-w-fit rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold text-[var(--foreground-secondary)]" href={`/bookings/${rental.id}/edit` as Route}>
-            Edit Booking
+            Edit
           </Link>
           <Link className="pressable min-w-fit rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold text-[var(--foreground-secondary)]" href={detailUrl("/transactions/new", detail.vehicle.id)}>
-            Add Payment
+            Record payment
           </Link>
           <RentalAdjustmentButton
             currentEndDate={rental.end_date}
             currentRate={Number(rental.rental_rate || 0)}
             currentStartDate={rental.start_date}
             customerName={customer.full_name || "Unknown customer"}
-            label="Extend / Return early"
+            label="Extend or end early"
             rentalId={rental.id}
             vehicleLabel={[detail.vehicle.make, detail.vehicle.model, detail.vehicle.trim].filter(Boolean).join(" ")}
             className="pressable inline-flex min-w-fit items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold text-[var(--foreground-secondary)]"
@@ -478,7 +485,17 @@ function InfoRow({ label, value, danger = false }: { label: string; value: React
 
 function ComplianceSection({ detail, organizationId }: { detail: VehicleDetail; organizationId: string }) {
   return (
-    <Section defaultOpen eyebrow="Compliance & renewals" title="Critical dates">
+    <Section
+      defaultOpen={getComplianceItems(detail).some((item) => item.date && (daysUntil(item.date) ?? 999) <= 30)}
+      summary={(() => {
+        const items = getComplianceItems(detail);
+        const saved = items.filter((item) => item.date).length;
+        const soonest = getSoonestCompliance(detail);
+        if (!saved) return "No dates saved yet. Add them to be reminded before they run out";
+        return `${saved} of ${items.length} dates saved${soonest ? ` · next: ${soonest.name} ${formatDate(soonest.date)}` : ""}`;
+      })()}
+      title="Tax, insurance and service dates"
+    >
       <div className="grid gap-3">
         {getComplianceItems(detail).map((item) => {
           const Icon = item.icon;
@@ -492,20 +509,19 @@ function ComplianceSection({ detail, organizationId }: { detail: VehicleDetail; 
                   </span>
                   <div>
                     <p className="font-semibold text-[var(--foreground)]">{item.name}</p>
-                    <p className="mt-1 text-sm text-[var(--muted)]">Expiry: {formatDate(item.date)}</p>
-                    <p className="mt-1 text-sm text-[var(--muted)]">Last cost: {item.cost ? money(item.cost) : "Not recorded"}</p>
+                    {item.date ? <p className="mt-1 text-sm text-[var(--muted)]">Runs out {formatDate(item.date)}{item.cost ? ` · last cost ${money(item.cost)}` : ""}</p> : <p className="mt-1 text-sm text-[var(--muted)]">No date saved yet</p>}
                   </div>
                 </div>
-                <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${state.className}`}>{state.label}</span>
+                {item.date ? <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${state.className}`}>{state.label}</span> : null}
               </div>
               <details className="mt-3 rounded-lg bg-[var(--primary-light)] p-3">
-                <summary className="cursor-pointer text-sm font-bold text-[var(--primary)]">Mark as renewed</summary>
+                <summary className="cursor-pointer text-sm font-bold text-[var(--primary)]">{item.date ? "Renewed it? Enter the new date" : "Add the date"}</summary>
                 <form action={renewVehicleCompliance} className="mt-3 grid gap-3 sm:grid-cols-2">
                   <input name="vehicleId" type="hidden" value={detail.vehicle.id} />
                   <input name="organizationId" type="hidden" value={organizationId} />
                   <input name="complianceType" type="hidden" value={item.key} />
                   <label className="block">
-                    <span className="text-xs font-bold uppercase text-[var(--muted)]">New expiry date</span>
+                    <span className="text-xs font-bold uppercase text-[var(--muted)]">Runs out on</span>
                     <input className={inputClass} name="newExpiryDate" required type="date" />
                   </label>
                   <label className="block">
@@ -513,7 +529,7 @@ function ComplianceSection({ detail, organizationId }: { detail: VehicleDetail; 
                     <input className={inputClass} min="0" name="cost" step="0.01" type="number" />
                   </label>
                   <label className="block sm:col-span-2">
-                    <span className="text-xs font-bold uppercase text-[var(--muted)]">Document upload</span>
+                    <span className="text-xs font-bold uppercase text-[var(--muted)]">Photo of the document (optional)</span>
                     <input className={inputClass} name="documentFile" type="file" />
                   </label>
                   <label className="block sm:col-span-2">
@@ -521,7 +537,7 @@ function ComplianceSection({ detail, organizationId }: { detail: VehicleDetail; 
                     <input className={inputClass} name="notes" />
                   </label>
                   <PendingButton className="inline-flex justify-center rounded-lg bg-[var(--primary)] px-3 py-2.5 text-sm font-bold text-white sm:col-span-2" pendingLabel="Saving..." type="submit">
-                    Save renewal
+                    Save
                   </PendingButton>
                 </form>
               </details>
@@ -588,10 +604,10 @@ function InspectionsSection({ detail }: { detail: VehicleDetail }) {
   const [latest, ...older] = detail.inspections;
 
   return (
-    <Section eyebrow="Inspections" id="inspections" title="Deliveries & Returns">
+    <Section eyebrow="Inspections" id="inspections" title="Handovers and returns">
       {!latest ? (
         <EmptyState action={<Link className="font-bold text-[var(--primary)]" href={`/inspections/condition/${detail.vehicle.id}` as Route}>Start a condition report</Link>}>
-          No delivery or return inspections yet.
+          No handover or return forms yet.
         </EmptyState>
       ) : (
         <div className="space-y-3">
@@ -663,7 +679,7 @@ function FinancialSection({ detail }: { detail: VehicleDetail }) {
   const chartMax = Math.max(1, ...detail.financials.monthlyChart.flatMap((month) => [month.revenue, month.expenses]));
 
   return (
-    <Section eyebrow="Financial summary" title="Profitability">
+    <Section eyebrow="Financial summary" title="What it earns and costs">
       <div className="grid gap-3 sm:grid-cols-2">
         <InfoRow label="Monthly revenue" value={money(detail.financials.currentMonthRevenue)} />
         <InfoRow label="Total revenue" value={money(detail.financials.lifetimeRevenue)} />
@@ -695,7 +711,7 @@ function FinancialSection({ detail }: { detail: VehicleDetail }) {
 
 function UtilizationSection({ detail }: { detail: VehicleDetail }) {
   return (
-    <Section eyebrow="Utilization" title="Vehicle demand">
+    <Section eyebrow="Utilization" title="How often it is rented">
       <div className="space-y-3">
         <MetricBar label="12-month utilization" value={detail.utilization.twelveMonth} />
         <MetricBar label="Lifecycle utilization" value={detail.utilization.lifecycle} tone="blue" />
@@ -729,7 +745,7 @@ function MaintenanceSection({ detail, organizationId }: { detail: VehicleDetail;
   const compliance = detail.vehicle.metadata?.compliance || {};
 
   return (
-    <Section eyebrow="Maintenance" id="maintenance" title="Service history">
+    <Section eyebrow="Maintenance" id="maintenance" title="Services and repairs">
       <div className="rounded-lg border border-[var(--border)] bg-white p-3">
         <p className="text-sm font-bold text-[var(--foreground)]">Next service: {formatDate(compliance.next_service_date)}</p>
         <p className="mt-1 text-sm text-[var(--muted)]">Estimated km: {compliance.next_service_mileage ? `${Number(compliance.next_service_mileage).toLocaleString()} km` : "Not set"}</p>
@@ -814,7 +830,7 @@ function TasksSection({ detail, organizationId }: { detail: VehicleDetail; organ
   const extraCount = Math.max(0, detail.vehicleTasks.length - visibleTasks.length);
 
   return (
-    <Section eyebrow="Tasks" title="Open tasks">
+    <Section eyebrow="Tasks" title="Jobs to do">
       <div className="mb-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
         <details>
           <summary className="inline-flex cursor-pointer rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--primary)]">
@@ -900,7 +916,7 @@ function TransactionsSection({ detail }: { detail: VehicleDetail }) {
   const totalExpense = detail.transactions.filter((transaction) => expenseTypes.has(transaction.type)).reduce((sum, transaction) => sum + Math.abs(Number(transaction.amount || 0)), 0);
 
   return (
-    <Section eyebrow="Transactions" title="Money history">
+    <Section eyebrow="Transactions" title="Money in and out">
       <div className="scrollbar-none flex gap-2 overflow-x-auto">
         {["All", "Income", "Expense", "Date range"].map((item) => (
           <button className="min-w-fit rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold text-[var(--foreground-secondary)]" key={item} type="button">
@@ -948,7 +964,7 @@ function RentalHistorySection({ detail }: { detail: VehicleDetail }) {
   const totalRentalDays = detail.rentals.reduce((sum, rental) => sum + Math.max(1, daysBetween(rental.start_date, rental.end_date || new Date().toISOString())), 0);
 
   return (
-    <Section eyebrow="Rentals" title="Rental history">
+    <Section eyebrow="Rentals" title="Past rentals">
       <div className="grid gap-3 sm:grid-cols-4">
         <InfoRow label="Total rentals" value={detail.rentals.length} />
         <InfoRow label="Rental days" value={totalRentalDays} />
@@ -979,7 +995,7 @@ function RentalHistorySection({ detail }: { detail: VehicleDetail }) {
 
 function DocumentsSection({ detail }: { detail: VehicleDetail }) {
   return (
-    <Section eyebrow="Documents" title="Vehicle files">
+    <Section eyebrow="Documents" title="Files and documents">
       <div className="grid gap-3 sm:grid-cols-2">
         {detail.documents.length === 0 ? (
           <EmptyState action={<span className="font-bold text-[var(--primary)]">Upload support will open from this card.</span>}>No documents uploaded yet.</EmptyState>
@@ -1057,7 +1073,7 @@ function SpecsSection({ detail }: { detail: VehicleDetail }) {
   ];
 
   return (
-    <Section eyebrow="Specifications" title="Vehicle profile">
+    <Section eyebrow="Specifications" title="Vehicle details">
       <div className="grid gap-2 sm:grid-cols-2">
         {rows.map(([label, value]) => (
           <Link className="rounded-lg border border-[var(--border)] bg-white p-3 hover:border-[var(--primary)]" href={`/fleet/${detail.vehicle.id}/edit`} key={label}>
@@ -1124,6 +1140,8 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
   const { vehicle } = detail;
   const title = [vehicle.make, vehicle.model, vehicle.trim, vehicle.year].filter(Boolean).join(" ");
   const statusClass = statusClasses[vehicle.status] || statusClasses.inactive;
+  // Only what has fallen due, the same figure the booking page shows.
+  const dueNow = detail.activeRental ? (await amountDueNowByRental(await createSupabaseServerClient(), [detail.activeRental.id])).get(detail.activeRental.id) || 0 : 0;
 
   return (
     <AppShell userEmail={userEmail}>
@@ -1146,7 +1164,7 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
               <div className="flex min-w-0 flex-col justify-between gap-4 rounded-lg bg-[var(--panel-secondary)] p-3">
                 <div className="min-w-0">
                   <div className="mb-2 flex flex-wrap items-center gap-2">
-                    <span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase ${statusClass}`}>{vehicle.status}</span>
+                    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClass}`}>{({ rented: "On rent", reserved: "Booked", maintenance: "In the shop", available: "Free", inactive: "Not in use" } as Record<string, string>)[String(vehicle.status).toLowerCase()] || vehicle.status}</span>
                     {detail.category ? <Badge tone="neutral">{detail.category.name}</Badge> : null}
                   </div>
                   <h1 className="max-w-full text-2xl font-semibold leading-tight tracking-[-0.03em] text-[var(--foreground)] sm:text-3xl">{title}</h1>
@@ -1164,11 +1182,9 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
 
         <AtAGlance detail={detail} />
 
-        <TimelineSection detail={detail} />
-
         <div className="grid gap-3 lg:grid-cols-[minmax(0,3fr)_minmax(320px,2fr)] lg:items-start">
           <div className="space-y-3">
-            <ActiveRentalCard detail={detail} />
+            <ActiveRentalCard detail={detail} dueNow={dueNow} />
             <ComplianceSection detail={detail} organizationId={organization.id} />
             <InspectionsSection detail={detail} />
           </div>
@@ -1184,11 +1200,14 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
             <GpsSection detail={detail} />
             <SpecsSection detail={detail} />
             <FinanceSection detail={detail} />
-            <Section eyebrow="Notes" title="Internal notes">
+            <Section eyebrow="Notes" title="Notes">
               <VehicleNotesForm organizationId={organization.id} notes={vehicle.metadata?.notes || ""} updatedAt={vehicle.metadata?.notes_updated_at} vehicleId={vehicle.id} />
             </Section>
           </div>
         </div>
+
+        {/* The full history comes last: who has it now and what is due matter more day to day. */}
+        <TimelineSection detail={detail} />
       </div>
     </AppShell>
   );

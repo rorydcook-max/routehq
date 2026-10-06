@@ -13,7 +13,22 @@ import { getCustomerDetail, getCustomerDocumentCompleteness } from "@/lib/custom
 import { getDefaultOrganization } from "@/lib/organization";
 import { amountDueNowByRental } from "@/lib/rental-balances";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { isRawDepositTransaction, isRevenueTransaction } from "@/lib/transaction-options";
+import { TRANSACTION_TYPE_OPTIONS, isRawDepositTransaction, isRevenueTransaction } from "@/lib/transaction-options";
+
+// The words owners see everywhere else, not the database's.
+const RENTAL_STATUS: Record<string, { label: string; tone: "neutral" | "green" | "amber" | "red" | "blue" }> = {
+  booked: { label: "Booked", tone: "amber" },
+  active: { label: "On rent", tone: "blue" },
+  due_soon: { label: "Due back soon", tone: "blue" },
+  extended: { label: "On rent", tone: "blue" },
+  overdue: { label: "Late return", tone: "red" },
+  completed: { label: "Completed", tone: "green" },
+  cancelled: { label: "Cancelled", tone: "neutral" }
+};
+
+function transactionName(type: string) {
+  return TRANSACTION_TYPE_OPTIONS.find((option) => option.value === type)?.label || type.replace(/_/g, " ");
+}
 
 function money(value: unknown) {
   return new Intl.NumberFormat("th-TH", {
@@ -316,7 +331,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                     <Badge tone={(daysUntil(activeRental.end_date) || 0) < 0 ? "red" : "blue"}>{rentalLabel(activeRental)}</Badge>
                   </div>
                   <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                    <InfoTile label="Rental period" value={`${formatDate(activeRental.start_date)} → ${formatDate(activeRental.end_date)}`} />
+                    <InfoTile label="Rental period" value={`${formatDate(activeRental.start_date)} to ${activeRental.end_date ? formatDate(activeRental.end_date) : "no end date"}`} />
                     <InfoTile label="Due now" value={dueNow > 0 ? money(dueNow) : "Nothing due"} danger={dueNow > 0} />
                   </div>
                   <div className="mt-3 flex flex-wrap gap-2">
@@ -444,10 +459,10 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             <Card>
               <SectionHeader eyebrow="Rental history" title="All rentals" />
               <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <InfoTile label="Total rentals" value={detail.rentals.length} />
+                <InfoTile label="Rentals" value={detail.rentals.length} />
                 <InfoTile label="Days rented" value={detail.totalRentalDays} />
-                <InfoTile label="Total spent" value={money(detail.lifetimeRevenue)} />
-                <InfoTile label="Avg duration" value={`${detail.averageRentalDuration} days`} />
+                <InfoTile label="Rent paid" value={money(detail.lifetimeRevenue)} />
+                <InfoTile label="Usual length" value={`${detail.averageRentalDuration} days`} />
               </div>
               <div className="mt-3 space-y-2">
                 {detail.rentals.length === 0 ? (
@@ -460,10 +475,10 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                           <p className="font-semibold text-[var(--foreground)]">
                             {rental.vehicles?.make} {rental.vehicles?.model} · <span className="font-mono-data">{rental.vehicles?.registration_number}</span>
                           </p>
-                          <p className="font-mono-data text-sm text-[var(--muted)]">{formatDate(rental.start_date)} → {formatDate(rental.end_date)} · {money(rental.rental_rate)}</p>
-                          <p className="font-mono-data mt-1 text-sm text-[var(--foreground-secondary)]">{rental.km_driven ? `${Number(rental.km_driven).toLocaleString()} km driven` : "Km not calculated"} · {depositLabel(rental)}</p>
+                          <p className="font-mono-data text-sm text-[var(--muted)]">{formatDate(rental.start_date)} {rental.end_date ? `to ${formatDate(rental.end_date)}` : "- no end date"} · {money(rental.rental_rate)}</p>
+                          <p className="font-mono-data mt-1 text-sm text-[var(--foreground-secondary)]">{rental.km_driven ? `${Number(rental.km_driven).toLocaleString()} km driven · ` : ""}{depositLabel(rental)}</p>
                         </div>
-                        <Badge tone={rental.status === "completed" ? "green" : rental.status === "active" ? "blue" : "amber"}>{rental.status}</Badge>
+                        <Badge tone={RENTAL_STATUS[String(rental.status)]?.tone || "neutral"}>{RENTAL_STATUS[String(rental.status)]?.label || String(rental.status || "").replace(/_/g, " ")}</Badge>
                       </div>
                     </Link>
                   ))
@@ -474,17 +489,17 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             <Card>
               <SectionHeader eyebrow="Transactions" title="What they have paid" />
               <div className="mt-3">
-                <InfoTile label="Total income from customer" value={money(totalIncome)} />
+                <InfoTile label="Rent and charges paid so far" value={money(totalIncome)} />
               </div>
               <div className="mt-3 space-y-2">
                 {detail.transactions.length === 0 ? (
-                  <div className="rounded-lg border border-dashed border-[var(--border)] bg-white/70 p-3 text-sm text-[var(--muted)]">No customer transactions yet.</div>
+                  <div className="rounded-lg border border-dashed border-[var(--border)] bg-white/70 p-3 text-sm text-[var(--muted)]">No payments recorded for this customer yet.</div>
                 ) : (
                   detail.transactions.map((transaction) => (
                     <div className="rounded-lg border border-[var(--border)] bg-white p-3" key={transaction.id}>
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <p className="font-semibold text-[var(--foreground)]">{transaction.type.replace(/_/g, " ")}</p>
+                          <p className="font-semibold text-[var(--foreground)]">{transactionName(transaction.type)}</p>
                           <p className="font-mono-data text-sm text-[var(--muted)]">{formatDate(transaction.transaction_date)} · {transaction.vehicles?.registration_number || "No vehicle"}</p>
                         </div>
                         <span

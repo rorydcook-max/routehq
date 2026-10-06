@@ -341,8 +341,8 @@ export async function recordDeliveryCashPaymentAndReceipt(formData: FormData) {
     return firstId;
   }
 
-  const rentPaymentId = await allocatePayment("rent", rentalPaymentAmount, "Rental payment received during delivery inspection");
-  const depositPaymentId = await allocatePayment("deposit", depositAmount, "Security deposit received during delivery inspection");
+  const rentPaymentId = await allocatePayment("rent", rentalPaymentAmount, "Rental payment received at handover");
+  const depositPaymentId = await allocatePayment("deposit", depositAmount, "Security deposit received at handover");
 
   async function insertPaymentTransaction(type: "rental_income" | "deposit_received", transactionAmount: number, rentalPaymentId: string | null) {
     if (transactionAmount <= 0) return null;
@@ -359,7 +359,7 @@ export async function recordDeliveryCashPaymentAndReceipt(formData: FormData) {
         currency: rental.currency || "THB",
         transaction_date: today,
         supplier: "Cash",
-        notes: type === "deposit_received" ? "Security deposit received during delivery inspection." : "Cash rental payment confirmed during delivery inspection.",
+        notes: type === "deposit_received" ? "Security deposit received at handover." : "Rental payment received at handover.",
         metadata: { source: "delivery_inspection", payment_method: paymentMethod },
         is_deposit: type === "deposit_received",
         deposit_rental_id: type === "deposit_received" ? rentalId : null,
@@ -420,7 +420,7 @@ export async function recordDeliveryCashPaymentAndReceipt(formData: FormData) {
     customer_id: customerId,
     event_type: "payment_received",
     title: "Cash payment received",
-    detail: `Rental payment ${rentalPaymentAmount} THB and deposit ${depositAmount} THB confirmed during delivery inspection.`
+    detail: `Rental payment ${rentalPaymentAmount} THB and deposit ${depositAmount} THB received at handover.`
   });
 
   if (rentalPaymentAmount > 0) {

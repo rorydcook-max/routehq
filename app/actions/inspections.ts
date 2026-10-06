@@ -276,7 +276,7 @@ async function reconcileReturnDeposit(formData: FormData, organizationId: string
     deductionData.set("rentalId", rentalId);
     deductionData.set("deductionAmount", String(amount));
     deductionData.set("reason", item.reason);
-    deductionData.set("notes", "Recorded from return inspection.");
+    deductionData.set("notes", "Recorded on the return form.");
     await applyDepositDeduction(deductionData);
     if (item.key === "depositOutstandingBalance") await payRentFromDeposit(createSupabaseAdminClient() as any, organizationId, rentalId, amount);
     settlement.deductions.push({ reason: item.reason, amount });
@@ -289,7 +289,7 @@ async function reconcileReturnDeposit(formData: FormData, organizationId: string
     refundData.set("organizationId", organizationId);
     refundData.set("rentalId", rentalId);
     refundData.set("returnAmount", String(refundAmount));
-    refundData.set("notes", "Recorded from return inspection.");
+    refundData.set("notes", "Recorded on the return form.");
     refundData.set("quiet", "true");
     await returnDeposit(refundData);
     settlement.refunded = refundAmount;
@@ -359,7 +359,7 @@ async function createOnDeliveryPaymentRecords(supabase: any, organizationId: str
       currency: rental.currency || "THB",
       metadata: {
         type: "rent",
-        description: "First rental payment - payment due on delivery",
+        description: "First rental payment - due at handover",
         payment_trigger: "on_delivery"
       }
     });
@@ -379,7 +379,7 @@ async function createOnDeliveryPaymentRecords(supabase: any, organizationId: str
       metadata: {
         is_deposit: true,
         type: "deposit",
-        description: "Security deposit - collected on delivery",
+        description: "Security deposit - collected at handover",
         payment_trigger: "on_delivery"
       }
     });
@@ -743,10 +743,10 @@ export async function submitInspection(formData: FormData) {
     event_type: `${mode}_inspection_completed`,
     title:
       mode === "return"
-        ? "Return inspection completed"
+        ? "Return form completed"
         : mode === "condition_report"
           ? "Vehicle condition report completed"
-          : "Delivery inspection completed",
+          : "Handover form completed",
     detail:
       mode === "return"
         ? `${customerName} returned ${vehicleLabel}. ${odometerReading.toLocaleString()} km recorded.`
@@ -778,7 +778,7 @@ export async function submitInspection(formData: FormData) {
   if (mode === "return" && !isSwap) {
     notifyOperator(
       organizationId,
-      `🔄 Return inspection complete — ${vehicleLabel} returned by ${customerName}`,
+      `🔄 Return complete — ${vehicleLabel} returned by ${customerName}`,
       "return_inspection"
     ).catch(() => null);
   }

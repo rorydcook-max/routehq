@@ -2,10 +2,10 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, ChevronDown, Copy } from "lucide-react";
+import { AlertTriangle, CheckCircle2, ChevronDown, Copy } from "lucide-react";
 import { connectChannel, disconnectChannel } from "@/app/actions/inbox";
 
-type Channel = { id: string; provider: string; display_name: string | null; status: string; last_error: string | null; webhook: string };
+type Channel = { id: string; provider: string; display_name: string | null; status: string; last_error: string | null; webhook: string; send_error?: string | null; send_failed_at?: string | null };
 
 const GUIDES = {
   line: {
@@ -120,10 +120,12 @@ function ConnectedChannel({ channel }: { channel: Channel }) {
     <div className="rounded-xl border border-[var(--border)] bg-white p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <CheckCircle2 className="flex-shrink-0 text-[var(--success)]" size={20} />
+          {channel.send_error ? <AlertTriangle className="flex-shrink-0 text-[var(--danger)]" size={20} /> : <CheckCircle2 className="flex-shrink-0 text-[var(--success)]" size={20} />}
           <div>
             <p className="text-[15px] font-semibold text-[var(--foreground)]">{channel.display_name || guide?.name || channel.provider}</p>
-            <p className="text-[13px] text-[var(--muted)]">{guide?.name || channel.provider} · connected</p>
+            <p className={`text-[13px] ${channel.send_error ? "font-semibold text-[var(--danger)]" : "text-[var(--muted)]"}`}>
+              {guide?.name || channel.provider} · {channel.send_error ? "connected, but messages are not going out" : "connected"}
+            </p>
           </div>
         </div>
         {confirming ? (
@@ -152,6 +154,14 @@ function ConnectedChannel({ channel }: { channel: Channel }) {
         )}
       </div>
       {confirming ? <p className="mt-2 text-[13px] text-[var(--muted)]">New messages will stop arriving. Your past chats stay in the inbox.</p> : null}
+      {channel.send_error ? (
+        <div className="mt-3 rounded-lg bg-[var(--danger-light)] px-3 py-2 text-[13px] text-[var(--foreground-secondary)]">
+          <p>
+            The last message sent from here{channel.send_failed_at ? ` (${new Date(channel.send_failed_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "Asia/Bangkok" })})` : ""} was not delivered. {/auth|token|unauthor|401|403|credential/i.test(channel.send_error) ? "The access token is no longer accepted." : channel.send_error}
+          </p>
+          <p className="mt-1">To fix it, disconnect this account and connect it again with a new access token. Your past chats stay in the inbox.</p>
+        </div>
+      ) : null}
       {channel.last_error ? (
         <div className="mt-3 rounded-lg bg-[var(--warning-light)] px-3 py-2 text-[13px] text-[var(--foreground-secondary)]">
           <p>

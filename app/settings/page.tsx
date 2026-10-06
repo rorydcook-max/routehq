@@ -206,6 +206,21 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     .eq("organization_id", organization.id)
     .neq("status", "disconnected")
     .order("created_at", { ascending: true });
+  // An account can be connected and still not be delivering (a token that was revoked, say).
+  // The last message sent on each account says which: if it failed, the account says so here.
+  const { data: recentSends } = await supabase
+    .from("conversation_messages")
+    .select("status, error, created_at, conversations!inner(channel_id)")
+    .eq("organization_id", organization.id)
+    .eq("direction", "out")
+    .order("created_at", { ascending: false })
+    .limit(60);
+  const lastSendByChannel = new Map<string, { failed: boolean; error: string | null; at: string }>();
+  for (const send of (recentSends || []) as any[]) {
+    const channelId = String(send.conversations?.channel_id || "");
+    if (!channelId || lastSendByChannel.has(channelId)) continue;
+    lastSendByChannel.set(channelId, { failed: send.status === "failed", error: send.error || null, at: String(send.created_at || "") });
+  }
   const typedVehicleMakes = (vehicleMakes || []) as VehicleMakeSetting[];
   const typedVehicleModels = (vehicleModels || []) as VehicleModelSetting[];
   const typedRecentTrims = (recentTrims || []) as VehicleTrimSetting[];
@@ -314,6 +329,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               display_name: channel.display_name,
               status: channel.status,
               last_error: channel.last_error,
+                send_error: lastSendByChannel.get(channel.id)?.failed ? lastSendByChannel.get(channel.id)?.error || "Not delivered" : null,
+                send_failed_at: lastSendByChannel.get(channel.id)?.failed ? lastSendByChannel.get(channel.id)?.at || null : null,
               webhook: webhookUrl(channel.provider, channel.webhook_key)
             }))}
             publicUrl={webhookReachable()}

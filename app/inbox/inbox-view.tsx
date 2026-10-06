@@ -283,6 +283,11 @@ export function InboxView({
                     {message.status === "failed" ? (
                       <p className="mt-1 flex items-center justify-end gap-1 text-[12px] text-[var(--danger)]">
                         <AlertCircle size={13} /> Not delivered. {plainSendError(message.error, selected?.provider)}
+                        {/auth|token|unauthor|401|403|credential/i.test(String(message.error || "")) ? (
+                          <a className="font-semibold underline" href="/settings?tab=messaging">
+                            Open Messaging
+                          </a>
+                        ) : null}
                       </p>
                     ) : null}
                   </div>

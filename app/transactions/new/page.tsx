@@ -3,6 +3,7 @@ import { AppShell } from "@/components/app-shell";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDefaultOrganization } from "@/lib/organization";
 import { getTransactionFormOptions, getTransactionFormPrefill } from "@/lib/transactions";
+import { listPaymentsWaiting } from "@/lib/transaction-matching";
 import { TransactionForm } from "./transaction-form";
 
 export default async function NewTransactionPage({
@@ -12,7 +13,8 @@ export default async function NewTransactionPage({
 }) {
   const params = await searchParams;
   const [userEmail, organization] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization()]);
-  const [options, prefill] = await Promise.all([
+  const [waiting, options, prefill] = await Promise.all([
+    listPaymentsWaiting(organization.id).catch(() => []),
     getTransactionFormOptions(organization.id),
     getTransactionFormPrefill({
       organizationId: organization.id,
@@ -39,6 +41,7 @@ export default async function NewTransactionPage({
           options={options}
           organizationId={organization.id}
           prefill={prefill}
+          waiting={waiting}
         />
       </div>
     </AppShell>

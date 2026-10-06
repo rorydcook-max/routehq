@@ -377,7 +377,10 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   const isOpenPayment = (p: any) => !["paid", "cancelled", "waived", "refunded"].includes(String(p.status || ""));
   const overduePaymentGroup = nonVoidedPayments.filter((p: any) => isOpenPayment(p) && p.due_date && p.due_date < today);
   const dueNowPaymentGroup = nonVoidedPayments.filter((p: any) => isOpenPayment(p) && (!p.due_date || p.due_date === today));
-  const upcomingPaymentGroup = nonVoidedPayments.filter((p: any) => isOpenPayment(p) && p.due_date && p.due_date > today);
+  const upcomingPaymentGroup = nonVoidedPayments.filter((p: any) => isOpenPayment(p) && p.due_date && p.due_date > today).sort((a: any, b: any) => String(a.due_date).localeCompare(String(b.due_date)));
+  // A monthly rental with no end date has rent lined up far ahead: only the next few are worth showing by default.
+  const upcomingShown = upcomingPaymentGroup.slice(0, 3);
+  const upcomingLater = upcomingPaymentGroup.slice(3);
   const cancelledPaymentGroup = nonVoidedPayments.filter((p: any) => ["cancelled", "waived"].includes(String(p.status || "")));
   const isCancelled = String(rental.status || "") === "cancelled";
   const isClosed = isCancelled || String(rental.status || "") === "completed";
@@ -1073,7 +1076,15 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             >
               <div className="space-y-3">
                 <p className="text-sm text-[var(--muted)]">
-                  <span className="font-semibold text-[var(--foreground)]">{money(totalPaid, rental.currency)}</span> paid so far. {financialState.detail}
+                  {/* Rent and deposit are said separately: "฿0 paid so far" beside a paid deposit read as a mistake. */}
+                  <span className="font-semibold text-[var(--foreground)]">{money(totalPaid, rental.currency)}</span> rent paid so far
+                  {paidInAll - totalPaid > 0 ? (
+                    <>
+                      {" · "}
+                      <span className="font-semibold text-[var(--foreground)]">{money(paidInAll - totalPaid, rental.currency)}</span> deposit paid
+                    </>
+                  ) : null}
+                  . {financialState.detail}
                 </p>
                 {needsExistingRentalPaymentSetup ? (
                   <ExistingRentalPaymentSetupCard
@@ -1121,10 +1132,22 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 {upcomingPaymentGroup.length > 0 ? (
                   <details>
                     <summary className="cursor-pointer text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--muted)] hover:text-[var(--foreground)]">
-                      Upcoming — {upcomingPaymentGroup.length} scheduled payment{upcomingPaymentGroup.length !== 1 ? "s" : ""}
+                      {upcomingLater.length > 0
+                        ? `Upcoming — next ${upcomingShown.length} of ${upcomingPaymentGroup.length} scheduled payments`
+                        : `Upcoming — ${upcomingPaymentGroup.length} scheduled payment${upcomingPaymentGroup.length !== 1 ? "s" : ""}`}
                     </summary>
                     <div className="mt-2 space-y-1">
-                      {upcomingPaymentGroup.map((payment: any) => <EditableRentalPaymentRow key={payment.id} payment={payment} />)}
+                      {upcomingShown.map((payment: any) => <EditableRentalPaymentRow key={payment.id} payment={payment} />)}
+                      {upcomingLater.length > 0 ? (
+                        <details>
+                          <summary className="cursor-pointer py-1 text-[13px] font-semibold text-[var(--primary)]">
+                            Show {upcomingLater.length} later payment{upcomingLater.length !== 1 ? "s" : ""}
+                          </summary>
+                          <div className="mt-1 space-y-1">
+                            {upcomingLater.map((payment: any) => <EditableRentalPaymentRow key={payment.id} payment={payment} />)}
+                          </div>
+                        </details>
+                      ) : null}
                     </div>
                   </details>
                 ) : null}

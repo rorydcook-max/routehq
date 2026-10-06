@@ -20,7 +20,8 @@ export function TransactionForm({
   defaultVehicleId = "",
   defaultRentalId = "",
   defaultCustomerId = "",
-  prefill = null
+  prefill = null,
+  waiting = []
 }: {
   organizationId: string;
   options: TransactionFormOptions;
@@ -28,6 +29,8 @@ export function TransactionForm({
   defaultRentalId?: string;
   defaultCustomerId?: string;
   prefill?: TransactionFormPrefill | null;
+  /** Payments the business is waiting for, shown first so the usual case is one tap. */
+  waiting?: MatchResult[];
 }) {
   const [type, setType] = useState(prefill?.type || "rental_income");
   const [amount, setAmount] = useState(prefill?.amount || "");
@@ -42,7 +45,14 @@ export function TransactionForm({
   const [customerId, setCustomerId] = useState(prefill?.customerId || defaultCustomerId);
   const [linkedRentalPaymentId, setLinkedRentalPaymentId] = useState(prefill?.rentalPaymentId || "");
   const [linkedTaskId, setLinkedTaskId] = useState(prefill?.taskId || "");
-  const [matches, setMatches] = useState<MatchResult[]>([]);
+  const startsLinked = Boolean(prefill?.rentalPaymentId || prefill?.taskId);
+  // Opened from a vehicle, booking or customer: only that one's payments are offered.
+  const waitingHere = useMemo(
+    () => waiting.filter((item) => (!defaultVehicleId || item.prefilledData.vehicleId === defaultVehicleId) && (!defaultRentalId || item.rentalId === defaultRentalId) && (!defaultCustomerId || item.customerId === defaultCustomerId)),
+    [waiting, defaultVehicleId, defaultRentalId, defaultCustomerId]
+  );
+  const [matches, setMatches] = useState<MatchResult[]>(startsLinked ? [] : waitingHere);
+  const [showAllMatches, setShowAllMatches] = useState(false);
   const [dismissedMatches, setDismissedMatches] = useState(false);
   const [isMatching, startMatchTransition] = useTransition();
 
@@ -55,6 +65,11 @@ export function TransactionForm({
     // Only money coming in can be a payment a customer owes.
     if (!type || !MONEY_IN.includes(type) || linkedRentalPaymentId || linkedTaskId || dismissedMatches) {
       setMatches([]);
+      return;
+    }
+    // Nothing typed yet: offer everything that is being waited for.
+    if (!amount && (!vehicleId || vehicleId === defaultVehicleId) && type === "rental_income") {
+      setMatches(waitingHere);
       return;
     }
 
@@ -77,7 +92,7 @@ export function TransactionForm({
     }, 600);
 
     return () => window.clearTimeout(timer);
-  }, [amount, dismissedMatches, linkedRentalPaymentId, linkedTaskId, organizationId, transactionDate, type, vehicleId]);
+  }, [amount, defaultVehicleId, dismissedMatches, linkedRentalPaymentId, linkedTaskId, organizationId, transactionDate, type, vehicleId, waitingHere]);
 
   function handleRentalChange(nextRentalId: string) {
     setRentalId(nextRentalId);
@@ -109,7 +124,7 @@ export function TransactionForm({
   }
 
   const isMoneyIn = MONEY_IN.includes(type);
-  const linkedBadge = linkedRentalPaymentId ? "Saving this marks that payment as paid on the booking." : linkedTaskId ? "Saving this ticks off the matching job on your To do list." : "";
+  const linkedBadge = linkedRentalPaymentId ? "Check the amount and date, then save. That payment is marked as paid on the booking." : linkedTaskId ? "Saving this ticks off the matching job on your To do list." : "";
   const chooseDirection = (moneyIn: boolean) => {
     if (moneyIn === isMoneyIn) return;
     setType(moneyIn ? "rental_income" : "repair");
@@ -156,13 +171,13 @@ export function TransactionForm({
             {isMatching ? <span className="text-xs font-semibold text-[var(--muted)]">Checking...</span> : null}
           </div>
           <div className="mt-3 space-y-2">
-            {matches.map((match) => (
+            {(showAllMatches ? matches : matches.slice(0, 5)).map((match) => (
               <div className="rounded-lg border border-[#bfe0db] bg-white p-3" key={match.id}>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="font-semibold text-[var(--foreground)]">{match.label}</p>
                     <p className="mt-1 text-sm text-[var(--muted)]">
-                      {[match.customerName, match.subLabel].filter(Boolean).join(" - ")}
+                      {[match.customerName, match.subLabel].filter(Boolean).join(" · ")}
                     </p>
                   </div>
                   <button className="primary-action pressable min-h-9 px-3 text-xs" onClick={() => acceptMatch(match)} type="button">
@@ -172,6 +187,11 @@ export function TransactionForm({
               </div>
             ))}
           </div>
+          {!showAllMatches && matches.length > 5 ? (
+            <button className="mt-3 block text-sm font-semibold text-[var(--primary)]" onClick={() => setShowAllMatches(true)} type="button">
+              Show {matches.length - 5} more
+            </button>
+          ) : null}
           <button
             className="mt-3 text-sm font-semibold text-[var(--primary)]"
             onClick={() => {
@@ -279,7 +299,8 @@ export function TransactionForm({
 
           <label className="block sm:col-span-2">
             <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">Receipt photo (optional)</span>
-            <input accept="image/*,application/pdf" capture="environment" className={inputClass} name="receipt" type="file" />
+            {/* No forced camera: a receipt is as often a screenshot or a photo taken earlier. The phone offers camera or library. */}
+            <input accept="image/*,application/pdf" className={`${inputClass} file:mr-3 file:rounded-md file:border-0 file:bg-[var(--primary-light)] file:px-3 file:py-1.5 file:text-[13px] file:font-semibold file:text-[var(--primary)]`} name="receipt" type="file" />
           </label>
         </div>
       </Card>

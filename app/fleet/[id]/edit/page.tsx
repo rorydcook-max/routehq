@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { updateVehicle } from "@/app/actions/vehicles";
+import { archiveVehicle, deleteVehicle, updateVehicle } from "@/app/actions/vehicles";
+import { ConfirmDeleteVehicleButton } from "@/app/fleet/fleet-actions";
 import { AppShell } from "@/components/app-shell";
 import { LocalizedDateInput } from "@/components/localized-date-input";
 import { MoneyInput } from "@/components/money-input";
@@ -280,6 +281,29 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
             </div>
           </form>
         </Card>
+        {/* Archiving and deleting live here, one step away from the list, so neither happens by a slip of the thumb. */}
+        <div className="mt-4">
+          <Fold summary="Archive it, or delete it if it was added by mistake" title="No longer renting this vehicle?">
+            <div className="space-y-4">
+              <form action={archiveVehicle} className="flex flex-wrap items-center justify-between gap-3">
+                <input name="vehicleId" type="hidden" value={vehicle.id} />
+                <input name="organizationId" type="hidden" value={organization.id} />
+                <p className="min-w-0 flex-1 text-sm text-[var(--foreground-secondary)]">
+                  <span className="font-semibold text-[var(--foreground)]">Archive</span>: takes it off your fleet and out of new bookings. Its past rentals and money stay in your records.
+                </p>
+                <PendingButton className="secondary-action pressable min-h-10 px-4 text-sm" pendingLabel="Archiving..." type="submit">
+                  Archive vehicle
+                </PendingButton>
+              </form>
+              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--border)] pt-4">
+                <p className="min-w-0 flex-1 text-sm text-[var(--foreground-secondary)]">
+                  <span className="font-semibold text-[var(--foreground)]">Delete</span>: removes it for good. Only for a vehicle added by mistake; it can&apos;t be deleted while it is on rent or booked.
+                </p>
+                <ConfirmDeleteVehicleButton deleteAction={deleteVehicle} label={`${vehicle.make} ${vehicle.model}`} organizationId={organization.id} vehicleId={vehicle.id} />
+              </div>
+            </div>
+          </Fold>
+        </div>
       </div>
     </AppShell>
   );

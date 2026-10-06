@@ -32,6 +32,30 @@ function dayLabel(iso: string | null, today: string) {
   return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", ...(sameYear ? {} : { year: "numeric" }), timeZone: "UTC" }).format(date);
 }
 
+/** "Was due yesterday", not "Was due Yesterday". */
+function dayInSentence(iso: string | null, today: string) {
+  return dayLabel(iso, today).replace(/^(Today|Tomorrow|Yesterday|No date)$/, (word) => word.toLowerCase());
+}
+
+/**
+ * A job's heading in a few words, with the rest as a second line. Jobs are
+ * saved with one long title ("Refund to decide - returned 15 days before the
+ * paid time ran out (pro rata ฿4,750)"); the list reads better as a short
+ * heading and a detail. The customer and vehicle are already on their own line.
+ */
+function headingOf(item: TaskListItem): { title: string; detail: string | null } {
+  const raw = String(item.title || "");
+  if (item.action === "swap_handover" || item.action === "swap_collection") {
+    return { title: raw.split(" to ")[0].split(" from ")[0], detail: null };
+  }
+  if (!item.action) return { title: raw, detail: null };
+  const [first, ...rest] = raw.split(" - ");
+  const detail = rest.join(" - ").trim();
+  if (item.action === "refund") return { title: first, detail: detail ? detail.charAt(0).toUpperCase() + detail.slice(1) : null };
+  // For a customer's request or a signature, what follows the heading is the customer and vehicle again, and the working-out belongs on the booking.
+  return { title: first, detail: null };
+}
+
 function timeLabel(dueAt: string | null) {
   if (!dueAt) return null;
   const time = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Bangkok" }).format(new Date(dueAt));
@@ -206,6 +230,8 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
       ) : null}
 
       {error ? <p className="mt-2 text-xs font-semibold text-[var(--danger)]">{error}</p> : null}
+      {/* No surprises: recording it here tells the customer too. */}
+      <p className="mt-3 text-xs text-[var(--muted)]">The customer is sent a short &quot;payment received&quot; message, unless you have turned customer messages off in Settings.</p>
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <button className="primary-action pressable min-h-9 px-4 text-xs" disabled={isPending} onClick={save} type="button">
           {isPending ? "Saving…" : `Record ${received > 0 ? money(received) : "payment"}`}
@@ -247,8 +273,11 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
 
   const coversSeveral = !!receipt && receipt.paymentIds.length > 1;
   const overdue = !item.completedAt && !!item.dueDate && item.dueDate < today;
-  const time = item.kind === "task" ? timeLabel(item.dueAt) : null;
-  const context = [item.customerName, item.vehicleLabel, item.rentalLabel].filter(Boolean).join(" · ");
+  // A time of day only for jobs someone gave a time to; jobs the app raises carry the moment they were raised, which means nothing.
+  const time = item.kind === "task" && !item.action ? timeLabel(item.dueAt) : null;
+  // The booking number is on the booking; here the customer and the vehicle say which one it is.
+  const context = [item.customerName, item.vehicleLabel].filter(Boolean).join(" · ") || item.rentalLabel || "";
+  const heading = headingOf(item);
 
   return (
     <div className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-start">
@@ -264,10 +293,11 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
         )}
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            <p className="font-bold text-[var(--foreground)]">{coversSeveral ? `Receipt for ${receipt.paymentIds.length} payments` : receipt ? item.paymentLabel || item.title : item.action === "swap_handover" || item.action === "swap_collection" ? item.title.split(" to ")[0].split(" from ")[0] : item.title}</p>
+            <p className="font-bold text-[var(--foreground)]">{coversSeveral ? `Receipt for ${receipt.paymentIds.length} payments` : receipt ? item.paymentLabel || item.title : heading.title}</p>
             {item.amount != null ? <span className="font-semibold text-[var(--foreground)]">{money(receipt ? receipt.total : item.amount)}</span> : null}
             {item.kind === "task" && !item.action && String(item.taskType || "") !== "admin" ? <Badge tone="neutral">{taskTypeLabel(item.taskType)}</Badge> : null}
           </div>
+          {heading.detail && !receipt ? <p className="mt-0.5 text-sm text-[var(--foreground-secondary)]">{heading.detail}</p> : null}
           {context ? (
             item.rentalId || item.vehicleId ? (
               <Link className="mt-0.5 block text-sm text-[var(--foreground-secondary)] underline decoration-[var(--border-strong)] underline-offset-2 sm:truncate" href={item.rentalId ? `/bookings/${item.rentalId}` : `/fleet/${item.vehicleId}`}>
@@ -279,9 +309,9 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
           ) : null}
           <p className={`mt-0.5 text-xs font-semibold ${overdue ? "text-[var(--danger)]" : "text-[var(--muted)]"}`}>
             {item.completedAt
-              ? `Done ${dayLabel(new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date(item.completedAt)), today)}`
+              ? `Done ${dayInSentence(new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date(item.completedAt)), today)}`
               : item.dueDate
-                ? `${overdue ? "Was due" : "Due"} ${dayLabel(item.dueDate, today)}${time ? ` · ${time}` : ""}`
+                ? `${overdue ? "Was due" : "Due"} ${dayInSentence(item.dueDate, today)}${time ? ` · ${time}` : ""}`
                 : "No due date"}
           </p>
           {coversSeveral ? (

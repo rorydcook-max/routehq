@@ -641,8 +641,8 @@ export function ReportsView({ data }: { data: ReportsData }) {
 
       <DepositsCard data={data.depositSummary} />
 
-      {/* Monthly Chart */}
-      {data.monthlyData.length > 0 ? (
+      {/* Month by month: only when there are at least two months to compare. One month is already in the tiles above, and a single bar drew as a stray block. */}
+      {data.monthlyData.length > 1 ? (
         <div className="content-section">
           <div className="mb-3 flex items-center gap-2">
             <TrendingUp size={16} className="text-[var(--primary)]" />
@@ -657,8 +657,8 @@ export function ReportsView({ data }: { data: ReportsData }) {
                   <YAxis tickFormatter={(v) => `฿${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} />
                   <Tooltip formatter={(v) => money(Number(v))} />
                   <Legend />
-                  <Bar dataKey="revenue" name="Money in" fill="#0f766e" radius={[2, 2, 0, 0]} />
-                  <Bar dataKey="expenses" name="Money out" fill="#fca5a5" radius={[2, 2, 0, 0]} />
+                  <Bar dataKey="revenue" name="Money in" fill="#0f766e" maxBarSize={44} radius={[2, 2, 0, 0]} />
+                  <Bar dataKey="expenses" name="Money out" fill="#fca5a5" maxBarSize={44} radius={[2, 2, 0, 0]} />
                   <Line type="monotone" dataKey="profit" name="Profit" stroke="#2563eb" strokeWidth={2} dot={{ r: 3 }} />
                 </ComposedChart>
               </ResponsiveContainer>

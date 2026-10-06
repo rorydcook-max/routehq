@@ -64,6 +64,54 @@ function paymentDescription(row: any, vehicle: any) {
   return `${month} rental payment - ${[vehicle?.make, vehicle?.model].filter(Boolean).join(" ") || vehicleLabel(vehicle)}`;
 }
 
+/**
+ * Every payment the business is waiting for that is overdue, due today or due
+ * in the next week, soonest first. Shown at the top of "Record money" so the
+ * usual case (rent arrived) is one tap, not a form to fill in.
+ */
+export async function listPaymentsWaiting(orgId: string): Promise<MatchResult[]> {
+  if (!orgId) return [];
+  const supabase = (await createSupabaseServerClient()) as any;
+  const today = businessToday();
+  const { data, error } = await supabase
+    .from("rental_payments")
+    .select("id, rental_id, amount, due_date, status, voided, metadata, rentals!inner(id, status, vehicle_id, customer_id, vehicles!rentals_vehicle_id_fkey(registration_number, make, model), customers!rentals_customer_id_fkey(full_name))")
+    .eq("organization_id", orgId)
+    .in("status", ["pending", "overdue", "scheduled"])
+    .is("deleted_at", null)
+    .lte("due_date", businessToday(7))
+    .neq("rentals.status", "cancelled")
+    .order("due_date", { ascending: true })
+    .limit(40);
+  if (error) return [];
+  return ((data || []) as any[])
+    .filter((row) => !row.voided && !row.metadata?.voided && Number(row.amount || 0) > 0)
+    .map((row) => {
+      const rental = row.rentals || {};
+      const vehicle = rental.vehicles || {};
+      const isDeposit = String(row.metadata?.type || "") === "deposit";
+      const due = dateOnly(row.due_date);
+      const name = [vehicle?.make, vehicle?.model].filter(Boolean).join(" ") || vehicleLabel(vehicle);
+      const label = isDeposit ? `Deposit - ${name}` : paymentDescription(row, vehicle);
+      const amount = Number(row.amount || 0);
+      return {
+        id: `payment-${row.id}`,
+        matchType: "rental_payment" as const,
+        confidence: "high" as const,
+        label: `${money(amount)} · ${isDeposit ? "deposit" : "rent"} · ${name}`,
+        subLabel: !due ? "" : due < today ? `was due ${shortDate(due)}` : due === today ? "due today" : `due ${shortDate(due)}`,
+        suggestedType: isDeposit ? "deposit_received" : "rental_income",
+        amount,
+        rentalId: row.rental_id,
+        rentalPaymentId: row.id,
+        customerId: rental.customer_id || undefined,
+        customerName: rental.customers?.full_name || undefined,
+        vehicleLabel: vehicleLabel(vehicle),
+        prefilledData: { amount, vehicleId: rental.vehicle_id || null, description: label, date: today }
+      };
+    });
+}
+
 function confidenceRank(value: "high" | "medium") {
   return value === "high" ? 0 : 1;
 }

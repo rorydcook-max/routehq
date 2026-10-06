@@ -125,13 +125,14 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
             {t("quickAdd")}
           </button>
         )}
-        <nav className="scrollbar-none min-h-0 flex-1 space-y-0.5 overflow-y-auto">
+        {/* On a short laptop screen the rows tighten so every link, Settings included, stays in view without scrolling. */}
+        <nav className="min-h-0 flex-1 space-y-0.5 overflow-y-auto [scrollbar-width:thin]">
           {allNavItems.map((item, index) => {
             const Icon = item.icon;
             return (
               <Link
-                className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm font-semibold transition ${
-                  index === dailyItems.length ? "!mt-3 " : ""
+                className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm font-semibold transition [@media(max-height:920px)]:py-1 ${
+                  index === dailyItems.length ? "!mt-3 [@media(max-height:920px)]:!mt-1.5 " : ""
                 }${
                   isActive(item.href)
                     ? "bg-[var(--primary-light)] text-[var(--primary)]"

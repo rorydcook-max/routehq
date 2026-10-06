@@ -1,13 +1,12 @@
 import Link from "next/link";
-import { Archive, FileSpreadsheet, Plus } from "lucide-react";
-import { archiveVehicle, bulkArchiveVehicles, bulkDeleteVehicles, deleteVehicle } from "@/app/actions/vehicles";
+import { FileSpreadsheet, Plus } from "lucide-react";
+import { bulkArchiveVehicles, bulkDeleteVehicles } from "@/app/actions/vehicles";
 import { AppShell } from "@/components/app-shell";
-import { PendingButton } from "@/components/pending-button";
 import { Badge, EmptyState, ProgressBar } from "@/components/ui";
 import { OutFreeSummary, VehicleKindIcon } from "@/components/vehicle-kind-icon";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDashboardData, money } from "@/lib/dashboard";
-import { ConfirmDeleteVehicleButton, FleetBulkActions } from "@/app/fleet/fleet-actions";
+import { FleetBulkActions } from "@/app/fleet/fleet-actions";
 import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization";
 import { groupVehiclesByKind, kindLabel } from "@/lib/vehicle-groups";
 
@@ -142,10 +141,9 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                     <th className="py-2.5 pr-3">Vehicle</th>
                     <th className="px-3 py-2.5">Status</th>
                     <th className="px-3 py-2.5">Monthly rate</th>
-                    <th className="hidden px-3 py-2.5 xl:table-cell">Rented (12 mo)</th>
+                    <th className="hidden px-3 py-2.5 xl:table-cell">On rent, last 12 months</th>
                     <th className="px-3 py-2.5">Paperwork</th>
-                    <th className="hidden px-3 py-2.5 xl:table-cell">Profit</th>
-                    <th className="hidden px-3 py-2.5 pr-4 xl:table-cell"><span className="sr-only">Actions</span></th>
+                    <th className="hidden px-3 py-2.5 pr-4 xl:table-cell">Profit</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -183,18 +181,6 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                         </td>
                         <td className="hidden px-3 py-3 xl:table-cell">
                           <span className={`font-mono-data ${vehicle.profit < 0 ? "text-[var(--danger)]" : ""}`}>{money(vehicle.profit)}</span>
-                        </td>
-                        <td className="hidden px-3 py-3 pr-4 xl:table-cell">
-                          <div className="flex justify-end gap-1.5 opacity-60 transition group-hover:opacity-100">
-                            <form action={archiveVehicle}>
-                              <input name="vehicleId" type="hidden" value={vehicle.id} />
-                              <input name="organizationId" type="hidden" value={organization.id} />
-                              <PendingButton aria-label={`Archive ${vehicle.make} ${vehicle.model}`} className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--border)] bg-white text-[var(--foreground-secondary)] hover:border-[var(--primary)] hover:text-[var(--primary)]" title="Archive vehicle" type="submit">
-                                <Archive size={15} />
-                              </PendingButton>
-                            </form>
-                            <ConfirmDeleteVehicleButton deleteAction={deleteVehicle} label={`${vehicle.make} ${vehicle.model}`} organizationId={organization.id} vehicleId={vehicle.id} />
-                          </div>
                         </td>
                       </tr>
                     );

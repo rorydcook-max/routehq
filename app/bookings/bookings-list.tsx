@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { CalendarDays, Car, Clock, Search, Trash2, UserRound, MoreHorizontal } from "lucide-react";
 import { deleteBooking, extendBookingHold } from "@/app/actions/bookings";
@@ -206,6 +206,12 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
+  // "/bookings?status=overdue" opens on that filter, so other pages can link straight to "late returns" and the like.
+  useEffect(() => {
+    const wanted = new URLSearchParams(window.location.search).get("status");
+    if (wanted && (filters as readonly string[]).includes(wanted)) setFilter(wanted as (typeof filters)[number]);
+  }, []);
+
   function handleDelete(bookingId: string) {
     setDeleteError(null);
     startTransition(async () => {
@@ -249,7 +255,8 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
               value={search}
             />
           </label>
-          <div className="scrollbar-none -mx-3 flex gap-1.5 overflow-x-auto px-3 sm:mx-0 sm:flex-wrap sm:px-0 xl:justify-end">
+          {/* Wraps onto a second row on a phone: scrolling sideways hid half the filters with no sign they were there. */}
+          <div className="flex flex-wrap gap-1.5 xl:justify-end">
             {filters.map((entry) => (
               <button
                 className={`pressable min-h-8 min-w-fit rounded-md border px-3 py-1.5 text-[12px] font-semibold ${filter === entry ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-[#fbfaf8] text-[var(--foreground-secondary)]"}`}
@@ -299,17 +306,19 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                 </Link>
 
                 <div className="min-w-0 py-0.5">
-                  <div className="flex flex-wrap items-center gap-1.5">
+                  {/* One badge for where the booking is, and one more only while it waits on the customer's link. The dots stay in the corner however the badges wrap. */}
+                  <div className="flex items-start gap-1.5">
+                  <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
                     <Badge tone={statusTone(effectiveStatus)}>{STATUS_LABELS[effectiveStatus] || effectiveStatus.replace(/_/g, " ")}</Badge>
-                    {linkLabel(booking.booking_link?.status) ? (
+                    {["booked", "draft"].includes(effectiveStatus) && linkLabel(booking.booking_link?.status) ? (
                     <Badge tone={["completed", "contract_signed"].includes(String(booking.booking_link?.status)) ? "green" : booking.booking_link?.status === "viewed" ? "blue" : "amber"}>
                       {linkLabel(booking.booking_link?.status)}
                     </Badge>
                   ) : null}
-                    {!booking.customers ? <Badge tone="amber">Awaiting details</Badge> : null}
-                    <span className="font-mono-data ml-1 text-[11px] font-semibold uppercase tracking-[0.04em] text-[var(--muted)]">{bookingReference(booking)}</span>
+                    <span className="font-mono-data ml-1 hidden text-[11px] font-semibold uppercase tracking-[0.04em] text-[var(--muted)] sm:inline">{bookingReference(booking)}</span>
+                  </div>
                     {/* Edit, extend, cancel and delete stay one tap away without crowding every card. */}
-                    <details className="relative z-10 ml-auto">
+                    <details className="relative z-10 ml-auto shrink-0">
                       <summary aria-label="More options" className="pressable flex h-8 w-8 cursor-pointer list-none items-center justify-center rounded-full text-[var(--muted)] hover:bg-[var(--panel-secondary)] [&::-webkit-details-marker]:hidden">
                         <MoreHorizontal size={18} />
                       </summary>

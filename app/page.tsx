@@ -68,6 +68,8 @@ type AgendaItem = {
   href: string;
   action: string;
   when?: string;
+  /** What kind of thing it is, most pressing first: 0 a vehicle that should be back, 1 today's handovers and returns, 2 a customer waiting, 3 money, 4 other jobs, 5 paperwork. */
+  rank?: number;
 };
 
 const TONE_CLASSES: Record<Tone, string> = {
@@ -204,6 +206,7 @@ export default async function Home() {
       const late = blockedBy(r)!;
       todayItems.push({
         key: `at-risk-${r.id}`,
+        rank: 0,
         tone: "red",
         icon: <KeyRound size={17} />,
         title: `Vehicle not back for ${who}`,
@@ -214,23 +217,23 @@ export default async function Home() {
     } else if (r.status === "Booked" && r.hasCustomer === false) {
       // The link is out but nobody has filled it in: there is no one to hand over to yet.
       if (r.start <= weekAhead) {
-        const item = { tone: (r.start <= today ? "red" : "amber") as "red" | "amber", icon: <KeyRound size={17} />, title: `Booking link not filled in · ${r.vehicle}`, href: `/bookings/${r.id}`, action: "Open" };
-        if (r.start <= today) todayItems.push({ ...item, key: `link-waiting-${r.id}`, detail: `Rental ${r.start === today ? "starts today" : `was due to start ${shortDate(r.start)}`}. Send the link again or cancel it.` });
+        const item = { rank: 3, tone: (r.start <= today ? "red" : "amber") as "red" | "amber", icon: <KeyRound size={17} />, title: `Booking link not filled in · ${r.vehicle}`, href: `/bookings/${r.id}`, action: "Open" };
+        if (r.start <= today) todayItems.push({ ...item, key: `link-waiting-${r.id}`, detail: `Rental ${r.start === today ? "starts today" : `was due to start ${shortDate(r.start)}`}. Send the customer the link, or cancel the booking.` });
         else upcomingItems.push({ ...item, key: `link-waiting-${r.id}`, sort: r.start, detail: "Waiting for the customer", when: dayLabel(r.start) });
       }
     } else if (r.status === "Booked") {
       if (r.start < today) {
-        todayItems.push({ key: `late-out-${r.id}`, tone: "red", icon: <KeyRound size={17} />, title: `Handover late · ${r.vehicle}`, detail: `${who} · was due ${shortDate(r.start)}`, href: `/inspections/delivery/${r.id}`, action: "Hand over" });
+        todayItems.push({ key: `late-out-${r.id}`, rank: 1, tone: "red", icon: <KeyRound size={17} />, title: `Handover late · ${r.vehicle}`, detail: `${who} · was due ${shortDate(r.start)}`, href: `/inspections/delivery/${r.id}`, action: "Hand over" });
       } else if (r.start === today) {
-        todayItems.push({ key: `out-${r.id}`, tone: "teal", icon: <KeyRound size={17} />, title: `Hand over ${r.vehicle}`, detail: who, href: `/inspections/delivery/${r.id}`, action: "Hand over" });
+        todayItems.push({ key: `out-${r.id}`, rank: 1, tone: "teal", icon: <KeyRound size={17} />, title: `Hand over ${r.vehicle}`, detail: who, href: `/inspections/delivery/${r.id}`, action: "Hand over" });
       } else if (r.start <= weekAhead) {
         upcomingItems.push({ key: `soon-out-${r.id}`, sort: r.start, tone: "teal", icon: <KeyRound size={17} />, title: `Hand over ${r.vehicle}`, detail: who, when: dayLabel(r.start), href: `/bookings/${r.id}`, action: "View" });
       }
     } else if (r.end && r.end !== "Indefinite") {
       if (r.end < today) {
-        todayItems.push({ key: `late-in-${r.id}`, tone: "red", icon: <RotateCcw size={17} />, title: `Return late · ${r.vehicle}`, detail: `${who} · was due back ${shortDate(r.end)}${nextBookingFor(r) ? ` · ${nextBookingFor(r)!.customer} has it booked from ${shortDate(nextBookingFor(r)!.start)}` : ""}`, href: `/inspections/return/${r.id}`, action: "Check in" });
+        todayItems.push({ key: `late-in-${r.id}`, rank: 0, tone: "red", icon: <RotateCcw size={17} />, title: `Return late · ${r.vehicle}`, detail: `${who} · was due back ${shortDate(r.end)}${nextBookingFor(r) ? ` · ${nextBookingFor(r)!.customer} has it booked from ${shortDate(nextBookingFor(r)!.start)}` : ""}`, href: `/inspections/return/${r.id}`, action: "Check in" });
       } else if (r.end === today) {
-        todayItems.push({ key: `in-${r.id}`, tone: "blue", icon: <RotateCcw size={17} />, title: `${r.vehicle} coming back`, detail: who, href: `/inspections/return/${r.id}`, action: "Check in" });
+        todayItems.push({ key: `in-${r.id}`, rank: 1, tone: "blue", icon: <RotateCcw size={17} />, title: `${r.vehicle} coming back`, detail: who, href: `/inspections/return/${r.id}`, action: "Check in" });
       } else if (r.end <= weekAhead) {
         upcomingItems.push({ key: `soon-in-${r.id}`, sort: r.end, tone: "blue", icon: <RotateCcw size={17} />, title: `${r.vehicle} due back`, detail: who, when: dayLabel(r.end), href: `/bookings/${r.id}`, action: "View" });
       }
@@ -240,6 +243,7 @@ export default async function Home() {
     const since = r.overdueSince ? daysBetween(r.overdueSince, today) : 0;
     todayItems.push({
       key: `pay-${r.id}`,
+      rank: 3,
       tone: since > 7 ? "red" : "amber",
       icon: <Wallet size={17} />,
       title: `${money(r.overdue || 0)} overdue`,
@@ -251,6 +255,7 @@ export default async function Home() {
   for (const r of receiptsWaiting) {
     todayItems.push({
       key: `receipt-${r.id}`,
+      rank: 3,
       tone: "teal",
       icon: <ReceiptText size={17} />,
       title: `Receipt to check · ${money(r.amount)}`,
@@ -266,6 +271,7 @@ export default async function Home() {
         const lapsed = item.label === "Service" ? "overdue" : "expired";
         paperwork.push({
           key: `doc-${v.id}-${item.key}`,
+          rank: 5,
           tone: item.daysLeft < 0 ? "red" : "amber",
           icon: <FileWarning size={17} />,
           title: item.daysLeft < 0 ? `${item.label} ${lapsed} · ${name}` : `${item.label} due · ${name}`,
@@ -287,6 +293,7 @@ export default async function Home() {
     const names = Array.from(new Set(paperwork.map((item) => item.title.split(" · ")[1])));
     todayItems.push({
       key: "paperwork",
+      rank: 5,
       tone: expired > 0 ? "red" : "amber",
       icon: <FileWarning size={17} />,
       title: `${plural(paperwork.length, "document")} to renew`,
@@ -308,6 +315,7 @@ export default async function Home() {
     const asks = waiting ? requestsOn(job.rentalId) : 0;
     todayItems.push({
       key: `job-${job.id}`,
+      rank: waiting ? 2 : 4,
       tone: waiting ? "red" : job.dueDate && job.dueDate < today ? "amber" : "neutral",
       icon: <Bell size={17} />,
       title: waiting ? `${job.customerName || "A customer"} is waiting for ${asks > 1 ? `${asks} answers` : "your answer"}` : job.action === "swap_handover" || job.action === "swap_collection" ? job.title.split(" to ")[0].split(" from ")[0] : job.title.split(" - ")[0],
@@ -317,15 +325,16 @@ export default async function Home() {
     });
   }
   if (jobRows.length > 3) {
-    todayItems.push({ key: "jobs-more", tone: "neutral", icon: <Bell size={17} />, title: `${plural(jobRows.length - 3, "more job")} on To do`, detail: "Forms, refunds and follow-ups due now", href: "/tasks", action: "Open" });
+    todayItems.push({ key: "jobs-more", rank: 6, tone: "neutral", icon: <Bell size={17} />, title: `${plural(jobRows.length - 3, "more job")} on To do`, detail: "Forms, refunds and follow-ups due now", href: "/tasks", action: "Open" });
   }
   for (const reminder of reminders) {
     if (reminder.due && reminder.due <= today) {
-      todayItems.push({ key: `rem-${reminder.id}`, tone: "neutral", icon: <Bell size={17} />, title: reminder.title, detail: reminder.target, href: "/tasks", action: "Open" });
+      todayItems.push({ key: `rem-${reminder.id}`, rank: 5, tone: "neutral", icon: <Bell size={17} />, title: reminder.title, detail: reminder.target, href: "/tasks", action: "Open" });
     }
   }
   const toneOrder: Record<Tone, number> = { red: 0, amber: 1, teal: 2, blue: 3, neutral: 4 };
-  todayItems.sort((a, b) => toneOrder[a.tone] - toneOrder[b.tone]);
+  // By kind first (a late return and today's handovers before admin jobs, however overdue those are), then by urgency.
+  todayItems.sort((a, b) => (a.rank ?? 4) - (b.rank ?? 4) || toneOrder[a.tone] - toneOrder[b.tone]);
   upcomingItems.sort((a, b) => a.sort.localeCompare(b.sort));
 
   const onRent = rentals.filter((r) => r.status !== "Booked").sort((a, b) => String(a.end).localeCompare(String(b.end)));
@@ -333,7 +342,6 @@ export default async function Home() {
 
   return (
     <AppShell userEmail={userEmail}>
-      <PushToggle variant="prompt" />
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-[13px] font-medium text-[var(--muted)]">{headerDate}</p>
@@ -350,6 +358,7 @@ export default async function Home() {
         </Link>
       </div>
 
+      <PushToggle variant="prompt" />
       {!onboardingStatus.hidden ? (
         <div className="mb-5">
           <OnboardingChecklist

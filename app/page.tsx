@@ -351,7 +351,7 @@ export default async function Home() {
       </div>
 
       {/* The two numbers that decide the day, then the money. Nothing below 14px, nothing faded. */}
-      <div className="mb-4 grid grid-cols-2 gap-3">
+      <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Link className={`pressable flex flex-col gap-0.5 rounded-[var(--radius)] p-4 text-white ${urgentCount > 0 ? "bg-[var(--danger)]" : "bg-[var(--success)]"}`} href="/tasks">
           <span className="text-[34px] font-bold leading-none tabular-nums">{urgentCount}</span>
           <span className="font-semibold">{t("tileUrgent")}</span>
@@ -360,8 +360,7 @@ export default async function Home() {
           <span className="text-[34px] font-bold leading-none tabular-nums">{todayItems.length}</span>
           <span className="font-semibold">{t("tileToday")}</span>
         </Link>
-      </div>
-      <div className="card mb-5 flex items-center justify-between gap-4 px-4 py-3.5">
+      <div className="card col-span-2 flex items-center justify-between gap-4 px-4 py-3.5">
         <Link className="min-w-0" href="/tasks">
           <span className="block font-semibold text-[var(--muted)]">{t("overdue")}</span>
           <span className={`block text-[24px] font-bold leading-tight tabular-nums ${overdueTotal > 0 ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{money(overdueTotal)}</span>
@@ -370,6 +369,7 @@ export default async function Home() {
           <span className="block font-semibold text-[var(--muted)]">{t("moneyThisMonth")}</span>
           <span className="block text-[24px] font-bold leading-tight tabular-nums text-[var(--success)]">{money(metrics.monthlyRevenue)}</span>
         </Link>
+      </div>
       </div>
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">

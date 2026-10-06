@@ -743,7 +743,7 @@ export function BookingForm({
                         {(() => {
                           const note = disabled ? null : availabilityNote(busyPeriods[vehicle.id] || [], businessToday(), say, locale);
                           return (
-                            <Badge tone={disabled ? "neutral" : note ? "amber" : selected ? "green" : "blue"}>
+                            <Badge tone={disabled ? "neutral" : note ? "amber" : "green"}>
                               {disabled ? (t.has(`vs_${vehicle.status}`) ? say(`vs_${vehicle.status}`) : vehicle.status) : note || say("vs_available")}
                             </Badge>
                           );

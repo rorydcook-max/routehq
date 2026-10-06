@@ -382,8 +382,8 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
   const line = heading.detail && !receipt ? [heading.detail, context].filter(Boolean).join(" · ") : context;
 
   return (
-    <div className="card flex flex-col gap-3.5 p-4">
-      <div className="flex items-center gap-3.5">
+    <div className="card flex flex-col gap-3.5 p-4 lg:flex-row lg:items-center lg:gap-6">
+      <div className="flex items-center gap-3.5 lg:min-w-0 lg:flex-1">
         <KindChip kind={jobKind(item)} />
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
@@ -440,7 +440,7 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
       </div>
 
       {/* Buttons share the full card width so a row of two or three never breaks onto a second line. */}
-      <div className="flex items-center gap-2 [&>*]:min-w-0 [&>*]:flex-1 [&>a]:justify-center [&>button]:justify-center [&_button]:w-full [&_form]:min-w-0 [&_form]:flex-1">
+      <div className="flex items-center gap-2 [&>*]:min-w-0 [&>*]:flex-1 [&>a]:justify-center [&>button]:justify-center [&_button]:w-full [&_form]:min-w-0 [&_form]:flex-1 lg:shrink-0 lg:[&>*]:flex-none lg:[&_button]:w-auto">
         {receipt?.url ? (
           <a className="secondary-action pressable min-h-9 px-3 text-xs" href={receipt.url} rel="noreferrer" target="_blank">
             {tx.say("viewReceipt")}
@@ -572,7 +572,7 @@ export function TasksList({
             const limited = group.key === "later" && !showAllLater && group.items.length > laterLimit;
             const items = limited ? group.items.slice(0, laterLimit) : group.items;
             return (
-              <section className="space-y-2.5" key={group.key}>
+              <section className={`space-y-2.5 ${group.key === "week" || group.key === "later" ? "calm-actions" : ""}`} key={group.key}>
                 <div className="flex items-center gap-2.5 px-1 pt-1">
                   <h2 className="text-[18px] font-bold text-[var(--foreground)]">{tx.say(`group_${group.key}`)}</h2>
                   <span className={`inline-flex min-w-7 items-center justify-center rounded-full px-2 py-0.5 text-[14px] font-bold ${group.tone === "red" ? "bg-[var(--danger)] text-white" : "bg-[var(--panel-tertiary)] text-[var(--foreground)]"}`}>{group.items.length}</span>

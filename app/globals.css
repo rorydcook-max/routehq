@@ -1091,6 +1091,30 @@ body {
 .text-\[9px\] {
   font-size: 13px !important;
 }
+/* A box inside a card is tinted, not outlined: a border inside a borderless
+   card read as a box in a box. Fields keep their own outline. */
+.card [class*="rounded"][class*="border-[var(--border)]"]:not(input):not(select):not(textarea):not(details):not(summary),
+.content-section [class*="rounded"][class*="border-[var(--border)]"]:not(input):not(select):not(textarea):not(details):not(summary) {
+  background-color: var(--panel-secondary);
+  border-color: transparent !important;
+}
+
+/* Shouty micro-labels ("PAPERWORK DUE NEXT") become plain labels: sentence case, no tracking. */
+.uppercase {
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+.uppercase.font-bold {
+  font-weight: 600 !important;
+}
+
+/* Jobs that are not due yet keep their buttons quiet, so the solid ones mean "now". */
+.calm-actions .primary-action {
+  background: var(--panel);
+  border: 2px solid var(--border-strong);
+  color: var(--foreground);
+}
+
 .phone-bar-item { font-size: 12px !important; }
 .phone-bar-badge { font-size: 11px !important; line-height: 1 !important; }
 

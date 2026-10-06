@@ -595,7 +595,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               </div>
             </div>
             {/* Two main actions side by side, More underneath: nothing wraps onto a second line. */}
-            <div className="grid grid-cols-2 gap-2 [&>*]:min-w-0 [&>a]:flex [&>a]:w-full [&>details]:col-span-2 [&_button]:w-full">
+            <div className="grid grid-cols-2 gap-2 [&>*]:min-w-0 [&>a]:flex [&>a]:w-full [&>details]:col-span-2 [&_button]:w-full lg:flex lg:flex-wrap lg:[&>a]:w-auto lg:[&>details]:w-auto lg:[&>details_summary]:w-auto lg:[&_button]:w-auto">
               {awaitingSignature ? (
                 <a className="pressable inline-flex min-h-9 min-w-fit items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-bold text-white shadow-sm" href="#send-link">
                   {tx.say("sendLink")}

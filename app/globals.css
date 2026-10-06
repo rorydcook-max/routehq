@@ -158,8 +158,8 @@ input[type="radio"] {
   color: var(--foreground-secondary);
   cursor: pointer;
   display: flex;
-  font-size: 13px;
-  gap: 8px;
+  font-size: 15px;
+  gap: 10px;
   line-height: 1.4;
   margin-bottom: 0;
   user-select: none;

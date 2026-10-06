@@ -77,7 +77,7 @@ export default async function AmendmentPage({ params }: { params: Promise<{ toke
             {amendment.rows.map((row) => (
               <div className="rounded-xl border border-[var(--border)] bg-[#fbfaf8] p-3" key={row.label}>
                 <p className="text-xs font-semibold uppercase text-[var(--muted)]">{({ Vehicle: t("rowVehicle"), "Return date": t("rowReturnDate"), "Charge for the extension": t("rowExtensionCharge"), "Rental rate": t("rowRentalRate"), "Security deposit": t("rowDeposit") } as Record<string, string>)[row.label] || row.label}</p>
-                <p className="mt-1 text-sm font-semibold text-[var(--foreground)]">{row.after}</p>
+                <p className="mt-1 text-sm font-semibold text-[var(--foreground)]"><bdi>{row.after}</bdi></p>
               </div>
             ))}
           </div>

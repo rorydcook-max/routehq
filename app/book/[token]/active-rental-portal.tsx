@@ -1,5 +1,6 @@
 "use client";
 
+import { customerDate } from "@/lib/i18n/customer-dates";
 import { businessToday } from "@/lib/business-time";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -364,7 +365,7 @@ function today() {
 /** "2026-11-04" -> "4 Nov 2026". */
 function niceDate(iso: string, locale = "en") {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso;
-  return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : `${locale}-u-ca-gregory`, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${iso}T00:00:00Z`));
+  return customerDate(iso, locale);
 }
 
 function addDaysLocal(iso: string, days: number) {

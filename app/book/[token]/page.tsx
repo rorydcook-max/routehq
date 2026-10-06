@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { customerDate } from "@/lib/i18n/customer-dates";
 import { AlertTriangle, CalendarDays, Clock, CreditCard, MapPin, ReceiptText, ShieldCheck } from "lucide-react";
 import { VehicleKindIcon } from "@/components/vehicle-kind-icon";
 import { kindFromCategory } from "@/lib/vehicle-groups";
@@ -206,7 +207,7 @@ function formatSummaryDate(value: unknown, t: T, locale: string) {
   const match = date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (!match) return date;
   // Western year numbering everywhere, so a date on this page matches the same date on the agreement.
-  return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : `${locale}-u-ca-gregory`, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]))));
+  return customerDate(date, locale);
 }
 
 async function ErrorState({ title, message, contact, rebookHref, rebookLabel }: { title: string; message: string; contact?: string | null; rebookHref?: string | null; rebookLabel?: string }) {
@@ -322,7 +323,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
               </span>
               <div>
                 <h2 className="text-2xl font-semibold">{vehicleTitle(vehicle)}</h2>
-                <p className="mt-1 text-sm font-bold text-[var(--muted)]">{vehicle.registration_number || t("platePending")} {vehicle.color ? `- ${vehicle.color}` : ""}</p>
+                <p className="mt-1 text-sm font-bold text-[var(--muted)]"><bdi>{vehicle.registration_number || t("platePending")}</bdi>{vehicle.color ? <> · <bdi>{vehicle.color}</bdi></> : null}</p>
               </div>
             </div>
             <div className="mt-4 grid grid-cols-2 gap-3">

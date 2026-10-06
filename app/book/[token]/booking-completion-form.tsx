@@ -2019,7 +2019,7 @@ function UploadCard({
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 6 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
           <Icon size={16} style={{ color: "var(--primary)", flexShrink: 0 }} />
-          <span style={{ fontSize: 13, fontWeight: 600, color: "#0f172a", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label}</span>
+          <span style={{ fontSize: 13, fontWeight: 600, color: "#0f172a", lineHeight: 1.3 }}>{label}</span>
         </div>
         {complete || selectedFile ? (
           <span style={{ fontSize: 11, color: "#16a34a", fontWeight: 500, flexShrink: 0 }}>
@@ -2033,13 +2033,14 @@ function UploadCard({
 
       {!complete ? (
         <>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
             <label
               style={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 gap: 6,
+                flex: "1 1 auto",
                 padding: "12px 12px",
                 minHeight: 44,
                 borderRadius: 7,
@@ -2078,6 +2079,7 @@ function UploadCard({
                 alignItems: "center",
                 justifyContent: "center",
                 gap: 6,
+                flex: "1 1 auto",
                 padding: "12px 12px",
                 minHeight: 44,
                 borderRadius: 7,

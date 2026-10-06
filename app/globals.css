@@ -1261,3 +1261,9 @@ aside a[class*="bg-[var(--sidebar-active)]"] {
    would otherwise cover them until the very end of the page. */
 .sticky-actions { bottom: 73px; }
 @media (min-width: 1024px) { .sticky-actions { bottom: 0; } }
+
+/* Burmese stacks marks above and below the line, so it needs more room between
+   lines than Latin text or the rows run into each other. */
+:lang(my) :is(p, span, h1, h2, h3, h4, label, button, a, summary, li, dt, dd, legend, small, strong) {
+  line-height: 1.8 !important;
+}

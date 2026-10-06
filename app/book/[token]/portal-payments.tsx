@@ -1,5 +1,6 @@
 "use client";
 
+import { customerDate } from "@/lib/i18n/customer-dates";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -17,9 +18,7 @@ type OrgPayment = {
 } | null;
 
 function shortDate(iso: string, locale: string) {
-  const match = iso.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if (!match) return iso;
-  return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : locale, { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]))));
+  return customerDate(iso, locale, false);
 }
 
 function money(amount: number, currency: string) {

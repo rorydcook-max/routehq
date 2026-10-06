@@ -1,5 +1,6 @@
 "use client";
 
+import { customerDate } from "@/lib/i18n/customer-dates";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
@@ -19,7 +20,7 @@ function addDays(iso: string, days: number) {
 }
 
 function shortDate(iso: string, locale = "en") {
-  return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : locale, { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${iso}T00:00:00Z`));
+  return customerDate(iso, locale, false);
 }
 
 export function Catalog({

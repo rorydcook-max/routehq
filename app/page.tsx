@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { Route } from "next";
 import type { ReactNode } from "react";
+import { getLocale, getTranslations } from "next-intl/server";
+import { dayOfWeekDate, intlLocale, shortDate as shortDateIn } from "@/lib/i18n/dates";
 import { ArrowRight, Bell, CalendarClock, CheckCircle2, FileWarning, KeyRound, Plus, ReceiptText, RotateCcw, Wallet } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { businessToday } from "@/lib/business-time";
@@ -25,24 +27,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isExpenseTransaction, isRevenueTransaction } from "@/lib/transaction-options";
 import { groupVehiclesByKind } from "@/lib/vehicle-groups";
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-/** "2026-09-27" -> "27 Sep". */
-function shortDate(value: string) {
-  const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if (!match) return value;
-  return `${Number(match[3])} ${MONTHS[Number(match[2]) - 1]}`;
-}
-
-/** "2026-09-30" -> "Tue 30 Sep". */
-function dayLabel(value: string) {
-  const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if (!match) return value;
-  const weekday = WEEKDAYS[new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]))).getUTCDay()];
-  return `${weekday} ${shortDate(value)}`;
-}
-
+// Dates and counts are worded by the translation files (see lib/i18n/dates.ts and locales/).
 function addDays(isoDate: string, days: number) {
   const date = new Date(`${isoDate}T00:00:00Z`);
   date.setUTCDate(date.getUTCDate() + days);
@@ -53,10 +38,7 @@ function daysBetween(from: string, to: string) {
   return Math.round((new Date(`${to}T00:00:00Z`).getTime() - new Date(`${from}T00:00:00Z`).getTime()) / 86_400_000);
 }
 
-function plural(count: number, word: string) {
-  return `${count} ${word}${count === 1 ? "" : "s"}`;
-}
-
+// (see locales/<language>/common.json for the wording)
 type Tone = "red" | "amber" | "teal" | "blue" | "neutral";
 
 type AgendaItem = {
@@ -125,12 +107,17 @@ function PanelLink({ href, children }: { href: string; children: ReactNode }) {
 export default async function Home() {
   // Holds that ran out without a signature give their dates back before anything is counted.
   await getDefaultOrganization().then((org) => releaseExpiredHolds(createSupabaseAdminClient(), org.id)).catch(() => null);
-  const [userEmail, organization, dashboardData, supabase] = await Promise.all([
+  const [userEmail, organization, dashboardData, supabase, t, c, locale] = await Promise.all([
     getCurrentUserEmail(),
     getDefaultOrganization(),
     getDashboardData(),
-    createSupabaseServerClient()
+    createSupabaseServerClient(),
+    getTranslations("dashboard"),
+    getTranslations("common"),
+    getLocale()
   ]);
+  const shortDate = (value: string) => shortDateIn(value, locale);
+  const dayLabel = (value: string) => dayOfWeekDate(value, locale);
   const [onboardingStatus, categories, valueTrackerData] = await Promise.all([
     getOnboardingStatus(supabase as any, organization.id),
     getVehicleCategories(organization.id),
@@ -148,8 +135,8 @@ export default async function Home() {
   const today = businessToday();
   const weekAhead = addDays(today, 7);
   const bangkokHour = (now.getUTCHours() + 7) % 24;
-  const greeting = bangkokHour < 12 ? "Good morning" : bangkokHour < 18 ? "Good afternoon" : "Good evening";
-  const headerDate = now.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: "Asia/Bangkok" });
+  const greeting = bangkokHour < 12 ? t("goodMorning") : bangkokHour < 18 ? t("goodAfternoon") : t("goodEvening");
+  const headerDate = now.toLocaleDateString(intlLocale(locale), { weekday: "long", day: "numeric", month: "long", timeZone: "Asia/Bangkok" });
 
   // ── Money ────────────────────────────────────────────────────────────────
   // Expenses are stored as positive amounts, so they're recognised by type.
@@ -168,7 +155,7 @@ export default async function Home() {
   const lastSixMonths = Array.from({ length: 6 }, (_, index) => {
     const month = new Date(Date.UTC(Number(today.slice(0, 4)), Number(today.slice(5, 7)) - 6 + index, 1));
     const key = `${month.getUTCFullYear()}-${String(month.getUTCMonth() + 1).padStart(2, "0")}`;
-    return { key, label: MONTHS[month.getUTCMonth()], amount: revenueByMonth.get(key) || 0 };
+    return { key, label: new Intl.DateTimeFormat(intlLocale(locale), { month: "short", timeZone: "UTC" }).format(month), amount: revenueByMonth.get(key) || 0 };
   });
   const maxMonth = Math.max(1, ...lastSixMonths.map((month) => month.amount));
 
@@ -193,6 +180,7 @@ export default async function Home() {
   // ── Today: everything that needs doing now, most urgent first ───────────
   const todayItems: AgendaItem[] = [];
   const paperwork: AgendaItem[] = [];
+  const paperworkVehicle = new Map<string, string>();
   const upcomingItems: Array<AgendaItem & { sort: string }> = [];
   // A vehicle that is late back puts the next booking for it at risk.
   const sameVehicle = (a: (typeof rentals)[number], b: (typeof rentals)[number]) => (a.vehicleId && b.vehicleId ? a.vehicleId === b.vehicleId : !!a.plate && a.plate === b.plate);
@@ -201,7 +189,7 @@ export default async function Home() {
     rentals.filter((r) => r.status === "Booked" && r.id !== late.id && sameVehicle(r, late) && r.start <= weekAhead).sort((a, b) => a.start.localeCompare(b.start))[0] || null;
   const blockedBy = (booking: (typeof rentals)[number]) => lateBack.find((late) => late.id !== booking.id && sameVehicle(late, booking)) || null;
   for (const r of rentals) {
-    const who = r.customer || "Walk-in customer";
+    const who = r.customer || t("walkIn");
     if (r.status === "Booked" && r.start <= weekAhead && blockedBy(r)) {
       const late = blockedBy(r)!;
       todayItems.push({
@@ -209,33 +197,33 @@ export default async function Home() {
         rank: 0,
         tone: "red",
         icon: <KeyRound size={17} />,
-        title: `Vehicle not back for ${who}`,
-        detail: `${r.vehicle} · ${r.start <= today ? "handover was due" : "handover"} ${r.start === today ? "today" : shortDate(r.start)} · ${late.customer} was due back ${shortDate(late.end)}`,
+        title: t("notBackTitle", { who }),
+        detail: `${r.vehicle} · ${r.start === today ? t("handoverDueToday") : r.start < today ? t("handoverWasDueOn", { date: shortDate(r.start) }) : t("handoverOn", { date: shortDate(r.start) })} · ${t("whoWasDueBack", { who: late.customer, date: shortDate(late.end) })}`,
         href: `/bookings/${r.id}`,
-        action: "View"
+        action: t("view")
       });
     } else if (r.status === "Booked" && r.hasCustomer === false) {
       // The link is out but nobody has filled it in: there is no one to hand over to yet.
       if (r.start <= weekAhead) {
-        const item = { rank: 3, tone: (r.start <= today ? "red" : "amber") as "red" | "amber", icon: <KeyRound size={17} />, title: `Booking link not filled in · ${r.vehicle}`, href: `/bookings/${r.id}`, action: "Open" };
-        if (r.start <= today) todayItems.push({ ...item, key: `link-waiting-${r.id}`, detail: `Rental ${r.start === today ? "starts today" : `was due to start ${shortDate(r.start)}`}. Send the customer the link, or cancel the booking.` });
-        else upcomingItems.push({ ...item, key: `link-waiting-${r.id}`, sort: r.start, detail: "Waiting for the customer", when: dayLabel(r.start) });
+        const item = { rank: 3, tone: (r.start <= today ? "red" : "amber") as "red" | "amber", icon: <KeyRound size={17} />, title: t("linkNotFilled", { vehicle: r.vehicle }), href: `/bookings/${r.id}`, action: t("open") };
+        if (r.start <= today) todayItems.push({ ...item, key: `link-waiting-${r.id}`, detail: r.start === today ? t("linkStartsToday") : t("linkWasDueToStart", { date: shortDate(r.start) }) });
+        else upcomingItems.push({ ...item, key: `link-waiting-${r.id}`, sort: r.start, detail: t("waitingForCustomer"), when: dayLabel(r.start) });
       }
     } else if (r.status === "Booked") {
       if (r.start < today) {
-        todayItems.push({ key: `late-out-${r.id}`, rank: 1, tone: "red", icon: <KeyRound size={17} />, title: `Handover late · ${r.vehicle}`, detail: `${who} · was due ${shortDate(r.start)}`, href: `/inspections/delivery/${r.id}`, action: "Hand over" });
+        todayItems.push({ key: `late-out-${r.id}`, rank: 1, tone: "red", icon: <KeyRound size={17} />, title: t("handoverLate", { vehicle: r.vehicle }), detail: t("whoWasDue", { who, date: shortDate(r.start) }), href: `/inspections/delivery/${r.id}`, action: t("handOver") });
       } else if (r.start === today) {
-        todayItems.push({ key: `out-${r.id}`, rank: 1, tone: "teal", icon: <KeyRound size={17} />, title: `Hand over ${r.vehicle}`, detail: who, href: `/inspections/delivery/${r.id}`, action: "Hand over" });
+        todayItems.push({ key: `out-${r.id}`, rank: 1, tone: "teal", icon: <KeyRound size={17} />, title: t("handOverVehicle", { vehicle: r.vehicle }), detail: who, href: `/inspections/delivery/${r.id}`, action: t("handOver") });
       } else if (r.start <= weekAhead) {
-        upcomingItems.push({ key: `soon-out-${r.id}`, sort: r.start, tone: "teal", icon: <KeyRound size={17} />, title: `Hand over ${r.vehicle}`, detail: who, when: dayLabel(r.start), href: `/bookings/${r.id}`, action: "View" });
+        upcomingItems.push({ key: `soon-out-${r.id}`, sort: r.start, tone: "teal", icon: <KeyRound size={17} />, title: t("handOverVehicle", { vehicle: r.vehicle }), detail: who, when: dayLabel(r.start), href: `/bookings/${r.id}`, action: t("view") });
       }
     } else if (r.end && r.end !== "Indefinite") {
       if (r.end < today) {
-        todayItems.push({ key: `late-in-${r.id}`, rank: 0, tone: "red", icon: <RotateCcw size={17} />, title: `Return late · ${r.vehicle}`, detail: `${who} · was due back ${shortDate(r.end)}${nextBookingFor(r) ? ` · ${nextBookingFor(r)!.customer} has it booked from ${shortDate(nextBookingFor(r)!.start)}` : ""}`, href: `/inspections/return/${r.id}`, action: "Check in" });
+        todayItems.push({ key: `late-in-${r.id}`, rank: 0, tone: "red", icon: <RotateCcw size={17} />, title: t("returnLate", { vehicle: r.vehicle }), detail: `${t("whoWasDueBackDot", { who, date: shortDate(r.end) })}${nextBookingFor(r) ? ` · ${t("bookedFrom", { who: nextBookingFor(r)!.customer, date: shortDate(nextBookingFor(r)!.start) })}` : ""}`, href: `/inspections/return/${r.id}`, action: t("checkIn") });
       } else if (r.end === today) {
-        todayItems.push({ key: `in-${r.id}`, rank: 1, tone: "blue", icon: <RotateCcw size={17} />, title: `${r.vehicle} coming back`, detail: who, href: `/inspections/return/${r.id}`, action: "Check in" });
+        todayItems.push({ key: `in-${r.id}`, rank: 1, tone: "blue", icon: <RotateCcw size={17} />, title: t("comingBack", { vehicle: r.vehicle }), detail: who, href: `/inspections/return/${r.id}`, action: t("checkIn") });
       } else if (r.end <= weekAhead) {
-        upcomingItems.push({ key: `soon-in-${r.id}`, sort: r.end, tone: "blue", icon: <RotateCcw size={17} />, title: `${r.vehicle} due back`, detail: who, when: dayLabel(r.end), href: `/bookings/${r.id}`, action: "View" });
+        upcomingItems.push({ key: `soon-in-${r.id}`, sort: r.end, tone: "blue", icon: <RotateCcw size={17} />, title: t("dueBack", { vehicle: r.vehicle }), detail: who, when: dayLabel(r.end), href: `/bookings/${r.id}`, action: t("view") });
       }
     }
   }
@@ -246,10 +234,10 @@ export default async function Home() {
       rank: 3,
       tone: since > 7 ? "red" : "amber",
       icon: <Wallet size={17} />,
-      title: `${money(r.overdue || 0)} overdue`,
-      detail: `${r.customer} · ${r.vehicle}${since > 0 ? ` · ${plural(since, "day")} late` : ""}`,
+      title: t("amountOverdue", { amount: money(r.overdue || 0) }),
+      detail: `${r.customer} · ${r.vehicle}${since > 0 ? ` · ${t("daysLate", { days: since })}` : ""}`,
       href: `/bookings/${r.id}`,
-      action: "Collect"
+      action: t("collect")
     });
   }
   for (const r of receiptsWaiting) {
@@ -258,29 +246,31 @@ export default async function Home() {
       rank: 3,
       tone: "teal",
       icon: <ReceiptText size={17} />,
-      title: `Receipt to check · ${money(r.amount)}`,
-      detail: [r.customer, r.vehicle].filter(Boolean).join(" · ") || "Customer says they have paid",
+      title: t("receiptToCheck", { amount: money(r.amount) }),
+      detail: [r.customer, r.vehicle].filter(Boolean).join(" · ") || t("customerSaysPaid"),
       href: "/tasks",
-      action: "Check"
+      action: t("check")
     });
   }
   for (const v of vehicles) {
     for (const item of v.compliance || []) {
       const name = `${v.make} ${v.model}`;
+      const label = c.has(`paper_${item.key}`) ? c(`paper_${item.key}`) : item.label;
+      paperworkVehicle.set(`doc-${v.id}-${item.key}`, name);
       if (item.daysLeft <= 7) {
-        const lapsed = item.label === "Service" ? "overdue" : "expired";
+        const service = item.key === "next_service_date";
         paperwork.push({
           key: `doc-${v.id}-${item.key}`,
           rank: 5,
           tone: item.daysLeft < 0 ? "red" : "amber",
           icon: <FileWarning size={17} />,
-          title: item.daysLeft < 0 ? `${item.label} ${lapsed} · ${name}` : `${item.label} due · ${name}`,
-          detail: `${v.plate} · ${item.daysLeft < 0 ? `${lapsed} since ${shortDate(item.date)}` : item.daysLeft === 0 ? "today" : `${dayLabel(item.date)}`}`,
+          title: item.daysLeft < 0 ? t(service ? "paperOverdue" : "paperExpired", { label, name }) : t("paperDue", { label, name }),
+          detail: `${v.plate} · ${item.daysLeft < 0 ? t(service ? "overdueSince" : "expiredSince", { date: shortDate(item.date) }) : item.daysLeft === 0 ? t("today") : `${dayLabel(item.date)}`}`,
           href: `/fleet/${v.id}`,
-          action: "Update"
+          action: t("update")
         });
       } else if (item.daysLeft <= 30) {
-        upcomingItems.push({ key: `soon-doc-${v.id}-${item.key}`, sort: item.date, tone: "neutral", icon: <FileWarning size={17} />, title: `${item.label} renewal · ${name}`, detail: v.plate, when: dayLabel(item.date), href: `/fleet/${v.id}`, action: "View" });
+        upcomingItems.push({ key: `soon-doc-${v.id}-${item.key}`, sort: item.date, tone: "neutral", icon: <FileWarning size={17} />, title: t("paperRenewal", { label, name }), detail: v.plate, when: dayLabel(item.date), href: `/fleet/${v.id}`, action: t("view") });
       }
     }
   }
@@ -290,16 +280,16 @@ export default async function Home() {
     todayItems.push(...paperwork);
   } else {
     const expired = paperwork.filter((item) => item.tone === "red").length;
-    const names = Array.from(new Set(paperwork.map((item) => item.title.split(" · ")[1])));
+    const names = paperwork.map((item) => paperworkVehicle.get(item.key) || "").filter((name, index, all) => name && all.indexOf(name) === index);
     todayItems.push({
       key: "paperwork",
       rank: 5,
       tone: expired > 0 ? "red" : "amber",
       icon: <FileWarning size={17} />,
-      title: `${plural(paperwork.length, "document")} to renew`,
-      detail: `${expired > 0 ? `${expired} expired · ` : ""}${names.slice(0, 3).join(", ")}${names.length > 3 ? ` +${names.length - 3} more` : ""}`,
+      title: t("documentsToRenew", { count: paperwork.length }),
+      detail: `${expired > 0 ? `${t("expiredCount", { count: expired })} · ` : ""}${names.slice(0, 3).join(", ")}${names.length > 3 ? ` ${t("plusMore", { count: names.length - 3 })}` : ""}`,
       href: "/fleet",
-      action: "Review"
+      action: t("review")
     });
   }
   // Jobs from To do that are due now: a customer waiting for an answer, a refund to decide, forms to complete.
@@ -318,18 +308,18 @@ export default async function Home() {
       rank: waiting ? 2 : 4,
       tone: waiting ? "red" : job.dueDate && job.dueDate < today ? "amber" : "neutral",
       icon: <Bell size={17} />,
-      title: waiting ? `${job.customerName || "A customer"} is waiting for ${asks > 1 ? `${asks} answers` : "your answer"}` : job.action === "swap_handover" || job.action === "swap_collection" ? job.title.split(" to ")[0].split(" from ")[0] : job.title.split(" - ")[0],
-      detail: [job.customerName, job.vehicleLabel].filter(Boolean).join(" · ") || "On To do",
+      title: waiting ? (asks > 1 ? t("waitingForAnswers", { who: job.customerName || t("aCustomer"), count: asks }) : t("waitingForAnswer", { who: job.customerName || t("aCustomer") })) : job.action === "swap_handover" || job.action === "swap_collection" ? job.title.split(" to ")[0].split(" from ")[0] : job.title.split(" - ")[0],
+      detail: [job.customerName, job.vehicleLabel].filter(Boolean).join(" · ") || t("onToDo"),
       href: waiting && job.rentalId ? `/bookings/${job.rentalId}#customer-requests` : "/tasks",
-      action: waiting ? "Answer" : "Open"
+      action: waiting ? t("answer") : t("open")
     });
   }
   if (jobRows.length > 3) {
-    todayItems.push({ key: "jobs-more", rank: 6, tone: "neutral", icon: <Bell size={17} />, title: `${plural(jobRows.length - 3, "more job")} on To do`, detail: "Forms, refunds and follow-ups due now", href: "/tasks", action: "Open" });
+    todayItems.push({ key: "jobs-more", rank: 6, tone: "neutral", icon: <Bell size={17} />, title: t("moreJobs", { count: jobRows.length - 3 }), detail: t("moreJobsDetail"), href: "/tasks", action: t("open") });
   }
   for (const reminder of reminders) {
     if (reminder.due && reminder.due <= today) {
-      todayItems.push({ key: `rem-${reminder.id}`, rank: 5, tone: "neutral", icon: <Bell size={17} />, title: reminder.title, detail: reminder.target, href: "/tasks", action: "Open" });
+      todayItems.push({ key: `rem-${reminder.id}`, rank: 5, tone: "neutral", icon: <Bell size={17} />, title: reminder.title, detail: reminder.target, href: "/tasks", action: t("open") });
     }
   }
   const toneOrder: Record<Tone, number> = { red: 0, amber: 1, teal: 2, blue: 3, neutral: 4 };
@@ -348,13 +338,15 @@ export default async function Home() {
           <h1 className="mt-0.5 text-[26px] font-semibold tracking-[-0.02em] text-[var(--foreground)]">{greeting}</h1>
           <p className="mt-1 text-sm text-[var(--foreground-secondary)]">
             {todayItems.length === 0
-              ? "Nothing needs you right now."
-              : `${plural(todayItems.length, "thing")} to sort today${urgentCount > 0 ? ` · ${urgentCount} urgent` : ""}.`}
+              ? t("nothingNeedsYou")
+              : urgentCount > 0
+                ? t("thingsTodayUrgent", { count: todayItems.length, urgent: urgentCount })
+                : t("thingsToday", { count: todayItems.length })}
           </p>
         </div>
         <Link className="pressable inline-flex items-center justify-center gap-2 self-start rounded-[9px] bg-[var(--primary)] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[var(--primary-hover)] sm:self-auto" href="/bookings/new">
           <Plus size={16} />
-          New booking
+          {t("newBooking")}
         </Link>
       </div>
 
@@ -372,13 +364,13 @@ export default async function Home() {
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
         <div className="min-w-0 space-y-5">
-          <Panel action={<PanelLink href="/calendar">Calendar</PanelLink>} title="Today">
+          <Panel action={<PanelLink href="/calendar">{t("calendar")}</PanelLink>} title={t("todayTitle")}>
             {todayItems.length === 0 ? (
               <div className="flex items-center gap-3 px-4 pb-5 pt-2 text-sm text-[var(--foreground-secondary)]">
                 <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-[var(--success-light)] text-[var(--success)]">
                   <CheckCircle2 size={18} />
                 </span>
-                All clear. No handovers, returns or late payments today.
+                {t("allClear")}
               </div>
             ) : (
               <ul className="divide-y divide-[var(--border)] border-t border-[var(--border)]">
@@ -387,11 +379,11 @@ export default async function Home() {
             )}
           </Panel>
 
-          <Panel action={<PanelLink href="/calendar">See all</PanelLink>} title="Coming up">
+          <Panel action={<PanelLink href="/calendar">{t("seeAll")}</PanelLink>} title={t("comingUp")}>
             {upcomingItems.length === 0 ? (
               <p className="flex items-center gap-2 px-4 pb-5 pt-2 text-sm text-[var(--muted)]">
                 <CalendarClock size={16} />
-                Nothing booked in the next 7 days.
+                {t("nothingBooked")}
               </p>
             ) : (
               <ul className="divide-y divide-[var(--border)] border-t border-[var(--border)]">
@@ -400,9 +392,9 @@ export default async function Home() {
             )}
           </Panel>
 
-          <Panel action={<PanelLink href="/bookings">All bookings</PanelLink>} title={`On rent now · ${onRent.length}`}>
+          <Panel action={<PanelLink href="/bookings">{t("allBookings")}</PanelLink>} title={t("onRentNow", { count: onRent.length })}>
             {onRent.length === 0 ? (
-              <p className="px-4 pb-5 pt-2 text-sm text-[var(--muted)]">Nothing is out on rent right now.</p>
+              <p className="px-4 pb-5 pt-2 text-sm text-[var(--muted)]">{t("nothingOut")}</p>
             ) : (
               <ul className="divide-y divide-[var(--border)] border-t border-[var(--border)]">
                 {onRent.slice(0, 8).map((r) => {
@@ -416,12 +408,12 @@ export default async function Home() {
                         </span>
                         <span className="flex-shrink-0 text-right text-[13px]">
                           <span className={`block ${late ? "font-semibold text-[var(--danger)]" : "text-[var(--foreground-secondary)]"}`}>
-                            {r.end === "Indefinite" ? "Open-ended" : late ? `Was due ${shortDate(r.end)}` : `Until ${shortDate(r.end)}`}
+                            {r.end === "Indefinite" ? t("openEnded") : late ? t("wasDue", { date: shortDate(r.end) }) : t("until", { date: shortDate(r.end) })}
                           </span>
                           {(r.overdue || 0) > 0 ? (
-                            <span className="block font-semibold text-[var(--danger)]">{money(r.overdue || 0)} owed</span>
+                            <span className="block font-semibold text-[var(--danger)]">{t("owed", { amount: money(r.overdue || 0) })}</span>
                           ) : (
-                            <span className="block text-[var(--muted)]">Paid up</span>
+                            <span className="block text-[var(--muted)]">{t("paidUp")}</span>
                           )}
                         </span>
                       </Link>
@@ -432,17 +424,17 @@ export default async function Home() {
             )}
             {onRent.length > 8 ? (
               <div className="border-t border-[var(--border)] px-4 py-2.5 text-center">
-                <PanelLink href="/bookings">{plural(onRent.length - 8, "more rental")}</PanelLink>
+                <PanelLink href="/bookings">{t("moreRentals", { count: onRent.length - 8 })}</PanelLink>
               </div>
             ) : null}
           </Panel>
         </div>
 
         <div className="min-w-0 space-y-5">
-          <Panel action={<PanelLink href="/fleet">Fleet</PanelLink>} title="Your fleet">
+          <Panel action={<PanelLink href="/fleet">{t("fleet")}</PanelLink>} title={t("yourFleet")}>
             {groups.length === 0 ? (
               <p className="px-4 pb-5 pt-2 text-sm text-[var(--muted)]">
-                No vehicles yet. <Link className="font-semibold text-[var(--primary)]" href="/fleet/new">Add your first one</Link>.
+                {t.rich("noVehiclesYet", { link: (chunks) => <Link className="font-semibold text-[var(--primary)]" href="/fleet/new">{chunks}</Link> })}
               </p>
             ) : (
               <div className="space-y-1 px-2 pb-3">
@@ -451,7 +443,7 @@ export default async function Home() {
                     <VehicleKindIcon kind={group.kind} />
                     <span className="min-w-0 flex-1">
                       <span className="flex items-baseline justify-between gap-2">
-                        <span className="text-[14px] font-semibold text-[var(--foreground)]">{group.label}</span>
+                        <span className="text-[14px] font-semibold text-[var(--foreground)]">{c(`kinds_${group.kind}`)}</span>
                         <span className="font-mono-data text-[14px] font-semibold text-[var(--foreground)]">{group.vehicles.length}</span>
                       </span>
                       <span className="mt-1 flex h-1.5 overflow-hidden rounded-full bg-[#eeece7]">
@@ -463,17 +455,16 @@ export default async function Home() {
                     </span>
                   </Link>
                 ))}
-                <p className="px-2 pt-2 text-[13px] text-[var(--muted)]">{utilization}% of your fleet is earning right now.</p>
+                <p className="px-2 pt-2 text-[13px] text-[var(--muted)]">{t("earning", { percent: utilization })}</p>
               </div>
             )}
           </Panel>
 
-          <Panel action={<PanelLink href="/reports">Reports</PanelLink>} title="Money this month">
+          <Panel action={<PanelLink href="/reports">{t("reports")}</PanelLink>} title={t("moneyThisMonth")}>
             <div className="px-4 pb-4">
               <p className="text-[28px] font-semibold tabular-nums tracking-[-0.02em] text-[var(--foreground)]">{money(metrics.monthlyRevenue)}</p>
               <p className="text-[13px] text-[var(--muted)]">
-                taken in · {money(monthlyExpenses)} costs ·{" "}
-                <span className={monthlyProfit < 0 ? "font-semibold text-[var(--danger)]" : "font-semibold text-[var(--success)]"}>{money(monthlyProfit)} profit</span>
+                {t.rich("takenIn", { costs: money(monthlyExpenses), profit: money(monthlyProfit), b: (chunks) => <span className={monthlyProfit < 0 ? "font-semibold text-[var(--danger)]" : "font-semibold text-[var(--success)]"}>{chunks}</span> })}
               </p>
               <div aria-hidden="true" className="mt-4 flex h-20 items-end gap-2">
                 {lastSixMonths.map((month) => (
@@ -490,14 +481,14 @@ export default async function Home() {
             </div>
             <dl className="grid grid-cols-2 border-t border-[var(--border)]">
               <Link className="border-r border-[var(--border)] px-4 py-3 transition hover:bg-[#fbfaf8]" href="/tasks">
-                <dt className="text-[12px] text-[var(--muted)]">Overdue</dt>
+                <dt className="text-[12px] text-[var(--muted)]">{t("overdue")}</dt>
                 <dd className={`font-mono-data text-[16px] font-semibold ${overdueTotal > 0 ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{money(overdueTotal)}</dd>
-                <dd className="text-[12px] text-[var(--muted)]">{overdueRentals.length === 0 ? "All paid" : plural(overdueRentals.length, "rental")}</dd>
+                <dd className="text-[12px] text-[var(--muted)]">{overdueRentals.length === 0 ? t("allPaid") : t("rentalsCount", { count: overdueRentals.length })}</dd>
               </Link>
               <Link className="px-4 py-3 transition hover:bg-[#fbfaf8]" href="/bookings">
-                <dt className="text-[12px] text-[var(--muted)]">Deposits held</dt>
+                <dt className="text-[12px] text-[var(--muted)]">{t("depositsHeld")}</dt>
                 <dd className="font-mono-data text-[16px] font-semibold text-[var(--foreground)]">{money(depositsHeld)}</dd>
-                <dd className="text-[12px] text-[var(--muted)]">{plural(depositsHeldCount, "customer")}</dd>
+                <dd className="text-[12px] text-[var(--muted)]">{t("customersCount", { count: depositsHeldCount })}</dd>
               </Link>
             </dl>
           </Panel>
@@ -506,8 +497,8 @@ export default async function Home() {
 
       <details className="group mt-6 rounded-xl border border-[var(--border)] bg-white shadow-[var(--shadow-sm)]">
         <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3.5 text-[15px] font-semibold text-[var(--foreground)]">
-          More insights
-          <span className="text-[13px] font-normal text-[var(--muted)] group-open:hidden">Fleet value, profit per vehicle, activity</span>
+          {t("moreInsights")}
+          <span className="text-[13px] font-normal text-[var(--muted)] group-open:hidden">{t("moreInsightsHint")}</span>
         </summary>
         <div className="space-y-4 border-t border-[var(--border)] p-4">
           <div className="grid gap-4 sm:grid-cols-2">

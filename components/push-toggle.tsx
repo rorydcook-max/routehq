@@ -2,6 +2,7 @@
 
 import { Bell, BellOff } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { removePushSubscription, savePushSubscription, sendTestPush } from "@/app/actions/push";
 
 type State = "checking" | "unsupported" | "needs-install" | "blocked" | "off" | "on";
@@ -34,6 +35,7 @@ async function currentState(): Promise<State> {
  * alerts are off and hasn't been dismissed.
  */
 export function PushToggle({ variant = "card" }: { variant?: "card" | "prompt" }) {
+  const t = useTranslations("shell");
   const [state, setState] = useState<State>("checking");
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState("");
@@ -100,22 +102,22 @@ export function PushToggle({ variant = "card" }: { variant?: "card" | "prompt" }
         <Bell className="shrink-0 text-[var(--primary)]" size={18} />
         <p className="min-w-0 flex-1 text-sm text-[var(--foreground-secondary)]">
           {state === "needs-install" ? (
-            "To get alerts on this iPhone, tap Share, then Add to Home Screen, and open RouteHQ from there."
+            t("pushInstall")
           ) : (
             <>
               {/* One line on a phone: the long version pushed today's list off the first screen. */}
-              <span className="sm:hidden">Get alerts on this phone</span>
-              <span className="hidden sm:inline">Get an alert on this device when a customer books, pays or asks for something.</span>
+              <span className="sm:hidden">{t("pushPromptShort")}</span>
+              <span className="hidden sm:inline">{t("pushPrompt")}</span>
             </>
           )}
         </p>
         {state === "off" ? (
           <button className="pressable shrink-0 rounded-lg bg-[var(--primary)] px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60" disabled={busy} onClick={turnOn} type="button">
-            Turn on
+            {t("turnOn")}
           </button>
         ) : null}
         <button
-          aria-label="Not now"
+          aria-label={t("notNow")}
           className="pressable shrink-0 rounded-lg px-2 py-1.5 text-xs font-semibold text-[var(--muted)]"
           onClick={() => {
             window.localStorage.setItem(DISMISS_KEY, "1");
@@ -123,7 +125,7 @@ export function PushToggle({ variant = "card" }: { variant?: "card" | "prompt" }
           }}
           type="button"
         >
-          Not now
+          {t("notNow")}
         </button>
       </div>
     );

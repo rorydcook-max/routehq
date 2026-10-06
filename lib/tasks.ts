@@ -39,6 +39,10 @@ export type TaskListItem = {
   coveredBy: string | null;
   /** Short name for a payment, e.g. "Rent · October 2026" or "Deposit". */
   paymentLabel: string | null;
+  /** What kind of payment this is, so the screen can name it in the reader's language. */
+  pay?: { kind: "deposit" | "top_up" | "extension" | "rent"; period: string | null } | null;
+  /** What kind of request a customer made. */
+  request?: string | null;
 };
 
 const bangkokDate = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" });
@@ -50,6 +54,14 @@ function paymentTitle(metadata: any) {
   if (type === "deposit_top_up") return "Collect deposit top-up";
   const period = metadata?.period_label ? ` · ${metadata.period_label}` : "";
   return `Collect rent${period}`;
+}
+
+function payKind(metadata: any): NonNullable<TaskListItem["pay"]> {
+  const type = String(metadata?.type || "");
+  if (type === "deposit" || metadata?.is_deposit === true) return { kind: "deposit", period: null };
+  if (type === "extension") return { kind: "extension", period: null };
+  if (type === "deposit_top_up") return { kind: "top_up", period: null };
+  return { kind: "rent", period: metadata?.period_label ? String(metadata.period_label) : null };
 }
 
 function isVoided(payment: any) {
@@ -157,6 +169,7 @@ export async function getTaskList(organizationId: string): Promise<TaskListItem[
       vehicleId: rental?.vehicleId || null,
       rentalId: row.rental_id,
       action: "request",
+      request: String(row.action_type || ""),
       rentalPaymentId: null,
       vehicleLabel: rental?.vehicle || null,
       rentalLabel: rental?.label || null,
@@ -237,7 +250,8 @@ export async function getTaskList(organizationId: string): Promise<TaskListItem[
           }
         : null,
       coveredBy: receipt && !isLead && lead ? `payment-${lead.id}` : null,
-      paymentLabel: customerPaymentLabel(row.metadata)
+      paymentLabel: customerPaymentLabel(row.metadata),
+      pay: payKind(row.metadata)
     };
   });
 

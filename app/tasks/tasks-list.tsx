@@ -3,16 +3,28 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { CheckCircle2, Circle, ReceiptText, Wallet, MoreHorizontal } from "lucide-react";
 import { confirmReceiptPayment, declinePaymentReceipt, recordPaymentReceived } from "@/app/actions/bookings";
 import { completeTask } from "@/app/actions/tasks";
 import { PendingButton } from "@/components/pending-button";
 import { Badge } from "@/components/ui";
 import { taskTypeLabel } from "@/lib/task-types";
+import { intlLocale, longDate, shortDate } from "@/lib/i18n/dates";
 import { allocatePayment, type OpenPayment } from "@/lib/payment-allocation";
 import type { TaskListItem } from "@/lib/tasks";
 
 type Filter = "open" | "done";
+
+type Say = (key: string, values?: Record<string, string | number>) => string;
+/** The words for this screen in the reader's language, and the language itself for dates. */
+type Tx = { say: Say; has: (key: string) => boolean; locale: string };
+
+function useTx(): Tx {
+  const t = useTranslations("todo");
+  const locale = useLocale();
+  return { say: t as unknown as Say, has: (key) => (t as any).has(key), locale };
+}
 
 const money = (value: number) => `฿${value.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
 
@@ -22,19 +34,66 @@ function addDays(iso: string, days: number) {
   return date.toISOString().slice(0, 10);
 }
 
-function dayLabel(iso: string | null, today: string) {
-  if (!iso) return "No date";
-  if (iso === today) return "Today";
-  if (iso === addDays(today, 1)) return "Tomorrow";
-  if (iso === addDays(today, -1)) return "Yesterday";
-  const date = new Date(`${iso}T00:00:00Z`);
-  const sameYear = iso.slice(0, 4) === today.slice(0, 4);
-  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", ...(sameYear ? {} : { year: "numeric" }), timeZone: "UTC" }).format(date);
+function plainDate(iso: string, today: string, locale: string) {
+  return iso.slice(0, 4) === today.slice(0, 4) ? shortDate(iso, locale) : longDate(iso, locale);
 }
 
-/** "Was due yesterday", not "Was due Yesterday". */
-function dayInSentence(iso: string | null, today: string) {
-  return dayLabel(iso, today).replace(/^(Today|Tomorrow|Yesterday|No date)$/, (word) => word.toLowerCase());
+function dayLabel(iso: string | null, today: string, tx: Tx) {
+  if (!iso) return tx.say("noDate");
+  if (iso === today) return tx.say("today");
+  if (iso === addDays(today, 1)) return tx.say("tomorrow");
+  if (iso === addDays(today, -1)) return tx.say("yesterday");
+  return plainDate(iso, today, tx.locale);
+}
+
+/** "Due today", "Was due yesterday", "Done 4 Oct": whole phrases, because languages order them differently. */
+function whenLine(item: TaskListItem, today: string, overdue: boolean, tx: Tx) {
+  if (item.completedAt) {
+    const day = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date(item.completedAt));
+    if (day === today) return tx.say("doneToday");
+    if (day === addDays(today, -1)) return tx.say("doneYesterday");
+    return tx.say("doneOn", { date: plainDate(day, today, tx.locale) });
+  }
+  const due = item.dueDate;
+  if (!due) return tx.say("noDueDate");
+  if (due === today) return tx.say("dueToday");
+  if (due === addDays(today, 1)) return tx.say("dueTomorrow");
+  if (due === addDays(today, -1)) return tx.say("wasDueYesterday");
+  return tx.say(overdue ? "wasDueOn" : "dueOn", { date: plainDate(due, today, tx.locale) });
+}
+
+/** Rent periods are saved as English text ("October 2026", "3 days", "Whole rental"). */
+function periodText(period: string, tx: Tx) {
+  const month = period.match(/^([A-Za-z]+) (\d{4})$/);
+  if (month) {
+    const parsed = Date.parse(`1 ${month[1]} ${month[2]} UTC`);
+    if (!Number.isNaN(parsed)) {
+      try {
+        return new Intl.DateTimeFormat(intlLocale(tx.locale), { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(parsed));
+      } catch {
+        return period;
+      }
+    }
+  }
+  const days = period.match(/^(\d+) days?$/);
+  if (days) return tx.say("periodDays", { count: Number(days[1]) });
+  if (period === "Whole rental") return tx.say("periodWhole");
+  return period;
+}
+
+/** "Collect rent · October 2026" for the list; "Rent · October 2026" where it is one line among several. */
+function payText(item: TaskListItem, form: "collect" | "pay", tx: Tx) {
+  const pay = item.pay;
+  if (!pay) return (form === "pay" ? item.paymentLabel : null) || item.title;
+  if (pay.kind !== "rent") return tx.say(`${form}_${pay.kind}`);
+  return pay.period ? tx.say(`${form}_rent_period`, { period: periodText(pay.period, tx) }) : tx.say(`${form}_rent`);
+}
+
+/** A date written in English inside a saved job title ("18 Nov 2026" or "2026-11-10"). */
+function savedDate(text: string, today: string, tx: Tx) {
+  const parsed = Date.parse(/^\d{4}-\d{2}-\d{2}$/.test(text) ? `${text}T00:00:00Z` : `${text} UTC`);
+  if (Number.isNaN(parsed)) return text;
+  return plainDate(new Date(parsed).toISOString().slice(0, 10), today, tx.locale);
 }
 
 /**
@@ -43,16 +102,38 @@ function dayInSentence(iso: string | null, today: string) {
  * paid time ran out (pro rata ฿4,750)"); the list reads better as a short
  * heading and a detail. The customer and vehicle are already on their own line.
  */
-function headingOf(item: TaskListItem): { title: string; detail: string | null } {
+function headingOf(item: TaskListItem, today: string, tx: Tx): { title: string; detail: string | null } {
   const raw = String(item.title || "");
-  if (item.action === "swap_handover" || item.action === "swap_collection") {
-    return { title: raw.split(" to ")[0].split(" from ")[0], detail: null };
-  }
+  if (item.kind === "payment") return { title: payText(item, "collect", tx), detail: null };
+  // A request nobody has made a job for: named by its kind.
+  if (item.request != null) return { title: tx.say(tx.has(`request_${item.request}`) ? `request_${item.request}` : "request_other"), detail: null };
+  // Jobs people typed themselves stay exactly as typed.
   if (!item.action) return { title: raw, detail: null };
+  // Jobs the app raised are saved as English sentences; the ones it knows are said again in the reader's language.
+  if (item.action === "swap_handover" || item.action === "swap_collection" || item.action === "swap_signature") {
+    return { title: tx.say(`job_${item.action}`), detail: null };
+  }
   const [first, ...rest] = raw.split(" - ");
   const detail = rest.join(" - ").trim();
-  if (item.action === "refund") return { title: first, detail: detail ? detail.charAt(0).toUpperCase() + detail.slice(1) : null };
-  // For a customer's request or a signature, what follows the heading is the customer and vehicle again, and the working-out belongs on the booking.
+  if (item.action === "refund") {
+    const early = detail.match(/^returned (\d+) days? before the paid time ran out \(pro rata (.+)\)$/);
+    const cancelled = detail.match(/^(.+) cancelled the (.+) \((.+) paid\)$/);
+    const said = early
+      ? tx.say("refundEarly", { days: Number(early[1]), amount: early[2] })
+      : cancelled
+        ? tx.say("refundCancelled", { name: cancelled[1], vehicle: cancelled[2], amount: cancelled[3] })
+        : detail
+          ? detail.charAt(0).toUpperCase() + detail.slice(1)
+          : null;
+    return { title: tx.say("job_refund"), detail: said };
+  }
+  if (item.action === "request") {
+    const extension = first.match(/^Extension to (.+) needs your answer$/);
+    if (extension) return { title: tx.say("job_extension", { date: savedDate(extension[1], today, tx) }), detail: null };
+    if (/no end date/.test(first)) return { title: tx.say("job_openEnded"), detail: null };
+    return { title: tx.locale === "en" ? first : tx.say("request_other"), detail: null };
+  }
+  // What follows the heading is the customer and vehicle again, and the working-out belongs on the booking.
   return { title: first, detail: null };
 }
 
@@ -63,16 +144,16 @@ function timeLabel(dueAt: string | null) {
   return time === "00:00" ? null : time;
 }
 
-type Group = { key: string; title: string; tone: "red" | "amber" | "neutral" | "teal"; items: TaskListItem[] };
+type Group = { key: string; tone: "red" | "amber" | "neutral" | "teal"; items: TaskListItem[] };
 
 function groupOpen(items: TaskListItem[], today: string): Group[] {
   const weekEnd = addDays(today, 7);
   const groups: Group[] = [
-    { key: "receipts", title: "Receipts to check", tone: "teal", items: [] },
-    { key: "overdue", title: "Overdue", tone: "red", items: [] },
-    { key: "today", title: "Today", tone: "amber", items: [] },
-    { key: "week", title: "Next 7 days", tone: "neutral", items: [] },
-    { key: "later", title: "Later", tone: "neutral", items: [] }
+    { key: "receipts", tone: "teal", items: [] },
+    { key: "overdue", tone: "red", items: [] },
+    { key: "today", tone: "amber", items: [] },
+    { key: "week", tone: "neutral", items: [] },
+    { key: "later", tone: "neutral", items: [] }
   ];
   for (const item of items) {
     const due = item.dueDate;
@@ -86,17 +167,10 @@ function groupOpen(items: TaskListItem[], today: string): Group[] {
   return groups.filter((group) => group.items.length > 0);
 }
 
-const METHODS = [
-  ["cash", "Cash"],
-  ["bank_transfer", "Bank transfer"],
-  ["promptpay", "PromptPay"],
-  ["wise", "Wise"],
-  ["revolut", "Revolut"],
-  ["other", "Other"]
-] as const;
+const METHODS = ["cash", "bank_transfer", "promptpay", "wise", "revolut", "other"] as const;
 
-function methodLabel(method: string) {
-  return METHODS.find(([key]) => key === method)?.[1] || "Other";
+function methodLabel(method: string, tx: Tx) {
+  return tx.say(`method_${(METHODS as readonly string[]).includes(method) ? method : "other"}`);
 }
 
 /**
@@ -107,15 +181,12 @@ function methodLabel(method: string) {
  */
 function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskListItem; siblings: TaskListItem[]; today: string; onClose: () => void }) {
   const router = useRouter();
+  const tx = useTx();
   const receipt = item.receipt;
-  const openPayments: OpenPayment[] = useMemo(
-    () =>
-      [item, ...siblings]
-        .filter((entry) => entry.rentalPaymentId)
-        .map((entry) => ({ id: entry.rentalPaymentId as string, label: entry.paymentLabel || entry.title, amount: entry.amount || 0, dueDate: entry.dueDate || "9999-12-31" }))
-        .sort((a, b) => a.dueDate.localeCompare(b.dueDate)),
-    [item, siblings]
-  );
+  const openPayments: OpenPayment[] = [item, ...siblings]
+    .filter((entry) => entry.rentalPaymentId)
+    .map((entry) => ({ id: entry.rentalPaymentId as string, label: payText(entry, "pay", tx), amount: entry.amount || 0, dueDate: entry.dueDate || "9999-12-31" }))
+    .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
   const [value, setValue] = useState(String(receipt?.total || item.amount || ""));
   const [date, setDate] = useState(today);
   const [method, setMethod] = useState(receipt?.method || "cash");
@@ -139,7 +210,7 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
   function save() {
     setError(null);
     if (!(received > 0)) {
-      setError("Enter the amount received.");
+      setError(tx.say("errEnterAmount"));
       return;
     }
     startTransition(async () => {
@@ -148,7 +219,7 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
         onClose();
         router.refresh();
       } catch {
-        setError("Couldn't record this payment. Please try again.");
+        setError(tx.say("errRecord"));
       }
     });
   }
@@ -161,7 +232,7 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
         onClose();
         router.refresh();
       } catch {
-        setError("Couldn't update this payment. Please try again.");
+        setError(tx.say("errUpdate"));
       }
     });
   }
@@ -171,18 +242,18 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
     <div className="mt-2 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
       <div className="grid gap-2 sm:grid-cols-3">
         <label className="text-xs font-semibold text-[var(--foreground-secondary)]">
-          Amount that arrived (฿)
+          {tx.say("amountArrived")}
           <input autoFocus className={field} inputMode="decimal" min="0" onChange={(event) => setValue(event.target.value)} step="0.01" type="number" value={value} />
         </label>
         <label className="text-xs font-semibold text-[var(--foreground-secondary)]">
-          Date received
+          {tx.say("dateReceived")}
           <input className={field} max={today} onChange={(event) => setDate(event.target.value)} type="date" value={date} />
         </label>
         <label className="text-xs font-semibold text-[var(--foreground-secondary)]">
-          Method
+          {tx.say("method")}
           <select className={field} onChange={(event) => setMethod(event.target.value)} value={method}>
-            {METHODS.map(([key, label]) => (
-              <option key={key} value={key}>{label}</option>
+            {METHODS.map((key) => (
+              <option key={key} value={key}>{tx.say(`method_${key}`)}</option>
             ))}
           </select>
         </label>
@@ -190,13 +261,13 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
 
       {offered.length > 1 ? (
         <div className="mt-3">
-          <p className="text-xs font-semibold text-[var(--foreground-secondary)]">What is it for?</p>
+          <p className="text-xs font-semibold text-[var(--foreground-secondary)]">{tx.say("whatFor")}</p>
           <div className="mt-1 space-y-1">
             {offered.map((payment) => (
               <label className="flex min-h-9 items-center gap-2 rounded-lg bg-white px-3 text-sm" key={payment.id}>
                 <input checked={chosenIds.includes(payment.id)} disabled={payment.id === item.rentalPaymentId} onChange={() => toggle(payment.id)} type="checkbox" />
                 <span className="min-w-0 flex-1 truncate">{payment.label}</span>
-                <span className="text-xs text-[var(--muted)]">{dayLabel(payment.dueDate === "9999-12-31" ? null : payment.dueDate, today)}</span>
+                <span className="text-xs text-[var(--muted)]">{dayLabel(payment.dueDate === "9999-12-31" ? null : payment.dueDate, today, tx)}</span>
                 <span className="font-semibold">{money(payment.amount)}</span>
               </label>
             ))}
@@ -206,22 +277,21 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
 
       {lines.length > 0 ? (
         <div className="mt-3 rounded-lg border border-[var(--border)] bg-white p-3">
-          <p className="text-xs font-semibold text-[var(--foreground-secondary)]">What will be recorded</p>
+          <p className="text-xs font-semibold text-[var(--foreground-secondary)]">{tx.say("whatRecorded")}</p>
           <ul className="mt-1 space-y-1 text-sm">
             {lines.map((line) => (
               <li className="flex flex-wrap items-baseline justify-between gap-x-3" key={line.id}>
                 <span className="font-semibold text-[var(--foreground)]">
-                  {line.carried ? "Extra goes to " : ""}
-                  {line.label}
+                  {line.carried ? tx.say("extraGoesTo", { label: line.label }) : line.label}
                 </span>
                 <span className={line.stillDue > 0 || line.extra > 0 ? "font-semibold text-[var(--warning)]" : "text-[var(--foreground-secondary)]"}>
                   {line.paid <= 0
-                    ? "Nothing left for this · stays due"
+                    ? tx.say("nothingLeft")
                     : line.extra > 0
-                      ? `${money(line.paid)} recorded · ${money(line.extra)} more than was due`
+                      ? tx.say("recordedExtra", { paid: money(line.paid), extra: money(line.extra) })
                       : line.stillDue > 0
-                        ? `${money(line.paid)} paid · ${money(line.stillDue)} stays due`
-                        : `${money(line.paid)} · paid in full`}
+                        ? tx.say("paidStays", { paid: money(line.paid), due: money(line.stillDue) })
+                        : tx.say("paidFull", { paid: money(line.paid) })}
                 </span>
               </li>
             ))}
@@ -231,17 +301,17 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
 
       {error ? <p className="mt-2 text-xs font-semibold text-[var(--danger)]">{error}</p> : null}
       {/* No surprises: recording it here tells the customer too. */}
-      <p className="mt-3 text-xs text-[var(--muted)]">The customer is sent a short &quot;payment received&quot; message, unless you have turned customer messages off in Settings.</p>
+      <p className="mt-3 text-xs text-[var(--muted)]">{tx.say("customerTold")}</p>
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <button className="primary-action pressable min-h-9 px-4 text-xs" disabled={isPending} onClick={save} type="button">
-          {isPending ? "Saving…" : `Record ${received > 0 ? money(received) : "payment"}`}
+          {isPending ? tx.say("saving") : received > 0 ? tx.say("recordAmount", { amount: money(received) }) : tx.say("recordPayment")}
         </button>
         <button className="secondary-action pressable min-h-9 px-4 text-xs" disabled={isPending} onClick={onClose} type="button">
-          Cancel
+          {tx.say("cancel")}
         </button>
         {receipt ? (
           <button className="pressable ml-auto min-h-9 px-2 text-xs font-semibold text-[var(--danger)]" disabled={isPending} onClick={decline} type="button">
-            Nothing arrived
+            {tx.say("nothingArrived")}
           </button>
         ) : null}
       </div>
@@ -250,6 +320,7 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
 }
 
 function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskListItem; organizationId: string; today: string; siblings?: TaskListItem[] }) {
+  const tx = useTx();
   const [showNote, setShowNote] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const [recording, setRecording] = useState(false);
@@ -266,7 +337,7 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
         await confirmReceiptPayment({ paymentId: item.rentalPaymentId as string, amount: receipt.total, date: today, method: receipt.method, paymentIds: receipt.paymentIds });
         router.refresh();
       } catch {
-        setReceiptError("Couldn't confirm this payment. Please try again.");
+        setReceiptError(tx.say("errConfirm"));
       }
     });
   }
@@ -277,7 +348,7 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
   const time = item.kind === "task" && !item.action ? timeLabel(item.dueAt) : null;
   // The booking number is on the booking; here the customer and the vehicle say which one it is.
   const context = [item.customerName, item.vehicleLabel].filter(Boolean).join(" · ") || item.rentalLabel || "";
-  const heading = headingOf(item);
+  const heading = headingOf(item, today, tx);
 
   return (
     <div className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-start">
@@ -293,9 +364,9 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
         )}
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            <p className="font-bold text-[var(--foreground)]">{coversSeveral ? `Receipt for ${receipt.paymentIds.length} payments` : receipt ? item.paymentLabel || item.title : heading.title}</p>
+            <p className="font-bold text-[var(--foreground)]">{coversSeveral ? tx.say("receiptForSeveral", { count: receipt.paymentIds.length }) : receipt ? payText(item, "pay", tx) : heading.title}</p>
             {item.amount != null ? <span className="font-semibold text-[var(--foreground)]">{money(receipt ? receipt.total : item.amount)}</span> : null}
-            {item.kind === "task" && !item.action && String(item.taskType || "") !== "admin" ? <Badge tone="neutral">{taskTypeLabel(item.taskType)}</Badge> : null}
+            {item.kind === "task" && !item.action && String(item.taskType || "") !== "admin" ? <Badge tone="neutral">{tx.has(`type_${item.taskType}`) ? tx.say(`type_${item.taskType}`) : taskTypeLabel(item.taskType)}</Badge> : null}
           </div>
           {heading.detail && !receipt ? <p className="mt-0.5 text-sm text-[var(--foreground-secondary)]">{heading.detail}</p> : null}
           {context ? (
@@ -308,20 +379,17 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
             )
           ) : null}
           <p className={`mt-0.5 text-xs font-semibold ${overdue ? "text-[var(--danger)]" : "text-[var(--muted)]"}`}>
-            {item.completedAt
-              ? `Done ${dayInSentence(new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date(item.completedAt)), today)}`
-              : item.dueDate
-                ? `${overdue ? "Was due" : "Due"} ${dayInSentence(item.dueDate, today)}${time ? ` · ${time}` : ""}`
-                : "No due date"}
+            {whenLine(item, today, overdue, tx)}
+            {time && !item.completedAt && item.dueDate ? ` · ${time}` : ""}
           </p>
           {coversSeveral ? (
             <p className="mt-0.5 text-sm text-[var(--foreground-secondary)]">
-              {[item, ...siblings].filter((entry) => receipt.paymentIds.includes(entry.rentalPaymentId || "")).map((entry) => `${entry.paymentLabel} ${money(entry.amount || 0)}`).join(" + ")}
+              {[item, ...siblings].filter((entry) => receipt.paymentIds.includes(entry.rentalPaymentId || "")).map((entry) => `${payText(entry, "pay", tx)} ${money(entry.amount || 0)}`).join(" + ")}
             </p>
           ) : null}
           {receipt ? (
             <p className="mt-1 text-sm font-semibold text-[var(--primary)]">
-              Customer sent a receipt · {methodLabel(receipt.method)} · {dayLabel(new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date(receipt.submittedAt)), today)}
+              {tx.say("receiptSent", { method: methodLabel(receipt.method, tx), day: dayLabel(new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date(receipt.submittedAt)), today, tx) })}
             </p>
           ) : null}
           {receiptError ? <p className="mt-1 text-xs font-semibold text-[var(--danger)]">{receiptError}</p> : null}
@@ -333,14 +401,14 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
               <input name="organizationId" type="hidden" value={organizationId} />
               <input name="taskId" type="hidden" value={item.id} />
               <input
-                aria-label="Note"
+                aria-label={tx.say("noteLabel")}
                 autoFocus
                 className="min-h-10 flex-1 rounded-lg border border-[var(--border)] px-3 text-sm"
                 name="notes"
-                placeholder="What was done (optional)"
+                placeholder={tx.say("notePlaceholder")}
               />
-              <PendingButton className="primary-action min-h-10 px-4 text-sm" pendingLabel="Saving…" type="submit">
-                Save & mark done
+              <PendingButton className="primary-action min-h-10 px-4 text-sm" pendingLabel={tx.say("saving")} type="submit">
+                {tx.say("saveDone")}
               </PendingButton>
             </form>
           ) : null}
@@ -350,32 +418,32 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
       <div className="flex shrink-0 flex-wrap items-center gap-2 pl-8 sm:pl-0">
         {receipt?.url ? (
           <a className="secondary-action pressable min-h-9 px-3 text-xs" href={receipt.url} rel="noreferrer" target="_blank">
-            View receipt
+            {tx.say("viewReceipt")}
           </a>
         ) : null}
         {receipt && !recording ? (
           <>
             <button className="primary-action pressable min-h-9 px-3 text-xs" disabled={isConfirming} onClick={confirmReceipt} type="button">
-              {isConfirming ? "Saving…" : "Confirm received"}
+              {isConfirming ? tx.say("saving") : tx.say("confirmReceived")}
             </button>
             <button className="secondary-action pressable min-h-9 px-3 text-xs" disabled={isConfirming} onClick={() => setRecording(true)} type="button">
-              Something&apos;s different
+              {tx.say("somethingDifferent")}
             </button>
           </>
         ) : item.kind === "payment" && item.rentalPaymentId && !recording ? (
           <button className="primary-action pressable min-h-9 px-3 text-xs" onClick={() => setRecording(true)} type="button">
-            Record payment
+            {tx.say("recordPayment")}
           </button>
         ) : null}
         {/* A job with a next step of its own goes straight to it; doing that step closes the job. */}
         {item.kind === "task" && !item.completedAt && item.rentalId && (item.action === "refund" || item.action === "request") ? (
           <Link className="primary-action pressable min-h-9 px-3 text-xs" href={`/bookings/${item.rentalId}#${item.action === "refund" ? "refunds" : "customer-requests"}`}>
-            {item.action === "refund" ? "Record refund" : "Answer"}
+            {item.action === "refund" ? tx.say("recordRefund") : tx.say("answer")}
           </Link>
         ) : null}
         {item.kind === "task" && !item.completedAt && item.rentalId && item.action === "swap_signature" ? (
           <Link className="primary-action pressable min-h-9 px-3 text-xs" href={`/bookings/${item.rentalId}#amendment`}>
-            Send the form
+            {tx.say("sendForm")}
           </Link>
         ) : null}
         {item.kind === "task" && !item.completedAt && item.rentalId && (item.action === "swap_handover" || item.action === "swap_collection") ? (
@@ -383,7 +451,7 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
             className="primary-action pressable min-h-9 px-3 text-xs"
             href={item.action === "swap_handover" ? `/inspections/delivery/${item.rentalId}?swap=1` : `/inspections/return/${item.rentalId}?swap=1&vehicle=${item.vehicleId}`}
           >
-            Open form
+            {tx.say("openForm")}
           </Link>
         ) : null}
         {item.kind === "task" && !item.completedAt && !showNote && !item.id.startsWith("request-") ? (
@@ -393,17 +461,17 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
               <form action={completeTask}>
                 <input name="organizationId" type="hidden" value={organizationId} />
                 <input name="taskId" type="hidden" value={item.id} />
-                <PendingButton className={`${item.action ? "secondary-action" : "primary-action"} min-h-9 px-3 text-xs`} pendingLabel="Saving…" type="submit">
-                  {item.action === "refund" ? "No refund" : "Mark done"}
+                <PendingButton className={`${item.action ? "secondary-action" : "primary-action"} min-h-9 px-3 text-xs`} pendingLabel={tx.say("saving")} type="submit">
+                  {item.action === "refund" ? tx.say("noRefund") : tx.say("markDone")}
                 </PendingButton>
               </form>
             ) : null}
             {showMore ? (
               <button className="secondary-action pressable min-h-9 px-3 text-xs" onClick={() => setShowNote(true)} type="button">
-                Add note
+                {tx.say("addNote")}
               </button>
             ) : (
-              <button aria-label="More options" className="secondary-action pressable flex min-h-9 items-center px-2.5 text-xs" onClick={() => setShowMore(true)} type="button">
+              <button aria-label={tx.say("moreOptions")} className="secondary-action pressable flex min-h-9 items-center px-2.5 text-xs" onClick={() => setShowMore(true)} type="button">
                 <MoreHorizontal size={16} />
               </button>
             )}
@@ -411,7 +479,7 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
         ) : null}
         {!context && item.rentalId ? (
           <Link className="secondary-action pressable min-h-9 px-3 text-xs" href={`/bookings/${item.rentalId}`}>
-            Booking
+            {tx.say("booking")}
           </Link>
         ) : null}
       </div>
@@ -430,6 +498,7 @@ export function TasksList({
   today: string;
   laterLimit?: number;
 }) {
+  const tx = useTx();
   const [filter, setFilter] = useState<Filter>("open");
   const [showAllLater, setShowAllLater] = useState(false);
 
@@ -454,8 +523,8 @@ export function TasksList({
     <div className="space-y-4">
       <div className="flex gap-2">
         {([
-          ["open", `To do (${open.length})`],
-          ["done", "Done"]
+          ["open", tx.say("tabOpen", { count: open.length })],
+          ["done", tx.say("tabDone")]
         ] as const).map(([value, label]) => (
           <button
             className={`pressable min-h-10 rounded-xl border px-4 text-sm font-bold ${filter === value ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground)]"}`}
@@ -471,8 +540,8 @@ export function TasksList({
       {filter === "open" ? (
         groups.length === 0 ? (
           <div className="empty-state">
-            <p className="text-lg font-semibold text-[var(--foreground)]">Nothing to do</p>
-            <p className="mt-2 text-sm text-[var(--muted)]">Payments due and tasks you add on a vehicle page will appear here.</p>
+            <p className="text-lg font-semibold text-[var(--foreground)]">{tx.say("emptyTitle")}</p>
+            <p className="mt-2 text-sm text-[var(--muted)]">{tx.say("emptyBody")}</p>
           </div>
         ) : (
           groups.map((group) => {
@@ -481,7 +550,7 @@ export function TasksList({
             return (
               <section className="overflow-hidden rounded-xl border border-[var(--border)] bg-white" key={group.key}>
                 <div className="flex items-center justify-between border-b border-[var(--border)] bg-[var(--panel-secondary)] px-4 py-2">
-                  <p className={`text-xs font-semibold uppercase tracking-[0.08em] ${toneClass[group.tone]}`}>{group.title}</p>
+                  <p className={`text-xs font-semibold uppercase tracking-[0.08em] ${toneClass[group.tone]}`}>{tx.say(`group_${group.key}`)}</p>
                   <p className="text-xs font-semibold text-[var(--muted)]">{group.items.length}</p>
                 </div>
                 <div className="divide-y divide-[var(--border)]">
@@ -495,7 +564,7 @@ export function TasksList({
                     onClick={() => setShowAllLater(true)}
                     type="button"
                   >
-                    Show {group.items.length - laterLimit} more
+                    {tx.say("showMore", { count: group.items.length - laterLimit })}
                   </button>
                 ) : null}
               </section>
@@ -504,7 +573,7 @@ export function TasksList({
         )
       ) : done.length === 0 ? (
         <div className="empty-state">
-          <p className="text-lg font-semibold text-[var(--foreground)]">No finished tasks yet</p>
+          <p className="text-lg font-semibold text-[var(--foreground)]">{tx.say("noFinished")}</p>
         </div>
       ) : (
         <section className="overflow-hidden rounded-xl border border-[var(--border)] bg-white">

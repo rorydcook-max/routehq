@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import { X } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
 type SubscriptionPayload = {
@@ -42,6 +43,7 @@ function toneForDays(days: number | null | undefined) {
 }
 
 export function TrialBanner({ placement = "floating" }: { placement?: "floating" | "sidebar" | "inline" }) {
+  const t = useTranslations("shell");
   const [payload, setPayload] = useState<SubscriptionPayload | null>(null);
   const [hidden, setHidden] = useState(true);
   const pathname = usePathname();
@@ -98,15 +100,15 @@ export function TrialBanner({ placement = "floating" }: { placement?: "floating"
       <div className="flex items-center gap-2">
         <span aria-hidden="true" className={clsx("h-2 w-2 shrink-0 rounded-full", tone.dot)} />
         <p className="text-xs font-bold leading-4">
-          Free trial: {days === null || days === undefined ? "30 days" : `${days} day${days === 1 ? "" : "s"}`} left
+          {t("trialLeft", { days: days === null || days === undefined ? 30 : days })}
         </p>
       </div>
       <div className={clsx("flex shrink-0 items-center gap-2", placement === "sidebar" && "justify-between")}>
         <Link className={clsx("pressable inline-flex min-h-7 items-center justify-center rounded-lg px-3 text-[11px] font-bold", tone.button)} href={"/settings/billing" as Route}>
-          Subscribe now
+          {t("subscribeNow")}
         </Link>
         <button
-          aria-label="Dismiss trial banner"
+          aria-label={t("close")}
           className="pressable inline-flex h-7 w-7 items-center justify-center rounded-lg border border-current/15 bg-white/70"
           onClick={() => {
             window.localStorage.setItem(dismissKey, String(Date.now() + 24 * 60 * 60 * 1000));

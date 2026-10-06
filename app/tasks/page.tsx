@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/app-shell";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { businessToday } from "@/lib/business-time";
@@ -8,13 +9,14 @@ import { TasksList } from "./tasks-list";
 export default async function TasksPage() {
   const [userEmail, organization] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization()]);
   const tasks = await getTaskList(organization.id);
+  const t = await getTranslations("todo");
 
   return (
     <AppShell userEmail={userEmail}>
       <div className="page-hero mb-5">
-        <p className="page-eyebrow">Tasks</p>
-        <h1 className="page-title">To do</h1>
-        <p className="page-subtitle mt-2">Payments to collect and jobs for the team, soonest first.</p>
+        <p className="page-eyebrow">{t("eyebrow")}</p>
+        <h1 className="page-title">{t("title")}</h1>
+        <p className="page-subtitle mt-2">{t("subtitle")}</p>
       </div>
 
       <TasksList organizationId={organization.id} tasks={tasks} today={businessToday()} />

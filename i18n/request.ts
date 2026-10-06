@@ -46,6 +46,15 @@ async function resolveLocale(): Promise<SupportedLocale> {
   } catch {
     // No request to read (a build-time render): fall through to the signed-in person's language.
   }
+  // Development only: "routehq_preview_locale" shows the staff app in another language without changing anyone's account.
+  if (process.env.NODE_ENV !== "production") {
+    try {
+      const preview = (await cookies()).get("routehq_preview_locale")?.value;
+      if (preview && supported.has(preview)) return preview as SupportedLocale;
+    } catch {
+      // No request to read.
+    }
+  }
   if (!hasSupabaseEnv()) return "en";
   try {
     const supabase = (await createSupabaseServerClient()) as any;

@@ -4,17 +4,12 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import type { Route } from "next";
 import { ArrowRight, Check, Copy, Search, Sparkles, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { askRouteHq, confirmAssistantAction } from "@/app/actions/ask";
 import type { ProposedAction } from "@/lib/assistant-actions";
 
-const EXAMPLES = [
-  "Which of my vehicles is making the least money?",
-  "What income can I expect over the next 6 months?",
-  "Which tax, insurance or service is due next?",
-  "Who owes me money right now?",
-  "I paid 5,000 baht for a new windscreen on the Ford Ecosport",
-  "Create a booking link for the Mazda 2 from 14 Oct, 11,000 a month, 5,000 deposit"
-];
+// Starter questions, worded in the reader's language (askExample1…4 in the locale files). Two more show what it can change.
+const EXAMPLE_KEYS = ["askExample1", "askExample2", "askExample3", "askExample4", "askExample5", "askExample6"];
 
 type Turn = {
   question: string;
@@ -34,6 +29,8 @@ type Turn = {
  * is shown first and saved only when the owner presses Confirm.
  */
 export function AskBox({ variant }: { variant: "sidebar" | "icon" }) {
+  const t = useTranslations("shell");
+  const EXAMPLES = EXAMPLE_KEYS.map((key) => t(key));
   const [open, setOpen] = useState(false);
   const [question, setQuestion] = useState("");
   const [turns, setTurns] = useState<Turn[]>([]);
@@ -87,7 +84,7 @@ export function AskBox({ variant }: { variant: "sidebar" | "icon" }) {
       try {
         result = await askRouteHq(asked, history);
       } catch {
-        result = { ok: false, error: "Something went wrong. Try again in a moment." };
+        result = { ok: false, error: t("askFailed") };
       }
       setTurns((current) => {
         const next = [...current];
@@ -110,7 +107,7 @@ export function AskBox({ variant }: { variant: "sidebar" | "icon" }) {
       try {
         outcome = await confirmAssistantAction(proposal.kind, proposal.args);
       } catch {
-        outcome = { ok: false, error: "That couldn't be saved. Nothing was changed." };
+        outcome = { ok: false, error: t("askNotSaved") };
       }
       if (outcome.ok) patch(index, { proposalState: "done", result: { message: outcome.message, link: outcome.link, copy: outcome.copy } });
       else patch(index, { proposalState: "waiting", resultError: outcome.error });
@@ -126,18 +123,18 @@ export function AskBox({ variant }: { variant: "sidebar" | "icon" }) {
           type="button"
         >
           <Search size={15} />
-          <span className="flex-1">Ask anything…</span>
+          <span className="flex-1">{t("askAnything")}</span>
           <kbd className="rounded border border-[var(--border)] px-1 text-[10px] font-semibold text-[var(--muted)]">Ctrl K</kbd>
         </button>
       ) : (
-        <button aria-label="Ask RouteHQ" className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border)] bg-white text-[var(--foreground-secondary)]" onClick={() => setOpen(true)} type="button">
+        <button aria-label={t("askTitle")} className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border)] bg-white text-[var(--foreground-secondary)]" onClick={() => setOpen(true)} type="button">
           <Search size={17} />
         </button>
       )}
 
       {open ? (
         <div className="fixed inset-0 z-[60] flex items-end justify-center bg-[#1c1b18]/40 p-0 sm:items-start sm:p-6 sm:pt-[10vh]" onClick={() => setOpen(false)} role="presentation">
-          <div aria-label="Ask RouteHQ" aria-modal="true" className="flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl sm:rounded-2xl" onClick={(event) => event.stopPropagation()} role="dialog">
+          <div aria-label={t("askTitle")} aria-modal="true" className="flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl sm:rounded-2xl" onClick={(event) => event.stopPropagation()} role="dialog">
             <form
               className="flex items-center gap-2 border-b border-[var(--border)] px-4 py-3"
               onSubmit={(event) => {
@@ -149,15 +146,15 @@ export function AskBox({ variant }: { variant: "sidebar" | "icon" }) {
               <input
                 className="h-10 min-w-0 flex-1 border-0 bg-transparent px-0 text-[15px] shadow-none outline-none focus:ring-0"
                 onChange={(event) => setQuestion(event.target.value)}
-                placeholder="Ask a question, or tell me what to add or change…"
+                placeholder={t("askPlaceholder")}
                 ref={input}
                 style={{ boxShadow: "none", border: "none" }}
                 value={question}
               />
               <button className="primary-action pressable min-h-9 px-3 text-[13px] disabled:opacity-60" disabled={isPending || !question.trim()} type="submit">
-                Ask
+                {t("ask")}
               </button>
-              <button aria-label="Close" className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[#f1efeb]" onClick={() => setOpen(false)} type="button">
+              <button aria-label={t("close")} className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[#f1efeb]" onClick={() => setOpen(false)} type="button">
                 <X size={18} />
               </button>
             </form>
@@ -165,7 +162,7 @@ export function AskBox({ variant }: { variant: "sidebar" | "icon" }) {
             <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
               {turns.length === 0 ? (
                 <div>
-                  <p className="text-[13px] text-[var(--muted)]">Answers come from your own records. Try one of these:</p>
+                  <p className="text-[13px] text-[var(--muted)]">{t("askIntro")}</p>
                   <div className="mt-3 grid gap-2 sm:grid-cols-2">
                     {EXAMPLES.map((example) => (
                       <button className="pressable rounded-xl border border-[var(--border)] bg-[#fbfaf8] px-3 py-2.5 text-left text-[13px] font-medium text-[var(--foreground-secondary)] hover:border-[var(--primary)] hover:text-[var(--primary)]" key={example} onClick={() => ask(example)} type="button">
@@ -220,18 +217,18 @@ export function AskBox({ variant }: { variant: "sidebar" | "icon" }) {
                                     ) : null}
                                   </div>
                                 ) : turn.proposalState === "cancelled" ? (
-                                  <p className="text-[13px] text-[var(--muted)]">Cancelled. Nothing was saved.</p>
+                                  <p className="text-[13px] text-[var(--muted)]">{t("askCancelled")}</p>
                                 ) : (
                                   <div>
                                     {turn.resultError ? <p className="mb-2 text-[13px] font-medium text-[var(--danger)]">{turn.resultError}</p> : null}
                                     <div className="flex items-center gap-2">
                                       <button className="primary-action pressable min-h-9 px-4 text-[13px] disabled:opacity-60" disabled={turn.proposalState === "saving"} onClick={() => confirm(index)} type="button">
-                                        {turn.proposalState === "saving" ? "Saving…" : "Confirm"}
+                                        {turn.proposalState === "saving" ? t("saving") : t("confirm")}
                                       </button>
                                       <button className="secondary-action pressable min-h-9 px-3 text-[13px]" disabled={turn.proposalState === "saving"} onClick={() => patch(index, { proposalState: "cancelled" })} type="button">
-                                        Cancel
+                                        {t("cancel")}
                                       </button>
-                                      <span className="text-[12px] text-[var(--muted)]">Wrong? Tell me what to change.</span>
+                                      <span className="text-[12px] text-[var(--muted)]">{t("askWrong")}</span>
                                     </div>
                                   </div>
                                 )}
@@ -250,7 +247,7 @@ export function AskBox({ variant }: { variant: "sidebar" | "icon" }) {
                           ) : null}
                         </>
                       ) : (
-                        <p className="mt-2 animate-pulse text-[13px] text-[var(--muted)]">Looking through your records…</p>
+                        <p className="mt-2 animate-pulse text-[13px] text-[var(--muted)]">{t("askLooking")}</p>
                       )}
                     </div>
                   ))}
@@ -258,7 +255,7 @@ export function AskBox({ variant }: { variant: "sidebar" | "icon" }) {
                 </div>
               )}
             </div>
-            <p className="border-t border-[var(--border)] px-4 py-2 text-[11px] text-[var(--muted)]">Written by AI from your records. Nothing is changed until you press Confirm.</p>
+            <p className="border-t border-[var(--border)] px-4 py-2 text-[11px] text-[var(--muted)]">{t("askFooter")}</p>
           </div>
         </div>
       ) : null}

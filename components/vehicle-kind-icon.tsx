@@ -1,4 +1,5 @@
 import { Bike, Bus, Car, Truck } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { VehicleKind } from "@/lib/vehicle-groups";
 
 function Motorbike({ size = 18 }: { size?: number }) {
@@ -50,11 +51,12 @@ export function VehicleKindIcon({ kind, size = 18, boxed = true }: { kind: Vehic
 
 /** "● 3 out · ● 2 free" summary used in fleet section headers and the dashboard. */
 export function OutFreeSummary({ out, free, other = 0 }: { out: number; free: number; other?: number }) {
+  const t = useTranslations("common");
   return (
     <span className="inline-flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-[var(--muted)]">
-      <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#2f6fdb]" />{out} out</span>
-      <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#16a34a]" />{free} free</span>
-      {other > 0 ? <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#d4a017]" />{other} booked / in shop</span> : null}
+      <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#2f6fdb]" />{t("countOut", { count: out })}</span>
+      <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#16a34a]" />{t("countFree", { count: free })}</span>
+      {other > 0 ? <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#d4a017]" />{t("countBookedOrShop", { count: other })}</span> : null}
     </span>
   );
 }

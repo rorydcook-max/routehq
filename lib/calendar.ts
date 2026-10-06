@@ -8,6 +8,8 @@ export type CalendarEvent = {
   tone: "blue" | "amber" | "red" | "green" | "purple";
   href: string;
   type: "rental_start" | "rental_end" | "rental_due" | "compliance" | "maintenance" | "payment" | "custom";
+  /** What the event is, so the screen can say it in the reader's language (calendar.ev_<key>). The title is the English version. */
+  say?: { key: string; subject: string; amount?: string; paper?: string };
 };
 
 const COMPLIANCE_ITEMS: Array<{ key: string; label: string }> = [
@@ -75,7 +77,8 @@ export async function getCalendarEvents(organizationId: string, year: number, mo
         title: `${notDelivered && start < today ? "Handover overdue" : notDelivered ? "Handover" : "Handed over"}: ${label}${customer}`,
         tone: notDelivered && start < today ? "red" : notDelivered ? "blue" : "green",
         href: `/bookings/${rental.id}`,
-        type: "rental_start"
+        type: "rental_start",
+        say: { key: notDelivered && start < today ? "handoverOverdue" : notDelivered ? "handover" : "handedOver", subject: `${label}${customer}` }
       });
     }
 
@@ -88,7 +91,8 @@ export async function getCalendarEvents(organizationId: string, year: number, mo
         title: `${returned ? "Returned" : late ? "Return overdue" : "Return"}: ${label}${customer}`,
         tone: returned ? "green" : late ? "red" : "amber",
         href: `/bookings/${rental.id}`,
-        type: "rental_end"
+        type: "rental_end",
+        say: { key: returned ? "returned" : late ? "returnOverdue" : "return", subject: `${label}${customer}` }
       });
     }
   }
@@ -103,7 +107,8 @@ export async function getCalendarEvents(organizationId: string, year: number, mo
       title: `${due < today ? "Unpaid" : "Payment"} ${money(Number(payment.amount || 0))}: ${who}`,
       tone: due < today ? "red" : "purple",
       href: `/bookings/${payment.rental_id}#payment-schedule`,
-      type: "payment"
+      type: "payment",
+      say: { key: due < today ? "unpaid" : "payment", subject: who, amount: money(Number(payment.amount || 0)) }
     });
   }
 
@@ -119,7 +124,8 @@ export async function getCalendarEvents(organizationId: string, year: number, mo
           title: `${item.label} ${date < today ? "expired" : "due"}: ${label}`,
           tone: "red",
           href: `/fleet/${vehicle.id}`,
-          type: "compliance"
+          type: "compliance",
+          say: { key: date < today ? "paperExpired" : "paperDue", subject: label, paper: item.key }
         });
       }
     }

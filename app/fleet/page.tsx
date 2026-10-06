@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { getLocale, getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
 import { FileSpreadsheet, Plus } from "lucide-react";
 import { bulkArchiveVehicles, bulkDeleteVehicles } from "@/app/actions/vehicles";
 import { AppShell } from "@/components/app-shell";
@@ -17,29 +19,24 @@ const statusTone = {
   Reserved: "amber"
 } as const;
 
-/** Plain names for vehicle statuses. */
-function statusLabel(status: string) {
-  if (status === "Rented") return "On rent";
-  if (status === "Reserved") return "Booked";
-  if (status === "Maintenance") return "In the shop";
-  return status;
-}
-
-function ComplianceBadge({ item, attention = 0 }: { item?: { label: string; date: string; daysLeft: number } | null; attention?: number }) {
-  if (!item) return <span className="text-xs text-[var(--muted)]">No dates recorded</span>;
+function ComplianceBadge({ item, attention = 0 }: { item?: { key?: string; label: string; date: string; daysLeft: number } | null; attention?: number }) {
+  const t = useTranslations("fleet");
+  const c = useTranslations("common");
+  if (!item) return <span className="text-xs text-[var(--muted)]">{t("noDates")}</span>;
   const tone = item.daysLeft < 0 ? "red" : item.daysLeft <= 30 ? "amber" : "green";
   const days = Math.abs(item.daysLeft);
-  const plural = days === 1 ? "" : "s";
-  const overdueWord = item.label === "Service" ? "overdue by" : "expired";
+  // Road tax, insurance and the rest are named in the reader's language.
+  const label = item.key && c.has(`paper_${item.key}`) ? c(`paper_${item.key}`) : item.label;
+  const isService = item.key === "next_service_date" || item.label === "Service";
   const text =
     item.daysLeft < 0
-      ? item.label === "Service"
-        ? `Service overdue by ${days} day${plural}`
-        : `${item.label} ${overdueWord} ${days} day${plural} ago`
+      ? isService
+        ? t("serviceOverdue", { days })
+        : t("expiredAgo", { label, days })
       : item.daysLeft === 0
-        ? `${item.label} due today`
-        : `${item.label} due in ${days} day${plural}`;
-  const more = attention > 1 ? ` +${attention - 1} more` : "";
+        ? t("dueToday", { label })
+        : t("dueIn", { label, days });
+  const more = attention > 1 ? ` ${t("plusMore", { count: attention - 1 })}` : "";
   return <Badge tone={tone}>{text + more}</Badge>;
 }
 
@@ -54,43 +51,45 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
   const groups = groupVehiclesByKind(vehicles, categories);
   const totalOut = vehicles.filter((vehicle) => vehicle.status === "Rented").length;
   const totalFree = vehicles.filter((vehicle) => vehicle.status === "Available").length;
+  const [t, c, locale] = await Promise.all([getTranslations("fleet"), getTranslations("common"), getLocale()]);
+  const kindName = (group: { kind: string; label: string }) => (c.has(`kinds_${group.kind}`) ? c(`kinds_${group.kind}`) : group.label);
 
   return (
     <AppShell userEmail={userEmail}>
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="page-title">Fleet</h1>
+          <h1 className="page-title">{t("title")}</h1>
           <p className="mt-1 text-sm text-[var(--muted)]">
-            {vehicles.length} {vehicles.length === 1 ? "vehicle" : "vehicles"} · {totalOut} out on rent · {totalFree} free now
+            {t("summary", { count: vehicles.length, out: totalOut, free: totalFree })}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Link className={secondaryButton} href="/fleet/import">
             <FileSpreadsheet size={16} />
-            Import
+            {t("import")}
           </Link>
           <Link className={primaryButton} href="/fleet/new">
             <Plus size={16} />
-            Add vehicle
+            {t("addVehicle")}
           </Link>
         </div>
       </div>
 
       {notice === "vehicle-has-bookings" ? (
         <p className="mb-4 rounded-xl border border-[#f3dfb0] bg-[#fdf7e9] p-3 text-sm font-medium text-[#8a5a12]" role="alert">
-          That vehicle is out on rent or has a booking coming up, so it wasn&apos;t deleted. Finish or cancel its bookings first, or archive it instead.
+          {t("noticeBookings")}
         </p>
       ) : null}
 
       {vehicles.length === 0 ? (
         <div className="rounded-xl border border-[var(--border)] bg-white p-6 shadow-[var(--shadow-sm)]">
           <EmptyState
-            title="No vehicles yet"
-            description="Add your first car or bike to start taking bookings."
+            title={t("emptyTitle")}
+            description={t("emptyBody")}
             action={
               <Link className={primaryButton} href="/fleet/new">
                 <Plus size={16} />
-                Add vehicle
+                {t("addVehicle")}
               </Link>
             }
           />
@@ -108,9 +107,9 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
               <VehicleKindIcon kind={group.kind} size={20} />
               <span className="min-w-0">
                 <span className="block text-[15px] font-semibold leading-tight text-[var(--foreground)]">
-                  {group.vehicles.length} <span className="font-normal text-[var(--foreground-secondary)]">{kindLabel(group.kind, group.vehicles.length).toLowerCase()}</span>
+                  {group.vehicles.length} <span className="font-normal text-[var(--foreground-secondary)]">{locale === "en" ? kindLabel(group.kind, group.vehicles.length).toLowerCase() : kindName(group)}</span>
                 </span>
-                <span className="mt-0.5 block text-[12px] text-[var(--muted)]">{group.out} out · {group.free} free</span>
+                <span className="mt-0.5 block text-[12px] text-[var(--muted)]">{t("outFree", { out: group.out, free: group.free })}</span>
               </span>
             </a>
           ))}
@@ -126,7 +125,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
               <VehicleKindIcon kind={group.kind} />
               <div className="min-w-0">
                 <h2 className="text-[16px] font-semibold tracking-[-0.01em] text-[var(--foreground)]">
-                  {group.label} <span className="font-normal text-[var(--muted)]">· {group.vehicles.length}</span>
+                  {kindName(group)} <span className="font-normal text-[var(--muted)]">· {group.vehicles.length}</span>
                 </h2>
                 <OutFreeSummary free={group.free} other={group.other} out={group.out} />
               </div>
@@ -137,13 +136,13 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
               <table className="w-full text-left text-sm">
                 <thead>
                   <tr className="border-b border-[var(--border)] text-[var(--muted)]">
-                    <th className="w-10 py-2.5 pl-4 pr-2"><span className="sr-only">Select</span></th>
-                    <th className="py-2.5 pr-3">Vehicle</th>
-                    <th className="px-3 py-2.5">Status</th>
-                    <th className="px-3 py-2.5">Monthly rate</th>
-                    <th className="hidden px-3 py-2.5 xl:table-cell">On rent, last 12 months</th>
-                    <th className="px-3 py-2.5">Paperwork</th>
-                    <th className="hidden px-3 py-2.5 pr-4 xl:table-cell">Profit</th>
+                    <th className="w-10 py-2.5 pl-4 pr-2"><span className="sr-only">{t("select")}</span></th>
+                    <th className="py-2.5 pr-3">{t("th_vehicle")}</th>
+                    <th className="px-3 py-2.5">{t("th_status")}</th>
+                    <th className="px-3 py-2.5">{t("th_rate")}</th>
+                    <th className="hidden px-3 py-2.5 xl:table-cell">{t("th_onRent")}</th>
+                    <th className="px-3 py-2.5">{t("th_paperwork")}</th>
+                    <th className="hidden px-3 py-2.5 pr-4 xl:table-cell">{t("th_profit")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -152,7 +151,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                     return (
                       <tr className="group border-b border-[var(--border)] last:border-0 hover:bg-[#fbfaf8]" key={vehicle.id}>
                         <td className="py-3 pl-4 pr-2">
-                          <input aria-label={`Select ${vehicle.make} ${vehicle.model}`} className="flex-shrink-0" form="fleetBulkForm" name="vehicleIds" type="checkbox" value={vehicle.id} />
+                          <input aria-label={t("selectAria", { vehicle: `${vehicle.make} ${vehicle.model}` })} className="flex-shrink-0" form="fleetBulkForm" name="vehicleIds" type="checkbox" value={vehicle.id} />
                         </td>
                         <td className="py-3 pr-3">
                           <Link className="block rounded-md outline-none focus:ring-2 focus:ring-[var(--primary)]/25" href={href}>
@@ -160,15 +159,15 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                               {vehicle.make} {vehicle.model}
                             </span>
                             <span className="block whitespace-nowrap text-[13px] text-[var(--muted)]">
-                              <span className="font-mono-data">{vehicle.plate}</span> · {vehicle.year || "Year unknown"} · {vehicle.mileage.toLocaleString()} km
+                              <span className="font-mono-data">{vehicle.plate}</span> · {vehicle.year || t("yearUnknown")} · {vehicle.mileage.toLocaleString()} km
                             </span>
                           </Link>
                         </td>
                         <td className="px-3 py-3">
-                          <Badge tone={statusTone[vehicle.status]}>{statusLabel(vehicle.status)}</Badge>
+                          <Badge tone={statusTone[vehicle.status]}>{t(`status_${vehicle.status}`)}</Badge>
                         </td>
                         <td className="px-3 py-3">
-                          <Link className="font-mono-data block" href={href}>{vehicle.monthlyRate > 0 ? money(vehicle.monthlyRate) : <span className="text-[var(--muted)]">Not set</span>}</Link>
+                          <Link className="font-mono-data block" href={href}>{vehicle.monthlyRate > 0 ? money(vehicle.monthlyRate) : <span className="text-[var(--muted)]">{t("notSet")}</span>}</Link>
                         </td>
                         <td className="hidden px-3 py-3 xl:table-cell">
                           <div className="min-w-28">
@@ -199,7 +198,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                       </p>
                       <p className="mt-0.5 truncate text-[13px] text-[var(--muted)]">
                         <span className="font-mono-data">{vehicle.plate}</span>
-                        {vehicle.monthlyRate > 0 ? <> · {money(vehicle.monthlyRate)}/mo</> : null}
+                        {vehicle.monthlyRate > 0 ? <> · {t("perMo", { amount: money(vehicle.monthlyRate) })}</> : null}
                       </p>
                       {vehicle.complianceNext && vehicle.complianceNext.daysLeft <= 30 ? (
                         <div className="mt-1.5">
@@ -207,7 +206,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                         </div>
                       ) : null}
                     </div>
-                    <Badge tone={statusTone[vehicle.status]}>{statusLabel(vehicle.status)}</Badge>
+                    <Badge tone={statusTone[vehicle.status]}>{t(`status_${vehicle.status}`)}</Badge>
                   </Link>
                 </li>
               ))}

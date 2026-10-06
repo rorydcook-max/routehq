@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { intlLocale } from "@/lib/i18n/dates";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { CalendarEvent } from "@/lib/calendar";
 
@@ -26,19 +28,41 @@ function monthKey(date: Date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 }
 
-function monthLabel(key: string) {
+function monthLabel(key: string, locale: string) {
   const [year, month] = key.split("-").map(Number);
-  return new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(new Date(year, month - 1, 1));
+  return new Intl.DateTimeFormat(intlLocale(locale), { month: "long", year: "numeric" }).format(new Date(year, month - 1, 1));
 }
 
-function dayLabel(date: string) {
+function dayLabel(date: string, locale: string) {
   const [year, month, day] = date.split("-").map(Number);
-  return new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short" }).format(new Date(year, month - 1, day));
+  return new Intl.DateTimeFormat(intlLocale(locale), { weekday: "short", day: "numeric", month: "short" }).format(new Date(year, month - 1, day));
+}
+
+/** Sunday to Saturday, as short names in the reader's language. */
+function weekdayNames(locale: string) {
+  // 4 January 1970 was a Sunday.
+  const names = (weekday: "short" | "narrow") => {
+    const format = new Intl.DateTimeFormat(intlLocale(locale), { weekday, timeZone: "UTC" });
+    return Array.from({ length: 7 }, (_, index) => format.format(new Date(Date.UTC(1970, 0, 4 + index))));
+  };
+  const short = names("short");
+  // Seven columns on a phone leave room for about four letters; some languages' short names are longer.
+  return short.some((name) => name.length > 4) ? names("narrow") : short;
 }
 
 export function CalendarView({ events, initialMonth, today }: { events: CalendarEvent[]; initialMonth: string; today: string }) {
   const router = useRouter();
+  const t = useTranslations("calendar");
+  const papers = useTranslations("common");
+  const locale = useLocale();
   const month = initialMonth;
+  /** An event in the reader's language. Older or unknown kinds keep the title they came with. */
+  const titleOf = (event: CalendarEvent) => {
+    const words = event.say;
+    if (!words || !t.has(`ev_${words.key}`)) return event.title;
+    const paper = words.paper ? (papers.has(`paper_${words.paper}`) ? papers(`paper_${words.paper}`) : words.paper) : "";
+    return t(`ev_${words.key}`, { subject: words.subject, amount: words.amount || "", paper });
+  };
 
   const days = useMemo(() => {
     const [year, monthIndex] = month.split("-").map(Number);
@@ -79,13 +103,13 @@ export function CalendarView({ events, initialMonth, today }: { events: Calendar
   const dayGroup = ([date, list]: [string, typeof events]) => (
     <div className="scroll-mt-4" id={`day-${date}`} key={date}>
       <p className={`mb-1 text-xs font-bold uppercase tracking-wide ${date === today ? "text-[var(--primary)]" : "text-[var(--muted)]"}`}>
-        {date === today ? "Today · " : ""}
-        {dayLabel(date)}
+        {date === today ? `${t("today")} · ` : ""}
+        {dayLabel(date, locale)}
       </p>
       <div className="space-y-1">
         {list.map((event) => (
           <Link className={`block rounded-lg border px-2.5 py-2 text-sm font-medium ${toneClasses[event.tone]}`} href={event.href as any} key={event.id}>
-            {event.title}
+            {titleOf(event)}
           </Link>
         ))}
       </div>
@@ -95,25 +119,25 @@ export function CalendarView({ events, initialMonth, today }: { events: Calendar
   return (
     <div className="space-y-4">
       <div className="content-section flex items-center justify-between gap-2">
-        <button aria-label="Previous month" className="secondary-action pressable" onClick={() => shiftMonth(-1)} type="button">
+        <button aria-label={t("prevMonth")} className="secondary-action pressable" onClick={() => shiftMonth(-1)} type="button">
           <ChevronLeft size={18} />
         </button>
         <div className="flex items-center gap-2">
-          <h2 className="text-lg font-semibold text-[var(--foreground)]">{monthLabel(month)}</h2>
+          <h2 className="text-lg font-semibold text-[var(--foreground)]">{monthLabel(month, locale)}</h2>
           {!isCurrentMonth ? (
             <button className="rounded-full border border-[var(--border)] px-2.5 py-1 text-xs font-bold text-[var(--primary)]" onClick={() => router.push(`/calendar?month=${today.slice(0, 7)}`)} type="button">
-              Today
+              {t("today")}
             </button>
           ) : null}
         </div>
-        <button aria-label="Next month" className="secondary-action pressable" onClick={() => shiftMonth(1)} type="button">
+        <button aria-label={t("nextMonth")} className="secondary-action pressable" onClick={() => shiftMonth(1)} type="button">
           <ChevronRight size={18} />
         </button>
       </div>
 
       <div className="content-section">
         <div className="mb-2 grid grid-cols-7 gap-1 text-center text-xs font-bold uppercase tracking-wide text-[var(--muted)]">
-          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+          {weekdayNames(locale).map((day) => (
             <div key={day}>{day}</div>
           ))}
         </div>
@@ -145,12 +169,12 @@ export function CalendarView({ events, initialMonth, today }: { events: Calendar
                       key={event.id}
                       href={event.href as any}
                       className={`block truncate rounded border px-1 py-0.5 text-[10px] font-medium ${toneClasses[event.tone]}`}
-                      title={event.title}
+                      title={titleOf(event)}
                     >
-                      {event.title}
+                      {titleOf(event)}
                     </Link>
                   ))}
-                  {dayEvents.length > 3 ? <span className="text-[10px] text-[var(--muted)]">+{dayEvents.length - 3} more</span> : null}
+                  {dayEvents.length > 3 ? <span className="text-[10px] text-[var(--muted)]">{t("more", { count: dayEvents.length - 3 })}</span> : null}
                 </div>
               </div>
             );
@@ -159,12 +183,12 @@ export function CalendarView({ events, initialMonth, today }: { events: Calendar
         {/* What the dots mean, for phones where a day only has room for dots. */}
         <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-[var(--muted)] sm:hidden">
           {([
-            ["blue", "Handover"],
-            ["amber", "Return"],
-            ["purple", "Payment"],
-            ["red", "Late or due"],
-            ["green", "Done"]
-          ] as const).map(([tone, label]) => (
+            ["blue", t("leg_blue")],
+            ["amber", t("leg_amber")],
+            ["purple", t("leg_purple")],
+            ["red", t("leg_red")],
+            ["green", t("leg_green")]
+          ] as Array<[CalendarEvent["tone"], string]>).map(([tone, label]) => (
             <span className="inline-flex items-center gap-1" key={tone}>
               <span className={`h-1.5 w-1.5 rounded-full ${dotClasses[tone]}`} />
               {label}
@@ -174,17 +198,17 @@ export function CalendarView({ events, initialMonth, today }: { events: Calendar
       </div>
 
       <div className="content-section">
-        <p className="mb-2 text-sm font-semibold text-[var(--foreground)]">{isCurrentMonth ? "Today and coming up" : monthLabel(month)}</p>
+        <p className="mb-2 text-sm font-semibold text-[var(--foreground)]">{isCurrentMonth ? t("comingUp") : monthLabel(month, locale)}</p>
         {agenda.length === 0 ? (
-          <p className="text-sm text-[var(--muted)]">Nothing scheduled in {monthLabel(month)}.</p>
+          <p className="text-sm text-[var(--muted)]">{t("nothingIn", { month: monthLabel(month, locale) })}</p>
         ) : (
           <div className="space-y-3">
-            {comingUp.length === 0 ? <p className="text-sm text-[var(--muted)]">Nothing else scheduled this month.</p> : comingUp.map(dayGroup)}
+            {comingUp.length === 0 ? <p className="text-sm text-[var(--muted)]">{t("nothingElse")}</p> : comingUp.map(dayGroup)}
             {/* What already happened stays one tap away, so today is the first thing on the list. */}
             {earlier.length > 0 ? (
               <details className="group rounded-lg border border-[var(--border)]">
                 <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 px-3 text-sm font-semibold text-[var(--foreground-secondary)] [&::-webkit-details-marker]:hidden">
-                  Earlier this month · {earlier.reduce((sum, [, list]) => sum + list.length, 0)}
+                  {t("earlier", { count: earlier.reduce((sum, [, list]) => sum + list.length, 0) })}
                   <ChevronRight className="shrink-0 text-[var(--muted)] transition-transform group-open:rotate-90" size={16} />
                 </summary>
                 <div className="space-y-3 border-t border-[var(--border)] p-3">{earlier.map(dayGroup)}</div>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Plus } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { getCurrentUserEmail } from "@/lib/auth/session";
@@ -13,6 +14,7 @@ export default async function TransactionsPage({
   searchParams?: Promise<{ linked?: string }>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : {};
+  const t = await getTranslations("money");
   const [userEmail, organization] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization()]);
   const [transactions, options] = await Promise.all([
     getTransactionList(organization.id),
@@ -23,19 +25,19 @@ export default async function TransactionsPage({
     <AppShell userEmail={userEmail}>
       <div className="page-hero mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="page-eyebrow">Transactions</p>
-          <h1 className="page-title">Money in & out</h1>
-          <p className="page-subtitle mt-1">Every payment you&apos;ve received and every cost, side by side.</p>
+          <p className="page-eyebrow">{t("eyebrow")}</p>
+          <h1 className="page-title">{t("listTitle")}</h1>
+          <p className="page-subtitle mt-1">{t("listSubtitle")}</p>
         </div>
         <Link className="primary-action pressable" href="/transactions/new">
           <Plus size={18} />
-          Record money
+          {t("recordMoney")}
         </Link>
       </div>
 
       {resolvedSearchParams.linked ? (
         <div className="mb-4 rounded-xl border border-[#bbf7d0] bg-[#f0fdf4] px-4 py-3 text-sm font-semibold text-[#166534]">
-          Saved. {resolvedSearchParams.linked === "payment" ? "The payment is marked as paid on the booking." : "The matching job on your To do list is ticked off."}
+          {resolvedSearchParams.linked === "payment" ? t("savedPayment") : t("savedTask")}
         </div>
       ) : null}
 

@@ -2,6 +2,10 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { longDate } from "@/lib/i18n/dates";
+
+type Say = (key: string, values?: Record<string, string | number>) => string;
 import { ChevronRight, Plus, Search } from "lucide-react";
 import { Badge, Card, EmptyState, SectionHeader } from "@/components/ui";
 import { flagForNationality } from "@/lib/customer-options";
@@ -15,29 +19,26 @@ function money(value: number) {
   }).format(value);
 }
 
-function formatDate(value: string | null) {
+function formatDate(value: string | null, say: Say, locale: string) {
   if (!value) {
-    return "No rentals yet";
+    return say("noRentals");
   }
-
-  return new Intl.DateTimeFormat("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric"
-  }).format(new Date(value));
+  return longDate(String(value).slice(0, 10), locale);
 }
 
-function documentBadge(status: CustomerListItem["documentStatus"]) {
+function documentBadge(status: CustomerListItem["documentStatus"], say: Say) {
   if (status === "complete") {
-    return <Badge tone="green">Complete</Badge>;
+    return <Badge tone="green">{say("doc_complete")}</Badge>;
   }
   if (status === "missing") {
-    return <Badge tone="amber">Documents missing</Badge>;
+    return <Badge tone="amber">{say("doc_missing")}</Badge>;
   }
-  return <Badge tone="red">No documents</Badge>;
+  return <Badge tone="red">{say("doc_none")}</Badge>;
 }
 
 export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
+  const say = useTranslations("customers") as unknown as Say;
+  const locale = useLocale();
   const [search, setSearch] = useState("");
   const [documentFilter, setDocumentFilter] = useState("all");
   const [rentalFilter, setRentalFilter] = useState("all");
@@ -66,25 +67,25 @@ export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
     <div className="space-y-4">
       <div className="page-hero flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="page-eyebrow">Customers</p>
-          <h1 className="page-title">Customers</h1>
-          <p className="page-subtitle mt-2">Find renters, document status, active rentals, and lifetime value.</p>
+          <p className="page-eyebrow">{say("title")}</p>
+          <h1 className="page-title">{say("title")}</h1>
+          <p className="page-subtitle mt-2">{say("subtitle")}</p>
         </div>
         <Link className="primary-action pressable" href="/customers/new">
           <Plus size={18} />
-          Add Customer
+          {say("add")}
         </Link>
       </div>
 
       <Card>
-        <SectionHeader eyebrow="Directory" title={`${filteredCustomers.length} customers`} />
+        <SectionHeader eyebrow={say("directory")} title={say("count", { count: filteredCustomers.length })} />
         <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-[1fr_auto_auto]">
           <label className="relative col-span-2 block lg:col-span-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" size={16} />
             <input
               className="input-with-leading-icon w-full rounded-xl border border-[var(--border)] bg-white pr-3 text-sm text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]"
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search by name or phone"
+              placeholder={say("search")}
               value={search}
             />
           </label>
@@ -93,29 +94,29 @@ export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
             onChange={(event) => setDocumentFilter(event.target.value)}
             value={documentFilter}
           >
-            <option value="all">All documents</option>
-            <option value="complete">Complete</option>
-            <option value="incomplete">Incomplete</option>
+            <option value="all">{say("allDocs")}</option>
+            <option value="complete">{say("complete")}</option>
+            <option value="incomplete">{say("incomplete")}</option>
           </select>
           <select
             className="min-w-0 rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-sm font-semibold text-[var(--foreground-secondary)]"
             onChange={(event) => setRentalFilter(event.target.value)}
             value={rentalFilter}
           >
-            <option value="all">Everyone</option>
-            <option value="renting">Renting now</option>
-            <option value="not_renting">Not renting</option>
+            <option value="all">{say("everyone")}</option>
+            <option value="renting">{say("renting")}</option>
+            <option value="not_renting">{say("notRenting")}</option>
           </select>
         </div>
       </Card>
 
       {filteredCustomers.length === 0 ? (
         <EmptyState
-          title="No customers yet"
-          description="Customers are created automatically when you create a booking, or you can add one manually."
+          title={say("emptyTitle")}
+          description={say("emptyBody")}
           action={
             <Link className="primary-action pressable" href="/customers/new">
-              Add Customer
+              {say("add")}
             </Link>
           }
         />
@@ -126,10 +127,12 @@ export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
             const activeRental = item.activeRental;
             const vehicle = activeRental ? `${activeRental.vehicles?.make || ""} ${activeRental.vehicles?.model || ""}`.trim() : "";
             const line = activeRental
-              ? `Renting the ${vehicle || "vehicle"} · ${activeRental.end_date ? `back ${formatDate(activeRental.end_date)}` : "open-ended"}`
+              ? activeRental.end_date
+                ? say("rentingLine", { vehicle: vehicle || say("vehicle"), date: formatDate(activeRental.end_date, say, locale) })
+                : say("rentingOpen", { vehicle: vehicle || say("vehicle") })
               : item.lastRentalDate
-                ? `Last rental ${formatDate(item.lastRentalDate)}`
-                : "No rentals yet";
+                ? say("lastRental", { date: formatDate(item.lastRentalDate, say, locale) })
+                : say("noRentals");
             return (
               <Link className="flex items-center gap-3 px-3.5 py-3 transition hover:bg-[var(--panel-secondary)]" href={`/customers/${item.customer.id}`} key={item.customer.id}>
                 <div className="min-w-0 flex-1">
@@ -137,13 +140,13 @@ export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
                     <p className="truncate text-[15px] font-semibold text-[var(--foreground)]">
                       {flagForNationality(item.customer.nationality)} {item.customer.full_name}
                     </p>
-                    {item.documentStatus === "complete" ? null : documentBadge(item.documentStatus)}
+                    {item.documentStatus === "complete" ? null : documentBadge(item.documentStatus, say)}
                   </div>
                   <p className={`mt-0.5 truncate text-sm ${activeRental ? "font-semibold text-[var(--primary)]" : "text-[var(--muted)]"}`}>{line}</p>
                 </div>
                 <div className="shrink-0 text-right">
                   <p className="font-mono-data text-sm font-semibold text-[var(--foreground)]">{money(item.lifetimeRevenue)}</p>
-                  <p className="text-xs text-[var(--muted)]">{item.totalRentals} {item.totalRentals === 1 ? "rental" : "rentals"}</p>
+                  <p className="text-xs text-[var(--muted)]">{say("rentals", { count: item.totalRentals })}</p>
                 </div>
                 <ChevronRight className="shrink-0 text-[var(--muted)]" size={16} />
               </Link>

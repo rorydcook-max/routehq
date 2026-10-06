@@ -1,6 +1,8 @@
 import { releaseExpiredHolds } from "@/lib/booking-holds";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import Link from "next/link";
+import { getLocale, getTranslations } from "next-intl/server";
+import { intlLocale } from "@/lib/i18n/dates";
 import type { Route } from "next";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
@@ -19,9 +21,9 @@ function shiftMonth(month: string, delta: number) {
   return `${next.getUTCFullYear()}-${String(next.getUTCMonth() + 1).padStart(2, "0")}`;
 }
 
-function monthLabel(month: string) {
+function monthLabel(month: string, locale: string) {
   const [year, index] = month.split("-").map(Number);
-  return new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(Date.UTC(year, index - 1, 1)));
+  return new Intl.DateTimeFormat(intlLocale(locale), { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(Date.UTC(year, index - 1, 1)));
 }
 
 export default async function CalendarPage({
@@ -33,6 +35,7 @@ export default async function CalendarPage({
   const today = businessToday();
   const month = /^\d{4}-\d{2}$/.test(String(params.month || "")) ? String(params.month) : today.slice(0, 7);
   const byVehicle = params.view === "vehicles";
+  const [t, todo, locale] = await Promise.all([getTranslations("calendar"), getTranslations("todo"), getLocale()]);
   const [userEmail, organization] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization()]);
   await releaseExpiredHolds(createSupabaseAdminClient(), organization.id).catch(() => null);
   const [yearStr, monthStr] = month.split("-");
@@ -47,37 +50,37 @@ export default async function CalendarPage({
   return (
     <AppShell userEmail={userEmail}>
       <div className="page-hero mb-5">
-        <p className="page-eyebrow">Calendar</p>
-        <h1 className="page-title">Calendar</h1>
+        <p className="page-eyebrow">{t("title")}</p>
+        <h1 className="page-title">{t("title")}</h1>
         <p className="page-subtitle mt-1">
-          {byVehicle ? "Which vehicles are out, booked or free, day by day." : "Handovers, returns, payments and renewals by day."}
+          {byVehicle ? t("subVehicle") : t("subDay")}
         </p>
       </div>
 
       <div className="mb-4 flex gap-2">
         <Link className={tab(!byVehicle)} href={`/calendar?month=${month}` as Route}>
-          By day
+          {t("byDay")}
         </Link>
         <Link className={tab(byVehicle)} href={`/calendar?view=vehicles&month=${month}` as Route}>
-          By vehicle
+          {t("byVehicle")}
         </Link>
       </div>
 
       {byVehicle ? (
         <div className="space-y-4">
           <div className="content-section flex items-center justify-between gap-2">
-            <Link aria-label="Previous month" className="secondary-action pressable" href={`/calendar?view=vehicles&month=${shiftMonth(month, -1)}` as Route}>
+            <Link aria-label={t("prevMonth")} className="secondary-action pressable" href={`/calendar?view=vehicles&month=${shiftMonth(month, -1)}` as Route}>
               <ChevronLeft size={18} />
             </Link>
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-semibold text-[var(--foreground)]">{monthLabel(month)}</h2>
+              <h2 className="text-lg font-semibold text-[var(--foreground)]">{monthLabel(month, locale)}</h2>
               {today.slice(0, 7) !== month ? (
                 <Link className="rounded-full border border-[var(--border)] px-2.5 py-1 text-xs font-bold text-[var(--primary)]" href={`/calendar?view=vehicles&month=${today.slice(0, 7)}` as Route}>
-                  Today
+                  {t("today")}
                 </Link>
               ) : null}
             </div>
-            <Link aria-label="Next month" className="secondary-action pressable" href={`/calendar?view=vehicles&month=${shiftMonth(month, 1)}` as Route}>
+            <Link aria-label={t("nextMonth")} className="secondary-action pressable" href={`/calendar?view=vehicles&month=${shiftMonth(month, 1)}` as Route}>
               <ChevronRight size={18} />
             </Link>
           </div>
@@ -91,8 +94,8 @@ export default async function CalendarPage({
 
           <section>
             <div className="mb-4">
-              <p className="page-eyebrow">Tasks</p>
-              <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[var(--foreground)]">To do</h2>
+              <p className="page-eyebrow">{todo("eyebrow")}</p>
+              <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[var(--foreground)]">{todo("title")}</h2>
             </div>
             <TasksList organizationId={organization.id} tasks={tasks} today={today} />
           </section>

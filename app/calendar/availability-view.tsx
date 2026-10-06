@@ -1,5 +1,7 @@
 import Link from "next/link";
 import type { Route } from "next";
+import { useLocale, useTranslations } from "next-intl";
+import { intlLocale } from "@/lib/i18n/dates";
 import { VehicleKindIcon } from "@/components/vehicle-kind-icon";
 import type { AvailabilityBooking, AvailabilityVehicle } from "@/lib/calendar";
 import { kindFromCategory, kindLabel, type VehicleKind } from "@/lib/vehicle-groups";
@@ -12,12 +14,7 @@ const barClasses: Record<AvailabilityBooking["state"], string> = {
   returned: "bg-[var(--panel-secondary)] text-[var(--muted)] border border-[var(--border)]"
 };
 
-const stateWords: Record<AvailabilityBooking["state"], string> = {
-  out: "On rent",
-  booked: "Booked",
-  late: "Late back",
-  returned: "Returned"
-};
+// The words for each state are in the language files (calendar.st_<state>).
 
 const KIND_ORDER: VehicleKind[] = ["car", "van", "motorbike", "scooter", "ebike", "atv", "other"];
 const DAY_WIDTH = 30;
@@ -34,12 +31,16 @@ function dayOf(iso: string) {
  * a vehicle sitting free. Scrolls sideways on a phone with the names pinned.
  */
 export function AvailabilityView({ vehicles, month, today }: { vehicles: AvailabilityVehicle[]; month: string; today: string }) {
+  const t = useTranslations("calendar");
+  const kinds = useTranslations("common");
+  const locale = useLocale();
+  const dayLetter = new Intl.DateTimeFormat(intlLocale(locale), { weekday: "narrow", timeZone: "UTC" });
   const [year, monthIndex] = month.split("-").map(Number);
   const dayCount = new Date(Date.UTC(year, monthIndex, 0)).getUTCDate();
   const days = Array.from({ length: dayCount }, (_, index) => {
     const date = `${month}-${String(index + 1).padStart(2, "0")}`;
     const weekday = new Date(`${date}T00:00:00Z`).getUTCDay();
-    return { date, day: index + 1, letter: "SMTWTFS"[weekday], weekend: weekday === 0 || weekday === 6 };
+    return { date, day: index + 1, letter: dayLetter.format(new Date(`${date}T00:00:00Z`)), weekend: weekday === 0 || weekday === 6 };
   });
   const showsToday = today.slice(0, 7) === month;
   const freeToday = showsToday ? vehicles.filter((vehicle) => !vehicle.inShop && !vehicle.bookings.some((b) => b.state !== "returned" && b.from <= today && b.to >= today)).length : null;
@@ -50,8 +51,8 @@ export function AvailabilityView({ vehicles, month, today }: { vehicles: Availab
   if (vehicles.length === 0) {
     return (
       <div className="empty-state">
-        <p className="text-lg font-semibold text-[var(--foreground)]">No vehicles yet</p>
-        <p className="mt-2 text-sm text-[var(--muted)]">Add a vehicle and its bookings will show here.</p>
+        <p className="text-lg font-semibold text-[var(--foreground)]">{t("noVehicles")}</p>
+        <p className="mt-2 text-sm text-[var(--muted)]">{t("noVehiclesBody")}</p>
       </div>
     );
   }
@@ -60,13 +61,13 @@ export function AvailabilityView({ vehicles, month, today }: { vehicles: Availab
     <div className="content-section">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <p className="text-sm font-semibold text-[var(--foreground)]">
-          {freeToday === null ? `${vehicles.length} vehicles` : `${freeToday} of ${vehicles.length} free today`}
+          {freeToday === null ? t("vehicleCount", { count: vehicles.length }) : t("freeToday", { free: freeToday, total: vehicles.length })}
         </p>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[var(--foreground-secondary)]">
           {(["out", "booked", "late", "returned"] as const).map((state) => (
             <span className="inline-flex items-center gap-1.5" key={state}>
               <span className={`h-3 w-5 rounded ${barClasses[state]}`} />
-              {stateWords[state]}
+              {t(`st_${state}`)}
             </span>
           ))}
         </div>
@@ -92,7 +93,7 @@ export function AvailabilityView({ vehicles, month, today }: { vehicles: Availab
               {groups.length > 1 ? (
                 <div className="flex border-b border-[var(--border)] bg-white">
                   <p className="sticky left-0 z-20 bg-white px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
-                    {kindLabel(group.kind, group.list.length)}
+                    {locale !== "en" && kinds.has(`kinds_${group.kind}`) ? kinds(`kinds_${group.kind}`) : kindLabel(group.kind, group.list.length)}
                   </p>
                 </div>
               ) : null}
@@ -104,18 +105,18 @@ export function AvailabilityView({ vehicles, month, today }: { vehicles: Availab
                     </span>
                     <span className="min-w-0">
                       <span className="block truncate text-[13px] font-semibold text-[var(--foreground)]">{vehicle.name}</span>
-                      <span className="block truncate text-[11px] text-[var(--muted)]">{vehicle.inShop ? "In the shop" : vehicle.plate}</span>
+                      <span className="block truncate text-[11px] text-[var(--muted)]">{vehicle.inShop ? t("inShop") : vehicle.plate}</span>
                     </span>
                   </Link>
                   <div className="relative grid h-11 flex-1 items-center" style={{ gridTemplateColumns: columns }}>
                     {days.map((cell) => (
                       <Link
-                        aria-label={`Book ${vehicle.name} from ${cell.day}`}
+                        aria-label={t("bookAria", { vehicle: vehicle.name, day: cell.day })}
                         className={`h-full border-r border-[var(--border)] last:border-r-0 hover:bg-[var(--primary-light)] ${cell.date === today ? "bg-[var(--primary-light)]" : cell.weekend ? "bg-[var(--panel-secondary)]" : ""}`}
                         href={`/bookings/new?vehicleId=${vehicle.id}${cell.date >= today ? `&startDate=${cell.date}` : ""}` as Route}
                         key={cell.date}
                         style={{ gridColumn: cell.day, gridRow: 1 }}
-                        title={`Free · tap to book ${vehicle.name}`}
+                        title={t("freeTap", { vehicle: vehicle.name })}
                       />
                     ))}
                     {vehicle.bookings.map((booking) => (
@@ -124,7 +125,7 @@ export function AvailabilityView({ vehicles, month, today }: { vehicles: Availab
                         href={`/bookings/${booking.id}` as Route}
                         key={booking.id}
                         style={{ gridColumn: `${dayOf(booking.from)} / ${dayOf(booking.to) + 1}`, gridRow: 1 }}
-                        title={`${booking.customer} · ${stateWords[booking.state]}`}
+                        title={`${booking.customer} · ${t(`st_${booking.state}`)}`}
                       >
                         <span className="truncate">{booking.customer}</span>
                       </Link>
@@ -136,7 +137,7 @@ export function AvailabilityView({ vehicles, month, today }: { vehicles: Availab
           ))}
         </div>
       </div>
-      <p className="mt-2 text-xs text-[var(--muted)]">Tap a booking to open it, or an empty day to book that vehicle.</p>
+      <p className="mt-2 text-xs text-[var(--muted)]">{t("tapHint")}</p>
     </div>
   );
 }

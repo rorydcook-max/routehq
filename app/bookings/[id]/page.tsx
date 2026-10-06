@@ -550,11 +550,11 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <Badge tone={statusTone(displayStatus)}>{statusLabel(String(displayStatus), tx)}</Badge>
-                {bookingLinkBadge(bookingLink?.status, tx) ? (
+                {/* One badge for where the booking stands, and one more only while it waits on the customer's link. */}
+                {["booked", "draft"].includes(String(displayStatus)) && bookingLinkBadge(bookingLink?.status, tx) ? (
                   <Badge tone={bookingLinkBadge(bookingLink?.status, tx)!.tone}>{bookingLinkBadge(bookingLink?.status, tx)!.label}</Badge>
                 ) : null}
-                {!customer ? <Badge tone="amber">{tx.list("awaitingCustomerShort")}</Badge> : null}
-                {rental.entered_by_operator ? <Badge tone="blue">{tx.say("enteredByTeam")}</Badge> : null}
+                {/* "Awaiting customer" is the heading below, and who entered the booking is said under "Customer's link". */}
                 <span className="font-mono-data text-xs font-semibold uppercase text-[var(--muted)]">{bookingReference(rental)}</span>
               </div>
               <h1 className="mt-2 truncate text-2xl font-semibold tracking-[-0.02em] text-[var(--foreground)]">

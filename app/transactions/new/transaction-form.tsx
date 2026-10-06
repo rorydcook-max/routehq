@@ -71,6 +71,8 @@ export function TransactionForm({
   const [matches, setMatches] = useState<MatchResult[]>(startsLinked ? [] : waitingHere);
   const [showAllMatches, setShowAllMatches] = useState(false);
   const [dismissedMatches, setDismissedMatches] = useState(false);
+  // While there are payments being waited for, they are the whole screen; the form opens when one is chosen or it is something else.
+  const [formOpen, setFormOpen] = useState(startsLinked || waitingHere.length === 0);
   const [isMatching, startMatchTransition] = useTransition();
 
   const rentalsForVehicle = useMemo(
@@ -138,11 +140,13 @@ export function TransactionForm({
     setLinkedRentalPaymentId(match.rentalPaymentId || "");
     setLinkedTaskId(match.taskId || "");
     setMatches([]);
+    setFormOpen(true);
   }
 
   const isMoneyIn = MONEY_IN.includes(type);
   const linkedBadge = linkedRentalPaymentId ? say("linkedPayment") : linkedTaskId ? say("linkedTask") : "";
   const chooseDirection = (moneyIn: boolean) => {
+    setFormOpen(true);
     if (moneyIn === isMoneyIn) return;
     setType(moneyIn ? "rental_income" : "repair");
     setLinkedRentalPaymentId("");
@@ -214,6 +218,7 @@ export function TransactionForm({
             onClick={() => {
               setDismissedMatches(true);
               setMatches([]);
+              setFormOpen(true);
             }}
             type="button"
           >
@@ -222,6 +227,8 @@ export function TransactionForm({
         </div>
       ) : null}
 
+      {formOpen ? (
+        <>
       <Card>
         <div className="card-section grid gap-3 sm:grid-cols-2">
           <label className="block sm:col-span-2">
@@ -330,6 +337,8 @@ export function TransactionForm({
           {say("save")}
         </PendingButton>
       </div>
+        </>
+      ) : null}
     </form>
   );
 }

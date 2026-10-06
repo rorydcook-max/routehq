@@ -2022,10 +2022,13 @@ export async function generatePaymentScheduleForRental(rentalId: string) {
   let overdueCount = 0;
   let upcomingCount = 0;
 
-  for (let periodIndex = 0; periodIndex < 12; periodIndex += 1) {
+  // With no end date: what is due so far and the next two months. The daily job adds each month after that.
+  const openEndedHorizon = endDate ? "" : addMonthsToDate(today > firstPaymentDate ? today : firstPaymentDate, 2);
+  for (let periodIndex = 0; periodIndex < (endDate ? 12 : 240); periodIndex += 1) {
     const dueDate = addMonthsToDate(firstPaymentDate, periodIndex);
     if (!dueDate) continue;
     if (endDate && dueDate > endDate) break;
+    if (!endDate && openEndedHorizon && dueDate > openEndedHorizon) break;
     if (preservedDueDates.has(dueDate)) continue;
 
     const matchedTransaction = findScheduleTransactionMatch({
@@ -3559,6 +3562,8 @@ type ConfirmReceiptInput = {
   method: string;
   /** Every payment this money is for (the one above is always included). */
   paymentIds?: string[];
+  /** Send the customer the short "payment received" message. On unless the person recording it unticks the box. */
+  tellCustomer?: boolean;
 };
 
 async function openPaymentsForRental(supabase: any, organizationId: string, rentalId: string) {
@@ -3642,7 +3647,7 @@ export async function confirmReceiptPayment(input: ConfirmReceiptInput) {
     }
   }
 
-  {
+  if (input.tellCustomer !== false) {
     const stillDue = lines.reduce((sum, line) => sum + line.stillDue, 0);
     await tellRentalCustomer(createSupabaseAdminClient() as any, primary.rental_id, ({ say, t, money }) =>
       `${say("paymentReceived", { amount: money(amount) })}${stillDue > 0 ? ` ${t("stillToPay", { amount: money(stillDue) })}` : ""}`,

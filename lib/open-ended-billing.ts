@@ -1,10 +1,10 @@
 import { businessToday } from "@/lib/business-time";
-import { addMonths, formatMonthLabel } from "@/lib/payment-schedule";
+import { addMonths, formatMonthLabel, OPEN_ENDED_MONTHS_AHEAD } from "@/lib/payment-schedule";
 
 /**
- * Monthly billing for rentals with no end date. Rent is scheduled a year
+ * Monthly billing for rentals with no end date. Rent is scheduled two months
  * ahead; these helpers start that schedule when a rental becomes open-ended
- * and keep it topped up for rentals that run past their first year.
+ * and roll it forward a month at a time for as long as the rental runs.
  */
 
 const iso = (date: Date) => date.toISOString().slice(0, 10);
@@ -76,8 +76,8 @@ export async function addMonthlyPayments(
 }
 
 /**
- * Keeps open-ended monthly rentals billed ahead: when the last scheduled rent
- * is less than three months away, another six months are added. Run daily.
+ * Keeps open-ended monthly rentals billed two months ahead: each month that
+ * comes inside that window is added. Run daily.
  */
 export async function topUpOpenEndedRent(admin: any): Promise<number> {
   const { data: rentals } = await admin
@@ -86,14 +86,18 @@ export async function topUpOpenEndedRent(admin: any): Promise<number> {
     .is("deleted_at", null)
     .is("end_date", null)
     .in("status", ["active", "due_soon", "overdue", "extended"]);
-  const horizon = iso(addMonths(asDate(businessToday()), 3));
+  const horizon = iso(addMonths(asDate(businessToday()), OPEN_ENDED_MONTHS_AHEAD));
   let added = 0;
   for (const rental of rentals || []) {
     if (String(rental.billing_interval || rental.pricing_model || "").toLowerCase() !== "monthly") continue;
     const last = (await rentPayments(admin, rental.id))[0];
     // A rental with no rent schedule at all is left for a person to look at.
-    if (!last?.due_date || String(last.due_date).slice(0, 10) >= horizon) continue;
-    const ok = await addMonthlyPayments(admin, rental, iso(addMonths(asDate(last.due_date), 1)), 6, Number(rental.rental_rate || 0), { source: "open_ended_top_up" });
+    if (!last?.due_date) continue;
+    const lastDue = asDate(last.due_date);
+    let months = 0;
+    while (months < 24 && iso(addMonths(lastDue, months + 1)) <= horizon) months++;
+    if (months === 0) continue;
+    const ok = await addMonthlyPayments(admin, rental, iso(addMonths(lastDue, 1)), months, Number(rental.rental_rate || 0), { source: "open_ended_top_up" });
     if (ok) added += 1;
   }
   return added;

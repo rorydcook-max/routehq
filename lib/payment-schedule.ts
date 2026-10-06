@@ -1,3 +1,5 @@
+import { businessToday } from "@/lib/business-time";
+
 type PaymentScheduleSupabase = {
   from: (table: string) => any;
 };
@@ -59,6 +61,26 @@ export function countBillingPeriods(startDate: string, endDate: string | null | 
   return Math.max(1, count);
 }
 
+/** How far ahead rent is scheduled on a rental with no end date. The daily job rolls it forward a month at a time. */
+export const OPEN_ENDED_MONTHS_AHEAD = 2;
+
+/**
+ * How many monthly payments a rental with no end date gets, counted from its
+ * first payment: everything due up to today, plus the next two months. A year
+ * or two of rent lined up for a rental that could end next week was noise on
+ * every screen that lists payments.
+ */
+export function openEndedMonthCount(firstDue: string, today = businessToday()) {
+  const first = String(firstDue).slice(0, 10);
+  const start = new Date(`${first}T00:00:00.000Z`);
+  if (Number.isNaN(start.getTime())) return 1;
+  const from = new Date(`${today > first ? today : first}T00:00:00.000Z`);
+  const horizon = addMonths(from, OPEN_ENDED_MONTHS_AHEAD);
+  let count = 0;
+  while (count < 240 && addMonths(start, count) <= horizon) count++;
+  return Math.max(1, count);
+}
+
 export function formatMonthLabel(date: Date): string {
   return new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric", timeZone: "UTC" }).format(date);
 }
@@ -103,7 +125,10 @@ export async function generatePaymentSchedule({
   const paidAtDate = `${normalizedDeliveryDate}T00:00:00.000Z`;
 
   if (period === "monthly" || period === "month") {
-    const monthsToGenerate = countBillingPeriods(normalizedDeliveryDate, endDate, "monthly", 12);
+    // With no end date: what is due so far and the next two months (never fewer than the months paid ahead).
+    const monthsToGenerate = endDate
+      ? countBillingPeriods(normalizedDeliveryDate, endDate, "monthly", 12)
+      : Math.max(openEndedMonthCount(normalizedDeliveryDate), upfrontPeriods);
 
     for (let i = 0; i < monthsToGenerate; i++) {
       const dueDate = addMonths(deliveryDateObj, i);

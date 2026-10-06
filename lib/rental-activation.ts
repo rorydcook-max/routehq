@@ -1,5 +1,5 @@
 import { businessToday } from "@/lib/business-time";
-import { addMonths, addWeeks, countBillingPeriods } from "@/lib/payment-schedule";
+import { addMonths, addWeeks, countBillingPeriods, openEndedMonthCount } from "@/lib/payment-schedule";
 
 type SupabaseClient = { from: (table: string) => any };
 
@@ -171,7 +171,7 @@ async function generatePaymentScheduleInternal(
   };
 
   if (period === "monthly" || period === "month") {
-    const monthsToGenerate = countBillingPeriods(startDateStr, endDateStr, "monthly", 24);
+    const monthsToGenerate = endDateStr ? countBillingPeriods(startDateStr, endDateStr, "monthly", 24) : openEndedMonthCount(startDateStr);
     for (let i = 0; i < monthsToGenerate; i++) {
       const dueDate = addMonths(startDate, i);
       generate(dueDate.toISOString().split("T")[0], i, formatMonthLabel(dueDate));

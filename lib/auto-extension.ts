@@ -4,6 +4,7 @@ import { bookingRules, clashes } from "@/lib/booking-rules";
 import { businessToday } from "@/lib/business-time";
 import { notifyOperator } from "@/lib/notify-operator";
 import { addMonthlyPayments, nextMonthlyDue } from "@/lib/open-ended-billing";
+import { openEndedMonthCount } from "@/lib/payment-schedule";
 import { BLOCKING_RENTAL_STATUSES } from "@/lib/rental-conflicts";
 import { planFor, quoteStay, rentalRateCard } from "@/lib/rental-estimate";
 import { recordActivityEvent } from "@/lib/supabase/activity";
@@ -92,7 +93,7 @@ export async function tryAutoExtend(admin: any, rentalId: string, newEndDateRaw:
       .eq("end_date", rental.end_date);
     if (updateError) return { applied: false, reason: "a later booking for this vehicle is in the way" };
 
-    const created = await addMonthlyPayments(admin, { ...rental, currency }, firstDue, 12, card.monthlyRate, { source: "customer_request_auto", previous_end_date: currentEnd }).catch(() => false);
+    const created = await addMonthlyPayments(admin, { ...rental, currency }, firstDue, openEndedMonthCount(firstDue), card.monthlyRate, { source: "customer_request_auto", previous_end_date: currentEnd }).catch(() => false);
     if (!created) {
       // Don't leave an open-ended rental with nothing to pay for it.
       await admin.from("rentals").update(previous).eq("id", rental.id);

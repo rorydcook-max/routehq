@@ -890,7 +890,8 @@
     "emptyTitle": "Nothing to do",
     "emptyBody": "Payments due and tasks you add on a vehicle page will appear here.",
     "showMore": "Show {count} more",
-    "noFinished": "No finished tasks yet"
+    "noFinished": "No finished tasks yet",
+    "tellCustomer": "Tell the customer the payment was received"
   },
   "bookings": {
     "eyebrow": "Bookings",

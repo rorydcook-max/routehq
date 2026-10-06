@@ -192,6 +192,7 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
   const [method, setMethod] = useState(receipt?.method || "cash");
   const [chosenIds, setChosenIds] = useState<string[]>(receipt?.paymentIds?.length ? receipt.paymentIds : [item.rentalPaymentId as string]);
   const [error, setError] = useState<string | null>(null);
+  const [tellCustomer, setTellCustomer] = useState(true);
   const [isPending, startTransition] = useTransition();
   const received = Number(value || 0);
   const chosen = openPayments.filter((payment) => chosenIds.includes(payment.id));
@@ -215,7 +216,7 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
     }
     startTransition(async () => {
       try {
-        await confirmReceiptPayment({ paymentId: item.rentalPaymentId as string, amount: received, date, method, paymentIds: chosenIds });
+        await confirmReceiptPayment({ paymentId: item.rentalPaymentId as string, amount: received, date, method, paymentIds: chosenIds, tellCustomer });
         onClose();
         router.refresh();
       } catch {
@@ -301,7 +302,10 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
 
       {error ? <p className="mt-2 text-xs font-semibold text-[var(--danger)]">{error}</p> : null}
       {/* No surprises: recording it here tells the customer too. */}
-      <p className="mt-3 text-xs text-[var(--muted)]">{tx.say("customerTold")}</p>
+      <label className="mt-3 flex cursor-pointer items-start gap-2 text-sm text-[var(--foreground-secondary)]">
+        <input checked={tellCustomer} className="mt-0.5 flex-shrink-0" onChange={(event) => setTellCustomer(event.target.checked)} type="checkbox" />
+        <span>{tx.say("tellCustomer")}</span>
+      </label>
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <button className="primary-action pressable min-h-9 px-4 text-xs" disabled={isPending} onClick={save} type="button">
           {isPending ? tx.say("saving") : received > 0 ? tx.say("recordAmount", { amount: money(received) }) : tx.say("recordPayment")}

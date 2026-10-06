@@ -613,19 +613,20 @@ button:disabled {
   border: 0.5px solid var(--border);
   border-radius: 10px;
   overflow: hidden;
-  padding: 0;
 }
 
-.card > :not(.card-header):not(.card-section) {
+/* A card that sets its own padding (p-4, px-4) spaces its own contents; the
+   margins below are only for cards built from header and section blocks. */
+.card:not([class*=" p-"]):not([class*=" px-"]) > :not(.card-header):not(.card-section) {
   margin-left: 14px;
   margin-right: 14px;
 }
 
-.card > .card-header + :not(.card-section) {
+.card:not([class*=" p-"]):not([class*=" px-"]) > .card-header + :not(.card-section) {
   margin-top: 12px;
 }
 
-.card > :last-child:not(.card-header):not(.card-section) {
+.card:not([class*=" p-"]):not([class*=" px-"]) > :last-child:not(.card-header):not(.card-section) {
   margin-bottom: 14px;
 }
 

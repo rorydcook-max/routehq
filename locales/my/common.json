@@ -1,7 +1,7 @@
 {
   "inspection": {
     "fuelPercentage": "ဆီပမာဏ (%)",
-    "fuelHint": "ဆီတိုင်းပုံနှင့် ကိုက်ညီအောင် ဆလိုက်ဒါကို ဆွဲပါ။",
+    "fuelHint": "သင့်ဓာတ်ပုံနှင့် ကိုက်ညီသော အဆင့်ကို နှိပ်ပါ။",
     "fuelPercentageFull": "ဆီပြည့်",
     "empty": "ကုန်",
     "full": "ပြည့်",
@@ -50,8 +50,8 @@
     "cleaningFee": "သန့်ရှင်းရေးခ (မဖြစ်မနေ မဟုတ်)",
     "depositRefund": "ပြန်အမ်းမည့် စရံငွေ",
     "overrideRefund": "လိုအပ်ပါက ပြန်အမ်းငွေ ပြင်ပါ",
-    "changeRefund": "Take something off, or give back a different amount",
-    "startsLaterNote": "This rental is not due to start until {date}. Carry on only if the customer is taking the vehicle now.",
+    "changeRefund": "တစ်စိတ်တစ်ပိုင်း ဖြတ်တောက်ရန် သို့မဟုတ် အခြားပမာဏ ပြန်ပေးရန်",
+    "startsLaterNote": "ဤငှားရမ်းမှုသည် {date} မတိုင်မီ မစတင်သေးပါ။ ဖောက်သည်က ယခု ယာဉ်ကို ယူသွားမှသာ ဆက်လုပ်ပါ။",
     "photosVideo": "ဓာတ်ပုံ / ဗီဒီယို",
     "depositAlreadyReturned": "စရံငွေ ပြန်အမ်းပြီး — နုတ်ယူရန် မလိုပါ",
     "depositDeductions": "စရံငွေမှ နုတ်ယူမှုများ",
@@ -206,7 +206,7 @@
     "bookings": "ဘွတ်ကင်များ",
     "transactions": "ငွေကြေးလုပ်ငန်းများ",
     "documents": "စာရွက်စာတမ်းများ",
-    "rentalCalculator": "ငှားရမ်းခတွက်စက်",
+    "rentalCalculator": "ဝယ်ယူမှု တွက်ချက်စက်",
     "business": "လုပ်ငန်း",
     "myAccount": "အကောင့်",
     "signOut": "ထွက်မည်",

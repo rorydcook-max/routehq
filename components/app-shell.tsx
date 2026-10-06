@@ -22,7 +22,7 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import type { Route } from "next";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Fragment } from "react";
 import { getShellContext, signOut, switchActiveOrganization, type ShellContext } from "@/app/actions/auth";
 import { AskBox } from "@/components/ask-box";
 import { RouteHqLogo } from "@/components/brand-logo";
@@ -205,15 +205,25 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
         ) : null}
         <TrialBanner />
         {children}
+        <TrialBanner placement="inline" />
       </main>
 
       <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] lg:hidden">
-        <div className="grid grid-cols-5 px-2 py-2">
-          {mobileBarItems.map((item) => {
+        {/* On phones the + lives in the menu bar: floating over the page it sat on top of the buttons at the end of each row. */}
+        <div className={`grid px-1 py-2 ${onFocusedFlow ? "grid-cols-5" : "grid-cols-6"}`}>
+          {mobileBarItems.map((item, index) => {
             const Icon = item.icon;
             return (
+              <Fragment key={item.key}>
+              {index === 2 && !onFocusedFlow ? (
+                <button aria-label={t("openFastActions")} className="flex items-center justify-center" onClick={() => setFastActionOpen(true)} type="button">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[var(--primary)] text-white shadow-[0_4px_12px_rgba(15,118,110,0.28)]">
+                    <Plus size={22} />
+                  </span>
+                </button>
+              ) : null}
               <Link
-                className={`flex flex-col items-center gap-1 rounded-md px-1 py-2 text-[11px] font-semibold ${
+                className={`flex min-w-0 flex-col items-center gap-1 rounded-md px-0.5 py-2 text-[10px] font-semibold ${
                   isActive(item.href) ? "text-[var(--primary)]" : "text-[var(--sidebar-text)]"
                 }`}
                 href={item.href}
@@ -225,13 +235,14 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
                     <span className="absolute -right-2.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--primary)] px-1 text-[10px] font-semibold text-white">{badgeFor(item.key)}</span>
                   ) : null}
                 </span>
-                <span className="truncate">{t(item.key)}</span>
+                <span className="max-w-full truncate">{t(item.key)}</span>
               </Link>
+              </Fragment>
             );
           })}
           <button
             aria-expanded={moreOpen}
-            className={`flex flex-col items-center gap-1 rounded-md px-1 py-2 text-[11px] font-semibold ${
+            className={`flex min-w-0 flex-col items-center gap-1 rounded-md px-0.5 py-2 text-[10px] font-semibold ${
               moreActive || moreOpen ? "text-[var(--primary)]" : "text-[var(--sidebar-text)]"
             }`}
             onClick={() => setMoreOpen(true)}
@@ -298,7 +309,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
       {/* The quick-add button stays out of handovers and create/edit forms, where it only covers fields. */}
       {onFocusedFlow ? null : <button
         aria-label={t("openFastActions")}
-        className="fixed bottom-20 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--primary)] text-white shadow-[0_8px_20px_rgba(15,118,110,0.28)] transition hover:bg-[var(--primary-hover)] lg:bottom-6 lg:right-6"
+        className="fixed bottom-6 right-6 z-40 hidden h-14 w-14 items-center justify-center rounded-full bg-[var(--primary)] text-white shadow-[0_8px_20px_rgba(15,118,110,0.28)] transition hover:bg-[var(--primary-hover)] lg:flex"
         onClick={() => setFastActionOpen(true)}
       >
         <Plus size={26} />

@@ -46,6 +46,8 @@ export type Rental = {
   balance: number;
   deposit: number;
   rentalRate: number;
+  /** False while a booking link is out and the customer has not filled it in yet. */
+  hasCustomer?: boolean;
   /** Unpaid payments whose due date has passed. */
   overdue?: number;
   /** Due date of the oldest of those payments. */

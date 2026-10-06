@@ -245,6 +245,7 @@ function mapRental(row: any): Rental {
     id: row.id,
     vehicleId: row.vehicle_id || null,
     customer: row.customers?.full_name || "Unknown customer",
+    hasCustomer: Boolean(row.customers?.full_name),
     vehicle: [row.vehicles?.make, row.vehicles?.model].filter(Boolean).join(" ") || "Unknown vehicle",
     plate: row.vehicles?.registration_number || "",
     start: row.start_date,

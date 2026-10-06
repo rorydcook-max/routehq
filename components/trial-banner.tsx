@@ -41,7 +41,7 @@ function toneForDays(days: number | null | undefined) {
   };
 }
 
-export function TrialBanner({ placement = "floating" }: { placement?: "floating" | "sidebar" }) {
+export function TrialBanner({ placement = "floating" }: { placement?: "floating" | "sidebar" | "inline" }) {
   const [payload, setPayload] = useState<SubscriptionPayload | null>(null);
   const [hidden, setHidden] = useState(true);
   const pathname = usePathname();
@@ -73,9 +73,10 @@ export function TrialBanner({ placement = "floating" }: { placement?: "floating"
 
   const days = payload.daysRemaining;
   // Phones have no room to spare: the reminder stays on the dashboard until the last week.
-  if (placement === "floating" && pathname !== "/" && (days === null || days === undefined || days > 7)) {
-    return null;
-  }
+  const lastWeek = days !== null && days !== undefined && days <= 7;
+  // Phones: floating (and on every page) only in the last week; before that it is a quiet line at the end of the dashboard.
+  if (placement === "floating" && !lastWeek) return null;
+  if (placement === "inline" && (lastWeek || pathname !== "/")) return null;
   const tone = toneForDays(days);
 
   return (
@@ -83,11 +84,13 @@ export function TrialBanner({ placement = "floating" }: { placement?: "floating"
     // and pushing everything down at that moment made people tap the wrong thing.
     <div
       className={clsx(
-        placement === "sidebar"
+        placement === "inline"
+          ? "mt-4 flex items-center justify-between gap-2 rounded-lg border px-3 py-2 lg:hidden"
+          : placement === "sidebar"
           ? // Desktop: a card in the sidebar, above the account card.
             "mt-3 hidden flex-col items-stretch gap-2 rounded-lg border p-2.5 lg:flex"
           : // Phones: floats above the bottom navigation, clear of the + button.
-            "fixed bottom-[calc(72px+env(safe-area-inset-bottom))] left-3 right-20 z-40 flex items-center justify-between gap-2 rounded-lg border px-3 py-2 shadow-lg lg:hidden",
+            "fixed bottom-[calc(72px+env(safe-area-inset-bottom))] left-3 right-3 z-40 flex items-center justify-between gap-2 rounded-lg border px-3 py-2 shadow-lg lg:hidden",
         tone.className
       )}
       role="status"

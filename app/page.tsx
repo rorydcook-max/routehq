@@ -211,6 +211,13 @@ export default async function Home() {
         href: `/bookings/${r.id}`,
         action: "View"
       });
+    } else if (r.status === "Booked" && r.hasCustomer === false) {
+      // The link is out but nobody has filled it in: there is no one to hand over to yet.
+      if (r.start <= weekAhead) {
+        const item = { tone: (r.start <= today ? "red" : "amber") as "red" | "amber", icon: <KeyRound size={17} />, title: `Booking link not filled in · ${r.vehicle}`, href: `/bookings/${r.id}`, action: "Open" };
+        if (r.start <= today) todayItems.push({ ...item, key: `link-waiting-${r.id}`, detail: `Rental ${r.start === today ? "starts today" : `was due to start ${shortDate(r.start)}`}. Send the link again or cancel it.` });
+        else upcomingItems.push({ ...item, key: `link-waiting-${r.id}`, sort: r.start, detail: "Waiting for the customer", when: dayLabel(r.start) });
+      }
     } else if (r.status === "Booked") {
       if (r.start < today) {
         todayItems.push({ key: `late-out-${r.id}`, tone: "red", icon: <KeyRound size={17} />, title: `Handover late · ${r.vehicle}`, detail: `${who} · was due ${shortDate(r.start)}`, href: `/inspections/delivery/${r.id}`, action: "Hand over" });

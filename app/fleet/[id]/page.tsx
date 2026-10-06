@@ -118,10 +118,10 @@ function taskDueState(value: string | null | undefined) {
     return { label: "No due date", className: "text-[var(--muted)]" };
   }
   if (days < 0) {
-    return { label: `Overdue ${formatDate(value)}`, className: "text-red-600" };
+    return { label: `Overdue ${formatDate(value)}`, className: "text-[var(--danger)]" };
   }
   if (days <= 3) {
-    return { label: `Due ${formatDate(value)}`, className: "text-amber-600" };
+    return { label: `Due ${formatDate(value)}`, className: "text-[var(--warning)]" };
   }
   return { label: `Due ${formatDate(value)}`, className: "text-[var(--muted)]" };
 }

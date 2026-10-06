@@ -38,7 +38,7 @@ function isEnabled(ns: Record<string, boolean>, key: string): boolean {
   return ns[key] !== false; // defaults to true
 }
 
-function buildEventBubble(emoji: string, title: string, body: string, color = "#0f766e") {
+function buildEventBubble(emoji: string, title: string, body: string, color = "#24456b") {
   return lineFlex(`RouteHQ: ${title}`, {
     type: "bubble",
     size: "kilo",
@@ -209,7 +209,7 @@ export async function sendCustomerPaymentReminder(params: {
   }
   bodyLines.push(`\nFor help, contact: ${params.operatorName}`);
 
-  const msg = buildEventBubble(emoji, title, bodyLines.join("\n"), params.daysOffset > 0 ? "#dc2626" : "#0f766e");
+  const msg = buildEventBubble(emoji, title, bodyLines.join("\n"), params.daysOffset > 0 ? "#dc2626" : "#24456b");
 
   await sendLinePushMessage(params.customerLineUserId, [msg]).catch(() => null);
 }

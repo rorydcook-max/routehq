@@ -556,10 +556,10 @@ export function CalculatorClient({
     dont_buy: "DON'T BUY"
   };
   const recColor: Record<CalcResults["recommendation"], string> = {
-    strong_buy: "text-emerald-600 bg-emerald-50 border-emerald-200",
-    buy: "text-emerald-600 bg-emerald-50 border-emerald-200",
-    marginal: "text-amber-600 bg-amber-50 border-amber-200",
-    dont_buy: "text-red-600 bg-red-50 border-red-200"
+    strong_buy: "text-[var(--success)] bg-[var(--success-light)] border-[var(--success-line)]",
+    buy: "text-[var(--success)] bg-[var(--success-light)] border-[var(--success-line)]",
+    marginal: "text-[var(--warning)] bg-[var(--warning-light)] border-[var(--warning-line)]",
+    dont_buy: "text-[var(--danger)] bg-[var(--danger-light)] border-[var(--danger-line)]"
   };
 
   const vehicleIdentified = Boolean(vehicle.make && vehicle.model && vehicle.year);
@@ -791,7 +791,7 @@ export function CalculatorClient({
                   ].map(({ label, value, positive }) => (
                     <div className="flex items-center justify-between" key={label}>
                       <span className="text-sm font-semibold text-[var(--foreground-secondary)]">{label}</span>
-                      <span className={`font-mono-data font-bold ${positive ? "text-emerald-600" : "text-red-500"}`}>
+                      <span className={`font-mono-data font-bold ${positive ? "text-[var(--success)]" : "text-[var(--danger)]"}`}>
                         {fmt(value)}
                       </span>
                     </div>
@@ -815,7 +815,7 @@ export function CalculatorClient({
                 <div className="mt-4">
                   <ResponsiveContainer height={220} width="100%">
                     <LineChart data={results.chartData} margin={{ top: 4, right: 8, left: 8, bottom: 4 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#eef2f6" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#dce3eb" />
                       <XAxis
                         dataKey="month"
                         label={{ value: "Month", position: "insideBottom", offset: -2, fontSize: 11 }}
@@ -831,11 +831,11 @@ export function CalculatorClient({
                       />
                       <ReferenceLine
                         label={{ value: "Break even", position: "right", fontSize: 11, fill: "#be123c" }}
-                        stroke="#be123c"
+                        stroke="#a04b36"
                         strokeDasharray="4 4"
                         y={0}
                       />
-                      <Line dataKey="profit" dot={false} stroke="#0f766e" strokeWidth={2} type="monotone" />
+                      <Line dataKey="profit" dot={false} stroke="#24456b" strokeWidth={2} type="monotone" />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
@@ -858,8 +858,8 @@ export function CalculatorClient({
                       {sensitivityRows.map(({ util, rev, profit, payback }) => (
                         <tr className="border-b border-[var(--border)] last:border-0" key={util}>
                           <td className="font-mono-data py-3 pr-3 font-semibold">{util}%</td>
-                          <td className="font-mono-data px-3 py-3 text-emerald-600">{fmt(rev)}</td>
-                          <td className={`font-mono-data px-3 py-3 font-semibold ${profit >= 0 ? "text-emerald-600" : "text-red-500"}`}>
+                          <td className="font-mono-data px-3 py-3 text-[var(--success)]">{fmt(rev)}</td>
+                          <td className={`font-mono-data px-3 py-3 font-semibold ${profit >= 0 ? "text-[var(--success)]" : "text-[var(--danger)]"}`}>
                             {fmt(profit)}
                           </td>
                           <td className="font-mono-data px-3 py-3 text-[var(--muted)]">
@@ -888,7 +888,7 @@ export function CalculatorClient({
                           <p className="mt-1 text-sm text-[var(--foreground-secondary)]">
                             Your {v.make} {v.model} is rented{" "}
                             <span className="font-mono-data font-semibold">{v.utilization}%</span> of the time and makes about{" "}
-                            <span className="font-mono-data font-semibold text-emerald-600">{fmt(approxMonthlyProfit)}</span> profit a month
+                            <span className="font-mono-data font-semibold text-[var(--success)]">{fmt(approxMonthlyProfit)}</span> profit a month
                           </p>
                         </div>
                       );
@@ -908,7 +908,7 @@ export function CalculatorClient({
                   {saving ? "Saving…" : "Save calculation"}
                 </button>
                 {saveMsg && (
-                  <span className={`text-sm font-semibold ${saveMsg.startsWith("Save failed") ? "text-red-500" : "text-emerald-600"}`}>
+                  <span className={`text-sm font-semibold ${saveMsg.startsWith("Save failed") ? "text-[var(--danger)]" : "text-[var(--success)]"}`}>
                     {saveMsg}
                   </span>
                 )}
@@ -954,7 +954,7 @@ export function CalculatorClient({
                     <div className="mt-1 flex flex-wrap gap-3 text-sm text-[var(--muted)]">
                       {calc.purchase_price && <span>Price: {fmt(Number(calc.purchase_price))}</span>}
                       {monthlyProfit !== null && (
-                        <span className={Number(monthlyProfit) >= 0 ? "text-emerald-600 font-semibold" : "text-red-500 font-semibold"}>
+                        <span className={Number(monthlyProfit) >= 0 ? "text-[var(--success)] font-semibold" : "text-[var(--danger)] font-semibold"}>
                           {fmt(Number(monthlyProfit))}/mo
                         </span>
                       )}

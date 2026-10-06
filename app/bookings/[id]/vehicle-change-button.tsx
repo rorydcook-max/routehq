@@ -211,7 +211,7 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
                       ) : null}
                       {options.handedOver && !swap ? (
                         <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-lg border border-[var(--border)] bg-[#fbfaf8] p-3">
-                          <input checked={signLater} className="mt-1 accent-[#0d9488]" onChange={(event) => setSignLater(event.target.checked)} type="checkbox" />
+                          <input checked={signLater} className="mt-1 accent-[var(--primary)]" onChange={(event) => setSignLater(event.target.checked)} type="checkbox" />
                           <span className="text-sm text-[var(--foreground-secondary)]">
                             <span className="block font-semibold text-[var(--foreground)]">{say("vc_cantSign")}</span>
                             {say("vc_cantSignBody")}

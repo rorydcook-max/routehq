@@ -252,7 +252,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
           <label className="relative block min-w-0 flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" size={16} />
             <input
-              className="input-with-leading-icon h-9 w-full rounded-lg border border-[var(--border)] bg-white pr-3 text-[13px] font-medium text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]"
+              className="input-with-leading-icon h-9 w-full rounded-lg border border-[var(--border)] bg-white pr-3 text-[13px] font-medium text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]"
               onChange={(event) => setSearch(event.target.value)}
               placeholder={tx.say("searchPlaceholder")}
               value={search}

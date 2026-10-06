@@ -9,19 +9,19 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { CalendarEvent } from "@/lib/calendar";
 
 const toneClasses: Record<CalendarEvent["tone"], string> = {
-  blue: "bg-blue-100 text-blue-800 border-blue-200",
-  amber: "bg-amber-100 text-amber-900 border-amber-200",
-  red: "bg-red-100 text-red-800 border-red-200",
-  green: "bg-emerald-100 text-emerald-900 border-emerald-200",
-  purple: "bg-purple-100 text-purple-900 border-purple-200"
+  blue: "bg-[var(--info-light)] text-[var(--info)] border-[var(--info-line)]",
+  amber: "bg-[var(--warning-light)] text-[var(--warning)] border-[var(--warning-line)]",
+  red: "bg-[var(--danger-light)] text-[var(--danger)] border-[var(--danger-line)]",
+  green: "bg-[var(--success-light)] text-[var(--success)] border-[var(--success-line)]",
+  purple: "bg-[var(--purple-light)] text-[var(--purple)] border-[var(--purple-line)]"
 };
 
 const dotClasses: Record<CalendarEvent["tone"], string> = {
-  blue: "bg-blue-500",
-  amber: "bg-amber-500",
-  red: "bg-red-500",
-  green: "bg-emerald-500",
-  purple: "bg-purple-500"
+  blue: "bg-[var(--info)]",
+  amber: "bg-[var(--warning)]",
+  red: "bg-[var(--danger)]",
+  green: "bg-[var(--success)]",
+  purple: "bg-[var(--purple)]"
 };
 
 function monthKey(date: Date) {

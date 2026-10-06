@@ -211,7 +211,7 @@ function FuelGauge({
         <summary className="cursor-pointer py-2 text-sm font-semibold text-[var(--primary)]">{t("exactFuelPercentage")}</summary>
         <input
           aria-label={t("fuelPercentageFull")}
-          className="h-12 w-full cursor-pointer accent-[#0f766e]"
+          className="h-12 w-full cursor-pointer accent-[#24456b]"
           max="100"
           min="0"
           onChange={(event) => setValue(Number(event.target.value))}
@@ -260,14 +260,14 @@ function VehicleDiagram({ onSelect, selected, marked }: { onSelect: (location: s
   return (
     <div className="relative mx-auto aspect-[3/4] max-h-[420px] max-w-sm rounded-xl border border-[var(--border)] bg-white p-4">
       <svg className="h-full w-full text-[var(--primary)]" viewBox="0 0 180 260" role="img" aria-label={t("vehicleDiagram")}>
-        <rect x="50" y="18" width="80" height="224" rx="35" fill="#e6fffb" stroke="currentColor" strokeWidth="3" />
+        <rect x="50" y="18" width="80" height="224" rx="35" fill="#e6edf5" stroke="currentColor" strokeWidth="3" />
         <rect x="64" y="58" width="52" height="42" rx="10" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
         <rect x="62" y="112" width="56" height="56" rx="14" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
         <rect x="65" y="184" width="50" height="28" rx="8" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
-        <circle cx="45" cy="70" r="11" fill="#10252b" />
-        <circle cx="135" cy="70" r="11" fill="#10252b" />
-        <circle cx="45" cy="194" r="11" fill="#10252b" />
-        <circle cx="135" cy="194" r="11" fill="#10252b" />
+        <circle cx="45" cy="70" r="11" fill="#1b2430" />
+        <circle cx="135" cy="70" r="11" fill="#1b2430" />
+        <circle cx="45" cy="194" r="11" fill="#1b2430" />
+        <circle cx="135" cy="194" r="11" fill="#1b2430" />
       </svg>
       {areas.map((area) => (
         <button

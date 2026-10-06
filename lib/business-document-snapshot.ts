@@ -118,7 +118,7 @@ export function buildBusinessDocumentSnapshot(organization: BusinessDocumentSnap
       assetReferenceFromCanonical(organization.business_logo_storage_bucket, organization.business_logo_storage_path) ||
       assetReferenceFromCanonical(settings.business_logo_storage_bucket, settings.business_logo_storage_path) ||
       assetReferenceFromLegacy(cleanOptional(organization.logo_url || String(settings.logo_url || ""))),
-    accent_colour: cleanOptional(organization.contract_accent_colour) || "#0f766e",
+    accent_colour: cleanOptional(organization.contract_accent_colour) || "#24456b",
     authorised_signatory: {
       name: cleanOptional(organization.authorised_signatory_name),
       title: cleanOptional(organization.authorised_signatory_title),

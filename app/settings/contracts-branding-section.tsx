@@ -7,7 +7,7 @@ import { Card, Fold, SectionHeader } from "@/components/ui";
 import { supportedLocaleOptions } from "@/lib/i18n/locales";
 
 const inputClass =
-  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]";
+  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]";
 
 export type ContractsBrandingOrganization = {
   id: string;
@@ -42,7 +42,7 @@ export function ContractsBrandingSection({
   organization: ContractsBrandingOrganization;
   signatureDisplayUrl: string | null;
 }) {
-  const accentColour = organization.contract_accent_colour || "#0f766e";
+  const accentColour = organization.contract_accent_colour || "#24456b";
   const tradingName = organization.trading_name || organization.name;
   const legalName = organization.legal_name || tradingName;
   const footerText = organization.contract_footer_text || "Issued by the rental business named in this agreement.";

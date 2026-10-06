@@ -21,7 +21,7 @@ function TooltipIcon({ text }: { text: string }) {
       <button
         aria-label="More information"
         className="ml-1 inline-flex h-3.5 w-3.5 cursor-help items-center justify-center rounded-full border text-[10px]"
-        style={{ borderColor: "#0f766e", color: "#0f766e" }}
+        style={{ borderColor: "#24456b", color: "#24456b" }}
         onBlur={() => setVisible(false)}
         onClick={() => setVisible((value) => !value)}
         onFocus={() => setVisible(true)}
@@ -67,7 +67,7 @@ function MetricRow({
             flexShrink: 0
           }}
         >
-          <i className={`ti ${icon}`} style={{ fontSize: "14px", color: "#0f766e" }} aria-hidden="true" />
+          <i className={`ti ${icon}`} style={{ fontSize: "14px", color: "#24456b" }} aria-hidden="true" />
         </span>
         <span className="flex min-w-0 items-center text-[12px] text-[var(--foreground-secondary)]">
           <span className="truncate">{label}</span>

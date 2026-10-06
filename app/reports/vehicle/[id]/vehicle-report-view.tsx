@@ -27,16 +27,16 @@ const PRESETS = [
   { value: "last_year", label: "Last Year" }
 ];
 
-const CHART_COLORS = ["#0d9488", "#dc2626", "#7c3aed", "#ea580c", "#0284c7", "#ca8a04", "#16a34a", "#db2777"];
+const CHART_COLORS = ["#24456b", "#2f6b45", "#b8742a", "#a04b36", "#6b4c8a", "#5b7f9e", "#8a9a5b", "#b07fa0"];
 
 const STATUS_TONE: Record<string, string> = {
-  active: "bg-emerald-100 text-emerald-800",
-  booked: "bg-blue-100 text-blue-800",
-  due_soon: "bg-amber-100 text-amber-800",
-  overdue: "bg-red-100 text-red-800",
-  completed: "bg-slate-100 text-slate-600",
-  cancelled: "bg-slate-100 text-slate-400",
-  extended: "bg-purple-100 text-purple-800"
+  active: "bg-[var(--success-light)] text-[var(--success)]",
+  booked: "bg-[var(--info-light)] text-[var(--info)]",
+  due_soon: "bg-[var(--warning-light)] text-[var(--warning)]",
+  overdue: "bg-[var(--danger-light)] text-[var(--danger)]",
+  completed: "bg-[var(--panel-secondary)] text-[var(--foreground-secondary)]",
+  cancelled: "bg-[var(--panel-secondary)] text-[var(--muted)]",
+  extended: "bg-[var(--purple-light)] text-[var(--purple)]"
 };
 
 function money(value: number) {
@@ -157,9 +157,9 @@ export function VehicleReportView({ data }: { data: VehicleReportData }) {
                 <XAxis dataKey="label" tick={{ fontSize: 11 }} />
                 <YAxis tickFormatter={(v) => `฿${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} width={52} />
                 <Tooltip formatter={(v) => money(Number(v))} />
-                <Bar dataKey="revenue" fill="#0d9488" name="Revenue" radius={[2, 2, 0, 0]} />
-                <Bar dataKey="expenses" fill="#dc2626" name="Expenses" radius={[2, 2, 0, 0]} />
-                <Line dataKey="profit" dot={false} name="Profit" stroke="#7c3aed" strokeWidth={2} type="monotone" />
+                <Bar dataKey="revenue" fill="#24456b" name="Revenue" radius={[2, 2, 0, 0]} />
+                <Bar dataKey="expenses" fill="#a04b36" name="Expenses" radius={[2, 2, 0, 0]} />
+                <Line dataKey="profit" dot={false} name="Profit" stroke="#2f6b45" strokeWidth={2} type="monotone" />
               </ComposedChart>
             </ResponsiveContainer>
           )}
@@ -224,7 +224,7 @@ export function VehicleReportView({ data }: { data: VehicleReportData }) {
           </div>
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Depreciation</p>
-            <p className={`mt-1 font-semibold ${depreciation > 0 ? "text-red-600" : "text-[var(--foreground)]"}`}>
+            <p className={`mt-1 font-semibold ${depreciation > 0 ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>
               {depreciation > 0 ? `-${money(depreciation)}` : "—"}
             </p>
           </div>
@@ -261,7 +261,7 @@ export function VehicleReportView({ data }: { data: VehicleReportData }) {
               <XAxis type="number" tickFormatter={(v) => `฿${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} />
               <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={48} />
               <Tooltip formatter={(v) => money(Number(v))} />
-              <Bar dataKey="value" fill="#0d9488" radius={[0, 4, 4, 0]} />
+              <Bar dataKey="value" fill="#24456b" radius={[0, 4, 4, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -297,11 +297,11 @@ export function VehicleReportView({ data }: { data: VehicleReportData }) {
                     <td className="py-2.5 pr-3 text-[var(--foreground-secondary)]">{fmtDate(rental.startDate)}</td>
                     <td className="py-2.5 pr-3 text-[var(--foreground-secondary)]">{rental.endDate ? fmtDate(rental.endDate) : "—"}</td>
                     <td className="py-2.5 pr-3">
-                      <span className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${STATUS_TONE[rental.status] || "bg-slate-100 text-slate-600"}`}>
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${STATUS_TONE[rental.status] || "bg-[var(--panel-secondary)] text-[var(--foreground-secondary)]"}`}>
                         {rental.status.replace(/_/g, " ")}
                       </span>
                     </td>
-                    <td className={`py-2.5 text-right font-semibold ${rental.balanceDue > 0 ? "text-red-600" : "text-[var(--foreground-secondary)]"}`}>
+                    <td className={`py-2.5 text-right font-semibold ${rental.balanceDue > 0 ? "text-[var(--danger)]" : "text-[var(--foreground-secondary)]"}`}>
                       {rental.balanceDue > 0 ? money(rental.balanceDue) : "—"}
                     </td>
                   </tr>
@@ -334,7 +334,7 @@ export function VehicleReportView({ data }: { data: VehicleReportData }) {
                     <td className="py-2.5 pr-3 text-[var(--foreground-secondary)]">{fmtDate(tx.date)}</td>
                     <td className="py-2.5 pr-3 font-semibold text-[var(--foreground)]">{tx.typeLabel}</td>
                     <td className="py-2.5 pr-3 text-[var(--foreground-secondary)]">{tx.notes || tx.supplier || "—"}</td>
-                    <td className={`py-2.5 text-right font-semibold tabular-nums ${tx.isIncome ? "text-emerald-600" : "text-[var(--foreground)]"}`}>
+                    <td className={`py-2.5 text-right font-semibold tabular-nums ${tx.isIncome ? "text-[var(--success)]" : "text-[var(--foreground)]"}`}>
                       {tx.isIncome ? "+" : "-"}
                       {money(tx.amount)}
                     </td>

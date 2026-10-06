@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { CheckCircle2, Circle, ReceiptText, Wallet, MoreHorizontal } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
+import { KindChip, jobKind } from "@/components/kind-chip";
 import { confirmReceiptPayment, declinePaymentReceipt, recordPaymentReceived } from "@/app/actions/bookings";
 import { completeTask } from "@/app/actions/tasks";
 import { PendingButton } from "@/components/pending-button";
@@ -357,15 +358,7 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
   return (
     <div className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-start">
       <div className="flex min-w-0 flex-1 items-start gap-3">
-        {receipt ? (
-          <ReceiptText className="mt-0.5 shrink-0 text-[var(--primary)]" size={20} />
-        ) : item.kind === "payment" ? (
-          <Wallet className={`mt-0.5 shrink-0 ${overdue ? "text-[var(--danger)]" : "text-[var(--primary)]"}`} size={20} />
-        ) : item.completedAt ? (
-          <CheckCircle2 className="mt-0.5 shrink-0 text-emerald-600" size={20} />
-        ) : (
-          <Circle className="mt-0.5 shrink-0 text-[var(--muted)]" size={20} />
-        )}
+        <KindChip kind={jobKind(item)} />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
             <p className="font-bold text-[var(--foreground)]">{coversSeveral ? tx.say("receiptForSeveral", { count: receipt.paymentIds.length }) : receipt ? payText(item, "pay", tx) : heading.title}</p>
@@ -419,7 +412,8 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
         </div>
       </div>
 
-      <div className="flex shrink-0 flex-wrap items-center gap-2 pl-8 sm:pl-0">
+      {/* Buttons run the full width on a phone so a row of two or three never breaks onto a second line. */}
+      <div className="flex shrink-0 flex-wrap items-center gap-2">
         {receipt?.url ? (
           <a className="secondary-action pressable min-h-9 px-3 text-xs" href={receipt.url} rel="noreferrer" target="_blank">
             {tx.say("viewReceipt")}

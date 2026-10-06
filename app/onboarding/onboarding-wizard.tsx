@@ -1206,7 +1206,7 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,#d9f7f0,transparent_38%),linear-gradient(135deg,#f8fffd,#eef7f5)] px-4 py-5 text-[var(--foreground)]">
+    <main className="min-h-screen bg-[var(--background)] px-4 py-5 text-[var(--foreground)]">
       <div className="mx-auto flex min-h-[calc(100vh-40px)] max-w-xl flex-col">
         <header className="mb-5 flex items-center justify-between">
           <div>

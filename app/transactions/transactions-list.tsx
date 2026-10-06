@@ -42,10 +42,10 @@ function transactionKind(transaction: TransactionListItem): TransactionKind {
 }
 
 function badgeForKind(kind: TransactionKind) {
-  if (kind === "deposit_received") return { label: "Deposit received", className: "border-amber-200 bg-amber-50 text-amber-700" };
-  if (kind === "deposit_refunded") return { label: "Deposit refunded", className: "border-amber-200 bg-amber-50 text-amber-700" };
-  if (kind === "income") return { label: "Income", className: "border-emerald-200 bg-emerald-50 text-emerald-700" };
-  return { label: "Expense", className: "border-slate-200 bg-slate-50 text-slate-600" };
+  if (kind === "deposit_received") return { label: "Deposit received", className: "border-[var(--warning-line)] bg-[var(--warning-light)] text-[var(--warning)]" };
+  if (kind === "deposit_refunded") return { label: "Deposit refunded", className: "border-[var(--warning-line)] bg-[var(--warning-light)] text-[var(--warning)]" };
+  if (kind === "income") return { label: "Income", className: "border-[var(--success-line)] bg-[var(--success-light)] text-[var(--success)]" };
+  return { label: "Expense", className: "border-[var(--border)] bg-[var(--panel-secondary)] text-[var(--foreground-secondary)]" };
 }
 
 function amountPresentation(transaction: TransactionListItem) {
@@ -160,7 +160,7 @@ function TransactionEditForm({
           <input className="mt-1 w-full" onChange={(event) => setNotes(event.target.value)} value={notes} />
         </label>
       </div>
-      {error ? <p className="mt-2 rounded-md bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">{error}</p> : null}
+      {error ? <p className="mt-2 rounded-md bg-[var(--danger-light)] px-3 py-2 text-xs font-semibold text-[var(--danger)]">{error}</p> : null}
       <div className="mt-3 flex flex-wrap justify-end gap-2">
         <button className="secondary-action pressable min-h-9 px-3 text-xs" disabled={isPending} onClick={onCancel} type="button">
           {tx.say("cancel")}

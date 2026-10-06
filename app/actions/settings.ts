@@ -180,7 +180,7 @@ function validatedEmail(formData: FormData, key: string) {
 }
 
 function validatedAccentColour(value: string | null) {
-  if (!value) return "#0f766e";
+  if (!value) return "#24456b";
   if (!/^#[0-9a-fA-F]{6}$/.test(value)) {
     throw new Error("Contract accent colour must be a six-digit hex colour.");
   }

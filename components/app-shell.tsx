@@ -231,7 +231,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
               {index === 2 && !onFocusedFlow ? (
                 <button aria-label={t("openFastActions")} className="flex items-center justify-center" onClick={() => setFastActionOpen(true)} type="button">
                   {/* Centred in the bar: its middle sits level with the middle of each icon-and-label pair. */}
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--primary)] text-white shadow-[0_4px_12px_rgba(15,118,110,0.28)]">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--primary)] text-white shadow-[0_4px_12px_var(--focus-ring-strong)]">
                     <Plus size={22} />
                   </span>
                 </button>

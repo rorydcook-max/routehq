@@ -47,7 +47,7 @@ const PRESETS: Array<{ value: DatePreset; label: string }> = [
   { value: "custom", label: "Custom" }
 ];
 
-const CHART_COLORS = ["#0f766e", "#2563eb", "#d97706", "#dc2626", "#7c3aed", "#0891b2", "#65a30d", "#c026d3"];
+const CHART_COLORS = ["#24456b", "#2f6b45", "#b8742a", "#a04b36", "#6b4c8a", "#5b7f9e", "#8a9a5b", "#b07fa0"];
 
 function money(value: number) {
   return new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB", maximumFractionDigits: 0 }).format(value);
@@ -92,11 +92,11 @@ function KpiCard({ label, value, change, sub, upIsBad = false }: { label: string
         {isFlat ? (
           <Minus size={14} className="text-[var(--muted)]" />
         ) : isUp ? (
-          <ArrowUpRight size={14} className={good ? "text-emerald-600" : "text-red-500"} />
+          <ArrowUpRight size={14} className={good ? "text-[var(--success)]" : "text-[var(--danger)]"} />
         ) : (
-          <ArrowDownRight size={14} className={good ? "text-emerald-600" : "text-red-500"} />
+          <ArrowDownRight size={14} className={good ? "text-[var(--success)]" : "text-[var(--danger)]"} />
         )}
-        <span className={`text-xs font-semibold ${isFlat ? "text-[var(--muted)]" : good ? "text-emerald-600" : "text-red-500"}`}>
+        <span className={`text-xs font-semibold ${isFlat ? "text-[var(--muted)]" : good ? "text-[var(--success)]" : "text-[var(--danger)]"}`}>
           {isFlat ? "No change" : pct(change)}
         </span>
         <span className="text-xs text-[var(--muted)]">vs prev. period</span>
@@ -107,31 +107,31 @@ function KpiCard({ label, value, change, sub, upIsBad = false }: { label: string
 
 function DepositsCard({ data }: { data: ReportsData["depositSummary"] }) {
   const rows = [
-    { label: "Holding now", value: money(data.totalDepositsCurrentlyHeld), valueClass: "text-amber-600" },
+    { label: "Holding now", value: money(data.totalDepositsCurrentlyHeld), valueClass: "text-[var(--warning)]" },
     { label: "Taken in", value: money(data.totalDepositsReceivedInPeriod), valueClass: "text-[var(--foreground)]" },
     { label: "Given back", value: money(data.totalDepositsReturnedInPeriod), valueClass: "text-[var(--foreground)]" },
     { label: "Kept for damage or unpaid rent", value: money(data.totalDepositsForfeitedInPeriod), valueClass: "text-[var(--primary)]" }
   ];
 
   return (
-    <div className="content-section border-amber-200 bg-amber-50/50">
+    <div className="content-section border-[var(--warning-line)] bg-[var(--warning-light)]/50">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.08em] text-amber-700">Deposits</p>
+          <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--warning)]">Deposits</p>
           <p className="mt-1 text-sm text-[var(--foreground-secondary)]">Customers' money you are holding until their rental ends.</p>
         </div>
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {rows.map((row) => (
-          <div key={row.label} className="rounded-xl border border-amber-100 bg-white/80 p-3">
+          <div key={row.label} className="rounded-xl border border-[var(--warning-line)] bg-white/80 p-3">
             <p className="text-xs font-semibold text-[var(--muted)]">{row.label}</p>
             <p className={`mt-1 text-lg font-semibold ${row.valueClass}`}>{row.value}</p>
           </div>
         ))}
       </div>
 
-      <p className="mt-3 rounded-lg border border-amber-100 bg-white/70 px-3 py-2 text-xs text-[var(--foreground-secondary)]">
+      <p className="mt-3 rounded-lg border border-[var(--warning-line)] bg-white/70 px-3 py-2 text-xs text-[var(--foreground-secondary)]">
         Deposits are not counted as income. Only the part you keep is.
       </p>
     </div>
@@ -245,13 +245,13 @@ function VehicleTableRow({
             </div>
           </button>
         </td>
-        <td className="px-3 py-3 text-right font-semibold text-emerald-600">{money(vehicle.income)}</td>
+        <td className="px-3 py-3 text-right font-semibold text-[var(--success)]">{money(vehicle.income)}</td>
         <td className="px-3 py-3 text-right text-[var(--foreground-secondary)]">{money(vehicle.expenses)}</td>
-        <td className={`px-3 py-3 text-right font-semibold ${vehicle.profit >= 0 ? "text-emerald-600" : "text-red-500"}`}>{money(vehicle.profit)}</td>
+        <td className={`px-3 py-3 text-right font-semibold ${vehicle.profit >= 0 ? "text-[var(--success)]" : "text-[var(--danger)]"}`}>{money(vehicle.profit)}</td>
         <td className="px-3 py-3 text-right text-[var(--foreground-secondary)]">{vehicle.rentalCount}</td>
         <td className="px-3 py-3 text-right text-[var(--foreground-secondary)]">{vehicle.utilizationRate.toFixed(0)}%</td>
         <td className="px-3 py-3 text-right text-[var(--foreground-secondary)]">{money(vehicle.avgDailyRate)}/d</td>
-        <td className={`px-3 py-3 text-right font-semibold ${vehicle.roi >= 0 ? "text-[var(--primary)]" : "text-red-500"}`}>{vehicle.roi.toFixed(1)}%</td>
+        <td className={`px-3 py-3 text-right font-semibold ${vehicle.roi >= 0 ? "text-[var(--primary)]" : "text-[var(--danger)]"}`}>{vehicle.roi.toFixed(1)}%</td>
         <td className="px-3 py-3 text-right">
           <Link href={`/reports/vehicle/${vehicle.id}` as any} className="text-xs font-semibold text-[var(--primary)] hover:underline">
             Details
@@ -339,14 +339,14 @@ function ComparisonPanel({ vehicles }: { vehicles: VehicleMetrics[] }) {
             <div className="min-w-[300px] h-52">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={barData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#dce3eb" />
                   <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                   <YAxis tickFormatter={(v) => `฿${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} />
                   <Tooltip formatter={(v) => money(Number(v))} />
                   <Legend />
-                  <Bar dataKey="Money in" fill="#0f766e" radius={[2, 2, 0, 0]} />
-                  <Bar dataKey="Money out" fill="#dc2626" radius={[2, 2, 0, 0]} />
-                  <Bar dataKey="Profit" fill="#2563eb" radius={[2, 2, 0, 0]} />
+                  <Bar dataKey="Money in" fill="#24456b" radius={[2, 2, 0, 0]} />
+                  <Bar dataKey="Money out" fill="#a04b36" radius={[2, 2, 0, 0]} />
+                  <Bar dataKey="Profit" fill="#2f6b45" radius={[2, 2, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -411,7 +411,7 @@ function AiInsightsPanel({ data }: { data: ReportsData }) {
     <div className="content-section">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <Lightbulb size={18} className="text-amber-500" />
+          <Lightbulb size={18} className="text-[var(--warning)]" />
           <p className="text-sm font-bold text-[var(--foreground)]">What stands out</p>
         </div>
         {!fetched ? (
@@ -432,7 +432,7 @@ function AiInsightsPanel({ data }: { data: ReportsData }) {
       ) : insights.length > 0 ? (
         <div className="mt-4 space-y-3">
           {insights.map((insight, i) => (
-            <div className="rounded-xl border border-[var(--border)] bg-amber-50/50 p-3" key={i}>
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--warning-light)]/50 p-3" key={i}>
               <p className="font-semibold text-[var(--foreground)]">{insight.title}</p>
               <p className="mt-1 text-sm text-[var(--foreground-secondary)]">{insight.insight}</p>
               <p className="mt-2 text-xs font-semibold text-[var(--primary)]">→ {insight.action}</p>
@@ -652,14 +652,14 @@ export function ReportsView({ data }: { data: ReportsData }) {
             <div className="min-w-[480px] h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart data={data.monthlyData} margin={{ top: 4, right: 8, bottom: 0, left: 8 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#dce3eb" />
                   <XAxis dataKey="label" tick={{ fontSize: 11 }} />
                   <YAxis tickFormatter={(v) => `฿${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} />
                   <Tooltip formatter={(v) => money(Number(v))} />
                   <Legend />
-                  <Bar dataKey="revenue" name="Money in" fill="#0f766e" maxBarSize={44} radius={[2, 2, 0, 0]} />
-                  <Bar dataKey="expenses" name="Money out" fill="#fca5a5" maxBarSize={44} radius={[2, 2, 0, 0]} />
-                  <Line type="monotone" dataKey="profit" name="Profit" stroke="#2563eb" strokeWidth={2} dot={{ r: 3 }} />
+                  <Bar dataKey="revenue" name="Money in" fill="#24456b" maxBarSize={44} radius={[2, 2, 0, 0]} />
+                  <Bar dataKey="expenses" name="Money out" fill="#ebc8bc" maxBarSize={44} radius={[2, 2, 0, 0]} />
+                  <Line type="monotone" dataKey="profit" name="Profit" stroke="#2f6b45" strokeWidth={2} dot={{ r: 3 }} />
                 </ComposedChart>
               </ResponsiveContainer>
             </div>
@@ -753,7 +753,7 @@ export function ReportsView({ data }: { data: ReportsData }) {
                     {bal.oldestDue ? ` · due ${niceDate(bal.oldestDue)}` : ""}
                   </p>
                 </div>
-                <p className="font-semibold text-red-500">{money(bal.totalBalance)}</p>
+                <p className="font-semibold text-[var(--danger)]">{money(bal.totalBalance)}</p>
               </div>
             ))}
           </div>
@@ -782,7 +782,7 @@ export function ReportsView({ data }: { data: ReportsData }) {
                     <td className="px-3 py-2.5 font-semibold text-[var(--foreground)]">{tx.typeLabel}</td>
                     <td className="px-3 py-2.5 text-[var(--foreground-secondary)]">{tx.vehicleLabel}</td>
                     <td className="px-3 py-2.5 text-[var(--foreground-secondary)]">{tx.customerName || "—"}</td>
-                    <td className={`px-3 py-2.5 text-right font-bold ${tx.isIncome ? "text-emerald-600" : tx.type === "deposit_received" ? "text-amber-600" : "text-red-500"}`}>
+                    <td className={`px-3 py-2.5 text-right font-bold ${tx.isIncome ? "text-[var(--success)]" : tx.type === "deposit_received" ? "text-[var(--warning)]" : "text-[var(--danger)]"}`}>
                       {/* A deposit coming in is money received, held for the customer: not a cost. */}
                         {tx.isIncome || tx.type === "deposit_received" ? "+" : "-"}{money(tx.amount)}
                     </td>

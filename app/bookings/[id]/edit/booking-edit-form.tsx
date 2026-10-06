@@ -609,7 +609,7 @@ export function BookingEditForm({
                   value={deliveryLocation}
                 />
                 {isMapsUrl(String(deliveryLocation)) ? (
-                  <p className="mt-1 rounded-lg bg-amber-50 px-3 py-2 text-xs font-medium text-amber-700">
+                  <p className="mt-1 rounded-lg bg-[var(--warning-light)] px-3 py-2 text-xs font-medium text-[var(--warning)]">
                     Location stored as coordinates. Edit this field to add a readable address.
                   </p>
                 ) : null}

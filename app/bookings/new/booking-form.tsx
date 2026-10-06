@@ -106,7 +106,7 @@ type Say = (key: string, values?: Record<string, string | number>) => string;
 // Vehicle, customer, rental, handover, review. Their names are in the language files (step_0 to step_4).
 const steps = [0, 1, 2, 3, 4];
 const inputClass =
-  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]";
+  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]";
 const defaultAppUrl = (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").replace(/\/$/, "");
 // These are saved on the booking exactly as written here; what staff see is translated (inc_0 to inc_7).
 const includedOptions = [
@@ -888,7 +888,7 @@ export function BookingForm({
             <label className="block">
               <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say(`rate_${periodKey}`)}</span>
               <input
-                className="font-mono-data mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]"
+                className="font-mono-data mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]"
                 inputMode="numeric"
                 onChange={(event) => setRentalRate(parseMoneyInput(event.target.value))}
                 placeholder={`${currencyInfo.symbol} 0`}
@@ -900,7 +900,7 @@ export function BookingForm({
             <label className="block">
               <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("deposit")}</span>
               <input
-                className="font-mono-data mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]"
+                className="font-mono-data mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]"
                 inputMode="numeric"
                 onChange={(event) => setDepositAmount(parseMoneyInput(event.target.value))}
                 placeholder={`${currencyInfo.symbol} 0`}
@@ -1001,7 +1001,7 @@ export function BookingForm({
                 <label className="block">
                   <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say(`howMany_${periodKey}`)}</span>
                   <input
-                    className="mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]"
+                    className="mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]"
                     inputMode="numeric"
                     min={1}
                     onChange={(event) => setUpfrontPeriods(Math.max(1, Number(event.target.value) || 1))}
@@ -1012,7 +1012,7 @@ export function BookingForm({
                 <label className="block">
                   <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say(`rate_${periodKey}`)}</span>
                   <input
-                    className="font-mono-data mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]"
+                    className="font-mono-data mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]"
                     inputMode="numeric"
                     onChange={(event) => setUpfrontRate(parseMoneyInput(event.target.value))}
                     placeholder={`${currencyInfo.symbol} 0`}
@@ -1170,7 +1170,7 @@ export function BookingForm({
                   <label className="block">
                     <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("paymentAmount")}</span>
                     <input
-                      className="font-mono-data mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]"
+                      className="font-mono-data mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]"
                       inputMode="numeric"
                       onChange={(event) => setWalkInPaymentAmount(parseMoneyInput(event.target.value))}
                       placeholder={`${currencyInfo.symbol} 0`}
@@ -1181,7 +1181,7 @@ export function BookingForm({
                   <label className="block">
                     <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("deposit")}</span>
                     <input
-                      className="font-mono-data mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]"
+                      className="font-mono-data mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]"
                       inputMode="numeric"
                       onChange={(event) => setWalkInDepositAmount(parseMoneyInput(event.target.value))}
                       placeholder={`${currencyInfo.symbol} 0`}
@@ -1270,7 +1270,7 @@ export function BookingForm({
               <div className="mt-3 space-y-2">
                 {(["up_to_date", "until", "none"] as const).map((value) => (
                   <label className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 ${existingPaid === value ? "border-[var(--primary)] bg-white" : "border-[var(--border)] bg-white"}`} key={value}>
-                    <input checked={existingPaid === value} className="mt-1 accent-[#0d9488]" onChange={() => setExistingPaid(value)} type="radio" />
+                    <input checked={existingPaid === value} className="mt-1 accent-[var(--primary)]" onChange={() => setExistingPaid(value)} type="radio" />
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm font-semibold text-[var(--foreground)]">{say(`paid_${value}`)}</span>
                       <span className="block text-xs text-[var(--muted)]">{say(`paid_${value}_d`)}</span>
@@ -1283,7 +1283,7 @@ export function BookingForm({
               </div>
               {depositAmount > 0 ? (
                 <label className="mt-3 flex cursor-pointer items-center gap-3 rounded-lg border border-[var(--border)] bg-white p-3">
-                  <input checked={existingDepositHeld} className="accent-[#0d9488]" onChange={(event) => setExistingDepositHeld(event.target.checked)} type="checkbox" />
+                  <input checked={existingDepositHeld} className="accent-[var(--primary)]" onChange={(event) => setExistingDepositHeld(event.target.checked)} type="checkbox" />
                   <span className="text-sm font-semibold text-[var(--foreground)]">{say("holding", { amount: money(depositAmount, currency) })}</span>
                 </label>
               ) : null}
@@ -1453,7 +1453,7 @@ function BookingLinkSharePanel({ result }: { result: BookingShareResult | null }
         {shareChannels.map(({ icon, key, label, title }) => (
           <button
             aria-label={title}
-            className="pressable flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-lg px-0.5 py-2 hover:bg-gray-50"
+            className="pressable flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-lg px-0.5 py-2 hover:bg-[var(--panel-secondary)]"
             key={key}
             onClick={() => handleShare(key)}
             title={title}
@@ -1631,7 +1631,7 @@ function GooglePlaceInput({
       <div className="mt-2 grid gap-2 sm:grid-cols-[1fr_auto]">
         <input
           autoComplete="off"
-          className="mt-0 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]"
+          className="mt-0 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]"
           onChange={(event) => onChange(event.target.value)}
           placeholder={`📍 ${placeholder}`}
           ref={inputRef}

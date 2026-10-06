@@ -1,11 +1,30 @@
 @import "tailwindcss";
 
 @font-face {
-  font-family: "Geist";
+  font-family: "Anuphan";
   font-display: swap;
   font-style: normal;
-  font-weight: 100 900;
-  src: url("/fonts/geist-latin.woff2") format("woff2");
+  font-weight: 100 700;
+  src: url("/fonts/anuphan-thai.woff2") format("woff2");
+  unicode-range: U+02D7, U+0303, U+0331, U+0E01-0E5B, U+200C-200D, U+25CC;
+}
+
+@font-face {
+  font-family: "Anuphan";
+  font-display: swap;
+  font-style: normal;
+  font-weight: 100 700;
+  src: url("/fonts/anuphan-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Anuphan";
+  font-display: swap;
+  font-style: normal;
+  font-weight: 100 700;
+  src: url("/fonts/anuphan-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
@@ -64,7 +83,7 @@
   --urgent-orange: #f97316;
   --urgent-green: #22C55E;
 
-  --font-geist-sans: "Geist";
+  --font-geist-sans: "Anuphan";
   --font-geist-mono: "Geist Mono";
 
   --line: var(--border);
@@ -95,7 +114,7 @@ body {
   margin: 0;
   background: var(--background);
   color: var(--foreground);
-  font-family: "Geist", system-ui, sans-serif;
+  font-family: "Anuphan", system-ui, sans-serif;
   font-size: 13px;
   line-height: 1.5;
   letter-spacing: -0.01em;
@@ -970,60 +989,97 @@ aside a[class*="bg-[var(--sidebar-active)]"] {
 }
 
 /* =====================================================================
-   "Calm & light" design system (Sept 2026).
-   Warm off-white canvas, white surfaces with a soft shadow instead of heavy
-   borders, one deep teal accent, colour kept for meaning (status) only.
-   These override the older tokens above, so every page picks them up.
+   "Harbour" look (Oct 2026).
+   Pale blue-grey canvas, white surfaces with a hairline border and a soft
+   shadow, one deep marine accent for anything you can press, and colour
+   otherwise kept for meaning: status (success / warning / danger) and the
+   kind of job (money, refund, form, handover, message) in small chips and
+   tags only - never on buttons or backgrounds. Anuphan covers Thai and
+   Latin in one family. These override the older tokens above.
    ===================================================================== */
 :root {
-  --background: #f6f5f2;
+  --background: #f0f4f8;
   --panel: #ffffff;
-  --panel-secondary: #f9f8f6;
-  --border: #e8e6e1;
-  --border-strong: #d8d5ce;
+  --panel-secondary: #f6f8fa;
+  --border: #dce3eb;
+  --border-strong: #c9d3de;
 
-  --foreground: #1c1b18;
-  --foreground-secondary: #45423c;
-  --muted: #7a766e;
+  --foreground: #1b2430;
+  --foreground-secondary: #3d4855;
+  --muted: #6b7480;
 
-  --sidebar-bg: #fbfaf8;
-  --sidebar-darker: #f1efeb;
-  --sidebar-hover: rgba(28, 27, 24, 0.05);
-  --sidebar-text: #45423c;
-  --sidebar-text-muted: #9a968e;
-  --sidebar-text-active: #0f766e;
-  --sidebar-border: #e8e6e1;
-  --sidebar-active: #0f766e;
+  --sidebar-bg: #f7f9fb;
+  --sidebar-darker: #eef2f6;
+  --sidebar-hover: rgba(27, 36, 48, 0.05);
+  --sidebar-text: #3d4855;
+  --sidebar-text-muted: #8a94a0;
+  --sidebar-text-active: #24456b;
+  --sidebar-border: #dce3eb;
+  --sidebar-active: #24456b;
 
-  --primary: #0f766e;
-  --primary-hover: #0b5f58;
-  --primary-light: #e7f3f1;
-  --primary-blue: #2f6fdb;
-  --primary-blue-hover: #255fc2;
-  --primary-blue-light: #eef3fc;
+  --primary: #24456b;
+  --primary-hover: #1a3451;
+  --primary-light: #e6edf5;
+  --primary-blue: #24456b;
+  --primary-blue-hover: #1a3451;
+  --primary-blue-light: #e6edf5;
 
-  --gradient-brand: #0f766e;
-  --gradient-teal: #0f766e;
+  --gradient-brand: #24456b;
+  --gradient-teal: #24456b;
+  --gradient-dark: #1b2430;
+  --gradient-dark-subtle: #1b2430;
+  --analytics-panel: #1b2430;
+  --analytics-card: #243040;
 
-  --success: #15803d;
-  --success-light: #ecf7ef;
-  --warning: #b45309;
-  --warning-light: #fdf5e8;
-  --danger: #c2410c;
-  --danger-light: #fdf0ea;
-  --info: #2f6fdb;
-  --info-light: #eef3fc;
-  --purple: #6d5bd0;
-  --purple-light: #f2f0fc;
+  --success: #2f6b45;
+  --success-light: #e3efe6;
+  --success-line: #c3dccb;
+  --warning: #b8742a;
+  --warning-light: #f6ebdb;
+  --warning-line: #e8d3b4;
+  --danger: #a04b36;
+  --danger-light: #f8e7e0;
+  --danger-line: #ebc8bc;
+  --info: #24456b;
+  --info-light: #e6edf5;
+  --info-line: #c6d3e3;
+  --purple: #6b4c8a;
+  --purple-light: #efe8f5;
+  --purple-line: #d8cbe5;
 
-  --shadow-sm: 0 1px 2px rgba(28, 27, 24, 0.05);
-  --shadow-md: 0 1px 2px rgba(28, 27, 24, 0.04), 0 4px 14px rgba(28, 27, 24, 0.05);
+  --urgent-red: #a04b36;
+  --urgent-amber: #b8742a;
+  --urgent-orange: #b8742a;
+  --urgent-green: #2f6b45;
+
+  /* Kind of job: a chip colour and its tint. */
+  --kind-money: #2f6b45;
+  --kind-money-bg: #e3efe6;
+  --kind-refund: #a04b36;
+  --kind-refund-bg: #f8e7e0;
+  --kind-form: #7a4a12;
+  --kind-form-bg: #f6ebdb;
+  --kind-move: #24456b;
+  --kind-move-bg: #e6edf5;
+  --kind-message: #6b4c8a;
+  --kind-message-bg: #efe8f5;
+
+  --focus-ring: rgba(36, 69, 107, 0.16);
+  --focus-ring-strong: rgba(36, 69, 107, 0.28);
+  --shadow-sm: 0 1px 2px rgba(27, 36, 48, 0.05);
+  --shadow-md: 0 1px 2px rgba(27, 36, 48, 0.04), 0 4px 14px rgba(27, 36, 48, 0.05);
   --radius: 12px;
 }
 
 body {
   font-size: 14px;
-  letter-spacing: -0.005em;
+  letter-spacing: 0;
+}
+
+/* Anuphan sets a little lighter than Geist did, so headings lean on weight
+   rather than tight tracking. */
+h1, h2, h3, .page-title, .page-hero h1 {
+  letter-spacing: -0.01em;
 }
 
 .content-area {
@@ -1184,7 +1240,7 @@ input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="r
 select:focus,
 textarea:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 @layer base {
   label {
@@ -1219,6 +1275,36 @@ td {
   letter-spacing: 0;
   padding: 2px 9px;
 }
+.badge-success { border-color: var(--success-line); color: var(--success); }
+.badge-warning { border-color: var(--warning-line); color: var(--warning); }
+.badge-danger { border-color: var(--danger-line); color: var(--danger); }
+.badge-info { border-color: var(--info-line); color: var(--info); }
+.badge-teal { border-color: var(--info-line); color: var(--primary); }
+.compliance-ok { border-color: var(--success-line); }
+.compliance-soon { border-color: var(--warning-line); }
+.compliance-urgent { background: var(--warning-light); border-color: var(--warning-line); color: var(--warning); }
+.compliance-expired { border-color: var(--danger-line); }
+.alert-panel { background: var(--panel); border-color: var(--warning-line); }
+.card-gradient-brand, .card-gradient-teal, .kpi-card-primary, .kpi-card-premium { background: var(--primary); }
+.card-gradient-dark { background: var(--foreground); }
+.analytics-panel { background: var(--analytics-panel) !important; }
+
+/* A small square chip that says what kind of job this is. */
+.kind-chip {
+  align-items: center;
+  border-radius: 10px;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 36px;
+  justify-content: center;
+  width: 36px;
+}
+.kind-chip svg { height: 18px; width: 18px; }
+.kind-money { background: var(--kind-money-bg); color: var(--kind-money); }
+.kind-refund { background: var(--kind-refund-bg); color: var(--kind-refund); }
+.kind-form { background: var(--kind-form-bg); color: var(--kind-form); }
+.kind-move { background: var(--kind-move-bg); color: var(--kind-move); }
+.kind-message { background: var(--kind-message-bg); color: var(--kind-message); }
 
 .nav-item-active,
 [data-active="true"],

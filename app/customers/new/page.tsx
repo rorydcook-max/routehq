@@ -8,7 +8,7 @@ import { commonCountries, customerLanguages, phoneCodeOptions } from "@/lib/cust
 import { getDefaultOrganization } from "@/lib/organization";
 
 const inputClass =
-  "mt-1 w-full rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[rgba(15,118,110,0.16)]";
+  "mt-1 w-full rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]";
 
 const contactMethodOptions = [
   { value: "whatsapp", label: "WhatsApp" },

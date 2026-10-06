@@ -63,19 +63,20 @@ const TONE_CLASSES: Record<Tone, string> = {
 };
 
 function AgendaRow({ item }: { item: AgendaItem }) {
+  // The pressing ones get a solid button; the rest are outlined so a list of eight is not a wall of blue.
+  const solid = item.tone === "red" || item.tone === "teal";
   return (
     <li>
-      <Link className="group flex items-center gap-3 px-4 py-3 transition hover:bg-[var(--panel-secondary)]" href={item.href as Route}>
-        <span className={`inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[10px] ${TONE_CLASSES[item.tone]}`}>{item.icon}</span>
+      <Link className="group flex items-center gap-3.5 px-4 py-3.5 transition hover:bg-[var(--panel-secondary)]" href={item.href as Route}>
+        <span className={`inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl ${TONE_CLASSES[item.tone]}`}>{item.icon}</span>
         <span className="min-w-0 flex-1">
-          <span className="block text-[14px] font-semibold leading-snug text-[var(--foreground)] sm:truncate">{item.title}</span>
-          <span className="line-clamp-2 block text-[13px] text-[var(--muted)] sm:truncate">
+          <span className="block text-[16px] font-bold leading-tight text-[var(--foreground)]">{item.title}</span>
+          <span className="line-clamp-2 block font-medium text-[var(--foreground-secondary)]">
             {item.detail}
-            {item.when ? <span className="sm:hidden"> · {item.when}</span> : null}
+            {item.when ? <span className={item.tone === "red" ? "font-bold text-[var(--danger)]" : ""}> · {item.when}</span> : null}
           </span>
         </span>
-        {item.when ? <span className="hidden flex-shrink-0 text-[13px] text-[var(--muted)] sm:block">{item.when}</span> : null}
-        <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-[8px] border border-[var(--border)] bg-white px-2.5 py-1.5 text-[13px] font-semibold text-[var(--foreground-secondary)] transition group-hover:border-[var(--primary)] group-hover:text-[var(--primary)]">
+        <span className={`inline-flex min-h-10 flex-shrink-0 items-center justify-center rounded-full px-4 font-bold ${solid ? "bg-[var(--primary)] text-white" : "border-2 border-[var(--border-strong)] bg-white text-[var(--foreground)]"}`}>
           {item.action}
         </span>
       </Link>
@@ -85,9 +86,9 @@ function AgendaRow({ item }: { item: AgendaItem }) {
 
 function Panel({ title, action, children, className = "" }: { title: string; action?: ReactNode; children: ReactNode; className?: string }) {
   return (
-    <section className={`overflow-hidden rounded-xl border border-[var(--border)] bg-white shadow-[var(--shadow-sm)] ${className}`}>
+    <section className={`card overflow-hidden ${className}`}>
       <header className="flex items-center justify-between gap-3 px-4 pb-2 pt-4">
-        <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-[var(--foreground)]">{title}</h2>
+        <h2 className="text-[18px] font-bold tracking-[-0.01em] text-[var(--foreground)]">{title}</h2>
         {action}
       </header>
       {children}
@@ -97,9 +98,9 @@ function Panel({ title, action, children, className = "" }: { title: string; act
 
 function PanelLink({ href, children }: { href: string; children: ReactNode }) {
   return (
-    <Link className="inline-flex items-center gap-1 text-[13px] font-semibold text-[var(--primary)] hover:underline" href={href as Route}>
+    <Link className="inline-flex items-center gap-1 font-bold text-[var(--primary)] hover:underline" href={href as Route}>
       {children}
-      <ArrowRight size={14} />
+      <ArrowRight size={16} />
     </Link>
   );
 }
@@ -180,6 +181,8 @@ export default async function Home() {
   // ── Today: everything that needs doing now, most urgent first ───────────
   const todayItems: AgendaItem[] = [];
   const paperwork: AgendaItem[] = [];
+  // Plates stay on the booking and vehicle pages; here the name is enough.
+  const noPlate = (label: string | null | undefined) => (label ? label.split(" · ")[0].replace(/\s*\([^)]*\)\s*$/, "") : "");
   const paperworkVehicle = new Map<string, string>();
   const upcomingItems: Array<AgendaItem & { sort: string }> = [];
   // A vehicle that is late back puts the next booking for it at risk.
@@ -235,7 +238,8 @@ export default async function Home() {
       tone: since > 7 ? "red" : "amber",
       icon: <Wallet size={17} />,
       title: t("amountOverdue", { amount: money(r.overdue || 0) }),
-      detail: `${r.customer} · ${r.vehicle}${since > 0 ? ` · ${t("daysLate", { days: since })}` : ""}`,
+      detail: `${r.customer} · ${noPlate(r.vehicle)}`,
+      when: since > 0 ? t("daysLate", { days: since }) : undefined,
       href: `/bookings/${r.id}`,
       action: t("collect")
     });
@@ -265,12 +269,12 @@ export default async function Home() {
           tone: item.daysLeft < 0 ? "red" : "amber",
           icon: <FileWarning size={17} />,
           title: item.daysLeft < 0 ? t(service ? "paperOverdue" : "paperExpired", { label, name }) : t("paperDue", { label, name }),
-          detail: `${v.plate} · ${item.daysLeft < 0 ? t(service ? "overdueSince" : "expiredSince", { date: shortDate(item.date) }) : item.daysLeft === 0 ? t("today") : `${dayLabel(item.date)}`}`,
+          detail: item.daysLeft < 0 ? t(service ? "overdueSince" : "expiredSince", { date: shortDate(item.date) }) : item.daysLeft === 0 ? t("today") : `${dayLabel(item.date)}`,
           href: `/fleet/${v.id}`,
           action: t("update")
         });
       } else if (item.daysLeft <= 30) {
-        upcomingItems.push({ key: `soon-doc-${v.id}-${item.key}`, sort: item.date, tone: "neutral", icon: <FileWarning size={17} />, title: t("paperRenewal", { label, name }), detail: v.plate, when: dayLabel(item.date), href: `/fleet/${v.id}`, action: t("view") });
+        upcomingItems.push({ key: `soon-doc-${v.id}-${item.key}`, sort: item.date, tone: "neutral", icon: <FileWarning size={17} />, title: t("paperRenewal", { label, name }), detail: dayLabel(item.date), href: `/fleet/${v.id}`, action: t("view") });
       }
     }
   }
@@ -308,8 +312,8 @@ export default async function Home() {
       rank: waiting ? 2 : 4,
       tone: waiting ? "red" : job.dueDate && job.dueDate < today ? "amber" : "neutral",
       icon: <Bell size={17} />,
-      title: waiting ? (asks > 1 ? t("waitingForAnswers", { who: job.customerName || t("aCustomer"), count: asks }) : t("waitingForAnswer", { who: job.customerName || t("aCustomer") })) : job.action === "swap_handover" || job.action === "swap_collection" ? job.title.split(" to ")[0].split(" from ")[0] : job.title.split(" - ")[0],
-      detail: [job.customerName, job.vehicleLabel].filter(Boolean).join(" · ") || t("onToDo"),
+      title: waiting ? (asks > 1 ? t("waitingForAnswers", { who: job.customerName || t("aCustomer"), count: asks }) : t("waitingForAnswer", { who: job.customerName || t("aCustomer") })) : noPlate(job.action === "swap_handover" || job.action === "swap_collection" ? job.title.split(" to ")[0].split(" from ")[0] : job.title.split(" - ")[0]),
+      detail: [waiting ? null : job.customerName, noPlate(job.vehicleLabel)].filter(Boolean).join(" · ") || t("onToDo"),
       href: waiting && job.rentalId ? `/bookings/${job.rentalId}#customer-requests` : "/tasks",
       action: waiting ? t("answer") : t("open")
     });
@@ -332,35 +336,41 @@ export default async function Home() {
 
   return (
     <AppShell userEmail={userEmail}>
-      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div className="mb-4 flex items-end justify-between gap-3">
         <div>
-          <p className="text-[13px] font-medium text-[var(--muted)]">{headerDate}</p>
-          <h1 className="mt-0.5 text-[26px] font-semibold tracking-[-0.02em] text-[var(--foreground)]">{greeting}</h1>
-          <p className="mt-1 text-sm text-[var(--foreground-secondary)]">
-            {todayItems.length === 0
-              ? t("nothingNeedsYou")
-              : urgentCount > 0
-                ? t("thingsTodayUrgent", { count: todayItems.length, urgent: urgentCount })
-                : t("thingsToday", { count: todayItems.length })}
-          </p>
+          <p className="font-semibold text-[var(--muted)]">{headerDate}</p>
+          <h1 className="page-title mt-0.5">{greeting}</h1>
         </div>
-        <Link className="pressable inline-flex items-center justify-center gap-2 self-start rounded-[9px] bg-[var(--primary)] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[var(--primary-hover)] sm:self-auto" href="/bookings/new">
-          <Plus size={16} />
-          {t("newBooking")}
-        </Link>
+        {/* On a phone the + in the bar does this. */}
+        <div className="hidden lg:block">
+          <Link className="primary-action pressable" href="/bookings/new">
+            <Plus size={18} />
+            {t("newBooking")}
+          </Link>
+        </div>
       </div>
 
-      <PushToggle variant="prompt" />
-      {!onboardingStatus.hidden ? (
-        <div className="mb-5">
-          <OnboardingChecklist
-            completedCount={onboardingStatus.completedCount}
-            items={onboardingStatus.items}
-            organizationId={organization.id}
-            totalCount={onboardingStatus.totalCount}
-          />
-        </div>
-      ) : null}
+      {/* The two numbers that decide the day, then the money. Nothing below 14px, nothing faded. */}
+      <div className="mb-4 grid grid-cols-2 gap-3">
+        <Link className={`pressable flex flex-col gap-0.5 rounded-[var(--radius)] p-4 text-white ${urgentCount > 0 ? "bg-[var(--danger)]" : "bg-[var(--success)]"}`} href="/tasks">
+          <span className="text-[34px] font-bold leading-none tabular-nums">{urgentCount}</span>
+          <span className="font-semibold">{t("tileUrgent")}</span>
+        </Link>
+        <Link className="pressable flex flex-col gap-0.5 rounded-[var(--radius)] bg-[var(--primary)] p-4 text-white" href="/tasks">
+          <span className="text-[34px] font-bold leading-none tabular-nums">{todayItems.length}</span>
+          <span className="font-semibold">{t("tileToday")}</span>
+        </Link>
+      </div>
+      <div className="card mb-5 flex items-center justify-between gap-4 px-4 py-3.5">
+        <Link className="min-w-0" href="/tasks">
+          <span className="block font-semibold text-[var(--muted)]">{t("overdue")}</span>
+          <span className={`block text-[24px] font-bold leading-tight tabular-nums ${overdueTotal > 0 ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{money(overdueTotal)}</span>
+        </Link>
+        <Link className="min-w-0 text-right" href="/reports">
+          <span className="block font-semibold text-[var(--muted)]">{t("moneyThisMonth")}</span>
+          <span className="block text-[24px] font-bold leading-tight tabular-nums text-[var(--success)]">{money(metrics.monthlyRevenue)}</span>
+        </Link>
+      </div>
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
         <div className="min-w-0 space-y-5">
@@ -401,20 +411,18 @@ export default async function Home() {
                   const late = r.end !== "Indefinite" && r.end < today;
                   return (
                     <li key={r.id}>
-                      <Link className="flex items-center gap-3 px-4 py-3 transition hover:bg-[var(--panel-secondary)]" href={`/bookings/${r.id}` as Route}>
+                      <Link className="flex items-center gap-3 px-4 py-3.5 transition hover:bg-[var(--panel-secondary)]" href={`/bookings/${r.id}` as Route}>
                         <span className="min-w-0 flex-1">
-                          <span className="block truncate text-[14px] font-semibold text-[var(--foreground)]">{r.vehicle}</span>
-                          <span className="block truncate text-[13px] text-[var(--muted)]">{r.customer}</span>
+                          <span className="block truncate text-[16px] font-bold text-[var(--foreground)]">{r.vehicle}</span>
+                          <span className="block truncate font-medium text-[var(--foreground-secondary)]">{r.customer}</span>
                         </span>
-                        <span className="flex-shrink-0 text-right text-[13px]">
-                          <span className={`block ${late ? "font-semibold text-[var(--danger)]" : "text-[var(--foreground-secondary)]"}`}>
+                        <span className="flex-shrink-0 text-right">
+                          <span className={`block font-bold ${late ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>
                             {r.end === "Indefinite" ? t("openEnded") : late ? t("wasDue", { date: shortDate(r.end) }) : t("until", { date: shortDate(r.end) })}
                           </span>
                           {(r.overdue || 0) > 0 ? (
-                            <span className="block font-semibold text-[var(--danger)]">{t("owed", { amount: money(r.overdue || 0) })}</span>
-                          ) : (
-                            <span className="block text-[var(--muted)]">{t("paidUp")}</span>
-                          )}
+                            <span className="block font-bold text-[var(--danger)]">{t("owed", { amount: money(r.overdue || 0) })}</span>
+                          ) : null}
                         </span>
                       </Link>
                     </li>
@@ -455,16 +463,16 @@ export default async function Home() {
                     </span>
                   </Link>
                 ))}
-                <p className="px-2 pt-2 text-[13px] text-[var(--muted)]">{t("earning", { percent: utilization })}</p>
+                <p className="px-2 pt-2 font-medium text-[var(--foreground-secondary)]">{t("earning", { percent: utilization })}</p>
               </div>
             )}
           </Panel>
 
           <Panel action={<PanelLink href="/reports">{t("reports")}</PanelLink>} title={t("moneyThisMonth")}>
             <div className="px-4 pb-4">
-              <p className="text-[28px] font-semibold tabular-nums tracking-[-0.02em] text-[var(--foreground)]">{money(metrics.monthlyRevenue)}</p>
-              <p className="text-[13px] text-[var(--muted)]">
-                {t.rich("takenIn", { costs: money(monthlyExpenses), profit: money(monthlyProfit), b: (chunks) => <span className={monthlyProfit < 0 ? "font-semibold text-[var(--danger)]" : "font-semibold text-[var(--success)]"}>{chunks}</span> })}
+              <p className="text-[28px] font-bold tabular-nums tracking-[-0.02em] text-[var(--foreground)]">{money(metrics.monthlyRevenue)}</p>
+              <p className="font-medium text-[var(--foreground-secondary)]">
+                {t.rich("takenIn", { costs: money(monthlyExpenses), profit: money(monthlyProfit), b: (chunks) => <span className={monthlyProfit < 0 ? "font-bold text-[var(--danger)]" : "font-bold text-[var(--success)]"}>{chunks}</span> })}
               </p>
               <div aria-hidden="true" className="mt-4 flex h-20 items-end gap-2">
                 {lastSixMonths.map((month) => (
@@ -474,31 +482,35 @@ export default async function Home() {
                       style={{ height: `${Math.max(4, Math.round((month.amount / maxMonth) * 64))}px` }}
                       title={`${month.label}: ${money(month.amount)}`}
                     />
-                    <span className="text-[11px] text-[var(--muted)]">{month.label}</span>
+                    <span className="font-medium text-[var(--muted)]">{month.label}</span>
                   </div>
                 ))}
               </div>
             </div>
-            <dl className="grid grid-cols-2 border-t border-[var(--border)]">
-              <Link className="border-r border-[var(--border)] px-4 py-3 transition hover:bg-[var(--panel-secondary)]" href="/tasks">
-                <dt className="text-[12px] text-[var(--muted)]">{t("overdue")}</dt>
-                <dd className={`font-mono-data text-[16px] font-semibold ${overdueTotal > 0 ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{money(overdueTotal)}</dd>
-                <dd className="text-[12px] text-[var(--muted)]">{overdueRentals.length === 0 ? t("allPaid") : t("rentalsCount", { count: overdueRentals.length })}</dd>
-              </Link>
-              <Link className="px-4 py-3 transition hover:bg-[var(--panel-secondary)]" href="/bookings">
-                <dt className="text-[12px] text-[var(--muted)]">{t("depositsHeld")}</dt>
-                <dd className="font-mono-data text-[16px] font-semibold text-[var(--foreground)]">{money(depositsHeld)}</dd>
-                <dd className="text-[12px] text-[var(--muted)]">{t("customersCount", { count: depositsHeldCount })}</dd>
-              </Link>
-            </dl>
+            <Link className="flex items-center justify-between border-t border-[var(--border)] px-4 py-3.5 transition hover:bg-[var(--panel-secondary)]" href="/bookings">
+              <span className="font-semibold text-[var(--foreground-secondary)]">{t("depositsHeld")} · {t("customersCount", { count: depositsHeldCount })}</span>
+              <span className="text-[16px] font-bold tabular-nums text-[var(--foreground)]">{money(depositsHeld)}</span>
+            </Link>
           </Panel>
         </div>
       </div>
 
-      <details className="group mt-6 rounded-xl border border-[var(--border)] bg-white shadow-[var(--shadow-sm)]">
-        <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3.5 text-[15px] font-semibold text-[var(--foreground)]">
+      <div className="mt-6 space-y-4">
+        <PushToggle variant="prompt" />
+        {!onboardingStatus.hidden ? (
+          <OnboardingChecklist
+            completedCount={onboardingStatus.completedCount}
+            items={onboardingStatus.items}
+            organizationId={organization.id}
+            totalCount={onboardingStatus.totalCount}
+          />
+        ) : null}
+      </div>
+
+      <details className="card group mt-4">
+        <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-4 text-[16px] font-bold text-[var(--foreground)]">
           {t("moreInsights")}
-          <span className="text-[13px] font-normal text-[var(--muted)] group-open:hidden">{t("moreInsightsHint")}</span>
+          <span className="font-medium text-[var(--muted)] group-open:hidden">{t("moreInsightsHint")}</span>
         </summary>
         <div className="space-y-4 border-t border-[var(--border)] p-4">
           <div className="grid gap-4 sm:grid-cols-2">

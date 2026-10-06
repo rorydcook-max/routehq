@@ -47,6 +47,33 @@ function dayLabel(iso: string | null, today: string, tx: Tx) {
   return plainDate(iso, today, tx.locale);
 }
 
+/** The short note on the right of a job: "16 days late", "Today", "Tomorrow", "8 Oct". */
+function whenShort(item: TaskListItem, today: string, overdue: boolean, tx: Tx) {
+  if (item.completedAt) {
+    const day = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date(item.completedAt));
+    return dayLabel(day, today, tx);
+  }
+  const due = item.dueDate;
+  if (!due) return "";
+  if (overdue) {
+    const days = Math.round((Date.parse(`${today}T00:00:00Z`) - Date.parse(`${due}T00:00:00Z`)) / 86400000);
+    return tx.say("daysLate", { count: days });
+  }
+  return dayLabel(due, today, tx);
+}
+
+/** "฿9,500 rent": the amount leads, the kind follows. */
+function payTitle(item: TaskListItem, tx: Tx) {
+  const amount = money(item.receipt ? item.receipt.total : item.amount || 0);
+  const kind = item.pay?.kind || "rent";
+  return tx.say(tx.has(`payTitle_${kind}`) ? `payTitle_${kind}` : "payTitle_rent", { amount });
+}
+
+/** The vehicle without its plate: "Honda CRF", not "Honda CRF · 1กฒ7756". The plate lives on the booking. */
+function vehicleName(label: string | null) {
+  return label ? label.split(" · ")[0] : null;
+}
+
 /** "Due today", "Was due yesterday", "Done 4 Oct": whole phrases, because languages order them differently. */
 function whenLine(item: TaskListItem, today: string, overdue: boolean, tx: Tx) {
   if (item.completedAt) {
@@ -119,14 +146,10 @@ function headingOf(item: TaskListItem, today: string, tx: Tx): { title: string; 
   if (item.action === "refund") {
     const early = detail.match(/^returned (\d+) days? before the paid time ran out \(pro rata (.+)\)$/);
     const cancelled = detail.match(/^(.+) cancelled the (.+) \((.+) paid\)$/);
-    const said = early
-      ? tx.say("refundEarly", { days: Number(early[1]), amount: early[2] })
-      : cancelled
-        ? tx.say("refundCancelled", { name: cancelled[1], vehicle: cancelled[2], amount: cancelled[3] })
-        : detail
-          ? detail.charAt(0).toUpperCase() + detail.slice(1)
-          : null;
-    return { title: tx.say("job_refund"), detail: said };
+    // The amount leads the heading; the reason is the one line under it.
+    if (early) return { title: tx.say("refundTitle", { amount: early[2] }), detail: tx.say("refundEarlyShort", { days: Number(early[1]) }) };
+    if (cancelled) return { title: tx.say("refundTitle", { amount: cancelled[3] }), detail: tx.say("refundCancelledShort", { name: cancelled[1] }) };
+    return { title: tx.say("job_refund"), detail: detail ? detail.charAt(0).toUpperCase() + detail.slice(1) : null };
   }
   if (item.action === "request") {
     const extension = first.match(/^Extension to (.+) needs your answer$/);
@@ -351,34 +374,39 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
   const overdue = !item.completedAt && !!item.dueDate && item.dueDate < today;
   // A time of day only for jobs someone gave a time to; jobs the app raises carry the moment they were raised, which means nothing.
   const time = item.kind === "task" && !item.action ? timeLabel(item.dueAt) : null;
-  // The booking number is on the booking; here the customer and the vehicle say which one it is.
-  const context = [item.customerName, item.vehicleLabel].filter(Boolean).join(" · ") || item.rentalLabel || "";
+  // The booking number and the plate are on the booking; here the customer and the vehicle say which one it is.
+  const context = [item.customerName, vehicleName(item.vehicleLabel)].filter(Boolean).join(" · ") || item.rentalLabel || "";
   const heading = headingOf(item, today, tx);
+  const title = coversSeveral ? tx.say("receiptForSeveral", { count: receipt.paymentIds.length }) : item.kind === "payment" ? payTitle(item, tx) : heading.title;
+  const when = whenShort(item, today, overdue, tx);
+  const line = heading.detail && !receipt ? [heading.detail, context].filter(Boolean).join(" · ") : context;
 
   return (
-    <div className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-start">
-      <div className="flex min-w-0 flex-1 items-start gap-3">
+    <div className="card flex flex-col gap-3.5 p-4">
+      <div className="flex items-center gap-3.5">
         <KindChip kind={jobKind(item)} />
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            <p className="font-bold text-[var(--foreground)]">{coversSeveral ? tx.say("receiptForSeveral", { count: receipt.paymentIds.length }) : receipt ? payText(item, "pay", tx) : heading.title}</p>
-            {item.amount != null ? <span className="font-semibold text-[var(--foreground)]">{money(receipt ? receipt.total : item.amount)}</span> : null}
-            {item.kind === "task" && !item.action && String(item.taskType || "") !== "admin" ? <Badge tone="neutral">{tx.has(`type_${item.taskType}`) ? tx.say(`type_${item.taskType}`) : taskTypeLabel(item.taskType)}</Badge> : null}
+          <div className="flex items-start justify-between gap-3">
+            <p className="text-[19px] font-bold leading-tight text-[var(--foreground)]">{title}</p>
+            {when ? (
+              <p className={`shrink-0 whitespace-nowrap pt-0.5 font-bold ${overdue ? "text-[var(--danger)]" : "text-[var(--foreground-secondary)]"}`}>
+                {when}
+                {time && !item.completedAt && item.dueDate ? ` · ${time}` : ""}
+              </p>
+            ) : null}
           </div>
-          {heading.detail && !receipt ? <p className="mt-0.5 text-sm text-[var(--foreground-secondary)]">{heading.detail}</p> : null}
-          {context ? (
+          {line ? (
             item.rentalId || item.vehicleId ? (
-              <Link className="mt-0.5 block text-sm text-[var(--foreground-secondary)] underline decoration-[var(--border-strong)] underline-offset-2 sm:truncate" href={item.rentalId ? `/bookings/${item.rentalId}` : `/fleet/${item.vehicleId}`}>
-                {context}
+              <Link className="mt-0.5 block font-medium text-[var(--foreground-secondary)]" href={item.rentalId ? `/bookings/${item.rentalId}` : `/fleet/${item.vehicleId}`}>
+                {line}
               </Link>
             ) : (
-              <p className="mt-0.5 text-sm text-[var(--foreground-secondary)] sm:truncate">{context}</p>
+              <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{line}</p>
             )
           ) : null}
-          <p className={`mt-0.5 text-xs font-semibold ${overdue ? "text-[var(--danger)]" : "text-[var(--muted)]"}`}>
-            {whenLine(item, today, overdue, tx)}
-            {time && !item.completedAt && item.dueDate ? ` · ${time}` : ""}
-          </p>
+        </div>
+      </div>
+      <div className="min-w-0">
           {coversSeveral ? (
             <p className="mt-0.5 text-sm text-[var(--foreground-secondary)]">
               {[item, ...siblings].filter((entry) => receipt.paymentIds.includes(entry.rentalPaymentId || "")).map((entry) => `${payText(entry, "pay", tx)} ${money(entry.amount || 0)}`).join(" + ")}
@@ -409,11 +437,10 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
               </PendingButton>
             </form>
           ) : null}
-        </div>
       </div>
 
-      {/* Buttons run the full width on a phone so a row of two or three never breaks onto a second line. */}
-      <div className="flex shrink-0 flex-wrap items-center gap-2">
+      {/* Buttons share the full card width so a row of two or three never breaks onto a second line. */}
+      <div className="flex items-center gap-2 [&>*]:min-w-0 [&>*]:flex-1 [&>a]:justify-center [&>button]:justify-center [&_button]:w-full [&_form]:min-w-0 [&_form]:flex-1">
         {receipt?.url ? (
           <a className="secondary-action pressable min-h-9 px-3 text-xs" href={receipt.url} rel="noreferrer" target="_blank">
             {tx.say("viewReceipt")}
@@ -469,8 +496,8 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
                 {tx.say("addNote")}
               </button>
             ) : (
-              <button aria-label={tx.say("moreOptions")} className="secondary-action pressable flex min-h-9 items-center px-2.5 text-xs" onClick={() => setShowMore(true)} type="button">
-                <MoreHorizontal size={16} />
+              <button aria-label={tx.say("moreOptions")} className="pressable flex !w-12 !flex-none items-center justify-center rounded-full bg-[var(--panel-secondary)] text-[var(--foreground)]" onClick={() => setShowMore(true)} style={{ minHeight: 44 }} type="button">
+                <MoreHorizontal size={20} />
               </button>
             )}
           </>
@@ -515,17 +542,16 @@ export function TasksList({
   );
   const groups = useMemo(() => groupOpen(open, today), [open, today]);
 
-  const toneClass = { red: "text-[var(--danger)]", amber: "text-[var(--warning)]", neutral: "text-[var(--foreground-secondary)]", teal: "text-[var(--primary)]" };
 
   return (
     <div className="space-y-4">
       <div className="flex gap-2">
         {([
-          ["open", tx.say("tabOpen", { count: open.length })],
+          ["open", tx.say("tabOpenShort")],
           ["done", tx.say("tabDone")]
         ] as const).map(([value, label]) => (
           <button
-            className={`pressable min-h-10 rounded-xl border px-4 text-sm font-bold ${filter === value ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground)]"}`}
+            className={`pressable min-h-10 rounded-full px-5 font-bold ${filter === value ? "bg-[var(--primary)] text-white" : "bg-white text-[var(--foreground)]"}`}
             key={value}
             onClick={() => setFilter(value)}
             type="button"
@@ -546,22 +572,16 @@ export function TasksList({
             const limited = group.key === "later" && !showAllLater && group.items.length > laterLimit;
             const items = limited ? group.items.slice(0, laterLimit) : group.items;
             return (
-              <section className="overflow-hidden rounded-xl border border-[var(--border)] bg-white" key={group.key}>
-                <div className="flex items-center justify-between border-b border-[var(--border)] bg-[var(--panel-secondary)] px-4 py-2">
-                  <p className={`text-xs font-semibold uppercase tracking-[0.08em] ${toneClass[group.tone]}`}>{tx.say(`group_${group.key}`)}</p>
-                  <p className="text-xs font-semibold text-[var(--muted)]">{group.items.length}</p>
+              <section className="space-y-2.5" key={group.key}>
+                <div className="flex items-center gap-2.5 px-1 pt-1">
+                  <h2 className="text-[18px] font-bold text-[var(--foreground)]">{tx.say(`group_${group.key}`)}</h2>
+                  <span className={`inline-flex min-w-7 items-center justify-center rounded-full px-2 py-0.5 text-[14px] font-bold ${group.tone === "red" ? "bg-[var(--danger)] text-white" : "bg-[var(--panel-tertiary)] text-[var(--foreground)]"}`}>{group.items.length}</span>
                 </div>
-                <div className="divide-y divide-[var(--border)]">
-                  {items.map((item) => (
-                    <TaskRow item={item} key={item.id} organizationId={organizationId} siblings={item.kind === "payment" ? siblingsOf(item) : []} today={today} />
-                  ))}
-                </div>
+                {items.map((item) => (
+                  <TaskRow item={item} key={item.id} organizationId={organizationId} siblings={item.kind === "payment" ? siblingsOf(item) : []} today={today} />
+                ))}
                 {limited ? (
-                  <button
-                    className="w-full border-t border-[var(--border)] px-4 py-2 text-left text-sm font-bold text-[var(--primary)]"
-                    onClick={() => setShowAllLater(true)}
-                    type="button"
-                  >
+                  <button className="pressable w-full rounded-full bg-white px-4 py-3 font-bold text-[var(--primary)]" onClick={() => setShowAllLater(true)} type="button">
                     {tx.say("showMore", { count: group.items.length - laterLimit })}
                   </button>
                 ) : null}
@@ -574,12 +594,10 @@ export function TasksList({
           <p className="text-lg font-semibold text-[var(--foreground)]">{tx.say("noFinished")}</p>
         </div>
       ) : (
-        <section className="overflow-hidden rounded-xl border border-[var(--border)] bg-white">
-          <div className="divide-y divide-[var(--border)]">
-            {done.slice(0, 50).map((item) => (
-              <TaskRow item={item} key={item.id} organizationId={organizationId} today={today} />
-            ))}
-          </div>
+        <section className="space-y-2.5">
+          {done.slice(0, 50).map((item) => (
+            <TaskRow item={item} key={item.id} organizationId={organizationId} today={today} />
+          ))}
         </section>
       )}
     </div>

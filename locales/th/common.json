@@ -900,7 +900,16 @@
     "emptyBody": "เงินที่ถึงกำหนดและงานที่คุณเพิ่มจากหน้ารถจะแสดงที่นี่",
     "showMore": "แสดงอีก {count} รายการ",
     "noFinished": "ยังไม่มีงานที่เสร็จ",
-    "tellCustomer": "แจ้งลูกค้าว่าได้รับเงินแล้ว"
+    "tellCustomer": "แจ้งลูกค้าว่าได้รับเงินแล้ว",
+    "tabOpenShort": "ต้องทำ",
+    "payTitle_rent": "ค่าเช่า {amount}",
+    "payTitle_deposit": "มัดจำ {amount}",
+    "payTitle_top_up": "ยอดเพิ่ม {amount}",
+    "payTitle_extension": "ค่าต่อเวลา {amount}",
+    "refundTitle": "คืนเงิน {amount}?",
+    "refundEarlyShort": "คืนรถก่อนกำหนด {days} วัน",
+    "refundCancelledShort": "{name} ยกเลิก",
+    "daysLate": "เลยกำหนด {count} วัน"
   },
   "bookings": {
     "eyebrow": "การจอง",

@@ -231,22 +231,22 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
               {index === 2 && !onFocusedFlow ? (
                 <button aria-label={t("openFastActions")} className="flex items-center justify-center" onClick={() => setFastActionOpen(true)} type="button">
                   {/* Centred in the bar: its middle sits level with the middle of each icon-and-label pair. */}
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--primary)] text-white shadow-[0_4px_12px_var(--focus-ring-strong)]">
-                    <Plus size={22} />
+                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--primary)] text-white">
+                    <Plus size={26} />
                   </span>
                 </button>
               ) : null}
               <Link
-                className={`flex min-w-0 flex-col items-center gap-1 rounded-md px-1 py-2 text-[11px] font-semibold ${
-                  isActive(item.href) ? "text-[var(--primary)]" : "text-[var(--sidebar-text)]"
+                className={`phone-bar-item flex min-w-0 flex-col items-center gap-1 rounded-md px-1 py-2 font-bold ${
+                  isActive(item.href) ? "text-[var(--foreground)]" : "text-[var(--muted)]"
                 }`}
                 href={item.href}
                 key={item.key}
               >
                 <span className="relative">
-                  <Icon size={18} />
+                  <Icon size={22} strokeWidth={isActive(item.href) ? 2.4 : 2} />
                   {badgeFor(item.key) > 0 ? (
-                    <span className="absolute -right-2.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--primary)] px-1 text-[10px] font-semibold text-white">{badgeFor(item.key)}</span>
+                    <span className="phone-bar-badge absolute -right-3 -top-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[var(--danger)] px-1 font-bold text-white">{badgeFor(item.key)}</span>
                   ) : null}
                 </span>
                 <span className="max-w-full truncate">{t(item.key)}</span>
@@ -256,8 +256,8 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
           })}
           <button
             aria-expanded={moreOpen}
-            className={`flex min-w-0 flex-col items-center gap-1 rounded-md px-1 py-2 text-[11px] font-semibold ${
-              moreActive || moreOpen ? "text-[var(--primary)]" : "text-[var(--sidebar-text)]"
+            className={`phone-bar-item flex min-w-0 flex-col items-center gap-1 rounded-md px-1 py-2 font-bold ${
+              moreActive || moreOpen ? "text-[var(--foreground)]" : "text-[var(--muted)]"
             }`}
             onClick={() => setMoreOpen(true)}
             type="button"

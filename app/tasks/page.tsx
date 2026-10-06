@@ -13,10 +13,8 @@ export default async function TasksPage() {
 
   return (
     <AppShell userEmail={userEmail}>
-      <div className="page-hero mb-5">
-        <p className="page-eyebrow">{t("eyebrow")}</p>
+      <div className="page-hero mb-4">
         <h1 className="page-title">{t("title")}</h1>
-        <p className="page-subtitle mt-2">{t("subtitle")}</p>
       </div>
 
       <TasksList organizationId={organization.id} tasks={tasks} today={businessToday()} />

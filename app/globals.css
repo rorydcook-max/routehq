@@ -998,16 +998,16 @@ aside a[class*="bg-[var(--sidebar-active)]"] {
    Latin in one family. These override the older tokens above.
    ===================================================================== */
 :root {
-  --background: #f0f4f8;
+  --background: #f2f4f6;
   --panel: #ffffff;
-  --panel-secondary: #f6f8fa;
-  --panel-tertiary: #eaeff4;
-  --border: #dce3eb;
+  --panel-secondary: #f2f4f6;
+  --panel-tertiary: #e6eaef;
+  --border: #e3e8ed;
   --border-strong: #c9d3de;
 
   --foreground: #1b2430;
   --foreground-secondary: #3d4855;
-  --muted: #6b7480;
+  --muted: #5c6773;
 
   --sidebar-bg: #f7f9fb;
   --sidebar-darker: #eef2f6;
@@ -1038,8 +1038,8 @@ aside a[class*="bg-[var(--sidebar-active)]"] {
   --warning: #b8742a;
   --warning-light: #f6ebdb;
   --warning-line: #e8d3b4;
-  --danger: #a04b36;
-  --danger-light: #f8e7e0;
+  --danger: #a8432f;
+  --danger-light: #f8e6e1;
   --danger-line: #ebc8bc;
   --info: #24456b;
   --info-light: #e6edf5;
@@ -1048,7 +1048,7 @@ aside a[class*="bg-[var(--sidebar-active)]"] {
   --purple-light: #efe8f5;
   --purple-line: #d8cbe5;
 
-  --urgent-red: #a04b36;
+  --urgent-red: #a8432f;
   --urgent-amber: #b8742a;
   --urgent-orange: #b8742a;
   --urgent-green: #2f6b45;
@@ -1056,7 +1056,7 @@ aside a[class*="bg-[var(--sidebar-active)]"] {
   /* Kind of job: a chip colour and its tint. */
   --kind-money: #2f6b45;
   --kind-money-bg: #e3efe6;
-  --kind-refund: #a04b36;
+  --kind-refund: #a8432f;
   --kind-refund-bg: #f8e7e0;
   --kind-form: #7a4a12;
   --kind-form-bg: #f6ebdb;
@@ -1067,15 +1067,32 @@ aside a[class*="bg-[var(--sidebar-active)]"] {
 
   --focus-ring: rgba(36, 69, 107, 0.16);
   --focus-ring-strong: rgba(36, 69, 107, 0.28);
-  --shadow-sm: 0 1px 2px rgba(27, 36, 48, 0.05);
-  --shadow-md: 0 1px 2px rgba(27, 36, 48, 0.04), 0 4px 14px rgba(27, 36, 48, 0.05);
-  --radius: 12px;
+  --shadow-sm: none;
+  --shadow-md: none;
+  --radius: 18px;
 }
 
 body {
-  font-size: 14px;
+  font-size: 15px;
   letter-spacing: 0;
 }
+
+/* Nothing on an owner's screen is smaller than 14px. The small utilities are
+   kept in the markup for now and lifted here, so the whole app moves at once;
+   the bottom menu and tag pills set their own size below. */
+.text-xs, .text-\[10px\], .text-\[11px\], .text-\[12px\], .text-\[13px\] {
+  font-size: 14px !important;
+  line-height: 1.35 !important;
+}
+.text-sm {
+  font-size: 15px !important;
+  line-height: 1.4 !important;
+}
+.text-\[9px\] {
+  font-size: 13px !important;
+}
+.phone-bar-item { font-size: 12px !important; }
+.phone-bar-badge { font-size: 11px !important; line-height: 1 !important; }
 
 /* Anuphan sets a little lighter than Geist did, so headings lean on weight
    rather than tight tracking. */
@@ -1115,14 +1132,14 @@ a[class*="rounded-lg"][class*="px-"]:active {
 .primary-action,
 .btn-primary {
   background: var(--primary);
-  border: 1px solid var(--primary);
-  border-radius: 9px;
-  box-shadow: var(--shadow-sm);
+  border: 0;
+  border-radius: 999px;
+  box-shadow: none;
   color: #ffffff;
-  font-size: 13px;
-  font-weight: 600;
-  min-height: 38px;
-  padding: 8px 16px;
+  font-size: 15px;
+  font-weight: 700;
+  min-height: 44px;
+  padding: 10px 20px;
 }
 .primary-action:hover,
 .btn-primary:hover {
@@ -1132,13 +1149,13 @@ a[class*="rounded-lg"][class*="px-"]:active {
 .secondary-action,
 .btn-secondary {
   background: var(--panel);
-  border: 1px solid var(--border-strong);
-  border-radius: 9px;
+  border: 2px solid var(--border-strong);
+  border-radius: 999px;
   color: var(--foreground);
-  font-size: 13px;
-  font-weight: 600;
-  min-height: 38px;
-  padding: 8px 16px;
+  font-size: 15px;
+  font-weight: 700;
+  min-height: 44px;
+  padding: 8px 18px;
 }
 .secondary-action:hover,
 .btn-secondary:hover {
@@ -1155,17 +1172,19 @@ a[class*="rounded-lg"][class*="px-"]:active {
 }
 .page-title,
 .page-hero h1 {
-  font-size: 24px;
-  font-weight: 650;
-  letter-spacing: -0.025em;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
 }
 .page-subtitle,
 .page-hero p {
-  color: var(--muted);
-  font-size: 14px;
+  color: var(--foreground-secondary);
+  font-size: 15px;
+  font-weight: 500;
 }
 
-/* Surfaces: soft shadow, hairline border, one radius. */
+/* Surfaces: plain white on the grey canvas, no border; the canvas does the separating. */
 .card,
 .content-section,
 .surface-panel,
@@ -1174,9 +1193,9 @@ a[class*="rounded-lg"][class*="px-"]:active {
 .sub-surface,
 .kpi-card {
   background: var(--panel);
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
 }
 .kpi-card-today,
 .kpi-card-profit,
@@ -1223,8 +1242,9 @@ a[class*="rounded-lg"][class*="px-"]:active {
 input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),
 select,
 textarea {
-  border: 1px solid var(--border-strong);
-  border-radius: 9px;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 12px;
+  font-size: 15px;
 }
 input[type="text"],
 input[type="email"],
@@ -1235,7 +1255,7 @@ input[type="date"],
 input[type="datetime-local"],
 input[type="time"],
 select {
-  height: 38px;
+  height: 44px;
 }
 input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):focus,
 select:focus,
@@ -1270,11 +1290,13 @@ td {
 
 /* Status pills */
 .badge {
+  border: 0;
   border-radius: 999px;
-  font-size: 12px;
-  font-weight: 550;
+  font-size: 13px !important;
+  font-weight: 700;
   letter-spacing: 0;
-  padding: 2px 9px;
+  line-height: 1.3 !important;
+  padding: 4px 10px;
 }
 .badge-success { border-color: var(--success-line); color: var(--success); }
 .badge-warning { border-color: var(--warning-line); color: var(--warning); }
@@ -1293,14 +1315,16 @@ td {
 /* A small square chip that says what kind of job this is. */
 .kind-chip {
   align-items: center;
-  border-radius: 10px;
+  border-radius: 14px;
   display: inline-flex;
   flex: 0 0 auto;
-  height: 36px;
+  height: 48px;
   justify-content: center;
-  width: 36px;
+  width: 48px;
 }
-.kind-chip svg { height: 18px; width: 18px; }
+.kind-chip svg { height: 22px; width: 22px; }
+.kind-chip-sm { border-radius: 12px; height: 40px; width: 40px; }
+.kind-chip-sm svg { height: 20px; width: 20px; }
 .kind-money { background: var(--kind-money-bg); color: var(--kind-money); }
 .kind-refund { background: var(--kind-refund-bg); color: var(--kind-refund); }
 .kind-form { background: var(--kind-form-bg); color: var(--kind-form); }

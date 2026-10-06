@@ -71,7 +71,7 @@ const recordItems: NavItem[] = [
 ];
 
 // Phones get the four places used most every day; everything else is under More.
-const mobileBarKeys: NavKey[] = ["dashboard", "tasks", "inbox", "bookings"];
+const mobileBarKeys: NavKey[] = ["dashboard", "bookings", "inbox"];
 
 export function AppShell({ children, userEmail }: { children: React.ReactNode; userEmail?: string | null }) {
   const t = useTranslations("nav");
@@ -99,7 +99,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
   const visibleRecordItems = isTeammate ? recordItems.filter((item) => item.href !== "/settings") : recordItems;
   const allNavItems = [...dailyItems, ...visibleRecordItems];
   const mobileBarItems = mobileBarKeys.map((key) => allNavItems.find((item) => item.key === key)).filter(Boolean) as NavItem[];
-  const moreItems = allNavItems.filter((item) => !mobileBarKeys.includes(item.key));
+  const moreItems = allNavItems.filter((item) => !mobileBarKeys.includes(item.key)).sort((a, b) => Number(b.key === "tasks") - Number(a.key === "tasks"));
 
   const onFocusedFlow = !!pathname && (pathname.startsWith("/inspections") || /\/(new|edit|import)(\/|$)/.test(pathname));
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
@@ -210,20 +210,21 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
 
       <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] lg:hidden">
         {/* On phones the + lives in the menu bar: floating over the page it sat on top of the buttons at the end of each row. */}
-        <div className={`grid px-1 py-2 ${onFocusedFlow ? "grid-cols-5" : "grid-cols-6"}`}>
+        <div className={`grid px-1 py-2 ${onFocusedFlow ? "grid-cols-4" : "grid-cols-5"}`}>
           {mobileBarItems.map((item, index) => {
             const Icon = item.icon;
             return (
               <Fragment key={item.key}>
               {index === 2 && !onFocusedFlow ? (
-                <button aria-label={t("openFastActions")} className="flex items-center justify-center" onClick={() => setFastActionOpen(true)} type="button">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[var(--primary)] text-white shadow-[0_4px_12px_rgba(15,118,110,0.28)]">
+                <button aria-label={t("openFastActions")} className="flex items-start justify-center" onClick={() => setFastActionOpen(true)} type="button">
+                  {/* Centred on the same line as the icons either side of it. */}
+                  <span className="-mt-[3px] flex h-10 w-10 items-center justify-center rounded-full bg-[var(--primary)] text-white shadow-[0_4px_12px_rgba(15,118,110,0.28)]">
                     <Plus size={22} />
                   </span>
                 </button>
               ) : null}
               <Link
-                className={`flex min-w-0 flex-col items-center gap-1 rounded-md px-0.5 py-2 text-[10px] font-semibold ${
+                className={`flex min-w-0 flex-col items-center gap-1 rounded-md px-1 py-2 text-[11px] font-semibold ${
                   isActive(item.href) ? "text-[var(--primary)]" : "text-[var(--sidebar-text)]"
                 }`}
                 href={item.href}
@@ -242,13 +243,18 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
           })}
           <button
             aria-expanded={moreOpen}
-            className={`flex min-w-0 flex-col items-center gap-1 rounded-md px-0.5 py-2 text-[10px] font-semibold ${
+            className={`flex min-w-0 flex-col items-center gap-1 rounded-md px-1 py-2 text-[11px] font-semibold ${
               moreActive || moreOpen ? "text-[var(--primary)]" : "text-[var(--sidebar-text)]"
             }`}
             onClick={() => setMoreOpen(true)}
             type="button"
           >
-            <MoreHorizontal size={16} />
+            <span className="relative">
+              <MoreHorizontal size={18} />
+              {shell.dueTasks > 0 ? (
+                <span className="absolute -right-2.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--primary)] px-1 text-[10px] font-semibold text-white">{shell.dueTasks}</span>
+              ) : null}
+            </span>
             <span className="truncate">{t("more")}</span>
           </button>
         </div>
@@ -278,7 +284,12 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
                     key={item.key}
                     onClick={() => setMoreOpen(false)}
                   >
-                    <Icon size={18} />
+                    <span className="relative">
+                      <Icon size={18} />
+                      {badgeFor(item.key) > 0 ? (
+                        <span className="absolute -right-3 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--primary)] px-1 text-[10px] font-semibold text-white">{badgeFor(item.key)}</span>
+                      ) : null}
+                    </span>
                     <span>{t(item.key)}</span>
                   </Link>
                 );

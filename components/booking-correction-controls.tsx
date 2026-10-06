@@ -528,7 +528,20 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
         <div className="min-w-[60%] flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <p className={`font-mono-data font-semibold ${voided ? "text-[var(--muted)] line-through" : "text-[var(--foreground)]"}`}>{money(payment.amount, payment.currency || "THB")}</p>
-            <SmallBadge tone={badgeTone as any}>{voided ? "voided" : payment.status || "pending"}</SmallBadge>
+            <SmallBadge tone={badgeTone as any}>
+              {(() => {
+                // Say where the payment stands in plain words, not the stored status.
+                if (voided) return "Cancelled";
+                if (status === "paid") return "Paid";
+                if (status === "waived") return "Waived";
+                const due = String(payment.due_date || "").slice(0, 10);
+                const todayHere = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date());
+                if (!due) return "No date";
+                if (due < todayHere) return "Overdue";
+                if (due === todayHere) return "Due today";
+                return "Not due yet";
+              })()}
+            </SmallBadge>
             {isExtension ? <SmallBadge tone="blue">Extension</SmallBadge> : null}
           </div>
           <p className={`text-sm ${voided ? "text-[var(--muted)]" : "text-[var(--muted)]"}`}>{paymentDescription(payment)}</p>

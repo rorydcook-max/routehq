@@ -300,20 +300,24 @@ export default async function Home() {
   const jobsDue = taskList
     .filter((task) => task.kind === "task" && !task.completedAt && !task.coveredBy && !!task.dueDate && task.dueDate <= today)
     .sort((a, b) => Number(b.action === "request") - Number(a.action === "request") || String(a.dueDate).localeCompare(String(b.dueDate)));
-  for (const job of jobsDue.slice(0, 3)) {
+  // Two requests on one booking are answered on the same screen, so they are one row here, not two identical ones.
+  const requestsOn = (rentalId?: string | null) => jobsDue.filter((other) => other.action === "request" && !!rentalId && other.rentalId === rentalId).length;
+  const jobRows = jobsDue.filter((job, index) => !(job.action === "request" && job.rentalId && jobsDue.findIndex((other) => other.action === "request" && other.rentalId === job.rentalId) !== index));
+  for (const job of jobRows.slice(0, 3)) {
     const waiting = job.action === "request";
+    const asks = waiting ? requestsOn(job.rentalId) : 0;
     todayItems.push({
       key: `job-${job.id}`,
       tone: waiting ? "red" : job.dueDate && job.dueDate < today ? "amber" : "neutral",
       icon: <Bell size={17} />,
-      title: waiting ? `${job.customerName || "A customer"} is waiting for your answer` : job.action === "swap_handover" || job.action === "swap_collection" ? job.title.split(" to ")[0].split(" from ")[0] : job.title.split(" - ")[0],
+      title: waiting ? `${job.customerName || "A customer"} is waiting for ${asks > 1 ? `${asks} answers` : "your answer"}` : job.action === "swap_handover" || job.action === "swap_collection" ? job.title.split(" to ")[0].split(" from ")[0] : job.title.split(" - ")[0],
       detail: [job.customerName, job.vehicleLabel].filter(Boolean).join(" · ") || "On To do",
       href: waiting && job.rentalId ? `/bookings/${job.rentalId}#customer-requests` : "/tasks",
       action: waiting ? "Answer" : "Open"
     });
   }
-  if (jobsDue.length > 3) {
-    todayItems.push({ key: "jobs-more", tone: "neutral", icon: <Bell size={17} />, title: `${plural(jobsDue.length - 3, "more job")} on To do`, detail: "Forms, refunds and follow-ups due now", href: "/tasks", action: "Open" });
+  if (jobRows.length > 3) {
+    todayItems.push({ key: "jobs-more", tone: "neutral", icon: <Bell size={17} />, title: `${plural(jobRows.length - 3, "more job")} on To do`, detail: "Forms, refunds and follow-ups due now", href: "/tasks", action: "Open" });
   }
   for (const reminder of reminders) {
     if (reminder.due && reminder.due <= today) {

@@ -1307,7 +1307,7 @@ function ComingUpCard({
                   </div>
                 )}
               </div>
-              {nextPayment ? <Badge tone={paymentStatusTone(nextPaymentStatus)}>{nextPaymentStatus}</Badge> : null}
+              {nextPayment ? <Badge tone={paymentStatusTone(nextPaymentStatus)}>{({ scheduled: "Not due yet", pending: "Waiting to be paid", overdue: "Overdue" } as Record<string, string>)[nextPaymentStatus] || nextPaymentStatus}</Badge> : null}
             </div>
             {nextPayment ? (
               <div className="mt-4">

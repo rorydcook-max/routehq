@@ -1,6 +1,9 @@
+import { onlineSigningGaps } from "@/lib/online-signing-readiness";
 export const onboardingSteps = [
   { step: "business_profile", label: "Business profile complete", href: "/onboarding" },
   { step: "first_vehicle", label: "First vehicle added", href: "/fleet/new" },
+  // Without this the customer is stopped at the last step of their booking link.
+  { step: "signature", label: "Add your signature", href: "/settings/signature" },
   { step: "all_vehicles", label: "All vehicles added", href: "/fleet" },
   { step: "first_customer", label: "First customer added", href: "/customers/new" },
   { step: "first_booking", label: "First booking created", href: "/bookings/new" },
@@ -59,7 +62,7 @@ export async function ensureOnboardingChecklist(supabase: any, organizationId: s
 
 export async function getOnboardingStatus(supabase: any, organizationId: string) {
   const [orgResult, checklistResult, vehicleResult, customerResult, rentalResult, memberResult] = await Promise.all([
-    supabase.from("organizations").select("id, name, settings, onboarding_completed").eq("id", organizationId).is("deleted_at", null).maybeSingle(),
+    supabase.from("organizations").select("*").eq("id", organizationId).is("deleted_at", null).maybeSingle(),
     supabase.from("onboarding_checklist").select("step, completed, completed_at").eq("organization_id", organizationId),
     supabase.from("vehicles").select("id", { count: "exact", head: true }).eq("organization_id", organizationId).is("deleted_at", null),
     supabase.from("customers").select("id", { count: "exact", head: true }).eq("organization_id", organizationId).is("deleted_at", null),
@@ -83,6 +86,7 @@ export async function getOnboardingStatus(supabase: any, organizationId: string)
   const dynamicCompletion: Record<OnboardingStepKey, boolean> = {
     business_profile: Boolean(organization.name && settings.location && settings.fleet_type && settings.fleet_size),
     first_vehicle: vehicleCount >= 1,
+    signature: orgResult.data ? onlineSigningGaps(orgResult.data).length === 0 : false,
     all_vehicles: fleetTargetMet(settings.fleet_size, vehicleCount),
     first_customer: customerCount >= 1,
     first_booking: rentalCount >= 1,

@@ -657,9 +657,11 @@ const copy = {
     remindersBody: "Tax, insurance and services: RouteHQ tells you before they are due.",
     vehicleLater: "Add your vehicles any time from Fleet.",
     lineTitle: "Get alerts on LINE",
-    lineBody: "A morning summary, and an alert when a customer books, pays or is late. Connect LINE from Settings; it takes a minute.",
-    finish: "Open my dashboard",
-    finishLine: "Finish and connect LINE",
+    lineBody: "A morning summary, and an alert when a customer books, pays or is late. Connect LINE any time from Settings.",
+    signatureTitle: "One thing left: your signature",
+    signatureBody: "Customers sign the agreement on their phone, and your signature goes on it too. Add it once, with your finger. It takes a minute.",
+    finishSignature: "Add my signature",
+    finish: "Do it later, open my dashboard",
     finishing: "Finishing…",
     profileFailed: "That did not save. Check your connection and try again.",
     finishFailed: "That did not finish. Check your connection and try again.",
@@ -712,8 +714,10 @@ const copy = {
     vehicleLater: "เพิ่มรถได้ทุกเมื่อจากเมนูรถ",
     lineTitle: "รับการแจ้งเตือนทาง LINE",
     lineBody: "สรุปทุกเช้า และแจ้งเตือนเมื่อลูกค้าจอง จ่ายเงิน หรือคืนรถช้า เชื่อมต่อ LINE ได้ในหน้าตั้งค่า ใช้เวลาประมาณหนึ่งนาที",
-    finish: "เปิดหน้าหลักของฉัน",
-    finishLine: "เสร็จสิ้นและเชื่อมต่อ LINE",
+    signatureTitle: "เหลืออีกอย่างเดียว: ลายเซ็นของคุณ",
+    signatureBody: "ลูกค้าเซ็นสัญญาบนมือถือ และลายเซ็นของคุณก็อยู่ในสัญญาด้วย เพิ่มครั้งเดียวด้วยนิ้ว ใช้เวลาประมาณหนึ่งนาที",
+    finishSignature: "เพิ่มลายเซ็นของฉัน",
+    finish: "ไว้ทำทีหลัง เปิดหน้าหลัก",
     finishing: "กำลังดำเนินการ…",
     profileFailed: "บันทึกไม่สำเร็จ ตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง",
     finishFailed: "ดำเนินการไม่สำเร็จ ตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง",
@@ -1040,17 +1044,22 @@ export function OnboardingWizard({
                 ) : null}
                 {/* LINE is connected properly from Settings. This step used to show a made-up QR code and a button that claimed LINE was connected. */}
                 <div className={tileClass}>
+                  <p className="text-[16px] font-bold text-[var(--foreground)]">{t.signatureTitle}</p>
+                  <p className="font-medium text-[var(--foreground-secondary)]">{t.signatureBody}</p>
+                </div>
+                <div className={tileClass}>
                   <p className="text-[16px] font-bold text-[var(--foreground)]">{t.lineTitle}</p>
                   <p className="font-medium text-[var(--foreground-secondary)]">{t.lineBody}</p>
                 </div>
               </div>
               {error ? <p className="mt-4 rounded-xl bg-[var(--warning-light)] p-3 font-semibold text-[var(--foreground)]">{error}</p> : null}
               <div className="mt-5 grid gap-2">
-                <button className="primary-action pressable w-full" disabled={isPending} onClick={() => complete("/")} type="button">
-                  {isPending ? t.finishing : t.finish}
+                {/* The signature is the one thing still needed before a customer can complete a booking, so it is the main way out of setup. */}
+                <button className="primary-action pressable w-full" disabled={isPending} onClick={() => complete("/settings/signature")} type="button">
+                  {isPending ? t.finishing : t.finishSignature}
                 </button>
-                <button className="secondary-action pressable w-full" disabled={isPending} onClick={() => complete("/settings?tab=notifications")} type="button">
-                  {t.finishLine}
+                <button className="secondary-action pressable w-full" disabled={isPending} onClick={() => complete("/")} type="button">
+                  {t.finish}
                 </button>
               </div>
             </div>

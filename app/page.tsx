@@ -350,6 +350,13 @@ export default async function Home() {
         </div>
       </div>
 
+      {/* A business that has not taken a booking yet needs its next step more than it needs empty numbers. */}
+      {!onboardingStatus.hidden && onboardingStatus.counts.rentals === 0 ? (
+        <div className="mb-4">
+          <OnboardingChecklist completedCount={onboardingStatus.completedCount} items={onboardingStatus.items} organizationId={organization.id} totalCount={onboardingStatus.totalCount} />
+        </div>
+      ) : null}
+
       {/* The two numbers that decide the day, then the money. Nothing below 14px, nothing faded. */}
       <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Link className={`pressable flex flex-col gap-0.5 rounded-[var(--radius)] p-4 text-white ${urgentCount > 0 ? "bg-[var(--danger)]" : "bg-[var(--success)]"}`} href="/tasks">
@@ -497,7 +504,7 @@ export default async function Home() {
 
       <div className="mt-6 space-y-4">
         <PushToggle variant="prompt" />
-        {!onboardingStatus.hidden ? (
+        {!onboardingStatus.hidden && onboardingStatus.counts.rentals > 0 ? (
           <OnboardingChecklist
             completedCount={onboardingStatus.completedCount}
             items={onboardingStatus.items}

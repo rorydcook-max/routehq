@@ -14,7 +14,10 @@ type ChecklistItem = {
   completed: boolean;
 };
 
-/** Slim setup card: progress plus only the steps still to do, each worded as something to do ("Invite a team member"). */
+/**
+ * What a new business still has to do, in the order it matters. The first
+ * step left is the big button; the rest are a short list under it.
+ */
 export function OnboardingChecklist({
   completedCount,
   items,
@@ -31,6 +34,7 @@ export function OnboardingChecklist({
   const allComplete = completedCount === totalCount;
   const progress = totalCount ? Math.round((completedCount / totalCount) * 100) : 0;
   const remaining = items.filter((item) => !item.completed);
+  const label = (item: ChecklistItem) => (t.has(`setup_${item.step}`) ? t(`setup_${item.step}`) : item.label);
 
   useEffect(() => {
     if (!allComplete) return;
@@ -42,42 +46,48 @@ export function OnboardingChecklist({
 
   if (allComplete) {
     return (
-      <section className="flex items-center gap-3 rounded-xl border border-[var(--border)] bg-white p-4 shadow-[var(--shadow-sm)]">
-        <CheckCircle2 className="text-[var(--success)]" size={20} />
-        <p className="text-sm text-[var(--foreground-secondary)]">
-          {t.rich("setupComplete", { b: (chunks) => <span className="font-semibold text-[var(--foreground)]">{chunks}</span> })}
-        </p>
+      <section className="card flex items-center gap-3 p-4">
+        <CheckCircle2 className="shrink-0 text-[var(--success)]" size={22} />
+        <p className="font-medium text-[var(--foreground-secondary)]">{t.rich("setupComplete", { b: (chunks) => <span className="font-bold text-[var(--foreground)]">{chunks}</span> })}</p>
       </section>
     );
   }
 
+  const [next, ...later] = remaining;
+
   return (
-    <section className="rounded-xl border border-[var(--border)] bg-white p-4 shadow-[var(--shadow-sm)]">
-      <div className="flex items-center gap-4">
+    <section className="card p-4">
+      <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <div className="flex items-baseline justify-between gap-3">
-            <h2 className="text-[15px] font-semibold text-[var(--foreground)]">{t("setupTitle")}</h2>
-            <span className="text-[13px] text-[var(--muted)]">{t("setupProgress", { done: completedCount, total: totalCount })}</span>
-          </div>
-          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[var(--panel-secondary)]">
-            <div className="h-full rounded-full bg-[var(--primary)]" style={{ width: `${progress}%` }} />
-          </div>
+          <h2 className="text-[17px] font-bold text-[var(--foreground)]">{t("setupTitle")}</h2>
+          <p className="font-medium text-[var(--foreground-secondary)]">{t("setupProgress", { done: completedCount, total: totalCount })}</p>
         </div>
         <form action={dismissChecklist}>
           <input name="organizationId" type="hidden" value={organizationId} />
-          <button aria-label={t("setupHide")} className="pressable rounded-lg p-1.5 text-[var(--muted)] hover:bg-[var(--panel-tertiary)]" title={t("setupHide")} type="submit">
-            <X size={16} />
+          <button aria-label={t("setupHide")} className="pressable flex h-11 w-11 items-center justify-center rounded-full text-[var(--foreground-secondary)]" title={t("setupHide")} type="submit">
+            <X size={20} />
           </button>
         </form>
       </div>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {remaining.map((item) => (
-          <Link className="pressable inline-flex items-center gap-1.5 rounded-full border border-[var(--border)] bg-[var(--panel-secondary)] px-3 py-1.5 text-[13px] font-semibold text-[var(--foreground-secondary)] hover:border-[var(--primary)] hover:text-[var(--primary)]" href={item.href as Route} key={item.step}>
-            {t.has(`setup_${item.step}`) ? t(`setup_${item.step}`) : item.label}
-            <ChevronRight size={14} />
-          </Link>
-        ))}
+      <div className="mt-2 h-2 overflow-hidden rounded-full bg-[var(--panel-secondary)]">
+        <div className="h-full rounded-full bg-[var(--primary)]" style={{ width: `${Math.max(progress, 4)}%` }} />
       </div>
+      {next ? (
+        <Link className="primary-action pressable mt-3 w-full" href={next.href as Route}>
+          {label(next)}
+          <ChevronRight size={18} />
+        </Link>
+      ) : null}
+      {later.length ? (
+        <div className="mt-2 space-y-1">
+          {later.map((item) => (
+            <Link className="pressable flex min-h-11 items-center justify-between gap-3 rounded-xl px-1 font-semibold text-[var(--foreground)]" href={item.href as Route} key={item.step}>
+              {label(item)}
+              <ChevronRight className="shrink-0 text-[var(--primary)]" size={18} />
+            </Link>
+          ))}
+        </div>
+      ) : null}
     </section>
   );
 }

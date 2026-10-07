@@ -549,6 +549,10 @@ export async function updateOwnerSignature(formData: FormData) {
     detail: removeSignature ? "Authorised signature removed." : replacingSignature ? "Authorised business signature replaced." : "Authorised signature settings updated."
   });
 
+  revalidatePath("/");
+  revalidatePath("/bookings/new");
+  revalidatePath("/settings/signature");
+
   if (replacingSignature) {
     await recordActivityEvent(supabase, {
       organization_id: organizationId,

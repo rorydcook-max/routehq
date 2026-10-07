@@ -1,3 +1,4 @@
+import { BUSINESS_TIME_ZONE } from "@/lib/business-time";
 import { Camera, FileVideo, Fuel, Gauge, PenLine, ShieldAlert } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { useTranslations } from "next-intl";
@@ -13,7 +14,8 @@ function formatDate(value: string | null | undefined, locale: string, notSet: st
   }
   return new Intl.DateTimeFormat(intlLocale(locale), {
     dateStyle: "medium",
-    timeStyle: "short"
+    timeStyle: "short",
+    timeZone: BUSINESS_TIME_ZONE
   }).format(new Date(value));
 }
 

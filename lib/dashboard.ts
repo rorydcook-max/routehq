@@ -5,7 +5,7 @@ import type { Customer, Reminder, Rental, TimelineEvent, Transaction, Vehicle, V
 import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getDefaultOrganization } from "@/lib/organization";
-import { businessToday } from "@/lib/business-time";
+import { businessToday, toWallTime } from "@/lib/business-time";
 import { QUIET_ACTIVITY_EVENT_FILTER } from "@/lib/activity-noise";
 
 type DashboardMetrics = ReturnType<typeof calculateDashboardMetrics> & {
@@ -321,7 +321,7 @@ function mapTimelineEvent(row: any, vehicleById: Map<string, Vehicle>): Timeline
     id: row.id,
     vehicle: vehicleById.get(row.entity_id)?.plate || row.entity_type,
     title: row.title,
-    date: row.occurred_at?.slice(0, 10) || row.created_at?.slice(0, 10) || "",
+    date: toWallTime(row.occurred_at || row.created_at).slice(0, 10),
     detail: row.detail || ""
   };
 }

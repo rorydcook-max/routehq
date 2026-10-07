@@ -1,5 +1,6 @@
 "use client";
 
+import { toWallTime } from "@/lib/business-time";
 import { useRef, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { updateVehicleNotes } from "@/app/actions/vehicles";
@@ -38,7 +39,7 @@ export function VehicleNotesForm({
       <input name="organizationId" type="hidden" value={organizationId} />
       <textarea className="min-h-32 w-full" defaultValue={notes} name="notes" placeholder={say("n_placeholder")} />
       <p className="font-medium text-[var(--foreground-secondary)]">
-        {isPending ? say("saving") : updatedAt ? say("n_edited", { date: longDate(String(updatedAt).slice(0, 10), locale) }) : say("n_auto")}
+        {isPending ? say("saving") : updatedAt ? say("n_edited", { date: longDate(toWallTime(updatedAt).slice(0, 10), locale) }) : say("n_auto")}
       </p>
     </form>
   );

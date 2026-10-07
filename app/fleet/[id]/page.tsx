@@ -22,7 +22,8 @@ import { TASK_TYPE_OPTIONS } from "@/lib/tasks";
 import { isRevenueTransaction } from "@/lib/transaction-options";
 import { getVehicleDetail, type VehicleDetail } from "@/lib/vehicle-detail";
 import { isQuietActivityEvent } from "@/lib/activity-noise";
-import { businessToday, businessNow } from "@/lib/business-time";
+import { activityTitle, visibleActivity } from "@/lib/activity-display";
+import { businessToday, businessNow, toWallTime } from "@/lib/business-time";
 import { longDate } from "@/lib/i18n/dates";
 
 // The wording for this page is in locales/<language>/common.json under "vehiclePage".
@@ -49,7 +50,7 @@ function percent(value: unknown) {
 }
 
 function formatDate(value: string | null | undefined, tx: Vx) {
-  return value ? longDate(String(value).slice(0, 10), tx.locale) : tx.say("notSet");
+  return value ? longDate(toWallTime(value).slice(0, 10), tx.locale) : tx.say("notSet");
 }
 
 /** Whole days from today (Thailand) to a date; negative when it has passed. */
@@ -420,9 +421,12 @@ function TimelineSection({ detail }: { detail: VehicleDetail }) {
   const reminderEvents = detail.reminders.map((reminder) => ({ id: `reminder-${reminder.id}`, title: reminder.title, detail: reminder.type, date: reminder.due_date, kind: "reminder" as const }));
   // Bookkeeping steps behind a signed document ("document created", "version
   // created") are noise on a vehicle's history; the signing itself stays.
-  const activityEvents = detail.activityEvents
+  // The same rule as a booking's history: the app's own record-keeping is left out, and what is left is named
+  // in the reader's language (the stored titles and details are English sentences).
+  const histNames = useTranslations("booking");
+  const activityEvents = visibleActivity(detail.activityEvents as any[])
     .filter((event: any) => !isQuietActivityEvent(event.event_type))
-    .map((event) => ({ id: event.id, title: event.title, detail: event.detail, date: event.occurred_at || event.created_at, kind: "activity" as const }));
+    .map((event) => ({ id: event.id, title: activityTitle(event, histNames as any), detail: tx.locale === "en" ? event.detail : null, date: event.occurred_at || event.created_at, kind: "activity" as const }));
   const rentalReturns = detail.rentals
     .filter((rental) => rental.end_date)
     .map((rental) => ({ id: `return-${rental.id}`, title: tx.say("tl_return", { name: rental.customers?.full_name || tx.say("customer") }), detail: null, date: rental.end_date!, kind: "rental" as const }));

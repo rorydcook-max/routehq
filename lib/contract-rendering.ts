@@ -1,3 +1,4 @@
+import { toWallTime } from "@/lib/business-time";
 import { getTravelPolicySettings, type IslandTravelPolicy } from "@/lib/travel-policy";
 
 function escapeHtml(value: unknown) {
@@ -49,23 +50,26 @@ export function formatContractDate(value: string | null | undefined, locale = "e
     return "Open ended";
   }
 
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
+  // Read on the business's clock, whatever clock the server keeps: a contract made at 1am in Thailand
+  // is dated that day, not the day before.
+  const match = toWallTime(value).match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!match) {
     return String(value);
   }
 
   return new Intl.DateTimeFormat(locale === "th" ? "th-TH-u-ca-buddhist" : "en-GB", {
     day: "2-digit",
     month: "2-digit",
-    year: "numeric"
-  }).format(date);
+    year: "numeric",
+    timeZone: "UTC"
+  }).format(new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]))));
 }
 
 function formatContractTime(value: string | null | undefined) {
   if (!value) return "";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  return new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false }).format(date);
+  // A date with no time has no time to print: it used to come out as "07:00" (or "00:00"), a time nobody agreed.
+  const match = toWallTime(value).match(/T(\d{2}):(\d{2})/);
+  return match ? `${match[1]}:${match[2]}` : "";
 }
 
 function splitName(fullName: string) {

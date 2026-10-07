@@ -1,3 +1,4 @@
+import { toWallTime } from "@/lib/business-time";
 import { useLocale, useTranslations } from "next-intl";
 import { updateContractBrandingSettings } from "@/app/actions/settings";
 import { longDate } from "@/lib/i18n/dates";
@@ -144,7 +145,7 @@ export function ContractsBrandingSection({
           signatureUrl={signatureDisplayUrl}
         />
         {organization.signature_authorised_at ? (
-          <p className="font-medium text-[var(--muted)]">{say("b_sigRecorded", { date: longDate(String(organization.signature_authorised_at).slice(0, 10), locale) })}</p>
+          <p className="font-medium text-[var(--muted)]">{say("b_sigRecorded", { date: longDate(toWallTime(organization.signature_authorised_at).slice(0, 10), locale) })}</p>
         ) : null}
       </div>
 

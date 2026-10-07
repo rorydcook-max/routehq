@@ -1,3 +1,4 @@
+import { toWallTime, businessToday } from "@/lib/business-time";
 export type UpcomingPayment = {
   id: string;
   amount: number;
@@ -21,12 +22,12 @@ export type VehicleEvent = {
 
 export function daysUntilDate(value: string | null | undefined) {
   if (!value) return null;
-  const today = new Date();
-  const target = new Date(value);
-  if (Number.isNaN(target.getTime())) return null;
-  today.setHours(0, 0, 0, 0);
-  target.setHours(0, 0, 0, 0);
-  return Math.ceil((target.getTime() - today.getTime()) / 86_400_000);
+  // Whole days between two calendar days, counted from the business's today (the server's own
+  // day is still yesterday for the first seven hours of a Thai morning).
+  const day = toWallTime(value).slice(0, 10);
+  const target = Date.parse(`${day}T00:00:00Z`);
+  if (Number.isNaN(target)) return null;
+  return Math.round((target - Date.parse(`${businessToday()}T00:00:00Z`)) / 86_400_000);
 }
 
 function eventSeverity(daysUntil: number): VehicleEvent["severity"] {

@@ -1,3 +1,5 @@
+import { toWallTime } from "@/lib/business-time";
+
 /**
  * Dates on customer pages, written the same way on the server and in the browser.
  *
@@ -17,7 +19,9 @@ const OWN_MONTHS: Record<string, { months: string[]; yearFirst: boolean }> = {
 
 /** "2026-10-06" -> "6 Oct 2026" (or "6 Oct" without the year), in the reader's language. */
 export function customerDate(iso: string, locale: string, withYear = true): string {
-  const match = String(iso || "").match(/^(\d{4})-(\d{2})-(\d{2})/);
+  // A stored moment ("2026-10-07T17:35:00Z") is read on the business's clock: that one is 8 Oct in Thailand, not 7 Oct.
+  const text = /^\d{4}-\d{2}-\d{2}[T ]\d{2}:/.test(String(iso || "")) ? toWallTime(iso) || String(iso) : String(iso || "");
+  const match = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if (!match) return iso;
   const year = Number(match[1]);
   const month = Number(match[2]);

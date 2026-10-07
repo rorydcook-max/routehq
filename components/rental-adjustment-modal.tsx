@@ -112,10 +112,17 @@ function money(value: unknown) {
   return new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB", maximumFractionDigits: 0 }).format(Number(value || 0));
 }
 
+// Dates here are calendar days held at midnight UTC, so adding days and writing them out never slips a day.
 function addDays(value: Date, days: number) {
   const next = new Date(value);
-  next.setDate(next.getDate() + days);
+  next.setUTCDate(next.getUTCDate() + days);
   return next;
+}
+
+/** Today (or a day near it) on this device's calendar. In Thailand "now" in UTC is still yesterday until 7am. */
+function localDay(offsetDays = 0) {
+  const now = new Date();
+  return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate() + offsetDays));
 }
 
 function isoDate(value: Date) {
@@ -129,7 +136,7 @@ function startOfDay(value: Date) {
 }
 
 function tomorrowDate() {
-  return startOfDay(addDays(new Date(), 1));
+  return localDay(1);
 }
 
 function daysBetween(from: string | null | undefined, to: string | null | undefined) {
@@ -141,8 +148,8 @@ function daysBetween(from: string | null | undefined, to: string | null | undefi
 }
 
 function defaultExtensionEndDate(currentEndDate?: string | null, days = 30) {
-  const current = currentEndDate ? new Date(currentEndDate) : new Date();
-  const base = Number.isNaN(current.getTime()) ? new Date() : current;
+  const current = currentEndDate ? new Date(currentEndDate) : localDay();
+  const base = Number.isNaN(current.getTime()) ? localDay() : current;
   const next = addDays(base, days);
   return isoDate(next < tomorrowDate() ? tomorrowDate() : next);
 }
@@ -252,7 +259,7 @@ export function RentalAdjustmentModal({
   // Until the operator changes them, the date follows the pricing period and the price follows the rates.
   const dateChosenByHand = useRef(false);
   const amountTypedByHand = useRef(false);
-  const [extensionDueDate, setExtensionDueDate] = useState(() => dateInputValue(currentEndDate) || isoDate(new Date()));
+  const [extensionDueDate, setExtensionDueDate] = useState(() => dateInputValue(currentEndDate) || isoDate(localDay()));
   const [advancePaid, setAdvancePaid] = useState(false);
   const [advancePaidAmount, setAdvancePaidAmount] = useState("");
   const [refundAmount, setRefundAmount] = useState("");
@@ -265,9 +272,9 @@ export function RentalAdjustmentModal({
   const [pendingToken, setPendingToken] = useState<string | null>(null);
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [newRate, setNewRate] = useState("");
-  const [rateFrom, setRateFrom] = useState(() => isoDate(new Date()));
+  const [rateFrom, setRateFrom] = useState(() => isoDate(localDay()));
   const [newDeposit, setNewDeposit] = useState("");
-  const [depositDueDate, setDepositDueDate] = useState(() => isoDate(new Date()));
+  const [depositDueDate, setDepositDueDate] = useState(() => isoDate(localDay()));
   const [additionalTerms, setAdditionalTerms] = useState("");
   const [cancelling, startCancel] = useTransition();
 

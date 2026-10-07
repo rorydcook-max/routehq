@@ -301,8 +301,7 @@ function buildMonthlyData(transactions: any[], from: string, to: string): Monthl
 
   for (const tx of transactions) {
     if (!tx.transaction_date) continue;
-    const date = new Date(tx.transaction_date);
-    const key = `${date.getFullYear()}-${pad(date.getMonth() + 1)}`;
+    const key = String(tx.transaction_date).slice(0, 7);
     const entry = byMonth.get(key);
     if (!entry) continue;
     const amount = Math.abs(Number(tx.amount || 0));

@@ -95,7 +95,8 @@
     "messagesToSendDetail": "Written for you, ready to send",
     "backSameDay": "back from {who} the same day",
     "holdEnding": "Hold on the {vehicle} ends at {time}",
-    "holdEndingDetail": "{who} has not signed yet"
+    "holdEndingDetail": "{who} has not signed yet",
+    "reportsProblem": "{who} has a problem with the vehicle"
   },
   "nav": {
     "main": "Main",
@@ -1938,7 +1939,32 @@
     "ref_cash": "Cash",
     "ref_bank": "Bank transfer",
     "ref_promptpay": "PromptPay",
-    "dep_noneSet": "none"
+    "dep_noneSet": "none",
+    "hist_customer_assigned": "Customer added to the booking",
+    "hist_payment_schedule_matched": "Payments matched to the schedule",
+    "hist_payment_refunded": "Payment refunded",
+    "hist_booking_restored": "Booking restored",
+    "hist_customer_created": "Customer added",
+    "hist_customer_document_uploaded": "Customer document added",
+    "hist_payment_confirmed": "Payment confirmed",
+    "hist_onboarding_business_profile_completed": "Business details completed",
+    "hist_payment_reported_by_customer": "Customer says they have paid",
+    "hist_payment_schedule_generation_failed": "Payment dates could not be set up",
+    "hist_business_identity_updated": "Business details changed",
+    "hist_authorised_signature_updated": "Business signature changed",
+    "hist_task_created": "Job added",
+    "hist_vehicle_created": "Vehicle added",
+    "hist_vehicle_updated": "Vehicle details changed",
+    "hist_vehicle_photos_updated": "Vehicle photos added",
+    "hist_compliance_renewed": "Tax, insurance or Por Ror Bor renewed",
+    "hist_maintenance_completed": "Service or repair done",
+    "hist_vehicle_archived": "Vehicle archived",
+    "hist_vehicle_deleted": "Vehicle removed",
+    "hist_vehicles_archived": "Vehicles archived",
+    "hist_vehicles_deleted": "Vehicles removed",
+    "hist_smart_import_completed": "Records imported",
+    "hist_rental_document_signed": "Document signed",
+    "hist_rental_document_legacy_contract_linked": "Earlier agreement attached"
   },
   "newBooking": {
     "pageBack": "Back to bookings",

@@ -132,7 +132,7 @@ export function ActiveRentalPortal({
                   {answer.declined ? `${t("answerDeclined")} ` : ""}
                   <bdi>{answer.reply}</bdi>
                 </p>
-                {answer.at ? <p className="mt-1 text-xs text-[var(--muted)]">{niceDate(answer.at.slice(0, 10), locale)}</p> : null}
+                {answer.at ? <p className="mt-1 text-xs text-[var(--muted)]">{customerDate(answer.at, locale)}</p> : null}
               </li>
             ))}
           </ul>
@@ -413,7 +413,9 @@ function addDaysLocal(iso: string, days: number) {
 }
 
 function nextDate(value: string | null | undefined) {
-  const date = value ? new Date(value) : new Date();
+  if (value && /^\d{4}-\d{2}-\d{2}/.test(value)) return addDaysLocal(value.slice(0, 10), 1);
+  // Tomorrow on the customer's own clock. toISOString() would give the UTC date, which in Thailand is a day behind until 7am.
+  const date = new Date();
   date.setDate(date.getDate() + 1);
-  return date.toISOString().slice(0, 10);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }

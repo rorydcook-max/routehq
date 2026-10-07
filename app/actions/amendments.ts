@@ -9,7 +9,7 @@ import { randomUUID } from "node:crypto";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { buildBusinessDocumentSnapshot } from "@/lib/business-document-snapshot";
-import { businessToday } from "@/lib/business-time";
+import { businessToday, toWallTime } from "@/lib/business-time";
 import { htmlToPdf } from "@/lib/html-to-pdf";
 import { onlineSigningGaps } from "@/lib/online-signing-readiness";
 import { loadBusyPeriods, vehicleConflictMessage } from "@/lib/rental-conflicts";
@@ -117,7 +117,7 @@ async function loadRental(admin: any, organizationId: string, rentalId: string) 
     if (version && renterSignature) {
       signedAgreement = {
         versionNumber: Number(version.version_number || 1),
-        signedOn: String(renterSignature.signed_at || "").slice(0, 10) || null,
+        signedOn: toWallTime(renterSignature.signed_at).slice(0, 10) || null,
         hashFragment: hashFragment(version.content_hash)
       };
     }

@@ -341,12 +341,14 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   for (const job of jobRows.slice(0, 3)) {
     const waiting = job.action === "request";
     const asks = waiting ? requestsOn(job.rentalId) : 0;
+    // A breakdown or damage report is not "a question": it says what it is, and it goes to the very top.
+    const problem = waiting && jobsDue.some((other) => other.action === "request" && other.taskType === "maintenance" && (other.id === job.id || (!!job.rentalId && other.rentalId === job.rentalId)));
     todayItems.push({
       key: `job-${job.id}`,
-      rank: waiting ? 2 : 4,
+      rank: problem ? 0 : waiting ? 2 : 4,
       tone: waiting ? "red" : job.dueDate && job.dueDate < today ? "amber" : "neutral",
       icon: <Bell size={17} />,
-      title: waiting ? (asks > 1 ? t("waitingForAnswers", { who: job.customerName || t("aCustomer"), count: asks }) : t("waitingForAnswer", { who: job.customerName || t("aCustomer") })) : jobName(job.action) || noPlate(job.action === "swap_handover" || job.action === "swap_collection" ? job.title.split(" to ")[0].split(" from ")[0] : job.title.split(" - ")[0]),
+      title: problem ? t("reportsProblem", { who: job.customerName || t("aCustomer") }) : waiting ? (asks > 1 ? t("waitingForAnswers", { who: job.customerName || t("aCustomer"), count: asks }) : t("waitingForAnswer", { who: job.customerName || t("aCustomer") })) : jobName(job.action) || noPlate(job.action === "swap_handover" || job.action === "swap_collection" ? job.title.split(" to ")[0].split(" from ")[0] : job.title.split(" - ")[0]),
       detail: [waiting ? null : job.customerName, noPlate(job.vehicleLabel)].filter(Boolean).join(" · ") || t("onToDo"),
       href: waiting && job.rentalId ? `/bookings/${job.rentalId}#customer-requests` : "/tasks",
       action: waiting ? t("answer") : t("open")

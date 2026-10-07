@@ -33,7 +33,7 @@ import { flagForNationality } from "@/lib/customer-options";
 import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { formatDeliveryLocation } from "@/lib/delivery-location";
-import { toWallTime, businessToday } from "@/lib/business-time";
+import { toWallTime, businessToday, BUSINESS_TIME_ZONE } from "@/lib/business-time";
 import { signedReceiptUrls } from "@/lib/payment-receipts";
 import { GeneratePaymentScheduleButton } from "@/app/bookings/[id]/generate-payment-schedule-button";
 import { RentalDocumentsCard } from "@/app/bookings/[id]/rental-documents-card";
@@ -56,15 +56,15 @@ function useTx(): Tx {
 
 function formatDate(value: string | null | undefined, tx: Tx) {
   if (!value) return tx.say("open");
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return String(value);
-  const iso = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  // The day on the business's clock, whatever clock the server keeps.
+  const iso = toWallTime(value).slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return String(value);
   return longDate(iso, tx.locale);
 }
 
 function formatDateTime(value: string | null | undefined, tx: Tx) {
   if (!value) return tx.say("notYet");
-  return new Intl.DateTimeFormat(intlLocale(tx.locale), { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(value));
+  return new Intl.DateTimeFormat(intlLocale(tx.locale), { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: BUSINESS_TIME_ZONE }).format(new Date(value));
 }
 
 function formatPaymentMethod(value: string | null | undefined, tx: Tx) {
@@ -706,6 +706,12 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             <p className="text-sm font-semibold text-[var(--warning)]">
               {tx.say("waitingAnswer", { name: customer?.full_name || tx.say("theCustomerCap") })}
             </p>
+            {/* Someone stuck at the roadside wants a phone call, not a typed reply. */}
+            {customer?.phone && pendingPortalActions.some((action: any) => action.action_type === "problem_report") ? (
+              <a className="pressable mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white" href={`tel:${String(customer.phone).replace(/\s+/g, "")}`}>
+                {tx.say("cp_call", { number: String(customer.phone) })}
+              </a>
+            ) : null}
             <div className="mt-3 space-y-3">
               {pendingPortalActions.map((action: any) => (
                 <CustomerPortalActionCard action={action} customerId={customer?.id || null} key={action.id} organizationId={organization.id} rentalId={rental.id} />

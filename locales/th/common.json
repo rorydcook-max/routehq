@@ -95,7 +95,8 @@
     "messagesToSendDetail": "เขียนไว้ให้แล้ว พร้อมส่ง",
     "backSameDay": "รับคืนจาก {who} วันเดียวกัน",
     "holdEnding": "การกัน {vehicle} จะหมดเวลา {time} น.",
-    "holdEndingDetail": "{who} ยังไม่ได้เซ็น"
+    "holdEndingDetail": "{who} ยังไม่ได้เซ็น",
+    "reportsProblem": "{who} แจ้งปัญหาเรื่องรถ"
   },
   "vehicles": {
     "addVehicle": "เพิ่มยานพาหนะใหม่",
@@ -1947,7 +1948,32 @@
     "ref_cash": "เงินสด",
     "ref_bank": "โอนเข้าบัญชี",
     "ref_promptpay": "พร้อมเพย์",
-    "dep_noneSet": "ไม่มี"
+    "dep_noneSet": "ไม่มี",
+    "hist_customer_assigned": "เพิ่มลูกค้าในการจอง",
+    "hist_payment_schedule_matched": "จับคู่การชำระเงินกับกำหนดจ่ายแล้ว",
+    "hist_payment_refunded": "คืนเงินแล้ว",
+    "hist_booking_restored": "กู้คืนการจองแล้ว",
+    "hist_customer_created": "เพิ่มลูกค้าแล้ว",
+    "hist_customer_document_uploaded": "เพิ่มเอกสารลูกค้าแล้ว",
+    "hist_payment_confirmed": "ยืนยันการชำระเงินแล้ว",
+    "hist_onboarding_business_profile_completed": "กรอกข้อมูลร้านครบแล้ว",
+    "hist_payment_reported_by_customer": "ลูกค้าแจ้งว่าจ่ายแล้ว",
+    "hist_payment_schedule_generation_failed": "ตั้งกำหนดจ่ายไม่สำเร็จ",
+    "hist_business_identity_updated": "แก้ไขข้อมูลร้านแล้ว",
+    "hist_authorised_signature_updated": "เปลี่ยนลายเซ็นของร้านแล้ว",
+    "hist_task_created": "เพิ่มงานแล้ว",
+    "hist_vehicle_created": "เพิ่มรถแล้ว",
+    "hist_vehicle_updated": "แก้ไขข้อมูลรถแล้ว",
+    "hist_vehicle_photos_updated": "เพิ่มรูปรถแล้ว",
+    "hist_compliance_renewed": "ต่อภาษี ประกัน หรือ พ.ร.บ. แล้ว",
+    "hist_maintenance_completed": "เช็กระยะหรือซ่อมเสร็จแล้ว",
+    "hist_vehicle_archived": "เก็บรถเข้าคลังแล้ว",
+    "hist_vehicle_deleted": "ลบรถแล้ว",
+    "hist_vehicles_archived": "เก็บรถเข้าคลังแล้ว",
+    "hist_vehicles_deleted": "ลบรถแล้ว",
+    "hist_smart_import_completed": "นำเข้าข้อมูลแล้ว",
+    "hist_rental_document_signed": "เซ็นเอกสารแล้ว",
+    "hist_rental_document_legacy_contract_linked": "แนบสัญญาฉบับเดิมแล้ว"
   },
   "newBooking": {
     "pageBack": "กลับไปที่การจอง",

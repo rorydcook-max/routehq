@@ -1,3 +1,4 @@
+import { toWallTime, businessToday } from "@/lib/business-time";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isRevenueTransaction } from "@/lib/transaction-options";
 
@@ -61,11 +62,10 @@ function daysBetween(start: string | null | undefined, end: string | null | unde
   if (!start) {
     return 0;
   }
-  const startDate = new Date(start);
-  const endDate = end ? new Date(end) : new Date();
-  startDate.setHours(0, 0, 0, 0);
-  endDate.setHours(0, 0, 0, 0);
-  return Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / 86_400_000) + 1);
+  const startDay = Date.parse(`${toWallTime(start).slice(0, 10)}T00:00:00Z`);
+  const endDay = Date.parse(`${end ? toWallTime(end).slice(0, 10) : businessToday()}T00:00:00Z`);
+  if (Number.isNaN(startDay) || Number.isNaN(endDay)) return 0;
+  return Math.max(1, Math.round((endDay - startDay) / 86_400_000) + 1);
 }
 
 function summarizeCustomer(customer: any, documents: any[], rentals: any[], transactions: any[]): CustomerListItem {

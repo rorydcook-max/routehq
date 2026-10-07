@@ -1,5 +1,6 @@
 "use client";
 
+import { toWallTime } from "@/lib/business-time";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
@@ -141,7 +142,7 @@ function ConnectedChannel({ channel }: { channel: Channel }) {
       {channel.send_error ? (
         <div className="mt-3 rounded-xl bg-[var(--danger-light)] px-4 py-3 font-medium text-[var(--foreground)]">
           <p>
-            {channel.send_failed_at ? say("mp_lastFailedOn", { date: shortDate(String(channel.send_failed_at).slice(0, 10), locale) }) : say("mp_lastFailed")} {tokenRejected ? say("mp_tokenRejected") : ""}
+            {channel.send_failed_at ? say("mp_lastFailedOn", { date: shortDate(toWallTime(channel.send_failed_at).slice(0, 10), locale) }) : say("mp_lastFailed")} {tokenRejected ? say("mp_tokenRejected") : ""}
           </p>
           <p className="mt-1">{say("mp_fix")}</p>
         </div>

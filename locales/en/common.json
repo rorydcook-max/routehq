@@ -727,7 +727,8 @@
     "collectWhen": "When would you like to collect it?",
     "collectWhenIntro": "Optional. Tell us a time that suits you, if it is not agreed yet.",
     "collectChange": "Need a different time?",
-    "receiptNumbered": "Receipt {number}"
+    "receiptNumbered": "Receipt {number}",
+    "keepItLongerDateOnly": "Choose a new return date."
   },
   "customerMessages": {
     "hi": "Hi {name},",

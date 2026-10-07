@@ -137,7 +137,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       .gte("created_at", new Date(Date.now() - 3 * 86_400_000).toISOString())
       .order("created_at", { ascending: false })
       .limit(50)
-      .then((result: any) => result, () => ({ data: [] }))
+      .then((result: any) => ({ ...result, data: (result?.data || []).filter((row: any) => !row.metadata?.superseded) }), () => ({ data: [] }))
   ]);
   const unsentByRental = new Map<string, { count: number; who: string }>();
   for (const row of ((unsentResult?.data || []) as any[]).filter((entry) => entry.metadata?.handoff_label)) {

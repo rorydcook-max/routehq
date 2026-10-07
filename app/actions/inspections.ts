@@ -697,7 +697,9 @@ export async function submitInspection(formData: FormData) {
           if (owed > 0) lines.push(t("stillToPay", { amount: money(owed) }));
           return lines.join(" ");
         },
-        { sentBy: user.id, withLink: owed > 0 }
+        // With no deposit to account for and nothing owed, this is only a thank-you to someone who has just handed
+        // the keys over in person: sent if it can go by itself, never left as a job for the owner.
+        { sentBy: user.id, withLink: owed > 0, replacesEarlier: true, seenAlready: owed <= 0 && !(settlement && settlement.available > 0) }
       );
 
       // Back before the time already paid for ran out: a job for the owner with the pro-rata figure.

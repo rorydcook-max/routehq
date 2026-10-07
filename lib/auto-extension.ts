@@ -191,7 +191,9 @@ export async function tryAutoExtend(admin: any, rentalId: string, newEndDateRaw:
       ? say("nowMonthly", { vehicle, amount: money(outcome.amount), date: date(outcome.dueDate) })
       : outcome.applied
         ? `${say("extended", { vehicle, date: date(outcome.newEndDate) })}${outcome.amount > 0 ? ` ${t("extraDaysDue", { amount: money(outcome.amount), date: date(outcome.dueDate) })}` : ""}`
-        : ""
+        : "",
+    // A customer who extended from their own page has the confirmation in front of them.
+    { seenAlready: !options.byStaff }
   );
 
   return outcome;

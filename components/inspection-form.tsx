@@ -407,11 +407,9 @@ export function InspectionForm({ context, unsigned = false }: { context: Inspect
   const isSwap = Boolean(context.swap);
   // A vehicle collected in a swap doesn't settle the deposit: the rental carries on.
   const depositAlreadyReturned = mode === "return" && !isSwap && context.rental?.deposit_status === "fully_returned";
-  const skipDepositStep = depositAlreadyReturned || (mode === "return" && isSwap);
   // No tracker fitted: skip the GPS step rather than show an empty screen.
   const hasGps = Boolean(context.gpsDevice);
   const withoutGps = (list: string[]) => (hasGps ? list : list.filter((item) => item !== "GPS"));
-  const steps = mode === "return" ? (skipDepositStep ? returnSteps.filter((item) => item !== "Deposit") : returnSteps) : withoutGps(mode === "condition_report" ? conditionSteps : deliverySteps);
   // Bikes have a left and right side, and no cabin or boot to photograph.
   const isBike = isTwoWheeler(kindFromCategory(context.vehicle.vehicle_categories));
   const [step, setStep] = useState(0);
@@ -480,6 +478,10 @@ export function InspectionForm({ context, unsigned = false }: { context: Inspect
   const appliedDeductions = Math.min(availableToReconcile, requestedDeductions);
   const calculatedRefund = Math.max(0, availableToReconcile - appliedDeductions);
   const depositRefundAmount = Math.min(availableToReconcile, Math.max(0, refundOverride ? Number(refundOverride) : calculatedRefund));
+  // No deposit held and nothing to take from one: a screen of "0 held, 0 returned" is not a step.
+  const nothingToSettle = mode === "return" && !isSwap && availableToReconcile <= 0 && requestedDeductions <= 0;
+  const skipDepositStep = depositAlreadyReturned || (mode === "return" && isSwap) || nothingToSettle;
+  const steps = mode === "return" ? (skipDepositStep ? returnSteps.filter((item) => item !== "Deposit") : returnSteps) : withoutGps(mode === "condition_report" ? conditionSteps : deliverySteps);
   const preExistingDamage = useMemo(() => {
     const items = Array.isArray(context.deliveryInspection?.damage_items) ? context.deliveryInspection.damage_items : [];
     return items.filter((item: any) => item?.is_pre_existing);
@@ -1110,7 +1112,7 @@ export function InspectionForm({ context, unsigned = false }: { context: Inspect
                 <Row label={t("depositDeductions")} value={`-${money(fuelDeficitCharge + damageCharge)}`} danger />
               </div>
             ) : null
-          ) : mode === "return" ? (
+          ) : mode === "return" && (depositAlreadyReturned || !nothingToSettle) ? (
             <div className="mt-4 rounded-lg border border-[var(--border)] bg-white p-3">
               {depositAlreadyReturned ? (
                 <div className="rounded-lg bg-[var(--success-light)] p-3">

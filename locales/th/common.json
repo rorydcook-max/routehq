@@ -736,7 +736,8 @@
     "collectWhen": "สะดวกมารับรถเมื่อไร",
     "collectWhenIntro": "ไม่ระบุก็ได้ บอกเวลาที่สะดวกมารับรถ หากยังไม่ได้ตกลงกัน",
     "collectChange": "ต้องการเปลี่ยนเวลา?",
-    "receiptNumbered": "ใบเสร็จ {number}"
+    "receiptNumbered": "ใบเสร็จ {number}",
+    "keepItLongerDateOnly": "เลือกวันคืนรถใหม่"
   },
   "customerMessages": {
     "hi": "สวัสดีคุณ {name}",

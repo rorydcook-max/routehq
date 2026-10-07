@@ -108,7 +108,8 @@ export async function cancelBookingByCustomer(formData: FormData): Promise<Resul
 
   await tellRentalCustomer(admin, rental.id, ({ say, t, date }) =>
     `${say("cancelledAsAsked", { vehicle, when: rental.end_date ? t("whenRange", { start: date(rental.start_date), end: date(rental.end_date) }) : t("whenMonthly", { start: date(rental.start_date) }) })}${paid > 0 ? ` ${t("aboutWhatYouPaid", { amount: money })}` : ""}`,
-    { withLink: false }
+    // They cancelled on their own page and have the confirmation in front of them.
+    { withLink: false, replacesEarlier: true, seenAlready: true }
   );
 
   revalidatePath("/");

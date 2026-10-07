@@ -75,7 +75,7 @@ export function ActiveRentalPortal({
   const actionCards = useMemo(
     () => [
       // A rental with no end date has nothing to extend.
-      ...(endDate ? [{ type: "extension_request" as const, title: t("keepItLonger"), icon: CalendarPlus, description: t("keepItLongerHint") }] : []),
+      ...(endDate ? [{ type: "extension_request" as const, title: t("keepItLonger"), icon: CalendarPlus, description: t(openEndedOffer ? "keepItLongerHint" : "keepItLongerDateOnly") }] : []),
       { type: "return_confirmation" as const, title: t("confirmReturn"), icon: CalendarCheck, description: t("confirmReturnHint") },
       { type: "problem_report" as const, title: t("reportProblem"), icon: AlertTriangle, description: t("reportProblemHint") },
       { type: "question" as const, title: t("askQuestion"), icon: MessageCircle, description: t("askQuestionHint") }

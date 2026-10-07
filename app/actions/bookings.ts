@@ -3215,7 +3215,7 @@ export async function cancelBookingWithDisposition(formData: FormData) {
   throwCancellationError("Could not cancel the payment schedule", paymentScheduleResult.error);
   // Any refund chosen in this dialog settles a "Refund to decide" job.
   if (refundOption) await completeRentalJobs(createSupabaseAdminClient() as any, rentalId, "refund", "Settled when the booking was cancelled");
-  await tellRentalCustomer(createSupabaseAdminClient() as any, rentalId, ({ say, t, vehicle }) => `${say("rentalCancelled", { vehicle })} ${t("anyQuestions")}`, { sentBy: user.id, withLink: false });
+  await tellRentalCustomer(createSupabaseAdminClient() as any, rentalId, ({ say, t, vehicle }) => `${say("rentalCancelled", { vehicle })} ${t("anyQuestions")}`, { sentBy: user.id, withLink: false, replacesEarlier: true });
 
   const refundLabel = refundOption ? ` — ${refundOption.replace(/_/g, " ")}` : "";
 

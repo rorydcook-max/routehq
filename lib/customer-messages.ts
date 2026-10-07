@@ -39,7 +39,33 @@ type Input = {
   sentBy?: string | null;
   /** Extra details kept with the record, e.g. the key that stops a reminder going twice. */
   metadata?: Record<string, unknown>;
+  /**
+   * The customer has just read this on their own booking page (they made the change themselves).
+   * It still goes to their chat or email when that is automatic, but it is not left for the owner to send by hand.
+   */
+  seenAlready?: boolean;
+  /**
+   * This message closes the story (the vehicle is back, the booking is cancelled). Anything still waiting
+   * to be sent by hand for the rental is out of date - "extended to the 13th" must not go out after the return.
+   */
+  replacesEarlier?: boolean;
 };
+
+/** Marks a rental's waiting-to-be-sent messages as overtaken, so they are no longer offered for sending. */
+async function retireUnsent(admin: any, organizationId: string, rentalId: string) {
+  const { data: rows } = await admin
+    .from("communication_log")
+    .select("id, metadata")
+    .eq("organisation_id", organizationId)
+    .eq("rental_id", rentalId)
+    .eq("type", "automated_reminder")
+    .in("status", ["pending", "failed"]);
+  await Promise.all(
+    (rows || [])
+      .filter((row: any) => !row.metadata?.superseded)
+      .map((row: any) => admin.from("communication_log").update({ metadata: { ...(row.metadata || {}), superseded: true } }).eq("id", row.id).then(() => null, () => null))
+  );
+}
 
 export function customerMessagesOn(settings: any) {
   return settings?.customer_messages?.enabled !== false;
@@ -110,6 +136,8 @@ export async function messageCustomer(admin: any, input: Input): Promise<Custome
 
   const { data: organization } = await admin.from("organizations").select("name, settings").eq("id", input.organizationId).maybeSingle();
   if (!customerMessagesOn(organization?.settings)) return { sent: false, reason: "off" };
+
+  if (input.replacesEarlier && input.rentalId) await retireUnsent(admin, input.organizationId, input.rentalId).catch(() => null);
 
   const link = input.withLink === false ? null : await bookingPageUrl(admin, input.rentalId);
   const wording = await customerMessageText(input.locale);
@@ -183,6 +211,8 @@ export async function messageCustomer(admin: any, input: Input): Promise<Custome
     if (result.status === "failed") await log("failed", "email", { error: result.error });
   }
 
+  if (input.seenAlready) return { sent: false, reason: "no_chat" };
+
   // 3. Ready for the owner to send in the app the customer prefers.
   const handoff = handoffFor(customer, body);
   await log("pending", handoff.channel === "none" ? null : handoff.channel, { not_sent_reason: "no_chat", handoff_label: handoff.label, handoff_url: handoff.url });
@@ -227,7 +257,7 @@ export async function tellRentalCustomer(
   admin: any,
   rentalId: string,
   build: (context: RentalMessageContext) => string,
-  options: { sentBy?: string | null; withLink?: boolean; metadata?: Record<string, unknown> } = {}
+  options: { sentBy?: string | null; withLink?: boolean; metadata?: Record<string, unknown>; seenAlready?: boolean; replacesEarlier?: boolean } = {}
 ): Promise<CustomerMessageResult> {
   try {
     const { data: rental } = await admin
@@ -263,7 +293,9 @@ export async function tellRentalCustomer(
       locale: wording.locale,
       sentBy: options.sentBy,
       withLink: options.withLink,
-      metadata: options.metadata
+      metadata: options.metadata,
+      seenAlready: options.seenAlready,
+      replacesEarlier: options.replacesEarlier
     });
   } catch {
     return { sent: false, reason: "failed" };

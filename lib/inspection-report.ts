@@ -99,7 +99,10 @@ const AREA_LABELS: Record<string, string> = {
   front_right: "Front right",
   rear_left: "Rear left",
   rear_right: "Rear right",
-  interior: "Interior"
+  interior: "Interior",
+  left_side: "Left side",
+  right_side: "Right side",
+  seat: "Seat and body"
 };
 
 const SEVERITY_LABELS: Record<string, string> = {

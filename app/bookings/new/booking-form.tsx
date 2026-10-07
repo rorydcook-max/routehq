@@ -1146,7 +1146,8 @@ export function BookingForm({
         <section className="content-section">
           <Header icon={CheckCircle2} eyebrow={say("stepN", { n: displayStepNumber })} title={shareResult ? say("allDone") : bookingMode === "existing_rental" ? say("checkSave") : say("checkSend")} />
           <BookingLinkSharePanel result={shareResult} />
-          {isSameDayHandover ? (
+          {/* Once the link exists the choice has been made; offering it again would make a second booking. */}
+          {isSameDayHandover && !shareResult ? (
             <div className="mt-3 rounded-lg border border-[var(--info-line)] bg-[var(--panel-secondary)] p-3">
               <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--primary)]">{say("fastTrack")}</p>
               <p className="mt-1 text-sm text-[var(--foreground-secondary)]">
@@ -1164,7 +1165,8 @@ export function BookingForm({
                   className="pressable min-h-11 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white"
                   onClick={() => {
                     setWalkInFastTrack(true);
-                    setWalkInPaymentAmount((current) => current || rentalRate);
+                    // A daily price is paid for the whole stay, not one day.
+                    setWalkInPaymentAmount((current) => current || (pricingModel === "daily" && !openEnded && startDate && endDate ? rentalRate * Math.max(1, Math.round((new Date(`${endDate}T00:00:00`).getTime() - new Date(`${startDate}T00:00:00`).getTime()) / 86400000)) : rentalRate));
                     setWalkInDepositAmount((current) => current || depositAmount);
                   }}
                   type="button"

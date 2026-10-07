@@ -2,7 +2,7 @@
 
 import { VehicleKindIcon } from "@/components/vehicle-kind-icon";
 import { isTwoWheeler, kindFromCategory } from "@/lib/vehicle-groups";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import type { Route } from "next";
@@ -58,11 +58,11 @@ function titleFor(context: InspectionContext) {
   return [context.vehicle.make, context.vehicle.model, context.vehicle.trim, context.vehicle.year].filter(Boolean).join(" ");
 }
 
-function formatDate(value: string | null | undefined) {
+function formatDate(value: string | null | undefined, locale = "en-GB") {
   if (!value) {
     return "Not set";
   }
-  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
+  return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : locale, { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
 }
 
 function money(value: unknown) {
@@ -243,9 +243,16 @@ function FuelGauge({
   );
 }
 
-function VehicleDiagram({ onSelect, selected, marked }: { onSelect: (location: string) => void; /** The area being described now. */ selected?: string; /** Areas that already have damage logged. */ marked?: string[] }) {
+function VehicleDiagram({ onSelect, selected, marked, bike }: { onSelect: (location: string) => void; /** The area being described now. */ selected?: string; /** Areas that already have damage logged. */ marked?: string[]; /** A motorbike or scooter: it has two sides and a seat, not four corners and an interior. */ bike?: boolean }) {
   const t = useTranslations("inspection");
-  const areas = [
+  const bikeAreas = [
+    { key: "front", label: t("areaFront"), className: "left-[34%] top-[1%] w-[32%] h-[15%]" },
+    { key: "rear", label: t("areaRear"), className: "left-[34%] bottom-[1%] w-[32%] h-[15%]" },
+    { key: "left_side", label: t("areaLeftSide"), className: "left-[1%] top-[36%] w-[26%] h-[28%]" },
+    { key: "right_side", label: t("areaRightSide"), className: "right-[1%] top-[36%] w-[26%] h-[28%]" },
+    { key: "seat", label: t("areaSeat"), className: "left-[29%] top-[44%] w-[42%] h-[20%]" }
+  ];
+  const carAreas = [
     { key: "front", label: t("areaFront"), className: "left-[34%] top-[4%] w-[32%] h-[18%]" },
     { key: "rear", label: t("areaRear"), className: "left-[34%] bottom-[4%] w-[32%] h-[18%]" },
     // Side areas sit outside the wheels (drawn at 25% and 75% of the width) so
@@ -256,19 +263,30 @@ function VehicleDiagram({ onSelect, selected, marked }: { onSelect: (location: s
     { key: "rear_right", label: t("areaRearRight"), className: "right-[1%] bottom-[17%] w-[20%] h-[27%]" },
     { key: "interior", label: t("areaInterior"), className: "left-[35%] top-[36%] w-[30%] h-[28%]" }
   ];
+  const areas = bike ? bikeAreas : carAreas;
 
   return (
     <div className="relative mx-auto aspect-[3/4] max-h-[420px] max-w-sm rounded-xl border border-[var(--border)] bg-white p-4">
-      <svg className="h-full w-full text-[var(--primary)]" viewBox="0 0 180 260" role="img" aria-label={t("vehicleDiagram")}>
-        <rect x="50" y="18" width="80" height="224" rx="35" fill="#e6edf5" stroke="currentColor" strokeWidth="3" />
-        <rect x="64" y="58" width="52" height="42" rx="10" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
-        <rect x="62" y="112" width="56" height="56" rx="14" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
-        <rect x="65" y="184" width="50" height="28" rx="8" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
-        <circle cx="45" cy="70" r="11" fill="#1b2430" />
-        <circle cx="135" cy="70" r="11" fill="#1b2430" />
-        <circle cx="45" cy="194" r="11" fill="#1b2430" />
-        <circle cx="135" cy="194" r="11" fill="#1b2430" />
-      </svg>
+      {bike ? (
+        <svg className="h-full w-full text-[var(--primary)]" viewBox="0 0 180 260" role="img" aria-label={t("vehicleDiagram")}>
+          <rect x="81" y="12" width="18" height="50" rx="9" fill="#1b2430" />
+          <rect x="79" y="198" width="22" height="50" rx="10" fill="#1b2430" />
+          <rect x="66" y="56" width="48" height="156" rx="22" fill="#e6edf5" stroke="currentColor" strokeWidth="3" />
+          <rect x="42" y="50" width="96" height="10" rx="5" fill="currentColor" />
+          <rect x="74" y="116" width="32" height="74" rx="13" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
+        </svg>
+      ) : (
+        <svg className="h-full w-full text-[var(--primary)]" viewBox="0 0 180 260" role="img" aria-label={t("vehicleDiagram")}>
+          <rect x="50" y="18" width="80" height="224" rx="35" fill="#e6edf5" stroke="currentColor" strokeWidth="3" />
+          <rect x="64" y="58" width="52" height="42" rx="10" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
+          <rect x="62" y="112" width="56" height="56" rx="14" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
+          <rect x="65" y="184" width="50" height="28" rx="8" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
+          <circle cx="45" cy="70" r="11" fill="#1b2430" />
+          <circle cx="135" cy="70" r="11" fill="#1b2430" />
+          <circle cx="45" cy="194" r="11" fill="#1b2430" />
+          <circle cx="135" cy="194" r="11" fill="#1b2430" />
+        </svg>
+      )}
       {areas.map((area) => (
         <button
           aria-label={t("logDamageAt", { area: area.label })}
@@ -369,6 +387,7 @@ function SignaturePad({
 
 export function InspectionForm({ context }: { context: InspectionContext }) {
   const t = useTranslations("inspection");
+  const locale = useLocale();
   const areaName = (location: string) => {
     const key = `area${location.split("_").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join("")}`;
     return t.has(key) ? t(key) : location.replace(/_/g, " ");
@@ -437,6 +456,8 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
     const remainingDeposit = Math.max(0, expectedDeposit - heldDeposit);
     return remainingDeposit ? String(remainingDeposit) : "";
   });
+  // Already paid before handover (a transfer, say): there is no cash to count, so the cash boxes stay folded away.
+  const [collectOpen, setCollectOpen] = useState(() => Boolean(deliveryPaymentAmount || deliveryDepositAmount) || !context.hasPaymentSchedule);
   const [receiptResult, setReceiptResult] = useState<ReceiptResult | null>(null);
   const [receiptError, setReceiptError] = useState("");
 
@@ -745,10 +766,10 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                 <p className="mt-2 text-sm text-[var(--muted)]">
                   {mode === "return" && context.customer?.full_name ? context.customer.full_name : null}
                   {mode !== "return" && context.customer?.full_name ? `${context.customer.full_name} · ` : ""}
-                  {mode === "return" ? null : context.rental?.start_date ? t("rentalStarts", { date: formatDate(context.rental.start_date) }) : t("standaloneReport")}
+                  {mode === "return" ? null : context.rental?.start_date ? t("rentalStarts", { date: formatDate(context.rental.start_date, locale) }) : t("standaloneReport")}
                 </p>
                 {mode === "delivery" && context.rental?.start_date && String(context.rental.start_date).slice(0, 10) > new Date(Date.now() + 86_400_000).toISOString().slice(0, 10) ? (
-                  <p className="mt-2 rounded-lg bg-[var(--warning-light)] px-3 py-2 text-sm font-semibold text-[var(--warning)]">{t("startsLaterNote", { date: formatDate(context.rental.start_date) })}</p>
+                  <p className="mt-2 rounded-lg bg-[var(--warning-light)] px-3 py-2 text-sm font-semibold text-[var(--warning)]">{t("startsLaterNote", { date: formatDate(context.rental.start_date, locale) })}</p>
                 ) : null}
                 {mode === "return" ? (
                   <p className="mt-2 rounded-lg bg-[var(--warning-light)] px-3 py-2 text-sm font-bold text-[var(--warning)]">
@@ -878,7 +899,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
           </label>
           {noDamage && damageItems.length === 0 ? null : (
             <>
-            <VehicleDiagram marked={damageItems.map((item) => item.location)} onSelect={setSelectedLocation} selected={selectedLocation} />
+            <VehicleDiagram bike={isBike} marked={damageItems.map((item) => item.location)} onSelect={setSelectedLocation} selected={selectedLocation} />
             <div className="mt-4 rounded-lg border border-[var(--border)] bg-white p-4">
               <p className="font-semibold text-[var(--foreground)]">{selectedLocation ? t("damageAt", { area: areaName(selectedLocation) }) : t("tapArea")}</p>
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -1033,7 +1054,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
       {step === steps.length - 1 ? (
         <StepShell eyebrow={t("eyebrowReview")} title={mode === "return" ? t("reviewReturn") : mode === "condition_report" ? t("reviewCondition") : t("reviewHandover")}>
           <div className="grid grid-cols-2 gap-3">
-            <SummaryTile icon={Gauge} label={t("odometer")} value={odometer ? `${Number(odometer).toLocaleString()} km` : t("missing")} />
+            <SummaryTile icon={Gauge} label={t("odometer")} value={odometer ? t("kmValue", { km: Number(odometer).toLocaleString() }) : t("missing")} />
             <SummaryTile icon={Fuel} label={t("fuel")} value={fuelLabel || t("missing")} />
             <SummaryTile icon={Camera} label={t("photosVideo")} value={videoCaptured ? t("videoCaptured") : t("photoCount", { count: Object.values(sidePhotos).filter(Boolean).length })} />
             <SummaryTile icon={ShieldCheck} label={t("damage")} value={noDamage ? t("noDamageNoted") : t("damageCount", { count: damageItems.length })} />
@@ -1058,7 +1079,18 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
               )}
             </div>
           ) : null}
-          {mode === "delivery" && context.rental?.id && !isSwap ? (
+          {mode === "delivery" && context.rental?.id && !isSwap && !collectOpen ? (
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[var(--success-line)] bg-[var(--success-light)] p-4">
+              <p className="flex items-center gap-2 text-sm font-semibold text-[var(--success)]">
+                <CheckCircle2 size={18} />
+                {t("nothingToCollect")}
+              </p>
+              <button className="text-sm font-bold text-[var(--primary)] underline" onClick={() => setCollectOpen(true)} type="button">
+                {t("recordCashAnyway")}
+              </button>
+            </div>
+          ) : null}
+          {mode === "delivery" && context.rental?.id && !isSwap && collectOpen ? (
             <div className="mt-4 rounded-lg border border-[var(--border)] bg-white p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>

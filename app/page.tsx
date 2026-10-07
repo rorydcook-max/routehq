@@ -117,6 +117,9 @@ export default async function Home() {
     getTranslations("common"),
     getLocale()
   ]);
+  const todo = await getTranslations("todo");
+  // Jobs the app raises are saved as English sentences; the kinds it knows are named in the reader's language, as on To do.
+  const jobName = (action: string | null | undefined) => (action && todo.has(`job_${action}` as never) ? todo(`job_${action}` as never) : null);
   const shortDate = (value: string) => shortDateIn(value, locale);
   const dayLabel = (value: string) => dayOfWeekDate(value, locale);
   const [onboardingStatus, categories, valueTrackerData] = await Promise.all([
@@ -312,7 +315,7 @@ export default async function Home() {
       rank: waiting ? 2 : 4,
       tone: waiting ? "red" : job.dueDate && job.dueDate < today ? "amber" : "neutral",
       icon: <Bell size={17} />,
-      title: waiting ? (asks > 1 ? t("waitingForAnswers", { who: job.customerName || t("aCustomer"), count: asks }) : t("waitingForAnswer", { who: job.customerName || t("aCustomer") })) : noPlate(job.action === "swap_handover" || job.action === "swap_collection" ? job.title.split(" to ")[0].split(" from ")[0] : job.title.split(" - ")[0]),
+      title: waiting ? (asks > 1 ? t("waitingForAnswers", { who: job.customerName || t("aCustomer"), count: asks }) : t("waitingForAnswer", { who: job.customerName || t("aCustomer") })) : jobName(job.action) || noPlate(job.action === "swap_handover" || job.action === "swap_collection" ? job.title.split(" to ")[0].split(" from ")[0] : job.title.split(" - ")[0]),
       detail: [waiting ? null : job.customerName, noPlate(job.vehicleLabel)].filter(Boolean).join(" · ") || t("onToDo"),
       href: waiting && job.rentalId ? `/bookings/${job.rentalId}#customer-requests` : "/tasks",
       action: waiting ? t("answer") : t("open")

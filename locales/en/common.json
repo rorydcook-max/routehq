@@ -153,7 +153,7 @@
     "odometerUpdatesMileage": "Saved as the vehicle's mileage.",
     "fuelPhoto": "Take a photo of the fuel gauge",
     "fuelCamera": "Take the fuel gauge photo",
-    "applyFuelCharge": "Apply fuel charge?",
+    "applyFuelCharge": "Charging for the missing fuel? Type the amount, or leave empty.",
     "recordCondition": "Record the vehicle condition",
     "recordVideo": "Record a video walking round it",
     "conditionMinimum": "Either one video walking round the vehicle, or a photo of each of the four sides.",
@@ -170,7 +170,7 @@
     "noDamageToReport": "No damage to report",
     "addDamagePhoto": "Add damage photo",
     "changeDamagePhoto": "Change photo",
-    "applyDamageExcess": "New damage found — apply damage excess charge?",
+    "applyDamageExcess": "New damage. Charging for it? Type the amount, or leave empty.",
     "confirmTracker": "Confirm tracker status",
     "gpsConfirm": "I confirm the GPS tracker is installed and operational",
     "noGpsDevice": "No GPS device assigned to this vehicle",
@@ -313,7 +313,13 @@
     "viewSignature": "Customer signature",
     "viewSignedBy": "Signed by {name} · {when}",
     "viewCustomer": "customer",
-    "viewPhotoAlt": "Inspection photo"
+    "viewPhotoAlt": "Inspection photo",
+    "nothingToCollect": "Already paid. Nothing to collect at handover.",
+    "recordCashAnyway": "Record cash anyway",
+    "areaLeftSide": "Left side",
+    "areaRightSide": "Right side",
+    "areaSeat": "Seat and body",
+    "kmValue": "{km} km"
   },
   "translation": {
     "translatedFrom": "Translated from {language}",

@@ -1913,7 +1913,12 @@
     "tl_signedChange": "Customer signed a change to the rental",
     "tl_details": "Customer filled in their details",
     "tl_askedUntil": "Customer asked to keep the vehicle until {date}",
-    "tl_problem": "Customer reported a problem"
+    "tl_problem": "Customer reported a problem",
+    "qx_daily": "{days, plural, one {# day} other {# days}} at {rate} a day",
+    "qx_weekly": "{days, plural, one {# day} other {# days}} at the weekly price of {rate}",
+    "qx_monthly": "{days, plural, one {# day} other {# days}} at the monthly price of {rate}",
+    "qx_week": "{days, plural, one {# day} other {# days}}, charged as one week ({rate})",
+    "qx_month": "{days, plural, one {# day} other {# days}}, charged as one month ({rate})"
   },
   "newBooking": {
     "pageBack": "Back to bookings",

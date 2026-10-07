@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { quoteExplainIn } from "@/lib/i18n/quote-text";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { Route } from "next";
@@ -53,7 +54,7 @@ export function ExtensionRequestAnswer({ actionId, rentalId, picture, requestedE
     <div className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
       {worth ? (
         <p className="text-sm text-[var(--foreground-secondary)]">
-          {t.rich(worth.perMonth ? "ext_worthMonthly" : worth.explain ? "ext_worthExplained" : "ext_worth", { amount: money(worth.amount), explain: String(worth.explain || ""), b: strong })}
+          {t.rich(worth.perMonth ? "ext_worthMonthly" : worth.explain ? "ext_worthExplained" : "ext_worth", { amount: money(worth.amount), explain: quoteExplainIn(worth.explain, t as unknown as (key: string, values?: Record<string, string | number>) => string), b: strong })}
         </p>
       ) : null}
 

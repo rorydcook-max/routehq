@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState, useTransition, useRef } from "react";
 import { adjustRental } from "@/app/actions/bookings";
 import { useLocale, useTranslations } from "next-intl";
 import { longDate } from "@/lib/i18n/dates";
+import { quoteExplainIn } from "@/lib/i18n/quote-text";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 import { cancelRentalAmendment, createRentalAmendment, getRentalAmendmentContext, makeRentalOpenEnded, type AmendmentSummary } from "@/app/actions/amendments";
@@ -550,7 +551,7 @@ export function RentalAdjustmentModal({
                 />
                 {extensionQuote ? (
                   <span className="mt-1 flex flex-wrap items-center gap-2 text-[12px] text-[var(--foreground-secondary)]">
-                    {t.rich("adj_fromRates", { amount: money(extensionQuote.amount), explain: extensionQuote.explain, b: strong })}
+                    {t.rich("adj_fromRates", { amount: money(extensionQuote.amount), explain: quoteExplainIn(extensionQuote.explain, say), b: strong })}
                     <button className={`rounded-md border border-[var(--border)] bg-white px-2 py-1 text-[11px] font-semibold text-[var(--primary)] ${parseAmount(extensionAmount) === extensionQuote.amount ? "hidden" : ""}`} onClick={() => {
                       amountTypedByHand.current = false;
                       setExtensionAmount(extensionQuote.amount.toLocaleString("en-US"));

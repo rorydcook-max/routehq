@@ -1922,7 +1922,12 @@
     "tl_signedChange": "ลูกค้าเซ็นการเปลี่ยนแปลงการเช่าแล้ว",
     "tl_details": "ลูกค้ากรอกข้อมูลแล้ว",
     "tl_askedUntil": "ลูกค้าขอใช้รถต่อถึง {date}",
-    "tl_problem": "ลูกค้าแจ้งปัญหา"
+    "tl_problem": "ลูกค้าแจ้งปัญหา",
+    "qx_daily": "{days} วัน วันละ {rate}",
+    "qx_weekly": "{days} วัน คิดตามราคารายสัปดาห์ {rate}",
+    "qx_monthly": "{days} วัน คิดตามราคารายเดือน {rate}",
+    "qx_week": "{days} วัน คิดเป็นหนึ่งสัปดาห์ ({rate})",
+    "qx_month": "{days} วัน คิดเป็นหนึ่งเดือน ({rate})"
   },
   "newBooking": {
     "pageBack": "กลับไปที่การจอง",

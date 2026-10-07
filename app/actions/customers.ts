@@ -5,8 +5,6 @@ import { redirect } from "next/navigation";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { buildDocumentStoragePath } from "@/services/documents/storage-path";
-
-const activeRentalStatuses = ["booked", "active", "due_soon", "overdue", "extended"];
 const contactMethods = ["whatsapp", "messenger", "line", "telegram", "sms", "email", "phone"];
 
 function optionalString(formData: FormData, key: string) {
@@ -419,56 +417,4 @@ export async function uploadCustomerDocument(formData: FormData) {
 
   revalidatePath("/customers");
   revalidatePath(`/customers/${customerId}`);
-}
-
-export async function deleteCustomer(formData: FormData) {
-  const supabase = (await createSupabaseServerClient()) as any;
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
-  const customerId = String(formData.get("customerId") || "");
-  const organizationId = String(formData.get("organizationId") || "");
-  if (!customerId || !organizationId) {
-    throw new Error("Customer is required.");
-  }
-
-  const { data: activeRentals, error: rentalError } = await supabase
-    .from("rentals")
-    .select("id")
-    .eq("organization_id", organizationId)
-    .eq("customer_id", customerId)
-    .in("status", activeRentalStatuses)
-    .is("deleted_at", null);
-
-  if (rentalError) {
-    throw new Error(rentalError.message);
-  }
-
-  if ((activeRentals || []).length > 0) {
-    throw new Error("This customer has active rentals and cannot be deleted.");
-  }
-
-  const { error } = await supabase.from("customers").update({ deleted_at: new Date().toISOString() }).eq("id", customerId).eq("organization_id", organizationId);
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  await recordActivityEvent(supabase, {
-    organization_id: organizationId,
-    actor_id: user.id,
-    entity_type: "customer",
-    entity_id: customerId,
-    customer_id: customerId,
-    event_type: "customer_deleted",
-    title: "Customer deleted",
-    detail: "Customer was soft-deleted."
-  });
-
-  revalidatePath("/customers");
-  redirect("/customers");
 }

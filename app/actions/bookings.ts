@@ -1,18 +1,15 @@
 "use server";
 
 import { said } from "@/lib/i18n/server-text";
-import { niceDate } from "@/lib/nice-date";
 import { completeRentalJobs, tellRentalCustomer } from "@/lib/customer-messages";
 import { allocatePayment, type OpenPayment } from "@/lib/payment-allocation";
 import { customerPaymentLabel } from "@/lib/payment-labels";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { markOnboardingStep } from "@/lib/onboarding";
 import { activateRental } from "@/lib/rental-activation";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { notifyOperator } from "@/lib/notify-operator";
-import { isRentalDocumentCustomerSigningEnabledForOrganization } from "@/lib/rental-document-customer-signing";
 import { wallTimeToIso, businessToday } from "@/lib/business-time";
 import { DOUBLE_BOOKING_MESSAGE, isDoubleBookingError, vehicleConflictMessage } from "@/lib/rental-conflicts";
 import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
@@ -981,84 +978,6 @@ export async function resendBookingLink(formData: FormData) {
   };
 }
 
-export async function cancelBooking(formData: FormData) {
-  const supabase = (await createSupabaseServerClient()) as any;
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    throw new Error("You must be signed in.");
-  }
-
-  const organizationId = requiredString(formData, "organizationId");
-  const rentalId = requiredString(formData, "rentalId");
-
-  const { data: rental, error: rentalError } = await supabase
-    .from("rentals")
-    .select("id, display_code, reference, vehicle_id, customer_id, status")
-    .eq("id", rentalId)
-    .eq("organization_id", organizationId)
-    .is("deleted_at", null)
-    .maybeSingle();
-
-  if (rentalError || !rental) {
-    throw new Error(rentalError?.message || "Booking was not found.");
-  }
-
-  if (["completed", "cancelled"].includes(rental.status)) {
-    throw new Error("This booking cannot be cancelled from its current status.");
-  }
-
-  const now = new Date().toISOString();
-  const [{ error: rentalUpdateError }, { error: linkUpdateError }, { error: vehicleUpdateError }] = await Promise.all([
-    supabase.from("rentals").update({ status: "cancelled" }).eq("id", rentalId).eq("organization_id", organizationId),
-    supabase
-      .from("booking_links")
-      .update({ status: "cancelled", cancelled_at: now })
-      .eq("organization_id", organizationId)
-      .eq("rental_id", rentalId),
-    supabase
-      .from("vehicles")
-      .update({
-        status: "available",
-        availability_status: "available_now",
-        current_customer_id: null,
-        current_rental_id: null
-      })
-      .eq("id", rental.vehicle_id)
-      .eq("organization_id", organizationId)
-      .eq("current_rental_id", rentalId)
-  ]);
-
-  const updateError = rentalUpdateError || linkUpdateError || vehicleUpdateError;
-  if (updateError) {
-    throw new Error(updateError.message);
-  }
-  await tellRentalCustomer(createSupabaseAdminClient() as any, rentalId, ({ say, t, vehicle }) => `${say("bookingCancelled", { vehicle })} ${t("anyQuestions")}`, { sentBy: user.id, withLink: false });
-  // Nothing more is owed on a cancelled booking (the full cancel dialog does the same).
-  await supabase.from("rental_payments").update({ status: "cancelled" }).eq("rental_id", rentalId).eq("organization_id", organizationId).in("status", ["scheduled", "pending", "overdue"]);
-  await syncVehicleStatusFromBookings(supabase, organizationId, rental.vehicle_id);
-
-  await recordActivityEvent(supabase, {
-    organization_id: organizationId,
-    actor_id: user.id,
-    entity_type: "rental",
-    entity_id: rentalId,
-    vehicle_id: rental.vehicle_id,
-    rental_id: rentalId,
-    customer_id: rental.customer_id,
-    event_type: "booking_cancelled",
-    title: "Booking cancelled",
-    detail: `${bookingReference(rental)} was cancelled.`
-  });
-
-  revalidatePath("/");
-  revalidatePath("/bookings");
-  revalidatePath(`/bookings/${rentalId}`);
-  revalidatePath(`/fleet/${rental.vehicle_id}`);
-}
-
 export async function deleteBooking(rentalId: string): Promise<{ success: boolean; error?: string }> {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
@@ -1200,11 +1119,6 @@ export async function manuallyActivateRental(rentalId: string): Promise<{ succes
 
 function allStrings(formData: FormData, key: string) {
   return formData.getAll(key).map((value) => String(value || "").trim()).filter(Boolean);
-}
-
-function dateTimeOrNull(formData: FormData, key: string) {
-  const value = String(formData.get(key) || "").trim();
-  return value || null;
 }
 
 function sameJson(left: unknown, right: unknown) {
@@ -3049,75 +2963,6 @@ export async function deleteRentalPayment(paymentId: string) {
   revalidatePath("/calendar");
 
   return { success: true };
-}
-
-export async function cleanupDepositPayments(rentalId: string) {
-  "use server";
-  const supabase = (await createSupabaseServerClient()) as any;
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { success: false, error: await said("You must be signed in.") };
-  }
-
-  const cleanRentalId = String(rentalId || "").trim();
-  if (!cleanRentalId) {
-    return { success: false, error: await said("Rental ID is required.") };
-  }
-
-  const { data: rental } = await supabase
-    .from("rentals")
-    .select("id, organization_id, deposit_held")
-    .eq("id", cleanRentalId)
-    .maybeSingle();
-
-  if (!rental) {
-    return { success: false, error: await said("Rental not found.") };
-  }
-
-  await ensureMembership(supabase, rental.organization_id, user.id);
-
-  const { data: payments } = await supabase
-    .from("rental_payments")
-    .select("id, amount, status, voided, metadata")
-    .eq("organization_id", rental.organization_id)
-    .eq("rental_id", cleanRentalId)
-    .is("deleted_at", null);
-
-  const depositHeld = Number(rental.deposit_held || 0);
-  const depositPaymentIds = (payments || [])
-    .filter((p: any) => !p.voided && p.status !== "voided")
-    .filter((p: any) =>
-      p.metadata?.is_deposit === true ||
-      p.metadata?.type === "deposit" ||
-      (depositHeld > 0 && Number(p.amount) === depositHeld)
-    )
-    .map((p: any) => p.id);
-
-  if (depositPaymentIds.length === 0) {
-    return { success: true, voided: 0 };
-  }
-
-  const { error } = await supabase
-    .from("rental_payments")
-    .update({
-      voided: true,
-      status: "voided",
-      metadata: { voided_reason: "Deposit tracked via deposit_held — payment record not needed", voided_at: new Date().toISOString(), voided_by: user.id }
-    })
-    .in("id", depositPaymentIds)
-    .eq("organization_id", rental.organization_id);
-
-  if (error) {
-    return { success: false, error: error.message };
-  }
-
-  revalidatePath(`/bookings/${cleanRentalId}`);
-  revalidatePath(`/bookings/${cleanRentalId}/edit`);
-
-  return { success: true, voided: depositPaymentIds.length };
 }
 
 export async function cancelBookingWithDisposition(formData: FormData) {

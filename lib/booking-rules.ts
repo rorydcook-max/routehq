@@ -59,12 +59,6 @@ export function earliestStart(today: string, leadHours: number, now = new Date()
   return date > today ? date : today;
 }
 
-/** A busy period with the turnaround gap added to its end, so the days after a return stay free. */
-export function withGap<T extends { startDate: string; endDate: string | null }>(period: T, gapDays: number): T {
-  if (!gapDays || !period.endDate) return period;
-  return { ...period, endDate: addDaysIso(period.endDate, gapDays) };
-}
-
 /** True when the dates clash with a period, allowing for the turnaround gap on either side. */
 export function clashes(startDate: string, endDate: string | null, period: { startDate: string; endDate: string | null }, gapDays = 0) {
   if (overlaps(startDate, endDate, period)) return true;

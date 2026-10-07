@@ -189,23 +189,6 @@ export async function getRentalAmendmentContext(rentalId: string): Promise<
   }
 }
 
-/** Amendments for the booking page. */
-export async function listRentalAmendments(rentalId: string): Promise<AmendmentSummary[]> {
-  try {
-    await operatorFor(rentalId);
-    const admin = createSupabaseAdminClient() as any;
-    const { data } = await admin
-      .from("rental_amendments")
-      .select("*")
-      .eq("rental_id", rentalId)
-      .order("created_at", { ascending: false })
-      .limit(20);
-    return (data || []).map(amendmentSummary);
-  } catch {
-    return [];
-  }
-}
-
 function renderInput(ctx: Awaited<ReturnType<typeof loadRental>>, snapshot: ReturnType<typeof buildBusinessDocumentSnapshot>, changes: AmendmentChanges, preparedOn: string): AmendmentRenderInput {
   return {
     changes,

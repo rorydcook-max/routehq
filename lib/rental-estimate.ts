@@ -75,11 +75,6 @@ export function rentalRateCard(vehicle: { daily_rate?: unknown; weekly_rate?: un
   return card;
 }
 
-/** A rough price for a stay; null when the vehicle has no rates at all. */
-export function estimateRental(rates: Rates, days: number): number | null {
-  return quoteStay(rates, days)?.amount ?? null;
-}
-
 /** The headline price for a card: the longest period the vehicle is priced for. */
 export function headlineRate(rates: Rates): { amount: number; per: "month" | "week" | "day" } | null {
   if (rates.monthlyRate > 0) return { amount: rates.monthlyRate, per: "month" };

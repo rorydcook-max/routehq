@@ -89,7 +89,8 @@
     "moreInsights": "More insights",
     "moreInsightsHint": "Fleet value, profit per vehicle, activity",
     "tileUrgent": "urgent",
-    "tileToday": "to do today"
+    "tileToday": "to do today",
+    "ownerOnly": "Only the business owner can open that page."
   },
   "nav": {
     "main": "Main",

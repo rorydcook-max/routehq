@@ -16,6 +16,7 @@ import { OutFreeSummary, VehicleKindIcon } from "@/components/vehicle-kind-icon"
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDashboardData, money } from "@/lib/dashboard";
 import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization";
+import { getCurrentMembership } from "@/lib/auth/roles";
 import { getValueTrackerData } from "@/lib/value-tracker";
 import { getOnboardingStatus } from "@/lib/onboarding";
 import { getReceiptsWaiting } from "@/lib/payment-receipts";
@@ -105,7 +106,10 @@ function PanelLink({ href, children }: { href: string; children: ReactNode }) {
   );
 }
 
-export default async function Home() {
+export default async function Home({ searchParams }: { searchParams?: Promise<{ notice?: string }> }) {
+  const notice = (searchParams ? await searchParams : {}).notice;
+  // A teammate sees the day's work and what customers owe, not how the business is doing or its set-up.
+  const isOwner = (await getCurrentMembership())?.role !== "teammate";
   // Holds that ran out without a signature give their dates back before anything is counted.
   await getDefaultOrganization().then((org) => releaseExpiredHolds(createSupabaseAdminClient(), org.id)).catch(() => null);
   const [userEmail, organization, dashboardData, supabase, t, c, locale] = await Promise.all([
@@ -353,8 +357,12 @@ export default async function Home() {
         </div>
       </div>
 
+      {notice === "owner-only" ? (
+        <p className="mb-4 rounded-[var(--radius)] border border-[var(--warning-line)] bg-[var(--warning-light)] px-4 py-3 font-semibold text-[var(--warning)]">{t("ownerOnly")}</p>
+      ) : null}
+
       {/* A business that has not taken a booking yet needs its next step more than it needs empty numbers. */}
-      {!onboardingStatus.hidden && onboardingStatus.counts.rentals === 0 ? (
+      {isOwner && !onboardingStatus.hidden && onboardingStatus.counts.rentals === 0 ? (
         <div className="mb-4">
           <OnboardingChecklist completedCount={onboardingStatus.completedCount} items={onboardingStatus.items} organizationId={organization.id} totalCount={onboardingStatus.totalCount} />
         </div>
@@ -375,10 +383,17 @@ export default async function Home() {
           <span className="block font-semibold text-[var(--muted)]">{t("overdue")}</span>
           <span className={`block text-[24px] font-bold leading-tight tabular-nums ${overdueTotal > 0 ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{money(overdueTotal)}</span>
         </Link>
-        <Link className="min-w-0 text-right" href="/reports">
-          <span className="block font-semibold text-[var(--muted)]">{t("moneyThisMonth")}</span>
-          <span className="block text-[24px] font-bold leading-tight tabular-nums text-[var(--success)]">{money(metrics.monthlyRevenue)}</span>
-        </Link>
+        {isOwner ? (
+          <Link className="min-w-0 text-right" href="/reports">
+            <span className="block font-semibold text-[var(--muted)]">{t("moneyThisMonth")}</span>
+            <span className="block text-[24px] font-bold leading-tight tabular-nums text-[var(--success)]">{money(metrics.monthlyRevenue)}</span>
+          </Link>
+        ) : (
+          <Link className="min-w-0 text-right" href="/bookings">
+            <span className="block font-semibold text-[var(--muted)]">{t("depositsHeld")}</span>
+            <span className="block text-[24px] font-bold leading-tight tabular-nums text-[var(--foreground)]">{money(depositsHeld)}</span>
+          </Link>
+        )}
       </div>
       </div>
 
@@ -474,6 +489,7 @@ export default async function Home() {
             )}
           </Panel>
 
+          {isOwner ? (
           <Panel action={<PanelLink href="/reports">{t("reports")}</PanelLink>} title={t("moneyThisMonth")}>
             <div className="px-4 pb-4">
               <p className="text-[28px] font-bold tabular-nums tracking-[-0.02em] text-[var(--foreground)]">{money(metrics.monthlyRevenue)}</p>
@@ -498,12 +514,13 @@ export default async function Home() {
               <span className="text-[16px] font-bold tabular-nums text-[var(--foreground)]">{money(depositsHeld)}</span>
             </Link>
           </Panel>
+          ) : null}
         </div>
       </div>
 
       <div className="mt-6 space-y-4">
         <PushToggle variant="prompt" />
-        {!onboardingStatus.hidden && onboardingStatus.counts.rentals > 0 ? (
+        {isOwner && !onboardingStatus.hidden && onboardingStatus.counts.rentals > 0 ? (
           <OnboardingChecklist
             firstBookingTaken
             completedCount={onboardingStatus.completedCount}
@@ -514,6 +531,7 @@ export default async function Home() {
         ) : null}
       </div>
 
+      {isOwner ? (
       <details className="card group mt-4">
         <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-4 text-[16px] font-bold text-[var(--foreground)]">
           {t("moreInsights")}
@@ -535,6 +553,7 @@ export default async function Home() {
           <VehicleTimelinePanel timeline={timeline} />
         </div>
       </details>
+      ) : null}
     </AppShell>
   );
 }

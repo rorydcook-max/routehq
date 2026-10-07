@@ -102,7 +102,17 @@ export async function middleware(request: NextRequest) {
 
     // Business settings and team management are owner-only. The server actions
     // enforce this too; this just keeps teammates off pages they cannot use.
-    const isOwnerOnlyRoute = pathname === "/settings" || pathname.startsWith("/settings/") || pathname === "/invite";
+    // A teammate runs the day: bookings, vehicles, customers, payments. How the business is doing (reports, what a
+    // vehicle would earn) and bringing in a whole fleet from a file are the owner's.
+    const isOwnerOnlyRoute =
+      pathname === "/settings" ||
+      pathname.startsWith("/settings/") ||
+      pathname === "/invite" ||
+      pathname === "/reports" ||
+      pathname.startsWith("/reports/") ||
+      pathname === "/rental-calculator" ||
+      pathname === "/import" ||
+      pathname.startsWith("/fleet/import");
     if (isOwnerOnlyRoute && membership.role !== "owner") {
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = "/";

@@ -97,7 +97,8 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
   const isTeammate = shell.role === "teammate";
   const hasSeveralBusinesses = shell.organizations.length > 1;
   const activeBusiness = shell.organizations.find((organization) => organization.active);
-  const visibleRecordItems = isTeammate ? recordItems.filter((item) => item.href !== "/settings") : recordItems;
+  const ownerOnly = ["/settings", "/reports", "/rental-calculator"];
+  const visibleRecordItems = isTeammate ? recordItems.filter((item) => !ownerOnly.includes(item.href)) : recordItems;
   const allNavItems = [...dailyItems, ...visibleRecordItems];
   const mobileBarItems = mobileBarKeys.map((key) => allNavItems.find((item) => item.key === key)).filter(Boolean) as NavItem[];
   const moreItems = allNavItems.filter((item) => !mobileBarKeys.includes(item.key)).sort((a, b) => Number(b.key === "bookings") - Number(a.key === "bookings"));
@@ -150,7 +151,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
             );
           })}
         </nav>
-        <TrialBanner placement="sidebar" />
+        {isTeammate ? null : <TrialBanner placement="sidebar" />}
         {userEmail ? (
           <div className="mt-3 rounded-xl border border-[var(--sidebar-border)] bg-white p-3">
             {hasSeveralBusinesses ? (
@@ -216,9 +217,9 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
             ) : null}
           </div>
         ) : null}
-        <TrialBanner />
+        {isTeammate ? null : <TrialBanner />}
         {children}
-        <TrialBanner placement="inline" />
+        {isTeammate ? null : <TrialBanner placement="inline" />}
       </main>
 
       <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] lg:hidden">

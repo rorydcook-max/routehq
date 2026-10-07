@@ -104,6 +104,9 @@ function formatDepositSummary(rental: any, tx: Tx) {
     return tx.say("dep_returnedPart", { returned: money(rental?.deposit_refunded_amount, currency) });
   }
 
+  // A booking taken without a deposit was reading "฿0 - not yet collected", as if money were owed.
+  if (!(Number(rental?.deposit_amount || 0) > 0)) return tx.say("dep_noneSet");
+
   return tx.say("dep_notCollected", { amount: money(rental?.deposit_amount, currency) });
 }
 

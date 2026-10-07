@@ -219,6 +219,20 @@ export async function getPublicBookingDetail(token: string) {
     markOpened
   ]);
   const inspectionReports = bookingLink.rental_id ? await getCustomerInspectionReports(supabase, bookingLink.organization_id, bookingLink.rental_id) : [];
+  // Receipts the business has issued for this rental: the customer paid, so the receipt is theirs to keep.
+  const receipts: Array<{ id: string; number: string; url: string }> = bookingLink.rental_id
+    ? await supabase
+        .from("receipts")
+        .select("id, receipt_number, pdf_url")
+        .eq("organisation_id", bookingLink.organization_id)
+        .eq("rental_id", bookingLink.rental_id)
+        .order("created_at", { ascending: true })
+        .then(({ data }: { data: any[] | null }) =>
+          (data || [])
+            .filter((row) => /^https?:\/\//.test(String(row.pdf_url || "")))
+            .map((row) => ({ id: String(row.id), number: String(row.receipt_number || ""), url: String(row.pdf_url) }))
+        )
+    : [];
   const rentalDocumentAgreement = agreementResult.agreement;
   const executedDownloads = agreementResult.downloads;
   const organizationForDisplay = organization
@@ -283,6 +297,7 @@ export async function getPublicBookingDetail(token: string) {
     deliveryInspection,
     deliveryPhotoUrls: deliveryPhotoUrls.filter(Boolean),
     inspectionReports,
+    receipts,
     contractHtml,
     signedContractUrl,
     rentalDocumentAgreement,

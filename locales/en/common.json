@@ -330,7 +330,13 @@
     "refund_cash": "Cash",
     "refund_bank_transfer": "Bank transfer",
     "refund_promptpay": "PromptPay",
-    "notSignedNote": "The customer has not signed the rental agreement yet. Send them their link and have them sign before you hand over the keys."
+    "notSignedNote": "The customer has not signed the rental agreement yet. Send them their link and have them sign before you hand over the keys.",
+    "need_odometer": "Take the photo and enter the reading to continue.",
+    "need_fuel": "Take the photo and tap the fuel level to continue.",
+    "need_walkaround": "Record the video or take all four photos to continue.",
+    "need_damage": "Tick “No damage”, or add what you found, to continue.",
+    "need_signature": "The customer's name and signature are needed to finish.",
+    "receiptRentOnly": "Rental payment {rent}"
   },
   "translation": {
     "translatedFrom": "Translated from {language}",
@@ -561,7 +567,7 @@
     "addDocumentDetails": "Please add your passport and driving licence details. Take a photo of each document, or type them in.",
     "tickEachBox": "Please tick the box to agree before you sign.",
     "pleaseSign": "Please sign the agreement before sending.",
-    "agreementUpdated": "Your changes updated the agreement. Please read the updated version below and sign again.",
+    "agreementUpdated": "The agreement has been updated. Please read the new version below and sign again.",
     "detailsSavedReadAgreement": "Your details are saved. Please read your final agreement below, then sign it.",
     "completeFailed": "We couldn't finish your booking. Please try again.",
     "allSetNamed": "You're all set, {name}.",
@@ -716,7 +722,11 @@
     "reason_cleaning_fee": "cleaning",
     "thenAmountOn": "Then {amount} on {date}",
     "lastPaymentIs": "The last payment is {amount}",
-    "totalForStay": "{amount} in all"
+    "totalForStay": "{amount} in all",
+    "collectWhen": "When would you like to collect it?",
+    "collectWhenIntro": "Optional. Tell us a time that suits you, if it is not agreed yet.",
+    "collectChange": "Need a different time?",
+    "receiptNumbered": "Receipt {number}"
   },
   "customerMessages": {
     "hi": "Hi {name},",
@@ -1927,7 +1937,8 @@
     "ref_how": "How are you giving it back?",
     "ref_cash": "Cash",
     "ref_bank": "Bank transfer",
-    "ref_promptpay": "PromptPay"
+    "ref_promptpay": "PromptPay",
+    "dep_noneSet": "none"
   },
   "newBooking": {
     "pageBack": "Back to bookings",

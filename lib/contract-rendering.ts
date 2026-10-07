@@ -291,9 +291,19 @@ export function renderContractTemplate(template: string, variables: Record<strin
     if (rendered === before) break;
   }
 
-  return rendered.replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, (_match, key) => {
+  const filled = rendered.replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, (_match, key) => {
     const value = variables[key] ?? "";
     return rawHtmlKeys.has(key) ? String(value) : escapeHtml(value);
+  });
+
+  // The letterhead lists only the contact details the business has given. A new business with no LINE or
+  // email yet was getting "LINE: Not provided / Email: Not provided" printed at the top of every agreement.
+  return filled.replace(/(<div class="owner-details">)([\s\S]*?)(<\/div>)/, (_match, open, body, close) => {
+    const kept = String(body)
+      .split(/<br\s*\/?>/i)
+      .map((line) => line.trim())
+      .filter((line) => line && !/(^|:\s*)Not provided$/i.test(line));
+    return `${open}\n      ${kept.join("<br />\n      ")}\n    ${close}`;
   });
 }
 

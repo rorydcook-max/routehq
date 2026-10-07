@@ -459,6 +459,8 @@ export function InspectionForm({ context, unsigned = false }: { context: Inspect
     const remainingDeposit = Math.max(0, expectedDeposit - heldDeposit);
     return remainingDeposit ? String(remainingDeposit) : "";
   });
+  // A booking with no deposit (or one already held in full) has no deposit box to fill in.
+  const [depositToCollect] = useState(() => Boolean(deliveryDepositAmount));
   // Already paid before handover (a transfer, say): there is no cash to count, so the cash boxes stay folded away.
   const [collectOpen, setCollectOpen] = useState(() => Boolean(deliveryPaymentAmount || deliveryDepositAmount) || !context.hasPaymentSchedule);
   const [receiptResult, setReceiptResult] = useState<ReceiptResult | null>(null);
@@ -580,6 +582,17 @@ export function InspectionForm({ context, unsigned = false }: { context: Inspect
     return true;
   }
 
+  // A greyed-out Next with no reason given leaves someone standing next to a customer, guessing.
+  function whatIsMissing() {
+    if (canAdvance()) return "";
+    if (step === 1) return t("need_odometer");
+    if (step === 2) return t("need_fuel");
+    if (step === 3) return t("need_walkaround");
+    if (step === 4) return t("need_damage");
+    if (step === steps.length - 1) return t("need_signature");
+    return "";
+  }
+
   function addDamage() {
     if (!selectedLocation || !damageDescription.trim()) {
       return;
@@ -674,6 +687,7 @@ export function InspectionForm({ context, unsigned = false }: { context: Inspect
           {uploadError}
         </p>
       ) : null}
+      {step > 0 && whatIsMissing() ? <p className="mt-4 text-center text-sm font-semibold text-[var(--muted)]">{whatIsMissing()}</p> : null}
       {/* The first screen has its own "Start" button; Back and Next begin on step 2. */}
       <div className={`sticky-actions sticky z-20 -mx-4 mt-4 gap-2 border-t ${step === 0 ? "hidden" : "flex"} border-[var(--border)] bg-white/95 p-4 backdrop-blur sm:mx-0 sm:rounded-lg sm:border`}>
         <button
@@ -1134,7 +1148,7 @@ export function InspectionForm({ context, unsigned = false }: { context: Inspect
                   </span>
                 ) : null}
               </div>
-              <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
+              <div className={`mt-3 grid gap-3 ${depositToCollect ? "sm:grid-cols-[1fr_1fr_auto]" : "sm:grid-cols-[1fr_auto]"}`}>
                 <label className="block">
                   <span className="text-sm font-bold text-[var(--foreground)]">{t("rentalPaymentReceived")}</span>
                   <input
@@ -1151,7 +1165,7 @@ export function InspectionForm({ context, unsigned = false }: { context: Inspect
                     value={deliveryPaymentAmount}
                   />
                 </label>
-                <label className="block">
+                <label className={depositToCollect ? "block" : "hidden"}>
                   <span className="text-sm font-bold text-[var(--foreground)]">{t("depositAmountReceived")}</span>
                   <input
                     className={inputClass}
@@ -1186,7 +1200,9 @@ export function InspectionForm({ context, unsigned = false }: { context: Inspect
                     {t("receiptNumberGenerated", { number: receiptResult.receipt_number })}
                   </p>
                   <p className="mt-1 text-xs font-semibold text-[var(--success)]">
-                    {t("receiptBreakdown", { rent: money(Number(deliveryPaymentAmount || 0)), deposit: money(Number(deliveryDepositAmount || 0)) })}
+                    {Number(deliveryDepositAmount || 0) > 0
+                      ? t("receiptBreakdown", { rent: money(Number(deliveryPaymentAmount || 0)), deposit: money(Number(deliveryDepositAmount || 0)) })
+                      : t("receiptRentOnly", { rent: money(Number(deliveryPaymentAmount || 0)) })}
                   </p>
                   {receiptResult.warning ? (
                     <p className="mt-2 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] px-3 py-2 text-xs font-bold text-[var(--warning)]">{receiptResult.warning}</p>

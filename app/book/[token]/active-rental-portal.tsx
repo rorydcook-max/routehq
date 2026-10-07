@@ -26,6 +26,7 @@ export function ActiveRentalPortal({
   certificateUrl,
   deliveryPhotoUrls,
   reports = [],
+  receipts = [],
   ownerContact,
   payments = [],
   paymentBundle = null,
@@ -45,6 +46,8 @@ export function ActiveRentalPortal({
   deliveryPhotoUrls: string[];
   /** Signed handover and collection reports. */
   reports?: Array<{ id: string; kind: "handover" | "return"; swap: boolean; url: string }>;
+  /** Receipts the business has issued for payments on this rental. */
+  receipts?: Array<{ id: string; number: string; url: string }>;
   ownerContact?: string | null;
   payments?: PortalPayment[];
   paymentBundle?: PortalBundle | null;
@@ -193,6 +196,12 @@ export function ActiveRentalPortal({
             <a className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-4 text-sm font-semibold text-[var(--foreground)]" href={report.url} key={report.id} rel="noreferrer" target="_blank">
               <FileText className="mb-2 text-[var(--primary)]" />
               {t(report.kind === "return" ? (report.swap ? "reportCollection" : "reportReturn") : report.swap ? "reportHandoverSwap" : "reportHandover")}
+            </a>
+          ))}
+          {receipts.map((receipt) => (
+            <a className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-4 text-sm font-semibold text-[var(--foreground)]" href={receipt.url} key={receipt.id} rel="noreferrer" target="_blank">
+              <FileText className="mb-2 text-[var(--primary)]" />
+              {t("receiptNumbered", { number: receipt.number })}
             </a>
           ))}
           {deliveryPhotoUrls.length ? (

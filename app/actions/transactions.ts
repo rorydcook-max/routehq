@@ -40,8 +40,18 @@ function formatReceiptAmount(amount: number) {
 }
 
 function formatReceiptMethod(value: string) {
+  const known: Record<string, string> = {
+    cash: "Cash / เงินสด",
+    promptpay: "PromptPay / พร้อมเพย์",
+    bank_transfer: "Bank transfer / โอนผ่านธนาคาร",
+    wise: "Wise",
+    revolut: "Revolut"
+  };
+  const key = value.trim().toLowerCase();
+  if (!key) return known.cash;
+  if (known[key]) return known[key];
   const normalized = value.replace(/_/g, " ").trim();
-  return normalized ? normalized.charAt(0).toUpperCase() + normalized.slice(1) : "Cash";
+  return normalized.charAt(0).toUpperCase() + normalized.slice(1);
 }
 
 export type GenerateReceiptInput = {
@@ -101,7 +111,7 @@ export async function generateReceipt(input: GenerateReceiptInput) {
   const prefix = String(organization.receipt_prefix || "REC").trim() || "REC";
   const receiptNumber = `${prefix}-${year}-${String((count || 0) + 1).padStart(4, "0")}`;
   const receiptId = crypto.randomUUID();
-  const receiptDate = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(new Date());
+  const receiptDate = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Bangkok" }).format(new Date());
   const vehicle = [input.vehicleMakeModel, input.vehiclePlate].filter(Boolean).join(" - ");
   const footerHtml = organization.receipt_footer_text
     ? `<p style="font-size: 12px; color: #717d86; text-align: center; border-top: 1px solid #e3e6e8; padding-top: 12px; margin: 0;">${escapeHtml(organization.receipt_footer_text)}</p>`
@@ -117,24 +127,24 @@ export async function generateReceipt(input: GenerateReceiptInput) {
   const receiptHtml = `
 <div style="font-family: Arial, sans-serif; max-width: 400px; margin: 0 auto; padding: 24px; border: 1px solid #e3e6e8; border-radius: 8px;">
   <div style="text-align: center; margin-bottom: 20px;">
-    <p style="font-size: 11px; color: #717d86; margin: 0; letter-spacing: 0.08em; text-transform: uppercase;">RECEIPT</p>
+    <p style="font-size: 11px; color: #717d86; margin: 0; letter-spacing: 0.08em; text-transform: uppercase;">RECEIPT / ใบเสร็จรับเงิน</p>
     ${receiptBrandHtml}
     <p style="font-size: 13px; color: #454d54; margin: 0;">${escapeHtml(receiptNumber)} · ${escapeHtml(receiptDate)}</p>
   </div>
   <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 12px; text-align: center; margin-bottom: 20px;">
-    <p style="font-size: 11px; color: #16a34a; margin: 0; font-weight: 600; letter-spacing: 0.08em;">PAID</p>
+    <p style="font-size: 11px; color: #16a34a; margin: 0; font-weight: 600; letter-spacing: 0.08em;">PAID / ชำระแล้ว</p>
     <p style="font-size: 28px; font-weight: 700; color: #16a34a; margin: 4px 0;">฿${formatReceiptAmount(amount)}</p>
     <p style="font-size: 12px; color: #16a34a; margin: 0;">${escapeHtml(formatReceiptMethod(input.paymentMethod))}</p>
   </div>
   <div style="margin-bottom: 16px;">
     <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f1f3f4; font-size: 13px;">
-      <span style="color: #717d86;">Customer</span><span style="color: #1a1d21; font-weight: 500;">${escapeHtml(input.customerName)}</span>
+      <span style="color: #717d86;">Customer / ลูกค้า</span><span style="color: #1a1d21; font-weight: 500;">${escapeHtml(input.customerName)}</span>
     </div>
     <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f1f3f4; font-size: 13px;">
-      <span style="color: #717d86;">Vehicle</span><span style="color: #1a1d21; font-weight: 500;">${escapeHtml(vehicle)}</span>
+      <span style="color: #717d86;">Vehicle / รถ</span><span style="color: #1a1d21; font-weight: 500;">${escapeHtml(vehicle)}</span>
     </div>
     <div style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px;">
-      <span style="color: #717d86;">Rental period</span><span style="color: #1a1d21; font-weight: 500;">${escapeHtml(input.rentalPeriod)}</span>
+      <span style="color: #717d86;">Rental period / ช่วงเวลาเช่า</span><span style="color: #1a1d21; font-weight: 500;">${escapeHtml(input.rentalPeriod)}</span>
     </div>
   </div>
   ${footerHtml}

@@ -443,6 +443,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             bookingData={bookingData}
             deliveryPhotoUrls={detail.deliveryPhotoUrls || []}
             reports={detail.inspectionReports || []}
+            receipts={detail.receipts || []}
             organizationName={businessName}
             endNoticeDays={bookingRules(organization?.settings).endNoticeDays}
             extensionRates={rentalRateCard(vehicle, rental)}
@@ -494,11 +495,16 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
                 {t("contactNamed", { business: businessName })}
               </a>
             ) : null}
-            {(detail.inspectionReports || []).length > 0 ? (
+            {(detail.inspectionReports || []).length + (detail.receipts || []).length > 0 ? (
               <div className="mt-5 flex flex-wrap justify-center gap-2">
                 {(detail.inspectionReports || []).map((report: any) => (
                   <a className="pressable inline-flex rounded-xl border border-[var(--primary)] bg-white px-5 py-3 text-sm font-semibold text-[var(--primary)]" href={report.url} key={report.id} rel="noreferrer" target="_blank">
                     {t(report.kind === "return" ? (report.swap ? "reportCollection" : "reportReturn") : report.swap ? "reportHandoverSwap" : "reportHandover")}
+                  </a>
+                ))}
+                {(detail.receipts || []).map((receipt) => (
+                  <a className="pressable inline-flex rounded-xl border border-[var(--primary)] bg-white px-5 py-3 text-sm font-semibold text-[var(--primary)]" href={receipt.url} key={receipt.id} rel="noreferrer" target="_blank">
+                    {t("receiptNumbered", { number: receipt.number })}
                   </a>
                 ))}
               </div>

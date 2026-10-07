@@ -144,8 +144,8 @@ function buildContractPreviewDocument(contractHtml: string) {
       body {
         margin: 0;
         padding: 0;
-        background: var(--primary-light);
-        color: var(--foreground);
+        background: #ffffff;
+        color: #1a1d21;
         font-family: Arial, sans-serif;
       }
 
@@ -712,12 +712,17 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
   // Earliest time the picker allows: now, on the customer's own clock. Set after the page loads so the
   // server and the phone never disagree about what "now" is (it was also seven hours out, being in UTC).
   const [minDateTime, setMinDateTime] = useState("");
+  // Until the page is live in the browser, a tap on the button would send the form the old-fashioned way and
+  // land the customer on an error page. On a slow phone that gap is seconds long, so the button waits.
+  const [pageLive, setPageLive] = useState(false);
+  useEffect(() => setPageLive(true), []);
   useEffect(() => {
     const now = new Date();
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     setMinDateTime(now.toISOString().slice(0, 16));
   }, []);
   const operatorDeliveryDateTime = compactDateTime(detail.bookingData.delivery_datetime);
+  const customerCollects = ["collect", "collection"].includes(String((detail as any).rental?.delivery_method || detail.bookingData.delivery_method || ""));
   const operatorDeliveryIsToday = isTodayDateTime(operatorDeliveryDateTime);
   const operatorDeliveryTimeLabel = timeLabelFromDateTime(operatorDeliveryDateTime);
 
@@ -1218,12 +1223,20 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
       </section>
 
       {/* When the business has already set both the place and the time, they are shown at the top: asking again is only for a customer who wants them changed. */}
-      <HandoverWishes agreed={Boolean(String(detail.bookingData.delivery_location || "").trim() && operatorDeliveryDateTime)} changeLabel={t.has("handoverChange" as never) ? t("handoverChange" as never) : t("handoverPreferences")} intro={t("handoverPreferencesIntro")} title={t("handoverPreferences")}>
+      <HandoverWishes
+        agreed={Boolean((customerCollects || String(detail.bookingData.delivery_location || "").trim()) && operatorDeliveryDateTime)}
+        changeLabel={customerCollects ? t("collectChange") : t("handoverChange")}
+        intro={customerCollects ? t("collectWhenIntro") : t("handoverPreferencesIntro")}
+        title={customerCollects ? t("collectWhen") : t("handoverPreferences")}
+      >
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <label className="sm:col-span-2">
-            <span className="text-sm font-bold text-[var(--foreground-secondary)]">{t("preferredPlace")}</span>
-            <GoogleAddressInput name="preferredDeliveryLocation" onChange={setPreferredDeliveryLocation} value={preferredDeliveryLocation} />
-          </label>
+          {/* Someone collecting from the shop already knows where: they are only asked when. */}
+          {customerCollects ? null : (
+            <label className="sm:col-span-2">
+              <span className="text-sm font-bold text-[var(--foreground-secondary)]">{t("preferredPlace")}</span>
+              <GoogleAddressInput name="preferredDeliveryLocation" onChange={setPreferredDeliveryLocation} value={preferredDeliveryLocation} />
+            </label>
+          )}
           <label className="sm:col-span-2">
             <span className="text-sm font-bold text-[var(--foreground-secondary)]">{t("preferredTime")}</span>
             {operatorDeliveryIsToday ? (
@@ -1489,7 +1502,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           </>
         ) : null}
         {error ? <p className="mt-4 rounded-xl bg-[var(--danger-light)] p-3 text-sm font-bold text-[var(--danger)]">{error}</p> : null}
-        <button className="pressable mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white disabled:opacity-70" disabled={isPending} key={readyToSign ? "sign" : "review"} type="submit">
+        <button className="pressable mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white disabled:opacity-70" disabled={isPending || !pageLive} key={readyToSign ? "sign" : "review"} type="submit">
           {isPending ? (
             <span className="inline-flex items-center gap-2"><span className="spinner" /> {t("sending")}</span>
           ) : readyToSign ? (

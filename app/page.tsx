@@ -6,18 +6,12 @@ import { dayOfWeekDate, intlLocale, shortDate as shortDateIn } from "@/lib/i18n/
 import { ArrowRight, Bell, CalendarClock, CheckCircle2, FileWarning, KeyRound, Plus, ReceiptText, RotateCcw, Wallet } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { businessToday } from "@/lib/business-time";
-import { FleetIntelligencePanel } from "@/components/dashboard/fleet-intelligence-panel";
-import { FleetPnLCard } from "@/components/dashboard/fleet-pnl-card";
-import { FleetValueCard } from "@/components/dashboard/fleet-value-card";
-import { RouteHQValueWidget } from "@/components/dashboard/routehq-value-widget";
-import { VehicleTimelinePanel } from "@/components/dashboard/vehicle-timeline-panel";
 import { OnboardingChecklist } from "@/components/onboarding-checklist";
 import { OutFreeSummary, VehicleKindIcon } from "@/components/vehicle-kind-icon";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDashboardData, money } from "@/lib/dashboard";
 import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization";
 import { getCurrentMembership } from "@/lib/auth/roles";
-import { getValueTrackerData } from "@/lib/value-tracker";
 import { getOnboardingStatus } from "@/lib/onboarding";
 import { getReceiptsWaiting } from "@/lib/payment-receipts";
 import { getTaskList } from "@/lib/tasks";
@@ -127,17 +121,8 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   const jobName = (action: string | null | undefined) => (action && todo.has(`job_${action}` as never) ? todo(`job_${action}` as never) : null);
   const shortDate = (value: string) => shortDateIn(value, locale);
   const dayLabel = (value: string) => dayOfWeekDate(value, locale);
-  const [onboardingStatus, categories, valueTrackerData] = await Promise.all([
-    getOnboardingStatus(supabase as any, organization.id),
-    getVehicleCategories(organization.id),
-    getValueTrackerData({
-      organizationId: organization.id,
-      subscriptionTier: organization.subscription_tier,
-      createdAt: organization.created_at,
-      supabase: supabase as any
-    })
-  ]);
-  const { metrics, reminders, rentals, timeline, transactions, vehicles } = dashboardData;
+  const [onboardingStatus, categories] = await Promise.all([getOnboardingStatus(supabase as any, organization.id), getVehicleCategories(organization.id)]);
+  const { metrics, reminders, rentals, transactions, vehicles } = dashboardData;
   const [receiptsWaiting, taskList, unsentResult] = await Promise.all([
     getReceiptsWaiting(organization.id),
     getTaskList(organization.id).catch(() => []),
@@ -193,13 +178,6 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   const overdueTotal = overdueRentals.reduce((sum, r) => sum + (r.overdue || 0), 0);
   const depositsHeld = metrics.depositsHeld ?? rentals.reduce((sum, r) => sum + (r.depositHeld || 0), 0);
   const depositsHeldCount = metrics.depositsHeldCount ?? rentals.filter((r) => (r.depositHeld || 0) > 0).length;
-
-  // ── Fleet value (kept for the insights section) ─────────────────────────
-  const valuedVehicles = vehicles.filter((v) => v.estimatedValue > 0 && v.purchasePrice > 0);
-  const totalFleetValue = vehicles.reduce((sum, v) => sum + (v.estimatedValue > 0 ? v.estimatedValue : v.purchasePrice), 0);
-  const totalPurchasePrice = vehicles.reduce((sum, v) => sum + v.purchasePrice, 0);
-  const totalDepreciation = valuedVehicles.reduce((sum, v) => sum + (v.purchasePrice - v.estimatedValue), 0);
-  const totalOperatingProfit = vehicles.reduce((sum, v) => sum + v.profit, 0);
 
   // ── Fleet at a glance ────────────────────────────────────────────────────
   const groups = groupVehiclesByKind(vehicles, categories);
@@ -579,29 +557,6 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
         ) : null}
       </div>
 
-      {isOwner ? (
-      <details className="card group mt-4">
-        <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-4 text-[16px] font-bold text-[var(--foreground)]">
-          {t("moreInsights")}
-          <span className="font-medium text-[var(--muted)] group-open:hidden">{t("moreInsightsHint")}</span>
-        </summary>
-        <div className="space-y-4 border-t border-[var(--border)] p-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <FleetValueCard
-              totalDepreciation={totalDepreciation}
-              totalFleetValue={totalFleetValue}
-              totalPurchasePrice={totalPurchasePrice}
-              valuedCount={valuedVehicles.length}
-              vehicleCount={vehicles.length}
-            />
-            <FleetPnLCard fleetNetPnL={-totalDepreciation + totalOperatingProfit} totalDepreciation={totalDepreciation} totalOperatingProfit={totalOperatingProfit} />
-          </div>
-          <FleetIntelligencePanel averageUtilization={metrics.averageUtilization} vehicles={vehicles} />
-          <RouteHQValueWidget data={valueTrackerData} />
-          <VehicleTimelinePanel timeline={timeline} />
-        </div>
-      </details>
-      ) : null}
     </AppShell>
   );
 }

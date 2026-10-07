@@ -141,6 +141,7 @@ export function VehicleIdentityFields({
   const [insuranceExpiryDate, setInsuranceExpiryDate] = useState("");
   const [ocrStatus, setOcrStatus] = useState<"idle" | "reading" | "done" | "error">("idle");
   const [ocrMessage, setOcrMessage] = useState("");
+  const [bookFileName, setBookFileName] = useState("");
   const [catalogStatus, setCatalogStatus] = useState<"loading" | "ready" | "error">(initialMakes.length > 0 ? "ready" : "loading");
   const [catalogMessage, setCatalogMessage] = useState("");
   const [makes, setMakes] = useState<VehicleMake[]>(initialMakes);
@@ -484,17 +485,21 @@ export function VehicleIdentityFields({
       <div className="card p-4">
         <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("bookTitle")}</h2>
         <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("bookBody")}</p>
-        <label className="mt-3 block">
-          <span className={labelClass}>{say("bookLabel")}</span>
+        {/* A proper button, in the reader's language. No forced camera: the phone offers the camera or an existing photo or PDF. */}
+        <label className="secondary-action pressable mt-3 w-full cursor-pointer">
+          {bookFileName ? say("bookChange") : say("bookLabel")}
           <input
             accept="image/*,application/pdf"
-            capture="environment"
-            className="mt-1 w-full"
+            className="sr-only"
             name="logbookFile"
-            onChange={(event) => handleOcrFileChange(event.target.files?.[0] || null)}
+            onChange={(event) => {
+              setBookFileName(event.target.files?.[0]?.name || "");
+              handleOcrFileChange(event.target.files?.[0] || null);
+            }}
             type="file"
           />
         </label>
+        {bookFileName ? <p className="mt-2 break-all font-medium text-[var(--foreground-secondary)]">{bookFileName}</p> : null}
         {ocrStatus !== "idle" ? (
           <p
             className={`mt-3 rounded-lg px-3 py-2 text-sm font-semibold ${

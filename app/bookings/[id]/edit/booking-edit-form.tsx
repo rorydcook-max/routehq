@@ -35,7 +35,11 @@ const includedOptions = [
   "Car seat",
   "GPS tracker",
   "Unlimited mileage",
-  "Free fuel"
+  "Free fuel",
+  "Helmet",
+  "Second helmet",
+  "Phone holder",
+  "Rain poncho"
 ];
 
 const paymentStatusOptions = ["pending", "paid", "overdue", "waived", "scheduled", "cancelled", "refunded", "reconciled"];

@@ -49,7 +49,7 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
   const [{ data: vehicles, error: vehiclesError }, { data: customers, error: customersError }, { data: organizationDetails }] = await Promise.all([
     supabase
       .from("vehicles")
-      .select("id, make, model, trim, year, registration_number, status, availability_status, daily_rate, weekly_rate, monthly_rate, deposit_amount, color")
+      .select("id, make, model, trim, year, registration_number, status, availability_status, daily_rate, weekly_rate, monthly_rate, deposit_amount, color, category_id")
       .eq("organization_id", organization.id)
       .is("deleted_at", null)
       .order("created_at", { ascending: false }),
@@ -70,8 +70,12 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
   const t = await getTranslations("newBooking");
   const busyPeriods = await loadBusyPeriods(supabase, organization.id);
 
+  // Which kind each vehicle is, so the form can show a scooter as a scooter and offer a helmet, not a car seat.
+  const { data: categoryRows } = await supabase.from("vehicle_categories").select("id, code");
+  const categoryCodes = new Map<string, string>((categoryRows || []).map((row: any) => [row.id, row.code]));
   const normalizedVehicles = (vehicles || []).map((vehicle: any) => ({
     ...vehicle,
+    category_code: categoryCodes.get(vehicle.category_id) || null,
     year: vehicle.year ? Number(vehicle.year) : null,
     daily_rate: Number(vehicle.daily_rate || 0),
     weekly_rate: Number(vehicle.weekly_rate || 0),

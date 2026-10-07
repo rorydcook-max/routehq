@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import type { LucideIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { longDate, shortDate } from "@/lib/i18n/dates";
-import { CalendarDays, Car, CheckCircle2, Copy, MapPin, Send, UserPlus, UserRound, X } from "lucide-react";
+import { Bike, CalendarDays, Car, CheckCircle2, Copy, MapPin, Send, UserPlus, UserRound, X } from "lucide-react";
 import { createBooking } from "@/app/actions/bookings";
 import { CustomerSelector } from "@/components/customer-selector";
 import { Badge, ProgressBar } from "@/components/ui";
@@ -20,6 +20,7 @@ type BookingVehicle = {
   trim: string | null;
   year: number | null;
   registration_number: string;
+  category_code?: string | null;
   status: string;
   availability_status: string;
   daily_rate: number;
@@ -117,8 +118,16 @@ const includedOptions = [
   "Car seat",
   "GPS tracker",
   "Unlimited mileage",
-  "Free fuel"
+  "Free fuel",
+  "Helmet",
+  "Second helmet",
+  "Phone holder",
+  "Rain poncho"
 ];
+// Offered for motorbikes and scooters only; a car seat is offered for everything else.
+const twoWheelerOnly = new Set(["Helmet", "Second helmet", "Phone holder", "Rain poncho"]);
+const notForTwoWheelers = new Set(["Car seat"]);
+const isTwoWheeler = (code: string | null | undefined) => ["scooter", "motorcycle", "ebike"].includes(String(code || ""));
 
 const CURRENCY_INFO: Record<string, { symbol: string; locale: string; label: string }> = {
   THB: { symbol: "฿", locale: "th-TH", label: "Thai Baht" },
@@ -734,7 +743,7 @@ export function BookingForm({
                 >
                   <div className="flex items-start gap-3">
                     <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-[var(--primary-light)] text-[var(--primary)]">
-                      <Car size={25} />
+                      {isTwoWheeler(vehicle.category_code) ? <Bike size={25} /> : <Car size={25} />}
                     </span>
                     <span className="min-w-0">
                       <span className="block text-lg font-semibold text-[var(--foreground)]">{vehicleTitle(vehicle)}</span>
@@ -748,6 +757,10 @@ export function BookingForm({
                             </Badge>
                           );
                         })()}
+                        {/* The price most bookings of this vehicle use: the daily one when there is one, else what it has. */}
+                        {vehicle.daily_rate > 0 ? (
+                          <Badge tone="neutral"><span className="font-mono-data">{say("per_daily", { amount: money(vehicle.daily_rate, currency) })}</span></Badge>
+                        ) : null}
                         {vehicle.monthly_rate > 0 ? (
                           <Badge tone="neutral"><span className="font-mono-data">{say("perMonth", { amount: money(vehicle.monthly_rate, currency) })}</span></Badge>
                         ) : null}
@@ -950,7 +963,9 @@ export function BookingForm({
           <div className="mt-3">
             <p className="text-[13px] font-semibold text-[var(--foreground)]">{say("included")}</p>
             <div className="mt-3 grid grid-cols-2 gap-2">
-              {includedOptions.map((item) => (
+              {includedOptions
+                .filter((item) => (isTwoWheeler(selectedVehicle?.category_code) ? !notForTwoWheelers.has(item) : !twoWheelerOnly.has(item)) || includedItems.includes(item))
+                .map((item) => (
                 <label
                   className="checkbox-label sub-surface min-h-12 font-bold text-[var(--foreground-secondary)]"
                   key={item}

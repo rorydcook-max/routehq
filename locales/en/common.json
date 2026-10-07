@@ -788,7 +788,8 @@
     "askWrong": "Wrong? Tell me what to change.",
     "askLooking": "Looking through your records…",
     "askFooter": "Written by AI from your records. Nothing is changed until you press Confirm.",
-    "setup_signature": "Add your signature"
+    "setup_signature": "Add your signature",
+    "setupTitleLater": "Finish setting up"
   },
   "todo": {
     "eyebrow": "Tasks",
@@ -2010,7 +2011,11 @@
     "noVehiclesEyebrow": "No vehicles",
     "noVehiclesTitle": "Add a vehicle before creating bookings",
     "noVehiclesBody": "A booking needs a vehicle, so RouteHQ can tie the dates, forms, payments and earnings to the right one.",
-    "addVehicle": "Add vehicle"
+    "addVehicle": "Add vehicle",
+    "inc_8": "Helmet",
+    "inc_9": "Second helmet",
+    "inc_10": "Phone holder",
+    "inc_11": "Rain poncho"
   },
   "fleet": {
     "title": "Fleet",
@@ -2583,7 +2588,7 @@
     "body": "Body type",
     "bookTitle": "Take a photo of the blue book",
     "bookBody": "We read the registration book and fill in what we can. Check the details before saving.",
-    "bookLabel": "Photo or PDF of the blue book",
+    "bookLabel": "Take or choose a photo",
     "bookReading": "Reading the document…",
     "bookDone": "Filled in what we could read. Check each field before saving.",
     "bookFailed": "Could not read this document. Fill the details in by hand.",
@@ -2612,7 +2617,10 @@
     "n_placeholder": "Anything worth remembering: quirks, service reminders, where the spare key is",
     "n_auto": "Saves when you tap away",
     "n_edited": "Last edited {date}",
-    "needMake": "Choose the make and model first."
+    "needMake": "Choose the make and model first.",
+    "ratesBody": "Fill in at least one. The others are worked out from it when you take a booking.",
+    "needPrice": "Add at least one price before saving.",
+    "bookChange": "Use a different photo"
   },
   "bookingEdit": {
     "crumbBookings": "Bookings",

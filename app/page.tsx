@@ -506,6 +506,7 @@ export default async function Home() {
         <PushToggle variant="prompt" />
         {!onboardingStatus.hidden && onboardingStatus.counts.rentals > 0 ? (
           <OnboardingChecklist
+            firstBookingTaken
             completedCount={onboardingStatus.completedCount}
             items={onboardingStatus.items}
             organizationId={organization.id}

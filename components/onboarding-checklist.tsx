@@ -22,12 +22,15 @@ export function OnboardingChecklist({
   completedCount,
   items,
   organizationId,
-  totalCount
+  totalCount,
+  firstBookingTaken = false
 }: {
   completedCount: number;
   items: ChecklistItem[];
   organizationId: string;
   totalCount: number;
+  /** Once a booking exists the card is about finishing off, not about getting ready. */
+  firstBookingTaken?: boolean;
 }) {
   const t = useTranslations("shell");
   const [hidden, setHidden] = useState(false);
@@ -59,7 +62,7 @@ export function OnboardingChecklist({
     <section className="card p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <h2 className="text-[17px] font-bold text-[var(--foreground)]">{t("setupTitle")}</h2>
+          <h2 className="text-[17px] font-bold text-[var(--foreground)]">{t(firstBookingTaken ? "setupTitleLater" : "setupTitle")}</h2>
           <p className="font-medium text-[var(--foreground-secondary)]">{t("setupProgress", { done: completedCount, total: totalCount })}</p>
         </div>
         <form action={dismissChecklist}>

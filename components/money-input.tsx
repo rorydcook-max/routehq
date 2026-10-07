@@ -31,12 +31,15 @@ export function MoneyInput({
   name,
   defaultValue = "",
   currency = "THB",
-  required = false
+  required = false,
+  onValueChange
 }: {
   name: string;
   defaultValue?: string | number;
   currency?: string;
   required?: boolean;
+  /** Told the plain digits each time the amount changes. */
+  onValueChange?: (digits: string) => void;
 }) {
   const info = CURRENCY_INFO[currency] ?? CURRENCY_INFO["THB"];
   // "1200.50" must start as 1,201, not 120,050: round first, then keep the digits.
@@ -64,6 +67,7 @@ export function MoneyInput({
         onChange={(e) => {
           const digits = e.target.value.replace(/[^0-9]/g, "");
           setRaw(digits);
+          onValueChange?.(digits);
           setDisplay(formatAmount(digits, info.locale));
         }}
       />

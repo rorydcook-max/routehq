@@ -756,6 +756,7 @@ function countryOption(country: string) {
 }
 
 function regionOptions(country: string) {
+  if (country === "Other") return [{ name: "Other", towns: ["Other"] }];
   const regions = countryOption(country).regions;
   return regions.some((region) => region.name === "Other") ? regions : [...regions, { name: "Other", towns: ["Other"] }];
 }
@@ -944,6 +945,7 @@ export function OnboardingWizard({
                             {localizedLocationLabel(option.country, profile.language)}
                           </option>
                         ))}
+                        <option value="Other">{localizedLocationLabel("Other", profile.language)}</option>
                       </select>
                     </label>
                     <label className="block">

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { createVehicle } from "@/app/actions/vehicles";
 import { ComplianceFields } from "@/app/fleet/new/compliance-fields";
+import { RatesFields } from "@/app/fleet/new/rates-fields";
 import { VehicleIdentityFields } from "@/app/fleet/new/vehicle-identity-fields";
 import { AppShell } from "@/components/app-shell";
 import { LocalizedDateInput } from "@/components/localized-date-input";
@@ -28,11 +29,19 @@ export default async function NewVehiclePage() {
   const {
     data: { user }
   } = await supabase.auth.getUser();
-  const [categories, branches, { data: profile }] = await Promise.all([
+  const [allCategories, branches, { data: profile }, { data: organizationSettings }] = await Promise.all([
     getVehicleCategories(organization.id),
     ensureDefaultBranch(organization),
-    supabase.from("users").select("preferred_locale, preferred_calendar").eq("id", user?.id).maybeSingle()
+    supabase.from("users").select("preferred_locale, preferred_calendar").eq("id", user?.id).maybeSingle(),
+    supabase.from("organizations").select("settings").eq("id", organization.id).maybeSingle()
   ]);
+  // Start on the kind of vehicle the business said it rents: a scooter shop should not have to change "Car" every time.
+  const fleetType = String(organizationSettings?.settings?.fleet_type || "");
+  const firstCodes = fleetType === "motorcycles" ? ["scooter", "motorcycle"] : ["car"];
+  const categories = [...allCategories].sort((a, b) => {
+    const rank = (code: string) => (firstCodes.includes(code) ? firstCodes.indexOf(code) : firstCodes.length);
+    return rank(a.code) - rank(b.code);
+  });
   const preferredLocale = profile?.preferred_locale || organization.default_locale || "en";
   const preferredCalendar = profile?.preferred_calendar || defaultCalendarForLocale(preferredLocale);
   const defaultCategoryCode = categories[0]?.code || "car";
@@ -75,28 +84,7 @@ export default async function NewVehiclePage() {
 
           <VehicleIdentityFields categories={categories} initialMakes={vehicleMakes || []} inputClass={inputClass} />
 
-          <div className="card p-4">
-            <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("ratesTitle")}</h2>
-            <div className="mt-3 grid gap-4 sm:grid-cols-3">
-              <label className="block">
-                <span className={labelClass}>{say("daily")}</span>
-                <MoneyInput currency={currency} name="dailyRate" />
-              </label>
-              <label className="block">
-                <span className={labelClass}>{say("weekly")}</span>
-                <MoneyInput currency={currency} name="weeklyRate" />
-              </label>
-              <label className="block">
-                <span className={labelClass}>{say("monthly")}</span>
-                <MoneyInput currency={currency} name="monthlyRate" />
-              </label>
-            </div>
-            <label className="mt-4 block sm:max-w-xs">
-              <span className={labelClass}>{say("deposit")}</span>
-              <MoneyInput currency={currency} name="depositAmount" />
-              <span className="mt-1 block font-medium text-[var(--muted)]">{say("depositHint")}</span>
-            </label>
-          </div>
+          <RatesFields currency={currency} />
 
           {/* Everything below can wait: one tap away, filled in any time. */}
           <Fold summary={say("datesSummary")} title={say("datesTitle")}>

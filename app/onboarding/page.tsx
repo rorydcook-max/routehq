@@ -25,6 +25,15 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
   const { data: membership } = await getActiveMembership(supabase, user.id);
 
   if (!membership?.organization_id) {
+    // They typed the business name when they signed up: do not ask for it again on its own screen. The wizard's first step shows it and lets them change it.
+    const signupName = String(user.user_metadata?.business_name || "").trim();
+    if (signupName.length >= 2 && signupName.length <= 120) {
+      const { error: createError } = await supabase.rpc("create_my_organization", {
+        p_name: signupName,
+        p_full_name: String(user.user_metadata?.full_name || "").trim() || null
+      });
+      if (!createError) redirect("/onboarding");
+    }
     const say = (await getTranslations("auth")) as unknown as (key: string) => string;
     return (
       <AuthCard body={say("orgBody")} title={say("orgTitle")}>

@@ -63,7 +63,7 @@ function formatDate(value: string | null | undefined, locale = "en-GB") {
   if (!value) {
     return "Not set";
   }
-  return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : locale, { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
+  return new Intl.DateTimeFormat(locale === "en" || locale === "en-GB" ? "en-GB" : `${locale}-u-ca-gregory-nu-latn`, { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
 }
 
 function money(value: unknown) {
@@ -386,7 +386,7 @@ function SignaturePad({
   );
 }
 
-export function InspectionForm({ context }: { context: InspectionContext }) {
+export function InspectionForm({ context, unsigned = false }: { context: InspectionContext; /** The customer has not signed the agreement yet. */ unsigned?: boolean }) {
   const t = useTranslations("inspection");
   const locale = useLocale();
   const areaName = (location: string) => {
@@ -779,6 +779,9 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                 </p>
                 {mode === "delivery" && context.rental?.start_date && String(context.rental.start_date).slice(0, 10) > new Date(Date.now() + 86_400_000).toISOString().slice(0, 10) ? (
                   <p className="mt-2 rounded-lg bg-[var(--warning-light)] px-3 py-2 text-sm font-semibold text-[var(--warning)]">{t("startsLaterNote", { date: formatDate(context.rental.start_date, locale) })}</p>
+                ) : null}
+                {mode === "delivery" && unsigned ? (
+                  <p className="mt-2 rounded-lg bg-[var(--warning-light)] px-3 py-2 text-sm font-semibold text-[var(--warning)]">{t("notSignedNote")}</p>
                 ) : null}
                 {mode === "return" ? (
                   <p className="mt-2 rounded-lg bg-[var(--warning-light)] px-3 py-2 text-sm font-bold text-[var(--warning)]">

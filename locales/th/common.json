@@ -315,7 +315,8 @@
     "refundHow": "คืนเงินด้วยวิธีใด",
     "refund_cash": "เงินสด",
     "refund_bank_transfer": "โอนเข้าบัญชี",
-    "refund_promptpay": "พร้อมเพย์"
+    "refund_promptpay": "พร้อมเพย์",
+    "notSignedNote": "ลูกค้ายังไม่ได้เซ็นสัญญาเช่า ส่งลิงก์ให้ลูกค้าเซ็นก่อนส่งมอบกุญแจ"
   },
   "translation": {
     "translatedFrom": "แปลจาก {language}",

@@ -329,7 +329,8 @@
     "refundHow": "How are you giving it back?",
     "refund_cash": "Cash",
     "refund_bank_transfer": "Bank transfer",
-    "refund_promptpay": "PromptPay"
+    "refund_promptpay": "PromptPay",
+    "notSignedNote": "The customer has not signed the rental agreement yet. Send them their link and have them sign before you hand over the keys."
   },
   "translation": {
     "translatedFrom": "Translated from {language}",

@@ -237,11 +237,15 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
     });
   }, [bookings, filter, search]);
 
+  // Only the filters that would show something, and none at all while there is nothing to choose between.
+  const usefulFilters = filters.filter((entry) => entry === "all" || entry === filter || bookings.some((booking) => matchesFilter(booking, entry)));
+  const showFilters = usefulFilters.length > 2 || filter !== "all";
+
   return (
     <div className="space-y-4">
       <div className="space-y-3">
         <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-          <label className="relative block min-w-0 flex-1">
+          <label className={`relative min-w-0 flex-1 ${bookings.length > 5 || search ? "block" : "hidden"}`}>
             <Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted)]" size={18} />
             <input
               className="input-with-leading-icon w-full rounded-full border-0 bg-white pr-4 font-medium text-[var(--foreground)] outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
@@ -251,8 +255,8 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
             />
           </label>
           {/* Wraps onto a second row on a phone: scrolling sideways hid half the filters with no sign they were there. */}
-          <div className="flex flex-wrap gap-2 xl:justify-end">
-            {filters.map((entry) => (
+          <div className={`flex-wrap gap-2 xl:justify-end ${showFilters ? "flex" : "hidden"}`}>
+            {usefulFilters.map((entry) => (
               <button
                 className={`pressable min-h-10 min-w-fit rounded-full px-4 font-bold ${filter === entry ? "bg-[var(--primary)] text-white" : "bg-white text-[var(--foreground)]"}`}
                 key={entry}

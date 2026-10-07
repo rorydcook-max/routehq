@@ -79,7 +79,8 @@ export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
 
       <div>
         <div className="grid grid-cols-2 gap-2 lg:grid-cols-[1fr_auto_auto]">
-          <label className="relative col-span-2 block lg:col-span-1">
+          {/* A short list needs no search or filters: they appear as the list grows. */}
+          <label className={`relative col-span-2 lg:col-span-1 ${customers.length > 5 ? "block" : "hidden"}`}>
             <Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted)]" size={18} />
             <input
               className="input-with-leading-icon w-full rounded-full border-0 bg-white pr-4 font-medium text-[var(--foreground)] outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
@@ -89,7 +90,7 @@ export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
             />
           </label>
           <select
-            className="min-w-0 rounded-full border-0 bg-white px-4 font-bold text-[var(--foreground)]"
+            className={`min-w-0 rounded-full border-0 bg-white px-4 font-bold text-[var(--foreground)] ${customers.length > 10 ? "" : "hidden"}`}
             onChange={(event) => setDocumentFilter(event.target.value)}
             value={documentFilter}
           >
@@ -98,7 +99,7 @@ export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
             <option value="incomplete">{say("incomplete")}</option>
           </select>
           <select
-            className="min-w-0 rounded-full border-0 bg-white px-4 font-bold text-[var(--foreground)]"
+            className={`min-w-0 rounded-full border-0 bg-white px-4 font-bold text-[var(--foreground)] ${customers.length > 10 ? "" : "hidden"}`}
             onChange={(event) => setRentalFilter(event.target.value)}
             value={rentalFilter}
           >

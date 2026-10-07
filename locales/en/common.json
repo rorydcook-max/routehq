@@ -1167,7 +1167,8 @@
     "selected": "{count} selected",
     "deleteThem": "Delete them? This can't be undone.",
     "yesDelete": "Yes, delete",
-    "deleteSelected": "Delete selected"
+    "deleteSelected": "Delete selected",
+    "moreDetails": "Who you paid and the mileage (optional)"
   },
   "booking": {
     "open": "Open",
@@ -3276,7 +3277,7 @@
     "profit": "Profit",
     "moneyIn": "Money in",
     "moneyOut": "Money out",
-    "profitNote": "Profit is money in less money out. Deposits are not counted unless you keep them.",
+    "profitNote": "Profit is money in less money out.",
     "sameAsBefore": "Same as the period before",
     "upOnBefore": "Up {percent}% on the period before",
     "downOnBefore": "Down {percent}% on the period before",

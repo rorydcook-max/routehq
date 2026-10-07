@@ -57,7 +57,8 @@ export function TransactionForm({
   );
   const [notes, setNotes] = useState(prefill?.notes || "");
   // No vehicle is preselected: a money entry silently booked against the first car in the list is worse than a required field.
-  const [vehicleId, setVehicleId] = useState(prefill?.vehicleId || defaultVehicleId || "");
+  // One vehicle in the business: it is the one.
+  const [vehicleId, setVehicleId] = useState(prefill?.vehicleId || defaultVehicleId || (options.vehicles.length === 1 ? options.vehicles[0].id : ""));
   const [rentalId, setRentalId] = useState(prefill?.rentalId || defaultRentalId);
   const [customerId, setCustomerId] = useState(prefill?.customerId || defaultCustomerId);
   const [linkedRentalPaymentId, setLinkedRentalPaymentId] = useState(prefill?.rentalPaymentId || "");
@@ -263,7 +264,8 @@ export function TransactionForm({
             </select>
           </label>
 
-          <label className="block">
+          {/* A repair or a tank of fuel belongs to the vehicle, not to a booking or a customer: those two are only asked for money in and refunds. */}
+          <label className={isMoneyIn || /refund|deposit/.test(type) ? "block" : "hidden"}>
             <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("booking")}</span>
             <select
               className={inputClass}
@@ -280,7 +282,7 @@ export function TransactionForm({
             </select>
           </label>
 
-          <label className="block">
+          <label className={isMoneyIn || /refund|deposit/.test(type) ? "block" : "hidden"}>
             <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("customer")}</span>
             <select className={inputClass} name="customerId" onChange={(event) => setCustomerId(event.target.value)} value={customerId}>
               <option value="">{say("noCustomer")}</option>
@@ -303,7 +305,9 @@ export function TransactionForm({
           </label>
 
           {isMoneyIn ? null : (
-            <>
+            <details className="sm:col-span-2">
+              <summary className="cursor-pointer py-1 text-[14px] font-semibold text-[var(--primary)]">{t.has("moreDetails") ? say("moreDetails") : "Who you paid and the mileage (optional)"}</summary>
+              <div className="mt-2 grid gap-3 sm:grid-cols-2">
               <label className="block">
                 <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("paidTo")}</span>
                 <input className={inputClass} name="supplier" placeholder={say("paidToPlaceholder")} />
@@ -313,7 +317,8 @@ export function TransactionForm({
                 <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("mileage")}</span>
                 <input className={inputClass} min="0" name="mileage" type="number" />
               </label>
-            </>
+              </div>
+            </details>
           )}
 
           <label className="block sm:col-span-2">

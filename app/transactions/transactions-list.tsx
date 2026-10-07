@@ -484,7 +484,8 @@ export function TransactionsList({
     const total = side === "in" ? incomeTotal : expenseTotal;
     return (
       <section className={`overflow-hidden rounded-xl border border-[var(--border)] bg-white shadow-[var(--shadow-sm)] ${phoneSide === side ? "" : "hidden lg:block"}`}>
-        <header className="flex items-center justify-between gap-3 px-4 py-3">
+        {/* On a phone the tab above and the totals at the top already say this; the heading is for the two-column layout. */}
+        <header className="hidden items-center justify-between gap-3 px-4 py-3 lg:flex">
           <div className="flex items-center gap-2.5">
             <span className={`inline-flex h-8 w-8 items-center justify-center rounded-[9px] ${side === "in" ? "bg-[var(--success-light)] text-[var(--success)]" : "bg-[var(--danger-light)] text-[var(--danger)]"}`}>
               {side === "in" ? <ArrowDownLeft size={17} /> : <ArrowUpRight size={17} />}

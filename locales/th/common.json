@@ -701,7 +701,10 @@
     "payCashOnly": "จ่ายเงินสดกับ {business} ได้เลย ไม่ต้องทำอะไรที่นี่",
     "handoverAgreed": "สถานที่และเวลารับรถอยู่ด้านบนของหน้านี้",
     "answersTitle": "คำตอบจาก {business}",
-    "answerDeclined": "ขออภัย ทำไม่ได้"
+    "answerDeclined": "ขออภัย ทำไม่ได้",
+    "amDue": "ครบกำหนด {date}",
+    "amFrom": "ตั้งแต่ {date}",
+    "amMore": "เพิ่ม {amount} ครบกำหนด {date}"
   },
   "customerMessages": {
     "hi": "สวัสดีคุณ {name}",

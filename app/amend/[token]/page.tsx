@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
+import { amendmentDisplayRows } from "@/lib/amendment-display";
 import { AlertTriangle, CheckCircle2, FileText } from "lucide-react";
 import { loadPublicAmendment } from "@/lib/public-amendment";
 import { AmendmentSignForm } from "./amendment-sign-form";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { CustomerLanguagePicker } from "@/components/customer-language-picker";
 
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("customer");
+  const locale = await getLocale();
   return { title: t("amendTitle"), robots: { index: false, follow: false } };
 }
 
@@ -38,6 +40,7 @@ export default async function AmendmentPage({ params }: { params: Promise<{ toke
   const { token } = await params;
   const amendment = await loadPublicAmendment(token);
   const t = await getTranslations("customer");
+  const locale = await getLocale();
 
   if (amendment.state === "not_found") {
     return <Message title={t("amendNotFoundTitle")} tone="red">{t("amendNotFoundMessage")}</Message>;
@@ -74,9 +77,9 @@ export default async function AmendmentPage({ params }: { params: Promise<{ toke
         {/* Say what is now agreed, so nobody has to open the PDF to check. */}
         {amendment.rows.length ? (
           <div className="mt-4 space-y-2 text-left">
-            {amendment.rows.map((row) => (
-              <div className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3" key={row.label}>
-                <p className="text-xs font-semibold uppercase text-[var(--muted)]">{({ Vehicle: t("rowVehicle"), "Return date": t("rowReturnDate"), "Charge for the extension": t("rowExtensionCharge"), "Rental rate": t("rowRentalRate"), "Security deposit": t("rowDeposit") } as Record<string, string>)[row.label] || row.label}</p>
+            {amendmentDisplayRows(amendment.changes, locale, t as unknown as (key: string, values?: Record<string, string | number>) => string).map((row) => (
+              <div className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3" key={row.key}>
+                <p className="text-xs font-semibold uppercase text-[var(--muted)]">{row.label}</p>
                 <p className="mt-1 text-sm font-semibold text-[var(--foreground)]"><bdi>{row.after}</bdi></p>
               </div>
             ))}
@@ -102,12 +105,12 @@ export default async function AmendmentPage({ params }: { params: Promise<{ toke
           <h1 className="mt-1 text-2xl font-semibold">{t("amendChangesTitle")}</h1>
           <p className="mt-1 text-sm font-bold text-[var(--muted)]">{amendment.vehicleLabel}</p>
           <div className="mt-4 space-y-2">
-            {amendment.rows.map((row) => (
-              <div className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3" key={row.label}>
-                <p className="text-xs font-semibold uppercase text-[var(--muted)]">{({ Vehicle: t("rowVehicle"), "Return date": t("rowReturnDate"), "Charge for the extension": t("rowExtensionCharge"), "Rental rate": t("rowRentalRate"), "Security deposit": t("rowDeposit") } as Record<string, string>)[row.label] || row.label}</p>
+            {amendmentDisplayRows(amendment.changes, locale, t as unknown as (key: string, values?: Record<string, string | number>) => string).map((row) => (
+              <div className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3" key={row.key}>
+                <p className="text-xs font-semibold uppercase text-[var(--muted)]">{row.label}</p>
                 <p className="mt-1 text-sm">
-                  {row.before !== "-" ? <span className="text-[var(--muted)] line-through">{row.before}</span> : null}
-                  {row.before !== "-" ? <span className="mx-2 text-[var(--muted)]">→</span> : null}
+                  {row.before ? <span className="text-[var(--muted)] line-through">{row.before}</span> : null}
+                  {row.before ? <span className="mx-2 text-[var(--muted)]">→</span> : null}
                   <span className="font-semibold text-[var(--primary)]">{row.after}</span>
                 </p>
               </div>

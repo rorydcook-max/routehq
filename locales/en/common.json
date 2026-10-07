@@ -692,7 +692,10 @@
     "payCashOnly": "Pay {business} in cash. There is nothing to do here.",
     "handoverAgreed": "The place and time for the handover are at the top of this page.",
     "answersTitle": "Replies from {business}",
-    "answerDeclined": "Sorry, we can't do that."
+    "answerDeclined": "Sorry, we can't do that.",
+    "amDue": "due {date}",
+    "amFrom": "from {date}",
+    "amMore": "{amount} more, due {date}"
   },
   "customerMessages": {
     "hi": "Hi {name},",

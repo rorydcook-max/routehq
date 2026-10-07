@@ -51,7 +51,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
   const groups = groupVehiclesByKind(vehicles, categories);
   const totalOut = vehicles.filter((vehicle) => vehicle.status === "Rented").length;
   const totalFree = vehicles.filter((vehicle) => vehicle.status === "Available" || Boolean(vehicle.freeUntil)).length;
-  const dayMonth = (value: string) => new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${value}T00:00:00Z`));
+  const dayMonth = (value: string) => new Intl.DateTimeFormat(locale === "en" ? "en-GB" : `${locale}-u-ca-gregory-nu-latn`, { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${value}T00:00:00Z`));
   const [t, c, locale] = await Promise.all([getTranslations("fleet"), getTranslations("common"), getLocale()]);
   const kindName = (group: { kind: string; label: string }) => (c.has(`kinds_${group.kind}`) ? c(`kinds_${group.kind}`) : group.label);
 

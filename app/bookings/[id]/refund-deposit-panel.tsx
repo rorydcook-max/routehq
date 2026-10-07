@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
+import { shownError } from "@/lib/error-text";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
@@ -81,7 +82,7 @@ export function RefundDepositPanel({
         setMessage(successMessage);
         router.refresh();
       } catch (caught) {
-        setError(caught instanceof Error ? caught.message : say("ref_wrong"));
+        setError(shownError(caught, say("ref_wrong")));
       }
     });
   }
@@ -191,6 +192,14 @@ export function RefundDepositPanel({
                 />
               </label>
               <label className="mt-3 block text-xs font-bold text-[var(--foreground-secondary)]">
+                {say("ref_how")}
+                <select className="mt-1 w-full" defaultValue="cash" name="paymentMethod">
+                  <option value="cash">{say("ref_cash")}</option>
+                  <option value="bank_transfer">{say("ref_bank")}</option>
+                  <option value="promptpay">{say("ref_promptpay")}</option>
+                </select>
+              </label>
+              <label className="mt-3 block text-xs font-bold text-[var(--foreground-secondary)]">
                 {say("ref_notes")}
                 <textarea className="mt-1 w-full" name="notes" placeholder={say("ref_optionalNotes")} />
               </label>
@@ -248,6 +257,14 @@ export function RefundDepositPanel({
                   step="0.01"
                   type="number"
                 />
+              </label>
+              <label className="mt-3 block text-xs font-bold text-[var(--foreground-secondary)]">
+                {say("ref_how")}
+                <select className="mt-1 w-full" defaultValue="cash" name="paymentMethod">
+                  <option value="cash">{say("ref_cash")}</option>
+                  <option value="bank_transfer">{say("ref_bank")}</option>
+                  <option value="promptpay">{say("ref_promptpay")}</option>
+                </select>
               </label>
               <label className="mt-3 block text-xs font-bold text-[var(--foreground-secondary)]">
                 {say("ref_reasonNotes")}

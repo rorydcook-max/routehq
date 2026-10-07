@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState, useTransition } from "react";
+import { shownError } from "@/lib/error-text";
 import { useTranslations } from "next-intl";
 import { Plus, Search, UserRound, X } from "lucide-react";
 import { createInlineCustomer } from "@/app/actions/customers";
@@ -78,7 +79,7 @@ export function CustomerSelector({
         setOpen(false);
         setCreating(false);
       } catch (createError) {
-        setError(createError instanceof Error ? createError.message : say("sel_failed"));
+        setError(shownError(createError, say("sel_failed")));
       }
     });
   }

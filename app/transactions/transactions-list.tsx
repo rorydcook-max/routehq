@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
+import { shownError } from "@/lib/error-text";
 import { ArrowDownLeft, ArrowUpRight, Check, ChevronLeft, ChevronRight, Pencil, Search, Trash2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
@@ -104,7 +105,7 @@ function TransactionEditForm({
         onSaved(tx.say("updated"));
         router.refresh();
       } catch (caught) {
-        setError(caught instanceof Error ? caught.message : tx.say("updateFailed"));
+        setError(shownError(caught, tx.say("updateFailed")));
       }
     });
   }
@@ -336,7 +337,7 @@ export function TransactionsList({
         showToast(tx.say("deleted"));
         router.refresh();
       } catch (caught) {
-        setError(caught instanceof Error ? caught.message : tx.say("deleteFailed"));
+        setError(shownError(caught, tx.say("deleteFailed")));
       } finally {
         setDeletingIds((current) => {
           const next = new Set(current);
@@ -360,7 +361,7 @@ export function TransactionsList({
         showToast(tx.say("bulkDeleted", { count: result.deleted }));
         router.refresh();
       } catch (caught) {
-        setError(caught instanceof Error ? caught.message : tx.say("bulkFailed"));
+        setError(shownError(caught, tx.say("bulkFailed")));
       } finally {
         setDeletingIds(new Set());
       }

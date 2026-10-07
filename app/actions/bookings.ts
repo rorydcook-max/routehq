@@ -3280,7 +3280,12 @@ export async function recordPaymentRefund(formData: FormData) {
       currency: rental.currency || "THB",
       transaction_date: businessToday(),
       notes: notes || "Payment refund",
-      metadata: { description: "Payment refund", notes, created_by_operator: true },
+      metadata: {
+        description: "Payment refund",
+        notes,
+        created_by_operator: true,
+        ...(["cash", "bank_transfer", "promptpay"].includes(String(formData.get("paymentMethod") || "")) ? { payment_method: String(formData.get("paymentMethod")) } : {})
+      },
       is_deposit: false,
       created_by: user.id
     });

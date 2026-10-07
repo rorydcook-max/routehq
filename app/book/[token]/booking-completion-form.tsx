@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { shownError } from "@/lib/error-text";
 import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
@@ -812,7 +813,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         await reportPublicBookingPayment(formData);
         setPaymentReported(true);
       } catch (reportError) {
-        setError(reportError instanceof Error ? reportError.message : t("reportPaymentFailed"));
+        setError(shownError(reportError, t("reportPaymentFailed")));
       }
     });
   }
@@ -911,7 +912,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         router.refresh();
         window.scrollTo({ top: 0, behavior: "smooth" });
       } catch (submitError) {
-        setError(submitError instanceof Error ? submitError.message : t("completeFailed"));
+        setError(shownError(submitError, t("completeFailed")));
       }
     });
   }

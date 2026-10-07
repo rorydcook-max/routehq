@@ -1,6 +1,7 @@
 "use client";
 
 import { includedOptions } from "@/lib/included-items";
+import { shownError } from "@/lib/error-text";
 import { businessToday } from "@/lib/business-time";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
@@ -545,7 +546,7 @@ export function BookingForm({
         }
         setShareResult(result);
       } catch (bookingError) {
-        setError(bookingError instanceof Error ? bookingError.message : say("errCreate"));
+        setError(shownError(bookingError, say("errCreate")));
       }
     });
   }

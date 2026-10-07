@@ -1932,7 +1932,11 @@
     "qx_weekly": "{days} วัน คิดตามราคารายสัปดาห์ {rate}",
     "qx_monthly": "{days} วัน คิดตามราคารายเดือน {rate}",
     "qx_week": "{days} วัน คิดเป็นหนึ่งสัปดาห์ ({rate})",
-    "qx_month": "{days} วัน คิดเป็นหนึ่งเดือน ({rate})"
+    "qx_month": "{days} วัน คิดเป็นหนึ่งเดือน ({rate})",
+    "ref_how": "คืนเงินด้วยวิธีใด",
+    "ref_cash": "เงินสด",
+    "ref_bank": "โอนเข้าบัญชี",
+    "ref_promptpay": "พร้อมเพย์"
   },
   "newBooking": {
     "pageBack": "กลับไปที่การจอง",

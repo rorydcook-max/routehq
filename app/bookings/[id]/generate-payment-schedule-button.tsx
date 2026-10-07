@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
+import { shownError } from "@/lib/error-text";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { generatePaymentScheduleForRental } from "@/app/actions/bookings";
@@ -39,7 +40,7 @@ export function GeneratePaymentScheduleButton({ rentalId }: { rentalId: string }
         setMessage(say("gen_done", { count }));
         router.refresh();
       } catch (scheduleError) {
-        setError(scheduleError instanceof Error ? scheduleError.message : say("gen_failed"));
+        setError(shownError(scheduleError, say("gen_failed")));
       }
     });
   }

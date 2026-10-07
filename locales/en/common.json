@@ -1923,7 +1923,11 @@
     "qx_weekly": "{days, plural, one {# day} other {# days}} at the weekly price of {rate}",
     "qx_monthly": "{days, plural, one {# day} other {# days}} at the monthly price of {rate}",
     "qx_week": "{days, plural, one {# day} other {# days}}, charged as one week ({rate})",
-    "qx_month": "{days, plural, one {# day} other {# days}}, charged as one month ({rate})"
+    "qx_month": "{days, plural, one {# day} other {# days}}, charged as one month ({rate})",
+    "ref_how": "How are you giving it back?",
+    "ref_cash": "Cash",
+    "ref_bank": "Bank transfer",
+    "ref_promptpay": "PromptPay"
   },
   "newBooking": {
     "pageBack": "Back to bookings",

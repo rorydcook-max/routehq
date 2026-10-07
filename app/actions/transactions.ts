@@ -84,7 +84,7 @@ export async function generateReceipt(input: GenerateReceiptInput) {
     throw new Error(organizationError?.message || "Organization not found.");
   }
 
-  const year = new Date().getFullYear();
+  const year = Number(businessToday().slice(0, 4));
   const yearStart = `${year}-01-01T00:00:00.000Z`;
   const yearEnd = `${year + 1}-01-01T00:00:00.000Z`;
   const { count, error: countError } = await supabase

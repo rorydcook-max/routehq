@@ -1,5 +1,6 @@
 "use client";
 
+import { businessToday } from "@/lib/business-time";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
@@ -138,8 +139,8 @@ function lateBefore(booking: any, all: any[]) {
   if (String(booking.status) !== "booked" || !booking.start_date) return null;
   const vehicleId = booking.vehicle_id || booking.vehicles?.id;
   if (!vehicleId) return null;
-  const today = new Date().toISOString().slice(0, 10);
-  const weekAhead = new Date(Date.now() + 7 * 86_400_000).toISOString().slice(0, 10);
+  const today = businessToday();
+  const weekAhead = businessToday(7);
   if (String(booking.start_date).slice(0, 10) > weekAhead) return null;
   return (
     all.find(

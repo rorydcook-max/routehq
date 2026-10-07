@@ -1,3 +1,4 @@
+import { businessToday } from "@/lib/business-time";
 import Link from "next/link";
 import type { Route } from "next";
 import { notFound } from "next/navigation";
@@ -16,7 +17,7 @@ function shortDate(value: string | null | undefined) {
 
 function daysFromToday(value: string | null | undefined) {
   if (!value) return null;
-  const today = new Date(`${new Date().toISOString().slice(0, 10)}T00:00:00Z`).getTime();
+  const today = new Date(`${businessToday()}T00:00:00Z`).getTime();
   return Math.round((new Date(`${String(value).slice(0, 10)}T00:00:00Z`).getTime() - today) / DAY);
 }
 

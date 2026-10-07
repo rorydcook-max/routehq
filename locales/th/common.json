@@ -2162,7 +2162,7 @@
     "select": "เลือก",
     "th_vehicle": "รถ",
     "th_status": "สถานะ",
-    "th_rate": "ค่าเช่าต่อเดือน",
+    "th_rate": "ราคา",
     "th_onRent": "ช่วงที่ถูกเช่าใน 12 เดือนล่าสุด",
     "th_paperwork": "เอกสารรถ",
     "th_profit": "กำไร",
@@ -2189,7 +2189,9 @@
     "deleteAria": "ลบ {label}",
     "deleteVehicle": "ลบรถ",
     "keep": "เก็บไว้",
-    "status_freeUntil": "ว่างถึง {date}"
+    "status_freeUntil": "ว่างถึง {date}",
+    "perWk": "{amount}/สัปดาห์",
+    "perDay": "{amount}/วัน"
   },
   "customers": {
     "noRentals": "ยังไม่เคยเช่า",
@@ -2641,7 +2643,7 @@
     "backToFleet": "กลับไปหน้ารถ",
     "backToVehicle": "กลับไปหน้ารถคันนี้",
     "addTitle": "เพิ่มรถ",
-    "addSubtitle": "ตอนนี้ใส่แค่ยี่ห้อ รุ่น และทะเบียนก็พอ ที่เหลือเพิ่มทีหลังได้",
+    "addSubtitle": "ตอนนี้ใส่แค่ยี่ห้อ รุ่น ทะเบียน และราคาหนึ่งราคาก็พอ ที่เหลือเพิ่มทีหลังได้",
     "import": "นำเข้ารายการ",
     "editTitle": "แก้ไข {name}",
     "ratesTitle": "ราคาเช่าและมัดจำ",

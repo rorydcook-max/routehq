@@ -74,3 +74,14 @@ export function toWallTime(value: unknown, timeZone: string = BUSINESS_TIME_ZONE
   const p = zonedParts(instant, timeZone);
   return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`;
 }
+
+/**
+ * "Now" for calendar sums (this month, this year, twelve months back): a Date
+ * whose own year, month and day are the business's, at midday. Code that uses
+ * getMonth() and friends on a server running in UTC would otherwise be a day,
+ * and at month end a month, behind for the first seven hours of each Thai day.
+ */
+export function businessNow(timeZone: string = BUSINESS_TIME_ZONE): Date {
+  const [year, month, day] = businessToday(0, timeZone).split("-").map(Number);
+  return new Date(year, month - 1, day, 12, 0, 0, 0);
+}

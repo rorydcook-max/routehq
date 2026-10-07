@@ -1,5 +1,6 @@
 "use client";
 
+import { businessToday } from "@/lib/business-time";
 import { VehicleKindIcon } from "@/components/vehicle-kind-icon";
 import { shownError } from "@/lib/error-text";
 import { isTwoWheeler, kindFromCategory } from "@/lib/vehicle-groups";
@@ -777,7 +778,7 @@ export function InspectionForm({ context, unsigned = false }: { context: Inspect
                   {mode !== "return" && context.customer?.full_name ? `${context.customer.full_name} · ` : ""}
                   {mode === "return" ? null : context.rental?.start_date ? t("rentalStarts", { date: formatDate(context.rental.start_date, locale) }) : t("standaloneReport")}
                 </p>
-                {mode === "delivery" && context.rental?.start_date && String(context.rental.start_date).slice(0, 10) > new Date(Date.now() + 86_400_000).toISOString().slice(0, 10) ? (
+                {mode === "delivery" && context.rental?.start_date && String(context.rental.start_date).slice(0, 10) > businessToday(1) ? (
                   <p className="mt-2 rounded-lg bg-[var(--warning-light)] px-3 py-2 text-sm font-semibold text-[var(--warning)]">{t("startsLaterNote", { date: formatDate(context.rental.start_date, locale) })}</p>
                 ) : null}
                 {mode === "delivery" && unsigned ? (

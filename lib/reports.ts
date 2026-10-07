@@ -1,6 +1,6 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isRawDepositTransaction, isRevenueTransaction } from "@/lib/transaction-options";
-import { businessToday } from "@/lib/business-time";
+import { businessToday, businessNow } from "@/lib/business-time";
 
 export type DatePreset = "this_month" | "last_month" | "last_3_months" | "last_6_months" | "this_year" | "last_year" | "custom";
 
@@ -227,7 +227,7 @@ function fmtDate(d: Date): string {
 }
 
 export function resolveDateRange(preset: DatePreset, customFrom?: string, customTo?: string): DateRange {
-  const now = new Date();
+  const now = businessNow();
 
   switch (preset) {
     case "this_month": {

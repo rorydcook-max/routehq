@@ -51,6 +51,9 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
   const groups = groupVehiclesByKind(vehicles, categories);
   const totalOut = vehicles.filter((vehicle) => vehicle.status === "Rented").length;
   const totalFree = vehicles.filter((vehicle) => vehicle.status === "Available" || Boolean(vehicle.freeUntil)).length;
+  /** The longest period a vehicle is priced for: "฿18,000/mo", else per week, else per day. */
+  const priceOf = (vehicle: { monthlyRate: number; weeklyRate: number; dailyRate: number }) =>
+    vehicle.monthlyRate > 0 ? t("perMo", { amount: money(vehicle.monthlyRate) }) : vehicle.weeklyRate > 0 ? t("perWk", { amount: money(vehicle.weeklyRate) }) : vehicle.dailyRate > 0 ? t("perDay", { amount: money(vehicle.dailyRate) }) : "";
   const dayMonth = (value: string) => new Intl.DateTimeFormat(locale === "en" ? "en-GB" : `${locale}-u-ca-gregory-nu-latn`, { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${value}T00:00:00Z`));
   const [t, c, locale] = await Promise.all([getTranslations("fleet"), getTranslations("common"), getLocale()]);
   const kindName = (group: { kind: string; label: string }) => (c.has(`kinds_${group.kind}`) ? c(`kinds_${group.kind}`) : group.label);
@@ -167,7 +170,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                           {vehicle.freeUntil ? <Badge tone="green">{t("status_freeUntil", { date: dayMonth(vehicle.freeUntil) })}</Badge> : <Badge tone={statusTone[vehicle.status]}>{t(`status_${vehicle.status}`)}</Badge>}
                         </td>
                         <td className="px-3 py-3">
-                          <Link className="font-mono-data block" href={href}>{vehicle.monthlyRate > 0 ? money(vehicle.monthlyRate) : <span className="text-[var(--muted)]">{t("notSet")}</span>}</Link>
+                          <Link className="font-mono-data block" href={href}>{priceOf(vehicle) || <span className="text-[var(--muted)]">{t("notSet")}</span>}</Link>
                         </td>
                         <td className="hidden px-3 py-3 xl:table-cell">
                           <div className="min-w-28">
@@ -196,9 +199,10 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                       <p className="truncate text-[17px] font-bold text-[var(--foreground)]">
                         {vehicle.make} {vehicle.model}
                       </p>
-                      <p className="mt-0.5 truncate font-medium text-[var(--foreground-secondary)]">
-                        <span className="font-mono-data">{vehicle.plate}</span>
-                        {vehicle.monthlyRate > 0 ? <> · {t("perMo", { amount: money(vehicle.monthlyRate) })}</> : null}
+                      {/* Plate and price each stay whole; on a narrow phone the price drops to its own line instead of being cut off. */}
+                      <p className="mt-0.5 flex flex-wrap gap-x-1.5 font-medium text-[var(--foreground-secondary)]">
+                        <span className="font-mono-data whitespace-nowrap">{vehicle.plate}</span>
+                        {priceOf(vehicle) ? <span className="whitespace-nowrap">· {priceOf(vehicle)}</span> : null}
                       </p>
                       {vehicle.complianceNext && vehicle.complianceNext.daysLeft <= 30 ? (
                         <div className="mt-1.5">

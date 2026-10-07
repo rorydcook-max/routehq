@@ -1,5 +1,6 @@
 "use server";
 
+import { businessToday } from "@/lib/business-time";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { completeRentalJobs, tellRentalCustomer } from "@/lib/customer-messages";
 import { revalidatePath } from "next/cache";
@@ -108,7 +109,7 @@ export async function confirmCustomerPayment(rentalId: string, amount: number, p
       type: "rental_income",
       amount: paymentAmount,
       currency: rental.currency || "THB",
-      transaction_date: now.slice(0, 10),
+      transaction_date: businessToday(),
       notes: `Customer-reported payment confirmed: ${method}`,
       metadata: { description: "Customer-reported payment confirmed", payment_method: method },
       is_deposit: false,
@@ -186,7 +187,7 @@ export async function returnDeposit(formData: FormData) {
       type: "deposit_refunded",
       amount: returnAmount,
       currency: rental.currency || "THB",
-      transaction_date: now.slice(0, 10),
+      transaction_date: businessToday(),
       notes: notes ? `Security deposit refunded. ${notes}` : "Security deposit refunded",
       metadata: { description: "Security deposit refunded", notes, ...(refundMethod ? { payment_method: refundMethod } : {}) },
       is_deposit: true,
@@ -288,7 +289,7 @@ export async function applyDepositDeduction(formData: FormData) {
       type: "deposit_forfeited",
       amount: deductionAmount,
       currency: rental.currency || "THB",
-      transaction_date: now.slice(0, 10),
+      transaction_date: businessToday(),
       notes: `Deposit deduction: ${reasonText}`,
       metadata: { description: "Deposit deduction", reason, notes },
       is_deposit: false,

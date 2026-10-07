@@ -709,7 +709,14 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
   const [submittedName, setSubmittedName] = useState("");
   const agreementRef = useRef<HTMLElement>(null);
   const router = useRouter();
-  const minDateTime = new Date().toISOString().slice(0, 16);
+  // Earliest time the picker allows: now, on the customer's own clock. Set after the page loads so the
+  // server and the phone never disagree about what "now" is (it was also seven hours out, being in UTC).
+  const [minDateTime, setMinDateTime] = useState("");
+  useEffect(() => {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    setMinDateTime(now.toISOString().slice(0, 16));
+  }, []);
   const operatorDeliveryDateTime = compactDateTime(detail.bookingData.delivery_datetime);
   const operatorDeliveryIsToday = isTodayDateTime(operatorDeliveryDateTime);
   const operatorDeliveryTimeLabel = timeLabelFromDateTime(operatorDeliveryDateTime);

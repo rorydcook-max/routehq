@@ -1,3 +1,4 @@
+import { businessNow } from "@/lib/business-time";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { loadFleetFigures } from "@/lib/fleet-metrics";
 import type { TaskListItem } from "@/lib/tasks";
@@ -92,7 +93,7 @@ function monthLabel(date: Date) {
 }
 
 function buildMonthlyChart(transactions: any[]) {
-  const now = new Date();
+  const now = businessNow();
   const months = Array.from({ length: 12 }, (_, index) => {
     const date = new Date(now.getFullYear(), now.getMonth() - (11 - index), 1);
     return {
@@ -125,7 +126,7 @@ function buildMonthlyChart(transactions: any[]) {
 }
 
 function calculateFinancials(vehicle: any, transactions: any[]) {
-  const now = new Date();
+  const now = businessNow();
   const currentMonth = monthKey(now);
   let currentMonthRevenue = 0;
   let lifetimeRevenue = 0;
@@ -162,7 +163,7 @@ function calculateFinancials(vehicle: any, transactions: any[]) {
 }
 
 function calculateUtilization(vehicle: any, rentals: any[], transactions: any[], fleetVehicles: any[]) {
-  const today = startOfDay(new Date());
+  const today = startOfDay(businessNow());
   const twelveMonthStart = new Date(today);
   twelveMonthStart.setDate(today.getDate() - 365);
   const ownedSince = dateFromIso(vehicle.purchase_date) || dateFromIso(vehicle.created_at) || today;

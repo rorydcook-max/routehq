@@ -2153,7 +2153,7 @@
     "select": "Select",
     "th_vehicle": "Vehicle",
     "th_status": "Status",
-    "th_rate": "Monthly rate",
+    "th_rate": "Price",
     "th_onRent": "On rent, last 12 months",
     "th_paperwork": "Paperwork",
     "th_profit": "Profit",
@@ -2180,7 +2180,9 @@
     "deleteAria": "Delete {label}",
     "deleteVehicle": "Delete vehicle",
     "keep": "Keep",
-    "status_freeUntil": "Free until {date}"
+    "status_freeUntil": "Free until {date}",
+    "perWk": "{amount}/wk",
+    "perDay": "{amount}/day"
   },
   "customers": {
     "noRentals": "No rentals yet",
@@ -2632,7 +2634,7 @@
     "backToFleet": "Back to fleet",
     "backToVehicle": "Back to vehicle",
     "addTitle": "Add vehicle",
-    "addSubtitle": "Only the make, model and number plate are needed now. Add the rest any time.",
+    "addSubtitle": "Make, model, plate and one price are enough for now. Add the rest later.",
     "import": "Import a list",
     "editTitle": "Edit {name}",
     "ratesTitle": "Rates and deposit",

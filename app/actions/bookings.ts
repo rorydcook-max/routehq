@@ -197,7 +197,7 @@ async function createWalkInPaymentRecords({
   note: string | null;
 }) {
   const now = new Date().toISOString();
-  const today = now.slice(0, 10);
+  const today = businessToday();
   const paymentInserts: Record<string, any>[] = [];
 
   if (paymentAmount > 0) {
@@ -3009,7 +3009,7 @@ export async function cancelBookingWithDisposition(formData: FormData) {
   }
 
   const now = new Date().toISOString();
-  const today = now.slice(0, 10);
+  const today = businessToday();
   const currency = rental.currency || "THB";
   const depositHeld = Number(rental.deposit_held || rental.deposit_amount || 0);
 

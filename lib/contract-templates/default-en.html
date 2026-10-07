@@ -500,23 +500,32 @@
     </div>
   </section>
 
-  <div class="section">
-    <h2>19. Vehicle Operability / ความสามารถในการใช้งานของยานพาหนะ</h2>
+  <section class="section">
+    <div class="section-title">19. Vehicle Operability / ความสามารถในการใช้งานของยานพาหนะ</div>
+    <div class="section-body">
     <div class="clause">
-      <span class="clause-num">19.1.</span>
       <div class="bilingual-section">
-        <div class="lang-en">The Owner is responsible for maintaining the vehicle in a roadworthy and operable condition throughout the rental period. If the vehicle becomes inoperable due to mechanical failure or breakdown not caused by the Renter's negligence, and the Owner is unable to restore operability or provide a suitable replacement vehicle within <strong>24 hours</strong> of the Renter notifying the Owner, the Renter has the right to request cancellation of the contract and receive a pro-rata refund for the unused remaining period.</div>
+        <div class="lang-en"><span class="clause-num">19.1</span> The Owner is responsible for maintaining the vehicle in a roadworthy and operable condition throughout the rental period. If the vehicle becomes inoperable due to mechanical failure or breakdown not caused by the Renter's negligence, and the Owner is unable to restore operability or provide a suitable replacement vehicle within <strong>24 hours</strong> of the Renter notifying the Owner, the Renter has the right to request cancellation of the contract and receive a pro-rata refund for the unused remaining period.</div>
         <div class="lang-th">เจ้าของมีหน้าที่รักษายานพาหนะให้อยู่ในสภาพพร้อมใช้งานตลอดระยะเวลาเช่า หากยานพาหนะไม่สามารถใช้งานได้เนื่องจากความขัดข้องทางกลไกหรือการเสียที่ไม่ได้เกิดจากความประมาทของผู้เช่า และเจ้าของไม่สามารถแก้ไขหรือจัดหายานพาหนะทดแทนที่เหมาะสมได้ภายใน <strong>24 ชั่วโมง</strong> นับจากที่ผู้เช่าแจ้ง ผู้เช่ามีสิทธิ์ขอยกเลิกสัญญาและรับเงินคืนตามสัดส่วนสำหรับระยะเวลาที่เหลืออยู่</div>
       </div>
     </div>
     <div class="clause">
-      <span class="clause-num">19.2.</span>
       <div class="bilingual-section">
-        <div class="lang-en">This clause does not apply where inoperability is caused by the Renter's actions including accidents, negligent operation, incorrect fuel, or damage caused by the Renter. In such cases Sections 9 and 12 apply.</div>
+        <div class="lang-en"><span class="clause-num">19.2</span> This clause does not apply where inoperability is caused by the Renter's actions including accidents, negligent operation, incorrect fuel, or damage caused by the Renter. In such cases Sections 9 and 12 apply.</div>
         <div class="lang-th">ข้อกำหนดนี้ไม่มีผลบังคับใช้หากการไม่สามารถใช้งานได้เกิดจากการกระทำของผู้เช่า รวมถึงอุบัติเหตุ การขับขี่ประมาท การเติมเชื้อเพลิงผิดประเภท หรือความเสียหายที่เกิดจากผู้เช่า ในกรณีดังกล่าวให้ใช้บทบัญญัติในข้อ 9 และข้อ 12</div>
       </div>
     </div>
-  </div>
+    </div>
+  </section>
+
+  {{#if owner_extra_terms}}
+  <section class="section">
+    <div class="section-title">20. Owner's own terms / เงื่อนไขของผู้ให้เช่า</div>
+    <div class="section-body">
+      {{owner_extra_terms}}
+    </div>
+  </section>
+  {{/if}}
 
   <div style="page-break-before:always;"></div>
 

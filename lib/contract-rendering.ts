@@ -9,6 +9,27 @@ function escapeHtml(value: unknown) {
     .replace(/'/g, "&#039;");
 }
 
+/** Plain text typed by a person, safe to place in the agreement: nothing in it is treated as HTML, and line breaks are kept. */
+function textToHtml(value: unknown) {
+  return escapeHtml(String(value ?? "").trim()).replace(/\r?\n/g, "<br>");
+}
+
+/** The owner's own terms as saved in the business settings: plain sentences, one per entry. */
+export function agreementExtraTerms(settings: Record<string, any> | null | undefined): string[] {
+  const raw = settings?.agreement_extra_terms;
+  return (Array.isArray(raw) ? raw : [])
+    .map((term) => String(term ?? "").trim())
+    .filter(Boolean)
+    .slice(0, 20);
+}
+
+/** Those terms as numbered clauses for section 20 of the agreement. Empty when there are none, so the section is left out. */
+export function ownerTermsHtml(terms: string[]) {
+  return terms
+    .map((term, index) => `<div class="clause"><div class="bilingual-section"><div class="lang-en"><span class="clause-num">20.${index + 1}</span> ${textToHtml(term)}</div></div></div>`)
+    .join("\n");
+}
+
 function stripEmpty(value: unknown, fallback = "") {
   const text = String(value ?? "").trim();
   return text || fallback;
@@ -130,6 +151,7 @@ export interface ContractVariables {
   contract_date: string;
   included_items: string;
   special_conditions: string;
+  owner_extra_terms: string;
   delivery_odometer: string;
   delivery_fuel_level: string;
   delivery_fuel_image_url: string;
@@ -203,6 +225,7 @@ export const contractVariableKeys = [
   "contract_date",
   "included_items",
   "special_conditions",
+  "owner_extra_terms",
   "delivery_odometer",
   "delivery_fuel_level",
   "delivery_fuel_image_url",
@@ -236,7 +259,8 @@ export const defaultRentalContractTemplate = `
 `;
 
 export function renderContractTemplate(template: string, variables: Record<string, unknown>) {
-  const rawHtmlKeys = new Set(["included_items", "special_conditions", "delivery_damage_report"]);
+  // These arrive already made safe (built by this file, or escaped by textToHtml); everything else is escaped below.
+  const rawHtmlKeys = new Set(["included_items", "special_conditions", "owner_extra_terms", "delivery_damage_report"]);
 
   let rendered = template.replace(/<!--\s*CONDITIONAL:\s*([a-zA-Z0-9_]+)\s*-->([\s\S]*?)<!--\s*END CONDITIONAL\s*-->/g, (_match, key, content) => {
     return variables[key] ? content : "";
@@ -564,7 +588,9 @@ export function buildContractVariables({
     insurance_excess: formatAmount(bookingData.insurance_excess || organization?.settings?.insurance_excess || 0),
     contract_date: formatContractDate(new Date().toISOString(), locale),
     included_items: includedItemsHtml(includedItems),
-    special_conditions: stripEmpty(bookingLink?.special_conditions || bookingData.special_conditions, ""),
+    // Typed by the owner on the booking: plain text only. It used to go into the agreement as raw HTML.
+    special_conditions: textToHtml(bookingLink?.special_conditions || bookingData.special_conditions),
+    owner_extra_terms: ownerTermsHtml(agreementExtraTerms(organization?.settings)),
     delivery_odometer: deliveryOdometer,
     delivery_fuel_level: deliveryFuelLevel,
     delivery_fuel_image_url: deliveryFuelImageUrl,

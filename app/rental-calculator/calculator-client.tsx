@@ -4,7 +4,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { fetchVehicleMakesForCategory, fetchVehicleModels, fetchVehicleTrims } from "@/lib/vehicle-catalog-db";
 import type { VehicleMake, VehicleModel, VehicleTrim } from "@/lib/vehicle-catalog-db";
-import { Badge, Card, ProgressBar, SectionHeader } from "@/components/ui";
+import { useLocale, useTranslations } from "next-intl";
+import { Badge, Card, SectionHeader } from "@/components/ui";
+
+type Say = (key: string, values?: Record<string, string | number>) => string;
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -32,7 +35,7 @@ type CalcResults = {
   score: number;
   recommendation: "strong_buy" | "buy" | "marginal" | "dont_buy";
   confidence: number;
-  rationale: string;
+  rationale: { key: string; values: Record<string, string | number> };
   chartData: Array<{ month: number; profit: number }>;
 };
 
@@ -148,22 +151,12 @@ function buildRationale(
   reliability: number,
   vehicle: VehicleSelection
 ) {
-  const vehicleName = [vehicle.make, vehicle.model].filter(Boolean).join(" ") || "this vehicle";
-  const paybackYears = (paybackMonths / 12).toFixed(1);
-  const rel = reliability >= 80 ? "it is very reliable" : reliability >= 60 ? "it is reliable" : "it is less reliable than most";
-
-  switch (rec) {
-    case "strong_buy":
-      return `It should earn well at today's prices and ${rel}. It pays for itself in about ${paybackYears} years.`;
-    case "buy":
-      return `The ${vehicleName} should make money and ${rel}. It pays for itself in about ${paybackYears} years.`;
-    case "marginal":
-      return `It only just makes money. Try to buy it for less, or check you could charge more for it.`;
-    case "dont_buy":
-      return score <= 0
-        ? `At these prices the ${vehicleName} would lose money.`
-        : `It would take about ${paybackYears} years to pay for itself, which is too long.`;
-  }
+  const years = (paybackMonths / 12).toFixed(1);
+  const rel = reliability >= 80 ? "very" : reliability >= 60 ? "ok" : "low";
+  const values: Record<string, string | number> = { years };
+  if (rec === "strong_buy" || rec === "buy") return { key: `why_buy_${rel}`, values };
+  if (rec === "marginal") return { key: "why_marginal", values };
+  return { key: score <= 0 ? "why_loses" : "why_slow", values };
 }
 
 // ── Vehicle Selector (uses same catalog functions as vehicle-identity-fields) ─
@@ -183,6 +176,7 @@ function VehicleSelectorMini({
   const [selectedMakeId, setSelectedMakeId] = useState("");
   const [selectedModelId, setSelectedModelId] = useState("");
   const [loadingMakes, setLoadingMakes] = useState(true);
+  const t = useTranslations("calc") as unknown as Say;
 
   const filteredMakes = makeSearch
     ? makes.filter((m) => normalizeMatch(m.name).includes(normalizeMatch(makeSearch)))
@@ -246,14 +240,14 @@ function VehicleSelectorMini({
       {/* Make */}
       <div className="relative">
         <label className="block">
-          <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Make</span>
+          <span className="text-sm font-semibold text-[var(--foreground-secondary)]">{t("make")}</span>
           <button
             className="mt-1 flex w-full items-center justify-between gap-3 rounded-xl border border-[var(--border-strong)] bg-white px-3 py-3 text-left text-base outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
             onClick={() => setMakeOpen((o) => !o)}
             type="button"
           >
             <span className={value.make ? "font-semibold text-[var(--foreground)]" : "text-[var(--muted)]"}>
-              {loadingMakes ? "Loading makes…" : value.make || "Select make"}
+              {loadingMakes ? t("loading") : value.make || t("pickMake")}
             </span>
             <span className="text-[var(--muted)]">▾</span>
           </button>
@@ -265,7 +259,7 @@ function VehicleSelectorMini({
                 autoFocus
                 className="w-full rounded-xl border border-[var(--border-strong)] bg-white px-3 py-2 text-sm outline-none focus:border-[var(--primary)]"
                 onChange={(e) => setMakeSearch(e.target.value)}
-                placeholder="Search make…"
+                placeholder={t("searchMake")}
                 value={makeSearch}
               />
             </div>
@@ -288,14 +282,14 @@ function VehicleSelectorMini({
 
       {/* Model */}
       <label className="block">
-        <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Model</span>
+        <span className="text-sm font-semibold text-[var(--foreground-secondary)]">{t("model")}</span>
         <select
           className={inputCls}
           disabled={!selectedMakeId}
           onChange={selectModel}
           value={selectedModelId}
         >
-          <option value="">{selectedMakeId ? "Select model" : "Select make first"}</option>
+          <option value="">{selectedMakeId ? t("pickModel") : t("makeFirst")}</option>
           {models.map((m) => (
             <option key={m.id} value={m.id}>{m.name}</option>
           ))}
@@ -304,10 +298,10 @@ function VehicleSelectorMini({
 
       {/* Year */}
       <label className="block">
-        <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Year</span>
+        <span className="text-sm font-semibold text-[var(--foreground-secondary)]">{t("year")}</span>
         {catalogYears.length > 0 ? (
           <select className={inputCls} onChange={selectYear} value={value.year}>
-            <option value="">Select year</option>
+            <option value="">{t("pickYear")}</option>
             {catalogYears.map((y) => <option key={y} value={y}>{y}</option>)}
           </select>
         ) : (
@@ -316,7 +310,7 @@ function VehicleSelectorMini({
             min="1990"
             max={new Date().getFullYear() + 1}
             onChange={selectYear}
-            placeholder={`e.g. ${new Date().getFullYear() - 2}`}
+            placeholder={String(new Date().getFullYear() - 2)}
             type="number"
             value={value.year}
           />
@@ -325,21 +319,21 @@ function VehicleSelectorMini({
 
       {/* Trim */}
       <label className="block">
-        <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Trim</span>
+        <span className="text-sm font-semibold text-[var(--foreground-secondary)]">{t("trim")}</span>
         {visibleTrims.length > 0 ? (
           <select
             className={inputCls}
             onChange={selectTrim}
             value={visibleTrims.find((t) => t.name === value.trim)?.id ?? ""}
           >
-            <option value="">Select trim</option>
+            <option value="">{t("pickTrim")}</option>
             {visibleTrims.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
           </select>
         ) : (
           <input
             className={inputCls}
             onChange={(e) => onChange({ ...value, trim: e.target.value })}
-            placeholder="e.g. Smart, E85, GLS"
+            placeholder="Smart, E85, GLS"
             value={value.trim}
           />
         )}
@@ -372,14 +366,14 @@ export function CalculatorClient({
   const [financed, setFinanced] = useState(false);
   const [downPayment, setDownPayment] = useState("");
   const [monthlyPayment, setMonthlyPayment] = useState("");
-  const [loanTermMonths, setLoanTermMonths] = useState("60");
+  const loanTermMonths = "60";
 
   // Rental assumptions
   const [estimatedRate, setEstimatedRate] = useState("");
   const estimatedRateRef = useRef("");
   estimatedRateRef.current = estimatedRate;
   const [utilization, setUtilization] = useState(String(fleetAvgUtilization));
-  const [intendedUse, setIntendedUse] = useState<"long_term" | "short_term" | "mixed">("mixed");
+  const intendedUse = "mixed";
 
   // AI estimates
   const [aiEstimates, setAiEstimates] = useState<AiEstimates>({
@@ -403,6 +397,8 @@ export function CalculatorClient({
   const [saveMsg, setSaveMsg] = useState("");
 
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const t = useTranslations("calc") as unknown as Say;
+  const locale = useLocale();
 
   // ── AI estimation ──────────────────────────────────────────────────────────
   const prevAiKey = useRef("");
@@ -451,7 +447,7 @@ export function CalculatorClient({
           }
         }
       })
-      .catch(() => setAiError("Failed to reach AI estimate service"))
+      .catch(() => setAiError(t("estFailed")))
       .finally(() => setAiLoading(false));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vehicle.make, vehicle.model, vehicle.year, vehicle.trim]);
@@ -510,7 +506,7 @@ export function CalculatorClient({
       });
 
       if (resp.ok) {
-        setSaveMsg("Saved!");
+        setSaveMsg("saved");
         // Refresh the saved list (add a placeholder entry)
         const newEntry: SavedCalc = {
           id: crypto.randomUUID(),
@@ -526,10 +522,10 @@ export function CalculatorClient({
         };
         setSavedCalcs((prev) => [newEntry, ...prev].slice(0, 5));
       } else {
-        setSaveMsg("Save failed — try again");
+        setSaveMsg("failed");
       }
     } catch {
-      setSaveMsg("Save failed — try again");
+      setSaveMsg("failed");
     } finally {
       setSaving(false);
       setTimeout(() => setSaveMsg(""), 3000);
@@ -550,10 +546,10 @@ export function CalculatorClient({
 
   // ── Recommendation display helpers ────────────────────────────────────────
   const recLabel: Record<CalcResults["recommendation"], string> = {
-    strong_buy: "BUY",
-    buy: "BUY",
-    marginal: "MARGINAL",
-    dont_buy: "DON'T BUY"
+    strong_buy: t("rec_buy"),
+    buy: t("rec_buy"),
+    marginal: t("rec_marginal"),
+    dont_buy: t("rec_no")
   };
   const recColor: Record<CalcResults["recommendation"], string> = {
     strong_buy: "text-[var(--success)] bg-[var(--success-light)] border-[var(--success-line)]",
@@ -587,7 +583,7 @@ export function CalculatorClient({
         <div className="space-y-5">
           {/* Vehicle identity */}
           <Card>
-            <SectionHeader eyebrow="Vehicle" title="Which vehicle are you thinking of buying?" />
+            <SectionHeader title={t("s_vehicle")} />
             <div className="mt-4">
               <VehicleSelectorMini value={vehicle} onChange={setVehicle} />
             </div>
@@ -595,10 +591,10 @@ export function CalculatorClient({
 
           {/* Purchase details */}
           <Card>
-            <SectionHeader eyebrow="Purchase" title="What it costs to buy" />
+            <SectionHeader title={t("s_buy")} />
             <div className="mt-4 space-y-4">
               <label className="block">
-                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Purchase price (฿)</span>
+                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">{t("price")}</span>
                 <input
                   className={inputCls}
                   min="0"
@@ -619,22 +615,18 @@ export function CalculatorClient({
                     className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${financed ? "translate-x-5" : "translate-x-0.5"}`}
                   />
                 </div>
-                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Paying with a loan</span>
+                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">{t("loan")}</span>
               </label>
 
               {financed && (
-                <div className="grid gap-4 sm:grid-cols-3">
+                <div className="grid gap-4 sm:grid-cols-2">
                   <label className="block">
-                    <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Down payment (฿)</span>
+                    <span className="text-sm font-semibold text-[var(--foreground-secondary)]">{t("down")}</span>
                     <input className={inputCls} min="0" onChange={(e) => setDownPayment(e.target.value)} placeholder="100,000" step="0.01" type="number" value={downPayment} />
                   </label>
                   <label className="block">
-                    <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Monthly payment (฿)</span>
+                    <span className="text-sm font-semibold text-[var(--foreground-secondary)]">{t("instalment")}</span>
                     <input className={inputCls} min="0" onChange={(e) => setMonthlyPayment(e.target.value)} placeholder="8,500" step="0.01" type="number" value={monthlyPayment} />
-                  </label>
-                  <label className="block">
-                    <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Loan term (months)</span>
-                    <input className={inputCls} min="1" onChange={(e) => setLoanTermMonths(e.target.value)} placeholder="60" type="number" value={loanTermMonths} />
                   </label>
                 </div>
               )}
@@ -643,21 +635,21 @@ export function CalculatorClient({
 
           {/* Rental assumptions */}
           <Card>
-            <SectionHeader eyebrow="Rental" title="What you expect it to earn" />
+            <SectionHeader title={t("s_earn")} />
             <div className="mt-4 space-y-4">
               <label className="block">
-                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Monthly price you would charge (฿)</span>
+                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">{t("rate")}</span>
                 <input className={inputCls} min="0" onChange={(e) => setEstimatedRate(e.target.value)} placeholder="25,000" step="0.01" type="number" value={estimatedRate} />
               </label>
               <label className="block">
                 <span className="text-sm font-semibold text-[var(--foreground-secondary)]">
-                  How much of the time it will be rented (%)
-                  <span className="ml-2 text-xs font-normal text-[var(--muted)]">
+                  {t("util")}
+                  <span className="mt-0.5 block text-sm font-normal text-[var(--muted)]">
                     {measuredUtilization === null
-                      ? "No history from your vehicles yet"
+                      ? t("utilNone")
                       : measuredUtilization < 20
-                        ? `Your vehicles so far: ${measuredUtilization}% (too little history to rely on)`
-                        : `Your vehicles average ${measuredUtilization}%`}
+                        ? t("utilThin", { percent: measuredUtilization })
+                        : t("utilAvg", { percent: measuredUtilization })}
                   </span>
                 </span>
                 <input
@@ -670,52 +662,38 @@ export function CalculatorClient({
                   value={utilization}
                 />
               </label>
-              <label className="block">
-                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">How you will rent it out</span>
-                <select className={inputCls} onChange={(e) => setIntendedUse(e.target.value as typeof intendedUse)} value={intendedUse}>
-                  <option value="long_term">Long-term rental</option>
-                  <option value="short_term">Short-term rental</option>
-                  <option value="mixed">Mixed</option>
-                </select>
-              </label>
             </div>
           </Card>
 
           {/* AI estimates panel */}
           <Card>
-            <div className="flex items-start justify-between gap-3">
-              <SectionHeader eyebrow="AI-estimated costs" title="Yearly running costs" />
-              {aiLoading && (
-                <span className="mt-1 text-xs font-semibold text-[var(--primary)] animate-pulse">Estimating…</span>
-              )}
-              {aiLoaded && !aiLoading && (
-                <span className="mt-1 rounded-full bg-[var(--success-light)] px-2 py-0.5 text-xs font-semibold text-[var(--success)]">AI estimated</span>
-              )}
-            </div>
-
-            {!vehicleIdentified && (
-              <p className="mt-3 rounded-lg bg-[var(--warning-light)] px-3 py-2 text-sm text-[var(--warning)]">
-                Select make, model, and year above to get AI cost estimates for this vehicle.
-              </p>
-            )}
+            <SectionHeader title={t("s_costs")} />
+            {/* One line with the total. The five figures behind it are estimated for the model and can be opened and changed. */}
+            <p className="mt-2 text-[17px] font-bold text-[var(--foreground)]">
+              {aiLoading ? t("estimating") : t("costsYear", { amount: fmt(aiEstimates.insurance_annual + aiEstimates.porbor_annual + aiEstimates.tax_annual + aiEstimates.maintenance_annual + aiEstimates.depreciation_annual) })}
+            </p>
+            <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">
+              {vehicleIdentified && aiLoaded ? t("costsFor") : t("costsTypical")}
+            </p>
             {aiError && (
               <p className="mt-3 rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">{aiError}</p>
             )}
 
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <details className="mt-2">
+              <summary className="cursor-pointer py-1 font-semibold text-[var(--primary)]">{t("costsChange")}</summary>
+            <div className="mt-3 grid gap-4 sm:grid-cols-2">
               {(
                 [
-                  { key: "insurance_annual", label: "Type 1 insurance (a year)" },
-                  { key: "porbor_annual", label: "Compulsory insurance, Por Ror Bor (a year)" },
-                  { key: "tax_annual", label: "Road tax (a year)" },
-                  { key: "maintenance_annual", label: "Servicing and repairs (a year)" },
-                  { key: "depreciation_annual", label: "Value it loses (a year)" }
+                  { key: "insurance_annual", label: t("c_ins") },
+                  { key: "porbor_annual", label: t("c_porbor") },
+                  { key: "tax_annual", label: t("c_tax") },
+                  { key: "maintenance_annual", label: t("c_maint") },
+                  { key: "depreciation_annual", label: t("c_dep") }
                 ] as Array<{ key: keyof AiEstimates; label: string }>
               ).map(({ key, label }) => (
                 <label className="block" key={key}>
                   <span className="text-sm font-semibold text-[var(--foreground-secondary)]">
                     {label}
-                    {aiLoaded && <span className="ml-1 rounded-full bg-[var(--success-light)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--success)]">AI</span>}
                   </span>
                   <input
                     className={inputCls}
@@ -728,21 +706,8 @@ export function CalculatorClient({
                   />
                 </label>
               ))}
-              <label className="block">
-                <span className="text-sm font-semibold text-[var(--foreground-secondary)]">
-                  Reliability score (0–100)
-                  {aiLoaded && <span className="ml-1 rounded-full bg-[var(--success-light)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--success)]">AI</span>}
-                </span>
-                <input
-                  className={inputCls}
-                  max="100"
-                  min="0"
-                  onChange={(e) => setAiEstimates((prev) => ({ ...prev, reliability_score: Number(e.target.value) }))}
-                  type="number"
-                  value={aiEstimates.reliability_score}
-                />
-              </label>
             </div>
+            </details>
           </Card>
         </div>
 
@@ -752,8 +717,8 @@ export function CalculatorClient({
             <Card>
               <div className="flex min-h-48 items-center justify-center text-center">
                 <div>
-                  <p className="text-lg font-bold text-[var(--foreground)]">Enter vehicle details</p>
-                  <p className="mt-1 text-sm text-[var(--muted)]">Fill in purchase price and rental assumptions to see results</p>
+                  <p className="text-lg font-bold text-[var(--foreground)]">{t("emptyTitle")}</p>
+                  <p className="mt-1 text-sm text-[var(--muted)]">{t("emptyBody")}</p>
                 </div>
               </div>
             </Card>
@@ -766,28 +731,18 @@ export function CalculatorClient({
                   {vehicle.make && vehicle.model && (
                     <p className="mt-1 text-sm font-semibold opacity-80">{vehicle.make} {vehicle.model} {vehicle.year}</p>
                   )}
-                  <p className="mt-3 text-sm font-medium opacity-90">{results.rationale}</p>
-                </div>
-                <div className="mt-4">
-                  <div className="mb-2 flex items-center justify-between text-sm">
-                    <span className="font-semibold text-[var(--foreground-secondary)]">Confidence score</span>
-                    <span className="font-mono-data font-bold">{results.confidence}%</span>
-                  </div>
-                  <ProgressBar
-                    tone={results.confidence >= 70 ? "green" : results.confidence >= 50 ? "amber" : "red"}
-                    value={results.confidence}
-                  />
+                  <p className="mt-3 text-sm font-medium opacity-90">{t(results.rationale.key, results.rationale.values)}</p>
                 </div>
               </Card>
 
               {/* Detailed breakdown */}
               <Card>
-                <SectionHeader eyebrow="Breakdown" title="Each month" />
+                <SectionHeader title={t("s_month")} />
                 <div className="mt-4 space-y-3">
                   {[
-                    { label: "Money in", value: results.monthlyRevenue, positive: true },
-                    { label: "Money out", value: results.monthlyExpenses, positive: false },
-                    { label: "Profit", value: results.monthlyNetProfit, positive: results.monthlyNetProfit >= 0 }
+                    { label: t("in"), value: results.monthlyRevenue, positive: true },
+                    { label: t("out"), value: results.monthlyExpenses, positive: false },
+                    { label: t("profit"), value: results.monthlyNetProfit, positive: results.monthlyNetProfit >= 0 }
                   ].map(({ label, value, positive }) => (
                     <div className="flex items-center justify-between" key={label}>
                       <span className="text-sm font-semibold text-[var(--foreground-secondary)]">{label}</span>
@@ -798,11 +753,11 @@ export function CalculatorClient({
                   ))}
                   <div className="border-t border-[var(--border)] pt-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Pays for itself in</span>
+                      <span className="text-sm font-semibold text-[var(--foreground-secondary)]">{t("payback")}</span>
                       <span className="font-mono-data font-bold text-[var(--foreground)]">
                         {isFinite(results.paybackMonths)
-                          ? `${Math.round(results.paybackMonths)} months (${(results.paybackMonths / 12).toFixed(1)} yrs)`
-                          : "Never at these prices"}
+                          ? t("paybackValue", { months: Math.round(results.paybackMonths), years: (results.paybackMonths / 12).toFixed(1) })
+                          : t("never")}
                       </span>
                     </div>
                   </div>
@@ -811,14 +766,14 @@ export function CalculatorClient({
 
               {/* 36-month chart */}
               <Card>
-                <SectionHeader eyebrow="Projection" title="36-month cumulative profit" />
+                <SectionHeader title={t("s_chart")} />
                 <div className="mt-4">
                   <ResponsiveContainer height={220} width="100%">
                     <LineChart data={results.chartData} margin={{ top: 4, right: 8, left: 8, bottom: 4 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#dce3eb" />
                       <XAxis
                         dataKey="month"
-                        label={{ value: "Month", position: "insideBottom", offset: -2, fontSize: 11 }}
+                        label={{ value: t("monthAxis"), position: "insideBottom", offset: -2, fontSize: 11 }}
                         tick={{ fontSize: 11 }}
                       />
                       <YAxis
@@ -826,11 +781,11 @@ export function CalculatorClient({
                         tick={{ fontSize: 11 }}
                       />
                       <Tooltip
-                        formatter={(v: unknown) => [fmt(Number(v)), "Cumulative profit"]}
-                        labelFormatter={(l: unknown) => `Month ${l}`}
+                        formatter={(v: unknown) => [fmt(Number(v)), t("profit")]}
+                        labelFormatter={(l: unknown) => `${t("monthAxis")} ${l}`}
                       />
                       <ReferenceLine
-                        label={{ value: "Break even", position: "right", fontSize: 11, fill: "var(--danger)" }}
+                        label={{ value: t("breakEven"), position: "insideTopRight", fontSize: 11, fill: "var(--danger)" }}
                         stroke="#a04b36"
                         strokeDasharray="4 4"
                         y={0}
@@ -843,15 +798,15 @@ export function CalculatorClient({
 
               {/* Sensitivity table */}
               <Card>
-                <SectionHeader eyebrow="Sensitivity" title="If it is rented more or less often" />
+                <SectionHeader title={t("s_sens")} />
                 <div className="mt-4 overflow-x-auto">
                   <table className="w-full min-w-[360px] text-left text-sm">
                     <thead>
                       <tr className="border-b border-[var(--border)] text-xs uppercase text-[var(--muted)]">
-                        <th className="py-2 pr-3">Time rented</th>
-                        <th className="px-3 py-2">Money in a month</th>
-                        <th className="px-3 py-2">Profit a month</th>
-                        <th className="px-3 py-2">Pays for itself in</th>
+                        <th className="py-2 pr-3">{t("th_time")}</th>
+                        <th className="px-3 py-2">{t("th_in")}</th>
+                        <th className="px-3 py-2">{t("th_profit")}</th>
+                        <th className="px-3 py-2">{t("payback")}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -863,7 +818,7 @@ export function CalculatorClient({
                             {fmt(profit)}
                           </td>
                           <td className="font-mono-data px-3 py-3 text-[var(--muted)]">
-                            {payback !== null ? `${payback} months` : "Never"}
+                            {payback !== null ? t("months", { count: payback }) : t("neverShort")}
                           </td>
                         </tr>
                       ))}
@@ -875,7 +830,7 @@ export function CalculatorClient({
               {/* Fleet comparison */}
               {similarVehicles.length > 0 && (
                 <Card>
-                  <SectionHeader eyebrow="Fleet comparison" title="Your similar vehicles" />
+                  <SectionHeader title={t("s_similar")} />
                   <div className="mt-4 space-y-3">
                     {similarVehicles.map((v) => {
                       const approxMonthlyProfit = v.profit / 36;
@@ -886,9 +841,7 @@ export function CalculatorClient({
                             <span className="font-mono-data text-xs text-[var(--muted)]">{v.plate}</span>
                           </div>
                           <p className="mt-1 text-sm text-[var(--foreground-secondary)]">
-                            Your {v.make} {v.model} is rented{" "}
-                            <span className="font-mono-data font-semibold">{v.utilization}%</span> of the time and makes about{" "}
-                            <span className="font-mono-data font-semibold text-[var(--success)]">{fmt(approxMonthlyProfit)}</span> profit a month
+                            {t("similarLine", { percent: v.utilization, profit: fmt(approxMonthlyProfit) })}
                           </p>
                         </div>
                       );
@@ -905,11 +858,11 @@ export function CalculatorClient({
                   onClick={handleSave}
                   type="button"
                 >
-                  {saving ? "Saving…" : "Save calculation"}
+                  {saving ? t("saving") : t("save")}
                 </button>
                 {saveMsg && (
-                  <span className={`text-sm font-semibold ${saveMsg.startsWith("Save failed") ? "text-[var(--danger)]" : "text-[var(--success)]"}`}>
-                    {saveMsg}
+                  <span className={`text-sm font-semibold ${saveMsg === "failed" ? "text-[var(--danger)]" : "text-[var(--success)]"}`}>
+                    {saveMsg === "failed" ? t("saveFailed") : t("saved")}
                   </span>
                 )}
               </div>
@@ -921,7 +874,7 @@ export function CalculatorClient({
       {/* ── Saved calculations panel ──────────────────────────────────────── */}
       {savedCalcs.length > 0 && (
         <Card>
-          <SectionHeader eyebrow="History" title="Recent saved calculations" />
+          <SectionHeader title={t("s_saved")} />
           <div className="mt-4 space-y-3">
             {savedCalcs.map((calc) => {
               const monthlyProfit = (calc.results as any)?.monthlyNetProfit ?? null;
@@ -932,10 +885,10 @@ export function CalculatorClient({
                   ? "amber"
                   : "red";
               const recBadgeLabel = calc.recommendation === "strong_buy" || calc.recommendation === "buy"
-                ? "BUY"
+                ? t("rec_buy")
                 : calc.recommendation === "marginal"
-                  ? "MARGINAL"
-                  : "DON'T BUY";
+                  ? t("rec_marginal")
+                  : t("rec_no");
 
               return (
                 <div
@@ -948,27 +901,24 @@ export function CalculatorClient({
                 >
                   <div>
                     <p className="font-semibold text-[var(--foreground)]">
-                      {[calc.vehicle_make, calc.vehicle_model, calc.vehicle_year].filter(Boolean).join(" ") || "Unknown vehicle"}
+                      {[calc.vehicle_make, calc.vehicle_model, calc.vehicle_year].filter(Boolean).join(" ") || t("unknown")}
                       {calc.vehicle_trim && <span className="ml-2 text-xs text-[var(--muted)]">{calc.vehicle_trim}</span>}
                     </p>
                     <div className="mt-1 flex flex-wrap gap-3 text-sm text-[var(--muted)]">
-                      {calc.purchase_price && <span>Price: {fmt(Number(calc.purchase_price))}</span>}
+                      {calc.purchase_price && <span>{fmt(Number(calc.purchase_price))}</span>}
                       {monthlyProfit !== null && (
                         <span className={Number(monthlyProfit) >= 0 ? "text-[var(--success)] font-semibold" : "text-[var(--danger)] font-semibold"}>
-                          {fmt(Number(monthlyProfit))}/mo
+                          {t("perMonth", { amount: fmt(Number(monthlyProfit)) })}
                         </span>
                       )}
                       {payback !== null && isFinite(Number(payback)) && (
-                        <span>pays for itself in {Math.round(Number(payback))} months</span>
+                        <span>{t("payback")} {t("months", { count: Math.round(Number(payback)) })}</span>
                       )}
-                      <span>{new Date(calc.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</span>
+                      <span>{new Date(calc.created_at).toLocaleDateString(locale === "en" ? "en-GB" : locale, { day: "numeric", month: "short", year: "numeric" })}</span>
                     </div>
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-2">
                     {calc.recommendation && <Badge tone={recBadgeTone as "green" | "amber" | "red"}>{recBadgeLabel}</Badge>}
-                    {calc.confidence_score !== null && (
-                      <span className="font-mono-data text-xs text-[var(--muted)]">{calc.confidence_score}% conf.</span>
-                    )}
                   </div>
                 </div>
               );

@@ -296,7 +296,6 @@ function ActionForm({
             <option value="Breakdown">{t("problemBreakdown")}</option>
             <option value="Damage">{t("problemDamage")}</option>
             <option value="Other mechanical issue">{t("problemMechanical")}</option>
-            <option value="Query about my rental">{t("problemQuery")}</option>
             <option value="Other">{t("problemOther")}</option>
           </select>
         </label>

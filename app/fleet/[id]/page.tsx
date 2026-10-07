@@ -492,18 +492,20 @@ function FinancialSection({ detail }: { detail: VehicleDetail }) {
       <div className="mt-3 rounded-xl bg-[var(--panel-secondary)] p-3.5">
         <p className="font-bold text-[var(--foreground)]">{tx.say("fi_chart")}</p>
         <div className="mt-3 flex h-40 items-end gap-2 overflow-x-auto">
-          {f.monthlyChart.map((month) => (
+          {f.monthlyChart.map((month, index) => (
             <div className="flex min-w-8 flex-1 flex-col items-center justify-end gap-1" key={month.label}>
               <div className="flex h-28 items-end gap-1">
                 <div className="w-3 rounded-t bg-[var(--primary)]" style={{ height: `${Math.max(3, (month.revenue / chartMax) * 112)}px` }} title={tx.say("fi_in", { amount: money(month.revenue) })} />
                 <div className="w-3 rounded-t bg-[var(--danger)]" style={{ height: `${Math.max(3, (month.expenses / chartMax) * 112)}px` }} title={tx.say("fi_out", { amount: money(month.expenses) })} />
               </div>
-              <span className="font-medium text-[var(--muted)]" style={{ fontSize: 12 }}>{month.label}</span>
+              <span className="font-medium text-[var(--muted)]" style={{ fontSize: 12 }}>{new Intl.DateTimeFormat(tx.locale === "en" ? "en-GB" : tx.locale, { month: "short" }).format(new Date(new Date().getFullYear(), new Date().getMonth() - (f.monthlyChart.length - 1 - index), 1))}</span>
             </div>
           ))}
         </div>
         <p className="mt-2 font-medium text-[var(--foreground-secondary)]">{tx.say("fi_legend")}</p>
       </div>
+      {/* Every payment in and out for this vehicle sits under its totals: one subject, one row on the page. */}
+      <TransactionsSection detail={detail} />
     </Fold>
   );
 }
@@ -536,6 +538,7 @@ function UtilizationSection({ detail }: { detail: VehicleDetail }) {
           <InfoRow label={tx.say("u_avgRate")} value={money(u.averageDailyRate)} />
         </div>
       </div>
+      <RentalHistorySection detail={detail} />
     </Fold>
   );
 }
@@ -705,6 +708,16 @@ function TasksSection({ detail, organizationId }: { detail: VehicleDetail; organ
   );
 }
 
+/** A list that lives inside another section: a heading and the rows, with no row of its own on the page. */
+function Part({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="mt-4">
+      <p className="font-bold text-[var(--foreground)]">{title}</p>
+      <div className="mt-2">{children}</div>
+    </div>
+  );
+}
+
 function TransactionsSection({ detail }: { detail: VehicleDetail }) {
   const tx = useVx();
   const moneyWords = useTranslations("money");
@@ -715,13 +728,8 @@ function TransactionsSection({ detail }: { detail: VehicleDetail }) {
   const totalExpense = detail.transactions.filter((transaction) => expenseTypes.has(transaction.type)).reduce((sum, transaction) => sum + Math.abs(Number(transaction.amount || 0)), 0);
 
   return (
-    <Fold summary={tx.say("x_summary", { inAmount: money(totalIncome), outAmount: money(totalExpense) })} title={tx.say("x_title")}>
-      <div className="grid grid-cols-3 gap-2.5">
-        <InfoRow label={tx.say("x_in")} value={money(totalIncome)} />
-        <InfoRow label={tx.say("x_out")} value={money(totalExpense)} />
-        <InfoRow danger={totalIncome - totalExpense < 0} label={tx.say("x_net")} value={money(totalIncome - totalExpense)} />
-      </div>
-      <div className="mt-3 space-y-2">
+    <Part title={tx.say("x_title")}>
+      <div className="space-y-2">
         {detail.transactions.length === 0 ? (
           <EmptyState action={<Link className="font-bold text-[var(--primary)]" href={detailUrl("/transactions/new", detail.vehicle.id)}>{tx.say("x_first")}</Link>}>
             {tx.say("x_none")}
@@ -729,6 +737,10 @@ function TransactionsSection({ detail }: { detail: VehicleDetail }) {
         ) : (
           detail.transactions.map((transaction) => {
             const expense = expenseTypes.has(transaction.type);
+            // A deposit taken or handed back is not income or a cost: shown plainly, without a plus or minus.
+            const held = transaction.type === "deposit_received" || transaction.type === "deposit_refunded";
+            // Notes the app wrote for its own records are English sentences; only notes a person typed are shown.
+            const note = transaction.notes && !/received by|receipt checked|recorded on the return form|received at handover|^deposit deduction|^security deposit/i.test(transaction.notes) ? transaction.notes : null;
             const extra = [
               transaction.supplier ? tx.say("x_paidTo", { name: transaction.supplier }) : null,
               transaction.mileage ? tx.say("x_mileage", { km: Number(transaction.mileage).toLocaleString("en-US") }) : null,
@@ -739,11 +751,11 @@ function TransactionsSection({ detail }: { detail: VehicleDetail }) {
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-[16px] font-bold text-[var(--foreground)]">{typeName(transaction.type)}</p>
-                    <p className="font-medium text-[var(--foreground-secondary)]">{[formatDate(transaction.transaction_date, tx), transaction.notes || null].filter(Boolean).join(" · ")}</p>
+                    <p className="font-medium text-[var(--foreground-secondary)]">{[formatDate(transaction.transaction_date, tx), note].filter(Boolean).join(" · ")}</p>
                     {extra.length ? <p className="font-medium text-[var(--muted)]">{extra.join(" · ")}</p> : null}
                   </div>
-                  <span className={`shrink-0 text-[16px] font-bold tabular-nums ${expense ? "text-[var(--foreground)]" : "text-[var(--success)]"}`}>
-                    {expense ? "−" : "+"}
+                  <span className={`shrink-0 text-[16px] font-bold tabular-nums ${expense || held ? "text-[var(--foreground)]" : "text-[var(--success)]"}`}>
+                    {held ? "" : expense ? "−" : "+"}
                     {money(Math.abs(Number(transaction.amount || 0)))}
                   </span>
                 </div>
@@ -752,7 +764,7 @@ function TransactionsSection({ detail }: { detail: VehicleDetail }) {
           })
         )}
       </div>
-    </Fold>
+    </Part>
   );
 }
 
@@ -769,18 +781,13 @@ function RentalHistorySection({ detail }: { detail: VehicleDetail }) {
   const totalRentalDays = detail.rentals.reduce((sum, rental) => sum + Math.max(1, daysBetween(rental.start_date, rental.end_date || businessToday())), 0);
 
   return (
-    <Fold summary={tx.say("h_summary", { count: detail.rentals.length })} title={tx.say("h_title")}>
+    <Part title={`${tx.say("h_title")} · ${detail.rentals.length}`}>
       {detail.rentals.length === 0 ? (
         <EmptyState>{tx.say("h_none")}</EmptyState>
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-2.5">
-            <InfoRow label={tx.say("h_total")} value={detail.rentals.length} />
-            <InfoRow label={tx.say("h_days")} value={totalRentalDays} />
-            <InfoRow label={tx.say("h_avg")} value={tx.say("h_avgDays", { count: Math.round(totalRentalDays / detail.rentals.length) })} />
-            <InfoRow label={tx.say("h_rate")} value={money(detail.utilization.averageDailyRate)} />
-          </div>
-          <div className="mt-3 space-y-2">
+          <p className="font-medium text-[var(--foreground-secondary)]">{tx.say("h_avg")}: {tx.say("h_avgDays", { count: Math.round(totalRentalDays / detail.rentals.length) })}</p>
+          <div className="mt-2 space-y-2">
             {detail.rentals.map((rental) => (
               <Link className="block rounded-xl bg-[var(--panel-secondary)] p-3.5" href={`/bookings/${rental.id}` as Route} key={rental.id}>
                 <div className="flex items-start justify-between gap-3">
@@ -798,7 +805,7 @@ function RentalHistorySection({ detail }: { detail: VehicleDetail }) {
           </div>
         </>
       )}
-    </Fold>
+    </Part>
   );
 }
 
@@ -975,10 +982,8 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
 
           <div className="space-y-3">
             <FinancialSection detail={detail} />
-            <TransactionsSection detail={detail} />
-            <UtilizationSection detail={detail} />
-            <RentalHistorySection detail={detail} />
-            <DocumentsSection detail={detail} />
+              <UtilizationSection detail={detail} />
+              <DocumentsSection detail={detail} />
             <GpsSection detail={detail} />
             <SpecsSection detail={detail} />
             <FinanceSection detail={detail} />

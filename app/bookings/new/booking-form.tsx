@@ -22,6 +22,7 @@ type BookingVehicle = {
   year: number | null;
   registration_number: string;
   category_code?: string | null;
+  included_items?: string[] | null;
   status: string;
   availability_status: string;
   daily_rate: number;
@@ -314,6 +315,8 @@ export function BookingForm({
   const [existingPaidUntil, setExistingPaidUntil] = useState("");
   const [existingDepositHeld, setExistingDepositHeld] = useState(true);
   const [includedItems, setIncludedItems] = useState<string[]>([includedOptions[1]]);
+  // The tick boxes stay folded when the vehicle already has its usual list.
+  const [includedOpen, setIncludedOpen] = useState(false);
   const [deliveryMethod, setDeliveryMethod] = useState<"delivery" | "collection" | "tbd">("delivery");
   const [deliveryLocation, setDeliveryLocation] = useState("");
   const [deliveryPlaceId, setDeliveryPlaceId] = useState("");
@@ -340,6 +343,12 @@ export function BookingForm({
   const [isPending, startTransition] = useTransition();
 
   const selectedVehicle = vehicles.find((vehicle) => vehicle.id === vehicleId) || null;
+  // Picking a vehicle brings its usual inclusions with it.
+  useEffect(() => {
+    const saved = vehicles.find((vehicle) => vehicle.id === vehicleId)?.included_items;
+    if (saved) setIncludedItems(saved);
+    setIncludedOpen(false);
+  }, [vehicleId, vehicles]);
   const dateConflict = vehicleId ? findConflict(busyPeriods[vehicleId] || [], startDate, openEnded ? null : endDate || null) : null;
   const currencyInfo = CURRENCY_INFO[currency] ?? CURRENCY_INFO["THB"];
   // Which set of words to use for the period the price is per.
@@ -954,7 +963,15 @@ export function BookingForm({
           )}
           <div className="mt-3">
             <p className="text-[13px] font-semibold text-[var(--foreground)]">{say("included")}</p>
-            <div className="mt-3 grid grid-cols-2 gap-2">
+            {selectedVehicle?.included_items && !includedOpen ? (
+              <p className="mt-1 font-medium text-[var(--foreground-secondary)]">
+                {includedItems.length ? includedItems.map((item) => (includedOptions.includes(item) ? say(`inc_${includedOptions.indexOf(item)}`) : item)).join(", ") : say("noneSelected")}{" "}
+                <button className="font-semibold text-[var(--primary)] underline" onClick={() => setIncludedOpen(true)} type="button">
+                  {say("change")}
+                </button>
+              </p>
+            ) : null}
+            <div className={`mt-3 grid-cols-2 gap-2 ${selectedVehicle?.included_items && !includedOpen ? "hidden" : "grid"}`}>
               {includedOptions
                 .filter((item) => (isTwoWheeler(selectedVehicle?.category_code) ? !notForTwoWheelers.has(item) : !twoWheelerOnly.has(item)) || includedItems.includes(item))
                 .map((item) => (

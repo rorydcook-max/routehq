@@ -1,5 +1,5 @@
 import { AppShell } from "@/components/app-shell";
-import { SectionHeader } from "@/components/ui";
+import { getTranslations } from "next-intl/server";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDefaultOrganization } from "@/lib/organization";
 import { loadFleetFigures } from "@/lib/fleet-metrics";
@@ -14,6 +14,7 @@ export default async function RentalCalculatorPage() {
   ]);
 
   const supabase = (await createSupabaseServerClient()) as any;
+  const t = await getTranslations("calc");
 
   // Fetch fleet vehicles for comparison and utilization pre-fill
   const [{ data: vehiclesData }, figures] = await Promise.all([
@@ -61,14 +62,9 @@ export default async function RentalCalculatorPage() {
 
   return (
     <AppShell userEmail={userEmail}>
-      <div className="mb-5 rounded-3xl border border-[var(--border)] bg-white px-5 py-4 shadow-[0_16px_38px_rgba(15,23,42,0.06)]">
-        <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--primary)]">Calculator</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-[var(--foreground)] sm:text-3xl">
-          Should you buy this vehicle?
-        </h1>
-        <p className="mt-1 text-sm font-medium text-[var(--muted)]">
-          Enter the vehicle and what it would cost. RouteHQ uses your own rental history and market prices to estimate whether it would pay for itself.
-        </p>
+      <div className="mb-4">
+        <h1 className="page-title">{t("title")}</h1>
+        <p className="page-subtitle mt-2">{t("subtitle")}</p>
       </div>
 
       <CalculatorClient

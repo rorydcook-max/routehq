@@ -503,6 +503,22 @@ async function createBookingOrThrow(formData: FormData) {
       .eq("organization_id", organizationId);
   }
 
+  // Remember what this vehicle was rented with, so the next booking starts from it instead of a wall of tick boxes.
+  try {
+    const { data: vehicleRow } = await supabase.from("vehicles").select("metadata, deposit_amount").eq("id", vehicleId).eq("organization_id", organizationId).maybeSingle();
+    await supabase
+      .from("vehicles")
+      .update({
+        metadata: { ...((vehicleRow?.metadata as Record<string, unknown> | null) || {}), included_items: includedItems },
+        // A vehicle with no usual deposit takes the first one charged for it.
+        ...(vehicleRow && vehicleRow.deposit_amount == null && depositAmount > 0 ? { deposit_amount: depositAmount } : {})
+      })
+      .eq("id", vehicleId)
+      .eq("organization_id", organizationId);
+  } catch {
+    // A convenience only: the booking itself is already saved.
+  }
+
   const contractInsert: Record<string, any> = {
     organization_id: organizationId,
     rental_id: rental.id,

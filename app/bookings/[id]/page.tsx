@@ -1634,7 +1634,12 @@ function portalActionSummary(action: any, tx: Tx) {
     const when = `${day} ${content.return_time || ""}`.trim();
     return content.return_location ? tx.say("sum_returnAt", { when, place: String(content.return_location) }) : tx.say("sum_return", { when });
   }
-  if (action.action_type === "problem_report") return `${content.category || tx.say("problem")}: ${content.description || tx.say("noDescription")}`;
+  if (action.action_type === "problem_report") {
+    // The kind of problem is saved in English; the owner reads it in their own language.
+    const kinds: Record<string, string> = { Breakdown: "pcat_breakdown", Damage: "pcat_damage", "Other mechanical issue": "pcat_mechanical", "Query about my rental": "pcat_query", Other: "pcat_other" };
+    const kind = kinds[String(content.category || "")];
+    return `${kind ? tx.say(kind) : content.category || tx.say("problem")}: ${content.description || tx.say("noDescription")}`;
+  }
   if (action.action_type === "question") return content.question || tx.say("sum_question");
   return tx.say("sum_other");
 }

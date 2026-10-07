@@ -28,7 +28,8 @@ export async function middleware(request: NextRequest) {
   if (pathname.startsWith("/book/") || pathname.startsWith("/amend/") || pathname.startsWith("/rent/")) {
     request.headers.set("x-routehq-customer-page", "1");
   }
-  const isOnboardingAllowedRoute = isPublicRoute || pathname.startsWith("/api/") || pathname.startsWith("/fleet/import");
+  // During first-time setup the wizard sends people to the normal Add vehicle and import screens; everything else waits until setup is finished.
+  const isOnboardingAllowedRoute = isPublicRoute || pathname.startsWith("/api/") || pathname.startsWith("/fleet/import") || pathname === "/fleet/new";
   const isSubscriptionAllowedRoute =
     isOnboardingAllowedRoute ||
     pathname === "/settings" ||

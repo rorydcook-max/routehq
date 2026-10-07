@@ -1,16 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { CalendarDays, Camera, Car, CheckCircle2, ChevronDown, FileSpreadsheet, ImagePlus, Languages, ScanLine, X } from "lucide-react";
-import { createOnboardingVehicle, finishOnboarding, saveBusinessProfile, skipFirstVehicle } from "@/app/actions/onboarding";
-import { fetchVehicleMakesForCategory, fetchVehicleModels, fetchVehicleTrims, type VehicleMake, type VehicleModel, type VehicleTrim } from "@/lib/vehicle-catalog-db";
-
-type Category = {
-  id: string;
-  code: string;
-  name: string;
-};
+import { Camera, Car, CheckCircle2, FileSpreadsheet, Languages } from "lucide-react";
+import { finishOnboarding, saveBusinessProfile, skipFirstVehicle } from "@/app/actions/onboarding";
 
 type Organization = {
   id: string;
@@ -564,6 +557,7 @@ const thaiLocationLabels: Record<string, string> = {
 const fleetSizes = ["1-5", "6-15", "16-50", "50+"];
 
 const fieldClass = "mt-1 w-full";
+const labelClass = "font-semibold text-[var(--foreground-secondary)]";
 
 const currencyOptionsByCountry: Record<string, string[]> = {
   Thailand: ["THB", "USD"],
@@ -584,55 +578,12 @@ const currencyOptionsByCountry: Record<string, string[]> = {
   "Sri Lanka": ["LKR", "USD"]
 };
 
-const colorTranslations: Record<string, { en: string; th: string }> = {
-  black: { en: "Black", th: "สีดำ" },
-  blue: { en: "Blue", th: "สีน้ำเงิน" },
-  bronze: { en: "Bronze", th: "สีบรอนซ์" },
-  brown: { en: "Brown", th: "สีน้ำตาล" },
-  gold: { en: "Gold", th: "สีทอง" },
-  gray: { en: "Gray", th: "สีเทา" },
-  grey: { en: "Gray", th: "สีเทา" },
-  green: { en: "Green", th: "สีเขียว" },
-  orange: { en: "Orange", th: "สีส้ม" },
-  pink: { en: "Pink", th: "สีชมพู" },
-  purple: { en: "Purple", th: "สีม่วง" },
-  red: { en: "Red", th: "สีแดง" },
-  silver: { en: "Silver", th: "สีเงิน" },
-  white: { en: "White", th: "สีขาว" },
-  yellow: { en: "Yellow", th: "สีเหลือง" },
-  "ดำ": { en: "Black", th: "สีดำ" },
-  "น้ำเงิน": { en: "Blue", th: "สีน้ำเงิน" },
-  "ฟ้า": { en: "Light Blue", th: "สีฟ้า" },
-  "น้ำตาล": { en: "Brown", th: "สีน้ำตาล" },
-  "ทอง": { en: "Gold", th: "สีทอง" },
-  "เทา": { en: "Gray", th: "สีเทา" },
-  "เขียว": { en: "Green", th: "สีเขียว" },
-  "ส้ม": { en: "Orange", th: "สีส้ม" },
-  "ชมพู": { en: "Pink", th: "สีชมพู" },
-  "ม่วง": { en: "Purple", th: "สีม่วง" },
-  "แดง": { en: "Red", th: "สีแดง" },
-  "เงิน": { en: "Silver", th: "สีเงิน" },
-  "ขาว": { en: "White", th: "สีขาว" },
-  "เหลือง": { en: "Yellow", th: "สีเหลือง" }
-};
-
 function currencyOptionsForCountry(country: string) {
   return currencyOptionsByCountry[country] || ["USD"];
 }
 
 function defaultCurrencyForCountry(country: string) {
   return currencyOptionsForCountry(country)[0] || "USD";
-}
-
-function normalizeColor(value: string | null | undefined, language: string) {
-  const raw = String(value || "").trim();
-  if (!raw) return "";
-  const normalized = raw.toLowerCase().replace(/^สี/, "").trim();
-  const direct = colorTranslations[normalized] || colorTranslations[raw];
-  if (direct) return language === "th" ? direct.th : direct.en;
-  const foundKey = Object.keys(colorTranslations).find((key) => raw.includes(key));
-  const found = foundKey ? colorTranslations[foundKey] : null;
-  return found ? (language === "th" ? found.th : found.en) : raw;
 }
 
 function formatDateForDisplay(value: string | null | undefined, language: string) {
@@ -661,6 +612,7 @@ function normalizeDateToIso(value: string | null | undefined) {
   return raw;
 }
 
+// The wizard keeps its own words because the language is chosen on its first screen, before it is saved to the account.
 const copy = {
   en: {
     setupTitle: "Set up RouteHQ",
@@ -689,21 +641,15 @@ const copy = {
     english: "English",
     thai: "ภาษาไทย (Thai)",
     step2Title: "Add your first vehicle",
-    step2Subtitle: "Photograph the registration book and we fill in the details for you.",
-    scanBlueBook: "Photograph the registration book",
-    scanBlueBookBody: "We read the plate, make, model and dates from it.",
-    uploadPhotos: "Add photos of the vehicle",
-    uploadPhotosBody: "Optional. Customers see these.",
-    photosSelected: (count: number) => `${count} photo${count === 1 ? "" : "s"} chosen`,
-    removePhoto: "Remove photo",
+    step2Subtitle: "One is enough to start. You can add the rest any time.",
+    addVehicle: "Add a vehicle",
+    addVehicleBody: "Photograph the registration book and we fill in the details, or type them in. You come back here afterwards.",
     importVehicles: "Bring in a list",
     importVehiclesBody: "Have your vehicles in a spreadsheet? Add them all at once.",
-    readingBlueBook: "Reading the registration book…",
-    renewalHelp: "RouteHQ reminds you before these dates.",
-    confirmVehicle: "Add this vehicle",
     addVehiclesLater: "I'll add vehicles later",
     step3Title: "You are ready",
     step3Subtitle: "Here is what happens next.",
+    vehicleAdded: (name: string) => `${name} is in your fleet`,
     expiresInDays: (item: string, days: number) => `${item} runs out in ${days} ${days === 1 ? "day" : "days"}`,
     alreadyExpired: (item: string) => `${item} has already run out`,
     nextUpcoming: (item: string, date: string) => `Next date: ${item}, ${date}. We will remind you before then.`,
@@ -715,49 +661,12 @@ const copy = {
     finish: "Open my dashboard",
     finishLine: "Finish and connect LINE",
     finishing: "Finishing…",
-    ocrFailed: "We could not read that photo. Try a clearer one, or type the details in.",
-    scanFailed: "We could not read the registration book. Try again, or type the details in.",
     profileFailed: "That did not save. Check your connection and try again.",
-    vehicleFailed: "The vehicle was not added. Check the details and try again.",
     finishFailed: "That did not finish. Check your connection and try again.",
     vehicleTax: "Road tax",
     compulsoryInsurance: "Compulsory insurance",
     voluntaryInsurance: "Insurance",
-    nextService: "Next service",
-    fields: {
-      category: "Kind of vehicle",
-      vin: "Chassis number (VIN)",
-      make: "Make",
-      model: "Model",
-      trim: "Version",
-      year: "Year",
-      registration: "Number plate",
-      color: "Colour",
-      mileage: "Mileage now",
-      currency: "Currency",
-      rate: "Your prices",
-      dailyShort: "Per day",
-      weeklyShort: "Per week",
-      monthlyShort: "Per month",
-      taxExpiry: "Road tax runs out",
-      porborExpiry: "Compulsory insurance runs out",
-      insuranceExpiry: "Insurance runs out",
-      nextService: "Next service due",
-      transmission: "Gearbox",
-      fuelType: "Fuel",
-      engineCc: "Engine size (cc)",
-      seating: "Seats",
-      otherMake: "Another make",
-      pickMake: "Choose a make",
-      loading: "Loading…",
-      searchMake: "Search makes",
-      pickModel: "Choose a model",
-      pickMakeFirst: "Choose a make first",
-      other: "Another one",
-      pickYear: "Choose a year",
-      pickTrim: "Choose a version",
-      cat: { car: "Car", van: "Van", motorcycle: "Motorbike", scooter: "Scooter", ebike: "E-bike", atv: "ATV" } as Record<string, string>
-    }
+    nextService: "Next service"
   },
   th: {
     setupTitle: "ตั้งค่า RouteHQ",
@@ -786,21 +695,15 @@ const copy = {
     english: "English",
     thai: "ภาษาไทย",
     step2Title: "เพิ่มรถคันแรก",
-    step2Subtitle: "ถ่ายรูปเล่มทะเบียน แล้วเราจะกรอกรายละเอียดให้",
-    scanBlueBook: "ถ่ายรูปเล่มทะเบียน",
-    scanBlueBookBody: "เราอ่านทะเบียน ยี่ห้อ รุ่น และวันที่จากรูปให้",
-    uploadPhotos: "เพิ่มรูปรถ",
-    uploadPhotosBody: "ไม่บังคับ ลูกค้าจะเห็นรูปเหล่านี้",
-    photosSelected: (count: number) => `เลือกแล้ว ${count} รูป`,
-    removePhoto: "ลบรูป",
+    step2Subtitle: "คันเดียวก็เริ่มได้ ที่เหลือเพิ่มได้ทุกเมื่อ",
+    addVehicle: "เพิ่มรถ",
+    addVehicleBody: "ถ่ายรูปเล่มทะเบียนแล้วเรากรอกรายละเอียดให้ หรือพิมพ์เองก็ได้ เสร็จแล้วจะกลับมาที่หน้านี้",
     importVehicles: "นำเข้ารายการรถ",
     importVehiclesBody: "มีรายการรถในสเปรดชีตอยู่แล้ว? เพิ่มทั้งหมดได้ในครั้งเดียว",
-    readingBlueBook: "กำลังอ่านเล่มทะเบียน…",
-    renewalHelp: "RouteHQ จะเตือนคุณก่อนถึงวันเหล่านี้",
-    confirmVehicle: "เพิ่มรถคันนี้",
     addVehiclesLater: "ไว้เพิ่มรถทีหลัง",
     step3Title: "พร้อมใช้งานแล้ว",
     step3Subtitle: "ต่อจากนี้จะเป็นแบบนี้",
+    vehicleAdded: (name: string) => `${name} อยู่ในรายการรถของคุณแล้ว`,
     expiresInDays: (item: string, days: number) => `${item}จะหมดอายุในอีก ${days} วัน`,
     alreadyExpired: (item: string) => `${item}หมดอายุแล้ว`,
     nextUpcoming: (item: string, date: string) => `วันถัดไป: ${item} ${date} เราจะเตือนคุณก่อนถึงวันนั้น`,
@@ -812,56 +715,14 @@ const copy = {
     finish: "เปิดหน้าหลักของฉัน",
     finishLine: "เสร็จสิ้นและเชื่อมต่อ LINE",
     finishing: "กำลังดำเนินการ…",
-    ocrFailed: "เราอ่านรูปนี้ไม่ได้ ลองใช้รูปที่ชัดขึ้น หรือพิมพ์รายละเอียดเอง",
-    scanFailed: "เราอ่านเล่มทะเบียนไม่ได้ ลองอีกครั้ง หรือพิมพ์รายละเอียดเอง",
     profileFailed: "บันทึกไม่สำเร็จ ตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง",
-    vehicleFailed: "เพิ่มรถไม่สำเร็จ ตรวจสอบรายละเอียดแล้วลองอีกครั้ง",
     finishFailed: "ดำเนินการไม่สำเร็จ ตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง",
     vehicleTax: "ภาษีรถ",
     compulsoryInsurance: "พ.ร.บ.",
     voluntaryInsurance: "ประกันภัย",
-    nextService: "เช็กระยะครั้งถัดไป",
-    fields: {
-      category: "ประเภทรถ",
-      vin: "เลขตัวถัง (VIN)",
-      make: "ยี่ห้อ",
-      model: "รุ่น",
-      trim: "รุ่นย่อย",
-      year: "ปี",
-      registration: "ทะเบียนรถ",
-      color: "สี",
-      mileage: "เลขไมล์ตอนนี้",
-      currency: "สกุลเงิน",
-      rate: "ราคาของคุณ",
-      dailyShort: "ต่อวัน",
-      weeklyShort: "ต่อสัปดาห์",
-      monthlyShort: "ต่อเดือน",
-      taxExpiry: "ภาษีรถหมดอายุ",
-      porborExpiry: "พ.ร.บ. หมดอายุ",
-      insuranceExpiry: "ประกันภัยหมดอายุ",
-      nextService: "กำหนดเช็กระยะครั้งถัดไป",
-      transmission: "เกียร์",
-      fuelType: "เชื้อเพลิง",
-      engineCc: "ขนาดเครื่องยนต์ (ซีซี)",
-      seating: "จำนวนที่นั่ง",
-      otherMake: "ยี่ห้ออื่น",
-      pickMake: "เลือกยี่ห้อ",
-      loading: "กำลังโหลด…",
-      searchMake: "ค้นหายี่ห้อ",
-      pickModel: "เลือกรุ่น",
-      pickMakeFirst: "เลือกยี่ห้อก่อน",
-      other: "อื่น ๆ",
-      pickYear: "เลือกปี",
-      pickTrim: "เลือกรุ่นย่อย",
-      cat: { car: "รถยนต์", van: "รถตู้", motorcycle: "มอเตอร์ไซค์", scooter: "สกู๊ตเตอร์", ebike: "จักรยานไฟฟ้า", atv: "เอทีวี" } as Record<string, string>
-    }
+    nextService: "เช็กระยะครั้งถัดไป"
   }
 };
-
-function bestCategory(categories: Category[], fleetType: string) {
-  const preferred = fleetType === "motorcycles" ? ["motorcycle", "scooter"] : ["car"];
-  return categories.find((category) => preferred.includes(category.code))?.id || categories[0]?.id || "";
-}
 
 function daysUntil(value: string | null | undefined) {
   if (!value) return null;
@@ -908,95 +769,33 @@ function localizedLocationLabel(value: string, language: string) {
   return language === "th" ? thaiLocationLabels[value] || value : value;
 }
 
-function normalizeCatalogMatch(value: string) {
-  return value.toLowerCase().replace(/[^a-z0-9]/g, "");
-}
+type FirstVehicle = { make: string; model: string; registrationNumber: string; compliance?: Record<string, string | null> | null };
 
-function yearsForTrims(trims: VehicleTrim[]) {
-  const thisYear = new Date().getFullYear();
-  const years = new Set<number>();
-  trims.forEach((trim) => {
-    const endYear = Math.min(trim.year_to || thisYear + 1, thisYear + 1);
-    for (let year = endYear; year >= trim.year_from; year -= 1) years.add(year);
-  });
-  return Array.from(years).sort((left, right) => right - left);
-}
-
-function defaultVehicleYears() {
-  const newestYear = new Date().getFullYear() + 1;
-  return Array.from({ length: newestYear - 2004 }, (_, index) => newestYear - index);
-}
-
-function trimCoversYear(trim: VehicleTrim, yearValue: string) {
-  const parsedYear = Number(yearValue);
-  if (!parsedYear) return true;
-  return parsedYear >= trim.year_from && parsedYear <= (trim.year_to || new Date().getFullYear() + 1);
-}
-
-function trimQualityScore(trim: VehicleTrim) {
-  return [
-    trim.name.length,
-    trim.engine_cc ? 8 : 0,
-    trim.transmission ? 8 : 0,
-    trim.fuel_type ? 4 : 0,
-    trim.seating_capacity ? 4 : 0,
-    trim.drivetrain ? 8 : 0
-  ].reduce((total, score) => total + score, 0);
-}
-
-function trimVariantCode(name: string) {
-  const cleaned = name
-    .replace(/\([^)]*\)/g, " ")
-    .replace(/[^a-zA-Z0-9. ]/g, " ")
-    .trim();
-  const tokens = cleaned.split(/\s+/).filter(Boolean);
-  const codeToken = tokens.find((token) => /[a-zA-Z]/.test(token) && !/^\d+(\.\d+)?L?$/i.test(token));
-  return codeToken ? normalizeCatalogMatch(codeToken) : "";
-}
-
-function isShortLegacyTrim(trim: VehicleTrim) {
-  const tokenCount = trim.name.replace(/\([^)]*\)/g, " ").split(/\s+/).filter(Boolean).length;
-  return tokenCount <= 3 && !trim.transmission && !trim.drivetrain;
-}
-
-function dedupeTrimsForPicker(trims: VehicleTrim[]) {
-  const withoutBundledRows = trims.filter((trim) => !trim.name.includes(" / "));
-  const bestByName = new Map<string, VehicleTrim>();
-
-  withoutBundledRows.forEach((trim) => {
-    const key = normalizeCatalogMatch(trim.name);
-    const existing = bestByName.get(key);
-    if (!existing || trimQualityScore(trim) > trimQualityScore(existing)) {
-      bestByName.set(key, trim);
-    }
-  });
-
-  const exactDeduped = Array.from(bestByName.values());
-  return exactDeduped.filter((trim) => {
-    if (!isShortLegacyTrim(trim)) return true;
-    const code = trimVariantCode(trim.name);
-    if (!code) return true;
-    return !exactDeduped.some((candidate) => {
-      if (candidate.id === trim.id || isShortLegacyTrim(candidate)) return false;
-      return trimVariantCode(candidate.name) === code && trimCoversYear(candidate, String(trim.year_from));
-    });
-  });
-}
-
-export function OnboardingWizard({ categories, organization, initialStep = 1, initialLanguage }: { categories: Category[]; organization: Organization; initialStep?: number; initialLanguage?: string }) {
+/**
+ * First-time setup: the business, a first vehicle, then the dashboard.
+ *
+ * The vehicle itself is added on the normal Add vehicle screen (one form to
+ * keep right, with the registration book reader). Until setup is finished the
+ * app sends the person back here, and the page picks up at the right step.
+ */
+export function OnboardingWizard({
+  organization,
+  initialStep = 1,
+  initialLanguage,
+  firstVehicle = null
+}: {
+  organization: Organization;
+  initialStep?: number;
+  initialLanguage?: string;
+  firstVehicle?: FirstVehicle | null;
+}) {
   const router = useRouter();
-  const fileRef = useRef<HTMLInputElement | null>(null);
-  const photoRef = useRef<HTMLInputElement | null>(null);
   const [step, setStep] = useState(initialStep);
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
-  const [ocrLoading, setOcrLoading] = useState(false);
-  const [vehiclePhotoCount, setVehiclePhotoCount] = useState(0);
-  const [vehiclePhotoFiles, setVehiclePhotoFiles] = useState<File[]>([]);
-  const [vehiclePhotoPreviews, setVehiclePhotoPreviews] = useState<Array<{ id: string; name: string; url: string }>>([]);
   const [success, setSuccess] = useState(false);
   const [vehicleSkipped, setVehicleSkipped] = useState(false);
-  const [vehicle, setVehicle] = useState<any>(null);
+  const vehicle = firstVehicle;
   const savedLocation = organization.settings?.main_location || {};
   const [profile, setProfile] = useState({
     businessName: organization.name || "",
@@ -1009,29 +808,6 @@ export function OnboardingWizard({ categories, organization, initialStep = 1, in
     fleetType: organization.settings?.fleet_type || "mixed",
     fleetSize: organization.settings?.fleet_size || "1-5",
     language: initialLanguage || organization.default_locale || "en"
-  });
-  const [vehicleFields, setVehicleFields] = useState({
-    categoryId: bestCategory(categories, organization.settings?.fleet_type || "mixed"),
-    make: "",
-    model: "",
-    trim: "",
-    year: "",
-    registrationNumber: "",
-    vin: "",
-    color: "",
-    mileage: "",
-    transmission: "",
-    fuelType: "",
-    seatingCapacity: "",
-    engineCc: "",
-    taxExpiryDate: "",
-    porborExpiryDate: "",
-    insuranceExpiryDate: "",
-    nextServiceDate: "",
-    currency: defaultCurrencyForCountry(savedLocation.country || "Thailand"),
-    dailyRate: "",
-    weeklyRate: "",
-    monthlyRate: ""
   });
 
   const selectedCountry = profile.country === "Other" ? profile.customCountry : profile.country;
@@ -1052,36 +828,7 @@ export function OnboardingWizard({ categories, organization, initialStep = 1, in
     { value: "th", label: t.thai }
   ];
   const compliance = useMemo(() => soonestCompliance(vehicle, t), [vehicle, t]);
-
-  function updateVehicle(updates: Partial<typeof vehicleFields>) {
-    setVehicleFields((current) => ({ ...current, ...updates }));
-  }
-
-  function updateVehiclePhotoPreviews(files: FileList | null | undefined) {
-    vehiclePhotoPreviews.forEach((preview) => URL.revokeObjectURL(preview.url));
-    const nextFiles = Array.from(files || []);
-    const previews = nextFiles.map((file) => ({
-      id: crypto.randomUUID(),
-      name: file.name || "Vehicle photo",
-      url: URL.createObjectURL(file)
-    }));
-    setVehiclePhotoFiles(nextFiles);
-    setVehiclePhotoCount(previews.length);
-    setVehiclePhotoPreviews(previews);
-  }
-
-  function removeVehiclePhoto(photoId: string) {
-    setVehiclePhotoPreviews((current) => {
-      const removedIndex = current.findIndex((photo) => photo.id === photoId);
-      const removed = current[removedIndex];
-      if (removed) URL.revokeObjectURL(removed.url);
-      const nextPreviews = current.filter((photo) => photo.id !== photoId);
-      setVehiclePhotoFiles((files) => files.filter((_, index) => index !== removedIndex));
-      setVehiclePhotoCount(nextPreviews.length);
-      if (photoRef.current && nextPreviews.length === 0) photoRef.current.value = "";
-      return nextPreviews;
-    });
-  }
+  const vehicleName = vehicle ? [vehicle.registrationNumber, vehicle.make, vehicle.model].filter(Boolean).join(" ") : "";
 
   function submitBusinessProfile() {
     setError("");
@@ -1097,69 +844,11 @@ export function OnboardingWizard({ categories, organization, initialStep = 1, in
         formData.set("fleetType", profile.fleetType);
         formData.set("fleetSize", profile.fleetSize);
         formData.set("language", profile.language);
-        formData.set("currency", vehicleFields.currency || defaultCurrencyForCountry(selectedCountry));
+        formData.set("currency", defaultCurrencyForCountry(selectedCountry));
         await saveBusinessProfile(formData);
-        updateVehicle({ categoryId: bestCategory(categories, profile.fleetType), currency: defaultCurrencyForCountry(selectedCountry) });
-        setStep(2);
-      } catch (submitError) {
-        setError(submitError instanceof Error ? submitError.message : t.profileFailed);
-      }
-    });
-  }
-
-  async function runOcr(file: File) {
-    setError("");
-    setOcrLoading(true);
-    try {
-      const payload = new FormData();
-      payload.set("file", file);
-      const response = await fetch("/api/ocr/vehicle-logbook", { method: "POST", body: payload });
-      const result = await response.json();
-      if (!response.ok) {
-        throw new Error(result.error || t.ocrFailed);
-      }
-      const extracted = result.extracted || {};
-      updateVehicle({
-        make: extracted.make || vehicleFields.make,
-        model: extracted.model || vehicleFields.model,
-        trim: extracted.trim || vehicleFields.trim,
-        year: extracted.year ? String(extracted.year) : vehicleFields.year,
-        registrationNumber: extracted.registration_number || vehicleFields.registrationNumber,
-        vin: extracted.vin || vehicleFields.vin,
-        color: normalizeColor(extracted.color, profile.language) || vehicleFields.color,
-        engineCc: extracted.engine_cc ? String(extracted.engine_cc) : vehicleFields.engineCc,
-        seatingCapacity: extracted.seating_capacity ? String(extracted.seating_capacity) : vehicleFields.seatingCapacity,
-        transmission: extracted.transmission || vehicleFields.transmission,
-        taxExpiryDate: formatDateForDisplay(extracted.tax_expiry_date, profile.language) || vehicleFields.taxExpiryDate,
-        porborExpiryDate: formatDateForDisplay(extracted.porbor_expiry_date, profile.language) || vehicleFields.porborExpiryDate,
-        insuranceExpiryDate: formatDateForDisplay(extracted.insurance_expiry_date, profile.language) || vehicleFields.insuranceExpiryDate
-      });
-    } catch (ocrError) {
-      setError(ocrError instanceof Error ? ocrError.message : t.scanFailed);
-    } finally {
-      setOcrLoading(false);
-    }
-  }
-
-  function createVehicle() {
-    setError("");
-    startTransition(async () => {
-      try {
-        const formData = new FormData();
-        formData.set("organizationId", organization.id);
-        Object.entries(vehicleFields).forEach(([key, value]) => {
-          const normalizedValue = ["taxExpiryDate", "porborExpiryDate", "insuranceExpiryDate", "nextServiceDate"].includes(key)
-            ? normalizeDateToIso(value)
-            : value;
-          formData.set(key, normalizedValue);
-        });
-        vehiclePhotoFiles.forEach((file) => formData.append("vehiclePhotos", file));
-        const created = await createOnboardingVehicle(formData);
-        setVehicle(created);
-        setVehicleSkipped(false);
-        setStep(3);
-      } catch (submitError) {
-        setError(submitError instanceof Error ? submitError.message : t.vehicleFailed);
+        setStep(vehicle ? 3 : 2);
+      } catch {
+        setError(t.profileFailed);
       }
     });
   }
@@ -1167,11 +856,15 @@ export function OnboardingWizard({ categories, organization, initialStep = 1, in
   function skipVehicle() {
     setError("");
     startTransition(async () => {
-      const formData = new FormData();
-      formData.set("organizationId", organization.id);
-      await skipFirstVehicle(formData);
-      setVehicleSkipped(true);
-      setStep(3);
+      try {
+        const formData = new FormData();
+        formData.set("organizationId", organization.id);
+        await skipFirstVehicle(formData);
+        setVehicleSkipped(true);
+        setStep(3);
+      } catch {
+        setError(t.profileFailed);
+      }
     });
   }
 
@@ -1186,57 +879,52 @@ export function OnboardingWizard({ categories, organization, initialStep = 1, in
         await finishOnboarding(formData);
         setSuccess(true);
         setTimeout(() => router.push(destination as never), 1500);
-      } catch (submitError) {
-        setError(submitError instanceof Error ? submitError.message : t.finishFailed);
+      } catch {
+        setError(t.finishFailed);
       }
     });
   }
 
+  const tileClass = "rounded-xl bg-[var(--panel-secondary)] p-3.5";
+
   return (
     <main className="min-h-screen bg-[var(--background)] px-4 py-5 text-[var(--foreground)]">
       <div className="mx-auto flex min-h-[calc(100vh-40px)] max-w-xl flex-col">
-        <header className="mb-5 flex items-center justify-between">
-          <div>
-            <h1 className="text-[22px] font-bold">{t.setupTitle}</h1>
-          </div>
-          <div className="flex gap-2">
+        <header className="mb-4 flex items-center justify-between">
+          <h1 className="text-[22px] font-bold">{t.setupTitle}</h1>
+          <div aria-hidden="true" className="flex gap-2">
             {[1, 2, 3].map((entry) => (
               <span className={`h-3 w-3 rounded-full ${entry <= step ? "bg-[var(--primary)]" : "bg-[var(--border-strong)]"}`} key={entry} />
             ))}
           </div>
         </header>
 
-        <section className="card flex-1 p-4 sm:p-7" style={{ overflow: "visible" }}>
+        <section className="card flex-1 p-4 sm:p-7">
           {success ? (
-            <div className="flex min-h-[520px] flex-col items-center justify-center text-center">
+            <div className="flex min-h-[420px] flex-col items-center justify-center text-center">
               <div className="success-pop flex h-24 w-24 items-center justify-center rounded-full bg-[var(--success-light)] text-[var(--success)]">
                 <CheckCircle2 size={52} />
               </div>
-              <h2 className="mt-5 text-3xl font-semibold">{t.setupComplete}</h2>
-              <p className="mt-2 max-w-md text-sm leading-6 text-[var(--foreground-secondary)]">{t.setupCompleteBody}</p>
-              <div className="confetti mt-6" />
+              <h2 className="mt-5 text-[26px] font-bold">{t.setupComplete}</h2>
+              <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{t.setupCompleteBody}</p>
             </div>
           ) : null}
 
           {!success && step === 1 ? (
-            <div className="mx-auto max-w-xl">
-              <StepTitle icon={Languages} title={t.step1Title} subtitle={t.step1Subtitle} />
-              <div className="mt-6 grid gap-3">
-                <ChoiceGrid label={t.primaryLanguage} options={languageOptions} value={profile.language} onChange={(language) => setProfile({ ...profile, language })} />
-                <label>
-                  <span className="font-semibold text-[var(--foreground-secondary)]">{t.businessName}</span>
-                  <input className={fieldClass} onChange={(event) => setProfile({ ...profile, businessName: event.target.value })} required value={profile.businessName} />
+            <div>
+              <StepTitle icon={Languages} subtitle={t.step1Subtitle} title={t.step1Title} />
+              <div className="mt-5 grid gap-4">
+                <ChoiceGrid label={t.primaryLanguage} onChange={(language) => setProfile({ ...profile, language })} options={languageOptions} value={profile.language} />
+                <label className="block">
+                  <span className={labelClass}>{t.businessName}</span>
+                  <input className={fieldClass} maxLength={120} onChange={(event) => setProfile({ ...profile, businessName: event.target.value })} required value={profile.businessName} />
                 </label>
-                <div className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
-                  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                    <p className="text-sm font-semibold">{t.mainLocation}</p>
-                    <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[var(--foreground-secondary)]" title={t.mainLocationHint}>
-                      {t.mainLocationHint}
-                    </span>
-                  </div>
+                <div className={tileClass}>
+                  <p className="text-[16px] font-bold text-[var(--foreground)]">{t.mainLocation}</p>
+                  <p className="font-medium text-[var(--foreground-secondary)]">{t.mainLocationHint}</p>
                   <div className="mt-3 grid gap-3 sm:grid-cols-3">
-                    <label>
-                      <span className="font-semibold text-[var(--foreground-secondary)]">{t.country}</span>
+                    <label className="block">
+                      <span className={labelClass}>{t.country}</span>
                       <select
                         className={fieldClass}
                         onChange={(event) => {
@@ -1244,15 +932,18 @@ export function OnboardingWizard({ categories, organization, initialStep = 1, in
                           const nextRegion = regionOptions(nextCountry)[0]?.name || "Other";
                           const nextTown = townOptions(nextCountry, nextRegion)[0] || "Other";
                           setProfile({ ...profile, country: nextCountry, region: nextRegion, town: nextTown });
-                          updateVehicle({ currency: defaultCurrencyForCountry(nextCountry) });
                         }}
                         value={profile.country}
                       >
-                        {locationOptions.map((option) => <option key={option.country} value={option.country}>{localizedLocationLabel(option.country, profile.language)}</option>)}
+                        {locationOptions.map((option) => (
+                          <option key={option.country} value={option.country}>
+                            {localizedLocationLabel(option.country, profile.language)}
+                          </option>
+                        ))}
                       </select>
                     </label>
-                    <label>
-                      <span className="font-semibold text-[var(--foreground-secondary)]">{t.region}</span>
+                    <label className="block">
+                      <span className={labelClass}>{t.region}</span>
                       <select
                         className={fieldClass}
                         onChange={(event) => {
@@ -1262,127 +953,75 @@ export function OnboardingWizard({ categories, organization, initialStep = 1, in
                         }}
                         value={profile.region}
                       >
-                        {currentRegions.map((region) => <option key={region.name} value={region.name}>{localizedLocationLabel(region.name, profile.language)}</option>)}
+                        {currentRegions.map((region) => (
+                          <option key={region.name} value={region.name}>
+                            {localizedLocationLabel(region.name, profile.language)}
+                          </option>
+                        ))}
                       </select>
                     </label>
-                    <label>
-                      <span className="font-semibold text-[var(--foreground-secondary)]">{t.town}</span>
+                    <label className="block">
+                      <span className={labelClass}>{t.town}</span>
                       <select className={fieldClass} onChange={(event) => setProfile({ ...profile, town: event.target.value })} value={profile.town}>
-                        {currentTowns.map((town) => <option key={town} value={town}>{localizedLocationLabel(town, profile.language)}</option>)}
+                        {currentTowns.map((town) => (
+                          <option key={town} value={town}>
+                            {localizedLocationLabel(town, profile.language)}
+                          </option>
+                        ))}
                       </select>
                     </label>
                   </div>
                   {profile.country === "Other" || profile.region === "Other" || profile.town === "Other" ? (
                     <div className="mt-3 grid gap-3 sm:grid-cols-3">
-                      {profile.country === "Other" ? <input className={fieldClass} onChange={(event) => setProfile({ ...profile, customCountry: event.target.value })} placeholder={t.customCountry} value={profile.customCountry} /> : null}
-                      {profile.region === "Other" ? <input className={fieldClass} onChange={(event) => setProfile({ ...profile, customRegion: event.target.value })} placeholder={t.customRegion} value={profile.customRegion} /> : null}
-                      {profile.town === "Other" ? <input className={fieldClass} onChange={(event) => setProfile({ ...profile, customTown: event.target.value })} placeholder={t.customTown} value={profile.customTown} /> : null}
+                      {profile.country === "Other" ? <input aria-label={t.customCountry} className="w-full" onChange={(event) => setProfile({ ...profile, customCountry: event.target.value })} placeholder={t.customCountry} value={profile.customCountry} /> : null}
+                      {profile.region === "Other" ? <input aria-label={t.customRegion} className="w-full" onChange={(event) => setProfile({ ...profile, customRegion: event.target.value })} placeholder={t.customRegion} value={profile.customRegion} /> : null}
+                      {profile.town === "Other" ? <input aria-label={t.customTown} className="w-full" onChange={(event) => setProfile({ ...profile, customTown: event.target.value })} placeholder={t.customTown} value={profile.customTown} /> : null}
                     </div>
                   ) : null}
                 </div>
-                <ChoiceGrid label={t.fleetType} options={fleetTypeOptions} value={profile.fleetType} onChange={(fleetType) => setProfile({ ...profile, fleetType })} />
-                <ChoiceGrid label={t.fleetSize} options={fleetSizeOptions} value={profile.fleetSize} onChange={(fleetSize) => setProfile({ ...profile, fleetSize })} />
+                <ChoiceGrid label={t.fleetType} onChange={(fleetType) => setProfile({ ...profile, fleetType })} options={fleetTypeOptions} value={profile.fleetType} />
+                <ChoiceGrid label={t.fleetSize} onChange={(fleetSize) => setProfile({ ...profile, fleetSize })} options={fleetSizeOptions} value={profile.fleetSize} />
               </div>
-              <FooterActions error={error} pending={isPending} primaryLabel={t.continue} savingLabel={t.saving} onPrimary={submitBusinessProfile} />
+              <FooterActions error={error} onPrimary={submitBusinessProfile} pending={isPending || profile.businessName.trim().length < 2} primaryLabel={t.continue} savingLabel={isPending ? t.saving : t.continue} />
             </div>
           ) : null}
 
           {!success && step === 2 ? (
-            <div className="mx-auto max-w-xl">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <StepTitle icon={ScanLine} title={t.step2Title} subtitle={t.step2Subtitle} />
-                <button className="secondary-action pressable shrink-0" onClick={skipVehicle} type="button">
-                  {t.addVehiclesLater}
-                </button>
+            <div>
+              <StepTitle icon={Car} subtitle={t.step2Subtitle} title={t.step2Title} />
+              <div className="mt-5 grid gap-2">
+                <a className="pressable flex items-start gap-3 rounded-xl bg-[var(--primary)] p-4 text-white" href="/fleet/new">
+                  <Camera className="mt-0.5 shrink-0" size={26} />
+                  <span>
+                    <span className="block text-[17px] font-bold">{t.addVehicle}</span>
+                    <span className="block font-medium text-white/90">{t.addVehicleBody}</span>
+                  </span>
+                </a>
+                <a className={`pressable flex items-start gap-3 ${tileClass}`} href="/fleet/import?from=onboarding">
+                  <FileSpreadsheet className="mt-0.5 shrink-0 text-[var(--primary)]" size={26} />
+                  <span>
+                    <span className="block text-[17px] font-bold text-[var(--foreground)]">{t.importVehicles}</span>
+                    <span className="block font-medium text-[var(--foreground-secondary)]">{t.importVehiclesBody}</span>
+                  </span>
+                </a>
               </div>
-              <input
-                accept="image/*,.pdf"
-                capture="environment"
-                className="hidden"
-                onChange={(event) => {
-                  const file = event.target.files?.[0];
-                  if (file) runOcr(file);
-                }}
-                ref={fileRef}
-                type="file"
-              />
-              <input
-                accept="image/*"
-                className="hidden"
-                multiple
-                onChange={(event) => updateVehiclePhotoPreviews(event.target.files)}
-                ref={photoRef}
-                type="file"
-              />
-              <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                <button className="pressable rounded-lg bg-[var(--primary)] p-3 text-left text-white shadow-lg" onClick={() => fileRef.current?.click()} type="button">
-                  <Camera size={28} />
-                  <p className="mt-3 text-lg font-semibold">{t.scanBlueBook}</p>
-                  <p className="mt-1 text-sm text-white/85">{t.scanBlueBookBody}</p>
-                </button>
-                <button className="pressable rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3 text-left" onClick={() => router.push("/fleet/import?from=onboarding")} type="button">
-                  <FileSpreadsheet className="text-[var(--primary)]" size={28} />
-                  <p className="mt-3 text-lg font-semibold">{t.importVehicles}</p>
-                  <p className="mt-1 text-sm text-[var(--foreground-secondary)]">{t.importVehiclesBody}</p>
-                </button>
-              </div>
-              <div className="mt-4 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex items-start gap-3">
-                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-[var(--primary-light)] text-[var(--primary)]">
-                      <ImagePlus size={24} />
-                    </span>
-                    <div>
-                      <p className="text-lg font-semibold text-[var(--foreground)]">{t.uploadPhotos}</p>
-                      <p className="mt-1 text-sm text-[var(--foreground-secondary)]">{vehiclePhotoCount ? t.photosSelected(vehiclePhotoCount) : t.uploadPhotosBody}</p>
-                    </div>
-                  </div>
-                  <button className="pressable rounded-lg bg-white px-4 py-3 text-sm font-semibold text-[var(--primary)] shadow-sm ring-1 ring-[var(--border-strong)]" onClick={() => photoRef.current?.click()} type="button">
-                    {t.uploadPhotos}
-                  </button>
-                </div>
-              </div>
-              {vehiclePhotoPreviews.length > 0 ? (
-                <div className="mt-4 rounded-lg border border-[var(--border)] bg-white p-3">
-                  <p className="text-sm font-semibold text-[var(--foreground)]">{t.photosSelected(vehiclePhotoPreviews.length)}</p>
-                  <div className="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4">
-                    {vehiclePhotoPreviews.map((photo) => (
-                      <div className="relative overflow-hidden rounded-lg border border-[var(--info-line)] bg-[var(--panel-secondary)]" key={photo.id}>
-                        <button
-                          aria-label={t.removePhoto}
-                          className="pressable absolute right-1 top-1 z-10 grid h-7 w-7 place-items-center rounded-full bg-white/95 text-[var(--danger)] shadow-sm"
-                          onClick={() => removeVehiclePhoto(photo.id)}
-                          type="button"
-                        >
-                          <X size={15} strokeWidth={3} />
-                        </button>
-                        <img alt={photo.name} className="aspect-square w-full object-cover" src={photo.url} />
-                        <p className="truncate px-2 py-1 text-[14px] font-bold text-[var(--foreground-secondary)]">{photo.name}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-              {ocrLoading ? <p className="mt-4 rounded-lg bg-[var(--primary-light)] p-3 text-sm font-bold text-[var(--primary)]">{t.readingBlueBook}</p> : null}
-              <VehicleFields categories={categories} fields={vehicleFields} labels={t.fields} language={profile.language} onChange={updateVehicle} selectedCountry={selectedCountry} />
-              <p className="mt-4 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3 text-sm font-semibold text-[var(--foreground-secondary)]">
-                {t.renewalHelp}
-              </p>
-              <FooterActions
-                error={error}
-                pending={isPending}
-                primaryLabel={t.confirmVehicle}
-                savingLabel={t.saving}
-                onPrimary={createVehicle}
-              />
+              {error ? <p className="mt-4 rounded-xl bg-[var(--warning-light)] p-3 font-semibold text-[var(--foreground)]">{error}</p> : null}
+              <button className="secondary-action pressable mt-4 w-full" disabled={isPending} onClick={skipVehicle} type="button">
+                {isPending ? t.saving : t.addVehiclesLater}
+              </button>
             </div>
           ) : null}
 
           {!success && step === 3 ? (
-            <div className="mx-auto max-w-xl">
-              <StepTitle icon={CheckCircle2} title={t.step3Title} subtitle={t.step3Subtitle} />
+            <div>
+              <StepTitle icon={CheckCircle2} subtitle={t.step3Subtitle} title={t.step3Title} />
               <div className="mt-5 space-y-2">
-                <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5">
+                {vehicle ? (
+                  <div className={tileClass}>
+                    <p className="text-[16px] font-bold text-[var(--foreground)]">{t.vehicleAdded(vehicleName)}</p>
+                  </div>
+                ) : null}
+                <div className={tileClass}>
                   <p className="text-[16px] font-bold text-[var(--foreground)]">
                     {vehicle && compliance && Number(compliance.days) < 0
                       ? t.alreadyExpired(compliance.label)
@@ -1394,13 +1033,13 @@ export function OnboardingWizard({ categories, organization, initialStep = 1, in
                     {vehicle && compliance && Number(compliance.days) >= 0 ? t.nextUpcoming(compliance.label, formatDateForDisplay(String(compliance.date), profile.language)) : t.remindersBody}
                   </p>
                 </div>
-                {vehicleSkipped ? (
-                  <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5">
+                {vehicleSkipped || !vehicle ? (
+                  <div className={tileClass}>
                     <p className="font-medium text-[var(--foreground-secondary)]">{t.vehicleLater}</p>
                   </div>
                 ) : null}
                 {/* LINE is connected properly from Settings. This step used to show a made-up QR code and a button that claimed LINE was connected. */}
-                <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5">
+                <div className={tileClass}>
                   <p className="text-[16px] font-bold text-[var(--foreground)]">{t.lineTitle}</p>
                   <p className="font-medium text-[var(--foreground-secondary)]">{t.lineBody}</p>
                 </div>
@@ -1425,7 +1064,7 @@ export function OnboardingWizard({ categories, organization, initialStep = 1, in
 function StepTitle({ icon: Icon, title, subtitle }: { icon: typeof Car; title: string; subtitle: string }) {
   return (
     <div>
-      <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-[var(--primary-light)] text-[var(--primary)]">
+      <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
         <Icon size={24} />
       </span>
       <h2 className="mt-3 text-[26px] font-bold leading-tight text-[var(--foreground)]">{title}</h2>
@@ -1437,11 +1076,12 @@ function StepTitle({ icon: Icon, title, subtitle }: { icon: typeof Car; title: s
 function ChoiceGrid({ label, options, value, onChange }: { label: string; options: Array<{ value: string; label: string }>; value: string; onChange: (value: string) => void }) {
   return (
     <div>
-      <p className="mb-2 text-sm font-semibold">{label}</p>
-      <div className="grid gap-2 sm:grid-cols-2">
+      <p className={labelClass}>{label}</p>
+      <div className="mt-1 flex flex-wrap gap-2">
         {options.map((option) => (
           <button
-            className={`pressable min-h-12 rounded-lg border px-4 py-3 text-left text-sm font-semibold ${value === option.value ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
+            aria-pressed={value === option.value}
+            className={`pressable min-h-11 rounded-full px-4 font-bold ${value === option.value ? "bg-[var(--primary)] text-white" : "bg-[var(--panel-secondary)] text-[var(--foreground)]"}`}
             key={option.value}
             onClick={() => onChange(option.value)}
             type="button"
@@ -1454,492 +1094,13 @@ function ChoiceGrid({ label, options, value, onChange }: { label: string; option
   );
 }
 
-function VehicleFields({
-  categories,
-  fields,
-  labels,
-  language,
-  onChange,
-  selectedCountry
-}: {
-  categories: Category[];
-  fields: Record<string, string>;
-  labels: (typeof copy)["en"]["fields"];
-  language: string;
-  onChange: (updates: any) => void;
-  selectedCountry: string;
-}) {
-  const selectedCategory = categories.find((category) => category.id === fields.categoryId);
-  const selectedCategoryText = `${selectedCategory?.code || ""} ${selectedCategory?.name || ""}`.toLowerCase();
-  const categoryCode = selectedCategory?.code || categories[0]?.code || "car";
-  const isTwoWheeler =
-    selectedCategoryText.includes("motorcycle") ||
-    selectedCategoryText.includes("scooter") ||
-    selectedCategoryText.includes("e-bike") ||
-    selectedCategoryText.includes("ebike");
-  const [makes, setMakes] = useState<VehicleMake[]>([]);
-  const [models, setModels] = useState<VehicleModel[]>([]);
-  const [trims, setTrims] = useState<VehicleTrim[]>([]);
-  const [selectedMakeId, setSelectedMakeId] = useState("");
-  const [selectedModelId, setSelectedModelId] = useState("");
-  const [selectedTrimId, setSelectedTrimId] = useState("");
-  const [manualMake, setManualMake] = useState(false);
-  const [manualModel, setManualModel] = useState(false);
-  const [manualTrim, setManualTrim] = useState(false);
-  const [makeDropdownOpen, setMakeDropdownOpen] = useState(false);
-  const [makeSearch, setMakeSearch] = useState("");
-  const catalogYears = useMemo(() => yearsForTrims(trims), [trims]);
-  const fallbackYears = useMemo(() => (selectedModelId || manualModel || fields.model ? defaultVehicleYears() : []), [fields.model, manualModel, selectedModelId]);
-  const yearOptions = catalogYears.length > 0 ? catalogYears : fallbackYears;
-  const visibleTrims = useMemo(() => dedupeTrimsForPicker(trims.filter((trim) => trimCoversYear(trim, fields.year))), [trims, fields.year]);
-  const searchedMakes = useMemo(() => {
-    const needle = normalizeCatalogMatch(makeSearch);
-    return needle ? makes.filter((make) => normalizeCatalogMatch(make.name).includes(needle)) : makes;
-  }, [makeSearch, makes]);
-
-  useEffect(() => {
-    let mounted = true;
-    fetchVehicleMakesForCategory(categoryCode)
-      .then((nextMakes) => {
-        if (!mounted) return;
-        setMakes(nextMakes);
-        const matchedMake = nextMakes.find((make) => normalizeCatalogMatch(make.name) === normalizeCatalogMatch(fields.make));
-        setSelectedMakeId(matchedMake?.id || "");
-        setManualMake(Boolean(fields.make && !matchedMake));
-        if (matchedMake) setMakeSearch("");
-      })
-      .catch(() => {
-        if (!mounted) return;
-        setMakes([]);
-      });
-
-    return () => {
-      mounted = false;
-    };
-  }, [categoryCode, fields.make]);
-
-  useEffect(() => {
-    if (!selectedMakeId) {
-      setModels([]);
-      return;
-    }
-
-    let mounted = true;
-    fetchVehicleModels(selectedMakeId, categoryCode)
-      .then((nextModels) => {
-        if (!mounted) return;
-        setModels(nextModels);
-        const matchedModel = nextModels.find((model) => normalizeCatalogMatch(model.name) === normalizeCatalogMatch(fields.model));
-        setSelectedModelId(matchedModel?.id || "");
-        setManualModel(Boolean(fields.model && !matchedModel));
-      })
-      .catch(() => {
-        if (!mounted) return;
-        setModels([]);
-      });
-
-    return () => {
-      mounted = false;
-    };
-  }, [categoryCode, fields.model, selectedMakeId]);
-
-  useEffect(() => {
-    if (!selectedModelId) {
-      setTrims([]);
-      setSelectedTrimId("");
-      return;
-    }
-
-    let mounted = true;
-    fetchVehicleTrims(selectedModelId)
-      .then((nextTrims) => {
-        if (!mounted) return;
-        setTrims(nextTrims);
-        const matchedTrim = nextTrims.find((trim) => normalizeCatalogMatch(trim.name) === normalizeCatalogMatch(fields.trim));
-        setSelectedTrimId(matchedTrim?.id || "");
-        setManualTrim(Boolean(fields.trim && !matchedTrim));
-      })
-      .catch(() => {
-        if (!mounted) return;
-        setTrims([]);
-      });
-
-    return () => {
-      mounted = false;
-    };
-  }, [fields.trim, selectedModelId]);
-
-  function handleMakeChange(value: string) {
-    setSelectedModelId("");
-    setSelectedTrimId("");
-    setModels([]);
-    setTrims([]);
-    setManualModel(false);
-    setManualTrim(false);
-    setMakeDropdownOpen(false);
-    setMakeSearch("");
-
-    if (value === "__manual__") {
-      setManualMake(true);
-      setSelectedMakeId("");
-      onChange({ make: "", model: "", year: "", trim: "" });
-      return;
-    }
-
-    const nextMake = makes.find((make) => make.id === value);
-    setManualMake(false);
-    setSelectedMakeId(nextMake?.id || "");
-    onChange({ make: nextMake?.name || "", model: "", year: "", trim: "" });
-  }
-
-  function handleModelChange(value: string) {
-    setSelectedTrimId("");
-    setTrims([]);
-    setManualTrim(false);
-
-    if (value === "__manual__") {
-      setManualModel(true);
-      setSelectedModelId("");
-      onChange({ model: "", year: "", trim: "" });
-      return;
-    }
-
-    const nextModel = models.find((model) => model.id === value);
-    setManualModel(false);
-    setSelectedModelId(nextModel?.id || "");
-    onChange({ model: nextModel?.name || "", year: "", trim: "" });
-  }
-
-  function applyTrim(nextTrim: VehicleTrim) {
-    setSelectedTrimId(nextTrim.id);
-    onChange({
-      trim: nextTrim.name,
-      engineCc: nextTrim.engine_cc ? String(nextTrim.engine_cc) : fields.engineCc,
-      transmission: nextTrim.transmission || fields.transmission,
-      fuelType: nextTrim.fuel_type || fields.fuelType,
-      seatingCapacity: nextTrim.seating_capacity ? String(nextTrim.seating_capacity) : fields.seatingCapacity
-    });
-  }
-
-  function handleTrimChange(value: string) {
-    if (value === "__manual__") {
-      setManualTrim(true);
-      setSelectedTrimId("");
-      onChange({ trim: "" });
-      return;
-    }
-
-    setManualTrim(false);
-    const nextTrim = visibleTrims.find((trim) => trim.id === value);
-    if (nextTrim) {
-      applyTrim(nextTrim);
-    } else {
-      setSelectedTrimId("");
-      onChange({ trim: "" });
-    }
-  }
-
+function FooterActions({ error, onPrimary, pending, primaryLabel, savingLabel }: { error: string; onPrimary: () => void; pending: boolean; primaryLabel: string; savingLabel: string }) {
   return (
-    <div className="mt-6 space-y-3">
-      <div className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <label>
-            <span className="font-semibold text-[var(--foreground-secondary)]">{labels.category}</span>
-            <select
-              className={fieldClass}
-              onChange={(event) => {
-                setSelectedMakeId("");
-                setSelectedModelId("");
-                setSelectedTrimId("");
-                setModels([]);
-                setTrims([]);
-                setManualMake(false);
-                setManualModel(false);
-                setManualTrim(false);
-                setMakeSearch("");
-                setMakeDropdownOpen(false);
-                onChange({ categoryId: event.target.value, make: "", model: "", year: "", trim: "", seatingCapacity: "" });
-              }}
-              value={fields.categoryId}
-            >
-              {categories.map((category) => <option key={category.id} value={category.id}>{labels.cat[category.code] || category.name}</option>)}
-            </select>
-          </label>
-          <TextField label={labels.vin} name="vin" value={fields.vin} onChange={onChange} />
-          <div>
-            <span className="font-semibold text-[var(--foreground-secondary)]">{labels.make}</span>
-            <div className="relative mt-2">
-              <button
-                className="pressable flex min-h-12 w-full items-center justify-between gap-3 rounded-lg border border-[var(--border)] bg-white px-4 py-3 text-left text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
-                onClick={() => setMakeDropdownOpen((open) => !open)}
-                type="button"
-              >
-                <span className="flex min-w-0 items-center gap-3">
-                  {selectedMakeId ? (
-                    (() => {
-                      const selected = makes.find((make) => make.id === selectedMakeId);
-                      return selected?.logo_url ? (
-                        <img alt="" className="h-7 w-7 shrink-0 rounded bg-white object-contain" src={selected.logo_url} />
-                      ) : (
-                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[var(--primary-light)] text-xs font-bold text-[var(--primary)]">{selected?.name.slice(0, 2) || "?"}</span>
-                      );
-                    })()
-                  ) : (
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[var(--panel-secondary)] text-xs font-bold text-[var(--primary)]">+</span>
-                  )}
-                  <span className={fields.make ? "truncate font-semibold" : "truncate text-[var(--foreground-secondary)]"}>
-                    {manualMake ? labels.otherMake : fields.make || (makes.length ? labels.pickMake : labels.loading)}
-                  </span>
-                </span>
-                <ChevronDown className="shrink-0 text-[var(--primary)]" size={18} />
-              </button>
-              {makeDropdownOpen ? (
-                <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-lg border border-[var(--border)] bg-white shadow-xl shadow-[var(--foreground)]/10">
-                  <div className="border-b border-[var(--border)] p-3">
-                    <input
-                      className="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
-                      onChange={(event) => setMakeSearch(event.target.value)}
-                      placeholder={labels.searchMake}
-                      value={makeSearch}
-                    />
-                  </div>
-                  <div className="max-h-72 overflow-y-auto py-1">
-                    {searchedMakes.map((make) => (
-                      <button
-                        className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm hover:bg-[var(--panel-secondary)]"
-                        key={make.id}
-                        onClick={() => handleMakeChange(make.id)}
-                        type="button"
-                      >
-                        {make.logo_url ? (
-                          <img alt="" className="h-7 w-7 shrink-0 rounded bg-white object-contain" src={make.logo_url} />
-                        ) : (
-                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[var(--primary-light)] text-xs font-bold text-[var(--primary)]">{make.name.slice(0, 2)}</span>
-                        )}
-                        <span className="font-semibold text-[var(--foreground)]">{make.name}</span>
-                        <span className="ml-auto text-xs uppercase text-[var(--foreground-secondary)]">{make.origin_country || ""}</span>
-                      </button>
-                    ))}
-                    <button
-                      className="flex w-full items-center gap-3 border-t border-[var(--border)] px-3 py-2 text-left text-sm font-semibold text-[var(--primary)] hover:bg-[var(--panel-secondary)]"
-                      onClick={() => handleMakeChange("__manual__")}
-                      type="button"
-                    >
-                      {labels.otherMake}
-                    </button>
-                  </div>
-                </div>
-              ) : null}
-            </div>
-            {manualMake ? <TextField label="" name="make" required value={fields.make} onChange={onChange} placeholder={labels.make} /> : null}
-          </div>
-          <div>
-            <label>
-              <span className="font-semibold text-[var(--foreground-secondary)]">{labels.model}</span>
-              <select className={fieldClass} disabled={!selectedMakeId && !manualMake} onChange={(event) => handleModelChange(event.target.value)} value={manualModel ? "__manual__" : (models.find((model) => normalizeCatalogMatch(model.name) === normalizeCatalogMatch(fields.model))?.id || "")}>
-                <option value="">{selectedMakeId ? labels.pickModel : labels.pickMakeFirst}</option>
-                {models.map((model) => <option key={model.id} value={model.id}>{model.name}</option>)}
-                <option value="__manual__">{labels.other}</option>
-              </select>
-            </label>
-            {manualModel || manualMake ? <TextField label="" name="model" required value={fields.model} onChange={onChange} placeholder={labels.model} /> : null}
-          </div>
-          <label>
-            <span className="font-semibold text-[var(--foreground-secondary)]">{labels.year}</span>
-            {yearOptions.length > 0 ? (
-              <select className={fieldClass} onChange={(event) => onChange({ year: event.target.value, trim: "" })} value={fields.year}>
-                <option value="">{labels.pickYear}</option>
-                {yearOptions.map((year) => <option key={year} value={year}>{year}</option>)}
-              </select>
-            ) : (
-              <input className={fieldClass} min="1900" onChange={(event) => onChange({ year: event.target.value })} type="number" value={fields.year} />
-            )}
-          </label>
-          <div>
-            <label>
-              <span className="font-semibold text-[var(--foreground-secondary)]">{labels.trim}</span>
-              {visibleTrims.length > 0 ? (
-                <select className={fieldClass} onChange={(event) => handleTrimChange(event.target.value)} value={manualTrim ? "__manual__" : selectedTrimId}>
-                  <option value="">{labels.pickTrim}</option>
-                  {visibleTrims.map((trim) => <option key={trim.id} value={trim.id}>{trim.name}</option>)}
-                  <option value="__manual__">{labels.other}</option>
-                </select>
-              ) : (
-                <input className={fieldClass} onChange={(event) => onChange({ trim: event.target.value })} placeholder={labels.trim} value={fields.trim} />
-              )}
-            </label>
-            {manualTrim && visibleTrims.length > 0 ? <TextField label="" name="trim" value={fields.trim} onChange={onChange} placeholder={labels.trim} /> : null}
-          </div>
-          <TextField label={labels.registration} name="registrationNumber" required value={fields.registrationNumber} onChange={onChange} />
-          <TextField label={labels.color} name="color" value={fields.color} onChange={onChange} />
-        </div>
-      </div>
-
-      <div className="rounded-lg border border-[var(--info-line)] bg-[var(--info-light)] p-3">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <TextField label={labels.transmission} name="transmission" value={fields.transmission} onChange={onChange} />
-          <TextField label={labels.fuelType} name="fuelType" value={fields.fuelType} onChange={onChange} />
-          <TextField label={labels.engineCc} name="engineCc" type="number" value={fields.engineCc} onChange={onChange} />
-          {!isTwoWheeler && <TextField label={labels.seating} name="seatingCapacity" type="number" value={fields.seatingCapacity} onChange={onChange} />}
-          <TextField label={labels.mileage} name="mileage" type="number" value={fields.mileage} onChange={onChange} />
-        </div>
-      </div>
-
-      <div className="rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3">
-        <span className="font-semibold text-[var(--foreground-secondary)]">{labels.rate}</span>
-        <div className="mt-2 grid gap-2 sm:grid-cols-[1fr_1fr_1fr_112px]">
-          <CompactRateField label={labels.dailyShort} name="dailyRate" value={fields.dailyRate} onChange={onChange} />
-          <CompactRateField label={labels.weeklyShort} name="weeklyRate" value={fields.weeklyRate} onChange={onChange} />
-          <CompactRateField label={labels.monthlyShort} name="monthlyRate" value={fields.monthlyRate} onChange={onChange} />
-          <label>
-            <span className="font-semibold text-[var(--foreground-secondary)]">{labels.currency}</span>
-            <select className={`${fieldClass} mt-1`} onChange={(event) => onChange({ currency: event.target.value })} value={fields.currency}>
-              {currencyOptionsForCountry(selectedCountry).map((currency) => <option key={currency} value={currency}>{currency}</option>)}
-            </select>
-          </label>
-        </div>
-      </div>
-
-      <div className="rounded-lg border border-[var(--success-line)] bg-[var(--success-light)] p-3">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <DateField label={labels.taxExpiry} language={language} name="taxExpiryDate" value={fields.taxExpiryDate} onChange={onChange} />
-          <DateField label={labels.porborExpiry} language={language} name="porborExpiryDate" value={fields.porborExpiryDate} onChange={onChange} />
-          <DateField label={labels.insuranceExpiry} language={language} name="insuranceExpiryDate" value={fields.insuranceExpiryDate} onChange={onChange} />
-          <DateField label={labels.nextService} language={language} name="nextServiceDate" value={fields.nextServiceDate} onChange={onChange} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function DateField({
-  label,
-  language,
-  name,
-  onChange,
-  value
-}: {
-  label: string;
-  language: string;
-  name: string;
-  onChange: (updates: any) => void;
-  value: string;
-}) {
-  const pickerRef = useRef<HTMLInputElement | null>(null);
-  const isoValue = normalizeDateToIso(value);
-
-  function openPicker() {
-    const picker = pickerRef.current;
-    if (!picker) return;
-    if (typeof picker.showPicker === "function") {
-      picker.showPicker();
-    } else {
-      picker.click();
-    }
-  }
-
-  return (
-    <label>
-      <span className="font-semibold text-[var(--foreground-secondary)]">{label}</span>
-      <div className="relative mt-2">
-        <input
-          className={`${fieldClass} mt-0 pr-12`}
-          onChange={(event) => onChange({ [name]: event.target.value })}
-          placeholder="DD/MM/YYYY"
-          value={value}
-        />
-        <button
-          aria-label={label}
-          className="pressable absolute right-2 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-lg bg-[var(--primary-light)] text-[var(--primary)]"
-          onClick={openPicker}
-          type="button"
-        >
-          <CalendarDays size={18} />
-        </button>
-        <input
-          aria-hidden="true"
-          className="pointer-events-none absolute bottom-0 right-0 h-px w-px opacity-0"
-          onChange={(event) => onChange({ [name]: formatDateForDisplay(event.target.value, language) })}
-          ref={pickerRef}
-          tabIndex={-1}
-          type="date"
-          value={isoValue.includes("-") ? isoValue : ""}
-        />
-      </div>
-    </label>
-  );
-}
-
-function CompactRateField({ label, name, onChange, value }: { label: string; name: string; onChange: (updates: any) => void; value: string }) {
-  return (
-    <label>
-      <span className="font-semibold text-[var(--foreground-secondary)]">{label}</span>
-      <input
-        className={`${fieldClass} mt-1`}
-        inputMode="decimal"
-        onChange={(event) => onChange({ [name]: event.target.value })}
-        type="number"
-        value={value}
-      />
-    </label>
-  );
-}
-
-function TextField({
-  label,
-  name,
-  onChange,
-  placeholder,
-  required = false,
-  type = "text",
-  value
-}: {
-  label: string;
-  name: string;
-  onChange: (updates: any) => void;
-  placeholder?: string;
-  required?: boolean;
-  type?: string;
-  value: string;
-}) {
-  return (
-    <label>
-      {label ? <span className="font-semibold text-[var(--foreground-secondary)]">{label}</span> : null}
-      <input className={fieldClass} onChange={(event) => onChange({ [name]: event.target.value })} placeholder={placeholder} required={required} type={type} value={value} />
-    </label>
-  );
-}
-
-function FooterActions({
-  error,
-  onPrimary,
-  onSecondary,
-  pending,
-  primaryLabel,
-  savingLabel,
-  secondaryLabel
-}: {
-  error: string;
-  onPrimary: () => void;
-  onSecondary?: () => void;
-  pending: boolean;
-  primaryLabel: string;
-  savingLabel: string;
-  secondaryLabel?: string;
-}) {
-  return (
-    <div className="mt-6">
+    <div className="mt-5">
       {error ? <p className="mb-3 rounded-xl bg-[var(--warning-light)] p-3 font-semibold text-[var(--foreground)]">{error}</p> : null}
-      <div className="flex flex-col gap-3 sm:flex-row">
-        {onSecondary && secondaryLabel ? (
-          <button className="pressable min-h-12 rounded-lg border border-[var(--border)] bg-white px-5 py-3 text-sm font-semibold text-[var(--foreground-secondary)]" disabled={pending} onClick={onSecondary} type="button">
-            {secondaryLabel}
-          </button>
-        ) : null}
-        <button className="primary-action pressable flex-1" disabled={pending} onClick={onPrimary} type="button">
-          {pending ? savingLabel : primaryLabel}
-        </button>
-      </div>
+      <button className="primary-action pressable w-full" disabled={pending} onClick={onPrimary} type="button">
+        {pending ? savingLabel : primaryLabel}
+      </button>
     </div>
   );
 }

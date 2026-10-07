@@ -34,25 +34,19 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
   }
 
   const organization = await getDefaultOrganization();
-  const [{ data: organizationDetail, error: organizationError }, { data: categories, error: categoriesError }] = await Promise.all([
+  const [{ data: organizationDetail, error: organizationError }, { data: profileStep }, { data: vehicles }] = await Promise.all([
     supabase
       .from("organizations")
       .select("id, name, default_locale, settings, onboarding_completed, onboarding_skipped")
       .eq("id", organization.id)
       .is("deleted_at", null)
       .maybeSingle(),
-    supabase
-      .from("vehicle_categories")
-      .select("id, code, name")
-      .or(`organization_id.is.null,organization_id.eq.${organization.id}`)
-      .order("sort_order", { ascending: true })
+    supabase.from("onboarding_checklist").select("completed").eq("organization_id", organization.id).eq("step", "business_profile").maybeSingle(),
+    supabase.from("vehicles").select("make, model, registration_number, metadata").eq("organization_id", organization.id).is("deleted_at", null).order("created_at", { ascending: true }).limit(1)
   ]);
 
   if (organizationError || !organizationDetail) {
     throw new Error(organizationError?.message || "Organization was not found.");
-  }
-  if (categoriesError) {
-    throw new Error(categoriesError.message);
   }
   if ((organizationDetail.onboarding_completed || organizationDetail.onboarding_skipped) && !previewStep) {
     redirect("/");
@@ -60,5 +54,16 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
 
   // Start the wizard in the language the person has been reading so far (their phone's, or the one they picked when signing up).
   const locale = await getLocale();
-  return <OnboardingWizard categories={categories || []} initialLanguage={locale === "th" ? "th" : undefined} initialStep={previewStep >= 1 && previewStep <= 3 ? previewStep : 1} organization={organizationDetail} />;
+  // The vehicle is added on the normal Add vehicle screen, which sends the person back here. Carry on from where they are.
+  const first = (vehicles || [])[0];
+  const firstVehicle = first ? { make: first.make, model: first.model, registrationNumber: first.registration_number, compliance: first.metadata?.compliance || null } : null;
+  const resumeStep = !profileStep?.completed ? 1 : firstVehicle ? 3 : 2;
+  return (
+    <OnboardingWizard
+      firstVehicle={firstVehicle}
+      initialLanguage={locale === "th" ? "th" : undefined}
+      initialStep={previewStep >= 1 && previewStep <= 3 ? previewStep : resumeStep}
+      organization={organizationDetail}
+    />
+  );
 }

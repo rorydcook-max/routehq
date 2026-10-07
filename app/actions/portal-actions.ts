@@ -182,8 +182,11 @@ export async function acknowledgePortalAction(formData: FormData) {
 export async function resolvePortalAction(formData: FormData) {
   const { membership, admin, action, actionId, rentalId } = await load(formData);
   const notes = optionalString(formData, "notes");
-  await resolve(admin, action, membership.userId, { resolution_notes: notes });
+  // A problem can be answered as it is closed, so the customer hears what was done.
+  const reply = optionalString(formData, "reply");
+  await resolve(admin, action, membership.userId, reply ? { resolution_notes: notes, reply } : { resolution_notes: notes });
   await completeRentalJobs(admin, rentalId, "request", notes || "Resolved", actionId);
+  if (reply) await tellRentalCustomer(admin, rentalId, ({ hi }) => `${hi} ${reply}`, { sentBy: membership.userId });
   refresh(rentalId);
 }
 

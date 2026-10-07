@@ -31,7 +31,8 @@ export function ActiveRentalPortal({
   orgPayment = null,
   endNoticeDays = 0,
   extensionRates = null,
-  openEndedOffer = null
+  openEndedOffer = null,
+  answers = []
 }: {
   token: string;
   organizationName: string;
@@ -51,6 +52,8 @@ export function ActiveRentalPortal({
   /** Set when the customer can switch to no end date at the monthly rate. */
   openEndedOffer?: OpenEndedOffer | null;
   orgPayment?: any;
+  /** What the business answered to this customer's recent questions, problems and requests. */
+  answers?: Array<{ id: string; type: string; declined: boolean; asked: string; reply: string; at: string }>;
 }) {
   const t = useTranslations("customer");
   const locale = useLocale();
@@ -111,6 +114,24 @@ export function ActiveRentalPortal({
       </section>
 
       <PortalPayments bundle={paymentBundle} orgPayment={orgPayment} organizationName={organizationName} payments={payments} token={token} />
+
+      {answers.length > 0 ? (
+        <section className="rounded-2xl border border-[var(--info-line)] bg-[var(--primary-light)] p-4 shadow-sm">
+          <p className="text-sm font-semibold text-[var(--foreground)]">{t("answersTitle", { business: organizationName })}</p>
+          <ul className="mt-2 space-y-3">
+            {answers.map((answer) => (
+              <li className="rounded-xl bg-white p-3" key={answer.id}>
+                {answer.asked ? <p className="text-xs text-[var(--muted)]"><bdi>{answer.asked}</bdi></p> : null}
+                <p className="mt-1 text-sm font-semibold text-[var(--foreground)]">
+                  {answer.declined ? `${t("answerDeclined")} ` : ""}
+                  <bdi>{answer.reply}</bdi>
+                </p>
+                {answer.at ? <p className="mt-1 text-xs text-[var(--muted)]">{niceDate(answer.at.slice(0, 10), locale)}</p> : null}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {confirmation ? (
         <p className="rounded-2xl border border-[var(--success-line)] bg-[var(--success-light)] p-4 text-sm font-bold text-[var(--success)]">{confirmation}</p>

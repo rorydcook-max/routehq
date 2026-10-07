@@ -12,6 +12,9 @@ export function PendingAmendmentCard({ id, token, rows, changedAlready = false }
   const router = useRouter();
   const [cancelling, startCancel] = useTransition();
   const say = useTranslations("booking") as unknown as (key: string) => string;
+  // The rows come in the agreement's own English; the row names are shown in the reader's language.
+  const customer = useTranslations("customer") as unknown as (key: string) => string;
+  const rowNames: Record<string, string> = { Vehicle: "rowVehicle", "Return date": "rowReturnDate", "Charge for the extension": "rowExtensionCharge", "Rental rate": "rowRentalRate", "Security deposit": "rowDeposit" };
 
   return (
     <Card>
@@ -21,7 +24,7 @@ export function PendingAmendmentCard({ id, token, rows, changedAlready = false }
           <li className="flex items-start gap-2" key={row.label}>
             <FilePen className="mt-0.5 shrink-0 text-[var(--primary)]" size={14} />
             <span>
-              <span className="font-bold">{row.label}:</span> {row.before !== "-" ? `${row.before} → ` : ""}
+              <span className="font-bold">{rowNames[row.label] ? customer(rowNames[row.label]) : row.label}:</span> {row.before !== "-" ? `${row.before} → ` : ""}
               <span className="font-bold">{row.after}</span>
             </span>
           </li>

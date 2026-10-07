@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
 
   // The same vehicle in the same area gives the same figures each time, so two checks can be compared fairly.
   const locale = String(body.locale || "en").slice(0, 8);
-  const cacheKey = ["v3", country, area, body.category || "car", make, model, year, String(body.trim || ""), Math.round(mileage / 20000), locale]
+  const cacheKey = ["v4", country, area, body.category || "car", make, model, year, String(body.trim || ""), Math.round(mileage / 20000), locale]
     .join("|")
     .toLowerCase()
     .slice(0, 300);
@@ -100,6 +100,7 @@ Reply with one JSON object and nothing else:
 What each field means:
 - rent_month_*: what small local operators charge a long-stay customer for one whole month, paid monthly (their monthly rate, which is usually far less than 30 times the day rate), lowest to highest across the year, for a vehicle of this age.
 - rent_day_*: what small local operators charge per day on a rental of a few days, low season to high season, for a vehicle of this age.
+- Price this exact model, body style and age. Variants rent differently (a plain hatchback rents for less than its sedan, crossover or top-trim sister models, and an older car for less than a new one), so do not borrow a sister model's price without adjusting it down or up. Where prices differ by season, rent_*_low is low season, rent_*_high is high season and rent_*_typical is the average across the whole year, not the peak.
 - Never use prices from Hertz, Avis, Budget, Sixt, Europcar, Enterprise, Thai Rent A Car, Chic, Drive Car Rental or other national and airport chains, or from booking aggregators (Rentalcars, Kayak, Klook, Discover Cars, Expedia): they charge far more than local operators can. Never work out a monthly rate by multiplying a day rate. If you only found chain or aggregator prices, estimate what a local shop charges (typically well below them) and lower the confidence.
 - occupancy_long / occupancy_short: % of days in a year it is out on rent when rented by the month / by the day, in this area.
 - insurance_year: comprehensive insurance for a vehicle used for rental, first year.

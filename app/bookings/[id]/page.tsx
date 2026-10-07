@@ -1597,7 +1597,8 @@ async function CustomerPortalActionCard({ action, organizationId, rentalId, cust
             <input name="organizationId" type="hidden" value={organizationId} />
             <input name="actionId" type="hidden" value={action.id} />
             <input name="rentalId" type="hidden" value={rentalId} />
-            <textarea className="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm" name="notes" placeholder={tx.say("whatYouDid")} />
+            <textarea className="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm" name="reply" placeholder={tx.say("tellCustomerOptional")} rows={2} />
+            <textarea className="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm" name="notes" placeholder={tx.say("whatYouDid")} rows={2} />
             <PendingButton className="primary-action pressable px-3 py-2" pendingLabel={tx.say("saving")} type="submit">
               {tx.say("markSorted")}
             </PendingButton>

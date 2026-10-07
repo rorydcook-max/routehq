@@ -311,10 +311,10 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
                                 >
                                   <option value="__ignore__">{t("ignore")}</option>
                                   {IMPORT_FIELD_GROUPS.map((group) => (
-                                    <optgroup key={group} label={group}>
+                                    <optgroup key={group} label={(t as unknown as (key: string) => string)(`g_${group.replace(/ /g, "_")}`)}>
                                       {IMPORT_FIELDS.filter((field) => field.group === group).map((field) => (
                                         <option key={field.key} value={field.key}>
-                                          {field.label}
+                                          {(t as unknown as (key: string) => string)(`f_${field.key}`)}
                                         </option>
                                       ))}
                                     </optgroup>

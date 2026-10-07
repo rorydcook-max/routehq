@@ -417,6 +417,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
 
         {detail.state === "active" ? (
           <ActiveRentalPortal
+            answers={await portalAnswers(rental?.id)}
             bookingData={bookingData}
             deliveryPhotoUrls={detail.deliveryPhotoUrls || []}
             organizationName={businessName}
@@ -556,4 +557,31 @@ async function openEndedOffer(vehicle: any, rental: any) {
   const monthly = String(rental.billing_interval || rental.pricing_model || "").toLowerCase() === "monthly";
   const firstDue = await nextMonthlyDue(createSupabaseAdminClient() as any, String(rental.id), end, monthly).catch(() => end);
   return { monthlyRate, firstDue };
+}
+
+/**
+ * What the business has answered to this customer's questions, problems and
+ * requests in the last two weeks. Answers also go out by chat, but a customer
+ * who has no chat connected would otherwise never see them.
+ */
+async function portalAnswers(rentalId: string | undefined) {
+  if (!rentalId) return [];
+  const since = new Date(Date.now() - 14 * 86400000).toISOString();
+  const { data } = await (createSupabaseAdminClient() as any)
+    .from("customer_portal_actions")
+    .select("id, action_type, content, resolved_at")
+    .eq("rental_id", rentalId)
+    .neq("status", "pending")
+    .gte("resolved_at", since)
+    .order("resolved_at", { ascending: false })
+    .limit(10);
+  return ((data || []) as any[])
+    .map((row) => {
+      const content = row.content || {};
+      const declined = content.outcome === "declined";
+      const reply = String(content.reply || (declined ? content.operator_note : "") || "").trim();
+      return { id: String(row.id), type: String(row.action_type), declined, asked: String(content.description || content.question || content.message || content.note || "").trim(), reply, at: String(row.resolved_at || "") };
+    })
+    .filter((row) => row.reply)
+    .slice(0, 4);
 }

@@ -31,7 +31,8 @@ export function Catalog({
   deposit,
   holdHours,
   gapDays,
-  today
+  today,
+  offer = "both_monthly"
 }: {
   slug: string;
   organizationName: string;
@@ -42,13 +43,16 @@ export function Catalog({
   gapDays: number;
   /** The first date a booking may start (today, or later when the business needs notice). */
   today: string;
+  /** Monthly, set dates, or both: the business decides in Settings. */
+  offer?: string;
 }) {
   const t = useTranslations("customer");
   const locale = useLocale();
   const router = useRouter();
   const [startDate, setStartDate] = useState(today);
   const [endDate, setEndDate] = useState("");
-  const [longTerm, setLongTerm] = useState(true);
+  const [longTerm, setLongTerm] = useState(offer === "monthly" || offer === "both_monthly");
+  const bothOffered = offer === "both_monthly" || offer === "both_dates";
   const [openId, setOpenId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -103,7 +107,7 @@ export function Catalog({
           <CalendarDays className="text-[var(--primary)]" size={18} />
           {t("whenDoYouNeedIt")}
         </div>
-        <div aria-label={t("typeOfRental")} className="mt-3 grid grid-cols-2 gap-1 rounded-xl bg-[var(--panel-secondary)] p-1 text-sm font-semibold" role="group">
+        <div aria-label={t("typeOfRental")} className={`mt-3 grid-cols-2 gap-1 rounded-xl bg-[var(--panel-secondary)] p-1 text-sm font-semibold ${bothOffered ? "grid" : "hidden"}`} role="group">
           <button aria-pressed={longTerm} className={`min-h-11 rounded-lg px-2 ${longTerm ? "bg-white text-[var(--foreground)] shadow-sm" : "text-[var(--muted)]"}`} onClick={() => setLongTerm(true)} type="button">
             {t("monthly")}
           </button>

@@ -5,7 +5,7 @@ import { getCurrentMembership } from "@/lib/auth/roles";
 import { OWNER_ONLY_MESSAGE } from "@/lib/auth/role-types";
 import { businessToday } from "@/lib/business-time";
 import { notifyOperator } from "@/lib/notify-operator";
-import { getPublicCatalog, publicBookingSettings } from "@/lib/public-catalog";
+import { BOOKING_OFFERS, getPublicCatalog, publicBookingSettings } from "@/lib/public-catalog";
 import { daysBetween, minimumStay, planFor } from "@/lib/rental-estimate";
 import { clashes, holdDeadline } from "@/lib/booking-holds";
 import { bookingRules, type BookingRules } from "@/lib/booking-rules";
@@ -178,7 +178,7 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
 }
 
 /** Turns the public booking page on or off and sets its terms. */
-export async function savePublicBookingSettings(input: { enabled: boolean; holdHours: number; deposit: number }): Promise<Result> {
+export async function savePublicBookingSettings(input: { enabled: boolean; holdHours: number; deposit: number; offer?: string }): Promise<Result> {
   const membership = await getCurrentMembership();
   if (!membership) return { ok: false, error: "Please sign in again." };
   if (membership.role !== "owner") return { ok: false, error: OWNER_ONLY_MESSAGE };
@@ -192,7 +192,7 @@ export async function savePublicBookingSettings(input: { enabled: boolean; holdH
   const deposit = Number.isFinite(Number(input.deposit)) && Number(input.deposit) >= 0 ? Math.round(Number(input.deposit)) : current.deposit;
   const { error } = await admin
     .from("organizations")
-    .update({ settings: { ...settings, public_booking: { enabled: !!input.enabled, hold_hours: holdHours, deposit } } })
+    .update({ settings: { ...settings, public_booking: { enabled: !!input.enabled, hold_hours: holdHours, deposit, offer: (BOOKING_OFFERS as string[]).includes(String(input.offer)) ? input.offer : current.offer } } })
     .eq("id", membership.organizationId);
   if (error) return { ok: false, error: "Couldn't save. Please try again." };
   revalidatePath("/settings");

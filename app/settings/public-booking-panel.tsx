@@ -12,11 +12,12 @@ type Say = (key: string, values?: Record<string, string | number>) => string;
  * Switch for the public booking page, the link to share, the deposit online
  * bookings ask for, and how long a customer has to start their booking form.
  */
-export function PublicBookingPanel({ slug, enabled, holdHours, deposit, pricedVehicles, totalVehicles }: { slug: string; enabled: boolean; holdHours: number; deposit: number; pricedVehicles: number; totalVehicles: number }) {
+export function PublicBookingPanel({ slug, enabled, holdHours, deposit, offer = "both_monthly", pricedVehicles, totalVehicles }: { slug: string; enabled: boolean; holdHours: number; deposit: number; offer?: string; pricedVehicles: number; totalVehicles: number }) {
   const say = useTranslations("settingsPage") as unknown as Say;
   const router = useRouter();
   const [on, setOn] = useState(enabled);
   const [hours, setHours] = useState(holdHours);
+  const [offerValue, setOfferValue] = useState(offer);
   const [depositValue, setDepositValue] = useState(String(deposit || ""));
   const [origin, setOrigin] = useState("");
   const [copied, setCopied] = useState(false);
@@ -25,12 +26,12 @@ export function PublicBookingPanel({ slug, enabled, holdHours, deposit, pricedVe
   useEffect(() => setOrigin(window.location.origin), []);
   const link = `${origin}/rent/${slug}`;
 
-  function save(next: { enabled: boolean; holdHours: number; deposit?: number }) {
+  function save(next: { enabled: boolean; holdHours: number; deposit?: number; offer?: string }) {
     setFailed(false);
     setOn(next.enabled);
     setHours(next.holdHours);
     startTransition(async () => {
-      const result = await savePublicBookingSettings({ ...next, deposit: next.deposit ?? Number(depositValue || 0) }).catch(() => ({ ok: false as const }));
+      const result = await savePublicBookingSettings({ ...next, deposit: next.deposit ?? Number(depositValue || 0), offer: next.offer ?? offerValue }).catch(() => ({ ok: false as const }));
       if (!result.ok) {
         setFailed(true);
         setOn(enabled);
@@ -81,6 +82,25 @@ export function PublicBookingPanel({ slug, enabled, holdHours, deposit, pricedVe
           </div>
 
           <p className={pricedVehicles < totalVehicles ? "font-bold text-[var(--warning)]" : "font-medium text-[var(--foreground-secondary)]"}>{say("pb_shown", { priced: pricedVehicles, total: totalVehicles })}</p>
+
+          <label className="block sm:max-w-md">
+            <span className="font-semibold text-[var(--foreground)]">{say("pb_offer")}</span>
+            <select
+              className="mt-1 block w-full"
+              disabled={isPending}
+              onChange={(event) => {
+                setOfferValue(event.target.value);
+                save({ enabled: on, holdHours: hours, offer: event.target.value });
+              }}
+              value={offerValue}
+            >
+              {["both_monthly", "both_dates", "monthly", "dates"].map((value) => (
+                <option key={value} value={value}>
+                  {say(`pb_offer_${value}`)}
+                </option>
+              ))}
+            </select>
+          </label>
 
           <label className="block sm:max-w-xs">
             <span className="font-semibold text-[var(--foreground)]">{say("pb_deposit")}</span>

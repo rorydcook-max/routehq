@@ -1,18 +1,19 @@
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/app-shell";
-import { Card, SectionHeader } from "@/components/ui";
+import { Card } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { InviteForm } from "@/app/invite/invite-form";
 
 export default async function InvitePage() {
-  const userEmail = await getCurrentUserEmail();
+  const [userEmail, t] = await Promise.all([getCurrentUserEmail(), getTranslations("auth")]);
 
   return (
     <AppShell userEmail={userEmail}>
       <div className="mx-auto max-w-xl">
+        {/* The two choices on the form say what each kind of person can do; no paragraph needed above them. */}
+        <h1 className="page-title mb-4">{t.has("iv_pageTitle") ? t("iv_pageTitle") : "Invite someone to your team"}</h1>
         <Card>
-          <SectionHeader eyebrow="Settings" title="Invite a team member" />
-          <p className="mt-2 text-sm text-[var(--muted)]">Invite someone to your business. Owners have full control; teammates can run day-to-day work but cannot change business settings, billing or the team.</p>
-          <div className="mt-5">
+          <div className="card-section">
             <InviteForm />
           </div>
         </Card>

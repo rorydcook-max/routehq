@@ -135,6 +135,7 @@ export async function saveBusinessProfile(formData: FormData) {
       supported_currencies: Array.from(new Set([currency, "THB", "USD"])),
       settings: {
         ...settings,
+        ...(businessPhone ? { business_phone: businessPhone } : {}),
         location,
         main_location: {
           country,

@@ -55,7 +55,7 @@ export default async function PublicCatalogPage({ params }: { params: Promise<{ 
           </div>
         </header>
 
-        <Catalog currency={catalog.currency} deposit={catalog.deposit} holdHours={catalog.holdHours} organizationName={catalog.name} slug={slug} gapDays={catalog.gapDays} today={catalog.minStart} vehicles={catalog.vehicles} />
+        <Catalog currency={catalog.currency} offer={catalog.offer} deposit={catalog.deposit} holdHours={catalog.holdHours} organizationName={catalog.name} slug={slug} gapDays={catalog.gapDays} today={catalog.minStart} vehicles={catalog.vehicles} />
       </div>
     </main>
   );

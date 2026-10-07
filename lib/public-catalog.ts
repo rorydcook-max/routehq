@@ -12,7 +12,10 @@ import { kindFromCategory, type VehicleKind } from "@/lib/vehicle-groups";
  * customer names or plates - only "busy from / to".
  */
 
-export type PublicBookingSettings = { enabled: boolean; holdHours: number; deposit: number };
+/** What the booking page offers: monthly rentals with no end date, rentals with set dates, or both (and which one it opens on). */
+export type BookingOffer = "both_monthly" | "both_dates" | "monthly" | "dates";
+export const BOOKING_OFFERS: BookingOffer[] = ["both_monthly", "both_dates", "monthly", "dates"];
+export type PublicBookingSettings = { enabled: boolean; holdHours: number; deposit: number; offer: BookingOffer };
 
 export type CatalogVehicle = {
   id: string;
@@ -39,7 +42,8 @@ export function publicBookingSettings(settings: any): PublicBookingSettings {
   return {
     enabled: raw?.enabled === true,
     holdHours: Number.isFinite(hours) && hours > 0 ? Math.min(hours, 168) : 24,
-    deposit: Number.isFinite(deposit) && deposit > 0 ? deposit : 0
+    deposit: Number.isFinite(deposit) && deposit > 0 ? deposit : 0,
+    offer: BOOKING_OFFERS.includes(raw?.offer) ? raw.offer : "both_monthly"
   };
 }
 
@@ -144,6 +148,7 @@ export async function getPublicCatalog(slug: string) {
     /** Days kept free around other bookings. */
     gapDays: rules.gapDays,
     deposit: settings.deposit,
+    offer: settings.offer,
     vehicles
   };
 }

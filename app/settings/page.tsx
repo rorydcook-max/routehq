@@ -383,6 +383,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             <PublicBookingPanel
               enabled={publicBookingSettings(organization.settings).enabled}
               deposit={publicBookingSettings(organization.settings).deposit}
+                  offer={publicBookingSettings(organization.settings).offer}
               holdHours={bookingRules(organization.settings).holdHours}
               pricedVehicles={publicVehicleCounts.priced}
               slug={organization.slug}

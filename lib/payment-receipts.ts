@@ -167,10 +167,21 @@ export async function getReceiptsWaiting(organizationId: string) {
     : { data: [] };
   const names = new Map<string, string>((vehicles || []).map((v: any) => [v.id, [v.make, v.model].filter(Boolean).join(" ")]));
 
-  return rows.map((row) => ({
-    id: String(row.id),
-    amount: Number(row.amount || 0),
-    customer: (row.rentals?.customers?.full_name as string) || null,
-    vehicle: names.get(row.vehicle_id || row.rentals?.vehicle_id) || null
-  }));
+  // One receipt can cover several payments (rent and deposit paid together): it is one thing to check, for the total.
+  const byReceipt = new Map<string, { id: string; amount: number; customer: string | null; vehicle: string | null }>();
+  for (const row of rows) {
+    const path = receiptOf(row.metadata)?.path || String(row.id);
+    const existing = byReceipt.get(path);
+    if (existing) {
+      existing.amount = Math.round((existing.amount + Number(row.amount || 0)) * 100) / 100;
+      continue;
+    }
+    byReceipt.set(path, {
+      id: String(row.id),
+      amount: Number(row.amount || 0),
+      customer: (row.rentals?.customers?.full_name as string) || null,
+      vehicle: names.get(row.vehicle_id || row.rentals?.vehicle_id) || null
+    });
+  }
+  return [...byReceipt.values()];
 }

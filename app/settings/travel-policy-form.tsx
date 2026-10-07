@@ -56,6 +56,9 @@ export function TravelPolicyForm({ organizationId, settings }: { organizationId:
   return (
     <form action={updateTravelPolicySettings} className="mt-3 space-y-5">
       <input name="organizationId" type="hidden" value={organizationId} />
+      {/* The choices travel in these two fields. The form is cleared after each save, which unticks the round buttons underneath. */}
+      <input name="homeTerritoryType" type="hidden" value={territoryType} />
+      <input name="islandTravelPolicy" type="hidden" value={travelPolicy} />
 
       <section>
         <p className={headingClass}>{say("tp_based")}</p>
@@ -80,7 +83,7 @@ export function TravelPolicyForm({ organizationId, settings }: { organizationId:
         <div className="mt-3 grid gap-2.5 sm:grid-cols-2">
           {(["island", "mainland"] as const).map((option) => (
             <label className={choiceClass(territoryType === option)} key={option}>
-              <input checked={territoryType === option} className="sr-only" name="homeTerritoryType" onChange={() => setTerritoryType(option)} type="radio" value={option} />
+              <input checked={territoryType === option} className="sr-only" name="homeTerritoryTypeChoice" onChange={() => setTerritoryType(option)} type="radio" value={option} />
               <span className="block font-bold text-[var(--foreground)]">{say(`tp_${option}`)}</span>
               <span className="mt-0.5 block font-medium text-[var(--foreground-secondary)]">{say(`tp_${option}Help`)}</span>
             </label>
@@ -99,7 +102,7 @@ export function TravelPolicyForm({ organizationId, settings }: { organizationId:
         <div className="mt-2.5 grid gap-2.5 lg:grid-cols-3">
           {policyOptions.map((option) => (
             <label className={choiceClass(travelPolicy === option)} key={option}>
-              <input checked={travelPolicy === option} className="sr-only" name="islandTravelPolicy" onChange={() => setTravelPolicy(option as TravelPolicySettings["island_travel_policy"])} type="radio" value={option} />
+              <input checked={travelPolicy === option} className="sr-only" name="islandTravelPolicyChoice" onChange={() => setTravelPolicy(option as TravelPolicySettings["island_travel_policy"])} type="radio" value={option} />
               <span className="block font-bold text-[var(--foreground)]">{say(`tp_${option}`)}</span>
               <span className="mt-0.5 block font-medium text-[var(--foreground-secondary)]">{say(`tp_${option}Body`)}</span>
             </label>

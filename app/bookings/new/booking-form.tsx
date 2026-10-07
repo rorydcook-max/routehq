@@ -1,5 +1,6 @@
 "use client";
 
+import { includedOptions } from "@/lib/included-items";
 import { businessToday } from "@/lib/business-time";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
@@ -110,20 +111,6 @@ const inputClass =
   "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]";
 const defaultAppUrl = (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").replace(/\/$/, "");
 // These are saved on the booking exactly as written here; what staff see is translated (inc_0 to inc_7).
-const includedOptions = [
-  "Full insurance",
-  "Compulsory insurance (Por Ror Bor)",
-  "Breakdown cover",
-  "Delivery and collection",
-  "Car seat",
-  "GPS tracker",
-  "Unlimited mileage",
-  "Free fuel",
-  "Helmet",
-  "Second helmet",
-  "Phone holder",
-  "Rain poncho"
-];
 // Offered for motorbikes and scooters only; a car seat is offered for everything else.
 const twoWheelerOnly = new Set(["Helmet", "Second helmet", "Phone holder", "Rain poncho"]);
 const notForTwoWheelers = new Set(["Car seat"]);
@@ -305,7 +292,9 @@ export function BookingForm({
   const [customerSkipped, setCustomerSkipped] = useState(!preselectedCustomer);
   const [bookingMode, setBookingMode] = useState<"booking_link" | "existing_rental">("booking_link");
   const [vehicleSearch, setVehicleSearch] = useState("");
-  const [vehicleId, setVehicleId] = useState(validPreselectedVehicle ? preselectedVehicleId : "");
+  // A shop with one vehicle has nothing to choose: it arrives already picked.
+  const onlyVehicle = vehicles.length === 1 && selectable(vehicles[0]) ? vehicles[0].id : "";
+  const [vehicleId, setVehicleId] = useState(validPreselectedVehicle ? preselectedVehicleId : onlyVehicle);
   const [selectedCustomer, setSelectedCustomer] = useState<BookingCustomer | null>(customers.find((customer) => customer.id === preselectedCustomerId) || null);
   const [startDate, setStartDate] = useState(/^\d{4}-\d{2}-\d{2}$/.test(preselectedStartDate) && preselectedStartDate >= businessToday() ? preselectedStartDate : businessToday());
   const [endDate, setEndDate] = useState(/^\d{4}-\d{2}-\d{2}$/.test(preselectedEndDate) && preselectedEndDate > businessToday() ? preselectedEndDate : "");
@@ -717,15 +706,18 @@ export function BookingForm({
       {step === 0 ? (
         <section className="content-section">
           <Header icon={Car} eyebrow={say("stepN", { n: 1 })} title={say("selectVehicle")} />
-          <label className="mt-3 block">
-            <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("searchLabel")}</span>
-            <input
-              className={inputClass}
-              onChange={(event) => setVehicleSearch(event.target.value.replace(/^🔎\s*/, ""))}
-              placeholder={`🔎 ${say("searchPlaceholder")}`}
-              value={vehicleSearch ? `🔎 ${vehicleSearch}` : ""}
-            />
-          </label>
+          {/* Searching only earns its place once the list is longer than a screen. */}
+          {vehicles.length > 5 ? (
+            <label className="mt-3 block">
+              <span className="font-semibold text-[var(--foreground-secondary)]">{say("searchLabel")}</span>
+              <input
+                className={inputClass}
+                onChange={(event) => setVehicleSearch(event.target.value.replace(/^🔎\s*/, ""))}
+                placeholder={`🔎 ${say("searchPlaceholder")}`}
+                value={vehicleSearch ? `🔎 ${vehicleSearch}` : ""}
+              />
+            </label>
+          ) : null}
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             {[...filteredVehicles]
               .map((vehicle) => ({ vehicle, rank: !selectable(vehicle) ? 2 : availabilityNote(busyPeriods[vehicle.id] || [], businessToday(), say, locale) ? 1 : 0 }))

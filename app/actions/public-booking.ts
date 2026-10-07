@@ -14,7 +14,7 @@ import { countersignRentalAgreementForCustomer } from "@/lib/rental-agreement-au
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { processCustomerPortalAction } from "@/lib/portal-notifications";
 import { notifyOperator } from "@/lib/notify-operator";
-import { generatePaymentSchedule } from "@/lib/payment-schedule";
+import { firstRentCharge, generatePaymentSchedule } from "@/lib/payment-schedule";
 import {
   completeRentalDocumentCustomerSigning,
   getCustomerExecutedAgreementDownload
@@ -879,7 +879,7 @@ export async function completePublicBooking(formData: FormData) {
         : {
             payment_due_trigger: "on_delivery",
             payment_due_after_delivery: true,
-            first_payment_amount: Number(currentRentalForAuthority.rental_rate || 0),
+            first_payment_amount: firstRentCharge(currentRentalForAuthority),
             deposit_payment_amount: Number(currentRentalForAuthority.deposit_amount || 0)
           };
 
@@ -1061,7 +1061,7 @@ export async function completePublicBooking(formData: FormData) {
       : {
           payment_due_trigger: "on_delivery",
           payment_due_after_delivery: true,
-          first_payment_amount: Number(rental.rental_rate || 0),
+          first_payment_amount: firstRentCharge(rental),
           deposit_payment_amount: Number(rental.deposit_amount || 0)
         };
 

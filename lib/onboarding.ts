@@ -1,12 +1,13 @@
 import { onlineSigningGaps } from "@/lib/online-signing-readiness";
 export const onboardingSteps = [
+  // In the order a new business needs them: what must be in place to take a booking first, the rest after.
   { step: "business_profile", label: "Business profile complete", href: "/onboarding" },
   { step: "first_vehicle", label: "First vehicle added", href: "/fleet/new" },
   // Without this the customer is stopped at the last step of their booking link.
   { step: "signature", label: "Add your signature", href: "/settings/signature" },
-  { step: "all_vehicles", label: "All vehicles added", href: "/fleet" },
-  { step: "first_customer", label: "First customer added", href: "/customers/new" },
+  { step: "payment_methods", label: "Say how customers pay you", href: "/settings?tab=rentals#payment-methods" },
   { step: "first_booking", label: "First booking created", href: "/bookings/new" },
+  { step: "all_vehicles", label: "All vehicles added", href: "/fleet" },
   { step: "contract_template", label: "Contract template reviewed", href: "/settings/contracts" },
   { step: "line_connected", label: "LINE notifications connected", href: "/settings?tab=notifications" },
   { step: "team_invited", label: "Team member invited", href: "/invite" }
@@ -88,7 +89,7 @@ export async function getOnboardingStatus(supabase: any, organizationId: string)
     first_vehicle: vehicleCount >= 1,
     signature: orgResult.data ? onlineSigningGaps(orgResult.data).length === 0 : false,
     all_vehicles: fleetTargetMet(settings.fleet_size, vehicleCount),
-    first_customer: customerCount >= 1,
+    payment_methods: Boolean(organization.promptpay_id || organization.promptpay_qr_url || organization.bank_account_number || organization.wise_link || organization.revolut_link),
     first_booking: rentalCount >= 1,
     contract_template: Boolean(checklistRows.get("contract_template")?.completed || settings.contract_template_reviewed_at),
     line_connected: Boolean(settings.line_id),

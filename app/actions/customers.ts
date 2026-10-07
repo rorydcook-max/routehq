@@ -2,7 +2,6 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { markOnboardingStep } from "@/lib/onboarding";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { buildDocumentStoragePath } from "@/services/documents/storage-path";
@@ -225,7 +224,6 @@ export async function createCustomer(formData: FormData) {
     title: "Customer created",
     detail: `${fullName} added to CRM.`
   });
-  await markOnboardingStep(supabase, organizationId, "first_customer");
 
   revalidatePath("/");
   revalidatePath("/customers");
@@ -283,7 +281,6 @@ export async function createInlineCustomer(formData: FormData) {
     title: "Customer created",
     detail: `${fullName} added inline during booking.`
   });
-  await markOnboardingStep(supabase, organizationId, "first_customer");
 
   revalidatePath("/customers");
   return {

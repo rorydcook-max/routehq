@@ -251,10 +251,11 @@ function PaymentRow({
             <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
               {t("howDidYouPay")}
               <select className="mt-2 w-full rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-base" defaultValue={defaultMethod} name="method">
-                <option value="promptpay">PromptPay / QR</option>
-                <option value="bank_transfer">{t("bankTransfer")}</option>
-                <option value="wise">Wise</option>
-                <option value="revolut">Revolut</option>
+                {/* Only the ways this business takes money. */}
+                {payment.qrSvg || orgPayment?.promptpay_id ? <option value="promptpay">PromptPay / QR</option> : null}
+                {hasBank ? <option value="bank_transfer">{t("bankTransfer")}</option> : null}
+                {orgPayment?.wise_link ? <option value="wise">Wise</option> : null}
+                {orgPayment?.revolut_link ? <option value="revolut">Revolut</option> : null}
                 <option value="other">{t("anotherWay")}</option>
               </select>
             </label>

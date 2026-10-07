@@ -1,3 +1,5 @@
+import { includedItemKey } from "@/lib/included-items";
+import { firstRentCharge } from "@/lib/payment-schedule";
 import type { ReactNode } from "react";
 import { customerDate } from "@/lib/i18n/customer-dates";
 import { AlertTriangle, CalendarDays, Clock, CreditCard, MapPin, ReceiptText, ShieldCheck } from "lucide-react";
@@ -312,7 +314,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   }
   // Before signing, "pay now" shows one QR for what is due at the start.
   // What is due at the start: the first rent and the deposit.
-  const firstPaymentAmount = Number(rental?.outstanding_balance || 0) > 0 ? Number(rental.outstanding_balance) : Number(rental?.rental_rate || 0) + Number(rental?.deposit_amount || 0);
+  const firstPaymentAmount = Number(rental?.outstanding_balance || 0) > 0 ? Number(rental.outstanding_balance) : firstRentCharge(rental) + Number(rental?.deposit_amount || 0);
   const firstPaymentQr =
     detail.state === "ready" && !detail.completion?.agreement && detail.org_payment?.promptpay_id && String(rental?.currency || "THB") === "THB"
       ? await promptPayQrSvg(detail.org_payment.promptpay_id, firstPaymentAmount)
@@ -330,8 +332,9 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
                 <p className="mt-1 text-sm font-bold text-[var(--muted)]"><bdi>{vehicle.registration_number || t("platePending")}</bdi>{vehicle.color ? <> · <bdi>{vehicle.color}</bdi></> : null}</p>
               </div>
             </div>
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              <Info className="col-span-2 sm:col-span-1" icon={CalendarDays} label={t("rentalPeriod")} value={rental.is_indefinite && detail.state !== "completed" ? t("openEndedFrom", { date: formatSummaryDate(rental.start_date, t, locale) }) : t("dateRange", { start: formatSummaryDate(rental.start_date, t, locale), end: formatSummaryDate(rental.end_date, t, locale) })} />
+            {/* One fact per line on a phone: two columns broke prices and place names across four lines. */}
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <Info icon={CalendarDays} label={t("rentalPeriod")} value={rental.is_indefinite && detail.state !== "completed" ? t("openEndedFrom", { date: formatSummaryDate(rental.start_date, t, locale) }) : t("dateRange", { start: formatSummaryDate(rental.start_date, t, locale), end: formatSummaryDate(rental.end_date, t, locale) })} />
               <Info icon={CreditCard} label={t("rateAndDeposit")} value={`${rateLabel(rental, t)}\n${Number(rental.deposit_amount || 0) > 0 ? t("depositAmount", { amount: money(rental.deposit_amount, rental.currency || "THB") }) : t("noDeposit")}`} />
               {/* Once the customer has the vehicle, where and when it was to be handed over is old news. */}
               {handedOver ? null : <Info icon={ReceiptText} label={t("firstPaymentDue")} value={paymentDueText(rental, bookingData, t, locale)} />}
@@ -345,7 +348,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
               {included.map((item) => (
                 <span className="inline-flex items-center gap-1 rounded-full bg-[var(--primary-light)] px-3 py-1.5 text-xs font-bold text-[var(--primary)]" key={item}>
                   <ShieldCheck size={14} />
-                  {item}
+                  {includedItemKey(item) && t.has(includedItemKey(item) as never) ? t(includedItemKey(item) as never) : item}
                 </span>
               ))}
             </div>
@@ -500,6 +503,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
               promptPayQrSvg: firstPaymentQr,
               bookingReference: String(detail.bookingLink?.reference || detail.bookingLink?.reference_number || detail.bookingLink?.id || token).slice(0, 18),
               rentalRate: Number(rental?.rental_rate || 0),
+              firstRent: firstRentCharge(rental),
               depositAmount: Number(rental?.deposit_amount || 0),
               outstandingBalance: Number(rental?.outstanding_balance || 0),
               currency: String(rental?.currency || "THB"),

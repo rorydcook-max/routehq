@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
-import type { ReactNode } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
+import type { FormEvent, ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { updatePaymentSettings } from "@/app/actions/settings";
 
@@ -39,6 +39,14 @@ export function PaymentMethodsForm({ businessName, settings }: { businessName: s
   const [receiptPrefix, setReceiptPrefix] = useState(settings.receipt_prefix || "REC");
   const [promptPayQrUrl, setPromptPayQrUrl] = useState(settings.promptpay_qr_url || "");
   const [removePromptPayQr, setRemovePromptPayQr] = useState(false);
+  const [qrFileName, setQrFileName] = useState("");
+
+  // After a save the page hands back the stored picture: show it instead of the empty picker.
+  useEffect(() => {
+    setPromptPayQrUrl(settings.promptpay_qr_url || "");
+    setRemovePromptPayQr(false);
+    setQrFileName("");
+  }, [settings.promptpay_qr_url]);
   const [defaultMethod, setDefaultMethod] = useState(initialMethods.includes(settings.default_payment_method || "") ? settings.default_payment_method || "cash" : "cash");
   const [result, setResult] = useState<"saved" | "failed" | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -54,7 +62,10 @@ export function PaymentMethodsForm({ businessName, settings }: { businessName: s
     });
   }
 
-  function submitPaymentSettings(formData: FormData) {
+  // Sent by hand, not as a form action: an action clears the form afterwards, which left the ticked methods looking unticked.
+  function submitPaymentSettings(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
     setResult(null);
     startTransition(async () => {
       try {
@@ -67,7 +78,7 @@ export function PaymentMethodsForm({ businessName, settings }: { businessName: s
   }
 
   return (
-    <form action={submitPaymentSettings} className="space-y-3">
+    <form className="space-y-3" onSubmit={submitPaymentSettings}>
       <input name="accepted_payment_methods" type="hidden" value={JSON.stringify(enabledMethods)} />
       <input name="promptpay_qr_remove" type="hidden" value={removePromptPayQr ? "true" : "false"} />
 
@@ -89,7 +100,7 @@ export function PaymentMethodsForm({ businessName, settings }: { businessName: s
                   <div className="flex flex-wrap gap-2">
                     <label className="secondary-action pressable cursor-pointer">
                       {say("pm_replace")}
-                      <input accept="image/png,image/jpeg,image/webp" className="sr-only" data-keep-original name="promptpay_qr" type="file" />
+                      <input accept="image/png,image/jpeg,image/webp" className="sr-only" data-keep-original name="promptpay_qr" onChange={(event) => setQrFileName(event.target.files?.[0]?.name || "")} type="file" />
                     </label>
                     <button
                       className="secondary-action pressable"
@@ -105,8 +116,12 @@ export function PaymentMethodsForm({ businessName, settings }: { businessName: s
                   </div>
                 </div>
               ) : (
-                <input accept="image/png,image/jpeg,image/webp" className="mt-2 w-full" data-keep-original name="promptpay_qr" type="file" />
+                <label className="secondary-action pressable mt-2 w-full cursor-pointer">
+                  {qrFileName ? say("pm_replace") : say("pm_addQr")}
+                  <input accept="image/png,image/jpeg,image/webp" className="sr-only" data-keep-original name="promptpay_qr" onChange={(event) => setQrFileName(event.target.files?.[0]?.name || "")} type="file" />
+                </label>
               )}
+              {qrFileName ? <p className="mt-2 font-semibold text-[var(--success)]">{say("pm_qrChosen", { file: qrFileName })}</p> : null}
             </div>
           </div>
         </MethodCard>

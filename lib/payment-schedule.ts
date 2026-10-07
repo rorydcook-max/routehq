@@ -37,6 +37,17 @@ export function addWeeks(date: Date, weeks: number): Date {
   return next;
 }
 
+// The rent a customer owes first. A daily price is charged for the whole stay in one payment;
+// every other price (week, month, fixed) is one period's worth.
+export function firstRentCharge(rental: { rental_rate?: unknown; pricing_model?: unknown; billing_interval?: unknown; start_date?: unknown; end_date?: unknown } | null | undefined): number {
+  const rate = Number(rental?.rental_rate || 0);
+  const period = String(rental?.billing_interval || rental?.pricing_model || "").toLowerCase();
+  if ((period === "daily" || period === "day") && rental?.start_date && rental?.end_date) {
+    return rate * Math.max(1, daysBetween(String(rental.start_date), String(rental.end_date)));
+  }
+  return rate;
+}
+
 export function daysBetween(date1: string, date2: string): number {
   const start = new Date(`${String(date1).slice(0, 10)}T00:00:00.000Z`);
   const end = new Date(`${String(date2).slice(0, 10)}T00:00:00.000Z`);

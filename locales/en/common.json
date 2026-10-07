@@ -661,7 +661,26 @@
     "payKind_rent": "Rent",
     "payKind_deposit": "Deposit",
     "payKind_deposit_top_up": "Deposit top-up",
-    "payKind_extension": "Extra days"
+    "payKind_extension": "Extra days",
+    "handoverChange": "Need a different place or time?",
+    "inc_0": "Full insurance",
+    "inc_1": "Compulsory insurance (Por Ror Bor)",
+    "inc_2": "Breakdown cover",
+    "inc_3": "Delivery and collection",
+    "inc_4": "Car seat",
+    "inc_5": "GPS tracker",
+    "inc_6": "Unlimited mileage",
+    "inc_7": "Free fuel",
+    "inc_8": "Helmet",
+    "inc_9": "Second helmet",
+    "inc_10": "Phone holder",
+    "inc_11": "Rain poncho",
+    "ack_agreement_reviewed": "I confirm that I have read and understood the rental agreement.",
+    "ack_early_termination": "I understand that if I end the rental early, my charges may be recalculated as set out in the agreement.",
+    "ack_damage_responsibility": "I understand my responsibilities for loss or damage while the vehicle is in my possession, subject to the agreement and applicable law.",
+    "ack_insurance": "I understand that insurance is subject to the insurer's terms, limits, exclusions and claims procedures.",
+    "ack_electronic_signature_records": "I consent to electronic records and electronic signatures being used for this rental.",
+    "ack_data_handling": "I understand that my personal information and uploaded documents will be handled for this rental according to the rental company's applicable privacy and contract processes."
   },
   "customerMessages": {
     "hi": "Hi {name},",
@@ -789,7 +808,8 @@
     "askLooking": "Looking through your records…",
     "askFooter": "Written by AI from your records. Nothing is changed until you press Confirm.",
     "setup_signature": "Add your signature",
-    "setupTitleLater": "Finish setting up"
+    "setupTitleLater": "Finish setting up",
+    "setup_payment_methods": "Say how customers pay you"
   },
   "todo": {
     "eyebrow": "Tasks",
@@ -1849,7 +1869,7 @@
     "stepN": "Step {n}",
     "selectVehicle": "Select vehicle",
     "searchLabel": "Search by make, model, or plate",
-    "searchPlaceholder": "Toyota, Ranger, BKK...",
+    "searchPlaceholder": "Type to search",
     "perMonth": "{amount} / month",
     "selectCustomer": "Select or create customer",
     "sendWithout": "Send the link without choosing a customer",
@@ -1933,11 +1953,11 @@
     "leaveBlank": "Leave blank if not yet agreed.",
     "collectionAddress": "Collection address",
     "collectionTime": "Collection time",
-    "sameDay": "Walk-in / same-day handover - payment will be due immediately.",
+    "sameDay": "The handover is today, so the first payment is due straight away.",
     "allDone": "All done",
     "checkSave": "Check and save",
     "checkSend": "Check and send",
-    "fastTrack": "Walk-in fast track",
+    "fastTrack": "Starting today",
     "fastTrackBody": "This handover is today. You can send the customer the booking link, or record the payment now and start the rental straight away.",
     "shareWithCustomer": "Share booking link with customer",
     "alreadyCollected": "Payment already collected - record now",
@@ -3150,7 +3170,9 @@
     "sig_readyTitle": "Your signature is saved",
     "sig_readyBody": "Agreements are signed for the business as {name}. Customers can sign online.",
     "sig_done": "Done",
-    "sig_change": "Change my signature"
+    "sig_change": "Change my signature",
+    "pm_addQr": "Add my QR picture",
+    "pm_qrChosen": "{file} is ready. Press Save to keep it."
   },
   "accountPage": {
     "roleOwner": "Owner",

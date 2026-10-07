@@ -18,6 +18,7 @@ import { buildDailySummaryMessage, sendLineMessage } from "@/services/messaging/
 import { requireOwner } from "@/lib/auth/roles";
 import { sendDailySummary } from "@/lib/line/daily-summary";
 import { getActiveMembership } from "@/lib/auth/active-organization-server";
+import { markOnboardingStep } from "@/lib/onboarding";
 
 const supportedLocales = new Set<string>(supportedLocaleCodes);
 const supportedCalendars = new Set<string>(supportedCalendarCodes);
@@ -302,7 +303,11 @@ export async function updatePaymentSettings(formData: FormData) {
     throw new Error(error.message);
   }
 
+  // Saving this section is the answer, even for a cash-only shop with no account details to add.
+  await markOnboardingStep(supabase, membership.organization_id, "payment_methods");
+
   revalidatePath("/settings");
+  revalidatePath("/");
 }
 
 export async function updateUpfrontDiscountSettings(formData: FormData) {

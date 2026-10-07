@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { CheckCircle2, CreditCard, FileText, IdCard, ImageIcon, MessageCircle, PenLine, Upload, UserRound, XCircle } from "lucide-react";
@@ -57,6 +58,8 @@ type PublicBookingDetail = {
   promptPayQrSvg?: string | null;
   bookingReference?: string;
   rentalRate?: number;
+  // The rent owed first: for a daily price, the whole stay.
+  firstRent?: number;
   outstandingBalance?: number;
   depositAmount?: number;
   currency?: string;
@@ -609,7 +612,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
   const effectiveTiming = selectedMethodInfo?.deliveryOnly ? "on_delivery" : paymentTiming;
   const rentalRate = detail.rentalRate ?? 0;
   // What is due at the start: the first rent and the deposit.
-  const paymentAmount = detail.outstandingBalance && detail.outstandingBalance > 0 ? detail.outstandingBalance : rentalRate + (detail.depositAmount ?? 0);
+  const paymentAmount = detail.outstandingBalance && detail.outstandingBalance > 0 ? detail.outstandingBalance : (detail.firstRent ?? rentalRate) + (detail.depositAmount ?? 0);
   const currency = detail.currency ?? "THB";
   const [upfrontAccepted, setUpfrontAccepted] = useState<boolean | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -1203,9 +1206,8 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         </details>
       </section>
 
-      <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
-        <SectionTitle icon={PenLine} label={t("handoverPreferences")} />
-        <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{t("handoverPreferencesIntro")}</p>
+      {/* When the business has already set both the place and the time, they are shown at the top: asking again is only for a customer who wants them changed. */}
+      <HandoverWishes agreed={Boolean(String(detail.bookingData.delivery_location || "").trim() && operatorDeliveryDateTime)} changeLabel={t.has("handoverChange" as never) ? t("handoverChange" as never) : t("handoverPreferences")} intro={t("handoverPreferencesIntro")} title={t("handoverPreferences")}>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <label className="sm:col-span-2">
             <span className="text-sm font-bold text-[var(--foreground-secondary)]">{t("preferredPlace")}</span>
@@ -1233,7 +1235,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             )}
           </label>
         </div>
-      </section>
+      </HandoverWishes>
 
       {acceptedMethods.length > 0 ? (
         <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
@@ -1454,7 +1456,8 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             {publicAgreement.requiredAcknowledgements.map((ack) => (
               <label className="checkbox-label rounded-xl border border-[var(--border)] bg-white p-3 font-bold text-[var(--foreground)]" key={`${publicAgreement.versionId}-${ack.type}`}>
                 <input className="flex-shrink-0" name={`ack_${ack.type}`} type="checkbox" />
-                <span>{ack.text}</span>
+                {/* Shown in the reader's language; the record keeps the fixed English statement and its version. */}
+                <span>{t.has(`ack_${ack.type}` as never) ? t(`ack_${ack.type}` as never) : ack.text}</span>
               </label>
             ))}
           </div>
@@ -1967,6 +1970,24 @@ function SavedDetails({ folded, children }: { folded: boolean; children: React.R
       </summary>
       <div className="space-y-5 border-t border-[var(--border)] p-3">{children}</div>
     </details>
+  );
+}
+
+function HandoverWishes({ agreed, changeLabel, children, intro, title }: { agreed: boolean; changeLabel: string; children: ReactNode; intro: string; title: string }) {
+  if (agreed) {
+    return (
+      <details className="rounded-2xl border border-[var(--border)] bg-white px-5 py-4 shadow-sm">
+        <summary className="cursor-pointer text-sm font-bold text-[var(--primary)]">{changeLabel}</summary>
+        {children}
+      </details>
+    );
+  }
+  return (
+    <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
+      <SectionTitle icon={PenLine} label={title} />
+      <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{intro}</p>
+      {children}
+    </section>
   );
 }
 

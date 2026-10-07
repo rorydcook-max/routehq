@@ -1,6 +1,7 @@
 "use client";
 
 import { businessToday } from "@/lib/business-time";
+import { typedNote } from "@/lib/transaction-notes";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
@@ -787,7 +788,7 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
             {isRefund ? <SmallBadge tone="amber">{tx.say("pc_refund")}</SmallBadge> : null}
             {voided ? <SmallBadge tone="neutral">{tx.say("pc_voided")}</SmallBadge> : null}
           </div>
-          <p className={`text-sm ${voided ? "text-[var(--muted)]" : "text-[var(--muted)]"}`}>{dateLabel(transaction.transaction_date, tx.locale)} {transaction.notes ? `/ ${transaction.notes}` : ""}</p>
+          <p className={`text-sm ${voided ? "text-[var(--muted)]" : "text-[var(--muted)]"}`}>{dateLabel(transaction.transaction_date, tx.locale)}{typedNote(transaction.notes) ? ` · ${typedNote(transaction.notes)}` : ""}</p>
           {isRefund && transaction.metadata?.refund_reason ? <p className="mt-1 text-sm font-semibold text-[var(--warning)]">{transaction.metadata.refund_reason}</p> : null}
         </div>
         <div className="flex shrink-0 items-center gap-2">

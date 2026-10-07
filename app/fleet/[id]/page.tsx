@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { typedNote } from "@/lib/transaction-notes";
 import type { Route } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -740,7 +741,7 @@ function TransactionsSection({ detail }: { detail: VehicleDetail }) {
             // A deposit taken or handed back is not income or a cost: shown plainly, without a plus or minus.
             const held = transaction.type === "deposit_received" || transaction.type === "deposit_refunded";
             // Notes the app wrote for its own records are English sentences; only notes a person typed are shown.
-            const note = transaction.notes && !/received by|receipt checked|recorded on the return form|received at handover|^deposit deduction|^security deposit/i.test(transaction.notes) ? transaction.notes : null;
+            const note = typedNote(transaction.notes);
             const extra = [
               transaction.supplier ? tx.say("x_paidTo", { name: transaction.supplier }) : null,
               transaction.mileage ? tx.say("x_mileage", { km: Number(transaction.mileage).toLocaleString("en-US") }) : null,

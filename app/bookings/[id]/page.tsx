@@ -4,6 +4,7 @@ import { AlertTriangle, CalendarDays, Car, CheckCircle2, Clock, CreditCard, File
 import { CancelBookingButton } from "@/app/bookings/[id]/cancel-booking-button";
 import { VehicleChangeButton } from "@/app/bookings/[id]/vehicle-change-button";
 import { UnsentMessages } from "@/app/bookings/[id]/unsent-messages";
+import { activityTitle, visibleActivity } from "@/lib/activity-display";
 import { UndoCancellationButton } from "@/app/bookings/[id]/undo-cancellation-button";
 import { confirmCustomerPayment } from "@/app/actions/deposits";
 import { PaymentReminderButton } from "@/app/bookings/[id]/payment-reminder-button";
@@ -956,16 +957,17 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               {/* The full history lives under the messages: one place for everything that has happened, not two rows on the page. */}
               <details className="mt-4">
                 <summary className="cursor-pointer py-1 text-sm font-semibold text-[var(--primary)]">
-                  {tx.say("historyTitle")} · {tx.say("entries", { count: activityEvents.length })}
+                  {tx.say("historyTitle")} · {tx.say("entries", { count: visibleActivity(activityEvents).length })}
                 </summary>
               <div className="mt-3 space-y-3">
-                {activityEvents.length === 0 ? (
+                {visibleActivity(activityEvents).length === 0 ? (
                   <SectionEmpty>{tx.say("noActivity")}</SectionEmpty>
                 ) : (
-                  activityEvents.map((event: any) => (
+                  visibleActivity(activityEvents as any[]).map((event: any) => (
                   <div className="sub-surface p-3" key={event.id}>
-                      <p className="font-semibold text-[var(--foreground)]">{event.title}</p>
-                      <p className="mt-1 text-sm text-[var(--muted)]">{event.detail || event.event_type}</p>
+                      <p className="font-semibold text-[var(--foreground)]">{activityTitle(event, tx.say as any)}</p>
+                      {/* The stored detail is an English sentence: shown to English readers only. */}
+                      {tx.locale === "en" && event.detail ? <p className="mt-1 text-sm text-[var(--muted)]">{event.detail}</p> : null}
                       <p className="mt-2 text-xs font-bold uppercase text-[var(--muted)]">{formatDateTime(event.occurred_at, tx)}</p>
                     </div>
                   ))
@@ -1439,7 +1441,8 @@ function communicationTypeBadge(type: string, tx: Tx) {
     manual_note: { label: tx.say("ct_manual_note"), className: "border-[var(--border)] bg-[var(--panel-secondary)] text-[var(--foreground-secondary)]" },
     customer_portal_action: { label: tx.say("ct_customer_portal_action"), className: "border-[var(--info-line)] bg-[var(--primary-light)] text-[var(--primary)]" },
     booking_link_activity: { label: tx.say("ct_booking_link_activity"), className: "border-[var(--purple-line)] bg-[var(--purple-light)] text-[var(--purple)]" },
-    operator_message: { label: tx.say("ct_operator_message"), className: "border-[var(--border)] bg-[var(--panel-tertiary)] text-[var(--foreground-secondary)]" }
+    operator_message: { label: tx.say("ct_operator_message"), className: "border-[var(--border)] bg-[var(--panel-tertiary)] text-[var(--foreground-secondary)]" },
+    system_event: { label: tx.say("ct_system_event"), className: "border-[var(--border)] bg-white text-[var(--foreground-secondary)]" }
   };
   const config = labels[type] || { label: String(type || "Event").replace(/_/g, " "), className: "border-[var(--border)] bg-white text-[var(--foreground-secondary)]" };
   return <span className={`inline-flex items-center rounded-full border px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.04em] ${config.className}`}>{config.label}</span>;
@@ -1532,7 +1535,7 @@ function CommunicationTimeline({
             </div>
             <span className="text-xs font-bold uppercase text-[var(--muted)]">{relativeTime(entry.created_at, tx)}</span>
           </div>
-          <p className="mt-2 whitespace-pre-line text-sm font-semibold leading-6 text-[var(--foreground-secondary)]">{entry.content || tx.say("noContent")}</p>
+          <p className="mt-2 whitespace-pre-line text-sm font-semibold leading-6 text-[var(--foreground-secondary)]">{timelineText(entry, tx) || tx.say("noContent")}</p>
         </div>
       ))}
     </div>
@@ -1624,6 +1627,26 @@ async function CustomerPortalActionCard({ action, organizationId, rentalId, cust
       </div>
     </div>
   );
+}
+
+/**
+ * What a line in the messages list says. Customer requests are worded from
+ * their details; the app's own notes are stored as English sentences, so the
+ * ones it writes are named in the reader's language.
+ */
+function timelineText(entry: any, tx: Tx): string {
+  if (entry.source === "customer_portal_action" && entry.action) return portalActionSummary(entry.action, tx);
+  const content = String(entry.content || "");
+  const type = String(entry.timeline_type || entry.type || "");
+  if (type !== "booking_link_activity" && type !== "system_event" && type !== "customer_portal_action") return content;
+  if (/^Customer opened booking link/i.test(content)) return tx.say("tl_opened");
+  if (/^Customer signed the rental agreement/i.test(content)) return tx.say("tl_signed");
+  if (/^Customer signed an amendment/i.test(content)) return tx.say("tl_signedChange");
+  if (/^Customer (submitted|completed) (their )?details/i.test(content)) return tx.say("tl_details");
+  const extension = content.match(/^Customer requested (?:an )?extension to (\d{4}-\d{2}-\d{2})/i);
+  if (extension) return tx.say("tl_askedUntil", { date: longDate(extension[1], tx.locale) });
+  if (/^Customer reported a problem/i.test(content)) return tx.say("tl_problem");
+  return content;
 }
 
 function portalActionSummary(action: any, tx: Tx) {

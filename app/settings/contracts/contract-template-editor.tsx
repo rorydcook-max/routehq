@@ -1,13 +1,15 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import { Eye, FileText, RotateCcw, Save } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Eye, RotateCcw, Save } from "lucide-react";
+import { supportedLocaleOptions } from "@/lib/i18n/locales";
 import { resetContractTemplate, saveContractTemplate } from "@/app/actions/contracts";
 import { PendingButton } from "@/components/pending-button";
 import { renderContractTemplate } from "@/lib/contract-rendering";
 
-const inputClass =
-  "mt-2 w-full rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]";
+const inputClass = "mt-1 w-full";
+const labelClass = "font-semibold text-[var(--foreground-secondary)]";
 
 type Variable = {
   key: string;
@@ -25,6 +27,7 @@ export function ContractTemplateEditor({
   template: any;
   variables: Variable[];
 }) {
+  const say = useTranslations("settingsPage") as unknown as (key: string) => string;
   const [name, setName] = useState<string>(template.name || template.title || "Standard rental agreement");
   const [language, setLanguage] = useState<string>(template.language || template.locale || "en");
   const [content, setContent] = useState<string>(template.content_html || template.body || "");
@@ -51,52 +54,53 @@ export function ContractTemplateEditor({
   }
 
   function openPreviewWindow() {
-    const previewWindow = window.open("", "_blank", "noopener,noreferrer");
-    if (!previewWindow) return;
-    previewWindow.document.write(preview);
-    previewWindow.document.close();
+    // Opened from a file-like address: a blank window asked for with "noopener" hands nothing back to write into, so this button used to do nothing.
+    const url = URL.createObjectURL(new Blob([`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><body style="font-family: system-ui, sans-serif; max-width: 820px; margin: 24px auto; padding: 0 16px; line-height: 1.6">${preview}</body>`], { type: "text/html" }));
+    window.open(url, "_blank", "noopener,noreferrer");
+    window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
   }
 
   return (
     <div className="grid gap-4 xl:grid-cols-[1fr_280px]">
-      <form action={saveContractTemplate} className="content-section">
+      <form action={saveContractTemplate} className="card p-4">
         <input name="organizationId" type="hidden" value={organizationId} />
         <input name="templateId" type="hidden" value={template.id} />
         <input name="contentHtml" type="hidden" value={content} />
 
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block">
-            <span className="text-sm font-bold text-[var(--foreground-secondary)]">Template name</span>
+            <span className={labelClass}>{say("ct_name")}</span>
             <input className={inputClass} name="name" onChange={(event) => setName(event.target.value)} value={name} />
           </label>
           <label className="block">
-            <span className="text-sm font-bold text-[var(--foreground-secondary)]">Language</span>
+            <span className={labelClass}>{say("ct_language")}</span>
             <select className={inputClass} name="language" onChange={(event) => setLanguage(event.target.value)} value={language}>
-              <option value="en">English</option>
-              <option value="th">Thai</option>
-              <option value="ru">Russian</option>
-              <option value="zh">Chinese</option>
-              <option value="fr">French</option>
-              <option value="ja">Japanese</option>
+              {supportedLocaleOptions.some((option) => option.code === language) ? null : <option value={language}>{language}</option>}
+              {supportedLocaleOptions.map((option) => (
+                <option key={option.code} value={option.code}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </label>
         </div>
 
         <label className="mt-4 block">
-          <span className="text-sm font-bold text-[var(--foreground-secondary)]">Contract HTML</span>
+          <span className={labelClass}>{say("ct_wording")}</span>
           <textarea
-            className={`${inputClass} min-h-[520px] font-mono text-sm leading-6`}
+            className={`${inputClass} font-mono text-[14px] leading-6`}
             onChange={(event) => setContent(event.target.value)}
             ref={textareaRef}
             spellCheck={false}
+            style={{ minHeight: 420 }}
             value={content}
           />
         </label>
 
         <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-          <PendingButton className="primary-action flex-1" pendingLabel="Saving..." savedLabel="Saved" type="submit">
+          <PendingButton className="primary-action flex-1" pendingLabel={say("saving")} savedLabel={say("saved")} type="submit">
             <Save size={18} />
-            Save template
+            {say("save")}
           </PendingButton>
           <button
             className="secondary-action pressable flex-1 text-[var(--primary)]"
@@ -104,7 +108,7 @@ export function ContractTemplateEditor({
             type="button"
           >
             <Eye size={18} />
-            Preview contract
+            {say("ct_openPreview")}
           </button>
           <button
             className="secondary-action pressable flex-1"
@@ -112,22 +116,19 @@ export function ContractTemplateEditor({
             type="button"
           >
             <Eye size={18} />
-            {previewOpen ? "Hide preview" : "Show preview"}
+            {previewOpen ? say("ct_hide") : say("ct_show")}
           </button>
         </div>
       </form>
 
       <aside className="space-y-4">
-        <section className="content-section">
-          <div className="flex items-center gap-2">
-            <FileText className="text-[var(--primary)]" size={19} />
-            <h2 className="font-semibold text-[var(--foreground)]">Variables</h2>
-          </div>
-          <p className="mt-2 text-sm text-[var(--muted)]">Click a variable to insert it at the cursor.</p>
+        <section className="card p-4">
+          <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("ct_fields")}</h2>
+          <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("ct_fieldsBody")}</p>
           <div className="mt-4 grid gap-2">
             {variables.map((variable) => (
               <button
-                className="pressable rounded-xl border border-[var(--border)] bg-white px-3 py-2 text-left font-mono text-xs font-bold text-[var(--primary)]"
+                className="pressable rounded-xl border border-[var(--border)] bg-white px-3 py-2.5 text-left font-mono text-[14px] font-bold text-[var(--primary)]"
                 key={variable.key}
                 onClick={() => insertVariable(variable.token)}
                 type="button"
@@ -138,27 +139,25 @@ export function ContractTemplateEditor({
           </div>
         </section>
 
-        <form action={resetContractTemplate} className="rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-4" onSubmit={(event) => {
-          if (!window.confirm("This will replace your current template with the comprehensive bilingual English/Thai default. Are you sure?")) {
+        <form action={resetContractTemplate} className="card p-4" onSubmit={(event) => {
+          if (!window.confirm(say("ct_resetConfirm"))) {
             event.preventDefault();
           }
         }}>
           <input name="organizationId" type="hidden" value={organizationId} />
-          <PendingButton className="pressable inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--danger)] px-4 py-3 text-sm font-semibold text-white" pendingLabel="Resetting..." type="submit">
+          <PendingButton className="secondary-action w-full" pendingLabel={say("ct_resetting")} type="submit">
             <RotateCcw size={18} />
-            Reset to comprehensive bilingual template
+            {say("ct_reset")}
           </PendingButton>
-          <p className="mt-2 text-xs text-[var(--danger)]">This replaces the current template with the comprehensive bilingual English/Thai default.</p>
+          <p className="mt-2 font-medium text-[var(--foreground-secondary)]">{say("ct_resetBody")}</p>
         </form>
       </aside>
 
       {previewOpen ? (
-        <section className="content-section xl:col-span-2">
-          <div className="flex items-center gap-2">
-            <Eye className="text-[var(--primary)]" size={19} />
-            <h2 className="font-semibold text-[var(--foreground)]">Preview with sample data</h2>
-          </div>
-          <div className="contract-preview sub-surface mt-4 p-5 text-sm leading-7 text-[var(--foreground-secondary)]" dangerouslySetInnerHTML={{ __html: preview }} />
+        <section className="card p-4 xl:col-span-2">
+          <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("ct_sample")}</h2>
+          {/* In its own frame: the agreement carries its own styles, and written straight into the page they restyled the whole screen. */}
+          <iframe className="mt-3 w-full rounded-xl bg-white" sandbox="" srcDoc={preview} style={{ height: 720, border: "1px solid var(--border)" }} title={say("ct_sample")} />
         </section>
       ) : null}
     </div>

@@ -36,6 +36,7 @@ async function currentState(): Promise<State> {
  */
 export function PushToggle({ variant = "card" }: { variant?: "card" | "prompt" }) {
   const t = useTranslations("shell");
+  const say = useTranslations("settingsPage") as unknown as (key: string) => string;
   const [state, setState] = useState<State>("checking");
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState("");
@@ -60,13 +61,13 @@ export function PushToggle({ variant = "card" }: { variant?: "card" | "prompt" }
       const subscription = (await registration.pushManager.getSubscription()) || (await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: keyBytes(PUBLIC_KEY) }));
       const saved = await savePushSubscription(subscription.toJSON() as any, navigator.userAgent);
       if (!saved.ok) {
-        setNote("Couldn't turn alerts on. Please try again.");
+        setNote(say("ps_failed"));
         return;
       }
       setState("on");
-      setNote("Alerts are on for this device.");
+      setNote(say("ps_nowOn"));
     } catch {
-      setNote("Couldn't turn alerts on. Please try again.");
+      setNote(say("ps_failed"));
     } finally {
       setBusy(false);
     }
@@ -91,7 +92,7 @@ export function PushToggle({ variant = "card" }: { variant?: "card" | "prompt" }
   async function test() {
     setBusy(true);
     const result = await sendTestPush().catch(() => ({ ok: false }));
-    setNote(result.ok ? "Sent. It should arrive in a moment." : "The test couldn't be sent.");
+    setNote(result.ok ? say("ps_testSent") : say("ps_testFailed"));
     setBusy(false);
   }
 
@@ -132,34 +133,34 @@ export function PushToggle({ variant = "card" }: { variant?: "card" | "prompt" }
   }
 
   return (
-    <div className="space-y-3 text-sm">
-      <p className="text-xs text-[var(--muted)]">An alert on this device when a customer books, pays, asks for something or sends a message. Each phone or computer is switched on separately.</p>
-      {state === "checking" ? <p className="text-[var(--muted)]">Checking…</p> : null}
-      {state === "unsupported" ? <p className="text-[var(--foreground-secondary)]">This browser can't show alerts. Try Chrome on Android or a computer, or add RouteHQ to your iPhone's home screen.</p> : null}
+    <div className="space-y-3">
+      <p className="font-medium text-[var(--foreground-secondary)]">{say("ps_body")}</p>
+      {state === "checking" ? <p className="font-medium text-[var(--muted)]">{say("ps_checking")}</p> : null}
+      {state === "unsupported" ? <p className="font-medium text-[var(--foreground)]">{say("ps_unsupported")}</p> : null}
       {state === "needs-install" ? (
-        <p className="text-[var(--foreground-secondary)]">On an iPhone, alerts work once RouteHQ is on your home screen: tap Share, then Add to Home Screen, open RouteHQ from there and come back to this page.</p>
+        <p className="font-medium text-[var(--foreground)]">{say("ps_install")}</p>
       ) : null}
-      {state === "blocked" ? <p className="text-[var(--foreground-secondary)]">Alerts are blocked for RouteHQ in this browser's settings. Allow notifications there, then come back.</p> : null}
+      {state === "blocked" ? <p className="font-medium text-[var(--foreground)]">{say("ps_blocked")}</p> : null}
       {state === "off" ? (
         <button className="primary-action pressable w-full disabled:opacity-60" disabled={busy} onClick={turnOn} type="button">
           <Bell size={16} />
-          Turn on alerts on this device
+          {say("ps_turnOn")}
         </button>
       ) : null}
       {state === "on" ? (
         <div className="flex flex-wrap gap-2">
           <span className="inline-flex items-center gap-2 rounded-lg bg-[var(--primary-light)] px-3 py-2 text-sm font-semibold text-[var(--primary)]">
-            <Bell size={16} /> Alerts are on
+            <Bell size={16} /> {say("ps_on")}
           </span>
           <button className="secondary-action pressable disabled:opacity-60" disabled={busy} onClick={test} type="button">
-            Send a test
+            {say("ps_test")}
           </button>
           <button className="secondary-action pressable disabled:opacity-60" disabled={busy} onClick={turnOff} type="button">
-            <BellOff size={16} /> Turn off
+            <BellOff size={16} /> {say("ps_turnOff")}
           </button>
         </div>
       ) : null}
-      {note ? <p className="text-xs font-semibold text-[var(--primary)]">{note}</p> : null}
+      {note ? <p className="font-bold text-[var(--primary)]">{note}</p> : null}
     </div>
   );
 }

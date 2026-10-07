@@ -12,7 +12,7 @@ import { readIdentityDocument } from "@/app/actions/identity-ocr";
 import { uploadFormFiles } from "@/lib/direct-upload-client";
 import { extractBodyHtml } from "@/lib/contract-rendering";
 import { formatDeliveryLocation } from "@/lib/delivery-location";
-import { toWallTime } from "@/lib/business-time";
+import { toWallTime, businessToday } from "@/lib/business-time";
 
 declare global {
   interface Window {
@@ -404,9 +404,9 @@ function formatMoney(amount: number, currency = "THB"): string {
   return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(amount);
 }
 
+// The business's today: the vehicle is handed over where the business is, and the page then reads the same on the server and on the phone.
 function todayDateString() {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  return businessToday();
 }
 
 function compactDateTime(value: unknown) {

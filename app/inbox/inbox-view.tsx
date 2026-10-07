@@ -1,5 +1,6 @@
 "use client";
 
+import { toWallTime, businessToday, BUSINESS_TIME_ZONE } from "@/lib/business-time";
 import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import type { Route } from "next";
@@ -43,21 +44,18 @@ function initials(name: string | null) {
 /** "14:05" today, "Yesterday", or "28 Sep" for older. */
 function when(iso: string | null, say: Say, locale: string) {
   if (!iso) return "";
+  // All on the business's clock, so the list reads the same from the server and on the phone.
   const date = new Date(iso);
-  const now = new Date();
-  const sameDay = date.toDateString() === now.toDateString();
-  if (sameDay) return date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
-  const yesterday = new Date(now);
-  yesterday.setDate(now.getDate() - 1);
-  if (date.toDateString() === yesterday.toDateString()) return say("yesterday");
-  return date.toLocaleDateString(intlLocale(locale), { day: "numeric", month: "short" });
+  const day = toWallTime(iso).slice(0, 10);
+  if (day === businessToday()) return toWallTime(iso).slice(11, 16);
+  if (day === businessToday(-1)) return say("yesterday");
+  return date.toLocaleDateString(intlLocale(locale), { day: "numeric", month: "short", timeZone: BUSINESS_TIME_ZONE });
 }
 
 function dayLabel(iso: string, say: Say, locale: string) {
   const date = new Date(iso);
-  const now = new Date();
-  if (date.toDateString() === now.toDateString()) return say("today");
-  return date.toLocaleDateString(intlLocale(locale), { weekday: "short", day: "numeric", month: "short" });
+  if (toWallTime(iso).slice(0, 10) === businessToday()) return say("today");
+  return date.toLocaleDateString(intlLocale(locale), { weekday: "short", day: "numeric", month: "short", timeZone: BUSINESS_TIME_ZONE });
 }
 
 function shortDate(value: string | null, say: Say, locale: string) {
@@ -282,7 +280,7 @@ export function InboxView({
                     <div className={`flex ${mine ? "justify-end" : "justify-start"}`}>
                       <div className={`max-w-[78%] rounded-2xl px-3.5 py-2 text-[14px] leading-snug ${mine ? "rounded-br-md bg-[var(--primary)] text-white" : "rounded-bl-md border border-[var(--border)] bg-white text-[var(--foreground)]"} ${message.status === "failed" ? "opacity-60" : ""}`}>
                         <p className="whitespace-pre-wrap break-words">{message.body}</p>
-                        <p className={`mt-1 text-right text-[11px] ${mine ? "text-white/70" : "text-[var(--muted)]"}`}>{new Date(message.created_at).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</p>
+                        <p className={`mt-1 text-right text-[11px] ${mine ? "text-white/70" : "text-[var(--muted)]"}`}>{toWallTime(message.created_at).slice(11, 16)}</p>
                       </div>
                     </div>
                     {message.status === "failed" ? (

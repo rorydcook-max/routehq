@@ -1,5 +1,6 @@
 "use client";
 
+import { daysFromToday } from "@/lib/business-time";
 import { useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { longDate } from "@/lib/i18n/dates";
@@ -345,11 +346,7 @@ function formatDate(value: string) {
 
 function returnDateTone(value: string | null | undefined): "green" | "amber" | "red" | "neutral" {
   if (!value) return "neutral";
-  const today = new Date();
-  const target = new Date(value);
-  today.setHours(0, 0, 0, 0);
-  target.setHours(0, 0, 0, 0);
-  const days = Math.ceil((target.getTime() - today.getTime()) / 86_400_000);
+  const days = daysFromToday(value) ?? 0;
   if (days < 0) return "red";
   if (days <= 3) return "amber";
   return "neutral";

@@ -1,6 +1,6 @@
 "use client";
 
-import { businessToday } from "@/lib/business-time";
+import { businessToday, daysFromToday as businessDaysFromToday } from "@/lib/business-time";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
@@ -86,19 +86,15 @@ function linkLabel(status: string | null | undefined, tx: Tx) {
 
 function isDueSoon(booking: any) {
   if (!booking.end_date || !["active", "booked", "extended", "due_soon"].includes(booking.status)) return false;
-  const today = new Date();
-  const target = new Date(booking.end_date);
-  today.setHours(0, 0, 0, 0);
-  target.setHours(0, 0, 0, 0);
-  const days = Math.ceil((target.getTime() - today.getTime()) / 86_400_000);
-  return days >= 0 && days <= 3;
+  const days = businessDaysFromToday(booking.end_date);
+  return days !== null && days >= 0 && days <= 3;
 }
 
 function matchesFilter(booking: any, filter: string) {
   if (filter === "all") return true;
   if (isCancelledBooking(booking)) return filter === "cancelled";
   if (filter === "due_soon") return booking.status === "due_soon" || isDueSoon(booking);
-  if (filter === "overdue") return booking.status === "overdue" || (booking.end_date && new Date(booking.end_date) < new Date() && !["completed", "cancelled"].includes(booking.status));
+  if (filter === "overdue") return booking.status === "overdue" || (booking.end_date && (businessDaysFromToday(booking.end_date) ?? 0) < 0 && !["completed", "cancelled"].includes(booking.status));
   return booking.status === filter;
 }
 
@@ -107,11 +103,7 @@ function canExtend(booking: any) {
 }
 
 function daysFromToday(iso: string) {
-  const today = new Date();
-  const target = new Date(iso);
-  today.setHours(0, 0, 0, 0);
-  target.setHours(0, 0, 0, 0);
-  return Math.round((target.getTime() - today.getTime()) / 86_400_000);
+  return businessDaysFromToday(iso) ?? 0;
 }
 
 function rentalTimingLabel(booking: any, tx: Tx) {

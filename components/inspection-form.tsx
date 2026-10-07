@@ -1,6 +1,6 @@
 "use client";
 
-import { businessToday } from "@/lib/business-time";
+import { businessToday, toWallTime } from "@/lib/business-time";
 import { VehicleKindIcon } from "@/components/vehicle-kind-icon";
 import { shownError } from "@/lib/error-text";
 import { isTwoWheeler, kindFromCategory } from "@/lib/vehicle-groups";
@@ -71,15 +71,14 @@ function money(value: unknown) {
   return new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB", maximumFractionDigits: 0 }).format(Number(value || 0));
 }
 
-function daysBetween(start: string | null | undefined, end: Date = new Date()) {
+/** Days a rental has run, counting the first day, on the business's calendar (the same on the server and on the phone). */
+function daysBetween(start: string | null | undefined) {
   if (!start) {
     return 0;
   }
-  const startDate = new Date(start);
-  startDate.setHours(0, 0, 0, 0);
-  const endDate = new Date(end);
-  endDate.setHours(0, 0, 0, 0);
-  return Math.max(0, Math.ceil((endDate.getTime() - startDate.getTime()) / 86_400_000) + 1);
+  const startDay = Date.parse(`${toWallTime(start).slice(0, 10)}T00:00:00Z`);
+  if (Number.isNaN(startDay)) return 0;
+  return Math.max(0, Math.round((Date.parse(`${businessToday()}T00:00:00Z`) - startDay) / 86_400_000) + 1);
 }
 
 function StepShell({

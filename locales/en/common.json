@@ -301,7 +301,7 @@
     "odometerBelowLast": "This is lower than the last recorded reading ({km} km). Check the number before continuing.",
     "drivenDuringRental": "Driven since handover: {km} km",
     "odometerAtDelivery": "At handover: {km} km",
-    "rentalLengthDays": "Rented for {count, plural, one {# day} other {# days}}",
+    "rentalLengthDays": "Rented for {count, plural, =0 {less than a day} one {# day} other {# days}}",
     "fuelDeficitApprox": "About {percent}% less fuel than at handover",
     "deductionsExceedDeposit": "That is more than the deposit. Only {amount} can come out of it; the rest stays owed.",
     "viewNotSet": "Not set",

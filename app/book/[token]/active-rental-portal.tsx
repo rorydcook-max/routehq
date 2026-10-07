@@ -1,7 +1,7 @@
 "use client";
 
 import { customerDate } from "@/lib/i18n/customer-dates";
-import { businessToday } from "@/lib/business-time";
+import { businessToday, daysFromToday } from "@/lib/business-time";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
@@ -386,11 +386,7 @@ function VehiclePhoto({ vehicle }: { vehicle: any }) {
 
 function returnCountdown(endDate: string | null | undefined, t: ReturnType<typeof useTranslations>) {
   if (!endDate) return { label: t("noReturnDate"), overdue: false, today: false };
-  const todayDate = new Date();
-  const target = new Date(endDate);
-  todayDate.setHours(0, 0, 0, 0);
-  target.setHours(0, 0, 0, 0);
-  const days = Math.ceil((target.getTime() - todayDate.getTime()) / 86_400_000);
+  const days = daysFromToday(endDate) ?? 0;
   if (days < 0) return { label: t("daysOverdue", { days: Math.abs(days) }), overdue: true, today: false };
   if (days === 0) return { label: t("dueBackToday"), overdue: false, today: true };
   return { label: t("dueBackInDays", { days }), overdue: false, today: false };

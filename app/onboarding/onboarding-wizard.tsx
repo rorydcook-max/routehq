@@ -1,5 +1,6 @@
 "use client";
 
+import { daysFromToday } from "@/lib/business-time";
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Camera, Car, CheckCircle2, FileSpreadsheet, Languages } from "lucide-react";
@@ -785,11 +786,7 @@ const copy = {
 
 function daysUntil(value: string | null | undefined) {
   if (!value) return null;
-  const today = new Date();
-  const target = new Date(value);
-  today.setHours(0, 0, 0, 0);
-  target.setHours(0, 0, 0, 0);
-  return Math.ceil((target.getTime() - today.getTime()) / 86_400_000);
+  return daysFromToday(value);
 }
 
 function soonestCompliance(vehicle: any, t: (typeof copy)["en"]) {

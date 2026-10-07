@@ -85,3 +85,14 @@ export function businessNow(timeZone: string = BUSINESS_TIME_ZONE): Date {
   const [year, month, day] = businessToday(0, timeZone).split("-").map(Number);
   return new Date(year, month - 1, day, 12, 0, 0, 0);
 }
+
+/**
+ * Whole days from the business's today to a date (negative once it has passed), or null when there is no
+ * readable date. Counted on the calendar, so the answer is the same on a server in UTC and on a phone in
+ * Thailand - "new Date()" on each gave different answers for the first seven hours of every day.
+ */
+export function daysFromToday(value: unknown, timeZone: string = BUSINESS_TIME_ZONE): number | null {
+  const day = Date.parse(`${toWallTime(value, timeZone).slice(0, 10)}T00:00:00Z`);
+  if (Number.isNaN(day)) return null;
+  return Math.round((day - Date.parse(`${businessToday(0, timeZone)}T00:00:00Z`)) / 86_400_000);
+}

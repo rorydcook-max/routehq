@@ -2,7 +2,7 @@
 
 import { includedOptions } from "@/lib/included-items";
 import { shownError } from "@/lib/error-text";
-import { businessToday } from "@/lib/business-time";
+import { businessToday, toWallTime } from "@/lib/business-time";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import type { LucideIcon } from "lucide-react";
@@ -145,17 +145,13 @@ function parseMoneyInput(value: string) {
   return digits ? Number(digits) : 0;
 }
 
+// Today and now on the business's clock, so the form opens on the same day whether the page was built on the server (UTC) or on the phone.
 function localDate(value = new Date()) {
-  const year = value.getFullYear();
-  const month = String(value.getMonth() + 1).padStart(2, "0");
-  const day = String(value.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+  return toWallTime(value.toISOString()).slice(0, 10);
 }
 
 function localDateTime(value = new Date()) {
-  const hours = String(value.getHours()).padStart(2, "0");
-  const minutes = String(value.getMinutes()).padStart(2, "0");
-  return `${localDate(value)}T${hours}:${minutes}`;
+  return toWallTime(value.toISOString());
 }
 
 function vehicleTitle(vehicle?: BookingVehicle | null) {

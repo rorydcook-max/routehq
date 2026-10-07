@@ -1,5 +1,6 @@
 "use server";
 
+import { said } from "@/lib/i18n/server-text";
 import { getLocale } from "next-intl/server";
 import { createBooking } from "@/app/actions/bookings";
 import { createTransaction } from "@/app/actions/transactions";
@@ -14,7 +15,7 @@ const OWNER_ONLY = "Only the business owner can use the assistant.";
 /** "Ask RouteHQ": answers a question from the business's records, or proposes a change for the owner to confirm. */
 export async function askRouteHq(question: string, history: AskTurn[] = []): Promise<AskAnswer> {
   const membership = await getCurrentMembership();
-  if (!membership) return { ok: false, error: "Please sign in again." };
+  if (!membership) return { ok: false, error: await said("Please sign in again.") };
   // Money questions and changes are the owner's business; teammates handle day-to-day work.
   if (membership.role !== "owner") return { ok: false, error: OWNER_ONLY };
 
@@ -52,7 +53,7 @@ function form(organizationId: string, values: Record<string, string | number | b
  */
 export async function confirmAssistantAction(kind: string, args: Record<string, unknown>): Promise<Done> {
   const membership = await getCurrentMembership();
-  if (!membership) return { ok: false, error: "Please sign in again." };
+  if (!membership) return { ok: false, error: await said("Please sign in again.") };
   if (membership.role !== "owner") return { ok: false, error: OWNER_ONLY };
 
   const checked = checkAction(String(kind), args && typeof args === "object" ? args : {}, await assistantRecords());

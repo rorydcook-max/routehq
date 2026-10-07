@@ -1,3 +1,4 @@
+import { said } from "@/lib/i18n/server-text";
 import { NextResponse } from "next/server";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { IMPORT_FIELD_KEYS, importFieldKeys } from "@/lib/import/fields";
@@ -67,8 +68,8 @@ function normaliseAnalysis(raw: any, sheets: ParsedSheet[]) {
 export async function POST(request: Request) {
   // Importing creates vehicles, customers and money records for the whole business.
   const membership = await getCurrentMembership();
-  if (!membership) return NextResponse.json({ error: "Please sign in first." }, { status: 401 });
-  if (membership.role !== "owner") return NextResponse.json({ error: "Only the business owner can import data." }, { status: 403 });
+  if (!membership) return NextResponse.json({ error: await said("Please sign in first.") }, { status: 401 });
+  if (membership.role !== "owner") return NextResponse.json({ error: await said("Only the business owner can import data.") }, { status: 403 });
 
   const formData = await request.formData();
   const file = formData.get("file");
@@ -76,10 +77,10 @@ export async function POST(request: Request) {
   const importType = String(formData.get("importType") || "mixed");
 
   if ((!(file instanceof File) || file.size === 0) && !sheetUrl) {
-    return NextResponse.json({ error: "Upload a spreadsheet or paste a public Google Sheets link first." }, { status: 400 });
+    return NextResponse.json({ error: await said("Upload a spreadsheet or paste a public Google Sheets link first.") }, { status: 400 });
   }
   if (sheetUrl && !isGoogleSheetsUrl(sheetUrl)) {
-    return NextResponse.json({ error: "Only public Google Sheets links are supported." }, { status: 400 });
+    return NextResponse.json({ error: await said("Only public Google Sheets links are supported.") }, { status: 400 });
   }
 
   let sheets: ParsedSheet[];
@@ -91,7 +92,7 @@ export async function POST(request: Request) {
   }
 
   if (sheets.length === 0) {
-    return NextResponse.json({ error: "No readable rows were found in this spreadsheet." }, { status: 400 });
+    return NextResponse.json({ error: await said("No readable rows were found in this spreadsheet.") }, { status: 400 });
   }
 
   const apiKey = process.env.OPENAI_API_KEY;

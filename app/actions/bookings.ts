@@ -1,5 +1,6 @@
 "use server";
 
+import { said } from "@/lib/i18n/server-text";
 import { niceDate } from "@/lib/nice-date";
 import { completeRentalJobs, tellRentalCustomer } from "@/lib/customer-messages";
 import { allocatePayment, type OpenPayment } from "@/lib/payment-allocation";
@@ -329,7 +330,7 @@ export async function createBooking(formData: FormData) {
   try {
     return { ok: true as const, ...(await createBookingOrThrow(formData)) };
   } catch (error) {
-    return { ok: false as const, error: error instanceof Error ? error.message : "Unable to create booking." };
+    return { ok: false as const, error: await said(error instanceof Error ? error.message : "Unable to create booking.") };
   }
 }
 
@@ -1064,10 +1065,10 @@ export async function deleteBooking(rentalId: string): Promise<{ success: boolea
     data: { user }
   } = await supabase.auth.getUser();
 
-  if (!user) return { success: false, error: "You must be signed in." };
+  if (!user) return { success: false, error: await said("You must be signed in.") };
 
   const cleanId = String(rentalId || "").trim();
-  if (!cleanId) return { success: false, error: "Booking ID is required." };
+  if (!cleanId) return { success: false, error: await said("Booking ID is required.") };
 
   const { data: rental, error: rentalError } = await supabase
     .from("rentals")
@@ -1085,7 +1086,7 @@ export async function deleteBooking(rentalId: string): Promise<{ success: boolea
   // business's records (and possibly evidence), so it can only be cancelled.
   const membership = await getCurrentMembership();
   if (!membership || membership.organizationId !== rental.organization_id || membership.role !== "owner") {
-    return { success: false, error: "Only the business owner can delete a booking." };
+    return { success: false, error: await said("Only the business owner can delete a booking.") };
   }
   const [documentsCheck, transactionsCheck, inspectionsCheck] = await Promise.all([
     supabase.from("rental_documents").select("id", { count: "exact", head: true }).eq("rental_id", cleanId).eq("organization_id", rental.organization_id),
@@ -1097,7 +1098,7 @@ export async function deleteBooking(rentalId: string): Promise<{ success: boolea
   if ((documentsCheck.count || 0) > 0 || (transactionsCheck.count || 0) > 0 || (inspectionsCheck.count || 0) > 0) {
     return {
       success: false,
-      error: "This booking has a rental agreement, payments or an inspection on record, so it can't be deleted. Cancel it instead - its records are kept."
+      error: await said("This booking has a rental agreement, payments or an inspection on record, so it can't be deleted. Cancel it instead - its records are kept.")
     };
   }
 
@@ -1162,10 +1163,10 @@ export async function manuallyActivateRental(rentalId: string): Promise<{ succes
     data: { user }
   } = await supabase.auth.getUser();
 
-  if (!user) return { success: false, error: "You must be signed in." };
+  if (!user) return { success: false, error: await said("You must be signed in.") };
 
   const cleanId = String(rentalId || "").trim();
-  if (!cleanId) return { success: false, error: "Rental ID is required." };
+  if (!cleanId) return { success: false, error: await said("Rental ID is required.") };
 
   const { data: rental, error: rentalError } = await supabase
     .from("rentals")
@@ -1359,7 +1360,7 @@ export async function updateBooking(formData: FormData) {
   if (changedTerms.length && (await hasSignedAgreement(supabase, rental.organization_id, rental.id))) {
     // Returned, not thrown: production hides thrown server-action messages.
     return {
-      error: `The customer has signed the agreement, so these can't be changed here: ${changedTerms.join(", ")}. To extend the rental or change the rate or deposit, use "Extend / change terms" on the booking: the customer signs a short amendment.`
+      error: await said(`The customer has signed the agreement, so these can't be changed here: ${changedTerms.join(", ")}. To extend the rental or change the rate or deposit, use "Extend / change terms" on the booking: the customer signs a short amendment.`)
     };
   }
 
@@ -2289,7 +2290,7 @@ export async function adjustRental(params: AdjustRentalParams): Promise<{ succes
     await adjustRentalOrThrow(params);
     return { success: true };
   } catch (error) {
-    return { success: false, error: error instanceof Error ? error.message : "Unable to adjust rental." };
+    return { success: false, error: await said(error instanceof Error ? error.message : "Unable to adjust rental.") };
   }
 }
 
@@ -2626,7 +2627,7 @@ export async function updateRentalEndDate(rentalId: string, newEndDate: string):
     await updateRentalEndDateOrThrow(rentalId, newEndDate);
     return { success: true };
   } catch (error) {
-    return { success: false, error: error instanceof Error ? error.message : "Unable to update the end date." };
+    return { success: false, error: await said(error instanceof Error ? error.message : "Unable to update the end date.") };
   }
 }
 
@@ -3058,12 +3059,12 @@ export async function cleanupDepositPayments(rentalId: string) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { success: false, error: "You must be signed in." };
+    return { success: false, error: await said("You must be signed in.") };
   }
 
   const cleanRentalId = String(rentalId || "").trim();
   if (!cleanRentalId) {
-    return { success: false, error: "Rental ID is required." };
+    return { success: false, error: await said("Rental ID is required.") };
   }
 
   const { data: rental } = await supabase
@@ -3073,7 +3074,7 @@ export async function cleanupDepositPayments(rentalId: string) {
     .maybeSingle();
 
   if (!rental) {
-    return { success: false, error: "Rental not found." };
+    return { success: false, error: await said("Rental not found.") };
   }
 
   await ensureMembership(supabase, rental.organization_id, user.id);
@@ -3740,18 +3741,18 @@ export async function declinePaymentReceipt(paymentId: string) {
 /** Gives a customer more time: the hold on their booking restarts from now. */
 export async function extendBookingHold(rentalId: string): Promise<{ success: boolean; error?: string }> {
   const membership = await getCurrentMembership();
-  if (!membership) return { success: false, error: "Please sign in again." };
+  if (!membership) return { success: false, error: await said("Please sign in again.") };
   const admin = createSupabaseAdminClient() as any;
   const [{ data: link }, { data: organization }] = await Promise.all([
     admin.from("booking_links").select("id, status, hold_released_at").eq("rental_id", String(rentalId || "")).eq("organization_id", membership.organizationId).is("deleted_at", null).order("created_at", { ascending: false }).limit(1).maybeSingle(),
     admin.from("organizations").select("settings").eq("id", membership.organizationId).maybeSingle()
   ]);
-  if (!link) return { success: false, error: "This booking has no booking link." };
-  if (["completed", "cancelled"].includes(String(link.status))) return { success: false, error: "This booking no longer needs a hold." };
+  if (!link) return { success: false, error: await said("This booking has no booking link.") };
+  if (["completed", "cancelled"].includes(String(link.status))) return { success: false, error: await said("This booking no longer needs a hold.") };
   if (link.hold_released_at) {
     // The dates were opened up: take them back if they are still free.
     const retaken = await retakeHold(admin, { id: link.id, rental_id: rentalId });
-    if (!retaken) return { success: false, error: "Those dates have since been booked by someone else." };
+    if (!retaken) return { success: false, error: await said("Those dates have since been booked by someone else.") };
   } else {
     await admin.from("booking_links").update({ hold_until: holdDeadline(bookingRules(organization?.settings).holdHours) }).eq("id", link.id);
   }

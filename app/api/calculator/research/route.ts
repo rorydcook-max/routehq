@@ -1,3 +1,4 @@
+import { said } from "@/lib/i18n/server-text";
 import { NextRequest, NextResponse } from "next/server";
 import { getRequestUser } from "@/lib/supabase/server";
 import { getDefaultOrganization } from "@/lib/organization";
@@ -18,12 +19,12 @@ const KEEP_DAYS = 30;
  */
 export async function POST(request: NextRequest) {
   const user = await getRequestUser();
-  if (!user) return NextResponse.json({ error: "Sign in first." }, { status: 401 });
+  if (!user) return NextResponse.json({ error: await said("Sign in first.") }, { status: 401 });
 
   const body = (await request.json().catch(() => ({}))) as Record<string, any>;
   const make = String(body.make || "").slice(0, 60);
   const model = String(body.model || "").slice(0, 60);
-  if (!make || !model) return NextResponse.json({ error: "Which vehicle?" }, { status: 400 });
+  if (!make || !model) return NextResponse.json({ error: await said("Which vehicle?") }, { status: 400 });
   if (!researchAvailable()) return NextResponse.json({ research: null, sources: [] });
 
   const organization = await getDefaultOrganization();

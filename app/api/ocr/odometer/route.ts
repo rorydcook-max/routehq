@@ -1,3 +1,4 @@
+import { said } from "@/lib/i18n/server-text";
 import { NextResponse } from "next/server";
 import { readFileAsJson, visionProvider } from "@/lib/ai-vision";
 import { getCurrentMembership } from "@/lib/auth/roles";
@@ -5,15 +6,15 @@ import { getCurrentMembership } from "@/lib/auth/roles";
 export async function POST(request: Request) {
   try {
     // Staff only: each call costs money.
-    if (!(await getCurrentMembership())) return NextResponse.json({ error: "Sign in first." }, { status: 401 });
+    if (!(await getCurrentMembership())) return NextResponse.json({ error: await said("Sign in first.") }, { status: 401 });
     if (!visionProvider()) {
-      return NextResponse.json({ error: "Photo reading is not set up." }, { status: 400 });
+      return NextResponse.json({ error: await said("Photo reading is not set up.") }, { status: 400 });
     }
 
     const formData = await request.formData();
     const file = formData.get("file");
     if (!(file instanceof File) || file.size === 0) {
-      return NextResponse.json({ error: "Upload an odometer photo." }, { status: 400 });
+      return NextResponse.json({ error: await said("Upload an odometer photo.") }, { status: 400 });
     }
 
     const parsed = await readFileAsJson({

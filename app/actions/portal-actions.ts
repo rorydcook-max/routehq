@@ -1,5 +1,6 @@
 "use server";
 
+import { said } from "@/lib/i18n/server-text";
 import { revalidatePath } from "next/cache";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { tryAutoExtend } from "@/lib/auto-extension";
@@ -71,16 +72,16 @@ export async function answerExtensionRequest(input: { actionId: string; rentalId
     form.set("actionId", input.actionId);
     form.set("rentalId", input.rentalId);
     const { membership, admin, action, actionId, rentalId, organizationId } = await load(form);
-    if (action.status !== "pending") return { ok: false, error: "This request has already been answered." };
+    if (action.status !== "pending") return { ok: false, error: await said("This request has already been answered.") };
     const openEnded = !!input.openEnded;
     const newEndDate = openEnded ? null : String(input.newEndDate || "").slice(0, 10);
-    if (!openEnded && !newEndDate) return { ok: false, error: "Choose the new return date." };
+    if (!openEnded && !newEndDate) return { ok: false, error: await said("Choose the new return date.") };
 
     let moved: { rentalId: string; from: string; to: string; fromVehicleId: string } | null = null;
     if (input.move) {
       // A customer who has signed for their vehicle signs any change to it (More > Change vehicle on their booking).
       const { data: signedLink } = await admin.from("booking_links").select("id").eq("rental_id", input.move.rentalId).not("contract_signed_at", "is", null).limit(1).maybeSingle();
-      if (signedLink) return { ok: false, error: "That customer has signed for their vehicle, so they need to sign the change. Open their booking and use More > Change vehicle." };
+      if (signedLink) return { ok: false, error: await said("That customer has signed for their vehicle, so they need to sign the change. Open their booking and use More > Change vehicle.") };
       const { data: before } = await admin.from("rentals").select("vehicle_id").eq("id", input.move.rentalId).eq("organization_id", organizationId).maybeSingle();
       const result = await moveBookingToVehicle(admin, { organizationId, rentalId: input.move.rentalId, vehicleId: input.move.vehicleId });
       if (!result.ok) return result;
@@ -91,7 +92,7 @@ export async function answerExtensionRequest(input: { actionId: string; rentalId
     if (!outcome.applied) {
       // Put the other booking back: nothing should change unless the whole answer goes through.
       if (moved?.fromVehicleId) await moveBookingToVehicle(admin, { organizationId, rentalId: moved.rentalId, vehicleId: moved.fromVehicleId }).catch(() => null);
-      return { ok: false, error: `Can't approve this: ${outcome.reason}.` };
+      return { ok: false, error: await said(`Can't approve this: ${outcome.reason}.`) };
     }
 
     await resolve(admin, action, membership.userId, { outcome: "approved", approved_end_date: newEndDate, approved_open_ended: openEnded, moved_rental_id: moved?.rentalId || null });
@@ -142,7 +143,7 @@ export async function answerExtensionRequest(input: { actionId: string; rentalId
     refresh(rentalId);
     return { ok: true };
   } catch (error) {
-    return { ok: false, error: error instanceof Error ? error.message : "That didn't work. Try again." };
+    return { ok: false, error: await said(error instanceof Error ? error.message : "That didn't work. Try again.") };
   }
 }
 

@@ -1,3 +1,4 @@
+import { said } from "@/lib/i18n/server-text";
 import { NextRequest, NextResponse } from "next/server";
 import { getRequestUser } from "@/lib/supabase/server";
 import { getDefaultOrganization } from "@/lib/organization";
@@ -20,12 +21,12 @@ const key = (url: string) => url.replace(/^https?:\/\/(www\.|m\.)?/, "").replace
  */
 export async function POST(request: NextRequest) {
   const user = await getRequestUser();
-  if (!user) return NextResponse.json({ error: "Sign in first." }, { status: 401 });
+  if (!user) return NextResponse.json({ error: await said("Sign in first.") }, { status: 401 });
   if (!researchAvailable()) return NextResponse.json({ listings: [], unavailable: true });
 
   const body = (await request.json().catch(() => ({}))) as Record<string, any>;
   const budget = Number(body.budget) || 0;
-  if (budget <= 0) return NextResponse.json({ error: "What is the budget?" }, { status: 400 });
+  if (budget <= 0) return NextResponse.json({ error: await said("What is the budget?") }, { status: 400 });
 
   const organization = await getDefaultOrganization();
   const { country, area, currency } = businessPlace(organization);

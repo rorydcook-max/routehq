@@ -1,5 +1,6 @@
 "use server";
 
+import { said } from "@/lib/i18n/server-text";
 import { promptPayQrPath } from "@/lib/promptpay-qr";
 import { businessToday } from "@/lib/business-time";
 import { revalidatePath } from "next/cache";
@@ -1420,7 +1421,7 @@ Rules:
       .update({
         research_status: "failed",
         research_payload: {
-          error: error instanceof Error ? error.message : "AI research failed.",
+          error: await said(error instanceof Error ? error.message : "AI research failed."),
           error_name: error instanceof Error ? error.name : "UnknownError",
           researched_by: user.id
         },
@@ -1550,10 +1551,10 @@ export async function createLineLinkCode(organizationId: string): Promise<{ ok: 
       .from("organizations")
       .update({ line_link_code: code, line_link_code_expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString() })
       .eq("id", organizationId);
-    if (error) return { ok: false, error: "Couldn't create a code. Please try again." };
+    if (error) return { ok: false, error: await said("Couldn't create a code. Please try again.") };
     return { ok: true, code };
   } catch {
-    return { ok: false, error: "Only the business owner can connect LINE." };
+    return { ok: false, error: await said("Only the business owner can connect LINE.") };
   }
 }
 

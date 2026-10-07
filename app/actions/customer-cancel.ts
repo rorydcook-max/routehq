@@ -1,5 +1,6 @@
 "use server";
 
+import { said } from "@/lib/i18n/server-text";
 import { completeRentalJobs, tellRentalCustomer } from "@/lib/customer-messages";
 import { revalidatePath } from "next/cache";
 import { niceDate } from "@/lib/nice-date";
@@ -19,11 +20,11 @@ type Result = { ok: true; paid: number; receiptWaiting: boolean } | { ok: false;
 export async function cancelBookingByCustomer(formData: FormData): Promise<Result> {
   const token = String(formData.get("token") || "").trim();
   const reason = String(formData.get("reason") || "").trim().slice(0, 500);
-  if (!token) return { ok: false, error: "This booking link could not be found." };
+  if (!token) return { ok: false, error: await said("This booking link could not be found.") };
 
   const admin = createSupabaseAdminClient() as any;
   const { data: link } = await admin.from("booking_links").select("id, organization_id, rental_id, vehicle_id, customer_id, status, booking_data").eq("token", token).is("deleted_at", null).maybeSingle();
-  if (!link?.rental_id) return { ok: false, error: "This booking link could not be found." };
+  if (!link?.rental_id) return { ok: false, error: await said("This booking link could not be found.") };
 
   const { data: rental } = await admin
     .from("rentals")
@@ -31,10 +32,10 @@ export async function cancelBookingByCustomer(formData: FormData): Promise<Resul
     .eq("id", link.rental_id)
     .is("deleted_at", null)
     .maybeSingle();
-  if (!rental) return { ok: false, error: "This booking could not be found." };
-  if (rental.status === "cancelled" || link.status === "cancelled") return { ok: false, error: "This booking has already been cancelled." };
+  if (!rental) return { ok: false, error: await said("This booking could not be found.") };
+  if (rental.status === "cancelled" || link.status === "cancelled") return { ok: false, error: await said("This booking has already been cancelled.") };
   // Once the vehicle is with the customer it is a return, not a cancellation.
-  if (!["booked", "draft"].includes(String(rental.status))) return { ok: false, error: "This rental has already started, so it can't be cancelled here. Please tell us when you would like to return the vehicle instead." };
+  if (!["booked", "draft"].includes(String(rental.status))) return { ok: false, error: await said("This rental has already started, so it can't be cancelled here. Please tell us when you would like to return the vehicle instead.") };
 
   const { data: payments } = await admin.from("rental_payments").select("amount, status, voided, metadata").eq("rental_id", rental.id);
   const live = (payments || []).filter((payment: any) => !payment.voided);
@@ -43,7 +44,7 @@ export async function cancelBookingByCustomer(formData: FormData): Promise<Resul
 
   const now = new Date().toISOString();
   const { error: rentalError } = await admin.from("rentals").update({ status: "cancelled" }).eq("id", rental.id).in("status", ["booked", "draft"]);
-  if (rentalError) return { ok: false, error: "We couldn't cancel the booking. Please try again or contact us." };
+  if (rentalError) return { ok: false, error: await said("We couldn't cancel the booking. Please try again or contact us.") };
   await Promise.all([
     admin
       .from("booking_links")

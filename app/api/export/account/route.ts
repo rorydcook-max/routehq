@@ -1,3 +1,4 @@
+import { said } from "@/lib/i18n/server-text";
 import { businessToday } from "@/lib/business-time";
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -32,7 +33,7 @@ export async function GET() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Please log in before exporting data." }, { status: 401 });
+    return NextResponse.json({ error: await said("Please log in before exporting data.") }, { status: 401 });
   }
 
   const { data: membership, error: membershipError } = await getActiveMembership(supabase, user.id);

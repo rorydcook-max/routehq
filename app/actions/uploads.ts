@@ -1,5 +1,6 @@
 "use server";
 
+import { said } from "@/lib/i18n/server-text";
 import {
   bookingLinkUploadPrefix,
   createSignedUploads,
@@ -13,8 +14,8 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 // These return { error } rather than throwing: production hides the message
 // of an error thrown from a server action, and people need to see these.
 
-function failed(error: unknown): PreparedUploads {
-  return { uploads: [], error: error instanceof Error ? error.message : "The upload could not be prepared." };
+async function failed(error: unknown): Promise<PreparedUploads> {
+  return { uploads: [], error: await said(error instanceof Error ? error.message : "The upload could not be prepared.") };
 }
 
 /** Signed upload URLs for an inspection, for a signed-in member of the business. */
@@ -24,7 +25,7 @@ export async function prepareInspectionUploads(organizationId: string, files: Up
     const {
       data: { user }
     } = await supabase.auth.getUser();
-    if (!user) return { uploads: [], error: "You must be signed in." };
+    if (!user) return { uploads: [], error: await said("You must be signed in.") };
     const { data: membership } = await supabase
       .from("organization_members")
       .select("id")
@@ -32,7 +33,7 @@ export async function prepareInspectionUploads(organizationId: string, files: Up
       .eq("user_id", user.id)
       .eq("is_active", true)
       .maybeSingle();
-    if (!membership) return { uploads: [], error: "You do not have access to this business." };
+    if (!membership) return { uploads: [], error: await said("You do not have access to this business.") };
     return { uploads: await createSignedUploads(inspectionUploadPrefix(organizationId), files) };
   } catch (error) {
     return failed(error);
@@ -49,8 +50,8 @@ export async function preparePublicBookingUploads(token: string, files: UploadRe
       .eq("token", String(token || ""))
       .is("deleted_at", null)
       .maybeSingle();
-    if (!link || link.status === "cancelled") return { uploads: [], error: "This booking link could not be found." };
-    if (link.expires_at && new Date(link.expires_at).getTime() < Date.now()) return { uploads: [], error: "This booking link has expired." };
+    if (!link || link.status === "cancelled") return { uploads: [], error: await said("This booking link could not be found.") };
+    if (link.expires_at && new Date(link.expires_at).getTime() < Date.now()) return { uploads: [], error: await said("This booking link has expired.") };
     return { uploads: await createSignedUploads(bookingLinkUploadPrefix(link.organization_id, link.id), files) };
   } catch (error) {
     return failed(error);

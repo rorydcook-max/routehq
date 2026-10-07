@@ -1,3 +1,4 @@
+import { said } from "@/lib/i18n/server-text";
 import { NextResponse } from "next/server";
 import { readFileAsJson, visionProvider } from "@/lib/ai-vision";
 
@@ -64,18 +65,18 @@ export async function POST(request: Request) {
   const apiKey = process.env.OPENAI_API_KEY;
 
   if (!visionProvider()) {
-    return NextResponse.json({ error: "Photo reading is not set up." }, { status: 400 });
+    return NextResponse.json({ error: await said("Photo reading is not set up.") }, { status: 400 });
   }
 
   const formData = await request.formData();
   const file = formData.get("file");
 
   if (!(file instanceof File) || file.size === 0) {
-    return NextResponse.json({ error: "Upload a logbook image or PDF first." }, { status: 400 });
+    return NextResponse.json({ error: await said("Upload a logbook image or PDF first.") }, { status: 400 });
   }
 
   if (!file.type.startsWith("image/") && file.type !== "application/pdf") {
-    return NextResponse.json({ error: "Only images and PDFs are supported for logbook OCR." }, { status: 400 });
+    return NextResponse.json({ error: await said("Only images and PDFs are supported for logbook OCR.") }, { status: 400 });
   }
 
   const bytes = Buffer.from(await file.arrayBuffer());
@@ -155,7 +156,7 @@ export async function POST(request: Request) {
   const outputText = getOutputText(payload);
 
   if (!outputText) {
-    return NextResponse.json({ error: "No OCR result was returned." }, { status: 502 });
+    return NextResponse.json({ error: await said("No OCR result was returned.") }, { status: 502 });
   }
 
   try {

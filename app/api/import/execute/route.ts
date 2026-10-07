@@ -1,3 +1,4 @@
+import { said } from "@/lib/i18n/server-text";
 import { NextResponse } from "next/server";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { businessToday } from "@/lib/business-time";
@@ -141,8 +142,8 @@ async function vehicleIdForPlate(supabase: any, organizationId: string, plate: s
 
 export async function POST(request: Request) {
   const membership = await getCurrentMembership();
-  if (!membership) return NextResponse.json({ error: "Please sign in before importing data." }, { status: 401 });
-  if (membership.role !== "owner") return NextResponse.json({ error: "Only the business owner can import data." }, { status: 403 });
+  if (!membership) return NextResponse.json({ error: await said("Please sign in before importing data.") }, { status: 401 });
+  if (membership.role !== "owner") return NextResponse.json({ error: await said("Only the business owner can import data.") }, { status: 403 });
 
   const supabase = (await createSupabaseServerClient()) as any;
   const formData = await request.formData();
@@ -151,17 +152,17 @@ export async function POST(request: Request) {
   const mappingText = String(formData.get("mapping") || "");
 
   if (((!(file instanceof File) || file.size === 0) && !sheetUrl) || !mappingText) {
-    return NextResponse.json({ error: "Spreadsheet source and confirmed mapping are required." }, { status: 400 });
+    return NextResponse.json({ error: await said("Spreadsheet source and confirmed mapping are required.") }, { status: 400 });
   }
   if (sheetUrl && !isGoogleSheetsUrl(sheetUrl)) {
-    return NextResponse.json({ error: "Only public Google Sheets links are supported." }, { status: 400 });
+    return NextResponse.json({ error: await said("Only public Google Sheets links are supported.") }, { status: 400 });
   }
 
   let mappings: SheetMapping[];
   try {
     mappings = JSON.parse(mappingText);
   } catch {
-    return NextResponse.json({ error: "Mapping was invalid." }, { status: 400 });
+    return NextResponse.json({ error: await said("Mapping was invalid.") }, { status: 400 });
   }
 
   let sheets;
@@ -173,7 +174,7 @@ export async function POST(request: Request) {
 
   const organization = await getDefaultOrganization();
   if (organization.id !== membership.organizationId) {
-    return NextResponse.json({ error: "Switch to the business you want to import into and try again." }, { status: 409 });
+    return NextResponse.json({ error: await said("Switch to the business you want to import into and try again.") }, { status: 409 });
   }
   const currency = organization.currency || "THB";
   const categories = await getVehicleCategories(organization.id);
@@ -387,7 +388,7 @@ export async function POST(request: Request) {
   if (!total) {
     return NextResponse.json(
       {
-        error: "Nothing was imported. Check the column mapping - vehicles need a plate, make and model.",
+        error: await said("Nothing was imported. Check the column mapping - vehicles need a plate, make and model."),
         imported,
         skipped: skipped.length ? skipped : ["No importable rows were found."],
         warnings

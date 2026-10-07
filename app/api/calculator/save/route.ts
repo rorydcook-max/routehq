@@ -1,3 +1,4 @@
+import { said } from "@/lib/i18n/server-text";
 import { NextRequest, NextResponse } from "next/server";
 import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -28,6 +29,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch {
-    return NextResponse.json({ error: "Failed to save calculation" }, { status: 500 });
+    return NextResponse.json({ error: await said("Failed to save calculation") }, { status: 500 });
   }
 }

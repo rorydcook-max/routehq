@@ -1,5 +1,6 @@
 "use server";
 
+import { said } from "@/lib/i18n/server-text";
 import { revalidatePath } from "next/cache";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { OWNER_ONLY_MESSAGE } from "@/lib/auth/role-types";
@@ -40,25 +41,25 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
   const phone = String(formData.get("phone") || "").replace(/[\s\-().]/g, "").slice(0, 24);
 
   // Bots fill every field; people never see this one.
-  if (String(formData.get("website") || "").trim()) return { ok: false, error: "Please try again." };
+  if (String(formData.get("website") || "").trim()) return { ok: false, error: await said("Please try again.") };
 
-  if (name.length < 2) return { ok: false, error: "Please tell us your name." };
-  if (phone.replace(/\D/g, "").length < 7) return { ok: false, error: "Please add a phone or WhatsApp number we can reach you on." };
-  if (!isDate(startDate) || startDate < businessToday()) return { ok: false, error: "Please choose a start date from today onwards." };
-  if (endDate && (!isDate(endDate) || endDate <= startDate)) return { ok: false, error: "The return date must be after the start date." };
+  if (name.length < 2) return { ok: false, error: await said("Please tell us your name.") };
+  if (phone.replace(/\D/g, "").length < 7) return { ok: false, error: await said("Please add a phone or WhatsApp number we can reach you on.") };
+  if (!isDate(startDate) || startDate < businessToday()) return { ok: false, error: await said("Please choose a start date from today onwards.") };
+  if (endDate && (!isDate(endDate) || endDate <= startDate)) return { ok: false, error: await said("The return date must be after the start date.") };
 
   const catalog = await getPublicCatalog(slug);
-  if (!catalog || !catalog.enabled) return { ok: false, error: "Online booking isn't available for this business right now." };
+  if (!catalog || !catalog.enabled) return { ok: false, error: await said("Online booking isn't available for this business right now.") };
   // The page only offers what the business chose; this stops a hand-made request getting round it.
-  if (catalog.offer === "monthly" && endDate) return { ok: false, error: "This business only takes monthly rentals with no end date." };
-  if (catalog.offer === "dates" && !endDate) return { ok: false, error: "Please choose a return date." };
+  if (catalog.offer === "monthly" && endDate) return { ok: false, error: await said("This business only takes monthly rentals with no end date.") };
+  if (catalog.offer === "dates" && !endDate) return { ok: false, error: await said("Please choose a return date.") };
   const vehicle = catalog.vehicles.find((item) => item.id === vehicleId);
-  if (!vehicle) return { ok: false, error: "That vehicle is no longer available. Please choose another." };
-  if (startDate < catalog.minStart) return { ok: false, error: `The earliest start date is ${shortDate(catalog.minStart)}. Please choose a later date.` };
+  if (!vehicle) return { ok: false, error: await said("That vehicle is no longer available. Please choose another.") };
+  if (startDate < catalog.minStart) return { ok: false, error: await said(`The earliest start date is ${shortDate(catalog.minStart)}. Please choose a later date.`) };
   if (vehicle.busy.some((period) => clashes(startDate, endDate, period, catalog.gapDays))) return { ok: false, error: TAKEN };
 
   const plan = planFor(vehicle, endDate ? daysBetween(startDate, endDate) : null);
-  if (!plan) return { ok: false, error: `${minimumStay(vehicle) || "This vehicle can't be booked online for those dates"}. Please choose a longer stay or another vehicle.` };
+  if (!plan) return { ok: false, error: await said(`${minimumStay(vehicle) || "This vehicle can't be booked online for those dates"}. Please choose a longer stay or another vehicle.`) };
 
   const admin = createSupabaseAdminClient() as any;
   const organizationId = catalog.organizationId;
@@ -72,14 +73,14 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
     .in("status", ["pending", "viewed"])
     .is("customer_details_submitted_at", null)
     .eq("customers.phone", phone);
-  if ((unfinished || []).length >= 2) return { ok: false, error: "You already have bookings waiting for your details. Please finish those first, or contact the business." };
+  if ((unfinished || []).length >= 2) return { ok: false, error: await said("You already have bookings waiting for your details. Please finish those first, or contact the business.") };
 
   // A returning customer keeps their record (matched by phone).
   const { data: existing } = await admin.from("customers").select("id").eq("organization_id", organizationId).eq("phone", phone).is("deleted_at", null).limit(1).maybeSingle();
   let customerId = existing?.id as string | undefined;
   if (!customerId) {
     const { data: created, error } = await admin.from("customers").insert({ organization_id: organizationId, full_name: name, phone }).select("id").single();
-    if (error || !created) return { ok: false, error: "We couldn't start your booking. Please try again." };
+    if (error || !created) return { ok: false, error: await said("We couldn't start your booking. Please try again.") };
     customerId = created.id;
   }
 
@@ -122,7 +123,7 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
     .single();
   if (contractError || !contract) {
     await undo();
-    return { ok: false, error: "We couldn't start your booking. Please try again." };
+    return { ok: false, error: await said("We couldn't start your booking. Please try again.") };
   }
 
   const bookingData = { delivery_method: "tbd", delivery_location: null, delivery_datetime: null, special_conditions: null, share_channel: "public_page", source: "public_page" };
@@ -148,7 +149,7 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
     .single();
   if (linkError || !link) {
     await undo();
-    return { ok: false, error: "We couldn't start your booking. Please try again." };
+    return { ok: false, error: await said("We couldn't start your booking. Please try again.") };
   }
 
   const baseUrl = String(process.env.NEXT_PUBLIC_APP_URL || "").replace(/\/$/, "");
@@ -183,12 +184,12 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
 /** Turns the public booking page on or off and sets its terms. */
 export async function savePublicBookingSettings(input: { enabled: boolean; holdHours: number; deposit: number; offer?: string }): Promise<Result> {
   const membership = await getCurrentMembership();
-  if (!membership) return { ok: false, error: "Please sign in again." };
+  if (!membership) return { ok: false, error: await said("Please sign in again.") };
   if (membership.role !== "owner") return { ok: false, error: OWNER_ONLY_MESSAGE };
 
   const admin = createSupabaseAdminClient() as any;
   const { data: organization } = await admin.from("organizations").select("settings, slug").eq("id", membership.organizationId).maybeSingle();
-  if (!organization) return { ok: false, error: "Business not found." };
+  if (!organization) return { ok: false, error: await said("Business not found.") };
   const settings = organization.settings && typeof organization.settings === "object" ? organization.settings : {};
   const current = publicBookingSettings(settings);
   const holdHours = [6, 12, 24, 48, 72].includes(Number(input.holdHours)) ? Number(input.holdHours) : current.holdHours;
@@ -197,7 +198,7 @@ export async function savePublicBookingSettings(input: { enabled: boolean; holdH
     .from("organizations")
     .update({ settings: { ...settings, public_booking: { enabled: !!input.enabled, hold_hours: holdHours, deposit, offer: (BOOKING_OFFERS as string[]).includes(String(input.offer)) ? input.offer : current.offer } } })
     .eq("id", membership.organizationId);
-  if (error) return { ok: false, error: "Couldn't save. Please try again." };
+  if (error) return { ok: false, error: await said("Couldn't save. Please try again.") };
   revalidatePath("/settings");
   revalidatePath(`/rent/${organization.slug}`);
   return { ok: true };
@@ -206,14 +207,14 @@ export async function savePublicBookingSettings(input: { enabled: boolean; holdH
 /** Turns the automatic messages to customers on or off (owner only). */
 export async function saveCustomerMessages(enabled: boolean): Promise<Result> {
   const membership = await getCurrentMembership();
-  if (!membership) return { ok: false, error: "Please sign in again." };
+  if (!membership) return { ok: false, error: await said("Please sign in again.") };
   if (membership.role !== "owner") return { ok: false, error: OWNER_ONLY_MESSAGE };
   const admin = createSupabaseAdminClient() as any;
   const { data: organization } = await admin.from("organizations").select("settings").eq("id", membership.organizationId).maybeSingle();
-  if (!organization) return { ok: false, error: "Business not found." };
+  if (!organization) return { ok: false, error: await said("Business not found.") };
   const settings = organization.settings && typeof organization.settings === "object" ? organization.settings : {};
   const { error } = await admin.from("organizations").update({ settings: { ...settings, customer_messages: { enabled: !!enabled } } }).eq("id", membership.organizationId);
-  if (error) return { ok: false, error: "Couldn't save. Please try again." };
+  if (error) return { ok: false, error: await said("Couldn't save. Please try again.") };
   revalidatePath("/settings");
   return { ok: true };
 }
@@ -221,12 +222,12 @@ export async function saveCustomerMessages(enabled: boolean): Promise<Result> {
 /** Holds and notice periods for the business (owner only). */
 export async function saveBookingRules(input: BookingRules): Promise<Result> {
   const membership = await getCurrentMembership();
-  if (!membership) return { ok: false, error: "Please sign in again." };
+  if (!membership) return { ok: false, error: await said("Please sign in again.") };
   if (membership.role !== "owner") return { ok: false, error: OWNER_ONLY_MESSAGE };
 
   const admin = createSupabaseAdminClient() as any;
   const { data: organization } = await admin.from("organizations").select("settings, slug").eq("id", membership.organizationId).maybeSingle();
-  if (!organization) return { ok: false, error: "Business not found." };
+  if (!organization) return { ok: false, error: await said("Business not found.") };
   const settings = organization.settings && typeof organization.settings === "object" ? organization.settings : {};
   // Run the values through the same reader the rest of the app uses, so only allowed options are stored.
   const clean = bookingRules({
@@ -241,7 +242,7 @@ export async function saveBookingRules(input: BookingRules): Promise<Result> {
       }
     })
     .eq("id", membership.organizationId);
-  if (error) return { ok: false, error: "Couldn't save. Please try again." };
+  if (error) return { ok: false, error: await said("Couldn't save. Please try again.") };
   revalidatePath("/settings");
   revalidatePath(`/rent/${organization.slug}`);
   return { ok: true };

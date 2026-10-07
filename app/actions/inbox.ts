@@ -1,5 +1,6 @@
 "use server";
 
+import { said } from "@/lib/i18n/server-text";
 import crypto from "crypto";
 import { revalidatePath } from "next/cache";
 import { getCurrentMembership } from "@/lib/auth/roles";
@@ -25,7 +26,7 @@ export async function connectChannel(input: { provider: "line" | "telegram"; acc
 
   const accessToken = String(input.accessToken || "").trim();
   const channelSecret = String(input.channelSecret || "").trim();
-  if (!accessToken) return { ok: false, error: "Paste the access token first." };
+  if (!accessToken) return { ok: false, error: await said("Paste the access token first.") };
 
   let externalId = "";
   let name = "";
@@ -33,7 +34,7 @@ export async function connectChannel(input: { provider: "line" | "telegram"; acc
   let signingSecret = channelSecret;
 
   if (input.provider === "line") {
-    if (!channelSecret) return { ok: false, error: "Paste the channel secret as well. It's on the Basic settings tab in LINE Developers." };
+    if (!channelSecret) return { ok: false, error: await said("Paste the channel secret as well. It's on the Basic settings tab in LINE Developers.") };
     const info = await lineBotInfo(accessToken);
     if (!info.ok) return { ok: false, error: `LINE didn't accept that access token. ${info.error}` };
     externalId = info.data.userId;
@@ -41,7 +42,7 @@ export async function connectChannel(input: { provider: "line" | "telegram"; acc
     publicHandle = info.data.basicId || null;
   } else {
     const me = await telegramGetMe(accessToken);
-    if (!me.ok) return { ok: false, error: `Telegram didn't accept that bot token. ${me.error}` };
+    if (!me.ok) return { ok: false, error: await said(`Telegram didn't accept that bot token. ${me.error}`) };
     externalId = String(me.data.result.id);
     name = me.data.result.username ? `@${me.data.result.username}` : me.data.result.first_name || "Telegram bot";
     publicHandle = me.data.result.username || null;
@@ -67,12 +68,12 @@ export async function connectChannel(input: { provider: "line" | "telegram"; acc
     )
     .select("id, webhook_key")
     .single();
-  if (error || !channel) return { ok: false, error: "Couldn't save the connection. Please try again." };
+  if (error || !channel) return { ok: false, error: await said("Couldn't save the connection. Please try again.") };
 
   const { error: secretError } = await supabase
     .from("messaging_channel_secrets")
     .upsert({ channel_id: channel.id, access_token: accessToken, signing_secret: signingSecret, updated_at: new Date().toISOString() });
-  if (secretError) return { ok: false, error: "Couldn't save the connection. Please try again." };
+  if (secretError) return { ok: false, error: await said("Couldn't save the connection. Please try again.") };
 
   // Tell the platform where to deliver messages, so there's no URL to copy around.
   const webhook = webhookUrl(input.provider, channel.webhook_key);
@@ -95,7 +96,7 @@ export async function disconnectChannel(channelId: string): Promise<ActionResult
 
   const supabase = createSupabaseAdminClient() as any;
   const { data: channel } = await supabase.from("messaging_channels").select("id, provider").eq("id", channelId).eq("organization_id", membership.organizationId).maybeSingle();
-  if (!channel) return { ok: false, error: "That connection no longer exists." };
+  if (!channel) return { ok: false, error: await said("That connection no longer exists.") };
 
   if (channel.provider === "telegram") {
     const { data: secrets } = await supabase.from("messaging_channel_secrets").select("access_token").eq("channel_id", channel.id).maybeSingle();
@@ -120,15 +121,15 @@ async function conversationForMember(conversationId: string) {
     .eq("id", conversationId)
     .eq("organization_id", membership.organizationId)
     .maybeSingle();
-  if (!conversation) return { error: "That conversation no longer exists." } as const;
+  if (!conversation) return { error: await said("That conversation no longer exists.") } as const;
   return { membership, supabase, conversation } as const;
 }
 
 /** Sends a reply to the customer on whichever platform they wrote from. */
 export async function sendInboxMessage(conversationId: string, text: string): Promise<ActionResult> {
   const body = String(text || "").trim();
-  if (!body) return { ok: false, error: "Type a message first." };
-  if (body.length > 4000) return { ok: false, error: "That message is too long. Keep it under 4,000 characters." };
+  if (!body) return { ok: false, error: await said("Type a message first.") };
+  if (body.length > 4000) return { ok: false, error: await said("That message is too long. Keep it under 4,000 characters.") };
 
   const found = await conversationForMember(conversationId);
   if ("error" in found) return { ok: false, error: found.error as string };
@@ -137,7 +138,7 @@ export async function sendInboxMessage(conversationId: string, text: string): Pr
   const { data: channel } = await supabase.from("messaging_channels").select("id, status").eq("id", conversation.channel_id).maybeSingle();
   const { data: secrets } = await supabase.from("messaging_channel_secrets").select("access_token").eq("channel_id", conversation.channel_id).maybeSingle();
   if (!channel || channel.status === "disconnected" || !secrets?.access_token) {
-    return { ok: false, error: "This account is no longer connected. Reconnect it in Settings → Messaging to reply." };
+    return { ok: false, error: await said("This account is no longer connected. Reconnect it in Settings → Messaging to reply.") };
   }
   const token = String(secrets.access_token);
 
@@ -150,7 +151,7 @@ export async function sendInboxMessage(conversationId: string, text: string): Pr
   } else if (conversation.provider === "telegram") {
     result = await telegramSend(token, conversation.external_user_id, body);
   } else {
-    result = { ok: false, error: "Replies on this platform aren't supported yet." };
+    result = { ok: false, error: await said("Replies on this platform aren't supported yet.") };
   }
 
   const now = new Date().toISOString();
@@ -171,7 +172,7 @@ export async function sendInboxMessage(conversationId: string, text: string): Pr
   }
 
   revalidatePath("/inbox");
-  return result.ok ? { ok: true } : { ok: false, error: `The message wasn't delivered. ${result.error || ""}`.trim() };
+  return result.ok ? { ok: true } : { ok: false, error: await said(`The message wasn't delivered. ${result.error || ""}`.trim()) };
 }
 
 export async function markConversationRead(conversationId: string): Promise<ActionResult> {
@@ -196,7 +197,7 @@ export async function linkConversationCustomer(conversationId: string, customerI
   if ("error" in found) return { ok: false, error: found.error as string };
   if (customerId) {
     const { data: customer } = await found.supabase.from("customers").select("id").eq("id", customerId).eq("organization_id", found.membership.organizationId).maybeSingle();
-    if (!customer) return { ok: false, error: "That customer wasn't found." };
+    if (!customer) return { ok: false, error: await said("That customer wasn't found.") };
   }
   await found.supabase.from("conversations").update({ customer_id: customerId }).eq("id", conversationId);
   revalidatePath("/inbox");

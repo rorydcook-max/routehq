@@ -1,5 +1,6 @@
 "use server";
 
+import { said } from "@/lib/i18n/server-text";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { retakeHold } from "@/lib/booking-holds";
@@ -1221,14 +1222,14 @@ export async function submitPaymentReceipt(formData: FormData) {
   const supabase = createSupabaseAdminClient() as any;
 
   if (!(file instanceof File) || file.size === 0) {
-    return { success: false, error: "Please add a photo or screenshot of your receipt." };
+    return { success: false, error: await said("Please add a photo or screenshot of your receipt.") };
   }
   const isImage = file.type.startsWith("image/");
   if (!isImage && file.type !== "application/pdf") {
-    return { success: false, error: "Please send a photo, a screenshot or a PDF." };
+    return { success: false, error: await said("Please send a photo, a screenshot or a PDF.") };
   }
   if (file.size > 4 * 1024 * 1024) {
-    return { success: false, error: "That file is too large. Please send a screenshot instead." };
+    return { success: false, error: await said("That file is too large. Please send a screenshot instead.") };
   }
 
   const { data: bookingLink } = await supabase
@@ -1239,7 +1240,7 @@ export async function submitPaymentReceipt(formData: FormData) {
     .maybeSingle();
 
   if (!bookingLink?.rental_id || bookingLink.status === "cancelled") {
-    return { success: false, error: "This booking link could not be found." };
+    return { success: false, error: await said("This booking link could not be found.") };
   }
 
   // Every payment the receipt is for must belong to the rental behind this link and still be open.
@@ -1257,7 +1258,7 @@ export async function submitPaymentReceipt(formData: FormData) {
   const payment = targets.find((row) => row.id === paymentId);
 
   if (!payment || targets.length !== targetIds.length) {
-    return { success: false, error: "This payment is already settled or could not be found." };
+    return { success: false, error: await said("This payment is already settled or could not be found.") };
   }
 
   const extension = file.type === "application/pdf" ? "pdf" : file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
@@ -1267,7 +1268,7 @@ export async function submitPaymentReceipt(formData: FormData) {
     upsert: false
   });
   if (uploadError) {
-    return { success: false, error: "We couldn't upload your receipt. Please try again." };
+    return { success: false, error: await said("We couldn't upload your receipt. Please try again.") };
   }
 
   const submittedAt = new Date().toISOString();
@@ -1283,7 +1284,7 @@ export async function submitPaymentReceipt(formData: FormData) {
       .eq("id", row.id)
       .eq("organization_id", bookingLink.organization_id);
     if (updateError) {
-      return { success: false, error: "We couldn't save your receipt. Please try again." };
+      return { success: false, error: await said("We couldn't save your receipt. Please try again.") };
     }
   }
   // A newer receipt replaces the one sent before, on every payment that one covered.

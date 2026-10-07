@@ -1,5 +1,6 @@
 "use server";
 
+import { said } from "@/lib/i18n/server-text";
 import { rentalRateCard, type Rates } from "@/lib/rental-estimate";
 import { tryAutoExtend } from "@/lib/auto-extension";
 import { getCurrentMembership } from "@/lib/auth/roles";
@@ -244,15 +245,15 @@ export async function createRentalAmendment(input: {
     const today = businessToday();
 
     if (["completed", "cancelled"].includes(String(rental.status))) {
-      return { ok: false, error: "This rental has ended, so its agreement can't be amended." };
+      return { ok: false, error: await said("This rental has ended, so its agreement can't be amended.") };
     }
     if (!ctx.signedAgreement) {
-      return { ok: false, error: "The customer hasn't signed the rental agreement yet. Edit the booking instead - they will sign the updated terms." };
+      return { ok: false, error: await said("The customer hasn't signed the rental agreement yet. Edit the booking instead - they will sign the updated terms.") };
     }
-    if (!ctx.customer) return { ok: false, error: "Assign a customer to this rental first." };
+    if (!ctx.customer) return { ok: false, error: await said("Assign a customer to this rental first.") };
     const gaps = onlineSigningGaps(organization);
     if (gaps.length) {
-      return { ok: false, error: `Customers can't sign online until your business adds ${gaps.join(", ")} in Settings.` };
+      return { ok: false, error: await said(`Customers can't sign online until your business adds ${gaps.join(", ")} in Settings.`) };
     }
 
     const currency = String(rental.currency || "THB");
@@ -261,8 +262,8 @@ export async function createRentalAmendment(input: {
 
     const newEndDate = cleanDate(input.newEndDate);
     if (newEndDate) {
-      if (rental.is_indefinite) return { ok: false, error: "This rental is open-ended, so it has no return date to extend." };
-      if (previousEnd && newEndDate <= previousEnd) return { ok: false, error: "The new return date must be after the current one." };
+      if (rental.is_indefinite) return { ok: false, error: await said("This rental is open-ended, so it has no return date to extend.") };
+      if (previousEnd && newEndDate <= previousEnd) return { ok: false, error: await said("The new return date must be after the current one.") };
       if (rental.vehicle_id && rental.start_date) {
         const conflict = await vehicleConflictMessage(admin, {
           organizationId,
@@ -272,7 +273,7 @@ export async function createRentalAmendment(input: {
           excludeRentalId: rental.id
         });
         if (conflict) {
-          return { ok: false, error: `Can't extend to that date. ${conflict.replace(/ Choose other dates or another vehicle\.$/, "")}` };
+          return { ok: false, error: await said(`Can't extend to that date. ${conflict.replace(/ Choose other dates or another vehicle\.$/, "")}`) };
         }
       }
       changes.previous_end_date = previousEnd;
@@ -287,7 +288,7 @@ export async function createRentalAmendment(input: {
     const newRate = cleanAmount(input.newRate);
     const currentRate = Number(rental.rental_rate || 0);
     if (newRate !== null && newRate !== currentRate) {
-      if (newRate <= 0) return { ok: false, error: "Enter a rate above zero." };
+      if (newRate <= 0) return { ok: false, error: await said("Enter a rate above zero.") };
       changes.previous_rate = currentRate;
       changes.new_rate = newRate;
       changes.rate_from = cleanDate(input.rateFrom) || today;
@@ -305,7 +306,7 @@ export async function createRentalAmendment(input: {
     if (terms) changes.additional_terms = terms;
 
     if (!changes.new_end_date && changes.new_rate === undefined && changes.new_deposit === undefined) {
-      return { ok: false, error: "Nothing to change: set a new return date, rate or deposit." };
+      return { ok: false, error: await said("Nothing to change: set a new return date, rate or deposit.") };
     }
 
     const snapshot = buildBusinessDocumentSnapshot(organization);
@@ -325,7 +326,7 @@ export async function createRentalAmendment(input: {
       .single();
     if (error) {
       if (String(error.code) === "23505") {
-        return { ok: false, error: "This rental already has an amendment waiting for the customer. Cancel it first to prepare a different one." };
+        return { ok: false, error: await said("This rental already has an amendment waiting for the customer. Cancel it first to prepare a different one.") };
       }
       throw new Error(error.message);
     }
@@ -372,11 +373,11 @@ export async function cancelRentalAmendment(amendmentId: string): Promise<Result
   try {
     const admin = createSupabaseAdminClient() as any;
     const { data: amendment } = await admin.from("rental_amendments").select("*").eq("id", amendmentId).maybeSingle();
-    if (!amendment) return { ok: false, error: "Amendment was not found." };
+    if (!amendment) return { ok: false, error: await said("Amendment was not found.") };
     const { user } = await operatorFor(amendment.rental_id);
-    if (amendment.status !== "awaiting_signature") return { ok: false, error: "Only an amendment waiting for a signature can be cancelled." };
+    if (amendment.status !== "awaiting_signature") return { ok: false, error: await said("Only an amendment waiting for a signature can be cancelled.") };
     if (amendment.changes?.applied_before_signature) {
-      return { ok: false, error: "The vehicle has already been changed, so this still needs the customer's signature. To undo it, change the vehicle back." };
+      return { ok: false, error: await said("The vehicle has already been changed, so this still needs the customer's signature. To undo it, change the vehicle back.") };
     }
     const { error } = await admin
       .from("rental_amendments")
@@ -449,14 +450,14 @@ export async function signRentalAmendment(input: {
   const uploaded: string[] = [];
   try {
     const token = String(input.token || "").trim();
-    if (!input.accepted) return { ok: false, error: "Please confirm that you agree to the changes." };
+    if (!input.accepted) return { ok: false, error: await said("Please confirm that you agree to the changes.") };
     const { data: amendment } = await admin.from("rental_amendments").select("*").eq("token", token).maybeSingle();
-    if (!amendment) return { ok: false, error: "This amendment could not be found." };
+    if (!amendment) return { ok: false, error: await said("This amendment could not be found.") };
     if (amendment.status === "signed") return { ok: true };
-    if (amendment.status !== "awaiting_signature") return { ok: false, error: "This amendment was cancelled by the rental business." };
-    if (new Date(amendment.expires_at).getTime() < Date.now()) return { ok: false, error: "This amendment has expired. Please ask the rental business for a new link." };
+    if (amendment.status !== "awaiting_signature") return { ok: false, error: await said("This amendment was cancelled by the rental business.") };
+    if (new Date(amendment.expires_at).getTime() < Date.now()) return { ok: false, error: await said("This amendment has expired. Please ask the rental business for a new link.") };
     if (input.contentHash !== amendment.content_hash) {
-      return { ok: false, error: "The amendment has changed since you opened it. Please reload the page." };
+      return { ok: false, error: await said("The amendment has changed since you opened it. Please reload the page.") };
     }
 
     const { data: customer } = await admin
@@ -466,9 +467,9 @@ export async function signRentalAmendment(input: {
       .maybeSingle();
     const signerName = String(input.signerName || "").trim().slice(0, 120);
     const customerName = String(customer?.customers?.full_name || "").trim();
-    if (!signerName) return { ok: false, error: "Please type your full name." };
+    if (!signerName) return { ok: false, error: await said("Please type your full name.") };
     if (customerName && !signerName.toLowerCase().includes(customerName.split(/\s+/)[0].toLowerCase())) {
-      return { ok: false, error: `Please sign with your name as it appears on the rental (${customerName}).` };
+      return { ok: false, error: await said(`Please sign with your name as it appears on the rental (${customerName}).`) };
     }
     const png = parseSignaturePng(input.signatureDataUrl);
 
@@ -693,12 +694,12 @@ async function applySignedAmendment(admin: any, amendmentId: string) {
  */
 export async function makeRentalOpenEnded(rentalId: string): Promise<{ ok: true; monthlyRate: number; firstDue: string } | { ok: false; error: string }> {
   const membership = await getCurrentMembership();
-  if (!membership) return { ok: false, error: "Please sign in again." };
+  if (!membership) return { ok: false, error: await said("Please sign in again.") };
   const admin = createSupabaseAdminClient() as any;
   const { data: rental } = await admin.from("rentals").select("id").eq("id", rentalId).eq("organization_id", membership.organizationId).is("deleted_at", null).maybeSingle();
-  if (!rental) return { ok: false, error: "Booking not found." };
+  if (!rental) return { ok: false, error: await said("Booking not found.") };
   const outcome = await tryAutoExtend(admin, rentalId, null, { openEnded: true, byStaff: true });
-  if (!outcome.applied) return { ok: false, error: `Can't make this monthly yet: ${outcome.reason}.` };
+  if (!outcome.applied) return { ok: false, error: await said(`Can't make this monthly yet: ${outcome.reason}.`) };
   revalidatePath(`/bookings/${rentalId}`);
   revalidatePath("/bookings");
   revalidatePath("/calendar");
@@ -964,11 +965,11 @@ export async function createVehicleChange(input: {
     if (!options.ok) return options;
     const ctx = await loadRental(admin, organizationId, rentalId);
     const { rental } = ctx;
-    if (["completed", "cancelled"].includes(String(rental.status))) return { ok: false, error: "This rental has ended." };
+    if (["completed", "cancelled"].includes(String(rental.status))) return { ok: false, error: await said("This rental has ended.") };
 
     const swap = input.swapRentalId ? options.swaps.find((item) => item.rentalId === input.swapRentalId && item.vehicleId === input.vehicleId) : null;
     const target = swap || options.free.find((item) => item.vehicleId === input.vehicleId);
-    if (!target) return { ok: false, error: "That vehicle is no longer free for this rental's dates. Pick another." };
+    if (!target) return { ok: false, error: await said("That vehicle is no longer free for this rental's dates. Pick another.") };
 
     // Nothing signed yet: the customer will sign the agreement with the new vehicle on it.
     if (!options.needsSignature) {
@@ -981,8 +982,8 @@ export async function createVehicleChange(input: {
       return { ok: true, applied: true, links: [] };
     }
 
-    if (!options.hasCustomer) return { ok: false, error: "Assign a customer to this rental first." };
-    if (options.signingGaps.length) return { ok: false, error: `Customers can't sign online until your business adds ${options.signingGaps.join(", ")} in Settings.` };
+    if (!options.hasCustomer) return { ok: false, error: await said("Assign a customer to this rental first.") };
+    if (options.signingGaps.length) return { ok: false, error: await said(`Customers can't sign online until your business adds ${options.signingGaps.join(", ")} in Settings.`) };
 
     const plateOf = (label: string, plate: string | null) => (plate ? `${label} (${plate})` : label);
     const reason = String(input.reason || "").trim().slice(0, 200) || null;
@@ -1020,7 +1021,7 @@ export async function createVehicleChange(input: {
         const outcome = await applyVehicleChange(admin, { changes: mine, created_by: user.id, signed_at: null }, rental);
         if (outcome !== "done") {
           await admin.from("rental_amendments").update({ status: "cancelled", cancelled_at: new Date().toISOString(), cancelled_by: user.id }).eq("id", created.id);
-          return { ok: false, error: `Couldn't change the vehicle: ${outcome}.` };
+          return { ok: false, error: await said(`Couldn't change the vehicle: ${outcome}.`) };
         }
         await recordActivityEvent(admin, { organization_id: organizationId, actor_id: user.id, entity_type: "rental", entity_id: rentalId, rental_id: rentalId, vehicle_id: target.vehicleId, customer_id: rental.customer_id, event_type: "vehicle_changed", title: "Vehicle changed ahead of the signature", detail: `${mine.previous_vehicle_label} to ${mine.new_vehicle_label}. The customer still has to sign the change.` } as any).catch(() => undefined);
         revalidatePath(`/bookings/${rentalId}`);

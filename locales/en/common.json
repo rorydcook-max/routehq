@@ -773,7 +773,8 @@
     "reason_fuel_deficit": "fuel",
     "reason_damage": "damage",
     "reason_cleaning_fee": "cleaning",
-    "holdEnding": "we are holding the {vehicle} for you until {time}. Finish your booking before then to keep it."
+    "holdEnding": "we are holding the {vehicle} for you until {time}. Finish your booking before then to keep it.",
+    "signChange": "please review and sign the change to your rental: {link}"
   },
   "common": {
     "kinds_car": "Cars",

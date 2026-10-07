@@ -106,7 +106,8 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-lg font-semibold text-[var(--foreground)]">{say("vc_button")}</p>
-                {options ? <p className="mt-1 text-sm text-[var(--muted)]">{say("vc_current", { vehicle: options.currentVehicleLabel })}</p> : null}
+                {/* Once the change is prepared the "now on" line would name the old vehicle. */}
+                {options && links.length === 0 ? <p className="mt-1 text-sm text-[var(--muted)]">{say("vc_current", { vehicle: options.currentVehicleLabel })}</p> : null}
               </div>
               <button aria-label={say("vc_close")} className="pressable rounded-lg p-1.5 text-[var(--muted)]" onClick={close} type="button">
                 <X size={16} />

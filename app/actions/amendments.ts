@@ -1,6 +1,7 @@
 "use server";
 
 import { said } from "@/lib/i18n/server-text";
+import { customerMessageText } from "@/lib/i18n/customer-message-text";
 import { rentalRateCard, type Rates } from "@/lib/rental-estimate";
 import { tryAutoExtend } from "@/lib/auto-extension";
 import { getCurrentMembership } from "@/lib/auth/roles";
@@ -1054,5 +1055,25 @@ export async function createVehicleChange(input: {
     }
   } catch (error) {
     return { ok: false, error: await said(errorMessage(error)) };
+  }
+}
+
+/**
+ * The sentence the owner sends with a change-signing link, in the customer's
+ * own language ("Hi Somchai, please review and sign the change to your rental: ...").
+ */
+export async function amendmentShareText(token: string, url: string): Promise<string | null> {
+  try {
+    const admin = createSupabaseAdminClient() as any;
+    const { data: amendment } = await admin.from("rental_amendments").select("rental_id").eq("token", token).maybeSingle();
+    if (!amendment?.rental_id) return null;
+    await operatorFor(amendment.rental_id);
+    const { data: rental } = await admin.from("rentals").select("customers!rentals_customer_id_fkey(full_name, preferred_locale)").eq("id", amendment.rental_id).maybeSingle();
+    const wording = await customerMessageText(rental?.customers?.preferred_locale);
+    const given = String(rental?.customers?.full_name || "").trim().split(/\s+/)[0] || "";
+    const hi = given ? wording.t("hi", { name: given }) : wording.t("hiNoName");
+    return `${hi} ${wording.t("signChange", { link: url })}`;
+  } catch {
+    return null;
   }
 }

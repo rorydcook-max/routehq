@@ -9,7 +9,7 @@ import { longDate } from "@/lib/i18n/dates";
 import { quoteExplainIn } from "@/lib/i18n/quote-text";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
-import { cancelRentalAmendment, createRentalAmendment, getRentalAmendmentContext, makeRentalOpenEnded, type AmendmentSummary } from "@/app/actions/amendments";
+import { amendmentShareText, cancelRentalAmendment, createRentalAmendment, getRentalAmendmentContext, makeRentalOpenEnded, type AmendmentSummary } from "@/app/actions/amendments";
 
 type AdjustmentType = "extension" | "early_return" | "terms";
 
@@ -36,8 +36,19 @@ export function AmendmentLinkPanel({ token, onCancel, cancelling, changedAlready
     setCanNativeShare(typeof navigator !== "undefined" && typeof navigator.share === "function");
   }, []);
   const url = `${origin}/amend/${token}`;
-  // Sent to the customer, so not in the staff language. It stays in English until the customer's language is known here.
-  const message = `Please review and sign the change to your rental: ${url}`;
+  // Sent to the customer, so in their language, not the staff's. English until the wording has loaded.
+  const [wording, setWording] = useState<string | null>(null);
+  useEffect(() => {
+    if (!origin) return;
+    let live = true;
+    amendmentShareText(token, `${origin}/amend/${token}`).then((text) => {
+      if (live && text) setWording(text);
+    }, () => undefined);
+    return () => {
+      live = false;
+    };
+  }, [origin, token]);
+  const message = wording || `Please review and sign the change to your rental: ${url}`;
   return (
     <div className="rounded-xl border border-[var(--info-line)] bg-[var(--primary-light)] p-3 text-sm">
       <p className="font-bold text-[var(--primary)]">{say("al_waiting")}</p>

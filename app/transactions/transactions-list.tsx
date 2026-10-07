@@ -244,11 +244,14 @@ function dayHeading(iso: string, today: string, tx: Tx) {
 export function TransactionsList({
   today,
   transactions,
-  vehicles
+  vehicles,
+  showProfit = true
 }: {
   today: string;
   transactions: TransactionListItem[];
   vehicles: VehicleOption[];
+  /** Off for teammates: they see what came in and went out, not how the business did. */
+  showProfit?: boolean;
 }) {
   const router = useRouter();
   const tx = useTx();
@@ -550,7 +553,7 @@ export function TransactionsList({
       </div>
 
       {/* Totals for the period */}
-      <div className="grid grid-cols-3 divide-x divide-[var(--border)] overflow-hidden rounded-xl border border-[var(--border)] bg-white shadow-[var(--shadow-sm)]">
+      <div className={`grid ${showProfit ? "grid-cols-3" : "grid-cols-2"} divide-x divide-[var(--border)] overflow-hidden rounded-xl border border-[var(--border)] bg-white shadow-[var(--shadow-sm)]`}>
         <div className="px-3 py-3 sm:px-4">
           <p className="text-[12px] text-[var(--muted)]">{tx.say("moneyIn")}</p>
           <p className="text-[17px] font-semibold tabular-nums text-[var(--success)] sm:text-[22px]">{money(incomeTotal)}</p>
@@ -559,10 +562,12 @@ export function TransactionsList({
           <p className="text-[12px] text-[var(--muted)]">{tx.say("moneyOut")}</p>
           <p className="text-[17px] font-semibold tabular-nums text-[var(--danger)] sm:text-[22px]">{money(expenseTotal)}</p>
         </div>
+        {showProfit ? (
         <div className="px-3 py-3 sm:px-4">
           <p className="text-[12px] text-[var(--muted)]">{profit < 0 ? tx.say("loss") : tx.say("profit")}</p>
           <p className={`text-[17px] font-semibold tabular-nums sm:text-[22px] ${profit < 0 ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{money(profit)}</p>
         </div>
+        ) : null}
       </div>
 
       {/* Search, and select-to-delete */}

@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { Plus } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { getCurrentUserEmail } from "@/lib/auth/session";
+import { getCurrentMembership } from "@/lib/auth/roles";
 import { businessToday } from "@/lib/business-time";
 import { getDefaultOrganization } from "@/lib/organization";
 import { getTransactionFormOptions, getTransactionList } from "@/lib/transactions";
@@ -41,7 +42,7 @@ export default async function TransactionsPage({
         </div>
       ) : null}
 
-      <TransactionsList today={businessToday()} transactions={transactions} vehicles={options.vehicles} />
+      <TransactionsList showProfit={(await getCurrentMembership())?.role !== "teammate"} today={businessToday()} transactions={transactions} vehicles={options.vehicles} />
     </AppShell>
   );
 }

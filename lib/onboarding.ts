@@ -38,9 +38,8 @@ export async function markOnboardingStep(supabase: any, organizationId: string, 
     { onConflict: "organization_id,step" }
   );
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  // A tick on the set-up list must never stop real work: a teammate, who may not change the list, still makes bookings.
+  if (error) console.warn("set-up checklist not updated:", error.message);
 }
 
 export async function ensureOnboardingChecklist(supabase: any, organizationId: string) {
@@ -56,9 +55,8 @@ export async function ensureOnboardingChecklist(supabase: any, organizationId: s
     ignoreDuplicates: true
   });
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  // A tick on the set-up list must never stop real work: a teammate, who may not change the list, still makes bookings.
+  if (error) console.warn("set-up checklist not updated:", error.message);
 }
 
 export async function getOnboardingStatus(supabase: any, organizationId: string) {

@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getLocale, getTranslations } from "next-intl/server";
 import { AuthCard } from "@/components/auth-card";
 import { CreateOrganizationForm } from "@/app/onboarding/create-organization-form";
 import { OnboardingWizard } from "@/app/onboarding/onboarding-wizard";
@@ -24,8 +25,9 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
   const { data: membership } = await getActiveMembership(supabase, user.id);
 
   if (!membership?.organization_id) {
+    const say = (await getTranslations("auth")) as unknown as (key: string) => string;
     return (
-      <AuthCard eyebrow="RouteHQ" title="Set up your business">
+      <AuthCard body={say("orgBody")} title={say("orgTitle")}>
         <CreateOrganizationForm defaultBusinessName={String(user.user_metadata?.business_name || "")} />
       </AuthCard>
     );
@@ -56,5 +58,7 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
     redirect("/");
   }
 
-  return <OnboardingWizard categories={categories || []} initialStep={previewStep >= 1 && previewStep <= 3 ? previewStep : 1} organization={organizationDetail} />;
+  // Start the wizard in the language the person has been reading so far (their phone's, or the one they picked when signing up).
+  const locale = await getLocale();
+  return <OnboardingWizard categories={categories || []} initialLanguage={locale === "th" ? "th" : undefined} initialStep={previewStep >= 1 && previewStep <= 3 ? previewStep : 1} organization={organizationDetail} />;
 }

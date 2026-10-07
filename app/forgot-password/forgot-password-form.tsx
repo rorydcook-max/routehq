@@ -1,11 +1,14 @@
 "use client";
 
 import { useEffect, useState, useActionState } from "react";
+import { useTranslations } from "next-intl";
 import { requestPasswordReset, type AuthActionState } from "@/app/actions/auth";
+import { authError, authInput, authLabel, authSuccess } from "@/components/auth-card";
 
 const initialState: AuthActionState = {};
 
-export function ForgotPasswordForm() {
+export function ForgotPasswordForm({ defaultEmail = "", signedIn = false }: { defaultEmail?: string; signedIn?: boolean }) {
+  const say = useTranslations("auth") as unknown as (key: string) => string;
   const [origin, setOrigin] = useState("");
   const [state, formAction, pending] = useActionState(requestPasswordReset, initialState);
 
@@ -17,30 +20,24 @@ export function ForgotPasswordForm() {
     <form action={formAction} className="space-y-4">
       <input name="origin" type="hidden" value={origin} />
       <label className="block">
-        <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Email</span>
-        <input
-          className="mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
-          name="email"
-          type="email"
-          autoComplete="email"
-          required
-        />
+        <span className={authLabel}>{say("email")}</span>
+        <input autoComplete="email" className={authInput} defaultValue={defaultEmail} inputMode="email" name="email" required type="email" />
       </label>
-      {state.error ? <p className="rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">{state.error}</p> : null}
-      {state.success ? <p className="rounded-lg bg-[var(--success-light)] px-3 py-2 text-sm font-semibold text-[var(--success)]">{state.success}</p> : null}
-      <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-3 font-bold text-white disabled:opacity-60" disabled={pending}>
+      {state.error ? <p className={authError}>{state.error}</p> : null}
+      {state.success ? <p className={authSuccess}>{state.success}</p> : null}
+      <button className="primary-action w-full" disabled={pending}>
         {pending ? (
           <>
             <span aria-hidden="true" className="spinner" />
-            Sending...
+            {say("sending")}
           </>
         ) : (
-          "Send reset link"
+          say("sendLink")
         )}
       </button>
-      <p className="text-center text-xs text-[var(--muted)]">
-        <a className="font-semibold text-[var(--primary)]" href="/login">Back to sign in</a>
-      </p>
+      <a className="secondary-action w-full" href={signedIn ? "/account" : "/login"}>
+        {signedIn ? say("backToAccount") : say("backToSignIn")}
+      </a>
     </form>
   );
 }

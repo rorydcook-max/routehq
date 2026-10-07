@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { AuthCard } from "@/components/auth-card";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -18,8 +19,10 @@ export default async function LoginPage() {
     }
   }
 
+  const say = (await getTranslations("auth")) as unknown as (key: string) => string;
+
   return (
-    <AuthCard eyebrow="RouteHQ" title="Sign in">
+    <AuthCard title={say("signInTitle")}>
       {!isConfigured ? (
         <p className="mb-4 rounded-lg bg-[var(--warning-light)] px-3 py-2 text-sm font-semibold text-[var(--warning)]">
           Supabase is not configured for this local app. Add `.env.local` and restart the dev server.

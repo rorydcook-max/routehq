@@ -1,24 +1,24 @@
 "use client";
 
 import { useActionState } from "react";
+import { useTranslations } from "next-intl";
 import { signUpWithEmail, type AuthActionState } from "@/app/actions/auth";
+import { authError, authInput, authLabel, authSuccess } from "@/components/auth-card";
 
 const initialState: AuthActionState = {};
 
-const inputClass =
-  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15";
-
 export function SignupForm() {
+  const say = useTranslations("auth") as unknown as (key: string) => string;
   const [state, formAction, pending] = useActionState(signUpWithEmail, initialState);
 
   if (state.success) {
     return (
       <div className="space-y-4">
-        <p className="rounded-lg bg-[var(--success-light)] px-3 py-3 text-sm font-semibold text-[var(--success)]">{state.success}</p>
-        <p className="text-center text-sm text-[var(--muted)]">
-          Already confirmed?{" "}
-          <a className="font-semibold text-[var(--primary)]" href="/login">
-            Sign in
+        <p className={authSuccess}>{state.success}</p>
+        <p className="text-center font-medium text-[var(--foreground-secondary)]">
+          {say("confirmed")}{" "}
+          <a className="font-bold text-[var(--primary)]" href="/login">
+            {say("signIn")}
           </a>
         </p>
       </div>
@@ -28,40 +28,37 @@ export function SignupForm() {
   return (
     <form action={formAction} className="space-y-4">
       <label className="block">
-        <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Business name</span>
-        <input className={inputClass} name="businessName" type="text" autoComplete="organization" maxLength={120} required />
+        <span className={authLabel}>{say("businessName")}</span>
+        <input autoComplete="organization" className={authInput} maxLength={120} name="businessName" required type="text" />
       </label>
       <label className="block">
-        <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Your name</span>
-        <input className={inputClass} name="fullName" type="text" autoComplete="name" required />
+        <span className={authLabel}>{say("yourName")}</span>
+        <input autoComplete="name" className={authInput} name="fullName" required type="text" />
       </label>
       <label className="block">
-        <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Email</span>
-        <input className={inputClass} name="email" type="email" autoComplete="email" required />
+        <span className={authLabel}>{say("email")}</span>
+        <input autoComplete="email" className={authInput} inputMode="email" name="email" required type="email" />
       </label>
       <label className="block">
-        <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Password</span>
-        <input className={inputClass} name="password" type="password" autoComplete="new-password" minLength={8} required />
-        <span className="mt-1 block text-xs text-[var(--muted)]">At least 8 characters.</span>
+        <span className={authLabel}>{say("password")}</span>
+        <input autoComplete="new-password" className={authInput} minLength={8} name="password" required type="password" />
+        <span className="mt-1 block font-medium text-[var(--foreground-secondary)]">{say("passwordHelp")}</span>
       </label>
-      {state.error ? <p className="rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">{state.error}</p> : null}
-      <button
-        className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-3 font-bold text-white disabled:opacity-60"
-        disabled={pending}
-      >
+      {state.error ? <p className={authError}>{state.error}</p> : null}
+      <button className="primary-action w-full" disabled={pending}>
         {pending ? (
           <>
             <span aria-hidden="true" className="spinner" />
-            Creating account...
+            {say("creating")}
           </>
         ) : (
-          "Create account"
+          say("create")
         )}
       </button>
-      <p className="text-center text-sm text-[var(--muted)]">
-        Already have an account?{" "}
-        <a className="font-semibold text-[var(--primary)]" href="/login">
-          Sign in
+      <p className="text-center font-medium text-[var(--foreground-secondary)]">
+        {say("haveAccount")}{" "}
+        <a className="font-bold text-[var(--primary)]" href="/login">
+          {say("signIn")}
         </a>
       </p>
     </form>

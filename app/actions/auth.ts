@@ -3,6 +3,7 @@
 import { cookies, headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { supportedLocaleCodes } from "@/lib/i18n/locales";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -16,6 +17,11 @@ export type AuthActionState = {
 
 const supportedLocales = new Set<string>(supportedLocaleCodes);
 
+/** Messages shown on the sign-in pages, in the reader's language. Raw sign-in service errors are never shown: they are English and technical. */
+async function authText() {
+  return (await getTranslations("auth")) as unknown as (key: string, values?: Record<string, string>) => string;
+}
+
 function localeFromForm(formData: FormData) {
   const preferredLocale = String(formData.get("preferredLocale") || "en");
   return supportedLocales.has(preferredLocale) ? preferredLocale : "en";
@@ -28,7 +34,8 @@ export async function signInWithEmail(_state: AuthActionState, formData: FormDat
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
-    return { error: error.message };
+    const say = await authText();
+    return { error: /confirm/i.test(error.message) ? say("confirmFirst") : say("signInFailed") };
   }
 
   redirect("/");
@@ -38,8 +45,9 @@ export async function requestPasswordReset(_state: AuthActionState, formData: Fo
   const email = String(formData.get("email") || "").trim();
   const origin = String(formData.get("origin") || "");
 
+  const say = await authText();
   if (!email) {
-    return { error: "Enter your email address." };
+    return { error: say("needEmail") };
   }
 
   const supabase = await createSupabaseServerClient();
@@ -47,10 +55,10 @@ export async function requestPasswordReset(_state: AuthActionState, formData: Fo
   const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
 
   if (error) {
-    return { success: "If an account exists for that email, a reset link has been sent." };
+    return { success: say("resetSent") };
   }
 
-  return { success: "If an account exists for that email, a reset link has been sent." };
+  return { success: say("resetSent") };
 }
 
 export async function signOut() {
@@ -149,26 +157,24 @@ async function requestOrigin() {
   return String(process.env.NEXT_PUBLIC_APP_URL || "").replace(/\/+$/, "") || undefined;
 }
 
-const SIGN_UP_SENT =
-  "Check your email to confirm your account. The link will bring you back here to set up your business.";
-
 export async function signUpWithEmail(_state: AuthActionState, formData: FormData): Promise<AuthActionState> {
   const businessName = String(formData.get("businessName") || "").trim();
   const fullName = String(formData.get("fullName") || "").trim();
   const email = String(formData.get("email") || "").trim().toLowerCase();
   const password = String(formData.get("password") || "");
 
+  const say = await authText();
   if (businessName.length < 2 || businessName.length > 120) {
-    return { error: "Enter your business name (2 to 120 characters)." };
+    return { error: say("needBusiness") };
   }
   if (!fullName) {
-    return { error: "Enter your name." };
+    return { error: say("needName") };
   }
   if (!email) {
-    return { error: "Enter your email address." };
+    return { error: say("needEmail") };
   }
   if (password.length < 8) {
-    return { error: "Password must be at least 8 characters." };
+    return { error: say("passwordShort") };
   }
 
   const origin = await requestOrigin();
@@ -183,7 +189,7 @@ export async function signUpWithEmail(_state: AuthActionState, formData: FormDat
   });
 
   if (error) {
-    return { error: error.message };
+    return { error: /password/i.test(error.message) ? say("passwordShort") : say("signUpFailed") };
   }
 
   // If email confirmation is switched off in Supabase, a session comes back
@@ -194,7 +200,7 @@ export async function signUpWithEmail(_state: AuthActionState, formData: FormDat
 
   // Same message whether or not the email was already registered, so the form
   // cannot be used to find out who has an account.
-  return { success: SIGN_UP_SENT };
+  return { success: say("signUpSent") };
 }
 
 export async function createMyOrganization(_state: AuthActionState, formData: FormData): Promise<AuthActionState> {
@@ -215,7 +221,7 @@ export async function createMyOrganization(_state: AuthActionState, formData: Fo
   });
 
   if (error) {
-    return { error: error.message };
+    return { error: (await authText())("orgFailed") };
   }
 
   redirect("/onboarding");
@@ -226,8 +232,9 @@ export async function inviteUser(_state: AuthActionState, formData: FormData): P
   const preferredLocale = localeFromForm(formData);
   const role: AppRole = formData.get("role") === "owner" ? "owner" : "teammate";
 
+  const say = await authText();
   if (!email) {
-    return { error: "Enter an email address." };
+    return { error: say("iv_needEmail") };
   }
 
   // Only owners manage the team, and invitees always join the inviter's own
@@ -240,11 +247,11 @@ export async function inviteUser(_state: AuthActionState, formData: FormData): P
   }
 
   if (inviter.email && inviter.email.toLowerCase() === email) {
-    return { error: "You are already a member of this business." };
+    return { error: say("iv_alreadyYou") };
   }
 
   const admin = createSupabaseAdminClient() as any;
-  const label = role === "owner" ? "an owner" : "a teammate";
+  const label = say(role === "owner" ? "iv_roleOwner" : "iv_roleTeammate");
 
   // Someone who already has a RouteHQ account - perhaps working for another
   // business too - is added directly. There is no invite email to send them:
@@ -263,7 +270,7 @@ export async function inviteUser(_state: AuthActionState, formData: FormData): P
       .maybeSingle();
 
     if (existingMembership?.is_active) {
-      return { error: "That person is already a member of this business." };
+      return { error: say("iv_alreadyMember") };
     }
 
     const { error: addError } = existingMembership
@@ -284,7 +291,7 @@ export async function inviteUser(_state: AuthActionState, formData: FormData): P
     }
 
     return {
-      success: `${email} already has a RouteHQ account, so they have been added to your business as ${label}. They can switch to it from the business menu next time they sign in.`
+      success: say("iv_addedExisting", { email, role: label })
     };
   }
 
@@ -300,12 +307,9 @@ export async function inviteUser(_state: AuthActionState, formData: FormData): P
   if (error || !data.user) {
     const message = error?.message || "";
     if (/already been registered|already registered|already exists/i.test(message)) {
-      return {
-        error:
-          "That email already has a RouteHQ account. Adding an existing account to a second business is not supported yet."
-      };
+      return { error: say("iv_failed") };
     }
-    return { error: message || "Unable to send invite." };
+    return { error: say("iv_failed") };
   }
 
   await admin.from("users").upsert({
@@ -328,29 +332,31 @@ export async function inviteUser(_state: AuthActionState, formData: FormData): P
     return { error: memberError.message };
   }
 
-  return { success: `Invite sent to ${email} as ${label}.` };
+  return { success: say("iv_sent", { email, role: label }) };
 }
 
 export async function completeInvite(_state: AuthActionState, formData: FormData): Promise<AuthActionState> {
   const password = String(formData.get("password") || "");
-  const preferredLocale = localeFromForm(formData);
+  // Only the invite form asks for a language. Choosing a new password must not change it.
+  const preferredLocale = formData.has("preferredLocale") ? localeFromForm(formData) : null;
+  const say = await authText();
 
   if (password.length < 8) {
-    return { error: "Password must be at least 8 characters." };
+    return { error: say("passwordShort") };
   }
 
   const supabase = await createSupabaseServerClient();
   const { data: authData, error } = await supabase.auth.updateUser({ password });
 
   if (error || !authData.user) {
-    return { error: error?.message || "Unable to set password." };
+    return { error: say("passwordFailed") };
   }
 
   const admin = createSupabaseAdminClient() as any;
   await admin.from("users").upsert({
     id: authData.user.id,
     full_name: authData.user.user_metadata?.full_name ?? null,
-    preferred_locale: preferredLocale
+    ...(preferredLocale ? { preferred_locale: preferredLocale } : {})
   });
 
   redirect("/");

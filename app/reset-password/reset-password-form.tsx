@@ -1,36 +1,33 @@
 "use client";
 
 import { useActionState } from "react";
+import { useTranslations } from "next-intl";
 import { completeInvite, type AuthActionState } from "@/app/actions/auth";
+import { authError, authInput, authLabel } from "@/components/auth-card";
 
 const initialState: AuthActionState = {};
 
 export function ResetPasswordForm() {
+  const say = useTranslations("auth") as unknown as (key: string) => string;
   const [state, formAction, pending] = useActionState(completeInvite, initialState);
 
   return (
     <form action={formAction} className="space-y-4">
       <label className="block">
-        <span className="text-sm font-semibold text-[var(--foreground-secondary)]">New password</span>
-        <input
-          className="mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
-          name="password"
-          type="password"
-          autoComplete="new-password"
-          minLength={8}
-          required
-        />
+        <span className={authLabel}>{say("newPassword")}</span>
+        <input autoComplete="new-password" className={authInput} minLength={8} name="password" required type="password" />
+        <span className="mt-1 block font-medium text-[var(--foreground-secondary)]">{say("passwordHelp")}</span>
       </label>
-      <input name="preferredLocale" type="hidden" value="en" />
-      {state.error ? <p className="rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">{state.error}</p> : null}
-      <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-3 font-bold text-white disabled:opacity-60" disabled={pending}>
+      {/* No language field here: choosing a new password used to switch the person's language back to English. */}
+      {state.error ? <p className={authError}>{state.error}</p> : null}
+      <button className="primary-action w-full" disabled={pending}>
         {pending ? (
           <>
             <span aria-hidden="true" className="spinner" />
-            Saving...
+            {say("saving")}
           </>
         ) : (
-          "Set new password"
+          say("saveNewPassword")
         )}
       </button>
     </form>

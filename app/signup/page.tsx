@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { AuthCard } from "@/components/auth-card";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -16,8 +17,10 @@ export default async function SignupPage() {
     }
   }
 
+  const say = (await getTranslations("auth")) as unknown as (key: string) => string;
+
   return (
-    <AuthCard eyebrow="RouteHQ" title="Create your account">
+    <AuthCard title={say("signUpTitle")}>
       <SignupForm />
     </AuthCard>
   );

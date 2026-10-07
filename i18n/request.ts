@@ -2,6 +2,7 @@ import { getRequestConfig } from "next-intl/server";
 import { cookies, headers } from "next/headers";
 import { CUSTOMER_LOCALE_COOKIE, pickLocale } from "@/lib/i18n/customer-locale";
 import { supportedLocaleCodes, type SupportedLocale } from "@/lib/i18n/locales";
+import { signedOutLocale, STAFF_LOCALE_COOKIE } from "@/lib/i18n/staff-locale";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -10,7 +11,9 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
  *
  * The language comes from the signed-in person's own profile (My account), not
  * from the URL or the business: two people in the same business can each see
- * the app in their own language. Signed-out staff pages use English.
+ * the app in their own language. Before sign-in (and until a language has been
+ * saved) it is the one picked on the sign-in page, else the phone's language
+ * when the app is fully written in it, else English.
  *
  * Customer pages (booking link, change to sign, online booking) are separate:
  * they follow the customer's own choice or their phone's language.
@@ -55,18 +58,26 @@ async function resolveLocale(): Promise<SupportedLocale> {
       // No request to read.
     }
   }
-  if (!hasSupabaseEnv()) return "en";
+  // Someone not signed in yet, or with no saved language.
+  const beforeSignIn = async (): Promise<SupportedLocale> => {
+    try {
+      return signedOutLocale((await cookies()).get(STAFF_LOCALE_COOKIE)?.value, (await headers()).get("accept-language"));
+    } catch {
+      return "en";
+    }
+  };
+  if (!hasSupabaseEnv()) return beforeSignIn();
   try {
     const supabase = (await createSupabaseServerClient()) as any;
     const {
       data: { user }
     } = await supabase.auth.getUser();
-    if (!user) return "en";
+    if (!user) return beforeSignIn();
     const { data } = await supabase.from("users").select("preferred_locale").eq("id", user.id).maybeSingle();
     const locale = String(data?.preferred_locale || "");
-    return (supported.has(locale) ? locale : "en") as SupportedLocale;
+    return supported.has(locale) ? (locale as SupportedLocale) : beforeSignIn();
   } catch {
-    return "en";
+    return beforeSignIn();
   }
 }
 

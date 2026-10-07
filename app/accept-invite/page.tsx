@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { AcceptInviteForm } from "@/app/accept-invite/accept-invite-form";
 import { AuthCard } from "@/components/auth-card";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
@@ -16,8 +17,10 @@ export default async function AcceptInvitePage() {
     }
   }
 
+  const say = (await getTranslations("auth")) as unknown as (key: string) => string;
+
   return (
-    <AuthCard eyebrow="RouteHQ invite" title="Set up your account">
+    <AuthCard language={false} title={say("inviteTitle")}>
       <AcceptInviteForm />
     </AuthCard>
   );

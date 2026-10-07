@@ -983,7 +983,7 @@ function dedupeTrimsForPicker(trims: VehicleTrim[]) {
   });
 }
 
-export function OnboardingWizard({ categories, organization, initialStep = 1 }: { categories: Category[]; organization: Organization; initialStep?: number }) {
+export function OnboardingWizard({ categories, organization, initialStep = 1, initialLanguage }: { categories: Category[]; organization: Organization; initialStep?: number; initialLanguage?: string }) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement | null>(null);
   const photoRef = useRef<HTMLInputElement | null>(null);
@@ -1008,7 +1008,7 @@ export function OnboardingWizard({ categories, organization, initialStep = 1 }: 
     customTown: "",
     fleetType: organization.settings?.fleet_type || "mixed",
     fleetSize: organization.settings?.fleet_size || "1-5",
-    language: organization.default_locale || "en"
+    language: initialLanguage || organization.default_locale || "en"
   });
   const [vehicleFields, setVehicleFields] = useState({
     categoryId: bestCategory(categories, organization.settings?.fleet_type || "mixed"),

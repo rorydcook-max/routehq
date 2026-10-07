@@ -721,7 +721,10 @@
     "reason_unpaid_rent": "ค่าเช่าค้างชำระ",
     "reason_fuel_deficit": "ค่าน้ำมันที่ขาด",
     "reason_damage": "ค่าความเสียหาย",
-    "reason_cleaning_fee": "ค่าทำความสะอาด"
+    "reason_cleaning_fee": "ค่าทำความสะอาด",
+    "thenAmountOn": "จากนั้น {amount} วันที่ {date}",
+    "lastPaymentIs": "งวดสุดท้าย {amount}",
+    "totalForStay": "รวมทั้งหมด {amount}"
   },
   "customerMessages": {
     "hi": "สวัสดีคุณ {name}",

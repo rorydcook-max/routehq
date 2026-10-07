@@ -1,4 +1,5 @@
 import { includedItemKey } from "@/lib/included-items";
+import { billingPeriodAmounts } from "@/lib/payment-schedule";
 import { firstRentCharge } from "@/lib/payment-schedule";
 import type { ReactNode } from "react";
 import { customerDate } from "@/lib/i18n/customer-dates";
@@ -196,6 +197,27 @@ function paymentDueText(rental: any, bookingData: Record<string, unknown>, t: T,
   }
 
   const weekly = period === "weekly";
+  // Set dates: say what the later payments are and what it all comes to, so a part month at the end is no surprise.
+  const rate = Number(rental?.rental_rate || 0);
+  if (endIso && rate > 0 && /^\d{4}-\d{2}-\d{2}$/.test(firstIso) && (period === "monthly" || period === "weekly")) {
+    const amounts = billingPeriodAmounts(firstIso, endIso, period, rate, weekly ? 52 : 24);
+    if (amounts.length >= 2) {
+      const currency = rental?.currency || "THB";
+      const total = amounts.reduce((sum, amount) => sum + amount, 0);
+      const last = amounts[amounts.length - 1];
+      const second = new Date(`${firstIso}T00:00:00Z`);
+      if (weekly) second.setUTCDate(second.getUTCDate() + 7);
+      else second.setUTCMonth(second.getUTCMonth() + 1);
+      const lines = [firstDueDate];
+      if (amounts.length === 2) lines.push(t("thenAmountOn", { amount: money(last, currency), date: formatSummaryDate(second.toISOString().slice(0, 10), t, locale) }));
+      else {
+        lines.push(t(weekly ? "thenEachWeekUntil" : "thenEachMonthUntil", { end: endDate }));
+        if (last < rate) lines.push(t("lastPaymentIs", { amount: money(last, currency) }));
+      }
+      lines.push(t("totalForStay", { amount: money(total, currency) }));
+      return lines.join("\n");
+    }
+  }
   return endDate
     ? `${firstDueDate}\n${t(weekly ? "thenEachWeekUntil" : "thenEachMonthUntil", { end: endDate })}`
     : `${firstDueDate}\n${t(weekly ? "thenEachWeek" : "thenEachMonth")}`;

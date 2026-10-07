@@ -712,7 +712,10 @@
     "reason_unpaid_rent": "unpaid rent",
     "reason_fuel_deficit": "fuel",
     "reason_damage": "damage",
-    "reason_cleaning_fee": "cleaning"
+    "reason_cleaning_fee": "cleaning",
+    "thenAmountOn": "Then {amount} on {date}",
+    "lastPaymentIs": "The last payment is {amount}",
+    "totalForStay": "{amount} in all"
   },
   "customerMessages": {
     "hi": "Hi {name},",

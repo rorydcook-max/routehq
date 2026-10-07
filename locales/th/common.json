@@ -306,7 +306,11 @@
     "areaLeftSide": "ด้านซ้าย",
     "areaRightSide": "ด้านขวา",
     "areaSeat": "เบาะและตัวรถ",
-    "kmValue": "{km} กม."
+    "kmValue": "{km} กม.",
+    "refundHow": "คืนเงินด้วยวิธีใด",
+    "refund_cash": "เงินสด",
+    "refund_bank_transfer": "โอนเข้าบัญชี",
+    "refund_promptpay": "พร้อมเพย์"
   },
   "translation": {
     "translatedFrom": "แปลจาก {language}",
@@ -704,7 +708,11 @@
     "answerDeclined": "ขออภัย ทำไม่ได้",
     "amDue": "ครบกำหนด {date}",
     "amFrom": "ตั้งแต่ {date}",
-    "amMore": "เพิ่ม {amount} ครบกำหนด {date}"
+    "amMore": "เพิ่ม {amount} ครบกำหนด {date}",
+    "reportHandover": "รายงานส่งมอบรถ",
+    "reportReturn": "รายงานคืนรถ",
+    "reportHandoverSwap": "รายงานส่งมอบรถ (รถคันใหม่)",
+    "reportCollection": "รายงานรับรถคืน (เปลี่ยนรถ)"
   },
   "customerMessages": {
     "hi": "สวัสดีคุณ {name}",
@@ -3291,7 +3299,14 @@
     "cat_inspection_boot": "ท้ายรถ",
     "cat_inspection_fuel": "เกจน้ำมัน",
     "cat_inspection_odometer": "เลขไมล์",
-    "cat_inspection_damage": "ความเสียหาย"
+    "cat_inspection_damage": "ความเสียหาย",
+    "signed_delivery_report_swap": "รายงานส่งมอบรถ (รถคันใหม่)",
+    "signed_return_report_swap": "รายงานรับรถคืน (เปลี่ยนรถ)",
+    "role_authorised_business_signatory": "ร้าน",
+    "role_operator": "พนักงาน",
+    "role_renter": "ลูกค้า",
+    "role_additional_driver": "ผู้ขับเพิ่ม",
+    "role_witness": "พยาน"
   },
   "reportsPage": {
     "title": "รายงาน",

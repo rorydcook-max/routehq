@@ -979,7 +979,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                         ? isCancelled ? tx.say("neverHandedOver") : isClosed ? tx.say("notRecorded") : tx.say("recordedAtHandover")
                         : rental.mileage_at_return == null
                           ? tx.say("kmAtHandover", { km: Number(rental.mileage_at_delivery).toLocaleString("en-US") })
-                          : `${tx.say("kmDriven", { km: Number(rental.km_driven ?? Number(rental.mileage_at_return) - Number(rental.mileage_at_delivery)).toLocaleString("en-US") })} · ${Number(rental.mileage_at_delivery).toLocaleString()} → ${Number(rental.mileage_at_return).toLocaleString()} km`
+                          : `${tx.say("kmDriven", { km: Number(rental.km_driven ?? Number(rental.mileage_at_return) - Number(rental.mileage_at_delivery)).toLocaleString("en-US") })} · ${Number(rental.mileage_at_delivery).toLocaleString()} → ${Number(rental.mileage_at_return).toLocaleString("en-US")}`
                   }
                 />
                 {deliveryInspection ? (

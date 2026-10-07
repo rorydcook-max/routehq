@@ -227,6 +227,7 @@ export async function returnDeposit(formData: FormData) {
   const rentalId = requiredString(formData, "rentalId");
   const returnAmount = numberFromForm(formData, "returnAmount");
   const notes = optionalString(formData, "notes");
+  const refundMethod = optionalString(formData, "paymentMethod");
   const rental = await getRentalForDeposit(supabase, organizationId, rentalId);
 
   const held = Number(rental.deposit_held || 0);
@@ -257,7 +258,7 @@ export async function returnDeposit(formData: FormData) {
       currency: rental.currency || "THB",
       transaction_date: now.slice(0, 10),
       notes: notes ? `Security deposit refunded. ${notes}` : "Security deposit refunded",
-      metadata: { description: "Security deposit refunded", notes },
+      metadata: { description: "Security deposit refunded", notes, ...(refundMethod ? { payment_method: refundMethod } : {}) },
       is_deposit: true,
       deposit_rental_id: rentalId,
       created_by: user.id

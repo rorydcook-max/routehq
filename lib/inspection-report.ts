@@ -27,6 +27,8 @@ export type DepositSettlement = {
   deductions: Array<{ reason: string; amount: number }>;
   refunded: number;
   retained: number;
+  /** How the refund was handed back: cash, bank_transfer or promptpay. */
+  refundMethod?: string | null;
 };
 
 export type InspectionReportInput = {
@@ -47,6 +49,8 @@ export type InspectionReportInput = {
   customerSignature: string;
   customerSignedName: string | null;
   depositSettlement?: DepositSettlement | null;
+  /** Part of a change of vehicle during the rental: the rental carries on. */
+  swap?: boolean;
   /** Inspection photos as saved on the inspection: { type, url } with url a storage path. */
   photos?: Array<{ type?: string; url?: string }>;
 };
@@ -67,10 +71,13 @@ export function photoLabel(type: string) {
   return PHOTO_LABELS[type] || type.replace(/_/g, " ");
 }
 
-const LABELS: Record<InspectionReportMode, string> = {
-  delivery: "Delivery report",
-  return: "Return report"
-};
+const REFUND_METHODS: Record<string, string> = { cash: "cash", bank_transfer: "bank transfer", promptpay: "PromptPay" };
+
+/** A change of vehicle is not the start or the end of the rental, so its two forms get their own names. */
+function reportTitle(mode: InspectionReportMode, swap?: boolean) {
+  if (swap) return mode === "delivery" ? "Replacement vehicle handover report" : "Vehicle collection report";
+  return mode === "delivery" ? "Handover report" : "Return report";
+}
 
 function escapeHtml(value: unknown) {
   return String(value ?? "")
@@ -171,6 +178,7 @@ export function renderInspectionReportHtml(input: {
   notes: string | null;
   signerName: string;
   signatureDataUrl: string;
+  swap?: boolean;
   translations?: ReportTranslations;
   depositSettlement?: DepositSettlement | null;
   currency?: string;
@@ -194,11 +202,11 @@ export function renderInspectionReportHtml(input: {
       ? `<h2>Deposit settlement</h2><table>
 <tr><th>Deposit held at return</th><td>${escapeHtml(money(settlement.available))}</td></tr>
 ${settlement.deductions.map((item) => `<tr><th>Deducted: ${escapeHtml(item.reason)}</th><td>&minus;${escapeHtml(money(item.amount))}</td></tr>`).join("")}
-<tr><th>Refunded to customer</th><td>${escapeHtml(money(settlement.refunded))}</td></tr>
+<tr><th>Refunded to customer${settlement.refundMethod && REFUND_METHODS[settlement.refundMethod] ? ` (${REFUND_METHODS[settlement.refundMethod]})` : ""}</th><td>${escapeHtml(money(settlement.refunded))}</td></tr>
 ${settlement.retained > 0 ? `<tr><th>Still held</th><td>${escapeHtml(money(settlement.retained))}</td></tr>` : ""}
 </table>`
       : "";
-  const title = LABELS[input.mode];
+  const title = reportTitle(input.mode, input.swap);
   const damage = input.damageItems.map(describeDamage);
   const damageRows = damage.length
     ? damage
@@ -209,7 +217,7 @@ ${settlement.retained > 0 ? `<tr><th>Still held</th><td>${escapeHtml(money(settl
         )
         .join("")
     : `<tr><td colspan="4" class="muted">No damage recorded.</td></tr>`;
-  const handover = input.mode === "delivery" ? "received the vehicle" : "returned the vehicle";
+  const handover = input.mode === "delivery" ? "received the vehicle" : input.swap ? "handed back the vehicle" : "returned the vehicle";
   const inspectedAt = formatReportTime(input.inspectedAt);
   const translationNote =
     input.translations && Object.keys(input.translations).length
@@ -254,7 +262,7 @@ ${translationNote}
  */
 export async function finaliseInspectionReport(input: InspectionReportInput) {
   const admin = createSupabaseAdminClient() as any;
-  const label = LABELS[input.mode];
+  const label = reportTitle(input.mode, input.swap);
   const uploaded: string[] = [];
 
   try {
@@ -303,6 +311,7 @@ export async function finaliseInspectionReport(input: InspectionReportInput) {
       depositSettlement: input.depositSettlement,
       currency: String(rental?.currency || "THB"),
       mode: input.mode,
+      swap: Boolean(input.swap),
       businessName: String(organization?.name || "Rental company"),
       reference,
       inspectedAt: input.inspectedAt,
@@ -348,6 +357,7 @@ export async function finaliseInspectionReport(input: InspectionReportInput) {
       p_rendered_html_snapshot: html,
       p_rendered_data_snapshot: {
         mode: input.mode,
+        ...(input.swap ? { swap: true } : {}),
         inspection_id: input.inspectionId,
         odometer_reading: input.odometerReading,
         fuel_level: input.fuelLevel,

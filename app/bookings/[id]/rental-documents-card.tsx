@@ -29,6 +29,11 @@ function statusBadge(document: BookingRentalDocument, say: Say) {
 export function RentalDocumentsCard({ documents }: { documents: BookingRentalDocument[] }) {
   const hasAgreement = documents.some((document) => document.type === "rental_agreement");
   const say = useTranslations("booking") as unknown as Say;
+  const names = useTranslations("documentsPage");
+  const nameOf = (document: BookingRentalDocument) => {
+    const key = `signed_${document.type}${document.swap ? "_swap" : ""}`;
+    return names.has(key as never) ? (names as unknown as Say)(key) : document.label;
+  };
   const locale = useLocale();
 
   return (
@@ -47,7 +52,7 @@ export function RentalDocumentsCard({ documents }: { documents: BookingRentalDoc
               <div className="flex items-center justify-between gap-3">
                 <p className="flex items-center gap-2 font-semibold text-[var(--foreground)]">
                   <FileSignature size={16} />
-                  {document.label}
+                  {nameOf(document)}
                   {document.versionNumber ? <span className="text-xs font-semibold text-[var(--muted)]">v{document.versionNumber}</span> : null}
                 </p>
                 <Badge tone={badge.tone}>{badge.label}</Badge>
@@ -56,7 +61,7 @@ export function RentalDocumentsCard({ documents }: { documents: BookingRentalDoc
                 <ul className="space-y-1 text-sm text-[var(--foreground-secondary)]">
                   {document.signatures.map((signature) => (
                     <li key={`${signature.role}-${signature.signedAt}`}>
-                      <span className="font-bold">{signature.roleLabel}:</span> {signature.name} · {formatSignedAt(signature.signedAt, locale)}
+                      <span className="font-bold">{names.has(`role_${signature.role}` as never) ? (names as unknown as Say)(`role_${signature.role}`) : signature.roleLabel}:</span> {signature.name} · {formatSignedAt(signature.signedAt, locale)}
                     </li>
                   ))}
                 </ul>

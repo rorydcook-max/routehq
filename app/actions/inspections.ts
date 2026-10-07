@@ -291,6 +291,11 @@ async function reconcileReturnDeposit(formData: FormData, organizationId: string
     refundData.set("returnAmount", String(refundAmount));
     refundData.set("notes", "Recorded on the return form.");
     refundData.set("quiet", "true");
+    const method = String(formData.get("depositRefundMethod") || "");
+    if (["cash", "bank_transfer", "promptpay"].includes(method)) {
+      refundData.set("paymentMethod", method);
+      settlement.refundMethod = method;
+    }
     await returnDeposit(refundData);
     settlement.refunded = refundAmount;
   }
@@ -646,13 +651,10 @@ export async function submitInspection(formData: FormData) {
       throw new Error(rentalError.message);
     }
 
-    const { error: futurePaymentsError } = await supabase
+    // Each cancelled payment keeps what it was for (an extension stays an extension).
+    const { data: futurePayments, error: futurePaymentsError } = await supabase
       .from("rental_payments")
-      .update({
-        voided: true,
-        status: "voided",
-        metadata: { type: "rent", voided_reason: "Vehicle returned before this payment was due", voided_at: new Date().toISOString(), voided_by: user.id }
-      })
+      .select("id, metadata")
       .eq("organization_id", organizationId)
       .eq("rental_id", rentalId)
       .in("status", ["scheduled", "pending"])
@@ -660,6 +662,18 @@ export async function submitInspection(formData: FormData) {
       .gt("due_date", endDate);
     if (futurePaymentsError) {
       throw new Error(futurePaymentsError.message);
+    }
+    for (const payment of futurePayments || []) {
+      const { error: voidError } = await supabase
+        .from("rental_payments")
+        .update({
+          voided: true,
+          status: "voided",
+          metadata: { type: "rent", ...(payment.metadata || {}), voided_reason: "Vehicle returned before this payment was due", voided_at: new Date().toISOString(), voided_by: user.id }
+        })
+        .eq("id", payment.id)
+        .eq("organization_id", organizationId);
+      if (voidError) throw new Error(voidError.message);
     }
 
     depositSettlement = await reconcileReturnDeposit(formData, organizationId, rentalId);
@@ -771,6 +785,7 @@ export async function submitInspection(formData: FormData) {
       customerSignature,
       customerSignedName,
       depositSettlement,
+      swap: isSwap,
       photos: media.photos
     });
   }

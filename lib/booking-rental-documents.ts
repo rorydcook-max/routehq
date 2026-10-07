@@ -8,7 +8,7 @@ import { createRentalDocumentSignedUrl } from "@/lib/rental-document-storage";
 const documentLabels: Record<string, string> = {
   rental_agreement: "Rental agreement",
   agreement_amendment: "Agreement amendment",
-  delivery_report: "Delivery report",
+  delivery_report: "Handover report",
   return_report: "Return report",
   vehicle_substitution: "Vehicle substitution",
   extension_amendment: "Extension amendment",
@@ -31,6 +31,8 @@ const signerLabels: Record<string, string> = {
 export type BookingRentalDocument = {
   id: string;
   type: string;
+  /** A handover or collection that was part of a change of vehicle. */
+  swap: boolean;
   label: string;
   status: string;
   versionNumber: number | null;
@@ -65,7 +67,7 @@ export async function getBookingRentalDocuments(supabase: any, organizationId: s
     ? await Promise.all([
         supabase
           .from("rental_document_versions")
-          .select("id, version_number, status, content_hash, finalised_at, final_pdf_storage_bucket, final_pdf_storage_path, pdf_storage_bucket, pdf_storage_path")
+          .select("id, version_number, status, content_hash, finalised_at, final_pdf_storage_bucket, final_pdf_storage_path, pdf_storage_bucket, pdf_storage_path, swap:rendered_data_snapshot->swap")
           .eq("organization_id", organizationId)
           .in("id", versionIds),
         supabase
@@ -104,6 +106,7 @@ export async function getBookingRentalDocuments(supabase: any, organizationId: s
       return {
         id: document.id,
         type: document.document_type,
+        swap: version?.swap === true,
         label: documentLabels[document.document_type] || document.document_type,
         status: document.status,
         versionNumber: version?.version_number ?? null,
@@ -119,7 +122,15 @@ export async function getBookingRentalDocuments(supabase: any, organizationId: s
     })
   );
 
-  return rows.sort((a, b) => documentOrder.indexOf(a.type) - documentOrder.indexOf(b.type));
+  return rows.sort((a, b) => documentOrder.indexOf(a.type) - documentOrder.indexOf(b.type) || String(a.finalisedAt || "").localeCompare(String(b.finalisedAt || "")));
+}
+
+/** The signed handover and return reports of a rental, for the customer's own page. */
+export async function getCustomerInspectionReports(supabase: any, organizationId: string, rentalId: string) {
+  const documents = await getBookingRentalDocuments(supabase, organizationId, rentalId).catch(() => []);
+  return documents
+    .filter((document) => (document.type === "delivery_report" || document.type === "return_report") && document.pdfUrl)
+    .map((document) => ({ id: document.id, kind: document.type === "delivery_report" ? ("handover" as const) : ("return" as const), swap: document.swap, url: document.pdfUrl as string }));
 }
 
 export function businessSignatureOf(documents: BookingRentalDocument[]) {

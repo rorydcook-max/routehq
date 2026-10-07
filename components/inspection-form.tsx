@@ -436,6 +436,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
   const [damageCharge, setDamageCharge] = useState(0);
   const [cleaningCharge, setCleaningCharge] = useState(0);
   const [refundOverride, setRefundOverride] = useState("");
+  const [refundMethod, setRefundMethod] = useState("cash");
   const [isPending, startTransition] = useTransition();
   const [uploadProgress, setUploadProgress] = useState("");
   const [uploadError, setUploadError] = useState("");
@@ -582,18 +583,24 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
       return;
     }
     const id = crypto.randomUUID();
-    setDamageItems((items) => [
-      ...items,
-      {
-        id,
-        location: selectedLocation,
-        severity: damageSeverity,
-        description: damageDescription.trim(),
-        photo_key: id,
-        is_pre_existing: mode !== "return",
-        noted_at: mode === "return" ? "return" : "delivery"
-      }
-    ]);
+    const description = damageDescription.trim();
+    // A double tap must not record the same mark twice.
+    setDamageItems((items) =>
+      items.some((item) => item.location === selectedLocation && item.severity === damageSeverity && item.description === description)
+        ? items
+        : [
+            ...items,
+            {
+              id,
+              location: selectedLocation,
+              severity: damageSeverity,
+              description,
+              photo_key: id,
+              is_pre_existing: mode !== "return",
+              noted_at: mode === "return" ? "return" : "delivery"
+            }
+          ]
+    );
     setNoDamage(false);
     setSelectedLocation("");
     setDamageSeverity("scratch");
@@ -746,6 +753,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
       <input name="customerSignature" type="hidden" value={signature} />
       <input name="customerSignedName" type="hidden" value={signedName} />
       <input name="depositRefundAmount" type="hidden" value={depositRefundAmount} />
+      <input name="depositRefundMethod" type="hidden" value={depositRefundAmount > 0 ? refundMethod : ""} />
       <input name="depositOutstandingBalance" type="hidden" value={outstandingBalance} />
       <input name="depositFuelDeficitCharge" type="hidden" value={fuelDeficitCharge} />
       <input name="depositDamageCharge" type="hidden" value={damageCharge} />
@@ -1032,6 +1040,24 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
               <div className="rounded-lg bg-[var(--primary-light)] p-3">
                 <Row label={t("depositRefund")} value={money(depositRefundAmount)} />
               </div>
+              {depositRefundAmount > 0 ? (
+                <div className="mt-3">
+                  <p className="text-sm font-semibold text-[var(--foreground)]">{t("refundHow")}</p>
+                  <div className="mt-2 grid grid-cols-3 gap-2">
+                    {(["cash", "bank_transfer", "promptpay"] as const).map((method) => (
+                      <button
+                        aria-pressed={refundMethod === method}
+                        className={`min-h-11 rounded-xl border px-2 text-sm font-semibold ${refundMethod === method ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
+                        key={method}
+                        onClick={() => setRefundMethod(method)}
+                        type="button"
+                      >
+                        {t(`refund_${method}`)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
             </div>
             {/* Usually the whole deposit goes back, so the two adjustments stay one tap away. */}
             <details open={cleaningCharge > 0 || Boolean(refundOverride)}>

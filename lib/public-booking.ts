@@ -1,4 +1,5 @@
 import { buildContractVariables, extractBodyHtml, renderContractTemplate } from "@/lib/contract-rendering";
+import { getCustomerInspectionReports } from "@/lib/booking-rental-documents";
 import { holdDeadline, retakeHold } from "@/lib/booking-holds";
 import { bookingRules } from "@/lib/booking-rules";
 import { resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
@@ -217,6 +218,7 @@ export async function getPublicBookingDetail(token: string) {
     ),
     markOpened
   ]);
+  const inspectionReports = bookingLink.rental_id ? await getCustomerInspectionReports(supabase, bookingLink.organization_id, bookingLink.rental_id) : [];
   const rentalDocumentAgreement = agreementResult.agreement;
   const executedDownloads = agreementResult.downloads;
   const organizationForDisplay = organization
@@ -280,6 +282,7 @@ export async function getPublicBookingDetail(token: string) {
     customerPortalActions: portalActionsResult.data || [],
     deliveryInspection,
     deliveryPhotoUrls: deliveryPhotoUrls.filter(Boolean),
+    inspectionReports,
     contractHtml,
     signedContractUrl,
     rentalDocumentAgreement,

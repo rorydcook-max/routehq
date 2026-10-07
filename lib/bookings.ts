@@ -355,7 +355,13 @@ export async function getBookingDetail(rentalId: string, organizationId: string)
     .filter((payment: any) => payment.status === "overdue")
     .reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
   const totalPaidIncome = rentalTransactions
-    .filter((transaction: any) => transaction.type === "rental_income" && !transaction.voided && !transaction.metadata?.voided)
+    // Rent settled out of the deposit at return is rent paid too.
+    .filter(
+      (transaction: any) =>
+        (transaction.type === "rental_income" || (transaction.type === "deposit_forfeited" && transaction.metadata?.reason === "Unpaid rent")) &&
+        !transaction.voided &&
+        !transaction.metadata?.voided
+    )
     .reduce((sum: number, transaction: any) => sum + Math.abs(Number(transaction.amount || 0)), 0);
   const outstandingBalance = pendingTotal + overdueTotal;
 

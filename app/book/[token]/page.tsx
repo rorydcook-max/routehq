@@ -420,6 +420,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             answers={await portalAnswers(rental?.id)}
             bookingData={bookingData}
             deliveryPhotoUrls={detail.deliveryPhotoUrls || []}
+            reports={detail.inspectionReports || []}
             organizationName={businessName}
             endNoticeDays={bookingRules(organization?.settings).endNoticeDays}
             extensionRates={rentalRateCard(vehicle, rental)}
@@ -468,6 +469,15 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
               <a className="pressable mt-5 inline-flex rounded-xl border border-[var(--primary)] bg-white px-5 py-3 text-sm font-semibold text-[var(--primary)]" href={contact}>
                 {t("contactNamed", { business: businessName })}
               </a>
+            ) : null}
+            {(detail.inspectionReports || []).length > 0 ? (
+              <div className="mt-5 flex flex-wrap justify-center gap-2">
+                {(detail.inspectionReports || []).map((report: any) => (
+                  <a className="pressable inline-flex rounded-xl border border-[var(--primary)] bg-white px-5 py-3 text-sm font-semibold text-[var(--primary)]" href={report.url} key={report.id} rel="noreferrer" target="_blank">
+                    {t(report.kind === "return" ? (report.swap ? "reportCollection" : "reportReturn") : report.swap ? "reportHandoverSwap" : "reportHandover")}
+                  </a>
+                ))}
+              </div>
             ) : null}
             {executedDownloads?.originalAgreementUrl || executedDownloads?.executionCertificateUrl ? (
               <div className="mt-5 flex flex-wrap justify-center gap-2">

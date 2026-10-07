@@ -23,7 +23,7 @@ const SIGNED_DOCUMENT_LABELS: Record<string, string> = {
   rental_agreement: "Rental agreement",
   agreement_amendment: "Agreement amendment",
   extension_amendment: "Extension amendment",
-  delivery_report: "Delivery report",
+  delivery_report: "Handover report",
   return_report: "Return report",
   vehicle_substitution: "Vehicle substitution",
   early_termination_statement: "Early termination statement",
@@ -93,7 +93,7 @@ export async function getDocumentList(organizationId: string, limit = 150): Prom
     customerIds.length ? supabase.from("customers").select("id, full_name").in("id", customerIds) : Promise.resolve({ data: [] }),
     inspectionIds.length ? supabase.from("inspections").select("id, rental_id, type").in("id", inspectionIds) : Promise.resolve({ data: [] }),
     versionIds.length
-      ? supabase.from("rental_document_versions").select("id, final_pdf_storage_bucket, final_pdf_storage_path, pdf_storage_bucket, pdf_storage_path").in("id", versionIds)
+      ? supabase.from("rental_document_versions").select("id, final_pdf_storage_bucket, final_pdf_storage_path, pdf_storage_bucket, pdf_storage_path, swap:rendered_data_snapshot->swap").in("id", versionIds)
       : Promise.resolve({ data: [] })
   ]);
 
@@ -152,7 +152,7 @@ export async function getDocumentList(organizationId: string, limit = 150): Prom
         id: `rental-document-${row.id}`,
         fileName: SIGNED_DOCUMENT_LABELS[row.document_type] || row.document_type,
         category: "signed_document",
-        docType: row.document_type,
+        docType: version?.swap === true && ["delivery_report", "return_report"].includes(row.document_type) ? `${row.document_type}_swap` : row.document_type,
         ownerType: "signed",
         ownerId: row.rental_id,
         ownerLabel: rentalLabel(rentalById.get(row.rental_id)),

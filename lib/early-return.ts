@@ -64,8 +64,16 @@ export function earlyReturnSuggestion(input: { payments: any[]; returnDate: stri
       periodStart = day(metadata.previous_end_date);
       periodEnd = day(metadata.new_end_date);
     } else {
-      const next = rent.slice(index + 1).find((row) => row.metadata?.type !== "extension" && day(row.due_date) > periodStart);
-      periodEnd = next ? day(next.due_date) : previousEnd && previousEnd > periodStart ? previousEnd : addInterval(periodStart, interval);
+      // The period runs to the next rent payment, or to where the first extension took over, whichever comes first.
+      // Cancelled payments mark nothing.
+      const live = (row: any) => !row.voided && !["voided", "waived", "cancelled"].includes(String(row.status));
+      const next = rent.slice(index + 1).find((row) => live(row) && row.metadata?.type !== "extension" && day(row.due_date) > periodStart);
+      const extendedFrom = rent
+        .filter((row) => row.metadata?.type === "extension" && row.metadata?.previous_end_date && day(row.metadata.previous_end_date) > periodStart)
+        .map((row) => day(row.metadata.previous_end_date))
+        .sort()[0];
+      const ends = [next ? day(next.due_date) : "", extendedFrom || ""].filter(Boolean).sort();
+      periodEnd = ends[0] || (previousEnd && previousEnd > periodStart ? previousEnd : addInterval(periodStart, interval));
     }
     const length = daysBetween(periodStart, periodEnd);
     const unused = daysBetween(usedUntil > periodStart ? usedUntil : periodStart, periodEnd);

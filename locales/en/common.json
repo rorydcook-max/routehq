@@ -320,7 +320,11 @@
     "areaLeftSide": "Left side",
     "areaRightSide": "Right side",
     "areaSeat": "Seat and body",
-    "kmValue": "{km} km"
+    "kmValue": "{km} km",
+    "refundHow": "How are you giving it back?",
+    "refund_cash": "Cash",
+    "refund_bank_transfer": "Bank transfer",
+    "refund_promptpay": "PromptPay"
   },
   "translation": {
     "translatedFrom": "Translated from {language}",
@@ -695,7 +699,11 @@
     "answerDeclined": "Sorry, we can't do that.",
     "amDue": "due {date}",
     "amFrom": "from {date}",
-    "amMore": "{amount} more, due {date}"
+    "amMore": "{amount} more, due {date}",
+    "reportHandover": "Handover report",
+    "reportReturn": "Return report",
+    "reportHandoverSwap": "Handover report (replacement vehicle)",
+    "reportCollection": "Collection report (vehicle changed)"
   },
   "customerMessages": {
     "hi": "Hi {name},",
@@ -3282,7 +3290,14 @@
     "cat_inspection_boot": "Boot",
     "cat_inspection_fuel": "Fuel gauge",
     "cat_inspection_odometer": "Odometer",
-    "cat_inspection_damage": "Damage"
+    "cat_inspection_damage": "Damage",
+    "signed_delivery_report_swap": "Handover report (replacement vehicle)",
+    "signed_return_report_swap": "Collection report (vehicle changed)",
+    "role_authorised_business_signatory": "Business",
+    "role_operator": "Staff",
+    "role_renter": "Customer",
+    "role_additional_driver": "Extra driver",
+    "role_witness": "Witness"
   },
   "reportsPage": {
     "title": "Reports",

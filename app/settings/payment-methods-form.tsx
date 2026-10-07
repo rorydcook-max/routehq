@@ -2,10 +2,12 @@
 
 import { useMemo, useState, useTransition } from "react";
 import type { ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import { updatePaymentSettings } from "@/app/actions/settings";
 
-const inputClass =
-  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]";
+type Say = (key: string, values?: Record<string, string | number>) => string;
+const labelClass = "font-semibold text-[var(--foreground-secondary)]";
+const helpClass = "mt-1 block font-medium text-[var(--muted)]";
 
 type PaymentSettings = {
   accepted_payment_methods?: string[] | null;
@@ -21,250 +23,158 @@ type PaymentSettings = {
   default_payment_method?: string | null;
 };
 
-const methodLabels: Record<string, string> = {
-  cash: "Cash",
-  promptpay: "PromptPay / QR Payment",
-  bank_transfer: "Thai Bank Transfer",
-  wise: "Wise",
-  revolut: "Revolut"
-};
+const METHODS = ["cash", "promptpay", "bank_transfer", "wise", "revolut"];
 
 function normaliseMethods(methods: unknown) {
-  if (!Array.isArray(methods)) {
-    return ["cash"];
-  }
-
-  const valid = methods.filter((method): method is string => typeof method === "string" && method in methodLabels);
+  if (!Array.isArray(methods)) return ["cash"];
+  const valid = methods.filter((method): method is string => typeof method === "string" && METHODS.includes(method));
   return Array.from(new Set(["cash", ...valid]));
 }
 
-export function PaymentMethodsForm({
-  businessName,
-  settings
-}: {
-  businessName: string;
-  settings: PaymentSettings;
-}) {
+export function PaymentMethodsForm({ businessName, settings }: { businessName: string; settings: PaymentSettings }) {
+  const say = useTranslations("settingsPage") as unknown as Say;
+  const methodName = (method: string) => (method === "promptpay" ? say("pm_promptpayName") : method === "bank_transfer" ? say("pm_bankName") : say(`pay_${method}`));
   const initialMethods = useMemo(() => normaliseMethods(settings.accepted_payment_methods), [settings.accepted_payment_methods]);
   const [enabledMethods, setEnabledMethods] = useState<string[]>(initialMethods);
   const [receiptPrefix, setReceiptPrefix] = useState(settings.receipt_prefix || "REC");
   const [promptPayQrUrl, setPromptPayQrUrl] = useState(settings.promptpay_qr_url || "");
   const [removePromptPayQr, setRemovePromptPayQr] = useState(false);
-  const [defaultMethod, setDefaultMethod] = useState(
-    initialMethods.includes(settings.default_payment_method || "") ? settings.default_payment_method || "cash" : "cash"
-  );
-  const [message, setMessage] = useState<{ tone: "success" | "error"; text: string } | null>(null);
+  const [defaultMethod, setDefaultMethod] = useState(initialMethods.includes(settings.default_payment_method || "") ? settings.default_payment_method || "cash" : "cash");
+  const [result, setResult] = useState<"saved" | "failed" | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const availableDefaultMethods = enabledMethods.filter((method) => method in methodLabels);
-  const acceptedMethodsJson = JSON.stringify(enabledMethods);
   const previewPrefix = receiptPrefix.trim().slice(0, 6) || "REC";
 
   function toggleMethod(method: string, checked: boolean) {
     setEnabledMethods((current) => {
       const next = checked ? Array.from(new Set([...current, method])) : current.filter((item) => item !== method);
       const safeNext = Array.from(new Set(["cash", ...next]));
-
-      if (!safeNext.includes(defaultMethod)) {
-        setDefaultMethod("cash");
-      }
-
+      if (!safeNext.includes(defaultMethod)) setDefaultMethod("cash");
       return safeNext;
     });
   }
 
   function submitPaymentSettings(formData: FormData) {
-    setMessage(null);
+    setResult(null);
     startTransition(async () => {
       try {
         await updatePaymentSettings(formData);
-        setMessage({ tone: "success", text: "Payment settings saved." });
-      } catch (error) {
-        setMessage({
-          tone: "error",
-          text: error instanceof Error ? error.message : "Unable to save payment settings."
-        });
+        setResult("saved");
+      } catch {
+        setResult("failed");
       }
     });
   }
 
   return (
-    <form action={submitPaymentSettings} className="mt-3 space-y-3">
-      <input name="accepted_payment_methods" type="hidden" value={acceptedMethodsJson} />
+    <form action={submitPaymentSettings} className="space-y-3">
+      <input name="accepted_payment_methods" type="hidden" value={JSON.stringify(enabledMethods)} />
       <input name="promptpay_qr_remove" type="hidden" value={removePromptPayQr ? "true" : "false"} />
 
-      <section className="form-section bg-[var(--primary-light)]">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--primary)]">Accepted methods</p>
-        <div className="mt-3 grid gap-3 md:grid-cols-2">
-          <MethodCard
-            checked
-            description="Paid in person on delivery or collection"
-            disabled
-            label="Cash"
-            name="cash"
-          />
-          <MethodCard
-            checked={enabledMethods.includes("promptpay")}
-            description="Thai QR payment - customers scan with their banking app"
-            label="PromptPay / QR Payment"
-            name="promptpay"
-            onToggle={toggleMethod}
-          >
-            <div className="mt-3 grid gap-3">
-              <label className="block">
-                <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">PromptPay ID</span>
-                <input className={inputClass} defaultValue={settings.promptpay_id || ""} name="promptpay_id" placeholder="Phone number (e.g. 0812345678) or national ID" />
-                <span className="mt-1 block text-xs leading-5 text-[var(--muted)]">
-                  Displayed as text below your QR code so customers can also pay by searching your number manually.
-                </span>
-              </label>
-
-              <div className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
-                <p className="text-[11px] font-medium text-[var(--foreground-secondary)]">PromptPay QR Code</p>
-                <p className="mt-1 text-xs leading-5 text-[var(--muted)]">
-                  Upload a screenshot or photo of your PromptPay QR code. Customers will scan this in their Thai banking app to pay. You can find your QR code in your banking app under 'Receive money' or 'My QR code'.
-                </p>
-                {promptPayQrUrl && !removePromptPayQr ? (
-                  <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
-                    <img alt="PromptPay QR code preview" className="h-28 w-28 rounded-lg border border-[var(--border)] bg-white object-contain p-1" src={promptPayQrUrl} />
-                    <div className="flex flex-wrap gap-2">
-                      <label className="pressable inline-flex cursor-pointer rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--foreground-secondary)]">
-                        Replace
-                        <input accept="image/png,image/jpeg,image/webp" className="sr-only" name="promptpay_qr" data-keep-original type="file" />
-                      </label>
-                      <button
-                        className="pressable rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]"
-                        onClick={() => {
-                          setRemovePromptPayQr(true);
-                          setPromptPayQrUrl("");
-                        }}
-                        type="button"
-                      >
-                        Remove
-                      </button>
-                    </div>
+      <div className="grid gap-2.5 md:grid-cols-2">
+        <MethodCard checked description={say("pm_cashBody")} disabled label={say("pay_cash")} name="cash" />
+        <MethodCard checked={enabledMethods.includes("promptpay")} description={say("pm_promptpayBody")} label={say("pm_promptpayName")} name="promptpay" onToggle={toggleMethod}>
+          <div className="mt-3 grid gap-3">
+            <label className="block">
+              <span className={labelClass}>{say("pm_ppId")}</span>
+              <input className="mt-1 w-full" defaultValue={settings.promptpay_id || ""} inputMode="numeric" name="promptpay_id" placeholder={say("pm_ppIdPh")} />
+              <span className={helpClass}>{say("pm_ppIdHelp")}</span>
+            </label>
+            <div>
+              <p className={labelClass}>{say("pm_qr")}</p>
+              <p className={helpClass}>{say("pm_qrHelp")}</p>
+              {promptPayQrUrl && !removePromptPayQr ? (
+                <div className="mt-3 flex flex-wrap items-center gap-3">
+                  <img alt={say("pm_qrAlt")} className="h-28 w-28 rounded-xl bg-white object-contain p-1" src={promptPayQrUrl} />
+                  <div className="flex flex-wrap gap-2">
+                    <label className="secondary-action pressable cursor-pointer">
+                      {say("pm_replace")}
+                      <input accept="image/png,image/jpeg,image/webp" className="sr-only" data-keep-original name="promptpay_qr" type="file" />
+                    </label>
+                    <button
+                      className="secondary-action pressable"
+                      onClick={() => {
+                        setRemovePromptPayQr(true);
+                        setPromptPayQrUrl("");
+                      }}
+                      style={{ color: "var(--danger)" }}
+                      type="button"
+                    >
+                      {say("pm_remove")}
+                    </button>
                   </div>
-                ) : (
-                  <label className="mt-3 block">
-                    <input accept="image/png,image/jpeg,image/webp" className={inputClass} name="promptpay_qr" data-keep-original type="file" />
-                  </label>
-                )}
-              </div>
-            </div>
-          </MethodCard>
-          <MethodCard
-            checked={enabledMethods.includes("bank_transfer")}
-            description="Direct transfer to your Thai bank account"
-            label="Thai Bank Transfer"
-            name="bank_transfer"
-            onToggle={toggleMethod}
-          >
-            <div className="mt-3 grid gap-3">
-              <label className="block">
-                <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Bank name</span>
-                <input className={inputClass} defaultValue={settings.bank_name || ""} name="bank_name" placeholder="e.g. Kasikorn, SCB, Bangkok Bank" />
-              </label>
-              <label className="block">
-                <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Account number</span>
-                <input className={inputClass} defaultValue={settings.bank_account_number || ""} name="bank_account_number" />
-              </label>
-              <label className="block">
-                <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Account name</span>
-                <input className={inputClass} defaultValue={settings.bank_account_name || ""} name="bank_account_name" />
-              </label>
-            </div>
-          </MethodCard>
-          <MethodCard
-            checked={enabledMethods.includes("wise")}
-            description="For international customers without a Thai bank account"
-            label="Wise"
-            name="wise"
-            onToggle={toggleMethod}
-          >
-            <label className="mt-3 block">
-              <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Wise.me link or email</span>
-              <input className={inputClass} defaultValue={settings.wise_link || ""} name="wise_link" placeholder="e.g. wise.com/pay/me/yourname" />
-            </label>
-          </MethodCard>
-          <MethodCard
-            checked={enabledMethods.includes("revolut")}
-            description="For European customers"
-            label="Revolut"
-            name="revolut"
-            onToggle={toggleMethod}
-          >
-            <label className="mt-3 block">
-              <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Revolut.me link</span>
-              <input className={inputClass} defaultValue={settings.revolut_link || ""} name="revolut_link" placeholder="e.g. revolut.me/yourname" />
-            </label>
-          </MethodCard>
-          <div className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3 opacity-75">
-            <div className="flex items-start justify-between gap-3">
-              <label className="checkbox-label">
-                <input className="flex-shrink-0" disabled type="checkbox" />
-                <span>
-                  <span className="block font-semibold text-[var(--muted)]">Credit / Debit Card</span>
-                  <span className="mt-1 block text-xs leading-5 text-[var(--muted)]">Card payments via Stripe</span>
-                </span>
-              </label>
-              <span className="rounded-full border border-[var(--warning-line)] bg-[var(--warning-light)] px-2 py-1 text-xs font-bold uppercase text-[var(--warning)]">
-                Coming soon
-              </span>
+                </div>
+              ) : (
+                <input accept="image/png,image/jpeg,image/webp" className="mt-2 w-full" data-keep-original name="promptpay_qr" type="file" />
+              )}
             </div>
           </div>
+        </MethodCard>
+        <MethodCard checked={enabledMethods.includes("bank_transfer")} description={say("pm_bankBody")} label={say("pm_bankName")} name="bank_transfer" onToggle={toggleMethod}>
+          <div className="mt-3 grid gap-3">
+            <label className="block">
+              <span className={labelClass}>{say("pm_bank")}</span>
+              <input className="mt-1 w-full" defaultValue={settings.bank_name || ""} name="bank_name" placeholder={say("pm_bankPh")} />
+            </label>
+            <label className="block">
+              <span className={labelClass}>{say("pm_accNo")}</span>
+              <input className="mt-1 w-full" defaultValue={settings.bank_account_number || ""} inputMode="numeric" name="bank_account_number" />
+            </label>
+            <label className="block">
+              <span className={labelClass}>{say("pm_accName")}</span>
+              <input className="mt-1 w-full" defaultValue={settings.bank_account_name || ""} name="bank_account_name" />
+            </label>
+          </div>
+        </MethodCard>
+        <MethodCard checked={enabledMethods.includes("wise")} description={say("pm_wiseBody")} label={say("pay_wise")} name="wise" onToggle={toggleMethod}>
+          <label className="mt-3 block">
+            <span className={labelClass}>{say("pm_wiseLink")}</span>
+            <input className="mt-1 w-full" defaultValue={settings.wise_link || ""} name="wise_link" placeholder="wise.com/pay/me/yourname" />
+          </label>
+        </MethodCard>
+        <MethodCard checked={enabledMethods.includes("revolut")} description={say("pm_revolutBody")} label={say("pay_revolut")} name="revolut" onToggle={toggleMethod}>
+          <label className="mt-3 block">
+            <span className={labelClass}>{say("pm_revolutLink")}</span>
+            <input className="mt-1 w-full" defaultValue={settings.revolut_link || ""} name="revolut_link" placeholder="revolut.me/yourname" />
+          </label>
+        </MethodCard>
+        <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5 opacity-70">
+          <p className="text-[16px] font-bold text-[var(--foreground)]">{say("pm_card")}</p>
+          <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{say("pm_cardBody")}</p>
         </div>
-      </section>
+      </div>
 
-      <section className="form-section bg-[var(--warning-light)]">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--primary)]">Receipt settings</p>
-        <div className="mt-3 grid gap-3 lg:grid-cols-2">
+      <div className="pt-2">
+        <p className="text-[16px] font-bold text-[var(--foreground)]">{say("pm_receipts")}</p>
+        <div className="mt-2.5 grid gap-3 lg:grid-cols-2">
           <label className="block">
-            <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Receipt number prefix</span>
-            <input
-              className={inputClass}
-              maxLength={6}
-              name="receipt_prefix"
-              onChange={(event) => setReceiptPrefix(event.target.value)}
-              value={receiptPrefix}
-            />
-            <span className="mt-1 block text-xs text-[var(--muted)]">Next receipt will be: {previewPrefix}-2026-0001</span>
+            <span className={labelClass}>{say("pm_prefix")}</span>
+            <input className="mt-1 w-full" maxLength={6} name="receipt_prefix" onChange={(event) => setReceiptPrefix(event.target.value)} value={receiptPrefix} />
+            <span className={helpClass}>{say("pm_prefixHelp", { example: `${previewPrefix}-${new Date().getFullYear()}-0001` })}</span>
           </label>
           <label className="block">
-            <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Default payment method</span>
-            <select className={inputClass} name="default_payment_method" onChange={(event) => setDefaultMethod(event.target.value)} value={defaultMethod}>
-              {availableDefaultMethods.map((method) => (
+            <span className={labelClass}>{say("pm_default")}</span>
+            <select className="mt-1 w-full" name="default_payment_method" onChange={(event) => setDefaultMethod(event.target.value)} value={defaultMethod}>
+              {enabledMethods.map((method) => (
                 <option key={method} value={method}>
-                  {methodLabels[method]}
+                  {methodName(method)}
                 </option>
               ))}
             </select>
           </label>
         </div>
         <label className="mt-3 block">
-          <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Receipt footer text</span>
-          <textarea
-            className={`${inputClass} min-h-28`}
-            defaultValue={settings.receipt_footer_text || ""}
-            name="receipt_footer_text"
-            placeholder={`e.g. Thank you for choosing ${businessName}! Drive safe.`}
-          />
+          <span className={labelClass}>{say("pm_footer")}</span>
+          <textarea className="mt-1 min-h-24 w-full" defaultValue={settings.receipt_footer_text || ""} name="receipt_footer_text" placeholder={say("pm_footerPh", { business: businessName })} />
         </label>
-      </section>
+      </div>
 
-      {message ? (
-        <p
-          className={`rounded-lg border px-3 py-2 text-xs font-semibold ${
-            message.tone === "success"
-              ? "border-[var(--success-line)] bg-[var(--success-light)] text-[var(--success)]"
-              : "border-[var(--danger-line)] bg-[var(--danger-light)] text-[var(--danger)]"
-          }`}
-        >
-          {message.text}
-        </p>
+      {result ? (
+        <p className={`rounded-xl px-4 py-3 font-bold ${result === "saved" ? "bg-[var(--success-light)] text-[var(--success)]" : "bg-[var(--danger-light)] text-[var(--danger)]"}`}>{result === "saved" ? say("pm_saved") : say("saveFailed")}</p>
       ) : null}
 
-      <button className="primary-action w-full disabled:cursor-not-allowed disabled:opacity-60" disabled={isPending} type="submit">
-        {isPending ? "Saving..." : "Save payment settings"}
+      <button className="primary-action w-full sm:w-auto" disabled={isPending} type="submit">
+        {isPending ? say("saving") : say("pm_save")}
       </button>
     </form>
   );
@@ -288,22 +198,12 @@ function MethodCard({
   onToggle?: (name: string, checked: boolean) => void;
 }) {
   return (
-    <div
-      className={`rounded-lg border p-3 ${
-        checked ? "border-[var(--primary)] bg-white shadow-[0_12px_26px_rgba(18,184,200,0.12)]" : "border-[var(--border)] bg-white"
-      }`}
-    >
-      <label className="checkbox-label">
-        <input
-          checked={checked}
-          className="flex-shrink-0"
-          disabled={disabled}
-          onChange={(event) => onToggle?.(name, event.target.checked)}
-          type="checkbox"
-        />
+    <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5">
+      <label className="flex cursor-pointer items-start gap-3">
+        <input checked={checked} className="mt-1 h-5 w-5 shrink-0" disabled={disabled} onChange={(event) => onToggle?.(name, event.target.checked)} type="checkbox" />
         <span>
-          <span className="block font-semibold text-[var(--foreground)]">{label}</span>
-          <span className="mt-1 block text-xs leading-5 text-[var(--muted)]">{description}</span>
+          <span className="block text-[16px] font-bold text-[var(--foreground)]">{label}</span>
+          <span className="mt-0.5 block font-medium text-[var(--foreground-secondary)]">{description}</span>
         </span>
       </label>
       {checked ? children : null}

@@ -2,22 +2,24 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { saveCustomerMessages } from "@/app/actions/online-booking";
 
 /** One switch for the messages RouteHQ sends customers on the business's behalf. Saves on change. */
 export function CustomerMessagesPanel({ enabled, hasChannel }: { enabled: boolean; hasChannel: boolean }) {
+  const say = useTranslations("settingsPage") as unknown as (key: string) => string;
   const router = useRouter();
   const [on, setOn] = useState(enabled);
-  const [error, setError] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   function change(next: boolean) {
     setOn(next);
-    setError(null);
+    setFailed(false);
     startTransition(async () => {
-      const result = await saveCustomerMessages(next).catch(() => ({ ok: false as const, error: "Couldn't save. Please try again." }));
+      const result = await saveCustomerMessages(next).catch(() => ({ ok: false as const }));
       if (!result.ok) {
-        setError(result.error);
+        setFailed(true);
         setOn(!next);
         return;
       }
@@ -28,27 +30,15 @@ export function CustomerMessagesPanel({ enabled, hasChannel }: { enabled: boolea
   return (
     <div>
       <label className="flex min-h-11 cursor-pointer items-start gap-3">
-        <input checked={on} className="mt-1 h-4 w-4" disabled={isPending} onChange={(event) => change(event.target.checked)} type="checkbox" />
+        <input checked={on} className="mt-1 h-5 w-5 shrink-0" disabled={isPending} onChange={(event) => change(event.target.checked)} type="checkbox" />
         <span>
-          <span className="block text-sm font-semibold text-[var(--foreground)]">Tell customers automatically</span>
-          <span className="mt-1 block text-[13px] leading-5 text-[var(--muted)]">
-            Reminders before a handover, a return and a rent payment, a nudge when rent is late, and a heads-up when their vehicle is due a service or renewal. Plus what just happened: an extension applied, a
-            request answered, a payment received, a refund, a cancellation. Each goes to the chat that customer first messaged you on; without one, by email if they gave it, otherwise it waits on the booking for
-            you to send in one tap.
-          </span>
+          <span className="block text-[16px] font-bold text-[var(--foreground)]">{say("cm_title")}</span>
+          <span className="mt-1 block font-medium text-[var(--foreground-secondary)]">{say("cm_body")}</span>
         </span>
       </label>
-      {on && !hasChannel ? (
-        <p className="mt-3 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3 text-[13px] text-[var(--warning)]">
-          No messaging account is connected yet, so nothing can be sent. Until one is, each message is kept on the booking marked "not sent" for you to pass on.
-        </p>
-      ) : null}
-      {on && hasChannel ? (
-        <p className="mt-3 text-[13px] leading-5 text-[var(--muted)]">
-          LINE and Telegram only let you message someone who has messaged you first. Each customer's booking page invites them to open a chat with you, and it connects itself to their booking when they do.
-        </p>
-      ) : null}
-      {error ? <p className="mt-2 text-sm font-semibold text-[var(--danger)]">{error}</p> : null}
+      {on && !hasChannel ? <p className="mt-3 rounded-xl bg-[var(--warning-light)] px-4 py-3 font-medium text-[var(--foreground)]">{say("cm_noChannel")}</p> : null}
+      {on && hasChannel ? <p className="mt-3 font-medium text-[var(--foreground-secondary)]">{say("cm_firstMessage")}</p> : null}
+      {failed ? <p className="mt-2 font-bold text-[var(--danger)]">{say("saveFailed")}</p> : null}
     </div>
   );
 }

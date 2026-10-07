@@ -2,8 +2,8 @@
 
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { updateOwnerSignature } from "@/app/actions/settings";
-import { SIGNATURE_AUTHORISATION_TEXT } from "@/lib/signature-authorisation";
 
 export function SignatureUploadSection({
   authorisedSignatoryName,
@@ -16,6 +16,9 @@ export function SignatureUploadSection({
   signatureUrl: string | null | undefined;
   orgName: string;
 }) {
+  const say = useTranslations("settingsPage") as unknown as (key: string, values?: Record<string, string>) => string;
+  // What the business agrees to; the same sentence the agreement records.
+  const authorisation = useTranslations("settings.contractsBranding") as unknown as (key: string) => string;
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<{ text: string; type: "error" | "success" } | null>(null);
   const router = useRouter();
@@ -27,10 +30,10 @@ export function SignatureUploadSection({
     startTransition(async () => {
       try {
         await updateOwnerSignature(formData);
-        setMessage({ text: "Signature saved. All new contracts will be auto-signed.", type: "success" });
+        setMessage({ text: say("sg_saved"), type: "success" });
         router.refresh();
-      } catch (err) {
-        setMessage({ text: err instanceof Error ? err.message : "Failed to update signature.", type: "error" });
+      } catch {
+        setMessage({ text: say("sg_failed"), type: "error" });
       }
     });
   }
@@ -44,11 +47,11 @@ export function SignatureUploadSection({
   function handleReplace() {
     const file = fileRef.current?.files?.[0];
     if (!file) {
-      setMessage({ text: "Please select an image file.", type: "error" });
+      setMessage({ text: say("sg_pick"), type: "error" });
       return;
     }
     if (!acknowledgementRef.current?.checked) {
-      setMessage({ text: "Please accept the signature authorisation before saving a new signature.", type: "error" });
+      setMessage({ text: say("sg_tick"), type: "error" });
       return;
     }
     const fd = new FormData();
@@ -63,11 +66,11 @@ export function SignatureUploadSection({
     e.preventDefault();
     const file = fileRef.current?.files?.[0];
     if (!file) {
-      setMessage({ text: "Please select an image file.", type: "error" });
+      setMessage({ text: say("sg_pick"), type: "error" });
       return;
     }
     if (!acknowledgementRef.current?.checked) {
-      setMessage({ text: "Please accept the signature authorisation before saving a new signature.", type: "error" });
+      setMessage({ text: say("sg_tick"), type: "error" });
       return;
     }
     const fd = new FormData();
@@ -78,11 +81,11 @@ export function SignatureUploadSection({
     submit(fd);
   }
 
-  const fileInputClass = "max-w-52 text-xs text-[var(--muted)] file:mr-2 file:rounded-lg file:border-0 file:bg-[var(--primary-light)] file:px-2.5 file:py-1.5 file:text-xs file:font-bold file:text-[var(--primary)]";
+  const fileInputClass = "max-w-full";
 
   const preview = signatureUrl ? (
     <img
-      alt={`${orgName} operator signature`}
+      alt={orgName}
       className="h-12 w-32 rounded-lg border border-[var(--border)] bg-white object-contain p-2"
       src={signatureUrl}
     />
@@ -101,24 +104,18 @@ export function SignatureUploadSection({
       <div className="flex items-center gap-3">
         {preview}
         <div className="min-w-0">
-          <p className="text-[13px] font-bold text-[var(--foreground)]">Authorised signature</p>
-          <p className="mt-0.5 text-[11px] leading-4 text-[var(--muted)]">
-            Applied automatically to each agreement when a customer signs online. PNG, JPG or WebP, max 2 MB.
-          </p>
+          <p className="text-[16px] font-bold leading-tight text-[var(--foreground)]">{say("sg_title")}</p>
+          <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{say("sg_body")}</p>
         </div>
       </div>
       {signatoryReady ? (
-        <p className="text-[11px] leading-4 text-[var(--foreground-secondary)]">
-          Signing as <strong>{authorisedSignatoryName}</strong>, {authorisedSignatoryTitle}.
-        </p>
+        <p className="font-medium text-[var(--foreground)]">{say("sg_as", { name: String(authorisedSignatoryName), title: String(authorisedSignatoryTitle) })}</p>
       ) : (
-        <p className="rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-2 text-[11px] font-bold leading-4 text-[var(--warning)]">
-          First save the authorised signatory&apos;s full name and job title above. The signature is recorded as theirs.
-        </p>
+        <p className="rounded-xl bg-[var(--warning-light)] px-4 py-3 font-medium text-[var(--foreground)]">{say("sg_first")}</p>
       )}
-      <label className="flex w-full items-start gap-2 rounded-lg border border-[var(--border)] bg-white p-2 text-[11px] leading-4 text-[var(--foreground-secondary)]">
-        <input className="mt-0.5 shrink-0" disabled={!signatoryReady} ref={acknowledgementRef} type="checkbox" />
-        <span>{SIGNATURE_AUTHORISATION_TEXT}</span>
+      <label className="flex w-full cursor-pointer items-start gap-3 rounded-xl bg-white p-3 font-medium text-[var(--foreground)]">
+        <input className="mt-0.5 h-5 w-5 shrink-0" disabled={!signatoryReady} ref={acknowledgementRef} type="checkbox" />
+        <span>{authorisation("signatureAuthorisation")}</span>
       </label>
       <div className="flex flex-wrap items-center gap-2">
         <input accept="image/png,image/jpeg,image/webp" className={fileInputClass} data-keep-original disabled={!signatoryReady} ref={fileRef} type="file" />
@@ -128,26 +125,26 @@ export function SignatureUploadSection({
           onClick={signatureUrl ? handleReplace : undefined}
           type={signatureUrl ? "button" : "submit"}
         >
-          {isPending ? "Uploading..." : signatureUrl ? "Replace signature" : "Upload signature"}
+          {isPending ? say("lg_working") : signatureUrl ? say("sg_replace") : say("sg_upload")}
         </button>
         {signatureUrl ? (
-          <button className="secondary-action" disabled={isPending} onClick={handleRemove} type="button">
-            {isPending ? "Removing..." : "Remove"}
+          <button className="secondary-action" disabled={isPending} onClick={handleRemove} style={{ color: "var(--danger)" }} type="button">
+            {say("pm_remove")}
           </button>
         ) : null}
       </div>
       {message ? (
-        <p className={`w-full text-xs ${message.type === "error" ? "text-[var(--danger)]" : "text-[var(--success)]"}`}>{message.text}</p>
+        <p className={`w-full font-bold ${message.type === "error" ? "text-[var(--danger)]" : "text-[var(--success)]"}`}>{message.text}</p>
       ) : null}
     </>
   );
 
   if (signatureUrl) {
-    return <div className="flex flex-col gap-3 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">{content}</div>;
+    return <div className="flex flex-col gap-3 rounded-xl bg-[var(--panel-secondary)] p-3.5">{content}</div>;
   }
 
   return (
-    <form className="flex flex-col gap-3 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3" onSubmit={handleUpload}>
+    <form className="flex flex-col gap-3 rounded-xl bg-[var(--panel-secondary)] p-3.5" onSubmit={handleUpload}>
       {content}
     </form>
   );

@@ -1,51 +1,41 @@
 "use client";
 
 import { useActionState } from "react";
+import { useTranslations } from "next-intl";
 import { inviteUser, type AuthActionState } from "@/app/actions/auth";
 import { supportedLocaleOptions } from "@/lib/i18n/locales";
 import { APP_ROLES } from "@/lib/auth/role-types";
 
 const initialState: AuthActionState = {};
+const labelClass = "font-semibold text-[var(--foreground-secondary)]";
 
 export function InviteForm() {
+  const say = useTranslations("settingsPage") as unknown as (key: string) => string;
   const [state, formAction, pending] = useActionState(inviteUser, initialState);
 
   return (
     <form action={formAction} className="space-y-4">
       <label className="block">
-        <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Email</span>
-        <input
-          className="mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
-          name="email"
-          type="email"
-          autoComplete="email"
-          required
-        />
+        <span className={labelClass}>{say("iv_email")}</span>
+        <input autoComplete="email" className="mt-1 w-full" name="email" required type="email" />
       </label>
       <fieldset className="block">
-        <legend className="text-sm font-semibold text-[var(--foreground-secondary)]">Role</legend>
-        <div className="mt-1 space-y-2">
+        <legend className={labelClass}>{say("iv_role")}</legend>
+        <div className="mt-1.5 space-y-2">
           {APP_ROLES.map((role) => (
-            <label
-              className="flex cursor-pointer items-start gap-3 rounded-lg border border-[var(--border)] bg-white px-3 py-3 has-[:checked]:border-[var(--primary)] has-[:checked]:bg-[var(--panel-secondary)]"
-              key={role.value}
-            >
-              <input className="mt-1" defaultChecked={role.value === "teammate"} name="role" type="radio" value={role.value} />
+            <label className="flex cursor-pointer items-start gap-3 rounded-xl bg-[var(--panel-secondary)] p-3.5 has-[:checked]:bg-[var(--primary-light)] has-[:checked]:ring-2 has-[:checked]:ring-[var(--primary)]" key={role.value}>
+              <input className="mt-1 h-5 w-5 shrink-0" defaultChecked={role.value === "teammate"} name="role" type="radio" value={role.value} />
               <span>
-                <span className="block text-sm font-bold text-[var(--foreground)]">{role.label}</span>
-                <span className="block text-xs text-[var(--muted)]">{role.description}</span>
+                <span className="block font-bold text-[var(--foreground)]">{say(`iv_${role.value}`)}</span>
+                <span className="mt-0.5 block font-medium text-[var(--foreground-secondary)]">{say(`iv_${role.value}Body`)}</span>
               </span>
             </label>
           ))}
         </div>
       </fieldset>
       <label className="block">
-        <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Default language</span>
-        <select
-          className="mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
-          name="preferredLocale"
-          defaultValue="th"
-        >
+        <span className={labelClass}>{say("iv_language")}</span>
+        <select className="mt-1 w-full" defaultValue="th" name="preferredLocale">
           {supportedLocaleOptions.map((locale) => (
             <option key={locale.code} value={locale.code}>
               {locale.label}
@@ -53,16 +43,16 @@ export function InviteForm() {
           ))}
         </select>
       </label>
-      {state.error ? <p className="rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">{state.error}</p> : null}
-      {state.success ? <p className="rounded-lg bg-[var(--success-light)] px-3 py-2 text-sm font-semibold text-[var(--success)]">{state.success}</p> : null}
-      <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-3 font-bold text-white disabled:opacity-60" disabled={pending}>
+      {state.error ? <p className="rounded-xl bg-[var(--danger-light)] px-4 py-3 font-bold text-[var(--danger)]">{state.error}</p> : null}
+      {state.success ? <p className="rounded-xl bg-[var(--success-light)] px-4 py-3 font-bold text-[var(--success)]">{state.success}</p> : null}
+      <button className="primary-action w-full" disabled={pending}>
         {pending ? (
           <>
             <span aria-hidden="true" className="spinner" />
-            Sending invite...
+            {say("iv_sending")}
           </>
         ) : (
-          "Send invite"
+          say("iv_send")
         )}
       </button>
     </form>

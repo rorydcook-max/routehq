@@ -2,7 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { createLineLinkCode, lineConnectionStatus } from "@/app/actions/settings";
+
+type Say = (key: string, values?: Record<string, string | number>) => string;
 
 /**
  * Connect LINE in two taps: add the RouteHQ account as a friend, then send it
@@ -10,9 +13,10 @@ import { createLineLinkCode, lineConnectionStatus } from "@/app/actions/settings
  * notices and refreshes the page.
  */
 export function LineConnectPanel({ organizationId, lineOaId }: { organizationId: string; lineOaId: string }) {
+  const say = useTranslations("settingsPage") as unknown as Say;
   const router = useRouter();
   const [code, setCode] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -34,11 +38,11 @@ export function LineConnectPanel({ organizationId, lineOaId }: { organizationId:
   }, [code, organizationId, router]);
 
   function getCode() {
-    setError(null);
+    setFailed(false);
     startTransition(async () => {
-      const result = await createLineLinkCode(organizationId);
+      const result = await createLineLinkCode(organizationId).catch(() => ({ ok: false as const }));
       if (result.ok) setCode(result.code);
-      else setError(result.error);
+      else setFailed(true);
     });
   }
 
@@ -46,51 +50,45 @@ export function LineConnectPanel({ organizationId, lineOaId }: { organizationId:
   const sendUrl = code ? `https://line.me/R/oaMessage/${encodeURIComponent(oa)}/?${encodeURIComponent(code)}` : "";
 
   return (
-    <div className="mt-3 space-y-4 rounded-lg border border-[var(--border)] p-3">
+    <div className="mt-3 space-y-4 rounded-xl bg-[var(--panel-secondary)] p-3.5">
       <div className="space-y-2">
-        <p className="text-xs font-bold uppercase tracking-wide text-[var(--primary)]">Step 1 · Add RouteHQ on LINE</p>
-        <p className="text-sm text-[var(--foreground-secondary)]">
-          Add <span className="font-mono font-semibold">{oa}</span> as a friend in LINE.
-        </p>
-        <a
-          className="inline-flex items-center gap-2 rounded-lg border border-[#06c755] px-3 py-2 text-sm font-semibold text-[var(--success)] hover:bg-[var(--success-light)]"
-          href={`https://line.me/R/ti/p/${encodeURIComponent(oa)}`}
-          rel="noreferrer"
-          target="_blank"
-        >
-          Add friend in LINE
+        <p className="text-[16px] font-bold text-[var(--foreground)]">{say("lc_step1")}</p>
+        <p className="font-medium text-[var(--foreground-secondary)]">{say("lc_step1Body", { account: oa })}</p>
+        <a className="secondary-action pressable" href={`https://line.me/R/ti/p/${encodeURIComponent(oa)}`} rel="noreferrer" target="_blank">
+          {say("lc_addFriend")}
         </a>
       </div>
 
       <div className="space-y-2">
-        <p className="text-xs font-bold uppercase tracking-wide text-[var(--primary)]">Step 2 · Send your connection code</p>
+        <p className="text-[16px] font-bold text-[var(--foreground)]">{say("lc_step2")}</p>
         {code ? (
           <>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] px-3 py-2 font-mono text-lg font-bold tracking-wider text-[var(--foreground)]">{code}</span>
+              <span className="rounded-xl bg-white px-4 py-2 font-mono text-[20px] font-bold tracking-wider text-[var(--foreground)]">{code}</span>
               <button
-                className="rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--foreground-secondary)]"
+                className="secondary-action pressable"
                 onClick={() => {
-                  navigator.clipboard?.writeText(code).then(() => setCopied(true)).catch(() => null);
+                  navigator.clipboard
+                    ?.writeText(code)
+                    .then(() => setCopied(true))
+                    .catch(() => null);
                 }}
                 type="button"
               >
-                {copied ? "Copied" : "Copy"}
+                {copied ? say("copied") : say("copy")}
               </button>
-              <a className="primary-action pressable min-h-10 px-4 text-sm" href={sendUrl} rel="noreferrer" target="_blank">
-                Send in LINE
+              <a className="primary-action pressable" href={sendUrl} rel="noreferrer" target="_blank">
+                {say("lc_send")}
               </a>
             </div>
-            <p className="text-xs text-[var(--muted)]">
-              Send this code to {oa} in LINE (the button opens the chat with it filled in). This page updates by itself once it arrives. The code works for 30 minutes.
-            </p>
+            <p className="font-medium text-[var(--foreground-secondary)]">{say("lc_sendBody", { account: oa })}</p>
           </>
         ) : (
-          <button className="primary-action pressable min-h-10 px-4 text-sm" disabled={isPending} onClick={getCode} type="button">
-            {isPending ? "Creating code…" : "Get a connection code"}
+          <button className="primary-action pressable" disabled={isPending} onClick={getCode} type="button">
+            {isPending ? say("lc_creating") : say("lc_getCode")}
           </button>
         )}
-        {error ? <p className="text-xs font-semibold text-[var(--danger)]">{error}</p> : null}
+        {failed ? <p className="font-bold text-[var(--danger)]">{say("lc_failed")}</p> : null}
       </div>
     </div>
   );

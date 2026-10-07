@@ -2,27 +2,31 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { saveBookingRules } from "@/app/actions/online-booking";
 import { END_NOTICE_OPTIONS, EXTEND_NOTICE_OPTIONS, GAP_DAY_OPTIONS, HOLD_HOUR_OPTIONS, LEAD_HOUR_OPTIONS, type BookingRules } from "@/lib/booking-rules";
 
-const days = (value: number, none: string) => (value === 0 ? none : value === 1 ? "1 day" : `${value} days`);
-const hours = (value: number, none: string) => (value === 0 ? none : value % 24 === 0 && value >= 24 ? days(value / 24, none) : `${value} hours`);
+type Say = (key: string, values?: Record<string, string | number>) => string;
 
 /** Holds and notice periods: set once, applied to every booking. Saves on change. */
 export function BookingRulesPanel({ rules }: { rules: BookingRules }) {
+  const say = useTranslations("settingsPage") as unknown as Say;
   const router = useRouter();
   const [values, setValues] = useState(rules);
-  const [message, setMessage] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  const days = (value: number, none: string) => (value === 0 ? none : say("ru_days", { count: value }));
+  const hours = (value: number, none: string) => (value === 0 ? none : value % 24 === 0 && value >= 24 ? days(value / 24, none) : say("ru_hours", { count: value }));
 
   function change(key: keyof BookingRules, value: number) {
     const next = { ...values, [key]: value };
     setValues(next);
-    setMessage(null);
+    setFailed(false);
     startTransition(async () => {
-      const result = await saveBookingRules(next).catch(() => ({ ok: false as const, error: "Couldn't save. Please try again." }));
+      const result = await saveBookingRules(next).catch(() => ({ ok: false as const }));
       if (!result.ok) {
-        setMessage(result.error);
+        setFailed(true);
         setValues(rules);
         return;
       }
@@ -31,62 +35,29 @@ export function BookingRulesPanel({ rules }: { rules: BookingRules }) {
   }
 
   const rows: Array<{ key: keyof BookingRules; label: string; help: string; options: number[]; text: (value: number) => string }> = [
-    {
-      key: "holdHours",
-      label: "Hold a vehicle for an unsigned booking for",
-      help: "A new booking link reserves the vehicle for this long. Once the customer signs it is booked. If they don't, the dates open up again and their link still works if the vehicle is free.",
-      options: HOLD_HOUR_OPTIONS,
-      text: (value) => `${value} hours`
-    },
-    {
-      key: "leadHours",
-      label: "Notice needed for an online booking",
-      help: "Customers booking from your booking page can't start sooner than this.",
-      options: LEAD_HOUR_OPTIONS,
-      text: (value) => hours(value, "None, same day is fine")
-    },
-    {
-      key: "gapDays",
-      label: "Keep free after each rental",
-      help: "Time for cleaning and checks. Online bookings and automatic extensions leave this gap; you can still book into it yourself.",
-      options: GAP_DAY_OPTIONS,
-      text: (value) => days(value, "No gap")
-    },
-    {
-      key: "endNoticeDays",
-      label: "Notice a customer gives before returning",
-      help: "On an open-ended rental, the earliest return date a customer can choose from their booking page.",
-      options: END_NOTICE_OPTIONS,
-      text: (value) => days(value, "None")
-    },
-    {
-      key: "extendNoticeDays",
-      label: "Notice needed to extend automatically",
-      help: "An extension asked for at least this far ahead is applied by itself when the vehicle is free. Later requests come to you.",
-      options: EXTEND_NOTICE_OPTIONS,
-      text: (value) => days(value, "None, any time before the end")
-    }
+    { key: "holdHours", label: say("ru_hold"), help: say("ru_holdHelp"), options: HOLD_HOUR_OPTIONS, text: (value) => say("ru_hours", { count: value }) },
+    { key: "leadHours", label: say("ru_lead"), help: say("ru_leadHelp"), options: LEAD_HOUR_OPTIONS, text: (value) => hours(value, say("ru_leadNone")) },
+    { key: "gapDays", label: say("ru_gap"), help: say("ru_gapHelp"), options: GAP_DAY_OPTIONS, text: (value) => days(value, say("ru_gapNone")) },
+    { key: "endNoticeDays", label: say("ru_end"), help: say("ru_endHelp"), options: END_NOTICE_OPTIONS, text: (value) => days(value, say("ru_none")) },
+    { key: "extendNoticeDays", label: say("ru_extend"), help: say("ru_extendHelp"), options: EXTEND_NOTICE_OPTIONS, text: (value) => days(value, say("ru_extendNone")) }
   ];
 
   return (
-    <div className="mt-4 grid gap-4 sm:grid-cols-2">
+    <div className="grid gap-4 sm:grid-cols-2">
       {rows.map((row) => (
-        <label className="block text-xs font-semibold text-[var(--foreground-secondary)]" key={row.key}>
-          {row.label}
-          <select
-            className="mt-1 block h-10 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-sm"
-            disabled={isPending}
-            onChange={(event) => change(row.key, Number(event.target.value))}
-            value={values[row.key]}
-          >
+        <label className="block" key={row.key}>
+          <span className="font-semibold text-[var(--foreground)]">{row.label}</span>
+          <select className="mt-1 block w-full" disabled={isPending} onChange={(event) => change(row.key, Number(event.target.value))} value={values[row.key]}>
             {row.options.map((option) => (
-              <option key={option} value={option}>{row.text(option)}</option>
+              <option key={option} value={option}>
+                {row.text(option)}
+              </option>
             ))}
           </select>
-          <span className="mt-1 block font-normal leading-5 text-[var(--muted)]">{row.help}</span>
+          <span className="mt-1 block font-medium text-[var(--muted)]">{row.help}</span>
         </label>
       ))}
-      {message ? <p className="text-xs font-semibold text-[var(--danger)] sm:col-span-2">{message}</p> : null}
+      {failed ? <p className="font-bold text-[var(--danger)] sm:col-span-2">{say("saveFailed")}</p> : null}
     </div>
   );
 }

@@ -2,18 +2,14 @@
 
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { updateBusinessLogo } from "@/app/actions/settings";
 import { BusinessLogoImage } from "@/components/business-logo-image";
 
-export function LogoUploadSection({
-  logoUrl,
-  orgName
-}: {
-  logoUrl: string | null | undefined;
-  orgName: string;
-}) {
+export function LogoUploadSection({ logoUrl, orgName }: { logoUrl: string | null | undefined; orgName: string }) {
+  const say = useTranslations("settingsPage") as unknown as (key: string) => string;
   const [isPending, startTransition] = useTransition();
-  const [message, setMessage] = useState<{ text: string; type: "error" | "success" } | null>(null);
+  const [message, setMessage] = useState<{ key: string; type: "error" | "success" } | null>(null);
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -22,12 +18,25 @@ export function LogoUploadSection({
     startTransition(async () => {
       try {
         await updateBusinessLogo(formData);
-        setMessage({ text: "Logo updated successfully.", type: "success" });
+        setMessage({ key: "lg_done", type: "success" });
+        if (fileRef.current) fileRef.current.value = "";
         router.refresh();
-      } catch (err) {
-        setMessage({ text: err instanceof Error ? err.message : "Failed to update logo.", type: "error" });
+      } catch {
+        setMessage({ key: "lg_failed", type: "error" });
       }
     });
+  }
+
+  // Choosing an image uploads it straight away: no second button to find.
+  function uploadChosen() {
+    const file = fileRef.current?.files?.[0];
+    if (!file) {
+      setMessage({ key: "lg_pick", type: "error" });
+      return;
+    }
+    const fd = new FormData();
+    fd.set("logo", file);
+    submit(fd);
   }
 
   function handleRemove() {
@@ -36,82 +45,27 @@ export function LogoUploadSection({
     submit(fd);
   }
 
-  function handleReplace() {
-    const file = fileRef.current?.files?.[0];
-    if (!file) {
-      setMessage({ text: "Please select an image file.", type: "error" });
-      return;
-    }
-    const fd = new FormData();
-    fd.set("logo", file);
-    submit(fd);
-  }
-
-  function handleUpload(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const file = fileRef.current?.files?.[0];
-    if (!file) {
-      setMessage({ text: "Please select an image file.", type: "error" });
-      return;
-    }
-    const fd = new FormData();
-    fd.set("logo", file);
-    submit(fd);
-  }
-
-  const fileInputClass = "max-w-52 text-xs text-[var(--muted)] file:mr-2 file:rounded-lg file:border-0 file:bg-[var(--primary-light)] file:px-2.5 file:py-1.5 file:text-xs file:font-bold file:text-[var(--primary)]";
-
-  if (logoUrl) {
-    return (
-      <div className="flex flex-col gap-3 rounded-lg border border-[var(--border)] bg-[var(--primary-light)] p-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
-          <BusinessLogoImage alt={`${orgName} logo`} className="h-10 w-14 rounded-lg border border-[var(--border)] bg-white object-contain p-1.5" src={logoUrl} />
-          <div>
-            <p className="text-[13px] font-bold text-[var(--foreground)]">Business logo</p>
-            <p className="mt-0.5 text-[11px] leading-4 text-[var(--muted)]">Appears on contracts, booking links and receipts.</p>
-          </div>
+  return (
+    <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5">
+      <div className="flex items-center gap-3">
+        {logoUrl ? <BusinessLogoImage alt={orgName} className="h-12 w-20 shrink-0 rounded-lg bg-white object-contain p-1.5" src={logoUrl} /> : null}
+        <div className="min-w-0">
+          <p className="text-[16px] font-bold leading-tight text-[var(--foreground)]">{logoUrl ? say("lg_title") : say("lg_uploadTitle")}</p>
+          <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{logoUrl ? say("lg_body") : say("lg_uploadBody")}</p>
         </div>
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <button className="secondary-action w-full sm:w-auto" disabled={isPending} onClick={handleRemove} type="button">
-            {isPending ? "Removing..." : "Remove logo"}
+      </div>
+      <input accept="image/png,image/jpeg,image/webp" className="hidden" data-keep-original onChange={uploadChosen} ref={fileRef} type="file" />
+      <div className="mt-3 flex flex-wrap gap-2">
+        <button className={logoUrl ? "secondary-action" : "primary-action"} disabled={isPending} onClick={() => fileRef.current?.click()} type="button">
+          {isPending ? say("lg_working") : logoUrl ? say("lg_replace") : say("lg_upload")}
+        </button>
+        {logoUrl ? (
+          <button className="secondary-action" disabled={isPending} onClick={handleRemove} style={{ color: "var(--danger)" }} type="button">
+            {say("lg_remove")}
           </button>
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <input accept="image/png,image/jpeg,image/webp" className={fileInputClass} ref={fileRef} data-keep-original type="file" />
-            <button className="primary-action w-full sm:w-auto" disabled={isPending} onClick={handleReplace} type="button">
-              {isPending ? "Replacing..." : "Replace logo"}
-            </button>
-          </div>
-        </div>
-        {message ? (
-          <p className={`mt-1 w-full text-xs ${message.type === "error" ? "text-[var(--danger)]" : "text-[var(--success)]"}`}>{message.text}</p>
         ) : null}
       </div>
-    );
-  }
-
-  return (
-    <form className="flex flex-col gap-3 rounded-lg border border-[var(--border)] bg-[var(--primary-light)] p-3 sm:flex-row sm:items-center sm:justify-between" onSubmit={handleUpload}>
-      <div className="flex items-center gap-3">
-        <div className="flex h-10 w-14 shrink-0 items-center justify-center rounded-lg bg-[var(--primary-light)] text-[var(--primary)]">
-          <svg aria-hidden="true" fill="none" height="24" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" viewBox="0 0 24 24" width="24">
-            <path d="M5 7h2l1.5-2h7L17 7h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z" />
-            <circle cx="12" cy="14" r="4" />
-          </svg>
-        </div>
-        <div>
-          <p className="text-[13px] font-bold text-[var(--foreground)]">Upload your business logo</p>
-          <p className="mt-0.5 text-[11px] leading-4 text-[var(--muted)]">PNG, JPG or SVG. Recommended 400x200px or wider. Appears on contracts, booking links and receipts.</p>
-        </div>
-      </div>
-      <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
-        <input accept="image/png,image/jpeg,image/webp" className={fileInputClass} ref={fileRef} data-keep-original type="file" />
-        <button className="primary-action w-full sm:w-auto" disabled={isPending} type="submit">
-          {isPending ? "Uploading..." : "Upload logo"}
-        </button>
-      </div>
-      {message ? (
-        <p className={`mt-1 w-full text-xs ${message.type === "error" ? "text-[var(--danger)]" : "text-[var(--success)]"}`}>{message.text}</p>
-      ) : null}
-    </form>
+      {message ? <p className={`mt-2 font-bold ${message.type === "error" ? "text-[var(--danger)]" : "text-[var(--success)]"}`}>{say(message.key)}</p> : null}
+    </div>
   );
 }

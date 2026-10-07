@@ -3,6 +3,9 @@
 import { AlertTriangle, CheckCircle2, FileSpreadsheet, Loader2, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
+
+type Say = (key: string, values?: Record<string, string | number>) => string;
 import { IMPORT_FIELD_GROUPS, IMPORT_FIELDS } from "@/lib/import/fields";
 
 const inputClass =
@@ -35,12 +38,7 @@ type Result = {
   warnings?: string[];
 };
 
-const dataTypeLabels: Record<string, string> = {
-  vehicles: "Vehicles",
-  customers: "Customers",
-  rentals: "Rentals",
-  transactions: "Payments and expenses"
-};
+const dataTypes = ["vehicles", "customers", "rentals", "transactions"];
 
 function confidenceTone(confidence = 0) {
   if (confidence >= 0.85) return "bg-[var(--success)]";
@@ -50,6 +48,7 @@ function confidenceTone(confidence = 0) {
 
 function IssueList({ title, items, tone }: { title: string; items: string[]; tone: "amber" | "blue" }) {
   const [showAll, setShowAll] = useState(false);
+  const t = useTranslations("importer") as unknown as Say;
   if (!items.length) return null;
   const shown = showAll ? items : items.slice(0, 12);
   return (
@@ -64,7 +63,7 @@ function IssueList({ title, items, tone }: { title: string; items: string[]; ton
       </ul>
       {items.length > 12 ? (
         <button className="mt-2 text-sm font-bold text-[var(--primary)]" onClick={() => setShowAll((value) => !value)} type="button">
-          {showAll ? "Show fewer" : `Show all ${items.length}`}
+          {showAll ? t("fewer") : t("showAll", { count: items.length })}
         </button>
       ) : null}
     </div>
@@ -74,13 +73,15 @@ function IssueList({ title, items, tone }: { title: string; items: string[]; ton
 export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportType?: string }) {
   const [file, setFile] = useState<File | null>(null);
   const [sheetUrl, setSheetUrl] = useState("");
-  const [importType, setImportType] = useState(defaultImportType);
+  // What the sheet holds is worked out when it is read, and can be changed per tab at the next step.
+  const importType = defaultImportType;
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [mappings, setMappings] = useState<SheetMapping[]>([]);
   const [result, setResult] = useState<Result | null>(null);
   const [status, setStatus] = useState<"idle" | "analyzing" | "review" | "importing" | "done" | "error">("idle");
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const t = useTranslations("importer") as unknown as Say;
 
   // A field can only take one column per sheet; flag clashes before importing.
   const clashes = useMemo(
@@ -100,7 +101,7 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
 
   async function analyzeFile() {
     if (!file && !sheetUrl.trim()) {
-      setError("Choose a spreadsheet file or paste a public Google Sheets link first.");
+      setError(t("needFile"));
       setStatus("error");
       return;
     }
@@ -114,10 +115,10 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
     formData.append("importType", importType);
 
     const response = await fetch("/api/import/analyze", { method: "POST", body: formData });
-    const payload = await response.json().catch(() => ({ error: "The spreadsheet could not be read." }));
+    const payload = await response.json().catch(() => ({ error: t("readFailed") }));
 
     if (!response.ok) {
-      setError(payload.error || "Reading the spreadsheet failed.");
+      setError(payload.error || t("readFailed"));
       setStatus("error");
       return;
     }
@@ -140,7 +141,7 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
     formData.append("mapping", JSON.stringify(mappings));
 
     const response = await fetch("/api/import/execute", { method: "POST", body: formData });
-    const payload = await response.json().catch(() => ({ error: "Import failed." }));
+    const payload = await response.json().catch(() => ({ error: t("importFailed") }));
 
     if (!response.ok) {
       if (payload.imported || payload.skipped) {
@@ -150,7 +151,7 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
           warnings: payload.warnings || []
         });
       }
-      setError(payload.error || "Import failed.");
+      setError(payload.error || t("importFailed"));
       setStatus("error");
       return;
     }
@@ -191,18 +192,17 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
             <FileSpreadsheet size={22} />
           </span>
           <div>
-            <p className="text-xs font-semibold uppercase text-[var(--primary)]">Step 1</p>
-            <h2 className="text-xl font-semibold text-[var(--foreground)]">Choose your spreadsheet</h2>
-            <p className="mt-1 text-sm text-[var(--muted)]">A CSV or Excel file, or a Google Sheet shared as “anyone with the link can view”. Every tab is read.</p>
+            <h2 className="text-xl font-semibold text-[var(--foreground)]">{t("s1")}</h2>
+            <p className="mt-1 text-sm text-[var(--muted)]">{t("s1Body")}</p>
           </div>
         </div>
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           <label className="block">
-            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Spreadsheet file</span>
+            <span className="secondary-action pressable w-full cursor-pointer">{file ? file.name : t("file")}</span>
             <input
               accept=".csv,.xlsx,.xls,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-              className={inputClass}
+              className="sr-only"
               onChange={(event) => {
                 setFile(event.target.files?.[0] || null);
                 setSheetUrl("");
@@ -211,20 +211,10 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
               type="file"
             />
           </label>
-          <label className="block">
-            <span className="text-sm font-semibold text-[var(--foreground-secondary)]">What's in it?</span>
-            <select className={inputClass} onChange={(event) => setImportType(event.target.value)} value={importType}>
-              <option value="mixed">Work it out for me</option>
-              <option value="vehicles">Vehicles</option>
-              <option value="customers">Customers</option>
-              <option value="rentals">Rentals</option>
-              <option value="transactions">Payments and expenses</option>
-            </select>
-          </label>
         </div>
 
         <label className="mt-4 block rounded-lg border border-[var(--border)] bg-white p-3">
-          <span className="text-sm font-semibold text-[var(--foreground-secondary)]">Or a Google Sheets link</span>
+          <span className="text-sm font-semibold text-[var(--foreground-secondary)]">{t("orLink")}</span>
           <input
             className={inputClass}
             onChange={(event) => {
@@ -245,23 +235,22 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
           type="button"
         >
           {status === "analyzing" ? <Loader2 className="animate-spin" size={18} /> : null}
-          {status === "analyzing" ? "Reading the spreadsheet..." : "Read spreadsheet"}
+          {status === "analyzing" ? t("reading") : t("read")}
         </button>
         {error ? <p className="mt-3 rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">{error}</p> : null}
         {status === "error" && result ? (
           <>
-            <IssueList items={result.skipped} title="Not imported" tone="amber" />
-            <IssueList items={result.warnings || []} title="Check these" tone="blue" />
+            <IssueList items={result.skipped} title={t("notImported")} tone="amber" />
+            <IssueList items={result.warnings || []} title={t("checkThese")} tone="blue" />
           </>
         ) : null}
       </section>
 
       {(status === "review" || status === "importing") && analysis ? (
         <section className="rounded-lg border border-[var(--success-line)] bg-[var(--success-light)] p-4">
-          <p className="text-xs font-semibold uppercase text-[var(--primary)]">Step 2</p>
-          <h2 className="text-xl font-semibold text-[var(--foreground)]">Check where each column goes</h2>
+          <h2 className="text-xl font-semibold text-[var(--foreground)]">{t("s2")}</h2>
           <p className="mt-2 text-sm text-[var(--muted)]">
-            Every column is listed. Columns set to “Don't import” are left out - pick a field for any you want to keep.
+            {t("s2Body")}
           </p>
           {notice ? <p className="mt-3 rounded-lg bg-[var(--warning-light)] px-3 py-2 text-sm font-semibold text-[var(--warning)]">{notice}</p> : null}
 
@@ -272,11 +261,11 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
                   <div>
                     <p className="font-semibold text-[var(--foreground)]">{sheet.sheet_name}</p>
                     <p className="text-sm text-[var(--muted)]">
-                      {sheet.row_count ?? 0} row{sheet.row_count === 1 ? "" : "s"}
+                      {t("rows", { count: sheet.row_count ?? 0 })}
                     </p>
                   </div>
                   <label className="block sm:max-w-[240px]">
-                    <span className="sr-only">Each row is</span>
+                    <span className="sr-only">{t("eachRow")}</span>
                     <select
                       className={inputClass}
                       onChange={(event) => {
@@ -285,9 +274,9 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
                       }}
                       value={sheet.primary_data_type}
                     >
-                      {Object.entries(dataTypeLabels).map(([value, label]) => (
+                      {dataTypes.map((value) => (
                         <option key={value} value={value}>
-                          Each row is: {label}
+                          {t("eachRow")}: {t(`dt_${value}`)}
                         </option>
                       ))}
                     </select>
@@ -298,9 +287,9 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
                   <table className="w-full min-w-[640px] text-left text-sm">
                     <thead>
                       <tr className="border-b border-[var(--border)] text-xs uppercase text-[var(--muted)]">
-                        <th className="py-2">Column in your sheet</th>
-                        <th className="py-2">Examples</th>
-                        <th className="py-2">Import as</th>
+                        <th className="py-2">{t("thColumn")}</th>
+                        <th className="py-2">{t("thExamples")}</th>
+                        <th className="py-2">{t("thAs")}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -313,14 +302,14 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
                             <td className="max-w-[240px] truncate py-2 pr-3 text-[var(--muted)]">{(mapping.sample_values || []).slice(0, 3).join(", ")}</td>
                             <td className="py-2">
                               <div className="flex items-center gap-2">
-                                {!ignored ? <span className={`inline-flex h-2.5 w-2.5 shrink-0 rounded-full ${confidenceTone(mapping.confidence)}`} title="How sure the suggestion is" /> : null}
+                                {!ignored ? <span className={`inline-flex h-2.5 w-2.5 shrink-0 rounded-full ${confidenceTone(mapping.confidence)}`} title={t("sure")} /> : null}
                                 <select
-                                  aria-label={`Import ${mapping.source_column} as`}
+                                  aria-label={`${t("thAs")}: ${mapping.source_column}`}
                                   className={`${inputClass} ${clash ? "border-[var(--danger)]" : ""}`}
                                   onChange={(event) => updateMapping(sheetIndex, columnIndex, event.target.value)}
                                   value={mapping.routehq_field || "__ignore__"}
                                 >
-                                  <option value="__ignore__">Don't import</option>
+                                  <option value="__ignore__">{t("ignore")}</option>
                                   {IMPORT_FIELD_GROUPS.map((group) => (
                                     <optgroup key={group} label={group}>
                                       {IMPORT_FIELDS.filter((field) => field.group === group).map((field) => (
@@ -332,7 +321,7 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
                                   ))}
                                 </select>
                               </div>
-                              {clash ? <p className="mt-1 text-xs font-semibold text-[var(--danger)]">Another column is also going here - choose one.</p> : null}
+                              {clash ? <p className="mt-1 text-xs font-semibold text-[var(--danger)]">{t("clash")}</p> : null}
                             </td>
                           </tr>
                         );
@@ -346,14 +335,14 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
 
           {hasClashes ? (
             <p className="mt-4 flex items-center gap-2 rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">
-              <AlertTriangle size={16} /> Two columns are set to the same field. Change one before importing.
+              <AlertTriangle size={16} /> {t("clashAll")}
             </p>
           ) : null}
 
           <div className="mt-5 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button className="inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-4 py-3 text-sm font-bold text-[var(--foreground-secondary)]" onClick={reset} type="button">
               <RotateCcw size={17} />
-              Start again
+              {t("again")}
             </button>
             <button
               className="inline-flex items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-4 py-3 text-sm font-bold text-white disabled:opacity-60"
@@ -362,7 +351,7 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
               type="button"
             >
               {status === "importing" ? <Loader2 className="animate-spin" size={18} /> : null}
-              {status === "importing" ? "Importing..." : "Import"}
+              {status === "importing" ? t("importing") : t("import")}
             </button>
           </div>
         </section>
@@ -373,26 +362,25 @@ export function ImportWizard({ defaultImportType = "mixed" }: { defaultImportTyp
           <div className="flex items-start gap-3">
             <CheckCircle2 className="text-[var(--success)]" size={28} />
             <div>
-              <p className="text-xs font-semibold uppercase text-[var(--primary)]">Step 3</p>
-              <h2 className="text-xl font-semibold text-[var(--foreground)]">Import finished</h2>
+              <h2 className="text-xl font-semibold text-[var(--foreground)]">{t("done")}</h2>
             </div>
           </div>
           <div className="mt-4 grid gap-3 sm:grid-cols-4">
-            {Object.entries(result.imported).map(([key, value]) => (
+            {Object.entries(result.imported).filter(([key, value]) => value > 0 || key === "vehicles").map(([key, value]) => (
               <div className="rounded-lg border border-[var(--border)] bg-white p-3" key={key}>
-                <p className="text-xs font-bold uppercase text-[var(--muted)]">{key === "transactions" ? "payments & expenses" : key}</p>
+                <p className="text-xs font-bold uppercase text-[var(--muted)]">{t(`dt_${key}`)}</p>
                 <p className="text-2xl font-semibold text-[var(--foreground)]">{value}</p>
               </div>
             ))}
           </div>
-          <IssueList items={result.skipped} title="Not imported" tone="amber" />
-          <IssueList items={result.warnings || []} title="Check these" tone="blue" />
+          <IssueList items={result.skipped} title={t("notImported")} tone="amber" />
+          <IssueList items={result.warnings || []} title={t("checkThese")} tone="blue" />
           <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-end">
             <button className="inline-flex justify-center rounded-lg border border-[var(--border)] bg-white px-4 py-3 text-sm font-bold text-[var(--foreground-secondary)]" onClick={reset} type="button">
-              Import another file
+              {t("another")}
             </button>
             <Link className="inline-flex justify-center rounded-lg bg-[var(--primary)] px-4 py-3 text-sm font-bold text-white" href="/fleet">
-              View fleet
+              {t("viewFleet")}
             </Link>
           </div>
         </section>

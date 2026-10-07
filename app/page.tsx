@@ -399,18 +399,14 @@ export default async function Home() {
             )}
           </Panel>
 
-          <Panel action={<PanelLink href="/calendar">{t("seeAll")}</PanelLink>} title={t("comingUp")}>
-            {upcomingItems.length === 0 ? (
-              <p className="flex items-center gap-2 px-4 pb-5 pt-2 text-sm text-[var(--muted)]">
-                <CalendarClock size={16} />
-                {t("nothingBooked")}
-              </p>
-            ) : (
+          {/* An empty week is not news: the card only appears when something is coming. */}
+          {upcomingItems.length === 0 ? null : (
+            <Panel action={<PanelLink href="/calendar">{t("seeAll")}</PanelLink>} title={t("comingUp")}>
               <ul className="divide-y divide-[var(--border)] border-t border-[var(--border)]">
                 {upcomingItems.slice(0, 8).map((item) => <AgendaRow item={item} key={item.key} />)}
               </ul>
-            )}
-          </Panel>
+            </Panel>
+          )}
 
           <Panel action={<PanelLink href="/bookings">{t("allBookings")}</PanelLink>} title={t("onRentNow", { count: onRent.length })}>
             {onRent.length === 0 ? (

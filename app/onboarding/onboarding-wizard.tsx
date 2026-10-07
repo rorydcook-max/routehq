@@ -674,6 +674,8 @@ const copy = {
     step1Title: "Welcome to RouteHQ",
     step1Subtitle: "Three short steps and you are ready to take bookings.",
     businessName: "Business name",
+    businessPhone: "Phone number customers can call",
+    businessPhoneHint: "Goes on the agreement and the booking link.",
     mainLocation: "Where you are based",
     mainLocationHint: "You can add more locations later.",
     country: "Country",
@@ -730,6 +732,8 @@ const copy = {
     step1Title: "ยินดีต้อนรับสู่ RouteHQ",
     step1Subtitle: "อีกแค่สามขั้นตอนสั้น ๆ คุณก็พร้อมรับการจอง",
     businessName: "ชื่อธุรกิจ",
+    businessPhone: "เบอร์โทรที่ลูกค้าติดต่อได้",
+    businessPhoneHint: "จะแสดงในสัญญาและลิงก์การจอง",
     mainLocation: "ธุรกิจของคุณอยู่ที่ไหน",
     mainLocationHint: "เพิ่มสถานที่อื่นได้ภายหลัง",
     country: "ประเทศ",
@@ -855,6 +859,7 @@ export function OnboardingWizard({
   const savedLocation = organization.settings?.main_location || {};
   const [profile, setProfile] = useState({
     businessName: organization.name || "",
+    businessPhone: String((organization as { business_phone?: string | null }).business_phone || ""),
     country: savedLocation.country || "Thailand",
     region: savedLocation.region || "Surat Thani",
     town: savedLocation.town || organization.settings?.location || "Koh Samui",
@@ -893,6 +898,7 @@ export function OnboardingWizard({
         const formData = new FormData();
         formData.set("organizationId", organization.id);
         formData.set("businessName", profile.businessName);
+    formData.set("businessPhone", profile.businessPhone);
         formData.set("location", locationValue);
         formData.set("country", selectedCountry);
         formData.set("region", selectedRegion);
@@ -974,6 +980,11 @@ export function OnboardingWizard({
                 <label className="block">
                   <span className={labelClass}>{t.businessName}</span>
                   <input className={fieldClass} maxLength={120} onChange={(event) => setProfile({ ...profile, businessName: event.target.value })} required value={profile.businessName} />
+                </label>
+                <label className="block">
+                  <span className={labelClass}>{t.businessPhone}</span>
+                  <input className={fieldClass} inputMode="tel" maxLength={40} onChange={(event) => setProfile({ ...profile, businessPhone: event.target.value })} type="tel" value={profile.businessPhone} />
+                  <span className="mt-1 block font-medium text-[var(--muted)]">{t.businessPhoneHint}</span>
                 </label>
                 <div className={tileClass}>
                   <p className="text-[16px] font-bold text-[var(--foreground)]">{t.mainLocation}</p>

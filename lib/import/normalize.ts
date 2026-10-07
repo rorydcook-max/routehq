@@ -2,8 +2,14 @@ export function cleanString(value: unknown) {
   return String(value ?? "").trim();
 }
 
+/** A plate as it is written: Thai plates have spaces ("กข 1234 ภูเก็ต"), which are kept, one at a time. */
 export function cleanPlate(value: unknown) {
-  return cleanString(value).replace(/\s+/g, "").toUpperCase();
+  return cleanString(value).replace(/\s+/g, " ").toUpperCase();
+}
+
+/** For telling whether two plates are the same vehicle: spacing, dashes and case ignored. */
+export function plateKey(value: unknown) {
+  return cleanString(value).replace(/[\s-]+/g, "").toUpperCase();
 }
 
 export function parseNumberValue(value: unknown) {

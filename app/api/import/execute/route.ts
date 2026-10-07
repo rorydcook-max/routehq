@@ -3,6 +3,7 @@ import { getCurrentMembership } from "@/lib/auth/roles";
 import { businessToday } from "@/lib/business-time";
 import {
   cleanPlate,
+  plateKey,
   cleanString,
   normalizeTransactionType,
   parseDateValue,
@@ -131,15 +132,11 @@ async function createImportedRental(
 
 async function vehicleIdForPlate(supabase: any, organizationId: string, plate: string) {
   if (!plate) return null;
-  const { data } = await supabase
-    .from("vehicles")
-    .select("id")
-    .eq("organization_id", organizationId)
-    .eq("registration_number", plate)
-    .is("deleted_at", null)
-    .limit(1)
-    .maybeSingle();
-  return (data?.id as string) || null;
+  // Compared without spaces or dashes, so "กข 1234" in the app and "กข1234" in a sheet are one vehicle.
+  const { data } = await supabase.from("vehicles").select("id, registration_number").eq("organization_id", organizationId).is("deleted_at", null);
+  const wanted = plateKey(plate);
+  const found = ((data || []) as Array<{ id: string; registration_number: string | null }>).find((vehicle) => plateKey(vehicle.registration_number) === wanted);
+  return found?.id || null;
 }
 
 export async function POST(request: Request) {

@@ -109,6 +109,7 @@ export async function saveBusinessProfile(formData: FormData) {
   const fleetType = requiredString(formData, "fleetType");
   const fleetSize = requiredString(formData, "fleetSize");
   const language = requiredString(formData, "language");
+  const businessPhone = String(formData.get("businessPhone") || "").trim().slice(0, 80);
   const currency = optionalString(formData, "currency") || "THB";
 
   const { data: organization, error: orgError } = await supabase
@@ -127,6 +128,8 @@ export async function saveBusinessProfile(formData: FormData) {
     .from("organizations")
     .update({
       name,
+      // Asked for in setup because it goes on the agreement and the customer's booking link.
+      ...(businessPhone ? { business_phone: businessPhone } : {}),
       default_locale: language,
       currency,
       supported_currencies: Array.from(new Set([currency, "THB", "USD"])),

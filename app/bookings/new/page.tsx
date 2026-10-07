@@ -130,7 +130,7 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
             defaultCurrency={organization.currency || "THB"}
             defaultDeposit={Number((organizationDetails?.settings as any)?.public_booking?.deposit || 0)}
             homeTerritory={homeTerritoryFromSettings(organizationDetails?.settings)}
-            operatorAddress={operatorAddressFromSettings(organizationDetails?.settings, organization.name)}
+            operatorAddress={String((organizationDetails as any)?.business_address || "").trim() || operatorAddressFromSettings(organizationDetails?.settings, organization.name)}
             organizationId={organization.id}
             organizationName={organization.name}
             preselectedCustomerId={customerId}

@@ -137,7 +137,27 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
     })
   ]);
   const { metrics, reminders, rentals, timeline, transactions, vehicles } = dashboardData;
-  const [receiptsWaiting, taskList] = await Promise.all([getReceiptsWaiting(organization.id), getTaskList(organization.id).catch(() => [])]);
+  const [receiptsWaiting, taskList, unsentResult] = await Promise.all([
+    getReceiptsWaiting(organization.id),
+    getTaskList(organization.id).catch(() => []),
+    // Customer messages the app wrote but could not deliver itself: the owner sends them in a tap.
+    (supabase as any)
+      .from("communication_log")
+      .select("id, rental_id, metadata, customers(full_name)")
+      .eq("organisation_id", organization.id)
+      .eq("type", "automated_reminder")
+      .in("status", ["pending", "failed"])
+      .not("rental_id", "is", null)
+      .gte("created_at", new Date(Date.now() - 7 * 86_400_000).toISOString())
+      .order("created_at", { ascending: false })
+      .limit(50)
+      .then((result: any) => result, () => ({ data: [] }))
+  ]);
+  const unsentByRental = new Map<string, { count: number; who: string }>();
+  for (const row of ((unsentResult?.data || []) as any[]).filter((entry) => entry.metadata?.handoff_label)) {
+    const found = unsentByRental.get(row.rental_id) || { count: 0, who: String(row.customers?.full_name || "") };
+    unsentByRental.set(row.rental_id, { count: found.count + 1, who: found.who });
+  }
 
   const now = new Date();
   const today = businessToday();
@@ -198,6 +218,9 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   const nextBookingFor = (late: (typeof rentals)[number]) =>
     rentals.filter((r) => r.status === "Booked" && r.id !== late.id && sameVehicle(r, late) && r.start <= weekAhead).sort((a, b) => a.start.localeCompare(b.start))[0] || null;
   const blockedBy = (booking: (typeof rentals)[number]) => lateBack.find((late) => late.id !== booking.id && sameVehicle(late, booking)) || null;
+  // A handover on the day the same vehicle comes back from someone else leaves no slack: say so on the handover.
+  const sameDayReturn = (booking: (typeof rentals)[number]) => rentals.find((other) => other.id !== booking.id && other.status !== "Booked" && other.end === booking.start && sameVehicle(other, booking)) || null;
+  const tight = (booking: (typeof rentals)[number], who: string) => (sameDayReturn(booking) ? `${who} · ${t("backSameDay", { who: sameDayReturn(booking)!.customer || t("aCustomer") })}` : who);
   for (const r of rentals) {
     const who = r.customer || t("walkIn");
     if (r.status === "Booked" && r.start <= weekAhead && blockedBy(r)) {
@@ -223,9 +246,9 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       if (r.start < today) {
         todayItems.push({ key: `late-out-${r.id}`, rank: 1, tone: "red", icon: <KeyRound size={17} />, title: t("handoverLate", { vehicle: r.vehicle }), detail: t("whoWasDue", { who, date: shortDate(r.start) }), href: `/inspections/delivery/${r.id}`, action: t("handOver") });
       } else if (r.start === today) {
-        todayItems.push({ key: `out-${r.id}`, rank: 1, tone: "teal", icon: <KeyRound size={17} />, title: t("handOverVehicle", { vehicle: r.vehicle }), detail: who, href: `/inspections/delivery/${r.id}`, action: t("handOver") });
+        todayItems.push({ key: `out-${r.id}`, rank: 1, tone: "teal", icon: <KeyRound size={17} />, title: t("handOverVehicle", { vehicle: r.vehicle }), detail: tight(r, who), href: `/inspections/delivery/${r.id}`, action: t("handOver") });
       } else if (r.start <= weekAhead) {
-        upcomingItems.push({ key: `soon-out-${r.id}`, sort: r.start, tone: "teal", icon: <KeyRound size={17} />, title: t("handOverVehicle", { vehicle: r.vehicle }), detail: who, when: dayLabel(r.start), href: `/bookings/${r.id}`, action: t("view") });
+        upcomingItems.push({ key: `soon-out-${r.id}`, sort: r.start, tone: "teal", icon: <KeyRound size={17} />, title: t("handOverVehicle", { vehicle: r.vehicle }), detail: tight(r, who), when: dayLabel(r.start), href: `/bookings/${r.id}`, action: t("view") });
       }
     } else if (r.end && r.end !== "Indefinite") {
       if (r.end < today) {
@@ -249,6 +272,18 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       when: since > 0 ? t("daysLate", { days: since }) : undefined,
       href: `/bookings/${r.id}`,
       action: t("collect")
+    });
+  }
+  for (const [rentalId, unsent] of unsentByRental) {
+    todayItems.push({
+      key: `unsent-${rentalId}`,
+      rank: 4,
+      tone: "amber",
+      icon: <Bell size={17} />,
+      title: t("messagesToSend", { count: unsent.count, who: unsent.who || t("aCustomer") }),
+      detail: t("messagesToSendDetail"),
+      href: `/bookings/${rentalId}#unsent-messages`,
+      action: t("open")
     });
   }
   for (const r of receiptsWaiting) {

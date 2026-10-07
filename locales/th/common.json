@@ -90,7 +90,10 @@
     "moreInsightsHint": "มูลค่ารถ กำไรต่อคัน และความเคลื่อนไหว",
     "tileUrgent": "เร่งด่วน",
     "tileToday": "ต้องทำวันนี้",
-    "ownerOnly": "หน้านั้นเปิดได้เฉพาะเจ้าของธุรกิจ"
+    "ownerOnly": "หน้านั้นเปิดได้เฉพาะเจ้าของธุรกิจ",
+    "messagesToSend": "{count, plural, one {ข้อความ} other {# ข้อความ}}ที่ต้องส่งให้ {who}",
+    "messagesToSendDetail": "เขียนไว้ให้แล้ว พร้อมส่ง",
+    "backSameDay": "รับคืนจาก {who} วันเดียวกัน"
   },
   "vehicles": {
     "addVehicle": "เพิ่มยานพาหนะใหม่",
@@ -712,7 +715,11 @@
     "reportHandover": "รายงานส่งมอบรถ",
     "reportReturn": "รายงานคืนรถ",
     "reportHandoverSwap": "รายงานส่งมอบรถ (รถคันใหม่)",
-    "reportCollection": "รายงานรับรถคืน (เปลี่ยนรถ)"
+    "reportCollection": "รายงานรับรถคืน (เปลี่ยนรถ)",
+    "reason_unpaid_rent": "ค่าเช่าค้างชำระ",
+    "reason_fuel_deficit": "ค่าน้ำมันที่ขาด",
+    "reason_damage": "ค่าความเสียหาย",
+    "reason_cleaning_fee": "ค่าทำความสะอาด"
   },
   "customerMessages": {
     "hi": "สวัสดีคุณ {name}",
@@ -764,7 +771,11 @@
     "serviceDue": "{vehicle} ถึงกำหนดเข้าศูนย์บริการวันที่ {date} เราจะติดต่อเพื่อนัดเวลาที่คุณสะดวก โดยปกติใช้เวลาไม่กี่ชั่วโมง",
     "renewalDue": "เอกสารบางรายการของ {vehicle} จะต่ออายุประมาณวันที่ {date} เราอาจต้องขอใช้รถหรือเอกสารสักครู่ และจะติดต่อเพื่อนัดหมาย",
     "signStillNeeded": "ตอนนี้คุณใช้ {vehicle} แล้ว และเรายังต้องการลายเซ็นของคุณเพื่อยืนยันการเปลี่ยนแปลง ใช้เวลาเพียงหนึ่งนาที: {link}",
-    "signWaiting": "มีการเปลี่ยนแปลงการเช่า {vehicle} ของคุณที่รอลายเซ็นอยู่ กรุณาตรวจสอบและเซ็นที่นี่: {link}"
+    "signWaiting": "มีการเปลี่ยนแปลงการเช่า {vehicle} ของคุณที่รอลายเซ็นอยู่ กรุณาตรวจสอบและเซ็นที่นี่: {link}",
+    "reason_unpaid_rent": "ค่าเช่าค้างชำระ",
+    "reason_fuel_deficit": "ค่าน้ำมันที่ขาด",
+    "reason_damage": "ค่าความเสียหาย",
+    "reason_cleaning_fee": "ค่าทำความสะอาด"
   },
   "common": {
     "kinds_car": "รถยนต์",
@@ -1862,7 +1873,16 @@
     "pcat_mechanical": "รถมีปัญหา",
     "pcat_query": "คำถามเกี่ยวกับการเช่า",
     "pcat_other": "เรื่องอื่น",
-    "tellCustomerOptional": "ข้อความถึงลูกค้า (ไม่บังคับ)"
+    "tellCustomerOptional": "ข้อความถึงลูกค้า (ไม่บังคับ)",
+    "unsentTitle": "{count, plural, one {มีข้อความ} other {มี # ข้อความ}}ที่ต้องส่งให้ {name}",
+    "unsentWhy": "ลูกค้ายังไม่ได้เปิดแชตกับร้าน ระบบจึงส่งให้เองไม่ได้",
+    "unsent_whatsapp": "ส่งทาง WhatsApp",
+    "unsent_telegram": "ส่งทาง Telegram",
+    "unsent_email": "ส่งทางอีเมล",
+    "unsent_sms": "ส่งทาง SMS",
+    "unsentCopy": "คัดลอกข้อความ",
+    "unsentCopied": "คัดลอกแล้ว",
+    "unsentDone": "เรียบร้อย"
   },
   "newBooking": {
     "pageBack": "กลับไปที่การจอง",

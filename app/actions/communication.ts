@@ -72,3 +72,23 @@ export async function addCommunicationNote(formData: FormData) {
     revalidatePath(`/customers/${customerId}`);
   }
 }
+
+/** The owner sent a ready-made customer message themselves (or decided it isn't needed): it stops showing as waiting. */
+export async function markCustomerMessageSent(id: string) {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("You must be signed in.");
+  // Read and written with the member's own access, so only their business's messages can be touched.
+  const { data: entry } = await supabase.from("communication_log").select("id, rental_id, metadata").eq("id", id).maybeSingle();
+  if (!entry) return { ok: false };
+  const { error } = await supabase
+    .from("communication_log")
+    .update({ status: "sent", metadata: { ...(entry.metadata || {}), sent_by_hand: true, sent_by_hand_at: new Date().toISOString(), sent_by_hand_by: user.id } })
+    .eq("id", id);
+  if (error) throw new Error(error.message);
+  if (entry.rental_id) revalidatePath(`/bookings/${entry.rental_id}`);
+  revalidatePath("/");
+  return { ok: true };
+}

@@ -3,6 +3,7 @@ import type { Route } from "next";
 import { AlertTriangle, CalendarDays, Car, CheckCircle2, Clock, CreditCard, FileText, Gauge, MapPin, ReceiptText, UserRound, XCircle } from "lucide-react";
 import { CancelBookingButton } from "@/app/bookings/[id]/cancel-booking-button";
 import { VehicleChangeButton } from "@/app/bookings/[id]/vehicle-change-button";
+import { UnsentMessages } from "@/app/bookings/[id]/unsent-messages";
 import { UndoCancellationButton } from "@/app/bookings/[id]/undo-cancellation-button";
 import { confirmCustomerPayment } from "@/app/actions/deposits";
 import { PaymentReminderButton } from "@/app/bookings/[id]/payment-reminder-button";
@@ -660,6 +661,20 @@ export default async function BookingDetailPage({ params, searchParams }: { para
           </div>
         </Card>
 
+        <UnsentMessages
+          customerName={customer?.full_name || tx.say("theCustomer")}
+          messages={(communicationTimeline || [])
+            .filter(
+              (entry: any) =>
+                entry.source === "communication_log" &&
+                entry.type === "automated_reminder" &&
+                ["pending", "failed"].includes(String(entry.status)) &&
+                !!entry.metadata?.handoff_label &&
+                Date.now() - new Date(entry.created_at).getTime() < 7 * 86_400_000
+            )
+            .slice(0, 5)
+            .map((entry: any) => ({ id: entry.id, content: entry.content, url: entry.metadata?.handoff_url || null }))}
+        />
         {(swapForms || []).length > 0 ? (
           <div className="scroll-mt-4 rounded-xl border border-[var(--warning-line)] bg-[var(--warning-light)] p-3" id="vehicle-change-forms">
             <p className="text-sm font-semibold text-[var(--warning)]">{tx.say("vehicleChanged", { name: customer?.full_name || tx.say("theCustomer") })}</p>
@@ -1518,15 +1533,6 @@ function CommunicationTimeline({
             <span className="text-xs font-bold uppercase text-[var(--muted)]">{relativeTime(entry.created_at, tx)}</span>
           </div>
           <p className="mt-2 whitespace-pre-line text-sm font-semibold leading-6 text-[var(--foreground-secondary)]">{entry.content || tx.say("noContent")}</p>
-          {(entry.status === "pending" || entry.status === "failed") && entry.metadata?.handoff_label ? (
-            entry.metadata?.handoff_url ? (
-              <a className="pressable mt-2 inline-flex min-h-9 items-center rounded-lg bg-[var(--primary)] px-3 text-xs font-semibold text-white" href={entry.metadata.handoff_url} rel="noreferrer" target="_blank">
-                {entry.metadata.handoff_label}
-              </a>
-            ) : (
-              <p className="mt-2 text-xs font-semibold text-[var(--warning)]">{entry.metadata.handoff_label}</p>
-            )
-          ) : null}
         </div>
       ))}
     </div>

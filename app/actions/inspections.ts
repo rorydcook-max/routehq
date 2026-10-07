@@ -690,7 +690,7 @@ export async function submitInspection(formData: FormData) {
           const lines = [say("returnedThanks", { vehicle })];
           if (settlement && settlement.available > 0) {
             const kept = settlement.deductions.reduce((sum, item) => sum + item.amount, 0);
-            if (kept > 0) lines.push(t("depositKept", { deposit: money(settlement.available), kept: money(kept), reasons: settlement.deductions.map((item) => `${item.reason.toLowerCase()} ${money(item.amount)}`).join(", ") }));
+            if (kept > 0) lines.push(t("depositKept", { deposit: money(settlement.available), kept: money(kept), reasons: settlement.deductions.map((item) => `${t(`reason_${item.reason.toLowerCase().replace(/\s+/g, "_")}`)} ${money(item.amount)}`).join(", ") }));
             if (settlement.refunded > 0) lines.push(kept > 0 ? t("amountReturned", { amount: money(settlement.refunded) }) : t("depositReturnedInFull", { amount: money(settlement.refunded) }));
             if (settlement.retained > 0) lines.push(t("depositStillToSettle", { amount: money(settlement.retained) }));
           }

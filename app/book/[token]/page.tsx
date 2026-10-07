@@ -454,7 +454,9 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
               const returned = Number(rental.deposit_refunded_amount || 0);
               const kept = Number(rental.deposit_forfeited_amount || 0);
               const left = Math.max(0, held - returned - kept);
-              const reason = String(rental.deposit_deduction_reason || "").split(" — ")[0].trim().toLowerCase();
+              const rawReason = String(rental.deposit_deduction_reason || "").split(" — ")[0].trim().toLowerCase();
+              const reasonKey = `reason_${rawReason.replace(/\s+/g, "_")}`;
+              const reason = rawReason && t.has(reasonKey as never) ? t(reasonKey as never) : rawReason;
               const currency = rental.currency || "THB";
               return (
                 <div className="mx-auto mt-4 max-w-sm rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3 text-left text-sm text-[var(--foreground-secondary)]">

@@ -49,6 +49,9 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
 
   const catalog = await getPublicCatalog(slug);
   if (!catalog || !catalog.enabled) return { ok: false, error: "Online booking isn't available for this business right now." };
+  // The page only offers what the business chose; this stops a hand-made request getting round it.
+  if (catalog.offer === "monthly" && endDate) return { ok: false, error: "This business only takes monthly rentals with no end date." };
+  if (catalog.offer === "dates" && !endDate) return { ok: false, error: "Please choose a return date." };
   const vehicle = catalog.vehicles.find((item) => item.id === vehicleId);
   if (!vehicle) return { ok: false, error: "That vehicle is no longer available. Please choose another." };
   if (startDate < catalog.minStart) return { ok: false, error: `The earliest start date is ${shortDate(catalog.minStart)}. Please choose a later date.` };

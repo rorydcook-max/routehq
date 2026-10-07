@@ -144,6 +144,7 @@ export function CalculatorClient({
   const [researchKey, setResearchKey] = useState("");
   const [sources, setSources] = useState<Source[]>([]);
   const [place, setPlace] = useState("");
+  const [platform, setPlatform] = useState<{ businesses: number; scope: string } | null>(null);
   const [saved, setSaved] = useState<SavedCalc[]>(initialSavedCalcs);
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved">("idle");
   const [searching, setSearching] = useState(false);
@@ -245,6 +246,7 @@ export function CalculatorClient({
       pages = reply.sources || [];
       where = reply.place || "";
       foundAt = Number(reply.atPrice) || price;
+      setPlatform(reply.platform || null);
     } catch {
       found = null;
     }
@@ -343,6 +345,7 @@ export function CalculatorClient({
     setPrice(Number(listing.price));
     setMileage(Number(listing.mileage_km) || 0);
     setFinanced(false);
+    setPlatform(null);
     setResearch(listing);
     setSources(listing.url ? [{ url: listing.url, title: listing.title || listing.source || "" }] : []);
     setResearchKey(`${[next.category, next.make, next.model, next.year, "", Number(listing.mileage_km) || 0].join("|")}@${listing.price}`);
@@ -529,6 +532,9 @@ export function CalculatorClient({
                   { low: money(research.market_price_low), high: money(research.market_price_high) }
                 )}
               </p>
+            ) : null}
+            {platform ? (
+              <p className="mt-3 text-sm text-[var(--foreground-secondary)]">{say(platform.scope === "area" ? "platformArea" : "platformCountry", { count: platform.businesses, model: subject.model })}</p>
             ) : null}
             {own ? (
               <p className="mt-3 text-sm text-[var(--foreground-secondary)]">

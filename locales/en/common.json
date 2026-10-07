@@ -3456,7 +3456,7 @@
     "months": "Months",
     "workItOut": "Work it out",
     "working": "Looking up prices…",
-    "workingHint": "Checking rental prices, running costs and resale values where you work. About a minute.",
+    "workingHint": "Checking what local rental shops charge, running costs and resale values where you work. A minute or two.",
     "verdict_strong": "Strong buy",
     "verdict_good": "Good buy",
     "verdict_thin": "Only at a better price",
@@ -3532,7 +3532,9 @@
     "caveat": "These are estimates from public prices and adverts. Check the vehicle and the figures before you buy.",
     "openOn": "See it on {site}",
     "othersNote": "Adverts change quickly. Check each one is still for sale.",
-    "slowYear": "It makes money in a normal year but loses in a slow one. A lower price gives you a cushion."
+    "slowYear": "It makes money in a normal year but loses in a slow one. A lower price gives you a cushion.",
+    "platformArea": "Rent is what {count} rental businesses near you charge for the {model} on RouteHQ.",
+    "platformCountry": "Rent is what {count} rental businesses in your country charge for the {model} on RouteHQ."
   },
   "importer": {
     "dt_vehicles": "Vehicles",

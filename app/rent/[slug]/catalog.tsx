@@ -152,8 +152,9 @@ export function Catalog({
           const bookable = !!planFor(vehicle, days);
           const tooShort = datesReady && free && !bookable ? (longTerm ? t("notOfferedMonthly") : minimumStay(vehicle) === "Minimum 1 week" ? t("minimumOneWeek") : minimumStay(vehicle) ? t("minimumOneMonth") : null) : null;
           const otherRates = [
-            vehicle.dailyRate > 0 && headline?.per !== "day" ? t("perDay", { rate: money(vehicle.dailyRate) }) : null,
-            vehicle.weeklyRate > 0 && headline?.per !== "week" ? t("perWeek", { rate: money(vehicle.weeklyRate) }) : null
+            // A business that only rents by the month does not show prices customers cannot book at.
+            offer !== "monthly" && vehicle.dailyRate > 0 && headline?.per !== "day" ? t("perDay", { rate: money(vehicle.dailyRate) }) : null,
+            offer !== "monthly" && vehicle.weeklyRate > 0 && headline?.per !== "week" ? t("perWeek", { rate: money(vehicle.weeklyRate) }) : null
           ].filter(Boolean);
           const isOpen = openId === vehicle.id;
           return (

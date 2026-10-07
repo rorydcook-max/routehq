@@ -1095,7 +1095,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
             <div className="mt-4 rounded-lg border border-[var(--border)] bg-white p-3">
               {depositAlreadyReturned ? (
                 <div className="rounded-lg bg-[var(--success-light)] p-3">
-                  <Row label={t("depositAlreadyReturned")} value="Complete" />
+                  <Row label={t("depositAlreadyReturned")} value="✓" />
                 </div>
               ) : (
                 <>

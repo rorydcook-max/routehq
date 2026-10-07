@@ -22,7 +22,7 @@ import { getOnboardingStatus } from "@/lib/onboarding";
 import { getReceiptsWaiting } from "@/lib/payment-receipts";
 import { getTaskList } from "@/lib/tasks";
 import { PushToggle } from "@/components/push-toggle";
-import { releaseExpiredHolds } from "@/lib/booking-holds";
+import { holdsEndingSoon, releaseExpiredHolds } from "@/lib/booking-holds";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isExpenseTransaction, isRevenueTransaction } from "@/lib/transaction-options";
@@ -112,6 +112,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   const isOwner = (await getCurrentMembership())?.role !== "teammate";
   // Holds that ran out without a signature give their dates back before anything is counted.
   await getDefaultOrganization().then((org) => releaseExpiredHolds(createSupabaseAdminClient(), org.id)).catch(() => null);
+  const endingHolds = await getDefaultOrganization().then((org) => holdsEndingSoon(createSupabaseAdminClient(), org.id)).catch(() => []);
   const [userEmail, organization, dashboardData, supabase, t, c, locale] = await Promise.all([
     getCurrentUserEmail(),
     getDefaultOrganization(),
@@ -272,6 +273,18 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       when: since > 0 ? t("daysLate", { days: since }) : undefined,
       href: `/bookings/${r.id}`,
       action: t("collect")
+    });
+  }
+  for (const hold of endingHolds) {
+    todayItems.push({
+      key: `hold-${hold.rentalId}`,
+      rank: 3,
+      tone: "amber",
+      icon: <Bell size={17} />,
+      title: t("holdEnding", { vehicle: hold.vehicle, time: new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Bangkok" }).format(new Date(hold.holdUntil)) }),
+      detail: hold.who ? t("holdEndingDetail", { who: hold.who }) : t("waitingForCustomer"),
+      href: `/bookings/${hold.rentalId}`,
+      action: t("open")
     });
   }
   for (const [rentalId, unsent] of unsentByRental) {

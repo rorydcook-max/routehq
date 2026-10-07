@@ -1,4 +1,4 @@
-import { completeRentalJobs, tellRentalCustomer } from "@/lib/customer-messages";
+import { completeRentalJobs, remindRentalCustomerOnce, tellRentalCustomer } from "@/lib/customer-messages";
 import { bookingRules, clashes } from "@/lib/booking-rules";
 
 export { clashes };
@@ -112,4 +112,38 @@ export async function retakeHold(admin: any, bookingLink: any): Promise<boolean>
   await admin.from("booking_links").update({ hold_until: holdDeadline(rules.holdHours), hold_released_at: null }).eq("id", bookingLink.id);
   await syncVehicleStatusFromBookings(admin, rental.organization_id, rental.vehicle_id).catch(() => null);
   return true;
+}
+
+export type EndingHold = { rentalId: string; vehicle: string; who: string; holdUntil: string };
+
+const clock = (iso: string) => new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Bangkok" }).format(new Date(iso));
+
+/**
+ * Unsigned bookings whose hold runs out within the next few hours, soonest
+ * first, for the dashboard. A customer with under three hours left is told
+ * once, so the dates are not lost by surprise.
+ */
+export async function holdsEndingSoon(admin: any, organizationId: string, withinHours = 6): Promise<EndingHold[]> {
+  const now = Date.now();
+  const { data: links } = await admin
+    .from("booking_links")
+    .select("id, rental_id, hold_until, rentals!inner(status), vehicles(make, model), customers(full_name)")
+    .eq("organization_id", organizationId)
+    .in("status", OPEN_LINK_STATUSES)
+    .is("hold_released_at", null)
+    .is("contract_signed_at", null)
+    .gt("hold_until", new Date(now).toISOString())
+    .lt("hold_until", new Date(now + withinHours * 3_600_000).toISOString())
+    .eq("rentals.status", "booked")
+    .order("hold_until", { ascending: true });
+
+  const ending: EndingHold[] = [];
+  for (const link of links || []) {
+    const vehicle = [link.vehicles?.make, link.vehicles?.model].filter(Boolean).join(" ") || "vehicle";
+    ending.push({ rentalId: link.rental_id, vehicle, who: String(link.customers?.full_name || ""), holdUntil: String(link.hold_until) });
+    if (new Date(link.hold_until).getTime() - now < 3 * 3_600_000) {
+      await remindRentalCustomerOnce(admin, link.rental_id, `hold-ending:${link.id}:${String(link.hold_until).slice(0, 16)}`, ({ say }) => say("holdEnding", { vehicle, time: clock(link.hold_until) })).catch(() => false);
+    }
+  }
+  return ending;
 }

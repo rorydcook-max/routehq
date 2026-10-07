@@ -93,7 +93,9 @@
     "ownerOnly": "Only the business owner can open that page.",
     "messagesToSend": "{count, plural, one {Message} other {# messages}} to send to {who}",
     "messagesToSendDetail": "Written for you, ready to send",
-    "backSameDay": "back from {who} the same day"
+    "backSameDay": "back from {who} the same day",
+    "holdEnding": "Hold on the {vehicle} ends at {time}",
+    "holdEndingDetail": "{who} has not signed yet"
   },
   "nav": {
     "main": "Main",
@@ -161,7 +163,7 @@
     "recordCondition": "Record the vehicle condition",
     "recordVideo": "Record a video walking round it",
     "conditionMinimum": "Either one video walking round the vehicle, or a photo of each of the four sides.",
-    "preExistingDamage": "Pre-existing damage logged at delivery",
+    "preExistingDamage": "Already on the vehicle at handover",
     "severity": "Severity",
     "damageScratch": "Scratch",
     "damageDent": "Dent",
@@ -193,9 +195,9 @@
     "changeRefund": "Take something off, or give back a different amount",
     "startsLaterNote": "This rental is not due to start until {date}. Carry on only if the customer is taking the vehicle now.",
     "photosVideo": "Photos / video",
-    "depositAlreadyReturned": "Deposit already returned — no reconciliation needed",
-    "depositDeductions": "Deposit deductions",
-    "depositRefundConfirmed": "Deposit refund confirmed",
+    "depositAlreadyReturned": "Deposit already given back",
+    "depositDeductions": "Taken from the deposit",
+    "depositRefundConfirmed": "Given back to the customer",
     "cashPayment": "Cash payment",
     "cashPaymentHint": "Confirm cash received during handover and generate a receipt.",
     "receiptReady": "Receipt ready",
@@ -262,7 +264,7 @@
     "tapArea": "Tap a vehicle area to log damage",
     "gpsActive": "GPS tracker is active",
     "gpsOffline": "GPS tracker appears offline",
-    "reviewReturn": "Review return and collect signature",
+    "reviewReturn": "Check and sign",
     "reviewCondition": "Review condition report",
     "reviewHandover": "Check and sign",
     "odometer": "Odometer",
@@ -299,8 +301,8 @@
     "drivenDuringRental": "Driven since handover: {km} km",
     "odometerAtDelivery": "At handover: {km} km",
     "rentalLengthDays": "Rented for {count, plural, one {# day} other {# days}}",
-    "fuelDeficitApprox": "Fuel deficit: approximately {percent}%",
-    "deductionsExceedDeposit": "Deductions exceed the deposit available. Only {amount} can be reconciled from this deposit.",
+    "fuelDeficitApprox": "About {percent}% less fuel than at handover",
+    "deductionsExceedDeposit": "That is more than the deposit. Only {amount} can come out of it; the rest stays owed.",
     "viewNotSet": "Not set",
     "viewFuel": "Fuel level",
     "viewType_delivery": "HANDOVER",
@@ -766,7 +768,8 @@
     "reason_unpaid_rent": "unpaid rent",
     "reason_fuel_deficit": "fuel",
     "reason_damage": "damage",
-    "reason_cleaning_fee": "cleaning"
+    "reason_cleaning_fee": "cleaning",
+    "holdEnding": "we are holding the {vehicle} for you until {time}. Finish your booking before then to keep it."
   },
   "common": {
     "kinds_car": "Cars",

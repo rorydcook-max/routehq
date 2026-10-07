@@ -1,6 +1,7 @@
 "use client";
 
 import { quoteStay, type Rates } from "@/lib/rental-estimate";
+import { shownError } from "@/lib/error-text";
 import { useEffect, useMemo, useState, useTransition, useRef } from "react";
 import { adjustRental } from "@/app/actions/bookings";
 import { useLocale, useTranslations } from "next-intl";
@@ -393,7 +394,7 @@ export function RentalAdjustmentModal({
           onClose();
         }, 1000);
       } catch (error) {
-        setMessage(error instanceof Error ? error.message : say("adj_failed"));
+        setMessage(shownError(error, say("adj_failed")));
       }
     });
   }

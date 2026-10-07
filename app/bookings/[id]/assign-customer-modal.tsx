@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { shownError } from "@/lib/error-text";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { UserPlus, X } from "lucide-react";
@@ -47,7 +48,7 @@ export function AssignCustomerModal({
         setOpen(false);
         router.refresh();
       } catch (err) {
-        setError(err instanceof Error ? err.message : say("assign_failed"));
+        setError(shownError(err, say("assign_failed")));
       }
     });
   }

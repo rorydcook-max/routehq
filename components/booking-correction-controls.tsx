@@ -1,6 +1,7 @@
 "use client";
 
 import { businessToday } from "@/lib/business-time";
+import { shownError } from "@/lib/error-text";
 import { typedNote } from "@/lib/transaction-notes";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
@@ -167,7 +168,7 @@ export function AddRentalPaymentInlineForm({ organizationId, rentalId, currency 
         setOpen(false);
         router.refresh();
       } catch (error) {
-        setMessage(error instanceof Error ? error.message : tx.say("pc_addFailed"));
+        setMessage(shownError(error, tx.say("pc_addFailed")));
       }
     });
   }
@@ -262,7 +263,7 @@ export function ExistingRentalPaymentSetupCard({
         await setupExistingRentalPayments(formData);
         router.refresh();
       } catch (error) {
-        setMessage(error instanceof Error ? error.message : tx.say("pc_setupFailed"));
+        setMessage(shownError(error, tx.say("pc_setupFailed")));
       }
     });
   }
@@ -437,7 +438,7 @@ export function EditableEndDate({ rentalId, currentEndDate }: { rentalId: string
         setEditing(false);
         router.refresh();
       } catch (error) {
-        setMessage(error instanceof Error ? error.message : tx.say("pc_endFailed"));
+        setMessage(shownError(error, tx.say("pc_endFailed")));
       }
     });
   }
@@ -525,7 +526,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
         setEditing(false);
         router.refresh();
       } catch (error) {
-        setMessage(error instanceof Error ? error.message : tx.say("pc_updateFailed"));
+        setMessage(shownError(error, tx.say("pc_updateFailed")));
       }
     });
   }
@@ -543,7 +544,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
         setRecordingPayment(false);
         router.refresh();
       } catch (error) {
-        setMessage(error instanceof Error ? error.message : tx.say("pc_recordFailed"));
+        setMessage(shownError(error, tx.say("pc_recordFailed")));
       }
     });
   }
@@ -720,7 +721,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
                         setEditing(false);
                         router.refresh();
                       } catch (error) {
-                        setMessage(error instanceof Error ? error.message : tx.say("pc_deletePaymentFailed"));
+                        setMessage(shownError(error, tx.say("pc_deletePaymentFailed")));
                       }
                     });
                   }}
@@ -774,7 +775,7 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
         setEditing(false);
         router.refresh();
       } catch (error) {
-        setMessage(error instanceof Error ? error.message : tx.say("pc_txFailed"));
+        setMessage(shownError(error, tx.say("pc_txFailed")));
       }
     });
   }
@@ -874,7 +875,7 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
                         setEditing(false);
                         router.refresh();
                       } catch (error) {
-                        setMessage(error instanceof Error ? error.message : tx.say("pc_deleteTxFailed"));
+                        setMessage(shownError(error, tx.say("pc_deleteTxFailed")));
                       }
                     });
                   }}

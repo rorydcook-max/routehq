@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { shownError } from "@/lib/error-text";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { RotateCcw, X } from "lucide-react";
@@ -41,7 +42,7 @@ export function UndoCancellationButton({
         setOpen(false);
         router.refresh();
       } catch (err) {
-        setError(err instanceof Error ? err.message : say("undo_failed"));
+        setError(shownError(err, say("undo_failed")));
       }
     });
   }

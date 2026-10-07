@@ -1,6 +1,7 @@
 "use client";
 
 import { VehicleKindIcon } from "@/components/vehicle-kind-icon";
+import { shownError } from "@/lib/error-text";
 import { isTwoWheeler, kindFromCategory } from "@/lib/vehicle-groups";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
@@ -637,7 +638,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
         const result = await recordDeliveryCashPaymentAndReceipt(formData);
         setReceiptResult(result);
       } catch (error) {
-        setReceiptError(error instanceof Error ? error.message : t("receiptFailed"));
+        setReceiptError(shownError(error, t("receiptFailed")));
       }
     });
   }
@@ -722,7 +723,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
                 } catch (error) {
                   if (String((error as any)?.digest || "").startsWith("NEXT_REDIRECT")) throw error;
                   setUploadProgress("");
-                  setUploadError(error instanceof Error ? error.message : t("uploadFailed"));
+                  setUploadError(shownError(error, t("uploadFailed")));
                 }
               });
             }}

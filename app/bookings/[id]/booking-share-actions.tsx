@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { shownError } from "@/lib/error-text";
 import { useTranslations } from "next-intl";
 import { Copy, MessageCircle, RotateCcw } from "lucide-react";
 import { resendBookingLink } from "@/app/actions/bookings";
@@ -93,7 +94,7 @@ export function BookingShareActions({
           setMessage(copied ? `${done} ${say("share_copiedShort")}` : `${done}${copyBlocked}`);
         }
       } catch (error) {
-        setMessage(error instanceof Error ? error.message : say("share_failed"));
+        setMessage(shownError(error, say("share_failed")));
       }
     });
   }

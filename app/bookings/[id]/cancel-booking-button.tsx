@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { shownError } from "@/lib/error-text";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { AlertTriangle, XCircle } from "lucide-react";
@@ -147,7 +148,7 @@ export function CancelBookingButton({
         reset();
         router.refresh();
       } catch (err) {
-        setError(err instanceof Error ? err.message : say("cn_failed"));
+        setError(shownError(err, say("cn_failed")));
       }
     });
   }

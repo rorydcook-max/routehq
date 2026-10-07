@@ -106,7 +106,7 @@ export function planFor(rates: Rates, days: number | null): RentalPlan | null {
   // monthly-only vehicle is still not offered for a weekend.
   const choices: Array<RentalPlan & { total: number }> = [];
   if (rates.dailyRate > 0) choices.push({ pricingModel: "daily", rate: rates.dailyRate, total: days * rates.dailyRate });
-  if (rates.weeklyRate > 0 && (days >= 7 || rates.dailyRate > 0)) choices.push({ pricingModel: "weekly", rate: rates.weeklyRate, total: Math.ceil(days / 7) * rates.weeklyRate });
+  if (rates.weeklyRate > 0 && (days >= 7 || rates.dailyRate > 0)) choices.push({ pricingModel: "weekly", rate: rates.weeklyRate, total: days > 7 ? Math.round((rates.weeklyRate * days) / 7 / 10) * 10 : rates.weeklyRate });
   if (rates.monthlyRate > 0 && choices.length > 0) choices.push({ pricingModel: "monthly", rate: rates.monthlyRate, total: rates.monthlyRate });
   if (!choices.length) return null;
   const best = choices.reduce((low, choice) => (choice.total < low.total ? choice : low), choices[0]);

@@ -78,7 +78,7 @@ export function PaymentMethodsForm({ businessName, settings }: { businessName: s
   }
 
   return (
-    <form className="space-y-3" onSubmit={submitPaymentSettings}>
+    <form method="post" className="space-y-3" onSubmit={submitPaymentSettings}>
       <input name="accepted_payment_methods" type="hidden" value={JSON.stringify(enabledMethods)} />
       <input name="promptpay_qr_remove" type="hidden" value={removePromptPayQr ? "true" : "false"} />
 

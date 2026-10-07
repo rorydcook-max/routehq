@@ -553,7 +553,7 @@ export function BookingForm({
   const backDisabled = step === 0 || showCustomerModal || Boolean(shareResult);
 
   return (
-    <form className="space-y-3" onSubmit={handleSubmit} ref={formRef}>
+    <form method="post" className="space-y-3" onSubmit={handleSubmit} ref={formRef}>
       <input name="bookingMode" type="hidden" value={bookingMode} />
       <input name="organizationId" type="hidden" value={organizationId} />
       <input name="vehicleId" type="hidden" value={vehicleId} />

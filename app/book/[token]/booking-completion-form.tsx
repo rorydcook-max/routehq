@@ -953,7 +953,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
   }
 
   return (
-    <form className="space-y-5" encType="multipart/form-data" onChange={(event) => updateLiveStatus(event.currentTarget)} onInput={(event) => updateLiveStatus(event.currentTarget)} onSubmit={handleSubmit} ref={formRef}>
+    <form className="space-y-5" encType="multipart/form-data" method="post" onChange={(event) => updateLiveStatus(event.currentTarget)} onInput={(event) => updateLiveStatus(event.currentTarget)} onSubmit={handleSubmit} ref={formRef}>
       <input name="token" type="hidden" value={detail.token} />
       {/* The language they are reading this in is the language their messages and agreement use. */}
       <input name="preferredLocale" type="hidden" value={locale} />

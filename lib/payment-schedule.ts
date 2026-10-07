@@ -72,6 +72,31 @@ export function countBillingPeriods(startDate: string, endDate: string | null | 
   return Math.max(1, count);
 }
 
+/**
+ * What each billing period of a rental with set dates costs. Every whole
+ * period is the full price. A part period at the end is charged for its days
+ * only (a thirtieth of the month, or a seventh of the week, per day, to the
+ * nearest 10), so 39 days at 18,000 a month is 18,000 then 5,400, not two full
+ * months. A rental shorter than one period still pays the one full period:
+ * that is the price the customer chose it at.
+ */
+export function billingPeriodAmounts(startDate: string, endDate: string | null | undefined, period: "monthly" | "weekly", rate: number, cap: number): number[] {
+  const count = countBillingPeriods(startDate, endDate, period, cap);
+  const amounts = Array.from({ length: count }, () => rate);
+  if (!endDate || count < 2) return amounts;
+  const start = new Date(`${String(startDate).slice(0, 10)}T00:00:00.000Z`);
+  const step = (index: number) => (period === "monthly" ? addMonths(start, index) : addWeeks(start, index));
+  const lastStart = step(count - 1).toISOString().slice(0, 10);
+  const lastFullEnd = step(count).toISOString().slice(0, 10);
+  const end = String(endDate).slice(0, 10);
+  if (end < lastFullEnd) {
+    const days = daysBetween(lastStart, end);
+    const part = Math.round((rate * days) / (period === "monthly" ? 30 : 7) / 10) * 10;
+    amounts[count - 1] = Math.max(0, Math.min(rate, part));
+  }
+  return amounts;
+}
+
 /** How far ahead rent is scheduled on a rental with no end date. The daily job rolls it forward a month at a time. */
 export const OPEN_ENDED_MONTHS_AHEAD = 2;
 
@@ -141,10 +166,11 @@ export async function generatePaymentSchedule({
       ? countBillingPeriods(normalizedDeliveryDate, endDate, "monthly", 12)
       : Math.max(openEndedMonthCount(normalizedDeliveryDate), upfrontPeriods);
 
+    const monthAmounts = endDate ? billingPeriodAmounts(normalizedDeliveryDate, endDate, "monthly", rentalRate, 12) : [];
     for (let i = 0; i < monthsToGenerate; i++) {
       const dueDate = addMonths(deliveryDateObj, i);
       const isUpfront = i < upfrontPeriods;
-      const amount = isUpfront ? upfrontRate || rentalRate : rentalRate;
+      const amount = isUpfront ? upfrontRate || rentalRate : monthAmounts[i] ?? rentalRate;
 
       records.push({
         organization_id: organisationId,
@@ -170,6 +196,7 @@ export async function generatePaymentSchedule({
   } else if (period === "weekly" || period === "week") {
     const weeksToGenerate = endDate ? countBillingPeriods(normalizedDeliveryDate, endDate, "weekly", 52) : 12;
 
+    const weekAmounts = endDate ? billingPeriodAmounts(normalizedDeliveryDate, endDate, "weekly", rentalRate, 52) : [];
     for (let i = 0; i < weeksToGenerate; i++) {
       const dueDate = addWeeks(deliveryDateObj, i);
       const isUpfront = i < upfrontPeriods;
@@ -178,7 +205,7 @@ export async function generatePaymentSchedule({
         rental_id: rentalId,
         customer_id: rental.customer_id,
         vehicle_id: rental.vehicle_id,
-        amount: rentalRate,
+        amount: isUpfront ? rentalRate : weekAmounts[i] ?? rentalRate,
         currency,
         scheduled_date: dateOnly(dueDate),
         due_date: dateOnly(dueDate),

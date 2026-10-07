@@ -1,5 +1,5 @@
 import { businessToday } from "@/lib/business-time";
-import { addMonths, addWeeks, countBillingPeriods, openEndedMonthCount } from "@/lib/payment-schedule";
+import { addMonths, addWeeks, billingPeriodAmounts, countBillingPeriods, openEndedMonthCount } from "@/lib/payment-schedule";
 
 type SupabaseClient = { from: (table: string) => any };
 
@@ -172,15 +172,17 @@ async function generatePaymentScheduleInternal(
 
   if (period === "monthly" || period === "month") {
     const monthsToGenerate = endDateStr ? countBillingPeriods(startDateStr, endDateStr, "monthly", 24) : openEndedMonthCount(startDateStr);
+    const monthAmounts = endDateStr ? billingPeriodAmounts(startDateStr, endDateStr, "monthly", rentalRate, 24) : [];
     for (let i = 0; i < monthsToGenerate; i++) {
       const dueDate = addMonths(startDate, i);
-      generate(dueDate.toISOString().split("T")[0], i, formatMonthLabel(dueDate));
+      generate(dueDate.toISOString().split("T")[0], i, formatMonthLabel(dueDate), monthAmounts[i]);
     }
   } else if (period === "weekly" || period === "week") {
     const weeksToGenerate = endDateStr ? countBillingPeriods(startDateStr, endDateStr, "weekly", 52) : 12;
+    const weekAmounts = endDateStr ? billingPeriodAmounts(startDateStr, endDateStr, "weekly", rentalRate, 52) : [];
     for (let i = 0; i < weeksToGenerate; i++) {
       const dueDate = addWeeks(startDate, i);
-      generate(dueDate.toISOString().split("T")[0], i);
+      generate(dueDate.toISOString().split("T")[0], i, undefined, weekAmounts[i]);
     }
   } else {
     // Daily and one-off prices: the whole rent is one payment on the first day.

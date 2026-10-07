@@ -144,7 +144,7 @@ export function SignatureUploadSection({
   }
 
   return (
-    <form className="flex flex-col gap-3 rounded-xl bg-[var(--panel-secondary)] p-3.5" onSubmit={handleUpload}>
+    <form method="post" className="flex flex-col gap-3 rounded-xl bg-[var(--panel-secondary)] p-3.5" onSubmit={handleUpload}>
       {content}
     </form>
   );

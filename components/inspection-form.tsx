@@ -732,7 +732,7 @@ export function InspectionForm({ context }: { context: InspectionContext }) {
   return (
     // Submitting only happens through the Submit button, which uploads the
     // photos first. Pressing Enter in a field must not post the files directly.
-    <form className="mx-auto max-w-3xl space-y-4" id="inspectionForm" onSubmit={(event) => event.preventDefault()}>
+    <form method="post" className="mx-auto max-w-3xl space-y-4" id="inspectionForm" onSubmit={(event) => event.preventDefault()}>
       <input name="organizationId" type="hidden" value={context.organizationId} />
       <input name="mode" type="hidden" value={mode} />
       <input name="swap" type="hidden" value={isSwap ? "1" : ""} />

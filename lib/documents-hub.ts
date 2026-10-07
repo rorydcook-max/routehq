@@ -7,7 +7,12 @@ export type DocumentListItem = {
   category: string;
   ownerType: string;
   ownerId: string | null;
+  /** Names and references only; the page words the rest in the reader's language. Empty when the owner is unknown. */
   ownerLabel: string;
+  /** For signed paperwork: which document it is ("rental_agreement"). */
+  docType?: string | null;
+  /** For inspection photos: taken at handover or at return. */
+  inspectionType?: "delivery" | "return" | null;
   mimeType: string | null;
   createdAt: string;
   signedUrl: string | null;
@@ -42,7 +47,7 @@ function ownerHref(ownerType: string, ownerId: string | null) {
 }
 
 function rentalLabel(rental: any) {
-  if (!rental) return "Rental";
+  if (!rental) return "";
   const reference = rental.reference || rental.display_code || String(rental.id || "").slice(0, 8);
   return [reference, rental.customers?.full_name].filter(Boolean).join(" · ");
 }
@@ -111,15 +116,17 @@ export async function getDocumentList(organizationId: string, limit = 150): Prom
 
   const uploads = await Promise.all(
     data.map(async (row: any): Promise<DocumentListItem> => {
-      let ownerLabel = row.owner_type;
+      let ownerLabel = "";
+      let inspectionType: "delivery" | "return" | null = null;
       let href = ownerHref(row.owner_type, row.owner_id);
-      if (row.owner_type === "vehicle" && row.owner_id) ownerLabel = vehicleLabels.get(row.owner_id) || "Vehicle";
-      if (row.owner_type === "customer" && row.owner_id) ownerLabel = customerLabels.get(row.owner_id) || "Customer";
+      if (row.owner_type === "vehicle" && row.owner_id) ownerLabel = String(vehicleLabels.get(row.owner_id) || "");
+      if (row.owner_type === "customer" && row.owner_id) ownerLabel = String(customerLabels.get(row.owner_id) || "");
       if (row.owner_type === "rental" && row.owner_id) ownerLabel = rentalLabel(rentalById.get(row.owner_id));
       if (row.owner_type === "inspection" && row.owner_id) {
         // Inspection photos belong to a booking: link there.
         const inspection: any = inspectionById.get(row.owner_id);
-        ownerLabel = `${inspection?.type === "return" ? "Return" : "Delivery"} inspection · ${rentalLabel(rentalById.get(inspection?.rental_id))}`;
+        ownerLabel = rentalLabel(rentalById.get(inspection?.rental_id));
+        inspectionType = inspection?.type === "return" ? "return" : "delivery";
         href = inspection?.rental_id ? `/bookings/${inspection.rental_id}` : null;
       }
       return {
@@ -129,6 +136,7 @@ export async function getDocumentList(organizationId: string, limit = 150): Prom
         ownerType: row.owner_type,
         ownerId: row.owner_id,
         ownerLabel,
+        inspectionType,
         mimeType: row.mime_type,
         createdAt: row.created_at,
         signedUrl: await signedPath(supabase, row.storage_path),
@@ -144,6 +152,7 @@ export async function getDocumentList(organizationId: string, limit = 150): Prom
         id: `rental-document-${row.id}`,
         fileName: SIGNED_DOCUMENT_LABELS[row.document_type] || row.document_type,
         category: "signed_document",
+        docType: row.document_type,
         ownerType: "signed",
         ownerId: row.rental_id,
         ownerLabel: rentalLabel(rentalById.get(row.rental_id)),

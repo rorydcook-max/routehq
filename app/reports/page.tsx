@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/app-shell";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDefaultOrganization } from "@/lib/organization";
@@ -19,12 +20,13 @@ export default async function ReportsPage({
   const [userEmail, organization] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization()]);
   const data = await getReportsData(organization.id, legacyMonth || preset, customFrom, customTo);
 
+  const say = (await getTranslations("reportsPage")) as unknown as (key: string) => string;
+
   return (
     <AppShell userEmail={userEmail}>
-      <div className="page-hero mb-5">
-        <p className="page-eyebrow">Reports</p>
-        <h1 className="page-title">Reports</h1>
-        <p className="page-subtitle mt-1">How the business is doing, from what you&apos;ve actually recorded.</p>
+      <div className="page-hero mb-4">
+        <h1 className="page-title">{say("title")}</h1>
+        <p className="page-subtitle page-subtitle-keep mt-1">{say("subtitle")}</p>
       </div>
       <ReportsView data={data} />
     </AppShell>

@@ -8,6 +8,14 @@ export async function POST(request: NextRequest) {
     if (!(await getCurrentMembership())) return NextResponse.json({ insights: [] }, { status: 401 });
     const body = await request.json();
     const { data } = body;
+    // Answer in the language the person reads the app in.
+    const language = (() => {
+      try {
+        return new Intl.DisplayNames(["en"], { type: "language" }).of(String(body.locale || "en").slice(0, 5)) || "English";
+      } catch {
+        return "English";
+      }
+    })();
 
     if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json({ insights: [] }, { status: 200 });
@@ -40,7 +48,7 @@ export async function POST(request: NextRequest) {
         {
           role: "system",
           content:
-            "You are a fleet business analyst. Generate 3-5 concise, actionable insights for a vehicle rental operator in Thailand based on their financial data. Return JSON only: an array of objects with fields: title (short), insight (1-2 sentences), action (specific next step). Focus on profitability improvement, cost reduction, and revenue growth."
+            `You are a fleet business analyst. Generate 3-5 concise, actionable insights for a vehicle rental operator in Thailand based on their financial data. Return JSON only, shaped {"insights": [...]}: an array of objects with fields: title (short), insight (1-2 sentences), action (specific next step). Focus on profitability improvement, cost reduction, and revenue growth. Use plain everyday words, no jargon. Write every title, insight and action in ${language}.`
         },
         {
           role: "user",

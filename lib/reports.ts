@@ -12,6 +12,8 @@ export interface DateRange {
 }
 
 export interface MonthlyDataPoint {
+  /** "2026-09": lets the page name the month in the reader's language. */
+  key?: string;
   label: string;
   revenue: number;
   expenses: number;
@@ -311,7 +313,7 @@ function buildMonthlyData(transactions: any[], from: string, to: string): Monthl
     }
   }
 
-  return months.map(({ key, ...m }) => ({ ...m, profit: m.revenue - m.expenses }));
+  return months.map((m) => ({ ...m, profit: m.revenue - m.expenses }));
 }
 
 /** null when the previous period was zero: "+100%" from nothing is meaningless. */

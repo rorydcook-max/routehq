@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/app-shell";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDefaultOrganization } from "@/lib/organization";
@@ -21,15 +22,17 @@ export default async function VehicleReportPage({
   const [userEmail, organization] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization()]);
   const data = await getVehicleReportData(organization.id, vehicleId, preset, customFrom, customTo);
 
+  const say = (await getTranslations("reportsPage")) as unknown as (key: string) => string;
+  const name = [data.vehicle.make, data.vehicle.model].filter(Boolean).join(" ");
+
   return (
     <AppShell userEmail={userEmail}>
-      <div className="page-hero mb-5">
-        <Link className="text-sm font-semibold text-[var(--primary)] hover:underline" href="/reports">
-          Reports
+      <div className="page-hero mb-4">
+        <Link className="font-bold text-[var(--primary)]" href="/reports">
+          {say("vr_back")}
         </Link>
-        <p className="page-eyebrow mt-1">Vehicle</p>
-        <h1 className="page-title">{data.vehicle.label}</h1>
-        <p className="page-subtitle page-subtitle-keep mt-2">{data.vehicle.plate} &mdash; per-vehicle financial overview</p>
+        <h1 className="page-title mt-2">{data.vehicle.plate || data.vehicle.label}</h1>
+        {name ? <p className="page-subtitle page-subtitle-keep mt-1">{name}</p> : null}
       </div>
       <VehicleReportView data={data} />
     </AppShell>

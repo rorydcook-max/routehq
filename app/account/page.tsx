@@ -1,17 +1,18 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { updatePreferredLocale } from "@/app/actions/settings";
 import { AppShell } from "@/components/app-shell";
 import { PendingButton } from "@/components/pending-button";
 import { PushToggle } from "@/components/push-toggle";
-import { Card, SectionHeader } from "@/components/ui";
 import { getCurrentMembership } from "@/lib/auth/roles";
-import { APP_ROLES } from "@/lib/auth/role-types";
 import { defaultCalendarForLocale, supportedCalendarOptions } from "@/lib/i18n/calendars";
 import { supportedLocaleOptions } from "@/lib/i18n/locales";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-const inputClass =
-  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2.5 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]";
+type Say = (key: string, values?: Record<string, string | number>) => string;
+
+const labelClass = "font-semibold text-[var(--foreground-secondary)]";
+const inputClass = "mt-1 w-full";
 
 /**
  * Personal settings for whoever is signed in, whatever their role. Nothing on
@@ -24,6 +25,7 @@ export default async function AccountPage() {
     redirect("/login");
   }
 
+  const say = (await getTranslations("accountPage")) as unknown as Say;
   const supabase = (await createSupabaseServerClient()) as any;
   const [{ data: profile }, { data: organization }] = await Promise.all([
     supabase.from("users").select("full_name, preferred_locale, preferred_calendar").eq("id", membership.userId).maybeSingle(),
@@ -31,83 +33,73 @@ export default async function AccountPage() {
   ]);
 
   const locale = profile?.preferred_locale || organization?.default_locale || "en";
-  const roleLabel = APP_ROLES.find((role) => role.value === membership.role)?.label || "Teammate";
+  const roleLabel = membership.role === "owner" ? say("roleOwner") : say("roleTeammate");
 
   return (
     <AppShell userEmail={membership.email}>
-      <div className="page-hero mb-5">
-        <p className="page-eyebrow">My account</p>
+      <div className="page-hero mb-4">
         <h1 className="page-title">{profile?.full_name || membership.email}</h1>
-        <p className="page-subtitle mt-2">
-          {roleLabel} at {organization?.name || "your business"}
+        <p className="page-subtitle page-subtitle-keep mt-1">
+          {organization?.name ? say("roleAt", { role: roleLabel, business: organization.name }) : roleLabel}
         </p>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <SectionHeader eyebrow="Language" title="Language and dates" />
-          <div className="card-section">
-            <p className="text-xs text-[var(--muted)]">
-              Only affects what you see. Other people in your business keep their own settings.
-            </p>
-            {/* Keyed by the saved values so the form shows them after a save (React resets forms to their first defaults). */}
-            <form action={updatePreferredLocale} className="mt-3 space-y-3" key={`${locale}-${profile?.preferred_calendar || ""}`}>
-              <label className="block">
-                <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Language</span>
-                <select className={inputClass} defaultValue={locale} name="preferredLocale">
-                  {supportedLocaleOptions.map((option) => (
-                    <option key={option.code} value={option.code}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="block">
-                <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Calendar</span>
-                <select
-                  className={inputClass}
-                  defaultValue={profile?.preferred_calendar || defaultCalendarForLocale(locale)}
-                  name="preferredCalendar"
-                >
-                  {supportedCalendarOptions.map((calendar) => (
-                    <option key={calendar.code} value={calendar.code}>
-                      {calendar.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <PendingButton className="primary-action w-full" pendingLabel="Saving..." savedLabel="Saved" type="submit">
-                Save
-              </PendingButton>
-            </form>
-          </div>
-        </Card>
+        <section className="card p-4">
+          <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("languageTitle")}</h2>
+          <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("languageBody")}</p>
+          {/* Keyed by the saved values so the form shows them after a save (React resets forms to their first defaults). */}
+          <form action={updatePreferredLocale} className="mt-3 space-y-3" key={`${locale}-${profile?.preferred_calendar || ""}`}>
+            <label className="block">
+              <span className={labelClass}>{say("language")}</span>
+              <select className={inputClass} defaultValue={locale} name="preferredLocale">
+                {supportedLocaleOptions.map((option) => (
+                  <option key={option.code} value={option.code}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="block">
+              <span className={labelClass}>{say("calendar")}</span>
+              <select className={inputClass} defaultValue={profile?.preferred_calendar || defaultCalendarForLocale(locale)} name="preferredCalendar">
+                {supportedCalendarOptions.map((calendar) => (
+                  <option key={calendar.code} value={calendar.code}>
+                    {say(`calendar_${calendar.code}`)}
+                  </option>
+                ))}
+              </select>
+              <span className="mt-1 block font-medium text-[var(--foreground-secondary)]">{say("calendarHelp")}</span>
+            </label>
+            <PendingButton className="primary-action w-full" pendingLabel={say("saving")} savedLabel={say("saved")} type="submit">
+              {say("save")}
+            </PendingButton>
+          </form>
+        </section>
 
-        <Card>
-          <SectionHeader eyebrow="Alerts" title="Alerts on this device" />
-          <div className="card-section">
+        <section className="card p-4">
+          <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("alertsTitle")}</h2>
+          <div className="mt-2">
             <PushToggle />
           </div>
-        </Card>
+        </section>
 
-        <Card>
-          <SectionHeader eyebrow="Sign-in" title="Account details" />
-          <div className="card-section space-y-2 text-sm">
-            <p>
-              <span className="text-[var(--muted)]">Email: </span>
-              {membership.email}
-            </p>
-            <p>
-              <span className="text-[var(--muted)]">Role: </span>
-              {roleLabel}
-            </p>
-            <p className="pt-1">
-              <a className="font-semibold text-[var(--primary)]" href="/forgot-password">
-                Change password
-              </a>
-            </p>
+        <section className="card p-4">
+          <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("signInTitle")}</h2>
+          <div className="mt-3 space-y-2">
+            <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5">
+              <p className="font-medium text-[var(--foreground-secondary)]">{say("email")}</p>
+              <p className="break-all text-[16px] font-bold text-[var(--foreground)]">{membership.email}</p>
+            </div>
+            <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5">
+              <p className="font-medium text-[var(--foreground-secondary)]">{say("role")}</p>
+              <p className="text-[16px] font-bold text-[var(--foreground)]">{roleLabel}</p>
+            </div>
           </div>
-        </Card>
+          <a className="secondary-action mt-3 w-full" href="/forgot-password">
+            {say("changePassword")}
+          </a>
+        </section>
       </div>
     </AppShell>
   );

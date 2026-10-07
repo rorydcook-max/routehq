@@ -1,19 +1,14 @@
 "use client";
 
-import { niceDate } from "@/lib/nice-date";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Bar,
   BarChart,
   CartesianGrid,
-  Cell,
-  ComposedChart,
   Legend,
-  Line,
-  Pie,
-  PieChart,
   PolarAngleAxis,
   PolarGrid,
   PolarRadiusAxis,
@@ -24,367 +19,225 @@ import {
   XAxis,
   YAxis
 } from "recharts";
-import {
-  ArrowDownRight,
-  ArrowUpRight,
-  ChevronDown,
-  ChevronRight,
-  Download,
-  Lightbulb,
-  Loader2,
-  Minus,
-  TrendingUp
-} from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, Check, ChevronDown, ChevronRight, Download, Lightbulb, Loader2 } from "lucide-react";
+import { intlLocale, longDate } from "@/lib/i18n/dates";
 import type { DatePreset, ReportsData, VehicleMetrics } from "@/lib/reports";
 
-const PRESETS: Array<{ value: DatePreset; label: string }> = [
-  { value: "this_month", label: "This month" },
-  { value: "last_month", label: "Last month" },
-  { value: "last_3_months", label: "Last 3 months" },
-  { value: "last_6_months", label: "Last 6 months" },
-  { value: "this_year", label: "This year" },
-  { value: "last_year", label: "Last year" },
-  { value: "custom", label: "Custom" }
-];
+type Say = (key: string, values?: Record<string, string | number>) => string;
 
+const PRESETS: DatePreset[] = ["this_month", "last_month", "last_3_months", "last_6_months", "this_year", "last_year", "custom"];
 const CHART_COLORS = ["#24456b", "#2f6b45", "#b8742a", "#a04b36", "#6b4c8a", "#5b7f9e", "#8a9a5b", "#b07fa0"];
+const BAHT = "฿";
 
-function money(value: number) {
-  return new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB", maximumFractionDigits: 0 }).format(value);
+export function money(value: number) {
+  const rounded = Math.round(Number(value) || 0);
+  return `${rounded < 0 ? "-" : ""}${BAHT}${Math.abs(rounded).toLocaleString("en-US")}`;
 }
 
-/** "2026-10-01" -> "1 Oct 2026". */
-function plainDate(iso: string) {
-  const date = new Date(`${String(iso).slice(0, 10)}T00:00:00Z`);
-  if (Number.isNaN(date.getTime())) return iso;
-  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(date);
-}
+const h2 = "text-[17px] font-bold text-[var(--foreground)]";
+const soft = "font-medium text-[var(--foreground-secondary)]";
+const tile = "rounded-xl bg-[var(--panel-secondary)] p-3.5";
 
-function pct(value: number) {
-  return `${value >= 0 ? "+" : ""}${value.toFixed(1)}%`;
-}
-
-// ── KPI Card ──────────────────────────────────────────────────────────────────
-
-/**
- * `change` is the % change against the previous period; null when there is
- * nothing to compare with (the previous period was zero), and `sub` then
- * describes the figure instead. `upIsBad` flips the colours for costs.
- */
-function KpiCard({ label, value, change, sub, upIsBad = false }: { label: string; value: string; change: number | null; sub?: string; upIsBad?: boolean }) {
-  if (change === null || !Number.isFinite(change) || change <= -99.95) {
-    return (
-      <div className="content-section">
-        <p className="text-[12px] text-[var(--muted)]">{label}</p>
-        <p className="mt-1 text-2xl font-semibold text-[var(--foreground)]">{value}</p>
-        <p className="mt-1 text-xs text-[var(--muted)]">{sub || (change !== null && change <= -99.95 ? "Nothing recorded yet this period" : "Nothing to compare with last period")}</p>
-      </div>
-    );
-  }
-  const isUp = change > 0;
-  const isFlat = Math.abs(change) < 0.1;
-  const good = upIsBad ? !isUp : isUp;
+/** How a figure moved against the period before. Nothing shown when there is nothing to compare with. */
+function Change({ change, upIsBad = false, say }: { change: number | null; upIsBad?: boolean; say: Say }) {
+  if (change === null || !Number.isFinite(change) || change <= -99.95) return null;
+  if (Math.abs(change) < 0.1) return <p className={soft}>{say("sameAsBefore")}</p>;
+  const up = change > 0;
+  const good = upIsBad ? !up : up;
   return (
-    <div className="content-section">
-      <p className="text-[12px] text-[var(--muted)]">{label}</p>
-      <p className="mt-1 text-2xl font-semibold text-[var(--foreground)]">{value}</p>
-      <div className="mt-1 flex items-center gap-1">
-        {isFlat ? (
-          <Minus size={14} className="text-[var(--muted)]" />
-        ) : isUp ? (
-          <ArrowUpRight size={14} className={good ? "text-[var(--success)]" : "text-[var(--danger)]"} />
-        ) : (
-          <ArrowDownRight size={14} className={good ? "text-[var(--success)]" : "text-[var(--danger)]"} />
-        )}
-        <span className={`text-xs font-semibold ${isFlat ? "text-[var(--muted)]" : good ? "text-[var(--success)]" : "text-[var(--danger)]"}`}>
-          {isFlat ? "No change" : pct(change)}
-        </span>
-        <span className="text-xs text-[var(--muted)]">vs prev. period</span>
-      </div>
-    </div>
+    <p className={`flex items-center gap-1 font-semibold ${good ? "text-[var(--success)]" : "text-[var(--warning)]"}`}>
+      {up ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
+      {say(up ? "upOnBefore" : "downOnBefore", { percent: Math.abs(change).toFixed(0) })}
+    </p>
   );
 }
 
-function DepositsCard({ data }: { data: ReportsData["depositSummary"] }) {
-  const rows = [
-    { label: "Holding now", value: money(data.totalDepositsCurrentlyHeld), valueClass: "text-[var(--warning)]" },
-    { label: "Taken in", value: money(data.totalDepositsReceivedInPeriod), valueClass: "text-[var(--foreground)]" },
-    { label: "Given back", value: money(data.totalDepositsReturnedInPeriod), valueClass: "text-[var(--foreground)]" },
-    { label: "Kept for damage or unpaid rent", value: money(data.totalDepositsForfeitedInPeriod), valueClass: "text-[var(--primary)]" }
-  ];
-
+/** Where money came from or went: one bar per kind, biggest first. */
+export function Breakdown({ title, rows, typeLabel, say }: { title: string; rows: Array<{ type: string; label: string; amount: number }>; typeLabel: (type: string, fallback: string) => string; say: Say }) {
+  const total = rows.reduce((sum, row) => sum + row.amount, 0);
   return (
-    <div className="content-section border-[var(--warning-line)] bg-[var(--warning-light)]/50">
-      <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--warning)]">Deposits</p>
-          <p className="mt-1 text-sm text-[var(--foreground-secondary)]">Customers' money you are holding until their rental ends.</p>
+    <section className="card p-4">
+      <h2 className={h2}>{title}</h2>
+      {rows.length === 0 ? (
+        <p className={`mt-1 ${soft}`}>{say("nothingRecorded")}</p>
+      ) : (
+        <div className="mt-3 space-y-3">
+          {rows.map((row, index) => (
+            <div key={row.type}>
+              <div className="flex items-baseline justify-between gap-3">
+                <span className="font-semibold text-[var(--foreground)]">{typeLabel(row.type, row.label)}</span>
+                <span className="whitespace-nowrap font-bold text-[var(--foreground)]">
+                  {money(row.amount)}
+                  {total > 0 ? <span className={`ml-2 ${soft}`}>{Math.round((row.amount / total) * 100)}%</span> : null}
+                </span>
+              </div>
+              <div className="mt-1 h-2 overflow-hidden rounded-full bg-[var(--panel-secondary)]">
+                <div className="h-full rounded-full" style={{ width: `${total > 0 ? Math.max(2, (row.amount / total) * 100) : 0}%`, background: CHART_COLORS[index % CHART_COLORS.length] }} />
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
-
-      <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {rows.map((row) => (
-          <div key={row.label} className="rounded-xl border border-[var(--warning-line)] bg-white/80 p-3">
-            <p className="text-xs font-semibold text-[var(--muted)]">{row.label}</p>
-            <p className={`mt-1 text-lg font-semibold ${row.valueClass}`}>{row.value}</p>
-          </div>
-        ))}
-      </div>
-
-      <p className="mt-3 rounded-lg border border-[var(--warning-line)] bg-white/70 px-3 py-2 text-xs text-[var(--foreground-secondary)]">
-        Deposits are not counted as income. Only the part you keep is.
-      </p>
-    </div>
+      )}
+    </section>
   );
 }
 
-// ── Donut Chart ───────────────────────────────────────────────────────────────
-
-function DonutChart({ title, data }: { title: string; data: Array<{ label: string; amount: number }> }) {
-  const [active, setActive] = useState<number | null>(null);
-  const total = data.reduce((s, d) => s + d.amount, 0);
-  if (data.length === 0) {
-    return (
-      <div className="content-section">
-        <p className="text-sm font-bold text-[var(--foreground)]">{title}</p>
-        <p className="mt-6 text-center text-sm text-[var(--muted)]">No data</p>
-      </div>
-    );
-  }
+/** Month by month as plain rows: readable on a phone, where a wide chart had to be scrolled sideways. Quiet months are left out. */
+export function MonthRows({ months, say }: { months: Array<{ label: string; revenue: number; expenses: number; profit: number }>; say: Say }) {
+  const busy = months.filter((month) => month.revenue !== 0 || month.expenses !== 0);
+  const biggest = Math.max(1, ...busy.map((month) => Math.max(month.revenue, month.expenses)));
+  if (busy.length < 2) return null;
   return (
-    <div className="content-section">
-      <p className="text-sm font-bold text-[var(--foreground)]">{title}</p>
-      <div className="mt-3 h-44">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={data}
-              dataKey="amount"
-              nameKey="label"
-              innerRadius="55%"
-              outerRadius="80%"
-              paddingAngle={2}
-              onMouseEnter={(_, index) => setActive(index)}
-              onMouseLeave={() => setActive(null)}
-            >
-              {data.map((entry, index) => (
-                <Cell
-                  key={entry.label}
-                  fill={CHART_COLORS[index % CHART_COLORS.length]}
-                  opacity={active === null || active === index ? 1 : 0.4}
-                />
-              ))}
-            </Pie>
-            <Tooltip formatter={(value) => money(Number(value))} />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
-      <div className="mt-2 space-y-1">
-        {data.map((entry, index) => (
-          <div className="flex items-center justify-between text-xs" key={entry.label}>
-            <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full" style={{ background: CHART_COLORS[index % CHART_COLORS.length] }} />
-              <span className="text-[var(--foreground-secondary)]">{entry.label}</span>
+    <section className="card p-4">
+      <h2 className={h2}>{say("monthsTitle")}</h2>
+      <div className="mt-3 space-y-2">
+        {busy.map((month) => (
+          <div className={tile} key={month.label}>
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="text-[16px] font-bold text-[var(--foreground)]">{month.label}</span>
+              <span className={`whitespace-nowrap font-bold ${month.profit >= 0 ? "text-[var(--success)]" : "text-[var(--warning)]"}`}>
+                {say("monthProfit", { amount: money(month.profit) })}
+              </span>
             </div>
-            <div className="text-right">
-              <span className="font-semibold text-[var(--foreground)]">{money(entry.amount)}</span>
-              <span className="ml-1 text-[var(--muted)]">{total > 0 ? `${((entry.amount / total) * 100).toFixed(0)}%` : ""}</span>
+            <div className="mt-2 flex items-center gap-2">
+              <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-white">
+                <div className="h-full rounded-full bg-[var(--primary)]" style={{ width: `${(month.revenue / biggest) * 100}%` }} />
+              </div>
+              <span className={`w-28 shrink-0 text-right ${soft}`}>{say("monthIn", { amount: money(month.revenue) })}</span>
+            </div>
+            <div className="mt-1 flex items-center gap-2">
+              <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-white">
+                <div className="h-full rounded-full bg-[#d99a86]" style={{ width: `${(month.expenses / biggest) * 100}%` }} />
+              </div>
+              <span className={`w-28 shrink-0 text-right ${soft}`}>{say("monthOut", { amount: money(month.expenses) })}</span>
             </div>
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 }
-
-// ── Vehicle Row (expandable) ──────────────────────────────────────────────────
 
 type SortKey = "profit" | "income" | "expenses" | "utilization" | "roi" | "rentals";
+const SORTS: SortKey[] = ["profit", "income", "expenses", "utilization", "rentals", "roi"];
 
-function VehicleTableRow({
-  vehicle,
-  isCompareMode,
-  isSelected,
-  onToggleSelect,
-  sortKey
-}: {
-  vehicle: VehicleMetrics;
-  isCompareMode: boolean;
-  isSelected: boolean;
-  onToggleSelect: (id: string) => void;
-  sortKey: SortKey;
-}) {
-  const [expanded, setExpanded] = useState(false);
-
+function Fact({ label, value }: { label: string; value: string }) {
   return (
-    <>
-      <tr className="border-b border-[var(--border)] last:border-0 hover:bg-[var(--panel-secondary)]/40 transition-colors">
-        {isCompareMode ? (
-          <td className="py-3 pl-3 pr-2">
-            <input
-              aria-label={`Compare ${vehicle.make} ${vehicle.model}`}
-              className="flex-shrink-0"
-              type="checkbox"
-              checked={isSelected}
-              onChange={() => onToggleSelect(vehicle.id)}
-            />
-          </td>
-        ) : null}
-        <td className="py-3 pr-3">
-          <button
-            className="flex items-center gap-1 text-left"
-            onClick={() => setExpanded((e) => !e)}
-            type="button"
-          >
-            {expanded ? <ChevronDown size={14} className="shrink-0 text-[var(--muted)]" /> : <ChevronRight size={14} className="shrink-0 text-[var(--muted)]" />}
-            <div>
-              <p className="font-semibold text-[var(--foreground)]">{vehicle.plate || vehicle.label}</p>
-              <p className="text-xs text-[var(--muted)]">
-                {vehicle.make} {vehicle.model}
-              </p>
-            </div>
-          </button>
-        </td>
-        <td className="px-3 py-3 text-right font-semibold text-[var(--success)]">{money(vehicle.income)}</td>
-        <td className="px-3 py-3 text-right text-[var(--foreground-secondary)]">{money(vehicle.expenses)}</td>
-        <td className={`px-3 py-3 text-right font-semibold ${vehicle.profit >= 0 ? "text-[var(--success)]" : "text-[var(--danger)]"}`}>{money(vehicle.profit)}</td>
-        <td className="px-3 py-3 text-right text-[var(--foreground-secondary)]">{vehicle.rentalCount}</td>
-        <td className="px-3 py-3 text-right text-[var(--foreground-secondary)]">{vehicle.utilizationRate.toFixed(0)}%</td>
-        <td className="px-3 py-3 text-right text-[var(--foreground-secondary)]">{money(vehicle.avgDailyRate)}/d</td>
-        <td className={`px-3 py-3 text-right font-semibold ${vehicle.roi >= 0 ? "text-[var(--primary)]" : "text-[var(--danger)]"}`}>{vehicle.roi.toFixed(1)}%</td>
-        <td className="px-3 py-3 text-right">
-          <Link href={`/reports/vehicle/${vehicle.id}` as any} className="text-xs font-semibold text-[var(--primary)] hover:underline">
-            Details
-          </Link>
-        </td>
-      </tr>
-      {expanded ? (
-        <tr className="border-b border-[var(--border)] bg-[var(--panel-secondary)]/40">
-          <td colSpan={isCompareMode ? 10 : 9} className="px-6 py-4">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[var(--muted)]">Where the money went</p>
-                {vehicle.expenseBreakdown.length === 0 ? (
-                  <p className="text-sm text-[var(--muted)]">No expenses recorded</p>
-                ) : (
-                  <div className="space-y-1">
-                    {vehicle.expenseBreakdown.map((exp) => (
-                      <div className="flex items-center justify-between text-sm" key={exp.type}>
-                        <span className="text-[var(--foreground-secondary)]">{exp.label}</span>
-                        <span className="font-semibold text-[var(--foreground)]">{money(exp.amount)}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <div>
-                <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[var(--muted)]">At a glance</p>
-                <div className="space-y-1 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-[var(--foreground-secondary)]">Rentals in period</span>
-                    <span className="font-semibold">{vehicle.rentalCount}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[var(--foreground-secondary)]">Average price per day</span>
-                    <span className="font-semibold">{money(vehicle.avgDailyRate)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[var(--foreground-secondary)]">Transactions</span>
-                    <span className="font-semibold">{vehicle.transactionCount}</span>
-                  </div>
-                  {vehicle.purchasePrice > 0 ? (
-                    <div className="flex justify-between">
-                      <span className="text-[var(--foreground-secondary)]">Purchase price</span>
-                      <span className="font-semibold">{money(vehicle.purchasePrice)}</span>
-                    </div>
-                  ) : null}
-                </div>
-              </div>
-            </div>
-          </td>
-        </tr>
-      ) : null}
-    </>
+    <div className="flex items-baseline justify-between gap-3">
+      <span className={soft}>{label}</span>
+      <span className="whitespace-nowrap font-bold text-[var(--foreground)]">{value}</span>
+    </div>
   );
 }
 
-// ── Comparison Panel ──────────────────────────────────────────────────────────
+function VehicleRow({ vehicle, comparing, selected, onSelect, typeLabel, say }: { vehicle: VehicleMetrics; comparing: boolean; selected: boolean; onSelect: (id: string) => void; typeLabel: (type: string, fallback: string) => string; say: Say }) {
+  const [open, setOpen] = useState(false);
+  const name = [vehicle.make, vehicle.model].filter(Boolean).join(" ");
+  return (
+    <div className={`${tile} ${comparing && selected ? "outline outline-2 outline-[var(--primary)]" : ""}`}>
+      <button aria-expanded={comparing ? undefined : open} aria-pressed={comparing ? selected : undefined} className="pressable flex w-full items-center gap-3 text-left" onClick={() => (comparing ? onSelect(vehicle.id) : setOpen((value) => !value))} type="button">
+        {comparing ? (
+          <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 ${selected ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border-strong,var(--border))] bg-white"}`}>
+            {selected ? <Check size={16} /> : null}
+          </span>
+        ) : open ? (
+          <ChevronDown className="shrink-0 text-[var(--primary)]" size={20} />
+        ) : (
+          <ChevronRight className="shrink-0 text-[var(--primary)]" size={20} />
+        )}
+        <span className="min-w-0 flex-1">
+          <span className="block text-[16px] font-bold text-[var(--foreground)]">{vehicle.plate || vehicle.label}</span>
+          <span className={`block ${soft}`}>{name || vehicle.label}</span>
+          <span className={`block ${soft}`}>{say("vehicleLine", { percent: Math.round(vehicle.utilizationRate), count: vehicle.rentalCount })}</span>
+        </span>
+        <span className="shrink-0 text-right">
+          <span className={`block text-[17px] font-bold ${vehicle.profit >= 0 ? "text-[var(--success)]" : "text-[var(--warning)]"}`}>{money(vehicle.profit)}</span>
+          <span className={`block ${soft}`}>{say("profit")}</span>
+        </span>
+      </button>
+      {open && !comparing ? (
+        <div className="mt-3 space-y-2 border-t border-[var(--border)] pt-3">
+          <Fact label={say("moneyIn")} value={money(vehicle.income)} />
+          <Fact label={say("moneyOut")} value={money(vehicle.expenses)} />
+          {vehicle.expenseBreakdown.map((expense) => (
+            <div className="flex items-baseline justify-between gap-3 pl-4" key={expense.type}>
+              <span className={soft}>{typeLabel(expense.type, expense.label)}</span>
+              <span className="whitespace-nowrap font-semibold text-[var(--foreground-secondary)]">{money(expense.amount)}</span>
+            </div>
+          ))}
+          <Fact label={say("avgPerDay")} value={money(vehicle.avgDailyRate)} />
+          {vehicle.purchasePrice > 0 ? (
+            <>
+              <Fact label={say("boughtFor")} value={money(vehicle.purchasePrice)} />
+              <Fact label={say("earnedBack")} value={`${vehicle.roi.toFixed(1)}%`} />
+            </>
+          ) : null}
+          <Link className="secondary-action pressable !mt-3 w-full" href={`/reports/vehicle/${vehicle.id}` as any}>
+            {say("fullReport")}
+          </Link>
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
-function ComparisonPanel({ vehicles }: { vehicles: VehicleMetrics[] }) {
-  const barData = vehicles.map((v) => ({
-    name: v.plate || v.label.split(" ")[0],
-    "Money in": v.income,
-    "Money out": v.expenses,
-    Profit: Math.max(0, v.profit)
-  }));
-
-  const maxRevenue = Math.max(...vehicles.map((v) => v.income), 1);
+function ComparisonPanel({ vehicles, say }: { vehicles: VehicleMetrics[]; say: Say }) {
+  const nameOf = (vehicle: VehicleMetrics) => vehicle.plate || vehicle.label.split(" ")[0];
+  const inKey = say("moneyIn");
+  const outKey = say("moneyOut");
+  const profitKey = say("profit");
+  const barData = vehicles.map((vehicle) => ({ name: nameOf(vehicle), [inKey]: vehicle.income, [outKey]: vehicle.expenses, [profitKey]: Math.max(0, vehicle.profit) }));
+  const maxIncome = Math.max(...vehicles.map((vehicle) => vehicle.income), 1);
+  const radarRow = (metric: string, value: (vehicle: VehicleMetrics) => number) => ({ metric, ...Object.fromEntries(vehicles.map((vehicle) => [nameOf(vehicle), Math.max(0, Math.min(100, Math.round(value(vehicle))))])) });
   const radarData = [
-    { metric: "Money in", ...Object.fromEntries(vehicles.map((v) => [v.plate || v.label.split(" ")[0], Math.round((v.income / maxRevenue) * 100)])) },
-    { metric: "Time rented", ...Object.fromEntries(vehicles.map((v) => [v.plate || v.label.split(" ")[0], Math.round(v.utilizationRate)])) },
-    { metric: "Return on cost", ...Object.fromEntries(vehicles.map((v) => [v.plate || v.label.split(" ")[0], Math.max(0, Math.min(100, v.roi))])) },
-    {
-      metric: "Margin",
-      ...Object.fromEntries(vehicles.map((v) => [v.plate || v.label.split(" ")[0], v.income > 0 ? Math.round((v.profit / v.income) * 100) : 0]))
-    }
+    radarRow(inKey, (vehicle) => (vehicle.income / maxIncome) * 100),
+    radarRow(say("timeRented"), (vehicle) => vehicle.utilizationRate),
+    radarRow(say("earnedBackShort"), (vehicle) => vehicle.roi),
+    radarRow(say("keptOfIncome"), (vehicle) => (vehicle.income > 0 ? (vehicle.profit / vehicle.income) * 100 : 0))
   ];
 
   return (
-    <div className="mt-4 content-section space-y-6">
-      <p className="text-sm font-bold text-[var(--foreground)]">Vehicle Comparison — {vehicles.map((v) => v.plate || v.make).join(" vs ")}</p>
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div>
-          <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[var(--muted)]">Money in, money out, profit</p>
-          <div className="overflow-x-auto">
-            <div className="min-w-[300px] h-52">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={barData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#dce3eb" />
-                  <XAxis dataKey="name" tick={{ fontSize: 11 }} />
-                  <YAxis tickFormatter={(v) => `฿${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} />
-                  <Tooltip formatter={(v) => money(Number(v))} />
-                  <Legend />
-                  <Bar dataKey="Money in" fill="#24456b" radius={[2, 2, 0, 0]} />
-                  <Bar dataKey="Money out" fill="#a04b36" radius={[2, 2, 0, 0]} />
-                  <Bar dataKey="Profit" fill="#2f6b45" radius={[2, 2, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+    <div className="mt-4 space-y-4">
+      <div>
+        <p className="font-bold text-[var(--foreground)]">{say("compareMoney")}</p>
+        <div className="mt-2 h-56">
+          <ResponsiveContainer height="100%" width="100%">
+            <BarChart data={barData}>
+              <CartesianGrid stroke="#dce3eb" strokeDasharray="3 3" />
+              <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+              <YAxis tick={{ fontSize: 12 }} tickFormatter={(value) => `${BAHT}${(value / 1000).toFixed(0)}k`} width={48} />
+              <Tooltip formatter={(value) => money(Number(value))} />
+              <Legend />
+              <Bar isAnimationActive={false} dataKey={inKey} fill="#24456b" radius={[2, 2, 0, 0]} />
+              <Bar isAnimationActive={false} dataKey={outKey} fill="#ebc8bc" radius={[2, 2, 0, 0]} />
+              <Bar isAnimationActive={false} dataKey={profitKey} fill="#2f6b45" radius={[2, 2, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
-        <div>
-          <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[var(--muted)]">Compared side by side</p>
-          <div className="h-52">
-            <ResponsiveContainer width="100%" height="100%">
-              <RadarChart data={radarData}>
-                <PolarGrid />
-                <PolarAngleAxis dataKey="metric" tick={{ fontSize: 11 }} />
-                <PolarRadiusAxis domain={[0, 100]} tick={false} />
-                {vehicles.map((v, i) => (
-                  <Radar
-                    key={v.id}
-                    name={v.plate || v.make}
-                    dataKey={v.plate || v.label.split(" ")[0]}
-                    stroke={CHART_COLORS[i % CHART_COLORS.length]}
-                    fill={CHART_COLORS[i % CHART_COLORS.length]}
-                    fillOpacity={0.15}
-                  />
-                ))}
-                <Legend />
-              </RadarChart>
-            </ResponsiveContainer>
-          </div>
+      </div>
+      <div>
+        <p className="font-bold text-[var(--foreground)]">{say("compareShape")}</p>
+        <div className="mt-2 h-60">
+          <ResponsiveContainer height="100%" width="100%">
+            <RadarChart data={radarData}>
+              <PolarGrid />
+              <PolarAngleAxis dataKey="metric" tick={{ fontSize: 12 }} />
+              <PolarRadiusAxis domain={[0, 100]} tick={false} />
+              {vehicles.map((vehicle, index) => (
+                <Radar isAnimationActive={false} dataKey={nameOf(vehicle)} fill={CHART_COLORS[index % CHART_COLORS.length]} fillOpacity={0.15} key={vehicle.id} name={nameOf(vehicle)} stroke={CHART_COLORS[index % CHART_COLORS.length]} />
+              ))}
+              <Legend />
+            </RadarChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </div>
   );
 }
-
-// ── AI Insights Panel ─────────────────────────────────────────────────────────
 
 type Insight = { title: string; insight: string; action: string };
 
-function AiInsightsPanel({ data }: { data: ReportsData }) {
+function InsightsPanel({ data, say, locale }: { data: ReportsData; say: Say; locale: string }) {
   const [insights, setInsights] = useState<Insight[]>([]);
   const [loading, setLoading] = useState(false);
   const [fetched, setFetched] = useState(false);
@@ -392,91 +245,78 @@ function AiInsightsPanel({ data }: { data: ReportsData }) {
   const fetchInsights = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/reports/insights", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data })
-      });
-      const json = await res.json();
+      const response = await fetch("/api/reports/insights", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ data, locale }) });
+      const json = await response.json();
       setInsights(json.insights || []);
     } catch {
-      // silently fail
+      setInsights([]);
     } finally {
       setLoading(false);
       setFetched(true);
     }
-  }, [data]);
+  }, [data, locale]);
 
   return (
-    <div className="content-section">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <Lightbulb size={18} className="text-[var(--warning)]" />
-          <p className="text-sm font-bold text-[var(--foreground)]">What stands out</p>
-        </div>
-        {!fetched ? (
-          <button
-            className="rounded-lg bg-[var(--primary)] px-3 py-1.5 text-xs font-bold text-white"
-            onClick={fetchInsights}
-            type="button"
-            disabled={loading}
-          >
-            {loading ? <Loader2 size={14} className="animate-spin" /> : "Generate"}
-          </button>
-        ) : null}
-      </div>
+    <section className="card p-4">
+      <h2 className={`flex items-center gap-2 ${h2}`}>
+        <Lightbulb className="text-[var(--warning)]" size={20} />
+        {say("insightsTitle")}
+      </h2>
       {loading ? (
-        <div className="mt-4 flex items-center gap-2 text-sm text-[var(--muted)]">
-          <Loader2 size={16} className="animate-spin" /> Analysing your fleet data…
-        </div>
+        <p className={`mt-2 flex items-center gap-2 ${soft}`}>
+          <Loader2 className="animate-spin" size={18} /> {say("insightsLoading")}
+        </p>
       ) : insights.length > 0 ? (
-        <div className="mt-4 space-y-3">
-          {insights.map((insight, i) => (
-            <div className="rounded-xl border border-[var(--border)] bg-[var(--warning-light)]/50 p-3" key={i}>
-              <p className="font-semibold text-[var(--foreground)]">{insight.title}</p>
-              <p className="mt-1 text-sm text-[var(--foreground-secondary)]">{insight.insight}</p>
-              <p className="mt-2 text-xs font-semibold text-[var(--primary)]">→ {insight.action}</p>
+        <div className="mt-3 space-y-2">
+          {insights.map((insight, index) => (
+            <div className={tile} key={index}>
+              <p className="text-[16px] font-bold text-[var(--foreground)]">{insight.title}</p>
+              <p className={`mt-1 ${soft}`}>{insight.insight}</p>
+              <p className="mt-2 font-semibold text-[var(--primary)]">{insight.action}</p>
             </div>
           ))}
         </div>
       ) : fetched ? (
-        <p className="mt-4 text-sm text-[var(--muted)]">No insights generated.</p>
+        <p className={`mt-1 ${soft}`}>{say("insightsNone")}</p>
       ) : (
-        <p className="mt-3 text-sm text-[var(--muted)]">Click Generate to get AI-powered insights based on your fleet financial data.</p>
+        <>
+          <p className={`mt-1 ${soft}`}>{say("insightsBody")}</p>
+          <button className="secondary-action pressable mt-3 w-full sm:w-auto" onClick={fetchInsights} type="button">
+            {say("insightsButton")}
+          </button>
+        </>
       )}
-    </div>
+    </section>
   );
 }
 
-// ── Main ReportsView ──────────────────────────────────────────────────────────
-
 export function ReportsView({ data }: { data: ReportsData }) {
+  const say = useTranslations("reportsPage") as unknown as Say;
+  const moneyT = useTranslations("money");
+  const locale = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [sortKey, setSortKey] = useState<SortKey>("profit");
-  const [sortAsc, setSortAsc] = useState(false);
   const [compareMode, setCompareMode] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [showExportMenu, setShowExportMenu] = useState(false);
 
   const preset = data.dateRange.preset;
-  const customFrom = data.dateRange.preset === "custom" ? data.dateRange.from : "";
-  const customTo = data.dateRange.preset === "custom" ? data.dateRange.to : "";
-  const [localFrom, setLocalFrom] = useState(customFrom);
-  const [localTo, setLocalTo] = useState(customTo);
+  const [localFrom, setLocalFrom] = useState(preset === "custom" ? data.dateRange.from : "");
+  const [localTo, setLocalTo] = useState(preset === "custom" ? data.dateRange.to : "");
+  const [customOpen, setCustomOpen] = useState(preset === "custom");
 
-  function setPreset(p: DatePreset) {
-    const params = new URLSearchParams(searchParams.toString());
-    if (p === "custom") {
-      params.set("preset", "custom");
-      if (localFrom) params.set("from", localFrom);
-      if (localTo) params.set("to", localTo);
-    } else {
-      params.set("preset", p);
-      params.delete("from");
-      params.delete("to");
-      params.delete("month");
+  const typeLabel = (type: string, fallback: string) => (moneyT.has(`type_${type}` as never) ? (moneyT as unknown as Say)(`type_${type}`) : fallback);
+
+  function setPreset(next: DatePreset) {
+    if (next === "custom") {
+      setCustomOpen(true);
+      return;
     }
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("preset", next);
+    params.delete("from");
+    params.delete("to");
+    params.delete("month");
     router.push(`/reports?${params.toString()}`);
   }
 
@@ -484,46 +324,22 @@ export function ReportsView({ data }: { data: ReportsData }) {
     if (!localFrom || !localTo) return;
     const params = new URLSearchParams();
     params.set("preset", "custom");
-    params.set("from", localFrom);
-    params.set("to", localTo);
+    params.set("from", localFrom <= localTo ? localFrom : localTo);
+    params.set("to", localFrom <= localTo ? localTo : localFrom);
     router.push(`/reports?${params.toString()}`);
   }
 
-  function toggleSort(key: SortKey) {
-    if (sortKey === key) {
-      setSortAsc((a) => !a);
-    } else {
-      setSortKey(key);
-      setSortAsc(false);
-    }
-  }
-
   function toggleSelect(id: string) {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else if (next.size < 4) {
-        next.add(id);
-      }
+    setSelected((previous) => {
+      const next = new Set(previous);
+      if (next.has(id)) next.delete(id);
+      else if (next.size < 4) next.add(id);
       return next;
     });
   }
 
-  function SortTh({ label, field }: { label: string; field: SortKey }) {
-    const active = sortKey === field;
-    return (
-      <th
-        className="cursor-pointer select-none whitespace-nowrap px-3 py-2 text-right text-xs uppercase text-[var(--muted)] hover:text-[var(--foreground)]"
-        onClick={() => toggleSort(field)}
-      >
-        {label} {active ? (sortAsc ? "↑" : "↓") : ""}
-      </th>
-    );
-  }
-
   const sortedVehicles = [...data.vehicleMetrics].sort((a, b) => {
-    const map: Record<SortKey, number> = {
+    const by: Record<SortKey, number> = {
       profit: b.profit - a.profit,
       income: b.income - a.income,
       expenses: b.expenses - a.expenses,
@@ -531,281 +347,229 @@ export function ReportsView({ data }: { data: ReportsData }) {
       roi: b.roi - a.roi,
       rentals: b.rentalCount - a.rentalCount
     };
-    const diff = map[sortKey];
-    return sortAsc ? -diff : diff;
+    return by[sortKey];
   });
+  const compareVehicles = sortedVehicles.filter((vehicle) => selected.has(vehicle.id));
+  const totalOutstanding = data.outstandingBalances.reduce((sum, balance) => sum + balance.totalBalance, 0);
+  const deposits = data.depositSummary;
 
-  const compareVehicles = sortedVehicles.filter((v) => selected.has(v.id));
-
-  const totalOutstanding = data.outstandingBalances.reduce((s, b) => s + b.totalBalance, 0);
+  const monthFormat = new Intl.DateTimeFormat(intlLocale(locale), { month: "short", year: "numeric", timeZone: "UTC" });
+  const monthly = data.monthlyData.map((month) => {
+    const key = String(month.key || "");
+    const match = key.match(/^(\d{4})-(\d{2})$/);
+    return { ...month, label: match ? monthFormat.format(new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, 1))) : month.label };
+  });
+  const exportHref = (format: string) => `/api/reports/export?format=${format}&preset=${data.dateRange.preset}&from=${data.dateRange.from}&to=${data.dateRange.to}`;
+  const nothingAtAll = data.vehicleMetrics.length === 0 && data.recentTransactions.length === 0;
 
   return (
-    <div className="space-y-4">
-      {/* Date range selector */}
-      <div className="content-section">
-        <div className="flex flex-wrap items-center gap-2">
-          {PRESETS.map((p) => (
-            <button
-              key={p.value}
-              onClick={() => setPreset(p.value)}
-              type="button"
-              className={`pressable min-h-10 rounded-full px-4 font-bold transition ${
-                preset === p.value
-                  ? "bg-[var(--primary)] text-white"
-                  : "bg-[var(--panel-secondary)] text-[var(--foreground)] hover:bg-[var(--panel-tertiary)]"
-              }`}
-            >
-              {p.label}
-            </button>
-          ))}
-          <div className="ml-auto relative">
-            <button
-              onClick={() => setShowExportMenu((v) => !v)}
-              type="button"
-              className="flex items-center gap-1.5 rounded-lg border border-[var(--border)] px-3 py-1.5 text-xs font-semibold text-[var(--foreground-secondary)] hover:border-[var(--primary)] hover:text-[var(--primary)]"
-            >
-              <Download size={14} /> Export
-            </button>
-            {showExportMenu ? (
-              <div className="absolute right-0 top-full z-10 mt-1 rounded-xl border border-[var(--border)] bg-white shadow-lg">
-                <a
-                  href={`/api/reports/export?format=csv&preset=${data.dateRange.preset}&from=${data.dateRange.from}&to=${data.dateRange.to}`}
-                  className="block px-4 py-2.5 text-sm font-semibold hover:bg-[var(--panel-secondary)]"
-                  download
-                  onClick={() => setShowExportMenu(false)}
-                >
-                  Download CSV
-                </a>
-                <a
-                  href={`/api/reports/export?format=pdf&preset=${data.dateRange.preset}&from=${data.dateRange.from}&to=${data.dateRange.to}`}
-                  className="block px-4 py-2.5 text-sm font-semibold hover:bg-[var(--panel-secondary)]"
-                  download
-                  onClick={() => setShowExportMenu(false)}
-                >
-                  Download PDF
-                </a>
-              </div>
-            ) : null}
-          </div>
+    <div className="space-y-3">
+      {/* Which period */}
+      <div>
+        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1" style={{ scrollbarWidth: "none" }}>
+          {PRESETS.map((value) => {
+            const active = value === "custom" ? customOpen : preset === value && !customOpen;
+            return (
+              <button aria-pressed={active} className={`pressable min-h-11 shrink-0 rounded-full px-4 font-bold ${active ? "bg-[var(--primary)] text-white" : "bg-white text-[var(--foreground)]"}`} key={value} onClick={() => setPreset(value)} type="button">
+                {say(`preset_${value}`)}
+              </button>
+            );
+          })}
         </div>
-        {preset === "custom" ? (
-          <div className="mt-3 flex flex-wrap items-end gap-3">
-            <label className="block">
-              <span className="text-xs font-semibold text-[var(--muted)]">From</span>
-              <input
-                type="date"
-                value={localFrom}
-                onChange={(e) => setLocalFrom(e.target.value)}
-                className="mt-1 block rounded-lg border border-[var(--border)] px-3 py-1.5 text-sm"
-              />
-            </label>
-            <label className="block">
-              <span className="text-xs font-semibold text-[var(--muted)]">To</span>
-              <input
-                type="date"
-                value={localTo}
-                onChange={(e) => setLocalTo(e.target.value)}
-                className="mt-1 block rounded-lg border border-[var(--border)] px-3 py-1.5 text-sm"
-              />
-            </label>
-            <button
-              onClick={applyCustomRange}
-              type="button"
-              className="rounded-lg bg-[var(--primary)] px-4 py-1.5 text-sm font-semibold text-white"
-            >
-              Apply
+        {customOpen ? (
+          <div className="card mt-2 p-4">
+            <div className="grid grid-cols-2 gap-3">
+              <label className="block">
+                <span className="font-semibold text-[var(--foreground-secondary)]">{say("from")}</span>
+                <input className="mt-1 w-full" onChange={(event) => setLocalFrom(event.target.value)} type="date" value={localFrom} />
+              </label>
+              <label className="block">
+                <span className="font-semibold text-[var(--foreground-secondary)]">{say("to")}</span>
+                <input className="mt-1 w-full" onChange={(event) => setLocalTo(event.target.value)} type="date" value={localTo} />
+              </label>
+            </div>
+            <button className="primary-action pressable mt-3 w-full" disabled={!localFrom || !localTo} onClick={applyCustomRange} type="button">
+              {say("showDates")}
             </button>
           </div>
         ) : null}
-        <p className="mt-2 text-xs text-[var(--muted)]">
-          {plainDate(data.dateRange.from)} – {plainDate(data.dateRange.to)}
-        </p>
+        <p className={`mt-2 ${soft}`}>{say("range", { from: longDate(data.dateRange.from, locale), to: longDate(data.dateRange.to, locale) })}</p>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-        <KpiCard label="Money in" value={money(data.totalRevenue)} change={data.revenueChange} />
-        <KpiCard label="Money out" value={money(data.totalExpenses)} change={data.expensesChange} upIsBad />
-        <KpiCard label="Profit" value={money(data.netProfit)} change={data.profitChange} />
-        <KpiCard
-          label="Outstanding"
-          value={money(totalOutstanding)}
-          change={null}
-          sub={
-            data.outstandingBalances.length
-              ? `Due now from ${data.outstandingBalances.length} customer${data.outstandingBalances.length === 1 ? "" : "s"}`
-              : "Nothing due right now"
-          }
-        />
-      </div>
-
-      <DepositsCard data={data.depositSummary} />
-
-      {/* Month by month: only when there are at least two months to compare. One month is already in the tiles above, and a single bar drew as a stray block. */}
-      {data.monthlyData.length > 1 ? (
-        <div className="content-section">
-          <div className="mb-3 flex items-center gap-2">
-            <TrendingUp size={16} className="text-[var(--primary)]" />
-            <p className="text-sm font-bold text-[var(--foreground)]">Money in and out, month by month</p>
+      {/* The headline */}
+      <section className="card p-4">
+        <p className={soft}>{say("profit")}</p>
+        <p className={`text-[32px] font-bold leading-tight ${data.netProfit >= 0 ? "text-[var(--foreground)]" : "text-[var(--warning)]"}`}>{money(data.netProfit)}</p>
+        <Change change={data.profitChange} say={say} />
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <div className={tile}>
+            <p className={soft}>{say("moneyIn")}</p>
+            <p className="text-[20px] font-bold text-[var(--foreground)]">{money(data.totalRevenue)}</p>
+            <Change change={data.revenueChange} say={say} />
           </div>
-          <div className="overflow-x-auto">
-            <div className="min-w-[480px] h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={data.monthlyData} margin={{ top: 4, right: 8, bottom: 0, left: 8 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#dce3eb" />
-                  <XAxis dataKey="label" tick={{ fontSize: 11 }} />
-                  <YAxis tickFormatter={(v) => `฿${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} />
-                  <Tooltip formatter={(v) => money(Number(v))} />
-                  <Legend />
-                  <Bar dataKey="revenue" name="Money in" fill="#24456b" maxBarSize={44} radius={[2, 2, 0, 0]} />
-                  <Bar dataKey="expenses" name="Money out" fill="#ebc8bc" maxBarSize={44} radius={[2, 2, 0, 0]} />
-                  <Line type="monotone" dataKey="profit" name="Profit" stroke="#2f6b45" strokeWidth={2} dot={{ r: 3 }} />
-                </ComposedChart>
-              </ResponsiveContainer>
+          <div className={tile}>
+            <p className={soft}>{say("moneyOut")}</p>
+            <p className="text-[20px] font-bold text-[var(--foreground)]">{money(data.totalExpenses)}</p>
+            <Change change={data.expensesChange} say={say} upIsBad />
+          </div>
+        </div>
+        <p className={`mt-3 ${soft}`}>{say("profitNote")}</p>
+      </section>
+
+      {/* Who owes money */}
+      <section className="card p-4">
+        <h2 className={h2}>{say("owedTitle")}</h2>
+        {data.outstandingBalances.length === 0 ? (
+          <p className={`mt-1 ${soft}`}>{say("owedNone")}</p>
+        ) : (
+          <>
+            <p className={`mt-1 ${soft}`}>{say("owedTotal", { amount: money(totalOutstanding), count: data.outstandingBalances.length })}</p>
+            <div className="mt-3 space-y-2">
+              {data.outstandingBalances.map((balance) => (
+                <Link className={`${tile} pressable flex items-center justify-between gap-3`} href={`/customers/${balance.customerId}`} key={balance.customerId}>
+                  <span className="min-w-0">
+                    <span className="block text-[16px] font-bold text-[var(--foreground)]">{balance.customerName}</span>
+                    <span className={`block ${soft}`}>
+                      {say("owedRentals", { count: balance.rentalCount })}
+                      {balance.oldestDue ? ` · ${say("owedSince", { date: longDate(balance.oldestDue, locale) })}` : ""}
+                    </span>
+                  </span>
+                  <span className="flex shrink-0 items-center gap-1 text-[17px] font-bold text-[var(--foreground)]">
+                    {money(balance.totalBalance)}
+                    <ChevronRight className="text-[var(--primary)]" size={18} />
+                  </span>
+                </Link>
+              ))}
             </div>
+          </>
+        )}
+      </section>
+
+      {/* Deposits: held for customers, never income until kept */}
+      <section className="card p-4">
+        <h2 className={h2}>{say("depositsTitle")}</h2>
+        <p className={`mt-1 ${soft}`}>{say("depositsBody")}</p>
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <div className={`${tile} col-span-2`}>
+            <p className={soft}>{say("depositsHolding")}</p>
+            <p className="text-[22px] font-bold text-[var(--foreground)]">{money(deposits.totalDepositsCurrentlyHeld)}</p>
           </div>
+          <div className={tile}>
+            <p className={soft}>{say("depositsTaken")}</p>
+            <p className="text-[17px] font-bold text-[var(--foreground)]">{money(deposits.totalDepositsReceivedInPeriod)}</p>
+          </div>
+          <div className={tile}>
+            <p className={soft}>{say("depositsReturned")}</p>
+            <p className="text-[17px] font-bold text-[var(--foreground)]">{money(deposits.totalDepositsReturnedInPeriod)}</p>
+          </div>
+          <div className={`${tile} col-span-2`}>
+            <p className={soft}>{say("depositsKept")}</p>
+            <p className="text-[17px] font-bold text-[var(--foreground)]">{money(deposits.totalDepositsForfeitedInPeriod)}</p>
+          </div>
+        </div>
+      </section>
+
+      <MonthRows months={monthly} say={say} />
+
+      {data.revenueByType.length > 0 || data.expensesByType.length > 0 ? (
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Breakdown rows={data.revenueByType} say={say} title={say("cameFrom")} typeLabel={typeLabel} />
+          <Breakdown rows={data.expensesByType} say={say} title={say("wentOn")} typeLabel={typeLabel} />
         </div>
       ) : null}
 
-      {/* Donut Charts */}
-      {(data.revenueByType.length > 0 || data.expensesByType.length > 0) ? (
-        <div className="grid gap-4 sm:grid-cols-2">
-          <DonutChart title="Where the money came from" data={data.revenueByType} />
-          <DonutChart title="Where the money went" data={data.expensesByType} />
-        </div>
-      ) : null}
-
-      {/* Fleet Performance Table */}
-      {data.vehicleMetrics.length > 0 ? (
-        <div className="content-section">
-          <div className="mb-3 flex items-center justify-between gap-3">
-            <p className="text-sm font-bold text-[var(--foreground)]">How each vehicle is doing</p>
-            <button
-              onClick={() => {
-                setCompareMode((v) => !v);
-                setSelected(new Set());
-              }}
-              type="button"
-              className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
-                compareMode
-                  ? "bg-[var(--primary)] text-white"
-                  : "border border-[var(--border)] text-[var(--foreground-secondary)]"
-              }`}
-            >
-              {compareMode ? "Exit Compare" : "Compare"}
-            </button>
-          </div>
-          {compareMode ? (
-            <p className="mb-2 text-xs text-[var(--muted)]">Select 2–4 vehicles to compare. {selected.size} selected.</p>
-          ) : null}
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[800px] text-left text-sm">
-              <thead>
-                <tr className="border-b border-[var(--border)]">
-                  {compareMode ? <th className="py-2 pl-3 pr-2 w-8" /> : null}
-                  <th className="py-2 pr-3 text-xs uppercase text-[var(--muted)]">Vehicle</th>
-                  <SortTh label="Money in" field="income" />
-                  <SortTh label="Money out" field="expenses" />
-                  <SortTh label="Profit" field="profit" />
-                  <SortTh label="Rentals" field="rentals" />
-                  <SortTh label="Time rented" field="utilization" />
-                  <th className="px-3 py-2 text-right text-xs uppercase text-[var(--muted)]">Avg per day</th>
-                  <SortTh label="Return on cost" field="roi" />
-                  <th className="px-3 py-2 text-right text-xs uppercase text-[var(--muted)]" />
-                </tr>
-              </thead>
-              <tbody>
-                {sortedVehicles.map((vehicle) => (
-                  <VehicleTableRow
-                    key={vehicle.id}
-                    vehicle={vehicle}
-                    isCompareMode={compareMode}
-                    isSelected={selected.has(vehicle.id)}
-                    onToggleSelect={toggleSelect}
-                    sortKey={sortKey}
-                  />
+      {/* Vehicle by vehicle */}
+      {sortedVehicles.length > 0 ? (
+        <section className="card p-4">
+          <h2 className={h2}>{say("vehiclesTitle")}</h2>
+          <p className={`mt-1 ${soft}`}>{compareMode ? say("compareHelp", { count: selected.size }) : say("vehiclesBody")}</p>
+          <div className="mt-3 flex gap-2">
+            <label className="min-w-0 flex-1">
+              <span className="sr-only">{say("sortBy")}</span>
+              <select aria-label={say("sortBy")} className="w-full" onChange={(event) => setSortKey(event.target.value as SortKey)} value={sortKey}>
+                {SORTS.map((key) => (
+                  <option key={key} value={key}>
+                    {say(`sort_${key}`)}
+                  </option>
                 ))}
-              </tbody>
-            </table>
-          </div>
-          {compareMode && compareVehicles.length >= 2 ? (
-            <ComparisonPanel vehicles={compareVehicles} />
-          ) : null}
-        </div>
-      ) : null}
-
-      {/* Outstanding Balances */}
-      {data.outstandingBalances.length > 0 ? (
-        <div className="content-section">
-          <p className="mb-3 text-sm font-bold text-[var(--foreground)]">Who owes you money</p>
-          <div className="space-y-2">
-            {data.outstandingBalances.map((bal) => (
-              <div
-                key={bal.customerId}
-                className="flex items-center justify-between rounded-xl border border-[var(--border)] px-4 py-3"
+              </select>
+            </label>
+            {sortedVehicles.length > 1 ? (
+              <button
+                aria-pressed={compareMode}
+                className={`pressable min-h-11 shrink-0 rounded-full px-4 font-bold ${compareMode ? "bg-[var(--primary)] text-white" : "bg-[var(--panel-secondary)] text-[var(--primary)]"}`}
+                onClick={() => {
+                  setCompareMode((value) => !value);
+                  setSelected(new Set());
+                }}
+                type="button"
               >
-                <div>
-                  <Link href={`/customers/${bal.customerId}`} className="font-semibold text-[var(--foreground)] hover:underline">
-                    {bal.customerName}
-                  </Link>
-                  <p className="text-xs text-[var(--muted)]">
-                    {bal.rentalCount} rental{bal.rentalCount === 1 ? "" : "s"}
-                    {bal.oldestDue ? ` · due ${niceDate(bal.oldestDue)}` : ""}
-                  </p>
-                </div>
-                <p className="font-semibold text-[var(--danger)]">{money(bal.totalBalance)}</p>
-              </div>
+                {compareMode ? say("compareDone") : say("compare")}
+              </button>
+            ) : null}
+          </div>
+          <div className="mt-3 space-y-2">
+            {sortedVehicles.map((vehicle) => (
+              <VehicleRow comparing={compareMode} key={vehicle.id} onSelect={toggleSelect} say={say} selected={selected.has(vehicle.id)} typeLabel={typeLabel} vehicle={vehicle} />
             ))}
           </div>
-        </div>
+          {compareMode && compareVehicles.length >= 2 ? <ComparisonPanel say={say} vehicles={compareVehicles} /> : null}
+        </section>
       ) : null}
 
-      {/* Recent Transactions */}
+      {/* Latest entries */}
       {data.recentTransactions.length > 0 ? (
-        <div className="content-section">
-          <p className="mb-3 text-sm font-bold text-[var(--foreground)]">Latest money in and out</p>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[480px] text-sm">
-              <thead>
-                <tr className="border-b border-[var(--border)] text-xs uppercase text-[var(--muted)]">
-                  <th className="py-2 pr-3">Date</th>
-                  <th className="px-3 py-2">Type</th>
-                  <th className="px-3 py-2">Vehicle</th>
-                  <th className="px-3 py-2">Customer</th>
-                  <th className="px-3 py-2 text-right">Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.recentTransactions.map((tx) => (
-                  <tr key={tx.id} className="border-b border-[var(--border)] last:border-0">
-                    <td className="whitespace-nowrap py-2.5 pr-3 text-[var(--muted)]">{niceDate(tx.date)}</td>
-                    <td className="px-3 py-2.5 font-semibold text-[var(--foreground)]">{tx.typeLabel}</td>
-                    <td className="px-3 py-2.5 text-[var(--foreground-secondary)]">{tx.vehicleLabel}</td>
-                    <td className="px-3 py-2.5 text-[var(--foreground-secondary)]">{tx.customerName || "—"}</td>
-                    <td className={`px-3 py-2.5 text-right font-bold ${tx.isIncome ? "text-[var(--success)]" : tx.type === "deposit_received" ? "text-[var(--warning)]" : "text-[var(--danger)]"}`}>
-                      {/* A deposit coming in is money received, held for the customer: not a cost. */}
-                        {tx.isIncome || tx.type === "deposit_received" ? "+" : "-"}{money(tx.amount)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <section className="card p-4">
+          <h2 className={h2}>{say("latestTitle")}</h2>
+          <div className="mt-3 space-y-2">
+            {data.recentTransactions.map((entry) => {
+              // A deposit coming in is money received and held for the customer: not income, not a cost.
+              const held = entry.type === "deposit_received";
+              return (
+                <div className={`${tile} flex items-center justify-between gap-3`} key={entry.id}>
+                  <div className="min-w-0">
+                    <p className="text-[16px] font-bold text-[var(--foreground)]">{typeLabel(entry.type, entry.typeLabel)}</p>
+                    <p className={soft}>{[entry.vehicleLabel, entry.customerName].filter(Boolean).join(" · ")}</p>
+                    <p className={soft}>{longDate(entry.date, locale)}</p>
+                  </div>
+                  <p className={`shrink-0 text-[17px] font-bold ${entry.isIncome ? "text-[var(--success)]" : "text-[var(--foreground)]"}`}>
+                    {entry.isIncome || held ? "+" : "-"}
+                    {money(entry.amount)}
+                  </p>
+                </div>
+              );
+            })}
           </div>
-        </div>
-      ) : null}
-
-      {/* AI Insights */}
-      <AiInsightsPanel data={data} />
-
-      {/* Empty state */}
-      {data.vehicleMetrics.length === 0 && data.recentTransactions.length === 0 ? (
-        <div className="content-section py-12 text-center">
-          <p className="text-[var(--muted)]">No transactions recorded for this period.</p>
-          <Link href="/transactions/new" className="mt-3 inline-block text-sm font-semibold text-[var(--primary)] hover:underline">
-            Add a transaction →
+          <Link className="secondary-action pressable mt-3 w-full" href="/transactions">
+            {say("allMoney")}
           </Link>
-        </div>
+        </section>
       ) : null}
+
+      {nothingAtAll ? (
+        <section className="card p-4">
+          <h2 className={h2}>{say("emptyTitle")}</h2>
+          <p className={`mt-1 ${soft}`}>{say("emptyBody")}</p>
+          <Link className="primary-action pressable mt-3 w-full" href="/transactions/new">
+            {say("emptyButton")}
+          </Link>
+        </section>
+      ) : (
+        <InsightsPanel data={data} locale={locale} say={say} />
+      )}
+
+      <section className="card p-4">
+        <h2 className={h2}>{say("exportTitle")}</h2>
+        <p className={`mt-1 ${soft}`}>{say("exportBody")}</p>
+        <div className="mt-3 flex gap-2 [&>*]:flex-1">
+          <a className="secondary-action pressable" download href={exportHref("pdf")}>
+            <Download size={18} /> {say("exportPdf")}
+          </a>
+          <a className="secondary-action pressable" download href={exportHref("csv")}>
+            <Download size={18} /> {say("exportCsv")}
+          </a>
+        </div>
+      </section>
     </div>
   );
 }

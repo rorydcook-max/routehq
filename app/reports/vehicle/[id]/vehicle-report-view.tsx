@@ -1,350 +1,206 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  ComposedChart,
-  Line,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis
-} from "recharts";
-import type { VehicleReportData } from "@/lib/reports";
+import { useLocale, useTranslations } from "next-intl";
+import { ChevronRight } from "lucide-react";
+import { intlLocale, longDate, shortDate } from "@/lib/i18n/dates";
+import type { DatePreset, VehicleReportData } from "@/lib/reports";
+import { Breakdown, MonthRows, money } from "../../reports-view";
 
-const PRESETS = [
-  { value: "this_month", label: "This Month" },
-  { value: "last_month", label: "Last Month" },
-  { value: "last_3_months", label: "3 Months" },
-  { value: "last_6_months", label: "6 Months" },
-  { value: "this_year", label: "This Year" },
-  { value: "last_year", label: "Last Year" }
-];
+type Say = (key: string, values?: Record<string, string | number>) => string;
 
-const CHART_COLORS = ["#24456b", "#2f6b45", "#b8742a", "#a04b36", "#6b4c8a", "#5b7f9e", "#8a9a5b", "#b07fa0"];
-
-const STATUS_TONE: Record<string, string> = {
-  active: "bg-[var(--success-light)] text-[var(--success)]",
-  booked: "bg-[var(--info-light)] text-[var(--info)]",
-  due_soon: "bg-[var(--warning-light)] text-[var(--warning)]",
-  overdue: "bg-[var(--danger-light)] text-[var(--danger)]",
-  completed: "bg-[var(--panel-secondary)] text-[var(--foreground-secondary)]",
-  cancelled: "bg-[var(--panel-secondary)] text-[var(--muted)]",
-  extended: "bg-[var(--purple-light)] text-[var(--purple)]"
-};
-
-function money(value: number) {
-  return new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB", maximumFractionDigits: 0 }).format(value);
-}
-
-function fmtDate(value: string) {
-  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
-}
-
-function KpiCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
-  return (
-    <div className="content-section">
-      <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">{label}</p>
-      <p className="mt-1 text-2xl font-semibold text-[var(--foreground)]">{value}</p>
-      {sub && <p className="mt-0.5 text-xs text-[var(--muted)]">{sub}</p>}
-    </div>
-  );
-}
+const PRESETS: DatePreset[] = ["this_month", "last_month", "last_3_months", "last_6_months", "this_year", "last_year", "custom"];
+const BAHT = "฿";
+const h2 = "text-[17px] font-bold text-[var(--foreground)]";
+const soft = "font-medium text-[var(--foreground-secondary)]";
+const tile = "rounded-xl bg-[var(--panel-secondary)] p-3.5";
 
 export function VehicleReportView({ data }: { data: VehicleReportData }) {
+  const say = useTranslations("reportsPage") as unknown as Say;
+  const moneyT = useTranslations("money");
+  const bookingsT = useTranslations("bookings");
+  const locale = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const currentPreset = searchParams.get("preset") || "this_month";
-  const isCustom = currentPreset === "custom";
+  const preset = data.dateRange.preset;
+  const [customOpen, setCustomOpen] = useState(preset === "custom");
+  const [localFrom, setLocalFrom] = useState(preset === "custom" ? data.dateRange.from : "");
+  const [localTo, setLocalTo] = useState(preset === "custom" ? data.dateRange.to : "");
 
-  function applyPreset(preset: string) {
-    const params = new URLSearchParams();
-    params.set("preset", preset);
-    router.push(`?${params.toString()}`);
+  const typeLabel = (type: string, fallback: string) => (moneyT.has(`type_${type}` as never) ? (moneyT as unknown as Say)(`type_${type}`) : fallback);
+  const statusLabel = (status: string) => (bookingsT.has(`status_${status}` as never) ? (bookingsT as unknown as Say)(`status_${status}`) : status.replace(/_/g, " "));
+
+  function setPreset(next: DatePreset) {
+    if (next === "custom") {
+      setCustomOpen(true);
+      return;
+    }
+    router.push(`?preset=${next}`);
   }
 
-  function applyCustom(from: string, to: string) {
+  function applyCustomRange() {
+    if (!localFrom || !localTo) return;
     const params = new URLSearchParams();
     params.set("preset", "custom");
-    if (from) params.set("from", from);
-    if (to) params.set("to", to);
+    params.set("from", localFrom <= localTo ? localFrom : localTo);
+    params.set("to", localFrom <= localTo ? localTo : localFrom);
     router.push(`?${params.toString()}`);
   }
 
-  const { vehicle, dateRange, totalRevenue, totalExpenses, netProfit, utilizationRate, rentalCount, avgDailyRate, roi, rentalDays } = data;
-  const depreciation = Math.max(0, vehicle.purchasePrice - vehicle.estimatedValue);
+  const { vehicle, totalRevenue, totalExpenses, netProfit, utilizationRate, rentalCount, avgDailyRate, roi, rentalDays } = data;
+  const lostValue = vehicle.purchasePrice > 0 && vehicle.estimatedValue > 0 ? Math.max(0, vehicle.purchasePrice - vehicle.estimatedValue) : 0;
+  const monthFormat = new Intl.DateTimeFormat(intlLocale(locale), { month: "short", year: "numeric", timeZone: "UTC" });
+  const monthly = data.monthlyData.map((month) => {
+    const match = String(month.key || "").match(/^(\d{4})-(\d{2})$/);
+    return { ...month, label: match ? monthFormat.format(new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, 1))) : month.label };
+  });
+  void searchParams;
 
   return (
-    <div className="space-y-6">
-      {/* Date range selector */}
-      <div className="content-section">
-        <div className="flex flex-wrap gap-2">
-          {PRESETS.map((p) => (
-            <button
-              className={`pressable min-h-9 rounded-xl border px-3 py-1.5 text-sm font-semibold ${currentPreset === p.value && !isCustom ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
-              key={p.value}
-              onClick={() => applyPreset(p.value)}
-              type="button"
-            >
-              {p.label}
-            </button>
-          ))}
-          <button
-            className={`pressable min-h-9 rounded-xl border px-3 py-1.5 text-sm font-semibold ${isCustom ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
-            onClick={() => applyPreset("custom")}
-            type="button"
-          >
-            Custom
-          </button>
+    <div className="space-y-3">
+      <div>
+        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1" style={{ scrollbarWidth: "none" }}>
+          {PRESETS.map((value) => {
+            const active = value === "custom" ? customOpen : preset === value && !customOpen;
+            return (
+              <button aria-pressed={active} className={`pressable min-h-11 shrink-0 rounded-full px-4 font-bold ${active ? "bg-[var(--primary)] text-white" : "bg-white text-[var(--foreground)]"}`} key={value} onClick={() => setPreset(value)} type="button">
+                {say(`preset_${value}`)}
+              </button>
+            );
+          })}
         </div>
-        {isCustom && (
-          <div className="mt-3 flex flex-wrap gap-3">
-            <input
-              className="rounded-xl border border-[var(--border)] px-3 py-2 text-sm"
-              defaultValue={searchParams.get("from") || ""}
-              id="from-date"
-              type="date"
-            />
-            <input
-              className="rounded-xl border border-[var(--border)] px-3 py-2 text-sm"
-              defaultValue={searchParams.get("to") || ""}
-              id="to-date"
-              type="date"
-            />
-            <button
-              className="pressable rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white"
-              onClick={() => {
-                const f = (document.getElementById("from-date") as HTMLInputElement)?.value;
-                const t = (document.getElementById("to-date") as HTMLInputElement)?.value;
-                if (f && t) applyCustom(f, t);
-              }}
-              type="button"
-            >
-              Apply
+        {customOpen ? (
+          <div className="card mt-2 p-4">
+            <div className="grid grid-cols-2 gap-3">
+              <label className="block">
+                <span className="font-semibold text-[var(--foreground-secondary)]">{say("from")}</span>
+                <input className="mt-1 w-full" onChange={(event) => setLocalFrom(event.target.value)} type="date" value={localFrom} />
+              </label>
+              <label className="block">
+                <span className="font-semibold text-[var(--foreground-secondary)]">{say("to")}</span>
+                <input className="mt-1 w-full" onChange={(event) => setLocalTo(event.target.value)} type="date" value={localTo} />
+              </label>
+            </div>
+            <button className="primary-action pressable mt-3 w-full" disabled={!localFrom || !localTo} onClick={applyCustomRange} type="button">
+              {say("showDates")}
             </button>
           </div>
-        )}
-        <p className="mt-2 text-xs text-[var(--muted)]">
-          {dateRange.label} &middot; {dateRange.from} to {dateRange.to}
-        </p>
+        ) : null}
+        <p className={`mt-2 ${soft}`}>{say("range", { from: longDate(data.dateRange.from, locale), to: longDate(data.dateRange.to, locale) })}</p>
       </div>
 
-      {/* KPI strip */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <KpiCard label="Revenue" value={money(totalRevenue)} sub={`${rentalCount} rental${rentalCount !== 1 ? "s" : ""}`} />
-        <KpiCard label="Expenses" value={money(totalExpenses)} />
-        <KpiCard label="Net Profit" value={money(netProfit)} sub={`ROI ${roi.toFixed(1)}%`} />
-        <KpiCard label="Utilization" value={`${utilizationRate.toFixed(0)}%`} sub={`${rentalDays} days out`} />
-      </div>
-
-      {/* Charts row */}
-      <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
-        {/* Monthly revenue vs expenses */}
-        <div className="content-section">
-          <p className="mb-4 text-sm font-bold text-[var(--foreground)]">Money in and out, month by month</p>
-          {data.monthlyData.length === 0 ? (
-            <p className="py-8 text-center text-sm text-[var(--muted)]">No data for this period</p>
-          ) : (
-            <ResponsiveContainer height={220} width="100%">
-              <ComposedChart data={data.monthlyData} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                <XAxis dataKey="label" tick={{ fontSize: 11 }} />
-                <YAxis tickFormatter={(v) => `฿${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} width={52} />
-                <Tooltip formatter={(v) => money(Number(v))} />
-                <Bar dataKey="revenue" fill="#24456b" name="Revenue" radius={[2, 2, 0, 0]} />
-                <Bar dataKey="expenses" fill="#a04b36" name="Expenses" radius={[2, 2, 0, 0]} />
-                <Line dataKey="profit" dot={false} name="Profit" stroke="#2f6b45" strokeWidth={2} type="monotone" />
-              </ComposedChart>
-            </ResponsiveContainer>
-          )}
-        </div>
-
-        {/* Expense breakdown */}
-        <div className="content-section">
-          <p className="mb-3 text-sm font-bold text-[var(--foreground)]">Expense Breakdown</p>
-          {data.expensesByType.length === 0 ? (
-            <p className="py-8 text-center text-sm text-[var(--muted)]">No expenses recorded</p>
-          ) : (
-            <>
-              <ResponsiveContainer height={140} width="100%">
-                <PieChart>
-                  <Pie
-                    cx="50%"
-                    cy="50%"
-                    data={data.expensesByType.map((e) => ({ name: e.label, value: e.amount }))}
-                    dataKey="value"
-                    innerRadius="55%"
-                    outerRadius="80%"
-                    paddingAngle={2}
-                  >
-                    {data.expensesByType.map((_, i) => (
-                      <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(v) => money(Number(v))} />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="mt-2 space-y-1">
-                {data.expensesByType.map((e, i) => (
-                  <div className="flex items-center justify-between text-xs" key={e.type}>
-                    <div className="flex items-center gap-1.5">
-                      <span className="h-2 w-2 rounded-full" style={{ background: CHART_COLORS[i % CHART_COLORS.length] }} />
-                      <span className="text-[var(--foreground-secondary)]">{e.label}</span>
-                    </div>
-                    <span className="font-semibold text-[var(--foreground)]">{money(e.amount)}</span>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Vehicle info & depreciation */}
-      <div className="content-section">
-        <p className="mb-4 text-sm font-bold text-[var(--foreground)]">Vehicle Details &amp; Depreciation</p>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Daily Rate</p>
-            <p className="mt-1 font-semibold text-[var(--foreground)]">{vehicle.dailyRate > 0 ? money(vehicle.dailyRate) : "—"}</p>
+      <section className="card p-4">
+        <p className={soft}>{say("profit")}</p>
+        <p className={`text-[32px] font-bold leading-tight ${netProfit >= 0 ? "text-[var(--foreground)]" : "text-[var(--warning)]"}`}>{money(netProfit)}</p>
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <div className={tile}>
+            <p className={soft}>{say("moneyIn")}</p>
+            <p className="text-[20px] font-bold text-[var(--foreground)]">{money(totalRevenue)}</p>
+            <p className={soft}>{say("owedRentals", { count: rentalCount })}</p>
           </div>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Purchase Price</p>
-            <p className="mt-1 font-semibold text-[var(--foreground)]">{vehicle.purchasePrice > 0 ? money(vehicle.purchasePrice) : "—"}</p>
+          <div className={tile}>
+            <p className={soft}>{say("moneyOut")}</p>
+            <p className="text-[20px] font-bold text-[var(--foreground)]">{money(totalExpenses)}</p>
           </div>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Est. Current Value</p>
-            <p className="mt-1 font-semibold text-[var(--foreground)]">{vehicle.estimatedValue > 0 ? money(vehicle.estimatedValue) : "—"}</p>
+          <div className={tile}>
+            <p className={soft}>{say("timeRented")}</p>
+            <p className="text-[20px] font-bold text-[var(--foreground)]">{Math.round(utilizationRate)}%</p>
+            <p className={soft}>{say("vr_daysOut", { count: rentalDays })}</p>
           </div>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Depreciation</p>
-            <p className={`mt-1 font-semibold ${depreciation > 0 ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>
-              {depreciation > 0 ? `-${money(depreciation)}` : "—"}
-            </p>
+          <div className={tile}>
+            <p className={soft}>{say("avgPerDay")}</p>
+            <p className="text-[20px] font-bold text-[var(--foreground)]">{avgDailyRate > 0 ? money(avgDailyRate) : "-"}</p>
+            {vehicle.dailyRate > 0 ? <p className={soft}>{say("vr_listed", { amount: money(vehicle.dailyRate) })}</p> : null}
           </div>
         </div>
-        {vehicle.purchasePrice > 0 && (
-          <div className="mt-4">
-            <div className="mb-1 flex items-center justify-between text-xs text-[var(--muted)]">
-              <span>Value retained</span>
-              <span>{vehicle.estimatedValue > 0 ? `${((vehicle.estimatedValue / vehicle.purchasePrice) * 100).toFixed(0)}%` : "—"}</span>
+      </section>
+
+      <MonthRows months={monthly} say={say} />
+
+      <Breakdown rows={data.expensesByType} say={say} title={say("wentOn")} typeLabel={typeLabel} />
+
+      {vehicle.purchasePrice > 0 ? (
+        <section className="card p-4">
+          <h2 className={h2}>{say("vr_valueTitle")}</h2>
+          <div className="mt-3 space-y-2">
+            <div className="flex items-baseline justify-between gap-3">
+              <span className={soft}>{say("boughtFor")}</span>
+              <span className="font-bold text-[var(--foreground)]">{money(vehicle.purchasePrice)}</span>
             </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--panel-secondary)]">
-              <div
-                className="h-2 rounded-full bg-[var(--primary)]"
-                style={{ width: `${Math.min(100, (vehicle.estimatedValue / vehicle.purchasePrice) * 100)}%` }}
-              />
+            {vehicle.estimatedValue > 0 ? (
+              <>
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className={soft}>{say("vr_worthNow")}</span>
+                  <span className="font-bold text-[var(--foreground)]">{money(vehicle.estimatedValue)}</span>
+                </div>
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className={soft}>{say("vr_lostValue")}</span>
+                  <span className="font-bold text-[var(--foreground)]">{money(lostValue)}</span>
+                </div>
+              </>
+            ) : null}
+            <div className="flex items-baseline justify-between gap-3">
+              <span className={soft}>{say("vr_earnedBackPeriod")}</span>
+              <span className="font-bold text-[var(--foreground)]">{roi.toFixed(1)}%</span>
             </div>
           </div>
-        )}
-      </div>
+          <Link className="secondary-action pressable mt-3 w-full" href={`/fleet/${vehicle.id}/edit` as any}>
+            {say("vr_editValue")}
+          </Link>
+        </section>
+      ) : null}
 
-      {/* Avg daily rate vs avg market rate bar */}
-      {avgDailyRate > 0 && vehicle.dailyRate > 0 && (
-        <div className="content-section">
-          <p className="mb-3 text-sm font-bold text-[var(--foreground)]">Avg Daily Rate vs Listed Rate</p>
-          <ResponsiveContainer height={100} width="100%">
-            <BarChart
-              data={[
-                { name: "Achieved", value: avgDailyRate },
-                { name: "Listed", value: vehicle.dailyRate }
-              ]}
-              layout="vertical"
-              margin={{ top: 0, right: 8, bottom: 0, left: 48 }}
-            >
-              <XAxis type="number" tickFormatter={(v) => `฿${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} />
-              <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={48} />
-              <Tooltip formatter={(v) => money(Number(v))} />
-              <Bar dataKey="value" fill="#24456b" radius={[0, 4, 4, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      )}
-
-      {/* Rentals table */}
-      <div className="content-section">
-        <p className="mb-4 text-sm font-bold text-[var(--foreground)]">Rentals in Period ({data.rentals.length})</p>
+      <section className="card p-4">
+        <h2 className={h2}>{say("vr_rentalsTitle", { count: data.rentals.length })}</h2>
         {data.rentals.length === 0 ? (
-          <p className="py-4 text-center text-sm text-[var(--muted)]">No rentals in this period</p>
+          <p className={`mt-1 ${soft}`}>{say("vr_noRentals")}</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-[var(--border)]">
-                  <th className="pb-2 text-left text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Ref</th>
-                  <th className="pb-2 text-left text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Customer</th>
-                  <th className="pb-2 text-left text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Start</th>
-                  <th className="pb-2 text-left text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">End</th>
-                  <th className="pb-2 text-left text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Status</th>
-                  <th className="pb-2 text-right text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Balance Due</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.rentals.map((rental) => (
-                  <tr className="border-b border-[var(--border)] last:border-0" key={rental.id}>
-                    <td className="py-2.5 pr-3 font-semibold text-[var(--foreground)]">
-                      <Link className="text-[var(--primary)] hover:underline" href={`/bookings/${rental.id}` as any}>
-                        {rental.displayCode || rental.id.slice(0, 8)}
-                      </Link>
-                    </td>
-                    <td className="py-2.5 pr-3 text-[var(--foreground-secondary)]">{rental.customerName || "—"}</td>
-                    <td className="py-2.5 pr-3 text-[var(--foreground-secondary)]">{fmtDate(rental.startDate)}</td>
-                    <td className="py-2.5 pr-3 text-[var(--foreground-secondary)]">{rental.endDate ? fmtDate(rental.endDate) : "—"}</td>
-                    <td className="py-2.5 pr-3">
-                      <span className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${STATUS_TONE[rental.status] || "bg-[var(--panel-secondary)] text-[var(--foreground-secondary)]"}`}>
-                        {rental.status.replace(/_/g, " ")}
-                      </span>
-                    </td>
-                    <td className={`py-2.5 text-right font-semibold ${rental.balanceDue > 0 ? "text-[var(--danger)]" : "text-[var(--foreground-secondary)]"}`}>
-                      {rental.balanceDue > 0 ? money(rental.balanceDue) : "—"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="mt-3 space-y-2">
+            {data.rentals.map((rental) => (
+              <Link className={`${tile} pressable flex items-center justify-between gap-3`} href={`/bookings/${rental.id}` as any} key={rental.id}>
+                <span className="min-w-0">
+                  <span className="block text-[16px] font-bold text-[var(--foreground)]">{rental.customerName || rental.displayCode || say("vr_aRental")}</span>
+                  <span className={`block ${soft}`}>
+                    {shortDate(rental.startDate, locale)}
+                    {rental.endDate ? ` - ${shortDate(rental.endDate, locale)}` : ""} · {statusLabel(rental.status)}
+                  </span>
+                  {rental.balanceDue > 0 && rental.status !== "cancelled" ? <span className="block font-semibold text-[var(--warning)]">{say("vr_stillOwed", { amount: money(rental.balanceDue) })}</span> : null}
+                </span>
+                <ChevronRight className="shrink-0 text-[var(--primary)]" size={18} />
+              </Link>
+            ))}
           </div>
         )}
-      </div>
+      </section>
 
-      {/* Transactions table */}
-      <div className="content-section">
-        <p className="mb-4 text-sm font-bold text-[var(--foreground)]">Transactions in Period ({data.transactions.length})</p>
+      <section className="card p-4">
+        <h2 className={h2}>{say("vr_moneyTitle", { count: data.transactions.length })}</h2>
         {data.transactions.length === 0 ? (
-          <p className="py-4 text-center text-sm text-[var(--muted)]">No transactions in this period</p>
+          <p className={`mt-1 ${soft}`}>{say("nothingRecorded")}</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-[var(--border)]">
-                  <th className="pb-2 text-left text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Date</th>
-                  <th className="pb-2 text-left text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Type</th>
-                  <th className="pb-2 text-left text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Notes / Supplier</th>
-                  <th className="pb-2 text-right text-xs font-bold uppercase tracking-[0.08em] text-[var(--muted)]">Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.transactions.map((tx) => (
-                  <tr className="border-b border-[var(--border)] last:border-0" key={tx.id}>
-                    <td className="py-2.5 pr-3 text-[var(--foreground-secondary)]">{fmtDate(tx.date)}</td>
-                    <td className="py-2.5 pr-3 font-semibold text-[var(--foreground)]">{tx.typeLabel}</td>
-                    <td className="py-2.5 pr-3 text-[var(--foreground-secondary)]">{tx.notes || tx.supplier || "—"}</td>
-                    <td className={`py-2.5 text-right font-semibold tabular-nums ${tx.isIncome ? "text-[var(--success)]" : "text-[var(--foreground)]"}`}>
-                      {tx.isIncome ? "+" : "-"}
-                      {money(tx.amount)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="mt-3 space-y-2">
+            {data.transactions.map((entry) => {
+              // A deposit coming in is held for the customer: money received, but not income.
+              const held = entry.type === "deposit_received" || entry.type === "deposit";
+              return (
+                <div className={`${tile} flex items-center justify-between gap-3`} key={entry.id}>
+                  <div className="min-w-0">
+                    <p className="text-[16px] font-bold text-[var(--foreground)]">{typeLabel(entry.type, entry.typeLabel)}</p>
+                    {entry.notes || entry.supplier ? <p className={soft}>{entry.notes || entry.supplier}</p> : null}
+                    <p className={soft}>{longDate(entry.date, locale)}</p>
+                  </div>
+                  <p className={`shrink-0 text-[17px] font-bold ${entry.isIncome ? "text-[var(--success)]" : "text-[var(--foreground)]"}`}>
+                    {entry.isIncome || held ? "+" : "-"}
+                    {money(entry.amount)}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         )}
-      </div>
+      </section>
     </div>
   );
 }

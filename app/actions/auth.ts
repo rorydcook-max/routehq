@@ -261,7 +261,14 @@ export async function inviteUser(_state: AuthActionState, formData: FormData): P
     return { error: lookupError.message };
   }
 
+  // Invited before but never finished setting up: the first link ran out or was lost, so send a fresh one.
+  let unfinished = false;
   if (existingUserId) {
+    const { data: found } = await admin.auth.admin.getUserById(existingUserId);
+    unfinished = Boolean(found?.user?.invited_at && !found.user.email_confirmed_at);
+  }
+
+  if (existingUserId && !unfinished) {
     const { data: existingMembership } = await admin
       .from("organization_members")
       .select("id, is_active")
@@ -311,6 +318,7 @@ export async function inviteUser(_state: AuthActionState, formData: FormData): P
     }
     return { error: say("iv_failed") };
   }
+  revalidatePath("/settings");
 
   await admin.from("users").upsert({
     id: data.user.id,
@@ -335,6 +343,27 @@ export async function inviteUser(_state: AuthActionState, formData: FormData): P
   return { success: say("iv_sent", { email, role: label }) };
 }
 
+/** The owner takes someone off the team. Their account stays (they may work for another business); they just lose this one. */
+export async function removeTeammate(formData: FormData): Promise<AuthActionState> {
+  const say = await authText();
+  let owner;
+  try {
+    owner = await requireOwner();
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : OWNER_ONLY_MESSAGE };
+  }
+  const memberId = String(formData.get("memberId") || "");
+  const admin = createSupabaseAdminClient() as any;
+  const { data: member } = await admin.from("organization_members").select("id, user_id, organization_id").eq("id", memberId).maybeSingle();
+  if (!member || member.organization_id !== owner.organizationId || member.user_id === owner.userId) {
+    return { error: say("iv_removeFailed") };
+  }
+  const { error } = await admin.from("organization_members").update({ is_active: false }).eq("id", member.id);
+  if (error) return { error: say("iv_removeFailed") };
+  revalidatePath("/settings");
+  return { success: "ok" };
+}
+
 export async function completeInvite(_state: AuthActionState, formData: FormData): Promise<AuthActionState> {
   const password = String(formData.get("password") || "");
   // Only the invite form asks for a language. Choosing a new password must not change it.
@@ -346,7 +375,7 @@ export async function completeInvite(_state: AuthActionState, formData: FormData
   }
 
   const supabase = await createSupabaseServerClient();
-  const { data: authData, error } = await supabase.auth.updateUser({ password });
+  const { data: authData, error } = await supabase.auth.updateUser({ password, data: { invite_completed: true } });
 
   if (error || !authData.user) {
     return { error: say("passwordFailed") };

@@ -24,6 +24,8 @@ import { supportedLocaleOptions } from "@/lib/i18n/locales";
 import { InviteForm } from "@/app/invite/invite-form";
 import { PaymentMethodsForm } from "@/app/settings/payment-methods-form";
 import { PublicBookingPanel } from "@/app/settings/public-booking-panel";
+import { TeamMemberActions } from "@/app/settings/team-member-actions";
+import { createSupabaseAdminClient as teamAdminClient } from "@/lib/supabase/admin";
 import { BookingRulesPanel } from "@/app/settings/booking-rules-panel";
 import { CustomerMessagesPanel } from "@/app/settings/customer-messages-panel";
 import { customerMessagesOn } from "@/lib/customer-messages";
@@ -257,6 +259,20 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     recipient_line_id: string | null;
   }>;
 
+  // Who has been invited but has not finished joining, so the owner can see it and send the invite again.
+  const waitingMembers = new Set<string>();
+  if (tab === "team") {
+    const teamAdmin = teamAdminClient() as any;
+    await Promise.all(
+      (members || [])
+        .filter((member: any) => member.is_active && member.invited_email && member.user_id !== user?.id)
+        .map(async (member: any) => {
+          const { data } = await teamAdmin.auth.admin.getUserById(member.user_id);
+          if (data?.user?.invited_at && !data.user.email_confirmed_at) waitingMembers.add(member.id);
+        })
+    );
+  }
+  const viewerIsOwner = (members || []).some((member: any) => member.user_id === user?.id && member.role === "owner");
   const promptPayQrDisplayUrl = tab === "rentals" ? await freshPromptPayQrUrl(await createSupabaseServerClient(), organization.promptpay_qr_url, 60 * 60) : organization.promptpay_qr_url;
   const paymentNames: Record<string, string> = { cash: say("pay_cash"), promptpay: say("pay_promptpay"), bank_transfer: say("pay_bank_transfer"), wise: say("pay_wise"), revolut: say("pay_revolut") };
   const acceptedMethods = Array.from(new Set(["cash", ...((organization.accepted_payment_methods as unknown as string[] | null) || [])])).filter((method) => method in paymentNames);
@@ -692,16 +708,19 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         <Card>
           <SectionHeader title={say("team_title")} />
           <div className="mt-4 space-y-3">
-            {(members || []).map((member: any) => (
-              <div className="flex flex-col gap-3 rounded-lg border border-[var(--border)] p-3 sm:flex-row sm:items-center sm:justify-between" key={member.id}>
+            {(members || []).filter((member: any) => member.is_active).map((member: any) => (
+              <div className="flex flex-col gap-3 rounded-lg border border-[var(--border)] p-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between" key={member.id}>
                 <div>
                   <p className="font-bold text-[var(--foreground)]">{member.display_name || member.invited_email || (member.user_id === user?.id ? userEmail : say("team_user"))}</p>
                   <p className="text-sm text-[var(--muted)]">{member.invited_email || say("team_activeAccount")}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge tone="neutral">{member.role === "owner" ? say("team_owner") : say("team_mate")}</Badge>
-                  {member.is_active ? null : <Badge tone="amber">{say("team_inactive")}</Badge>}
+                  {waitingMembers.has(member.id) ? <Badge tone="amber">{say("team_waiting")}</Badge> : null}
                 </div>
+                {viewerIsOwner && member.user_id !== user?.id ? (
+                  <TeamMemberActions email={member.invited_email || null} memberId={member.id} role={member.role === "owner" ? "owner" : "teammate"} waiting={waitingMembers.has(member.id)} />
+                ) : null}
               </div>
             ))}
           </div>

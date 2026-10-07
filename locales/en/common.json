@@ -3196,7 +3196,13 @@
     "pb_offer_both_monthly": "Monthly or set dates (opens on monthly)",
     "pb_offer_both_dates": "Monthly or set dates (opens on set dates)",
     "pb_offer_monthly": "Monthly only, with no end date",
-    "pb_offer_dates": "Set dates only"
+    "pb_offer_dates": "Set dates only",
+    "team_waiting": "Has not joined yet",
+    "team_resend": "Send the invite again",
+    "team_sending": "Sending…",
+    "team_remove": "Remove",
+    "team_removeSure": "Yes, remove from the team",
+    "team_keep": "Keep"
   },
   "accountPage": {
     "roleOwner": "Owner",
@@ -3428,7 +3434,12 @@
     "iv_sent": "Invite sent to {email} as {role}.",
     "iv_failed": "The invite was not sent. Check the email address and try again.",
     "backToAccount": "Back to my account",
-    "iv_pageTitle": "Invite someone to your team"
+    "iv_pageTitle": "Invite someone to your team",
+    "link_working": "Signing you in…",
+    "link_expiredTitle": "This link no longer works",
+    "link_expiredBody": "Invite links can be used once and run out after a while. Ask the person who invited you to send it again. If you already set a password, just sign in.",
+    "link_login": "Go to sign in",
+    "iv_removeFailed": "That person could not be removed. Try again."
   },
   "calc": {
     "title": "Buying a vehicle",

@@ -22,6 +22,12 @@ export async function GET(request: NextRequest) {
   if (code) {
     const supabase = await createSupabaseServerClient();
     await supabase.auth.exchangeCodeForSession(code);
+  } else {
+    // No code: the link's result (a sign-in, or "this link has expired") is after the "#", which only the
+    // browser can read. The browser keeps that part when it follows this redirect.
+    const landing = new URL("/auth/landing", url.origin);
+    landing.searchParams.set("next", next);
+    return NextResponse.redirect(landing);
   }
 
   return NextResponse.redirect(new URL(next, url.origin));

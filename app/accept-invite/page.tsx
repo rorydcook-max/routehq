@@ -15,6 +15,11 @@ export default async function AcceptInvitePage() {
     if (!user) {
       redirect("/login");
     }
+    // This page sets a password for whoever is signed in, so it is only for someone who came in on an invite
+    // and has not finished it. Anyone else (for instance the owner opening a teammate's old link) goes home.
+    if (!user.invited_at || user.user_metadata?.invite_completed) {
+      redirect("/");
+    }
   }
 
   const say = (await getTranslations("auth")) as unknown as (key: string) => string;

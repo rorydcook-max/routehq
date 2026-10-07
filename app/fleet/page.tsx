@@ -50,7 +50,8 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
   const [{ vehicles }, categories] = await Promise.all([getDashboardData(), getVehicleCategories(organization.id)]);
   const groups = groupVehiclesByKind(vehicles, categories);
   const totalOut = vehicles.filter((vehicle) => vehicle.status === "Rented").length;
-  const totalFree = vehicles.filter((vehicle) => vehicle.status === "Available").length;
+  const totalFree = vehicles.filter((vehicle) => vehicle.status === "Available" || Boolean(vehicle.freeUntil)).length;
+  const dayMonth = (value: string) => new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${value}T00:00:00Z`));
   const [t, c, locale] = await Promise.all([getTranslations("fleet"), getTranslations("common"), getLocale()]);
   const kindName = (group: { kind: string; label: string }) => (c.has(`kinds_${group.kind}`) ? c(`kinds_${group.kind}`) : group.label);
 
@@ -163,7 +164,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                           </Link>
                         </td>
                         <td className="px-3 py-3">
-                          <Badge tone={statusTone[vehicle.status]}>{t(`status_${vehicle.status}`)}</Badge>
+                          {vehicle.freeUntil ? <Badge tone="green">{t("status_freeUntil", { date: dayMonth(vehicle.freeUntil) })}</Badge> : <Badge tone={statusTone[vehicle.status]}>{t(`status_${vehicle.status}`)}</Badge>}
                         </td>
                         <td className="px-3 py-3">
                           <Link className="font-mono-data block" href={href}>{vehicle.monthlyRate > 0 ? money(vehicle.monthlyRate) : <span className="text-[var(--muted)]">{t("notSet")}</span>}</Link>
@@ -205,7 +206,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                         </div>
                       ) : null}
                     </div>
-                    <Badge tone={statusTone[vehicle.status]}>{t(`status_${vehicle.status}`)}</Badge>
+                    {vehicle.freeUntil ? <Badge tone="green">{t("status_freeUntil", { date: dayMonth(vehicle.freeUntil) })}</Badge> : <Badge tone={statusTone[vehicle.status]}>{t(`status_${vehicle.status}`)}</Badge>}
                   </Link>
                 </li>
               ))}

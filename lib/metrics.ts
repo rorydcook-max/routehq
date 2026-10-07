@@ -29,7 +29,7 @@ export function calculateDashboardMetrics({
     outstandingPayments: rentals.reduce((sum, rental) => sum + rental.balance, 0),
     fleetProfit: vehicles.reduce((sum, vehicle) => sum + vehicle.profit, 0),
     activeRentals: rentals.filter((rental) => rental.status === "Active").length,
-    availableVehicles: vehicles.filter((vehicle) => vehicle.status === "Available").length,
+    availableVehicles: vehicles.filter((vehicle) => vehicle.status === "Available" || Boolean(vehicle.freeUntil)).length,
     maintenanceDue: vehicles.filter((vehicle) => vehicle.status === "Maintenance").length,
     highAlerts: reminders.filter((reminder) => reminder.severity === "High").length,
     averageUtilization: vehicles.length ? Math.round(vehicles.reduce((sum, vehicle) => sum + vehicle.utilization, 0) / vehicles.length) : 0

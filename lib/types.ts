@@ -1,6 +1,8 @@
 export type VehicleStatus = "Rented" | "Available" | "Maintenance" | "Reserved";
 
 export type Vehicle = {
+  /** Set when the vehicle is booked for later but free today: the day its next booking starts. */
+  freeUntil?: string | null;
   id: string;
   plate: string;
   categoryId?: string | null;

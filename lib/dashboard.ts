@@ -160,6 +160,13 @@ export async function getDashboardData(): Promise<DashboardData> {
       const held = String(row.deposit_status || "").toLowerCase() === "received" ? Number(row.deposit_held || 0) : 0;
       return { ...mapRental(row), overdue: late?.amount || 0, overdueSince: late?.since || null, depositHeld: held };
     });
+  // A vehicle booked for next month is free today. "Booked" is kept for one whose booking starts today or has started.
+  const todayDate = businessToday();
+  for (const vehicle of vehicles) {
+    if (vehicle.status !== "Reserved") continue;
+    const starts = rentals.filter((rental) => rental.vehicleId === vehicle.id && rental.status === "Booked").map((rental) => String(rental.start || "").slice(0, 10)).sort();
+    if (starts.length > 0 && starts[0] > todayDate) vehicle.freeUntil = starts[0];
+  }
   const customers: Customer[] = (customersResult.data || []).map(mapCustomer);
   const transactions: Transaction[] = (transactionsResult.data || []).map(mapTransaction);
   const reminders: Reminder[] = (remindersResult.data || []).map(mapReminder);

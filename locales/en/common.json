@@ -2094,7 +2094,8 @@
     "delete": "Delete",
     "deleteAria": "Delete {label}",
     "deleteVehicle": "Delete vehicle",
-    "keep": "Keep"
+    "keep": "Keep",
+    "status_freeUntil": "Free until {date}"
   },
   "customers": {
     "noRentals": "No rentals yet",

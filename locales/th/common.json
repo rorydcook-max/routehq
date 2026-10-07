@@ -2103,7 +2103,8 @@
     "delete": "ลบ",
     "deleteAria": "ลบ {label}",
     "deleteVehicle": "ลบรถ",
-    "keep": "เก็บไว้"
+    "keep": "เก็บไว้",
+    "status_freeUntil": "ว่างถึง {date}"
   },
   "customers": {
     "noRentals": "ยังไม่เคยเช่า",

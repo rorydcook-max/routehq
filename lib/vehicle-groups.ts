@@ -49,7 +49,7 @@ export function isTwoWheeler(kind: VehicleKind) {
 
 export type VehicleGroup<V> = { kind: VehicleKind; label: string; vehicles: V[]; out: number; free: number; other: number };
 
-export function groupVehiclesByKind<V extends { categoryId?: string | null; status: string }>(vehicles: V[], categories: Category[]): VehicleGroup<V>[] {
+export function groupVehiclesByKind<V extends { categoryId?: string | null; status: string; freeUntil?: string | null }>(vehicles: V[], categories: Category[]): VehicleGroup<V>[] {
   const byId = new Map(categories.map((category) => [category.id, category]));
   const buckets = new Map<VehicleKind, V[]>();
   for (const vehicle of vehicles) {
@@ -59,7 +59,7 @@ export function groupVehiclesByKind<V extends { categoryId?: string | null; stat
   return ORDER.filter((kind) => buckets.has(kind)).map((kind) => {
     const list = buckets.get(kind) || [];
     const out = list.filter((vehicle) => vehicle.status === "Rented").length;
-    const free = list.filter((vehicle) => vehicle.status === "Available").length;
+    const free = list.filter((vehicle) => vehicle.status === "Available" || Boolean(vehicle.freeUntil)).length;
     return { kind, label: PLURAL[kind], vehicles: list, out, free, other: list.length - out - free };
   });
 }

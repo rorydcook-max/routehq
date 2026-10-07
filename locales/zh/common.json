@@ -440,7 +440,7 @@
     "enterLine": "请输入您的 LINE ID。",
     "enterTelegram": "请输入您的 Telegram 用户名。",
     "addDocumentDetails": "请补充护照和驾照信息。可以分别拍照，也可以手动输入。",
-    "tickEachBox": "签名前请勾选每一项。",
+    "tickEachBox": "签名前请勾选。",
     "pleaseSign": "请先在合同上签名再提交。",
     "agreementUpdated": "您的修改更新了合同。请阅读下方的新版本并重新签名。",
     "detailsSavedReadAgreement": "您的资料已保存。请阅读下方的正式合同，然后签名。",
@@ -559,7 +559,8 @@
     "payKind_rent": "租金",
     "payKind_deposit": "押金",
     "payKind_deposit_top_up": "补交押金",
-    "payKind_extension": "延长天数"
+    "payKind_extension": "延长天数",
+    "agreeAll": "我同意以上所有内容"
   },
   "customerMessages": {
     "hi": "{name}，您好！",

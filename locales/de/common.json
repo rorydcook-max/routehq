@@ -440,7 +440,7 @@
     "enterLine": "Bitte geben Sie Ihre LINE-ID ein.",
     "enterTelegram": "Bitte geben Sie Ihren Telegram-Namen ein.",
     "addDocumentDetails": "Bitte ergänzen Sie die Angaben zu Reisepass und Führerschein. Fotografieren Sie jedes Dokument oder tippen Sie die Daten ein.",
-    "tickEachBox": "Bitte setzen Sie vor dem Unterschreiben jedes Häkchen.",
+    "tickEachBox": "Bitte setzen Sie vor dem Unterschreiben das Häkchen.",
     "pleaseSign": "Bitte unterschreiben Sie den Vertrag vor dem Absenden.",
     "agreementUpdated": "Ihre Änderungen haben den Vertrag aktualisiert. Bitte lesen Sie die neue Fassung unten und unterschreiben Sie erneut.",
     "detailsSavedReadAgreement": "Ihre Daten sind gespeichert. Bitte lesen Sie unten Ihren endgültigen Vertrag und unterschreiben Sie ihn dann.",
@@ -559,7 +559,8 @@
     "payKind_rent": "Miete",
     "payKind_deposit": "Kaution",
     "payKind_deposit_top_up": "Kautionsaufstockung",
-    "payKind_extension": "Zusätzliche Tage"
+    "payKind_extension": "Zusätzliche Tage",
+    "agreeAll": "Ich stimme allen oben genannten Punkten zu"
   },
   "customerMessages": {
     "hi": "Hallo {name},",

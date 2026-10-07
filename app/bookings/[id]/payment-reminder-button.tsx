@@ -24,7 +24,7 @@ export function PaymentReminderButton({ rentalId }: { rentalId: string }) {
   return (
     <div className="flex flex-col gap-2">
       <button
-        className="secondary-action pressable w-full"
+        className="pressable inline-flex min-h-9 items-center gap-2 text-left font-semibold text-[var(--primary)] underline underline-offset-2"
         disabled={isPending}
         onClick={handleClick}
         type="button"

@@ -440,7 +440,7 @@
     "enterLine": "Saisissez votre identifiant LINE.",
     "enterTelegram": "Saisissez votre nom d'utilisateur Telegram.",
     "addDocumentDetails": "Ajoutez les informations de votre passeport et de votre permis de conduire. Prenez chaque document en photo, ou saisissez-les.",
-    "tickEachBox": "Cochez chaque case avant de signer.",
+    "tickEachBox": "Cochez la case avant de signer.",
     "pleaseSign": "Signez le contrat avant d'envoyer.",
     "agreementUpdated": "Vos modifications ont mis à jour le contrat. Lisez la nouvelle version ci-dessous et signez à nouveau.",
     "detailsSavedReadAgreement": "Vos informations sont enregistrées. Lisez votre contrat définitif ci-dessous, puis signez-le.",
@@ -559,7 +559,8 @@
     "payKind_rent": "Loyer",
     "payKind_deposit": "Caution",
     "payKind_deposit_top_up": "Complément de caution",
-    "payKind_extension": "Jours supplémentaires"
+    "payKind_extension": "Jours supplémentaires",
+    "agreeAll": "J'accepte tout ce qui précède"
   },
   "customerMessages": {
     "hi": "Bonjour {name},",

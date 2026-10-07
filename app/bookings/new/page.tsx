@@ -18,13 +18,19 @@ type SearchParams = {
   endDate?: string;
 };
 
-function operatorAddressFromSettings(settings: unknown) {
+function operatorAddressFromSettings(settings: unknown, businessName = "") {
   if (!settings || typeof settings !== "object") {
     return "";
   }
 
   const values = settings as Record<string, unknown>;
-  return String(values.address || values.business_address || values.collection_address || "").trim();
+  const saved = String(values.address || values.business_address || values.collection_address || "").trim();
+  if (saved) return saved;
+  // Setup asks for the town, not a street address. The shop's name and town is a better
+  // place to collect from than "to be confirmed", and it can be typed over.
+  const mainLocation = values.main_location && typeof values.main_location === "object" ? (values.main_location as Record<string, unknown>) : {};
+  const town = String(values.home_territory || mainLocation.town || values.location || "").trim();
+  return [businessName.trim(), town].filter(Boolean).join(", ");
 }
 
 function homeTerritoryFromSettings(settings: unknown) {
@@ -121,7 +127,7 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
             defaultCurrency={organization.currency || "THB"}
             defaultDeposit={Number((organizationDetails?.settings as any)?.public_booking?.deposit || 0)}
             homeTerritory={homeTerritoryFromSettings(organizationDetails?.settings)}
-            operatorAddress={operatorAddressFromSettings(organizationDetails?.settings)}
+            operatorAddress={operatorAddressFromSettings(organizationDetails?.settings, organization.name)}
             organizationId={organization.id}
             organizationName={organization.name}
             preselectedCustomerId={customerId}

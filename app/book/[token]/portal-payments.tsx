@@ -59,12 +59,14 @@ export function PortalPayments({
   const t = useTranslations("customer");
   const [openId, setOpenId] = useState<string | null>(null);
   if (payments.length === 0) return null;
+  // A business that only takes cash: the customer sees what is due and when, with nothing to press.
+  const canPayHere = Boolean(orgPayment?.promptpay_id || orgPayment?.bank_account_number || orgPayment?.wise_link || orgPayment?.revolut_link || payments.some((payment) => payment.qrSvg));
 
   return (
     <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
       <p className="text-xs font-semibold uppercase text-[var(--primary)]">{t("payments")}</p>
       <div className="mt-3 divide-y divide-[var(--border)]">
-        {bundle ? (
+        {bundle && canPayHere ? (
           <PaymentRow
             covers={bundle.ids}
             isOpen={openId === "all"}
@@ -93,12 +95,13 @@ export function PortalPayments({
             onToggle={() => setOpenId(openId === payment.id ? null : payment.id)}
             orgPayment={orgPayment}
             organizationName={organizationName}
+            payable={canPayHere}
             payment={payment}
             token={token}
           />
         ))}
       </div>
-      <p className="mt-3 text-xs leading-5 text-[var(--muted)]">{t("payingInCash", { business: organizationName })}</p>
+      <p className="mt-3 text-xs leading-5 text-[var(--muted)]">{canPayHere || !t.has("payCashOnly" as never) ? t("payingInCash", { business: organizationName }) : (t as unknown as (key: string, values: Record<string, string>) => string)("payCashOnly", { business: organizationName })}</p>
     </section>
   );
 }
@@ -110,7 +113,8 @@ function PaymentRow({
   organizationName,
   isOpen,
   onToggle,
-  covers
+  covers,
+  payable = true
 }: {
   token: string;
   payment: PortalPayment;
@@ -120,6 +124,8 @@ function PaymentRow({
   onToggle: () => void;
   /** Set on the "everything together" row: the payments one receipt will cover. */
   covers?: string[];
+  /** False when the business takes cash only: the row is information, not a button. */
+  payable?: boolean;
 }) {
   const t = useTranslations("customer");
   const locale = useLocale();
@@ -182,13 +188,13 @@ function PaymentRow({
                   : t("dueOn", { date: shortDate(payment.dueDate, locale) })}
           </p>
         </div>
-        <button
+        {payable ? <button
           className={`pressable min-h-10 shrink-0 rounded-xl px-4 text-sm font-semibold ${sentAt || isOpen ? "border border-[var(--border)] bg-white text-[var(--foreground)]" : "bg-[var(--primary)] text-white"}`}
           onClick={onToggle}
           type="button"
         >
           {isOpen ? t("close") : sentAt ? t("change") : t("pay")}
-        </button>
+        </button> : null}
       </div>
 
       {payment.receiptDeclined && !sentAt ? (

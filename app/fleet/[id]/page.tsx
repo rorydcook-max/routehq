@@ -133,28 +133,51 @@ function QuickActions({ vehicleId, status, rentalId }: { vehicleId: string; stat
     : status === "available"
       ? { href: detailUrl("/bookings/new", vehicleId), label: tx.say("a_newBooking"), icon: CalendarDays }
       : { href: detailUrl("/transactions/new", vehicleId), label: tx.say("a_recordMoney"), icon: ReceiptText };
-  const actions = [
-    primary,
-    ...[
-      { href: detailUrl("/transactions/new", vehicleId), label: tx.say("a_recordMoney"), icon: ReceiptText },
-      { href: detailUrl("/bookings/new", vehicleId), label: tx.say("a_newBooking"), icon: CalendarDays },
-      { href: "#maintenance", label: tx.say("a_logMaintenance"), icon: Wrench },
-      { href: `/inspections/condition/${vehicleId}`, label: tx.say("a_condition"), icon: ClipboardCheck },
-      { href: `/fleet/${vehicleId}/edit`, label: tx.say("a_edit"), icon: PenLine }
-    ].filter((action) => action.label !== primary.label)
-  ];
+  // One main button, the two things done most, and the rest one tap away: six buttons in a block was a wall.
+  const recordMoney = { href: detailUrl("/transactions/new", vehicleId), label: tx.say("a_recordMoney"), icon: ReceiptText };
+  const edit = { href: `/fleet/${vehicleId}/edit`, label: tx.say("a_edit"), icon: PenLine };
+  const shown = [recordMoney, edit].filter((action) => action.label !== primary.label);
+  const more = [
+    { href: detailUrl("/bookings/new", vehicleId), label: tx.say("a_newBooking"), icon: CalendarDays },
+    { href: "#maintenance", label: tx.say("a_logMaintenance"), icon: Wrench },
+    { href: `/inspections/condition/${vehicleId}`, label: tx.say("a_condition"), icon: ClipboardCheck }
+  ].filter((action) => action.label !== primary.label);
+  const PrimaryIcon = primary.icon;
 
   return (
-    <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
-      {actions.map((action, index) => {
-        const Icon = action.icon;
-        return (
-          <Link className={`pressable ${index === 0 ? "primary-action col-span-2" : "secondary-action"} !px-3 text-center leading-tight`} href={action.href as Route} key={action.label}>
-            <Icon className="shrink-0" size={18} />
-            {action.label}
-          </Link>
-        );
-      })}
+    <div className="space-y-2">
+      {/* Out with a customer: the card just below already opens the booking, so it is not offered twice. */}
+      {rentalId ? null : (
+        <Link className="pressable primary-action w-full !px-3 text-center leading-tight" href={primary.href as Route}>
+          <PrimaryIcon className="shrink-0" size={18} />
+          {primary.label}
+        </Link>
+      )}
+      <div className="grid grid-cols-2 gap-2">
+        {shown.map((action) => {
+          const Icon = action.icon;
+          return (
+            <Link className="pressable secondary-action !px-3 text-center leading-tight" href={action.href as Route} key={action.label}>
+              <Icon className="shrink-0" size={18} />
+              {action.label}
+            </Link>
+          );
+        })}
+      </div>
+      <details>
+        <summary className="cursor-pointer list-none py-1 text-center font-semibold text-[var(--primary)]">{tx.say("a_more")}</summary>
+        <div className="mt-2 grid gap-2">
+          {more.map((action) => {
+            const Icon = action.icon;
+            return (
+              <Link className="pressable secondary-action !px-3 text-center leading-tight" href={action.href as Route} key={action.label}>
+                <Icon className="shrink-0" size={18} />
+                {action.label}
+              </Link>
+            );
+          })}
+        </div>
+      </details>
     </div>
   );
 }
@@ -927,7 +950,6 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
                 <div className="min-w-0">
                   <div className="mb-2 flex flex-wrap items-center gap-2">
                     <Badge tone={statusTone}>{tx.has(`vs_${status}`) ? tx.say(`vs_${status}`) : vehicle.status}</Badge>
-                    {detail.category ? <Badge tone="neutral">{detail.category.name}</Badge> : null}
                   </div>
                   <h1 className="max-w-full text-[26px] font-bold leading-tight tracking-[-0.01em] text-[var(--foreground)]">{title}</h1>
                   <div className="mt-3">

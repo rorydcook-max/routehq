@@ -588,6 +588,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
   const [livePhone, setLivePhone] = useState(detail.customer?.phone || "");
   const [liveEmail, setLiveEmail] = useState(detail.customer?.email || "");
   const [focusField, setFocusField] = useState<"phone" | "email" | null>(null);
+  const [agreedAll, setAgreedAll] = useState(false);
   const [preferredDeliveryLocation, setPreferredDeliveryLocation] = useState(formatDeliveryLocation(String(detail.bookingData.delivery_location || "")));
   const [liveStatus, setLiveStatus] = useState(detail.completion);
   const orgPayment = detail.orgPayment;
@@ -926,7 +927,9 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           {t("everythingReceived")}{" "}
           {detail.vehicleWithCustomer
             ? t("businessToldContact", { business: detail.organizationName })
-            : t("businessWillContact", { business: detail.organizationName })}
+            : operatorDeliveryDateTime && String(detail.bookingData.delivery_location || "").trim() && t.has("handoverAgreed" as never)
+                ? t("handoverAgreed" as never)
+                : t("businessWillContact", { business: detail.organizationName })}
         </p>
         <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-center">
         {originalAgreementUrl ? (
@@ -1237,7 +1240,13 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         </div>
       </HandoverWishes>
 
-      {acceptedMethods.length > 0 ? (
+      {/* A cash-only business has nothing to choose between: say how to pay in one line. */}
+      {acceptedMethods.length === 1 && acceptedMethods[0] === "cash" ? (
+        <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
+          <SectionTitle icon={CreditCard} label={t("method_cash")} />
+          <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{t("method_cash_hint")}</p>
+        </section>
+      ) : acceptedMethods.length > 0 ? (
         <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
           <SectionTitle icon={CreditCard} label={t("howPay")} />
           <div className="mt-4 grid gap-3">
@@ -1418,29 +1427,10 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             {t("previewExplain", { business: detail.organizationName })}
           </p>
         ) : null}
-        {isRentalDocumentEngine && publicAgreement && readyToSign ? (
-          <div className="mt-4 rounded-xl border border-[var(--info-line)] bg-[var(--panel-secondary)] p-4">
-            <p className="text-xs font-semibold uppercase text-[var(--primary)]">{t("agreementVersion", { number: publicAgreement.versionNumber })}</p>
-            <p className="mt-1 text-sm font-bold text-[var(--foreground)]">{publicAgreement.businessIdentity.name}</p>
-            <div className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
-              <p><span className="font-bold">{t("rateLabel")}</span>{" "}
-                {(() => {
-                  const per = ({ daily: "perDay", day: "perDay", weekly: "perWeek", week: "perWeek", monthly: "perMonth", month: "perMonth", custom: "forTheRental", "entire period": "forTheRental" } as Record<string, string>)[String(publicAgreement.rentalSummary.billingPeriod || "").toLowerCase()];
-                  return per ? t(per, { rate: publicAgreement.rentalSummary.rate }) : `${publicAgreement.rentalSummary.rate} / ${publicAgreement.rentalSummary.billingPeriod}`;
-                })()}</p>
-              <p><span className="font-bold">{t("depositLabel")}</span> {publicAgreement.rentalSummary.deposit}</p>
-              {/* Only shown when the agreement actually states one. */}
-              {publicAgreement.rentalSummary.standardDailyRate ? (
-                <p><span className="font-bold">{t("standardDailyRateLabel")}</span> {publicAgreement.rentalSummary.standardDailyRate}</p>
-              ) : null}
-            </div>
-            <p className="mt-3 text-xs text-[var(--muted)]">
-              {t("textFixedOnceSigned")} <span className="font-mono">{publicAgreement.contentHashFragment}</span>
-            </p>
-            {customerSigningEligibility?.customerSafeMessage ? (
-              <p className="mt-3 rounded-lg border border-[var(--danger-line)] bg-white p-3 text-sm font-bold text-[var(--danger)]">{customerSigningEligibility.customerSafeMessage}</p>
-            ) : null}
-          </div>
+        {/* Price and deposit are at the top of the page and in the agreement itself; the version number and
+            document fingerprint are kept on the record, not shown to someone renting a scooter. */}
+        {isRentalDocumentEngine && publicAgreement && readyToSign && customerSigningEligibility?.customerSafeMessage ? (
+          <p className="mt-3 rounded-lg border border-[var(--danger-line)] bg-white p-3 text-sm font-bold text-[var(--danger)]">{customerSigningEligibility.customerSafeMessage}</p>
         ) : null}
         <div className="routehq-contract-preview contract-preview mt-4 h-[70vh] min-h-[460px] overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)]">
           <iframe
@@ -1452,14 +1442,18 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         </div>
         {readyToSign && publicAgreement ? (
           <>
-          <div className="mt-4 space-y-2">
-            {publicAgreement.requiredAcknowledgements.map((ack) => (
-              <label className="checkbox-label rounded-xl border border-[var(--border)] bg-white p-3 font-bold text-[var(--foreground)]" key={`${publicAgreement.versionId}-${ack.type}`}>
-                <input className="flex-shrink-0" name={`ack_${ack.type}`} type="checkbox" />
-                {/* Shown in the reader's language; the record keeps the fixed English statement and its version. */}
-                <span>{t.has(`ack_${ack.type}` as never) ? t(`ack_${ack.type}` as never) : ack.text}</span>
-              </label>
-            ))}
+          {/* The statements are read as a list and agreed with one tick. Each one is still recorded by name and version. */}
+          <div className="mt-4 rounded-xl border border-[var(--border)] bg-white p-4">
+            <ul className="list-disc space-y-2 pl-5 text-sm leading-6 text-[var(--foreground)]">
+              {publicAgreement.requiredAcknowledgements.map((ack) => (
+                <li key={`${publicAgreement.versionId}-${ack.type}`}>{t.has(`ack_${ack.type}` as never) ? t(`ack_${ack.type}` as never) : ack.text}</li>
+              ))}
+            </ul>
+            <label className="checkbox-label mt-4 rounded-xl bg-[var(--panel-secondary)] p-3 font-bold text-[var(--foreground)]">
+              <input checked={agreedAll} className="flex-shrink-0" onChange={(event) => setAgreedAll(event.target.checked)} type="checkbox" />
+              <span>{t.has("agreeAll" as never) ? t("agreeAll" as never) : "I agree to all of the above"}</span>
+            </label>
+            {agreedAll ? publicAgreement.requiredAcknowledgements.map((ack) => <input key={ack.type} name={`ack_${ack.type}`} type="hidden" value="on" />) : null}
           </div>
         <label className="mt-4 block">
           <span className="text-sm font-bold text-[var(--foreground-secondary)]">{t("yourFullName")}</span>

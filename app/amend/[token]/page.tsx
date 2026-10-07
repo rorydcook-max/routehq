@@ -118,7 +118,7 @@ export default async function AmendmentPage({ params }: { params: Promise<{ toke
 
         <section className="rounded-2xl border border-[var(--border)] bg-white p-3 shadow-sm">
           <iframe className="h-[420px] w-full rounded-xl border border-[var(--border)] bg-white" sandbox="" srcDoc={amendment.html} title={t("amendTitle")} />
-          <p className="mt-2 px-1 text-[11px] text-[var(--muted)]">{t("amendFingerprint", { code: amendment.contentHashFragment })}</p>
+          {/* The document fingerprint is on the form itself and on the record; it means nothing to the person signing. */}
         </section>
 
         <AmendmentSignForm contentHash={amendment.contentHash} renterName={amendment.renterName} token={amendment.token} />

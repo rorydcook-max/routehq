@@ -582,7 +582,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 </p>
               </div>
               <div className="rounded-xl bg-[var(--background)] px-3.5 py-3">
-                <p className="font-semibold text-[var(--muted)]">{tx.say("billing")}</p>
+                {/* When the big number is money owed (it can include the deposit), the tile says so instead of "Rent". */}
+                <p className="font-semibold text-[var(--muted)]">{financialState.amount !== null && financialState.label ? financialState.label : tx.say("billing")}</p>
                 <p className={`mt-0.5 text-[20px] font-bold leading-tight tabular-nums ${financialState.amount !== null ? financialStateClass : "text-[var(--foreground)]"}`}>
                   {financialState.amount !== null ? money(financialState.amount, rental.currency) : tx.say(`ratePer_${["daily", "weekly", "monthly"].includes(String(rental.pricing_model)) ? rental.pricing_model : "other"}`, { amount: money(rental.rental_rate, rental.currency) })}
                 </p>
@@ -937,10 +938,12 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 hiddenActionIds={pendingPortalActions.map((action: any) => action.id)}
                 rentalId={rental.id}
               />
-            </Fold>
-
-            <Fold summary={tx.say("entries", { count: activityEvents.length })} title={tx.say("historyTitle")}>
-              <div className="space-y-3">
+              {/* The full history lives under the messages: one place for everything that has happened, not two rows on the page. */}
+              <details className="mt-4">
+                <summary className="cursor-pointer py-1 text-sm font-semibold text-[var(--primary)]">
+                  {tx.say("historyTitle")} · {tx.say("entries", { count: activityEvents.length })}
+                </summary>
+              <div className="mt-3 space-y-3">
                 {activityEvents.length === 0 ? (
                   <SectionEmpty>{tx.say("noActivity")}</SectionEmpty>
                 ) : (
@@ -953,6 +956,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   ))
                 )}
               </div>
+              </details>
             </Fold>
           </div>
 
@@ -1260,6 +1264,10 @@ function ComingUpCard({
   const showRecordPayment = nextPayment && ["pending", "overdue"].includes(nextPaymentStatus);
   const visibleEvents = vehicleEvents.slice(0, 5);
   const tx = useTx();
+
+  // The next payment is already in Payments, just above. This row earns its place only when the
+  // vehicle itself has something coming (tax, insurance, a service) during the rental.
+  if (vehicleEvents.length === 0) return null;
 
   return (
     <Fold

@@ -92,7 +92,10 @@ function amountInput(value: unknown) {
 /** What a payment is for. Words someone typed are shown as typed; otherwise it is named from what the payment is. */
 function paymentDescription(payment: RentalPayment, tx: Ctl) {
   const metadata = payment.metadata || {};
-  if (metadata.description) return String(metadata.description);
+  // The app's own English descriptions ("Security deposit", "First rental payment - due at handover") are
+  // not words someone typed: those payments are named in the reader's language below.
+  const appWritten = /^(security deposit|first rental payment|rental payment|rent payment|\d+ days? rent)\b/i.test(String(metadata.description || "").trim());
+  if (metadata.description && !appWritten) return String(metadata.description);
   const isExtension = metadata.type === "extension" || metadata.adjustment_type === "extension";
   if (isExtension) return tx.say("pc_extensionDesc", { from: dateLabel(metadata.previous_end_date, tx.locale), to: dateLabel(metadata.new_end_date, tx.locale) });
   if (metadata.type === "deposit" || metadata.is_deposit === true) return tx.say("pc_deposit");

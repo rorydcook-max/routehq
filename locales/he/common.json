@@ -440,7 +440,7 @@
     "enterLine": "הזינו את ה-LINE ID שלכם.",
     "enterTelegram": "הזינו את שם המשתמש שלכם ב-Telegram.",
     "addDocumentDetails": "הוסיפו את פרטי הדרכון ורישיון הנהיגה. צלמו כל מסמך, או הקלידו את הפרטים.",
-    "tickEachBox": "סמנו כל תיבה לפני החתימה.",
+    "tickEachBox": "סמנו את התיבה לפני החתימה.",
     "pleaseSign": "חתמו על ההסכם לפני השליחה.",
     "agreementUpdated": "השינויים שלכם עדכנו את ההסכם. קראו את הגרסה המעודכנת למטה וחתמו שוב.",
     "detailsSavedReadAgreement": "הפרטים שלכם נשמרו. קראו את ההסכם הסופי למטה ואז חתמו עליו.",
@@ -559,7 +559,8 @@
     "payKind_rent": "דמי השכרה",
     "payKind_deposit": "פיקדון",
     "payKind_deposit_top_up": "השלמת פיקדון",
-    "payKind_extension": "ימים נוספים"
+    "payKind_extension": "ימים נוספים",
+    "agreeAll": "אני מסכים/ה לכל האמור לעיל"
   },
   "customerMessages": {
     "hi": "שלום {name},",

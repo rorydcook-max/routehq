@@ -440,7 +440,7 @@
     "enterLine": "Vui lòng nhập LINE ID của bạn.",
     "enterTelegram": "Vui lòng nhập tên người dùng Telegram của bạn.",
     "addDocumentDetails": "Vui lòng bổ sung thông tin hộ chiếu và giấy phép lái xe. Chụp ảnh từng giấy tờ, hoặc tự nhập.",
-    "tickEachBox": "Vui lòng đánh dấu tất cả các ô trước khi ký.",
+    "tickEachBox": "Vui lòng đánh dấu vào ô trước khi ký.",
     "pleaseSign": "Vui lòng ký hợp đồng trước khi gửi.",
     "agreementUpdated": "Những thay đổi của bạn đã cập nhật hợp đồng. Vui lòng đọc bản mới bên dưới và ký lại.",
     "detailsSavedReadAgreement": "Đã lưu thông tin của bạn. Vui lòng đọc hợp đồng chính thức bên dưới, rồi ký.",
@@ -559,7 +559,8 @@
     "payKind_rent": "Tiền thuê",
     "payKind_deposit": "Tiền cọc",
     "payKind_deposit_top_up": "Cọc bổ sung",
-    "payKind_extension": "Ngày thuê thêm"
+    "payKind_extension": "Ngày thuê thêm",
+    "agreeAll": "Tôi đồng ý với tất cả các điều trên"
   },
   "customerMessages": {
     "hi": "Chào {name},",

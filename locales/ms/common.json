@@ -440,7 +440,7 @@
     "enterLine": "Sila masukkan LINE ID anda.",
     "enterTelegram": "Sila masukkan nama pengguna Telegram anda.",
     "addDocumentDetails": "Sila lengkapkan butiran pasport dan lesen memandu anda. Ambil gambar setiap dokumen, atau taipkan butirannya.",
-    "tickEachBox": "Sila tandakan setiap kotak sebelum menandatangani.",
+    "tickEachBox": "Sila tandakan kotak sebelum menandatangani.",
     "pleaseSign": "Sila tandatangan perjanjian sebelum menghantar.",
     "agreementUpdated": "Perubahan anda telah mengemas kini perjanjian. Sila baca versi terkini di bawah dan tandatangan semula.",
     "detailsSavedReadAgreement": "Butiran anda disimpan. Sila baca perjanjian muktamad di bawah, kemudian tandatangan.",
@@ -559,7 +559,8 @@
     "payKind_rent": "Sewa",
     "payKind_deposit": "Deposit",
     "payKind_deposit_top_up": "Tambahan deposit",
-    "payKind_extension": "Hari tambahan"
+    "payKind_extension": "Hari tambahan",
+    "agreeAll": "Saya bersetuju dengan semua perkara di atas"
   },
   "customerMessages": {
     "hi": "Hai {name},",

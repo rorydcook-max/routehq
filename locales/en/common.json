@@ -3549,7 +3549,12 @@
     "othersNote": "Adverts change quickly. Check each one is still for sale.",
     "slowYear": "It makes money in a normal year but loses in a slow one. A lower price gives you a cushion.",
     "platformArea": "Rent is what {count} rental businesses near you charge for the {model} on RouteHQ.",
-    "platformCountry": "Rent is what {count} rental businesses in your country charge for the {model} on RouteHQ."
+    "platformCountry": "Rent is what {count} rental businesses in your country charge for the {model} on RouteHQ.",
+    "rentYours": "What you would charge for a month",
+    "rentYoursDaily": "What a full month of day rentals brings in",
+    "rentFromWeb": "Our estimate from prices found online. Shops that rent through Marketplace and walk-ins often charge less. Change it to your own price.",
+    "rentFromOwn": "This is what you charge for your own {model}.",
+    "rentFromUsual": "A usual figure for this kind of vehicle. Change it to your own price."
   },
   "importer": {
     "dt_vehicles": "Vehicles",

@@ -36,7 +36,8 @@ export async function POST(request: NextRequest) {
 
   // The same vehicle in the same area gives the same figures each time, so two checks can be compared fairly.
   const locale = String(body.locale || "en").slice(0, 8);
-  const cacheKey = ["v4", country, area, body.category || "car", make, model, year, String(body.trim || ""), Math.round(mileage / 20000), locale]
+  // The figures do not depend on the reader's language, so every language shares them; only the notes are per language.
+  const cacheKey = ["v7", country, area, body.category || "car", make, model, year, String(body.trim || ""), Math.round(mileage / 20000)]
     .join("|")
     .toLowerCase()
     .slice(0, 300);
@@ -60,7 +61,8 @@ export async function POST(request: NextRequest) {
     store = createSupabaseAdminClient();
     const { data: kept } = await store.from("market_research_cache").select("payload, sources, created_at").eq("cache_key", cacheKey).maybeSingle();
     if (kept && Date.now() - new Date(kept.created_at).getTime() < KEEP_DAYS * 86400000) {
-      return respond(kept.payload, kept.sources || []);
+      const notes = kept.payload?.notes_by_locale?.[locale] || kept.payload?.notes_en || [];
+      return respond({ ...kept.payload, notes }, kept.sources || []);
     }
   } catch {
     store = null;
@@ -94,6 +96,7 @@ Reply with one JSON object and nothing else:
   "max_rental_age": number,
   "market_price_low": number, "market_price_high": number,
   "notes": [up to 4 short sentences],
+  "notes_en": [the same notes in English],
   "confidence": "high" | "medium" | "low"
 }
 
@@ -117,7 +120,8 @@ Rules: percentages are whole numbers (85, not 0.85). Search several times: renta
 
   try {
     const { data, sources } = await researchJsonSteady(prompt);
-    const research = { ...data, at_price: price };
+    const notesEn = Array.isArray(data.notes_en) && data.notes_en.length ? data.notes_en : data.notes || [];
+    const research = { ...data, notes_en: notesEn, notes_by_locale: { [locale]: data.notes || [] }, at_price: price };
     const pages = sources.slice(0, 12);
     if (store && Number(data.rent_month_typical) > 0) {
       await store.from("market_research_cache").upsert({ cache_key: cacheKey, payload: research, sources: pages, created_at: new Date().toISOString() });

@@ -9,7 +9,8 @@ import { bookOnline } from "@/app/actions/online-booking";
 import { VehicleKindIcon } from "@/components/vehicle-kind-icon";
 import type { CatalogVehicle } from "@/lib/public-catalog";
 import { clashes } from "@/lib/booking-rules";
-import { daysBetween, estimateRental, headlineRate, minimumStay, planFor } from "@/lib/rental-estimate";
+import { daysBetween, headlineRate, minimumStay, planFor } from "@/lib/rental-estimate";
+import { countBillingPeriods } from "@/lib/payment-schedule";
 
 const inputClass = "mt-1.5 w-full rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15";
 
@@ -147,9 +148,13 @@ export function Catalog({
       <section className="space-y-3">
         {rows.map(({ vehicle, free, freeFrom, openEndedClash }) => {
           const headline = headlineRate(vehicle);
-          const estimate = days ? estimateRental(vehicle, days) : null;
           // A monthly-only vehicle can't be booked for a weekend.
-          const bookable = !!planFor(vehicle, days);
+          const plan = planFor(vehicle, days);
+          const bookable = !!plan;
+          // Exactly what this booking will be charged, worked out the way the payments are: a day price for each day,
+          // or one payment for each week or month started. Never an "about" figure the booking then disagrees with.
+          const periods = plan && days && end ? (plan.pricingModel === "daily" ? days : countBillingPeriods(startDate, end, plan.pricingModel, 52)) : 0;
+          const stayTotal = plan && periods > 0 ? periods * plan.rate : null;
           const tooShort = datesReady && free && !bookable ? (longTerm ? t("notOfferedMonthly") : minimumStay(vehicle) === "Minimum 1 week" ? t("minimumOneWeek") : minimumStay(vehicle) ? t("minimumOneMonth") : null) : null;
           const otherRates = [
             // A business that only rents by the month does not show prices customers cannot book at.
@@ -183,9 +188,9 @@ export function Catalog({
                   ) : null}
                   {vehicle.deposit > 0 ? <p className="mt-0.5 text-sm text-[var(--muted)]">{t("depositReturnedAtEnd", { amount: money(vehicle.deposit) })}</p> : null}
                   {/* No price for a stay the vehicle can't be booked for: a slice of the monthly rate is not on offer. */}
-                {free && estimate && days && !tooShort ? (
-                    <p className="mt-1 text-sm text-[var(--primary)]">
-                      {t("aboutForDays", { amount: money(estimate), days })}
+                  {free && plan && stayTotal && !tooShort ? (
+                    <p className="mt-1 text-sm font-semibold text-[var(--primary)]">
+                      {money(stayTotal)} = {periods} × {t(plan.pricingModel === "daily" ? "perDay" : plan.pricingModel === "weekly" ? "perWeek" : "perMonth", { rate: money(plan.rate) })}
                     </p>
                   ) : null}
                   {tooShort ? <p className="mt-1 text-sm font-semibold text-[var(--warning)]">{tooShort}</p> : null}

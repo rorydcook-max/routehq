@@ -132,7 +132,11 @@ export function project(a: Assumptions): Projection {
     valueAtStart = value;
   }
 
-  const best = rows.reduce((top, row) => (row.perYear > top.perYear ? row : top), rows[0]);
+  const top = rows.reduce((high, row) => (row.perYear > high.perYear ? row : high), rows[0]);
+  // When keeping it a year or two longer earns as good as the same per year (within 3%), keep it: selling and
+  // replacing a vehicle is work and risk the sums do not see.
+  const nearTop = top.perYear > 0 ? rows.filter((row) => row.perYear >= top.perYear * 0.97) : [top];
+  const best = nearTop[nearTop.length - 1];
 
   // Money back: rent less running costs and loan payments, month by month, until it covers what was put in.
   let paybackMonths: number | null = null;

@@ -227,7 +227,7 @@ export function CalculatorClient({
     setListings(null);
     if (key === researchKey.split("@")[0]) {
       setSubject(next);
-      setAssumptions(compose(research, Number(researchKey.split("@")[1]) || price, next, price));
+      setAssumptions(withOwnRate(compose(research, Number(researchKey.split("@")[1]) || price, next, price), next));
       return;
     }
     setBusy(true);
@@ -255,9 +255,27 @@ export function CalculatorClient({
     setPlace(where);
     setResearchKey(`${key}@${foundAt}`);
     setSubject(next);
-    setAssumptions(compose(found, foundAt, next, price));
+    setAssumptions(withOwnRate(compose(found, foundAt, next, price), next));
     setBusy(false);
     requestAnimationFrame(() => document.getElementById("calc-result")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  }
+
+  /** The operator's own price for this model beats anything found online: it is what their customers really pay. */
+  function ownVehicle(forSubject: Subject) {
+    return fleetVehicles.find((v) => v.monthlyRate > 0 && v.make.toLowerCase() === forSubject.make.toLowerCase() && v.model.toLowerCase() === forSubject.model.toLowerCase());
+  }
+  function withOwnRate(figures: Assumptions, forSubject: Subject): Assumptions {
+    const mine = style === "monthly" ? ownVehicle(forSubject) : undefined;
+    return mine ? { ...figures, rentMonthly: mine.monthlyRate, rentLow: Math.round(mine.monthlyRate * 0.9), rentHigh: Math.round(mine.monthlyRate * 1.1) } : figures;
+  }
+  /** Changing the rent moves the slow-year and good-year rents with it. */
+  function setRent(value: number) {
+    setAssumptions((current) => {
+      if (!current) return current;
+      const ratio = current.rentMonthly > 0 ? value / current.rentMonthly : 1;
+      return { ...current, rentMonthly: value, rentLow: Math.round((current.rentLow || current.rentMonthly * 0.85) * ratio), rentHigh: Math.round((current.rentHigh || current.rentMonthly * 1.15) * ratio) };
+    });
+    setSaveState("idle");
   }
 
   function change(patch: Partial<Assumptions>) {
@@ -355,9 +373,7 @@ export function CalculatorClient({
     requestAnimationFrame(() => document.getElementById("calc-result")?.scrollIntoView({ behavior: "smooth", block: "start" }));
   }
 
-  const own = subject
-    ? fleetVehicles.find((v) => v.monthlyRate > 0 && v.make.toLowerCase() === subject.make.toLowerCase() && v.model.toLowerCase() === subject.model.toLowerCase())
-    : undefined;
+  const own = subject ? ownVehicle(subject) : undefined;
   const best = outcome?.expected.best;
   // "Only at a better price" for one of two reasons: the return is too low, or it is fine in a normal year but loses in a slow one.
   const slowYearOnly = Boolean(outcome && outcome.verdict === "thin" && outcome.expected.returnPct >= 10);
@@ -497,6 +513,24 @@ export function CalculatorClient({
               {say(best.year === 1 ? "sellAfterOne" : "sellAfter", { years: best.year, value: about(best.value), profit: about(best.profit) })}
             </p>
 
+            <div className="mt-4 rounded-xl border border-[var(--border)] p-3">
+              <Num
+                hint={
+                  platform
+                    ? say(platform.scope === "area" ? "platformArea" : "platformCountry", { count: platform.businesses, model: subject.model })
+                    : own && style === "monthly" && own.monthlyRate === assumptions.rentMonthly
+                      ? say("rentFromOwn", { model: subject.model })
+                      : research
+                        ? t("rentFromWeb")
+                        : t("rentFromUsual")
+                }
+                label={style === "daily" ? t("rentYoursDaily") : t("rentYours")}
+                onChange={setRent}
+                suffix={currency}
+                value={assumptions.rentMonthly}
+              />
+            </div>
+
             <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
               <div className="rounded-xl bg-[var(--surface-muted,#f6f7f9)] p-3">
                 <dt className="text-[var(--foreground-muted)]">{assumptions.financed ? t("returnOnCash") : t("returnOnCost")}</dt>
@@ -533,14 +567,11 @@ export function CalculatorClient({
                 )}
               </p>
             ) : null}
-            {platform ? (
-              <p className="mt-3 text-sm text-[var(--foreground-secondary)]">{say(platform.scope === "area" ? "platformArea" : "platformCountry", { count: platform.businesses, model: subject.model })}</p>
-            ) : null}
-            {own ? (
+            {own && own.monthlyRate !== assumptions.rentMonthly ? (
               <p className="mt-3 text-sm text-[var(--foreground-secondary)]">
                 {say("ownRate", { model: subject.model, amount: money(own.monthlyRate) })}{" "}
-                {style === "monthly" && own.monthlyRate !== assumptions.rentMonthly ? (
-                  <button className="font-semibold text-[var(--primary)] underline" onClick={() => change({ rentMonthly: own.monthlyRate, rentLow: Math.round(own.monthlyRate * 0.9), rentHigh: Math.round(own.monthlyRate * 1.1) })} type="button">
+                {style === "monthly" ? (
+                  <button className="font-semibold text-[var(--primary)] underline" onClick={() => setRent(own.monthlyRate)} type="button">
                     {t("useIt")}
                   </button>
                 ) : null}
@@ -637,7 +668,7 @@ export function CalculatorClient({
               </ul>
             ) : null}
             <div className="grid grid-cols-2 gap-3">
-              <Num hint={t("rentHint")} label={t("rent")} onChange={(value) => change({ rentMonthly: value })} value={assumptions.rentMonthly} />
+              <Num hint={t("rentHint")} label={t("rent")} onChange={setRent} value={assumptions.rentMonthly} />
               <Num hint={t("occupancyHint")} label={t("occupancy")} onChange={(value) => change({ occupancy: Math.min(100, value) })} suffix="%" value={assumptions.occupancy} />
               <Num label={t("insurance")} onChange={(value) => change({ insurance: value })} value={assumptions.insurance} />
               <Num label={t("taxes")} onChange={(value) => change({ tax: value, compulsory: 0 })} value={assumptions.tax + assumptions.compulsory} />

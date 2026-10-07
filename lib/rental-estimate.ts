@@ -100,8 +100,17 @@ export function planFor(rates: Rates, days: number | null): RentalPlan | null {
   // No end date always means the monthly rate, renewing each month.
   if (days === null) return rates.monthlyRate > 0 ? { pricingModel: "monthly", rate: rates.monthlyRate } : null;
   if (days >= 28 && rates.monthlyRate > 0) return { pricingModel: "monthly", rate: rates.monthlyRate };
-  if (days >= 7 && rates.weeklyRate > 0) return { pricingModel: "weekly", rate: rates.weeklyRate };
-  return rates.dailyRate > 0 ? { pricingModel: "daily", rate: rates.dailyRate } : null;
+  // Under a month: whichever of the vehicle's prices costs the customer least for the stay, so that a few extra
+  // days never cost more than the week or month they fall inside (25 days at the day price can be dearer than
+  // the month). A longer price only stands in when the stay could be booked at a shorter one anyway: a
+  // monthly-only vehicle is still not offered for a weekend.
+  const choices: Array<RentalPlan & { total: number }> = [];
+  if (rates.dailyRate > 0) choices.push({ pricingModel: "daily", rate: rates.dailyRate, total: days * rates.dailyRate });
+  if (rates.weeklyRate > 0 && (days >= 7 || rates.dailyRate > 0)) choices.push({ pricingModel: "weekly", rate: rates.weeklyRate, total: Math.ceil(days / 7) * rates.weeklyRate });
+  if (rates.monthlyRate > 0 && choices.length > 0) choices.push({ pricingModel: "monthly", rate: rates.monthlyRate, total: rates.monthlyRate });
+  if (!choices.length) return null;
+  const best = choices.reduce((low, choice) => (choice.total < low.total ? choice : low), choices[0]);
+  return { pricingModel: best.pricingModel, rate: best.rate };
 }
 
 /** Why a short stay can't be booked online, in the customer's words. */

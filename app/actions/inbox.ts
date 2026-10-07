@@ -21,8 +21,8 @@ const SIGNED_OUT = "Please sign in again.";
  */
 export async function connectChannel(input: { provider: "line" | "telegram"; accessToken: string; channelSecret?: string }): Promise<ActionResult<{ name: string; webhook: string; webhookSet: boolean }>> {
   const membership = await getCurrentMembership();
-  if (!membership) return { ok: false, error: SIGNED_OUT };
-  if (membership.role !== "owner") return { ok: false, error: OWNER_ONLY_MESSAGE };
+  if (!membership) return { ok: false, error: await said(SIGNED_OUT) };
+  if (membership.role !== "owner") return { ok: false, error: await said(OWNER_ONLY_MESSAGE) };
 
   const accessToken = String(input.accessToken || "").trim();
   const channelSecret = String(input.channelSecret || "").trim();
@@ -91,8 +91,8 @@ export async function connectChannel(input: { provider: "line" | "telegram"; acc
 
 export async function disconnectChannel(channelId: string): Promise<ActionResult> {
   const membership = await getCurrentMembership();
-  if (!membership) return { ok: false, error: SIGNED_OUT };
-  if (membership.role !== "owner") return { ok: false, error: OWNER_ONLY_MESSAGE };
+  if (!membership) return { ok: false, error: await said(SIGNED_OUT) };
+  if (membership.role !== "owner") return { ok: false, error: await said(OWNER_ONLY_MESSAGE) };
 
   const supabase = createSupabaseAdminClient() as any;
   const { data: channel } = await supabase.from("messaging_channels").select("id, provider").eq("id", channelId).eq("organization_id", membership.organizationId).maybeSingle();
@@ -113,7 +113,7 @@ export async function disconnectChannel(channelId: string): Promise<ActionResult
 
 async function conversationForMember(conversationId: string) {
   const membership = await getCurrentMembership();
-  if (!membership) return { error: SIGNED_OUT } as const;
+  if (!membership) return { error: await said(SIGNED_OUT) } as const;
   const supabase = createSupabaseAdminClient() as any;
   const { data: conversation } = await supabase
     .from("conversations")

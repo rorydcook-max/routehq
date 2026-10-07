@@ -56,7 +56,7 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
   const vehicle = catalog.vehicles.find((item) => item.id === vehicleId);
   if (!vehicle) return { ok: false, error: await said("That vehicle is no longer available. Please choose another.") };
   if (startDate < catalog.minStart) return { ok: false, error: await said(`The earliest start date is ${shortDate(catalog.minStart)}. Please choose a later date.`) };
-  if (vehicle.busy.some((period) => clashes(startDate, endDate, period, catalog.gapDays))) return { ok: false, error: TAKEN };
+  if (vehicle.busy.some((period) => clashes(startDate, endDate, period, catalog.gapDays))) return { ok: false, error: await said(TAKEN) };
 
   const plan = planFor(vehicle, endDate ? daysBetween(startDate, endDate) : null);
   if (!plan) return { ok: false, error: await said(`${minimumStay(vehicle) || "This vehicle can't be booked online for those dates"}. Please choose a longer stay or another vehicle.`) };
@@ -185,7 +185,7 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
 export async function savePublicBookingSettings(input: { enabled: boolean; holdHours: number; deposit: number; offer?: string }): Promise<Result> {
   const membership = await getCurrentMembership();
   if (!membership) return { ok: false, error: await said("Please sign in again.") };
-  if (membership.role !== "owner") return { ok: false, error: OWNER_ONLY_MESSAGE };
+  if (membership.role !== "owner") return { ok: false, error: await said(OWNER_ONLY_MESSAGE) };
 
   const admin = createSupabaseAdminClient() as any;
   const { data: organization } = await admin.from("organizations").select("settings, slug").eq("id", membership.organizationId).maybeSingle();
@@ -208,7 +208,7 @@ export async function savePublicBookingSettings(input: { enabled: boolean; holdH
 export async function saveCustomerMessages(enabled: boolean): Promise<Result> {
   const membership = await getCurrentMembership();
   if (!membership) return { ok: false, error: await said("Please sign in again.") };
-  if (membership.role !== "owner") return { ok: false, error: OWNER_ONLY_MESSAGE };
+  if (membership.role !== "owner") return { ok: false, error: await said(OWNER_ONLY_MESSAGE) };
   const admin = createSupabaseAdminClient() as any;
   const { data: organization } = await admin.from("organizations").select("settings").eq("id", membership.organizationId).maybeSingle();
   if (!organization) return { ok: false, error: await said("Business not found.") };
@@ -223,7 +223,7 @@ export async function saveCustomerMessages(enabled: boolean): Promise<Result> {
 export async function saveBookingRules(input: BookingRules): Promise<Result> {
   const membership = await getCurrentMembership();
   if (!membership) return { ok: false, error: await said("Please sign in again.") };
-  if (membership.role !== "owner") return { ok: false, error: OWNER_ONLY_MESSAGE };
+  if (membership.role !== "owner") return { ok: false, error: await said(OWNER_ONLY_MESSAGE) };
 
   const admin = createSupabaseAdminClient() as any;
   const { data: organization } = await admin.from("organizations").select("settings, slug").eq("id", membership.organizationId).maybeSingle();

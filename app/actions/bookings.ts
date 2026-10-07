@@ -1279,7 +1279,7 @@ export async function updateBooking(formData: FormData) {
       excludeRentalId: rental.id
     });
     if (conflict) {
-      return { error: conflict };
+      return { error: await said(conflict) };
     }
   }
 

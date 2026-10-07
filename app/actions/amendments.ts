@@ -184,7 +184,7 @@ export async function getRentalAmendmentContext(rentalId: string): Promise<
       rates: rentalRateCard(vehicleRates, rental)
     };
   } catch (error) {
-    return { ok: false, error: errorMessage(error) };
+    return { ok: false, error: await said(errorMessage(error)) };
   }
 }
 
@@ -347,7 +347,7 @@ export async function createRentalAmendment(input: {
     revalidatePath(`/bookings/${rentalId}`);
     return { ok: true, token: amendment.token };
   } catch (error) {
-    return { ok: false, error: errorMessage(error) };
+    return { ok: false, error: await said(errorMessage(error)) };
   }
 }
 
@@ -409,7 +409,7 @@ export async function cancelRentalAmendment(amendmentId: string): Promise<Result
     revalidatePath(`/bookings/${amendment.rental_id}`);
     return { ok: true };
   } catch (error) {
-    return { ok: false, error: errorMessage(error) };
+    return { ok: false, error: await said(errorMessage(error)) };
   }
 }
 
@@ -521,7 +521,7 @@ export async function signRentalAmendment(input: {
     return { ok: true };
   } catch (error) {
     if (uploaded.length) await storage.remove(uploaded).catch(() => undefined);
-    return { ok: false, error: errorMessage(error) };
+    return { ok: false, error: await said(errorMessage(error)) };
   }
 }
 
@@ -903,7 +903,7 @@ export async function getVehicleChangeOptions(rentalId: string): Promise<Result<
       swaps
     };
   } catch (error) {
-    return { ok: false, error: errorMessage(error) };
+    return { ok: false, error: await said(errorMessage(error)) };
   }
 }
 
@@ -1053,6 +1053,6 @@ export async function createVehicleChange(input: {
       throw error;
     }
   } catch (error) {
-    return { ok: false, error: errorMessage(error) };
+    return { ok: false, error: await said(errorMessage(error)) };
   }
 }

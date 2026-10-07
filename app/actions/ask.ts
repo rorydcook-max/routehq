@@ -17,7 +17,7 @@ export async function askRouteHq(question: string, history: AskTurn[] = []): Pro
   const membership = await getCurrentMembership();
   if (!membership) return { ok: false, error: await said("Please sign in again.") };
   // Money questions and changes are the owner's business; teammates handle day-to-day work.
-  if (membership.role !== "owner") return { ok: false, error: OWNER_ONLY };
+  if (membership.role !== "owner") return { ok: false, error: await said(OWNER_ONLY) };
 
   let language = "English";
   try {
@@ -54,7 +54,7 @@ function form(organizationId: string, values: Record<string, string | number | b
 export async function confirmAssistantAction(kind: string, args: Record<string, unknown>): Promise<Done> {
   const membership = await getCurrentMembership();
   if (!membership) return { ok: false, error: await said("Please sign in again.") };
-  if (membership.role !== "owner") return { ok: false, error: OWNER_ONLY };
+  if (membership.role !== "owner") return { ok: false, error: await said(OWNER_ONLY) };
 
   const checked = checkAction(String(kind), args && typeof args === "object" ? args : {}, await assistantRecords());
   if (!checked.ok) return { ok: false, error: checked.error };

@@ -556,8 +556,10 @@ export function BookingEditForm({
                   </div>
                 ) : null}
               </div>
-              <div className="mt-3 sm:max-w-xs">
-                <MoneyField label={say("t_depositHeld")} name="depositHeld" value={rental.deposit_held} />
+              <input name="depositHeld" type="hidden" value={String(Number(rental.deposit_held || 0))} />
+              <div className="mt-2.5">
+                <FixedTile label={say("t_depositHeld")} value={money(rental.deposit_held, currency)} />
+                <p className="mt-1.5 font-medium text-[var(--muted)]">{say("t_depositHeldHint")}</p>
               </div>
             </section>
           ) : (
@@ -606,7 +608,12 @@ export function BookingEditForm({
                   </label>
                   <MoneyField label={say("t_rate")} name="rentalRate" required value={rental.rental_rate} />
                   <MoneyField label={say("t_depositAgreed")} name="depositAmount" value={rental.deposit_amount} />
-                  <MoneyField label={say("t_depositHeld")} name="depositHeld" value={rental.deposit_held} />
+                </div>
+                {/* What is held changes only when money is recorded, so the books always say where the deposit is. */}
+                <input name="depositHeld" type="hidden" value={String(Number(rental.deposit_held || 0))} />
+                <div className="mt-3">
+                  <FixedTile label={say("t_depositHeld")} value={money(rental.deposit_held, currency)} />
+                  <p className="mt-1.5 font-medium text-[var(--muted)]">{say("t_depositHeldHint")}</p>
                 </div>
               </section>
             </>

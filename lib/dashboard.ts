@@ -146,11 +146,10 @@ export async function getDashboardData(): Promise<DashboardData> {
     .map((row: any) => mapVehicle(row, figures.get(row.id)))
     .sort((a: Vehicle, b: Vehicle) => b.profit - a.profit);
   const vehicleById = new Map(vehicles.map((vehicle) => [vehicle.id, vehicle]));
-  const depositsHeldRows = rentalRows.filter((row: any) => {
-    const status = String(row.status || "").toLowerCase();
-    const depositStatus = String(row.deposit_status || "").toLowerCase();
-    return status !== "completed" && status !== "cancelled" && depositStatus === "received";
-  });
+  // A deposit is held from the moment it is received until it is handed back or
+  // kept, whatever stage the booking is at: a finished or cancelled booking
+  // whose deposit has not been settled yet is still money you are holding.
+  const depositsHeldRows = rentalRows.filter((row: any) => String(row.deposit_status || "").toLowerCase() === "received" && Number(row.deposit_held || 0) > 0);
   const depositsHeld = depositsHeldRows.reduce((sum: number, row: any) => sum + Number(row.deposit_held || 0), 0);
   // The dashboard is about what's happening now: returned and cancelled bookings
   // used to be mapped to "Active"/"Booked" and showed up in today's schedule.

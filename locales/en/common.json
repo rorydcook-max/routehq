@@ -2686,6 +2686,7 @@
     "saving": "Saving…",
     "pt_rent": "Rent",
     "pt_deposit": "Deposit",
-    "pt_extension": "Extension"
+    "pt_extension": "Extension",
+    "t_depositHeldHint": "This changes when you record a deposit received, returned or kept on the booking."
   }
 }

@@ -398,8 +398,10 @@ export async function getReportsData(
       .select("id, deposit_held, deposit_status, status")
       .eq("organization_id", organizationId)
       .is("deleted_at", null)
-      .eq("status", "active")
+      // Held at any stage (booked, on rent, late, finished but not settled),
+      // the same count as the dashboard. This used to look at "active" only.
       .eq("deposit_status", "received")
+      .gt("deposit_held", 0)
   ]);
 
   const transactions: any[] = txResult.data || [];

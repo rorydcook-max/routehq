@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { CalendarDays, Camera, Car, CheckCircle2, FileSpreadsheet, ImagePlus, Languages, LineChart, MapPin, ScanLine, X } from "lucide-react";
+import { CalendarDays, Camera, Car, CheckCircle2, ChevronDown, FileSpreadsheet, ImagePlus, Languages, ScanLine, X } from "lucide-react";
 import { createOnboardingVehicle, finishOnboarding, saveBusinessProfile, skipFirstVehicle } from "@/app/actions/onboarding";
 import { fetchVehicleMakesForCategory, fetchVehicleModels, fetchVehicleTrims, type VehicleMake, type VehicleModel, type VehicleTrim } from "@/lib/vehicle-catalog-db";
 
@@ -563,7 +563,7 @@ const thaiLocationLabels: Record<string, string> = {
 };
 const fleetSizes = ["1-5", "6-15", "16-50", "50+"];
 
-const fieldClass = "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] font-semibold text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15";
+const fieldClass = "mt-1 w-full";
 
 const currencyOptionsByCountry: Record<string, string[]> = {
   Thailand: ["THB", "USD"],
@@ -663,209 +663,197 @@ function normalizeDateToIso(value: string | null | undefined) {
 
 const copy = {
   en: {
-    setupEyebrow: "RouteHQ setup",
-    setupTitle: "Get operational in minutes",
-    saving: "Saving...",
+    setupTitle: "Set up RouteHQ",
+    saving: "Saving…",
     continue: "Continue",
-    setupComplete: "Setup complete",
-    setupCompleteBody: "Your RouteHQ account is ready. Opening your dashboard now.",
+    setupComplete: "All set",
+    setupCompleteBody: "Opening your dashboard…",
     step1Title: "Welcome to RouteHQ",
-    step1Subtitle: "Let's set up your account in a few steps",
+    step1Subtitle: "Three short steps and you are ready to take bookings.",
     businessName: "Business name",
-    mainLocation: "Main location",
-    mainLocationHint: "This becomes your default main branch. You can add more locations later.",
+    mainLocation: "Where you are based",
+    mainLocationHint: "You can add more locations later.",
     country: "Country",
-    region: "Province / region",
-    town: "Town / subdistrict",
-    customCountry: "Enter country",
-    customRegion: "Enter province, state, or region",
-    customTown: "Enter town or subdistrict",
-    fleetType: "Fleet type",
-    fleetSize: "Approximate fleet size",
-    primaryLanguage: "Primary language",
-    carsOnly: "Cars only",
-    motorcyclesOnly: "Motorcycles only",
-    mixedFleet: "Mixed fleet",
+    region: "Province or region",
+    town: "Town or area",
+    customCountry: "Type your country",
+    customRegion: "Type your province or region",
+    customTown: "Type your town or area",
+    fleetType: "What you rent out",
+    fleetSize: "How many vehicles",
+    primaryLanguage: "Language",
+    carsOnly: "Cars",
+    motorcyclesOnly: "Motorbikes",
+    mixedFleet: "Both",
     vehicles: "vehicles",
     english: "English",
     thai: "ภาษาไทย (Thai)",
     step2Title: "Add your first vehicle",
-    step2Subtitle: "Scan your Registration Book for the fastest setup",
-    scanBlueBook: "Scan Registration Book",
-    scanBlueBookBody: "Take a photo of your vehicle registration book. We'll read it automatically.",
-    uploadPhotos: "Upload vehicle photos",
-    uploadPhotosBody: "Optional, but useful for your fleet profile.",
-    photosSelected: (count: number) => `${count} photo${count === 1 ? "" : "s"} selected`,
-    importVehicles: "Import vehicles",
-    importVehiclesBody: "Use the smart importer for CSV, Excel, or Google Sheets.",
-    enterManually: "Enter manually",
-    enterManuallyBody: "Fill in the details yourself below.",
-    readingBlueBook: "Reading Registration Book...",
-    renewalHelp: "These dates help RouteHQ remind you before renewals are due.",
-    confirmVehicle: "Confirm and add vehicle",
+    step2Subtitle: "Photograph the registration book and we fill in the details for you.",
+    scanBlueBook: "Photograph the registration book",
+    scanBlueBookBody: "We read the plate, make, model and dates from it.",
+    uploadPhotos: "Add photos of the vehicle",
+    uploadPhotosBody: "Optional. Customers see these.",
+    photosSelected: (count: number) => `${count} photo${count === 1 ? "" : "s"} chosen`,
+    removePhoto: "Remove photo",
+    importVehicles: "Bring in a list",
+    importVehiclesBody: "Have your vehicles in a spreadsheet? Add them all at once.",
+    readingBlueBook: "Reading the registration book…",
+    renewalHelp: "RouteHQ reminds you before these dates.",
+    confirmVehicle: "Add this vehicle",
     addVehiclesLater: "I'll add vehicles later",
-    step3Title: "See your first alert",
-    step3Subtitle: "RouteHQ turns dates into operational reminders",
-    attentionSoon: "Attention soon",
-    complianceGood: "Compliance looks good",
-    expiresInDays: (item: string, days: number) => `${item} expires in ${days} days`,
-    allComplianceGood: (vehicleName: string) => `All compliance looks good for your ${vehicleName}`,
-    nextUpcoming: (item: string, date: string) => `Next upcoming date: ${item} on ${date}`,
-    sampleAlert: "Sample alert",
-    sampleAlertTitle: "Vehicle tax expires in 24 days",
-    sampleAlertBody: "Once you add your vehicles, RouteHQ tracks all renewal dates and alerts you before they expire.",
-    vehicleLater: "You can add your first vehicle from the Fleet page after setup.",
-    alertSchedule: "RouteHQ will alert you 1 month, 2 weeks, and 1 week before any expiry by notification and LINE message.",
-    step4Title: "Get daily updates on LINE",
-    step4Subtitle: "Most operators find this the most useful feature",
-    lineBenefits: [
-      "Daily morning summary - active rentals, returns due, payments expected",
-      "Instant alerts - compliance expiring, GPS offline, overdue returns",
-      "Payment reminders - automatically sent to your customers"
-    ],
-    lineId: "Or enter your LINE ID",
-    scanLine: "Scan with your LINE app to connect",
-    connectedLine: "I've connected LINE",
-    skipNow: "Skip for now",
-    finishing: "Finishing...",
-    ocrFailed: "OCR failed.",
-    scanFailed: "Unable to scan Registration Book.",
-    profileFailed: "Unable to save business profile.",
-    vehicleFailed: "Unable to create vehicle.",
-    finishFailed: "Unable to finish onboarding.",
-    vehicleTax: "Vehicle tax",
+    step3Title: "You are ready",
+    step3Subtitle: "Here is what happens next.",
+    expiresInDays: (item: string, days: number) => `${item} runs out in ${days} ${days === 1 ? "day" : "days"}`,
+    alreadyExpired: (item: string) => `${item} has already run out`,
+    nextUpcoming: (item: string, date: string) => `Next date: ${item}, ${date}. We will remind you before then.`,
+    remindersTitle: "Reminders before things run out",
+    remindersBody: "Tax, insurance and services: RouteHQ tells you before they are due.",
+    vehicleLater: "Add your vehicles any time from Fleet.",
+    lineTitle: "Get alerts on LINE",
+    lineBody: "A morning summary, and an alert when a customer books, pays or is late. Connect LINE from Settings; it takes a minute.",
+    finish: "Open my dashboard",
+    finishLine: "Finish and connect LINE",
+    finishing: "Finishing…",
+    ocrFailed: "We could not read that photo. Try a clearer one, or type the details in.",
+    scanFailed: "We could not read the registration book. Try again, or type the details in.",
+    profileFailed: "That did not save. Check your connection and try again.",
+    vehicleFailed: "The vehicle was not added. Check the details and try again.",
+    finishFailed: "That did not finish. Check your connection and try again.",
+    vehicleTax: "Road tax",
     compulsoryInsurance: "Compulsory insurance",
-    voluntaryInsurance: "Voluntary insurance",
+    voluntaryInsurance: "Insurance",
     nextService: "Next service",
     fields: {
-      category: "Vehicle category",
-      vin: "VIN / frame number",
+      category: "Kind of vehicle",
+      vin: "Chassis number (VIN)",
       make: "Make",
       model: "Model",
-      trim: "Trim",
+      trim: "Version",
       year: "Year",
-      registration: "Registration number",
+      registration: "Number plate",
       color: "Colour",
-      mileage: "Current mileage",
+      mileage: "Mileage now",
       currency: "Currency",
-      rate: "Rate",
-      dailyRate: "Daily rental rate",
-      weeklyRate: "Weekly rental rate",
-      monthlyRate: "Monthly rental rate",
-      dailyShort: "Daily",
-      weeklyShort: "Weekly",
-      monthlyShort: "Monthly",
-      taxExpiry: "Tax expiry",
-      porborExpiry: "Compulsory insurance expiry",
-      insuranceExpiry: "Voluntary insurance expiry",
+      rate: "Your prices",
+      dailyShort: "Per day",
+      weeklyShort: "Per week",
+      monthlyShort: "Per month",
+      taxExpiry: "Road tax runs out",
+      porborExpiry: "Compulsory insurance runs out",
+      insuranceExpiry: "Insurance runs out",
       nextService: "Next service due",
-      transmission: "Transmission",
-      fuelType: "Fuel type",
-      engineCc: "Engine CC",
-      seating: "Seating capacity"
+      transmission: "Gearbox",
+      fuelType: "Fuel",
+      engineCc: "Engine size (cc)",
+      seating: "Seats",
+      otherMake: "Another make",
+      pickMake: "Choose a make",
+      loading: "Loading…",
+      searchMake: "Search makes",
+      pickModel: "Choose a model",
+      pickMakeFirst: "Choose a make first",
+      other: "Another one",
+      pickYear: "Choose a year",
+      pickTrim: "Choose a version",
+      cat: { car: "Car", van: "Van", motorcycle: "Motorbike", scooter: "Scooter", ebike: "E-bike", atv: "ATV" } as Record<string, string>
     }
   },
   th: {
-    setupEyebrow: "ตั้งค่า RouteHQ",
-    setupTitle: "เริ่มใช้งานได้ในไม่กี่นาที",
-    saving: "กำลังบันทึก...",
-    continue: "ดำเนินการต่อ",
-    setupComplete: "ตั้งค่าเสร็จแล้ว",
-    setupCompleteBody: "บัญชี RouteHQ ของคุณพร้อมใช้งานแล้ว กำลังเปิดแดชบอร์ด",
+    setupTitle: "ตั้งค่า RouteHQ",
+    saving: "กำลังบันทึก…",
+    continue: "ต่อไป",
+    setupComplete: "เรียบร้อยแล้ว",
+    setupCompleteBody: "กำลังเปิดหน้าหลักของคุณ…",
     step1Title: "ยินดีต้อนรับสู่ RouteHQ",
-    step1Subtitle: "มาตั้งค่าบัญชีของคุณในไม่กี่ขั้นตอน",
+    step1Subtitle: "อีกแค่สามขั้นตอนสั้น ๆ คุณก็พร้อมรับการจอง",
     businessName: "ชื่อธุรกิจ",
-    mainLocation: "สถานที่หลัก",
-    mainLocationHint: "ส่วนนี้จะเป็นสาขาหลักเริ่มต้น คุณสามารถเพิ่มสถานที่อื่นได้ภายหลัง",
+    mainLocation: "ธุรกิจของคุณอยู่ที่ไหน",
+    mainLocationHint: "เพิ่มสถานที่อื่นได้ภายหลัง",
     country: "ประเทศ",
-    region: "จังหวัด / ภูมิภาค",
-    town: "เมือง / ตำบล",
-    customCountry: "ระบุประเทศ",
-    customRegion: "ระบุจังหวัด รัฐ หรือภูมิภาค",
-    customTown: "ระบุเมืองหรือตำบล",
-    fleetType: "ประเภทยานพาหนะ",
-    fleetSize: "ขนาดกองยานโดยประมาณ",
-    primaryLanguage: "ภาษาหลัก",
-    carsOnly: "รถยนต์เท่านั้น",
-    motorcyclesOnly: "มอเตอร์ไซค์เท่านั้น",
-    mixedFleet: "กองยานผสม",
+    region: "จังหวัดหรือภูมิภาค",
+    town: "เมืองหรือย่าน",
+    customCountry: "พิมพ์ชื่อประเทศ",
+    customRegion: "พิมพ์ชื่อจังหวัดหรือภูมิภาค",
+    customTown: "พิมพ์ชื่อเมืองหรือย่าน",
+    fleetType: "คุณให้เช่าอะไร",
+    fleetSize: "มีรถกี่คัน",
+    primaryLanguage: "ภาษา",
+    carsOnly: "รถยนต์",
+    motorcyclesOnly: "มอเตอร์ไซค์",
+    mixedFleet: "ทั้งสองอย่าง",
     vehicles: "คัน",
     english: "English",
     thai: "ภาษาไทย",
     step2Title: "เพิ่มรถคันแรก",
-    step2Subtitle: "สแกนเล่มทะเบียนเพื่อเริ่มต้นได้เร็วที่สุด",
-    scanBlueBook: "สแกนเล่มทะเบียน",
-    scanBlueBookBody: "ถ่ายรูปสมุดทะเบียนรถ แล้วระบบจะอ่านข้อมูลให้อัตโนมัติ",
-    uploadPhotos: "Upload vehicle photos",
-    uploadPhotosBody: "Optional, but useful for your fleet profile.",
-    photosSelected: (count: number) => `${count} photos selected`,
-    importVehicles: "Import vehicles",
-    importVehiclesBody: "Use the smart importer for CSV, Excel, or Google Sheets.",
-    enterManually: "กรอกเอง",
-    enterManuallyBody: "กรอกรายละเอียดรถด้วยตัวเองด้านล่าง",
-    readingBlueBook: "กำลังอ่านเล่มทะเบียน...",
-    renewalHelp: "วันที่เหล่านี้ช่วยให้ RouteHQ แจ้งเตือนคุณก่อนถึงกำหนดต่ออายุ",
-    confirmVehicle: "ยืนยันและเพิ่มรถ",
-    addVehiclesLater: "ฉันจะเพิ่มรถภายหลัง",
-    step3Title: "ดูการแจ้งเตือนแรกของคุณ",
-    step3Subtitle: "RouteHQ เปลี่ยนวันหมดอายุให้เป็นการแจ้งเตือนที่ใช้งานได้จริง",
-    attentionSoon: "ใกล้ถึงกำหนด",
-    complianceGood: "ข้อมูลต่ออายุเรียบร้อย",
-    expiresInDays: (item: string, days: number) => `${item} จะหมดอายุใน ${days} วัน`,
-    allComplianceGood: (vehicleName: string) => `ข้อมูลต่ออายุของ ${vehicleName} เรียบร้อยดี`,
-    nextUpcoming: (item: string, date: string) => `รายการถัดไป: ${item} วันที่ ${date}`,
-    sampleAlert: "ตัวอย่างการแจ้งเตือน",
-    sampleAlertTitle: "ภาษีรถจะหมดอายุใน 24 วัน",
-    sampleAlertBody: "เมื่อคุณเพิ่มรถ RouteHQ จะติดตามวันต่ออายุทั้งหมดและแจ้งเตือนก่อนหมดอายุ",
-    vehicleLater: "คุณสามารถเพิ่มรถคันแรกได้จากหน้า Fleet หลังตั้งค่าเสร็จ",
-    alertSchedule: "RouteHQ จะแจ้งเตือนก่อนหมดอายุ 1 เดือน, 2 สัปดาห์ และ 1 สัปดาห์ ผ่านการแจ้งเตือนและ LINE",
-    step4Title: "รับอัปเดตประจำวันทาง LINE",
-    step4Subtitle: "ผู้ประกอบการส่วนใหญ่พบว่านี่เป็นฟีเจอร์ที่มีประโยชน์มาก",
-    lineBenefits: [
-      "สรุปตอนเช้า - รถที่กำลังเช่า, รถที่ต้องคืน, ยอดเงินที่คาดว่าจะได้รับ",
-      "แจ้งเตือนทันที - ต่ออายุใกล้หมด, GPS ออฟไลน์, คืนรถเกินกำหนด",
-      "เตือนชำระเงิน - ส่งเตือนลูกค้าอัตโนมัติ"
-    ],
-    lineId: "หรือกรอก LINE ID ของคุณ",
-    scanLine: "สแกนด้วยแอป LINE เพื่อเชื่อมต่อ",
-    connectedLine: "ฉันเชื่อมต่อ LINE แล้ว",
-    skipNow: "ข้ามตอนนี้",
-    finishing: "กำลังเสร็จสิ้น...",
-    ocrFailed: "อ่านเอกสารไม่สำเร็จ",
-    scanFailed: "ไม่สามารถสแกนเล่มทะเบียนได้",
-    profileFailed: "ไม่สามารถบันทึกข้อมูลธุรกิจได้",
-    vehicleFailed: "ไม่สามารถเพิ่มรถได้",
-    finishFailed: "ไม่สามารถตั้งค่าให้เสร็จสิ้นได้",
+    step2Subtitle: "ถ่ายรูปเล่มทะเบียน แล้วเราจะกรอกรายละเอียดให้",
+    scanBlueBook: "ถ่ายรูปเล่มทะเบียน",
+    scanBlueBookBody: "เราอ่านทะเบียน ยี่ห้อ รุ่น และวันที่จากรูปให้",
+    uploadPhotos: "เพิ่มรูปรถ",
+    uploadPhotosBody: "ไม่บังคับ ลูกค้าจะเห็นรูปเหล่านี้",
+    photosSelected: (count: number) => `เลือกแล้ว ${count} รูป`,
+    removePhoto: "ลบรูป",
+    importVehicles: "นำเข้ารายการรถ",
+    importVehiclesBody: "มีรายการรถในสเปรดชีตอยู่แล้ว? เพิ่มทั้งหมดได้ในครั้งเดียว",
+    readingBlueBook: "กำลังอ่านเล่มทะเบียน…",
+    renewalHelp: "RouteHQ จะเตือนคุณก่อนถึงวันเหล่านี้",
+    confirmVehicle: "เพิ่มรถคันนี้",
+    addVehiclesLater: "ไว้เพิ่มรถทีหลัง",
+    step3Title: "พร้อมใช้งานแล้ว",
+    step3Subtitle: "ต่อจากนี้จะเป็นแบบนี้",
+    expiresInDays: (item: string, days: number) => `${item}จะหมดอายุในอีก ${days} วัน`,
+    alreadyExpired: (item: string) => `${item}หมดอายุแล้ว`,
+    nextUpcoming: (item: string, date: string) => `วันถัดไป: ${item} ${date} เราจะเตือนคุณก่อนถึงวันนั้น`,
+    remindersTitle: "เตือนก่อนหมดอายุ",
+    remindersBody: "ภาษี ประกัน และเช็กระยะ RouteHQ จะบอกคุณก่อนถึงกำหนด",
+    vehicleLater: "เพิ่มรถได้ทุกเมื่อจากเมนูรถ",
+    lineTitle: "รับการแจ้งเตือนทาง LINE",
+    lineBody: "สรุปทุกเช้า และแจ้งเตือนเมื่อลูกค้าจอง จ่ายเงิน หรือคืนรถช้า เชื่อมต่อ LINE ได้ในหน้าตั้งค่า ใช้เวลาประมาณหนึ่งนาที",
+    finish: "เปิดหน้าหลักของฉัน",
+    finishLine: "เสร็จสิ้นและเชื่อมต่อ LINE",
+    finishing: "กำลังดำเนินการ…",
+    ocrFailed: "เราอ่านรูปนี้ไม่ได้ ลองใช้รูปที่ชัดขึ้น หรือพิมพ์รายละเอียดเอง",
+    scanFailed: "เราอ่านเล่มทะเบียนไม่ได้ ลองอีกครั้ง หรือพิมพ์รายละเอียดเอง",
+    profileFailed: "บันทึกไม่สำเร็จ ตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง",
+    vehicleFailed: "เพิ่มรถไม่สำเร็จ ตรวจสอบรายละเอียดแล้วลองอีกครั้ง",
+    finishFailed: "ดำเนินการไม่สำเร็จ ตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง",
     vehicleTax: "ภาษีรถ",
-    compulsoryInsurance: "ประกันภาคบังคับ",
-    voluntaryInsurance: "ประกันสมัครใจ",
-    nextService: "บริการครั้งถัดไป",
+    compulsoryInsurance: "พ.ร.บ.",
+    voluntaryInsurance: "ประกันภัย",
+    nextService: "เช็กระยะครั้งถัดไป",
     fields: {
       category: "ประเภทรถ",
-      vin: "VIN / เลขตัวถัง",
+      vin: "เลขตัวถัง (VIN)",
       make: "ยี่ห้อ",
       model: "รุ่น",
       trim: "รุ่นย่อย",
       year: "ปี",
       registration: "ทะเบียนรถ",
       color: "สี",
-      mileage: "เลขไมล์ปัจจุบัน",
-      currency: "Currency",
-      dailyRate: "Daily rental rate",
-      weeklyRate: "Weekly rental rate",
-      monthlyRate: "Monthly rental rate",
-      rate: "Rate",
-      dailyShort: "Daily",
-      weeklyShort: "Weekly",
-      monthlyShort: "Monthly",
-      taxExpiry: "วันหมดอายุภาษี",
-      porborExpiry: "วันหมดอายุ พ.ร.บ.",
-      insuranceExpiry: "วันหมดอายุประกันสมัครใจ",
-      nextService: "กำหนดเข้าบริการครั้งถัดไป",
+      mileage: "เลขไมล์ตอนนี้",
+      currency: "สกุลเงิน",
+      rate: "ราคาของคุณ",
+      dailyShort: "ต่อวัน",
+      weeklyShort: "ต่อสัปดาห์",
+      monthlyShort: "ต่อเดือน",
+      taxExpiry: "ภาษีรถหมดอายุ",
+      porborExpiry: "พ.ร.บ. หมดอายุ",
+      insuranceExpiry: "ประกันภัยหมดอายุ",
+      nextService: "กำหนดเช็กระยะครั้งถัดไป",
       transmission: "เกียร์",
       fuelType: "เชื้อเพลิง",
-      engineCc: "ขนาดเครื่องยนต์ CC",
-      seating: "จำนวนที่นั่ง"
+      engineCc: "ขนาดเครื่องยนต์ (ซีซี)",
+      seating: "จำนวนที่นั่ง",
+      otherMake: "ยี่ห้ออื่น",
+      pickMake: "เลือกยี่ห้อ",
+      loading: "กำลังโหลด…",
+      searchMake: "ค้นหายี่ห้อ",
+      pickModel: "เลือกรุ่น",
+      pickMakeFirst: "เลือกยี่ห้อก่อน",
+      other: "อื่น ๆ",
+      pickYear: "เลือกปี",
+      pickTrim: "เลือกรุ่นย่อย",
+      cat: { car: "รถยนต์", van: "รถตู้", motorcycle: "มอเตอร์ไซค์", scooter: "สกู๊ตเตอร์", ebike: "จักรยานไฟฟ้า", atv: "เอทีวี" } as Record<string, string>
     }
   }
 };
@@ -995,11 +983,11 @@ function dedupeTrimsForPicker(trims: VehicleTrim[]) {
   });
 }
 
-export function OnboardingWizard({ categories, organization }: { categories: Category[]; organization: Organization }) {
+export function OnboardingWizard({ categories, organization, initialStep = 1 }: { categories: Category[]; organization: Organization; initialStep?: number }) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement | null>(null);
   const photoRef = useRef<HTMLInputElement | null>(null);
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(initialStep);
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
   const [ocrLoading, setOcrLoading] = useState(false);
@@ -1187,18 +1175,17 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
     });
   }
 
-  function complete(lineConnected: boolean) {
+  function complete(destination: string) {
     setError("");
     startTransition(async () => {
       try {
         const formData = new FormData();
-        const lineInput = document.getElementById("lineId") as HTMLInputElement | null;
         formData.set("organizationId", organization.id);
-        formData.set("lineId", lineInput?.value || "");
-        formData.set("lineConnected", String(lineConnected));
+        formData.set("lineId", "");
+        formData.set("lineConnected", "false");
         await finishOnboarding(formData);
         setSuccess(true);
-        setTimeout(() => router.push("/"), 2000);
+        setTimeout(() => router.push(destination as never), 1500);
       } catch (submitError) {
         setError(submitError instanceof Error ? submitError.message : t.finishFailed);
       }
@@ -1210,24 +1197,23 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
       <div className="mx-auto flex min-h-[calc(100vh-40px)] max-w-xl flex-col">
         <header className="mb-5 flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-[var(--primary)]">{t.setupEyebrow}</p>
-            <h1 className="text-2xl font-semibold">{t.setupTitle}</h1>
+            <h1 className="text-[22px] font-bold">{t.setupTitle}</h1>
           </div>
           <div className="flex gap-2">
-            {[1, 2, 3, 4].map((entry) => (
+            {[1, 2, 3].map((entry) => (
               <span className={`h-3 w-3 rounded-full ${entry <= step ? "bg-[var(--primary)]" : "bg-[var(--border-strong)]"}`} key={entry} />
             ))}
           </div>
         </header>
 
-        <section className="flex-1 rounded-lg border border-[var(--border)] bg-white/92 p-3 shadow-[0_18px_60px_rgba(16,37,43,0.08)] sm:p-7">
+        <section className="card flex-1 p-4 sm:p-7" style={{ overflow: "visible" }}>
           {success ? (
             <div className="flex min-h-[520px] flex-col items-center justify-center text-center">
               <div className="success-pop flex h-24 w-24 items-center justify-center rounded-full bg-[var(--success-light)] text-[var(--success)]">
                 <CheckCircle2 size={52} />
               </div>
               <h2 className="mt-5 text-3xl font-semibold">{t.setupComplete}</h2>
-              <p className="mt-2 max-w-md text-sm leading-6 text-[var(--muted)]">{t.setupCompleteBody}</p>
+              <p className="mt-2 max-w-md text-sm leading-6 text-[var(--foreground-secondary)]">{t.setupCompleteBody}</p>
               <div className="confetti mt-6" />
             </div>
           ) : null}
@@ -1238,19 +1224,19 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
               <div className="mt-6 grid gap-3">
                 <ChoiceGrid label={t.primaryLanguage} options={languageOptions} value={profile.language} onChange={(language) => setProfile({ ...profile, language })} />
                 <label>
-                  <span className="text-sm font-semibold">{t.businessName}</span>
+                  <span className="font-semibold text-[var(--foreground-secondary)]">{t.businessName}</span>
                   <input className={fieldClass} onChange={(event) => setProfile({ ...profile, businessName: event.target.value })} required value={profile.businessName} />
                 </label>
                 <div className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
                   <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                     <p className="text-sm font-semibold">{t.mainLocation}</p>
-                    <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[var(--muted)]" title={t.mainLocationHint}>
+                    <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[var(--foreground-secondary)]" title={t.mainLocationHint}>
                       {t.mainLocationHint}
                     </span>
                   </div>
                   <div className="mt-3 grid gap-3 sm:grid-cols-3">
                     <label>
-                      <span className="text-xs font-semibold uppercase text-[var(--muted)]">{t.country}</span>
+                      <span className="font-semibold text-[var(--foreground-secondary)]">{t.country}</span>
                       <select
                         className={fieldClass}
                         onChange={(event) => {
@@ -1266,7 +1252,7 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
                       </select>
                     </label>
                     <label>
-                      <span className="text-xs font-semibold uppercase text-[var(--muted)]">{t.region}</span>
+                      <span className="font-semibold text-[var(--foreground-secondary)]">{t.region}</span>
                       <select
                         className={fieldClass}
                         onChange={(event) => {
@@ -1280,7 +1266,7 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
                       </select>
                     </label>
                     <label>
-                      <span className="text-xs font-semibold uppercase text-[var(--muted)]">{t.town}</span>
+                      <span className="font-semibold text-[var(--foreground-secondary)]">{t.town}</span>
                       <select className={fieldClass} onChange={(event) => setProfile({ ...profile, town: event.target.value })} value={profile.town}>
                         {currentTowns.map((town) => <option key={town} value={town}>{localizedLocationLabel(town, profile.language)}</option>)}
                       </select>
@@ -1305,7 +1291,7 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
             <div className="mx-auto max-w-xl">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <StepTitle icon={ScanLine} title={t.step2Title} subtitle={t.step2Subtitle} />
-                <button className="pressable rounded-lg border border-[var(--border)] bg-white px-4 py-3 text-sm font-semibold text-[var(--primary)]" onClick={skipVehicle} type="button">
+                <button className="secondary-action pressable shrink-0" onClick={skipVehicle} type="button">
                   {t.addVehiclesLater}
                 </button>
               </div>
@@ -1337,7 +1323,7 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
                 <button className="pressable rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3 text-left" onClick={() => router.push("/fleet/import?from=onboarding")} type="button">
                   <FileSpreadsheet className="text-[var(--primary)]" size={28} />
                   <p className="mt-3 text-lg font-semibold">{t.importVehicles}</p>
-                  <p className="mt-1 text-sm text-[var(--muted)]">{t.importVehiclesBody}</p>
+                  <p className="mt-1 text-sm text-[var(--foreground-secondary)]">{t.importVehiclesBody}</p>
                 </button>
               </div>
               <div className="mt-4 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
@@ -1348,7 +1334,7 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
                     </span>
                     <div>
                       <p className="text-lg font-semibold text-[var(--foreground)]">{t.uploadPhotos}</p>
-                      <p className="mt-1 text-sm text-[var(--muted)]">{vehiclePhotoCount ? t.photosSelected(vehiclePhotoCount) : t.uploadPhotosBody}</p>
+                      <p className="mt-1 text-sm text-[var(--foreground-secondary)]">{vehiclePhotoCount ? t.photosSelected(vehiclePhotoCount) : t.uploadPhotosBody}</p>
                     </div>
                   </div>
                   <button className="pressable rounded-lg bg-white px-4 py-3 text-sm font-semibold text-[var(--primary)] shadow-sm ring-1 ring-[var(--border-strong)]" onClick={() => photoRef.current?.click()} type="button">
@@ -1363,7 +1349,7 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
                     {vehiclePhotoPreviews.map((photo) => (
                       <div className="relative overflow-hidden rounded-lg border border-[var(--info-line)] bg-[var(--panel-secondary)]" key={photo.id}>
                         <button
-                          aria-label={`Remove ${photo.name}`}
+                          aria-label={t.removePhoto}
                           className="pressable absolute right-1 top-1 z-10 grid h-7 w-7 place-items-center rounded-full bg-white/95 text-[var(--danger)] shadow-sm"
                           onClick={() => removeVehiclePhoto(photo.id)}
                           type="button"
@@ -1371,7 +1357,7 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
                           <X size={15} strokeWidth={3} />
                         </button>
                         <img alt={photo.name} className="aspect-square w-full object-cover" src={photo.url} />
-                        <p className="truncate px-2 py-1 text-[11px] font-bold text-[var(--muted)]">{photo.name}</p>
+                        <p className="truncate px-2 py-1 text-[14px] font-bold text-[var(--foreground-secondary)]">{photo.name}</p>
                       </div>
                     ))}
                   </div>
@@ -1379,7 +1365,7 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
               ) : null}
               {ocrLoading ? <p className="mt-4 rounded-lg bg-[var(--primary-light)] p-3 text-sm font-bold text-[var(--primary)]">{t.readingBlueBook}</p> : null}
               <VehicleFields categories={categories} fields={vehicleFields} labels={t.fields} language={profile.language} onChange={updateVehicle} selectedCountry={selectedCountry} />
-              <p className="mt-4 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3 text-sm font-semibold text-[var(--muted)]">
+              <p className="mt-4 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3 text-sm font-semibold text-[var(--foreground-secondary)]">
                 {t.renewalHelp}
               </p>
               <FooterActions
@@ -1393,68 +1379,41 @@ export function OnboardingWizard({ categories, organization }: { categories: Cat
           ) : null}
 
           {!success && step === 3 ? (
-            <div className="mx-auto flex min-h-[520px] max-w-xl flex-col justify-center">
-              <StepTitle icon={LineChart} title={t.step3Title} subtitle={t.step3Subtitle} />
-              <div className="mt-6 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
-                {vehicle && compliance ? (
-                  <div>
-                    <p className={`text-sm font-semibold uppercase ${Number(compliance.days) <= 60 ? "text-[var(--warning)]" : "text-[var(--success)]"}`}>
-                      {Number(compliance.days) <= 60 ? t.attentionSoon : t.complianceGood}
-                    </p>
-                    <h3 className="mt-2 text-2xl font-semibold">
-                      {Number(compliance.days) <= 60
-                        ? t.expiresInDays(compliance.label, Number(compliance.days))
-                        : t.allComplianceGood(`${vehicle.make} ${vehicle.model}`)}
-                    </h3>
-                    <p className="mt-2 text-sm text-[var(--muted)]">{t.nextUpcoming(compliance.label, String(compliance.date))}</p>
-                  </div>
-                ) : vehicle ? (
-                  <h3 className="text-2xl font-semibold">{t.allComplianceGood(`${vehicle.make} ${vehicle.model}`)}</h3>
-                ) : (
-                  <div>
-                    <p className="text-sm font-semibold uppercase text-[var(--primary)]">{t.sampleAlert}</p>
-                    <h3 className="mt-2 text-2xl font-semibold">{t.sampleAlertTitle}</h3>
-                    <p className="mt-2 text-sm text-[var(--muted)]">{t.sampleAlertBody}</p>
-                  </div>
-                )}
-                {vehicleSkipped ? <p className="mt-4 rounded-lg bg-white p-3 text-sm font-bold text-[var(--muted)]">{t.vehicleLater}</p> : null}
-              </div>
-              <p className="mt-5 text-sm leading-6 text-[var(--muted)]">{t.alertSchedule}</p>
-              <FooterActions error={error} pending={false} primaryLabel={t.continue} savingLabel={t.saving} onPrimary={() => setStep(4)} />
-            </div>
-          ) : null}
-
-          {!success && step === 4 ? (
             <div className="mx-auto max-w-xl">
-              <StepTitle icon={MapPin} title={t.step4Title} subtitle={t.step4Subtitle} />
-              <div className="mt-6 grid gap-3 md:grid-cols-[1fr_220px]">
-                <div className="space-y-3">
-                  {t.lineBenefits.map((item) => (
-                    <div className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3 text-sm font-bold text-[var(--foreground-secondary)]" key={item}>{item}</div>
-                  ))}
-                  <label className="block">
-                    <span className="text-sm font-semibold">{t.lineId}</span>
-                    <input className={fieldClass} id="lineId" placeholder="@yourlineid" />
-                  </label>
+              <StepTitle icon={CheckCircle2} title={t.step3Title} subtitle={t.step3Subtitle} />
+              <div className="mt-5 space-y-2">
+                <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5">
+                  <p className="text-[16px] font-bold text-[var(--foreground)]">
+                    {vehicle && compliance && Number(compliance.days) < 0
+                      ? t.alreadyExpired(compliance.label)
+                      : vehicle && compliance && Number(compliance.days) <= 60
+                        ? t.expiresInDays(compliance.label, Number(compliance.days))
+                        : t.remindersTitle}
+                  </p>
+                  <p className="font-medium text-[var(--foreground-secondary)]">
+                    {vehicle && compliance && Number(compliance.days) >= 0 ? t.nextUpcoming(compliance.label, formatDateForDisplay(String(compliance.date), profile.language)) : t.remindersBody}
+                  </p>
                 </div>
-                <div className="rounded-lg border border-[var(--border)] bg-white p-3 text-center">
-                  <div className="mx-auto grid h-44 w-44 grid-cols-6 gap-1 rounded-lg bg-white p-3 shadow-inner">
-                    {Array.from({ length: 36 }).map((_, index) => (
-                      <span className={`${[0, 1, 2, 6, 12, 13, 14, 5, 11, 17, 23, 29, 35, 30, 31, 32, 18, 20, 21, 26, 27].includes(index) ? "bg-[var(--foreground)]" : "bg-[var(--primary-light)]"} rounded-sm`} key={index} />
-                    ))}
+                {vehicleSkipped ? (
+                  <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5">
+                    <p className="font-medium text-[var(--foreground-secondary)]">{t.vehicleLater}</p>
                   </div>
-                  <p className="mt-3 text-sm font-bold text-[var(--muted)]">{t.scanLine}</p>
+                ) : null}
+                {/* LINE is connected properly from Settings. This step used to show a made-up QR code and a button that claimed LINE was connected. */}
+                <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5">
+                  <p className="text-[16px] font-bold text-[var(--foreground)]">{t.lineTitle}</p>
+                  <p className="font-medium text-[var(--foreground-secondary)]">{t.lineBody}</p>
                 </div>
               </div>
-              <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                <button className="pressable min-h-12 rounded-lg bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white disabled:opacity-70" disabled={isPending} onClick={() => complete(true)} type="button">
-                  {isPending ? t.finishing : t.connectedLine}
+              {error ? <p className="mt-4 rounded-xl bg-[var(--warning-light)] p-3 font-semibold text-[var(--foreground)]">{error}</p> : null}
+              <div className="mt-5 grid gap-2">
+                <button className="primary-action pressable w-full" disabled={isPending} onClick={() => complete("/")} type="button">
+                  {isPending ? t.finishing : t.finish}
                 </button>
-                <button className="pressable min-h-12 rounded-lg border border-[var(--border)] bg-white px-5 py-3 text-sm font-semibold text-[var(--foreground-secondary)]" disabled={isPending} onClick={() => complete(false)} type="button">
-                  {t.skipNow}
+                <button className="secondary-action pressable w-full" disabled={isPending} onClick={() => complete("/settings?tab=notifications")} type="button">
+                  {t.finishLine}
                 </button>
               </div>
-              {error ? <p className="mt-4 rounded-lg bg-[var(--danger-light)] p-3 text-sm font-bold text-[var(--danger)]">{error}</p> : null}
             </div>
           ) : null}
         </section>
@@ -1469,8 +1428,8 @@ function StepTitle({ icon: Icon, title, subtitle }: { icon: typeof Car; title: s
       <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-[var(--primary-light)] text-[var(--primary)]">
         <Icon size={24} />
       </span>
-      <h2 className="mt-4 text-3xl font-semibold text-[var(--foreground)]">{title}</h2>
-      <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{subtitle}</p>
+      <h2 className="mt-3 text-[26px] font-bold leading-tight text-[var(--foreground)]">{title}</h2>
+      <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{subtitle}</p>
     </div>
   );
 }
@@ -1685,7 +1644,7 @@ function VehicleFields({
       <div className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <label>
-            <span className="text-sm font-semibold">{labels.category}</span>
+            <span className="font-semibold text-[var(--foreground-secondary)]">{labels.category}</span>
             <select
               className={fieldClass}
               onChange={(event) => {
@@ -1703,12 +1662,12 @@ function VehicleFields({
               }}
               value={fields.categoryId}
             >
-              {categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
+              {categories.map((category) => <option key={category.id} value={category.id}>{labels.cat[category.code] || category.name}</option>)}
             </select>
           </label>
           <TextField label={labels.vin} name="vin" value={fields.vin} onChange={onChange} />
           <div>
-            <span className="text-sm font-semibold">{labels.make}</span>
+            <span className="font-semibold text-[var(--foreground-secondary)]">{labels.make}</span>
             <div className="relative mt-2">
               <button
                 className="pressable flex min-h-12 w-full items-center justify-between gap-3 rounded-lg border border-[var(--border)] bg-white px-4 py-3 text-left text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
@@ -1728,11 +1687,11 @@ function VehicleFields({
                   ) : (
                     <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[var(--panel-secondary)] text-xs font-bold text-[var(--primary)]">+</span>
                   )}
-                  <span className={fields.make ? "truncate font-semibold" : "truncate text-[var(--muted)]"}>
-                    {manualMake ? "Other / custom make" : fields.make || (makes.length ? `Select ${selectedCategory?.name || "vehicle"} brand` : "Loading makes...")}
+                  <span className={fields.make ? "truncate font-semibold" : "truncate text-[var(--foreground-secondary)]"}>
+                    {manualMake ? labels.otherMake : fields.make || (makes.length ? labels.pickMake : labels.loading)}
                   </span>
                 </span>
-                <span className="text-[var(--muted)]">v</span>
+                <ChevronDown className="shrink-0 text-[var(--primary)]" size={18} />
               </button>
               {makeDropdownOpen ? (
                 <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-lg border border-[var(--border)] bg-white shadow-xl shadow-[var(--foreground)]/10">
@@ -1740,7 +1699,7 @@ function VehicleFields({
                     <input
                       className="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
                       onChange={(event) => setMakeSearch(event.target.value)}
-                      placeholder={`Search ${selectedCategory?.name?.toLowerCase() || "vehicle"} brand`}
+                      placeholder={labels.searchMake}
                       value={makeSearch}
                     />
                   </div>
@@ -1758,7 +1717,7 @@ function VehicleFields({
                           <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[var(--primary-light)] text-xs font-bold text-[var(--primary)]">{make.name.slice(0, 2)}</span>
                         )}
                         <span className="font-semibold text-[var(--foreground)]">{make.name}</span>
-                        <span className="ml-auto text-xs uppercase text-[var(--muted)]">{make.origin_country || ""}</span>
+                        <span className="ml-auto text-xs uppercase text-[var(--foreground-secondary)]">{make.origin_country || ""}</span>
                       </button>
                     ))}
                     <button
@@ -1766,30 +1725,30 @@ function VehicleFields({
                       onClick={() => handleMakeChange("__manual__")}
                       type="button"
                     >
-                      Other / custom make
+                      {labels.otherMake}
                     </button>
                   </div>
                 </div>
               ) : null}
             </div>
-            {manualMake ? <TextField label="" name="make" required value={fields.make} onChange={onChange} placeholder="Make" /> : null}
+            {manualMake ? <TextField label="" name="make" required value={fields.make} onChange={onChange} placeholder={labels.make} /> : null}
           </div>
           <div>
             <label>
-              <span className="text-sm font-semibold">{labels.model}</span>
+              <span className="font-semibold text-[var(--foreground-secondary)]">{labels.model}</span>
               <select className={fieldClass} disabled={!selectedMakeId && !manualMake} onChange={(event) => handleModelChange(event.target.value)} value={manualModel ? "__manual__" : (models.find((model) => normalizeCatalogMatch(model.name) === normalizeCatalogMatch(fields.model))?.id || "")}>
-                <option value="">{selectedMakeId ? "Select model" : "Select make first"}</option>
+                <option value="">{selectedMakeId ? labels.pickModel : labels.pickMakeFirst}</option>
                 {models.map((model) => <option key={model.id} value={model.id}>{model.name}</option>)}
-                <option value="__manual__">Other / custom</option>
+                <option value="__manual__">{labels.other}</option>
               </select>
             </label>
-            {manualModel || manualMake ? <TextField label="" name="model" required value={fields.model} onChange={onChange} placeholder="Model" /> : null}
+            {manualModel || manualMake ? <TextField label="" name="model" required value={fields.model} onChange={onChange} placeholder={labels.model} /> : null}
           </div>
           <label>
-            <span className="text-sm font-semibold">{labels.year}</span>
+            <span className="font-semibold text-[var(--foreground-secondary)]">{labels.year}</span>
             {yearOptions.length > 0 ? (
               <select className={fieldClass} onChange={(event) => onChange({ year: event.target.value, trim: "" })} value={fields.year}>
-                <option value="">Select year</option>
+                <option value="">{labels.pickYear}</option>
                 {yearOptions.map((year) => <option key={year} value={year}>{year}</option>)}
               </select>
             ) : (
@@ -1798,18 +1757,18 @@ function VehicleFields({
           </label>
           <div>
             <label>
-              <span className="text-sm font-semibold">{labels.trim}</span>
+              <span className="font-semibold text-[var(--foreground-secondary)]">{labels.trim}</span>
               {visibleTrims.length > 0 ? (
                 <select className={fieldClass} onChange={(event) => handleTrimChange(event.target.value)} value={manualTrim ? "__manual__" : selectedTrimId}>
-                  <option value="">Select trim</option>
+                  <option value="">{labels.pickTrim}</option>
                   {visibleTrims.map((trim) => <option key={trim.id} value={trim.id}>{trim.name}</option>)}
-                  <option value="__manual__">Other / custom trim</option>
+                  <option value="__manual__">{labels.other}</option>
                 </select>
               ) : (
-                <input className={fieldClass} onChange={(event) => onChange({ trim: event.target.value })} placeholder="Trim" value={fields.trim} />
+                <input className={fieldClass} onChange={(event) => onChange({ trim: event.target.value })} placeholder={labels.trim} value={fields.trim} />
               )}
             </label>
-            {manualTrim && visibleTrims.length > 0 ? <TextField label="" name="trim" value={fields.trim} onChange={onChange} placeholder="Trim" /> : null}
+            {manualTrim && visibleTrims.length > 0 ? <TextField label="" name="trim" value={fields.trim} onChange={onChange} placeholder={labels.trim} /> : null}
           </div>
           <TextField label={labels.registration} name="registrationNumber" required value={fields.registrationNumber} onChange={onChange} />
           <TextField label={labels.color} name="color" value={fields.color} onChange={onChange} />
@@ -1827,13 +1786,13 @@ function VehicleFields({
       </div>
 
       <div className="rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3">
-        <span className="text-sm font-semibold">{labels.rate}</span>
+        <span className="font-semibold text-[var(--foreground-secondary)]">{labels.rate}</span>
         <div className="mt-2 grid gap-2 sm:grid-cols-[1fr_1fr_1fr_112px]">
           <CompactRateField label={labels.dailyShort} name="dailyRate" value={fields.dailyRate} onChange={onChange} />
           <CompactRateField label={labels.weeklyShort} name="weeklyRate" value={fields.weeklyRate} onChange={onChange} />
           <CompactRateField label={labels.monthlyShort} name="monthlyRate" value={fields.monthlyRate} onChange={onChange} />
           <label>
-            <span className="text-xs font-semibold text-[var(--muted)]">{labels.currency}</span>
+            <span className="font-semibold text-[var(--foreground-secondary)]">{labels.currency}</span>
             <select className={`${fieldClass} mt-1`} onChange={(event) => onChange({ currency: event.target.value })} value={fields.currency}>
               {currencyOptionsForCountry(selectedCountry).map((currency) => <option key={currency} value={currency}>{currency}</option>)}
             </select>
@@ -1881,7 +1840,7 @@ function DateField({
 
   return (
     <label>
-      <span className="text-sm font-semibold">{label}</span>
+      <span className="font-semibold text-[var(--foreground-secondary)]">{label}</span>
       <div className="relative mt-2">
         <input
           className={`${fieldClass} mt-0 pr-12`}
@@ -1890,7 +1849,7 @@ function DateField({
           value={value}
         />
         <button
-          aria-label={`Choose ${label}`}
+          aria-label={label}
           className="pressable absolute right-2 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-lg bg-[var(--primary-light)] text-[var(--primary)]"
           onClick={openPicker}
           type="button"
@@ -1914,7 +1873,7 @@ function DateField({
 function CompactRateField({ label, name, onChange, value }: { label: string; name: string; onChange: (updates: any) => void; value: string }) {
   return (
     <label>
-      <span className="text-xs font-semibold text-[var(--muted)]">{label}</span>
+      <span className="font-semibold text-[var(--foreground-secondary)]">{label}</span>
       <input
         className={`${fieldClass} mt-1`}
         inputMode="decimal"
@@ -1945,7 +1904,7 @@ function TextField({
 }) {
   return (
     <label>
-      {label ? <span className="text-sm font-semibold">{label}</span> : null}
+      {label ? <span className="font-semibold text-[var(--foreground-secondary)]">{label}</span> : null}
       <input className={fieldClass} onChange={(event) => onChange({ [name]: event.target.value })} placeholder={placeholder} required={required} type={type} value={value} />
     </label>
   );
@@ -1970,14 +1929,14 @@ function FooterActions({
 }) {
   return (
     <div className="mt-6">
-      {error ? <p className="mb-3 rounded-lg bg-[var(--danger-light)] p-3 text-sm font-bold text-[var(--danger)]">{error}</p> : null}
+      {error ? <p className="mb-3 rounded-xl bg-[var(--warning-light)] p-3 font-semibold text-[var(--foreground)]">{error}</p> : null}
       <div className="flex flex-col gap-3 sm:flex-row">
         {onSecondary && secondaryLabel ? (
           <button className="pressable min-h-12 rounded-lg border border-[var(--border)] bg-white px-5 py-3 text-sm font-semibold text-[var(--foreground-secondary)]" disabled={pending} onClick={onSecondary} type="button">
             {secondaryLabel}
           </button>
         ) : null}
-        <button className="pressable min-h-12 flex-1 rounded-lg bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white disabled:opacity-70" disabled={pending} onClick={onPrimary} type="button">
+        <button className="primary-action pressable flex-1" disabled={pending} onClick={onPrimary} type="button">
           {pending ? savingLabel : primaryLabel}
         </button>
       </div>

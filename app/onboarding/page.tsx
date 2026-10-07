@@ -7,7 +7,9 @@ import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getActiveMembership } from "@/lib/auth/active-organization-server";
 
-export default async function OnboardingPage() {
+export default async function OnboardingPage({ searchParams }: { searchParams: Promise<{ preview?: string }> }) {
+  // On a developer's machine only: /onboarding?preview=2 shows a step of the wizard for an account that has already finished it. Never on the live site.
+  const previewStep = process.env.NODE_ENV === "development" ? Number((await searchParams).preview || 0) : 0;
   await getCurrentUserEmail();
   const supabase = (await createSupabaseServerClient()) as any;
 
@@ -50,9 +52,9 @@ export default async function OnboardingPage() {
   if (categoriesError) {
     throw new Error(categoriesError.message);
   }
-  if (organizationDetail.onboarding_completed || organizationDetail.onboarding_skipped) {
+  if ((organizationDetail.onboarding_completed || organizationDetail.onboarding_skipped) && !previewStep) {
     redirect("/");
   }
 
-  return <OnboardingWizard categories={categories || []} organization={organizationDetail} />;
+  return <OnboardingWizard categories={categories || []} initialStep={previewStep >= 1 && previewStep <= 3 ? previewStep : 1} organization={organizationDetail} />;
 }

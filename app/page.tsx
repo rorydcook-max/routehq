@@ -3,7 +3,7 @@ import type { Route } from "next";
 import type { ReactNode } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { dayOfWeekDate, intlLocale, shortDate as shortDateIn } from "@/lib/i18n/dates";
-import { ArrowRight, Bell, CalendarClock, CheckCircle2, FileWarning, KeyRound, Plus, ReceiptText, RotateCcw, Wallet } from "lucide-react";
+import { ArrowRight, Bell, CalendarClock, CheckCircle2, FileWarning, KeyRound, Plus, ReceiptText, RotateCcw, Wallet, MessageCircle } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { businessToday } from "@/lib/business-time";
 import { OnboardingChecklist } from "@/components/onboarding-checklist";
@@ -134,7 +134,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       .eq("type", "automated_reminder")
       .in("status", ["pending", "failed"])
       .not("rental_id", "is", null)
-      .gte("created_at", new Date(Date.now() - 7 * 86_400_000).toISOString())
+      .gte("created_at", new Date(Date.now() - 3 * 86_400_000).toISOString())
       .order("created_at", { ascending: false })
       .limit(50)
       .then((result: any) => result, () => ({ data: [] }))
@@ -265,12 +265,13 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       action: t("open")
     });
   }
-  for (const [rentalId, unsent] of unsentByRental) {
+  // At most two rows: these are reminders to pass on, not the day's work.
+  for (const [rentalId, unsent] of [...unsentByRental].slice(0, 2)) {
     todayItems.push({
       key: `unsent-${rentalId}`,
-      rank: 4,
-      tone: "amber",
-      icon: <Bell size={17} />,
+      rank: 5,
+      tone: "neutral",
+      icon: <MessageCircle size={17} />,
       title: t("messagesToSend", { count: unsent.count, who: unsent.who || t("aCustomer") }),
       detail: t("messagesToSendDetail"),
       href: `/bookings/${rentalId}#unsent-messages`,

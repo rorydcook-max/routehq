@@ -671,7 +671,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 entry.type === "automated_reminder" &&
                 ["pending", "failed"].includes(String(entry.status)) &&
                 !!entry.metadata?.handoff_label &&
-                Date.now() - new Date(entry.created_at).getTime() < 7 * 86_400_000
+                Date.now() - new Date(entry.created_at).getTime() < 3 * 86_400_000
             )
             .slice(0, 5)
             .map((entry: any) => ({ id: entry.id, content: entry.content, url: entry.metadata?.handoff_url || null }))}

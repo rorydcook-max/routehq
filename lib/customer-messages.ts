@@ -220,7 +220,7 @@ export async function messageCustomer(admin: any, input: Input): Promise<Custome
 }
 
 /** Closes the open jobs of one kind on a rental, e.g. the "Refund to decide" job once a refund is recorded. */
-export async function completeRentalJobs(admin: any, rentalId: string, action: "refund" | "request", note?: string, portalActionId?: string) {
+export async function completeRentalJobs(admin: any, rentalId: string, action: "refund" | "request" | "settle_deposit", note?: string, portalActionId?: string) {
   let query = admin.from("tasks").update({ completed_at: new Date().toISOString(), ...(note ? { completion_notes: note } : {}) }).eq("rental_id", rentalId).eq("action", action).is("completed_at", null);
   if (portalActionId) query = query.eq("portal_action_id", portalActionId);
   await query.then(() => null, () => null);

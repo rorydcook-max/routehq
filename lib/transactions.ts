@@ -1,4 +1,5 @@
 import { businessToday } from "@/lib/business-time";
+import { depositStillHeld } from "@/lib/charges";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { TRANSACTION_TYPE_OPTIONS } from "@/lib/transaction-options";
 
@@ -50,7 +51,7 @@ export type TransactionListItem = {
 export type TransactionFormOptions = {
   vehicles: Array<{ id: string; label: string }>;
   customers: Array<{ id: string; label: string }>;
-  rentals: Array<{ id: string; label: string; vehicleId: string; customerId: string; startDate?: string | null; endDate?: string | null; status?: string | null }>;
+  rentals: Array<{ id: string; label: string; vehicleId: string; customerId: string; startDate?: string | null; endDate?: string | null; status?: string | null; depositHeld?: number }>;
 };
 
 export type TransactionFormPrefill = {
@@ -121,7 +122,7 @@ export async function getTransactionFormOptions(organizationId: string): Promise
       .order("full_name"),
     supabase
       .from("rentals")
-      .select("id, display_code, reference, vehicle_id, customer_id, status, start_date, end_date, customers!rentals_customer_id_fkey(full_name)")
+      .select("id, display_code, reference, vehicle_id, customer_id, status, start_date, end_date, deposit_held, deposit_refunded_amount, deposit_forfeited_amount, deposit_status, customers!rentals_customer_id_fkey(full_name)")
       .eq("organization_id", organizationId)
       .is("deleted_at", null)
       .or(`status.in.(booked,active,due_soon,overdue,extended),and(status.eq.completed,end_date.gte.${businessToday(-90)})`)
@@ -150,6 +151,7 @@ export async function getTransactionFormOptions(organizationId: string): Promise
       startDate: row.start_date || null,
       endDate: row.end_date || null,
       status: row.status || null,
+      depositHeld: depositStillHeld(row),
       label: [row.reference || row.display_code, row.customers?.full_name].filter(Boolean).join(" · ")
     }))
   };

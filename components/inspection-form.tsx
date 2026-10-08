@@ -438,6 +438,8 @@ export function InspectionForm({ context, unsigned = false }: { context: Inspect
   const [refundMethod, setRefundMethod] = useState("cash");
   // Charges the deposit cannot cover are billed to the customer unless the owner says not to.
   const [billUncovered, setBillUncovered] = useState(true);
+  // Damage whose cost is not known until it has been looked at: the deposit stays held, nothing goes back yet.
+  const [holdForDamage, setHoldForDamage] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [uploadProgress, setUploadProgress] = useState("");
   const [uploadError, setUploadError] = useState("");
@@ -478,7 +480,7 @@ export function InspectionForm({ context, unsigned = false }: { context: Inspect
   const requestedDeductions = outstandingBalance + fuelDeficitCharge + damageCharge + cleaningCharge;
   const appliedDeductions = Math.min(availableToReconcile, requestedDeductions);
   const calculatedRefund = Math.max(0, availableToReconcile - appliedDeductions);
-  const depositRefundAmount = Math.min(availableToReconcile, Math.max(0, refundOverride ? Number(refundOverride) : calculatedRefund));
+  const depositRefundAmount = holdForDamage ? 0 : Math.min(availableToReconcile, Math.max(0, refundOverride ? Number(refundOverride) : calculatedRefund));
   // Rent still owed comes out of the deposit first (as on the server); fuel, damage and cleaning take what is left.
   const uncoveredCharges = Math.max(0, fuelDeficitCharge + damageCharge + cleaningCharge - Math.max(0, availableToReconcile - outstandingBalance));
   // No deposit held and nothing to take from one: a screen of "0 held, 0 returned" is not a step.
@@ -780,6 +782,7 @@ export function InspectionForm({ context, unsigned = false }: { context: Inspect
       <input name="depositDamageCharge" type="hidden" value={damageCharge} />
       <input name="depositCleaningCharge" type="hidden" value={cleaningCharge} />
       <input name="billUncoveredCharges" type="hidden" value={billUncovered && uncoveredCharges > 0 ? "true" : ""} />
+      <input name="holdDepositForDamage" type="hidden" value={holdForDamage ? "true" : ""} />
 
       <Progress step={step} steps={steps} />
 
@@ -1092,6 +1095,15 @@ export function InspectionForm({ context, unsigned = false }: { context: Inspect
                 </div>
               ) : null}
             </div>
+            {availableToReconcile > 0 ? (
+              <label className="flex items-start gap-3 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] px-3 py-3 text-sm font-semibold text-[var(--foreground)]">
+                <input checked={holdForDamage} className="mt-0.5 h-5 w-5 flex-shrink-0" onChange={(event) => setHoldForDamage(event.target.checked)} type="checkbox" />
+                <span>
+                  {t("holdForDamage")}
+                  <span className="mt-1 block text-xs font-medium text-[var(--muted)]">{t("holdForDamageHint")}</span>
+                </span>
+              </label>
+            ) : null}
             {/* Usually the whole deposit goes back, so the two adjustments stay one tap away. */}
             <details open={cleaningCharge > 0 || Boolean(refundOverride)}>
               <summary className="cursor-pointer py-1 text-sm font-semibold text-[var(--primary)]">{t("changeRefund")}</summary>

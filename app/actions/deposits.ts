@@ -232,6 +232,7 @@ export async function returnDeposit(formData: FormData) {
   {
     const admin = createSupabaseAdminClient() as any;
     await completeRentalJobs(admin, rentalId, "refund", `Deposit of ${money(returnAmount)} returned`);
+  await completeRentalJobs(admin, rentalId, "settle_deposit", `Deposit of ${money(returnAmount)} returned`);
     // The return inspection sends one message covering the whole settlement instead.
     if (String(formData.get("quiet") || "") !== "true") {
       await tellRentalCustomer(

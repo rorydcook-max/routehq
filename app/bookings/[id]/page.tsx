@@ -651,6 +651,12 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 {tx.say("editBooking")}
               </ActionButton>
               {!["completed", "cancelled", "draft"].includes(rental.status) ? <VehicleChangeButton rentalId={rental.id} /> : null}
+              {/* Damage, a fine, fuel: a cost the renter is responsible for, taken from the deposit first and the rest billed. */}
+              {rental.customer_id && !["cancelled", "draft"].includes(rental.status) ? (
+                <ActionButton href={`/transactions/new?cost=1&rentalId=${rental.id}&vehicleId=${rental.vehicle_id || vehicle?.id || ""}` as Route} tone="light">
+                  {tx.say("addCost")}
+                </ActionButton>
+              ) : null}
               {!["completed", "cancelled"].includes(rental.status) ? (
                 <CancelBookingButton
                   rentalId={rental.id}

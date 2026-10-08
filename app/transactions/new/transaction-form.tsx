@@ -25,7 +25,8 @@ export function TransactionForm({
   defaultRentalId = "",
   defaultCustomerId = "",
   prefill = null,
-  waiting = []
+  waiting = [],
+  startAsCost = false
 }: {
   organizationId: string;
   options: TransactionFormOptions;
@@ -35,6 +36,8 @@ export function TransactionForm({
   prefill?: TransactionFormPrefill | null;
   /** Payments the business is waiting for, shown first so the usual case is one tap. */
   waiting?: MatchResult[];
+  /** Opened from a booking's "Add a cost": money out, charged to that booking. */
+  startAsCost?: boolean;
 }) {
   const t = useTranslations("money");
   const say = t as unknown as (key: string, values?: Record<string, string | number>) => string;
@@ -51,7 +54,7 @@ export function TransactionForm({
         : match.dueDate === today
           ? say("dueToday")
           : say(match.dueDate < today ? "wasDueOn" : "dueOn", { date: shortDate(match.dueDate, locale) });
-  const [type, setType] = useState(prefill?.type || "rental_income");
+  const [type, setType] = useState(prefill?.type || (startAsCost ? "repair" : "rental_income"));
   const [amount, setAmount] = useState(prefill?.amount || "");
   // Today in business time: toISOString() is UTC, which is still "yesterday" in Thailand before 7am.
   const [transactionDate, setTransactionDate] = useState(
@@ -71,11 +74,11 @@ export function TransactionForm({
     () => waiting.filter((item) => (!defaultVehicleId || item.prefilledData.vehicleId === defaultVehicleId) && (!defaultRentalId || item.rentalId === defaultRentalId) && (!defaultCustomerId || item.customerId === defaultCustomerId)),
     [waiting, defaultVehicleId, defaultRentalId, defaultCustomerId]
   );
-  const [matches, setMatches] = useState<MatchResult[]>(startsLinked ? [] : waitingHere);
+  const [matches, setMatches] = useState<MatchResult[]>(startsLinked || startAsCost ? [] : waitingHere);
   const [showAllMatches, setShowAllMatches] = useState(false);
   const [dismissedMatches, setDismissedMatches] = useState(false);
   // While there are payments being waited for, they are the whole screen; the form opens when one is chosen or it is something else.
-  const [formOpen, setFormOpen] = useState(startsLinked || waitingHere.length === 0);
+  const [formOpen, setFormOpen] = useState(startsLinked || startAsCost || waitingHere.length === 0);
   const [isMatching, startMatchTransition] = useTransition();
 
   // A booking is told apart by its dates as much as by its number.
@@ -86,9 +89,13 @@ export function TransactionForm({
     [options.rentals, vehicleId]
   );
   // Billing the renter for this cost: off unless chosen. The booking offered first is the one the vehicle was on that day.
-  const [billCustomer, setBillCustomer] = useState(false);
-  const [billRentalId, setBillRentalId] = useState("");
-  const [billAmount, setBillAmount] = useState("");
+  const [billCustomer, setBillCustomer] = useState(startAsCost && Boolean(defaultRentalId));
+  const [billRentalId, setBillRentalId] = useState(startAsCost ? defaultRentalId : "");
+  // Above what the deposit covers: billed unless the owner unticks it (insurance pays above the excess, say).
+  const [billRemainder, setBillRemainder] = useState(true);
+  const [billAmountTyped, setBillAmount] = useState("");
+  // The whole cost, until the owner types a different amount to charge.
+  const billAmount = billAmountTyped || amount;
   const likelyBooking = useMemo(() => {
     const onTheDay = rentalsForVehicle.find((rental) => (rental.startDate || "") <= transactionDate && (!rental.endDate || rental.endDate >= transactionDate));
     return onTheDay || rentalsForVehicle[0] || null;
@@ -345,7 +352,6 @@ export function TransactionForm({
                     setBillCustomer(event.target.checked);
                     if (event.target.checked) {
                       if (!billRentalId && likelyBooking) setBillRentalId(likelyBooking.id);
-                      if (!billAmount) setBillAmount(amount);
                     }
                   }}
                   type="checkbox"
@@ -372,7 +378,30 @@ export function TransactionForm({
                     <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("billAmount")}</span>
                     <input className={inputClass} inputMode="decimal" min="0" name="billAmount" onChange={(event) => setBillAmount(event.target.value)} required step="0.01" type="number" value={billAmount} />
                   </label>
-                  <p className="text-[13px] text-[var(--muted)] sm:col-span-2">{say("billWhatHappens")}</p>
+                  {(() => {
+                    const booking = rentalsForVehicle.find((rental) => rental.id === billRentalId);
+                    const charge = Number(billAmount || 0);
+                    const held = Number(booking?.depositHeld || 0);
+                    const fromDeposit = Math.min(held, charge);
+                    const rest = Math.max(0, charge - fromDeposit);
+                    const baht = (value: number) => `฿${Math.round(value).toLocaleString("en-US")}`;
+                    return (
+                      <div className="space-y-2 sm:col-span-2">
+                        {fromDeposit > 0 ? <p className="text-[14px] font-semibold text-[var(--foreground)]">{say("billFromDeposit", { amount: baht(fromDeposit), held: baht(held) })}</p> : null}
+                        {rest > 0 ? (
+                          <label className="flex items-start gap-3 text-[14px] font-semibold text-[var(--foreground)]">
+                            <input checked={billRemainder} className="mt-0.5 h-5 w-5 flex-shrink-0" onChange={(event) => setBillRemainder(event.target.checked)} type="checkbox" />
+                            <span>
+                              {say(fromDeposit > 0 ? "billRest" : "billAll", { amount: baht(rest) })}
+                              <span className="mt-0.5 block text-[13px] font-medium text-[var(--muted)]">{say("billRestHint")}</span>
+                            </span>
+                          </label>
+                        ) : null}
+                        <input name="billRemainder" type="hidden" value={billRemainder ? "true" : ""} />
+                        <p className="text-[13px] text-[var(--muted)]">{say("billWhatHappens")}</p>
+                      </div>
+                    );
+                  })()}
                 </div>
               ) : null}
             </div>

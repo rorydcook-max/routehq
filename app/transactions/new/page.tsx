@@ -10,7 +10,7 @@ import { TransactionForm } from "./transaction-form";
 export default async function NewTransactionPage({
   searchParams
 }: {
-  searchParams: Promise<{ vehicleId?: string; rentalId?: string; customerId?: string; rentalPaymentId?: string; taskId?: string }>;
+  searchParams: Promise<{ vehicleId?: string; rentalId?: string; customerId?: string; rentalPaymentId?: string; taskId?: string; cost?: string }>;
 }) {
   const params = await searchParams;
   const t = await getTranslations("money");
@@ -39,6 +39,7 @@ export default async function NewTransactionPage({
         <TransactionForm
           defaultCustomerId={params.customerId || ""}
           defaultRentalId={params.rentalId || ""}
+        startAsCost={params.cost === "1"}
           defaultVehicleId={params.vehicleId || ""}
           options={options}
           organizationId={organization.id}

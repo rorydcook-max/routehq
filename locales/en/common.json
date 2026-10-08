@@ -341,7 +341,9 @@
     "billRemainder": "Bill the customer the {amount} the deposit does not cover",
     "billRemainderYes": "It is added to the booking as an amount due, and the customer can pay it from their booking page.",
     "billRemainderNo": "Not billed. You can still add it to the booking later.",
-    "billedToCustomer": "Billed to the customer"
+    "billedToCustomer": "Billed to the customer",
+    "holdForDamage": "Damage cost not known yet: keep the deposit for now",
+    "holdForDamageHint": "Nothing is returned now. Pricing the damage goes on To do; add the cost on the booking when you know it, and return what is left."
   },
   "translation": {
     "translatedFrom": "Translated from {language}",
@@ -799,7 +801,11 @@
     "holdEnding": "we are holding the {vehicle} for you until {time}. Finish your booking before then to keep it.",
     "signChange": "please review and sign the change to your rental: {link}",
     "chargeAdded": "a charge of {amount} for {reason} has been added to your rental. You can see it and pay it from your booking page.",
-    "chargeAddedPlain": "a charge of {amount} has been added to your rental. You can see it and pay it from your booking page."
+    "chargeAddedPlain": "a charge of {amount} has been added to your rental. You can see it and pay it from your booking page.",
+    "chargeFromDeposit": "{amount} for {reason} has been taken from your deposit.",
+    "chargeFromDepositPlain": "{amount} has been taken from your deposit for costs during your rental.",
+    "chargeRestToPay": "{amount} more is still to pay; you can pay it from your booking page.",
+    "depositHeldForDamage": "Your deposit is being held until the damage has been assessed. We will let you know what is returned."
   },
   "common": {
     "kinds_car": "Cars",
@@ -1000,7 +1006,9 @@
     "chgr_cleaning": "cleaning",
     "chgr_repair": "repair",
     "chgr_fine": "fine",
-    "chgr_other": "other costs"
+    "chgr_other": "other costs",
+    "job_settle_deposit": "Price the damage and settle the deposit",
+    "settleDeposit": "Settle deposit"
   },
   "bookings": {
     "eyebrow": "Bookings",
@@ -1237,12 +1245,16 @@
     "deleteSelected": "Delete selected",
     "moreDetails": "Who you paid and the mileage (optional)",
     "type_charge_recovered": "Charge paid by customer",
-    "billTitle": "Bill the customer for this",
-    "billHint": "Damage, a fine or fuel that the renter is responsible for.",
+    "billTitle": "Charge this to the customer",
+    "billHint": "Damage, a fine or fuel the renter is responsible for. It comes out of their deposit first.",
     "billAmount": "Amount to bill",
-    "billWhatHappens": "The cost stays as money out. The customer is told and can pay from their booking page; when they pay it is money in. If they never pay, waive it on the booking.",
+    "billWhatHappens": "The cost stays as money out. The customer is told, and a bill can be paid from their booking page; when it is paid it is money in. If they never pay, choose \"Won't be paid\" on the booking.",
     "match_charge": "{amount} · charge · {vehicle}",
-    "billBooking": "Booking to bill"
+    "billBooking": "Booking to bill",
+    "billFromDeposit": "{amount} comes out of the deposit held ({held}).",
+    "billRest": "Bill the customer the other {amount}",
+    "billAll": "Bill the customer {amount}",
+    "billRestHint": "Untick if insurance or someone else covers it."
   },
   "booking": {
     "open": "Open",
@@ -2006,7 +2018,8 @@
     "paidChargesLine": "charges paid {amount}",
     "pc_wontPay": "Won't be paid",
     "tl_autoExtended": "Extended to {date} at the customer's request. {amount} due on {due}.",
-    "tl_autoOpenEnded": "Changed to no end date at the customer's request. {amount} a month from {date}."
+    "tl_autoOpenEnded": "Changed to no end date at the customer's request. {amount} a month from {date}.",
+    "addCost": "Add a cost"
   },
   "newBooking": {
     "pageBack": "Back to bookings",

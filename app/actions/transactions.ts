@@ -2,7 +2,7 @@
 
 import { completeRentalJobs, tellRentalCustomer } from "@/lib/customer-messages";
 import { getTransactionFormOptions } from "@/lib/transactions";
-import { billRentalCustomer } from "@/lib/charges";
+import { chargeRenter } from "@/lib/charges";
 import { businessToday } from "@/lib/business-time";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -588,14 +588,15 @@ export async function createTransaction(formData: FormData) {
 
   if (billOption && billAmount > 0) {
     const reasonByType: Record<string, string> = { repair: "repair", maintenance: "repair", servicing: "repair", fine: "fine", fuel: "fuel", accessories: "other", other: "other" };
-    await billRentalCustomer(supabase, {
+    // From the deposit still held first; the rest is billed unless the owner unticked it (insurance, say).
+    await chargeRenter(supabase, {
       organizationId,
       rentalId: billOption.id,
       amount: billAmount,
       description: optionalString(formData, "notes") || null,
       reasons: [reasonByType[type] || "other"],
       expenseTransactionId: data.id,
-      tellCustomer: true,
+      billRemainder: String(formData.get("billRemainder") || "") === "true",
       sentBy: user.id
     });
   }

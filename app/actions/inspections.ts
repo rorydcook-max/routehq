@@ -698,6 +698,25 @@ export async function submitInspection(formData: FormData) {
       }
     }
 
+    // Damage still to be priced: the deposit stays held, and pricing it is a job for the owner.
+    const holdingForDamage = String(formData.get("holdDepositForDamage") || "") === "true" && Boolean(depositSettlement && depositSettlement.retained > 0);
+    if (holdingForDamage) {
+      const admin = createSupabaseAdminClient() as any;
+      const { data: heldRental } = await admin.from("rentals").select("vehicle_id, reference, display_code, customers!rentals_customer_id_fkey(full_name), vehicles!rentals_vehicle_id_fkey(make, model)").eq("id", rentalId).maybeSingle();
+      await admin.from("tasks").insert({
+        organization_id: organizationId,
+        vehicle_id: heldRental?.vehicle_id || vehicleId,
+        rental_id: rentalId,
+        title: `Price the damage and settle the deposit - ${heldRental?.customers?.full_name || "Customer"} - ${[heldRental?.vehicles?.make, heldRental?.vehicles?.model].filter(Boolean).join(" ") || "vehicle"}`,
+        title_key: null,
+        task_type: "admin",
+        // Closes when what is left of the deposit is returned.
+        action: "settle_deposit",
+        due_at: new Date(Date.now() + 3 * 86_400_000).toISOString(),
+        created_by: user.id
+      });
+    }
+
     // One message to the customer: the vehicle is back, what happened to the deposit, and anything still to pay.
     {
       const settlement = depositSettlement;
@@ -712,7 +731,7 @@ export async function submitInspection(formData: FormData) {
             const kept = settlement.deductions.reduce((sum, item) => sum + item.amount, 0);
             if (kept > 0) lines.push(t("depositKept", { deposit: money(settlement.available), kept: money(kept), reasons: settlement.deductions.map((item) => `${t(`reason_${item.reason.toLowerCase().replace(/\s+/g, "_")}`)} ${money(item.amount)}`).join(", ") }));
             if (settlement.refunded > 0) lines.push(kept > 0 ? t("amountReturned", { amount: money(settlement.refunded) }) : t("depositReturnedInFull", { amount: money(settlement.refunded) }));
-            if (settlement.retained > 0) lines.push(t("depositStillToSettle", { amount: money(settlement.retained) }));
+            if (settlement.retained > 0) lines.push(holdingForDamage ? t("depositHeldForDamage") : t("depositStillToSettle", { amount: money(settlement.retained) }));
           }
           if (owed > 0) lines.push(t("stillToPay", { amount: money(owed) }));
           return lines.join(" ");

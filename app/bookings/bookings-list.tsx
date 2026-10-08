@@ -1,10 +1,12 @@
 "use client";
 
+import { isTwoWheeler, kindFromCategory } from "@/lib/vehicle-groups";
+
 import { businessToday, daysFromToday as businessDaysFromToday } from "@/lib/business-time";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { CalendarDays, Car, Clock, Search, Trash2, UserRound, MoreHorizontal } from "lucide-react";
+import { CalendarDays, Bike, Car, Clock, Search, Trash2, UserRound, MoreHorizontal } from "lucide-react";
 import { deleteBooking, extendBookingHold } from "@/app/actions/bookings";
 import { CancelBookingButton } from "@/app/bookings/[id]/cancel-booking-button";
 import { UndoCancellationButton } from "@/app/bookings/[id]/undo-cancellation-button";
@@ -292,7 +294,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-[var(--primary)]">
-                      <Car size={28} strokeWidth={1.8} />
+                      {isTwoWheeler(kindFromCategory((booking.vehicles as any)?.vehicle_categories)) ? <Bike size={28} strokeWidth={1.8} /> : <Car size={28} strokeWidth={1.8} />}
                     </div>
                   )}
                 </Link>

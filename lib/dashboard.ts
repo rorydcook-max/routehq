@@ -22,6 +22,8 @@ export type DashboardData = {
   reminders: Reminder[];
   timeline: TimelineEvent[];
   metrics: DashboardMetrics;
+  /** Finished or cancelled bookings with money past due (a charge billed after the return, unpaid rent). */
+  closedOverdue?: Rental[];
 };
 
 const vehicleStatusMap: Record<string, VehicleStatus> = {
@@ -160,6 +162,13 @@ export async function getDashboardData(): Promise<DashboardData> {
       const held = String(row.deposit_status || "").toLowerCase() === "received" ? Number(row.deposit_held || 0) : 0;
       return { ...mapRental(row), overdue: late?.amount || 0, overdueSince: late?.since || null, depositHeld: held };
     });
+  // Money still owed on a booking that has ended is still owed: it counts on the dashboard too.
+  const closedOverdue: Rental[] = rentalRows
+    .filter((row: any) => ["completed", "cancelled"].includes(String(row.status || "").toLowerCase()) && (overdueByRental.get(row.id)?.amount || 0) > 0)
+    .map((row: any) => {
+      const late = overdueByRental.get(row.id)!;
+      return { ...mapRental(row), overdue: late.amount, overdueSince: late.since, depositHeld: 0 };
+    });
   // A vehicle booked for next month is free today. "Booked" is kept for one whose booking starts today or has started.
   const todayDate = businessToday();
   for (const vehicle of vehicles) {
@@ -181,6 +190,7 @@ export async function getDashboardData(): Promise<DashboardData> {
     transactions,
     reminders,
     timeline,
+    closedOverdue,
     metrics: {
       ...metrics,
       depositsHeld,

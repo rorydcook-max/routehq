@@ -174,7 +174,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   const maxMonth = Math.max(1, ...lastSixMonths.map((month) => month.amount));
 
   // Only payments past their due date count as overdue.
-  const overdueRentals = rentals.filter((r) => (r.overdue || 0) > 0).sort((a, b) => String(a.overdueSince).localeCompare(String(b.overdueSince)));
+  const overdueRentals = [...rentals, ...(dashboardData.closedOverdue || [])].filter((r) => (r.overdue || 0) > 0).sort((a, b) => String(a.overdueSince).localeCompare(String(b.overdueSince)));
   const overdueTotal = overdueRentals.reduce((sum, r) => sum + (r.overdue || 0), 0);
   const depositsHeld = metrics.depositsHeld ?? rentals.reduce((sum, r) => sum + (r.depositHeld || 0), 0);
   const depositsHeldCount = metrics.depositsHeldCount ?? rentals.filter((r) => (r.depositHeld || 0) > 0).length;

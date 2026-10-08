@@ -47,7 +47,7 @@ function depositStatusFor(held: number, refunded: number, forfeited: number) {
 async function getRentalForDeposit(supabase: any, organizationId: string, rentalId: string) {
   const { data: rental, error } = await supabase
     .from("rentals")
-    .select("id, organization_id, vehicle_id, customer_id, deposit_amount, rental_rate, deposit_held, deposit_status, deposit_refunded_amount, deposit_forfeited_amount, deposit_reconciled_at, deposit_reconciled_by, currency")
+    .select("id, organization_id, vehicle_id, customer_id, deposit_amount, rental_rate, deposit_held, deposit_status, deposit_refunded_amount, deposit_forfeited_amount, deposit_reconciled_at, deposit_reconciled_by, currency, status")
     .eq("id", rentalId)
     .eq("organization_id", organizationId)
     .is("deleted_at", null)
@@ -242,7 +242,8 @@ export async function returnDeposit(formData: FormData) {
           nextRefunded >= held
             ? say("depositReturnedFull", { amount: baht(held) })
             : `${say("depositReturnedPart", { returned: baht(returnAmount), held: baht(held) })}${forfeited > 0 ? ` ${t("depositKeptForCharges", { amount: baht(forfeited) })}` : ""} ${t("anyQuestions")}`,
-        { sentBy: user.id, withLink: false }
+        // Once the booking is over, this message settles the deposit: earlier unsent ones about it ("held", "taken") are out of date.
+        { sentBy: user.id, withLink: false, replacesEarlier: String((rental as any).status || "") === "completed" }
       );
     }
   }

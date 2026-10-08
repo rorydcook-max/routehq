@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { applyDepositDeduction, returnDeposit } from "@/app/actions/deposits";
 import { activateRental } from "@/lib/rental-activation";
 import { finaliseInspectionReport, type DepositSettlement } from "@/lib/inspection-report";
+import { billRentalCustomer } from "@/lib/charges";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { notifyOperator } from "@/lib/notify-operator";
@@ -269,6 +270,10 @@ async function reconcileReturnDeposit(formData: FormData, organizationId: string
   for (const item of deductions) {
     const requested = numberField(formData, item.key) || 0;
     const amount = Math.min(remaining, requested);
+    // What the deposit could not cover is kept, so it can be billed to the customer.
+    if (requested > amount && item.key !== "depositOutstandingBalance") {
+      settlement.uncovered = [...(settlement.uncovered || []), { reason: item.reason, amount: Math.round((requested - amount) * 100) / 100 }];
+    }
     if (amount <= 0) continue;
 
     const deductionData = new FormData();
@@ -677,6 +682,21 @@ export async function submitInspection(formData: FormData) {
     }
 
     depositSettlement = await reconcileReturnDeposit(formData, organizationId, rentalId);
+    // The rest of a fuel, damage or cleaning charge becomes an amount due on the booking, if the owner chose to bill it.
+    {
+      const uncoveredTotal = (depositSettlement?.uncovered || []).reduce((sum, item) => sum + item.amount, 0);
+      if (depositSettlement && uncoveredTotal > 0 && String(formData.get("billUncoveredCharges") || "") === "true") {
+        const reasonKey: Record<string, string> = { "Fuel deficit": "fuel", Damage: "damage", "Cleaning fee": "cleaning" };
+        await billRentalCustomer(supabase, {
+          organizationId,
+          rentalId,
+          amount: uncoveredTotal,
+          reasons: (depositSettlement.uncovered || []).map((item) => reasonKey[item.reason] || "other"),
+          sentBy: user.id
+        });
+        depositSettlement.billed = uncoveredTotal;
+      }
+    }
 
     // One message to the customer: the vehicle is back, what happened to the deposit, and anything still to pay.
     {

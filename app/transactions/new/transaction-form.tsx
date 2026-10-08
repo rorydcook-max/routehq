@@ -11,7 +11,9 @@ import { TRANSACTION_TYPE_OPTIONS } from "@/lib/transaction-options";
 import type { MatchResult } from "@/lib/transaction-matching";
 import type { TransactionFormOptions, TransactionFormPrefill } from "@/lib/transactions";
 
-const MONEY_IN: string[] = ["rental_income", "deposit_received", "deposit_forfeited", "deposit_deduction"];
+const MONEY_IN: string[] = ["rental_income", "charge_recovered", "deposit_received", "deposit_forfeited", "deposit_deduction"];
+// Costs a renter can be responsible for. Insurance, tax and finance are the owner's own.
+const BILLABLE: string[] = ["repair", "maintenance", "servicing", "fine", "fuel", "accessories", "other"];
 
 const inputClass =
   "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2.5 text-[15px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]";
@@ -80,6 +82,14 @@ export function TransactionForm({
     () => options.rentals.filter((rental) => rental.vehicleId === vehicleId),
     [options.rentals, vehicleId]
   );
+  // Billing the renter for this cost: off unless chosen. The booking offered first is the one the vehicle was on that day.
+  const [billCustomer, setBillCustomer] = useState(false);
+  const [billRentalId, setBillRentalId] = useState("");
+  const [billAmount, setBillAmount] = useState("");
+  const likelyBooking = useMemo(() => {
+    const onTheDay = rentalsForVehicle.find((rental) => (rental.startDate || "") <= transactionDate && (!rental.endDate || rental.endDate >= transactionDate));
+    return onTheDay || rentalsForVehicle[0] || null;
+  }, [rentalsForVehicle, transactionDate]);
 
   useEffect(() => {
     // Only money coming in can be a payment a customer owes.
@@ -320,6 +330,50 @@ export function TransactionForm({
               </div>
             </details>
           )}
+
+          {!isMoneyIn && BILLABLE.includes(type) && rentalsForVehicle.length > 0 ? (
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3 sm:col-span-2">
+              <label className="flex items-start gap-3 text-[14px] font-semibold text-[var(--foreground)]">
+                <input
+                  checked={billCustomer}
+                  className="mt-0.5 h-5 w-5 flex-shrink-0"
+                  name="billCustomer"
+                  onChange={(event) => {
+                    setBillCustomer(event.target.checked);
+                    if (event.target.checked) {
+                      if (!billRentalId && likelyBooking) setBillRentalId(likelyBooking.id);
+                      if (!billAmount) setBillAmount(amount);
+                    }
+                  }}
+                  type="checkbox"
+                  value="true"
+                />
+                <span>
+                  {say("billTitle")}
+                  <span className="mt-0.5 block text-[13px] font-medium text-[var(--muted)]">{say("billHint")}</span>
+                </span>
+              </label>
+              {billCustomer ? (
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  <label className="block">
+                    <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("booking")}</span>
+                    <select className={inputClass} name="billRentalId" onChange={(event) => setBillRentalId(event.target.value)} required value={billRentalId}>
+                      {rentalsForVehicle.map((rental) => (
+                        <option key={rental.id} value={rental.id}>
+                          {rental.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="block">
+                    <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("billAmount")}</span>
+                    <input className={inputClass} inputMode="decimal" min="0" name="billAmount" onChange={(event) => setBillAmount(event.target.value)} required step="0.01" type="number" value={billAmount} />
+                  </label>
+                  <p className="text-[13px] text-[var(--muted)] sm:col-span-2">{say("billWhatHappens")}</p>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
 
           <label className="block sm:col-span-2">
             <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("notes")}</span>

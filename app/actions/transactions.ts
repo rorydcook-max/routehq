@@ -1,6 +1,8 @@
 "use server";
 
 import { completeRentalJobs, tellRentalCustomer } from "@/lib/customer-messages";
+import { getTransactionFormOptions } from "@/lib/transactions";
+import { billRentalCustomer } from "@/lib/charges";
 import { businessToday } from "@/lib/business-time";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -480,8 +482,15 @@ export async function createTransaction(formData: FormData) {
     throw new Error("Vehicle, type, and a positive amount are required.");
   }
 
-  const rentalId = optionalString(formData, "rentalId");
-  const customerId = optionalString(formData, "customerId");
+  // A cost the renter is responsible for (damage, a fine, fuel): the cost is still money out, and the booking gets a bill.
+  const billRentalId = String(formData.get("billCustomer") || "") === "true" ? optionalString(formData, "billRentalId") : null;
+  const billAmount = billRentalId ? numberField(formData, "billAmount") || 0 : 0;
+  const billOption = billRentalId ? (await getTransactionFormOptions(organizationId)).rentals.find((rental) => rental.id === billRentalId) : null;
+  if (billRentalId && (!billOption || billAmount <= 0)) {
+    throw new Error("Choose the booking and the amount to bill the customer.");
+  }
+  const rentalId = billOption ? billOption.id : optionalString(formData, "rentalId");
+  const customerId = billOption ? billOption.customerId : optionalString(formData, "customerId");
   const rentalPaymentId = optionalString(formData, "rentalPaymentId");
   const linkedTaskId = optionalString(formData, "taskId");
   const receipt = formData.get("receipt");
@@ -575,6 +584,20 @@ export async function createTransaction(formData: FormData) {
         .eq("id", rentalId)
         .eq("organization_id", organizationId);
     }
+  }
+
+  if (billOption && billAmount > 0) {
+    const reasonByType: Record<string, string> = { repair: "repair", maintenance: "repair", servicing: "repair", fine: "fine", fuel: "fuel", accessories: "other", other: "other" };
+    await billRentalCustomer(supabase, {
+      organizationId,
+      rentalId: billOption.id,
+      amount: billAmount,
+      description: optionalString(formData, "notes") || null,
+      reasons: [reasonByType[type] || "other"],
+      expenseTransactionId: data.id,
+      tellCustomer: true,
+      sentBy: user.id
+    });
   }
 
   if (rentalPaymentId) {

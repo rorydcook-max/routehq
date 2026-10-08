@@ -2762,6 +2762,8 @@ export async function recordPaymentReceived(paymentId: string, fields: RecordPay
       ? "Deposit"
       : paymentType === "extension"
         ? "Extension payment"
+        : paymentType === "charge"
+          ? "Charge"
         : payment.metadata?.period_label
           ? `${payment.metadata.period_label} rent`
           : "Rent payment");
@@ -2770,13 +2772,15 @@ export async function recordPaymentReceived(paymentId: string, fields: RecordPay
   // A deposit (for example a top-up agreed in a signed amendment) is held,
   // not earned: record it as deposit received and add it to the deposit held.
   const isDepositPayment = payment.metadata?.type === "deposit" || payment.metadata?.is_deposit === true;
+  // A cost billed to the customer (damage, a fine, fuel) is income of its own, not rent.
+  const isChargePayment = paymentType === "charge";
   const { error: transactionError } = await supabase.from("transactions").insert({
     organization_id: payment.organization_id,
     vehicle_id: payment.vehicle_id || null,
     rental_id: payment.rental_id,
     customer_id: payment.customer_id || null,
     rental_payment_id: payment.id,
-    type: isDepositPayment ? "deposit_received" : "rental_income",
+    type: isDepositPayment ? "deposit_received" : isChargePayment ? "charge_recovered" : "rental_income",
     ...(isDepositPayment ? { is_deposit: true, deposit_rental_id: payment.rental_id } : {}),
     amount,
     currency: payment.currency || "THB",
@@ -2837,13 +2841,16 @@ export async function recordPaymentReceived(paymentId: string, fields: RecordPay
       amount: remainder,
       currency: payment.currency || "THB",
       status: "pending",
-      metadata: {
-        type: payment.metadata?.type || "rent",
-        is_deposit: payment.metadata?.is_deposit === true,
-        period_label: payment.metadata?.period_label || null,
-        description: `Remaining balance - ${description}`,
-        remainder_of: payment.id
-      }
+      // A bill keeps its own words and links; rent and deposits are named from their kind when shown.
+      metadata: paymentType === "charge"
+        ? { ...(payment.metadata || {}), payment_received_method: undefined, payment_received_note: undefined, payment_received_at: undefined, remainder_of: payment.id }
+        : {
+            type: payment.metadata?.type || "rent",
+            is_deposit: payment.metadata?.is_deposit === true,
+            period_label: payment.metadata?.period_label || null,
+            description: `Remaining balance - ${description}`,
+            remainder_of: payment.id
+          }
     });
     if (remainderError) {
       throw new Error(remainderError.message);

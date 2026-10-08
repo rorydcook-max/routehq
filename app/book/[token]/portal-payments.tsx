@@ -43,6 +43,13 @@ async function shrinkImage(file: File): Promise<File> {
   }
 }
 
+/** What a charge is for: the owner's own words, or the reasons from the return form in the customer's language. */
+function chargeFor(payment: PortalPayment, t: ReturnType<typeof useTranslations>) {
+  if (payment.chargeNote) return ` · ${payment.chargeNote}`;
+  const reasons = (payment.chargeReasons || []).map((reason) => (t.has(`chgr_${reason}` as never) ? t(`chgr_${reason}` as never) : reason));
+  return reasons.length ? ` · ${reasons.join(", ")}` : "";
+}
+
 export function PortalPayments({
   token,
   payments,
@@ -175,7 +182,7 @@ function PaymentRow({
           <p className="text-base font-semibold text-[var(--foreground)]">
             {money(payment.amount, payment.currency)}{" "}
             <span className="text-sm font-medium text-[var(--muted)]">
-              · {payment.kind ? `${t(`payKind_${payment.kind}`)}${payment.kind === "rent" && payment.periodLabel && locale === "en" ? ` · ${payment.periodLabel}` : ""}` : payment.label}
+              · {payment.kind ? `${t(`payKind_${payment.kind}`)}${payment.kind === "rent" && payment.periodLabel && locale === "en" ? ` · ${payment.periodLabel}` : ""}${payment.kind === "charge" ? chargeFor(payment, t) : ""}` : payment.label}
             </span>
           </p>
           <p className={`text-sm ${sentAt ? "text-[var(--success)]" : payment.overdue ? "font-semibold text-[var(--danger)]" : "text-[var(--muted)]"}`}>

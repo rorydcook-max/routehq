@@ -38,6 +38,7 @@ const paymentMethodOptions = ["cash", "promptpay", "bank_transfer", "wise", "rev
 
 const transactionTypeOptions = [
   "rental_income",
+  "charge_recovered",
   "refund",
   "deposit",
   "deposit_received",
@@ -96,10 +97,15 @@ function paymentDescription(payment: RentalPayment, tx: Ctl) {
   const metadata = payment.metadata || {};
   // The app's own English descriptions ("Security deposit", "First rental payment - due at handover") are
   // not words someone typed: those payments are named in the reader's language below.
-  const appWritten = /^(security deposit|first rental payment|rental payment|rent payment|\d+ days? rent)\b/i.test(String(metadata.description || "").trim());
-  if (metadata.description && !appWritten) return String(metadata.description);
+  const appWritten = /^(security deposit|first rental payment|rental payment|rent payment|remaining balance|\d+ days? rent)\b/i.test(String(metadata.description || "").trim());
+  if (metadata.description && !appWritten) return metadata.type === "charge" ? tx.say("pc_chargeFor", { reasons: String(metadata.description) }) : String(metadata.description);
   const isExtension = metadata.type === "extension" || metadata.adjustment_type === "extension";
   if (isExtension) return tx.say("pc_extensionDesc", { from: dateLabel(metadata.previous_end_date, tx.locale), to: dateLabel(metadata.new_end_date, tx.locale) });
+  // A bill from the return form names its reasons; one added by hand keeps the words it was given (above).
+  if (metadata.type === "charge") {
+    const reasons = (Array.isArray(metadata.charge_reasons) ? metadata.charge_reasons : []).map((reason: string) => tx.say(`chg_${reason}`));
+    return reasons.length ? tx.say("pc_chargeFor", { reasons: reasons.join(", ") }) : tx.say("pc_charge");
+  }
   if (metadata.type === "deposit" || metadata.is_deposit === true) return tx.say("pc_deposit");
   return metadata.period_label ? tx.say("pc_rentFor", { period: monthPeriod(metadata.period_label, tx.locale) }) : tx.say("pc_rent");
 }

@@ -72,7 +72,7 @@ export async function fetchSummaryData(organizationId: string): Promise<SummaryD
       .select("amount, type, transaction_date")
       .eq("organization_id", org.id)
       // Income is rent plus any deposit that was kept. Deposits held or handed back are not income.
-      .in("type", ["rental_income", "deposit_forfeited", "deposit_deduction"])
+      .in("type", ["rental_income", "charge_recovered", "deposit_forfeited", "deposit_deduction"])
       .neq("voided", true)
       .gte("transaction_date", today.slice(0, 7) + "-01")
       .lte("transaction_date", today)

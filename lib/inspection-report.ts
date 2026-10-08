@@ -29,6 +29,10 @@ export type DepositSettlement = {
   retained: number;
   /** How the refund was handed back: cash, bank_transfer or promptpay. */
   refundMethod?: string | null;
+  /** Fuel, damage or cleaning the deposit could not cover. */
+  uncovered?: Array<{ reason: string; amount: number }>;
+  /** Of that, what was billed to the customer as an amount due on the booking. */
+  billed?: number;
 };
 
 export type InspectionReportInput = {

@@ -323,7 +323,10 @@
     "need_walkaround": "ถ่ายวิดีโอ หรือถ่ายรูปให้ครบสี่ด้านก่อนไปต่อ",
     "need_damage": "ติ๊ก “ไม่มีความเสียหาย” หรือเพิ่มรายการที่พบก่อนไปต่อ",
     "need_signature": "ต้องมีชื่อและลายเซ็นของลูกค้าก่อนจึงจะเสร็จ",
-    "receiptRentOnly": "ค่าเช่า {rent}"
+    "receiptRentOnly": "ค่าเช่า {rent}",
+    "billRemainder": "เรียกเก็บส่วนที่เงินมัดจำไม่พอ {amount} จากลูกค้า",
+    "billRemainderYes": "จะเพิ่มเป็นยอดค้างในการจอง และลูกค้าจ่ายได้จากหน้าการจองของตัวเอง",
+    "billRemainderNo": "ไม่เรียกเก็บ เพิ่มในการจองทีหลังได้"
   },
   "translation": {
     "translatedFrom": "แปลจาก {language}",
@@ -737,7 +740,14 @@
     "collectWhenIntro": "ไม่ระบุก็ได้ บอกเวลาที่สะดวกมารับรถ หากยังไม่ได้ตกลงกัน",
     "collectChange": "ต้องการเปลี่ยนเวลา?",
     "receiptNumbered": "ใบเสร็จ {number}",
-    "keepItLongerDateOnly": "เลือกวันคืนรถใหม่"
+    "keepItLongerDateOnly": "เลือกวันคืนรถใหม่",
+    "payKind_charge": "ค่าใช้จ่ายเพิ่มเติม",
+    "chgr_fuel": "ค่าน้ำมัน",
+    "chgr_damage": "ค่าเสียหาย",
+    "chgr_cleaning": "ค่าทำความสะอาด",
+    "chgr_repair": "ค่าซ่อม",
+    "chgr_fine": "ค่าปรับ",
+    "chgr_other": "ค่าใช้จ่ายอื่น"
   },
   "customerMessages": {
     "hi": "สวัสดีคุณ {name}",
@@ -795,7 +805,9 @@
     "reason_damage": "ค่าความเสียหาย",
     "reason_cleaning_fee": "ค่าทำความสะอาด",
     "holdEnding": "เรากัน {vehicle} ไว้ให้คุณถึงเวลา {time} น. กรุณาทำการจองให้เสร็จก่อนเวลานั้นเพื่อไม่ให้เสียคิว",
-    "signChange": "กรุณาตรวจสอบและเซ็นการเปลี่ยนแปลงการเช่าของคุณ: {link}"
+    "signChange": "กรุณาตรวจสอบและเซ็นการเปลี่ยนแปลงการเช่าของคุณ: {link}",
+    "chargeAdded": "มีค่าใช้จ่าย {amount} สำหรับ{reason} เพิ่มในการเช่าของคุณ ดูรายละเอียดและจ่ายได้จากหน้าการจองของคุณ",
+    "chargeAddedPlain": "มีค่าใช้จ่าย {amount} เพิ่มในการเช่าของคุณ ดูรายละเอียดและจ่ายได้จากหน้าการจองของคุณ"
   },
   "common": {
     "kinds_car": "รถยนต์",
@@ -1222,7 +1234,13 @@
     "deleteThem": "ลบรายการเหล่านี้หรือไม่ ลบแล้วกู้คืนไม่ได้",
     "yesDelete": "ใช่ ลบเลย",
     "deleteSelected": "ลบที่เลือก",
-    "moreDetails": "จ่ายให้ใคร และเลขไมล์ (ไม่บังคับ)"
+    "moreDetails": "จ่ายให้ใคร และเลขไมล์ (ไม่บังคับ)",
+    "type_charge_recovered": "ลูกค้าจ่ายค่าใช้จ่ายที่เรียกเก็บ",
+    "billTitle": "เรียกเก็บค่าใช้จ่ายนี้จากลูกค้า",
+    "billHint": "ค่าเสียหาย ค่าปรับ หรือค่าน้ำมันที่ผู้เช่าต้องรับผิดชอบ",
+    "billAmount": "จำนวนที่เรียกเก็บ",
+    "billWhatHappens": "ค่าใช้จ่ายนี้ยังเป็นเงินออก ระบบจะแจ้งลูกค้า และลูกค้าจ่ายได้จากหน้าการจอง เมื่อจ่ายแล้วจะเป็นเงินเข้า ถ้าลูกค้าไม่จ่าย ยกเว้นได้ที่หน้าการจอง",
+    "match_charge": "{amount} · ค่าใช้จ่ายที่เรียกเก็บ · {vehicle}"
   },
   "booking": {
     "open": "ไม่กำหนด",
@@ -1974,7 +1992,16 @@
     "hist_vehicles_deleted": "ลบรถแล้ว",
     "hist_smart_import_completed": "นำเข้าข้อมูลแล้ว",
     "hist_rental_document_signed": "เซ็นเอกสารแล้ว",
-    "hist_rental_document_legacy_contract_linked": "แนบสัญญาฉบับเดิมแล้ว"
+    "hist_rental_document_legacy_contract_linked": "แนบสัญญาฉบับเดิมแล้ว",
+    "pc_charge": "ค่าใช้จ่ายที่เรียกเก็บจากลูกค้า",
+    "pc_chargeFor": "เรียกเก็บ: {reasons}",
+    "chg_fuel": "ค่าน้ำมัน",
+    "chg_damage": "ค่าเสียหาย",
+    "chg_cleaning": "ค่าทำความสะอาด",
+    "chg_repair": "ค่าซ่อม",
+    "chg_fine": "ค่าปรับ",
+    "chg_other": "ค่าใช้จ่ายอื่น",
+    "paidChargesLine": "จ่ายค่าใช้จ่ายที่เรียกเก็บแล้ว {amount}"
   },
   "newBooking": {
     "pageBack": "กลับไปที่การจอง",

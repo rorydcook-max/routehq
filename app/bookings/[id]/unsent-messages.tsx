@@ -59,7 +59,7 @@ export function UnsentMessages({ messages, customerName }: { messages: UnsentMes
           const app = appOf(message.url);
           return (
             <div className="rounded-lg bg-white p-3" key={message.id}>
-              <p className="whitespace-pre-line text-sm leading-6 text-[var(--foreground)]">
+              <p className="whitespace-pre-line text-sm leading-6 text-[var(--foreground)] [overflow-wrap:anywhere]">
                 <bdi>{message.content}</bdi>
               </p>
               <div className="mt-3 flex flex-wrap gap-2">

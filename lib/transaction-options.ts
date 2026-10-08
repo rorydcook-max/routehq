@@ -5,6 +5,7 @@ export const TRANSACTION_TYPE_OPTIONS = [
   { value: "deposit_forfeited", label: "Deposit forfeited (kept)", category: "revenue" },
   { value: "deposit_deduction", label: "Deposit deduction", category: "revenue" },
   { value: "deposit", label: "Deposit", category: "deposit" },
+  { value: "charge_recovered", label: "Charge paid by customer", category: "revenue" },
   { value: "refund", label: "Refund", category: "expense" },
   { value: "repair", label: "Repair", category: "expense" },
   { value: "servicing", label: "Servicing", category: "expense" },
@@ -19,7 +20,7 @@ export const TRANSACTION_TYPE_OPTIONS = [
 ] as const;
 
 export function isIncomeTransactionType(type: string) {
-  return type === "rental_income" || type === "Rental Income" || type === "deposit_forfeited" || type === "deposit_deduction" || type === "Deposit forfeited (kept)" || type === "Deposit deduction";
+  return type === "rental_income" || type === "Rental Income" || type === "charge_recovered" || type === "deposit_forfeited" || type === "deposit_deduction" || type === "Deposit forfeited (kept)" || type === "Deposit deduction";
 }
 
 export function isRawDepositTransaction({

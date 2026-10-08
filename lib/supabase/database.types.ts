@@ -38,6 +38,7 @@ type TransactionType =
   | "deposit_refunded"
   | "deposit_forfeited"
   | "deposit_deduction"
+  | "charge_recovered"
   | "other";
 type DocumentOwnerType = "vehicle" | "customer" | "rental" | "transaction" | "inspection" | "contract" | "invoice" | "organization";
 type InspectionType = "delivery" | "return" | "maintenance" | "incident" | "periodic" | "condition_report";

@@ -4,5 +4,6 @@ export function customerPaymentLabel(metadata: any) {
   if (type === "deposit" || metadata?.is_deposit === true) return "Deposit";
   if (type === "deposit_top_up") return "Deposit top-up";
   if (type === "extension") return "Extension";
+  if (type === "charge") return String(metadata?.description || "Charge");
   return metadata?.period_label ? `Rent · ${metadata.period_label}` : "Rent";
 }

@@ -436,6 +436,8 @@ export function InspectionForm({ context, unsigned = false }: { context: Inspect
   const [cleaningCharge, setCleaningCharge] = useState(0);
   const [refundOverride, setRefundOverride] = useState("");
   const [refundMethod, setRefundMethod] = useState("cash");
+  // Charges the deposit cannot cover are billed to the customer unless the owner says not to.
+  const [billUncovered, setBillUncovered] = useState(true);
   const [isPending, startTransition] = useTransition();
   const [uploadProgress, setUploadProgress] = useState("");
   const [uploadError, setUploadError] = useState("");
@@ -477,6 +479,8 @@ export function InspectionForm({ context, unsigned = false }: { context: Inspect
   const appliedDeductions = Math.min(availableToReconcile, requestedDeductions);
   const calculatedRefund = Math.max(0, availableToReconcile - appliedDeductions);
   const depositRefundAmount = Math.min(availableToReconcile, Math.max(0, refundOverride ? Number(refundOverride) : calculatedRefund));
+  // Rent still owed comes out of the deposit first (as on the server); fuel, damage and cleaning take what is left.
+  const uncoveredCharges = Math.max(0, fuelDeficitCharge + damageCharge + cleaningCharge - Math.max(0, availableToReconcile - outstandingBalance));
   // No deposit held and nothing to take from one: a screen of "0 held, 0 returned" is not a step.
   const nothingToSettle = mode === "return" && !isSwap && availableToReconcile <= 0 && requestedDeductions <= 0;
   const skipDepositStep = depositAlreadyReturned || (mode === "return" && isSwap) || nothingToSettle;
@@ -775,6 +779,7 @@ export function InspectionForm({ context, unsigned = false }: { context: Inspect
       <input name="depositFuelDeficitCharge" type="hidden" value={fuelDeficitCharge} />
       <input name="depositDamageCharge" type="hidden" value={damageCharge} />
       <input name="depositCleaningCharge" type="hidden" value={cleaningCharge} />
+      <input name="billUncoveredCharges" type="hidden" value={billUncovered && uncoveredCharges > 0 ? "true" : ""} />
 
       <Progress step={step} steps={steps} />
 
@@ -1051,7 +1056,15 @@ export function InspectionForm({ context, unsigned = false }: { context: Inspect
             {fuelDeficitCharge > 0 ? <Row label={t("fuelDeficitCharge")} value={`-${money(fuelDeficitCharge)}`} danger /> : null}
             {damageCharge > 0 ? <Row label={t("damageExcess")} value={`-${money(damageCharge)}`} danger /> : null}
             {cleaningCharge > 0 ? <Row label={t("cleaningFee")} value={`-${money(cleaningCharge)}`} danger /> : null}
-            {requestedDeductions > availableToReconcile ? (
+            {uncoveredCharges > 0 ? (
+              <label className="flex items-start gap-3 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] px-3 py-3 text-sm font-semibold text-[var(--foreground)]">
+                <input checked={billUncovered} className="mt-0.5 h-5 w-5 flex-shrink-0" onChange={(event) => setBillUncovered(event.target.checked)} type="checkbox" />
+                <span>
+                  {t("billRemainder", { amount: money(uncoveredCharges) })}
+                  <span className="mt-1 block text-xs font-medium text-[var(--muted)]">{billUncovered ? t("billRemainderYes") : t("billRemainderNo")}</span>
+                </span>
+              </label>
+            ) : requestedDeductions > availableToReconcile ? (
               <p className="rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] px-3 py-2 text-sm font-bold text-[var(--warning)]">
                 {t("deductionsExceedDeposit", { amount: money(availableToReconcile) })}
               </p>

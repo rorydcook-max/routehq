@@ -19,6 +19,7 @@ const typeLabels: Record<string, string> = {
   accessories: "Accessories",
   refund: "Refund",
   deposit: "Deposit",
+  charge_recovered: "Charge paid by customer",
   other: "Other"
 };
 
@@ -36,6 +37,10 @@ export type TransactionListItem = {
   vehicleId: string;
   vehicleLabel: string;
   rentalId: string | null;
+  /** The booking's reference (FL-2026-0007), when the entry belongs to one. */
+  bookingRef: string | null;
+  /** Make and model, without the plate. */
+  vehicleName: string;
   customerId: string | null;
   customerName: string | null;
   isDeposit: boolean;
@@ -45,7 +50,7 @@ export type TransactionListItem = {
 export type TransactionFormOptions = {
   vehicles: Array<{ id: string; label: string }>;
   customers: Array<{ id: string; label: string }>;
-  rentals: Array<{ id: string; label: string; vehicleId: string; customerId: string }>;
+  rentals: Array<{ id: string; label: string; vehicleId: string; customerId: string; startDate?: string | null; endDate?: string | null; status?: string | null }>;
 };
 
 export type TransactionFormPrefill = {
@@ -65,7 +70,7 @@ export async function getTransactionList(organizationId: string): Promise<Transa
   const { data, error } = await supabase
     .from("transactions")
     .select(
-      "id, display_code, type, amount, currency, transaction_date, notes, supplier, mileage, vehicle_id, rental_id, customer_id, is_deposit, voided, vehicles!transactions_vehicle_id_fkey(registration_number, make, model), customers!transactions_customer_id_fkey(full_name)"
+      "id, display_code, type, amount, currency, transaction_date, notes, supplier, mileage, vehicle_id, rental_id, customer_id, is_deposit, voided, vehicles!transactions_vehicle_id_fkey(registration_number, make, model), customers!transactions_customer_id_fkey(full_name), rentals!transactions_rental_id_fkey(reference, display_code)"
     )
     .eq("organization_id", organizationId)
     .is("deleted_at", null)
@@ -90,6 +95,8 @@ export async function getTransactionList(organizationId: string): Promise<Transa
     vehicleId: row.vehicle_id,
     vehicleLabel: [row.vehicles?.registration_number, row.vehicles?.make, row.vehicles?.model].filter(Boolean).join(" ") || "Vehicle",
     rentalId: row.rental_id,
+    bookingRef: row.rentals?.reference || row.rentals?.display_code || null,
+    vehicleName: [row.vehicles?.make, row.vehicles?.model].filter(Boolean).join(" ") || row.vehicles?.registration_number || "",
     customerId: row.customer_id,
     customerName: row.customers?.full_name || null,
     isDeposit: Boolean(row.is_deposit),
@@ -114,12 +121,12 @@ export async function getTransactionFormOptions(organizationId: string): Promise
       .order("full_name"),
     supabase
       .from("rentals")
-      .select("id, display_code, reference, vehicle_id, customer_id, customers!rentals_customer_id_fkey(full_name)")
+      .select("id, display_code, reference, vehicle_id, customer_id, status, start_date, end_date, customers!rentals_customer_id_fkey(full_name)")
       .eq("organization_id", organizationId)
       .is("deleted_at", null)
-      .in("status", ["booked", "active", "due_soon", "overdue", "extended"])
+      .or(`status.in.(booked,active,due_soon,overdue,extended),and(status.eq.completed,end_date.gte.${businessToday(-90)})`)
       .order("start_date", { ascending: false })
-      .limit(100)
+      .limit(150)
   ]);
 
   const queryError = [vehiclesResult, customersResult, rentalsResult].find((result) => result.error)?.error;
@@ -140,6 +147,9 @@ export async function getTransactionFormOptions(organizationId: string): Promise
       id: row.id,
       vehicleId: row.vehicle_id,
       customerId: row.customer_id,
+      startDate: row.start_date || null,
+      endDate: row.end_date || null,
+      status: row.status || null,
       label: [row.reference || row.display_code, row.customers?.full_name].filter(Boolean).join(" · ")
     }))
   };
@@ -178,11 +188,14 @@ export async function getTransactionFormPrefill({
 
     const isDeposit = data.metadata?.type === "deposit" || data.metadata?.is_deposit === true;
     const isExtension = data.metadata?.type === "extension";
+    const isCharge = data.metadata?.type === "charge";
     return {
-      type: isDeposit ? "deposit_received" : "rental_income",
+      type: isDeposit ? "deposit_received" : isCharge ? "charge_recovered" : "rental_income",
       amount: String(Number(data.amount || 0)),
       transactionDate: businessToday(),
-      notes: isDeposit
+      notes: isCharge
+        ? String(data.metadata?.description || "Charge")
+        : isDeposit
         ? `Deposit - ${vehicleName}`
         : isExtension
           ? `Extension payment - ${vehicleName}`
@@ -231,7 +244,7 @@ export async function getTransactionFormPrefill({
 }
 
 export function isIncomeTransactionType(type: string) {
-  return type === "rental_income" || type === "deposit_forfeited" || type === "deposit_deduction";
+  return type === "rental_income" || type === "charge_recovered" || type === "deposit_forfeited" || type === "deposit_deduction";
 }
 
 export { TRANSACTION_TYPE_OPTIONS };

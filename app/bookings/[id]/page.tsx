@@ -417,6 +417,11 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   const customerFormComplete = Boolean(bookingLink?.customer_details_submitted_at || ["details_submitted", "contract_signed", "completed"].includes(String(bookingLink?.status || "")));
   const paymentDueOnDeliveryAmount = Number(rental.first_payment_amount || rental.rental_rate || 0);
   const paidInAll = activePayments.filter((payment: any) => payment.status === "paid").reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
+  // Said apart: rent, the deposit held, and what the customer paid towards costs billed to them.
+  const paidOfKind = (test: (payment: any) => boolean) =>
+    activePayments.filter((payment: any) => payment.status === "paid" && test(payment)).reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
+  const paidDeposit = paidOfKind((payment) => payment.metadata?.type === "deposit" || payment.metadata?.is_deposit === true);
+  const paidCharges = paidOfKind((payment) => payment.metadata?.type === "charge");
   const financialState = (() => {
     if (isCancelled) {
       return {
@@ -1082,11 +1087,12 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               <div className="space-y-3">
                 <p className="text-sm text-[var(--muted)]">
                   {/* Rent and deposit are said separately: "฿0 paid so far" beside a paid deposit read as a mistake. */}
-                  {t.rich(paidInAll - totalPaid > 0 ? "paidLineDeposit" : "paidLine", {
+                  {t.rich(paidDeposit > 0 ? "paidLineDeposit" : "paidLine", {
                     rent: money(totalPaid, rental.currency),
-                    deposit: money(paidInAll - totalPaid, rental.currency),
+                    deposit: money(paidDeposit, rental.currency),
                     b: (chunks: React.ReactNode) => <span className="font-semibold text-[var(--foreground)]">{chunks}</span>
-                  })}{" "}
+                  })}
+                  {paidCharges > 0 ? ` · ${tx.say("paidChargesLine", { amount: money(paidCharges, rental.currency) })}` : null}{" "}
                   {financialState.detail}
                 </p>
                 {needsExistingRentalPaymentSetup ? (

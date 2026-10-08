@@ -89,6 +89,7 @@ export function normalizeTransactionType(value: unknown) {
   const cleaned = cleanString(value).toLowerCase().replace(/\s+/g, "_");
   const allowed = new Set([
     "rental_income",
+    "charge_recovered",
     "repair",
     "servicing",
     "maintenance",

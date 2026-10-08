@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import { shownError } from "@/lib/error-text";
 import { ArrowDownLeft, ArrowUpRight, Check, ChevronLeft, ChevronRight, Pencil, Search, Trash2, X } from "lucide-react";
@@ -374,10 +375,12 @@ export function TransactionsList({
     const deleting = deletingIds.has(transaction.id);
     const selected = selectedIds.has(transaction.id);
     // One line under the title. Money in: who and which vehicle. Money out: the vehicle and what it was for; the plate stays on the vehicle page.
-    const vehicleName = transaction.vehicleLabel.replace(/^\S*\d\S*\s+/, "");
-    const who = kind === "expense"
+    const vehicleName = transaction.vehicleName || transaction.vehicleLabel;
+    // A refund or a cost billed to a customer is about a booking: who, and what for, come first.
+    const who = kind === "expense" && !transaction.rentalId
       ? [vehicleName, transaction.notes || transaction.supplier].filter(Boolean).join(" · ")
       : [transaction.customerName || transaction.supplier, vehicleName].filter(Boolean).join(" · ");
+    const context = transaction.rentalId ? [transaction.bookingRef, kind === "expense" || transaction.type === "charge_recovered" ? transaction.notes : null].filter(Boolean).join(" · ") : "";
     return (
       <li className={`group px-4 py-3.5 transition ${deleting ? "opacity-40" : ""} ${selected ? "bg-[var(--primary-light)]" : "hover:bg-[var(--panel-secondary)]"}`} key={transaction.id}>
         <div className="flex items-center gap-3">
@@ -396,6 +399,11 @@ export function TransactionsList({
               {kind.startsWith("deposit") ? <span className="ml-2 font-medium text-[var(--muted)]">{kind === "deposit_refunded" ? tx.say("returned") : tx.say("held")}</span> : null}
             </p>
             {who ? <p className="truncate font-medium text-[var(--foreground-secondary)]">{who}</p> : null}
+            {context ? (
+              <Link className="mt-0.5 block truncate text-[13px] font-semibold text-[var(--primary)]" href={`/bookings/${transaction.rentalId}`}>
+                {context}
+              </Link>
+            ) : null}
           </div>
           <p className={`flex-shrink-0 text-[17px] font-bold tabular-nums ${amount.className}`}>
             {amount.prefix}

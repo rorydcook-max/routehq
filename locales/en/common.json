@@ -2613,7 +2613,18 @@
     "ph_removeFailed": "Could not remove the photo. Try again.",
     "cs_ranOut": "Ran out {date}",
     "a_more": "More for this vehicle",
-    "fi_summaryTeam": "This month: {amount} in"
+    "fi_summaryTeam": "This month: {amount} in",
+    "g_condition": "Condition",
+    "g_condNotSet": "Not set",
+    "g_condAdd": "Set it on Edit",
+    "g_condSet": "Set by you",
+    "g_condDamage": "Moved down after damage on {date}",
+    "cond_new": "New",
+    "cond_like_new": "Like new",
+    "cond_great": "Great",
+    "cond_good": "Good",
+    "cond_fair": "Fair",
+    "cond_poor": "Poor"
   },
   "customerPage": {
     "back": "Customers",

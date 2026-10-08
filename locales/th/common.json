@@ -2622,7 +2622,18 @@
     "ph_removeFailed": "ลบรูปไม่สำเร็จ ลองอีกครั้ง",
     "cs_ranOut": "หมดอายุ {date}",
     "a_more": "อื่น ๆ สำหรับรถคันนี้",
-    "fi_summaryTeam": "เดือนนี้: รับเงิน {amount}"
+    "fi_summaryTeam": "เดือนนี้: รับเงิน {amount}",
+    "g_condition": "สภาพรถ",
+    "g_condNotSet": "ยังไม่ได้ระบุ",
+    "g_condAdd": "ระบุได้ที่แก้ไข",
+    "g_condSet": "คุณระบุไว้",
+    "g_condDamage": "ลดระดับหลังพบความเสียหายเมื่อ {date}",
+    "cond_new": "ใหม่",
+    "cond_like_new": "เหมือนใหม่",
+    "cond_great": "ดีมาก",
+    "cond_good": "ดี",
+    "cond_fair": "พอใช้",
+    "cond_poor": "ไม่ดี"
   },
   "customerPage": {
     "back": "ลูกค้า",

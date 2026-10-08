@@ -3,7 +3,7 @@ import { typedNote } from "@/lib/transaction-notes";
 import type { Route } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Banknote, CalendarDays, ClipboardCheck, FileText, Fuel, Gauge, MapPin, PenLine, ReceiptText, ShieldCheck, Smartphone, Wrench } from "lucide-react";
+import { Banknote, CalendarDays, ClipboardCheck, FileText, Fuel, Gauge, Sparkles, MapPin, PenLine, ReceiptText, ShieldCheck, Smartphone, Wrench } from "lucide-react";
 import { completeTask, createVehicleTask } from "@/app/actions/tasks";
 import { logVehicleMaintenance, renewVehicleCompliance } from "@/app/actions/vehicles";
 import { VehicleNotesForm } from "@/app/fleet/[id]/vehicle-notes-form";
@@ -217,6 +217,18 @@ function AtAGlance({ detail }: { detail: VehicleDetail }) {
       subClass: toneText.neutral,
       icon: Gauge
     },
+    (() => {
+      // How good it is: set on Edit, moved down by damage found at a return.
+      const condition = (detail.vehicle as any).metadata?.condition;
+      const byDamage = condition?.by === "damage";
+      return {
+        label: tx.say("g_condition"),
+        value: condition?.value ? tx.say(`cond_${condition.value}`) : tx.say("g_condNotSet"),
+        sub: byDamage ? tx.say("g_condDamage", { date: formatDate(condition.damage_on || condition.set_at, tx) }) : condition?.value ? tx.say("g_condSet") : tx.say("g_condAdd"),
+        subClass: byDamage ? toneText.amber : toneText.neutral,
+        icon: Sparkles
+      };
+    })(),
     ...(gps
       ? [
           {

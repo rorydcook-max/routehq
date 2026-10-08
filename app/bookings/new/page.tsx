@@ -9,6 +9,7 @@ import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { onlineSigningGaps } from "@/lib/online-signing-readiness";
 import { loadBusyPeriods } from "@/lib/rental-conflicts";
+import { extrasFrom, seasonsFrom } from "@/lib/price-rules";
 import { BookingForm } from "./booking-form";
 
 type SearchParams = {
@@ -126,6 +127,8 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
         ) : (
           <BookingForm
             busyPeriods={busyPeriods}
+            extras={extrasFrom(organizationDetails?.settings)}
+            seasons={seasonsFrom(organizationDetails?.settings)}
             customers={customers || []}
             defaultCurrency={organization.currency || "THB"}
             defaultDeposit={Number((organizationDetails?.settings as any)?.public_booking?.deposit || 0)}

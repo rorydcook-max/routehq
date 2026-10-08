@@ -8,6 +8,8 @@ import { businessToday } from "@/lib/business-time";
 import { notifyOperator } from "@/lib/notify-operator";
 import { BOOKING_OFFERS, getPublicCatalog, publicBookingSettings } from "@/lib/public-catalog";
 import { daysBetween, minimumStay, planFor } from "@/lib/rental-estimate";
+import { extrasFor, priceExtras, seasonalRate } from "@/lib/price-rules";
+import { isTwoWheeler } from "@/lib/vehicle-groups";
 import { clashes, holdDeadline } from "@/lib/booking-holds";
 import { bookingRules, type BookingRules } from "@/lib/booking-rules";
 import { isDoubleBookingError } from "@/lib/rental-conflicts";
@@ -58,7 +60,19 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
   if (startDate < catalog.minStart) return { ok: false, error: await said(`The earliest start date is ${shortDate(catalog.minStart)}. Please choose a later date.`) };
   if (vehicle.busy.some((period) => clashes(startDate, endDate, period, catalog.gapDays))) return { ok: false, error: await said(TAKEN) };
 
-  const plan = planFor(vehicle, endDate ? daysBetween(startDate, endDate) : null);
+  const basePlan = planFor(vehicle, endDate ? daysBetween(startDate, endDate) : null);
+  // High season and paid extras: priced here from Settings, never taken from the browser.
+  const plan = basePlan ? { ...basePlan, rate: seasonalRate(basePlan.rate, basePlan.pricingModel, catalog.seasons, startDate, endDate).rate } : null;
+  let extraIds: string[] = [];
+  try {
+    extraIds = (JSON.parse(String(formData.get("extraIds") || "[]")) as unknown[]).map(String).slice(0, 30);
+  } catch {
+    extraIds = [];
+  }
+  const extrasPriced = priceExtras(
+    extrasFor(catalog.extras, isTwoWheeler(vehicle.kind)).filter((extra) => extraIds.includes(extra.id)),
+    endDate ? daysBetween(startDate, endDate) : null
+  );
   if (!plan) return { ok: false, error: await said(`${minimumStay(vehicle) || "This vehicle can't be booked online for those dates"}. Please choose a longer stay or another vehicle.`) };
 
   const admin = createSupabaseAdminClient() as any;
@@ -97,9 +111,11 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
       pricing_model: plan.pricingModel,
       recurring_billing: plan.pricingModel === "monthly",
       billing_interval: plan.pricingModel,
-      rental_rate: plan.rate,
+      rental_rate: plan.rate + extrasPriced.monthly,
       deposit_amount: vehicle.deposit,
-      balance_due: plan.rate + vehicle.deposit,
+      balance_due: plan.rate + extrasPriced.monthly + vehicle.deposit + extrasPriced.upfront,
+      extras: extrasPriced.lines,
+      extras_total: extrasPriced.upfront,
       currency: catalog.currency,
       delivery_method: "tbd",
       delivery_location: null,

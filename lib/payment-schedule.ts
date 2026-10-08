@@ -145,7 +145,7 @@ export async function generatePaymentSchedule({
 
   const { data: rental } = await supabase
     .from("rentals")
-    .select("customer_id, vehicle_id, currency")
+    .select("customer_id, vehicle_id, currency, extras, extras_total")
     .eq("id", rentalId)
     .eq("organization_id", organisationId)
     .maybeSingle();
@@ -242,6 +242,25 @@ export async function generatePaymentSchedule({
         period_label: isDaily ? `${days} ${days === 1 ? "day" : "days"}` : "Whole rental",
         is_upfront: false
       }
+    });
+  }
+
+  // Paid extras picked on the booking: one payment, due with the first rent.
+  const extrasTotal = Number(rental.extras_total || 0);
+  if (records.length > 0 && extrasTotal > 0) {
+    const names = (Array.isArray(rental.extras) ? rental.extras : []).map((line: any) => String(line?.name || "")).filter(Boolean);
+    records.push({
+      organization_id: organisationId,
+      rental_id: rentalId,
+      customer_id: rental.customer_id,
+      vehicle_id: rental.vehicle_id,
+      amount: extrasTotal,
+      currency,
+      scheduled_date: normalizedDeliveryDate,
+      due_date: normalizedDeliveryDate,
+      status: "scheduled",
+      paid_at: null,
+      metadata: { type: "extras", is_deposit: false, description: names.length ? `Extras: ${names.join(", ")}` : "Extras", extras: names }
     });
   }
 

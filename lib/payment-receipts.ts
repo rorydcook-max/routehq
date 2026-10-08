@@ -36,7 +36,7 @@ export type PortalPayment = {
   id: string;
   label: string;
   /** What the payment is for, so the customer's page can name it in their language. */
-  kind?: "rent" | "deposit" | "deposit_top_up" | "extension" | "charge";
+  kind?: "rent" | "deposit" | "deposit_top_up" | "extension" | "charge" | "extras";
   /** For a charge: what it is for (as the owner wrote it), or the reasons the return form gave. */
   chargeNote?: string | null;
   chargeReasons?: string[];
@@ -103,7 +103,7 @@ export async function getPortalPayments(
       return {
         id: String(row.id),
         label: customerPaymentLabel(row.metadata),
-      kind: (row.metadata?.type === "deposit" || row.metadata?.is_deposit === true ? "deposit" : row.metadata?.type === "deposit_top_up" ? "deposit_top_up" : row.metadata?.type === "extension" ? "extension" : row.metadata?.type === "charge" ? "charge" : "rent") as PortalPayment["kind"],
+      kind: (row.metadata?.type === "deposit" || row.metadata?.is_deposit === true ? "deposit" : row.metadata?.type === "deposit_top_up" ? "deposit_top_up" : row.metadata?.type === "extension" ? "extension" : row.metadata?.type === "charge" ? "charge" : row.metadata?.type === "extras" ? "extras" : "rent") as PortalPayment["kind"],
       chargeNote: row.metadata?.type === "charge" && row.metadata?.description ? String(row.metadata.description) : null,
       chargeReasons: row.metadata?.type === "charge" && Array.isArray(row.metadata?.charge_reasons) ? row.metadata.charge_reasons.map(String) : [],
       periodLabel: row.metadata?.period_label ? String(row.metadata.period_label) : null,

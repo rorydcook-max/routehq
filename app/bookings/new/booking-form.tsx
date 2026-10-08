@@ -8,6 +8,7 @@ import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import type { LucideIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { longDate, shortDate } from "@/lib/i18n/dates";
+import { extrasFor, priceExtras, seasonalRate, type Extra, type Season } from "@/lib/price-rules";
 import { Bike, CalendarDays, Car, CheckCircle2, Copy, MapPin, Send, UserPlus, UserRound, X } from "lucide-react";
 import { createBooking } from "@/app/actions/bookings";
 import { CustomerSelector } from "@/components/customer-selector";
@@ -251,7 +252,9 @@ export function BookingForm({
   defaultCurrency = "THB",
   defaultDeposit = 0,
   homeTerritory = "Koh Samui, Thailand",
-  busyPeriods = {}
+  busyPeriods = {},
+  seasons = [],
+  extras = []
 }: {
   organizationId: string;
   organizationName: string;
@@ -268,6 +271,10 @@ export function BookingForm({
   /** The deposit the business usually takes, from Settings. */
   defaultDeposit?: number;
   homeTerritory?: string;
+  /** High-season price rises from Settings. */
+  seasons?: Season[];
+  /** Paid extras offered from Settings. */
+  extras?: Extra[];
 }) {
   const t = useTranslations("newBooking");
   const say = t as unknown as Say;
@@ -302,6 +309,9 @@ export function BookingForm({
   const [pricingModel, setPricingModel] = useState("monthly");
   // Until the operator picks a period themselves, it follows the length of the rental.
   const pricingChosenByHand = useRef(false);
+  // A price typed by hand stays: changing the dates no longer moves it for high seasons.
+  const rateTyped = useRef(false);
+  const [chosenExtras, setChosenExtras] = useState<string[]>([]);
   const [currency, setCurrency] = useState(CURRENCY_INFO[defaultCurrency] ? defaultCurrency : "THB");
   // Filled from the start when the vehicle is already chosen, so the rate never shows as empty while the page loads.
   const [rentalRate, setRentalRate] = useState(() => {
@@ -390,9 +400,9 @@ export function BookingForm({
   // and the review showed ฿0).
   useEffect(() => {
     const vehicle = vehicles.find((item) => item.id === vehicleId) || null;
-    if (vehicle) setRentalRate(rateFor(vehicle, pricingModel));
+    if (vehicle && !rateTyped.current) setRentalRate(seasonalRate(rateFor(vehicle, pricingModel), pricingModel, seasons, startDate, openEnded ? null : endDate).rate);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [vehicleId, pricingModel]);
+  }, [vehicleId, pricingModel, startDate, endDate, openEnded]);
 
   // The deposit follows the vehicle: its own if set, otherwise the business's usual one.
   useEffect(() => {
@@ -409,6 +419,10 @@ export function BookingForm({
     if (current?.endDate && startDate < current.endDate) setStartDate(current.endDate);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vehicleId]);
+
+  // Paid extras picked for this booking, priced for its days (or a month when it has no end).
+  const stayDays = !openEnded && startDate && endDate ? Math.max(1, Math.round((new Date(`${endDate}T00:00:00`).getTime() - new Date(`${startDate}T00:00:00`).getTime()) / 86400000)) : null;
+  const pricedExtras = priceExtras(extras.filter((extra) => chosenExtras.includes(extra.id)), stayDays);
 
   function canContinue() {
     if (step === 0) return Boolean(selectedVehicle && selectable(selectedVehicle));
@@ -531,6 +545,7 @@ export function BookingForm({
         const fastTrack = submitIntent === "booking_link" ? false : shouldFastTrackWalkIn;
         const requestedBookingMode = submitIntent === "booking_link" ? "booking_link" : fastTrack ? "existing_rental" : bookingMode;
         formData.set("includedItems", JSON.stringify(includedItems));
+    formData.set("extraIds", JSON.stringify(chosenExtras));
         formData.set("openEnded", String(openEnded));
         formData.set("baseUrl", baseUrl || defaultAppUrl || window.location.origin);
         formData.set("bookingMode", requestedBookingMode);
@@ -920,7 +935,10 @@ export function BookingForm({
               <input
                 className="font-mono-data mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]"
                 inputMode="numeric"
-                onChange={(event) => setRentalRate(parseMoneyInput(event.target.value))}
+                onChange={(event) => {
+                  rateTyped.current = true;
+                  setRentalRate(parseMoneyInput(event.target.value));
+                }}
                 placeholder={`${currencyInfo.symbol} 0`}
                 required
                 type="text"
@@ -939,6 +957,15 @@ export function BookingForm({
               />
             </label>
           </div>
+          {(() => {
+            const season = seasonalRate(rateFor(selectedVehicle, pricingModel), pricingModel, seasons, startDate, openEnded ? null : endDate);
+            if (!season.pct || rentalRate !== season.rate) return null;
+            return (
+              <p className="mt-2 text-xs font-semibold text-[var(--warning)]">
+                {say(season.pct > 0 ? "seasonUp" : "seasonDown", { pct: Math.abs(season.pct), names: season.names.join(", ") || say("seasonDefault"), amount: money(rateFor(selectedVehicle, pricingModel), currency) })}
+              </p>
+            );
+          })()}
           {(() => {
             const source = rateWithSource(selectedVehicle, pricingModel);
             if (!source.from || rentalRate !== source.rate) return null;
@@ -969,10 +996,11 @@ export function BookingForm({
                     : say(`pf_first_${pricingModel}`, { rent: money(firstRent, currency) });
               return (
                 <p className="mt-2 rounded-lg bg-[var(--panel-secondary)] px-3 py-2 text-[13px] text-[var(--foreground-secondary)]">
-                  {t.rich("toStart", { total: money(firstRent + depositAmount, currency), b: (chunks: React.ReactNode) => <span className="font-semibold text-[var(--foreground)]">{chunks}</span> })}
+                  {t.rich("toStart", { total: money(firstRent + depositAmount + pricedExtras.upfront, currency), b: (chunks: React.ReactNode) => <span className="font-semibold text-[var(--foreground)]">{chunks}</span> })}
                   {" · "}
                   {rentWords}
                   {depositAmount > 0 ? ` ${say("plusDeposit", { amount: money(depositAmount, currency) })}` : ""}
+                  {pricedExtras.upfront > 0 ? ` ${say("plusExtras", { amount: money(pricedExtras.upfront, currency) })}` : ""}
                 </p>
               );
             })()
@@ -1011,6 +1039,35 @@ export function BookingForm({
               ))}
             </div>
           </div>
+          {(() => {
+            const offered = extrasFor(extras, isTwoWheeler(selectedVehicle?.category_code));
+            if (!offered.length) return null;
+            return (
+              <div className="mt-3">
+                <p className="text-[13px] font-semibold text-[var(--foreground)]">{say("extras")}</p>
+                <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                  {offered.map((extra) => (
+                    <label className="checkbox-label sub-surface min-h-12 font-bold text-[var(--foreground-secondary)]" key={extra.id} style={{ display: "flex", alignItems: "center", padding: "10px 12px" }}>
+                      <input
+                        checked={chosenExtras.includes(extra.id)}
+                        className="flex-shrink-0"
+                        onChange={(event) => setChosenExtras((current) => (event.target.checked ? [...current, extra.id] : current.filter((id) => id !== extra.id)))}
+                        type="checkbox"
+                      />
+                      <span className="min-w-0 flex-1">{extra.name}</span>
+                      <span className="shrink-0 text-[13px] font-semibold text-[var(--muted)]">{say(extra.per === "day" ? "extraPerDay" : "extraOnce", { amount: money(extra.price, currency) })}</span>
+                    </label>
+                  ))}
+                </div>
+                {pricedExtras.lines.length ? (
+                  <p className="mt-2 text-xs text-[var(--muted)]">
+                    {pricedExtras.upfront > 0 ? say("extrasUpfront", { amount: money(pricedExtras.upfront, currency) }) : ""}
+                    {pricedExtras.monthly > 0 ? ` ${say("extrasMonthly", { amount: money(pricedExtras.monthly, currency) })}` : ""}
+                  </p>
+                ) : null}
+              </div>
+            );
+          })()}
           {/* Rarely needed: kept one tap away so the usual booking is a short screen. */}
           <details className="mt-3" open={upfrontEnabled || Boolean(specialConditions) || currency !== (CURRENCY_INFO[defaultCurrency] ? defaultCurrency : "THB")}>
             <summary className="cursor-pointer py-1 text-sm font-semibold text-[var(--primary)]">{say("moreOptions")}</summary>
@@ -1288,7 +1345,7 @@ export function BookingForm({
                   return (
                     <SummaryRow
                       label={say("s_paysFirst")}
-                      value={`${money(firstRent + depositAmount, currency)} · ${rentWords}${depositAmount > 0 ? ` ${say("plusDeposit", { amount: money(depositAmount, currency) })}` : ""}`}
+                      value={`${money(firstRent + depositAmount + pricedExtras.upfront, currency)} · ${rentWords}${depositAmount > 0 ? ` ${say("plusDeposit", { amount: money(depositAmount, currency) })}` : ""}${pricedExtras.upfront > 0 ? ` ${say("plusExtras", { amount: money(pricedExtras.upfront, currency) })}` : ""}`}
                     />
                   );
                 })()
@@ -1303,6 +1360,12 @@ export function BookingForm({
                     : say("collectionFrom", { place: collectionAddress || say("placeTbc"), time: collectionTime ? longDateTime(collectionTime) : say("timeTbc") })
               }
             />}
+            {pricedExtras.lines.length ? (
+              <SummaryRow
+                label={say("s_extras")}
+                value={pricedExtras.lines.map((line) => `${line.name} ${money(line.amount, currency)}`).join(", ")}
+              />
+            ) : null}
             <SummaryRow label={say("s_included")} value={includedItems.length ? includedItems.map((item) => (includedOptions.includes(item) ? say(`inc_${includedOptions.indexOf(item)}`) : item)).join(", ") : say("noneSelected")} />
           </div>
           {bookingMode === "existing_rental" && !walkInFastTrack ? (

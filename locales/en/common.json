@@ -743,7 +743,16 @@
     "chgr_cleaning": "cleaning",
     "chgr_repair": "repair",
     "chgr_fine": "fine",
-    "chgr_other": "other costs"
+    "chgr_other": "other costs",
+    "payKind_extras": "Extras",
+    "seasonPrice": "{names} price: +{pct}% on these dates",
+    "seasonDiscount": "{names}: {pct}% off on these dates",
+    "highSeason": "High season",
+    "addExtras": "Add extras",
+    "extraPerDay": "{amount} a day",
+    "extraOnce": "{amount}",
+    "extrasAtStart": "Extras {amount}, paid with the first payment.",
+    "extrasEachMonth": "{amount} a month added to the rent."
   },
   "customerMessages": {
     "hi": "Hi {name},",
@@ -1010,7 +1019,10 @@
     "chgr_fine": "fine",
     "chgr_other": "other costs",
     "job_settle_deposit": "Price the damage and settle the deposit",
-    "settleDeposit": "Settle deposit"
+    "settleDeposit": "Settle deposit",
+    "payTitle_extras": "{amount} extras",
+    "collect_extras": "Collect extras",
+    "pay_extras": "Extras"
   },
   "bookings": {
     "eyebrow": "Bookings",
@@ -1262,7 +1274,8 @@
     "costTitle": "Add a cost",
     "costSubtitle": "Repairs, damage, fines or fuel on this booking. Bill the renter and it comes out of the deposit first.",
     "fineTitle": "Record a fine",
-    "fineSubtitle": "Set the date of the offence. Whoever had the vehicle that day is billed, and the fine comes out of their deposit if it is still held."
+    "fineSubtitle": "Set the date of the offence. Whoever had the vehicle that day is billed, and the fine comes out of their deposit if it is still held.",
+    "exportSheet": "Download for your accountant (spreadsheet)"
   },
   "booking": {
     "open": "Open",
@@ -2029,7 +2042,8 @@
     "tl_autoOpenEnded": "Changed to no end date at the customer's request. {amount} a month from {date}.",
     "addCost": "Add a cost",
     "hist_vehicle_condition_changed": "Condition changed after damage",
-    "doNotRent": "{name} is marked: don't rent to again."
+    "doNotRent": "{name} is marked: don't rent to again.",
+    "pc_extras": "Extras: {names}"
   },
   "newBooking": {
     "pageBack": "Back to bookings",
@@ -2247,7 +2261,17 @@
     "needStart": "Choose the start date to continue.",
     "needReturn": "Choose the return date, or tick \"Open-ended\", to continue.",
     "needRate": "Enter the rental price to continue.",
-    "doNotRent": "Marked: don't rent to this customer again."
+    "doNotRent": "Marked: don't rent to this customer again.",
+    "seasonUp": "{names}: +{pct}% on the usual {amount}",
+    "seasonDown": "{names}: {pct}% off the usual {amount}",
+    "seasonDefault": "High season",
+    "plusExtras": "+ extras {amount}",
+    "extras": "Paid extras",
+    "extraPerDay": "{amount} a day",
+    "extraOnce": "{amount} once",
+    "extrasUpfront": "Extras {amount}, paid with the first payment.",
+    "extrasMonthly": "{amount} a month added to the rent.",
+    "s_extras": "Extras"
   },
   "fleet": {
     "title": "Fleet",
@@ -3435,7 +3459,33 @@
     "team_sending": "Sending…",
     "team_remove": "Remove",
     "team_removeSure": "Yes, remove from the team",
-    "team_keep": "Keep"
+    "team_keep": "Keep",
+    "remove": "Remove",
+    "season_title": "High-season prices",
+    "season_none": "Off: the same prices all year",
+    "season_summary": "{count, plural, one {# season} other {# seasons}} with higher prices",
+    "season_body": "Dates each year when prices go up. Bookings and your online booking page charge the higher price for the days that fall in a season. Use a minus number for a low-season discount.",
+    "season_name": "Name",
+    "season_namePh": "e.g. Christmas and New Year",
+    "season_from": "From",
+    "season_to": "To",
+    "season_pct": "Change %",
+    "season_monthly": "Monthly prices too (usually left off: long-stay customers keep one price)",
+    "season_add": "Add a season",
+    "extra_title": "Paid extras",
+    "extra_none": "None yet",
+    "extra_body": "Things a customer can add to a booking, like a child seat or airport delivery. They are offered on the booking form and your online booking page, added to the first payment, and listed on the agreement.",
+    "extra_name": "Extra",
+    "extra_namePh": "e.g. Child seat",
+    "extra_price": "Price ({symbol})",
+    "extra_per": "Charged",
+    "extra_perDay": "Per day",
+    "extra_perRental": "Once per booking",
+    "extra_for": "Offered with",
+    "extra_forAll": "Every vehicle",
+    "extra_forCars": "Cars and vans",
+    "extra_forBikes": "Scooters and motorbikes",
+    "extra_add": "Add an extra"
   },
   "accountPage": {
     "roleOwner": "Owner",

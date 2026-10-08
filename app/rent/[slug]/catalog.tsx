@@ -11,6 +11,8 @@ import type { CatalogVehicle } from "@/lib/public-catalog";
 import { clashes } from "@/lib/booking-rules";
 import { daysBetween, headlineRate, minimumStay, planFor } from "@/lib/rental-estimate";
 import { billingPeriodAmounts } from "@/lib/payment-schedule";
+import { extrasFor, priceExtras, seasonalRate, type Extra, type Season } from "@/lib/price-rules";
+import { isTwoWheeler } from "@/lib/vehicle-groups";
 
 const inputClass = "mt-1.5 w-full rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15";
 
@@ -33,7 +35,9 @@ export function Catalog({
   holdHours,
   gapDays,
   today,
-  offer = "both_monthly"
+  offer = "both_monthly",
+  seasons = [],
+  extras = []
 }: {
   slug: string;
   organizationName: string;
@@ -46,6 +50,8 @@ export function Catalog({
   today: string;
   /** Monthly, set dates, or both: the business decides in Settings. */
   offer?: string;
+  seasons?: Season[];
+  extras?: Extra[];
 }) {
   const t = useTranslations("customer");
   const locale = useLocale();
@@ -56,6 +62,7 @@ export function Catalog({
   const bothOffered = offer === "both_monthly" || offer === "both_dates";
   const [openId, setOpenId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [chosen, setChosen] = useState<string[]>([]);
   const [isPending, startTransition] = useTransition();
 
   const money = (value: number) => (currency === "THB" ? `฿${Math.round(value).toLocaleString("en-US")}` : `${currency} ${Math.round(value).toLocaleString("en-US")}`);
@@ -85,6 +92,7 @@ export function Catalog({
         formData.set("vehicleId", vehicle.id);
         formData.set("startDate", startDate);
         formData.set("endDate", end || "");
+        formData.set("extraIds", JSON.stringify(chosen));
         const result = await bookOnline(formData);
         if (!result.ok) {
           setError(result.error);
@@ -149,7 +157,12 @@ export function Catalog({
         {rows.map(({ vehicle, free, freeFrom, openEndedClash }) => {
           const headline = headlineRate(vehicle);
           // A monthly-only vehicle can't be booked for a weekend.
-          const plan = planFor(vehicle, days);
+          const basePlan = planFor(vehicle, days);
+          // High season: the price for these dates, not the usual one.
+          const season = basePlan ? seasonalRate(basePlan.rate, basePlan.pricingModel, seasons, startDate, end) : null;
+          const plan = basePlan && season ? { ...basePlan, rate: season.rate } : basePlan;
+          const offered = extrasFor(extras, isTwoWheeler(vehicle.kind));
+          const pricedExtras = priceExtras(offered.filter((extra) => chosen.includes(extra.id)), days);
           const bookable = !!plan;
           // Exactly what this booking will be charged, worked out the way the payments are: a day price for each day,
           // or one payment for each week or month started. Never an "about" figure the booking then disagrees with.
@@ -196,6 +209,11 @@ export function Catalog({
                       {lastPart !== null ? ` + ${money(lastPart)}` : ""}
                     </p>
                   ) : null}
+                  {free && plan && season?.pct && !tooShort ? (
+                    <p className="mt-0.5 text-xs font-semibold text-[var(--warning)]">
+                      {t(season.pct > 0 ? "seasonPrice" : "seasonDiscount", { pct: Math.abs(season.pct), names: season.names.join(", ") || t("highSeason") })}
+                    </p>
+                  ) : null}
                   {tooShort ? <p className="mt-1 text-sm font-semibold text-[var(--warning)]">{tooShort}</p> : null}
 
                   {!free ? (
@@ -209,6 +227,7 @@ export function Catalog({
                     className={`pressable min-h-11 shrink-0 rounded-xl px-4 text-sm font-semibold ${isOpen ? "border border-[var(--border)] bg-white text-[var(--foreground)]" : "bg-[var(--primary)] text-white"}`}
                     onClick={() => {
                       setError(null);
+                      setChosen([]);
                       setOpenId(isOpen ? null : vehicle.id);
                     }}
                     type="button"
@@ -230,6 +249,26 @@ export function Catalog({
                       <input autoComplete="tel" className={inputClass} inputMode="tel" name="phone" placeholder="+66 ..." required />
                     </label>
                   </div>
+                  {offered.length ? (
+                    <fieldset>
+                      <legend className="text-sm font-semibold text-[var(--foreground-secondary)]">{t("addExtras")}</legend>
+                      <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                        {offered.map((extra) => (
+                          <label className="flex min-h-11 items-center gap-3 rounded-xl border border-[var(--border)] px-3 py-2 text-sm font-semibold text-[var(--foreground)]" key={extra.id}>
+                            <input checked={chosen.includes(extra.id)} onChange={(event) => setChosen((list) => (event.target.checked ? [...list, extra.id] : list.filter((id) => id !== extra.id)))} type="checkbox" />
+                            <span className="min-w-0 flex-1">{extra.name}</span>
+                            <span className="shrink-0 text-xs text-[var(--muted)]">{t(extra.per === "day" ? "extraPerDay" : "extraOnce", { amount: money(extra.price) })}</span>
+                          </label>
+                        ))}
+                      </div>
+                      {pricedExtras.upfront > 0 || pricedExtras.monthly > 0 ? (
+                        <p className="mt-2 text-xs text-[var(--muted)]">
+                          {pricedExtras.upfront > 0 ? t("extrasAtStart", { amount: money(pricedExtras.upfront) }) : ""}
+                          {pricedExtras.monthly > 0 ? ` ${t("extrasEachMonth", { amount: money(pricedExtras.monthly) })}` : ""}
+                        </p>
+                      ) : null}
+                    </fieldset>
+                  ) : null}
                   {/* Hidden from people; bots fill it in and are ignored. */}
                   <input aria-hidden="true" autoComplete="off" className="hidden" name="website" tabIndex={-1} />
                   {error ? <p className="text-sm font-semibold text-[var(--danger)]">{error}</p> : null}

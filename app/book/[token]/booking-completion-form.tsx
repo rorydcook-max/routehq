@@ -61,6 +61,8 @@ type PublicBookingDetail = {
   rentalRate?: number;
   // The rent owed first: for a daily price, the whole stay.
   firstRent?: number;
+  /** Paid extras picked on the booking, paid with the first rent. */
+  extrasTotal?: number;
   outstandingBalance?: number;
   depositAmount?: number;
   currency?: string;
@@ -614,7 +616,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
   const effectiveTiming = selectedMethodInfo?.deliveryOnly ? "on_delivery" : paymentTiming;
   const rentalRate = detail.rentalRate ?? 0;
   // What is due at the start: the first rent and the deposit.
-  const paymentAmount = detail.outstandingBalance && detail.outstandingBalance > 0 ? detail.outstandingBalance : (detail.firstRent ?? rentalRate) + (detail.depositAmount ?? 0);
+  const paymentAmount = detail.outstandingBalance && detail.outstandingBalance > 0 ? detail.outstandingBalance : (detail.firstRent ?? rentalRate) + (detail.depositAmount ?? 0) + (detail.extrasTotal ?? 0);
   const currency = detail.currency ?? "THB";
   const [upfrontAccepted, setUpfrontAccepted] = useState<boolean | null>(null);
   const [isPending, startTransition] = useTransition();

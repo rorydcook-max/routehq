@@ -336,7 +336,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   }
   // Before signing, "pay now" shows one QR for what is due at the start.
   // What is due at the start: the first rent and the deposit.
-  const firstPaymentAmount = Number(rental?.outstanding_balance || 0) > 0 ? Number(rental.outstanding_balance) : firstRentCharge(rental) + Number(rental?.deposit_amount || 0);
+  const firstPaymentAmount = Number(rental?.outstanding_balance || 0) > 0 ? Number(rental.outstanding_balance) : firstRentCharge(rental) + Number(rental?.deposit_amount || 0) + Number(rental?.extras_total || 0);
   const firstPaymentQr =
     detail.state === "ready" && !detail.completion?.agreement && detail.org_payment?.promptpay_id && String(rental?.currency || "THB") === "THB"
       ? await promptPayQrSvg(detail.org_payment.promptpay_id, firstPaymentAmount)
@@ -545,6 +545,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
               bookingReference: String(detail.bookingLink?.reference || detail.bookingLink?.reference_number || detail.bookingLink?.id || token).slice(0, 18),
               rentalRate: Number(rental?.rental_rate || 0),
               firstRent: firstRentCharge(rental),
+              extrasTotal: Number(rental?.extras_total || 0),
               depositAmount: Number(rental?.deposit_amount || 0),
               outstandingBalance: Number(rental?.outstanding_balance || 0),
               currency: String(rental?.currency || "THB"),

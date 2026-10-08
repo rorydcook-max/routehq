@@ -415,7 +415,11 @@ export function buildContractVariables({
 }): ContractVariables {
   const settings = getTravelPolicySettings(organization?.settings);
   const bookingData = (bookingLink?.booking_data || {}) as Record<string, any>;
-  const includedItems = Array.isArray(bookingLink?.included_items) ? bookingLink.included_items : [];
+  const paidExtras = (Array.isArray(rental?.extras) ? rental.extras : []).map((line: any) => {
+    const price = `${Math.round(Number(line?.price || 0)).toLocaleString("en-US")} ${rental?.currency || "THB"}`;
+    return `${line?.name} - ${line?.per === "day" ? `${price} per day / ต่อวัน` : `${price}`} (paid extra / บริการเสริม)`;
+  });
+  const includedItems = [...(Array.isArray(bookingLink?.included_items) ? bookingLink.included_items : []), ...paidExtras];
   const fullName = optionalText(customer?.full_name, "Customer");
   const name = splitName(fullName);
   const locale = customer?.preferred_locale || bookingLink?.locale || organization?.default_locale || "en";

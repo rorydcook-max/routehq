@@ -578,6 +578,12 @@ export function TransactionsList({
         </div>
         ) : null}
       </div>
+      {/* Everything in this period as a spreadsheet, for an accountant. */}
+      <div className="-mt-1 text-right">
+        <a className="text-[13px] font-semibold text-[var(--primary)] underline-offset-2 hover:underline" download href={`/api/export/money?from=${range.from}&to=${range.to}`}>
+          {tx.say("exportSheet")}
+        </a>
+      </div>
 
       {/* Search, and select-to-delete */}
       <div className="flex items-center gap-2">

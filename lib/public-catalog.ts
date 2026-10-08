@@ -5,6 +5,7 @@ import { releaseExpiredHolds } from "@/lib/booking-holds";
 import { bookingRules, earliestStart } from "@/lib/booking-rules";
 import { businessToday } from "@/lib/business-time";
 import { kindFromCategory, type VehicleKind } from "@/lib/vehicle-groups";
+import { extrasFrom, seasonsFrom } from "@/lib/price-rules";
 
 /**
  * The public booking page: anyone with the link sees a business's vehicles,
@@ -149,6 +150,9 @@ export async function getPublicCatalog(slug: string) {
     gapDays: rules.gapDays,
     deposit: settings.deposit,
     offer: settings.offer,
+    /** High-season price rises and paid extras, from Settings. */
+    seasons: seasonsFrom(orgSettings),
+    extras: extrasFrom(orgSettings),
     vehicles
   };
 }

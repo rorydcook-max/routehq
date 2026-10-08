@@ -40,7 +40,7 @@ export type TaskListItem = {
   /** Short name for a payment, e.g. "Rent · October 2026" or "Deposit". */
   paymentLabel: string | null;
   /** What kind of payment this is, so the screen can name it in the reader's language. */
-  pay?: { kind: "deposit" | "top_up" | "extension" | "rent" | "charge"; period: string | null } | null;
+  pay?: { kind: "deposit" | "top_up" | "extension" | "rent" | "charge" | "extras"; period: string | null } | null;
   /** What kind of request a customer made. */
   request?: string | null;
 };
@@ -53,6 +53,7 @@ function paymentTitle(metadata: any) {
   if (type === "extension") return "Collect extension payment";
   if (type === "deposit_top_up") return "Collect deposit top-up";
   if (type === "charge") return `Collect charge${metadata?.description ? ` · ${metadata.description}` : ""}`;
+  if (type === "extras") return "Collect extras";
   const period = metadata?.period_label ? ` · ${metadata.period_label}` : "";
   return `Collect rent${period}`;
 }
@@ -64,6 +65,7 @@ function payKind(metadata: any): NonNullable<TaskListItem["pay"]> {
   if (type === "deposit_top_up") return { kind: "top_up", period: null };
   // For a bill, "period" carries what it is for: the owner's words, or the return form's reasons.
   if (type === "charge") return { kind: "charge", period: metadata?.description ? String(metadata.description) : Array.isArray(metadata?.charge_reasons) ? metadata.charge_reasons.map((reason: string) => `#${reason}`).join(",") : null };
+  if (type === "extras") return { kind: "extras", period: Array.isArray(metadata?.extras) ? metadata.extras.join(", ") : null };
   return { kind: "rent", period: metadata?.period_label ? String(metadata.period_label) : null };
 }
 

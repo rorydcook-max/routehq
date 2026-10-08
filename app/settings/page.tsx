@@ -23,6 +23,8 @@ import { LineConnectPanel } from "@/app/settings/line-connect-panel";
 import { supportedLocaleOptions } from "@/lib/i18n/locales";
 import { InviteForm } from "@/app/invite/invite-form";
 import { PaymentMethodsForm } from "@/app/settings/payment-methods-form";
+import { ExtrasPanel, SeasonsPanel } from "@/app/settings/price-rules-panel";
+import { extrasFrom, seasonsFrom } from "@/lib/price-rules";
 import { PublicBookingPanel } from "@/app/settings/public-booking-panel";
 import { TeamMemberActions } from "@/app/settings/team-member-actions";
 import { createSupabaseAdminClient as teamAdminClient } from "@/lib/supabase/admin";
@@ -408,6 +410,20 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           </Fold>
           <Fold id="holds" summary={say("hold_summary", { hours: bookingRules(organization.settings).holdHours })} title={say("hold_title")}>
             <BookingRulesPanel rules={bookingRules(organization.settings)} />
+          </Fold>
+          <Fold
+            id="high-season"
+            summary={seasonsFrom(organization.settings).length ? say("season_summary", { count: seasonsFrom(organization.settings).length }) : say("season_none")}
+            title={say("season_title")}
+          >
+            <SeasonsPanel initial={seasonsFrom(organization.settings)} />
+          </Fold>
+          <Fold
+            id="extras"
+            summary={extrasFrom(organization.settings).length ? extrasFrom(organization.settings).map((extra) => extra.name).join(", ") : say("extra_none")}
+            title={say("extra_title")}
+          >
+            <ExtrasPanel currencySymbol={(organization.currency || "THB") === "THB" ? "฿" : organization.currency || ""} initial={extrasFrom(organization.settings)} />
           </Fold>
           <Fold id="paying-ahead" summary={organization.upfront_discount_enabled ? say("ahead_on") : say("ahead_off")} title={say("ahead_title")}>
             <p className="mb-3 font-medium text-[var(--foreground-secondary)]">{say("ahead_body")}</p>

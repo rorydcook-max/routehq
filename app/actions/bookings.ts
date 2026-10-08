@@ -1,5 +1,7 @@
 "use server";
 
+import { extrasFrom, priceExtras } from "@/lib/price-rules";
+
 import { said } from "@/lib/i18n/server-text";
 import { completeRentalJobs, tellRentalCustomer } from "@/lib/customer-messages";
 import { allocatePayment, type OpenPayment } from "@/lib/payment-allocation";
@@ -453,9 +455,18 @@ async function createBookingOrThrow(formData: FormData) {
     share_channel: shareChannel
   };
 
+  // Paid extras: priced again here from Settings, so the price can't be changed in the browser.
+  const extraIds = safeJsonArray(formData, "extraIds").map(String);
+  const extrasPriced = priceExtras(
+    extrasFrom(organization.settings).filter((extra) => extraIds.includes(extra.id)),
+    endDate ? Math.max(1, Math.round((new Date(`${endDate}T00:00:00Z`).getTime() - new Date(`${startDate}T00:00:00Z`).getTime()) / 86_400_000)) : null
+  );
+
   const rentalInsert: Record<string, any> = {
     organization_id: organizationId,
     customer_id: customerId || null,
+    extras: extrasPriced.lines,
+    extras_total: extrasPriced.upfront,
     vehicle_id: vehicleId,
     start_date: startDate,
     end_date: endDate,
@@ -464,7 +475,8 @@ async function createBookingOrThrow(formData: FormData) {
     pricing_model: pricingModel,
     recurring_billing: pricingModel === "monthly",
     billing_interval: pricingModel,
-    rental_rate: rentalRate,
+    // With no end date, per-day extras are a monthly amount on top of the rent.
+    rental_rate: rentalRate + extrasPriced.monthly,
     deposit_amount: depositAmount,
     balance_due: walkInFastTrack ? Math.max(0, rentalRate - (walkInPaymentAmount || 0)) : rentalRate + depositAmount,
     currency,

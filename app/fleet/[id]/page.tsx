@@ -17,6 +17,7 @@ import { Badge, Card, Fold, ProgressBar } from "@/components/ui";
 import { amountDueNowByRental } from "@/lib/rental-balances";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUserEmail } from "@/lib/auth/session";
+import { getCurrentMembership } from "@/lib/auth/roles";
 import { getDefaultOrganization } from "@/lib/organization";
 import { TASK_TYPE_OPTIONS } from "@/lib/tasks";
 import { isRevenueTransaction } from "@/lib/transaction-options";
@@ -477,22 +478,27 @@ function InspectionsSection({ detail }: { detail: VehicleDetail }) {
   );
 }
 
-function FinancialSection({ detail }: { detail: VehicleDetail }) {
+function FinancialSection({ detail, isOwner }: { detail: VehicleDetail; isOwner: boolean }) {
   const tx = useVx();
   const f = detail.financials;
   const chartMax = Math.max(1, ...f.monthlyChart.flatMap((month) => [month.revenue, month.expenses]));
 
   return (
-    <Fold summary={tx.say("fi_summary", { profit: money(f.lifetimeProfit) })} title={tx.say("fi_title")} tone={f.lifetimeProfit < 0 ? "red" : "neutral"}>
+    <Fold
+      summary={isOwner ? tx.say("fi_summary", { profit: money(f.lifetimeProfit) }) : tx.say("fi_summaryTeam", { amount: money(f.currentMonthRevenue) })}
+      title={tx.say("fi_title")}
+      tone={isOwner && f.lifetimeProfit < 0 ? "red" : "neutral"}
+    >
+      {/* Profit, what was paid and what it is worth are the owner's; a teammate sees the money in and out. */}
       <div className="grid grid-cols-2 gap-2.5">
         <InfoRow label={tx.say("fi_month")} value={money(f.currentMonthRevenue)} />
-        <InfoRow danger={f.lifetimeProfit < 0} label={tx.say("fi_profit")} value={money(f.lifetimeProfit)} />
+        {isOwner ? <InfoRow danger={f.lifetimeProfit < 0} label={tx.say("fi_profit")} value={money(f.lifetimeProfit)} /> : null}
         <InfoRow label={tx.say("fi_totalIn")} value={money(f.lifetimeRevenue)} />
         <InfoRow label={tx.say("fi_totalOut")} value={money(f.lifetimeExpenses)} />
-        {f.purchasePrice > 0 ? <InfoRow label={tx.say("fi_purchase")} value={money(f.purchasePrice)} /> : null}
-        {f.estimatedValue > 0 ? <InfoRow label={tx.say("fi_value")} value={money(f.estimatedValue)} /> : null}
-        {f.purchasePrice > 0 && f.estimatedValue > 0 ? <InfoRow label={tx.say("fi_depreciation")} value={money(f.depreciation)} /> : null}
-        {f.purchasePrice > 0 ? <InfoRow danger={f.roi < 0} label={tx.say("fi_roi")} value={percent(f.roi)} /> : null}
+        {isOwner && f.purchasePrice > 0 ? <InfoRow label={tx.say("fi_purchase")} value={money(f.purchasePrice)} /> : null}
+        {isOwner && f.estimatedValue > 0 ? <InfoRow label={tx.say("fi_value")} value={money(f.estimatedValue)} /> : null}
+        {isOwner && f.purchasePrice > 0 && f.estimatedValue > 0 ? <InfoRow label={tx.say("fi_depreciation")} value={money(f.depreciation)} /> : null}
+        {isOwner && f.purchasePrice > 0 ? <InfoRow danger={f.roi < 0} label={tx.say("fi_roi")} value={percent(f.roi)} /> : null}
       </div>
       <div className="mt-3 rounded-xl bg-[var(--panel-secondary)] p-3.5">
         <p className="font-bold text-[var(--foreground)]">{tx.say("fi_chart")}</p>
@@ -921,6 +927,7 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
   const [userEmail, organization, t, locale] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization(), getTranslations("vehiclePage"), getLocale()]);
   const tx: Vx = { say: t as unknown as Say, has: (key) => t.has(key as never), locale };
   const detail = await getVehicleDetail(id, organization.id);
+  const isOwner = (await getCurrentMembership())?.role === "owner";
 
   if (!detail) {
     return (
@@ -986,7 +993,7 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
           </div>
 
           <div className="space-y-3">
-            <FinancialSection detail={detail} />
+            <FinancialSection detail={detail} isOwner={isOwner} />
               <UtilizationSection detail={detail} />
               <DocumentsSection detail={detail} />
             <GpsSection detail={detail} />

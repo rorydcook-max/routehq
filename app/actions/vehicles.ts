@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { markOnboardingStep } from "@/lib/onboarding";
 import { recordActivityEvent } from "@/lib/supabase/activity";
+import { getCurrentMembership } from "@/lib/auth/roles";
 import { asCondition, valueForCondition } from "@/lib/vehicle-condition";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -419,6 +420,9 @@ export async function updateVehicle(formData: FormData) {
     purchase_mileage: optionalNumberFromForm(formData, "purchaseMileage")
   };
 
+  // What was paid, what it is worth and any loan are the owner's: a teammate's save leaves them as they are.
+  const ownerFields = (await getCurrentMembership())?.role === "owner";
+
   // Saving the form used to replace everything stored with the vehicle, losing what it does not show.
   const { data: before } = await supabase.from("vehicles").select("metadata").eq("id", vehicleId).eq("organization_id", organizationId).maybeSingle();
   const kept = (before?.metadata || {}) as Record<string, any>;
@@ -427,7 +431,7 @@ export async function updateVehicle(formData: FormData) {
   const conditionPicked = asCondition(formData.get("condition"));
   const conditionChanged = conditionPicked && conditionPicked !== kept.condition?.value;
   const estimateShown = kept.valuation?.typical && Number(kept.valuation.value || kept.valuation.typical);
-  const typedValue = optionalNumberFromForm(formData, "estimatedValue");
+  const typedValue = ownerFields ? optionalNumberFromForm(formData, "estimatedValue") : null;
   const valueFollows = conditionChanged && estimateShown && (!typedValue || typedValue === estimateShown);
   const placed = valueFollows ? valueForCondition(kept.valuation, conditionPicked) : null;
   const conditionPatch = conditionChanged
@@ -448,9 +452,15 @@ export async function updateVehicle(formData: FormData) {
       vin: optionalStringFromForm(formData, "vin"),
       registration_number: registrationNumber,
       color: optionalStringFromForm(formData, "color"),
-      purchase_price: optionalNumberFromForm(formData, "purchasePrice"),
-      purchase_date: optionalStringFromForm(formData, "purchaseDate"),
-      estimated_value: placed || optionalNumberFromForm(formData, "estimatedValue"),
+      ...(ownerFields
+        ? {
+            purchase_price: optionalNumberFromForm(formData, "purchasePrice"),
+            purchase_date: optionalStringFromForm(formData, "purchaseDate"),
+            estimated_value: placed || optionalNumberFromForm(formData, "estimatedValue")
+          }
+        : placed
+          ? { estimated_value: placed }
+          : {}),
       mileage: numberFromForm(formData, "mileage"),
       home_branch_id: optionalStringFromForm(formData, "homeBranchId"),
       service_area: serviceArea,
@@ -463,9 +473,9 @@ export async function updateVehicle(formData: FormData) {
       metadata: {
         ...kept,
         ...conditionPatch,
-        acquisition: merged("acquisition", acquisition),
+        acquisition: ownerFields ? merged("acquisition", acquisition) : kept.acquisition || {},
         compliance: merged("compliance", compliance),
-        finance: merged("finance", finance)
+        finance: ownerFields ? merged("finance", finance) : kept.finance || {}
       }
     })
     .eq("id", vehicleId)

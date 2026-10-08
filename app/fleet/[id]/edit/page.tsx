@@ -9,6 +9,7 @@ import { MoneyInput } from "@/components/money-input";
 import { PendingButton } from "@/components/pending-button";
 import { Fold } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
+import { getCurrentMembership } from "@/lib/auth/roles";
 import { ensureDefaultBranch } from "@/lib/branches";
 import { defaultCalendarForLocale } from "@/lib/i18n/calendars";
 import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization";
@@ -49,6 +50,8 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
     notFound();
   }
 
+  // What was paid, what it is worth and any loan are for the owner only.
+  const isOwner = (await getCurrentMembership())?.role === "owner";
   const specifications = vehicle.specifications || {};
   const acquisition = vehicle.metadata?.acquisition || {};
   const compliance = vehicle.metadata?.compliance || {};
@@ -133,6 +136,22 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
               {textField("plate", "registrationNumber", vehicle.registration_number, { required: true })}
               {textField("colour", "color", vehicle.color)}
               {textField("mileage", "mileage", vehicle.mileage, { type: "number" })}
+              <label className="block sm:col-span-2">
+                <span className={labelClass}>{say("condition")}</span>
+                <select className={inputClass} defaultValue={valueOrEmpty(vehicle.metadata?.condition?.value)} name="condition">
+                  <option value="">{say("choose")}</option>
+                  {CONDITIONS.map((value) => (
+                    <option key={value} value={value}>
+                      {say(`cond_${value}`)}
+                    </option>
+                  ))}
+                </select>
+                {vehicle.metadata?.condition?.by === "damage" ? (
+                  <span className="mt-1 block font-medium text-[var(--muted)]">{say("conditionByDamage", { date: longDate(String(vehicle.metadata.condition.damage_on || ""), preferredLocale) })}</span>
+                ) : (
+                  <span className="mt-1 block font-medium text-[var(--muted)]">{say("conditionHint")}</span>
+                )}
+              </label>
             </div>
           </Fold>
           <Fold summary={say("datesSummary")} title={say("datesTitle")}>
@@ -168,24 +187,9 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
               {textField("body", "bodyClass", specifications.body_class)}
             </div>
           </Fold>
+          {isOwner ? (
           <Fold summary={say("valueSummaryEdit")} title={say("valueTitleEdit")}>
             <div className="grid gap-4 sm:grid-cols-2">
-              <label className="block sm:col-span-2">
-                <span className={labelClass}>{say("condition")}</span>
-                <select className={inputClass} defaultValue={valueOrEmpty(vehicle.metadata?.condition?.value)} name="condition">
-                  <option value="">{say("choose")}</option>
-                  {CONDITIONS.map((value) => (
-                    <option key={value} value={value}>
-                      {say(`cond_${value}`)}
-                    </option>
-                  ))}
-                </select>
-                {vehicle.metadata?.condition?.by === "damage" ? (
-                  <span className="mt-1 block font-medium text-[var(--muted)]">{say("conditionByDamage", { date: longDate(String(vehicle.metadata.condition.damage_on || ""), preferredLocale) })}</span>
-                ) : (
-                  <span className="mt-1 block font-medium text-[var(--muted)]">{say("conditionHint")}</span>
-                )}
-              </label>
               {moneyField("purchasePrice", "purchasePrice", vehicle.purchase_price)}
               {dateField("purchaseDate", "purchaseDate", vehicle.purchase_date)}
               {textField("purchaseMileage", "purchaseMileage", acquisition.purchase_mileage, { type: "number" })}
@@ -193,6 +197,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
             </div>
             <p className="mt-3 text-sm text-[var(--muted)]">{say("valueHintEdit")}</p>
           </Fold>
+          ) : null}
           {branches.length > 1 ? (
             <Fold summary={say("locSummary")} title={say("locTitle")}>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -222,6 +227,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
               <input name="serviceArea" type="hidden" value={vehicle.service_area || "home_branch"} />
             </>
           )}
+          {isOwner ? (
           <Fold summary={say("loanSummary")} title={say("loanTitle")}>
             <div className="grid gap-4 sm:grid-cols-2">
               {textField("lender", "financeLender", finance.lender)}
@@ -230,6 +236,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
               {dateField("loanEnd", "financeEndDate", finance.end_date)}
             </div>
           </Fold>
+          ) : null}
 
           <div className="sticky-actions sticky z-10 -mx-1 flex gap-2 bg-[var(--background)] px-1 py-3 sm:justify-end [&>*:last-child]:flex-1 sm:[&>*:last-child]:flex-none">
             <Link className="secondary-action pressable justify-center" href={`/fleet/${vehicle.id}`}>

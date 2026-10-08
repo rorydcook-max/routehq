@@ -2612,7 +2612,8 @@
     "ph_removed": "Photo removed.",
     "ph_removeFailed": "Could not remove the photo. Try again.",
     "cs_ranOut": "Ran out {date}",
-    "a_more": "More for this vehicle"
+    "a_more": "More for this vehicle",
+    "fi_summaryTeam": "This month: {amount} in"
   },
   "customerPage": {
     "back": "Customers",

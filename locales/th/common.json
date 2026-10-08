@@ -2621,7 +2621,8 @@
     "ph_removed": "ลบรูปแล้ว",
     "ph_removeFailed": "ลบรูปไม่สำเร็จ ลองอีกครั้ง",
     "cs_ranOut": "หมดอายุ {date}",
-    "a_more": "อื่น ๆ สำหรับรถคันนี้"
+    "a_more": "อื่น ๆ สำหรับรถคันนี้",
+    "fi_summaryTeam": "เดือนนี้: รับเงิน {amount}"
   },
   "customerPage": {
     "back": "ลูกค้า",

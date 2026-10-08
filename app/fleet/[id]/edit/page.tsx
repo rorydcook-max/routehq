@@ -149,6 +149,8 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
                   ))}
                 </select>
               </label>
+              {moneyField("sumInsured", "insuranceSumInsured", compliance.insurance_sum_insured)}
+              {moneyField("insuranceExcess", "insuranceExcess", compliance.insurance_excess)}
               {dateField("service", "nextServiceDate", compliance.next_service_date)}
               {dateField("oil", "oilChangeDueDate", compliance.oil_change_due_date)}
             </div>
@@ -166,10 +168,12 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
           </Fold>
           <Fold summary={say("valueSummaryEdit")} title={say("valueTitleEdit")}>
             <div className="grid gap-4 sm:grid-cols-2">
-              {textField("purchaseMileage", "purchaseMileage", acquisition.purchase_mileage, { type: "number" })}
               {moneyField("purchasePrice", "purchasePrice", vehicle.purchase_price)}
+              {dateField("purchaseDate", "purchaseDate", vehicle.purchase_date)}
+              {textField("purchaseMileage", "purchaseMileage", acquisition.purchase_mileage, { type: "number" })}
               {moneyField("estimatedValue", "estimatedValue", vehicle.estimated_value)}
             </div>
+            <p className="mt-3 text-sm text-[var(--muted)]">{say("valueHintEdit")}</p>
           </Fold>
           {branches.length > 1 ? (
             <Fold summary={say("locSummary")} title={say("locTitle")}>

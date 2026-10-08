@@ -416,6 +416,14 @@ export function ReportsView({ data }: { data: ReportsData }) {
         <p className={`mt-3 ${soft}`}>{say("profitNote")}</p>
       </section>
 
+      <Link className="card pressable flex items-center justify-between gap-3 p-4" href={"/reports/fleet-value" as any}>
+        <span>
+          <span className="block font-bold text-[var(--foreground)]">{say("fleetValueLink")}</span>
+          <span className={soft}>{say("fleetValueLinkHint")}</span>
+        </span>
+        <span aria-hidden className="text-xl text-[var(--muted)]">›</span>
+      </Link>
+
       {/* Who owes money */}
       <section className="card p-4">
         <h2 className={h2}>{say("owedTitle")}</h2>

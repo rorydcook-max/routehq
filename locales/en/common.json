@@ -2851,7 +2851,11 @@
     "needMake": "Choose the make and model first.",
     "ratesBody": "Fill in at least one. The others are worked out from it when you take a booking.",
     "needPrice": "Add at least one price before saving.",
-    "bookChange": "Use a different photo"
+    "bookChange": "Use a different photo",
+    "purchaseDate": "Date bought",
+    "sumInsured": "Sum insured",
+    "insuranceExcess": "Insurance excess",
+    "valueHintEdit": "All optional. Leave the current value empty and RouteHQ estimates it from used adverts for this make, model, year and mileage (Reports, Fleet value)."
   },
   "bookingEdit": {
     "crumbBookings": "Bookings",
@@ -3565,7 +3569,9 @@
     "monthProfit": "{amount} profit",
     "monthIn": "{amount} in",
     "monthOut": "{amount} out",
-    "earnedBackShort": "Earned back"
+    "earnedBackShort": "Earned back",
+    "fleetValueLink": "Fleet value",
+    "fleetValueLinkHint": "What your vehicles are worth now, against what you paid"
   },
   "auth": {
     "signInTitle": "Sign in",
@@ -3878,5 +3884,35 @@
     "reference": "Reference: {code}",
     "tryAgain": "Try again",
     "goBack": "Go back"
+  },
+  "fleetValue": {
+    "back": "Back to reports",
+    "title": "Fleet value",
+    "subtitle": "What each vehicle would sell for today, from used adverts for the same make, model and year. Add what you paid to see how each one has held its value.",
+    "worthNow": "Worth now",
+    "valuedCount": "{valued} of {total} vehicles valued",
+    "paidUp": "Bought for {paid} ({count, plural, one {# vehicle} other {# vehicles}}): worth {change} more now",
+    "paidDown": "Bought for {paid} ({count, plural, one {# vehicle} other {# vehicles}}): worth {change} less now",
+    "checking": "Checking {n} of {total}: {name}",
+    "checkingHint": "About half a minute each. Vehicles of the same model and year share one look-up.",
+    "estimate": "Estimate values ({count})",
+    "allChecked": "All values checked in the last month.",
+    "someFailed": "{count, plural, one {# vehicle} other {# vehicles}} could not be valued. Try again later, or type a value on the vehicle.",
+    "notValued": "Not valued",
+    "yourFigure": "Your figure",
+    "estimateFrom": "Adverts: {low} to {high} ({count} found, {date})",
+    "estimateRough": "Rough estimate: {low} to {high} ({date})",
+    "bought": "Bought for {amount}",
+    "boughtOn": "Bought for {amount} on {date}",
+    "upBy": "up {amount} ({pct}%)",
+    "downBy": "down {amount} ({pct}%)",
+    "insuredFor": "Insured for {amount}",
+    "underInsured": "Insured for {amount}: less than it is worth",
+    "editFigures": "Edit figures",
+    "addPaid": "Add what you paid",
+    "checkAgain": "Check again",
+    "estimateOne": "Estimate",
+    "footnote": "Estimates assume fair condition and a private sale. Your own figure, typed on the vehicle, is always used instead and never replaced.",
+    "addYear": "Add the year on the vehicle for a closer figure."
   }
 }

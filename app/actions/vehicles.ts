@@ -395,25 +395,33 @@ export async function updateVehicle(formData: FormData) {
     body_class: optionalStringFromForm(formData, "bodyClass")
   });
 
-  const compliance = compactObject({
+  // Only the fields this form shows; anything else saved on the vehicle (costs from an import, included items) is kept below.
+  const compliance = {
+    insurance_sum_insured: optionalNumberFromForm(formData, "insuranceSumInsured"),
+    insurance_excess: optionalNumberFromForm(formData, "insuranceExcess"),
     tax_expiry_date: optionalStringFromForm(formData, "taxExpiryDate"),
     porbor_expiry_date: optionalStringFromForm(formData, "porborExpiryDate"),
     insurance_expiry_date: optionalStringFromForm(formData, "insuranceExpiryDate"),
     voluntary_insurance_type: optionalStringFromForm(formData, "voluntaryInsuranceType"),
     next_service_date: optionalStringFromForm(formData, "nextServiceDate"),
     oil_change_due_date: optionalStringFromForm(formData, "oilChangeDueDate")
-  });
+  };
 
-  const finance = compactObject({
+  const finance = {
     lender: optionalStringFromForm(formData, "financeLender"),
     monthly_payment: optionalNumberFromForm(formData, "financeMonthlyPayment"),
     outstanding_balance: optionalNumberFromForm(formData, "financeOutstanding"),
     end_date: optionalStringFromForm(formData, "financeEndDate")
-  });
+  };
 
-  const acquisition = compactObject({
+  const acquisition = {
     purchase_mileage: optionalNumberFromForm(formData, "purchaseMileage")
-  });
+  };
+
+  // Saving the form used to replace everything stored with the vehicle, losing what it does not show.
+  const { data: before } = await supabase.from("vehicles").select("metadata").eq("id", vehicleId).eq("organization_id", organizationId).maybeSingle();
+  const kept = (before?.metadata || {}) as Record<string, any>;
+  const merged = (section: string, fromForm: Record<string, unknown>) => compactObject({ ...(kept[section] || {}), ...fromForm });
 
   const { error } = await supabase
     .from("vehicles")
@@ -427,6 +435,7 @@ export async function updateVehicle(formData: FormData) {
       registration_number: registrationNumber,
       color: optionalStringFromForm(formData, "color"),
       purchase_price: optionalNumberFromForm(formData, "purchasePrice"),
+      purchase_date: optionalStringFromForm(formData, "purchaseDate"),
       estimated_value: optionalNumberFromForm(formData, "estimatedValue"),
       mileage: numberFromForm(formData, "mileage"),
       home_branch_id: optionalStringFromForm(formData, "homeBranchId"),
@@ -438,9 +447,10 @@ export async function updateVehicle(formData: FormData) {
       deposit_amount: String(formData.get("depositAmount") || "").trim() ? numberFromForm(formData, "depositAmount") : null,
       specifications,
       metadata: {
-        acquisition,
-        compliance,
-        finance
+        ...kept,
+        acquisition: merged("acquisition", acquisition),
+        compliance: merged("compliance", compliance),
+        finance: merged("finance", finance)
       }
     })
     .eq("id", vehicleId)

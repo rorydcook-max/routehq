@@ -187,7 +187,7 @@
     "alreadyRefunded": "Already given back",
     "alreadyForfeited": "Already kept",
     "availableToReconcile": "Left to settle",
-    "outstandingBalance": "Unpaid rent",
+    "outstandingBalance": "Still owed on the booking",
     "fuelDeficitCharge": "Fuel missing",
     "damageExcess": "Damage",
     "cleaningFee": "Cleaning fee",
@@ -340,7 +340,8 @@
     "receiptRentOnly": "Rental payment {rent}",
     "billRemainder": "Bill the customer the {amount} the deposit does not cover",
     "billRemainderYes": "It is added to the booking as an amount due, and the customer can pay it from their booking page.",
-    "billRemainderNo": "Not billed. You can still add it to the booking later."
+    "billRemainderNo": "Not billed. You can still add it to the booking later.",
+    "billedToCustomer": "Billed to the customer"
   },
   "translation": {
     "translatedFrom": "Translated from {language}",
@@ -1992,7 +1993,8 @@
     "chg_repair": "repair",
     "chg_fine": "fine",
     "chg_other": "other costs",
-    "paidChargesLine": "charges paid {amount}"
+    "paidChargesLine": "charges paid {amount}",
+    "pc_wontPay": "Won't be paid"
   },
   "newBooking": {
     "pageBack": "Back to bookings",

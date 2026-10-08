@@ -172,7 +172,7 @@
     "alreadyRefunded": "คืนแล้ว",
     "alreadyForfeited": "หักไปแล้ว",
     "availableToReconcile": "ยอดที่เหลือให้จัดการ",
-    "outstandingBalance": "ค่าเช่าค้างชำระ",
+    "outstandingBalance": "ยอดค้างชำระในการจอง",
     "fuelDeficitCharge": "ค่าน้ำมันที่ขาด",
     "damageExcess": "ค่าความเสียหาย",
     "cleaningFee": "ค่าทำความสะอาด",
@@ -326,7 +326,8 @@
     "receiptRentOnly": "ค่าเช่า {rent}",
     "billRemainder": "เรียกเก็บส่วนที่เงินมัดจำไม่พอ {amount} จากลูกค้า",
     "billRemainderYes": "จะเพิ่มเป็นยอดค้างในการจอง และลูกค้าจ่ายได้จากหน้าการจองของตัวเอง",
-    "billRemainderNo": "ไม่เรียกเก็บ เพิ่มในการจองทีหลังได้"
+    "billRemainderNo": "ไม่เรียกเก็บ เพิ่มในการจองทีหลังได้",
+    "billedToCustomer": "เรียกเก็บจากลูกค้า"
   },
   "translation": {
     "translatedFrom": "แปลจาก {language}",
@@ -2001,7 +2002,8 @@
     "chg_repair": "ค่าซ่อม",
     "chg_fine": "ค่าปรับ",
     "chg_other": "ค่าใช้จ่ายอื่น",
-    "paidChargesLine": "จ่ายค่าใช้จ่ายที่เรียกเก็บแล้ว {amount}"
+    "paidChargesLine": "จ่ายค่าใช้จ่ายที่เรียกเก็บแล้ว {amount}",
+    "pc_wontPay": "ลูกค้าไม่จ่าย"
   },
   "newBooking": {
     "pageBack": "กลับไปที่การจอง",

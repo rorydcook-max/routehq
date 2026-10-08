@@ -1124,7 +1124,7 @@ export function InspectionForm({ context, unsigned = false }: { context: Inspect
                 <Row label={t("depositDeductions")} value={`-${money(fuelDeficitCharge + damageCharge)}`} danger />
               </div>
             ) : null
-          ) : mode === "return" && (depositAlreadyReturned || !nothingToSettle) ? (
+          ) : mode === "return" && (depositAlreadyReturned || availableToReconcile > 0 || (billUncovered && uncoveredCharges > 0)) ? (
             <div className="mt-4 rounded-lg border border-[var(--border)] bg-white p-3">
               {depositAlreadyReturned ? (
                 <div className="rounded-lg bg-[var(--success-light)] p-3">
@@ -1132,8 +1132,13 @@ export function InspectionForm({ context, unsigned = false }: { context: Inspect
                 </div>
               ) : (
                 <>
-                  <Row label={t("depositDeductions")} value={`-${money(appliedDeductions)}`} danger={appliedDeductions > 0} />
-                  <Row label={t("depositRefundConfirmed")} value={money(depositRefundAmount)} />
+                  {availableToReconcile > 0 ? (
+                    <>
+                      <Row label={t("depositDeductions")} value={`-${money(appliedDeductions)}`} danger={appliedDeductions > 0} />
+                      <Row label={t("depositRefundConfirmed")} value={money(depositRefundAmount)} />
+                    </>
+                  ) : null}
+                  {billUncovered && uncoveredCharges > 0 ? <Row label={t("billedToCustomer")} value={money(uncoveredCharges)} /> : null}
                 </>
               )}
             </div>

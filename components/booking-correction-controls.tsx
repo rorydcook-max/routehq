@@ -537,6 +537,25 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
     });
   }
 
+  // A bill the customer is not going to pay: written off in one tap (it can be put back from the pencil).
+  function waiveCharge() {
+    setMessage(null);
+    startTransition(async () => {
+      try {
+        await updateRentalPayment(payment.id, {
+          amount: Number(payment.amount || 0),
+          dueDate: dateInput(payment.due_date),
+          description: String(payment.metadata?.description || ""),
+          status: "waived" as any,
+          paidDate: null
+        });
+        router.refresh();
+      } catch (error) {
+        setMessage(shownError(error, tx.say("pc_updateFailed")));
+      }
+    });
+  }
+
   function saveReceivedPayment() {
     setMessage(null);
     startTransition(async () => {
@@ -600,6 +619,11 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
             >
               <i aria-hidden="true" className="ti ti-cash text-[14px]" />
               {tx.say("pc_record")}
+            </button>
+          ) : null}
+          {canRecordPayment && payment.metadata?.type === "charge" ? (
+            <button className="pressable inline-flex min-h-9 items-center justify-center rounded-lg border border-[var(--border)] bg-white px-3 text-sm font-semibold text-[var(--foreground-secondary)]" disabled={isPending} onClick={waiveCharge} type="button">
+              {tx.say("pc_wontPay")}
             </button>
           ) : null}
           {!voided ? (

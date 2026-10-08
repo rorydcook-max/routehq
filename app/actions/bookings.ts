@@ -1104,7 +1104,7 @@ export async function manuallyActivateRental(rentalId: string): Promise<{ succes
 
   const { data: rental, error: rentalError } = await supabase
     .from("rentals")
-    .select("id, organization_id, vehicle_id, customer_id")
+    .select("id, organization_id, vehicle_id, customer_id, start_date, display_code, reference")
     .eq("id", cleanId)
     .is("deleted_at", null)
     .maybeSingle();
@@ -1112,6 +1112,12 @@ export async function manuallyActivateRental(rentalId: string): Promise<{ succes
   if (rentalError || !rental) return { success: false, error: rentalError?.message || "Rental not found." };
 
   await ensureMembership(supabase, rental.organization_id, user.id);
+
+  // Handed over before the booked start date: the rental started today (as with the form).
+  const handoverDate = todayDate();
+  if (rental.start_date && handoverDate < String(rental.start_date).slice(0, 10)) {
+    await supabase.from("rentals").update({ start_date: handoverDate }).eq("id", cleanId).eq("organization_id", rental.organization_id).then(() => null, () => null);
+  }
 
   // Also set the vehicle to rented if not already
   if (rental.vehicle_id) {
@@ -1123,6 +1129,19 @@ export async function manuallyActivateRental(rentalId: string): Promise<{ succes
   }
 
   await activateRental(cleanId, supabase);
+
+  await recordActivityEvent(supabase, {
+    organization_id: rental.organization_id,
+    actor_id: user.id,
+    entity_type: "rental",
+    entity_id: cleanId,
+    vehicle_id: rental.vehicle_id,
+    rental_id: cleanId,
+    customer_id: rental.customer_id,
+    event_type: "handed_over_without_form",
+    title: "Handed over without the form",
+    detail: `${bookingReference(rental)} went out without a handover form.`
+  }).catch(() => null);
 
   revalidatePath("/");
   revalidatePath("/bookings");

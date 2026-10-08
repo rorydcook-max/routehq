@@ -2047,7 +2047,8 @@
     "hist_vehicle_condition_changed": "Condition changed after damage",
     "doNotRent": "{name} is marked: don't rent to again.",
     "pc_extras": "Extras: {names}",
-    "extrasPlus": "+ {amount} extras: {names}"
+    "extrasPlus": "+ {amount} extras: {names}",
+    "hist_handed_over_without_form": "Handed over without the form"
   },
   "newBooking": {
     "pageBack": "Back to bookings",

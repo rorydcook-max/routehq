@@ -2056,7 +2056,8 @@
     "hist_vehicle_condition_changed": "สภาพรถเปลี่ยนหลังพบความเสียหาย",
     "doNotRent": "{name} ถูกทำเครื่องหมายไว้: ไม่ให้เช่าอีก",
     "pc_extras": "บริการเสริม: {names}",
-    "extrasPlus": "+ บริการเสริม {amount}: {names}"
+    "extrasPlus": "+ บริการเสริม {amount}: {names}",
+    "hist_handed_over_without_form": "ส่งมอบรถโดยไม่กรอกแบบฟอร์ม"
   },
   "newBooking": {
     "pageBack": "กลับไปที่การจอง",

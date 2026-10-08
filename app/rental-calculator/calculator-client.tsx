@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { fetchVehicleMakesForCategory, fetchVehicleModels, fetchVehicleTrims } from "@/lib/vehicle-catalog-db";
 import type { VehicleMake, VehicleModel, VehicleTrim } from "@/lib/vehicle-catalog-db";
 import { Card, Fold } from "@/components/ui";
+import { longDate } from "@/lib/i18n/dates";
 import { buildAssumptions, evaluate, flatResaleCurve, yearlyLossPct } from "@/lib/vehicle-investment";
 import type { Assumptions, Outcome, RentStyle, Research, Verdict } from "@/lib/vehicle-investment";
 
@@ -71,6 +72,41 @@ function Num({ label, value, onChange, hint, suffix }: { label: string; value: n
       </span>
       {hint ? <span className="mt-1 block text-xs font-normal text-[var(--foreground-muted)]">{hint}</span> : null}
     </label>
+  );
+}
+
+/** What the look-up is doing, so a minute of waiting does not look like nothing is happening. */
+function ResearchProgress({ elapsed, say }: { elapsed: number; say: Say }) {
+  const steps = [
+    { key: "step_rent", from: 0 },
+    { key: "step_adverts", from: 15 },
+    { key: "step_costs", from: 30 },
+    { key: "step_sums", from: 50 }
+  ];
+  // Moves quickly at first and slows near the end, never claiming to be finished.
+  const pct = Math.min(95, Math.round(100 * (1 - Math.exp(-elapsed / 35))));
+  return (
+    <div aria-live="polite" id="calc-progress" className="mt-4 scroll-mt-24 rounded-xl border border-[var(--border)] bg-[var(--surface-muted,#f6f7f9)] p-4">
+      <div className="h-2 w-full overflow-hidden rounded-full bg-white">
+        <div className="h-full rounded-full bg-[var(--primary)] transition-all duration-1000 ease-out" style={{ width: `${Math.max(6, pct)}%` }} />
+      </div>
+      <ul className="mt-3 space-y-2 text-sm">
+        {steps.map((step, index) => {
+          const next = steps[index + 1];
+          const done = next ? elapsed >= next.from : false;
+          const now = elapsed >= step.from && !done;
+          return (
+            <li className={`flex items-center gap-2 ${done ? "text-[var(--success)]" : now ? "font-semibold text-[var(--foreground)]" : "text-[var(--foreground-muted)]"}`} key={step.key}>
+              <span aria-hidden className={`inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${done ? "border-[var(--success)] bg-[var(--success)] text-[10px] text-white" : now ? "animate-pulse border-[var(--primary)] bg-[var(--primary)]/20" : "border-[var(--border-strong)]"}`}>
+                {done ? "✓" : ""}
+              </span>
+              {say(step.key)}
+            </li>
+          );
+        })}
+      </ul>
+      <p className="mt-3 text-xs text-[var(--foreground-muted)]">{say("workingHint")}</p>
+    </div>
   );
 }
 
@@ -150,6 +186,16 @@ export function CalculatorClient({
   const [searching, setSearching] = useState(false);
   const [listings, setListings] = useState<Listing[] | null>(null);
   const [searchFailed, setSearchFailed] = useState(false);
+  const [lookedUp, setLookedUp] = useState<{ how: string; checkedAt: string } | null>(null);
+  // Seconds since the look-up started, for the progress shown while it runs.
+  const [elapsed, setElapsed] = useState(0);
+  useEffect(() => {
+    if (!busy) return;
+    setElapsed(0);
+    const started = Date.now();
+    const timer = window.setInterval(() => setElapsed(Math.round((Date.now() - started) / 1000)), 1000);
+    return () => window.clearInterval(timer);
+  }, [busy]);
 
   useEffect(() => {
     let live = true;
@@ -231,6 +277,8 @@ export function CalculatorClient({
       return;
     }
     setBusy(true);
+    // On a phone the progress sits below the button, out of sight: bring it into view.
+    window.setTimeout(() => document.getElementById("calc-progress")?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
     let found: Research | null = null;
     let pages: Source[] = [];
     let where = "";
@@ -247,6 +295,7 @@ export function CalculatorClient({
       where = reply.place || "";
       foundAt = Number(reply.atPrice) || price;
       setPlatform(reply.platform || null);
+      setLookedUp(reply.how ? { how: String(reply.how), checkedAt: String(reply.checkedAt || "") } : null);
     } catch {
       found = null;
     }
@@ -493,7 +542,7 @@ export function CalculatorClient({
         <button className="btn-primary mt-5 w-full justify-center py-3 text-base disabled:opacity-50" disabled={!ready || busy} onClick={workItOut} type="button">
           {busy ? t("working") : t("workItOut")}
         </button>
-        {busy ? <p className="mt-2 text-center text-sm text-[var(--foreground-muted)]">{t("workingHint")}</p> : null}
+        {busy ? <ResearchProgress elapsed={elapsed} say={say} /> : null}
       </Card>
 
       {assumptions && outcome && best && subject ? (
@@ -553,6 +602,42 @@ export function CalculatorClient({
                 </dd>
               </div>
             </dl>
+
+            {research?.rates && Object.keys(research.rates).length ? (
+              <div className="mt-4 rounded-xl border border-[var(--border)] p-3">
+                <p className="text-sm font-bold">{say("ratesTitle", { place: place || "-" })}</p>
+                <dl className="mt-2 space-y-1.5 text-sm">
+                  {(["day", "week", "month"] as const).map((period) => {
+                    const range = research.rates?.[period];
+                    if (!range) return null;
+                    return (
+                      <div className="flex items-baseline justify-between gap-3" key={period}>
+                        <dt className="text-[var(--foreground-secondary)]">{t(`per_${period}`)}</dt>
+                        <dd className="text-right">
+                          <span className="font-bold">{money(range.low)} – {money(range.high)}</span>
+                          <span className="block text-xs text-[var(--foreground-muted)]">{say("ratesAverage", { amount: money(range.average) })}</span>
+                        </dd>
+                      </div>
+                    );
+                  })}
+                </dl>
+                <p className="mt-2 text-xs text-[var(--foreground-muted)]">
+                  {say("ratesFrom", {
+                    count: Object.values(research.rates).reduce((sum, range) => sum + (range?.count || 0), 0),
+                    dropped: Object.values(research.rates).reduce((sum, range) => sum + (range?.dropped || 0), 0)
+                  })}
+                </p>
+              </div>
+            ) : null}
+            {lookedUp && research ? (
+              <p className="mt-3 text-xs text-[var(--foreground-muted)]">
+                {lookedUp.how === "saved"
+                  ? say("lookedUpSaved", { date: longDate(lookedUp.checkedAt.slice(0, 10), locale) })
+                  : lookedUp.how === "rechecked"
+                    ? t("lookedUpRechecked")
+                    : t("lookedUpFresh")}
+              </p>
+            ) : null}
 
             {target || slowYearOnly ? (
               <p className="mt-4 rounded-xl border border-[var(--warning)]/40 bg-[var(--warning)]/10 p-3 text-sm font-medium">
@@ -675,7 +760,6 @@ export function CalculatorClient({
               <Num label={t("maintenance")} onChange={(value) => change({ maintenance: value })} value={assumptions.maintenance} />
               <Num label={t("maintenanceGrowth")} onChange={(value) => change({ maintenanceGrowthPct: value })} suffix="%" value={assumptions.maintenanceGrowthPct} />
               <Num hint={t("otherHint")} label={t("other")} onChange={(value) => change({ otherMonthly: value })} value={assumptions.otherMonthly} />
-              <Num hint={t("buyingHint")} label={t("buying")} onChange={(value) => change({ buyingCosts: value })} value={assumptions.buyingCosts} />
               <Num hint={say("lossHint", { years: best.year, value: about(best.value) })} label={t("loss")} onChange={(value) => change({ resalePct: flatResaleCurve(value) })} suffix="%" value={yearlyLossPct(assumptions.resalePct, best.year)} />
               <Num hint={t("maxAgeHint")} label={t("maxAge")} onChange={(value) => change({ maxRentalAge: Math.max(assumptions.ageNow + 1, value) })} value={assumptions.maxRentalAge} />
             </div>

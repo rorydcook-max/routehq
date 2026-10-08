@@ -259,6 +259,12 @@ export type Research = {
   rent_day_low?: number;
   rent_day_typical?: number;
   rent_day_high?: number;
+  rent_week_low?: number;
+  rent_week_typical?: number;
+  rent_week_high?: number;
+  /** The believable local prices found, by the day, week and month. */
+  rates?: import("@/lib/rate-range").RateRanges;
+  rent_quotes?: import("@/lib/rate-range").RateQuote[];
   occupancy_long?: number;
   occupancy_short?: number;
   insurance_year?: number;
@@ -325,7 +331,8 @@ export function buildAssumptions(input: {
 
   return {
     price,
-    buyingCosts: Math.round(num(r.buying_costs) >= 0 && r.buying_costs !== undefined ? num(r.buying_costs) : price * d.buyingShare),
+    // Transfer and registration fees are left out: small next to the price, and the owner asked for them not to be counted.
+    buyingCosts: 0,
     financed: input.financed,
     downPayment: input.downPayment,
     monthlyPayment: input.monthlyPayment,

@@ -86,6 +86,8 @@ export async function researchJsonSteady(prompt: string, times = 3): Promise<{ d
       data[field] = Array.from({ length }, (_, index) => Math.round((middle(values.map((value) => Number(value[index]))) as number) * 10) / 10);
     }
   }
+  // Every price each look found counts: together they show the real spread.
+  if (runs.some((run) => Array.isArray(run.data.rent_quotes))) data.rent_quotes = runs.flatMap((run) => (Array.isArray(run.data.rent_quotes) ? run.data.rent_quotes : []));
   // Only as sure as the least sure look.
   const order = ["low", "medium", "high"];
   const confidences = runs.map((run) => order.indexOf(String(run.data.confidence))).filter((index) => index >= 0);

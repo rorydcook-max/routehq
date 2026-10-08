@@ -676,6 +676,13 @@ export default async function BookingDetailPage({ params, searchParams }: { para
           </div>
         </Card>
 
+        {customer?.do_not_rent ? (
+          <div className="rounded-xl border border-[var(--danger-line)] bg-[var(--danger-light)] p-3 font-bold text-[var(--danger)]" role="alert">
+            {tx.say("doNotRent", { name: customer.full_name })}
+            {customer.do_not_rent_reason ? <span className="block font-semibold">{customer.do_not_rent_reason}</span> : null}
+          </div>
+        ) : null}
+
         <UnsentMessages
           customerName={customer?.full_name || tx.say("theCustomer")}
           messages={(communicationTimeline || [])

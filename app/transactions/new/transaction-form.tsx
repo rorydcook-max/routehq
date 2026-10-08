@@ -26,7 +26,8 @@ export function TransactionForm({
   defaultCustomerId = "",
   prefill = null,
   waiting = [],
-  startAsCost = false
+  startAsCost = false,
+  startAsFine = false
 }: {
   organizationId: string;
   options: TransactionFormOptions;
@@ -38,6 +39,8 @@ export function TransactionForm({
   waiting?: MatchResult[];
   /** Opened from a booking's "Add a cost": money out, charged to that booking. */
   startAsCost?: boolean;
+  /** A fine: dated the day of the offence, billed to whoever had the vehicle then. */
+  startAsFine?: boolean;
 }) {
   const t = useTranslations("money");
   const say = t as unknown as (key: string, values?: Record<string, string | number>) => string;
@@ -54,7 +57,7 @@ export function TransactionForm({
         : match.dueDate === today
           ? say("dueToday")
           : say(match.dueDate < today ? "wasDueOn" : "dueOn", { date: shortDate(match.dueDate, locale) });
-  const [type, setType] = useState(prefill?.type || (startAsCost ? "repair" : "rental_income"));
+  const [type, setType] = useState(prefill?.type || (startAsCost ? "repair" : startAsFine ? "fine" : "rental_income"));
   const [amount, setAmount] = useState(prefill?.amount || "");
   // Today in business time: toISOString() is UTC, which is still "yesterday" in Thailand before 7am.
   const [transactionDate, setTransactionDate] = useState(
@@ -74,11 +77,11 @@ export function TransactionForm({
     () => waiting.filter((item) => (!defaultVehicleId || item.prefilledData.vehicleId === defaultVehicleId) && (!defaultRentalId || item.rentalId === defaultRentalId) && (!defaultCustomerId || item.customerId === defaultCustomerId)),
     [waiting, defaultVehicleId, defaultRentalId, defaultCustomerId]
   );
-  const [matches, setMatches] = useState<MatchResult[]>(startsLinked || startAsCost ? [] : waitingHere);
+  const [matches, setMatches] = useState<MatchResult[]>(startsLinked || startAsCost || startAsFine ? [] : waitingHere);
   const [showAllMatches, setShowAllMatches] = useState(false);
   const [dismissedMatches, setDismissedMatches] = useState(false);
   // While there are payments being waited for, they are the whole screen; the form opens when one is chosen or it is something else.
-  const [formOpen, setFormOpen] = useState(startsLinked || startAsCost || waitingHere.length === 0);
+  const [formOpen, setFormOpen] = useState(startsLinked || startAsCost || startAsFine || waitingHere.length === 0);
   const [isMatching, startMatchTransition] = useTransition();
 
   // A booking is told apart by its dates as much as by its number.
@@ -89,7 +92,9 @@ export function TransactionForm({
     [options.rentals, vehicleId]
   );
   // Billing the renter for this cost: off unless chosen. The booking offered first is the one the vehicle was on that day.
-  const [billCustomer, setBillCustomer] = useState(startAsCost && Boolean(defaultRentalId));
+  const [billCustomer, setBillCustomer] = useState((startAsCost && Boolean(defaultRentalId)) || startAsFine);
+  // Picked by hand: the date no longer moves it.
+  const [billPicked, setBillPicked] = useState(false);
   const [billRentalId, setBillRentalId] = useState(startAsCost ? defaultRentalId : "");
   // Above what the deposit covers: billed unless the owner unticks it (insurance pays above the excess, say).
   const [billRemainder, setBillRemainder] = useState(true);
@@ -100,6 +105,11 @@ export function TransactionForm({
     const onTheDay = rentalsForVehicle.find((rental) => (rental.startDate || "") <= transactionDate && (!rental.endDate || rental.endDate >= transactionDate));
     return onTheDay || rentalsForVehicle[0] || null;
   }, [rentalsForVehicle, transactionDate]);
+  // Changing the date of the offence moves the bill to whoever had the vehicle that day.
+  useEffect(() => {
+    if (billCustomer && !billPicked && likelyBooking && (startAsFine || !billRentalId)) setBillRentalId(likelyBooking.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [likelyBooking, billCustomer]);
 
   useEffect(() => {
     // Only money coming in can be a payment a customer owes.
@@ -366,7 +376,16 @@ export function TransactionForm({
                 <div className="mt-3 grid gap-3 sm:grid-cols-2">
                   <label className="block">
                     <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("billBooking")}</span>
-                    <select className={inputClass} name="billRentalId" onChange={(event) => setBillRentalId(event.target.value)} required value={billRentalId}>
+                    <select
+                      className={inputClass}
+                      name="billRentalId"
+                      onChange={(event) => {
+                        setBillPicked(true);
+                        setBillRentalId(event.target.value);
+                      }}
+                      required
+                      value={billRentalId}
+                    >
                       {rentalsForVehicle.map((rental) => (
                         <option key={rental.id} value={rental.id}>
                           {bookingOption(rental)}

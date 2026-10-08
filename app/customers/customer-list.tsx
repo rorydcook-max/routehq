@@ -128,7 +128,9 @@ export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
             const activeRental = item.activeRental;
             const vehicle = activeRental ? `${activeRental.vehicles?.make || ""} ${activeRental.vehicles?.model || ""}`.trim() : "";
             const line = activeRental
-              ? activeRental.end_date
+              ? activeRental.status === "booked"
+                ? say("bookedLine", { vehicle: vehicle || say("vehicle"), date: formatDate(activeRental.start_date, say, locale) })
+                : activeRental.end_date
                 ? say("rentingLine", { vehicle: vehicle || say("vehicle"), date: formatDate(activeRental.end_date, say, locale) })
                 : say("rentingOpen", { vehicle: vehicle || say("vehicle") })
               : item.lastRentalDate
@@ -141,6 +143,7 @@ export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
                     <p className="truncate text-[17px] font-bold text-[var(--foreground)]">
                       {flagForNationality(item.customer.nationality)} {item.customer.full_name}
                     </p>
+                    {item.customer?.do_not_rent ? <Badge tone="red">{say("doNotRent")}</Badge> : null}
                     {item.documentStatus === "complete" ? null : documentBadge(item.documentStatus, say)}
                   </div>
                   <p className={`mt-0.5 truncate font-medium ${activeRental ? "font-bold text-[var(--foreground)]" : "text-[var(--foreground-secondary)]"}`}>{line}</p>

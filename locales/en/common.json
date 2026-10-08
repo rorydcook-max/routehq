@@ -1260,7 +1260,9 @@
     "depositLeftAfter": "{amount} of the deposit is still held after this. Return it from the booking when you are ready.",
     "backToBooking": "Back to the booking",
     "costTitle": "Add a cost",
-    "costSubtitle": "Repairs, damage, fines or fuel on this booking. Bill the renter and it comes out of the deposit first."
+    "costSubtitle": "Repairs, damage, fines or fuel on this booking. Bill the renter and it comes out of the deposit first.",
+    "fineTitle": "Record a fine",
+    "fineSubtitle": "Set the date of the offence. Whoever had the vehicle that day is billed, and the fine comes out of their deposit if it is still held."
   },
   "booking": {
     "open": "Open",
@@ -2026,7 +2028,8 @@
     "tl_autoExtended": "Extended to {date} at the customer's request. {amount} due on {due}.",
     "tl_autoOpenEnded": "Changed to no end date at the customer's request. {amount} a month from {date}.",
     "addCost": "Add a cost",
-    "hist_vehicle_condition_changed": "Condition changed after damage"
+    "hist_vehicle_condition_changed": "Condition changed after damage",
+    "doNotRent": "{name} is marked: don't rent to again."
   },
   "newBooking": {
     "pageBack": "Back to bookings",
@@ -2243,7 +2246,8 @@
     "clashOpen": "This vehicle is already booked from {from} with no return date ({who}). Choose other dates or another vehicle.",
     "needStart": "Choose the start date to continue.",
     "needReturn": "Choose the return date, or tick \"Open-ended\", to continue.",
-    "needRate": "Enter the rental price to continue."
+    "needRate": "Enter the rental price to continue.",
+    "doNotRent": "Marked: don't rent to this customer again."
   },
   "fleet": {
     "title": "Fleet",
@@ -2326,7 +2330,9 @@
     "sel_phoneCall": "Phone call",
     "sel_creating": "Creating…",
     "sel_createSelect": "Create and select",
-    "noPhone": "No phone"
+    "noPhone": "No phone",
+    "doNotRent": "Don't rent",
+    "bookedLine": "Booked: {vehicle} from {date}"
   },
   "calendar": {
     "title": "Calendar",
@@ -2624,7 +2630,8 @@
     "cond_great": "Great",
     "cond_good": "Good",
     "cond_fair": "Fair",
-    "cond_poor": "Poor"
+    "cond_poor": "Poor",
+    "a_fine": "Record a fine"
   },
   "customerPage": {
     "back": "Customers",
@@ -2744,7 +2751,15 @@
     "new_emPhone": "Phone",
     "new_notesSummary": "Only you and your team see these",
     "new_cancel": "Cancel",
-    "new_save": "Save customer"
+    "new_save": "Save customer",
+    "dnr_add": "Don't rent to them again",
+    "dnr_on": "Don't rent to this customer again",
+    "dnr_remove": "Allow again",
+    "dnr_reason": "Why? (only your team sees this)",
+    "dnr_placeholder": "e.g. left without paying for damage",
+    "dnr_hint": "Anyone who picks this customer for a booking is warned, with this reason.",
+    "dnr_save": "Mark don't rent",
+    "dnr_cancel": "Cancel"
   },
   "vehicleForm": {
     "backToFleet": "Back to fleet",

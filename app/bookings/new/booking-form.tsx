@@ -40,6 +40,8 @@ type BookingCustomer = {
   phone: string | null;
   nationality: string | null;
   document_status?: string | null;
+  do_not_rent?: boolean | null;
+  do_not_rent_reason?: string | null;
 };
 
 type BookingShareResult = {
@@ -811,6 +813,12 @@ export function BookingForm({
                 </div>
                 <Badge tone={documentTone(selectedCustomer.document_status)}>{documentLabel(selectedCustomer.document_status)}</Badge>
               </div>
+              {selectedCustomer.do_not_rent ? (
+                <p className="mt-3 rounded-lg bg-[var(--danger-light)] p-3 text-sm font-bold text-[var(--danger)]" role="alert">
+                  {say("doNotRent")}
+                  {selectedCustomer.do_not_rent_reason ? <span className="block font-semibold">{selectedCustomer.do_not_rent_reason}</span> : null}
+                </p>
+              ) : null}
               {selectedCustomer.document_status !== "complete" ? (
                 <p className="mt-3 rounded-lg bg-[var(--warning-light)] p-3 text-sm font-semibold text-[var(--warning)]">{say("missingDocs")}</p>
               ) : null}

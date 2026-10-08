@@ -61,7 +61,7 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
       .order("created_at", { ascending: false }),
     supabase
       .from("customers")
-      .select("id, full_name, phone, nationality, document_status")
+      .select("id, full_name, phone, nationality, document_status, do_not_rent, do_not_rent_reason")
       .eq("organization_id", organization.id)
       .is("deleted_at", null)
       .order("created_at", { ascending: false }),

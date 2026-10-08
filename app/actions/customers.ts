@@ -333,6 +333,13 @@ export async function updateCustomer(formData: FormData) {
   if (formData.has("emergencyContactName")) updates.emergency_contact_name = optionalString(formData, "emergencyContactName");
   if (formData.has("emergencyContactPhone")) updates.emergency_contact_phone = fullPhone(formData, "emergencyPhoneCountryCode", "emergencyContactPhone");
   if (notes !== undefined) updates.notes = notes;
+  // "Don't rent to them again": a warning whenever they are picked for a booking, with the reason.
+  if (formData.has("doNotRent")) {
+    const on = String(formData.get("doNotRent")) === "true";
+    updates.do_not_rent = on;
+    updates.do_not_rent_reason = on ? optionalString(formData, "doNotRentReason") : null;
+    updates.do_not_rent_at = on ? new Date().toISOString() : null;
+  }
 
   const { error } = await supabase.from("customers").update(updates).eq("id", customerId).eq("organization_id", organizationId);
   if (error) {

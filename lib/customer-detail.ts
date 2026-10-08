@@ -68,17 +68,27 @@ function daysBetween(start: string | null | undefined, end: string | null | unde
   return Math.max(1, Math.round((endDay - startDay) / 86_400_000) + 1);
 }
 
+/** Rent paid back to the customer: it comes off what they brought in. */
+export function refundsOf(transactions: any[]) {
+  return transactions.filter((transaction) => !transaction.voided && String(transaction.type) === "refund").reduce((sum, transaction) => sum + Math.abs(Number(transaction.amount || 0)), 0);
+}
+
 function summarizeCustomer(customer: any, documents: any[], rentals: any[], transactions: any[]): CustomerListItem {
-  const activeRentals = rentals.filter((rental) => activeRentalStatuses.includes(rental.status));
+  // What is out on the road first, then what is booked.
+  const activeRentals = rentals
+    .filter((rental) => activeRentalStatuses.includes(rental.status))
+    .sort((left, right) => Number(left.status === "booked") - Number(right.status === "booked") || String(left.start_date).localeCompare(String(right.start_date)));
+  // Cancelled (voided) entries are not money the customer brought in.
   const lifetimeRevenue = transactions
     .filter((transaction) =>
+      !transaction.voided &&
       isRevenueTransaction({
         amount: Number(transaction.amount || 0),
         isDeposit: transaction.is_deposit,
         type: transaction.type
       })
     )
-    .reduce((sum, transaction) => sum + Math.abs(Number(transaction.amount || 0)), 0);
+    .reduce((sum, transaction) => sum + Math.abs(Number(transaction.amount || 0)), 0) - refundsOf(transactions);
   const lastRentalDate = rentals
     .map((rental) => rental.end_date || rental.start_date)
     .filter(Boolean)

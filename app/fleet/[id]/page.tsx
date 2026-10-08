@@ -143,7 +143,8 @@ function QuickActions({ vehicleId, status, rentalId }: { vehicleId: string; stat
   const more = [
     { href: detailUrl("/bookings/new", vehicleId), label: tx.say("a_newBooking"), icon: CalendarDays },
     { href: "#maintenance", label: tx.say("a_logMaintenance"), icon: Wrench },
-    { href: `/inspections/condition/${vehicleId}`, label: tx.say("a_condition"), icon: ClipboardCheck }
+    { href: `/inspections/condition/${vehicleId}`, label: tx.say("a_condition"), icon: ClipboardCheck },
+    { href: `/transactions/new?fine=1&vehicleId=${vehicleId}`, label: tx.say("a_fine"), icon: ReceiptText }
   ].filter((action) => action.label !== primary.label);
   const PrimaryIcon = primary.icon;
 

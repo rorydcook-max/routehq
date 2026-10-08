@@ -5,6 +5,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { FileText, MessageCircle, PenLine, Phone, Plus } from "lucide-react";
 import { updateCustomer, uploadCustomerDocument } from "@/app/actions/customers";
 import { CustomerNotesForm } from "@/app/customers/[id]/customer-notes-form";
+import { DoNotRent } from "@/app/customers/[id]/do-not-rent";
 import { AppShell } from "@/components/app-shell";
 import { CommunicationPanel } from "@/components/communication-panel";
 import { PendingButton } from "@/components/pending-button";
@@ -12,7 +13,7 @@ import { Badge, Card, Fold } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { businessToday } from "@/lib/business-time";
 import { commonCountries, customerLanguages, flagForNationality, countryLabel } from "@/lib/customer-options";
-import { getCustomerDetail, getCustomerDocumentCompleteness, type CustomerDetail } from "@/lib/customer-detail";
+import { getCustomerDetail, getCustomerDocumentCompleteness, type CustomerDetail, refundsOf } from "@/lib/customer-detail";
 import { longDate } from "@/lib/i18n/dates";
 import { getDefaultOrganization } from "@/lib/organization";
 import { amountDueNowByRental } from "@/lib/rental-balances";
@@ -403,7 +404,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
   // Income only: deposits are held and returned, so they are not income.
   const totalIncome = detail.transactions
     .filter((transaction: any) => !transaction.voided && isRevenueTransaction({ amount: Math.abs(Number(transaction.amount || 0)), isDeposit: Boolean(transaction.is_deposit), type: transaction.type }))
-    .reduce((sum, transaction) => sum + Math.abs(Number(transaction.amount || 0)), 0);
+    .reduce((sum, transaction) => sum + Math.abs(Number(transaction.amount || 0)), 0) - refundsOf(detail.transactions);
   const dueByRental = currentRentals.length > 0 ? await amountDueNowByRental(await createSupabaseServerClient(), currentRentals.map((rental) => rental.id)) : new Map<string, number>();
   const dueNow = activeRental ? dueByRental.get(activeRental.id) || 0 : 0;
 
@@ -440,6 +441,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           </p>
           {licenceDays !== null && licenceDays < 0 ? <p className="mt-1 font-bold text-[var(--danger)]">{cx.say("warnLicence", { date: formatDate(customer.driver_license_expiry, cx) })}</p> : null}
           {passportDays !== null && passportDays < 0 ? <p className="mt-1 font-bold text-[var(--danger)]">{cx.say("warnPassport", { date: formatDate(customer.passport_expiry, cx) })}</p> : null}
+          <DoNotRent customerId={customer.id} on={Boolean((customer as any).do_not_rent)} organizationId={organization.id} place="banner" reason={(customer as any).do_not_rent_reason || null} />
           <div className="mt-4 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
             <Link className="primary-action pressable col-span-2" href={`/bookings/new?customerId=${customer.id}` as Route}>
               <Plus size={18} />
@@ -462,6 +464,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
               {cx.say("editDetails")}
             </a>
           </div>
+          <DoNotRent customerId={customer.id} on={Boolean((customer as any).do_not_rent)} organizationId={organization.id} place="control" reason={null} />
         </Card>
 
         {currentRentals.map((rental) => (

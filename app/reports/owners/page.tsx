@@ -5,6 +5,13 @@ import { AppShell } from "@/components/app-shell";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { businessToday } from "@/lib/business-time";
 import { longDate } from "@/lib/i18n/dates";
+
+/** "7 Oct": the month and year are already in the statement heading. */
+function dayInMonth(date: string, locale: string) {
+  const d = new Date(`${String(date).slice(0, 10)}T00:00:00Z`);
+  if (isNaN(d.getTime())) return longDate(date, locale);
+  return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : `${locale}-u-ca-gregory`, { day: "numeric", month: "short", timeZone: "UTC" }).format(d);
+}
 import { getDefaultOrganization } from "@/lib/organization";
 import { buildStatements, type VehicleStatement } from "@/lib/owner-statements";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -117,9 +124,9 @@ export default async function OwnerStatementsPage({ searchParams }: { searchPara
                             <tbody>
                               {item.lines.map((line, index) => (
                                 <tr className="border-t border-[var(--border)]" key={index}>
-                                  <td className="py-1.5 pr-2 text-[var(--muted)]">{longDate(line.date, locale)}</td>
+                                  <td className="whitespace-nowrap py-1.5 pr-2 text-[var(--muted)]">{dayInMonth(line.date, locale)}</td>
                                   <td className="py-1.5 pr-2">{line.label}</td>
-                                  <td className={`py-1.5 text-right tabular-nums ${line.kind === "out" || line.amount < 0 ? "text-[var(--danger)]" : ""}`}>
+                                  <td className={`whitespace-nowrap py-1.5 text-right tabular-nums ${line.kind === "out" || line.amount < 0 ? "text-[var(--danger)]" : ""}`}>
                                     {line.kind === "out" || line.amount < 0 ? "-" : ""}
                                     {baht(Math.abs(line.amount))}
                                   </td>

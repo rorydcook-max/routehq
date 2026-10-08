@@ -211,7 +211,9 @@ export function Catalog({
                   ) : null}
                   {free && plan && season?.pct && !tooShort ? (
                     <p className="mt-0.5 text-xs font-semibold text-[var(--warning)]">
-                      {t(season.pct > 0 ? "seasonPrice" : "seasonDiscount", { pct: Math.abs(season.pct), names: season.names.join(", ") || t("highSeason") })}
+                      {season.seasonDays > 0 && season.seasonDays < season.days
+                          ? t(season.pct > 0 ? "seasonPricePart" : "seasonDiscountPart", { pct: Math.abs(season.pct), names: season.names.join(", ") || t("highSeason"), inDays: season.seasonDays, days: season.days })
+                          : t(season.pct > 0 ? "seasonPrice" : "seasonDiscount", { pct: Math.abs(season.pct), names: season.names.join(", ") || t("highSeason") })}
                     </p>
                   ) : null}
                   {tooShort ? <p className="mt-1 text-sm font-semibold text-[var(--warning)]">{tooShort}</p> : null}

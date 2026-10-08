@@ -76,8 +76,8 @@ export function seasonalRate(
   seasons: Season[],
   startDate: string | null | undefined,
   endDate: string | null | undefined
-): { rate: number; pct: number; names: string[] } {
-  const none = { rate, pct: 0, names: [] as string[] };
+): { rate: number; pct: number; names: string[]; seasonDays: number; days: number } {
+  const none = { rate, pct: 0, names: [] as string[], seasonDays: 0, days: 0 };
   if (!(rate > 0) || !seasons.length || !startDate || pricingModel === "custom") return none;
   const apply = seasons.filter((season) => pricingModel !== "monthly" || season.monthly);
   if (!apply.length) return none;
@@ -85,19 +85,22 @@ export function seasonalRate(
   const end = endDate ? endDate.slice(0, 10) : addDays(start, 30);
   const days = Math.max(1, Math.round((new Date(`${end}T00:00:00Z`).getTime() - new Date(`${start}T00:00:00Z`).getTime()) / 86_400_000));
   let total = 0;
+  let seasonDays = 0;
   const names = new Set<string>();
   for (let index = 0; index < Math.min(days, 366); index++) {
     const day = addDays(start, index);
     let best: Season | null = null;
     for (const season of apply) if (inSeason(season, day) && (!best || Math.abs(season.pct) > Math.abs(best.pct))) best = season;
     if (best) {
+      seasonDays += 1;
       total += best.pct;
       if (best.name) names.add(best.name);
     }
   }
   const pct = total / Math.min(days, 366);
   if (!pct) return none;
-  return { rate: Math.max(0, Math.round((rate * (1 + pct / 100)) / 10) * 10), pct: Math.round(pct), names: [...names] };
+  const counted = Math.min(days, 366);
+  return { rate: Math.max(0, Math.round((rate * (1 + pct / 100)) / 10) * 10), pct: Math.round(pct), names: [...names], seasonDays, days: counted };
 }
 
 /** Extras offered for a kind of vehicle. */

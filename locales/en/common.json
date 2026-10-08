@@ -753,7 +753,9 @@
     "extraOnce": "{amount}",
     "extrasAtStart": "Extras {amount}, paid with the first payment.",
     "extrasEachMonth": "{amount} a month added to the rent.",
-    "extrasLine": "Extras: {names} · {amount}"
+    "extrasLine": "Extras: {names} · {amount}",
+    "seasonPricePart": "{names} price on {inDays} of your {days} days: +{pct}% overall",
+    "seasonDiscountPart": "{names} on {inDays} of your {days} days: {pct}% off overall"
   },
   "customerMessages": {
     "hi": "Hi {name},",
@@ -2273,7 +2275,8 @@
     "extraOnce": "{amount} once",
     "extrasUpfront": "Extras {amount}, paid with the first payment.",
     "extrasMonthly": "{amount} a month added to the rent.",
-    "s_extras": "Extras"
+    "s_extras": "Extras",
+    "seasonPartDays": "({inDays} of {days} days in season)"
   },
   "fleet": {
     "title": "Fleet",

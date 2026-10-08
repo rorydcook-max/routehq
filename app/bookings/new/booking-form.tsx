@@ -963,6 +963,7 @@ export function BookingForm({
             return (
               <p className="mt-2 text-xs font-semibold text-[var(--warning)]">
                 {say(season.pct > 0 ? "seasonUp" : "seasonDown", { pct: Math.abs(season.pct), names: season.names.join(", ") || say("seasonDefault"), amount: money(rateFor(selectedVehicle, pricingModel), currency) })}
+                    {season.seasonDays > 0 && season.seasonDays < season.days ? ` ${say("seasonPartDays", { inDays: season.seasonDays, days: season.days })}` : ""}
               </p>
             );
           })()}

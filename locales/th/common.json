@@ -762,7 +762,9 @@
     "extraOnce": "{amount}",
     "extrasAtStart": "บริการเสริม {amount} ชำระพร้อมการชำระครั้งแรก",
     "extrasEachMonth": "เพิ่ม {amount} ต่อเดือนในค่าเช่า",
-    "extrasLine": "บริการเสริม: {names} · {amount}"
+    "extrasLine": "บริการเสริม: {names} · {amount}",
+    "seasonPricePart": "ราคาช่วง {names} {inDays} จาก {days} วันที่เช่า: รวมแล้วเพิ่ม {pct}%",
+    "seasonDiscountPart": "{names} {inDays} จาก {days} วันที่เช่า: รวมแล้วลด {pct}%"
   },
   "customerMessages": {
     "hi": "สวัสดีคุณ {name}",
@@ -2282,7 +2284,8 @@
     "extraOnce": "{amount} ครั้งเดียว",
     "extrasUpfront": "บริการเสริม {amount} ชำระพร้อมการชำระครั้งแรก",
     "extrasMonthly": "เพิ่ม {amount} ต่อเดือนในค่าเช่า",
-    "s_extras": "บริการเสริม"
+    "s_extras": "บริการเสริม",
+    "seasonPartDays": "({inDays} จาก {days} วันอยู่ในช่วงนี้)"
   },
   "fleet": {
     "title": "รถ",

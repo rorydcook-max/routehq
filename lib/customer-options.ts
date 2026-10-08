@@ -90,3 +90,13 @@ export function flagForNationality(nationality?: string | null) {
   const normalized = nationality.toLowerCase();
   return commonCountries.find((country) => [country.name, country.country, country.code].some((value) => value.toLowerCase() === normalized))?.flag || "🌐";
 }
+
+/** A country's name in the reader's language ("ไทย", "สหราชอาณาจักร"), falling back to the English name kept here. */
+export function countryLabel(code: string, fallback: string, locale: string) {
+  try {
+    const names = new Intl.DisplayNames([locale === "en" ? "en-GB" : locale, "en"], { type: "region" });
+    return names.of(code) || fallback;
+  } catch {
+    return fallback;
+  }
+}

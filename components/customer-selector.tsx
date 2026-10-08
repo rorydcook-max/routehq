@@ -2,10 +2,10 @@
 
 import { useMemo, useRef, useState, useTransition } from "react";
 import { shownError } from "@/lib/error-text";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Plus, Search, UserRound, X } from "lucide-react";
 import { createInlineCustomer } from "@/app/actions/customers";
-import { commonCountries, flagForNationality, phoneCodeOptions } from "@/lib/customer-options";
+import { commonCountries, flagForNationality, phoneCodeOptions, countryLabel } from "@/lib/customer-options";
 
 type SelectorCustomer = {
   id: string;
@@ -42,6 +42,7 @@ export function CustomerSelector({
   onSelect?: (customer: SelectorCustomer) => void;
 }) {
   const say = useTranslations("customers") as unknown as (key: string) => string;
+  const locale = useLocale();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [localCustomers, setLocalCustomers] = useState(customers);
@@ -139,7 +140,7 @@ export function CustomerSelector({
                   <select className={inputClass} defaultValue="Thai" name="nationality" required>
                     {commonCountries.map((country) => (
                       <option key={country.code} value={country.name}>
-                        {country.flag} {country.name}
+                        {country.flag} {countryLabel(country.code, country.country, locale)}
                       </option>
                     ))}
                   </select>

@@ -380,7 +380,7 @@ export function TransactionsList({
     const who = kind === "expense" && !transaction.rentalId
       ? [vehicleName, transaction.notes || transaction.supplier].filter(Boolean).join(" · ")
       : [transaction.customerName || transaction.supplier, vehicleName].filter(Boolean).join(" · ");
-    const context = transaction.rentalId ? [transaction.bookingRef, kind === "expense" || transaction.type === "charge_recovered" ? transaction.notes : null].filter(Boolean).join(" · ") : "";
+    const context = transaction.rentalId ? [transaction.bookingRef, kind === "expense" ? transaction.notes : null].filter(Boolean).join(" · ") : "";
     return (
       <li className={`group px-4 py-3.5 transition ${deleting ? "opacity-40" : ""} ${selected ? "bg-[var(--primary-light)]" : "hover:bg-[var(--panel-secondary)]"}`} key={transaction.id}>
         <div className="flex items-center gap-3">

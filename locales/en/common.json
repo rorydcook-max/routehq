@@ -2004,7 +2004,9 @@
     "chg_fine": "fine",
     "chg_other": "other costs",
     "paidChargesLine": "charges paid {amount}",
-    "pc_wontPay": "Won't be paid"
+    "pc_wontPay": "Won't be paid",
+    "tl_autoExtended": "Extended to {date} at the customer's request. {amount} due on {due}.",
+    "tl_autoOpenEnded": "Changed to no end date at the customer's request. {amount} a month from {date}."
   },
   "newBooking": {
     "pageBack": "Back to bookings",

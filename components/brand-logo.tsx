@@ -28,11 +28,7 @@ export function RouteHqLogo({ className, showDescriptor = true, tone = "light", 
           <span className={onDark ? "text-white" : "text-[#1B2430]"}>Route</span>
           <span className="text-[#D9784F]">HQ</span>
         </div>
-        {showDescriptor ? (
-          <div className={clsx("mt-1 text-[8px] font-bold uppercase tracking-[0.36em]", onDark ? "text-white/70" : "text-[#1B2430]/70")}>
-            Rental Operations OS
-          </div>
-        ) : null}
+        {/* No English strapline under the name: the name is enough, in every language. */}
       </div>
     </div>
   );

@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { useLocale } from "next-intl";
 import { createCustomer } from "@/app/actions/customers";
 import { AppShell } from "@/components/app-shell";
 import { PendingButton } from "@/components/pending-button";
 import { Fold } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
-import { commonCountries, customerLanguages, phoneCodeOptions } from "@/lib/customer-options";
+import { commonCountries, countryLabel, customerLanguages, phoneCodeOptions } from "@/lib/customer-options";
 import { getDefaultOrganization } from "@/lib/organization";
 
 // The wording for this page is in locales/<language>/common.json under "customerPage".
@@ -16,11 +17,12 @@ const labelClass = "font-semibold text-[var(--foreground-secondary)]";
 const contactMethods = ["whatsapp", "messenger", "line", "telegram", "sms", "email", "phone"];
 
 function CountryDatalist({ id }: { id: string }) {
+  const locale = useLocale();
   return (
     <datalist id={id}>
       {commonCountries.map((country) => (
         <option key={`${id}-${country.code}`} value={country.name}>
-          {country.flag} {country.country}
+          {country.flag} {countryLabel(country.code, country.country, locale)}
         </option>
       ))}
     </datalist>

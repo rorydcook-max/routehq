@@ -11,7 +11,7 @@ import { PendingButton } from "@/components/pending-button";
 import { Badge, Card, Fold } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { businessToday } from "@/lib/business-time";
-import { commonCountries, customerLanguages, flagForNationality } from "@/lib/customer-options";
+import { commonCountries, customerLanguages, flagForNationality, countryLabel } from "@/lib/customer-options";
 import { getCustomerDetail, getCustomerDocumentCompleteness, type CustomerDetail } from "@/lib/customer-detail";
 import { longDate } from "@/lib/i18n/dates";
 import { getDefaultOrganization } from "@/lib/organization";
@@ -134,6 +134,7 @@ function ActiveRentalCard({ rental, customerId, dueNow }: { rental: any; custome
 
 function DetailsForm({ customer, organizationId }: { customer: any; organizationId: string }) {
   const cx = useCx();
+  const locale = useLocale();
   const day = (value: unknown) => String(value || "").slice(0, 10);
   return (
     <form action={updateCustomer} className="grid gap-3 sm:grid-cols-2">
@@ -142,7 +143,7 @@ function DetailsForm({ customer, organizationId }: { customer: any; organization
       <datalist id="customer-country-options">
         {commonCountries.map((country) => (
           <option key={country.code} value={country.name}>
-            {country.flag} {country.country}
+            {country.flag} {countryLabel(country.code, country.country, locale)}
           </option>
         ))}
       </datalist>

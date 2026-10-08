@@ -1655,6 +1655,16 @@ function timelineText(entry: any, tx: Tx): string {
   const content = String(entry.content || "");
   const type = String(entry.timeline_type || entry.type || "");
   if (type !== "booking_link_activity" && type !== "system_event" && type !== "customer_portal_action") return content;
+  // An extension the app applied by itself is stored as an English sentence; its figures are kept beside it.
+  const meta = entry.metadata || {};
+  if (meta.adjustment_type === "extension" && meta.source === "customer_request_auto") {
+    if (meta.open_ended) return tx.say("tl_autoOpenEnded", { amount: money(meta.monthly_rate), date: longDate(String(meta.first_due || "").slice(0, 10), tx.locale) });
+    return tx.say("tl_autoExtended", {
+      date: longDate(String(meta.new_end_date || "").slice(0, 10), tx.locale),
+      amount: money(meta.extension_payment_amount),
+      due: longDate(String(meta.previous_end_date || "").slice(0, 10), tx.locale)
+    });
+  }
   if (/^Customer opened booking link/i.test(content)) return tx.say("tl_opened");
   if (/^Customer signed the rental agreement/i.test(content)) return tx.say("tl_signed");
   if (/^Customer signed an amendment/i.test(content)) return tx.say("tl_signedChange");

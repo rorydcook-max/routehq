@@ -2013,7 +2013,9 @@
     "chg_fine": "ค่าปรับ",
     "chg_other": "ค่าใช้จ่ายอื่น",
     "paidChargesLine": "จ่ายค่าใช้จ่ายที่เรียกเก็บแล้ว {amount}",
-    "pc_wontPay": "ลูกค้าไม่จ่าย"
+    "pc_wontPay": "ลูกค้าไม่จ่าย",
+    "tl_autoExtended": "ต่อเวลาเช่าถึง {date} ตามที่ลูกค้าขอ ค่าเช่า {amount} ครบกำหนด {due}",
+    "tl_autoOpenEnded": "เปลี่ยนเป็นไม่กำหนดวันคืนตามที่ลูกค้าขอ เดือนละ {amount} เริ่ม {date}"
   },
   "newBooking": {
     "pageBack": "กลับไปที่การจอง",

@@ -560,7 +560,8 @@
     "payKind_deposit": "စပေါ်ငွေ",
     "payKind_deposit_top_up": "စပေါ်ငွေ ထပ်ဖြည့်",
     "payKind_extension": "အပိုရက်များ",
-    "agreeAll": "အထက်ပါအားလုံးကို သဘောတူပါသည်"
+    "agreeAll": "အထက်ပါအားလုံးကို သဘောတူပါသည်",
+    "extrasLine": "အပိုဝန်ဆောင်မှု: {names} · {amount}"
   },
   "customerMessages": {
     "hi": "မင်္ဂလာပါ {name}၊",

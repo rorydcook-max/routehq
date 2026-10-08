@@ -560,7 +560,8 @@
     "payKind_deposit": "Залог",
     "payKind_deposit_top_up": "Доплата залога",
     "payKind_extension": "Дополнительные дни",
-    "agreeAll": "Я согласен(на) со всем вышеперечисленным"
+    "agreeAll": "Я согласен(на) со всем вышеперечисленным",
+    "extrasLine": "Доп. услуги: {names} · {amount}"
   },
   "customerMessages": {
     "hi": "Здравствуйте, {name}!",

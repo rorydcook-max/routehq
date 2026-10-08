@@ -47,7 +47,7 @@ function bestMatchTransaction(transactions: any[], usedIds: Set<string>, dueDate
 export async function activateRental(rentalId: string, supabase: SupabaseClient): Promise<void> {
   const { data: rental, error } = await (supabase as any)
     .from("rentals")
-    .select("id, organization_id, customer_id, vehicle_id, start_date, end_date, rental_rate, pricing_model, billing_interval, currency, status")
+    .select("id, organization_id, customer_id, vehicle_id, start_date, end_date, rental_rate, pricing_model, billing_interval, currency, status, extras, extras_total")
     .eq("id", rentalId)
     .is("deleted_at", null)
     .maybeSingle();
@@ -83,6 +83,8 @@ export async function activateRental(rentalId: string, supabase: SupabaseClient)
   if (!hasScheduledFuture) {
     newPayments = await generatePaymentScheduleInternal(rental, existingRentPayments, supabase);
   }
+  const extrasPayment = await addExtrasPayment(rental, existingRentPayments, newPayments.length > 0 || existingRentPayments.length > 0, supabase);
+  if (extrasPayment) newPayments.push(extrasPayment);
 
   // Try to match existing unmatched payments to income transactions
   await matchPaymentsToTransactions(rental, existingRentPayments, supabase);
@@ -121,7 +123,7 @@ async function generatePaymentScheduleInternal(
   const today = businessToday();
 
   // Build set of dates already covered by existing payments (within 5 days)
-  const existingDates = existingPayments.map((p: any) => dateOnly(p.due_date)).filter(Boolean);
+  const existingDates = existingPayments.filter((p: any) => p.metadata?.type !== "extras").map((p: any) => dateOnly(p.due_date)).filter(Boolean);
   const isDateCovered = (dueDateStr: string) =>
     existingDates.some((d: string) => Math.abs(daysBetween(dueDateStr, d)) <= 5);
 
@@ -205,6 +207,37 @@ async function generatePaymentScheduleInternal(
   }
 
   return inserted || [];
+}
+
+/** Paid extras picked on the booking: one payment, due on the first day, added once. */
+async function addExtrasPayment(rental: any, existingPayments: any[], hasRent: boolean, supabase: SupabaseClient): Promise<any | null> {
+  const total = Number(rental.extras_total || 0);
+  if (!(total > 0) || !hasRent || !rental.customer_id || !rental.vehicle_id) return null;
+  if (existingPayments.some((p: any) => p.metadata?.type === "extras")) return null;
+  const due = dateOnly(rental.start_date) || businessToday();
+  const today = businessToday();
+  const names = (Array.isArray(rental.extras) ? rental.extras : []).map((line: any) => String(line?.name || "")).filter(Boolean);
+  const { data, error } = await (supabase as any)
+    .from("rental_payments")
+    .insert({
+      organization_id: rental.organization_id,
+      rental_id: rental.id,
+      customer_id: rental.customer_id,
+      vehicle_id: rental.vehicle_id,
+      amount: total,
+      currency: rental.currency || "THB",
+      scheduled_date: due,
+      due_date: due,
+      status: due < today ? "overdue" : due === today ? "pending" : "scheduled",
+      metadata: { type: "extras", is_deposit: false, description: names.length ? `Extras: ${names.join(", ")}` : "Extras", extras: names, auto_generated: true }
+    })
+    .select("id, due_date, status, vehicle_id")
+    .maybeSingle();
+  if (error) {
+    console.error("activateRental: failed to add extras payment:", error.message);
+    return null;
+  }
+  return data;
 }
 
 async function matchPaymentsToTransactions(

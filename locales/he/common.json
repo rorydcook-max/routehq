@@ -560,7 +560,8 @@
     "payKind_deposit": "פיקדון",
     "payKind_deposit_top_up": "השלמת פיקדון",
     "payKind_extension": "ימים נוספים",
-    "agreeAll": "אני מסכים/ה לכל האמור לעיל"
+    "agreeAll": "אני מסכים/ה לכל האמור לעיל",
+    "extrasLine": "תוספות: {names} · {amount}"
   },
   "customerMessages": {
     "hi": "שלום {name},",

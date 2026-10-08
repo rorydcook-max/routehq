@@ -560,7 +560,8 @@
     "payKind_deposit": "Kaution",
     "payKind_deposit_top_up": "Kautionsaufstockung",
     "payKind_extension": "Zusätzliche Tage",
-    "agreeAll": "Ich stimme allen oben genannten Punkten zu"
+    "agreeAll": "Ich stimme allen oben genannten Punkten zu",
+    "extrasLine": "Extras: {names} · {amount}"
   },
   "customerMessages": {
     "hi": "Hallo {name},",

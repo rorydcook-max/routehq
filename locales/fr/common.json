@@ -560,7 +560,8 @@
     "payKind_deposit": "Caution",
     "payKind_deposit_top_up": "Complément de caution",
     "payKind_extension": "Jours supplémentaires",
-    "agreeAll": "J'accepte tout ce qui précède"
+    "agreeAll": "J'accepte tout ce qui précède",
+    "extrasLine": "Options: {names} · {amount}"
   },
   "customerMessages": {
     "hi": "Bonjour {name},",

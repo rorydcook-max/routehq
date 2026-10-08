@@ -560,7 +560,8 @@
     "payKind_deposit": "Tiền cọc",
     "payKind_deposit_top_up": "Cọc bổ sung",
     "payKind_extension": "Ngày thuê thêm",
-    "agreeAll": "Tôi đồng ý với tất cả các điều trên"
+    "agreeAll": "Tôi đồng ý với tất cả các điều trên",
+    "extrasLine": "Dịch vụ thêm: {names} · {amount}"
   },
   "customerMessages": {
     "hi": "Chào {name},",

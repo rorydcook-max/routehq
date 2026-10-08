@@ -776,7 +776,7 @@ export async function assignCustomerToBooking(formData: FormData) {
   const [{ data: rental, error: rentalError }, { data: customer, error: customerError }] = await Promise.all([
     supabase
       .from("rentals")
-      .select("id, vehicle_id, contract_id, display_code, reference")
+      .select("id, vehicle_id, contract_id, display_code, reference, status")
       .eq("id", rentalId)
       .eq("organization_id", organizationId)
       .is("deleted_at", null)
@@ -813,6 +813,9 @@ export async function assignCustomerToBooking(formData: FormData) {
   const updateError = results.find((r: any) => r.error)?.error;
   if (updateError) {
     throw new Error(updateError.message);
+  }
+  if (rental.status === "active") {
+    await activateRental(rentalId, supabase).catch(() => null);
   }
 
   await recordActivityEvent(supabase, {

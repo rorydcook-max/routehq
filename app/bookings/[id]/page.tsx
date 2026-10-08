@@ -598,6 +598,11 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   {financialState.amount !== null ? money(financialState.amount, rental.currency) : tx.say(`ratePer_${["daily", "weekly", "monthly"].includes(String(rental.pricing_model)) ? rental.pricing_model : "other"}`, { amount: money(rental.rental_rate, rental.currency) })}
                 </p>
                 <p className="font-medium text-[var(--foreground-secondary)]">{financialState.amount !== null ? tx.say(`ratePer_${["daily", "weekly", "monthly"].includes(String(rental.pricing_model)) ? rental.pricing_model : "other"}`, { amount: money(rental.rental_rate, rental.currency) }) : financialState.detail}</p>
+                {Number(rental.extras_total || 0) > 0 ? (
+                  <p className="mt-1 text-sm font-semibold text-[var(--foreground-secondary)]">
+                    {tx.say("extrasPlus", { amount: money(rental.extras_total, rental.currency), names: (Array.isArray(rental.extras) ? rental.extras : []).map((line: any) => String(line?.name || "")).filter(Boolean).join(", ") || "-" })}
+                  </p>
+                ) : null}
                 {pendingPaymentAmount > 0 && customer ? (
                   <div className="mt-2">
                     <PaymentReminderButton rentalId={rental.id} />

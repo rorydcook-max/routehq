@@ -27,6 +27,14 @@ import { CustomerLanguagePicker } from "@/components/customer-language-picker";
 /** The page's words in the customer's language. Passed to the helpers below so they stay plain functions. */
 type T = Awaited<ReturnType<typeof getTranslations>>;
 
+/** Paid extras the customer picked (child seat, delivery...), on their own line under the rent. */
+function extrasText(rental: any, t: T) {
+  const total = Number(rental?.extras_total || 0);
+  if (!(total > 0)) return "";
+  const names = (Array.isArray(rental?.extras) ? rental.extras : []).map((line: any) => String(line?.name || "")).filter(Boolean);
+  return "\n" + t("extrasLine", { names: names.join(", ") || "-", amount: money(total, rental?.currency || "THB") });
+}
+
 /** An amendment waiting for this customer's signature, if any. */
 async function pendingAmendmentFor(rentalId: string) {
   const admin = createSupabaseAdminClient() as any;
@@ -357,7 +365,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             {/* One fact per line on a phone: two columns broke prices and place names across four lines. */}
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <Info icon={CalendarDays} label={t("rentalPeriod")} value={rental.is_indefinite && detail.state !== "completed" ? t("openEndedFrom", { date: formatSummaryDate(rental.start_date, t, locale) }) : t("dateRange", { start: formatSummaryDate(rental.start_date, t, locale), end: formatSummaryDate(rental.end_date, t, locale) })} />
-              <Info icon={CreditCard} label={t("rateAndDeposit")} value={`${rateLabel(rental, t)}\n${Number(rental.deposit_amount || 0) > 0 ? t("depositAmount", { amount: money(rental.deposit_amount, rental.currency || "THB") }) : t("noDeposit")}`} />
+              <Info icon={CreditCard} label={t("rateAndDeposit")} value={`${rateLabel(rental, t)}${extrasText(rental, t)}\n${Number(rental.deposit_amount || 0) > 0 ? t("depositAmount", { amount: money(rental.deposit_amount, rental.currency || "THB") }) : t("noDeposit")}`} />
               {/* Once the customer has the vehicle, where and when it was to be handed over is old news. */}
               {handedOver ? null : <Info icon={ReceiptText} label={t("firstPaymentDue")} value={paymentDueText(rental, bookingData, t, locale)} />}
               {handedOver ? null : <Info icon={MapPin} label={t("handover")} value={delivery.location} />}

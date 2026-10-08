@@ -560,7 +560,8 @@
     "payKind_deposit": "Deposit",
     "payKind_deposit_top_up": "Tambahan deposit",
     "payKind_extension": "Hari tambahan",
-    "agreeAll": "Saya bersetuju dengan semua perkara di atas"
+    "agreeAll": "Saya bersetuju dengan semua perkara di atas",
+    "extrasLine": "Tambahan: {names} · {amount}"
   },
   "customerMessages": {
     "hi": "Hai {name},",

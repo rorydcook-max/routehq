@@ -560,7 +560,8 @@
     "payKind_deposit": "押金",
     "payKind_deposit_top_up": "补交押金",
     "payKind_extension": "延长天数",
-    "agreeAll": "我同意以上所有内容"
+    "agreeAll": "我同意以上所有内容",
+    "extrasLine": "附加服务: {names} · {amount}"
   },
   "customerMessages": {
     "hi": "{name}，您好！",

@@ -113,6 +113,11 @@ function periodText(period: string, tx: Tx) {
 function payText(item: TaskListItem, form: "collect" | "pay", tx: Tx) {
   const pay = item.pay;
   if (!pay) return (form === "pay" ? item.paymentLabel : null) || item.title;
+  if (pay.kind === "charge") {
+    // "#fuel,#damage" are the return form's reasons, named here; anything else is the owner's own words.
+    const what = (pay.period || "").startsWith("#") ? pay.period!.split(",").map((reason) => tx.say(`chgr_${reason.slice(1)}`)).join(", ") : pay.period;
+    return what ? `${tx.say(`${form}_charge`)} · ${what}` : tx.say(`${form}_charge`);
+  }
   if (pay.kind !== "rent") return tx.say(`${form}_${pay.kind}`);
   return pay.period ? tx.say(`${form}_rent_period`, { period: periodText(pay.period, tx) }) : tx.say(`${form}_rent`);
 }

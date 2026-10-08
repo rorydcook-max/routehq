@@ -1000,7 +1000,16 @@
     "refundTitle": "คืนเงิน {amount}?",
     "refundEarlyShort": "คืนรถก่อนกำหนด {days} วัน",
     "refundCancelledShort": "{name} ยกเลิก",
-    "daysLate": "เลยกำหนด {count} วัน"
+    "daysLate": "เลยกำหนด {count} วัน",
+    "payTitle_charge": "เรียกเก็บ {amount}",
+    "collect_charge": "เก็บเงินค่าใช้จ่ายที่เรียกเก็บ",
+    "pay_charge": "ค่าใช้จ่ายที่เรียกเก็บ",
+    "chgr_fuel": "ค่าน้ำมัน",
+    "chgr_damage": "ค่าเสียหาย",
+    "chgr_cleaning": "ค่าทำความสะอาด",
+    "chgr_repair": "ค่าซ่อม",
+    "chgr_fine": "ค่าปรับ",
+    "chgr_other": "ค่าใช้จ่ายอื่น"
   },
   "bookings": {
     "eyebrow": "การจอง",
@@ -1241,7 +1250,8 @@
     "billHint": "ค่าเสียหาย ค่าปรับ หรือค่าน้ำมันที่ผู้เช่าต้องรับผิดชอบ",
     "billAmount": "จำนวนที่เรียกเก็บ",
     "billWhatHappens": "ค่าใช้จ่ายนี้ยังเป็นเงินออก ระบบจะแจ้งลูกค้า และลูกค้าจ่ายได้จากหน้าการจอง เมื่อจ่ายแล้วจะเป็นเงินเข้า ถ้าลูกค้าไม่จ่าย ยกเว้นได้ที่หน้าการจอง",
-    "match_charge": "{amount} · ค่าใช้จ่ายที่เรียกเก็บ · {vehicle}"
+    "match_charge": "{amount} · ค่าใช้จ่ายที่เรียกเก็บ · {vehicle}",
+    "billBooking": "การจองที่จะเรียกเก็บ"
   },
   "booking": {
     "open": "ไม่กำหนด",

@@ -991,7 +991,16 @@
     "refundTitle": "{amount} refund?",
     "refundEarlyShort": "Back {days, plural, one {# day} other {# days}} early",
     "refundCancelledShort": "{name} cancelled",
-    "daysLate": "{count, plural, one {# day late} other {# days late}}"
+    "daysLate": "{count, plural, one {# day late} other {# days late}}",
+    "payTitle_charge": "{amount} charge",
+    "collect_charge": "Collect charge",
+    "pay_charge": "Charge",
+    "chgr_fuel": "fuel",
+    "chgr_damage": "damage",
+    "chgr_cleaning": "cleaning",
+    "chgr_repair": "repair",
+    "chgr_fine": "fine",
+    "chgr_other": "other costs"
   },
   "bookings": {
     "eyebrow": "Bookings",
@@ -1232,7 +1241,8 @@
     "billHint": "Damage, a fine or fuel that the renter is responsible for.",
     "billAmount": "Amount to bill",
     "billWhatHappens": "The cost stays as money out. The customer is told and can pay from their booking page; when they pay it is money in. If they never pay, waive it on the booking.",
-    "match_charge": "{amount} · charge · {vehicle}"
+    "match_charge": "{amount} · charge · {vehicle}",
+    "billBooking": "Booking to bill"
   },
   "booking": {
     "open": "Open",

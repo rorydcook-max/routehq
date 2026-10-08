@@ -78,6 +78,9 @@ export function TransactionForm({
   const [formOpen, setFormOpen] = useState(startsLinked || waitingHere.length === 0);
   const [isMatching, startMatchTransition] = useTransition();
 
+  // A booking is told apart by its dates as much as by its number.
+  const bookingOption = (rental: TransactionFormOptions["rentals"][number]) =>
+    rental.startDate ? `${rental.label} · ${shortDate(rental.startDate, locale)}–${rental.endDate ? shortDate(rental.endDate, locale) : "…"}` : rental.label;
   const rentalsForVehicle = useMemo(
     () => options.rentals.filter((rental) => rental.vehicleId === vehicleId),
     [options.rentals, vehicleId]
@@ -286,7 +289,7 @@ export function TransactionForm({
               <option value="">{say("noBooking")}</option>
               {rentalsForVehicle.map((rental) => (
                 <option key={rental.id} value={rental.id}>
-                  {rental.label}
+                  {bookingOption(rental)}
                 </option>
               ))}
             </select>
@@ -356,11 +359,11 @@ export function TransactionForm({
               {billCustomer ? (
                 <div className="mt-3 grid gap-3 sm:grid-cols-2">
                   <label className="block">
-                    <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("booking")}</span>
+                    <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("billBooking")}</span>
                     <select className={inputClass} name="billRentalId" onChange={(event) => setBillRentalId(event.target.value)} required value={billRentalId}>
                       {rentalsForVehicle.map((rental) => (
                         <option key={rental.id} value={rental.id}>
-                          {rental.label}
+                          {bookingOption(rental)}
                         </option>
                       ))}
                     </select>

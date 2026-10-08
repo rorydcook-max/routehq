@@ -228,6 +228,23 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
             </>
           )}
           {isOwner ? (
+            <Fold summary={vehicle.metadata?.partner?.name ? say("partnerSummary", { name: String(vehicle.metadata.partner.name), pct: Number(vehicle.metadata.partner.pct || 0) }) : say("partnerNone")} title={say("partnerTitle")}>
+              <p className="mb-3 font-medium text-[var(--muted)]">{say("partnerHint")}</p>
+              <div className="grid gap-4 sm:grid-cols-2">
+                {textField("partnerName", "partnerName", vehicle.metadata?.partner?.name)}
+                {textField("partnerPhone", "partnerPhone", vehicle.metadata?.partner?.phone)}
+                {textField("partnerPct", "partnerPct", vehicle.metadata?.partner?.pct, { type: "number" })}
+                <label className="block">
+                  <span className={labelClass}>{say("partnerBasis")}</span>
+                  <select className={inputClass} defaultValue={vehicle.metadata?.partner?.basis === "profit" ? "profit" : "income"} name="partnerBasis">
+                    <option value="income">{say("partnerBasisIncome")}</option>
+                    <option value="profit">{say("partnerBasisProfit")}</option>
+                  </select>
+                </label>
+              </div>
+            </Fold>
+          ) : null}
+          {isOwner ? (
           <Fold summary={say("loanSummary")} title={say("loanTitle")}>
             <div className="grid gap-4 sm:grid-cols-2">
               {textField("lender", "financeLender", finance.lender)}

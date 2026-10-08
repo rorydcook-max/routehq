@@ -71,6 +71,15 @@ export function customerMessagesOn(settings: any) {
   return settings?.customer_messages?.enabled !== false;
 }
 
+/** The automatic daily reminders, each of which a business can turn off in Settings. */
+export const REMINDER_KINDS = ["handover", "return", "rent_due", "rent_late", "vehicle_due", "signature"] as const;
+export type ReminderKind = (typeof REMINDER_KINDS)[number];
+
+export function remindersOff(settings: any): ReminderKind[] {
+  const off = settings?.customer_messages?.off;
+  return Array.isArray(off) ? (off.filter((kind: unknown) => (REMINDER_KINDS as readonly string[]).includes(String(kind))) as ReminderKind[]) : [];
+}
+
 async function bookingPageUrl(admin: any, rentalId: string | null | undefined) {
   if (!rentalId) return null;
   const { data } = await admin.from("booking_links").select("token, public_url").eq("rental_id", rentalId).is("deleted_at", null).order("created_at", { ascending: false }).limit(1).maybeSingle();

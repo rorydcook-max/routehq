@@ -16,6 +16,7 @@ import { isDoubleBookingError } from "@/lib/rental-conflicts";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
+import { remindersOff } from "@/lib/customer-messages";
 
 type Result<T = {}> = ({ ok: true } & T) | { ok: false; error: string };
 
@@ -229,7 +230,23 @@ export async function saveCustomerMessages(enabled: boolean): Promise<Result> {
   const { data: organization } = await admin.from("organizations").select("settings").eq("id", membership.organizationId).maybeSingle();
   if (!organization) return { ok: false, error: await said("Business not found.") };
   const settings = organization.settings && typeof organization.settings === "object" ? organization.settings : {};
-  const { error } = await admin.from("organizations").update({ settings: { ...settings, customer_messages: { enabled: !!enabled } } }).eq("id", membership.organizationId);
+  const { error } = await admin.from("organizations").update({ settings: { ...settings, customer_messages: { ...(settings.customer_messages || {}), enabled: !!enabled } } }).eq("id", membership.organizationId);
+  if (error) return { ok: false, error: await said("Couldn't save. Please try again.") };
+  revalidatePath("/settings");
+  return { ok: true };
+}
+
+/** Turns single automatic reminders on or off (owner only). */
+export async function saveReminderKinds(off: string[]): Promise<Result> {
+  const membership = await getCurrentMembership();
+  if (!membership) return { ok: false, error: await said("Please sign in again.") };
+  if (membership.role !== "owner") return { ok: false, error: await said(OWNER_ONLY_MESSAGE) };
+  const admin = createSupabaseAdminClient() as any;
+  const { data: organization } = await admin.from("organizations").select("settings").eq("id", membership.organizationId).maybeSingle();
+  if (!organization) return { ok: false, error: await said("Business not found.") };
+  const settings = organization.settings && typeof organization.settings === "object" ? organization.settings : {};
+  const clean = remindersOff({ customer_messages: { off } });
+  const { error } = await admin.from("organizations").update({ settings: { ...settings, customer_messages: { ...(settings.customer_messages || {}), off: clean } } }).eq("id", membership.organizationId);
   if (error) return { ok: false, error: await said("Couldn't save. Please try again.") };
   revalidatePath("/settings");
   return { ok: true };

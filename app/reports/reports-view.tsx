@@ -423,6 +423,13 @@ export function ReportsView({ data }: { data: ReportsData }) {
         </span>
         <span aria-hidden className="text-xl text-[var(--muted)]">›</span>
       </Link>
+      <Link className="card pressable flex items-center justify-between gap-3 p-4" href={"/reports/owners" as any}>
+        <span>
+          <span className="block font-bold text-[var(--foreground)]">{say("ownersLink")}</span>
+          <span className={soft}>{say("ownersLinkHint")}</span>
+        </span>
+        <span aria-hidden className="text-xl text-[var(--muted)]">›</span>
+      </Link>
 
       {/* Who owes money */}
       <section className="card p-4">

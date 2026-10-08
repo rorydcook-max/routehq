@@ -2916,7 +2916,17 @@
     "cond_poor": "Poor condition",
     "condition": "Condition",
     "conditionHint": "Places its value among used adverts for the same model and year. New damage found at a return moves it down by itself.",
-    "conditionByDamage": "Moved down after damage was recorded on {date}. Set it back once repaired."
+    "conditionByDamage": "Moved down after damage was recorded on {date}. Set it back once repaired.",
+    "partnerTitle": "Owned by someone else",
+    "partnerNone": "No: the business owns it",
+    "partnerSummary": "{name} · {pct}% share",
+    "partnerHint": "For a vehicle you run for its owner. Each month, Reports shows what it brought in, what it cost, and their share.",
+    "partnerName": "Owner's name",
+    "partnerPhone": "Owner's phone",
+    "partnerPct": "Their share (%)",
+    "partnerBasis": "Share of",
+    "partnerBasisIncome": "Money in (you pay the costs)",
+    "partnerBasisProfit": "Profit after the vehicle's costs"
   },
   "bookingEdit": {
     "crumbBookings": "Bookings",
@@ -3485,7 +3495,15 @@
     "extra_forAll": "Every vehicle",
     "extra_forCars": "Cars and vans",
     "extra_forBikes": "Scooters and motorbikes",
-    "extra_add": "Add an extra"
+    "extra_add": "Add an extra",
+    "rem_title": "Automatic reminders",
+    "rem_body": "Sent once each, on the customer's chat (LINE, or WhatsApp when connected). When a customer has no chat yet, the message waits on the booking for you to send with one tap.",
+    "rem_handover": "Handover tomorrow",
+    "rem_return": "Return in 3 days, and tomorrow",
+    "rem_rent_due": "Rent due tomorrow",
+    "rem_rent_late": "Rent 3 days late",
+    "rem_vehicle_due": "Service or paperwork due on the vehicle they have",
+    "rem_signature": "A change still waiting for their signature"
   },
   "accountPage": {
     "roleOwner": "Owner",
@@ -3658,7 +3676,9 @@
     "monthOut": "{amount} out",
     "earnedBackShort": "Earned back",
     "fleetValueLink": "Fleet value",
-    "fleetValueLinkHint": "What your vehicles are worth now, against what you paid"
+    "fleetValueLinkHint": "What your vehicles are worth now, against what you paid",
+    "ownersLink": "Owners' statements",
+    "ownersLinkHint": "For vehicles you run for someone else: their share each month"
   },
   "auth": {
     "signInTitle": "Sign in",
@@ -4010,5 +4030,23 @@
     "conditionIs": "{condition}.",
     "conditionNotSet": "Condition not set: valued as good condition.",
     "conditionByDamage": "Moved down after damage on {date}."
+  },
+  "ownerStatements": {
+    "back": "Back to reports",
+    "title": "Owners' statements",
+    "subtitle": "For vehicles you run for someone else: what each brought in this month, what it cost, and the owner's share. Print or save as PDF to send.",
+    "previous": "Previous month",
+    "next": "Next month",
+    "noneTitle": "No vehicles owned by someone else",
+    "noneBody": "On a vehicle's Edit page, fill in \"Owned by someone else\" with the owner's name and share.",
+    "print": "Print or save as PDF",
+    "statementFor": "Statement for {name}",
+    "theirShare": "Your share this month",
+    "moneyIn": "Money in",
+    "costs": "Costs",
+    "profit": "Profit",
+    "shareOfIncome": "{pct}% of money in",
+    "shareOfProfit": "{pct}% of profit",
+    "nothingThisMonth": "Nothing in or out this month."
   }
 }

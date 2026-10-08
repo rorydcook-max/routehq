@@ -473,6 +473,19 @@ export async function updateVehicle(formData: FormData) {
       metadata: {
         ...kept,
         ...conditionPatch,
+        // Owned by someone else: their name and share (owner only; empty name clears it).
+        ...(ownerFields
+          ? {
+              partner: optionalStringFromForm(formData, "partnerName")
+                ? {
+                    name: optionalStringFromForm(formData, "partnerName"),
+                    phone: optionalStringFromForm(formData, "partnerPhone"),
+                    pct: Math.max(0, Math.min(100, optionalNumberFromForm(formData, "partnerPct") || 0)),
+                    basis: String(formData.get("partnerBasis")) === "profit" ? "profit" : "income"
+                  }
+                : null
+            }
+          : {}),
         acquisition: ownerFields ? merged("acquisition", acquisition) : kept.acquisition || {},
         compliance: merged("compliance", compliance),
         finance: ownerFields ? merged("finance", finance) : kept.finance || {}

@@ -1,5 +1,5 @@
 import { businessToday } from "@/lib/business-time";
-import { remindRentalCustomerOnce } from "@/lib/customer-messages";
+import { remindersOff, remindRentalCustomerOnce, type ReminderKind } from "@/lib/customer-messages";
 import { complianceItems } from "@/lib/fleet-metrics";
 import { niceDate } from "@/lib/nice-date";
 
@@ -24,15 +24,20 @@ export async function sendDailyCustomerReminders(admin: any): Promise<Record<str
   const inThreeDays = businessToday(3);
   const threeDaysAgo = businessToday(-3);
   const sent = { handover: 0, returnSoon: 0, rentDue: 0, rentOverdue: 0, vehicleDue: 0, signature: 0 };
+  // Reminders each business has turned off in Settings.
+  const { data: organizations } = await admin.from("organizations").select("id, settings");
+  const offBy = new Map<string, ReminderKind[]>((organizations || []).map((organization: any) => [String(organization.id), remindersOff(organization.settings)]));
+  const allowed = (organizationId: unknown, kind: ReminderKind) => !(offBy.get(String(organizationId)) || []).includes(kind);
 
   // ── Handover tomorrow ────────────────────────────────────────────────────
   const { data: starting } = await admin
     .from("rentals")
-    .select("id, start_date, delivery_datetime, delivery_location")
+    .select("id, organization_id, start_date, delivery_datetime, delivery_location")
     .is("deleted_at", null)
     .eq("status", "booked")
     .eq("start_date", tomorrow);
   for (const rental of starting || []) {
+    if (!allowed(rental.organization_id, "handover")) continue;
     const ok = await remindRentalCustomerOnce(admin, rental.id, `handover:${tomorrow}`, ({ say, t, vehicle, date }) =>
       `${say("handoverTomorrow", { vehicle, date: date(tomorrow) })}${rental.delivery_location ? ` ${t("handoverPlace", { place: rental.delivery_location })}` : ""} ${t("finishDetails")}`
     );
@@ -42,11 +47,12 @@ export async function sendDailyCustomerReminders(admin: any): Promise<Record<str
   // ── Return coming up ─────────────────────────────────────────────────────
   const { data: ending } = await admin
     .from("rentals")
-    .select("id, end_date")
+    .select("id, organization_id, end_date")
     .is("deleted_at", null)
     .in("status", ON_RENT)
     .in("end_date", [tomorrow, inThreeDays]);
   for (const rental of ending || []) {
+    if (!allowed(rental.organization_id, "return")) continue;
     const end = String(rental.end_date).slice(0, 10);
     const ok = await remindRentalCustomerOnce(admin, rental.id, `return:${end}:${end === tomorrow ? "1" : "3"}`, ({ say, t, label, vehicle, date }) =>
       `${say(end === tomorrow ? "dueBackTomorrow" : "dueBackThreeDays", { vehicle, date: date(end) })} ${t("keepLonger", { button: label("confirmReturn") })}`
@@ -57,7 +63,7 @@ export async function sendDailyCustomerReminders(admin: any): Promise<Record<str
   // ── Rent due tomorrow, and rent three days late ──────────────────────────
   const { data: payments } = await admin
     .from("rental_payments")
-    .select("id, rental_id, amount, due_date, voided, metadata, rentals!inner(status)")
+    .select("id, rental_id, organization_id, amount, due_date, voided, metadata, rentals!inner(status)")
     .is("deleted_at", null)
     .in("status", ["scheduled", "pending", "overdue"])
     .in("due_date", [tomorrow, threeDaysAgo])
@@ -68,6 +74,7 @@ export async function sendDailyCustomerReminders(admin: any): Promise<Record<str
     if (payment.metadata?.receipt?.path) continue;
     const due = String(payment.due_date).slice(0, 10);
     const late = due === threeDaysAgo;
+    if (!allowed(payment.organization_id, late ? "rent_late" : "rent_due")) continue;
     const ok = await remindRentalCustomerOnce(admin, payment.rental_id, `${late ? "rent-late" : "rent-due"}:${payment.id}`, ({ say, vehicle, money, date }) =>
       say(late ? "rentLate" : "rentDueTomorrow", { amount: money(Number(payment.amount || 0)), vehicle, date: date(due) })
     );
@@ -77,10 +84,11 @@ export async function sendDailyCustomerReminders(admin: any): Promise<Record<str
   // ── The vehicle they have needs a service or a renewal this week ─────────
   const { data: out } = await admin
     .from("rentals")
-    .select("id, vehicles!rentals_vehicle_id_fkey(metadata)")
+    .select("id, organization_id, vehicles!rentals_vehicle_id_fkey(metadata)")
     .is("deleted_at", null)
     .in("status", ON_RENT);
   for (const rental of out || []) {
+    if (!allowed(rental.organization_id, "vehicle_due")) continue;
     for (const item of complianceItems(rental.vehicles?.metadata, today)) {
       if (item.daysLeft < 0 || item.daysLeft > 7) continue;
       const service = item.key === "next_service_date";
@@ -99,11 +107,12 @@ export async function sendDailyCustomerReminders(admin: any): Promise<Record<str
   // The day after it was sent, then every three days, until it is signed or cancelled.
   const { data: unsigned } = await admin
     .from("rental_amendments")
-    .select("id, rental_id, token, changes, created_at, expires_at")
+    .select("id, rental_id, organization_id, token, changes, created_at, expires_at")
     .eq("status", "awaiting_signature");
   const base = String(process.env.NEXT_PUBLIC_APP_URL || "").replace(/\/$/, "");
   for (const amendment of unsigned || []) {
     if (amendment.expires_at && new Date(amendment.expires_at).getTime() < Date.now()) continue;
+    if (!allowed(amendment.organization_id, "signature")) continue;
     const days = Math.floor((Date.now() - new Date(amendment.created_at).getTime()) / 86_400_000);
     if (days < 1 || (days - 1) % 3 !== 0) continue;
     const link = `${base}/amend/${amendment.token}`;

@@ -30,7 +30,7 @@ import { TeamMemberActions } from "@/app/settings/team-member-actions";
 import { createSupabaseAdminClient as teamAdminClient } from "@/lib/supabase/admin";
 import { BookingRulesPanel } from "@/app/settings/booking-rules-panel";
 import { CustomerMessagesPanel } from "@/app/settings/customer-messages-panel";
-import { customerMessagesOn } from "@/lib/customer-messages";
+import { customerMessagesOn, remindersOff } from "@/lib/customer-messages";
 import { bookingRules } from "@/lib/booking-rules";
 import { publicBookingSettings } from "@/lib/public-catalog";
 import { TravelPolicyForm } from "@/app/settings/travel-policy-form";
@@ -369,6 +369,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             <div className="mt-3">
               <CustomerMessagesPanel
                 enabled={customerMessagesOn(organization.settings)}
+                off={remindersOff(organization.settings)}
                 hasChannel={((messagingChannels || []) as any[]).some((channel) => channel.status !== "disconnected")}
               />
             </div>

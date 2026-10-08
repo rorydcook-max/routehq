@@ -29,11 +29,13 @@ export default async function FleetValuePage() {
       name: [vehicle.year, vehicle.make, vehicle.model, vehicle.trim].filter(Boolean).join(" "),
       plate: vehicle.registration_number || "",
       hasYear: Boolean(vehicle.year),
+      condition: vehicle.metadata?.condition?.value || null,
+      conditionByDamage: vehicle.metadata?.condition?.by === "damage" ? String(vehicle.metadata.condition.damage_on || "") : null,
       mileage: vehicle.mileage == null ? null : Number(vehicle.mileage),
       paid: vehicle.purchase_price == null ? null : Number(vehicle.purchase_price),
       boughtOn: vehicle.purchase_date || null,
       value: own && own > 0 ? own : null,
-      ownFigure: Boolean(own && own > 0 && (!valuation?.typical || Number(valuation.typical) !== own)),
+      ownFigure: Boolean(own && own > 0 && (!valuation?.typical || Number(valuation.value || valuation.typical) !== own)),
       sumInsured: Number(vehicle.metadata?.compliance?.insurance_sum_insured || 0) || null,
       valuation
     };

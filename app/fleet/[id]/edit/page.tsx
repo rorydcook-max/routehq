@@ -13,6 +13,8 @@ import { ensureDefaultBranch } from "@/lib/branches";
 import { defaultCalendarForLocale } from "@/lib/i18n/calendars";
 import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { CONDITIONS } from "@/lib/vehicle-condition";
+import { longDate } from "@/lib/i18n/dates";
 
 // The wording for this page is in locales/<language>/common.json under "vehicleForm".
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -168,6 +170,22 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
           </Fold>
           <Fold summary={say("valueSummaryEdit")} title={say("valueTitleEdit")}>
             <div className="grid gap-4 sm:grid-cols-2">
+              <label className="block sm:col-span-2">
+                <span className={labelClass}>{say("condition")}</span>
+                <select className={inputClass} defaultValue={valueOrEmpty(vehicle.metadata?.condition?.value)} name="condition">
+                  <option value="">{say("choose")}</option>
+                  {CONDITIONS.map((value) => (
+                    <option key={value} value={value}>
+                      {say(`cond_${value}`)}
+                    </option>
+                  ))}
+                </select>
+                {vehicle.metadata?.condition?.by === "damage" ? (
+                  <span className="mt-1 block font-medium text-[var(--muted)]">{say("conditionByDamage", { date: longDate(String(vehicle.metadata.condition.damage_on || ""), preferredLocale) })}</span>
+                ) : (
+                  <span className="mt-1 block font-medium text-[var(--muted)]">{say("conditionHint")}</span>
+                )}
+              </label>
               {moneyField("purchasePrice", "purchasePrice", vehicle.purchase_price)}
               {dateField("purchaseDate", "purchaseDate", vehicle.purchase_date)}
               {textField("purchaseMileage", "purchaseMileage", acquisition.purchase_mileage, { type: "number" })}

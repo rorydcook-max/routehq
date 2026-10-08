@@ -2025,7 +2025,8 @@
     "pc_wontPay": "Won't be paid",
     "tl_autoExtended": "Extended to {date} at the customer's request. {amount} due on {due}.",
     "tl_autoOpenEnded": "Changed to no end date at the customer's request. {amount} a month from {date}.",
-    "addCost": "Add a cost"
+    "addCost": "Add a cost",
+    "hist_vehicle_condition_changed": "Condition changed after damage"
   },
   "newBooking": {
     "pageBack": "Back to bookings",
@@ -2855,7 +2856,16 @@
     "purchaseDate": "Date bought",
     "sumInsured": "Sum insured",
     "insuranceExcess": "Insurance excess",
-    "valueHintEdit": "All optional. Leave the current value empty and RouteHQ estimates it from used adverts for this make, model, year and mileage (Reports, Fleet value)."
+    "valueHintEdit": "All optional. Leave the current value empty and RouteHQ estimates it from used adverts for this make, model, year and mileage (Reports, Fleet value).",
+    "cond_new": "New",
+    "cond_like_new": "Like new",
+    "cond_great": "Great condition",
+    "cond_good": "Good condition",
+    "cond_fair": "Fair condition",
+    "cond_poor": "Poor condition",
+    "condition": "Condition",
+    "conditionHint": "Places its value among used adverts for the same model and year. New damage found at a return moves it down by itself.",
+    "conditionByDamage": "Moved down after damage was recorded on {date}. Set it back once repaired."
   },
   "bookingEdit": {
     "crumbBookings": "Bookings",
@@ -3912,7 +3922,16 @@
     "addPaid": "Add what you paid",
     "checkAgain": "Check again",
     "estimateOne": "Estimate",
-    "footnote": "Estimates assume fair condition and a private sale. Your own figure, typed on the vehicle, is always used instead and never replaced.",
-    "addYear": "Add the year on the vehicle for a closer figure."
+    "footnote": "Values sit within the range of used adverts according to each vehicle's condition (a private sale). Your own figure, typed on the vehicle, is always used instead and never replaced.",
+    "addYear": "Add the year on the vehicle for a closer figure.",
+    "cond_new": "New",
+    "cond_like_new": "Like new",
+    "cond_great": "Great condition",
+    "cond_good": "Good condition",
+    "cond_fair": "Fair condition",
+    "cond_poor": "Poor condition",
+    "conditionIs": "{condition}.",
+    "conditionNotSet": "Condition not set: valued as good condition.",
+    "conditionByDamage": "Moved down after damage on {date}."
   }
 }

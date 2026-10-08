@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { markOnboardingStep } from "@/lib/onboarding";
 import { recordActivityEvent } from "@/lib/supabase/activity";
+import { asCondition, valueForCondition } from "@/lib/vehicle-condition";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -422,6 +423,19 @@ export async function updateVehicle(formData: FormData) {
   const { data: before } = await supabase.from("vehicles").select("metadata").eq("id", vehicleId).eq("organization_id", organizationId).maybeSingle();
   const kept = (before?.metadata || {}) as Record<string, any>;
   const merged = (section: string, fromForm: Record<string, unknown>) => compactObject({ ...(kept[section] || {}), ...fromForm });
+  // Condition: changed only when the owner picks a different one; the estimated value moves with it while it is still the estimate.
+  const conditionPicked = asCondition(formData.get("condition"));
+  const conditionChanged = conditionPicked && conditionPicked !== kept.condition?.value;
+  const estimateShown = kept.valuation?.typical && Number(kept.valuation.value || kept.valuation.typical);
+  const typedValue = optionalNumberFromForm(formData, "estimatedValue");
+  const valueFollows = conditionChanged && estimateShown && (!typedValue || typedValue === estimateShown);
+  const placed = valueFollows ? valueForCondition(kept.valuation, conditionPicked) : null;
+  const conditionPatch = conditionChanged
+    ? {
+        condition: { value: conditionPicked, set_at: new Date().toISOString(), by: "owner" },
+        ...(placed ? { valuation: { ...kept.valuation, value: placed } } : {})
+      }
+    : {};
 
   const { error } = await supabase
     .from("vehicles")
@@ -436,7 +450,7 @@ export async function updateVehicle(formData: FormData) {
       color: optionalStringFromForm(formData, "color"),
       purchase_price: optionalNumberFromForm(formData, "purchasePrice"),
       purchase_date: optionalStringFromForm(formData, "purchaseDate"),
-      estimated_value: optionalNumberFromForm(formData, "estimatedValue"),
+      estimated_value: placed || optionalNumberFromForm(formData, "estimatedValue"),
       mileage: numberFromForm(formData, "mileage"),
       home_branch_id: optionalStringFromForm(formData, "homeBranchId"),
       service_area: serviceArea,
@@ -448,6 +462,7 @@ export async function updateVehicle(formData: FormData) {
       specifications,
       metadata: {
         ...kept,
+        ...conditionPatch,
         acquisition: merged("acquisition", acquisition),
         compliance: merged("compliance", compliance),
         finance: merged("finance", finance)

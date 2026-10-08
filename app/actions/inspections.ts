@@ -8,6 +8,7 @@ import { activateRental } from "@/lib/rental-activation";
 import { finaliseInspectionReport, type DepositSettlement } from "@/lib/inspection-report";
 import { billRentalCustomer } from "@/lib/charges";
 import { recordActivityEvent } from "@/lib/supabase/activity";
+import { afterDamage, asCondition, valueForCondition } from "@/lib/vehicle-condition";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { notifyOperator } from "@/lib/notify-operator";
 import { earlyReturnSuggestion } from "@/lib/early-return";
@@ -517,6 +518,47 @@ export async function submitInspection(formData: FormData) {
   }
 
   await updateVehicleMileageIfHigher(supabase, organizationId, vehicleId, odometerReading);
+
+  // New damage found at a return or condition check moves the vehicle's condition down, and its estimated value with it.
+  if ((mode === "return" || mode === "condition_report") && damageItems.length) {
+    try {
+      const { data: current } = await supabase.from("vehicles").select("metadata, estimated_value").eq("id", vehicleId).eq("organization_id", organizationId).maybeSingle();
+      const metadata = (current?.metadata || {}) as Record<string, any>;
+      const was = asCondition(metadata.condition?.value);
+      const next = afterDamage(was, damageItems);
+      if (next) {
+        const valuation = metadata.valuation;
+        const shown = Number(current?.estimated_value || 0);
+        const followsEstimate = valuation?.typical && (!shown || shown === Number(valuation.value || valuation.typical));
+        const newValue = followsEstimate ? valueForCondition(valuation, next) : null;
+        await supabase
+          .from("vehicles")
+          .update({
+            metadata: {
+              ...metadata,
+              condition: { value: next, set_at: new Date().toISOString(), by: "damage", damage_on: businessToday() },
+              ...(newValue ? { valuation: { ...valuation, value: newValue } } : {})
+            },
+            ...(newValue ? { estimated_value: newValue } : {})
+          })
+          .eq("id", vehicleId)
+          .eq("organization_id", organizationId);
+        await recordActivityEvent(supabase, {
+          organization_id: organizationId,
+          actor_id: user.id,
+          entity_type: "vehicle",
+          entity_id: vehicleId,
+          vehicle_id: vehicleId,
+          rental_id: rentalId,
+          event_type: "vehicle_condition_changed",
+          title: "Condition changed after damage",
+          detail: `Condition ${was || "good"} -> ${next} after damage was recorded.`
+        });
+      }
+    } catch (error) {
+      console.error("condition update failed", error);
+    }
+  }
 
   const { data: vehicle } = await supabase
     .from("vehicles")

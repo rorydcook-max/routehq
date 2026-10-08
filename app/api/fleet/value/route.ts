@@ -5,6 +5,7 @@ import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { businessPlace, researchAvailable } from "@/lib/ai-research";
 import { valueVehicle } from "@/lib/vehicle-valuation";
+import { asCondition, valueForCondition } from "@/lib/vehicle-condition";
 
 export const maxDuration = 120;
 
@@ -46,15 +47,17 @@ export async function POST(request: NextRequest) {
   if (!valuation) return NextResponse.json({ valuation: null });
 
   const metadata = (vehicle.metadata || {}) as Record<string, any>;
-  const previous = Number(metadata.valuation?.typical || 0);
+  const previous = Number(metadata.valuation?.value || metadata.valuation?.typical || 0);
+  // The adverts give the range; the vehicle's condition says where in it this one sits.
+  const placed = { ...valuation, value: valueForCondition(valuation, asCondition(metadata.condition?.value)) };
   const current = vehicle.estimated_value == null ? null : Number(vehicle.estimated_value);
   const follows = current == null || current === 0 || (previous > 0 && current === previous);
-  const estimatedValue = follows ? valuation.typical : current;
+  const estimatedValue = follows ? placed.value : current;
   await admin
     .from("vehicles")
-    .update({ metadata: { ...metadata, valuation }, ...(follows ? { estimated_value: valuation.typical } : {}) })
+    .update({ metadata: { ...metadata, valuation: placed }, ...(follows ? { estimated_value: placed.value } : {}) })
     .eq("id", vehicle.id)
     .eq("organization_id", organization.id);
 
-  return NextResponse.json({ valuation, estimatedValue, ownFigure: !follows });
+  return NextResponse.json({ valuation: placed, estimatedValue, ownFigure: !follows });
 }

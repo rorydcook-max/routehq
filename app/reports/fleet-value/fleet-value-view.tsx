@@ -13,6 +13,8 @@ export type ValueRow = {
   name: string;
   plate: string;
   hasYear: boolean;
+  condition: string | null;
+  conditionByDamage: string | null;
   mileage: number | null;
   paid: number | null;
   boughtOn: string | null;
@@ -129,6 +131,10 @@ export function FleetValueView({ rows: initial, currency, canEstimate }: { rows:
                     })}
                   </p>
                 ) : null}
+                <p>
+                  {row.condition ? say("conditionIs", { condition: t(`cond_${row.condition}`) }) : t("conditionNotSet")}
+                  {row.conditionByDamage ? <span className="text-[var(--muted)]"> {say("conditionByDamage", { date: longDate(row.conditionByDamage, locale) })}</span> : null}
+                </p>
                 {!row.hasYear ? <p className="text-[var(--muted)]">{t("addYear")}</p> : null}
                 {row.paid ? (
                   <p>

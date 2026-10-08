@@ -13,6 +13,8 @@ export type Valuation = {
   typical: number;
   high: number;
   count: number;
+  /** Where this vehicle sits in the range, from its condition (lib/vehicle-condition). */
+  value?: number;
   checked_at: string;
   confidence?: string;
   /** "estimate" is ours; the owner's own figure is kept in estimated_value and never overwritten. */

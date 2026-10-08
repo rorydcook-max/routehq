@@ -25,7 +25,10 @@ export async function POST(request: Request) {
       mediaType: file.type || "image/jpeg",
       maxTokens: 300
     });
-    const seen = parsed.shows_odometer === true && typeof parsed.odometer_reading === "number";
+    // A plain or blank photo has come back as "123456": a made-up placeholder, not a reading.
+    const digits = String(parsed.odometer_reading ?? "");
+    const placeholder = /^(0*1234567?8?9?|9876543?2?1?|(\d)\2{3,})$/.test(digits);
+    const seen = parsed.shows_odometer === true && typeof parsed.odometer_reading === "number" && !placeholder;
     return NextResponse.json({
       odometer_reading: seen ? parsed.odometer_reading : null,
       confidence: seen && typeof parsed.confidence === "number" ? parsed.confidence : 0,

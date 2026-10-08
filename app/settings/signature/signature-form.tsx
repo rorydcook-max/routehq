@@ -77,10 +77,10 @@ export function SignatureForm({ defaultName, defaultTitle, ready, backHref }: { 
         </div>
         {!saved ? (
           <div className="mt-4 grid gap-2">
-            <a className="primary-action pressable w-full" href={backHref}>
+            <a className="primary-action pressable w-full sm:w-auto" href={backHref}>
               {say("sig_done")}
             </a>
-            <button className="secondary-action pressable w-full" onClick={() => setChanging(true)} type="button">
+            <button className="secondary-action pressable w-full sm:w-auto" onClick={() => setChanging(true)} type="button">
               {say("sig_change")}
             </button>
           </div>
@@ -121,7 +121,7 @@ export function SignatureForm({ defaultName, defaultTitle, ready, backHref }: { 
       </label>
 
       {error ? <p className="rounded-xl bg-[var(--warning-light)] p-3 font-semibold text-[var(--foreground)]">{error}</p> : null}
-      <button className="primary-action pressable w-full" disabled={isPending} onClick={save} type="button">
+      <button className="primary-action pressable w-full sm:w-auto" disabled={isPending} onClick={save} type="button">
         {isPending ? say("saving") : say("sig_save")}
       </button>
     </section>

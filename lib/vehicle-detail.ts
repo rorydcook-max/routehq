@@ -6,6 +6,12 @@ import { isRawDepositTransaction, isRevenueTransaction } from "@/lib/transaction
 
 const expenseTypes = new Set(["repair", "servicing", "maintenance", "fuel", "insurance", "tax", "finance", "fine", "accessories", "refund"]);
 
+/** The rental that matters now: the one the car is out on, else the soonest booking. */
+export function rentalHappeningNow<T extends { status?: string | null; start_date?: string | null }>(rentals: T[] | null | undefined): T | null {
+  const list = (rentals || []).slice().sort((a, b) => String(a.start_date || "").localeCompare(String(b.start_date || "")));
+  return list.find((r) => r.status !== "booked") || list[0] || null;
+}
+
 export type VehicleDetailDocument = {
   id: string;
   fileName: string;
@@ -349,9 +355,8 @@ export async function getVehicleDetail(vehicleId: string, organizationId: string
       .eq("vehicle_id", vehicleId)
       .in("status", ["booked", "active", "due_soon", "overdue", "extended"])
       .is("deleted_at", null)
-      .order("start_date", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
+      .order("start_date", { ascending: true })
+      .limit(20),
     supabase
       .from("inspections")
       .select("*, customers!inspections_customer_id_fkey(full_name, nationality, phone), rentals!inspections_rental_id_fkey(display_code, reference, start_date, end_date)")
@@ -422,7 +427,7 @@ export async function getVehicleDetail(vehicleId: string, organizationId: string
   return {
     vehicle,
     category: vehicle.vehicle_categories || null,
-    activeRental: activeRentalResult.data || null,
+    activeRental: rentalHappeningNow(activeRentalResult.data as any[]),
     inspections,
     transactions,
     maintenanceEvents: maintenanceResult.data || [],

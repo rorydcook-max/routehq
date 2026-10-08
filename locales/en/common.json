@@ -1278,7 +1278,8 @@
     "costSubtitle": "Repairs, damage, fines or fuel on this booking. Bill the renter and it comes out of the deposit first.",
     "fineTitle": "Record a fine",
     "fineSubtitle": "Set the date of the offence. Whoever had the vehicle that day is billed, and the fine comes out of their deposit if it is still held.",
-    "exportSheet": "Download for your accountant (spreadsheet)"
+    "exportSheet": "Download for your accountant (spreadsheet)",
+    "exportShort": "Spreadsheet"
   },
   "booking": {
     "open": "Open",

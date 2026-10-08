@@ -1403,7 +1403,7 @@ export function BookingForm({
       {whatIsMissing() ? <p className="text-center text-sm font-semibold text-[var(--muted)]">{whatIsMissing()}</p> : null}
       <div className="sticky-actions sticky z-20 -mx-4 flex gap-2 border-t border-[var(--border)] bg-white/95 p-3 backdrop-blur sm:mx-0 sm:rounded-lg sm:border">
         <button
-          className="pressable min-h-12 flex-1 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--foreground-secondary)] disabled:opacity-50"
+          className="secondary-action pressable flex-1 disabled:opacity-40 sm:flex-none"
           disabled={backDisabled}
           onClick={goBack}
           type="button"
@@ -1414,7 +1414,7 @@ export function BookingForm({
             button, and the click that opens the review step also submits it. */}
         {step < steps.length - 1 ? (
           <button
-            className="pressable min-h-12 flex-1 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white shadow-lg disabled:bg-[var(--muted)]"
+            className="primary-action pressable flex-1 disabled:opacity-50 sm:ml-auto sm:flex-none sm:min-w-[180px]"
             disabled={!canContinue() || showCustomerModal}
             key="continue"
             onClick={goNext}
@@ -1424,7 +1424,7 @@ export function BookingForm({
           </button>
         ) : shareResult ? (
           <Link
-            className="pressable min-h-12 flex-1 rounded-lg bg-[var(--primary)] px-3 py-2 text-center text-sm font-semibold text-white shadow-lg inline-flex items-center justify-center"
+            className="primary-action pressable flex-1 sm:ml-auto sm:flex-none sm:min-w-[180px]"
             href={`/bookings/${shareResult.rentalId}`}
           >
             {say("viewBooking")}

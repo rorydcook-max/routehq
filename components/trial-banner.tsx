@@ -89,24 +89,33 @@ export function TrialBanner({ placement = "floating" }: { placement?: "floating"
         placement === "inline"
           ? "mt-4 flex items-center justify-between gap-2 rounded-lg border px-3 py-2 lg:hidden"
           : placement === "sidebar"
-          ? // Desktop: a card in the sidebar, above the account card.
-            "mt-3 hidden flex-col items-stretch gap-2 rounded-lg border p-2.5 lg:flex"
+          ? // Desktop: one line in the sidebar, above the account card; the line is the link.
+            "mt-3 hidden items-center justify-between gap-2 rounded-lg border px-2.5 py-2 lg:flex"
           : // Phones: floats above the bottom navigation, clear of the + button.
             "fixed bottom-[calc(72px+env(safe-area-inset-bottom))] left-3 right-3 z-40 flex items-center justify-between gap-2 rounded-lg border px-3 py-2 shadow-lg lg:hidden",
         tone.className
       )}
       role="status"
     >
-      <div className="flex items-center gap-2">
-        <span aria-hidden="true" className={clsx("h-2 w-2 shrink-0 rounded-full", tone.dot)} />
-        <p className="text-xs font-bold leading-4">
-          {t("trialLeft", { days: days === null || days === undefined ? 30 : days })}
-        </p>
-      </div>
-      <div className={clsx("flex shrink-0 items-center gap-2", placement === "sidebar" && "justify-between")}>
-        <Link className={clsx("pressable inline-flex min-h-7 items-center justify-center rounded-lg px-3 text-[11px] font-bold", tone.button)} href={"/settings/billing" as Route}>
-          {t("subscribeNow")}
+      {placement === "sidebar" ? (
+        <Link className="flex min-w-0 items-center gap-2 hover:underline" href={"/settings/billing" as Route}>
+          <span aria-hidden="true" className={clsx("h-2 w-2 shrink-0 rounded-full", tone.dot)} />
+          <span className="truncate text-xs font-bold leading-4">{t("trialLeft", { days: days === null || days === undefined ? 30 : days })}</span>
         </Link>
+      ) : (
+        <div className="flex items-center gap-2">
+          <span aria-hidden="true" className={clsx("h-2 w-2 shrink-0 rounded-full", tone.dot)} />
+          <p className="text-xs font-bold leading-4">
+            {t("trialLeft", { days: days === null || days === undefined ? 30 : days })}
+          </p>
+        </div>
+      )}
+      <div className="flex shrink-0 items-center gap-2">
+        {placement === "sidebar" ? null : (
+          <Link className={clsx("pressable inline-flex min-h-7 items-center justify-center rounded-lg px-3 text-[11px] font-bold", tone.button)} href={"/settings/billing" as Route}>
+            {t("subscribeNow")}
+          </Link>
+        )}
         <button
           aria-label={t("close")}
           className="pressable inline-flex h-7 w-7 items-center justify-center rounded-lg border border-current/15 bg-white/70"

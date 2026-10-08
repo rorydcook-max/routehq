@@ -28,6 +28,11 @@ function valueOrEmpty(value: unknown) {
   return value === null || value === undefined ? "" : String(value);
 }
 
+/** A rate of 0 means "no such rate", so the field stays blank instead of showing 0. */
+function rateOrEmpty(value: unknown) {
+  return Number(value || 0) > 0 ? String(value) : "";
+}
+
 export default async function EditVehiclePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const userEmail = await getCurrentUserEmail();
@@ -107,9 +112,9 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
           {/* Most changed first. Everything else is one tap away. */}
           <Fold open summary={ratesSummary} title={say("ratesTitle")}>
             <div className="grid gap-4 sm:grid-cols-3">
-              {moneyField("daily", "dailyRate", vehicle.daily_rate)}
-              {moneyField("weekly", "weeklyRate", vehicle.weekly_rate)}
-              {moneyField("monthly", "monthlyRate", vehicle.monthly_rate)}
+              {moneyField("daily", "dailyRate", rateOrEmpty(vehicle.daily_rate))}
+              {moneyField("weekly", "weeklyRate", rateOrEmpty(vehicle.weekly_rate))}
+              {moneyField("monthly", "monthlyRate", rateOrEmpty(vehicle.monthly_rate))}
             </div>
             <label className="mt-4 block sm:max-w-xs">
               <span className={labelClass}>{say("deposit")}</span>

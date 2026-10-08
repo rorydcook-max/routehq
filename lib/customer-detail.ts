@@ -1,3 +1,4 @@
+import { rentalHappeningNow } from "@/lib/vehicle-detail";
 import { toWallTime, businessToday } from "@/lib/business-time";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isRevenueTransaction } from "@/lib/transaction-options";
@@ -102,7 +103,7 @@ function summarizeCustomer(customer: any, documents: any[], rentals: any[], tran
     documentStatus: completeness.status,
     documentCompleteness: completeness.percentage,
     activeRentals,
-    activeRental: activeRentals[0] || null,
+    activeRental: rentalHappeningNow(activeRentals),
     lifetimeRevenue,
     lastRentalDate,
     totalRentals: rentals.length
@@ -197,9 +198,8 @@ export async function getCustomerDetail(customerId: string, organizationId: stri
       .eq("customer_id", customerId)
       .in("status", activeRentalStatuses)
       .is("deleted_at", null)
-      .order("start_date", { ascending: false })
-      .limit(1)
-      .maybeSingle()
+      .order("start_date", { ascending: true })
+      .limit(20)
   ]);
 
   const queryError = [documentsResult, rentalsResult, transactionsResult, activeRentalResult].find((result) => result.error && result.error.code !== "PGRST116")?.error;
@@ -215,7 +215,7 @@ export async function getCustomerDetail(customerId: string, organizationId: stri
 
   return {
     ...summary,
-    activeRental: activeRentalResult.data || summary.activeRental,
+    activeRental: rentalHappeningNow(activeRentalResult.data as any[]) || summary.activeRental,
     documentsWithUrls: await addDocumentUrls(supabase, documents),
     rentals,
     transactions,

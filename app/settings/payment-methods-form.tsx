@@ -116,7 +116,7 @@ export function PaymentMethodsForm({ businessName, settings }: { businessName: s
                   </div>
                 </div>
               ) : (
-                <label className="secondary-action pressable mt-2 w-full cursor-pointer">
+                <label className="secondary-action pressable mt-2 w-full cursor-pointer sm:w-auto">
                   {qrFileName ? say("pm_replace") : say("pm_addQr")}
                   <input accept="image/png,image/jpeg,image/webp" className="sr-only" data-keep-original name="promptpay_qr" onChange={(event) => setQrFileName(event.target.files?.[0]?.name || "")} type="file" />
                 </label>

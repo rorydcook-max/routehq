@@ -1,4 +1,4 @@
-import { supportedLocaleOptions } from "@/lib/i18n/locales";
+import { customerLocaleOptions } from "@/lib/i18n/locales";
 
 /**
  * Nationalities renters on the islands most often have. Thailand first, then by
@@ -65,7 +65,7 @@ export const commonCountries = [
 ];
 
 /** Every language the customer-facing pages and contracts are available in. */
-export const customerLanguages = supportedLocaleOptions.map((option) => ({ code: option.code, label: option.label }));
+export const customerLanguages = customerLocaleOptions.map((option) => ({ code: option.code, label: option.label }));
 
 /** Dialling codes with a flag, one entry per code, Thailand first. */
 export const phoneCodeOptions = (() => {

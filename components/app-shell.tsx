@@ -155,12 +155,10 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
         {userEmail ? (
           <div className="mt-3 rounded-xl border border-[var(--sidebar-border)] bg-white p-3">
             {hasSeveralBusinesses ? (
-              <form action={switchActiveOrganization} className="mb-3">
-                <label className="block font-semibold text-[var(--sidebar-text-muted)]" htmlFor="business-switcher">
-                  {t("business")}
-                </label>
+              <form action={switchActiveOrganization} className="mb-2">
                 <select
-                  className="mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-2 py-1.5 text-xs font-semibold text-[var(--foreground)]"
+                  aria-label={t("business")}
+                  className="w-full rounded-lg border border-[var(--border)] bg-white px-2 py-1.5 text-xs font-semibold text-[var(--foreground)]"
                   defaultValue={activeBusiness?.id}
                   id="business-switcher"
                   name="organizationId"
@@ -177,14 +175,16 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
             <Link className="block truncate text-xs font-semibold text-[var(--muted)] hover:text-[var(--foreground)]" href="/account">
               {userEmail}
             </Link>
-            <Link className="mt-1 block text-[12px] font-semibold text-[var(--primary)] hover:underline" href="/account">
-              {t("myAccount")}
-            </Link>
-            <form action={signOut} className="mt-3">
-              <PendingButton className="inline-flex w-full items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] px-3 py-2 text-xs font-semibold text-[var(--foreground-secondary)] hover:bg-[var(--sidebar-darker)]" pendingLabel="" type="submit">
-                {t("signOut")}
-              </PendingButton>
-            </form>
+            <div className="mt-1.5 flex items-center justify-between gap-2">
+              <Link className="text-[12px] font-semibold text-[var(--primary)] hover:underline" href="/account">
+                {t("myAccount")}
+              </Link>
+              <form action={signOut}>
+                <PendingButton className="text-[12px] font-semibold text-[var(--muted)] hover:text-[var(--foreground)] hover:underline" pendingLabel="" type="submit">
+                  {t("signOut")}
+                </PendingButton>
+              </form>
+            </div>
           </div>
         ) : null}
       </aside>

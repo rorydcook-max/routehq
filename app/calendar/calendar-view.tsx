@@ -118,7 +118,7 @@ export function CalendarView({ events, initialMonth, today }: { events: Calendar
 
   return (
     <div className="space-y-4">
-      <div className="content-section flex items-center justify-between gap-2">
+      <div className="content-section flex items-center justify-between gap-2 lg:justify-center lg:gap-8">
         <button aria-label={t("prevMonth")} className="secondary-action pressable !w-11 !px-0 shrink-0" onClick={() => shiftMonth(-1)} type="button">
           <ChevronLeft size={20} />
         </button>

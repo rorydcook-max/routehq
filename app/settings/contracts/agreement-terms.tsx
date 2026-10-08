@@ -86,12 +86,12 @@ export function AgreementTerms({
             </div>
           ))}
           {terms.length < MAX_TERMS ? (
-            <button className="secondary-action pressable w-full" onClick={() => setTerms((current) => [...current, ""])} type="button">
+            <button className="secondary-action pressable w-full sm:w-auto" onClick={() => setTerms((current) => [...current, ""])} type="button">
               <Plus size={18} />
               {say("ag_add")}
             </button>
           ) : null}
-          <PendingButton className="primary-action w-full" pendingLabel={say("saving")} savedLabel={say("saved")} type="submit">
+          <PendingButton className="primary-action w-full sm:w-auto" pendingLabel={say("saving")} savedLabel={say("saved")} type="submit">
             {say("save")}
           </PendingButton>
           <p className={soft}>{say("ag_applies")}</p>
@@ -109,7 +109,7 @@ export function AgreementTerms({
             </div>
           ))}
         </div>
-        <a className="secondary-action pressable mt-3 w-full" href={numbersHref}>
+        <a className="secondary-action pressable mt-3 w-full sm:w-auto" href={numbersHref}>
           {say("ag_numbersChange")}
         </a>
       </section>
@@ -117,7 +117,7 @@ export function AgreementTerms({
       <section className="card p-4">
         <h2 className={h2}>{say("ag_sampleTitle")}</h2>
         <p className={`mt-1 ${soft}`}>{say("ag_sampleBody")}</p>
-        <button className="secondary-action pressable mt-3 w-full" onClick={openSample} type="button">
+        <button className="secondary-action pressable mt-3 w-full sm:w-auto" onClick={openSample} type="button">
           <Eye size={18} />
           {say("ag_sampleOpen")}
         </button>

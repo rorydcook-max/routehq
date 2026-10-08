@@ -3,6 +3,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
 import { textDirection } from "@/lib/i18n/locales";
 import { ImageShrinker } from "@/components/image-shrinker";
+import { FlagFont } from "@/components/flag-font";
 // Bundled with the app (was "@latest" from a CDN): icons can't change or
 // break underneath us, and they load with the page.
 import "@tabler/icons-webfont/dist/tabler-icons.min.css";
@@ -40,6 +41,7 @@ export default async function RootLayout({
       <body>
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
         <ImageShrinker />
+        <FlagFont />
       </body>
     </html>
   );

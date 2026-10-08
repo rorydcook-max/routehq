@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import { inviteUser, type AuthActionState } from "@/app/actions/auth";
-import { supportedLocaleOptions } from "@/lib/i18n/locales";
+import { operatorLocaleOptions } from "@/lib/i18n/locales";
 import { APP_ROLES } from "@/lib/auth/role-types";
 
 const initialState: AuthActionState = {};
@@ -36,7 +36,7 @@ export function InviteForm() {
       <label className="block">
         <span className={labelClass}>{say("iv_language")}</span>
         <select className="mt-1 w-full" defaultValue="th" name="preferredLocale">
-          {supportedLocaleOptions.map((locale) => (
+          {operatorLocaleOptions.map((locale) => (
             <option key={locale.code} value={locale.code}>
               {locale.label}
             </option>

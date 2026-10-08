@@ -6,7 +6,7 @@ import { PendingButton } from "@/components/pending-button";
 import { PushToggle } from "@/components/push-toggle";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { defaultCalendarForLocale, supportedCalendarOptions } from "@/lib/i18n/calendars";
-import { supportedLocaleOptions } from "@/lib/i18n/locales";
+import { operatorLocaleOptions } from "@/lib/i18n/locales";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -53,7 +53,7 @@ export default async function AccountPage() {
             <label className="block">
               <span className={labelClass}>{say("language")}</span>
               <select className={inputClass} defaultValue={locale} name="preferredLocale">
-                {supportedLocaleOptions.map((option) => (
+                {operatorLocaleOptions.map((option) => (
                   <option key={option.code} value={option.code}>
                     {option.label}
                   </option>
@@ -71,7 +71,7 @@ export default async function AccountPage() {
               </select>
               <span className="mt-1 block font-medium text-[var(--foreground-secondary)]">{say("calendarHelp")}</span>
             </label>
-            <PendingButton className="primary-action w-full" pendingLabel={say("saving")} savedLabel={say("saved")} type="submit">
+            <PendingButton className="primary-action w-full sm:w-auto" pendingLabel={say("saving")} savedLabel={say("saved")} type="submit">
               {say("save")}
             </PendingButton>
           </form>
@@ -96,7 +96,7 @@ export default async function AccountPage() {
               <p className="text-[16px] font-bold text-[var(--foreground)]">{roleLabel}</p>
             </div>
           </div>
-          <a className="secondary-action mt-3 w-full" href="/forgot-password">
+          <a className="secondary-action mt-3 w-full sm:w-auto" href="/forgot-password">
             {say("changePassword")}
           </a>
         </section>

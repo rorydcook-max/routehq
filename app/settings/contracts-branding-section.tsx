@@ -7,7 +7,7 @@ import { SignatureUploadSection } from "@/app/settings/signature-upload-section"
 import { BusinessLogoImage } from "@/components/business-logo-image";
 import { PendingButton } from "@/components/pending-button";
 import { Card, Fold, SectionHeader } from "@/components/ui";
-import { supportedLocaleOptions } from "@/lib/i18n/locales";
+import { customerLocaleOptions } from "@/lib/i18n/locales";
 
 const inputClass =
   "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]";
@@ -109,7 +109,7 @@ export function ContractsBrandingSection({
             <label className="block">
               <span className={labelClass}>{say("b_language")}</span>
               <select className={inputClass} defaultValue={organization.default_contract_locale || organization.default_locale || "en"} name="default_contract_locale">
-                {supportedLocaleOptions.map((locale) => (
+                {customerLocaleOptions.map((locale) => (
                   <option key={locale.code} value={locale.code}>
                     {locale.label}
                   </option>

@@ -933,7 +933,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                 <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Logo URL</span>
                 <input className={inputClass} name="logoUrl" placeholder="https://..." type="url" />
               </label>
-              <PendingButton className="primary-action mt-4 w-full" pendingLabel="Adding..." type="submit">
+              <PendingButton className="primary-action mt-4 w-full sm:w-auto" pendingLabel="Adding..." type="submit">
                 Add make
               </PendingButton>
             </form>
@@ -972,7 +972,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                   <input className={inputClass} name="bodyType" placeholder="SUV" />
                 </label>
               </div>
-              <PendingButton className="primary-action mt-4 w-full" pendingLabel="Adding..." type="submit">
+              <PendingButton className="primary-action mt-4 w-full sm:w-auto" pendingLabel="Adding..." type="submit">
                 Add model
               </PendingButton>
             </form>
@@ -1029,7 +1029,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                 <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">Drivetrain</span>
                 <input className={inputClass} name="drivetrain" placeholder="FWD" />
               </label>
-              <PendingButton className="primary-action mt-4 w-full" pendingLabel="Adding..." type="submit">
+              <PendingButton className="primary-action mt-4 w-full sm:w-auto" pendingLabel="Adding..." type="submit">
                 Add trim
               </PendingButton>
             </form>

@@ -647,11 +647,12 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   customerName={customer?.full_name || null}
                 />
               ) : null}
-              <details className="basis-full">
-                <summary className="pressable inline-flex min-h-11 w-full cursor-pointer list-none items-center justify-center gap-1 rounded-full bg-[var(--background)] px-4 py-2 font-bold text-[var(--foreground)] [&::-webkit-details-marker]:hidden">
+              {/* More sits beside the other actions; opened, it takes a row of its own for the extra buttons. */}
+              <details className="basis-full lg:basis-auto lg:open:basis-full">
+                <summary className="pressable inline-flex min-h-11 w-full cursor-pointer list-none items-center justify-center gap-1 rounded-full border-2 border-[var(--border-strong)] bg-[var(--panel)] px-4 py-2 font-bold text-[var(--foreground)] hover:bg-[var(--panel-secondary)] [&::-webkit-details-marker]:hidden">
                   {tx.say("more")}
                 </summary>
-                <div className="mt-2 flex flex-wrap gap-2 [&>*]:flex-1 [&_a]:w-full [&_button]:w-full">
+                <div className="mt-2 flex flex-wrap gap-2 [&>*]:flex-1 [&_a]:w-full [&_button]:w-full lg:[&>*]:flex-none lg:[&_a]:w-auto">
               <ActionButton href={`/bookings/${rental.id}/edit` as Route} tone="light">
                 {tx.say("editBooking")}
               </ActionButton>

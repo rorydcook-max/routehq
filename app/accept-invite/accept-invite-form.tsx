@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { completeInvite, type AuthActionState } from "@/app/actions/auth";
 import { authError, authInput, authLabel } from "@/components/auth-card";
-import { supportedLocaleOptions } from "@/lib/i18n/locales";
+import { operatorLocaleOptions } from "@/lib/i18n/locales";
 
 const initialState: AuthActionState = {};
 
@@ -23,7 +23,7 @@ export function AcceptInviteForm() {
       <label className="block">
         <span className={authLabel}>{say("language")}</span>
         <select className={authInput} defaultValue={locale} name="preferredLocale">
-          {supportedLocaleOptions.map((option) => (
+          {operatorLocaleOptions.map((option) => (
             <option key={option.code} value={option.code}>
               {option.label}
             </option>

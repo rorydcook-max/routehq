@@ -4,7 +4,7 @@ import { Globe } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { CUSTOMER_LOCALE_COOKIE } from "@/lib/i18n/customer-locale";
-import { supportedLocaleOptions } from "@/lib/i18n/locales";
+import { customerLocaleOptions } from "@/lib/i18n/locales";
 
 /**
  * Lets a customer read their booking in their own language. Each language is
@@ -27,7 +27,7 @@ export function CustomerLanguagePicker({ className = "" }: { className?: string 
         }}
         value={locale}
       >
-        {supportedLocaleOptions.map((option) => (
+        {customerLocaleOptions.map((option) => (
           <option key={option.code} value={option.code}>
             {option.label.replace(/ \(.*\)$/, "")}
           </option>

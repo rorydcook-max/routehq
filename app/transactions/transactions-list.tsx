@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import { shownError } from "@/lib/error-text";
-import { ArrowDownLeft, ArrowUpRight, Check, ChevronLeft, ChevronRight, Pencil, Search, Trash2, X } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Check, ChevronLeft, ChevronRight, Download, Pencil, Search, Trash2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { intlLocale } from "@/lib/i18n/dates";
@@ -578,13 +578,6 @@ export function TransactionsList({
         </div>
         ) : null}
       </div>
-      {/* Everything in this period as a spreadsheet, for an accountant. */}
-      <div className="-mt-1 text-right">
-        <a className="text-[13px] font-semibold text-[var(--primary)] underline-offset-2 hover:underline" download href={`/api/export/money?from=${range.from}&to=${range.to}`}>
-          {tx.say("exportSheet")}
-        </a>
-      </div>
-
       {/* Search, and select-to-delete */}
       <div className="flex items-center gap-2">
         <label className="relative block min-w-0 flex-1">
@@ -594,6 +587,11 @@ export function TransactionsList({
         <button className="secondary-action pressable min-h-[38px] px-3 text-[13px]" onClick={() => (selecting ? stopSelecting() : setSelecting(true))} type="button">
           {selecting ? tx.say("done") : tx.say("select")}
         </button>
+        {/* Everything in this period as a spreadsheet, for an accountant. */}
+        <a aria-label={tx.say("exportSheet")} className="secondary-action pressable min-h-[38px] gap-1.5 px-3 text-[13px]" download href={`/api/export/money?from=${range.from}&to=${range.to}`} title={tx.say("exportSheet")}>
+          <Download size={16} />
+          <span className="hidden lg:inline">{tx.say("exportShort")}</span>
+        </a>
       </div>
 
       {/* Phones show one side at a time */}

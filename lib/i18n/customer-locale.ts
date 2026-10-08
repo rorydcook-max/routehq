@@ -1,9 +1,9 @@
-import { supportedLocaleCodes, type SupportedLocale } from "@/lib/i18n/locales";
+import { customerLocaleCodes, type SupportedLocale } from "@/lib/i18n/locales";
 
 /** Remembers the language a customer picked on a booking link, change-to-sign page or online booking page. */
 export const CUSTOMER_LOCALE_COOKIE = "routehq_customer_locale";
 
-const supported = new Set<string>(supportedLocaleCodes);
+const supported = new Set<string>(customerLocaleCodes);
 
 /**
  * The customer's language: what they picked, else the first language their
@@ -24,7 +24,6 @@ export function pickLocale(chosen: string | null | undefined, acceptLanguage: st
     .sort((a, b) => b.q - a.q);
   for (const { tag } of wanted) {
     const lower = tag.toLowerCase();
-    if (lower === "zh-tw" || lower === "zh-hk" || lower.startsWith("zh-hant")) return "zh-TW";
     const base = lower.split("-")[0];
     const mapped = base === "no" || base === "nn" ? "nb" : base === "tl" ? "fil" : base === "iw" ? "he" : base === "in" ? "id" : base;
     if (supported.has(mapped)) return mapped as SupportedLocale;

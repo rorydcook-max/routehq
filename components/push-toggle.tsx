@@ -142,7 +142,7 @@ export function PushToggle({ variant = "card" }: { variant?: "card" | "prompt" }
       ) : null}
       {state === "blocked" ? <p className="font-medium text-[var(--foreground)]">{say("ps_blocked")}</p> : null}
       {state === "off" ? (
-        <button className="primary-action pressable w-full disabled:opacity-60" disabled={busy} onClick={turnOn} type="button">
+        <button className="primary-action pressable w-full sm:w-auto disabled:opacity-60" disabled={busy} onClick={turnOn} type="button">
           <Bell size={16} />
           {say("ps_turnOn")}
         </button>

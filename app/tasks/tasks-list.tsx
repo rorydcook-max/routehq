@@ -143,7 +143,8 @@ function headingOf(item: TaskListItem, today: string, tx: Tx): { title: string; 
   // Jobs people typed themselves stay exactly as typed.
   if (!item.action) return { title: raw, detail: null };
   // Jobs the app raised are saved as English sentences; the ones it knows are said again in the reader's language.
-  if (item.action === "settle_deposit") return { title: tx.say("job_settle_deposit"), detail: raw.split(" - ").slice(1).join(" · ") || null };
+  // The customer and vehicle in the saved title are already on the context line.
+  if (item.action === "settle_deposit") return { title: tx.say("job_settle_deposit"), detail: null };
   if (item.action === "swap_handover" || item.action === "swap_collection" || item.action === "swap_signature") {
     return { title: tx.say(`job_${item.action}`), detail: null };
   }

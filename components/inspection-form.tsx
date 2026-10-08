@@ -580,6 +580,15 @@ export function InspectionForm({ context, unsigned = false }: { context: Inspect
   // The reading taken when this vehicle was handed over. Unknown (not zero) when there is none on file.
   const handoverKm = context.rental?.mileage_at_delivery != null ? Number(context.rental.mileage_at_delivery) : null;
 
+  // A reading far beyond what anyone could drive is almost always a typo or an extra digit.
+  const lastKm = handoverKm ?? (context.vehicle?.mileage != null ? Number(context.vehicle.mileage) : null);
+  const odometerJump = (() => {
+    if (!odometer || lastKm == null || !(lastKm > 0)) return 0;
+    const jump = Number(odometer) - lastKm;
+    const days = mode === "return" ? Math.max(1, daysBetween(context.rental?.start_date)) : 1;
+    return jump > Math.max(3000, days * 1500) ? jump : 0;
+  })();
+
   function canAdvance() {
     if (step === 1) return Boolean(odometer && odometerPhotoCaptured);
     if (step === 2) return fuelLevel !== null && fuelPhotoCaptured;
@@ -863,6 +872,12 @@ export function InspectionForm({ context, unsigned = false }: { context: Inspect
               {t("odometerBelowLast", { km: Number(context.vehicle.mileage).toLocaleString("en-US") })}
             </p>
           ) : null}
+          {odometerJump > 0 ? (
+            <p className="mt-3 flex items-start gap-2 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] px-3 py-2 text-sm font-bold text-[var(--warning)]" role="alert">
+              <AlertTriangle className="mt-0.5 shrink-0" size={16} />
+              {t("odometerHuge", { km: odometerJump.toLocaleString("en-US") })}
+            </p>
+          ) : null}
         </StepShell>
       </div>
 
@@ -1144,7 +1159,9 @@ export function InspectionForm({ context, unsigned = false }: { context: Inspect
                 </div>
               ) : (
                 <>
-                  {availableToReconcile > 0 ? (
+                  {availableToReconcile > 0 && holdForDamage ? (
+                    <Row label={t("depositKeptForNow")} value={money(availableToReconcile)} />
+                  ) : availableToReconcile > 0 ? (
                     <>
                       <Row label={t("depositDeductions")} value={`-${money(appliedDeductions)}`} danger={appliedDeductions > 0} />
                       <Row label={t("depositRefundConfirmed")} value={money(depositRefundAmount)} />

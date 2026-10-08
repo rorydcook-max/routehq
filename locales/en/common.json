@@ -343,7 +343,9 @@
     "billRemainderNo": "Not billed. You can still add it to the booking later.",
     "billedToCustomer": "Billed to the customer",
     "holdForDamage": "Damage cost not known yet: keep the deposit for now",
-    "holdForDamageHint": "Nothing is returned now. Pricing the damage goes on To do; add the cost on the booking when you know it, and return what is left."
+    "holdForDamageHint": "Nothing is returned now. Pricing the damage goes on To do; add the cost on the booking when you know it, and return what is left.",
+    "odometerHuge": "That is {km} km more than the last reading. Check the number before you go on.",
+    "depositKeptForNow": "Deposit kept until the damage is priced"
   },
   "translation": {
     "translatedFrom": "Translated from {language}",
@@ -1254,7 +1256,11 @@
     "billFromDeposit": "{amount} comes out of the deposit held ({held}).",
     "billRest": "Bill the customer the other {amount}",
     "billAll": "Bill the customer {amount}",
-    "billRestHint": "Untick if insurance or someone else covers it."
+    "billRestHint": "Untick if insurance or someone else covers it.",
+    "depositLeftAfter": "{amount} of the deposit is still held after this. Return it from the booking when you are ready.",
+    "backToBooking": "Back to the booking",
+    "costTitle": "Add a cost",
+    "costSubtitle": "Repairs, damage, fines or fuel on this booking. Bill the renter and it comes out of the deposit first."
   },
   "booking": {
     "open": "Open",
@@ -2231,7 +2237,12 @@
     "inc_8": "Helmet",
     "inc_9": "Second helmet",
     "inc_10": "Phone holder",
-    "inc_11": "Rain poncho"
+    "inc_11": "Rain poncho",
+    "clashUntil": "This vehicle is already booked from {from} to {to} ({who}). Choose other dates or another vehicle.",
+    "clashOpen": "This vehicle is already booked from {from} with no return date ({who}). Choose other dates or another vehicle.",
+    "needStart": "Choose the start date to continue.",
+    "needReturn": "Choose the return date, or tick \"Open-ended\", to continue.",
+    "needRate": "Enter the rental price to continue."
   },
   "fleet": {
     "title": "Fleet",

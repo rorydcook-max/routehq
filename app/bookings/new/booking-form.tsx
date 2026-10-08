@@ -13,7 +13,7 @@ import { createBooking } from "@/app/actions/bookings";
 import { CustomerSelector } from "@/components/customer-selector";
 import { Badge, ProgressBar } from "@/components/ui";
 import { flagForNationality } from "@/lib/customer-options";
-import { conflictMessage, findConflict, type BusyPeriod } from "@/lib/rental-conflicts";
+import { findConflict, type BusyPeriod } from "@/lib/rental-conflicts";
 
 type BookingVehicle = {
   id: string;
@@ -414,6 +414,15 @@ export function BookingForm({
     if (step === 2) return Boolean(startDate && rentalRate > 0 && (openEnded || endDate) && !dateConflict);
     if (step === 3) return true;
     return true;
+  }
+
+  // Why Continue is greyed out, so the button never just sits there.
+  function whatIsMissing() {
+    if (step !== 2 || dateConflict) return null;
+    if (!startDate) return say("needStart");
+    if (!openEnded && !endDate) return say("needReturn");
+    if (!(rentalRate > 0)) return say("needRate");
+    return null;
   }
 
   function goNext() {
@@ -877,7 +886,9 @@ export function BookingForm({
           </label>
           {dateConflict ? (
             <p className="mt-3 rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-3 text-sm font-bold text-[var(--danger)]" role="alert">
-              {conflictMessage(dateConflict)}
+              {dateConflict.endDate
+                ? say("clashUntil", { from: shortDate(dateConflict.startDate, locale), to: shortDate(dateConflict.endDate, locale), who: [dateConflict.code, dateConflict.customerName].filter(Boolean).join(", ") })
+                : say("clashOpen", { from: shortDate(dateConflict.startDate, locale), who: [dateConflict.code, dateConflict.customerName].filter(Boolean).join(", ") })}
             </p>
           ) : null}
           <div className="mt-3 grid grid-cols-4 gap-2 sm:gap-3">
@@ -1317,6 +1328,7 @@ export function BookingForm({
         </section>
       ) : null}
 
+      {whatIsMissing() ? <p className="text-center text-sm font-semibold text-[var(--muted)]">{whatIsMissing()}</p> : null}
       <div className="sticky-actions sticky z-20 -mx-4 flex gap-2 border-t border-[var(--border)] bg-white/95 p-3 backdrop-blur sm:mx-0 sm:rounded-lg sm:border">
         <button
           className="pressable min-h-12 flex-1 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--foreground-secondary)] disabled:opacity-50"

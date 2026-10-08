@@ -398,7 +398,11 @@ export function TransactionForm({
                           </label>
                         ) : null}
                         <input name="billRemainder" type="hidden" value={billRemainder ? "true" : ""} />
-                        <p className="text-[13px] text-[var(--muted)]">{say("billWhatHappens")}</p>
+                        {rest > 0 && billRemainder ? (
+                          <p className="text-[13px] text-[var(--muted)]">{say("billWhatHappens")}</p>
+                        ) : fromDeposit > 0 && held > fromDeposit ? (
+                          <p className="text-[13px] text-[var(--muted)]">{say("depositLeftAfter", { amount: baht(held - fromDeposit) })}</p>
+                        ) : null}
                       </div>
                     );
                   })()}

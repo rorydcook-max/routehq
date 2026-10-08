@@ -25,21 +25,24 @@ export default async function NewTransactionPage({
     })
   ]);
 
+  // Opened from a booking's "Add a cost": say so, and lead back to that booking.
+  const costForBooking = params.cost === "1" && params.rentalId ? params.rentalId : null;
+
   return (
     <AppShell userEmail={userEmail}>
       <div className="mx-auto max-w-xl">
         <div className="page-hero mb-5">
-          <Link className="text-sm font-bold text-[var(--primary)]" href="/transactions">
-            {t("back")}
+          <Link className="text-sm font-bold text-[var(--primary)]" href={costForBooking ? `/bookings/${costForBooking}` : "/transactions"}>
+            {costForBooking ? t("backToBooking") : t("back")}
           </Link>
-          <h1 className="page-title mt-2">{t("recordTitle")}</h1>
-          <p className="page-subtitle mt-2">{t("recordSubtitle")}</p>
+          <h1 className="page-title mt-2">{costForBooking ? t("costTitle") : t("recordTitle")}</h1>
+          <p className="page-subtitle mt-2">{costForBooking ? t("costSubtitle") : t("recordSubtitle")}</p>
         </div>
 
         <TransactionForm
           defaultCustomerId={params.customerId || ""}
           defaultRentalId={params.rentalId || ""}
-        startAsCost={params.cost === "1"}
+          startAsCost={params.cost === "1"}
           defaultVehicleId={params.vehicleId || ""}
           options={options}
           organizationId={organization.id}

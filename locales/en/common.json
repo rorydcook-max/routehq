@@ -829,7 +829,11 @@
     "chargeFromDepositPlain": "{amount} has been taken from your deposit for costs during your rental.",
     "chargeRestToPay": "{amount} more is still to pay; you can pay it from your booking page.",
     "depositHeldForDamage": "Your deposit is being held until the damage has been assessed. We will let you know what is returned.",
-    "bookingRestored": "Your booking is back on as before. Sorry for any confusion."
+    "bookingRestored": "Your booking is back on as before. Sorry for any confusion.",
+    "extrasMoved": "your extras ({amount}) will now be paid together with your rent on {date}.",
+    "extrasRemoved": "{names} has been taken off your booking.",
+    "extrasRefunded": "we've refunded {amount} for your extras. Thank you.",
+    "extrasCredited": "the {amount} you paid for extras will come off your rent due {date}."
   },
   "common": {
     "kinds_car": "Cars",
@@ -1290,7 +1294,9 @@
     "fineSubtitle": "Set the date of the offence. Whoever had the vehicle that day is billed, and the fine comes out of their deposit if it is still held.",
     "exportSheet": "Download for your accountant (spreadsheet)",
     "exportShort": "Spreadsheet",
-    "match_extras": "{amount} · extras · {vehicle}"
+    "match_extras": "{amount} · extras · {vehicle}",
+    "extrasTag": "Extras",
+    "extrasPart": "incl. {amount} extras"
   },
   "booking": {
     "open": "Open",
@@ -2062,7 +2068,38 @@
     "extrasPlus": "+ {amount} extras: {names}",
     "hist_handed_over_without_form": "Handed over without the form",
     "ref_earlyOwed": "{owed} is still owed on this booking, so the net figure is {net}.",
-    "recordOnVehicle": "Record it on the vehicle"
+    "recordOnVehicle": "Record it on the vehicle",
+    "ex_title": "Paid extras",
+    "ex_none": "No extras on the booking now",
+    "ex_removedList": "Taken off: {names}",
+    "ex_paid": "Paid {amount}",
+    "ex_open": "Still to pay {amount}",
+    "ex_refunded": "Refunded {amount}",
+    "ex_credited": "Taken off rent {amount}",
+    "ex_move": "Add to next rent",
+    "ex_remove": "Take extras off",
+    "ex_refund": "Refund {amount}",
+    "ex_credit": "Take off next rent",
+    "ex_moveText": "The {amount} for extras will be paid with the next rent ({next}). The customer is told.",
+    "ex_moveConfirm": "Add to next rent",
+    "ex_moved": "Extras added to the next rent.",
+    "ex_removeWhich": "Which extras come off?",
+    "ex_removeText": "Nothing more is owed for them. The customer is told.",
+    "ex_removeTextPaid": "Anything not paid yet for them is no longer owed. What was already paid stays here to refund or take off the rent.",
+    "ex_removeConfirm": "Take off",
+    "ex_removed": "Extras taken off the booking.",
+    "ex_refundText": "Give back money paid for extras only. Recorded as an extras refund.",
+    "ex_creditText": "Money paid for extras comes off the rent still to come ({next}) instead of being given back.",
+    "ex_amount": "Amount",
+    "ex_refundWhy": "Why, for example the child seat was not used",
+    "ex_refundConfirm": "Record refund",
+    "ex_creditConfirm": "Take off the rent",
+    "ex_refundDone": "Extras refund recorded.",
+    "ex_creditDone": "Taken off the next rent.",
+    "pc_plusExtras": "+ extras {amount}",
+    "pc_lessExtras": "less {amount} paid for extras",
+    "pc_extrasMoved": "Extras: {names} (moved onto the rent)",
+    "pc_extrasRemoved": "Extras: {names} (taken off)"
   },
   "newBooking": {
     "pageBack": "Back to bookings",

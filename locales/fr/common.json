@@ -619,6 +619,10 @@
     "renewalDue": "des documents du véhicule {vehicle} doivent être renouvelés vers le {date}. Nous pourrions avoir besoin du véhicule ou de ses papiers un court moment et vous contacterons pour l’organiser.",
     "signStillNeeded": "vous avez maintenant le véhicule {vehicle}, et il nous faut encore votre signature pour confirmer le changement. Cela prend une minute : {link}",
     "signWaiting": "un changement dans votre location du véhicule {vehicle} attend votre signature. Merci de le vérifier et de signer ici : {link}",
-    "bookingRestored": "Votre réservation est de nouveau active comme avant. Désolé pour la confusion."
+    "bookingRestored": "Votre réservation est de nouveau active comme avant. Désolé pour la confusion.",
+    "extrasMoved": "vos options ({amount}) seront désormais payées avec votre loyer du {date}.",
+    "extrasRemoved": "{names} a été retiré de votre réservation.",
+    "extrasRefunded": "nous vous avons remboursé {amount} pour vos options. Merci.",
+    "extrasCredited": "les {amount} payés pour vos options seront déduits de votre loyer du {date}."
   }
 }

@@ -3,6 +3,7 @@
 import { completeRentalJobs, tellRentalCustomer } from "@/lib/customer-messages";
 import { getTransactionFormOptions } from "@/lib/transactions";
 import { chargeRenter } from "@/lib/charges";
+import { extrasIncomeTag } from "@/lib/extras";
 import { businessToday } from "@/lib/business-time";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -625,6 +626,13 @@ export async function createTransaction(formData: FormData) {
 
     if (paymentLinkError) {
       throw new Error(paymentLinkError.message);
+    }
+
+    // Extras are rental income, tagged so what was paid for them can be seen and refunded.
+    const { data: linkedPayment } = await supabase.from("rental_payments").select("metadata").eq("id", rentalPaymentId).eq("organization_id", organizationId).maybeSingle();
+    const tag = extrasIncomeTag(linkedPayment?.metadata, amount);
+    if (Object.keys(tag).length) {
+      await supabase.from("transactions").update({ metadata: tag }).eq("id", data.id).eq("organization_id", organizationId);
     }
   }
 

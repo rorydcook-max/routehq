@@ -31,7 +31,7 @@ type T = Awaited<ReturnType<typeof getTranslations>>;
 function extrasText(rental: any, t: T) {
   const total = Number(rental?.extras_total || 0);
   if (!(total > 0)) return "";
-  const names = (Array.isArray(rental?.extras) ? rental.extras : []).map((line: any) => String(line?.name || "")).filter(Boolean);
+  const names = (Array.isArray(rental?.extras) ? rental.extras : []).filter((line: any) => !line?.removed_at).map((line: any) => String(line?.name || "")).filter(Boolean);
   return "\n" + t("extrasLine", { names: names.join(", ") || "-", amount: money(total, rental?.currency || "THB") });
 }
 

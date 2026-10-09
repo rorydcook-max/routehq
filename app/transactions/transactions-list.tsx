@@ -397,6 +397,12 @@ export function TransactionsList({
             <p className="truncate text-[16px] font-bold text-[var(--foreground)]">
               {tx.typeName(transaction.type, transaction.typeLabel)}
               {kind.startsWith("deposit") ? <span className="ml-2 font-medium text-[var(--muted)]">{kind === "deposit_refunded" ? tx.say("returned") : tx.say("held")}</span> : null}
+              {transaction.extrasRefund ? <span className="ml-2 font-medium text-[var(--muted)]">{tx.say("extrasTag")}</span> : null}
+              {!transaction.extrasRefund && transaction.extrasAmount > 0 ? (
+                <span className="ml-2 font-medium text-[var(--muted)]">
+                  {Math.abs(transaction.extrasAmount - Math.abs(transaction.amount)) < 1 ? tx.say("extrasTag") : tx.say("extrasPart", { amount: money(transaction.extrasAmount, transaction.currency) })}
+                </span>
+              ) : null}
             </p>
             {who ? <p className="truncate font-medium text-[var(--foreground-secondary)]">{who}</p> : null}
             {context ? (

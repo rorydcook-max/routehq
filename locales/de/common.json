@@ -619,6 +619,10 @@
     "renewalDue": "einige Unterlagen für {vehicle} werden um den {date} erneuert. Wir benötigen das Fahrzeug oder seine Papiere möglicherweise kurz und melden uns zur Abstimmung.",
     "signStillNeeded": "Sie haben jetzt {vehicle}, und wir benötigen noch Ihre Unterschrift, um die Änderung zu bestätigen. Es dauert eine Minute: {link}",
     "signWaiting": "eine Änderung Ihrer Miete für {vehicle} wartet auf Ihre Unterschrift. Bitte prüfen und hier unterschreiben: {link}",
-    "bookingRestored": "Ihre Buchung ist wieder wie zuvor aktiv. Entschuldigung für die Verwirrung."
+    "bookingRestored": "Ihre Buchung ist wieder wie zuvor aktiv. Entschuldigung für die Verwirrung.",
+    "extrasMoved": "Ihre Extras ({amount}) werden jetzt zusammen mit Ihrer Miete am {date} bezahlt.",
+    "extrasRemoved": "{names} wurde aus Ihrer Buchung entfernt.",
+    "extrasRefunded": "wir haben Ihnen {amount} für Ihre Extras erstattet. Vielen Dank.",
+    "extrasCredited": "die {amount}, die Sie für Extras bezahlt haben, werden von Ihrer Miete fällig am {date} abgezogen."
   }
 }

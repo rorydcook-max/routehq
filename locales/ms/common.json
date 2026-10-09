@@ -619,6 +619,10 @@
     "renewalDue": "beberapa dokumen {vehicle} akan diperbaharui sekitar {date}. Kami mungkin memerlukan kenderaan atau dokumennya seketika dan akan menghubungi anda untuk mengaturnya.",
     "signStillNeeded": "anda kini menggunakan {vehicle}, dan kami masih memerlukan tandatangan anda untuk mengesahkan perubahan ini. Hanya seminit: {link}",
     "signWaiting": "ada perubahan pada sewaan {vehicle} anda yang menunggu tandatangan anda. Sila semak dan tandatangani di sini: {link}",
-    "bookingRestored": "Tempahan anda kembali aktif seperti sebelum ini. Maaf atas kekeliruan."
+    "bookingRestored": "Tempahan anda kembali aktif seperti sebelum ini. Maaf atas kekeliruan.",
+    "extrasMoved": "caj tambahan anda ({amount}) kini akan dibayar bersama sewa pada {date}.",
+    "extrasRemoved": "{names} telah dikeluarkan daripada tempahan anda.",
+    "extrasRefunded": "kami telah memulangkan {amount} untuk tambahan anda. Terima kasih.",
+    "extrasCredited": "{amount} yang anda bayar untuk tambahan akan ditolak daripada sewa yang perlu dibayar pada {date}."
   }
 }

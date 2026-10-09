@@ -92,8 +92,20 @@ function amountInput(value: unknown) {
   return Number.isFinite(parsed) ? String(parsed) : "0";
 }
 
-/** What a payment is for. Words someone typed are shown as typed; otherwise it is named from what the payment is. */
+/** What a payment is for, with any extras moved onto it or taken off it said after. */
 function paymentDescription(payment: RentalPayment, tx: Ctl) {
+  const metadata = payment.metadata || {};
+  const amount = (value: unknown) => new Intl.NumberFormat("th-TH", { style: "currency", currency: (payment as any).currency || "THB", maximumFractionDigits: 0 }).format(Number(value || 0));
+  if (metadata.type === "extras" && metadata.moved_to_payment) return tx.say("pc_extrasMoved", { names: (Array.isArray(metadata.extras) ? metadata.extras : []).join(", ") || "-" });
+  if (metadata.type === "extras" && metadata.removed_extras) return tx.say("pc_extrasRemoved", { names: (Array.isArray(metadata.extras) ? metadata.extras : []).join(", ") || "-" });
+  const base = basePaymentDescription(payment, tx);
+  const plus = Number(metadata.includes_extras?.amount || 0);
+  const less = Number(metadata.extras_credit || 0);
+  return [base, plus > 0 ? tx.say("pc_plusExtras", { amount: amount(plus) }) : null, less > 0 ? tx.say("pc_lessExtras", { amount: amount(less) }) : null].filter(Boolean).join(" ");
+}
+
+/** Words someone typed are shown as typed; otherwise a payment is named from what it is. */
+function basePaymentDescription(payment: RentalPayment, tx: Ctl) {
   const metadata = payment.metadata || {};
   // The app's own English descriptions ("Security deposit", "First rental payment - due at handover") are
   // not words someone typed: those payments are named in the reader's language below.
@@ -501,7 +513,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
   const [isPending, startTransition] = useTransition();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const badgeTone = voided ? "neutral" : status === "paid" ? "green" : status === "overdue" ? "red" : status === "waived" ? "blue" : "amber";
+  const badgeTone = voided || status === "cancelled" ? "neutral" : status === "paid" ? "green" : status === "overdue" ? "red" : status === "waived" ? "blue" : "amber";
   // Scheduled payments can be recorded too: customers often pay early.
   const canRecordPayment = !voided && ["scheduled", "pending", "overdue"].includes(status);
 
@@ -585,7 +597,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
             <SmallBadge tone={badgeTone as any}>
               {(() => {
                 // Say where the payment stands in plain words, not the stored status.
-                if (voided) return tx.say("pc_b_cancelled");
+                if (voided || status === "cancelled") return tx.say("pc_b_cancelled");
                 if (status === "paid") return tx.say("pc_b_paid");
                 if (status === "waived") return tx.say("pc_b_waived");
                 const due = String(payment.due_date || "").slice(0, 10);

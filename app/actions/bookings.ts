@@ -1,6 +1,7 @@
 "use server";
 
 import { extrasFrom, priceExtras } from "@/lib/price-rules";
+import { extrasIncomeTag } from "@/lib/extras";
 
 import { said } from "@/lib/i18n/server-text";
 import { completeRentalJobs, tellRentalCustomer } from "@/lib/customer-messages";
@@ -2825,6 +2826,8 @@ export async function recordPaymentReceived(paymentId: string, fields: RecordPay
       payment_method: method,
       payment_description: description,
       note,
+      // Extras are rental income, tagged so what was paid for them can be seen and refunded.
+      ...extrasIncomeTag(payment.metadata, amount),
       // The customer's receipt, when they sent one, stays with the money it proves.
       ...(payment.metadata?.receipt?.path ? { receipt_path: payment.metadata.receipt.path } : {})
     },
@@ -2883,7 +2886,12 @@ export async function recordPaymentReceived(paymentId: string, fields: RecordPay
             is_deposit: payment.metadata?.is_deposit === true,
             period_label: payment.metadata?.period_label || null,
             description: `Remaining balance - ${description}`,
-            remainder_of: payment.id
+            remainder_of: payment.id,
+            // Extras keep their names; extras inside rent count as paid first, the rest stays with the remainder.
+            ...(Array.isArray(payment.metadata?.extras) ? { extras: payment.metadata.extras } : {}),
+            ...(Number(payment.metadata?.includes_extras?.amount || 0) > amount
+              ? { includes_extras: { ...payment.metadata.includes_extras, amount: Number(payment.metadata.includes_extras.amount) - amount } }
+              : {})
           }
     });
     if (remainderError) {

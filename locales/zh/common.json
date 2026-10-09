@@ -619,6 +619,10 @@
     "renewalDue": "{vehicle} 的部分证件将在 {date} 前后续期。我们可能需要短暂使用车辆或其证件，届时会联系您安排。",
     "signStillNeeded": "您现在使用的是 {vehicle}，我们仍需要您的签名来确认这项变更。只需一分钟：{link}",
     "signWaiting": "您对 {vehicle} 的租赁有一项变更等待您签名。请查看并在此签署：{link}",
-    "bookingRestored": "您的预订已恢复如初。给您带来困扰，敬请谅解。"
+    "bookingRestored": "您的预订已恢复如初。给您带来困扰，敬请谅解。",
+    "extrasMoved": "您的附加服务费用（{amount}）将与 {date} 的租金一起支付。",
+    "extrasRemoved": "已从您的预订中移除 {names}。",
+    "extrasRefunded": "我们已退还您附加服务费用 {amount}。谢谢。",
+    "extrasCredited": "您为附加服务支付的 {amount} 将从 {date} 到期的租金中扣除。"
   }
 }

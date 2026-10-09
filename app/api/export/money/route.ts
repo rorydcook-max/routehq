@@ -45,8 +45,8 @@ export async function GET(request: NextRequest) {
 
   const th = locale === "th";
   const header = th
-    ? ["วันที่", "เข้า/ออก", "หมวด", "จำนวนเงิน", "สกุลเงิน", "นับเป็นรายได้", "ช่องทางชำระ", "การจอง", "ลูกค้า", "รถ", "ทะเบียน", "จ่ายให้", "หมายเหตุ", "ยกเลิกแล้ว"]
-    : ["Date", "In/Out", "Category", "Amount", "Currency", "Counts as income", "Paid by", "Booking", "Customer", "Vehicle", "Plate", "Paid to", "Notes", "Cancelled"];
+    ? ["วันที่", "เข้า/ออก", "หมวด", "จำนวนเงิน", "สกุลเงิน", "นับเป็นรายได้", "ส่วนที่เป็นบริการเสริม", "ช่องทางชำระ", "การจอง", "ลูกค้า", "รถ", "ทะเบียน", "จ่ายให้", "หมายเหตุ", "ยกเลิกแล้ว"]
+    : ["Date", "In/Out", "Category", "Amount", "Currency", "Counts as income", "Of which extras", "Paid by", "Booking", "Customer", "Vehicle", "Plate", "Paid to", "Notes", "Cancelled"];
   const yes = th ? "ใช่" : "Yes";
   const no = th ? "ไม่" : "No";
   const lines = [header.map(cell).join(",")];
@@ -61,7 +61,8 @@ export async function GET(request: NextRequest) {
       : out
         ? th ? "ออก" : "Out"
         : th ? "เข้า" : "In";
-    const category = t.has(`type_${row.type}`) ? t(`type_${row.type}`) : String(row.type || "");
+    const typeName = t.has(`type_${row.type}`) ? t(`type_${row.type}`) : String(row.type || "");
+    const category = row.metadata?.refund_of === "extras" || row.metadata?.income_kind === "extras" ? `${typeName} (${t("extrasTag")})` : typeName;
     lines.push(
       [
         row.transaction_date,
@@ -70,6 +71,7 @@ export async function GET(request: NextRequest) {
         amount,
         row.currency || organization.currency || "THB",
         !row.voided && isRevenueTransaction({ amount, isDeposit: row.is_deposit, type: row.type }) ? yes : no,
+        row.metadata?.refund_of === "extras" ? amount : Number(row.metadata?.extras_amount || 0) || "",
         (th ? METHOD_TH : METHOD_EN)[String(row.metadata?.payment_method || "")] || row.metadata?.payment_method || "",
         row.rentals?.display_code || row.rentals?.reference || "",
         row.customers?.full_name || "",

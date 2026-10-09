@@ -46,6 +46,10 @@ export type TransactionListItem = {
   customerName: string | null;
   isDeposit: boolean;
   voided: boolean;
+  /** Paid for extras (all of it, or the extras part of a rent payment). */
+  extrasAmount: number;
+  /** A refund of extras only. */
+  extrasRefund: boolean;
 };
 
 export type TransactionFormOptions = {
@@ -71,7 +75,7 @@ export async function getTransactionList(organizationId: string): Promise<Transa
   const { data, error } = await supabase
     .from("transactions")
     .select(
-      "id, display_code, type, amount, currency, transaction_date, notes, supplier, mileage, vehicle_id, rental_id, customer_id, is_deposit, voided, vehicles!transactions_vehicle_id_fkey(registration_number, make, model), customers!transactions_customer_id_fkey(full_name), rentals!transactions_rental_id_fkey(reference, display_code)"
+      "id, display_code, type, amount, currency, transaction_date, notes, supplier, mileage, vehicle_id, rental_id, customer_id, is_deposit, voided, metadata, vehicles!transactions_vehicle_id_fkey(registration_number, make, model), customers!transactions_customer_id_fkey(full_name), rentals!transactions_rental_id_fkey(reference, display_code)"
     )
     .eq("organization_id", organizationId)
     .is("deleted_at", null)
@@ -101,7 +105,9 @@ export async function getTransactionList(organizationId: string): Promise<Transa
     customerId: row.customer_id,
     customerName: row.customers?.full_name || null,
     isDeposit: Boolean(row.is_deposit),
-    voided: Boolean(row.voided || row.metadata?.voided)
+    voided: Boolean(row.voided || row.metadata?.voided),
+    extrasAmount: Number(row.metadata?.extras_amount || 0),
+    extrasRefund: row.metadata?.refund_of === "extras"
   }));
 }
 

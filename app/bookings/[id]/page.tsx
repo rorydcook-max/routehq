@@ -19,6 +19,8 @@ import { AssignCustomerModal } from "@/app/bookings/[id]/assign-customer-modal";
 import { SkipInspectionButton } from "@/app/bookings/[id]/skip-inspection-button";
 import { BookingShareActions } from "@/app/bookings/[id]/booking-share-actions";
 import { RefundDepositPanel } from "@/app/bookings/[id]/refund-deposit-panel";
+import { ExtrasPanel } from "@/app/bookings/[id]/extras-panel";
+import { activeExtrasLines, extrasLines, extrasSummary } from "@/lib/extras";
 import { AppShell } from "@/components/app-shell";
 import { AddRentalPaymentInlineForm, EditableEndDate, EditableRentalPaymentRow, EditableTransactionRow, ExistingRentalPaymentSetupCard } from "@/components/booking-correction-controls";
 import { CommunicationPanel } from "@/components/communication-panel";
@@ -422,6 +424,9 @@ export default async function BookingDetailPage({ params, searchParams }: { para
     activePayments.filter((payment: any) => payment.status === "paid" && test(payment)).reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
   const paidDeposit = paidOfKind((payment) => payment.metadata?.type === "deposit" || payment.metadata?.is_deposit === true);
   const paidCharges = paidOfKind((payment) => payment.metadata?.type === "charge");
+  // Paid extras are rent income, followed on their own so the owner can see, refund or move them.
+  const extras = extrasSummary(rental, payments, transactions);
+  const hasExtras = extrasLines(rental).length > 0 || extras.paid > 0 || extras.open > 0;
   const financialState = (() => {
     if (isCancelled) {
       return {
@@ -600,7 +605,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 <p className="font-medium text-[var(--foreground-secondary)]">{financialState.amount !== null ? tx.say(`ratePer_${["daily", "weekly", "monthly"].includes(String(rental.pricing_model)) ? rental.pricing_model : "other"}`, { amount: money(rental.rental_rate, rental.currency) }) : financialState.detail}</p>
                 {Number(rental.extras_total || 0) > 0 ? (
                   <p className="mt-1 text-sm font-semibold text-[var(--foreground-secondary)]">
-                    {tx.say("extrasPlus", { amount: money(rental.extras_total, rental.currency), names: (Array.isArray(rental.extras) ? rental.extras : []).map((line: any) => String(line?.name || "")).filter(Boolean).join(", ") || "-" })}
+                    {tx.say("extrasPlus", { amount: money(rental.extras_total, rental.currency), names: activeExtrasLines(rental).map((line) => line.name).join(", ") || "-" })}
                   </p>
                 ) : null}
                 {pendingPaymentAmount > 0 && customer ? (
@@ -1114,6 +1119,22 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   {paidCharges > 0 ? ` · ${tx.say("paidChargesLine", { amount: money(paidCharges, rental.currency) })}` : null}{" "}
                   {financialState.detail}
                 </p>
+                {hasExtras ? (
+                  <ExtrasPanel
+                    available={extras.available}
+                    credited={extras.credited}
+                    currency={rental.currency || "THB"}
+                    lines={extrasLines(rental).map((line, index) => ({ name: line.name, amount: line.amount, index, removed: Boolean(line.removed_at) })).filter((line) => !line.removed).map(({ removed: _removed, ...line }) => line)}
+                    nextRent={extras.nextRent ? `${shortDate(extras.nextRent.dueDate, tx.locale)} · ${money(extras.nextRent.amount, rental.currency)}` : null}
+                    open={extras.open}
+                    openOwn={extras.openOwn}
+                    organizationId={organization.id}
+                    paid={extras.paid}
+                    refunded={extras.refunded}
+                    removedNames={extras.removedLines.map((line) => line.name)}
+                    rentalId={rental.id}
+                  />
+                ) : null}
                 {needsExistingRentalPaymentSetup ? (
                   <ExistingRentalPaymentSetupCard
                     currency={rental.currency}

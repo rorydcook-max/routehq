@@ -1289,7 +1289,8 @@
     "fineTitle": "Record a fine",
     "fineSubtitle": "Set the date of the offence. Whoever had the vehicle that day is billed, and the fine comes out of their deposit if it is still held.",
     "exportSheet": "Download for your accountant (spreadsheet)",
-    "exportShort": "Spreadsheet"
+    "exportShort": "Spreadsheet",
+    "match_extras": "{amount} · extras · {vehicle}"
   },
   "booking": {
     "open": "Open",

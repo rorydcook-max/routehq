@@ -828,7 +828,8 @@
     "chargeFromDeposit": "{amount} for {reason} has been taken from your deposit.",
     "chargeFromDepositPlain": "{amount} has been taken from your deposit for costs during your rental.",
     "chargeRestToPay": "{amount} more is still to pay; you can pay it from your booking page.",
-    "depositHeldForDamage": "Your deposit is being held until the damage has been assessed. We will let you know what is returned."
+    "depositHeldForDamage": "Your deposit is being held until the damage has been assessed. We will let you know what is returned.",
+    "bookingRestored": "Your booking is back on as before. Sorry for any confusion."
   },
   "common": {
     "kinds_car": "Cars",
@@ -2289,7 +2290,9 @@
     "extrasUpfront": "Extras {amount}, paid with the first payment.",
     "extrasMonthly": "{amount} a month added to the rent.",
     "s_extras": "Extras",
-    "seasonPartDays": "({inDays} of {days} days in season)"
+    "seasonPartDays": "({inDays} of {days} days in season)",
+    "sel_whatsappSame": "WhatsApp number, if not the phone number above",
+    "sel_channels": "How to reach them"
   },
   "fleet": {
     "title": "Fleet",

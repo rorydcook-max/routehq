@@ -618,6 +618,7 @@
     "serviceDue": "le véhicule {vehicle} doit passer en entretien le {date}. Nous vous contacterons pour convenir d’un moment qui vous arrange ; cela prend en général quelques heures.",
     "renewalDue": "des documents du véhicule {vehicle} doivent être renouvelés vers le {date}. Nous pourrions avoir besoin du véhicule ou de ses papiers un court moment et vous contacterons pour l’organiser.",
     "signStillNeeded": "vous avez maintenant le véhicule {vehicle}, et il nous faut encore votre signature pour confirmer le changement. Cela prend une minute : {link}",
-    "signWaiting": "un changement dans votre location du véhicule {vehicle} attend votre signature. Merci de le vérifier et de signer ici : {link}"
+    "signWaiting": "un changement dans votre location du véhicule {vehicle} attend votre signature. Merci de le vérifier et de signer ici : {link}",
+    "bookingRestored": "Votre réservation est de nouveau active comme avant. Désolé pour la confusion."
   }
 }

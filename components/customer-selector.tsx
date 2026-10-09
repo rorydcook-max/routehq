@@ -50,7 +50,8 @@ export function CustomerSelector({
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
-  const formRef = useRef<HTMLFormElement>(null);
+  const formRef = useRef<HTMLDivElement>(null);
+  const [contact, setContact] = useState("whatsapp");
 
   const selectedCustomer = localCustomers.find((customer) => customer.id === selectedId);
   const filteredCustomers = useMemo(() => {
@@ -67,8 +68,15 @@ export function CustomerSelector({
 
     startTransition(async () => {
       try {
-        const formData = new FormData(form);
+        const formData = new FormData();
+        form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>("input[name], select[name], textarea[name]").forEach((field) => {
+          if (field instanceof HTMLInputElement && (field.type === "checkbox" || field.type === "radio") && !field.checked) return;
+          formData.set(field.name, field.value);
+        });
         formData.set("organizationId", organizationId);
+        if (formData.get("preferredContactMethod") === "whatsapp" && !String(formData.get("whatsappNumber") || "").trim()) {
+          formData.set("whatsappNumber", `${String(formData.get("phoneCountryCode") || "")}${String(formData.get("phone") || "").replace(/^0/, "")}`);
+        }
         const result = await createInlineCustomer(formData);
         const fullName = result.full_name || String(formData.get("fullName") || "");
         const phone = result.phone || null;
@@ -124,7 +132,17 @@ export function CustomerSelector({
               </button>
 
               {creating ? (
-                <form ref={formRef} className="mt-3 space-y-3 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
+                <div
+            className="mt-3 space-y-3 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3"
+            onKeyDown={(event) => {
+              // Enter saves the customer; it must not submit the booking form around this box.
+              if (event.key === "Enter" && (event.target as HTMLElement).tagName !== "TEXTAREA") {
+                event.preventDefault();
+                handleCreateCustomer();
+              }
+            }}
+            ref={formRef}
+          >
                   <input name="organizationId" type="hidden" value={organizationId} />
                   <input className={inputClass} name="fullName" placeholder={say("sel_fullName")} required />
                   <div className="grid grid-cols-[124px_1fr] gap-2">
@@ -146,28 +164,27 @@ export function CustomerSelector({
                   </select>
                   <div className="rounded-lg border border-[var(--border)] bg-white p-3">
                     <p className="text-xs font-bold uppercase text-[var(--primary)]">{say("sel_channels")}</p>
-                    <p className="mt-1 text-xs leading-5 text-[var(--muted)]">{say("sel_channelsHint")}</p>
-                    <div className="mt-3 grid gap-2">
-                      <input className={inputClass} name="email" placeholder={say("sel_email")} type="email" />
-                      <input className={inputClass} name="whatsappNumber" placeholder={say("sel_whatsapp")} type="tel" />
-                      <input className={inputClass} name="messengerId" placeholder={say("sel_messenger")} />
-                      <input className={inputClass} name="lineId" placeholder="@lineusername" />
-                      <input className={inputClass} name="telegramUsername" placeholder="@telegramusername" />
-                      <input className={`${inputClass} opacity-85`} name="instagramHandle" placeholder="@instagramhandle" />
-                      <select className={inputClass} defaultValue="whatsapp" name="preferredContactMethod">
+                    <div className="mt-2 grid gap-2">
+                      <select className={inputClass} name="preferredContactMethod" onChange={(event) => setContact(event.target.value)} value={contact}>
                         {contactMethodOptions.map((method) => (
                           <option key={`selector-contact-${method.value}`} value={method.value}>
                             {method.label || say("sel_phoneCall")}
                           </option>
                         ))}
                       </select>
+                      {/* WhatsApp defaults to the phone number, so nothing extra to type for the usual case. */}
+                      {contact === "whatsapp" ? <input className={inputClass} name="whatsappNumber" placeholder={say("sel_whatsappSame")} type="tel" /> : null}
+                      {contact === "email" ? <input className={inputClass} name="email" placeholder={say("sel_email")} type="email" /> : null}
+                      {contact === "messenger" ? <input className={inputClass} name="messengerId" placeholder={say("sel_messenger")} /> : null}
+                      {contact === "line" ? <input className={inputClass} name="lineId" placeholder="@lineusername" /> : null}
+                      {contact === "telegram" ? <input className={inputClass} name="telegramUsername" placeholder="@telegramusername" /> : null}
                     </div>
                   </div>
                   {error ? <p className="rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">{error}</p> : null}
                   <button className="inline-flex w-full justify-center rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-bold text-white disabled:opacity-70" disabled={isPending} onClick={handleCreateCustomer} type="button">
                     {isPending ? say("sel_creating") : say("sel_createSelect")}
                   </button>
-                </form>
+                </div>
               ) : null}
               {creating ? null : (
                 <>

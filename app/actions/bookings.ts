@@ -3445,24 +3445,18 @@ export async function undoCancellation(formData: FormData) {
       .eq("status", "cancelled")
       .gte("scheduled_date", today),
 
-    // Re-assign vehicle to this rental
-    ...(resolvedVehicleId ? [
-      supabase
-        .from("vehicles")
-        .update({
-          status: "rented",
-          availability_status: "rented",
-          current_customer_id: rental.customer_id,
-          current_rental_id: rentalId,
-        })
-        .eq("id", resolvedVehicleId)
-        .eq("organization_id", organizationId),
-    ] : []),
   ];
 
   const results = await Promise.all(ops);
   const firstError = results.find((r: any) => r?.error)?.error;
   if (firstError) throw new Error(firstError.message);
+
+  // On rent, reserved or free: whatever this vehicle's bookings now say.
+  if (resolvedVehicleId) await syncVehicleStatusFromBookings(supabase, organizationId, resolvedVehicleId).catch(() => null);
+  {
+    const admin = createSupabaseAdminClient() as any;
+    await tellRentalCustomer(admin, rentalId, ({ say }) => say("bookingRestored"), { sentBy: user.id, withLink: true, replacesEarlier: true });
+  }
 
   await recordActivityEvent(supabase, {
     organization_id: organizationId,

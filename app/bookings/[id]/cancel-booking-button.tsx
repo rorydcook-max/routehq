@@ -80,7 +80,7 @@ export function CancelBookingButton({
   const [notes, setNotes] = useState("");
   const [cancelledAt, setCancelledAt] = useState("");
   const [collectionDatetime, setCollectionDatetime] = useState("");
-  const [vehicleDisposition, setVehicleDisposition] = useState<"available" | "repair" | "keep_assigned">("available");
+  const [vehicleDisposition, setVehicleDisposition] = useState<"available" | "repair" | "keep_assigned">(rentalStatus === "booked" ? "keep_assigned" : "available");
   const [repairNotes, setRepairNotes] = useState("");
   const [repairExpectedEnd, setRepairExpectedEnd] = useState("");
   const [error, setError] = useState("");
@@ -89,6 +89,8 @@ export function CancelBookingButton({
   const hasPayment = totalPaid > 0;
   const hasDeposit = depositHeld > 0;
   const isPreDelivery = rentalStatus === "booked";
+  // Before the handover the vehicle never left, so the reasons about ending a rental do not apply.
+  const reasonOptions = isPreDelivery ? REASONS.filter((r) => !["customer_cancelled_early", "vehicle_breakdown"].includes(r.value)) : REASONS.filter((r) => r.value !== "customer_cancelled_before_delivery");
   const needsFullFlow = !isPreDelivery || hasPayment || hasDeposit;
 
   function reset() {
@@ -113,7 +115,7 @@ export function CancelBookingButton({
     if (needsFullFlow) {
       setStep("disposition");
     } else {
-      setStep("vehicle");
+      setStep(isPreDelivery ? "confirm" : "vehicle");
     }
   }
 
@@ -123,7 +125,7 @@ export function CancelBookingButton({
       setError(say("cn_enterRefund")); return;
     }
     setError("");
-    setStep("vehicle");
+    setStep(isPreDelivery ? "confirm" : "vehicle");
   }
 
   function submit() {
@@ -175,7 +177,9 @@ export function CancelBookingButton({
     if (giveBackRental === 0 && hasPayment) lines.push(say("cn_s_noRefund", { amount: money(totalPaid, currency) }));
     }
     lines.push(say("cn_s_cancelPayments"));
-    if (vehicleDisposition === "available") lines.push(say("cn_s_release"));
+    if (isPreDelivery) {
+      // The vehicle never left; nothing to say about it.
+    } else if (vehicleDisposition === "available") lines.push(say("cn_s_release"));
     else if (vehicleDisposition === "repair") lines.push(`${say("cn_s_repair")}${repairNotes ? `: ${repairNotes}` : ""}`);
     else lines.push(say("cn_s_unchanged"));
 
@@ -280,7 +284,7 @@ export function CancelBookingButton({
                     <p className="text-sm font-semibold text-[var(--foreground)] mb-1">{say("cn_why")}</p>
                     <p className="text-xs text-[var(--muted)] mb-3">{say("cn_selectAll")}</p>
                     <div className="space-y-2">
-                      {REASONS.map(r => (
+                      {reasonOptions.map(r => (
                         <button
                           aria-pressed={reasons.includes(r.value)}
                           key={r.value}
@@ -328,6 +332,7 @@ export function CancelBookingButton({
                         value={cancelledAt}
                       />
                     </label>
+                    {isPreDelivery ? null : (
                     <label className="block">
                       <span className="text-xs font-bold text-[var(--foreground-secondary)]">{say("cn_collect")}</span>
                       <p className="mb-1 text-[11px] text-[var(--muted)]">
@@ -340,6 +345,7 @@ export function CancelBookingButton({
                         value={collectionDatetime}
                       />
                     </label>
+                    )}
                   </div>
                 </>
               )}
@@ -522,7 +528,7 @@ export function CancelBookingButton({
                     disabled={isPending}
                     onClick={() => {
                       setError("");
-                      if (step === "confirm") setStep("vehicle");
+                      if (step === "confirm") setStep(isPreDelivery ? (needsFullFlow ? "disposition" : "reason") : "vehicle");
                       else if (step === "vehicle") setStep(needsFullFlow ? "disposition" : "reason");
                       else setStep("reason");
                     }}

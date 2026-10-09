@@ -618,6 +618,7 @@
     "serviceDue": "{vehicle} perlu diservis pada {date}. Kami akan menghubungi anda untuk mengatur masa yang sesuai; biasanya mengambil masa beberapa jam.",
     "renewalDue": "beberapa dokumen {vehicle} akan diperbaharui sekitar {date}. Kami mungkin memerlukan kenderaan atau dokumennya seketika dan akan menghubungi anda untuk mengaturnya.",
     "signStillNeeded": "anda kini menggunakan {vehicle}, dan kami masih memerlukan tandatangan anda untuk mengesahkan perubahan ini. Hanya seminit: {link}",
-    "signWaiting": "ada perubahan pada sewaan {vehicle} anda yang menunggu tandatangan anda. Sila semak dan tandatangani di sini: {link}"
+    "signWaiting": "ada perubahan pada sewaan {vehicle} anda yang menunggu tandatangan anda. Sila semak dan tandatangani di sini: {link}",
+    "bookingRestored": "Tempahan anda kembali aktif seperti sebelum ini. Maaf atas kekeliruan."
   }
 }

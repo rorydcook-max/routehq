@@ -618,6 +618,7 @@
     "serviceDue": "xe {vehicle} đến hạn bảo dưỡng vào {date}. Chúng tôi sẽ liên hệ để sắp xếp thời gian phù hợp với bạn; thường mất vài giờ.",
     "renewalDue": "một số giấy tờ của xe {vehicle} sẽ được gia hạn vào khoảng {date}. Chúng tôi có thể cần xe hoặc giấy tờ xe trong thời gian ngắn và sẽ liên hệ để sắp xếp.",
     "signStillNeeded": "hiện bạn đang dùng xe {vehicle}, và chúng tôi vẫn cần chữ ký của bạn để xác nhận thay đổi. Chỉ mất một phút: {link}",
-    "signWaiting": "có một thay đổi trong việc thuê xe {vehicle} của bạn đang chờ bạn ký. Vui lòng kiểm tra và ký tại đây: {link}"
+    "signWaiting": "có một thay đổi trong việc thuê xe {vehicle} của bạn đang chờ bạn ký. Vui lòng kiểm tra và ký tại đây: {link}",
+    "bookingRestored": "Đặt xe của bạn đã được khôi phục như trước. Xin lỗi vì sự nhầm lẫn."
   }
 }

@@ -21,7 +21,7 @@ type Props = {
   currency: string;
   rentalStatus: string;
   /** Returned before the paid time ran out: the pro-rata refund to consider. */
-  earlyReturn?: { amount: number; unusedDays: number; periodDays: number; paid: number } | null;
+  earlyReturn?: { amount: number; unusedDays: number; periodDays: number; paid: number; owed?: number } | null;
 };
 
 type ActiveForm = "return" | "deduction" | "refund" | null;
@@ -133,8 +133,11 @@ export function RefundDepositPanel({
                   b: (chunks: React.ReactNode) => <span className="font-semibold">{chunks}</span>
                 })}
               </p>
+              {Number(earlyReturn.owed || 0) > 0 ? (
+                <p className="mt-1 font-semibold">{say("ref_earlyOwed", { owed: money(Number(earlyReturn.owed), currency), net: money(Math.max(0, earlyReturn.amount - Number(earlyReturn.owed)), currency) })}</p>
+              ) : null}
               <button className="pressable mt-2 rounded-lg border border-[var(--warning-line)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--warning)]" onClick={() => openForm("refund")} type="button">
-                {say("ref_earlyButton", { amount: money(earlyReturn.amount, currency) })}
+                {say("ref_earlyButton", { amount: money(Math.max(0, earlyReturn.amount - Number(earlyReturn.owed || 0)), currency) })}
               </button>
             </div>
           ) : null}
@@ -250,7 +253,7 @@ export function RefundDepositPanel({
                 {say("ref_refundAmount")}
                 <input
                   className="mt-1 w-full"
-                  defaultValue={earlyReturn ? Math.min(earlyReturn.amount, totalPaid) : totalPaid}
+                  defaultValue={earlyReturn ? Math.min(Math.max(0, earlyReturn.amount - Number(earlyReturn.owed || 0)), totalPaid) : totalPaid}
                   max={totalPaid}
                   min={0.01}
                   name="amount"

@@ -13,6 +13,8 @@ export type EarlyReturn = {
   periodDays: number;
   /** Rent paid for those periods. */
   paid: number;
+  /** Still owed on the booking at the time of the return, to net off. */
+  owed?: number;
 };
 
 const day = (value: unknown) => String(value || "").slice(0, 10);

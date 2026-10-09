@@ -15,6 +15,7 @@ import { CustomerSelector } from "@/components/customer-selector";
 import { Badge, ProgressBar } from "@/components/ui";
 import { flagForNationality } from "@/lib/customer-options";
 import { findConflict, type BusyPeriod } from "@/lib/rental-conflicts";
+import { loadGooglePlaces as loadSharedGooglePlaces } from "@/lib/google-places";
 
 type BookingVehicle = {
   id: string;
@@ -206,39 +207,7 @@ function rateFor(vehicle: BookingVehicle | null, pricingModel: string) {
   return rateWithSource(vehicle, pricingModel).rate;
 }
 
-function loadGooglePlaces() {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-  if (!apiKey || typeof window === "undefined") {
-    return null;
-  }
-
-  if (window.google?.maps?.places?.Autocomplete) {
-    return Promise.resolve();
-  }
-
-  if (!window.__routeHqGoogleMapsPromise) {
-    window.__routeHqGoogleMapsPromise = new Promise((resolve, reject) => {
-      const existingScript = document.querySelector<HTMLScriptElement>('script[data-routehq-google-places="true"]');
-      if (existingScript) {
-        existingScript.addEventListener("load", () => resolve(), { once: true });
-        existingScript.addEventListener("error", () => reject(new Error("Google Maps failed to load.")), { once: true });
-        return;
-      }
-
-      const script = document.createElement("script");
-      script.async = true;
-      script.defer = true;
-      script.dataset.routehqGooglePlaces = "true";
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&libraries=places&v=weekly`;
-      script.onload = () => resolve();
-      script.onerror = () => reject(new Error("Google Maps failed to load."));
-      document.head.appendChild(script);
-    });
-  }
-
-  return window.__routeHqGoogleMapsPromise;
-}
-
+const loadGooglePlaces = loadSharedGooglePlaces;
 export function BookingForm({
   organizationId,
   organizationName,

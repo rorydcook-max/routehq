@@ -16,6 +16,8 @@ import { tellRentalCustomer } from "@/lib/customer-messages";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
 import { inspectionUploadPrefix, readUploadedFiles } from "@/lib/direct-uploads";
+import { earlyHandoverBlocker, isDoubleBookingError } from "@/lib/rental-conflicts";
+import { said } from "@/lib/i18n/server-text";
 
 type InspectionMode = "delivery" | "return" | "condition_report";
 
@@ -456,6 +458,16 @@ export async function submitInspection(formData: FormData) {
     throw new Error("Customer signature is required before submitting.");
   }
 
+  // An early handover needs the vehicle free from today: say so before the form is saved.
+  if (mode === "delivery" && rentalId && !isSwap) {
+    const { data: booked } = await supabase.from("rentals").select("start_date, end_date").eq("id", rentalId).eq("organization_id", organizationId).maybeSingle();
+    const blocker = await earlyHandoverBlocker(supabase, { organizationId, vehicleId, rentalId, startDate: booked?.start_date, endDate: booked?.end_date || null, today: todayDate() });
+    if (blocker) {
+      const who = [blocker.code, blocker.customerName].filter(Boolean).join(", ");
+      throw new Error(`${await said("This vehicle is still out on another rental. Return that rental first, or change the vehicle on this booking.")}${who ? ` (${who}${blocker.endDate ? ` → ${blocker.endDate}` : ""})` : ""}`);
+    }
+  }
+
   const now = new Date().toISOString();
   const { data: inspection, error: inspectionError } = await supabase
     .from("inspections")
@@ -627,7 +639,7 @@ export async function submitInspection(formData: FormData) {
       .eq("id", rentalId)
       .eq("organization_id", organizationId);
     if (rentalError) {
-      throw new Error(rentalError.message);
+      throw new Error(isDoubleBookingError(rentalError) ? await said("This vehicle is still out on another rental. Return that rental first, or change the vehicle on this booking.") : rentalError.message);
     }
 
     const { error: vehicleError } = await supabase
@@ -785,7 +797,7 @@ export async function submitInspection(formData: FormData) {
 
       // Back before the time already paid for ran out: a job for the owner with the pro-rata figure.
       // Whether to refund, and how much, is theirs to decide.
-      if (owed <= 0) {
+      {
         const admin = createSupabaseAdminClient() as any;
         const { data: allPayments } = await admin.from("rental_payments").select("id, amount, status, due_date, metadata").eq("rental_id", rentalId).is("deleted_at", null);
         const previousEnd = rental?.end_date ? String(rental.end_date).slice(0, 10) : null;
@@ -794,15 +806,16 @@ export async function submitInspection(formData: FormData) {
           const lastPaid = (allPayments || [])
             .filter((payment: any) => ["paid", "reconciled"].includes(String(payment.status)) && payment.metadata?.type !== "deposit" && payment.metadata?.is_deposit !== true)
             .sort((a: any, b: any) => String(b.due_date).localeCompare(String(a.due_date)))[0];
-          if (lastPaid) await admin.from("rental_payments").update({ metadata: { ...(lastPaid.metadata || {}), early_return: { ...suggestion, return_date: returnDate } } }).eq("id", lastPaid.id);
+          if (lastPaid) await admin.from("rental_payments").update({ metadata: { ...(lastPaid.metadata || {}), early_return: { ...suggestion, owed: Math.max(0, owed), return_date: returnDate } } }).eq("id", lastPaid.id);
           const symbol = String(rental?.currency || "THB") === "THB" ? "฿" : `${rental?.currency} `;
+          const owedNote = owed > 0 ? `, ${symbol}${Math.round(owed).toLocaleString("en-US")} still owed` : "";
           await admin.from("tasks").insert({
             organization_id: organizationId,
             vehicle_id: vehicleId,
             rental_id: rentalId,
             title_key: null,
             created_by: null,
-            title: `Refund to decide - returned ${suggestion.unusedDays} ${suggestion.unusedDays === 1 ? "day" : "days"} before the paid time ran out (pro rata ${symbol}${suggestion.amount.toLocaleString("en-US")})`,
+            title: `Refund to decide - returned ${suggestion.unusedDays} ${suggestion.unusedDays === 1 ? "day" : "days"} before the paid time ran out (pro rata ${symbol}${suggestion.amount.toLocaleString("en-US")}${owedNote})`,
             task_type: "admin",
             action: "refund",
             due_at: new Date().toISOString()

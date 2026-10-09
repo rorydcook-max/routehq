@@ -561,7 +561,12 @@
     "payKind_deposit_top_up": "Complément de caution",
     "payKind_extension": "Jours supplémentaires",
     "agreeAll": "J'accepte tout ce qui précède",
-    "extrasLine": "Options: {names} · {amount}"
+    "extrasLine": "Options: {names} · {amount}",
+    "missing_passportNumber": "Indiquez votre numéro de passeport ou de pièce d'identité.",
+    "missing_driverLicenseNumber": "Indiquez votre numéro de permis.",
+    "missing_driverLicenseExpiry": "Quand votre permis expire-t-il ?",
+    "missing_driverLicenseCountry": "Quel pays a délivré votre permis ?",
+    "handoverPhotos": "Photos de remise ({count})"
   },
   "customerMessages": {
     "hi": "Bonjour {name},",

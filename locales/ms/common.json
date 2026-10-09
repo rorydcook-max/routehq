@@ -561,7 +561,12 @@
     "payKind_deposit_top_up": "Tambahan deposit",
     "payKind_extension": "Hari tambahan",
     "agreeAll": "Saya bersetuju dengan semua perkara di atas",
-    "extrasLine": "Tambahan: {names} · {amount}"
+    "extrasLine": "Tambahan: {names} · {amount}",
+    "missing_passportNumber": "Masukkan nombor pasport atau kad pengenalan.",
+    "missing_driverLicenseNumber": "Masukkan nombor lesen memandu.",
+    "missing_driverLicenseExpiry": "Bila lesen memandu anda tamat?",
+    "missing_driverLicenseCountry": "Negara mana yang mengeluarkan lesen anda?",
+    "handoverPhotos": "Gambar serahan ({count})"
   },
   "customerMessages": {
     "hi": "Hai {name},",

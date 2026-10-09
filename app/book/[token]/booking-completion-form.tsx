@@ -13,6 +13,7 @@ import { uploadFormFiles } from "@/lib/direct-upload-client";
 import { extractBodyHtml } from "@/lib/contract-rendering";
 import { formatDeliveryLocation } from "@/lib/delivery-location";
 import { toWallTime, businessToday } from "@/lib/business-time";
+import { loadGooglePlaces as loadSharedGooglePlaces } from "@/lib/google-places";
 
 declare global {
   interface Window {
@@ -535,39 +536,7 @@ const phoneCountrySvgOptions = [
 ];
 
 
-function loadPublicGooglePlaces() {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-  if (!apiKey || typeof window === "undefined") {
-    return null;
-  }
-
-  if (window.google?.maps?.places?.Autocomplete) {
-    return Promise.resolve();
-  }
-
-  if (!window.__routeHqPublicGoogleMapsPromise) {
-    window.__routeHqPublicGoogleMapsPromise = new Promise((resolve, reject) => {
-      const existingScript = document.querySelector<HTMLScriptElement>('script[data-routehq-public-google-places="true"]');
-      if (existingScript) {
-        existingScript.addEventListener("load", () => resolve(), { once: true });
-        existingScript.addEventListener("error", () => reject(new Error("Google Maps failed to load.")), { once: true });
-        return;
-      }
-
-      const script = document.createElement("script");
-      script.async = true;
-      script.defer = true;
-      script.dataset.routehqPublicGooglePlaces = "true";
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&libraries=places&v=weekly`;
-      script.onload = () => resolve();
-      script.onerror = () => reject(new Error("Google Maps failed to load."));
-      document.head.appendChild(script);
-    });
-  }
-
-  return window.__routeHqPublicGoogleMapsPromise;
-}
-
+const loadPublicGooglePlaces = loadSharedGooglePlaces;
 export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail }) {
   const t = useTranslations("customer");
   const locale = useLocale();
@@ -871,10 +840,16 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
       return;
     }
 
-    if (ID_FIELDS.some((name) => !String(fd.get(name) || "").trim())) {
+    const missingId = ID_FIELDS.find((name) => !String(fd.get(name) || "").trim());
+    if (missingId) {
       setIdOpen(true);
-      setError(t("addDocumentDetails"));
-      document.getElementById("document-numbers")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      const filledSome = ID_FIELDS.some((name) => String(fd.get(name) || "").trim());
+      setError(filledSome ? t(`missing_${missingId}`) : t("addDocumentDetails"));
+      window.setTimeout(() => {
+        const field = document.querySelector<HTMLInputElement>(`input[name="${missingId}"]`);
+        (field || document.getElementById("document-numbers"))?.scrollIntoView({ behavior: "smooth", block: "center" });
+        field?.focus();
+      }, 50);
       return;
     }
 

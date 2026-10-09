@@ -561,7 +561,12 @@
     "payKind_deposit_top_up": "စပေါ်ငွေ ထပ်ဖြည့်",
     "payKind_extension": "အပိုရက်များ",
     "agreeAll": "အထက်ပါအားလုံးကို သဘောတူပါသည်",
-    "extrasLine": "အပိုဝန်ဆောင်မှု: {names} · {amount}"
+    "extrasLine": "အပိုဝန်ဆောင်မှု: {names} · {amount}",
+    "missing_passportNumber": "နိုင်ငံကူးလက်မှတ် သို့မဟုတ် မှတ်ပုံတင်နံပါတ် ထည့်ပါ။",
+    "missing_driverLicenseNumber": "ယာဉ်မောင်းလိုင်စင်နံပါတ် ထည့်ပါ။",
+    "missing_driverLicenseExpiry": "လိုင်စင် ဘယ်တော့ သက်တမ်းကုန်မလဲ။",
+    "missing_driverLicenseCountry": "လိုင်စင်ကို ဘယ်နိုင်ငံက ထုတ်ပေးတာလဲ။",
+    "handoverPhotos": "လက်ဆင့်ကမ်းချိန်ဓာတ်ပုံများ ({count})"
   },
   "customerMessages": {
     "hi": "မင်္ဂလာပါ {name}၊",

@@ -89,4 +89,18 @@ export function isDoubleBookingError(error: { code?: string; message?: string } 
   return !!error && (error.code === "23P01" || String(error.message || "").includes("rentals_no_double_booking"));
 }
 
+/**
+ * Handing over before the booked start date: is the vehicle actually free from
+ * today until this booking ends? Returns the rental in the way, else null.
+ */
+export async function earlyHandoverBlocker(
+  supabase: any,
+  args: { organizationId: string; vehicleId: string; rentalId: string; startDate: string | null | undefined; endDate: string | null; today: string }
+): Promise<BusyPeriod | null> {
+  const booked = String(args.startDate || "").slice(0, 10);
+  if (!booked || args.today >= booked) return null;
+  const busy = await loadBusyPeriods(supabase, args.organizationId, [args.vehicleId]);
+  return findConflict(busy[args.vehicleId] || [], args.today, args.endDate || booked, args.rentalId);
+}
+
 export const DOUBLE_BOOKING_MESSAGE = "This vehicle is already booked for some of those dates. Choose other dates or another vehicle.";

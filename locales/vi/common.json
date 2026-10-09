@@ -561,7 +561,12 @@
     "payKind_deposit_top_up": "Cọc bổ sung",
     "payKind_extension": "Ngày thuê thêm",
     "agreeAll": "Tôi đồng ý với tất cả các điều trên",
-    "extrasLine": "Dịch vụ thêm: {names} · {amount}"
+    "extrasLine": "Dịch vụ thêm: {names} · {amount}",
+    "missing_passportNumber": "Nhập số hộ chiếu hoặc CCCD.",
+    "missing_driverLicenseNumber": "Nhập số bằng lái xe.",
+    "missing_driverLicenseExpiry": "Bằng lái hết hạn khi nào?",
+    "missing_driverLicenseCountry": "Bằng lái do nước nào cấp?",
+    "handoverPhotos": "Ảnh lúc giao xe ({count})"
   },
   "customerMessages": {
     "hi": "Chào {name},",

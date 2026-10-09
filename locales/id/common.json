@@ -561,7 +561,12 @@
     "payKind_deposit_top_up": "Tambahan deposit",
     "payKind_extension": "Hari tambahan",
     "agreeAll": "Saya menyetujui semua hal di atas",
-    "extrasLine": "Tambahan: {names} · {amount}"
+    "extrasLine": "Tambahan: {names} · {amount}",
+    "missing_passportNumber": "Isi nomor paspor atau KTP Anda.",
+    "missing_driverLicenseNumber": "Isi nomor SIM Anda.",
+    "missing_driverLicenseExpiry": "Kapan SIM Anda berakhir?",
+    "missing_driverLicenseCountry": "Negara mana yang menerbitkan SIM Anda?",
+    "handoverPhotos": "Foto serah terima ({count})"
   },
   "customerMessages": {
     "hi": "Halo {name},",

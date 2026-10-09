@@ -561,7 +561,12 @@
     "payKind_deposit_top_up": "Kautionsaufstockung",
     "payKind_extension": "Zusätzliche Tage",
     "agreeAll": "Ich stimme allen oben genannten Punkten zu",
-    "extrasLine": "Extras: {names} · {amount}"
+    "extrasLine": "Extras: {names} · {amount}",
+    "missing_passportNumber": "Bitte Pass- oder Ausweisnummer eintragen.",
+    "missing_driverLicenseNumber": "Bitte Führerscheinnummer eintragen.",
+    "missing_driverLicenseExpiry": "Wann läuft der Führerschein ab?",
+    "missing_driverLicenseCountry": "Welches Land hat den Führerschein ausgestellt?",
+    "handoverPhotos": "Übergabefotos ({count})"
   },
   "customerMessages": {
     "hi": "Hallo {name},",

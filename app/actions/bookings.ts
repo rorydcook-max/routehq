@@ -3353,7 +3353,30 @@ export async function recordPaymentRefund(formData: FormData) {
     for (const row of flagged || []) {
       await admin.from("rental_payments").update({ metadata: { ...(row.metadata || {}), early_return: { ...(row.metadata?.early_return || {}), settled: true } } }).eq("id", row.id);
     }
-    await tellRentalCustomer(admin, rentalId, ({ say, money }) => say("refunded", { amount: money(amount) }), { sentBy: user.id, withLink: false });
+    // Refunding the net figure (unused days minus what was owed) settles the balance too:
+    // the money was taken off the refund, so those payments are not chased again.
+    const suggestion = (flagged || []).map((row: any) => row.metadata?.early_return).find((item: any) => item && Number(item.owed || 0) > 0);
+    if (suggestion && amount + Number(suggestion.owed) <= Number(suggestion.amount) + 1) {
+      const { data: open } = await admin
+        .from("rental_payments")
+        .select("id, amount, metadata")
+        .eq("rental_id", rentalId)
+        .in("status", ["pending", "overdue", "scheduled"])
+        .is("deleted_at", null);
+      let left = Number(suggestion.owed);
+      for (const row of open || []) {
+        if (left <= 0) break;
+        const value = Number(row.amount || 0);
+        if (value > left + 1) continue;
+        left -= value;
+        await admin
+          .from("rental_payments")
+          .update({ status: "paid", paid_at: new Date().toISOString(), metadata: { ...(row.metadata || {}), settled_against_refund: true, description: `${row.metadata?.description || ""}${row.metadata?.description ? " - " : ""}settled against the refund of unused days` } })
+          .eq("id", row.id);
+      }
+    }
+    // A "still to pay" message waiting to go out is out of date once the refund settles things.
+    await tellRentalCustomer(admin, rentalId, ({ say, money }) => say("refunded", { amount: money(amount) }), { sentBy: user.id, withLink: false, replacesEarlier: true });
   }
   revalidatePath("/tasks");
 

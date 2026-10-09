@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui";
 import { isMapsUrl } from "@/lib/delivery-location";
 import { toWallTime } from "@/lib/business-time";
 import { longDate } from "@/lib/i18n/dates";
+import { loadGooglePlaces as loadSharedGooglePlaces } from "@/lib/google-places";
 
 // The wording for this screen is in locales/<language>/common.json under
 // "bookingEdit"; billing periods, delivery choices and included items reuse "newBooking".
@@ -89,31 +90,7 @@ function isVoidedPayment(payment: any) {
   return payment?.status === "voided" || Boolean(payment?.voided || payment?.metadata?.voided);
 }
 
-function loadGooglePlaces() {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-  if (!apiKey || typeof window === "undefined") return null;
-  const routeWindow = window as Window & { google?: any; __routeHqGoogleMapsPromise?: Promise<void> };
-  if (routeWindow.google?.maps?.places?.Autocomplete) return Promise.resolve();
-  if (!routeWindow.__routeHqGoogleMapsPromise) {
-    routeWindow.__routeHqGoogleMapsPromise = new Promise((resolve, reject) => {
-      const existing = document.querySelector<HTMLScriptElement>('script[data-routehq-google-places="true"]');
-      if (existing) {
-        existing.addEventListener("load", () => resolve(), { once: true });
-        existing.addEventListener("error", () => reject(new Error("Google Maps failed to load.")), { once: true });
-        return;
-      }
-      const script = document.createElement("script");
-      script.dataset.routehqGooglePlaces = "true";
-      script.async = true;
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
-      script.onload = () => resolve();
-      script.onerror = () => reject(new Error("Google Maps failed to load."));
-      document.head.appendChild(script);
-    });
-  }
-  return routeWindow.__routeHqGoogleMapsPromise;
-}
-
+const loadGooglePlaces = loadSharedGooglePlaces;
 function MoneyField({ label, name, value, required = false }: { label: string; name: string; value: unknown; required?: boolean }) {
   const [display, setDisplay] = useState(moneyInput(value));
   return (

@@ -561,7 +561,12 @@
     "payKind_deposit_top_up": "השלמת פיקדון",
     "payKind_extension": "ימים נוספים",
     "agreeAll": "אני מסכים/ה לכל האמור לעיל",
-    "extrasLine": "תוספות: {names} · {amount}"
+    "extrasLine": "תוספות: {names} · {amount}",
+    "missing_passportNumber": "הזינו מספר דרכון או תעודת זהות.",
+    "missing_driverLicenseNumber": "הזינו מספר רישיון נהיגה.",
+    "missing_driverLicenseExpiry": "מתי פג תוקף הרישיון?",
+    "missing_driverLicenseCountry": "איזו מדינה הנפיקה את הרישיון?",
+    "handoverPhotos": "תמונות מסירה ({count})"
   },
   "customerMessages": {
     "hi": "שלום {name},",

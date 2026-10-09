@@ -386,7 +386,7 @@ function SignaturePad({
   );
 }
 
-export function InspectionForm({ context, unsigned = false }: { context: InspectionContext; /** The customer has not signed the agreement yet. */ unsigned?: boolean }) {
+export function InspectionForm({ context, unsigned = false, blocker = null }: { context: InspectionContext; /** The customer has not signed the agreement yet. */ unsigned?: boolean; /** Why the handover cannot go ahead right now (another customer still has the vehicle). */ blocker?: string | null }) {
   const t = useTranslations("inspection");
   const locale = useLocale();
   const areaName = (location: string) => {
@@ -813,6 +813,9 @@ export function InspectionForm({ context, unsigned = false }: { context: Inspect
                 {mode === "delivery" && context.rental?.start_date && String(context.rental.start_date).slice(0, 10) > businessToday(1) ? (
                   <p className="mt-2 rounded-lg bg-[var(--warning-light)] px-3 py-2 text-sm font-semibold text-[var(--warning)]">{t("startsLaterNote", { date: formatDate(context.rental.start_date, locale) })}</p>
                 ) : null}
+                {blocker ? (
+                  <p className="mt-2 rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-bold text-[var(--danger)]">{blocker}</p>
+                ) : null}
                 {mode === "delivery" && unsigned ? (
                   <p className="mt-2 rounded-lg bg-[var(--warning-light)] px-3 py-2 text-sm font-semibold text-[var(--warning)]">{t("notSignedNote")}</p>
                 ) : null}
@@ -827,9 +830,11 @@ export function InspectionForm({ context, unsigned = false }: { context: Inspect
               </div>
             </div>
           </div>
-          <button className={`${touchButton} mt-5 w-full bg-[var(--primary)] text-white shadow-lg`} onClick={() => setStep(1)} type="button">
-            {mode === "return" ? t("startReturn") : mode === "condition_report" ? t("startCondition") : t("startDelivery")}
-          </button>
+          {blocker ? null : (
+            <button className={`${touchButton} mt-5 w-full bg-[var(--primary)] text-white shadow-lg`} onClick={() => setStep(1)} type="button">
+              {mode === "return" ? t("startReturn") : mode === "condition_report" ? t("startCondition") : t("startDelivery")}
+            </button>
+          )}
         </StepShell>
       ) : null}
 
@@ -1171,6 +1176,17 @@ export function InspectionForm({ context, unsigned = false }: { context: Inspect
                 </>
               )}
             </div>
+          ) : null}
+          {mode === "return" && !isSwap && outstandingBalance > 0 ? (
+            <div className="mt-4 rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-4">
+              <p className="text-sm font-bold text-[var(--danger)]">{t("stillOwed", { amount: money(outstandingBalance) })}</p>
+              <p className="mt-1 text-xs font-semibold text-[var(--danger)]">{t("stillOwedHint")}</p>
+            </div>
+          ) : null}
+          {mode === "return" && !isSwap && context.rental?.end_date && businessToday() < String(context.rental.end_date).slice(0, 10) ? (
+            <p className="mt-3 text-sm font-semibold text-[var(--foreground-secondary)]">
+              {t("backEarly", { count: Math.round((Date.parse(`${String(context.rental.end_date).slice(0, 10)}T00:00:00Z`) - Date.parse(`${businessToday()}T00:00:00Z`)) / 86_400_000) })}
+            </p>
           ) : null}
           {mode === "delivery" && context.rental?.id && !isSwap && !collectOpen ? (
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[var(--success-line)] bg-[var(--success-light)] p-4">

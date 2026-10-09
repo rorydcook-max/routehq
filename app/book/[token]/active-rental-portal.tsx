@@ -204,16 +204,24 @@ export function ActiveRentalPortal({
               {t("receiptNumbered", { number: receipt.number })}
             </a>
           ))}
-          {deliveryPhotoUrls.length ? (
-            deliveryPhotoUrls.map((url, index) => (
-              <a className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-4 text-sm font-semibold text-[var(--foreground)]" href={url} key={url} rel="noreferrer" target="_blank">
-                <ImageIcon className="mb-2 text-[var(--primary)]" />
-                {t("handoverPhoto", { number: index + 1 })}
-              </a>
-            ))
-          ) : null}
           {!signedContractUrl && deliveryPhotoUrls.length === 0 ? <p className="text-sm text-[var(--muted)]">{t("documentsWillAppear")}</p> : null}
         </div>
+        {deliveryPhotoUrls.length ? (
+          <div className="mt-4">
+            <p className="text-sm font-semibold text-[var(--foreground)]">
+              <ImageIcon className="mr-1.5 inline-block align-[-3px] text-[var(--primary)]" size={16} />
+              {t("handoverPhotos", { count: deliveryPhotoUrls.length })}
+            </p>
+            <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4">
+              {deliveryPhotoUrls.map((url, index) => (
+                <a className="block aspect-square overflow-hidden rounded-lg bg-[var(--panel-secondary)]" href={url} key={url} rel="noreferrer" target="_blank">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img alt={t("handoverPhoto", { number: index + 1 })} className="h-full w-full object-cover" loading="lazy" src={url} />
+                </a>
+              ))}
+            </div>
+          </div>
+        ) : null}
       </section>
     </div>
   );

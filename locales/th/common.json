@@ -331,7 +331,11 @@
     "holdForDamage": "ยังไม่ทราบค่าความเสียหาย: เก็บเงินมัดจำไว้ก่อน",
     "holdForDamageHint": "ยังไม่คืนเงินตอนนี้ งานประเมินค่าเสียหายจะอยู่ในต้องทำ เมื่อรู้ยอดแล้วให้เพิ่มค่าใช้จ่ายในการจอง แล้วคืนส่วนที่เหลือ",
     "odometerHuge": "มากกว่าเลขไมล์ครั้งก่อน {km} กม. ตรวจตัวเลขอีกครั้งก่อนไปต่อ",
-    "depositKeptForNow": "เก็บเงินมัดจำไว้จนกว่าจะรู้ค่าเสียหาย"
+    "depositKeptForNow": "เก็บเงินมัดจำไว้จนกว่าจะรู้ค่าเสียหาย",
+    "stillOutBlocker": "{customer} ยังใช้รถคันนี้อยู่ ({code}) ถึง {date} รับรถคืนก่อน หรือเปลี่ยนรถในการจองนี้",
+    "stillOwed": "ยังค้างชำระในการจองนี้ {amount}",
+    "stillOwedHint": "เก็บตอนนี้ หรือปล่อยค้างไว้ในการจองเพื่อตามเก็บทีหลัง",
+    "backEarly": "คืนก่อนกำหนด {count} วัน หน้าการจองจะเสนอการคืนเงินค่าวันที่ไม่ได้ใช้หลังจากเสร็จขั้นตอนนี้"
   },
   "translation": {
     "translatedFrom": "แปลจาก {language}",
@@ -764,7 +768,12 @@
     "extrasEachMonth": "เพิ่ม {amount} ต่อเดือนในค่าเช่า",
     "extrasLine": "บริการเสริม: {names} · {amount}",
     "seasonPricePart": "ราคาช่วง {names} {inDays} จาก {days} วันที่เช่า: รวมแล้วเพิ่ม {pct}%",
-    "seasonDiscountPart": "{names} {inDays} จาก {days} วันที่เช่า: รวมแล้วลด {pct}%"
+    "seasonDiscountPart": "{names} {inDays} จาก {days} วันที่เช่า: รวมแล้วลด {pct}%",
+    "missing_passportNumber": "กรุณาใส่เลขหนังสือเดินทางหรือบัตรประชาชน",
+    "missing_driverLicenseNumber": "กรุณาใส่เลขใบขับขี่",
+    "missing_driverLicenseExpiry": "ใบขับขี่หมดอายุวันไหน",
+    "missing_driverLicenseCountry": "ใบขับขี่ออกโดยประเทศไหน",
+    "handoverPhotos": "รูปตอนส่งมอบ ({count})"
   },
   "customerMessages": {
     "hi": "สวัสดีคุณ {name}",
@@ -2058,7 +2067,9 @@
     "doNotRent": "{name} ถูกทำเครื่องหมายไว้: ไม่ให้เช่าอีก",
     "pc_extras": "บริการเสริม: {names}",
     "extrasPlus": "+ บริการเสริม {amount}: {names}",
-    "hist_handed_over_without_form": "ส่งมอบรถโดยไม่กรอกแบบฟอร์ม"
+    "hist_handed_over_without_form": "ส่งมอบรถโดยไม่กรอกแบบฟอร์ม",
+    "ref_earlyOwed": "การจองนี้ยังค้างชำระ {owed} หักแล้วเหลือคืนสุทธิ {net}",
+    "recordOnVehicle": "บันทึกลงประวัติรถ"
   },
   "newBooking": {
     "pageBack": "กลับไปที่การจอง",

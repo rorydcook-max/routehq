@@ -739,7 +739,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             ) : null}
             <div className="mt-3 space-y-3">
               {pendingPortalActions.map((action: any) => (
-                <CustomerPortalActionCard action={action} customerId={customer?.id || null} key={action.id} organizationId={organization.id} rentalId={rental.id} />
+                <CustomerPortalActionCard action={action} customerId={customer?.id || null} key={action.id} organizationId={organization.id} rentalId={rental.id} vehicleId={rental.vehicle_id || vehicle?.id || null} />
               ))}
             </div>
           </div>
@@ -1577,7 +1577,7 @@ function CommunicationTimeline({
   );
 }
 
-async function CustomerPortalActionCard({ action, organizationId, rentalId, customerId }: { action: any; organizationId: string; rentalId: string; customerId: string | null }) {
+async function CustomerPortalActionCard({ action, organizationId, rentalId, customerId, vehicleId = null }: { action: any; organizationId: string; rentalId: string; vehicleId?: string | null; customerId: string | null }) {
   const tx: Tx = { say: (await getTranslations("booking")) as unknown as Say, list: (await getTranslations("bookings")) as unknown as Say, locale: await getLocale() };
   const content = action.content || {};
   const picture = action.action_type === "extension_request" ? await extensionPicture(createSupabaseAdminClient() as any, organizationId, rentalId, content).catch(() => null) : null;
@@ -1643,9 +1643,16 @@ async function CustomerPortalActionCard({ action, organizationId, rentalId, cust
             <input name="rentalId" type="hidden" value={rentalId} />
             <textarea className="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm" name="reply" placeholder={tx.say("tellCustomerOptional")} rows={2} />
             <textarea className="w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm" name="notes" placeholder={tx.say("whatYouDid")} rows={2} />
-            <PendingButton className="primary-action pressable px-3 py-2" pendingLabel={tx.say("saving")} type="submit">
-              {tx.say("markSorted")}
-            </PendingButton>
+            <div className="flex flex-wrap items-center gap-2">
+              <PendingButton className="primary-action pressable px-3 py-2" pendingLabel={tx.say("saving")} type="submit">
+                {tx.say("markSorted")}
+              </PendingButton>
+              {vehicleId && ["Damage", "Breakdown", "Other mechanical issue"].includes(String(content.category || "")) ? (
+                <Link className="secondary-action pressable px-3 py-2" href={`/inspections/condition/${vehicleId}` as Route}>
+                  {tx.say("recordOnVehicle")}
+                </Link>
+              ) : null}
+            </div>
           </form>
         ) : (
           <form action={replyToPortalQuestion} className="space-y-3">

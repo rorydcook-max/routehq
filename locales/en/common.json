@@ -345,7 +345,11 @@
     "holdForDamage": "Damage cost not known yet: keep the deposit for now",
     "holdForDamageHint": "Nothing is returned now. Pricing the damage goes on To do; add the cost on the booking when you know it, and return what is left.",
     "odometerHuge": "That is {km} km more than the last reading. Check the number before you go on.",
-    "depositKeptForNow": "Deposit kept until the damage is priced"
+    "depositKeptForNow": "Deposit kept until the damage is priced",
+    "stillOutBlocker": "{customer} still has this vehicle ({code}) until {date}. Return that rental first, or change the vehicle on this booking.",
+    "stillOwed": "Still owed on this booking: {amount}",
+    "stillOwedHint": "Collect it now, or it stays on the booking to chase later.",
+    "backEarly": "Back {count, plural, one {# day} other {# days}} early. Any refund for unused days is offered on the booking page once this is done."
   },
   "translation": {
     "translatedFrom": "Translated from {language}",
@@ -755,7 +759,12 @@
     "extrasEachMonth": "{amount} a month added to the rent.",
     "extrasLine": "Extras: {names} · {amount}",
     "seasonPricePart": "{names} price on {inDays} of your {days} days: +{pct}% overall",
-    "seasonDiscountPart": "{names} on {inDays} of your {days} days: {pct}% off overall"
+    "seasonDiscountPart": "{names} on {inDays} of your {days} days: {pct}% off overall",
+    "missing_passportNumber": "Add your passport or ID number.",
+    "missing_driverLicenseNumber": "Add your driving licence number.",
+    "missing_driverLicenseExpiry": "When does your driving licence run out?",
+    "missing_driverLicenseCountry": "Which country issued your driving licence?",
+    "handoverPhotos": "Handover photos ({count})"
   },
   "customerMessages": {
     "hi": "Hi {name},",
@@ -2049,7 +2058,9 @@
     "doNotRent": "{name} is marked: don't rent to again.",
     "pc_extras": "Extras: {names}",
     "extrasPlus": "+ {amount} extras: {names}",
-    "hist_handed_over_without_form": "Handed over without the form"
+    "hist_handed_over_without_form": "Handed over without the form",
+    "ref_earlyOwed": "{owed} is still owed on this booking, so the net figure is {net}.",
+    "recordOnVehicle": "Record it on the vehicle"
   },
   "newBooking": {
     "pageBack": "Back to bookings",

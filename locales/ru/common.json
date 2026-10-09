@@ -561,7 +561,12 @@
     "payKind_deposit_top_up": "Доплата залога",
     "payKind_extension": "Дополнительные дни",
     "agreeAll": "Я согласен(на) со всем вышеперечисленным",
-    "extrasLine": "Доп. услуги: {names} · {amount}"
+    "extrasLine": "Доп. услуги: {names} · {amount}",
+    "missing_passportNumber": "Укажите номер паспорта или удостоверения.",
+    "missing_driverLicenseNumber": "Укажите номер водительских прав.",
+    "missing_driverLicenseExpiry": "Когда истекает срок прав?",
+    "missing_driverLicenseCountry": "Какая страна выдала права?",
+    "handoverPhotos": "Фото при выдаче ({count})"
   },
   "customerMessages": {
     "hi": "Здравствуйте, {name}!",

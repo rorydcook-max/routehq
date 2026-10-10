@@ -1041,7 +1041,9 @@
     "settleDeposit": "Settle deposit",
     "payTitle_extras": "{amount} extras",
     "collect_extras": "Collect extras",
-    "pay_extras": "Extras"
+    "pay_extras": "Extras",
+    "job_problem": "Urgent: the customer reported a problem",
+    "job_returnArranged": "The customer arranged the return"
   },
   "bookings": {
     "eyebrow": "Bookings",

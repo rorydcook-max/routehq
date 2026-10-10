@@ -162,6 +162,10 @@ function headingOf(item: TaskListItem, today: string, tx: Tx): { title: string; 
     const extension = first.match(/^Extension to (.+) needs your answer$/);
     if (extension) return { title: tx.say("job_extension", { date: savedDate(extension[1], today, tx) }), detail: null };
     if (/no end date/.test(first)) return { title: tx.say("job_openEnded"), detail: null };
+    // What the customer sent from their booking page (lib/portal-notifications.ts).
+    if (/^URGENT customer problem$/i.test(first)) return { title: tx.say("job_problem"), detail: null };
+    if (/^Customer question$/i.test(first)) return { title: tx.say("request_question"), detail: null };
+    if (/^Confirmed return$/i.test(first)) return { title: tx.say("job_returnArranged"), detail: null };
     return { title: tx.locale === "en" ? first : tx.say("request_other"), detail: null };
   }
   // What follows the heading is the customer and vehicle again, and the working-out belongs on the booking.

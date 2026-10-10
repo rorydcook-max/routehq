@@ -1050,7 +1050,9 @@
     "settleDeposit": "สรุปเงินมัดจำ",
     "payTitle_extras": "บริการเสริม {amount}",
     "collect_extras": "เก็บเงินบริการเสริม",
-    "pay_extras": "บริการเสริม"
+    "pay_extras": "บริการเสริม",
+    "job_problem": "ด่วน: ลูกค้าแจ้งปัญหา",
+    "job_returnArranged": "ลูกค้านัดคืนรถแล้ว"
   },
   "bookings": {
     "eyebrow": "การจอง",

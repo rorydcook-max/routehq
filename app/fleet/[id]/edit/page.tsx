@@ -44,12 +44,14 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
     data: { user }
   } = await supabase.auth.getUser();
 
-  const [{ data: vehicle }, branches, categories, { data: profile }] = await Promise.all([
+  const [{ data: vehicle }, branches, categories, { data: profile }, { data: organizationSettings }] = await Promise.all([
     supabase.from("vehicles").select("*").eq("id", id).eq("organization_id", organization.id).is("deleted_at", null).maybeSingle(),
     ensureDefaultBranch(organization),
     getVehicleCategories(organization.id),
-    supabase.from("users").select("preferred_locale, preferred_calendar").eq("id", user?.id).maybeSingle()
+    supabase.from("users").select("preferred_locale, preferred_calendar").eq("id", user?.id).maybeSingle(),
+    supabase.from("organizations").select("settings").eq("id", organization.id).maybeSingle()
   ]);
+  const usualDeposit = Number(organizationSettings?.settings?.public_booking?.deposit || 0);
 
   if (!vehicle) {
     notFound();
@@ -119,7 +121,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
             <label className="mt-4 block sm:max-w-xs">
               <span className={labelClass}>{say("deposit")}</span>
               <MoneyInput currency={currency} defaultValue={valueOrEmpty((vehicle as any).deposit_amount)} name="depositAmount" />
-              <span className="mt-1 block font-medium text-[var(--muted)]">{say("depositHint")}</span>
+              <span className="mt-1 block font-medium text-[var(--muted)]">{usualDeposit > 0 ? say("depositHintUsual", { amount: `฿${usualDeposit.toLocaleString("en-US")}` }) : say("depositHintNone")}</span>
             </label>
           </Fold>
           <Fold summary={`${vehicle.make} ${vehicle.model} · ${vehicle.registration_number}`} title={say("identTitle")}>

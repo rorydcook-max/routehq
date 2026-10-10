@@ -84,7 +84,7 @@ export default async function NewVehiclePage() {
 
           <VehicleIdentityFields categories={categories} initialMakes={vehicleMakes || []} inputClass={inputClass} />
 
-          <RatesFields currency={currency} />
+          <RatesFields currency={currency} usualDeposit={Number(organizationSettings?.settings?.public_booking?.deposit || 0)} />
 
           {/* Everything below can wait: one tap away, filled in any time. */}
           <Fold summary={say("datesSummary")} title={say("datesTitle")}>

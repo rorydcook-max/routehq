@@ -210,5 +210,6 @@
   "That is more than was paid for extras.": "จำนวนนี้มากกว่าที่ชำระค่าบริการเสริมไว้",
   "Enter an amount greater than zero.": "ใส่จำนวนเงินมากกว่าศูนย์",
   "There is no rent payment still to come to take it off.": "ไม่มีค่าเช่างวดถัดไปให้หัก",
-  "The rent still to come is less than that amount.": "ค่าเช่าที่เหลืออยู่น้อยกว่าจำนวนนี้"
+  "The rent still to come is less than that amount.": "ค่าเช่าที่เหลืออยู่น้อยกว่าจำนวนนี้",
+  "Check the year: four digits, like 2023.": "ตรวจสอบปีรถ: ตัวเลขสี่หลัก เช่น 2023"
 }

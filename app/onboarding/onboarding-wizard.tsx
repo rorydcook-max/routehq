@@ -886,7 +886,7 @@ export function OnboardingWizard({
     { value: "th", label: t.thai }
   ];
   const compliance = useMemo(() => soonestCompliance(vehicle, t), [vehicle, t]);
-  const vehicleName = vehicle ? [vehicle.registrationNumber, vehicle.make, vehicle.model].filter(Boolean).join(" ") : "";
+  const vehicleName = vehicle ? [[vehicle.make, vehicle.model].filter(Boolean).join(" "), vehicle.registrationNumber ? `(${vehicle.registrationNumber})` : ""].filter(Boolean).join(" ") : "";
 
   function submitBusinessProfile() {
     setError("");

@@ -666,7 +666,7 @@ export function VehicleIdentityFields({
                 ))}
               </select>
             ) : (
-              <input className={inputClass} min="1900" onChange={(event) => setYear(event.target.value)} placeholder="2024" type="number" value={year} />
+              <input className={inputClass} inputMode="numeric" max={new Date().getFullYear() + 1} maxLength={4} min="1950" onChange={(event) => setYear(event.target.value.replace(/\D/g, "").slice(0, 4))} placeholder="2024" type="number" value={year} />
             )}
           </label>
           <label className="block">

@@ -26,6 +26,7 @@ import { PaymentMethodsForm } from "@/app/settings/payment-methods-form";
 import { ExtrasPanel, SeasonsPanel } from "@/app/settings/price-rules-panel";
 import { extrasFrom, seasonsFrom } from "@/lib/price-rules";
 import { PublicBookingPanel } from "@/app/settings/public-booking-panel";
+import { UsualDepositPanel } from "@/app/settings/usual-deposit-panel";
 import { TeamMemberActions } from "@/app/settings/team-member-actions";
 import { createSupabaseAdminClient as teamAdminClient } from "@/lib/supabase/admin";
 import { BookingRulesPanel } from "@/app/settings/booking-rules-panel";
@@ -397,6 +398,18 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               default_payment_method: organization.default_payment_method
             }}
           />
+          </Fold>
+          <Fold
+            id="usual-deposit"
+            summary={publicBookingSettings(organization.settings).deposit > 0 ? say("ud_summary", { amount: `฿${publicBookingSettings(organization.settings).deposit.toLocaleString("en-US")}` }) : say("ud_none")}
+            title={say("ud_title")}
+          >
+            <UsualDepositPanel
+              deposit={publicBookingSettings(organization.settings).deposit}
+              enabled={publicBookingSettings(organization.settings).enabled}
+              holdHours={bookingRules(organization.settings).holdHours}
+              offer={publicBookingSettings(organization.settings).offer}
+            />
           </Fold>
           <Fold id="booking-page" summary={publicBookingSettings(organization.settings).enabled ? say("book_on") : say("book_off")} title={say("book_title")}>
             <PublicBookingPanel

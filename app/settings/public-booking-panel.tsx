@@ -18,7 +18,6 @@ export function PublicBookingPanel({ slug, enabled, holdHours, deposit, offer = 
   const [on, setOn] = useState(enabled);
   const [hours, setHours] = useState(holdHours);
   const [offerValue, setOfferValue] = useState(offer);
-  const [depositValue, setDepositValue] = useState(String(deposit || ""));
   const [origin, setOrigin] = useState("");
   const [copied, setCopied] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -31,7 +30,7 @@ export function PublicBookingPanel({ slug, enabled, holdHours, deposit, offer = 
     setOn(next.enabled);
     setHours(next.holdHours);
     startTransition(async () => {
-      const result = await savePublicBookingSettings({ ...next, deposit: next.deposit ?? Number(depositValue || 0), offer: next.offer ?? offerValue }).catch(() => ({ ok: false as const }));
+      const result = await savePublicBookingSettings({ ...next, deposit: next.deposit ?? deposit, offer: next.offer ?? offerValue }).catch(() => ({ ok: false as const }));
       if (!result.ok) {
         setFailed(true);
         setOn(enabled);
@@ -102,23 +101,7 @@ export function PublicBookingPanel({ slug, enabled, holdHours, deposit, offer = 
             </select>
           </label>
 
-          <label className="block sm:max-w-xs">
-            <span className="font-semibold text-[var(--foreground)]">{say("pb_deposit")}</span>
-            <input
-              className="mt-1 block w-full"
-              disabled={isPending}
-              inputMode="numeric"
-              min="0"
-              onBlur={() => {
-                if (Number(depositValue || 0) !== deposit) save({ enabled: on, holdHours: hours, deposit: Number(depositValue || 0) });
-              }}
-              onChange={(event) => setDepositValue(event.target.value)}
-              placeholder="0"
-              type="number"
-              value={depositValue}
-            />
-            <span className="mt-1 block font-medium text-[var(--muted)]">{say("pb_depositHelp")}</span>
-          </label>
+          <p className="font-medium text-[var(--foreground-secondary)]">{deposit > 0 ? say("pb_depositIs", { amount: `฿${deposit.toLocaleString("en-US")}` }) : say("pb_depositNone")}</p>
         </>
       ) : null}
       {failed ? <p className="font-bold text-[var(--danger)]">{say("saveFailed")}</p> : null}

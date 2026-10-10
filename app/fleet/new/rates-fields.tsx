@@ -11,8 +11,8 @@ const labelClass = "font-semibold text-[var(--foreground-secondary)]";
  * price at all could then be booked for nothing by mistake. Any one will do;
  * the others are worked out from it when a booking is made.
  */
-export function RatesFields({ currency }: { currency: string }) {
-  const say = useTranslations("vehicleForm") as unknown as (key: string) => string;
+export function RatesFields({ currency, usualDeposit = 0 }: { currency: string; usualDeposit?: number }) {
+  const say = useTranslations("vehicleForm") as unknown as (key: string, values?: Record<string, string | number>) => string;
   const [rates, setRates] = useState({ dailyRate: "", weeklyRate: "", monthlyRate: "" });
   const [asked, setAsked] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -55,7 +55,7 @@ export function RatesFields({ currency }: { currency: string }) {
       <label className="mt-4 block sm:max-w-xs">
         <span className={labelClass}>{say("deposit")}</span>
         <MoneyInput currency={currency} name="depositAmount" />
-        <span className="mt-1 block font-medium text-[var(--foreground-secondary)]">{say("depositHint")}</span>
+        <span className="mt-1 block font-medium text-[var(--foreground-secondary)]">{usualDeposit > 0 ? say("depositHintUsual", { amount: `฿${usualDeposit.toLocaleString("en-US")}` }) : say("depositHintNone")}</span>
       </label>
     </div>
   );

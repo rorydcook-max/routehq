@@ -2340,7 +2340,10 @@
     "s_extras": "Extras",
     "seasonPartDays": "({inDays} of {days} days in season)",
     "sel_whatsappSame": "WhatsApp number, if not the phone number above",
-    "sel_channels": "How to reach them"
+    "sel_channels": "How to reach them",
+    "onStartDay": "Start day, 9:00",
+    "collectionPlaceholder": "Your shop",
+    "collectionHelper": "Where the customer picks it up. Leave blank to use your shop's address."
   },
   "fleet": {
     "title": "Fleet",
@@ -2995,7 +2998,9 @@
     "partnerPct": "Their share (%)",
     "partnerBasis": "Share of",
     "partnerBasisIncome": "Money in (you pay the costs)",
-    "partnerBasisProfit": "Profit after the vehicle's costs"
+    "partnerBasisProfit": "Profit after the vehicle's costs",
+    "depositHintUsual": "Leave empty to use your usual deposit, {amount}.",
+    "depositHintNone": "Leave empty for no deposit. You can set a usual deposit for all vehicles in Settings, under Rentals and payments."
   },
   "bookingEdit": {
     "crumbBookings": "Bookings",
@@ -3572,7 +3577,14 @@
     "rem_rent_due": "Rent due tomorrow",
     "rem_rent_late": "Rent 3 days late",
     "rem_vehicle_due": "Service or paperwork due on the vehicle they have",
-    "rem_signature": "A change still waiting for their signature"
+    "rem_signature": "A change still waiting for their signature",
+    "ud_title": "Usual deposit",
+    "ud_summary": "{amount} when a vehicle has none of its own",
+    "ud_none": "None set: bookings take no deposit unless the vehicle has one",
+    "ud_body": "Used for any vehicle without a deposit of its own, on bookings you make and online. Leave empty for no deposit.",
+    "ud_label": "Usual deposit (฿)",
+    "pb_depositIs": "Online bookings take your usual deposit ({amount}) unless the vehicle has its own. Change it under Usual deposit.",
+    "pb_depositNone": "Online bookings take no deposit unless the vehicle has its own. Set one under Usual deposit."
   },
   "accountPage": {
     "roleOwner": "Owner",

@@ -20,6 +20,16 @@ function optionalNumberFromForm(formData: FormData, key: string) {
   return value ? Number(value) : null;
 }
 
+/** A model year: four digits, from 1950 to next year. Anything else is a typing slip, not a year. */
+function yearFromForm(formData: FormData) {
+  const year = optionalNumberFromForm(formData, "year");
+  if (year === null) return null;
+  if (!Number.isInteger(year) || year < 1950 || year > new Date().getFullYear() + 1) {
+    throw new Error("Check the year: four digits, like 2023.");
+  }
+  return year;
+}
+
 function optionalStringFromForm(formData: FormData, key: string) {
   return String(formData.get(key) || "").trim() || null;
 }
@@ -262,7 +272,7 @@ export async function createVehicle(formData: FormData) {
       make,
       model,
       trim,
-      year: optionalNumberFromForm(formData, "year"),
+      year: yearFromForm(formData),
       vin: String(formData.get("vin") || "").trim() || null,
       registration_number: registrationNumber,
       color: String(formData.get("color") || "").trim() || null,
@@ -448,7 +458,7 @@ export async function updateVehicle(formData: FormData) {
       model,
       category_id: categoryId,
       trim: optionalStringFromForm(formData, "trim"),
-      year: optionalNumberFromForm(formData, "year"),
+      year: yearFromForm(formData),
       vin: optionalStringFromForm(formData, "vin"),
       registration_number: registrationNumber,
       color: optionalStringFromForm(formData, "color"),

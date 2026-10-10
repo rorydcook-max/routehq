@@ -566,7 +566,9 @@
     "missing_driverLicenseNumber": "Masukkan nombor lesen memandu.",
     "missing_driverLicenseExpiry": "Bila lesen memandu anda tamat?",
     "missing_driverLicenseCountry": "Negara mana yang mengeluarkan lesen anda?",
-    "handoverPhotos": "Gambar serahan ({count})"
+    "handoverPhotos": "Gambar serahan ({count})",
+    "payPlusExtras": "+ tambahan {amount}",
+    "payLessExtras": "{amount} untuk tambahan telah ditolak"
   },
   "customerMessages": {
     "hi": "Hai {name},",

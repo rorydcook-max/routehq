@@ -182,7 +182,7 @@ function PaymentRow({
           <p className="text-base font-semibold text-[var(--foreground)]">
             {money(payment.amount, payment.currency)}{" "}
             <span className="text-sm font-medium text-[var(--muted)]">
-              · {payment.kind ? `${t(`payKind_${payment.kind}`)}${payment.kind === "rent" && payment.periodLabel && locale === "en" ? ` · ${payment.periodLabel}` : ""}${payment.kind === "charge" ? chargeFor(payment, t) : ""}` : payment.label}
+              · {payment.kind ? `${t(`payKind_${payment.kind}`)}${payment.kind === "rent" && payment.periodLabel && locale === "en" ? ` · ${payment.periodLabel}` : ""}${payment.kind === "charge" ? chargeFor(payment, t) : ""}${Number(payment.extrasAdded || 0) > 0 ? ` ${t("payPlusExtras", { amount: money(Number(payment.extrasAdded), payment.currency) })}` : ""}${Number(payment.extrasCredit || 0) > 0 ? ` · ${t("payLessExtras", { amount: money(Number(payment.extrasCredit), payment.currency) })}` : ""}` : payment.label}
             </span>
           </p>
           <p className={`text-sm ${sentAt ? "text-[var(--success)]" : payment.overdue ? "font-semibold text-[var(--danger)]" : "text-[var(--muted)]"}`}>

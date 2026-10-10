@@ -566,7 +566,9 @@
     "missing_driverLicenseNumber": "Укажите номер водительских прав.",
     "missing_driverLicenseExpiry": "Когда истекает срок прав?",
     "missing_driverLicenseCountry": "Какая страна выдала права?",
-    "handoverPhotos": "Фото при выдаче ({count})"
+    "handoverPhotos": "Фото при выдаче ({count})",
+    "payPlusExtras": "+ доп. услуги {amount}",
+    "payLessExtras": "вычтено {amount} за доп. услуги"
   },
   "customerMessages": {
     "hi": "Здравствуйте, {name}!",

@@ -566,7 +566,9 @@
     "missing_driverLicenseNumber": "Indiquez votre numéro de permis.",
     "missing_driverLicenseExpiry": "Quand votre permis expire-t-il ?",
     "missing_driverLicenseCountry": "Quel pays a délivré votre permis ?",
-    "handoverPhotos": "Photos de remise ({count})"
+    "handoverPhotos": "Photos de remise ({count})",
+    "payPlusExtras": "+ options {amount}",
+    "payLessExtras": "{amount} payés pour les options déduits"
   },
   "customerMessages": {
     "hi": "Bonjour {name},",

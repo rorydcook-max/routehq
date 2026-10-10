@@ -566,7 +566,9 @@
     "missing_driverLicenseNumber": "Nhập số bằng lái xe.",
     "missing_driverLicenseExpiry": "Bằng lái hết hạn khi nào?",
     "missing_driverLicenseCountry": "Bằng lái do nước nào cấp?",
-    "handoverPhotos": "Ảnh lúc giao xe ({count})"
+    "handoverPhotos": "Ảnh lúc giao xe ({count})",
+    "payPlusExtras": "+ dịch vụ thêm {amount}",
+    "payLessExtras": "đã trừ {amount} phí dịch vụ thêm"
   },
   "customerMessages": {
     "hi": "Chào {name},",

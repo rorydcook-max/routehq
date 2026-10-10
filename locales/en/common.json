@@ -764,7 +764,9 @@
     "missing_driverLicenseNumber": "Add your driving licence number.",
     "missing_driverLicenseExpiry": "When does your driving licence run out?",
     "missing_driverLicenseCountry": "Which country issued your driving licence?",
-    "handoverPhotos": "Handover photos ({count})"
+    "handoverPhotos": "Handover photos ({count})",
+    "payPlusExtras": "+ extras {amount}",
+    "payLessExtras": "{amount} paid for extras taken off"
   },
   "customerMessages": {
     "hi": "Hi {name},",

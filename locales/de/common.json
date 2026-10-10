@@ -566,7 +566,9 @@
     "missing_driverLicenseNumber": "Bitte Führerscheinnummer eintragen.",
     "missing_driverLicenseExpiry": "Wann läuft der Führerschein ab?",
     "missing_driverLicenseCountry": "Welches Land hat den Führerschein ausgestellt?",
-    "handoverPhotos": "Übergabefotos ({count})"
+    "handoverPhotos": "Übergabefotos ({count})",
+    "payPlusExtras": "+ Extras {amount}",
+    "payLessExtras": "{amount} für Extras abgezogen"
   },
   "customerMessages": {
     "hi": "Hallo {name},",

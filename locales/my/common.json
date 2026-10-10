@@ -566,7 +566,9 @@
     "missing_driverLicenseNumber": "ယာဉ်မောင်းလိုင်စင်နံပါတ် ထည့်ပါ။",
     "missing_driverLicenseExpiry": "လိုင်စင် ဘယ်တော့ သက်တမ်းကုန်မလဲ။",
     "missing_driverLicenseCountry": "လိုင်စင်ကို ဘယ်နိုင်ငံက ထုတ်ပေးတာလဲ။",
-    "handoverPhotos": "လက်ဆင့်ကမ်းချိန်ဓာတ်ပုံများ ({count})"
+    "handoverPhotos": "လက်ဆင့်ကမ်းချိန်ဓာတ်ပုံများ ({count})",
+    "payPlusExtras": "+ ထပ်ဆောင်း {amount}",
+    "payLessExtras": "ထပ်ဆောင်းအတွက် {amount} နုတ်ပြီး"
   },
   "customerMessages": {
     "hi": "မင်္ဂလာပါ {name}၊",

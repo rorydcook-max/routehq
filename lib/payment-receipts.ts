@@ -42,6 +42,9 @@ export type PortalPayment = {
   chargeReasons?: string[];
   /** "October 2026", "3 days": the stretch of rent it covers, as written when it was scheduled. */
   periodLabel?: string | null;
+  /** Extras moved onto this payment, and money paid for extras taken off it: said so the amount makes sense. */
+  extrasAdded?: number;
+  extrasCredit?: number;
   amount: number;
   currency: string;
   dueDate: string;
@@ -107,6 +110,8 @@ export async function getPortalPayments(
       chargeNote: row.metadata?.type === "charge" && row.metadata?.description ? String(row.metadata.description) : null,
       chargeReasons: row.metadata?.type === "charge" && Array.isArray(row.metadata?.charge_reasons) ? row.metadata.charge_reasons.map(String) : [],
       periodLabel: row.metadata?.period_label ? String(row.metadata.period_label) : null,
+      extrasAdded: Number(row.metadata?.includes_extras?.amount || 0),
+      extrasCredit: Number(row.metadata?.extras_credit || 0),
         amount,
         currency,
         dueDate,

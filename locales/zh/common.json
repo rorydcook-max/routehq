@@ -566,7 +566,9 @@
     "missing_driverLicenseNumber": "请填写驾照号码。",
     "missing_driverLicenseExpiry": "驾照何时到期？",
     "missing_driverLicenseCountry": "驾照由哪个国家签发？",
-    "handoverPhotos": "交车照片（{count}）"
+    "handoverPhotos": "交车照片（{count}）",
+    "payPlusExtras": "+ 附加服务 {amount}",
+    "payLessExtras": "已扣除附加服务费用 {amount}"
   },
   "customerMessages": {
     "hi": "{name}，您好！",

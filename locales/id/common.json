@@ -566,7 +566,9 @@
     "missing_driverLicenseNumber": "Isi nomor SIM Anda.",
     "missing_driverLicenseExpiry": "Kapan SIM Anda berakhir?",
     "missing_driverLicenseCountry": "Negara mana yang menerbitkan SIM Anda?",
-    "handoverPhotos": "Foto serah terima ({count})"
+    "handoverPhotos": "Foto serah terima ({count})",
+    "payPlusExtras": "+ tambahan {amount}",
+    "payLessExtras": "{amount} untuk tambahan sudah dipotong"
   },
   "customerMessages": {
     "hi": "Halo {name},",

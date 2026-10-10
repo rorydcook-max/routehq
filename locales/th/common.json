@@ -773,7 +773,9 @@
     "missing_driverLicenseNumber": "กรุณาใส่เลขใบขับขี่",
     "missing_driverLicenseExpiry": "ใบขับขี่หมดอายุวันไหน",
     "missing_driverLicenseCountry": "ใบขับขี่ออกโดยประเทศไหน",
-    "handoverPhotos": "รูปตอนส่งมอบ ({count})"
+    "handoverPhotos": "รูปตอนส่งมอบ ({count})",
+    "payPlusExtras": "+ บริการเสริม {amount}",
+    "payLessExtras": "หักเงินค่าบริการเสริมแล้ว {amount}"
   },
   "customerMessages": {
     "hi": "สวัสดีคุณ {name}",

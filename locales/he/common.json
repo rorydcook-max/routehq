@@ -566,7 +566,9 @@
     "missing_driverLicenseNumber": "הזינו מספר רישיון נהיגה.",
     "missing_driverLicenseExpiry": "מתי פג תוקף הרישיון?",
     "missing_driverLicenseCountry": "איזו מדינה הנפיקה את הרישיון?",
-    "handoverPhotos": "תמונות מסירה ({count})"
+    "handoverPhotos": "תמונות מסירה ({count})",
+    "payPlusExtras": "+ תוספות {amount}",
+    "payLessExtras": "קוזזו {amount} ששולמו עבור תוספות"
   },
   "customerMessages": {
     "hi": "שלום {name},",

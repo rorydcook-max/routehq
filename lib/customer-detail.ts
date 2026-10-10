@@ -90,8 +90,17 @@ function summarizeCustomer(customer: any, documents: any[], rentals: any[], tran
       })
     )
     .reduce((sum, transaction) => sum + Math.abs(Number(transaction.amount || 0)), 0) - refundsOf(transactions);
+  // Only rentals that went out count: not drafts, links not filled in, future bookings or cancellations.
+  // One that came back early ended on its return day, not on its booked date.
+  const today = businessToday();
   const lastRentalDate = rentals
-    .map((rental) => rental.end_date || rental.start_date)
+    .filter((rental) => ["active", "due_soon", "overdue", "extended", "completed"].includes(String(rental.status)))
+    .map((rental) => {
+      // The return form's date when there is one: the day the vehicle actually came back.
+      if (rental.status === "completed" && rental.returned_on) return String(rental.returned_on);
+      const end = String(rental.end_date || rental.start_date || "").slice(0, 10);
+      return rental.status === "completed" && end > today ? today : end;
+    })
     .filter(Boolean)
     .sort()
     .at(-1) || null;
@@ -130,7 +139,7 @@ async function addDocumentUrls(supabase: any, documents: any[]): Promise<Custome
 
 export async function getCustomerList(organizationId: string): Promise<CustomerListItem[]> {
   const supabase = (await createSupabaseServerClient()) as any;
-  const [customersResult, documentsResult, rentalsResult, transactionsResult] = await Promise.all([
+  const [customersResult, documentsResult, rentalsResult, transactionsResult, returnsResult] = await Promise.all([
     supabase.from("customers").select("*").eq("organization_id", organizationId).is("deleted_at", null).order("created_at", { ascending: false }),
     supabase.from("documents").select("*").eq("organization_id", organizationId).eq("owner_type", "customer").is("deleted_at", null),
     supabase
@@ -139,7 +148,8 @@ export async function getCustomerList(organizationId: string): Promise<CustomerL
       .eq("organization_id", organizationId)
       .is("deleted_at", null)
       .order("start_date", { ascending: false }),
-    supabase.from("transactions").select("*").eq("organization_id", organizationId).is("deleted_at", null)
+    supabase.from("transactions").select("*").eq("organization_id", organizationId).is("deleted_at", null),
+    supabase.from("inspections").select("rental_id, submitted_at, created_at").eq("organization_id", organizationId).eq("type", "return").not("rental_id", "is", null)
   ]);
 
   const queryError = [customersResult, documentsResult, rentalsResult, transactionsResult].find((result) => result.error)?.error;
@@ -147,11 +157,19 @@ export async function getCustomerList(organizationId: string): Promise<CustomerL
     throw new Error(queryError.message);
   }
 
+  // The day each vehicle came back, in the business's time zone.
+  const returnedOn = new Map<string, string>();
+  for (const row of (returnsResult.data || []) as any[]) {
+    const day = toWallTime(row.submitted_at || row.created_at).slice(0, 10);
+    if (day && (!returnedOn.has(row.rental_id) || day > String(returnedOn.get(row.rental_id)))) returnedOn.set(row.rental_id, day);
+  }
+  const rentals = (rentalsResult.data || []).map((rental: any) => ({ ...rental, returned_on: returnedOn.get(rental.id) || null }));
+
   return (customersResult.data || []).map((customer: any) =>
     summarizeCustomer(
       customer,
       (documentsResult.data || []).filter((document: any) => document.owner_id === customer.id),
-      (rentalsResult.data || []).filter((rental: any) => rental.customer_id === customer.id),
+      rentals.filter((rental: any) => rental.customer_id === customer.id),
       (transactionsResult.data || []).filter((transaction: any) => transaction.customer_id === customer.id)
     )
   );

@@ -114,7 +114,9 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
       billing_interval: plan.pricingModel,
       rental_rate: plan.rate + extrasPriced.monthly,
       deposit_amount: vehicle.deposit,
-      balance_due: plan.rate + extrasPriced.monthly + vehicle.deposit + extrasPriced.upfront,
+      // What the customer pays first: the whole stay when priced by the day (one payment), else the first period.
+      balance_due:
+        (plan.pricingModel === "daily" && endDate ? plan.rate * daysBetween(startDate, endDate) : plan.rate) + extrasPriced.monthly + vehicle.deposit + extrasPriced.upfront,
       extras: extrasPriced.lines,
       extras_total: extrasPriced.upfront,
       currency: catalog.currency,

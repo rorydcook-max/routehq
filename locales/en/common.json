@@ -3192,8 +3192,8 @@
     "br_deleteConfirm": "Remove {name}? Vehicles kept here stay in your records but will no longer have this location.",
     "br_active": "In use",
     "cm_title": "Tell customers automatically",
-    "cm_body": "Reminders before a handover, a return and a payment, and news when something changes on their booking. Sent to the customer's chat, or by email; otherwise kept on the booking for you to send.",
-    "cm_noChannel": "No messaging account is connected yet, so nothing can be sent. Until one is, each message is kept on the booking marked \"not sent\" for you to pass on.",
+    "cm_body": "Reminders before a handover, a return and a payment, and news when something changes on their booking. Sent to the customer's chat, or by email; anything that can't be sent waits in your Inbox for you to pass on.",
+    "cm_noChannel": "No chat account is connected yet, so nothing goes out on LINE or Telegram. Until one is, each message waits in your Inbox and on the booking, marked \"not sent\", for you to pass on with one tap.",
     "cm_firstMessage": "LINE and Telegram only let you message someone who has messaged you first. Each customer's booking page invites them to open a chat with you, and it connects itself to their booking when they do.",
     "ru_hours": "{count, plural, one {# hour} other {# hours}}",
     "ru_days": "{count, plural, one {# day} other {# days}}",
@@ -3571,7 +3571,7 @@
     "extra_forBikes": "Scooters and motorbikes",
     "extra_add": "Add an extra",
     "rem_title": "Automatic reminders",
-    "rem_body": "Sent once each, on the customer's chat (LINE, or WhatsApp when connected). When a customer has no chat yet, the message waits on the booking for you to send with one tap.",
+    "rem_body": "Sent once each, to the customer's chat (LINE or Telegram) or by email. When neither is possible, the message waits in your Inbox for you to send with one tap.",
     "rem_handover": "Handover tomorrow",
     "rem_return": "Return in 3 days, and tomorrow",
     "rem_rent_due": "Rent due tomorrow",
@@ -3584,7 +3584,8 @@
     "ud_body": "Used for any vehicle without a deposit of its own, on bookings you make and online. Leave empty for no deposit.",
     "ud_label": "Usual deposit (฿)",
     "pb_depositIs": "Online bookings take your usual deposit ({amount}) unless the vehicle has its own. Change it under Usual deposit.",
-    "pb_depositNone": "Online bookings take no deposit unless the vehicle has its own. Set one under Usual deposit."
+    "pb_depositNone": "Online bookings take no deposit unless the vehicle has its own. Set one under Usual deposit.",
+    "cm_noChannelEmail": "No chat account is connected yet. Customers who gave an email get their messages by email; for the rest, each message waits in your Inbox and on the booking, marked \"not sent\", for you to pass on with one tap."
   },
   "accountPage": {
     "roleOwner": "Owner",

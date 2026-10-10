@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { isEmailConfigured } from "@/lib/email";
 import type { Route } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { intlLocale } from "@/lib/i18n/dates";
@@ -372,6 +373,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                 enabled={customerMessagesOn(organization.settings)}
                 off={remindersOff(organization.settings)}
                 hasChannel={((messagingChannels || []) as any[]).some((channel) => channel.status !== "disconnected")}
+                emailOn={isEmailConfigured()}
               />
             </div>
           </Card>
@@ -742,7 +744,12 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               <div className="flex flex-col gap-3 rounded-lg border border-[var(--border)] p-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between" key={member.id}>
                 <div>
                   <p className="font-bold text-[var(--foreground)]">{member.display_name || member.invited_email || (member.user_id === user?.id ? userEmail : say("team_user"))}</p>
-                  <p className="text-sm text-[var(--muted)]">{member.invited_email || say("team_activeAccount")}</p>
+                  {/* Second line only when it adds something: the email under a name, or that they've joined. */}
+                  {member.display_name && member.invited_email ? (
+                    <p className="text-sm text-[var(--muted)]">{member.invited_email}</p>
+                  ) : member.user_id && !waitingMembers.has(member.id) ? (
+                    <p className="text-sm text-[var(--muted)]">{say("team_activeAccount")}</p>
+                  ) : null}
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge tone="neutral">{member.role === "owner" ? say("team_owner") : say("team_mate")}</Badge>

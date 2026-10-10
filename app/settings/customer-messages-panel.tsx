@@ -8,7 +8,7 @@ import { saveCustomerMessages, saveReminderKinds } from "@/app/actions/online-bo
 const KINDS = ["handover", "return", "rent_due", "rent_late", "vehicle_due", "signature"];
 
 /** One switch for the messages RouteHQ sends customers on the business's behalf. Saves on change. */
-export function CustomerMessagesPanel({ enabled, hasChannel, off: initialOff = [] }: { enabled: boolean; hasChannel: boolean; off?: string[] }) {
+export function CustomerMessagesPanel({ enabled, hasChannel, emailOn = false, off: initialOff = [] }: { enabled: boolean; hasChannel: boolean; emailOn?: boolean; off?: string[] }) {
   const [off, setOff] = useState<string[]>(initialOff);
   function toggle(kind: string, on: boolean) {
     const next = on ? off.filter((item) => item !== kind) : [...off, kind];
@@ -51,7 +51,7 @@ export function CustomerMessagesPanel({ enabled, hasChannel, off: initialOff = [
           <span className="mt-1 block font-medium text-[var(--foreground-secondary)]">{say("cm_body")}</span>
         </span>
       </label>
-      {on && !hasChannel ? <p className="mt-3 rounded-xl bg-[var(--warning-light)] px-4 py-3 font-medium text-[var(--foreground)]">{say("cm_noChannel")}</p> : null}
+      {on && !hasChannel ? <p className="mt-3 rounded-xl bg-[var(--warning-light)] px-4 py-3 font-medium text-[var(--foreground)]">{say(emailOn ? "cm_noChannelEmail" : "cm_noChannel")}</p> : null}
       {on && hasChannel ? <p className="mt-3 font-medium text-[var(--foreground-secondary)]">{say("cm_firstMessage")}</p> : null}
       {on ? (
         <div className="mt-4 rounded-xl border border-[var(--border)] p-3">

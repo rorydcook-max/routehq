@@ -112,11 +112,14 @@ function rentalTimingLabel(booking: any, tx: Tx) {
   const status = String(booking.status || "").toLowerCase();
   if (["completed", "cancelled"].includes(status)) return null;
   // Not handed over yet: what matters is when it starts.
-  if (status === "booked" && booking.start_date) {
+  const onRent = ["active", "due_soon", "overdue", "extended"].includes(status);
+  if (!onRent && booking.start_date) {
     const days = daysFromToday(booking.start_date);
     if (days > 1) return tx.say("startsIn", { days });
     if (days === 1) return tx.say("startsTomorrow");
     if (days === 0) return tx.say("startsToday");
+    // Not confirmed and its start has passed: the hold note says what matters.
+    if (status !== "booked") return null;
     return tx.say("handoverOverdue", { days: -days });
   }
   if (!booking.end_date) return tx.say("openEnded");

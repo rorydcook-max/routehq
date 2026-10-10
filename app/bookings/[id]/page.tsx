@@ -35,7 +35,7 @@ import { flagForNationality } from "@/lib/customer-options";
 import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { formatDeliveryLocation } from "@/lib/delivery-location";
-import { toWallTime, businessToday, BUSINESS_TIME_ZONE } from "@/lib/business-time";
+import { toWallTime, wallTimeToIso, businessToday, BUSINESS_TIME_ZONE } from "@/lib/business-time";
 import { signedReceiptUrls } from "@/lib/payment-receipts";
 import { GeneratePaymentScheduleButton } from "@/app/bookings/[id]/generate-payment-schedule-button";
 import { RentalDocumentsCard } from "@/app/bookings/[id]/rental-documents-card";
@@ -66,7 +66,10 @@ function formatDate(value: string | null | undefined, tx: Tx) {
 
 function formatDateTime(value: string | null | undefined, tx: Tx) {
   if (!value) return tx.say("notYet");
-  return new Intl.DateTimeFormat(intlLocale(tx.locale), { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: BUSINESS_TIME_ZONE }).format(new Date(value));
+  // A time without an offset is already Thai time; reading it as UTC showed 09:00 handovers as 16:00.
+  const instant = wallTimeToIso(value);
+  if (!instant) return tx.say("notYet");
+  return new Intl.DateTimeFormat(intlLocale(tx.locale), { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: BUSINESS_TIME_ZONE }).format(new Date(instant));
 }
 
 function formatPaymentMethod(value: string | null | undefined, tx: Tx) {

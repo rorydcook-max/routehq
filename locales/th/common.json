@@ -2088,7 +2088,7 @@
     "hist_handed_over_without_form": "ส่งมอบรถโดยไม่กรอกแบบฟอร์ม",
     "ref_earlyOwed": "การจองนี้ยังค้างชำระ {owed} หักแล้วเหลือคืนสุทธิ {net}",
     "recordOnVehicle": "บันทึกลงประวัติรถ",
-    "ex_title": "บริการเสริมที่คิดเงิน",
+    "ex_title": "บริการเสริม",
     "ex_none": "ตอนนี้ไม่มีบริการเสริมในการจองนี้",
     "ex_removedList": "นำออกแล้ว: {names}",
     "ex_paid": "ชำระแล้ว {amount}",

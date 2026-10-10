@@ -1093,9 +1093,10 @@ body {
   font-size: 13px !important;
 }
 /* A box inside a card is tinted, not outlined: a border inside a borderless
-   card read as a box in a box. Fields keep their own outline. */
-.card [class*="rounded"][class*="border-[var(--border)]"]:not(input):not(select):not(textarea):not(details):not(summary),
-.content-section [class*="rounded"][class*="border-[var(--border)]"]:not(input):not(select):not(textarea):not(details):not(summary) {
+   card read as a box in a box. Fields keep their own outline, and so do
+   buttons and links: an outlined button is a button, a grey box is not. */
+.card [class*="rounded"][class*="border-[var(--border)]"]:not(input):not(select):not(textarea):not(details):not(summary):not(button):not(a),
+.content-section [class*="rounded"][class*="border-[var(--border)]"]:not(input):not(select):not(textarea):not(details):not(summary):not(button):not(a) {
   background-color: var(--panel-secondary);
   border-color: transparent !important;
 }

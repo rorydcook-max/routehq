@@ -74,7 +74,7 @@ export function ExtrasPanel({ rentalId, organizationId, currency, lines, removed
     credited > 0 ? say("ex_credited", { amount: money(credited, currency) }) : null
   ].filter(Boolean);
 
-  const button = "pressable rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground)]";
+  const button = "secondary-action pressable min-h-10 px-3 text-sm";
 
   return (
     <div className="rounded-xl border border-[var(--border)] bg-white p-3" id="extras">
@@ -202,14 +202,14 @@ function Actions({ isPending, label, onCancel, onConfirm, submit, disabled }: { 
   return (
     <div className="mt-3 flex flex-wrap gap-2">
       <button
-        className="pressable rounded-lg bg-[var(--primary)] px-3 py-2 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+        className="primary-action pressable min-h-10 px-3 text-sm disabled:cursor-not-allowed disabled:opacity-60"
         disabled={isPending || disabled}
         onClick={submit ? undefined : onConfirm}
         type={submit ? "submit" : "button"}
       >
         {isPending ? say("saving") : label}
       </button>
-      <button className="pressable rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground-secondary)]" disabled={isPending} onClick={onCancel} type="button">
+      <button className="secondary-action pressable min-h-10 px-3 text-sm" disabled={isPending} onClick={onCancel} type="button">
         {say("cancelBtn")}
       </button>
     </div>

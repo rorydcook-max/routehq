@@ -1155,7 +1155,13 @@
     "suggestAgain": "Suggest again",
     "suggest": "Suggest a reply",
     "sending": "Sending…",
-    "send": "Send"
+    "send": "Send",
+    "toSendTitle": "{count, plural, one {1 message to send} other {# messages to send}}",
+    "toSendWhy": "These customers have no chat open with you yet, so the app couldn't send these itself. Tap Send to open the app with the message filled in, then tap Done.",
+    "toSendCount": "{count, plural, one {1 message} other {# messages}}",
+    "toSendOpen": "Open",
+    "toSendNoName": "Customer",
+    "toSendBooking": "Open the booking"
   },
   "money": {
     "back": "Back to money in & out",
@@ -3644,7 +3650,11 @@
     "role_operator": "Staff",
     "role_renter": "Customer",
     "role_additional_driver": "Extra driver",
-    "role_witness": "Witness"
+    "role_witness": "Witness",
+    "atCondition": "Condition photos · {vehicle}",
+    "receiptNo": "Receipt {number}",
+    "issuedOn": "Issued {date}",
+    "filter_receipt": "Receipts"
   },
   "reportsPage": {
     "title": "Reports",
@@ -3737,7 +3747,9 @@
     "fleetValueLink": "Fleet value",
     "fleetValueLinkHint": "What your vehicles are worth now, against what you paid",
     "ownersLink": "Owners' statements",
-    "ownersLinkHint": "For vehicles you run for someone else: their share each month"
+    "ownersLinkHint": "For vehicles you run for someone else: their share each month",
+    "extrasTag": "Extras",
+    "extrasPart": "incl. {amount} extras"
   },
   "auth": {
     "signInTitle": "Sign in",

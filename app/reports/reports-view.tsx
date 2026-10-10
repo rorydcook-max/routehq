@@ -53,7 +53,7 @@ function Change({ change, upIsBad = false, say }: { change: number | null; upIsB
 }
 
 /** Where money came from or went: one bar per kind, biggest first. */
-export function Breakdown({ title, rows, typeLabel, say }: { title: string; rows: Array<{ type: string; label: string; amount: number }>; typeLabel: (type: string, fallback: string) => string; say: Say }) {
+export function Breakdown({ title, rows, typeLabel, say }: { title: string; rows: Array<{ type: string; label: string; amount: number; extras?: number }>; typeLabel: (type: string, fallback: string) => string; say: Say }) {
   const total = rows.reduce((sum, row) => sum + row.amount, 0);
   return (
     <section className="card p-4">
@@ -71,6 +71,7 @@ export function Breakdown({ title, rows, typeLabel, say }: { title: string; rows
                   {total > 0 ? <span className={`ml-2 ${soft}`}>{Math.round((row.amount / total) * 100)}%</span> : null}
                 </span>
               </div>
+              {Number(row.extras || 0) > 0 ? <p className={soft}>{say("extrasPart", { amount: money(Number(row.extras)) })}</p> : null}
               <div className="mt-1 h-2 overflow-hidden rounded-full bg-[var(--panel-secondary)]">
                 <div className="h-full rounded-full" style={{ width: `${total > 0 ? Math.max(2, (row.amount / total) * 100) : 0}%`, background: CHART_COLORS[index % CHART_COLORS.length] }} />
               </div>
@@ -543,7 +544,12 @@ export function ReportsView({ data }: { data: ReportsData }) {
               return (
                 <div className={`${tile} flex items-center justify-between gap-3`} key={entry.id}>
                   <div className="min-w-0">
-                    <p className="text-[16px] font-bold text-[var(--foreground)]">{typeLabel(entry.type, entry.typeLabel)}</p>
+                    <p className="text-[16px] font-bold text-[var(--foreground)]">
+                      {typeLabel(entry.type, entry.typeLabel)}
+                      {entry.extras > 0 ? (
+                        <span className={`ml-2 font-medium ${soft}`}>{Math.abs(entry.extras - entry.amount) < 1 ? say("extrasTag") : say("extrasPart", { amount: money(entry.extras) })}</span>
+                      ) : null}
+                    </p>
                     <p className={soft}>{[entry.vehicleLabel, entry.customerName].filter(Boolean).join(" · ")}</p>
                     <p className={soft}>{longDate(entry.date, locale)}</p>
                   </div>

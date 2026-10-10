@@ -70,7 +70,7 @@ export async function signOut() {
 export type ShellContext = {
   role: AppRole | null;
   organizations: { id: string; name: string; active: boolean }[];
-  /** Customer chats with unread messages, shown as a badge on Inbox. */
+  /** Customer chats with unread messages, plus messages waiting to be sent by hand: the badge on Inbox. */
   unreadChats: number;
   /** Payments and jobs due today or overdue, shown as a badge on To do. */
   dueTasks: number;
@@ -93,8 +93,8 @@ export async function getShellContext(): Promise<ShellContext> {
       return 0;
     }
   };
-  // The three lookups do not depend on each other, so they run together.
-  const [{ data }, { count }, dueTasks] = await Promise.all([
+  // The lookups do not depend on each other, so they run together.
+  const [{ data }, { count }, dueTasks, { count: toSend }] = await Promise.all([
     supabase
       .from("organization_members")
       .select("organization_id, organizations(name)")
@@ -107,7 +107,17 @@ export async function getShellContext(): Promise<ShellContext> {
       .eq("organization_id", membership.organizationId)
       .eq("status", "open")
       .gt("unread_count", 0),
-    countDueTasks()
+    countDueTasks(),
+    // Messages the app wrote for customers with no chat open: they wait in the inbox for the owner to send.
+    supabase
+      .from("communication_log")
+      .select("id", { count: "exact", head: true })
+      .eq("organisation_id", membership.organizationId)
+      .eq("type", "automated_reminder")
+      .in("status", ["pending", "failed"])
+      .not("metadata->handoff_label", "is", null)
+      .or("metadata->>superseded.is.null,metadata->>superseded.eq.false")
+      .gte("created_at", new Date(Date.now() - 3 * 86_400_000).toISOString())
   ]);
 
   const organizations = ((data || []) as any[]).map((row) => ({
@@ -115,7 +125,7 @@ export async function getShellContext(): Promise<ShellContext> {
     name: String(row.organizations?.name || "Business"),
     active: row.organization_id === membership.organizationId
   }));
-  return { role: membership.role, organizations, unreadChats: count || 0, dueTasks };
+  return { role: membership.role, organizations, unreadChats: (count || 0) + (toSend || 0), dueTasks };
 }
 
 /** Switch the business this person is working in. Only businesses they actively belong to are accepted. */

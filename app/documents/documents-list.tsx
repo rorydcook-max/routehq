@@ -24,6 +24,7 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
     if (document.ownerType === "signed") {
       return has(`signed_${document.docType}`) ? say(`signed_${document.docType}`) : tidy(document.docType || document.fileName);
     }
+    if (document.ownerType === "receipt") return say("receiptNo", { number: document.fileName });
     const category = document.category.startsWith("inspection_damage") ? "inspection_damage" : document.category;
     return has(`cat_${category}`) ? say(`cat_${category}`) : document.fileName || tidy(document.category);
   }
@@ -31,6 +32,7 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
   /** Who or what the file belongs to. */
   function ownerLabel(document: DocumentListItem) {
     if (document.ownerType === "inspection") {
+      if (document.inspectionType === "condition") return say("atCondition", { vehicle: document.ownerLabel || "-" });
       return say(document.inspectionType === "return" ? "atReturn" : "atHandover", { booking: document.ownerLabel || say("aBooking") });
     }
     return document.ownerLabel || (has(`owner_${document.ownerType}`) ? say(`owner_${document.ownerType}`) : tidy(document.ownerType));
@@ -122,7 +124,7 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
                 </div>
                 {first.href ? (
                   <Link className="secondary-action pressable mt-3 w-full sm:w-auto" href={first.href as any}>
-                    {say("openBooking")}
+                    {say(first.inspectionType === "condition" ? "openVehicle" : "openBooking")}
                   </Link>
                 ) : null}
               </div>
@@ -148,7 +150,7 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
                   <p className="text-[16px] font-bold text-[var(--foreground)]">{fileLabel(document)}</p>
                   <p className="font-medium text-[var(--foreground-secondary)]">{ownerLabel(document)}</p>
                   <p className="font-medium text-[var(--foreground-secondary)]">
-                    {document.ownerType === "signed" ? `${say("signedOn", { date: longDate(document.createdAt, locale) })}` : say("addedOn", { date: longDate(document.createdAt, locale) })}
+                    {document.ownerType === "signed" ? say("signedOn", { date: longDate(document.createdAt, locale) }) : document.ownerType === "receipt" ? say("issuedOn", { date: longDate(document.createdAt, locale) }) : say("addedOn", { date: longDate(document.createdAt, locale) })}
                   </p>
                 </div>
               </div>

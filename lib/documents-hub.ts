@@ -11,8 +11,8 @@ export type DocumentListItem = {
   ownerLabel: string;
   /** For signed paperwork: which document it is ("rental_agreement"). */
   docType?: string | null;
-  /** For inspection photos: taken at handover or at return. */
-  inspectionType?: "delivery" | "return" | null;
+  /** For inspection photos: taken at handover, at return, or a condition check on the vehicle with no booking. */
+  inspectionType?: "delivery" | "return" | "condition" | null;
   mimeType: string | null;
   createdAt: string;
   signedUrl: string | null;
@@ -59,7 +59,7 @@ function rentalLabel(rental: any) {
  */
 export async function getDocumentList(organizationId: string, limit = 150): Promise<DocumentListItem[]> {
   const supabase = (await createSupabaseServerClient()) as any;
-  const [uploadsResult, signedResult] = await Promise.all([
+  const [uploadsResult, signedResult, receiptsResult] = await Promise.all([
     supabase
       .from("documents")
       .select("id, file_name, category, owner_type, owner_id, mime_type, storage_path, created_at")
@@ -73,6 +73,13 @@ export async function getDocumentList(organizationId: string, limit = 150): Prom
       .eq("organization_id", organizationId)
       .in("status", ["signed", "finalised"])
       .order("created_at", { ascending: false })
+      .limit(limit),
+    // Receipts given to customers for money received.
+    supabase
+      .from("receipts")
+      .select("id, rental_id, receipt_number, amount, created_at")
+      .eq("organisation_id", organizationId)
+      .order("created_at", { ascending: false })
       .limit(limit)
   ]);
 
@@ -81,6 +88,7 @@ export async function getDocumentList(organizationId: string, limit = 150): Prom
   }
   const data = uploadsResult.data || [];
   const signed = signedResult.data || [];
+  const receipts = receiptsResult.data || [];
 
   const idsOf = (type: string) => [...new Set(data.filter((row: any) => row.owner_type === type && row.owner_id).map((row: any) => row.owner_id))];
   const vehicleIds = idsOf("vehicle");
@@ -91,7 +99,7 @@ export async function getDocumentList(organizationId: string, limit = 150): Prom
   const [vehiclesResult, customersResult, inspectionsResult, versionsResult] = await Promise.all([
     vehicleIds.length ? supabase.from("vehicles").select("id, registration_number, make, model").in("id", vehicleIds) : Promise.resolve({ data: [] }),
     customerIds.length ? supabase.from("customers").select("id, full_name").in("id", customerIds) : Promise.resolve({ data: [] }),
-    inspectionIds.length ? supabase.from("inspections").select("id, rental_id, type").in("id", inspectionIds) : Promise.resolve({ data: [] }),
+    inspectionIds.length ? supabase.from("inspections").select("id, rental_id, vehicle_id, type, vehicles(registration_number, make, model)").in("id", inspectionIds) : Promise.resolve({ data: [] }),
     versionIds.length
       ? supabase.from("rental_document_versions").select("id, final_pdf_storage_bucket, final_pdf_storage_path, pdf_storage_bucket, pdf_storage_path, swap:rendered_data_snapshot->swap").in("id", versionIds)
       : Promise.resolve({ data: [] })
@@ -102,7 +110,8 @@ export async function getDocumentList(organizationId: string, limit = 150): Prom
     ...new Set([
       ...idsOf("rental"),
       ...(inspectionsResult.data || []).map((row: any) => row.rental_id).filter(Boolean),
-      ...signed.map((row: any) => row.rental_id)
+      ...signed.map((row: any) => row.rental_id),
+      ...receipts.map((row: any) => row.rental_id).filter(Boolean)
     ])
   ];
   const { data: rentals } = rentalIds.length
@@ -117,7 +126,7 @@ export async function getDocumentList(organizationId: string, limit = 150): Prom
   const uploads = await Promise.all(
     data.map(async (row: any): Promise<DocumentListItem> => {
       let ownerLabel = "";
-      let inspectionType: "delivery" | "return" | null = null;
+      let inspectionType: "delivery" | "return" | "condition" | null = null;
       let href = ownerHref(row.owner_type, row.owner_id);
       if (row.owner_type === "vehicle" && row.owner_id) ownerLabel = String(vehicleLabels.get(row.owner_id) || "");
       if (row.owner_type === "customer" && row.owner_id) ownerLabel = String(customerLabels.get(row.owner_id) || "");
@@ -125,9 +134,17 @@ export async function getDocumentList(organizationId: string, limit = 150): Prom
       if (row.owner_type === "inspection" && row.owner_id) {
         // Inspection photos belong to a booking: link there.
         const inspection: any = inspectionById.get(row.owner_id);
-        ownerLabel = rentalLabel(rentalById.get(inspection?.rental_id));
-        inspectionType = inspection?.type === "return" ? "return" : "delivery";
-        href = inspection?.rental_id ? `/bookings/${inspection.rental_id}` : null;
+        if (!inspection?.rental_id && inspection?.vehicle_id) {
+          // A condition check recorded on the vehicle itself (damage found, no booking): link to the vehicle.
+          const vehicle = inspection.vehicles || {};
+          ownerLabel = [vehicle.make, vehicle.model, vehicle.registration_number].filter(Boolean).join(" ");
+          inspectionType = "condition";
+          href = `/fleet/${inspection.vehicle_id}`;
+        } else {
+          ownerLabel = rentalLabel(rentalById.get(inspection?.rental_id));
+          inspectionType = inspection?.type === "return" ? "return" : "delivery";
+          href = inspection?.rental_id ? `/bookings/${inspection.rental_id}` : null;
+        }
       }
       return {
         id: row.id,
@@ -172,5 +189,22 @@ export async function getDocumentList(organizationId: string, limit = 150): Prom
     })
   );
 
-  return [...signedItems, ...uploads].sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+  // The stored receipt link runs out after a year, so a fresh one is made from where the file is kept.
+  const receiptItems = await Promise.all(
+    receipts.map(async (row: any): Promise<DocumentListItem> => ({
+      id: `receipt-${row.id}`,
+      fileName: String(row.receipt_number || "Receipt"),
+      category: "receipt",
+      docType: String(row.receipt_number || ""),
+      ownerType: "receipt",
+      ownerId: row.rental_id,
+      ownerLabel: rentalLabel(rentalById.get(row.rental_id)),
+      mimeType: "application/pdf",
+      createdAt: row.created_at,
+      signedUrl: await signedPath(supabase, `${organizationId}/receipts/${row.id}.pdf`),
+      href: row.rental_id ? `/bookings/${row.rental_id}` : null
+    }))
+  );
+
+  return [...signedItems, ...receiptItems, ...uploads].sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
 }

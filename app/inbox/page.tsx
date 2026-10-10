@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { MessagesSquare } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { InboxView } from "@/app/inbox/inbox-view";
+import { MessagesToSend, type ToSendGroup } from "@/app/inbox/messages-to-send";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import type { InboxConversation, InboxMessage } from "@/lib/inbox/store";
@@ -59,6 +60,34 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
   ]);
 
   const hasChannel = (channels || []).length > 0;
+
+  // Messages the app wrote for customers with no chat open yet: they wait for the owner to send them in a tap.
+  // Same rule as the booking page: the last three days, and not overtaken by a later message.
+  const { data: waiting } = await supabase
+    .from("communication_log")
+    .select("id, rental_id, customer_id, content, metadata, created_at, customers(full_name), rentals(reference, display_code)")
+    .eq("organisation_id", organization.id)
+    .eq("type", "automated_reminder")
+    .in("status", ["pending", "failed"])
+    .not("metadata->handoff_label", "is", null)
+    .gte("created_at", new Date(Date.now() - 3 * 86_400_000).toISOString())
+    .order("created_at", { ascending: false })
+    .limit(100);
+  const toSend = new Map<string, ToSendGroup>();
+  for (const row of (waiting || []) as any[]) {
+    if (row.metadata?.superseded) continue;
+    const key = String(row.rental_id || row.customer_id || row.id);
+    const group: ToSendGroup = toSend.get(key) || {
+      key,
+      customerName: String(row.customers?.full_name || ""),
+      bookingRef: String(row.rentals?.reference || row.rentals?.display_code || ""),
+      rentalId: row.rental_id || null,
+      messages: []
+    };
+    group.messages.push({ id: row.id, content: String(row.content || ""), url: row.metadata?.handoff_url || null });
+    toSend.set(key, group);
+  }
+  const toSendGroups = [...toSend.values()];
   const t = await getTranslations("inbox");
 
   return (
@@ -67,6 +96,8 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
         <h1 className="page-title">{t("title")}</h1>
         <p className="page-subtitle mt-1">{t("subtitle")}</p>
       </div>
+
+      {toSendGroups.length ? <MessagesToSend groups={toSendGroups} /> : null}
 
       {!hasChannel && list.length === 0 ? (
         <div className="rounded-xl border border-[var(--border)] bg-white p-8 text-center shadow-[var(--shadow-sm)]">

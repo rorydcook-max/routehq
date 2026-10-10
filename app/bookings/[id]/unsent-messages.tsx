@@ -24,7 +24,7 @@ function appOf(url: string | null) {
  * Messages the app wrote for the customer but could not deliver itself (no
  * chat with them yet). The owner sends each one in a tap, then ticks it off.
  */
-export function UnsentMessages({ messages, customerName }: { messages: UnsentMessage[]; customerName: string }) {
+export function UnsentMessages({ messages, customerName, bare = false }: { messages: UnsentMessage[]; customerName: string; bare?: boolean }) {
   const say = useTranslations("booking") as unknown as Say;
   const router = useRouter();
   const [done, setDone] = useState<string[]>([]);
@@ -51,10 +51,14 @@ export function UnsentMessages({ messages, customerName }: { messages: UnsentMes
   }
 
   return (
-    <div className="scroll-mt-4 rounded-xl border border-[var(--warning-line)] bg-[var(--warning-light)] p-3" id="unsent-messages">
-      <p className="text-sm font-semibold text-[var(--warning)]">{say("unsentTitle", { count: open.length, name: customerName })}</p>
-      <p className="mt-1 text-sm text-[var(--foreground-secondary)]">{say("unsentWhy")}</p>
-      <div className="mt-3 space-y-3">
+    <div className={bare ? "" : "scroll-mt-4 rounded-xl border border-[var(--warning-line)] bg-[var(--warning-light)] p-3"} id={bare ? undefined : "unsent-messages"}>
+      {bare ? null : (
+        <>
+          <p className="text-sm font-semibold text-[var(--warning)]">{say("unsentTitle", { count: open.length, name: customerName })}</p>
+          <p className="mt-1 text-sm text-[var(--foreground-secondary)]">{say("unsentWhy")}</p>
+        </>
+      )}
+      <div className={bare ? "space-y-3" : "mt-3 space-y-3"}>
         {open.map((message) => {
           const app = appOf(message.url);
           return (

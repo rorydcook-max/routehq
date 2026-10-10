@@ -1164,7 +1164,13 @@
     "suggestAgain": "ร่างใหม่",
     "suggest": "ช่วยร่างคำตอบ",
     "sending": "กำลังส่ง…",
-    "send": "ส่ง"
+    "send": "ส่ง",
+    "toSendTitle": "ข้อความรอส่ง {count} ข้อความ",
+    "toSendWhy": "ลูกค้าเหล่านี้ยังไม่ได้ทักแชทหาคุณ ระบบจึงส่งเองไม่ได้ แตะส่งเพื่อเปิดแอปพร้อมข้อความ แล้วแตะเสร็จแล้ว",
+    "toSendCount": "{count} ข้อความ",
+    "toSendOpen": "เปิด",
+    "toSendNoName": "ลูกค้า",
+    "toSendBooking": "เปิดการจอง"
   },
   "money": {
     "back": "กลับไปที่เงินเข้า-ออก",
@@ -3653,7 +3659,11 @@
     "role_operator": "พนักงาน",
     "role_renter": "ลูกค้า",
     "role_additional_driver": "ผู้ขับเพิ่ม",
-    "role_witness": "พยาน"
+    "role_witness": "พยาน",
+    "atCondition": "รูปสภาพรถ · {vehicle}",
+    "receiptNo": "ใบเสร็จ {number}",
+    "issuedOn": "ออกเมื่อ {date}",
+    "filter_receipt": "ใบเสร็จ"
   },
   "reportsPage": {
     "title": "รายงาน",
@@ -3746,7 +3756,9 @@
     "fleetValueLink": "มูลค่ารถ",
     "fleetValueLinkHint": "รถของคุณมีมูลค่าเท่าไรตอนนี้ เทียบกับราคาที่ซื้อ",
     "ownersLink": "รายงานเจ้าของรถ",
-    "ownersLinkHint": "สำหรับรถที่ดูแลให้คนอื่น: ส่วนแบ่งของเจ้าของแต่ละเดือน"
+    "ownersLinkHint": "สำหรับรถที่ดูแลให้คนอื่น: ส่วนแบ่งของเจ้าของแต่ละเดือน",
+    "extrasTag": "บริการเสริม",
+    "extrasPart": "รวมบริการเสริม {amount}"
   },
   "auth": {
     "signInTitle": "เข้าสู่ระบบ",

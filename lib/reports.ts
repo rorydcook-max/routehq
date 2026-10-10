@@ -63,12 +63,16 @@ export interface RecentTransaction {
   customerName: string | null;
   notes: string | null;
   isIncome: boolean;
+  /** Paid for extras, or given back for extras when it is an extras refund. */
+  extras: number;
 }
 
 export interface RevenueByType {
   type: string;
   label: string;
   amount: number;
+  /** Of this, paid for extras (rent) or given back for extras (refunds). */
+  extras?: number;
 }
 
 export interface DepositSummary {
@@ -423,10 +427,14 @@ export async function getReportsData(
   const vExpenseMap = new Map<string, number>();
   const vTxCountMap = new Map<string, number>();
   const vExpBreakMap = new Map<string, Map<string, number>>();
+  // Extras are rent income, followed on their own: what was paid for them and what was given back.
+  const extrasByType = new Map<string, number>();
 
   for (const tx of transactions) {
     const amount = Math.abs(Number(tx.amount || 0));
     const type = tx.type as string;
+    const extras = tx.metadata?.refund_of === "extras" ? amount : Math.min(amount, Math.abs(Number(tx.metadata?.extras_amount || 0)));
+    if (extras > 0 && (isIncomeTx(tx) || isExpenseTx(tx))) extrasByType.set(type, (extrasByType.get(type) || 0) + extras);
 
     if (isIncomeTx(tx)) {
       totalRevenue += amount;
@@ -460,11 +468,11 @@ export async function getReportsData(
   const profitPrev = revenuePrev - expensesPrev;
 
   const revenueByType: RevenueByType[] = [...revenueByTypeMap.entries()]
-    .map(([type, amount]) => ({ type, label: typeLabels[type] || type, amount }))
+    .map(([type, amount]) => ({ type, label: typeLabels[type] || type, amount, extras: extrasByType.get(type) || 0 }))
     .sort((a, b) => b.amount - a.amount);
 
   const expensesByType: ExpenseByType[] = [...expensesByTypeMap.entries()]
-    .map(([type, amount]) => ({ type, label: typeLabels[type] || type, amount }))
+    .map(([type, amount]) => ({ type, label: typeLabels[type] || type, amount, extras: extrasByType.get(type) || 0 }))
     .sort((a, b) => b.amount - a.amount);
 
   // Per-vehicle rental counts and utilization
@@ -590,7 +598,8 @@ export async function getReportsData(
     vehicleLabel: tx.vehicles ? vehicleLabel(tx.vehicles) : "General",
     customerName: tx.customers?.full_name || null,
     notes: tx.notes,
-    isIncome: isIncomeTx(tx)
+    isIncome: isIncomeTx(tx),
+    extras: tx.metadata?.refund_of === "extras" ? Math.abs(Number(tx.amount || 0)) : Math.abs(Number(tx.metadata?.extras_amount || 0))
   }));
 
   const monthlyData = buildMonthlyData(transactions, dateRange.from, dateRange.to);

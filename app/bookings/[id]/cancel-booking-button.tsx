@@ -521,7 +521,8 @@ export function CancelBookingButton({
                 <p className="rounded-xl bg-[var(--danger-light)] px-3 py-2 text-sm font-bold text-[var(--danger)]">{error}</p>
               )}
 
-              <div className="flex gap-2 pt-1">
+              {/* On a phone the main button takes its own row, so no button wraps onto two lines. */}
+              <div className="flex flex-wrap gap-2 pt-1 [&>button]:whitespace-nowrap">
                 {step !== "reason" && (
                   <button
                     className="pressable inline-flex min-h-10 flex-1 items-center justify-center rounded-xl border border-[var(--border)] bg-white px-4 text-sm font-bold text-[var(--foreground-secondary)]"
@@ -547,7 +548,7 @@ export function CancelBookingButton({
                 </button>
                 {step === "confirm" ? (
                   <button
-                    className="pressable inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--danger)] px-4 text-sm font-semibold text-white disabled:opacity-70"
+                    className="pressable order-first inline-flex min-h-10 flex-1 basis-full items-center justify-center gap-2 rounded-xl bg-[var(--danger)] px-4 text-sm font-semibold text-white sm:order-none sm:basis-auto disabled:opacity-70"
                     disabled={isPending}
                     onClick={submit}
                     type="button"
@@ -560,7 +561,7 @@ export function CancelBookingButton({
                   </button>
                 ) : (
                   <button
-                    className="pressable inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--danger)] px-4 text-sm font-semibold text-white"
+                    className="pressable order-first inline-flex min-h-10 flex-1 basis-full items-center justify-center gap-2 rounded-xl bg-[var(--danger)] px-4 text-sm font-semibold text-white sm:order-none sm:basis-auto"
                     onClick={
                       step === "reason"
                         ? handleReasonNext

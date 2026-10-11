@@ -1056,7 +1056,9 @@
     "collect_extras": "Collect extras",
     "pay_extras": "Extras",
     "job_problem": "Urgent: the customer reported a problem",
-    "job_returnArranged": "The customer arranged the return"
+    "job_returnArranged": "The customer arranged the return",
+    "job_owed_early": "Rent to decide: {amount} for unused days",
+    "job_owed_early_detail": "Returned {days, plural, one {# day} other {# days}} early, {owed} owed"
   },
   "bookings": {
     "eyebrow": "Bookings",
@@ -2131,7 +2133,12 @@
     "referralFeeLater": "Finder's fee {pct}% of the first rent, set when it is recorded.",
     "referralOpen": "Partners",
     "step_bookedDirectory": "Booked by the customer through the RouteHQ directory",
-    "handoverNowHint": "Take the handover photos now, while the customer is with you."
+    "handoverNowHint": "Take the handover photos now, while the customer is with you.",
+    "earlyOwedTitle": "Back {days, plural, one {# day} other {# days}} early: {amount} of the unpaid rent is for days after the return.",
+    "earlyOwedBody": "{owed} is still to pay. Take the unused days off, or keep it as booked. The customer is told the amount after you choose.",
+    "earlyOwedTakeOff": "Take {amount} off",
+    "earlyOwedKeep": "Keep as booked",
+    "earlyOwedFailed": "That didn't save. Try again."
   },
   "newBooking": {
     "pageBack": "Back to bookings",

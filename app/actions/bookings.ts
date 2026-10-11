@@ -2381,6 +2381,35 @@ async function adjustRentalOrThrow(params: {
       throw new Error(futurePaymentFetchError.message);
     }
 
+    // Unpaid extensions are judged by the days they cover: wholly after the new date, off; partly, cut to the days kept.
+    const { data: extensionRows } = await supabase
+      .from("rental_payments")
+      .select("id, amount, metadata")
+      .eq("rental_id", rental.id)
+      .eq("organization_id", rental.organization_id)
+      .in("status", ["scheduled", "pending", "overdue", "failed"])
+      .is("transaction_id", null)
+      .lte("due_date", cleanEndDate)
+      .or("voided.is.null,voided.eq.false");
+    const spanDays = (from: string, to: string) => Math.round((new Date(`${to}T00:00:00Z`).getTime() - new Date(`${from}T00:00:00Z`).getTime()) / 86_400_000);
+    for (const row of extensionRows || []) {
+      const from = String(row.metadata?.previous_end_date || "").slice(0, 10);
+      const to = String(row.metadata?.new_end_date || "").slice(0, 10);
+      if (row.metadata?.type !== "extension" || !from || !to || to <= cleanEndDate) continue;
+      if (from >= cleanEndDate) {
+        (futurePayments as any[]).push(row);
+        continue;
+      }
+      const kept = spanDays(from, cleanEndDate);
+      const length = spanDays(from, to);
+      if (length <= 0) continue;
+      const amount = Math.round((Number(row.amount || 0) * kept) / length / 10) * 10;
+      await supabase
+        .from("rental_payments")
+        .update({ amount, metadata: { ...(row.metadata || {}), new_end_date: cleanEndDate, scheduled_amount: Number(row.amount || 0), shortened_reason: "Return date brought forward" } })
+        .eq("id", row.id);
+    }
+
     const futurePaymentIds = (futurePayments || []).map((p: any) => p.id);
     for (const payment of futurePayments || []) {
       await supabase
@@ -3004,7 +3033,7 @@ export async function cancelBookingWithDisposition(formData: FormData) {
   const now = new Date().toISOString();
   const today = businessToday();
   const currency = rental.currency || "THB";
-  const depositHeld = Number(rental.deposit_held || rental.deposit_amount || 0);
+  const depositHeld = Math.max(0, Number(rental.deposit_held || 0) - Number(rental.deposit_refunded_amount || 0) - Number(rental.deposit_forfeited_amount || 0));
 
   const { data: paidTransactions } = await supabase
     .from("transactions")

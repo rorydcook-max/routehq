@@ -61,7 +61,10 @@ function rateLabel(rental: any, t: T) {
     const start = String(rental?.start_date || "").slice(0, 10);
     const end = String(rental?.end_date || "").slice(0, 10);
     const days = start && end ? Math.round((new Date(`${end}T00:00:00Z`).getTime() - new Date(`${start}T00:00:00Z`).getTime()) / 86_400_000) : 0;
-    return days > 1 ? `${t("perDay", { rate })}\n${t("totalForDays", { total: money(Number(rental?.rental_rate || 0) * days, currency), days })}` : t("perDay", { rate });
+    // Once the vehicle is back, the dates are the days it was out, not what was booked and charged (an early return
+    // the owner kept as booked): the payments below say what is owed.
+    const finished = ["completed", "returned", "closed", "cancelled"].includes(String(rental?.status || ""));
+    return days > 1 && !finished ? `${t("perDay", { rate })}\n${t("totalForDays", { total: money(Number(rental?.rental_rate || 0) * days, currency), days })}` : t("perDay", { rate });
   }
   if (period === "weekly") return t("perWeek", { rate });
   if (period === "custom") return t("forTheRental", { rate });

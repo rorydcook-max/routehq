@@ -21,6 +21,7 @@ import { earlyStartFor } from "@/lib/early-start";
 import { BookingShareActions } from "@/app/bookings/[id]/booking-share-actions";
 import { RefundDepositPanel } from "@/app/bookings/[id]/refund-deposit-panel";
 import { ExtrasPanel } from "@/app/bookings/[id]/extras-panel";
+import { EarlyReturnOwedPanel } from "@/app/bookings/[id]/early-return-owed";
 import { activeExtrasLines, extrasLines, extrasSummary } from "@/lib/extras";
 import { AppShell } from "@/components/app-shell";
 import { AddRentalPaymentInlineForm, EditableEndDate, EditableRentalPaymentRow, EditableTransactionRow, ExistingRentalPaymentSetupCard } from "@/components/booking-correction-controls";
@@ -645,7 +646,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               </div>
             </div>
             {/* Two main actions side by side, More underneath: nothing wraps onto a second line. */}
-            <div className="grid grid-cols-2 gap-2 [&>*]:min-w-0 [&>a]:flex [&>a]:w-full [&>details]:col-span-2 [&_button]:w-full lg:flex lg:flex-wrap lg:[&>a]:w-auto lg:[&>details]:w-auto lg:[&>details_summary]:w-auto lg:[&_button]:w-auto">
+            <div className="grid grid-cols-2 gap-2 [&>*]:min-w-0 [&>a]:flex [&>a]:w-full [&>details]:col-span-2 [&>button]:w-full [&>*>button]:w-full lg:flex lg:flex-wrap lg:[&>a]:w-auto lg:[&>details]:w-auto lg:[&>details_summary]:w-auto lg:[&>button]:w-auto lg:[&>*>button]:w-auto">
               {awaitingSignature ? (
                 <a className="pressable inline-flex min-h-9 min-w-fit items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-bold text-white shadow-sm" href="#send-link">
                   {tx.say("sendLink")}
@@ -686,7 +687,9 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 <summary className="pressable inline-flex min-h-11 w-full cursor-pointer list-none items-center justify-center gap-1 rounded-full border-2 border-[var(--border-strong)] bg-[var(--panel)] px-4 py-2 font-bold text-[var(--foreground)] hover:bg-[var(--panel-secondary)] [&::-webkit-details-marker]:hidden">
                   {tx.say("more")}
                 </summary>
-                <div className="mt-2 flex flex-wrap gap-2 [&>*]:flex-1 [&_a]:w-full [&_button]:w-full lg:[&>*]:flex-none lg:[&_a]:w-auto">
+                {/* Only the buttons in this row are stretched: the cancel and change-vehicle dialogs open from inside it,
+                    and stretching every button in them squeezed the dialog's heading into a sliver beside its close button. */}
+                <div className="mt-2 flex flex-wrap gap-2 [&>*]:flex-1 [&>a]:w-full [&>button]:w-full [&>*>button]:w-full lg:[&>*]:flex-none lg:[&>a]:w-auto">
               <ActionButton href={`/bookings/${rental.id}/edit` as Route} tone="light">
                 {tx.say("editBooking")}
               </ActionButton>
@@ -703,7 +706,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   organizationId={organization.id}
                   vehicleId={String(rental.vehicle_id || vehicle?.id || "")}
                   totalPaid={totalPaid}
-                  depositHeld={Number(rental.deposit_held || rental.deposit_amount || 0)}
+                  depositHeld={Math.max(0, Number(rental.deposit_held || 0) - Number(rental.deposit_refunded_amount || 0) - Number(rental.deposit_forfeited_amount || 0))}
                   currency={rental.currency || "THB"}
                   rentalRate={Number(rental.rental_rate || 0)}
                   rentalStatus={displayStatus}
@@ -1153,6 +1156,13 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               tone={financialState.tone === "red" ? "red" : financialState.tone === "green" ? "green" : financialState.tone === "amber" ? "amber" : "neutral"}
             >
               <div className="space-y-3">
+                {(() => {
+                  // Back early with rent unpaid (set at the return): take off the days after, or keep the booking as it was.
+                  const rows = (payments as any[]).filter((payment) => payment.metadata?.early_return_owed && !payment.metadata.early_return_owed.decided && ["scheduled", "pending", "failed", "overdue"].includes(String(payment.status)));
+                  if (!rows.length) return null;
+                  const unused = Math.round(rows.reduce((sum, payment) => sum + Number(payment.metadata.early_return_owed.share || 0), 0) / 10) * 10;
+                  return <EarlyReturnOwedPanel days={Number(rows[0].metadata.early_return_owed.unused_days || 0)} owed={money(pendingPaymentAmount, rental.currency)} rentalId={rental.id} unused={money(unused, rental.currency)} />;
+                })()}
                 <p className="text-sm text-[var(--muted)]">
                   {/* Rent and deposit are said separately: "฿0 paid so far" beside a paid deposit read as a mistake. */}
                   {t.rich(paidDeposit > 0 ? "paidLineDeposit" : "paidLine", {

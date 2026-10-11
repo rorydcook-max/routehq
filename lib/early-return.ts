@@ -59,6 +59,55 @@ export function earlyReturnSuggestion(input: { payments: any[]; returnDate: stri
   let amount = 0;
   rent.forEach((payment, index) => {
     if (!["paid", "reconciled"].includes(String(payment.status))) return;
+    const share = unusedShare(rent, index, usedUntil, previousEnd, interval);
+    if (!share) return;
+    unusedDays += share.unused;
+    periodDays += share.length;
+    paid += Number(payment.amount || 0);
+    amount += share.amount;
+  });
+
+  const rounded = Math.round(amount / 10) * 10;
+  return rounded > 0 ? { amount: rounded, unusedDays, periodDays, paid } : null;
+}
+
+const OPEN = ["scheduled", "pending", "failed", "overdue"];
+
+export type EarlyReturnOwed = {
+  /** The part of the unpaid rent that is for days after the return, rounded to the nearest 10. */
+  amount: number;
+  unusedDays: number;
+  /** Each unpaid payment and the part of it for days after the return. */
+  shares: Array<{ id: string; share: number }>;
+};
+
+/**
+ * Back early with rent not yet paid: how much of what is owed is for days after the return. Like a refund, taking
+ * it off is the owner's decision; this is the figure to offer.
+ */
+export function earlyReturnOwed(input: { payments: any[]; returnDate: string; previousEnd: string | null; interval: string }): EarlyReturnOwed | null {
+  const interval = String(input.interval || "monthly").toLowerCase();
+  const rent = input.payments.filter((payment) => !isDeposit(payment) && payment.due_date).sort((a, b) => day(a.due_date).localeCompare(day(b.due_date)));
+  const usedUntil = addDays(input.returnDate, 1);
+  let unusedDays = 0;
+  let amount = 0;
+  const shares: EarlyReturnOwed["shares"] = [];
+  rent.forEach((payment, index) => {
+    if (!OPEN.includes(String(payment.status)) || payment.voided === true) return;
+    const share = unusedShare(rent, index, usedUntil, input.previousEnd, interval);
+    if (!share || share.amount <= 0) return;
+    unusedDays = Math.max(unusedDays, share.unused);
+    amount += share.amount;
+    shares.push({ id: String(payment.id), share: Math.round(share.amount) });
+  });
+  const rounded = Math.round(amount / 10) * 10;
+  return rounded > 0 ? { amount: rounded, unusedDays, shares } : null;
+}
+
+/** For one rent payment: the days its period covers, how many fall after the return, and that share of the amount. */
+function unusedShare(rent: any[], index: number, usedUntil: string, previousEnd: string | null, interval: string) {
+  {
+    const payment = rent[index];
     const metadata = payment.metadata || {};
     let periodStart = day(payment.due_date);
     let periodEnd: string;
@@ -79,13 +128,7 @@ export function earlyReturnSuggestion(input: { payments: any[]; returnDate: stri
     }
     const length = daysBetween(periodStart, periodEnd);
     const unused = daysBetween(usedUntil > periodStart ? usedUntil : periodStart, periodEnd);
-    if (length <= 0 || unused <= 0) return;
-    unusedDays += unused;
-    periodDays += length;
-    paid += Number(payment.amount || 0);
-    amount += (Number(payment.amount || 0) * Math.min(unused, length)) / length;
-  });
-
-  const rounded = Math.round(amount / 10) * 10;
-  return rounded > 0 ? { amount: rounded, unusedDays, periodDays, paid } : null;
+    if (length <= 0 || unused <= 0) return null;
+    return { length, unused: Math.min(unused, length), amount: (Number(payment.amount || 0) * Math.min(unused, length)) / length };
+  }
 }

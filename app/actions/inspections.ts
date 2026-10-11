@@ -11,7 +11,7 @@ import { recordActivityEvent } from "@/lib/supabase/activity";
 import { afterDamage, asCondition, valueForCondition } from "@/lib/vehicle-condition";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { notifyOperator } from "@/lib/notify-operator";
-import { earlyReturnSuggestion } from "@/lib/early-return";
+import { earlyReturnOwed, earlyReturnSuggestion } from "@/lib/early-return";
 import { tellRentalCustomer } from "@/lib/customer-messages";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
@@ -798,6 +798,32 @@ export async function submitInspection(formData: FormData) {
     {
       const settlement = depositSettlement;
       const owed = await stillOwed(createSupabaseAdminClient() as any, organizationId, rentalId).catch(() => 0);
+      // Back early with rent still unpaid: part of what is owed is for days after the return. The owner decides
+      // whether it stands (booking page), so the customer isn't told a figure that may change.
+      let owedEarly = null as ReturnType<typeof earlyReturnOwed>;
+      if (owed > 0) {
+        const admin = createSupabaseAdminClient() as any;
+        const { data: rows } = await admin.from("rental_payments").select("id, amount, status, due_date, voided, metadata").eq("rental_id", rentalId).is("deleted_at", null);
+        const before = rental?.end_date ? String(rental.end_date).slice(0, 10) : null;
+        owedEarly = earlyReturnOwed({ payments: rows || [], returnDate, previousEnd: before && before > returnDate ? before : null, interval: String(rental?.billing_interval || rental?.pricing_model || "monthly") });
+        if (owedEarly) {
+          for (const item of owedEarly.shares) {
+            const row = (rows || []).find((payment: any) => payment.id === item.id);
+            await admin.from("rental_payments").update({ metadata: { ...(row?.metadata || {}), early_return_owed: { share: item.share, unused_days: owedEarly.unusedDays, return_date: returnDate } } }).eq("id", item.id);
+          }
+          const symbol = String(rental?.currency || "THB") === "THB" ? "฿" : `${rental?.currency} `;
+          await admin.from("tasks").insert({
+            organization_id: organizationId,
+            vehicle_id: vehicleId,
+            rental_id: rentalId,
+            created_by: null,
+            title: `Rent to decide - returned ${owedEarly.unusedDays} ${owedEarly.unusedDays === 1 ? "day" : "days"} early (${symbol}${owedEarly.amount.toLocaleString("en-US")} of ${symbol}${Math.round(owed).toLocaleString("en-US")} owed is for days after)`,
+            task_type: "admin",
+            action: "owed_early",
+            due_at: new Date().toISOString()
+          });
+        }
+      }
       await supabase.from("rentals").update({ balance_due: owed }).eq("id", rentalId).eq("organization_id", organizationId);
       await tellRentalCustomer(
         createSupabaseAdminClient() as any,
@@ -810,12 +836,12 @@ export async function submitInspection(formData: FormData) {
             if (settlement.refunded > 0) lines.push(kept > 0 ? t("amountReturned", { amount: money(settlement.refunded) }) : t("depositReturnedInFull", { amount: money(settlement.refunded) }));
             if (settlement.retained > 0) lines.push(holdingForDamage ? t("depositHeldForDamage") : t("depositStillToSettle", { amount: money(settlement.retained) }));
           }
-          if (owed > 0) lines.push(t("stillToPay", { amount: money(owed) }));
+          if (owed > 0 && !owedEarly) lines.push(t("stillToPay", { amount: money(owed) }));
           return lines.join(" ");
         },
         // With no deposit to account for and nothing owed, this is only a thank-you to someone who has just handed
         // the keys over in person: sent if it can go by itself, never left as a job for the owner.
-        { sentBy: user.id, withLink: owed > 0, replacesEarlier: true, seenAlready: owed <= 0 && !(settlement && settlement.available > 0) }
+        { sentBy: user.id, withLink: owed > 0, replacesEarlier: true, seenAlready: (owed <= 0 || Boolean(owedEarly)) && !(settlement && settlement.available > 0) }
       );
 
       // Back before the time already paid for ran out: a job for the owner with the pro-rata figure.

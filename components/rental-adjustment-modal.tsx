@@ -423,6 +423,8 @@ export function RentalAdjustmentModal({
   const submitDisabled =
     isPending ||
     showPendingPanel ||
+    // Until the booking's rates have loaded, the extension price is still 0: saving then would extend for free.
+    (isExtension && !context) ||
     (useAmendment && signingBlocked) ||
     (isTerms ? !newRate.trim() && !newDeposit.trim() : isExtension ? !extensionEndDate : !earlyReturnDate);
 

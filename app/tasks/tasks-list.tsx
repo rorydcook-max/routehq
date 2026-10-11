@@ -145,6 +145,10 @@ function headingOf(item: TaskListItem, today: string, tx: Tx): { title: string; 
   // Jobs the app raised are saved as English sentences; the ones it knows are said again in the reader's language.
   // The customer and vehicle in the saved title are already on the context line.
   if (item.action === "settle_deposit") return { title: tx.say("job_settle_deposit"), detail: null };
+  if (item.action === "owed_early") {
+    const early = raw.match(/returned (\d+) days? early \((.+?) of (.+?) owed/);
+    return early ? { title: tx.say("job_owed_early", { amount: early[2] }), detail: tx.say("job_owed_early_detail", { days: Number(early[1]), owed: early[3] }) } : { title: tx.say("job_owed_early", { amount: "" }), detail: null };
+  }
   if (item.action === "swap_handover" || item.action === "swap_collection" || item.action === "swap_signature") {
     return { title: tx.say(`job_${item.action}`), detail: null };
   }

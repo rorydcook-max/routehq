@@ -1065,7 +1065,9 @@
     "collect_extras": "เก็บเงินบริการเสริม",
     "pay_extras": "บริการเสริม",
     "job_problem": "ด่วน: ลูกค้าแจ้งปัญหา",
-    "job_returnArranged": "ลูกค้านัดคืนรถแล้ว"
+    "job_returnArranged": "ลูกค้านัดคืนรถแล้ว",
+    "job_owed_early": "ค่าเช่าที่ต้องตัดสินใจ: {amount} สำหรับวันที่ไม่ได้ใช้",
+    "job_owed_early_detail": "คืนรถก่อนกำหนด {days} วัน ค้างจ่าย {owed}"
   },
   "bookings": {
     "eyebrow": "การจอง",
@@ -2140,7 +2142,12 @@
     "referralFeeLater": "ค่าแนะนำ {pct}% ของค่าเช่างวดแรก กำหนดเมื่อบันทึก",
     "referralOpen": "พาร์ตเนอร์",
     "step_bookedDirectory": "ลูกค้าจองผ่านไดเรกทอรีของ RouteHQ",
-    "handoverNowHint": "ถ่ายรูปส่งมอบรถตอนนี้ ระหว่างที่ลูกค้ายังอยู่"
+    "handoverNowHint": "ถ่ายรูปส่งมอบรถตอนนี้ ระหว่างที่ลูกค้ายังอยู่",
+    "earlyOwedTitle": "คืนรถก่อนกำหนด {days} วัน: ค่าเช่าที่ยังไม่จ่าย {amount} เป็นของวันหลังคืนรถ",
+    "earlyOwedBody": "ยังต้องจ่ายอีก {owed} หักวันที่ไม่ได้ใช้ออก หรือคิดตามที่จองไว้ ระบบจะแจ้งยอดให้ลูกค้าหลังคุณเลือก",
+    "earlyOwedTakeOff": "หักออก {amount}",
+    "earlyOwedKeep": "คิดตามที่จอง",
+    "earlyOwedFailed": "บันทึกไม่สำเร็จ ลองอีกครั้ง"
   },
   "newBooking": {
     "pageBack": "กลับไปที่การจอง",

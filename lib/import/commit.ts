@@ -335,7 +335,8 @@ export async function commitPreview(context: CommitContext, preview: ImportPrevi
     if (rentalId && look.length && (await addTask(context, vehicleId, rentalId, lookTitle(look, `rental for ${rental.customerName || "unnamed customer"}`)))) result.counts.tasks += 1;
   }
 
-  // 4. Money.
+  // 4. Money. Years of history can be thousands of rows: written 200 at a time, row by row only if a group fails.
+  const money: { row: number; record: Record<string, unknown> }[] = [];
   for (const transaction of preview.transactions) {
     if (!transaction.include || transaction.amount === null) continue;
     const vehicleId = (transaction.vehicleKey && vehicleIdByKey.get(transaction.vehicleKey)) || transaction.existingVehicleId;
@@ -343,20 +344,34 @@ export async function commitPreview(context: CommitContext, preview: ImportPrevi
       result.failed.push(`row ${transaction.row}: no vehicle ${transaction.plate ? `with plate ${transaction.plate}` : "plate"}`);
       continue;
     }
-    const { error } = await context.supabase.from("transactions").insert({
-      organization_id: context.organizationId,
-      vehicle_id: vehicleId,
-      transaction_date: transaction.date || businessToday(),
-      type: transaction.type,
-      amount: transaction.amount,
-      currency: context.currency,
-      notes: transaction.notes || null,
-      metadata: { source: "import" },
-      import_batch_id: context.batchId,
-      created_by: context.userId
+    money.push({
+      row: transaction.row,
+      record: {
+        organization_id: context.organizationId,
+        vehicle_id: vehicleId,
+        transaction_date: transaction.date || businessToday(),
+        type: transaction.type,
+        amount: transaction.amount,
+        currency: context.currency,
+        notes: transaction.notes || null,
+        metadata: { source: "import" },
+        import_batch_id: context.batchId,
+        created_by: context.userId
+      }
     });
-    if (error) result.failed.push(`row ${transaction.row}: ${error.message}`);
-    else result.counts.transactions += 1;
+  }
+  for (let at = 0; at < money.length; at += 200) {
+    const group = money.slice(at, at + 200);
+    const { error } = await context.supabase.from("transactions").insert(group.map((item) => item.record));
+    if (!error) {
+      result.counts.transactions += group.length;
+      continue;
+    }
+    for (const item of group) {
+      const { error: rowError } = await context.supabase.from("transactions").insert(item.record);
+      if (rowError) result.failed.push(`row ${item.row}: ${rowError.message}`);
+      else result.counts.transactions += 1;
+    }
   }
 
   return result;

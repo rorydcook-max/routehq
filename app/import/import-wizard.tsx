@@ -457,7 +457,7 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
             {(["vehicles", "customers", "rentals", "transactions"] as const).map((key) => (
               <div className="rounded-lg border border-[var(--border)] bg-white p-3" key={key}>
                 <p className="text-xs font-bold uppercase text-[var(--muted)]">{t(`tab_${key}`)}</p>
-                <p className="text-2xl font-semibold text-[var(--foreground)]">{result.counts[key]}</p>
+                <p className="text-2xl font-semibold text-[var(--foreground)]">{Number(result.counts[key] || 0).toLocaleString("en-US")}</p>
                 {key === "vehicles" && result.counts.vehiclesUpdated ? <p className="text-xs font-medium text-[var(--muted)]">{t("updated", { count: result.counts.vehiclesUpdated })}</p> : null}
               </div>
             ))}

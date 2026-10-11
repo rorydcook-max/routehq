@@ -6,6 +6,9 @@ import { previewCounts, type ImportPreview } from "@/lib/import/preview";
 import { getVehicleCategories } from "@/lib/organization";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 
+// A big file (years of payments) takes a while to write.
+export const maxDuration = 300;
+
 /**
  * "Bring it in": writes the cards the owner confirmed (with their edits) into
  * the business, all tagged with the batch so the import can be undone.

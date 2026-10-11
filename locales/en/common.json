@@ -4276,7 +4276,14 @@
     "chatOpen": "Or paste messages from LINE or WhatsApp",
     "chatLabel": "Messages from your chat",
     "chatPlaceholder": "Paste the messages here, for example:\nClick 1กข 2345 – John, 5–12 Oct, 250/day, 081 234 5678\nNMAX 2กค 7788 – Anna from 1 Nov, 3,500 a month, deposit 2,000",
-    "chatWorks": "Bookings, vehicles, customers and payments are picked out of the messages. A whole chat exported as a .txt file works too: choose it as the file."
+    "chatWorks": "Bookings, vehicles, customers and payments are picked out of the messages. A whole chat exported as a .txt file works too: choose it as the file.",
+    "fromMessages": "From your messages",
+    "fromPhotos": "From your photos",
+    "fromCalendar": "From your calendar",
+    "srcMessages": "Pasted messages",
+    "srcCalendar": "Calendar",
+    "srcSheet": "Google Sheet",
+    "srcPhotos": "{count, plural, one {# photo} other {# photos}}"
   },
   "errorPages": {
     "notFoundTitle": "We could not find that page",

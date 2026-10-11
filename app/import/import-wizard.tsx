@@ -31,6 +31,25 @@ const dataTypes = ["vehicles", "customers", "rentals", "transactions"];
 const SOFT: Problem[] = ["already_in_fleet", "already_a_customer", "already_booked", "cancelled_in_file"];
 const SHOW = 40;
 
+/** Where a card came from: the sheet and row, or "From your messages" for what was read from messages, photos or a calendar. */
+function rowLabel(sheet: string, row: number, t: Say) {
+  if (/\(messages\)$/.test(sheet)) return t("fromMessages");
+  if (/\(photos\)$/.test(sheet)) return t("fromPhotos");
+  if (/\(calendar\)$/.test(sheet)) return t("fromCalendar");
+  return t("fromRow", { sheet, row });
+}
+
+/** The name of an earlier import: a file's own name, or what it was read from. */
+function sourceLabel(name: string, t: Say) {
+  if (!name) return t("aSpreadsheet");
+  if (name === "Pasted messages") return t("srcMessages");
+  if (name === "Calendar") return t("srcCalendar");
+  if (name === "Google Sheet") return t("srcSheet");
+  const photos = name.match(/^(\d+) photos?$/);
+  if (photos) return t("srcPhotos", { count: Number(photos[1]) });
+  return name;
+}
+
 function needsLook(problems: Problem[]) {
   return problems.filter((problem) => !SOFT.includes(problem));
 }
@@ -556,7 +575,7 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
               return (
                 <li className="flex flex-wrap items-center justify-between gap-2 py-2" key={item.id}>
                   <div>
-                    <p className="font-semibold text-[var(--foreground)]">{item.sourceName || t("aSpreadsheet")}</p>
+                    <p className="font-semibold text-[var(--foreground)]">{sourceLabel(item.sourceName, t)}</p>
                     <p className="text-sm text-[var(--muted)]">
                       {longDate(item.createdAt.slice(0, 10), locale)} · {t("recentCounts", { vehicles: item.counts.vehicles || 0, rentals: item.counts.rentals || 0, customers: item.counts.customers || 0, transactions: item.counts.transactions || 0 })}
                       {gone ? ` · ${t("undone")}` : ""}
@@ -586,7 +605,7 @@ function VehicleCard({ vehicle, onChange, t }: { vehicle: PreviewVehicle; onChan
           <p className="truncate text-[16px] font-bold text-[var(--foreground)]">
             {vehicle.make || t("unknownMake")} {vehicle.model} <span className="font-medium text-[var(--muted)]">{vehicle.plate || t("noPlate")}</span>
           </p>
-          <p className="text-xs text-[var(--muted)]">{t("fromRow", { sheet: vehicle.sheet, row: vehicle.row })}</p>
+          <p className="text-xs text-[var(--muted)]">{rowLabel(vehicle.sheet, vehicle.row, t)}</p>
         </div>
         <Include checked={vehicle.include} onChange={(include) => onChange({ include })} t={t} />
       </div>
@@ -647,7 +666,7 @@ function RentalCard({ rental, vehicleLabel, choices, onChange, t }: { rental: Pr
           </p>
           <p className="text-xs text-[var(--muted)]">
             <span className={`mr-2 rounded-full px-2 py-0.5 font-bold ${rental.status === "active" ? "bg-[var(--primary-light)] text-[var(--primary)]" : "bg-[var(--panel-secondary)] text-[var(--foreground-secondary)]"}`}>{t(`st_${rental.status}`)}</span>
-            {t("fromRow", { sheet: rental.sheet, row: rental.row })}
+            {rowLabel(rental.sheet, rental.row, t)}
           </p>
         </div>
         <Include checked={rental.include} onChange={(include) => onChange({ include })} t={t} />
@@ -725,7 +744,7 @@ function CustomerCard({ customer, onChange, t }: { customer: PreviewCustomer; on
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="truncate text-[16px] font-bold text-[var(--foreground)]">{customer.fullName || t("unnamed")}</p>
-          <p className="text-xs text-[var(--muted)]">{t("fromRow", { sheet: customer.sheet, row: customer.row })}</p>
+          <p className="text-xs text-[var(--muted)]">{rowLabel(customer.sheet, customer.row, t)}</p>
         </div>
         <Include checked={customer.include} onChange={(include) => onChange({ include })} t={t} />
       </div>
@@ -760,7 +779,7 @@ function TransactionRow({ transaction, vehicleLabel, onChange, t }: { transactio
     <div className={`rounded-xl border border-[var(--border)] bg-white p-3 ${faded}`}>
       <div className="flex items-start justify-between gap-3">
         <p className="min-w-0 truncate text-sm font-bold text-[var(--foreground)]">
-          {vehicleLabel} <span className="font-medium text-[var(--muted)]">· {t("fromRow", { sheet: transaction.sheet, row: transaction.row })}</span>
+          {vehicleLabel} <span className="font-medium text-[var(--muted)]">· {rowLabel(transaction.sheet, transaction.row, t)}</span>
         </p>
         <Include checked={transaction.include} onChange={(include) => onChange({ include })} t={t} />
       </div>

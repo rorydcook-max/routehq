@@ -37,10 +37,12 @@ Rules:
 - One booking is one rentals row, even when it is spread over several messages; a later message that changes or cancels a booking updates that row (booking_status "cancelled" if it was called off).
 - Someone renting a vehicle goes in rentals only (not again in customers). customers is for people listed without a booking.
 - vehicles: only vehicles listed as part of the fleet; a vehicle that only appears in a booking stays in that booking (vehicle_registration and vehicle_name).
-- Dates: YYYY-MM-DD. Today is ${today}. A chat export starts each message with its date: use it for "tomorrow", "Monday" or a day without a month. Buddhist years: subtract 543.
+- Dates: YYYY-MM-DD. Today is ${today}. A chat export dates each message (WhatsApp) or each day with a heading line such as "Tue, 10/06/2026" or "วันอังคาร, 06/10/2569" (LINE): use the date of the message for "tomorrow", "Monday" or a day without a month. Where day and month could be either way round, the weekday in the heading decides. Buddhist years: subtract 543.
+- A later message that moves a booking ("ขอเลื่อนเป็นวันอังคาร", "can we start Wednesday instead") changes that booking's dates.
 - Money: numbers only, no ฿ or commas. rental_rate is what the renter pays per period, rate_period "day", "week" or "month" ("/วัน", "/d" = day; "/ด.", "/เดือน" = month). amount_paid: what the renter has paid so far, when said.
 - transactions.type: rent, deposit, fuel, repair, insurance, tax, other.
 - make is the brand (Honda, Yamaha, Toyota...). "Click", "PCX", "NMAX", "Yaris" are models: give their brand as make. model is the model name only; remarks such as "new bike" go in notes.
+- Names without polite titles: "คุณนาเดีย" is "นาเดีย", "Khun Somchai" is "Somchai", "Mr Ben" is "Ben".
 - Phone numbers as written, joined if split over lines.
 - Greetings, stickers, photos and chatter are not data.
 

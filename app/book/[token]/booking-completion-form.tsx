@@ -665,7 +665,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
       ? t("readingDetails")
       : docRead[kind] === "read"
         ? t("detailsRead")
-        : docRead[kind] === "unreadable"
+        : docRead[kind] === "unreadable" && !(kind === "passport" ? fieldValue("passportNumber") : fieldValue("driverLicenseNumber"))
           ? t("photoUnreadable")
           : null;
   const drawing = useRef(false);

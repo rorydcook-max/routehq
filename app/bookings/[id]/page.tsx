@@ -864,15 +864,12 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               ) : (
                 <div className="space-y-3">
                   <div className="rounded-lg border border-[var(--info-line)] bg-[var(--panel-secondary)] p-3">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-start gap-2">
                       <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)]">
                         <Clock className="text-[var(--primary)]" size={16} />
                       </span>
-                      <p className="font-semibold text-[var(--primary)]">{tx.list("awaitingCustomer")}</p>
+                      <p className="text-sm leading-6 text-[var(--primary)]">{tx.say("awaitingBody")}</p>
                     </div>
-                    <p className="mt-3 text-sm leading-6 text-[var(--primary)]">
-                      {tx.say("awaitingBody")}
-                    </p>
                   </div>
                   <AssignCustomerModal
                     customers={allCustomers}

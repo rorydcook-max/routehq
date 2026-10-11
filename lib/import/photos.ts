@@ -43,6 +43,7 @@ Rules:
 - registration_number / vehicle_registration: the plate as written, with the province if shown (e.g. "1กข 2345 สุราษฎร์ธานี").
 - A registration book: make (ยี่ห้อ), model (แบบ/รุ่น), year (ปีรถ, as written, Buddhist years are fine), color (สี), vin (เลขตัวรถ), engine_cc (ซีซี), fuel_type (เชื้อเพลิง), seating_capacity (ที่นั่ง), tax_expiry_date (วันครบกำหนดเสียภาษี, the latest one).
 - Dates: YYYY-MM-DD when you are sure (convert Buddhist years by subtracting 543); otherwise as written, e.g. "5 ต.ค.". A notebook usually shows the year in its heading.
+- Names without polite titles: "คุณสมชาย" is "สมชาย", "Khun Somchai" is "Somchai".
 - A line of writing can wrap onto the next line (a phone number, an amount): join it back together.
 - vehicle_name: the make or model written next to the plate ("Click", "Yaris"), as written.
 - Money: numbers only, no ฿ or commas. rental_rate is what the renter pays per period, and rate_period is "day", "week" or "month" ("/วัน", "/d" = day; "/ด.", "/เดือน" = month).

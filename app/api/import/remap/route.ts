@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { ownBatch } from "@/app/api/import/batch";
 import { attachExisting, buildPreview, previewCounts } from "@/lib/import/preview";
+import { existingRentals } from "@/lib/import/existing";
 
 /** The owner changed how a column was read: rebuild the cards from the stored sheets. */
 export async function POST(request: Request) {
@@ -13,7 +14,7 @@ export async function POST(request: Request) {
     supabase.from("vehicles").select("id, registration_number, make, model").eq("organization_id", organization.id).is("deleted_at", null),
     supabase.from("customers").select("id, full_name, phone").eq("organization_id", organization.id).is("deleted_at", null)
   ]);
-  const preview = attachExisting(buildPreview(batch.sheets, mappings), vehicles || [], customers || []);
+  const preview = attachExisting(buildPreview(batch.sheets, mappings), vehicles || [], customers || [], await existingRentals(supabase, organization.id));
   const counts = previewCounts(preview);
   await supabase.from("import_batches").update({ mappings, preview, counts }).eq("id", batch.id);
   return NextResponse.json({ preview, counts, mappings });

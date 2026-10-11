@@ -236,8 +236,9 @@ async function createRental(context: CommitContext, rental: PreviewRental, vehic
       start_date: rental.startDate,
       end_date: rental.endDate,
       is_indefinite: !rental.endDate,
-      pricing_model: "monthly",
-      billing_interval: "monthly",
+      pricing_model: PRICING[rental.ratePeriod || "month"],
+      billing_interval: PRICING[rental.ratePeriod || "month"],
+      recurring_billing: (rental.ratePeriod || "month") === "month",
       rental_rate: rental.rate || 0,
       deposit_amount: rental.deposit || 0,
       mileage_at_delivery: rental.mileageAtStart,
@@ -250,7 +251,8 @@ async function createRental(context: CommitContext, rental: PreviewRental, vehic
     .select("id")
     .single();
   if (error) {
-    result.failed.push(`${rental.customerName || `row ${rental.row}`}: ${error.message}`);
+    const reason = /rentals_no_double_booking|exclusion constraint/.test(error.message) ? "the vehicle is already rented for these dates" : error.message;
+    result.failed.push(`${rental.customerName || `row ${rental.row}`}: ${reason}`);
     return null;
   }
   result.counts.rentals += 1;
@@ -280,6 +282,8 @@ async function createRental(context: CommitContext, rental: PreviewRental, vehic
   }
   return data.id as string;
 }
+
+const PRICING = { day: "daily", week: "weekly", month: "monthly" } as const;
 
 function nextDay(date: string) {
   const day = new Date(`${date}T00:00:00Z`);

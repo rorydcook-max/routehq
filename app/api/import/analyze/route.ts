@@ -4,7 +4,13 @@ import { getCurrentMembership } from "@/lib/auth/roles";
 import { IMPORT_FIELD_KEYS, importFieldKeys } from "@/lib/import/fields";
 import { googleSheetToSpreadsheetInput, isGoogleSheetsUrl, parseSpreadsheetFile, type ParsedSheet } from "@/lib/import/spreadsheet";
 import { attachExisting, buildPreview, previewCounts } from "@/lib/import/preview";
+import { existingRentals } from "@/lib/import/existing";
 import { getDefaultOrganization } from "@/lib/organization";
+import { MAX_IMPORT_PHOTOS, photoSheetKinds, readImportPhotos } from "@/lib/import/photos";
+import { visionProvider } from "@/lib/ai-vision";
+
+// Reading several photos takes a while.
+export const maxDuration = 120;
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 /**
@@ -19,7 +25,7 @@ async function previewAndBatch(sheets: ParsedSheet[], analysis: ReturnType<typeo
     supabase.from("vehicles").select("id, registration_number, make, model").eq("organization_id", organization.id).is("deleted_at", null),
     supabase.from("customers").select("id, full_name, phone").eq("organization_id", organization.id).is("deleted_at", null)
   ]);
-  const preview = attachExisting(buildPreview(sheets, analysis.sheets), vehicles || [], customers || []);
+  const preview = attachExisting(buildPreview(sheets, analysis.sheets), vehicles || [], customers || [], await existingRentals(supabase, organization.id));
   const { data: batch } = await supabase
     .from("import_batches")
     .insert({ organization_id: organization.id, created_by: userId, source_name: sourceName.slice(0, 120), sheets, mappings: analysis.sheets, preview, counts: previewCounts(preview) })
@@ -97,6 +103,24 @@ export async function POST(request: Request) {
 
   const formData = await request.formData();
   const file = formData.get("file");
+
+  // Photos of registration books, notebook pages and lists: read into RouteHQ's own fields.
+  const photos = formData.getAll("photo").filter((item): item is File => item instanceof File && item.size > 0 && item.type.startsWith("image/"));
+  if (photos.length) {
+    if (!visionProvider()) return NextResponse.json({ error: await said("Reading photos isn't switched on yet. Send them to us in Help and we'll bring them in.") }, { status: 400 });
+    if (photos.length > MAX_IMPORT_PHOTOS) return NextResponse.json({ error: await said(`Send up to ${MAX_IMPORT_PHOTOS} photos at a time.`) }, { status: 400 });
+    const { sheets, readings } = await readImportPhotos(await Promise.all(photos.map(async (photo) => ({ bytes: Buffer.from(await photo.arrayBuffer()), mediaType: photo.type, name: photo.name }))));
+    if (!sheets.length) return NextResponse.json({ error: await said("We couldn't find vehicles, bookings or payments in these photos. Try a sharper photo in good light, or send them to us in Help."), readings }, { status: 400 });
+    const kinds = photoSheetKinds();
+    const analysis = normaliseAnalysis({ sheets: sheets.map((sheet) => ({ sheet_name: sheet.sheetName, primary_data_type: kinds[sheet.sheetName], confidence: 0.9, column_mappings: sheet.headers.map((header) => ({ source_column: header, routehq_field: header, confidence: 0.9 })) })) }, sheets);
+    const skipped = readings.filter((reading) => reading.kind === "other" || reading.kind === "unreadable").map((reading) => reading.name);
+    return NextResponse.json({
+      analysis,
+      readings,
+      ...(await previewAndBatch(sheets, analysis, `${photos.length} photo${photos.length === 1 ? "" : "s"}`, membership.userId)),
+      warning: skipped.length ? await said(`Nothing to bring in was found on: ${skipped.join(", ")}.`) : await said("Read from photos: check each card, especially names, plates and amounts.")
+    });
+  }
   const sheetUrl = String(formData.get("sheetUrl") || "").trim();
   const importType = String(formData.get("importType") || "mixed");
 

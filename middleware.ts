@@ -143,6 +143,17 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
+  // The importer is open during first-time setup (so the checks below are skipped for it), but it stays the owner's.
+  if (user && (pathname === "/import" || pathname.startsWith("/fleet/import"))) {
+    const { data: membership } = await loadActiveMembership(supabase, user.id, request.cookies.get(ACTIVE_ORGANIZATION_COOKIE)?.value || null);
+    if (membership && membership.role !== "owner") {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/";
+      redirectUrl.search = "?notice=owner-only";
+      return NextResponse.redirect(redirectUrl);
+    }
+  }
+
   if (user && !isOnboardingAllowedRoute) {
     const { data: membership } = await loadActiveMembership(
       supabase,

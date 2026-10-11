@@ -224,5 +224,22 @@
   "The end date is before the start date.": "วันสิ้นสุดอยู่ก่อนวันเริ่ม",
   "Add the customer's name first.": "ใส่ชื่อลูกค้าก่อน",
   "The referral could not be sent.": "ส่งการแนะนำไม่สำเร็จ",
-  "Could not mark the fee as paid.": "บันทึกว่าจ่ายค่าแนะนำแล้วไม่สำเร็จ"
+  "Could not mark the fee as paid.": "บันทึกว่าจ่ายค่าแนะนำแล้วไม่สำเร็จ",
+  "Reading photos isn't switched on yet. Send them to us in Help and we'll bring them in.": "ยังเปิดการอ่านรูปไม่ได้ ส่งรูปมาให้เราในหน้าช่วยเหลือ เราจะนำเข้าให้",
+  "We couldn't find vehicles, bookings or payments in these photos. Try a sharper photo in good light, or send them to us in Help.": "ไม่พบรถ การจอง หรือการชำระเงินในรูปเหล่านี้ ลองถ่ายให้ชัดขึ้นในที่แสงพอ หรือส่งมาให้เราในหน้าช่วยเหลือ",
+  "Read from photos: check each card, especially names, plates and amounts.": "อ่านจากรูปถ่าย: ตรวจแต่ละรายการ โดยเฉพาะชื่อ ทะเบียน และจำนวนเงิน",
+  "Write a message or add a file.": "เขียนข้อความหรือแนบไฟล์",
+  "This conversation was not found.": "ไม่พบการสนทนานี้",
+  "Your own booking address comes with the Growth plan and above.": "ที่อยู่หน้าจองของคุณเองมีในแพ็กเกจ Growth ขึ้นไป",
+  "Use at least 3 letters or numbers.": "ใช้ตัวอักษรหรือตัวเลขอย่างน้อย 3 ตัว",
+  "Use only letters, numbers and dashes.": "ใช้ได้เฉพาะตัวอักษร ตัวเลข และขีด",
+  "That address is kept for RouteHQ. Try another.": "ที่อยู่นี้สงวนไว้สำหรับ RouteHQ ลองชื่ออื่น",
+  "Another business already has that address. Try another.": "มีธุรกิจอื่นใช้ที่อยู่นี้แล้ว ลองชื่ออื่น",
+  "Your own domain comes with the Business plan.": "โดเมนของคุณเองมีในแพ็กเกจ Business",
+  "That doesn't look like a web address. Write it like book.yourshop.com.": "ดูไม่เหมือนที่อยู่เว็บ เขียนแบบ book.yourshop.com",
+  "That address is already used by another business.": "ที่อยู่นี้มีธุรกิจอื่นใช้แล้ว",
+  "Could not add the address. Please try again.": "เพิ่มที่อยู่ไม่สำเร็จ โปรดลองอีกครั้ง",
+  "Add the email address to reply to.": "เพิ่มอีเมลที่ให้เราตอบกลับ",
+  "Add your LINE ID.": "เพิ่ม LINE ID ของคุณ",
+  "Add your WhatsApp number.": "เพิ่มเบอร์ WhatsApp ของคุณ"
 }

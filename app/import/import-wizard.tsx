@@ -1,6 +1,7 @@
 "use client";
 
-import { AlertTriangle, CheckCircle2, FileSpreadsheet, Loader2, RotateCcw, Undo2 } from "lucide-react";
+import { AlertTriangle, Camera, CheckCircle2, FileSpreadsheet, Loader2, RotateCcw, Undo2, X } from "lucide-react";
+import { compressImage } from "@/lib/direct-upload-client";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
@@ -26,7 +27,7 @@ type Result = {
 export type RecentImport = { id: string; sourceName: string; createdAt: string; status: string; counts: Record<string, number> };
 
 const dataTypes = ["vehicles", "customers", "rentals", "transactions"];
-const SOFT: Problem[] = ["already_in_fleet", "already_a_customer"];
+const SOFT: Problem[] = ["already_in_fleet", "already_a_customer", "already_booked"];
 const SHOW = 40;
 
 function needsLook(problems: Problem[]) {
@@ -74,6 +75,8 @@ function More({ total, shown, onMore, t }: { total: number; shown: number; onMor
 export function ImportWizard({ recent = [] }: { defaultImportType?: string; recent?: RecentImport[] }) {
   const t = useTranslations("importer") as unknown as Say;
   const [file, setFile] = useState<File | null>(null);
+  // Photos of registration books, notebook pages and lists (up to 8).
+  const [photos, setPhotos] = useState<File[]>([]);
   const [sheetUrl, setSheetUrl] = useState("");
   const [status, setStatus] = useState<"idle" | "analyzing" | "review" | "remapping" | "importing" | "done" | "error">("idle");
   const [batchId, setBatchId] = useState<string | null>(null);
@@ -114,7 +117,7 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
   }
 
   async function analyzeFile() {
-    if (!file && !sheetUrl.trim()) {
+    if (!file && !sheetUrl.trim() && !photos.length) {
       setError(t("needFile"));
       setStatus("error");
       return;
@@ -123,8 +126,13 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
     setNotice("");
     setStatus("analyzing");
     const formData = new FormData();
-    if (file) formData.append("file", file);
-    formData.append("sheetUrl", sheetUrl.trim());
+    if (photos.length) {
+      // Smaller photos upload faster and still read well.
+      for (const photo of photos) formData.append("photo", await compressImage(photo, 1800, 0.82));
+    } else {
+      if (file) formData.append("file", file);
+      formData.append("sheetUrl", sheetUrl.trim());
+    }
     const response = await fetch("/api/import/analyze", { method: "POST", body: formData });
     const payload = await response.json().catch(() => ({ error: t("readFailed") }));
     if (!response.ok) {
@@ -211,7 +219,7 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
             </p>
           </div>
         </div>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
           <label className="block">
             <span className="secondary-action pressable w-full cursor-pointer">{file ? file.name : t("file")}</span>
             <input
@@ -219,6 +227,28 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
               className="sr-only"
               onChange={(event) => {
                 setFile(event.target.files?.[0] || null);
+                setSheetUrl("");
+                setPhotos([]);
+                reset();
+              }}
+              type="file"
+            />
+          </label>
+          <label className="block">
+            <span className="secondary-action pressable w-full cursor-pointer">
+              <Camera size={18} />
+              {photos.length ? t("photosChosen", { count: photos.length }) : t("photos")}
+            </span>
+            <input
+              accept="image/*"
+              className="sr-only"
+              multiple
+              onChange={(event) => {
+                const picked = Array.from(event.target.files || []);
+                event.target.value = "";
+                if (!picked.length) return;
+                setPhotos((current) => [...current, ...picked].slice(0, 8));
+                setFile(null);
                 setSheetUrl("");
                 reset();
               }}
@@ -232,6 +262,7 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
               onChange={(event) => {
                 setSheetUrl(event.target.value);
                 setFile(null);
+                setPhotos([]);
                 reset();
               }}
               placeholder={t("orLink")}
@@ -240,10 +271,22 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
             />
           </label>
         </div>
-        <p className="mt-3 text-sm text-[var(--muted)]">{t("whatWorks")}</p>
-        <button className="primary-action pressable mt-4 w-full sm:w-auto" disabled={status === "analyzing" || (!file && !sheetUrl.trim())} onClick={analyzeFile} type="button">
+        {photos.length ? (
+          <ul className="mt-3 flex flex-wrap gap-2">
+            {photos.map((photo, index) => (
+              <li className="flex max-w-full items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--panel)] py-1 pl-3 pr-1.5 text-sm font-medium" key={`${photo.name}-${index}`}>
+                <span className="truncate">{photo.name}</span>
+                <button aria-label={t("removePhoto", { name: photo.name })} className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full hover:bg-[var(--panel-secondary)]" onClick={() => { setPhotos((current) => current.filter((_, at) => at !== index)); reset(); }} type="button">
+                  <X size={14} />
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        <p className="mt-3 text-sm text-[var(--muted)]">{photos.length ? t("photosWork") : t("whatWorks")}</p>
+        <button className="primary-action pressable mt-4 w-full sm:w-auto" disabled={status === "analyzing" || (!file && !sheetUrl.trim() && !photos.length)} onClick={analyzeFile} type="button">
           {status === "analyzing" ? <Loader2 className="animate-spin" size={18} /> : null}
-          {status === "analyzing" ? t("reading") : t("read")}
+          {status === "analyzing" ? (photos.length ? t("readingPhotos", { count: photos.length }) : t("reading")) : t("read")}
         </button>
         {error ? <p className="mt-3 rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">{error}</p> : null}
       </section>
@@ -576,7 +619,14 @@ function RentalCard({ rental, vehicleLabel, onChange, t }: { rental: PreviewRent
         </label>
         <label className="block text-xs font-semibold text-[var(--muted)]">
           {t("c_rent")}
-          <input className={smallInput} inputMode="numeric" onChange={(event) => onChange({ rate: event.target.value ? Number(event.target.value) : null })} value={rental.rate ?? ""} />
+          <span className="mt-1 flex gap-1">
+            <input className={`${smallInput} mt-0 min-w-0 flex-1`} inputMode="numeric" onChange={(event) => onChange({ rate: event.target.value ? Number(event.target.value) : null })} value={rental.rate ?? ""} />
+            <select aria-label={t("c_ratePer")} className={`${smallInput} mt-0 w-auto`} onChange={(event) => onChange({ ratePeriod: event.target.value as PreviewRental["ratePeriod"] })} value={rental.ratePeriod || "month"}>
+              <option value="day">{t("per_day")}</option>
+              <option value="week">{t("per_week")}</option>
+              <option value="month">{t("per_month")}</option>
+            </select>
+          </span>
         </label>
         <label className="block text-xs font-semibold text-[var(--muted)]">
           {t("c_deposit")}

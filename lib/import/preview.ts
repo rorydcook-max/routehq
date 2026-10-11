@@ -27,7 +27,9 @@ export type Problem =
   | "duplicate_in_file"
   | "already_in_fleet"
   | "already_a_customer"
-  | "paid_until_unknown";
+  | "paid_until_unknown"
+  | "already_booked"
+  | "vehicle_busy";
 
 type Base = { key: string; sheet: string; row: number; include: boolean; problems: Problem[] };
 
@@ -58,6 +60,12 @@ export type PreviewRental = Base & {
   startDate: string | null;
   endDate: string | null;
   rate: number | null;
+  /** What the rent is per. Notebooks and short-term shops usually charge by the day. */
+  ratePeriod: "day" | "week" | "month";
+  /** Make and model written next to the plate, used when the vehicle is new. */
+  vehicleName: string;
+  /** Already a customer of the business (matched by phone, then name). */
+  existingCustomer: boolean;
   deposit: number | null;
   mileageAtStart: number | null;
   nextDue: string | null;
@@ -128,12 +136,43 @@ function dateOrProblem(value: string, problems: Problem[]) {
 }
 
 /** Thai phone numbers as the app stores them: digits, leading 0 kept, "+66" turned into 0. */
+/** "per day", "/วัน", "250/d" → day; "week", "สัปดาห์" → week; everything else is monthly, as before. */
+export function ratePeriodFrom(...texts: unknown[]): "day" | "week" | "month" {
+  const text = texts.map((value) => cleanString(value).toLowerCase()).join(" ");
+  if (/\b(day|daily|days|d)\b|\/d\b|วัน|รายวัน/.test(text)) return "day";
+  if (/\b(week|weekly|wk)\b|สัปดาห์|อาทิตย์|รายสัปดาห์/.test(text)) return "week";
+  return "month";
+}
+
+// The make of models Thai rental shops write on their own ("Click", "Yaris").
+const MAKE_OF_MODEL: [RegExp, string][] = [
+  [/^(click|pcx|adv|scoopy|wave|zoomer|forza|msx|grom|lead|giorno|vario|cbr|city|jazz|civic|accord|hr-?v|br-?v|cr-?v|wr-?v|brio)\b/i, "Honda"],
+  [/^(nmax|n-max|aerox|fino|filano|grand filano|xmax|x-max|qbix|mio|exciter|r15|tricity|lexi)\b/i, "Yamaha"],
+  [/^(yaris|vios|fortuner|hilux|revo|corolla|altis|camry|veloz|avanza|innova|commuter|cross)\b/i, "Toyota"],
+  [/^(xpander|pajero|triton|attrage|mirage)\b/i, "Mitsubishi"],
+  [/^(almera|navara|note|kicks|march|terra)\b/i, "Nissan"],
+  [/^(swift|ciaz|ertiga|celerio|burgman|smash)\b/i, "Suzuki"],
+  [/^(mazda ?2|mazda ?3|cx-?3|cx-?30|cx-?5|bt-?50)\b/i, "Mazda"],
+  [/^(d-?max|mu-?x)\b/i, "Isuzu"],
+  [/^(ranger|everest)\b/i, "Ford"],
+  [/^(vespa|primavera|sprint)\b/i, "Vespa"]
+];
+export function guessMakeModel(name: string): { make: string; model: string } {
+  const text = cleanString(name);
+  if (!text) return { make: "", model: "" };
+  const known = MAKE_OF_MODEL.find(([pattern]) => pattern.test(text));
+  if (known) return { make: known[1], model: text };
+  const split = splitVehicleName(text);
+  return { make: split.make, model: split.model || text };
+}
+
 export function cleanPhone(value: unknown) {
   const digits = cleanString(value).replace(/[^\d+]/g, "");
   if (!digits) return "";
   if (digits.startsWith("+66")) return `0${digits.slice(3)}`;
   if (digits.startsWith("66") && digits.length >= 11) return `0${digits.slice(2)}`;
-  return digits.replace(/^\+/, "");
+  if (digits.startsWith("+")) return `+${digits.slice(1).replace(/\+/g, "")}`;
+  return digits;
 }
 
 function rentalFrom(fields: Record<string, string>, base: Omit<Base, "problems">, plate: string, today: string): PreviewRental | null {
@@ -170,6 +209,9 @@ function rentalFrom(fields: Record<string, string>, base: Omit<Base, "problems">
     startDate,
     endDate,
     rate,
+    ratePeriod: ratePeriodFrom(fields.rate_period, fields.rental_rate, fields.notes),
+    vehicleName: cleanString(fields.vehicle_name || [fields.make, fields.model].filter(Boolean).join(" ")),
+    existingCustomer: false,
     deposit: parseNumberValue(fields.deposit_amount),
     mileageAtStart: parseIntegerValue(parseKnownNumber(fields.mileage_at_start)),
     nextDue,
@@ -261,7 +303,7 @@ export function buildPreview(sheets: ParsedSheet[], mappings: SheetMapping[]): I
       if (key && platesSeen.has(key)) problems.push("duplicate_in_file");
       else if (key) platesSeen.set(key, base.key);
 
-      const known = new Set(["registration_number", "vehicle_registration", "make", "model", "trim", "vehicle_name", "year", "color", "current_mileage", "daily_rate", "weekly_rate", "monthly_rate", "customer_name", "phone", "email", "start_date", "end_date", "rental_rate", "deposit_amount", "mileage_at_start", "next_payment_date", "full_name"]);
+      const known = new Set(["registration_number", "vehicle_registration", "make", "model", "trim", "vehicle_name", "year", "color", "current_mileage", "daily_rate", "weekly_rate", "monthly_rate", "customer_name", "phone", "email", "start_date", "end_date", "rental_rate", "rate_period", "deposit_amount", "mileage_at_start", "next_payment_date", "full_name"]);
       const extra = Object.fromEntries(Object.entries(fields).filter(([field, value]) => !known.has(field) && cleanString(value)));
 
       preview.vehicles.push({
@@ -300,13 +342,20 @@ export function buildPreview(sheets: ParsedSheet[], mappings: SheetMapping[]): I
 
 export type ExistingVehicle = { id: string; registration_number: string | null; make: string; model: string };
 export type ExistingCustomer = { id: string; full_name: string; phone: string | null };
+/** A booking or rental the business already has, to catch the same rental coming in twice. */
+export type ExistingRental = { vehicle_id: string; start_date: string; end_date: string | null; customer_name: string; customer_phone: string | null };
+
+function overlaps(aStart: string | null, aEnd: string | null, bStart: string, bEnd: string | null) {
+  if (!aStart) return false;
+  return (!bEnd || aStart <= bEnd) && (!aEnd || bStart <= aEnd);
+}
 
 /**
  * Matches the preview against what the business already has, so a second
  * import updates rather than duplicates: vehicles by plate, customers by phone
  * then name.
  */
-export function attachExisting(preview: ImportPreview, vehicles: ExistingVehicle[], customers: ExistingCustomer[]) {
+export function attachExisting(preview: ImportPreview, vehicles: ExistingVehicle[], customers: ExistingCustomer[], rentals: ExistingRental[] = []) {
   const vehicleByPlate = new Map(vehicles.map((vehicle) => [plateKey(vehicle.registration_number), vehicle.id]));
   const customerByPhone = new Map(customers.filter((customer) => cleanPhone(customer.phone)).map((customer) => [cleanPhone(customer.phone), customer.id]));
   const customerByName = new Map(customers.map((customer) => [cleanString(customer.full_name).toLowerCase(), customer.id]));
@@ -319,9 +368,38 @@ export function attachExisting(preview: ImportPreview, vehicles: ExistingVehicle
     vehicle.existingId = vehicle.plate ? findByPlate(vehicleByPlate, vehicle.plate) || null : null;
     if (vehicle.existingId) mark(vehicle.problems, "already_in_fleet");
   }
+  // A rental on a plate that isn't in the fleet or the file (a notebook line: "Click 2กข 777"): a new vehicle card for it.
+  const addedByPlate = new Map<string, string>();
   for (const rental of preview.rentals) {
     rental.existingVehicleId = rental.plate ? findByPlate(vehicleByPlate, rental.plate) || null : null;
-    if (!rental.existingVehicleId && !rental.vehicleKey) mark(rental.problems, "unknown_vehicle");
+    rental.existingCustomer = Boolean((rental.phone && customerByPhone.get(rental.phone)) || customerByName.get(rental.customerName.toLowerCase()));
+    if (rental.existingVehicleId) {
+      // The same vehicle is already booked for these dates: the same rental again, or someone else's.
+      const clash = rentals.find((existing) => existing.vehicle_id === rental.existingVehicleId && overlaps(rental.startDate, rental.endDate, existing.start_date, existing.end_date));
+      if (clash) {
+        const same = (rental.phone && cleanPhone(clash.customer_phone) === rental.phone) || cleanString(clash.customer_name).toLowerCase() === rental.customerName.toLowerCase();
+        mark(rental.problems, same ? "already_booked" : "vehicle_busy");
+        rental.problems = rental.problems.filter((problem) => problem !== "paid_until_unknown");
+        rental.include = false;
+      }
+    }
+    if (rental.existingVehicleId || rental.vehicleKey) continue;
+    if (!rental.plate) {
+      mark(rental.problems, "unknown_vehicle");
+      continue;
+    }
+    const seenKey = findByPlate(addedByPlate, rental.plate);
+    if (seenKey) {
+      rental.vehicleKey = seenKey;
+      continue;
+    }
+    const { make, model } = guessMakeModel(rental.vehicleName);
+    const problems: Problem[] = ["no_mileage"];
+    if (!make || !model) problems.push("no_make_model");
+    const key = `vehicles:${rental.sheet}:from-rental-${rental.row}`;
+    preview.vehicles.push({ key, sheet: rental.sheet, row: rental.row, include: true, problems, existingId: null, plate: rental.plate, make, model, trim: "", year: null, color: "", mileage: null, dailyRate: rental.ratePeriod === "day" ? rental.rate : null, weeklyRate: rental.ratePeriod === "week" ? rental.rate : null, monthlyRate: rental.ratePeriod === "month" ? rental.rate : null, extra: {} });
+    addedByPlate.set(plateKey(rental.plate), key);
+    rental.vehicleKey = key;
   }
   for (const transaction of preview.transactions) {
     transaction.existingVehicleId = transaction.plate ? findByPlate(vehicleByPlate, transaction.plate) || null : null;
@@ -340,8 +418,15 @@ export function previewCounts(preview: ImportPreview) {
     vehicles: preview.vehicles.filter((item) => item.include).length,
     rentedNow: preview.rentals.filter((item) => item.include && item.status === "active").length,
     rentals: preview.rentals.filter((item) => item.include).length,
-    customers: preview.customers.filter((item) => item.include).length,
+    // Customers listed on their own, plus new people renting in the file.
+    customers:
+      preview.customers.filter((item) => item.include).length +
+      new Set(
+        preview.rentals
+          .filter((item) => item.include && !item.existingCustomer && item.customerName && !preview.customers.some((customer) => customer.include && (customer.fullName.toLowerCase() === item.customerName.toLowerCase() || (customer.phone && customer.phone === item.phone))))
+          .map((item) => item.phone || item.customerName.toLowerCase())
+      ).size,
     transactions: preview.transactions.filter((item) => item.include).length,
-    needsLook: [...preview.vehicles, ...preview.rentals, ...preview.customers, ...preview.transactions].filter((item) => item.include && item.problems.some((problem) => !["already_in_fleet", "already_a_customer"].includes(problem))).length
+    needsLook: [...preview.vehicles, ...preview.rentals, ...preview.customers, ...preview.transactions].filter((item) => item.include && item.problems.some((problem) => !["already_in_fleet", "already_a_customer", "already_booked"].includes(problem))).length
   };
 }

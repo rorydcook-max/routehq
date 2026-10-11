@@ -29,8 +29,9 @@ function Notice({ title, message }: { title: string; message: string }) {
   );
 }
 
-export default async function PublicCatalogPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+export default async function PublicCatalogPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ from?: string; to?: string; vehicle?: string; via?: string }> }) {
+  const [{ slug }, query] = await Promise.all([params, searchParams]);
+  const isoDay = (value: unknown) => (/^\d{4}-\d{2}-\d{2}$/.test(String(value || "")) ? String(value) : null);
   const catalog = await getPublicCatalog(slug);
   const t = await getTranslations("customer");
 
@@ -57,7 +58,23 @@ export default async function PublicCatalogPage({ params }: { params: Promise<{ 
           </div>
         </header>
 
-        <Catalog currency={catalog.currency} offer={catalog.offer} deposit={catalog.deposit} holdHours={catalog.holdHours} organizationName={catalog.name} slug={slug} gapDays={catalog.gapDays} today={catalog.minStart} vehicles={catalog.vehicles} seasons={catalog.seasons} extras={catalog.extras} />
+        <Catalog
+          currency={catalog.currency}
+          offer={catalog.offer}
+          deposit={catalog.deposit}
+          holdHours={catalog.holdHours}
+          organizationName={catalog.name}
+          slug={slug}
+          gapDays={catalog.gapDays}
+          today={catalog.minStart}
+          vehicles={catalog.vehicles}
+          seasons={catalog.seasons}
+          extras={catalog.extras}
+          initialStart={isoDay(query.from)}
+          initialEnd={isoDay(query.to)}
+          initialVehicleId={query.vehicle ? String(query.vehicle).slice(0, 60) : null}
+          source={query.via === "directory" ? "directory" : null}
+        />
       </div>
     </main>
   );

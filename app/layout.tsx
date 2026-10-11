@@ -5,6 +5,7 @@ import { textDirection } from "@/lib/i18n/locales";
 import { ImageShrinker } from "@/components/image-shrinker";
 import { FlagFont } from "@/components/flag-font";
 import { BrandStyle } from "@/components/brand-style";
+import { headers } from "next/headers";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { shellBrand } from "@/lib/shell-brand";
@@ -12,6 +13,8 @@ import { shellBrand } from "@/lib/shell-brand";
 /** The signed-in operator's brand colour, so pages open in it rather than switching after load. */
 async function operatorBrandColour() {
   try {
+    // Customer pages carry the business's own brand, and the directory is RouteHQ's: neither takes the signed-in operator's colour.
+    if ((await headers()).get("x-routehq-customer-page")) return null;
     const membership = await getCurrentMembership();
     if (!membership) return null;
     const brand = await shellBrand((await createSupabaseServerClient()) as any, membership.organizationId);

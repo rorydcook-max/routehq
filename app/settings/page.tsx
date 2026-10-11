@@ -30,6 +30,9 @@ import { extrasFrom, seasonsFrom } from "@/lib/price-rules";
 import { PublicBookingPanel } from "@/app/settings/public-booking-panel";
 import { UsualDepositPanel } from "@/app/settings/usual-deposit-panel";
 import { PartnerNetworkPanel } from "@/app/settings/partner-network-panel";
+import { DirectoryPanel } from "@/app/settings/directory-panel";
+import { canBeListed, directorySettings } from "@/lib/directory";
+import { DIRECTORY_ADDON_MONTHLY } from "@/lib/plans";
 import { partnerNetworkSettings } from "@/lib/partner-network";
 import { FINDERS_FEE_PCT } from "@/lib/plans";
 import { TeamMemberActions } from "@/app/settings/team-member-actions";
@@ -427,6 +430,14 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               pricedVehicles={publicVehicleCounts.priced}
               slug={organization.slug}
               totalVehicles={publicVehicleCounts.total}
+            />
+          </Fold>
+          <Fold id="directory" summary={directorySettings(organization.settings).enabled && canBeListed(organization as any) && publicBookingSettings(organization.settings).enabled ? say("dir_on") : say("dir_off")} title={say("dir_title")}>
+            <DirectoryPanel
+              addonPrice={DIRECTORY_ADDON_MONTHLY}
+              allowed={canBeListed(organization as any)}
+              bookingPageOn={publicBookingSettings(organization.settings).enabled}
+              enabled={directorySettings(organization.settings).enabled}
             />
           </Fold>
           <Fold id="partner-network" summary={partnerNetworkSettings(organization.settings).enabled ? say("pn_on") : say("pn_off")} title={say("pn_title")}>

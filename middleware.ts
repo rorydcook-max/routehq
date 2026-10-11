@@ -15,7 +15,8 @@ export async function middleware(request: NextRequest) {
     pathname === "/book" ||
     pathname.startsWith("/book/") ||
     pathname.startsWith("/amend/") ||
-    // Each business's public booking page.
+    // The directory of every listed business, and each business's public booking page.
+    pathname === "/rent" ||
     pathname.startsWith("/rent/") ||
     pathname.startsWith("/auth/") ||
     pathname === "/api/line/webhook" ||
@@ -25,7 +26,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/api/cron/") ||
     pathname === "/api/line/daily-summary";
   // Customer pages take their language from the customer (their choice, or their phone's language), never from whoever is signed in.
-  if (pathname.startsWith("/book/") || pathname.startsWith("/amend/") || pathname.startsWith("/rent/")) {
+  if (pathname.startsWith("/book/") || pathname.startsWith("/amend/") || pathname === "/rent" || pathname.startsWith("/rent/")) {
     request.headers.set("x-routehq-customer-page", "1");
   }
   // During first-time setup the wizard sends people to the normal Add vehicle and import screens; everything else waits until setup is finished.

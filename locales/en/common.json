@@ -2122,7 +2122,8 @@
     "referralFeeOwed": "Finder's fee {amount} to pay them.",
     "referralFeePaid": "Finder's fee {amount} paid.",
     "referralFeeLater": "Finder's fee {pct}% of the first rent, set when it is recorded.",
-    "referralOpen": "Partners"
+    "referralOpen": "Partners",
+    "step_bookedDirectory": "Booked by the customer through the RouteHQ directory"
   },
   "newBooking": {
     "pageBack": "Back to bookings",
@@ -3652,7 +3653,15 @@
     "pn_reachRegion": "In my province",
     "pn_reachCountry": "Anywhere in the country",
     "pn_fee": "The fee is settled between you directly, by PromptPay or bank transfer, and marked paid on the Partners page. It is set from the first rent recorded, so a customer who never turns up costs nothing.",
-    "pn_open": "Open Partners"
+    "pn_open": "Open Partners",
+    "dir_title": "RouteHQ directory",
+    "dir_on": "Listed on routehq.app/rent",
+    "dir_off": "Not listed",
+    "dir_switch": "List my free vehicles on the RouteHQ directory",
+    "dir_body": "Customers searching routehq.app/rent by place and dates see your free vehicles and prices, and book on your own booking page. The customer is yours from the first tap; RouteHQ takes no commission.",
+    "dir_needsBookingPage": "Switch on your online booking page first; the directory sends customers there.",
+    "dir_plan": "Included in Pro and Business. On your plan it is an add-on at {price} a month; message us to add it.",
+    "dir_open": "See the directory"
   },
   "accountPage": {
     "roleOwner": "Owner",
@@ -4338,5 +4347,37 @@
     "feeUnpaid": "not paid yet",
     "feePending": "Fee ({pct}% of first rent) set when the first rent is recorded",
     "openBooking": "Open booking"
+  },
+  "directory": {
+    "title": "Rent a car or scooter in Thailand",
+    "subtitle": "Live availability and prices from local rental businesses. Book straight with the business.",
+    "where": "Where",
+    "wherePlaceholder": "Koh Samui, Phuket, Chiang Mai…",
+    "from": "From",
+    "to": "To (optional)",
+    "kind": "Vehicle",
+    "anyKind": "Any",
+    "search": "Search",
+    "found": "{count, plural, one {# vehicle} other {# vehicles}} free from {businesses, plural, one {# business} other {# businesses}}",
+    "allVehicles": "All their vehicles",
+    "seats": "{count} seats",
+    "per_daily": "a day",
+    "per_weekly": "a week",
+    "per_monthly": "a month",
+    "total": "{amount} in total",
+    "deposit": "Deposit {amount}",
+    "book": "Book",
+    "more": "{count} more vehicles",
+    "noneTitle": "Nothing free for that search",
+    "noneBody": "Try other dates, another place, or any kind of vehicle.",
+    "hint": "Choose a place and dates to see what is free.",
+    "footer": "Each business sets its own prices and terms and handles your booking. RouteHQ is the software they run on.",
+    "kind_car": "Car",
+    "kind_scooter": "Scooter",
+    "kind_motorbike": "Motorbike",
+    "kind_van": "Van",
+    "kind_atv": "ATV",
+    "kind_ebike": "E-bike",
+    "noDeposit": "No deposit"
   }
 }

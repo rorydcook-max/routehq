@@ -37,7 +37,11 @@ export function Catalog({
   today,
   offer = "both_monthly",
   seasons = [],
-  extras = []
+  extras = [],
+  initialStart,
+  initialEnd,
+  initialVehicleId,
+  source
 }: {
   slug: string;
   organizationName: string;
@@ -52,15 +56,20 @@ export function Catalog({
   offer?: string;
   seasons?: Season[];
   extras?: Extra[];
+  /** Arriving from the directory: the dates and vehicle they already chose. */
+  initialStart?: string | null;
+  initialEnd?: string | null;
+  initialVehicleId?: string | null;
+  source?: string | null;
 }) {
   const t = useTranslations("customer");
   const locale = useLocale();
   const router = useRouter();
-  const [startDate, setStartDate] = useState(today);
-  const [endDate, setEndDate] = useState("");
-  const [longTerm, setLongTerm] = useState(offer === "monthly" || offer === "both_monthly");
+  const [startDate, setStartDate] = useState(initialStart && initialStart >= today ? initialStart : today);
+  const [endDate, setEndDate] = useState(initialEnd || "");
+  const [longTerm, setLongTerm] = useState(initialEnd ? offer === "monthly" : offer === "monthly" || offer === "both_monthly");
   const bothOffered = offer === "both_monthly" || offer === "both_dates";
-  const [openId, setOpenId] = useState<string | null>(null);
+  const [openId, setOpenId] = useState<string | null>(initialVehicleId || null);
   const [error, setError] = useState<string | null>(null);
   const [chosen, setChosen] = useState<string[]>([]);
   const [isPending, startTransition] = useTransition();
@@ -93,6 +102,7 @@ export function Catalog({
         formData.set("startDate", startDate);
         formData.set("endDate", end || "");
         formData.set("extraIds", JSON.stringify(chosen));
+        if (source) formData.set("source", source);
         const result = await bookOnline(formData);
         if (!result.ok) {
           setError(result.error);

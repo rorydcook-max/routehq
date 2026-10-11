@@ -38,6 +38,22 @@ export async function savePartnerNetwork(input: { enabled: boolean; reach: strin
   return { ok: true };
 }
 
+/** Listing on the public directory. */
+export async function saveDirectoryListing(input: { enabled: boolean }): Promise<Result<{}>> {
+  const who = await owner();
+  if ("error" in who) return { ok: false, error: who.error };
+  if (who.membership.role !== "owner") return { ok: false, error: await said("Only the business owner can change this.") };
+  const supabase = (await createSupabaseServerClient()) as any;
+  const current = (who.organization.settings && typeof who.organization.settings === "object" ? who.organization.settings : {}) as Record<string, unknown>;
+  const { error } = await supabase
+    .from("organizations")
+    .update({ settings: { ...current, directory: { ...((current.directory as Record<string, unknown>) || {}), enabled: input.enabled === true } } })
+    .eq("id", who.organization.id);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/settings");
+  return { ok: true };
+}
+
 /** Partners' vehicles free for the dates. */
 export async function searchPartnerVehicles(input: { startDate: string; endDate: string | null; kind: string | null }): Promise<Result<{ vehicles: PartnerVehicle[] }>> {
   const who = await owner();

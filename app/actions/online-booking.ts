@@ -84,7 +84,7 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
     .from("booking_links")
     .select("id, customers!inner(phone)")
     .eq("organization_id", organizationId)
-    .eq("booking_data->>source", "public_page")
+    .in("booking_data->>source", ["public_page", "directory"])
     .in("status", ["pending", "viewed"])
     .is("customer_details_submitted_at", null)
     .eq("customers.phone", phone);
@@ -145,7 +145,9 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
     return { ok: false, error: await said("We couldn't start your booking. Please try again.") };
   }
 
-  const bookingData = { delivery_method: "tbd", delivery_location: null, delivery_datetime: null, special_conditions: null, share_channel: "public_page", source: "public_page" };
+  // Where the customer came from: the business's own page, or the RouteHQ directory.
+  const source = String(formData.get("source") || "") === "directory" ? "directory" : "public_page";
+  const bookingData = { delivery_method: "tbd", delivery_location: null, delivery_datetime: null, special_conditions: null, share_channel: source, source };
   const { data: link, error: linkError } = await admin
     .from("booking_links")
     .insert({
@@ -159,7 +161,7 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
       delivery_method: "tbd",
       booking_data: bookingData,
       included_items: [],
-      share_channels: ["public_page"],
+      share_channels: [source],
       // Held for a limited time; the link itself lasts much longer.
       hold_until: holdDeadline(catalog.holdHours),
       expires_at: new Date(Date.now() + 60 * 24 * 3_600_000).toISOString()

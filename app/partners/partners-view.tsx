@@ -3,7 +3,8 @@
 import { Check, Copy, Loader2, Search, Send } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { longDate, shortDate } from "@/lib/i18n/dates";
 import { markFeePaid, searchPartnerVehicles, sendReferral } from "@/app/actions/partners";
 import { priceFor, type PartnerVehicle, type ReferralRow } from "@/lib/partner-pricing";
 
@@ -228,6 +229,7 @@ export function PartnersView({ referrals, today }: { referrals: ReferralRow[]; t
 }
 
 function ReferralList({ rows, paid, t, titleKey, emptyKey }: { rows: ReferralRow[]; paid: Set<string>; t: Say; titleKey: string; emptyKey: string }) {
+  const locale = useLocale();
   const stage = (row: ReferralRow) => {
     if (row.status === "cancelled" || row.rentalStatus === "cancelled") return t("st_cancelled");
     if (row.rentalStatus && ["active", "due_soon", "overdue", "extended", "completed"].includes(row.rentalStatus)) return t("st_rented");
@@ -247,8 +249,7 @@ function ReferralList({ rows, paid, t, titleKey, emptyKey }: { rows: ReferralRow
                   {row.customerName || t("aCustomer")} <span className="font-medium text-[var(--muted)]">· {row.vehicle}</span>
                 </p>
                 <p className="text-sm text-[var(--foreground-secondary)]">
-                  {row.direction === "sent" ? t("toPartner", { partner: row.partner }) : t("fromPartner", { partner: row.partner })} · {row.startDate}
-                  {row.endDate ? ` – ${row.endDate}` : ""} · {stage(row)}
+                  {row.direction === "sent" ? t("toPartner", { partner: row.partner }) : t("fromPartner", { partner: row.partner })} · {row.endDate ? `${shortDate(row.startDate, locale)} – ${longDate(row.endDate, locale)}` : longDate(row.startDate, locale)} · {stage(row)}
                 </p>
                 <p className="text-sm font-semibold">
                   {row.feeAmount ? (

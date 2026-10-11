@@ -1,3 +1,4 @@
+import { longDate } from "@/lib/i18n/dates";
 ﻿/**
  * Partner network. An operator with nothing free sends the customer to a
  * partner's vehicle: the customer becomes the partner's from then on, and the
@@ -237,14 +238,14 @@ export async function referCustomer(
     organization_id: vehicle.organization_id,
     vehicle_id: vehicle.id,
     rental_id: rental.id,
-    title: `Referral from ${referrerName}: ${input.customerName || "a customer"} for ${vehicle.make} ${vehicle.model}, ${input.startDate}${input.endDate ? ` to ${input.endDate}` : ""}. Booking link sent; finder's fee ${FINDERS_FEE_PCT}% of the first rent.`,
+    title: `Referral from ${referrerName}: ${input.customerName || "a customer"} for ${vehicle.make} ${vehicle.model}, ${longDate(input.startDate, "en")}${input.endDate ? ` to ${longDate(input.endDate, "en")}` : ""}. Booking link sent; finder's fee ${FINDERS_FEE_PCT}% of the first rent.`,
     task_type: "other",
     due_at: input.startDate,
     created_by: null
   });
   try {
     const { notifyOperator } = await import("@/lib/notify-operator");
-    await notifyOperator(vehicle.organization_id, `ðŸ¤ Referral from ${referrerName}: ${input.customerName || "a customer"} wants your ${vehicle.make} ${vehicle.model} from ${input.startDate}. The booking link has been sent to them.`, "operator_notification");
+    await notifyOperator(vehicle.organization_id, `ðŸ¤ Referral from ${referrerName}: ${input.customerName || "a customer"} wants your ${vehicle.make} ${vehicle.model} from ${longDate(input.startDate, "en")}. The booking link has been sent to them.`, "operator_notification");
   } catch {
     // The task on their list is enough.
   }

@@ -9,6 +9,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { dbRoleFromApp, getCurrentMembership, OWNER_ONLY_MESSAGE, requireOwner, type AppRole } from "@/lib/auth/roles";
 import { ACTIVE_ORGANIZATION_COOKIE } from "@/lib/auth/active-organization";
+import { shellBrand } from "@/lib/shell-brand";
 
 export type AuthActionState = {
   error?: string;
@@ -74,12 +75,16 @@ export type ShellContext = {
   unreadChats: number;
   /** Payments and jobs due today or overdue, shown as a badge on To do. */
   dueTasks: number;
+  /** The operator's brand, when their plan lets it replace RouteHQ's in the app. */
+  brand: import("@/lib/shell-brand").ShellBrand | null;
 };
+
+export type { ShellBrand } from "@/lib/shell-brand";
 
 /** Used by the app shell for navigation and the business switcher. Display only - access is enforced on the server. */
 export async function getShellContext(): Promise<ShellContext> {
   const membership = await getCurrentMembership();
-  if (!membership) return { role: null, organizations: [], unreadChats: 0, dueTasks: 0 };
+  if (!membership) return { role: null, organizations: [], unreadChats: 0, dueTasks: 0, brand: null };
 
   const supabase = (await createSupabaseServerClient()) as any;
   // Only what needs doing now counts: later jobs would make the badge permanent noise.
@@ -94,7 +99,7 @@ export async function getShellContext(): Promise<ShellContext> {
     }
   };
   // The lookups do not depend on each other, so they run together.
-  const [{ data }, { count }, dueTasks, { count: toSend }] = await Promise.all([
+  const [{ data }, { count }, dueTasks, { count: toSend }, brand] = await Promise.all([
     supabase
       .from("organization_members")
       .select("organization_id, organizations(name)")
@@ -117,7 +122,8 @@ export async function getShellContext(): Promise<ShellContext> {
       .in("status", ["pending", "failed"])
       .not("metadata->handoff_label", "is", null)
       .or("metadata->>superseded.is.null,metadata->>superseded.eq.false")
-      .gte("created_at", new Date(Date.now() - 3 * 86_400_000).toISOString())
+      .gte("created_at", new Date(Date.now() - 3 * 86_400_000).toISOString()),
+    shellBrand(supabase, membership.organizationId)
   ]);
 
   const organizations = ((data || []) as any[]).map((row) => ({
@@ -125,7 +131,7 @@ export async function getShellContext(): Promise<ShellContext> {
     name: String(row.organizations?.name || "Business"),
     active: row.organization_id === membership.organizationId
   }));
-  return { role: membership.role, organizations, unreadChats: (count || 0) + (toSend || 0), dueTasks };
+  return { role: membership.role, organizations, unreadChats: (count || 0) + (toSend || 0), dueTasks, brand };
 }
 
 /** Switch the business this person is working in. Only businesses they actively belong to are accepted. */

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { BusinessLogoImage } from "@/components/business-logo-image";
+import { BrandStyle } from "@/components/brand-style";
 import { getPublicCatalog } from "@/lib/public-catalog";
 import { Catalog } from "./catalog";
 import { getTranslations } from "next-intl/server";
@@ -38,6 +39,7 @@ export default async function PublicCatalogPage({ params }: { params: Promise<{ 
 
   return (
     <main className="min-h-screen bg-[var(--panel-secondary)] px-4 py-5 text-[var(--foreground)]">
+      <BrandStyle colour={catalog.brandColour} />
       <div className="mx-auto max-w-3xl space-y-5">
         <div className="flex justify-end">
           <CustomerLanguagePicker />

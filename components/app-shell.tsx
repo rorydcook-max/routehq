@@ -26,6 +26,7 @@ import { useEffect, useState, Fragment } from "react";
 import { getShellContext, signOut, switchActiveOrganization, type ShellContext } from "@/app/actions/auth";
 import { AskBox } from "@/components/ask-box";
 import { RouteHqLogo } from "@/components/brand-logo";
+import { BrandStyle } from "@/components/brand-style";
 import { FastActionSheet } from "@/components/fast-action-sheet";
 import { PendingButton } from "@/components/pending-button";
 import { TrialBanner } from "@/components/trial-banner";
@@ -82,18 +83,40 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
 
   // Teammates cannot use business settings, so the link is hidden for them.
   // Display only: the middleware and server actions enforce the rule.
-  const [shell, setShell] = useState<ShellContext>({ role: null, organizations: [], unreadChats: 0, dueTasks: 0 });
+  const [shell, setShell] = useState<ShellContext>({ role: null, organizations: [], unreadChats: 0, dueTasks: 0, brand: null });
   useEffect(() => {
     let cancelled = false;
+    // The brand from last time, so their logo shows at once instead of RouteHQ's for a moment.
+    try {
+      const remembered = window.sessionStorage.getItem("routehq_shell_brand");
+      if (remembered) setShell((current) => ({ ...current, brand: JSON.parse(remembered) }));
+    } catch {
+      // Storage can be unavailable; the fresh context arrives below anyway.
+    }
     getShellContext()
       .then((context) => {
-        if (!cancelled) setShell(context);
+        if (cancelled) return;
+        setShell(context);
+        try {
+          if (context.brand) window.sessionStorage.setItem("routehq_shell_brand", JSON.stringify(context.brand));
+          else window.sessionStorage.removeItem("routehq_shell_brand");
+        } catch {
+          // Nothing to do: the logo just loads a moment later next time.
+        }
       })
       .catch(() => undefined);
     return () => {
       cancelled = true;
     };
   }, []);
+  const brand = shell.brand;
+  const brandLogo = brand?.logoUrl ? (
+    <span className="flex flex-col">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img alt={brand.name} className="max-h-12 max-w-[190px] object-contain object-left" src={brand.logoUrl} />
+      {brand.poweredBy ? <span className="mt-0.5 text-[10px] font-semibold text-[var(--sidebar-text-muted)]">Powered by RouteHQ</span> : null}
+    </span>
+  ) : null;
   const isTeammate = shell.role === "teammate";
   const hasSeveralBusinesses = shell.organizations.length > 1;
   const activeBusiness = shell.organizations.find((organization) => organization.active);
@@ -110,9 +133,10 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
 
   return (
     <div className="min-h-screen pb-24 lg:pb-0">
+      <BrandStyle colour={brand?.colour} />
       <aside className="fixed left-0 top-0 z-20 hidden h-screen w-[220px] flex-col border-r border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] px-3 py-4 lg:flex">
         <div className="mb-4 flex items-center px-2 pt-1">
-          <RouteHqLogo />
+          {brandLogo || <RouteHqLogo />}
         </div>
         {!isTeammate ? <AskBox variant="sidebar" /> : null}
         {/* Quick add sits in the side menu on computers: floating over the page it covered the buttons at the end of each row. */}
@@ -194,8 +218,13 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
           // Phones: logo and (for people in several businesses) the switcher.
           // Account and sign-out live under More, away from thumbs.
           <div className="mb-3 flex items-center justify-between gap-2 lg:hidden">
-            <Link aria-label="RouteHQ dashboard" href="/">
-              <RouteHqLogo className="h-7 w-auto" showDescriptor={false} />
+            <Link aria-label={brand?.name || "RouteHQ dashboard"} href="/">
+              {brand?.logoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img alt={brand.name} className="h-8 max-w-[140px] object-contain object-left" src={brand.logoUrl} />
+              ) : (
+                <RouteHqLogo className="h-7 w-auto" showDescriptor={false} />
+              )}
             </Link>
             <span className="ml-auto">{!isTeammate ? <AskBox variant="icon" /> : null}</span>
             {hasSeveralBusinesses ? (

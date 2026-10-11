@@ -5,6 +5,7 @@ import { loadPublicAmendment } from "@/lib/public-amendment";
 import { AmendmentSignForm } from "./amendment-sign-form";
 import { getLocale, getTranslations } from "next-intl/server";
 import { CustomerLanguagePicker } from "@/components/customer-language-picker";
+import { BrandStyle } from "@/components/brand-style";
 
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
@@ -96,6 +97,7 @@ export default async function AmendmentPage({ params }: { params: Promise<{ toke
 
   return (
     <main className="min-h-screen bg-[var(--panel-secondary)] px-4 py-5 text-[var(--foreground)]">
+      <BrandStyle colour={amendment.brandColour} />
       <div className="mx-auto max-w-2xl space-y-4">
         <div className="flex justify-end">
           <CustomerLanguagePicker />

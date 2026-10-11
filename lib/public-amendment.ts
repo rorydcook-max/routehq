@@ -18,6 +18,7 @@ export type PublicAmendment =
       signerName: string | null;
       pdfUrl: string | null;
       contactPhone: string | null;
+  brandColour: string | null;
     };
 
 /** An amendment as its link shows it to the customer. Server only. */
@@ -65,6 +66,7 @@ export async function loadPublicAmendment(token: string): Promise<PublicAmendmen
     signedAt: amendment.signed_at || null,
     signerName: amendment.signer_name || null,
     pdfUrl,
-    contactPhone: String(organization?.business_phone || settings.phone || settings.business_phone || "") || null
+    contactPhone: String(organization?.business_phone || settings.phone || settings.business_phone || "") || null,
+    brandColour: (organization?.contract_accent_colour as string | null) || null
   };
 }

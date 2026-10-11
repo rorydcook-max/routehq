@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { planById } from "@/lib/plans";
 import { isEmailConfigured } from "@/lib/email";
 import type { Route } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -312,6 +313,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           logoDisplayUrl={logoDisplayUrl}
           organization={organization}
           signatureDisplayUrl={signatureDisplayUrl}
+          whiteLabel={String(organization.subscription_status || "trial") === "trial" || planById(organization.subscription_tier).whiteLabel}
         />
         <p className="mt-3 px-1 font-medium text-[var(--foreground-secondary)]">
           {t.rich("currencyLine", {

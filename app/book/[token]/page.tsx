@@ -11,6 +11,7 @@ import { CancelBooking } from "./cancel-booking";
 import { BookingCompletionForm } from "./booking-completion-form";
 import { getPublicBookingDetail } from "@/lib/public-booking";
 import { BusinessLogoImage } from "@/components/business-logo-image";
+import { BrandStyle } from "@/components/brand-style";
 import { isMapsUrl, formatDeliveryLocation } from "@/lib/delivery-location";
 import { toWallTime } from "@/lib/business-time";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -388,6 +389,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
 
   return (
     <main className="min-h-screen bg-[var(--panel-secondary)] px-4 py-5 text-[var(--foreground)]">
+      <BrandStyle colour={organization?.contract_accent_colour} />
       <div className="mx-auto max-w-3xl space-y-5">
         {pendingAmendmentToken ? (
           <a

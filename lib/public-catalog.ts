@@ -140,6 +140,7 @@ export async function getPublicCatalog(slug: string) {
     organizationId: String(organization.id),
     name: String(organization.name || "Vehicle rental"),
     logoUrl: (branding as any)?.logoUrl || null,
+    brandColour: (organization.contract_accent_colour as string | null) || null,
     location: String(orgSettings.main_location?.label || orgSettings.location || ""),
     phone: String(orgSettings.business_phone || orgSettings.phone || ""),
     currency: String(organization.currency || "THB"),

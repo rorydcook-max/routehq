@@ -4,6 +4,22 @@ import { getLocale } from "next-intl/server";
 import { textDirection } from "@/lib/i18n/locales";
 import { ImageShrinker } from "@/components/image-shrinker";
 import { FlagFont } from "@/components/flag-font";
+import { BrandStyle } from "@/components/brand-style";
+import { getCurrentMembership } from "@/lib/auth/roles";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { shellBrand } from "@/lib/shell-brand";
+
+/** The signed-in operator's brand colour, so pages open in it rather than switching after load. */
+async function operatorBrandColour() {
+  try {
+    const membership = await getCurrentMembership();
+    if (!membership) return null;
+    const brand = await shellBrand((await createSupabaseServerClient()) as any, membership.organizationId);
+    return brand?.colour || null;
+  } catch {
+    return null;
+  }
+}
 // Bundled with the app (was "@latest" from a CDN): icons can't change or
 // break underneath us, and they load with the page.
 import "@tabler/icons-webfont/dist/tabler-icons.min.css";
@@ -35,10 +51,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const locale = await getLocale();
+  const [locale, brandColour] = await Promise.all([getLocale(), operatorBrandColour()]);
   return (
     <html dir={textDirection(locale)} lang={locale}>
       <body>
+        <BrandStyle colour={brandColour} />
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
         <ImageShrinker />
         <FlagFont />

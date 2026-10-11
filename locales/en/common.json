@@ -3315,9 +3315,9 @@
     "b_signer": "Who signs for the business",
     "b_signerTitle": "Their job title",
     "b_language": "Language of agreements",
-    "b_colour": "Colour on agreements",
+    "b_colour": "Brand colour",
     "b_footer": "Line at the bottom of agreements",
-    "b_powered": "Show \"Powered by RouteHQ\" at the bottom",
+    "b_powered": "Show 'Powered by RouteHQ' on customer pages and under your logo",
     "b_sigRecorded": "Signature approved for use on {date}.",
     "b_prevSummary": "A sample with your name, logo and signature",
     "b_prevTitle": "See how your agreement looks",
@@ -3627,7 +3627,12 @@
     "pl_setup": "On the yearly plan: we import your data and set you up",
     "pl_support": "Priority support",
     "pl_tooSmall": "Too small for your {count} vehicles",
-    "pl_founding": "Founding offer: the first 100 businesses keep half price for as long as they stay."
+    "pl_founding": "Founding offer: the first 100 businesses keep half price for as long as they stay.",
+    "b_colourHint": "One colour; RouteHQ works out the shades so buttons and text stay readable.",
+    "b_brandTitle": "Your brand",
+    "b_brandBody": "Your logo and colour go on everything customers see: booking links, the signing page, their booking page, receipts, agreements and your online booking page. From the Growth plan, your logo also replaces RouteHQ's inside the app.",
+    "b_brandBodyApp": "Your logo and colour go on everything customers see, and your logo replaces RouteHQ's inside the app for you and your team.",
+    "b_poweredPlan": "Can be switched off from the Growth plan."
   },
   "accountPage": {
     "roleOwner": "Owner",

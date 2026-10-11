@@ -8,6 +8,7 @@ import { BusinessLogoImage } from "@/components/business-logo-image";
 import { PendingButton } from "@/components/pending-button";
 import { Card, Fold, SectionHeader } from "@/components/ui";
 import { customerLocaleOptions } from "@/lib/i18n/locales";
+import { brandPalette } from "@/lib/brand";
 
 const inputClass =
   "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]";
@@ -39,11 +40,14 @@ export type ContractsBrandingOrganization = {
 export function ContractsBrandingSection({
   logoDisplayUrl,
   organization,
-  signatureDisplayUrl
+  signatureDisplayUrl,
+  whiteLabel = false
 }: {
   logoDisplayUrl: string | null;
   organization: ContractsBrandingOrganization;
   signatureDisplayUrl: string | null;
+  /** Their plan lets their logo replace RouteHQ's inside the app (everything is on during the trial). */
+  whiteLabel?: boolean;
 }) {
   const say = useTranslations("settingsPage") as unknown as (key: string, values?: Record<string, string>) => string;
   const locale = useLocale();
@@ -116,20 +120,40 @@ export function ContractsBrandingSection({
                 ))}
               </select>
             </label>
-            <label className="block">
-              <span className={labelClass}>{say("b_colour")}</span>
-              <input className={`${inputClass} h-10`} defaultValue={accentColour} name="contract_accent_colour" type="color" />
-            </label>
             <label className="block sm:col-span-2">
               <span className={labelClass}>{say("b_footer")}</span>
               <input className={inputClass} defaultValue={organization.contract_footer_text || ""} name="contract_footer_text" />
             </label>
-            <label className="checkbox-label sub-surface min-h-10 font-semibold text-[var(--foreground)] sm:col-span-2" style={{ display: "flex", alignItems: "center", padding: "8px 12px" }}>
-              <input defaultChecked={poweredByRouteHq} name="powered_by_routehq_enabled" type="checkbox" value="true" />
-              <span>{say("b_powered")}</span>
-            </label>
           </div>
         </Fold>
+
+        {/* Their brand: one colour and their logo, on every page a customer sees and, on a white-label plan, in the app itself. */}
+        <div className="rounded-xl border border-[var(--border)] p-3">
+          <p className="font-bold text-[var(--foreground)]">{say("b_brandTitle")}</p>
+          <p className="mt-1 text-sm text-[var(--muted)]">{whiteLabel ? say("b_brandBodyApp") : say("b_brandBody")}</p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <label className="block">
+              <span className={labelClass}>{say("b_colour")}</span>
+              <span className="mt-1 flex items-center gap-2">
+                <input className="h-10 w-14 cursor-pointer rounded-lg border border-[var(--border)] bg-white p-1" defaultValue={accentColour} name="contract_accent_colour" type="color" />
+                <span className="flex gap-1" aria-hidden="true">
+                  {(() => {
+                    const palette = brandPalette(accentColour);
+                    return [palette.primary, palette.hover, palette.light].map((swatch) => <span className="h-7 w-7 rounded-md border border-[var(--border)]" key={swatch} style={{ background: swatch }} />);
+                  })()}
+                </span>
+              </span>
+              <span className="mt-1 block text-xs text-[var(--muted)]">{say("b_colourHint")}</span>
+            </label>
+            <label className={`checkbox-label sub-surface min-h-10 font-semibold text-[var(--foreground)] ${whiteLabel ? "" : "opacity-60"}`} style={{ display: "flex", alignItems: "center", padding: "8px 12px" }}>
+              <input defaultChecked={poweredByRouteHq || !whiteLabel} disabled={!whiteLabel} name="powered_by_routehq_enabled" type="checkbox" value="true" />
+              <span>
+                {say("b_powered")}
+                {!whiteLabel ? <span className="block text-xs font-medium text-[var(--muted)]">{say("b_poweredPlan")}</span> : null}
+              </span>
+            </label>
+          </div>
+        </div>
 
         <PendingButton className="primary-action w-full sm:w-auto" pendingLabel={say("saving")} savedLabel={say("saved")} type="submit">
           {say("save")}

@@ -98,7 +98,9 @@ export function parseDateValue(value: unknown) {
     }
   }
 
-  const cleaned = raw.replace(/(\d+)(st|nd|rd|th)/gi, "$1").replace(/\./g, "/");
+  // A time after the date ("08/10/2026 09:00", "2026-10-13T10:00", "9:00 AM") isn't part of the day.
+  const dateOnly = raw.replace(/[T\s,]+\d{1,2}[:.]\d{2}(?::\d{2})?(?:\.\d+)?\s*(?:am|pm)?\s*(?:Z|[+-]\d{2}:?\d{2})?$/i, "").trim();
+  const cleaned = dateOnly.replace(/(\d+)(st|nd|rd|th)/gi, "$1").replace(/\./g, "/");
   const isoMatch = cleaned.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
   // Thai documents often use the Buddhist calendar (2569 = 2026).
   const gregorianYear = (year: string) => String(Number(year) > 2400 ? Number(year) - 543 : Number(year));
@@ -117,7 +119,8 @@ export function parseDateValue(value: unknown) {
   const dayFirstMatch = cleaned.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})$/);
   if (dayFirstMatch) {
     const year = dayFirstMatch[3].length === 2 ? fourDigitYear(dayFirstMatch[3]) : gregorianYear(dayFirstMatch[3]);
-    return real(year, dayFirstMatch[2], dayFirstMatch[1]);
+    // Day first, as Thailand and Europe write it; a date that only works month first (10/22/2026) is American.
+    return real(year, dayFirstMatch[2], dayFirstMatch[1]) || real(year, dayFirstMatch[1], dayFirstMatch[2]);
   }
 
   // Text dates like "Jul 22 2023". Read the calendar date as written: going

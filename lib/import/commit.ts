@@ -36,7 +36,6 @@ function num(value: unknown) {
 }
 
 async function addTask(context: CommitContext, vehicleId: string | null, rentalId: string | null, title: string) {
-  if (!vehicleId) return false;
   const { error } = await context.supabase.from("tasks").insert({
     organization_id: context.organizationId,
     vehicle_id: vehicleId,
@@ -48,6 +47,10 @@ async function addTask(context: CommitContext, vehicleId: string | null, rentalI
     created_by: context.userId
   });
   return !error;
+}
+
+function shortDay(day: string) {
+  return new Date(`${day}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
 }
 
 /** What to tell the owner to check, in plain words. */
@@ -311,7 +314,7 @@ export async function commitPreview(context: CommitContext, preview: ImportPrevi
     if (!id) continue;
     vehicleIdByKey.set(vehicle.key, id);
     const look = vehicle.problems.filter((problem) => NEEDS_LOOK.includes(problem));
-    if (look.length && !vehicle.existingId && (await addTask(context, id, null, lookTitle(look, `${vehicle.make} ${vehicle.model} ${vehicle.plate}`.trim())))) result.counts.tasks += 1;
+    if (id && look.length && !vehicle.existingId && (await addTask(context, id, null, lookTitle(look, `${vehicle.make} ${vehicle.model} ${vehicle.plate}`.trim())))) result.counts.tasks += 1;
   }
 
   // 2. Customers listed on their own.
@@ -325,7 +328,18 @@ export async function commitPreview(context: CommitContext, preview: ImportPrevi
     if (!rental.include) continue;
     const vehicleId = (rental.vehicleKey && vehicleIdByKey.get(rental.vehicleKey)) || rental.existingVehicleId;
     if (!vehicleId) {
-      result.failed.push(`${rental.customerName || `row ${rental.row}`}: no vehicle ${rental.plate ? `with plate ${rental.plate}` : "plate"}`);
+      // Nobody said which vehicle: the customer comes in, and the booking waits in To do with everything the file said.
+      const waiting = rental.customerName
+        ? await findOrCreateCustomer(context, { fullName: rental.customerName, phone: rental.phone, email: rental.email }, result, customerCache)
+        : null;
+      const when = [rental.startDate, rental.endDate].filter(Boolean).map((day) => shortDay(day as string)).join(" – ");
+      const vehicle = rental.vehicleName || rental.plate;
+      const price = rental.rate ? `฿${rental.rate.toLocaleString("en-US")} / ${rental.ratePeriod || "month"}` : "";
+      const details = [when, vehicle, price].filter(Boolean).join(", ");
+      const title = `Booking for ${rental.customerName || `row ${rental.row}`}${details ? ` (${details})` : ""}: choose the vehicle and add the booking`;
+      if (await addTask(context, null, null, title)) result.counts.tasks += 1;
+      else result.failed.push(`${rental.customerName || `row ${rental.row}`}: no vehicle`);
+      void waiting;
       continue;
     }
     const customerId = await findOrCreateCustomer(context, { fullName: rental.customerName || `Customer (row ${rental.row})`, phone: rental.phone, email: rental.email }, result, customerCache);

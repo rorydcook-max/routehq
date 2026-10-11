@@ -29,7 +29,8 @@ export type Problem =
   | "already_a_customer"
   | "paid_until_unknown"
   | "already_booked"
-  | "vehicle_busy";
+  | "vehicle_busy"
+  | "cancelled_in_file";
 
 type Base = { key: string; sheet: string; row: number; include: boolean; problems: Problem[] };
 
@@ -110,13 +111,63 @@ function mappedRow(row: Record<string, string>, mappings: Mapping[]) {
     if (!mapping.routehq_field || mapping.routehq_field === "__ignore__") continue;
     output[mapping.routehq_field] = row[mapping.source_column] || "";
   }
+  // First and last name in their own columns (most booking systems export them that way).
+  const joined = [output.first_name, output.last_name].map(cleanString).filter(Boolean).join(" ");
+  if (joined) {
+    if (!cleanString(output.customer_name)) output.customer_name = joined;
+    if (!cleanString(output.full_name)) output.full_name = joined;
+  }
+  // A country code in its own column: "49" + "1701234567" is +491701234567.
+  const code = cleanString(output.phone_country_code).replace(/\D/g, "");
+  if (code && cleanString(output.phone) && !cleanString(output.phone).startsWith("+")) output.phone = `+${code}${cleanString(output.phone).replace(/\D/g, "").replace(/^0/, "")}`;
+  // Where the rent column says what it's per ("DailyRate", "Monthly price").
+  const rateColumn = mappings.find((mapping) => mapping.routehq_field === "rental_rate")?.source_column || "";
+  const hasTotal = mappings.some((mapping) => mapping.routehq_field === "rental_total");
+  if (rateColumn && !hasTotal && /total|incl|gesamt|subtotal|amount due|order price|ยอดรวม|รวม/i.test(rateColumn) && !/day|daily|week|month|วัน|สัปดาห์|เดือน/i.test(rateColumn)) {
+    output.rental_total = output.rental_rate;
+    output.rental_rate = "";
+    return output;
+  }
+  if (rateColumn && !hasTotal && /^\W*(price|amount|cost|charges?|fee|ราคา)\b/i.test(rateColumn) && !/rent|rate|per\b|day|daily|week|month|วัน|สัปดาห์|เดือน/i.test(rateColumn)) {
+    output.price_unclear = "1";
+  }
+  if (rateColumn && !cleanString(output.rate_period)) {
+    const hint = ratePeriodFrom(rateColumn);
+    if (hint !== "month" || /month|เดือน/i.test(rateColumn)) output.rate_period = hint;
+  }
   return output;
 }
 
+const THAI_PLATE = /\d?\s?[ก-ฮ]{1,3}[\s-]?\d{1,4}(?:\s+[ก-๙]{4,}(?:\s?[ก-๙]+)?)?/;
+
+/**
+ * Booking systems put the vehicle in one text: "1 x Honda Click 125i (2กท 1188)", "Honda PCX 160 (1กข 2345)".
+ * The plate is taken out; what's left is the vehicle's name.
+ */
+export function splitPlateFromName(value: unknown): { plate: string; name: string } {
+  const text = cleanString(value).replace(/^\d+\s*[x×]\s+/i, "");
+  if (!text) return { plate: "", name: "" };
+  const inBrackets = text.match(/[(\[]\s*([^)\]]{3,30})\s*[)\]]/);
+  if (inBrackets && /\d/.test(inBrackets[1]) && (THAI_PLATE.test(inBrackets[1]) || /^[A-Z0-9 -]{3,12}$/i.test(inBrackets[1]))) {
+    return { plate: cleanPlate(inBrackets[1]), name: cleanString(text.replace(inBrackets[0], "")) };
+  }
+  const thai = text.match(THAI_PLATE);
+  if (thai && cleanString(text.replace(thai[0], "")).length >= 3) return { plate: cleanPlate(thai[0]), name: cleanString(text.replace(thai[0], "").replace(/[-–|,]+$/, "")) };
+  return { plate: cleanPlate(text), name: "" };
+}
+
+function daysBetween(start: string, end: string) {
+  return Math.max(1, Math.round((new Date(`${end}T00:00:00Z`).getTime() - new Date(`${start}T00:00:00Z`).getTime()) / 86_400_000));
+}
+
+const CANCELLED = /cancel|annul|storn|no.?show|void|ยกเลิก|ไม่มา/i;
+
 export function sheetDataType(value: string, mappings: Mapping[]) {
   const cleaned = cleanString(value).toLowerCase();
-  if ((DATA_TYPES as readonly string[]).includes(cleaned)) return cleaned as (typeof DATA_TYPES)[number];
   const fields = new Set(mappings.map((mapping) => mapping.routehq_field));
+  const isBookings = fields.has("start_date") && ["customer_name", "first_name", "last_name", "full_name"].some((field) => fields.has(field));
+  if (isBookings && (cleaned === "vehicles" || cleaned === "customers")) return "rentals";
+  if ((DATA_TYPES as readonly string[]).includes(cleaned)) return cleaned as (typeof DATA_TYPES)[number];
   if (fields.has("amount") && fields.has("type")) return "transactions";
   if (fields.has("vehicle_registration") && fields.has("start_date")) return "rentals";
   if (fields.has("full_name") || fields.has("passport_number") || fields.has("driving_licence_number")) return "customers";
@@ -138,7 +189,7 @@ function dateOrProblem(value: string, problems: Problem[]) {
 /** Thai phone numbers as the app stores them: digits, leading 0 kept, "+66" turned into 0. */
 /** "per day", "/วัน", "250/d" → day; "week", "สัปดาห์" → week; everything else is monthly, as before. */
 export function ratePeriodFrom(...texts: unknown[]): "day" | "week" | "month" {
-  const text = texts.map((value) => cleanString(value).toLowerCase()).join(" ");
+  const text = texts.map((value) => cleanString(value).replace(/([a-z])([A-Z])/g, "$1 $2").replace(/[_.]+/g, " ").toLowerCase()).join(" ");
   if (/\b(day|daily|days|d)\b|\/d\b|วัน|รายวัน/.test(text)) return "day";
   if (/\b(week|weekly|wk)\b|สัปดาห์|อาทิตย์|รายสัปดาห์/.test(text)) return "week";
   return "month";
@@ -158,7 +209,8 @@ const MAKE_OF_MODEL: [RegExp, string][] = [
   [/^(vespa|primavera|sprint)\b/i, "Vespa"]
 ];
 export function guessMakeModel(name: string): { make: string; model: string } {
-  const text = cleanString(name);
+  // "Economy - Toyota Yaris", "Compact SUV - Toyota Yaris Cross": the class before the dash isn't the make.
+  const text = cleanString(name).split(/\s[-–]\s/).pop()!.trim();
   if (!text) return { make: "", model: "" };
   const known = MAKE_OF_MODEL.find(([pattern]) => pattern.test(text));
   if (known) return { make: known[1], model: text };
@@ -185,20 +237,46 @@ function rentalFrom(fields: Record<string, string>, base: Omit<Base, "problems">
   if (!startDate) problems.push("no_start");
   const endDate = dateOrProblem(fields.end_date, problems);
   const nextDue = dateOrProblem(fields.next_payment_date, problems);
-  const rate = parseNumberValue(fields.rental_rate || fields.monthly_rate);
+  let rate = parseNumberValue(fields.rental_rate || fields.monthly_rate);
+  let ratePeriod = ratePeriodFrom(fields.rate_period, fields.rental_rate, fields.notes);
+  // Only a total for the whole booking: a month or more is priced per month, anything shorter per day.
+  let total = parseNumberValue(fields.rental_total);
+  if (fields.price_unclear && rate && startDate && endDate && daysBetween(startDate, endDate) < 28 && !cleanString(fields.rate_period)) {
+    total = rate;
+    rate = null;
+  }
+  if (!rate && total && startDate && endDate) {
+    const days = daysBetween(startDate, endDate);
+    if (days >= 28) {
+      ratePeriod = "month";
+      rate = Math.round(total / (days / 30));
+    } else {
+      ratePeriod = "day";
+      rate = Math.round(total / days);
+    }
+  }
   if (!rate) problems.push("no_rate");
   const status: PreviewRental["status"] = endDate && endDate < today ? "completed" : startDate && startDate > today ? "booked" : "active";
-  // Paid up to: the day before the next payment is due, when the sheet says so; otherwise the owner tells us.
+  // Paid up to: the day before the next payment is due, when the sheet says so; paid in full, the end date;
+  // otherwise the owner tells us.
   let paidUntil: string | null = null;
+  const paid = parseNumberValue(fields.amount_paid);
+  const owedForStay = total ?? (rate && startDate && endDate ? (ratePeriod === "day" ? rate * daysBetween(startDate, endDate) : ratePeriod === "week" ? (rate * daysBetween(startDate, endDate)) / 7 : null) : null);
   if (nextDue) {
     const day = new Date(`${nextDue}T00:00:00Z`);
     day.setUTCDate(day.getUTCDate() - 1);
     paidUntil = day.toISOString().slice(0, 10);
+  } else if (paid !== null && endDate && owedForStay !== null && paid >= owedForStay - 1) {
+    paidUntil = endDate;
   } else if (status === "active") {
     problems.push("paid_until_unknown");
   }
+  // A booking the other system shows as cancelled: listed, but left out unless ticked.
+  const cancelled = CANCELLED.test(cleanString(fields.booking_status));
+  if (cancelled) problems.push("cancelled_in_file");
   return {
     ...base,
+    include: cancelled ? false : base.include,
     problems: [...new Set(problems)],
     plate,
     existingVehicleId: null,
@@ -209,7 +287,7 @@ function rentalFrom(fields: Record<string, string>, base: Omit<Base, "problems">
     startDate,
     endDate,
     rate,
-    ratePeriod: ratePeriodFrom(fields.rate_period, fields.rental_rate, fields.notes),
+    ratePeriod,
     vehicleName: cleanString(fields.vehicle_name || [fields.make, fields.model].filter(Boolean).join(" ")),
     existingCustomer: false,
     deposit: parseNumberValue(fields.deposit_amount),
@@ -256,7 +334,10 @@ export function buildPreview(sheets: ParsedSheet[], mappings: SheetMapping[]): I
       }
 
       if (type === "rentals") {
-        const plate = cleanPlate(fields.vehicle_registration || fields.registration_number);
+        // "1 x Honda Click 125i (2กท 1188)": the plate, and the vehicle's name if no other column gives it.
+        const split = splitPlateFromName(fields.vehicle_registration || fields.registration_number);
+        if (split.name && !cleanString(fields.vehicle_name)) fields.vehicle_name = split.name;
+        const plate = split.plate;
         const rental = rentalFrom(fields, base, plate, today);
         if (!rental) return;
         if (!plate) rental.problems.push("no_plate");
@@ -266,7 +347,7 @@ export function buildPreview(sheets: ParsedSheet[], mappings: SheetMapping[]): I
 
       if (type === "transactions") {
         const problems: Problem[] = [];
-        const plate = cleanPlate(fields.vehicle_registration || fields.registration_number);
+        const plate = splitPlateFromName(fields.vehicle_registration || fields.registration_number).plate;
         if (!plate) problems.push("no_plate");
         const amount = parseNumberValue(fields.amount);
         if (amount === null) problems.push("no_amount");
@@ -303,7 +384,7 @@ export function buildPreview(sheets: ParsedSheet[], mappings: SheetMapping[]): I
       if (key && platesSeen.has(key)) problems.push("duplicate_in_file");
       else if (key) platesSeen.set(key, base.key);
 
-      const known = new Set(["registration_number", "vehicle_registration", "make", "model", "trim", "vehicle_name", "year", "color", "current_mileage", "daily_rate", "weekly_rate", "monthly_rate", "customer_name", "phone", "email", "start_date", "end_date", "rental_rate", "rate_period", "deposit_amount", "mileage_at_start", "next_payment_date", "full_name"]);
+      const known = new Set(["registration_number", "vehicle_registration", "make", "model", "trim", "vehicle_name", "year", "color", "current_mileage", "daily_rate", "weekly_rate", "monthly_rate", "customer_name", "phone", "email", "start_date", "end_date", "rental_rate", "rate_period", "deposit_amount", "mileage_at_start", "next_payment_date", "full_name", "price_unclear", "first_name", "last_name", "phone_country_code", "rental_total", "amount_paid", "booking_status"]);
       const extra = Object.fromEntries(Object.entries(fields).filter(([field, value]) => !known.has(field) && cleanString(value)));
 
       preview.vehicles.push({
@@ -383,7 +464,7 @@ export function attachExisting(preview: ImportPreview, vehicles: ExistingVehicle
         rental.include = false;
       }
     }
-    if (rental.existingVehicleId || rental.vehicleKey) continue;
+    if (rental.existingVehicleId || rental.vehicleKey || !rental.include) continue;
     if (!rental.plate) {
       mark(rental.problems, "unknown_vehicle");
       continue;
@@ -391,13 +472,23 @@ export function attachExisting(preview: ImportPreview, vehicles: ExistingVehicle
     const seenKey = findByPlate(addedByPlate, rental.plate);
     if (seenKey) {
       rental.vehicleKey = seenKey;
+      const card = preview.vehicles.find((vehicle) => vehicle.key === seenKey);
+      if (card && rental.rate) {
+        if (rental.ratePeriod === "day" && card.dailyRate === null) card.dailyRate = rental.rate;
+        if (rental.ratePeriod === "week" && card.weeklyRate === null) card.weeklyRate = rental.rate;
+        if (rental.ratePeriod === "month" && card.monthlyRate === null) card.monthlyRate = rental.rate;
+      }
+      if (card && rental.mileageAtStart !== null && (card.mileage === null || rental.mileageAtStart > card.mileage)) {
+        card.mileage = rental.mileageAtStart;
+        card.problems = card.problems.filter((problem) => problem !== "no_mileage");
+      }
       continue;
     }
     const { make, model } = guessMakeModel(rental.vehicleName);
-    const problems: Problem[] = ["no_mileage"];
+    const problems: Problem[] = rental.mileageAtStart === null ? ["no_mileage"] : [];
     if (!make || !model) problems.push("no_make_model");
     const key = `vehicles:${rental.sheet}:from-rental-${rental.row}`;
-    preview.vehicles.push({ key, sheet: rental.sheet, row: rental.row, include: true, problems, existingId: null, plate: rental.plate, make, model, trim: "", year: null, color: "", mileage: null, dailyRate: rental.ratePeriod === "day" ? rental.rate : null, weeklyRate: rental.ratePeriod === "week" ? rental.rate : null, monthlyRate: rental.ratePeriod === "month" ? rental.rate : null, extra: {} });
+    preview.vehicles.push({ key, sheet: rental.sheet, row: rental.row, include: true, problems, existingId: null, plate: rental.plate, make, model, trim: "", year: null, color: "", mileage: rental.mileageAtStart, dailyRate: rental.ratePeriod === "day" ? rental.rate : null, weeklyRate: rental.ratePeriod === "week" ? rental.rate : null, monthlyRate: rental.ratePeriod === "month" ? rental.rate : null, extra: {} });
     addedByPlate.set(plateKey(rental.plate), key);
     rental.vehicleKey = key;
   }
@@ -427,6 +518,6 @@ export function previewCounts(preview: ImportPreview) {
           .map((item) => item.phone || item.customerName.toLowerCase())
       ).size,
     transactions: preview.transactions.filter((item) => item.include).length,
-    needsLook: [...preview.vehicles, ...preview.rentals, ...preview.customers, ...preview.transactions].filter((item) => item.include && item.problems.some((problem) => !["already_in_fleet", "already_a_customer", "already_booked"].includes(problem))).length
+    needsLook: [...preview.vehicles, ...preview.rentals, ...preview.customers, ...preview.transactions].filter((item) => item.include && item.problems.some((problem) => !["already_in_fleet", "already_a_customer", "already_booked", "cancelled_in_file"].includes(problem))).length
   };
 }

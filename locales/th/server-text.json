@@ -241,5 +241,9 @@
   "Could not add the address. Please try again.": "เพิ่มที่อยู่ไม่สำเร็จ โปรดลองอีกครั้ง",
   "Add the email address to reply to.": "เพิ่มอีเมลที่ให้เราตอบกลับ",
   "Add your LINE ID.": "เพิ่ม LINE ID ของคุณ",
-  "Add your WhatsApp number.": "เพิ่มเบอร์ WhatsApp ของคุณ"
+  "Add your WhatsApp number.": "เพิ่มเบอร์ WhatsApp ของคุณ",
+  "Reading messages isn't switched on yet. Send them to us in Help and we'll bring them in.": "การอ่านข้อความยังไม่เปิดใช้งาน ส่งมาให้เราในหน้าช่วยเหลือ แล้วเราจะนำเข้าให้",
+  "We couldn't find vehicles, bookings, customers or payments in these messages. Paste the messages that list them, or send them to us in Help.": "ไม่พบรถ การจอง ลูกค้า หรือการชำระเงินในข้อความเหล่านี้ วางข้อความที่มีรายการเหล่านี้ หรือส่งมาให้เราในหน้าช่วยเหลือ",
+  "This chat is long, so only its most recent messages were read. Check each card, especially names, dates and amounts.": "แชตนี้ยาว จึงอ่านเฉพาะข้อความล่าสุด ตรวจแต่ละการ์ด โดยเฉพาะชื่อ วันที่ และจำนวนเงิน",
+  "Read from messages: check each card, especially names, dates and amounts.": "อ่านจากข้อความแล้ว ตรวจแต่ละการ์ด โดยเฉพาะชื่อ วันที่ และจำนวนเงิน"
 }

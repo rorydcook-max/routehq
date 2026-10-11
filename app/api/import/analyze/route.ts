@@ -8,6 +8,7 @@ import { existingRentals } from "@/lib/import/existing";
 import { getDefaultOrganization } from "@/lib/organization";
 import { MAX_IMPORT_PHOTOS, photoSheetKinds, readImportPhotos } from "@/lib/import/photos";
 import { visionProvider } from "@/lib/ai-vision";
+import { canReadChat, chatSheetKinds, isChatFile, readChatText } from "@/lib/import/chat-text";
 import { calendarToSheets, fetchCalendar, isCalendarFile, isCalendarUrl, parseIcs } from "@/lib/import/calendar";
 
 // Reading several photos takes a while.
@@ -32,7 +33,8 @@ async function previewAndBatch(sheets: ParsedSheet[], analysis: ReturnType<typeo
     .insert({ organization_id: organization.id, created_by: userId, source_name: sourceName.slice(0, 120), sheets, mappings: analysis.sheets, preview, counts: previewCounts(preview) })
     .select("id")
     .single();
-  return { batchId: batch?.id || null, preview, counts: previewCounts(preview) };
+  const fleet = ((vehicles || []) as any[]).map((vehicle) => ({ id: vehicle.id as string, label: `${vehicle.make || ""} ${vehicle.model || ""} ${vehicle.registration_number || ""}`.replace(/\s+/g, " ").trim() }));
+  return { batchId: batch?.id || null, preview, counts: previewCounts(preview), fleet };
 }
 
 type ColumnMapping = { source_column: string; routehq_field: string; confidence?: number; sample_values?: string[] };
@@ -122,6 +124,24 @@ export async function POST(request: Request) {
       warning: skipped.length ? await said(`Nothing to bring in was found on: ${skipped.join(", ")}.`) : await said("Read from photos: check each card, especially names, plates and amounts.")
     });
   }
+  // Messages from a LINE or WhatsApp chat, pasted in or as the chat's exported .txt file.
+  const chatText = String(formData.get("chatText") || "").trim();
+  const chatFile = file instanceof File && file.size > 0 && isChatFile(file.name, file.type);
+  if (chatText || chatFile) {
+    if (!canReadChat()) return NextResponse.json({ error: await said("Reading messages isn't switched on yet. Send them to us in Help and we'll bring them in.") }, { status: 400 });
+    const read = await readChatText(chatText || (await (file as File).text()));
+    if (!read.sheets.length) return NextResponse.json({ error: await said("We couldn't find vehicles, bookings, customers or payments in these messages. Paste the messages that list them, or send them to us in Help.") }, { status: 400 });
+    const kinds = chatSheetKinds();
+    const analysis = normaliseAnalysis({ sheets: read.sheets.map((sheet) => ({ sheet_name: sheet.sheetName, primary_data_type: kinds[sheet.sheetName], confidence: 0.9, column_mappings: sheet.headers.map((header) => ({ source_column: header, routehq_field: header, confidence: 0.9 })) })) }, read.sheets);
+    return NextResponse.json({
+      analysis,
+      ...(await previewAndBatch(read.sheets, analysis, chatFile ? (file as File).name : "Pasted messages", membership.userId)),
+      warning: read.trimmed
+        ? await said("This chat is long, so only its most recent messages were read. Check each card, especially names, dates and amounts.")
+        : await said("Read from messages: check each card, especially names, dates and amounts.")
+    });
+  }
+
   const sheetUrl = String(formData.get("sheetUrl") || "").trim();
   const importType = String(formData.get("importType") || "mixed");
 
@@ -194,6 +214,7 @@ Headers and values may be Thai: ทะเบียน = registration_number, ย
 Rules:
 - Map every column you reasonably can. Use each field at most once per sheet.
 - monthly_rate is the vehicle's advertised price. The rent the current renter actually pays is rental_rate.
+- Exports from other booking systems: separate first and last name columns are first_name and last_name; a booking's status (reserved, cancelled, returned…) is booking_status; the total price of the whole booking is rental_total (a daily rate column is rental_rate); money already paid is amount_paid (not deposit_amount); a phone country code column is phone_country_code; the vehicle's class, category or item name (e.g. "Economy - Toyota Yaris", "1 x Honda Click (2กท 1188)") is vehicle_name unless it is the only place the plate appears, then vehicle_registration.
 - "Asset valuation" or similar is estimated_value. "Outstanding balance" of a financed vehicle is finance_outstanding.
 - sheet_name must exactly match a provided sheet_name.
 

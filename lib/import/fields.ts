@@ -51,6 +51,9 @@ export const IMPORT_FIELDS: ImportField[] = [
   { key: "finance_end_date", label: "Finance end date", group: "Finance" },
 
   { key: "customer_name", label: "Renter name", group: "Current rental" },
+  { key: "first_name", label: "First name", group: "Current rental" },
+  { key: "last_name", label: "Last name", group: "Current rental" },
+  { key: "phone_country_code", label: "Phone country code", group: "Current rental" },
   { key: "phone", label: "Renter phone", group: "Current rental" },
   { key: "email", label: "Renter email", group: "Current rental" },
   { key: "start_date", label: "Rented from", group: "Current rental" },
@@ -60,6 +63,9 @@ export const IMPORT_FIELDS: ImportField[] = [
   { key: "deposit_amount", label: "Deposit", group: "Current rental" },
   { key: "mileage_at_start", label: "Mileage when rented", group: "Current rental" },
   { key: "next_payment_date", label: "Next payment due", group: "Current rental" },
+  { key: "rental_total", label: "Total price of the booking", group: "Current rental" },
+  { key: "amount_paid", label: "Amount already paid", group: "Current rental" },
+  { key: "booking_status", label: "Booking status (cancelled ones are left out)", group: "Current rental" },
 
   { key: "full_name", label: "Customer name", group: "Customer" },
   { key: "nationality", label: "Nationality", group: "Customer" },

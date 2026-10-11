@@ -1,10 +1,11 @@
 "use client";
 
-import { AlertTriangle, Camera, CheckCircle2, FileSpreadsheet, Loader2, RotateCcw, Undo2, X } from "lucide-react";
+import { AlertTriangle, Camera, CheckCircle2, FileSpreadsheet, Loader2, MessageSquareText, RotateCcw, Undo2, X } from "lucide-react";
 import { compressImage } from "@/lib/direct-upload-client";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { longDate } from "@/lib/i18n/dates";
 import { IMPORT_FIELD_GROUPS, IMPORT_FIELDS } from "@/lib/import/fields";
 import type { ImportPreview, PreviewCustomer, PreviewRental, PreviewTransaction, PreviewVehicle, Problem } from "@/lib/import/preview";
 import { previewCounts } from "@/lib/import/preview";
@@ -27,7 +28,7 @@ type Result = {
 export type RecentImport = { id: string; sourceName: string; createdAt: string; status: string; counts: Record<string, number> };
 
 const dataTypes = ["vehicles", "customers", "rentals", "transactions"];
-const SOFT: Problem[] = ["already_in_fleet", "already_a_customer", "already_booked"];
+const SOFT: Problem[] = ["already_in_fleet", "already_a_customer", "already_booked", "cancelled_in_file"];
 const SHOW = 40;
 
 function needsLook(problems: Problem[]) {
@@ -74,13 +75,19 @@ function More({ total, shown, onMore, t }: { total: number; shown: number; onMor
 
 export function ImportWizard({ recent = [] }: { defaultImportType?: string; recent?: RecentImport[] }) {
   const t = useTranslations("importer") as unknown as Say;
+  const locale = useLocale();
   const [file, setFile] = useState<File | null>(null);
   // Photos of registration books, notebook pages and lists (up to 8).
   const [photos, setPhotos] = useState<File[]>([]);
   const [sheetUrl, setSheetUrl] = useState("");
+  // Messages pasted from a LINE or WhatsApp chat.
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatText, setChatText] = useState("");
   const [status, setStatus] = useState<"idle" | "analyzing" | "review" | "remapping" | "importing" | "done" | "error">("idle");
   const [batchId, setBatchId] = useState<string | null>(null);
   const [preview, setPreview] = useState<ImportPreview | null>(null);
+  // The business's vehicles, for rentals whose vehicle the file doesn't name.
+  const [fleet, setFleet] = useState<{ id: string; label: string }[]>([]);
   const [mappings, setMappings] = useState<SheetMapping[]>([]);
   const [mappingOpen, setMappingOpen] = useState(false);
   const [tab, setTab] = useState<"vehicles" | "rentals" | "customers" | "transactions">("vehicles");
@@ -117,7 +124,7 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
   }
 
   async function analyzeFile() {
-    if (!file && !sheetUrl.trim() && !photos.length) {
+    if (!file && !sheetUrl.trim() && !photos.length && !chatText.trim()) {
       setError(t("needFile"));
       setStatus("error");
       return;
@@ -126,7 +133,9 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
     setNotice("");
     setStatus("analyzing");
     const formData = new FormData();
-    if (photos.length) {
+    if (chatText.trim()) {
+      formData.append("chatText", chatText.trim());
+    } else if (photos.length) {
       // Smaller photos upload faster and still read well.
       for (const photo of photos) formData.append("photo", await compressImage(photo, 1800, 0.82));
     } else {
@@ -142,6 +151,7 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
     }
     setMappings(payload.analysis?.sheets || []);
     setPreview(payload.preview || { vehicles: [], rentals: [], customers: [], transactions: [] });
+    setFleet(Array.isArray(payload.fleet) ? payload.fleet : []);
     setBatchId(payload.batchId || null);
     setNotice(payload.warning || "");
     const next = payload.preview as ImportPreview | undefined;
@@ -196,9 +206,11 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
     );
   }
 
-  const vehicleLabel = (plate: string, vehicleKey: string | null) => {
+  const vehicleLabel = (plate: string, vehicleKey: string | null, existingVehicleId?: string | null) => {
     const own = vehicleKey && preview?.vehicles.find((vehicle) => vehicle.key === vehicleKey);
-    return own ? `${own.make} ${own.model} ${own.plate}`.trim() : plate || t("noPlate");
+    if (own) return `${own.make} ${own.model} ${own.plate}`.trim();
+    const inFleet = existingVehicleId && fleet.find((vehicle) => vehicle.id === existingVehicleId);
+    return plate || (inFleet ? inFleet.label : t("noPlate"));
   };
 
   return (
@@ -223,12 +235,13 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
           <label className="block">
             <span className="secondary-action pressable w-full cursor-pointer">{file ? file.name : t("file")}</span>
             <input
-              accept=".csv,.xlsx,.xls,.ics,text/csv,text/calendar,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              accept=".csv,.xlsx,.xls,.ics,.txt,text/csv,text/calendar,text/plain,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
               className="sr-only"
               onChange={(event) => {
                 setFile(event.target.files?.[0] || null);
                 setSheetUrl("");
                 setPhotos([]);
+                setChatText("");
                 reset();
               }}
               type="file"
@@ -250,6 +263,7 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
                 setPhotos((current) => [...current, ...picked].slice(0, 8));
                 setFile(null);
                 setSheetUrl("");
+                setChatText("");
                 reset();
               }}
               type="file"
@@ -263,6 +277,7 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
                 setSheetUrl(event.target.value);
                 setFile(null);
                 setPhotos([]);
+                setChatText("");
                 reset();
               }}
               placeholder={t("orLink")}
@@ -283,8 +298,32 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
             ))}
           </ul>
         ) : null}
-        <p className="mt-3 text-sm text-[var(--muted)]">{photos.length ? t("photosWork") : t("whatWorks")}</p>
-        <button className="primary-action pressable mt-4 w-full sm:w-auto" disabled={status === "analyzing" || (!file && !sheetUrl.trim() && !photos.length)} onClick={analyzeFile} type="button">
+        {chatOpen ? (
+          <label className="mt-3 block text-sm font-semibold text-[var(--foreground)]">
+            {t("chatLabel")}
+            <textarea
+              className={`${inputClass} min-h-[9rem] font-normal`}
+              onChange={(event) => {
+                setChatText(event.target.value);
+                if (event.target.value) {
+                  setFile(null);
+                  setSheetUrl("");
+                  setPhotos([]);
+                }
+                reset();
+              }}
+              placeholder={t("chatPlaceholder")}
+              value={chatText}
+            />
+          </label>
+        ) : (
+          <button className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-[var(--primary)]" onClick={() => setChatOpen(true)} type="button">
+            <MessageSquareText size={16} />
+            {t("chatOpen")}
+          </button>
+        )}
+        <p className="mt-3 text-sm text-[var(--muted)]">{chatText.trim() ? t("chatWorks") : photos.length ? t("photosWork") : t("whatWorks")}</p>
+        <button className="primary-action pressable mt-4 w-full sm:w-auto" disabled={status === "analyzing" || (!file && !sheetUrl.trim() && !photos.length && !chatText.trim())} onClick={analyzeFile} type="button">
           {status === "analyzing" ? <Loader2 className="animate-spin" size={18} /> : null}
           {status === "analyzing" ? (photos.length ? t("readingPhotos", { count: photos.length }) : t("reading")) : t("read")}
         </button>
@@ -296,7 +335,7 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
         <section className="card p-4">
           <h2 className="text-xl font-semibold text-[var(--foreground)]">{t("foundTitle")}</h2>
           <p className="mt-1 text-[16px] font-medium text-[var(--foreground)]">
-            {t("foundLine", { vehicles: counts.vehicles, rentedNow: counts.rentedNow, customers: counts.customers, transactions: counts.transactions })}
+            {t("foundLine", { vehicles: counts.vehicles, rentals: counts.rentals, rentedNow: counts.rentedNow, customers: counts.customers, transactions: counts.transactions })}
             {counts.needsLook ? <span className="text-[var(--warning)]"> {t("foundLook", { count: counts.needsLook })}</span> : null}
           </p>
           <p className="mt-1 text-sm text-[var(--muted)]">{t("foundBody")}</p>
@@ -333,7 +372,14 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
             ) : null}
             {tab === "rentals" ? (
               preview.rentals.length ? (
-                preview.rentals.slice(0, shown).map((rental) => <RentalCard key={rental.key} onChange={(changes) => patch("rentals", rental.key, changes)} rental={rental} t={t} vehicleLabel={vehicleLabel(rental.plate, rental.vehicleKey)} />)
+                preview.rentals.slice(0, shown).map((rental) => <RentalCard
+                    choices={[...fleet.map((vehicle) => ({ value: `fleet:${vehicle.id}`, label: vehicle.label })), ...preview.vehicles.filter((vehicle) => vehicle.include && !vehicle.existingId).map((vehicle) => ({ value: `new:${vehicle.key}`, label: `${vehicle.make} ${vehicle.model} ${vehicle.plate}`.trim() }))]}
+                    key={rental.key}
+                    onChange={(changes) => patch("rentals", rental.key, changes)}
+                    rental={rental}
+                    t={t}
+                    vehicleLabel={vehicleLabel(rental.plate, rental.vehicleKey, rental.existingVehicleId)}
+                  />)
               ) : (
                 <p className="text-sm text-[var(--muted)]">{t("noneHere")}</p>
               )
@@ -512,7 +558,7 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
                   <div>
                     <p className="font-semibold text-[var(--foreground)]">{item.sourceName || t("aSpreadsheet")}</p>
                     <p className="text-sm text-[var(--muted)]">
-                      {new Date(item.createdAt).toLocaleDateString()} · {t("recentCounts", { vehicles: item.counts.vehicles || 0, rentals: item.counts.rentals || 0, customers: item.counts.customers || 0, transactions: item.counts.transactions || 0 })}
+                      {longDate(item.createdAt.slice(0, 10), locale)} · {t("recentCounts", { vehicles: item.counts.vehicles || 0, rentals: item.counts.rentals || 0, customers: item.counts.customers || 0, transactions: item.counts.transactions || 0 })}
                       {gone ? ` · ${t("undone")}` : ""}
                     </p>
                   </div>
@@ -583,7 +629,14 @@ function VehicleCard({ vehicle, onChange, t }: { vehicle: PreviewVehicle; onChan
   );
 }
 
-function RentalCard({ rental, vehicleLabel, onChange, t }: { rental: PreviewRental; vehicleLabel: string; onChange: (changes: Partial<PreviewRental>) => void; t: Say }) {
+function RentalCard({ rental, vehicleLabel, choices, onChange, t }: { rental: PreviewRental; vehicleLabel: string; choices: { value: string; label: string }[]; onChange: (changes: Partial<PreviewRental>) => void; t: Say }) {
+  // The file doesn't say which vehicle (another system's export often has only its own car number): the owner picks.
+  const needsVehicle = rental.problems.includes("unknown_vehicle") || rental.problems.includes("no_plate");
+  const [choosing] = useState(needsVehicle);
+  const wanted = (rental.vehicleName || "").toLowerCase().split(/\s+/).filter((word) => word.length > 1);
+  const score = (label: string) => wanted.filter((word) => label.toLowerCase().includes(word)).length;
+  const ordered = wanted.length ? [...choices].sort((a, b) => score(b.label) - score(a.label)) : choices;
+  const picked = rental.existingVehicleId ? `fleet:${rental.existingVehicleId}` : rental.vehicleKey ? `new:${rental.vehicleKey}` : "";
   const faded = !rental.include ? "opacity-50" : "";
   return (
     <div className={`rounded-xl border border-[var(--border)] bg-white p-3 ${faded}`}>
@@ -600,6 +653,28 @@ function RentalCard({ rental, vehicleLabel, onChange, t }: { rental: PreviewRent
         <Include checked={rental.include} onChange={(include) => onChange({ include })} t={t} />
       </div>
       <Flag problems={rental.problems} t={t} />
+      {choosing ? (
+        <label className="mt-2 block text-xs font-semibold text-[var(--warning)]">
+          {t("c_whichVehicle")}
+          <select
+            className={`${smallInput} border-[var(--warning)]`}
+            onChange={(event) => {
+              const value = event.target.value;
+              const cleared = rental.problems.filter((problem) => problem !== "unknown_vehicle" && problem !== "no_plate");
+              if (value.startsWith("fleet:")) onChange({ existingVehicleId: value.slice(6), vehicleKey: null, problems: cleared });
+              else if (value.startsWith("new:")) onChange({ vehicleKey: value.slice(4), existingVehicleId: null, problems: cleared });
+            }}
+            value={picked}
+          >
+            <option value="">{t("c_chooseVehicle")}</option>
+            {ordered.map((choice) => (
+              <option key={choice.value} value={choice.value}>
+                {choice.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      ) : null}
       <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
         <label className="block text-xs font-semibold text-[var(--muted)]">
           {t("c_customer")}
@@ -617,11 +692,11 @@ function RentalCard({ rental, vehicleLabel, onChange, t }: { rental: PreviewRent
           {t("c_end")}
           <input className={smallInput} onChange={(event) => onChange({ endDate: event.target.value || null })} type="date" value={rental.endDate || ""} />
         </label>
-        <label className="block text-xs font-semibold text-[var(--muted)]">
+        <label className="col-span-2 block text-xs font-semibold text-[var(--muted)]">
           {t("c_rent")}
           <span className="mt-1 flex gap-1">
-            <input className={`${smallInput} mt-0 min-w-0 flex-1`} inputMode="numeric" onChange={(event) => onChange({ rate: event.target.value ? Number(event.target.value) : null })} value={rental.rate ?? ""} />
-            <select aria-label={t("c_ratePer")} className={`${smallInput} mt-0 w-auto`} onChange={(event) => onChange({ ratePeriod: event.target.value as PreviewRental["ratePeriod"] })} value={rental.ratePeriod || "month"}>
+            <input className={`${smallInput} !mt-0 !w-auto min-w-0 flex-1`} inputMode="numeric" onChange={(event) => onChange({ rate: event.target.value ? Number(event.target.value) : null })} value={rental.rate ?? ""} />
+            <select aria-label={t("c_ratePer")} className={`${smallInput} !mt-0 !w-28 shrink-0`} onChange={(event) => onChange({ ratePeriod: event.target.value as PreviewRental["ratePeriod"] })} value={rental.ratePeriod || "month"}>
               <option value="day">{t("per_day")}</option>
               <option value="week">{t("per_week")}</option>
               <option value="month">{t("per_month")}</option>

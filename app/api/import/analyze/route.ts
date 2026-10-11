@@ -8,6 +8,7 @@ import { existingRentals } from "@/lib/import/existing";
 import { getDefaultOrganization } from "@/lib/organization";
 import { MAX_IMPORT_PHOTOS, photoSheetKinds, readImportPhotos } from "@/lib/import/photos";
 import { visionProvider } from "@/lib/ai-vision";
+import { calendarToSheets, fetchCalendar, isCalendarFile, isCalendarUrl, parseIcs } from "@/lib/import/calendar";
 
 // Reading several photos takes a while.
 export const maxDuration = 120;
@@ -123,6 +124,27 @@ export async function POST(request: Request) {
   }
   const sheetUrl = String(formData.get("sheetUrl") || "").trim();
   const importType = String(formData.get("importType") || "mixed");
+
+  // A calendar where each booking is an event: an .ics file or a calendar's iCal link.
+  const calendarFile = file instanceof File && file.size > 0 && isCalendarFile(file.name, file.type, (await file.slice(0, 40).text()).toUpperCase());
+  if (calendarFile || (sheetUrl && isCalendarUrl(sheetUrl))) {
+    let text: string;
+    try {
+      text = calendarFile ? await (file as File).text() : await fetchCalendar(sheetUrl);
+    } catch (error) {
+      return NextResponse.json({ error: error instanceof Error ? error.message : await said("The calendar could not be read.") }, { status: 400 });
+    }
+    const events = parseIcs(text);
+    if (!events.length) return NextResponse.json({ error: await said("No events were found in this calendar.") }, { status: 400 });
+    const read = await calendarToSheets(events);
+    if (!read.sheets.length) return NextResponse.json({ error: await said("None of the events in this calendar look like rentals from the last year or ahead.") }, { status: 400 });
+    const analysis = normaliseAnalysis({ sheets: read.sheets.map((sheet) => ({ sheet_name: sheet.sheetName, primary_data_type: "rentals", confidence: 0.85, column_mappings: sheet.headers.map((header) => ({ source_column: header, routehq_field: header, confidence: 0.85 })) })) }, read.sheets);
+    return NextResponse.json({
+      analysis,
+      ...(await previewAndBatch(read.sheets, analysis, calendarFile ? (file as File).name : "Calendar", membership.userId)),
+      warning: await said(`Read ${read.events} calendar events: ${read.rentals} bookings, ${read.skipped} left out (not rentals, or finished over a year ago). Check each card, especially vehicles and rent.`)
+    });
+  }
 
   if ((!(file instanceof File) || file.size === 0) && !sheetUrl) {
     return NextResponse.json({ error: await said("Upload a spreadsheet or paste a public Google Sheets link first.") }, { status: 400 });

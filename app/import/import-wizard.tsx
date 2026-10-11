@@ -223,7 +223,7 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
           <label className="block">
             <span className="secondary-action pressable w-full cursor-pointer">{file ? file.name : t("file")}</span>
             <input
-              accept=".csv,.xlsx,.xls,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              accept=".csv,.xlsx,.xls,.ics,text/csv,text/calendar,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
               className="sr-only"
               onChange={(event) => {
                 setFile(event.target.files?.[0] || null);

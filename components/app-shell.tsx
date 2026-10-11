@@ -7,6 +7,7 @@ import {
   Calculator,
   CircleUserRound,
   FileText,
+  Handshake,
   Home,
   Plus,
   ClipboardList,
@@ -43,7 +44,8 @@ type NavKey =
   | "tasks"
   | "transactions"
   | "documents"
-  | "rentalCalculator";
+  | "rentalCalculator"
+  | "partners";
 
 type NavItem = {
   key: NavKey;
@@ -59,7 +61,8 @@ const dailyItems: NavItem[] = [
   { key: "bookings", href: "/bookings", icon: ClipboardList },
   { key: "calendar", href: "/calendar", icon: CalendarDays },
   { key: "fleet", href: "/fleet", icon: Car },
-  { key: "customers", href: "/customers", icon: Users }
+  { key: "customers", href: "/customers", icon: Users },
+  { key: "partners", href: "/partners" as Route, icon: Handshake }
 ];
 
 // Looked at now and then: money, paperwork and set-up.

@@ -356,6 +356,13 @@ export default async function BookingDetailPage({ params, searchParams }: { para
 
 
   const { rental, bookingLink, payments, transactions, inspections, documents, activityEvents, customerPortalActions, communicationTimeline } = detail;
+  // A customer a partner sent: who, and the finder's fee owed to them.
+  const { data: referral } = await supabaseForVehicles
+    .from("referrals")
+    .select("id, fee_pct, fee_amount, fee_paid_at, from_org:organizations!referrals_from_organization_id_fkey(name, trading_name)")
+    .eq("rental_id", id)
+    .eq("to_organization_id", organization.id)
+    .maybeSingle();
   const vehicle = rental.vehicles;
   const customer = rental.customers;
   // Receipts customers sent stay with their payment; staff open them from the schedule.
@@ -557,6 +564,17 @@ export default async function BookingDetailPage({ params, searchParams }: { para
           </div>
         ) : null}
 
+        {referral ? (
+          <div className="rounded-lg border border-[var(--info-line)] bg-[var(--info-light)] px-3 py-2 text-sm font-semibold text-[var(--foreground)]">
+            {tx.say("referredBy", { partner: String(referral.from_org?.trading_name || referral.from_org?.name || "") })}{" "}
+            {referral.fee_amount
+              ? tx.say(referral.fee_paid_at ? "referralFeePaid" : "referralFeeOwed", { amount: money(Number(referral.fee_amount), rental.currency) })
+              : tx.say("referralFeeLater", { pct: Number(referral.fee_pct || 10) })}{" "}
+            <Link className="font-bold text-[var(--primary)]" href="/partners">
+              {tx.say("referralOpen")}
+            </Link>
+          </div>
+        ) : null}
         <div className="flex flex-wrap items-center gap-2 text-sm font-bold text-[var(--muted)]">
           <Link className="text-[var(--primary)]" href="/bookings">{tx.list("title")}</Link>
           <span>/</span>

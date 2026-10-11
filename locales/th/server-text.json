@@ -217,5 +217,12 @@
   "An import can only be taken back within 30 days.": "ยกเลิกการนำเข้าได้ภายใน 30 วันเท่านั้น",
   "This import has already been brought in.": "การนำเข้านี้ถูกนำเข้าไปแล้ว",
   "Nothing was brought in. Vehicles need at least a plate; check the cards and try again.": "ยังไม่มีอะไรถูกนำเข้า รถต้องมีทะเบียนอย่างน้อย ตรวจการ์ดแล้วลองอีกครั้ง",
-  "Automatic mapping is unavailable right now - check how each column was read.": "การจับคู่อัตโนมัติใช้ไม่ได้ตอนนี้ ตรวจดูว่าแต่ละคอลัมน์ถูกอ่านอย่างไร"
+  "Automatic mapping is unavailable right now - check how each column was read.": "การจับคู่อัตโนมัติใช้ไม่ได้ตอนนี้ ตรวจดูว่าแต่ละคอลัมน์ถูกอ่านอย่างไร",
+  "Switch to the business you want to work in and try again.": "สลับไปยังธุรกิจที่ต้องการแล้วลองอีกครั้ง",
+  "Only the business owner can change this.": "เจ้าของธุรกิจเท่านั้นที่เปลี่ยนได้",
+  "Choose a start date first.": "เลือกวันเริ่มก่อน",
+  "The end date is before the start date.": "วันสิ้นสุดอยู่ก่อนวันเริ่ม",
+  "Add the customer's name first.": "ใส่ชื่อลูกค้าก่อน",
+  "The referral could not be sent.": "ส่งการแนะนำไม่สำเร็จ",
+  "Could not mark the fee as paid.": "บันทึกว่าจ่ายค่าแนะนำแล้วไม่สำเร็จ"
 }

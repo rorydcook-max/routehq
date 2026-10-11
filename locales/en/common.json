@@ -119,7 +119,8 @@
     "more": "More",
     "close": "Close",
     "openFastActions": "Open fast actions",
-    "quickAdd": "Quick add"
+    "quickAdd": "Quick add",
+    "partners": "Partners"
   },
   "vehicles": {
     "addVehicle": "Add New Vehicle",
@@ -1311,7 +1312,9 @@
     "exportShort": "Spreadsheet",
     "match_extras": "{amount} · extras · {vehicle}",
     "extrasTag": "Extras",
-    "extrasPart": "incl. {amount} extras"
+    "extrasPart": "incl. {amount} extras",
+    "type_finders_fee": "Finder's fee paid",
+    "type_finders_fee_income": "Finder's fee received"
   },
   "booking": {
     "open": "Open",
@@ -2114,7 +2117,12 @@
     "pc_plusExtras": "+ extras {amount}",
     "pc_lessExtras": "less {amount} paid for extras",
     "pc_extrasMoved": "Extras: {names} (moved onto the rent)",
-    "pc_extrasRemoved": "Extras: {names} (taken off)"
+    "pc_extrasRemoved": "Extras: {names} (taken off)",
+    "referredBy": "Sent to you by {partner}.",
+    "referralFeeOwed": "Finder's fee {amount} to pay them.",
+    "referralFeePaid": "Finder's fee {amount} paid.",
+    "referralFeeLater": "Finder's fee {pct}% of the first rent, set when it is recorded.",
+    "referralOpen": "Partners"
   },
   "newBooking": {
     "pageBack": "Back to bookings",
@@ -2348,7 +2356,8 @@
     "sel_channels": "How to reach them",
     "onStartDay": "Start day, 9:00",
     "collectionPlaceholder": "Your shop",
-    "collectionHelper": "Where the customer picks it up. Leave blank to use your shop's address."
+    "collectionHelper": "Where the customer picks it up. Leave blank to use your shop's address.",
+    "clashPartners": "Nothing else free? See partners' vehicles for these dates →"
   },
   "fleet": {
     "title": "Fleet",
@@ -3632,7 +3641,18 @@
     "b_brandTitle": "Your brand",
     "b_brandBody": "Your logo and colour go on everything customers see: booking links, the signing page, their booking page, receipts, agreements and your online booking page. From the Growth plan, your logo also replaces RouteHQ's inside the app.",
     "b_brandBodyApp": "Your logo and colour go on everything customers see, and your logo replaces RouteHQ's inside the app for you and your team.",
-    "b_poweredPlan": "Can be switched off from the Growth plan."
+    "b_poweredPlan": "Can be switched off from the Growth plan.",
+    "pn_title": "Partner network",
+    "pn_on": "On: you can send customers to partners and take theirs",
+    "pn_off": "Off",
+    "pn_switch": "Join the partner network",
+    "pn_body": "When you have nothing free, send the customer to a partner's vehicle. When a partner sends you one, you rent as normal and owe them a one-time finder's fee of {pct}% of the first rent payment. Only businesses in the network see each other.",
+    "pn_reach": "Look for partners",
+    "pn_reachTown": "In my town",
+    "pn_reachRegion": "In my province",
+    "pn_reachCountry": "Anywhere in the country",
+    "pn_fee": "The fee is settled between you directly, by PromptPay or bank transfer, and marked paid on the Partners page. It is set from the first rent recorded, so a customer who never turns up costs nothing.",
+    "pn_open": "Open Partners"
   },
   "accountPage": {
     "roleOwner": "Owner",
@@ -4263,5 +4283,60 @@
     "nothingThisMonth": "Nothing in or out this month.",
     "extrasLeftOut": "{amount} paid for extras is not included: those are the business's own services.",
     "extrasLeftOutLine": "{amount} extras left out"
+  },
+  "partners": {
+    "title": "Partners",
+    "subtitle": "Nothing free? Send the customer to a partner. They rent as normal and pay you a one-time finder's fee of {pct}% of the first rent.",
+    "offTitle": "The partner network is off",
+    "offBody": "Switch it on to see partners' free vehicles and send customers to them, and to take customers partners send you. Finder's fee: {pct}% of the first rent, one time.",
+    "turnOn": "Turn it on in Settings",
+    "findTitle": "What does the customer want?",
+    "findBody": "Partners' vehicles that are free for these dates, with their prices.",
+    "from": "From",
+    "to": "To",
+    "toOptional": "leave blank for open-ended",
+    "kind": "Kind of vehicle",
+    "anyKind": "Any",
+    "search": "Find",
+    "freeTitle": "{count, plural, one {# vehicle free} other {# vehicles free}} from partners",
+    "noneTitle": "Nothing free from partners for those dates",
+    "noneBody": "Try other dates, or widen how far you look in Settings.",
+    "per_daily": "a day",
+    "per_weekly": "a week",
+    "per_monthly": "a month",
+    "forDays": "{total} for {days} days",
+    "deposit": "Deposit {amount}",
+    "choose": "Choose",
+    "chosen": "Chosen",
+    "sendTitle": "Send the customer to {partner} for the {vehicle}",
+    "sendBody": "We create the booking link in the partner's business and send it to the customer. From then on the customer is the partner's; you see only the fee.",
+    "customerName": "Customer's name",
+    "customerPhone": "Customer's phone",
+    "sendButton": "Create the link",
+    "sentTitle": "Sent to {partner}",
+    "sentBody": "Give the customer this link. The partner has been told.",
+    "copyLink": "Copy link",
+    "copied": "Copied",
+    "sendWhatsapp": "Send on WhatsApp",
+    "whatsappText": "Hello! We have no vehicle free for those dates, but our partner {partner} does. Here is your booking link: {url}",
+    "owedTitle": "{count, plural, one {# finder's fee to pay} other {# finder's fees to pay}}",
+    "toPartner": "to {partner}",
+    "fromPartner": "from {partner}",
+    "aCustomer": "a customer",
+    "by": "by {date}",
+    "markPaid": "Mark paid",
+    "sentListTitle": "Customers you sent to partners",
+    "receivedListTitle": "Customers partners sent you",
+    "sentEmpty": "None yet.",
+    "receivedEmpty": "None yet.",
+    "st_sent": "Link sent",
+    "st_booked": "Booked",
+    "st_rented": "Rented",
+    "st_cancelled": "Cancelled",
+    "fee": "Fee {amount} ({pct}% of first rent)",
+    "feePaid": "paid",
+    "feeUnpaid": "not paid yet",
+    "feePending": "Fee ({pct}% of first rent) set when the first rent is recorded",
+    "openBooking": "Open booking"
   }
 }

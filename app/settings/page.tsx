@@ -29,6 +29,9 @@ import { ExtrasPanel, SeasonsPanel } from "@/app/settings/price-rules-panel";
 import { extrasFrom, seasonsFrom } from "@/lib/price-rules";
 import { PublicBookingPanel } from "@/app/settings/public-booking-panel";
 import { UsualDepositPanel } from "@/app/settings/usual-deposit-panel";
+import { PartnerNetworkPanel } from "@/app/settings/partner-network-panel";
+import { partnerNetworkSettings } from "@/lib/partner-network";
+import { FINDERS_FEE_PCT } from "@/lib/plans";
 import { TeamMemberActions } from "@/app/settings/team-member-actions";
 import { createSupabaseAdminClient as teamAdminClient } from "@/lib/supabase/admin";
 import { BookingRulesPanel } from "@/app/settings/booking-rules-panel";
@@ -425,6 +428,9 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               slug={organization.slug}
               totalVehicles={publicVehicleCounts.total}
             />
+          </Fold>
+          <Fold id="partner-network" summary={partnerNetworkSettings(organization.settings).enabled ? say("pn_on") : say("pn_off")} title={say("pn_title")}>
+            <PartnerNetworkPanel initial={partnerNetworkSettings(organization.settings)} pct={FINDERS_FEE_PCT} />
           </Fold>
           <Fold id="holds" summary={say("hold_summary", { hours: bookingRules(organization.settings).holdHours })} title={say("hold_title")}>
             <BookingRulesPanel rules={bookingRules(organization.settings)} />

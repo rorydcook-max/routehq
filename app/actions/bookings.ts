@@ -11,6 +11,7 @@ import { revalidatePath } from "next/cache";
 import { markOnboardingStep } from "@/lib/onboarding";
 import { activateRental } from "@/lib/rental-activation";
 import { settleExistingRental } from "@/lib/existing-rental";
+import { noteReferralFee } from "@/lib/partner-network";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { notifyOperator } from "@/lib/notify-operator";
@@ -2758,6 +2759,8 @@ export async function recordPaymentReceived(paymentId: string, fields: RecordPay
   if (transactionError) {
     throw new Error(transactionError.message);
   }
+  // A referred customer's first rent sets the partner's finder's fee.
+  if (!isDepositPayment && !isChargePayment) await noteReferralFee(supabase, payment.rental_id, amount, payment.metadata).catch(() => null);
 
   const metadata = {
     ...(payment.metadata || {}),

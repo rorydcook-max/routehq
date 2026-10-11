@@ -883,6 +883,10 @@ export function BookingForm({
               {dateConflict.endDate
                 ? say("clashUntil", { from: shortDate(dateConflict.startDate, locale), to: shortDate(dateConflict.endDate, locale), who: [dateConflict.code, dateConflict.customerName].filter(Boolean).join(", ") })
                 : say("clashOpen", { from: shortDate(dateConflict.startDate, locale), who: [dateConflict.code, dateConflict.customerName].filter(Boolean).join(", ") })}
+              {/* Nothing of their own free: a partner's vehicle keeps the customer. */}
+              <a className="mt-2 block font-bold text-[var(--primary)]" href="/partners">
+                {say("clashPartners")}
+              </a>
             </p>
           ) : null}
           <div className="mt-3 grid grid-cols-4 gap-2 sm:gap-3">

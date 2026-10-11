@@ -16,11 +16,13 @@ export const TRANSACTION_TYPE_OPTIONS = [
   { value: "finance", label: "Finance", category: "expense" },
   { value: "fine", label: "Fine", category: "expense" },
   { value: "accessories", label: "Accessories", category: "expense" },
+  { value: "finders_fee", label: "Finder's fee paid", category: "expense" },
+  { value: "finders_fee_income", label: "Finder's fee received", category: "revenue" },
   { value: "other", label: "Other", category: "expense" }
 ] as const;
 
 export function isIncomeTransactionType(type: string) {
-  return type === "rental_income" || type === "Rental Income" || type === "charge_recovered" || type === "deposit_forfeited" || type === "deposit_deduction" || type === "Deposit forfeited (kept)" || type === "Deposit deduction";
+  return type === "rental_income" || type === "Rental Income" || type === "charge_recovered" || type === "finders_fee_income" || type === "deposit_forfeited" || type === "deposit_deduction" || type === "Deposit forfeited (kept)" || type === "Deposit deduction";
 }
 
 export function isRawDepositTransaction({

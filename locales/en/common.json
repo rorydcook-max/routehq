@@ -4122,7 +4122,7 @@
   "ownerStatements": {
     "back": "Back to reports",
     "title": "Owners' statements",
-    "subtitle": "For vehicles you run for someone else: what each brought in this month, what it cost, and the owner's share. Print or save as PDF to send.",
+    "subtitle": "For vehicles you run for someone else: what each brought in this month, what it cost, and the owner's share. Extras you provide, like a child seat or airport delivery, are left out. Print or save as PDF to send.",
     "previous": "Previous month",
     "next": "Next month",
     "noneTitle": "No vehicles owned by someone else",
@@ -4135,6 +4135,8 @@
     "profit": "Profit",
     "shareOfIncome": "{pct}% of money in",
     "shareOfProfit": "{pct}% of profit",
-    "nothingThisMonth": "Nothing in or out this month."
+    "nothingThisMonth": "Nothing in or out this month.",
+    "extrasLeftOut": "{amount} paid for extras is not included: those are the business's own services.",
+    "extrasLeftOutLine": "{amount} extras left out"
   }
 }

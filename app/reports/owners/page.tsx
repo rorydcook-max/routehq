@@ -46,7 +46,7 @@ export default async function OwnerStatementsPage({ searchParams }: { searchPara
   const { data: transactions } = owned.length
     ? await supabase
         .from("transactions")
-        .select("vehicle_id, type, amount, is_deposit, voided, transaction_date, notes")
+        .select("vehicle_id, type, amount, is_deposit, voided, transaction_date, notes, metadata")
         .eq("organization_id", organization.id)
         .is("deleted_at", null)
         .in("vehicle_id", owned.map((vehicle: any) => vehicle.id))
@@ -119,13 +119,17 @@ export default async function OwnerStatementsPage({ searchParams }: { searchPara
                           <dt className="text-[var(--muted)]">{say(item.partner.basis === "profit" ? "shareOfProfit" : "shareOfIncome", { pct: item.partner.pct })}</dt>
                           <dd className="text-right font-bold sm:text-left">{baht(item.share)}</dd>
                         </dl>
+                        {item.extrasLeftOut > 0 ? <p className="mt-2 text-sm text-[var(--muted)]">{say("extrasLeftOut", { amount: baht(item.extrasLeftOut) })}</p> : null}
                         {item.lines.length ? (
                           <table className="mt-3 w-full text-sm">
                             <tbody>
                               {item.lines.map((line, index) => (
                                 <tr className="border-t border-[var(--border)]" key={index}>
                                   <td className="whitespace-nowrap py-1.5 pr-2 text-[var(--muted)]">{dayInMonth(line.date, locale)}</td>
-                                  <td className="py-1.5 pr-2">{line.label}</td>
+                                  <td className="py-1.5 pr-2">
+                                    {line.label}
+                                    {line.extrasLeftOut ? <span className="text-[var(--muted)]"> · {say("extrasLeftOutLine", { amount: baht(line.extrasLeftOut) })}</span> : null}
+                                  </td>
                                   <td className={`whitespace-nowrap py-1.5 text-right tabular-nums ${line.kind === "out" || line.amount < 0 ? "text-[var(--danger)]" : ""}`}>
                                     {line.kind === "out" || line.amount < 0 ? "-" : ""}
                                     {baht(Math.abs(line.amount))}

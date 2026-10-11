@@ -18,6 +18,7 @@ import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
 import { inspectionUploadPrefix, readUploadedFiles } from "@/lib/direct-uploads";
 import { earlyHandoverBlocker, isDoubleBookingError } from "@/lib/rental-conflicts";
 import { said } from "@/lib/i18n/server-text";
+import { asEarlyStartChoice, earlyStartFor, ensureEarlyStartCharge } from "@/lib/early-start";
 
 type InspectionMode = "delivery" | "return" | "condition_report";
 
@@ -626,16 +627,24 @@ export async function submitInspection(formData: FormData) {
     // (Later handovers keep the booked date; the agreement is unaffected.)
     const { data: bookedRental } = await supabase
       .from("rentals")
-      .select("start_date")
+      .select("start_date, end_date, rental_rate, pricing_model, billing_interval, currency, customer_id")
       .eq("id", rentalId)
       .eq("organization_id", organizationId)
       .maybeSingle();
     const handoverDate = todayDate();
     const startsEarly = bookedRental?.start_date && handoverDate < String(bookedRental.start_date).slice(0, 10);
+    // Early: the extra days are charged, the booking keeps its length, or they're free, as the owner chose at the start.
+    let early = null as ReturnType<typeof earlyStartFor>;
+    if (startsEarly) {
+      const { data: rates } = await supabase.from("vehicles").select("daily_rate, weekly_rate, monthly_rate").eq("id", vehicleId).eq("organization_id", organizationId).maybeSingle();
+      early = earlyStartFor(bookedRental, rates, handoverDate);
+    }
+    const earlyChoice = asEarlyStartChoice(stringField(formData, "earlyStart")) || "free";
+    const shortenTo = early && earlyChoice === "shorten" ? early.shortenedEnd : null;
 
     const { error: rentalError } = await supabase
       .from("rentals")
-      .update({ mileage_at_delivery: odometerReading, status: "active", ...(startsEarly ? { start_date: handoverDate } : {}) })
+      .update({ mileage_at_delivery: odometerReading, status: "active", ...(startsEarly ? { start_date: handoverDate } : {}), ...(shortenTo ? { end_date: shortenTo } : {}) })
       .eq("id", rentalId)
       .eq("organization_id", organizationId);
     if (rentalError) {
@@ -654,6 +663,20 @@ export async function submitInspection(formData: FormData) {
       .eq("organization_id", organizationId);
     if (vehicleError) {
       throw new Error(vehicleError.message);
+    }
+
+    if (early) {
+      await supabase
+        .from("rental_payments")
+        .update({ due_date: handoverDate, scheduled_date: handoverDate })
+        .eq("organization_id", organizationId)
+        .eq("rental_id", rentalId)
+        .eq("due_date", early.bookedStart)
+        .in("status", ["scheduled", "pending", "failed", "overdue"])
+        .is("deleted_at", null);
+    }
+    if (early && earlyChoice === "charge") {
+      await ensureEarlyStartCharge(supabase, { organizationId, rentalId, vehicleId, customerId: bookedRental?.customer_id || customerId || null, currency: bookedRental?.currency || "THB", today: handoverDate, early });
     }
 
     await createOnDeliveryPaymentRecords(supabase, organizationId, rentalId);

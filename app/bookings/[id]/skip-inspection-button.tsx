@@ -3,9 +3,15 @@
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { manuallyActivateRental } from "@/app/actions/bookings";
+import type { EarlyStart, EarlyStartChoice } from "@/lib/early-start";
+import { longDate } from "@/lib/i18n/dates";
+import { useLocale } from "next-intl";
 
-export function SkipInspectionButton({ rentalId }: { rentalId: string }) {
+export function SkipInspectionButton({ rentalId, early = null }: { rentalId: string; early?: EarlyStart | null }) {
   const say = useTranslations("booking") as unknown as (key: string) => string;
+  const ask = useTranslations("inspection") as unknown as (key: string, values?: Record<string, string | number>) => string;
+  const locale = useLocale();
+  const [earlyChoice, setEarlyChoice] = useState<EarlyStartChoice>(early && early.amount > 0 ? "charge" : "free");
   const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -13,7 +19,7 @@ export function SkipInspectionButton({ rentalId }: { rentalId: string }) {
   function handleConfirm() {
     setError(null);
     startTransition(async () => {
-      const result = await manuallyActivateRental(rentalId);
+      const result = await manuallyActivateRental(rentalId, early ? earlyChoice : undefined);
       if (!result.success) {
         setError(result.error || say("skip_failed"));
         setShowConfirm(false);
@@ -27,6 +33,25 @@ export function SkipInspectionButton({ rentalId }: { rentalId: string }) {
         <p className="mb-2 text-xs font-semibold text-[var(--warning)]">
           {say("skip_confirm")}
         </p>
+        {early ? (
+          <fieldset className="mb-3">
+            <legend className="text-xs font-bold text-[var(--foreground)]">{ask("earlyTitle", { days: early.days, date: longDate(early.bookedStart, locale) })}</legend>
+            <div className="mt-1 space-y-1">
+              {(
+                [
+                  early.amount > 0 ? { value: "charge", label: ask("earlyCharge", { days: early.days, amount: `฿${early.amount.toLocaleString("en-US")}` }) } : null,
+                  early.shortenedEnd ? { value: "shorten", label: ask("earlyShorten", { date: longDate(early.shortenedEnd, locale) }) } : null,
+                  { value: "free", label: early.bookedEnd ? ask("earlyFreeBack", { date: longDate(early.bookedEnd, locale) }) : ask("earlyFree") }
+                ].filter(Boolean) as { value: EarlyStartChoice; label: string }[]
+              ).map((option) => (
+                <label className="flex min-h-9 cursor-pointer items-center gap-2 rounded-lg bg-white px-2 py-1 text-xs font-semibold text-[var(--foreground)]" key={option.value}>
+                  <input checked={earlyChoice === option.value} className="h-4 w-4 accent-[var(--primary)]" name="skipEarlyStart" onChange={() => setEarlyChoice(option.value)} type="radio" value={option.value} />
+                  {option.label}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        ) : null}
         <div className="flex gap-2">
           <button
             className="pressable inline-flex min-h-7 items-center rounded-lg bg-[var(--warning)] px-3 text-xs font-bold text-white disabled:opacity-60"

@@ -1,5 +1,6 @@
 "use server";
 
+import { earlyStartFor, ensureEarlyStartCharge } from "@/lib/early-start";
 import { completeRentalJobs, tellRentalCustomer } from "@/lib/customer-messages";
 import { getTransactionFormOptions } from "@/lib/transactions";
 import { chargeRenter } from "@/lib/charges";
@@ -258,6 +259,13 @@ export async function recordDeliveryCashPaymentAndReceipt(formData: FormData) {
 
   if (rentalError || !rental) {
     throw new Error(rentalError?.message || "Rental could not be found.");
+  }
+
+  if (String(formData.get("earlyStart") || "") === "charge") {
+    const { data: booked } = await supabase.from("rentals").select("start_date, end_date, rental_rate, pricing_model, billing_interval").eq("id", rentalId).eq("organization_id", organizationId).maybeSingle();
+    const { data: rates } = await supabase.from("vehicles").select("daily_rate, weekly_rate, monthly_rate").eq("id", vehicleId).eq("organization_id", organizationId).maybeSingle();
+    const early = earlyStartFor(booked, rates, today);
+    if (early) await ensureEarlyStartCharge(supabase, { organizationId, rentalId, vehicleId, customerId: customerId || rental.customer_id || null, currency: rental.currency || "THB", today, early });
   }
 
   const { data: existingPayments, error: existingPaymentsError } = await supabase

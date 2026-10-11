@@ -111,8 +111,9 @@ export async function getInspectionContextByRental(
       .eq("rental_id", rentalId)
       .is("deleted_at", null)
       .in("status", ["scheduled", "pending", "failed", "overdue"])
-      // Only rent already due counts against the deposit; later months are not owed on return.
-      .lte("due_date", new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date()))
+      // Only rent already due counts against the deposit; later months are not owed on return. A handover before
+      // the booked start collects what was due on that start date.
+      .lte("due_date", mode === "delivery" && String(rental.start_date || "").slice(0, 10) > new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date()) ? String(rental.start_date).slice(0, 10) : new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date()))
       .order("due_date", { ascending: true }),
     supabase
       .from("rental_payments")

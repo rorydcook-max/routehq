@@ -16,7 +16,8 @@ import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { notifyOperator } from "@/lib/notify-operator";
 import { wallTimeToIso, businessToday } from "@/lib/business-time";
-import { DOUBLE_BOOKING_MESSAGE, isDoubleBookingError, vehicleConflictMessage } from "@/lib/rental-conflicts";
+import { DOUBLE_BOOKING_MESSAGE, earlyHandoverBlocker, isDoubleBookingError, vehicleConflictMessage } from "@/lib/rental-conflicts";
+import { asEarlyStartChoice, earlyStartFor, ensureEarlyStartCharge } from "@/lib/early-start";
 import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { holdDeadline, retakeHold } from "@/lib/booking-holds";
@@ -1014,7 +1015,7 @@ export async function deleteBooking(rentalId: string): Promise<{ success: boolea
   return { success: true };
 }
 
-export async function manuallyActivateRental(rentalId: string): Promise<{ success: boolean; error?: string }> {
+export async function manuallyActivateRental(rentalId: string, earlyStart?: string): Promise<{ success: boolean; error?: string }> {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -1027,7 +1028,7 @@ export async function manuallyActivateRental(rentalId: string): Promise<{ succes
 
   const { data: rental, error: rentalError } = await supabase
     .from("rentals")
-    .select("id, organization_id, vehicle_id, customer_id, start_date, display_code, reference")
+    .select("id, organization_id, vehicle_id, customer_id, start_date, end_date, rental_rate, pricing_model, billing_interval, currency, display_code, reference")
     .eq("id", cleanId)
     .is("deleted_at", null)
     .maybeSingle();
@@ -1036,10 +1037,29 @@ export async function manuallyActivateRental(rentalId: string): Promise<{ succes
 
   await ensureMembership(supabase, rental.organization_id, user.id);
 
-  // Handed over before the booked start date: the rental started today (as with the form).
+  // Handed over before the booked start date: the rental starts today, and the extra days are charged, the
+  // booking keeps its length, or they're free, as the owner chose (as with the form).
   const handoverDate = todayDate();
   if (rental.start_date && handoverDate < String(rental.start_date).slice(0, 10)) {
-    await supabase.from("rentals").update({ start_date: handoverDate }).eq("id", cleanId).eq("organization_id", rental.organization_id).then(() => null, () => null);
+    const inWay = await earlyHandoverBlocker(supabase, { organizationId: rental.organization_id, vehicleId: String(rental.vehicle_id || ""), rentalId: cleanId, startDate: rental.start_date, endDate: rental.end_date || null, today: handoverDate });
+    if (inWay) return { success: false, error: await said("This vehicle is still out on another rental. Return that rental first, or change the vehicle on this booking.") };
+    const { data: rates } = await supabase.from("vehicles").select("daily_rate, weekly_rate, monthly_rate").eq("id", rental.vehicle_id).eq("organization_id", rental.organization_id).maybeSingle();
+    const early = earlyStartFor(rental, rates, handoverDate);
+    const choice = asEarlyStartChoice(earlyStart) || "free";
+    const shortenTo = early && choice === "shorten" ? early.shortenedEnd : null;
+    const { error: moveError } = await supabase.from("rentals").update({ start_date: handoverDate, ...(shortenTo ? { end_date: shortenTo } : {}) }).eq("id", cleanId).eq("organization_id", rental.organization_id);
+    if (moveError) return { success: false, error: isDoubleBookingError(moveError) ? await said(DOUBLE_BOOKING_MESSAGE) : moveError.message };
+    if (early) {
+      await supabase
+        .from("rental_payments")
+        .update({ due_date: handoverDate, scheduled_date: handoverDate })
+        .eq("organization_id", rental.organization_id)
+        .eq("rental_id", cleanId)
+        .eq("due_date", early.bookedStart)
+        .in("status", ["scheduled", "pending", "failed", "overdue"])
+        .is("deleted_at", null);
+      if (choice === "charge") await ensureEarlyStartCharge(supabase, { organizationId: rental.organization_id, rentalId: cleanId, vehicleId: rental.vehicle_id, customerId: rental.customer_id, currency: rental.currency || "THB", today: handoverDate, early });
+    }
   }
 
   // Also set the vehicle to rented if not already

@@ -28,6 +28,7 @@ import { prepareInspectionUploads } from "@/app/actions/uploads";
 import { uploadFormFiles } from "@/lib/direct-upload-client";
 import { recordDeliveryCashPaymentAndReceipt } from "@/app/actions/transactions";
 import type { InspectionContext, InspectionMode } from "@/lib/inspection-detail";
+import { earlyStartFor, type EarlyStartChoice } from "@/lib/early-start";
 
 type DamageItem = {
   id: string;
@@ -404,6 +405,10 @@ export function InspectionForm({ context, unsigned = false, blocker = null }: { 
     severity && severityKeys[severity] ? t(severityKeys[severity]) : String(severity || "");
   const mode = context.mode;
   const isSwap = Boolean(context.swap);
+  // Handing over before the booked start: the owner says what happens to the extra days (charged by default).
+  const early = useMemo(() => (mode === "delivery" && !isSwap ? earlyStartFor(context.rental, context.vehicle, businessToday()) : null), [mode, isSwap, context.rental, context.vehicle]);
+  const [earlyChoice, setEarlyChoice] = useState<EarlyStartChoice>(() => (early && early.amount > 0 ? "charge" : "free"));
+  const [earlyAdded, setEarlyAdded] = useState(0);
   // A vehicle collected in a swap doesn't settle the deposit: the rental carries on.
   const depositAlreadyReturned = mode === "return" && !isSwap && context.rental?.deposit_status === "fully_returned";
   // No tracker fitted: skip the GPS step rather than show an empty screen.
@@ -657,6 +662,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null }: { 
     formData.set("rentalPaymentAmount", String(rentalPaymentAmount));
     formData.set("depositAmount", String(depositAmount));
     formData.set("paymentMethod", "cash");
+    formData.set("earlyStart", early ? earlyChoice : "");
     formData.set("customerName", context.customer?.full_name || "Customer");
     formData.set("vehicleMakeModel", [context.vehicle.make, context.vehicle.model, context.vehicle.trim].filter(Boolean).join(" "));
     formData.set("vehiclePlate", context.vehicle.registration_number || "");
@@ -775,6 +781,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null }: { 
       <input name="organizationId" type="hidden" value={context.organizationId} />
       <input name="mode" type="hidden" value={mode} />
       <input name="swap" type="hidden" value={isSwap ? "1" : ""} />
+      <input name="earlyStart" type="hidden" value={early ? earlyChoice : ""} />
       <input name="rentalId" type="hidden" value={context.rental?.id || ""} />
       <input name="vehicleId" type="hidden" value={context.vehicle.id} />
       <input name="customerId" type="hidden" value={context.customer?.id || ""} />
@@ -830,8 +837,43 @@ export function InspectionForm({ context, unsigned = false, blocker = null }: { 
               </div>
             </div>
           </div>
+          {early && !blocker ? (
+            <fieldset className="mt-4">
+              <legend className="text-sm font-bold text-[var(--foreground)]">{t("earlyTitle", { days: early.days, date: formatDate(early.bookedStart, locale) })}</legend>
+              <div className="mt-2 space-y-2">
+                {(
+                  [
+                    early.amount > 0 ? { value: "charge", label: t("earlyCharge", { days: early.days, amount: money(early.amount) }) } : null,
+                    early.shortenedEnd ? { value: "shorten", label: t("earlyShorten", { date: formatDate(early.shortenedEnd, locale) }) } : null,
+                    { value: "free", label: early.bookedEnd ? t("earlyFreeBack", { date: formatDate(early.bookedEnd, locale) }) : t("earlyFree") }
+                  ].filter(Boolean) as { value: EarlyStartChoice; label: string }[]
+                ).map((option) => (
+                  <label className={`flex min-h-12 cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 text-sm font-semibold ${earlyChoice === option.value ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground)]"}`} key={option.value}>
+                    <input checked={earlyChoice === option.value} className="h-4 w-4 accent-[var(--primary)]" name="earlyStartChoice" onChange={() => setEarlyChoice(option.value)} type="radio" value={option.value} />
+                    {option.label}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          ) : null}
           {blocker ? null : (
-            <button className={`${touchButton} mt-5 w-full bg-[var(--primary)] text-white shadow-lg`} onClick={() => setStep(1)} type="button">
+            <button
+              className={`${touchButton} mt-5 w-full bg-[var(--primary)] text-white shadow-lg`}
+              onClick={() => {
+                // Charged extra days are collected with the rent at handover (and come off again if the answer changes).
+                const add = early && earlyChoice === "charge" ? early.amount : 0;
+                if (add !== earlyAdded) {
+                  setDeliveryPaymentAmount((current) => {
+                    const next = Math.max(0, Number(current || 0) - earlyAdded + add);
+                    return next ? String(next) : "";
+                  });
+                  if (add > 0) setCollectOpen(true);
+                  setEarlyAdded(add);
+                }
+                setStep(1);
+              }}
+              type="button"
+            >
               {mode === "return" ? t("startReturn") : mode === "condition_report" ? t("startCondition") : t("startDelivery")}
             </button>
           )}

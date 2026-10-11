@@ -351,7 +351,13 @@
     "stillOutBlocker": "{customer} still has this vehicle ({code}) until {date}. Return that rental first, or change the vehicle on this booking.",
     "stillOwed": "Still owed on this booking: {amount}",
     "stillOwedHint": "Collect it now, or it stays on the booking to chase later.",
-    "backEarly": "Back {count, plural, one {# day} other {# days}} early. Any refund for unused days is offered on the booking page once this is done."
+    "backEarly": "Back {count, plural, one {# day} other {# days}} early. Any refund for unused days is offered on the booking page once this is done.",
+    "bookedBetweenBlocker": "{customer} is booked on this vehicle from {from} to {to} ({code}), before this booking starts. Hand it over on this booking's start date, or move one of the bookings to another vehicle.",
+    "earlyTitle": "The {days, plural, one {extra day} other {# extra days}} before {date}:",
+    "earlyCharge": "Charge for {days, plural, one {it} other {them}}: {amount}",
+    "earlyShorten": "Keep the booked length: back on {date}",
+    "earlyFreeBack": "No charge: still back on {date}",
+    "earlyFree": "No charge"
   },
   "translation": {
     "translatedFrom": "Translated from {language}",

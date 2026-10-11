@@ -29,7 +29,11 @@ export default async function DeliveryInspectionPage({ params, searchParams }: {
     const inWay = await earlyHandoverBlocker(supabase, { organizationId: organization.id, vehicleId: String((context as any).vehicle?.id || rental?.vehicle_id || ""), rentalId, startDate: rental?.start_date, endDate: rental?.end_date || null, today: businessToday() });
     if (inWay) {
       const [t, locale] = await Promise.all([getTranslations("inspection"), getLocale()]);
-      blocker = t("stillOutBlocker", { code: inWay.code || "", customer: inWay.customerName || "", date: inWay.endDate ? longDate(inWay.endDate, locale) : "" });
+      const today = businessToday();
+      blocker =
+        inWay.startDate > today
+          ? t("bookedBetweenBlocker", { code: inWay.code || "", customer: inWay.customerName || "", from: longDate(inWay.startDate, locale), to: inWay.endDate ? longDate(inWay.endDate, locale) : "" })
+          : t("stillOutBlocker", { code: inWay.code || "", customer: inWay.customerName || "", date: inWay.endDate ? longDate(inWay.endDate, locale) : "" });
     }
   }
 

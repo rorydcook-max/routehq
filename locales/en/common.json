@@ -596,7 +596,7 @@
     "drivingLicence": "Driving licence",
     "selfiePhoto": "Photo of you",
     "checkNumbers": "Check your passport and licence numbers",
-    "typeNumbersInstead": "Type your passport and licence numbers instead",
+    "typeNumbersInstead": "Photo can't be read? Type the numbers here",
     "passportNumber": "Passport or ID number",
     "licenceNumber": "Driving licence number",
     "licenceExpiry": "Licence runs out on",
@@ -2124,7 +2124,8 @@
     "referralFeePaid": "Finder's fee {amount} paid.",
     "referralFeeLater": "Finder's fee {pct}% of the first rent, set when it is recorded.",
     "referralOpen": "Partners",
-    "step_bookedDirectory": "Booked by the customer through the RouteHQ directory"
+    "step_bookedDirectory": "Booked by the customer through the RouteHQ directory",
+    "handoverNowHint": "Take the handover photos now, while the customer is with you."
   },
   "newBooking": {
     "pageBack": "Back to bookings",

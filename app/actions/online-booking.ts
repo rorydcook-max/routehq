@@ -1,5 +1,7 @@
 "use server";
 
+import { phoneVariants, toInternationalPhone } from "@/lib/phone";
+
 import { said } from "@/lib/i18n/server-text";
 import { revalidatePath } from "next/cache";
 import { getCurrentMembership } from "@/lib/auth/roles";
@@ -40,8 +42,9 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
   const startDate = String(formData.get("startDate") || "").trim();
   const endDate = String(formData.get("endDate") || "").trim() || null;
   const name = String(formData.get("name") || "").trim().slice(0, 120);
-  // Stored without spaces, the way the booking form and WhatsApp links expect.
-  const phone = String(formData.get("phone") || "").replace(/[\s\-().]/g, "").slice(0, 24);
+  // Stored the way the rest of RouteHQ stores numbers: +66812345670.
+  const typedPhone = String(formData.get("phone") || "").replace(/[\s\-().]/g, "").slice(0, 24);
+  const phone = toInternationalPhone(typedPhone) || typedPhone;
 
   // Bots fill every field; people never see this one.
   if (String(formData.get("website") || "").trim()) return { ok: false, error: await said("Please try again.") };
@@ -87,11 +90,11 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
     .in("booking_data->>source", ["public_page", "directory"])
     .in("status", ["pending", "viewed"])
     .is("customer_details_submitted_at", null)
-    .eq("customers.phone", phone);
+    .in("customers.phone", phoneVariants(phone));
   if ((unfinished || []).length >= 2) return { ok: false, error: await said("You already have bookings waiting for your details. Please finish those first, or contact the business.") };
 
   // A returning customer keeps their record (matched by phone).
-  const { data: existing } = await admin.from("customers").select("id").eq("organization_id", organizationId).eq("phone", phone).is("deleted_at", null).limit(1).maybeSingle();
+  const { data: existing } = await admin.from("customers").select("id").eq("organization_id", organizationId).in("phone", phoneVariants(phone)).is("deleted_at", null).limit(1).maybeSingle();
   let customerId = existing?.id as string | undefined;
   if (!customerId) {
     const { data: created, error } = await admin.from("customers").insert({ organization_id: organizationId, full_name: name, phone }).select("id").single();

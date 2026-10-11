@@ -1,3 +1,4 @@
+import { phoneVariants, toInternationalPhone } from "@/lib/phone";
 /**
  * Writes an import preview into the business. Every row carries the batch id,
  * so the whole import can be undone. Rows the owner marked "needs a look" go in
@@ -182,7 +183,7 @@ async function findOrCreateCustomer(context: CommitContext, input: { fullName: s
 
   // Same person already in the business: by phone, then by name.
   const { data: byPhone } = input.phone
-    ? await supabase.from("customers").select("id").eq("organization_id", context.organizationId).eq("phone", input.phone).is("deleted_at", null).limit(1).maybeSingle()
+    ? await supabase.from("customers").select("id").eq("organization_id", context.organizationId).in("phone", phoneVariants(input.phone)).is("deleted_at", null).limit(1).maybeSingle()
     : { data: null };
   const { data: byName } = byPhone
     ? { data: null }
@@ -205,7 +206,7 @@ async function findOrCreateCustomer(context: CommitContext, input: { fullName: s
     .insert({
       organization_id: context.organizationId,
       full_name: input.fullName,
-      phone: input.phone || null,
+      phone: toInternationalPhone(input.phone),
       email: input.email || null,
       nationality: input.nationality || null,
       passport_number: input.passport || null,

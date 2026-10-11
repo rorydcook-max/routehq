@@ -605,7 +605,7 @@
     "drivingLicence": "ใบขับขี่",
     "selfiePhoto": "รูปถ่ายของคุณ",
     "checkNumbers": "ตรวจสอบเลขหนังสือเดินทางและใบขับขี่",
-    "typeNumbersInstead": "พิมพ์เลขหนังสือเดินทางและใบขับขี่เอง",
+    "typeNumbersInstead": "อ่านรูปไม่ได้? พิมพ์เลขที่นี่",
     "passportNumber": "เลขหนังสือเดินทางหรือบัตรประชาชน",
     "licenceNumber": "เลขใบขับขี่",
     "licenceExpiry": "ใบขับขี่หมดอายุวันที่",
@@ -2133,7 +2133,8 @@
     "referralFeePaid": "จ่ายค่าแนะนำ {amount} แล้ว",
     "referralFeeLater": "ค่าแนะนำ {pct}% ของค่าเช่างวดแรก กำหนดเมื่อบันทึก",
     "referralOpen": "พาร์ตเนอร์",
-    "step_bookedDirectory": "ลูกค้าจองผ่านไดเรกทอรีของ RouteHQ"
+    "step_bookedDirectory": "ลูกค้าจองผ่านไดเรกทอรีของ RouteHQ",
+    "handoverNowHint": "ถ่ายรูปส่งมอบรถตอนนี้ ระหว่างที่ลูกค้ายังอยู่"
   },
   "newBooking": {
     "pageBack": "กลับไปที่การจอง",

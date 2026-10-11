@@ -456,7 +456,7 @@
     "drivingLicence": "驾照",
     "selfiePhoto": "本人照片",
     "checkNumbers": "核对护照和驾照号码",
-    "typeNumbersInstead": "改为手动输入护照和驾照号码",
+    "typeNumbersInstead": "照片无法识别？在这里输入号码",
     "passportNumber": "护照或身份证号码",
     "licenceNumber": "驾照号码",
     "licenceExpiry": "驾照有效期至",

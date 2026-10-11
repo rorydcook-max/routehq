@@ -117,8 +117,10 @@ function formatDepositSummary(rental: any, tx: Tx) {
 
 function startedAgoLabel(startDate: string | null | undefined, tx: Tx): string {
   if (!startDate) return tx.say("ago_recently");
+  // Calendar days in Thai time: a rental that started this morning started "today", not "yesterday".
   const start = new Date(String(startDate).slice(0, 10) + "T00:00:00Z");
-  const diffDays = Math.round((Date.now() - start.getTime()) / 86_400_000);
+  const today = new Date(businessToday() + "T00:00:00Z");
+  const diffDays = Math.round((today.getTime() - start.getTime()) / 86_400_000);
   if (diffDays < 1) return tx.say("ago_today");
   if (diffDays === 1) return tx.say("ago_yesterday");
   if (diffDays < 30) return tx.say("ago_days", { count: diffDays });
@@ -372,8 +374,12 @@ export default async function BookingDetailPage({ params, searchParams }: { para
     const path = payment.metadata?.receipt?.path;
     if (path) payment.receipt_url = receiptUrls.get(path) || null;
   }
-  const isRetrospective = Boolean(rental.entered_by_operator) ||
-    Boolean(rental.start_date && new Date(String(rental.start_date).slice(0, 10) + "T00:00:00Z") < new Date(Date.now() - 7 * 86_400_000));
+  // "Already out": recorded by the team for a rental that started before today, or one that started over a week ago.
+  // A walk-in handed over today still gets the normal handover prompt.
+  const startDay = rental.start_date ? String(rental.start_date).slice(0, 10) : null;
+  const isRetrospective =
+    Boolean(startDay && rental.entered_by_operator && startDay < businessToday()) ||
+    Boolean(startDay && new Date(startDay + "T00:00:00Z") < new Date(Date.now() - 7 * 86_400_000));
   // A booking stays "booked" until the vehicle is handed over; showing it as
   // active on its start date offered "Start return" before any delivery.
   const displayStatus = rental.status;
@@ -981,7 +987,25 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                       <AlertTriangle className="text-[var(--warning)]" size={18} />
                       {tx.say("noHandoverForm")}
                     </div>
-                    <p className="mt-2 text-sm text-[var(--warning)]">{tx.say("wentOutWithout")}</p>
+                    {startDay === businessToday() ? (
+                      <>
+                        {/* A walk-in that went out today: the customer is probably still here. */}
+                        <p className="mt-1 text-sm text-[var(--warning)]">{tx.say("handoverNowHint")}</p>
+                        <Link className="primary-action pressable mt-2 block w-full px-3 py-2 text-center" href={`/inspections/delivery/${rental.id}` as Route}>
+                          {tx.say("startHandover")}
+                        </Link>
+                      </>
+                    ) : (
+                      <>
+                        <p className="mt-2 text-sm text-[var(--warning)]">{tx.say("wentOutWithout")}</p>
+                        <Link
+                          className="pressable mt-2 inline-flex items-center rounded-lg border border-[var(--warning-line)] bg-white px-3 py-2 text-xs font-bold text-[var(--warning)]"
+                          href={`/inspections/delivery/${rental.id}` as Route}
+                        >
+                          {tx.say("fillHandoverOptional")}
+                        </Link>
+                      </>
+                    )}
                   </div>
                 )}
                 {/* Before the handover there is no return to talk about: a warning sign on a form that can't be opened yet was noise. */}

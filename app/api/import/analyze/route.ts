@@ -3,6 +3,30 @@ import { NextResponse } from "next/server";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { IMPORT_FIELD_KEYS, importFieldKeys } from "@/lib/import/fields";
 import { googleSheetToSpreadsheetInput, isGoogleSheetsUrl, parseSpreadsheetFile, type ParsedSheet } from "@/lib/import/spreadsheet";
+import { attachExisting, buildPreview, previewCounts } from "@/lib/import/preview";
+import { getDefaultOrganization } from "@/lib/organization";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+
+/**
+ * Turns the mapping into the cards the owner will see, matched against what the
+ * business already has, and keeps everything on a batch so the import can be
+ * confirmed later without the file, and undone afterwards.
+ */
+async function previewAndBatch(sheets: ParsedSheet[], analysis: ReturnType<typeof normaliseAnalysis>, sourceName: string, userId: string) {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const organization = await getDefaultOrganization();
+  const [{ data: vehicles }, { data: customers }] = await Promise.all([
+    supabase.from("vehicles").select("id, registration_number, make, model").eq("organization_id", organization.id).is("deleted_at", null),
+    supabase.from("customers").select("id, full_name, phone").eq("organization_id", organization.id).is("deleted_at", null)
+  ]);
+  const preview = attachExisting(buildPreview(sheets, analysis.sheets), vehicles || [], customers || []);
+  const { data: batch } = await supabase
+    .from("import_batches")
+    .insert({ organization_id: organization.id, created_by: userId, source_name: sourceName.slice(0, 120), sheets, mappings: analysis.sheets, preview, counts: previewCounts(preview) })
+    .select("id")
+    .single();
+  return { batchId: batch?.id || null, preview, counts: previewCounts(preview) };
+}
 
 type ColumnMapping = { source_column: string; routehq_field: string; confidence?: number; sample_values?: string[] };
 type SheetAnalysis = {
@@ -95,10 +119,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: await said("No readable rows were found in this spreadsheet.") }, { status: 400 });
   }
 
+  const sourceName = sheetUrl ? "Google Sheet" : (file as File).name;
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     // Without AI the columns can still be mapped by hand.
-    return NextResponse.json({ analysis: normaliseAnalysis(null, sheets) });
+    const analysis = normaliseAnalysis(null, sheets);
+    return NextResponse.json({ analysis, ...(await previewAndBatch(sheets, analysis, sourceName, membership.userId)) });
   }
 
   const sheetSummary = sheets.map((sheet) => ({
@@ -116,6 +142,8 @@ Current rental fields (columns on a vehicle sheet describing who is renting that
 Customer fields: ${importFieldKeys(["Customer"]).join(", ")}, plus phone and email
 Rental sheet fields: vehicle_registration, customer_name, phone, email, start_date, end_date, rental_rate, deposit_amount, mileage_at_start, next_payment_date
 Transaction fields: vehicle_registration, date, type, amount, notes
+
+Headers and values may be Thai: ทะเบียน = registration_number, ยี่ห้อ = make, รุ่น = model, ปี = year, สี = color, เลขไมล์ = current_mileage, ราคา/เดือน or ค่าเช่าต่อเดือน = monthly_rate, ค่าเช่า (of the current renter) = rental_rate, ลูกค้า/ผู้เช่า = customer_name, เบอร์/โทร = phone, วันเริ่ม/รับรถ = start_date, วันคืน/สิ้นสุด = end_date, มัดจำ = deposit_amount, ครบกำหนด/จ่ายครั้งถัดไป = next_payment_date, ภาษี = tax_expiry_date, พรบ = porbor_expiry_date, ประกัน = insurance_expiry_date, จำนวนเงิน/ยอด = amount, วันที่ = date, รายการ/ประเภท = type.
 
 Rules:
 - Map every column you reasonably can. Use each field at most once per sheet.
@@ -145,7 +173,8 @@ Return ONLY JSON:
   const payload = await openaiResponse.json().catch(() => null);
   if (!openaiResponse.ok || !payload) {
     // Fall back to manual mapping rather than blocking the import.
-    return NextResponse.json({ analysis: normaliseAnalysis(null, sheets), warning: "Automatic mapping is unavailable right now - map the columns yourself." });
+    const analysis = normaliseAnalysis(null, sheets);
+    return NextResponse.json({ analysis, ...(await previewAndBatch(sheets, analysis, sourceName, membership.userId)), warning: await said("Automatic mapping is unavailable right now - check how each column was read.") });
   }
 
   let raw: unknown = null;
@@ -154,5 +183,6 @@ Return ONLY JSON:
   } catch {
     raw = null;
   }
-  return NextResponse.json({ analysis: normaliseAnalysis(raw, sheets) });
+  const analysis = normaliseAnalysis(raw, sheets);
+  return NextResponse.json({ analysis, ...(await previewAndBatch(sheets, analysis, sourceName, membership.userId)) });
 }

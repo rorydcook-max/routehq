@@ -211,5 +211,11 @@
   "Enter an amount greater than zero.": "ใส่จำนวนเงินมากกว่าศูนย์",
   "There is no rent payment still to come to take it off.": "ไม่มีค่าเช่างวดถัดไปให้หัก",
   "The rent still to come is less than that amount.": "ค่าเช่าที่เหลืออยู่น้อยกว่าจำนวนนี้",
-  "Check the year: four digits, like 2023.": "ตรวจสอบปีรถ: ตัวเลขสี่หลัก เช่น 2023"
+  "Check the year: four digits, like 2023.": "ตรวจสอบปีรถ: ตัวเลขสี่หลัก เช่น 2023",
+  "This import was not found. Start again from the file.": "ไม่พบการนำเข้านี้ เริ่มใหม่จากไฟล์",
+  "This import has already been taken back.": "การนำเข้านี้ถูกยกเลิกไปแล้ว",
+  "An import can only be taken back within 30 days.": "ยกเลิกการนำเข้าได้ภายใน 30 วันเท่านั้น",
+  "This import has already been brought in.": "การนำเข้านี้ถูกนำเข้าไปแล้ว",
+  "Nothing was brought in. Vehicles need at least a plate; check the cards and try again.": "ยังไม่มีอะไรถูกนำเข้า รถต้องมีทะเบียนอย่างน้อย ตรวจการ์ดแล้วลองอีกครั้ง",
+  "Automatic mapping is unavailable right now - check how each column was read.": "การจับคู่อัตโนมัติใช้ไม่ได้ตอนนี้ ตรวจดูว่าแต่ละคอลัมน์ถูกอ่านอย่างไร"
 }

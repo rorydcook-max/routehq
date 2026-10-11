@@ -34,6 +34,32 @@ export function pushConfigured() {
   return configure();
 }
 
+/** Sends to these people's devices, whichever business they turned alerts on in (used for RouteHQ's own team). Never throws. */
+export async function sendPushToUsers(admin: any, userIds: string[], message: PushMessage): Promise<number> {
+  try {
+    if (!configure() || !userIds.length) return 0;
+    const { data: subscriptions } = await admin.from("push_subscriptions").select("id, endpoint, p256dh, auth").in("user_id", userIds);
+    const seen = new Set<string>();
+    const payload = JSON.stringify({ title: message.title, body: message.body.slice(0, 240), url: message.url || "/", tag: message.tag || undefined });
+    let delivered = 0;
+    await Promise.all(
+      ((subscriptions || []) as any[])
+        .filter((row) => (seen.has(row.endpoint) ? false : (seen.add(row.endpoint), true)))
+        .map(async (row) => {
+          try {
+            await webpush.sendNotification({ endpoint: row.endpoint, keys: { p256dh: row.p256dh, auth: row.auth } }, payload, { TTL: 60 * 60 * 12 });
+            delivered += 1;
+          } catch {
+            // Gone devices are tidied by the business sends.
+          }
+        })
+    );
+    return delivered;
+  } catch {
+    return 0;
+  }
+}
+
 /** Sends to every device in the business that asked for alerts. Never throws. */
 export async function sendPushToOrganization(admin: any, organizationId: string, message: PushMessage, options: { onlyUserId?: string } = {}): Promise<number> {
   try {

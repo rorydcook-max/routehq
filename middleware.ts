@@ -2,6 +2,31 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/lib/supabase/database.types";
 import { ACTIVE_ORGANIZATION_COOKIE, loadActiveMembership } from "@/lib/auth/active-organization";
+import { canUseOwnDomain, canUseSubdomain, hostTarget, isBookingSitePath, rootDomain } from "@/lib/booking-address";
+
+type BookingSite = { slug: string; tier: string | null; status: string | null; has_domain: boolean };
+// Which business an address belongs to, remembered for a minute so each page view doesn't ask the database.
+const siteCache = new Map<string, { site: BookingSite | null; at: number }>();
+
+async function resolveBookingSite(target: { label: string } | { host: string }, url: string, key: string): Promise<BookingSite | null> {
+  const cacheKey = "label" in target ? `label:${target.label}` : `host:${target.host}`;
+  const cached = siteCache.get(cacheKey);
+  if (cached && Date.now() - cached.at < 60_000) return cached.site;
+  try {
+    const response = await fetch(`${url}/rest/v1/rpc/resolve_booking_host`, {
+      method: "POST",
+      headers: { apikey: key, authorization: `Bearer ${key}`, "content-type": "application/json" },
+      body: JSON.stringify({ p_label: "label" in target ? target.label : null, p_host: "host" in target ? target.host : null })
+    });
+    const rows = response.ok ? await response.json() : [];
+    const row = Array.isArray(rows) ? rows[0] : null;
+    const site: BookingSite | null = row?.slug ? { slug: row.slug, tier: row.tier, status: row.status, has_domain: Boolean(row.has_domain) } : null;
+    siteCache.set(cacheKey, { site, at: Date.now() });
+    return site;
+  } catch {
+    return null;
+  }
+}
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -30,7 +55,7 @@ export async function middleware(request: NextRequest) {
     request.headers.set("x-routehq-customer-page", "1");
   }
   // During first-time setup the wizard sends people to the normal Add vehicle and import screens; everything else waits until setup is finished.
-  const isOnboardingAllowedRoute = isPublicRoute || pathname.startsWith("/api/") || pathname.startsWith("/fleet/import") || pathname === "/fleet/new";
+  const isOnboardingAllowedRoute = isPublicRoute || pathname.startsWith("/api/") || pathname.startsWith("/fleet/import") || pathname === "/fleet/new" || pathname === "/help" || pathname.startsWith("/help/");
   const isSubscriptionAllowedRoute =
     isOnboardingAllowedRoute ||
     pathname === "/settings" ||
@@ -39,6 +64,39 @@ export async function middleware(request: NextRequest) {
     pathname === "/subscription-required";
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  // Booking addresses: theirshop.routehq.app and a business's own domain open that business's booking page.
+  // Booking links and the booking page keep working there; anything else goes to RouteHQ itself.
+  const target = hostTarget(request.headers.get("host"));
+  if (target && supabaseUrl && supabaseAnonKey) {
+    const appHome = String(process.env.NEXT_PUBLIC_APP_URL || `https://${rootDomain()}`).replace(/\/$/, "");
+    const site = await resolveBookingSite(target, supabaseUrl, supabaseAnonKey);
+    // In development the app itself is on localhost, and Next.js turns a redirect to localhost into one back to the
+    // address being visited (a loop), so there those requests are simply served here instead.
+    const appOnLocalhost = /\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(appHome);
+    const toApp = () => (appOnLocalhost ? null : NextResponse.redirect(new URL(`${pathname}${request.nextUrl.search}`, appHome)));
+    if (!site) {
+      const away = toApp();
+      if (away) return away;
+    } else {
+      const plan = { subscription_tier: site.tier, subscription_status: site.status };
+      const allowed = "label" in target ? canUseSubdomain(plan) : site.has_domain && canUseOwnDomain(plan);
+      // On a plan without the address, the page still works at its RouteHQ address.
+      if (!allowed) {
+        const destination = `${pathname === "/" ? `/rent/${site.slug}` : pathname}${request.nextUrl.search}`;
+        if (!appOnLocalhost) return NextResponse.redirect(new URL(destination, appHome));
+        if (pathname === "/") return NextResponse.redirect(new URL(destination, request.url));
+      } else if (!isBookingSitePath(pathname)) {
+        const away = toApp();
+        if (away) return away;
+      } else if (pathname === "/") {
+        const url = request.nextUrl.clone();
+        url.pathname = `/rent/${site.slug}`;
+        request.headers.set("x-routehq-customer-page", "1");
+        return NextResponse.rewrite(url, { request });
+      }
+    }
+  }
 
   if (!supabaseUrl || !supabaseAnonKey) {
     if (isPublicRoute) {

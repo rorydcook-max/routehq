@@ -75,6 +75,8 @@ export type ShellContext = {
   unreadChats: number;
   /** Payments and jobs due today or overdue, shown as a badge on To do. */
   dueTasks: number;
+  /** Help conversations with a reply from RouteHQ not yet read. */
+  helpReplies: number;
   /** The operator's brand, when their plan lets it replace RouteHQ's in the app. */
   brand: import("@/lib/shell-brand").ShellBrand | null;
 };
@@ -84,7 +86,7 @@ export type { ShellBrand } from "@/lib/shell-brand";
 /** Used by the app shell for navigation and the business switcher. Display only - access is enforced on the server. */
 export async function getShellContext(): Promise<ShellContext> {
   const membership = await getCurrentMembership();
-  if (!membership) return { role: null, organizations: [], unreadChats: 0, dueTasks: 0, brand: null };
+  if (!membership) return { role: null, organizations: [], unreadChats: 0, dueTasks: 0, helpReplies: 0, brand: null };
 
   const supabase = (await createSupabaseServerClient()) as any;
   // Only what needs doing now counts: later jobs would make the badge permanent noise.
@@ -99,7 +101,7 @@ export async function getShellContext(): Promise<ShellContext> {
     }
   };
   // The lookups do not depend on each other, so they run together.
-  const [{ data }, { count }, dueTasks, { count: toSend }, brand] = await Promise.all([
+  const [{ data }, { count }, dueTasks, { count: toSend }, brand, { count: helpReplies }] = await Promise.all([
     supabase
       .from("organization_members")
       .select("organization_id, organizations(name)")
@@ -123,7 +125,8 @@ export async function getShellContext(): Promise<ShellContext> {
       .not("metadata->handoff_label", "is", null)
       .or("metadata->>superseded.is.null,metadata->>superseded.eq.false")
       .gte("created_at", new Date(Date.now() - 3 * 86_400_000).toISOString()),
-    shellBrand(supabase, membership.organizationId)
+    shellBrand(supabase, membership.organizationId),
+    supabase.from("support_threads").select("id", { count: "exact", head: true }).eq("organization_id", membership.organizationId).eq("unread_by_business", true)
   ]);
 
   const organizations = ((data || []) as any[]).map((row) => ({
@@ -131,7 +134,7 @@ export async function getShellContext(): Promise<ShellContext> {
     name: String(row.organizations?.name || "Business"),
     active: row.organization_id === membership.organizationId
   }));
-  return { role: membership.role, organizations, unreadChats: (count || 0) + (toSend || 0), dueTasks, brand };
+  return { role: membership.role, organizations, unreadChats: (count || 0) + (toSend || 0), dueTasks, helpReplies: helpReplies || 0, brand };
 }
 
 /** Switch the business this person is working in. Only businesses they actively belong to are accepted. */

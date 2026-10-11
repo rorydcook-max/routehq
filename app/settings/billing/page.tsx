@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDefaultOrganization } from "@/lib/organization";
 import { planById, planForFleet, vehiclesOverLimit } from "@/lib/plans";
+import { supportContacts } from "@/lib/support";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { PlanCards } from "./plan-cards";
 
@@ -53,9 +54,7 @@ export default async function BillingPage() {
   ]);
 
   const trialDays = daysUntil(organization?.trial_ends_at);
-  const supportLine = process.env.LINE_OA_ID || "";
-  const supportWhatsApp = (process.env.SUPPORT_WHATSAPP || "").replace(/\D/g, "");
-  const supportEmail = process.env.SUPPORT_EMAIL || "";
+  const contacts = supportContacts();
   const status = String(organization?.subscription_status || "trial");
   const plan = planById(organization?.subscription_tier);
   const vehicles = Number(vehicleCount || 0);
@@ -119,18 +118,21 @@ export default async function BillingPage() {
         <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("bl_howBody")}</p>
         {/* Support channels come from the environment so no placeholder number or address ships. */}
         <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-          {supportLine ? (
-            <a className="primary-action pressable" href={`https://line.me/R/ti/p/${encodeURIComponent(supportLine)}`} rel="noreferrer" target="_blank">
+          <Link className="primary-action pressable" href={"/help?topic=billing" as Route}>
+            {say("bl_help")}
+          </Link>
+          {contacts.lineUrl ? (
+            <a className="secondary-action pressable" href={contacts.lineUrl} rel="noreferrer" target="_blank">
               {say("bl_line")}
             </a>
           ) : null}
-          {supportWhatsApp ? (
-            <a className="secondary-action pressable" href={`https://wa.me/${supportWhatsApp}`} rel="noreferrer" target="_blank">
+          {contacts.whatsappUrl ? (
+            <a className="secondary-action pressable" href={contacts.whatsappUrl} rel="noreferrer" target="_blank">
               {say("bl_whatsapp")}
             </a>
           ) : null}
-          {supportEmail ? (
-            <a className="secondary-action pressable" href={`mailto:${supportEmail}?subject=${encodeURIComponent("RouteHQ subscription")}`}>
+          {contacts.email ? (
+            <a className="secondary-action pressable" href={`mailto:${contacts.email}?subject=${encodeURIComponent("RouteHQ subscription")}`}>
               {say("bl_email")}
             </a>
           ) : null}

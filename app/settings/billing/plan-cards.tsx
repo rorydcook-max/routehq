@@ -20,6 +20,7 @@ function differences(plan: Plan, say: Say): string[] {
   if (plan.ownersStatements) lines.push(say("pl_owners"));
   if (plan.severalLocations) lines.push(say("pl_locations"));
   if (plan.whiteLabel) lines.push(say("pl_whiteLabel"));
+  if (plan.customDomain) lines.push(say("pl_ownDomain"));
   lines.push(plan.directoryIncluded ? say("pl_directoryIn") : say("pl_directoryAddon", { price: baht(DIRECTORY_ADDON_MONTHLY) }));
   if (plan.setupService) lines.push(say("pl_setup"));
   if (plan.prioritySupport) lines.push(say("pl_support"));

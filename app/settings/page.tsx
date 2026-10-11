@@ -31,6 +31,8 @@ import { PublicBookingPanel } from "@/app/settings/public-booking-panel";
 import { UsualDepositPanel } from "@/app/settings/usual-deposit-panel";
 import { PartnerNetworkPanel } from "@/app/settings/partner-network-panel";
 import { DirectoryPanel } from "@/app/settings/directory-panel";
+import { BookingAddressPanel } from "@/app/settings/booking-address-panel";
+import { bookingAddress, canUseOwnDomain, canUseSubdomain, cleanSubdomain, rootDomain, subdomainUrl } from "@/lib/booking-address";
 import { canBeListed, directorySettings } from "@/lib/directory";
 import { DIRECTORY_ADDON_MONTHLY } from "@/lib/plans";
 import { partnerNetworkSettings } from "@/lib/partner-network";
@@ -163,6 +165,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     .limit(1)
     .maybeSingle();
   const isPlatformAdmin = Boolean(platformAdmin);
+  const { data: addressRow } = await supabase.from("organizations").select("booking_subdomain, custom_domain, custom_domain_status").eq("id", organization.id).maybeSingle();
+  const addressOrg = { ...(organization as any), ...(addressRow || {}) };
 
   const [
     { data: profile },
@@ -427,9 +431,23 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               deposit={publicBookingSettings(organization.settings).deposit}
                   offer={publicBookingSettings(organization.settings).offer}
               holdHours={bookingRules(organization.settings).holdHours}
+              link={bookingAddress(addressOrg).url}
               pricedVehicles={publicVehicleCounts.priced}
               slug={organization.slug}
               totalVehicles={publicVehicleCounts.total}
+            />
+          </Fold>
+          <Fold id="booking-address" summary={bookingAddress(addressOrg).url.replace(/^https?:\/\//, "")} title={say("ba_title")}>
+            <BookingAddressPanel
+              canDomain={canUseOwnDomain(addressOrg)}
+              canSubdomain={canUseSubdomain(addressOrg)}
+              domain={addressOrg.custom_domain || null}
+              domainStatus={addressOrg.custom_domain_status || null}
+              pathUrl={`${String(process.env.NEXT_PUBLIC_APP_URL || `https://${rootDomain()}`).replace(/\/$/, "")}/rent/${organization.slug}`}
+              rootDomain={rootDomain()}
+              subdomain={addressOrg.booking_subdomain || null}
+              subdomainUrl={addressOrg.booking_subdomain ? subdomainUrl(addressOrg.booking_subdomain) : null}
+              suggestion={cleanSubdomain(String(organization.name || organization.slug).replace(/\b(car|cars|rent|rental|rentals|test\d*)\b/gi, "")) || cleanSubdomain(organization.slug).slice(0, 20)}
             />
           </Fold>
           <Fold id="directory" summary={directorySettings(organization.settings).enabled && canBeListed(organization as any) && publicBookingSettings(organization.settings).enabled ? say("dir_on") : say("dir_off")} title={say("dir_title")}>

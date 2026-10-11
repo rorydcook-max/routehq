@@ -7,7 +7,8 @@ const PUSH_TITLES: Record<string, string> = {
   payment_received: "Payment",
   contract_signed: "Booking signed",
   return_inspection: "Vehicle returned",
-  new_message: "New message"
+  new_message: "New message",
+  support_reply: "RouteHQ Help"
 };
 
 /**

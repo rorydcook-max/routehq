@@ -8,6 +8,7 @@ import {
   CircleUserRound,
   FileText,
   Handshake,
+  LifeBuoy,
   Home,
   Plus,
   ClipboardList,
@@ -45,7 +46,8 @@ type NavKey =
   | "transactions"
   | "documents"
   | "rentalCalculator"
-  | "partners";
+  | "partners"
+  | "help";
 
 type NavItem = {
   key: NavKey;
@@ -71,7 +73,8 @@ const recordItems: NavItem[] = [
   { key: "reports", href: "/reports", icon: BarChart3 },
   { key: "documents", href: "/documents", icon: FileText },
   { key: "rentalCalculator", href: "/rental-calculator", icon: Calculator },
-  { key: "settings", href: "/settings", icon: Settings }
+  { key: "settings", href: "/settings", icon: Settings },
+  { key: "help", href: "/help" as Route, icon: LifeBuoy }
 ];
 
 // Phones get the four places used most every day; everything else is under More.
@@ -86,7 +89,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
 
   // Teammates cannot use business settings, so the link is hidden for them.
   // Display only: the middleware and server actions enforce the rule.
-  const [shell, setShell] = useState<ShellContext>({ role: null, organizations: [], unreadChats: 0, dueTasks: 0, brand: null });
+  const [shell, setShell] = useState<ShellContext>({ role: null, organizations: [], unreadChats: 0, dueTasks: 0, helpReplies: 0, brand: null });
   useEffect(() => {
     let cancelled = false;
     // The brand from last time, so their logo shows at once instead of RouteHQ's for a moment.
@@ -132,7 +135,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
   const onFocusedFlow = !!pathname && (pathname.startsWith("/inspections") || /\/(new|edit|import)(\/|$)/.test(pathname));
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
   const moreActive = moreItems.some((item) => isActive(item.href));
-  const badgeFor = (key: NavKey) => (key === "inbox" ? shell.unreadChats : key === "tasks" ? shell.dueTasks : 0);
+  const badgeFor = (key: NavKey) => (key === "inbox" ? shell.unreadChats : key === "tasks" ? shell.dueTasks : key === "help" ? shell.helpReplies : 0);
 
   return (
     <div className="min-h-screen pb-24 lg:pb-0">

@@ -12,7 +12,7 @@ type Say = (key: string, values?: Record<string, string | number>) => string;
  * Switch for the public booking page, the link to share, the deposit online
  * bookings ask for, and how long a customer has to start their booking form.
  */
-export function PublicBookingPanel({ slug, enabled, holdHours, deposit, offer = "both_monthly", pricedVehicles, totalVehicles }: { slug: string; enabled: boolean; holdHours: number; deposit: number; offer?: string; pricedVehicles: number; totalVehicles: number }) {
+export function PublicBookingPanel({ slug, link: shareLink, enabled, holdHours, deposit, offer = "both_monthly", pricedVehicles, totalVehicles }: { slug: string; link?: string; enabled: boolean; holdHours: number; deposit: number; offer?: string; pricedVehicles: number; totalVehicles: number }) {
   const say = useTranslations("settingsPage") as unknown as Say;
   const router = useRouter();
   const [on, setOn] = useState(enabled);
@@ -23,7 +23,8 @@ export function PublicBookingPanel({ slug, enabled, holdHours, deposit, offer = 
   const [failed, setFailed] = useState(false);
   const [isPending, startTransition] = useTransition();
   useEffect(() => setOrigin(window.location.origin), []);
-  const link = `${origin}/rent/${slug}`;
+  // Their own address (subdomain or domain) when they have one; otherwise this app's /rent page.
+  const link = shareLink && !shareLink.includes("/rent/") ? shareLink : `${origin}/rent/${slug}`;
 
   function save(next: { enabled: boolean; holdHours: number; deposit?: number; offer?: string }) {
     setFailed(false);
@@ -73,7 +74,7 @@ export function PublicBookingPanel({ slug, enabled, holdHours, deposit, offer = 
                 <Copy size={17} />
                 {copied ? say("copied") : say("pb_copy")}
               </button>
-              <a className="secondary-action pressable" href={`/rent/${slug}`} rel="noreferrer" target="_blank">
+              <a className="secondary-action pressable" href={link || `/rent/${slug}`} rel="noreferrer" target="_blank">
                 <ExternalLink size={17} />
                 {say("pb_open")}
               </a>

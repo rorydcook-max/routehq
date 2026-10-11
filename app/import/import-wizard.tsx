@@ -204,6 +204,11 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
           <div>
             <h2 className="text-xl font-semibold text-[var(--foreground)]">{t("s1")}</h2>
             <p className="mt-1 text-sm text-[var(--muted)]">{t("s1Body")}</p>
+            <p className="mt-1 text-sm">
+              <Link className="font-semibold text-[var(--primary)]" href={"/help?topic=import" as any}>
+                {t("sendToUs")}
+              </Link>
+            </p>
           </div>
         </div>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">

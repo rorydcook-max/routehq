@@ -54,7 +54,8 @@ export function withCompressedImages<T>(action: (formData: FormData) => Promise<
 export async function uploadFormFiles(
   formData: FormData,
   prepare: (files: UploadRequest[]) => Promise<PreparedUploads>,
-  onProgress?: (done: number, total: number) => void
+  onProgress?: (done: number, total: number) => void,
+  bucket = "documents"
 ): Promise<FormData> {
   const next = new FormData();
   const pending: Array<{ field: string; file: File }> = [];
@@ -78,7 +79,7 @@ export async function uploadFormFiles(
   for (let index = 0; index < files.length; index++) {
     const { field, file } = files[index];
     const target = signed[index];
-    const { error } = await supabase.storage.from("documents").uploadToSignedUrl(target.path, target.token, file, {
+    const { error } = await supabase.storage.from(bucket).uploadToSignedUrl(target.path, target.token, file, {
       contentType: file.type || undefined
     });
     if (error) throw new Error(`${file.name} could not be uploaded (${error.message}). Check the connection and try again.`);

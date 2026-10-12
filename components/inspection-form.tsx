@@ -13,7 +13,7 @@ import { submitInspection } from "@/app/actions/inspections";
 import { prepareInspectionUploads } from "@/app/actions/uploads";
 import { uploadFormFiles } from "@/lib/direct-upload-client";
 import { recordDeliveryCashPaymentAndReceipt } from "@/app/actions/transactions";
-import type { InspectionContext, InspectionMode } from "@/lib/inspection-detail";
+import type { InspectionContext } from "@/lib/inspection-detail";
 import { earlyStartFor, type EarlyStartChoice } from "@/lib/early-start";
 
 type DamageItem = {

@@ -260,10 +260,6 @@ export function RentalAdjustmentModal({
   const dateChosenByHand = useRef(false);
   const amountTypedByHand = useRef(false);
   const [extensionDueDate, setExtensionDueDate] = useState(() => dateInputValue(currentEndDate) || isoDate(localDay()));
-  const [advancePaid, setAdvancePaid] = useState(false);
-  const [advancePaidAmount, setAdvancePaidAmount] = useState("");
-  const [refundAmount, setRefundAmount] = useState("");
-  const [refundReason, setRefundReason] = useState("");
   const [note, setNote] = useState("");
   const [message, setMessage] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -360,23 +356,15 @@ export function RentalAdjustmentModal({
   }
 
   const tomorrow = useMemo(() => isoDate(tomorrowDate()), []);
-  const startDate = dateInputValue(currentStartDate);
   const originalEndDate = dateInputValue(currentEndDate);
   const extensionDays = daysBetween(currentEndDate, extensionEndDate);
   const earlyReturnDays = daysBetween(earlyReturnDate, currentEndDate);
   const extensionQuote = context?.rates && extensionDays > 0 ? quoteStay(context.rates, extensionDays) : null;
-  const dailyRate = Math.round(Number(currentRate || 0) / 30);
   const quotedAmount = extensionQuote?.amount ?? null;
   useEffect(() => {
     if (amountTypedByHand.current || quotedAmount === null) return;
     setExtensionAmount(quotedAmount > 0 ? quotedAmount.toLocaleString("en-US") : "");
   }, [quotedAmount]);
-  const suggestedRefund = Math.round(earlyReturnDays * (Number(currentRate || 0) / 30));
-
-  function updateAdvanceAmount(value: string) {
-    setAdvancePaidAmount(value);
-    setRefundAmount(formatAmountInput(value));
-  }
 
   function submit() {
     if (useAmendment) {
@@ -395,9 +383,9 @@ export function RentalAdjustmentModal({
           newEndDate,
           extensionPaymentAmount: parseAmount(extensionAmount),
           extensionPaymentDueDate: extensionDueDate || undefined,
-          advancePaidAmount: advancePaid ? parseAmount(advancePaidAmount) : 0,
-          refundAmount: advancePaid ? parseAmount(refundAmount) : 0,
-          refundReason,
+          advancePaidAmount: 0,
+          refundAmount: 0,
+          refundReason: "",
           note
         });
 

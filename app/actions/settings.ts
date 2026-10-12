@@ -13,7 +13,6 @@ import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { jurisdictionByCountry, mergeTravelPolicySettings, type HomeTerritoryType, type IslandTravelPolicy } from "@/lib/travel-policy";
-import { buildDailySummaryMessage, sendLineMessage } from "@/services/messaging/line";
 import { requireOwner } from "@/lib/auth/roles";
 import { sendDailySummary } from "@/lib/line/daily-summary";
 import { getActiveMembership } from "@/lib/auth/active-organization-server";

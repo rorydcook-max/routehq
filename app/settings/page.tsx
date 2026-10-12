@@ -168,7 +168,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const addressOrg = { ...(organization as any), ...(addressRow || {}) };
 
   const [
-    { data: profile },
     { data: members },
     branches,
     categories,
@@ -178,7 +177,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     catalogSubmissionsResult,
     { data: lineMessages }
   ] = await Promise.all([
-    supabase.from("users").select("preferred_locale, preferred_calendar, full_name").eq("id", user?.id).maybeSingle(),
     supabase
       .from("organization_members")
       .select("id, user_id, role, display_name, invited_email, is_active, created_at")

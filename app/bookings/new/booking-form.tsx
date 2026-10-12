@@ -1642,17 +1642,7 @@ function GooglePlaceInput({
   const say = useTranslations("newBooking") as unknown as Say;
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isEnabled, setIsEnabled] = useState(false);
-  const [hasError, setHasError] = useState(false);
-  const [timedOut, setTimedOut] = useState(false);
   const [pinModalOpen, setPinModalOpen] = useState(false);
-  const mapsKeyConfigured = Boolean(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY);
-
-  // If Maps hasn't loaded within 3 seconds, fall back to plain text input
-  useEffect(() => {
-    if (isEnabled || !mapsKeyConfigured) return;
-    const timer = setTimeout(() => setTimedOut(true), 3000);
-    return () => clearTimeout(timer);
-  }, [isEnabled, mapsKeyConfigured]);
 
   const onPlaceSelectRef = useRef(onPlaceSelect);
   onPlaceSelectRef.current = onPlaceSelect;
@@ -1690,11 +1680,8 @@ function GooglePlaceInput({
           document.head.appendChild(style);
         }
       })
-      .catch(() => {
-        if (!cancelled) {
-          setHasError(true);
-        }
-      });
+      // If Google does not load, the plain text box keeps working.
+      .catch(() => undefined);
 
     return () => {
       cancelled = true;

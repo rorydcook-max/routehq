@@ -17,6 +17,7 @@ import { bookingRules, clashes } from "@/lib/booking-rules";
 import { moveBookingToVehicle } from "@/lib/extension-picture";
 import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
 import { notifyOperator } from "@/lib/notify-operator";
+import { retireUnsentNaming } from "@/lib/customer-messages";
 import {
   amendmentHash,
   amendmentMoney,
@@ -834,6 +835,11 @@ async function applyVehicleChange(admin: any, amendment: any, rental: any): Prom
     )
   ]);
   await syncVehicleStatusFromBookings(admin, organizationId, newVehicleId).catch(() => null);
+  // Messages written before the change that name the old vehicle are not sent any more.
+  if (oldVehicleId && oldVehicleId !== newVehicleId) {
+    const { data: oldVehicle } = await admin.from("vehicles").select("make, model").eq("id", oldVehicleId).maybeSingle();
+    await retireUnsentNaming(admin, organizationId, rental.id, [oldVehicle?.make, oldVehicle?.model].filter(Boolean).join(" ")).catch(() => null);
+  }
 
   if (handedOver) {
     // The customer has a vehicle in their hands: record the one they receive and the one they give back.

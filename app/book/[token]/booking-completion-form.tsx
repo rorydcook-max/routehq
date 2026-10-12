@@ -494,7 +494,6 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
   const [signedContractUrl, setSignedContractUrl] = useState<string | null>(null);
   const [executionCertificateUrl, setExecutionCertificateUrl] = useState<string | null>(detail.executedAgreementDownloads?.executionCertificateUrl || null);
   const [originalAgreementUrl, setOriginalAgreementUrl] = useState<string | null>(detail.executedAgreementDownloads?.originalAgreementUrl || null);
-  const [agreed, setAgreed] = useState(false);
   const [signature, setSignature] = useState("");
   const savedPhone = splitSavedPhone(detail.customer?.phone);
   const [phoneCountryCode, setPhoneCountryCode] = useState(savedPhone.code);
@@ -667,7 +666,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
     const filled = (name: string) => String(formData.get(name) || "").trim().length > 0;
     const uploaded = (...names: string[]) =>
       names.some((name) => formData.getAll(name).some((value) => value instanceof File && value.size > 0));
-    const acceptedAgreement = typeof nextAgreed === "boolean" ? nextAgreed : formData.get("agreementAccepted") === "on";
+    const acceptedAgreement = typeof nextAgreed === "boolean" ? nextAgreed : (publicAgreement?.requiredAcknowledgements || []).length === 0 || formData.get("agreeAll") === "on";
     setLivePhone(String(formData.get("phone") || "").trim());
     setLiveEmail(String(formData.get("email") || "").trim());
     setLiveStatus({
@@ -723,7 +722,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
     if (canvas) {
       const nextSignature = canvas.toDataURL("image/png", 0.72);
       setSignature(nextSignature);
-      updateLiveStatus(undefined, agreed, nextSignature);
+      updateLiveStatus(undefined, undefined, nextSignature);
     }
   }
 
@@ -732,7 +731,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
     if (!canvas) return;
     canvas.getContext("2d")?.clearRect(0, 0, canvas.width, canvas.height);
     setSignature("");
-    updateLiveStatus(undefined, agreed, "");
+    updateLiveStatus(undefined, undefined, "");
   }
 
   function handleReportPayment() {
@@ -1397,7 +1396,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
               ))}
             </ul>
             <label className="checkbox-label mt-4 rounded-xl bg-[var(--panel-secondary)] p-3 font-bold text-[var(--foreground)]">
-              <input checked={agreedAll} className="flex-shrink-0" onChange={(event) => setAgreedAll(event.target.checked)} type="checkbox" />
+              <input checked={agreedAll} className="flex-shrink-0" name="agreeAll" onChange={(event) => setAgreedAll(event.target.checked)} type="checkbox" />
               <span>{t.has("agreeAll" as never) ? t("agreeAll" as never) : "I agree to all of the above"}</span>
             </label>
             {agreedAll ? publicAgreement.requiredAcknowledgements.map((ack) => <input key={ack.type} name={`ack_${ack.type}`} type="hidden" value="on" />) : null}
@@ -1741,7 +1740,6 @@ function GoogleAddressInput({ name = "address", onChange, value }: { name?: stri
   const t = useTranslations("customer");
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isEnabled, setIsEnabled] = useState(false);
-  const [hasError, setHasError] = useState(false);
   const [pinModalOpen, setPinModalOpen] = useState(false);
   const mapsKeyConfigured = Boolean(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY);
 
@@ -1768,7 +1766,7 @@ function GoogleAddressInput({ name = "address", onChange, value }: { name?: stri
         });
         setIsEnabled(true);
       })
-      .catch(() => setHasError(true));
+      .catch(() => undefined);
 
     return () => {
       cancelled = true;

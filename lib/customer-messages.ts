@@ -67,6 +67,27 @@ async function retireUnsent(admin: any, organizationId: string, rentalId: string
   );
 }
 
+/**
+ * After a vehicle change, a message still waiting to be sent that names the vehicle the customer
+ * no longer has is out of date ("the return date for the Toyota Yaris is now ..."): it is no longer offered.
+ */
+export async function retireUnsentNaming(admin: any, organizationId: string, rentalId: string, vehicleName: string) {
+  const name = vehicleName.trim().toLowerCase();
+  if (!name) return;
+  const { data: rows } = await admin
+    .from("communication_log")
+    .select("id, metadata, content")
+    .eq("organisation_id", organizationId)
+    .eq("rental_id", rentalId)
+    .eq("type", "automated_reminder")
+    .in("status", ["pending", "failed"]);
+  await Promise.all(
+    (rows || [])
+      .filter((row: any) => !row.metadata?.superseded && String(row.content || "").toLowerCase().includes(name))
+      .map((row: any) => admin.from("communication_log").update({ metadata: { ...(row.metadata || {}), superseded: true } }).eq("id", row.id).then(() => null, () => null))
+  );
+}
+
 export function customerMessagesOn(settings: any) {
   return settings?.customer_messages?.enabled !== false;
 }

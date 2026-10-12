@@ -63,9 +63,14 @@ export function Breakdown({ title, rows, typeLabel, say }: { title: string; rows
         <p className={`mt-1 ${soft}`}>{say("nothingRecorded")}</p>
       ) : (
         <>
-          <div aria-hidden="true" className="mt-3 flex h-4 overflow-hidden rounded-full bg-[var(--panel-tertiary)]">
+          <div aria-hidden="true" className="mt-3 flex h-4 rounded-full bg-[var(--panel-tertiary)]">
             {rows.map((row, index) => (
-              <span className={index > 0 ? "border-l-2 border-white" : ""} key={row.type} style={{ background: CHART_COLORS[index % CHART_COLORS.length], width: `${total > 0 ? (row.amount / total) * 100 : 0}%` }} />
+              <span
+                className={`grow-x relative h-full transition hover:brightness-110 ${index > 0 ? "border-l-2 border-white" : "rounded-l-full"} ${index === rows.length - 1 ? "rounded-r-full" : ""}`}
+                data-tip={`${typeLabel(row.type, row.label)}: ${money(row.amount)}${total > 0 ? ` (${Math.round((row.amount / total) * 100)}%)` : ""}`}
+                key={row.type}
+                style={{ background: CHART_COLORS[index % CHART_COLORS.length], width: `${total > 0 ? (row.amount / total) * 100 : 0}%` }}
+              />
             ))}
           </div>
           <div className="mt-2 divide-y divide-[var(--border)]">

@@ -129,7 +129,15 @@
     "moneyIn": "เข้า",
     "moneyOut": "ออก",
     "inOutWeeks": "เงินเข้าและออก ห้าสัปดาห์ล่าสุด",
-    "profitLabel": "กำไร"
+    "profitLabel": "กำไร",
+    "lotFree": "ว่าง",
+    "lotOff": "ไม่พร้อมใช้",
+    "lotTipLate": "{who} คืนช้า ครบกำหนด {date}",
+    "lotTipBack": "{who} คืนวันนี้",
+    "lotTipOut": "ส่งให้ {who} วันนี้",
+    "lotTipOpen": "อยู่กับ {who} ไม่มีวันสิ้นสุด",
+    "lotTipUntil": "อยู่กับ {who} ถึง {date}",
+    "lotTipFreeUntil": "ว่างถึง {date}"
   },
   "vehicles": {
     "addVehicle": "เพิ่มยานพาหนะใหม่",

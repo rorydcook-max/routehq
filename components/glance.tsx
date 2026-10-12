@@ -61,11 +61,11 @@ export function WeekPlanner({ days, lanes, legend }: { days: Array<{ key: string
               <span className="relative h-full flex-1">
                 {lane.bars.map((bar) => (
                   <Link
-                    className={`planner-bar grow-x absolute top-2 flex h-[30px] items-center overflow-hidden whitespace-nowrap rounded-[10px] px-2 font-bold shadow-[0_2px_6px_rgba(19,38,43,0.12)] lg:top-[6px] ${BAR_STYLE[bar.kind]}`}
+                    className={`planner-bar grow-x absolute top-2 flex h-[30px] items-center whitespace-nowrap rounded-[10px] px-2 font-bold shadow-[0_2px_6px_rgba(19,38,43,0.12)] lg:top-[6px] ${BAR_STYLE[bar.kind]}`}
                     href={bar.href as Route}
                     key={`${bar.href}-${bar.start}`}
                     style={{ left: `calc(${(bar.start / 7) * 100}% + 2px)`, width: `calc(${(bar.length / 7) * 100}% - 4px)`, ["--d" as string]: `${160 + index * 60}ms` } as CSSProperties}
-                    title={bar.title}
+                    data-tip={bar.title}
                   >
                     <span className="truncate">{bar.label}</span>
                     {bar.back ? <span aria-hidden="true" className="absolute right-1 top-[9px] h-3 w-3 rounded-full bg-[var(--coming-back)] shadow-[0_0_0_2px_#fff]" /> : null}
@@ -91,10 +91,10 @@ export function InOutBars({ periods, label, money }: { periods: Array<{ key: str
   return (
     <div aria-label={label} className={`mt-3 flex h-[108px] items-end ${periods.length > 7 ? "gap-1" : "gap-3"}`} role="img">
       {periods.map((period) => (
-        <div className="flex flex-1 flex-col items-center gap-1" key={period.key}>
-          <div className="flex h-[82px] w-full items-end justify-center gap-[2px] border-b border-[var(--border)]">
-            <span className="grow-y w-1/2 max-w-5 rounded-t-[4px] bg-[var(--chart-in)]" style={{ height: `${Math.max(2, Math.round((period.in / max) * 80))}px` }} title={`${period.label}: ${money(period.in)}`} />
-            <span className="grow-y w-1/2 max-w-5 rounded-t-[4px] bg-[var(--chart-out)]" style={{ height: `${Math.max(2, Math.round((period.out / max) * 80))}px` }} title={`${period.label}: ${money(period.out)}`} />
+        <div className="chart-col relative flex flex-1 flex-col items-center gap-1 pt-1" data-tip={`${period.label}: ${money(period.in)} in, ${money(period.out)} out`} key={period.key} tabIndex={0}>
+          <div className="chart-bars flex h-[82px] w-full items-end justify-center gap-[2px] border-b border-[var(--border)]">
+            <span className="grow-y w-1/2 max-w-5 rounded-t-[4px] bg-[var(--chart-in)]" style={{ height: `${Math.max(2, Math.round((period.in / max) * 80))}px` }} />
+            <span className="grow-y w-1/2 max-w-5 rounded-t-[4px] bg-[var(--chart-out)]" style={{ height: `${Math.max(2, Math.round((period.out / max) * 80))}px` }} />
           </div>
           <span className={`whitespace-nowrap font-semibold text-[var(--muted)] ${periods.length > 7 ? "text-[13px]" : ""}`}>{period.label}</span>
         </div>
@@ -180,4 +180,56 @@ export function PartBar({ part, whole, color = "var(--success)" }: { part: numbe
 export function initialsOf(name: string | null | undefined) {
   const words = String(name || "").trim().split(/\s+/).filter(Boolean).slice(0, 2);
   return words.map((word) => Array.from(word.replace(/^[\u0E40-\u0E44]+/, ""))[0] || Array.from(word)[0] || "").join("").toUpperCase() || "?";
+}
+
+export type LotState = "late" | "back" | "rent" | "out" | "free" | "off";
+export type LotVehicle = { id: string; name: string; art: ReactNode; state: LotState; tip: string; href: string };
+
+const LOT_COLOUR: Record<LotState, string> = {
+  late: "var(--danger)",
+  back: "var(--coming-back)",
+  rent: "var(--on-rent)",
+  out: "var(--going-out)",
+  free: "var(--success)",
+  off: "var(--border-strong)"
+};
+const LOT_ORDER: LotState[] = ["late", "back", "out", "rent", "free", "off"];
+
+/** The fleet as a car park: every vehicle drawn in its own colour, with a bar under it saying what it is doing. Point at one for who has it and until when. */
+export function FleetLot({ vehicles, labels, title, action }: { vehicles: LotVehicle[]; labels: Record<LotState, string>; title: string; action?: ReactNode }) {
+  const sorted = [...vehicles].sort((a, b) => LOT_ORDER.indexOf(a.state) - LOT_ORDER.indexOf(b.state));
+  const counts = LOT_ORDER.map((state) => ({ state, count: vehicles.filter((vehicle) => vehicle.state === state).length })).filter((entry) => entry.count > 0);
+  return (
+    <section className="card p-4 lg:p-5">
+      <header className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
+        <h2 className="text-[20px] text-[var(--foreground)] lg:text-[22px]">{title}</h2>
+        {action}
+      </header>
+      {/* How the fleet splits, as one bar: the same colours as the cars below. */}
+      <div aria-hidden="true" className="mt-3 flex h-2.5 overflow-hidden rounded-full bg-[var(--panel-tertiary)]">
+        {counts.map((entry, index) => (
+          <span className={`grow-x ${index > 0 ? "border-l-2 border-white" : ""}`} key={entry.state} style={{ background: LOT_COLOUR[entry.state], width: `${(entry.count / vehicles.length) * 100}%` }} />
+        ))}
+      </div>
+      <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-semibold text-[var(--foreground-secondary)]">
+        {counts.map((entry) => (
+          <span className="inline-flex items-center gap-1.5" key={entry.state}>
+            <Dot color={LOT_COLOUR[entry.state]} />
+            <span className="num text-[var(--foreground)]">{entry.count}</span> {labels[entry.state]}
+          </span>
+        ))}
+      </p>
+      <ul className="mt-4 grid grid-cols-4 gap-x-2 gap-y-3 sm:grid-cols-6 xl:grid-cols-8">
+        {sorted.map((vehicle, index) => (
+          <li className="rise" key={vehicle.id} style={{ ["--d" as string]: `${200 + index * 35}ms` } as CSSProperties}>
+            <Link aria-label={vehicle.tip} className="lot-spot group relative flex flex-col items-center gap-1.5 rounded-2xl p-1.5 outline-none transition hover:bg-[var(--panel-secondary)] focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]" data-tip={vehicle.tip} href={vehicle.href as Route}>
+              <span className={`transition duration-200 group-hover:-translate-y-0.5 lg:scale-110 ${vehicle.state === "off" ? "opacity-50 grayscale" : ""}`}>{vehicle.art}</span>
+              <span className="h-1.5 w-10 rounded-full" style={{ background: LOT_COLOUR[vehicle.state] }} />
+              <span className="w-full truncate text-center font-semibold text-[var(--foreground)]">{vehicle.name}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
 }

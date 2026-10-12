@@ -129,7 +129,15 @@
     "moneyIn": "In",
     "moneyOut": "Out",
     "inOutWeeks": "Money in and out, last five weeks",
-    "profitLabel": "profit"
+    "profitLabel": "profit",
+    "lotFree": "free",
+    "lotOff": "not available",
+    "lotTipLate": "late back from {who}, due {date}",
+    "lotTipBack": "back today from {who}",
+    "lotTipOut": "goes out to {who} today",
+    "lotTipOpen": "with {who}, no end date",
+    "lotTipUntil": "with {who} until {date}",
+    "lotTipFreeUntil": "free until {date}"
   },
   "nav": {
     "main": "Main",

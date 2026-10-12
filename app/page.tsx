@@ -21,7 +21,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isExpenseTransaction, isRevenueTransaction } from "@/lib/transaction-options";
 import { kindFromCategory } from "@/lib/vehicle-groups";
 import { VehicleArt, paintOf } from "@/components/vehicle-art";
-import { Dot, InOutBars, Ring, TileHead, WeekPlanner, type PlannerBar, type PlannerLane } from "@/components/glance";
+import { Dot, FleetLot, InOutBars, TileHead, WeekPlanner, type LotState, type LotVehicle, type PlannerBar, type PlannerLane } from "@/components/glance";
 
 // Dates and counts are worded by the translation files (see lib/i18n/dates.ts and locales/).
 function addDays(isoDate: string, days: number) {
@@ -416,7 +416,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
         kind: lateBackHere || lateOut ? "late" : onRoad ? "rent" : "next",
         back: onRoad && !lateBackHere && r.end !== "Indefinite" && r.end <= weekEnd,
         href: `/bookings/${r.id}`,
-        title: `${r.customer} · ${r.vehicle}`
+        title: `${r.customer || t("walkIn")} · ${shortDate(startDay)} – ${r.end === "Indefinite" ? t("openEnded") : shortDate(String(r.end))}`
       });
     }
     // A return and the next handover on the same day share it: the first bar stops where the next one starts.
@@ -459,6 +459,40 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
     return <VehicleArt colour={vehicle.color} kind={kindFromCategory(category as any)} model={vehicle.model} size="md" />;
   };
 
+  const lot: LotVehicle[] = vehicles.map((v) => {
+    const current = rentals.find((r) => r.vehicleId === v.id && r.status !== "Booked") || null;
+    const next = rentals.filter((r) => r.vehicleId === v.id && r.status === "Booked").sort((a, b) => String(a.start).localeCompare(String(b.start)))[0] || null;
+    const who = (r: (typeof rentals)[number]) => r.customer || t("walkIn");
+    let state: LotState = "free";
+    let tip = `${v.make} ${v.model} · ${t("lotFree")}`;
+    if (current && current.end !== "Indefinite" && current.end < today) {
+      state = "late";
+      tip = t("lotTipLate", { who: who(current), date: shortDate(String(current.end)) });
+    } else if (current && current.end === today) {
+      state = "back";
+      tip = t("lotTipBack", { who: who(current) });
+    } else if (next && String(next.start).slice(0, 10) <= today) {
+      state = "out";
+      tip = t("lotTipOut", { who: who(next) });
+    } else if (current) {
+      state = "rent";
+      tip = current.end === "Indefinite" ? t("lotTipOpen", { who: who(current) }) : t("lotTipUntil", { who: who(current), date: shortDate(String(current.end)) });
+    } else if (String(v.status) === "Maintenance") {
+      state = "off";
+      tip = `${v.make} ${v.model} · ${t("lotOff")}`;
+    } else if (next) {
+      tip = t("lotTipFreeUntil", { date: shortDate(String(next.start).slice(0, 10)) });
+    }
+    const category = categories.find((entry: any) => entry.id === v.categoryId) || null;
+    return {
+      id: v.id,
+      name: v.model || v.make,
+      art: <VehicleArt colour={v.color} kind={kindFromCategory(category as any)} model={v.model} size="sm" />,
+      state,
+      tip: `${v.model || v.make}: ${tip}`,
+      href: current ? `/bookings/${current.id}` : next ? `/bookings/${next.id}` : `/fleet/${v.id}`
+    };
+  });
   const pill = (count: number, label: string, dot?: string) => (
     <span className="inline-flex items-center gap-1.5 rounded-2xl bg-[var(--band-soft)] px-3 py-2 text-white">
       {dot ? <Dot color={dot} /> : null}
@@ -501,25 +535,16 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
         </Link>
       ) : (
         <Link className="card pressable tile p-4 tile-green" href="/bookings">
-          <TileHead icon={<CheckCircle2 size={22} />} title={t("allPaid")} />
-          <span className="font-semibold">{t("nobodyOwes")}</span>
-        </Link>
-      )
-  });
-  if (vehicles.length > 0) {
-    smallTiles.push({
-      key: "earning",
-      node: (
-        <Link className="card pressable tile p-4 text-[var(--foreground)]" href="/fleet">
-          <TileHead title={t("outEarning")} />
+          <TileHead title={t("allPaid")} />
           <span className="flex items-center gap-3">
-            <Ring label={`${utilization}%`} pct={utilization} />
-            <span className="font-semibold text-[var(--foreground-secondary)]">{t("earningShort", { out: rentedCount, total: vehicles.length })}</span>
+            <span className="inline-flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-[var(--success)] text-white shadow-[0_6px_16px_rgba(43,107,71,0.28)]">
+              <CheckCircle2 size={28} strokeWidth={2.4} />
+            </span>
+            <span className="font-semibold">{t("nobodyOwes")}</span>
           </span>
         </Link>
       )
-    });
-  }
+  });
   const backOrOut = nextBack || nextOut;
   if (backOrOut) {
     const back = backOrOut === nextBack;
@@ -629,6 +654,15 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
             </section>
           ) : null}
 
+          {lot.length > 0 ? (
+            <FleetLot
+              action={<PanelLink href="/fleet">{t("fleet")}</PanelLink>}
+              labels={{ late: t("legendLate"), back: t("weekBack"), rent: t("legendOnRent"), out: t("weekOut"), free: t("lotFree"), off: t("lotOff") }}
+              title={t("yourFleet")}
+              vehicles={lot}
+            />
+          ) : null}
+
           {/* On a phone the tiles come straight after the week. */}
           <div className="grid grid-cols-2 gap-3 lg:hidden">{tiles}</div>
 
@@ -645,8 +679,8 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
                 {t("allClear")}
               </div>
             ) : (
-              <ul className="space-y-2.5">
-                {todayItems.map((item, index) => <AgendaRow art={artFor(item)} card delay={Math.min(index, 8) * 50 + 150} item={item} key={item.key} />)}
+              <ul className="card rise divide-y divide-[var(--border)] overflow-hidden p-0" style={{ ["--d" as string]: "180ms" } as CSSProperties}>
+                {todayItems.map((item) => <AgendaRow art={artFor(item)} item={item} key={item.key} />)}
               </ul>
             )}
           </section>

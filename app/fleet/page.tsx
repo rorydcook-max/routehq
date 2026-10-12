@@ -260,7 +260,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                         <td className="px-3 py-3">
                           <div className="flex min-w-32 items-center gap-2">
                             <span aria-hidden="true" className="h-2.5 flex-1 overflow-hidden rounded-full bg-[var(--panel-tertiary)]">
-                              <span className="block h-full rounded-full bg-[var(--chart-in)]" style={{ width: `${Math.max(0, Math.min(100, vehicle.utilization))}%` }} />
+                              <span className="grow-x block h-full rounded-full bg-[var(--chart-in)]" style={{ width: `${Math.max(0, Math.min(100, vehicle.utilization))}%` }} />
                             </span>
                             <span className="num w-11 text-right text-[var(--foreground)]">{vehicle.utilization}%</span>
                           </div>
@@ -298,7 +298,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                       </div>
                       <div className="mt-2 flex items-center gap-2.5">
                         <span aria-hidden="true" className="h-2.5 flex-1 overflow-hidden rounded-full bg-[var(--panel-tertiary)]">
-                          <span className="block h-full rounded-full bg-[var(--chart-in)]" style={{ width: `${Math.max(0, Math.min(100, vehicle.utilization))}%` }} />
+                          <span className="grow-x block h-full rounded-full bg-[var(--chart-in)]" style={{ width: `${Math.max(0, Math.min(100, vehicle.utilization))}%` }} />
                         </span>
                         <span className="num flex-shrink-0 whitespace-nowrap text-right text-[15px] text-[var(--foreground)]">{t("utilShort", { pct: vehicle.utilization })}</span>
                       </div>

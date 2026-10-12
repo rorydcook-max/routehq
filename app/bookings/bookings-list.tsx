@@ -373,6 +373,21 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                     {vehicleTitle(booking.vehicles) || tx.say("vehicle")} · {formatRange(booking.start_date, booking.end_date, tx)}
                   </p>
                   {timingLabel ? <p className="mt-1 font-bold text-[var(--foreground)]">{timingLabel}</p> : null}
+          {(() => {
+            // Only a rental that is out and has an end: the bar runs from handover to return, filled up to today.
+            const start = String(booking.start_date || "").slice(0, 10);
+            const end = String(booking.end_date || "").slice(0, 10);
+            const onRoad = ["active", "due_soon", "overdue", "extended"].includes(String(booking.status || ""));
+            if (!onRoad || !start || !end || end <= start) return null;
+            const day = (iso: string) => new Date(`${iso}T00:00:00Z`).getTime();
+            const done = Math.max(0, Math.min(100, ((day(businessToday()) - day(start)) / (day(end) - day(start))) * 100));
+            const late = businessToday() > end;
+            return (
+              <span aria-hidden="true" className="mt-2 block h-2 max-w-sm overflow-hidden rounded-full bg-[var(--panel-tertiary)]">
+                <span className="grow-x block h-full rounded-full" style={{ width: `${late ? 100 : done}%`, background: late ? "var(--danger)" : "var(--on-rent)" }} />
+              </span>
+            );
+          })()}
                   {waitingOn ? (
                     <p className="mt-1 font-bold text-[var(--danger)]">
                       {tx.say("notBack", { name: waitingOn.customers?.full_name || tx.say("currentCustomer"), date: shortDate(String(waitingOn.end_date).slice(0, 10), tx.locale) })}{" "}

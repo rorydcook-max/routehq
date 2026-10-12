@@ -19,7 +19,7 @@ import {
   XAxis,
   YAxis
 } from "recharts";
-import { ArrowDownRight, ArrowUpRight, Check, ChevronDown, ChevronRight, Download, Lightbulb, Loader2 } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, Check, CheckCircle2, ChevronDown, ChevronRight, Download, Handshake, Lightbulb, Loader2, TrendingUp } from "lucide-react";
 import { intlLocale, longDate } from "@/lib/i18n/dates";
 import { Dot, InOutBars } from "@/components/glance";
 import type { DatePreset, ReportsData, VehicleMetrics } from "@/lib/reports";
@@ -436,19 +436,39 @@ export function ReportsView({ data }: { data: ReportsData }) {
             <Change change={data.expensesChange} say={say} upIsBad />
           </div>
         </div>
-        <p className={`mt-3 ${soft}`}>{say("profitNote")}</p>
+        {data.totalRevenue > 0 ? (
+          (() => {
+            const spent = Math.min(100, Math.round((data.totalExpenses / data.totalRevenue) * 100));
+            return (
+              <div className="mt-4" title={say("profitNote")}>
+                <div aria-hidden="true" className="flex h-3.5 overflow-hidden rounded-full bg-[var(--panel-tertiary)]">
+                  {spent > 0 ? <span className="grow-x block h-full" style={{ background: "var(--chart-out)", width: `${spent}%` }} /> : null}
+                  {spent < 100 ? <span className={`grow-x block h-full flex-1 ${spent > 0 ? "border-l-2 border-white" : ""}`} style={{ background: "var(--success)" }} /> : null}
+                </div>
+                <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-semibold text-[var(--foreground-secondary)]">
+                  <span className="inline-flex items-center gap-1.5"><Dot color="var(--chart-out)" />{say("spentShare", { percent: spent })}</span>
+                  <span className="inline-flex items-center gap-1.5"><Dot color="var(--success)" />{say("keptShare", { percent: 100 - spent })}</span>
+                </p>
+              </div>
+            );
+          })()
+        ) : (
+          <p className={`mt-3 ${soft}`}>{say("profitNote")}</p>
+        )}
       </section>
 
       <div className="grid content-start gap-3">
       <Link className="card pressable flex items-center justify-between gap-3 p-4" href={"/reports/fleet-value" as any}>
-        <span>
+        <span aria-hidden="true" className="inline-flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[var(--primary-light)] text-[var(--primary)]"><TrendingUp size={22} /></span>
+        <span className="min-w-0 flex-1">
           <span className="block font-bold text-[var(--foreground)]">{say("fleetValueLink")}</span>
           <span className={soft}>{say("fleetValueLinkHint")}</span>
         </span>
         <span aria-hidden className="text-xl text-[var(--muted)]">›</span>
       </Link>
       <Link className="card pressable flex items-center justify-between gap-3 p-4" href={"/reports/owners" as any}>
-        <span>
+        <span aria-hidden="true" className="inline-flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[var(--accent-light)] text-[#5c3a0c]"><Handshake size={22} /></span>
+        <span className="min-w-0 flex-1">
           <span className="block font-bold text-[var(--foreground)]">{say("ownersLink")}</span>
           <span className={soft}>{say("ownersLinkHint")}</span>
         </span>
@@ -460,7 +480,10 @@ export function ReportsView({ data }: { data: ReportsData }) {
       <section className="card p-4">
         <h2 className={h2}>{say("owedTitle")}</h2>
         {data.outstandingBalances.length === 0 ? (
-          <p className={`mt-1 ${soft}`}>{say("owedNone")}</p>
+          <p className="mt-3 flex items-center gap-3 font-semibold text-[var(--foreground-secondary)]">
+            <span className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-[var(--success)] text-white"><CheckCircle2 size={22} strokeWidth={2.4} /></span>
+            {say("owedNone")}
+          </p>
         ) : (
           <>
             <p className={`mt-1 ${soft}`}>{say("owedTotal", { amount: money(totalOutstanding), count: data.outstandingBalances.length })}</p>

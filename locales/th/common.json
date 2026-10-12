@@ -3923,6 +3923,8 @@
     "moneyIn": "เงินเข้า",
     "moneyOut": "เงินออก",
     "profitNote": "กำไรคือเงินเข้าหักเงินออก",
+    "keptShare": "เก็บไว้ {percent}%",
+    "spentShare": "จ่ายออก {percent}%",
     "sameAsBefore": "เท่ากับช่วงก่อนหน้า",
     "upOnBefore": "เพิ่มขึ้น {percent}% จากช่วงก่อนหน้า",
     "downOnBefore": "ลดลง {percent}% จากช่วงก่อนหน้า",

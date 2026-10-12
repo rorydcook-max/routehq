@@ -3914,6 +3914,8 @@
     "moneyIn": "Money in",
     "moneyOut": "Money out",
     "profitNote": "Profit is money in less money out.",
+    "keptShare": "Kept {percent}%",
+    "spentShare": "Spent {percent}%",
     "sameAsBefore": "Same as the period before",
     "upOnBefore": "Up {percent}% on the period before",
     "downOnBefore": "Down {percent}% on the period before",

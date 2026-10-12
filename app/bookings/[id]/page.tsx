@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { canDecideMoney, getCurrentMembership } from "@/lib/auth/roles";
 import type { Route } from "next";
-import { AlertTriangle, Car, CheckCircle2, Clock, CreditCard, FileText, Gauge, MapPin, UserRound } from "lucide-react";
+import { AlertTriangle, ArrowRight, Car, CheckCircle2, Clock, CreditCard, FileText, Gauge, MapPin, UserRound } from "lucide-react";
 import { CancelBookingButton } from "@/app/bookings/[id]/cancel-booking-button";
 import { VehicleChangeButton } from "@/app/bookings/[id]/vehicle-change-button";
 import { UnsentMessages } from "@/app/bookings/[id]/unsent-messages";
@@ -26,7 +26,7 @@ import { EarlyReturnOwedPanel } from "@/app/bookings/[id]/early-return-owed";
 import { activeExtrasLines, extrasLines, extrasSummary } from "@/lib/extras";
 import { AppShell } from "@/components/app-shell";
 import { VehicleArt } from "@/components/vehicle-art";
-import { PartBar, PaymentStrip, RentalTrack, initialsOf } from "@/components/glance";
+import { DateLeaf, PartBar, PaymentStrip, RentalTrack, initialsOf } from "@/components/glance";
 import { kindFromCategory } from "@/lib/vehicle-groups";
 import { AddRentalPaymentInlineForm, EditableEndDate, EditableRentalPaymentRow, EditableTransactionRow, ExistingRentalPaymentSetupCard } from "@/components/booking-correction-controls";
 import { CommunicationPanel } from "@/components/communication-panel";
@@ -627,10 +627,21 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               <div className="rounded-xl bg-[var(--background)] px-3.5 py-3">
                 <p className="font-semibold text-[var(--muted)]">{tx.say("dates")}</p>
                 <p className="mt-0.5 text-[20px] font-bold leading-tight text-[var(--foreground)]">{daysRemaining(rental.end_date, rental.status, rental.start_date, tx)}</p>
-                <p className="flex flex-wrap items-center gap-1 font-medium text-[var(--foreground-secondary)]">
-                  <span>{rental.end_date ? tx.say("dateTo", { date: formatDate(rental.start_date, tx) }) : tx.say("fromOpenEnded", { date: formatDate(rental.start_date, tx) })}</span>
-                  <EditableEndDate currentEndDate={rental.end_date} rentalId={rental.id} />
-                </p>
+                {/* Out and back as two calendar leaves; the full dates show on hover. */}
+                {rental.end_date && rental.start_date ? (
+                  <div className="mt-2.5 flex flex-wrap items-center gap-2">
+                    <DateLeaf date={rental.start_date} locale={tx.locale} />
+                    <ArrowRight aria-hidden="true" className="text-[var(--muted)]" size={18} />
+                    <DateLeaf date={rental.end_date} locale={tx.locale} tone="var(--coming-back)" />
+                    <span className="sr-only">{tx.say("dateTo", { date: formatDate(rental.start_date, tx) })}</span>
+                    <EditableEndDate currentEndDate={rental.end_date} iconOnly rentalId={rental.id} />
+                  </div>
+                ) : (
+                  <p className="flex flex-wrap items-center gap-1 font-medium text-[var(--foreground-secondary)]">
+                    <span>{rental.end_date ? tx.say("dateTo", { date: formatDate(rental.start_date, tx) }) : tx.say("fromOpenEnded", { date: formatDate(rental.start_date, tx) })}</span>
+                    <EditableEndDate currentEndDate={rental.end_date} rentalId={rental.id} />
+                  </p>
+                )}
               </div>
               <div className="rounded-xl bg-[var(--background)] px-3.5 py-3">
                 {/* When the big number is money owed (it can include the deposit), the tile says so instead of "Rent". */}

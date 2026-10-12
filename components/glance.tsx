@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 import type { CSSProperties, ReactNode } from "react";
+import { intlLocale } from "@/lib/i18n/dates";
 
 // Small pictures that say one thing at a glance: a ring, a week planner, a pair of bars.
 // Colours carry one meaning each (see "Look G" in globals.css).
@@ -296,6 +297,20 @@ export function Spark({ points, label, color = "var(--chart-in)" }: { points: Ar
           <span className="spark-dot" style={{ top: `${(y(point.value) / height) * 100}%` }} />
         </span>
       ))}
+    </span>
+  );
+}
+
+/** A date as a calendar leaf: the month on a coloured strip, the day large, the weekday under it. */
+export function DateLeaf({ date, locale, tone = "var(--on-rent)" }: { date: string; locale: string; tone?: string }) {
+  const day = new Date(`${String(date).slice(0, 10)}T00:00:00Z`);
+  if (Number.isNaN(day.getTime())) return null;
+  const format = (options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat(intlLocale(locale), { ...options, timeZone: "UTC" }).format(day);
+  return (
+    <span className="inline-flex w-[66px] flex-shrink-0 flex-col overflow-hidden rounded-xl bg-white text-center shadow-[0_1px_3px_rgba(19,38,43,0.14)]" title={format({ weekday: "long", day: "numeric", month: "long", year: "numeric" })}>
+      <span className="py-0.5 text-[14px] font-bold text-white" style={{ background: tone }}>{format({ month: "short" })}</span>
+      <span className="num pt-1 text-[24px] leading-none text-[var(--foreground)]">{day.getUTCDate()}</span>
+      <span className="pb-1 text-[14px] font-semibold text-[var(--muted)]">{format({ weekday: "short" })}</span>
     </span>
   );
 }

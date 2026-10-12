@@ -1406,7 +1406,7 @@ export function BookingForm({
           </Link>
         ) : (
           <button
-            className="pressable min-h-12 flex-1 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white shadow-lg disabled:bg-[var(--muted)]"
+            className="pressable min-h-12 flex-1 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white shadow-lg disabled:opacity-40 disabled:shadow-none"
             disabled={isPending}
             key="submit"
             onClick={() => {

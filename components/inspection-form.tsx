@@ -1,9 +1,9 @@
 "use client";
 
 import { businessToday, toWallTime } from "@/lib/business-time";
-import { VehicleKindIcon } from "@/components/vehicle-kind-icon";
 import { shownError } from "@/lib/error-text";
 import { isTwoWheeler, kindFromCategory } from "@/lib/vehicle-groups";
+import { VehicleArt } from "@/components/vehicle-art";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
@@ -709,7 +709,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, canW
         </button>
         {step < steps.length - 1 ? (
           <button
-            className={`${touchButton} flex-1 bg-[var(--primary)] text-white shadow-lg disabled:bg-[var(--muted)]`}
+            className={`${touchButton} flex-1 bg-[var(--primary)] text-white shadow-lg disabled:opacity-40 disabled:shadow-none`}
             disabled={!canAdvance()}
             // Distinct keys stop React reusing this button as the submit button, which let the
             // click that opened the last step also submit (condition reports need no signature).
@@ -722,7 +722,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, canW
           </button>
         ) : (
           <button
-            className={`${touchButton} flex-1 bg-[var(--primary)] text-white shadow-lg disabled:bg-[var(--muted)]`}
+            className={`${touchButton} flex-1 bg-[var(--primary)] text-white shadow-lg disabled:opacity-40 disabled:shadow-none`}
             disabled={!canAdvance() || isPending}
             form="inspectionForm"
             key="submit"
@@ -791,9 +791,9 @@ export function InspectionForm({ context, unsigned = false, blocker = null, canW
       {step === 0 ? (
         <StepShell eyebrow={t("eyebrowVehicleConfirmation")} title={mode === "return" ? t("titleConfirmReturn") : mode === "condition_report" ? t("titleStartCondition") : t("titleConfirmHandover")}>
           <div className="rounded-xl border border-[var(--border)] bg-white p-4">
-            <div className="flex items-start gap-4">
-              <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
-                <VehicleKindIcon boxed={false} kind={kindFromCategory(context.vehicle.vehicle_categories)} size={30} />
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
+              <span className="shrink-0 self-start">
+                <VehicleArt colour={(context.vehicle as any).color} kind={kindFromCategory(context.vehicle.vehicle_categories)} model={(context.vehicle as any).model} size="md" />
               </span>
               <div>
                 <p className="text-2xl font-semibold text-[var(--foreground)]">{titleFor(context)}</p>
@@ -813,8 +813,8 @@ export function InspectionForm({ context, unsigned = false, blocker = null, canW
                   <p className="mt-2 rounded-lg bg-[var(--warning-light)] px-3 py-2 text-sm font-semibold text-[var(--warning)]">{t("notSignedNote")}</p>
                 ) : null}
                 {mode === "return" ? (
-                  <p className="mt-2 rounded-lg bg-[var(--warning-light)] px-3 py-2 text-sm font-bold text-[var(--warning)]">
-                    <span className="font-mono-data">
+                  <p className="mt-2 rounded-lg bg-[var(--panel-secondary)] px-3 py-2 font-semibold text-[var(--foreground-secondary)]">
+                    <span>
                       {handoverKm != null ? `${t("odometerAtDelivery", { km: handoverKm.toLocaleString("en-US") })} · ` : ""}
                       {t("rentalLengthDays", { count: daysBetween(context.rental?.start_date) })}
                     </span>
@@ -1274,7 +1274,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, canW
                   />
                 </label>
                 <button
-                  className={`${touchButton} self-end bg-[var(--primary)] text-white disabled:bg-[var(--muted)]`}
+                  className={`${touchButton} self-end bg-[var(--primary)] text-white disabled:opacity-40 disabled:shadow-none`}
                   disabled={isReceiptPending || Boolean(receiptResult)}
                   onClick={generateDeliveryReceipt}
                   type="button"

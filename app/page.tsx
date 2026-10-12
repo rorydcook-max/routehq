@@ -3,15 +3,14 @@ import type { Route } from "next";
 import type { ReactNode } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { dayOfWeekDate, intlLocale, shortDate as shortDateIn } from "@/lib/i18n/dates";
-import { ArrowRight, Bell, CalendarClock, CheckCircle2, FileWarning, KeyRound, Plus, ReceiptText, RotateCcw, Wallet, MessageCircle } from "lucide-react";
+import { ArrowRight, Bell, CheckCircle2, Clock3, FileWarning, KeyRound, Lock, Plus, ReceiptText, RotateCcw, Wallet, MessageCircle } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { businessToday } from "@/lib/business-time";
 import { OnboardingChecklist } from "@/components/onboarding-checklist";
-import { OutFreeSummary, VehicleKindIcon } from "@/components/vehicle-kind-icon";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDashboardData, money } from "@/lib/dashboard";
 import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization";
-import { getCurrentMembership } from "@/lib/auth/roles";
+import { canDecideMoney, getCurrentMembership } from "@/lib/auth/roles";
 import { getOnboardingStatus } from "@/lib/onboarding";
 import { getReceiptsWaiting } from "@/lib/payment-receipts";
 import { getTaskList } from "@/lib/tasks";
@@ -20,8 +19,9 @@ import { holdsEndingSoon, releaseExpiredHolds } from "@/lib/booking-holds";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isExpenseTransaction, isRevenueTransaction } from "@/lib/transaction-options";
-import { groupVehiclesByKind, kindFromCategory } from "@/lib/vehicle-groups";
-import { VehicleArt } from "@/components/vehicle-art";
+import { kindFromCategory } from "@/lib/vehicle-groups";
+import { VehicleArt, paintOf } from "@/components/vehicle-art";
+import { Dot, InOutBars, Ring, TileHead, WeekPlanner, type PlannerBar, type PlannerLane } from "@/components/glance";
 
 // Dates and counts are worded by the translation files (see lib/i18n/dates.ts and locales/).
 function addDays(isoDate: string, days: number) {
@@ -104,7 +104,10 @@ function PanelLink({ href, children }: { href: string; children: ReactNode }) {
 export default async function Home({ searchParams }: { searchParams?: Promise<{ notice?: string }> }) {
   const notice = (searchParams ? await searchParams : {}).notice;
   // A teammate sees the day's work and what customers owe, not how the business is doing or its set-up.
-  const isOwner = (await getCurrentMembership())?.role === "owner";
+  const membership = await getCurrentMembership();
+  const isOwner = membership?.role === "owner";
+  // Refunds and free days are the owner's or a manager's call: a teammate's day does not list them.
+  const canDecide = canDecideMoney(membership?.role);
   // Holds that ran out without a signature give their dates back before anything is counted.
   await getDefaultOrganization().then((org) => releaseExpiredHolds(createSupabaseAdminClient(), org.id)).catch(() => null);
   const endingHolds = await getDefaultOrganization().then((org) => holdsEndingSoon(createSupabaseAdminClient(), org.id)).catch(() => []);
@@ -161,27 +164,13 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
     .filter((t) => isExpenseTransaction({ isDeposit: t.isDeposit, type: t.rawType || t.type }))
     .reduce((sum, t) => sum + Math.abs(t.amount), 0);
   const monthlyProfit = metrics.monthlyRevenue - monthlyExpenses;
-  const revenueByMonth = new Map<string, number>();
-  transactions.forEach((t) => {
-    if (!t.date || !isRevenueTransaction({ amount: t.amount, isDeposit: t.isDeposit, type: t.rawType || t.type })) return;
-    const key = t.date.slice(0, 7);
-    revenueByMonth.set(key, (revenueByMonth.get(key) || 0) + t.amount);
-  });
-  const lastSixMonths = Array.from({ length: 6 }, (_, index) => {
-    const month = new Date(Date.UTC(Number(today.slice(0, 4)), Number(today.slice(5, 7)) - 6 + index, 1));
-    const key = `${month.getUTCFullYear()}-${String(month.getUTCMonth() + 1).padStart(2, "0")}`;
-    return { key, label: new Intl.DateTimeFormat(intlLocale(locale), { month: "short", timeZone: "UTC" }).format(month), amount: revenueByMonth.get(key) || 0 };
-  });
-  const maxMonth = Math.max(1, ...lastSixMonths.map((month) => month.amount));
 
   // Only payments past their due date count as overdue.
   const overdueRentals = [...rentals, ...(dashboardData.closedOverdue || [])].filter((r) => (r.overdue || 0) > 0).sort((a, b) => String(a.overdueSince).localeCompare(String(b.overdueSince)));
   const overdueTotal = overdueRentals.reduce((sum, r) => sum + (r.overdue || 0), 0);
   const depositsHeld = metrics.depositsHeld ?? rentals.reduce((sum, r) => sum + (r.depositHeld || 0), 0);
-  const depositsHeldCount = metrics.depositsHeldCount ?? rentals.filter((r) => (r.depositHeld || 0) > 0).length;
 
   // ── Fleet at a glance ────────────────────────────────────────────────────
-  const groups = groupVehiclesByKind(vehicles, categories);
   const rentedCount = vehicles.filter((v) => v.status === "Rented").length;
   const utilization = vehicles.length > 0 ? Math.round((rentedCount / vehicles.length) * 100) : 0;
 
@@ -335,6 +324,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   // The first few are listed; the rest are one row, so the dashboard and To do never tell different stories.
   const jobsDue = taskList
     .filter((task) => task.kind === "task" && !task.completedAt && !task.coveredBy && !!task.dueDate && task.dueDate <= today)
+    .filter((task) => canDecide || !["refund", "waive_early", "owed_early"].includes(String(task.action || "")))
     .sort((a, b) => Number(b.action === "request") - Number(a.action === "request") || String(a.dueDate).localeCompare(String(b.dueDate)));
   // Two requests on one booking are answered on the same screen, so they are one row here, not two identical ones.
   const requestsOn = (rentalId?: string | null) => jobsDue.filter((other) => other.action === "request" && !!rentalId && other.rentalId === rentalId).length;
@@ -368,7 +358,6 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   todayItems.sort((a, b) => (a.rank ?? 4) - (b.rank ?? 4) || toneOrder[a.tone] - toneOrder[b.tone]);
   upcomingItems.sort((a, b) => a.sort.localeCompare(b.sort));
 
-  const onRent = rentals.filter((r) => r.status !== "Booked").sort((a, b) => String(a.end).localeCompare(String(b.end)));
   const urgentCount = todayItems.filter((item) => item.tone === "red").length;
 
   // ── Pictures: each job about a vehicle shows it ─────────────────────────
@@ -402,36 +391,92 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       day,
       out: rentals.filter((r) => r.status === "Booked" && String(r.start || "").slice(0, 10) === day).length,
       back: rentals.filter((r) => r.status !== "Booked" && r.end !== "Indefinite" && String(r.end || "").slice(0, 10) === day).length,
-      name: new Intl.DateTimeFormat(intlLocale(locale), { weekday: "short", timeZone: "UTC" }).format(date),
+      name: ((short) => (short.replace(/\.$/, "").length > 4 ? new Intl.DateTimeFormat(intlLocale(locale), { weekday: "narrow", timeZone: "UTC" }).format(date) : short))(new Intl.DateTimeFormat(intlLocale(locale), { weekday: "short", timeZone: "UTC" }).format(date)),
       number: date.getUTCDate()
     };
   });
+  // ── The week planner: one lane per vehicle, who has it and when it changes hands ──
+  const weekEnd = addDays(today, 6);
+  const firstName = (name: string | null | undefined) => String(name || "").trim().split(/\s+/)[0] || t("walkIn");
+  const lanesAll = vehicles.map((v) => {
+    const bars: PlannerBar[] = [];
+    for (const r of rentals.filter((entry) => entry.vehicleId === v.id)) {
+      const startDay = String(r.start || "").slice(0, 10);
+      const onRoad = r.status !== "Booked";
+      const lateBackHere = onRoad && r.end !== "Indefinite" && r.end < today;
+      const endDay = r.end === "Indefinite" || lateBackHere ? weekEnd : String(r.end || "").slice(0, 10);
+      if (!startDay || startDay > weekEnd || endDay < today) continue;
+      const from = Math.max(0, daysBetween(today, startDay));
+      const to = Math.min(6, daysBetween(today, endDay));
+      const lateOut = !onRoad && startDay < today;
+      bars.push({
+        start: from,
+        length: Math.max(1, to - from + 1),
+        label: firstName(r.customer),
+        kind: lateBackHere || lateOut ? "late" : onRoad ? "rent" : "next",
+        back: onRoad && !lateBackHere && r.end !== "Indefinite" && r.end <= weekEnd,
+        href: `/bookings/${r.id}`,
+        title: `${r.customer} · ${r.vehicle}`
+      });
+    }
+    // A return and the next handover on the same day share it: the first bar stops where the next one starts.
+    bars.sort((a, b) => a.start - b.start);
+    for (let index = 0; index < bars.length - 1; index++) {
+      if (bars[index].start + bars[index].length > bars[index + 1].start && bars[index + 1].start > bars[index].start) bars[index].length = bars[index + 1].start - bars[index].start;
+    }
+    return { id: v.id, name: v.model || v.make, paint: paintOf(v.color) || "var(--primary)", href: `/fleet/${v.id}`, bars } as PlannerLane;
+  });
+  const lanes = [...lanesAll.filter((lane) => lane.bars.length > 0), ...lanesAll.filter((lane) => lane.bars.length === 0)].slice(0, 8);
+  const moreLanes = lanesAll.length - lanes.length;
+
+  // ── Tiles: one thing each, readable at a glance ──
+  const monthName = new Intl.DateTimeFormat(intlLocale(locale), { month: "long", timeZone: "UTC" }).format(new Date(`${today}T00:00:00Z`));
+  const lastMonthDate = new Date(Date.UTC(Number(today.slice(0, 4)), Number(today.slice(5, 7)) - 2, 1));
+  const lastMonth = `${lastMonthDate.getUTCFullYear()}-${String(lastMonthDate.getUTCMonth() + 1).padStart(2, "0")}`;
+  // Compared with the same point last month, so the 5th is not measured against a whole month.
+  const sameDayLastMonth = `${lastMonth}-${today.slice(8, 10)}`;
+  const isIn = (x: (typeof transactions)[number]) => isRevenueTransaction({ amount: x.amount, isDeposit: x.isDeposit, type: x.rawType || x.type });
+  const isOut = (x: (typeof transactions)[number]) => isExpenseTransaction({ isDeposit: x.isDeposit, type: x.rawType || x.type });
+  const lastMonthSoFar = transactions.filter((x) => String(x.date || "").slice(0, 7) === lastMonth && String(x.date || "") <= sameDayLastMonth);
+  const lastMonthProfit = lastMonthSoFar.filter(isIn).reduce((sum, x) => sum + x.amount, 0) - lastMonthSoFar.filter(isOut).reduce((sum, x) => sum + Math.abs(x.amount), 0);
+  const profitChange = monthlyProfit - lastMonthProfit;
+  // Five weeks, Monday to Sunday, the last one being this week.
+  const mondayOffset = (new Date(`${today}T00:00:00Z`).getUTCDay() + 6) % 7;
+  const weeks = Array.from({ length: 5 }, (_, index) => {
+    const from = addDays(today, -mondayOffset - (4 - index) * 7);
+    const to = addDays(from, 6);
+    const inWeek = transactions.filter((x) => String(x.date || "").slice(0, 10) >= from && String(x.date || "").slice(0, 10) <= to);
+    return { key: from, label: shortDate(from), in: inWeek.filter(isIn).reduce((sum, x) => sum + x.amount, 0), out: inWeek.filter(isOut).reduce((sum, x) => sum + Math.abs(x.amount), 0) };
+  });
+  const nextBack = rentals.filter((r) => r.status !== "Booked" && r.end !== "Indefinite" && r.end >= today).sort((a, b) => String(a.end).localeCompare(String(b.end)))[0] || null;
+  const nextOut = rentals.filter((r) => r.status === "Booked" && String(r.start || "") >= today).sort((a, b) => String(a.start).localeCompare(String(b.start)))[0] || null;
+  const unsentTotal = [...unsentByRental.values()].reduce((sum, entry) => sum + entry.count, 0);
+  const firstUnsent = [...unsentByRental.keys()][0];
+  const vehicleArtFor = (vehicleId: string | null | undefined) => {
+    const vehicle = vehicleById.get(String(vehicleId || ""));
+    if (!vehicle) return null;
+    const category = categories.find((entry: any) => entry.id === vehicle.categoryId) || null;
+    return <VehicleArt colour={vehicle.color} kind={kindFromCategory(category as any)} model={vehicle.model} size="md" />;
+  };
+
+  const pill = (count: number, label: string, dot?: string) => (
+    <span className="inline-flex items-center gap-1.5 rounded-2xl bg-[var(--band-soft)] px-3 py-2 text-white">
+      {dot ? <Dot color={dot} /> : null}
+      <span className="num text-[22px] leading-none">{count}</span>
+      <span className="font-semibold">{label}</span>
+    </span>
+  );
   const hero = (
-    <div className="flex flex-wrap items-end justify-between gap-4">
+    <div className="flex flex-wrap items-end justify-between gap-4 pb-6 lg:pb-8">
       <div className="min-w-0 flex-1">
-        <p className="font-semibold text-white/85">{headerDate}</p>
-        <h1 className="mt-0.5 text-[30px] font-bold leading-tight text-white">{greeting}</h1>
-        <div className="mt-4 grid max-w-xl grid-cols-7 gap-1.5">
-          {weekDays.map((day, index) => (
-            <Link
-              aria-label={`${day.name} ${day.number}: ${t("weekOut")} ${day.out}, ${t("weekBack")} ${day.back}`}
-              className={`flex flex-col items-center rounded-2xl py-2 ${index === 0 ? "bg-white text-[var(--foreground)]" : "bg-[var(--band-soft)] text-white"}`}
-              href="/calendar"
-              key={day.day}
-            >
-              <span className="font-semibold leading-tight">{day.name}</span>
-              <span className="text-[19px] font-bold leading-tight tabular-nums">{day.number}</span>
-              <span className="mt-1 flex h-2 items-center gap-1">
-                {day.out ? <span className="h-2 w-2 rounded-full bg-[var(--accent)]" /> : null}
-                {day.back ? <span className="h-2 w-2 rounded-full bg-[#8fd3c9]" /> : null}
-              </span>
-            </Link>
-          ))}
+        <p className="font-semibold text-white/90">{headerDate}</p>
+        <h1 className="mt-0.5 text-[32px] leading-tight text-white lg:text-[36px]">{greeting}</h1>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {urgentCount > 0 ? pill(urgentCount, t("pillUrgent"), "#f6b7a3") : null}
+          {pill(todayItems.length, t("pillToDo"))}
+          {pill(weekDays[0].out, t("pillOut"), "var(--going-out)")}
+          {pill(weekDays[0].back, t("pillBack"), "var(--coming-back)")}
         </div>
-        <p className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1 font-semibold text-white/90">
-          <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[var(--accent)]" />{t("weekOut")}</span>
-          <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#8fd3c9]" />{t("weekBack")}</span>
-        </p>
       </div>
       {/* On a phone the + in the bar does this. */}
       <Link className="pressable hidden min-h-11 items-center gap-2 rounded-full bg-[var(--band-action)] px-5 font-bold text-[var(--band-action-ink)] lg:inline-flex" href="/bookings/new">
@@ -440,6 +485,110 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       </Link>
     </div>
   );
+
+  const firstOverdue = overdueRentals[0];
+  const smallTiles: Array<{ key: string; node: ReactNode }> = [];
+  smallTiles.push({
+    key: "owed",
+    node:
+      overdueTotal > 0 ? (
+        <Link className="card pressable tile p-4 tile-brick" href={(overdueRentals.length === 1 ? `/bookings/${firstOverdue.id}` : "/tasks") as Route}>
+          <TileHead icon={<Clock3 size={22} />} title={t("overdue")} />
+          <span>
+            <span className="num block text-[28px] leading-tight">{money(overdueTotal)}</span>
+            <span className="font-semibold">{overdueRentals.length === 1 ? firstName(firstOverdue.customer) : t("customersCount", { count: overdueRentals.length })}</span>
+          </span>
+        </Link>
+      ) : (
+        <Link className="card pressable tile p-4 tile-green" href="/bookings">
+          <TileHead icon={<CheckCircle2 size={22} />} title={t("allPaid")} />
+          <span className="font-semibold">{t("nobodyOwes")}</span>
+        </Link>
+      )
+  });
+  if (vehicles.length > 0) {
+    smallTiles.push({
+      key: "earning",
+      node: (
+        <Link className="card pressable tile p-4 text-[var(--foreground)]" href="/fleet">
+          <TileHead title={t("outEarning")} />
+          <span className="flex items-center gap-3">
+            <Ring label={`${utilization}%`} pct={utilization} />
+            <span className="font-semibold text-[var(--foreground-secondary)]">{t("earningShort", { out: rentedCount, total: vehicles.length })}</span>
+          </span>
+        </Link>
+      )
+    });
+  }
+  const backOrOut = nextBack || nextOut;
+  if (backOrOut) {
+    const back = backOrOut === nextBack;
+    const day = back ? String(backOrOut.end) : String(backOrOut.start).slice(0, 10);
+    smallTiles.push({
+      key: "next",
+      node: (
+        <Link className="card pressable tile p-4 text-[var(--foreground)]" href={`/bookings/${backOrOut.id}` as Route}>
+          <span className="flex items-center gap-2 text-[15px] font-bold"><Dot color={back ? "var(--coming-back)" : "var(--going-out)"} />{day === today ? t(back ? "backToday" : "outToday") : t(back ? "backOn" : "outOn", { day: dayLabel(day) })}</span>
+          <span className="flex justify-center">{vehicleArtFor(backOrOut.vehicleId)}</span>
+          <span className="line-clamp-2 font-semibold text-[var(--foreground-secondary)]">{t(back ? "vehicleFrom" : "vehicleTo", { vehicle: noPlate(backOrOut.vehicle), who: firstName(backOrOut.customer) })}</span>
+        </Link>
+      )
+    });
+  }
+  if (unsentTotal > 0 && firstUnsent) {
+    smallTiles.push({
+      key: "messages",
+      node: (
+        <Link className="card pressable tile p-4 tile-plum" href={`/bookings/${firstUnsent}#unsent-messages` as Route}>
+          <TileHead icon={<MessageCircle size={22} />} title={t("messagesTile")} />
+          <span>
+            <span className="num block text-[36px] leading-none">{unsentTotal}</span>
+            <span className="font-semibold">{t("messagesReady")}</span>
+          </span>
+        </Link>
+      )
+    });
+  }
+  if (depositsHeld > 0) {
+    smallTiles.push({
+      key: "deposits",
+      node: (
+        <Link className="card pressable tile p-4 tile-sky" href="/bookings">
+          <TileHead icon={<Lock size={22} />} title={t("depositsHeld")} />
+          <span>
+            <span className="num block text-[26px] leading-tight">{money(depositsHeld)}</span>
+            <span className="font-semibold">{t("depositsNote")}</span>
+          </span>
+        </Link>
+      )
+    });
+  }
+  const moneyTile = isOwner ? (
+    <Link className="card pressable col-span-2 block p-4 text-[var(--foreground)]" href="/reports" key="money">
+      <span className="block text-[15px] font-bold">{t("monthSoFar", { month: monthName })}</span>
+      <span className={`num mt-1 block text-[32px] leading-tight ${monthlyProfit < 0 ? "text-[var(--danger)]" : ""}`}>{money(monthlyProfit)}</span>
+      {lastMonthSoFar.length > 0 ? (
+        <span className={`block font-bold ${profitChange < 0 ? "text-[var(--danger)]" : "text-[var(--success)]"}`}>
+          {profitChange < 0 ? t("profitDown", { amount: money(Math.abs(profitChange)) }) : t("profitUp", { amount: money(profitChange) })}
+        </span>
+      ) : (
+        <span className="block font-bold text-[var(--foreground-secondary)]">{t("profitLabel")}</span>
+      )}
+      <span className="mt-2.5 flex gap-4 font-semibold text-[var(--foreground-secondary)]">
+        <span className="inline-flex items-center gap-1.5"><Dot color="var(--chart-in)" />{t("moneyIn")} {money(metrics.monthlyRevenue)}</span>
+        <span className="inline-flex items-center gap-1.5"><Dot color="var(--chart-out)" />{t("moneyOut")} {money(monthlyExpenses)}</span>
+      </span>
+      <InOutBars label={t("inOutWeeks")} money={money} periods={weeks} />
+    </Link>
+  ) : null;
+  // Two to a row; an odd one out takes the whole row rather than leave a gap.
+  const tiles = [
+    ...smallTiles.slice(0, 2).map((tile) => <div className="min-w-0 [&>a]:h-full" key={tile.key}>{tile.node}</div>),
+    moneyTile,
+    ...smallTiles.slice(2).map((tile, index, rest) => (
+      <div className={`min-w-0 [&>a]:h-full ${index === rest.length - 1 && rest.length % 2 === 1 ? "col-span-2" : ""}`} key={tile.key}>{tile.node}</div>
+    ))
+  ];
 
   return (
     <AppShell heroOverlap hero={hero} userEmail={userEmail}>
@@ -455,39 +604,40 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
         </div>
       ) : null}
 
-      {/* The numbers that decide the day, on the band's lower edge. Nothing below 14px, nothing faded. */}
-      <div className="relative -mt-7 mb-6 grid grid-cols-2 gap-3 lg:-mt-8 lg:grid-cols-4 lg:px-4">
-        <Link className="card pressable flex flex-col gap-1 p-4" href="/tasks">
-          <span className="font-semibold text-[var(--muted)]">{t("statUrgent")}</span>
-          <span className={`text-[30px] font-bold leading-none tabular-nums ${urgentCount > 0 ? "text-[var(--danger)]" : "text-[var(--success)]"}`}>{urgentCount}</span>
-        </Link>
-        <Link className="card pressable flex flex-col gap-1 p-4" href="/tasks">
-          <span className="font-semibold text-[var(--muted)]">{t("statToday")}</span>
-          <span className="text-[30px] font-bold leading-none tabular-nums text-[var(--foreground)]">{todayItems.length}</span>
-        </Link>
-        <Link className="card pressable flex flex-col gap-1 p-4" href="/tasks">
-          <span className="font-semibold text-[var(--muted)]">{t("overdue")}</span>
-          <span className={`text-[24px] font-bold leading-tight tabular-nums ${overdueTotal > 0 ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{money(overdueTotal)}</span>
-        </Link>
-        {isOwner ? (
-          <Link className="card pressable flex flex-col gap-1 p-4" href="/reports">
-            <span className="font-semibold text-[var(--muted)]">{t("moneyThisMonth")}</span>
-            <span className="text-[24px] font-bold leading-tight tabular-nums text-[var(--success)]">{money(metrics.monthlyRevenue)}</span>
-          </Link>
-        ) : (
-          <Link className="card pressable flex flex-col gap-1 p-4" href="/bookings">
-            <span className="font-semibold text-[var(--muted)]">{t("depositsHeld")}</span>
-            <span className="text-[24px] font-bold leading-tight tabular-nums text-[var(--foreground)]">{money(depositsHeld)}</span>
-          </Link>
-        )}
-      </div>
+      {/* The week, on the band's lower edge: every vehicle, who has it, when it changes hands. */}
+      {lanes.length > 0 ? (
+        <section className="card relative -mt-12 mb-5 p-3 pb-2 lg:-mt-14 lg:p-4">
+          <header className="flex items-baseline justify-between gap-3 px-1 pb-2">
+            <h2 className="text-[19px] text-[var(--foreground)]">{t("thisWeek")}</h2>
+            <PanelLink href="/calendar">{t("calendar")}</PanelLink>
+          </header>
+          <WeekPlanner
+            days={weekDays.map((day) => ({ key: day.day, name: day.name, number: day.number }))}
+            lanes={lanes}
+            legend={[
+              { color: "var(--on-rent)", label: t("legendOnRent") },
+              { color: "var(--going-out)", label: t("weekOut") },
+              { color: "var(--coming-back)", label: t("weekBack") },
+              ...(lanes.some((lane) => lane.bars.some((bar) => bar.kind === "late")) ? [{ color: "var(--danger)", label: t("legendLate") }] : [])
+            ]}
+          />
+          {moreLanes > 0 ? (
+            <p className="px-1 pb-1 pt-1"><PanelLink href="/calendar">{t("moreOnCalendar", { count: moreLanes })}</PanelLink></p>
+          ) : null}
+        </section>
+      ) : null}
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-        <div className="min-w-0 space-y-5">
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+        {/* Tiles: on a phone they come first, on a computer they sit beside the day's work. */}
+        <div className="grid min-w-0 content-start grid-cols-2 gap-3 lg:order-2">
+          {tiles}
+        </div>
+
+        <div className="min-w-0 space-y-5 lg:order-1">
           <section>
             <header className="mb-2.5 flex items-center justify-between gap-3 px-1">
-              <h2 className="text-[20px] font-bold text-[var(--foreground)]">{t("todayTitle")}</h2>
-              <PanelLink href="/calendar">{t("calendar")}</PanelLink>
+              <h2 className="text-[21px] text-[var(--foreground)]">{t("todayTitle")}</h2>
+              <PanelLink href="/tasks">{t("allJobs")}</PanelLink>
             </header>
             {todayItems.length === 0 ? (
               <div className="card flex items-center gap-3 p-4 text-[var(--foreground-secondary)]">
@@ -511,108 +661,6 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
               </ul>
             </Panel>
           )}
-
-          <Panel action={<PanelLink href="/bookings">{t("allBookings")}</PanelLink>} title={t("onRentNow", { count: onRent.length })}>
-            {onRent.length === 0 ? (
-              <p className="px-4 pb-5 pt-2 text-sm text-[var(--muted)]">{t("nothingOut")}</p>
-            ) : (
-              <ul className="divide-y divide-[var(--border)] border-t border-[var(--border)]">
-                {onRent.slice(0, 8).map((r) => {
-                  const late = r.end !== "Indefinite" && r.end < today;
-                  return (
-                    <li key={r.id}>
-                      <Link className="flex items-center gap-3 px-4 py-3.5 transition hover:bg-[var(--panel-secondary)]" href={`/bookings/${r.id}` as Route}>
-                        {artFor({ key: `in-${r.id}` } as AgendaItem)}
-                        <span className="min-w-0 flex-1">
-                          <span className="block truncate text-[16px] font-bold text-[var(--foreground)]">{r.vehicle}</span>
-                          <span className="block truncate font-medium text-[var(--foreground-secondary)]">{r.customer}</span>
-                        </span>
-                        <span className="flex-shrink-0 text-right">
-                          <span className={`block font-bold ${late ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>
-                            {r.end === "Indefinite" ? t("openEnded") : late ? t("wasDue", { date: shortDate(r.end) }) : t("until", { date: shortDate(r.end) })}
-                          </span>
-                          {(r.overdue || 0) > 0 ? (
-                            <span className="block font-bold text-[var(--danger)]">{t("owed", { amount: money(r.overdue || 0) })}</span>
-                          ) : null}
-                        </span>
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-            {onRent.length > 8 ? (
-              <div className="border-t border-[var(--border)] px-4 py-2.5 text-center">
-                <PanelLink href="/bookings">{t("moreRentals", { count: onRent.length - 8 })}</PanelLink>
-              </div>
-            ) : null}
-          </Panel>
-        </div>
-
-        <div className="min-w-0 space-y-5">
-          <Panel action={<PanelLink href="/fleet">{t("fleet")}</PanelLink>} title={t("yourFleet")}>
-            {groups.length === 0 ? (
-              <p className="px-4 pb-5 pt-2 text-sm text-[var(--muted)]">
-                {t.rich("noVehiclesYet", { link: (chunks) => <Link className="font-semibold text-[var(--primary)]" href="/fleet/new">{chunks}</Link> })}
-              </p>
-            ) : (
-              <div className="space-y-1 px-2 pb-3">
-                <div className="flex items-center gap-4 px-2 pb-2">
-                  <svg aria-hidden="true" className="h-20 w-20 flex-shrink-0" viewBox="0 0 36 36">
-                    <circle cx="18" cy="18" fill="none" r="15" stroke="var(--primary-light)" strokeWidth="5" />
-                    <circle cx="18" cy="18" fill="none" r="15" stroke="var(--primary)" strokeDasharray={`${(utilization / 100) * 94.25} 94.25`} strokeLinecap="round" strokeWidth="5" transform="rotate(-90 18 18)" />
-                    <text fill="var(--foreground)" fontSize="9" fontWeight="700" textAnchor="middle" x="18" y="21">{utilization}%</text>
-                  </svg>
-                  <p className="text-[16px] font-bold text-[var(--foreground)]">{t("earningCount", { out: rentedCount, total: vehicles.length })}</p>
-                </div>
-                {groups.map((group) => (
-                  <Link className="flex items-center gap-3 rounded-[10px] px-2 py-2.5 transition hover:bg-[var(--panel-secondary)]" href={`/fleet#${group.kind}` as Route} key={group.kind}>
-                    <VehicleKindIcon kind={group.kind} />
-                    <span className="min-w-0 flex-1">
-                      <span className="flex items-baseline justify-between gap-2">
-                        <span className="text-[14px] font-semibold text-[var(--foreground)]">{c(`kinds_${group.kind}`)}</span>
-                        <span className="font-mono-data text-[14px] font-semibold text-[var(--foreground)]">{group.vehicles.length}</span>
-                      </span>
-                      <span className="mt-1 flex h-1.5 overflow-hidden rounded-full bg-[var(--panel-secondary)]">
-                        <span className="bg-[var(--info)]" style={{ width: `${(group.out / group.vehicles.length) * 100}%` }} />
-                        <span className="bg-[var(--success)]" style={{ width: `${(group.free / group.vehicles.length) * 100}%` }} />
-                        <span className="bg-[var(--warning)]" style={{ width: `${(group.other / group.vehicles.length) * 100}%` }} />
-                      </span>
-                      <span className="mt-1 block"><OutFreeSummary free={group.free} other={group.other} out={group.out} /></span>
-                    </span>
-                  </Link>
-                ))}
-
-              </div>
-            )}
-          </Panel>
-
-          {isOwner ? (
-          <Panel action={<PanelLink href="/reports">{t("reports")}</PanelLink>} title={t("moneyThisMonth")}>
-            <div className="px-4 pb-4">
-              <p className="text-[28px] font-bold tabular-nums tracking-[-0.02em] text-[var(--foreground)]">{money(metrics.monthlyRevenue)}</p>
-              <p className="font-medium text-[var(--foreground-secondary)]">
-                {t.rich("takenIn", { costs: money(monthlyExpenses), profit: money(monthlyProfit), b: (chunks) => <span className={monthlyProfit < 0 ? "font-bold text-[var(--danger)]" : "font-bold text-[var(--success)]"}>{chunks}</span> })}
-              </p>
-              <div aria-hidden="true" className="mt-4 flex h-20 items-end gap-2">
-                {lastSixMonths.map((month) => (
-                  <div className="flex flex-1 flex-col items-center gap-1" key={month.key}>
-                    <div
-                      className={`w-full rounded-t-[5px] ${month.key === thisMonth ? "bg-[var(--primary)]" : "bg-[var(--info-line)]"}`}
-                      style={{ height: `${Math.max(4, Math.round((month.amount / maxMonth) * 64))}px` }}
-                      title={`${month.label}: ${money(month.amount)}`}
-                    />
-                    <span className="font-medium text-[var(--muted)]">{month.label}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <Link className="flex items-center justify-between border-t border-[var(--border)] px-4 py-3.5 transition hover:bg-[var(--panel-secondary)]" href="/bookings">
-              <span className="font-semibold text-[var(--foreground-secondary)]">{t("depositsHeld")} · {t("customersCount", { count: depositsHeldCount })}</span>
-              <span className="text-[16px] font-bold tabular-nums text-[var(--foreground)]">{money(depositsHeld)}</span>
-            </Link>
-          </Panel>
-          ) : null}
         </div>
       </div>
 

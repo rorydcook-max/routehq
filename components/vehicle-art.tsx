@@ -27,7 +27,7 @@ const PAINT: Array<[RegExp, string]> = [
   [/pink|ชมพู/i, "#d97a9a"]
 ];
 
-function paintOf(colour: string | null | undefined) {
+export function paintOf(colour: string | null | undefined) {
   const text = String(colour || "");
   return PAINT.find(([pattern]) => pattern.test(text))?.[1] || null;
 }

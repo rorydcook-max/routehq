@@ -2203,7 +2203,13 @@
     "vc_moveNote": "วันที่และราคาเดิม ลูกค้าที่ลงนามแล้วจะได้รับแบบฟอร์มสั้น ๆ เพื่อลงนามการเปลี่ยนรถ",
     "vc_moveRepair": "{vehicle} ถูกตั้งให้ส่งซ่อม แต่มีการจองย้ายมาใช้คันนี้ ตรวจสอบให้ซ่อมเสร็จทันเวลา",
     "vc_noCustomerYet": "ลูกค้ายังไม่ได้กรอกข้อมูล",
-    "vc_fromOpen": "ตั้งแต่ {date} ไม่กำหนดวันคืน"
+    "vc_fromOpen": "ตั้งแต่ {date} ไม่กำหนดวันคืน",
+    "paidOfTotal": "จ่ายแล้ว {paid} จาก {total}",
+    "track_today": "วันนี้",
+    "track_paidTo": "จ่ายถึง {date}",
+    "track_paidAll": "จ่ายค่าเช่าครบแล้ว",
+    "track_owed": "ค้าง {amount} ตั้งแต่ {date}",
+    "track_next": "{amount} ครบกำหนด {date}"
   },
   "newBooking": {
     "pageBack": "กลับไปที่การจอง",
@@ -2486,7 +2492,15 @@
     "seePlans": "ดูแพ็กเกจ",
     "bandVehicles": "คัน",
     "bandOut": "ออกให้เช่า",
-    "bandFree": "ว่างตอนนี้"
+    "bandFree": "ว่างตอนนี้",
+    "bandAttention": "ต้องดูแล",
+    "busyTitle": "ความถี่การเช่า",
+    "busyDetail": "ถูกเช่า ใน 12 เดือนที่ผ่านมา",
+    "paperDueOn": "ครบกำหนด {date}",
+    "paperLate": "เลยกำหนดตั้งแต่ {date}",
+    "papersOk": "เอกสารยังไม่หมดอายุ",
+    "papersOkDetail": "ไม่มีอะไรครบกำหนดใน 30 วัน",
+    "utilShort": "เช่า {pct}%"
   },
   "customers": {
     "noRentals": "ยังไม่เคยเช่า",
@@ -3957,7 +3971,9 @@
     "ownersLink": "รายงานเจ้าของรถ",
     "ownersLinkHint": "สำหรับรถที่ดูแลให้คนอื่น: ส่วนแบ่งของเจ้าของแต่ละเดือน",
     "extrasTag": "บริการเสริม",
-    "extrasPart": "รวมบริการเสริม {amount}"
+    "extrasPart": "รวมบริการเสริม {amount}",
+    "bestMonth": "เดือนที่ดีที่สุด: {month} กำไร {amount}",
+    "monthByMonth": "ดูทีละเดือน"
   },
   "auth": {
     "signInTitle": "เข้าสู่ระบบ",

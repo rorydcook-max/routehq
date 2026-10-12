@@ -2194,7 +2194,13 @@
     "vc_moveNote": "Same dates and price. A customer who has already signed gets a short change form to sign.",
     "vc_moveRepair": "The {vehicle} is marked for repair, but a booking is moving to it. Make sure it's back in time.",
     "vc_noCustomerYet": "Customer not filled in yet",
-    "vc_fromOpen": "from {date}, no end date"
+    "vc_fromOpen": "from {date}, no end date",
+    "paidOfTotal": "{paid} of {total} paid",
+    "track_today": "Today",
+    "track_paidTo": "Paid to {date}",
+    "track_paidAll": "All rent paid",
+    "track_owed": "{amount} owed since {date}",
+    "track_next": "{amount} due {date}"
   },
   "newBooking": {
     "pageBack": "Back to bookings",
@@ -2477,7 +2483,15 @@
     "seePlans": "See plans",
     "bandVehicles": "{count, plural, one {vehicle} other {vehicles}}",
     "bandOut": "out earning",
-    "bandFree": "free now"
+    "bandFree": "free now",
+    "bandAttention": "need attention",
+    "busyTitle": "How busy",
+    "busyDetail": "rented, last 12 months",
+    "paperDueOn": "due {date}",
+    "paperLate": "overdue since {date}",
+    "papersOk": "Papers in date",
+    "papersOkDetail": "Nothing due in the next 30 days",
+    "utilShort": "{pct}% rented"
   },
   "customers": {
     "noRentals": "No rentals yet",
@@ -3948,7 +3962,9 @@
     "ownersLink": "Owners' statements",
     "ownersLinkHint": "For vehicles you run for someone else: their share each month",
     "extrasTag": "Extras",
-    "extrasPart": "incl. {amount} extras"
+    "extrasPart": "incl. {amount} extras",
+    "bestMonth": "Best month: {month}, {amount} profit",
+    "monthByMonth": "Month by month"
   },
   "auth": {
     "signInTitle": "Sign in",

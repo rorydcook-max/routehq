@@ -4,9 +4,11 @@ import { useTranslations } from "next-intl";
 import { FileSpreadsheet, Plus } from "lucide-react";
 import { bulkArchiveVehicles, bulkDeleteVehicles } from "@/app/actions/vehicles";
 import { AppShell } from "@/components/app-shell";
-import { Badge, EmptyState, ProgressBar } from "@/components/ui";
+import { Badge, EmptyState } from "@/components/ui";
 import { OutFreeSummary, VehicleKindIcon } from "@/components/vehicle-kind-icon";
 import { VehicleArt } from "@/components/vehicle-art";
+import { Dot, Ring, TileHead } from "@/components/glance";
+import { Wrench } from "lucide-react";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDashboardData, money } from "@/lib/dashboard";
 import { FleetBulkActions } from "@/app/fleet/fleet-actions";
@@ -62,10 +64,18 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
     vehicle.monthlyRate > 0 ? t("perMo", { amount: money(vehicle.monthlyRate) }) : vehicle.weeklyRate > 0 ? t("perWk", { amount: money(vehicle.weeklyRate) }) : vehicle.dailyRate > 0 ? t("perDay", { amount: money(vehicle.dailyRate) }) : "";
   const dayMonth = (value: string) => new Intl.DateTimeFormat(locale === "en" ? "en-GB" : `${locale}-u-ca-gregory-nu-latn`, { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${value}T00:00:00Z`));
   const [t, c, locale] = await Promise.all([getTranslations("fleet"), getTranslations("common"), getLocale()]);
+  // At a glance (Look G): how busy the fleet is, and the next piece of paperwork or service due.
+  const busy = vehicles.length > 0 ? Math.round(vehicles.reduce((sum, vehicle) => sum + Number(vehicle.utilization || 0), 0) / vehicles.length) : 0;
+  const attention = vehicles.filter((vehicle) => (vehicle.complianceAttentionCount || 0) > 0).length;
+  const nextPaper = vehicles
+    .filter((vehicle) => vehicle.complianceNext && vehicle.complianceNext.daysLeft <= 30)
+    .sort((a, b) => (a.complianceNext!.daysLeft || 0) - (b.complianceNext!.daysLeft || 0))[0];
+  const paperName = (item: { key?: string; label: string }) => (item.key && c.has(`paper_${item.key}`) ? c(`paper_${item.key}`) : item.label);
   const kindName = (group: { kind: string; label: string }) => (c.has(`kinds_${group.kind}`) ? c(`kinds_${group.kind}`) : group.label);
 
   return (
     <AppShell
+      heroOverlap
       hero={
         <div>
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -81,25 +91,51 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
               </Link>
             </div>
           </div>
-          <div className="mt-4 grid max-w-xl grid-cols-3 gap-2">
-            <span className="rounded-2xl bg-[var(--band-soft)] px-3 py-2.5 text-white">
-              <span className="block text-[24px] font-bold leading-none tabular-nums">{vehicles.length}</span>
-              <span className="mt-1 block font-semibold text-white/85">{t("bandVehicles", { count: vehicles.length })}</span>
-            </span>
-            <span className="rounded-2xl bg-[var(--band-soft)] px-3 py-2.5 text-white">
-              <span className="block text-[24px] font-bold leading-none tabular-nums">{totalOut}</span>
-              <span className="mt-1 block font-semibold text-white/85">{t("bandOut")}</span>
-            </span>
-            <span className="rounded-2xl bg-white px-3 py-2.5 text-[var(--foreground)]">
-              <span className="block text-[24px] font-bold leading-none tabular-nums">{totalFree}</span>
-              <span className="mt-1 block font-semibold text-[var(--muted)]">{t("bandFree")}</span>
-            </span>
+          <div className="mt-4 flex flex-wrap gap-2 pb-6 lg:pb-8">
+            {[
+              { count: vehicles.length, label: t("bandVehicles", { count: vehicles.length }), dot: null },
+              { count: totalOut, label: t("bandOut"), dot: "#ffffff" },
+              { count: totalFree, label: t("bandFree"), dot: "var(--going-out)" },
+              ...(attention > 0 ? [{ count: attention, label: t("bandAttention"), dot: "#f6b7a3" }] : [])
+            ].map((pill) => (
+              <span className="inline-flex items-center gap-1.5 rounded-2xl bg-[var(--band-soft)] px-3 py-2 text-white" key={pill.label}>
+                {pill.dot ? <Dot color={pill.dot} /> : null}
+                <span className="num text-[22px] leading-none">{pill.count}</span>
+                <span className="font-semibold">{pill.label}</span>
+              </span>
+            ))}
           </div>
         </div>
       }
       userEmail={userEmail}
     >
-      <div className="mb-5" />
+      {vehicles.length > 0 ? (
+        <div className="relative -mt-12 mb-5 grid grid-cols-2 gap-3 lg:-mt-14 lg:max-w-2xl">
+          <Link className="card pressable tile p-4 text-[var(--foreground)]" href="/calendar">
+            <TileHead title={t("busyTitle")} />
+            <span className="flex items-center gap-3">
+              <Ring label={`${busy}%`} pct={busy} />
+              <span className="font-semibold text-[var(--foreground-secondary)]">{t("busyDetail")}</span>
+            </span>
+          </Link>
+          {nextPaper ? (
+            <Link className="card pressable tile tile-brick p-4" href={`/fleet/${nextPaper.id}`}>
+              <TileHead icon={<Wrench size={22} />} title={paperName(nextPaper.complianceNext!)} />
+              <span>
+                <span className="num block text-[24px] leading-tight">{nextPaper.model || nextPaper.make}</span>
+                <span className="font-semibold">{nextPaper.complianceNext!.daysLeft < 0 ? t("paperLate", { date: dayMonth(nextPaper.complianceNext!.date) }) : t("paperDueOn", { date: dayMonth(nextPaper.complianceNext!.date) })}</span>
+              </span>
+            </Link>
+          ) : (
+            <span className="card tile tile-green p-4">
+              <TileHead title={t("papersOk")} />
+              <span className="font-semibold">{t("papersOkDetail")}</span>
+            </span>
+          )}
+        </div>
+      ) : (
+        <div className="mb-5" />
+      )}
 
       {over > 0 ? (
         <p className="mb-4 rounded-xl border border-[var(--warning-line)] bg-[var(--warning-light)] p-3 text-sm font-medium text-[var(--foreground)]" role="status">
@@ -173,7 +209,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                     <th className="py-2.5 pr-3">{t("th_vehicle")}</th>
                     <th className="px-3 py-2.5">{t("th_status")}</th>
                     <th className="px-3 py-2.5">{t("th_rate")}</th>
-                    <th className="hidden px-3 py-2.5 xl:table-cell">{t("th_onRent")}</th>
+                    <th className="px-3 py-2.5">{t("th_onRent")}</th>
                     <th className="px-3 py-2.5">{t("th_paperwork")}</th>
                     <th className="hidden px-3 py-2.5 pr-4 xl:table-cell">{t("th_profit")}</th>
                   </tr>
@@ -205,10 +241,12 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                         <td className="px-3 py-3">
                           <Link className="font-mono-data block" href={href}>{priceOf(vehicle) || <span className="text-[var(--muted)]">{t("notSet")}</span>}</Link>
                         </td>
-                        <td className="hidden px-3 py-3 xl:table-cell">
-                          <div className="min-w-28">
-                            <div className="font-mono-data mb-1 text-xs text-[var(--muted)]">{vehicle.utilization}%</div>
-                            <ProgressBar value={vehicle.utilization} tone={vehicle.utilization > 80 ? "green" : "amber"} />
+                        <td className="px-3 py-3">
+                          <div className="flex min-w-32 items-center gap-2">
+                            <span aria-hidden="true" className="h-2.5 flex-1 overflow-hidden rounded-full bg-[var(--panel-tertiary)]">
+                              <span className="block h-full rounded-full bg-[var(--chart-in)]" style={{ width: `${Math.max(0, Math.min(100, vehicle.utilization))}%` }} />
+                            </span>
+                            <span className="num w-11 text-right text-[var(--foreground)]">{vehicle.utilization}%</span>
                           </div>
                         </td>
                         <td className="px-3 py-3">
@@ -241,6 +279,12 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                       <div className="mt-1.5 flex flex-wrap gap-1.5">
                         {vehicle.freeUntil ? <Badge tone="green">{t("status_freeUntil", { date: dayMonth(vehicle.freeUntil) })}</Badge> : <Badge tone={statusTone[vehicle.status]}>{t(`status_${vehicle.status}`)}</Badge>}
                         {vehicle.complianceNext && vehicle.complianceNext.daysLeft <= 30 ? <ComplianceBadge attention={vehicle.complianceAttentionCount} item={vehicle.complianceNext} /> : null}
+                      </div>
+                      <div className="mt-2 flex items-center gap-2.5">
+                        <span aria-hidden="true" className="h-2.5 flex-1 overflow-hidden rounded-full bg-[var(--panel-tertiary)]">
+                          <span className="block h-full rounded-full bg-[var(--chart-in)]" style={{ width: `${Math.max(0, Math.min(100, vehicle.utilization))}%` }} />
+                        </span>
+                        <span className="num flex-shrink-0 whitespace-nowrap text-right text-[15px] text-[var(--foreground)]">{t("utilShort", { pct: vehicle.utilization })}</span>
                       </div>
                     </div>
                   </Link>

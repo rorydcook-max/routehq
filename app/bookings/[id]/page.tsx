@@ -26,6 +26,7 @@ import { EarlyReturnOwedPanel } from "@/app/bookings/[id]/early-return-owed";
 import { activeExtrasLines, extrasLines, extrasSummary } from "@/lib/extras";
 import { AppShell } from "@/components/app-shell";
 import { VehicleArt } from "@/components/vehicle-art";
+import { PartBar, RentalTrack } from "@/components/glance";
 import { kindFromCategory } from "@/lib/vehicle-groups";
 import { AddRentalPaymentInlineForm, EditableEndDate, EditableRentalPaymentRow, EditableTransactionRow, ExistingRentalPaymentSetupCard } from "@/components/booking-correction-controls";
 import { CommunicationPanel } from "@/components/communication-panel";
@@ -552,6 +553,21 @@ export default async function BookingDetailPage({ params, searchParams }: { para
       tone: outstandingBalance > 0 ? ("red" as const) : ("neutral" as const)
     };
   })();
+  // The rental as a track (Look G): rent only, not the deposit or costs billed to the customer.
+  const rentPaymentsAll = activePayments.filter(
+    (payment: any) => !(payment.metadata?.type === "deposit" || payment.metadata?.is_deposit === true) && payment.metadata?.type !== "charge" && !["cancelled", "waived", "refunded"].includes(String(payment.status || ""))
+  );
+  const openRent = rentPaymentsAll.filter((payment: any) => payment.status !== "paid" && payment.due_date).sort((a: any, b: any) => String(a.due_date).localeCompare(String(b.due_date)));
+  const firstOpenRent = openRent[0] || null;
+  const rentAgreed = rentPaymentsAll.reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
+  const rentPaid = rentPaymentsAll.filter((payment: any) => payment.status === "paid").reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
+  const trackEnd = rental.end_date ? String(rental.end_date).slice(0, 10) : null;
+  const showTrack = !isCancelled && !!startDay && !!trackEnd && trackEnd > startDay && rentPaymentsAll.length > 0;
+  const firstOpenDue = firstOpenRent ? String(firstOpenRent.due_date).slice(0, 10) : null;
+  const paidTo = firstOpenDue || trackEnd;
+  const dueOwed = !!firstOpenDue && firstOpenDue <= today;
+  const dueThere = firstOpenDue ? openRent.filter((payment: any) => String(payment.due_date).slice(0, 10) === firstOpenDue).reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0) : 0;
+  const depositHeldNow = String(rental.deposit_status || "") === "received" && Number(rental.deposit_held || 0) > 0;
   const financialStateClass =
     financialState.tone === "green"
       ? "text-[var(--success)]"
@@ -598,6 +614,11 @@ export default async function BookingDetailPage({ params, searchParams }: { para
         <Card>
           <div className="card-section flex flex-col gap-4">
             <div className="min-w-0">
+              {vehicle ? (
+                <Link aria-label={vehicleTitle(vehicle)} className="mb-3 block" href={`/fleet/${vehicle.id}` as Route}>
+                  <VehicleArt colour={(vehicle as any).color} kind={kindFromCategory((vehicle as any).vehicle_categories)} model={(vehicle as any).model} size="lg" />
+                </Link>
+              ) : null}
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="flex flex-wrap items-center gap-2">
                   <Badge tone={statusTone(displayStatus)}>{statusLabel(String(displayStatus), tx)}</Badge>
@@ -611,17 +632,17 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               </div>
               {/* Who has it, and a picture of what they have: the vehicle in its own colour (Lagoon look). */}
               <div className="mt-3 flex items-center gap-3">
+                {customer ? (
+                  <span aria-hidden="true" className="num inline-flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)] text-[18px] text-[var(--primary)]">
+                    {String(customer.full_name || "").trim().split(/\s+/).slice(0, 2).map((part: string) => Array.from(part)[0] || "").join("").toUpperCase()}
+                  </span>
+                ) : null}
                 <div className="min-w-0 flex-1">
-                  <h1 className="text-[28px] font-bold leading-tight tracking-[-0.01em] text-[var(--foreground)]">
+                  <h1 className="text-[28px] leading-tight text-[var(--foreground)]">
                     {customer ? customer.full_name : tx.list("awaitingCustomer")}
                   </h1>
-                  <p className="mt-1 text-[17px] font-semibold text-[var(--foreground-secondary)]">{vehicleTitle(vehicle)}</p>
+                  <p className="mt-0.5 text-[17px] font-semibold text-[var(--foreground-secondary)]">{vehicleTitle(vehicle)}</p>
                 </div>
-                {vehicle ? (
-                  <Link aria-label={vehicleTitle(vehicle)} className="shrink-0" href={`/fleet/${vehicle.id}` as Route}>
-                    <VehicleArt colour={(vehicle as any).color} kind={kindFromCategory((vehicle as any).vehicle_categories)} model={(vehicle as any).model} size="md" />
-                  </Link>
-                ) : null}
               </div>
               {awaitingSignature && holdUntil ? (
                 <p className="mt-2 font-semibold text-[var(--warning)]">
@@ -648,6 +669,12 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   {financialState.amount !== null ? money(financialState.amount, rental.currency) : tx.say(`ratePer_${["daily", "weekly", "monthly"].includes(String(rental.pricing_model)) ? rental.pricing_model : "other"}`, { amount: money(rental.rental_rate, rental.currency) })}
                 </p>
                 <p className="font-medium text-[var(--foreground-secondary)]">{financialState.amount !== null ? tx.say(`ratePer_${["daily", "weekly", "monthly"].includes(String(rental.pricing_model)) ? rental.pricing_model : "other"}`, { amount: money(rental.rental_rate, rental.currency) }) : financialState.detail}</p>
+                {!isCancelled && rentAgreed > 0 && !!rental.end_date ? (
+                  <>
+                    <PartBar part={rentPaid} whole={rentAgreed} />
+                    <p className="mt-1 font-semibold text-[var(--foreground-secondary)]">{tx.say("paidOfTotal", { paid: money(rentPaid, rental.currency), total: money(rentAgreed, rental.currency) })}</p>
+                  </>
+                ) : null}
                 {Number(rental.extras_total || 0) > 0 ? (
                   <p className="mt-1 text-sm font-semibold text-[var(--foreground-secondary)]">
                     {tx.say("extrasPlus", { amount: money(rental.extras_total, rental.currency), names: activeExtrasLines(rental).map((line) => line.name).join(", ") || "-" })}
@@ -660,6 +687,29 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 ) : null}
               </div>
             </div>
+            {showTrack ? (
+              <RentalTrack
+                dueOn={firstOpenDue}
+                dueOwed={dueOwed}
+                end={trackEnd!}
+                labels={{
+                  start: shortDate(startDay!, tx.locale),
+                  end: shortDate(trackEnd!, tx.locale),
+                  today: tx.say("track_today"),
+                  paid: firstOpenDue ? (firstOpenDue > startDay! ? tx.say("track_paidTo", { date: shortDate(firstOpenDue, tx.locale) }) : null) : tx.say("track_paidAll"),
+                  due: firstOpenDue ? tx.say(dueOwed ? "track_owed" : "track_next", { amount: money(dueThere, rental.currency), date: shortDate(firstOpenDue, tx.locale) }) : null
+                }}
+                paidTo={paidTo}
+                start={startDay!}
+                today={today}
+              />
+            ) : null}
+            {!isCancelled && Number(rental.deposit_amount || rental.deposit_held || 0) > 0 ? (
+              <div className={`flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 ${depositHeldNow ? "bg-[var(--coming-back-light)] text-[var(--coming-back-ink)]" : "bg-[var(--background)] text-[var(--foreground)]"}`}>
+                <span className="font-semibold">{tx.say("deposit")}</span>
+                <span className="num text-right text-[18px]">{formatDepositSummary(rental, tx)}</span>
+              </div>
+            ) : null}
             {/* Two main actions side by side, More underneath: nothing wraps onto a second line. */}
             <div className="grid grid-cols-2 gap-2 [&>*]:min-w-0 [&>a]:flex [&>a]:w-full [&>details]:col-span-2 [&>button]:w-full [&>*>button]:w-full lg:flex lg:flex-wrap lg:[&>a]:w-auto lg:[&>details]:w-auto lg:[&>details_summary]:w-auto lg:[&>button]:w-auto lg:[&>*>button]:w-auto">
               {awaitingSignature ? (

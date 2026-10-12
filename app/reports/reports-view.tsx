@@ -21,12 +21,13 @@ import {
 } from "recharts";
 import { ArrowDownRight, ArrowUpRight, Check, ChevronDown, ChevronRight, Download, Lightbulb, Loader2 } from "lucide-react";
 import { intlLocale, longDate } from "@/lib/i18n/dates";
+import { Dot, InOutBars } from "@/components/glance";
 import type { DatePreset, ReportsData, VehicleMetrics } from "@/lib/reports";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
 const PRESETS: DatePreset[] = ["this_month", "last_month", "last_3_months", "last_6_months", "this_year", "last_year", "custom"];
-const CHART_COLORS = ["#0e5e6f", "#2b6b47", "#e8952a", "#b4472c", "#6b4c8a", "#4f9a94", "#8a9a5b", "#b07fa0"];
+const CHART_COLORS = ["#008fa3", "#c9711c", "#2f6fb8", "#a0522d", "#6b4c8a", "#4f9a94", "#8a9a5b", "#b07fa0"];
 const BAHT = "฿";
 
 export function money(value: number) {
@@ -61,36 +62,49 @@ export function Breakdown({ title, rows, typeLabel, say }: { title: string; rows
       {rows.length === 0 ? (
         <p className={`mt-1 ${soft}`}>{say("nothingRecorded")}</p>
       ) : (
-        <div className="mt-3 space-y-3">
-          {rows.map((row, index) => (
-            <div key={row.type}>
-              <div className="flex items-baseline justify-between gap-3">
-                <span className="font-semibold text-[var(--foreground)]">{typeLabel(row.type, row.label)}</span>
-                <span className="whitespace-nowrap font-bold text-[var(--foreground)]">
-                  {money(row.amount)}
-                  {total > 0 ? <span className={`ml-2 ${soft}`}>{Math.round((row.amount / total) * 100)}%</span> : null}
-                </span>
+        <>
+          <div aria-hidden="true" className="mt-3 flex h-4 overflow-hidden rounded-full bg-[var(--panel-tertiary)]">
+            {rows.map((row, index) => (
+              <span className={index > 0 ? "border-l-2 border-white" : ""} key={row.type} style={{ background: CHART_COLORS[index % CHART_COLORS.length], width: `${total > 0 ? (row.amount / total) * 100 : 0}%` }} />
+            ))}
+          </div>
+          <div className="mt-2 divide-y divide-[var(--border)]">
+            {rows.map((row, index) => (
+              <div className="py-2" key={row.type}>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="flex min-w-0 items-center gap-2 font-semibold text-[var(--foreground)]"><Dot color={CHART_COLORS[index % CHART_COLORS.length]} />{typeLabel(row.type, row.label)}</span>
+                  <span className="whitespace-nowrap">
+                    <span className="num text-[16px] text-[var(--foreground)]">{money(row.amount)}</span>
+                    {total > 0 ? <span className={`ml-2 ${soft}`}>{Math.round((row.amount / total) * 100)}%</span> : null}
+                  </span>
+                </div>
+                {Number(row.extras || 0) > 0 ? <p className={`pl-[18px] ${soft}`}>{say("extrasPart", { amount: money(Number(row.extras)) })}</p> : null}
               </div>
-              {Number(row.extras || 0) > 0 ? <p className={soft}>{say("extrasPart", { amount: money(Number(row.extras)) })}</p> : null}
-              <div className="mt-1 h-2 overflow-hidden rounded-full bg-[var(--panel-secondary)]">
-                <div className="h-full rounded-full" style={{ width: `${total > 0 ? Math.max(2, (row.amount / total) * 100) : 0}%`, background: CHART_COLORS[index % CHART_COLORS.length] }} />
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </>
       )}
     </section>
   );
 }
 
 /** Month by month as plain rows: readable on a phone, where a wide chart had to be scrolled sideways. Quiet months are left out. */
-export function MonthRows({ months, say }: { months: Array<{ label: string; revenue: number; expenses: number; profit: number }>; say: Say }) {
+export function MonthRows({ months, say }: { months: Array<{ key?: string; label: string; short?: string; revenue: number; expenses: number; profit: number }>; say: Say }) {
   const busy = months.filter((month) => month.revenue !== 0 || month.expenses !== 0);
   const biggest = Math.max(1, ...busy.map((month) => Math.max(month.revenue, month.expenses)));
   if (busy.length < 2) return null;
+  const best = [...busy].sort((a, b) => b.profit - a.profit)[0];
   return (
     <section className="card p-4">
       <h2 className={h2}>{say("monthsTitle")}</h2>
+      <p className="mt-2 flex gap-4 font-semibold text-[var(--foreground-secondary)]">
+        <span className="inline-flex items-center gap-1.5"><Dot color="var(--chart-in)" />{say("moneyIn")}</span>
+        <span className="inline-flex items-center gap-1.5"><Dot color="var(--chart-out)" />{say("moneyOut")}</span>
+      </p>
+      <InOutBars label={say("monthsTitle")} money={money} periods={months.map((month) => ({ key: month.key || month.label, label: month.short || month.label, in: month.revenue, out: month.expenses }))} />
+      {best && best.profit > 0 ? <p className="mt-2 font-bold text-[var(--success)]">{say("bestMonth", { month: best.label, amount: money(best.profit) })}</p> : null}
+      <details className="mt-3">
+        <summary className="cursor-pointer font-bold text-[var(--primary)]">{say("monthByMonth")}</summary>
       <div className="mt-3 space-y-2">
         {busy.map((month) => (
           <div className={tile} key={month.label}>
@@ -102,19 +116,20 @@ export function MonthRows({ months, say }: { months: Array<{ label: string; reve
             </div>
             <div className="mt-2 flex items-center gap-2">
               <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-white">
-                <div className="h-full rounded-full bg-[var(--primary)]" style={{ width: `${(month.revenue / biggest) * 100}%` }} />
+                <div className="h-full rounded-full bg-[var(--chart-in)]" style={{ width: `${(month.revenue / biggest) * 100}%` }} />
               </div>
               <span className={`w-28 shrink-0 text-right ${soft}`}>{say("monthIn", { amount: money(month.revenue) })}</span>
             </div>
             <div className="mt-1 flex items-center gap-2">
               <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-white">
-                <div className="h-full rounded-full bg-[#d99a86]" style={{ width: `${(month.expenses / biggest) * 100}%` }} />
+                <div className="h-full rounded-full bg-[var(--chart-out)]" style={{ width: `${(month.expenses / biggest) * 100}%` }} />
               </div>
               <span className={`w-28 shrink-0 text-right ${soft}`}>{say("monthOut", { amount: money(month.expenses) })}</span>
             </div>
           </div>
         ))}
       </div>
+      </details>
     </section>
   );
 }
@@ -355,10 +370,12 @@ export function ReportsView({ data }: { data: ReportsData }) {
   const deposits = data.depositSummary;
 
   const monthFormat = new Intl.DateTimeFormat(intlLocale(locale), { month: "short", year: "numeric", timeZone: "UTC" });
+  const monthShort = new Intl.DateTimeFormat(intlLocale(locale), { month: "short", timeZone: "UTC" });
   const monthly = data.monthlyData.map((month) => {
     const key = String(month.key || "");
     const match = key.match(/^(\d{4})-(\d{2})$/);
-    return { ...month, label: match ? monthFormat.format(new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, 1))) : month.label };
+    const date = match ? new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, 1)) : null;
+    return { ...month, label: date ? monthFormat.format(date) : month.label, short: date ? monthShort.format(date) : month.label };
   });
   const exportHref = (format: string) => `/api/reports/export?format=${format}&preset=${data.dateRange.preset}&from=${data.dateRange.from}&to=${data.dateRange.to}`;
   const nothingAtAll = data.vehicleMetrics.length === 0 && data.recentTransactions.length === 0;
@@ -400,17 +417,17 @@ export function ReportsView({ data }: { data: ReportsData }) {
       {/* The headline */}
       <section className="card p-4">
         <p className={soft}>{say("profit")}</p>
-        <p className={`text-[32px] font-bold leading-tight ${data.netProfit >= 0 ? "text-[var(--foreground)]" : "text-[var(--warning)]"}`}>{money(data.netProfit)}</p>
+        <p className={`num text-[36px] leading-tight ${data.netProfit >= 0 ? "text-[var(--foreground)]" : "text-[var(--warning)]"}`}>{money(data.netProfit)}</p>
         <Change change={data.profitChange} say={say} />
         <div className="mt-3 grid grid-cols-2 gap-2">
           <div className={tile}>
             <p className={soft}>{say("moneyIn")}</p>
-            <p className="text-[20px] font-bold text-[var(--foreground)]">{money(data.totalRevenue)}</p>
+            <p className="num flex items-center gap-1.5 text-[22px] text-[var(--foreground)]"><Dot color="var(--chart-in)" />{money(data.totalRevenue)}</p>
             <Change change={data.revenueChange} say={say} />
           </div>
           <div className={tile}>
             <p className={soft}>{say("moneyOut")}</p>
-            <p className="text-[20px] font-bold text-[var(--foreground)]">{money(data.totalExpenses)}</p>
+            <p className="num flex items-center gap-1.5 text-[22px] text-[var(--foreground)]"><Dot color="var(--chart-out)" />{money(data.totalExpenses)}</p>
             <Change change={data.expensesChange} say={say} upIsBad />
           </div>
         </div>
@@ -466,9 +483,9 @@ export function ReportsView({ data }: { data: ReportsData }) {
         <h2 className={h2}>{say("depositsTitle")}</h2>
         <p className={`mt-1 ${soft}`}>{say("depositsBody")}</p>
         <div className="mt-3 grid grid-cols-2 gap-2">
-          <div className={`${tile} col-span-2`}>
-            <p className={soft}>{say("depositsHolding")}</p>
-            <p className="text-[22px] font-bold text-[var(--foreground)]">{money(deposits.totalDepositsCurrentlyHeld)}</p>
+          <div className="tile-sky col-span-2 rounded-xl p-3.5">
+            <p className="font-semibold">{say("depositsHolding")}</p>
+            <p className="num text-[26px] leading-tight">{money(deposits.totalDepositsCurrentlyHeld)}</p>
           </div>
           <div className={tile}>
             <p className={soft}>{say("depositsTaken")}</p>

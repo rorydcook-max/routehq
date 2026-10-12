@@ -6,6 +6,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { completeRentalJobs, tellRentalCustomer } from "@/lib/customer-messages";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { said } from "@/lib/i18n/server-text";
+import { getCurrentMembership } from "@/lib/auth/roles";
 
 const OPEN = ["scheduled", "pending", "failed", "overdue"];
 const isDeposit = (row: any) => row.metadata?.is_deposit === true || ["deposit", "deposit_top_up"].includes(String(row.metadata?.type || ""));
@@ -20,6 +21,7 @@ export async function decideEarlyReturnOwed(rentalId: string, decision: "take_of
     data: { user }
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: await said("You must be signed in.") };
+  if (decision === "take_off" && (await getCurrentMembership())?.role !== "owner") return { ok: false, error: await said("Only the owner can take rent off. Ask them to decide.") };
 
   // Read through the signed-in user, so only someone in the business gets this far.
   const { data: rental } = await supabase.from("rentals").select("id, organization_id, vehicle_id, customer_id, currency").eq("id", rentalId).is("deleted_at", null).maybeSingle();

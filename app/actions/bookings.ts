@@ -17,7 +17,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { notifyOperator } from "@/lib/notify-operator";
 import { wallTimeToIso, businessToday } from "@/lib/business-time";
 import { DOUBLE_BOOKING_MESSAGE, earlyHandoverBlocker, isDoubleBookingError, vehicleConflictMessage } from "@/lib/rental-conflicts";
-import { asEarlyStartChoice, earlyStartFor, ensureEarlyStartCharge } from "@/lib/early-start";
+import { earlyStartFor, ensureEarlyStartCharge, settleEarlyChoice } from "@/lib/early-start";
 import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { holdDeadline, retakeHold } from "@/lib/booking-holds";
@@ -1045,7 +1045,7 @@ export async function manuallyActivateRental(rentalId: string, earlyStart?: stri
     if (inWay) return { success: false, error: await said("This vehicle is still out on another rental. Return that rental first, or change the vehicle on this booking.") };
     const { data: rates } = await supabase.from("vehicles").select("daily_rate, weekly_rate, monthly_rate").eq("id", rental.vehicle_id).eq("organization_id", rental.organization_id).maybeSingle();
     const early = earlyStartFor(rental, rates, handoverDate);
-    const choice = asEarlyStartChoice(earlyStart) || "free";
+    const choice = settleEarlyChoice(earlyStart, early, (await getCurrentMembership())?.role === "owner");
     const shortenTo = early && choice === "shorten" ? early.shortenedEnd : null;
     const { error: moveError } = await supabase.from("rentals").update({ start_date: handoverDate, ...(shortenTo ? { end_date: shortenTo } : {}) }).eq("id", cleanId).eq("organization_id", rental.organization_id);
     if (moveError) return { success: false, error: isDoubleBookingError(moveError) ? await said(DOUBLE_BOOKING_MESSAGE) : moveError.message };

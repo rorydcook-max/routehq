@@ -2149,7 +2149,9 @@
     "earlyOwedBody": "{owed} is still to pay. Take the unused days off, or keep it as booked. The customer is told the amount after you choose.",
     "earlyOwedTakeOff": "Take {amount} off",
     "earlyOwedKeep": "Keep as booked",
-    "earlyOwedFailed": "That didn't save. Try again."
+    "earlyOwedFailed": "That didn't save. Try again.",
+    "earlyOwedOwner": "The owner decides this one.",
+    "vc_swapPrices": "This customer keeps paying {mine} for the {other}, and {name} keeps paying {theirs} for the {current}. Use Change terms on either booking to adjust."
   },
   "newBooking": {
     "pageBack": "Back to bookings",

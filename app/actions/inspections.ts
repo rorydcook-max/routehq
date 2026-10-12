@@ -18,7 +18,8 @@ import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
 import { inspectionUploadPrefix, readUploadedFiles } from "@/lib/direct-uploads";
 import { earlyHandoverBlocker, isDoubleBookingError } from "@/lib/rental-conflicts";
 import { said } from "@/lib/i18n/server-text";
-import { asEarlyStartChoice, earlyStartFor, ensureEarlyStartCharge } from "@/lib/early-start";
+import { earlyStartFor, ensureEarlyStartCharge, settleEarlyChoice } from "@/lib/early-start";
+import { getCurrentMembership } from "@/lib/auth/roles";
 
 type InspectionMode = "delivery" | "return" | "condition_report";
 
@@ -639,7 +640,7 @@ export async function submitInspection(formData: FormData) {
       const { data: rates } = await supabase.from("vehicles").select("daily_rate, weekly_rate, monthly_rate").eq("id", vehicleId).eq("organization_id", organizationId).maybeSingle();
       early = earlyStartFor(bookedRental, rates, handoverDate);
     }
-    const earlyChoice = asEarlyStartChoice(stringField(formData, "earlyStart")) || "free";
+    const earlyChoice = settleEarlyChoice(stringField(formData, "earlyStart"), early, early ? (await getCurrentMembership())?.role === "owner" : true);
     const shortenTo = early && earlyChoice === "shorten" ? early.shortenedEnd : null;
 
     const { error: rentalError } = await supabase

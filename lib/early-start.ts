@@ -45,6 +45,18 @@ export function asEarlyStartChoice(value: unknown): EarlyStartChoice | null {
 }
 
 /**
+ * What actually happens to the extra days. Nothing chosen means they are charged (when there is a price
+ * for them). Giving them away is the owner's call: a teammate's "free" is charged instead.
+ */
+export function settleEarlyChoice(value: unknown, early: EarlyStart | null, isOwner: boolean): EarlyStartChoice {
+  const chosen = asEarlyStartChoice(value);
+  const chargeable = Boolean(early && early.amount > 0);
+  if (!chosen) return chargeable ? "charge" : "free";
+  if (chosen === "free" && chargeable && !isOwner) return "charge";
+  return chosen;
+}
+
+/**
  * The charge for the extra days, as a payment due today. Written once per booking: a second call (the
  * cash recorded during the handover, then the handover saved) finds it and does nothing.
  */

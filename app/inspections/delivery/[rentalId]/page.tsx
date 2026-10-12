@@ -1,4 +1,5 @@
 import { InspectionForm } from "@/components/inspection-form";
+import { getCurrentMembership } from "@/lib/auth/roles";
 import { AppShell } from "@/components/app-shell";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getInspectionContextByRental } from "@/lib/inspection-detail";
@@ -13,7 +14,7 @@ import { getLocale } from "next-intl/server";
 export default async function DeliveryInspectionPage({ params, searchParams }: { params: Promise<{ rentalId: string }>; searchParams: Promise<{ swap?: string; vehicle?: string }> }) {
   const { rentalId } = await params;
   const query = await searchParams;
-  const [userEmail, organization] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization()]);
+  const [userEmail, organization, membership] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization(), getCurrentMembership()]);
   // ?swap=1: a change of vehicle during the rental (see lib/inspection-detail.ts).
   const context = await getInspectionContextByRental(rentalId, organization.id, "delivery", query.swap === "1" ? { vehicleId: query.vehicle || null } : undefined);
 
@@ -39,7 +40,7 @@ export default async function DeliveryInspectionPage({ params, searchParams }: {
 
   return (
     <AppShell userEmail={userEmail}>
-      <InspectionForm blocker={blocker} context={context} unsigned={unsigned} />
+      <InspectionForm blocker={blocker} canWaive={membership?.role === "owner"} context={context} unsigned={unsigned} />
     </AppShell>
   );
 }

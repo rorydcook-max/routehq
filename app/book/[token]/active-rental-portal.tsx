@@ -1,5 +1,7 @@
 "use client";
 
+import { VehicleArt } from "@/components/vehicle-art";
+import { kindFromCategory } from "@/lib/vehicle-groups";
 import { customerDate } from "@/lib/i18n/customer-dates";
 import { businessToday, daysFromToday } from "@/lib/business-time";
 import { useLocale, useTranslations } from "next-intl";
@@ -385,11 +387,7 @@ function VehiclePhoto({ vehicle }: { vehicle: any }) {
   if (photo) {
     return <img alt="Vehicle" className="h-24 w-24 rounded-2xl object-cover" src={typeof photo === "string" ? photo : photo.url} />;
   }
-  return (
-    <span className="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl bg-[var(--primary-light)] text-[var(--primary)]">
-      <ImageIcon size={32} />
-    </span>
-  );
+  return <VehicleArt colour={vehicle?.color} kind={kindFromCategory(vehicle?.vehicle_categories)} model={vehicle?.model} size="md" />;
 }
 
 function returnCountdown(endDate: string | null | undefined, t: ReturnType<typeof useTranslations>) {

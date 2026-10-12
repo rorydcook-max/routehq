@@ -271,7 +271,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
         {isTeammate ? null : <TrialBanner placement="inline" />}
       </main>
 
-      <nav className="fixed bottom-3 left-3 right-3 z-30 rounded-[24px] border border-[var(--border)] bg-white shadow-[var(--shadow-float)] lg:hidden">
+      <nav className="fixed bottom-[calc(12px+env(safe-area-inset-bottom))] left-3 right-3 z-30 rounded-[24px] border border-[var(--border)] bg-white shadow-[var(--shadow-float)] lg:hidden">
         {/* On phones the + lives in the menu bar: floating over the page it sat on top of the buttons at the end of each row. */}
         <div className={`grid px-1 py-2 ${onFocusedFlow ? "grid-cols-4" : "grid-cols-5"}`}>
           {mobileBarItems.map((item, index) => {

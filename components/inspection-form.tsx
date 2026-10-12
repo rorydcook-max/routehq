@@ -387,7 +387,7 @@ function SignaturePad({
   );
 }
 
-export function InspectionForm({ context, unsigned = false, blocker = null }: { context: InspectionContext; /** The customer has not signed the agreement yet. */ unsigned?: boolean; /** Why the handover cannot go ahead right now (another customer still has the vehicle). */ blocker?: string | null }) {
+export function InspectionForm({ context, unsigned = false, blocker = null, canWaive = true }: { context: InspectionContext; /** Owners can give early days for free; teammates charge them or keep the length. */ canWaive?: boolean; /** The customer has not signed the agreement yet. */ unsigned?: boolean; /** Why the handover cannot go ahead right now (another customer still has the vehicle). */ blocker?: string | null }) {
   const t = useTranslations("inspection");
   const locale = useLocale();
   const areaName = (location: string) => {
@@ -845,7 +845,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null }: { 
                   [
                     early.amount > 0 ? { value: "charge", label: t("earlyCharge", { days: early.days, amount: money(early.amount) }) } : null,
                     early.shortenedEnd ? { value: "shorten", label: t("earlyShorten", { date: formatDate(early.shortenedEnd, locale) }) } : null,
-                    { value: "free", label: early.bookedEnd ? t("earlyFreeBack", { date: formatDate(early.bookedEnd, locale) }) : t("earlyFree") }
+                    canWaive || early.amount <= 0 ? { value: "free", label: early.bookedEnd ? t("earlyFreeBack", { date: formatDate(early.bookedEnd, locale) }) : t("earlyFree") } : null
                   ].filter(Boolean) as { value: EarlyStartChoice; label: string }[]
                 ).map((option) => (
                   <label className={`flex min-h-12 cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 text-sm font-semibold ${earlyChoice === option.value ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground)]"}`} key={option.value}>

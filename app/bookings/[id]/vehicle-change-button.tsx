@@ -57,6 +57,8 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
   const free = choice.startsWith("free:") ? options?.free.find((item) => item.vehicleId === choice.slice(5)) : null;
   const money = (amount: number) => `${!options || options.currency === "THB" ? "฿" : `${options.currency} `}${Math.round(amount).toLocaleString("en-US")}`;
 
+  const priceText = (amount: number, pricing: string) => say(`ratePer_${["daily", "weekly", "monthly"].includes(pricing) ? pricing : "other"}`, { amount: money(amount) });
+
   // The replacement normally carries a bigger deposit than this rental has.
   const depositGap = options && free && options.needsSignature ? Math.max(0, free.deposit - options.currentDeposit) : 0;
 
@@ -170,6 +172,11 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
                   {swap ? (
                     <p className="mt-2 rounded-lg bg-[var(--panel-secondary)] p-3 text-xs leading-5 text-[var(--foreground-secondary)]">
                       {say("vc_swapNote", { name: swap.customerName, current: options.currentVehicleLabel, other: swap.label })}
+                      {swap.rate !== options.currentRate || swap.pricing !== options.currentPricing ? (
+                        <span className="mt-1 block font-semibold text-[var(--foreground)]">
+                          {say("vc_swapPrices", { name: swap.customerName, mine: priceText(options.currentRate, options.currentPricing), theirs: priceText(swap.rate, swap.pricing), current: options.currentVehicleLabel, other: swap.label })}
+                        </span>
+                      ) : null}
                     </p>
                   ) : null}
 

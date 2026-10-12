@@ -20,9 +20,10 @@ function contactHref(phone: string | null) {
   return `https://wa.me/${digits.startsWith("0") ? `66${digits.slice(1)}` : digits}`;
 }
 
-function Message({ tone, title, children }: { tone: "red" | "green"; title: string; children: React.ReactNode }) {
+function Message({ tone, title, children, colour = null }: { tone: "red" | "green"; title: string; children: React.ReactNode; colour?: string | null }) {
   return (
     <main className="min-h-screen bg-[var(--panel-secondary)] px-4 py-8 text-[var(--foreground)]">
+      <BrandStyle colour={colour} />
       <div className="mx-auto mb-3 flex max-w-xl justify-end">
         <CustomerLanguagePicker />
       </div>
@@ -55,7 +56,7 @@ export default async function AmendmentPage({ params }: { params: Promise<{ toke
 
   if (amendment.state === "cancelled") {
     return (
-      <Message title={t("amendWithdrawnTitle")} tone="red">
+      <Message colour={amendment.brandColour} title={t("amendWithdrawnTitle")} tone="red">
         <p>{t("amendWithdrawnMessage", { business: amendment.businessName })}</p>
         {contactLink}
       </Message>
@@ -63,7 +64,7 @@ export default async function AmendmentPage({ params }: { params: Promise<{ toke
   }
   if (amendment.state === "expired") {
     return (
-      <Message title={t("amendExpiredTitle")} tone="red">
+      <Message colour={amendment.brandColour} title={t("amendExpiredTitle")} tone="red">
         <p>{t("amendExpiredMessage", { business: amendment.businessName })}</p>
         {contactLink}
       </Message>
@@ -71,7 +72,7 @@ export default async function AmendmentPage({ params }: { params: Promise<{ toke
   }
   if (amendment.state === "signed") {
     return (
-      <Message title={t("amendSignedTitle")} tone="green">
+      <Message colour={amendment.brandColour} title={t("amendSignedTitle")} tone="green">
         <p>
           {amendment.signerName ? t("amendThanksNamed", { name: amendment.signerName, business: amendment.businessName }) : t("amendThanks", { business: amendment.businessName })}
         </p>

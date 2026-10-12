@@ -31,7 +31,7 @@ export async function loadPublicAmendment(token: string): Promise<PublicAmendmen
 
   const [{ data: rental }, { data: organization }] = await Promise.all([
     admin.from("rentals").select("id, vehicle_id, customer_id").eq("id", amendment.rental_id).maybeSingle(),
-    admin.from("organizations").select("name, trading_name, business_phone, settings").eq("id", amendment.organization_id).maybeSingle()
+    admin.from("organizations").select("name, trading_name, business_phone, settings, contract_accent_colour").eq("id", amendment.organization_id).maybeSingle()
   ]);
   const [{ data: vehicle }, { data: customer }] = await Promise.all([
     rental?.vehicle_id ? admin.from("vehicles").select("make, model, year, registration_number").eq("id", rental.vehicle_id).maybeSingle() : Promise.resolve({ data: null }),

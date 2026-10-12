@@ -92,7 +92,7 @@ export function TrialBanner({ placement = "floating" }: { placement?: "floating"
           ? // Desktop: one line in the sidebar, above the account card; the line is the link.
             "mt-3 hidden items-center justify-between gap-2 rounded-lg border px-2.5 py-2 lg:flex"
           : // Phones: floats above the bottom navigation, clear of the + button.
-            "fixed bottom-[calc(72px+env(safe-area-inset-bottom))] left-3 right-3 z-40 flex items-center justify-between gap-2 rounded-lg border px-3 py-2 shadow-lg lg:hidden",
+            "fixed bottom-[calc(96px+env(safe-area-inset-bottom))] left-3 right-3 z-40 flex items-center justify-between gap-2 rounded-lg border px-3 py-2 shadow-lg lg:hidden",
         tone.className
       )}
       role="status"

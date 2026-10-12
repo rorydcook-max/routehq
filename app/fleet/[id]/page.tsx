@@ -10,6 +10,8 @@ import { VehicleNotesForm } from "@/app/fleet/[id]/vehicle-notes-form";
 import { VehiclePhotoManager } from "@/app/fleet/[id]/vehicle-photo-manager";
 import { VehicleTimeline, type VehicleTimelineEvent } from "@/app/fleet/[id]/vehicle-timeline";
 import { AppShell } from "@/components/app-shell";
+import { VehicleArt } from "@/components/vehicle-art";
+import { kindFromCategory } from "@/lib/vehicle-groups";
 import { RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
 import { InspectionViewer } from "@/components/inspection-viewer";
 import { PendingButton } from "@/components/pending-button";
@@ -977,7 +979,7 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
         <Card>
           <div className="card-section">
             <div className="grid gap-4 lg:grid-cols-[minmax(0,1.45fr)_minmax(340px,0.9fr)] lg:items-stretch">
-              <VehiclePhotoManager organizationId={organization.id} photos={detail.photos} vehicleId={vehicle.id} vehicleLabel={[vehicle.make, vehicle.model].filter(Boolean).join(" ")} />
+              <VehiclePhotoManager art={<VehicleArt colour={vehicle.color} kind={kindFromCategory(detail.category)} model={vehicle.model} size="xl" />} organizationId={organization.id} photos={detail.photos} vehicleId={vehicle.id} vehicleLabel={[vehicle.make, vehicle.model].filter(Boolean).join(" ")} />
               <div className="flex min-w-0 flex-col justify-between gap-4">
                 <div className="min-w-0">
                   <div className="mb-2 flex flex-wrap items-center gap-2">

@@ -1,5 +1,7 @@
 "use client";
 
+import { VehicleArt } from "@/components/vehicle-art";
+import { kindFromCategory } from "@/lib/vehicle-groups";
 import { includedOptions } from "@/lib/included-items";
 import { shownError } from "@/lib/error-text";
 import { businessToday, toWallTime } from "@/lib/business-time";
@@ -9,7 +11,7 @@ import type { LucideIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { longDate, shortDate } from "@/lib/i18n/dates";
 import { extrasFor, priceExtras, seasonalRate, type Extra, type Season } from "@/lib/price-rules";
-import { Bike, CalendarDays, Car, CheckCircle2, Copy, MapPin, Send, UserPlus, UserRound, X } from "lucide-react";
+import { CalendarDays, Car, CheckCircle2, Copy, MapPin, Send, UserPlus, UserRound, X } from "lucide-react";
 import { createBooking } from "@/app/actions/bookings";
 import { CustomerSelector } from "@/components/customer-selector";
 import { Badge, ProgressBar } from "@/components/ui";
@@ -737,9 +739,7 @@ export function BookingForm({
                   type="button"
                 >
                   <div className="flex items-start gap-3">
-                    <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-[var(--primary-light)] text-[var(--primary)]">
-                      {isTwoWheeler(vehicle.category_code) ? <Bike size={25} /> : <Car size={25} />}
-                    </span>
+                    <VehicleArt colour={(vehicle as any).color} kind={kindFromCategory({ code: String(vehicle.category_code || ""), name: "" })} model={vehicle.model} size="sm" />
                     <span className="min-w-0">
                       <span className="block text-lg font-semibold text-[var(--foreground)]">{vehicleTitle(vehicle)}</span>
                       <span className="font-mono-data block text-sm font-bold text-[var(--muted)]">{vehicle.registration_number}</span>

@@ -12,11 +12,13 @@ type VehiclePhotoManagerProps = {
   vehicleId: string;
   vehicleLabel: string;
   photos: VehicleDetailDocument[];
+  /** The drawing of the vehicle, shown until it has a photo. */
+  art?: React.ReactNode;
 };
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
-export function VehiclePhotoManager({ organizationId, vehicleId, vehicleLabel, photos }: VehiclePhotoManagerProps) {
+export function VehiclePhotoManager({ organizationId, vehicleId, vehicleLabel, photos, art }: VehiclePhotoManagerProps) {
   const say = useTranslations("vehiclePage") as unknown as Say;
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -122,13 +124,24 @@ export function VehiclePhotoManager({ organizationId, vehicleId, vehicleLabel, p
             </span>
           </>
         ) : (
-          <div className="flex w-full flex-col items-center justify-center gap-3 p-6 text-center">
-            <p className="font-semibold text-[var(--foreground-secondary)]">{say("ph_none")}</p>
-            <span className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-white px-5 font-bold text-[var(--primary)]">
-              <ImagePlus size={18} />
-              {say("ph_add")}
-            </span>
-          </div>
+          art ? (
+            <>
+              {/* The drawing sits a little high so the button doesn't cover a wheel. */}
+              <span className="absolute inset-0 flex [&>span]:pb-12">{art}</span>
+              <span className="absolute bottom-3 right-3 inline-flex min-h-[44px] items-center gap-2 rounded-full bg-white px-4 font-bold text-[var(--primary)] shadow-sm">
+                <ImagePlus size={18} />
+                {say("ph_add")}
+              </span>
+            </>
+          ) : (
+            <div className="flex w-full flex-col items-center justify-center gap-3 p-6 text-center">
+              <p className="font-semibold text-[var(--foreground-secondary)]">{say("ph_none")}</p>
+              <span className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-white px-5 font-bold text-[var(--primary)]">
+                <ImagePlus size={18} />
+                {say("ph_add")}
+              </span>
+            </div>
+          )
         )}
       </button>
 

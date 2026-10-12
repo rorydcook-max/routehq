@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getCurrentMembership } from "@/lib/auth/roles";
 import type { Route } from "next";
 import { AlertTriangle, CalendarDays, Car, CheckCircle2, Clock, CreditCard, FileText, Gauge, MapPin, ReceiptText, UserRound, XCircle } from "lucide-react";
 import { CancelBookingButton } from "@/app/bookings/[id]/cancel-booking-button";
@@ -372,6 +373,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
     .maybeSingle();
   const vehicle = rental.vehicles;
   const customer = rental.customers;
+  // Giving money away (free early days, unpaid rent taken off) is the owner's call.
+  const isOwner = (await getCurrentMembership())?.role === "owner";
   // Receipts customers sent stay with their payment; staff open them from the schedule.
   const receiptUrls = await signedReceiptUrls(payments.map((payment: any) => payment.metadata?.receipt?.path).filter(Boolean));
   for (const payment of payments as any[]) {
@@ -956,7 +959,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                       >
                         {tx.say("fillHandover")}
                       </Link>
-                      <SkipInspectionButton early={earlyStartFor(rental, vehicle, businessToday())} rentalId={rental.id} />
+                      <SkipInspectionButton canWaive={isOwner} early={earlyStartFor(rental, vehicle, businessToday())} rentalId={rental.id} />
                     </div>
                   </div>
                 ) : isRetrospective ? (
@@ -986,7 +989,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     <Link className="primary-action pressable block w-full px-3 py-2 text-center" href={`/inspections/delivery/${rental.id}` as Route}>
                       {tx.say("startHandover")}
                     </Link>
-                    <SkipInspectionButton early={earlyStartFor(rental, vehicle, businessToday())} rentalId={rental.id} />
+                    <SkipInspectionButton canWaive={isOwner} early={earlyStartFor(rental, vehicle, businessToday())} rentalId={rental.id} />
                   </div>
                 ) : isCancelled ? (
                   <div className="sub-surface p-3">
@@ -1173,7 +1176,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   const rows = (payments as any[]).filter((payment) => payment.metadata?.early_return_owed && !payment.metadata.early_return_owed.decided && ["scheduled", "pending", "failed", "overdue"].includes(String(payment.status)));
                   if (!rows.length) return null;
                   const unused = Math.round(rows.reduce((sum, payment) => sum + Number(payment.metadata.early_return_owed.share || 0), 0) / 10) * 10;
-                  return <EarlyReturnOwedPanel days={Number(rows[0].metadata.early_return_owed.unused_days || 0)} owed={money(pendingPaymentAmount, rental.currency)} rentalId={rental.id} unused={money(unused, rental.currency)} />;
+                  return <EarlyReturnOwedPanel canDecide={isOwner} days={Number(rows[0].metadata.early_return_owed.unused_days || 0)} owed={money(pendingPaymentAmount, rental.currency)} rentalId={rental.id} unused={money(unused, rental.currency)} />;
                 })()}
                 <p className="text-sm text-[var(--muted)]">
                   {/* Rent and deposit are said separately: "฿0 paid so far" beside a paid deposit read as a mistake. */}

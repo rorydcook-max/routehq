@@ -197,7 +197,7 @@ export async function getCustomerDetail(customerId: string, organizationId: stri
     supabase.from("documents").select("*").eq("organization_id", organizationId).eq("owner_type", "customer").eq("owner_id", customerId).is("deleted_at", null).order("created_at", { ascending: false }),
     supabase
       .from("rentals")
-      .select("*, vehicles!rentals_vehicle_id_fkey(id, make, model, registration_number)")
+      .select("*, vehicles!rentals_vehicle_id_fkey(id, make, model, registration_number, color, vehicle_categories(code, name))")
       .eq("organization_id", organizationId)
       .eq("customer_id", customerId)
       .is("deleted_at", null)
@@ -211,7 +211,7 @@ export async function getCustomerDetail(customerId: string, organizationId: stri
       .order("transaction_date", { ascending: false }),
     supabase
       .from("rentals")
-      .select("*, vehicles!rentals_vehicle_id_fkey(id, make, model, registration_number)")
+      .select("*, vehicles!rentals_vehicle_id_fkey(id, make, model, registration_number, color, vehicle_categories(code, name))")
       .eq("organization_id", organizationId)
       .eq("customer_id", customerId)
       .in("status", activeRentalStatuses)

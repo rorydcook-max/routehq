@@ -809,13 +809,14 @@ export type VehicleChangeOptions = {
   hasCustomer: boolean;
   currentVehicleLabel: string;
   currentRate: number;
+  currentPricing: string;
   /** The deposit agreed on this rental. */
   currentDeposit: number;
   currency: string;
   /** `deposit` is what the business normally takes for that vehicle. */
   free: Array<{ vehicleId: string; label: string; plate: string | null; monthlyRate: number; deposit: number }>;
   /** Vehicles out with other customers that could be exchanged for this one. */
-  swaps: Array<{ rentalId: string; vehicleId: string; label: string; plate: string | null; customerName: string }>;
+  swaps: Array<{ rentalId: string; vehicleId: string; label: string; plate: string | null; customerName: string; rate: number; pricing: string }>;
 };
 
 function freeFrom(rental: any) {
@@ -843,7 +844,7 @@ export async function getVehicleChangeOptions(rentalId: string): Promise<Result<
       handedOver
         ? admin
             .from("rentals")
-            .select("id, vehicle_id, start_date, end_date, status, customers!rentals_customer_id_fkey(full_name)")
+            .select("id, vehicle_id, start_date, end_date, status, rental_rate, pricing_model, customers!rentals_customer_id_fkey(full_name)")
             .eq("organization_id", organizationId)
             .in("status", ON_RENT)
             .neq("id", rentalId)
@@ -871,7 +872,7 @@ export async function getVehicleChangeOptions(rentalId: string): Promise<Result<
       .filter((other) => other.customers?.full_name && byId.has(other.vehicle_id))
       // Each vehicle must be free for the other rental's remaining time, ignoring the two rentals themselves.
       .filter((other) => clear(other.vehicle_id, from, end, [rentalId, other.id]) && clear(rental.vehicle_id, businessToday(), cleanDate(other.end_date), [rentalId, other.id]))
-      .map((other) => ({ rentalId: String(other.id), vehicleId: String(other.vehicle_id), label: label(byId.get(other.vehicle_id)), plate: byId.get(other.vehicle_id)?.registration_number || null, customerName: String(other.customers.full_name) }));
+      .map((other) => ({ rentalId: String(other.id), vehicleId: String(other.vehicle_id), label: label(byId.get(other.vehicle_id)), plate: byId.get(other.vehicle_id)?.registration_number || null, customerName: String(other.customers.full_name), rate: Number(other.rental_rate || 0), pricing: String(other.pricing_model || "") }));
 
     return {
       ok: true,
@@ -881,6 +882,7 @@ export async function getVehicleChangeOptions(rentalId: string): Promise<Result<
       hasCustomer: Boolean(ctx.customer),
       currentVehicleLabel: label(ctx.vehicle),
       currentRate: Number(rental.rental_rate || 0),
+      currentPricing: String(rental.pricing_model || ""),
       currentDeposit: Number(rental.deposit_amount || 0),
       currency: String(rental.currency || "THB"),
       free,

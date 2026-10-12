@@ -7,7 +7,7 @@ import type { EarlyStart, EarlyStartChoice } from "@/lib/early-start";
 import { longDate } from "@/lib/i18n/dates";
 import { useLocale } from "next-intl";
 
-export function SkipInspectionButton({ rentalId, early = null }: { rentalId: string; early?: EarlyStart | null }) {
+export function SkipInspectionButton({ rentalId, early = null, canWaive = true }: { rentalId: string; early?: EarlyStart | null; canWaive?: boolean }) {
   const say = useTranslations("booking") as unknown as (key: string) => string;
   const ask = useTranslations("inspection") as unknown as (key: string, values?: Record<string, string | number>) => string;
   const locale = useLocale();
@@ -41,7 +41,7 @@ export function SkipInspectionButton({ rentalId, early = null }: { rentalId: str
                 [
                   early.amount > 0 ? { value: "charge", label: ask("earlyCharge", { days: early.days, amount: `฿${early.amount.toLocaleString("en-US")}` }) } : null,
                   early.shortenedEnd ? { value: "shorten", label: ask("earlyShorten", { date: longDate(early.shortenedEnd, locale) }) } : null,
-                  { value: "free", label: early.bookedEnd ? ask("earlyFreeBack", { date: longDate(early.bookedEnd, locale) }) : ask("earlyFree") }
+                  canWaive || early.amount <= 0 ? { value: "free", label: early.bookedEnd ? ask("earlyFreeBack", { date: longDate(early.bookedEnd, locale) }) : ask("earlyFree") } : null
                 ].filter(Boolean) as { value: EarlyStartChoice; label: string }[]
               ).map((option) => (
                 <label className="flex min-h-9 cursor-pointer items-center gap-2 rounded-lg bg-white px-2 py-1 text-xs font-semibold text-[var(--foreground)]" key={option.value}>

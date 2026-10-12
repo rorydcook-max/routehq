@@ -56,10 +56,11 @@ function isPale(hex: string) {
 const BOX = {
   sm: "h-11 w-14 rounded-xl",
   md: "h-[74px] w-[104px] rounded-2xl",
-  lg: "h-28 w-full rounded-[20px]"
+  lg: "h-28 w-full rounded-[20px]",
+  xl: "h-full min-h-[190px] w-full rounded-2xl"
 } as const;
 
-const ART = { sm: 48, md: 88, lg: 150 } as const;
+const ART = { sm: 48, md: 88, lg: 150, xl: 230 } as const;
 
 export function VehicleArt({
   kind,
@@ -80,11 +81,12 @@ export function VehicleArt({
     // eslint-disable-next-line @next/next/no-img-element
     return <img alt="" className={`${BOX[size]} flex-shrink-0 object-cover ${className}`} src={photoUrl} />;
   }
-  const paint = paintOf(colour) || "#0e5e6f";
-  const pale = isPale(paint);
-  const dark = !pale && parseInt(paint.slice(1, 3), 16) < 70;
+  const known = paintOf(colour);
+  const paint = known || "var(--primary)";
+  const pale = known ? isPale(known) : false;
+  const dark = known ? !pale && parseInt(known.slice(1, 3), 16) < 70 : false;
   // White and black vehicles sit on the neutral aqua; coloured ones on a tint of their own paint.
-  const backdrop = pale || dark || paint === "#a7b0b8" || paint === "#7d8790" ? "#e3eeec" : mixWithWhite(paint, 0.82);
+  const backdrop = !known ? "var(--primary-light)" : pale || dark || known === "#a7b0b8" || known === "#7d8790" ? "#e3eeec" : mixWithWhite(known, 0.82);
   const glass = pale ? "#9fb3bb" : "#e8f1f2";
   const outline = pale ? "#9fb3bb" : "none";
   const shape: Shape = shapeOf(kind, String(model || ""));
@@ -94,32 +96,32 @@ export function VehicleArt({
       <svg height={width / 2} viewBox="0 0 120 60" width={width}>
         {shape === "car" ? (
           <>
-            <path d="M8 44 L16 29 Q22 20 36 19 L76 19 Q88 19 96 28 L106 33 Q113 35 113 42 L113 46 L8 46 Z" fill={paint} stroke={outline} strokeWidth="1.5" />
+            <path d="M8 44 L16 29 Q22 20 36 19 L76 19 Q88 19 96 28 L106 33 Q113 35 113 42 L113 46 L8 46 Z" stroke={outline} strokeWidth="1.5" style={{ fill: paint }} />
             <path d="M28 30 L36 22 L56 22 L56 30 Z M60 22 L76 22 Q84 22 89 30 L60 30 Z" fill={glass} />
           </>
         ) : shape === "suv" ? (
           <>
-            <path d="M6 44 L12 26 Q16 16 30 15 L84 15 Q96 15 102 24 L110 30 Q115 33 115 40 L115 46 L6 46 Z" fill={paint} stroke={outline} strokeWidth="1.5" />
+            <path d="M6 44 L12 26 Q16 16 30 15 L84 15 Q96 15 102 24 L110 30 Q115 33 115 40 L115 46 L6 46 Z" stroke={outline} strokeWidth="1.5" style={{ fill: paint }} />
             <path d="M24 28 L30 19 L54 19 L54 28 Z M58 19 L82 19 Q90 19 95 28 L58 28 Z" fill={glass} />
           </>
         ) : shape === "pickup" ? (
           <>
-            <path d="M6 46 L6 30 L58 30 L58 46 Z M58 46 L58 22 Q60 15 70 15 L88 15 Q96 15 102 24 L110 30 Q115 33 115 40 L115 46 Z" fill={paint} stroke={outline} strokeWidth="1.5" />
+            <path d="M6 46 L6 30 L58 30 L58 46 Z M58 46 L58 22 Q60 15 70 15 L88 15 Q96 15 102 24 L110 30 Q115 33 115 40 L115 46 Z" stroke={outline} strokeWidth="1.5" style={{ fill: paint }} />
             <path d="M65 28 L69 19 L86 19 Q92 19 96 28 Z" fill={glass} />
           </>
         ) : shape === "van" ? (
           <>
-            <path d="M6 44 L6 18 Q6 12 14 12 L86 12 Q96 12 104 24 L112 30 Q115 33 115 40 L115 46 L6 46 Z" fill={paint} stroke={outline} strokeWidth="1.5" />
+            <path d="M6 44 L6 18 Q6 12 14 12 L86 12 Q96 12 104 24 L112 30 Q115 33 115 40 L115 46 L6 46 Z" stroke={outline} strokeWidth="1.5" style={{ fill: paint }} />
             <path d="M15 17 h21 v11 h-21 z M41 17 h21 v11 h-21 z M67 17 h17 Q92 17 98 28 L67 28 Z" fill={glass} />
           </>
         ) : shape === "scooter" ? (
           <>
-            <path d="M30 42 Q34 28 54 28 L76 28 L84 14 L94 14 L90 28 Q104 30 104 42 Z" fill={paint} stroke={outline} strokeWidth="1.5" />
+            <path d="M30 42 Q34 28 54 28 L76 28 L84 14 L94 14 L90 28 Q104 30 104 42 Z" stroke={outline} strokeWidth="1.5" style={{ fill: paint }} />
             <rect fill="#13262b" height="7" rx="3" width="24" x="48" y="22" />
           </>
         ) : (
           <>
-            <path d="M34 42 Q38 28 56 27 L78 27 L88 16 L95 16 L87 31 Q97 34 99 42 Z" fill={paint} stroke={outline} strokeWidth="1.5" />
+            <path d="M34 42 Q38 28 56 27 L78 27 L88 16 L95 16 L87 31 Q97 34 99 42 Z" stroke={outline} strokeWidth="1.5" style={{ fill: paint }} />
             <path d="M50 27 Q54 20 66 20 L74 20 Q78 24 76 27 Z" fill="#13262b" />
           </>
         )}

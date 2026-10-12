@@ -307,9 +307,9 @@ export function DateLeaf({ date, locale, tone = "var(--on-rent)" }: { date: stri
   if (Number.isNaN(day.getTime())) return null;
   const format = (options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat(intlLocale(locale), { ...options, timeZone: "UTC" }).format(day);
   return (
-    <span className="inline-flex w-[66px] flex-shrink-0 flex-col overflow-hidden rounded-xl bg-white text-center shadow-[0_1px_3px_rgba(19,38,43,0.14)]" title={format({ weekday: "long", day: "numeric", month: "long", year: "numeric" })}>
+    <span className="inline-flex w-[50px] flex-shrink-0 flex-col sm:w-[66px] overflow-hidden rounded-xl bg-white text-center shadow-[0_1px_3px_rgba(19,38,43,0.14)]" title={format({ weekday: "long", day: "numeric", month: "long", year: "numeric" })}>
       <span className="py-0.5 text-[14px] font-bold text-white" style={{ background: tone }}>{format({ month: "short" })}</span>
-      <span className="num pt-1 text-[24px] leading-none text-[var(--foreground)]">{day.getUTCDate()}</span>
+      <span className="num pt-1 text-[20px] leading-none text-[var(--foreground)] sm:text-[24px]">{day.getUTCDate()}</span>
       <span className="pb-1 text-[14px] font-semibold text-[var(--muted)]">{format({ weekday: "short" })}</span>
     </span>
   );

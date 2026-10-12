@@ -3,7 +3,7 @@ import { typedNote } from "@/lib/transaction-notes";
 import type { Route } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Banknote, CalendarDays, ClipboardCheck, FileText, Fuel, Gauge, Sparkles, MapPin, PenLine, ReceiptText, ShieldCheck, Smartphone, Wrench } from "lucide-react";
+import { ArrowRight, Banknote, CalendarDays, ClipboardCheck, FileText, Fuel, Gauge, Sparkles, MapPin, PenLine, ReceiptText, ShieldCheck, Smartphone, Wrench } from "lucide-react";
 import { completeTask, createVehicleTask } from "@/app/actions/tasks";
 import { logVehicleMaintenance, renewVehicleCompliance } from "@/app/actions/vehicles";
 import { VehicleNotesForm } from "@/app/fleet/[id]/vehicle-notes-form";
@@ -11,6 +11,7 @@ import { VehiclePhotoManager } from "@/app/fleet/[id]/vehicle-photo-manager";
 import { VehicleTimeline, type VehicleTimelineEvent } from "@/app/fleet/[id]/vehicle-timeline";
 import { AppShell } from "@/components/app-shell";
 import { VehicleArt } from "@/components/vehicle-art";
+import { DateLeaf } from "@/components/glance";
 import { kindFromCategory } from "@/lib/vehicle-groups";
 import { RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
 import { InspectionViewer } from "@/components/inspection-viewer";
@@ -331,7 +332,14 @@ function ActiveRentalCard({ detail, dueNow }: { detail: VehicleDetail; dueNow: n
       <div className="mt-3 grid grid-cols-2 gap-2.5">
         <InfoRow
           label={tx.say("ar_period")}
-          value={rental.end_date ? tx.say("ar_range", { from: formatDate(rental.start_date, tx), to: formatDate(rental.end_date, tx) }) : tx.say("ar_rangeOpen", { from: formatDate(rental.start_date, tx) })}
+          value={rental.end_date && rental.start_date ? (
+            <span className="mt-1.5 flex items-center gap-1.5 sm:gap-2">
+              <DateLeaf date={toWallTime(rental.start_date).slice(0, 10)} locale={tx.locale} />
+              <ArrowRight aria-hidden="true" className="hidden text-[var(--muted)] sm:block" size={16} />
+              <DateLeaf date={toWallTime(rental.end_date).slice(0, 10)} locale={tx.locale} tone="var(--coming-back)" />
+              <span className="sr-only">{tx.say("ar_range", { from: formatDate(rental.start_date, tx), to: formatDate(rental.end_date, tx) })}</span>
+            </span>
+          ) : tx.say("ar_rangeOpen", { from: formatDate(rental.start_date, tx) })}
         />
         <InfoRow label={tx.say("ar_price")} value={tx.say(`ar_${priceKey}`, { amount: money(rental.rental_rate) })} />
         <InfoRow label={tx.say("ar_deposit")} value={money(rental.deposit_amount)} />

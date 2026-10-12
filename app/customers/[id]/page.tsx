@@ -4,7 +4,7 @@ import { kindFromCategory } from "@/lib/vehicle-groups";
 import type { Route } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
-import { FileText, MessageCircle, PenLine, Phone, Plus } from "lucide-react";
+import { ArrowRight, CheckCircle2, FileText, MessageCircle, PenLine, Phone, Plus } from "lucide-react";
 import { updateCustomer, uploadCustomerDocument } from "@/app/actions/customers";
 import { CustomerNotesForm } from "@/app/customers/[id]/customer-notes-form";
 import { DoNotRent } from "@/app/customers/[id]/do-not-rent";
@@ -12,7 +12,7 @@ import { AppShell } from "@/components/app-shell";
 import { CommunicationPanel } from "@/components/communication-panel";
 import { PendingButton } from "@/components/pending-button";
 import { Badge, Card, Fold } from "@/components/ui";
-import { Ring, TileHead, initialsOf } from "@/components/glance";
+import { DateLeaf, Ring, TileHead, initialsOf } from "@/components/glance";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { businessToday } from "@/lib/business-time";
 import { commonCountries, customerLanguages, flagForNationality, countryLabel } from "@/lib/customer-options";
@@ -104,6 +104,7 @@ function preferredContactMethod(customer: any) {
 
 function ActiveRentalCard({ rental, customerId, dueNow }: { rental: any; customerId: string; dueNow: number }) {
   const cx = useCx();
+  const locale = useLocale();
   const days = daysUntil(rental.end_date);
   const late = days !== null && days < 0;
   return (
@@ -121,7 +122,14 @@ function ActiveRentalCard({ rental, customerId, dueNow }: { rental: any; custome
       <div className="mt-3 grid grid-cols-2 gap-2.5">
         <InfoTile
           label={cx.say("r_period")}
-          value={rental.end_date ? cx.say("r_range", { from: formatDate(rental.start_date, cx), to: formatDate(rental.end_date, cx) }) : cx.say("r_rangeOpen", { from: formatDate(rental.start_date, cx) })}
+          value={rental.end_date && rental.start_date ? (
+            <span className="mt-1.5 flex items-center gap-1.5 sm:gap-2">
+              <DateLeaf date={String(rental.start_date)} locale={locale} />
+              <ArrowRight aria-hidden="true" className="hidden text-[var(--muted)] sm:block" size={16} />
+              <DateLeaf date={String(rental.end_date)} locale={locale} tone="var(--coming-back)" />
+              <span className="sr-only">{cx.say("r_range", { from: formatDate(rental.start_date, cx), to: formatDate(rental.end_date, cx) })}</span>
+            </span>
+          ) : cx.say("r_rangeOpen", { from: formatDate(rental.start_date, cx) })}
         />
         <InfoTile danger={dueNow > 0} label={cx.say("r_dueNow")} value={dueNow > 0 ? money(dueNow) : cx.say("r_nothing")} />
       </div>
@@ -501,7 +509,10 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           ) : (
             <div className="card tile tile-green p-4">
               <TileHead title={cx.say("g_owesNothing")} />
-              <span className="font-semibold">{cx.say("g_owesNothingDetail")}</span>
+              <span className="flex items-center gap-3">
+                <span className="inline-flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-[var(--success)] text-white"><CheckCircle2 size={24} strokeWidth={2.4} /></span>
+                <span className="font-semibold">{cx.say("g_owesNothingDetail")}</span>
+              </span>
             </div>
           )}
           <a className="card pressable tile p-4 text-[var(--foreground)]" href="#documents">

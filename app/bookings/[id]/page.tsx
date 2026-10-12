@@ -629,9 +629,9 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 <p className="mt-0.5 text-[20px] font-bold leading-tight text-[var(--foreground)]">{daysRemaining(rental.end_date, rental.status, rental.start_date, tx)}</p>
                 {/* Out and back as two calendar leaves; the full dates show on hover. */}
                 {rental.end_date && rental.start_date ? (
-                  <div className="mt-2.5 flex flex-wrap items-center gap-2">
+                  <div className="mt-2.5 flex items-center gap-1.5 sm:gap-2">
                     <DateLeaf date={rental.start_date} locale={tx.locale} />
-                    <ArrowRight aria-hidden="true" className="text-[var(--muted)]" size={18} />
+                    <ArrowRight aria-hidden="true" className="hidden text-[var(--muted)] sm:block" size={18} />
                     <DateLeaf date={rental.end_date} locale={tx.locale} tone="var(--coming-back)" />
                     <span className="sr-only">{tx.say("dateTo", { date: formatDate(rental.start_date, tx) })}</span>
                     <EditableEndDate currentEndDate={rental.end_date} iconOnly rentalId={rental.id} />

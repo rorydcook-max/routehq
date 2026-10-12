@@ -482,7 +482,7 @@ export function EditableEndDate({ rentalId, currentEndDate, iconOnly = false }: 
       <span className={iconOnly ? "sr-only" : undefined}>{dateLabel(currentEndDate, tx.locale)}</span>
       <button
         aria-label={tx.say("pc_editEnd")}
-        className={`pressable inline-flex ${iconOnly ? "h-9 w-9 bg-white shadow-[0_1px_3px_rgba(19,38,43,0.14)]" : "h-6 w-6"} items-center justify-center rounded-full text-[var(--muted)] hover:bg-[var(--panel-secondary)] hover:text-[var(--primary)]`}
+        className={`pressable inline-flex ${iconOnly ? "h-8 w-8 flex-shrink-0 bg-white sm:h-9 sm:w-9 shadow-[0_1px_3px_rgba(19,38,43,0.14)]" : "h-6 w-6"} items-center justify-center rounded-full text-[var(--muted)] hover:bg-[var(--panel-secondary)] hover:text-[var(--primary)]`}
         onClick={() => setEditing(true)}
         type="button"
       >

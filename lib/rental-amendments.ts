@@ -44,6 +44,11 @@ export type AmendmentChanges = {
    * changed first and this is signed afterwards. Holds the date it was changed.
    */
   applied_before_signature?: string | null;
+  /**
+   * The replacement had bookings that hadn't started: they move to the vehicle given up, in the same step
+   * as this change. Kept here so the move happens when this change is carried out.
+   */
+  move_bookings?: Array<{ rental_id: string; customer_name: string | null; start_date: string; end_date: string | null }> | null;
   /** Extra wording the business wants the customer to agree to. */
   additional_terms?: string | null;
 };

@@ -34,7 +34,7 @@ export default async function TransactionsPage({
         </div>
       ) : null}
 
-      <TransactionsList showProfit={(await getCurrentMembership())?.role !== "teammate"} today={businessToday()} transactions={transactions} vehicles={options.vehicles} />
+      <TransactionsList showProfit={(await getCurrentMembership())?.role === "owner"} today={businessToday()} transactions={transactions} vehicles={options.vehicles} />
     </AppShell>
   );
 }

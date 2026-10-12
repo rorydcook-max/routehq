@@ -7,7 +7,7 @@ import { getTranslations } from "next-intl/server";
 import { supportedLocaleCodes } from "@/lib/i18n/locales";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { dbRoleFromApp, getCurrentMembership, OWNER_ONLY_MESSAGE, requireOwner, type AppRole } from "@/lib/auth/roles";
+import { appRoleFromForm, dbRoleFromApp, getCurrentMembership, OWNER_ONLY_MESSAGE, requireOwner, type AppRole } from "@/lib/auth/roles";
 import { ACTIVE_ORGANIZATION_COOKIE } from "@/lib/auth/active-organization";
 import { shellBrand } from "@/lib/shell-brand";
 
@@ -249,7 +249,7 @@ export async function createMyOrganization(_state: AuthActionState, formData: Fo
 export async function inviteUser(_state: AuthActionState, formData: FormData): Promise<AuthActionState> {
   const email = String(formData.get("email") || "").trim().toLowerCase();
   const preferredLocale = localeFromForm(formData);
-  const role: AppRole = formData.get("role") === "owner" ? "owner" : "teammate";
+  const role: AppRole = appRoleFromForm(formData.get("role"));
 
   const say = await authText();
   if (!email) {
@@ -270,7 +270,7 @@ export async function inviteUser(_state: AuthActionState, formData: FormData): P
   }
 
   const admin = createSupabaseAdminClient() as any;
-  const label = say(role === "owner" ? "iv_roleOwner" : "iv_roleTeammate");
+  const label = say(role === "owner" ? "iv_roleOwner" : role === "manager" ? "iv_roleManager" : "iv_roleTeammate");
 
   // Someone who already has a RouteHQ account - perhaps working for another
   // business too - is added directly. There is no invite email to send them:
@@ -360,6 +360,30 @@ export async function inviteUser(_state: AuthActionState, formData: FormData): P
   }
 
   return { success: say("iv_sent", { email, role: label }) };
+}
+
+/** The owner sets someone's level: manager (can decide refunds and waive charges) or teammate. */
+export async function setTeamLevel(formData: FormData): Promise<AuthActionState> {
+  const say = await authText();
+  let owner;
+  try {
+    owner = await requireOwner();
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : OWNER_ONLY_MESSAGE };
+  }
+  const memberId = String(formData.get("memberId") || "");
+  const role = appRoleFromForm(formData.get("role"));
+  if (role === "owner") return { error: say("iv_levelFailed") };
+  const admin = createSupabaseAdminClient() as any;
+  const { data: member } = await admin.from("organization_members").select("id, user_id, organization_id, role").eq("id", memberId).maybeSingle();
+  // The owner's own level, and other owners', are not changed here.
+  if (!member || member.organization_id !== owner.organizationId || member.user_id === owner.userId || member.role === "owner") {
+    return { error: say("iv_levelFailed") };
+  }
+  const { error } = await admin.from("organization_members").update({ role: dbRoleFromApp(role) }).eq("id", member.id);
+  if (error) return { error: say("iv_levelFailed") };
+  revalidatePath("/settings");
+  return { success: "ok" };
 }
 
 /** The owner takes someone off the team. Their account stays (they may work for another business); they just lose this one. */

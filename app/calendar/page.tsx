@@ -6,6 +6,7 @@ import { intlLocale } from "@/lib/i18n/dates";
 import type { Route } from "next";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
+import { canDecideMoney, getCurrentMembership } from "@/lib/auth/roles";
 import { bandTab, PageBand } from "@/components/page-band";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getAvailability, getCalendarEvents } from "@/lib/calendar";
@@ -94,7 +95,7 @@ export default async function CalendarPage({
               <p className="page-eyebrow">{todo("eyebrow")}</p>
               <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[var(--foreground)]">{todo("title")}</h2>
             </div>
-            <TasksList organizationId={organization.id} tasks={tasks} today={today} />
+            <TasksList canDecide={canDecideMoney((await getCurrentMembership())?.role)} organizationId={organization.id} tasks={tasks} today={today} />
           </section>
         </>
       )}

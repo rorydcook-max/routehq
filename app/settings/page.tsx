@@ -789,11 +789,11 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                   ) : null}
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge tone="neutral">{member.role === "owner" ? say("team_owner") : say("team_mate")}</Badge>
+                  <Badge tone="neutral">{member.role === "owner" ? say("team_owner") : member.role === "manager" ? say("team_manager") : say("team_mate")}</Badge>
                   {waitingMembers.has(member.id) ? <Badge tone="amber">{say("team_waiting")}</Badge> : null}
                 </div>
                 {viewerIsOwner && member.user_id !== user?.id ? (
-                  <TeamMemberActions email={member.invited_email || null} memberId={member.id} role={member.role === "owner" ? "owner" : "teammate"} waiting={waitingMembers.has(member.id)} />
+                  <TeamMemberActions email={member.invited_email || null} memberId={member.id} role={member.role === "owner" ? "owner" : member.role === "manager" ? "manager" : "teammate"} waiting={waitingMembers.has(member.id)} />
                 ) : null}
               </div>
             ))}

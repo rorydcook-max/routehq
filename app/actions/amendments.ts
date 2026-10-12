@@ -4,7 +4,7 @@ import { said } from "@/lib/i18n/server-text";
 import { customerMessageText } from "@/lib/i18n/customer-message-text";
 import { rentalRateCard, type Rates } from "@/lib/rental-estimate";
 import { tryAutoExtend } from "@/lib/auto-extension";
-import { getCurrentMembership } from "@/lib/auth/roles";
+import { canDecideMoney, getCurrentMembership } from "@/lib/auth/roles";
 import { randomUUID } from "node:crypto";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
@@ -627,7 +627,8 @@ async function applySignedAmendment(admin: any, amendmentId: string) {
   // what gets collected. Once it is held, an increase becomes a payment due.
   const topUp = Number(changes.new_deposit ?? 0) - Number(changes.previous_deposit ?? 0);
   const depositAlreadyHeld = Number(rental.deposit_held || 0) > 0;
-  if (changes.new_deposit !== undefined && changes.new_deposit !== null && topUp > 0 && depositAlreadyHeld) {
+  const onTheRoad = ["active", "due_soon", "overdue", "extended"].includes(String(rental.status || ""));
+  if (changes.new_deposit !== undefined && changes.new_deposit !== null && topUp > 0 && (depositAlreadyHeld || onTheRoad)) {
     const due = changes.deposit_due_date || businessToday();
     const { error } = await admin.from("rental_payments").insert({
       ...base,
@@ -635,7 +636,7 @@ async function applySignedAmendment(admin: any, amendmentId: string) {
       scheduled_date: due,
       status: "pending",
       amount: topUp,
-      metadata: { type: "deposit", is_deposit: true, description: "Security deposit top-up", amendment_id: claimed.id }
+      metadata: { type: "deposit", is_deposit: true, description: depositAlreadyHeld ? "Security deposit top-up" : "Security deposit", amendment_id: claimed.id }
     });
     if (error) failures.push(`deposit top-up: ${error.message}`);
   }
@@ -698,6 +699,70 @@ export async function makeRentalOpenEnded(rentalId: string): Promise<{ ok: true;
 const ON_RENT = ["active", "due_soon", "overdue", "extended"];
 
 /**
+ * The replacement's bookings that hadn't started move to the vehicle given up, and this rental moves to the
+ * replacement, all at once (the double-booking rule would refuse either move on its own). A booking whose
+ * customer had already signed gets a short change form to sign; the move doesn't wait for it.
+ */
+async function moveWithBookings(
+  admin: any,
+  args: { organizationId: string; rentalId: string; newVehicleId: string; oldVehicleId: string; bookings: NonNullable<AmendmentChanges["move_bookings"]>; actorId: string | null; stillWithCustomer?: boolean }
+): Promise<string> {
+  const ids = args.bookings.map((booking) => booking.rental_id);
+  const { data: rows } = await admin.from("rentals").select("id, status, vehicle_id").in("id", ids).is("deleted_at", null);
+  const still = ((rows || []) as any[]).filter((row) => row.vehicle_id === args.newVehicleId);
+  if (still.some((row) => row.status !== "booked")) return "one of the bookings on the replacement has been handed over since this was prepared";
+  const moves = [{ rental_id: args.rentalId, vehicle_id: args.newVehicleId }, ...still.map((row) => ({ rental_id: row.id, vehicle_id: args.oldVehicleId }))];
+  const { error } = await admin.rpc("reassign_rental_vehicles", { p_organization_id: args.organizationId, p_moves: moves });
+  if (error) return "the vehicles could not be changed because another booking is in the way";
+
+  const { data: oldVehicle } = await admin.from("vehicles").select("make, model, registration_number").eq("id", args.oldVehicleId).maybeSingle();
+  const { data: newVehicle } = await admin.from("vehicles").select("make, model, registration_number").eq("id", args.newVehicleId).maybeSingle();
+  const name = (vehicle: any) => [vehicle?.make, vehicle?.model].filter(Boolean).join(" ") || "vehicle";
+  const plate = (vehicle: any) => (vehicle?.registration_number ? `${name(vehicle)} (${vehicle.registration_number})` : name(vehicle));
+  const quiet = (query: any) => query.then(() => null, () => null);
+  for (const row of still) {
+    await Promise.all([
+      quiet(admin.from("rental_payments").update({ vehicle_id: args.oldVehicleId }).eq("rental_id", row.id)),
+      quiet(admin.from("booking_links").update({ vehicle_id: args.oldVehicleId }).eq("rental_id", row.id)),
+      quiet(admin.from("tasks").update({ vehicle_id: args.oldVehicleId }).eq("rental_id", row.id).is("completed_at", null))
+    ]);
+    const booking = args.bookings.find((item) => item.rental_id === row.id);
+    await recordActivityEvent(admin, {
+      organization_id: args.organizationId,
+      actor_id: args.actorId,
+      entity_type: "rental",
+      entity_id: row.id,
+      rental_id: row.id,
+      vehicle_id: args.oldVehicleId,
+      event_type: "vehicle_changed",
+      title: "Vehicle changed",
+      detail: `Moved from the ${name(newVehicle)} to the ${name(oldVehicle)}, which another rental gave up. Dates and price unchanged.`
+    } as any).catch(() => undefined);
+    // Signed already: the customer agrees the new vehicle on a short form.
+    const ctx = await loadRental(admin, args.organizationId, row.id).catch(() => null);
+    if (ctx?.signedAgreement && args.actorId) {
+      const changes: AmendmentChanges = {
+        currency: String(ctx.rental.currency || "THB"),
+        billing_period: String(ctx.rental.billing_interval || ctx.rental.pricing_model || "monthly"),
+        previous_vehicle_id: args.newVehicleId,
+        previous_vehicle_label: plate(newVehicle),
+        new_vehicle_id: args.oldVehicleId,
+        new_vehicle_label: plate(oldVehicle),
+        vehicle_handed_over: false,
+        vehicle_change_reason: "Other",
+        applied_before_signature: businessToday()
+      };
+      await insertVehicleAmendment(admin, args.organizationId, row.id, args.actorId, changes).catch(() => null);
+      const who = ctx.customer?.full_name || booking?.customer_name || "the customer";
+      await admin.from("tasks").insert({ organization_id: args.organizationId, vehicle_id: args.oldVehicleId, rental_id: row.id, title_key: null, created_by: null, title: `Signature needed - ${who} to sign the change to the ${name(oldVehicle)}`, task_type: "admin", action: "swap_signature", due_at: new Date().toISOString() }).then(() => null, () => null);
+    }
+    revalidatePath(`/bookings/${row.id}`);
+  }
+  if (!args.stillWithCustomer) await syncVehicleStatusFromBookings(admin, args.organizationId, args.oldVehicleId).catch(() => null);
+  return "done";
+}
+
+/**
  * Carries out a signed change of vehicle. Returns "done", "waiting" (an
  * exchange whose other customer hasn't signed yet) or the reason it could not
  * be applied.
@@ -732,6 +797,9 @@ async function applyVehicleChange(admin: any, amendment: any, rental: any): Prom
       if (error) return "the vehicles could not be exchanged because another booking is in the way";
       // The other rental's own paperwork (forms, payments) is finished from its amendment.
       await applySignedAmendment(admin, partner.id);
+    } else if (changes.move_bookings?.length) {
+      const moved = await moveWithBookings(admin, { organizationId, rentalId: rental.id, newVehicleId, oldVehicleId, bookings: changes.move_bookings, actorId: amendment.created_by || null, stillWithCustomer: handedOver });
+      if (moved !== "done") return moved;
     } else if (!handedOver) {
       const moved = await moveBookingToVehicle(admin, { organizationId, rentalId: rental.id, vehicleId: newVehicleId });
       if (!moved.ok) return moved.error;
@@ -815,6 +883,11 @@ export type VehicleChangeOptions = {
   currency: string;
   /** `deposit` is what the business normally takes for that vehicle. */
   free: Array<{ vehicleId: string; label: string; plate: string | null; monthlyRate: number; deposit: number }>;
+  /**
+   * Taken only by bookings that haven't started, which could move to the vehicle given up (free for their
+   * dates). Offered to the owner and managers.
+   */
+  moveIn: Array<{ vehicleId: string; label: string; plate: string | null; monthlyRate: number; deposit: number; bookings: Array<{ rentalId: string; customerName: string | null; startDate: string; endDate: string | null }> }>;
   /** Vehicles out with other customers that could be exchanged for this one. */
   swaps: Array<{ rentalId: string; vehicleId: string; label: string; plate: string | null; customerName: string; rate: number; pricing: string }>;
 };
@@ -868,6 +941,29 @@ export async function getVehicleChangeOptions(rentalId: string): Promise<Result<
       }))
       .sort((a, b) => a.label.localeCompare(b.label));
 
+    // Taken only by bookings that haven't started, and the vehicle given up is free for them: they can move to it.
+    const role = (await getCurrentMembership())?.role;
+    const freeIds = new Set(free.map((item) => item.vehicleId));
+    const candidates = ((vehicles || []) as any[]).filter((vehicle) => vehicle.id !== rental.vehicle_id && !freeIds.has(vehicle.id) && !/sold|retired|inactive|archived|written|maintenance/i.test(String(vehicle.status || "")));
+    const blockingIds = candidates.flatMap((vehicle) => (busy[vehicle.id] || []).filter((period) => period.rentalId !== rentalId && clashes(from, end, period, gapDays)).map((period) => period.rentalId));
+    const { data: blockingRows } = canDecideMoney(role) && rental.vehicle_id && blockingIds.length ? await admin.from("rentals").select("id, status").in("id", blockingIds) : { data: [] };
+    const notStarted = new Set(((blockingRows || []) as any[]).filter((row) => row.status === "booked").map((row) => String(row.id)));
+    const moveIn = canDecideMoney(role) && rental.vehicle_id
+      ? candidates
+          .map((vehicle) => ({ vehicle, blocking: (busy[vehicle.id] || []).filter((period) => period.rentalId !== rentalId && clashes(from, end, period, gapDays)) }))
+          .filter(({ blocking }) => blocking.length > 0 && blocking.every((period) => notStarted.has(period.rentalId)))
+          .filter(({ blocking }) => blocking.every((period) => clear(rental.vehicle_id, period.startDate, period.endDate, [rentalId, ...blocking.map((item) => item.rentalId)])))
+          .map(({ vehicle, blocking }) => ({
+            vehicleId: String(vehicle.id),
+            label: label(vehicle),
+            plate: vehicle.registration_number || null,
+            monthlyRate: Number(vehicle.monthly_rate || 0),
+            deposit: vehicle.deposit_amount === null || vehicle.deposit_amount === undefined ? usualDeposit : Math.max(0, Number(vehicle.deposit_amount) || 0),
+            bookings: blocking.map((period) => ({ rentalId: period.rentalId, customerName: period.customerName, startDate: period.startDate, endDate: period.endDate }))
+          }))
+          .sort((left, right) => left.label.localeCompare(right.label))
+      : [];
+
     const swaps = ((others || []) as any[])
       .filter((other) => other.customers?.full_name && byId.has(other.vehicle_id))
       // Each vehicle must be free for the other rental's remaining time, ignoring the two rentals themselves.
@@ -886,6 +982,7 @@ export async function getVehicleChangeOptions(rentalId: string): Promise<Result<
       currentDeposit: Number(rental.deposit_amount || 0),
       currency: String(rental.currency || "THB"),
       free,
+      moveIn,
       swaps
     };
   } catch (error) {
@@ -942,6 +1039,8 @@ export async function createVehicleChange(input: {
   newDeposit?: number | string | null;
   /** The customer can't sign now: change the vehicle straight away and collect the signature after. */
   signLater?: boolean;
+  /** The replacement's bookings that haven't started move to the vehicle given up. */
+  moveBookings?: boolean;
 }): Promise<Result<{ applied: boolean; links: Array<{ token: string; customerName: string }> }>> {
   const admin = createSupabaseAdminClient() as any;
   try {
@@ -954,10 +1053,27 @@ export async function createVehicleChange(input: {
     if (["completed", "cancelled"].includes(String(rental.status))) return { ok: false, error: await said("This rental has ended.") };
 
     const swap = input.swapRentalId ? options.swaps.find((item) => item.rentalId === input.swapRentalId && item.vehicleId === input.vehicleId) : null;
-    const target = swap || options.free.find((item) => item.vehicleId === input.vehicleId);
+    const moveIn = !swap && input.moveBookings ? options.moveIn.find((item) => item.vehicleId === input.vehicleId) : null;
+    const target = swap || options.free.find((item) => item.vehicleId === input.vehicleId) || moveIn;
+    const moveBookings = moveIn ? moveIn.bookings.map((booking) => ({ rental_id: booking.rentalId, customer_name: booking.customerName, start_date: booking.startDate, end_date: booking.endDate })) : null;
     if (!target) return { ok: false, error: await said("That vehicle is no longer free for this rental's dates. Pick another.") };
 
     // Nothing signed yet: the customer will sign the agreement with the new vehicle on it.
+    if (!options.needsSignature && moveBookings) {
+      const outcome = await moveWithBookings(admin, { organizationId, rentalId, newVehicleId: input.vehicleId, oldVehicleId: String(rental.vehicle_id), bookings: moveBookings, actorId: user.id });
+      if (outcome !== "done") return { ok: false, error: await said(`Couldn't change the vehicle: ${outcome}.`) };
+      const quiet = (query: any) => query.then(() => null, () => null);
+      await Promise.all([
+        quiet(admin.from("rental_payments").update({ vehicle_id: input.vehicleId }).eq("rental_id", rentalId)),
+        quiet(admin.from("booking_links").update({ vehicle_id: input.vehicleId }).eq("rental_id", rentalId))
+      ]);
+      await syncVehicleStatusFromBookings(admin, organizationId, input.vehicleId).catch(() => null);
+      await recordActivityEvent(admin, { organization_id: organizationId, actor_id: user.id, entity_type: "rental", entity_id: rentalId, rental_id: rentalId, vehicle_id: input.vehicleId, customer_id: rental.customer_id, event_type: "vehicle_changed", title: "Vehicle changed", detail: `Moved to the ${target.label}; its bookings moved to the vehicle this booking had. Dates and price unchanged.` } as any).catch(() => undefined);
+      revalidatePath(`/bookings/${rentalId}`);
+      revalidatePath("/bookings");
+      revalidatePath("/calendar");
+      return { ok: true, applied: true, links: [] };
+    }
     if (!options.needsSignature) {
       const moved = await moveBookingToVehicle(admin, { organizationId, rentalId, vehicleId: input.vehicleId });
       if (!moved.ok) return { ok: false, error: moved.error.replace("the other booking's", "this booking's").replace("The other booking", "This booking") };
@@ -983,7 +1099,8 @@ export async function createVehicleChange(input: {
       new_vehicle_label: plateOf(target.label, target.plate),
       vehicle_handed_over: options.handedOver,
       vehicle_change_reason: reason,
-      original_vehicle_disposition: swap ? null : input.disposition === "repair" ? "repair" : "available"
+      original_vehicle_disposition: swap ? null : input.disposition === "repair" ? "repair" : "available",
+      ...(moveBookings ? { move_bookings: moveBookings } : {})
     };
     const newRate = cleanAmount(input.newRate);
     if (newRate !== null && newRate > 0 && newRate !== Number(rental.rental_rate || 0)) {

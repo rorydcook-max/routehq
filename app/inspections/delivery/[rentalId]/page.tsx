@@ -1,5 +1,5 @@
 import { InspectionForm } from "@/components/inspection-form";
-import { getCurrentMembership } from "@/lib/auth/roles";
+import { canDecideMoney, getCurrentMembership } from "@/lib/auth/roles";
 import { AppShell } from "@/components/app-shell";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getInspectionContextByRental } from "@/lib/inspection-detail";
@@ -40,7 +40,7 @@ export default async function DeliveryInspectionPage({ params, searchParams }: {
 
   return (
     <AppShell userEmail={userEmail}>
-      <InspectionForm blocker={blocker} canWaive={membership?.role === "owner"} context={context} unsigned={unsigned} />
+      <InspectionForm blocker={blocker} canWaive={canDecideMoney(membership?.role)} context={context} unsigned={unsigned} />
     </AppShell>
   );
 }

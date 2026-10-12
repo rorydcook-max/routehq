@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { canDecideMoney, getCurrentMembership } from "@/lib/auth/roles";
 
 export async function completeTask(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
@@ -14,6 +15,10 @@ export async function completeTask(formData: FormData) {
 
   if (!taskId || !organizationId) {
     throw new Error("Task and organization are required.");
+  }
+  const { data: task } = await supabase.from("tasks").select("action").eq("id", taskId).eq("organization_id", organizationId).maybeSingle();
+  if (["refund", "waive_early", "owed_early"].includes(String(task?.action || "")) && !canDecideMoney((await getCurrentMembership())?.role)) {
+    throw new Error("Only the owner or a manager can decide this.");
   }
 
   const { error } = await supabase

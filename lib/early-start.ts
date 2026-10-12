@@ -46,14 +46,37 @@ export function asEarlyStartChoice(value: unknown): EarlyStartChoice | null {
 
 /**
  * What actually happens to the extra days. Nothing chosen means they are charged (when there is a price
- * for them). Giving them away is the owner's call: a teammate's "free" is charged instead.
+ * for them). Giving them away is the owner's or a manager's call: a teammate's "free" becomes "ask" -
+ * the charge is written but not collected, and the owner or a manager waives it or keeps it.
  */
-export function settleEarlyChoice(value: unknown, early: EarlyStart | null, isOwner: boolean): EarlyStartChoice {
+export function settleEarlyChoice(value: unknown, early: EarlyStart | null, canDecide: boolean): EarlyStartChoice | "ask" {
   const chosen = asEarlyStartChoice(value);
   const chargeable = Boolean(early && early.amount > 0);
   if (!chosen) return chargeable ? "charge" : "free";
-  if (chosen === "free" && chargeable && !isOwner) return "charge";
+  if (chosen === "free" && chargeable && !canDecide) return "ask";
   return chosen;
+}
+
+/** The charge written for an "ask": marked as waiting, with a job on To do for the owner or a manager. */
+export async function requestEarlyWaiver(
+  admin: any,
+  args: { organizationId: string; rentalId: string; vehicleId: string | null; paymentId: string | null; early: EarlyStart; customerName: string; userId: string | null }
+) {
+  if (args.paymentId) {
+    const { data: row } = await admin.from("rental_payments").select("metadata").eq("id", args.paymentId).maybeSingle();
+    if (row) await admin.from("rental_payments").update({ metadata: { ...(row.metadata || {}), early_start: { ...(row.metadata?.early_start || {}), waiver_requested: true, waiver_requested_by: args.userId } } }).eq("id", args.paymentId);
+  }
+  const { data: open } = await admin.from("tasks").select("id").eq("rental_id", args.rentalId).eq("action", "waive_early").is("completed_at", null).limit(1);
+  if ((open || []).length) return;
+  await admin.from("tasks").insert({
+    organization_id: args.organizationId,
+    rental_id: args.rentalId,
+    vehicle_id: args.vehicleId,
+    title: `Free early days asked - ${args.early.days} days (฿${Math.round(args.early.amount).toLocaleString("en-US")}) for ${args.customerName}`,
+    task_type: "admin",
+    action: "waive_early",
+    due_at: new Date().toISOString()
+  });
 }
 
 /**

@@ -18,8 +18,8 @@ import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
 import { inspectionUploadPrefix, readUploadedFiles } from "@/lib/direct-uploads";
 import { earlyHandoverBlocker, isDoubleBookingError } from "@/lib/rental-conflicts";
 import { said } from "@/lib/i18n/server-text";
-import { earlyStartFor, ensureEarlyStartCharge, settleEarlyChoice } from "@/lib/early-start";
-import { getCurrentMembership } from "@/lib/auth/roles";
+import { earlyStartFor, ensureEarlyStartCharge, requestEarlyWaiver, settleEarlyChoice } from "@/lib/early-start";
+import { canDecideMoney, getCurrentMembership } from "@/lib/auth/roles";
 
 type InspectionMode = "delivery" | "return" | "condition_report";
 
@@ -640,7 +640,7 @@ export async function submitInspection(formData: FormData) {
       const { data: rates } = await supabase.from("vehicles").select("daily_rate, weekly_rate, monthly_rate").eq("id", vehicleId).eq("organization_id", organizationId).maybeSingle();
       early = earlyStartFor(bookedRental, rates, handoverDate);
     }
-    const earlyChoice = settleEarlyChoice(stringField(formData, "earlyStart"), early, early ? (await getCurrentMembership())?.role === "owner" : true);
+    const earlyChoice = settleEarlyChoice(stringField(formData, "earlyStart"), early, early ? canDecideMoney((await getCurrentMembership())?.role) : true);
     const shortenTo = early && earlyChoice === "shorten" ? early.shortenedEnd : null;
 
     const { error: rentalError } = await supabase
@@ -676,8 +676,11 @@ export async function submitInspection(formData: FormData) {
         .in("status", ["scheduled", "pending", "failed", "overdue"])
         .is("deleted_at", null);
     }
-    if (early && earlyChoice === "charge") {
-      await ensureEarlyStartCharge(supabase, { organizationId, rentalId, vehicleId, customerId: bookedRental?.customer_id || customerId || null, currency: bookedRental?.currency || "THB", today: handoverDate, early });
+    if (early && (earlyChoice === "charge" || earlyChoice === "ask")) {
+      const paymentId = await ensureEarlyStartCharge(supabase, { organizationId, rentalId, vehicleId, customerId: bookedRental?.customer_id || customerId || null, currency: bookedRental?.currency || "THB", today: handoverDate, early });
+      if (earlyChoice === "ask") {
+        await requestEarlyWaiver(createSupabaseAdminClient(), { organizationId, rentalId, vehicleId, paymentId, early, customerName, userId: user.id }).catch((error) => console.error("early waiver request failed", error));
+      }
     }
 
     await createOnDeliveryPaymentRecords(supabase, organizationId, rentalId);

@@ -3,12 +3,13 @@
 import { useActionState, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { inviteUser, removeTeammate, type AuthActionState } from "@/app/actions/auth";
+import { inviteUser, removeTeammate, setTeamLevel, type AuthActionState } from "@/app/actions/auth";
+import type { AppRole } from "@/lib/auth/role-types";
 
 const initialState: AuthActionState = {};
 
 /** For the owner, beside each other person: send the invite again if they have not joined yet, or take them off the team. */
-export function TeamMemberActions({ memberId, email, role, waiting }: { memberId: string; email: string | null; role: "owner" | "teammate"; waiting: boolean }) {
+export function TeamMemberActions({ memberId, email, role, waiting }: { memberId: string; email: string | null; role: AppRole; waiting: boolean }) {
   const say = useTranslations("settingsPage") as unknown as (key: string) => string;
   const locale = useLocale();
   const router = useRouter();
@@ -16,6 +17,23 @@ export function TeamMemberActions({ memberId, email, role, waiting }: { memberId
   const [sure, setSure] = useState(false);
   const [error, setError] = useState("");
   const [removing, startRemove] = useTransition();
+  const [level, setLevel] = useState<AppRole>(role);
+  const [saving, startSave] = useTransition();
+
+  function changeLevel(next: AppRole) {
+    setLevel(next);
+    setError("");
+    startSave(async () => {
+      const data = new FormData();
+      data.set("memberId", memberId);
+      data.set("role", next);
+      const result = await setTeamLevel(data);
+      if (result.error) {
+        setError(result.error);
+        setLevel(role);
+      } else router.refresh();
+    });
+  }
 
   function remove() {
     startRemove(async () => {
@@ -29,6 +47,16 @@ export function TeamMemberActions({ memberId, email, role, waiting }: { memberId
 
   return (
     <div className="w-full">
+      {role !== "owner" ? (
+        <label className="mb-2 block">
+          <span className="font-semibold text-[var(--foreground-secondary)]">{say("team_level")}</span>
+          <select className="mt-1 w-full" disabled={saving} onChange={(event) => changeLevel(event.target.value as AppRole)} value={level}>
+            <option value="manager">{say("iv_manager")}</option>
+            <option value="teammate">{say("iv_teammate")}</option>
+          </select>
+          <span className="mt-1 block text-sm font-medium text-[var(--foreground-secondary)]">{say(level === "manager" ? "iv_managerBody" : "iv_teammateBody")}</span>
+        </label>
+      ) : null}
       <div className="flex flex-wrap items-center gap-2">
         {waiting && email ? (
           <form action={resend}>

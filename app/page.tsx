@@ -104,7 +104,7 @@ function PanelLink({ href, children }: { href: string; children: ReactNode }) {
 export default async function Home({ searchParams }: { searchParams?: Promise<{ notice?: string }> }) {
   const notice = (searchParams ? await searchParams : {}).notice;
   // A teammate sees the day's work and what customers owe, not how the business is doing or its set-up.
-  const isOwner = (await getCurrentMembership())?.role !== "teammate";
+  const isOwner = (await getCurrentMembership())?.role === "owner";
   // Holds that ran out without a signature give their dates back before anything is counted.
   await getDefaultOrganization().then((org) => releaseExpiredHolds(createSupabaseAdminClient(), org.id)).catch(() => null);
   const endingHolds = await getDefaultOrganization().then((org) => holdsEndingSoon(createSupabaseAdminClient(), org.id)).catch(() => []);

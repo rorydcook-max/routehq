@@ -8,6 +8,7 @@ import { MoreHorizontal } from "lucide-react";
 import { KindChip, jobKind } from "@/components/kind-chip";
 import { confirmReceiptPayment, declinePaymentReceipt, recordPaymentReceived } from "@/app/actions/bookings";
 import { completeTask } from "@/app/actions/tasks";
+import { decideEarlyWaiver } from "@/app/actions/early-start";
 import { PendingButton } from "@/components/pending-button";
 import { Badge } from "@/components/ui";
 import { taskTypeLabel } from "@/lib/task-types";
@@ -148,6 +149,10 @@ function headingOf(item: TaskListItem, today: string, tx: Tx): { title: string; 
   if (item.action === "owed_early") {
     const early = raw.match(/returned (\d+) days? early \((.+?) of (.+?) owed/);
     return early ? { title: tx.say("job_owed_early", { amount: early[2] }), detail: tx.say("job_owed_early_detail", { days: Number(early[1]), owed: early[3] }) } : { title: tx.say("job_owed_early", { amount: "" }), detail: null };
+  }
+  if (item.action === "waive_early") {
+    const asked = raw.match(/asked - (\d+) days? \((.+?)\)/);
+    return { title: tx.say("job_waive_early"), detail: asked ? tx.say("job_waive_early_detail", { days: Number(asked[1]), amount: asked[2] }) : null };
   }
   if (item.action === "swap_handover" || item.action === "swap_collection" || item.action === "swap_signature") {
     return { title: tx.say(`job_${item.action}`), detail: null };
@@ -362,7 +367,7 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
   );
 }
 
-function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskListItem; organizationId: string; today: string; siblings?: TaskListItem[] }) {
+function TaskRow({ item, organizationId, today, siblings = [], canDecide = true }: { item: TaskListItem; organizationId: string; today: string; siblings?: TaskListItem[]; canDecide?: boolean }) {
   const tx = useTx();
   const [showNote, setShowNote] = useState(false);
   const [showMore, setShowMore] = useState(false);
@@ -371,6 +376,20 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
   const [receiptError, setReceiptError] = useState<string | null>(null);
   const [isConfirming, startConfirm] = useTransition();
   const receipt = item.kind === "payment" ? item.receipt : null;
+  // Refunds and free days are the owner's or a manager's call; a teammate sees the job and who decides it.
+  const moneyJob = item.kind === "task" && (item.action === "refund" || item.action === "waive_early" || item.action === "owed_early");
+  const waitsForDecider = moneyJob && !canDecide && !item.completedAt;
+  const [waiverError, setWaiverError] = useState<string | null>(null);
+  const [deciding, startDeciding] = useTransition();
+  function decideWaiver(decision: "waive" | "keep") {
+    if (!item.rentalId) return;
+    setWaiverError(null);
+    startDeciding(async () => {
+      const result = await decideEarlyWaiver(item.rentalId as string, decision);
+      if (!result.ok) setWaiverError(result.error || tx.say("errConfirm"));
+      else router.refresh();
+    });
+  }
 
   function confirmReceipt() {
     if (!item.rentalPaymentId || !receipt) return;
@@ -433,6 +452,8 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
             </p>
           ) : null}
           {receiptError ? <p className="mt-1 text-xs font-semibold text-[var(--danger)]">{receiptError}</p> : null}
+          {waitsForDecider ? <p className="mt-1 font-semibold text-[var(--foreground-secondary)]">{tx.say("decidedByOwner")}</p> : null}
+          {waiverError ? <p className="mt-1 font-semibold text-[var(--danger)]">{waiverError}</p> : null}
           {recording && item.rentalPaymentId ? (
             <ReceivePaymentPanel item={item} onClose={() => setRecording(false)} siblings={siblings} today={today} />
           ) : null}
@@ -476,7 +497,17 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
           </button>
         ) : null}
         {/* A job with a next step of its own goes straight to it; doing that step closes the job. */}
-        {item.kind === "task" && !item.completedAt && item.rentalId && (item.action === "refund" || item.action === "request" || item.action === "settle_deposit") ? (
+        {item.kind === "task" && !item.completedAt && item.rentalId && item.action === "waive_early" && canDecide ? (
+          <>
+            <button className="primary-action pressable min-h-9 px-3 text-xs" disabled={deciding} onClick={() => decideWaiver("waive")} type="button">
+              {tx.say("waiveEarly")}
+            </button>
+            <button className="secondary-action pressable min-h-9 px-3 text-xs" disabled={deciding} onClick={() => decideWaiver("keep")} type="button">
+              {tx.say("keepCharge")}
+            </button>
+          </>
+        ) : null}
+        {item.kind === "task" && !item.completedAt && item.rentalId && (item.action === "refund" || item.action === "request" || item.action === "settle_deposit") && !waitsForDecider ? (
           <Link className="primary-action pressable min-h-9 px-3 text-xs" href={`/bookings/${item.rentalId}#${item.action === "request" ? "customer-requests" : "refunds"}`}>
             {item.action === "refund" ? tx.say("recordRefund") : item.action === "settle_deposit" ? tx.say("settleDeposit") : tx.say("answer")}
           </Link>
@@ -494,7 +525,7 @@ function TaskRow({ item, organizationId, today, siblings = [] }: { item: TaskLis
             {tx.say("openForm")}
           </Link>
         ) : null}
-        {item.kind === "task" && !item.completedAt && !showNote && !item.id.startsWith("request-") ? (
+        {item.kind === "task" && !item.completedAt && !showNote && !item.id.startsWith("request-") && !waitsForDecider && !(item.action === "waive_early" && canDecide) ? (
           <>
             {/* One main button per row. A job with its own next step keeps "mark done" and notes behind the dots. */}
             {!item.action || item.action === "refund" || showMore ? (
@@ -531,12 +562,15 @@ export function TasksList({
   tasks,
   organizationId,
   today,
-  laterLimit = 5
+  laterLimit = 5,
+  canDecide = true
 }: {
   tasks: TaskListItem[];
   organizationId: string;
   today: string;
   laterLimit?: number;
+  /** Owner or manager: can decide refunds and free days. */
+  canDecide?: boolean;
 }) {
   const tx = useTx();
   const [filter, setFilter] = useState<Filter>("open");
@@ -593,7 +627,7 @@ export function TasksList({
                   <span className={`inline-flex min-w-7 items-center justify-center rounded-full px-2 py-0.5 text-[14px] font-bold ${group.tone === "red" ? "bg-[var(--danger)] text-white" : "bg-[var(--panel-tertiary)] text-[var(--foreground)]"}`}>{group.items.length}</span>
                 </div>
                 {items.map((item) => (
-                  <TaskRow item={item} key={item.id} organizationId={organizationId} siblings={item.kind === "payment" ? siblingsOf(item) : []} today={today} />
+                  <TaskRow canDecide={canDecide} item={item} key={item.id} organizationId={organizationId} siblings={item.kind === "payment" ? siblingsOf(item) : []} today={today} />
                 ))}
                 {limited ? (
                   <button className="pressable w-full rounded-full bg-white px-4 py-3 font-bold text-[var(--primary)]" onClick={() => setShowAllLater(true)} type="button">

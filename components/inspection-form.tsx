@@ -845,7 +845,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, canW
                   [
                     early.amount > 0 ? { value: "charge", label: t("earlyCharge", { days: early.days, amount: money(early.amount) }) } : null,
                     early.shortenedEnd ? { value: "shorten", label: t("earlyShorten", { date: formatDate(early.shortenedEnd, locale) }) } : null,
-                    canWaive || early.amount <= 0 ? { value: "free", label: early.bookedEnd ? t("earlyFreeBack", { date: formatDate(early.bookedEnd, locale) }) : t("earlyFree") } : null
+                    { value: "free", label: canWaive || early.amount <= 0 ? (early.bookedEnd ? t("earlyFreeBack", { date: formatDate(early.bookedEnd, locale) }) : t("earlyFree")) : t("earlyAskFree") }
                   ].filter(Boolean) as { value: EarlyStartChoice; label: string }[]
                 ).map((option) => (
                   <label className={`flex min-h-12 cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 text-sm font-semibold ${earlyChoice === option.value ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground)]"}`} key={option.value}>

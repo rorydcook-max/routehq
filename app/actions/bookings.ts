@@ -17,9 +17,9 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { notifyOperator } from "@/lib/notify-operator";
 import { wallTimeToIso, businessToday } from "@/lib/business-time";
 import { DOUBLE_BOOKING_MESSAGE, earlyHandoverBlocker, isDoubleBookingError, vehicleConflictMessage } from "@/lib/rental-conflicts";
-import { earlyStartFor, ensureEarlyStartCharge, settleEarlyChoice } from "@/lib/early-start";
+import { earlyStartFor, ensureEarlyStartCharge, requestEarlyWaiver, settleEarlyChoice } from "@/lib/early-start";
 import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
-import { getCurrentMembership } from "@/lib/auth/roles";
+import { canDecideMoney, getCurrentMembership } from "@/lib/auth/roles";
 import { holdDeadline, retakeHold } from "@/lib/booking-holds";
 import { bookingRules } from "@/lib/booking-rules";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -1045,7 +1045,7 @@ export async function manuallyActivateRental(rentalId: string, earlyStart?: stri
     if (inWay) return { success: false, error: await said("This vehicle is still out on another rental. Return that rental first, or change the vehicle on this booking.") };
     const { data: rates } = await supabase.from("vehicles").select("daily_rate, weekly_rate, monthly_rate").eq("id", rental.vehicle_id).eq("organization_id", rental.organization_id).maybeSingle();
     const early = earlyStartFor(rental, rates, handoverDate);
-    const choice = settleEarlyChoice(earlyStart, early, (await getCurrentMembership())?.role === "owner");
+    const choice = settleEarlyChoice(earlyStart, early, canDecideMoney((await getCurrentMembership())?.role));
     const shortenTo = early && choice === "shorten" ? early.shortenedEnd : null;
     const { error: moveError } = await supabase.from("rentals").update({ start_date: handoverDate, ...(shortenTo ? { end_date: shortenTo } : {}) }).eq("id", cleanId).eq("organization_id", rental.organization_id);
     if (moveError) return { success: false, error: isDoubleBookingError(moveError) ? await said(DOUBLE_BOOKING_MESSAGE) : moveError.message };
@@ -1058,7 +1058,13 @@ export async function manuallyActivateRental(rentalId: string, earlyStart?: stri
         .eq("due_date", early.bookedStart)
         .in("status", ["scheduled", "pending", "failed", "overdue"])
         .is("deleted_at", null);
-      if (choice === "charge") await ensureEarlyStartCharge(supabase, { organizationId: rental.organization_id, rentalId: cleanId, vehicleId: rental.vehicle_id, customerId: rental.customer_id, currency: rental.currency || "THB", today: handoverDate, early });
+      if (choice === "charge" || choice === "ask") {
+        const paymentId = await ensureEarlyStartCharge(supabase, { organizationId: rental.organization_id, rentalId: cleanId, vehicleId: rental.vehicle_id, customerId: rental.customer_id, currency: rental.currency || "THB", today: handoverDate, early });
+        if (choice === "ask") {
+          const { data: who } = rental.customer_id ? await supabase.from("customers").select("full_name").eq("id", rental.customer_id).maybeSingle() : { data: null };
+          await requestEarlyWaiver(createSupabaseAdminClient(), { organizationId: rental.organization_id, rentalId: cleanId, vehicleId: rental.vehicle_id, paymentId, early, customerName: who?.full_name || "the customer", userId: user.id }).catch(() => null);
+        }
+      }
     }
   }
 
@@ -3277,6 +3283,7 @@ export async function recordPaymentRefund(formData: FormData) {
 
   if (!organizationId || !rentalId) throw new Error("Missing required fields.");
   if (amount <= 0) throw new Error("Enter a refund amount greater than zero.");
+  if (!canDecideMoney((await getCurrentMembership())?.role)) throw new Error(await said("Only the owner or a manager can refund a payment. Ask them to decide."));
 
   const { data: rental, error: rentalError } = await supabase
     .from("rentals")

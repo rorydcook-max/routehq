@@ -41,7 +41,7 @@ export function SkipInspectionButton({ rentalId, early = null, canWaive = true }
                 [
                   early.amount > 0 ? { value: "charge", label: ask("earlyCharge", { days: early.days, amount: `฿${early.amount.toLocaleString("en-US")}` }) } : null,
                   early.shortenedEnd ? { value: "shorten", label: ask("earlyShorten", { date: longDate(early.shortenedEnd, locale) }) } : null,
-                  canWaive || early.amount <= 0 ? { value: "free", label: early.bookedEnd ? ask("earlyFreeBack", { date: longDate(early.bookedEnd, locale) }) : ask("earlyFree") } : null
+                  { value: "free", label: canWaive || early.amount <= 0 ? (early.bookedEnd ? ask("earlyFreeBack", { date: longDate(early.bookedEnd, locale) }) : ask("earlyFree")) : ask("earlyAskFree") }
                 ].filter(Boolean) as { value: EarlyStartChoice; label: string }[]
               ).map((option) => (
                 <label className="flex min-h-9 cursor-pointer items-center gap-2 rounded-lg bg-white px-2 py-1 text-xs font-semibold text-[var(--foreground)]" key={option.value}>

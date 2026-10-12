@@ -33,7 +33,7 @@ export default async function AccountPage() {
   ]);
 
   const locale = profile?.preferred_locale || organization?.default_locale || "en";
-  const roleLabel = membership.role === "owner" ? say("roleOwner") : say("roleTeammate");
+  const roleLabel = membership.role === "owner" ? say("roleOwner") : membership.role === "manager" ? say("roleManager") : say("roleTeammate");
 
   return (
     <AppShell userEmail={membership.email}>

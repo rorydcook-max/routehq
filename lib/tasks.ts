@@ -254,7 +254,8 @@ export async function getTaskList(organizationId: string): Promise<TaskListItem[
             total: group.reduce((sum: number, item: any) => sum + Number(item.amount || 0), 0)
           }
         : null,
-      coveredBy: receipt && !isLead && lead ? `payment-${lead.id}` : null,
+      // Free early days a teammate asked for: the "to confirm" job stands in for it until the owner or a manager decides.
+      coveredBy: row.metadata?.early_start?.waiver_requested && !row.metadata.early_start.waiver_decided ? "waive_early" : receipt && !isLead && lead ? `payment-${lead.id}` : null,
       paymentLabel: customerPaymentLabel(row.metadata),
       pay: payKind(row.metadata)
     };

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getCurrentMembership } from "@/lib/auth/roles";
+import { canDecideMoney, getCurrentMembership } from "@/lib/auth/roles";
 import type { Route } from "next";
 import { AlertTriangle, CalendarDays, Car, CheckCircle2, Clock, CreditCard, FileText, Gauge, MapPin, ReceiptText, UserRound, XCircle } from "lucide-react";
 import { CancelBookingButton } from "@/app/bookings/[id]/cancel-booking-button";
@@ -373,8 +373,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
     .maybeSingle();
   const vehicle = rental.vehicles;
   const customer = rental.customers;
-  // Giving money away (free early days, unpaid rent taken off) is the owner's call.
-  const isOwner = (await getCurrentMembership())?.role === "owner";
+  // Giving money away (refunds, free early days, unpaid rent taken off) is the owner's or a manager's call.
+  const isOwner = canDecideMoney((await getCurrentMembership())?.role);
   // Receipts customers sent stay with their payment; staff open them from the schedule.
   const receiptUrls = await signedReceiptUrls(payments.map((payment: any) => payment.metadata?.receipt?.path).filter(Boolean));
   for (const payment of payments as any[]) {
@@ -1129,6 +1129,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   totalPaid={totalPaid}
                   currency={rental.currency || "THB"}
                   rentalStatus={displayStatus}
+                  canRefund={isOwner}
                   earlyReturn={(payments as any[]).map((payment) => payment.metadata?.early_return).find((item) => item && !item.settled) || null}
                 />
                 {paymentMethod || paymentTiming ? <PaymentInfo method={paymentMethod} timing={paymentTiming} /> : null}

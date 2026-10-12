@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { shortDate } from "@/lib/i18n/dates";
 import { RefreshCw, X } from "lucide-react";
 import { createVehicleChange, getVehicleChangeOptions, type VehicleChangeOptions } from "@/app/actions/amendments";
 import { AmendmentLinkPanel } from "@/components/rental-adjustment-modal";
@@ -20,6 +21,7 @@ const REASONS = ["Breakdown or fault", "Customer asked for a different vehicle",
 export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
   const router = useRouter();
   const say = useTranslations("booking") as unknown as (key: string, values?: Record<string, string | number>) => string;
+  const locale = useLocale();
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<VehicleChangeOptions | null>(null);
   const [choice, setChoice] = useState("");
@@ -44,7 +46,7 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
         return;
       }
       setOptions(result);
-      setChoice(result.free[0] ? `free:${result.free[0].vehicleId}` : result.swaps[0] ? `swap:${result.swaps[0].rentalId}` : "");
+      setChoice(result.free[0] ? `free:${result.free[0].vehicleId}` : result.moveIn[0] ? `move:${result.moveIn[0].vehicleId}` : result.swaps[0] ? `swap:${result.swaps[0].rentalId}` : "");
     });
   }
 
@@ -54,7 +56,10 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
   }
 
   const swap = choice.startsWith("swap:") ? options?.swaps.find((item) => item.rentalId === choice.slice(5)) : null;
-  const free = choice.startsWith("free:") ? options?.free.find((item) => item.vehicleId === choice.slice(5)) : null;
+  // A vehicle whose bookings move to this one counts as free here: same rate and deposit questions.
+  const moveIn = choice.startsWith("move:") ? options?.moveIn.find((item) => item.vehicleId === choice.slice(5)) : null;
+  const free = choice.startsWith("free:") ? options?.free.find((item) => item.vehicleId === choice.slice(5)) : moveIn;
+  const range = (start: string, end: string | null) => (end ? `${shortDate(start, locale)} – ${shortDate(end, locale)}` : say("vc_fromOpen", { date: shortDate(start, locale) }));
   const money = (amount: number) => `${!options || options.currency === "THB" ? "฿" : `${options.currency} `}${Math.round(amount).toLocaleString("en-US")}`;
 
   const priceText = (amount: number, pricing: string) => say(`ratePer_${["daily", "weekly", "monthly"].includes(pricing) ? pricing : "other"}`, { amount: money(amount) });
@@ -74,7 +79,8 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
         disposition,
         newRate: newRate ? Number(newRate) : null,
         newDeposit: depositGap > 0 && topUp === "require" ? free!.deposit : null,
-        signLater: signLater && !swap
+        signLater: signLater && !swap,
+        moveBookings: Boolean(moveIn)
       });
       if (!result.ok) {
         setError(result.error);
@@ -140,7 +146,7 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
                 </button>
               </div>
             ) : options ? (
-              options.free.length === 0 && options.swaps.length === 0 ? (
+              options.free.length === 0 && options.moveIn.length === 0 && options.swaps.length === 0 ? (
                 <p className="mt-4 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3 text-sm text-[var(--warning)]">{say("vc_noneFree")}</p>
               ) : (
                 <>
@@ -157,6 +163,16 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
                           ))}
                         </optgroup>
                       ) : null}
+                      {options.moveIn.length ? (
+                        <optgroup label={say("vc_groupMove")}>
+                          {options.moveIn.map((item) => (
+                            <option key={item.vehicleId} value={`move:${item.vehicleId}`}>
+                              {item.label}
+                              {item.plate ? ` · ${item.plate}` : ""} {say("vc_bookedFrom", { date: shortDate(item.bookings[0].startDate, locale) })}
+                            </option>
+                          ))}
+                        </optgroup>
+                      ) : null}
                       {options.swaps.length ? (
                         <optgroup label={say("vc_groupSwap")}>
                           {options.swaps.map((item) => (
@@ -169,6 +185,18 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
                       ) : null}
                     </select>
                   </label>
+                  {moveIn ? (
+                    <div className="mt-2 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3 text-[var(--foreground)]">
+                      <p className="font-semibold">{say("vc_moveTitle", { vehicle: options.currentVehicleLabel })}</p>
+                      <ul className="mt-1 space-y-0.5">
+                        {moveIn.bookings.map((booking) => (
+                          <li key={booking.rentalId}>{say("vc_moveLine", { name: booking.customerName || say("vc_noCustomerYet"), dates: range(booking.startDate, booking.endDate) })}</li>
+                        ))}
+                      </ul>
+                      <p className="mt-1 text-[var(--foreground-secondary)]">{say("vc_moveNote")}</p>
+                      {disposition === "repair" ? <p className="mt-1 font-semibold text-[var(--danger)]">{say("vc_moveRepair", { vehicle: options.currentVehicleLabel })}</p> : null}
+                    </div>
+                  ) : null}
                   {swap ? (
                     <p className="mt-2 rounded-lg bg-[var(--panel-secondary)] p-3 text-xs leading-5 text-[var(--foreground-secondary)]">
                       {say("vc_swapNote", { name: swap.customerName, current: options.currentVehicleLabel, other: swap.label })}

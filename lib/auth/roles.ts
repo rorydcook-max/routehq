@@ -22,7 +22,7 @@ import { createSupabaseServerClient, getRequestUser } from "@/lib/supabase/serve
 import { appRoleFromDb, OWNER_ONLY_MESSAGE } from "@/lib/auth/role-types";
 import { getActiveMembership } from "@/lib/auth/active-organization-server";
 
-export { APP_ROLES, appRoleFromDb, dbRoleFromApp, OWNER_ONLY_MESSAGE } from "@/lib/auth/role-types";
+export { APP_ROLES, appRoleFromDb, appRoleFromForm, canDecideMoney, dbRoleFromApp, OWNER_ONLY_MESSAGE } from "@/lib/auth/role-types";
 export type { AppRole } from "@/lib/auth/role-types";
 
 export async function getCurrentMembership() {
@@ -39,6 +39,12 @@ export async function getCurrentMembership() {
     organizationId: membership.organization_id as string,
     role: appRoleFromDb(membership.role)
   };
+}
+
+/** Refunds, waived charges and the like: true for the owner and managers. */
+export async function currentCanDecideMoney() {
+  const membership = await getCurrentMembership();
+  return membership?.role === "owner" || membership?.role === "manager";
 }
 
 /** For server actions that change the business. Redirects if signed out; throws a clear message for teammates. */

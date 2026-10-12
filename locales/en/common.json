@@ -362,7 +362,8 @@
     "earlyCharge": "Charge for {days, plural, one {it} other {them}}: {amount}",
     "earlyShorten": "Keep the booked length: back on {date}",
     "earlyFreeBack": "No charge: still back on {date}",
-    "earlyFree": "No charge"
+    "earlyFree": "No charge",
+    "earlyAskFree": "No charge, if the owner or a manager agrees: the charge waits for them and isn't collected now"
   },
   "translation": {
     "translatedFrom": "Translated from {language}",
@@ -1066,7 +1067,12 @@
     "job_owed_early_detail": "Returned {days, plural, one {# day} other {# days}} early, {owed} owed",
     "bandOverdue": "overdue",
     "bandToday": "today",
-    "bandWeek": "this week"
+    "bandWeek": "this week",
+    "job_waive_early": "Free early days to confirm",
+    "job_waive_early_detail": "{days} days, {amount}, asked at the handover",
+    "waiveEarly": "Give them free",
+    "keepCharge": "Keep the charge",
+    "decidedByOwner": "The owner or a manager decides this one."
   },
   "bookings": {
     "eyebrow": "Bookings",
@@ -2150,8 +2156,17 @@
     "earlyOwedTakeOff": "Take {amount} off",
     "earlyOwedKeep": "Keep as booked",
     "earlyOwedFailed": "That didn't save. Try again.",
-    "earlyOwedOwner": "The owner decides this one.",
-    "vc_swapPrices": "This customer keeps paying {mine} for the {other}, and {name} keeps paying {theirs} for the {current}. Use Change terms on either booking to adjust."
+    "earlyOwedOwner": "The owner or a manager decides this one.",
+    "vc_swapPrices": "This customer keeps paying {mine} for the {other}, and {name} keeps paying {theirs} for the {current}. Use Change terms on either booking to adjust.",
+    "ref_decidedBy": "The owner or a manager decides refunds.",
+    "vc_groupMove": "Booked later: its booking moves to this vehicle",
+    "vc_bookedFrom": "(booked from {date})",
+    "vc_moveTitle": "These bookings move to the {vehicle}:",
+    "vc_moveLine": "{name}, {dates}",
+    "vc_moveNote": "Same dates and price. A customer who has already signed gets a short change form to sign.",
+    "vc_moveRepair": "The {vehicle} is marked for repair, but a booking is moving to it. Make sure it's back in time.",
+    "vc_noCustomerYet": "Customer not filled in yet",
+    "vc_fromOpen": "from {date}, no end date"
   },
   "newBooking": {
     "pageBack": "Back to bookings",
@@ -3423,7 +3438,7 @@
     "iv_owner": "Owner",
     "iv_ownerBody": "Everything, including business settings, billing and the team.",
     "iv_teammate": "Teammate",
-    "iv_teammateBody": "Bookings, handovers, payments and customers. No business settings.",
+    "iv_teammateBody": "Bookings, handovers, payments and customers. Refunds and waived charges go to the owner or a manager.",
     "iv_language": "Their language",
     "iv_sending": "Sending the invite…",
     "iv_send": "Send invite",
@@ -3719,7 +3734,11 @@
     "ba_checkAgain": "Check again",
     "ba_askUs": "Ask us to help",
     "ba_seePlans": "See plans",
-    "bl_help": "Write to us in Help"
+    "bl_help": "Write to us in Help",
+    "iv_manager": "Manager",
+    "iv_managerBody": "Day-to-day work, and can decide refunds and waive charges. No business settings.",
+    "team_manager": "Manager",
+    "team_level": "Level"
   },
   "accountPage": {
     "roleOwner": "Owner",
@@ -3739,7 +3758,8 @@
     "signInTitle": "Your sign-in",
     "email": "Email",
     "role": "What you can do",
-    "changePassword": "Change password"
+    "changePassword": "Change password",
+    "roleManager": "Manager"
   },
   "documentsPage": {
     "title": "Documents",
@@ -3973,7 +3993,9 @@
     "link_expiredTitle": "This link no longer works",
     "link_expiredBody": "Invite links can be used once and run out after a while. Ask the person who invited you to send it again. If you already set a password, just sign in.",
     "link_login": "Go to sign in",
-    "iv_removeFailed": "That person could not be removed. Try again."
+    "iv_removeFailed": "That person could not be removed. Try again.",
+    "iv_roleManager": "a manager",
+    "iv_levelFailed": "Couldn't change their level. Try again."
   },
   "calc": {
     "title": "Buying a vehicle",

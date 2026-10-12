@@ -44,8 +44,9 @@ export function RefundDepositPanel({
   totalPaid,
   currency,
   rentalStatus,
-  earlyReturn = null
-}: Props) {
+  earlyReturn = null,
+  canRefund = true
+}: Props & { canRefund?: boolean }) {
   const router = useRouter();
   const t = useTranslations("booking");
   const say = t as unknown as Say;
@@ -60,7 +61,7 @@ export function RefundDepositPanel({
     [depositHeld, depositRefunded, depositForfeited]
   );
   const canUseDeposit = depositHeld > 0 && available > 0;
-  const canRefundPayment = totalPaid > 0;
+  const canRefundPayment = totalPaid > 0 && canRefund;
 
   function openForm(form: ActiveForm) {
     setError(null);
@@ -121,6 +122,21 @@ export function RefundDepositPanel({
 
       {!collapsed ? (
         <>
+          {earlyReturn && totalPaid > 0 && !canRefund ? (
+            <div className="mt-3 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3 text-sm text-[var(--warning)]">
+              <p>
+                {t.rich("ref_early", {
+                  days: earlyReturn.unusedDays,
+                  amount: money(earlyReturn.amount, currency),
+                  paid: money(earlyReturn.paid, currency),
+                  unused: earlyReturn.unusedDays,
+                  period: earlyReturn.periodDays,
+                  b: (chunks: React.ReactNode) => <span className="font-semibold">{chunks}</span>
+                })}
+              </p>
+              <p className="mt-1 font-semibold text-[var(--foreground)]">{say("ref_decidedBy")}</p>
+            </div>
+          ) : null}
           {earlyReturn && canRefundPayment ? (
             <div className="mt-3 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3 text-sm text-[var(--warning)]">
               <p>

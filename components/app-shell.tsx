@@ -127,7 +127,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
       {brand.poweredBy ? <span className="mt-0.5 text-[10px] font-semibold text-[var(--sidebar-text-muted)]">Powered by RouteHQ</span> : null}
     </span>
   ) : null;
-  const isTeammate = shell.role === "teammate";
+  const isTeammate = shell.role === "teammate" || shell.role === "manager";
   const hasSeveralBusinesses = shell.organizations.length > 1;
   const activeBusiness = shell.organizations.find((organization) => organization.active);
   const ownerOnly = ["/settings", "/reports", "/rental-calculator"];

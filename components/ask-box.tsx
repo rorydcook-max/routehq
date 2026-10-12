@@ -124,7 +124,7 @@ export function AskBox({ variant }: { variant: "sidebar" | "icon" }) {
         >
           <Search size={16} />
           <span className="min-w-0 flex-1 truncate font-medium">{t("askAnything")}</span>
-          <kbd className="shrink-0 rounded-md bg-[var(--panel-tertiary)] px-1.5 py-0.5 font-sans font-semibold text-[var(--muted)]" style={{ fontSize: 12 }}>Ctrl K</kbd>
+          <kbd className="shrink-0 rounded-md bg-[var(--panel-tertiary)] px-1.5 py-0.5 font-sans font-semibold text-[var(--muted)]" style={{ fontSize: 14 }}>Ctrl K</kbd>
         </button>
       ) : (
         <button aria-label={t("askTitle")} className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border)] bg-white text-[var(--foreground-secondary)]" onClick={() => setOpen(true)} type="button">

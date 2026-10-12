@@ -1487,10 +1487,10 @@ function ComingUpCard({
                       padding: "14px 16px"
                     }}
                   >
-                    <p style={{ fontSize: 13, fontWeight: 500, color: "var(--warning)", margin: "0 0 4px" }}>
+                    <p style={{ fontSize: 14, fontWeight: 500, color: "var(--warning)", margin: "0 0 4px" }}>
                       {tx.say("noScheduleFound")}
                     </p>
-                    <p style={{ fontSize: 12, color: "var(--warning)", margin: 0 }}>
+                    <p style={{ fontSize: 14, color: "var(--warning)", margin: 0 }}>
                       {tx.say("useGenerate")}
                     </p>
                   </div>

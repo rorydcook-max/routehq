@@ -728,7 +728,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
               <button
                 onClick={() => setShowDeleteConfirm(true)}
                 style={{
-                  fontSize: 11, padding: "4px 10px", borderRadius: 5,
+                  fontSize: 14, padding: "4px 10px", borderRadius: 5,
                   border: "0.5px solid var(--danger-line)", background: "var(--danger-light)",
                   color: "var(--danger)", cursor: "pointer", fontWeight: 500
                 }}
@@ -741,14 +741,14 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
               background: "var(--danger-light)", border: "0.5px solid var(--danger-line)",
               borderRadius: 7, padding: "10px 12px", marginTop: 8
             }}>
-              <p style={{ fontSize: 12, color: "var(--danger)", fontWeight: 500, margin: "0 0 6px" }}>
+              <p style={{ fontSize: 14, color: "var(--danger)", fontWeight: 500, margin: "0 0 6px" }}>
                 {tx.say("pc_deletePaymentConfirm")}
               </p>
               <div style={{ display: "flex", gap: 6 }}>
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
                   style={{
-                    fontSize: 11, padding: "4px 10px", borderRadius: 5,
+                    fontSize: 14, padding: "4px 10px", borderRadius: 5,
                     border: "0.5px solid var(--border)", background: "#fff",
                     color: "var(--muted)", cursor: "pointer"
                   }}
@@ -769,7 +769,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
                     });
                   }}
                   style={{
-                    fontSize: 11, padding: "4px 10px", borderRadius: 5,
+                    fontSize: 14, padding: "4px 10px", borderRadius: 5,
                     border: "none", background: "var(--danger)",
                     color: "#fff", cursor: "pointer", fontWeight: 500
                   }}
@@ -882,7 +882,7 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
               <button
                 onClick={() => setShowDeleteConfirm(true)}
                 style={{
-                  fontSize: 11, padding: "4px 10px", borderRadius: 5,
+                  fontSize: 14, padding: "4px 10px", borderRadius: 5,
                   border: "0.5px solid var(--danger-line)", background: "var(--danger-light)",
                   color: "var(--danger)", cursor: "pointer", fontWeight: 500
                 }}
@@ -895,14 +895,14 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
               background: "var(--danger-light)", border: "0.5px solid var(--danger-line)",
               borderRadius: 7, padding: "10px 12px", marginTop: 8
             }}>
-              <p style={{ fontSize: 12, color: "var(--danger)", fontWeight: 500, margin: "0 0 6px" }}>
+              <p style={{ fontSize: 14, color: "var(--danger)", fontWeight: 500, margin: "0 0 6px" }}>
                 {tx.say("pc_deleteTxConfirm")}
               </p>
               <div style={{ display: "flex", gap: 6 }}>
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
                   style={{
-                    fontSize: 11, padding: "4px 10px", borderRadius: 5,
+                    fontSize: 14, padding: "4px 10px", borderRadius: 5,
                     border: "0.5px solid var(--border)", background: "#fff",
                     color: "var(--muted)", cursor: "pointer"
                   }}
@@ -923,7 +923,7 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
                     });
                   }}
                   style={{
-                    fontSize: 11, padding: "4px 10px", borderRadius: 5,
+                    fontSize: 14, padding: "4px 10px", borderRadius: 5,
                     border: "none", background: "var(--danger)",
                     color: "#fff", cursor: "pointer", fontWeight: 500
                   }}

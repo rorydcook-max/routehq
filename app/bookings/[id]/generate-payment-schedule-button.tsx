@@ -9,7 +9,7 @@ import { generatePaymentScheduleForRental } from "@/app/actions/bookings";
 const primaryBtnStyle = {
   background: "var(--primary)",
   color: "var(--primary-text)",
-  fontSize: 13,
+  fontSize: 14,
   fontWeight: 600,
   padding: "8px 16px",
   borderRadius: 7,

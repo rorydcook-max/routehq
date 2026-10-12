@@ -225,8 +225,8 @@ function ComparisonPanel({ vehicles, say }: { vehicles: VehicleMetrics[]; say: S
           <ResponsiveContainer height="100%" width="100%">
             <BarChart data={barData}>
               <CartesianGrid stroke="#dce3eb" strokeDasharray="3 3" />
-              <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} tickFormatter={(value) => `${BAHT}${(value / 1000).toFixed(0)}k`} width={48} />
+              <XAxis dataKey="name" tick={{ fontSize: 14 }} />
+              <YAxis tick={{ fontSize: 14 }} tickFormatter={(value) => `${BAHT}${(value / 1000).toFixed(0)}k`} width={48} />
               <Tooltip formatter={(value) => money(Number(value))} />
               <Legend />
               <Bar isAnimationActive={false} dataKey={inKey} fill="#0e5e6f" radius={[2, 2, 0, 0]} />
@@ -242,7 +242,7 @@ function ComparisonPanel({ vehicles, say }: { vehicles: VehicleMetrics[]; say: S
           <ResponsiveContainer height="100%" width="100%">
             <RadarChart data={radarData}>
               <PolarGrid />
-              <PolarAngleAxis dataKey="metric" tick={{ fontSize: 12 }} />
+              <PolarAngleAxis dataKey="metric" tick={{ fontSize: 14 }} />
               <PolarRadiusAxis domain={[0, 100]} tick={false} />
               {vehicles.map((vehicle, index) => (
                 <Radar isAnimationActive={false} dataKey={nameOf(vehicle)} fill={CHART_COLORS[index % CHART_COLORS.length]} fillOpacity={0.15} key={vehicle.id} name={nameOf(vehicle)} stroke={CHART_COLORS[index % CHART_COLORS.length]} />

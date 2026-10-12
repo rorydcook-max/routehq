@@ -4,7 +4,7 @@ import { firstRentCharge } from "@/lib/payment-schedule";
 import type { ReactNode } from "react";
 import { customerDate } from "@/lib/i18n/customer-dates";
 import { AlertTriangle, CalendarDays, Clock, CreditCard, MapPin, ReceiptText, ShieldCheck } from "lucide-react";
-import { VehicleKindIcon } from "@/components/vehicle-kind-icon";
+import { VehicleArt } from "@/components/vehicle-art";
 import { kindFromCategory } from "@/lib/vehicle-groups";
 import { ActiveRentalPortal } from "./active-rental-portal";
 import { CancelBooking } from "./cancel-booking";
@@ -358,8 +358,8 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
     <>
           <div className="mt-5 rounded-2xl border border-[var(--border)] bg-[var(--panel-secondary)] p-4">
             <div className="flex items-start gap-3">
-              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
-                <VehicleKindIcon boxed={false} kind={kindFromCategory(vehicle.vehicle_categories)} size={28} />
+              <span className="shrink-0">
+                <VehicleArt colour={vehicle.color} kind={kindFromCategory(vehicle.vehicle_categories)} model={vehicle.model} size="sm" />
               </span>
               <div>
                 <h2 className="text-2xl font-semibold">{vehicleTitle(vehicle)}</h2>

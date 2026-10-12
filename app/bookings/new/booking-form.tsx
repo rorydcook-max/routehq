@@ -732,14 +732,15 @@ export function BookingForm({
               const selected = vehicle.id === vehicleId;
               return (
                 <button
-                  className={`pressable rounded-lg border p-3 text-left ${selected ? "border-[var(--primary)] bg-[var(--primary-light)]" : "border-[var(--border)] bg-white"} ${disabled ? "opacity-55" : ""}`}
+                  className={`pressable rounded-2xl border p-3 text-left ${selected ? "border-[var(--primary)] bg-[var(--primary-light)] ring-2 ring-[var(--primary)]" : "border-[var(--border)] bg-white"} ${disabled ? "opacity-55" : ""}`}
                   disabled={disabled}
                   key={vehicle.id}
                   onClick={() => setVehicleId(vehicle.id)}
                   type="button"
                 >
                   <div className="flex items-start gap-3">
-                    <VehicleArt colour={(vehicle as any).color} kind={kindFromCategory({ code: String(vehicle.category_code || ""), name: "" })} model={vehicle.model} size="sm" />
+                    <span className="shrink-0 lg:hidden"><VehicleArt colour={(vehicle as any).color} kind={kindFromCategory({ code: String(vehicle.category_code || ""), name: "" })} model={vehicle.model} size="sm" /></span>
+                    <span className="hidden shrink-0 lg:block"><VehicleArt colour={(vehicle as any).color} kind={kindFromCategory({ code: String(vehicle.category_code || ""), name: "" })} model={vehicle.model} size="md" /></span>
                     <span className="min-w-0">
                       <span className="block text-lg font-semibold text-[var(--foreground)]">{vehicleTitle(vehicle)}</span>
                       <span className="font-mono-data block text-sm font-bold text-[var(--muted)]">{vehicle.registration_number}</span>
@@ -864,7 +865,7 @@ export function BookingForm({
             </label>
           </div>
           {bookingMode === "existing_rental" ? (
-            <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 3 }}>
+            <p style={{ fontSize: 14, color: "var(--muted)", marginTop: 3 }}>
               {say("useActualStart")}
             </p>
           ) : null}

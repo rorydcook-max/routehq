@@ -1002,7 +1002,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           {t("contactIntro", { business: detail.organizationName })}
         </p>
         {contactChannelError ? (
-          <div style={{ background: "var(--warning-light)", border: "0.5px solid var(--warning-line)", borderRadius: 8, padding: "10px 14px", marginTop: 12, fontSize: 13, color: "var(--warning)" }}>
+          <div style={{ background: "var(--warning-light)", border: "0.5px solid var(--warning-line)", borderRadius: 8, padding: "10px 14px", marginTop: 12, fontSize: 14, color: "var(--warning)" }}>
             {contactChannelError}
           </div>
         ) : null}
@@ -1041,11 +1041,11 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         {/* Contextual confirmation / input for the selected method */}
         {preferredContactMethod === "phone" ? (
           livePhone ? (
-            <div style={{ background: "var(--success-light)", border: "0.5px solid var(--success-line)", borderRadius: 8, padding: "10px 14px", marginTop: 8, fontSize: 13, color: "var(--success)" }}>
+            <div style={{ background: "var(--success-light)", border: "0.5px solid var(--success-line)", borderRadius: 8, padding: "10px 14px", marginTop: 8, fontSize: 14, color: "var(--success)" }}>
               ✓ {t("wellContactOn", { contact: livePhone })}
             </div>
           ) : (
-            <div style={{ background: "var(--warning-light)", border: "0.5px solid var(--warning-line)", borderRadius: 8, padding: "10px 14px", marginTop: 8, fontSize: 13, color: "var(--warning)" }}>
+            <div style={{ background: "var(--warning-light)", border: "0.5px solid var(--warning-line)", borderRadius: 8, padding: "10px 14px", marginTop: 8, fontSize: 14, color: "var(--warning)" }}>
               {t("addPhoneAbove")}
             </div>
           )
@@ -1053,11 +1053,11 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
 
         {preferredContactMethod === "email" ? (
           liveEmail ? (
-            <div style={{ background: "var(--success-light)", border: "0.5px solid var(--success-line)", borderRadius: 8, padding: "10px 14px", marginTop: 8, fontSize: 13, color: "var(--success)" }}>
+            <div style={{ background: "var(--success-light)", border: "0.5px solid var(--success-line)", borderRadius: 8, padding: "10px 14px", marginTop: 8, fontSize: 14, color: "var(--success)" }}>
               ✓ {t("wellContactOn", { contact: liveEmail })}
             </div>
           ) : (
-            <div style={{ background: "var(--warning-light)", border: "0.5px solid var(--warning-line)", borderRadius: 8, padding: "10px 14px", marginTop: 8, fontSize: 13, color: "var(--warning)" }}>
+            <div style={{ background: "var(--warning-light)", border: "0.5px solid var(--warning-line)", borderRadius: 8, padding: "10px 14px", marginTop: 8, fontSize: 14, color: "var(--warning)" }}>
               {t("addEmailAbove")}
             </div>
           )
@@ -1065,7 +1065,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
 
         {preferredContactMethod === "whatsapp" ? (
           <div style={{ marginTop: 8 }}>
-            <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "var(--foreground)" }}>{t("whatsappNumber")}</label>
+            <label style={{ display: "block", fontSize: 14, fontWeight: 500, color: "var(--foreground)" }}>{t("whatsappNumber")}</label>
             <input
               name="whatsappNumber"
               onChange={(e) => setWhatsappNumber(e.target.value)}
@@ -1077,7 +1077,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             {livePhone && !whatsappNumber ? (
               <button
                 onClick={() => setWhatsappNumber(livePhone)}
-                style={{ fontSize: 11, color: "var(--primary)", background: "none", border: "none", cursor: "pointer", marginTop: 4, padding: 0 }}
+                style={{ fontSize: 14, color: "var(--primary)", background: "none", border: "none", cursor: "pointer", marginTop: 4, padding: 0 }}
                 type="button"
               >
                 {t("sameAsPhone", { phone: livePhone })}
@@ -1088,57 +1088,57 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
 
         {preferredContactMethod === "messenger" ? (
           <div style={{ marginTop: 8 }}>
-            <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "var(--foreground)" }}>{t("messengerUsername")}</label>
+            <label style={{ display: "block", fontSize: 14, fontWeight: 500, color: "var(--foreground)" }}>{t("messengerUsername")}</label>
             <input defaultValue={detail.customer?.messenger_id || ""} name="messengerId" placeholder="messenger.com/username" style={{ ...fieldStyle, marginTop: 4 }} />
           </div>
         ) : null}
 
         {preferredContactMethod === "line" ? (
           <div style={{ marginTop: 8 }}>
-            <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "var(--foreground)" }}>LINE ID</label>
+            <label style={{ display: "block", fontSize: 14, fontWeight: 500, color: "var(--foreground)" }}>LINE ID</label>
             <input defaultValue={detail.customer?.line_id || ""} name="lineId" placeholder="@lineusername" style={{ ...fieldStyle, marginTop: 4 }} />
           </div>
         ) : null}
 
         {preferredContactMethod === "telegram" ? (
           <div style={{ marginTop: 8 }}>
-            <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: "var(--foreground)" }}>{t("telegramUsername")}</label>
+            <label style={{ display: "block", fontSize: 14, fontWeight: 500, color: "var(--foreground)" }}>{t("telegramUsername")}</label>
             <input defaultValue={detail.customer?.telegram_username || ""} name="telegramUsername" placeholder="@telegramusername" style={{ ...fieldStyle, marginTop: 4 }} />
           </div>
         ) : null}
 
         {/* Secondary channels — collapsible */}
         <details style={{ marginTop: 16 }}>
-          <summary style={{ fontSize: 13, color: "var(--primary)", cursor: "pointer", fontWeight: 500, listStyle: "none", userSelect: "none" }}>
+          <summary style={{ fontSize: 14, color: "var(--primary)", cursor: "pointer", fontWeight: 500, listStyle: "none", userSelect: "none" }}>
             {t("moreWaysToContact")}
           </summary>
           <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             {preferredContactMethod !== "whatsapp" ? (
               <div>
-                <label style={{ fontSize: 13, fontWeight: 500, color: "var(--foreground)", display: "block" }}>WhatsApp</label>
+                <label style={{ fontSize: 14, fontWeight: 500, color: "var(--foreground)", display: "block" }}>WhatsApp</label>
                 <input name="whatsappNumber" onChange={(e) => setWhatsappNumber(e.target.value)} placeholder="+66812345678" style={{ ...fieldStyle, marginTop: 4 }} type="tel" value={whatsappNumber} />
               </div>
             ) : null}
             {preferredContactMethod !== "messenger" ? (
               <div>
-                <label style={{ fontSize: 13, fontWeight: 500, color: "var(--foreground)", display: "block" }}>Facebook Messenger</label>
+                <label style={{ fontSize: 14, fontWeight: 500, color: "var(--foreground)", display: "block" }}>Facebook Messenger</label>
                 <input defaultValue={detail.customer?.messenger_id || ""} name="messengerId" placeholder="messenger.com/username" style={{ ...fieldStyle, marginTop: 4 }} />
               </div>
             ) : null}
             {preferredContactMethod !== "line" ? (
               <div>
-                <label style={{ fontSize: 13, fontWeight: 500, color: "var(--foreground)", display: "block" }}>LINE ID</label>
+                <label style={{ fontSize: 14, fontWeight: 500, color: "var(--foreground)", display: "block" }}>LINE ID</label>
                 <input defaultValue={detail.customer?.line_id || ""} name="lineId" placeholder="@lineusername" style={{ ...fieldStyle, marginTop: 4 }} />
               </div>
             ) : null}
             {preferredContactMethod !== "telegram" ? (
               <div>
-                <label style={{ fontSize: 13, fontWeight: 500, color: "var(--foreground)", display: "block" }}>Telegram</label>
+                <label style={{ fontSize: 14, fontWeight: 500, color: "var(--foreground)", display: "block" }}>Telegram</label>
                 <input defaultValue={detail.customer?.telegram_username || ""} name="telegramUsername" placeholder="@telegramusername" style={{ ...fieldStyle, marginTop: 4 }} />
               </div>
             ) : null}
             <div style={{ gridColumn: "1 / 2" }}>
-              <label style={{ fontSize: 13, fontWeight: 500, color: "var(--foreground)", display: "block" }}>
+              <label style={{ fontSize: 14, fontWeight: 500, color: "var(--foreground)", display: "block" }}>
                 Instagram
               </label>
               <input defaultValue={detail.customer?.instagram_handle || ""} name="instagramHandle" placeholder="@instagramhandle" style={{ ...fieldStyle, marginTop: 4 }} />
@@ -1655,7 +1655,7 @@ function PhoneCountrySelect({ name, onChange, value }: { name: string; onChange:
         type="button"
       >
         <FlagSvg code={selected.flagCode} label={selected.code} />
-        <span style={{ fontSize: 13 }}>{selected.callingCode}</span>
+        <span style={{ fontSize: 14 }}>{selected.callingCode}</span>
       </button>
       {open ? (
         <>
@@ -1681,7 +1681,7 @@ function PhoneCountrySelect({ name, onChange, value }: { name: string; onChange:
               style={{
                 width: "100%",
                 padding: "7px 10px",
-                fontSize: 13,
+                fontSize: 14,
                 border: "none",
                 borderBottom: "0.5px solid var(--border)",
                 outline: "none",
@@ -1692,7 +1692,7 @@ function PhoneCountrySelect({ name, onChange, value }: { name: string; onChange:
             />
             <div>
               {filtered.length === 0 ? (
-                <p style={{ padding: 16, textAlign: "center", fontSize: 13, color: "var(--muted)" }}>{t("noResults")}</p>
+                <p style={{ padding: 16, textAlign: "center", fontSize: 14, color: "var(--muted)" }}>{t("noResults")}</p>
               ) : filtered.map((country) => (
                 <button
                   key={`${name}-${country.callingCode}-${country.code}`}
@@ -1703,7 +1703,7 @@ function PhoneCountrySelect({ name, onChange, value }: { name: string; onChange:
                     gap: 8,
                     padding: "7px 10px",
                     cursor: "pointer",
-                    fontSize: 13,
+                    fontSize: 14,
                     whiteSpace: "nowrap",
                     overflow: "hidden",
                     width: "100%",
@@ -1714,8 +1714,8 @@ function PhoneCountrySelect({ name, onChange, value }: { name: string; onChange:
                   type="button"
                 >
                   <FlagSvg code={country.flagCode} label={country.code} />
-                  <span style={{ fontSize: 12, fontWeight: 500, color: "var(--foreground)", width: 36, flexShrink: 0 }}>{country.code}</span>
-                  <span style={{ fontSize: 12, color: "var(--muted)", flexShrink: 0 }}>{country.callingCode}</span>
+                  <span style={{ fontSize: 14, fontWeight: 500, color: "var(--foreground)", width: 36, flexShrink: 0 }}>{country.code}</span>
+                  <span style={{ fontSize: 14, color: "var(--muted)", flexShrink: 0 }}>{country.callingCode}</span>
                 </button>
               ))}
             </div>
@@ -1979,15 +1979,15 @@ function UploadCard({
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 6 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
           <Icon size={16} style={{ color: "var(--primary)", flexShrink: 0 }} />
-          <span style={{ fontSize: 13, fontWeight: 600, color: "var(--foreground)", lineHeight: 1.3 }}>{label}</span>
+          <span style={{ fontSize: 14, fontWeight: 600, color: "var(--foreground)", lineHeight: 1.3 }}>{label}</span>
         </div>
         {complete || selectedFile ? (
-          <span style={{ fontSize: 11, color: "var(--success)", fontWeight: 500, flexShrink: 0 }}>
+          <span style={{ fontSize: 14, color: "var(--success)", fontWeight: 500, flexShrink: 0 }}>
             {"✓ "}
             {selectedFile ? t("added") : t("received")}
           </span>
         ) : (
-          <span style={{ fontSize: 11, color: "var(--warning)", flexShrink: 0 }}>{t("needed")}</span>
+          <span style={{ fontSize: 14, color: "var(--warning)", flexShrink: 0 }}>{t("needed")}</span>
         )}
       </div>
 
@@ -2073,7 +2073,7 @@ function UploadCard({
             </label>
           </div>
           {!isMobile ? (
-            <p style={{ fontSize: 10, color: "var(--muted)", margin: "4px 0 0", textAlign: "center" }}>
+            <p style={{ fontSize: 14, color: "var(--muted)", margin: "4px 0 0", textAlign: "center" }}>
               {t("takePhotoHint")}
             </p>
           ) : null}
@@ -2090,7 +2090,7 @@ function UploadCard({
             cursor: "pointer",
             border: "0.5px solid var(--border)",
             background: "var(--panel-secondary)",
-            fontSize: 11,
+            fontSize: 14,
             fontWeight: 500,
             color: "var(--muted)"
           }}
@@ -2109,7 +2109,7 @@ function UploadCard({
         </label>
       )}
       {note ? (
-        <p aria-live="polite" style={{ fontSize: 12, fontWeight: 600, margin: "8px 0 0", color: noteTone === "unreadable" ? "var(--warning)" : noteTone === "read" ? "var(--success)" : "var(--primary)" }}>
+        <p aria-live="polite" style={{ fontSize: 14, fontWeight: 600, margin: "8px 0 0", color: noteTone === "unreadable" ? "var(--warning)" : noteTone === "read" ? "var(--success)" : "var(--primary)" }}>
           {note}
         </p>
       ) : null}

@@ -531,7 +531,7 @@ function FinancialSection({ detail, isOwner }: { detail: VehicleDetail; isOwner:
                 <div className="w-3 rounded-t bg-[var(--primary)]" style={{ height: `${Math.max(3, (month.revenue / chartMax) * 112)}px` }} title={tx.say("fi_in", { amount: money(month.revenue) })} />
                 <div className="w-3 rounded-t bg-[var(--danger)]" style={{ height: `${Math.max(3, (month.expenses / chartMax) * 112)}px` }} title={tx.say("fi_out", { amount: money(month.expenses) })} />
               </div>
-              <span className="font-medium text-[var(--muted)]" style={{ fontSize: 12 }}>{new Intl.DateTimeFormat(tx.locale === "en" ? "en-GB" : `${tx.locale}-u-ca-gregory-nu-latn`, { month: "short" }).format(new Date(businessNow().getFullYear(), businessNow().getMonth() - (f.monthlyChart.length - 1 - index), 1))}</span>
+              <span className="font-medium text-[var(--muted)]" style={{ fontSize: 14 }}>{new Intl.DateTimeFormat(tx.locale === "en" ? "en-GB" : `${tx.locale}-u-ca-gregory-nu-latn`, { month: "short" }).format(new Date(businessNow().getFullYear(), businessNow().getMonth() - (f.monthlyChart.length - 1 - index), 1))}</span>
             </div>
           ))}
         </div>

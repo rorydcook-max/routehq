@@ -118,42 +118,43 @@ export function CalendarView({ events, initialMonth, today }: { events: Calendar
 
   return (
     <div className="space-y-4">
-      <div className="content-section flex items-center justify-between gap-2 lg:justify-center lg:gap-8">
-        <button aria-label={t("prevMonth")} className="secondary-action pressable !w-11 !px-0 shrink-0" onClick={() => shiftMonth(-1)} type="button">
+      <div className="flex items-center justify-between gap-2 py-1 lg:justify-center lg:gap-8">
+        <button aria-label={t("prevMonth")} className="pressable flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-[var(--foreground)] shadow-[var(--shadow-card)] hover:text-[var(--primary)]" onClick={() => shiftMonth(-1)} type="button">
           <ChevronLeft size={20} />
         </button>
         <div className="flex min-w-0 flex-col items-center">
-          <h2 className="whitespace-nowrap text-[18px] font-bold text-[var(--foreground)]">{monthLabel(month, locale)}</h2>
+          <h2 className="whitespace-nowrap text-[22px] text-[var(--foreground)]">{monthLabel(month, locale)}</h2>
           {!isCurrentMonth ? (
             <button className="font-bold text-[var(--primary)] underline underline-offset-2" onClick={() => router.push(`/calendar?month=${today.slice(0, 7)}`)} type="button">
               {t("today")}
             </button>
           ) : null}
         </div>
-        <button aria-label={t("nextMonth")} className="secondary-action pressable !w-11 !px-0 shrink-0" onClick={() => shiftMonth(1)} type="button">
+        <button aria-label={t("nextMonth")} className="pressable flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-[var(--foreground)] shadow-[var(--shadow-card)] hover:text-[var(--primary)]" onClick={() => shiftMonth(1)} type="button">
           <ChevronRight size={20} />
         </button>
       </div>
 
       <div className="content-section">
-        <div className="mb-2 grid grid-cols-7 gap-1 text-center text-xs font-bold uppercase tracking-wide text-[var(--muted)]">
+        <div className="mb-2 grid grid-cols-7 gap-1.5 text-center font-bold text-[var(--muted)]">
           {weekdayNames(locale).map((day) => (
             <div key={day}>{day}</div>
           ))}
         </div>
-        <div className="grid grid-cols-7 gap-1">
+        <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
           {days.map((cell, index) => {
             const dayEvents = cell.date ? eventsByDate.get(cell.date) || [] : [];
             const isToday = cell.date === today;
+            const past = !!cell.date && cell.date < today;
             return (
               <div
                 key={index}
-                className={`min-h-[52px] rounded-lg p-1 sm:min-h-[72px] ${
-                  cell.date ? `border bg-[var(--panel)] ${isToday ? "border-[var(--primary)] ring-1 ring-[var(--primary)]" : "border-[var(--border)]"}` : ""
+                className={`min-h-[52px] rounded-xl p-1 sm:min-h-[96px] sm:p-1.5 ${
+                  cell.date ? (isToday ? "bg-white ring-2 ring-[var(--primary)]" : past ? "bg-[var(--panel-secondary)] opacity-75" : "bg-white shadow-[0_1px_3px_rgba(19,38,43,0.08)]") : ""
                 }`}
               >
                 {cell.label ? (
-                  <span className={`text-xs font-semibold ${isToday ? "rounded-full bg-[var(--primary)] px-1.5 text-white" : "text-[var(--foreground-secondary)]"}`}>
+                  <span className={`num inline-flex h-6 min-w-6 items-center justify-center rounded-full px-1 text-[14px] sm:h-7 sm:min-w-7 sm:text-[15px] ${isToday ? "bg-[var(--primary)] text-white" : past ? "text-[var(--muted)]" : "text-[var(--foreground)]"}`}>
                     {cell.label}
                   </span>
                 ) : null}
@@ -168,10 +169,11 @@ export function CalendarView({ events, initialMonth, today }: { events: Calendar
                     <Link
                       key={event.id}
                       href={event.href as any}
-                      className={`block truncate rounded border px-1 py-0.5 text-[10px] font-medium ${toneClasses[event.tone]}`}
-                      title={titleOf(event)}
+                      className={`relative flex items-center gap-1.5 rounded-md border px-1.5 py-0.5 text-[13px] font-semibold ${toneClasses[event.tone]}`}
+                      data-tip={titleOf(event)}
                     >
-                      {titleOf(event)}
+                      <span aria-hidden="true" className={`h-2 w-2 flex-shrink-0 rounded-full ${dotClasses[event.tone]}`} />
+                      <span className="min-w-0 truncate">{titleOf(event)}</span>
                     </Link>
                   ))}
                   {dayEvents.length > 3 ? <span className="text-[10px] text-[var(--muted)]">{t("more", { count: dayEvents.length - 3 })}</span> : null}
@@ -181,7 +183,7 @@ export function CalendarView({ events, initialMonth, today }: { events: Calendar
           })}
         </div>
         {/* What the dots mean, for phones where a day only has room for dots. */}
-        <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-[var(--muted)] sm:hidden">
+        <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 font-semibold text-[var(--foreground-secondary)]">
           {([
             ["blue", t("leg_blue")],
             ["amber", t("leg_amber")],
@@ -189,8 +191,8 @@ export function CalendarView({ events, initialMonth, today }: { events: Calendar
             ["red", t("leg_red")],
             ["green", t("leg_green")]
           ] as Array<[CalendarEvent["tone"], string]>).map(([tone, label]) => (
-            <span className="inline-flex items-center gap-1" key={tone}>
-              <span className={`h-2 w-2 rounded-full ${dotClasses[tone]}`} />
+            <span className="inline-flex items-center gap-1.5" key={tone}>
+              <span className={`h-2.5 w-2.5 rounded-full ${dotClasses[tone]}`} />
               {label}
             </span>
           ))}

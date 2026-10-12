@@ -517,14 +517,14 @@ export function TransactionsList({
   }
 
   const chip = (active: boolean) =>
-    `pressable whitespace-nowrap rounded-[8px] px-3 py-1.5 text-[13px] font-semibold transition ${active ? "bg-white text-[var(--foreground)] shadow-[var(--shadow-sm)]" : "text-[var(--muted)] hover:text-[var(--foreground)]"}`;
+    `pressable inline-flex min-h-10 items-center whitespace-nowrap rounded-full px-3 font-semibold transition sm:px-4 ${active ? "bg-[var(--primary)] text-white shadow-[var(--shadow-card)]" : "bg-white text-[var(--foreground)] shadow-[var(--shadow-card)] hover:text-[var(--primary)]"}`;
 
   return (
     <div className="space-y-4">
       {/* Period picker */}
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="scrollbar-none -mx-1 flex overflow-x-auto px-1">
-          <div className="inline-flex gap-0.5 rounded-[10px] bg-[var(--panel-secondary)] p-1">
+          <div className="inline-flex gap-1.5 py-1 sm:gap-2">
             {PERIOD_MODES.map((entry) => (
               <button aria-pressed={mode === entry} className={chip(mode === entry)} key={entry} onClick={() => setMode(entry)} type="button">
                 {tx.say(`mode_${entry}`)}
@@ -541,15 +541,15 @@ export function TransactionsList({
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <button aria-label={tx.say("earlier")} className="pressable flex h-9 w-9 items-center justify-center rounded-[9px] border border-[var(--border)] bg-white text-[var(--foreground-secondary)] hover:border-[var(--primary)] hover:text-[var(--primary)]" onClick={() => setAnchor(shiftAnchor(mode, anchor, -1))} type="button">
+            <button aria-label={tx.say("earlier")} className="pressable flex h-10 w-10 items-center justify-center rounded-full bg-white text-[var(--foreground)] shadow-[var(--shadow-card)] hover:text-[var(--primary)]" onClick={() => setAnchor(shiftAnchor(mode, anchor, -1))} type="button">
               <ChevronLeft size={17} />
             </button>
-            <p className="min-w-[150px] flex-1 text-center text-[15px] font-semibold text-[var(--foreground)] lg:flex-none">{periodLabel(mode, range, today, tx)}</p>
-            <button aria-label={tx.say("later")} className="pressable flex h-9 w-9 items-center justify-center rounded-[9px] border border-[var(--border)] bg-white text-[var(--foreground-secondary)] hover:border-[var(--primary)] hover:text-[var(--primary)]" onClick={() => setAnchor(shiftAnchor(mode, anchor, 1))} type="button">
+            <p className="min-w-[150px] flex-1 text-center text-[17px] font-bold text-[var(--foreground)] lg:flex-none">{periodLabel(mode, range, today, tx)}</p>
+            <button aria-label={tx.say("later")} className="pressable flex h-10 w-10 items-center justify-center rounded-full bg-white text-[var(--foreground)] shadow-[var(--shadow-card)] hover:text-[var(--primary)]" onClick={() => setAnchor(shiftAnchor(mode, anchor, 1))} type="button">
               <ChevronRight size={17} />
             </button>
             {!isCurrentPeriod ? (
-              <button className="pressable rounded-[9px] border border-[var(--border)] bg-white px-3 py-2 text-[13px] font-semibold text-[var(--primary)]" onClick={() => setAnchor(today)} type="button">
+              <button className="pressable inline-flex min-h-10 items-center whitespace-nowrap rounded-full bg-white px-4 font-semibold text-[var(--primary)] shadow-[var(--shadow-card)]" onClick={() => setAnchor(today)} type="button">
                 {mode === "day" ? tx.say("today") : tx.say(`this_${mode}`)}
               </button>
             ) : null}

@@ -8,21 +8,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import type { Route } from "next";
-import {
-  AlertTriangle,
-  Camera,
-  CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
-  FileVideo,
-  Fuel,
-  Gauge,
-  MapPin,
-  PenLine,
-  ShieldCheck,
-  Smartphone,
-  Trash2
-} from "lucide-react";
+import { AlertTriangle, Camera, CheckCircle2, ChevronLeft, ChevronRight, FileVideo, Fuel, Gauge, MapPin, ShieldCheck, Smartphone, Trash2 } from "lucide-react";
 import { submitInspection } from "@/app/actions/inspections";
 import { prepareInspectionUploads } from "@/app/actions/uploads";
 import { uploadFormFiles } from "@/lib/direct-upload-client";

@@ -1,7 +1,7 @@
 "use server";
 
 import { said } from "@/lib/i18n/server-text";
-import { completeRentalJobs, tellRentalCustomer } from "@/lib/customer-messages";
+import { tellRentalCustomer } from "@/lib/customer-messages";
 import { revalidatePath } from "next/cache";
 import { niceDate } from "@/lib/nice-date";
 import { notifyOperator } from "@/lib/notify-operator";

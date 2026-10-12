@@ -1,7 +1,6 @@
 import { businessToday } from "@/lib/business-time";
 import { remindersOff, remindRentalCustomerOnce, type ReminderKind } from "@/lib/customer-messages";
 import { complianceItems } from "@/lib/fleet-metrics";
-import { niceDate } from "@/lib/nice-date";
 
 /**
  * The reminders customers get without anyone sending them, run once a day:

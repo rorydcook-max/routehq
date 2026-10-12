@@ -98,7 +98,6 @@ export async function confirmCustomerPayment(rentalId: string, amount: number, p
   }
 
   const method = paymentMethod || bookingLink.preferred_payment_method || "unknown";
-  const now = new Date().toISOString();
   const { data: transaction, error: transactionError } = await supabase
     .from("transactions")
     .insert({

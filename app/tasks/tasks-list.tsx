@@ -6,12 +6,10 @@ import { useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { MoreHorizontal } from "lucide-react";
 import { KindChip, jobKind } from "@/components/kind-chip";
-import { confirmReceiptPayment, declinePaymentReceipt, recordPaymentReceived } from "@/app/actions/bookings";
+import { confirmReceiptPayment, declinePaymentReceipt } from "@/app/actions/bookings";
 import { completeTask } from "@/app/actions/tasks";
 import { decideEarlyWaiver } from "@/app/actions/early-start";
 import { PendingButton } from "@/components/pending-button";
-import { Badge } from "@/components/ui";
-import { taskTypeLabel } from "@/lib/task-types";
 import { intlLocale, longDate, shortDate } from "@/lib/i18n/dates";
 import { allocatePayment, type OpenPayment } from "@/lib/payment-allocation";
 import type { TaskListItem } from "@/lib/tasks";
@@ -73,22 +71,6 @@ function payTitle(item: TaskListItem, tx: Tx) {
 /** The vehicle without its plate: "Honda CRF", not "Honda CRF · 1กฒ7756". The plate lives on the booking. */
 function vehicleName(label: string | null) {
   return label ? label.split(" · ")[0] : null;
-}
-
-/** "Due today", "Was due yesterday", "Done 4 Oct": whole phrases, because languages order them differently. */
-function whenLine(item: TaskListItem, today: string, overdue: boolean, tx: Tx) {
-  if (item.completedAt) {
-    const day = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date(item.completedAt));
-    if (day === today) return tx.say("doneToday");
-    if (day === addDays(today, -1)) return tx.say("doneYesterday");
-    return tx.say("doneOn", { date: plainDate(day, today, tx.locale) });
-  }
-  const due = item.dueDate;
-  if (!due) return tx.say("noDueDate");
-  if (due === today) return tx.say("dueToday");
-  if (due === addDays(today, 1)) return tx.say("dueTomorrow");
-  if (due === addDays(today, -1)) return tx.say("wasDueYesterday");
-  return tx.say(overdue ? "wasDueOn" : "dueOn", { date: plainDate(due, today, tx.locale) });
 }
 
 /** Rent periods are saved as English text ("October 2026", "3 days", "Whole rental"). */

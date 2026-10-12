@@ -1,4 +1,4 @@
-import { completeRentalJobs, tellRentalCustomer } from "@/lib/customer-messages";
+import { tellRentalCustomer } from "@/lib/customer-messages";
 import { niceDate } from "@/lib/nice-date";
 import { bookingRules, clashes } from "@/lib/booking-rules";
 import { businessToday } from "@/lib/business-time";

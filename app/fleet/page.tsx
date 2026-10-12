@@ -45,7 +45,6 @@ function ComplianceBadge({ item, attention = 0 }: { item?: { key?: string; label
 }
 
 const primaryButton = "primary-action pressable";
-const secondaryButton = "secondary-action pressable";
 
 export default async function FleetPage({ searchParams }: { searchParams: Promise<{ notice?: string }> }) {
   const { notice } = await searchParams;

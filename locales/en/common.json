@@ -2208,7 +2208,11 @@
     "track_paidTo": "Paid to {date}",
     "track_paidAll": "All rent paid",
     "track_owed": "{amount} owed since {date}",
-    "track_next": "{amount} due {date}"
+    "track_next": "{amount} due {date}",
+    "strip_paid": "Paid",
+    "strip_owed": "Owed",
+    "strip_today": "Due today",
+    "strip_later": "To come"
   },
   "newBooking": {
     "pageBack": "Back to bookings",

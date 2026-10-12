@@ -171,8 +171,6 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   const depositsHeld = metrics.depositsHeld ?? rentals.reduce((sum, r) => sum + (r.depositHeld || 0), 0);
 
   // ── Fleet at a glance ────────────────────────────────────────────────────
-  const rentedCount = vehicles.filter((v) => v.status === "Rented").length;
-  const utilization = vehicles.length > 0 ? Math.round((rentedCount / vehicles.length) * 100) : 0;
 
   // ── Today: everything that needs doing now, most urgent first ───────────
   const todayItems: AgendaItem[] = [];

@@ -1,7 +1,7 @@
 "use server";
 
 import { earlyStartFor, ensureEarlyStartCharge } from "@/lib/early-start";
-import { completeRentalJobs, tellRentalCustomer } from "@/lib/customer-messages";
+import { tellRentalCustomer } from "@/lib/customer-messages";
 import { getTransactionFormOptions } from "@/lib/transactions";
 import { chargeRenter } from "@/lib/charges";
 import { extrasIncomeTag } from "@/lib/extras";

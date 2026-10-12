@@ -5,7 +5,7 @@ import { shownError } from "@/lib/error-text";
 import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { CheckCircle2, CreditCard, FileText, IdCard, ImageIcon, MessageCircle, PenLine, Upload, UserRound, XCircle } from "lucide-react";
+import { CheckCircle2, CreditCard, FileText, IdCard, ImageIcon, MessageCircle, PenLine, Upload, UserRound } from "lucide-react";
 import { completePublicBooking, reportPublicBookingPayment } from "@/app/actions/public-booking";
 import { preparePublicBookingUploads } from "@/app/actions/uploads";
 import { readIdentityDocument } from "@/app/actions/identity-ocr";
@@ -110,9 +110,6 @@ const fieldStyle = {
   outline: "none",
 };
 const inputClass = "mt-2 focus:ring-2 focus:ring-[var(--primary)]/15";
-const emojiSelectStyle = {
-  fontFamily: '"Segoe UI Emoji", "Noto Color Emoji", "Apple Color Emoji", "Segoe UI", system-ui, sans-serif'
-};
 
 type DocKind = "passport" | "driver_license";
 type DocReadState = "reading" | "read" | "unreadable" | null;
@@ -380,27 +377,6 @@ const PAYMENT_METHODS: {
   { key: "card",          label: "Credit / Debit Card",    description: "Card payments via Stripe",                                  deliveryOnly: false, iconClass: "ti ti-credit-card" },
 ];
 
-const CONTACT_METHODS = [
-  { value: "whatsapp", label: "WhatsApp" },
-  { value: "messenger", label: "Messenger" },
-  { value: "line", label: "LINE" },
-  { value: "telegram", label: "Telegram" },
-  { value: "sms", label: "SMS" },
-  { value: "email", label: "Email" },
-  { value: "phone", label: "Phone call" }
-];
-
-function defaultContactMethod(customer: any) {
-  if (customer?.preferred_contact_method) return customer.preferred_contact_method;
-  if (customer?.whatsapp_number) return "whatsapp";
-  if (customer?.messenger_id) return "messenger";
-  if (customer?.line_id) return "line";
-  if (customer?.telegram_username) return "telegram";
-  if (customer?.email) return "email";
-  if (customer?.phone) return "phone";
-  return "whatsapp";
-}
-
 // ─── PromptPay QR payload (EMVCo / Bank of Thailand standard) ─────────────────
 
 function formatMoney(amount: number, currency = "THB"): string {
@@ -449,33 +425,6 @@ function resolveNationality(value: string) {
     ) || null
   );
 }
-
-const phoneCountryOptions = [
-  { flag: "🇹🇭", code: "TH", callingCode: "+66" },
-  { flag: "🇬🇧", code: "GB", callingCode: "+44" },
-  { flag: "🇩🇪", code: "DE", callingCode: "+49" },
-  { flag: "🇫🇷", code: "FR", callingCode: "+33" },
-  { flag: "🇷🇺", code: "RU", callingCode: "+7" },
-  { flag: "🇨🇳", code: "CN", callingCode: "+86" },
-  { flag: "🇯🇵", code: "JP", callingCode: "+81" },
-  { flag: "🇺🇸", code: "US", callingCode: "+1" },
-  { flag: "🇦🇺", code: "AU", callingCode: "+61" },
-  { flag: "🇨🇭", code: "CH", callingCode: "+41" },
-  { flag: "🇳🇱", code: "NL", callingCode: "+31" },
-  { flag: "🇸🇪", code: "SE", callingCode: "+46" },
-  { flag: "🇮🇱", code: "IL", callingCode: "+972" },
-  { flag: "🇩🇰", code: "DK", callingCode: "+45" },
-  { flag: "🇳🇴", code: "NO", callingCode: "+47" },
-  { flag: "🇫🇮", code: "FI", callingCode: "+358" },
-  { flag: "🇮🇩", code: "ID", callingCode: "+62" },
-  { flag: "🇲🇾", code: "MY", callingCode: "+60" },
-  { flag: "🇸🇬", code: "SG", callingCode: "+65" },
-  { flag: "🇻🇳", code: "VN", callingCode: "+84" },
-  { flag: "🇵🇭", code: "PH", callingCode: "+63" },
-  { flag: "🇰🇭", code: "KH", callingCode: "+855" },
-  { flag: "🇱🇦", code: "LA", callingCode: "+856" },
-  { flag: "🇮🇳", code: "IN", callingCode: "+91" }
-];
 
 /** A saved number like "+66812345678" shown as its country code and the rest, so the code isn't shown twice. */
 function splitSavedPhone(value: unknown): { code: string; local: string } {

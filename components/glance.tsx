@@ -7,7 +7,6 @@ import type { CSSProperties, ReactNode } from "react";
 
 export function Ring({ pct, label, size = 80, stroke = 10, color = "var(--on-rent)", track = "var(--primary-light)" }: { pct: number; label: string; size?: number; stroke?: number; color?: string; track?: string }) {
   const r = (size - stroke) / 2;
-  const c = 2 * Math.PI * r;
   const shown = Math.max(0, Math.min(100, pct));
   return (
     <span className="relative inline-block flex-shrink-0" style={{ height: size, width: size }}>
@@ -231,5 +230,43 @@ export function FleetLot({ vehicles, labels, title, action }: { vehicles: LotVeh
         ))}
       </ul>
     </section>
+  );
+}
+
+export type StripPayment = { key: string; state: "paid" | "owed" | "today" | "later"; tip: string };
+const STRIP_STYLE: Record<StripPayment["state"], string> = {
+  paid: "bg-[var(--success)]",
+  owed: "bg-[var(--danger)]",
+  today: "bg-[var(--going-out)]",
+  later: "bg-[var(--panel-tertiary)] shadow-[inset_0_0_0_2px_var(--border-strong)]"
+};
+
+/** Every rent payment of a booking as one row of blocks, in date order: paid, owed, due today, still to come. Point at one for its date and amount. */
+export function PaymentStrip({ payments, legend }: { payments: StripPayment[]; legend: Record<StripPayment["state"], string> }) {
+  if (payments.length === 0) return null;
+  const shown = payments.slice(0, 36);
+  const present = (["paid", "owed", "today", "later"] as const).filter((state) => payments.some((payment) => payment.state === state));
+  return (
+    <div>
+      <div className="flex gap-[3px]">
+        {shown.map((payment, index) => (
+          <span
+            className={`grow-y relative h-7 min-w-[6px] flex-1 rounded-[6px] outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] ${STRIP_STYLE[payment.state]}`}
+            data-tip={payment.tip}
+            key={payment.key}
+            style={{ ["--d" as string]: `${Math.min(index, 20) * 25}ms` } as CSSProperties}
+            tabIndex={0}
+          />
+        ))}
+      </div>
+      <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-semibold text-[var(--foreground-secondary)]">
+        {present.map((state) => (
+          <span className="inline-flex items-center gap-1.5" key={state}>
+            <span aria-hidden="true" className={`inline-block h-2.5 w-2.5 rounded-[3px] ${STRIP_STYLE[state]}`} />
+            {legend[state]} <span className="num text-[var(--foreground)]">{payments.filter((payment) => payment.state === state).length}</span>
+          </span>
+        ))}
+      </p>
+    </div>
   );
 }

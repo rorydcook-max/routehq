@@ -6,8 +6,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { longDate } from "@/lib/i18n/dates";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
-import { ChevronRight, Plus, Search } from "lucide-react";
-import { Badge, Card, EmptyState, SectionHeader } from "@/components/ui";
+import { ChevronRight, Search } from "lucide-react";
+import { Badge, EmptyState } from "@/components/ui";
 import { flagForNationality } from "@/lib/customer-options";
 import { initialsOf } from "@/components/glance";
 import type { CustomerListItem } from "@/lib/customer-detail";

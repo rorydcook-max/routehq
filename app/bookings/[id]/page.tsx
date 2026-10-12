@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { canDecideMoney, getCurrentMembership } from "@/lib/auth/roles";
 import type { Route } from "next";
-import { AlertTriangle, CalendarDays, Car, CheckCircle2, Clock, CreditCard, FileText, Gauge, MapPin, ReceiptText, UserRound, XCircle } from "lucide-react";
+import { AlertTriangle, Car, CheckCircle2, Clock, CreditCard, FileText, Gauge, MapPin, UserRound } from "lucide-react";
 import { CancelBookingButton } from "@/app/bookings/[id]/cancel-booking-button";
 import { VehicleChangeButton } from "@/app/bookings/[id]/vehicle-change-button";
 import { UnsentMessages } from "@/app/bookings/[id]/unsent-messages";
@@ -26,7 +26,7 @@ import { EarlyReturnOwedPanel } from "@/app/bookings/[id]/early-return-owed";
 import { activeExtrasLines, extrasLines, extrasSummary } from "@/lib/extras";
 import { AppShell } from "@/components/app-shell";
 import { VehicleArt } from "@/components/vehicle-art";
-import { PartBar, RentalTrack, initialsOf } from "@/components/glance";
+import { PartBar, PaymentStrip, RentalTrack, initialsOf } from "@/components/glance";
 import { kindFromCategory } from "@/lib/vehicle-groups";
 import { AddRentalPaymentInlineForm, EditableEndDate, EditableRentalPaymentRow, EditableTransactionRow, ExistingRentalPaymentSetupCard } from "@/components/booking-correction-controls";
 import { CommunicationPanel } from "@/components/communication-panel";
@@ -37,7 +37,6 @@ import { Badge, Card, Fold, SectionHeader } from "@/components/ui";
 import { OpenOnHash } from "@/components/open-on-hash";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getBookingDetail, getCustomersForSelector } from "@/lib/bookings";
-import { flagForNationality } from "@/lib/customer-options";
 import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { formatDeliveryLocation } from "@/lib/delivery-location";
@@ -46,7 +45,6 @@ import { signedReceiptUrls } from "@/lib/payment-receipts";
 import { GeneratePaymentScheduleButton } from "@/app/bookings/[id]/generate-payment-schedule-button";
 import { RentalDocumentsCard } from "@/app/bookings/[id]/rental-documents-card";
 import { PendingAmendmentCard } from "@/app/bookings/[id]/pending-amendment-card";
-import { amendmentRows } from "@/lib/rental-amendments";
 import { businessSignatureOf, getBookingRentalDocuments, renterSignatureOf, type BookingRentalDocument } from "@/lib/booking-rental-documents";
 
 function money(value: unknown, currency = "THB") {
@@ -191,12 +189,6 @@ function statusTone(status: string): "green" | "amber" | "red" | "blue" | "neutr
   return "neutral";
 }
 
-function documentTone(status?: string | null): "green" | "amber" | "red" {
-  if (status === "complete") return "green";
-  if (status === "no_documents") return "red";
-  return "amber";
-}
-
 function documentLabel(status: string | null | undefined, tx: Tx) {
   if (status === "complete") return tx.say("doc_complete");
   if (status === "no_documents") return tx.say("doc_none");
@@ -277,30 +269,6 @@ function ActionButton({ href, children, tone = "primary" }: { href: Route; child
 
 function SectionEmpty({ children }: { children: React.ReactNode }) {
   return <p className="empty-state text-sm">{children}</p>;
-}
-
-function BookingMetricCard({
-  icon,
-  label,
-  children
-}: {
-  icon: React.ReactNode;
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <Card>
-      <div className="card-section flex min-h-[118px] flex-col">
-        <div className="mb-3 flex items-center gap-2">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--primary-light)] text-[var(--primary)]">
-            {icon}
-          </span>
-          <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--muted)]">{label}</p>
-        </div>
-        <div className="min-w-0 flex-1 space-y-1">{children}</div>
-      </div>
-    </Card>
-  );
 }
 
 export default async function BookingDetailPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams?: Promise<{ updated?: string; success?: string }> }) {
@@ -1224,6 +1192,22 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               tone={financialState.tone === "red" ? "red" : financialState.tone === "green" ? "green" : financialState.tone === "amber" ? "amber" : "neutral"}
             >
               <div className="space-y-3">
+                {/* Every rent payment as a block, in date order: what is paid, owed, due today and still to come. */}
+                <PaymentStrip
+                  legend={{ paid: tx.say("strip_paid"), owed: tx.say("strip_owed"), today: tx.say("strip_today"), later: tx.say("strip_later") }}
+                  payments={[...rentPaymentsAll]
+                    .filter((payment: any) => payment.due_date)
+                    .sort((a: any, b: any) => String(a.due_date).localeCompare(String(b.due_date)))
+                    .map((payment: any) => {
+                      const due = String(payment.due_date).slice(0, 10);
+                      const state = payment.status === "paid" ? "paid" : due < today ? "owed" : due === today ? "today" : "later";
+                      return {
+                        key: payment.id,
+                        state,
+                        tip: `${shortDate(due, tx.locale)} · ${money(payment.amount, rental.currency)} · ${tx.say(`strip_${state}`)}`
+                      } as const;
+                    })}
+                />
                 {(() => {
                   // Back early with rent unpaid (set at the return): take off the days after, or keep the booking as it was.
                   const rows = (payments as any[]).filter((payment) => payment.metadata?.early_return_owed && !payment.metadata.early_return_owed.decided && ["scheduled", "pending", "failed", "overdue"].includes(String(payment.status)));

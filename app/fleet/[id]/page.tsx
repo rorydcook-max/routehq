@@ -22,7 +22,6 @@ import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { getDefaultOrganization } from "@/lib/organization";
 import { TASK_TYPE_OPTIONS } from "@/lib/tasks";
-import { isRevenueTransaction } from "@/lib/transaction-options";
 import { getVehicleDetail, type VehicleDetail } from "@/lib/vehicle-detail";
 import { isQuietActivityEvent } from "@/lib/activity-noise";
 import { activityTitle, visibleActivity } from "@/lib/activity-display";
@@ -748,10 +747,6 @@ function TransactionsSection({ detail }: { detail: VehicleDetail }) {
   const tx = useVx();
   const moneyWords = useTranslations("money");
   const typeName = (type: string) => (moneyWords.has(`type_${type}` as never) ? (moneyWords as unknown as Say)(`type_${type}`) : type.replace(/_/g, " "));
-  const totalIncome = detail.transactions
-    .filter((transaction) => isRevenueTransaction({ amount: Number(transaction.amount || 0), isDeposit: transaction.is_deposit, type: transaction.type }))
-    .reduce((sum, transaction) => sum + Math.abs(Number(transaction.amount || 0)), 0);
-  const totalExpense = detail.transactions.filter((transaction) => expenseTypes.has(transaction.type)).reduce((sum, transaction) => sum + Math.abs(Number(transaction.amount || 0)), 0);
 
   return (
     <Part title={tx.say("x_title")}>

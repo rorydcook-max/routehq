@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { longDate } from "@/lib/i18n/dates";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
-import { AtSign, Copy, Instagram, Mail, MessageCircle, Phone, Send, Smartphone, StickyNote } from "lucide-react";
+import { Copy, Instagram, Mail, MessageCircle, Phone, Send, StickyNote } from "lucide-react";
 import { addCommunicationNote } from "@/app/actions/communication";
 import { Badge } from "@/components/ui";
 

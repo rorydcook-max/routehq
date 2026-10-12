@@ -1,5 +1,5 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { sendLinePushMessage, lineText, lineFlex } from "@/lib/providers/messaging/line";
+import { sendLinePushMessage, lineFlex } from "@/lib/providers/messaging/line";
 
 const THB = (n: number) =>
   new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB", maximumFractionDigits: 0 }).format(n);

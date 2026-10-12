@@ -10,7 +10,6 @@ import { BrandStyle } from "@/components/brand-style";
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("customer");
-  const locale = await getLocale();
   return { title: t("amendTitle"), robots: { index: false, follow: false } };
 }
 

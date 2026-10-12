@@ -12,7 +12,6 @@ import { Breakdown, MonthRows, money } from "../../reports-view";
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
 const PRESETS: DatePreset[] = ["this_month", "last_month", "last_3_months", "last_6_months", "this_year", "last_year", "custom"];
-const BAHT = "฿";
 const h2 = "text-[17px] font-bold text-[var(--foreground)]";
 const soft = "font-medium text-[var(--foreground-secondary)]";
 const tile = "rounded-xl bg-[var(--panel-secondary)] p-3.5";

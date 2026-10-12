@@ -6,7 +6,7 @@ import { businessToday, daysFromToday as businessDaysFromToday } from "@/lib/bus
 import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { CalendarDays, Clock, Search, Trash2, UserRound, MoreHorizontal } from "lucide-react";
+import { Clock, Search, Trash2, MoreHorizontal } from "lucide-react";
 import { deleteBooking, extendBookingHold } from "@/app/actions/bookings";
 import { CancelBookingButton } from "@/app/bookings/[id]/cancel-booking-button";
 import { UndoCancellationButton } from "@/app/bookings/[id]/undo-cancellation-button";
@@ -52,10 +52,6 @@ function formatRange(start: string | null | undefined, end: string | null | unde
 
 function vehicleTitle(vehicle: any) {
   return [vehicle?.make, vehicle?.model, vehicle?.trim].filter(Boolean).join(" ");
-}
-
-function bookingReference(booking: any) {
-  return booking?.reference || booking?.display_code || booking?.id?.slice(0, 8) || "Booking";
 }
 
 function statusTone(status: string): "green" | "amber" | "red" | "blue" | "neutral" {

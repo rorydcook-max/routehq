@@ -7,7 +7,7 @@ import { businessToday, daysFromToday } from "@/lib/business-time";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
-import { AlertTriangle, CalendarCheck, CalendarPlus, CheckCircle2, FileText, ImageIcon, MessageCircle } from "lucide-react";
+import { AlertTriangle, CalendarCheck, CalendarPlus, FileText, ImageIcon, MessageCircle } from "lucide-react";
 import { submitCustomerPortalAction } from "@/app/actions/public-booking";
 import type { PortalBundle, PortalPayment } from "@/lib/payment-receipts";
 import { planFor, quoteStay, type Rates } from "@/lib/rental-estimate";

@@ -22,7 +22,6 @@ import { MessagingPanel } from "@/app/settings/messaging-panel";
 import { webhookReachable, webhookUrl } from "@/lib/inbox/store";
 import { LineTestButton } from "@/app/settings/line-test-button";
 import { LineConnectPanel } from "@/app/settings/line-connect-panel";
-import { supportedLocaleOptions } from "@/lib/i18n/locales";
 import { InviteForm } from "@/app/invite/invite-form";
 import { PaymentMethodsForm } from "@/app/settings/payment-methods-form";
 import { ExtrasPanel, SeasonsPanel } from "@/app/settings/price-rules-panel";

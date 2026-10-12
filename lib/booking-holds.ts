@@ -1,4 +1,4 @@
-import { completeRentalJobs, remindRentalCustomerOnce, tellRentalCustomer } from "@/lib/customer-messages";
+import { remindRentalCustomerOnce, tellRentalCustomer } from "@/lib/customer-messages";
 import { bookingRules, clashes } from "@/lib/booking-rules";
 
 export { clashes };

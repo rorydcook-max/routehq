@@ -2217,7 +2217,11 @@
     "track_paidTo": "จ่ายถึง {date}",
     "track_paidAll": "จ่ายค่าเช่าครบแล้ว",
     "track_owed": "ค้าง {amount} ตั้งแต่ {date}",
-    "track_next": "{amount} ครบกำหนด {date}"
+    "track_next": "{amount} ครบกำหนด {date}",
+    "strip_paid": "จ่ายแล้ว",
+    "strip_owed": "ค้างชำระ",
+    "strip_today": "ครบกำหนดวันนี้",
+    "strip_later": "งวดถัดไป"
   },
   "newBooking": {
     "pageBack": "กลับไปที่การจอง",
@@ -4626,6 +4630,25 @@
     "plan_starter": "Starter",
     "plan_growth": "Growth",
     "plan_pro": "Pro",
-    "plan_business": "Business"
+    "plan_business": "Business",
+    "teamLink": "ทีม RouteHQ: ข้อความที่รอตอบ",
+    "teamTitle": "ความช่วยเหลือ: ทุกธุรกิจ",
+    "teamSubtitle": "ข้อความจากทุกธุรกิจ คำตอบที่นี่จะถึงธุรกิจใน RouteHQ พร้อมการแจ้งเตือน",
+    "teamFilter_waiting": "รอเราตอบ",
+    "teamFilter_all": "ทั้งหมด",
+    "teamStatus_open": "รอตอบ",
+    "teamStatus_answered": "ตอบแล้ว",
+    "teamStatus_closed": "เรียบร้อย",
+    "teamNothingWaiting": "ไม่มีข้อความรอ",
+    "teamPlan": "แพ็กเกจ",
+    "teamYearly": "รายปี",
+    "teamMonthly": "รายเดือน",
+    "teamImport": "บริการนำเข้าข้อมูล",
+    "teamImportIncluded": "รวมอยู่แล้ว (Growth รายปีขึ้นไป)",
+    "teamImportNot": "ไม่รวม",
+    "teamPrefers": "ติดต่อทาง",
+    "teamReplyOn": "ตอบทาง {channel}",
+    "teamReplyTitle": "ตอบในนาม RouteHQ",
+    "teamReplyNote": "ธุรกิจจะเห็นข้อความนี้ในหน้าความช่วยเหลือและได้รับการแจ้งเตือน"
   }
 }

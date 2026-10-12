@@ -2,18 +2,16 @@
 
 import { said } from "@/lib/i18n/server-text";
 import { promptPayQrPath } from "@/lib/promptpay-qr";
-import { businessToday } from "@/lib/business-time";
 import { revalidatePath } from "next/cache";
 import { SIGNATURE_AUTHORISATION_TEXT, SIGNATURE_AUTHORISATION_TEXT_VERSION } from "@/lib/signature-authorisation";
 import { redirect } from "next/navigation";
 import OpenAI from "openai";
-import { browserSafeAssetUrl, canonicalBrandingReferenceFromSettings, parseLegacyBrandingReference } from "@/lib/branding-assets";
+import { browserSafeAssetUrl, parseLegacyBrandingReference } from "@/lib/branding-assets";
 import { supportedCalendarCodes } from "@/lib/i18n/calendars";
 import { supportedLocaleCodes } from "@/lib/i18n/locales";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { getDefaultOrganizationSlug } from "@/lib/supabase/config";
 import { jurisdictionByCountry, mergeTravelPolicySettings, type HomeTerritoryType, type IslandTravelPolicy } from "@/lib/travel-policy";
 import { buildDailySummaryMessage, sendLineMessage } from "@/services/messaging/line";
 import { requireOwner } from "@/lib/auth/roles";
@@ -123,14 +121,6 @@ function assertRasterImageBytes(buffer: Buffer, extension: string, label: string
   if ((extension === "png" && !isPng) || (extension === "jpg" && !isJpeg) || (extension === "webp" && !isWebp)) {
     throw new Error(`${label} file contents do not match the selected image format.`);
   }
-}
-
-function storagePathFromPublicUrl(url: string | null | undefined) {
-  if (!url) return null;
-  const marker = "/storage/v1/object/public/documents/";
-  const index = url.indexOf(marker);
-  if (index < 0) return null;
-  return decodeURIComponent(url.slice(index + marker.length).split("?")[0]);
 }
 
 function settingsObject(value: unknown): Record<string, unknown> {

@@ -29,10 +29,6 @@ function money(value: number, currency = "THB") {
   return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Math.abs(value));
 }
 
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
-}
-
 function inputDate(value: string) {
   return String(value || "").slice(0, 10);
 }
@@ -42,13 +38,6 @@ function transactionKind(transaction: TransactionListItem): TransactionKind {
   if (transaction.type === "deposit_received" || transaction.type === "deposit" || transaction.isDeposit) return "deposit_received";
   if (isIncomeTransactionType(transaction.type)) return "income";
   return "expense";
-}
-
-function badgeForKind(kind: TransactionKind) {
-  if (kind === "deposit_received") return { label: "Deposit received", className: "border-[var(--warning-line)] bg-[var(--warning-light)] text-[var(--warning)]" };
-  if (kind === "deposit_refunded") return { label: "Deposit refunded", className: "border-[var(--warning-line)] bg-[var(--warning-light)] text-[var(--warning)]" };
-  if (kind === "income") return { label: "Income", className: "border-[var(--success-line)] bg-[var(--success-light)] text-[var(--success)]" };
-  return { label: "Expense", className: "border-[var(--border)] bg-[var(--panel-secondary)] text-[var(--foreground-secondary)]" };
 }
 
 function amountPresentation(transaction: TransactionListItem) {

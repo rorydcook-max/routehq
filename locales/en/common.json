@@ -137,7 +137,9 @@
     "lotTipOut": "goes out to {who} today",
     "lotTipOpen": "with {who}, no end date",
     "lotTipUntil": "with {who} until {date}",
-    "lotTipFreeUntil": "free until {date}"
+    "lotTipFreeUntil": "free until {date}",
+    "profitWeeks": "Profit week by week",
+    "weekTip": "Week of {date}: {amount}"
   },
   "nav": {
     "main": "Main",

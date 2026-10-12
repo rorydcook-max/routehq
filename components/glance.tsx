@@ -195,11 +195,11 @@ const LOT_COLOUR: Record<LotState, string> = {
 const LOT_ORDER: LotState[] = ["late", "back", "out", "rent", "free", "off"];
 
 /** The fleet as a car park: every vehicle drawn in its own colour, with a bar under it saying what it is doing. Point at one for who has it and until when. */
-export function FleetLot({ vehicles, labels, title, action }: { vehicles: LotVehicle[]; labels: Record<LotState, string>; title: string; action?: ReactNode }) {
+export function FleetLot({ vehicles, labels, title, action, compact = false }: { vehicles: LotVehicle[]; labels: Record<LotState, string>; title: string; action?: ReactNode; compact?: boolean }) {
   const sorted = [...vehicles].sort((a, b) => LOT_ORDER.indexOf(a.state) - LOT_ORDER.indexOf(b.state));
   const counts = LOT_ORDER.map((state) => ({ state, count: vehicles.filter((vehicle) => vehicle.state === state).length })).filter((entry) => entry.count > 0);
   return (
-    <section className="card p-4 lg:p-5">
+    <section className="card rise p-4 lg:p-5">
       <header className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
         <h2 className="text-[20px] text-[var(--foreground)] lg:text-[22px]">{title}</h2>
         {action}
@@ -218,11 +218,11 @@ export function FleetLot({ vehicles, labels, title, action }: { vehicles: LotVeh
           </span>
         ))}
       </p>
-      <ul className="mt-4 grid grid-cols-4 gap-x-2 gap-y-3 sm:grid-cols-6 xl:grid-cols-8">
+      <ul className={`mt-4 grid grid-cols-4 gap-x-2 gap-y-3 ${compact ? "" : "sm:grid-cols-6 xl:grid-cols-8"}`}>
         {sorted.map((vehicle, index) => (
           <li className="rise" key={vehicle.id} style={{ ["--d" as string]: `${200 + index * 35}ms` } as CSSProperties}>
             <Link aria-label={vehicle.tip} className="lot-spot group relative flex flex-col items-center gap-1.5 rounded-2xl p-1.5 outline-none transition hover:bg-[var(--panel-secondary)] focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]" data-tip={vehicle.tip} href={vehicle.href as Route}>
-              <span className={`transition duration-200 group-hover:-translate-y-0.5 lg:scale-110 ${vehicle.state === "off" ? "opacity-50 grayscale" : ""}`}>{vehicle.art}</span>
+              <span className={`transition duration-200 group-hover:-translate-y-0.5 ${compact ? "" : "lg:scale-110"} ${vehicle.state === "off" ? "opacity-50 grayscale" : ""}`}>{vehicle.art}</span>
               <span className="h-1.5 w-10 rounded-full" style={{ background: LOT_COLOUR[vehicle.state] }} />
               <span className="w-full truncate text-center font-semibold text-[var(--foreground)]">{vehicle.name}</span>
             </Link>
@@ -268,5 +268,34 @@ export function PaymentStrip({ payments, legend }: { payments: StripPayment[]; l
         ))}
       </p>
     </div>
+  );
+}
+
+/** A small line of how a number moved, oldest first. Point at a point for its value. Below zero shows under a dashed line. */
+export function Spark({ points, label, color = "var(--chart-in)" }: { points: Array<{ key: string; value: number; tip: string }>; label: string; color?: string }) {
+  if (points.length < 2) return null;
+  const width = 100;
+  const height = 40;
+  const values = points.map((point) => point.value);
+  const max = Math.max(0, ...values);
+  const min = Math.min(0, ...values);
+  const span = max - min || 1;
+  const x = (index: number) => (index / (points.length - 1)) * width;
+  const y = (value: number) => height - 3 - ((value - min) / span) * (height - 6);
+  const line = points.map((point, index) => `${index ? "L" : "M"}${x(index).toFixed(2)} ${y(point.value).toFixed(2)}`).join(" ");
+  const step = 100 / (points.length - 1);
+  return (
+    <span aria-label={label} className="relative mt-3 block h-14" role="img" style={{ color }}>
+      <svg aria-hidden="true" className="wipe absolute inset-0 h-full w-full overflow-visible" preserveAspectRatio="none" viewBox={`0 0 ${width} ${height}`}>
+        <path d={`${line} L${width} ${height} L0 ${height} Z`} fill="currentColor" fillOpacity={0.12} />
+        {min < 0 ? <line stroke="var(--border-strong)" strokeDasharray="3 3" vectorEffect="non-scaling-stroke" x1={0} x2={width} y1={y(0)} y2={y(0)} /> : null}
+        <path d={line} fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} vectorEffect="non-scaling-stroke" />
+      </svg>
+      {points.map((point, index) => (
+        <span className={`spark-hit ${index === points.length - 1 ? "last" : ""}`} data-tip={point.tip} key={point.key} style={{ left: `calc(${index * step}% - ${step / 2}%)`, width: `${step}%` }} tabIndex={0}>
+          <span className="spark-dot" style={{ top: `${(y(point.value) / height) * 100}%` }} />
+        </span>
+      ))}
+    </span>
   );
 }

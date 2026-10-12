@@ -40,7 +40,7 @@ export default async function BookingsPage() {
           <div className="mt-4">
             <BandPills
               items={[
-                { count: onRent, label: t("bandOnRent"), dot: "#ffffff" },
+                { count: onRent, label: t("bandOnRent"), dot: "var(--band-dot)" },
                 { count: starting, label: t("bandStarting"), dot: "var(--going-out)" },
                 { count: owing, label: t("bandOwing"), alert: true }
               ]}

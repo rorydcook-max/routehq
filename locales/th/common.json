@@ -137,7 +137,9 @@
     "lotTipOut": "ส่งให้ {who} วันนี้",
     "lotTipOpen": "อยู่กับ {who} ไม่มีวันสิ้นสุด",
     "lotTipUntil": "อยู่กับ {who} ถึง {date}",
-    "lotTipFreeUntil": "ว่างถึง {date}"
+    "lotTipFreeUntil": "ว่างถึง {date}",
+    "profitWeeks": "กำไรรายสัปดาห์",
+    "weekTip": "สัปดาห์ {date}: {amount}"
   },
   "vehicles": {
     "addVehicle": "เพิ่มยานพาหนะใหม่",

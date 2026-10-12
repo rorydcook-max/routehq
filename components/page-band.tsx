@@ -41,7 +41,7 @@ export function PageBand({
 
 /** A tab or filter that sits on the band: white when chosen, see-through otherwise. */
 export function bandTab(active: boolean) {
-  return `pressable inline-flex min-h-10 items-center rounded-full px-4 font-bold ${active ? "bg-white text-[var(--foreground)]" : "bg-[var(--band-soft)] text-white"}`;
+  return `pressable inline-flex min-h-10 items-center rounded-full px-4 font-bold ${active ? "band-tab-on bg-white text-[var(--foreground)]" : "bg-[var(--band-soft)] text-white"}`;
 }
 
 /**
@@ -54,7 +54,7 @@ export function BandPills({ items }: { items: Array<{ count: number; label: stri
       {items.map((item) => {
         const loud = !!item.alert && item.count > 0;
         return (
-          <span className={`inline-flex items-center gap-1.5 rounded-2xl px-3 py-2 ${loud ? "bg-white text-[var(--foreground)]" : "bg-[var(--band-soft)] text-white"}`} key={item.label}>
+          <span className={`inline-flex items-center gap-1.5 rounded-2xl px-3 py-2 ${loud ? "band-loud bg-white text-[var(--foreground)]" : "bg-[var(--band-soft)] text-white"}`} key={item.label}>
             {item.dot ? <span aria-hidden="true" className="inline-block h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ background: item.dot }} /> : null}
             <span className={`num text-[22px] leading-none ${loud ? "text-[var(--danger)]" : ""}`}>{item.count}</span>
             <span className="font-semibold">{item.label}</span>

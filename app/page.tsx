@@ -3,7 +3,7 @@ import type { Route } from "next";
 import type { CSSProperties, ReactNode } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { dayOfWeekDate, intlLocale, shortDate as shortDateIn } from "@/lib/i18n/dates";
-import { ArrowRight, Bell, CheckCircle2, Clock3, FileWarning, KeyRound, Lock, Plus, ReceiptText, RotateCcw, Wallet, MessageCircle } from "lucide-react";
+import { ArrowRight, Bell, Car, CheckCircle2, TrendingUp, Clock3, FileWarning, KeyRound, Lock, Plus, ReceiptText, RotateCcw, Wallet, MessageCircle } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { businessToday } from "@/lib/business-time";
 import { OnboardingChecklist } from "@/components/onboarding-checklist";
@@ -21,7 +21,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isExpenseTransaction, isRevenueTransaction } from "@/lib/transaction-options";
 import { kindFromCategory } from "@/lib/vehicle-groups";
 import { VehicleArt, paintOf } from "@/components/vehicle-art";
-import { Dot, FleetLot, InOutBars, TileHead, WeekPlanner, type LotState, type LotVehicle, type PlannerBar, type PlannerLane } from "@/components/glance";
+import { Dot, FleetLot, InOutBars, Ring, Spark, TileHead, WeekPlanner, type LotState, type LotVehicle, type PlannerBar, type PlannerLane } from "@/components/glance";
 
 // Dates and counts are worded by the translation files (see lib/i18n/dates.ts and locales/).
 function addDays(isoDate: string, days: number) {
@@ -504,7 +504,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
         <p className="font-semibold text-white/90">{headerDate}</p>
         <h1 className="mt-0.5 text-[34px] leading-[1.05] tracking-[-0.025em] text-white lg:text-[44px]">{greeting}</h1>
         <div className="mt-4 flex flex-wrap gap-2">
-          {urgentCount > 0 ? pill(urgentCount, t("pillUrgent"), "#f6b7a3") : null}
+          {urgentCount > 0 ? pill(urgentCount, t("pillUrgent"), "var(--band-alert)") : null}
           {pill(todayItems.length, t("pillToDo"))}
           {pill(weekDays[0].out, t("pillOut"), "var(--going-out)")}
           {pill(weekDays[0].back, t("pillBack"), "var(--coming-back)")}
@@ -613,6 +613,54 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
     ))
   ];
 
+  // ── Computers: four numbers across the top, each with a small picture ──
+  const onRoad = lot.filter((vehicle) => vehicle.state === "rent" || vehicle.state === "back" || vehicle.state === "late").length;
+  const onRoadPct = vehicles.length > 0 ? Math.round((onRoad / vehicles.length) * 100) : 0;
+  // Eight weeks of profit (money in less money out, deposits left out), oldest first, the last being this week.
+  const sparkWeeks = Array.from({ length: 8 }, (_, index) => {
+    const from = addDays(today, -mondayOffset - (7 - index) * 7);
+    const to = addDays(from, 6);
+    const inWeek = transactions.filter((x) => String(x.date || "").slice(0, 10) >= from && String(x.date || "").slice(0, 10) <= to);
+    const net = inWeek.filter(isIn).reduce((sum, x) => sum + x.amount, 0) - inWeek.filter(isOut).reduce((sum, x) => sum + Math.abs(x.amount), 0);
+    return { key: from, value: net, tip: t("weekTip", { date: shortDate(from), amount: money(net) }) };
+  });
+  const roadCard =
+    vehicles.length > 0 ? (
+      <Link className="card pressable tile p-4 text-[var(--foreground)]" href="/fleet">
+        <TileHead icon={<Car size={22} />} title={t("outEarning")} />
+        <span className="flex items-center gap-4">
+          <Ring label={`${onRoadPct}%`} pct={onRoadPct} size={76} />
+          <span className="font-semibold text-[var(--foreground-secondary)]">{t("earningShort", { out: onRoad, total: vehicles.length })}</span>
+        </span>
+      </Link>
+    ) : null;
+  const moneyKpi = isOwner ? (
+    <Link className="card pressable tile !overflow-visible p-4 text-[var(--foreground)]" href="/reports">
+      <TileHead icon={<TrendingUp size={22} />} title={t("monthSoFar", { month: monthName })} />
+      <span className="block">
+        <span className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+          <span className={`num text-[28px] leading-none ${monthlyProfit < 0 ? "text-[var(--danger)]" : ""}`}>{money(monthlyProfit)}</span>
+          {lastMonthSoFar.length > 0 ? (
+            <span className={`delta-chip ${profitChange < 0 ? "down" : "up"}`} data-tip={profitChange < 0 ? t("profitDown", { amount: money(Math.abs(profitChange)) }) : t("profitUp", { amount: money(profitChange) })}>
+              {profitChange < 0 ? "↓" : "↑"} {money(Math.abs(profitChange))}
+            </span>
+          ) : null}
+        </span>
+        <Spark label={t("profitWeeks")} points={sparkWeeks} />
+      </span>
+    </Link>
+  ) : null;
+  const fourth = smallTiles.find((tile) => tile.key === "deposits") || smallTiles.find((tile) => tile.key === "next") || null;
+  const stripTiles = [
+    roadCard ? { key: "road", node: roadCard } : null,
+    moneyKpi ? { key: "money", node: moneyKpi } : null,
+    smallTiles.find((tile) => tile.key === "owed") || null,
+    fourth
+  ].filter(Boolean) as Array<{ key: string; node: ReactNode }>;
+  const sideTiles = smallTiles.filter((tile) => tile.key !== "owed" && tile.key !== fourth?.key);
+  const STRIP_COLS: Record<number, string> = { 1: "lg:grid-cols-1", 2: "lg:grid-cols-2", 3: "lg:grid-cols-3", 4: "lg:grid-cols-4" };
+  const lotLabels = { late: t("legendLate"), back: t("weekBack"), rent: t("legendOnRent"), out: t("weekOut"), free: t("lotFree"), off: t("lotOff") };
+
   return (
     <AppShell heroOverlap hero={hero} userEmail={userEmail}>
 
@@ -628,10 +676,18 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       ) : null}
 
       {/* Phones: the week, then the tiles, then the day. Computers: the week and the day on the left, the tiles in a column on the right, both rising over the band. */}
+      {stripTiles.length > 0 ? (
+        <div className={`relative z-10 mb-6 hidden gap-4 lg:grid ${STRIP_COLS[stripTiles.length]}`}>
+          {stripTiles.map((tile, index) => (
+            <div className="rise min-w-0 [&>a]:h-full [&>span]:h-full" key={tile.key} style={{ ["--d" as string]: `${index * 70}ms` } as CSSProperties}>{tile.node}</div>
+          ))}
+        </div>
+      ) : null}
+
       <div className="grid gap-5 lg:grid-cols-12 lg:gap-6">
-        <div className="min-w-0 space-y-5 lg:col-span-7 2xl:col-span-8">
+        <div className="min-w-0 space-y-5 lg:col-span-8">
           {lanes.length > 0 ? (
-            <section className="card rise relative -mt-12 p-3 pb-2 lg:-mt-16 lg:p-5 lg:pb-3">
+            <section className="card rise relative -mt-12 p-3 pb-2 lg:mt-0 lg:p-5 lg:pb-3">
               <header className="flex items-baseline justify-between gap-3 px-1 pb-2">
                 <h2 className="text-[20px] text-[var(--foreground)] lg:text-[22px]">{t("thisWeek")}</h2>
                 <PanelLink href="/calendar">{t("calendar")}</PanelLink>
@@ -652,13 +708,11 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
             </section>
           ) : null}
 
+          {/* Phones: the car park comes after the week. Computers have it in the side column. */}
           {lot.length > 0 ? (
-            <FleetLot
-              action={<PanelLink href="/fleet">{t("fleet")}</PanelLink>}
-              labels={{ late: t("legendLate"), back: t("weekBack"), rent: t("legendOnRent"), out: t("weekOut"), free: t("lotFree"), off: t("lotOff") }}
-              title={t("yourFleet")}
-              vehicles={lot}
-            />
+            <div className="lg:hidden">
+              <FleetLot action={<PanelLink href="/fleet">{t("fleet")}</PanelLink>} labels={lotLabels} title={t("yourFleet")} vehicles={lot} />
+            </div>
           ) : null}
 
           {/* On a phone the tiles come straight after the week. */}
@@ -694,7 +748,16 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
         </div>
 
         {/* On a computer the tiles stand in their own column beside the week. */}
-        <aside className="hidden min-w-0 content-start gap-3 lg:col-span-5 lg:-mt-16 lg:grid lg:grid-cols-2 2xl:col-span-4">{tiles}</aside>
+        <aside className="hidden min-w-0 content-start gap-5 lg:col-span-4 lg:grid">
+          {sideTiles.length > 0 ? (
+            <div className="grid grid-cols-2 gap-3">
+              {sideTiles.map((tile, index) => (
+                <div className={`rise min-w-0 [&>a]:h-full [&>span]:h-full ${index === sideTiles.length - 1 && sideTiles.length % 2 === 1 ? "col-span-2" : ""}`} key={tile.key} style={{ ["--d" as string]: `${240 + index * 70}ms` } as CSSProperties}>{tile.node}</div>
+              ))}
+            </div>
+          ) : null}
+          {lot.length > 0 ? <FleetLot compact action={<PanelLink href="/fleet">{t("fleet")}</PanelLink>} labels={lotLabels} title={t("yourFleet")} vehicles={lot} /> : null}
+        </aside>
       </div>
 
       <div className="mt-6 space-y-4">

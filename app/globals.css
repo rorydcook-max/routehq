@@ -1621,3 +1621,83 @@ h2 { letter-spacing: -0.015em; }
 .chart-col:hover > .chart-bars span { filter: brightness(1.12); }
 .chart-col { border-radius: 8px; }
 .chart-col:hover { background: var(--panel-secondary); }
+
+/* ── Look G, round 4: computers get a light header ─────────────────────────
+   On a phone the band stays a block of the business colour behind the logo.
+   On a computer it was a big solid slab (Rory, 12 Oct): there the page opens on
+   its own background, the name in dark Prompt, the counts as white chips. */
+:root {
+  --band-dot: #ffffff;
+  --band-alert: #f6b7a3;
+}
+@media (min-width: 1024px) {
+  .hero-band {
+    --band-soft: #ffffff;
+    --band-dot: var(--on-rent);
+    --band-alert: var(--danger);
+    background: transparent !important;
+    color: var(--foreground) !important;
+    overflow: visible !important;
+    border-radius: 0 !important;
+    padding: 6px 2px 24px !important;
+    margin-bottom: 0 !important;
+  }
+  .hero-band .band-art { display: none; }
+  .hero-band .text-white { color: var(--foreground); }
+  .hero-band :is(.text-white\/90, .text-white\/85, .text-white\/80) { color: var(--foreground-secondary); }
+  .hero-band [class*="bg-[var(--band-soft)]"] { box-shadow: var(--shadow-card); }
+  .hero-band .band-tab-on { background: var(--primary); color: #fff; }
+  .hero-band .band-loud { background: var(--danger-light); }
+}
+
+/* A number's change, as a small chip: green up, brick down. Point at it for the sentence. */
+.delta-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.delta-chip.up { background: var(--success-light); color: var(--success); }
+.delta-chip.down { background: var(--danger-light); color: var(--danger); }
+
+/* Sparkline: each point has a hover area; the latest point always shows. */
+.spark-hit { position: absolute; top: 0; bottom: 0; outline: none; }
+.spark-dot {
+  position: absolute;
+  left: 50%;
+  width: 11px;
+  height: 11px;
+  margin: -5.5px 0 0 -5.5px;
+  border-radius: 999px;
+  background: #fff;
+  border: 3px solid currentColor;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+.spark-hit:hover .spark-dot,
+.spark-hit:focus-visible .spark-dot,
+.spark-hit.last .spark-dot { opacity: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .wipe { animation: g-wipe 1000ms cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: var(--d, 250ms); }
+}
+@keyframes g-wipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+
+/* On the light header the page's main action is a solid button in the business colour. */
+@media (min-width: 1024px) {
+  .hero-band [class*="bg-[var(--band-action)]"] { background: var(--primary); color: #fff; box-shadow: var(--shadow-card); }
+  .hero-band [class*="bg-[var(--band-action)]"]:hover { background: var(--primary-hover); }
+}
+
+/* A sparkline's label opens below it, so it never covers the number above. */
+.spark-hit[data-tip]::after { bottom: auto; top: calc(100% + 8px); transform: translate(-50%, -4px); }
+.spark-hit[data-tip]:hover::after, .spark-hit[data-tip]:focus-visible::after { transform: translate(-50%, 0); }
+
+/* The side menu sits on the page's own background, no dividing line; the page you are on is a white chip that lifts. */
+.app-sidebar { background: var(--background); border-right-color: transparent; }
+.app-sidebar nav a[class*="bg-[var(--primary-light)]"] { background: #fff; box-shadow: var(--shadow-card); font-weight: 700; }
+.app-sidebar nav a:not([class*="bg-[var(--primary-light)]"]):hover { background: rgba(255, 255, 255, 0.7); }

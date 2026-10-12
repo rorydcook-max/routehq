@@ -144,7 +144,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
   return (
     <div className="min-h-screen pb-28 lg:pb-0">
       <BrandStyle colour={brand?.colour} />
-      <aside className="fixed left-0 top-0 z-20 hidden h-screen w-[220px] flex-col border-r border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] px-3 py-4 lg:flex">
+      <aside className="app-sidebar fixed left-0 top-0 z-20 hidden h-screen w-[220px] flex-col border-r border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] px-3 py-4 lg:flex">
         <div className="mb-4 flex items-center px-2 pt-1">
           {brandLogo || <RouteHqLogo />}
         </div>
@@ -258,7 +258,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
           </div>
           ) : null;
           return hero ? (
-            <div className={`relative -mx-[14px] -mt-[14px] overflow-hidden rounded-b-[32px] bg-[var(--band)] px-[14px] pt-[14px] text-[var(--band-ink)] sm:-mx-6 sm:-mt-5 sm:px-6 lg:mx-0 lg:mt-0 lg:rounded-[28px] lg:px-8 lg:pt-7 ${heroOverlap ? "mb-0 pb-10 lg:pb-[72px]" : "mb-4 pb-6 lg:mb-5 lg:pb-7"}`}>
+            <div className={`hero-band relative -mx-[14px] -mt-[14px] overflow-hidden rounded-b-[32px] bg-[var(--band)] px-[14px] pt-[14px] text-[var(--band-ink)] sm:-mx-6 sm:-mt-5 sm:px-6 lg:mx-0 lg:mt-0 lg:rounded-[28px] lg:px-8 lg:pt-7 ${heroOverlap ? "mb-0 pb-10 lg:pb-[72px]" : "mb-4 pb-6 lg:mb-5 lg:pb-7"}`}>
               <svg aria-hidden="true" className="band-art" viewBox="0 0 420 320">
                 <circle cx="250" cy="150" fill="none" r="96" stroke="currentColor" strokeOpacity="0.16" strokeWidth="2" />
                 <circle cx="250" cy="150" fill="none" r="146" stroke="currentColor" strokeOpacity="0.11" strokeWidth="2" />

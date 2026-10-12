@@ -90,12 +90,12 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
               </Link>
             </div>
           </div>
-          <div className="mt-4 flex flex-wrap gap-2 pb-6 lg:pb-8">
+          <div className="mt-4 flex flex-wrap gap-2 pb-6 lg:pb-0">
             {[
               { count: vehicles.length, label: t("bandVehicles", { count: vehicles.length }), dot: null },
-              { count: totalOut, label: t("bandOut"), dot: "#ffffff" },
+              { count: totalOut, label: t("bandOut"), dot: "var(--band-dot)" },
               { count: totalFree, label: t("bandFree"), dot: "var(--going-out)" },
-              ...(attention > 0 ? [{ count: attention, label: t("bandAttention"), dot: "#f6b7a3" }] : [])
+              ...(attention > 0 ? [{ count: attention, label: t("bandAttention"), dot: "var(--band-alert)" }] : [])
             ].map((pill) => (
               <span className="inline-flex items-center gap-1.5 rounded-2xl bg-[var(--band-soft)] px-3 py-2 text-white" key={pill.label}>
                 {pill.dot ? <Dot color={pill.dot} /> : null}
@@ -109,7 +109,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
       userEmail={userEmail}
     >
       {vehicles.length > 0 ? (
-        <div className="relative -mt-12 mb-5 grid grid-cols-2 gap-3 lg:-mt-14 lg:grid-cols-4">
+        <div className="relative -mt-12 mb-5 grid grid-cols-2 gap-3 lg:mt-0 lg:grid-cols-4">
           <Link className="card pressable tile p-4 text-[var(--foreground)]" href="/calendar">
             <TileHead title={t("busyTitle")} />
             <span className="flex items-center gap-3">

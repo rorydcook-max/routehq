@@ -9,7 +9,7 @@ import { ScrollToToday } from "./scroll-to-today";
 
 const barClasses: Record<AvailabilityBooking["state"], string> = {
   out: "bg-[var(--primary)] text-white",
-  booked: "border border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]",
+  booked: "bg-[var(--going-out)] text-[#13262b]",
   late: "bg-[var(--danger)] text-white",
   returned: "bg-[var(--panel-secondary)] text-[var(--muted)] border border-[var(--border)]"
 };

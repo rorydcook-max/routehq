@@ -2969,7 +2969,14 @@
     "dnr_placeholder": "เช่น ไม่จ่ายค่าเสียหายแล้วหายไป",
     "dnr_hint": "ใครเลือกลูกค้ารายนี้ในการจองจะเห็นคำเตือนพร้อมเหตุผลนี้",
     "dnr_save": "ทำเครื่องหมายไม่ให้เช่า",
-    "dnr_cancel": "ยกเลิก"
+    "dnr_cancel": "ยกเลิก",
+    "g_days": "เช่า {count} วัน",
+    "g_notDeposits": "ไม่นับเงินมัดจำ",
+    "g_owes": "ค้างชำระตอนนี้",
+    "g_owesNothing": "ไม่มียอดค้าง",
+    "g_owesNothingDetail": "จ่ายครบแล้ว",
+    "g_docs": "เอกสาร",
+    "g_docsMissing": "ยังขาด {count} อย่าง"
   },
   "vehicleForm": {
     "backToFleet": "กลับไปหน้ารถ",

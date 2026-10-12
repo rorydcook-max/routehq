@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/app-shell";
+import { BandPills } from "@/components/page-band";
 import { canDecideMoney, getCurrentMembership } from "@/lib/auth/roles";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { businessToday } from "@/lib/business-time";
@@ -23,21 +24,16 @@ export default async function TasksPage() {
       userEmail={userEmail}
       hero={
         <div>
-          <h1 className="text-[30px] font-bold leading-tight text-white">{t("title")}</h1>
-          <div className="mt-4 grid max-w-xl grid-cols-3 gap-2">
-            {/* Late work is the one to act on: white, and brick when it is not zero. */}
-            <span className="rounded-2xl bg-white px-3 py-2.5 text-[var(--foreground)]">
-              <span className={`block text-[24px] font-bold leading-none tabular-nums ${overdue > 0 ? "text-[var(--danger)]" : ""}`}>{overdue}</span>
-              <span className="mt-1 block font-semibold text-[var(--muted)]">{t("bandOverdue")}</span>
-            </span>
-            <span className="rounded-2xl bg-[var(--band-soft)] px-3 py-2.5 text-white">
-              <span className="block text-[24px] font-bold leading-none tabular-nums">{dueToday}</span>
-              <span className="mt-1 block font-semibold text-white/85">{t("bandToday")}</span>
-            </span>
-            <span className="rounded-2xl bg-[var(--band-soft)] px-3 py-2.5 text-white">
-              <span className="block text-[24px] font-bold leading-none tabular-nums">{thisWeek}</span>
-              <span className="mt-1 block font-semibold text-white/85">{t("bandWeek")}</span>
-            </span>
+          <h1 className="text-[32px] leading-tight text-white">{t("title")}</h1>
+          {/* Late work is the one to act on: white, with a brick number, when it is not zero. */}
+          <div className="mt-4">
+            <BandPills
+              items={[
+                { count: overdue, label: t("bandOverdue"), alert: true },
+                { count: dueToday, label: t("bandToday") },
+                { count: thisWeek, label: t("bandWeek") }
+              ]}
+            />
           </div>
         </div>
       }

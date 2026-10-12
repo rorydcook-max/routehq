@@ -12,6 +12,7 @@ import { AppShell } from "@/components/app-shell";
 import { CommunicationPanel } from "@/components/communication-panel";
 import { PendingButton } from "@/components/pending-button";
 import { Badge, Card, Fold } from "@/components/ui";
+import { Ring, TileHead } from "@/components/glance";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { businessToday } from "@/lib/business-time";
 import { commonCountries, customerLanguages, flagForNationality, countryLabel } from "@/lib/customer-options";
@@ -352,7 +353,7 @@ function PaymentsSection({ detail, totalIncome }: { detail: CustomerDetail; tota
   const moneyWords = useTranslations("money");
   const typeName = (type: string) => (moneyWords.has(`type_${type}` as never) ? (moneyWords as unknown as Say)(`type_${type}`) : type.replace(/_/g, " "));
   return (
-    <Fold summary={detail.transactions.length === 0 ? cx.say("n_none") : cx.say("p_summary", { amount: money(totalIncome) })} title={cx.say("p_title")}>
+    <Fold id="payments" summary={detail.transactions.length === 0 ? cx.say("n_none") : cx.say("p_summary", { amount: money(totalIncome) })} title={cx.say("p_title")}>
       {detail.transactions.length === 0 ? (
         <p className="font-medium text-[var(--foreground-secondary)]">{cx.say("p_none")}</p>
       ) : (
@@ -423,6 +424,8 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
   const licenceDays = daysUntil(customer.driver_license_expiry);
   const passportDays = daysUntil(customer.passport_expiry);
   const docsTone = completeness.status === "complete" ? "green" : completeness.status === "none" ? "red" : "amber";
+  const docsIn = [completeness.hasPassport, completeness.hasLicense, completeness.hasSelfie].filter(Boolean).length;
+  const owedNow = [...dueByRental.values()].reduce((sum, amount) => sum + amount, 0);
 
   return (
     <AppShell userEmail={userEmail}>
@@ -437,7 +440,12 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
 
         <Card className="p-4">
           <Badge tone={docsTone}>{completeness.status === "complete" ? cx.say("docsOk") : completeness.status === "none" ? cx.say("docsNone") : cx.say("docsMissing")}</Badge>
-          <h1 className="mt-2 text-[28px] font-bold leading-tight tracking-[-0.01em] text-[var(--foreground)]">{customer.full_name}</h1>
+          <div className="mt-3 flex items-center gap-3">
+            <span aria-hidden="true" className="num inline-flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)] text-[20px] text-[var(--primary)]">
+              {String(customer.full_name || "").trim().split(/\s+/).slice(0, 2).map((part: string) => Array.from(part)[0] || "").join("").toUpperCase()}
+            </span>
+            <h1 className="min-w-0 text-[28px] leading-tight text-[var(--foreground)]">{customer.full_name}</h1>
+          </div>
           <p className="mt-1 text-[17px] font-semibold text-[var(--foreground-secondary)]">
             {customer.nationality ? `${flagForNationality(customer.nationality)} ${customer.nationality}` : cx.say("noNationality")}
             {customer.phone ? ` · ${customer.phone}` : ""}
@@ -470,6 +478,41 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           <DoNotRent customerId={customer.id} on={Boolean((customer as any).do_not_rent)} organizationId={organization.id} place="control" reason={null} />
         </Card>
 
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <div className="card tile p-4 text-[var(--foreground)]">
+            <TileHead title={cx.say("h_title")} />
+            <span>
+              <span className="num block text-[32px] leading-none">{detail.rentals.length}</span>
+              <span className="font-semibold text-[var(--foreground-secondary)]">{cx.say("g_days", { count: detail.totalRentalDays })}</span>
+            </span>
+          </div>
+          <div className="card tile p-4 text-[var(--foreground)]">
+            <TileHead title={cx.say("h_paid")} />
+            <span>
+              <span className="num block text-[26px] leading-tight">{money(totalIncome)}</span>
+              <span className="font-semibold text-[var(--foreground-secondary)]">{cx.say("g_notDeposits")}</span>
+            </span>
+          </div>
+          {owedNow > 0 ? (
+            <a className="card pressable tile tile-brick p-4" href="#payments">
+              <TileHead title={cx.say("g_owes")} />
+              <span className="num block text-[26px] leading-tight">{money(owedNow)}</span>
+            </a>
+          ) : (
+            <div className="card tile tile-green p-4">
+              <TileHead title={cx.say("g_owesNothing")} />
+              <span className="font-semibold">{cx.say("g_owesNothingDetail")}</span>
+            </div>
+          )}
+          <a className="card pressable tile p-4 text-[var(--foreground)]" href="#documents">
+            <TileHead title={cx.say("g_docs")} />
+            <span className="flex items-center gap-3">
+              <Ring color={docsIn === 3 ? "var(--success)" : "var(--going-out)"} label={`${docsIn}/3`} pct={(docsIn / 3) * 100} size={68} stroke={9} track="var(--panel-tertiary)" />
+              <span className="font-semibold text-[var(--foreground-secondary)]">{docsIn === 3 ? cx.say("docsOk") : cx.say("g_docsMissing", { count: 3 - docsIn })}</span>
+            </span>
+          </a>
+        </div>
+
         {currentRentals.map((rental) => (
           <ActiveRentalCard customerId={customer.id} dueNow={dueByRental.get(rental.id) || 0} key={rental.id} rental={rental} />
         ))}
@@ -477,6 +520,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
         <div className="grid items-start gap-3 lg:grid-cols-2">
           <div className="space-y-3">
             <Fold
+              id="documents"
               open={completeness.status !== "complete"}
               summary={completeness.status === "complete" ? cx.say("docs_ok") : cx.say("docs_missing", { list: missingDocs.join(", ") })}
               title={cx.say("docs_title")}

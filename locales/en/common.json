@@ -2960,7 +2960,14 @@
     "dnr_placeholder": "e.g. left without paying for damage",
     "dnr_hint": "Anyone who picks this customer for a booking is warned, with this reason.",
     "dnr_save": "Mark don't rent",
-    "dnr_cancel": "Cancel"
+    "dnr_cancel": "Cancel",
+    "g_days": "{count, plural, one {# day} other {# days}} rented",
+    "g_notDeposits": "deposits not counted",
+    "g_owes": "Owes now",
+    "g_owesNothing": "Owes nothing",
+    "g_owesNothingDetail": "All paid up",
+    "g_docs": "Documents",
+    "g_docsMissing": "{count} still to come"
   },
   "vehicleForm": {
     "backToFleet": "Back to fleet",

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Plus } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
+import { BandPills } from "@/components/page-band";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getBookingList } from "@/lib/bookings";
 import { getDefaultOrganization } from "@/lib/organization";
@@ -29,26 +30,21 @@ export default async function BookingsPage() {
       hero={
         <div>
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h1 className="text-[30px] font-bold leading-tight text-white">{t("title")}</h1>
+            <h1 className="text-[32px] leading-tight text-white">{t("title")}</h1>
             <Link className="pressable inline-flex min-h-11 items-center gap-2 rounded-full bg-[var(--band-action)] px-4 font-bold text-[var(--band-action-ink)]" href="/bookings/new">
               <Plus size={16} />
               {t("create")}
             </Link>
           </div>
-          <div className="mt-4 grid max-w-xl grid-cols-3 gap-2">
-            <span className="rounded-2xl bg-[var(--band-soft)] px-3 py-2.5 text-white">
-              <span className="block text-[24px] font-bold leading-none tabular-nums">{onRent}</span>
-              <span className="mt-1 block font-semibold text-white/85">{t("bandOnRent")}</span>
-            </span>
-            <span className="rounded-2xl bg-[var(--band-soft)] px-3 py-2.5 text-white">
-              <span className="block text-[24px] font-bold leading-none tabular-nums">{starting}</span>
-              <span className="mt-1 block font-semibold text-white/85">{t("bandStarting")}</span>
-            </span>
-            {/* Money owed is the one that needs doing something about: white, and brick when it is not zero. */}
-            <span className="rounded-2xl bg-white px-3 py-2.5 text-[var(--foreground)]">
-              <span className={`block text-[24px] font-bold leading-none tabular-nums ${owing > 0 ? "text-[var(--danger)]" : ""}`}>{owing}</span>
-              <span className="mt-1 block font-semibold text-[var(--muted)]">{t("bandOwing")}</span>
-            </span>
+          {/* Money owed is the one that needs doing something about: white, with a brick number, when it is not zero. */}
+          <div className="mt-4">
+            <BandPills
+              items={[
+                { count: onRent, label: t("bandOnRent"), dot: "#ffffff" },
+                { count: starting, label: t("bandStarting"), dot: "var(--going-out)" },
+                { count: owing, label: t("bandOwing"), alert: true }
+              ]}
+            />
           </div>
         </div>
       }

@@ -79,7 +79,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
       hero={
         <div>
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h1 className="text-[30px] font-bold leading-tight text-white">{t("title")}</h1>
+            <h1 className="text-[32px] leading-tight text-white">{t("title")}</h1>
             <div className="flex flex-wrap gap-2">
               <Link className="pressable inline-flex min-h-11 items-center gap-2 rounded-full bg-[var(--band-soft)] px-4 font-bold text-white" href="/fleet/import">
                 <FileSpreadsheet size={16} />

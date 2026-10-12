@@ -9,19 +9,19 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { CalendarEvent } from "@/lib/calendar";
 
 const toneClasses: Record<CalendarEvent["tone"], string> = {
-  blue: "bg-[var(--info-light)] text-[var(--info)] border-[var(--info-line)]",
-  amber: "bg-[var(--warning-light)] text-[var(--warning)] border-[var(--warning-line)]",
+  blue: "bg-[var(--accent-light)] text-[#6b4210] border-[#f1d8a6]",
+  amber: "bg-[var(--coming-back-light)] text-[var(--coming-back-ink)] border-[#c5dcef]",
   red: "bg-[var(--danger-light)] text-[var(--danger)] border-[var(--danger-line)]",
   green: "bg-[var(--success-light)] text-[var(--success)] border-[var(--success-line)]",
-  purple: "bg-[var(--purple-light)] text-[var(--purple)] border-[var(--purple-line)]"
+  purple: "bg-[var(--panel-tertiary)] text-[var(--foreground)] border-[var(--border-strong)]"
 };
 
 const dotClasses: Record<CalendarEvent["tone"], string> = {
-  blue: "bg-[var(--info)]",
-  amber: "bg-[var(--warning)]",
+  blue: "bg-[var(--going-out)]",
+  amber: "bg-[var(--coming-back)]",
   red: "bg-[var(--danger)]",
   green: "bg-[var(--success)]",
-  purple: "bg-[var(--purple)]"
+  purple: "bg-[var(--foreground-secondary)]"
 };
 
 function monthKey(date: Date) {
@@ -160,7 +160,7 @@ export function CalendarView({ events, initialMonth, today }: { events: Calendar
                 {/* Phones: coloured dots; the list below has the details. */}
                 <div className="mt-1 flex flex-wrap gap-0.5 sm:hidden">
                   {dayEvents.slice(0, 6).map((event) => (
-                    <span className={`h-1.5 w-1.5 rounded-full ${dotClasses[event.tone]}`} key={event.id} />
+                    <span className={`h-2 w-2 rounded-full ${dotClasses[event.tone]}`} key={event.id} />
                   ))}
                 </div>
                 <div className="mt-1 hidden space-y-0.5 sm:block">
@@ -190,7 +190,7 @@ export function CalendarView({ events, initialMonth, today }: { events: Calendar
             ["green", t("leg_green")]
           ] as Array<[CalendarEvent["tone"], string]>).map(([tone, label]) => (
             <span className="inline-flex items-center gap-1" key={tone}>
-              <span className={`h-1.5 w-1.5 rounded-full ${dotClasses[tone]}`} />
+              <span className={`h-2 w-2 rounded-full ${dotClasses[tone]}`} />
               {label}
             </span>
           ))}

@@ -2,18 +2,19 @@ import { businessToday } from "@/lib/business-time";
 import Link from "next/link";
 import type { Route } from "next";
 import { notFound } from "next/navigation";
+import { getLocale, getTranslations } from "next-intl/server";
 import { ChevronRight } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
+import { PageBand } from "@/components/page-band";
+import { VehicleArt } from "@/components/vehicle-art";
+import { initialsOf } from "@/components/glance";
 import { getCurrentUserEmail } from "@/lib/auth/session";
+import { shortDate } from "@/lib/i18n/dates";
 import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { kindFromCategory } from "@/lib/vehicle-groups";
 
 const DAY = 86_400_000;
-
-function shortDate(value: string | null | undefined) {
-  if (!value) return "";
-  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${String(value).slice(0, 10)}T00:00:00Z`));
-}
 
 function daysFromToday(value: string | null | undefined) {
   if (!value) return null;
@@ -21,29 +22,38 @@ function daysFromToday(value: string | null | undefined) {
   return Math.round((new Date(`${String(value).slice(0, 10)}T00:00:00Z`).getTime() - today) / DAY);
 }
 
+type Say = (key: string, values?: Record<string, string | number>) => string;
+
 /** When it is due, in the words an owner would use, and whether it needs a nudge. */
-function timing(type: string, rental: any): { text: string; tone: "late" | "today" | "later" } {
-  const days = daysFromToday(type === "delivery" ? rental.start_date : rental.end_date);
-  const verb = type === "delivery" ? "Goes out" : "Due back";
-  if (days === null) return { text: "No return date set", tone: "later" };
-  if (days < 0) return { text: `${verb === "Goes out" ? "Was due to go out" : "Was due back"} ${shortDate(type === "delivery" ? rental.start_date : rental.end_date)} - ${Math.abs(days)} day${days === -1 ? "" : "s"} late`, tone: "late" };
-  if (days === 0) return { text: `${verb} today`, tone: "today" };
-  if (days === 1) return { text: `${verb} tomorrow`, tone: "later" };
-  return { text: `${verb} ${shortDate(type === "delivery" ? rental.start_date : rental.end_date)} - in ${days} days`, tone: "later" };
+function timing(type: string, rental: any, say: Say, locale: string): { text: string; tone: "late" | "today" | "later" } {
+  const date = type === "delivery" ? rental.start_date : rental.end_date;
+  const days = daysFromToday(date);
+  const out = type === "delivery";
+  if (days === null) return { text: say("noReturnDate"), tone: "later" };
+  if (days < 0) return { text: say(out ? "lateOut" : "lateBack", { date: shortDate(date, locale), days: Math.abs(days) }), tone: "late" };
+  if (days === 0) return { text: say(out ? "outToday" : "backToday"), tone: "today" };
+  if (days === 1) return { text: say(out ? "outTomorrow" : "backTomorrow"), tone: "later" };
+  return { text: say(out ? "outOn" : "backOn", { date: shortDate(date, locale), days }), tone: "later" };
 }
+
+const TONE: Record<"late" | "today" | "later", string> = {
+  late: "bg-[var(--danger-light)] text-[var(--danger)]",
+  today: "bg-[var(--primary-light)] text-[var(--primary)]",
+  later: "bg-[var(--panel-tertiary)] text-[var(--foreground-secondary)]"
+};
 
 export default async function StartInspectionPage({ params }: { params: Promise<{ type: string }> }) {
   const { type } = await params;
   if (!["delivery", "return"].includes(type)) {
     notFound();
   }
-
-  const [userEmail, organization] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization()]);
+  const [userEmail, organization, t, locale] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization(), getTranslations("inspectStart"), getLocale()]);
+  const say = t as unknown as Say;
   const supabase = (await createSupabaseServerClient()) as any;
   const statuses = type === "delivery" ? ["booked"] : ["active", "due_soon", "overdue", "extended"];
   const { data, error } = await supabase
     .from("rentals")
-    .select("id, start_date, end_date, status, customers!rentals_customer_id_fkey(full_name, phone), vehicles!rentals_vehicle_id_fkey(make, model, registration_number)")
+    .select("id, start_date, end_date, status, customers!rentals_customer_id_fkey(full_name, phone), vehicles!rentals_vehicle_id_fkey(make, model, registration_number, color, vehicle_categories(code, name))")
     .eq("organization_id", organization.id)
     .in("status", statuses)
     .is("deleted_at", null)
@@ -57,41 +67,38 @@ export default async function StartInspectionPage({ params }: { params: Promise<
   // A booking link nobody has filled in yet has no customer to hand a vehicle to.
   const ready = rentals.filter((rental) => type !== "delivery" || rental.customers);
   const waiting = rentals.filter((rental) => type === "delivery" && !rental.customers);
-  const title = type === "delivery" ? "Hand over a vehicle" : "Take a vehicle back";
-  const intro = type === "delivery" ? "Which booking is going out? Soonest first." : "Which vehicle is coming back? Soonest first.";
-  const empty = type === "delivery" ? "No bookings are waiting to go out." : "No vehicles are out on rent.";
+  const out = type === "delivery";
 
   return (
-    <AppShell userEmail={userEmail}>
+    <AppShell hero={<PageBand subtitle={say(out ? "introOut" : "introBack")} keepSubtitle title={say(out ? "titleOut" : "titleBack")} />} userEmail={userEmail}>
       <div className="mx-auto max-w-2xl">
-        <div className="mb-4">
-          <h1 className="text-[22px] font-semibold tracking-[-0.02em] text-[var(--foreground)]">{title}</h1>
-          <p className="mt-1 text-sm text-[var(--muted)]">{intro}</p>
-        </div>
-
         {ready.length === 0 ? (
-          <div className="rounded-xl border border-[var(--border)] bg-white p-5 text-center">
-            <p className="text-sm font-semibold text-[var(--foreground-secondary)]">{empty}</p>
-            <Link className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-[var(--primary)] px-4 text-sm font-semibold text-white" href={type === "delivery" ? "/bookings/new" : "/bookings"}>
-              {type === "delivery" ? "Create a booking" : "See all bookings"}
+          <div className="card p-6 text-center">
+            <p className="text-[17px] font-semibold text-[var(--foreground)]">{say(out ? "emptyOut" : "emptyBack")}</p>
+            <Link className="primary-action pressable mt-4 inline-flex" href={out ? "/bookings/new" : "/bookings"}>
+              {say(out ? "createBooking" : "seeBookings")}
             </Link>
           </div>
         ) : (
-          <ul className="overflow-hidden rounded-xl border border-[var(--border)] bg-white shadow-[var(--shadow-sm)]">
-            {ready.map((rental) => {
-              const when = timing(type, rental);
+          <ul className="space-y-2.5">
+            {ready.map((rental, index) => {
+              const when = timing(type, rental, say, locale);
               return (
-                <li className="border-b border-[var(--border)] last:border-0" key={rental.id}>
-                  <Link className="pressable flex min-h-16 items-center gap-3 px-4 py-3 hover:bg-[var(--panel-secondary)]" href={`/inspections/${type}/${rental.id}` as Route}>
+                <li className="rise" key={rental.id} style={{ ["--d" as string]: `${Math.min(index, 8) * 50}ms` } as React.CSSProperties}>
+                  <Link className="card pressable flex items-center gap-3.5 p-3" href={`/inspections/${type}/${rental.id}` as Route}>
+                    <VehicleArt colour={rental.vehicles?.color} kind={kindFromCategory(rental.vehicles?.vehicle_categories)} model={rental.vehicles?.model} size="sm" />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-[15px] font-semibold text-[var(--foreground)]">
+                      <p className="truncate text-[17px] font-bold text-[var(--foreground)]">
                         {rental.vehicles?.make} {rental.vehicles?.model}
-                        {rental.vehicles?.registration_number ? <span className="font-mono-data ml-2 text-[13px] font-medium text-[var(--muted)]">{rental.vehicles.registration_number}</span> : null}
+                        {rental.vehicles?.registration_number ? <span className="font-mono-data ml-2 font-medium text-[var(--muted)]">{rental.vehicles.registration_number}</span> : null}
                       </p>
-                      <p className="mt-0.5 truncate text-[13px] text-[var(--foreground-secondary)]">{rental.customers?.full_name || "Customer not added yet"}</p>
-                      <p className={`mt-0.5 text-[13px] font-medium ${when.tone === "late" ? "text-[var(--danger)]" : when.tone === "today" ? "text-[var(--primary)]" : "text-[var(--muted)]"}`}>{when.text}</p>
+                      <p className="mt-0.5 flex items-center gap-2 truncate font-medium text-[var(--foreground-secondary)]">
+                        <span aria-hidden="true" className="num inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)] text-[12px] text-[var(--primary)]">{initialsOf(rental.customers?.full_name)}</span>
+                        <span className="truncate">{rental.customers?.full_name || say("noCustomer")}</span>
+                      </p>
+                      <span className={`mt-1.5 inline-flex rounded-full px-2.5 py-0.5 font-bold ${TONE[when.tone]}`}>{when.text}</span>
                     </div>
-                    <ChevronRight className="shrink-0 text-[var(--muted)]" size={18} />
+                    <ChevronRight className="shrink-0 text-[var(--muted)]" size={20} />
                   </Link>
                 </li>
               );
@@ -100,19 +107,20 @@ export default async function StartInspectionPage({ params }: { params: Promise<
         )}
 
         {waiting.length > 0 ? (
-          <div className="mt-5">
-            <p className="mb-2 text-[13px] font-semibold text-[var(--foreground-secondary)]">Waiting for the customer to fill in their booking link</p>
-            <ul className="overflow-hidden rounded-xl border border-[var(--border)] bg-white">
+          <div className="mt-6">
+            <h2 className="mb-2 px-1 text-[18px] text-[var(--foreground)]">{say("waitingTitle")}</h2>
+            <ul className="space-y-2">
               {waiting.map((rental) => (
-                <li className="border-b border-[var(--border)] last:border-0" key={rental.id}>
-                  <Link className="pressable flex min-h-14 items-center gap-3 px-4 py-3 hover:bg-[var(--panel-secondary)]" href={`/bookings/${rental.id}` as Route}>
+                <li key={rental.id}>
+                  <Link className="card pressable flex items-center gap-3.5 p-3" href={`/bookings/${rental.id}` as Route}>
+                    <VehicleArt colour={rental.vehicles?.color} kind={kindFromCategory(rental.vehicles?.vehicle_categories)} model={rental.vehicles?.model} size="sm" />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-[14px] font-semibold text-[var(--foreground-secondary)]">
+                      <p className="truncate font-semibold text-[var(--foreground)]">
                         {rental.vehicles?.make} {rental.vehicles?.model}
                       </p>
-                      <p className="mt-0.5 text-[13px] text-[var(--muted)]">Booked from {shortDate(rental.start_date)}. Open the booking to send the link again.</p>
+                      <p className="mt-0.5 text-[var(--foreground-secondary)]">{say("waitingLine", { date: shortDate(rental.start_date, locale) })}</p>
                     </div>
-                    <ChevronRight className="shrink-0 text-[var(--muted)]" size={18} />
+                    <ChevronRight className="shrink-0 text-[var(--muted)]" size={20} />
                   </Link>
                 </li>
               ))}

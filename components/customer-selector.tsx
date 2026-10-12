@@ -118,7 +118,7 @@ export function CustomerSelector({
           <div className="absolute bottom-0 left-0 right-0 max-h-[80vh] overflow-hidden rounded-t-2xl border border-[var(--border)] bg-white shadow-2xl sm:relative sm:max-h-[420px] sm:rounded-lg">
             <div className="flex items-center justify-between border-b border-[var(--border)] p-3">
               <p className="font-semibold text-[var(--foreground)]">{say("sel_select")}</p>
-              <button className="rounded-full p-2 text-[var(--muted)]" onClick={() => setOpen(false)} type="button">
+              <button aria-label={say("closeLabel")} className="rounded-full p-2 text-[var(--muted)]" onClick={() => setOpen(false)} type="button">
                 <X size={18} />
               </button>
             </div>

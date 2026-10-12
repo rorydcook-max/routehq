@@ -383,7 +383,10 @@
     "earlyShorten": "เช่าเท่าเดิม: คืนรถวันที่ {date}",
     "earlyFreeBack": "ไม่คิดเงิน: คืนรถวันที่ {date} ตามเดิม",
     "earlyFree": "ไม่คิดเงิน",
-    "earlyAskFree": "ไม่คิดเงิน ถ้าเจ้าของหรือผู้จัดการตกลง: ยอดนี้รอให้พวกเขาตัดสินใจ ยังไม่ต้องเก็บตอนนี้"
+    "earlyAskFree": "ไม่คิดเงิน ถ้าเจ้าของหรือผู้จัดการตกลง: ยอดนี้รอให้พวกเขาตัดสินใจ ยังไม่ต้องเก็บตอนนี้",
+    "removeDamage": "ลบรายการความเสียหายนี้",
+    "gpsLastSeen": "{provider} · เห็นล่าสุด {when}",
+    "gpsNever": "ไม่เคย"
   },
   "translation": {
     "translatedFrom": "แปลจาก {language}",
@@ -976,7 +979,8 @@
     "askFooter": "เขียนโดย AI จากข้อมูลของคุณ จะไม่มีอะไรเปลี่ยนจนกว่าคุณจะกดยืนยัน",
     "setup_signature": "เพิ่มลายเซ็นของคุณ",
     "setupTitleLater": "ตั้งค่าส่วนที่เหลือให้เสร็จ",
-    "setup_payment_methods": "บอกวิธีที่ลูกค้าจ่ายเงินให้คุณ"
+    "setup_payment_methods": "บอกวิธีที่ลูกค้าจ่ายเงินให้คุณ",
+    "copy": "คัดลอก"
   },
   "todo": {
     "eyebrow": "งาน",
@@ -2221,7 +2225,8 @@
     "strip_paid": "จ่ายแล้ว",
     "strip_owed": "ค้างชำระ",
     "strip_today": "ครบกำหนดวันนี้",
-    "strip_later": "งวดถัดไป"
+    "strip_later": "งวดถัดไป",
+    "closeLabel": "ปิด"
   },
   "newBooking": {
     "pageBack": "กลับไปที่การจอง",
@@ -2554,7 +2559,8 @@
     "sel_createSelect": "เพิ่มและเลือก",
     "noPhone": "ไม่มีเบอร์โทร",
     "doNotRent": "ไม่ให้เช่า",
-    "bookedLine": "จองแล้ว {vehicle} · เริ่ม {date}"
+    "bookedLine": "จองแล้ว {vehicle} · เริ่ม {date}",
+    "closeLabel": "ปิด"
   },
   "calendar": {
     "title": "ปฏิทิน",
@@ -4650,5 +4656,27 @@
     "teamReplyOn": "ตอบทาง {channel}",
     "teamReplyTitle": "ตอบในนาม RouteHQ",
     "teamReplyNote": "ธุรกิจจะเห็นข้อความนี้ในหน้าความช่วยเหลือและได้รับการแจ้งเตือน"
+  },
+  "inspectStart": {
+    "titleOut": "ส่งมอบรถ",
+    "titleBack": "รับรถคืน",
+    "introOut": "การจองไหนจะออกไป เรียงจากใกล้ที่สุด",
+    "introBack": "รถคันไหนจะกลับมา เรียงจากใกล้ที่สุด",
+    "emptyOut": "ไม่มีการจองที่รอส่งมอบ",
+    "emptyBack": "ไม่มีรถที่กำลังเช่าอยู่",
+    "createBooking": "สร้างการจอง",
+    "seeBookings": "ดูการจองทั้งหมด",
+    "noCustomer": "ยังไม่ได้เพิ่มลูกค้า",
+    "noReturnDate": "ไม่ได้กำหนดวันคืน",
+    "lateOut": "ควรส่งมอบ {date} ช้าไป {days} วัน",
+    "lateBack": "ควรคืน {date} ช้าไป {days} วัน",
+    "outToday": "ส่งมอบวันนี้",
+    "backToday": "คืนวันนี้",
+    "outTomorrow": "ส่งมอบพรุ่งนี้",
+    "backTomorrow": "คืนพรุ่งนี้",
+    "outOn": "ส่งมอบ {date} อีก {days} วัน",
+    "backOn": "คืน {date} อีก {days} วัน",
+    "waitingTitle": "รอลูกค้ากรอกลิงก์การจอง",
+    "waitingLine": "จองตั้งแต่ {date} เปิดการจองเพื่อส่งลิงก์อีกครั้ง"
   }
 }

@@ -399,7 +399,10 @@
     "earlyShorten": "Keep the booked length: back on {date}",
     "earlyFreeBack": "No charge: still back on {date}",
     "earlyFree": "No charge",
-    "earlyAskFree": "No charge, if the owner or a manager agrees: the charge waits for them and isn't collected now"
+    "earlyAskFree": "No charge, if the owner or a manager agrees: the charge waits for them and isn't collected now",
+    "removeDamage": "Remove this damage",
+    "gpsLastSeen": "{provider} · last seen {when}",
+    "gpsNever": "never"
   },
   "translation": {
     "translatedFrom": "Translated from {language}",
@@ -967,7 +970,8 @@
     "askFooter": "Written by AI from your records. Nothing is changed until you press Confirm.",
     "setup_signature": "Add your signature",
     "setupTitleLater": "Finish setting up",
-    "setup_payment_methods": "Say how customers pay you"
+    "setup_payment_methods": "Say how customers pay you",
+    "copy": "Copy"
   },
   "todo": {
     "eyebrow": "Tasks",
@@ -2212,7 +2216,8 @@
     "strip_paid": "Paid",
     "strip_owed": "Owed",
     "strip_today": "Due today",
-    "strip_later": "To come"
+    "strip_later": "To come",
+    "closeLabel": "Close"
   },
   "newBooking": {
     "pageBack": "Back to bookings",
@@ -2545,7 +2550,8 @@
     "sel_createSelect": "Create and select",
     "noPhone": "No phone",
     "doNotRent": "Don't rent",
-    "bookedLine": "Booked: {vehicle} from {date}"
+    "bookedLine": "Booked: {vehicle} from {date}",
+    "closeLabel": "Close"
   },
   "calendar": {
     "title": "Calendar",
@@ -4641,5 +4647,27 @@
     "plan_growth": "Growth",
     "plan_pro": "Pro",
     "plan_business": "Business"
+  },
+  "inspectStart": {
+    "titleOut": "Hand over a vehicle",
+    "titleBack": "Take a vehicle back",
+    "introOut": "Which booking is going out? Soonest first.",
+    "introBack": "Which vehicle is coming back? Soonest first.",
+    "emptyOut": "No bookings are waiting to go out.",
+    "emptyBack": "No vehicles are out on rent.",
+    "createBooking": "Create a booking",
+    "seeBookings": "See all bookings",
+    "noCustomer": "Customer not added yet",
+    "noReturnDate": "No return date set",
+    "lateOut": "Was due to go out {date}, {days, plural, one {# day} other {# days}} late",
+    "lateBack": "Was due back {date}, {days, plural, one {# day} other {# days}} late",
+    "outToday": "Goes out today",
+    "backToday": "Due back today",
+    "outTomorrow": "Goes out tomorrow",
+    "backTomorrow": "Due back tomorrow",
+    "outOn": "Goes out {date}, in {days} days",
+    "backOn": "Due back {date}, in {days} days",
+    "waitingTitle": "Waiting for the customer to fill in their booking link",
+    "waitingLine": "Booked from {date}. Open the booking to send the link again."
   }
 }

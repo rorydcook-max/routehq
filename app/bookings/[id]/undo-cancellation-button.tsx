@@ -76,7 +76,7 @@ export function UndoCancellationButton({
                   {customerName || say("undo_thisBooking")}
                 </h3>
               </div>
-              <button
+              <button aria-label={say("closeLabel")}
                 className="pressable rounded-lg p-1.5 text-[var(--muted)]"
                 onClick={() => setOpen(false)}
                 type="button"

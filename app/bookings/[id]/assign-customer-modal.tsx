@@ -74,7 +74,7 @@ export function AssignCustomerModal({
                   {say("assign_body")}
                 </p>
               </div>
-              <button
+              <button aria-label={say("closeLabel")}
                 className="pressable flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--border)] text-[var(--muted)]"
                 onClick={() => { setOpen(false); setSelectedCustomer(null); setError(""); }}
                 type="button"

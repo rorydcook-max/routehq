@@ -1834,7 +1834,7 @@ function GooglePinModal({
             <h3 className="text-lg font-semibold text-[var(--foreground)]">{say("dropPin")}</h3>
             <p className="mt-1 text-sm text-[var(--muted)]">{say("pinBody")}</p>
           </div>
-          <button className="pressable rounded-full p-2 text-[var(--muted)] hover:bg-[var(--panel-secondary)]" onClick={onClose} type="button">
+          <button aria-label={say("close")} className="pressable rounded-full p-2 text-[var(--muted)] hover:bg-[var(--panel-secondary)]" onClick={onClose} type="button">
             <X size={20} />
           </button>
         </div>

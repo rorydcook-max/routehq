@@ -202,7 +202,7 @@ export function AskBox({ variant }: { variant: "sidebar" | "icon" }) {
                                       <button
                                         className="mt-2 flex w-full items-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-left font-mono text-[12px] text-[var(--foreground)]"
                                         onClick={() => navigator.clipboard.writeText(turn.result?.copy || "").catch(() => undefined)}
-                                        title="Copy"
+                                        title={t("copy")}
                                         type="button"
                                       >
                                         <span className="min-w-0 flex-1 truncate">{turn.result.copy}</span>

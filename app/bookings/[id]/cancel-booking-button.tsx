@@ -267,7 +267,7 @@ export function CancelBookingButton({
                   {!hasPayment && !hasDeposit && <span>{say("cn_noPayment")}</span>}
                 </div>
               </div>
-              <button
+              <button aria-label={say("closeLabel")}
                 className="pressable rounded-lg border border-[var(--danger-line)] bg-white p-1.5 text-[var(--danger)]"
                 onClick={reset}
                 type="button"

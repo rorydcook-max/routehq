@@ -1044,7 +1044,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, canW
                       </label>
                     </div>
                   </div>
-                  <button className="rounded-lg border border-[var(--danger-line)] p-2 text-[var(--danger)]" onClick={() => setDamageItems((items) => items.filter((entry) => entry.id !== item.id))} type="button">
+                  <button aria-label={t("removeDamage")} className="rounded-lg border border-[var(--danger-line)] p-2 text-[var(--danger)]" onClick={() => setDamageItems((items) => items.filter((entry) => entry.id !== item.id))} type="button">
                     <Trash2 size={18} />
                   </button>
                 </div>
@@ -1071,7 +1071,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, canW
                 <div>
                   <p className="font-semibold text-[var(--foreground)]">{context.gpsDevice.last_seen_at ? t("gpsActive") : t("gpsOffline")}</p>
                   <p className="mt-1 text-sm text-[var(--muted)]">
-                    {context.gpsDevice.provider} · Last seen {context.gpsDevice.last_seen_at ? formatDate(context.gpsDevice.last_seen_at) : "never"}
+                    {t("gpsLastSeen", { provider: String(context.gpsDevice.provider || ""), when: context.gpsDevice.last_seen_at ? formatDate(context.gpsDevice.last_seen_at) : t("gpsNever") })}
                   </p>
                   {context.latestLocation ? (
                     <p className="mt-1 flex items-center gap-1 text-sm text-[var(--muted)]">

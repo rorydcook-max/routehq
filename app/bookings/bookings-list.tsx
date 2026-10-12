@@ -278,7 +278,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
           description={tx.say("emptyBody")}
         />
       ) : (
-        <div className="grid gap-3">
+        <div className="grid gap-3 xl:grid-cols-2 xl:items-start">
           {filtered.map((booking) => {
             const timingLabel = rentalTimingLabel(booking, tx);
             const hold = holdState(booking, tx);

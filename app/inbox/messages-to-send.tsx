@@ -24,7 +24,7 @@ export function MessagesToSend({ groups }: { groups: ToSendGroup[] }) {
         <h2 className="text-[19px] leading-tight text-[var(--messages-ink)]">{say("toSendTitle", { count: total })}</h2>
       </div>
       <p className="mt-2 text-[var(--messages-ink)]">{say("toSendWhy")}</p>
-      <div className="mt-3 space-y-2">
+      <div className="mt-3 grid gap-2 lg:grid-cols-2 lg:items-start">
         {groups.map((group) => (
           <details className="rounded-2xl bg-white" key={group.key}>
             <summary className="flex cursor-pointer items-center justify-between gap-3 px-3 py-3">

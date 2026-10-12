@@ -26,7 +26,7 @@ import { EarlyReturnOwedPanel } from "@/app/bookings/[id]/early-return-owed";
 import { activeExtrasLines, extrasLines, extrasSummary } from "@/lib/extras";
 import { AppShell } from "@/components/app-shell";
 import { VehicleArt } from "@/components/vehicle-art";
-import { PartBar, RentalTrack } from "@/components/glance";
+import { PartBar, RentalTrack, initialsOf } from "@/components/glance";
 import { kindFromCategory } from "@/lib/vehicle-groups";
 import { AddRentalPaymentInlineForm, EditableEndDate, EditableRentalPaymentRow, EditableTransactionRow, ExistingRentalPaymentSetupCard } from "@/components/booking-correction-controls";
 import { CommunicationPanel } from "@/components/communication-panel";
@@ -634,7 +634,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               <div className="mt-3 flex items-center gap-3">
                 {customer ? (
                   <span aria-hidden="true" className="num inline-flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)] text-[18px] text-[var(--primary)]">
-                    {String(customer.full_name || "").trim().split(/\s+/).slice(0, 2).map((part: string) => Array.from(part)[0] || "").join("").toUpperCase()}
+                    {initialsOf(customer.full_name)}
                   </span>
                 ) : null}
                 <div className="min-w-0 flex-1">

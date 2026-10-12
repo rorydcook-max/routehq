@@ -181,9 +181,9 @@ function selectable(vehicle: BookingVehicle) {
 /** One line on when the car is taken, e.g. "Taken until 8 Nov" or "Booked from 27 Oct". */
 function availabilityNote(periods: BusyPeriod[], today: string, say: Say, locale: string) {
   const current = periods.find((period) => period.startDate <= today && (!period.endDate || period.endDate >= today));
-  if (current) return current.endDate ? say("takenUntil", { date: shortDate(current.endDate, locale) }) : say("takenOpen");
+  if (current) return { text: current.endDate ? say("takenUntil", { date: shortDate(current.endDate, locale) }) : say("takenOpen"), out: true };
   const next = periods.find((period) => period.startDate > today);
-  return next ? say("bookedFrom", { date: shortDate(next.startDate, locale) }) : null;
+  return next ? { text: say("bookedFrom", { date: shortDate(next.startDate, locale) }), out: false } : null;
 }
 
 /**
@@ -747,8 +747,8 @@ export function BookingForm({
                         {(() => {
                           const note = disabled ? null : availabilityNote(busyPeriods[vehicle.id] || [], businessToday(), say, locale);
                           return (
-                            <Badge tone={disabled ? "neutral" : note ? "amber" : "green"}>
-                              {disabled ? (t.has(`vs_${vehicle.status}`) ? say(`vs_${vehicle.status}`) : vehicle.status) : note || say("vs_available")}
+                            <Badge tone={disabled ? "neutral" : note ? (note.out ? "blue" : "amber") : "green"}>
+                              {disabled ? (t.has(`vs_${vehicle.status}`) ? say(`vs_${vehicle.status}`) : vehicle.status) : note?.text || say("vs_available")}
                             </Badge>
                           );
                         })()}

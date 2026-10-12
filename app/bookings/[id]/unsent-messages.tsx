@@ -51,7 +51,7 @@ export function UnsentMessages({ messages, customerName, bare = false }: { messa
   }
 
   return (
-    <div className={bare ? "" : "scroll-mt-4 rounded-xl border border-[var(--warning-line)] bg-[var(--warning-light)] p-3"} id={bare ? undefined : "unsent-messages"}>
+    <div className={bare ? "" : "scroll-mt-4 rounded-[24px] bg-[var(--messages-light)] p-4 shadow-[var(--shadow-card)]"} id={bare ? undefined : "unsent-messages"}>
       {bare ? null : (
         <>
           <p className="text-sm font-semibold text-[var(--warning)]">{say("unsentTitle", { count: open.length, name: customerName })}</p>

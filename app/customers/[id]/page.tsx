@@ -12,7 +12,7 @@ import { AppShell } from "@/components/app-shell";
 import { CommunicationPanel } from "@/components/communication-panel";
 import { PendingButton } from "@/components/pending-button";
 import { Badge, Card, Fold } from "@/components/ui";
-import { Ring, TileHead } from "@/components/glance";
+import { Ring, TileHead, initialsOf } from "@/components/glance";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { businessToday } from "@/lib/business-time";
 import { commonCountries, customerLanguages, flagForNationality, countryLabel } from "@/lib/customer-options";
@@ -442,7 +442,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           <Badge tone={docsTone}>{completeness.status === "complete" ? cx.say("docsOk") : completeness.status === "none" ? cx.say("docsNone") : cx.say("docsMissing")}</Badge>
           <div className="mt-3 flex items-center gap-3">
             <span aria-hidden="true" className="num inline-flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)] text-[20px] text-[var(--primary)]">
-              {String(customer.full_name || "").trim().split(/\s+/).slice(0, 2).map((part: string) => Array.from(part)[0] || "").join("").toUpperCase()}
+              {initialsOf(customer.full_name)}
             </span>
             <h1 className="min-w-0 text-[28px] leading-tight text-[var(--foreground)]">{customer.full_name}</h1>
           </div>

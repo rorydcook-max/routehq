@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import { shownError } from "@/lib/error-text";
 import { ArrowDownLeft, ArrowUpRight, Check, ChevronLeft, ChevronRight, Download, Pencil, Search, Trash2, X } from "lucide-react";
+import { Dot } from "@/components/glance";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { intlLocale } from "@/lib/i18n/dates";
@@ -501,11 +502,11 @@ export function TransactionsList({
     const items = side === "in" ? income : expenses;
     const total = side === "in" ? incomeTotal : expenseTotal;
     return (
-      <section className={`overflow-hidden rounded-xl border border-[var(--border)] bg-white shadow-[var(--shadow-sm)] ${phoneSide === side ? "" : "hidden lg:block"}`}>
+      <section className={`card overflow-hidden ${phoneSide === side ? "" : "hidden lg:block"}`}>
         {/* On a phone the tab above and the totals at the top already say this; the heading is for the two-column layout. */}
         <header className="hidden items-center justify-between gap-3 px-4 py-3 lg:flex">
           <div className="flex items-center gap-2.5">
-            <span className={`inline-flex h-8 w-8 items-center justify-center rounded-[9px] ${side === "in" ? "bg-[var(--success-light)] text-[var(--success)]" : "bg-[var(--danger-light)] text-[var(--danger)]"}`}>
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-[9px] text-white" style={{ background: side === "in" ? "var(--chart-in)" : "var(--chart-out)" }}>
               {side === "in" ? <ArrowDownLeft size={17} /> : <ArrowUpRight size={17} />}
             </span>
             <div>
@@ -513,7 +514,7 @@ export function TransactionsList({
               <p className="text-[12px] text-[var(--muted)]">{items.length === 0 ? tx.say("nothingYet") : tx.say("entries", { count: items.length })}</p>
             </div>
           </div>
-          <p className={`text-[18px] font-semibold tabular-nums ${side === "in" ? "text-[var(--success)]" : "text-[var(--danger)]"}`}>{money(total)}</p>
+          <p className="num text-[20px] text-[var(--foreground)]">{money(total)}</p>
         </header>
         {items.length === 0 ? (
           <p className="border-t border-[var(--border)] px-4 py-6 text-center text-sm text-[var(--muted)]">
@@ -568,22 +569,30 @@ export function TransactionsList({
       </div>
 
       {/* Totals for the period */}
-      <div className={`grid ${showProfit ? "grid-cols-3" : "grid-cols-2"} divide-x divide-[var(--border)] overflow-hidden rounded-xl border border-[var(--border)] bg-white shadow-[var(--shadow-sm)]`}>
-        <div className="px-3 py-3 sm:px-4">
-          <p className="text-[12px] text-[var(--muted)]">{tx.say("moneyIn")}</p>
-          <p className="text-[17px] font-semibold tabular-nums text-[var(--success)] sm:text-[22px]">{money(incomeTotal)}</p>
+      <section className="card p-4">
+        <div className={`grid gap-3 ${showProfit ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-2"}`}>
+          <div>
+            <p className="flex items-center gap-1.5 font-semibold text-[var(--foreground-secondary)]"><Dot color="var(--chart-in)" />{tx.say("moneyIn")}</p>
+            <p className="num text-[24px] leading-tight text-[var(--foreground)]">{money(incomeTotal)}</p>
+          </div>
+          <div>
+            <p className="flex items-center gap-1.5 font-semibold text-[var(--foreground-secondary)]"><Dot color="var(--chart-out)" />{tx.say("moneyOut")}</p>
+            <p className="num text-[24px] leading-tight text-[var(--foreground)]">{money(expenseTotal)}</p>
+          </div>
+          {showProfit ? (
+            <div className="col-span-2 rounded-xl bg-[var(--panel-secondary)] px-3 py-2 sm:col-span-1 sm:bg-transparent sm:p-0">
+              <p className="font-semibold text-[var(--foreground-secondary)]">{profit < 0 ? tx.say("loss") : tx.say("profit")}</p>
+              <p className={`num text-[24px] leading-tight ${profit < 0 ? "text-[var(--danger)]" : "text-[var(--success)]"}`}>{money(profit)}</p>
+            </div>
+          ) : null}
         </div>
-        <div className="px-3 py-3 sm:px-4">
-          <p className="text-[12px] text-[var(--muted)]">{tx.say("moneyOut")}</p>
-          <p className="text-[17px] font-semibold tabular-nums text-[var(--danger)] sm:text-[22px]">{money(expenseTotal)}</p>
-        </div>
-        {showProfit ? (
-        <div className="px-3 py-3 sm:px-4">
-          <p className="text-[12px] text-[var(--muted)]">{profit < 0 ? tx.say("loss") : tx.say("profit")}</p>
-          <p className={`text-[17px] font-semibold tabular-nums sm:text-[22px] ${profit < 0 ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{money(profit)}</p>
-        </div>
+        {incomeTotal + expenseTotal > 0 ? (
+          <div aria-hidden="true" className="mt-3 flex h-3 overflow-hidden rounded-full bg-[var(--panel-tertiary)]">
+            <span className="bg-[var(--chart-in)]" style={{ width: `${(incomeTotal / (incomeTotal + expenseTotal)) * 100}%` }} />
+            <span className="border-l-2 border-white bg-[var(--chart-out)]" style={{ width: `${(expenseTotal / (incomeTotal + expenseTotal)) * 100}%` }} />
+          </div>
         ) : null}
-      </div>
+      </section>
       {/* Search, and select-to-delete */}
       <div className="flex items-center gap-2">
         <label className="relative block min-w-0 flex-1">
@@ -618,10 +627,10 @@ export function TransactionsList({
       </div>
 
       {deposits.length > 0 ? (
-        <details className="group overflow-hidden rounded-xl border border-[var(--border)] bg-white shadow-[var(--shadow-sm)]">
-          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3">
+        <details className="card group overflow-hidden">
+          <summary className="tile-sky flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3">
             <div>
-              <h2 className="text-[15px] font-semibold text-[var(--foreground)]">{tx.say("deposits", { count: deposits.length })}</h2>
+              <h2 className="text-[16px]">{tx.say("deposits", { count: deposits.length })}</h2>
               <p className="text-[12px] text-[var(--muted)]">{tx.say("depositsHint")}</p>
             </div>
             <p className="text-right text-[13px] text-[var(--foreground-secondary)]">

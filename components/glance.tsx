@@ -175,3 +175,9 @@ export function PartBar({ part, whole, color = "var(--success)" }: { part: numbe
     </span>
   );
 }
+
+/** Two letters for an avatar. Thai words can start with a vowel sign written first (เ แ โ ใ ไ): the consonant is the letter. */
+export function initialsOf(name: string | null | undefined) {
+  const words = String(name || "").trim().split(/\s+/).filter(Boolean).slice(0, 2);
+  return words.map((word) => Array.from(word.replace(/^[\u0E40-\u0E44]+/, ""))[0] || Array.from(word)[0] || "").join("").toUpperCase() || "?";
+}

@@ -81,7 +81,11 @@ const recordItems: NavItem[] = [
 // Rory, 6 Oct: To do and Inbox earn a place in the bar; Bookings is one tap away under More.
 const mobileBarKeys: NavKey[] = ["dashboard", "tasks", "inbox"];
 
-export function AppShell({ children, userEmail }: { children: React.ReactNode; userEmail?: string | null }) {
+/**
+ * `hero`: the teal band a page opens with (Lagoon look): on a phone it runs edge to edge behind the logo row,
+ * on a computer it is a rounded block at the top of the page.
+ */
+export function AppShell({ children, userEmail, hero, heroOverlap = false }: { children: React.ReactNode; userEmail?: string | null; hero?: React.ReactNode; heroOverlap?: boolean }) {
   const t = useTranslations("nav");
   const [fastActionOpen, setFastActionOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
@@ -138,7 +142,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
   const badgeFor = (key: NavKey) => (key === "inbox" ? shell.unreadChats : key === "tasks" ? shell.dueTasks : key === "help" ? shell.helpReplies : 0);
 
   return (
-    <div className="min-h-screen pb-24 lg:pb-0">
+    <div className="min-h-screen pb-28 lg:pb-0">
       <BrandStyle colour={brand?.colour} />
       <aside className="fixed left-0 top-0 z-20 hidden h-screen w-[220px] flex-col border-r border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] px-3 py-4 lg:flex">
         <div className="mb-4 flex items-center px-2 pt-1">
@@ -220,16 +224,17 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
       </aside>
 
       <main className="content-area mx-auto lg:ml-[220px] lg:max-w-none">
-        {userEmail ? (
+        {(() => {
+          const topRow = userEmail ? (
           // Phones: logo and (for people in several businesses) the switcher.
           // Account and sign-out live under More, away from thumbs.
           <div className="mb-3 flex items-center justify-between gap-2 lg:hidden">
             <Link aria-label={brand?.name || "RouteHQ dashboard"} href="/">
               {brand?.logoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img alt={brand.name} className="h-8 max-w-[140px] object-contain object-left" src={brand.logoUrl} />
+                <img alt={brand.name} className={`h-8 max-w-[140px] object-contain object-left ${hero ? "rounded-md bg-white px-1.5 py-0.5" : ""}`} src={brand.logoUrl} />
               ) : (
-                <RouteHqLogo className="h-7 w-auto" showDescriptor={false} />
+                <RouteHqLogo className="h-7 w-auto" showDescriptor={false} tone={hero ? "dark" : "light"} />
               )}
             </Link>
             <span className="ml-auto">{!isTeammate ? <AskBox variant="icon" /> : null}</span>
@@ -251,13 +256,22 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
               </form>
             ) : null}
           </div>
-        ) : null}
+          ) : null;
+          return hero ? (
+            <div className={`-mx-[14px] -mt-[14px] rounded-b-[32px] bg-[var(--band)] px-[14px] pt-[14px] text-[var(--band-ink)] sm:-mx-6 sm:-mt-5 sm:px-6 lg:mx-0 lg:mt-0 lg:rounded-[28px] lg:px-7 lg:pt-7 ${heroOverlap ? "mb-0 pb-10 lg:pb-12" : "mb-4 pb-6 lg:mb-5 lg:pb-7"}`}>
+              {topRow}
+              {hero}
+            </div>
+          ) : (
+            topRow
+          );
+        })()}
         {isTeammate ? null : <TrialBanner />}
         {children}
         {isTeammate ? null : <TrialBanner placement="inline" />}
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] lg:hidden">
+      <nav className="fixed bottom-3 left-3 right-3 z-30 rounded-[24px] border border-[var(--border)] bg-white shadow-[var(--shadow-float)] lg:hidden">
         {/* On phones the + lives in the menu bar: floating over the page it sat on top of the buttons at the end of each row. */}
         <div className={`grid px-1 py-2 ${onFocusedFlow ? "grid-cols-4" : "grid-cols-5"}`}>
           {mobileBarItems.map((item, index) => {
@@ -267,14 +281,14 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
               {index === 2 && !onFocusedFlow ? (
                 <button aria-label={t("openFastActions")} className="flex items-center justify-center" onClick={() => setFastActionOpen(true)} type="button">
                   {/* Centred in the bar: its middle sits level with the middle of each icon-and-label pair. */}
-                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--primary)] text-white">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-ink)]">
                     <Plus size={26} />
                   </span>
                 </button>
               ) : null}
               <Link
                 className={`phone-bar-item flex min-w-0 flex-col items-center gap-1 rounded-md px-1 py-2 font-bold ${
-                  isActive(item.href) ? "text-[var(--foreground)]" : "text-[var(--muted)]"
+                  isActive(item.href) ? "text-[var(--primary)]" : "text-[var(--muted)]"
                 }`}
                 href={item.href}
                 key={item.key}
@@ -293,7 +307,7 @@ export function AppShell({ children, userEmail }: { children: React.ReactNode; u
           <button
             aria-expanded={moreOpen}
             className={`phone-bar-item flex min-w-0 flex-col items-center gap-1 rounded-md px-1 py-2 font-bold ${
-              moreActive || moreOpen ? "text-[var(--foreground)]" : "text-[var(--muted)]"
+              moreActive || moreOpen ? "text-[var(--primary)]" : "text-[var(--muted)]"
             }`}
             onClick={() => setMoreOpen(true)}
             type="button"

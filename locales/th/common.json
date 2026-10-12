@@ -96,7 +96,12 @@
     "backSameDay": "รับคืนจาก {who} วันเดียวกัน",
     "holdEnding": "การกัน {vehicle} จะหมดเวลา {time} น.",
     "holdEndingDetail": "{who} ยังไม่ได้เซ็น",
-    "reportsProblem": "{who} แจ้งปัญหาเรื่องรถ"
+    "reportsProblem": "{who} แจ้งปัญหาเรื่องรถ",
+    "weekOut": "ส่งรถ",
+    "weekBack": "รับรถคืน",
+    "statUrgent": "ต้องจัดการด่วน",
+    "statToday": "งานวันนี้",
+    "earningCount": "ออกให้เช่า {out} จาก {total} คัน"
   },
   "vehicles": {
     "addVehicle": "เพิ่มยานพาหนะใหม่",
@@ -1067,7 +1072,10 @@
     "job_problem": "ด่วน: ลูกค้าแจ้งปัญหา",
     "job_returnArranged": "ลูกค้านัดคืนรถแล้ว",
     "job_owed_early": "ค่าเช่าที่ต้องตัดสินใจ: {amount} สำหรับวันที่ไม่ได้ใช้",
-    "job_owed_early_detail": "คืนรถก่อนกำหนด {days} วัน ค้างจ่าย {owed}"
+    "job_owed_early_detail": "คืนรถก่อนกำหนด {days} วัน ค้างจ่าย {owed}",
+    "bandOverdue": "เลยกำหนด",
+    "bandToday": "วันนี้",
+    "bandWeek": "สัปดาห์นี้"
   },
   "bookings": {
     "eyebrow": "การจอง",
@@ -1130,7 +1138,10 @@
     "deleteConfirm": "ลบการจองนี้ถาวรหรือไม่ ลบได้เฉพาะการจองที่บันทึกผิดเท่านั้น ถ้ามีสัญญาที่เซ็นแล้ว การชำระเงิน หรือการตรวจสภาพรถ ให้ใช้ <b>ยกเลิกการจอง</b> แทน เพื่อเก็บประวัติไว้",
     "deleting": "กำลังลบ…",
     "confirmDelete": "ยืนยันการลบ",
-    "back": "ไม่ลบ"
+    "back": "ไม่ลบ",
+    "bandOnRent": "กำลังเช่า",
+    "bandStarting": "เริ่มสัปดาห์นี้",
+    "bandOwing": "ค้างชำระ"
   },
   "inbox": {
     "title": "ข้อความ",
@@ -2427,7 +2438,10 @@
     "perWk": "{amount}/สัปดาห์",
     "perDay": "{amount}/วัน",
     "overPlan": "รถมากกว่าที่แพ็กเกจรองรับ {count} คัน ยังใช้งานได้ตามปกติ กรุณาเปลี่ยนเป็น {plan} ภายใน 14 วัน",
-    "seePlans": "ดูแพ็กเกจ"
+    "seePlans": "ดูแพ็กเกจ",
+    "bandVehicles": "คัน",
+    "bandOut": "ออกให้เช่า",
+    "bandFree": "ว่างตอนนี้"
   },
   "customers": {
     "noRentals": "ยังไม่เคยเช่า",

@@ -209,7 +209,7 @@ function buildHeaderBubble(orgName: string, dateStr: string) {
         { type: "text", text: "Good morning! 🌅", size: "xl", color: "#ffffff", weight: "bold" },
         { type: "text", text: dateStr, size: "xs", color: "#ffffff99" }
       ],
-      backgroundColor: "#24456b",
+      backgroundColor: "#0e5e6f",
       paddingAll: "20px"
     },
     body: {
@@ -302,7 +302,7 @@ function buildPaymentsBubble(payments: any[]) {
   const total = payments.reduce((s, r) => s + Number(r.balance_due || 0), 0);
   const rows: any[] = [
     { type: "text", text: `💰 Payments Due Today`, weight: "bold", size: "sm", color: "#172026" },
-    { type: "text", text: THB(total), size: "lg", weight: "bold", color: "#24456b" }
+    { type: "text", text: THB(total), size: "lg", weight: "bold", color: "#0e5e6f" }
   ];
 
   for (const r of payments.slice(0, 4)) {
@@ -370,7 +370,7 @@ function buildRevenueBubble(monthRevenue: number) {
       layout: "vertical",
       contents: [
         { type: "text", text: "📈 This Month So Far", weight: "bold", size: "sm", color: "#172026" },
-        { type: "text", text: THB(monthRevenue), size: "xxl", weight: "bold", color: "#24456b", margin: "md" },
+        { type: "text", text: THB(monthRevenue), size: "xxl", weight: "bold", color: "#0e5e6f", margin: "md" },
         { type: "text", text: "Rent received this month (deposits not included)", size: "xs", color: "#667085", margin: "sm" }
       ],
       paddingAll: "16px",

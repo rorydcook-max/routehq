@@ -26,7 +26,7 @@ import type { DatePreset, ReportsData, VehicleMetrics } from "@/lib/reports";
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
 const PRESETS: DatePreset[] = ["this_month", "last_month", "last_3_months", "last_6_months", "this_year", "last_year", "custom"];
-const CHART_COLORS = ["#24456b", "#2f6b45", "#b8742a", "#a04b36", "#6b4c8a", "#5b7f9e", "#8a9a5b", "#b07fa0"];
+const CHART_COLORS = ["#0e5e6f", "#2b6b47", "#e8952a", "#b4472c", "#6b4c8a", "#4f9a94", "#8a9a5b", "#b07fa0"];
 const BAHT = "฿";
 
 export function money(value: number) {
@@ -209,7 +209,7 @@ function ComparisonPanel({ vehicles, say }: { vehicles: VehicleMetrics[]; say: S
               <YAxis tick={{ fontSize: 12 }} tickFormatter={(value) => `${BAHT}${(value / 1000).toFixed(0)}k`} width={48} />
               <Tooltip formatter={(value) => money(Number(value))} />
               <Legend />
-              <Bar isAnimationActive={false} dataKey={inKey} fill="#24456b" radius={[2, 2, 0, 0]} />
+              <Bar isAnimationActive={false} dataKey={inKey} fill="#0e5e6f" radius={[2, 2, 0, 0]} />
               <Bar isAnimationActive={false} dataKey={outKey} fill="#ebc8bc" radius={[2, 2, 0, 0]} />
               <Bar isAnimationActive={false} dataKey={profitKey} fill="#2f6b45" radius={[2, 2, 0, 0]} />
             </BarChart>

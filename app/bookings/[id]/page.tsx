@@ -24,6 +24,8 @@ import { ExtrasPanel } from "@/app/bookings/[id]/extras-panel";
 import { EarlyReturnOwedPanel } from "@/app/bookings/[id]/early-return-owed";
 import { activeExtrasLines, extrasLines, extrasSummary } from "@/lib/extras";
 import { AppShell } from "@/components/app-shell";
+import { VehicleArt } from "@/components/vehicle-art";
+import { kindFromCategory } from "@/lib/vehicle-groups";
 import { AddRentalPaymentInlineForm, EditableEndDate, EditableRentalPaymentRow, EditableTransactionRow, ExistingRentalPaymentSetupCard } from "@/components/booking-correction-controls";
 import { CommunicationPanel } from "@/components/communication-panel";
 import { RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
@@ -604,10 +606,20 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 {/* Where the money stands, in one phrase, at the top. The reference is in the breadcrumb and the plate under Vehicle. */}
                 {!awaitingSignature ? <span className={`font-bold ${financialStateClass}`}>{financialState.label}</span> : null}
               </div>
-              <h1 className="mt-3 text-[28px] font-bold leading-tight tracking-[-0.01em] text-[var(--foreground)]">
-                {customer ? customer.full_name : tx.list("awaitingCustomer")}
-              </h1>
-              <p className="mt-1 text-[17px] font-semibold text-[var(--foreground-secondary)]">{vehicleTitle(vehicle)}</p>
+              {/* Who has it, and a picture of what they have: the vehicle in its own colour (Lagoon look). */}
+              <div className="mt-3 flex items-center gap-3">
+                <div className="min-w-0 flex-1">
+                  <h1 className="text-[28px] font-bold leading-tight tracking-[-0.01em] text-[var(--foreground)]">
+                    {customer ? customer.full_name : tx.list("awaitingCustomer")}
+                  </h1>
+                  <p className="mt-1 text-[17px] font-semibold text-[var(--foreground-secondary)]">{vehicleTitle(vehicle)}</p>
+                </div>
+                {vehicle ? (
+                  <Link aria-label={vehicleTitle(vehicle)} className="shrink-0" href={`/fleet/${vehicle.id}` as Route}>
+                    <VehicleArt colour={(vehicle as any).color} kind={kindFromCategory((vehicle as any).vehicle_categories)} model={(vehicle as any).model} size="md" />
+                  </Link>
+                ) : null}
+              </div>
               {awaitingSignature && holdUntil ? (
                 <p className="mt-2 font-semibold text-[var(--warning)]">
                   {new Date(holdUntil).getTime() > Date.now()

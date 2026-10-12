@@ -96,7 +96,12 @@
     "backSameDay": "back from {who} the same day",
     "holdEnding": "Hold on the {vehicle} ends at {time}",
     "holdEndingDetail": "{who} has not signed yet",
-    "reportsProblem": "{who} has a problem with the vehicle"
+    "reportsProblem": "{who} has a problem with the vehicle",
+    "weekOut": "Going out",
+    "weekBack": "Coming back",
+    "statUrgent": "Needs you now",
+    "statToday": "To do today",
+    "earningCount": "{out} of {total} out earning"
   },
   "nav": {
     "main": "Main",
@@ -1058,7 +1063,10 @@
     "job_problem": "Urgent: the customer reported a problem",
     "job_returnArranged": "The customer arranged the return",
     "job_owed_early": "Rent to decide: {amount} for unused days",
-    "job_owed_early_detail": "Returned {days, plural, one {# day} other {# days}} early, {owed} owed"
+    "job_owed_early_detail": "Returned {days, plural, one {# day} other {# days}} early, {owed} owed",
+    "bandOverdue": "overdue",
+    "bandToday": "today",
+    "bandWeek": "this week"
   },
   "bookings": {
     "eyebrow": "Bookings",
@@ -1121,7 +1129,10 @@
     "deleteConfirm": "Delete this booking permanently? Only bookings entered by mistake can be deleted - once there is a signed agreement, a payment or an inspection, use <b>Cancel booking</b> instead so the records are kept.",
     "deleting": "Deleting…",
     "confirmDelete": "Confirm delete",
-    "back": "Cancel"
+    "back": "Cancel",
+    "bandOnRent": "on rent",
+    "bandStarting": "start this week",
+    "bandOwing": "owe money"
   },
   "inbox": {
     "title": "Inbox",
@@ -2418,7 +2429,10 @@
     "perWk": "{amount}/wk",
     "perDay": "{amount}/day",
     "overPlan": "{count, plural, one {# vehicle} other {# vehicles}} more than your plan covers. Nothing is blocked; please move up to {plan} within 14 days.",
-    "seePlans": "See plans"
+    "seePlans": "See plans",
+    "bandVehicles": "{count, plural, one {vehicle} other {vehicles}}",
+    "bandOut": "out earning",
+    "bandFree": "free now"
   },
   "customers": {
     "noRentals": "No rentals yet",

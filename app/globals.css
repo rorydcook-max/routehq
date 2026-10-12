@@ -990,87 +990,103 @@ aside a[class*="bg-[var(--sidebar-active)]"] {
 }
 
 /* =====================================================================
-   "Harbour" look (Oct 2026).
-   Pale blue-grey canvas, white surfaces with a hairline border and a soft
-   shadow, one deep marine accent for anything you can press, and colour
-   otherwise kept for meaning: status (success / warning / danger) and the
-   kind of job (money, refund, form, handover, message) in small chips and
-   tags only - never on buttons or backgrounds. Anuphan covers Thai and
-   Latin in one family. These override the older tokens above.
+   "Lagoon" look (12 Oct 2026, chosen by Rory over Harbour).
+   Pale aqua canvas, white rounded surfaces, deep teal for anything you can
+   press and for the header bands, mango for the one thing to do next (the +
+   button, the main call to action, today on the week strip). Status colours
+   keep their meaning (success / warning / danger) and each kind of job
+   (money, refund, form, handover, message) keeps its own tint. No gradients,
+   no dark mode, no black buttons. Anuphan covers Thai and Latin.
+   These override the older tokens above.
    ===================================================================== */
 :root {
-  --background: #f2f4f6;
+  --background: #eef5f4;
   --panel: #ffffff;
-  --panel-secondary: #f2f4f6;
-  --panel-tertiary: #e6eaef;
-  --border: #e3e8ed;
-  --border-strong: #c9d3de;
+  --panel-secondary: #f3f8f7;
+  --panel-tertiary: #e3eeec;
+  --border: #dbe9e6;
+  --border-strong: #b9d4d0;
 
-  --foreground: #1b2430;
-  --foreground-secondary: #3d4855;
-  --muted: #5c6773;
+  --foreground: #13262b;
+  --foreground-secondary: #2f4448;
+  --muted: #4b5f63;
 
-  --sidebar-bg: #f7f9fb;
-  --sidebar-darker: #eef2f6;
-  --sidebar-hover: rgba(27, 36, 48, 0.05);
-  --sidebar-text: #3d4855;
-  --sidebar-text-muted: #8a94a0;
-  --sidebar-text-active: #24456b;
-  --sidebar-border: #dce3eb;
-  --sidebar-active: #24456b;
+  --sidebar-bg: #ffffff;
+  --sidebar-darker: #eef5f4;
+  --sidebar-hover: rgba(14, 94, 111, 0.06);
+  --sidebar-text: #2f4448;
+  --sidebar-text-muted: #6b7f83;
+  --sidebar-text-active: #0e5e6f;
+  --sidebar-border: #dbe9e6;
+  --sidebar-active: #0e5e6f;
 
-  --primary: #24456b;
-  --primary-hover: #1a3451;
-  --primary-light: #e6edf5;
-  --primary-blue: #24456b;
-  --primary-blue-hover: #1a3451;
-  --primary-blue-light: #e6edf5;
+  --primary: #0e5e6f;
+  --primary-hover: #0a4653;
+  --primary-light: #d8eeea;
+  --primary-blue: #0e5e6f;
+  --primary-blue-hover: #0a4653;
+  --primary-blue-light: #d8eeea;
 
-  --gradient-brand: #24456b;
-  --gradient-teal: #24456b;
-  --gradient-dark: #1b2430;
-  --gradient-dark-subtle: #1b2430;
-  --analytics-panel: #1b2430;
-  --analytics-card: #243040;
+  /* The one thing to do next. Text on it is dark, never white (white on mango fails contrast). */
+  --accent: #f2a541;
+  --accent-hover: #e8952a;
+  --accent-ink: #13262b;
+  --accent-light: #fdf0d8;
+  --band-action: var(--accent);
+  --band-logo-accent: #f2a541;
+  --band-action-ink: var(--accent-ink);
 
-  --success: #2f6b45;
-  --success-light: #e3efe6;
-  --success-line: #c3dccb;
-  --warning: #b8742a;
-  --warning-light: #f6ebdb;
-  --warning-line: #e8d3b4;
-  --danger: #a8432f;
-  --danger-light: #f8e6e1;
-  --danger-line: #ebc8bc;
-  --info: #24456b;
-  --info-light: #e6edf5;
-  --info-line: #c6d3e3;
+  /* Header bands (Today, Fleet): the teal block the page opens with. */
+  --band: #0e5e6f;
+  --band-ink: #ffffff;
+  --band-soft: rgba(255, 255, 255, 0.14);
+
+  --gradient-brand: #0e5e6f;
+  --gradient-teal: #0e5e6f;
+  --gradient-dark: #13262b;
+  --gradient-dark-subtle: #13262b;
+  --analytics-panel: #0e5e6f;
+  --analytics-card: #0a4653;
+
+  --success: #2b6b47;
+  --success-light: #ddf0e4;
+  --success-line: #bfdfca;
+  --warning: #9a5d0c;
+  --warning-light: #fff1d6;
+  --warning-line: #f1d8a6;
+  --danger: #b4472c;
+  --danger-light: #fbe6dc;
+  --danger-line: #f0c6b6;
+  --info: #0e5e6f;
+  --info-light: #d8eeea;
+  --info-line: #b9d4d0;
   --purple: #6b4c8a;
   --purple-light: #efe8f5;
   --purple-line: #d8cbe5;
 
-  --urgent-red: #a8432f;
-  --urgent-amber: #b8742a;
-  --urgent-orange: #b8742a;
-  --urgent-green: #2f6b45;
+  --urgent-red: #b4472c;
+  --urgent-amber: #9a5d0c;
+  --urgent-orange: #9a5d0c;
+  --urgent-green: #2b6b47;
 
   /* Kind of job: a chip colour and its tint. */
-  --kind-money: #2f6b45;
-  --kind-money-bg: #e3efe6;
-  --kind-refund: #a8432f;
-  --kind-refund-bg: #f8e7e0;
-  --kind-form: #7a4a12;
-  --kind-form-bg: #f6ebdb;
-  --kind-move: #24456b;
-  --kind-move-bg: #e6edf5;
+  --kind-money: #2b6b47;
+  --kind-money-bg: #ddf0e4;
+  --kind-refund: #b4472c;
+  --kind-refund-bg: #fbe6dc;
+  --kind-form: #8a540e;
+  --kind-form-bg: #fff1d6;
+  --kind-move: #0e5e6f;
+  --kind-move-bg: #d8eeea;
   --kind-message: #6b4c8a;
   --kind-message-bg: #efe8f5;
 
-  --focus-ring: rgba(36, 69, 107, 0.16);
-  --focus-ring-strong: rgba(36, 69, 107, 0.28);
+  --focus-ring: rgba(14, 94, 111, 0.18);
+  --focus-ring-strong: rgba(14, 94, 111, 0.3);
   --shadow-sm: none;
   --shadow-md: none;
-  --radius: 18px;
+  --shadow-float: 0 8px 24px rgba(14, 94, 111, 0.14);
+  --radius: 20px;
 }
 
 body {

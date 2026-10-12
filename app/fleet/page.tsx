@@ -6,6 +6,7 @@ import { bulkArchiveVehicles, bulkDeleteVehicles } from "@/app/actions/vehicles"
 import { AppShell } from "@/components/app-shell";
 import { Badge, EmptyState, ProgressBar } from "@/components/ui";
 import { OutFreeSummary, VehicleKindIcon } from "@/components/vehicle-kind-icon";
+import { VehicleArt } from "@/components/vehicle-art";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDashboardData, money } from "@/lib/dashboard";
 import { FleetBulkActions } from "@/app/fleet/fleet-actions";
@@ -64,25 +65,41 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
   const kindName = (group: { kind: string; label: string }) => (c.has(`kinds_${group.kind}`) ? c(`kinds_${group.kind}`) : group.label);
 
   return (
-    <AppShell userEmail={userEmail}>
-      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <AppShell
+      hero={
         <div>
-          <h1 className="page-title">{t("title")}</h1>
-          <p className="mt-1 font-semibold text-[var(--foreground-secondary)]">
-            {t("summary", { count: vehicles.length, out: totalOut, free: totalFree })}
-          </p>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h1 className="text-[30px] font-bold leading-tight text-white">{t("title")}</h1>
+            <div className="flex flex-wrap gap-2">
+              <Link className="pressable inline-flex min-h-11 items-center gap-2 rounded-full bg-[var(--band-soft)] px-4 font-bold text-white" href="/fleet/import">
+                <FileSpreadsheet size={16} />
+                {t("import")}
+              </Link>
+              <Link className="pressable inline-flex min-h-11 items-center gap-2 rounded-full bg-[var(--band-action)] px-4 font-bold text-[var(--band-action-ink)]" href="/fleet/new">
+                <Plus size={16} />
+                {t("addVehicle")}
+              </Link>
+            </div>
+          </div>
+          <div className="mt-4 grid max-w-xl grid-cols-3 gap-2">
+            <span className="rounded-2xl bg-[var(--band-soft)] px-3 py-2.5 text-white">
+              <span className="block text-[24px] font-bold leading-none tabular-nums">{vehicles.length}</span>
+              <span className="mt-1 block font-semibold text-white/85">{t("bandVehicles", { count: vehicles.length })}</span>
+            </span>
+            <span className="rounded-2xl bg-[var(--band-soft)] px-3 py-2.5 text-white">
+              <span className="block text-[24px] font-bold leading-none tabular-nums">{totalOut}</span>
+              <span className="mt-1 block font-semibold text-white/85">{t("bandOut")}</span>
+            </span>
+            <span className="rounded-2xl bg-white px-3 py-2.5 text-[var(--foreground)]">
+              <span className="block text-[24px] font-bold leading-none tabular-nums">{totalFree}</span>
+              <span className="mt-1 block font-semibold text-[var(--muted)]">{t("bandFree")}</span>
+            </span>
+          </div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Link className={secondaryButton} href="/fleet/import">
-            <FileSpreadsheet size={16} />
-            {t("import")}
-          </Link>
-          <Link className={primaryButton} href="/fleet/new">
-            <Plus size={16} />
-            {t("addVehicle")}
-          </Link>
-        </div>
-      </div>
+      }
+      userEmail={userEmail}
+    >
+      <div className="mb-5" />
 
       {over > 0 ? (
         <p className="mb-4 rounded-xl border border-[var(--warning-line)] bg-[var(--warning-light)] p-3 text-sm font-medium text-[var(--foreground)]" role="status">
@@ -170,12 +187,15 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                           <input aria-label={t("selectAria", { vehicle: `${vehicle.make} ${vehicle.model}` })} className="flex-shrink-0" form="fleetBulkForm" name="vehicleIds" type="checkbox" value={vehicle.id} />
                         </td>
                         <td className="py-3 pr-3">
-                          <Link className="block rounded-md outline-none focus:ring-2 focus:ring-[var(--primary)]/25" href={href}>
-                            <span className="whitespace-nowrap font-semibold text-[var(--foreground)] group-hover:text-[var(--primary)]">
-                              {vehicle.make} {vehicle.model}
-                            </span>
-                            <span className="block whitespace-nowrap text-[13px] text-[var(--muted)]">
-                              <span className="font-mono-data">{vehicle.plate}</span> · {vehicle.year || t("yearUnknown")} · {vehicle.mileage.toLocaleString()} km
+                          <Link className="flex items-center gap-3 rounded-md outline-none focus:ring-2 focus:ring-[var(--primary)]/25" href={href}>
+                            <VehicleArt colour={vehicle.color} kind={group.kind} model={vehicle.model} size="sm" />
+                            <span className="min-w-0">
+                              <span className="block whitespace-nowrap font-semibold text-[var(--foreground)] group-hover:text-[var(--primary)]">
+                                {vehicle.make} {vehicle.model}
+                              </span>
+                              <span className="block whitespace-nowrap text-[13px] text-[var(--muted)]">
+                                <span className="font-mono-data">{vehicle.plate}</span> · {vehicle.year || t("yearUnknown")} · {vehicle.mileage.toLocaleString()} km
+                              </span>
                             </span>
                           </Link>
                         </td>
@@ -207,7 +227,8 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
             <ul className="divide-y divide-[var(--border)] lg:hidden">
               {group.vehicles.map((vehicle) => (
                 <li key={vehicle.id}>
-                  <Link className="flex items-center gap-3 px-4 py-3.5 active:bg-[var(--panel-secondary)]" href={`/fleet/${vehicle.id}`}>
+                  <Link className="flex items-center gap-3 px-3 py-3 active:bg-[var(--panel-secondary)]" href={`/fleet/${vehicle.id}`}>
+                    <VehicleArt colour={vehicle.color} kind={group.kind} model={vehicle.model} />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-[17px] font-bold text-[var(--foreground)]">
                         {vehicle.make} {vehicle.model}
@@ -217,13 +238,11 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                         <span className="font-mono-data whitespace-nowrap">{vehicle.plate}</span>
                         {priceOf(vehicle) ? <span className="whitespace-nowrap">· {priceOf(vehicle)}</span> : null}
                       </p>
-                      {vehicle.complianceNext && vehicle.complianceNext.daysLeft <= 30 ? (
-                        <div className="mt-1.5">
-                          <ComplianceBadge attention={vehicle.complianceAttentionCount} item={vehicle.complianceNext} />
-                        </div>
-                      ) : null}
+                      <div className="mt-1.5 flex flex-wrap gap-1.5">
+                        {vehicle.freeUntil ? <Badge tone="green">{t("status_freeUntil", { date: dayMonth(vehicle.freeUntil) })}</Badge> : <Badge tone={statusTone[vehicle.status]}>{t(`status_${vehicle.status}`)}</Badge>}
+                        {vehicle.complianceNext && vehicle.complianceNext.daysLeft <= 30 ? <ComplianceBadge attention={vehicle.complianceAttentionCount} item={vehicle.complianceNext} /> : null}
+                      </div>
                     </div>
-                    {vehicle.freeUntil ? <Badge tone="green">{t("status_freeUntil", { date: dayMonth(vehicle.freeUntil) })}</Badge> : <Badge tone={statusTone[vehicle.status]}>{t(`status_${vehicle.status}`)}</Badge>}
                   </Link>
                 </li>
               ))}

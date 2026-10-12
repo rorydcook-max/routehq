@@ -6,6 +6,7 @@ import { intlLocale } from "@/lib/i18n/dates";
 import type { Route } from "next";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
+import { bandTab, PageBand } from "@/components/page-band";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getAvailability, getCalendarEvents } from "@/lib/calendar";
 import { getDefaultOrganization } from "@/lib/organization";
@@ -44,27 +45,23 @@ export default async function CalendarPage({
     byVehicle ? Promise.resolve([]) : getTaskList(organization.id),
     byVehicle ? getAvailability(organization.id, Number(yearStr), Number(monthStr)) : Promise.resolve([])
   ]);
-  const tab = (active: boolean) =>
-    `pressable inline-flex min-h-10 items-center rounded-xl border px-4 text-sm font-bold ${active ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground)]"}`;
 
   return (
-    <AppShell userEmail={userEmail}>
-      <div className="page-hero mb-5">
-        <p className="page-eyebrow">{t("title")}</p>
-        <h1 className="page-title">{t("title")}</h1>
-        <p className="page-subtitle mt-1">
-          {byVehicle ? t("subVehicle") : t("subDay")}
-        </p>
-      </div>
-
-      <div className="mb-4 flex gap-2">
-        <Link className={tab(!byVehicle)} href={`/calendar?month=${month}` as Route}>
-          {t("byDay")}
-        </Link>
-        <Link className={tab(byVehicle)} href={`/calendar?view=vehicles&month=${month}` as Route}>
-          {t("byVehicle")}
-        </Link>
-      </div>
+    <AppShell
+      userEmail={userEmail}
+      hero={
+        <PageBand subtitle={byVehicle ? t("subVehicle") : t("subDay")} title={t("title")}>
+          <div className="flex gap-2">
+            <Link className={bandTab(!byVehicle)} href={`/calendar?month=${month}` as Route}>
+              {t("byDay")}
+            </Link>
+            <Link className={bandTab(byVehicle)} href={`/calendar?view=vehicles&month=${month}` as Route}>
+              {t("byVehicle")}
+            </Link>
+          </div>
+        </PageBand>
+      }
+    >
 
       {byVehicle ? (
         <div className="space-y-4">

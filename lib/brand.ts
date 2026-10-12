@@ -4,7 +4,9 @@
  * the focus ring so everything stays readable.
  */
 
-export const ROUTEHQ_BRAND = "#24456b";
+export const ROUTEHQ_BRAND = "#0e5e6f";
+/** RouteHQ's colours before Lagoon: a business that has one saved simply has RouteHQ's own. */
+const EARLIER_ROUTEHQ = ["#24456b"];
 
 export function isBrandColour(value: unknown): value is string {
   return /^#[0-9a-f]{6}$/i.test(String(value || ""));
@@ -62,7 +64,7 @@ export function brandPalette(colour: string): BrandPalette {
 
 /** The CSS that re-colours a page. Empty when the colour is RouteHQ's own. */
 export function brandCss(colour: string | null | undefined) {
-  if (!isBrandColour(colour) || colour.toLowerCase() === ROUTEHQ_BRAND) return "";
+  if (!isBrandColour(colour) || colour.toLowerCase() === ROUTEHQ_BRAND || EARLIER_ROUTEHQ.includes(colour.toLowerCase())) return "";
   const palette = brandPalette(colour);
-  return `:root{--primary:${palette.primary};--primary-hover:${palette.hover};--primary-light:${palette.light};--primary-blue:${palette.primary};--primary-blue-hover:${palette.hover};--primary-blue-light:${palette.light};--primary-strong:${palette.hover};--gradient-brand:${palette.primary};--gradient-teal:${palette.primary};--info:${palette.primary};--info-light:${palette.light};--sidebar-active:${palette.primary};--sidebar-text-active:${palette.primary};--kind-move:${palette.primary};--kind-move-bg:${palette.light};--focus-ring:${palette.ring};--focus-ring-strong:${palette.ringStrong};}`;
+  return `:root{--primary:${palette.primary};--primary-hover:${palette.hover};--primary-light:${palette.light};--primary-blue:${palette.primary};--primary-blue-hover:${palette.hover};--primary-blue-light:${palette.light};--primary-strong:${palette.hover};--gradient-brand:${palette.primary};--gradient-teal:${palette.primary};--info:${palette.primary};--info-light:${palette.light};--sidebar-active:${palette.primary};--sidebar-text-active:${palette.primary};--kind-move:${palette.primary};--kind-move-bg:${palette.light};--focus-ring:${palette.ring};--focus-ring-strong:${palette.ringStrong};--band:${palette.primary};--band-action:#ffffff;--band-logo-accent:#ffffff;--band-action-ink:${palette.primary};--analytics-panel:${palette.primary};--analytics-card:${palette.hover};}`;
 }

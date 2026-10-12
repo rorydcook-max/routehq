@@ -3,6 +3,7 @@ import type { Route } from "next";
 import { getTranslations } from "next-intl/server";
 import { MessagesSquare } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
+import { PageBand } from "@/components/page-band";
 import { InboxView } from "@/app/inbox/inbox-view";
 import { MessagesToSend, type ToSendGroup } from "@/app/inbox/messages-to-send";
 import { getCurrentUserEmail } from "@/lib/auth/session";
@@ -91,11 +92,7 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
   const t = await getTranslations("inbox");
 
   return (
-    <AppShell userEmail={userEmail}>
-      <div className="mb-4">
-        <h1 className="page-title">{t("title")}</h1>
-        <p className="page-subtitle mt-1">{t("subtitle")}</p>
-      </div>
+    <AppShell userEmail={userEmail} hero={<PageBand subtitle={t("subtitle")} title={t("title")} />}>
 
       {toSendGroups.length ? <MessagesToSend groups={toSendGroups} /> : null}
 

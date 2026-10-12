@@ -20,7 +20,8 @@ import { holdsEndingSoon, releaseExpiredHolds } from "@/lib/booking-holds";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isExpenseTransaction, isRevenueTransaction } from "@/lib/transaction-options";
-import { groupVehiclesByKind } from "@/lib/vehicle-groups";
+import { groupVehiclesByKind, kindFromCategory } from "@/lib/vehicle-groups";
+import { VehicleArt } from "@/components/vehicle-art";
 
 // Dates and counts are worded by the translation files (see lib/i18n/dates.ts and locales/).
 function addDays(isoDate: string, days: number) {
@@ -57,13 +58,13 @@ const TONE_CLASSES: Record<Tone, string> = {
   neutral: "bg-[var(--panel-tertiary)] text-[var(--muted)]"
 };
 
-function AgendaRow({ item }: { item: AgendaItem }) {
-  // The pressing ones get a solid button; the rest are outlined so a list of eight is not a wall of blue.
+function AgendaRow({ item, art, card = false }: { item: AgendaItem; art?: ReactNode; card?: boolean }) {
+  // The pressing ones get a solid button; the rest are outlined so a list of eight is not a wall of colour.
   const solid = item.tone === "red" || item.tone === "teal";
   return (
     <li>
-      <Link className="group flex items-center gap-3.5 px-4 py-3.5 transition hover:bg-[var(--panel-secondary)]" href={item.href as Route}>
-        <span className={`inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl ${TONE_CLASSES[item.tone]}`}>{item.icon}</span>
+      <Link className={`group flex items-center gap-3.5 transition ${card ? "card pressable p-3" : "px-4 py-3.5 hover:bg-[var(--panel-secondary)]"}`} href={item.href as Route}>
+        {art || <span className={`inline-flex flex-shrink-0 items-center justify-center ${card ? "h-11 w-14 rounded-xl" : "h-10 w-10 rounded-xl"} ${TONE_CLASSES[item.tone]}`}>{item.icon}</span>}
         <span className="min-w-0 flex-1">
           <span className="block text-[16px] font-bold leading-tight text-[var(--foreground)]">{item.title}</span>
           <span className="line-clamp-2 block font-medium text-[var(--foreground-secondary)]">
@@ -370,21 +371,78 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   const onRent = rentals.filter((r) => r.status !== "Booked").sort((a, b) => String(a.end).localeCompare(String(b.end)));
   const urgentCount = todayItems.filter((item) => item.tone === "red").length;
 
-  return (
-    <AppShell userEmail={userEmail}>
-      <div className="mb-4 flex items-end justify-between gap-3">
-        <div>
-          <p className="font-semibold text-[var(--muted)]">{headerDate}</p>
-          <h1 className="page-title mt-0.5">{greeting}</h1>
+  // ── Pictures: each job about a vehicle shows it ─────────────────────────
+  const vehicleById = new Map(vehicles.map((v) => [v.id, v]));
+  const rentalById = new Map([...rentals, ...(dashboardData.closedOverdue || [])].map((r) => [r.id, r]));
+  const jobById = new Map(taskList.map((task) => [task.id, task]));
+  const vehicleOf = (item: AgendaItem) => {
+    const match = item.key.match(/^(?:at-risk|link-waiting|late-out|out|soon-out|late-in|in|soon-in|pay)-(.+)$/);
+    if (match) return vehicleById.get(String(rentalById.get(match[1])?.vehicleId || "")) || null;
+    const doc = item.key.match(/^(?:soon-)?doc-([0-9a-f-]{36})-/);
+    if (doc) return vehicleById.get(doc[1]) || null;
+    const job = item.key.match(/^job-(.+)$/);
+    if (job) {
+      const task = jobById.get(job[1]);
+      return vehicleById.get(String(task?.vehicleId || rentalById.get(String(task?.rentalId || ""))?.vehicleId || "")) || null;
+    }
+    return null;
+  };
+  const artFor = (item: AgendaItem) => {
+    const vehicle = vehicleOf(item);
+    if (!vehicle) return null;
+    const category = categories.find((entry: any) => entry.id === vehicle.categoryId) || null;
+    return <VehicleArt colour={vehicle.color} kind={kindFromCategory(category as any)} model={vehicle.model} size="sm" />;
+  };
+
+  // ── The week ahead, for the band: what goes out and comes back each day ──
+  const weekDays = Array.from({ length: 7 }, (_, index) => {
+    const day = addDays(today, index);
+    const date = new Date(`${day}T00:00:00Z`);
+    return {
+      day,
+      out: rentals.filter((r) => r.status === "Booked" && String(r.start || "").slice(0, 10) === day).length,
+      back: rentals.filter((r) => r.status !== "Booked" && r.end !== "Indefinite" && String(r.end || "").slice(0, 10) === day).length,
+      name: new Intl.DateTimeFormat(intlLocale(locale), { weekday: "short", timeZone: "UTC" }).format(date),
+      number: date.getUTCDate()
+    };
+  });
+  const hero = (
+    <div className="flex flex-wrap items-end justify-between gap-4">
+      <div className="min-w-0 flex-1">
+        <p className="font-semibold text-white/85">{headerDate}</p>
+        <h1 className="mt-0.5 text-[30px] font-bold leading-tight text-white">{greeting}</h1>
+        <div className="mt-4 grid max-w-xl grid-cols-7 gap-1.5">
+          {weekDays.map((day, index) => (
+            <Link
+              aria-label={`${day.name} ${day.number}: ${t("weekOut")} ${day.out}, ${t("weekBack")} ${day.back}`}
+              className={`flex flex-col items-center rounded-2xl py-2 ${index === 0 ? "bg-white text-[var(--foreground)]" : "bg-[var(--band-soft)] text-white"}`}
+              href="/calendar"
+              key={day.day}
+            >
+              <span className="font-semibold leading-tight">{day.name}</span>
+              <span className="text-[19px] font-bold leading-tight tabular-nums">{day.number}</span>
+              <span className="mt-1 flex h-2 items-center gap-1">
+                {day.out ? <span className="h-2 w-2 rounded-full bg-[var(--accent)]" /> : null}
+                {day.back ? <span className="h-2 w-2 rounded-full bg-[#8fd3c9]" /> : null}
+              </span>
+            </Link>
+          ))}
         </div>
-        {/* On a phone the + in the bar does this. */}
-        <div className="hidden lg:block">
-          <Link className="primary-action pressable" href="/bookings/new">
-            <Plus size={18} />
-            {t("newBooking")}
-          </Link>
-        </div>
+        <p className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1 font-semibold text-white/90">
+          <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[var(--accent)]" />{t("weekOut")}</span>
+          <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#8fd3c9]" />{t("weekBack")}</span>
+        </p>
       </div>
+      {/* On a phone the + in the bar does this. */}
+      <Link className="pressable hidden min-h-11 items-center gap-2 rounded-full bg-[var(--band-action)] px-5 font-bold text-[var(--band-action-ink)] lg:inline-flex" href="/bookings/new">
+        <Plus size={18} />
+        {t("newBooking")}
+      </Link>
+    </div>
+  );
+
+  return (
+    <AppShell heroOverlap hero={hero} userEmail={userEmail}>
 
       {notice === "owner-only" ? (
         <p className="mb-4 rounded-[var(--radius)] border border-[var(--warning-line)] bg-[var(--warning-light)] px-4 py-3 font-semibold text-[var(--warning)]">{t("ownerOnly")}</p>
@@ -397,57 +455,59 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
         </div>
       ) : null}
 
-      {/* The two numbers that decide the day, then the money. Nothing below 14px, nothing faded. */}
-      <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Link className={`pressable flex flex-col gap-0.5 rounded-[var(--radius)] p-4 text-white ${urgentCount > 0 ? "bg-[var(--danger)]" : "bg-[var(--success)]"}`} href="/tasks">
-          <span className="text-[34px] font-bold leading-none tabular-nums">{urgentCount}</span>
-          <span className="font-semibold">{t("tileUrgent")}</span>
+      {/* The numbers that decide the day, on the band's lower edge. Nothing below 14px, nothing faded. */}
+      <div className="relative -mt-7 mb-6 grid grid-cols-2 gap-3 lg:-mt-8 lg:grid-cols-4 lg:px-4">
+        <Link className="card pressable flex flex-col gap-1 p-4" href="/tasks">
+          <span className="font-semibold text-[var(--muted)]">{t("statUrgent")}</span>
+          <span className={`text-[30px] font-bold leading-none tabular-nums ${urgentCount > 0 ? "text-[var(--danger)]" : "text-[var(--success)]"}`}>{urgentCount}</span>
         </Link>
-        <Link className="pressable flex flex-col gap-0.5 rounded-[var(--radius)] bg-[var(--primary)] p-4 text-white" href="/tasks">
-          <span className="text-[34px] font-bold leading-none tabular-nums">{todayItems.length}</span>
-          <span className="font-semibold">{t("tileToday")}</span>
+        <Link className="card pressable flex flex-col gap-1 p-4" href="/tasks">
+          <span className="font-semibold text-[var(--muted)]">{t("statToday")}</span>
+          <span className="text-[30px] font-bold leading-none tabular-nums text-[var(--foreground)]">{todayItems.length}</span>
         </Link>
-      <div className="card col-span-2 flex items-center justify-between gap-4 px-4 py-3.5">
-        <Link className="min-w-0" href="/tasks">
-          <span className="block font-semibold text-[var(--muted)]">{t("overdue")}</span>
-          <span className={`block text-[24px] font-bold leading-tight tabular-nums ${overdueTotal > 0 ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{money(overdueTotal)}</span>
+        <Link className="card pressable flex flex-col gap-1 p-4" href="/tasks">
+          <span className="font-semibold text-[var(--muted)]">{t("overdue")}</span>
+          <span className={`text-[24px] font-bold leading-tight tabular-nums ${overdueTotal > 0 ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{money(overdueTotal)}</span>
         </Link>
         {isOwner ? (
-          <Link className="min-w-0 text-right" href="/reports">
-            <span className="block font-semibold text-[var(--muted)]">{t("moneyThisMonth")}</span>
-            <span className="block text-[24px] font-bold leading-tight tabular-nums text-[var(--success)]">{money(metrics.monthlyRevenue)}</span>
+          <Link className="card pressable flex flex-col gap-1 p-4" href="/reports">
+            <span className="font-semibold text-[var(--muted)]">{t("moneyThisMonth")}</span>
+            <span className="text-[24px] font-bold leading-tight tabular-nums text-[var(--success)]">{money(metrics.monthlyRevenue)}</span>
           </Link>
         ) : (
-          <Link className="min-w-0 text-right" href="/bookings">
-            <span className="block font-semibold text-[var(--muted)]">{t("depositsHeld")}</span>
-            <span className="block text-[24px] font-bold leading-tight tabular-nums text-[var(--foreground)]">{money(depositsHeld)}</span>
+          <Link className="card pressable flex flex-col gap-1 p-4" href="/bookings">
+            <span className="font-semibold text-[var(--muted)]">{t("depositsHeld")}</span>
+            <span className="text-[24px] font-bold leading-tight tabular-nums text-[var(--foreground)]">{money(depositsHeld)}</span>
           </Link>
         )}
-      </div>
       </div>
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
         <div className="min-w-0 space-y-5">
-          <Panel action={<PanelLink href="/calendar">{t("calendar")}</PanelLink>} title={t("todayTitle")}>
+          <section>
+            <header className="mb-2.5 flex items-center justify-between gap-3 px-1">
+              <h2 className="text-[20px] font-bold text-[var(--foreground)]">{t("todayTitle")}</h2>
+              <PanelLink href="/calendar">{t("calendar")}</PanelLink>
+            </header>
             {todayItems.length === 0 ? (
-              <div className="flex items-center gap-3 px-4 pb-5 pt-2 text-sm text-[var(--foreground-secondary)]">
-                <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-[var(--success-light)] text-[var(--success)]">
-                  <CheckCircle2 size={18} />
+              <div className="card flex items-center gap-3 p-4 text-[var(--foreground-secondary)]">
+                <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--success-light)] text-[var(--success)]">
+                  <CheckCircle2 size={20} />
                 </span>
                 {t("allClear")}
               </div>
             ) : (
-              <ul className="divide-y divide-[var(--border)] border-t border-[var(--border)]">
-                {todayItems.map((item) => <AgendaRow item={item} key={item.key} />)}
+              <ul className="space-y-2.5">
+                {todayItems.map((item) => <AgendaRow art={artFor(item)} card item={item} key={item.key} />)}
               </ul>
             )}
-          </Panel>
+          </section>
 
           {/* An empty week is not news: the card only appears when something is coming. */}
           {upcomingItems.length === 0 ? null : (
             <Panel action={<PanelLink href="/calendar">{t("seeAll")}</PanelLink>} title={t("comingUp")}>
               <ul className="divide-y divide-[var(--border)] border-t border-[var(--border)]">
-                {upcomingItems.slice(0, 8).map((item) => <AgendaRow item={item} key={item.key} />)}
+                {upcomingItems.slice(0, 8).map((item) => <AgendaRow art={artFor(item)} item={item} key={item.key} />)}
               </ul>
             </Panel>
           )}
@@ -462,6 +522,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
                   return (
                     <li key={r.id}>
                       <Link className="flex items-center gap-3 px-4 py-3.5 transition hover:bg-[var(--panel-secondary)]" href={`/bookings/${r.id}` as Route}>
+                        {artFor({ key: `in-${r.id}` } as AgendaItem)}
                         <span className="min-w-0 flex-1">
                           <span className="block truncate text-[16px] font-bold text-[var(--foreground)]">{r.vehicle}</span>
                           <span className="block truncate font-medium text-[var(--foreground-secondary)]">{r.customer}</span>
@@ -496,6 +557,14 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
               </p>
             ) : (
               <div className="space-y-1 px-2 pb-3">
+                <div className="flex items-center gap-4 px-2 pb-2">
+                  <svg aria-hidden="true" className="h-20 w-20 flex-shrink-0" viewBox="0 0 36 36">
+                    <circle cx="18" cy="18" fill="none" r="15" stroke="var(--primary-light)" strokeWidth="5" />
+                    <circle cx="18" cy="18" fill="none" r="15" stroke="var(--primary)" strokeDasharray={`${(utilization / 100) * 94.25} 94.25`} strokeLinecap="round" strokeWidth="5" transform="rotate(-90 18 18)" />
+                    <text fill="var(--foreground)" fontSize="9" fontWeight="700" textAnchor="middle" x="18" y="21">{utilization}%</text>
+                  </svg>
+                  <p className="text-[16px] font-bold text-[var(--foreground)]">{t("earningCount", { out: rentedCount, total: vehicles.length })}</p>
+                </div>
                 {groups.map((group) => (
                   <Link className="flex items-center gap-3 rounded-[10px] px-2 py-2.5 transition hover:bg-[var(--panel-secondary)]" href={`/fleet#${group.kind}` as Route} key={group.kind}>
                     <VehicleKindIcon kind={group.kind} />
@@ -513,7 +582,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
                     </span>
                   </Link>
                 ))}
-                <p className="px-2 pt-2 font-medium text-[var(--foreground-secondary)]">{t("earning", { percent: utilization })}</p>
+
               </div>
             )}
           </Panel>

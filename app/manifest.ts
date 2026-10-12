@@ -11,7 +11,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
  */
 export default async function manifest(): Promise<MetadataRoute.Manifest> {
   let name = "RouteHQ";
-  let themeColour = "#24456b";
+  let themeColour = "#0e5e6f";
   try {
     const membership = await getCurrentMembership();
     if (membership) {

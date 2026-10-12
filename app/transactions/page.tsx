@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Plus } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
+import { PageBand } from "@/components/page-band";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { businessToday } from "@/lib/business-time";
@@ -23,18 +23,10 @@ export default async function TransactionsPage({
   ]);
 
   return (
-    <AppShell userEmail={userEmail}>
-      <div className="page-hero mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="page-eyebrow">{t("eyebrow")}</p>
-          <h1 className="page-title">{t("listTitle")}</h1>
-          <p className="page-subtitle mt-1">{t("listSubtitle")}</p>
-        </div>
-        <Link className="primary-action pressable" href="/transactions/new">
-          <Plus size={18} />
-          {t("recordMoney")}
-        </Link>
-      </div>
+    <AppShell
+      userEmail={userEmail}
+      hero={<PageBand action={{ href: "/transactions/new", label: t("recordMoney"), icon: <Plus size={16} /> }} subtitle={t("listSubtitle")} title={t("listTitle")} />}
+    >
 
       {resolvedSearchParams.linked ? (
         <div className="mb-4 rounded-xl border border-[var(--success-line)] bg-[var(--success-light)] px-4 py-3 text-sm font-semibold text-[var(--success)]">

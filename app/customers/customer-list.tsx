@@ -65,18 +65,6 @@ export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
 
   return (
     <div className="space-y-4">
-      <div className="page-hero flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="page-eyebrow">{say("title")}</p>
-          <h1 className="page-title">{say("title")}</h1>
-          <p className="page-subtitle mt-2">{say("subtitle")}</p>
-        </div>
-        <Link className="primary-action pressable" href="/customers/new">
-          <Plus size={18} />
-          {say("add")}
-        </Link>
-      </div>
-
       <div>
         <div className="grid grid-cols-2 gap-2 lg:grid-cols-[1fr_auto_auto]">
           {/* A short list needs no search or filters: they appear as the list grows. */}

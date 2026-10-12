@@ -213,7 +213,7 @@ function FuelGauge({
         <summary className="cursor-pointer py-2 text-sm font-semibold text-[var(--primary)]">{t("exactFuelPercentage")}</summary>
         <input
           aria-label={t("fuelPercentageFull")}
-          className="h-12 w-full cursor-pointer accent-[#24456b]"
+          className="h-12 w-full cursor-pointer accent-[#0e5e6f]"
           max="100"
           min="0"
           onChange={(event) => setValue(Number(event.target.value))}
@@ -273,13 +273,13 @@ function VehicleDiagram({ onSelect, selected, marked, bike }: { onSelect: (locat
         <svg className="h-full w-full text-[var(--primary)]" viewBox="0 0 180 260" role="img" aria-label={t("vehicleDiagram")}>
           <rect x="81" y="12" width="18" height="50" rx="9" fill="#1b2430" />
           <rect x="79" y="198" width="22" height="50" rx="10" fill="#1b2430" />
-          <rect x="66" y="56" width="48" height="156" rx="22" fill="#e6edf5" stroke="currentColor" strokeWidth="3" />
+          <rect x="66" y="56" width="48" height="156" rx="22" fill="#d8eeea" stroke="currentColor" strokeWidth="3" />
           <rect x="42" y="50" width="96" height="10" rx="5" fill="currentColor" />
           <rect x="74" y="116" width="32" height="74" rx="13" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
         </svg>
       ) : (
         <svg className="h-full w-full text-[var(--primary)]" viewBox="0 0 180 260" role="img" aria-label={t("vehicleDiagram")}>
-          <rect x="50" y="18" width="80" height="224" rx="35" fill="#e6edf5" stroke="currentColor" strokeWidth="3" />
+          <rect x="50" y="18" width="80" height="224" rx="35" fill="#d8eeea" stroke="currentColor" strokeWidth="3" />
           <rect x="64" y="58" width="52" height="42" rx="10" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
           <rect x="62" y="112" width="56" height="56" rx="14" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
           <rect x="65" y="184" width="50" height="28" rx="8" fill="#ffffff" stroke="currentColor" strokeWidth="2" />

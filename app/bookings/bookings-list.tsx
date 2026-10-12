@@ -1,17 +1,18 @@
 "use client";
 
-import { isTwoWheeler, kindFromCategory } from "@/lib/vehicle-groups";
+import { kindFromCategory } from "@/lib/vehicle-groups";
 
 import { businessToday, daysFromToday as businessDaysFromToday } from "@/lib/business-time";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { CalendarDays, Bike, Car, Clock, Search, Trash2, UserRound, MoreHorizontal } from "lucide-react";
+import { CalendarDays, Clock, Search, Trash2, UserRound, MoreHorizontal } from "lucide-react";
 import { deleteBooking, extendBookingHold } from "@/app/actions/bookings";
 import { CancelBookingButton } from "@/app/bookings/[id]/cancel-booking-button";
 import { UndoCancellationButton } from "@/app/bookings/[id]/undo-cancellation-button";
 import { RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
 import { Badge, EmptyState } from "@/components/ui";
+import { VehicleArt } from "@/components/vehicle-art";
 import { flagForNationality } from "@/lib/customer-options";
 import { intlLocale, longDate, shortDate } from "@/lib/i18n/dates";
 
@@ -286,20 +287,11 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
             const effectiveStatus = isCancelledBooking(booking) ? "cancelled" : String(booking.status || "");
             return (
             <article className={`card relative p-4 transition ${statusCardClasses(booking)}`} key={booking.id}>
-              {/* Photo beside the details from tablet width up. On phones a photo squeezed into a strip showed a slice of bonnet, so it is left out there. */}
-              <div className="grid gap-3 md:grid-cols-[104px_minmax(0,1fr)_auto] md:items-center">
-                <Link className={`group relative h-[72px] overflow-hidden hidden md:block rounded-xl bg-[var(--panel-secondary)]`} href={`/bookings/${booking.id}`}>
-                  {photoUrl ? (
-                    <img
-                      alt={tx.say("photoAlt", { vehicle: vehicleTitle(booking.vehicles) || tx.say("vehicle") })}
-                      className="h-full w-full object-cover transition duration-200 group-hover:scale-[1.03]"
-                      src={photoUrl}
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center text-[var(--primary)]">
-                      {isTwoWheeler(kindFromCategory((booking.vehicles as any)?.vehicle_categories)) ? <Bike size={28} strokeWidth={1.8} /> : <Car size={28} strokeWidth={1.8} />}
-                    </div>
-                  )}
+              {/* The vehicle's picture beside the details: its photo, or a drawing in its own colour (Lagoon look). Small on phones so the words keep their room. */}
+              <div className="grid grid-cols-[56px_minmax(0,1fr)] gap-3 md:grid-cols-[104px_minmax(0,1fr)_auto] md:items-center">
+                <Link aria-label={tx.say("photoAlt", { vehicle: vehicleTitle(booking.vehicles) || tx.say("vehicle") })} className="relative z-10 mt-1 self-start md:mt-0 md:self-center" href={`/bookings/${booking.id}`}>
+                  <span className="block md:hidden"><VehicleArt colour={(booking.vehicles as any)?.color} kind={kindFromCategory((booking.vehicles as any)?.vehicle_categories)} model={booking.vehicles?.model} photoUrl={photoUrl} size="sm" /></span>
+                  <span className="hidden md:block"><VehicleArt colour={(booking.vehicles as any)?.color} kind={kindFromCategory((booking.vehicles as any)?.vehicle_categories)} model={booking.vehicles?.model} photoUrl={photoUrl} size="md" /></span>
                 </Link>
 
                 <div className="min-w-0 py-0.5">
@@ -399,9 +391,9 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
 
                 {/* Money only when there is something to say: what is due now in brick, otherwise what has been paid. */}
                 {Number(booking.balance_due) > 0 ? (
-                  <p className="text-[17px] font-bold tabular-nums text-[var(--danger)] md:text-right">{tx.say("dueNow", { amount: money(booking.balance_due, booking.currency) })}</p>
+                  <p className="col-start-2 text-[17px] font-bold tabular-nums text-[var(--danger)] md:col-start-auto md:text-right">{tx.say("dueNow", { amount: money(booking.balance_due, booking.currency) })}</p>
                 ) : Number(booking.total_paid) > 0 ? (
-                  <p className="font-bold tabular-nums text-[var(--success)] md:text-right">{tx.say("paid")} {money(booking.total_paid, booking.currency)}</p>
+                  <p className="col-start-2 font-bold tabular-nums text-[var(--success)] md:col-start-auto md:text-right">{tx.say("paid")} {money(booking.total_paid, booking.currency)}</p>
                 ) : null}
               </div>
               {confirmDeleteId === booking.id ? (

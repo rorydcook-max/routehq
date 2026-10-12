@@ -111,7 +111,7 @@ export async function getBookingList(organizationId: string) {
   const supabase = (await createSupabaseServerClient()) as any;
   const { data: rentals, error } = await supabase
     .from("rentals")
-    .select("*, vehicles!rentals_vehicle_id_fkey(id, make, model, trim, year, registration_number, status, vehicle_categories(code, name)), customers!rentals_customer_id_fkey(id, full_name, phone, nationality, document_status)")
+    .select("*, vehicles!rentals_vehicle_id_fkey(id, make, model, trim, year, registration_number, status, color, vehicle_categories(code, name)), customers!rentals_customer_id_fkey(id, full_name, phone, nationality, document_status)")
     .eq("organization_id", organizationId)
     .is("deleted_at", null)
     .order("created_at", { ascending: false });
@@ -212,7 +212,7 @@ export async function getBookingDetail(rentalId: string, organizationId: string)
   const supabase = (await createSupabaseServerClient()) as any;
   const { data: rental, error } = await supabase
     .from("rentals")
-    .select("*, vehicles!rentals_vehicle_id_fkey(*), customers!rentals_customer_id_fkey(*)")
+    .select("*, vehicles!rentals_vehicle_id_fkey(*, vehicle_categories(code, name)), customers!rentals_customer_id_fkey(*)")
     .eq("id", rentalId)
     .eq("organization_id", organizationId)
     .is("deleted_at", null)

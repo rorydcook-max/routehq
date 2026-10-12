@@ -52,7 +52,7 @@ export function ContractsBrandingSection({
   const say = useTranslations("settingsPage") as unknown as (key: string, values?: Record<string, string>) => string;
   const locale = useLocale();
   const labelClass = "font-semibold text-[var(--foreground-secondary)]";
-  const accentColour = organization.contract_accent_colour || "#24456b";
+  const accentColour = organization.contract_accent_colour || "#0e5e6f";
   const tradingName = organization.trading_name || organization.name;
   const legalName = organization.legal_name || tradingName;
   const footerText = organization.contract_footer_text || "Issued by the rental business named in this agreement.";

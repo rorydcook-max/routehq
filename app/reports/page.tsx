@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/app-shell";
+import { PageBand } from "@/components/page-band";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDefaultOrganization } from "@/lib/organization";
 import { getReportsData, type DatePreset } from "@/lib/reports";
@@ -23,11 +24,7 @@ export default async function ReportsPage({
   const say = (await getTranslations("reportsPage")) as unknown as (key: string) => string;
 
   return (
-    <AppShell userEmail={userEmail}>
-      <div className="page-hero mb-4">
-        <h1 className="page-title">{say("title")}</h1>
-        <p className="page-subtitle page-subtitle-keep mt-1">{say("subtitle")}</p>
-      </div>
+    <AppShell userEmail={userEmail} hero={<PageBand keepSubtitle subtitle={say("subtitle")} title={say("title")} />}>
       <ReportsView data={data} />
     </AppShell>
   );

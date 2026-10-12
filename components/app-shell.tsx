@@ -263,7 +263,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
                 <circle cx="250" cy="150" fill="none" r="96" stroke="currentColor" strokeOpacity="0.16" strokeWidth="2" />
                 <circle cx="250" cy="150" fill="none" r="146" stroke="currentColor" strokeOpacity="0.11" strokeWidth="2" />
                 <circle cx="250" cy="150" fill="none" r="198" stroke="currentColor" strokeOpacity="0.07" strokeWidth="2" />
-                <circle className="sun" cx="250" cy="150" fill="#f2a541" r="44" />
+                <circle className="sun" cx="250" cy="150" fill="#f2a541" r="34" />
               </svg>
               <div className="relative">
                 {topRow}

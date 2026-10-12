@@ -9,6 +9,7 @@ type Say = (key: string, values?: Record<string, string | number>) => string;
 import { ChevronRight, Plus, Search } from "lucide-react";
 import { Badge, Card, EmptyState, SectionHeader } from "@/components/ui";
 import { flagForNationality } from "@/lib/customer-options";
+import { initialsOf } from "@/components/glance";
 import type { CustomerListItem } from "@/lib/customer-detail";
 
 function money(value: number) {
@@ -126,9 +127,17 @@ export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
                 : say("noRentals");
             return (
               <Link className="flex items-center gap-3 px-4 py-3.5 transition hover:bg-[var(--panel-secondary)]" href={`/customers/${item.customer.id}`} key={item.customer.id}>
+                <span
+                  aria-hidden="true"
+                  className={`num inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-[15px] sm:h-11 sm:w-11 sm:text-[16px] ${
+                    activeRental ? (activeRental.status === "booked" ? "bg-[var(--accent-light)] text-[#5c3a0c]" : "bg-[var(--primary)] text-white") : "bg-[var(--panel-tertiary)] text-[var(--foreground-secondary)]"
+                  }`}
+                >
+                  {initialsOf(item.customer.full_name)}
+                </span>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                    <p className="truncate text-[17px] font-bold text-[var(--foreground)]">
+                    <p className="break-words text-[17px] font-bold leading-tight text-[var(--foreground)]">
                       {flagForNationality(item.customer.nationality)} {item.customer.full_name}
                     </p>
                     {item.customer?.do_not_rent ? <Badge tone="red">{say("doNotRent")}</Badge> : null}
@@ -138,7 +147,7 @@ export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
                 </div>
                 {/* Money only when there is some; "฿0 · 1 rental" said nothing. */}
                 {item.lifetimeRevenue > 0 ? (
-                  <p className="shrink-0 text-right font-bold tabular-nums text-[var(--foreground)]">{money(item.lifetimeRevenue)}</p>
+                  <p className="num shrink-0 text-right text-[16px] text-[var(--foreground)]">{money(item.lifetimeRevenue)}</p>
                 ) : null}
                 <ChevronRight className="shrink-0 text-[var(--foreground-secondary)]" size={20} strokeWidth={2.2} />
               </Link>

@@ -110,7 +110,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
       userEmail={userEmail}
     >
       {vehicles.length > 0 ? (
-        <div className="relative -mt-12 mb-5 grid grid-cols-2 gap-3 lg:-mt-14 lg:max-w-2xl">
+        <div className="relative -mt-12 mb-5 grid grid-cols-2 gap-3 lg:-mt-14 lg:grid-cols-4">
           <Link className="card pressable tile p-4 text-[var(--foreground)]" href="/calendar">
             <TileHead title={t("busyTitle")} />
             <span className="flex items-center gap-3">
@@ -132,6 +132,22 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
               <span className="font-semibold">{t("papersOkDetail")}</span>
             </span>
           )}
+          {groups.length > 1
+            ? groups.map((group) => (
+                <div className="hidden lg:block" key={`tile-${group.kind}`}>
+                <a className="card pressable tile h-full p-4 text-[var(--foreground)]" href={`#${group.kind}`}>
+                  <span className="flex items-center justify-between gap-2">
+                    <span className="tile-title">{kindName(group)}</span>
+                    <VehicleKindIcon kind={group.kind} size={20} />
+                  </span>
+                  <span>
+                    <span className="num block text-[32px] leading-none">{group.vehicles.length}</span>
+                    <span className="font-semibold text-[var(--foreground-secondary)]">{t("outFree", { out: group.out, free: group.free })}</span>
+                  </span>
+                </a>
+                </div>
+              ))
+            : null}
         </div>
       ) : (
         <div className="mb-5" />
@@ -167,7 +183,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
       ) : null}
 
       {groups.length > 1 ? (
-        <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <div className="mb-5 grid grid-cols-2 gap-3 lg:hidden">
           {groups.map((group) => (
             <a
               className="card pressable flex items-start gap-3 p-4 transition"

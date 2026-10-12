@@ -613,12 +613,13 @@ export default async function BookingDetailPage({ params, searchParams }: { para
 
         <Card>
           <div className="card-section flex flex-col gap-4">
-            <div className="min-w-0">
+            <div className="min-w-0 lg:flex lg:flex-row-reverse lg:items-center lg:gap-6">
               {vehicle ? (
-                <Link aria-label={vehicleTitle(vehicle)} className="mb-3 block" href={`/fleet/${vehicle.id}` as Route}>
+                <Link aria-label={vehicleTitle(vehicle)} className="mb-3 block lg:mb-0 lg:w-[320px] lg:shrink-0" href={`/fleet/${vehicle.id}` as Route}>
                   <VehicleArt colour={(vehicle as any).color} kind={kindFromCategory((vehicle as any).vehicle_categories)} model={(vehicle as any).model} size="lg" />
                 </Link>
               ) : null}
+              <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="flex flex-wrap items-center gap-2">
                   <Badge tone={statusTone(displayStatus)}>{statusLabel(String(displayStatus), tx)}</Badge>
@@ -638,7 +639,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   </span>
                 ) : null}
                 <div className="min-w-0 flex-1">
-                  <h1 className="text-[28px] leading-tight text-[var(--foreground)]">
+                  <h1 className="text-[28px] leading-tight tracking-[-0.02em] text-[var(--foreground)] lg:text-[36px]">
                     {customer ? customer.full_name : tx.list("awaitingCustomer")}
                   </h1>
                   <p className="mt-0.5 text-[17px] font-semibold text-[var(--foreground-secondary)]">{vehicleTitle(vehicle)}</p>
@@ -651,6 +652,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     : tx.say("holdEnded", { when: formatDateTime(holdUntil, tx) })}
                 </p>
               ) : null}
+              </div>
             </div>
             {/* The two numbers you check first. */}
             <div className="grid grid-cols-2 gap-2.5">

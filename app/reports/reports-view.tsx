@@ -381,9 +381,9 @@ export function ReportsView({ data }: { data: ReportsData }) {
   const nothingAtAll = data.vehicleMetrics.length === 0 && data.recentTransactions.length === 0;
 
   return (
-    <div className="space-y-3">
+    <div className="grid gap-3 lg:grid-cols-2 lg:items-start [&>*]:min-w-0">
       {/* Which period */}
-      <div>
+      <div className="lg:col-span-2">
         <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1" style={{ scrollbarWidth: "none" }}>
           {PRESETS.map((value) => {
             const active = value === "custom" ? customOpen : preset === value && !customOpen;
@@ -434,6 +434,7 @@ export function ReportsView({ data }: { data: ReportsData }) {
         <p className={`mt-3 ${soft}`}>{say("profitNote")}</p>
       </section>
 
+      <div className="grid content-start gap-3">
       <Link className="card pressable flex items-center justify-between gap-3 p-4" href={"/reports/fleet-value" as any}>
         <span>
           <span className="block font-bold text-[var(--foreground)]">{say("fleetValueLink")}</span>
@@ -448,6 +449,7 @@ export function ReportsView({ data }: { data: ReportsData }) {
         </span>
         <span aria-hidden className="text-xl text-[var(--muted)]">›</span>
       </Link>
+      </div>
 
       {/* Who owes money */}
       <section className="card p-4">
@@ -502,10 +504,12 @@ export function ReportsView({ data }: { data: ReportsData }) {
         </div>
       </section>
 
-      <MonthRows months={monthly} say={say} />
+      <div className="lg:col-span-2 empty:hidden">
+        <MonthRows months={monthly} say={say} />
+      </div>
 
       {data.revenueByType.length > 0 || data.expensesByType.length > 0 ? (
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2 lg:col-span-2">
           <Breakdown rows={data.revenueByType} say={say} title={say("cameFrom")} typeLabel={typeLabel} />
           <Breakdown rows={data.expensesByType} say={say} title={say("wentOn")} typeLabel={typeLabel} />
         </div>
@@ -513,7 +517,7 @@ export function ReportsView({ data }: { data: ReportsData }) {
 
       {/* Vehicle by vehicle */}
       {sortedVehicles.length > 0 ? (
-        <section className="card p-4">
+        <section className="card p-4 lg:col-span-2">
           <h2 className={h2}>{say("vehiclesTitle")}</h2>
           <p className={`mt-1 ${soft}`}>{compareMode ? say("compareHelp", { count: selected.size }) : say("vehiclesBody")}</p>
           <div className="mt-3 flex gap-2">
@@ -552,7 +556,7 @@ export function ReportsView({ data }: { data: ReportsData }) {
 
       {/* Latest entries */}
       {data.recentTransactions.length > 0 ? (
-        <section className="card p-4">
+        <section className="card p-4 lg:col-span-2">
           <h2 className={h2}>{say("latestTitle")}</h2>
           <div className="mt-3 space-y-2">
             {data.recentTransactions.map((entry) => {

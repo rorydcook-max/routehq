@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Route } from "next";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { dayOfWeekDate, intlLocale, shortDate as shortDateIn } from "@/lib/i18n/dates";
 import { ArrowRight, Bell, CheckCircle2, Clock3, FileWarning, KeyRound, Lock, Plus, ReceiptText, RotateCcw, Wallet, MessageCircle } from "lucide-react";
@@ -58,11 +58,11 @@ const TONE_CLASSES: Record<Tone, string> = {
   neutral: "bg-[var(--panel-tertiary)] text-[var(--muted)]"
 };
 
-function AgendaRow({ item, art, card = false }: { item: AgendaItem; art?: ReactNode; card?: boolean }) {
+function AgendaRow({ item, art, card = false, delay }: { item: AgendaItem; art?: ReactNode; card?: boolean; delay?: number }) {
   // The pressing ones get a solid button; the rest are outlined so a list of eight is not a wall of colour.
   const solid = item.tone === "red" || item.tone === "teal";
   return (
-    <li>
+    <li className={delay === undefined ? undefined : "rise"} style={delay === undefined ? undefined : ({ ["--d" as string]: `${delay}ms` } as CSSProperties)}>
       <Link className={`group flex items-center gap-3.5 transition ${card ? "card pressable p-3" : "px-4 py-3.5 hover:bg-[var(--panel-secondary)]"}`} href={item.href as Route}>
         {art || <span className={`inline-flex flex-shrink-0 items-center justify-center ${card ? "h-11 w-14 rounded-xl" : "h-10 w-10 rounded-xl"} ${TONE_CLASSES[item.tone]}`}>{item.icon}</span>}
         <span className="min-w-0 flex-1">
@@ -467,10 +467,10 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
     </span>
   );
   const hero = (
-    <div className="flex flex-wrap items-end justify-between gap-4 pb-6 lg:pb-8">
+    <div className="flex flex-wrap items-end justify-between gap-4 pb-6 lg:pb-2">
       <div className="min-w-0 flex-1">
         <p className="font-semibold text-white/90">{headerDate}</p>
-        <h1 className="mt-0.5 text-[32px] leading-tight text-white lg:text-[36px]">{greeting}</h1>
+        <h1 className="mt-0.5 text-[34px] leading-[1.05] tracking-[-0.025em] text-white lg:text-[44px]">{greeting}</h1>
         <div className="mt-4 flex flex-wrap gap-2">
           {urgentCount > 0 ? pill(urgentCount, t("pillUrgent"), "#f6b7a3") : null}
           {pill(todayItems.length, t("pillToDo"))}
@@ -527,10 +527,10 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
     smallTiles.push({
       key: "next",
       node: (
-        <Link className="card pressable tile p-4 text-[var(--foreground)]" href={`/bookings/${backOrOut.id}` as Route}>
+        <Link className={`card pressable tile p-4 ${back ? "tile-sky" : "tile-mango"}`} href={`/bookings/${backOrOut.id}` as Route}>
           <span className="flex items-center gap-2 text-[15px] font-bold"><Dot color={back ? "var(--coming-back)" : "var(--going-out)"} />{day === today ? t(back ? "backToday" : "outToday") : t(back ? "backOn" : "outOn", { day: dayLabel(day) })}</span>
           <span className="flex justify-center">{vehicleArtFor(backOrOut.vehicleId)}</span>
-          <span className="line-clamp-2 font-semibold text-[var(--foreground-secondary)]">{t(back ? "vehicleFrom" : "vehicleTo", { vehicle: noPlate(backOrOut.vehicle), who: firstName(backOrOut.customer) })}</span>
+          <span className="line-clamp-2 font-semibold">{t(back ? "vehicleFrom" : "vehicleTo", { vehicle: noPlate(backOrOut.vehicle), who: firstName(backOrOut.customer) })}</span>
         </Link>
       )
     });
@@ -564,7 +564,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
     });
   }
   const moneyTile = isOwner ? (
-    <Link className="card pressable col-span-2 block p-4 text-[var(--foreground)]" href="/reports" key="money">
+    <Link className="card pressable rise col-span-2 block p-4 text-[var(--foreground)]" href="/reports" key="money" style={{ ["--d" as string]: "260ms" } as CSSProperties}>
       <span className="block text-[15px] font-bold">{t("monthSoFar", { month: monthName })}</span>
       <span className={`num mt-1 block text-[32px] leading-tight ${monthlyProfit < 0 ? "text-[var(--danger)]" : ""}`}>{money(monthlyProfit)}</span>
       {lastMonthSoFar.length > 0 ? (
@@ -583,10 +583,10 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   ) : null;
   // Two to a row; an odd one out takes the whole row rather than leave a gap.
   const tiles = [
-    ...smallTiles.slice(0, 2).map((tile) => <div className="min-w-0 [&>a]:h-full" key={tile.key}>{tile.node}</div>),
+    ...smallTiles.slice(0, 2).map((tile, index) => <div className="rise min-w-0 [&>a]:h-full [&>div]:h-full [&>span]:h-full" key={tile.key} style={{ ["--d" as string]: `${120 + index * 70}ms` } as CSSProperties}>{tile.node}</div>),
     moneyTile,
     ...smallTiles.slice(2).map((tile, index, rest) => (
-      <div className={`min-w-0 [&>a]:h-full ${index === rest.length - 1 && rest.length % 2 === 1 ? "col-span-2" : ""}`} key={tile.key}>{tile.node}</div>
+      <div className={`rise min-w-0 [&>a]:h-full ${index === rest.length - 1 && rest.length % 2 === 1 ? "col-span-2" : ""}`} key={tile.key} style={{ ["--d" as string]: `${330 + index * 70}ms` } as CSSProperties}>{tile.node}</div>
     ))
   ];
 
@@ -604,43 +604,41 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
         </div>
       ) : null}
 
-      {/* The week, on the band's lower edge: every vehicle, who has it, when it changes hands. */}
-      {lanes.length > 0 ? (
-        <section className="card relative -mt-12 mb-5 p-3 pb-2 lg:-mt-14 lg:p-4">
-          <header className="flex items-baseline justify-between gap-3 px-1 pb-2">
-            <h2 className="text-[19px] text-[var(--foreground)]">{t("thisWeek")}</h2>
-            <PanelLink href="/calendar">{t("calendar")}</PanelLink>
-          </header>
-          <WeekPlanner
-            days={weekDays.map((day) => ({ key: day.day, name: day.name, number: day.number }))}
-            lanes={lanes}
-            legend={[
-              { color: "var(--on-rent)", label: t("legendOnRent") },
-              { color: "var(--going-out)", label: t("weekOut") },
-              { color: "var(--coming-back)", label: t("weekBack") },
-              ...(lanes.some((lane) => lane.bars.some((bar) => bar.kind === "late")) ? [{ color: "var(--danger)", label: t("legendLate") }] : [])
-            ]}
-          />
-          {moreLanes > 0 ? (
-            <p className="px-1 pb-1 pt-1"><PanelLink href="/calendar">{t("moreOnCalendar", { count: moreLanes })}</PanelLink></p>
+      {/* Phones: the week, then the tiles, then the day. Computers: the week and the day on the left, the tiles in a column on the right, both rising over the band. */}
+      <div className="grid gap-5 lg:grid-cols-12 lg:gap-6">
+        <div className="min-w-0 space-y-5 lg:col-span-7 2xl:col-span-8">
+          {lanes.length > 0 ? (
+            <section className="card rise relative -mt-12 p-3 pb-2 lg:-mt-16 lg:p-5 lg:pb-3">
+              <header className="flex items-baseline justify-between gap-3 px-1 pb-2">
+                <h2 className="text-[20px] text-[var(--foreground)] lg:text-[22px]">{t("thisWeek")}</h2>
+                <PanelLink href="/calendar">{t("calendar")}</PanelLink>
+              </header>
+              <WeekPlanner
+                days={weekDays.map((day) => ({ key: day.day, name: day.name, number: day.number }))}
+                lanes={lanes}
+                legend={[
+                  { color: "var(--on-rent)", label: t("legendOnRent") },
+                  { color: "var(--going-out)", label: t("weekOut") },
+                  { color: "var(--coming-back)", label: t("weekBack") },
+                  ...(lanes.some((lane) => lane.bars.some((bar) => bar.kind === "late")) ? [{ color: "var(--danger)", label: t("legendLate") }] : [])
+                ]}
+              />
+              {moreLanes > 0 ? (
+                <p className="px-1 pb-1 pt-1"><PanelLink href="/calendar">{t("moreOnCalendar", { count: moreLanes })}</PanelLink></p>
+              ) : null}
+            </section>
           ) : null}
-        </section>
-      ) : null}
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
-        {/* Tiles: on a phone they come first, on a computer they sit beside the day's work. */}
-        <div className="grid min-w-0 content-start grid-cols-2 gap-3 lg:order-2">
-          {tiles}
-        </div>
+          {/* On a phone the tiles come straight after the week. */}
+          <div className="grid grid-cols-2 gap-3 lg:hidden">{tiles}</div>
 
-        <div className="min-w-0 space-y-5 lg:order-1">
           <section>
             <header className="mb-2.5 flex items-center justify-between gap-3 px-1">
-              <h2 className="text-[21px] text-[var(--foreground)]">{t("todayTitle")}</h2>
+              <h2 className="text-[22px] text-[var(--foreground)]">{t("todayTitle")}</h2>
               <PanelLink href="/tasks">{t("allJobs")}</PanelLink>
             </header>
             {todayItems.length === 0 ? (
-              <div className="card flex items-center gap-3 p-4 text-[var(--foreground-secondary)]">
+              <div className="card rise flex items-center gap-3 p-4 text-[var(--foreground-secondary)]">
                 <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--success-light)] text-[var(--success)]">
                   <CheckCircle2 size={20} />
                 </span>
@@ -648,7 +646,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
               </div>
             ) : (
               <ul className="space-y-2.5">
-                {todayItems.map((item) => <AgendaRow art={artFor(item)} card item={item} key={item.key} />)}
+                {todayItems.map((item, index) => <AgendaRow art={artFor(item)} card delay={Math.min(index, 8) * 50 + 150} item={item} key={item.key} />)}
               </ul>
             )}
           </section>
@@ -662,6 +660,9 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
             </Panel>
           )}
         </div>
+
+        {/* On a computer the tiles stand in their own column beside the week. */}
+        <aside className="hidden min-w-0 content-start gap-3 lg:col-span-5 lg:-mt-16 lg:grid lg:grid-cols-2 2xl:col-span-4">{tiles}</aside>
       </div>
 
       <div className="mt-6 space-y-4">

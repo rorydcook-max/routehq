@@ -1528,3 +1528,41 @@ a.card.pressable:hover {
 .tile-sky { background: var(--coming-back-light); color: var(--coming-back-ink); }
 .tile-plum { background: var(--messages-light); color: var(--messages-ink); }
 .tile-green { background: var(--success-light); color: #1d4a31; }
+
+/* ── Look G, round 2: movement, depth and a band with some life in it ────── */
+.tile-mango { background: var(--accent-light); color: #5c3a0c; }
+.tile .tile-title, .tile-title { font-family: var(--font-display); font-weight: 600; font-size: 16px; letter-spacing: -0.005em; }
+h1, .page-hero h1 { letter-spacing: -0.02em; }
+h2 { letter-spacing: -0.015em; }
+
+/* The band: faint rings and a sun in its top corner, so a business colour is never just a flat block. */
+.band-art {
+  position: absolute;
+  right: -120px;
+  top: -120px;
+  width: 340px;
+  height: 260px;
+  pointer-events: none;
+  opacity: 0.9;
+}
+@media (min-width: 1024px) {
+  .band-art { right: 40px; top: -90px; width: 420px; height: 320px; }
+}
+
+/* Movement: things arrive rather than appear. Nothing moves for people who ask for less motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .rise { animation: g-rise 520ms cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: var(--d, 0ms); }
+  .grow-x { animation: g-grow-x 760ms cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: var(--d, 0ms); transform-origin: left center; }
+  .grow-y { animation: g-grow-y 640ms cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: var(--d, 0ms); transform-origin: center bottom; }
+  .ring-draw { animation: g-ring 1100ms cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: var(--d, 200ms); }
+  .band-art .sun { animation: g-float 7s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  a.card.pressable, .card a.pressable.card { transition: transform 160ms ease, box-shadow 160ms ease; }
+  a.card.pressable:hover { transform: translateY(-2px); }
+  .planner-bar { transition: filter 140ms ease, transform 140ms ease; }
+  .planner-bar:hover { filter: brightness(1.1); }
+}
+@keyframes g-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@keyframes g-grow-x { from { transform: scaleX(0); } to { transform: none; } }
+@keyframes g-grow-y { from { transform: scaleY(0); } to { transform: none; } }
+@keyframes g-ring { from { stroke-dasharray: 0 100; } }
+@keyframes g-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }

@@ -258,9 +258,17 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
           </div>
           ) : null;
           return hero ? (
-            <div className={`-mx-[14px] -mt-[14px] rounded-b-[32px] bg-[var(--band)] px-[14px] pt-[14px] text-[var(--band-ink)] sm:-mx-6 sm:-mt-5 sm:px-6 lg:mx-0 lg:mt-0 lg:rounded-[28px] lg:px-7 lg:pt-7 ${heroOverlap ? "mb-0 pb-10 lg:pb-12" : "mb-4 pb-6 lg:mb-5 lg:pb-7"}`}>
-              {topRow}
-              {hero}
+            <div className={`relative -mx-[14px] -mt-[14px] overflow-hidden rounded-b-[32px] bg-[var(--band)] px-[14px] pt-[14px] text-[var(--band-ink)] sm:-mx-6 sm:-mt-5 sm:px-6 lg:mx-0 lg:mt-0 lg:rounded-[28px] lg:px-8 lg:pt-7 ${heroOverlap ? "mb-0 pb-10 lg:pb-[72px]" : "mb-4 pb-6 lg:mb-5 lg:pb-7"}`}>
+              <svg aria-hidden="true" className="band-art" viewBox="0 0 420 320">
+                <circle cx="250" cy="150" fill="none" r="96" stroke="currentColor" strokeOpacity="0.16" strokeWidth="2" />
+                <circle cx="250" cy="150" fill="none" r="146" stroke="currentColor" strokeOpacity="0.11" strokeWidth="2" />
+                <circle cx="250" cy="150" fill="none" r="198" stroke="currentColor" strokeOpacity="0.07" strokeWidth="2" />
+                <circle className="sun" cx="250" cy="150" fill="#f2a541" r="44" />
+              </svg>
+              <div className="relative">
+                {topRow}
+                {hero}
+              </div>
             </div>
           ) : (
             topRow

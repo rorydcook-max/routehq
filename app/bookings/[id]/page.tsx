@@ -885,6 +885,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               )}
             </Fold>
 
+            {isCancelled && !customer ? null : (
             <Fold
               open={!customer || customer.document_status !== "complete"}
               summary={customer ? `${customer.full_name} · ${documentLabel(customer.document_status, tx)}` : tx.list("awaitingCustomer")}
@@ -929,6 +930,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 </div>
               )}
             </Fold>
+            )}
 
             {customer ? (
               <Card>

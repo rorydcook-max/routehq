@@ -7,7 +7,7 @@ export async function POST(request: Request) {
   try {
     // Staff only: each call costs money.
     if (!(await getCurrentMembership())) return NextResponse.json({ error: await said("Sign in first.") }, { status: 401 });
-    if (!visionProvider()) {
+    if (!visionProvider(false)) {
       return NextResponse.json({ error: await said("Photo reading is not set up.") }, { status: 400 });
     }
 
@@ -23,7 +23,8 @@ export async function POST(request: Request) {
       prompt: "Say what this photo shows. Only if it clearly shows an odometer, read the value in kilometres; with several numbers choose the main odometer, not the trip meter.",
       bytes: Buffer.from(await file.arrayBuffer()),
       mediaType: file.type || "image/jpeg",
-      maxTokens: 300
+      maxTokens: 300,
+      personal: false
     });
     // A plain or blank photo has come back as "123456": a made-up placeholder, not a reading.
     const digits = String(parsed.odometer_reading ?? "");

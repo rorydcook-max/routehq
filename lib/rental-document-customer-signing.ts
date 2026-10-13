@@ -74,6 +74,22 @@ function compare(label: string, current: unknown, snapshotted: unknown, issues: 
   }
 }
 
+/**
+ * The same day however the agreement wrote it: "13/10/2569", "13/10/2026" and "13/10/2026 (พ.ศ. 2569)" are one date.
+ * Comparing the written text flagged every Thai agreement as "changed" when the way dates are written changed.
+ */
+function sameDay(value: unknown) {
+  const text = stringValue(value);
+  const match = text.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (!match) return text;
+  const year = Number(match[3]) > 2400 ? Number(match[3]) - 543 : Number(match[3]);
+  return `${match[1].padStart(2, "0")}/${match[2].padStart(2, "0")}/${year}`;
+}
+
+function compareDay(label: string, current: unknown, snapshotted: unknown, issues: string[]) {
+  if (sameDay(current) !== sameDay(snapshotted)) issues.push(label);
+}
+
 function materialChangeIssues({ organization, rental, customer, vehicle, bookingLink, version }: any) {
   const snapshot = dataSnapshot(version.rendered_data_snapshot);
   const variables = variablesFromVersion(version);
@@ -84,9 +100,9 @@ function materialChangeIssues({ organization, rental, customer, vehicle, booking
   compare("customer ID", customer?.id, snapshot.customer_id, issues);
   compare("rental ID", rental?.id, snapshot.rental_id, issues);
   compare("vehicle registration", currentVariables.vehicle_registration, variables.vehicle_registration, issues);
-  compare("start date", currentVariables.rental_start_date, variables.rental_start_date, issues);
+  compareDay("start date", currentVariables.rental_start_date, variables.rental_start_date, issues);
   compare("start time", currentVariables.rental_start_time, variables.rental_start_time, issues);
-  compare("end date", currentVariables.rental_end_date, variables.rental_end_date, issues);
+  compareDay("end date", currentVariables.rental_end_date, variables.rental_end_date, issues);
   compare("end time", currentVariables.rental_end_time, variables.rental_end_time, issues);
   compare("open-ended status", rental?.is_indefinite ? "Open-ended" : "Fixed term", variables.open_ended_status, issues);
   compare("rental rate", currentVariables.rental_rate, variables.rental_rate, issues);
@@ -220,7 +236,7 @@ async function eligibilityFor(ctx: LoadedContext) {
     warnings.push("customer_record_will_be_created_from_form");
   }
 
-  if (version && rental && vehicle) {
+  if (version && rental && vehicle && !renterSignature) {
     const materialIssues = materialChangeIssues(ctx);
     if (materialIssues.length > 0) {
       blockingIssues.push("material_booking_change_detected");

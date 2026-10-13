@@ -761,14 +761,13 @@ export function BookingForm({
                             </Badge>
                           );
                         })()}
-                        {/* The price most bookings of this vehicle use: the daily one when there is one, else what it has. */}
-                        {vehicle.daily_rate > 0 ? (
-                          <Badge tone="neutral"><span className="font-mono-data">{say("per_daily", { amount: money(vehicle.daily_rate, currency) })}</span></Badge>
-                        ) : null}
-                        {vehicle.monthly_rate > 0 ? (
-                          <Badge tone="neutral"><span className="font-mono-data">{say("perMonth", { amount: money(vehicle.monthly_rate, currency) })}</span></Badge>
-                        ) : null}
                       </span>
+                      {/* The prices most bookings of this vehicle use. */}
+                      {vehicle.daily_rate > 0 || vehicle.monthly_rate > 0 ? (
+                        <span className="mt-1.5 block font-semibold text-[var(--foreground-secondary)]">
+                          {[vehicle.daily_rate > 0 ? say("per_daily", { amount: money(vehicle.daily_rate, currency) }) : null, vehicle.monthly_rate > 0 ? say("perMonth", { amount: money(vehicle.monthly_rate, currency) }) : null].filter(Boolean).join(" · ")}
+                        </span>
+                      ) : null}
                     </span>
                   </div>
                 </button>
@@ -1342,7 +1341,7 @@ export function BookingForm({
                   return (
                     <SummaryRow
                       label={say("s_paysFirst")}
-                      value={`${money(firstRent + depositAmount + pricedExtras.upfront, currency)} · ${rentWords}${depositAmount > 0 ? ` ${say("plusDeposit", { amount: money(depositAmount, currency) })}` : ""}${pricedExtras.upfront > 0 ? ` ${say("plusExtras", { amount: money(pricedExtras.upfront, currency) })}` : ""}`}
+                      value={depositAmount > 0 || pricedExtras.upfront > 0 ? `${money(firstRent + depositAmount + pricedExtras.upfront, currency)} · ${rentWords}${depositAmount > 0 ? ` ${say("plusDeposit", { amount: money(depositAmount, currency) })}` : ""}${pricedExtras.upfront > 0 ? ` ${say("plusExtras", { amount: money(pricedExtras.upfront, currency) })}` : ""}` : rentWords}
                     />
                   );
                 })()
@@ -1427,7 +1426,7 @@ export function BookingForm({
           </Link>
         ) : (
           <button
-            className="pressable min-h-12 flex-1 rounded-full bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white shadow-lg disabled:opacity-40 disabled:shadow-none"
+            className="pressable min-h-12 flex-1 whitespace-nowrap rounded-full bg-[var(--primary)] px-3 py-2 text-[15px] font-bold text-white shadow-lg disabled:opacity-40 disabled:shadow-none"
             disabled={isPending}
             key="submit"
             onClick={() => {
@@ -1547,12 +1546,12 @@ function BookingLinkSharePanel({ result }: { result: BookingShareResult | null }
       <p className="mt-1 text-sm leading-6 text-[var(--foreground-secondary)]">{say("nowSend")}</p>
 
       {canNativeShare ? (
-        <button className="pressable mt-3 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white" onClick={nativeShare} type="button">
+        <button className="pressable mt-3 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[var(--primary)] px-3 py-2 text-[15px] font-bold text-white" onClick={nativeShare} type="button">
           {say("sendToCustomer")}
         </button>
       ) : null}
 
-      <div className="mt-3 grid grid-cols-5 gap-1 rounded-lg border border-[var(--border)] bg-white p-1">
+      <div className="mt-3 grid grid-cols-3 gap-1 rounded-2xl border border-[var(--border)] bg-white p-1.5 sm:grid-cols-5">
         {shareChannels.map(({ icon, key, label, title }) => (
           <button
             aria-label={title}
@@ -1563,7 +1562,7 @@ function BookingLinkSharePanel({ result }: { result: BookingShareResult | null }
             type="button"
           >
             {icon}
-            <span className="max-w-full truncate tracking-tight" style={{ fontSize: "14px", color: "var(--muted)", fontWeight: 500 }}>{label}</span>
+            <span className="whitespace-nowrap" style={{ fontSize: "14px", color: "var(--foreground-secondary)", fontWeight: 600 }}>{label}</span>
           </button>
         ))}
       </div>

@@ -5,6 +5,7 @@ import { shownError } from "@/lib/error-text";
 import { typedNote } from "@/lib/transaction-notes";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { longDate } from "@/lib/i18n/dates";
@@ -462,18 +463,30 @@ export function EditableEndDate({ rentalId, currentEndDate, iconOnly = false }: 
     });
   }
 
-  if (editing) {
-    return (
-      <span className="inline-flex flex-wrap items-center gap-2">
-        <input className="font-mono-data h-8 rounded-lg border border-[var(--border)] bg-white px-2 text-xs font-semibold" type="date" value={value} onChange={(event) => setValue(event.target.value)} />
-        <ActionButton disabled={isPending} onClick={save} tone="primary">
-          {isPending ? tx.say("saving") : tx.say("pc_save")}
-        </ActionButton>
-        <ActionButton disabled={isPending} onClick={() => { setValue(dateInput(currentEndDate)); setMessage(null); setEditing(false); }}>
-          {tx.say("cancelBtn")}
-        </ActionButton>
-        {message ? <span className="basis-full text-xs font-semibold text-[var(--danger)]">{message}</span> : null}
-      </span>
+  if (editing && typeof document !== "undefined") {
+    const close = () => {
+      if (isPending) return;
+      setValue(dateInput(currentEndDate));
+      setMessage(null);
+      setEditing(false);
+    };
+    return createPortal(
+      <div aria-modal="true" className="fixed inset-0 z-[80] flex items-end justify-center bg-black/40 p-3 sm:items-center" onClick={close} role="dialog">
+        <div className="w-full max-w-sm rounded-3xl bg-white p-5 shadow-2xl" onClick={(event) => event.stopPropagation()}>
+          <p className="text-[18px] font-bold text-[var(--foreground)]">{tx.say("pc_editEnd")}</p>
+          <input autoFocus className="mt-3 h-12 w-full rounded-xl border border-[var(--border)] bg-white px-3 text-[16px] font-semibold" onChange={(event) => { setValue(event.target.value); setMessage(null); }} type="date" value={value} />
+          {message ? <p className="mt-3 rounded-xl bg-[var(--danger-light)] p-3 font-semibold text-[var(--danger)]" role="alert">{message}</p> : null}
+          <div className="mt-4 flex gap-2 [&>*]:flex-1">
+            <button className="secondary-action pressable" disabled={isPending} onClick={close} type="button">
+              {tx.say("cancelBtn")}
+            </button>
+            <button className="primary-action pressable" disabled={isPending} onClick={save} type="button">
+              {isPending ? tx.say("saving") : tx.say("pc_save")}
+            </button>
+          </div>
+        </div>
+      </div>,
+      document.body
     );
   }
 

@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/app-shell";
+import { PageBand } from "@/components/page-band";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDocumentList } from "@/lib/documents-hub";
 import { getDefaultOrganization } from "@/lib/organization";
@@ -11,11 +12,7 @@ export default async function DocumentsPage() {
   const say = (await getTranslations("documentsPage")) as unknown as (key: string) => string;
 
   return (
-    <AppShell userEmail={userEmail}>
-      <div className="page-hero mb-4">
-        <h1 className="page-title">{say("title")}</h1>
-        <p className="page-subtitle page-subtitle-keep mt-1">{say("subtitle")}</p>
-      </div>
+    <AppShell hero={<PageBand keepSubtitle subtitle={say("subtitle")} title={say("title")} />} userEmail={userEmail}>
 
       <DocumentsList documents={documents} />
     </AppShell>

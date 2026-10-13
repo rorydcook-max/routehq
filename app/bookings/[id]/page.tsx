@@ -835,7 +835,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             <Fold
               id="booking-link"
               open={Boolean(bookingLink) && String(bookingLink?.status || "") !== "completed" && !isClosed}
-              summary={!bookingLink ? tx.say("link_notCreated") : String(bookingLink.status || "") === "completed" ? tx.say("link_finished") : tx.say("link_waiting")}
+              summary={!bookingLink ? tx.say("link_notCreated") : String(bookingLink.status || "") === "completed" ? tx.say("link_finished") : isCancelled ? tx.say("link_closed") : tx.say("link_waiting")}
               title={tx.say("linkTitle")}
               tone={bookingLink && String(bookingLink.status || "") !== "completed" && !isClosed ? "amber" : "neutral"}
             >

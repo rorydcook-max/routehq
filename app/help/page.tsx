@@ -3,6 +3,7 @@ import type { Route } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ChevronRight, Mail, MessageCircle } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
+import { PageBand } from "@/components/page-band";
 import { HelpPreference } from "@/components/help/help-actions";
 import { HelpCompose } from "@/components/help/help-compose";
 import { getCurrentMembership } from "@/lib/auth/roles";
@@ -37,12 +38,8 @@ export default async function HelpPage({ searchParams }: { searchParams: Promise
   const hasDirect = Boolean(contacts.whatsappUrl || contacts.lineUrl || contacts.email);
 
   return (
-    <AppShell userEmail={userEmail}>
-      <div className="mx-auto max-w-3xl space-y-4">
-        <div className="page-hero">
-          <h1 className="page-title">{t("title")}</h1>
-          <p className="page-subtitle mt-2">{t("subtitle")}</p>
-        </div>
+    <AppShell hero={<PageBand keepSubtitle subtitle={t("subtitle")} title={t("title")} />} userEmail={userEmail}>
+      <div className="max-w-3xl space-y-4">
 
         {team ? (
           <Link className="card pressable flex items-center gap-3 p-4" href={"/help/team" as Route}>

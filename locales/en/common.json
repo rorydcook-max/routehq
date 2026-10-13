@@ -1500,6 +1500,7 @@
     "link_notCreated": "Not created: this booking was entered by your team",
     "link_finished": "The customer has finished and signed",
     "link_waiting": "Waiting for the customer",
+    "link_closed": "Closed when the booking was cancelled",
     "linkTitle": "Customer's link",
     "link_teamBody": "This booking was entered by your team. Create a link if you want the customer to add their details and sign the agreement online.",
     "allDone": "The customer finished everything on {date}. Show the steps",

@@ -1,4 +1,5 @@
 import { AppShell } from "@/components/app-shell";
+import { PageBand } from "@/components/page-band";
 import { getTranslations } from "next-intl/server";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDefaultOrganization } from "@/lib/organization";
@@ -40,11 +41,7 @@ export default async function RentalCalculatorPage() {
   const defaultStyle: RentStyle = offer === "dates" || offer === "both_dates" ? "daily" : "monthly";
 
   return (
-    <AppShell userEmail={userEmail}>
-      <div className="mx-auto mb-4 max-w-2xl">
-        <h1 className="page-title">{t("title")}</h1>
-        <p className="page-subtitle mt-2">{t("subtitle")}</p>
-      </div>
+    <AppShell hero={<PageBand keepSubtitle subtitle={t("subtitle")} title={t("title")} />} userEmail={userEmail}>
       <CalculatorClient
         currency={organization.currency || "THB"}
         defaultCategory={defaultCategory}

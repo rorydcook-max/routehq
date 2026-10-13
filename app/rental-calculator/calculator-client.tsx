@@ -431,7 +431,7 @@ export function CalculatorClient({
   const subjectName = subject ? [subject.year, subject.make, subject.model].join(" ") : "";
 
   return (
-    <div className="mx-auto max-w-2xl space-y-4">
+    <div className="max-w-2xl space-y-4">
       <Card className="p-4">
         <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
           {CATEGORIES.map((code) => (

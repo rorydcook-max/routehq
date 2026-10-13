@@ -45,6 +45,7 @@ import { bookingRules } from "@/lib/booking-rules";
 import { publicBookingSettings } from "@/lib/public-catalog";
 import { TravelPolicyForm } from "@/app/settings/travel-policy-form";
 import { AppShell } from "@/components/app-shell";
+import { PageBand, bandTab } from "@/components/page-band";
 import { PendingButton } from "@/components/pending-button";
 import { Badge, Card, Fold, SectionHeader } from "@/components/ui";
 import { OpenOnHash } from "@/components/open-on-hash";
@@ -294,24 +295,21 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   }`;
 
   return (
-    <AppShell userEmail={userEmail}>
+    <AppShell
+      hero={
+        <PageBand title={say("title")}>
+          <nav aria-label={say("title")} className="flex flex-wrap gap-2">
+            {SETTINGS_TABS.map((entry) => (
+              <Link aria-current={tab === entry.key ? "page" : undefined} className={bandTab(tab === entry.key)} href={`/settings?tab=${entry.key}` as Route} key={entry.key}>
+                {say(`tab_${entry.key}`)}
+              </Link>
+            ))}
+          </nav>
+        </PageBand>
+      }
+      userEmail={userEmail}
+    >
       <OpenOnHash />
-      <div className="page-hero mb-5">
-        <h1 className="page-title">{say("title")}</h1>
-      </div>
-
-      <nav aria-label={say("title")} className="mb-5 flex flex-wrap gap-2">
-        {SETTINGS_TABS.map((entry) => (
-          <Link
-            aria-current={tab === entry.key ? "page" : undefined}
-            className={`pressable flex min-h-11 items-center justify-center rounded-full px-4 py-2 text-center font-bold leading-tight transition ${tab === entry.key ? "bg-[var(--primary)] text-white" : "bg-white text-[var(--foreground)]"}`}
-            href={`/settings?tab=${entry.key}` as Route}
-            key={entry.key}
-          >
-            {say(`tab_${entry.key}`)}
-          </Link>
-        ))}
-      </nav>
 
       {tab === "business" ? (
         <>
@@ -704,10 +702,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         <>
       <div className="mt-4">
         <Card>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 px-2 py-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <SectionHeader title={say("imp_title")} />
-              <p className="mt-2 font-medium text-[var(--foreground-secondary)]">{say("imp_body")}</p>
+              <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("imp_title")}</h2>
+              <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("imp_body")}</p>
             </div>
             <Link className="primary-action pressable" href="/fleet/import">
               {say("imp_btn")}
@@ -721,10 +719,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         <>
       <div className="mt-4">
         <Card>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 px-2 py-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <SectionHeader title={say("terms_title")} />
-              <p className="mt-2 font-medium text-[var(--foreground-secondary)]">{say("terms_body")}</p>
+              <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("terms_title")}</h2>
+              <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("terms_body")}</p>
             </div>
             <Link className="primary-action pressable" href="/settings/contracts">
               {say("terms_btn")}
@@ -738,10 +736,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         <>
       <div className="mt-4">
         <Card>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 px-2 py-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <SectionHeader title={say("which_title")} />
-              <p className="mt-2 font-medium text-[var(--foreground-secondary)]">{say("which_body")}</p>
+              <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("which_title")}</h2>
+              <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("which_body")}</p>
             </div>
             <Link className="primary-action pressable" href="/settings/notifications">
               {say("which_btn")}
@@ -755,10 +753,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         <>
       <div className="mt-4">
         <Card>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 px-2 py-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <SectionHeader title={say("plan_title")} />
-              <p className="mt-2 font-medium text-[var(--foreground-secondary)]">{say("plan_body")}</p>
+              <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("plan_title")}</h2>
+              <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("plan_body")}</p>
             </div>
             <Link className="primary-action pressable" href={"/settings/billing" as Route}>
               {say("plan_btn")}

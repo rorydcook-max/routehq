@@ -265,11 +265,11 @@ function ActionForm({
       <form action={(formData) => onSubmit(formData, t("requestSent", { business: organizationName }))} className="mt-4 space-y-3">
         <input name="actionType" type="hidden" value="extension_request" />
         {openEndedOffer ? (
-          <div className="grid grid-cols-2 gap-2 rounded-xl bg-[var(--panel-secondary)] p-1 text-sm font-semibold">
-            <button className={`min-h-11 rounded-lg px-2 ${!noEnd ? "bg-white text-[var(--foreground)] shadow-sm" : "text-[var(--muted)]"}`} onClick={() => setNoEnd(false)} type="button">
+          <div className="grid grid-cols-2 gap-2 font-semibold">
+            <button className={`min-h-11 rounded-full border-2 px-2 ${!noEnd ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground)]"}`} onClick={() => setNoEnd(false)} type="button">
               {t("untilADate")}
             </button>
-            <button className={`min-h-11 rounded-lg px-2 ${noEnd ? "bg-white text-[var(--foreground)] shadow-sm" : "text-[var(--muted)]"}`} onClick={() => setNoEnd(true)} type="button">
+            <button className={`min-h-11 rounded-full border-2 px-2 ${noEnd ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground)]"}`} onClick={() => setNoEnd(true)} type="button">
               {t("monthlyOpenEnded")}
             </button>
           </div>

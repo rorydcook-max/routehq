@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { shortDate } from "@/lib/i18n/dates";
@@ -191,18 +192,24 @@ export function TransactionForm({
       <input name="taskId" type="hidden" value={linkedTaskId} />
 
       {/* The first question is the simplest one: did money come in or go out? */}
-      <div className="grid grid-cols-2 gap-2 rounded-xl bg-[var(--panel-secondary)] p-1">
-        {[true, false].map((moneyIn) => (
-          <button
-            aria-pressed={isMoneyIn === moneyIn}
-            className={`min-h-11 rounded-lg text-[15px] font-semibold transition ${isMoneyIn === moneyIn ? "bg-white text-[var(--foreground)] shadow-[var(--shadow-sm)]" : "text-[var(--muted)]"}`}
-            key={String(moneyIn)}
-            onClick={() => chooseDirection(moneyIn)}
-            type="button"
-          >
-            {moneyIn ? say("moneyIn") : say("moneyOut")}
-          </button>
-        ))}
+      <div className="grid grid-cols-2 gap-3">
+        {[true, false].map((moneyIn) => {
+          const chosen = isMoneyIn === moneyIn;
+          const colour = moneyIn ? "var(--chart-in)" : "var(--chart-out)";
+          return (
+            <button
+              aria-pressed={chosen}
+              className={`pressable flex min-h-14 items-center justify-center gap-2 rounded-2xl border-2 text-[16px] font-bold transition ${chosen ? "text-white shadow-[var(--shadow-card)]" : "bg-white text-[var(--foreground)]"}`}
+              key={String(moneyIn)}
+              onClick={() => chooseDirection(moneyIn)}
+              style={chosen ? { background: colour, borderColor: colour } : { borderColor: "var(--border)" }}
+              type="button"
+            >
+              {moneyIn ? <ArrowDownLeft aria-hidden="true" size={20} /> : <ArrowUpRight aria-hidden="true" size={20} />}
+              {moneyIn ? say("moneyIn") : say("moneyOut")}
+            </button>
+          );
+        })}
       </div>
 
       {linkedBadge ? (

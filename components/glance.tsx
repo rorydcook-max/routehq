@@ -86,12 +86,12 @@ export function WeekPlanner({ days, lanes, legend }: { days: Array<{ key: string
 }
 
 /** Money in against money out, a pair of bars per period. */
-export function InOutBars({ periods, label, money }: { periods: Array<{ key: string; label: string; in: number; out: number }>; label: string; money: (value: number) => string }) {
+export function InOutBars({ periods, label, money, inWord = "in", outWord = "out" }: { periods: Array<{ key: string; label: string; in: number; out: number }>; label: string; money: (value: number) => string; inWord?: string; outWord?: string }) {
   const max = Math.max(1, ...periods.flatMap((period) => [period.in, period.out]));
   return (
     <div aria-label={label} className={`mt-3 flex h-[108px] items-end ${periods.length > 7 ? "gap-1" : "gap-3"}`} role="img">
       {periods.map((period) => (
-        <div className="chart-col relative flex flex-1 flex-col items-center gap-1 pt-1" data-tip={`${period.label}: ${money(period.in)} in, ${money(period.out)} out`} key={period.key} tabIndex={0}>
+        <div className="chart-col relative flex flex-1 flex-col items-center gap-1 pt-1" data-tip={`${period.label} · ${inWord} ${money(period.in)} · ${outWord} ${money(period.out)}`} key={period.key} tabIndex={0}>
           <div className="chart-bars flex h-[82px] w-full items-end justify-center gap-[2px] border-b border-[var(--border)]">
             <span className="grow-y w-1/2 max-w-5 rounded-t-[4px] bg-[var(--chart-in)]" style={{ height: `${Math.max(2, Math.round((period.in / max) * 80))}px` }} />
             <span className="grow-y w-1/2 max-w-5 rounded-t-[4px] bg-[var(--chart-out)]" style={{ height: `${Math.max(2, Math.round((period.out / max) * 80))}px` }} />

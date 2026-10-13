@@ -601,7 +601,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
         <span className="inline-flex items-center gap-1.5"><Dot color="var(--chart-in)" />{t("moneyIn")} {money(metrics.monthlyRevenue)}</span>
         <span className="inline-flex items-center gap-1.5"><Dot color="var(--chart-out)" />{t("moneyOut")} {money(monthlyExpenses)}</span>
       </span>
-      <InOutBars label={t("inOutWeeks")} money={money} periods={weeks} />
+      <InOutBars inWord={t("moneyIn")} label={t("inOutWeeks")} money={money} outWord={t("moneyOut")} periods={weeks} />
     </Link>
   ) : null;
   // Two to a row; an odd one out takes the whole row rather than leave a gap.

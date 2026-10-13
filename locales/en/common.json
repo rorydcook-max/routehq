@@ -3937,7 +3937,7 @@
     "cameFrom": "Where the money came from",
     "wentOn": "Where the money went",
     "vehiclesTitle": "Vehicle by vehicle",
-    "vehiclesBody": "Tap a vehicle to see its figures.",
+    "vehiclesBody": "Tap a vehicle for its full report.",
     "vehicleLine": "Rented {percent}% of the time · {count, plural, one {# rental} other {# rentals}}",
     "sortBy": "Sort by",
     "sort_profit": "Most profit first",
@@ -3995,7 +3995,13 @@
     "extrasTag": "Extras",
     "extrasPart": "incl. {amount} extras",
     "bestMonth": "Best month: {month}, {amount} profit",
-    "monthByMonth": "Month by month"
+    "monthByMonth": "Month by month",
+    "weeksTitle": "Week by week",
+    "bestWeek": "Best week: from {week}, {amount} profit",
+    "donutTotal": "Total",
+    "otherKinds": "Everything else",
+    "tileRentals": "{count, plural, =0 {No rentals} one {# rental} other {# rentals}}",
+    "allMoneyHint": "Every entry, to search and filter"
   },
   "auth": {
     "signInTitle": "Sign in",

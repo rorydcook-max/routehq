@@ -19,15 +19,19 @@ import {
   XAxis,
   YAxis
 } from "recharts";
-import { ArrowDownRight, ArrowUpRight, Check, CheckCircle2, ChevronDown, ChevronRight, Download, Handshake, Lightbulb, Loader2, TrendingUp } from "lucide-react";
+import { ArrowDownRight, ArrowLeftRight, ArrowUpRight, Check, CheckCircle2, ChevronRight, Download, Handshake, Lightbulb, Loader2, TrendingUp } from "lucide-react";
 import { intlLocale, longDate } from "@/lib/i18n/dates";
-import { Dot, InOutBars } from "@/components/glance";
+import { Dot, InOutBars, Ring } from "@/components/glance";
+import { VehicleArt } from "@/components/vehicle-art";
+import { kindFromCategory } from "@/lib/vehicle-groups";
 import type { DatePreset, ReportsData, VehicleMetrics } from "@/lib/reports";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
 const PRESETS: DatePreset[] = ["this_month", "last_month", "last_3_months", "last_6_months", "this_year", "last_year", "custom"];
-const CHART_COLORS = ["#008fa3", "#c9711c", "#2f6fb8", "#a0522d", "#6b4c8a", "#4f9a94", "#8a9a5b", "#b07fa0"];
+const CHART_COLORS = ["#008fa3", "#c9711c", "#2f6fb8", "#a0522d", "#6b4c8a", "#c0457a", "#5f8a1e"];
+/** The same seven, warm first, for where money went. Also checked with the validator. */
+const OUT_COLORS = ["#c9711c", "#6b4c8a", "#a0522d", "#2f6fb8", "#c0457a", "#008fa3", "#5f8a1e"];
 const BAHT = "฿";
 
 export function money(value: number) {
@@ -53,41 +57,105 @@ function Change({ change, upIsBad = false, say }: { change: number | null; upIsB
   );
 }
 
-/** Where money came from or went: one bar per kind, biggest first. */
-export function Breakdown({ title, rows, typeLabel, say }: { title: string; rows: Array<{ type: string; label: string; amount: number; extras?: number }>; typeLabel: (type: string, fallback: string) => string; say: Say }) {
-  const total = rows.reduce((sum, row) => sum + row.amount, 0);
+type Slice = { type: string; label: string; amount: number; extras?: number };
+
+/** A ring cut into slices, one per kind. Pointing at a slice (or its line in the key) lights it up and names it in the middle. */
+function Donut({ slices, active, onActive, total, say }: { slices: Array<Slice & { color: string; name: string }>; active: number | null; onActive: (index: number | null) => void; total: number; say: Say }) {
+  const size = 144;
+  const stroke = 20;
+  const r = (size - stroke - 8) / 2;
+  const c = 2 * Math.PI * r;
+  const gap = slices.length > 1 ? 2.5 : 0;
+  let offset = 0;
+  const shown = active !== null ? slices[active] : null;
+  return (
+    <div className="relative shrink-0" style={{ height: size, width: size }}>
+      <svg aria-hidden="true" height={size} viewBox={`0 0 ${size} ${size}`} width={size}>
+        <circle cx={size / 2} cy={size / 2} fill="none" r={r} stroke="var(--panel-tertiary)" strokeWidth={stroke} />
+        {slices.map((slice, index) => {
+          const length = total > 0 ? (slice.amount / total) * c : 0;
+          const drawn = Math.max(0.5, length - gap);
+          const start = offset;
+          offset += length;
+          return (
+            <circle
+              className="ring-draw cursor-pointer"
+              cx={size / 2}
+              cy={size / 2}
+              fill="none"
+              key={slice.type}
+              onMouseEnter={() => onActive(index)}
+              onMouseLeave={() => onActive(null)}
+              opacity={active === null || active === index ? 1 : 0.3}
+              r={r}
+              stroke={slice.color}
+              strokeDasharray={`${drawn} ${c - drawn}`}
+              strokeDashoffset={-start}
+              strokeWidth={active === index ? stroke + 6 : stroke}
+              style={{ transition: "opacity 150ms, stroke-width 150ms" }}
+              transform={`rotate(-90 ${size / 2} ${size / 2})`}
+            />
+          );
+        })}
+      </svg>
+      <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
+        {shown ? (
+          <>
+            <span className="num text-[22px] leading-none text-[var(--foreground)]">{total > 0 ? Math.round((shown.amount / total) * 100) : 0}%</span>
+            <span className="mt-1 line-clamp-2 text-[14px] font-semibold leading-tight text-[var(--foreground-secondary)]">{shown.name}</span>
+          </>
+        ) : (
+          <>
+            <span className="num text-[17px] leading-none text-[var(--foreground)]">{money(total)}</span>
+            <span className="mt-1 text-[14px] font-semibold text-[var(--foreground-secondary)]">{say("donutTotal")}</span>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** Where money came from or went: a ring of slices with a key beside it. Past six kinds, the smallest share one slice. */
+export function Breakdown({ title, rows, typeLabel, say, palette = CHART_COLORS }: { title: string; rows: Slice[]; typeLabel: (type: string, fallback: string) => string; say: Say; palette?: string[] }) {
+  const [active, setActive] = useState<number | null>(null);
+  const sorted = [...rows].sort((a, b) => b.amount - a.amount);
+  const kept = sorted.length > 7 ? sorted.slice(0, 6) : sorted;
+  const rest = sorted.length > 7 ? sorted.slice(6) : [];
+  const grouped: Slice[] = rest.length ? [...kept, { type: "__rest", label: say("otherKinds"), amount: rest.reduce((sum, row) => sum + row.amount, 0) }] : kept;
+  const slices = grouped.map((row, index) => ({ ...row, color: palette[index % palette.length], name: row.type === "__rest" ? row.label : typeLabel(row.type, row.label) }));
+  const total = slices.reduce((sum, row) => sum + row.amount, 0);
   return (
     <section className="card p-4">
       <h2 className={h2}>{title}</h2>
-      {rows.length === 0 ? (
+      {slices.length === 0 ? (
         <p className={`mt-1 ${soft}`}>{say("nothingRecorded")}</p>
       ) : (
-        <>
-          <div aria-hidden="true" className="mt-3 flex h-4 rounded-full bg-[var(--panel-tertiary)]">
-            {rows.map((row, index) => (
-              <span
-                className={`grow-x relative h-full transition hover:brightness-110 ${index > 0 ? "border-l-2 border-white" : "rounded-l-full"} ${index === rows.length - 1 ? "rounded-r-full" : ""}`}
-                data-tip={`${typeLabel(row.type, row.label)}: ${money(row.amount)}${total > 0 ? ` (${Math.round((row.amount / total) * 100)}%)` : ""}`}
-                key={row.type}
-                style={{ background: CHART_COLORS[index % CHART_COLORS.length], width: `${total > 0 ? (row.amount / total) * 100 : 0}%` }}
-              />
-            ))}
-          </div>
-          <div className="mt-2 divide-y divide-[var(--border)]">
-            {rows.map((row, index) => (
-              <div className="py-2" key={row.type}>
-                <div className="flex items-center justify-between gap-3">
-                  <span className="flex min-w-0 items-center gap-2 font-semibold text-[var(--foreground)]"><Dot color={CHART_COLORS[index % CHART_COLORS.length]} />{typeLabel(row.type, row.label)}</span>
+        <div className="mt-3 flex flex-col items-center gap-4 min-[420px]:flex-row min-[420px]:items-center">
+          <Donut active={active} onActive={setActive} say={say} slices={slices} total={total} />
+          <ul className="w-full min-w-0 flex-1 space-y-1">
+            {slices.map((slice, index) => (
+              <li
+                className={`cursor-default rounded-xl px-2.5 py-1.5 transition ${active === index ? "bg-[var(--panel-secondary)]" : ""}`}
+                key={slice.type}
+                onBlur={() => setActive(null)}
+                onClick={() => setActive((value) => (value === index ? null : index))}
+                onFocus={() => setActive(index)}
+                onMouseEnter={() => setActive(index)}
+                onMouseLeave={() => setActive(null)}
+                tabIndex={0}
+              >
+                <span className="flex items-center justify-between gap-3">
+                  <span className="flex min-w-0 items-center gap-2 font-semibold text-[var(--foreground)]"><Dot color={slice.color} />{slice.name}</span>
                   <span className="whitespace-nowrap">
-                    <span className="num text-[16px] text-[var(--foreground)]">{money(row.amount)}</span>
-                    {total > 0 ? <span className={`ml-2 ${soft}`}>{Math.round((row.amount / total) * 100)}%</span> : null}
+                    <span className="num text-[16px] text-[var(--foreground)]">{money(slice.amount)}</span>
+                    {total > 0 ? <span className={`ml-1.5 ${soft}`}>{Math.round((slice.amount / total) * 100)}%</span> : null}
                   </span>
-                </div>
-                {Number(row.extras || 0) > 0 ? <p className={`pl-[18px] ${soft}`}>{say("extrasPart", { amount: money(Number(row.extras)) })}</p> : null}
-              </div>
+                </span>
+                {Number(slice.extras || 0) > 0 ? <span className={`block pl-[18px] ${soft}`}>{say("extrasPart", { amount: money(Number(slice.extras)) })}</span> : null}
+              </li>
             ))}
-          </div>
-        </>
+          </ul>
+        </div>
       )}
     </section>
   );
@@ -106,7 +174,7 @@ export function MonthRows({ months, say }: { months: Array<{ key?: string; label
         <span className="inline-flex items-center gap-1.5"><Dot color="var(--chart-in)" />{say("moneyIn")}</span>
         <span className="inline-flex items-center gap-1.5"><Dot color="var(--chart-out)" />{say("moneyOut")}</span>
       </p>
-      <InOutBars label={say("monthsTitle")} money={money} periods={months.map((month) => ({ key: month.key || month.label, label: month.short || month.label, in: month.revenue, out: month.expenses }))} />
+      <InOutBars inWord={say("moneyIn")} label={say("monthsTitle")} money={money} outWord={say("moneyOut")} periods={months.map((month) => ({ key: month.key || month.label, label: month.short || month.label, in: month.revenue, out: month.expenses }))} />
       {best && best.profit > 0 ? <p className="mt-2 font-bold text-[var(--success)]">{say("bestMonth", { month: best.label, amount: money(best.profit) })}</p> : null}
       <details className="mt-3">
         <summary className="cursor-pointer font-bold text-[var(--primary)]">{say("monthByMonth")}</summary>
@@ -139,66 +207,77 @@ export function MonthRows({ months, say }: { months: Array<{ key?: string; label
   );
 }
 
-type SortKey = "profit" | "income" | "expenses" | "utilization" | "roi" | "rentals";
-const SORTS: SortKey[] = ["profit", "income", "expenses", "utilization", "rentals", "roi"];
-
-function Fact({ label, value }: { label: string; value: string }) {
+/** Week by week: the same pair of bars as month by month, for a period of a few weeks. */
+export function WeekBars({ weeks, say }: { weeks: Array<{ key: string; label: string; revenue: number; expenses: number; profit: number }>; say: Say }) {
+  const busy = weeks.filter((week) => week.revenue !== 0 || week.expenses !== 0);
+  if (busy.length < 2 || weeks.length > 16) return null;
+  const best = [...busy].sort((a, b) => b.profit - a.profit)[0];
   return (
-    <div className="flex items-baseline justify-between gap-3">
-      <span className={soft}>{label}</span>
-      <span className="whitespace-nowrap font-bold text-[var(--foreground)]">{value}</span>
-    </div>
+    <section className="card p-4">
+      <h2 className={h2}>{say("weeksTitle")}</h2>
+      <p className="mt-2 flex gap-4 font-semibold text-[var(--foreground-secondary)]">
+        <span className="inline-flex items-center gap-1.5"><Dot color="var(--chart-in)" />{say("moneyIn")}</span>
+        <span className="inline-flex items-center gap-1.5"><Dot color="var(--chart-out)" />{say("moneyOut")}</span>
+      </p>
+      <InOutBars inWord={say("moneyIn")} label={say("weeksTitle")} money={money} outWord={say("moneyOut")} periods={weeks.map((week) => ({ key: week.key, label: week.label, in: week.revenue, out: week.expenses }))} />
+      {best && best.profit > 0 ? <p className="mt-2 font-bold text-[var(--success)]">{say("bestWeek", { week: best.label, amount: money(best.profit) })}</p> : null}
+    </section>
   );
 }
 
-function VehicleRow({ vehicle, comparing, selected, onSelect, typeLabel, say }: { vehicle: VehicleMetrics; comparing: boolean; selected: boolean; onSelect: (id: string) => void; typeLabel: (type: string, fallback: string) => string; say: Say }) {
-  const [open, setOpen] = useState(false);
+type SortKey = "profit" | "income" | "expenses" | "utilization" | "roi" | "rentals";
+const SORTS: SortKey[] = ["profit", "income", "expenses", "utilization", "rentals", "roi"];
+
+function VehicleTile({ vehicle, comparing, selected, onSelect, href, say }: { vehicle: VehicleMetrics; comparing: boolean; selected: boolean; onSelect: (id: string) => void; href: string; say: Say }) {
   const name = [vehicle.make, vehicle.model].filter(Boolean).join(" ");
-  return (
-    <div className={`${tile} ${comparing && selected ? "outline outline-2 outline-[var(--primary)]" : ""}`}>
-      <button aria-expanded={comparing ? undefined : open} aria-pressed={comparing ? selected : undefined} className="pressable flex w-full items-center gap-3 text-left" onClick={() => (comparing ? onSelect(vehicle.id) : setOpen((value) => !value))} type="button">
+  const spent = vehicle.income > 0 ? Math.min(100, Math.round((vehicle.expenses / vehicle.income) * 100)) : vehicle.expenses > 0 ? 100 : 0;
+  const used = Math.round(vehicle.utilizationRate);
+  const body = (
+    <>
+      <span className="flex items-center gap-3">
+        <VehicleArt colour={vehicle.color} kind={kindFromCategory(vehicle.category as never)} model={vehicle.model} size="sm" />
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-[16px] font-bold text-[var(--foreground)]">{vehicle.plate || vehicle.label}</span>
+          <span className={`block truncate ${soft}`}>{name || vehicle.label}</span>
+        </span>
         {comparing ? (
-          <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 ${selected ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border-strong,var(--border))] bg-white"}`}>
+          <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 ${selected ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white"}`}>
             {selected ? <Check size={16} /> : null}
           </span>
-        ) : open ? (
-          <ChevronDown className="shrink-0 text-[var(--primary)]" size={20} />
         ) : (
           <ChevronRight className="shrink-0 text-[var(--primary)]" size={20} />
         )}
-        <span className="min-w-0 flex-1">
-          <span className="block text-[16px] font-bold text-[var(--foreground)]">{vehicle.plate || vehicle.label}</span>
-          <span className={`block ${soft}`}>{name || vehicle.label}</span>
-          <span className={`block ${soft}`}>{say("vehicleLine", { percent: Math.round(vehicle.utilizationRate), count: vehicle.rentalCount })}</span>
-        </span>
-        <span className="shrink-0 text-right">
-          <span className={`block text-[17px] font-bold ${vehicle.profit >= 0 ? "text-[var(--success)]" : "text-[var(--warning)]"}`}>{money(vehicle.profit)}</span>
+      </span>
+      <span className="mt-3 flex items-end justify-between gap-3">
+        <span className="min-w-0">
           <span className={`block ${soft}`}>{say("profit")}</span>
+          <span className={`num block text-[26px] leading-tight ${vehicle.profit >= 0 ? "text-[var(--success)]" : "text-[var(--warning)]"}`}>{money(vehicle.profit)}</span>
+          <span className={`block ${soft}`}>{say("tileRentals", { count: vehicle.rentalCount })}</span>
         </span>
-      </button>
-      {open && !comparing ? (
-        <div className="mt-3 space-y-2 border-t border-[var(--border)] pt-3">
-          <Fact label={say("moneyIn")} value={money(vehicle.income)} />
-          <Fact label={say("moneyOut")} value={money(vehicle.expenses)} />
-          {vehicle.expenseBreakdown.map((expense) => (
-            <div className="flex items-baseline justify-between gap-3 pl-4" key={expense.type}>
-              <span className={soft}>{typeLabel(expense.type, expense.label)}</span>
-              <span className="whitespace-nowrap font-semibold text-[var(--foreground-secondary)]">{money(expense.amount)}</span>
-            </div>
-          ))}
-          <Fact label={say("avgPerDay")} value={money(vehicle.avgDailyRate)} />
-          {vehicle.purchasePrice > 0 ? (
-            <>
-              <Fact label={say("boughtFor")} value={money(vehicle.purchasePrice)} />
-              <Fact label={say("earnedBack")} value={`${vehicle.roi.toFixed(1)}%`} />
-            </>
-          ) : null}
-          <Link className="secondary-action pressable !mt-3 w-full" href={`/reports/vehicle/${vehicle.id}` as any}>
-            {say("fullReport")}
-          </Link>
-        </div>
-      ) : null}
-    </div>
+        <span className="flex shrink-0 flex-col items-center">
+          <Ring color="var(--on-rent)" label={`${used}%`} pct={used} size={64} stroke={7} track="var(--panel-tertiary)" />
+          <span className="mt-1 whitespace-nowrap text-[14px] font-semibold text-[var(--foreground-secondary)]">{say("timeRented")}</span>
+        </span>
+      </span>
+      <span aria-hidden="true" className="mt-3 flex h-2.5 overflow-hidden rounded-full bg-[var(--panel-tertiary)]">
+        {spent > 0 ? <span className="grow-x block h-full" style={{ background: "var(--chart-out)", width: `${spent}%` }} /> : null}
+        {spent < 100 && vehicle.income > 0 ? <span className={`grow-x block h-full flex-1 ${spent > 0 ? "border-l-2 border-white" : ""}`} style={{ background: "var(--success)" }} /> : null}
+      </span>
+      <span className="mt-1.5 flex flex-wrap justify-between gap-x-3 font-semibold text-[var(--foreground-secondary)]">
+        <span>{say("moneyIn")} {money(vehicle.income)}</span>
+        <span className="inline-flex items-center gap-1.5"><Dot color="var(--chart-out)" />{say("moneyOut")} {money(vehicle.expenses)}</span>
+      </span>
+    </>
+  );
+  const shell = `pressable block rounded-2xl bg-[var(--panel-secondary)] p-3.5 text-left transition hover:bg-[var(--panel-tertiary)] ${comparing && selected ? "outline outline-2 outline-[var(--primary)]" : ""}`;
+  return comparing ? (
+    <button aria-pressed={selected} className={`${shell} w-full`} onClick={() => onSelect(vehicle.id)} type="button">
+      {body}
+    </button>
+  ) : (
+    <Link className={shell} href={href as never}>
+      {body}
+    </Link>
   );
 }
 
@@ -382,6 +461,10 @@ export function ReportsView({ data }: { data: ReportsData }) {
     const date = match ? new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, 1)) : null;
     return { ...month, label: date ? monthFormat.format(date) : month.label, short: date ? monthShort.format(date) : month.label };
   });
+  const weekFormat = new Intl.DateTimeFormat(intlLocale(locale), { day: "numeric", month: "short", timeZone: "UTC" });
+  const weekly = (data.weeklyData || []).map((week) => ({ ...week, key: String(week.key || week.label), label: weekFormat.format(new Date(`${String(week.key || week.label)}T00:00:00Z`)) }));
+  const busyMonths = monthly.filter((month) => month.revenue !== 0 || month.expenses !== 0).length;
+  const periodQuery = `preset=${data.dateRange.preset}&from=${data.dateRange.from}&to=${data.dateRange.to}`;
   const exportHref = (format: string) => `/api/reports/export?format=${format}&preset=${data.dateRange.preset}&from=${data.dateRange.from}&to=${data.dateRange.to}`;
   const nothingAtAll = data.vehicleMetrics.length === 0 && data.recentTransactions.length === 0;
 
@@ -474,8 +557,17 @@ export function ReportsView({ data }: { data: ReportsData }) {
         </span>
         <span aria-hidden className="text-xl text-[var(--muted)]">›</span>
       </Link>
+      <Link className="card pressable flex items-center justify-between gap-3 p-4" href="/transactions">
+        <span aria-hidden="true" className="inline-flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[var(--panel-secondary)] text-[var(--foreground-secondary)]"><ArrowLeftRight size={22} /></span>
+        <span className="min-w-0 flex-1">
+          <span className="block font-bold text-[var(--foreground)]">{say("allMoney")}</span>
+          <span className={soft}>{say("allMoneyHint", { count: data.recentTransactions.length })}</span>
+        </span>
+        <span aria-hidden className="text-xl text-[var(--muted)]">›</span>
+      </Link>
       </div>
 
+      <div className="grid content-start gap-3 [&>*]:min-w-0">
       {/* Who owes money */}
       <section className="card p-4">
         <h2 className={h2}>{say("owedTitle")}</h2>
@@ -508,6 +600,11 @@ export function ReportsView({ data }: { data: ReportsData }) {
         )}
       </section>
 
+      <div className="hidden empty:hidden lg:block">
+        {busyMonths >= 2 ? <MonthRows months={monthly} say={say} /> : <WeekBars say={say} weeks={weekly} />}
+      </div>
+      </div>
+
       {/* Deposits: held for customers, never income until kept */}
       <section className="card p-4">
         <h2 className={h2}>{say("depositsTitle")}</h2>
@@ -532,14 +629,14 @@ export function ReportsView({ data }: { data: ReportsData }) {
         </div>
       </section>
 
-      <div className="lg:col-span-2 empty:hidden">
-        <MonthRows months={monthly} say={say} />
+      <div className="empty:hidden lg:hidden">
+        {busyMonths >= 2 ? <MonthRows months={monthly} say={say} /> : <WeekBars say={say} weeks={weekly} />}
       </div>
 
       {data.revenueByType.length > 0 || data.expensesByType.length > 0 ? (
-        <div className="grid gap-3 sm:grid-cols-2 lg:col-span-2">
+        <div className="grid gap-3 lg:col-span-2 lg:grid-cols-2 [&>*]:min-w-0">
           <Breakdown rows={data.revenueByType} say={say} title={say("cameFrom")} typeLabel={typeLabel} />
-          <Breakdown rows={data.expensesByType} say={say} title={say("wentOn")} typeLabel={typeLabel} />
+          <Breakdown palette={OUT_COLORS} rows={data.expensesByType} say={say} title={say("wentOn")} typeLabel={typeLabel} />
         </div>
       ) : null}
 
@@ -573,46 +670,12 @@ export function ReportsView({ data }: { data: ReportsData }) {
               </button>
             ) : null}
           </div>
-          <div className="mt-3 space-y-2">
+          <div className="mt-3 grid gap-2.5 sm:grid-cols-2 xl:grid-cols-3">
             {sortedVehicles.map((vehicle) => (
-              <VehicleRow comparing={compareMode} key={vehicle.id} onSelect={toggleSelect} say={say} selected={selected.has(vehicle.id)} typeLabel={typeLabel} vehicle={vehicle} />
+              <VehicleTile comparing={compareMode} href={`/reports/vehicle/${vehicle.id}?${periodQuery}`} key={vehicle.id} onSelect={toggleSelect} say={say} selected={selected.has(vehicle.id)} vehicle={vehicle} />
             ))}
           </div>
           {compareMode && compareVehicles.length >= 2 ? <ComparisonPanel say={say} vehicles={compareVehicles} /> : null}
-        </section>
-      ) : null}
-
-      {/* Latest entries */}
-      {data.recentTransactions.length > 0 ? (
-        <section className="card p-4 lg:col-span-2">
-          <h2 className={h2}>{say("latestTitle")}</h2>
-          <div className="mt-3 space-y-2">
-            {data.recentTransactions.map((entry) => {
-              // A deposit coming in is money received and held for the customer: not income, not a cost.
-              const held = entry.type === "deposit_received";
-              return (
-                <div className={`${tile} flex items-center justify-between gap-3`} key={entry.id}>
-                  <div className="min-w-0">
-                    <p className="text-[16px] font-bold text-[var(--foreground)]">
-                      {typeLabel(entry.type, entry.typeLabel)}
-                      {entry.extras > 0 ? (
-                        <span className={`ml-2 font-medium ${soft}`}>{Math.abs(entry.extras - entry.amount) < 1 ? say("extrasTag") : say("extrasPart", { amount: money(entry.extras) })}</span>
-                      ) : null}
-                    </p>
-                    <p className={soft}>{[entry.vehicleLabel, entry.customerName].filter(Boolean).join(" · ")}</p>
-                    <p className={soft}>{longDate(entry.date, locale)}</p>
-                  </div>
-                  <p className={`shrink-0 text-[17px] font-bold ${entry.isIncome ? "text-[var(--success)]" : "text-[var(--foreground)]"}`}>
-                    {entry.isIncome || held ? "+" : "-"}
-                    {money(entry.amount)}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-          <Link className="secondary-action pressable mt-3 w-full" href="/transactions">
-            {say("allMoney")}
-          </Link>
         </section>
       ) : null}
 

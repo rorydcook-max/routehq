@@ -4004,7 +4004,13 @@
     "extrasTag": "บริการเสริม",
     "extrasPart": "รวมบริการเสริม {amount}",
     "bestMonth": "เดือนที่ดีที่สุด: {month} กำไร {amount}",
-    "monthByMonth": "ดูทีละเดือน"
+    "monthByMonth": "ดูทีละเดือน",
+    "weeksTitle": "รายสัปดาห์",
+    "bestWeek": "สัปดาห์ที่ดีที่สุด: เริ่ม {week} กำไร {amount}",
+    "donutTotal": "รวม",
+    "otherKinds": "อื่น ๆ",
+    "tileRentals": "{count, plural, =0 {ยังไม่มีการเช่า} other {เช่า # ครั้ง}}",
+    "allMoneyHint": "ทุกรายการ ค้นหาและกรองได้"
   },
   "auth": {
     "signInTitle": "เข้าสู่ระบบ",

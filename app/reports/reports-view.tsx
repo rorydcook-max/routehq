@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
@@ -19,7 +19,7 @@ import {
   XAxis,
   YAxis
 } from "recharts";
-import { ArrowDownRight, ArrowLeftRight, ArrowUpRight, Check, CheckCircle2, ChevronRight, Download, Handshake, Lightbulb, Loader2, TrendingUp } from "lucide-react";
+import { ArrowDownRight, ArrowLeftRight, ArrowUpRight, Check, CheckCircle2, ChevronRight, Download, Handshake, LayoutGrid, Lightbulb, List, Loader2, TrendingUp } from "lucide-react";
 import { intlLocale, longDate } from "@/lib/i18n/dates";
 import { Dot, InOutBars, Ring } from "@/components/glance";
 import { VehicleArt } from "@/components/vehicle-art";
@@ -281,6 +281,46 @@ function VehicleTile({ vehicle, comparing, selected, onSelect, href, say }: { ve
   );
 }
 
+function VehicleListRow({ vehicle, best, comparing, selected, onSelect, href, say }: { vehicle: VehicleMetrics; best: number; comparing: boolean; selected: boolean; onSelect: (id: string) => void; href: string; say: Say }) {
+  const name = [vehicle.make, vehicle.model].filter(Boolean).join(" ");
+  const share = best > 0 ? Math.min(100, (Math.abs(vehicle.profit) / best) * 100) : 0;
+  const body = (
+    <>
+      <VehicleArt colour={vehicle.color} kind={kindFromCategory(vehicle.category as never)} model={vehicle.model} size="sm" />
+      <span className="min-w-0 flex-1">
+        <span className="flex items-baseline justify-between gap-3">
+          <span className="truncate text-[16px] font-bold text-[var(--foreground)]">{vehicle.plate || vehicle.label}</span>
+          <span className={`num shrink-0 text-[17px] ${vehicle.profit >= 0 ? "text-[var(--success)]" : "text-[var(--warning)]"}`}>{money(vehicle.profit)}</span>
+        </span>
+        <span className="flex items-baseline justify-between gap-3">
+          <span className={`truncate ${soft}`}>{name || vehicle.label}</span>
+          <span className={`shrink-0 whitespace-nowrap ${soft}`}>{say("rowRented", { percent: Math.round(vehicle.utilizationRate) })}</span>
+        </span>
+        <span aria-hidden="true" className="mt-1.5 block h-1.5 overflow-hidden rounded-full bg-[var(--panel-tertiary)]">
+          <span className="grow-x block h-full rounded-full" style={{ width: `${Math.max(share, vehicle.profit !== 0 ? 2 : 0)}%`, background: vehicle.profit >= 0 ? "var(--success)" : "var(--warning)" }} />
+        </span>
+      </span>
+      {comparing ? (
+        <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 ${selected ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white"}`}>
+          {selected ? <Check size={16} /> : null}
+        </span>
+      ) : (
+        <ChevronRight className="shrink-0 text-[var(--primary)]" size={20} />
+      )}
+    </>
+  );
+  const shell = `pressable flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left transition hover:bg-[var(--panel-secondary)] ${comparing && selected ? "bg-[var(--primary-light)]" : ""}`;
+  return comparing ? (
+    <button aria-pressed={selected} className={shell} onClick={() => onSelect(vehicle.id)} type="button">
+      {body}
+    </button>
+  ) : (
+    <Link className={shell} href={href as never}>
+      {body}
+    </Link>
+  );
+}
+
 function ComparisonPanel({ vehicles, say }: { vehicles: VehicleMetrics[]; say: Say }) {
   const nameOf = (vehicle: VehicleMetrics) => vehicle.plate || vehicle.label.split(" ")[0];
   const inKey = say("moneyIn");
@@ -398,6 +438,19 @@ export function ReportsView({ data }: { data: ReportsData }) {
   const searchParams = useSearchParams();
   const [sortKey, setSortKey] = useState<SortKey>("profit");
   const [compareMode, setCompareMode] = useState(false);
+  // A list by default: tiles for a big fleet make a very long page. The choice is remembered on this device.
+  const [vehicleView, setVehicleView] = useState<"list" | "grid">("list");
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem("routehq.reports.vehicleView") === "grid") setVehicleView("grid");
+    } catch {}
+  }, []);
+  function chooseView(next: "list" | "grid") {
+    setVehicleView(next);
+    try {
+      window.localStorage.setItem("routehq.reports.vehicleView", next);
+    } catch {}
+  }
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const preset = data.dateRange.preset;
@@ -645,8 +698,8 @@ export function ReportsView({ data }: { data: ReportsData }) {
         <section className="card p-4 lg:col-span-2">
           <h2 className={h2}>{say("vehiclesTitle")}</h2>
           <p className={`mt-1 ${soft}`}>{compareMode ? say("compareHelp", { count: selected.size }) : say("vehiclesBody")}</p>
-          <div className="mt-3 flex gap-2">
-            <label className="min-w-0 flex-1">
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <label className="min-w-0 basis-full sm:basis-auto sm:flex-1">
               <span className="sr-only">{say("sortBy")}</span>
               <select aria-label={say("sortBy")} className="w-full" onChange={(event) => setSortKey(event.target.value as SortKey)} value={sortKey}>
                 {SORTS.map((key) => (
@@ -669,12 +722,35 @@ export function ReportsView({ data }: { data: ReportsData }) {
                 {compareMode ? say("compareDone") : say("compare")}
               </button>
             ) : null}
+            <div className="ml-auto flex shrink-0 rounded-full bg-[var(--panel-secondary)] p-1" role="group">
+              {(["list", "grid"] as const).map((view) => (
+                <button
+                  aria-label={say(view === "list" ? "viewList" : "viewGrid")}
+                  aria-pressed={vehicleView === view}
+                  className={`pressable flex h-9 w-10 items-center justify-center rounded-full ${vehicleView === view ? "bg-white text-[var(--primary)] shadow-sm" : "text-[var(--foreground-secondary)]"}`}
+                  key={view}
+                  onClick={() => chooseView(view)}
+                  title={say(view === "list" ? "viewList" : "viewGrid")}
+                  type="button"
+                >
+                  {view === "list" ? <List size={18} /> : <LayoutGrid size={18} />}
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="mt-3 grid gap-2.5 sm:grid-cols-2 xl:grid-cols-3">
-            {sortedVehicles.map((vehicle) => (
-              <VehicleTile comparing={compareMode} href={`/reports/vehicle/${vehicle.id}?${periodQuery}`} key={vehicle.id} onSelect={toggleSelect} say={say} selected={selected.has(vehicle.id)} vehicle={vehicle} />
-            ))}
-          </div>
+          {vehicleView === "list" ? (
+            <div className="mt-2 divide-y divide-[var(--border)]">
+              {sortedVehicles.map((vehicle) => (
+                <VehicleListRow best={Math.max(1, ...sortedVehicles.map((item) => Math.abs(item.profit)))} comparing={compareMode} href={`/reports/vehicle/${vehicle.id}?${periodQuery}`} key={vehicle.id} onSelect={toggleSelect} say={say} selected={selected.has(vehicle.id)} vehicle={vehicle} />
+              ))}
+            </div>
+          ) : (
+            <div className="mt-3 grid gap-2.5 sm:grid-cols-2 xl:grid-cols-3">
+              {sortedVehicles.map((vehicle) => (
+                <VehicleTile comparing={compareMode} href={`/reports/vehicle/${vehicle.id}?${periodQuery}`} key={vehicle.id} onSelect={toggleSelect} say={say} selected={selected.has(vehicle.id)} vehicle={vehicle} />
+              ))}
+            </div>
+          )}
           {compareMode && compareVehicles.length >= 2 ? <ComparisonPanel say={say} vehicles={compareVehicles} /> : null}
         </section>
       ) : null}

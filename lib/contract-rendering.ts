@@ -57,12 +57,10 @@ export function formatContractDate(value: string | null | undefined, locale = "e
     return String(value);
   }
 
-  return new Intl.DateTimeFormat(locale === "th" ? "th-TH-u-ca-buddhist" : "en-GB", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    timeZone: "UTC"
-  }).format(new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]))));
+  // One date sits in both the English and the Thai lines of the agreement. "13/10/2569" alone read as a
+  // wrong year in the English line, so a Thai agreement gives the Western year with the Buddhist one beside it.
+  const western = `${match[3]}/${match[2]}/${match[1]}`;
+  return locale === "th" ? `${western} (พ.ศ. ${Number(match[1]) + 543})` : western;
 }
 
 function formatContractTime(value: string | null | undefined) {

@@ -633,8 +633,10 @@
     "enterLine": "Please enter your LINE ID.",
     "enterTelegram": "Please enter your Telegram username.",
     "addDocumentDetails": "Please add your passport and driving licence details. Take a photo of each document, or type them in.",
+    "typeNumbersPhotoUnread": "We couldn't read the numbers from your photos. Please type them in above.",
     "tickEachBox": "Please tick the box to agree before you sign.",
     "pleaseSign": "Please sign the agreement before sending.",
+    "signNameMismatch": "Please sign with your own name, as on your booking: {name}.",
     "agreementUpdated": "The agreement has been updated. Please read the new version below and sign again.",
     "detailsSavedReadAgreement": "Your details are saved. Please read your final agreement below, then sign it.",
     "completeFailed": "We couldn't finish your booking. Please try again.",
@@ -4006,7 +4008,10 @@
     "donutTotal": "Total",
     "otherKinds": "Everything else",
     "tileRentals": "{count, plural, =0 {No rentals} one {# rental} other {# rentals}}",
-    "allMoneyHint": "Every entry, to search and filter"
+    "allMoneyHint": "Every entry, to search and filter",
+    "viewList": "List",
+    "viewGrid": "Tiles",
+    "rowRented": "{percent}% rented"
   },
   "auth": {
     "signInTitle": "Sign in",

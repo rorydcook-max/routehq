@@ -677,7 +677,8 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         detail.completion.documents ||
         ((detail.documentStatus.passport || uploaded("passportFile", "passportCameraFile")) &&
           (detail.documentStatus.driver_license || uploaded("driverLicenseFile", "driverLicenseCameraFile")) &&
-          (detail.documentStatus.selfie || uploaded("selfieFile", "selfieCameraFile"))),
+          (detail.documentStatus.selfie || uploaded("selfieFile", "selfieCameraFile")) &&
+          ID_FIELDS.every(filled)),
       agreement: detail.completion.agreement || (acceptedAgreement && Boolean(nextSignature) && filled("signedName"))
     });
   }
@@ -792,7 +793,8 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
     if (missingId) {
       setIdOpen(true);
       const filledSome = ID_FIELDS.some((name) => String(fd.get(name) || "").trim());
-      setError(filledSome ? t(`missing_${missingId}`) : t("addDocumentDetails"));
+      const photosIn = ["passportFile", "passportCameraFile", "driverLicenseFile", "driverLicenseCameraFile"].some((name) => fd.getAll(name).some((value) => value instanceof File && value.size > 0));
+      setError(filledSome ? t(`missing_${missingId}`) : photosIn ? t("typeNumbersPhotoUnread") : t("addDocumentDetails"));
       window.setTimeout(() => {
         const field = document.querySelector<HTMLInputElement>(`input[name="${missingId}"]`);
         (field || document.getElementById("document-numbers"))?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -810,6 +812,14 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
       }
       if (!signature) {
         setError(t("pleaseSign"));
+        return;
+      }
+      const bookedName = String(fd.get("fullName") || detail.customer?.full_name || "").trim();
+      const signedAs = String(fd.get("signedName") || "").trim().toLowerCase();
+      const firstName = bookedName.split(/\s+/)[0]?.toLowerCase() || "";
+      if (firstName && !signedAs.includes(firstName)) {
+        setError(t("signNameMismatch", { name: bookedName }));
+        document.querySelector<HTMLInputElement>('input[name="signedName"]')?.focus();
         return;
       }
     }

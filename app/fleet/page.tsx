@@ -69,6 +69,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
   const nextPaper = vehicles
     .filter((vehicle) => vehicle.complianceNext && vehicle.complianceNext.daysLeft <= 30)
     .sort((a, b) => (a.complianceNext!.daysLeft || 0) - (b.complianceNext!.daysLeft || 0))[0];
+  const noDates = vehicles.filter((vehicle) => !(vehicle as { compliance?: unknown[] }).compliance?.length);
   const paperName = (item: { key?: string; label: string }) => (item.key && c.has(`paper_${item.key}`) ? c(`paper_${item.key}`) : item.label);
   const kindName = (group: { kind: string; label: string }) => (c.has(`kinds_${group.kind}`) ? c(`kinds_${group.kind}`) : group.label);
 
@@ -123,6 +124,14 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
               <span>
                 <span className="num block text-[24px] leading-tight">{nextPaper.model || nextPaper.make}</span>
                 <span className="font-semibold">{nextPaper.complianceNext!.daysLeft < 0 ? t("paperLate", { date: dayMonth(nextPaper.complianceNext!.date) }) : t("paperDueOn", { date: dayMonth(nextPaper.complianceNext!.date) })}</span>
+              </span>
+            </Link>
+          ) : noDates.length > 0 ? (
+            <Link className="card pressable tile p-4 text-[var(--foreground)]" href={`/fleet/${noDates[0].id}/edit` as never}>
+              <TileHead icon={<Wrench size={22} />} title={t("papersMissingTitle")} />
+              <span>
+                <span className="num block text-[28px] leading-tight">{noDates.length}</span>
+                <span className="font-semibold text-[var(--foreground-secondary)]">{t("papersMissingDetail", { count: noDates.length })}</span>
               </span>
             </Link>
           ) : (

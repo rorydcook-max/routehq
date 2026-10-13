@@ -2526,6 +2526,8 @@
     "paperLate": "เลยกำหนดตั้งแต่ {date}",
     "papersOk": "เอกสารยังไม่หมดอายุ",
     "papersOkDetail": "ไม่มีอะไรครบกำหนดใน 30 วัน",
+    "papersMissingTitle": "วันหมดอายุเอกสาร",
+    "papersMissingDetail": "คันที่ยังไม่ได้ใส่วันภาษีหรือประกัน",
     "utilShort": "เช่า {pct}%"
   },
   "customers": {

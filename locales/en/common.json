@@ -2517,6 +2517,8 @@
     "paperLate": "overdue since {date}",
     "papersOk": "Papers in date",
     "papersOkDetail": "Nothing due in the next 30 days",
+    "papersMissingTitle": "Paper dates",
+    "papersMissingDetail": "{count, plural, one {vehicle has} other {vehicles have}} no tax or insurance dates yet",
     "utilShort": "{pct}% rented"
   },
   "customers": {

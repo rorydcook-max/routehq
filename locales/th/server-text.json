@@ -248,5 +248,11 @@
   "Read from messages: check each card, especially names, dates and amounts.": "อ่านจากข้อความแล้ว ตรวจแต่ละการ์ด โดยเฉพาะชื่อ วันที่ และจำนวนเงิน",
   "Only the owner or a manager can take rent off. Ask them to decide.": "เฉพาะเจ้าของหรือผู้จัดการเท่านั้นที่หักค่าเช่าออกได้ ให้เจ้าของหรือผู้จัดการเป็นผู้ตัดสินใจ",
   "Only the owner or a manager can decide this.": "เฉพาะเจ้าของหรือผู้จัดการเท่านั้นที่ตัดสินใจเรื่องนี้ได้",
-  "Only the owner or a manager can refund a payment. Ask them to decide.": "เฉพาะเจ้าของหรือผู้จัดการเท่านั้นที่คืนเงินได้ ให้พวกเขาเป็นผู้ตัดสินใจ"
+  "Only the owner or a manager can refund a payment. Ask them to decide.": "เฉพาะเจ้าของหรือผู้จัดการเท่านั้นที่คืนเงินได้ ให้พวกเขาเป็นผู้ตัดสินใจ",
+  "Choose the start and return dates.": "เลือกวันเริ่มเช่าและวันคืนรถ",
+  "The start date can't be in the past.": "วันเริ่มเช่าต้องไม่ใช่วันที่ผ่านมาแล้ว",
+  "This rental has already started. Use Extend or end early instead.": "การเช่านี้เริ่มแล้ว ใช้ ต่อเวลา หรือ คืนก่อนกำหนด แทน",
+  "The customer has signed for these dates. Send them the change to sign instead.": "ลูกค้าเซ็นสัญญาตามวันที่เดิมแล้ว ส่งการเปลี่ยนแปลงให้ลูกค้าเซ็นแทน",
+  "Some of this booking is already paid. Use Extend or end early instead.": "การจองนี้มีการชำระเงินแล้วบางส่วน ใช้ ต่อเวลา หรือ คืนก่อนกำหนด แทน",
+  "Couldn't change the dates.": "เปลี่ยนวันที่ไม่สำเร็จ"
 }

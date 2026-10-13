@@ -33,13 +33,15 @@ export function UnsentMessages({ messages, customerName, bare = false }: { messa
   const open = messages.filter((message) => !done.includes(message.id));
   if (open.length === 0) return null;
 
-  function finish(id: string) {
-    setDone((ids) => [...ids, id]);
+  function finish(...ids: string[]) {
+    setDone((current) => [...current, ...ids]);
     startTransition(async () => {
-      await markCustomerMessageSent(id).catch(() => null);
+      await Promise.all(ids.map((id) => markCustomerMessageSent(id).catch(() => null)));
       router.refresh();
     });
   }
+  // The newest message says what's current; older ones for the same booking fold away under it.
+  const [latest, ...earlier] = open;
 
   async function copy(message: UnsentMessage) {
     try {
@@ -59,11 +61,11 @@ export function UnsentMessages({ messages, customerName, bare = false }: { messa
         </>
       )}
       <div className={bare ? "space-y-3" : "mt-3 space-y-3"}>
-        {open.map((message) => {
+        {[latest].map((message) => {
           const app = appOf(message.url);
           return (
-            <div className="rounded-lg bg-white p-3" key={message.id}>
-              <p className="whitespace-pre-line text-sm leading-6 text-[var(--foreground)] [overflow-wrap:anywhere]">
+            <div className="rounded-2xl bg-white p-3.5" key={message.id}>
+              <p className="whitespace-pre-line text-[15px] leading-6 text-[var(--foreground)] [overflow-wrap:anywhere]">
                 <bdi>{message.content}</bdi>
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
@@ -85,6 +87,26 @@ export function UnsentMessages({ messages, customerName, bare = false }: { messa
             </div>
           );
         })}
+        {earlier.length ? (
+          <details className="group rounded-2xl bg-white/70 px-3 py-2.5">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 font-semibold text-[var(--foreground-secondary)]">
+              <span>{say("unsentEarlier", { count: earlier.length })}</span>
+              <span aria-hidden="true" className="ti ti-chevron-down transition group-open:rotate-180" />
+            </summary>
+            <p className="mt-1 text-[14px] text-[var(--muted)]">{say("unsentEarlierHint")}</p>
+            <div className="mt-2 space-y-2">
+              {earlier.map((message) => (
+                <p className="line-clamp-3 whitespace-pre-line rounded-xl bg-white p-3 text-[14px] leading-6 text-[var(--foreground-secondary)] [overflow-wrap:anywhere]" key={message.id}>
+                  <bdi>{message.content}</bdi>
+                </p>
+              ))}
+            </div>
+            <button className="secondary-action pressable mt-2.5 min-h-10 whitespace-nowrap px-4 text-[14px]" disabled={pending} onClick={() => finish(...earlier.map((message) => message.id))} type="button">
+              <Check size={16} />
+              {say("unsentClearEarlier")}
+            </button>
+          </details>
+        ) : null}
       </div>
     </div>
   );

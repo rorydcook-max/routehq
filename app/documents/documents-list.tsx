@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { ExternalLink, FileSignature, FileText, Search } from "lucide-react";
+import { CalendarDays, Car, FileSignature, FileText, Images, Search, UserRound } from "lucide-react";
 import type { DocumentListItem } from "@/lib/documents-hub";
 import { longDate } from "@/lib/i18n/dates";
 
@@ -75,9 +75,21 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
     return result;
   }, [filtered]);
 
+  // Grouped by the day the file was made, newest day first, so a long history reads as a short list per day.
+  const days = useMemo(() => {
+    const byDay = new Map<string, Row[]>();
+    for (const row of rows) {
+      const day = String((row.kind === "photos" ? row.documents[0] : row.document).createdAt || "").slice(0, 10);
+      const list = byDay.get(day) || [];
+      list.push(row);
+      byDay.set(day, list);
+    }
+    return [...byDay.entries()].sort((a, b) => b[0].localeCompare(a[0]));
+  }, [rows]);
+
   return (
     <div className="space-y-3">
-      <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+      <div className="space-y-2.5">
         <label className="relative block">
           <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--foreground-secondary)]" size={18} />
           <input
@@ -88,13 +100,21 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
             value={search}
           />
         </label>
-        <select aria-label={say("show")} className="w-full sm:w-auto" onChange={(event) => setOwnerFilter(event.target.value)} value={ownerFilter}>
-          {ownerTypes.map((type) => (
-            <option key={type} value={type}>
-              {filterLabel(type)}
-            </option>
-          ))}
-        </select>
+        {ownerTypes.length > 2 ? (
+          <div aria-label={say("show")} className="flex flex-wrap gap-2" role="group">
+            {ownerTypes.map((type) => (
+              <button
+                aria-pressed={ownerFilter === type}
+                className={`pressable shrink-0 whitespace-nowrap rounded-full border-2 px-4 py-2 text-[14px] font-bold ${ownerFilter === type ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
+                key={type}
+                onClick={() => setOwnerFilter(type)}
+                type="button"
+              >
+                {filterLabel(type)}
+              </button>
+            ))}
+          </div>
+        ) : null}
       </div>
 
       {filtered.length === 0 ? (
@@ -103,83 +123,90 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
           <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{documents.length === 0 ? say("emptyBody") : say("noMatchBody")}</p>
         </div>
       ) : (
-        rows.map((row) => {
-          if (row.kind === "photos") {
-            const first = row.documents[0];
-            return (
-              <div className="card p-4" key={row.key}>
-                <div className="lg:flex lg:items-center lg:justify-between lg:gap-4">
-                <div className="min-w-0">
-                <p className="text-[16px] font-bold text-[var(--foreground)]">{ownerLabel(first)}</p>
-                <p className="font-medium text-[var(--foreground-secondary)]">
-                  {say("photoCount", { count: row.documents.length })} · {longDate(first.createdAt, locale)}
-                </p>
-                </div>
-                {first.href ? (
-                  <Link className="secondary-action pressable !hidden shrink-0 whitespace-nowrap lg:!inline-flex" href={first.href as any}>
-                    {say(first.inspectionType === "condition" ? "openVehicle" : "openBooking")}
-                  </Link>
-                ) : null}
-                </div>
-                <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
-                  {row.documents.map((document) =>
-                    document.signedUrl ? (
-                      <a className="shrink-0" href={document.signedUrl} key={document.id} rel="noreferrer" target="_blank" title={fileLabel(document)}>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img alt={fileLabel(document)} className="h-16 w-24 rounded-lg bg-[var(--panel-secondary)] object-cover" loading="lazy" src={document.signedUrl} />
-                      </a>
-                    ) : null
-                  )}
-                </div>
-                {first.href ? (
-                  <Link className="secondary-action pressable mt-3 w-full sm:w-auto lg:!hidden" href={first.href as any}>
-                    {say(first.inspectionType === "condition" ? "openVehicle" : "openBooking")}
-                  </Link>
-                ) : null}
-              </div>
-            );
-          }
-          const document = row.document;
-          return (
-            <div className="card p-4 lg:flex lg:items-center lg:justify-between lg:gap-4" key={document.id}>
-              <div className="flex min-w-0 items-start gap-3 lg:items-center">
-                {document.mimeType?.startsWith("image/") && document.signedUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img alt="" className="h-12 w-12 shrink-0 rounded-xl object-cover" loading="lazy" src={document.signedUrl} />
-                ) : (
-                  <span
-                    className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${
-                      document.ownerType === "signed" ? "bg-[var(--success-light)] text-[var(--success)]" : "bg-[var(--primary-light)] text-[var(--primary)]"
-                    }`}
-                  >
-                    {document.ownerType === "signed" ? <FileSignature size={22} /> : <FileText size={22} />}
+        days.map(([day, dayRows]) => (
+          <section className="card overflow-hidden !p-0" key={day}>
+            <p className="border-b border-[var(--border)] bg-[var(--panel-secondary)] px-4 py-2.5 font-bold text-[var(--foreground-secondary)]">{longDate(day, locale)}</p>
+            <ul className="divide-y divide-[var(--border)]">
+              {dayRows.map((row) => {
+                if (row.kind === "photos") {
+                  const first = row.documents[0];
+                  const shown = row.documents.filter((document) => document.signedUrl).slice(0, 4);
+                  return (
+                    <li className="px-4 py-3" key={row.key}>
+                      <div className="flex items-center gap-3">
+                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--panel-secondary)] text-[var(--primary)]"><Images size={20} /></span>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate font-bold text-[var(--foreground)]">{ownerLabel(first)}</p>
+                          <p className="truncate text-[14px] font-medium text-[var(--foreground-secondary)]">{say("photoCount", { count: row.documents.length })}</p>
+                        </div>
+                        {first.href ? <OwnerLink href={first.href} kind={first.inspectionType === "condition" ? "vehicle" : "booking"} label={say(first.inspectionType === "condition" ? "openVehicle" : "openBooking")} /> : null}
+                      </div>
+                      <div className="mt-2.5 flex gap-1.5 pl-14">
+                        {shown.map((document) => (
+                          <a className="shrink-0" href={document.signedUrl as string} key={document.id} rel="noreferrer" target="_blank" title={fileLabel(document)}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img alt={fileLabel(document)} className="h-12 w-16 rounded-lg bg-[var(--panel-secondary)] object-cover" loading="lazy" src={document.signedUrl as string} />
+                          </a>
+                        ))}
+                        {row.documents.length > shown.length ? (
+                          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[var(--panel-secondary)] text-[14px] font-bold text-[var(--foreground-secondary)]">{say("morePhotos", { count: row.documents.length - shown.length })}</span>
+                        ) : null}
+                      </div>
+                    </li>
+                  );
+                }
+                const document = row.document;
+                const icon =
+                  document.mimeType?.startsWith("image/") && document.signedUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img alt="" className="h-11 w-11 shrink-0 rounded-xl object-cover" loading="lazy" src={document.signedUrl} />
+                  ) : (
+                    <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${document.ownerType === "signed" ? "bg-[var(--success-light)] text-[var(--success)]" : "bg-[var(--primary-light)] text-[var(--primary)]"}`}>
+                      {document.ownerType === "signed" ? <FileSignature size={20} /> : <FileText size={20} />}
+                    </span>
+                  );
+                const text = (
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-bold text-[var(--foreground)]">{fileLabel(document)}</span>
+                    <span className="block truncate text-[14px] font-medium text-[var(--foreground-secondary)]">{ownerLabel(document)}</span>
                   </span>
-                )}
-                <div className="min-w-0">
-                  <p className="text-[16px] font-bold text-[var(--foreground)]">{fileLabel(document)}</p>
-                  <p className="font-medium text-[var(--foreground-secondary)]">{ownerLabel(document)}</p>
-                  <p className="font-medium text-[var(--foreground-secondary)]">
-                    {document.ownerType === "signed" ? say("signedOn", { date: longDate(document.createdAt, locale) }) : document.ownerType === "receipt" ? say("issuedOn", { date: longDate(document.createdAt, locale) }) : say("addedOn", { date: longDate(document.createdAt, locale) })}
-                  </p>
-                </div>
-              </div>
-              <div className="mt-3 flex gap-2 lg:mt-0 lg:shrink-0 [&>*]:flex-1 [&>*]:whitespace-nowrap sm:[&>*]:flex-none">
-                {document.signedUrl ? (
-                  <a className="primary-action pressable" href={document.signedUrl} rel="noreferrer" target="_blank">
-                    <ExternalLink size={18} />
-                    {say("view")}
-                  </a>
-                ) : null}
-                {document.href ? (
-                  <Link className="secondary-action pressable" href={document.href as any}>
-                    {say(document.ownerType === "vehicle" ? "openVehicle" : document.ownerType === "customer" ? "openCustomer" : "openBooking")}
-                  </Link>
-                ) : null}
-              </div>
-            </div>
-          );
-        })
+                );
+                return (
+                  <li className="flex items-center gap-3 px-4 py-3 hover:bg-[var(--panel-secondary)]" key={document.id}>
+                    {document.signedUrl ? (
+                      <a className="flex min-w-0 flex-1 items-center gap-3" href={document.signedUrl} rel="noreferrer" target="_blank" title={say("view")}>
+                        {icon}
+                        {text}
+                      </a>
+                    ) : (
+                      <span className="flex min-w-0 flex-1 items-center gap-3">
+                        {icon}
+                        {text}
+                      </span>
+                    )}
+                    {document.href ? (
+                      <OwnerLink
+                        href={document.href}
+                        kind={document.ownerType === "vehicle" ? "vehicle" : document.ownerType === "customer" ? "customer" : "booking"}
+                        label={say(document.ownerType === "vehicle" ? "openVehicle" : document.ownerType === "customer" ? "openCustomer" : "openBooking")}
+                      />
+                    ) : null}
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ))
       )}
     </div>
+  );
+}
+
+function OwnerLink({ href, kind, label }: { href: string; kind: "booking" | "customer" | "vehicle"; label: string }) {
+  const Icon = kind === "vehicle" ? Car : kind === "customer" ? UserRound : CalendarDays;
+  return (
+    <Link aria-label={label} className="pressable flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-[var(--border)] bg-white text-[var(--primary)] hover:border-[var(--primary)]" href={href as any} title={label}>
+      <Icon size={18} />
+    </Link>
   );
 }

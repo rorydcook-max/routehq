@@ -30,7 +30,7 @@ import { DateLeaf, PartBar, PaymentStrip, RentalTrack, initialsOf } from "@/comp
 import { kindFromCategory } from "@/lib/vehicle-groups";
 import { AddRentalPaymentInlineForm, EditableEndDate, EditableRentalPaymentRow, EditableTransactionRow, ExistingRentalPaymentSetupCard } from "@/components/booking-correction-controls";
 import { CommunicationPanel } from "@/components/communication-panel";
-import { RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
+import { BookingDatesButton, RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
 import { InspectionViewer } from "@/components/inspection-viewer";
 import { PendingButton } from "@/components/pending-button";
 import { Badge, Card, Fold, SectionHeader } from "@/components/ui";
@@ -638,7 +638,11 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     <ArrowRight aria-hidden="true" className="hidden text-[var(--muted)] sm:block" size={18} />
                     <DateLeaf date={rental.end_date} locale={tx.locale} tone={isCancelled ? "var(--muted)" : "var(--coming-back)"} />
                     <span className="sr-only">{tx.say("dateTo", { date: formatDate(rental.start_date, tx) })}</span>
-                    {isCancelled || rental.status === "completed" ? null : <EditableEndDate currentEndDate={rental.end_date} iconOnly rentalId={rental.id} />}
+                    {isCancelled || rental.status === "completed" ? null : rental.status === "booked" && !bookingLink?.contract_signed_at && !renterSignatureOf(rentalDocuments) ? (
+                      <BookingDatesButton billingPeriod={String(rental.billing_interval || rental.pricing_model || "")} currentEndDate={rental.end_date} currentRate={Number(rental.rental_rate || 0)} currentStartDate={rental.start_date} customerName={customer?.full_name || tx.list("awaitingCustomerShort")} rentalId={rental.id} vehicleLabel={vehicleTitle(vehicle)} />
+                    ) : (
+                      <EditableEndDate currentEndDate={rental.end_date} iconOnly rentalId={rental.id} />
+                    )}
                   </div>
                 ) : (
                   <p className="flex flex-wrap items-center gap-1 font-medium text-[var(--foreground-secondary)]">

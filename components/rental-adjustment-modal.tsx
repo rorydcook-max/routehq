@@ -3,7 +3,9 @@
 import { quoteStay, type Rates } from "@/lib/rental-estimate";
 import { shownError } from "@/lib/error-text";
 import { useEffect, useMemo, useState, useTransition, useRef } from "react";
-import { adjustRental } from "@/app/actions/bookings";
+import { createPortal } from "react-dom";
+import { useRouter } from "next/navigation";
+import { adjustRental, rescheduleBooking } from "@/app/actions/bookings";
 import { useLocale, useTranslations } from "next-intl";
 import { longDate } from "@/lib/i18n/dates";
 import { quoteExplainIn } from "@/lib/i18n/quote-text";
@@ -259,7 +261,9 @@ export function RentalAdjustmentModal({
   // Until the operator changes them, the date follows the pricing period and the price follows the rates.
   const dateChosenByHand = useRef(false);
   const amountTypedByHand = useRef(false);
-  const [extensionDueDate, setExtensionDueDate] = useState(() => dateInputValue(currentEndDate) || isoDate(localDay()));
+  // Before the start, nothing has begun: changes are about the booking's dates, not an extension.
+  const notStarted = Boolean(currentStartDate) && dateInputValue(currentStartDate) > isoDate(localDay());
+  const [extensionDueDate, setExtensionDueDate] = useState(() => (notStarted ? dateInputValue(currentStartDate) : dateInputValue(currentEndDate)) || isoDate(localDay()));
   const [note, setNote] = useState("");
   const [message, setMessage] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -416,6 +420,23 @@ export function RentalAdjustmentModal({
     (useAmendment && signingBlocked) ||
     (isTerms ? !newRate.trim() && !newDeposit.trim() : isExtension ? !extensionEndDate : !earlyReturnDate);
 
+  if (notStarted && !openEnded && (!context || !agreementSigned)) {
+    return (
+      <RescheduleSheet
+        billingPeriod={context ? String(context.billingPeriod || "") : null}
+        currentEndDate={currentEndDate}
+        currentRate={context?.currentRate ?? currentRate ?? 0}
+        currentStartDate={currentStartDate}
+        customerName={customerName}
+        loading={!context}
+        onClose={onClose}
+        onSuccess={onSuccess}
+        rentalId={rentalId}
+        vehicleLabel={vehicleLabel}
+      />
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--foreground)]/35 px-4 py-6" role="dialog" aria-modal="true">
       <div className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-[var(--border)] bg-white p-4 shadow-[0_24px_80px_rgba(15,23,42,0.22)]">
@@ -434,11 +455,11 @@ export function RentalAdjustmentModal({
         <div className={`mt-4 grid gap-2 sm:gap-3 ${agreementSigned && !openEnded ? "sm:grid-cols-3" : agreementSigned || !openEnded ? "sm:grid-cols-2" : ""}`}>
           {openEnded ? null : (
             <OptionCard
-              description={say("adj_extendDesc")}
+              description={notStarted ? say("adj_moveDesc") : say("adj_extendDesc")}
               icon="ti-calendar-plus"
               onClick={() => setAdjustmentType("extension")}
               selected={isExtension}
-              title={say("adj_extendTitle")}
+              title={notStarted ? say("adj_moveTitle") : say("adj_extendTitle")}
               tone="teal"
             />
           )}
@@ -550,7 +571,7 @@ export function RentalAdjustmentModal({
               </div>
 
               <label className="block">
-                {say("adj_agreed")}
+                {notStarted ? say("adj_agreedBooked") : say("adj_agreed")}
                 <CurrencyInput
                   onChange={(value) => {
                     amountTypedByHand.current = true;
@@ -575,7 +596,7 @@ export function RentalAdjustmentModal({
               <label className="block">
                 {say("adj_paymentDue")}
                 <input className="mt-1 min-h-11 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-[13px]" onChange={(event) => setExtensionDueDate(event.target.value)} type="date" value={extensionDueDate} />
-                <span className="mt-1 block text-[11px] text-[var(--muted)]">{say("adj_typically")}</span>
+                <span className="mt-1 block text-[14px] text-[var(--muted)]">{notStarted ? say("adj_dueBooked") : say("adj_typically")}</span>
               </label>
 
               {agreementSigned ? (
@@ -719,6 +740,81 @@ export function RentalAdjustmentButton({
           }}
         />
       ) : null}
+    </>
+  );
+}
+
+/** A booking that hasn't started and isn't signed: new dates, rent worked out again. */
+function RescheduleSheet({ rentalId, currentStartDate, currentEndDate, currentRate, billingPeriod, customerName, vehicleLabel, loading, onClose, onSuccess }: {
+  rentalId: string; currentStartDate?: string | null; currentEndDate?: string | null; currentRate: number; billingPeriod: string | null; customerName: string; vehicleLabel: string; loading: boolean; onClose: () => void; onSuccess?: () => void;
+}) {
+  const say = useTranslations("booking") as unknown as Say;
+  const [start, setStart] = useState(dateInputValue(currentStartDate));
+  const [end, setEnd] = useState(dateInputValue(currentEndDate));
+  const [message, setMessage] = useState("");
+  const [done, setDone] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const days = start && end ? Math.max(1, daysBetween(start, end)) : 0;
+  const daily = String(billingPeriod || "").toLowerCase().startsWith("da");
+  const today = isoDate(localDay());
+  function save() {
+    setMessage("");
+    startTransition(async () => {
+      const result = await rescheduleBooking(rentalId, start, end);
+      if (!result.ok) {
+        setMessage(result.error || say("adj_failed"));
+        return;
+      }
+      setDone(true);
+      setTimeout(() => {
+        onSuccess?.();
+        onClose();
+      }, 900);
+    });
+  }
+  return (
+    <div aria-modal="true" className="fixed inset-0 z-50 flex items-end justify-center bg-[var(--foreground)]/35 p-3 sm:items-center" onClick={() => (isPending ? null : onClose())} role="dialog">
+      <div className="w-full max-w-md rounded-3xl bg-white p-5 shadow-[0_24px_80px_rgba(15,23,42,0.22)]" onClick={(event) => event.stopPropagation()}>
+        <p className="text-[19px] font-bold text-[var(--foreground)]">{say("rs_title")}</p>
+        <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{[customerName, vehicleLabel].filter(Boolean).join(" · ")}</p>
+        <p className="mt-3 text-[14px] text-[var(--foreground-secondary)]">{say("rs_desc")}</p>
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          <label className="block font-semibold text-[var(--foreground-secondary)]">
+            {say("rs_start")}
+            <input className="mt-1 h-12 w-full rounded-xl border border-[var(--border-strong)] bg-white px-3 text-[16px] font-semibold text-[var(--foreground)]" min={today} onChange={(event) => { setStart(event.target.value); setMessage(""); }} type="date" value={start} />
+          </label>
+          <label className="block font-semibold text-[var(--foreground-secondary)]">
+            {say("rs_end")}
+            <input className="mt-1 h-12 w-full rounded-xl border border-[var(--border-strong)] bg-white px-3 text-[16px] font-semibold text-[var(--foreground)]" min={start || today} onChange={(event) => { setEnd(event.target.value); setMessage(""); }} type="date" value={end} />
+          </label>
+        </div>
+        <p className="mt-3 rounded-2xl bg-[var(--panel-secondary)] px-4 py-3 font-bold text-[var(--foreground)]">
+          {loading ? say("rs_loading") : daily && days > 0 && currentRate > 0 ? say("rs_daily", { days, rate: money(currentRate), total: money(currentRate * days) }) : say("rs_other")}
+        </p>
+        {message ? <p className="mt-3 rounded-xl bg-[var(--danger-light)] p-3 font-semibold text-[var(--danger)]" role="alert">{message}</p> : null}
+        {done ? <p className="mt-3 rounded-xl bg-[var(--success-light)] p-3 font-semibold text-[var(--success)]">{say("rs_saved")}</p> : null}
+        <div className="mt-4 flex gap-2 [&>*]:flex-1">
+          <button className="secondary-action pressable min-h-12 whitespace-nowrap" disabled={isPending} onClick={onClose} type="button">{say("adj_close")}</button>
+          <button className="primary-action pressable min-h-12 whitespace-nowrap" disabled={isPending || loading || !start || !end || done} onClick={save} type="button">{isPending ? say("saving") : say("rs_save")}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** The pencil beside a not-yet-started booking's dates. */
+export function BookingDatesButton(props: { rentalId: string; currentStartDate?: string | null; currentEndDate?: string | null; currentRate: number; billingPeriod: string; customerName: string; vehicleLabel: string }) {
+  const say = useTranslations("booking") as unknown as Say;
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button aria-label={say("rs_title")} className="pressable inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-white text-[var(--muted)] shadow-[0_1px_3px_rgba(19,38,43,0.14)] hover:text-[var(--primary)] sm:h-9 sm:w-9" onClick={() => setOpen(true)} type="button">
+        <i aria-hidden="true" className="ti ti-pencil text-[13px]" />
+      </button>
+      {open && typeof document !== "undefined"
+        ? createPortal(<RescheduleSheet {...props} loading={false} onClose={() => setOpen(false)} onSuccess={() => router.refresh()} />, document.body)
+        : null}
     </>
   );
 }

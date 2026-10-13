@@ -2,6 +2,7 @@
 
 import { extrasFrom, priceExtras } from "@/lib/price-rules";
 import { extrasIncomeTag } from "@/lib/extras";
+import { generatePaymentSchedule } from "@/lib/payment-schedule";
 
 import { said } from "@/lib/i18n/server-text";
 import { completeRentalJobs, tellRentalCustomer } from "@/lib/customer-messages";
@@ -3656,4 +3657,102 @@ export async function extendBookingHold(rentalId: string): Promise<{ success: bo
   revalidatePath("/bookings");
   revalidatePath(`/bookings/${rentalId}`);
   return { success: true };
+}
+
+/**
+ * Before the handover, nothing has started: new dates simply replace the old ones and the rent is worked out again
+ * from them (no "extension" on a rental that hasn't begun). Only while nothing has been paid and the customer
+ * hasn't signed; after that the change goes through an amendment the customer signs.
+ */
+export async function rescheduleBooking(rentalId: string, startDate: string, endDate: string): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const supabase = (await createSupabaseServerClient()) as any;
+    const {
+      data: { user }
+    } = await supabase.auth.getUser();
+    if (!user) return { ok: false, error: await said("You must be signed in.") };
+
+    const start = dateOnly(startDate);
+    const end = dateOnly(endDate);
+    if (!start || !end) return { ok: false, error: await said("Choose the start and return dates.") };
+    if (end < start) return { ok: false, error: await said("The return date must be after the start date.") };
+    if (start < businessToday()) return { ok: false, error: await said("The start date can't be in the past.") };
+
+    const { data: rental } = await supabase
+      .from("rentals")
+      .select("id, organization_id, vehicle_id, customer_id, status, start_date, end_date, rental_rate, deposit_amount, billing_interval, pricing_model, delivery_datetime")
+      .eq("id", rentalId)
+      .is("deleted_at", null)
+      .maybeSingle();
+    if (!rental) return { ok: false, error: await said("Rental not found.") };
+    await ensureMembership(supabase, rental.organization_id, user.id);
+    if (String(rental.status) !== "booked") return { ok: false, error: await said("This rental has already started. Use Extend or end early instead.") };
+
+    const { data: links } = await supabase.from("booking_links").select("contract_signed_at").eq("rental_id", rental.id).is("deleted_at", null);
+    if ((links || []).some((link: any) => link.contract_signed_at)) return { ok: false, error: await said("The customer has signed for these dates. Send them the change to sign instead.") };
+
+    const { data: payments } = await supabase.from("rental_payments").select("id, status, transaction_id").eq("rental_id", rental.id).is("deleted_at", null);
+    if ((payments || []).some((payment: any) => payment.status === "paid" || payment.transaction_id)) return { ok: false, error: await said("Some of this booking is already paid. Use Extend or end early instead.") };
+
+    if (rental.vehicle_id) {
+      const conflict = await vehicleConflictMessage(supabase, { organizationId: rental.organization_id, vehicleId: rental.vehicle_id, startDate: start, endDate: end, excludeRentalId: rental.id });
+      if (conflict) return { ok: false, error: await said(conflict) };
+    }
+
+    // A handover time on the old start day moves with it; one already agreed for another day stays.
+    const oldStart = dateOnly(rental.start_date);
+    const delivery = rental.delivery_datetime ? String(rental.delivery_datetime) : null;
+    const update: Record<string, unknown> = { start_date: start, end_date: end };
+    if (delivery && delivery.slice(0, 10) === oldStart) update.delivery_datetime = start + delivery.slice(10);
+
+    const { error: updateError } = await supabase.from("rentals").update(update).eq("id", rental.id).eq("organization_id", rental.organization_id);
+    if (updateError) return { ok: false, error: await said(isDoubleBookingError(updateError) ? DOUBLE_BOOKING_MESSAGE : updateError.message) };
+
+    // The rent (and deposit) still to pay, worked out again from the new dates. A booking whose customer hasn't
+    // finished the link has no schedule yet: it is made when they do, from these dates.
+    const period = String(rental.billing_interval || rental.pricing_model || "monthly").toLowerCase();
+    if (!(payments || []).length) {
+      if (period.startsWith("da") && Number(rental.rental_rate || 0) > 0) {
+        const days = Math.max(1, Math.round((Date.parse(`${end}T00:00:00Z`) - Date.parse(`${start}T00:00:00Z`)) / 86_400_000));
+        await supabase.from("rentals").update({ balance_due: Number(rental.rental_rate) * days + Number(rental.deposit_amount || 0) }).eq("id", rental.id);
+      }
+    } else if (rental.customer_id && Number(rental.rental_rate || 0) > 0) {
+      await supabase.from("rental_payments").delete().eq("organization_id", rental.organization_id).eq("rental_id", rental.id).in("status", ["scheduled", "pending", "overdue"]).is("transaction_id", null);
+      await generatePaymentSchedule({
+        supabase,
+        organisationId: rental.organization_id,
+        rentalId: rental.id,
+        rentalRate: Number(rental.rental_rate || 0),
+        depositAmount: Number(rental.deposit_amount || 0),
+        deliveryDate: start,
+        endDate: end,
+        billingPeriod: rental.billing_interval || rental.pricing_model || "monthly",
+        upfrontPeriods: 0
+      });
+      const { data: open } = await supabase.from("rental_payments").select("amount, metadata").eq("rental_id", rental.id).in("status", ["scheduled", "pending", "overdue"]).is("deleted_at", null);
+      const owed = (open || []).filter((row: any) => !(row.metadata?.is_deposit === true || row.metadata?.type === "deposit")).reduce((sum: number, row: any) => sum + Number(row.amount || 0), 0);
+      await supabase.from("rentals").update({ balance_due: owed }).eq("id", rental.id);
+    }
+
+    await recordActivityEvent(supabase, {
+      organization_id: rental.organization_id,
+      actor_id: user.id,
+      entity_type: "rental",
+      entity_id: rental.id,
+      vehicle_id: rental.vehicle_id,
+      rental_id: rental.id,
+      customer_id: rental.customer_id,
+      event_type: "rental_rescheduled",
+      title: "Booking dates changed",
+      detail: `${oldStart} to ${dateOnly(rental.end_date) || "open"} changed to ${start} to ${end}`
+    }).catch(() => null);
+
+    await syncVehicleStatusFromBookings(supabase, rental.organization_id, rental.vehicle_id).catch(() => null);
+    revalidatePath(`/bookings/${rental.id}`);
+    revalidatePath("/bookings");
+    revalidatePath("/");
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: await said(error instanceof Error ? error.message : "Couldn't change the dates.") };
+  }
 }

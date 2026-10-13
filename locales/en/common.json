@@ -1189,7 +1189,10 @@
     "back": "Cancel",
     "bandOnRent": "on rent",
     "bandStarting": "start this week",
-    "bandOwing": "owe money"
+    "bandOwing": "owe money",
+    "secNow": "On rent now",
+    "secUpcoming": "Coming up",
+    "secDone": "Finished"
   },
   "inbox": {
     "title": "Inbox",
@@ -2235,7 +2238,23 @@
     "strip_owed": "Owed",
     "strip_today": "Due today",
     "strip_later": "To come",
-    "closeLabel": "Close"
+    "closeLabel": "Close",
+    "rs_title": "Change the dates",
+    "rs_desc": "Nothing has started yet, so the new dates replace the old ones and the rent is worked out again.",
+    "rs_start": "Start date",
+    "rs_end": "Return date",
+    "rs_daily": "{days, plural, one {# day} other {# days}} × {rate} = {total}",
+    "rs_other": "The rent is worked out again from the new dates.",
+    "rs_save": "Save new dates",
+    "rs_saved": "Dates changed",
+    "rs_loading": "Loading…",
+    "adj_moveTitle": "Change the return date",
+    "adj_moveDesc": "It hasn't started yet. Add days and the customer signs the change.",
+    "adj_agreedBooked": "Extra rent for the added days",
+    "adj_dueBooked": "Due with the first rent.",
+    "unsentEarlier": "{count, plural, one {# earlier message} other {# earlier messages}}",
+    "unsentEarlierHint": "Probably out of date: the newest one above says what's current.",
+    "unsentClearEarlier": "Mark these done"
   },
   "newBooking": {
     "pageBack": "Back to bookings",
@@ -3915,7 +3934,11 @@
     "atCondition": "Condition photos · {vehicle}",
     "receiptNo": "Receipt {number}",
     "issuedOn": "Issued {date}",
-    "filter_receipt": "Receipts"
+    "filter_receipt": "Receipts",
+    "shortBooking": "Booking",
+    "shortCustomer": "Customer",
+    "shortVehicle": "Vehicle",
+    "morePhotos": "+{count}"
   },
   "reportsPage": {
     "title": "Reports",

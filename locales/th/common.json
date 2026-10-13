@@ -1198,7 +1198,10 @@
     "back": "ไม่ลบ",
     "bandOnRent": "กำลังเช่า",
     "bandStarting": "เริ่มสัปดาห์นี้",
-    "bandOwing": "ค้างชำระ"
+    "bandOwing": "ค้างชำระ",
+    "secNow": "กำลังเช่าอยู่",
+    "secUpcoming": "กำลังจะมาถึง",
+    "secDone": "จบแล้ว"
   },
   "inbox": {
     "title": "ข้อความ",
@@ -2244,7 +2247,23 @@
     "strip_owed": "ค้างชำระ",
     "strip_today": "ครบกำหนดวันนี้",
     "strip_later": "งวดถัดไป",
-    "closeLabel": "ปิด"
+    "closeLabel": "ปิด",
+    "rs_title": "เปลี่ยนวันที่",
+    "rs_desc": "การเช่ายังไม่เริ่ม วันที่ใหม่จะแทนวันที่เดิม และคิดค่าเช่าใหม่",
+    "rs_start": "วันเริ่มเช่า",
+    "rs_end": "วันคืนรถ",
+    "rs_daily": "{days} วัน × {rate} = {total}",
+    "rs_other": "ค่าเช่าจะคิดใหม่ตามวันที่ใหม่",
+    "rs_save": "บันทึกวันที่ใหม่",
+    "rs_saved": "เปลี่ยนวันที่แล้ว",
+    "rs_loading": "กำลังโหลด…",
+    "adj_moveTitle": "เปลี่ยนวันคืนรถ",
+    "adj_moveDesc": "การเช่ายังไม่เริ่ม เพิ่มวันแล้วให้ลูกค้าเซ็นยืนยัน",
+    "adj_agreedBooked": "ค่าเช่าเพิ่มสำหรับวันที่เพิ่ม",
+    "adj_dueBooked": "ชำระพร้อมค่าเช่างวดแรก",
+    "unsentEarlier": "ข้อความก่อนหน้า {count} ข้อความ",
+    "unsentEarlierHint": "อาจไม่เป็นปัจจุบันแล้ว ข้อความล่าสุดด้านบนคือข้อมูลปัจจุบัน",
+    "unsentClearEarlier": "ทำเครื่องหมายว่าเสร็จ"
   },
   "newBooking": {
     "pageBack": "กลับไปที่การจอง",
@@ -3924,7 +3943,11 @@
     "atCondition": "รูปสภาพรถ · {vehicle}",
     "receiptNo": "ใบเสร็จ {number}",
     "issuedOn": "ออกเมื่อ {date}",
-    "filter_receipt": "ใบเสร็จ"
+    "filter_receipt": "ใบเสร็จ",
+    "shortBooking": "การจอง",
+    "shortCustomer": "ลูกค้า",
+    "shortVehicle": "รถ",
+    "morePhotos": "+{count}"
   },
   "reportsPage": {
     "title": "รายงาน",

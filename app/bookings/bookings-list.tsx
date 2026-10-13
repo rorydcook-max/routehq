@@ -232,6 +232,26 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
     });
   }, [bookings, filter, search]);
 
+  // "All" reads in three parts: what is out now, what is coming, what is finished. A filter or a search is one list.
+  const sections = useMemo(() => {
+    if (filter !== "all" || search.trim()) return [{ key: "list", title: null as string | null, items: filtered }];
+    const part = (booking: any) => {
+      const status = isCancelledBooking(booking) ? "cancelled" : String(booking.status || "");
+      if (status === "cancelled" || status === "completed") return "done";
+      if (["booked", "draft", "pending", "confirmed"].includes(status)) return "upcoming";
+      return "now";
+    };
+    return (["now", "upcoming", "done"] as const)
+      .map((key) => {
+        const day = (booking: any, field: "start_date" | "end_date") => String(booking[field] || (field === "end_date" ? "9999" : "")).slice(0, 10);
+        const items = filtered.filter((booking) => part(booking) === key);
+        items.sort((a, b) => (key === "upcoming" ? day(a, "start_date").localeCompare(day(b, "start_date")) : key === "now" ? day(a, "end_date").localeCompare(day(b, "end_date")) : day(b, "end_date").localeCompare(day(a, "end_date"))));
+        return { key, title: tx.say(key === "now" ? "secNow" : key === "upcoming" ? "secUpcoming" : "secDone") as string | null, items };
+      })
+      .filter((section) => section.items.length > 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filtered, filter, search, tx.locale]);
+
   // Only the filters that would show something, and none at all while there is nothing to choose between.
   const usefulFilters = filters.filter((entry) => entry === "all" || entry === filter || bookings.some((booking) => matchesFilter(booking, entry)));
   const showFilters = usefulFilters.length > 2 || filter !== "all";
@@ -274,8 +294,17 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
           description={tx.say("emptyBody")}
         />
       ) : (
-        <div className="grid gap-3 xl:grid-cols-2 xl:items-start">
-          {filtered.map((booking) => {
+        <div className="space-y-6">
+          {sections.map((section) => (
+          <section key={section.key}>
+            {section.title ? (
+              <h2 className="mb-2.5 flex items-center gap-2 px-1 text-[19px] text-[var(--foreground)]">
+                {section.title}
+                <span className="num inline-flex min-w-7 items-center justify-center rounded-full bg-white px-2 py-0.5 text-[14px] text-[var(--foreground-secondary)]">{section.items.length}</span>
+              </h2>
+            ) : null}
+            <div className="grid gap-3 xl:grid-cols-2 xl:items-start">
+          {section.items.map((booking) => {
             const timingLabel = rentalTimingLabel(booking, tx);
             const hold = holdState(booking, tx);
             const waitingOn = lateBefore(booking, bookings);
@@ -435,6 +464,9 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
             </article>
             );
           })}
+            </div>
+          </section>
+          ))}
         </div>
       )}
     </div>

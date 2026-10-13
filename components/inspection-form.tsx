@@ -171,7 +171,7 @@ function FuelGauge({
           <p className="text-sm font-semibold text-[var(--foreground)]">{t("fuelPercentage")}</p>
           <p className="mt-1 text-xs font-semibold text-[var(--muted)]">{t("fuelHint")}</p>
         </div>
-        <span className="rounded-full bg-[var(--primary-light)] px-4 py-2 text-lg font-semibold text-[var(--primary)]">
+        <span className="shrink-0 whitespace-nowrap rounded-full bg-[var(--primary-light)] px-4 py-2 text-lg font-semibold text-[var(--primary)]">
           {value === null ? t("notSet") : `${value}%`}
         </span>
       </div>
@@ -550,7 +550,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, canW
       const result = await response.json();
       clearTimeout(timer);
       if (!response.ok) {
-        setOcrMessage(result.error || t("ocrUnavailable"));
+        setOcrMessage(t("ocrUnavailable"));
         return;
       }
       // Fill the reading only when staff haven't typed one: never silently replace a number someone entered.
@@ -1196,7 +1196,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, canW
                     <Row label={t("depositKeptForNow")} value={money(availableToReconcile)} />
                   ) : availableToReconcile > 0 ? (
                     <>
-                      <Row label={t("depositDeductions")} value={`-${money(appliedDeductions)}`} danger={appliedDeductions > 0} />
+                      <Row label={t("depositDeductions")} value={appliedDeductions > 0 ? `-${money(appliedDeductions)}` : money(0)} danger={appliedDeductions > 0} />
                       <Row label={t("depositRefundConfirmed")} value={money(depositRefundAmount)} />
                     </>
                   ) : null}

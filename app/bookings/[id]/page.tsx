@@ -363,6 +363,10 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   const vehicleEvents = detail.vehicle_events || rental.vehicle_events || [];
   const activePayments = payments.filter((payment: any) => !isVoidedPayment(payment));
   const activeTransactions = transactions.filter((transaction: any) => !isVoidedTransaction(transaction));
+  // Rent given back (an early return, a goodwill refund): the booking shows it beside what was paid.
+  const rentGivenBack = activeTransactions
+    .filter((transaction: any) => transaction.type === "refund" && !transaction.is_deposit)
+    .reduce((sum: number, transaction: any) => sum + Math.abs(Number(transaction.amount || 0)), 0);
   const fallbackTotalRentalValue = activePayments.reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
   const fallbackTotalPaid = activeTransactions.filter((transaction: any) => transaction.type === "rental_income").reduce((sum: number, transaction: any) => sum + Math.abs(Number(transaction.amount || 0)), 0);
   const totalRentalValue = Number(rental.total_scheduled ?? fallbackTotalRentalValue);
@@ -654,6 +658,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   <>
                     <PartBar part={rentPaid} whole={rentAgreed} />
                     <p className="mt-1 font-semibold text-[var(--foreground-secondary)]">{tx.say("paidOfTotal", { paid: money(rentPaid, rental.currency), total: money(rentAgreed, rental.currency) })}</p>
+                    {rentGivenBack > 0 ? <p className="font-semibold text-[var(--foreground-secondary)]">{tx.say("givenBackLine", { amount: money(rentGivenBack, rental.currency) })}</p> : null}
                   </>
                 ) : null}
                 {Number(rental.extras_total || 0) > 0 ? (
@@ -1024,6 +1029,10 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     </Link>
                     <SkipInspectionButton canWaive={isOwner} early={earlyStartFor(rental, vehicle, businessToday())} rentalId={rental.id} />
                   </div>
+                ) : rental.status === "completed" ? (
+                  <div className="sub-surface p-3">
+                    <p className="font-semibold text-[var(--foreground)]">{tx.say("noHandoverDone")}</p>
+                  </div>
                 ) : isCancelled ? (
                   <div className="sub-surface p-3">
                     <p className="font-semibold text-[var(--foreground)]">{tx.say("neverHandedOver")}</p>
@@ -1184,7 +1193,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     </div>
                   </div>
                 ) : null}
-                <Info icon={CreditCard} label={tx.say("rentPaid")} value={money(totalPaid, rental.currency)} />
+                <Info icon={CreditCard} label={tx.say("rentPaid")} value={rentGivenBack > 0 ? tx.say("paidLessBack", { paid: money(totalPaid, rental.currency), back: money(rentGivenBack, rental.currency) }) : money(totalPaid, rental.currency)} />
               </div>
             </Fold>
 

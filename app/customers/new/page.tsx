@@ -7,6 +7,7 @@ import { PendingButton } from "@/components/pending-button";
 import { Fold } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { commonCountries, countryLabel, customerLanguages, phoneCodeOptions } from "@/lib/customer-options";
+import { DuplicatePhoneHint } from "@/components/duplicate-phone-hint";
 import { getDefaultOrganization } from "@/lib/organization";
 
 // The wording for this page is in locales/<language>/common.json under "customerPage".
@@ -75,9 +76,10 @@ export default async function NewCustomerPage() {
                 <span className={labelClass}>{say("f_phone")}</span>
                 <PhoneFields codeLabel={say("new_countryCode")} codeName="phoneCountryCode" inputName="phone" required />
               </label>
+              <DuplicatePhoneHint organizationId={organization.id} />
               <label className="block">
                 <span className={labelClass}>{say("f_nationality")}</span>
-                <input className={inputClass} list="nationality-options" name="nationality" placeholder="Thai" required />
+                <input className={inputClass} list="nationality-options" name="nationality" />
               </label>
               <label className="block sm:col-span-2">
                 <span className={labelClass}>{say("f_language")}</span>

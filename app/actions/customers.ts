@@ -12,7 +12,7 @@ function optionalString(formData: FormData, key: string) {
 }
 
 function fullPhone(formData: FormData, codeKey: string, localKey: string) {
-  const raw = String(formData.get(localKey) || "").replace(/\s+/g, "").trim();
+  const raw = String(formData.get(localKey) || "").replace(/[\s\-().]+/g, "").trim();
   if (!raw) {
     return null;
   }
@@ -177,8 +177,8 @@ export async function createCustomer(formData: FormData) {
   const email = optionalString(formData, "email");
   const nationality = optionalString(formData, "nationality");
 
-  if (!organizationId || !fullName || !phone || !nationality) {
-    throw new Error("Full name, phone number, and nationality are required.");
+  if (!organizationId || !fullName || !phone) {
+    throw new Error("Full name and phone number are required.");
   }
 
   const { data, error } = await supabase
@@ -228,6 +228,23 @@ export async function createCustomer(formData: FormData) {
   redirect(`/customers/${data.id}`);
 }
 
+/** Someone already saved with this phone number, so the owner can open them instead of adding them twice. */
+export async function customerWithPhone(organizationId: string, code: string, local: string) {
+  const digits = String(local || "").replace(/[\s\-().]+/g, "");
+  if (!organizationId || digits.replace(/\D/g, "").length < 6) return null;
+  const phone = digits.startsWith("+") ? digits : `${String(code || "+66").trim()}${digits.startsWith("0") ? digits.slice(1) : digits}`;
+  const supabase = (await createSupabaseServerClient()) as any;
+  const { data } = await supabase
+    .from("customers")
+    .select("id, full_name")
+    .eq("organization_id", organizationId)
+    .is("deleted_at", null)
+    .or(`phone.eq.${phone},whatsapp.eq.${phone}`)
+    .limit(1)
+    .maybeSingle();
+  return data ? { id: String(data.id), name: String(data.full_name || "") } : null;
+}
+
 export async function createInlineCustomer(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
@@ -244,8 +261,8 @@ export async function createInlineCustomer(formData: FormData) {
   const nationality = optionalString(formData, "nationality");
   const email = optionalString(formData, "email");
 
-  if (!organizationId || !fullName || !phone || !nationality) {
-    throw new Error("Name, phone, and nationality are required.");
+  if (!organizationId || !fullName || !phone) {
+    throw new Error("Name and phone are required.");
   }
 
   const { data, error } = await supabase

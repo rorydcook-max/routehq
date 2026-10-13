@@ -92,7 +92,8 @@ export async function POST(request: Request) {
       });
       return NextResponse.json({ extracted });
     } catch (error) {
-      return NextResponse.json({ error: error instanceof Error ? error.message : "The document could not be read." }, { status: 502 });
+      console.error("[ocr/vehicle-logbook]", error instanceof Error ? error.message : error);
+    return NextResponse.json({ error: await said("The document could not be read.") }, { status: 502 });
     }
   }
   const base64 = bytes.toString("base64");

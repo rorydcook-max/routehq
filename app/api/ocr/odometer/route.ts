@@ -35,9 +35,7 @@ export async function POST(request: Request) {
       note: typeof parsed.note === "string" ? parsed.note : ""
     });
   } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Odometer OCR failed." },
-      { status: 500 }
-    );
+    console.error("[ocr/odometer]", error instanceof Error ? error.message : error);
+    return NextResponse.json({ error: await said("The photo could not be read. Type the reading in.") }, { status: 502 });
   }
 }

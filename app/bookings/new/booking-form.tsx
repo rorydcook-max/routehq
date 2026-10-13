@@ -312,8 +312,9 @@ export function BookingForm({
   const [shareResult, setShareResult] = useState<BookingShareResult | null>(null);
   const [walkInNow, setWalkInNow] = useState(false);
   const [walkInFastTrack, setWalkInFastTrack] = useState(false);
-  const [walkInPaymentAmount, setWalkInPaymentAmount] = useState(0);
-  const [walkInDepositAmount, setWalkInDepositAmount] = useState(0);
+  // null until typed: until then the amounts follow the booking (2 days at ฿1,080 is ฿2,160, not one day's rate).
+  const [walkInPaymentAmount, setWalkInPaymentAmount] = useState<number | null>(null);
+  const [walkInDepositAmount, setWalkInDepositAmount] = useState<number | null>(null);
   const [walkInPaymentMethod, setWalkInPaymentMethod] = useState("cash");
   const [walkInPaymentNote, setWalkInPaymentNote] = useState("");
   const [upfrontEnabled, setUpfrontEnabled] = useState(false);
@@ -397,6 +398,10 @@ export function BookingForm({
   // Paid extras picked for this booking, priced for its days (or a month when it has no end).
   const stayDays = !openEnded && startDate && endDate ? Math.max(1, Math.round((new Date(`${endDate}T00:00:00`).getTime() - new Date(`${startDate}T00:00:00`).getTime()) / 86400000)) : null;
   const pricedExtras = priceExtras(extras.filter((extra) => chosenExtras.includes(extra.id)), stayDays);
+  // What is due at the start: the whole stay when priced by the day, the periods paid ahead, or the first period; plus extras paid once.
+  const firstRentDue = pricingModel === "daily" ? rentalRate * (stayDays || 1) : upfrontEnabled && upfrontPeriods > 0 ? upfrontPeriods * upfrontRate : rentalRate;
+  const walkInPay = walkInPaymentAmount ?? firstRentDue + pricedExtras.upfront;
+  const walkInDeposit = walkInDepositAmount ?? depositAmount;
 
   function canContinue() {
     if (step === 0) return Boolean(selectedVehicle && selectable(selectedVehicle));
@@ -493,8 +498,8 @@ export function BookingForm({
     setDeliveryMethod("delivery");
     setDeliveryDateTime(now);
     setWalkInFastTrack(true);
-    setWalkInPaymentAmount(rentalRate);
-    setWalkInDepositAmount(depositAmount);
+    setWalkInPaymentAmount(null);
+    setWalkInDepositAmount(null);
   }
 
   function submitBookingLink() {
@@ -526,8 +531,8 @@ export function BookingForm({
         formData.set("baseUrl", baseUrl || defaultAppUrl || window.location.origin);
         formData.set("bookingMode", requestedBookingMode);
         formData.set("walkInFastTrack", String(fastTrack));
-        formData.set("walkInPaymentAmount", String(walkInPaymentAmount || rentalRate || 0));
-        formData.set("walkInDepositAmount", String(walkInDepositAmount || depositAmount || 0));
+        formData.set("walkInPaymentAmount", String(walkInPay || 0));
+        formData.set("walkInDepositAmount", String(walkInDeposit || 0));
         formData.set("walkInPaymentMethod", walkInPaymentMethod);
         formData.set("walkInPaymentNote", walkInPaymentNote);
         formData.set("existingPaid", existingPaid);
@@ -575,8 +580,8 @@ export function BookingForm({
       <input name="specialConditions" type="hidden" value={specialConditions} />
       <input name="baseUrl" type="hidden" value={baseUrl} />
       <input name="walkInFastTrack" type="hidden" value={String(walkInFastTrack)} />
-      <input name="walkInPaymentAmount" type="hidden" value={walkInPaymentAmount} />
-      <input name="walkInDepositAmount" type="hidden" value={walkInDepositAmount} />
+      <input name="walkInPaymentAmount" type="hidden" value={walkInPay} />
+      <input name="walkInDepositAmount" type="hidden" value={walkInDeposit} />
       <input name="walkInPaymentMethod" type="hidden" value={walkInPaymentMethod} />
       <input name="walkInPaymentNote" type="hidden" value={walkInPaymentNote} />
       <input name="upfrontPeriods" type="hidden" value={upfrontEnabled ? upfrontPeriods : 0} />
@@ -848,7 +853,7 @@ export function BookingForm({
               <span>{say("walkInNow")}</span>
             </label>
           ) : null}
-          <div className="mt-3 grid gap-3 sm:grid-cols-2 sm:items-end">
+          <div className="mt-3 grid gap-3 sm:grid-cols-2 sm:items-start">
             <label className="block">
               <span className="flex items-center justify-between gap-2 text-[11px] font-medium text-[var(--foreground-secondary)]">
                 <span>{say("startDate")}</span>
@@ -861,17 +866,13 @@ export function BookingForm({
                 </button>
               </span>
               <input className={inputClass} onChange={(event) => setStartDate(event.target.value)} required type="date" value={startDate} />
+              {bookingMode === "existing_rental" ? <span className="mt-1 block text-[14px] font-medium text-[var(--muted)]">{say("useActualStart")}</span> : null}
             </label>
             <label className="block">
               <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("endDate")}</span>
               <input className={inputClass} disabled={openEnded} onChange={(event) => setEndDate(event.target.value)} type="date" value={endDate} />
             </label>
           </div>
-          {bookingMode === "existing_rental" ? (
-            <p style={{ fontSize: 14, color: "var(--muted)", marginTop: 3 }}>
-              {say("useActualStart")}
-            </p>
-          ) : null}
           <label className="checkbox-label sub-surface mt-3 min-h-12 font-bold text-[var(--foreground)]" style={{ display: "flex", alignItems: "center", padding: "10px 12px" }}>
             <input
               checked={openEnded}
@@ -1238,10 +1239,8 @@ export function BookingForm({
                 <button
                   className="pressable min-h-11 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white"
                   onClick={() => {
+                    // The amounts follow the booking (a daily price is paid for the whole stay) until typed over.
                     setWalkInFastTrack(true);
-                    // A daily price is paid for the whole stay, not one day.
-                    setWalkInPaymentAmount((current) => current || (pricingModel === "daily" && !openEnded && startDate && endDate ? rentalRate * Math.max(1, Math.round((new Date(`${endDate}T00:00:00`).getTime() - new Date(`${startDate}T00:00:00`).getTime()) / 86400000)) : rentalRate));
-                    setWalkInDepositAmount((current) => current || depositAmount);
                   }}
                   type="button"
                 >
@@ -1258,7 +1257,7 @@ export function BookingForm({
                       onChange={(event) => setWalkInPaymentAmount(parseMoneyInput(event.target.value))}
                       placeholder={`${currencyInfo.symbol} 0`}
                       type="text"
-                      value={moneyInput(walkInPaymentAmount || rentalRate, currencyInfo, true)}
+                      value={moneyInput(walkInPay, currencyInfo, true)}
                     />
                   </label>
                   <label className="block">
@@ -1269,7 +1268,7 @@ export function BookingForm({
                       onChange={(event) => setWalkInDepositAmount(parseMoneyInput(event.target.value))}
                       placeholder={`${currencyInfo.symbol} 0`}
                       type="text"
-                      value={moneyInput(walkInDepositAmount || depositAmount, currencyInfo, true)}
+                      value={moneyInput(walkInDeposit, currencyInfo, true)}
                     />
                   </label>
                   <label className="block">

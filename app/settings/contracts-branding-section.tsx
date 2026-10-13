@@ -11,7 +11,7 @@ import { customerLocaleOptions } from "@/lib/i18n/locales";
 import { brandPalette } from "@/lib/brand";
 
 const inputClass =
-  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]";
+  "mt-1 min-h-11 w-full rounded-xl border border-[var(--border-strong)] bg-white px-3 text-[15px] font-semibold text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]";
 
 export type ContractsBrandingOrganization = {
   id: string;

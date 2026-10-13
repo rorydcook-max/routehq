@@ -602,6 +602,29 @@ export async function completePublicBooking(formData: FormData) {
   const emergencyPhone = fullPhone(formData, "emergencyPhoneCountryCode", "emergencyContactPhone");
   const contactFields = formData.has("contactChannelsSubmitted") ? contactChannelFields(formData, phone, email) : {};
 
+  if (!customerId && phone) {
+    // A returning customer: the same phone number in this business is the same person. Their record is
+    // updated with what they typed, instead of a second "Mia" appearing in the customer list.
+    const { data: sameNumber } = await supabase
+      .from("customers")
+      .select("id")
+      .eq("organization_id", organizationId)
+      .or(`phone.eq.${phone},whatsapp.eq.${phone}`)
+      .is("deleted_at", null)
+      .order("created_at", { ascending: true })
+      .limit(1);
+    const returning = (sameNumber || [])[0];
+    if (returning?.id) {
+      customerId = returning.id as string;
+      await Promise.all([
+        supabase.from("booking_links").update({ customer_id: customerId }).eq("id", bookingLink.id),
+        supabase.from("rentals").update({ customer_id: customerId }).eq("id", bookingLink.rental_id),
+        supabase.from("contracts").update({ customer_id: customerId }).eq("id", contractId),
+        supabase.from("vehicles").update({ current_customer_id: customerId }).eq("id", bookingLink.vehicle_id)
+      ]);
+    }
+  }
+
   if (!customerId) {
     // No customer linked yet — create a new record from form data, then link it everywhere
     const { data: newCustomer, error: createError } = await supabase

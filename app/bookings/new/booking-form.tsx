@@ -11,7 +11,8 @@ import type { LucideIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { longDate, shortDate } from "@/lib/i18n/dates";
 import { extrasFor, priceExtras, seasonalRate, type Extra, type Season } from "@/lib/price-rules";
-import { CalendarDays, Car, CheckCircle2, Copy, MapPin, Send, UserPlus, UserRound, X } from "lucide-react";
+import { ArrowRight, CalendarDays, Car, CheckCircle2, Copy, MapPin, Send, UserPlus, UserRound, X } from "lucide-react";
+import { DateLeaf } from "@/components/glance";
 import { createBooking } from "@/app/actions/bookings";
 import { CustomerSelector } from "@/components/customer-selector";
 import { Badge, ProgressBar } from "@/components/ui";
@@ -329,7 +330,9 @@ export function BookingForm({
     if (saved) setIncludedItems(saved);
     setIncludedOpen(false);
   }, [vehicleId, vehicles]);
-  const dateConflict = vehicleId ? findConflict(busyPeriods[vehicleId] || [], startDate, openEnded ? null : endDate || null) : null;
+  const anyClash = vehicleId ? findConflict(busyPeriods[vehicleId] || [], startDate, openEnded ? null : endDate || null) : null;
+  const dateConflict = anyClash && (openEnded || endDate || String(anyClash.startDate).slice(0, 10) <= startDate) ? anyClash : null;
+  const nextBooking = !dateConflict && anyClash ? anyClash : null;
   const currencyInfo = CURRENCY_INFO[currency] ?? CURRENCY_INFO["THB"];
   // Which set of words to use for the period the price is per.
   const periodKey = pricingModel === "monthly" || pricingModel === "weekly" || pricingModel === "daily" ? pricingModel : "custom";
@@ -889,11 +892,15 @@ export function BookingForm({
                 {say("clashPartners")}
               </a>
             </p>
+          ) : nextBooking ? (
+            <p className="mt-3 rounded-lg bg-[var(--panel-secondary)] p-3 font-semibold text-[var(--foreground-secondary)]">
+              {say("nextBookingFrom", { date: shortDate(nextBooking.startDate, locale) })}
+            </p>
           ) : null}
           <div className="mt-3 grid grid-cols-4 gap-2 sm:gap-3">
             {["daily", "weekly", "monthly", "custom"].map((period) => (
               <button
-                className={`pressable min-h-11 rounded-lg border px-1 py-2 text-sm font-semibold capitalize ${pricingModel === period ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
+                className={`pressable min-h-11 rounded-full border px-1 py-2 text-sm font-semibold capitalize ${pricingModel === period ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
                 key={period}
                 onClick={() => {
                   pricingChosenByHand.current = true;
@@ -1135,7 +1142,7 @@ export function BookingForm({
               ["tbd", say("del_tbd")]
             ].map(([value, label]) => (
               <button
-                className={`pressable min-h-12 rounded-lg border px-1 py-2 text-sm font-semibold ${deliveryMethod === value ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
+                className={`pressable min-h-12 rounded-full border px-1 py-2 text-sm font-semibold ${deliveryMethod === value ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
                 key={value}
                 onClick={() => setDeliveryMethod(value as "delivery" | "collection" | "tbd")}
                 type="button"
@@ -1279,6 +1286,20 @@ export function BookingForm({
                   </label>
                 </div>
               ) : null}
+            </div>
+          ) : null}
+          {selectedVehicle && startDate ? (
+            <div aria-hidden="true" className="mt-3 flex flex-wrap items-center gap-4 rounded-2xl bg-[var(--panel-secondary)] p-4">
+              <VehicleArt colour={(selectedVehicle as any).color} kind={kindFromCategory({ code: String(selectedVehicle.category_code || ""), name: "" })} model={selectedVehicle.model} size="md" />
+              <span className="flex items-center gap-2">
+                <DateLeaf date={startDate} locale={locale} />
+                {!openEnded && endDate ? (
+                  <>
+                    <ArrowRight className="text-[var(--muted)]" size={18} />
+                    <DateLeaf date={endDate} locale={locale} tone="var(--coming-back)" />
+                  </>
+                ) : null}
+              </span>
             </div>
           ) : null}
           <div className="mt-3 grid gap-3">
@@ -1543,7 +1564,7 @@ function BookingLinkSharePanel({ result }: { result: BookingShareResult | null }
             type="button"
           >
             {icon}
-            <span className="max-w-full truncate tracking-tight" style={{ fontSize: "10px", color: "var(--muted)", fontWeight: 500 }}>{label}</span>
+            <span className="max-w-full truncate tracking-tight" style={{ fontSize: "14px", color: "var(--muted)", fontWeight: 500 }}>{label}</span>
           </button>
         ))}
       </div>

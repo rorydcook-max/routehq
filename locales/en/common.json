@@ -2454,7 +2454,8 @@
     "onStartDay": "Start day, 9:00",
     "collectionPlaceholder": "Your shop",
     "collectionHelper": "Where the customer picks it up. Leave blank to use your shop's address.",
-    "clashPartners": "Nothing else free? See partners' vehicles for these dates →"
+    "clashPartners": "Nothing else free? See partners' vehicles for these dates →",
+    "nextBookingFrom": "Free until the next booking on {date}. Choose a return date before then."
   },
   "fleet": {
     "title": "Fleet",

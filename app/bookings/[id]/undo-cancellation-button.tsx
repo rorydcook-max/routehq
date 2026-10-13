@@ -53,7 +53,7 @@ export function UndoCancellationButton({
         className={
           compact
             ? "pressable inline-flex min-h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border)] bg-white px-3 py-1.5 text-[12px] font-semibold text-[var(--primary)]"
-            : "pressable inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--primary)]"
+            : "pressable inline-flex min-h-11 items-center justify-center gap-2 rounded-full border-2 border-[var(--border-strong)] bg-white px-4 py-2 font-bold text-[var(--primary)]"
         }
         onClick={() => setOpen(true)}
         type="button"

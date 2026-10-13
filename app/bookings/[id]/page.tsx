@@ -630,11 +630,11 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 {/* Out and back as two calendar leaves; the full dates show on hover. */}
                 {rental.end_date && rental.start_date ? (
                   <div className="mt-2.5 flex items-center gap-1.5 sm:gap-2">
-                    <DateLeaf date={rental.start_date} locale={tx.locale} />
+                    <DateLeaf date={rental.start_date} locale={tx.locale} tone={isCancelled ? "var(--muted)" : undefined} />
                     <ArrowRight aria-hidden="true" className="hidden text-[var(--muted)] sm:block" size={18} />
-                    <DateLeaf date={rental.end_date} locale={tx.locale} tone="var(--coming-back)" />
+                    <DateLeaf date={rental.end_date} locale={tx.locale} tone={isCancelled ? "var(--muted)" : "var(--coming-back)"} />
                     <span className="sr-only">{tx.say("dateTo", { date: formatDate(rental.start_date, tx) })}</span>
-                    <EditableEndDate currentEndDate={rental.end_date} iconOnly rentalId={rental.id} />
+                    {isCancelled || rental.status === "completed" ? null : <EditableEndDate currentEndDate={rental.end_date} iconOnly rentalId={rental.id} />}
                   </div>
                 ) : (
                   <p className="flex flex-wrap items-center gap-1 font-medium text-[var(--foreground-secondary)]">
@@ -729,13 +729,13 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 />
               ) : null}
               {/* More sits beside the other actions; opened, it takes a row of its own for the extra buttons. */}
-              <details className="basis-full lg:basis-auto lg:open:basis-full">
+              <details className="basis-full lg:basis-auto lg:open:flex lg:open:basis-full lg:open:flex-wrap lg:open:items-center lg:open:gap-2">
                 <summary className="pressable inline-flex min-h-11 w-full cursor-pointer list-none items-center justify-center gap-1 rounded-full border-2 border-[var(--border-strong)] bg-[var(--panel)] px-4 py-2 font-bold text-[var(--foreground)] hover:bg-[var(--panel-secondary)] [&::-webkit-details-marker]:hidden">
                   {tx.say("more")}
                 </summary>
                 {/* Only the buttons in this row are stretched: the cancel and change-vehicle dialogs open from inside it,
                     and stretching every button in them squeezed the dialog's heading into a sliver beside its close button. */}
-                <div className="mt-2 flex flex-wrap gap-2 [&>*]:flex-1 [&>a]:w-full [&>button]:w-full [&>*>button]:w-full lg:[&>*]:flex-none lg:[&>a]:w-auto">
+                <div className="mt-2 flex flex-wrap gap-2 [&>*]:flex-1 [&>a]:w-full [&>button]:w-full [&>*>button]:w-full [&>button]:!min-h-11 [&>button]:!rounded-full [&>button]:!border-2 [&>button]:!px-4 [&>button]:!text-[15px] [&>button]:!font-bold lg:mt-0 lg:[&>*]:flex-none lg:[&>a]:w-auto lg:[&>button]:w-auto">
               <ActionButton href={`/bookings/${rental.id}/edit` as Route} tone="light">
                 {tx.say("editBooking")}
               </ActionButton>

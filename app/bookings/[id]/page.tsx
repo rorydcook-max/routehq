@@ -1710,7 +1710,7 @@ function CommunicationTimeline({
             </div>
             <span className="text-xs font-bold uppercase text-[var(--muted)]">{relativeTime(entry.created_at, tx)}</span>
           </div>
-          <p className="mt-2 whitespace-pre-line text-sm font-semibold leading-6 text-[var(--foreground-secondary)]">{timelineText(entry, tx) || tx.say("noContent")}</p>
+          <p className="mt-2 whitespace-pre-line [overflow-wrap:anywhere] text-sm font-semibold leading-6 text-[var(--foreground-secondary)]">{timelineText(entry, tx) || tx.say("noContent")}</p>
         </div>
       ))}
     </div>

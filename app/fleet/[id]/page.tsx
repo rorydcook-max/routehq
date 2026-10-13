@@ -11,7 +11,7 @@ import { VehiclePhotoManager } from "@/app/fleet/[id]/vehicle-photo-manager";
 import { VehicleTimeline, type VehicleTimelineEvent } from "@/app/fleet/[id]/vehicle-timeline";
 import { AppShell } from "@/components/app-shell";
 import { VehicleArt } from "@/components/vehicle-art";
-import { DateLeaf } from "@/components/glance";
+import { DateLeaf, ElapsedBar } from "@/components/glance";
 import { kindFromCategory } from "@/lib/vehicle-groups";
 import { RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
 import { InspectionViewer } from "@/components/inspection-viewer";
@@ -329,6 +329,7 @@ function ActiveRentalCard({ detail, dueNow }: { detail: VehicleDetail; dueNow: n
           {days === null ? tx.say("ar_openEnded") : days < 0 ? tx.say("daysOverdue", { count: Math.abs(days) }) : tx.say("daysLeft", { count: days })}
         </p>
       </div>
+      {rental.status !== "booked" && rental.start_date && rental.end_date ? <ElapsedBar end={toWallTime(rental.end_date)} late={late} start={toWallTime(rental.start_date)} /> : null}
       <div className="mt-3 grid grid-cols-2 gap-2.5">
         <InfoRow
           label={tx.say("ar_period")}

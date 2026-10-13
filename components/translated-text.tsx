@@ -23,7 +23,7 @@ export async function TranslatedText({ value, className }: { value: ReadableText
         <summary className="cursor-pointer select-none font-semibold">
           {t("translatedFrom", { language })} · {t("showOriginal")}
         </summary>
-        <p className="mt-1 whitespace-pre-wrap text-[var(--foreground-secondary)]" lang={value.sourceLanguage || undefined}>
+        <p className="mt-1 whitespace-pre-wrap [overflow-wrap:anywhere] text-[var(--foreground-secondary)]" lang={value.sourceLanguage || undefined}>
           {value.original}
         </p>
       </details>

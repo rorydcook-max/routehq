@@ -180,7 +180,7 @@ export function AskBox({ variant }: { variant: "sidebar" | "icon" }) {
                         <p className="mt-2 rounded-lg bg-[var(--danger-light)] px-3 py-2 text-[13px] text-[var(--danger)]">{turn.error}</p>
                       ) : turn.answer ? (
                         <>
-                          <p className="mt-2 whitespace-pre-line text-[14px] leading-relaxed text-[var(--foreground-secondary)]">{turn.answer}</p>
+                          <p className="mt-2 whitespace-pre-line [overflow-wrap:anywhere] text-[14px] leading-relaxed text-[var(--foreground-secondary)]">{turn.answer}</p>
                           {turn.proposal ? (
                             <div className="mt-3 overflow-hidden rounded-xl border border-[var(--border)]">
                               <p className="border-b border-[var(--border)] bg-[var(--panel-secondary)] px-3 py-2 text-[13px] font-semibold text-[var(--foreground)]">{turn.proposal.title}</p>

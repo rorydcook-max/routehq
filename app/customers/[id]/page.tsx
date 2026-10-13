@@ -12,7 +12,7 @@ import { AppShell } from "@/components/app-shell";
 import { CommunicationPanel } from "@/components/communication-panel";
 import { PendingButton } from "@/components/pending-button";
 import { Badge, Card, Fold } from "@/components/ui";
-import { DateLeaf, Ring, TileHead, initialsOf } from "@/components/glance";
+import { DateLeaf, ElapsedBar, Ring, TileHead, initialsOf } from "@/components/glance";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { businessToday } from "@/lib/business-time";
 import { commonCountries, customerLanguages, flagForNationality, countryLabel } from "@/lib/customer-options";
@@ -119,6 +119,7 @@ function ActiveRentalCard({ rental, customerId, dueNow }: { rental: any; custome
           {days === null ? cx.say("r_openEnded") : late ? cx.say("r_daysLate", { count: Math.abs(days) }) : cx.say("r_daysLeft", { count: days })}
         </p>
       </div>
+      {rental.status !== "booked" && rental.start_date && rental.end_date ? <ElapsedBar end={String(rental.end_date)} late={late} start={String(rental.start_date)} /> : null}
       <div className="mt-3 grid grid-cols-2 gap-2.5">
         <InfoTile
           label={cx.say("r_period")}
@@ -517,9 +518,9 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           )}
           <a className="card pressable tile p-4 text-[var(--foreground)]" href="#documents">
             <TileHead title={cx.say("g_docs")} />
-            <span className="flex items-center gap-3">
+            <span className="flex flex-col items-start gap-2 min-[420px]:flex-row min-[420px]:items-center min-[420px]:gap-3">
               <Ring color={docsIn === 3 ? "var(--success)" : "var(--going-out)"} label={`${docsIn}/3`} pct={(docsIn / 3) * 100} size={68} stroke={9} track="var(--panel-tertiary)" />
-              <span className="font-semibold text-[var(--foreground-secondary)]">{docsIn === 3 ? cx.say("docsOk") : cx.say("g_docsMissing", { count: 3 - docsIn })}</span>
+              <span className="min-w-0 font-semibold text-[var(--foreground-secondary)]">{docsIn === 3 ? cx.say("docsOk") : cx.say("g_docsMissing", { count: 3 - docsIn })}</span>
             </span>
           </a>
         </div>

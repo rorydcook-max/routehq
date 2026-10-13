@@ -584,7 +584,7 @@ async function Info({ className = "", icon: Icon, label, value }: { className?: 
         <Icon className="text-[var(--primary)]" size={16} />
         {label}
       </div>
-      <p className="mt-1 whitespace-pre-line text-[16px] font-bold leading-snug text-[var(--foreground)]">
+      <p className="mt-1 whitespace-pre-line [overflow-wrap:anywhere] text-[16px] font-bold leading-snug text-[var(--foreground)]">
         {lines.map((line, index) => (
           line.startsWith("https://www.google.com/maps") ? (
             <a className="text-[var(--primary)] underline underline-offset-2" href={line} key={`${line}-${index}`} rel="noreferrer" target="_blank">

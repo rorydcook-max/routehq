@@ -166,6 +166,19 @@ export function RentalTrack({
   );
 }
 
+/** How far through a rental we are, as one thin bar under "N days left". Red once it runs late. */
+export function ElapsedBar({ start, end, late = false }: { start: string; end: string; late?: boolean }) {
+  const day = (iso: string) => new Date(`${iso.slice(0, 10)}T00:00:00Z`).getTime();
+  const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date());
+  const span = Math.max(1, day(end) - day(start));
+  const pct = late ? 100 : Math.max(0, Math.min(100, ((day(today) - day(start)) / span) * 100));
+  return (
+    <div aria-hidden="true" className="mt-3 h-2 overflow-hidden rounded-full bg-[var(--panel-tertiary)]">
+      <span className="grow-x block h-full rounded-full" style={{ width: `${Math.max(pct, 3)}%`, background: late ? "var(--danger)" : "var(--on-rent)" }} />
+    </div>
+  );
+}
+
 /** Part of a whole, as one bar: rent paid out of rent agreed. */
 export function PartBar({ part, whole, color = "var(--success)" }: { part: number; whole: number; color?: string }) {
   const pct = whole > 0 ? Math.max(0, Math.min(100, (part / whole) * 100)) : 0;

@@ -9,6 +9,7 @@ import { KindChip, jobKind } from "@/components/kind-chip";
 import { confirmReceiptPayment, declinePaymentReceipt } from "@/app/actions/bookings";
 import { completeTask } from "@/app/actions/tasks";
 import { decideEarlyWaiver } from "@/app/actions/early-start";
+import { decideEarlyReturnOwed } from "@/app/actions/early-return";
 import { PendingButton } from "@/components/pending-button";
 import { intlLocale, longDate, shortDate } from "@/lib/i18n/dates";
 import { allocatePayment, type OpenPayment } from "@/lib/payment-allocation";
@@ -373,6 +374,18 @@ function TaskRow({ item, organizationId, today, siblings = [], canDecide = true 
     });
   }
 
+  // Back early with rent still owed: the owner takes the unused days off or keeps the booking, right here.
+  const owedAmount = item.action === "owed_early" ? String(item.title || "").match(/returned \d+ days? early \((.+?) of/)?.[1] || "" : "";
+  function decideOwed(decision: "take_off" | "keep") {
+    if (!item.rentalId) return;
+    setWaiverError(null);
+    startDeciding(async () => {
+      const result = await decideEarlyReturnOwed(item.rentalId as string, decision);
+      if (!result.ok) setWaiverError(result.error || tx.say("errConfirm"));
+      else router.refresh();
+    });
+  }
+
   function confirmReceipt() {
     if (!item.rentalPaymentId || !receipt) return;
     setReceiptError(null);
@@ -489,6 +502,16 @@ function TaskRow({ item, organizationId, today, siblings = [], canDecide = true 
             </button>
           </>
         ) : null}
+        {item.kind === "task" && !item.completedAt && item.rentalId && item.action === "owed_early" && canDecide ? (
+          <>
+            <button className="primary-action pressable min-h-9 px-3 text-xs" disabled={deciding} onClick={() => decideOwed("take_off")} type="button">
+              {owedAmount ? tx.say("owedTakeOff", { amount: owedAmount }) : tx.say("owedKeep")}
+            </button>
+            <button className="secondary-action pressable min-h-9 px-3 text-xs" disabled={deciding} onClick={() => decideOwed("keep")} type="button">
+              {tx.say("owedKeep")}
+            </button>
+          </>
+        ) : null}
         {item.kind === "task" && !item.completedAt && item.rentalId && (item.action === "refund" || item.action === "request" || item.action === "settle_deposit") && !waitsForDecider ? (
           <Link className="primary-action pressable min-h-9 px-3 text-xs" href={`/bookings/${item.rentalId}#${item.action === "request" ? "customer-requests" : "refunds"}`}>
             {item.action === "refund" ? tx.say("recordRefund") : item.action === "settle_deposit" ? tx.say("settleDeposit") : tx.say("answer")}
@@ -507,7 +530,7 @@ function TaskRow({ item, organizationId, today, siblings = [], canDecide = true 
             {tx.say("openForm")}
           </Link>
         ) : null}
-        {item.kind === "task" && !item.completedAt && !showNote && !item.id.startsWith("request-") && !waitsForDecider && !(item.action === "waive_early" && canDecide) ? (
+        {item.kind === "task" && !item.completedAt && !showNote && !item.id.startsWith("request-") && !waitsForDecider && !((item.action === "waive_early" || item.action === "owed_early") && canDecide) ? (
           <>
             {/* One main button per row. A job with its own next step keeps "mark done" and notes behind the dots. */}
             {!item.action || item.action === "refund" || showMore ? (

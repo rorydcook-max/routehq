@@ -7,7 +7,7 @@ import { businessToday, daysFromToday } from "@/lib/business-time";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
-import { AlertTriangle, CalendarCheck, CalendarPlus, FileText, ImageIcon, MessageCircle } from "lucide-react";
+import { AlertTriangle, CalendarCheck, CalendarPlus, Camera, FileText, ImageIcon, MessageCircle } from "lucide-react";
 import { submitCustomerPortalAction } from "@/app/actions/public-booking";
 import type { PortalBundle, PortalPayment } from "@/lib/payment-receipts";
 import { planFor, quoteStay, type Rates } from "@/lib/rental-estimate";
@@ -180,29 +180,29 @@ export function ActiveRentalPortal({
       </section>
 
       <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
-        <p className="text-xs font-semibold uppercase text-[var(--primary)]">{t("yourRentalDocuments")}</p>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <p className="text-[17px] font-bold text-[var(--foreground)]">{t("yourRentalDocuments")}</p>
+        <div className="mt-3 grid gap-2 sm:grid-cols-2">
           {signedContractUrl ? (
-            <a className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-4 text-sm font-semibold text-[var(--foreground)]" href={signedContractUrl} rel="noreferrer" target="_blank">
-              <FileText className="mb-2 text-[var(--primary)]" />
+            <a className="pressable flex min-h-14 items-center gap-3 rounded-xl bg-[var(--panel-secondary)] px-3 py-2 font-semibold text-[var(--foreground)]" href={signedContractUrl} rel="noreferrer" target="_blank">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-[var(--primary)]"><FileText size={18} /></span>
               {t("signedAgreement")}
             </a>
           ) : null}
           {certificateUrl ? (
-            <a className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-4 text-sm font-semibold text-[var(--foreground)]" href={certificateUrl} rel="noreferrer" target="_blank">
-              <FileText className="mb-2 text-[var(--primary)]" />
+            <a className="pressable flex min-h-14 items-center gap-3 rounded-xl bg-[var(--panel-secondary)] px-3 py-2 font-semibold text-[var(--foreground)]" href={certificateUrl} rel="noreferrer" target="_blank">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-[var(--primary)]"><FileText size={18} /></span>
               {t("proofOfSigning")}
             </a>
           ) : null}
           {reports.map((report) => (
-            <a className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-4 text-sm font-semibold text-[var(--foreground)]" href={report.url} key={report.id} rel="noreferrer" target="_blank">
-              <FileText className="mb-2 text-[var(--primary)]" />
+            <a className="pressable flex min-h-14 items-center gap-3 rounded-xl bg-[var(--panel-secondary)] px-3 py-2 font-semibold text-[var(--foreground)]" href={report.url} key={report.id} rel="noreferrer" target="_blank">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-[var(--primary)]"><FileText size={18} /></span>
               {t(report.kind === "return" ? (report.swap ? "reportCollection" : "reportReturn") : report.swap ? "reportHandoverSwap" : "reportHandover")}
             </a>
           ))}
           {receipts.map((receipt) => (
-            <a className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-4 text-sm font-semibold text-[var(--foreground)]" href={receipt.url} key={receipt.id} rel="noreferrer" target="_blank">
-              <FileText className="mb-2 text-[var(--primary)]" />
+            <a className="pressable flex min-h-14 items-center gap-3 rounded-xl bg-[var(--panel-secondary)] px-3 py-2 font-semibold text-[var(--foreground)]" href={receipt.url} key={receipt.id} rel="noreferrer" target="_blank">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-[var(--primary)]"><FileText size={18} /></span>
               {t("receiptNumbered", { number: receipt.number })}
             </a>
           ))}
@@ -354,7 +354,7 @@ function ActionForm({
         </label>
         <label className="block text-sm font-bold text-[var(--foreground-secondary)]">
           {t("photoOptional")}
-          <input accept="image/*" className={inputClass} name="photo" type="file" />
+          <PhotoPick addLabel={t("addPhoto")} changeLabel={t("changePhoto")} />
         </label>
         <SubmitButton isPending={isPending} label={t("sendReport")} />
       </form>
@@ -420,4 +420,25 @@ function nextDate(value: string | null | undefined) {
   const date = new Date();
   date.setDate(date.getDate() + 1);
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+/** A photo for the report: a big tappable box instead of the browser's "Choose file", with a preview once chosen. */
+function PhotoPick({ addLabel, changeLabel }: { addLabel: string; changeLabel: string }) {
+  const [preview, setPreview] = useState<string | null>(null);
+  return (
+    <span className="mt-2 flex min-h-[64px] cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed border-[var(--border-strong)] bg-white px-4 py-3 font-semibold text-[var(--primary)]">
+      {preview ? <img alt="" className="h-12 w-12 shrink-0 rounded-lg object-cover" src={preview} /> : <Camera aria-hidden="true" className="shrink-0" size={22} />}
+      <span>{preview ? changeLabel : addLabel}</span>
+      <input
+        accept="image/*"
+        className="sr-only"
+        name="photo"
+        onChange={(event) => {
+          const file = event.target.files?.[0];
+          setPreview(file ? URL.createObjectURL(file) : null);
+        }}
+        type="file"
+      />
+    </span>
+  );
 }

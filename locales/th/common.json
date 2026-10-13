@@ -832,7 +832,9 @@
     "missing_driverLicenseCountry": "ใบขับขี่ออกโดยประเทศไหน",
     "handoverPhotos": "รูปตอนส่งมอบ ({count})",
     "payPlusExtras": "+ บริการเสริม {amount}",
-    "payLessExtras": "หักเงินค่าบริการเสริมแล้ว {amount}"
+    "payLessExtras": "หักเงินค่าบริการเสริมแล้ว {amount}",
+    "addPhoto": "ถ่ายหรือเลือกรูป",
+    "changePhoto": "เปลี่ยนรูป"
   },
   "customerMessages": {
     "hi": "สวัสดีคุณ {name}",
@@ -1125,7 +1127,9 @@
     "job_waive_early_detail": "{days} วัน {amount} ขอตอนส่งมอบรถ",
     "waiveEarly": "ให้ฟรี",
     "keepCharge": "เก็บเงินตามเดิม",
-    "decidedByOwner": "เจ้าของหรือผู้จัดการเป็นผู้ตัดสินใจเรื่องนี้"
+    "decidedByOwner": "เจ้าของหรือผู้จัดการเป็นผู้ตัดสินใจเรื่องนี้",
+    "owedTakeOff": "ลด {amount}",
+    "owedKeep": "คิดตามที่จองไว้"
   },
   "bookings": {
     "eyebrow": "การจอง",

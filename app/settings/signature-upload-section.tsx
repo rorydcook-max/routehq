@@ -81,7 +81,19 @@ export function SignatureUploadSection({
     submit(fd);
   }
 
-  const fileInputClass = "max-w-full";
+  function choose() {
+    if (!acknowledgementRef.current?.checked) {
+      setMessage({ text: say("sg_tick"), type: "error" });
+      return;
+    }
+    fileRef.current?.click();
+  }
+
+  function picked() {
+    if (!fileRef.current?.files?.[0]) return;
+    handleReplace();
+    fileRef.current.value = "";
+  }
 
   const preview = signatureUrl ? (
     <img
@@ -118,13 +130,8 @@ export function SignatureUploadSection({
         <span>{authorisation("signatureAuthorisation")}</span>
       </label>
       <div className="flex flex-wrap items-center gap-2">
-        <input accept="image/png,image/jpeg,image/webp" className={fileInputClass} data-keep-original disabled={!signatoryReady} ref={fileRef} type="file" />
-        <button
-          className="primary-action"
-          disabled={isPending || !signatoryReady}
-          onClick={signatureUrl ? handleReplace : undefined}
-          type={signatureUrl ? "button" : "submit"}
-        >
+        <input accept="image/png,image/jpeg,image/webp" className="sr-only" data-keep-original disabled={!signatoryReady} onChange={picked} ref={fileRef} tabIndex={-1} type="file" />
+        <button className="primary-action whitespace-nowrap" disabled={isPending || !signatoryReady} onClick={choose} type="button">
           {isPending ? say("lg_working") : signatureUrl ? say("sg_replace") : say("sg_upload")}
         </button>
         {signatureUrl ? (

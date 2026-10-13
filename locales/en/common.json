@@ -823,7 +823,9 @@
     "missing_driverLicenseCountry": "Which country issued your driving licence?",
     "handoverPhotos": "Handover photos ({count})",
     "payPlusExtras": "+ extras {amount}",
-    "payLessExtras": "{amount} paid for extras taken off"
+    "payLessExtras": "{amount} paid for extras taken off",
+    "addPhoto": "Take or add a photo",
+    "changePhoto": "Change photo"
   },
   "customerMessages": {
     "hi": "Hi {name},",
@@ -1116,7 +1118,9 @@
     "job_waive_early_detail": "{days} days, {amount}, asked at the handover",
     "waiveEarly": "Give them free",
     "keepCharge": "Keep the charge",
-    "decidedByOwner": "The owner or a manager decides this one."
+    "decidedByOwner": "The owner or a manager decides this one.",
+    "owedTakeOff": "Take {amount} off",
+    "owedKeep": "Keep as booked"
   },
   "bookings": {
     "eyebrow": "Bookings",

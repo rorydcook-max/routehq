@@ -30,7 +30,13 @@ export async function decideEarlyReturnOwed(rentalId: string, decision: "take_of
   const admin = createSupabaseAdminClient() as any;
   const { data: rows } = await admin.from("rental_payments").select("id, amount, status, voided, metadata").eq("rental_id", rentalId).eq("organization_id", rental.organization_id).is("deleted_at", null);
   const marked = (rows || []).filter((row: any) => row.metadata?.early_return_owed && !row.metadata.early_return_owed.decided && OPEN.includes(String(row.status)));
-  if (!marked.length) return { ok: false, error: await said("This has already been decided.") };
+  if (!marked.length) {
+    // Paid or settled some other way first: nothing is left to decide, so the job closes instead of standing forever.
+    await completeRentalJobs(admin, rentalId, "owed_early", "Nothing left to decide");
+    revalidatePath("/tasks");
+    revalidatePath("/");
+    return { ok: true };
+  }
 
   let takenOff = 0;
   for (const row of marked) {

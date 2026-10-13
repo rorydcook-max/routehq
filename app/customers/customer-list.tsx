@@ -143,7 +143,7 @@ export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
                     {item.customer?.do_not_rent ? <Badge tone="red">{say("doNotRent")}</Badge> : null}
                     {item.documentStatus === "complete" ? null : documentBadge(item.documentStatus, say)}
                   </div>
-                  <p className={`mt-0.5 truncate font-medium ${activeRental ? "font-bold text-[var(--foreground)]" : "text-[var(--foreground-secondary)]"}`}>{line}</p>
+                  <p className={`mt-0.5 line-clamp-2 break-words font-medium ${activeRental ? "font-bold text-[var(--foreground)]" : "text-[var(--foreground-secondary)]"}`}>{line}</p>
                 </div>
                 {/* Money only when there is some; "฿0 · 1 rental" said nothing. */}
                 {item.lifetimeRevenue > 0 ? (

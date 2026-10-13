@@ -111,7 +111,9 @@ export async function getTaskList(organizationId: string): Promise<TaskListItem[
   if (tasksResult.error) throw new Error(tasksResult.error.message);
   if (paymentsResult.error) throw new Error(paymentsResult.error.message);
 
-  const tasks = tasksResult.data || [];
+  // "Rent to decide" only stands while that rent is still open and undecided: paid in full first, there is nothing left to decide.
+  const owedOpen = new Set(((paymentsResult.data || []) as any[]).filter((row) => row.metadata?.early_return_owed && !row.metadata.early_return_owed.decided).map((row) => row.rental_id));
+  const tasks = (tasksResult.data || []).filter((row: any) => row.action !== "owed_early" || row.completed_at || owedOpen.has(row.rental_id));
   // A waiting request must always be on the list, even when no job was created for it.
   const withJob = new Set(tasks.filter((row: any) => !row.completed_at).map((row: any) => row.portal_action_id).filter(Boolean));
   const requests = ((requestsResult.data || []) as any[]).filter((row) => row.rental_id && !withJob.has(row.id));

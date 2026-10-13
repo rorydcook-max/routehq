@@ -23,7 +23,7 @@ export function Ring({ pct, label, size = 80, stroke = 10, color = "var(--on-ren
 }
 
 export function Dot({ color, size = 10 }: { color: string; size?: number }) {
-  return <span aria-hidden="true" className="inline-block flex-shrink-0 rounded-full" style={{ background: color, height: size, width: size }} />;
+  return <span aria-hidden="true" className="inline-block flex-shrink-0 rounded-full" style={{ background: color, height: size, width: size, boxShadow: "inset 0 0 0 1px rgba(15, 30, 40, 0.22)" }} />;
 }
 
 export type PlannerBar = { start: number; length: number; label: string; kind: "rent" | "next" | "late"; back?: boolean; href: string; title: string };

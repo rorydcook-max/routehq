@@ -1,7 +1,7 @@
 import { businessNow } from "@/lib/business-time";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { loadFleetFigures } from "@/lib/fleet-metrics";
-import type { TaskListItem } from "@/lib/tasks";
+import { getTaskList, type TaskListItem } from "@/lib/tasks";
 import { isRawDepositTransaction, isRevenueTransaction } from "@/lib/transaction-options";
 
 const expenseTypes = new Set(["repair", "servicing", "maintenance", "fuel", "insurance", "tax", "finance", "fine", "accessories", "refund"]);
@@ -377,17 +377,10 @@ export async function getVehicleDetail(vehicleId: string, organizationId: string
     supabase.from("documents").select("*").eq("organization_id", organizationId).eq("owner_type", "vehicle").eq("owner_id", vehicleId).is("deleted_at", null).order("created_at", { ascending: false }),
     supabase.from("activity_events").select("*").eq("organization_id", organizationId).eq("vehicle_id", vehicleId).order("occurred_at", { ascending: false }),
     supabase.from("reminders").select("*").eq("organization_id", organizationId).eq("vehicle_id", vehicleId).is("deleted_at", null).order("due_date", { ascending: true }),
-    supabase
-      .from("tasks")
-      .select("id, title, task_type, due_at, completed_at, vehicle_id, rental_id")
-      .eq("organization_id", organizationId)
-      .eq("vehicle_id", vehicleId)
-      .is("completed_at", null)
-      .is("deleted_at", null)
-      // Payments are read from the payment schedule, not from these older reminder rows.
-      .neq("task_type", "payment_reminder")
-      .order("due_at", { ascending: true, nullsFirst: false })
-      .limit(10),
+    // The same jobs To do shows for this vehicle (payments are read from the schedule, not listed here).
+    getTaskList(organizationId)
+      .then((items) => ({ data: items.filter((item) => item.kind === "task" && !item.completedAt && item.vehicleId === vehicleId), error: null }))
+      .catch(() => ({ data: [] as TaskListItem[], error: null })),
     supabase.from("gps_devices").select("*").eq("organization_id", organizationId).eq("vehicle_id", vehicleId).is("deleted_at", null).maybeSingle(),
     supabase.from("vehicle_locations").select("*").eq("organization_id", organizationId).eq("vehicle_id", vehicleId).order("recorded_at", { ascending: false }).limit(1).maybeSingle(),
     // Fleet average utilisation, worked out from rentals (the stored column was never updated).
@@ -436,17 +429,7 @@ export async function getVehicleDetail(vehicleId: string, organizationId: string
     documents,
     activityEvents: eventsResult.data || [],
     reminders: remindersResult.data || [],
-    vehicleTasks: (tasksResult.data || []).map((row: any) => ({
-      id: row.id,
-      title: row.title,
-      taskType: row.task_type,
-      dueAt: row.due_at,
-      completedAt: row.completed_at,
-      vehicleId: row.vehicle_id,
-      rentalId: row.rental_id,
-      vehicleLabel: [vehicle.registration_number, vehicle.make, vehicle.model].filter(Boolean).join(" ") || null,
-      rentalLabel: null
-    })),
+    vehicleTasks: (tasksResult.data || []) as TaskListItem[],
     gpsDevice: gpsResult.data || null,
     latestLocation: locationResult.data || null,
     photos: sortVehiclePhotos(documents),

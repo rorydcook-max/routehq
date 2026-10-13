@@ -226,16 +226,16 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
 
             {/* The full table needs a laptop's width. Tablets get the same tidy list as phones, and narrow laptops drop the two "nice to know" columns rather than scroll sideways. */}
             <div className="hidden overflow-x-auto lg:block">
-              <table className="w-full text-left text-sm">
+              <table className="w-full table-fixed text-left text-sm">
                 <thead>
                   <tr className="border-b border-[var(--border)] text-[var(--muted)]">
                     <th className="w-10 py-2.5 pl-4 pr-2"><span className="sr-only">{t("select")}</span></th>
                     <th className="py-2.5 pr-3">{t("th_vehicle")}</th>
-                    <th className="px-3 py-2.5">{t("th_status")}</th>
-                    <th className="px-3 py-2.5">{t("th_rate")}</th>
-                    <th className="px-3 py-2.5">{t("th_onRent")}</th>
-                    <th className="px-3 py-2.5">{t("th_paperwork")}</th>
-                    <th className="hidden px-3 py-2.5 pr-4 xl:table-cell">{t("th_profit")}</th>
+                    <th className="w-[112px] px-3 py-2.5">{t("th_status")}</th>
+                    <th className="w-[120px] px-3 py-2.5 xl:w-[130px]">{t("th_rate")}</th>
+                    <th className="w-[160px] px-3 py-2.5 xl:w-[220px]">{t("th_onRent")}</th>
+                    <th className="w-[150px] px-3 py-2.5 xl:w-[170px]">{t("th_paperwork")}</th>
+                    <th className="hidden w-[120px] px-3 py-2.5 pr-4 xl:table-cell">{t("th_profit")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -247,13 +247,13 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                           <input aria-label={t("selectAria", { vehicle: `${vehicle.make} ${vehicle.model}` })} className="flex-shrink-0" form="fleetBulkForm" name="vehicleIds" type="checkbox" value={vehicle.id} />
                         </td>
                         <td className="py-3 pr-3">
-                          <Link className="flex items-center gap-3 rounded-md outline-none focus:ring-2 focus:ring-[var(--primary)]/25" href={href}>
+                          <Link className="flex min-w-0 items-center gap-3 rounded-md outline-none focus:ring-2 focus:ring-[var(--primary)]/25" href={href}>
                             <VehicleArt colour={vehicle.color} kind={group.kind} model={vehicle.model} size="sm" />
                             <span className="min-w-0">
-                              <span className="block whitespace-nowrap font-semibold text-[var(--foreground)] group-hover:text-[var(--primary)]">
+                              <span className="block truncate font-semibold text-[var(--foreground)] group-hover:text-[var(--primary)]">
                                 {vehicle.make} {vehicle.model}
                               </span>
-                              <span className="block whitespace-nowrap text-[13px] text-[var(--muted)]">
+                              <span className="block truncate text-[14px] text-[var(--muted)]">
                                 <span className="font-mono-data">{vehicle.plate}</span> · {vehicle.year || t("yearUnknown")} · {vehicle.mileage.toLocaleString()} km
                               </span>
                             </span>

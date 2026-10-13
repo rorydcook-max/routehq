@@ -1120,7 +1120,8 @@
     "keepCharge": "Keep the charge",
     "decidedByOwner": "The owner or a manager decides this one.",
     "owedTakeOff": "Take {amount} off",
-    "owedKeep": "Keep as booked"
+    "owedKeep": "Keep as booked",
+    "openJob": "Open"
   },
   "bookings": {
     "eyebrow": "Bookings",

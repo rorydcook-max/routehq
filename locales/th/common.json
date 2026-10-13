@@ -1129,7 +1129,8 @@
     "keepCharge": "เก็บเงินตามเดิม",
     "decidedByOwner": "เจ้าของหรือผู้จัดการเป็นผู้ตัดสินใจเรื่องนี้",
     "owedTakeOff": "ลด {amount}",
-    "owedKeep": "คิดตามที่จองไว้"
+    "owedKeep": "คิดตามที่จองไว้",
+    "openJob": "เปิด"
   },
   "bookings": {
     "eyebrow": "การจอง",

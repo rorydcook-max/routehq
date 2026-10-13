@@ -4,7 +4,7 @@ import type { Route } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ArrowRight, Banknote, CalendarDays, ClipboardCheck, FileText, Fuel, Gauge, Sparkles, MapPin, PenLine, ReceiptText, ShieldCheck, Smartphone, Wrench } from "lucide-react";
-import { completeTask, createVehicleTask } from "@/app/actions/tasks";
+import { createVehicleTask } from "@/app/actions/tasks";
 import { logVehicleMaintenance, renewVehicleCompliance } from "@/app/actions/vehicles";
 import { VehicleNotesForm } from "@/app/fleet/[id]/vehicle-notes-form";
 import { VehiclePhotoManager } from "@/app/fleet/[id]/vehicle-photo-manager";
@@ -24,6 +24,7 @@ import { getCurrentMembership } from "@/lib/auth/roles";
 import { getDefaultOrganization } from "@/lib/organization";
 import { TASK_TYPE_OPTIONS } from "@/lib/tasks";
 import { getVehicleDetail, type VehicleDetail } from "@/lib/vehicle-detail";
+import { VehicleJobs } from "@/app/tasks/tasks-list";
 import { isQuietActivityEvent } from "@/lib/activity-noise";
 import { activityTitle, visibleActivity } from "@/lib/activity-display";
 import { businessToday, businessNow, toWallTime } from "@/lib/business-time";
@@ -684,27 +685,7 @@ function TasksSection({ detail, organizationId }: { detail: VehicleDetail; organ
         <EmptyState>{tx.say("t_none")}</EmptyState>
       ) : (
         <div className="space-y-2">
-          {visibleTasks.map((task) => {
-            const days = daysUntil(task.dueAt);
-            return (
-              <div className="flex items-center justify-between gap-3 rounded-xl bg-[var(--panel-secondary)] p-3.5" key={task.id}>
-                <div className="min-w-0">
-                  <p className="text-[16px] font-bold leading-tight text-[var(--foreground)]">{task.title}</p>
-                  <p className={`font-semibold ${days !== null && days < 0 ? "text-[var(--danger)]" : "text-[var(--foreground-secondary)]"}`}>
-                    {days === null ? tx.say("t_noDue") : days < 0 ? tx.say("t_overdue", { date: formatDate(task.dueAt, tx) }) : tx.say("t_dueOn", { date: formatDate(task.dueAt, tx) })}
-                  </p>
-                </div>
-                <form action={completeTask} className="shrink-0">
-                  <input name="organizationId" type="hidden" value={organizationId} />
-                  <input name="taskId" type="hidden" value={task.id} />
-                  <input name="vehicleId" type="hidden" value={detail.vehicle.id} />
-                  <PendingButton className="secondary-action" pendingLabel={tx.say("saving")} type="submit">
-                    {tx.say("t_done")}
-                  </PendingButton>
-                </form>
-              </div>
-            );
-          })}
+          <VehicleJobs items={visibleTasks} organizationId={organizationId} today={businessToday()} vehicleId={detail.vehicle.id} />
           {extraCount > 0 ? (
             <Link className="inline-flex font-bold text-[var(--primary)]" href="/tasks">
               {tx.say("t_all", { count: detail.vehicleTasks.length })}

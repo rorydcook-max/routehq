@@ -657,3 +657,43 @@ export function TasksList({
     </div>
   );
 }
+
+/**
+ * A vehicle's open jobs, worded as on To do. A job the app raised (a refund, rent to decide, a form) opens on To do,
+ * where its own buttons are; a job someone typed can be marked done here.
+ */
+export function VehicleJobs({ items, today, organizationId, vehicleId }: { items: TaskListItem[]; today: string; organizationId: string; vehicleId: string }) {
+  const tx = useTx();
+  return (
+    <div className="space-y-2">
+      {items.map((item) => {
+        const heading = headingOf(item, today, tx);
+        const overdue = !!item.dueDate && item.dueDate < today;
+        const when = whenShort(item, today, overdue, tx);
+        return (
+          <div className="flex items-center justify-between gap-3 rounded-xl bg-[var(--panel-secondary)] p-3.5" key={item.id}>
+            <div className="min-w-0">
+              <p className="text-[16px] font-bold leading-tight text-[var(--foreground)]">{heading.title}</p>
+              {heading.detail ? <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{heading.detail}</p> : null}
+              {when ? <p className={`mt-0.5 font-semibold ${overdue ? "text-[var(--danger)]" : "text-[var(--foreground-secondary)]"}`}>{when}</p> : null}
+            </div>
+            {item.action ? (
+              <Link className="secondary-action pressable shrink-0 whitespace-nowrap px-4" href="/tasks">
+                {tx.say("openJob")}
+              </Link>
+            ) : (
+              <form action={completeTask} className="shrink-0">
+                <input name="organizationId" type="hidden" value={organizationId} />
+                <input name="taskId" type="hidden" value={item.id} />
+                <input name="vehicleId" type="hidden" value={vehicleId} />
+                <PendingButton className="secondary-action whitespace-nowrap" pendingLabel={tx.say("saving")} type="submit">
+                  {tx.say("markDone")}
+                </PendingButton>
+              </form>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}

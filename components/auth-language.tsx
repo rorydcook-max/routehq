@@ -1,17 +1,15 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import { LAUNCH_LOCALES, STAFF_LOCALE_COOKIE } from "@/lib/i18n/staff-locale";
 
 /** English / Thai switch on the sign-in pages. The choice is kept on this device until the person signs in. */
 export function AuthLanguage() {
-  const router = useRouter();
   const locale = useLocale();
 
   function choose(code: string) {
     document.cookie = `${STAFF_LOCALE_COOKIE}=${code}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
-    router.refresh();
+    window.location.reload();
   }
 
   return (

@@ -345,8 +345,8 @@ function ActiveRentalCard({ detail, dueNow }: { detail: VehicleDetail; dueNow: n
         <InfoRow label={tx.say("ar_deposit")} value={money(rental.deposit_amount)} />
         <InfoRow danger={dueNow > 0} label={tx.say("ar_dueNow")} value={dueNow > 0 ? money(dueNow) : tx.say("ar_nothing")} />
       </div>
-      <div className="mt-3 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap [&>*]:min-w-0">
-        <Link className="primary-action pressable col-span-2" href={`/bookings/${rental.id}` as Route}>
+      <div className="mt-3 grid gap-2 sm:flex sm:flex-wrap [&>*]:min-w-0 [&>*]:whitespace-nowrap">
+        <Link className="primary-action pressable" href={`/bookings/${rental.id}` as Route}>
           {tx.say("ar_open")}
         </Link>
         {inspectionAction ? (

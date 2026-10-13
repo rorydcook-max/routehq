@@ -514,10 +514,10 @@ export function CalculatorClient({
         </div>
 
         <p className={labelCls + " mt-4"}>{t("howRent")}</p>
-        <div className="mt-1 grid grid-cols-3 gap-2">
+        <div className="mt-1 flex flex-wrap gap-2">
           {(["monthly", "daily", "mix"] as RentStyle[]).map((option) => (
             <button
-              className={`rounded-xl border px-2 py-3 text-sm font-semibold ${style === option ? "border-[var(--primary)] bg-[var(--primary)]/10 text-[var(--primary)]" : "border-[var(--border-strong)] bg-white text-[var(--foreground-secondary)]"}`}
+              className={`pressable min-h-11 whitespace-nowrap rounded-full border-2 px-4 py-2 font-semibold ${style === option ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground)]"}`}
               key={option}
               onClick={() => setStyle(option)}
               type="button"

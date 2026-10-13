@@ -232,13 +232,13 @@ export function FleetLot({ vehicles, labels, title, action, compact = false }: {
           </span>
         ))}
       </p>
-      <ul className={`mt-4 grid grid-cols-4 gap-x-2 gap-y-3 ${compact ? "" : "sm:grid-cols-6 xl:grid-cols-8"}`}>
+      <ul className={`mt-4 grid gap-x-2 gap-y-3 ${compact ? "grid-cols-3" : "grid-cols-4 sm:grid-cols-6 xl:grid-cols-8"}`}>
         {sorted.map((vehicle, index) => (
           <li className="rise" key={vehicle.id} style={{ ["--d" as string]: `${200 + index * 35}ms` } as CSSProperties}>
             <Link aria-label={vehicle.tip} className="lot-spot group relative flex flex-col items-center gap-1.5 rounded-2xl p-1.5 outline-none transition hover:bg-[var(--panel-secondary)] focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)]" data-tip={vehicle.tip} href={vehicle.href as Route}>
               <span className={`transition duration-200 group-hover:-translate-y-0.5 ${compact ? "" : "lg:scale-110"} ${vehicle.state === "off" ? "opacity-50 grayscale" : ""}`}>{vehicle.art}</span>
               <span className="h-1.5 w-10 rounded-full" style={{ background: LOT_COLOUR[vehicle.state] }} />
-              <span className="w-full truncate text-center font-semibold text-[var(--foreground)]">{vehicle.name}</span>
+              <span className="line-clamp-2 w-full break-words text-center font-semibold leading-tight text-[var(--foreground)]">{vehicle.name}</span>
             </Link>
           </li>
         ))}

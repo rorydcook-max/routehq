@@ -1273,14 +1273,17 @@ export function InspectionForm({ context, unsigned = false, blocker = null, canW
                     value={deliveryDepositAmount}
                   />
                 </label>
-                <button
-                  className={`${touchButton} self-end bg-[var(--primary)] text-white disabled:opacity-40 disabled:shadow-none`}
-                  disabled={isReceiptPending || Boolean(receiptResult)}
-                  onClick={generateDeliveryReceipt}
-                  type="button"
-                >
-                  {isReceiptPending ? t("generating") : receiptResult ? t("receiptGenerated") : t("confirmCashReceipt")}
-                </button>
+                {/* Once the receipt exists the button has done its job: it used to sit on "Generating..." while the page refreshed. */}
+                {receiptResult ? null : (
+                  <button
+                    className={`${touchButton} self-end bg-[var(--primary)] text-white disabled:opacity-40 disabled:shadow-none`}
+                    disabled={isReceiptPending}
+                    onClick={generateDeliveryReceipt}
+                    type="button"
+                  >
+                    {isReceiptPending ? t("generating") : t("confirmCashReceipt")}
+                  </button>
+                )}
               </div>
               {receiptError ? (
                 <p className="mt-3 rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] px-3 py-2 text-sm font-bold text-[var(--danger)]">{receiptError}</p>

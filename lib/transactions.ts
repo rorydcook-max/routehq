@@ -98,7 +98,7 @@ export async function getTransactionList(organizationId: string): Promise<Transa
     supplier: row.supplier,
     mileage: row.mileage,
     vehicleId: row.vehicle_id,
-    vehicleLabel: [row.vehicles?.registration_number, row.vehicles?.make, row.vehicles?.model].filter(Boolean).join(" ") || "Vehicle",
+    vehicleLabel: [row.vehicles?.registration_number, row.vehicles?.make, row.vehicles?.model].filter(Boolean).join(" ") || (row.vehicle_id ? "Vehicle" : ""),
     rentalId: row.rental_id,
     bookingRef: row.rentals?.reference || row.rentals?.display_code || null,
     vehicleName: [row.vehicles?.make, row.vehicles?.model].filter(Boolean).join(" ") || row.vehicles?.registration_number || "",

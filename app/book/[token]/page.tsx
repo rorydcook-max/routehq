@@ -260,7 +260,7 @@ async function ErrorState({ title, message, contact, rebookHref, rebookLabel }: 
         <h1 className="mt-4 text-2xl font-semibold text-[var(--foreground)]">{title}</h1>
         <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{message}</p>
         {rebookHref ? (
-          <a className="pressable mt-5 inline-flex rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={rebookHref}>
+          <a className="pressable mt-5 inline-flex rounded-full bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={rebookHref}>
             {rebookLabel || t("chooseOtherDates")}
           </a>
         ) : null}
@@ -442,7 +442,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {invites.map((invite) => (
-                <a className="pressable inline-flex min-h-11 items-center justify-center rounded-xl bg-[var(--primary)] px-4 text-sm font-semibold text-white" href={invite.url} key={invite.provider} rel="noreferrer" target="_blank">
+                <a className="pressable inline-flex min-h-11 items-center justify-center rounded-full bg-[var(--primary)] px-4 text-sm font-semibold text-white" href={invite.url} key={invite.provider} rel="noreferrer" target="_blank">
                   {t("updatesOn", { app: invite.label })}
                 </a>
               ))}
@@ -504,19 +504,19 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
               );
             })()}
             {contact ? (
-              <a className="pressable mt-5 inline-flex rounded-xl border border-[var(--primary)] bg-white px-5 py-3 text-sm font-semibold text-[var(--primary)]" href={contact}>
+              <a className="pressable mt-5 inline-flex rounded-full border border-[var(--primary)] bg-white px-5 py-3 text-sm font-semibold text-[var(--primary)]" href={contact}>
                 {t("contactNamed", { business: businessName })}
               </a>
             ) : null}
             {(detail.inspectionReports || []).length + (detail.receipts || []).length > 0 ? (
               <div className="mt-5 flex flex-wrap justify-center gap-2">
                 {(detail.inspectionReports || []).map((report: any) => (
-                  <a className="pressable inline-flex rounded-xl border border-[var(--primary)] bg-white px-5 py-3 text-sm font-semibold text-[var(--primary)]" href={report.url} key={report.id} rel="noreferrer" target="_blank">
+                  <a className="pressable inline-flex rounded-full border border-[var(--primary)] bg-white px-5 py-3 text-sm font-semibold text-[var(--primary)]" href={report.url} key={report.id} rel="noreferrer" target="_blank">
                     {t(report.kind === "return" ? (report.swap ? "reportCollection" : "reportReturn") : report.swap ? "reportHandoverSwap" : "reportHandover")}
                   </a>
                 ))}
                 {(detail.receipts || []).map((receipt) => (
-                  <a className="pressable inline-flex rounded-xl border border-[var(--primary)] bg-white px-5 py-3 text-sm font-semibold text-[var(--primary)]" href={receipt.url} key={receipt.id} rel="noreferrer" target="_blank">
+                  <a className="pressable inline-flex rounded-full border border-[var(--primary)] bg-white px-5 py-3 text-sm font-semibold text-[var(--primary)]" href={receipt.url} key={receipt.id} rel="noreferrer" target="_blank">
                     {t("receiptNumbered", { number: receipt.number })}
                   </a>
                 ))}
@@ -525,12 +525,12 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             {executedDownloads?.originalAgreementUrl || executedDownloads?.executionCertificateUrl ? (
               <div className="mt-5 flex flex-wrap justify-center gap-2">
                 {executedDownloads.originalAgreementUrl ? (
-                  <a className="pressable inline-flex rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={executedDownloads.originalAgreementUrl} rel="noreferrer" target="_blank">
+                  <a className="pressable inline-flex rounded-full bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={executedDownloads.originalAgreementUrl} rel="noreferrer" target="_blank">
                     {t("downloadAgreement")}
                   </a>
                 ) : null}
                 {executedDownloads.executionCertificateUrl ? (
-                  <a className="pressable inline-flex rounded-xl border border-[var(--primary)] bg-white px-5 py-3 text-sm font-semibold text-[var(--primary)]" href={executedDownloads.executionCertificateUrl} rel="noreferrer" target="_blank">
+                  <a className="pressable inline-flex rounded-full border border-[var(--primary)] bg-white px-5 py-3 text-sm font-semibold text-[var(--primary)]" href={executedDownloads.executionCertificateUrl} rel="noreferrer" target="_blank">
                     {t("proofOfSigning")}
                   </a>
                 ) : null}

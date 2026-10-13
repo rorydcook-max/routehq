@@ -165,7 +165,7 @@ function ExtendHoldButton({ rentalId, ended }: { rentalId: string; ended: boolea
   return (
     <>
       <button
-        className="pressable ml-2 rounded-md border border-[var(--border)] bg-white px-2 py-0.5 text-[11px] font-semibold text-[var(--primary)] disabled:opacity-60"
+        className="pressable ml-2 rounded-full border border-[var(--border)] bg-white px-2 py-0.5 text-[11px] font-semibold text-[var(--primary)] disabled:opacity-60"
         disabled={isPending}
         onClick={() => {
           setError(null);
@@ -307,7 +307,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                         <MoreHorizontal size={18} />
                       </summary>
                       <div className="absolute right-0 top-full z-20 mt-1 flex min-w-[150px] flex-col items-stretch gap-1.5 rounded-lg border border-[var(--border)] bg-white p-2 text-left shadow-lg">
-                <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-md border border-[var(--border)] bg-white px-3 py-1.5 text-[12px] font-semibold text-[var(--foreground-secondary)]" href={`/bookings/${booking.id}/edit`}>
+                <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-full border border-[var(--border)] bg-white px-3 py-1.5 text-[12px] font-semibold text-[var(--foreground-secondary)]" href={`/bookings/${booking.id}/edit`}>
                   {tx.say("edit")}
                 </Link>
                 {canExtend(booking) ? (
@@ -348,7 +348,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                 ) : null}
                 {confirmDeleteId === booking.id ? null : (
                   <button
-                    className="pressable inline-flex min-h-8 items-center justify-center rounded-md border border-[var(--danger-line)] bg-[var(--danger-light)] px-2 text-[var(--danger)]"
+                    className="pressable inline-flex min-h-8 items-center justify-center rounded-full border border-[var(--danger-line)] bg-[var(--danger-light)] px-2 text-[var(--danger)]"
                     onClick={() => { setConfirmDeleteId(booking.id); setDeleteError(null); }}
                     title={tx.say("deleteBooking")}
                     type="button"
@@ -414,7 +414,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                   </p>
                   <div className="flex gap-2">
                     <button
-                      className="pressable inline-flex min-h-7 items-center rounded-lg bg-[var(--danger)] px-3 text-xs font-bold text-white disabled:opacity-60"
+                      className="pressable inline-flex min-h-7 items-center rounded-full bg-[var(--danger)] px-3 text-xs font-bold text-white disabled:opacity-60"
                       disabled={isPending}
                       onClick={() => handleDelete(booking.id)}
                       type="button"
@@ -422,7 +422,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                       {isPending ? tx.say("deleting") : tx.say("confirmDelete")}
                     </button>
                     <button
-                      className="pressable inline-flex min-h-7 items-center rounded-lg border border-[var(--border)] bg-white px-3 text-xs font-bold text-[var(--foreground-secondary)]"
+                      className="pressable inline-flex min-h-7 items-center rounded-full border border-[var(--border)] bg-white px-3 text-xs font-bold text-[var(--foreground-secondary)]"
                       disabled={isPending}
                       onClick={() => setConfirmDeleteId(null)}
                       type="button"

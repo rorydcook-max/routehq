@@ -55,7 +55,7 @@ export function AmendmentLinkPanel({ token, onCancel, cancelling, changedAlready
       <p className="mt-1 text-[12px] text-[var(--foreground-secondary)]">{changedAlready ? say("al_changed") : say("al_nothing")}</p>
       {canNativeShare ? (
         <button
-          className="pressable mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white"
+          className="pressable mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white"
           onClick={() => {
             navigator.share({ text: message }).catch(() => undefined);
           }}
@@ -65,14 +65,14 @@ export function AmendmentLinkPanel({ token, onCancel, cancelling, changedAlready
         </button>
       ) : null}
       <div className="mt-2 grid grid-cols-3 gap-2">
-        <a className="pressable inline-flex min-h-11 items-center justify-center rounded-lg border border-[var(--border)] bg-white px-2 text-xs font-semibold text-[var(--foreground-secondary)]" href={`https://wa.me/?text=${encodeURIComponent(message)}`} rel="noreferrer" target="_blank">
+        <a className="pressable inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--border)] bg-white px-2 text-xs font-semibold text-[var(--foreground-secondary)]" href={`https://wa.me/?text=${encodeURIComponent(message)}`} rel="noreferrer" target="_blank">
           WhatsApp
         </a>
-        <a className="pressable inline-flex min-h-11 items-center justify-center rounded-lg border border-[var(--border)] bg-white px-2 text-xs font-semibold text-[var(--foreground-secondary)]" href={`https://line.me/R/share?text=${encodeURIComponent(message)}`} rel="noreferrer" target="_blank">
+        <a className="pressable inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--border)] bg-white px-2 text-xs font-semibold text-[var(--foreground-secondary)]" href={`https://line.me/R/share?text=${encodeURIComponent(message)}`} rel="noreferrer" target="_blank">
           LINE
         </a>
         <button
-          className="pressable inline-flex min-h-11 items-center justify-center rounded-lg border border-[var(--border)] bg-white px-2 text-xs font-semibold text-[var(--foreground-secondary)]"
+          className="pressable inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--border)] bg-white px-2 text-xs font-semibold text-[var(--foreground-secondary)]"
           onClick={() => {
             navigator.clipboard?.writeText(url).then(() => setCopied(true), () => undefined);
           }}
@@ -86,7 +86,7 @@ export function AmendmentLinkPanel({ token, onCancel, cancelling, changedAlready
           {say("al_preview")}
         </a>
         {onCancel ? (
-          <button className="pressable ml-auto inline-flex min-h-10 items-center rounded-lg px-2 text-xs font-semibold text-[var(--danger)] underline disabled:opacity-60" disabled={cancelling} onClick={onCancel} type="button">
+          <button className="pressable ml-auto inline-flex min-h-10 items-center rounded-full px-2 text-xs font-semibold text-[var(--danger)] underline disabled:opacity-60" disabled={cancelling} onClick={onCancel} type="button">
             {cancelling ? say("al_cancelling") : say("al_cancel")}
           </button>
         ) : null}
@@ -426,7 +426,7 @@ export function RentalAdjustmentModal({
               {customerName || say("adj_customer")} - {vehicleLabel || say("adj_vehicle")}
             </p>
           </div>
-          <button className="pressable rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold text-[var(--muted)]" onClick={onClose} type="button">
+          <button className="pressable rounded-full border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold text-[var(--muted)]" onClick={onClose} type="button">
             {say("adj_close")}
           </button>
         </div>
@@ -539,7 +539,7 @@ export function RentalAdjustmentModal({
                   <span>
                     {t.rich("adj_noDate", { amount: money(context?.rates?.monthlyRate || 0), b: strong })}
                   </span>
-                  <button className="rounded-md border border-[var(--border)] bg-white px-3 py-1.5 text-[12px] font-semibold text-[var(--primary)] disabled:opacity-60" disabled={isPending} onClick={makeOpenEnded} type="button">
+                  <button className="rounded-full border border-[var(--border)] bg-white px-3 py-1.5 text-[12px] font-semibold text-[var(--primary)] disabled:opacity-60" disabled={isPending} onClick={makeOpenEnded} type="button">
                     {say("adj_makeMonthly")}
                   </button>
                 </div>
@@ -647,7 +647,7 @@ export function RentalAdjustmentModal({
         <div className="mt-4 flex gap-2">
           {showPendingPanel ? (
             <button
-              className="pressable min-h-11 flex-1 rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-bold text-white"
+              className="pressable min-h-11 flex-1 rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-bold text-white"
               onClick={() => {
                 onSuccess?.();
                 onClose();
@@ -658,11 +658,11 @@ export function RentalAdjustmentModal({
             </button>
           ) : (
             <>
-              <button className="pressable min-h-11 flex-1 rounded-xl border border-[var(--border)] bg-white px-4 py-2 text-sm font-bold text-[var(--foreground-secondary)]" onClick={onClose} type="button">
+              <button className="pressable min-h-11 flex-1 rounded-full border border-[var(--border)] bg-white px-4 py-2 text-sm font-bold text-[var(--foreground-secondary)]" onClick={onClose} type="button">
                 {say("cancelBtn")}
               </button>
               <button
-                className="pressable min-h-11 flex-1 rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-bold text-white disabled:opacity-60"
+                className="pressable min-h-11 flex-1 rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-bold text-white disabled:opacity-60"
                 disabled={submitDisabled}
                 onClick={submit}
                 type="button"

@@ -152,7 +152,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
         {/* Quick add sits in the side menu on computers: floating over the page it covered the buttons at the end of each row. */}
         {onFocusedFlow ? null : (
           <button
-            className="mb-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--primary)] px-3 py-2.5 text-sm font-semibold text-white shadow-[var(--shadow-sm)] transition hover:bg-[var(--primary-hover)]"
+            className="mb-3 flex w-full items-center justify-center gap-2 rounded-full bg-[var(--primary)] px-3 py-2.5 text-sm font-semibold text-white shadow-[var(--shadow-sm)] transition hover:bg-[var(--primary-hover)]"
             onClick={() => setFastActionOpen(true)}
             type="button"
           >

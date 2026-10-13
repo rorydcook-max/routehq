@@ -881,17 +881,17 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         </p>
         <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-center">
         {originalAgreementUrl ? (
-          <a className="pressable inline-flex min-h-[44px] items-center justify-center rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={originalAgreementUrl} rel="noreferrer" target="_blank">
+          <a className="pressable inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={originalAgreementUrl} rel="noreferrer" target="_blank">
             {t("downloadAgreement")}
           </a>
         ) : null}
         {signedContractUrl ? (
-          <a className="pressable inline-flex min-h-[44px] items-center justify-center rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={signedContractUrl} rel="noreferrer" target="_blank">
+          <a className="pressable inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={signedContractUrl} rel="noreferrer" target="_blank">
             {t("downloadAgreement")}
           </a>
         ) : null}
         {executionCertificateUrl ? (
-          <a className="pressable inline-flex min-h-[44px] items-center justify-center rounded-xl border border-[var(--border)] bg-white px-5 py-3 text-sm font-semibold text-[var(--primary)]" href={executionCertificateUrl} rel="noreferrer" target="_blank">
+          <a className="pressable inline-flex min-h-[44px] items-center justify-center rounded-full border border-[var(--border)] bg-white px-5 py-3 text-sm font-semibold text-[var(--primary)]" href={executionCertificateUrl} rel="noreferrer" target="_blank">
             {t("proofOfSigning")}
           </a>
         ) : null}
@@ -1311,7 +1311,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
                         <div>
                           <p className="text-xs font-semibold uppercase text-[var(--primary)]">Wise</p>
                           <p className="mt-2 text-sm text-[var(--muted)]">{t("useAppToPay", { app: "Wise", amount: formatMoney(paymentAmount, currency) })}</p>
-                          <a className="pressable mt-3 inline-flex rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white" href={orgPayment.wise_link} rel="noreferrer" target="_blank">
+                          <a className="pressable mt-3 inline-flex rounded-full bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white" href={orgPayment.wise_link} rel="noreferrer" target="_blank">
                             {t("payWith", { app: "Wise" })}
                           </a>
                           <PaymentReportedButton isPending={isPaymentReportPending} onClick={handleReportPayment} reported={paymentReported} text="I've paid" />
@@ -1320,7 +1320,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
                         <div>
                           <p className="text-xs font-semibold uppercase text-[var(--primary)]">Revolut</p>
                           <p className="mt-2 text-sm text-[var(--muted)]">{t("useAppToPay", { app: "Revolut", amount: formatMoney(paymentAmount, currency) })}</p>
-                          <a className="pressable mt-3 inline-flex rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white" href={orgPayment.revolut_link} rel="noreferrer" target="_blank">
+                          <a className="pressable mt-3 inline-flex rounded-full bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white" href={orgPayment.revolut_link} rel="noreferrer" target="_blank">
                             {t("payWith", { app: "Revolut" })}
                           </a>
                           <PaymentReportedButton isPending={isPaymentReportPending} onClick={handleReportPayment} reported={paymentReported} text="I've paid" />
@@ -1418,7 +1418,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         <div className="mt-4">
           <div className="mb-2 flex items-center justify-between">
             <span className="text-sm font-bold text-[var(--foreground-secondary)]">{t("signBelow")}</span>
-            <button className="pressable rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-bold text-[var(--foreground-secondary)]" onClick={clearSignature} type="button">
+            <button className="pressable rounded-full border border-[var(--border)] bg-white px-3 py-2 text-xs font-bold text-[var(--foreground-secondary)]" onClick={clearSignature} type="button">
               {t("clear")}
             </button>
           </div>
@@ -1437,7 +1437,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           </>
         ) : null}
         {error ? <p className="mt-4 rounded-xl bg-[var(--danger-light)] p-3 text-sm font-bold text-[var(--danger)]">{error}</p> : null}
-        <button className="pressable mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white disabled:opacity-70" disabled={isPending || !pageLive} key={readyToSign ? "sign" : "review"} type="submit">
+        <button className="pressable mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white disabled:opacity-70" disabled={isPending || !pageLive} key={readyToSign ? "sign" : "review"} type="submit">
           {isPending ? (
             <span className="inline-flex items-center gap-2"><span className="spinner" /> {t("sending")}</span>
           ) : readyToSign ? (
@@ -1507,7 +1507,7 @@ function PaymentReportedButton({
 
   return (
     <button
-      className="pressable mt-3 inline-flex rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white disabled:opacity-60"
+      className="pressable mt-3 inline-flex rounded-full bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white disabled:opacity-60"
       disabled={isPending}
       onClick={onClick}
       type="button"
@@ -1798,7 +1798,7 @@ function GoogleAddressInput({ name = "address", onChange, value }: { name?: stri
         />
         {mapsKeyConfigured && isEnabled ? (
           <button
-            className="pressable mt-2 rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm font-semibold text-[var(--foreground)]"
+            className="pressable mt-2 rounded-full border border-[var(--border)] bg-white px-4 py-3 text-sm font-semibold text-[var(--foreground)]"
             onClick={() => setPinModalOpen(true)}
             type="button"
           >
@@ -1890,13 +1890,13 @@ function PublicGooglePinModal({ onClose, onConfirm }: { onClose: () => void; onC
             <p className="text-xs font-semibold uppercase text-[var(--primary)]">Google Maps</p>
             <h3 className="text-lg font-semibold text-[var(--foreground)]">{t("dropPin")}</h3>
           </div>
-          <button className="pressable rounded-xl border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold" onClick={onClose} type="button">
+          <button className="pressable rounded-full border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold" onClick={onClose} type="button">
             {t("close")}
           </button>
         </div>
         <div className="mt-4 h-80 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)]" ref={mapRef} />
         <p className="mt-3 rounded-xl bg-[var(--panel-secondary)] p-3 text-sm font-bold text-[var(--foreground-secondary)]">{address}</p>
-        <button className="pressable mt-3 min-h-12 w-full rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white" onClick={() => onConfirm(address)} type="button">
+        <button className="pressable mt-3 min-h-12 w-full rounded-full bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white" onClick={() => onConfirm(address)} type="button">
           {t("usePlace")}
         </button>
       </div>

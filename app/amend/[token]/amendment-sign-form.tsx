@@ -108,7 +108,7 @@ export function AmendmentSignForm({ token, contentHash, renterName }: { token: s
       </div>
       {error ? <p className="mt-3 rounded-xl bg-[var(--danger-light)] px-3 py-2 text-sm font-bold text-[var(--danger)]">{error}</p> : null}
       <button
-        className="pressable mt-4 min-h-12 w-full rounded-xl bg-[var(--primary)] px-5 py-3 text-base font-semibold text-white disabled:opacity-50"
+        className="pressable mt-4 min-h-12 w-full rounded-full bg-[var(--primary)] px-5 py-3 text-base font-semibold text-white disabled:opacity-50"
         disabled={!ready || isPending}
         onClick={submit}
         type="button"

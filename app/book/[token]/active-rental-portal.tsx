@@ -376,7 +376,7 @@ function ActionForm({
 function SubmitButton({ isPending, label }: { isPending: boolean; label: string }) {
   const t = useTranslations("customer");
   return (
-    <button className="pressable min-h-12 w-full rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white disabled:opacity-60" disabled={isPending} type="submit">
+    <button className="pressable min-h-12 w-full rounded-full bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white disabled:opacity-60" disabled={isPending} type="submit">
       {isPending ? t("sending") : label}
     </button>
   );

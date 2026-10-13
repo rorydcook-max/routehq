@@ -102,7 +102,7 @@ function TransactionEditForm({
   }
 
   return (
-    <div className="mt-3 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
+    <div className="mt-3 rounded-2xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3 text-[14px] font-semibold text-[var(--foreground-secondary)]">
       <div className="grid gap-3 md:grid-cols-[120px_150px_1fr]">
         <label>
           {tx.say("f_amount")}
@@ -152,12 +152,12 @@ function TransactionEditForm({
           <input className="mt-1 w-full" onChange={(event) => setNotes(event.target.value)} value={notes} />
         </label>
       </div>
-      {error ? <p className="mt-2 rounded-md bg-[var(--danger-light)] px-3 py-2 text-xs font-semibold text-[var(--danger)]">{error}</p> : null}
+      {error ? <p className="mt-2 rounded-xl bg-[var(--danger-light)] px-3 py-2 text-[14px] font-semibold text-[var(--danger)]">{error}</p> : null}
       <div className="mt-3 flex flex-wrap justify-end gap-2">
-        <button className="secondary-action pressable min-h-9 px-3 text-xs" disabled={isPending} onClick={onCancel} type="button">
+        <button className="secondary-action pressable min-h-10 whitespace-nowrap px-4 text-[14px]" disabled={isPending} onClick={onCancel} type="button">
           {tx.say("cancel")}
         </button>
-        <button className="primary-action pressable min-h-9 px-3 text-xs" disabled={isPending} onClick={save} type="button">
+        <button className="primary-action pressable min-h-10 whitespace-nowrap px-4 text-[14px]" disabled={isPending} onClick={save} type="button">
           {isPending ? tx.say("saving") : tx.say("saveChanges")}
         </button>
       </div>
@@ -365,7 +365,7 @@ export function TransactionsList({
     const deleting = deletingIds.has(transaction.id);
     const selected = selectedIds.has(transaction.id);
     // One line under the title. Money in: who and which vehicle. Money out: the vehicle and what it was for; the plate stays on the vehicle page.
-    const vehicleName = transaction.vehicleName || transaction.vehicleLabel;
+    const vehicleName = transaction.vehicleId ? transaction.vehicleName || transaction.vehicleLabel : tx.say("businessCost");
     // A refund or a cost billed to a customer is about a booking: who, and what for, come first.
     const who = kind === "expense" && !transaction.rentalId
       ? [vehicleName, transaction.notes || transaction.supplier].filter(Boolean).join(" · ")
@@ -394,9 +394,9 @@ export function TransactionsList({
                 </span>
               ) : null}
             </p>
-            {who ? <p className="truncate font-medium text-[var(--foreground-secondary)]">{who}</p> : null}
+            {who ? <p className="line-clamp-2 break-words font-medium text-[var(--foreground-secondary)]">{who}</p> : null}
             {context ? (
-              <Link className="mt-0.5 block truncate text-[13px] font-semibold text-[var(--primary)]" href={`/bookings/${transaction.rentalId}`}>
+              <Link className="mt-0.5 block truncate text-[14px] font-semibold text-[var(--primary)]" href={`/bookings/${transaction.rentalId}`}>
                 {context}
               </Link>
             ) : null}
@@ -452,7 +452,7 @@ export function TransactionsList({
                 {tx.say("keepIt")}
               </button>
               <button
-                className="pressable min-h-9 rounded-lg bg-[var(--danger)] px-3 text-xs font-semibold text-white"
+                className="pressable min-h-9 rounded-full bg-[var(--danger)] px-3 text-xs font-semibold text-white"
                 disabled={isPending}
                 onClick={() => handleDelete(transaction.id)}
                 type="button"
@@ -647,7 +647,7 @@ export function TransactionsList({
               </button>
               {selectedIds.size > 0 ? (
                 <button
-                  className="pressable flex min-h-9 items-center gap-2 rounded-lg bg-[var(--danger)] px-3 text-xs font-semibold text-white"
+                  className="pressable flex min-h-9 items-center gap-2 rounded-full bg-[var(--danger)] px-3 text-xs font-semibold text-white"
                   disabled={isPending}
                   onClick={() => (bulkConfirm ? handleBulkDelete() : setBulkConfirm(true))}
                   type="button"

@@ -112,7 +112,7 @@ export function BookingShareActions({
           {isPending ? <span className="spinner" /> : <MessageCircle size={18} />}
           {!link ? say("share_create") : formDone ? say("share_sendPage") : say("share_resend")}
         </button>
-        <button className="pressable inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-4 py-3 text-sm font-semibold text-[var(--foreground-secondary)] disabled:opacity-70" disabled={isPending || !link} onClick={copyCurrentLink} type="button">
+        <button className="pressable inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full border border-[var(--border)] bg-white px-4 py-3 text-sm font-semibold text-[var(--foreground-secondary)] disabled:opacity-70" disabled={isPending || !link} onClick={copyCurrentLink} type="button">
           {isPending ? <RotateCcw size={18} /> : <Copy size={18} />}
           {say("share_copy")}
         </button>

@@ -52,10 +52,10 @@ export function CancelBooking({ token, organizationName }: { token: string; orga
       </label>
       {error ? <p className="text-sm font-semibold text-[var(--danger)]">{error}</p> : null}
       <div className="grid gap-2 sm:grid-cols-2">
-        <button className="pressable min-h-12 rounded-xl border border-[var(--border)] bg-white px-4 text-sm font-semibold text-[var(--foreground)]" disabled={isPending} onClick={() => setOpen(false)} type="button">
+        <button className="pressable min-h-12 rounded-full border border-[var(--border)] bg-white px-4 text-sm font-semibold text-[var(--foreground)]" disabled={isPending} onClick={() => setOpen(false)} type="button">
           {t("keepMyBooking")}
         </button>
-        <button className="pressable min-h-12 rounded-xl bg-[var(--danger)] px-4 text-sm font-semibold text-white disabled:opacity-60" disabled={isPending} type="submit">
+        <button className="pressable min-h-12 rounded-full bg-[var(--danger)] px-4 text-sm font-semibold text-white disabled:opacity-60" disabled={isPending} type="submit">
           {isPending ? t("cancelling") : t("yesCancelIt")}
         </button>
       </div>

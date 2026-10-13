@@ -48,7 +48,7 @@ export default async function AmendmentPage({ params }: { params: Promise<{ toke
   }
   const contact = contactHref(amendment.contactPhone);
   const contactLink = contact ? (
-    <a className="pressable mt-5 inline-flex rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={contact}>
+    <a className="pressable mt-5 inline-flex rounded-full bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={contact}>
       {t("contactNamed", { business: amendment.businessName })}
     </a>
   ) : null;
@@ -87,7 +87,7 @@ export default async function AmendmentPage({ params }: { params: Promise<{ toke
           </div>
         ) : null}
         {amendment.pdfUrl ? (
-          <a className="pressable mt-5 inline-flex items-center gap-2 rounded-xl bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={amendment.pdfUrl} rel="noreferrer" target="_blank">
+          <a className="pressable mt-5 inline-flex items-center gap-2 rounded-full bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white" href={amendment.pdfUrl} rel="noreferrer" target="_blank">
             <FileText size={16} /> {t("amendDownload")}
           </a>
         ) : null}

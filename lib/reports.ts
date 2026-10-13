@@ -178,6 +178,8 @@ export interface ReportsData {
   /** Week by week (weeks start on Monday), for periods too short to chart by month. */
   weeklyData: MonthlyDataPoint[];
   vehicleMetrics: VehicleMetrics[];
+  /** Money out recorded against no vehicle (rent, phone, ads): in the totals, in no vehicle's row. */
+  businessCosts: number;
   outstandingBalances: OutstandingBalance[];
   recentTransactions: RecentTransaction[];
   // Legacy compat fields
@@ -496,6 +498,7 @@ export async function getReportsData(
   const vExpBreakMap = new Map<string, Map<string, number>>();
   // Extras are rent income, followed on their own: what was paid for them and what was given back.
   const extrasByType = new Map<string, number>();
+  let businessCosts = 0;
 
   for (const tx of transactions) {
     const amount = Math.abs(Number(tx.amount || 0));
@@ -509,6 +512,7 @@ export async function getReportsData(
     } else if (isExpenseTx(tx)) {
       totalExpenses += amount;
       expensesByTypeMap.set(type, (expensesByTypeMap.get(type) || 0) + amount);
+      if (!tx.vehicle_id) businessCosts += amount;
     }
 
     if (tx.vehicle_id) {
@@ -682,6 +686,7 @@ export async function getReportsData(
     monthlyData,
     weeklyData,
     vehicleMetrics,
+    businessCosts,
     outstandingBalances,
     recentTransactions,
     // Legacy compat

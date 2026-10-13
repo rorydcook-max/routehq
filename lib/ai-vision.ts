@@ -1,7 +1,8 @@
 /**
  * Reading photos and documents (passports, licences, odometers, blue books).
  *
- * Providers: Claude (ANTHROPIC_API_KEY), OpenAI (OPENAI_API_KEY) and Google Gemini (GEMINI_API_KEY).
+ * Providers: Claude (ANTHROPIC_API_KEY), OpenAI (OPENAI_API_KEY) and Google Gemini (GEMINI_API_KEY, model from
+ * GEMINI_VISION_MODEL, else gemini-flash-latest, with newer fallbacks when Google retires one).
  * Callers ask for a JSON object and get one back; which provider answered is not their concern.
  *
  * Gemini has a free tier, but on it Google may use what is sent to improve its models and people may
@@ -99,7 +100,21 @@ async function readWithOpenAi(input: ReadInput) {
 }
 
 async function readWithGemini(input: ReadInput) {
-  const model = process.env.GEMINI_VISION_MODEL || "gemini-2.5-flash";
+  const models = [...new Set([process.env.GEMINI_VISION_MODEL, "gemini-flash-latest", "gemini-3-flash-preview", "gemini-3.1-flash-lite"].filter(Boolean) as string[])];
+  let lastError: unknown = null;
+  for (const model of models) {
+    try {
+      return await readWithGeminiModel(input, model);
+    } catch (error) {
+      lastError = error;
+      // A retired, unknown or busy model is worth trying the next one; anything else (bad photo, quota) stands.
+      if (!/no longer available|not found|is not supported|unknown model|404|high demand|overloaded|unavailable|503|try again later/i.test(error instanceof Error ? error.message : "")) break;
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error("The photo could not be read.");
+}
+
+async function readWithGeminiModel(input: ReadInput, model: string) {
   const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
     method: "POST",
     headers: { "x-goog-api-key": process.env.GEMINI_API_KEY || "", "Content-Type": "application/json" },

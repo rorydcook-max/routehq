@@ -297,7 +297,7 @@ export function ExistingRentalPaymentSetupCard({
             {tx.say("pc_setupBody")}
           </p>
         </div>
-        <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-lg border border-[var(--warning-line)] bg-white px-3 text-xs font-semibold text-[var(--warning)]" href={`/bookings/${rentalId}/edit#payments`}>
+        <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-full border border-[var(--warning-line)] bg-white px-3 text-xs font-semibold text-[var(--warning)]" href={`/bookings/${rentalId}/edit#payments`}>
           {tx.say("pc_setupManual")}
         </Link>
       </div>
@@ -635,7 +635,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
         <div className="flex items-center gap-2">
           {canRecordPayment ? (
             <button
-              className="pressable inline-flex min-h-9 items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-4 text-sm font-semibold text-white"
+              className="pressable inline-flex min-h-9 items-center justify-center gap-2 rounded-full bg-[var(--primary)] px-4 text-sm font-semibold text-white"
               onClick={() => {
                 setRecordAmount(amountInput(payment.amount));
                 setRecordDate(businessToday());
@@ -648,7 +648,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
             </button>
           ) : null}
           {canRecordPayment && payment.metadata?.type === "charge" ? (
-            <button className="pressable inline-flex min-h-9 items-center justify-center rounded-lg border border-[var(--border)] bg-white px-3 text-sm font-semibold text-[var(--foreground-secondary)]" disabled={isPending} onClick={waiveCharge} type="button">
+            <button className="pressable inline-flex min-h-9 items-center justify-center rounded-full border border-[var(--border)] bg-white px-3 text-sm font-semibold text-[var(--foreground-secondary)]" disabled={isPending} onClick={waiveCharge} type="button">
               {tx.say("pc_wontPay")}
             </button>
           ) : null}

@@ -112,7 +112,7 @@ export function RefundDepositPanel({
           {depositHeld > 0 && available === 0 ? <p className="mt-1 text-xs font-semibold text-[var(--muted)]">{say("ref_settled")}</p> : null}
         </div>
         <button
-          className="pressable rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground-secondary)]"
+          className="pressable rounded-full border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground-secondary)]"
           type="button"
           onClick={() => setCollapsed((value) => !value)}
         >
@@ -152,7 +152,7 @@ export function RefundDepositPanel({
               {Number(earlyReturn.owed || 0) > 0 ? (
                 <p className="mt-1 font-semibold">{say("ref_earlyOwed", { owed: money(Number(earlyReturn.owed), currency), net: money(Math.max(0, earlyReturn.amount - Number(earlyReturn.owed)), currency) })}</p>
               ) : null}
-              <button className="pressable mt-2 rounded-lg border border-[var(--warning-line)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--warning)]" onClick={() => openForm("refund")} type="button">
+              <button className="pressable mt-2 rounded-full border border-[var(--warning-line)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--warning)]" onClick={() => openForm("refund")} type="button">
                 {say("ref_earlyButton", { amount: money(Math.max(0, earlyReturn.amount - Number(earlyReturn.owed || 0)), currency) })}
               </button>
             </div>
@@ -161,14 +161,14 @@ export function RefundDepositPanel({
             {canUseDeposit ? (
               <>
                 <button
-                  className="pressable rounded-lg bg-[var(--primary)] px-3 py-2 text-xs font-semibold text-white"
+                  className="pressable rounded-full bg-[var(--primary)] px-3 py-2 text-xs font-semibold text-white"
                   type="button"
                   onClick={() => openForm("return")}
                 >
                   {say("ref_returnDeposit")}
                 </button>
                 <button
-                  className="pressable rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground)]"
+                  className="pressable rounded-full border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground)]"
                   type="button"
                   onClick={() => openForm("deduction")}
                 >
@@ -178,7 +178,7 @@ export function RefundDepositPanel({
             ) : null}
             {canRefundPayment ? (
               <button
-                className="pressable rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground)]"
+                className="pressable rounded-full border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground)]"
                 type="button"
                 onClick={() => openForm("refund")}
               >
@@ -314,14 +314,14 @@ function FormActions({
   return (
     <div className="mt-3 flex flex-wrap gap-2">
       <button
-        className="pressable rounded-lg bg-[var(--primary)] px-3 py-2 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+        className="pressable rounded-full bg-[var(--primary)] px-3 py-2 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
         disabled={isPending}
         type="submit"
       >
         {isPending ? say("saving") : label}
       </button>
       <button
-        className="pressable rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground-secondary)]"
+        className="pressable rounded-full border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground-secondary)]"
         disabled={isPending}
         type="button"
         onClick={onCancel}

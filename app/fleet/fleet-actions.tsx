@@ -48,7 +48,7 @@ export function FleetBulkActions({
             {t("deleteForGood", { count })}
           </PendingButton>
         ) : (
-          <button className="inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--danger-line)] bg-white px-3 py-2 text-sm font-bold text-[var(--danger)]" onClick={() => setConfirming(true)} type="button">
+          <button className="inline-flex items-center justify-center gap-2 rounded-full border border-[var(--danger-line)] bg-white px-3 py-2 text-sm font-bold text-[var(--danger)]" onClick={() => setConfirming(true)} type="button">
             <Trash2 size={16} />
             {t("delete")}
           </button>
@@ -92,7 +92,7 @@ export function ConfirmDeleteVehicleButton({
       <PendingButton className="inline-flex h-8 items-center justify-center rounded-lg bg-[var(--danger)] px-2 text-xs font-bold text-white" pendingLabel="…" type="submit">
         {t("delete")}
       </PendingButton>
-      <button className="inline-flex h-8 items-center justify-center rounded-lg border border-[var(--border)] bg-white px-2 text-xs font-semibold" onClick={() => setConfirming(false)} type="button">
+      <button className="inline-flex h-8 items-center justify-center rounded-full border border-[var(--border)] bg-white px-2 text-xs font-semibold" onClick={() => setConfirming(false)} type="button">
         {t("keep")}
       </button>
     </form>

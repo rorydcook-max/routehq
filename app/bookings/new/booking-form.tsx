@@ -783,7 +783,7 @@ export function BookingForm({
           <Header icon={UserRound} eyebrow={say("stepN", { n: 2 })} title={say("selectCustomer")} />
           {/* Allow re-opening the skip modal */}
           <button
-            className="pressable mt-3 inline-flex items-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--muted)]"
+            className="pressable mt-3 inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--muted)]"
             hidden={bookingMode === "existing_rental"}
             onClick={handleSkipCustomer}
             type="button"
@@ -1179,7 +1179,7 @@ export function BookingForm({
                   <label htmlFor="delivery-datetime">{say("deliveryDateTime")}</label>
                   <span className="cursor-help text-[var(--muted)]" title={say("timeTooltip")}>ⓘ</span>
                 </div>
-                <button className="pressable mb-2 min-h-10 rounded-lg border border-[var(--primary)] bg-[var(--primary)] px-4 py-2 text-[13px] font-bold text-white" onClick={setHandoverNow} type="button">
+                <button className="pressable mb-2 min-h-10 rounded-full border border-[var(--primary)] bg-[var(--primary)] px-4 py-2 text-[13px] font-bold text-white" onClick={setHandoverNow} type="button">
                   {startsLater ? say("onStartDay") : say("now")}
                 </button>
                 <input className={inputClass} id="delivery-datetime" onChange={(event) => setDeliveryDateTime(event.target.value)} type="datetime-local" value={deliveryDateTime} />
@@ -1201,7 +1201,7 @@ export function BookingForm({
                   <label htmlFor="collection-datetime">{say("collectionTime")}</label>
                   <span className="cursor-help text-[var(--muted)]" title={say("timeTooltip")}>ⓘ</span>
                 </div>
-                <button className="pressable min-h-10 rounded-lg border border-[var(--primary)] bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white" onClick={setHandoverNow} type="button">
+                <button className="pressable min-h-10 rounded-full border border-[var(--primary)] bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white" onClick={setHandoverNow} type="button">
                   {startsLater ? say("onStartDay") : say("now")}
                 </button>
                 <input className={inputClass} id="collection-datetime" onChange={(event) => setCollectionTime(event.target.value)} type="datetime-local" value={collectionTime} />
@@ -1230,14 +1230,14 @@ export function BookingForm({
               </p>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
                 <button
-                  className="pressable min-h-11 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--foreground-secondary)]"
+                  className="pressable min-h-11 rounded-full border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--foreground-secondary)]"
                   onClick={submitBookingLink}
                   type="button"
                 >
                   {say("shareWithCustomer")}
                 </button>
                 <button
-                  className="pressable min-h-11 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white"
+                  className="pressable min-h-11 rounded-full bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white"
                   onClick={() => {
                     // The amounts follow the booking (a daily price is paid for the whole stay) until typed over.
                     setWalkInFastTrack(true);
@@ -1427,7 +1427,7 @@ export function BookingForm({
           </Link>
         ) : (
           <button
-            className="pressable min-h-12 flex-1 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white shadow-lg disabled:opacity-40 disabled:shadow-none"
+            className="pressable min-h-12 flex-1 rounded-full bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white shadow-lg disabled:opacity-40 disabled:shadow-none"
             disabled={isPending}
             key="submit"
             onClick={() => {
@@ -1547,7 +1547,7 @@ function BookingLinkSharePanel({ result }: { result: BookingShareResult | null }
       <p className="mt-1 text-sm leading-6 text-[var(--foreground-secondary)]">{say("nowSend")}</p>
 
       {canNativeShare ? (
-        <button className="pressable mt-3 inline-flex min-h-12 w-full items-center justify-center rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white" onClick={nativeShare} type="button">
+        <button className="pressable mt-3 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white" onClick={nativeShare} type="button">
           {say("sendToCustomer")}
         </button>
       ) : null}
@@ -1729,7 +1729,7 @@ function GooglePlaceInput({
         />
         {isEnabled ? (
           <button
-            className="pressable min-h-12 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--foreground-secondary)]"
+            className="pressable min-h-12 rounded-full border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--foreground-secondary)]"
             onClick={() => setPinModalOpen(true)}
             type="button"
           >
@@ -1849,11 +1849,11 @@ function GooglePinModal({
         <div className="mt-3 h-80 overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)]" ref={mapRef} />
         <p className="mt-3 text-sm font-semibold text-[var(--foreground-secondary)]">{address}</p>
         <div className="mt-3 flex gap-2">
-          <button className="pressable min-h-11 flex-1 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--foreground-secondary)]" onClick={onClose} type="button">
+          <button className="pressable min-h-11 flex-1 rounded-full border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--foreground-secondary)]" onClick={onClose} type="button">
             {say("cancel")}
           </button>
           <button
-            className="pressable min-h-11 flex-1 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white"
+            className="pressable min-h-11 flex-1 rounded-full bg-[var(--primary)] px-3 py-2 text-sm font-semibold text-white"
             onClick={() => onConfirm({ address, lat: pin.lat, lng: pin.lng, placeId })}
             type="button"
           >

@@ -355,7 +355,7 @@ function SignaturePad({
       <div className="mt-3 flex items-center justify-between gap-2">
         <p className="text-xs font-semibold text-[var(--muted)]">{value ? t("signatureCaptured") : t("signInBox")}</p>
         <button
-          className="rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold text-[var(--foreground-secondary)]"
+          className="rounded-full border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold text-[var(--foreground-secondary)]"
           onClick={() => {
             const canvas = canvasRef.current;
             const context = canvas?.getContext("2d");

@@ -56,7 +56,7 @@ export function AssignCustomerModal({
   return (
     <>
       <button
-        className="pressable inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-sm font-semibold text-[var(--foreground-secondary)]"
+        className="pressable inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-[var(--border)] bg-white px-4 py-3 text-sm font-semibold text-[var(--foreground-secondary)]"
         onClick={() => setOpen(true)}
         type="button"
       >
@@ -93,7 +93,7 @@ export function AssignCustomerModal({
                 <p className="rounded-xl bg-[var(--danger-light)] px-4 py-3 text-sm font-semibold text-[var(--danger)]">{error}</p>
               ) : null}
               <button
-                className="pressable inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white disabled:opacity-70"
+                className="pressable inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white disabled:opacity-70"
                 disabled={isPending || !selectedCustomer}
                 onClick={handleSubmit}
                 type="button"

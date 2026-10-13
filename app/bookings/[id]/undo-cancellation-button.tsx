@@ -115,7 +115,7 @@ export function UndoCancellationButton({
 
               <div className="flex gap-2">
                 <button
-                  className="pressable inline-flex min-h-10 flex-1 items-center justify-center rounded-xl border border-[var(--border)] bg-white px-4 text-sm font-bold text-[var(--foreground-secondary)]"
+                  className="pressable inline-flex min-h-10 flex-1 items-center justify-center rounded-full border border-[var(--border)] bg-white px-4 text-sm font-bold text-[var(--foreground-secondary)]"
                   disabled={isPending}
                   onClick={() => setOpen(false)}
                   type="button"
@@ -123,7 +123,7 @@ export function UndoCancellationButton({
                   {say("undo_back")}
                 </button>
                 <button
-                  className="pressable inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--primary)] px-4 text-sm font-semibold text-white disabled:opacity-70"
+                  className="pressable inline-flex min-h-10 flex-1 items-center justify-center gap-2 rounded-full bg-[var(--primary)] px-4 text-sm font-semibold text-white disabled:opacity-70"
                   disabled={isPending}
                   onClick={submit}
                   type="button"

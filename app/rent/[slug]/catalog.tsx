@@ -284,7 +284,7 @@ export function Catalog({
                   {/* Hidden from people; bots fill it in and are ignored. */}
                   <input aria-hidden="true" autoComplete="off" className="hidden" name="website" tabIndex={-1} />
                   {error ? <p className="text-sm font-semibold text-[var(--danger)]">{error}</p> : null}
-                  <button className="pressable min-h-12 w-full rounded-xl bg-[var(--primary)] px-4 text-sm font-semibold text-white disabled:opacity-60" disabled={isPending} type="submit">
+                  <button className="pressable min-h-12 w-full rounded-full bg-[var(--primary)] px-4 text-sm font-semibold text-white disabled:opacity-60" disabled={isPending} type="submit">
                     {isPending ? t("booking") : t("bookAndContinue")}
                   </button>
                   <p className="text-xs leading-5 text-[var(--muted)]">

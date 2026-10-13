@@ -69,7 +69,7 @@ export default async function DirectoryPage({ searchParams }: { searchParams: Pr
                 ))}
               </select>
             </label>
-            <button className="pressable mt-1 inline-flex min-h-[50px] items-center justify-center gap-2 self-end rounded-xl bg-[var(--primary)] px-5 text-[16px] font-semibold text-white" type="submit">
+            <button className="pressable mt-1 inline-flex min-h-[50px] items-center justify-center gap-2 self-end rounded-full bg-[var(--primary)] px-5 text-[16px] font-semibold text-white" type="submit">
               <Search size={18} /> {t("search")}
             </button>
           </form>
@@ -110,7 +110,7 @@ export default async function DirectoryPage({ searchParams }: { searchParams: Pr
                           {vehicle.quote.total !== null ? <span className="font-medium text-[var(--muted)]"> · {t("total", { amount: money(vehicle.quote.total, business.currency) })}</span> : null}
                         </p>
                         <p className="text-sm text-[var(--muted)]">{vehicle.deposit > 0 ? t("deposit", { amount: money(vehicle.deposit, business.currency) }) : t("noDeposit")}</p>
-                        <Link className="pressable mt-3 inline-flex min-h-11 items-center justify-center rounded-xl bg-[var(--primary)] px-4 text-sm font-semibold text-white" href={bookHref(business.slug, vehicle.id) as Route}>
+                        <Link className="pressable mt-3 inline-flex min-h-11 items-center justify-center rounded-full bg-[var(--primary)] px-4 text-sm font-semibold text-white" href={bookHref(business.slug, vehicle.id) as Route}>
                           {t("book")}
                         </Link>
                       </div>

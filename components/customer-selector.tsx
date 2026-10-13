@@ -181,7 +181,7 @@ export function CustomerSelector({
                     </div>
                   </div>
                   {error ? <p className="rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">{error}</p> : null}
-                  <button className="inline-flex w-full justify-center rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-bold text-white disabled:opacity-70" disabled={isPending} onClick={handleCreateCustomer} type="button">
+                  <button className="inline-flex w-full justify-center rounded-full bg-[var(--primary)] px-3 py-2 text-sm font-bold text-white disabled:opacity-70" disabled={isPending} onClick={handleCreateCustomer} type="button">
                     {isPending ? say("sel_creating") : say("sel_createSelect")}
                   </button>
                 </div>

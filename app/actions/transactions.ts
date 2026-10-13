@@ -482,12 +482,15 @@ export async function createTransaction(formData: FormData) {
   }
 
   const organizationId = String(formData.get("organizationId") || "");
-  const vehicleId = String(formData.get("vehicleId") || "");
+  const pickedVehicle = String(formData.get("vehicleId") || "");
   const type = normalizeTransactionType(formData.get("type"));
   const amount = numberField(formData, "amount");
   const transactionDate = optionalString(formData, "transactionDate") || businessToday();
+  // Money out can be a business cost (rent, phone, ads) that belongs to no vehicle.
+  const businessCost = pickedVehicle === "none" && !["rental_income", "charge_recovered", "deposit_received", "deposit_forfeited", "deposit_deduction"].includes(type) && !/refund|deposit/.test(type);
+  const vehicleId = businessCost ? null : pickedVehicle;
 
-  if (!organizationId || !vehicleId || amount === null || amount <= 0) {
+  if (!organizationId || (!vehicleId && !businessCost) || amount === null || amount <= 0) {
     throw new Error("Vehicle, type, and a positive amount are required.");
   }
 
@@ -510,7 +513,7 @@ export async function createTransaction(formData: FormData) {
     const storagePath = buildDocumentStoragePath({
       organizationId,
       ownerType: "transaction",
-      ownerId: vehicleId,
+      ownerId: vehicleId || organizationId,
       fileName: receipt.name || "receipt.upload"
     });
 
@@ -528,7 +531,7 @@ export async function createTransaction(formData: FormData) {
       .insert({
         organization_id: organizationId,
         owner_type: "transaction",
-        owner_id: vehicleId,
+        owner_id: vehicleId || organizationId,
         storage_bucket: "documents",
         storage_path: storagePath,
         file_name: receipt.name || "receipt.upload",
@@ -672,7 +675,7 @@ export async function createTransaction(formData: FormData) {
     detail: rentalPaymentId ? `Amount ${amount} THB linked to rental payment.` : `Amount ${amount} THB`
   });
 
-  if (type === "rental_income") {
+  if (type === "rental_income" && vehicleId) {
     const [vehicleRes, customerRes] = await Promise.all([
       supabase.from("vehicles").select("make, model, registration_number").eq("id", vehicleId).maybeSingle(),
       customerId ? supabase.from("customers").select("full_name").eq("id", customerId).maybeSingle() : Promise.resolve({ data: null })
@@ -685,7 +688,8 @@ export async function createTransaction(formData: FormData) {
 
   revalidatePath("/");
   revalidatePath("/transactions");
-  revalidatePath(`/fleet/${vehicleId}`);
+  if (vehicleId) revalidatePath(`/fleet/${vehicleId}`);
+  revalidatePath("/reports");
   if (rentalId) {
     revalidatePath(`/bookings/${rentalId}`);
   }

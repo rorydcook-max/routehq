@@ -178,7 +178,7 @@ export function CommunicationPanel({
               <div className="relative" key={channel.key}>
                 <button
                   aria-label={channel.label}
-                  className={`flex h-10 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-semibold bg-[var(--panel-secondary)] text-[var(--foreground-secondary)] transition hover:border-[var(--primary)] hover:text-[var(--primary)] ${
+                  className={`flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-full border px-4 text-sm font-semibold bg-[var(--panel-secondary)] text-[var(--foreground-secondary)] transition hover:border-[var(--primary)] hover:text-[var(--primary)] ${
                     preferred === channel.key ? "border-[var(--primary)] ring-2 ring-[var(--primary)]/25" : "border-[var(--border)]"
                   }`}
                   onClick={() => openExternal(channel)}

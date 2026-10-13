@@ -70,7 +70,7 @@ export function TeamMemberActions({ memberId, email, role, waiting }: { memberId
         ) : null}
         {sure ? (
           <>
-            <button className="pressable rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]" disabled={removing} onClick={remove} type="button">
+            <button className="pressable rounded-full border border-[var(--danger-line)] bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]" disabled={removing} onClick={remove} type="button">
               {say("team_removeSure")}
             </button>
             <button className="px-2 py-2 text-sm font-semibold text-[var(--muted)]" onClick={() => setSure(false)} type="button">

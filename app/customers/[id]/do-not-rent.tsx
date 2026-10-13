@@ -76,7 +76,7 @@ export function DoNotRent({
       </label>
       <p className="mt-2 text-sm text-[var(--muted)]">{say("dnr_hint")}</p>
       <div className="mt-3 flex gap-2">
-        <button className="pressable min-h-11 flex-1 rounded-lg bg-[var(--danger)] px-3 font-bold text-white disabled:opacity-60" disabled={pending} onClick={() => save(true)} type="button">
+        <button className="pressable min-h-11 flex-1 rounded-full bg-[var(--danger)] px-3 font-bold text-white disabled:opacity-60" disabled={pending} onClick={() => save(true)} type="button">
           {say("dnr_save")}
         </button>
         <button className="secondary-action pressable flex-1" onClick={() => setOpen(false)} type="button">

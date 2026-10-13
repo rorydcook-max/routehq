@@ -699,7 +699,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             {/* Two main actions side by side, More underneath: nothing wraps onto a second line. */}
             <div className="grid grid-cols-2 gap-2 [&>*]:min-w-0 [&>a]:flex [&>a]:w-full [&>details]:col-span-2 [&>button]:w-full [&>*>button]:w-full lg:flex lg:flex-wrap lg:[&>a]:w-auto lg:[&>details]:w-auto lg:[&>details_summary]:w-auto lg:[&>button]:w-auto lg:[&>*>button]:w-auto">
               {awaitingSignature ? (
-                <a className="pressable inline-flex min-h-9 min-w-fit items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-bold text-white shadow-sm" href="#send-link">
+                <a className="pressable inline-flex min-h-9 min-w-fit items-center justify-center gap-2 rounded-full bg-[var(--primary)] px-3 py-2 text-sm font-bold text-white shadow-sm" href="#send-link">
                   {tx.say("sendLink")}
                 </a>
               ) : null}
@@ -798,7 +798,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             <div className="mt-3 flex flex-wrap gap-2">
               {(swapForms || []).map((form: any) => (
                 <Link
-                  className="pressable inline-flex min-h-9 items-center justify-center rounded-lg bg-[var(--primary)] px-3 py-2 text-sm font-bold text-white shadow-sm"
+                  className="pressable inline-flex min-h-9 items-center justify-center rounded-full bg-[var(--primary)] px-3 py-2 text-sm font-bold text-white shadow-sm"
                   href={(form.action === "swap_handover" ? `/inspections/delivery/${rental.id}?swap=1` : `/inspections/return/${rental.id}?swap=1&vehicle=${form.vehicle_id}`) as Route}
                   key={form.id}
                 >
@@ -821,7 +821,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             </p>
             {/* Someone stuck at the roadside wants a phone call, not a typed reply. */}
             {customer?.phone && pendingPortalActions.some((action: any) => action.action_type === "problem_report") ? (
-              <a className="pressable mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white" href={`tel:${String(customer.phone).replace(/\s+/g, "")}`}>
+              <a className="pressable mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white" href={`tel:${String(customer.phone).replace(/\s+/g, "")}`}>
                 {tx.say("cp_call", { number: String(customer.phone) })}
               </a>
             ) : null}
@@ -1011,7 +1011,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                       {tx.say("startedOptional", { ago: startedAgoLabel(rental.start_date, tx) })}
                     </p>
                     <Link
-                      className="pressable mt-2 inline-flex items-center rounded-lg border border-[var(--warning-line)] bg-white px-3 py-2 text-xs font-bold text-[var(--warning)]"
+                      className="pressable mt-2 inline-flex items-center rounded-full border border-[var(--warning-line)] bg-white px-3 py-2 text-xs font-bold text-[var(--warning)]"
                       href={`/inspections/delivery/${rental.id}` as Route}
                     >
                       {tx.say("fillHandoverOptional")}
@@ -1057,7 +1057,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                       <>
                         <p className="mt-2 text-sm text-[var(--warning)]">{tx.say("wentOutWithout")}</p>
                         <Link
-                          className="pressable mt-2 inline-flex items-center rounded-lg border border-[var(--warning-line)] bg-white px-3 py-2 text-xs font-bold text-[var(--warning)]"
+                          className="pressable mt-2 inline-flex items-center rounded-full border border-[var(--warning-line)] bg-white px-3 py-2 text-xs font-bold text-[var(--warning)]"
                           href={`/inspections/delivery/${rental.id}` as Route}
                         >
                           {tx.say("fillHandoverOptional")}
@@ -1512,11 +1512,11 @@ function ComingUpCard({
             {nextPayment ? (
               <div className="mt-4">
                 {showRecordPayment ? (
-                  <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-lg bg-[var(--primary)] px-3 text-xs font-semibold text-white" href={`#record-payment-${nextPayment.id}` as Route}>
+                  <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-full bg-[var(--primary)] px-3 text-xs font-semibold text-white" href={`#record-payment-${nextPayment.id}` as Route}>
                     {tx.say("recordReceived")}
                   </Link>
                 ) : (
-                  <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-lg border border-[var(--border)] bg-white px-3 text-xs font-semibold text-[var(--primary)]" href={"#payment-schedule" as Route}>
+                  <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-full border border-[var(--border)] bg-white px-3 text-xs font-semibold text-[var(--primary)]" href={"#payment-schedule" as Route}>
                     {tx.say("viewSchedule")}
                   </Link>
                 )}

@@ -176,6 +176,9 @@ export function TransactionForm({
   }
 
   const isMoneyIn = MONEY_IN.includes(type);
+  // A shop's rent or a phone bill belongs to the business, not to one vehicle.
+  const canSkipVehicle = !isMoneyIn && !/refund|deposit/.test(type);
+  const noVehicle = vehicleId === "none";
   const linkedBadge = linkedRentalPaymentId ? say("linkedPayment") : linkedTaskId ? say("linkedTask") : "";
   const chooseDirection = (moneyIn: boolean) => {
     setFormOpen(true);
@@ -290,15 +293,17 @@ export function TransactionForm({
                 setRentalId("");
               }}
               required
-              value={vehicleId}
+              value={canSkipVehicle || !noVehicle ? vehicleId : ""}
             >
               <option value="">{say("selectVehicle")}</option>
+              {canSkipVehicle ? <option value="none">{say("noVehicle")}</option> : null}
               {options.vehicles.map((vehicle) => (
                 <option key={vehicle.id} value={vehicle.id}>
                   {vehicle.label}
                 </option>
               ))}
             </select>
+            {noVehicle && canSkipVehicle ? <span className="mt-1 block text-[14px] text-[var(--muted)]">{say("noVehicleHint")}</span> : null}
           </label>
 
           {/* A repair or a tank of fuel belongs to the vehicle, not to a booking or a customer: those two are only asked for money in and refunds. */}

@@ -1384,7 +1384,10 @@
     "extrasTag": "Extras",
     "extrasPart": "incl. {amount} extras",
     "type_finders_fee": "Finder's fee paid",
-    "type_finders_fee_income": "Finder's fee received"
+    "type_finders_fee_income": "Finder's fee received",
+    "noVehicle": "No vehicle (business cost)",
+    "noVehicleHint": "Rent, phone, ads, wages: counted in your totals, not against a vehicle.",
+    "businessCost": "Business cost"
   },
   "booking": {
     "open": "Open",
@@ -4013,7 +4016,9 @@
     "allMoneyHint": "Every entry, to search and filter",
     "viewList": "List",
     "viewGrid": "Tiles",
-    "rowRented": "{percent}% rented"
+    "rowRented": "{percent}% rented",
+    "businessCostsTitle": "Business costs",
+    "businessCostsHint": "Money out not tied to a vehicle: rent, phone, ads."
   },
   "auth": {
     "signInTitle": "Sign in",

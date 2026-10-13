@@ -24,10 +24,10 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
         </p>
         {error.digest ? <p className="mt-2 font-mono text-xs text-[var(--muted)]">{t("reference", { code: error.digest })}</p> : null}
         <div className="mt-4 flex flex-wrap gap-2">
-          <button className="rounded-md bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white" onClick={reset} type="button">
+          <button className="rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white" onClick={reset} type="button">
             {t("tryAgain")}
           </button>
-          <button className="rounded-md border border-[var(--border)] bg-white px-4 py-2 text-sm font-semibold text-[var(--foreground-secondary)]" onClick={() => window.history.back()} type="button">
+          <button className="rounded-full border border-[var(--border)] bg-white px-4 py-2 text-sm font-semibold text-[var(--foreground-secondary)]" onClick={() => window.history.back()} type="button">
             {t("goBack")}
           </button>
         </div>

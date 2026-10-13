@@ -113,13 +113,13 @@ export function PushToggle({ variant = "card" }: { variant?: "card" | "prompt" }
           )}
         </p>
         {state === "off" ? (
-          <button className="pressable shrink-0 rounded-lg bg-[var(--primary)] px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60" disabled={busy} onClick={turnOn} type="button">
+          <button className="pressable shrink-0 rounded-full bg-[var(--primary)] px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60" disabled={busy} onClick={turnOn} type="button">
             {t("turnOn")}
           </button>
         ) : null}
         <button
           aria-label={t("notNow")}
-          className="pressable shrink-0 rounded-lg px-2 py-1.5 text-xs font-semibold text-[var(--muted)]"
+          className="pressable shrink-0 rounded-full px-2 py-1.5 text-xs font-semibold text-[var(--muted)]"
           onClick={() => {
             window.localStorage.setItem(DISMISS_KEY, "1");
             setDismissed(true);

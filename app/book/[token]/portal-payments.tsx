@@ -236,12 +236,12 @@ function PaymentRow({
               ) : null}
               <div className="flex flex-wrap gap-2">
                 {orgPayment?.wise_link ? (
-                  <a className="pressable inline-flex min-h-10 items-center rounded-xl border border-[var(--border)] bg-white px-4 text-sm font-semibold text-[var(--foreground)]" href={orgPayment.wise_link} rel="noreferrer" target="_blank">
+                  <a className="pressable inline-flex min-h-10 items-center rounded-full border border-[var(--border)] bg-white px-4 text-sm font-semibold text-[var(--foreground)]" href={orgPayment.wise_link} rel="noreferrer" target="_blank">
                     {t("payWith", { app: "Wise" })}
                   </a>
                 ) : null}
                 {orgPayment?.revolut_link ? (
-                  <a className="pressable inline-flex min-h-10 items-center rounded-xl border border-[var(--border)] bg-white px-4 text-sm font-semibold text-[var(--foreground)]" href={orgPayment.revolut_link} rel="noreferrer" target="_blank">
+                  <a className="pressable inline-flex min-h-10 items-center rounded-full border border-[var(--border)] bg-white px-4 text-sm font-semibold text-[var(--foreground)]" href={orgPayment.revolut_link} rel="noreferrer" target="_blank">
                     {t("payWith", { app: "Revolut" })}
                   </a>
                 ) : null}
@@ -273,7 +273,7 @@ function PaymentRow({
               </select>
             </label>
             {error ? <p className="text-sm font-semibold text-[var(--danger)]">{error}</p> : null}
-            <button className="pressable min-h-12 w-full rounded-xl bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white disabled:opacity-60" disabled={isPending} type="submit">
+            <button className="pressable min-h-12 w-full rounded-full bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white disabled:opacity-60" disabled={isPending} type="submit">
               {isPending ? t("sending") : t("sendReceipt")}
             </button>
             <p className="flex items-start gap-2 text-xs leading-5 text-[var(--muted)]">
@@ -298,7 +298,7 @@ function CopyLine({ label, value, detail }: { label: string; value: string; deta
         {detail ? <p className="text-sm text-[var(--muted)]">{detail}</p> : null}
       </div>
       <button
-        className="pressable inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-xl border border-[var(--border)] px-3 text-sm font-semibold text-[var(--primary)]"
+        className="pressable inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full border border-[var(--border)] px-3 text-sm font-semibold text-[var(--primary)]"
         onClick={() => {
           navigator.clipboard?.writeText(value).then(() => {
             setCopied(true);

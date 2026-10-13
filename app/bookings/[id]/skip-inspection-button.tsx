@@ -54,7 +54,7 @@ export function SkipInspectionButton({ rentalId, early = null, canWaive = true }
         ) : null}
         <div className="flex gap-2">
           <button
-            className="pressable inline-flex min-h-7 items-center rounded-lg bg-[var(--warning)] px-3 text-xs font-bold text-white disabled:opacity-60"
+            className="pressable inline-flex min-h-7 items-center rounded-full bg-[var(--warning)] px-3 text-xs font-bold text-white disabled:opacity-60"
             disabled={isPending}
             onClick={handleConfirm}
             type="button"
@@ -62,7 +62,7 @@ export function SkipInspectionButton({ rentalId, early = null, canWaive = true }
             {isPending ? say("saving") : say("skip_yes")}
           </button>
           <button
-            className="pressable inline-flex min-h-7 items-center rounded-lg border border-[var(--border)] bg-white px-3 text-xs font-bold text-[var(--foreground-secondary)]"
+            className="pressable inline-flex min-h-7 items-center rounded-full border border-[var(--border)] bg-white px-3 text-xs font-bold text-[var(--foreground-secondary)]"
             disabled={isPending}
             onClick={() => setShowConfirm(false)}
             type="button"
@@ -77,7 +77,7 @@ export function SkipInspectionButton({ rentalId, early = null, canWaive = true }
   return (
     <>
       <button
-        className="pressable inline-flex w-full items-center justify-center rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold text-[var(--foreground-secondary)]"
+        className="pressable inline-flex w-full items-center justify-center rounded-full border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold text-[var(--foreground-secondary)]"
         onClick={() => setShowConfirm(true)}
         type="button"
       >

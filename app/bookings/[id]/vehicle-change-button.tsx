@@ -101,7 +101,7 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
   return (
     <>
       <button
-        className="pressable inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--foreground-secondary)]"
+        className="pressable inline-flex min-h-9 items-center justify-center gap-2 rounded-full border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--foreground-secondary)]"
         onClick={load}
         type="button"
       >

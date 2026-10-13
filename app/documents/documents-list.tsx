@@ -108,10 +108,19 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
             const first = row.documents[0];
             return (
               <div className="card p-4" key={row.key}>
+                <div className="lg:flex lg:items-center lg:justify-between lg:gap-4">
+                <div className="min-w-0">
                 <p className="text-[16px] font-bold text-[var(--foreground)]">{ownerLabel(first)}</p>
                 <p className="font-medium text-[var(--foreground-secondary)]">
                   {say("photoCount", { count: row.documents.length })} · {longDate(first.createdAt, locale)}
                 </p>
+                </div>
+                {first.href ? (
+                  <Link className="secondary-action pressable !hidden shrink-0 whitespace-nowrap lg:!inline-flex" href={first.href as any}>
+                    {say(first.inspectionType === "condition" ? "openVehicle" : "openBooking")}
+                  </Link>
+                ) : null}
+                </div>
                 <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
                   {row.documents.map((document) =>
                     document.signedUrl ? (
@@ -123,7 +132,7 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
                   )}
                 </div>
                 {first.href ? (
-                  <Link className="secondary-action pressable mt-3 w-full sm:w-auto" href={first.href as any}>
+                  <Link className="secondary-action pressable mt-3 w-full sm:w-auto lg:!hidden" href={first.href as any}>
                     {say(first.inspectionType === "condition" ? "openVehicle" : "openBooking")}
                   </Link>
                 ) : null}
@@ -132,8 +141,8 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
           }
           const document = row.document;
           return (
-            <div className="card p-4" key={document.id}>
-              <div className="flex items-start gap-3">
+            <div className="card p-4 lg:flex lg:items-center lg:justify-between lg:gap-4" key={document.id}>
+              <div className="flex min-w-0 items-start gap-3 lg:items-center">
                 {document.mimeType?.startsWith("image/") && document.signedUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img alt="" className="h-12 w-12 shrink-0 rounded-xl object-cover" loading="lazy" src={document.signedUrl} />
@@ -154,7 +163,7 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
                   </p>
                 </div>
               </div>
-              <div className="mt-3 flex gap-2 [&>*]:flex-1 sm:[&>*]:flex-none">
+              <div className="mt-3 flex gap-2 lg:mt-0 lg:shrink-0 [&>*]:flex-1 [&>*]:whitespace-nowrap sm:[&>*]:flex-none">
                 {document.signedUrl ? (
                   <a className="primary-action pressable" href={document.signedUrl} rel="noreferrer" target="_blank">
                     <ExternalLink size={18} />

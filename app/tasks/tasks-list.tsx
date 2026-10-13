@@ -422,7 +422,7 @@ function TaskRow({ item, organizationId, today, siblings = [], canDecide = true 
           ) : null}
         </div>
       </div>
-      <div className="min-w-0">
+      <div className="min-w-0 empty:hidden">
           {coversSeveral ? (
             <p className="mt-0.5 text-sm text-[var(--foreground-secondary)]">
               {[item, ...siblings].filter((entry) => receipt.paymentIds.includes(entry.rentalPaymentId || "")).map((entry) => `${payText(entry, "pay", tx)} ${money(entry.amount || 0)}`).join(" + ")}
@@ -433,7 +433,7 @@ function TaskRow({ item, organizationId, today, siblings = [], canDecide = true 
               {tx.say("receiptSent", { method: methodLabel(receipt.method, tx), day: dayLabel(new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date(receipt.submittedAt)), today, tx) })}
             </p>
           ) : null}
-          {receiptError ? <p className="mt-1 text-xs font-semibold text-[var(--danger)]">{receiptError}</p> : null}
+          {receiptError ? <p className="mt-1 text-[14px] font-semibold text-[var(--danger)]">{receiptError}</p> : null}
           {waitsForDecider ? <p className="mt-1 font-semibold text-[var(--foreground-secondary)]">{tx.say("decidedByOwner")}</p> : null}
           {waiverError ? <p className="mt-1 font-semibold text-[var(--danger)]">{waiverError}</p> : null}
           {recording && item.rentalPaymentId ? (
@@ -458,9 +458,9 @@ function TaskRow({ item, organizationId, today, siblings = [], canDecide = true 
       </div>
 
       {/* Buttons share the full card width so a row of two or three never breaks onto a second line. */}
-      <div className="flex items-center gap-2 [&>*]:min-w-0 [&>*]:flex-1 [&>a]:justify-center [&>button]:justify-center [&_button]:w-full [&_form]:min-w-0 [&_form]:flex-1 lg:shrink-0 lg:[&>*]:flex-none lg:[&_button]:w-auto">
+      <div className="flex items-center gap-2 [&>*]:min-w-0 [&>*]:flex-1 [&>a]:justify-center [&>button]:justify-center [&_button]:w-full [&_form]:min-w-0 [&_form]:flex-1 lg:min-w-[19rem] lg:shrink-0 lg:justify-end lg:[&>*]:flex-none lg:[&_button]:w-auto">
         {receipt?.url ? (
-          <a className="secondary-action pressable min-h-9 px-3 text-xs" href={receipt.url} rel="noreferrer" target="_blank">
+          <a className="secondary-action pressable min-h-9 px-3 text-[14px]" href={receipt.url} rel="noreferrer" target="_blank">
             {tx.say("viewReceipt")}
           </a>
         ) : null}

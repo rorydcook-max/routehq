@@ -404,7 +404,9 @@
     "earlyAskFree": "No charge, if the owner or a manager agrees: the charge waits for them and isn't collected now",
     "removeDamage": "Remove this damage",
     "gpsLastSeen": "{provider} · last seen {when}",
-    "gpsNever": "never"
+    "gpsNever": "never",
+    "blockerOpenOther": "Open {code}",
+    "blockerChangeVehicle": "Change the vehicle"
   },
   "translation": {
     "translatedFrom": "Translated from {language}",

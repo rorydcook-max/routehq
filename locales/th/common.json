@@ -388,7 +388,9 @@
     "earlyAskFree": "ไม่คิดเงิน ถ้าเจ้าของหรือผู้จัดการตกลง: ยอดนี้รอให้พวกเขาตัดสินใจ ยังไม่ต้องเก็บตอนนี้",
     "removeDamage": "ลบรายการความเสียหายนี้",
     "gpsLastSeen": "{provider} · เห็นล่าสุด {when}",
-    "gpsNever": "ไม่เคย"
+    "gpsNever": "ไม่เคย",
+    "blockerOpenOther": "เปิด {code}",
+    "blockerChangeVehicle": "เปลี่ยนรถ"
   },
   "translation": {
     "translatedFrom": "แปลจาก {language}",

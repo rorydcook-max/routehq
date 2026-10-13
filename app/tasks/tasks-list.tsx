@@ -334,10 +334,10 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
         <span>{tx.say("tellCustomer")}</span>
       </label>
       <div className="mt-3 flex flex-wrap items-center gap-2">
-        <button className="primary-action pressable min-h-9 px-4 text-xs" disabled={isPending} onClick={save} type="button">
+        <button className="primary-action stay-primary pressable min-h-10 whitespace-nowrap px-4 text-[14px]" disabled={isPending} onClick={save} type="button">
           {isPending ? tx.say("saving") : received > 0 ? tx.say("recordAmount", { amount: money(received) }) : tx.say("recordPayment")}
         </button>
-        <button className="secondary-action pressable min-h-9 px-4 text-xs" disabled={isPending} onClick={onClose} type="button">
+        <button className="secondary-action pressable min-h-10 whitespace-nowrap px-4 text-[14px]" disabled={isPending} onClick={onClose} type="button">
           {tx.say("cancel")}
         </button>
         {receipt ? (

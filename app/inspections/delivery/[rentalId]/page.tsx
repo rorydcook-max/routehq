@@ -21,6 +21,7 @@ export default async function DeliveryInspectionPage({ params, searchParams }: {
   // A booking sent to the customer that they have not signed yet: say so before the keys change hands.
   let unsigned = false;
   let blocker: string | null = null;
+  let blockerLinks: { otherRentalId: string; code: string } | null = null;
   if (query.swap !== "1" && String((context as any).rental?.status || "") === "booked") {
     const supabase = (await createSupabaseServerClient()) as any;
     const { data: links } = await supabase.from("booking_links").select("contract_signed_at").eq("rental_id", rentalId).is("deleted_at", null);
@@ -29,6 +30,7 @@ export default async function DeliveryInspectionPage({ params, searchParams }: {
     const rental = (context as any).rental;
     const inWay = await earlyHandoverBlocker(supabase, { organizationId: organization.id, vehicleId: String((context as any).vehicle?.id || rental?.vehicle_id || ""), rentalId, startDate: rental?.start_date, endDate: rental?.end_date || null, today: businessToday() });
     if (inWay) {
+      blockerLinks = { otherRentalId: inWay.rentalId, code: inWay.code || "" };
       const [t, locale] = await Promise.all([getTranslations("inspection"), getLocale()]);
       const today = businessToday();
       blocker =
@@ -40,7 +42,7 @@ export default async function DeliveryInspectionPage({ params, searchParams }: {
 
   return (
     <AppShell userEmail={userEmail}>
-      <InspectionForm blocker={blocker} canWaive={canDecideMoney(membership?.role)} context={context} unsigned={unsigned} />
+      <InspectionForm blocker={blocker} blockerLinks={blockerLinks} canWaive={canDecideMoney(membership?.role)} context={context} unsigned={unsigned} />
     </AppShell>
   );
 }

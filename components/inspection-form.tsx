@@ -373,7 +373,7 @@ function SignaturePad({
   );
 }
 
-export function InspectionForm({ context, unsigned = false, blocker = null, canWaive = true }: { context: InspectionContext; /** Owners can give early days for free; teammates charge them or keep the length. */ canWaive?: boolean; /** The customer has not signed the agreement yet. */ unsigned?: boolean; /** Why the handover cannot go ahead right now (another customer still has the vehicle). */ blocker?: string | null }) {
+export function InspectionForm({ context, unsigned = false, blocker = null, blockerLinks = null, canWaive = true }: { context: InspectionContext; /** The booking in the way, so the owner can go straight to it. */ blockerLinks?: { otherRentalId: string; code: string } | null; /** Owners can give early days for free; teammates charge them or keep the length. */ canWaive?: boolean; /** The customer has not signed the agreement yet. */ unsigned?: boolean; /** Why the handover cannot go ahead right now (another customer still has the vehicle). */ blocker?: string | null }) {
   const t = useTranslations("inspection");
   const locale = useLocale();
   const areaName = (location: string) => {
@@ -807,7 +807,15 @@ export function InspectionForm({ context, unsigned = false, blocker = null, canW
                   <p className="mt-2 rounded-lg bg-[var(--warning-light)] px-3 py-2 text-sm font-semibold text-[var(--warning)]">{t("startsLaterNote", { date: formatDate(context.rental.start_date, locale) })}</p>
                 ) : null}
                 {blocker ? (
-                  <p className="mt-2 rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-bold text-[var(--danger)]">{blocker}</p>
+                  <div className="mt-2 rounded-xl bg-[var(--danger-light)] px-3 py-2.5">
+                    <p className="font-bold text-[var(--danger)]">{blocker}</p>
+                    {blockerLinks ? (
+                      <div className="mt-2.5 flex flex-wrap gap-2">
+                        <a className="secondary-action pressable min-h-10 whitespace-nowrap px-4 text-[14px]" href={`/bookings/${blockerLinks.otherRentalId}`}>{t("blockerOpenOther", { code: blockerLinks.code })}</a>
+                        {context.rental?.id ? <a className="secondary-action pressable min-h-10 whitespace-nowrap px-4 text-[14px]" href={`/bookings/${context.rental.id}`}>{t("blockerChangeVehicle")}</a> : null}
+                      </div>
+                    ) : null}
+                  </div>
                 ) : null}
                 {mode === "delivery" && unsigned ? (
                   <p className="mt-2 rounded-lg bg-[var(--warning-light)] px-3 py-2 text-sm font-semibold text-[var(--warning)]">{t("notSignedNote")}</p>

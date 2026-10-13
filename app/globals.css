@@ -1127,7 +1127,7 @@ body {
 }
 
 /* Jobs that are not due yet keep their buttons quiet, so the solid ones mean "now". */
-.calm-actions .primary-action {
+.calm-actions .primary-action:not(.stay-primary) {
   background: var(--panel);
   border: 2px solid var(--border-strong);
   color: var(--foreground);

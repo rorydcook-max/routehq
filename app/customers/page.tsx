@@ -1,6 +1,6 @@
 import { CustomerList } from "@/app/customers/customer-list";
 import { AppShell } from "@/components/app-shell";
-import { PageBand } from "@/components/page-band";
+import { BandPills, PageBand } from "@/components/page-band";
 import { getTranslations } from "next-intl/server";
 import { Plus } from "lucide-react";
 import { getCurrentUserEmail } from "@/lib/auth/session";
@@ -15,7 +15,17 @@ export default async function CustomersPage() {
   return (
     <AppShell
       userEmail={userEmail}
-      hero={<PageBand action={{ href: "/customers/new", label: say("add"), icon: <Plus size={16} /> }} subtitle={say("subtitle")} title={say("title")} />}
+      hero={
+        <PageBand action={{ href: "/customers/new", label: say("add"), icon: <Plus size={16} /> }} title={say("title")}>
+          <BandPills
+            items={[
+              { count: customers.length, label: say("pillAll") },
+              { count: customers.filter((item) => (item.activeRentals || []).some((rental: any) => rental.status !== "booked")).length, label: say("pillRenting"), dot: "var(--on-rent)" },
+              { count: customers.filter((item) => item.documentStatus !== "complete").length, label: say("pillDocs"), alert: true }
+            ]}
+          />
+        </PageBand>
+      }
     >
       <CustomerList customers={customers} />
     </AppShell>

@@ -16,10 +16,18 @@ export function PageTabs({ tabs, initial, aliases = {}, label }: { tabs: PageTab
   useEffect(() => {
     const fromHash = (scroll: boolean) => {
       const raw = decodeURIComponent(window.location.hash.replace(/^#/, ""));
+      if (!raw) return;
       const id = aliases[raw] || raw;
-      if (!tabs.some((tab) => tab.id === id)) return;
-      setActive(id);
-      if (scroll) bar.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (tabs.some((tab) => tab.id === id)) {
+        setActive(id);
+        if (scroll) bar.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+      const target = document.getElementById(raw);
+      const panel = target?.closest<HTMLElement>('[role="tabpanel"]');
+      if (!target || !panel) return;
+      setActive(panel.id.replace(/^panel-/, ""));
+      window.setTimeout(() => target.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
     };
     fromHash(Boolean(window.location.hash));
     const onHash = () => fromHash(true);

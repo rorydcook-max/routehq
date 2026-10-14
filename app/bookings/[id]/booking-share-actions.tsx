@@ -102,17 +102,17 @@ export function BookingShareActions({
   return (
     <div className="space-y-3">
       {link ? (
-        <div className="rounded-lg border border-[var(--border)] bg-white p-3">
-          <p className="text-xs font-bold uppercase text-[var(--muted)]">{formDone ? say("share_pageLabel") : say("share_linkLabel")}</p>
+        <div className="rounded-xl bg-[var(--panel-secondary)] p-3">
+          <p className="font-semibold text-[var(--muted)]">{formDone ? say("share_pageLabel") : say("share_linkLabel")}</p>
           <p className="mt-1 break-all text-sm font-bold text-[var(--foreground)]">{link}</p>
         </div>
       ) : null}
       <div className="flex flex-col gap-2 sm:flex-row">
-        <button className={`pressable inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold disabled:opacity-70 ${formDone ? "border border-[var(--border)] bg-white text-[var(--foreground-secondary)]" : "bg-[var(--primary)] text-white"}`} disabled={isPending} onClick={() => resend("share")} type="button">
+        <button className={`${formDone ? "secondary-action" : "primary-action"} pressable flex-1 whitespace-nowrap disabled:opacity-70`} disabled={isPending} onClick={() => resend("share")} type="button">
           {isPending ? <span className="spinner" /> : <MessageCircle size={18} />}
           {!link ? say("share_create") : formDone ? say("share_sendPage") : say("share_resend")}
         </button>
-        <button className="pressable inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full border border-[var(--border)] bg-white px-4 py-3 text-sm font-semibold text-[var(--foreground-secondary)] disabled:opacity-70" disabled={isPending || !link} onClick={copyCurrentLink} type="button">
+        <button className="secondary-action pressable flex-1 whitespace-nowrap disabled:opacity-70" disabled={isPending || !link} onClick={copyCurrentLink} type="button">
           {isPending ? <RotateCcw size={18} /> : <Copy size={18} />}
           {say("share_copy")}
         </button>

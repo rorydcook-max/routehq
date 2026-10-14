@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { canDecideMoney, getCurrentMembership } from "@/lib/auth/roles";
 import type { Route } from "next";
-import { AlertTriangle, ArrowRight, Car, CheckCircle2, Clock, CreditCard, FileText, Gauge, MapPin, UserRound } from "lucide-react";
+import { AlertTriangle, ArrowRight, Car, CheckCircle2, Clock, CreditCard, FileText, Gauge, MapPin, UserRound, ArrowDownLeft, ArrowUpRight } from "lucide-react";
 import { CancelBookingButton } from "@/app/bookings/[id]/cancel-booking-button";
 import { VehicleChangeButton } from "@/app/bookings/[id]/vehicle-change-button";
 import { UnsentMessages } from "@/app/bookings/[id]/unsent-messages";
-import { activityTitle, visibleActivity } from "@/lib/activity-display";
+import { activityTitle, tidyDetail, visibleActivity } from "@/lib/activity-display";
 import { UndoCancellationButton } from "@/app/bookings/[id]/undo-cancellation-button";
 import { confirmCustomerPayment } from "@/app/actions/deposits";
 import { PaymentReminderButton } from "@/app/bookings/[id]/payment-reminder-button";
@@ -33,7 +33,8 @@ import { CommunicationPanel } from "@/components/communication-panel";
 import { BookingDatesButton, RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
 import { InspectionViewer } from "@/components/inspection-viewer";
 import { PendingButton } from "@/components/pending-button";
-import { Badge, Card, Fold, SectionHeader } from "@/components/ui";
+import { Badge, Card, Pane, SectionHeader } from "@/components/ui";
+import { PageTabs } from "@/components/page-tabs";
 import { OpenOnHash } from "@/components/open-on-hash";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getBookingDetail, getCustomersForSelector } from "@/lib/bookings";
@@ -551,6 +552,17 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             ? "text-[var(--info)]"
             : "text-[var(--muted)]";
 
+  // The tab that opens first is the one that needs a look: the customer still to finish, money owed, a deposit to settle.
+  const firstTab =
+    !isClosed && (!customer || (Boolean(bookingLink) && String(bookingLink?.status || "") !== "completed"))
+      ? "customer"
+      : overduePaymentGroup.length + dueNowPaymentGroup.length > 0 || Boolean(customerReportedPayment)
+        ? "payments"
+        : (payments as any[]).some((payment) => payment.metadata?.early_return && !payment.metadata.early_return.settled) ||
+            (isClosed && !isCancelled && Number(rental.deposit_held || 0) - Number(rental.deposit_refunded_amount || 0) - Number(rental.deposit_forfeited_amount || 0) > 0)
+          ? "deposit"
+          : "overview";
+
   return (
     <AppShell userEmail={userEmail}>
       <OpenOnHash />
@@ -839,149 +851,19 @@ export default async function BookingDetailPage({ params, searchParams }: { para
 
         {/* Mileage moved under Vehicle and the customer's details under Customer; the header carries the two numbers that matter. */}
 
-        <div className="grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[minmax(0,3fr)_minmax(320px,2fr)]">
-          <div className="space-y-3">
-            <Fold
-              id="booking-link"
-              open={Boolean(bookingLink) && String(bookingLink?.status || "") !== "completed" && !isClosed}
-              summary={!bookingLink ? tx.say("link_notCreated") : String(bookingLink.status || "") === "completed" ? tx.say("link_finished") : isCancelled ? tx.say("link_closed") : tx.say("link_waiting")}
-              title={tx.say("linkTitle")}
-              tone={bookingLink && String(bookingLink.status || "") !== "completed" && !isClosed ? "amber" : "neutral"}
-            >
-              {!bookingLink ? (
-                <p className="text-sm text-[var(--muted)]">
-                  {tx.say("link_teamBody")}
-                </p>
-              ) : null}
-              {(() => {
-                const steps = bookingLink ? timelineSteps(bookingLink, rentalDocuments) : [];
-                if (steps.length === 0) return null;
-                const allDone = steps.every((step) => step.complete);
-                const list = (
-                  <div className="mt-3 space-y-3">
-                    {steps.map((step) => (
-                      <div className="sub-surface flex items-start gap-3 p-3" key={step.key}>
-                        <span className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${step.complete ? "bg-[var(--success-light)] text-[var(--success)]" : "bg-[var(--panel-secondary)] text-[var(--muted)]"}`}>
-                          {step.complete ? <CheckCircle2 size={16} /> : <Clock size={16} />}
-                        </span>
-                        <div>
-                          <p className="font-semibold text-[var(--foreground)]">{tx.say(`step_${step.key}`)}</p>
-                          <p className="text-sm text-[var(--muted)]">{step.at ? formatDateTime(step.at, tx) : tx.say("notYet")}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                );
-                // Once the customer has done everything, the steps are history: one line, open on request.
-                return allDone ? (
-                  <details className="mt-3">
-                    <summary className="flex cursor-pointer items-center gap-2 rounded-lg border border-[var(--success-line)] bg-[var(--success-light)] p-3 text-sm font-semibold text-[var(--success)]">
-                      <CheckCircle2 size={16} />
-                      {tx.say("allDone", { date: formatDate(String(steps[steps.length - 1].at || ""), tx) })}
-                    </summary>
-                    {list}
-                  </details>
-                ) : (
-                  list
-                );
-              })()}
-              {/* A cancelled booking's link only tells the customer it was cancelled: nothing to send. */}
-              {isCancelled ? null : (
-                <div className="mt-3">
-                  <div className="scroll-mt-4" id="send-link" />
-                <BookingShareActions currentUrl={bookingLink?.public_url || null} formDone={String(bookingLink?.status || "") === "completed"} organizationId={organization.id} rentalId={rental.id} />
-                </div>
-              )}
-            </Fold>
-
-            {isCancelled && !customer ? null : (
-            <Fold
-              open={!customer || customer.document_status !== "complete"}
-              summary={customer ? `${customer.full_name} · ${documentLabel(customer.document_status, tx)}` : tx.list("awaitingCustomer")}
-              title={tx.say("custDocsTitle")}
-              tone={!customer || customer.document_status !== "complete" ? "amber" : "neutral"}
-            >
-              {customer ? (
-                <>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <Info icon={UserRound} label={tx.say("name")} value={customer?.full_name || tx.say("notRecorded")} />
-                    <Info icon={UserRound} label={tx.say("phone")} value={customer?.phone || tx.say("notRecorded")} />
-                    <Info icon={UserRound} label={tx.say("email")} value={customer?.email || tx.say("notRecorded")} />
-                    <Info icon={FileText} label={tx.say("documents")} value={documentLabel(customer?.document_status, tx)} danger={customer?.document_status !== "complete"} />
-                  </div>
-                  <div className="mt-3 grid gap-2 sm:grid-cols-3">
-                    {["passport", "driver_license", "selfie"].map((category) => {
-                      const found = customerDocuments.some((document: any) => document.category === category);
-                      return (
-                        <div className="flex items-center gap-2 rounded-lg border border-[var(--border)] bg-white p-3" key={category}>
-                          {found ? <CheckCircle2 className="text-[var(--success)]" size={18} /> : <AlertTriangle className="text-[var(--warning)]" size={18} />}
-                          <span className="text-sm font-bold text-[var(--foreground)]">{tx.say(`doc_${category}`)}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </>
-              ) : (
-                <div className="space-y-3">
-                  <div className="rounded-lg border border-[var(--info-line)] bg-[var(--panel-secondary)] p-3">
-                    <div className="flex items-start gap-2">
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)]">
-                        <Clock className="text-[var(--primary)]" size={16} />
-                      </span>
-                      <p className="text-sm leading-6 text-[var(--primary)]">{tx.say("awaitingBody")}</p>
-                    </div>
-                  </div>
-                  <AssignCustomerModal
-                    customers={allCustomers}
-                    organizationId={organization.id}
-                    rentalId={rental.id}
-                  />
-                </div>
-              )}
-            </Fold>
-            )}
-
-            {customer ? (
-              <Card>
-                <SectionHeader eyebrow={tx.say("commEyebrow")} title={tx.say("commTitle")} />
-                <div className="mt-3">
-                  <CommunicationPanel
-                    booking={{
-                      vehicle_id: vehicle?.id || null,
-                      vehicle_make_model: vehicleTitle(vehicle),
-                      vehicle_plate: vehicle?.registration_number || null,
-                      rental_status: rental.status,
-                      end_date: rental.end_date,
-                      outstanding_balance: pendingPaymentAmount,
-                      deposit_held: Number(rental.deposit_held || 0)
-                    }}
-                    bookingPortalUrl={bookingPortalUrl}
-                    businessName={organization.name || "RouteHQ"}
-                    customer={{
-                      id: customer.id,
-                      name: customer.full_name,
-                      email: customer.email,
-                      phone: customer.phone,
-                      whatsapp_number: customer.whatsapp_number,
-                      messenger_id: customer.messenger_id,
-                      line_id: customer.line_id,
-                      telegram_username: customer.telegram_username,
-                      instagram_handle: customer.instagram_handle,
-                      preferred_contact_method: customer.preferred_contact_method
-                    }}
-                    customerId={customer.id}
-                    hideSummary
-                    organisationId={organization.id}
-                    rentalId={rental.id}
-                    revalidatePathname={`/bookings/${rental.id}`}
-                  />
-                </div>
-              </Card>
-            ) : null}
-
-            <Card>
-              <SectionHeader eyebrow={tx.say("inspEyebrow")} title={tx.say("inspTitle")} />
-              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <PageTabs
+          aliases={{ "send-link": "customer", "booking-link": "customer", amendment: "overview" }}
+          initial={firstTab}
+          label={tx.say("tab_label")}
+          tabs={[
+            {
+              id: "overview",
+              label: tx.say("tab_overview"),
+              content: (
+                <div className="grid items-start gap-3 lg:grid-cols-2">
+                  <div className="grid gap-3">
+            <Pane title={tx.say("inspTitle")}>
+              <div className="grid gap-3 sm:grid-cols-2">
                 {deliveryInspection ? (
                   <InspectionStatus label={tx.say("handoverForm")} inspection={deliveryInspection} href={`/inspections/delivery/${rental.id}` as Route} available={false} />
                 ) : isRetrospective && rental.status === "booked" ? (
@@ -1087,119 +969,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   </div>
                 </details>
               )}
-            </Card>
-
-            <Fold
-              summary={(communicationTimeline || []).length === 0 ? tx.say("nothingYet") : tx.say("entries", { count: (communicationTimeline || []).length })}
-              title={tx.say("msgsTitle")}
-            >
-              <CommunicationTimeline
-                customerId={customer?.id || null}
-                entries={communicationTimeline || []}
-                organizationId={organization.id}
-                pendingActions={[]}
-                hiddenActionIds={pendingPortalActions.map((action: any) => action.id)}
-                rentalId={rental.id}
-              />
-              {/* The full history lives under the messages: one place for everything that has happened, not two rows on the page. */}
-              <details className="mt-4">
-                <summary className="cursor-pointer py-1 text-sm font-semibold text-[var(--primary)]">
-                  {tx.say("historyTitle")} · {tx.say("entries", { count: visibleActivity(activityEvents).length })}
-                </summary>
-              <div className="mt-3 space-y-3">
-                {visibleActivity(activityEvents).length === 0 ? (
-                  <SectionEmpty>{tx.say("noActivity")}</SectionEmpty>
-                ) : (
-                  visibleActivity(activityEvents as any[]).map((event: any) => (
-                  <div className="sub-surface p-3" key={event.id}>
-                      <p className="font-semibold text-[var(--foreground)]">{activityTitle(event, tx.say as any)}</p>
-                      {/* The stored detail is an English sentence: shown to English readers only. */}
-                      {tx.locale === "en" && event.detail ? <p className="mt-1 text-sm text-[var(--muted)]">{event.detail}</p> : null}
-                      <p className="mt-2 text-xs font-bold uppercase text-[var(--muted)]">{formatDateTime(event.occurred_at, tx)}</p>
-                    </div>
-                  ))
-                )}
-              </div>
-              </details>
-            </Fold>
-          </div>
-
-          {/* Phones read top to bottom: money and deposit come before the paperwork. */}
-          <div className="order-first space-y-3 lg:order-none">
-            <Fold
-              open={Boolean(customerReportedPayment) || (isClosed && !isCancelled && Number(rental.deposit_held || 0) - Number(rental.deposit_refunded_amount || 0) - Number(rental.deposit_forfeited_amount || 0) > 0) || (payments as any[]).some((payment) => payment.metadata?.early_return && !payment.metadata.early_return.settled)}
-              summary={tx.say("vehDepSummary", { vehicle: vehicleTitle(vehicle), deposit: formatDepositSummary(rental, tx) })}
-              title={tx.say("vehDepTitle")}
-            >
-              <div className="space-y-3 text-sm">
-                <Info icon={Car} label={tx.say("vehicle")} value={`${vehicleTitle(vehicle)} / ${vehicle?.registration_number || ""}`} />
-                <Info
-                  icon={Gauge}
-                  label={tx.say("mileage")}
-                  value={
-                    rental.mileage_at_delivery == null && rental.mileage_at_return != null
-                      ? tx.say("kmAtReturn", { km: Number(rental.mileage_at_return).toLocaleString("en-US") })
-                      : rental.mileage_at_delivery == null
-                        ? isCancelled ? tx.say("neverHandedOver") : isClosed ? tx.say("notRecorded") : tx.say("recordedAtHandover")
-                        : rental.mileage_at_return == null
-                          ? tx.say("kmAtHandover", { km: Number(rental.mileage_at_delivery).toLocaleString("en-US") })
-                          : `${tx.say("kmDriven", { km: Number(rental.km_driven ?? Number(rental.mileage_at_return) - Number(rental.mileage_at_delivery)).toLocaleString("en-US") })} · ${Number(rental.mileage_at_delivery).toLocaleString()} → ${Number(rental.mileage_at_return).toLocaleString("en-US")}`
-                  }
-                />
-                {deliveryInspection ? (
-                  <Info icon={MapPin} label={tx.say("handover")} value={tx.say("handedOver", { when: formatDateTime(deliveryInspection.submitted_at || deliveryInspection.created_at, tx) })} />
-                ) : isCancelled || (rental.entered_by_operator && delivery.undecided) ? null : (
-                  <DeliveryInfo delivery={delivery} />
-                )}
-                {isCancelled && !deliveryInspection ? null : (
-                  <Info
-                    icon={MapPin}
-                    label={tx.say("return")}
-                    value={
-                      returnInspection
-                        ? `${tx.say("returnedAt", { when: formatDateTime(returnInspection.submitted_at || returnInspection.created_at, tx) })}${rental.return_location ? ` · ${rental.return_location}` : ""}`
-                        : rental.return_location || (rental.end_date ? tx.say("notArranged") : tx.say("noReturnDate"))
-                    }
-                  />
-                )}
-                <Info icon={CreditCard} label={tx.say("deposit")} value={formatDepositSummary(rental, tx)} />
-                <div className="scroll-mt-4" id="refunds" />
-                <RefundDepositPanel
-                  rentalId={rental.id}
-                  organizationId={organization.id}
-                  vehicleId={String(rental.vehicle_id || vehicle?.id || "")}
-                  depositHeld={Number(rental.deposit_held || 0)}
-                  depositRefunded={Number(rental.deposit_refunded_amount || 0)}
-                  depositForfeited={Number(rental.deposit_forfeited_amount || 0)}
-                  depositStatus={String(rental.deposit_status || "pending")}
-                  totalPaid={totalPaid}
-                  currency={rental.currency || "THB"}
-                  rentalStatus={displayStatus}
-                  canRefund={isOwner}
-                  earlyReturn={(payments as any[]).map((payment) => payment.metadata?.early_return).find((item) => item && !item.settled) || null}
-                />
-                {paymentMethod || paymentTiming ? <PaymentInfo method={paymentMethod} timing={paymentTiming} /> : null}
-                {customerReportedPayment ? (
-                  <div className="rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3">
-                    <div className="flex items-start gap-3">
-                      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-[var(--warning)]">
-                        <i aria-hidden="true" className="ti ti-alert-circle text-base" />
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <p className="font-semibold text-[var(--warning)]">{tx.say("reportedPay")}</p>
-                        <p className="mt-1 text-sm text-[var(--warning)]">{tx.say("reportedAt", { when: formatDateTime(bookingLink?.payment_reported_at, tx) })}</p>
-                        <form action={confirmCustomerPaymentAction} className="mt-3">
-                          <PendingButton className="pressable inline-flex w-full items-center justify-center rounded-lg bg-[var(--warning)] px-3 py-2 text-sm font-semibold text-white shadow-sm" pendingLabel={tx.say("confirming")} type="submit">
-                            {tx.say("confirmPay")}
-                          </PendingButton>
-                        </form>
-                      </div>
-                    </div>
-                  </div>
-                ) : null}
-                <Info icon={CreditCard} label={tx.say("rentPaid")} value={rentGivenBack > 0 ? tx.say("paidLessBack", { paid: money(totalPaid, rental.currency), back: money(rentGivenBack, rental.currency) }) : money(totalPaid, rental.currency)} />
-              </div>
-            </Fold>
+            </Pane>
 
             {pendingAmendment ? (
           <div className="scroll-mt-4" id="amendment" />
@@ -1208,9 +978,65 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               <PendingAmendmentCard changedAlready={Boolean(pendingAmendment.changes?.applied_before_signature)} id={pendingAmendment.id} changes={pendingAmendment.changes || {}} token={pendingAmendment.token} />
             ) : null}
 
-            <RentalDocumentsCard documents={rentalDocuments} />
+                  </div>
+                  <div className="grid gap-3">
+            {customer ? (
+              <Pane title={tx.say("commTitle")}>
+                <div>
+                  <CommunicationPanel
+                    booking={{
+                      vehicle_id: vehicle?.id || null,
+                      vehicle_make_model: vehicleTitle(vehicle),
+                      vehicle_plate: vehicle?.registration_number || null,
+                      rental_status: rental.status,
+                      end_date: rental.end_date,
+                      outstanding_balance: pendingPaymentAmount,
+                      deposit_held: Number(rental.deposit_held || 0)
+                    }}
+                    bookingPortalUrl={bookingPortalUrl}
+                    businessName={organization.name || "RouteHQ"}
+                    customer={{
+                      id: customer.id,
+                      name: customer.full_name,
+                      email: customer.email,
+                      phone: customer.phone,
+                      whatsapp_number: customer.whatsapp_number,
+                      messenger_id: customer.messenger_id,
+                      line_id: customer.line_id,
+                      telegram_username: customer.telegram_username,
+                      instagram_handle: customer.instagram_handle,
+                      preferred_contact_method: customer.preferred_contact_method
+                    }}
+                    customerId={customer.id}
+                    hideSummary
+                    organisationId={organization.id}
+                    rentalId={rental.id}
+                    revalidatePathname={`/bookings/${rental.id}`}
+                  />
+                </div>
+              </Pane>
+            ) : null}
 
-            <Fold
+            {isClosed ? null : (
+            <ComingUpCard
+              currency={rental.currency}
+              rentalId={rental.id}
+              upcomingPayments={upcomingPayments}
+              vehicle={vehicle}
+              vehicleEvents={vehicleEvents}
+            />
+            )}
+                  </div>
+                </div>
+              )
+            },
+            {
+              id: "payments",
+              label: tx.say("tab_payments"),
+              alert: overduePaymentGroup.length + dueNowPaymentGroup.length > 0 || Boolean(customerReportedPayment),
+              content: (
+                <div className="grid gap-3">
+            <Pane
               id="payment-schedule"
               open={overduePaymentGroup.length + dueNowPaymentGroup.length > 0 || (payments.length === 0 && !isClosed && !awaitingSignature)}
               summary={`${financialState.label}${financialState.amount !== null ? ` · ${money(financialState.amount, rental.currency)}` : ""}`}
@@ -1364,20 +1190,260 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   </details>
                 ) : null}
               </div>
-            </Fold>
+            </Pane>
 
-            {isClosed ? null : (
-            <ComingUpCard
-              currency={rental.currency}
-              rentalId={rental.id}
-              upcomingPayments={upcomingPayments}
-              vehicle={vehicle}
-              vehicleEvents={vehicleEvents}
-            />
+                </div>
+              )
+            },
+            {
+              id: "deposit",
+              label: tx.say("tab_deposit"),
+              alert: (payments as any[]).some((payment) => payment.metadata?.early_return && !payment.metadata.early_return.settled),
+              content: (
+                <div className="grid gap-3">
+            <Pane
+              open={Boolean(customerReportedPayment) || (isClosed && !isCancelled && Number(rental.deposit_held || 0) - Number(rental.deposit_refunded_amount || 0) - Number(rental.deposit_forfeited_amount || 0) > 0) || (payments as any[]).some((payment) => payment.metadata?.early_return && !payment.metadata.early_return.settled)}
+              summary={tx.say("vehDepSummary", { vehicle: vehicleTitle(vehicle), deposit: formatDepositSummary(rental, tx) })}
+              title={tx.say("vehDepTitle")}
+            >
+              <div className="grid gap-2.5 sm:grid-cols-2 sm:[&>:not(.sub-info)]:col-span-2">
+                <Info icon={Car} label={tx.say("vehicle")} value={`${vehicleTitle(vehicle)} / ${vehicle?.registration_number || ""}`} />
+                <Info
+                  icon={Gauge}
+                  label={tx.say("mileage")}
+                  value={
+                    rental.mileage_at_delivery == null && rental.mileage_at_return != null
+                      ? tx.say("kmAtReturn", { km: Number(rental.mileage_at_return).toLocaleString("en-US") })
+                      : rental.mileage_at_delivery == null
+                        ? isCancelled ? tx.say("neverHandedOver") : isClosed ? tx.say("notRecorded") : tx.say("recordedAtHandover")
+                        : rental.mileage_at_return == null
+                          ? tx.say("kmAtHandover", { km: Number(rental.mileage_at_delivery).toLocaleString("en-US") })
+                          : `${tx.say("kmDriven", { km: Number(rental.km_driven ?? Number(rental.mileage_at_return) - Number(rental.mileage_at_delivery)).toLocaleString("en-US") })} · ${Number(rental.mileage_at_delivery).toLocaleString()} → ${Number(rental.mileage_at_return).toLocaleString("en-US")}`
+                  }
+                />
+                {deliveryInspection ? (
+                  <Info icon={MapPin} label={tx.say("handover")} value={tx.say("handedOver", { when: formatDateTime(deliveryInspection.submitted_at || deliveryInspection.created_at, tx) })} />
+                ) : isCancelled || (rental.entered_by_operator && delivery.undecided) ? null : (
+                  <DeliveryInfo delivery={delivery} />
+                )}
+                {isCancelled && !deliveryInspection ? null : (
+                  <Info
+                    icon={MapPin}
+                    label={tx.say("return")}
+                    value={
+                      returnInspection
+                        ? `${tx.say("returnedAt", { when: formatDateTime(returnInspection.submitted_at || returnInspection.created_at, tx) })}${rental.return_location ? ` · ${rental.return_location}` : ""}`
+                        : rental.return_location || (rental.end_date ? tx.say("notArranged") : tx.say("noReturnDate"))
+                    }
+                  />
+                )}
+                <Info icon={CreditCard} label={tx.say("deposit")} value={(() => { const text = formatDepositSummary(rental, tx); return text.charAt(0).toUpperCase() + text.slice(1); })()} />
+                <Info icon={CreditCard} label={tx.say("rentPaid")} value={rentGivenBack > 0 ? tx.say("paidLessBack", { paid: money(totalPaid, rental.currency), back: money(rentGivenBack, rental.currency) }) : money(totalPaid, rental.currency)} />
+                <div className="scroll-mt-4" id="refunds" />
+                <RefundDepositPanel
+                  rentalId={rental.id}
+                  organizationId={organization.id}
+                  vehicleId={String(rental.vehicle_id || vehicle?.id || "")}
+                  depositHeld={Number(rental.deposit_held || 0)}
+                  depositRefunded={Number(rental.deposit_refunded_amount || 0)}
+                  depositForfeited={Number(rental.deposit_forfeited_amount || 0)}
+                  depositStatus={String(rental.deposit_status || "pending")}
+                  totalPaid={totalPaid}
+                  currency={rental.currency || "THB"}
+                  rentalStatus={displayStatus}
+                  canRefund={isOwner}
+                  earlyReturn={(payments as any[]).map((payment) => payment.metadata?.early_return).find((item) => item && !item.settled) || null}
+                />
+                {paymentMethod || paymentTiming ? <PaymentInfo method={paymentMethod} timing={paymentTiming} /> : null}
+                {customerReportedPayment ? (
+                  <div className="rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3">
+                    <div className="flex items-start gap-3">
+                      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-[var(--warning)]">
+                        <i aria-hidden="true" className="ti ti-alert-circle text-base" />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold text-[var(--warning)]">{tx.say("reportedPay")}</p>
+                        <p className="mt-1 text-sm text-[var(--warning)]">{tx.say("reportedAt", { when: formatDateTime(bookingLink?.payment_reported_at, tx) })}</p>
+                        <form action={confirmCustomerPaymentAction} className="mt-3">
+                          <PendingButton className="pressable inline-flex w-full items-center justify-center rounded-lg bg-[var(--warning)] px-3 py-2 text-sm font-semibold text-white shadow-sm" pendingLabel={tx.say("confirming")} type="submit">
+                            {tx.say("confirmPay")}
+                          </PendingButton>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            </Pane>
+
+                </div>
+              )
+            },
+            {
+              id: "customer",
+              label: tx.say("tab_customer"),
+              alert: !customer || customer.document_status !== "complete" || (Boolean(bookingLink) && String(bookingLink?.status || "") !== "completed" && !isClosed),
+              content: (
+                <div className="grid items-start gap-3 lg:grid-cols-2">
+            {isCancelled && !customer ? null : (
+            <Pane
+              open={!customer || customer.document_status !== "complete"}
+              summary={customer ? `${customer.full_name} · ${documentLabel(customer.document_status, tx)}` : tx.list("awaitingCustomer")}
+              title={tx.say("custDocsTitle")}
+              tone={!customer || customer.document_status !== "complete" ? "amber" : "neutral"}
+            >
+              {customer ? (
+                <>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <Info icon={UserRound} label={tx.say("name")} value={customer?.full_name || tx.say("notRecorded")} />
+                    <Info icon={UserRound} label={tx.say("phone")} value={customer?.phone || tx.say("notRecorded")} />
+                    <Info icon={UserRound} label={tx.say("email")} value={customer?.email || tx.say("notRecorded")} />
+                    <Info icon={FileText} label={tx.say("documents")} value={documentLabel(customer?.document_status, tx)} danger={customer?.document_status !== "complete"} />
+                  </div>
+                  <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                    {["passport", "driver_license", "selfie"].map((category) => {
+                      const found = customerDocuments.some((document: any) => document.category === category);
+                      return (
+                        <div className="flex items-center gap-2 rounded-lg border border-[var(--border)] bg-white p-3" key={category}>
+                          {found ? <CheckCircle2 className="text-[var(--success)]" size={18} /> : <AlertTriangle className="text-[var(--warning)]" size={18} />}
+                          <span className="text-sm font-bold text-[var(--foreground)]">{tx.say(`doc_${category}`)}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              ) : (
+                <div className="space-y-3">
+                  <div className="rounded-lg border border-[var(--info-line)] bg-[var(--panel-secondary)] p-3">
+                    <div className="flex items-start gap-2">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)]">
+                        <Clock className="text-[var(--primary)]" size={16} />
+                      </span>
+                      <p className="text-sm leading-6 text-[var(--primary)]">{tx.say("awaitingBody")}</p>
+                    </div>
+                  </div>
+                  <AssignCustomerModal
+                    customers={allCustomers}
+                    organizationId={organization.id}
+                    rentalId={rental.id}
+                  />
+                </div>
+              )}
+            </Pane>
             )}
 
-          </div>
-        </div>
+            <Pane
+              id="booking-link"
+              open={Boolean(bookingLink) && String(bookingLink?.status || "") !== "completed" && !isClosed}
+              summary={!bookingLink ? tx.say("link_notCreated") : String(bookingLink.status || "") === "completed" ? tx.say("link_finished") : isCancelled ? tx.say("link_closed") : tx.say("link_waiting")}
+              title={tx.say("linkTitle")}
+              tone={bookingLink && String(bookingLink.status || "") !== "completed" && !isClosed ? "amber" : "neutral"}
+            >
+              {!bookingLink ? (
+                <p className="text-sm text-[var(--muted)]">
+                  {tx.say("link_teamBody")}
+                </p>
+              ) : null}
+              {(() => {
+                const steps = bookingLink ? timelineSteps(bookingLink, rentalDocuments) : [];
+                if (steps.length === 0) return null;
+                const allDone = steps.every((step) => step.complete);
+                const list = (
+                  <div className="mt-3 space-y-3">
+                    {steps.map((step) => (
+                      <div className="sub-surface flex items-start gap-3 p-3" key={step.key}>
+                        <span className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${step.complete ? "bg-[var(--success-light)] text-[var(--success)]" : "bg-[var(--panel-secondary)] text-[var(--muted)]"}`}>
+                          {step.complete ? <CheckCircle2 size={16} /> : <Clock size={16} />}
+                        </span>
+                        <div>
+                          <p className="font-semibold text-[var(--foreground)]">{tx.say(`step_${step.key}`)}</p>
+                          <p className="text-sm text-[var(--muted)]">{step.at ? formatDateTime(step.at, tx) : tx.say("notYet")}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+                // Once the customer has done everything, the steps are history: one line, open on request.
+                return allDone ? (
+                  <details className="mt-3">
+                    <summary className="flex cursor-pointer items-center gap-2 rounded-lg border border-[var(--success-line)] bg-[var(--success-light)] p-3 text-sm font-semibold text-[var(--success)]">
+                      <CheckCircle2 size={16} />
+                      {(() => {
+                        const last = steps.map((step) => step.at).filter(Boolean).map(String).sort().pop();
+                        return last ? tx.say("allDone", { date: formatDate(last, tx) }) : tx.say("allDoneUndated");
+                      })()}
+                    </summary>
+                    {list}
+                  </details>
+                ) : (
+                  list
+                );
+              })()}
+              {/* A cancelled booking's link only tells the customer it was cancelled: nothing to send. */}
+              {isCancelled ? null : (
+                <div className="mt-3">
+                  <div className="scroll-mt-4" id="send-link" />
+                <BookingShareActions currentUrl={bookingLink?.public_url || null} formDone={String(bookingLink?.status || "") === "completed"} organizationId={organization.id} rentalId={rental.id} />
+                </div>
+              )}
+            </Pane>
+
+                </div>
+              )
+            },
+            {
+              id: "paperwork",
+              label: tx.say("tab_paperwork"),
+              content: (
+                <div className="grid gap-3">
+            <RentalDocumentsCard documents={rentalDocuments} />
+
+                </div>
+              )
+            },
+            {
+              id: "activity",
+              label: tx.say("tab_activity"),
+              content: (
+                <div className="grid gap-3">
+            <Pane
+              summary={(communicationTimeline || []).length === 0 ? tx.say("nothingYet") : tx.say("entries", { count: (communicationTimeline || []).length })}
+              title={tx.say("msgsTitle")}
+            >
+              <CommunicationTimeline
+                customerId={customer?.id || null}
+                entries={communicationTimeline || []}
+                organizationId={organization.id}
+                pendingActions={[]}
+                hiddenActionIds={pendingPortalActions.map((action: any) => action.id)}
+                rentalId={rental.id}
+              />
+              {/* The full history lives under the messages: one place for everything that has happened, not two rows on the page. */}
+              <details className="mt-4">
+                <summary className="cursor-pointer py-1 text-sm font-semibold text-[var(--primary)]">
+                  {tx.say("historyTitle")} · {tx.say("entries", { count: visibleActivity(activityEvents).length })}
+                </summary>
+              <div className="mt-3 space-y-3">
+                {visibleActivity(activityEvents).length === 0 ? (
+                  <SectionEmpty>{tx.say("noActivity")}</SectionEmpty>
+                ) : (
+                  visibleActivity(activityEvents as any[]).map((event: any) => (
+                  <div className="sub-surface p-3" key={event.id}>
+                      <p className="font-semibold text-[var(--foreground)]">{activityTitle(event, tx.say as any)}</p>
+                      {/* The stored detail is an English sentence: shown to English readers only. */}
+                      {tx.locale === "en" && event.detail ? <p className="mt-1 text-sm text-[var(--foreground-secondary)]">{tidyDetail(event.detail, event.title)}</p> : null}
+                      <p className="mt-2 text-xs font-bold uppercase text-[var(--muted)]">{formatDateTime(event.occurred_at, tx)}</p>
+                    </div>
+                  ))
+                )}
+              </div>
+              </details>
+            </Pane>
+                </div>
+              )
+            }
+          ]}
+        />
       </div>
     </AppShell>
   );
@@ -1385,11 +1451,11 @@ export default async function BookingDetailPage({ params, searchParams }: { para
 
 function Info({ icon: Icon, label, value, danger = false }: { icon: typeof Car; label: string; value: string; danger?: boolean }) {
   return (
-    <div className="sub-surface flex items-start gap-3 p-3">
+    <div className="sub-info flex items-start gap-3 rounded-xl bg-[var(--panel-secondary)] px-3 py-2.5">
       <Icon className={`mt-0.5 shrink-0 ${danger ? "text-[var(--danger)]" : "text-[var(--primary)]"}`} size={18} />
-      <div>
-        <p className="text-xs font-bold uppercase text-[var(--muted)]">{label}</p>
-        <p className={`font-mono-data mt-1 font-semibold ${danger ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{value}</p>
+      <div className="min-w-0">
+        <p className="font-semibold text-[var(--muted)]">{label}</p>
+        <p className={`mt-0.5 font-bold ${danger ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{value}</p>
       </div>
     </div>
   );
@@ -1475,7 +1541,7 @@ function ComingUpCard({
   if (vehicleEvents.length === 0) return null;
 
   return (
-    <Fold
+    <Pane
       summary={nextPayment ? tx.say("nextPaySummary", { amount: money(nextPayment.amount, nextPayment.currency || currency), date: formatDate(nextPayment.due_date, tx) }) : tx.say("noPayScheduled")}
       title={tx.say("comingTitle")}
     >
@@ -1575,7 +1641,7 @@ function ComingUpCard({
           </div>
         </div>
       </div>
-    </Fold>
+    </Pane>
   );
 }
 
@@ -1633,30 +1699,30 @@ function communicationTypeBadge(type: string, tx: Tx) {
     system_event: { label: tx.say("ct_system_event"), className: "border-[var(--border)] bg-white text-[var(--foreground-secondary)]" }
   };
   const config = labels[type] || { label: String(type || "Event").replace(/_/g, " "), className: "border-[var(--border)] bg-white text-[var(--foreground-secondary)]" };
-  return <span className={`inline-flex items-center rounded-full border px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.04em] ${config.className}`}>{config.label}</span>;
+  return <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[14px] font-bold ${config.className}`}>{config.label}</span>;
 }
 
 function directionIndicator(direction: string | null | undefined, tx: Tx) {
-  if (direction === "outbound") return <span className="font-mono-data text-sm font-semibold text-[var(--primary)]" title={tx.say("dirOut")}>-&gt;</span>;
-  if (direction === "inbound") return <span className="font-mono-data text-sm font-semibold text-[var(--primary)]" title={tx.say("dirIn")}>&lt;-</span>;
+  if (direction === "outbound") return <span aria-label={tx.say("dirOut")} className="inline-flex text-[var(--primary)]" title={tx.say("dirOut")}><ArrowUpRight size={17} /></span>;
+  if (direction === "inbound") return <span aria-label={tx.say("dirIn")} className="inline-flex text-[var(--primary)]" title={tx.say("dirIn")}><ArrowDownLeft size={17} /></span>;
   return null;
 }
 
-function channelIcon(channel?: string | null) {
+function channelIcon(channel: string | null | undefined, tx: Tx) {
   const normalized = String(channel || "").toLowerCase();
   const labels: Record<string, string> = {
-    whatsapp: "WA",
+    whatsapp: "WhatsApp",
     line: "LINE",
-    messenger: "MSG",
-    facebook: "MSG",
-    telegram: "TG",
+    messenger: "Messenger",
+    facebook: "Messenger",
+    telegram: "Telegram",
     sms: "SMS",
-    email: "MAIL",
-    phone: "TEL",
-    booking_portal: "PORTAL"
+    email: tx.say("ch_email"),
+    phone: tx.say("ch_phone"),
+    booking_portal: tx.say("ch_portal")
   };
-  const label = labels[normalized] || (normalized ? normalized.slice(0, 6).toUpperCase() : "");
-  return label ? <span className="rounded-full border border-[var(--border)] bg-white px-2 py-1 text-[10px] font-semibold uppercase text-[var(--muted)]">{label}</span> : null;
+  const label = labels[normalized] || (normalized ? normalized.charAt(0).toUpperCase() + normalized.slice(1).replace(/_/g, " ") : "");
+  return label ? <span className="font-semibold text-[var(--foreground-secondary)]">{label}</span> : null;
 }
 
 function communicationStatusBadge(entry: any, tx: Tx) {
@@ -1705,7 +1771,7 @@ function CommunicationTimeline({
               {communicationTypeBadge("customer_portal_action", tx)}
               <Badge tone="amber">{tx.say("awaitingResponse")}</Badge>
             </div>
-            <span className="text-xs font-bold uppercase text-[var(--warning)]">{relativeTime(action.created_at, tx)}</span>
+            <span className="font-semibold text-[var(--warning)]">{relativeTime(action.created_at, tx)}</span>
           </div>
           <p className="text-sm font-semibold text-[var(--foreground)]">{portalActionSummary(action, tx)}</p>
           <a className="mt-1 inline-block text-sm font-semibold text-[var(--primary)]" href="#customer-requests">{tx.say("answerTop")}</a>
@@ -1718,12 +1784,12 @@ function CommunicationTimeline({
             <div className="flex flex-wrap items-center gap-2">
               {communicationTypeBadge(entry.timeline_type || entry.type, tx)}
               {directionIndicator(entry.direction, tx)}
-              {channelIcon(entry.channel)}
+              {channelIcon(entry.channel, tx)}
               {communicationStatusBadge(entry, tx)}
             </div>
-            <span className="text-xs font-bold uppercase text-[var(--muted)]">{relativeTime(entry.created_at, tx)}</span>
+            <span className="font-semibold text-[var(--muted)]">{relativeTime(entry.created_at, tx)}</span>
           </div>
-          <p className="mt-2 whitespace-pre-line [overflow-wrap:anywhere] text-sm font-semibold leading-6 text-[var(--foreground-secondary)]">{timelineText(entry, tx) || tx.say("noContent")}</p>
+          <p className="mt-2 whitespace-pre-line [overflow-wrap:anywhere] font-semibold leading-6 text-[var(--foreground)]">{timelineText(entry, tx) || tx.say("noContent")}</p>
         </div>
       ))}
     </div>

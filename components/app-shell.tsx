@@ -27,6 +27,7 @@ import type { Route } from "next";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, Fragment } from "react";
 import { getShellContext, signOut, switchActiveOrganization, type ShellContext } from "@/app/actions/auth";
+import { Toaster } from "@/components/toast";
 import { AskBox } from "@/components/ask-box";
 import { RouteHqLogo } from "@/components/brand-logo";
 import { BrandStyle } from "@/components/brand-style";
@@ -344,7 +345,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
                     <span className="phone-bar-badge absolute -right-3 -top-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[var(--danger)] px-1 font-bold text-white">{badgeFor(item.key)}</span>
                   ) : null}
                 </span>
-                <span className="max-w-full truncate">{t(item.key)}</span>
+                <span className="max-w-full truncate">{item.key === "dashboard" ? t("home") : t(item.key)}</span>
               </Link>
               </Fragment>
             );
@@ -358,13 +359,13 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
             type="button"
           >
             <span className="relative">
-              <MoreHorizontal size={18} />
+              <MoreHorizontal size={22} />
               {shell.dueTasks > 0 && !mobileBarKeys.includes("tasks") ? (
-                <span className="absolute -right-2.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--primary)] px-1 text-[10px] font-semibold text-white">{shell.dueTasks}</span>
+                <span className="phone-bar-badge absolute -right-3 -top-1.5 flex items-center justify-center rounded-full bg-[var(--primary)] px-1 font-bold text-white">{shell.dueTasks}</span>
               ) : null}
             </span>
             {/* Same size as the other labels: buttons otherwise take the page's larger default. */}
-            <span className="max-w-full truncate text-[11px] leading-[16.5px]">{t("more")}</span>
+            <span className="max-w-full truncate">{t("more")}</span>
           </button>
         </div>
       </nav>
@@ -441,6 +442,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
       ) : null}
 
       <FastActionSheet open={fastActionOpen} onClose={() => setFastActionOpen(false)} />
+      <Toaster />
     </div>
   );
 }

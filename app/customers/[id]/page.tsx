@@ -9,9 +9,10 @@ import { updateCustomer, uploadCustomerDocument } from "@/app/actions/customers"
 import { CustomerNotesForm } from "@/app/customers/[id]/customer-notes-form";
 import { DoNotRent } from "@/app/customers/[id]/do-not-rent";
 import { AppShell } from "@/components/app-shell";
+import { PageTabs } from "@/components/page-tabs";
 import { CommunicationPanel } from "@/components/communication-panel";
 import { PendingButton } from "@/components/pending-button";
-import { Badge, Card, Fold } from "@/components/ui";
+import { Badge, Card, Pane } from "@/components/ui";
 import { DateLeaf, ElapsedBar, Ring, TileHead, initialsOf } from "@/components/glance";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { businessToday } from "@/lib/business-time";
@@ -329,7 +330,7 @@ function RentalsSection({ detail }: { detail: CustomerDetail }) {
   const bookingWords = useTranslations("bookings");
   const statusName = (status: string) => (bookingWords.has(`status_${status}` as never) ? (bookingWords as unknown as Say)(`status_${status}`) : status.replace(/_/g, " "));
   return (
-    <Fold summary={cx.say("h_summary", { count: detail.rentals.length })} title={cx.say("h_title")}>
+    <Pane summary={cx.say("h_summary", { count: detail.rentals.length })} title={cx.say("h_title")}>
       {detail.rentals.length === 0 ? (
         <p className="font-medium text-[var(--foreground-secondary)]">{cx.say("h_none")}</p>
       ) : (
@@ -353,7 +354,7 @@ function RentalsSection({ detail }: { detail: CustomerDetail }) {
           ))}
         </div>
       )}
-    </Fold>
+    </Pane>
   );
 }
 
@@ -362,7 +363,7 @@ function PaymentsSection({ detail, totalIncome }: { detail: CustomerDetail; tota
   const moneyWords = useTranslations("money");
   const typeName = (type: string) => (moneyWords.has(`type_${type}` as never) ? (moneyWords as unknown as Say)(`type_${type}`) : type.replace(/_/g, " "));
   return (
-    <Fold id="payments" summary={detail.transactions.length === 0 ? cx.say("n_none") : cx.say("p_summary", { amount: money(totalIncome) })} title={cx.say("p_title")}>
+    <Pane id="payments" summary={detail.transactions.length === 0 ? cx.say("n_none") : cx.say("p_summary", { amount: money(totalIncome) })} title={cx.say("p_title")}>
       {detail.transactions.length === 0 ? (
         <p className="font-medium text-[var(--foreground-secondary)]">{cx.say("p_none")}</p>
       ) : (
@@ -383,7 +384,7 @@ function PaymentsSection({ detail, totalIncome }: { detail: CustomerDetail; tota
           ))}
         </div>
       )}
-    </Fold>
+    </Pane>
   );
 }
 
@@ -531,9 +532,17 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           <ActiveRentalCard customerId={customer.id} dueNow={dueByRental.get(rental.id) || 0} key={rental.id} rental={rental} />
         ))}
 
-        <div className="grid items-start gap-3 lg:grid-cols-2">
-          <div className="space-y-3">
-            <Fold
+        <PageTabs
+          aliases={{ notes: "details" }}
+          initial={completeness.status !== "complete" ? "documents" : detail.rentals.length > 0 ? "rentals" : "details"}
+          label={cx.say("tab_label")}
+          tabs={[
+            {
+              id: "documents",
+              label: cx.say("tab_documents"),
+              alert: completeness.status !== "complete",
+              content: (
+            <Pane
               id="documents"
               open={completeness.status !== "complete"}
               summary={completeness.status === "complete" ? cx.say("docs_ok") : cx.say("docs_missing", { list: missingDocs.join(", ") })}
@@ -555,19 +564,16 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                   </div>
                 ) : null}
               </div>
-            </Fold>
-
-            <Fold id="details" summary={missingDetails > 0 ? cx.say("d_missing", { count: missingDetails }) : cx.say("d_ok")} title={cx.say("d_title")}>
-              <DetailsForm customer={customer} organizationId={organization.id} />
-            </Fold>
-
-            <Fold summary={cx.say("ch_summary")} title={cx.say("ch_title")}>
-              <ContactChannelsForm customer={customer} organizationId={organization.id} />
-            </Fold>
-          </div>
-
-          <div className="space-y-3">
-            <Fold summary={cx.say("msg_summary")} title={cx.say("msg_title")}>
+            </Pane>
+              )
+            },
+            { id: "rentals", label: cx.say("tab_rentals"), count: detail.rentals.length, content: <RentalsSection detail={detail} /> },
+            { id: "payments", label: cx.say("tab_money"), content: <PaymentsSection detail={detail} totalIncome={totalIncome} /> },
+            {
+              id: "messages",
+              label: cx.say("tab_messages"),
+              content: (
+            <Pane summary={cx.say("msg_summary")} title={cx.say("msg_title")}>
               <CommunicationPanel
                 booking={{
                   vehicle_id: activeRental?.vehicle_id || activeRental?.vehicles?.id || null,
@@ -596,16 +602,30 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 rentalId={activeRental?.id || ""}
                 revalidatePathname={`/customers/${customer.id}`}
               />
-            </Fold>
-
-            <RentalsSection detail={detail} />
-            <PaymentsSection detail={detail} totalIncome={totalIncome} />
-
-            <Fold id="notes" open={Boolean(customer.notes)} summary={customer.notes ? undefined : cx.say("n_none")} title={cx.say("n_title")}>
+            </Pane>
+              )
+            },
+            {
+              id: "details",
+              label: cx.say("tab_details"),
+              content: (
+                <div className="grid items-start gap-3 lg:grid-cols-2">
+            <Pane id="details" summary={missingDetails > 0 ? cx.say("d_missing", { count: missingDetails }) : cx.say("d_ok")} title={cx.say("d_title")}>
+              <DetailsForm customer={customer} organizationId={organization.id} />
+            </Pane>
+                  <div className="grid gap-3">
+            <Pane summary={cx.say("ch_summary")} title={cx.say("ch_title")}>
+              <ContactChannelsForm customer={customer} organizationId={organization.id} />
+            </Pane>
+            <Pane id="notes" open={Boolean(customer.notes)} summary={customer.notes ? undefined : cx.say("n_none")} title={cx.say("n_title")}>
               <CustomerNotesForm customerId={customer.id} notes={customer.notes || ""} organizationId={organization.id} />
-            </Fold>
-          </div>
-        </div>
+            </Pane>
+                  </div>
+                </div>
+              )
+            }
+          ]}
+        />
       </div>
     </AppShell>
   );

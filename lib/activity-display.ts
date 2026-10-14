@@ -32,3 +32,23 @@ export function activityTitle(event: { event_type?: string | null; title?: strin
   const key = `hist_${String(event.event_type || "")}`;
   return t.has(key as never) ? t(key as never) : String(event.title || "");
 }
+
+/**
+ * Stored history lines were written for the records ("Payment received: 4 days rent THB 5,760 via promptpay").
+ * Shown to people they read like the rest of the app: ฿ amounts, payment methods by name, no repeated label.
+ */
+export function tidyDetail(detail: string | null | undefined, title?: string | null) {
+  if (!detail) return "";
+  let text = String(detail)
+    .replace(/\bTHB\s?(\d[\d,]*(?:\.\d+)?)/g, "฿$1")
+    .replace(/\bvia promptpay\b/gi, "by PromptPay")
+    .replace(/\bvia bank[_ ]transfer\b/gi, "by bank transfer")
+    .replace(/\bvia cash\b/gi, "in cash")
+    .replace(/\bvia card\b/gi, "by card");
+  // "Payment received: …" under the heading "Payment received" says it twice.
+  if (title) {
+    const lead = `${title.trim()}:`;
+    if (text.toLowerCase().startsWith(lead.toLowerCase())) text = text.slice(lead.length).trim();
+  }
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}

@@ -3,7 +3,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { intlLocale } from "@/lib/i18n/dates";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
-import { Badge, Fold } from "@/components/ui";
+import { Badge, Pane } from "@/components/ui";
 import type { BookingRentalDocument } from "@/lib/booking-rental-documents";
 
 function formatSignedAt(value: string, locale: string) {
@@ -37,7 +37,7 @@ export function RentalDocumentsCard({ documents }: { documents: BookingRentalDoc
   const locale = useLocale();
 
   return (
-    <Fold
+    <Pane
       summary={documents.length === 0 ? say("nothingYet") : say("docs_count", { count: documents.length })}
       title={say("docs_title")}
     >
@@ -90,6 +90,6 @@ export function RentalDocumentsCard({ documents }: { documents: BookingRentalDoc
           );
         })}
       </div>
-    </Fold>
+    </Pane>
   );
 }

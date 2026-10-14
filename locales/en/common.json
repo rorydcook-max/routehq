@@ -168,7 +168,8 @@
     "help": "Help",
     "g_rentals": "Rentals",
     "g_money": "Money",
-    "g_tools": "Tools"
+    "g_tools": "Tools",
+    "home": "Home"
   },
   "vehicles": {
     "addVehicle": "Add New Vehicle",
@@ -1145,7 +1146,7 @@
     "eyebrow": "Bookings",
     "title": "Bookings",
     "subtitle": "Every rental, from booking link to return.",
-    "create": "Create booking",
+    "create": "New booking",
     "searchPlaceholder": "Search customer, plate, or booking reference",
     "filterAll": "All",
     "status_booked": "Booked",
@@ -1415,7 +1416,8 @@
     "noVehicle": "No vehicle (business cost)",
     "noVehicleHint": "Rent, phone, ads, wages: counted in your totals, not against a vehicle.",
     "businessCost": "Business cost",
-    "afterRefunds": "after {amount} given back"
+    "afterRefunds": "after {amount} given back",
+    "undo": "Undo"
   },
   "booking": {
     "open": "Open",
@@ -2272,11 +2274,22 @@
     "adj_dueBooked": "Due with the first rent.",
     "unsentEarlier": "{count, plural, one {# earlier message} other {# earlier messages}}",
     "unsentEarlierHint": "Probably out of date: the newest one above says what's current.",
-    "unsentClearEarlier": "Mark these done"
+    "unsentClearEarlier": "Mark these done",
+    "tab_label": "Parts of this booking",
+    "tab_overview": "Handover & contact",
+    "tab_payments": "Payments",
+    "tab_deposit": "Vehicle & deposit",
+    "tab_customer": "Customer",
+    "tab_paperwork": "Agreement",
+    "tab_activity": "Messages",
+    "ch_email": "Email",
+    "ch_phone": "Phone",
+    "ch_portal": "Customer page",
+    "allDoneUndated": "The customer has finished everything. Show the steps"
   },
   "newBooking": {
     "pageBack": "Back to bookings",
-    "pageTitle": "Create booking",
+    "pageTitle": "New booking",
     "step_0": "Vehicle",
     "step_1": "Customer",
     "step_2": "Rental",
@@ -2609,7 +2622,10 @@
     "noPhone": "No phone",
     "doNotRent": "Don't rent",
     "bookedLine": "Booked: {vehicle} from {date}",
-    "closeLabel": "Close"
+    "closeLabel": "Close",
+    "pillAll": "customers",
+    "pillRenting": "renting now",
+    "pillDocs": "missing documents"
   },
   "calendar": {
     "title": "Calendar",
@@ -3079,7 +3095,13 @@
     "g_owesNothing": "Owes nothing",
     "g_owesNothingDetail": "All paid up",
     "g_docs": "Documents",
-    "g_docsMissing": "{count} still to come"
+    "g_docsMissing": "{count} still to come",
+    "tab_label": "Parts of this customer's page",
+    "tab_documents": "Documents",
+    "tab_rentals": "Rentals",
+    "tab_money": "Payments",
+    "tab_messages": "Messages",
+    "tab_details": "Details"
   },
   "vehicleForm": {
     "backToFleet": "Back to fleet",
@@ -3992,7 +4014,8 @@
     "shortCustomer": "Customer",
     "shortVehicle": "Vehicle",
     "morePhotos": "+{count}",
-    "showOlder": "Show older"
+    "showOlder": "Show older",
+    "folderLine": "{count, plural, one {# file} other {# files}} · latest {date}"
   },
   "reportsPage": {
     "title": "Reports",

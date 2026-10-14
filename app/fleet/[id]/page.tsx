@@ -17,7 +17,7 @@ import { kindFromCategory } from "@/lib/vehicle-groups";
 import { RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
 import { InspectionViewer } from "@/components/inspection-viewer";
 import { PendingButton } from "@/components/pending-button";
-import { Badge, Card, ProgressBar } from "@/components/ui";
+import { Badge, Card, Pane, ProgressBar } from "@/components/ui";
 import { amountDueNowByRental } from "@/lib/rental-balances";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUserEmail } from "@/lib/auth/session";
@@ -27,7 +27,7 @@ import { TASK_TYPE_OPTIONS } from "@/lib/tasks";
 import { getVehicleDetail, type VehicleDetail } from "@/lib/vehicle-detail";
 import { VehicleJobs } from "@/app/tasks/tasks-list";
 import { isQuietActivityEvent } from "@/lib/activity-noise";
-import { activityTitle, visibleActivity } from "@/lib/activity-display";
+import { activityTitle, tidyDetail, visibleActivity } from "@/lib/activity-display";
 import { businessToday, businessNow, toWallTime } from "@/lib/business-time";
 import { longDate } from "@/lib/i18n/dates";
 
@@ -107,22 +107,10 @@ function getSoonestCompliance(detail: VehicleDetail, tx: Vx) {
 
 function EmptyState({ children, action }: { children: React.ReactNode; action?: React.ReactNode }) {
   return (
-    <div className="rounded-xl bg-[var(--panel-secondary)] p-4 font-medium text-[var(--foreground-secondary)]">
+    <div className="empty-state">
       {children}
       {action ? <div className="mt-3">{action}</div> : null}
     </div>
-  );
-}
-
-/** One part of a tab: a card with a heading and a one-line summary. Replaces the folded rows the page used to stack. */
-function Pane({ title, summary, tone = "neutral", children }: { title: string; summary?: React.ReactNode; tone?: "neutral" | "red" | "green" | "amber"; open?: boolean; id?: string; children: React.ReactNode }) {
-  const tones = { neutral: "font-medium text-[var(--foreground-secondary)]", red: "font-bold text-[var(--danger)]", green: "font-bold text-[var(--success)]", amber: "font-bold text-[var(--warning)]" };
-  return (
-    <section className="card p-4">
-      <h2 className="text-[18px] font-bold tracking-[-0.01em] text-[var(--foreground)]">{title}</h2>
-      {summary ? <p className={`mt-0.5 ${tones[tone]}`}>{summary}</p> : null}
-      <div className="mt-3">{children}</div>
-    </section>
   );
 }
 
@@ -441,7 +429,7 @@ function TimelineSection({ detail }: { detail: VehicleDetail }) {
   const histNames = useTranslations("booking");
   const activityEvents = visibleActivity(detail.activityEvents as any[])
     .filter((event: any) => !isQuietActivityEvent(event.event_type))
-    .map((event) => ({ id: event.id, title: activityTitle(event, histNames as any), detail: tx.locale === "en" ? event.detail : null, date: event.occurred_at || event.created_at, kind: "activity" as const }));
+    .map((event) => ({ id: event.id, title: activityTitle(event, histNames as any), detail: tx.locale === "en" ? tidyDetail(event.detail, event.title) : null, date: event.occurred_at || event.created_at, kind: "activity" as const }));
   const rentalReturns = detail.rentals
     .filter((rental) => rental.end_date)
     .map((rental) => ({ id: `return-${rental.id}`, title: tx.say("tl_return", { name: rental.customers?.full_name || tx.say("customer") }), detail: null, date: rental.end_date!, kind: "rental" as const }));

@@ -51,6 +51,18 @@ export function Fold({
   );
 }
 
+/** One part of a tab: a card with a heading and a one-line summary. Takes the same props as Fold. */
+export function Pane({ title, summary, tone = "neutral", id, children }: { title: string; summary?: ReactNode; tone?: "neutral" | "red" | "green" | "amber"; open?: boolean; id?: string; children: ReactNode }) {
+  const tones = { neutral: "font-medium text-[var(--foreground-secondary)]", red: "font-bold text-[var(--danger)]", green: "font-bold text-[var(--success)]", amber: "font-bold text-[var(--warning)]" };
+  return (
+    <section className="card scroll-mt-4 p-4" id={id}>
+      <h2 className="text-[18px] font-bold tracking-[-0.01em] text-[var(--foreground)]">{title}</h2>
+      {summary ? <p className={clsx("mt-0.5", tones[tone])}>{summary}</p> : null}
+      <div className="mt-3">{children}</div>
+    </section>
+  );
+}
+
 export function EmptyState({
   title,
   description,
@@ -61,10 +73,10 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--border-strong)] bg-[var(--panel-secondary)] px-6 py-12 text-center">
-      <p className="text-base font-semibold text-[var(--foreground)]">{title}</p>
+    <div className="empty-state flex flex-col items-center justify-center !py-10">
+      <p className="text-[17px] font-bold text-[var(--foreground)]">{title}</p>
       {description ? (
-        <p className="mt-1.5 max-w-sm text-sm text-[var(--muted)]">{description}</p>
+        <p className="mt-1.5 max-w-sm font-medium text-[var(--foreground-secondary)]">{description}</p>
       ) : null}
       {action ? <div className="mt-4">{action}</div> : null}
     </div>

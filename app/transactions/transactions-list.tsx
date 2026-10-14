@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { toast } from "@/components/toast";
 import { shownError } from "@/lib/error-text";
 import { ArrowDownLeft, ArrowUpRight, Check, ChevronLeft, ChevronRight, Download, Search, Trash2, X } from "lucide-react";
 import { Dot } from "@/components/glance";
@@ -260,7 +261,6 @@ export function TransactionsList({
   const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkConfirm, setBulkConfirm] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -303,9 +303,21 @@ export function TransactionsList({
   const depositsOut = sum(deposits.filter((transaction) => transactionKind(transaction) === "deposit_refunded"));
 
   function showToast(message: string) {
-    setToast(message);
-    window.setTimeout(() => setToast(null), 2600);
+    toast({ message });
   }
+
+  // Deletes wait five seconds for an Undo; leaving the page sends any that are still waiting.
+  const waitingDeletes = useRef(new Map<string, number>());
+  useEffect(() => {
+    const waiting = waitingDeletes.current;
+    return () => {
+      for (const [id, timer] of waiting) {
+        window.clearTimeout(timer);
+        void deleteTransaction(id).catch(() => undefined);
+      }
+      waiting.clear();
+    };
+  }, []);
 
   function toggleSelected(id: string) {
     setSelectedIds((current) => {
@@ -324,22 +336,42 @@ export function TransactionsList({
 
   function handleDelete(id: string) {
     setError(null);
-    setDeletingIds((current) => new Set(current).add(id));
-    startTransition(async () => {
-      try {
-        await deleteTransaction(id);
-        setHiddenIds((current) => new Set(current).add(id));
-        setConfirmDeleteId(null);
-        showToast(tx.say("deleted"));
-        router.refresh();
-      } catch (caught) {
-        setError(shownError(caught, tx.say("deleteFailed")));
-      } finally {
-        setDeletingIds((current) => {
-          const next = new Set(current);
-          next.delete(id);
-          return next;
-        });
+    setEditingId(null);
+    setConfirmDeleteId(null);
+    setHiddenIds((current) => new Set(current).add(id));
+    const unhide = () =>
+      setHiddenIds((current) => {
+        const next = new Set(current);
+        next.delete(id);
+        return next;
+      });
+    const timer = window.setTimeout(() => {
+      waitingDeletes.current.delete(id);
+      setDeletingIds((current) => new Set(current).add(id));
+      startTransition(async () => {
+        try {
+          await deleteTransaction(id);
+          router.refresh();
+        } catch (caught) {
+          unhide();
+          setError(shownError(caught, tx.say("deleteFailed")));
+        } finally {
+          setDeletingIds((current) => {
+            const next = new Set(current);
+            next.delete(id);
+            return next;
+          });
+        }
+      });
+    }, 5000);
+    waitingDeletes.current.set(id, timer);
+    toast({
+      message: tx.say("deleted"),
+      actionLabel: tx.say("undo"),
+      onAction: () => {
+        window.clearTimeout(timer);
+        waitingDeletes.current.delete(id);
+        unhide();
       }
     });
   }
@@ -434,10 +466,7 @@ export function TransactionsList({
         {editingId === transaction.id && confirmDeleteId !== transaction.id ? (
           <button
             className="pressable mt-2 inline-flex min-h-10 items-center gap-1.5 whitespace-nowrap rounded-full px-3 font-bold text-[var(--danger)]"
-            onClick={() => {
-              setConfirmDeleteId(transaction.id);
-              setEditingId(null);
-            }}
+            onClick={() => handleDelete(transaction.id)}
             type="button"
           >
             <Trash2 size={16} />
@@ -664,7 +693,6 @@ export function TransactionsList({
         </div>
       ) : null}
 
-      {toast ? <div className="fixed bottom-24 right-4 z-50 rounded-xl bg-[var(--foreground)] px-4 py-3 text-sm font-semibold text-white shadow-xl lg:bottom-6">{toast}</div> : null}
     </div>
   );
 }

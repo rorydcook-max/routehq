@@ -76,17 +76,26 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
     return result;
   }, [filtered]);
 
-  // Grouped by the day the file was made, newest day first, so a long history reads as a short list per day.
-  const days = useMemo(() => {
-    const byDay = new Map<string, Row[]>();
-    for (const row of rows) {
-      const day = String((row.kind === "photos" ? row.documents[0] : row.document).createdAt || "").slice(0, 10);
-      const list = byDay.get(day) || [];
-      list.push(row);
-      byDay.set(day, list);
+  // One card per booking, customer or vehicle, the one with the newest file first.
+  type Folder = { key: string; label: string; href: string | null; kind: "booking" | "customer" | "vehicle"; latest: string; files: DocumentListItem[] };
+  const folders = useMemo(() => {
+    const byKey = new Map<string, Folder>();
+    for (const document of filtered) {
+      const kind: Folder["kind"] = document.href?.startsWith("/customers") ? "customer" : document.href?.startsWith("/fleet") || document.inspectionType === "condition" || document.ownerType === "vehicle" ? "vehicle" : "booking";
+      const key = document.href || `${document.ownerType}|${document.ownerId || document.ownerLabel}`;
+      const folder = byKey.get(key) || { key, label: document.ownerLabel || ownerLabel(document), href: document.href, kind, latest: "", files: [] };
+      folder.files.push(document);
+      if (String(document.createdAt) > folder.latest) folder.latest = String(document.createdAt);
+      byKey.set(key, folder);
     }
-    return [...byDay.entries()].sort((a, b) => b[0].localeCompare(a[0]));
-  }, [rows]);
+    // Inside a card: the paperwork first, then ID photos, then handover and return photos.
+    const rank = (document: DocumentListItem) => (document.ownerType === "signed" ? 0 : document.ownerType === "receipt" ? 1 : document.ownerType === "inspection" ? 3 : 2);
+    return [...byKey.values()]
+      .map((folder) => ({ ...folder, files: [...folder.files].sort((x, y) => rank(x) - rank(y) || String(y.createdAt).localeCompare(String(x.createdAt))) }))
+      .sort((x, y) => y.latest.localeCompare(x.latest));
+  }, [filtered]);
+  const [open, setOpen] = useState<Set<string>>(new Set());
+  void rows;
 
   return (
     <div className="space-y-3">
@@ -102,7 +111,7 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
           />
         </label>
         {ownerTypes.length > 2 ? (
-          <div aria-label={say("show")} className="flex flex-wrap gap-2" role="group">
+          <div aria-label={say("show")} className="scrollbar-none -mx-1 flex gap-2 overflow-x-auto px-1 py-0.5 sm:flex-wrap" role="group">
             {ownerTypes.map((type) => (
               <button
                 aria-pressed={ownerFilter === type}
@@ -124,82 +133,56 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
           <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{documents.length === 0 ? say("emptyBody") : say("noMatchBody")}</p>
         </div>
       ) : (
-        (search.trim() ? days : days.slice(0, dayLimit)).map(([day, dayRows]) => (
-          <section className="card overflow-hidden !p-0" key={day}>
-            <p className="border-b border-[var(--border)] bg-[var(--panel-secondary)] px-4 py-2.5 font-bold text-[var(--foreground-secondary)]">{longDate(day, locale)}</p>
-            <ul className="divide-y divide-[var(--border)]">
-              {dayRows.map((row) => {
-                if (row.kind === "photos") {
-                  const first = row.documents[0];
-                  const shown = row.documents.filter((document) => document.signedUrl).slice(0, 4);
-                  return (
-                    <li className="px-4 py-3" key={row.key}>
-                      <div className="flex items-center gap-3">
-                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--panel-secondary)] text-[var(--primary)]"><Images size={20} /></span>
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate font-bold text-[var(--foreground)]">{ownerLabel(first)}</p>
-                          <p className="truncate text-[14px] font-medium text-[var(--foreground-secondary)]">{say("photoCount", { count: row.documents.length })}</p>
-                        </div>
-                        {first.href ? <OwnerLink href={first.href} kind={first.inspectionType === "condition" ? "vehicle" : "booking"} label={say(first.inspectionType === "condition" ? "openVehicle" : "openBooking")} /> : null}
-                      </div>
-                      <div className="mt-2.5 flex gap-1.5 pl-14">
-                        {shown.map((document) => (
-                          <a className="shrink-0" href={document.signedUrl as string} key={document.id} rel="noreferrer" target="_blank" title={fileLabel(document)}>
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img alt={fileLabel(document)} className="h-12 w-16 rounded-lg bg-[var(--panel-secondary)] object-cover" loading="lazy" src={document.signedUrl as string} />
-                          </a>
-                        ))}
-                        {row.documents.length > shown.length ? (
-                          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[var(--panel-secondary)] text-[14px] font-bold text-[var(--foreground-secondary)]">{say("morePhotos", { count: row.documents.length - shown.length })}</span>
-                        ) : null}
-                      </div>
-                    </li>
-                  );
-                }
-                const document = row.document;
-                const icon =
-                  document.mimeType?.startsWith("image/") && document.signedUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img alt="" className="h-11 w-11 shrink-0 rounded-xl object-cover" loading="lazy" src={document.signedUrl} />
-                  ) : (
-                    <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${document.ownerType === "signed" ? "bg-[var(--success-light)] text-[var(--success)]" : "bg-[var(--primary-light)] text-[var(--primary)]"}`}>
-                      {document.ownerType === "signed" ? <FileSignature size={20} /> : <FileText size={20} />}
-                    </span>
-                  );
-                const text = (
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate font-bold text-[var(--foreground)]">{fileLabel(document)}</span>
-                    <span className="block truncate text-[14px] font-medium text-[var(--foreground-secondary)]">{ownerLabel(document)}</span>
-                  </span>
-                );
-                return (
-                  <li className="flex items-center gap-3 px-4 py-3 hover:bg-[var(--panel-secondary)]" key={document.id}>
-                    {document.signedUrl ? (
-                      <a className="flex min-w-0 flex-1 items-center gap-3" href={document.signedUrl} rel="noreferrer" target="_blank" title={say("view")}>
-                        {icon}
-                        {text}
-                      </a>
+        <div className="grid gap-3 xl:grid-cols-2">
+          {(search.trim() ? folders : folders.slice(0, dayLimit * 2)).map((folder) => {
+            const expanded = open.has(folder.key);
+            const shown = expanded ? folder.files : folder.files.slice(0, 5);
+            const FolderIcon = folder.kind === "vehicle" ? Car : folder.kind === "customer" ? UserRound : CalendarDays;
+            return (
+              <section className="card p-4" key={folder.key}>
+                <div className="flex items-center gap-3">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]"><FolderIcon size={20} /></span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[17px] font-bold text-[var(--foreground)]">{folder.label || say("aBooking")}</p>
+                    <p className="truncate font-medium text-[var(--foreground-secondary)]">{say("folderLine", { count: folder.files.length, date: longDate(folder.latest.slice(0, 10), locale) })}</p>
+                  </div>
+                  {folder.href ? <OwnerLink href={folder.href} kind={folder.kind} label={say(folder.kind === "vehicle" ? "openVehicle" : folder.kind === "customer" ? "openCustomer" : "openBooking")} /> : null}
+                </div>
+                <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6 xl:grid-cols-4 2xl:grid-cols-6">
+                  {shown.map((document) => {
+                    const picture = document.mimeType?.startsWith("image/") && document.signedUrl;
+                    const label = fileLabel(document);
+                    const tile = picture ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img alt={label} className="aspect-[4/3] w-full rounded-xl bg-[var(--panel-secondary)] object-cover" loading="lazy" src={document.signedUrl as string} />
                     ) : (
-                      <span className="flex min-w-0 flex-1 items-center gap-3">
-                        {icon}
-                        {text}
+                      <span className={`flex aspect-[4/3] w-full items-center justify-center rounded-xl ${document.ownerType === "signed" ? "bg-[var(--success-light)] text-[var(--success)]" : "bg-[var(--panel-secondary)] text-[var(--primary)]"}`}>
+                        {document.ownerType === "signed" ? <FileSignature size={22} /> : document.ownerType === "inspection" ? <Images size={22} /> : <FileText size={22} />}
                       </span>
-                    )}
-                    {document.href ? (
-                      <OwnerLink
-                        href={document.href}
-                        kind={document.ownerType === "vehicle" ? "vehicle" : document.ownerType === "customer" ? "customer" : "booking"}
-                        label={say(document.ownerType === "vehicle" ? "openVehicle" : document.ownerType === "customer" ? "openCustomer" : "openBooking")}
-                      />
-                    ) : null}
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
-        ))
+                    );
+                    return (
+                      <a className="pressable group block min-w-0" href={document.signedUrl || document.href || "#"} key={document.id} rel="noreferrer" target={document.signedUrl ? "_blank" : undefined} title={label}>
+                        {tile}
+                        <span className="mt-1 block truncate text-[14px] font-semibold leading-tight text-[var(--foreground-secondary)] group-hover:text-[var(--primary)]">{label}</span>
+                      </a>
+                    );
+                  })}
+                  {folder.files.length > shown.length ? (
+                    <button
+                      className="pressable flex aspect-[4/3] w-full items-center justify-center rounded-xl bg-[var(--panel-secondary)] font-bold text-[var(--primary)]"
+                      onClick={() => setOpen((current) => new Set(current).add(folder.key))}
+                      type="button"
+                    >
+                      {say("morePhotos", { count: folder.files.length - shown.length })}
+                    </button>
+                  ) : null}
+                </div>
+              </section>
+            );
+          })}
+        </div>
       )}
-      {!search.trim() && days.length > dayLimit ? (
+      {!search.trim() && folders.length > dayLimit * 2 ? (
         <button className="pressable inline-flex min-h-11 items-center whitespace-nowrap rounded-full border border-[var(--border)] bg-white px-5 font-bold text-[var(--foreground)]" onClick={() => setDayLimit((limit) => limit + 10)} type="button">
           {say("showOlder")}
         </button>

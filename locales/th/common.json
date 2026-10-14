@@ -424,7 +424,8 @@
     "help": "ช่วยเหลือ",
     "g_rentals": "การเช่า",
     "g_money": "การเงิน",
-    "g_tools": "เครื่องมือ"
+    "g_tools": "เครื่องมือ",
+    "home": "หน้าแรก"
   },
   "customer": {
     "theRentalBusiness": "ร้านเช่ารถ",
@@ -1424,7 +1425,8 @@
     "noVehicle": "ไม่ผูกกับรถ (ค่าใช้จ่ายธุรกิจ)",
     "noVehicleHint": "ค่าเช่าร้าน ค่าโทรศัพท์ ค่าโฆษณา ค่าจ้าง: นับในยอดรวม ไม่ผูกกับรถคันใด",
     "businessCost": "ค่าใช้จ่ายธุรกิจ",
-    "afterRefunds": "หลังคืนเงิน {amount}"
+    "afterRefunds": "หลังคืนเงิน {amount}",
+    "undo": "เลิกทำ"
   },
   "booking": {
     "open": "ไม่กำหนด",
@@ -2281,7 +2283,18 @@
     "adj_dueBooked": "ชำระพร้อมค่าเช่างวดแรก",
     "unsentEarlier": "ข้อความก่อนหน้า {count} ข้อความ",
     "unsentEarlierHint": "อาจไม่เป็นปัจจุบันแล้ว ข้อความล่าสุดด้านบนคือข้อมูลปัจจุบัน",
-    "unsentClearEarlier": "ทำเครื่องหมายว่าเสร็จ"
+    "unsentClearEarlier": "ทำเครื่องหมายว่าเสร็จ",
+    "tab_label": "ส่วนต่างๆ ของการจองนี้",
+    "tab_overview": "ส่งมอบและติดต่อ",
+    "tab_payments": "การชำระเงิน",
+    "tab_deposit": "รถและเงินมัดจำ",
+    "tab_customer": "ลูกค้า",
+    "tab_paperwork": "สัญญา",
+    "tab_activity": "ข้อความ",
+    "ch_email": "อีเมล",
+    "ch_phone": "โทรศัพท์",
+    "ch_portal": "หน้าลูกค้า",
+    "allDoneUndated": "ลูกค้าทำครบทุกขั้นตอนแล้ว ดูขั้นตอน"
   },
   "newBooking": {
     "pageBack": "กลับไปที่การจอง",
@@ -2618,7 +2631,10 @@
     "noPhone": "ไม่มีเบอร์โทร",
     "doNotRent": "ไม่ให้เช่า",
     "bookedLine": "จองแล้ว {vehicle} · เริ่ม {date}",
-    "closeLabel": "ปิด"
+    "closeLabel": "ปิด",
+    "pillAll": "ลูกค้า",
+    "pillRenting": "กำลังเช่า",
+    "pillDocs": "เอกสารไม่ครบ"
   },
   "calendar": {
     "title": "ปฏิทิน",
@@ -3088,7 +3104,13 @@
     "g_owesNothing": "ไม่มียอดค้าง",
     "g_owesNothingDetail": "จ่ายครบแล้ว",
     "g_docs": "เอกสาร",
-    "g_docsMissing": "ยังขาด {count} อย่าง"
+    "g_docsMissing": "ยังขาด {count} อย่าง",
+    "tab_label": "ส่วนต่างๆ ของหน้าลูกค้า",
+    "tab_documents": "เอกสาร",
+    "tab_rentals": "การเช่า",
+    "tab_money": "การชำระเงิน",
+    "tab_messages": "ข้อความ",
+    "tab_details": "รายละเอียด"
   },
   "vehicleForm": {
     "backToFleet": "กลับไปหน้ารถ",
@@ -4001,7 +4023,8 @@
     "shortCustomer": "ลูกค้า",
     "shortVehicle": "รถ",
     "morePhotos": "+{count}",
-    "showOlder": "ดูที่เก่ากว่า"
+    "showOlder": "ดูที่เก่ากว่า",
+    "folderLine": "{count} ไฟล์ · ล่าสุด {date}"
   },
   "reportsPage": {
     "title": "รายงาน",

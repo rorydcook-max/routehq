@@ -383,7 +383,14 @@ export function TransactionsList({
               type="checkbox"
             />
           ) : null}
-          <div className="min-w-0 flex-1">
+          <div
+            className="min-w-0 flex-1 cursor-pointer"
+            onClick={() => {
+              if (selecting) return toggleSelected(transaction.id);
+              setEditingId(editingId === transaction.id ? null : transaction.id);
+              setConfirmDeleteId(null);
+            }}
+          >
             <p className="truncate text-[16px] font-bold text-[var(--foreground)]">
               {tx.typeName(transaction.type, transaction.typeLabel)}
               {kind.startsWith("deposit") ? <span className="ml-2 font-medium text-[var(--muted)]">{kind === "deposit_refunded" ? tx.say("returned") : tx.say("held")}</span> : null}
@@ -396,7 +403,7 @@ export function TransactionsList({
             </p>
             {who ? <p className="line-clamp-2 break-words font-medium text-[var(--foreground-secondary)]">{who}</p> : null}
             {context ? (
-              <Link className="mt-0.5 block truncate text-[14px] font-semibold text-[var(--primary)]" href={`/bookings/${transaction.rentalId}`}>
+              <Link className="mt-0.5 block truncate text-[14px] font-semibold text-[var(--primary)]" href={`/bookings/${transaction.rentalId}`} onClick={(event) => event.stopPropagation()}>
                 {context}
               </Link>
             ) : null}
@@ -405,7 +412,7 @@ export function TransactionsList({
             {amount.prefix}
             {money(transaction.amount, transaction.currency)}
           </p>
-          <div className="flex flex-shrink-0 items-center gap-0.5 sm:opacity-0 sm:transition sm:group-hover:opacity-100 sm:focus-within:opacity-100">
+          <div className="hidden flex-shrink-0 items-center gap-0.5 sm:flex sm:opacity-0 sm:transition sm:group-hover:opacity-100 sm:focus-within:opacity-100">
             <button
               aria-label={tx.say("editAria")}
               className="pressable flex h-8 w-8 items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[var(--panel-tertiary)] hover:text-[var(--primary)]"
@@ -442,17 +449,31 @@ export function TransactionsList({
             vehicles={vehicles}
           />
         ) : null}
+        {/* On a phone, delete is inside the opened entry rather than an icon on every row. */}
+        {editingId === transaction.id && confirmDeleteId !== transaction.id ? (
+          <button
+            className="pressable mt-2 inline-flex min-h-10 items-center gap-1.5 whitespace-nowrap rounded-full px-3 font-bold text-[var(--danger)] sm:hidden"
+            onClick={() => {
+              setConfirmDeleteId(transaction.id);
+              setEditingId(null);
+            }}
+            type="button"
+          >
+            <Trash2 size={16} />
+            {tx.say("delete")}
+          </button>
+        ) : null}
 
         {confirmDeleteId === transaction.id ? (
           <div className="mt-2 rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-3">
             <p className="text-sm font-semibold text-[var(--danger)]">{tx.say("deleteQ")}</p>
-            <p className="mt-1 text-xs text-[var(--foreground-secondary)]">{tx.say("deleteBody")}</p>
+            <p className="mt-1 text-sm text-[var(--foreground-secondary)]">{tx.say("deleteBody")}</p>
             <div className="mt-3 flex justify-end gap-2">
-              <button className="secondary-action pressable min-h-9 px-3 text-xs" onClick={() => setConfirmDeleteId(null)} type="button">
+              <button className="secondary-action pressable min-h-10 whitespace-nowrap px-4 text-sm" onClick={() => setConfirmDeleteId(null)} type="button">
                 {tx.say("keepIt")}
               </button>
               <button
-                className="pressable min-h-9 rounded-full bg-[var(--danger)] px-3 text-xs font-semibold text-white"
+                className="pressable min-h-10 whitespace-nowrap rounded-full bg-[var(--danger)] px-4 text-sm font-bold text-white"
                 disabled={isPending}
                 onClick={() => handleDelete(transaction.id)}
                 type="button"
@@ -592,7 +613,7 @@ export function TransactionsList({
           {selecting ? tx.say("done") : tx.say("select")}
         </button>
         {/* Everything in this period as a spreadsheet, for an accountant. */}
-        <a aria-label={tx.say("exportSheet")} className="secondary-action pressable min-h-[38px] gap-1.5 px-3 text-[13px]" download href={`/api/export/money?from=${range.from}&to=${range.to}`} title={tx.say("exportSheet")}>
+        <a aria-label={tx.say("exportSheet")} className="secondary-action pressable min-h-10 gap-1.5 px-3 text-[14px]" download href={`/api/export/money?from=${range.from}&to=${range.to}`} title={tx.say("exportSheet")}>
           <Download size={16} />
           <span className="hidden lg:inline">{tx.say("exportShort")}</span>
         </a>

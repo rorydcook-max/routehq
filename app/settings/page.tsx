@@ -768,7 +768,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
       ) : null}
       {tab === "team" ? (
         <>
-      <div className="mt-4 grid gap-3 xl:grid-cols-[1.15fr_0.85fr]">
+      <div className="mt-4 grid items-start gap-3 xl:grid-cols-[1.15fr_0.85fr]">
         <Card>
           <SectionHeader title={say("team_title")} />
           <div className="mt-4 space-y-3">

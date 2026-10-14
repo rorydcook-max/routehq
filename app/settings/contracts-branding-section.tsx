@@ -131,9 +131,9 @@ export function ContractsBrandingSection({
         <div className="rounded-xl border border-[var(--border)] p-3">
           <p className="font-bold text-[var(--foreground)]">{say("b_brandTitle")}</p>
           <p className="mt-1 text-sm text-[var(--muted)]">{whiteLabel ? say("b_brandBodyApp") : say("b_brandBody")}</p>
-          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <div className="mt-3 space-y-3">
             <BrandColourField customLabel={say("b_colourCustom")} hint={say("b_colourHint")} initial={accentColour} key={accentColour} label={say("b_colour")} />
-            <label className={`checkbox-label sub-surface min-h-10 font-semibold text-[var(--foreground)] ${whiteLabel ? "" : "opacity-60"}`} style={{ display: "flex", alignItems: "center", padding: "8px 12px" }}>
+            <label className={`checkbox-label sub-surface min-h-10 w-fit max-w-full font-semibold text-[var(--foreground)] ${whiteLabel ? "" : "opacity-60"}`} style={{ display: "flex", alignItems: "center", padding: "8px 12px" }}>
               <input defaultChecked={poweredByRouteHq || !whiteLabel} disabled={!whiteLabel} name="powered_by_routehq_enabled" type="checkbox" value="true" />
               <span>
                 {say("b_powered")}

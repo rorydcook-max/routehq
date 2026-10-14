@@ -15,6 +15,7 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
   const locale = useLocale();
   const [search, setSearch] = useState("");
   const [ownerFilter, setOwnerFilter] = useState("all");
+  const [dayLimit, setDayLimit] = useState(5);
 
   const has = (key: string) => t.has(key as never);
   const tidy = (value: string) => value.replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase());
@@ -123,7 +124,7 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
           <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{documents.length === 0 ? say("emptyBody") : say("noMatchBody")}</p>
         </div>
       ) : (
-        days.map(([day, dayRows]) => (
+        (search.trim() ? days : days.slice(0, dayLimit)).map(([day, dayRows]) => (
           <section className="card overflow-hidden !p-0" key={day}>
             <p className="border-b border-[var(--border)] bg-[var(--panel-secondary)] px-4 py-2.5 font-bold text-[var(--foreground-secondary)]">{longDate(day, locale)}</p>
             <ul className="divide-y divide-[var(--border)]">
@@ -198,6 +199,11 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
           </section>
         ))
       )}
+      {!search.trim() && days.length > dayLimit ? (
+        <button className="pressable inline-flex min-h-11 items-center whitespace-nowrap rounded-full border border-[var(--border)] bg-white px-5 font-bold text-[var(--foreground)]" onClick={() => setDayLimit((limit) => limit + 10)} type="button">
+          {say("showOlder")}
+        </button>
+      ) : null}
     </div>
   );
 }

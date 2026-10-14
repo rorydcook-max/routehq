@@ -44,7 +44,7 @@ export default async function AccountPage() {
         </p>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid items-start gap-4 lg:grid-cols-2">
         <section className="card p-4">
           <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("languageTitle")}</h2>
           <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("languageBody")}</p>

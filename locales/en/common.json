@@ -407,7 +407,8 @@
     "gpsLastSeen": "{provider} · last seen {when}",
     "gpsNever": "never",
     "blockerOpenOther": "Open {code}",
-    "blockerChangeVehicle": "Change the vehicle"
+    "blockerChangeVehicle": "Change the vehicle",
+    "fuelAtDelivery": "At handover: {level}"
   },
   "translation": {
     "translatedFrom": "Translated from {language}",
@@ -1203,7 +1204,8 @@
     "bandOwing": "owe money",
     "secNow": "On rent now",
     "secUpcoming": "Coming up",
-    "secDone": "Finished"
+    "secDone": "Finished",
+    "showAllDone": "Show all {count} finished"
   },
   "inbox": {
     "title": "Inbox",
@@ -3963,7 +3965,8 @@
     "shortBooking": "Booking",
     "shortCustomer": "Customer",
     "shortVehicle": "Vehicle",
-    "morePhotos": "+{count}"
+    "morePhotos": "+{count}",
+    "showOlder": "Show older"
   },
   "reportsPage": {
     "title": "Reports",

@@ -487,6 +487,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           <DoNotRent customerId={customer.id} on={Boolean((customer as any).do_not_rent)} organizationId={organization.id} place="control" reason={null} />
         </Card>
 
+        {detail.rentals.length > 0 ? (
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           <div className="card tile p-4 text-[var(--foreground)]">
             <TileHead title={cx.say("h_title")} />
@@ -524,6 +525,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             </span>
           </a>
         </div>
+        ) : null}
 
         {currentRentals.map((rental) => (
           <ActiveRentalCard customerId={customer.id} dueNow={dueByRental.get(rental.id) || 0} key={rental.id} rental={rental} />

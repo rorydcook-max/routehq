@@ -232,9 +232,9 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                     <th className="w-10 py-2.5 pl-4 pr-2"><span className="sr-only">{t("select")}</span></th>
                     <th className="py-2.5 pr-3">{t("th_vehicle")}</th>
                     <th className="w-[112px] px-3 py-2.5">{t("th_status")}</th>
-                    <th className="w-[120px] px-3 py-2.5 xl:w-[130px]">{t("th_rate")}</th>
-                    <th className="w-[160px] px-3 py-2.5 xl:w-[220px]">{t("th_onRent")}</th>
-                    <th className="w-[150px] px-3 py-2.5 xl:w-[170px]">{t("th_paperwork")}</th>
+                    <th className="w-[116px] px-3 py-2.5">{t("th_rate")}</th>
+                    <th className="w-[150px] px-3 py-2.5 xl:w-[170px]">{t("th_onRent")}</th>
+                    <th className="w-[140px] px-3 py-2.5 xl:w-[150px]">{t("th_paperwork")}</th>
                     <th className="hidden w-[120px] px-3 py-2.5 pr-4 xl:table-cell">{t("th_profit")}</th>
                   </tr>
                 </thead>

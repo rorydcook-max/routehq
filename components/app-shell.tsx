@@ -142,7 +142,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
   const badgeFor = (key: NavKey) => (key === "inbox" ? shell.unreadChats : key === "tasks" ? shell.dueTasks : key === "help" ? shell.helpReplies : 0);
 
   return (
-    <div className="min-h-screen pb-28 lg:pb-0">
+    <div className={`min-h-screen lg:pb-0 ${onFocusedFlow ? "focused-flow pb-24" : "pb-28"}`}>
       <BrandStyle colour={brand?.colour} />
       <aside className="app-sidebar fixed left-0 top-0 z-20 hidden h-screen w-[220px] flex-col border-r border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] px-3 py-4 lg:flex">
         <div className="mb-4 flex items-center px-2 pt-1">
@@ -179,7 +179,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
                 <Icon size={16} />
                 {t(item.key)}
                 {badgeFor(item.key) > 0 ? (
-                  <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--primary)] px-1.5 text-[11px] font-semibold text-white">{badgeFor(item.key)}</span>
+                  <span className="ml-auto flex h-[22px] min-w-[22px] items-center justify-center rounded-full bg-[var(--primary)] px-1.5 text-[14px] font-bold leading-none text-white">{badgeFor(item.key)}</span>
                 ) : null}
               </Link>
             );
@@ -192,7 +192,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
               <form action={switchActiveOrganization} className="mb-2">
                 <select
                   aria-label={t("business")}
-                  className="w-full rounded-lg border border-[var(--border)] bg-white px-2 py-1.5 text-xs font-semibold text-[var(--foreground)]"
+                  className="w-full rounded-lg border border-[var(--border)] bg-white px-2 py-1.5 text-sm font-semibold text-[var(--foreground)]"
                   defaultValue={activeBusiness?.id}
                   id="business-switcher"
                   name="organizationId"
@@ -206,15 +206,15 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
                 </select>
               </form>
             ) : null}
-            <Link className="block truncate text-xs font-semibold text-[var(--muted)] hover:text-[var(--foreground)]" href="/account">
+            <Link className="block truncate text-sm font-semibold text-[var(--muted)] hover:text-[var(--foreground)]" href="/account">
               {userEmail}
             </Link>
             <div className="mt-1.5 flex items-center justify-between gap-2">
-              <Link className="text-[12px] font-semibold text-[var(--primary)] hover:underline" href="/account">
+              <Link className="text-[14px] font-semibold text-[var(--primary)] hover:underline" href="/account">
                 {t("myAccount")}
               </Link>
               <form action={signOut}>
-                <PendingButton className="text-[12px] font-semibold text-[var(--muted)] hover:text-[var(--foreground)] hover:underline" pendingLabel="" type="submit">
+                <PendingButton className="text-[14px] font-semibold text-[var(--muted)] hover:text-[var(--foreground)] hover:underline" pendingLabel="" type="submit">
                   {t("signOut")}
                 </PendingButton>
               </form>
@@ -242,7 +242,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
               <form action={switchActiveOrganization}>
                 <select
                   aria-label={t("business")}
-                  className="max-w-[150px] truncate rounded-full border border-[var(--border)] bg-white px-2 py-1.5 text-xs font-semibold text-[var(--foreground-secondary)] shadow-sm"
+                  className="max-w-[150px] truncate rounded-full border border-[var(--border)] bg-white px-2 py-1.5 text-sm font-semibold text-[var(--foreground-secondary)] shadow-sm"
                   defaultValue={activeBusiness?.id}
                   name="organizationId"
                   onChange={(event) => event.currentTarget.form?.requestSubmit()}
@@ -279,7 +279,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
         {isTeammate ? null : <TrialBanner placement="inline" />}
       </main>
 
-      <nav className="fixed bottom-[calc(12px+env(safe-area-inset-bottom))] left-3 right-3 z-30 rounded-[24px] border border-[var(--border)] bg-white shadow-[var(--shadow-float)] lg:hidden">
+      <nav className={`fixed bottom-[calc(12px+env(safe-area-inset-bottom))] left-3 right-3 z-30 rounded-[24px] border border-[var(--border)] bg-white shadow-[var(--shadow-float)] lg:hidden ${onFocusedFlow ? "hidden" : ""}`}>
         {/* On phones the + lives in the menu bar: floating over the page it sat on top of the buttons at the end of each row. */}
         <div className={`grid px-1 py-2 ${onFocusedFlow ? "grid-cols-4" : "grid-cols-5"}`}>
           {mobileBarItems.map((item, index) => {

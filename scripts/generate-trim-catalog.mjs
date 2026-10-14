@@ -430,8 +430,9 @@ async function deactivateInvalidEvTrims(supabase, target) {
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
-  const apiKey = requiredEnv("OPENAI_API_KEY");
-  const model = process.env.OPENAI_TRIM_CATALOG_MODEL || "gpt-4o";
+  const useGemini = process.env.TRIM_PROVIDER === "gemini";
+  const apiKey = useGemini ? requiredEnv("GEMINI_API_KEY") : requiredEnv("OPENAI_API_KEY");
+  const model = useGemini ? process.env.GEMINI_TRIM_MODEL || "gemini-flash-latest" : process.env.OPENAI_TRIM_CATALOG_MODEL || "gpt-4o";
   const supabaseUrl = requiredEnv("NEXT_PUBLIC_SUPABASE_URL");
   const serviceRoleKey = requiredEnv("SUPABASE_SERVICE_ROLE_KEY");
   const supabase = createClient(supabaseUrl, serviceRoleKey, {
@@ -440,7 +441,7 @@ async function main() {
       autoRefreshToken: false
     }
   });
-  const openai = new OpenAI({ apiKey });
+  const openai = useGemini ? new OpenAI({ apiKey, baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/" }) : new OpenAI({ apiKey });
   const targets = await loadTargets(supabase, args);
 
   let processed = 0;

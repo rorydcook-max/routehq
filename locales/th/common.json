@@ -391,7 +391,8 @@
     "gpsLastSeen": "{provider} · เห็นล่าสุด {when}",
     "gpsNever": "ไม่เคย",
     "blockerOpenOther": "เปิด {code}",
-    "blockerChangeVehicle": "เปลี่ยนรถ"
+    "blockerChangeVehicle": "เปลี่ยนรถ",
+    "fuelAtDelivery": "ตอนส่งมอบ: {level}"
   },
   "translation": {
     "translatedFrom": "แปลจาก {language}",
@@ -1212,7 +1213,8 @@
     "bandOwing": "ค้างชำระ",
     "secNow": "กำลังเช่าอยู่",
     "secUpcoming": "กำลังจะมาถึง",
-    "secDone": "จบแล้ว"
+    "secDone": "จบแล้ว",
+    "showAllDone": "ดูที่เสร็จแล้วทั้งหมด {count} รายการ"
   },
   "inbox": {
     "title": "ข้อความ",
@@ -3972,7 +3974,8 @@
     "shortBooking": "การจอง",
     "shortCustomer": "ลูกค้า",
     "shortVehicle": "รถ",
-    "morePhotos": "+{count}"
+    "morePhotos": "+{count}",
+    "showOlder": "ดูที่เก่ากว่า"
   },
   "reportsPage": {
     "title": "รายงาน",

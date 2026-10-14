@@ -634,6 +634,21 @@ export function VehicleIdentityFields({
               <option value="__manual__">{say("modelOther")}</option>
             </select>
           </label>
+          <label className="block">
+            <span className={labelClass}>{say("year")}</span>
+            {catalogYears.length > 0 ? (
+              <select className={inputClass} onChange={(event) => setYear(event.target.value)} value={year}>
+                <option value="">{say("yearSelect")}</option>
+                {catalogYears.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input className={inputClass} inputMode="numeric" max={new Date().getFullYear() + 1} maxLength={4} min="1950" onChange={(event) => setYear(event.target.value.replace(/\D/g, "").slice(0, 4))} placeholder="2024" type="number" value={year} />
+            )}
+          </label>
         </div>
 
         {manualMake || manualModel ? (
@@ -653,22 +668,7 @@ export function VehicleIdentityFields({
           </div>
         ) : null}
 
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <label className="block">
-            <span className={labelClass}>{say("year")}</span>
-            {catalogYears.length > 0 ? (
-              <select className={inputClass} onChange={(event) => setYear(event.target.value)} value={year}>
-                <option value="">{say("yearSelect")}</option>
-                {catalogYears.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <input className={inputClass} inputMode="numeric" max={new Date().getFullYear() + 1} maxLength={4} min="1950" onChange={(event) => setYear(event.target.value.replace(/\D/g, "").slice(0, 4))} placeholder="2024" type="number" value={year} />
-            )}
-          </label>
+        <div className="mt-4">
           <label className="block">
             <span className={labelClass}>{say("trim")}</span>
             {visibleTrims.length > 0 ? (

@@ -120,8 +120,8 @@ function FileCapture({
 
   return (
     <label className="block rounded-lg border border-dashed border-[var(--info-line)] bg-white p-4">
-      <span className="flex min-h-14 items-center justify-center gap-3 rounded-lg bg-[var(--primary-light)] px-4 py-3 text-base font-semibold text-[var(--primary)]">
-        <Icon size={22} />
+      <span className="flex min-h-14 items-center justify-center gap-2.5 rounded-lg bg-[var(--primary-light)] px-3 py-3 text-center text-base font-semibold leading-tight text-[var(--primary)]">
+        <Icon className="shrink-0" size={22} />
         {label}
       </span>
       <input
@@ -925,6 +925,11 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
       <div hidden={step !== 2}>
         <StepShell eyebrow={t("eyebrowFuelLevel")} title={t("fuelPhoto")}>
           <FileCapture accept="image/*" label={t("fuelCamera")} name="photo_fuel" onSelected={() => setFuelPhotoCaptured(true)} />
+          {mode === "return" && context.deliveryInspection?.fuel_level != null ? (
+            <p className="mt-3 font-semibold text-[var(--foreground-secondary)]">
+              {t("fuelAtDelivery", { level: `${Math.max(0, Math.min(100, deliveryFuel))}%` })}
+            </p>
+          ) : null}
           <div className="mt-4">
             <FuelGauge
               onChange={(value, label) => {

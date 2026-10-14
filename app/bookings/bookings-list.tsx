@@ -165,7 +165,7 @@ function ExtendHoldButton({ rentalId, ended }: { rentalId: string; ended: boolea
   return (
     <>
       <button
-        className="pressable ml-2 rounded-full border border-[var(--border)] bg-white px-2 py-0.5 text-[11px] font-semibold text-[var(--primary)] disabled:opacity-60"
+        className="pressable ml-2 inline-flex min-h-9 items-center whitespace-nowrap rounded-full border border-[var(--border)] bg-white px-3 text-[14px] font-bold text-[var(--primary)] disabled:opacity-60"
         disabled={isPending}
         onClick={() => {
           setError(null);
@@ -178,7 +178,7 @@ function ExtendHoldButton({ rentalId, ended }: { rentalId: string; ended: boolea
       >
         {isPending ? tx.say("saving") : ended ? tx.say("holdAgain") : tx.say("extendHold")}
       </button>
-      {error ? <span className="ml-2 text-[11px] font-semibold text-[var(--danger)]">{error}</span> : null}
+      {error ? <span className="ml-2 text-[14px] font-semibold text-[var(--danger)]">{error}</span> : null}
     </>
   );
 }
@@ -194,6 +194,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
   const [filter, setFilter] = useState<(typeof filters)[number]>("all");
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [allDone, setAllDone] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   // "/bookings?status=overdue" opens on that filter, so other pages can link straight to "late returns" and the like.
@@ -304,7 +305,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
               </h2>
             ) : null}
             <div className="grid gap-3 xl:grid-cols-2 xl:items-start">
-          {section.items.map((booking) => {
+          {(section.key === "done" && !allDone ? section.items.slice(0, 4) : section.items).map((booking) => {
             const timingLabel = rentalTimingLabel(booking, tx);
             const hold = holdState(booking, tx);
             const waitingOn = lateBefore(booking, bookings);
@@ -321,7 +322,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
 
                 <div className="min-w-0 py-0.5">
                   {/* One badge for where the booking is, and one more only while it waits on the customer's link. The dots stay in the corner however the badges wrap. */}
-                  <div className="flex items-start gap-1.5">
+                  <div className="flex items-start gap-1.5 pr-8">
                   <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
                     <Badge tone={statusTone(effectiveStatus)}>{statusLabel(effectiveStatus, tx)}</Badge>
                     {["booked", "draft"].includes(effectiveStatus) && linkLabel(booking.booking_link?.status, tx) ? (
@@ -331,17 +332,17 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                   ) : null}
                   </div>
                     {/* Edit, extend, cancel and delete stay one tap away without crowding every card. */}
-                    <details className="relative z-10 ml-auto shrink-0">
+                    <details className="absolute right-2.5 top-2.5 z-10">
                       <summary aria-label={tx.say("moreOptions")} className="pressable flex h-8 w-8 cursor-pointer list-none items-center justify-center rounded-full text-[var(--muted)] hover:bg-[var(--panel-secondary)] [&::-webkit-details-marker]:hidden">
                         <MoreHorizontal size={18} />
                       </summary>
                       <div className="absolute right-0 top-full z-20 mt-1 flex min-w-[150px] flex-col items-stretch gap-1.5 rounded-lg border border-[var(--border)] bg-white p-2 text-left shadow-lg">
-                <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-full border border-[var(--border)] bg-white px-3 py-1.5 text-[12px] font-semibold text-[var(--foreground-secondary)]" href={`/bookings/${booking.id}/edit`}>
+                <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-full border border-[var(--border)] bg-white px-3 py-1.5 text-[14px] font-semibold text-[var(--foreground-secondary)]" href={`/bookings/${booking.id}/edit`}>
                   {tx.say("edit")}
                 </Link>
                 {canExtend(booking) ? (
                   <RentalAdjustmentButton
-                    className="pressable inline-flex min-h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border)] bg-white px-3 py-1.5 text-[12px] font-semibold text-[var(--foreground-secondary)]"
+                    className="pressable inline-flex min-h-8 items-center justify-center gap-1.5 rounded-md border border-[var(--border)] bg-white px-3 py-1.5 text-[14px] font-semibold text-[var(--foreground-secondary)]"
                     currentEndDate={booking.end_date}
                     currentRate={Number(booking.rental_rate || 0)}
                     currentStartDate={booking.start_date}
@@ -465,6 +466,11 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
             );
           })}
             </div>
+            {section.key === "done" && !allDone && section.items.length > 4 ? (
+              <button className="pressable mt-3 inline-flex min-h-11 items-center whitespace-nowrap rounded-full border border-[var(--border)] bg-white px-5 font-bold text-[var(--foreground)]" onClick={() => setAllDone(true)} type="button">
+                {tx.say("showAllDone", { count: String(section.items.length) })}
+              </button>
+            ) : null}
           </section>
           ))}
         </div>

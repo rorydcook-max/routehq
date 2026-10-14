@@ -1429,6 +1429,7 @@ aside a[class*="bg-[var(--sidebar-active)]"] {
 /* Back / Continue bars: on phones they sit just above the floating bottom menu
    (76px tall, 12px up), which would otherwise cover them until the end of the page. */
 .sticky-actions { bottom: calc(96px + env(safe-area-inset-bottom)); }
+.focused-flow .sticky-actions { bottom: 0; }
 @media (min-width: 1024px) { .sticky-actions { bottom: 0; } }
 
 /* Burmese stacks marks above and below the line, so it needs more room between

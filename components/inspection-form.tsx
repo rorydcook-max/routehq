@@ -1256,40 +1256,46 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
               <div className={`mt-3 grid gap-3 ${depositToCollect ? "sm:grid-cols-[1fr_1fr_auto]" : "sm:grid-cols-[1fr_auto]"}`}>
                 <label className="block">
                   <span className="text-sm font-bold text-[var(--foreground)]">{t("rentalPaymentReceived")}</span>
-                  <input
-                    className={inputClass}
+                  <span className="relative block">
+                    <span aria-hidden="true" className="pointer-events-none absolute bottom-0 left-3 flex h-11 items-center font-semibold text-[var(--foreground-secondary)]">฿</span>
+                    <input
+                    className={`${inputClass} !pl-9`}
                     inputMode="decimal"
                     min="0"
                     onChange={(event) => {
                       setDeliveryPaymentAmount(event.target.value);
                       setReceiptError("");
                     }}
-                    placeholder="THB"
+                    placeholder="0"
                     step="0.01"
                     type="number"
                     value={deliveryPaymentAmount}
                   />
+                  </span>
                 </label>
                 <label className={depositToCollect ? "block" : "hidden"}>
                   <span className="text-sm font-bold text-[var(--foreground)]">{t("depositAmountReceived")}</span>
-                  <input
-                    className={inputClass}
+                  <span className="relative block">
+                    <span aria-hidden="true" className="pointer-events-none absolute bottom-0 left-3 flex h-11 items-center font-semibold text-[var(--foreground-secondary)]">฿</span>
+                    <input
+                    className={`${inputClass} !pl-9`}
                     inputMode="decimal"
                     min="0"
                     onChange={(event) => {
                       setDeliveryDepositAmount(event.target.value);
                       setReceiptError("");
                     }}
-                    placeholder="THB"
+                    placeholder="0"
                     step="0.01"
                     type="number"
                     value={deliveryDepositAmount}
                   />
+                  </span>
                 </label>
                 {/* Once the receipt exists the button has done its job: it used to sit on "Generating..." while the page refreshed. */}
                 {receiptResult ? null : (
                   <button
-                    className={`${touchButton} self-end bg-[var(--primary)] text-white disabled:opacity-40 disabled:shadow-none`}
+                    className={`${touchButton} self-end whitespace-nowrap border-2 border-[var(--primary)] bg-white text-[var(--primary)] disabled:opacity-40`}
                     disabled={isReceiptPending}
                     onClick={generateDeliveryReceipt}
                     type="button"

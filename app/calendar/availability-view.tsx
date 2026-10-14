@@ -75,14 +75,14 @@ export function AvailabilityView({ vehicles, month, today }: { vehicles: Availab
 
       {showsToday ? <ScrollToToday targetId="availability-today" /> : null}
       <div className="overflow-x-auto rounded-xl border border-[var(--border)]" data-scroller data-sticky={LABEL_WIDTH}>
-        <div style={{ minWidth: LABEL_WIDTH + dayCount * DAY_WIDTH }}>
+        <div style={{ minWidth: 168 + dayCount * DAY_WIDTH }}>
           <div className="flex border-b border-[var(--border)] bg-[var(--panel-secondary)]">
             <div className={`sticky left-0 z-20 shrink-0 bg-[var(--panel-secondary)] ${LABEL_CLASS}`} />
             <div className="grid flex-1" style={{ gridTemplateColumns: columns }}>
               {days.map((cell) => (
-                <div className={`py-1 text-center text-[10px] leading-tight ${cell.date === today ? "bg-[var(--primary)] font-semibold text-white" : cell.weekend ? "text-[var(--muted)]" : "text-[var(--foreground-secondary)]"}`} id={cell.date === today ? "availability-today" : undefined} key={cell.date}>
+                <div className={`py-1 text-center text-[14px] leading-tight ${cell.date === today ? "bg-[var(--primary)] font-semibold text-white" : cell.weekend ? "text-[var(--muted)]" : "text-[var(--foreground-secondary)]"}`} id={cell.date === today ? "availability-today" : undefined} key={cell.date}>
                   <div>{cell.letter}</div>
-                  <div className="text-xs font-semibold">{cell.day}</div>
+                  <div className="font-semibold">{cell.day}</div>
                 </div>
               ))}
             </div>
@@ -92,7 +92,7 @@ export function AvailabilityView({ vehicles, month, today }: { vehicles: Availab
             <div key={group.kind}>
               {groups.length > 1 ? (
                 <div className="flex border-b border-[var(--border)] bg-white">
-                  <p className="sticky left-0 z-20 bg-white px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
+                  <p className="sticky left-0 z-20 bg-white px-3 py-1.5 text-[14px] font-bold text-[var(--foreground-secondary)]">
                     {locale !== "en" && kinds.has(`kinds_${group.kind}`) ? kinds(`kinds_${group.kind}`) : kindLabel(group.kind, group.list.length)}
                   </p>
                 </div>

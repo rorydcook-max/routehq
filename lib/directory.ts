@@ -30,6 +30,7 @@ export type DirectoryVehicle = {
   kind: string;
   seats: number | null;
   transmission: string;
+  color: string;
   dailyRate: number;
   weeklyRate: number;
   monthlyRate: number;
@@ -87,7 +88,7 @@ export async function searchDirectory(input: DirectorySearch): Promise<Directory
 
   const { data: vehicles } = await admin
     .from("vehicles")
-    .select("id, organization_id, make, model, year, status, daily_rate, weekly_rate, monthly_rate, deposit_amount, specifications, vehicle_categories(code)")
+    .select("id, organization_id, make, model, year, color, status, daily_rate, weekly_rate, monthly_rate, deposit_amount, specifications, vehicle_categories(code)")
     .in("organization_id", listed.map((organization) => organization.id))
     .is("deleted_at", null)
     .not("status", "in", "(maintenance,inactive,retired)");
@@ -140,6 +141,7 @@ export async function searchDirectory(input: DirectorySearch): Promise<Directory
             kind: String(vehicle.vehicle_categories?.code || ""),
             seats: vehicle.specifications?.seating_capacity ? Number(vehicle.specifications.seating_capacity) : null,
             transmission: String(vehicle.specifications?.transmission || ""),
+        color: String(vehicle.color || ""),
             ...rates,
             quote: quoteFor(rates, days, seasons, startDate, input.endDate),
             deposit: vehicle.deposit_amount != null ? Number(vehicle.deposit_amount) : usualDeposit

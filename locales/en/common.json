@@ -839,7 +839,8 @@
     "returningFound": "Welcome back! We already have your passport, driving licence and photo, so you don't need to add them again.",
     "returningPartial": "Welcome back! Some of your documents are already on file. Please add the ones still marked as needed.",
     "returningNone": "We couldn't find you with those details. Please add your documents below.",
-    "photoManual": "Photo added. We couldn't read it automatically, so please type the numbers below."
+    "photoManual": "Photo added. We couldn't read it automatically, so please type the numbers below.",
+    "startFrom": "Start on {date} instead"
   },
   "customerMessages": {
     "hi": "Hi {name},",

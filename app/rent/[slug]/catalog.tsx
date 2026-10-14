@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { CalendarDays } from "lucide-react";
 import { bookOnline } from "@/app/actions/online-booking";
-import { VehicleKindIcon } from "@/components/vehicle-kind-icon";
+import { VehicleArt } from "@/components/vehicle-art";
 import type { CatalogVehicle } from "@/lib/public-catalog";
 import { clashes } from "@/lib/booking-rules";
 import { daysBetween, headlineRate, minimumStay, planFor } from "@/lib/rental-estimate";
@@ -88,7 +88,7 @@ export function Catalog({
           const freeFrom = clash?.endDate && clash.endDate > startDate ? clash.endDate : null;
           return { vehicle, free: !clash, freeFrom, openEndedClash: !!clash && !clash.endDate };
         })
-        .sort((a, b) => Number(b.free) - Number(a.free)),
+        .sort((a, b) => Number(b.free) - Number(a.free) || (a.freeFrom || "9999").localeCompare(b.freeFrom || "9999")),
     [vehicles, startDate, end, datesReady, gapDays]
   );
   const freeCount = rows.filter((row) => row.free).length;
@@ -134,7 +134,7 @@ export function Catalog({
             {t("setDates")}
           </button>
         </div>
-        <p className="mt-2 text-xs leading-5 text-[var(--muted)]">
+        <p className="mt-2 text-sm leading-5 text-[var(--muted)]">
           {longTerm
             ? t("monthlyExplain")
             : t("setDatesExplain")}
@@ -188,7 +188,7 @@ export function Catalog({
           ].filter(Boolean);
           const isOpen = openId === vehicle.id;
           return (
-            <article className={`rounded-2xl border bg-white p-4 shadow-sm ${free ? "border-[var(--border)]" : "border-[var(--border)] opacity-70"}`} key={vehicle.id}>
+            <article className="rounded-2xl border border-[var(--border)] bg-white p-4 shadow-sm" key={vehicle.id}>
               {vehicle.photoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img alt={vehicle.name} className="mb-3 aspect-[16/9] w-full rounded-xl object-cover sm:hidden" src={vehicle.photoUrl} />
@@ -198,8 +198,8 @@ export function Catalog({
                   // eslint-disable-next-line @next/next/no-img-element
                   <img alt="" className="hidden h-24 w-36 shrink-0 rounded-xl object-cover sm:block" src={vehicle.photoUrl} />
                 ) : (
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
-                    <VehicleKindIcon boxed={false} kind={vehicle.kind} size={26} />
+                  <span className="shrink-0">
+                    <VehicleArt colour={vehicle.color} kind={vehicle.kind} model={vehicle.name} size="sm" />
                   </span>
                 )}
                 <div className="min-w-0 flex-1">
@@ -220,7 +220,7 @@ export function Catalog({
                     </p>
                   ) : null}
                   {free && plan && season?.pct && !tooShort ? (
-                    <p className="mt-0.5 text-xs font-semibold text-[var(--warning)]">
+                    <p className="mt-0.5 text-sm font-semibold text-[var(--warning)]">
                       {season.seasonDays > 0 && season.seasonDays < season.days
                           ? t(season.pct > 0 ? "seasonPricePart" : "seasonDiscountPart", { pct: Math.abs(season.pct), names: season.names.join(", ") || t("highSeason"), inDays: season.seasonDays, days: season.days })
                           : t(season.pct > 0 ? "seasonPrice" : "seasonDiscount", { pct: Math.abs(season.pct), names: season.names.join(", ") || t("highSeason") })}
@@ -230,8 +230,23 @@ export function Catalog({
 
                   {!free ? (
                     <p className="mt-1 text-sm font-semibold text-[var(--warning)]">
-                      {freeFrom ? t("takenFreeFrom", { date: shortDate(freeFrom, locale) }) : openEndedClash ? t("onLongTermRental") : t("takenForDates")}
+                      {openEndedClash ? t("onLongTermRental") : t("takenForDates")}
                     </p>
+                  ) : null}
+                  {!free && freeFrom ? (
+                    <button
+                      className="pressable mt-2 inline-flex min-h-10 items-center whitespace-nowrap rounded-full border-2 border-[var(--primary)] bg-white px-4 text-sm font-bold text-[var(--primary)]"
+                      onClick={() => {
+                        // Keep the length of stay they asked for, starting when this vehicle is free.
+                        const length = end ? daysBetween(startDate, end) : 0;
+                        setStartDate(freeFrom);
+                        if (end && length > 0) setEndDate(addDays(freeFrom, length));
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      type="button"
+                    >
+                      {t("startFrom", { date: shortDate(freeFrom, locale) })}
+                    </button>
                   ) : null}
                 </div>
                 {free && datesReady && bookable ? (

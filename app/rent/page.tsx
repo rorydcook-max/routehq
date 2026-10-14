@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { BusinessLogoImage } from "@/components/business-logo-image";
 import { CustomerLanguagePicker } from "@/components/customer-language-picker";
+import { VehicleArt } from "@/components/vehicle-art";
 import { businessToday } from "@/lib/business-time";
 import { searchDirectory, type DirectoryBusiness } from "@/lib/directory";
 
@@ -99,12 +100,17 @@ export default async function DirectoryPage({ searchParams }: { searchParams: Pr
                   <div className="mt-3 grid gap-3 sm:grid-cols-2">
                     {business.vehicles.slice(0, 8).map((vehicle) => (
                       <div className="flex flex-col rounded-xl border border-[var(--border)] p-3" key={vehicle.id}>
-                        <p className="text-[16px] font-bold">
-                          {vehicle.make} {vehicle.model} {vehicle.year ? <span className="font-medium text-[var(--muted)]">{vehicle.year}</span> : null}
-                        </p>
-                        <p className="text-sm text-[var(--muted)]">
-                          {[vehicle.kind ? t(`kind_${vehicle.kind}`) : "", vehicle.seats ? t("seats", { count: vehicle.seats }) : "", vehicle.transmission].filter(Boolean).join(" · ")}
-                        </p>
+                        <div className="flex items-center gap-3">
+                          <VehicleArt colour={vehicle.color} kind={(vehicle.kind || "car") as any} model={vehicle.model} size="sm" />
+                          <div className="min-w-0">
+                            <p className="text-[16px] font-bold">
+                              {vehicle.make} {vehicle.model} {vehicle.year ? <span className="font-medium text-[var(--muted)]">{vehicle.year}</span> : null}
+                            </p>
+                            <p className="text-sm text-[var(--muted)]">
+                              {[vehicle.kind ? t(`kind_${vehicle.kind}`) : "", vehicle.seats ? t("seats", { count: vehicle.seats }) : "", vehicle.transmission].filter(Boolean).join(" · ")}
+                            </p>
+                          </div>
+                        </div>
                         <p className="mt-2 text-[15px] font-bold">
                           {money(vehicle.quote.rate, business.currency)} {t(`per_${vehicle.quote.model}`)}
                           {vehicle.quote.total !== null ? <span className="font-medium text-[var(--muted)]"> · {t("total", { amount: money(vehicle.quote.total, business.currency) })}</span> : null}

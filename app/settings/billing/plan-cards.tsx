@@ -55,7 +55,7 @@ export function PlanCards({ currentTier, vehicles }: { currentTier: string; vehi
         </div>
       </div>
 
-      <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+      <div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
         {PLANS.map((plan) => {
           const current = plan.id === currentTier;
           const popular = plan.id === "growth";
@@ -63,7 +63,7 @@ export function PlanCards({ currentTier, vehicles }: { currentTier: string; vehi
           const price = yearly ? yearlyPrice(plan) : plan.monthly;
           return (
             <section
-              className={`card flex flex-col p-4 ${current ? "ring-2 ring-[var(--primary)]" : popular ? "ring-1 ring-[var(--primary)]/40" : ""}`}
+              className={`card flex min-w-0 flex-col p-4 ${current ? "ring-2 ring-[var(--primary)]" : popular ? "ring-1 ring-[var(--primary)]/40" : ""}`}
               key={plan.id}
             >
               <div className="flex items-start justify-between gap-2">
@@ -95,12 +95,12 @@ export function PlanCards({ currentTier, vehicles }: { currentTier: string; vehi
                 {differences(plan, say).map((line) => (
                   <li className="flex items-start gap-2" key={line}>
                     <Check className="mt-0.5 shrink-0 text-[var(--success)]" size={15} />
-                    <span>{line}</span>
+                    <span className="min-w-0 [overflow-wrap:anywhere]">{line}</span>
                   </li>
                 ))}
               </ul>
 
-              {!current && !fits ? <p className="mt-3 text-xs font-semibold text-[var(--muted)]">{say("pl_tooSmall", { count: vehicles })}</p> : null}
+              {!current && !fits ? <p className="mt-3 text-sm font-semibold text-[var(--muted)]">{say("pl_tooSmall", { count: vehicles })}</p> : null}
             </section>
           );
         })}

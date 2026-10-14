@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import OpenAI from "openai";
+import { aiTextConfigured, createChatCompletion } from "@/lib/ai-chat";
 import { supportedLocaleOptions } from "@/lib/i18n/locales";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
@@ -59,7 +59,7 @@ export async function translateForReader(
   const passthrough = (): ReadableText[] =>
     originals.map((original) => ({ original, text: original, translated: false, sourceLanguage: null }));
 
-  if (!organizationId || !process.env.OPENAI_API_KEY || !originals.some(Boolean)) return passthrough();
+  if (!organizationId || !aiTextConfigured() || !originals.some(Boolean)) return passthrough();
 
   try {
     const admin = createSupabaseAdminClient() as any;
@@ -79,8 +79,7 @@ export async function translateForReader(
     const misses = wanted.filter((h) => !cache.has(h));
     if (misses.length) {
       const items = misses.map((h) => ({ id: h.slice(0, 12), text: originals[hashes.indexOf(h)] }));
-      const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY, timeout: 12_000, maxRetries: 0 });
-      const response = await client.chat.completions.create({
+      const response = await createChatCompletion({
         model: MODEL,
         temperature: 0,
         response_format: { type: "json_object" },
@@ -91,7 +90,7 @@ export async function translateForReader(
             content: `Target language: ${languageName(targetLocale)} (${targetLocale}).\n\n${JSON.stringify({ items })}`
           }
         ]
-      });
+      }, { timeout: 12000 });
       const parsed = JSON.parse(response.choices[0]?.message?.content || "{}");
       const byId = new Map<string, any>((parsed.items || []).map((item: any) => [String(item.id), item]));
 

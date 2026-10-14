@@ -1,5 +1,5 @@
-import OpenAI from "openai";
 import { businessToday } from "@/lib/business-time";
+import { aiTextConfigured, createChatCompletion } from "@/lib/ai-chat";
 import { getDashboardData } from "@/lib/dashboard";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isExpenseTransaction, isRevenueTransaction } from "@/lib/transaction-options";
@@ -139,8 +139,14 @@ async function businessSnapshot() {
 /** Answers a plain-language question about the business from its own records. */
 export async function answerQuestion(question: string, language = "English", history: AskTurn[] = []): Promise<AskAnswer> {
   const asked = String(question || "").trim().slice(0, 500);
+  // A question gets an answer, never a "save this" card: the change tools are offered only when the message asks
+  // for a change. (Gemini in particular would otherwise turn "which vehicle earned most?" into a cost to record.)
+  const isQuestion =
+    /[?？]\s*$/.test(asked) ||
+    /^(what|which|who|when|where|how|why|is|are|was|were|do|does|did|can|could|should|will|would|show|list|tell|give me|compare|explain)\b/i.test(asked) ||
+    /(ไหม|มั้ย|อะไร|เท่าไร|เท่าไหร่|ที่ไหน|เมื่อไร|เมื่อไหร่|ใคร|ยังไง|อย่างไร|หรือเปล่า)\s*$/.test(asked);
   if (asked.length < 3) return { ok: false, error: "Type a question first." };
-  if (!process.env.OPENAI_API_KEY) return { ok: false, error: "The assistant isn't switched on for this account yet." };
+  if (!aiTextConfigured()) return { ok: false, error: "The assistant isn't switched on for this account yet." };
 
   let snapshot: Awaited<ReturnType<typeof businessSnapshot>>;
   try {
@@ -150,8 +156,7 @@ export async function answerQuestion(question: string, language = "English", his
   }
 
   try {
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    const completion = await openai.chat.completions.create({
+    const completion = await createChatCompletion({
       model: MODEL,
       max_tokens: 600,
       temperature: 0,
@@ -177,8 +182,7 @@ export async function answerQuestion(question: string, language = "English", his
         ...history.slice(-6).map((turn) => ({ role: turn.role, content: String(turn.content || "").slice(0, 1500) })),
         { role: "user", content: asked }
       ],
-      tools: ASSISTANT_TOOLS,
-      tool_choice: "auto"
+      ...(isQuestion ? {} : { tools: ASSISTANT_TOOLS, tool_choice: "auto" as const })
     });
 
     // The model asked to make a change: check it against the real records and

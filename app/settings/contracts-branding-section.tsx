@@ -8,7 +8,7 @@ import { BusinessLogoImage } from "@/components/business-logo-image";
 import { PendingButton } from "@/components/pending-button";
 import { Card, Fold, SectionHeader } from "@/components/ui";
 import { customerLocaleOptions } from "@/lib/i18n/locales";
-import { brandPalette } from "@/lib/brand";
+import { BrandColourField } from "@/app/settings/brand-colour-field";
 
 const inputClass =
   "mt-1 min-h-11 w-full rounded-xl border border-[var(--border-strong)] bg-white px-3 text-[15px] font-semibold text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]";
@@ -132,24 +132,12 @@ export function ContractsBrandingSection({
           <p className="font-bold text-[var(--foreground)]">{say("b_brandTitle")}</p>
           <p className="mt-1 text-sm text-[var(--muted)]">{whiteLabel ? say("b_brandBodyApp") : say("b_brandBody")}</p>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
-            <label className="block">
-              <span className={labelClass}>{say("b_colour")}</span>
-              <span className="mt-1 flex items-center gap-2">
-                <input className="h-10 w-14 cursor-pointer rounded-lg border border-[var(--border)] bg-white p-1" defaultValue={accentColour} name="contract_accent_colour" type="color" />
-                <span className="flex gap-1" aria-hidden="true">
-                  {(() => {
-                    const palette = brandPalette(accentColour);
-                    return [palette.primary, palette.hover, palette.light].map((swatch) => <span className="h-7 w-7 rounded-md border border-[var(--border)]" key={swatch} style={{ background: swatch }} />);
-                  })()}
-                </span>
-              </span>
-              <span className="mt-1 block text-xs text-[var(--muted)]">{say("b_colourHint")}</span>
-            </label>
+            <BrandColourField customLabel={say("b_colourCustom")} hint={say("b_colourHint")} initial={accentColour} key={accentColour} label={say("b_colour")} />
             <label className={`checkbox-label sub-surface min-h-10 font-semibold text-[var(--foreground)] ${whiteLabel ? "" : "opacity-60"}`} style={{ display: "flex", alignItems: "center", padding: "8px 12px" }}>
               <input defaultChecked={poweredByRouteHq || !whiteLabel} disabled={!whiteLabel} name="powered_by_routehq_enabled" type="checkbox" value="true" />
               <span>
                 {say("b_powered")}
-                {!whiteLabel ? <span className="block text-xs font-medium text-[var(--muted)]">{say("b_poweredPlan")}</span> : null}
+                {!whiteLabel ? <span className="block text-sm font-medium text-[var(--muted)]">{say("b_poweredPlan")}</span> : null}
               </span>
             </label>
           </div>
@@ -177,7 +165,7 @@ export function ContractsBrandingSection({
         <Fold summary={say("b_prevSummary")} title={say("b_prevTitle")}>
         <div className="rounded-lg border border-[var(--border)] bg-white p-4">
           <div className="flex items-start justify-between gap-4 border-b border-[var(--border)] pb-4">
-            <BusinessLogoImage alt={`${tradingName} logo`} className="h-16 w-28 rounded-lg border border-[var(--border)] bg-white object-contain p-2" src={logoDisplayUrl} />
+            <BusinessLogoImage alt={`${tradingName} logo`} className="h-14 w-auto max-w-[200px] object-contain object-left" src={logoDisplayUrl} />
             <div className="text-right">
               <p className="text-[11px] font-semibold uppercase tracking-[0.08em]" style={{ color: accentColour }}>
                 {say("b_prevHead")}

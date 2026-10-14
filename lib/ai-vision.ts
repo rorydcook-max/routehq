@@ -7,7 +7,8 @@
  *
  * Gemini has a free tier, but on it Google may use what is sent to improve its models and people may
  * read it. So it reads only photos with nothing personal in them (an odometer, a fuel gauge) unless
- * GEMINI_PAID=true says the key is on a paid plan. Passports and licences go to it only then.
+ * GEMINI_PAID=true says the key is on a paid plan, or GEMINI_ALLOW_ID_PHOTOS=true says the owner accepts that
+ * (Rory, 14 Oct: yes while every record is test data; switch on Gemini billing before real customers).
  * When a provider fails (no credit, down), the next one is tried.
  */
 
@@ -26,7 +27,7 @@ type Provider = "anthropic" | "openai" | "gemini";
 
 /** The providers that may read this kind of photo, in the order to try them: free first for vehicle photos. */
 function providersFor(personal = true): Provider[] {
-  const geminiAllowed = Boolean(process.env.GEMINI_API_KEY) && (!personal || process.env.GEMINI_PAID === "true");
+  const geminiAllowed = Boolean(process.env.GEMINI_API_KEY) && (!personal || process.env.GEMINI_PAID === "true" || process.env.GEMINI_ALLOW_ID_PHOTOS === "true");
   const paid: Provider[] = [];
   if (process.env.ANTHROPIC_API_KEY) paid.push("anthropic");
   if (process.env.OPENAI_API_KEY) paid.push("openai");
@@ -100,7 +101,7 @@ async function readWithOpenAi(input: ReadInput) {
 }
 
 async function readWithGemini(input: ReadInput) {
-  const models = [...new Set([process.env.GEMINI_VISION_MODEL, "gemini-flash-latest", "gemini-3-flash-preview", "gemini-3.1-flash-lite"].filter(Boolean) as string[])];
+  const models = [...new Set([process.env.GEMINI_VISION_MODEL, "gemini-flash-lite-latest", "gemini-3.1-flash-lite", "gemini-flash-latest", "gemini-3-flash-preview"].filter(Boolean) as string[])];
   let lastError: unknown = null;
   for (const model of models) {
     try {
@@ -108,7 +109,7 @@ async function readWithGemini(input: ReadInput) {
     } catch (error) {
       lastError = error;
       // A retired, unknown or busy model is worth trying the next one; anything else (bad photo, quota) stands.
-      if (!/no longer available|not found|is not supported|unknown model|404|high demand|overloaded|unavailable|503|try again later/i.test(error instanceof Error ? error.message : "")) break;
+      if (!/no longer available|not found|is not supported|unknown model|404|high demand|overloaded|unavailable|503|try again later|timeout|timed out|aborted/i.test(error instanceof Error ? `${error.name} ${error.message}` : "")) break;
     }
   }
   throw lastError instanceof Error ? lastError : new Error("The photo could not be read.");
@@ -122,7 +123,9 @@ async function readWithGeminiModel(input: ReadInput, model: string) {
       systemInstruction: { parts: [{ text: `${input.system} Return only JSON.` }] },
       contents: [{ role: "user", parts: [{ inline_data: { mime_type: input.mediaType || "image/jpeg", data: input.bytes.toString("base64") } }, { text: input.prompt }] }],
       generationConfig: { temperature: 0, responseMimeType: "application/json", maxOutputTokens: Math.max(input.maxTokens || 600, 1024) }
-    })
+    }),
+    // A busy model can take minutes; give up and try the next one.
+    signal: AbortSignal.timeout(25_000)
   });
   const payload = await response.json();
   if (!response.ok) throw new Error(payload?.error?.message || "The photo could not be read.");

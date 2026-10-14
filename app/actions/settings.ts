@@ -3,6 +3,7 @@
 import { said } from "@/lib/i18n/server-text";
 import { promptPayQrPath } from "@/lib/promptpay-qr";
 import { revalidatePath } from "next/cache";
+import { tidyLogo } from "@/lib/logo-tidy";
 import { SIGNATURE_AUTHORISATION_TEXT, SIGNATURE_AUTHORISATION_TEXT_VERSION } from "@/lib/signature-authorisation";
 import { redirect } from "next/navigation";
 import OpenAI from "openai";
@@ -397,13 +398,17 @@ export async function updateBusinessLogo(formData: FormData) {
       throw new Error("Business logo must be 2MB or smaller.");
     }
 
-    const extension = validateRasterBrandingFile(logoFile, "Business logo");
+    const uploadedExtension = validateRasterBrandingFile(logoFile, "Business logo");
+    const uploaded = Buffer.from(await logoFile.arrayBuffer());
+    assertRasterImageBytes(uploaded, uploadedExtension, "Business logo");
+    // Crop the margin and clear a flat background so the logo fills its space everywhere.
+    const tidied = await tidyLogo(uploaded);
+    const buffer = tidied || uploaded;
+    const extension = tidied ? "png" : uploadedExtension;
 
     const storagePath = `${organizationId}/branding/logos/${crypto.randomUUID()}.${extension}`;
-    const buffer = Buffer.from(await logoFile.arrayBuffer());
-    assertRasterImageBytes(buffer, extension, "Business logo");
     const { error: uploadError } = await supabase.storage.from("branding").upload(storagePath, buffer, {
-      contentType: logoFile.type || undefined,
+      contentType: tidied ? "image/png" : logoFile.type || undefined,
       upsert: true
     });
 
@@ -440,8 +445,7 @@ export async function updateBusinessLogo(formData: FormData) {
     detail: removeLogo ? "Business logo removed." : "Business logo updated."
   });
 
-  revalidatePath("/settings");
-  revalidatePath("/");
+  revalidatePath("/", "layout");
 }
 
 export async function updateOwnerSignature(formData: FormData) {
@@ -647,8 +651,7 @@ export async function updateContractBrandingSettings(formData: FormData) {
     })
   ]);
 
-  revalidatePath("/settings");
-  revalidatePath("/settings/contracts");
+  revalidatePath("/", "layout");
 }
 
 export async function updateTravelPolicySettings(formData: FormData) {

@@ -1,10 +1,10 @@
 "use server";
 
 import { said } from "@/lib/i18n/server-text";
+import { readFileAsJson, visionProvider } from "@/lib/ai-vision";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { retakeHold } from "@/lib/booking-holds";
-import OpenAI from "openai";
 import { organizationSignatureReference } from "@/lib/branding-assets";
 import { buildContractVariables, renderContractTemplate } from "@/lib/contract-rendering";
 import { defaultRentalContractTemplate, embedLogoInContractVariables, ensureDefaultContractTemplate } from "@/lib/contracts";
@@ -282,40 +282,17 @@ async function uploadPublicCustomerDocument({
 }
 
 async function extractDocumentOcr(file: File, category: "passport" | "driver_license") {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey || !file.type.startsWith("image/")) {
+  if (!visionProvider(true) || !file.type.startsWith("image/")) {
     return {} as Record<string, string>;
   }
 
   try {
     const bytes = Buffer.from(await file.arrayBuffer());
-    const base64 = bytes.toString("base64");
     const prompt =
       category === "passport"
         ? "Extract from this passport image: passport_number, full_name, nationality, date_of_birth (YYYY-MM-DD), expiry_date (YYYY-MM-DD). Respond ONLY with a JSON object with these exact keys. If a field is not visible, use null."
         : "Extract from this driving licence image: licence_number, issuing_country, expiry_date (YYYY-MM-DD). Respond ONLY with a JSON object with these exact keys. If a field is not visible, use null.";
-    const openai = new OpenAI({ apiKey });
-    const result = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      max_tokens: 300,
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "image_url",
-              image_url: {
-                url: `data:${file.type || "image/jpeg"};base64,${base64}`,
-                detail: "high"
-              }
-            },
-            { type: "text", text: prompt }
-          ]
-        }
-      ]
-    });
-    const raw = result.choices[0]?.message?.content || "{}";
-    const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim()) as Record<string, unknown>;
+    const parsed = await readFileAsJson({ system: "You read identity documents for a vehicle rental business.", prompt, bytes, mediaType: file.type || "image/jpeg", maxTokens: 300, personal: true });
 
     return Object.fromEntries(
       Object.entries(parsed)

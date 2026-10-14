@@ -555,6 +555,11 @@ export function CalculatorClient({
               </p>
               <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold ${VERDICT_TONE[outcome.verdict]}`}>{say(`verdict_${outcome.verdict}`)}</span>
             </div>
+            {Number(research?.market_price_low) > 0 && assumptions.price > 0 && assumptions.price < Number(research?.market_price_low) * 0.5 ? (
+              <p className="mt-3 rounded-xl border border-[var(--warning-line)] bg-[var(--warning-light)] px-3 py-2 font-semibold text-[var(--warning)]">
+                {say("priceLooksLow", { vehicle: subjectName, low: money(Number(research?.market_price_low)) })}
+              </p>
+            ) : null}
             <p className={`mt-3 text-3xl font-bold ${best.perYear >= 0 ? "text-[var(--foreground)]" : "text-[var(--danger)]"}`}>
               {best.perYear >= 0 ? say("makes", { amount: about(best.perYear) }) : say("loses", { amount: about(-best.perYear) })}
             </p>
@@ -570,7 +575,9 @@ export function CalculatorClient({
                     : own && style === "monthly" && own.monthlyRate === assumptions.rentMonthly
                       ? say("rentFromOwn", { model: subject.model })
                       : research
-                        ? t("rentFromWeb")
+                        ? sources.length === 0 && research.confidence === "low"
+                          ? t("rentFromKnowledge")
+                          : t("rentFromWeb")
                         : t("rentFromUsual")
                 }
                 label={style === "daily" ? t("rentYoursDaily") : t("rentYours")}

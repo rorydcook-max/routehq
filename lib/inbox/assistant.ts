@@ -1,5 +1,5 @@
-import OpenAI from "openai";
 import { businessToday } from "@/lib/business-time";
+import { aiTextConfigured, createChatCompletion } from "@/lib/ai-chat";
 import { BLOCKING_RENTAL_STATUSES } from "@/lib/rental-conflicts";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
@@ -13,7 +13,7 @@ type Draft = { ok: true; text: string } | { ok: false; error: string };
  * this customer's bookings. Staff read it and press send; it never sends itself.
  */
 export async function draftReply(input: { organizationId: string; conversationId: string; customerId?: string | null }): Promise<Draft> {
-  if (!process.env.OPENAI_API_KEY) return { ok: false, error: "Suggested replies aren't switched on for this account yet." };
+  if (!aiTextConfigured()) return { ok: false, error: "Suggested replies aren't switched on for this account yet." };
 
   const supabase = createSupabaseAdminClient() as any;
   const today = businessToday();
@@ -71,8 +71,7 @@ export async function draftReply(input: { organizationId: string; conversationId
   };
 
   try {
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    const completion = await openai.chat.completions.create({
+    const completion = await createChatCompletion({
       model: MODEL,
       max_tokens: 350,
       temperature: 0.4,

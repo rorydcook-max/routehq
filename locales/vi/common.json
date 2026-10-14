@@ -577,7 +577,8 @@
     "returningChecking": "Đang kiểm tra…",
     "returningFound": "Chào mừng bạn trở lại! Chúng tôi đã có hộ chiếu, bằng lái và ảnh của bạn, nên bạn không cần thêm lại.",
     "returningPartial": "Chào mừng bạn trở lại! Một số giấy tờ của bạn đã có. Vui lòng thêm những mục còn thiếu.",
-    "returningNone": "Không tìm thấy thông tin của bạn. Vui lòng thêm giấy tờ bên dưới."
+    "returningNone": "Không tìm thấy thông tin của bạn. Vui lòng thêm giấy tờ bên dưới.",
+    "photoManual": "Đã thêm ảnh. Chúng tôi không thể tự đọc, vui lòng nhập số bên dưới."
   },
   "customerMessages": {
     "hi": "Chào {name},",

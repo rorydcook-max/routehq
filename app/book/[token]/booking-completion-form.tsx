@@ -112,7 +112,7 @@ const fieldStyle = {
 const inputClass = "mt-2 focus:ring-2 focus:ring-[var(--primary)]/15";
 
 type DocKind = "passport" | "driver_license";
-type DocReadState = "reading" | "read" | "unreadable" | null;
+type DocReadState = "reading" | "read" | "unreadable" | "manual" | null;
 const ID_FIELDS = ["passportNumber", "driverLicenseNumber", "driverLicenseExpiry", "driverLicenseCountry"] as const;
 
 /** Phone photos are several megabytes; a copy this size reads just as well and sends in a moment. */
@@ -582,7 +582,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         body.set("file", await shrinkImage(picked));
         const result = await readIdentityDocument(body);
         if (!result.ok) {
-          setDocRead((state) => ({ ...state, [kind]: result.reason === "unreadable" ? "unreadable" : null }));
+          setDocRead((state) => ({ ...state, [kind]: result.reason === "unreadable" ? "unreadable" : "manual" }));
           setIdOpen(true);
           return;
         }
@@ -605,7 +605,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         const mine = kind === "passport" ? ["passportNumber"] : ["driverLicenseNumber", "driverLicenseExpiry", "driverLicenseCountry"];
         if (mine.some((name) => !fieldValue(name))) setIdOpen(true);
       } catch {
-        setDocRead((state) => ({ ...state, [kind]: "unreadable" }));
+        setDocRead((state) => ({ ...state, [kind]: "manual" }));
         setIdOpen(true);
       }
     });
@@ -618,6 +618,8 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         ? t("detailsRead")
         : docRead[kind] === "unreadable" && !(kind === "passport" ? fieldValue("passportNumber") : fieldValue("driverLicenseNumber"))
           ? t("photoUnreadable")
+          : docRead[kind] === "manual" && !(kind === "passport" ? fieldValue("passportNumber") : fieldValue("driverLicenseNumber"))
+            ? t("photoManual")
           : null;
   const drawing = useRef(false);
   const isRentalDocumentEngine = true;
@@ -2138,7 +2140,7 @@ function UploadCard({
         </label>
       )}
       {note ? (
-        <p aria-live="polite" style={{ fontSize: 14, fontWeight: 600, margin: "8px 0 0", color: noteTone === "unreadable" ? "var(--warning)" : noteTone === "read" ? "var(--success)" : "var(--primary)" }}>
+        <p aria-live="polite" style={{ fontSize: 14, fontWeight: 600, margin: "8px 0 0", color: noteTone === "unreadable" || noteTone === "manual" ? "var(--warning)" : noteTone === "read" ? "var(--success)" : "var(--primary)" }}>
           {note}
         </p>
       ) : null}

@@ -139,7 +139,8 @@
     "lotTipUntil": "with {who} until {date}",
     "lotTipFreeUntil": "free until {date}",
     "profitWeeks": "Profit week by week",
-    "weekTip": "Week of {date}: {amount}"
+    "weekTip": "Week of {date}: {amount}",
+    "planTitle": "What's on"
   },
   "nav": {
     "main": "Main",
@@ -836,7 +837,8 @@
     "returningChecking": "Checking…",
     "returningFound": "Welcome back! We already have your passport, driving licence and photo, so you don't need to add them again.",
     "returningPartial": "Welcome back! Some of your documents are already on file. Please add the ones still marked as needed.",
-    "returningNone": "We couldn't find you with those details. Please add your documents below."
+    "returningNone": "We couldn't find you with those details. Please add your documents below.",
+    "photoManual": "Photo added. We couldn't read it automatically, so please type the numbers below."
   },
   "customerMessages": {
     "hi": "Hi {name},",
@@ -2643,7 +2645,20 @@
     "bookAria": "Book {vehicle} from {day}",
     "freeTap": "Free · tap to book {vehicle}",
     "tapHint": "Tap a booking to open it, or an empty day to book that vehicle.",
-    "ev_expected": "Expected {amount}: {subject}"
+    "ev_expected": "Expected {amount}: {subject}",
+    "viewDay": "Day",
+    "viewWeek": "Week",
+    "viewMonth": "Month",
+    "viewCustom": "Custom",
+    "from": "From",
+    "to": "To",
+    "previous": "Earlier",
+    "next": "Later",
+    "nothingThisDay": "Nothing booked",
+    "nothingInRange": "Nothing scheduled on these days.",
+    "lateSince": "Late · was due {date}",
+    "outsideLoaded": "These days are further out than this page loads.",
+    "openThere": "Open in the calendar"
   },
   "vehiclePage": {
     "fleet": "Fleet",
@@ -3802,7 +3817,7 @@
     "pl_support": "Priority support",
     "pl_tooSmall": "Too small for your {count} vehicles",
     "pl_founding": "Founding offer: the first 100 businesses keep half price for as long as they stay.",
-    "b_colourHint": "One colour; RouteHQ works out the shades so buttons and text stay readable.",
+    "b_colourHint": "Tap a colour to try it on this page. Save to use it everywhere; RouteHQ works out the shades so buttons and text stay readable.",
     "b_brandTitle": "Your brand",
     "b_brandBody": "Your logo and colour go on everything customers see: booking links, the signing page, their booking page, receipts, agreements and your online booking page. From the Growth plan, your logo also replaces RouteHQ's inside the app.",
     "b_brandBodyApp": "Your logo and colour go on everything customers see, and your logo replaces RouteHQ's inside the app for you and your team.",
@@ -3856,7 +3871,8 @@
     "iv_manager": "Manager",
     "iv_managerBody": "Day-to-day work, and can decide refunds and waive charges. No business settings.",
     "team_manager": "Manager",
-    "team_level": "Level"
+    "team_level": "Level",
+    "b_colourCustom": "Pick your own"
   },
   "accountPage": {
     "roleOwner": "Owner",
@@ -4259,7 +4275,9 @@
     "ratesFrom": "From {count} prices found online. {dropped, plural, =0 {} one {# unusual price left out.} other {# unusual prices left out.}}",
     "lookedUpSaved": "Prices from a look-up on {date}. Older ones are checked again in the background.",
     "lookedUpRechecked": "Checked against an earlier look-up for this model.",
-    "lookedUpFresh": "Looked up just now."
+    "lookedUpFresh": "Looked up just now.",
+    "priceLooksLow": "That price is far below what a {vehicle} sells for (from about {low}). Check the price you typed: the rent below is worked out from it.",
+    "rentFromKnowledge": "A rough estimate for this model here: live prices could not be checked this time. Change it to your own price."
   },
   "importer": {
     "dt_vehicles": "Vehicles",

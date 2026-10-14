@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
     store = null;
   }
   const keep = async (research: Record<string, any>, pages: unknown[]) => {
-    if (store && Number(research.rent_month_typical) > 0) {
+    if (store && Number(research.rent_month_typical) > 0 && !(research.confidence === "low" && pages.length === 0)) {
       await store.from("market_research_cache").upsert({ cache_key: cacheKey, payload: research, sources: pages, created_at: new Date().toISOString() });
     }
   };

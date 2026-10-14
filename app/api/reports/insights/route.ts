@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
+import { aiTextConfigured, createChatCompletion } from "@/lib/ai-chat";
 import { getCurrentMembership } from "@/lib/auth/roles";
 
 export async function POST(request: NextRequest) {
@@ -17,11 +17,9 @@ export async function POST(request: NextRequest) {
       }
     })();
 
-    if (!process.env.OPENAI_API_KEY) {
+    if (!aiTextConfigured()) {
       return NextResponse.json({ insights: [] }, { status: 200 });
     }
-
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
     const summary = {
       period: data.dateRange?.label,
@@ -41,7 +39,7 @@ export async function POST(request: NextRequest) {
       outstandingTotal: (data.outstandingBalances || []).reduce((sum: number, b: any) => sum + b.totalBalance, 0)
     };
 
-    const completion = await openai.chat.completions.create({
+    const completion = await createChatCompletion({
       model: "gpt-4o",
       max_tokens: 800,
       messages: [

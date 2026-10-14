@@ -20,8 +20,11 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isExpenseTransaction, isRevenueTransaction } from "@/lib/transaction-options";
 import { kindFromCategory } from "@/lib/vehicle-groups";
-import { VehicleArt, paintOf } from "@/components/vehicle-art";
-import { Dot, FleetLot, InOutBars, Ring, Spark, TileHead, WeekPlanner, type LotState, type LotVehicle, type PlannerBar, type PlannerLane } from "@/components/glance";
+import { VehicleArt } from "@/components/vehicle-art";
+import { Dot, FleetLot, InOutBars, Ring, Spark, TileHead, type LotState, type LotVehicle } from "@/components/glance";
+import { AgendaCalendar } from "@/components/agenda-calendar";
+import { getCalendarEventsBetween, type CalendarEvent } from "@/lib/calendar";
+import { taskCalendarEvents } from "@/lib/calendar-tasks";
 
 // Dates and counts are worded by the translation files (see lib/i18n/dates.ts and locales/).
 function addDays(isoDate: string, days: number) {
@@ -77,18 +80,6 @@ function AgendaRow({ item, art, card = false, delay }: { item: AgendaItem; art?:
         </span>
       </Link>
     </li>
-  );
-}
-
-function Panel({ title, action, children, className = "" }: { title: string; action?: ReactNode; children: ReactNode; className?: string }) {
-  return (
-    <section className={`card overflow-hidden ${className}`}>
-      <header className="flex items-center justify-between gap-3 px-4 pb-2 pt-4">
-        <h2 className="text-[18px] font-bold tracking-[-0.01em] text-[var(--foreground)]">{title}</h2>
-        {action}
-      </header>
-      {children}
-    </section>
   );
 }
 
@@ -393,39 +384,25 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       number: date.getUTCDate()
     };
   });
-  // ── The week planner: one lane per vehicle, who has it and when it changes hands ──
-  const weekEnd = addDays(today, 6);
+  // ── The calendar: what happens each day (handovers, returns, payments, renewals, jobs), a week by default ──
   const firstName = (name: string | null | undefined) => String(name || "").trim().split(/\s+/)[0] || t("walkIn");
-  const lanesAll = vehicles.map((v) => {
-    const bars: PlannerBar[] = [];
-    for (const r of rentals.filter((entry) => entry.vehicleId === v.id)) {
-      const startDay = String(r.start || "").slice(0, 10);
-      const onRoad = r.status !== "Booked";
-      const lateBackHere = onRoad && r.end !== "Indefinite" && r.end < today;
-      const endDay = r.end === "Indefinite" || lateBackHere ? weekEnd : String(r.end || "").slice(0, 10);
-      if (!startDay || startDay > weekEnd || endDay < today) continue;
-      const from = Math.max(0, daysBetween(today, startDay));
-      const to = Math.min(6, daysBetween(today, endDay));
-      const lateOut = !onRoad && startDay < today;
-      bars.push({
-        start: from,
-        length: Math.max(1, to - from + 1),
-        label: firstName(r.customer),
-        kind: lateBackHere || lateOut ? "late" : onRoad ? "rent" : "next",
-        back: onRoad && !lateBackHere && r.end !== "Indefinite" && r.end <= weekEnd,
-        href: `/bookings/${r.id}`,
-        title: `${r.customer || t("walkIn")} · ${shortDate(startDay)} – ${r.end === "Indefinite" ? t("openEnded") : shortDate(String(r.end))}`
-      });
-    }
-    // A return and the next handover on the same day share it: the first bar stops where the next one starts.
-    bars.sort((a, b) => a.start - b.start);
-    for (let index = 0; index < bars.length - 1; index++) {
-      if (bars[index].start + bars[index].length > bars[index + 1].start && bars[index + 1].start > bars[index].start) bars[index].length = bars[index + 1].start - bars[index].start;
-    }
-    return { id: v.id, name: v.model || v.make, paint: paintOf(v.color) || "var(--primary)", href: `/fleet/${v.id}`, bars } as PlannerLane;
-  });
-  const lanes = [...lanesAll.filter((lane) => lane.bars.length > 0), ...lanesAll.filter((lane) => lane.bars.length === 0)].slice(0, 8);
-  const moreLanes = lanesAll.length - lanes.length;
+  const calendarFrom = `${addDays(`${today.slice(0, 7)}-01`, -1).slice(0, 7)}-01`;
+  const calendarTo = addDays(`${addDays(`${addDays(`${today.slice(0, 7)}-01`, 62).slice(0, 7)}-01`, 32).slice(0, 7)}-01`, -1);
+  const calendarEvents: CalendarEvent[] = await getCalendarEventsBetween(organization.id, calendarFrom, calendarTo).catch(() => []);
+  calendarEvents.push(
+    ...taskCalendarEvents(taskList, {
+      from: calendarFrom,
+      to: calendarTo,
+      today,
+      canDecide,
+      describe: (job) => {
+        const waiting = job.action === "request";
+        const what = waiting ? t("waitingForAnswer", { who: job.customerName || t("aCustomer") }) : jobName(job.action) || job.title.split(" - ")[0];
+        return [what, waiting ? null : job.customerName, noPlate(job.vehicleLabel)].filter(Boolean).join(" · ");
+      }
+    })
+  );
+  calendarEvents.sort((a, b) => a.date.localeCompare(b.date));
 
   // ── Tiles: one thing each, readable at a glance ──
   const monthName = new Intl.DateTimeFormat(intlLocale(locale), { month: "long", timeZone: "UTC" }).format(new Date(`${today}T00:00:00Z`));
@@ -685,28 +662,16 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       ) : null}
 
       <div className="grid gap-5 lg:grid-cols-12 lg:gap-6">
+        <div className="min-w-0 space-y-5 lg:col-span-12">
+          <section className="card rise relative -mt-12 p-3 lg:mt-0 lg:p-5">
+            <header className="flex items-baseline justify-between gap-3 px-1 pb-3">
+              <h2 className="text-[20px] text-[var(--foreground)] lg:text-[22px]">{t("planTitle")}</h2>
+              <PanelLink href="/calendar">{t("calendar")}</PanelLink>
+            </header>
+            <AgendaCalendar covers={{ from: calendarFrom, to: calendarTo }} defaultView="week" events={calendarEvents} storageKey="routehq.dashboard.calendar" today={today} />
+          </section>
+        </div>
         <div className="min-w-0 space-y-5 lg:col-span-8">
-          {lanes.length > 0 ? (
-            <section className="card rise relative -mt-12 p-3 pb-2 lg:mt-0 lg:p-5 lg:pb-3">
-              <header className="flex items-baseline justify-between gap-3 px-1 pb-2">
-                <h2 className="text-[20px] text-[var(--foreground)] lg:text-[22px]">{t("thisWeek")}</h2>
-                <PanelLink href="/calendar">{t("calendar")}</PanelLink>
-              </header>
-              <WeekPlanner
-                days={weekDays.map((day) => ({ key: day.day, name: day.name, number: day.number }))}
-                lanes={lanes}
-                legend={[
-                  { color: "var(--on-rent)", label: t("legendOnRent") },
-                  { color: "var(--going-out)", label: t("weekOut") },
-                  { color: "var(--coming-back)", label: t("weekBack") },
-                  ...(lanes.some((lane) => lane.bars.some((bar) => bar.kind === "late")) ? [{ color: "var(--danger)", label: t("legendLate") }] : [])
-                ]}
-              />
-              {moreLanes > 0 ? (
-                <p className="px-1 pb-1 pt-1"><PanelLink href="/calendar">{t("moreOnCalendar", { count: moreLanes })}</PanelLink></p>
-              ) : null}
-            </section>
-          ) : null}
 
           {/* Phones: the car park comes after the week. Computers have it in the side column. */}
           {lot.length > 0 ? (
@@ -737,14 +702,6 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
             )}
           </section>
 
-          {/* An empty week is not news: the card only appears when something is coming. */}
-          {upcomingItems.length === 0 ? null : (
-            <Panel action={<PanelLink href="/calendar">{t("seeAll")}</PanelLink>} title={t("comingUp")}>
-              <ul className="divide-y divide-[var(--border)] border-t border-[var(--border)]">
-                {upcomingItems.slice(0, 8).map((item) => <AgendaRow art={artFor(item)} item={item} key={item.key} />)}
-              </ul>
-            </Panel>
-          )}
         </div>
 
         {/* On a computer the tiles stand in their own column beside the week. */}

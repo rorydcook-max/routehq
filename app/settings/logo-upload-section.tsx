@@ -48,7 +48,7 @@ export function LogoUploadSection({ logoUrl, orgName }: { logoUrl: string | null
   return (
     <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5">
       <div className="flex items-center gap-3">
-        {logoUrl ? <BusinessLogoImage alt={orgName} className="h-12 w-20 shrink-0 rounded-lg bg-white object-contain p-1.5" src={logoUrl} /> : null}
+        {logoUrl ? <BusinessLogoImage alt={orgName} className="h-12 w-auto max-w-[160px] shrink-0 object-contain object-left" src={logoUrl} /> : null}
         <div className="min-w-0">
           <p className="text-[16px] font-bold leading-tight text-[var(--foreground)]">{logoUrl ? say("lg_title") : say("lg_uploadTitle")}</p>
           <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{logoUrl ? say("lg_body") : say("lg_uploadBody")}</p>

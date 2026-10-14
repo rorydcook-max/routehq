@@ -1,4 +1,5 @@
 import { businessToday } from "@/lib/business-time";
+import { aiTextConfigured, createChatCompletion } from "@/lib/ai-chat";
 import type { ParsedSheet } from "@/lib/import/spreadsheet";
 
 /**
@@ -55,10 +56,7 @@ Return JSON: {"vehicles":[],"rentals":[{"vehicle_registration":"1กข 2345","v
 }
 
 async function readChunk(text: string, apiKey: string, today: string): Promise<Partial<Record<Kind, Record<string, unknown>[]>>> {
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
+  const payload: any = await createChatCompletion({
       model: process.env.OPENAI_IMPORT_MODEL || "gpt-4o",
       response_format: { type: "json_object" },
       temperature: 0,
@@ -66,10 +64,8 @@ async function readChunk(text: string, apiKey: string, today: string): Promise<P
         { role: "system", content: "You read rental business messages for RouteHQ. Return strict JSON only." },
         { role: "user", content: prompt(text, today) }
       ]
-    })
-  });
-  const payload = await response.json().catch(() => null);
-  if (!response.ok || !payload) throw new Error("not read");
+    } as any).catch(() => null);
+  if (!payload) throw new Error("not read");
   return JSON.parse(payload.choices?.[0]?.message?.content || "{}");
 }
 
@@ -88,7 +84,7 @@ function chunks(text: string) {
 }
 
 export function canReadChat() {
-  return Boolean(process.env.OPENAI_API_KEY);
+  return aiTextConfigured();
 }
 
 /** A chat export or pasted text: is it messages rather than a spreadsheet? */
@@ -98,7 +94,7 @@ export function isChatFile(name: string, type: string) {
 
 /** Reads the messages and returns one sheet per kind, in RouteHQ's own columns. */
 export async function readChatText(raw: string): Promise<{ sheets: ParsedSheet[]; trimmed: boolean; unread: number }> {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = aiTextConfigured() ? "configured" : "";
   if (!apiKey) return { sheets: [], trimmed: false, unread: 0 };
   // A years-long chat export: the most recent messages matter most.
   const trimmed = raw.length > MAX_CHAT_CHARACTERS;

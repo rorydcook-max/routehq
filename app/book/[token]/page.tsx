@@ -410,15 +410,15 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
           <CustomerLanguagePicker />
         </div>
         <header className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
-          <div className="flex items-center gap-3">
+          <div className={logoUrl ? "space-y-2" : "flex items-center gap-3"}>
             <BusinessLogoImage
               alt={`${organization.name} logo`}
-              className="max-h-[60px] max-w-[160px] object-contain"
+              className="block h-auto max-h-16 w-auto max-w-[240px] object-contain object-left"
               fallback={<span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--primary)] text-lg font-semibold text-white">{String(organization?.name || "F").slice(0, 1)}</span>}
               src={logoUrl}
             />
             <div>
-              <p className="text-xs font-semibold uppercase text-[var(--primary)]">{t("rentalBooking")}</p>
+              <p className="text-sm font-semibold text-[var(--primary)]">{t("rentalBooking")}</p>
               {logoUrl ? null : <h1 className="text-xl font-semibold">{organization?.name || ""}</h1>}
             </div>
           </div>

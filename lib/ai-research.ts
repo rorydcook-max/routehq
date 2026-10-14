@@ -29,7 +29,49 @@ function collectSources(response: any): ResearchSource[] {
 }
 
 export function researchAvailable() {
-  return Boolean(process.env.OPENAI_API_KEY);
+  return Boolean(process.env.OPENAI_API_KEY || process.env.GEMINI_API_KEY);
+}
+
+/**
+ * The same look-up through Gemini with Google Search, used when OpenAI is not
+ * set up or cannot answer (out of credit, busy). Lighter models first: they
+ * answer in seconds and search just as well.
+ */
+async function researchJsonGemini(prompt: string): Promise<{ data: Record<string, any>; sources: ResearchSource[] }> {
+  const key = process.env.GEMINI_API_KEY;
+  if (!key) throw new Error("Research is not set up.");
+  const models = [...new Set([process.env.GEMINI_RESEARCH_MODEL, "gemini-flash-latest", "gemini-flash-lite-latest", "gemini-3.1-flash-lite"].filter(Boolean) as string[])];
+  // Google Search is not in Gemini's free allowance. Without it the model answers from what it knows of the
+  // market: rougher than live prices (so marked low confidence), but far closer than a share of the price.
+  const offline = `You cannot browse the web for this answer. Answer from what you know of this market, for this exact vehicle, and set "confidence" to "low". Leave "rent_quotes" empty.\n\n${prompt}`;
+  const attempts = [...models.map((model) => ({ model, search: true })), ...["gemini-flash-lite-latest", "gemini-3.1-flash-lite"].map((model) => ({ model, search: false }))];
+  let lastError: unknown = null;
+  for (const { model, search } of attempts) {
+    try {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-goog-api-key": key },
+        body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: search ? prompt : offline }] }], ...(search ? { tools: [{ google_search: {} }] } : {}), generationConfig: { temperature: 0.2 } }),
+        signal: AbortSignal.timeout(100_000)
+      });
+      const body: any = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(`gemini ${model} ${response.status}: ${String(body?.error?.message || "").slice(0, 160)}`);
+      const candidate = body?.candidates?.[0];
+      const text = (candidate?.content?.parts || []).map((part: any) => part?.text || "").join("");
+      const seen = new Map<string, ResearchSource>();
+      for (const chunk of candidate?.groundingMetadata?.groundingChunks || []) {
+        const url = chunk?.web?.uri;
+        if (typeof url === "string" && /^https?:\/\//.test(url) && !seen.has(url)) seen.set(url, { url, title: String(chunk?.web?.title || new URL(url).hostname) });
+      }
+      const data = parseJsonObject(text);
+      if (!search) data.confidence = "low";
+      return { data, sources: Array.from(seen.values()) };
+    } catch (error) {
+      lastError = error;
+      console.error("[ai-research]", String((error as any)?.message || error).slice(0, 200));
+    }
+  }
+  throw lastError || new Error("Research failed.");
 }
 
 /**
@@ -37,6 +79,17 @@ export function researchAvailable() {
  * object. Returns the object and the pages it used.
  */
 export async function researchJson(prompt: string): Promise<{ data: Record<string, any>; sources: ResearchSource[] }> {
+  if (!process.env.OPENAI_API_KEY) return researchJsonGemini(prompt);
+  try {
+    return await researchJsonOpenAI(prompt);
+  } catch (error) {
+    if (!process.env.GEMINI_API_KEY) throw error;
+    console.error("[ai-research] openai:", String((error as any)?.message || error).slice(0, 200));
+    return researchJsonGemini(prompt);
+  }
+}
+
+async function researchJsonOpenAI(prompt: string): Promise<{ data: Record<string, any>; sources: ResearchSource[] }> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error("Research is not set up.");
   const client = new OpenAI({ apiKey }) as any;

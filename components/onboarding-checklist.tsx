@@ -76,7 +76,7 @@ export function OnboardingChecklist({
         <div className="h-full rounded-full bg-[var(--primary)]" style={{ width: `${Math.max(progress, 4)}%` }} />
       </div>
       {next ? (
-        <Link className="primary-action pressable mt-3 w-full" href={next.href as Route}>
+        <Link className="primary-action pressable mt-3 w-full whitespace-nowrap lg:w-auto lg:px-6" href={next.href as Route}>
           {label(next)}
           <ChevronRight size={18} />
         </Link>

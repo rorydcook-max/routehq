@@ -7,7 +7,7 @@ export type CalendarEvent = {
   title: string;
   tone: "blue" | "amber" | "red" | "green" | "purple";
   href: string;
-  type: "rental_start" | "rental_end" | "rental_due" | "compliance" | "maintenance" | "payment" | "custom";
+  type: "rental_start" | "rental_end" | "rental_due" | "compliance" | "maintenance" | "payment" | "custom" | "task";
   /** What the event is, so the screen can say it in the reader's language (calendar.ev_<key>). The title is the English version. */
   say?: { key: string; subject: string; amount?: string; paper?: string };
 };
@@ -35,11 +35,14 @@ function money(value: number) {
  * shorter months, so the calendar was always empty.)
  */
 export async function getCalendarEvents(organizationId: string, year: number, month: number): Promise<CalendarEvent[]> {
+  const mm = String(month).padStart(2, "0");
+  return getCalendarEventsBetween(organizationId, `${year}-${mm}-01`, `${year}-${mm}-${String(lastDayOfMonth(year, month)).padStart(2, "0")}`);
+}
+
+/** The same events for any stretch of days (the dashboard asks for a few months around today). */
+export async function getCalendarEventsBetween(organizationId: string, startDate: string, endDate: string): Promise<CalendarEvent[]> {
   const supabase = (await createSupabaseServerClient()) as any;
   const events: CalendarEvent[] = [];
-  const mm = String(month).padStart(2, "0");
-  const startDate = `${year}-${mm}-01`;
-  const endDate = `${year}-${mm}-${String(lastDayOfMonth(year, month)).padStart(2, "0")}`;
   const today = businessToday();
 
   const [rentalsResult, paymentsResult, vehiclesResult] = await Promise.all([

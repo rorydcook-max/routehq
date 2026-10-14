@@ -65,6 +65,11 @@ export function brandPalette(colour: string): BrandPalette {
 /** The CSS that re-colours a page. Empty when the colour is RouteHQ's own. */
 export function brandCss(colour: string | null | undefined) {
   if (!isBrandColour(colour) || colour.toLowerCase() === ROUTEHQ_BRAND || EARLIER_ROUTEHQ.includes(colour.toLowerCase())) return "";
+  return brandCssAlways(colour);
+}
+
+/** The same CSS for any colour, RouteHQ's own included (the settings preview needs that). */
+export function brandCssAlways(colour: string) {
   const palette = brandPalette(colour);
   return `:root{--primary:${palette.primary};--primary-hover:${palette.hover};--primary-light:${palette.light};--primary-blue:${palette.primary};--primary-blue-hover:${palette.hover};--primary-blue-light:${palette.light};--primary-strong:${palette.hover};--gradient-brand:${palette.primary};--gradient-teal:${palette.primary};--info:${palette.primary};--info-light:${palette.light};--sidebar-active:${palette.primary};--sidebar-text-active:${palette.primary};--kind-move:${palette.primary};--kind-move-bg:${palette.light};--focus-ring:${palette.ring};--focus-ring-strong:${palette.ringStrong};--band:${palette.primary};--band-action:#ffffff;--band-logo-accent:#ffffff;--band-action-ink:${palette.primary};--analytics-panel:${palette.primary};--analytics-card:${palette.hover};}`;
 }

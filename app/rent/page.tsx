@@ -3,6 +3,7 @@ import { Search } from "lucide-react";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { BusinessLogoImage } from "@/components/business-logo-image";
+import { RouteHqLogo } from "@/components/brand-logo";
 import { CustomerLanguagePicker } from "@/components/customer-language-picker";
 import { VehicleArt } from "@/components/vehicle-art";
 import { businessToday } from "@/lib/business-time";
@@ -41,7 +42,7 @@ export default async function DirectoryPage({ searchParams }: { searchParams: Pr
     <main className="min-h-screen bg-[var(--panel-secondary)] px-4 py-5 text-[var(--foreground)]">
       <div className="mx-auto max-w-4xl space-y-5">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-sm font-bold text-[var(--muted)]">RouteHQ</p>
+          <a aria-label="RouteHQ" href="/rent"><RouteHqLogo className="h-7 w-auto" showDescriptor={false} /></a>
           <CustomerLanguagePicker />
         </div>
         <header className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">

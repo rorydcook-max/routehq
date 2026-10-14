@@ -163,7 +163,7 @@ export function Catalog({
               : t("freeCountMonthly", { free: freeCount, total: vehicles.length, start: shortDate(startDate, locale) })}
       </p>
 
-      <section className="space-y-3">
+      <section className="grid items-start gap-3 lg:grid-cols-2">
         {rows.map(({ vehicle, free, freeFrom, openEndedClash }) => {
           const headline = headlineRate(vehicle);
           // A monthly-only vehicle can't be booked for a weekend.
@@ -188,7 +188,7 @@ export function Catalog({
           ].filter(Boolean);
           const isOpen = openId === vehicle.id;
           return (
-            <article className="rounded-2xl border border-[var(--border)] bg-white p-4 shadow-sm" key={vehicle.id}>
+            <article className={`rounded-2xl border border-[var(--border)] bg-white p-4 shadow-sm ${isOpen ? "lg:col-span-2" : ""}`} key={vehicle.id}>
               {vehicle.photoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img alt={vehicle.name} className="mb-3 aspect-[16/9] w-full rounded-xl object-cover sm:hidden" src={vehicle.photoUrl} />

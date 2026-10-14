@@ -737,7 +737,7 @@
     "textFixedOnceSigned": "This exact text is fixed once you sign. Document fingerprint:",
     "signBelow": "Sign below",
     "signAndComplete": "Sign the agreement and finish",
-    "saveAndReview": "Save my details and read the agreement",
+    "saveAndReview": "Save and read agreement",
     "progress": "Your progress",
     "documents": "Documents",
     "agreement": "Agreement",
@@ -844,7 +844,8 @@
     "returningPartial": "Welcome back! Some of your documents are already on file. Please add the ones still marked as needed.",
     "returningNone": "We couldn't find you with those details. Please add your documents below.",
     "photoManual": "Photo added. We couldn't read it automatically, so please type the numbers below.",
-    "startFrom": "Start on {date} instead"
+    "startFrom": "Start on {date} instead",
+    "timingLater": "At pickup"
   },
   "customerMessages": {
     "hi": "Hi {name},",

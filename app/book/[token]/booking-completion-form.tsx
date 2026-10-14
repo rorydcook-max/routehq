@@ -1252,36 +1252,34 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm font-semibold text-[var(--foreground)]">{t(`method_${key}`)}</span>
                       <span className="mt-1 block text-sm leading-5 text-[var(--muted)]">{t(`method_${key}_hint`)}</span>
-                      <span className="mt-3 flex flex-wrap gap-2">
-                        <button
-                          className={`pressable rounded-full px-3 py-1 text-xs font-semibold ${active && effectiveTiming === "on_delivery" ? "bg-[var(--primary)] text-white" : "bg-white text-[var(--foreground-secondary)] ring-1 ring-[var(--border)]"}`}
-                          onClick={(event) => {
-                            event.preventDefault();
-                            setPaymentMethod(key);
-                            setPaymentTiming("on_delivery");
-                            setPaymentReported(false);
-                          }}
-                          type="button"
-                        >
-                          {t("payAtHandover")}
-                        </button>
-                        {!info.deliveryOnly ? (
-                          <button
-                            className={`pressable rounded-full px-3 py-1 text-xs font-semibold ${payNowActive ? "bg-[var(--primary)] text-white" : "bg-white text-[var(--foreground-secondary)] ring-1 ring-[var(--border)]"}`}
-                            onClick={(event) => {
-                              event.preventDefault();
-                              setPaymentMethod(key);
-                              setPaymentTiming("now");
-                              setPaymentReported(false);
-                            }}
-                            type="button"
-                          >
-                            {t("payNow")}
-                          </button>
-                        ) : null}
-                      </span>
                     </span>
                   </label>
+                  {active && !info.deliveryOnly ? (
+                    <div className="mt-3 grid grid-cols-2 gap-1 rounded-xl bg-white p-1 ring-1 ring-[var(--border)]" role="group">
+                      <button
+                        aria-pressed={effectiveTiming === "on_delivery"}
+                        className={`pressable whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition ${effectiveTiming === "on_delivery" ? "bg-[var(--primary)] text-white shadow-sm" : "text-[var(--foreground-secondary)]"}`}
+                        onClick={() => {
+                          setPaymentTiming("on_delivery");
+                          setPaymentReported(false);
+                        }}
+                        type="button"
+                      >
+                        {t("timingLater")}
+                      </button>
+                      <button
+                        aria-pressed={payNowActive}
+                        className={`pressable whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition ${payNowActive ? "bg-[var(--primary)] text-white shadow-sm" : "text-[var(--foreground-secondary)]"}`}
+                        onClick={() => {
+                          setPaymentTiming("now");
+                          setPaymentReported(false);
+                        }}
+                        type="button"
+                      >
+                        {t("payNow")}
+                      </button>
+                    </div>
+                  ) : null}
 
                   {active && effectiveTiming === "now" ? (
                     <div className="mt-4 rounded-2xl border border-[var(--info-line)] bg-white p-4">

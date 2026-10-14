@@ -1660,13 +1660,13 @@ function InspectionStatus({ label, inspection, href, available }: { label: strin
   }
 
   return (
-    <div className="sub-surface p-3">
+    <div className="rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
       <div className="flex items-center gap-2 font-semibold text-[var(--foreground)]">
-        <AlertTriangle className="text-[var(--warning)]" size={18} />
+        <Clock className="text-[var(--muted)]" size={18} />
         {label}
       </div>
       {available ? (
-        <Link className="primary-action pressable mt-3 px-3 py-2" href={href}>
+        <Link className="secondary-action pressable mt-3 w-full whitespace-nowrap" href={href}>
           {tx.say("startNow")}
         </Link>
       ) : (

@@ -96,6 +96,7 @@ export default async function CalendarPage({
           <div className="content-section">
             <AgendaCalendar
               autoLoad
+              roomy
               covers={covers}
               defaultView={(["day", "week", "month", "custom"].includes(String(params.v)) ? params.v : "month") as AgendaView}
               events={[

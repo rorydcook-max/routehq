@@ -58,6 +58,7 @@ export function AgendaCalendar({
   fullCalendarHref = "/calendar",
   storageKey,
   autoLoad = false,
+  roomy = false,
   action
 }: {
   events: CalendarEvent[];
@@ -72,6 +73,8 @@ export function AgendaCalendar({
   storageKey?: string;
   /** On the calendar page: days outside what was loaded are fetched straight away instead of offering a button. */
   autoLoad?: boolean;
+  /** The calendar page has the room to write entries into the month grid on a computer; the dashboard shows dots. */
+  roomy?: boolean;
   action?: ReactNode;
 }) {
   const t = useTranslations("calendar");
@@ -80,6 +83,7 @@ export function AgendaCalendar({
   const router = useRouter();
   const [view, setView] = useState<AgendaView>(defaultView);
   const [anchor, setAnchor] = useState(initialAnchor || today);
+  const [selected, setSelected] = useState(initialAnchor || today);
   const [range, setRange] = useState({ from: initialAnchor || today, to: initialUntil && initialUntil >= (initialAnchor || today) ? initialUntil : addDays(initialAnchor || today, 13) });
 
   // The view someone last picked here comes back next time (this browser only).
@@ -119,6 +123,7 @@ export function AgendaCalendar({
   const span =
     view === "day" ? { from: anchor, to: anchor } : view === "week" ? { from: anchor, to: addDays(anchor, 6) } : view === "month" ? { from: monthStart, to: monthEnd } : range;
   const outside = span.from < covers.from || span.to > covers.to;
+  const chosen = selected >= span.from && selected <= span.to ? selected : today >= span.from && today <= span.to ? today : span.from;
   const loadHref = `${fullCalendarHref}?month=${span.from.slice(0, 7)}&v=${view}&on=${view === "custom" ? range.from : anchor}${view === "custom" ? `&until=${range.to}` : ""}`;
   useEffect(() => {
     if (autoLoad && outside) router.replace(loadHref as any, { scroll: false });
@@ -174,41 +179,28 @@ export function AgendaCalendar({
     );
   };
 
-  // A computer has room for the week as seven columns; a phone reads it as a list.
-  const weekColumns = (
-    <div className="hidden grid-cols-7 gap-2 lg:grid">
+  // The week as one strip: each day with a dot per entry. Tap a day to list it underneath.
+  const weekStrip = (
+    <div className="grid grid-cols-7 gap-1">
       {Array.from({ length: 7 }, (_, index) => addDays(anchor, index)).map((date) => {
         const list = on(date);
+        const isChosen = date === chosen;
         const isToday = date === today;
         return (
-          <div className={`min-h-[180px] min-w-0 rounded-xl p-1.5 ${isToday ? "bg-[var(--primary-light)]" : "bg-[var(--panel-secondary)]"}`} key={date}>
-            <p className={`px-1 pb-1.5 text-center font-bold ${isToday ? "text-[var(--primary)]" : "text-[var(--foreground-secondary)]"}`}>
-              <span className="block text-[14px]">{fmt(locale, { weekday: "short" }).format(asDate(date))}</span>
-              <span className="num block text-[20px] leading-tight">{asDate(date).getUTCDate()}</span>
-            </p>
-            <div className="space-y-1">
-              {list.map((event) => (
-                <Link
-                  className={`pressable block rounded-lg border-l-4 bg-white px-2 py-1.5 text-[14px] font-semibold leading-snug text-[var(--foreground)] shadow-[0_1px_2px_rgba(19,38,43,0.08)] ${TONE[event.tone].chip}`}
-                  data-tip={titleOf(event)}
-                  href={event.href as any}
-                  key={`${event.id}-${date}`}
-                >
-                  {(() => {
-                    const [kind, ...rest] = titleOf(event).split(": ");
-                    return rest.length ? (
-                      <>
-                        <span className="flex items-start gap-1 text-[var(--foreground-secondary)]"><span className="mt-0.5 shrink-0">{ICON[event.type](14)}</span><span className="min-w-0 break-words">{kind}</span></span>
-                        <span className="line-clamp-2">{rest.join(": ")}</span>
-                      </>
-                    ) : (
-                      <span className="flex gap-1"><span className="mt-0.5 shrink-0 text-[var(--foreground-secondary)]">{ICON[event.type](14)}</span><span className="line-clamp-3">{kind}</span></span>
-                    );
-                  })()}
-                </Link>
-              ))}
-            </div>
-          </div>
+          <button
+            aria-pressed={isChosen}
+            className={`pressable flex min-h-[68px] min-w-0 flex-col items-center gap-1 rounded-xl px-0.5 py-1.5 ${isChosen ? "bg-[var(--primary-light)] ring-2 ring-[var(--primary)]" : "bg-[var(--panel-secondary)]"}`}
+            key={date}
+            onClick={() => setSelected(date)}
+            type="button"
+          >
+            <span className={`text-[14px] font-bold ${isToday ? "text-[var(--primary)]" : "text-[var(--foreground-secondary)]"}`}>{fmt(locale, { weekday: "short" }).format(asDate(date))}</span>
+            <span className={`num text-[18px] leading-none ${isToday ? "text-[var(--primary)]" : "text-[var(--foreground)]"}`}>{asDate(date).getUTCDate()}</span>
+            <span className="flex min-h-2 flex-wrap justify-center gap-0.5">
+              {list.slice(0, 4).map((event) => <span className={`h-2 w-2 rounded-full ${TONE[event.tone].dot}`} key={event.id} />)}
+              {list.length > 4 ? <span className="text-[12px] font-bold leading-[8px] text-[var(--muted)]">+</span> : null}
+            </span>
+          </button>
         );
       })}
     </div>
@@ -232,21 +224,18 @@ export function AgendaCalendar({
             const isToday = date === today;
             return (
               <button
-                className={`pressable flex min-h-[56px] min-w-0 flex-col items-stretch rounded-xl p-1 text-left lg:min-h-[104px] ${isToday ? "bg-white ring-2 ring-[var(--primary)]" : date < today ? "bg-[var(--panel-secondary)]" : "bg-white shadow-[0_1px_3px_rgba(19,38,43,0.08)]"}`}
+                className={`pressable flex min-h-[52px] min-w-0 flex-col items-stretch rounded-xl p-1 text-left ${roomy ? "lg:min-h-[104px]" : ""} ${date === chosen ? "bg-[var(--primary-light)] ring-2 ring-[var(--primary)]" : isToday ? "bg-white ring-2 ring-[var(--border-strong)]" : date < today ? "bg-[var(--panel-secondary)]" : "bg-white shadow-[0_1px_3px_rgba(19,38,43,0.08)]"}`}
                 key={date}
-                onClick={() => {
-                  setAnchor(date);
-                  pick("day");
-                }}
+                onClick={() => setSelected(date)}
                 type="button"
               >
-                <span className={`num inline-flex h-7 min-w-7 items-center justify-center self-center rounded-full px-1 text-[15px] lg:self-start ${isToday ? "bg-[var(--primary)] text-white" : date < today ? "text-[var(--muted)]" : "text-[var(--foreground)]"}`}>
+                <span className={`num inline-flex h-7 min-w-7 items-center justify-center self-center rounded-full px-1 text-[15px] ${roomy ? "lg:self-start" : ""} ${isToday ? "bg-[var(--primary)] text-white" : date < today ? "text-[var(--muted)]" : "text-[var(--foreground)]"}`}>
                   {asDate(date).getUTCDate()}
                 </span>
-                <span className="mt-1 flex flex-wrap justify-center gap-0.5 lg:hidden">
+                <span className={`mt-1 flex flex-wrap justify-center gap-0.5 ${roomy ? "lg:hidden" : ""}`}>
                   {list.slice(0, 6).map((event) => <span className={`h-2 w-2 rounded-full ${TONE[event.tone].dot}`} key={event.id} />)}
                 </span>
-                <span className="mt-1 hidden space-y-0.5 lg:block">
+                <span className={`mt-1 hidden space-y-0.5 ${roomy ? "lg:block" : ""}`}>
                   {list.slice(0, 3).map((event) => (
                     <span className={`block truncate rounded-md border-l-[3px] bg-[var(--panel-secondary)] px-1.5 py-0.5 text-[14px] font-semibold text-[var(--foreground)] ${TONE[event.tone].chip}`} key={event.id}>
                       {titleOf(event)}
@@ -340,12 +329,10 @@ export function AgendaCalendar({
               {t("openThere")}
             </button>
           </div>
-        ) : view === "month" ? (
-          monthGrid
-        ) : view === "week" ? (
+        ) : view === "month" || view === "week" ? (
           <>
-            {weekColumns}
-            <div className="lg:hidden">{listFor(span.from, span.to, false)}</div>
+            {view === "month" ? monthGrid : weekStrip}
+            <div className="mt-2">{listFor(chosen, chosen, false)}</div>
           </>
         ) : (
           listFor(span.from, span.to, view === "custom")

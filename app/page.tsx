@@ -662,7 +662,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       ) : null}
 
       <div className="grid gap-5 lg:grid-cols-12 lg:gap-6">
-        <div className="min-w-0 space-y-5 lg:col-span-12">
+        <div className="min-w-0 space-y-5 lg:col-span-8">
           <section className="card rise relative -mt-12 p-3 lg:mt-0 lg:p-5">
             <header className="flex items-baseline justify-between gap-3 px-1 pb-3">
               <h2 className="text-[20px] text-[var(--foreground)] lg:text-[22px]">{t("planTitle")}</h2>
@@ -670,8 +670,6 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
             </header>
             <AgendaCalendar covers={{ from: calendarFrom, to: calendarTo }} defaultView="week" events={calendarEvents} storageKey="routehq.dashboard.calendar" today={today} />
           </section>
-        </div>
-        <div className="min-w-0 space-y-5 lg:col-span-8">
 
           {/* Phones: the car park comes after the week. Computers have it in the side column. */}
           {lot.length > 0 ? (

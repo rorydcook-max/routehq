@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { updatePreferredLocale } from "@/app/actions/settings";
+import { signOut } from "@/app/actions/auth";
 import { AppShell } from "@/components/app-shell";
 import { PendingButton } from "@/components/pending-button";
 import { PushToggle } from "@/components/push-toggle";
@@ -26,6 +27,7 @@ export default async function AccountPage() {
   }
 
   const say = (await getTranslations("accountPage")) as unknown as Say;
+  const nav = await getTranslations("nav");
   const supabase = (await createSupabaseServerClient()) as any;
   const [{ data: profile }, { data: organization }] = await Promise.all([
     supabase.from("users").select("full_name, preferred_locale, preferred_calendar").eq("id", membership.userId).maybeSingle(),
@@ -96,9 +98,16 @@ export default async function AccountPage() {
               <p className="text-[16px] font-bold text-[var(--foreground)]">{roleLabel}</p>
             </div>
           </div>
-          <a className="secondary-action mt-3 w-full sm:w-auto" href="/forgot-password">
-            {say("changePassword")}
-          </a>
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+            <a className="secondary-action pressable whitespace-nowrap" href="/forgot-password">
+              {say("changePassword")}
+            </a>
+            <form action={signOut}>
+              <PendingButton className="secondary-action pressable w-full whitespace-nowrap sm:w-auto" pendingLabel="" type="submit">
+                {nav("signOut")}
+              </PendingButton>
+            </form>
+          </div>
         </section>
       </div>
     </AppShell>

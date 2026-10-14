@@ -108,6 +108,16 @@ export function AgendaCalendar({
     return t(`ev_${words.key}`, { subject: words.subject, amount: words.amount || "", paper });
   };
 
+  const chipOf = (event: CalendarEvent) => {
+    const words = event.say;
+    if (words?.amount) return words.amount;
+    if (words?.paper) return papers.has(`paper_${words.paper}`) ? papers(`paper_${words.paper}`) : words.paper;
+    const subject = String(words?.subject || "").split(" · ")[0].trim();
+    if (!subject) return titleOf(event);
+    const parts = subject.split(" ");
+    return parts.length > 1 ? parts.slice(1).join(" ") : subject;
+  };
+
   const byDate = useMemo(() => {
     const map = new Map<string, CalendarEvent[]>();
     for (const event of events) map.set(event.date, [...(map.get(event.date) || []), event]);
@@ -237,8 +247,8 @@ export function AgendaCalendar({
                 </span>
                 <span className={`mt-1 hidden space-y-0.5 ${roomy ? "lg:block" : ""}`}>
                   {list.slice(0, 3).map((event) => (
-                    <span className={`block truncate rounded-md border-l-[3px] bg-[var(--panel-secondary)] px-1.5 py-0.5 text-[14px] font-semibold text-[var(--foreground)] ${TONE[event.tone].chip}`} key={event.id}>
-                      {titleOf(event)}
+                    <span className={`block truncate rounded-md border-l-[3px] bg-[var(--panel-secondary)] px-1.5 py-0.5 text-[14px] font-semibold ${event.tone === "green" ? "text-[var(--muted)]" : "text-[var(--foreground)]"} ${TONE[event.tone].chip}`} key={event.id} title={titleOf(event)}>
+                      {chipOf(event)}
                     </span>
                   ))}
                   {list.length > 3 ? <span className="block px-1 text-[14px] font-semibold text-[var(--muted)]">{t("more", { count: list.length - 3 })}</span> : null}

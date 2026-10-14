@@ -1259,9 +1259,10 @@ a[class*="rounded-lg"][class*="px-"]:active {
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
+/* Card headings look the same everywhere: 18px, no rule under them (the tabbed pages set the pattern). */
 .card-header {
-  border-bottom: 1px solid var(--border);
-  padding: 14px 16px;
+  border-bottom: 0;
+  padding: 16px 16px 0;
 }
 .card-section {
   border-bottom: 1px solid var(--border);
@@ -1275,8 +1276,8 @@ a[class*="rounded-lg"][class*="px-"]:active {
 }
 .card-header h2 {
   color: var(--foreground) !important;
-  font-size: 15px !important;
-  font-weight: 650 !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
   letter-spacing: -0.01em !important;
   text-transform: none !important;
 }

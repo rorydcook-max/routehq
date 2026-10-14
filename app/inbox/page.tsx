@@ -97,12 +97,12 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
       {toSendGroups.length ? <MessagesToSend groups={toSendGroups} /> : null}
 
       {!hasChannel && list.length === 0 ? (
-        <div className="rounded-xl border border-[var(--border)] bg-white p-8 text-center shadow-[var(--shadow-sm)]">
+        <div className="card p-8 text-center">
           <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
             <MessagesSquare size={22} />
           </span>
-          <h2 className="mt-4 text-[17px] font-semibold text-[var(--foreground)]">{t("emptyTitle")}</h2>
-          <p className="mx-auto mt-1 max-w-md text-sm text-[var(--muted)]">
+          <h2 className="mt-4 text-[18px] font-bold text-[var(--foreground)]">{t("emptyTitle")}</h2>
+          <p className="mx-auto mt-1 max-w-md font-medium text-[var(--foreground-secondary)]">
             {t("emptyBody")}
           </p>
           {membership?.role === "owner" ? (
@@ -110,7 +110,7 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
               {t("connect")}
             </Link>
           ) : (
-            <p className="mt-4 text-sm text-[var(--muted)]">{t("askOwner")}</p>
+            <p className="mt-4 font-medium text-[var(--foreground-secondary)]">{t("askOwner")}</p>
           )}
         </div>
       ) : (

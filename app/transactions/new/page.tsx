@@ -31,7 +31,7 @@ export default async function NewTransactionPage({
 
   return (
     <AppShell userEmail={userEmail}>
-      <div className="mx-auto max-w-xl">
+      <div className="mx-auto max-w-3xl">
         <div className="page-hero mb-5">
           <Link className="text-sm font-bold text-[var(--primary)]" href={costForBooking ? `/bookings/${costForBooking}` : "/transactions"}>
             {costForBooking ? t("backToBooking") : t("back")}

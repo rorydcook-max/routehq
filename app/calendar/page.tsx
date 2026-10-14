@@ -14,7 +14,6 @@ import { taskCalendarEvents } from "@/lib/calendar-tasks";
 import { AgendaCalendar, type AgendaView } from "@/components/agenda-calendar";
 import { getDefaultOrganization } from "@/lib/organization";
 import { getTaskList } from "@/lib/tasks";
-import { TasksList } from "@/app/tasks/tasks-list";
 import { AvailabilityView } from "./availability-view";
 import { businessToday } from "@/lib/business-time";
 
@@ -115,15 +114,6 @@ export default async function CalendarPage({
             />
           </div>
 
-          <div className="my-6 border-t border-[var(--border)]" />
-
-          <section>
-            <div className="mb-4">
-              <p className="page-eyebrow">{todo("eyebrow")}</p>
-              <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[var(--foreground)]">{todo("title")}</h2>
-            </div>
-            <TasksList canDecide={canDecideMoney(membership?.role)} organizationId={organization.id} tasks={tasks} today={today} />
-          </section>
         </>
       )}
     </AppShell>

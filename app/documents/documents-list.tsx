@@ -111,7 +111,7 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
           />
         </label>
         {ownerTypes.length > 2 ? (
-          <div aria-label={say("show")} className="scrollbar-none -mx-1 flex gap-2 overflow-x-auto px-1 py-0.5 sm:flex-wrap" role="group">
+          <div aria-label={say("show")} className="flex flex-wrap gap-2" role="group">
             {ownerTypes.map((type) => (
               <button
                 aria-pressed={ownerFilter === type}

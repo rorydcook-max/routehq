@@ -1174,7 +1174,7 @@
     "dueBackToday": "Due back today",
     "dueBackTomorrow": "Due back tomorrow",
     "dueBackIn": "Due back in {days, plural, one {# day} other {# days}}",
-    "holdEnded": "Hold ended · dates are open to others. The customer's link still works if the vehicle is free.",
+    "holdEnded": "Hold ended · dates open to others",
     "heldUntil": "Held for the customer until {when}",
     "holdError": "Couldn't update the hold.",
     "saving": "Saving…",
@@ -3922,7 +3922,10 @@
     "iv_managerBody": "Day-to-day work, and can decide refunds and waive charges. No business settings.",
     "team_manager": "Manager",
     "team_level": "Level",
-    "b_colourCustom": "Pick your own"
+    "b_colourCustom": "Pick your own",
+    "grp_paid": "Getting paid",
+    "grp_prices": "Prices and rules",
+    "grp_online": "Booking online"
   },
   "accountPage": {
     "roleOwner": "Owner",

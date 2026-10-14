@@ -298,7 +298,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     <AppShell
       hero={
         <PageBand title={say("title")}>
-          <nav aria-label={say("title")} className="flex flex-wrap gap-2">
+          <nav aria-label={say("title")} className="scrollbar-none -mx-[14px] flex gap-2 overflow-x-auto px-[14px] sm:mx-0 sm:flex-wrap sm:px-0">
             {SETTINGS_TABS.map((entry) => (
               <Link aria-current={tab === entry.key ? "page" : undefined} className={bandTab(tab === entry.key)} href={`/settings?tab=${entry.key}` as Route} key={entry.key}>
                 {say(`tab_${entry.key}`)}
@@ -315,12 +315,25 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         <>
       <div>
         <ContractsBrandingSection
-          logoDisplayUrl={logoDisplayUrl}
-          organization={organization}
-          signatureDisplayUrl={signatureDisplayUrl}
-          whiteLabel={String(organization.subscription_status || "trial") === "trial" || planById(organization.subscription_tier).whiteLabel}
-        />
-        <p className="mt-3 px-1 font-medium text-[var(--foreground-secondary)]">
+          aside={
+            <>
+              <section className="card p-4">
+                <h2 className="text-[18px] font-bold text-[var(--foreground)]">{say("terms_title")}</h2>
+                <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{say("terms_body")}</p>
+                <Link className="primary-action pressable mt-3" href="/settings/contracts">
+                  {say("terms_btn")}
+                </Link>
+              </section>
+              <section className="card p-4">
+                <h2 className="text-[18px] font-bold text-[var(--foreground)]">{say("loc_title")}</h2>
+                <div className="mt-2">
+                  <BranchList branches={branches} organizationId={organization.id} />
+                </div>
+              </section>
+            </>
+          }
+          footer={
+        <p className="font-medium text-[var(--foreground-secondary)]">
           {t.rich("currencyLine", {
             currency: organization.currency,
             zone: organization.timezone.replace("_", " "),
@@ -331,16 +344,12 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             )
           })}
         </p>
-      </div>
-        </>
-      ) : null}
-      {tab === "business" ? (
-        <>
-      <div className="mt-4">
-        <Card>
-          <SectionHeader title={say("loc_title")} />
-          <BranchList branches={branches} organizationId={organization.id} />
-        </Card>
+          }
+          logoDisplayUrl={logoDisplayUrl}
+          organization={organization}
+          signatureDisplayUrl={signatureDisplayUrl}
+          whiteLabel={String(organization.subscription_status || "trial") === "trial" || planById(organization.subscription_tier).whiteLabel}
+        />
       </div>
         </>
       ) : null}
@@ -387,39 +396,118 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         </div>
       ) : null}
       {tab === "rentals" ? (
-        <div className="space-y-3">
-          {/* Each section says what is set now, and opens with one tap. Getting paid comes first. */}
-          <Fold id="payment-methods" summary={paymentSummary} title={say("pay_title")}>
-            <p className="mb-3 font-medium text-[var(--foreground-secondary)]">{say("pay_body")}</p>
-            <PaymentMethodsForm
-            businessName={organization.name}
-            settings={{
-              accepted_payment_methods: organization.accepted_payment_methods,
-              promptpay_id: organization.promptpay_id,
-              promptpay_qr_url: promptPayQrDisplayUrl,
-              bank_name: organization.bank_name,
-              bank_account_number: organization.bank_account_number,
-              bank_account_name: organization.bank_account_name,
-              wise_link: organization.wise_link,
-              revolut_link: organization.revolut_link,
-              receipt_prefix: organization.receipt_prefix,
-              receipt_footer_text: organization.receipt_footer_text,
-              default_payment_method: organization.default_payment_method
-            }}
-          />
-          </Fold>
-          <Fold
-            id="usual-deposit"
-            summary={publicBookingSettings(organization.settings).deposit > 0 ? say("ud_summary", { amount: `฿${publicBookingSettings(organization.settings).deposit.toLocaleString("en-US")}` }) : say("ud_none")}
-            title={say("ud_title")}
-          >
-            <UsualDepositPanel
-              deposit={publicBookingSettings(organization.settings).deposit}
-              enabled={publicBookingSettings(organization.settings).enabled}
-              holdHours={bookingRules(organization.settings).holdHours}
-              offer={publicBookingSettings(organization.settings).offer}
+        <div className="grid items-start gap-4 lg:grid-cols-2">
+          <div className="space-y-4">
+            <div className="space-y-3">
+              <h2 className="px-1 pt-1 text-[17px] font-bold text-[var(--foreground-secondary)]">{say("grp_paid")}</h2>
+            <Fold id="payment-methods" summary={paymentSummary} title={say("pay_title")}>
+              <p className="mb-3 font-medium text-[var(--foreground-secondary)]">{say("pay_body")}</p>
+              <PaymentMethodsForm
+              businessName={organization.name}
+              settings={{
+                accepted_payment_methods: organization.accepted_payment_methods,
+                promptpay_id: organization.promptpay_id,
+                promptpay_qr_url: promptPayQrDisplayUrl,
+                bank_name: organization.bank_name,
+                bank_account_number: organization.bank_account_number,
+                bank_account_name: organization.bank_account_name,
+                wise_link: organization.wise_link,
+                revolut_link: organization.revolut_link,
+                receipt_prefix: organization.receipt_prefix,
+                receipt_footer_text: organization.receipt_footer_text,
+                default_payment_method: organization.default_payment_method
+              }}
             />
-          </Fold>
+            </Fold>
+            <Fold
+              id="usual-deposit"
+              summary={publicBookingSettings(organization.settings).deposit > 0 ? say("ud_summary", { amount: `฿${publicBookingSettings(organization.settings).deposit.toLocaleString("en-US")}` }) : say("ud_none")}
+              title={say("ud_title")}
+            >
+              <UsualDepositPanel
+                deposit={publicBookingSettings(organization.settings).deposit}
+                enabled={publicBookingSettings(organization.settings).enabled}
+                holdHours={bookingRules(organization.settings).holdHours}
+                offer={publicBookingSettings(organization.settings).offer}
+              />
+            </Fold>
+            <Fold id="paying-ahead" summary={organization.upfront_discount_enabled ? say("ahead_on") : say("ahead_off")} title={say("ahead_title")}>
+              <p className="mb-3 font-medium text-[var(--foreground-secondary)]">{say("ahead_body")}</p>
+              <form action={updateUpfrontDiscountSettings} className="mt-3 space-y-3">
+                <label className="checkbox-label sub-surface min-h-10 font-semibold text-[var(--foreground)]" style={{ display: "flex", alignItems: "center", padding: "8px 12px" }}>
+                  <input
+                    className="flex-shrink-0"
+                    defaultChecked={Boolean(organization.upfront_discount_enabled)}
+                    name="upfront_discount_enabled"
+                    type="checkbox"
+                    value="true"
+                  />
+                  <span>{say("ahead_offer")}</span>
+                </label>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <label className="block">
+                    <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("ahead_months")}</span>
+                    <input
+                      className={inputClass}
+                      defaultValue={String(organization.upfront_discount_min_periods ?? 3)}
+                      min="1"
+                      name="upfront_discount_min_periods"
+                      type="number"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("ahead_price")}</span>
+                    <input
+                      className={inputClass}
+                      defaultValue={organization.upfront_discount_rate ? String(organization.upfront_discount_rate) : ""}
+                      min="0"
+                      name="upfront_discount_rate"
+                      placeholder={say("ahead_pricePh")}
+                      step="0.01"
+                      type="number"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("ahead_label")}</span>
+                    <input
+                      className={inputClass}
+                      defaultValue={organization.upfront_discount_label || ""}
+                      name="upfront_discount_label"
+                      placeholder={say("ahead_labelPh")}
+                      type="text"
+                    />
+                  </label>
+                </div>
+                <PendingButton className="primary-action" pendingLabel={say("saving")} savedLabel={say("saved")} type="submit">
+                  {say("save")}
+                </PendingButton>
+              </form>
+            </Fold>
+            </div>
+              <div className="space-y-3">
+              <h2 className="px-1 pt-1 text-[17px] font-bold text-[var(--foreground-secondary)]">{say("grp_prices")}</h2>
+            <Fold
+              id="high-season"
+              summary={seasonsFrom(organization.settings).length ? say("season_summary", { count: seasonsFrom(organization.settings).length }) : say("season_none")}
+              title={say("season_title")}
+            >
+              <SeasonsPanel initial={seasonsFrom(organization.settings)} />
+            </Fold>
+            <Fold
+              id="extras"
+              summary={extrasFrom(organization.settings).length ? extrasFrom(organization.settings).map((extra) => extra.name).join(", ") : say("extra_none")}
+              title={say("extra_title")}
+            >
+              <ExtrasPanel currencySymbol={(organization.currency || "THB") === "THB" ? "฿" : organization.currency || ""} initial={extrasFrom(organization.settings)} />
+            </Fold>
+            <Fold id="travel" summary={travelSummary} title={say("travel_title")}>
+              <p className="font-medium text-[var(--foreground-secondary)]">{say("travel_body")}</p>
+              <TravelPolicyForm organizationId={organization.id} settings={travelPolicySettings} />
+            </Fold>
+            </div>
+            </div>
+          <div className="space-y-3">
+            <h2 className="px-1 pt-1 text-[17px] font-bold text-[var(--foreground-secondary)]">{say("grp_online")}</h2>
           <Fold id="booking-page" summary={publicBookingSettings(organization.settings).enabled ? say("book_on") : say("book_off")} title={say("book_title")}>
             <PublicBookingPanel
               enabled={publicBookingSettings(organization.settings).enabled}
@@ -459,76 +547,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           <Fold id="holds" summary={say("hold_summary", { hours: bookingRules(organization.settings).holdHours })} title={say("hold_title")}>
             <BookingRulesPanel rules={bookingRules(organization.settings)} />
           </Fold>
-          <Fold
-            id="high-season"
-            summary={seasonsFrom(organization.settings).length ? say("season_summary", { count: seasonsFrom(organization.settings).length }) : say("season_none")}
-            title={say("season_title")}
-          >
-            <SeasonsPanel initial={seasonsFrom(organization.settings)} />
-          </Fold>
-          <Fold
-            id="extras"
-            summary={extrasFrom(organization.settings).length ? extrasFrom(organization.settings).map((extra) => extra.name).join(", ") : say("extra_none")}
-            title={say("extra_title")}
-          >
-            <ExtrasPanel currencySymbol={(organization.currency || "THB") === "THB" ? "฿" : organization.currency || ""} initial={extrasFrom(organization.settings)} />
-          </Fold>
-          <Fold id="paying-ahead" summary={organization.upfront_discount_enabled ? say("ahead_on") : say("ahead_off")} title={say("ahead_title")}>
-            <p className="mb-3 font-medium text-[var(--foreground-secondary)]">{say("ahead_body")}</p>
-            <form action={updateUpfrontDiscountSettings} className="mt-3 space-y-3">
-              <label className="checkbox-label sub-surface min-h-10 font-semibold text-[var(--foreground)]" style={{ display: "flex", alignItems: "center", padding: "8px 12px" }}>
-                <input
-                  className="flex-shrink-0"
-                  defaultChecked={Boolean(organization.upfront_discount_enabled)}
-                  name="upfront_discount_enabled"
-                  type="checkbox"
-                  value="true"
-                />
-                <span>{say("ahead_offer")}</span>
-              </label>
-              <div className="grid gap-3 sm:grid-cols-3">
-                <label className="block">
-                  <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("ahead_months")}</span>
-                  <input
-                    className={inputClass}
-                    defaultValue={String(organization.upfront_discount_min_periods ?? 3)}
-                    min="1"
-                    name="upfront_discount_min_periods"
-                    type="number"
-                  />
-                </label>
-                <label className="block">
-                  <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("ahead_price")}</span>
-                  <input
-                    className={inputClass}
-                    defaultValue={organization.upfront_discount_rate ? String(organization.upfront_discount_rate) : ""}
-                    min="0"
-                    name="upfront_discount_rate"
-                    placeholder={say("ahead_pricePh")}
-                    step="0.01"
-                    type="number"
-                  />
-                </label>
-                <label className="block">
-                  <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("ahead_label")}</span>
-                  <input
-                    className={inputClass}
-                    defaultValue={organization.upfront_discount_label || ""}
-                    name="upfront_discount_label"
-                    placeholder={say("ahead_labelPh")}
-                    type="text"
-                  />
-                </label>
-              </div>
-              <PendingButton className="primary-action" pendingLabel={say("saving")} savedLabel={say("saved")} type="submit">
-                {say("save")}
-              </PendingButton>
-            </form>
-          </Fold>
-          <Fold id="travel" summary={travelSummary} title={say("travel_title")}>
-            <p className="font-medium text-[var(--foreground-secondary)]">{say("travel_body")}</p>
-            <TravelPolicyForm organizationId={organization.id} settings={travelPolicySettings} />
-          </Fold>
+          </div>
         </div>
       ) : null}
       {tab === "notifications" ? (
@@ -709,23 +728,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             </div>
             <Link className="primary-action pressable" href="/fleet/import">
               {say("imp_btn")}
-            </Link>
-          </div>
-        </Card>
-      </div>
-        </>
-      ) : null}
-      {tab === "business" ? (
-        <>
-      <div className="mt-4">
-        <Card>
-          <div className="flex flex-col gap-3 px-2 py-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("terms_title")}</h2>
-              <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("terms_body")}</p>
-            </div>
-            <Link className="primary-action pressable" href="/settings/contracts">
-              {say("terms_btn")}
             </Link>
           </div>
         </Card>

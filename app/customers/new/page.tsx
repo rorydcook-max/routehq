@@ -51,7 +51,7 @@ export default async function NewCustomerPage() {
 
   return (
     <AppShell userEmail={userEmail}>
-      <div className="mx-auto max-w-2xl">
+      <div className="mx-auto max-w-3xl">
         <div className="page-hero mb-4">
           <Link className="font-bold text-[var(--primary)]" href="/customers">
             {say("backToList")}

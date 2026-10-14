@@ -11,7 +11,7 @@ import type { LucideIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { longDate, shortDate } from "@/lib/i18n/dates";
 import { extrasFor, priceExtras, seasonalRate, type Extra, type Season } from "@/lib/price-rules";
-import { ArrowRight, CalendarDays, Car, CheckCircle2, Copy, MapPin, Send, UserPlus, UserRound, X } from "lucide-react";
+import { ArrowRight, CalendarDays, Car, CheckCircle2, Copy, MapPin, Send, UserPlus, UserRound, X, Search } from "lucide-react";
 import { DateLeaf } from "@/components/glance";
 import { createBooking } from "@/app/actions/bookings";
 import { CustomerSelector } from "@/components/customer-selector";
@@ -724,13 +724,14 @@ export function BookingForm({
           <Header icon={Car} eyebrow={say("stepN", { n: 1 })} title={say("selectVehicle")} />
           {/* Searching only earns its place once the list is longer than a screen. */}
           {vehicles.length > 5 ? (
-            <label className="mt-3 block">
-              <span className="font-semibold text-[var(--foreground-secondary)]">{say("searchLabel")}</span>
+            <label className="relative mt-3 block">
+              <span className="sr-only">{say("searchLabel")}</span>
+              <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--foreground-secondary)]" size={18} />
               <input
-                className={inputClass}
-                onChange={(event) => setVehicleSearch(event.target.value.replace(/^🔎\s*/, ""))}
-                placeholder={`🔎 ${say("searchPlaceholder")}`}
-                value={vehicleSearch ? `🔎 ${vehicleSearch}` : ""}
+                className="input-with-leading-icon w-full"
+                onChange={(event) => setVehicleSearch(event.target.value)}
+                placeholder={say("searchLabel")}
+                value={vehicleSearch}
               />
             </label>
           ) : null}

@@ -41,7 +41,7 @@ export function PageBand({
 
 /** A tab or filter that sits on the band: white when chosen, see-through otherwise. */
 export function bandTab(active: boolean) {
-  return `pressable inline-flex min-h-10 items-center rounded-full px-4 font-bold ${active ? "band-tab-on bg-white text-[var(--foreground)]" : "bg-[var(--band-soft)] text-white"}`;
+  return `pressable inline-flex min-h-10 shrink-0 items-center whitespace-nowrap rounded-full px-4 font-bold ${active ? "band-tab-on bg-white text-[var(--foreground)]" : "bg-[var(--band-soft)] text-white"}`;
 }
 
 /**

@@ -6,7 +6,7 @@ import { LogoUploadSection } from "@/app/settings/logo-upload-section";
 import { SignatureUploadSection } from "@/app/settings/signature-upload-section";
 import { BusinessLogoImage } from "@/components/business-logo-image";
 import { PendingButton } from "@/components/pending-button";
-import { Card, Fold, SectionHeader } from "@/components/ui";
+import { Fold, Pane } from "@/components/ui";
 import { customerLocaleOptions } from "@/lib/i18n/locales";
 import { BrandColourField } from "@/app/settings/brand-colour-field";
 
@@ -41,8 +41,14 @@ export function ContractsBrandingSection({
   logoDisplayUrl,
   organization,
   signatureDisplayUrl,
-  whiteLabel = false
+  whiteLabel = false,
+  footer,
+  aside
 }: {
+  /** A line under the details (currency and time zone). */
+  footer?: React.ReactNode;
+  /** Other business settings for the right-hand column (agreement, locations). */
+  aside?: React.ReactNode;
   logoDisplayUrl: string | null;
   organization: ContractsBrandingOrganization;
   signatureDisplayUrl: string | null;
@@ -59,11 +65,9 @@ export function ContractsBrandingSection({
   const poweredByRouteHq = organization.powered_by_routehq_enabled ?? true;
 
   return (
-    <Card>
-      <SectionHeader title={say("b_title")} />
-      <p className="mt-2 font-medium text-[var(--foreground-secondary)]">{say("b_body")}</p>
-
-      <form action={updateContractBrandingSettings} className="mt-4 space-y-4">
+    <div className="grid items-start gap-3 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+    <Pane summary={say("b_body")} title={say("b_title")}>
+      <form action={updateContractBrandingSettings} className="space-y-4">
         <div className="grid gap-3 sm:grid-cols-2">
             <label className="block">
               <span className={labelClass}>{say("b_name")}</span>
@@ -128,7 +132,7 @@ export function ContractsBrandingSection({
         </Fold>
 
         {/* Their brand: one colour and their logo, on every page a customer sees and, on a white-label plan, in the app itself. */}
-        <div className="rounded-xl border border-[var(--border)] p-3">
+        <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5">
           <p className="font-bold text-[var(--foreground)]">{say("b_brandTitle")}</p>
           <p className="mt-1 text-sm text-[var(--muted)]">{whiteLabel ? say("b_brandBodyApp") : say("b_brandBody")}</p>
           <div className="mt-3 space-y-3">
@@ -147,9 +151,14 @@ export function ContractsBrandingSection({
           {say("save")}
         </PendingButton>
       </form>
+      {footer ? <div className="mt-4 border-t border-[var(--border)] pt-3">{footer}</div> : null}
+    </Pane>
 
-      <div className="mt-4 space-y-3">
-        <LogoUploadSection logoUrl={logoDisplayUrl} orgName={tradingName} />
+      <div className="grid gap-3">
+        <section className="card p-1 [&>div]:!bg-white">
+          <LogoUploadSection logoUrl={logoDisplayUrl} orgName={tradingName} />
+        </section>
+        <section className="card p-1 [&>div]:!bg-white">
         <SignatureUploadSection
           authorisedSignatoryName={organization.authorised_signatory_name}
           authorisedSignatoryTitle={organization.authorised_signatory_title}
@@ -157,11 +166,10 @@ export function ContractsBrandingSection({
           signatureUrl={signatureDisplayUrl}
         />
         {organization.signature_authorised_at ? (
-          <p className="font-medium text-[var(--muted)]">{say("b_sigRecorded", { date: longDate(toWallTime(organization.signature_authorised_at).slice(0, 10), locale) })}</p>
+          <p className="px-2 pb-1 font-medium text-[var(--muted)]">{say("b_sigRecorded", { date: longDate(toWallTime(organization.signature_authorised_at).slice(0, 10), locale) })}</p>
         ) : null}
-      </div>
-
-      <div className="mt-4">
+        </section>
+        {aside}
         <Fold summary={say("b_prevSummary")} title={say("b_prevTitle")}>
         <div className="rounded-lg border border-[var(--border)] bg-white p-4">
           <div className="flex items-start justify-between gap-4 border-b border-[var(--border)] pb-4">
@@ -210,6 +218,6 @@ export function ContractsBrandingSection({
         </div>
         </Fold>
       </div>
-    </Card>
+    </div>
   );
 }

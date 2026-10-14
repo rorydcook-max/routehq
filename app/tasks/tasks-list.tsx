@@ -471,7 +471,7 @@ function TaskRow({ item, organizationId, today, siblings = [], canDecide = true 
       </div>
 
       {/* Buttons share the full card width so a row of two or three never breaks onto a second line. */}
-      <div className="flex items-center gap-2 [&>*]:min-w-0 [&>*]:flex-1 [&>a]:justify-center [&>button]:justify-center [&_button]:w-full [&_form]:min-w-0 [&_form]:flex-1 lg:min-w-[19rem] lg:shrink-0 lg:justify-end lg:[&>*]:flex-none lg:[&_button]:w-auto">
+      <div className="flex items-center gap-2 [&_a]:whitespace-nowrap [&_button]:whitespace-nowrap [&>*]:min-w-0 [&>*]:flex-1 [&>a]:justify-center [&>button]:justify-center [&_button]:w-full [&_form]:min-w-0 [&_form]:flex-1 lg:min-w-[19rem] lg:shrink-0 lg:justify-end lg:[&>*]:flex-none lg:[&_button]:w-auto">
         {receipt?.url ? (
           <a className="secondary-action pressable min-h-9 px-3 text-[14px]" href={receipt.url} rel="noreferrer" target="_blank">
             {tx.say("viewReceipt")}

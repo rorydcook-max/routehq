@@ -164,8 +164,8 @@ function QuickActions({ vehicleId, status, rentalId }: { vehicleId: string; stat
         {shown.map((action) => {
           const Icon = action.icon;
           return (
-            <Link className="pressable secondary-action !px-3 text-center leading-tight" href={action.href as Route} key={action.label}>
-              <Icon className="shrink-0" size={18} />
+            <Link className="pressable secondary-action whitespace-nowrap !px-3 text-center leading-tight" href={action.href as Route} key={action.label}>
+              <Icon className="hidden shrink-0 sm:block" size={18} />
               {action.label}
             </Link>
           );

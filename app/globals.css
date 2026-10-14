@@ -133,11 +133,13 @@ body {
   letter-spacing: 0;
 }
 
-button,
-input,
-select,
-textarea {
-  font: inherit;
+@layer base {
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
 }
 
 input[type="checkbox"],

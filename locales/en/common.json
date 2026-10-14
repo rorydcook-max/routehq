@@ -1702,7 +1702,7 @@
     "gen_done": "Payment schedule generated — {count, plural, one {# upcoming payment} other {# upcoming payments}} added",
     "gen_failed": "Unable to generate payment schedule.",
     "gen_busy": "Generating…",
-    "gen_button": "Generate payment schedule from rental rate",
+    "gen_button": "Set up payments",
     "assign_pick": "Please select a customer first.",
     "assign_failed": "Unable to assign customer.",
     "assign_open": "Assign customer manually",

@@ -722,8 +722,8 @@ export function RentalAdjustmentButton({
 
   return (
     <>
-      <button className={className} onClick={() => setOpen(true)} type="button">
-        <i aria-hidden="true" className="ti ti-calendar-event text-sm" />
+      <button className={`${className || ""} whitespace-nowrap`} onClick={() => setOpen(true)} type="button">
+        <i aria-hidden="true" className="ti ti-calendar-event hidden text-sm sm:inline" />
         {label || say("adj_defaultLabel")}
       </button>
       {open ? (

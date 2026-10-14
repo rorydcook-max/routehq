@@ -568,7 +568,16 @@
     "missing_driverLicenseCountry": "驾照由哪个国家签发？",
     "handoverPhotos": "交车照片（{count}）",
     "payPlusExtras": "+ 附加服务 {amount}",
-    "payLessExtras": "已扣除附加服务费用 {amount}"
+    "payLessExtras": "已扣除附加服务费用 {amount}",
+    "returningAsk": "以前在我们这里租过车吗？",
+    "returningHow": "输入您上次使用的电话号码和出生日期。如果我们已有您的证件，就不需要再次上传。",
+    "returningPhone": "电话号码",
+    "returningDob": "出生日期",
+    "returningCheck": "查找",
+    "returningChecking": "正在查找…",
+    "returningFound": "欢迎回来！我们已有您的护照、驾照和照片，无需再次上传。",
+    "returningPartial": "欢迎回来！我们已有您的部分证件，请补充仍显示需要的证件。",
+    "returningNone": "没有找到您的记录，请在下方上传证件。"
   },
   "customerMessages": {
     "hi": "{name}，您好！",

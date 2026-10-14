@@ -216,5 +216,16 @@
     "tasks": "やること",
     "inbox": "受信箱",
     "quickAdd": "クイック追加"
+  },
+  "customer": {
+    "returningAsk": "以前ご利用いただいたことがありますか？",
+    "returningHow": "前回お使いの電話番号と生年月日を入力してください。書類がお手元にある場合、再提出は不要です。",
+    "returningPhone": "電話番号",
+    "returningDob": "生年月日",
+    "returningCheck": "確認する",
+    "returningChecking": "確認中…",
+    "returningFound": "おかえりなさい！パスポート、運転免許証、写真はすでにお預かりしているので、再提出は不要です。",
+    "returningPartial": "おかえりなさい！一部の書類はお預かり済みです。「必要」と表示されている書類を追加してください。",
+    "returningNone": "その情報ではお客様が見つかりませんでした。下に書類を追加してください。"
   }
 }

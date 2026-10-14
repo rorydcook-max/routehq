@@ -568,7 +568,16 @@
     "missing_driverLicenseCountry": "Quel pays a délivré votre permis ?",
     "handoverPhotos": "Photos de remise ({count})",
     "payPlusExtras": "+ options {amount}",
-    "payLessExtras": "{amount} payés pour les options déduits"
+    "payLessExtras": "{amount} payés pour les options déduits",
+    "returningAsk": "Vous avez déjà loué chez nous ?",
+    "returningHow": "Saisissez le numéro de téléphone et la date de naissance utilisés la dernière fois. Si nous avons vos documents, inutile de les ajouter à nouveau.",
+    "returningPhone": "Numéro de téléphone",
+    "returningDob": "Date de naissance",
+    "returningCheck": "Vérifier",
+    "returningChecking": "Vérification…",
+    "returningFound": "Bon retour ! Nous avons déjà votre passeport, votre permis et votre photo, inutile de les ajouter à nouveau.",
+    "returningPartial": "Bon retour ! Une partie de vos documents est déjà enregistrée. Ajoutez ceux encore marqués comme nécessaires.",
+    "returningNone": "Nous ne vous avons pas trouvé avec ces informations. Ajoutez vos documents ci-dessous."
   },
   "customerMessages": {
     "hi": "Bonjour {name},",

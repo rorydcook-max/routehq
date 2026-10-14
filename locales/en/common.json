@@ -827,7 +827,16 @@
     "payPlusExtras": "+ extras {amount}",
     "payLessExtras": "{amount} paid for extras taken off",
     "addPhoto": "Take or add a photo",
-    "changePhoto": "Change photo"
+    "changePhoto": "Change photo",
+    "returningAsk": "Rented from us before?",
+    "returningHow": "Enter the phone number and date of birth you used last time. If we have your documents, you won't need to add them again.",
+    "returningPhone": "Phone number",
+    "returningDob": "Date of birth",
+    "returningCheck": "Check",
+    "returningChecking": "Checking…",
+    "returningFound": "Welcome back! We already have your passport, driving licence and photo, so you don't need to add them again.",
+    "returningPartial": "Welcome back! Some of your documents are already on file. Please add the ones still marked as needed.",
+    "returningNone": "We couldn't find you with those details. Please add your documents below."
   },
   "customerMessages": {
     "hi": "Hi {name},",

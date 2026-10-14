@@ -568,7 +568,16 @@
     "missing_driverLicenseCountry": "Bằng lái do nước nào cấp?",
     "handoverPhotos": "Ảnh lúc giao xe ({count})",
     "payPlusExtras": "+ dịch vụ thêm {amount}",
-    "payLessExtras": "đã trừ {amount} phí dịch vụ thêm"
+    "payLessExtras": "đã trừ {amount} phí dịch vụ thêm",
+    "returningAsk": "Bạn đã từng thuê xe của chúng tôi?",
+    "returningHow": "Nhập số điện thoại và ngày sinh bạn đã dùng lần trước. Nếu chúng tôi đã có giấy tờ của bạn, bạn không cần thêm lại.",
+    "returningPhone": "Số điện thoại",
+    "returningDob": "Ngày sinh",
+    "returningCheck": "Kiểm tra",
+    "returningChecking": "Đang kiểm tra…",
+    "returningFound": "Chào mừng bạn trở lại! Chúng tôi đã có hộ chiếu, bằng lái và ảnh của bạn, nên bạn không cần thêm lại.",
+    "returningPartial": "Chào mừng bạn trở lại! Một số giấy tờ của bạn đã có. Vui lòng thêm những mục còn thiếu.",
+    "returningNone": "Không tìm thấy thông tin của bạn. Vui lòng thêm giấy tờ bên dưới."
   },
   "customerMessages": {
     "hi": "Chào {name},",

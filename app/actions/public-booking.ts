@@ -1339,3 +1339,52 @@ export async function submitPaymentReceipt(formData: FormData) {
 
   return { success: true, submittedAt };
 }
+
+/**
+ * "Rented from us before?" on the booking link: with the phone number and date of birth both matching a customer
+ * of this business, says which ID documents are already on file (never the documents or numbers themselves), so
+ * the customer can skip adding them again. Completing the booking then links that same customer by phone.
+ */
+export async function checkReturningCustomer(
+  token: string,
+  phoneCode: string,
+  phoneLocal: string,
+  dateOfBirth: string
+): Promise<{ found: boolean; passport?: boolean; driver_license?: boolean; selfie?: boolean; numbers?: boolean }> {
+  const local = String(phoneLocal || "").replace(/[\s\-().]/g, "");
+  const dob = String(dateOfBirth || "").slice(0, 10);
+  if (!token || local.length < 6 || !/^\d{4}-\d{2}-\d{2}$/.test(dob)) return { found: false };
+  const phone = local.startsWith("+") ? local : `${String(phoneCode || "+66").trim()}${local.startsWith("0") ? local.slice(1) : local}`;
+  if (!/^\+\d{7,15}$/.test(phone)) return { found: false };
+
+  const supabase = createSupabaseAdminClient() as any;
+  const { data: link } = await supabase.from("booking_links").select("organization_id, status").eq("token", token).is("deleted_at", null).maybeSingle();
+  if (!link || ["cancelled", "expired"].includes(String(link.status))) return { found: false };
+
+  const { data: rows } = await supabase
+    .from("customers")
+    .select("id, date_of_birth, passport_number, driver_license_number, driver_license_country, driver_license_expiry")
+    .eq("organization_id", link.organization_id)
+    .or(`phone.eq.${phone},whatsapp.eq.${phone}`)
+    .is("deleted_at", null)
+    .order("created_at", { ascending: true })
+    .limit(5);
+  const match = ((rows || []) as any[]).find((row) => String(row.date_of_birth || "").slice(0, 10) === dob);
+  if (!match) return { found: false };
+
+  const { data: documents } = await supabase
+    .from("documents")
+    .select("category")
+    .eq("organization_id", link.organization_id)
+    .eq("owner_type", "customer")
+    .eq("owner_id", match.id)
+    .is("deleted_at", null);
+  const categories = new Set(((documents || []) as any[]).map((document) => String(document.category)));
+  return {
+    found: true,
+    passport: categories.has("passport"),
+    driver_license: categories.has("driver_license"),
+    selfie: categories.has("selfie"),
+    numbers: Boolean(match.passport_number && match.driver_license_number && match.driver_license_country && match.driver_license_expiry)
+  };
+}

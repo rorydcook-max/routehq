@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { CheckCircle2, CreditCard, FileText, IdCard, ImageIcon, MessageCircle, PenLine, Upload, UserRound } from "lucide-react";
-import { completePublicBooking, reportPublicBookingPayment } from "@/app/actions/public-booking";
+import { checkReturningCustomer, completePublicBooking, reportPublicBookingPayment } from "@/app/actions/public-booking";
 import { preparePublicBookingUploads } from "@/app/actions/uploads";
 import { readIdentityDocument } from "@/app/actions/identity-ocr";
 import { uploadFormFiles } from "@/lib/direct-upload-client";
@@ -545,6 +545,9 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
   const [docRead, setDocRead] = useState<Record<DocKind, DocReadState>>({ passport: null, driver_license: null });
   const [photoNationality, setPhotoNationality] = useState("");
   const [idOpen, setIdOpen] = useState(false);
+  // A returning customer's documents already on file (found by phone number and date of birth).
+  const [onFile, setOnFile] = useState<{ passport?: boolean; driver_license?: boolean; selfie?: boolean; numbers?: boolean } | null>(null);
+  const haveDoc = (kind: "passport" | "driver_license" | "selfie") => Boolean(detail.documentStatus[kind] || onFile?.[kind]);
   const filledByPhoto = useRef<Record<string, string>>({});
   const readQueue = useRef<Promise<void>>(Promise.resolve());
 
@@ -675,10 +678,10 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
       details: ["fullName", "nationality", "phone", "dateOfBirth"].every(filled),
       documents:
         detail.completion.documents ||
-        ((detail.documentStatus.passport || uploaded("passportFile", "passportCameraFile")) &&
-          (detail.documentStatus.driver_license || uploaded("driverLicenseFile", "driverLicenseCameraFile")) &&
-          (detail.documentStatus.selfie || uploaded("selfieFile", "selfieCameraFile")) &&
-          ID_FIELDS.every(filled)),
+        ((haveDoc("passport") || uploaded("passportFile", "passportCameraFile")) &&
+          (haveDoc("driver_license") || uploaded("driverLicenseFile", "driverLicenseCameraFile")) &&
+          (haveDoc("selfie") || uploaded("selfieFile", "selfieCameraFile")) &&
+          (Boolean(onFile?.numbers) || ID_FIELDS.every(filled))),
       agreement: detail.completion.agreement || (acceptedAgreement && Boolean(nextSignature) && filled("signedName"))
     });
   }
@@ -789,7 +792,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
       return;
     }
 
-    const missingId = ID_FIELDS.find((name) => !String(fd.get(name) || "").trim());
+    const missingId = onFile?.numbers ? undefined : ID_FIELDS.find((name) => !String(fd.get(name) || "").trim());
     if (missingId) {
       setIdOpen(true);
       const filledSome = ID_FIELDS.some((name) => String(fd.get(name) || "").trim());
@@ -914,10 +917,26 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
           {t("documentsIntro")}
         </p>
+        {!detail.customer?.id && !(detail.documentStatus.passport && detail.documentStatus.driver_license && detail.documentStatus.selfie) ? (
+          <ReturningCustomerCheck
+            defaultCode={phoneCountryCode}
+            onFound={(found, phone, dob) => {
+              setOnFile(found);
+              // The same number and birthday go into their details below, so the booking links to them.
+              const phoneField = formRef.current?.querySelector<HTMLInputElement>('input[name="phone"]');
+              const dobField = formRef.current?.querySelector<HTMLInputElement>('input[name="dateOfBirth"]');
+              if (phoneField && !phoneField.value.trim()) phoneField.value = phone.local;
+              if (phone.code) setPhoneCountryCode(phone.code);
+              if (dobField && !dobField.value) dobField.value = dob;
+              window.setTimeout(() => updateLiveStatus(), 0);
+            }}
+            token={detail.token}
+          />
+        ) : null}
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          <UploadCard cameraName="passportCameraFile" complete={detail.documentStatus.passport} icon={IdCard} label={t("passportOrId")} name="passportFile" note={readNote("passport")} noteTone={docRead.passport} onPicked={(picked) => readDocument("passport", picked)} />
-          <UploadCard cameraName="driverLicenseCameraFile" complete={detail.documentStatus.driver_license} icon={FileText} label={t("drivingLicence")} name="driverLicenseFile" note={readNote("driver_license")} noteTone={docRead.driver_license} onPicked={(picked) => readDocument("driver_license", picked)} />
-          <UploadCard cameraCapture="user" cameraName="selfieCameraFile" complete={detail.documentStatus.selfie} icon={ImageIcon} label={t("selfiePhoto")} name="selfieFile" />
+          <UploadCard cameraName="passportCameraFile" complete={haveDoc("passport")} icon={IdCard} label={t("passportOrId")} name="passportFile" note={readNote("passport")} noteTone={docRead.passport} onPicked={(picked) => readDocument("passport", picked)} />
+          <UploadCard cameraName="driverLicenseCameraFile" complete={haveDoc("driver_license")} icon={FileText} label={t("drivingLicence")} name="driverLicenseFile" note={readNote("driver_license")} noteTone={docRead.driver_license} onPicked={(picked) => readDocument("driver_license", picked)} />
+          <UploadCard cameraCapture="user" cameraName="selfieCameraFile" complete={haveDoc("selfie")} icon={ImageIcon} label={t("selfiePhoto")} name="selfieFile" />
         </div>
         {/* The numbers stay folded away: the photos fill them in. They open by themselves when something is missing. */}
         <details className="mt-2" id="document-numbers" onToggle={(event) => setIdOpen(event.currentTarget.open)} open={idOpen}>
@@ -2124,5 +2143,59 @@ function UploadCard({
         </p>
       ) : null}
     </div>
+  );
+}
+
+/** "Rented from us before?": phone number and date of birth find the documents already on file. */
+function ReturningCustomerCheck({ token, defaultCode, onFound }: {
+  token: string;
+  defaultCode: string;
+  onFound: (found: { passport?: boolean; driver_license?: boolean; selfie?: boolean; numbers?: boolean }, phone: { code: string; local: string }, dob: string) => void;
+}) {
+  const t = useTranslations("customer");
+  const [code, setCode] = useState(defaultCode || "+66");
+  const [local, setLocal] = useState("");
+  const [dob, setDob] = useState("");
+  const [result, setResult] = useState<"found" | "partial" | "none" | null>(null);
+  const [pending, start] = useTransition();
+  function check() {
+    start(async () => {
+      const found = await checkReturningCustomer(token, code, local, dob).catch(() => ({ found: false }) as { found: boolean });
+      if (!found.found) {
+        setResult("none");
+        return;
+      }
+      const all = Boolean((found as any).passport && (found as any).driver_license && (found as any).selfie);
+      setResult(all ? "found" : "partial");
+      onFound(found as any, { code, local }, dob);
+    });
+  }
+  if (result === "found" || result === "partial") {
+    return (
+      <p className="mt-3 flex items-start gap-2 rounded-xl bg-[var(--success-light)] p-3 text-[15px] font-semibold text-[var(--success)]">
+        <CheckCircle2 className="mt-0.5 shrink-0" size={18} />
+        {result === "found" ? t("returningFound") : t("returningPartial")}
+      </p>
+    );
+  }
+  return (
+    <details className="mt-3 rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] px-3 py-2.5">
+      <summary className="cursor-pointer font-semibold text-[var(--primary)]">{t("returningAsk")}</summary>
+      <p className="mt-1.5 text-[14px] text-[var(--muted)]">{t("returningHow")}</p>
+      <div className="mt-2.5 grid gap-2">
+        <div className="flex">
+          <PhoneCountrySelect name="returningPhoneCode" onChange={setCode} value={code} />
+          <input aria-label={t("returningPhone")} className="min-h-11 min-w-0 flex-1 rounded-r-lg border border-l-0 border-[var(--border)] bg-white px-3 text-base" inputMode="tel" onChange={(event) => setLocal(event.target.value)} placeholder={t("returningPhone")} type="tel" value={local} />
+        </div>
+        <label className="block text-[14px] font-semibold text-[var(--foreground-secondary)]">
+          {t("returningDob")}
+          <input className="mt-1 min-h-11 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-base" onChange={(event) => setDob(event.target.value)} type="date" value={dob} />
+        </label>
+        <button className="pressable min-h-11 whitespace-nowrap rounded-full bg-[var(--primary)] px-4 font-bold text-white disabled:opacity-50" disabled={pending || local.replace(/\D/g, "").length < 6 || !dob} onClick={check} type="button">
+          {pending ? t("returningChecking") : t("returningCheck")}
+        </button>
+        {result === "none" ? <p className="text-[14px] font-semibold text-[var(--warning)]">{t("returningNone")}</p> : null}
+      </div>
+    </details>
   );
 }

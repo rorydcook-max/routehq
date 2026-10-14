@@ -568,7 +568,16 @@
     "missing_driverLicenseCountry": "Negara mana yang mengeluarkan lesen anda?",
     "handoverPhotos": "Gambar serahan ({count})",
     "payPlusExtras": "+ tambahan {amount}",
-    "payLessExtras": "{amount} untuk tambahan telah ditolak"
+    "payLessExtras": "{amount} untuk tambahan telah ditolak",
+    "returningAsk": "Pernah menyewa dengan kami?",
+    "returningHow": "Masukkan nombor telefon dan tarikh lahir yang anda gunakan sebelum ini. Jika dokumen anda sudah ada, anda tidak perlu menambahnya lagi.",
+    "returningPhone": "Nombor telefon",
+    "returningDob": "Tarikh lahir",
+    "returningCheck": "Semak",
+    "returningChecking": "Menyemak…",
+    "returningFound": "Selamat kembali! Pasport, lesen memandu dan foto anda sudah ada, jadi tidak perlu ditambah lagi.",
+    "returningPartial": "Selamat kembali! Sebahagian dokumen anda sudah ada. Sila tambah yang masih ditanda diperlukan.",
+    "returningNone": "Kami tidak menemui anda dengan butiran itu. Sila tambah dokumen anda di bawah."
   },
   "customerMessages": {
     "hi": "Hai {name},",

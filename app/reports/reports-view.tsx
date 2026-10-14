@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
@@ -116,7 +116,7 @@ function Donut({ slices, active, onActive, total, say }: { slices: Array<Slice &
 }
 
 /** Where money came from or went: a ring of slices with a key beside it. Past six kinds, the smallest share one slice. */
-export function Breakdown({ title, rows, typeLabel, say, palette = CHART_COLORS }: { title: string; rows: Slice[]; typeLabel: (type: string, fallback: string) => string; say: Say; palette?: string[] }) {
+export function Breakdown({ title, rows, typeLabel, say, palette = CHART_COLORS, footer }: { title: string; rows: Slice[]; typeLabel: (type: string, fallback: string) => string; say: Say; palette?: string[]; footer?: ReactNode }) {
   const [active, setActive] = useState<number | null>(null);
   const sorted = [...rows].sort((a, b) => b.amount - a.amount);
   const kept = sorted.length > 7 ? sorted.slice(0, 6) : sorted;
@@ -157,6 +157,7 @@ export function Breakdown({ title, rows, typeLabel, say, palette = CHART_COLORS 
           </ul>
         </div>
       )}
+      {footer}
     </section>
   );
 }
@@ -564,6 +565,7 @@ export function ReportsView({ data }: { data: ReportsData }) {
           <div className={tile}>
             <p className={soft}>{say("moneyIn")}</p>
             <p className="num flex items-center gap-1.5 text-[22px] text-[var(--foreground)]"><Dot color="var(--chart-in)" />{money(data.totalRevenue)}</p>
+            {data.refunds > 0 ? <p className={soft}>{say("afterRefunds", { amount: money(data.refunds) })}</p> : null}
             <Change change={data.revenueChange} say={say} />
           </div>
           <div className={tile}>
@@ -688,7 +690,23 @@ export function ReportsView({ data }: { data: ReportsData }) {
 
       {data.revenueByType.length > 0 || data.expensesByType.length > 0 ? (
         <div className="grid gap-3 lg:col-span-2 lg:grid-cols-2 [&>*]:min-w-0">
-          <Breakdown rows={data.revenueByType} say={say} title={say("cameFrom")} typeLabel={typeLabel} />
+          <Breakdown
+            footer={
+              data.refunds > 0 ? (
+                <div className="mt-3 flex items-start justify-between gap-3 border-t border-[var(--border)] pt-3">
+                  <div className="min-w-0">
+                    <p className="font-bold text-[var(--foreground)]">{say("refundsTitle")}</p>
+                    <p className={soft}>{data.refundExtras > 0 ? say("refundsHintExtras", { amount: money(data.refundExtras) }) : say("refundsHint")}</p>
+                  </div>
+                  <p className="flex-shrink-0 font-bold tabular-nums text-[var(--foreground)]">-{money(data.refunds)}</p>
+                </div>
+              ) : null
+            }
+            rows={data.revenueByType}
+            say={say}
+            title={say("cameFrom")}
+            typeLabel={typeLabel}
+          />
           <Breakdown palette={OUT_COLORS} rows={data.expensesByType} say={say} title={say("wentOn")} typeLabel={typeLabel} />
         </div>
       ) : null}

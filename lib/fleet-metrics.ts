@@ -1,5 +1,5 @@
 import { businessToday } from "@/lib/business-time";
-import { isExpenseTransaction, isRevenueTransaction } from "@/lib/transaction-options";
+import { isRunningCost, moneyInAmount } from "@/lib/transaction-options";
 
 /**
  * Per-vehicle figures worked out from the records themselves. The vehicles
@@ -74,11 +74,10 @@ export function computeVehicleFigures(input: {
 
   for (const vehicle of input.vehicles) {
     const vehicleTransactions = input.transactions.filter((row) => row.vehicle_id === vehicle.id && !row.voided);
-    const revenue = vehicleTransactions
-      .filter((row) => isRevenueTransaction({ amount: Number(row.amount || 0), isDeposit: row.is_deposit, type: row.type }))
-      .reduce((sum, row) => sum + Number(row.amount || 0), 0);
+    // Refunds come off what the vehicle brought in; they are not a running cost.
+    const revenue = vehicleTransactions.reduce((sum, row) => sum + moneyInAmount({ amount: Number(row.amount || 0), isDeposit: row.is_deposit, type: row.type }), 0);
     const expenses = vehicleTransactions
-      .filter((row) => isExpenseTransaction({ isDeposit: row.is_deposit, type: row.type }))
+      .filter((row) => isRunningCost({ isDeposit: row.is_deposit, type: row.type }))
       .reduce((sum, row) => sum + Math.abs(Number(row.amount || 0)), 0);
 
     const rentalSpans = input.rentals

@@ -51,3 +51,23 @@ export function isRevenueTransaction({
 }) {
   return amount > 0 && !isRawDepositTransaction({ isDeposit, type }) && isIncomeTransactionType(type);
 }
+
+/**
+ * Money given back to a customer (not a deposit). It is recorded and listed as money out,
+ * but it is not a cost of running the business: it comes off money in (Rory, Oct 2026).
+ */
+export function isRefundTransaction({ isDeposit, type }: { isDeposit?: boolean | null; type: string }) {
+  return !isRawDepositTransaction({ isDeposit, type }) && (type === "refund" || type === "Refund");
+}
+
+/** A cost of running the business: money out that is not a refund. */
+export function isRunningCost(input: { isDeposit?: boolean | null; type: string }) {
+  return isExpenseTransaction(input) && !isRefundTransaction(input);
+}
+
+/** What a transaction adds to money in: income counts, a refund takes off, everything else is 0. */
+export function moneyInAmount(input: { amount: number; isDeposit?: boolean | null; type: string }) {
+  if (isRevenueTransaction(input)) return input.amount;
+  if (isRefundTransaction(input)) return -Math.abs(input.amount);
+  return 0;
+}

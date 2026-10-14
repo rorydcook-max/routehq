@@ -2,9 +2,7 @@ import { businessNow } from "@/lib/business-time";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { loadFleetFigures } from "@/lib/fleet-metrics";
 import { getTaskList, type TaskListItem } from "@/lib/tasks";
-import { isRawDepositTransaction, isRevenueTransaction } from "@/lib/transaction-options";
-
-const expenseTypes = new Set(["repair", "servicing", "maintenance", "fuel", "insurance", "tax", "finance", "fine", "accessories", "refund"]);
+import { isRunningCost, moneyInAmount } from "@/lib/transaction-options";
 
 /** The rental that matters now: the one the car is out on, else the soonest booking. */
 export function rentalHappeningNow<T extends { status?: string | null; start_date?: string | null }>(rentals: T[] | null | undefined): T | null {
@@ -87,7 +85,7 @@ function overlapDays(start: Date, end: Date, windowStart: Date, windowEnd: Date)
 }
 
 function isExpense(transaction: { type: string; is_deposit?: boolean | null; isDeposit?: boolean | null }) {
-  return !isRawDepositTransaction({ isDeposit: transaction.is_deposit ?? transaction.isDeposit, type: transaction.type }) && expenseTypes.has(transaction.type);
+  return isRunningCost({ isDeposit: transaction.is_deposit ?? transaction.isDeposit, type: transaction.type });
 }
 
 function monthKey(date: Date) {
@@ -121,8 +119,9 @@ function buildMonthlyChart(transactions: any[]) {
       return;
     }
     const amount = Math.abs(toNumber(transaction.amount));
-    if (isRevenueTransaction({ amount: toNumber(transaction.amount), isDeposit: transaction.is_deposit, type: transaction.type })) {
-      entry.revenue += amount;
+    const moneyIn = moneyInAmount({ amount: toNumber(transaction.amount), isDeposit: transaction.is_deposit, type: transaction.type });
+    if (moneyIn !== 0) {
+      entry.revenue += moneyIn;
     } else if (isExpense(transaction)) {
       entry.expenses += amount;
     }
@@ -140,10 +139,11 @@ function calculateFinancials(vehicle: any, transactions: any[]) {
 
   transactions.forEach((transaction) => {
     const amount = Math.abs(toNumber(transaction.amount));
-    if (isRevenueTransaction({ amount: toNumber(transaction.amount), isDeposit: transaction.is_deposit, type: transaction.type })) {
-      lifetimeRevenue += amount;
+    const moneyIn = moneyInAmount({ amount: toNumber(transaction.amount), isDeposit: transaction.is_deposit, type: transaction.type });
+    if (moneyIn !== 0) {
+      lifetimeRevenue += moneyIn;
       if (dateFromIso(transaction.transaction_date) && monthKey(new Date(transaction.transaction_date)) === currentMonth) {
-        currentMonthRevenue += amount;
+        currentMonthRevenue += moneyIn;
       }
     } else if (isExpense(transaction)) {
       lifetimeExpenses += amount;
@@ -192,15 +192,10 @@ function calculateUtilization(vehicle: any, rentals: any[], transactions: any[],
   const daysRentedThisYear = rentalWindows.reduce((total, item) => total + overlapDays(item.start, item.end, yearStart, today), 0);
   const daysInYearSoFar = Math.max(1, daysBetween(yearStart, today) + 1);
   const lifecycleDays = Math.max(1, daysBetween(ownedSince, today) + 1);
-  const totalRentalRevenue = transactions
-    .filter((transaction) =>
-      isRevenueTransaction({
-        amount: toNumber(transaction.amount),
-        isDeposit: transaction.is_deposit,
-        type: transaction.type
-      })
-    )
-    .reduce((sum, transaction) => sum + Math.abs(toNumber(transaction.amount)), 0);
+  const totalRentalRevenue = transactions.reduce(
+    (sum, transaction) => sum + moneyInAmount({ amount: Math.abs(toNumber(transaction.amount)), isDeposit: transaction.is_deposit, type: transaction.type }),
+    0
+  );
   const totalRentalDays = rentalWindows.reduce((sum, item) => sum + Math.max(1, daysBetween(item.start, item.end) + 1), 0);
   const maintenanceThisYear = vehicle.status === "maintenance" ? 1 : 0;
   const fleetAverage =

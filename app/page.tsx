@@ -18,7 +18,7 @@ import { PushToggle } from "@/components/push-toggle";
 import { holdsEndingSoon, releaseExpiredHolds } from "@/lib/booking-holds";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { isExpenseTransaction, isRevenueTransaction } from "@/lib/transaction-options";
+import { isRunningCost, moneyInAmount } from "@/lib/transaction-options";
 import { kindFromCategory } from "@/lib/vehicle-groups";
 import { VehicleArt } from "@/components/vehicle-art";
 import { Dot, FleetLot, InOutBars, Ring, Spark, TileHead, type LotState, type LotVehicle } from "@/components/glance";
@@ -152,7 +152,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   const thisMonth = today.slice(0, 7);
   const monthlyExpenses = transactions
     .filter((t) => String(t.date || "").slice(0, 7) === thisMonth)
-    .filter((t) => isExpenseTransaction({ isDeposit: t.isDeposit, type: t.rawType || t.type }))
+    .filter((t) => isRunningCost({ isDeposit: t.isDeposit, type: t.rawType || t.type }))
     .reduce((sum, t) => sum + Math.abs(t.amount), 0);
   const monthlyProfit = metrics.monthlyRevenue - monthlyExpenses;
 
@@ -410,10 +410,11 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   const lastMonth = `${lastMonthDate.getUTCFullYear()}-${String(lastMonthDate.getUTCMonth() + 1).padStart(2, "0")}`;
   // Compared with the same point last month, so the 5th is not measured against a whole month.
   const sameDayLastMonth = `${lastMonth}-${today.slice(8, 10)}`;
-  const isIn = (x: (typeof transactions)[number]) => isRevenueTransaction({ amount: x.amount, isDeposit: x.isDeposit, type: x.rawType || x.type });
-  const isOut = (x: (typeof transactions)[number]) => isExpenseTransaction({ isDeposit: x.isDeposit, type: x.rawType || x.type });
+  // Money in is net of refunds; money out is running costs only.
+  const inOf = (x: (typeof transactions)[number]) => moneyInAmount({ amount: x.amount, isDeposit: x.isDeposit, type: x.rawType || x.type });
+  const isOut = (x: (typeof transactions)[number]) => isRunningCost({ isDeposit: x.isDeposit, type: x.rawType || x.type });
   const lastMonthSoFar = transactions.filter((x) => String(x.date || "").slice(0, 7) === lastMonth && String(x.date || "") <= sameDayLastMonth);
-  const lastMonthProfit = lastMonthSoFar.filter(isIn).reduce((sum, x) => sum + x.amount, 0) - lastMonthSoFar.filter(isOut).reduce((sum, x) => sum + Math.abs(x.amount), 0);
+  const lastMonthProfit = lastMonthSoFar.reduce((sum, x) => sum + inOf(x), 0) - lastMonthSoFar.filter(isOut).reduce((sum, x) => sum + Math.abs(x.amount), 0);
   const profitChange = monthlyProfit - lastMonthProfit;
   // Five weeks, Monday to Sunday, the last one being this week.
   const mondayOffset = (new Date(`${today}T00:00:00Z`).getUTCDay() + 6) % 7;
@@ -421,7 +422,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
     const from = addDays(today, -mondayOffset - (4 - index) * 7);
     const to = addDays(from, 6);
     const inWeek = transactions.filter((x) => String(x.date || "").slice(0, 10) >= from && String(x.date || "").slice(0, 10) <= to);
-    return { key: from, label: shortDate(from), in: inWeek.filter(isIn).reduce((sum, x) => sum + x.amount, 0), out: inWeek.filter(isOut).reduce((sum, x) => sum + Math.abs(x.amount), 0) };
+    return { key: from, label: shortDate(from), in: inWeek.reduce((sum, x) => sum + inOf(x), 0), out: inWeek.filter(isOut).reduce((sum, x) => sum + Math.abs(x.amount), 0) };
   });
   const nextBack = rentals.filter((r) => r.status !== "Booked" && r.end !== "Indefinite" && r.end >= today).sort((a, b) => String(a.end).localeCompare(String(b.end)))[0] || null;
   const nextOut = rentals.filter((r) => r.status === "Booked" && String(r.start || "") >= today).sort((a, b) => String(a.start).localeCompare(String(b.start)))[0] || null;
@@ -598,7 +599,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
     const from = addDays(today, -mondayOffset - (7 - index) * 7);
     const to = addDays(from, 6);
     const inWeek = transactions.filter((x) => String(x.date || "").slice(0, 10) >= from && String(x.date || "").slice(0, 10) <= to);
-    const net = inWeek.filter(isIn).reduce((sum, x) => sum + x.amount, 0) - inWeek.filter(isOut).reduce((sum, x) => sum + Math.abs(x.amount), 0);
+    const net = inWeek.reduce((sum, x) => sum + inOf(x), 0) - inWeek.filter(isOut).reduce((sum, x) => sum + Math.abs(x.amount), 0);
     return { key: from, value: net, tip: t("weekTip", { date: shortDate(from), amount: money(net) }) };
   });
   const roadCard =

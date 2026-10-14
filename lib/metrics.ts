@@ -1,5 +1,5 @@
 import type { Reminder, Rental, Transaction, Vehicle } from "@/lib/types";
-import { isRevenueTransaction } from "@/lib/transaction-options";
+import { moneyInAmount } from "@/lib/transaction-options";
 import { businessToday } from "@/lib/business-time";
 
 export function calculateDashboardMetrics({
@@ -18,14 +18,8 @@ export function calculateDashboardMetrics({
   return {
     monthlyRevenue: transactions
       .filter((transaction) => String(transaction.date || "").slice(0, 7) === thisMonth)
-      .filter((transaction) =>
-        isRevenueTransaction({
-          amount: transaction.amount,
-          isDeposit: transaction.isDeposit,
-          type: transaction.rawType || transaction.type
-        })
-      )
-      .reduce((sum, transaction) => sum + transaction.amount, 0),
+      // Refunds come off money in.
+      .reduce((sum, transaction) => sum + moneyInAmount({ amount: transaction.amount, isDeposit: transaction.isDeposit, type: transaction.rawType || transaction.type }), 0),
     outstandingPayments: rentals.reduce((sum, rental) => sum + rental.balance, 0),
     fleetProfit: vehicles.reduce((sum, vehicle) => sum + vehicle.profit, 0),
     activeRentals: rentals.filter((rental) => rental.status === "Active").length,

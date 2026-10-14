@@ -1,5 +1,5 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { isRawDepositTransaction, isRevenueTransaction } from "@/lib/transaction-options";
+import { isRawDepositTransaction, isRefundTransaction, isRevenueTransaction } from "@/lib/transaction-options";
 import { businessToday, businessNow } from "@/lib/business-time";
 
 export type DatePreset = "this_month" | "last_month" | "last_3_months" | "last_6_months" | "this_year" | "last_year" | "custom";
@@ -137,6 +137,8 @@ export interface VehicleReportData {
   rentalCount: number;
   avgDailyRate: number;
   roi: number;
+  /** Given back to customers: already taken off totalRevenue. */
+  refunds: number;
   monthlyData: MonthlyDataPoint[];
   weeklyData: MonthlyDataPoint[];
   expensesByType: ExpenseByType[];
@@ -173,6 +175,10 @@ export interface ReportsData {
   profitChange: number | null;
   revenueByType: RevenueByType[];
   expensesByType: ExpenseByType[];
+  /** Given back to customers in the period. Already taken off totalRevenue; not in expensesByType. */
+  refunds: number;
+  /** Of the refunds, extras paid back. */
+  refundExtras: number;
   depositSummary: DepositSummary;
   monthlyData: MonthlyDataPoint[];
   /** Week by week (weeks start on Monday), for periods too short to chart by month. */
@@ -205,11 +211,14 @@ const typeLabels: Record<string, string> = {
   finance: "Finance",
   fine: "Fine",
   accessories: "Accessories",
+  finders_fee: "Finder's fee paid",
+  finders_fee_income: "Finder's fee received",
+  charge_recovered: "Charge paid by customer",
   refund: "Refund",
   other: "Other"
 };
 
-const expenseTypes = new Set(["repair", "servicing", "maintenance", "fuel", "insurance", "tax", "finance", "fine", "accessories", "refund", "other"]);
+const expenseTypes = new Set(["repair", "servicing", "maintenance", "fuel", "insurance", "tax", "finance", "fine", "accessories", "finders_fee", "other"]);
 
 function txType(input: string | { type: string }) {
   return typeof input === "string" ? input : input.type;
@@ -230,6 +239,11 @@ function isIncomeTx(input: string | { amount?: number | null; is_deposit?: boole
 function isExpenseTx(input: string | { is_deposit?: boolean | null; isDeposit?: boolean | null; type: string }) {
   const type = txType(input);
   return !isRawDepositTransaction({ isDeposit: txIsDeposit(input), type }) && expenseTypes.has(type);
+}
+
+/** Money given back to a customer: comes off money in, is not a running cost. */
+function isRefundTx(input: { is_deposit?: boolean | null; isDeposit?: boolean | null; type: string }) {
+  return isRefundTransaction({ isDeposit: txIsDeposit(input), type: txType(input) });
 }
 
 function pad(n: number) {
@@ -321,6 +335,8 @@ function buildMonthlyData(transactions: any[], from: string, to: string): Monthl
     const amount = Math.abs(Number(tx.amount || 0));
     if (isIncomeTx(tx)) {
       entry.revenue += amount;
+    } else if (isRefundTx(tx)) {
+      entry.revenue -= amount;
     } else if (isExpenseTx(tx)) {
       entry.expenses += amount;
     }
@@ -383,6 +399,7 @@ function buildWeeklyData(transactions: any[], from: string, to: string): Monthly
     if (!entry) continue;
     const amount = Math.abs(Number(tx.amount || 0));
     if (isIncomeTx(tx)) entry.revenue += amount;
+    else if (isRefundTx(tx)) entry.revenue -= amount;
     else if (isExpenseTx(tx)) entry.expenses += amount;
   }
   return weeks.map((week) => ({ ...week, profit: week.revenue - week.expenses }));
@@ -499,16 +516,20 @@ export async function getReportsData(
   // Extras are rent income, followed on their own: what was paid for them and what was given back.
   const extrasByType = new Map<string, number>();
   let businessCosts = 0;
+  let refunds = 0;
 
   for (const tx of transactions) {
     const amount = Math.abs(Number(tx.amount || 0));
     const type = tx.type as string;
     const extras = tx.metadata?.refund_of === "extras" ? amount : Math.min(amount, Math.abs(Number(tx.metadata?.extras_amount || 0)));
-    if (extras > 0 && (isIncomeTx(tx) || isExpenseTx(tx))) extrasByType.set(type, (extrasByType.get(type) || 0) + extras);
+    if (extras > 0 && (isIncomeTx(tx) || isRefundTx(tx) || isExpenseTx(tx))) extrasByType.set(type, (extrasByType.get(type) || 0) + extras);
 
     if (isIncomeTx(tx)) {
       totalRevenue += amount;
       revenueByTypeMap.set(type, (revenueByTypeMap.get(type) || 0) + amount);
+    } else if (isRefundTx(tx)) {
+      totalRevenue -= amount;
+      refunds += amount;
     } else if (isExpenseTx(tx)) {
       totalExpenses += amount;
       expensesByTypeMap.set(type, (expensesByTypeMap.get(type) || 0) + amount);
@@ -519,6 +540,8 @@ export async function getReportsData(
       vTxCountMap.set(tx.vehicle_id, (vTxCountMap.get(tx.vehicle_id) || 0) + 1);
       if (isIncomeTx(tx)) {
         vIncomeMap.set(tx.vehicle_id, (vIncomeMap.get(tx.vehicle_id) || 0) + amount);
+      } else if (isRefundTx(tx)) {
+        vIncomeMap.set(tx.vehicle_id, (vIncomeMap.get(tx.vehicle_id) || 0) - amount);
       } else if (isExpenseTx(tx)) {
         vExpenseMap.set(tx.vehicle_id, (vExpenseMap.get(tx.vehicle_id) || 0) + amount);
         if (!vExpBreakMap.has(tx.vehicle_id)) vExpBreakMap.set(tx.vehicle_id, new Map());
@@ -534,6 +557,7 @@ export async function getReportsData(
   for (const tx of prevTransactions) {
     const amount = Math.abs(Number(tx.amount || 0));
     if (isIncomeTx(tx)) revenuePrev += amount;
+    else if (isRefundTx(tx)) revenuePrev -= amount;
     else if (isExpenseTx(tx)) expensesPrev += amount;
   }
   const profitPrev = revenuePrev - expensesPrev;
@@ -682,6 +706,8 @@ export async function getReportsData(
     profitChange: pctChange(netProfit, profitPrev),
     revenueByType,
     expensesByType,
+    refunds,
+    refundExtras: extrasByType.get("refund") || 0,
     depositSummary,
     monthlyData,
     weeklyData,
@@ -765,12 +791,16 @@ export async function getVehicleReportData(
 
   let totalRevenue = 0;
   let totalExpenses = 0;
+  let refunds = 0;
   const expensesByTypeMap = new Map<string, number>();
 
   for (const tx of transactions) {
     const amount = Math.abs(Number(tx.amount || 0));
     if (isIncomeTx(tx)) {
       totalRevenue += amount;
+    } else if (isRefundTx(tx)) {
+      totalRevenue -= amount;
+      refunds += amount;
     } else if (isExpenseTx(tx)) {
       totalExpenses += amount;
       expensesByTypeMap.set(tx.type, (expensesByTypeMap.get(tx.type) || 0) + amount);
@@ -819,6 +849,7 @@ export async function getVehicleReportData(
     rentalCount,
     avgDailyRate,
     roi,
+    refunds,
     monthlyData,
     weeklyData,
     expensesByType,

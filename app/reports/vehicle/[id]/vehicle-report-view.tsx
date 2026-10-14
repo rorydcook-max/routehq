@@ -187,6 +187,7 @@ export function VehicleReportView({ data }: { data: VehicleReportData }) {
           <div className={tile}>
             <p className={soft}>{say("moneyIn")}</p>
             <p className="num flex items-center gap-1.5 text-[20px] text-[var(--foreground)]"><Dot color="var(--chart-in)" />{money(totalRevenue)}</p>
+            {data.refunds > 0 ? <p className={soft}>{say("afterRefunds", { amount: money(data.refunds) })}</p> : null}
             <p className={soft}>{say("owedRentals", { count: rentalCount })}</p>
           </div>
           <div className={tile}>

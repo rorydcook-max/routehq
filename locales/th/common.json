@@ -103,7 +103,7 @@
     "statToday": "งานวันนี้",
     "earningCount": "ออกให้เช่า {out} จาก {total} คัน",
     "pillUrgent": "ต้องจัดการด่วน",
-    "pillToDo": "งาน",
+    "pillToDo": "งานวันนี้",
     "pillOut": "ส่งรถ",
     "pillBack": "รับคืน",
     "thisWeek": "สัปดาห์นี้",
@@ -1420,7 +1420,8 @@
     "type_finders_fee_income": "รับค่าแนะนำ",
     "noVehicle": "ไม่ผูกกับรถ (ค่าใช้จ่ายธุรกิจ)",
     "noVehicleHint": "ค่าเช่าร้าน ค่าโทรศัพท์ ค่าโฆษณา ค่าจ้าง: นับในยอดรวม ไม่ผูกกับรถคันใด",
-    "businessCost": "ค่าใช้จ่ายธุรกิจ"
+    "businessCost": "ค่าใช้จ่ายธุรกิจ",
+    "afterRefunds": "หลังคืนเงิน {amount}"
   },
   "booking": {
     "open": "ไม่กำหนด",
@@ -4086,7 +4087,11 @@
     "viewGrid": "การ์ด",
     "rowRented": "เช่าออก {percent}%",
     "businessCostsTitle": "ค่าใช้จ่ายธุรกิจ",
-    "businessCostsHint": "เงินออกที่ไม่ผูกกับรถ: ค่าเช่าร้าน ค่าโทรศัพท์ ค่าโฆษณา"
+    "businessCostsHint": "เงินออกที่ไม่ผูกกับรถ: ค่าเช่าร้าน ค่าโทรศัพท์ ค่าโฆษณา",
+    "afterRefunds": "หลังคืนเงิน {amount}",
+    "refundsTitle": "คืนเงินให้ลูกค้า",
+    "refundsHint": "เงินคืนหักจากเงินเข้า ไม่ใช่ค่าใช้จ่ายในการดำเนินงาน",
+    "refundsHintExtras": "เงินคืนหักจากเงินเข้า รวมค่าบริการเสริม {amount} ไม่ใช่ค่าใช้จ่ายในการดำเนินงาน"
   },
   "auth": {
     "signInTitle": "เข้าสู่ระบบ",

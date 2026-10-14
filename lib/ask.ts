@@ -2,7 +2,7 @@ import { businessToday } from "@/lib/business-time";
 import { aiTextConfigured, createChatCompletion } from "@/lib/ai-chat";
 import { getDashboardData } from "@/lib/dashboard";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { isExpenseTransaction, isRevenueTransaction } from "@/lib/transaction-options";
+import { isRunningCost, moneyInAmount } from "@/lib/transaction-options";
 import { ASSISTANT_TOOLS, checkAction, type AssistantRecords, type ProposedAction } from "@/lib/assistant-actions";
 import { getVehicleCategories } from "@/lib/organization";
 
@@ -88,8 +88,9 @@ async function businessSnapshot() {
   for (const transaction of data.transactions) {
     const key = monthKey(transaction.date);
     const type = transaction.rawType || transaction.type;
-    if (isRevenueTransaction({ amount: transaction.amount, isDeposit: transaction.isDeposit, type })) incomeByMonth.set(key, (incomeByMonth.get(key) || 0) + transaction.amount);
-    else if (isExpenseTransaction({ isDeposit: transaction.isDeposit, type })) costsByMonth.set(key, (costsByMonth.get(key) || 0) + Math.abs(transaction.amount));
+    const moneyIn = moneyInAmount({ amount: transaction.amount, isDeposit: transaction.isDeposit, type });
+    if (moneyIn !== 0) incomeByMonth.set(key, (incomeByMonth.get(key) || 0) + moneyIn);
+    else if (isRunningCost({ isDeposit: transaction.isDeposit, type })) costsByMonth.set(key, (costsByMonth.get(key) || 0) + Math.abs(transaction.amount));
   }
   const history = Array.from({ length: 12 }, (_, index) => {
     const month = addMonths(thisMonth, index - 11);

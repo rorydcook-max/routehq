@@ -103,7 +103,7 @@
     "statToday": "To do today",
     "earningCount": "{out} of {total} out earning",
     "pillUrgent": "need you now",
-    "pillToDo": "to do",
+    "pillToDo": "for today",
     "pillOut": "going out",
     "pillBack": "coming back",
     "thisWeek": "This week",
@@ -1411,7 +1411,8 @@
     "type_finders_fee_income": "Finder's fee received",
     "noVehicle": "No vehicle (business cost)",
     "noVehicleHint": "Rent, phone, ads, wages: counted in your totals, not against a vehicle.",
-    "businessCost": "Business cost"
+    "businessCost": "Business cost",
+    "afterRefunds": "after {amount} given back"
   },
   "booking": {
     "open": "Open",
@@ -4077,7 +4078,11 @@
     "viewGrid": "Tiles",
     "rowRented": "{percent}% rented",
     "businessCostsTitle": "Business costs",
-    "businessCostsHint": "Money out not tied to a vehicle: rent, phone, ads."
+    "businessCostsHint": "Money out not tied to a vehicle: rent, phone, ads.",
+    "afterRefunds": "after {amount} given back",
+    "refundsTitle": "Given back to customers",
+    "refundsHint": "Refunds come off money in. They are not a running cost.",
+    "refundsHintExtras": "Refunds come off money in, incl. {amount} for extras. They are not a running cost."
   },
   "auth": {
     "signInTitle": "Sign in",

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import { shownError } from "@/lib/error-text";
-import { ArrowDownLeft, ArrowUpRight, Check, ChevronLeft, ChevronRight, Download, Pencil, Search, Trash2, X } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Check, ChevronLeft, ChevronRight, Download, Search, Trash2, X } from "lucide-react";
 import { Dot } from "@/components/glance";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
@@ -23,7 +23,7 @@ import { isIncomeTransactionType, TRANSACTION_TYPE_OPTIONS } from "@/lib/transac
 import type { TransactionListItem } from "@/lib/transactions";
 
 type VehicleOption = { id: string; label: string };
-type TransactionKind = "income" | "expense" | "deposit_received" | "deposit_refunded";
+type TransactionKind = "income" | "refund" | "expense" | "deposit_received" | "deposit_refunded";
 
 function money(value: number, currency = "THB") {
   return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Math.abs(value));
@@ -37,6 +37,7 @@ function transactionKind(transaction: TransactionListItem): TransactionKind {
   if (transaction.type === "deposit_refunded") return "deposit_refunded";
   if (transaction.type === "deposit_received" || transaction.type === "deposit" || transaction.isDeposit) return "deposit_received";
   if (isIncomeTransactionType(transaction.type)) return "income";
+  if (transaction.type === "refund") return "refund";
   return "expense";
 }
 
@@ -109,7 +110,7 @@ function TransactionEditForm({
           <div className="relative mt-1">
             <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]">฿</span>
             <input
-              className="w-full pl-8"
+              className="w-full !pl-9"
               min="0"
               onChange={(event) => setAmount(event.target.value)}
               step="0.01"
@@ -281,16 +282,20 @@ export function TransactionsList({
     });
   }, [hiddenIds, range, search, transactions]);
 
-  const { income, expenses, deposits } = useMemo(() => {
+  const { income, refunds, expenses, deposits } = useMemo(() => {
     const byDateDesc = (a: TransactionListItem, b: TransactionListItem) => String(b.transactionDate).localeCompare(String(a.transactionDate));
     return {
-      income: inPeriod.filter((transaction) => transactionKind(transaction) === "income").sort(byDateDesc),
+      income: inPeriod.filter((transaction) => ["income", "refund"].includes(transactionKind(transaction))).sort(byDateDesc),
+      refunds: inPeriod.filter((transaction) => transactionKind(transaction) === "refund"),
       expenses: inPeriod.filter((transaction) => transactionKind(transaction) === "expense").sort(byDateDesc),
       deposits: inPeriod.filter((transaction) => transactionKind(transaction).startsWith("deposit")).sort(byDateDesc)
     };
   }, [inPeriod]);
 
-  const sum = (items: TransactionListItem[]) => items.reduce((total, transaction) => total + Math.abs(transaction.amount), 0);
+  // A refund counts against money in.
+  const sum = (items: TransactionListItem[]) => items.reduce((total, transaction) => total + (transactionKind(transaction) === "refund" ? -1 : 1) * Math.abs(transaction.amount), 0);
+  const signedMoney = (value: number) => `${value < 0 ? "−" : ""}${money(value)}`;
+  const refundTotal = refunds.reduce((total, transaction) => total + Math.abs(transaction.amount), 0);
   const incomeTotal = sum(income);
   const expenseTotal = sum(expenses);
   const profit = incomeTotal - expenseTotal;
@@ -370,7 +375,7 @@ export function TransactionsList({
     const who = kind === "expense" && !transaction.rentalId
       ? [vehicleName, transaction.notes || transaction.supplier].filter(Boolean).join(" · ")
       : [transaction.customerName || transaction.supplier, vehicleName].filter(Boolean).join(" · ");
-    const context = transaction.rentalId ? [transaction.bookingRef, kind === "expense" ? transaction.notes : null].filter(Boolean).join(" · ") : "";
+    const context = transaction.rentalId ? [transaction.bookingRef, kind === "expense" || kind === "refund" ? transaction.notes : null].filter(Boolean).join(" · ") : "";
     return (
       <li className={`group px-4 py-3.5 transition ${deleting ? "opacity-40" : ""} ${selected ? "bg-[var(--primary-light)]" : "hover:bg-[var(--panel-secondary)]"}`} key={transaction.id}>
         <div className="flex items-center gap-3">
@@ -412,30 +417,6 @@ export function TransactionsList({
             {amount.prefix}
             {money(transaction.amount, transaction.currency)}
           </p>
-          <div className="hidden flex-shrink-0 items-center gap-0.5 sm:flex sm:opacity-0 sm:transition sm:group-hover:opacity-100 sm:focus-within:opacity-100">
-            <button
-              aria-label={tx.say("editAria")}
-              className="pressable flex h-8 w-8 items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[var(--panel-tertiary)] hover:text-[var(--primary)]"
-              onClick={() => {
-                setEditingId(editingId === transaction.id ? null : transaction.id);
-                setConfirmDeleteId(null);
-              }}
-              type="button"
-            >
-              <Pencil size={14} />
-            </button>
-            <button
-              aria-label={tx.say("deleteAria")}
-              className="pressable flex h-8 w-8 items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[var(--danger-light)] hover:text-[var(--danger)]"
-              onClick={() => {
-                setConfirmDeleteId(confirmDeleteId === transaction.id ? null : transaction.id);
-                setEditingId(null);
-              }}
-              type="button"
-            >
-              <Trash2 size={14} />
-            </button>
-          </div>
         </div>
 
         {editingId === transaction.id ? (
@@ -452,7 +433,7 @@ export function TransactionsList({
         {/* On a phone, delete is inside the opened entry rather than an icon on every row. */}
         {editingId === transaction.id && confirmDeleteId !== transaction.id ? (
           <button
-            className="pressable mt-2 inline-flex min-h-10 items-center gap-1.5 whitespace-nowrap rounded-full px-3 font-bold text-[var(--danger)] sm:hidden"
+            className="pressable mt-2 inline-flex min-h-10 items-center gap-1.5 whitespace-nowrap rounded-full px-3 font-bold text-[var(--danger)]"
             onClick={() => {
               setConfirmDeleteId(transaction.id);
               setEditingId(null);
@@ -498,9 +479,9 @@ export function TransactionsList({
     return days.map((group) => (
       <div key={group.day}>
         {mode !== "day" ? (
-          <p className="flex items-center justify-between border-y border-[var(--border)] bg-[var(--panel-secondary)] px-4 py-1.5 text-[12px] font-semibold text-[var(--muted)]">
+          <p className="flex items-center justify-between border-y border-[var(--border)] bg-[var(--panel-secondary)] px-4 py-1.5 text-sm font-semibold text-[var(--muted)]">
             <span>{dayHeading(group.day, today, tx)}</span>
-            {group.items.length > 1 ? <span className="tabular-nums">{money(sum(group.items))}</span> : null}
+            {group.items.length > 1 ? <span className="tabular-nums">{signedMoney(sum(group.items))}</span> : null}
           </p>
         ) : null}
         <ul className="divide-y divide-[var(--border)]">{group.items.map(renderRow)}</ul>
@@ -521,10 +502,10 @@ export function TransactionsList({
             </span>
             <div>
               <h2 className="text-[15px] font-semibold text-[var(--foreground)]">{side === "in" ? tx.say("moneyIn") : tx.say("moneyOut")}</h2>
-              <p className="text-[12px] text-[var(--muted)]">{items.length === 0 ? tx.say("nothingYet") : tx.say("entries", { count: items.length })}</p>
+              <p className="text-sm text-[var(--muted)]">{items.length === 0 ? tx.say("nothingYet") : tx.say("entries", { count: items.length })}</p>
             </div>
           </div>
-          <p className="num text-[20px] text-[var(--foreground)]">{money(total)}</p>
+          <p className="num text-[20px] text-[var(--foreground)]">{signedMoney(total)}</p>
         </header>
         {items.length === 0 ? (
           <p className="border-t border-[var(--border)] px-4 py-6 text-center text-sm text-[var(--muted)]">
@@ -583,7 +564,8 @@ export function TransactionsList({
         <div className={`grid gap-3 ${showProfit ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-2"}`}>
           <div>
             <p className="flex items-center gap-1.5 font-semibold text-[var(--foreground-secondary)]"><Dot color="var(--chart-in)" />{tx.say("moneyIn")}</p>
-            <p className="num text-[24px] leading-tight text-[var(--foreground)]">{money(incomeTotal)}</p>
+            <p className="num text-[24px] leading-tight text-[var(--foreground)]">{signedMoney(incomeTotal)}</p>
+            {refundTotal > 0 ? <p className="text-sm font-semibold text-[var(--muted)]">{tx.say("afterRefunds", { amount: money(refundTotal) })}</p> : null}
           </div>
           <div>
             <p className="flex items-center gap-1.5 font-semibold text-[var(--foreground-secondary)]"><Dot color="var(--chart-out)" />{tx.say("moneyOut")}</p>
@@ -596,7 +578,7 @@ export function TransactionsList({
             </div>
           ) : null}
         </div>
-        {incomeTotal + expenseTotal > 0 ? (
+        {incomeTotal > 0 && incomeTotal + expenseTotal > 0 ? (
           <div aria-hidden="true" className="mt-3 flex h-3 overflow-hidden rounded-full bg-[var(--panel-tertiary)]">
             <span className="bg-[var(--chart-in)]" style={{ width: `${(incomeTotal / (incomeTotal + expenseTotal)) * 100}%` }} />
             <span className="border-l-2 border-white bg-[var(--chart-out)]" style={{ width: `${(expenseTotal / (incomeTotal + expenseTotal)) * 100}%` }} />

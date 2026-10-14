@@ -3,7 +3,7 @@ import { typedNote } from "@/lib/transaction-notes";
 import type { Route } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
-import { ArrowRight, Banknote, CalendarDays, ClipboardCheck, FileText, Fuel, Gauge, Sparkles, MapPin, PenLine, ReceiptText, ShieldCheck, Smartphone, Wrench } from "lucide-react";
+import { ArrowRight, Banknote, CalendarDays, ClipboardCheck, FileText, Fuel, MapPin, PenLine, ReceiptText, ShieldCheck, Wrench } from "lucide-react";
 import { createVehicleTask } from "@/app/actions/tasks";
 import { logVehicleMaintenance, renewVehicleCompliance } from "@/app/actions/vehicles";
 import { VehicleNotesForm } from "@/app/fleet/[id]/vehicle-notes-form";
@@ -11,12 +11,13 @@ import { VehiclePhotoManager } from "@/app/fleet/[id]/vehicle-photo-manager";
 import { VehicleTimeline, type VehicleTimelineEvent } from "@/app/fleet/[id]/vehicle-timeline";
 import { AppShell } from "@/components/app-shell";
 import { VehicleArt } from "@/components/vehicle-art";
-import { DateLeaf, ElapsedBar } from "@/components/glance";
+import { DateLeaf, Dot, ElapsedBar, InOutBars, Ring } from "@/components/glance";
+import { PageTabs, type PageTab } from "@/components/page-tabs";
 import { kindFromCategory } from "@/lib/vehicle-groups";
 import { RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
 import { InspectionViewer } from "@/components/inspection-viewer";
 import { PendingButton } from "@/components/pending-button";
-import { Badge, Card, Fold, ProgressBar } from "@/components/ui";
+import { Badge, Card, ProgressBar } from "@/components/ui";
 import { amountDueNowByRental } from "@/lib/rental-balances";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUserEmail } from "@/lib/auth/session";
@@ -113,6 +114,18 @@ function EmptyState({ children, action }: { children: React.ReactNode; action?: 
   );
 }
 
+/** One part of a tab: a card with a heading and a one-line summary. Replaces the folded rows the page used to stack. */
+function Pane({ title, summary, tone = "neutral", children }: { title: string; summary?: React.ReactNode; tone?: "neutral" | "red" | "green" | "amber"; open?: boolean; id?: string; children: React.ReactNode }) {
+  const tones = { neutral: "font-medium text-[var(--foreground-secondary)]", red: "font-bold text-[var(--danger)]", green: "font-bold text-[var(--success)]", amber: "font-bold text-[var(--warning)]" };
+  return (
+    <section className="card p-4">
+      <h2 className="text-[18px] font-bold tracking-[-0.01em] text-[var(--foreground)]">{title}</h2>
+      {summary ? <p className={`mt-0.5 ${tones[tone]}`}>{summary}</p> : null}
+      <div className="mt-3">{children}</div>
+    </section>
+  );
+}
+
 function Plate({ registration, province }: { registration: string; province?: string }) {
   return (
     <div className="thai-plate min-w-48">
@@ -145,7 +158,7 @@ function QuickActions({ vehicleId, status, rentalId }: { vehicleId: string; stat
   const shown = [recordMoney, edit].filter((action) => action.label !== primary.label);
   const more = [
     { href: detailUrl("/bookings/new", vehicleId), label: tx.say("a_newBooking"), icon: CalendarDays },
-    { href: "#maintenance", label: tx.say("a_logMaintenance"), icon: Wrench },
+    { href: "#upkeep", label: tx.say("a_logMaintenance"), icon: Wrench },
     { href: `/inspections/condition/${vehicleId}`, label: tx.say("a_condition"), icon: ClipboardCheck },
     { href: `/transactions/new?fine=1&vehicleId=${vehicleId}`, label: tx.say("a_fine"), icon: ReceiptText }
   ].filter((action) => action.label !== primary.label);
@@ -189,67 +202,64 @@ function QuickActions({ vehicleId, status, rentalId }: { vehicleId: string; stat
   );
 }
 
-function AtAGlance({ detail }: { detail: VehicleDetail }) {
+/** Four tiles, each a picture and one answer, each opening the tab with the detail. */
+function Glance({ detail, isOwner }: { detail: VehicleDetail; isOwner: boolean }) {
   const tx = useVx();
   const soonest = getSoonestCompliance(detail, tx);
-  const soonestUrgency = urgency(daysUntil(soonest?.date), tx);
-  const latestInspection = detail.inspections[0];
-  const gps = detail.gpsDevice;
-  const activeRental = detail.activeRental;
+  const soonestDays = daysUntil(soonest?.date);
+  const soonestUrgency = urgency(soonestDays, tx);
   const toneText = { red: "text-[var(--danger)]", amber: "text-[var(--warning)]", green: "text-[var(--success)]", neutral: "text-[var(--foreground-secondary)]" };
+  const f = detail.financials;
+  const u = detail.utilization;
+  const months = f.monthlyChart.slice(-6);
+  const top = Math.max(1, ...months.flatMap((month) => [month.revenue, month.expenses]));
+  const condition = (detail.vehicle as any).metadata?.condition;
+  const byDamage = condition?.by === "damage";
+  const latestInspection = detail.inspections[0];
+  const tile = "card pressable flex min-h-[132px] flex-col justify-between gap-2 p-4";
 
-  // Each tile: a label, the answer in bold, and one line under it. Colour only where something is wrong.
-  const tiles = [
-    {
-      label: tx.say("g_paper"),
-      value: soonest ? soonest.name : tx.say("g_noDates"),
-      sub: soonest ? soonestUrgency.label : tx.say("g_addDates"),
-      subClass: soonest ? toneText[soonestUrgency.tone] : toneText.neutral,
-      icon: ShieldCheck
-    },
-    {
-      label: activeRental ? tx.say("g_onRentTo") : tx.say("g_rightNow"),
-      value: activeRental?.customers?.full_name || tx.say("g_free"),
-      sub: activeRental?.end_date ? tx.say("g_dueBack", { date: formatDate(activeRental.end_date, tx) }) : activeRental ? tx.say("g_noEnd") : tx.say("g_nobody"),
-      subClass: toneText.neutral,
-      icon: CalendarDays
-    },
-    {
-      label: tx.say("g_mileage"),
-      value: tx.say("km", { km: Number(detail.vehicle.mileage || 0).toLocaleString("en-US") }),
-      sub: latestInspection?.inspected_at ? tx.say("g_recorded", { date: formatDate(latestInspection.inspected_at, tx) }) : tx.say("g_asEntered"),
-      subClass: toneText.neutral,
-      icon: Gauge
-    },
-    (() => {
-      // How good it is: set on Edit, moved down by damage found at a return.
-      const condition = (detail.vehicle as any).metadata?.condition;
-      const byDamage = condition?.by === "damage";
-      return {
-        label: tx.say("g_condition"),
-        value: condition?.value ? tx.say(`cond_${condition.value}`) : tx.say("g_condNotSet"),
-        sub: byDamage ? tx.say("g_condDamage", { date: formatDate(condition.damage_on || condition.set_at, tx) }) : condition?.value ? tx.say("g_condSet") : tx.say("g_condAdd"),
-        subClass: byDamage ? toneText.amber : toneText.neutral,
-        icon: Sparkles
-      };
-    })(),
-    ...(gps
-      ? [
-          {
-            label: tx.say("g_gps"),
-            value: gps.last_seen_at ? tx.say("g_online") : tx.say("g_offline"),
-            sub: gps.last_seen_at ? tx.say("g_lastSeen", { date: formatDate(gps.last_seen_at, tx) }) : tx.say("g_notSeen"),
-            subClass: gps.last_seen_at ? toneText.neutral : toneText.red,
-            icon: Smartphone
-          }
-        ]
-      : [])
-  ];
+  return (
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <a className={tile} href="#money">
+        <span className="tile-title">{isOwner ? tx.say("gl_profit") : tx.say("gl_monthIn")}</span>
+        <span className={`num text-[22px] leading-none ${isOwner && f.lifetimeProfit < 0 ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{money(isOwner ? f.lifetimeProfit : f.currentMonthRevenue)}</span>
+        <span aria-hidden="true" className="flex h-[30px] items-end justify-between border-b-2 border-[var(--border)]">
+          {months.map((month) => (
+            <span className="flex items-end gap-[2px]" key={month.label}>
+              <span className="grow-y block w-[6px] rounded-t-[2px] bg-[var(--chart-in)]" style={{ height: month.revenue > 0 ? Math.max(4, Math.round((month.revenue / top) * 28)) : 0 }} />
+              <span className="grow-y block w-[6px] rounded-t-[2px] bg-[var(--chart-out)]" style={{ height: month.expenses > 0 ? Math.max(4, Math.round((month.expenses / top) * 28)) : 0 }} />
+            </span>
+          ))}
+        </span>
+        <span className="font-semibold text-[var(--foreground-secondary)]">{tx.say("gl_last6")}</span>
+      </a>
+      <a className={tile} href="#rentals">
+        <span className="tile-title">{tx.say("gl_rented")}</span>
+        <span className="flex items-center gap-3">
+          <Ring label={percent(u.twelveMonth)} labelSize={15} pct={u.twelveMonth} size={66} stroke={7} />
+          <span className="font-semibold leading-snug text-[var(--foreground-secondary)]">{tx.say("gl_fleetAvg", { percent: percent(u.fleetAverage) })}</span>
+        </span>
+      </a>
+      <a className={tile} href="#upkeep">
+        <span className="tile-title">{tx.say("g_paper")}</span>
+        <span className="text-[18px] font-bold leading-tight text-[var(--foreground)]">{soonest ? soonest.name : tx.say("gl_notSetUp")}</span>
+        <span className={`font-bold ${soonest ? toneText[soonestUrgency.tone] : "text-[var(--primary)]"}`}>{soonest ? soonestUrgency.label : tx.say("g_addDates")}</span>
+      </a>
+      <a className={tile} href="#checks">
+        <span className="tile-title">{tx.say("g_mileage")}</span>
+        <span className="num text-[22px] leading-none text-[var(--foreground)]">{tx.say("km", { km: Number(detail.vehicle.mileage || 0).toLocaleString("en-US") })}</span>
+        <span className={`font-semibold ${byDamage ? toneText.amber : toneText.neutral}`}>
+          {condition?.value ? tx.say(`cond_${condition.value}`) : tx.say("gl_condNotSet")}
+          {latestInspection?.inspected_at ? ` · ${formatDate(latestInspection.inspected_at, tx)}` : ""}
+        </span>
+      </a>
+    </div>
+  );
+}
 
-  // The rental card above already says who has it and until when.
-  const rentalCardShown = Boolean(activeRental) && ["rented", "reserved"].includes(detail.vehicle.status);
-  const shownTiles = rentalCardShown ? tiles.filter((tile) => tile.icon !== CalendarDays) : tiles;
-
+/** Day, week and month prices, with the deposit. Lives under Details; the top of the page shows them in one line. */
+function RatesPane({ detail }: { detail: VehicleDetail }) {
+  const tx = useVx();
   const rates: Array<["day" | "week" | "month", number]> = [
     ["day", Number(detail.vehicle.daily_rate || 0)],
     ["week", Number(detail.vehicle.weekly_rate || 0)],
@@ -257,44 +267,24 @@ function AtAGlance({ detail }: { detail: VehicleDetail }) {
   ];
   const ratesSet = rates.filter(([, value]) => value > 0).length;
   const deposit = (detail.vehicle as any).deposit_amount;
-
   return (
-    <div className="space-y-3">
-      <div className={`grid grid-cols-2 gap-3 ${shownTiles.length === 3 ? "lg:grid-cols-3 max-lg:[&>*:last-child]:col-span-2" : shownTiles.length === 2 ? "" : "lg:grid-cols-4"}`}>
-        {shownTiles.map((tile) => {
-          const Icon = tile.icon;
-          return (
-            <div className="card p-4" key={tile.label}>
-              <div className="flex items-center justify-between gap-2">
-                <p className="font-semibold text-[var(--muted)]">{tile.label}</p>
-                <Icon className="shrink-0 text-[var(--muted)]" size={18} />
-              </div>
-              <p className="mt-1 text-[18px] font-bold leading-tight text-[var(--foreground)]">{tile.value}</p>
-              <p className={`mt-0.5 font-semibold ${tile.subClass}`}>{tile.sub}</p>
-            </div>
-          );
-        })}
+    <Pane title={tx.say("r_title")}>
+      <div className="grid grid-cols-3 gap-2.5">
+        {rates.map(([period, value]) => (
+          <div className="rounded-xl bg-[var(--panel-secondary)] p-3" key={period}>
+            <p className="font-semibold text-[var(--muted)]">{tx.say(`rp_${period}`)}</p>
+            <p className={`num mt-0.5 text-[18px] ${value > 0 ? "text-[var(--foreground)]" : "text-[var(--muted)]"}`}>{value > 0 ? money(value) : "—"}</p>
+          </div>
+        ))}
       </div>
-      <div className="card p-4">
-        <div className="flex items-center justify-between gap-3">
-          <p className="font-semibold text-[var(--muted)]">{tx.say("r_title")}</p>
-          <Link className="font-bold text-[var(--primary)]" href={`/fleet/${detail.vehicle.id}/edit` as Route}>
-            {ratesSet === 3 ? tx.say("r_edit") : ratesSet === 0 ? tx.say("r_add") : tx.say("r_addMissing")}
-          </Link>
-        </div>
-        <div className="mt-1 flex flex-wrap gap-x-5 gap-y-1">
-          {rates.map(([period, value]) => (
-            <p className={`text-[17px] font-bold tabular-nums ${value > 0 ? "text-[var(--foreground)]" : "text-[var(--muted)]"}`} key={period}>
-              {value > 0 ? tx.say(`r_${period}`, { amount: money(value) }) : tx.say(`r_${period}NotSet`)}
-            </p>
-          ))}
-        </div>
-        <p className="mt-1 font-medium text-[var(--foreground-secondary)]">
-          {deposit === null || deposit === undefined ? tx.say("r_depositUsual") : tx.say("r_deposit", { amount: money(Number(deposit)) })}
-          {ratesSet > 0 && ratesSet < 3 ? ` · ${tx.say("r_hint")}` : ""}
-        </p>
-      </div>
-    </div>
+      <p className="mt-2 font-medium text-[var(--foreground-secondary)]">
+        {deposit === null || deposit === undefined ? tx.say("r_depositUsual") : tx.say("r_deposit", { amount: money(Number(deposit)) })}
+        {ratesSet > 0 && ratesSet < 3 ? ` · ${tx.say("r_hint")}` : ""}
+      </p>
+      <Link className="mt-2 inline-flex font-bold text-[var(--primary)]" href={`/fleet/${detail.vehicle.id}/edit` as Route}>
+        {ratesSet === 3 ? tx.say("r_edit") : ratesSet === 0 ? tx.say("r_add") : tx.say("r_addMissing")}
+      </Link>
+    </Pane>
   );
 }
 
@@ -331,7 +321,7 @@ function ActiveRentalCard({ detail, dueNow }: { detail: VehicleDetail; dueNow: n
         </p>
       </div>
       {rental.status !== "booked" && rental.start_date && rental.end_date ? <ElapsedBar end={toWallTime(rental.end_date)} late={late} start={toWallTime(rental.start_date)} /> : null}
-      <div className="mt-3 grid grid-cols-2 gap-2.5">
+      <div className="mt-3 grid grid-cols-2 gap-2.5 lg:grid-cols-4">
         <InfoRow
           label={tx.say("ar_period")}
           value={rental.end_date && rental.start_date ? (
@@ -381,7 +371,7 @@ function ComplianceSection({ detail, organizationId }: { detail: VehicleDetail; 
   const toneText = { red: "text-[var(--danger)]", amber: "text-[var(--warning)]", green: "text-[var(--success)]", neutral: "text-[var(--foreground-secondary)]" };
 
   return (
-    <Fold
+    <Pane
       open={needsLook}
       summary={!saved ? tx.say("cs_none") : `${tx.say("cs_saved", { saved, total: items.length })}${soonest ? ` · ${tx.say("cs_next", { name: soonest.name, date: formatDate(soonest.date, tx) })}` : ""}`}
       title={tx.say("cs_title")}
@@ -434,7 +424,7 @@ function ComplianceSection({ detail, organizationId }: { detail: VehicleDetail; 
           );
         })}
       </div>
-    </Fold>
+    </Pane>
   );
 }
 
@@ -463,9 +453,9 @@ function TimelineSection({ detail }: { detail: VehicleDetail }) {
   const oneYearAgo = `${Number(todayIso.slice(0, 4)) - 1}${todayIso.slice(4)}`;
 
   return (
-    <Fold summary={tx.say("tl_summary", { count: events.filter((event) => event.date.slice(0, 10) <= todayIso).length })} title={tx.say("tl_title")}>
+    <Pane summary={tx.say("tl_summary", { count: events.filter((event) => event.date.slice(0, 10) <= todayIso).length })} title={tx.say("tl_title")}>
       <VehicleTimeline defaultFrom={oneYearAgo} defaultTo={todayIso} events={events} />
-    </Fold>
+    </Pane>
   );
 }
 
@@ -478,7 +468,7 @@ function InspectionsSection({ detail }: { detail: VehicleDetail }) {
   };
 
   return (
-    <Fold id="inspections" title={tx.say("in_title")}>
+    <Pane id="inspections" title={tx.say("in_title")}>
       {!latest ? (
         <EmptyState action={<Link className="font-bold text-[var(--primary)]" href={`/inspections/condition/${detail.vehicle.id}` as Route}>{tx.say("in_start")}</Link>}>
           {tx.say("in_none")}
@@ -498,17 +488,22 @@ function InspectionsSection({ detail }: { detail: VehicleDetail }) {
           ))}
         </div>
       )}
-    </Fold>
+    </Pane>
   );
 }
 
 function FinancialSection({ detail, isOwner }: { detail: VehicleDetail; isOwner: boolean }) {
   const tx = useVx();
   const f = detail.financials;
-  const chartMax = Math.max(1, ...f.monthlyChart.flatMap((month) => [month.revenue, month.expenses]));
+  const chartMonths = f.monthlyChart.map((month, index) => ({
+    key: String(index),
+    label: new Intl.DateTimeFormat(tx.locale === "en" ? "en-GB" : `${tx.locale}-u-ca-gregory-nu-latn`, { month: "short" }).format(new Date(businessNow().getFullYear(), businessNow().getMonth() - (f.monthlyChart.length - 1 - index), 1)),
+    in: month.revenue,
+    out: month.expenses
+  }));
 
   return (
-    <Fold
+    <Pane
       summary={isOwner ? tx.say("fi_summary", { profit: money(f.lifetimeProfit) }) : tx.say("fi_summaryTeam", { amount: money(f.currentMonthRevenue) })}
       title={tx.say("fi_title")}
       tone={isOwner && f.lifetimeProfit < 0 ? "red" : "neutral"}
@@ -526,22 +521,22 @@ function FinancialSection({ detail, isOwner }: { detail: VehicleDetail; isOwner:
       </div>
       <div className="mt-3 rounded-xl bg-[var(--panel-secondary)] p-3.5">
         <p className="font-bold text-[var(--foreground)]">{tx.say("fi_chart")}</p>
-        <div className="mt-3 flex h-40 items-end gap-2 overflow-x-auto">
-          {f.monthlyChart.map((month, index) => (
-            <div className="flex min-w-8 flex-1 flex-col items-center justify-end gap-1" key={month.label}>
-              <div className="flex h-28 items-end gap-1">
-                <div className="w-3 rounded-t bg-[var(--primary)]" style={{ height: `${Math.max(3, (month.revenue / chartMax) * 112)}px` }} title={tx.say("fi_in", { amount: money(month.revenue) })} />
-                <div className="w-3 rounded-t bg-[var(--danger)]" style={{ height: `${Math.max(3, (month.expenses / chartMax) * 112)}px` }} title={tx.say("fi_out", { amount: money(month.expenses) })} />
-              </div>
-              <span className="font-medium text-[var(--muted)]" style={{ fontSize: 14 }}>{new Intl.DateTimeFormat(tx.locale === "en" ? "en-GB" : `${tx.locale}-u-ca-gregory-nu-latn`, { month: "short" }).format(new Date(businessNow().getFullYear(), businessNow().getMonth() - (f.monthlyChart.length - 1 - index), 1))}</span>
-            </div>
-          ))}
-        </div>
-        <p className="mt-2 font-medium text-[var(--foreground-secondary)]">{tx.say("fi_legend")}</p>
+        {[
+          { months: chartMonths, className: "hidden sm:block" },
+          { months: chartMonths.slice(-6), className: "sm:hidden" }
+        ].map((view) => (
+          <div className={view.className} key={view.className}>
+            <InOutBars inWord={tx.say("fi_inWord")} label={tx.say("fi_chart")} money={money} outWord={tx.say("fi_outWord")} periods={view.months} />
+          </div>
+        ))}
+        <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-semibold text-[var(--foreground-secondary)]">
+          <span className="inline-flex items-center gap-1.5"><Dot color="var(--chart-in)" />{tx.say("fi_inWord")}</span>
+          <span className="inline-flex items-center gap-1.5"><Dot color="var(--chart-out)" />{tx.say("fi_outWord")}</span>
+        </p>
       </div>
       {/* Every payment in and out for this vehicle sits under its totals: one subject, one row on the page. */}
       <TransactionsSection detail={detail} />
-    </Fold>
+    </Pane>
   );
 }
 
@@ -562,7 +557,7 @@ function UtilizationSection({ detail }: { detail: VehicleDetail }) {
   const tx = useVx();
   const u = detail.utilization;
   return (
-    <Fold summary={tx.say("u_summary", { percent: percent(u.twelveMonth) })} title={tx.say("u_title")}>
+    <Pane summary={tx.say("u_summary", { percent: percent(u.twelveMonth) })} title={tx.say("u_title")}>
       <div className="space-y-3">
         <MetricBar label={tx.say("u_12")} note={tx.say("u_fleetAvg", { percent: percent(u.fleetAverage) })} value={u.twelveMonth} />
         <MetricBar label={tx.say("u_life")} tone="blue" value={u.lifecycle} />
@@ -574,7 +569,7 @@ function UtilizationSection({ detail }: { detail: VehicleDetail }) {
         </div>
       </div>
       <RentalHistorySection detail={detail} />
-    </Fold>
+    </Pane>
   );
 }
 
@@ -584,7 +579,7 @@ function MaintenanceSection({ detail, organizationId }: { detail: VehicleDetail;
   const typeName = (type: string) => (tx.has(`mt_${type}`) ? tx.say(`mt_${type}`) : type.replace(/_/g, " "));
 
   return (
-    <Fold
+    <Pane
       id="maintenance"
       summary={compliance.next_service_date ? tx.say("m_summaryNext", { date: formatDate(compliance.next_service_date, tx) }) : tx.say("m_summaryNone")}
       title={tx.say("m_title")}
@@ -668,7 +663,7 @@ function MaintenanceSection({ detail, organizationId }: { detail: VehicleDetail;
           ))
         )}
       </div>
-    </Fold>
+    </Pane>
   );
 }
 
@@ -680,7 +675,7 @@ function TasksSection({ detail, organizationId }: { detail: VehicleDetail; organ
   const extraCount = Math.max(0, detail.vehicleTasks.length - visibleTasks.length);
 
   return (
-    <Fold open={detail.vehicleTasks.length > 0} summary={tx.say("t_summary", { count: detail.vehicleTasks.length })} title={tx.say("t_title")}>
+    <Pane open={detail.vehicleTasks.length > 0} summary={tx.say("t_summary", { count: detail.vehicleTasks.length })} title={tx.say("t_title")}>
       {visibleTasks.length === 0 ? (
         <EmptyState>{tx.say("t_none")}</EmptyState>
       ) : (
@@ -719,7 +714,7 @@ function TasksSection({ detail, organizationId }: { detail: VehicleDetail; organ
           </PendingButton>
         </form>
       </details>
-    </Fold>
+    </Pane>
   );
 }
 
@@ -823,7 +818,7 @@ function RentalHistorySection({ detail }: { detail: VehicleDetail }) {
 function DocumentsSection({ detail }: { detail: VehicleDetail }) {
   const tx = useVx();
   return (
-    <Fold summary={tx.say("d_summary", { count: detail.documents.length })} title={tx.say("d_title")}>
+    <Pane summary={tx.say("d_summary", { count: detail.documents.length })} title={tx.say("d_title")}>
       {detail.documents.length === 0 ? (
         <EmptyState>{tx.say("d_none")}</EmptyState>
       ) : (
@@ -839,7 +834,7 @@ function DocumentsSection({ detail }: { detail: VehicleDetail }) {
           ))}
         </div>
       )}
-    </Fold>
+    </Pane>
   );
 }
 
@@ -849,7 +844,7 @@ function GpsSection({ detail }: { detail: VehicleDetail }) {
   const offline = !detail.gpsDevice.last_seen_at;
 
   return (
-    <Fold
+    <Pane
       summary={offline ? tx.say("gp_never") : tx.say("g_lastSeen", { date: formatDate(detail.gpsDevice.last_seen_at, tx) })}
       title={tx.say("gp_title")}
       tone={offline ? "red" : "neutral"}
@@ -862,7 +857,7 @@ function GpsSection({ detail }: { detail: VehicleDetail }) {
         <MapPin size={17} />
         {detail.latestLocation ? `${detail.latestLocation.latitude}, ${detail.latestLocation.longitude}` : tx.say("gp_noPing")}
       </p>
-    </Fold>
+    </Pane>
   );
 }
 
@@ -877,7 +872,7 @@ function SpecsSection({ detail }: { detail: VehicleDetail }) {
       ["s_trim", detail.vehicle.trim],
       ["s_year", detail.vehicle.year],
       ["s_colour", detail.vehicle.color],
-      ["s_body", specs.body_class],
+      ["s_body", specs.body_class ? (String(specs.body_class).length <= 3 ? String(specs.body_class).toUpperCase() : String(specs.body_class).charAt(0).toUpperCase() + String(specs.body_class).slice(1)) : null],
       ["s_engine", specs.engine_cc],
       ["s_gearbox", specs.transmission],
       ["s_fuel", specs.fuel_type],
@@ -889,7 +884,7 @@ function SpecsSection({ detail }: { detail: VehicleDetail }) {
   ).filter(([, value]) => value !== null && value !== undefined && String(value).trim() !== "");
 
   return (
-    <Fold summary={[detail.vehicle.year, detail.vehicle.color, specs.transmission].filter(Boolean).join(" · ") || undefined} title={tx.say("s_title")}>
+    <Pane summary={[detail.vehicle.year, detail.vehicle.color, specs.transmission].filter(Boolean).join(" · ") || undefined} title={tx.say("s_title")}>
       <div className="grid grid-cols-2 gap-2.5">
         {rows.map(([key, value]) => (
           <InfoRow key={key} label={tx.say(key)} value={String(value)} />
@@ -899,7 +894,7 @@ function SpecsSection({ detail }: { detail: VehicleDetail }) {
         <PenLine size={17} />
         {tx.say("a_edit")}
       </Link>
-    </Fold>
+    </Pane>
   );
 }
 
@@ -910,7 +905,7 @@ function FinanceSection({ detail }: { detail: VehicleDetail }) {
   const totalPaid = detail.transactions.filter((transaction) => transaction.type === "finance").reduce((sum, transaction) => sum + Math.abs(Number(transaction.amount || 0)), 0);
 
   return (
-    <Fold summary={finance.outstanding_balance ? `${tx.say("l_balance")} ${money(finance.outstanding_balance)}` : undefined} title={tx.say("l_title")}>
+    <Pane summary={finance.outstanding_balance ? `${tx.say("l_balance")} ${money(finance.outstanding_balance)}` : undefined} title={tx.say("l_title")}>
       <div className="grid grid-cols-2 gap-2.5">
         {finance.lender ? <InfoRow label={tx.say("l_lender")} value={finance.lender} /> : null}
         <InfoRow label={tx.say("l_monthly")} value={money(finance.monthly_payment)} />
@@ -918,7 +913,7 @@ function FinanceSection({ detail }: { detail: VehicleDetail }) {
         <InfoRow label={tx.say("l_end")} value={formatDate(finance.end_date, tx)} />
         <InfoRow label={tx.say("l_paid")} value={money(totalPaid)} />
       </div>
-    </Fold>
+    </Pane>
   );
 }
 
@@ -951,6 +946,59 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
   const statusTone = status === "rented" ? "blue" : status === "available" ? "green" : status === "reserved" || status === "maintenance" ? "amber" : "neutral";
   // Only what has fallen due, the same figure the booking page shows.
   const dueNow = detail.activeRental ? (await amountDueNowByRental(await createSupabaseServerClient(), [detail.activeRental.id])).get(detail.activeRental.id) || 0 : 0;
+  const rateLine = (
+    [
+      ["r_day", Number(vehicle.daily_rate || 0)],
+      ["r_week", Number(vehicle.weekly_rate || 0)],
+      ["r_month", Number(vehicle.monthly_rate || 0)]
+    ] as Array<[string, number]>
+  )
+    .filter(([, value]) => value > 0)
+    .map(([key, value]) => tx.say(key, { amount: money(value) }))
+    .join(" · ");
+
+  // The tab that opens first is the one that needs a look: paperwork about to run out, then open jobs, then the money.
+  const soonestDays = daysUntil(getSoonestCompliance(detail, tx)?.date);
+  const paperUrgent = soonestDays !== null && soonestDays <= 7;
+  const firstTab = paperUrgent ? "upkeep" : detail.vehicleTasks.length > 0 ? "todo" : isOwner ? "money" : "rentals";
+  const tabs: PageTab[] = [
+    { id: "todo", label: tx.say("tab_todo"), count: detail.vehicleTasks.length, content: <TasksSection detail={detail} organizationId={organization.id} /> },
+    { id: "money", label: tx.say("tab_money"), content: <FinancialSection detail={detail} isOwner={isOwner} /> },
+    {
+      id: "upkeep",
+      label: tx.say("tab_upkeep"),
+      alert: paperUrgent,
+      content: (
+        <div className="grid gap-3 lg:grid-cols-2 lg:items-start">
+          <ComplianceSection detail={detail} organizationId={organization.id} />
+          <div className="grid gap-3">
+            <MaintenanceSection detail={detail} organizationId={organization.id} />
+            <DocumentsSection detail={detail} />
+            <FinanceSection detail={detail} />
+          </div>
+        </div>
+      )
+    },
+    { id: "rentals", label: tx.say("tab_rentals"), content: <UtilizationSection detail={detail} /> },
+    { id: "checks", label: tx.say("tab_checks"), content: <InspectionsSection detail={detail} /> },
+    {
+      id: "details",
+      label: tx.say("tab_details"),
+      content: (
+        <div className="grid gap-3 lg:grid-cols-2 lg:items-start">
+          <SpecsSection detail={detail} />
+          <div className="grid gap-3">
+            <RatesPane detail={detail} />
+            <GpsSection detail={detail} />
+            <Pane title={tx.say("notes")}>
+              <VehicleNotesForm notes={vehicle.metadata?.notes || ""} organizationId={organization.id} updatedAt={vehicle.metadata?.notes_updated_at} vehicleId={vehicle.id} />
+            </Pane>
+          </div>
+        </div>
+      )
+    },
+    { id: "history", label: tx.say("tab_history"), content: <TimelineSection detail={detail} /> }
+  ];
 
   return (
     <AppShell userEmail={userEmail}>
@@ -974,6 +1022,7 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
                   <div className="mt-3">
                     <Plate province={vehicle.metadata?.registration_province} registration={vehicle.registration_number} />
                   </div>
+                  {rateLine ? <p className="mt-3 text-[17px] font-bold text-[var(--foreground)]">{rateLine}</p> : null}
                 </div>
                 <QuickActions rentalId={detail.activeRental?.id || null} status={vehicle.status} vehicleId={vehicle.id} />
               </div>
@@ -982,31 +1031,8 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
         </Card>
 
         <ActiveRentalCard detail={detail} dueNow={dueNow} />
-        <AtAGlance detail={detail} />
-
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,3fr)_minmax(320px,2fr)] lg:items-start">
-          <div className="space-y-3">
-            <ComplianceSection detail={detail} organizationId={organization.id} />
-            <TasksSection detail={detail} organizationId={organization.id} />
-            <MaintenanceSection detail={detail} organizationId={organization.id} />
-            <InspectionsSection detail={detail} />
-          </div>
-
-          <div className="space-y-3">
-            <FinancialSection detail={detail} isOwner={isOwner} />
-              <UtilizationSection detail={detail} />
-              <DocumentsSection detail={detail} />
-            <GpsSection detail={detail} />
-            <SpecsSection detail={detail} />
-            <FinanceSection detail={detail} />
-            <Fold title={tx.say("notes")}>
-              <VehicleNotesForm notes={vehicle.metadata?.notes || ""} organizationId={organization.id} updatedAt={vehicle.metadata?.notes_updated_at} vehicleId={vehicle.id} />
-            </Fold>
-          </div>
-        </div>
-
-        {/* The full history comes last: who has it now and what is due matter more day to day. */}
-        <TimelineSection detail={detail} />
+        <Glance detail={detail} isOwner={isOwner} />
+        <PageTabs aliases={{ maintenance: "upkeep", inspections: "checks" }} initial={firstTab} label={tx.say("tab_label")} tabs={tabs} />
       </div>
     </AppShell>
   );

@@ -118,13 +118,13 @@ export function AskBox({ variant }: { variant: "sidebar" | "icon" }) {
     <>
       {variant === "sidebar" ? (
         <button
-          className="mb-3 flex w-full items-center gap-2 rounded-xl border border-[var(--sidebar-border)] bg-white px-3 py-2 text-left text-[13px] text-[var(--muted)] transition hover:border-[var(--primary)] hover:text-[var(--foreground)]"
+          className="flex h-10 w-full items-center gap-2 rounded-xl border border-[var(--sidebar-border)] bg-white px-3 text-left text-[14px] text-[var(--muted)] transition hover:border-[var(--primary)] hover:text-[var(--foreground)]"
+          title="Ctrl K"
           onClick={() => setOpen(true)}
           type="button"
         >
           <Search size={16} />
           <span className="min-w-0 flex-1 truncate font-medium">{t("askAnything")}</span>
-          <kbd className="shrink-0 rounded-md bg-[var(--panel-tertiary)] px-1.5 py-0.5 font-sans font-semibold text-[var(--muted)]" style={{ fontSize: 14 }}>Ctrl K</kbd>
         </button>
       ) : (
         <button aria-label={t("askTitle")} className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border)] bg-white text-[var(--foreground-secondary)]" onClick={() => setOpen(true)} type="button">

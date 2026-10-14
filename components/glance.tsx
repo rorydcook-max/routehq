@@ -6,7 +6,7 @@ import { intlLocale } from "@/lib/i18n/dates";
 // Small pictures that say one thing at a glance: a ring, a week planner, a pair of bars.
 // Colours carry one meaning each (see "Look G" in globals.css).
 
-export function Ring({ pct, label, size = 80, stroke = 10, color = "var(--on-rent)", track = "var(--primary-light)" }: { pct: number; label: string; size?: number; stroke?: number; color?: string; track?: string }) {
+export function Ring({ pct, label, size = 80, stroke = 10, color = "var(--on-rent)", track = "var(--primary-light)", labelSize = 18 }: { pct: number; label: string; size?: number; stroke?: number; color?: string; track?: string; labelSize?: number }) {
   const r = (size - stroke) / 2;
   const shown = Math.max(0, Math.min(100, pct));
   return (
@@ -17,7 +17,7 @@ export function Ring({ pct, label, size = 80, stroke = 10, color = "var(--on-ren
           <circle className="ring-draw" cx={size / 2} cy={size / 2} fill="none" pathLength={100} r={r} stroke={color} strokeDasharray={`${shown} 100`} strokeLinecap="round" strokeWidth={stroke} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
         ) : null}
       </svg>
-      <span className="num absolute inset-0 flex items-center justify-center text-[18px] text-[var(--foreground)]">{label}</span>
+      <span className="num absolute inset-0 flex items-center justify-center text-[var(--foreground)]" style={{ fontSize: labelSize }}>{label}</span>
     </span>
   );
 }
@@ -96,7 +96,7 @@ export function InOutBars({ periods, label, money, inWord = "in", outWord = "out
             <span className="grow-y w-1/2 max-w-5 rounded-t-[4px] bg-[var(--chart-in)]" style={{ height: `${Math.max(2, Math.round((period.in / max) * 80))}px` }} />
             <span className="grow-y w-1/2 max-w-5 rounded-t-[4px] bg-[var(--chart-out)]" style={{ height: `${Math.max(2, Math.round((period.out / max) * 80))}px` }} />
           </div>
-          <span className={`whitespace-nowrap font-semibold text-[var(--muted)] ${periods.length > 7 ? "text-[13px]" : ""}`}>{period.label}</span>
+          <span className="whitespace-nowrap font-semibold text-[var(--muted)]">{period.label}</span>
         </div>
       ))}
     </div>

@@ -9,6 +9,7 @@ import {
   FileText,
   Handshake,
   LifeBuoy,
+  LogOut,
   Home,
   Plus,
   ClipboardList,
@@ -55,24 +56,44 @@ type NavItem = {
   icon: typeof Home;
 };
 
-// What an owner opens every day, in the order the day goes.
-const dailyItems: NavItem[] = [
-  { key: "dashboard", href: "/", icon: Home },
-  { key: "tasks", href: "/tasks", icon: ListChecks },
-  { key: "inbox", href: "/inbox", icon: MessagesSquare },
-  { key: "bookings", href: "/bookings", icon: ClipboardList },
-  { key: "calendar", href: "/calendar", icon: CalendarDays },
-  { key: "fleet", href: "/fleet", icon: Car },
-  { key: "customers", href: "/customers", icon: Users },
-  { key: "partners", href: "/partners" as Route, icon: Handshake }
+// The side menu in groups, in the order the day goes: today's work, the rentals, the money, then the tools
+// used now and then. Settings and Help sit at the foot. A group heading is a word, not a link.
+type NavGroup = { heading: "g_rentals" | "g_money" | "g_tools" | null; items: NavItem[] };
+const navGroups: NavGroup[] = [
+  {
+    heading: null,
+    items: [
+      { key: "dashboard", href: "/", icon: Home },
+      { key: "tasks", href: "/tasks", icon: ListChecks },
+      { key: "inbox", href: "/inbox", icon: MessagesSquare }
+    ]
+  },
+  {
+    heading: "g_rentals",
+    items: [
+      { key: "bookings", href: "/bookings", icon: ClipboardList },
+      { key: "calendar", href: "/calendar", icon: CalendarDays },
+      { key: "fleet", href: "/fleet", icon: Car },
+      { key: "customers", href: "/customers", icon: Users }
+    ]
+  },
+  {
+    heading: "g_money",
+    items: [
+      { key: "transactions", href: "/transactions", icon: ReceiptText },
+      { key: "reports", href: "/reports", icon: BarChart3 }
+    ]
+  },
+  {
+    heading: "g_tools",
+    items: [
+      { key: "documents", href: "/documents", icon: FileText },
+      { key: "partners", href: "/partners" as Route, icon: Handshake },
+      { key: "rentalCalculator", href: "/rental-calculator", icon: Calculator }
+    ]
+  }
 ];
-
-// Looked at now and then: money, paperwork and set-up.
-const recordItems: NavItem[] = [
-  { key: "transactions", href: "/transactions", icon: ReceiptText },
-  { key: "reports", href: "/reports", icon: BarChart3 },
-  { key: "documents", href: "/documents", icon: FileText },
-  { key: "rentalCalculator", href: "/rental-calculator", icon: Calculator },
+const footItems: NavItem[] = [
   { key: "settings", href: "/settings", icon: Settings },
   { key: "help", href: "/help" as Route, icon: LifeBuoy }
 ];
@@ -131,8 +152,10 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
   const hasSeveralBusinesses = shell.organizations.length > 1;
   const activeBusiness = shell.organizations.find((organization) => organization.active);
   const ownerOnly = ["/settings", "/reports", "/rental-calculator"];
-  const visibleRecordItems = isTeammate ? recordItems.filter((item) => !ownerOnly.includes(item.href)) : recordItems;
-  const allNavItems = [...dailyItems, ...visibleRecordItems];
+  const allowed = (item: NavItem) => !isTeammate || !ownerOnly.includes(item.href);
+  const groups = navGroups.map((group) => ({ ...group, items: group.items.filter(allowed) })).filter((group) => group.items.length > 0);
+  const visibleFootItems = footItems.filter(allowed);
+  const allNavItems = [...groups.flatMap((group) => group.items), ...visibleFootItems];
   const mobileBarItems = mobileBarKeys.map((key) => allNavItems.find((item) => item.key === key)).filter(Boolean) as NavItem[];
   const moreItems = allNavItems.filter((item) => !mobileBarKeys.includes(item.key)).sort((a, b) => Number(b.key === "bookings") - Number(a.key === "bookings"));
 
@@ -141,84 +164,98 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
   const moreActive = moreItems.some((item) => isActive(item.href));
   const badgeFor = (key: NavKey) => (key === "inbox" ? shell.unreadChats : key === "tasks" ? shell.dueTasks : key === "help" ? shell.helpReplies : 0);
 
+  const sideLink = (item: NavItem, compact = false) => {
+    const Icon = item.icon;
+    return (
+      <Link
+        className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm font-semibold transition [@media(max-height:860px)]:py-1.5 ${compact ? "flex-1 justify-center" : "w-full"} ${
+          isActive(item.href) ? "bg-[var(--primary-light)] text-[var(--primary)]" : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--foreground)]"
+        }`}
+        href={item.href}
+        key={item.key}
+      >
+        <Icon className="shrink-0" size={16} />
+        {t(item.key)}
+        {badgeFor(item.key) > 0 ? (
+          <span className="ml-auto flex h-[22px] min-w-[22px] items-center justify-center rounded-full bg-[var(--primary)] px-1.5 text-[14px] font-bold leading-none text-white">{badgeFor(item.key)}</span>
+        ) : null}
+      </Link>
+    );
+  };
+
   return (
     <div className={`min-h-screen lg:pb-0 ${onFocusedFlow ? "focused-flow pb-24" : "pb-28"}`}>
       <BrandStyle colour={brand?.colour} />
       <aside className="app-sidebar fixed left-0 top-0 z-20 hidden h-screen w-[220px] flex-col border-r border-[var(--sidebar-border)] bg-[var(--sidebar-bg)] px-3 py-4 lg:flex">
-        <div className="mb-4 flex items-center px-2 pt-1">
+        <div className="mb-3 flex items-center px-2 pt-1">
           {brandLogo || <RouteHqLogo />}
         </div>
-        {!isTeammate ? <AskBox variant="sidebar" /> : null}
+        {hasSeveralBusinesses ? (
+          <form action={switchActiveOrganization} className="mb-3">
+            <select
+              aria-label={t("business")}
+              className="w-full rounded-xl border border-[var(--border)] bg-white px-2.5 py-2 text-sm font-bold text-[var(--foreground)]"
+              defaultValue={activeBusiness?.id}
+              id="business-switcher"
+              name="organizationId"
+              onChange={(event) => event.currentTarget.form?.requestSubmit()}
+            >
+              {shell.organizations.map((organization) => (
+                <option className="text-[var(--foreground)]" key={organization.id} value={organization.id}>
+                  {organization.name}
+                </option>
+              ))}
+            </select>
+          </form>
+        ) : null}
         {/* Quick add sits in the side menu on computers: floating over the page it covered the buttons at the end of each row. */}
-        {onFocusedFlow ? null : (
-          <button
-            className="mb-3 flex w-full items-center justify-center gap-2 rounded-full bg-[var(--primary)] px-3 py-2.5 text-sm font-semibold text-white shadow-[var(--shadow-sm)] transition hover:bg-[var(--primary-hover)]"
-            onClick={() => setFastActionOpen(true)}
-            type="button"
-          >
-            <Plus size={16} />
-            {t("quickAdd")}
-          </button>
-        )}
-        {/* On a short laptop screen the rows tighten so every link, Settings included, stays in view without scrolling. */}
-        <nav className="min-h-0 flex-1 space-y-0.5 overflow-y-auto [scrollbar-width:thin]">
-          {allNavItems.map((item, index) => {
-            const Icon = item.icon;
-            return (
-              <Link
-                className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm font-semibold transition [@media(max-height:920px)]:py-1 ${
-                  index === dailyItems.length ? "!mt-3 [@media(max-height:920px)]:!mt-1.5 " : ""
-                }${
-                  isActive(item.href)
-                    ? "bg-[var(--primary-light)] text-[var(--primary)]"
-                    : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--foreground)]"
-                }`}
-                href={item.href}
-                key={item.key}
-              >
-                <Icon size={16} />
-                {t(item.key)}
-                {badgeFor(item.key) > 0 ? (
-                  <span className="ml-auto flex h-[22px] min-w-[22px] items-center justify-center rounded-full bg-[var(--primary)] px-1.5 text-[14px] font-bold leading-none text-white">{badgeFor(item.key)}</span>
-                ) : null}
-              </Link>
-            );
-          })}
-        </nav>
-        {isTeammate ? null : <TrialBanner placement="sidebar" />}
-        {userEmail ? (
-          <div className="mt-3 rounded-xl border border-[var(--sidebar-border)] bg-white p-3">
-            {hasSeveralBusinesses ? (
-              <form action={switchActiveOrganization} className="mb-2">
-                <select
-                  aria-label={t("business")}
-                  className="w-full rounded-lg border border-[var(--border)] bg-white px-2 py-1.5 text-sm font-semibold text-[var(--foreground)]"
-                  defaultValue={activeBusiness?.id}
-                  id="business-switcher"
-                  name="organizationId"
-                  onChange={(event) => event.currentTarget.form?.requestSubmit()}
-                >
-                  {shell.organizations.map((organization) => (
-                    <option className="text-[var(--foreground)]" key={organization.id} value={organization.id}>
-                      {organization.name}
-                    </option>
-                  ))}
-                </select>
-              </form>
-            ) : null}
-            <Link className="block truncate text-sm font-semibold text-[var(--muted)] hover:text-[var(--foreground)]" href="/account">
-              {userEmail}
-            </Link>
-            <div className="mt-1.5 flex items-center justify-between gap-2">
-              <Link className="text-[14px] font-semibold text-[var(--primary)] hover:underline" href="/account">
-                {t("myAccount")}
-              </Link>
-              <form action={signOut}>
-                <PendingButton className="text-[14px] font-semibold text-[var(--muted)] hover:text-[var(--foreground)] hover:underline" pendingLabel="" type="submit">
-                  {t("signOut")}
-                </PendingButton>
-              </form>
+        <div className="mb-3 flex items-center gap-2">
+          {!isTeammate ? (
+            <div className="min-w-0 flex-1">
+              <AskBox variant="sidebar" />
             </div>
+          ) : null}
+          {onFocusedFlow ? null : (
+            <button
+              aria-label={t("quickAdd")}
+              className={`flex h-10 items-center justify-center gap-2 rounded-full bg-[var(--primary)] text-sm font-bold text-white shadow-[var(--shadow-sm)] transition hover:bg-[var(--primary-hover)] ${isTeammate ? "w-full px-3" : "w-10 shrink-0"}`}
+              data-tip={isTeammate ? undefined : t("quickAdd")}
+              onClick={() => setFastActionOpen(true)}
+              type="button"
+            >
+              <Plus size={isTeammate ? 16 : 20} />
+              {isTeammate ? t("quickAdd") : null}
+            </button>
+          )}
+        </div>
+        {/* On a short laptop screen the rows tighten so every link, Settings included, stays in view without scrolling. */}
+        <nav className="min-h-0 flex-1 overflow-y-auto [scrollbar-width:thin]">
+          {groups.map((group, groupIndex) => (
+            <div className={groupIndex ? "mt-3 [@media(max-height:860px)]:mt-1.5" : ""} key={group.heading || "today"}>
+              {group.heading ? <p className="px-3 pb-0.5 text-[14px] font-bold text-[var(--sidebar-text-muted)]">{t(group.heading)}</p> : null}
+              <div className="space-y-0.5">{group.items.map((item) => sideLink(item))}</div>
+            </div>
+          ))}
+        </nav>
+        <div className="mt-2 flex gap-1 border-t border-[var(--sidebar-border)] pt-2">
+          {visibleFootItems.map((item) => sideLink(item, true))}
+        </div>
+        {isTeammate ? null : (
+          <div className="[@media(max-height:860px)]:hidden">
+            <TrialBanner placement="sidebar" />
+          </div>
+        )}
+        {userEmail ? (
+          <div className="mt-2 flex items-center gap-2 rounded-xl bg-white p-1.5 pl-2 shadow-[var(--shadow-sm)]">
+            <Link className="flex min-w-0 flex-1 items-center gap-2 rounded-lg hover:text-[var(--primary)]" href="/account" title={t("myAccount")}>
+              <span aria-hidden="true" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)] text-[14px] font-bold uppercase text-[var(--primary)]">{userEmail.slice(0, 1)}</span>
+              <span className="min-w-0 truncate text-sm font-semibold text-[var(--foreground-secondary)]">{userEmail}</span>
+            </Link>
+            <form action={signOut}>
+              <PendingButton aria-label={t("signOut")} className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--foreground)]" pendingLabel="" title={t("signOut")} type="submit">
+                <LogOut size={16} />
+              </PendingButton>
+            </form>
           </div>
         ) : null}
       </aside>
@@ -338,48 +375,62 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
             className="w-full rounded-t-2xl bg-white p-4 pb-8 shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="mb-3 flex items-center justify-between">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--sidebar-text-muted)]">{t("more")}</p>
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-[18px] font-bold text-[var(--foreground)]">{t("more")}</p>
               <button aria-label={t("close")} className="rounded-lg p-1.5 text-[var(--sidebar-text)]" onClick={() => setMoreOpen(false)} type="button">
-                <X size={18} />
+                <X size={20} />
               </button>
             </div>
-            <div className="grid grid-cols-3 gap-2">
-              {moreItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <Link
-                    className={`flex flex-col items-center gap-1.5 rounded-xl px-2 py-3 text-center text-xs font-semibold ${
-                      isActive(item.href) ? "bg-[var(--primary-light)] text-[var(--primary)]" : "bg-[var(--panel-secondary)] text-[var(--sidebar-text)]"
-                    }`}
-                    href={item.href}
-                    key={item.key}
-                    onClick={() => setMoreOpen(false)}
-                  >
-                    <span className="relative">
-                      <Icon size={18} />
-                      {badgeFor(item.key) > 0 ? (
-                        <span className="absolute -right-3 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--primary)] px-1 text-[10px] font-semibold text-white">{badgeFor(item.key)}</span>
+            <div className="max-h-[70vh] space-y-3 overflow-y-auto">
+              {[
+                ...groups.map((group) => ({ heading: group.heading, items: group.items.filter((item) => !mobileBarKeys.includes(item.key)) })),
+                { heading: null, items: visibleFootItems }
+              ]
+                .filter((group) => group.items.length > 0)
+                .map((group, groupIndex) => (
+                  <div key={group.heading || `plain-${groupIndex}`}>
+                    {group.heading ? <p className="mb-1.5 font-bold text-[var(--muted)]">{t(group.heading)}</p> : null}
+                    <div className="grid grid-cols-3 gap-2">
+                      {group.items.map((item) => {
+                        const Icon = item.icon;
+                        return (
+                          <Link
+                            className={`flex flex-col items-center gap-1.5 rounded-xl px-1.5 py-3 text-center text-[14px] font-bold leading-tight ${
+                              isActive(item.href) ? "bg-[var(--primary-light)] text-[var(--primary)]" : "bg-[var(--panel-secondary)] text-[var(--foreground)]"
+                            }`}
+                            href={item.href}
+                            key={item.key}
+                            onClick={() => setMoreOpen(false)}
+                          >
+                            <span className="relative">
+                              <Icon size={20} />
+                              {badgeFor(item.key) > 0 ? (
+                                <span className="absolute -right-3.5 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--primary)] px-1 text-[14px] font-bold leading-none text-white">{badgeFor(item.key)}</span>
+                              ) : null}
+                            </span>
+                            <span>{t(item.key)}</span>
+                          </Link>
+                        );
+                      })}
+                      {group.heading === null && groupIndex > 0 ? (
+                        <Link
+                          className="flex flex-col items-center gap-1.5 rounded-xl bg-[var(--panel-secondary)] px-1.5 py-3 text-center text-[14px] font-bold leading-tight text-[var(--foreground)]"
+                          href="/account"
+                          onClick={() => setMoreOpen(false)}
+                        >
+                          <CircleUserRound size={20} />
+                          <span>{t("myAccount")}</span>
+                        </Link>
                       ) : null}
-                    </span>
-                    <span>{t(item.key)}</span>
-                  </Link>
-                );
-              })}
-              <Link
-                className="flex flex-col items-center gap-1.5 rounded-xl bg-[var(--panel-secondary)] px-2 py-3 text-center text-xs font-semibold text-[var(--sidebar-text)]"
-                href="/account"
-                onClick={() => setMoreOpen(false)}
-              >
-                <CircleUserRound size={18} />
-                <span>{t("myAccount")}</span>
-              </Link>
+                    </div>
+                  </div>
+                ))}
             </div>
             {userEmail ? (
               <div className="mt-4 flex items-center justify-between gap-3 border-t border-[var(--border)] pt-3">
-                <span className="min-w-0 truncate text-xs font-semibold text-[var(--sidebar-text-muted)]">{userEmail}</span>
+                <span className="min-w-0 truncate text-[14px] font-semibold text-[var(--muted)]">{userEmail}</span>
                 <form action={signOut}>
-                  <PendingButton className="inline-flex shrink-0 items-center justify-center rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--foreground)]" pendingLabel="" type="submit">
+                  <PendingButton className="inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full border border-[var(--border)] bg-white px-4 py-2 text-[14px] font-bold text-[var(--foreground)]" pendingLabel="" type="submit">
                     {t("signOut")}
                   </PendingButton>
                 </form>

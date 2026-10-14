@@ -421,7 +421,10 @@
     "inbox": "ข้อความ",
     "quickAdd": "เพิ่มรายการ",
     "partners": "พาร์ตเนอร์",
-    "help": "ช่วยเหลือ"
+    "help": "ช่วยเหลือ",
+    "g_rentals": "การเช่า",
+    "g_money": "การเงิน",
+    "g_tools": "เครื่องมือ"
   },
   "customer": {
     "theRentalBusiness": "ร้านเช่ารถ",
@@ -2927,7 +2930,28 @@
     "cond_good": "ดี",
     "cond_fair": "พอใช้",
     "cond_poor": "ไม่ดี",
-    "a_fine": "บันทึกค่าปรับ"
+    "a_fine": "บันทึกค่าปรับ",
+    "gl_profit": "กำไรจนถึงตอนนี้",
+    "gl_monthIn": "เงินเข้าเดือนนี้",
+    "gl_last6": "6 เดือนล่าสุด",
+    "gl_rented": "เวลาที่ให้เช่า",
+    "gl_daysYear": "{count} จาก {total} วันในปีนี้",
+    "gl_notSetUp": "ยังไม่มีวันที่",
+    "rp_day": "วัน",
+    "rp_week": "สัปดาห์",
+    "rp_month": "เดือน",
+    "tab_label": "ส่วนต่างๆ ของหน้ารถคันนี้",
+    "tab_todo": "งาน",
+    "tab_money": "การเงิน",
+    "tab_upkeep": "เอกสารและการดูแล",
+    "tab_rentals": "การเช่า",
+    "tab_checks": "การตรวจรถ",
+    "tab_details": "รายละเอียด",
+    "tab_history": "ประวัติ",
+    "gl_condNotSet": "ยังไม่ระบุสภาพรถ",
+    "fi_inWord": "เงินเข้า",
+    "fi_outWord": "ค่าใช้จ่าย",
+    "gl_fleetAvg": "ค่าเฉลี่ยทั้งกองรถ {percent}"
   },
   "customerPage": {
     "back": "ลูกค้า",

@@ -1563,6 +1563,8 @@ h2 { letter-spacing: -0.015em; }
   a.card.pressable:hover { transform: translateY(-2px); }
   .planner-bar { transition: filter 140ms ease, transform 140ms ease; }
   .planner-bar:hover { filter: brightness(1.1); }
+  /* A tab's content eases in when chosen (its bars and rings redraw too). */
+  .tab-panel:not([hidden]) { animation: g-rise 280ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 }
 @keyframes g-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 @keyframes g-grow-x { from { transform: scaleX(0); } to { transform: none; } }

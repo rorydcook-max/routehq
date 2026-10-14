@@ -30,6 +30,14 @@ function presetStart(preset: Exclude<RangePreset, "custom">, endDate: string) {
   return toDateInput(start);
 }
 
+/** One colour per kind of event, the same meanings as elsewhere: renewals amber, rentals coming back blue. */
+const KIND_COLOUR: Record<VehicleTimelineEvent["kind"], string> = {
+  activity: "var(--primary)",
+  compliance: "var(--warning)",
+  reminder: "var(--going-out)",
+  rental: "var(--coming-back)"
+};
+
 /** What has happened with this vehicle, newest first. */
 export function VehicleTimeline({ events, defaultFrom, defaultTo }: { events: VehicleTimelineEvent[]; defaultFrom: string; defaultTo: string }) {
   const say = useTranslations("vehiclePage") as unknown as Say;
@@ -48,6 +56,17 @@ export function VehicleTimeline({ events, defaultFrom, defaultTo }: { events: Ve
       })
       .sort((left, right) => new Date(right.date).getTime() - new Date(left.date).getTime());
   }, [events, from, to]);
+
+  const days = useMemo(() => {
+    const groups: Array<{ key: string; events: VehicleTimelineEvent[] }> = [];
+    for (const event of visibleEvents) {
+      const key = String(event.date).slice(0, 10);
+      const last = groups[groups.length - 1];
+      if (last && last.key === key) last.events.push(event);
+      else groups.push({ key, events: [event] });
+    }
+    return groups;
+  }, [visibleEvents]);
 
   function changePreset(nextPreset: RangePreset) {
     setPreset(nextPreset);
@@ -96,17 +115,24 @@ export function VehicleTimeline({ events, defaultFrom, defaultTo }: { events: Ve
       {visibleEvents.length === 0 ? (
         <p className="py-4 font-medium text-[var(--foreground-secondary)]">{say("tl_empty")}</p>
       ) : (
-        <ol className="grid gap-2.5">
-          {visibleEvents.map((event) => (
-            <li className="rounded-xl bg-[var(--panel-secondary)] p-3.5" key={event.id}>
-              <p className="text-[16px] font-bold leading-tight text-[var(--foreground)]">{event.title}</p>
-              <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">
-                <time dateTime={event.date}>{longDate(event.date, locale)}</time>
-                {event.detail ? ` · ${event.detail}` : ""}
-              </p>
-            </li>
+        <div className="grid gap-4">
+          {days.map((day) => (
+            <section key={day.key}>
+              <h3 className="mb-2 font-bold text-[var(--muted)]">
+                <time dateTime={day.key}>{longDate(day.key, locale)}</time>
+              </h3>
+              <ol className="relative ml-[7px] border-l-2 border-[var(--border)] pl-5">
+                {day.events.map((event) => (
+                  <li className="relative pb-3 last:pb-0" key={event.id}>
+                    <span aria-hidden="true" className="absolute -left-[28px] top-[5px] h-3.5 w-3.5 rounded-full shadow-[0_0_0_3px_#fff]" style={{ background: KIND_COLOUR[event.kind] }} />
+                    <p className="text-[16px] font-bold leading-tight text-[var(--foreground)]">{event.title}</p>
+                    {event.detail ? <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{/^\d{4}-\d{2}-\d{2}$/.test(event.detail) ? longDate(event.detail, locale) : event.detail}</p> : null}
+                  </li>
+                ))}
+              </ol>
+            </section>
           ))}
-        </ol>
+        </div>
       )}
     </div>
   );

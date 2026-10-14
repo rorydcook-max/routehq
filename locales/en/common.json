@@ -165,7 +165,10 @@
     "openFastActions": "Open fast actions",
     "quickAdd": "Quick add",
     "partners": "Partners",
-    "help": "Help"
+    "help": "Help",
+    "g_rentals": "Rentals",
+    "g_money": "Money",
+    "g_tools": "Tools"
   },
   "vehicles": {
     "addVehicle": "Add New Vehicle",
@@ -2918,7 +2921,28 @@
     "cond_good": "Good",
     "cond_fair": "Fair",
     "cond_poor": "Poor",
-    "a_fine": "Record a fine"
+    "a_fine": "Record a fine",
+    "gl_profit": "Profit so far",
+    "gl_monthIn": "In this month",
+    "gl_last6": "Last 6 months",
+    "gl_rented": "Time rented",
+    "gl_daysYear": "{count} of {total} days this year",
+    "gl_notSetUp": "No dates yet",
+    "rp_day": "Day",
+    "rp_week": "Week",
+    "rp_month": "Month",
+    "tab_label": "Parts of this vehicle's page",
+    "tab_todo": "To do",
+    "tab_money": "Money",
+    "tab_upkeep": "Paperwork & service",
+    "tab_rentals": "Rentals",
+    "tab_checks": "Checks",
+    "tab_details": "Details",
+    "tab_history": "History",
+    "gl_condNotSet": "Condition not set",
+    "fi_inWord": "Money in",
+    "fi_outWord": "Costs",
+    "gl_fleetAvg": "Fleet average {percent}"
   },
   "customerPage": {
     "back": "Customers",

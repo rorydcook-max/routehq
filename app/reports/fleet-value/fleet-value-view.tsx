@@ -33,7 +33,7 @@ export function FleetValueView({ rows: initial, currency, canEstimate }: { rows:
   const say = t as unknown as Say;
   const locale = useLocale();
   const money = useMemo(() => {
-    const format = new Intl.NumberFormat(locale === "en" ? "en-GB" : `${locale}-u-nu-latn`, { style: "currency", currency, maximumFractionDigits: 0 });
+    const format = new Intl.NumberFormat(locale === "en" ? "en-GB" : `${locale}-u-nu-latn`, { style: "currency", currency, currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 });
     return (value: number) => format.format(Math.round(value));
   }, [locale, currency]);
   const [rows, setRows] = useState(initial);

@@ -334,6 +334,7 @@ export function BookingForm({
   const anyClash = vehicleId ? findConflict(busyPeriods[vehicleId] || [], startDate, openEnded ? null : endDate || null) : null;
   const dateConflict = anyClash && (openEnded || endDate || String(anyClash.startDate).slice(0, 10) <= startDate) ? anyClash : null;
   const nextBooking = !dateConflict && anyClash ? anyClash : null;
+  const nextBookingStart = nextBooking ? String(nextBooking.startDate).slice(0, 10) : "";
   const currencyInfo = CURRENCY_INFO[currency] ?? CURRENCY_INFO["THB"];
   // Which set of words to use for the period the price is per.
   const periodKey = pricingModel === "monthly" || pricingModel === "weekly" || pricingModel === "daily" ? pricingModel : "custom";
@@ -364,11 +365,13 @@ export function BookingForm({
   useEffect(() => {
     if (pricingChosenByHand.current) return;
     if (openEnded) return setPricingModel("monthly");
-    if (!startDate || !endDate) return;
-    const days = Math.round((new Date(`${endDate}T00:00:00`).getTime() - new Date(`${startDate}T00:00:00`).getTime()) / 86400000);
+    // No return date yet: the most it can be is up to the next booking, so a five-day gap starts on a day rate, not a month's.
+    const until = endDate || nextBookingStart;
+    if (!startDate || !until) return;
+    const days = Math.round((new Date(`${until}T00:00:00`).getTime() - new Date(`${startDate}T00:00:00`).getTime()) / 86400000);
     if (!(days > 0)) return;
     setPricingModel(days >= 28 ? "monthly" : days >= 7 ? "weekly" : "daily");
-  }, [startDate, endDate, openEnded]);
+  }, [startDate, endDate, openEnded, nextBookingStart]);
 
   // Prefill the rate when the vehicle or pricing period changes - not when the
   // vehicle list refreshes (after saving, the booked car drops out of the list

@@ -43,7 +43,7 @@ export default async function FleetValuePage() {
 
   return (
     <AppShell userEmail={userEmail}>
-      <div className="mx-auto max-w-3xl">
+      <div className="max-w-4xl">
         <div className="page-hero mb-5">
           <Link className="text-sm font-bold text-[var(--primary)]" href="/reports">
             {t("back")}

@@ -58,7 +58,7 @@ export default async function OwnerStatementsPage({ searchParams }: { searchPara
   const byOwner = new Map<string, VehicleStatement[]>();
   for (const statement of statements) byOwner.set(statement.partner.name, [...(byOwner.get(statement.partner.name) || []), statement]);
   const currency = organization.currency || "THB";
-  const baht = (value: number) => new Intl.NumberFormat(locale === "en" ? "en-GB" : `${locale}-u-nu-latn`, { style: "currency", currency, maximumFractionDigits: 0 }).format(Math.round(value));
+  const baht = (value: number) => new Intl.NumberFormat(locale === "en" ? "en-GB" : `${locale}-u-nu-latn`, { style: "currency", currency, currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 }).format(Math.round(value));
   const monthName = new Intl.DateTimeFormat(locale === "en" ? "en-GB" : `${locale}-u-ca-gregory`, { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${from}T00:00:00Z`));
 
   return (

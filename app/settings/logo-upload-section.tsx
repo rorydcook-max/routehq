@@ -50,7 +50,7 @@ export function LogoUploadSection({ logoUrl, orgName }: { logoUrl: string | null
       <div className="flex items-center gap-3">
         {logoUrl ? <BusinessLogoImage alt={orgName} className="h-12 w-auto max-w-[160px] shrink-0 object-contain object-left" src={logoUrl} /> : null}
         <div className="min-w-0">
-          <p className="text-[16px] font-bold leading-tight text-[var(--foreground)]">{logoUrl ? say("lg_title") : say("lg_uploadTitle")}</p>
+          <h2 className="text-lg font-bold leading-tight text-[var(--foreground)]">{logoUrl ? say("lg_title") : say("lg_uploadTitle")}</h2>
           <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{logoUrl ? say("lg_body") : say("lg_uploadBody")}</p>
         </div>
       </div>

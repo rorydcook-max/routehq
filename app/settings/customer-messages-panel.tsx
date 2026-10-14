@@ -57,7 +57,7 @@ export function CustomerMessagesPanel({ enabled, hasChannel, emailOn = false, of
         <div className="mt-4 rounded-xl border border-[var(--border)] p-3">
           <p className="font-bold text-[var(--foreground)]">{say("rem_title")}</p>
           <p className="mt-1 text-sm text-[var(--muted)]">{say("rem_body")}</p>
-          <div className="mt-2 grid gap-1">
+          <div className="mt-2 grid gap-x-6 gap-y-1 lg:grid-cols-2">
             {KINDS.map((kind) => (
               <label className="flex min-h-10 cursor-pointer items-center gap-3 text-[15px] font-medium text-[var(--foreground)]" key={kind}>
                 <input checked={!off.includes(kind)} className="h-5 w-5 shrink-0" disabled={isPending} onChange={(event) => toggle(kind, event.target.checked)} type="checkbox" />

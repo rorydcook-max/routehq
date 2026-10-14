@@ -220,7 +220,7 @@ export function WeekBars({ weeks, say }: { weeks: Array<{ key: string; label: st
         <span className="inline-flex items-center gap-1.5"><Dot color="var(--chart-in)" />{say("moneyIn")}</span>
         <span className="inline-flex items-center gap-1.5"><Dot color="var(--chart-out)" />{say("moneyOut")}</span>
       </p>
-      <InOutBars inWord={say("moneyIn")} label={say("weeksTitle")} money={money} outWord={say("moneyOut")} periods={weeks.map((week) => ({ key: week.key, label: week.label, in: week.revenue, out: week.expenses }))} />
+      <InOutBars height={140} inWord={say("moneyIn")} label={say("weeksTitle")} money={money} outWord={say("moneyOut")} periods={weeks.map((week) => ({ key: week.key, label: week.label, in: week.revenue, out: week.expenses }))} />
       {best && best.profit > 0 ? <p className="mt-2 font-bold text-[var(--success)]">{say("bestWeek", { week: best.label, amount: money(best.profit) })}</p> : null}
     </section>
   );

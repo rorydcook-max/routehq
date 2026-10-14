@@ -116,7 +116,7 @@ export function SignatureUploadSection({
       <div className="flex items-center gap-3">
         {preview}
         <div className="min-w-0">
-          <p className="text-[16px] font-bold leading-tight text-[var(--foreground)]">{say("sg_title")}</p>
+          <h2 className="text-lg font-bold leading-tight text-[var(--foreground)]">{say("sg_title")}</h2>
           <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{say("sg_body")}</p>
         </div>
       </div>

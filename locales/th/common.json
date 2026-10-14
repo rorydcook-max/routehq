@@ -2295,7 +2295,8 @@
     "ch_email": "อีเมล",
     "ch_phone": "โทรศัพท์",
     "ch_portal": "หน้าลูกค้า",
-    "allDoneUndated": "ลูกค้าทำครบทุกขั้นตอนแล้ว ดูขั้นตอน"
+    "allDoneUndated": "ลูกค้าทำครบทุกขั้นตอนแล้ว ดูขั้นตอน",
+    "cp_callShort": "โทร"
   },
   "newBooking": {
     "pageBack": "กลับไปที่การจอง",

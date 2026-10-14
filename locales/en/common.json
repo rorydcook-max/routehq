@@ -2286,7 +2286,8 @@
     "ch_email": "Email",
     "ch_phone": "Phone",
     "ch_portal": "Customer page",
-    "allDoneUndated": "The customer has finished everything. Show the steps"
+    "allDoneUndated": "The customer has finished everything. Show the steps",
+    "cp_callShort": "Call"
   },
   "newBooking": {
     "pageBack": "Back to bookings",

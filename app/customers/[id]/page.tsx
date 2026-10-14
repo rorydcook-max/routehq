@@ -480,7 +480,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 {cx.say("whatsapp")}
               </a>
             ) : null}
-            <a className="secondary-action pressable" href="#details">
+            <a className={`secondary-action pressable whitespace-nowrap ${(customer.phone ? 1 : 0) + (phoneDigits.length >= 8 ? 1 : 0) === 1 ? "" : "col-span-2"}`} href="#details">
               <PenLine size={17} />
               {cx.say("editDetails")}
             </a>

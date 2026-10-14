@@ -170,15 +170,15 @@ export function CommunicationPanel({
       </div>
 
       <div className="rounded-xl border border-[var(--border)] bg-[var(--panel)] p-3">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="grid grid-cols-2 gap-2">
           {channels.length === 0 ? (
-            <p className="text-sm text-[var(--muted)]">{say("cp_noChannels")}</p>
+            <p className="col-span-2 text-sm text-[var(--muted)]">{say("cp_noChannels")}</p>
           ) : (
             channels.map((channel) => (
               <div className="relative" key={channel.key}>
                 <button
                   aria-label={channel.label}
-                  className={`flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-full border px-4 text-sm font-semibold bg-[var(--panel-secondary)] text-[var(--foreground-secondary)] transition hover:border-[var(--primary)] hover:text-[var(--primary)] ${
+                  className={`flex h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-full border px-3 text-sm font-semibold bg-[var(--panel-secondary)] text-[var(--foreground-secondary)] transition hover:border-[var(--primary)] hover:text-[var(--primary)] ${
                     preferred === channel.key ? "border-[var(--primary)] ring-2 ring-[var(--primary)]/25" : "border-[var(--border)]"
                   }`}
                   onClick={() => openExternal(channel)}
@@ -187,7 +187,7 @@ export function CommunicationPanel({
                 >
                   {channel.icon}
                   {/* A name beside the picture: a lone icon left people guessing what it did. */}
-                  <span>{channel.key === "phone" ? say("cp_call", { number: channel.handle }) : channel.label}</span>
+                  <span className="truncate">{channel.key === "phone" ? say("cp_callShort") : channel.label}</span>
                 </button>
                 {(activePopover === "whatsapp" && channel.key === "whatsapp") || (activePopover === "line" && channel.key === "line") ? (
                   <TemplatePopover

@@ -412,7 +412,10 @@
     "gpsNever": "never",
     "blockerOpenOther": "Open {code}",
     "blockerChangeVehicle": "Change the vehicle",
-    "fuelAtDelivery": "At handover: {level}"
+    "fuelAtDelivery": "At handover: {level}",
+    "photoTaken": "Photo added",
+    "retakePhoto": "Retake",
+    "orFourPhotos": "or a photo of each side"
   },
   "translation": {
     "translatedFrom": "Translated from {language}",

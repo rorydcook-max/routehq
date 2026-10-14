@@ -392,7 +392,10 @@
     "gpsNever": "ไม่เคย",
     "blockerOpenOther": "เปิด {code}",
     "blockerChangeVehicle": "เปลี่ยนรถ",
-    "fuelAtDelivery": "ตอนส่งมอบ: {level}"
+    "fuelAtDelivery": "ตอนส่งมอบ: {level}",
+    "photoTaken": "เพิ่มรูปแล้ว",
+    "retakePhoto": "ถ่ายใหม่",
+    "orFourPhotos": "หรือถ่ายรูปแต่ละด้าน"
   },
   "translation": {
     "translatedFrom": "แปลจาก {language}",

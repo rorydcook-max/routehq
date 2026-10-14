@@ -107,6 +107,7 @@ function FileCapture({
   accept,
   capture = "environment",
   icon: Icon = Camera,
+  compact = false,
   onSelected
 }: {
   label: string;
@@ -114,16 +115,30 @@ function FileCapture({
   accept: string;
   capture?: "environment" | "user";
   icon?: typeof Camera;
+  compact?: boolean;
   onSelected?: (file: File) => void;
 }) {
   const [preview, setPreview] = useState<string | null>(null);
+  const t = useTranslations("inspection");
+  const isVideo = accept.startsWith("video");
 
   return (
-    <label className="block rounded-lg border border-dashed border-[var(--info-line)] bg-white p-4">
-      <span className="flex min-h-14 items-center justify-center gap-2.5 rounded-lg bg-[var(--primary-light)] px-3 py-3 text-center text-base font-semibold leading-tight text-[var(--primary)]">
-        <Icon className="shrink-0" size={22} />
-        {label}
-      </span>
+    <label
+      className={`block cursor-pointer rounded-lg border ${compact ? "p-2" : "p-4"} ${
+        preview ? "border-[var(--success-line)] bg-white" : compact ? "border-dashed border-[var(--info-line)] bg-[var(--primary-light)]" : "border-dashed border-[var(--info-line)] bg-white"
+      }`}
+    >
+      {preview ? null : compact ? (
+        <span className="flex min-h-[96px] flex-col items-center justify-center gap-2 text-center text-sm font-semibold leading-tight text-[var(--primary)]">
+          <Icon className="shrink-0" size={24} />
+          {label}
+        </span>
+      ) : (
+        <span className="flex min-h-14 items-center justify-center gap-2.5 rounded-lg bg-[var(--primary-light)] px-3 py-3 text-center text-base font-semibold leading-tight text-[var(--primary)]">
+          <Icon className="shrink-0" size={22} />
+          {label}
+        </span>
+      )}
       <input
         accept={accept}
         capture={capture}
@@ -140,10 +155,30 @@ function FileCapture({
         type="file"
       />
       {preview ? (
-        accept.startsWith("video") ? (
-          <video className="mt-3 max-h-52 w-full rounded-lg border border-[var(--border)] object-cover" controls src={preview} />
+        isVideo ? (
+          <video className="max-h-52 w-full rounded-lg border border-[var(--border)] object-cover" controls src={preview} />
         ) : (
-          <img alt="" className="mt-3 max-h-52 w-full rounded-lg border border-[var(--border)] object-cover" src={preview} />
+          // eslint-disable-next-line @next/next/no-img-element
+          <img alt="" className={`w-full rounded-lg border border-[var(--border)] object-cover ${compact ? "aspect-[4/3]" : "max-h-60"}`} src={preview} />
+        )
+      ) : null}
+      {preview ? (
+        compact ? (
+          <span className="mt-2 flex items-center justify-center gap-1.5 text-sm font-semibold text-[var(--success)]">
+            <CheckCircle2 className="shrink-0" size={16} />
+            <span className="truncate">{label}</span>
+          </span>
+        ) : (
+          <span className="mt-3 flex items-center justify-between gap-3">
+            <span className="flex items-center gap-2 text-sm font-semibold text-[var(--success)]">
+              <CheckCircle2 size={18} />
+              {t("photoTaken")}
+            </span>
+            <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-sm font-semibold text-[var(--primary)]">
+              <Icon size={16} />
+              {t("retakePhoto")}
+            </span>
+          </span>
         )
       ) : null}
     </label>
@@ -171,7 +206,7 @@ function FuelGauge({
           <p className="text-sm font-semibold text-[var(--foreground)]">{t("fuelPercentage")}</p>
           <p className="mt-1 text-xs font-semibold text-[var(--muted)]">{t("fuelHint")}</p>
         </div>
-        <span className="shrink-0 whitespace-nowrap rounded-full bg-[var(--primary-light)] px-4 py-2 text-lg font-semibold text-[var(--primary)]">
+        <span className={`shrink-0 whitespace-nowrap rounded-full px-4 py-2 font-semibold ${value === null ? "bg-[var(--panel-secondary)] text-base text-[var(--muted)]" : "bg-[var(--primary-light)] text-lg text-[var(--primary)]"}`}>
           {value === null ? t("notSet") : `${value}%`}
         </span>
       </div>
@@ -234,58 +269,64 @@ function FuelGauge({
 function VehicleDiagram({ onSelect, selected, marked, bike }: { onSelect: (location: string) => void; /** The area being described now. */ selected?: string; /** Areas that already have damage logged. */ marked?: string[]; /** A motorbike or scooter: it has two sides and a seat, not four corners and an interior. */ bike?: boolean }) {
   const t = useTranslations("inspection");
   const bikeAreas = [
-    { key: "front", label: t("areaFront"), className: "left-[34%] top-[1%] w-[32%] h-[15%]" },
-    { key: "rear", label: t("areaRear"), className: "left-[34%] bottom-[1%] w-[32%] h-[15%]" },
-    { key: "left_side", label: t("areaLeftSide"), className: "left-[1%] top-[36%] w-[26%] h-[28%]" },
-    { key: "right_side", label: t("areaRightSide"), className: "right-[1%] top-[36%] w-[26%] h-[28%]" },
-    { key: "seat", label: t("areaSeat"), className: "left-[29%] top-[44%] w-[42%] h-[20%]" }
+    { key: "front", label: t("areaFront"), className: "left-[33.3%] top-[1.5%] w-[33.3%] h-[19.2%]" },
+    { key: "rear", label: t("areaRear"), className: "left-[33.3%] top-[79.2%] w-[33.3%] h-[19.2%]" },
+    { key: "left_side", label: t("areaLeftSide"), className: "left-[1.1%] top-[32.3%] w-[30.0%] h-[35.4%]" },
+    { key: "right_side", label: t("areaRightSide"), className: "left-[68.9%] top-[32.3%] w-[30.0%] h-[35.4%]" },
+    { key: "seat", label: t("areaSeat"), className: "left-[38.9%] top-[43.1%] w-[22.2%] h-[30.8%]" }
   ];
   const carAreas = [
-    { key: "front", label: t("areaFront"), className: "left-[34%] top-[4%] w-[32%] h-[18%]" },
-    { key: "rear", label: t("areaRear"), className: "left-[34%] bottom-[4%] w-[32%] h-[18%]" },
-    // Side areas sit outside the wheels (drawn at 25% and 75% of the width) so
-    // their labels stay readable.
-    { key: "front_left", label: t("areaFrontLeft"), className: "left-[1%] top-[17%] w-[20%] h-[27%]" },
-    { key: "front_right", label: t("areaFrontRight"), className: "right-[1%] top-[17%] w-[20%] h-[27%]" },
-    { key: "rear_left", label: t("areaRearLeft"), className: "left-[1%] bottom-[17%] w-[20%] h-[27%]" },
-    { key: "rear_right", label: t("areaRearRight"), className: "right-[1%] bottom-[17%] w-[20%] h-[27%]" },
-    { key: "interior", label: t("areaInterior"), className: "left-[35%] top-[36%] w-[30%] h-[28%]" }
+    { key: "front", label: t("areaFront"), className: "left-[35.6%] top-[7.7%] w-[28.9%] h-[13.8%]" },
+    { key: "interior", label: t("areaInterior"), className: "left-[36.7%] top-[38.5%] w-[26.7%] h-[31.5%]" },
+    { key: "rear", label: t("areaRear"), className: "left-[35.6%] top-[82.3%] w-[28.9%] h-[10.8%]" },
+    // The sides sit outside the wheels, wide enough for "Front left" on two lines.
+    { key: "front_left", label: t("areaFrontLeft"), className: "left-[1.1%] top-[10.8%] w-[22.2%] h-[33.8%]" },
+    { key: "front_right", label: t("areaFrontRight"), className: "left-[76.7%] top-[10.8%] w-[22.2%] h-[33.8%]" },
+    { key: "rear_left", label: t("areaRearLeft"), className: "left-[1.1%] top-[56.2%] w-[22.2%] h-[33.8%]" },
+    { key: "rear_right", label: t("areaRearRight"), className: "left-[76.7%] top-[56.2%] w-[22.2%] h-[33.8%]" }
   ];
   const areas = bike ? bikeAreas : carAreas;
 
   return (
-    <div className="relative mx-auto aspect-[3/4] max-h-[420px] max-w-sm rounded-xl border border-[var(--border)] bg-white p-4">
-      {bike ? (
-        <svg className="h-full w-full text-[var(--primary)]" viewBox="0 0 180 260" role="img" aria-label={t("vehicleDiagram")}>
-          <rect x="81" y="12" width="18" height="50" rx="9" fill="#1b2430" />
-          <rect x="79" y="198" width="22" height="50" rx="10" fill="#1b2430" />
-          <rect x="66" y="56" width="48" height="156" rx="22" fill="#d8eeea" stroke="currentColor" strokeWidth="3" />
-          <rect x="42" y="50" width="96" height="10" rx="5" fill="currentColor" />
-          <rect x="74" y="116" width="32" height="74" rx="13" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
-        </svg>
-      ) : (
-        <svg className="h-full w-full text-[var(--primary)]" viewBox="0 0 180 260" role="img" aria-label={t("vehicleDiagram")}>
-          <rect x="50" y="18" width="80" height="224" rx="35" fill="#d8eeea" stroke="currentColor" strokeWidth="3" />
-          <rect x="64" y="58" width="52" height="42" rx="10" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
-          <rect x="62" y="112" width="56" height="56" rx="14" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
-          <rect x="65" y="184" width="50" height="28" rx="8" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
-          <circle cx="45" cy="70" r="11" fill="#1b2430" />
-          <circle cx="135" cy="70" r="11" fill="#1b2430" />
-          <circle cx="45" cy="194" r="11" fill="#1b2430" />
-          <circle cx="135" cy="194" r="11" fill="#1b2430" />
-        </svg>
-      )}
-      {areas.map((area) => (
-        <button
-          aria-label={t("logDamageAt", { area: area.label })}
-          className={`absolute flex items-center justify-center rounded-lg border px-1 text-center text-[11px] font-semibold leading-tight ${selected === area.key ? "border-[var(--primary)] bg-[var(--primary)] text-white" : marked?.includes(area.key) ? "border-[var(--danger)] bg-[var(--danger-light)] text-[var(--danger)]" : "border-[var(--primary)]/25 bg-[var(--primary)]/5 text-[var(--primary)]"} ${area.className}`}
-          key={area.key}
-          onClick={() => onSelect(area.key)}
-          type="button"
-        >
-          {area.label}
-        </button>
-      ))}
+    <div className="rounded-xl border border-[var(--border)] bg-white p-3">
+      <div className="relative mx-auto aspect-[180/260] w-full max-w-[300px]">
+        {bike ? (
+          <svg aria-label={t("vehicleDiagram")} className="absolute inset-0 h-full w-full text-[var(--primary)]" role="img" viewBox="0 0 180 260">
+            <rect fill="#1b2430" height="48" rx="9" width="18" x="81" y="8" />
+            <rect fill="#1b2430" height="48" rx="10" width="22" x="79" y="204" />
+            <rect fill="#d8eeea" height="150" rx="22" stroke="currentColor" strokeWidth="3" width="44" x="68" y="56" />
+            <rect fill="currentColor" height="9" rx="4.5" width="92" x="44" y="54" />
+          </svg>
+        ) : (
+          <svg aria-label={t("vehicleDiagram")} className="absolute inset-0 h-full w-full text-[var(--primary)]" role="img" viewBox="0 0 180 260">
+            <circle cx="54" cy="72" fill="#1b2430" r="10" />
+            <circle cx="126" cy="72" fill="#1b2430" r="10" />
+            <circle cx="54" cy="190" fill="#1b2430" r="10" />
+            <circle cx="126" cy="190" fill="#1b2430" r="10" />
+            <rect fill="#d8eeea" height="232" rx="28" stroke="currentColor" strokeWidth="3" width="64" x="58" y="14" />
+            <path d="M68 62 Q90 54 112 62 L110 92 Q90 88 70 92 Z" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
+            <path d="M70 188 Q90 184 110 188 L112 208 Q90 214 68 208 Z" fill="#ffffff" stroke="currentColor" strokeWidth="2" />
+          </svg>
+        )}
+        {areas.map((area) => (
+          <button
+            aria-label={t("logDamageAt", { area: area.label })}
+            aria-pressed={selected === area.key}
+            className={`pressable absolute flex items-center justify-center rounded-lg border-2 px-0.5 text-center text-sm font-semibold leading-tight transition ${
+              selected === area.key
+                ? "border-[var(--primary)] bg-[var(--primary)] text-white shadow-md"
+                : marked?.includes(area.key)
+                  ? "border-[var(--danger)] bg-[var(--danger-light)] text-[var(--danger)]"
+                  : "border-dashed border-[var(--primary)]/40 bg-white/70 text-[var(--primary)] hover:bg-white"
+            } ${area.className}`}
+            key={area.key}
+            onClick={() => onSelect(area.key)}
+            type="button"
+          >
+            {area.label}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -955,7 +996,12 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
         <StepShell eyebrow={t("eyebrowWalkaround")} title={t("recordCondition")}>
           <p className="mb-3 text-sm text-[var(--muted)]">{t("conditionMinimum")}</p>
           <FileCapture accept="video/*" icon={FileVideo} label={t("recordVideo")} name="walkaroundVideo" onSelected={() => setVideoCaptured(true)} />
-          <div className="mt-4 grid grid-cols-2 gap-3">
+          <p className="mb-2 mt-4 flex items-center gap-3 text-sm font-semibold text-[var(--muted)]">
+            <span className="h-px flex-1 bg-[var(--border)]" />
+            {t("orFourPhotos")}
+            <span className="h-px flex-1 bg-[var(--border)]" />
+          </p>
+          <div className="grid grid-cols-2 gap-2">
             {[
               ["front", t("areaFront")],
               ["rear", t("areaRear")],
@@ -965,6 +1011,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
             ].map(([key, label]) => (
               <FileCapture
                 accept="image/*"
+                compact
                 key={key}
                 label={label}
                 name={`photo_${key}`}
@@ -997,8 +1044,11 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
           {noDamage && damageItems.length === 0 ? null : (
             <>
             <VehicleDiagram bike={isBike} marked={damageItems.map((item) => item.location)} onSelect={setSelectedLocation} selected={selectedLocation} />
-            <div className="mt-4 rounded-lg border border-[var(--border)] bg-white p-4">
-              <p className="font-semibold text-[var(--foreground)]">{selectedLocation ? t("damageAt", { area: areaName(selectedLocation) }) : t("tapArea")}</p>
+            {!selectedLocation ? (
+              <p className="mt-3 text-center text-sm font-semibold text-[var(--muted)]">{t("tapArea")}</p>
+            ) : (
+            <div className="mt-4 rounded-lg border border-[var(--primary)] bg-white p-4">
+              <p className="font-semibold text-[var(--foreground)]">{t("damageAt", { area: areaName(selectedLocation) })}</p>
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
                 <label className="block">
                   <span className="text-sm font-bold text-[var(--foreground)]">{t("severity")}</span>
@@ -1019,6 +1069,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
                 {t("saveDamageItem")}
               </button>
             </div>
+            )}
             </>
           )}
           <div className="mt-3 space-y-2">

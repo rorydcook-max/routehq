@@ -142,7 +142,7 @@ export function CalculatorClient({
   const say = t as unknown as Say;
   const locale = useLocale();
   const money = useMemo(() => {
-    const format = new Intl.NumberFormat(locale, { style: "currency", currency, maximumFractionDigits: 0 });
+    const format = new Intl.NumberFormat(locale, { style: "currency", currency, currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 });
     return (value: number) => format.format(Math.round(value));
   }, [locale, currency]);
   // Worked-out figures are estimates, so they are shown rounded rather than to the last unit.
@@ -509,7 +509,7 @@ export function CalculatorClient({
           ) : (
             <span />
           )}
-          <Num label={t("price")} onChange={setPrice} suffix={currency} value={price} />
+          <Num label={t("price")} onChange={setPrice} suffix={currency === "THB" ? "฿" : currency} value={price} />
           <Num label={t("mileage")} onChange={setMileage} suffix="km" value={mileage} />
         </div>
 
@@ -582,7 +582,7 @@ export function CalculatorClient({
                 }
                 label={style === "daily" ? t("rentYoursDaily") : t("rentYours")}
                 onChange={setRent}
-                suffix={currency}
+                suffix={currency === "THB" ? "฿" : currency}
                 value={assumptions.rentMonthly}
               />
             </div>

@@ -169,7 +169,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
     const Icon = item.icon;
     return (
       <Link
-        className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm font-semibold transition [@media(max-height:860px)]:py-1.5 ${compact ? "flex-1 justify-center" : "w-full"} ${
+        className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm font-semibold transition [@media(max-height:960px)]:py-1.5 ${compact ? "flex-1 justify-center" : "w-full"} ${
           isActive(item.href) ? "bg-[var(--primary-light)] text-[var(--primary)]" : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--foreground)]"
         }`}
         href={item.href}
@@ -232,7 +232,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
         {/* On a short laptop screen the rows tighten so every link, Settings included, stays in view without scrolling. */}
         <nav className="min-h-0 flex-1 overflow-y-auto [scrollbar-width:thin]">
           {groups.map((group, groupIndex) => (
-            <div className={groupIndex ? "mt-3 [@media(max-height:860px)]:mt-1.5" : ""} key={group.heading || "today"}>
+            <div className={groupIndex ? "mt-3 [@media(max-height:960px)]:mt-1.5" : ""} key={group.heading || "today"}>
               {group.heading ? <p className="px-3 pb-0.5 text-[14px] font-bold text-[var(--sidebar-text-muted)]">{t(group.heading)}</p> : null}
               <div className="space-y-0.5">{group.items.map((item) => sideLink(item))}</div>
             </div>
@@ -242,7 +242,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
           {visibleFootItems.map((item) => sideLink(item, true))}
         </div>
         {isTeammate ? null : (
-          <div className="[@media(max-height:860px)]:hidden">
+          <div className="[@media(max-height:960px)]:hidden">
             <TrialBanner placement="sidebar" />
           </div>
         )}

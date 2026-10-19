@@ -31,6 +31,8 @@ import { Toaster } from "@/components/toast";
 import { AskBox } from "@/components/ask-box";
 import { RouteHqLogo } from "@/components/brand-logo";
 import { BrandStyle } from "@/components/brand-style";
+import { BusinessLogoImage } from "@/components/business-logo-image";
+import { useInitialShellBrand } from "@/components/shell-brand-provider";
 import { FastActionSheet } from "@/components/fast-action-sheet";
 import { PendingButton } from "@/components/pending-button";
 import { TrialBanner } from "@/components/trial-banner";
@@ -115,26 +117,16 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
 
   // Teammates cannot use business settings, so the link is hidden for them.
   // Display only: the middleware and server actions enforce the rule.
-  const [shell, setShell] = useState<ShellContext>({ role: null, organizations: [], unreadChats: 0, dueTasks: 0, helpReplies: 0, brand: null });
+  // The brand arrives with the page from the root layout, so their logo is on the first frame: no RouteHQ flash.
+  const initialBrand = useInitialShellBrand();
+  const [shell, setShell] = useState<ShellContext>({ role: null, organizations: [], unreadChats: 0, dueTasks: 0, helpReplies: 0, brand: initialBrand });
   useEffect(() => {
     let cancelled = false;
-    // The brand from last time, so their logo shows at once instead of RouteHQ's for a moment.
-    try {
-      const remembered = window.sessionStorage.getItem("routehq_shell_brand");
-      if (remembered) setShell((current) => ({ ...current, brand: JSON.parse(remembered) }));
-    } catch {
-      // Storage can be unavailable; the fresh context arrives below anyway.
-    }
     getShellContext()
       .then((context) => {
         if (cancelled) return;
-        setShell(context);
-        try {
-          if (context.brand) window.sessionStorage.setItem("routehq_shell_brand", JSON.stringify(context.brand));
-          else window.sessionStorage.removeItem("routehq_shell_brand");
-        } catch {
-          // Nothing to do: the logo just loads a moment later next time.
-        }
+        // A failed logo lookup in the refresh must not swap their brand for RouteHQ's: keep the first-frame brand.
+        setShell({ ...context, brand: context.brand ?? initialBrand });
       })
       .catch(() => undefined);
     return () => {
@@ -142,10 +134,11 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
     };
   }, []);
   const brand = shell.brand;
-  const brandLogo = brand?.logoUrl ? (
-    <span className="flex flex-col">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img alt={brand.name} className="max-h-12 max-w-[190px] object-contain object-left" src={brand.logoUrl} />
+  // Their name in text if the logo file is missing or slow: never an empty box where the brand should be.
+  const brandName = brand?.name ? <span className="truncate text-[1.1rem] font-black leading-none tracking-[-0.02em] text-[var(--foreground)]">{brand.name}</span> : null;
+  const brandLogo = brand ? (
+    <span className="flex min-w-0 flex-col">
+      <BusinessLogoImage alt={brand.name} className="max-h-12 max-w-[190px] object-contain object-left" fallback={brandName} src={brand.logoUrl} />
       {brand.poweredBy ? <span className="mt-0.5 text-[10px] font-semibold text-[var(--sidebar-text-muted)]">Powered by RouteHQ</span> : null}
     </span>
   ) : null;
@@ -267,10 +260,17 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
           // Phones: logo and (for people in several businesses) the switcher.
           // Account and sign-out live under More, away from thumbs.
           <div className="mb-3 flex items-center justify-between gap-2 lg:hidden">
-            <Link aria-label={brand?.name || "RouteHQ dashboard"} href="/">
-              {brand?.logoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img alt={brand.name} className={`h-8 max-w-[140px] object-contain object-left ${hero ? "rounded-md bg-white px-1.5 py-0.5" : ""}`} src={brand.logoUrl} />
+            <Link aria-label={brand?.name || "RouteHQ dashboard"} className="min-w-0" href="/">
+              {brand ? (
+                // On the coloured band the logo sits on a white tab; if the file is missing, their name goes there instead.
+                <span className={`flex h-8 max-w-[160px] items-center ${hero ? "rounded-md bg-white px-1.5" : ""}`}>
+                  <BusinessLogoImage
+                    alt={brand.name}
+                    className="h-7 max-w-[140px] object-contain object-left"
+                    fallback={<span className="truncate text-[15px] font-black leading-none text-[var(--foreground)]">{brand.name}</span>}
+                    src={brand.logoUrl}
+                  />
+                </span>
               ) : (
                 <RouteHqLogo className="h-7 w-auto" showDescriptor={false} tone={hero ? "dark" : "light"} />
               )}

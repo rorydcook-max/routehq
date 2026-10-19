@@ -580,7 +580,7 @@ export function CalculatorClient({
                           : t("rentFromWeb")
                         : t("rentFromUsual")
                 }
-                label={style === "daily" ? t("rentYoursDaily") : t("rentYours")}
+                label={style === "daily" ? t("rentYoursDaily") : style === "mix" ? t("rentYoursMix") : t("rentYours")}
                 onChange={setRent}
                 suffix={currency === "THB" ? "฿" : currency}
                 value={assumptions.rentMonthly}
@@ -657,6 +657,8 @@ export function CalculatorClient({
                   assumptions.price > research.market_price_high * 1.02 ? "marketAbove" : assumptions.price < research.market_price_low * 0.98 ? "marketBelow" : "marketWithin",
                   { low: money(research.market_price_low), high: money(research.market_price_high) }
                 )}
+                {/* When nothing could be checked live, the advert range is an estimate too: say so, or it contradicts the line above. */}
+                {sources.length === 0 && research.confidence === "low" ? ` ${t("marketEstimateNote")}` : ""}
               </p>
             ) : null}
             {own && own.monthlyRate !== assumptions.rentMonthly ? (

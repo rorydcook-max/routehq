@@ -180,7 +180,11 @@ function selectable(vehicle: BookingVehicle) {
 }
 
 /** One line on when the car is taken, e.g. "Taken until 8 Nov" or "Booked from 27 Oct". */
-function availabilityNote(periods: BusyPeriod[], today: string, say: Say, locale: string) {
+function availabilityNote(periods: BusyPeriod[], today: string, say: Say, locale: string): { text: string; out: boolean; late?: boolean } | null {
+  // Still with the customer past its return date: the same "late back" the dashboard and calendar show,
+  // so nobody books it as if it were on the forecourt.
+  const late = periods.find((period) => period.out && period.startDate <= today && !!period.endDate && period.endDate < today);
+  if (late) return { text: say("lateBackDue", { date: shortDate(late.endDate as string, locale) }), out: true, late: true };
   const current = periods.find((period) => period.startDate <= today && (!period.endDate || period.endDate >= today));
   if (current) return { text: current.endDate ? say("takenUntil", { date: shortDate(current.endDate, locale) }) : say("takenOpen"), out: true };
   const next = periods.find((period) => period.startDate > today);
@@ -760,7 +764,7 @@ export function BookingForm({
                         {(() => {
                           const note = disabled ? null : availabilityNote(busyPeriods[vehicle.id] || [], businessToday(), say, locale);
                           return (
-                            <Badge tone={disabled ? "neutral" : note ? (note.out ? "blue" : "amber") : "green"}>
+                            <Badge tone={disabled ? "neutral" : note ? (note.late ? "red" : note.out ? "blue" : "amber") : "green"}>
                               {disabled ? (t.has(`vs_${vehicle.status}`) ? say(`vs_${vehicle.status}`) : vehicle.status) : note?.text || say("vs_available")}
                             </Badge>
                           );
@@ -1182,7 +1186,8 @@ export function BookingForm({
                   <label htmlFor="delivery-datetime">{say("deliveryDateTime")}</label>
                   <span className="cursor-help text-[var(--muted)]" title={say("timeTooltip")}>ⓘ</span>
                 </div>
-                <button className="pressable mb-2 min-h-10 rounded-full border border-[var(--primary)] bg-[var(--primary)] px-4 py-2 text-[13px] font-bold text-white" onClick={setHandoverNow} type="button">
+                {/* Outlined until pressed: solid, it read as already chosen while the field below sat empty. */}
+                <button className={`pressable mb-2 min-h-10 rounded-full border px-4 py-2 text-[13px] font-bold ${deliveryDateTime ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--primary)] bg-white text-[var(--primary)]"}`} onClick={setHandoverNow} type="button">
                   {startsLater ? say("onStartDay") : say("now")}
                 </button>
                 <input className={inputClass} id="delivery-datetime" onChange={(event) => setDeliveryDateTime(event.target.value)} type="datetime-local" value={deliveryDateTime} />
@@ -1204,7 +1209,7 @@ export function BookingForm({
                   <label htmlFor="collection-datetime">{say("collectionTime")}</label>
                   <span className="cursor-help text-[var(--muted)]" title={say("timeTooltip")}>ⓘ</span>
                 </div>
-                <button className="pressable min-h-10 rounded-full border border-[var(--primary)] bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white" onClick={setHandoverNow} type="button">
+                <button className={`pressable mb-2 min-h-10 rounded-full border px-4 py-2 text-[13px] font-bold ${collectionTime ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--primary)] bg-white text-[var(--primary)]"}`} onClick={setHandoverNow} type="button">
                   {startsLater ? say("onStartDay") : say("now")}
                 </button>
                 <input className={inputClass} id="collection-datetime" onChange={(event) => setCollectionTime(event.target.value)} type="datetime-local" value={collectionTime} />

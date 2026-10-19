@@ -1407,14 +1407,37 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         {isRentalDocumentEngine && publicAgreement && readyToSign && customerSigningEligibility?.customerSafeMessage ? (
           <p className="mt-3 rounded-lg border border-[var(--danger-line)] bg-white p-3 text-sm font-bold text-[var(--danger)]">{customerSigningEligibility.customerSafeMessage}</p>
         ) : null}
-        <div className="routehq-contract-preview contract-preview mt-4 h-[70vh] min-h-[460px] overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)]">
-          <iframe
-            className="h-full w-full border-0 bg-[var(--panel-secondary)]"
-            sandbox=""
-            srcDoc={buildContractPreviewDocument(agreementHtml)}
-            title={t("rentalAgreement")}
-          />
-        </div>
+        {/* Before the details are saved the draft is full of "Not provided": it stays folded so the page
+            scrolls past it, and anyone curious can open it. The final text to sign is always open. */}
+        {readyToSign ? (
+          <>
+            <div className="routehq-contract-preview contract-preview mt-4 h-[60vh] min-h-[420px] overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] [overscroll-behavior:contain]">
+              <iframe
+                className="h-full w-full border-0 bg-[var(--panel-secondary)]"
+                sandbox=""
+                srcDoc={buildContractPreviewDocument(agreementHtml)}
+                title={t("rentalAgreement")}
+              />
+            </div>
+            <p className="mt-1.5 text-center text-xs font-semibold text-[var(--muted)]">{t.has("previewScrollHint" as never) ? t("previewScrollHint" as never) : "Scroll inside the box to read it all."}</p>
+          </>
+        ) : (
+          <details className="group mt-4 rounded-xl border border-[var(--border)] bg-white">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-bold text-[var(--primary)] [&::-webkit-details-marker]:hidden">
+              <span>{t.has("previewOpen" as never) ? t("previewOpen" as never) : "Read the draft agreement"}</span>
+              <span aria-hidden="true" className="text-[var(--muted)] transition group-open:rotate-180">⌄</span>
+            </summary>
+            <div className="routehq-contract-preview contract-preview h-[60vh] min-h-[420px] overflow-hidden border-t border-[var(--border)] bg-[var(--panel-secondary)] [overscroll-behavior:contain]">
+              <iframe
+                className="h-full w-full border-0 bg-[var(--panel-secondary)]"
+                loading="lazy"
+                sandbox=""
+                srcDoc={buildContractPreviewDocument(agreementHtml)}
+                title={t("rentalAgreement")}
+              />
+            </div>
+          </details>
+        )}
         {readyToSign && publicAgreement ? (
           <>
           {/* The statements are read as a list and agreed with one tick. Each one is still recorded by name and version. */}

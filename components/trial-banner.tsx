@@ -68,14 +68,24 @@ export function TrialBanner({ placement = "floating" }: { placement?: "floating"
   // Never over a form: handovers and the create/edit screens keep their
   // buttons at the bottom of the screen, where the banner floats on phones.
   const onForm = !!pathname && (pathname.startsWith("/inspections") || /\/(new|edit)(\/|$)/.test(pathname));
+  const days = payload?.daysRemaining;
+  // Phones have no room to spare: the reminder stays on the dashboard until the last week.
+  const lastWeek = days !== null && days !== undefined && days <= 7;
+  // While it floats, the page gets extra room at the end so the last row and its buttons can scroll
+  // up from underneath it (globals.css reads this flag).
+  const floating = placement === "floating" && !hidden && !!payload?.organization && !onForm && lastWeek;
+  useEffect(() => {
+    if (!floating) return;
+    document.body.dataset.trialBanner = "1";
+    return () => {
+      delete document.body.dataset.trialBanner;
+    };
+  }, [floating]);
+
   // The sidebar copy sits in the page flow, so it never covers anything.
   if (hidden || !payload?.organization || (onForm && placement === "floating")) {
     return null;
   }
-
-  const days = payload.daysRemaining;
-  // Phones have no room to spare: the reminder stays on the dashboard until the last week.
-  const lastWeek = days !== null && days !== undefined && days <= 7;
   // Phones: floating (and on every page) only in the last week; before that it is a quiet line at the end of the dashboard.
   if (placement === "floating" && !lastWeek) return null;
   if (placement === "inline" && (lastWeek || pathname !== "/")) return null;
@@ -91,8 +101,9 @@ export function TrialBanner({ placement = "floating" }: { placement?: "floating"
           : placement === "sidebar"
           ? // Desktop: one line in the sidebar, above the account card; the line is the link.
             "mt-3 hidden items-center justify-between gap-2 rounded-lg border px-2.5 py-2 lg:flex"
-          : // Phones: floats above the bottom navigation, clear of the + button.
-            "fixed bottom-[calc(96px+env(safe-area-inset-bottom))] left-3 right-3 z-40 flex items-center justify-between gap-2 rounded-lg border px-3 py-2 shadow-lg lg:hidden",
+          : // Phones: a slim tab docked on top of the bottom menu (one strip, not a floating card), so it
+            // reads as part of the menu and covers as little of the page as possible.
+            "fixed bottom-[calc(86px+env(safe-area-inset-bottom))] left-6 right-6 z-[29] flex items-center justify-between gap-2 rounded-t-xl border border-b-0 px-3 py-1 lg:hidden",
         tone.className
       )}
       role="status"
@@ -112,13 +123,13 @@ export function TrialBanner({ placement = "floating" }: { placement?: "floating"
       )}
       <div className="flex shrink-0 items-center gap-2">
         {placement === "sidebar" ? null : (
-          <Link className={clsx("pressable inline-flex min-h-7 items-center justify-center rounded-lg px-3 text-[11px] font-bold", tone.button)} href={"/settings/billing" as Route}>
+          <Link className={clsx("pressable inline-flex items-center justify-center rounded-lg px-3 text-[11px] font-bold", placement === "floating" ? "min-h-6" : "min-h-7", tone.button)} href={"/settings/billing" as Route}>
             {t("subscribeNow")}
           </Link>
         )}
         <button
           aria-label={t("close")}
-          className="pressable inline-flex h-7 w-7 items-center justify-center rounded-lg border border-current/15 bg-white/70"
+          className={clsx("pressable inline-flex items-center justify-center rounded-lg border border-current/15 bg-white/70", placement === "floating" ? "h-6 w-6" : "h-7 w-7")}
           onClick={() => {
             window.localStorage.setItem(dismissKey, String(Date.now() + 24 * 60 * 60 * 1000));
             setHidden(true);

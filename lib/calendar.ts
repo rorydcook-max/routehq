@@ -85,7 +85,10 @@ export async function getCalendarEventsBetween(organizationId: string, startDate
       });
     }
 
-    if (end && end >= startDate && end <= endDate) {
+    // A booking that was never handed over has no return to be late for: its "Handover overdue" event
+    // above already says what needs deciding, so no second red row for the same rental.
+    const neverStarted = rental.status === "booked" && end && end < today;
+    if (end && end >= startDate && end <= endDate && !neverStarted) {
       const returned = rental.status === "completed";
       const late = !returned && end < today;
       events.push({
@@ -194,6 +197,9 @@ export type AvailabilityBooking = {
   to: string;
   customer: string;
   state: "booked" | "out" | "late" | "returned";
+  /** For a late return: the day it was due back, and how many days past that it is. The bar runs on to today. */
+  dueBack?: string;
+  daysLate?: number;
   startsBefore: boolean;
   /** Runs past the end of the month, or has no end date. */
   runsOn: boolean;
@@ -254,6 +260,8 @@ export async function getAvailability(organizationId: string, year: number, mont
       to: end > endDate ? endDate : end,
       customer: rental.customers?.full_name || "Booking link sent",
       state: returned ? "returned" : late ? "late" : rental.status === "booked" ? "booked" : "out",
+      dueBack: late ? plannedEnd : undefined,
+      daysLate: late ? Math.max(1, Math.round((Date.parse(`${today}T00:00:00Z`) - Date.parse(`${plannedEnd}T00:00:00Z`)) / 86400000)) : undefined,
       startsBefore: start < startDate,
       runsOn: end > endDate
     });

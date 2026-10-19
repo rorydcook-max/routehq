@@ -140,6 +140,12 @@ export function InboxView({
   const href = (id?: string | null, show: string = filter) => `/inbox?show=${show}${id ? `&c=${id}` : ""}` as Route;
   const customer = selected?.customer_id ? customers.find((entry) => entry.id === selected.customer_id) : null;
   const lastInbound = [...messages].reverse().find((message) => message.direction === "in");
+  // One connection problem is said once, above the reply box, not under every message it stopped.
+  const isAuthError = (value: unknown) => /auth|token|unauthor|401|403|credential/i.test(String(value || ""));
+  const disconnectedFailures = messages.filter((message) => message.status === "failed" && isAuthError(message.error)).length;
+  // The link to a customer is one line in the header; the picker only opens when it is being changed.
+  const [relinking, setRelinking] = useState(false);
+  useEffect(() => setRelinking(false), [selected?.id]);
 
   let previousDay = "";
 
@@ -210,32 +216,42 @@ export function InboxView({
                   <ProviderTag provider={selected.provider} />
                 </p>
                 {customer ? (
-                  <Link className="text-[13px] font-medium text-[var(--primary)] hover:underline" href={`/customers/${customer.id}` as Route}>
-                    {customer.full_name || say("customerRecord")}
-                  </Link>
+                  <p className="flex items-center gap-2 text-[13px]">
+                    <Link className="font-medium text-[var(--primary)] hover:underline" href={`/customers/${customer.id}` as Route}>
+                      {customer.full_name || say("customerRecord")}
+                    </Link>
+                    {!relinking ? (
+                      <button className="text-[var(--muted)] underline-offset-2 hover:underline" onClick={() => setRelinking(true)} type="button">
+                        {t.has("changeLink" as never) ? say("changeLink") : "Change"}
+                      </button>
+                    ) : null}
+                  </p>
                 ) : (
                   <p className="text-[13px] text-[var(--muted)]">{say("notLinked")}</p>
                 )}
               </div>
-              <select
-                aria-label={say("linkAria")}
-                className="h-9 w-auto max-w-[190px] text-[13px]"
-                onChange={(event) => {
-                  const value = event.target.value || null;
-                  startQuiet(async () => {
-                    await linkConversationCustomer(selected.id, value);
-                    router.refresh();
-                  });
-                }}
-                value={selected.customer_id || ""}
-              >
-                <option value="">{selected.customer_id ? say("unlink") : say("linkTo")}</option>
-                {customers.map((entry) => (
-                  <option key={entry.id} value={entry.id}>
-                    {entry.full_name || entry.phone || say("customer")}
-                  </option>
-                ))}
-              </select>
+              {!customer || relinking ? (
+                <select
+                  aria-label={say("linkAria")}
+                  className="h-9 w-auto max-w-[190px] text-[13px]"
+                  onChange={(event) => {
+                    const value = event.target.value || null;
+                    setRelinking(false);
+                    startQuiet(async () => {
+                      await linkConversationCustomer(selected.id, value);
+                      router.refresh();
+                    });
+                  }}
+                  value={selected.customer_id || ""}
+                >
+                  <option value="">{selected.customer_id ? say("unlink") : say("linkTo")}</option>
+                  {customers.map((entry) => (
+                    <option key={entry.id} value={entry.id}>
+                      {entry.full_name || entry.phone || say("customer")}
+                    </option>
+                  ))}
+                </select>
+              ) : null}
               <button
                 className="secondary-action pressable min-h-9 px-3 text-[13px]"
                 onClick={() =>
@@ -257,11 +273,11 @@ export function InboxView({
                 {bookings.map((booking) => (
                   <Link className="flex-shrink-0 rounded-lg border border-[var(--border)] bg-white px-3 py-1.5 text-[12px] hover:border-[var(--primary)]" href={`/bookings/${booking.id}` as Route} key={booking.id}>
                     <span className="block font-semibold text-[var(--foreground)]">
-                      {[booking.vehicles?.make, booking.vehicles?.model].filter(Boolean).join(" ") || say("booking")} · {t.has(`status_${booking.status}`) ? say(`status_${booking.status}`) : booking.status}
+                      {[booking.vehicles?.make, booking.vehicles?.model].filter(Boolean).join(" ") || say("booking")} Â· {t.has(`status_${booking.status}`) ? say(`status_${booking.status}`) : booking.status}
                     </span>
                     <span className="block text-[var(--muted)]">
-                      {shortDate(booking.start_date, say, locale)} – {shortDate(booking.end_date, say, locale)}
-                      {Number(booking.balance_due || 0) > 0 ? ` · ${say("owed", { amount: `฿${Number(booking.balance_due).toLocaleString("en-US")}` })}` : ""}
+                      {shortDate(booking.start_date, say, locale)} â€“ {shortDate(booking.end_date, say, locale)}
+                      {Number(booking.balance_due || 0) > 0 ? ` Â· ${say("owed", { amount: `à¸¿${Number(booking.balance_due).toLocaleString("en-US")}` })}` : ""}
                     </span>
                   </Link>
                 ))}
@@ -285,12 +301,9 @@ export function InboxView({
                     </div>
                     {message.status === "failed" ? (
                       <p className="mt-1 flex items-center justify-end gap-1 text-[12px] text-[var(--danger)]">
-                        <AlertCircle size={13} /> {say("notDelivered", { reason: plainSendError(message.error, selected?.provider, say) })}
-                        {/auth|token|unauthor|401|403|credential/i.test(String(message.error || "")) ? (
-                          <a className="font-semibold underline" href="/settings?tab=messaging">
-                            {say("openMessaging")}
-                          </a>
-                        ) : null}
+                        <AlertCircle size={13} />
+                        {/* A connection problem is explained once in the banner below; here just the fact. */}
+                        {isAuthError(message.error) ? (t.has("notDeliveredShort" as never) ? say("notDeliveredShort") : "Not delivered") : say("notDelivered", { reason: plainSendError(message.error, selected?.provider, say) })}
                       </p>
                     ) : null}
                   </div>
@@ -300,6 +313,17 @@ export function InboxView({
             </div>
 
             <footer className="border-t border-[var(--border)] bg-white p-3">
+              {disconnectedFailures > 0 ? (
+                <p className="mb-2 flex flex-wrap items-center justify-between gap-2 rounded-lg bg-[var(--danger-light)] px-3 py-2 text-[13px] font-medium text-[var(--danger)]" role="status">
+                  <span className="flex items-center gap-1.5">
+                    <AlertCircle size={14} />
+                    {t.has("disconnectedBanner" as never) ? say("disconnectedBanner", { count: disconnectedFailures, provider: selected.provider === "line" ? "LINE" : selected.provider === "whatsapp" ? "WhatsApp" : "Messenger" }) : `${disconnectedFailures} not delivered: the messaging connection needs reconnecting.`}
+                  </span>
+                  <a className="font-bold underline" href="/settings?tab=messaging">
+                    {say("openMessaging")}
+                  </a>
+                </p>
+              ) : null}
               {error ? (
                 <p className="mb-2 rounded-lg bg-[var(--danger-light)] px-3 py-2 text-[13px] font-medium text-[var(--danger)]" role="alert">
                   {error}

@@ -151,7 +151,9 @@ function daysBetween(from: string | null | undefined, to: string | null | undefi
 
 function defaultExtensionEndDate(currentEndDate?: string | null, days = 30) {
   const current = currentEndDate ? new Date(currentEndDate) : localDay();
-  const base = Number.isNaN(current.getTime()) ? localDay() : current;
+  // Already past the return date: the extra days count from today, so "+1 day" and "+3 days" are
+  // different dates (both used to clamp to tomorrow and light up together).
+  const base = Number.isNaN(current.getTime()) || startOfDay(current) < localDay() ? localDay() : current;
   const next = addDays(base, days);
   return isoDate(next < tomorrowDate() ? tomorrowDate() : next);
 }

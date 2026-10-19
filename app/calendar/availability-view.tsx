@@ -26,6 +26,10 @@ function dayOf(iso: string) {
   return Number(iso.slice(8, 10));
 }
 
+function shortDay(iso: string, locale: string) {
+  return new Intl.DateTimeFormat(intlLocale(locale), { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${iso}T00:00:00Z`));
+}
+
 /**
  * The month as one row per vehicle: coloured bars are bookings, white space is
  * a vehicle sitting free. Scrolls sideways on a phone with the names pinned.
@@ -125,9 +129,10 @@ export function AvailabilityView({ vehicles, month, today }: { vehicles: Availab
                         href={`/bookings/${booking.id}` as Route}
                         key={booking.id}
                         style={{ gridColumn: `${dayOf(booking.from)} / ${dayOf(booking.to) + 1}`, gridRow: 1 }}
-                        title={`${booking.customer} · ${t(`st_${booking.state}`)}`}
+                        title={booking.state === "late" && booking.dueBack ? `${booking.customer} · ${t("lateBar", { date: shortDay(booking.dueBack, locale), days: booking.daysLate || 1 })}` : `${booking.customer} · ${t(`st_${booking.state}`)}`}
                       >
-                        <span className="truncate">{booking.customer}</span>
+                        {/* A late bar runs on to today; the text says when it was actually due so the bar's end is not read as the return date. */}
+                        <span className="truncate">{booking.state === "late" && booking.dueBack ? `${booking.customer} · ${t("lateBar", { date: shortDay(booking.dueBack, locale), days: booking.daysLate || 1 })}` : booking.customer}</span>
                       </Link>
                     ))}
                   </div>

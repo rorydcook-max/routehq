@@ -347,7 +347,10 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   todayItems.sort((a, b) => (a.rank ?? 4) - (b.rank ?? 4) || toneOrder[a.tone] - toneOrder[b.tone]);
   upcomingItems.sort((a, b) => a.sort.localeCompare(b.sort));
 
-  const urgentCount = todayItems.filter((item) => item.tone === "red").length;
+  // Counted the way the To do page counts them (open jobs by due date), so the two pages agree.
+  const openTasks = taskList.filter((task: any) => !task.completedAt);
+  const tasksOverdue = openTasks.filter((task: any) => task.dueDate && task.dueDate < today).length;
+  const tasksDueToday = openTasks.filter((task: any) => task.dueDate === today).length;
 
   // ── Pictures: each job about a vehicle shows it ─────────────────────────
   const vehicleById = new Map(vehicles.map((v) => [v.id, v]));
@@ -385,7 +388,8 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
     };
   });
   // ── The calendar: what happens each day (handovers, returns, payments, renewals, jobs), a week by default ──
-  const firstName = (name: string | null | undefined) => String(name || "").trim().split(/\s+/)[0] || t("walkIn");
+  // The whole name: the tiles have two lines, and a first name alone ("from Test") reads as a cut-off.
+  const firstName = (name: string | null | undefined) => String(name || "").trim() || t("walkIn");
   const calendarFrom = `${addDays(`${today.slice(0, 7)}-01`, -1).slice(0, 7)}-01`;
   const calendarTo = addDays(`${addDays(`${addDays(`${today.slice(0, 7)}-01`, 62).slice(0, 7)}-01`, 32).slice(0, 7)}-01`, -1);
   const calendarEvents: CalendarEvent[] = await getCalendarEventsBetween(organization.id, calendarFrom, calendarTo).catch(() => []);
@@ -416,6 +420,8 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   const lastMonthSoFar = transactions.filter((x) => String(x.date || "").slice(0, 7) === lastMonth && String(x.date || "") <= sameDayLastMonth);
   const lastMonthProfit = lastMonthSoFar.reduce((sum, x) => sum + inOf(x), 0) - lastMonthSoFar.filter(isOut).reduce((sum, x) => sum + Math.abs(x.amount), 0);
   const profitChange = monthlyProfit - lastMonthProfit;
+  // No comparison when last month had nothing to compare with: "up ฿43,100" on a total of ฿43,100 says nothing.
+  const showProfitChange = lastMonthSoFar.length > 0 && lastMonthProfit !== 0;
   // Five weeks, Monday to Sunday, the last one being this week.
   const mondayOffset = (new Date(`${today}T00:00:00Z`).getUTCDay() + 6) % 7;
   const weeks = Array.from({ length: 5 }, (_, index) => {
@@ -462,10 +468,11 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
     const category = categories.find((entry: any) => entry.id === v.categoryId) || null;
     return {
       id: v.id,
-      name: v.model || v.make,
+      // Make and model together: a "Mazda 2" as "2" on its own is a number, not a car.
+      name: [v.make, v.model].filter(Boolean).join(" ") || v.make,
       art: <VehicleArt colour={v.color} kind={kindFromCategory(category as any)} model={v.model} size="sm" />,
       state,
-      tip: `${v.model || v.make}: ${tip}`,
+      tip: `${[v.make, v.model].filter(Boolean).join(" ")}: ${tip}`,
       href: current ? `/bookings/${current.id}` : next ? `/bookings/${next.id}` : `/fleet/${v.id}`
     };
   });
@@ -482,8 +489,9 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
         <p className="font-semibold text-white/90">{headerDate}</p>
         <h1 className="mt-0.5 text-[34px] leading-[1.05] tracking-[-0.025em] text-white lg:text-[44px]">{greeting}</h1>
         <div className="mt-4 flex flex-wrap gap-2">
-          {urgentCount > 0 ? pill(urgentCount, t("pillUrgent"), "var(--band-alert)") : null}
-          {pill(todayItems.length, t("pillToDo"))}
+          {/* The same two numbers as the To do page, so the dashboard never tells a different story. */}
+          {tasksOverdue > 0 ? pill(tasksOverdue, t("pillOverdue"), "var(--band-alert)") : null}
+          {pill(tasksDueToday, t("pillToDo"))}
           {pill(weekDays[0].out, t("pillOut"), "var(--going-out)")}
           {pill(weekDays[0].back, t("pillBack"), "var(--coming-back)")}
         </div>
@@ -568,7 +576,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
     <Link className="card pressable rise col-span-2 block p-4 text-[var(--foreground)]" href="/reports" key="money" style={{ ["--d" as string]: "260ms" } as CSSProperties}>
       <span className="block text-[15px] font-bold">{t("monthSoFar", { month: monthName })}</span>
       <span className={`num mt-1 block text-[32px] leading-tight ${monthlyProfit < 0 ? "text-[var(--danger)]" : ""}`}>{money(monthlyProfit)}</span>
-      {lastMonthSoFar.length > 0 ? (
+      {showProfitChange ? (
         <span className={`block font-bold ${profitChange < 0 ? "text-[var(--danger)]" : "text-[var(--success)]"}`}>
           {profitChange < 0 ? t("profitDown", { amount: money(Math.abs(profitChange)) }) : t("profitUp", { amount: money(profitChange) })}
         </span>
@@ -618,7 +626,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       <span className="block">
         <span className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
           <span className={`num text-[28px] leading-none ${monthlyProfit < 0 ? "text-[var(--danger)]" : ""}`}>{money(monthlyProfit)}</span>
-          {lastMonthSoFar.length > 0 ? (
+          {showProfitChange ? (
             <span className={`delta-chip ${profitChange < 0 ? "down" : "up"}`} data-tip={profitChange < 0 ? t("profitDown", { amount: money(Math.abs(profitChange)) }) : t("profitUp", { amount: money(profitChange) })}>
               {profitChange < 0 ? "↓" : "↑"} {money(Math.abs(profitChange))}
             </span>
@@ -669,7 +677,8 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
               <h2 className="text-[20px] text-[var(--foreground)] lg:text-[22px]">{t("planTitle")}</h2>
               <PanelLink href="/calendar">{t("calendar")}</PanelLink>
             </header>
-            <AgendaCalendar covers={{ from: calendarFrom, to: calendarTo }} defaultView="week" events={calendarEvents} storageKey="routehq.dashboard.calendar" today={today} />
+            {/* Late items are not carried into today here: the Today list below already has them, with the action to take. */}
+            <AgendaCalendar carryLate={false} covers={{ from: calendarFrom, to: calendarTo }} defaultView="week" events={calendarEvents} storageKey="routehq.dashboard.calendar" today={today} />
           </section>
 
           {/* Phones: the car park comes after the week. Computers have it in the side column. */}

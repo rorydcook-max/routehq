@@ -41,7 +41,12 @@ function ComplianceBadge({ item, attention = 0 }: { item?: { key?: string; label
         ? t("dueToday", { label })
         : t("dueIn", { label, days });
   const more = attention > 1 ? ` ${t("plusMore", { count: attention - 1 })}` : "";
-  return <Badge tone={tone}>{text + more}</Badge>;
+  // Wraps inside its column: "Service overdue 322 days +2 more" was running into the Profit column.
+  return (
+    <Badge tone={tone}>
+      <span className="whitespace-normal leading-snug">{text + more}</span>
+    </Badge>
+  );
 }
 
 const primaryButton = "primary-action pressable";
@@ -61,7 +66,9 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
   /** The longest period a vehicle is priced for: "฿18,000/mo", else per week, else per day. */
   const priceOf = (vehicle: { monthlyRate: number; weeklyRate: number; dailyRate: number }) =>
     vehicle.monthlyRate > 0 ? t("perMo", { amount: money(vehicle.monthlyRate) }) : vehicle.weeklyRate > 0 ? t("perWk", { amount: money(vehicle.weeklyRate) }) : vehicle.dailyRate > 0 ? t("perDay", { amount: money(vehicle.dailyRate) }) : "";
-  const dayMonth = (value: string) => new Intl.DateTimeFormat(locale === "en" ? "en-GB" : `${locale}-u-ca-gregory-nu-latn`, { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${value}T00:00:00Z`));
+  // The year is added when it is not this year: "overdue since 1 Dec" on its own read as a date still to come.
+  const dayMonth = (value: string) =>
+    new Intl.DateTimeFormat(locale === "en" ? "en-GB" : `${locale}-u-ca-gregory-nu-latn`, { day: "numeric", month: "short", ...(value.slice(0, 4) !== new Date().toISOString().slice(0, 4) ? { year: "numeric" } : {}), timeZone: "UTC" }).format(new Date(`${value}T00:00:00Z`));
   const [t, c, locale] = await Promise.all([getTranslations("fleet"), getTranslations("common"), getLocale()]);
   // At a glance (Look G): how busy the fleet is, and the next piece of paperwork or service due.
   const busy = vehicles.length > 0 ? Math.round(vehicles.reduce((sum, vehicle) => sum + Number(vehicle.utilization || 0), 0) / vehicles.length) : 0;
@@ -122,7 +129,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
             <Link className="card pressable tile tile-brick p-4" href={`/fleet/${nextPaper.id}`}>
               <TileHead icon={<Wrench size={22} />} title={paperName(nextPaper.complianceNext!)} />
               <span>
-                <span className="num block text-[24px] leading-tight">{nextPaper.model || nextPaper.make}</span>
+                <span className="num block text-[24px] leading-tight">{[nextPaper.make, nextPaper.model].filter(Boolean).join(" ")}</span>
                 <span className="font-semibold">{nextPaper.complianceNext!.daysLeft < 0 ? t("paperLate", { date: dayMonth(nextPaper.complianceNext!.date) }) : t("paperDueOn", { date: dayMonth(nextPaper.complianceNext!.date) })}</span>
               </span>
             </Link>

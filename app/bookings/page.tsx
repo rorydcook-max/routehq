@@ -31,7 +31,8 @@ export default async function BookingsPage() {
         <div>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h1 className="text-[32px] leading-tight text-white">{t("title")}</h1>
-            <Link className="pressable inline-flex min-h-11 items-center gap-2 rounded-full bg-[var(--band-action)] px-4 font-bold text-[var(--band-action-ink)]" href="/bookings/new">
+            {/* On a phone the + in the bottom bar makes a booking, as on the dashboard: the band stays short enough for the first card to show. */}
+            <Link className="pressable hidden min-h-11 items-center gap-2 rounded-full bg-[var(--band-action)] px-4 font-bold text-[var(--band-action-ink)] lg:inline-flex" href="/bookings/new">
               <Plus size={16} />
               {t("create")}
             </Link>

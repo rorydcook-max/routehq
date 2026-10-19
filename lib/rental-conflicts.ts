@@ -8,12 +8,17 @@
 
 export const BLOCKING_RENTAL_STATUSES = ["booked", "active", "due_soon", "overdue", "extended"] as const;
 
+/** Statuses where the customer has the vehicle: it is not back until a return is recorded, whatever the end date says. */
+export const OUT_RENTAL_STATUSES = ["active", "due_soon", "overdue", "extended"] as const;
+
 export type BusyPeriod = {
   rentalId: string;
   code: string | null;
   customerName: string | null;
   startDate: string;
   endDate: string | null;
+  /** True while the customer has the vehicle (handed over, not yet returned). */
+  out?: boolean;
 };
 
 function addDay(iso: string) {
@@ -32,9 +37,18 @@ export function overlaps(startDate: string, endDate: string | null, period: Pick
   return startDate < holdEnd(period.startDate, period.endDate) && period.startDate < holdEnd(startDate, endDate);
 }
 
-export function findConflict(periods: BusyPeriod[], startDate: string, endDate: string | null, excludeRentalId?: string | null) {
+export function findConflict(periods: BusyPeriod[], startDate: string, endDate: string | null, excludeRentalId?: string | null, today = new Date().toISOString().slice(0, 10)) {
   if (!startDate) return null;
-  return periods.find((period) => period.rentalId !== excludeRentalId && overlaps(startDate, endDate, period)) || null;
+  return (
+    periods.find((period) => {
+      if (period.rentalId === excludeRentalId) return false;
+      // A vehicle still with its customer past the due date is not back yet: it holds the car up to today,
+      // so a booking starting today clashes instead of slipping through. Later dates are left alone, as
+      // a day late should not block next month.
+      const held = period.out && period.endDate && period.endDate <= today ? { ...period, endDate: addDay(today) } : period;
+      return overlaps(startDate, endDate, held);
+    }) || null
+  );
 }
 
 function shortDate(iso: string) {
@@ -51,7 +65,7 @@ export function conflictMessage(period: BusyPeriod) {
 export async function loadBusyPeriods(supabase: any, organizationId: string, vehicleIds?: string[]) {
   let query = supabase
     .from("rentals")
-    .select("id, vehicle_id, display_code, reference, start_date, end_date, customers!rentals_customer_id_fkey(full_name)")
+    .select("id, vehicle_id, display_code, reference, start_date, end_date, status, customers!rentals_customer_id_fkey(full_name)")
     .eq("organization_id", organizationId)
     .is("deleted_at", null)
     .in("status", BLOCKING_RENTAL_STATUSES as unknown as string[]);
@@ -67,7 +81,8 @@ export async function loadBusyPeriods(supabase: any, organizationId: string, veh
       code: row.display_code || row.reference || null,
       customerName: row.customers?.full_name || null,
       startDate: String(row.start_date).slice(0, 10),
-      endDate: row.end_date ? String(row.end_date).slice(0, 10) : null
+      endDate: row.end_date ? String(row.end_date).slice(0, 10) : null,
+      out: (OUT_RENTAL_STATUSES as readonly string[]).includes(String(row.status || ""))
     });
   }
   for (const list of Object.values(byVehicle)) list.sort((a, b) => a.startDate.localeCompare(b.startDate));

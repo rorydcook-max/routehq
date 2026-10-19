@@ -236,18 +236,25 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
   // "All" reads in three parts: what is out now, what is coming, what is finished. A filter or a search is one list.
   const sections = useMemo(() => {
     if (filter !== "all" || search.trim()) return [{ key: "list", title: null as string | null, items: filtered }];
+    const today = businessToday();
     const part = (booking: any) => {
       const status = isCancelledBooking(booking) ? "cancelled" : String(booking.status || "");
       if (status === "cancelled" || status === "completed") return "done";
-      if (["booked", "draft", "pending", "confirmed"].includes(status)) return "upcoming";
+      if (["booked", "draft", "pending", "confirmed"].includes(status)) {
+        // Not "coming up" any more: its start date has passed with no handover, or the hold ran out
+        // unsigned. These want a decision (hand over late, move the dates, or cancel), so they sit first.
+        const stale = !!booking.start_date && String(booking.start_date).slice(0, 10) < today;
+        if (stale || holdState(booking, tx)?.ended) return "decide";
+        return "upcoming";
+      }
       return "now";
     };
-    return (["now", "upcoming", "done"] as const)
+    return (["decide", "now", "upcoming", "done"] as const)
       .map((key) => {
         const day = (booking: any, field: "start_date" | "end_date") => String(booking[field] || (field === "end_date" ? "9999" : "")).slice(0, 10);
         const items = filtered.filter((booking) => part(booking) === key);
-        items.sort((a, b) => (key === "upcoming" ? day(a, "start_date").localeCompare(day(b, "start_date")) : key === "now" ? day(a, "end_date").localeCompare(day(b, "end_date")) : day(b, "end_date").localeCompare(day(a, "end_date"))));
-        return { key, title: tx.say(key === "now" ? "secNow" : key === "upcoming" ? "secUpcoming" : "secDone") as string | null, items };
+        items.sort((a, b) => (key === "upcoming" || key === "decide" ? day(a, "start_date").localeCompare(day(b, "start_date")) : key === "now" ? day(a, "end_date").localeCompare(day(b, "end_date")) : day(b, "end_date").localeCompare(day(a, "end_date"))));
+        return { key, title: tx.say(key === "decide" ? "secDecide" : key === "now" ? "secNow" : key === "upcoming" ? "secUpcoming" : "secDone") as string | null, items };
       })
       .filter((section) => section.items.length > 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps

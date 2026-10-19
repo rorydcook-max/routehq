@@ -5,20 +5,20 @@ import { textDirection } from "@/lib/i18n/locales";
 import { ImageShrinker } from "@/components/image-shrinker";
 import { FlagFont } from "@/components/flag-font";
 import { BrandStyle } from "@/components/brand-style";
+import { ShellBrandProvider } from "@/components/shell-brand-provider";
 import { headers } from "next/headers";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { shellBrand } from "@/lib/shell-brand";
 
-/** The signed-in operator's brand colour, so pages open in it rather than switching after load. */
-async function operatorBrandColour() {
+/** The signed-in operator's brand (logo, name, colour), so pages open in it rather than switching after load. */
+async function operatorBrand() {
   try {
     // Customer pages carry the business's own brand, and the directory is RouteHQ's: neither takes the signed-in operator's colour.
     if ((await headers()).get("x-routehq-customer-page")) return null;
     const membership = await getCurrentMembership();
     if (!membership) return null;
-    const brand = await shellBrand((await createSupabaseServerClient()) as any, membership.organizationId);
-    return brand?.colour || null;
+    return await shellBrand((await createSupabaseServerClient()) as any, membership.organizationId);
   } catch {
     return null;
   }
@@ -54,12 +54,14 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [locale, brandColour] = await Promise.all([getLocale(), operatorBrandColour()]);
+  const [locale, brand] = await Promise.all([getLocale(), operatorBrand()]);
   return (
     <html dir={textDirection(locale)} lang={locale}>
       <body>
-        <BrandStyle colour={brandColour} />
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <BrandStyle colour={brand?.colour || null} />
+        <NextIntlClientProvider>
+          <ShellBrandProvider brand={brand}>{children}</ShellBrandProvider>
+        </NextIntlClientProvider>
         <ImageShrinker />
         <FlagFont />
       </body>

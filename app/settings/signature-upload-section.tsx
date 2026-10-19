@@ -81,7 +81,15 @@ export function SignatureUploadSection({
     submit(fd);
   }
 
+  // With a signature already approved, the authorisation box only appears once Replace is pressed:
+  // an unticked box next to "approved for use on …" looked like the approval was missing.
+  const [replacing, setReplacing] = useState(false);
+
   function choose() {
+    if (signatureUrl && !replacing) {
+      setReplacing(true);
+      return;
+    }
     if (!acknowledgementRef.current?.checked) {
       setMessage({ text: say("sg_tick"), type: "error" });
       return;
@@ -125,16 +133,22 @@ export function SignatureUploadSection({
       ) : (
         <p className="rounded-xl bg-[var(--warning-light)] px-4 py-3 font-medium text-[var(--foreground)]">{say("sg_first")}</p>
       )}
-      <label className="flex w-full cursor-pointer items-start gap-3 rounded-xl bg-white p-3 font-medium text-[var(--foreground)]">
-        <input className="mt-0.5 h-5 w-5 shrink-0" disabled={!signatoryReady} ref={acknowledgementRef} type="checkbox" />
-        <span>{authorisation("signatureAuthorisation")}</span>
-      </label>
+      {!signatureUrl || replacing ? (
+        <label className="flex w-full cursor-pointer items-start gap-3 rounded-xl bg-white p-3 font-medium text-[var(--foreground)]">
+          <input className="mt-0.5 h-5 w-5 shrink-0" disabled={!signatoryReady} ref={acknowledgementRef} type="checkbox" />
+          <span>{authorisation("signatureAuthorisation")}</span>
+        </label>
+      ) : null}
       <div className="flex flex-wrap items-center gap-2">
         <input accept="image/png,image/jpeg,image/webp" className="sr-only" data-keep-original disabled={!signatoryReady} onChange={picked} ref={fileRef} tabIndex={-1} type="file" />
         <button className="primary-action whitespace-nowrap" disabled={isPending || !signatoryReady} onClick={choose} type="button">
-          {isPending ? say("lg_working") : signatureUrl ? say("sg_replace") : say("sg_upload")}
+          {isPending ? say("lg_working") : signatureUrl && !replacing ? say("sg_replace") : say("sg_upload")}
         </button>
-        {signatureUrl ? (
+        {signatureUrl && replacing ? (
+          <button className="secondary-action" disabled={isPending} onClick={() => setReplacing(false)} type="button">
+            {say("sg_keep")}
+          </button>
+        ) : signatureUrl ? (
           <button className="secondary-action" disabled={isPending} onClick={handleRemove} style={{ color: "var(--danger)" }} type="button">
             {say("pm_remove")}
           </button>

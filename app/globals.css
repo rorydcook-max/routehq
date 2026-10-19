@@ -1446,6 +1446,13 @@ aside a[class*="bg-[var(--sidebar-active)]"] {
 .focused-flow .sticky-actions { bottom: 0; }
 @media (min-width: 1024px) { .sticky-actions { bottom: 0; } }
 
+/* Trial reminder floating above the phone menu (last week of the trial): the page gets the same
+   height again at the end, so the last row and its buttons are never stuck underneath it. */
+@media (max-width: 1023px) {
+  body[data-trial-banner] .content-area { padding-bottom: 40px; }
+  body[data-trial-banner] .sticky-actions { bottom: calc(132px + env(safe-area-inset-bottom)); }
+}
+
 /* Burmese stacks marks above and below the line, so it needs more room between
    lines than Latin text or the rows run into each other. */
 :lang(my) :is(p, span, h1, h2, h3, h4, label, button, a, summary, li, dt, dd, legend, small, strong) {
@@ -1550,6 +1557,8 @@ a.card.pressable:hover {
 .tile-mango { background: var(--accent-light); color: #5c3a0c; }
 .tile .tile-title, .tile-title { font-family: var(--font-display); font-weight: 600; font-size: 16px; letter-spacing: -0.005em; }
 h1, .page-hero h1 { letter-spacing: -0.02em; }
+/* Prompt is wide at 30px: pulled in a touch more so the page title reads as one word, not letters in a row. */
+.page-title, .page-hero h1 { letter-spacing: -0.03em; line-height: 1.1; }
 h2 { letter-spacing: -0.015em; }
 
 /* The band: faint rings and a sun in its top corner, so a business colour is never just a flat block. */

@@ -411,7 +411,9 @@ function TaskRow({ item, organizationId, today, siblings = [], canDecide = true 
   const line = heading.detail && !receipt ? [heading.detail, context].filter(Boolean).join(" · ") : context;
 
   return (
-    <div className="card flex flex-col gap-3.5 p-4 lg:flex-row lg:items-center lg:gap-6">
+    // While a payment is being recorded the card stacks on computers too: the form takes the full width
+    // under the heading instead of sharing the row with the icon and running over it.
+    <div className={`card flex flex-col gap-3.5 p-4 ${recording ? "" : "lg:flex-row lg:items-center lg:gap-6"}`}>
       <div className="flex items-center gap-3.5 lg:min-w-0 lg:flex-1">
         <KindChip kind={jobKind(item)} />
         <div className="min-w-0 flex-1">

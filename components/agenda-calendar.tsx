@@ -59,9 +59,12 @@ export function AgendaCalendar({
   storageKey,
   autoLoad = false,
   roomy = false,
+  carryLate = true,
   action
 }: {
   events: CalendarEvent[];
+  /** Late items (an overdue return, an unpaid payment) listed under today as well as on their own day. The dashboard has its own Today list, so it turns this off. */
+  carryLate?: boolean;
   today: string;
   /** The days the events were loaded for; anything outside is fetched by opening the calendar there. */
   covers: { from: string; to: string };
@@ -108,14 +111,22 @@ export function AgendaCalendar({
     return t(`ev_${words.key}`, { subject: words.subject, amount: words.amount || "", paper });
   };
 
+  // The month chip is a few characters wide, so it says what kind of thing it is as well as which vehicle:
+  // "↗ Fortuner" going out, "↙ Fortuner" coming back, "Insurance · Yaris", "฿9,000".
   const chipOf = (event: CalendarEvent) => {
     const words = event.say;
-    if (words?.amount) return words.amount;
-    if (words?.paper) return papers.has(`paper_${words.paper}`) ? papers(`paper_${words.paper}`) : words.paper;
     const subject = String(words?.subject || "").split(" · ")[0].trim();
-    if (!subject) return titleOf(event);
     const parts = subject.split(" ");
-    return parts.length > 1 ? parts.slice(1).join(" ") : subject;
+    const model = parts.length > 1 ? parts.slice(1).join(" ") : subject;
+    if (words?.amount) return words.amount;
+    if (words?.paper) {
+      const paper = papers.has(`paper_${words.paper}`) ? papers(`paper_${words.paper}`) : words.paper;
+      return model ? `${paper} · ${model}` : paper;
+    }
+    if (!subject) return titleOf(event);
+    if (event.type === "rental_start") return `↗ ${model}`;
+    if (event.type === "rental_end" || event.type === "rental_due") return `↙ ${model}`;
+    return model;
   };
 
   const byDate = useMemo(() => {
@@ -124,7 +135,7 @@ export function AgendaCalendar({
     return map;
   }, [events]);
   // Something late (a handover, a return, a payment) is still today's job, so today lists it too.
-  const carried = useMemo(() => events.filter((event) => event.date < today && event.tone === "red" && event.type !== "compliance" && event.type !== "task"), [events, today]);
+  const carried = useMemo(() => (carryLate ? events.filter((event) => event.date < today && event.tone === "red" && event.type !== "compliance" && event.type !== "task") : []), [carryLate, events, today]);
   const on = (date: string) => [...(date === today ? carried : []), ...(byDate.get(date) || [])];
 
   // The days on screen for each view.

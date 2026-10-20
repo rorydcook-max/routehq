@@ -351,6 +351,17 @@ async function createBookingOrThrow(formData: FormData) {
     throw new Error(conflict);
   }
 
+  // A price typed for a car that had none is kept on the car, so the next booking starts from it.
+  // Never overwrites a saved price; a failure here (a role that can't edit vehicles) doesn't stop the booking.
+  if (String(formData.get("saveVehicleRate") || "") === "true" && rentalRate > 0 && ["daily", "weekly", "monthly"].includes(pricingModel)) {
+    const column = `${pricingModel}_rate` as "daily_rate" | "weekly_rate" | "monthly_rate";
+    if (!(Number((vehicle as any)[column] || 0) > 0)) {
+      const { error: rateError } = await supabase.from("vehicles").update({ [column]: rentalRate }).eq("id", vehicleId).eq("organization_id", organizationId);
+      if (rateError) console.warn("[createBooking] could not save vehicle price:", rateError.message);
+      else revalidatePath(`/fleet/${vehicleId}`);
+    }
+  }
+
   // Optional customer lookup
   let customer: { full_name: string; phone: string | null; nationality: string | null; document_status: string | null } | null = null;
   if (customerId) {

@@ -294,6 +294,8 @@ export function BookingForm({
     const preselected = validPreselectedVehicle ? vehicles.find((vehicle) => vehicle.id === preselectedVehicleId) : null;
     return preselected ? rateFor(preselected, "monthly") : 0;
   });
+  // A price typed for a car with none saved is kept on the car unless this is unticked.
+  const [saveVehicleRate, setSaveVehicleRate] = useState(true);
   const [depositAmount, setDepositAmount] = useState(defaultDeposit > 0 ? defaultDeposit : 0);
   // For a rental that has already started: what the customer has paid so far.
   const [existingPaid, setExistingPaid] = useState<"up_to_date" | "until" | "none">("up_to_date");
@@ -563,6 +565,12 @@ export function BookingForm({
 
   const backDisabled = step === 0 || showCustomerModal || Boolean(shareResult);
 
+  // Offered when the car has no saved price for this period and one has been typed.
+  const ownSavedRate = Number(
+    (pricingModel === "daily" ? selectedVehicle?.daily_rate : pricingModel === "weekly" ? selectedVehicle?.weekly_rate : pricingModel === "monthly" ? selectedVehicle?.monthly_rate : 1) || 0
+  );
+  const canSaveVehicleRate = Boolean(selectedVehicle) && pricingModel !== "custom" && ownSavedRate <= 0 && rentalRate > 0;
+
   return (
     <form method="post" className="space-y-3" onSubmit={handleSubmit} ref={formRef}>
       <input name="bookingMode" type="hidden" value={bookingMode} />
@@ -574,6 +582,7 @@ export function BookingForm({
       <input name="pricingModel" type="hidden" value={pricingModel} />
       <input name="currency" type="hidden" value={currency} />
       <input name="rentalRate" type="hidden" value={rentalRate} />
+      <input name="saveVehicleRate" type="hidden" value={String(saveVehicleRate && canSaveVehicleRate)} />
       <input name="depositAmount" type="hidden" value={depositAmount} />
       <input name="deliveryMethod" type="hidden" value={deliveryMethod} />
       <input name="deliveryLocation" type="hidden" value={deliveryLocation} />
@@ -775,7 +784,9 @@ export function BookingForm({
                         <span className="mt-1.5 block font-semibold text-[var(--foreground-secondary)]">
                           {[vehicle.daily_rate > 0 ? say("per_daily", { amount: money(vehicle.daily_rate, currency) }) : null, vehicle.monthly_rate > 0 ? say("perMonth", { amount: money(vehicle.monthly_rate, currency) }) : null].filter(Boolean).join(" · ")}
                         </span>
-                      ) : null}
+                      ) : Number(vehicle.weekly_rate || 0) > 0 ? null : (
+                        <span className="mt-1.5 block text-sm font-medium text-[var(--muted)]">{say("noPriceYet")}</span>
+                      )}
                     </span>
                   </div>
                 </button>
@@ -969,6 +980,12 @@ export function BookingForm({
               </p>
             );
           })()}
+          {canSaveVehicleRate ? (
+            <label className="mt-2 flex cursor-pointer items-center gap-2 text-[13px] font-medium text-[var(--foreground-secondary)]">
+              <input checked={saveVehicleRate} className="h-4 w-4" onChange={(event) => setSaveVehicleRate(event.target.checked)} type="checkbox" />
+              {say(`saveRate_${pricingModel}`, { amount: money(rentalRate, currency) })}
+            </label>
+          ) : null}
           {!(rentalRate > 0) ? (
             // A hint, not a warning: nothing has gone wrong, the price just hasn't been typed yet.
             <p className="mt-2 text-xs text-[var(--muted)]">

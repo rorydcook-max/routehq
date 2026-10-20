@@ -2541,7 +2541,11 @@
     "collectionPlaceholder": "Your shop",
     "collectionHelper": "Where the customer picks it up. Leave blank to use your shop's address.",
     "clashPartners": "Nothing else free? See partners' vehicles for these dates →",
-    "nextBookingFrom": "Free until the next booking on {date}. Choose a return date before then."
+    "nextBookingFrom": "Free until the next booking on {date}. Choose a return date before then.",
+    "noPriceYet": "No price yet",
+    "saveRate_daily": "Save {amount} a day as this vehicle's price",
+    "saveRate_weekly": "Save {amount} a week as this vehicle's price",
+    "saveRate_monthly": "Save {amount} a month as this vehicle's price"
   },
   "fleet": {
     "title": "Fleet",

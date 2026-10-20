@@ -15,8 +15,8 @@ type ChecklistItem = {
 };
 
 /**
- * What a new business still has to do, in the order it matters. The first
- * step left is the big button; the rest are a short list under it.
+ * What a new business still has to do, in the order it matters, as one
+ * numbered list with the next step highlighted.
  */
 export function OnboardingChecklist({
   completedCount,
@@ -56,7 +56,7 @@ export function OnboardingChecklist({
     );
   }
 
-  const [next, ...later] = remaining;
+  const next = remaining[0];
 
   return (
     <section className="card p-4">
@@ -75,22 +75,42 @@ export function OnboardingChecklist({
       <div className="mt-2 h-2 overflow-hidden rounded-full bg-[var(--panel-secondary)]">
         <div className="h-full rounded-full bg-[var(--primary)]" style={{ width: `${Math.max(progress, 4)}%` }} />
       </div>
-      {next ? (
-        <Link className="primary-action pressable mt-3 w-full whitespace-nowrap lg:w-auto lg:px-6" href={next.href as Route}>
-          {label(next)}
-          <ChevronRight size={18} />
-        </Link>
-      ) : null}
-      {later.length ? (
-        <div className="mt-2 space-y-1">
-          {later.map((item) => (
-            <Link className="pressable flex min-h-11 items-center justify-between gap-3 rounded-xl px-1 font-semibold text-[var(--foreground)]" href={item.href as Route} key={item.step}>
-              {label(item)}
-              <ChevronRight className="shrink-0 text-[var(--primary)]" size={18} />
-            </Link>
-          ))}
-        </div>
-      ) : null}
+      {/* One list, one pattern: the steps left, the next one highlighted. Done steps are counted in the bar above. */}
+      <ol className="mt-3 space-y-1">
+        {items.map((item, index) => {
+          if (item.completed) return null;
+          const isNext = item === next;
+          return (
+            <li key={item.step}>
+              <Link
+                aria-current={isNext ? "step" : undefined}
+                className={`pressable flex min-h-11 items-center gap-3 rounded-xl px-2.5 py-1.5 font-semibold ${
+                  isNext
+                    ? "bg-[var(--primary-light)] text-[var(--primary)]"
+                    : item.completed
+                      ? "text-[var(--muted)]"
+                      : "text-[var(--foreground)] hover:bg-[var(--panel-secondary)]"
+                }`}
+                href={item.href as Route}
+              >
+                {item.completed ? (
+                  <CheckCircle2 className="shrink-0 text-[var(--success)]" size={22} />
+                ) : (
+                  <span
+                    className={`flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full text-[12px] font-bold ${
+                      isNext ? "bg-[var(--primary)] text-white" : "border-2 border-[var(--border)] text-[var(--foreground-secondary)]"
+                    }`}
+                  >
+                    {index + 1}
+                  </span>
+                )}
+                <span className={`min-w-0 flex-1 ${item.completed ? "line-through decoration-[var(--border)]" : ""}`}>{label(item)}</span>
+                {item.completed ? null : <ChevronRight className={`shrink-0 ${isNext ? "" : "text-[var(--muted)]"}`} size={18} />}
+              </Link>
+            </li>
+          );
+        })}
+      </ol>
     </section>
   );
 }

@@ -42,13 +42,14 @@ export const ASSISTANT_TOOLS = [
           make: { type: "string" },
           model: { type: "string" },
           year: { type: "integer" },
-          registrationNumber: { type: "string", description: "License plate exactly as given" },
+          registrationNumber: { type: "string", description: "License plate exactly as given. Never make one up or write 'unknown': if the owner didn't give it, ask for it instead of calling." },
           color: { type: "string" },
           mileage: { type: "number" },
           dailyRate: { type: "number" },
           weeklyRate: { type: "number" },
           monthlyRate: { type: "number" },
-          purchasePrice: { type: "number" }
+          purchasePrice: { type: "number", description: "Only what the owner says they paid or bought it for" },
+          currentValue: { type: "number", description: "What the owner says it is worth now (its value), not what they paid" }
         },
         required: ["make", "model", "registrationNumber"]
       }
@@ -138,8 +139,16 @@ export function checkAction(kind: string, raw: Record<string, unknown>, records:
 
   if (kind === "add_vehicle") {
     const make = text(raw.make, 60);
-    const model = text(raw.model, 60);
-    const plate = text(raw.registrationNumber, 20).toUpperCase();
+    let model = text(raw.model, 60);
+    // A model may arrive with the year in it ("Ranger Wildtrak 2018"): the year goes in its own field.
+    const yearInModel = model.match(/\b(19[7-9]\d|20\d\d)\b/);
+    if (yearInModel && !raw.year) {
+      raw = { ...raw, year: Number(yearInModel[1]) };
+      model = model.replace(yearInModel[0], "").replace(/\s{2,}/g, " ").trim();
+    }
+    // "UNKNOWN", "N/A", "TBD" and the like are not a plate: ask for it rather than saving a placeholder.
+    const plateGiven = text(raw.registrationNumber, 20).toUpperCase();
+    const plate = /^(UNKNOWN|N\/?A|NONE|TBD|TBA|NOT GIVEN|NO PLATE|-+|\?+|X+)$/.test(plateGiven) ? "" : plateGiven;
     if (!make || !model) return { ok: false, error: "I need the make and model to add a vehicle." };
     if (!plate) return { ok: false, error: "What's the license plate? I need it to add the vehicle." };
     if (records.vehicles.some((entry) => entry.plate.replace(/\s+/g, "").toUpperCase() === plate.replace(/\s+/g, ""))) {
@@ -160,7 +169,8 @@ export function checkAction(kind: string, raw: Record<string, unknown>, records:
       dailyRate: amount(raw.dailyRate),
       weeklyRate: amount(raw.weeklyRate),
       monthlyRate: amount(raw.monthlyRate),
-      purchasePrice: amount(raw.purchasePrice)
+      purchasePrice: amount(raw.purchasePrice),
+      currentValue: amount(raw.currentValue)
     };
     const rows = [
       { label: "Vehicle", value: [make, model, year].filter(Boolean).join(" ") },
@@ -171,7 +181,8 @@ export function checkAction(kind: string, raw: Record<string, unknown>, records:
       args.dailyRate ? { label: "Per day", value: baht(args.dailyRate) } : null,
       args.weeklyRate ? { label: "Per week", value: baht(args.weeklyRate) } : null,
       args.monthlyRate ? { label: "Per month", value: baht(args.monthlyRate) } : null,
-      args.purchasePrice ? { label: "Bought for", value: baht(args.purchasePrice) } : null
+      args.purchasePrice ? { label: "Bought for", value: baht(args.purchasePrice) } : null,
+      args.currentValue ? { label: "Worth now", value: baht(args.currentValue) } : null
     ].filter(Boolean) as ProposedAction["rows"];
     return { ok: true, action: { kind: "add_vehicle", title: "Add this vehicle", rows, args } };
   }

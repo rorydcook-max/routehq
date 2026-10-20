@@ -142,10 +142,14 @@ export async function answerQuestion(question: string, language = "English", his
   const asked = String(question || "").trim().slice(0, 500);
   // A question gets an answer, never a "save this" card: the change tools are offered only when the message asks
   // for a change. (Gemini in particular would otherwise turn "which vehicle earned most?" into a cost to record.)
-  const isQuestion =
+  // "Can you add a car…?" is a request, not a question: a change word means the tools are offered (the model still
+  // only calls one when the message really asks for that change, and nothing is saved until the owner confirms).
+  const asksForChange =
+    /\b(add|record|log|create|register|mark|renew|renewed|book)\b/i.test(asked) || /(เพิ่ม|บันทึก|สร้าง|จอง|ต่ออายุ)/.test(asked);
+  const isQuestion = !asksForChange && (
     /[?？]\s*$/.test(asked) ||
     /^(what|which|who|when|where|how|why|is|are|was|were|do|does|did|can|could|should|will|would|show|list|tell|give me|compare|explain)\b/i.test(asked) ||
-    /(ไหม|มั้ย|อะไร|เท่าไร|เท่าไหร่|ที่ไหน|เมื่อไร|เมื่อไหร่|ใคร|ยังไง|อย่างไร|หรือเปล่า)\s*$/.test(asked);
+    /(ไหม|มั้ย|อะไร|เท่าไร|เท่าไหร่|ที่ไหน|เมื่อไร|เมื่อไหร่|ใคร|ยังไง|อย่างไร|หรือเปล่า)\s*$/.test(asked));
   if (asked.length < 3) return { ok: false, error: "Type a question first." };
   if (!aiTextConfigured()) return { ok: false, error: "The assistant isn't switched on for this account yet." };
 
@@ -207,7 +211,20 @@ export async function answerQuestion(question: string, language = "English", his
       return { ok: true, answer: "Here's what I'll save. Check it and confirm.", links: [], proposal: checked.action };
     }
 
-    const parsed = JSON.parse(completion.choices[0]?.message?.content || "{}");
+    // Gemini sometimes wraps the JSON in ``` fences or adds a line around it; a reply that isn't JSON at all is
+    // still an answer, shown as it is rather than as "couldn't reach the assistant".
+    const content = String(completion.choices[0]?.message?.content || "").trim();
+    let parsed: any = {};
+    try {
+      parsed = JSON.parse(content.replace(/^```(?:json)?\s*|\s*```$/g, "") || "{}");
+    } catch {
+      const inner = content.match(/\{[\s\S]*\}/)?.[0];
+      try {
+        parsed = inner ? JSON.parse(inner) : { answer: content };
+      } catch {
+        parsed = { answer: content };
+      }
+    }
     const answer = typeof parsed.answer === "string" ? parsed.answer.trim() : "";
     if (!answer) return { ok: false, error: "Couldn't work out an answer to that. Try asking it another way." };
 
@@ -233,7 +250,13 @@ export async function answerQuestion(question: string, language = "English", his
       });
 
     return { ok: true, answer, links };
-  } catch {
+  } catch (error) {
+    const why = error instanceof Error ? error.message : String(error);
+    console.warn("[ask] failed:", why.slice(0, 300));
+    // Out of credit won't fix itself in a moment, so it says so rather than "try again".
+    if (/no credits|insufficient_quota|exceeded your current quota|billing/i.test(why)) {
+      return { ok: false, error: "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RouteHQ works as normal." };
+    }
     return { ok: false, error: "Couldn't reach the assistant just now. Try again in a moment." };
   }
 }

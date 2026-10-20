@@ -64,7 +64,7 @@ export async function confirmAssistantAction(kind: string, args: Record<string, 
   try {
     if (checked.action.kind === "add_vehicle") {
       try {
-        await createVehicle(form(organizationId, { categoryId: a.categoryId, make: a.make, model: a.model, registrationNumber: a.registrationNumber, year: a.year, color: a.color, mileage: a.mileage, dailyRate: a.dailyRate, weeklyRate: a.weeklyRate, monthlyRate: a.monthlyRate, purchasePrice: a.purchasePrice, serviceArea: "home_branch" }));
+        await createVehicle(form(organizationId, { categoryId: a.categoryId, make: a.make, model: a.model, registrationNumber: a.registrationNumber, year: a.year, color: a.color, mileage: a.mileage, dailyRate: a.dailyRate, weeklyRate: a.weeklyRate, monthlyRate: a.monthlyRate, purchasePrice: a.purchasePrice, estimatedValue: a.currentValue, serviceArea: "home_branch" }));
       } catch (error) {
         if (!isRedirect(error)) throw error;
       }

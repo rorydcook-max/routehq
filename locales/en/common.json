@@ -1276,7 +1276,7 @@
     "sending": "Sending…",
     "send": "Send",
     "toSendTitle": "{count, plural, one {1 message to send} other {# messages to send}}",
-    "toSendWhy": "These customers have no chat open with you yet, so the app couldn't send these itself. Tap Send to open the app with the message filled in, then tap Done.",
+    "toSendWhy": "These customers have no chat open with you yet, so the app couldn't send these itself. Tap Open, send the message from your phone, then tap Done.",
     "toSendCount": "{count, plural, one {1 message} other {# messages}}",
     "toSendOpen": "Open",
     "toSendNoName": "Customer",
@@ -2603,7 +2603,8 @@
     "papersOkDetail": "Nothing due in the next 30 days",
     "papersMissingTitle": "Paper dates",
     "papersMissingDetail": "{count, plural, one {vehicle has} other {vehicles have}} no tax or insurance dates yet",
-    "utilShort": "{pct}% rented"
+    "utilShort": "{pct}% rented",
+    "setPrice": "Set price"
   },
   "customers": {
     "noRentals": "No rentals yet",

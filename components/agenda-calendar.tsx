@@ -118,7 +118,11 @@ export function AgendaCalendar({
     const subject = String(words?.subject || "").split(" · ")[0].trim();
     const parts = subject.split(" ");
     const model = parts.length > 1 ? parts.slice(1).join(" ") : subject;
-    if (words?.amount) return words.amount;
+    // A payment says whose it is: "฿9,000 · Somchai" (a bare amount meant opening it to find out).
+    if (words?.amount) {
+      const firstName = String(words.subject || "").trim().split(/\s+/)[0];
+      return firstName && firstName !== "Customer" ? `${words.amount} · ${firstName}` : words.amount;
+    }
     if (words?.paper) {
       const paper = papers.has(`paper_${words.paper}`) ? papers(`paper_${words.paper}`) : words.paper;
       return model ? `${paper} · ${model}` : paper;

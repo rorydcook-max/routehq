@@ -238,10 +238,11 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                   <tr className="border-b border-[var(--border)] text-[var(--muted)]">
                     <th className="w-10 py-2.5 pl-4 pr-2"><span className="sr-only">{t("select")}</span></th>
                     <th className="py-2.5 pr-3">{t("th_vehicle")}</th>
-                    <th className="w-[112px] px-3 py-2.5">{t("th_status")}</th>
+                    {/* Status fits "Free until 8 Nov" on one line; paperwork gets the room for its chip, so rows stay one or two lines tall. */}
+                    <th className="w-[148px] px-3 py-2.5">{t("th_status")}</th>
                     <th className="w-[116px] px-3 py-2.5">{t("th_rate")}</th>
-                    <th className="w-[150px] px-3 py-2.5 xl:w-[170px]">{t("th_onRent")}</th>
-                    <th className="w-[140px] px-3 py-2.5 xl:w-[150px]">{t("th_paperwork")}</th>
+                    <th className="w-[140px] px-3 py-2.5 xl:w-[160px]">{t("th_onRent")}</th>
+                    <th className="w-[190px] px-3 py-2.5 xl:w-[230px]">{t("th_paperwork")}</th>
                     <th className="hidden w-[120px] px-3 py-2.5 pr-4 xl:table-cell">{t("th_profit")}</th>
                   </tr>
                 </thead>
@@ -261,16 +262,25 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                                 {vehicle.make} {vehicle.model}
                               </span>
                               <span className="block truncate text-[14px] text-[var(--muted)]">
-                                <span className="font-mono-data">{vehicle.plate}</span> · {vehicle.year || t("yearUnknown")} · {vehicle.mileage.toLocaleString()} km
+                                <span className="font-mono-data">{vehicle.plate}</span> · {vehicle.year || t("yearUnknown")}
+                                {/* A mileage nobody has entered yet isn't "0 km". */}
+                                {vehicle.mileage > 0 ? ` · ${vehicle.mileage.toLocaleString()} km` : ""}
                               </span>
                             </span>
                           </Link>
                         </td>
                         <td className="px-3 py-3">
-                          {vehicle.freeUntil ? <Badge tone="green">{t("status_freeUntil", { date: dayMonth(vehicle.freeUntil) })}</Badge> : <Badge tone={statusTone[vehicle.status]}>{t(`status_${vehicle.status}`)}</Badge>}
+                          <span className="inline-block whitespace-nowrap">
+                            {vehicle.freeUntil ? <Badge tone="green">{t("status_freeUntil", { date: dayMonth(vehicle.freeUntil) })}</Badge> : <Badge tone={statusTone[vehicle.status]}>{t(`status_${vehicle.status}`)}</Badge>}
+                          </span>
                         </td>
                         <td className="px-3 py-3">
-                          <Link className="font-mono-data block" href={href}>{priceOf(vehicle) || <span className="text-[var(--muted)]">{t("notSet")}</span>}</Link>
+                          {/* No price yet: the cell is the way to set one. */}
+                          {priceOf(vehicle) ? (
+                            <Link className="font-mono-data block" href={href}>{priceOf(vehicle)}</Link>
+                          ) : (
+                            <Link className="block whitespace-nowrap font-semibold text-[var(--primary)] hover:underline" href={`/fleet/${vehicle.id}/edit` as never}>{t("setPrice")}</Link>
+                          )}
                         </td>
                         <td className="px-3 py-3">
                           <div className="flex min-w-32 items-center gap-2">

@@ -17,7 +17,8 @@ import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
  * happens to load a page, including customers who aren't signed in.
  */
 
-const OPEN_LINK_STATUSES = ["pending", "sent", "viewed", "expired"];
+// Details saved but not signed is still an open hold: the dates are not confirmed until the signature.
+const OPEN_LINK_STATUSES = ["pending", "sent", "viewed", "details_submitted", "expired"];
 
 export function holdDeadline(holdHours: number, from = Date.now()) {
   return new Date(from + holdHours * 3_600_000).toISOString();

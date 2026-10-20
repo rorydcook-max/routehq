@@ -88,7 +88,7 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
     .select("id, customers!inner(phone)")
     .eq("organization_id", organizationId)
     .in("booking_data->>source", ["public_page", "directory"])
-    .in("status", ["pending", "viewed"])
+    .in("status", ["pending", "viewed", "details_submitted"])
     .is("customer_details_submitted_at", null)
     .in("customers.phone", phoneVariants(phone));
   if ((unfinished || []).length >= 2) return { ok: false, error: await said("You already have bookings waiting for your details. Please finish those first, or contact the business.") };

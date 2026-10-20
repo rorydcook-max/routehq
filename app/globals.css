@@ -1494,8 +1494,41 @@ aside a[class*="bg-[var(--sidebar-active)]"] {
   src: url("/fonts/prompt-latin-700.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+/* Rory, 20 Oct: headings move from Prompt to Bai Jamjuree (squarer, more of a product face). Prompt stays loaded for any older rule that names it. */
+@font-face {
+  font-family: "Bai Jamjuree";
+  font-display: swap;
+  font-style: normal;
+  font-weight: 600;
+  src: url("/fonts/baijamjuree-thai-600.woff2") format("woff2");
+  unicode-range: U+02D7, U+0303, U+0331, U+0E01-0E5B, U+200C-200D, U+25CC;
+}
+@font-face {
+  font-family: "Bai Jamjuree";
+  font-display: swap;
+  font-style: normal;
+  font-weight: 700;
+  src: url("/fonts/baijamjuree-thai-700.woff2") format("woff2");
+  unicode-range: U+02D7, U+0303, U+0331, U+0E01-0E5B, U+200C-200D, U+25CC;
+}
+@font-face {
+  font-family: "Bai Jamjuree";
+  font-display: swap;
+  font-style: normal;
+  font-weight: 600;
+  src: url("/fonts/baijamjuree-latin-600.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Bai Jamjuree";
+  font-display: swap;
+  font-style: normal;
+  font-weight: 700;
+  src: url("/fonts/baijamjuree-latin-700.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 :root {
-  --font-display: "Prompt", "Anuphan", system-ui, sans-serif;
+  --font-display: "Bai Jamjuree", "Prompt", "Anuphan", system-ui, sans-serif;
   --shadow-card: 0 1px 2px rgba(19, 38, 43, 0.06), 0 12px 30px rgba(14, 94, 111, 0.11);
   --shadow-lift: 0 2px 4px rgba(19, 38, 43, 0.07), 0 18px 40px rgba(14, 94, 111, 0.16);
   /* What each colour means, everywhere: */
@@ -1557,8 +1590,8 @@ a.card.pressable:hover {
 .tile-mango { background: var(--accent-light); color: #5c3a0c; }
 .tile .tile-title, .tile-title { font-family: var(--font-display); font-weight: 600; font-size: 16px; letter-spacing: -0.005em; }
 h1, .page-hero h1 { letter-spacing: -0.02em; }
-/* Prompt is wide at 30px: pulled in a touch more so the page title reads as one word, not letters in a row. */
-.page-title, .page-hero h1 { letter-spacing: -0.03em; line-height: 1.1; }
+/* Bai Jamjuree is squarer than Prompt, so the big titles get only a touch of tightening. */
+.page-title, .page-hero h1 { letter-spacing: -0.015em; line-height: 1.1; }
 h2 { letter-spacing: -0.015em; }
 
 /* The band: faint rings and a sun in its top corner, so a business colour is never just a flat block. */

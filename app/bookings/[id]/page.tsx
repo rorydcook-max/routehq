@@ -519,6 +519,19 @@ export default async function BookingDetailPage({ params, searchParams }: { para
         tone: "green" as const
       };
     }
+    // Booked, nothing scheduled yet: the schedule is written at signing, so say what the handover will
+    // collect instead of asking the operator to "add a payment row".
+    if (!activeRentalStatus && !isClosed && activePayments.length === 0 && outstandingBalance <= 0 && paymentDueOnDeliveryAmount > 0) {
+      const depositDue = Number(rental.deposit_amount || 0);
+      return {
+        label: tx.say("fin_nothingDueYet"),
+        detail: depositDue > 0
+          ? tx.say("fin_atHandoverWithDeposit", { total: money(paymentDueOnDeliveryAmount + depositDue, rental.currency), rent: money(paymentDueOnDeliveryAmount, rental.currency), deposit: money(depositDue, rental.currency) })
+          : tx.say("fin_atHandover", { rent: money(paymentDueOnDeliveryAmount, rental.currency) }),
+        amount: null as number | null,
+        tone: "neutral" as const
+      };
+    }
     return {
       label: outstandingBalance > 0 ? tx.say("fin_outstanding") : tx.say("fin_noSchedule"),
       detail: outstandingBalance > 0 ? tx.say("fin_remains") : tx.say("fin_addRow"),
@@ -1335,7 +1348,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             <Pane
               id="booking-link"
               open={Boolean(bookingLink) && String(bookingLink?.status || "") !== "completed" && !isClosed}
-              summary={!bookingLink ? tx.say("link_notCreated") : String(bookingLink.status || "") === "completed" ? tx.say("link_finished") : isCancelled ? tx.say("link_closed") : tx.say("link_waiting")}
+              summary={!bookingLink ? tx.say("link_notCreated") : String(bookingLink.status || "") === "completed" ? tx.say("link_finished") : isCancelled ? tx.say("link_closed") : bookingLink.customer_details_submitted_at ? tx.say("link_waitingSignature") : tx.say("link_waiting")}
               title={tx.say("linkTitle")}
               tone={bookingLink && String(bookingLink.status || "") !== "completed" && !isClosed ? "amber" : "neutral"}
             >

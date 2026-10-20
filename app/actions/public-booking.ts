@@ -798,9 +798,11 @@ export async function completePublicBooking(formData: FormData) {
   // the operator can see the customer finished their part even if signing
   // cannot complete yet - nothing they entered is lost.
   if (!bookingLink.customer_details_submitted_at) {
+    // The status moves on too, so the booking page says "Details received" rather than "Customer opened link".
+    const advance = ["pending", "sent", "viewed"].includes(String(bookingLink.status || "")) ? { status: "details_submitted" } : {};
     await supabase
       .from("booking_links")
-      .update({ customer_details_submitted_at: new Date().toISOString() })
+      .update({ customer_details_submitted_at: new Date().toISOString(), ...advance })
       .eq("id", bookingLink.id)
       .is("customer_details_submitted_at", null);
   }

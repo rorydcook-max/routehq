@@ -815,25 +815,21 @@ export function BookingForm({
             </div>
 
           </div>
+          {/* The picker row already shows who was chosen; this only adds what to know about them before going on. */}
           {selectedCustomer ? (
-            <div className="sub-surface mt-3 p-3">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-lg font-semibold text-[var(--foreground)]">
-                    {flagForNationality(selectedCustomer.nationality)} {selectedCustomer.full_name}
-                  </p>
-                  <p className="mt-1 text-sm font-semibold text-[var(--muted)]">{selectedCustomer.phone || say("noPhone")}</p>
-                </div>
+            <div className="mt-3 space-y-2">
+              <div className="flex items-center gap-2">
                 <Badge tone={documentTone(selectedCustomer.document_status)}>{documentLabel(selectedCustomer.document_status)}</Badge>
+                {!selectedCustomer.phone ? <span className="text-sm font-semibold text-[var(--muted)]">{say("noPhone")}</span> : null}
               </div>
               {selectedCustomer.do_not_rent ? (
-                <p className="mt-3 rounded-lg bg-[var(--danger-light)] p-3 text-sm font-bold text-[var(--danger)]" role="alert">
+                <p className="rounded-lg bg-[var(--danger-light)] p-3 text-sm font-bold text-[var(--danger)]" role="alert">
                   {say("doNotRent")}
                   {selectedCustomer.do_not_rent_reason ? <span className="block font-semibold">{selectedCustomer.do_not_rent_reason}</span> : null}
                 </p>
               ) : null}
               {selectedCustomer.document_status !== "complete" ? (
-                <p className="mt-3 rounded-lg bg-[var(--warning-light)] p-3 text-sm font-semibold text-[var(--warning)]">{say("missingDocs")}</p>
+                <p className="rounded-lg bg-[var(--warning-light)] p-3 text-sm font-semibold text-[var(--warning)]">{say("missingDocs")}</p>
               ) : null}
             </div>
           ) : null}

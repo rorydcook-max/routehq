@@ -398,7 +398,14 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                   </div>
 
                   <Link className="mt-2 block text-[19px] font-bold leading-tight text-[var(--foreground)] after:absolute after:inset-0 after:content-[''] hover:text-[var(--primary)]" href={`/bookings/${booking.id}`}>
-                    {booking.customers ? customerLabel(booking, tx) : <span className="inline-flex items-center gap-1.5 text-[var(--warning)]"><Clock size={18} /> {tx.say("awaitingCustomer")}</span>}
+                    {booking.customers ? (
+                      customerLabel(booking, tx)
+                    ) : booking.status === "cancelled" ? (
+                      // Nothing is awaited on a cancelled booking: the link was never filled in.
+                      <span className="text-[var(--muted)]">{tx.say("noCustomer")}</span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 text-[var(--warning)]"><Clock size={18} /> {tx.say("awaitingCustomer")}</span>
+                    )}
                   </Link>
 
                   {/* One line: the vehicle and the dates. The plate and the phone are on the booking. */}

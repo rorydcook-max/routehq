@@ -1218,7 +1218,8 @@
     "secNow": "On rent now",
     "secUpcoming": "Coming up",
     "secDone": "Finished",
-    "showAllDone": "Show all {count} finished"
+    "showAllDone": "Show all {count} finished",
+    "noCustomer": "No customer (link never filled in)"
   },
   "inbox": {
     "title": "Inbox",

@@ -1619,8 +1619,20 @@ function NationalitySelect({ defaultValue, fill, name }: { defaultValue: string;
         autoComplete="off"
         className={inputClass}
         onBlur={() => {
-          // If nothing selected, clear back to empty so required validation fires correctly
-          if (!selected) setSearch("");
+          if (selected) return;
+          // Typed "Thailand" or "thai" and moved on without tapping the row: take the one match rather
+          // than wiping the box and failing later with "nationality is required".
+          const needle = search.toLowerCase().trim();
+          const exact = needle ? NATIONALITIES.filter((n) => [n.name, n.country, countryName(n)].some((label) => label.toLowerCase() === needle)) : [];
+          const match = exact.length === 1 ? exact[0] : filtered.length === 1 ? filtered[0] : null;
+          if (match) {
+            setSelected(match.name);
+            setSearch(shown(match));
+            setOpen(false);
+            return;
+          }
+          // Otherwise clear back to empty so required validation fires correctly
+          setSearch("");
         }}
         onChange={(e) => {
           setSearch(e.target.value);

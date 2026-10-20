@@ -22,10 +22,25 @@ import {
 } from "@/lib/rental-document-customer-signing";
 import { toWallTime, wallTimeToIso, businessToday } from "@/lib/business-time";
 
+// The customer reads these, so a missing field is named the way the form labels it, not by its key.
+const FIELD_WORDS: Record<string, string> = {
+  fullName: "your full name",
+  nationality: "your nationality (choose it from the list)",
+  phone: "your phone number",
+  dateOfBirth: "your date of birth",
+  preferredContactMethod: "how we should contact you",
+  passportNumber: "your passport or ID number",
+  driverLicenseNumber: "your driving licence number",
+  driverLicenseExpiry: "when your driving licence runs out",
+  driverLicenseCountry: "the country that issued your licence",
+  signedName: "your name as signed",
+  signature: "your signature"
+};
+
 function requiredString(formData: FormData, key: string) {
   const value = String(formData.get(key) || "").trim();
   if (!value) {
-    throw new Error(`${key} is required.`);
+    throw new Error(`Please add ${FIELD_WORDS[key] || key.replace(/([A-Z])/g, " $1").toLowerCase()}.`);
   }
   return value;
 }

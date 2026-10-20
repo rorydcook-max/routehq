@@ -19,6 +19,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { AssignCustomerModal } from "@/app/bookings/[id]/assign-customer-modal";
 import { SkipInspectionButton } from "@/app/bookings/[id]/skip-inspection-button";
 import { earlyStartFor } from "@/lib/early-start";
+import { lateStartFor } from "@/lib/late-start";
 import { BookingShareActions } from "@/app/bookings/[id]/booking-share-actions";
 import { RefundDepositPanel } from "@/app/bookings/[id]/refund-deposit-panel";
 import { ExtrasPanel } from "@/app/bookings/[id]/extras-panel";
@@ -925,7 +926,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                       >
                         {tx.say("fillHandover")}
                       </Link>
-                      <SkipInspectionButton canWaive={isOwner} early={earlyStartFor(rental, vehicle, businessToday())} rentalId={rental.id} />
+                      <SkipInspectionButton canWaive={isOwner} early={earlyStartFor(rental, vehicle, businessToday())} late={lateStartFor(rental, businessToday())} rentalId={rental.id} />
                     </div>
                   </div>
                 ) : isRetrospective ? (
@@ -955,7 +956,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     <Link className="primary-action pressable block w-full px-3 py-2 text-center" href={`/inspections/delivery/${rental.id}` as Route}>
                       {tx.say("startHandover")}
                     </Link>
-                    <SkipInspectionButton canWaive={isOwner} early={earlyStartFor(rental, vehicle, businessToday())} rentalId={rental.id} />
+                    <SkipInspectionButton canWaive={isOwner} early={earlyStartFor(rental, vehicle, businessToday())} late={lateStartFor(rental, businessToday())} rentalId={rental.id} />
                   </div>
                 ) : rental.status === "completed" ? (
                   <div className="sub-surface p-3">

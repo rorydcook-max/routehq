@@ -1,6 +1,7 @@
 "use server";
 
 import { earlyStartFor, ensureEarlyStartCharge } from "@/lib/early-start";
+import { applyLateStart } from "@/lib/late-start";
 import { tellRentalCustomer } from "@/lib/customer-messages";
 import { getTransactionFormOptions } from "@/lib/transactions";
 import { chargeRenter } from "@/lib/charges";
@@ -267,6 +268,12 @@ export async function recordDeliveryCashPaymentAndReceipt(formData: FormData) {
     const { data: rates } = await supabase.from("vehicles").select("daily_rate, weekly_rate, monthly_rate").eq("id", vehicleId).eq("organization_id", organizationId).maybeSingle();
     const early = earlyStartFor(booked, rates, today);
     if (early) await ensureEarlyStartCharge(supabase, { organizationId, rentalId, vehicleId, customerId: customerId || rental.customer_id || null, currency: rental.currency || "THB", today, early });
+  }
+
+  // Handed over late: the missed days come off the rent (or the schedule moves) before the cash is set against it,
+  // so the customer is never asked for days they didn't have. The form's save then finds it already done.
+  if (formData.has("lateStart")) {
+    await applyLateStart(supabase, { organizationId, rentalId, today, choice: String(formData.get("lateStart") || "") }).catch((error) => console.error("late start failed", error));
   }
 
   const { data: existingPayments, error: existingPaymentsError } = await supabase

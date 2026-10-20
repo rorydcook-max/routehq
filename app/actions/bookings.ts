@@ -21,6 +21,7 @@ import { notifyOperator } from "@/lib/notify-operator";
 import { wallTimeToIso, businessToday } from "@/lib/business-time";
 import { DOUBLE_BOOKING_MESSAGE, earlyHandoverBlocker, isDoubleBookingError, vehicleConflictMessage } from "@/lib/rental-conflicts";
 import { earlyStartFor, ensureEarlyStartCharge, requestEarlyWaiver, settleEarlyChoice } from "@/lib/early-start";
+import { applyLateStart, lateStartNote } from "@/lib/late-start";
 import { syncVehicleStatusFromBookings } from "@/lib/vehicle-status";
 import { canDecideMoney, getCurrentMembership } from "@/lib/auth/roles";
 import { holdDeadline, retakeHold } from "@/lib/booking-holds";
@@ -1029,7 +1030,7 @@ export async function deleteBooking(rentalId: string): Promise<{ success: boolea
   return { success: true };
 }
 
-export async function manuallyActivateRental(rentalId: string, earlyStart?: string): Promise<{ success: boolean; error?: string }> {
+export async function manuallyActivateRental(rentalId: string, earlyStart?: string, lateStart?: string): Promise<{ success: boolean; error?: string }> {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -1080,6 +1081,28 @@ export async function manuallyActivateRental(rentalId: string, earlyStart?: stri
         }
       }
     }
+  }
+
+  // Handed over after the booked start date: rent starts today (the return date stays, or an open-ended
+  // schedule moves with it), or the booking keeps its dates, as the owner chose. Before activation, so it
+  // still sees a booking.
+  const lateResult = await applyLateStart(supabase, { organizationId: rental.organization_id, rentalId: cleanId, today: handoverDate, choice: lateStart }).catch((error) => {
+    console.error("late start failed", error);
+    return null;
+  });
+  if (lateResult) {
+    await recordActivityEvent(supabase, {
+      organization_id: rental.organization_id,
+      actor_id: user.id,
+      entity_type: "rental",
+      entity_id: cleanId,
+      vehicle_id: rental.vehicle_id,
+      rental_id: cleanId,
+      customer_id: rental.customer_id,
+      event_type: "late_start",
+      title: "Handed over late",
+      detail: lateStartNote(lateResult)
+    }).catch(() => null);
   }
 
   // Also set the vehicle to rented if not already

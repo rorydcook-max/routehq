@@ -15,6 +15,7 @@ import { uploadFormFiles } from "@/lib/direct-upload-client";
 import { recordDeliveryCashPaymentAndReceipt } from "@/app/actions/transactions";
 import type { InspectionContext } from "@/lib/inspection-detail";
 import { earlyStartFor, type EarlyStartChoice } from "@/lib/early-start";
+import { lateStartFor, type LateStartChoice } from "@/lib/late-start";
 
 type DamageItem = {
   id: string;
@@ -436,6 +437,10 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
   const early = useMemo(() => (mode === "delivery" && !isSwap ? earlyStartFor(context.rental, context.vehicle, businessToday()) : null), [mode, isSwap, context.rental, context.vehicle]);
   const [earlyChoice, setEarlyChoice] = useState<EarlyStartChoice>(() => (early && early.amount > 0 ? "charge" : "free"));
   const [earlyAdded, setEarlyAdded] = useState(0);
+  // Handed over after the booked start: rent starts today (the default) or keeps the booked dates.
+  const late = useMemo(() => (mode === "delivery" && !isSwap ? lateStartFor(context.rental, businessToday()) : null), [mode, isSwap, context.rental]);
+  const [lateChoice, setLateChoice] = useState<LateStartChoice>("from_handover");
+  const [lateTakenOff, setLateTakenOff] = useState(0);
   // A vehicle collected in a swap doesn't settle the deposit: the rental carries on.
   const depositAlreadyReturned = mode === "return" && !isSwap && context.rental?.deposit_status === "fully_returned";
   // No tracker fitted: skip the GPS step rather than show an empty screen.
@@ -694,6 +699,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
     formData.set("depositAmount", String(depositAmount));
     formData.set("paymentMethod", "cash");
     formData.set("earlyStart", early ? earlyChoice : "");
+    if (late) formData.set("lateStart", lateChoice);
     formData.set("customerName", context.customer?.full_name || "Customer");
     formData.set("vehicleMakeModel", [context.vehicle.make, context.vehicle.model, context.vehicle.trim].filter(Boolean).join(" "));
     formData.set("vehiclePlate", context.vehicle.registration_number || "");
@@ -813,6 +819,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
       <input name="mode" type="hidden" value={mode} />
       <input name="swap" type="hidden" value={isSwap ? "1" : ""} />
       <input name="earlyStart" type="hidden" value={early ? earlyChoice : ""} />
+      {late ? <input name="lateStart" type="hidden" value={lateChoice} /> : null}
       <input name="rentalId" type="hidden" value={context.rental?.id || ""} />
       <input name="vehicleId" type="hidden" value={context.vehicle.id} />
       <input name="customerId" type="hidden" value={context.customer?.id || ""} />
@@ -895,6 +902,31 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
               </div>
             </fieldset>
           ) : null}
+          {late && !blocker ? (
+            <fieldset className="mt-4">
+              <legend className="text-sm font-bold text-[var(--foreground)]">{t("lateTitle", { days: late.days, date: formatDate(late.bookedStart, locale) })}</legend>
+              <div className="mt-2 space-y-2">
+                {(
+                  [
+                    {
+                      value: "from_handover",
+                      label: late.openEnded
+                        ? t("lateFromTodayMoves", { days: late.days })
+                        : late.credit > 0
+                          ? t("lateFromToday", { date: formatDate(late.bookedEnd, locale), amount: money(late.credit) })
+                          : t("lateFromTodayPlain", { date: formatDate(late.bookedEnd, locale) })
+                    },
+                    { value: "as_booked", label: t("lateAsBooked", { date: formatDate(late.bookedStart, locale) }) }
+                  ] as { value: LateStartChoice; label: string }[]
+                ).map((option) => (
+                  <label className={`flex min-h-12 cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 text-sm font-semibold ${lateChoice === option.value ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground)]"}`} key={option.value}>
+                    <input checked={lateChoice === option.value} className="h-4 w-4 accent-[var(--primary)]" name="lateStartChoice" onChange={() => setLateChoice(option.value)} type="radio" value={option.value} />
+                    {option.label}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          ) : null}
           {blocker ? null : (
             <button
               className={`${touchButton} mt-5 w-full bg-[var(--primary)] text-white shadow-lg`}
@@ -908,6 +940,15 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
                   });
                   if (add > 0) setCollectOpen(true);
                   setEarlyAdded(add);
+                }
+                // Rent from today on a booking with a return date: the missed days aren't collected (and come back if the answer changes).
+                const off = late && lateChoice === "from_handover" && !late.openEnded ? late.credit : 0;
+                if (off !== lateTakenOff) {
+                  setDeliveryPaymentAmount((current) => {
+                    const next = Math.max(0, Number(current || 0) + lateTakenOff - off);
+                    return next ? String(next) : "";
+                  });
+                  setLateTakenOff(off);
                 }
                 setStep(1);
               }}

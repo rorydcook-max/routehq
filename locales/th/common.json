@@ -396,7 +396,12 @@
     "fuelAtDelivery": "ตอนส่งมอบ: {level}",
     "photoTaken": "เพิ่มรูปแล้ว",
     "retakePhoto": "ถ่ายใหม่",
-    "orFourPhotos": "หรือถ่ายรูปแต่ละด้าน"
+    "orFourPhotos": "หรือถ่ายรูปแต่ละด้าน",
+    "lateTitle": "ส่งมอบรถช้ากว่าวันเริ่มที่จองไว้ {days} วัน ({date}) เริ่มคิดค่าเช่าเมื่อไหร่?",
+    "lateFromToday": "เริ่มวันนี้: คืนรถ {date} ตามที่จอง ลดค่าเช่า {amount}",
+    "lateFromTodayPlain": "เริ่มวันนี้: คืนรถ {date} ตามที่จอง",
+    "lateFromTodayMoves": "เริ่มวันนี้: เลื่อนวันชำระทุกงวดออกไป {days} วัน",
+    "lateAsBooked": "ตามที่จอง เริ่ม {date}"
   },
   "translation": {
     "translatedFrom": "แปลจาก {language}",
@@ -2325,7 +2330,8 @@
     "fin_collectAtHandoverDetail": "ยังไม่มียอดค้างจนกว่าจะส่งมอบรถ เก็บเงินจำนวนนี้ตอนส่งมอบ หรือยกเลิกการจองหากลูกค้าไม่มารับรถ",
     "track_atHandover": "เก็บ {amount} ตอนส่งมอบรถ",
     "grp_atHandover": "เก็บตอนส่งมอบรถ — {count} รายการ",
-    "pc_b_atHandover": "ตอนส่งมอบ"
+    "pc_b_atHandover": "ตอนส่งมอบ",
+    "hist_late_start": "ส่งมอบรถล่าช้า"
   },
   "newBooking": {
     "pageBack": "กลับไปที่การจอง",

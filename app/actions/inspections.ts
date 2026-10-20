@@ -19,6 +19,7 @@ import { inspectionUploadPrefix, readUploadedFiles } from "@/lib/direct-uploads"
 import { earlyHandoverBlocker, isDoubleBookingError } from "@/lib/rental-conflicts";
 import { said } from "@/lib/i18n/server-text";
 import { earlyStartFor, ensureEarlyStartCharge, requestEarlyWaiver, settleEarlyChoice } from "@/lib/early-start";
+import { applyLateStart, lateStartNote } from "@/lib/late-start";
 import { canDecideMoney, getCurrentMembership } from "@/lib/auth/roles";
 
 type InspectionMode = "delivery" | "return" | "condition_report";
@@ -642,6 +643,26 @@ export async function submitInspection(formData: FormData) {
     }
     const earlyChoice = settleEarlyChoice(stringField(formData, "earlyStart"), early, early ? canDecideMoney((await getCurrentMembership())?.role) : true);
     const shortenTo = early && earlyChoice === "shorten" ? early.shortenedEnd : null;
+    // Late: rent starts today (same return date, or an open-ended schedule moves with it), or the booking keeps
+    // its dates, as the owner chose at the start. Applied while it is still a booking; does nothing the second time.
+    const lateResult = await applyLateStart(supabase, { organizationId, rentalId, today: handoverDate, choice: stringField(formData, "lateStart") }).catch((error) => {
+      console.error("late start failed", error);
+      return null;
+    });
+    if (lateResult) {
+      await recordActivityEvent(supabase, {
+        organization_id: organizationId,
+        actor_id: user.id,
+        entity_type: "rental",
+        entity_id: rentalId,
+        vehicle_id: vehicleId,
+        rental_id: rentalId,
+        customer_id: bookedRental?.customer_id || customerId || null,
+        event_type: "late_start",
+        title: "Handed over late",
+        detail: lateStartNote(lateResult)
+      }).catch(() => null);
+    }
 
     const { error: rentalError } = await supabase
       .from("rentals")

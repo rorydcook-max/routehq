@@ -4,14 +4,16 @@ import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { manuallyActivateRental } from "@/app/actions/bookings";
 import type { EarlyStart, EarlyStartChoice } from "@/lib/early-start";
+import type { LateStart, LateStartChoice } from "@/lib/late-start";
 import { longDate } from "@/lib/i18n/dates";
 import { useLocale } from "next-intl";
 
-export function SkipInspectionButton({ rentalId, early = null, canWaive = true }: { rentalId: string; early?: EarlyStart | null; canWaive?: boolean }) {
+export function SkipInspectionButton({ rentalId, early = null, late = null, canWaive = true }: { rentalId: string; early?: EarlyStart | null; late?: LateStart | null; canWaive?: boolean }) {
   const say = useTranslations("booking") as unknown as (key: string) => string;
   const ask = useTranslations("inspection") as unknown as (key: string, values?: Record<string, string | number>) => string;
   const locale = useLocale();
   const [earlyChoice, setEarlyChoice] = useState<EarlyStartChoice>(early && early.amount > 0 ? "charge" : "free");
+  const [lateChoice, setLateChoice] = useState<LateStartChoice>("from_handover");
   const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -19,7 +21,7 @@ export function SkipInspectionButton({ rentalId, early = null, canWaive = true }
   function handleConfirm() {
     setError(null);
     startTransition(async () => {
-      const result = await manuallyActivateRental(rentalId, early ? earlyChoice : undefined);
+      const result = await manuallyActivateRental(rentalId, early ? earlyChoice : undefined, late ? lateChoice : undefined);
       if (!result.success) {
         setError(result.error || say("skip_failed"));
         setShowConfirm(false);
@@ -46,6 +48,31 @@ export function SkipInspectionButton({ rentalId, early = null, canWaive = true }
               ).map((option) => (
                 <label className="flex min-h-9 cursor-pointer items-center gap-2 rounded-lg bg-white px-2 py-1 text-xs font-semibold text-[var(--foreground)]" key={option.value}>
                   <input checked={earlyChoice === option.value} className="h-4 w-4 accent-[var(--primary)]" name="skipEarlyStart" onChange={() => setEarlyChoice(option.value)} type="radio" value={option.value} />
+                  {option.label}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        ) : null}
+        {late ? (
+          <fieldset className="mb-3">
+            <legend className="text-xs font-bold text-[var(--foreground)]">{ask("lateTitle", { days: late.days, date: longDate(late.bookedStart, locale) })}</legend>
+            <div className="mt-1 space-y-1">
+              {(
+                [
+                  {
+                    value: "from_handover",
+                    label: late.openEnded
+                      ? ask("lateFromTodayMoves", { days: late.days })
+                      : late.credit > 0
+                        ? ask("lateFromToday", { date: longDate(late.bookedEnd || "", locale), amount: `฿${late.credit.toLocaleString("en-US")}` })
+                        : ask("lateFromTodayPlain", { date: longDate(late.bookedEnd || "", locale) })
+                  },
+                  { value: "as_booked", label: ask("lateAsBooked", { date: longDate(late.bookedStart, locale) }) }
+                ] as { value: LateStartChoice; label: string }[]
+              ).map((option) => (
+                <label className="flex min-h-9 cursor-pointer items-center gap-2 rounded-lg bg-white px-2 py-1 text-xs font-semibold text-[var(--foreground)]" key={option.value}>
+                  <input checked={lateChoice === option.value} className="h-4 w-4 accent-[var(--primary)]" name="skipLateStart" onChange={() => setLateChoice(option.value)} type="radio" value={option.value} />
                   {option.label}
                 </label>
               ))}

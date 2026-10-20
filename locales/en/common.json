@@ -416,7 +416,12 @@
     "fuelAtDelivery": "At handover: {level}",
     "photoTaken": "Photo added",
     "retakePhoto": "Retake",
-    "orFourPhotos": "or a photo of each side"
+    "orFourPhotos": "or a photo of each side",
+    "lateTitle": "Going out {days, plural, one {# day} other {# days}} after the booked start ({date}). When does rent start?",
+    "lateFromToday": "From today: back on {date} as booked, {amount} off the rent",
+    "lateFromTodayPlain": "From today: back on {date} as booked",
+    "lateFromTodayMoves": "From today: every payment date moves {days, plural, one {# day} other {# days}} later",
+    "lateAsBooked": "As booked, from {date}"
   },
   "translation": {
     "translatedFrom": "Translated from {language}",
@@ -2316,7 +2321,8 @@
     "fin_collectAtHandoverDetail": "Nothing is owed until the vehicle goes out. Take this when you hand it over, or cancel the booking if it isn't going ahead.",
     "track_atHandover": "{amount} to collect at handover",
     "grp_atHandover": "To collect at handover — {count, plural, one {# payment} other {# payments}}",
-    "pc_b_atHandover": "At handover"
+    "pc_b_atHandover": "At handover",
+    "hist_late_start": "Handed over late"
   },
   "newBooking": {
     "pageBack": "Back to bookings",

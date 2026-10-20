@@ -55,7 +55,15 @@ function replyShape(o: { country: string; area: string; currency: string; price:
   "rent_fade_from_age": number,
   "rent_fade_pct": number,
   "max_rental_age": number,
-  "market_price_low": number, "market_price_high": number,
+  "market_price_low": number, "market_price_typical": number, "market_price_high": number,
+  "demand": "high" | "medium" | "low",
+  "demand_note": string,
+  "reliability": 1 | 2 | 3 | 4 | 5,
+  "reliability_note": string,
+  "parts": "easy" | "average" | "hard",
+  "known_issues": [{ "issue": string, "severity": "minor" | "watch" | "serious", "typical_cost": number }],
+  "value_note": string,
+  "alternatives": [{ "name": string, "typical_price": number, "rent_month": number, "why": string }],
   "notes": [up to 4 short sentences],
   "notes_en": [the same notes in English],
   "confidence": "high" | "medium" | "low"
@@ -75,8 +83,15 @@ What each field means:
 - resale_pct_by_year: what it would sell for after 1, 2, ... 10 years of being owned from today, as a % of the price paid today (${o.price ? `${o.price} ${o.currency}` : "the typical market price"}), allowing for rental mileage of about 25,000 km a year for cars and vans or 12,000 km for two-wheelers.
 - rent_fade_from_age: vehicle age in years from which customers pay less for it. rent_fade_pct: how much less each year from then.
 - max_rental_age: age in years after which rental customers or insurers stop accepting it.
-- market_price_low / market_price_high: what this model, year and condition is advertised for in ${o.country} today.
-- notes: written in ${languageName(o.locale)}, plain words, on what matters most for this model as a rental vehicle here: demand, known faults, parts, resale. Do not comment on the price they would pay.
+- market_price_low / market_price_typical / market_price_high: what this model, year, trim and mileage is advertised for in ${o.country} today (used-car sites, dealers, Marketplace), cheapest believable to dearest, and the middle.
+- demand: how easily this model rents in ${o.area} compared with other vehicles there. demand_note: one sentence on who rents it and why (or why not).
+- reliability: 5 = very reliable and cheap to keep going, 1 = known for costly trouble, judged for this model and year in rental use. reliability_note: one sentence saying why.
+- parts: how easy and cheap parts and servicing are to get in ${o.country}.
+- known_issues: up to 4 known faults or things to check before buying this model and year (for example a gearbox, timing belt, recall or rust weak spot), most serious first, each with what fixing it typically costs. Empty if none are well known.
+- value_note: one sentence on whether it is good value for the money next to its rivals (features, comfort, fuel use, what customers get).
+- alternatives: up to 3 other vehicles a rental operator here could buy for about the same money that would likely earn more, rent more easily or cost less to keep, each with its typical used price here, what it rents for a month here, and why. Empty if this is already the best choice.
+- notes: written in ${languageName(o.locale)}, plain words, on anything else that matters for this model as a rental vehicle here. Do not comment on the price they would pay.
+- demand_note, reliability_note, known_issues[].issue, value_note and alternatives[].why are written in ${languageName(o.locale)}, in plain words a busy owner understands.
 
 Rules: all money in ${o.currency}, whole numbers. Percentages are whole numbers (85, not 0.85). Base every figure on what you found; where you could not find it for this exact model, use the closest rival and lower the confidence. Do not flatter the vehicle. Raw JSON only, no markdown, no comments.`;
 }
@@ -114,7 +129,8 @@ export async function POST(request: NextRequest) {
   // The same vehicle in the same area gives the same figures each time, so two checks can be compared fairly.
   // The figures do not depend on the reader's language, so every language shares them; only the notes are per language.
   const clean = (value: unknown) => String(value).replace(/[|%_]/g, " ").trim();
-  const modelKey = ["v8", country, area, category, make, model].map(clean).join("|").toLowerCase();
+  // v9: adds reliability, known issues, demand, alternatives and value. Older look-ups still seed a quick re-check.
+  const modelKey = ["v9", country, area, category, make, model].map(clean).join("|").toLowerCase();
   const cacheKey = [modelKey, year, clean(trim), Math.round(mileage / 20000)].join("|").toLowerCase().slice(0, 300);
 
   let store: any = null;
@@ -146,7 +162,10 @@ export async function POST(request: NextRequest) {
     const merged = { ...research };
     if (platform?.month) Object.assign(merged, { rent_month_low: platform.month.low, rent_month_typical: platform.month.typical, rent_month_high: platform.month.high });
     if (platform?.day) Object.assign(merged, { rent_day_low: platform.day.low, rent_day_typical: platform.day.typical, rent_day_high: platform.day.high });
-    return NextResponse.json({ research: merged, sources: pages, place: area, atPrice: Number(research.at_price) || price, platform, how, checkedAt: checkedAt || new Date().toISOString() });
+    // "live": the figures were checked against real pages on the web. Without it they are the AI's general knowledge,
+    // and the result says so plainly at the top.
+    const live = Array.isArray(pages) && pages.length > 0;
+    return NextResponse.json({ research: merged, sources: pages, place: area, atPrice: Number(research.at_price) || price, platform, how, live, checkedAt: checkedAt || new Date().toISOString() });
   };
 
   /** A quick look: the earlier figures are checked against the live web rather than found from nothing. */
@@ -199,7 +218,7 @@ ${shape}`;
         .from("market_research_cache")
         .select("payload, cache_key, created_at")
         // Any earlier version of the saved figures will do as a starting point ("_" matches the version digit).
-        .like("cache_key", `${modelKey.replace(/^v8/, "v_")}|%`)
+        .like("cache_key", `${modelKey.replace(/^v9/, "v_")}|%`)
         .gte("created_at", since)
         .order("created_at", { ascending: false })
         .limit(1)

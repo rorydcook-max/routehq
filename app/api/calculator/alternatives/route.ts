@@ -77,6 +77,8 @@ ${yardstick && considering ? `For the ${considering} these figures are already b
 
   try {
     const { data, sources } = await researchJson(prompt);
+    // Adverts only exist on the live web. An answer with no pages behind it is made up, however plausible: say so instead.
+    if (sources.length === 0) return NextResponse.json({ listings: [], failed: true, offline: true });
     const opened = new Set(sources.map((source) => key(source.url)));
     const listings = (Array.isArray(data.listings) ? data.listings : [])
       .filter((item: any) => item && Number(item.price) > 0 && item.make && item.model)

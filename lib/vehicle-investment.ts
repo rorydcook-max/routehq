@@ -278,7 +278,18 @@ export type Research = {
   rent_fade_pct?: number;
   max_rental_age?: number;
   market_price_low?: number;
+  market_price_typical?: number;
   market_price_high?: number;
+  /** How easily this model rents here, with a line on who rents it. */
+  demand?: "high" | "medium" | "low" | string;
+  demand_note?: string;
+  /** 5 = very reliable, 1 = known for costly trouble. */
+  reliability?: number;
+  reliability_note?: string;
+  parts?: "easy" | "average" | "hard" | string;
+  known_issues?: Array<{ issue: string; severity?: "minor" | "watch" | "serious" | string; typical_cost?: number }>;
+  value_note?: string;
+  alternatives?: Array<{ name: string; typical_price?: number; rent_month?: number; why?: string }>;
   notes?: string[];
   confidence?: string;
 };

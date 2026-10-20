@@ -75,6 +75,59 @@ function Num({ label, value, onChange, hint, suffix }: { label: string; value: n
   );
 }
 
+
+/** One titled block of the result: the owner's question, then its answer. */
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="mt-5 border-t border-[var(--border)] pt-4">
+      <h3 className="text-[15px] font-bold text-[var(--foreground)]">{title}</h3>
+      <div className="mt-2">{children}</div>
+    </section>
+  );
+}
+
+function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
+  return (
+    <div className="rounded-xl bg-[var(--surface-muted,#f6f7f9)] p-3">
+      <dt className="text-[var(--foreground-muted)]">{label}</dt>
+      <dd className="mt-1 text-lg font-bold">{value}</dd>
+      {hint ? <dd className="mt-0.5 text-xs text-[var(--foreground-muted)]">{hint}</dd> : null}
+    </div>
+  );
+}
+
+function CostRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-baseline justify-between gap-3">
+      <dt className="text-[var(--foreground-secondary)]">{label}</dt>
+      <dd className="font-semibold">{value}</dd>
+    </div>
+  );
+}
+
+/** Where the price asked sits between the cheapest and dearest adverts; the tick is the typical price. */
+function RangeBar({ low, high, typical, price }: { low: number; high: number; typical: number; price: number }) {
+  const span = Math.max(1, high - low);
+  const at = (value: number) => Math.round(Math.min(1, Math.max(0, (value - low) / span)) * 100);
+  return (
+    <div className="relative mt-3 h-2 rounded-full bg-[var(--panel-tertiary)]">
+      <span aria-hidden className="absolute top-1/2 h-3.5 w-0.5 -translate-y-1/2 bg-[var(--foreground-muted)]" style={{ left: `${at(typical)}%` }} />
+      <span aria-hidden className="absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-[var(--primary)] shadow" style={{ left: `${at(price)}%` }} />
+    </div>
+  );
+}
+
+/** Five dots, filled up to the count: reliability at a glance. */
+function Dots({ count }: { count: number }) {
+  return (
+    <span aria-label={`${count} / 5`} className="inline-flex gap-1">
+      {[1, 2, 3, 4, 5].map((n) => (
+        <span className={`h-2.5 w-2.5 rounded-full ${n <= count ? (count >= 4 ? "bg-[var(--success)]" : count >= 3 ? "bg-[var(--warning)]" : "bg-[var(--danger)]") : "bg-[var(--panel-tertiary)]"}`} key={n} />
+      ))}
+    </span>
+  );
+}
+
 /** What the look-up is doing, so a minute of waiting does not look like nothing is happening. */
 function ResearchProgress({ elapsed, say }: { elapsed: number; say: Say }) {
   const steps = [
@@ -185,7 +238,7 @@ export function CalculatorClient({
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved">("idle");
   const [searching, setSearching] = useState(false);
   const [listings, setListings] = useState<Listing[] | null>(null);
-  const [searchFailed, setSearchFailed] = useState(false);
+  const [searchFailed, setSearchFailed] = useState<false | "failed" | "offline">(false);
   const [lookedUp, setLookedUp] = useState<{ how: string; checkedAt: string } | null>(null);
   // Seconds since the look-up started, for the progress shown while it runs.
   const [elapsed, setElapsed] = useState(0);
@@ -372,10 +425,10 @@ export function CalculatorClient({
       });
       const reply = await response.json();
       setListings(Array.isArray(reply.listings) ? reply.listings : []);
-      setSearchFailed(Boolean(reply.failed || reply.unavailable));
+      setSearchFailed(reply.offline || reply.unavailable ? "offline" : reply.failed ? "failed" : false);
     } catch {
       setListings([]);
-      setSearchFailed(true);
+      setSearchFailed("failed");
     }
     setSearching(false);
   }
@@ -429,6 +482,19 @@ export function CalculatorClient({
   const target = assumptions && outcome && !slowYearOnly && (outcome.verdict === "thin" || outcome.verdict === "no") ? priceForReturn(assumptions, 10) : null;
   const comparable = saved.filter((row) => typeof row.results?.perYear === "number").sort((a, b) => b.results!.perYear - a.results!.perYear);
   const subjectName = subject ? [subject.year, subject.make, subject.model].join(" ") : "";
+  // Figures the result reads off: whether the web was really checked, where the price sits, running costs, what it's worth later.
+  const liveData = Boolean(research) && sources.length > 0;
+  const market = (() => {
+    const low = Number(research?.market_price_low) || 0;
+    const high = Number(research?.market_price_high) || 0;
+    if (!(low > 0 && high >= low) || !assumptions) return null;
+    const typical = Number(research?.market_price_typical) > 0 ? Number(research?.market_price_typical) : (low + high) / 2;
+    const gap = assumptions.price - typical;
+    const verdict = gap < -typical * 0.04 ? "below" : gap > typical * 0.04 ? "above" : "fair";
+    return { low, high, typical, gap: Math.abs(gap), verdict };
+  })();
+  const runningYear = assumptions ? assumptions.insurance + assumptions.tax + assumptions.compulsory + assumptions.maintenance + assumptions.otherMonthly * 12 : 0;
+  const worthAfter = outcome && best ? [1, 3, best.year].filter((year, index, all) => all.indexOf(year) === index && year <= outcome.expected.rows.length).map((year) => outcome.expected.rows[year - 1]) : [];
 
   return (
     <div className="max-w-2xl space-y-4">
@@ -549,130 +615,225 @@ export function CalculatorClient({
         <>
           <Card className="p-4">
             <div id="calc-result" className="scroll-mt-4" />
+            {/* The verdict first, then where the figures came from: an owner should never have to guess whether a number was checked. */}
             <div className="flex items-start justify-between gap-3">
-              <p className="text-sm font-medium text-[var(--foreground-secondary)]">
-                {subjectName} · {money(assumptions.price)}
-              </p>
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-[var(--foreground-secondary)]">
+                  {subjectName} · {money(assumptions.price)}
+                </p>
+                <p className={`mt-1 text-2xl font-bold sm:text-3xl ${best.perYear >= 0 ? "text-[var(--foreground)]" : "text-[var(--danger)]"}`}>
+                  {best.perYear >= 0 ? say("makes", { amount: about(best.perYear) }) : say("loses", { amount: about(-best.perYear) })}
+                </p>
+              </div>
               <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold ${VERDICT_TONE[outcome.verdict]}`}>{say(`verdict_${outcome.verdict}`)}</span>
             </div>
+            <p className={`mt-3 rounded-xl px-3 py-2 text-sm font-medium ${liveData ? "bg-[var(--success-light)] text-[var(--success)]" : "bg-[var(--warning-light)] text-[var(--warning)]"}`}>
+              {liveData
+                ? lookedUp?.how === "saved"
+                  ? say("b_dataSaved", { date: longDate(lookedUp.checkedAt.slice(0, 10), locale), count: sources.length })
+                  : say("b_dataLive", { count: sources.length })
+                : research
+                  ? t("b_dataKnowledge")
+                  : t("b_dataUsual")}
+            </p>
             {Number(research?.market_price_low) > 0 && assumptions.price > 0 && assumptions.price < Number(research?.market_price_low) * 0.5 ? (
               <p className="mt-3 rounded-xl border border-[var(--warning-line)] bg-[var(--warning-light)] px-3 py-2 font-semibold text-[var(--warning)]">
                 {say("priceLooksLow", { vehicle: subjectName, low: money(Number(research?.market_price_low)) })}
               </p>
             ) : null}
-            <p className={`mt-3 text-3xl font-bold ${best.perYear >= 0 ? "text-[var(--foreground)]" : "text-[var(--danger)]"}`}>
-              {best.perYear >= 0 ? say("makes", { amount: about(best.perYear) }) : say("loses", { amount: about(-best.perYear) })}
-            </p>
-            <p className="mt-2 text-sm text-[var(--foreground-secondary)]">
-              {say(best.year === 1 ? "sellAfterOne" : "sellAfter", { years: best.year, value: about(best.value), profit: about(best.profit) })}
-            </p>
-
-            <div className="mt-4 rounded-xl border border-[var(--border)] p-3">
-              <Num
-                hint={
-                  platform
-                    ? say(platform.scope === "area" ? "platformArea" : "platformCountry", { count: platform.businesses, model: subject.model })
-                    : own && style === "monthly" && own.monthlyRate === assumptions.rentMonthly
-                      ? say("rentFromOwn", { model: subject.model })
-                      : research
-                        ? sources.length === 0 && research.confidence === "low"
-                          ? t("rentFromKnowledge")
-                          : t("rentFromWeb")
-                        : t("rentFromUsual")
-                }
-                label={style === "daily" ? t("rentYoursDaily") : style === "mix" ? t("rentYoursMix") : t("rentYours")}
-                onChange={setRent}
-                suffix={currency === "THB" ? "฿" : currency}
-                value={assumptions.rentMonthly}
-              />
-            </div>
-
-            <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
-              <div className="rounded-xl bg-[var(--surface-muted,#f6f7f9)] p-3">
-                <dt className="text-[var(--foreground-muted)]">{assumptions.financed ? t("returnOnCash") : t("returnOnCost")}</dt>
-                <dd className="mt-1 text-lg font-bold">{say("pctYear", { pct: (assumptions.financed ? outcome.expected.cashReturnPct : outcome.expected.returnPct).toFixed(1) })}</dd>
-              </div>
-              <div className="rounded-xl bg-[var(--surface-muted,#f6f7f9)] p-3">
-                <dt className="text-[var(--foreground-muted)]">{t("moneyBack")}</dt>
-                <dd className="mt-1 text-lg font-bold">
-                  {outcome.expected.paybackMonths ? say("monthsCount", { months: outcome.expected.paybackMonths }) : t("notFromRent")}
-                </dd>
-              </div>
-              <div className="rounded-xl bg-[var(--surface-muted,#f6f7f9)] p-3">
-                <dt className="text-[var(--foreground-muted)]">{financed ? t("monthlyAfterLoan") : t("monthlyFirstYear")}</dt>
-                <dd className="mt-1 text-lg font-bold">{about(outcome.expected.firstYearMonthly)}</dd>
-              </div>
-              <div className="rounded-xl bg-[var(--surface-muted,#f6f7f9)] p-3">
-                <dt className="text-[var(--foreground-muted)]">{t("range")}</dt>
-                <dd className="mt-1 text-lg font-bold">
-                  {about(outcome.cautious.best.perYear)} – {about(outcome.upside.best.perYear)}
-                </dd>
-              </div>
-            </dl>
-
-            {research?.rates && Object.keys(research.rates).length ? (
-              <div className="mt-4 rounded-xl border border-[var(--border)] p-3">
-                <p className="text-sm font-bold">{say("ratesTitle", { place: place || "-" })}</p>
-                <dl className="mt-2 space-y-1.5 text-sm">
-                  {(["day", "week", "month"] as const).map((period) => {
-                    const range = research.rates?.[period];
-                    if (!range) return null;
-                    return (
-                      <div className="flex items-baseline justify-between gap-3" key={period}>
-                        <dt className="text-[var(--foreground-secondary)]">{t(`per_${period}`)}</dt>
-                        <dd className="text-right">
-                          <span className="font-bold">{money(range.low)} – {money(range.high)}</span>
-                          <span className="block text-xs text-[var(--foreground-muted)]">{say("ratesAverage", { amount: money(range.average) })}</span>
-                        </dd>
-                      </div>
-                    );
-                  })}
-                </dl>
-                <p className="mt-2 text-xs text-[var(--foreground-muted)]">
-                  {say("ratesFrom", {
-                    count: Object.values(research.rates).reduce((sum, range) => sum + (range?.count || 0), 0),
-                    dropped: Object.values(research.rates).reduce((sum, range) => sum + (range?.dropped || 0), 0)
-                  })}
-                </p>
-              </div>
-            ) : null}
-            {lookedUp && research ? (
-              <p className="mt-3 text-xs text-[var(--foreground-muted)]">
-                {lookedUp.how === "saved"
-                  ? say("lookedUpSaved", { date: longDate(lookedUp.checkedAt.slice(0, 10), locale) })
-                  : lookedUp.how === "rechecked"
-                    ? t("lookedUpRechecked")
-                    : t("lookedUpFresh")}
-              </p>
-            ) : null}
-
             {target || slowYearOnly ? (
-              <p className="mt-4 rounded-xl border border-[var(--warning)]/40 bg-[var(--warning)]/10 p-3 text-sm font-medium">
+              <p className="mt-3 rounded-xl border border-[var(--warning)]/40 bg-[var(--warning)]/10 p-3 text-sm font-medium">
                 {slowYearOnly ? t("slowYear") : say("payNoMore", { amount: money(target || 0) })}
               </p>
             ) : null}
-            {research?.market_price_low && research?.market_price_high ? (
-              <p className="mt-3 text-sm text-[var(--foreground-secondary)]">
-                {say(
-                  assumptions.price > research.market_price_high * 1.02 ? "marketAbove" : assumptions.price < research.market_price_low * 0.98 ? "marketBelow" : "marketWithin",
-                  { low: money(research.market_price_low), high: money(research.market_price_high) }
-                )}
-                {/* When nothing could be checked live, the advert range is an estimate too: say so, or it contradicts the line above. */}
-                {sources.length === 0 && research.confidence === "low" ? ` ${t("marketEstimateNote")}` : ""}
-              </p>
-            ) : null}
-            {own && own.monthlyRate !== assumptions.rentMonthly ? (
-              <p className="mt-3 text-sm text-[var(--foreground-secondary)]">
-                {say("ownRate", { model: subject.model, amount: money(own.monthlyRate) })}{" "}
-                {style === "monthly" ? (
-                  <button className="font-semibold text-[var(--primary)] underline" onClick={() => setRent(own.monthlyRate)} type="button">
-                    {t("useIt")}
-                  </button>
+
+            {/* 1. Is the price fair? */}
+            <Section title={t("b_priceTitle")}>
+              {market ? (
+                <>
+                  <p className={`font-bold ${market.verdict === "above" ? "text-[var(--warning)]" : market.verdict === "below" ? "text-[var(--success)]" : "text-[var(--foreground)]"}`}>
+                    {market.verdict === "below" ? say("b_priceBelow", { amount: about(market.gap) }) : market.verdict === "above" ? say("b_priceAbove", { amount: about(market.gap) }) : t("b_priceFair")}
+                  </p>
+                  <RangeBar high={market.high} low={market.low} price={assumptions.price} typical={market.typical} />
+                  <p className="mt-2 text-xs text-[var(--foreground-muted)]">{say("b_priceRange", { low: money(market.low), typical: money(market.typical), high: money(market.high) })}</p>
+                </>
+              ) : (
+                <p className="text-sm text-[var(--foreground-secondary)]">{t("b_priceUnknown")}</p>
+              )}
+            </Section>
+
+            {/* 2. How it rents */}
+            <Section title={t("b_rentsTitle")}>
+              {research?.demand ? (
+                <p className="text-sm">
+                  <span className={`mr-2 rounded-full px-2.5 py-0.5 text-xs font-bold ${research.demand === "high" ? "bg-[var(--success-light)] text-[var(--success)]" : research.demand === "low" ? "bg-[var(--danger-light)] text-[var(--danger)]" : "bg-[var(--panel-tertiary)] text-[var(--foreground)]"}`}>
+                    {t.has(`b_demand_${research.demand}`) ? say(`b_demand_${research.demand}`) : String(research.demand)}
+                  </span>
+                  <span className="text-[var(--foreground-secondary)]">{research.demand_note || ""}</span>
+                </p>
+              ) : null}
+              <div className="mt-3 rounded-xl border border-[var(--border)] p-3">
+                <Num
+                  hint={
+                    platform
+                      ? say(platform.scope === "area" ? "platformArea" : "platformCountry", { count: platform.businesses, model: subject.model })
+                      : own && style === "monthly" && own.monthlyRate === assumptions.rentMonthly
+                        ? say("rentFromOwn", { model: subject.model })
+                        : research
+                          ? sources.length === 0 && research.confidence === "low"
+                            ? t("rentFromKnowledge")
+                            : t("rentFromWeb")
+                          : t("rentFromUsual")
+                  }
+                  label={style === "daily" ? t("rentYoursDaily") : style === "mix" ? t("rentYoursMix") : t("rentYours")}
+                  onChange={setRent}
+                  suffix={currency === "THB" ? "฿" : currency}
+                  value={assumptions.rentMonthly}
+                />
+              </div>
+              <p className="mt-2 text-sm text-[var(--foreground-secondary)]">{say("b_occupancy", { pct: assumptions.occupancy, amount: about((assumptions.rentMonthly * assumptions.occupancy) / 100) })}</p>
+              {research?.rates && Object.keys(research.rates).length ? (
+                <div className="mt-3 rounded-xl bg-[var(--surface-muted,#f6f7f9)] p-3">
+                  <p className="text-sm font-bold">{say("ratesTitle", { place: place || "-" })}</p>
+                  <dl className="mt-2 space-y-1.5 text-sm">
+                    {(["day", "week", "month"] as const).map((period) => {
+                      const range = research.rates?.[period];
+                      if (!range) return null;
+                      return (
+                        <div className="flex items-baseline justify-between gap-3" key={period}>
+                          <dt className="text-[var(--foreground-secondary)]">{t(`per_${period}`)}</dt>
+                          <dd className="text-right">
+                            <span className="font-bold">{money(range.low)} – {money(range.high)}</span>
+                            <span className="block text-xs text-[var(--foreground-muted)]">{say("ratesAverage", { amount: money(range.average) })}</span>
+                          </dd>
+                        </div>
+                      );
+                    })}
+                  </dl>
+                  <p className="mt-2 text-xs text-[var(--foreground-muted)]">
+                    {say("ratesFrom", {
+                      count: Object.values(research.rates).reduce((sum, range) => sum + (range?.count || 0), 0),
+                      dropped: Object.values(research.rates).reduce((sum, range) => sum + (range?.dropped || 0), 0)
+                    })}
+                  </p>
+                </div>
+              ) : null}
+              {own && own.monthlyRate !== assumptions.rentMonthly ? (
+                <p className="mt-2 text-sm text-[var(--foreground-secondary)]">
+                  {say("ownRate", { model: subject.model, amount: money(own.monthlyRate) })}{" "}
+                  {style === "monthly" ? (
+                    <button className="font-semibold text-[var(--primary)] underline" onClick={() => setRent(own.monthlyRate)} type="button">
+                      {t("useIt")}
+                    </button>
+                  ) : null}
+                </p>
+              ) : null}
+            </Section>
+
+            {/* 3. What it would make */}
+            <Section title={t("b_earnTitle")}>
+              <dl className="grid grid-cols-2 gap-3 text-sm">
+                <Stat hint={t("b_perMonthHint")} label={financed ? t("monthlyAfterLoan") : t("b_perMonth")} value={about(outcome.expected.firstYearMonthly)} />
+                <Stat hint={say("b_perYearHint", { years: best.year })} label={t("b_perYear")} value={about(best.perYear)} />
+                <Stat label={say("b_total", { years: best.year })} value={about(best.profit)} />
+                <Stat label={t("moneyBack")} value={outcome.expected.paybackMonths ? say("monthsCount", { months: outcome.expected.paybackMonths }) : t("notFromRent")} />
+                <Stat
+                  hint={say("b_returnHint", { amount: Math.round(assumptions.financed ? outcome.expected.cashReturnPct : outcome.expected.returnPct) })}
+                  label={assumptions.financed ? t("returnOnCash") : t("b_return")}
+                  value={say("pctYear", { pct: (assumptions.financed ? outcome.expected.cashReturnPct : outcome.expected.returnPct).toFixed(1) })}
+                />
+                <Stat label={t("b_range")} value={`${about(outcome.cautious.best.perYear)} – ${about(outcome.upside.best.perYear)}`} />
+              </dl>
+            </Section>
+
+            {/* 4. Running costs */}
+            <Section title={t("b_costsTitle")}>
+              <dl className="space-y-1.5 text-sm">
+                <CostRow label={t("b_costInsurance")} value={money(assumptions.insurance)} />
+                <CostRow label={t("b_costTax")} value={money(assumptions.tax + assumptions.compulsory)} />
+                <CostRow label={say("b_costService", { pct: assumptions.maintenanceGrowthPct })} value={money(assumptions.maintenance)} />
+                {assumptions.otherMonthly > 0 ? <CostRow label={t("other")} value={money(assumptions.otherMonthly * 12)} /> : null}
+              </dl>
+              <p className="mt-2 font-bold">{say("b_costTotal", { year: about(runningYear), month: about(runningYear / 12) })}</p>
+            </Section>
+
+            {/* 5. Reliability and known issues */}
+            {research && (research.reliability || research.parts || research.known_issues?.length) ? (
+              <Section title={t("b_reliabilityTitle")}>
+                {research.reliability ? (
+                  <p className="flex flex-wrap items-center gap-2 text-sm">
+                    <Dots count={Math.round(Number(research.reliability))} />
+                    <span className="font-semibold">{t("b_reliability")}</span>
+                    {research.parts && t.has(`b_parts_${research.parts}`) ? <span className="rounded-full bg-[var(--panel-tertiary)] px-2.5 py-0.5 text-xs font-bold">{say(`b_parts_${research.parts}`)}</span> : null}
+                  </p>
                 ) : null}
-              </p>
+                {research.reliability_note ? <p className="mt-1 text-sm text-[var(--foreground-secondary)]">{research.reliability_note}</p> : null}
+                {research.known_issues?.length ? (
+                  <ul className="mt-3 space-y-2">
+                    {research.known_issues.slice(0, 4).map((item, index) => (
+                      <li className="flex items-start gap-2 text-sm" key={index}>
+                        <span className={`mt-0.5 shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold ${item.severity === "serious" ? "bg-[var(--danger-light)] text-[var(--danger)]" : item.severity === "watch" ? "bg-[var(--warning-light)] text-[var(--warning)]" : "bg-[var(--panel-tertiary)] text-[var(--foreground-secondary)]"}`}>
+                          {t.has(`b_sev_${item.severity || "minor"}`) ? say(`b_sev_${item.severity || "minor"}`) : String(item.severity || "")}
+                        </span>
+                        <span>
+                          {item.issue}
+                          {Number(item.typical_cost) > 0 ? <span className="text-[var(--foreground-muted)]"> · {say("b_issueCost", { amount: money(Number(item.typical_cost)) })}</span> : null}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-2 text-sm text-[var(--foreground-secondary)]">{t("b_issuesNone")}</p>
+                )}
+              </Section>
             ) : null}
 
-            <div className="mt-4 grid grid-cols-2 gap-3">
+            {/* 6. Value and other options */}
+            {research && (research.value_note || research.alternatives?.length) ? (
+              <Section title={t("b_valueTitle")}>
+                {research.value_note ? <p className="text-sm text-[var(--foreground-secondary)]">{research.value_note}</p> : null}
+                {research.alternatives?.length ? (
+                  <>
+                    <p className="mt-2 text-sm font-semibold">{t("b_altIntro")}</p>
+                    <ul className="mt-1 space-y-2">
+                      {research.alternatives.slice(0, 3).map((alt, index) => (
+                        <li className="rounded-xl bg-[var(--surface-muted,#f6f7f9)] p-3 text-sm" key={index}>
+                          <p className="font-bold">{alt.name}</p>
+                          {Number(alt.typical_price) > 0 || Number(alt.rent_month) > 0 ? (
+                            <p className="text-xs text-[var(--foreground-muted)]">{say("b_altLine", { price: money(Number(alt.typical_price) || 0), rent: money(Number(alt.rent_month) || 0) })}</p>
+                          ) : null}
+                          {alt.why ? <p className="mt-1 text-[var(--foreground-secondary)]">{alt.why}</p> : null}
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                ) : (
+                  <p className="mt-2 text-sm text-[var(--foreground-secondary)]">{t("b_altNone")}</p>
+                )}
+              </Section>
+            ) : null}
+
+            {/* 7. When to sell */}
+            <Section title={t("b_sellTitle")}>
+              <p className="font-bold">{say(best.year === 1 ? "sellAfterOne" : "sellAfter", { years: best.year, value: about(best.value), profit: about(best.profit) })}</p>
+              <p className="mt-1 text-sm text-[var(--foreground-secondary)]">{t("b_sellWhy")}</p>
+              <dl className="mt-3 grid grid-cols-3 gap-2 text-sm">
+                {worthAfter.map((row) => (
+                  <Stat key={row.year} label={say("b_worthAfter", { years: row.year })} value={about(row.value)} />
+                ))}
+              </dl>
+              <p className="mt-2 text-xs text-[var(--foreground-muted)]">{say("b_lossPerYear", { pct: yearlyLossPct(assumptions.resalePct, best.year) })}</p>
+            </Section>
+
+            {research?.notes?.length ? (
+              <ul className="mt-4 list-disc space-y-1 pl-5 text-sm text-[var(--foreground-secondary)]">
+                {research.notes.slice(0, 4).map((note, index) => (
+                  <li key={index}>{note}</li>
+                ))}
+              </ul>
+            ) : null}
+
+            <div className="mt-5 grid grid-cols-2 gap-3">
               <button className="btn-secondary justify-center py-3" disabled={saveState !== "idle"} onClick={save} type="button">
                 {saveState === "saved" ? t("savedDone") : saveState === "saving" ? t("saving") : t("save")}
               </button>
@@ -688,7 +849,7 @@ export function CalculatorClient({
               <h2 className="text-base font-bold">{say("othersTitle", { amount: money(assumptions.price) })}</h2>
               {ranked.length > 0 ? <p className="mt-1 text-xs text-[var(--foreground-muted)]">{t("othersNote")}</p> : null}
               {ranked.length === 0 ? (
-                <p className="mt-2 text-sm text-[var(--foreground-secondary)]">{searchFailed ? t("othersFailed") : t("othersNone")}</p>
+                <p className="mt-2 text-sm text-[var(--foreground-secondary)]">{searchFailed === "offline" ? t("othersOffline") : searchFailed ? t("othersFailed") : t("othersNone")}</p>
               ) : (
                 <ul className="mt-3 space-y-3">
                   {ranked.map((item, index) => {
@@ -753,14 +914,7 @@ export function CalculatorClient({
             <p className="mt-3 text-xs text-[var(--foreground-muted)]">{t("yearNote")}</p>
           </Fold>
 
-          <Fold title={t("figures")} summary={research ? say("figuresFrom", { place: place || "-" }) : t("figuresUsual")}>
-            {research?.notes?.length ? (
-              <ul className="mb-4 list-disc space-y-1 pl-5 text-sm text-[var(--foreground-secondary)]">
-                {research.notes.slice(0, 4).map((note, index) => (
-                  <li key={index}>{note}</li>
-                ))}
-              </ul>
-            ) : null}
+          <Fold title={t("figures")} summary={research ? (liveData ? say("figuresFrom", { place: place || "-" }) : t("figuresRough")) : t("figuresUsual")}>
             <div className="grid grid-cols-2 gap-3">
               <Num hint={t("rentHint")} label={t("rent")} onChange={setRent} value={assumptions.rentMonthly} />
               <Num hint={t("occupancyHint")} label={t("occupancy")} onChange={(value) => change({ occupancy: Math.min(100, value) })} suffix="%" value={assumptions.occupancy} />

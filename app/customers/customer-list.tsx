@@ -97,7 +97,10 @@ export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
             <option value="not_renting">{say("notRenting")}</option>
           </select>
         </div>
-        <p className="mt-3 px-1 text-[18px] font-bold text-[var(--foreground)]">{say("count", { count: filteredCustomers.length })}</p>
+        {/* The total is in the pills above; a count here only helps once a search or filter narrows the list. */}
+        {filteredCustomers.length !== customers.length ? (
+          <p className="mt-3 px-1 text-[18px] font-bold text-[var(--foreground)]">{say("count", { count: filteredCustomers.length })}</p>
+        ) : null}
       </div>
 
       {filteredCustomers.length === 0 ? (
@@ -145,9 +148,17 @@ export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
                   </div>
                   <p className={`mt-0.5 line-clamp-2 break-words font-medium ${activeRental ? "font-bold text-[var(--foreground)]" : "text-[var(--foreground-secondary)]"}`}>{line}</p>
                 </div>
-                {/* Money only when there is some; "฿0 · 1 rental" said nothing. */}
-                {item.lifetimeRevenue > 0 ? (
-                  <p className="num shrink-0 text-right text-[16px] text-[var(--foreground)]">{money(item.lifetimeRevenue)}</p>
+                {/* What they owe comes first, in red; otherwise what they have spent with you, labelled. Nothing when there is neither. */}
+                {Number(item.owesNow || 0) > 0 ? (
+                  <span className="shrink-0 text-right">
+                    <span className="num block text-[16px] text-[var(--danger)]">{money(Number(item.owesNow))}</span>
+                    <span className="block text-[13px] font-semibold text-[var(--danger)]">{say("owesLabel")}</span>
+                  </span>
+                ) : item.lifetimeRevenue > 0 ? (
+                  <span className="shrink-0 text-right">
+                    <span className="num block text-[16px] text-[var(--foreground)]">{money(item.lifetimeRevenue)}</span>
+                    <span className="block text-[13px] font-medium text-[var(--foreground-secondary)]">{say("spentLabel")}</span>
+                  </span>
                 ) : null}
                 <ChevronRight className="shrink-0 text-[var(--foreground-secondary)]" size={20} strokeWidth={2.2} />
               </Link>

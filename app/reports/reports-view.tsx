@@ -293,9 +293,12 @@ function VehicleListRow({ vehicle, best, comparing, selected, onSelect, href, sa
           <span className="truncate text-[16px] font-bold text-[var(--foreground)]">{vehicle.plate || vehicle.label}</span>
           <span className={`num shrink-0 text-[17px] ${vehicle.profit >= 0 ? "text-[var(--success)]" : "text-[var(--warning)]"}`}>{money(vehicle.profit)}</span>
         </span>
+        {/* "% rented" sits with the vehicle, and the figure on the right says it's profit: the bar below measures the profit. */}
         <span className="flex items-baseline justify-between gap-3">
-          <span className={`truncate ${soft}`}>{name || vehicle.label}</span>
-          <span className={`shrink-0 whitespace-nowrap ${soft}`}>{say("rowRented", { percent: Math.round(vehicle.utilizationRate) })}</span>
+          <span className={`truncate ${soft}`}>
+            {name || vehicle.label} · {say("rowRented", { percent: Math.round(vehicle.utilizationRate) })}
+          </span>
+          <span className={`shrink-0 whitespace-nowrap ${soft}`}>{say("profit")}</span>
         </span>
         <span aria-hidden="true" className="mt-1.5 block h-1.5 overflow-hidden rounded-full bg-[var(--panel-tertiary)]">
           <span className="grow-x block h-full rounded-full" style={{ width: `${Math.max(share, vehicle.profit !== 0 ? 2 : 0)}%`, background: vehicle.profit >= 0 ? "var(--success)" : "var(--warning)" }} />

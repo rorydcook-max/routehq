@@ -2,6 +2,7 @@ import { rentalHappeningNow } from "@/lib/vehicle-detail";
 import { toWallTime, businessToday } from "@/lib/business-time";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isRevenueTransaction } from "@/lib/transaction-options";
+import { amountDueNowByRental } from "@/lib/rental-balances";
 
 const activeRentalStatuses = ["booked", "active", "due_soon", "overdue", "extended"];
 
@@ -28,6 +29,8 @@ export type CustomerListItem = {
   lifetimeRevenue: number;
   lastRentalDate: string | null;
   totalRentals: number;
+  /** Unpaid rent due today or earlier, across their rentals (the list only). */
+  owesNow?: number;
 };
 
 export type CustomerDetail = CustomerListItem & {
@@ -164,15 +167,21 @@ export async function getCustomerList(organizationId: string): Promise<CustomerL
     if (day && (!returnedOn.has(row.rental_id) || day > String(returnedOn.get(row.rental_id)))) returnedOn.set(row.rental_id, day);
   }
   const rentals = (rentalsResult.data || []).map((rental: any) => ({ ...rental, returned_on: returnedOn.get(rental.id) || null }));
+  // What each person owes right now, the same figure their page and To do use.
+  const dueByRental = await amountDueNowByRental(supabase, rentals.filter((rental: any) => rental.status !== "cancelled").map((rental: any) => rental.id));
 
-  return (customersResult.data || []).map((customer: any) =>
-    summarizeCustomer(
-      customer,
-      (documentsResult.data || []).filter((document: any) => document.owner_id === customer.id),
-      rentals.filter((rental: any) => rental.customer_id === customer.id),
-      (transactionsResult.data || []).filter((transaction: any) => transaction.customer_id === customer.id)
-    )
-  );
+  return (customersResult.data || []).map((customer: any) => {
+    const theirRentals = rentals.filter((rental: any) => rental.customer_id === customer.id);
+    return {
+      ...summarizeCustomer(
+        customer,
+        (documentsResult.data || []).filter((document: any) => document.owner_id === customer.id),
+        theirRentals,
+        (transactionsResult.data || []).filter((transaction: any) => transaction.customer_id === customer.id)
+      ),
+      owesNow: theirRentals.reduce((sum: number, rental: any) => sum + (dueByRental.get(rental.id) || 0), 0)
+    };
+  });
 }
 
 export async function getCustomerDetail(customerId: string, organizationId: string): Promise<CustomerDetail | null> {

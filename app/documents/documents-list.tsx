@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { CalendarDays, Car, FileSignature, FileText, Images, Search, UserRound } from "lucide-react";
+import { CalendarDays, Car, ChevronRight, FileSignature, FileText, Images, Search, UserRound } from "lucide-react";
 import type { DocumentListItem } from "@/lib/documents-hub";
 import { longDate } from "@/lib/i18n/dates";
 
@@ -143,7 +143,13 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
                 <div className="flex items-center gap-3">
                   <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]"><FolderIcon size={20} /></span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-[17px] font-bold text-[var(--foreground)]">{folder.label || say("aBooking")}</p>
+                    {folder.href ? (
+                      <Link className="block truncate text-[17px] font-bold text-[var(--foreground)] hover:text-[var(--primary)]" href={folder.href as any}>
+                        {folder.label || say("aBooking")}
+                      </Link>
+                    ) : (
+                      <p className="truncate text-[17px] font-bold text-[var(--foreground)]">{folder.label || say("aBooking")}</p>
+                    )}
                     <p className="truncate font-medium text-[var(--foreground-secondary)]">{say("folderLine", { count: folder.files.length, date: longDate(folder.latest.slice(0, 10), locale) })}</p>
                   </div>
                   {folder.href ? <OwnerLink href={folder.href} kind={folder.kind} label={say(folder.kind === "vehicle" ? "openVehicle" : folder.kind === "customer" ? "openCustomer" : "openBooking")} /> : null}
@@ -191,11 +197,11 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
   );
 }
 
-function OwnerLink({ href, kind, label }: { href: string; kind: "booking" | "customer" | "vehicle"; label: string }) {
-  const Icon = kind === "vehicle" ? Car : kind === "customer" ? UserRound : CalendarDays;
+// The folder's own icon is already on the left; the way in is a plain chevron, like every other row that opens something.
+function OwnerLink({ href, label }: { href: string; kind: "booking" | "customer" | "vehicle"; label: string }) {
   return (
-    <Link aria-label={label} className="pressable flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-[var(--border)] bg-white text-[var(--primary)] hover:border-[var(--primary)]" href={href as any} title={label}>
-      <Icon size={18} />
+    <Link aria-label={label} className="pressable flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[var(--primary)] hover:bg-[var(--panel-secondary)]" href={href as any} title={label}>
+      <ChevronRight size={20} />
     </Link>
   );
 }

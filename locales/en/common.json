@@ -2649,7 +2649,9 @@
     "closeLabel": "Close",
     "pillAll": "customers",
     "pillRenting": "renting now",
-    "pillDocs": "missing documents"
+    "pillDocs": "missing documents",
+    "owesLabel": "owes now",
+    "spentLabel": "spent"
   },
   "calendar": {
     "title": "Calendar",
@@ -3126,7 +3128,11 @@
     "tab_rentals": "Rentals",
     "tab_money": "Payments",
     "tab_messages": "Messages",
-    "tab_details": "Details"
+    "tab_details": "Details",
+    "r_notHandedOver": "Not handed over · {count, plural, one {# day} other {# days}}",
+    "r_startsToday": "Starts today",
+    "r_startsIn": "Starts in {count, plural, one {# day} other {# days}}",
+    "g_owesDetail": "due today or earlier"
   },
   "vehicleForm": {
     "backToFleet": "Back to fleet",

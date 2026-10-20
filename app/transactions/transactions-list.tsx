@@ -407,9 +407,10 @@ export function TransactionsList({
     const who = kind === "expense" && !transaction.rentalId
       ? [vehicleName, transaction.notes || transaction.supplier].filter(Boolean).join(" · ")
       : [transaction.customerName || transaction.supplier, vehicleName].filter(Boolean).join(" · ");
-    const context = transaction.rentalId ? [transaction.bookingRef, kind === "expense" || kind === "refund" ? transaction.notes : null].filter(Boolean).join(" · ") : "";
+    // The booking number rides on the same line as who and what; only a note for a refund or cost gets a line of its own.
+    const note = transaction.rentalId && (kind === "expense" || kind === "refund") ? String(transaction.notes || "") : "";
     return (
-      <li className={`group px-4 py-3.5 transition ${deleting ? "opacity-40" : ""} ${selected ? "bg-[var(--primary-light)]" : "hover:bg-[var(--panel-secondary)]"}`} key={transaction.id}>
+      <li className={`group px-4 py-3 transition ${deleting ? "opacity-40" : ""} ${selected ? "bg-[var(--primary-light)]" : "hover:bg-[var(--panel-secondary)]"}`} key={transaction.id}>
         <div className="flex items-center gap-3">
           {selecting ? (
             <input
@@ -438,12 +439,20 @@ export function TransactionsList({
                 </span>
               ) : null}
             </p>
-            {who ? <p className="line-clamp-2 break-words font-medium text-[var(--foreground-secondary)]">{who}</p> : null}
-            {context ? (
-              <Link className="mt-0.5 block truncate text-[14px] font-semibold text-[var(--primary)]" href={`/bookings/${transaction.rentalId}`} onClick={(event) => event.stopPropagation()}>
-                {context}
-              </Link>
+            {who || (transaction.rentalId && transaction.bookingRef) ? (
+              <p className="line-clamp-2 break-words font-medium text-[var(--foreground-secondary)]">
+                {who}
+                {transaction.rentalId && transaction.bookingRef ? (
+                  <>
+                    {who ? " · " : ""}
+                    <Link className="font-semibold text-[var(--primary)] hover:underline" href={`/bookings/${transaction.rentalId}`} onClick={(event) => event.stopPropagation()}>
+                      {transaction.bookingRef}
+                    </Link>
+                  </>
+                ) : null}
+              </p>
             ) : null}
+            {note ? <p className="mt-0.5 truncate text-[14px] font-medium text-[var(--muted)]">{note}</p> : null}
           </div>
           <p className={`flex-shrink-0 text-[17px] font-bold tabular-nums ${amount.className}`}>
             {amount.prefix}

@@ -107,7 +107,24 @@ function ActiveRentalCard({ rental, customerId, dueNow }: { rental: any; custome
   const cx = useCx();
   const locale = useLocale();
   const days = daysUntil(rental.end_date);
-  const late = days !== null && days < 0;
+  // A booking that hasn't gone out is about its start: "10 days late" on a car never handed over read as an overdue return.
+  const booked = rental.status === "booked";
+  const startsIn = booked ? daysUntil(rental.start_date) : null;
+  const notHandedOver = booked && startsIn !== null && startsIn < 0;
+  const late = notHandedOver || (!booked && days !== null && days < 0);
+  const timing = booked
+    ? startsIn === null
+      ? cx.say("r_openEnded")
+      : notHandedOver
+        ? cx.say("r_notHandedOver", { count: Math.abs(startsIn) })
+        : startsIn === 0
+          ? cx.say("r_startsToday")
+          : cx.say("r_startsIn", { count: startsIn })
+    : days === null
+      ? cx.say("r_openEnded")
+      : days < 0
+        ? cx.say("r_daysLate", { count: Math.abs(days) })
+        : cx.say("r_daysLeft", { count: days });
   return (
     <section className="card p-4">
       <div className="flex items-start justify-between gap-3">
@@ -117,7 +134,7 @@ function ActiveRentalCard({ rental, customerId, dueNow }: { rental: any; custome
           <p className="text-[20px] font-bold leading-tight text-[var(--foreground)]">{vehicleName(rental.vehicles)}</p>
         </div>
         <p className={`shrink-0 whitespace-nowrap font-bold ${late ? "text-[var(--danger)]" : "text-[var(--foreground-secondary)]"}`}>
-          {days === null ? cx.say("r_openEnded") : late ? cx.say("r_daysLate", { count: Math.abs(days) }) : cx.say("r_daysLeft", { count: days })}
+          {timing}
         </p>
       </div>
       {rental.status !== "booked" && rental.start_date && rental.end_date ? <ElapsedBar end={String(rental.end_date)} late={late} start={String(rental.start_date)} /> : null}
@@ -330,16 +347,19 @@ function RentalsSection({ detail }: { detail: CustomerDetail }) {
   const bookingWords = useTranslations("bookings");
   const statusName = (status: string) => (bookingWords.has(`status_${status}` as never) ? (bookingWords as unknown as Say)(`status_${status}`) : status.replace(/_/g, " "));
   return (
-    <Pane summary={cx.say("h_summary", { count: detail.rentals.length })} title={cx.say("h_title")}>
+    // Days rented and rent paid are in the tiles at the top of the page; only the usual length is new here.
+    <Pane
+      summary={
+        detail.rentals.length > 1 && detail.averageRentalDuration > 0
+          ? `${cx.say("h_summary", { count: detail.rentals.length })} · ${cx.say("h_usual")} ${cx.say("h_usualDays", { count: detail.averageRentalDuration })}`
+          : cx.say("h_summary", { count: detail.rentals.length })
+      }
+      title={cx.say("h_title")}
+    >
       {detail.rentals.length === 0 ? (
         <p className="font-medium text-[var(--foreground-secondary)]">{cx.say("h_none")}</p>
       ) : (
         <div className="grid gap-2.5">
-          <div className="grid grid-cols-3 gap-2.5">
-            <InfoTile label={cx.say("h_days")} value={detail.totalRentalDays} />
-            <InfoTile label={cx.say("h_paid")} value={money(detail.lifetimeRevenue)} />
-            <InfoTile label={cx.say("h_usual")} value={cx.say("h_usualDays", { count: detail.averageRentalDuration })} />
-          </div>
           {detail.rentals.map((rental) => (
             <Link className="pressable block rounded-xl bg-[var(--panel-secondary)] p-3.5" href={`/bookings/${rental.id}` as Route} key={rental.id}>
               <div className="flex items-start justify-between gap-3">
@@ -449,8 +469,11 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
         </div>
 
         <Card className="p-4">
-          <Badge tone={docsTone}>{completeness.status === "complete" ? cx.say("docsOk") : completeness.status === "none" ? cx.say("docsNone") : cx.say("docsMissing")}</Badge>
-          <div className="mt-3 flex items-center gap-3">
+          {/* The documents tile below says the same once there are rentals; the badge is for a new customer with no tiles yet. */}
+          {detail.rentals.length === 0 ? (
+            <Badge tone={docsTone}>{completeness.status === "complete" ? cx.say("docsOk") : completeness.status === "none" ? cx.say("docsNone") : cx.say("docsMissing")}</Badge>
+          ) : null}
+          <div className={`${detail.rentals.length === 0 ? "mt-3" : ""} flex items-center gap-3`}>
             <span aria-hidden="true" className="num inline-flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)] text-[20px] text-[var(--primary)]">
               {initialsOf(customer.full_name)}
             </span>
@@ -507,7 +530,10 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           {owedNow > 0 ? (
             <a className="card pressable tile tile-brick p-4" href="#payments">
               <TileHead title={cx.say("g_owes")} />
-              <span className="num block text-[26px] leading-tight">{money(owedNow)}</span>
+              <span>
+                <span className="num block text-[26px] leading-tight">{money(owedNow)}</span>
+                <span className="font-semibold">{cx.say("g_owesDetail")}</span>
+              </span>
             </a>
           ) : (
             <div className="card tile tile-green p-4">

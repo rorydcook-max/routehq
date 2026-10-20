@@ -2658,7 +2658,9 @@
     "closeLabel": "ปิด",
     "pillAll": "ลูกค้า",
     "pillRenting": "กำลังเช่า",
-    "pillDocs": "เอกสารไม่ครบ"
+    "pillDocs": "เอกสารไม่ครบ",
+    "owesLabel": "ค้างชำระ",
+    "spentLabel": "ยอดใช้จ่าย"
   },
   "calendar": {
     "title": "ปฏิทิน",
@@ -3135,7 +3137,11 @@
     "tab_rentals": "การเช่า",
     "tab_money": "การชำระเงิน",
     "tab_messages": "ข้อความ",
-    "tab_details": "รายละเอียด"
+    "tab_details": "รายละเอียด",
+    "r_notHandedOver": "ยังไม่ได้ส่งมอบ · {count} วัน",
+    "r_startsToday": "เริ่มวันนี้",
+    "r_startsIn": "เริ่มในอีก {count} วัน",
+    "g_owesDetail": "ถึงกำหนดวันนี้หรือก่อนหน้า"
   },
   "vehicleForm": {
     "backToFleet": "กลับไปหน้ารถ",

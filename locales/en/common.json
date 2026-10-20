@@ -2305,7 +2305,9 @@
     "ch_phone": "Phone",
     "ch_portal": "Customer page",
     "allDoneUndated": "The customer has finished everything. Show the steps",
-    "cp_callShort": "Call"
+    "cp_callShort": "Call",
+    "tl_extended": "Extended to {date} (was {was}). {amount} for the extra days is due {due}.",
+    "tl_extendedNoPay": "Extended to {date} (was {was}). No extra payment added."
   },
   "newBooking": {
     "pageBack": "Back to bookings",

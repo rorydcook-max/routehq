@@ -1947,6 +1947,16 @@ function timelineText(entry: any, tx: Tx): string {
       due: longDate(String(meta.previous_end_date || "").slice(0, 10), tx.locale)
     });
   }
+  // An extension staff made is stored as an English sentence too; its figures are kept beside it.
+  if (meta.adjustment_type === "extension" && meta.new_end_date && meta.previous_end_date) {
+    const date = longDate(String(meta.new_end_date).slice(0, 10), tx.locale);
+    const was = longDate(String(meta.previous_end_date).slice(0, 10), tx.locale);
+    const amount = Number(meta.extension_payment_amount || 0);
+    const line = amount > 0
+      ? tx.say("tl_extended", { date, was, amount: money(amount), due: longDate(String(meta.extension_payment_due_date || meta.previous_end_date).slice(0, 10), tx.locale) })
+      : tx.say("tl_extendedNoPay", { date, was });
+    return meta.note ? `${line} ${meta.note}` : line;
+  }
   if (/^Customer opened booking link/i.test(content)) return tx.say("tl_opened");
   if (/^Customer signed the rental agreement/i.test(content)) return tx.say("tl_signed");
   if (/^Customer signed an amendment/i.test(content)) return tx.say("tl_signedChange");

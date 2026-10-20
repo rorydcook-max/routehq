@@ -2300,7 +2300,7 @@ async function adjustRentalOrThrow(params: {
         throw new Error("Assign a customer before creating an extension payment.");
       }
 
-      const description = `Extension - ${originalEndDate || "open"} to ${cleanEndDate}`;
+      const description = `Extension - ${originalEndDate ? niceDate(originalEndDate) : "open"} to ${niceDate(cleanEndDate)}`;
       const { error: paymentError } = await supabase.from("rental_payments").insert({
         organization_id: rental.organization_id,
         rental_id: rental.id,

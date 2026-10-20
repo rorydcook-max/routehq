@@ -2314,7 +2314,9 @@
     "ch_phone": "โทรศัพท์",
     "ch_portal": "หน้าลูกค้า",
     "allDoneUndated": "ลูกค้าทำครบทุกขั้นตอนแล้ว ดูขั้นตอน",
-    "cp_callShort": "โทร"
+    "cp_callShort": "โทร",
+    "tl_extended": "ขยายเวลาเช่าถึง {date} (เดิม {was}) ค่าวันที่เพิ่ม {amount} ครบกำหนด {due}",
+    "tl_extendedNoPay": "ขยายเวลาเช่าถึง {date} (เดิม {was}) ไม่ได้เพิ่มยอดชำระ"
   },
   "newBooking": {
     "pageBack": "กลับไปที่การจอง",

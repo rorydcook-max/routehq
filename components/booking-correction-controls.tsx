@@ -110,7 +110,7 @@ function basePaymentDescription(payment: RentalPayment, tx: Ctl) {
   const metadata = payment.metadata || {};
   // The app's own English descriptions ("Security deposit", "First rental payment - due at handover") are
   // not words someone typed: those payments are named in the reader's language below.
-  const appWritten = /^(security deposit|first rental payment|rental payment|rent payment|remaining balance|\d+ days? rent)\b/i.test(String(metadata.description || "").trim());
+  const appWritten = /^(security deposit|first rental payment|rental payment|rent payment|remaining balance|extension - |\d+ days? rent)\b/i.test(String(metadata.description || "").trim());
   if (metadata.type === "extras") return tx.say("pc_extras", { names: (Array.isArray(metadata.extras) ? metadata.extras : []).join(", ") || "-" });
   if (metadata.description && !appWritten) return metadata.type === "charge" ? tx.say("pc_chargeFor", { reasons: String(metadata.description) }) : String(metadata.description);
   const isExtension = metadata.type === "extension" || metadata.adjustment_type === "extension";

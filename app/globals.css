@@ -1769,3 +1769,7 @@ h2 { letter-spacing: -0.015em; }
 .app-sidebar { background: var(--background); border-right-color: transparent; }
 .app-sidebar nav a[class*="bg-[var(--primary-light)]"] { background: #fff; box-shadow: var(--shadow-card); font-weight: 700; }
 .app-sidebar nav a:not([class*="bg-[var(--primary-light)]"]):hover { background: rgba(255, 255, 255, 0.7); }
+
+/* A sideways-scrolling row of chips on a phone: scrolls by swipe, no bar under it. */
+.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }

@@ -132,8 +132,10 @@ function ActiveRentalCard({ rental, customerId, dueNow }: { rental: any; custome
         <div className="min-w-0 flex-1">
           <p className="font-semibold text-[var(--muted)]">{rental.status === "booked" ? cx.say("r_booked") : cx.say("r_renting")}</p>
           <p className="text-[20px] font-bold leading-tight text-[var(--foreground)]">{vehicleName(rental.vehicles)}</p>
+          {/* On a phone the timing goes under the name, so a long one doesn't squeeze the vehicle onto two lines. */}
+          <p className={`mt-0.5 font-bold sm:hidden ${late ? "text-[var(--danger)]" : "text-[var(--foreground-secondary)]"}`}>{timing}</p>
         </div>
-        <p className={`shrink-0 whitespace-nowrap font-bold ${late ? "text-[var(--danger)]" : "text-[var(--foreground-secondary)]"}`}>
+        <p className={`hidden shrink-0 whitespace-nowrap font-bold sm:block ${late ? "text-[var(--danger)]" : "text-[var(--foreground-secondary)]"}`}>
           {timing}
         </p>
       </div>

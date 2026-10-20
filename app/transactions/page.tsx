@@ -25,7 +25,7 @@ export default async function TransactionsPage({
   return (
     <AppShell
       userEmail={userEmail}
-      hero={<PageBand action={{ href: "/transactions/new", label: t("recordMoney"), icon: <Plus size={16} /> }} subtitle={t("listSubtitle")} title={t("listTitle")} />}
+      hero={<PageBand action={{ href: "/transactions/new", label: t("recordMoney"), icon: <Plus size={16} />, desktopOnly: true }} subtitle={t("listSubtitle")} title={t("listTitle")} />}
     >
 
       {resolvedSearchParams.linked ? (

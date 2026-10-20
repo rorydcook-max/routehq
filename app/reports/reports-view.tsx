@@ -50,8 +50,9 @@ function Change({ change, upIsBad = false, say }: { change: number | null; upIsB
   const up = change > 0;
   const good = upIsBad ? !up : up;
   return (
-    <p className={`flex items-center gap-1 font-semibold ${good ? "text-[var(--success)]" : "text-[var(--warning)]"}`}>
-      {up ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
+    // The arrow sits on the first line, so a phrase that wraps on a phone doesn't leave it floating between two lines.
+    <p className={`flex items-start gap-1 font-semibold leading-snug ${good ? "text-[var(--success)]" : "text-[var(--warning)]"}`}>
+      {up ? <ArrowUpRight className="mt-[3px] shrink-0" size={16} /> : <ArrowDownRight className="mt-[3px] shrink-0" size={16} />}
       {say(up ? "upOnBefore" : "downOnBefore", { percent: Math.abs(change).toFixed(0) })}
     </p>
   );

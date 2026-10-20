@@ -445,7 +445,7 @@ export function TransactionsList({
                 {transaction.rentalId && transaction.bookingRef ? (
                   <>
                     {who ? " · " : ""}
-                    <Link className="font-semibold text-[var(--primary)] hover:underline" href={`/bookings/${transaction.rentalId}`} onClick={(event) => event.stopPropagation()}>
+                    <Link className="whitespace-nowrap font-semibold text-[var(--primary)] hover:underline" href={`/bookings/${transaction.rentalId}`} onClick={(event) => event.stopPropagation()}>
                       {transaction.bookingRef}
                     </Link>
                   </>

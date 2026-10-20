@@ -111,7 +111,8 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
           />
         </label>
         {ownerTypes.length > 2 ? (
-          <div aria-label={say("show")} className="flex flex-wrap gap-2" role="group">
+          // One row that scrolls sideways on a phone (three wrapped rows pushed the files down); wraps from tablet width.
+          <div aria-label={say("show")} className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0" role="group">
             {ownerTypes.map((type) => (
               <button
                 aria-pressed={ownerFilter === type}

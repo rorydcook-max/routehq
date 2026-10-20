@@ -16,7 +16,8 @@ export function PageBand({
   title: string;
   subtitle?: string | null;
   keepSubtitle?: boolean;
-  action?: { href: string; label: string; icon?: React.ReactNode } | null;
+  /** `desktopOnly`: the action is already on the phone's + button, so phones keep the band short. */
+  action?: { href: string; label: string; icon?: React.ReactNode; desktopOnly?: boolean } | null;
   children?: React.ReactNode;
 }) {
   return (
@@ -28,7 +29,10 @@ export function PageBand({
           {subtitle ? <p className={`mt-1 font-medium text-white/85 ${keepSubtitle ? "" : "hidden sm:block"}`}>{subtitle}</p> : null}
         </div>
         {action ? (
-          <Link className="pressable inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-full bg-[var(--band-action)] px-4 font-bold text-[var(--band-action-ink)]" href={action.href as Route}>
+          <Link
+            className={`pressable min-h-11 items-center gap-2 whitespace-nowrap rounded-full bg-[var(--band-action)] px-4 font-bold text-[var(--band-action-ink)] ${action.desktopOnly ? "hidden lg:inline-flex" : "inline-flex"}`}
+            href={action.href as Route}
+          >
             {action.icon}
             {action.label}
           </Link>

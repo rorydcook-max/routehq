@@ -909,8 +909,8 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
   const { id } = await params;
   const [userEmail, organization, t, locale] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization(), getTranslations("vehiclePage"), getLocale()]);
   const tx: Vx = { say: t as unknown as Say, has: (key) => t.has(key as never), locale };
-  const detail = await getVehicleDetail(id, organization.id);
-  const isOwner = (await getCurrentMembership())?.role === "owner";
+  const [detail, membership] = await Promise.all([getVehicleDetail(id, organization.id), getCurrentMembership()]);
+  const isOwner = membership?.role === "owner";
 
   if (!detail) {
     return (

@@ -370,7 +370,8 @@ export async function getVehicleDetail(vehicleId: string, organizationId: string
       .is("deleted_at", null)
       .order("start_date", { ascending: false }),
     supabase.from("documents").select("*").eq("organization_id", organizationId).eq("owner_type", "vehicle").eq("owner_id", vehicleId).is("deleted_at", null).order("created_at", { ascending: false }),
-    supabase.from("activity_events").select("*").eq("organization_id", organizationId).eq("vehicle_id", vehicleId).order("occurred_at", { ascending: false }),
+    // The page shows the recent history; a busy car's whole log was read on every visit.
+    supabase.from("activity_events").select("*").eq("organization_id", organizationId).eq("vehicle_id", vehicleId).order("occurred_at", { ascending: false }).limit(100),
     supabase.from("reminders").select("*").eq("organization_id", organizationId).eq("vehicle_id", vehicleId).is("deleted_at", null).order("due_date", { ascending: true }),
     // The same jobs To do shows for this vehicle (payments are read from the schedule, not listed here).
     getTaskList(organizationId)
@@ -407,8 +408,8 @@ export async function getVehicleDetail(vehicleId: string, organizationId: string
     throw new Error(queryError.message);
   }
 
-  const documents = await addDocumentUrls(supabase, documentsResult.data || []);
-  const inspections = await addInspectionUrls(supabase, inspectionsResult.data || []);
+  // Signed links for files and inspection photos, fetched side by side rather than one after the other.
+  const [documents, inspections] = await Promise.all([addDocumentUrls(supabase, documentsResult.data || []), addInspectionUrls(supabase, inspectionsResult.data || [])]);
   const transactions = transactionsResult.data || [];
   const rentals = rentalsResult.data || [];
 

@@ -162,7 +162,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
     const Icon = item.icon;
     return (
       <Link
-        className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm font-semibold transition [@media(max-height:960px)]:py-1.5 ${compact ? "flex-1 justify-center" : "w-full"} ${
+        className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm font-semibold transition [@media(max-height:960px)]:py-1.5 ${compact ? "min-w-0 flex-1 justify-center gap-1.5 whitespace-nowrap px-2" : "w-full"} ${
           isActive(item.href) ? "bg-[var(--primary-light)] text-[var(--primary)]" : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--foreground)]"
         }`}
         href={item.href}

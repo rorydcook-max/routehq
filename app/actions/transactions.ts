@@ -5,6 +5,7 @@ import { tellRentalCustomer } from "@/lib/customer-messages";
 import { getTransactionFormOptions } from "@/lib/transactions";
 import { chargeRenter } from "@/lib/charges";
 import { extrasIncomeTag } from "@/lib/extras";
+import { niceMoney } from "@/lib/nice-money";
 import { businessToday } from "@/lib/business-time";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -838,7 +839,7 @@ export async function updateTransaction(transactionId: string, fields: Transacti
     throw new Error(updateError.message);
   }
 
-  const detail = `Transaction corrected: ${oldType} THB ${Math.round(oldAmount).toLocaleString()} -> ${type} THB ${Math.round(amount).toLocaleString()}${description ? ` (${description})` : ""}`;
+  const detail = `Transaction corrected: ${oldType} ${niceMoney(oldAmount)} -> ${type} ${niceMoney(amount)}${description ? ` (${description})` : ""}`;
   await recordActivityEvent(supabase, {
     organization_id: transaction.organization_id,
     actor_id: user.id,

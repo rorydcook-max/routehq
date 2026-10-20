@@ -14,6 +14,8 @@ import { activateRental } from "@/lib/rental-activation";
 import { settleExistingRental } from "@/lib/existing-rental";
 import { noteReferralFee } from "@/lib/partner-network";
 import { recordActivityEvent } from "@/lib/supabase/activity";
+import { niceDate } from "@/lib/nice-date";
+import { niceMoney } from "@/lib/nice-money";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { notifyOperator } from "@/lib/notify-operator";
 import { wallTimeToIso, businessToday } from "@/lib/business-time";
@@ -1444,7 +1446,7 @@ export async function addRentalPayment(formData: FormData) {
     throw new Error(insertError?.message || "Unable to add payment row.");
   }
 
-  const detail = `Payment row added: THB ${Math.round(amount).toLocaleString()} due ${dueDate} (${description}).`;
+  const detail = `Payment row added: ${niceMoney(amount, rental.currency)} due ${niceDate(dueDate)} (${description}).`;
   await recordActivityEvent(supabase, {
     organization_id: rental.organization_id,
     actor_id: user.id,
@@ -2325,11 +2327,13 @@ async function adjustRentalOrThrow(params: {
       }
     }
 
+    const extCurrency = rental.currency || "THB";
+    const extMoney = `${extCurrency === "THB" ? "฿" : `${extCurrency} `}${Math.round(extensionPaymentAmount).toLocaleString("en-US")}`;
     const paymentSentence =
       extensionPaymentAmount > 0
-        ? ` Extension payment THB ${Math.round(extensionPaymentAmount).toLocaleString()} due ${extensionPaymentDueDate}.`
-        : " No extension payment recorded.";
-    const detail = `Rental extended to ${cleanEndDate}.${paymentSentence}${cleanNote ? ` ${cleanNote}` : ""}`;
+        ? ` ${extMoney} for the extra days is due ${niceDate(extensionPaymentDueDate)}.`
+        : " No extra payment recorded.";
+    const detail = `Rental extended to ${niceDate(cleanEndDate)} (was ${niceDate(originalEndDate)}).${paymentSentence}${cleanNote ? ` ${cleanNote}` : ""}`;
 
     await Promise.all([
       recordActivityEvent(supabase, {
@@ -2341,7 +2345,7 @@ async function adjustRentalOrThrow(params: {
         rental_id: rental.id,
         customer_id: rental.customer_id,
         event_type: "rental_extended",
-        title: `Rental extended to ${cleanEndDate}`,
+        title: `Rental extended to ${niceDate(cleanEndDate)}`,
         detail: `${detail} Adjusted by ${actor}.`
       }),
       supabase.from("communication_log").insert({
@@ -2475,7 +2479,7 @@ async function adjustRentalOrThrow(params: {
         ? ` ${futurePaymentsDeleted} later ${futurePaymentsDeleted === 1 ? "payment" : "payments"} removed from the schedule.`
         : "";
     const detail = `Return date set to ${cleanEndDate}${originalEndDate ? ` (was ${originalEndDate})` : " (was open-ended)"}.`;
-    const legacyDetail = `Early return recorded - new end date ${cleanEndDate}. ${refundAmount > 0 ? `Refund of THB ${Math.round(refundAmount).toLocaleString()} issued.` : "No refund issued."}${voidedSentence}${refundReason ? ` ${refundReason}` : ""}${cleanNote ? ` ${cleanNote}` : ""}`;
+    const legacyDetail = `Early return recorded - new end date ${niceDate(cleanEndDate)}. ${refundAmount > 0 ? `Refund of ${niceMoney(refundAmount, rental.currency)} issued.` : "No refund issued."}${voidedSentence}${refundReason ? ` ${refundReason}` : ""}${cleanNote ? ` ${cleanNote}` : ""}`;
 
     await Promise.all([
       recordActivityEvent(supabase, {
@@ -2723,7 +2727,7 @@ export async function updateRentalPayment(paymentId: string, fields: RentalPayme
     throw new Error(updateError.message);
   }
 
-  const detail = `Payment corrected: THB ${Math.round(oldAmount).toLocaleString()} -> THB ${Math.round(amount).toLocaleString()} (${description || oldDescription || "Scheduled payment"})`;
+  const detail = `Payment corrected: ${niceMoney(oldAmount)} -> ${niceMoney(amount)} (${description || oldDescription || "Scheduled payment"})`;
   await recordActivityEvent(supabase, {
     organization_id: payment.organization_id,
     actor_id: user.id,
@@ -2916,7 +2920,7 @@ export async function recordPaymentReceived(paymentId: string, fields: RecordPay
       .eq("organization_id", payment.organization_id);
   }
 
-  const detail = `Payment received: ${description} THB ${Math.round(amount).toLocaleString()} via ${method}`;
+  const detail = `Payment received: ${description} ${niceMoney(amount)} via ${method}`;
   await recordActivityEvent(supabase, {
     organization_id: payment.organization_id,
     actor_id: user.id,
@@ -3557,8 +3561,8 @@ export async function confirmReceiptPayment(input: ConfirmReceiptInput) {
     }
     const notes = [
       receipt ? "Receipt checked" : null,
-      split ? `Part of one payment of THB ${amount.toLocaleString("en-US")}` : null,
-      line.extra > 0 ? `Includes THB ${line.extra.toLocaleString("en-US")} more than was due` : null
+      split ? `Part of one payment of ${niceMoney(amount)}` : null,
+      line.extra > 0 ? `Includes ${niceMoney(line.extra)} more than was due` : null
     ].filter(Boolean);
     await recordPaymentReceived(line.id, { amount: line.paid, date: input.date, method: input.method, note: notes.join(". ") || null });
   }

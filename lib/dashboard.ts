@@ -1,6 +1,7 @@
 import { computeVehicleFigures, type VehicleFigures } from "@/lib/fleet-metrics";
 import { customers as seedCustomers, reminders as seedReminders, rentals as seedRentals, timeline as seedTimeline, transactions as seedTransactions, vehicles as seedVehicles } from "@/lib/data";
 import { calculateDashboardMetrics } from "@/lib/metrics";
+import { HANDED_OVER_STATUSES } from "@/lib/rental-balances";
 import type { Customer, Reminder, Rental, TimelineEvent, Transaction, Vehicle, VehicleStatus } from "@/lib/types";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -124,10 +125,12 @@ export async function getDashboardData(): Promise<DashboardData> {
   // remaining balance (future rent, an extension due next month) is not overdue.
   const { data: latePayments } = await supabase
     .from("rental_payments")
-    .select("rental_id, amount, due_date, status, metadata, voided")
+    .select("rental_id, amount, due_date, status, metadata, voided, rentals!inner(status)")
     .eq("organization_id", organizationId)
     .is("deleted_at", null)
     .in("status", ["scheduled", "pending", "overdue"])
+    // Nothing is owed on a booking that was never handed over.
+    .in("rentals.status", HANDED_OVER_STATUSES)
     .lt("due_date", businessToday());
   const overdueByRental = new Map<string, { amount: number; since: string }>();
   for (const payment of latePayments || []) {

@@ -129,6 +129,10 @@ function headingOf(item: TaskListItem, today: string, tx: Tx): { title: string; 
   // Jobs the app raised are saved as English sentences; the ones it knows are said again in the reader's language.
   // The customer and vehicle in the saved title are already on the context line.
   if (item.action === "settle_deposit") return { title: tx.say("job_settle_deposit"), detail: null };
+  // A booking whose day has come and the vehicle hasn't gone out. Nothing is owed yet: what's due is taken at the handover.
+  if (item.action === "handover") {
+    return { title: tx.say("job_handover"), detail: item.amount ? tx.say("job_handover_collect", { amount: money(item.amount) }) : null };
+  }
   if (item.action === "owed_early") {
     const early = raw.match(/returned (\d+) days? early \((.+?) of (.+?) owed/);
     return early ? { title: tx.say("job_owed_early", { amount: early[2] }), detail: tx.say("job_owed_early_detail", { days: Number(early[1]), owed: early[3] }) } : { title: tx.say("job_owed_early", { amount: "" }), detail: null };
@@ -519,6 +523,16 @@ function TaskRow({ item, organizationId, today, siblings = [], canDecide = true 
             {item.action === "refund" ? tx.say("recordRefund") : item.action === "settle_deposit" ? tx.say("settleDeposit") : tx.say("answer")}
           </Link>
         ) : null}
+        {item.kind === "task" && !item.completedAt && item.rentalId && item.action === "handover" ? (
+          <>
+            <Link className="primary-action pressable min-h-9 px-3 text-xs" href={`/inspections/delivery/${item.rentalId}`}>
+              {tx.say("handOver")}
+            </Link>
+            <Link className="secondary-action pressable min-h-9 px-3 text-xs" href={`/bookings/${item.rentalId}`}>
+              {tx.say("openBooking")}
+            </Link>
+          </>
+        ) : null}
         {item.kind === "task" && !item.completedAt && item.rentalId && item.action === "swap_signature" ? (
           <Link className="primary-action pressable min-h-9 px-3 text-xs" href={`/bookings/${item.rentalId}#amendment`}>
             {tx.say("sendForm")}
@@ -532,7 +546,7 @@ function TaskRow({ item, organizationId, today, siblings = [], canDecide = true 
             {tx.say("openForm")}
           </Link>
         ) : null}
-        {item.kind === "task" && !item.completedAt && !showNote && !item.id.startsWith("request-") && !waitsForDecider && !((item.action === "waive_early" || item.action === "owed_early") && canDecide) ? (
+        {item.kind === "task" && !item.completedAt && !showNote && !item.id.startsWith("request-") && !item.id.startsWith("handover-") && !waitsForDecider && !((item.action === "waive_early" || item.action === "owed_early") && canDecide) ? (
           <>
             {/* One main button per row. A job with its own next step keeps "mark done" and notes behind the dots. */}
             {!item.action || item.action === "refund" || showMore ? (

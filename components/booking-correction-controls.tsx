@@ -505,7 +505,8 @@ export function EditableEndDate({ rentalId, currentEndDate, iconOnly = false }: 
   );
 }
 
-export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }) {
+/** atHandover: the vehicle hasn't gone out yet, so a payment due by now is taken at the handover, not overdue. */
+export function EditableRentalPaymentRow({ payment, atHandover = false }: { payment: RentalPayment; atHandover?: boolean }) {
   const router = useRouter();
   const tx = useCtl();
   const metadata = payment.metadata || {};
@@ -526,7 +527,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
   const [isPending, startTransition] = useTransition();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const badgeTone = voided || status === "cancelled" ? "neutral" : status === "paid" ? "green" : status === "overdue" ? "red" : status === "waived" ? "blue" : "amber";
+  const badgeTone = voided || status === "cancelled" ? "neutral" : status === "paid" ? "green" : atHandover || status === "waived" ? "blue" : status === "overdue" ? "red" : "amber";
   // Scheduled payments can be recorded too: customers often pay early.
   const canRecordPayment = !voided && ["scheduled", "pending", "overdue"].includes(status);
 
@@ -615,6 +616,7 @@ export function EditableRentalPaymentRow({ payment }: { payment: RentalPayment }
                 if (status === "waived") return tx.say("pc_b_waived");
                 const due = String(payment.due_date || "").slice(0, 10);
                 const todayHere = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date());
+                if (atHandover && (!due || due <= todayHere)) return tx.say("pc_b_atHandover");
                 if (!due) return tx.say("pc_b_noDate");
                 if (due < todayHere) return tx.say("pc_b_overdue");
                 if (due === todayHere) return tx.say("pc_b_dueToday");

@@ -1147,7 +1147,11 @@
     "decidedByOwner": "The owner or a manager decides this one.",
     "owedTakeOff": "Take {amount} off",
     "owedKeep": "Keep as booked",
-    "openJob": "Open"
+    "openJob": "Open",
+    "job_handover": "Not handed over yet",
+    "job_handover_collect": "{amount} to collect at handover",
+    "handOver": "Hand over",
+    "openBooking": "Open booking"
   },
   "bookings": {
     "eyebrow": "Bookings",
@@ -2307,7 +2311,12 @@
     "allDoneUndated": "The customer has finished everything. Show the steps",
     "cp_callShort": "Call",
     "tl_extended": "Extended to {date} (was {was}). {amount} for the extra days is due {due}.",
-    "tl_extendedNoPay": "Extended to {date} (was {was}). No extra payment added."
+    "tl_extendedNoPay": "Extended to {date} (was {was}). No extra payment added.",
+    "fin_collectAtHandover": "To collect at handover",
+    "fin_collectAtHandoverDetail": "Nothing is owed until the vehicle goes out. Take this when you hand it over, or cancel the booking if it isn't going ahead.",
+    "track_atHandover": "{amount} to collect at handover",
+    "grp_atHandover": "To collect at handover — {count, plural, one {# payment} other {# payments}}",
+    "pc_b_atHandover": "At handover"
   },
   "newBooking": {
     "pageBack": "Back to bookings",

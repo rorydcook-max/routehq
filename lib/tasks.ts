@@ -2,6 +2,7 @@ import { businessToday } from "@/lib/business-time";
 import { customerPaymentLabel } from "@/lib/payment-labels";
 import { receiptOf, signedReceiptUrls } from "@/lib/payment-receipts";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { isHandedOver } from "@/lib/rental-balances";
 
 export { TASK_TYPE_OPTIONS, taskTypeLabel } from "@/lib/task-types";
 
@@ -82,7 +83,7 @@ function isVoided(payment: any) {
  */
 export async function getTaskList(organizationId: string): Promise<TaskListItem[]> {
   const supabase = (await createSupabaseServerClient()) as any;
-  const [tasksResult, paymentsResult, requestsResult] = await Promise.all([
+  const [tasksResult, paymentsResult, requestsResult, handoversResult] = await Promise.all([
     supabase
       .from("tasks")
       .select("id, title, task_type, due_at, completed_at, vehicle_id, rental_id, rental_payment_id, action, portal_action_id")
@@ -105,8 +106,17 @@ export async function getTaskList(organizationId: string): Promise<TaskListItem[
       .select("id, action_type, created_at, rental_id")
       .eq("organisation_id", organizationId)
       .eq("status", "pending")
-      .order("created_at", { ascending: true })
+      .order("created_at", { ascending: true }),
+    // Bookings whose start day has come and the vehicle hasn't gone out: the handover is the job, not the money.
+    supabase
+      .from("rentals")
+      .select("id, start_date, delivery_datetime, display_code, reference, vehicle_id, customers!rentals_customer_id_fkey(full_name)")
+      .eq("organization_id", organizationId)
+      .eq("status", "booked")
+      .is("deleted_at", null)
+      .lte("start_date", businessToday())
   ]);
+  const handoversDue = (handoversResult.data || []) as any[];
 
   if (tasksResult.error) throw new Error(tasksResult.error.message);
   if (paymentsResult.error) throw new Error(paymentsResult.error.message);
@@ -120,16 +130,29 @@ export async function getTaskList(organizationId: string): Promise<TaskListItem[
   // Rent is scheduled a year ahead; only what is overdue or due in the next five weeks is a job.
   // A payment the customer has already sent a receipt for always shows, whenever it is due.
   const horizon = businessToday(35);
-  const payments = (paymentsResult.data || []).filter(
-    (payment: any) => !isVoided(payment) && payment.rentals && (!payment.due_date || String(payment.due_date).slice(0, 10) <= horizon || receiptOf(payment.metadata))
+  const today = businessToday();
+  const open = ((paymentsResult.data || []) as any[]).filter((payment) => !isVoided(payment) && payment.rentals);
+  // Money is only owed once the vehicle has been handed over. Before that, what is due by now is
+  // collected at the handover, so it sits on the handover job (unless the customer already sent a receipt).
+  const collectAtHandover = new Map<string, number>();
+  for (const payment of open) {
+    if (isHandedOver(payment.rentals.status) || receiptOf(payment.metadata)) continue;
+    if (String(payment.due_date || "").slice(0, 10) > today) continue;
+    collectAtHandover.set(payment.rental_id, (collectAtHandover.get(payment.rental_id) || 0) + Number(payment.amount || 0));
+  }
+  const payments = open.filter(
+    (payment: any) =>
+      receiptOf(payment.metadata) ||
+      (isHandedOver(payment.rentals.status) && (!payment.due_date || String(payment.due_date).slice(0, 10) <= horizon))
   );
 
-  const receiptUrls = await signedReceiptUrls(payments.map((row: any) => receiptOf(row.metadata)?.path).filter(Boolean));
+  const receiptUrls = await signedReceiptUrls(payments.map((row: any) => receiptOf(row.metadata)?.path).filter(Boolean) as string[]);
 
   const vehicleIds = [
     ...new Set([
       ...tasks.map((row: any) => row.vehicle_id),
-      ...payments.map((row: any) => row.vehicle_id || row.rentals?.vehicle_id)
+      ...payments.map((row: any) => row.vehicle_id || row.rentals?.vehicle_id),
+      ...handoversDue.map((row) => row.vehicle_id)
     ].filter(Boolean))
   ];
   const rentalIds = [...new Set([...tasks.map((row: any) => row.rental_id), ...requests.map((row) => row.rental_id)].filter(Boolean))];
@@ -263,7 +286,29 @@ export async function getTaskList(organizationId: string): Promise<TaskListItem[
     };
   });
 
-  return [...requestItems, ...taskItems, ...paymentItems].sort((a, b) => {
+  // A booking whose day has come but the vehicle hasn't gone out: hand it over (taking what's due then), or cancel it.
+  const handoverItems: TaskListItem[] = handoversDue.map((row) => ({
+    id: `handover-${row.id}`,
+    kind: "task",
+    title: "Hand over",
+    taskType: "delivery",
+    dueAt: row.delivery_datetime || null,
+    dueDate: String(row.start_date || "").slice(0, 10) || null,
+    completedAt: null,
+    vehicleId: row.vehicle_id || null,
+    rentalId: row.id,
+    action: "handover",
+    rentalPaymentId: null,
+    vehicleLabel: row.vehicle_id ? vehicleLabels.get(row.vehicle_id) || null : null,
+    rentalLabel: row.display_code || row.reference || null,
+    customerName: row.customers?.full_name || null,
+    amount: collectAtHandover.get(row.id) || null,
+    receipt: null,
+    coveredBy: null,
+    paymentLabel: null
+  }));
+
+  return [...requestItems, ...taskItems, ...handoverItems, ...paymentItems].sort((a, b) => {
     const left = a.dueDate || "9999-12-31";
     const right = b.dueDate || "9999-12-31";
     if (left !== right) return left < right ? -1 : 1;

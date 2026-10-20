@@ -505,6 +505,8 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   );
 
   const firstOverdue = overdueRentals[0];
+  // One customer with two late rentals is one customer.
+  const overdueCustomers = new Set(overdueRentals.map((r) => r.customer)).size;
   const smallTiles: Array<{ key: string; node: ReactNode }> = [];
   smallTiles.push({
     key: "owed",
@@ -514,7 +516,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
           <TileHead icon={<Clock3 size={22} />} title={t("overdue")} />
           <span>
             <span className="num block text-[28px] leading-tight">{money(overdueTotal)}</span>
-            <span className="font-semibold">{overdueRentals.length === 1 ? firstName(firstOverdue.customer) : t("customersCount", { count: overdueRentals.length })}</span>
+            <span className="font-semibold">{overdueCustomers === 1 ? firstName(firstOverdue.customer) : t("customersCount", { count: overdueCustomers })}</span>
           </span>
         </Link>
       ) : (

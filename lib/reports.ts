@@ -1,6 +1,7 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isRawDepositTransaction, isRefundTransaction, isRevenueTransaction } from "@/lib/transaction-options";
 import { businessToday, businessNow } from "@/lib/business-time";
+import { isHandedOver } from "@/lib/rental-balances";
 
 export type DatePreset = "this_month" | "last_month" | "last_3_months" | "last_6_months" | "this_year" | "last_year" | "custom";
 
@@ -631,7 +632,8 @@ export async function getReportsData(
   const custBalMap = new Map<string, { name: string; phone: string; total: number; rentals: Set<string>; oldestDue: string | null }>();
   for (const payment of (duePayments || []) as any[]) {
     const rental = payment.rentals;
-    if (!rental?.customer_id || payment.voided || payment.metadata?.voided || rental.status === "cancelled") continue;
+    // Nothing is owed on a booking that was never handed over (or was cancelled).
+    if (!rental?.customer_id || payment.voided || payment.metadata?.voided || !isHandedOver(rental.status)) continue;
     const existing = custBalMap.get(rental.customer_id) || {
       name: rental.customers?.full_name || "Unknown",
       phone: rental.customers?.phone || "",

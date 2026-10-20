@@ -1156,7 +1156,11 @@
     "decidedByOwner": "เจ้าของหรือผู้จัดการเป็นผู้ตัดสินใจเรื่องนี้",
     "owedTakeOff": "ลด {amount}",
     "owedKeep": "คิดตามที่จองไว้",
-    "openJob": "เปิด"
+    "openJob": "เปิด",
+    "job_handover": "ยังไม่ได้ส่งมอบรถ",
+    "job_handover_collect": "เก็บเงิน {amount} ตอนส่งมอบรถ",
+    "handOver": "ส่งมอบรถ",
+    "openBooking": "เปิดการจอง"
   },
   "bookings": {
     "eyebrow": "การจอง",
@@ -2316,7 +2320,12 @@
     "allDoneUndated": "ลูกค้าทำครบทุกขั้นตอนแล้ว ดูขั้นตอน",
     "cp_callShort": "โทร",
     "tl_extended": "ขยายเวลาเช่าถึง {date} (เดิม {was}) ค่าวันที่เพิ่ม {amount} ครบกำหนด {due}",
-    "tl_extendedNoPay": "ขยายเวลาเช่าถึง {date} (เดิม {was}) ไม่ได้เพิ่มยอดชำระ"
+    "tl_extendedNoPay": "ขยายเวลาเช่าถึง {date} (เดิม {was}) ไม่ได้เพิ่มยอดชำระ",
+    "fin_collectAtHandover": "เก็บเงินตอนส่งมอบรถ",
+    "fin_collectAtHandoverDetail": "ยังไม่มียอดค้างจนกว่าจะส่งมอบรถ เก็บเงินจำนวนนี้ตอนส่งมอบ หรือยกเลิกการจองหากลูกค้าไม่มารับรถ",
+    "track_atHandover": "เก็บ {amount} ตอนส่งมอบรถ",
+    "grp_atHandover": "เก็บตอนส่งมอบรถ — {count} รายการ",
+    "pc_b_atHandover": "ตอนส่งมอบ"
   },
   "newBooking": {
     "pageBack": "กลับไปที่การจอง",

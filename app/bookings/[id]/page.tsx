@@ -377,8 +377,11 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   const nonVoidedPayments = payments.filter((p: any) => !isVoidedPayment(p));
   // Payments that were cancelled or waived are history, not money to collect.
   const isOpenPayment = (p: any) => !["paid", "cancelled", "waived", "refunded"].includes(String(p.status || ""));
-  const overduePaymentGroup = nonVoidedPayments.filter((p: any) => isOpenPayment(p) && p.due_date && p.due_date < today);
-  const dueNowPaymentGroup = nonVoidedPayments.filter((p: any) => isOpenPayment(p) && (!p.due_date || p.due_date === today));
+  // Money is only owed once the vehicle has been handed over. Before that, what has fallen due is taken at the handover.
+  const notHandedOver = String(rental.status || "").toLowerCase() === "booked";
+  const atHandoverPaymentGroup = notHandedOver ? nonVoidedPayments.filter((p: any) => isOpenPayment(p) && (!p.due_date || p.due_date <= today)) : [];
+  const overduePaymentGroup = notHandedOver ? [] : nonVoidedPayments.filter((p: any) => isOpenPayment(p) && p.due_date && p.due_date < today);
+  const dueNowPaymentGroup = notHandedOver ? [] : nonVoidedPayments.filter((p: any) => isOpenPayment(p) && (!p.due_date || p.due_date === today));
   const upcomingPaymentGroup = nonVoidedPayments.filter((p: any) => isOpenPayment(p) && p.due_date && p.due_date > today).sort((a: any, b: any) => String(a.due_date).localeCompare(String(b.due_date)));
   // A monthly rental with no end date has rent lined up far ahead: only the next few are worth showing by default.
   const upcomingShown = upcomingPaymentGroup.slice(0, 3);
@@ -500,14 +503,14 @@ export default async function BookingDetailPage({ params, searchParams }: { para
         tone: "red" as const
       };
     }
-    // Booked and payments have fallen due (rent and deposit on the first day, say):
-    // show the same total the payment list and the bookings list show.
+    // Booked and payments have fallen due (rent and deposit on the first day, say). Nothing is owed until the
+    // vehicle goes out: it is what the handover collects. Same total as the payment list and the bookings list.
     if (!activeRentalStatus && pendingPaymentAmount > 0) {
       return {
-        label: tx.say("fin_dueNow"),
-        detail: tx.say("fin_dueNowDetail"),
+        label: notHandedOver ? tx.say("fin_collectAtHandover") : tx.say("fin_dueNow"),
+        detail: notHandedOver ? tx.say("fin_collectAtHandoverDetail") : tx.say("fin_dueNowDetail"),
         amount: pendingPaymentAmount,
-        tone: "amber" as const
+        tone: notHandedOver ? ("blue" as const) : ("amber" as const)
       };
     }
     // Before handover, with money still to come: say what is coming and when,
@@ -575,7 +578,9 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   const showTrack = !isCancelled && !!startDay && !!trackEnd && trackEnd > startDay && rentPaymentsAll.length > 0;
   const firstOpenDue = firstOpenRent ? String(firstOpenRent.due_date).slice(0, 10) : null;
   const paidTo = firstOpenDue || trackEnd;
-  const dueOwed = !!firstOpenDue && firstOpenDue <= today;
+  // Rent fallen due on a booking that hasn't gone out is taken at the handover, not owed.
+  const dueOwed = !notHandedOver && !!firstOpenDue && firstOpenDue <= today;
+  const dueAtHandover = notHandedOver && !!firstOpenDue && firstOpenDue <= today;
   const dueThere = firstOpenDue ? openRent.filter((payment: any) => String(payment.due_date).slice(0, 10) === firstOpenDue).reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0) : 0;
   const depositHeldNow = String(rental.deposit_status || "") === "received" && Number(rental.deposit_held || 0) > 0;
   const financialStateClass =
@@ -736,7 +741,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   end: shortDate(trackEnd!, tx.locale),
                   today: tx.say("track_today"),
                   paid: firstOpenDue ? (firstOpenDue > startDay! ? tx.say("track_paidTo", { date: shortDate(firstOpenDue, tx.locale) }) : null) : tx.say("track_paidAll"),
-                  due: firstOpenDue ? tx.say(dueOwed ? "track_owed" : "track_next", { amount: money(dueThere, rental.currency), date: shortDate(firstOpenDue, tx.locale) }) : null
+                  due: firstOpenDue ? tx.say(dueOwed ? "track_owed" : dueAtHandover ? "track_atHandover" : "track_next", { amount: money(dueThere, rental.currency), date: shortDate(firstOpenDue, tx.locale) }) : null
                 }}
                 paidTo={paidTo}
                 start={startDay!}
@@ -1075,7 +1080,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 <div className="grid gap-3">
             <Pane
               id="payment-schedule"
-              open={overduePaymentGroup.length + dueNowPaymentGroup.length > 0 || (payments.length === 0 && !isClosed && !awaitingSignature)}
+              open={overduePaymentGroup.length + dueNowPaymentGroup.length + atHandoverPaymentGroup.length > 0 || (payments.length === 0 && !isClosed && !awaitingSignature)}
               summary={`${financialState.label}${financialState.amount !== null ? ` · ${money(financialState.amount, rental.currency)}` : ""}`}
               title={tx.say("payTitle")}
               tone={financialState.tone === "red" ? "red" : financialState.tone === "green" ? "green" : financialState.tone === "amber" ? "amber" : "neutral"}
@@ -1083,17 +1088,18 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               <div className="space-y-3">
                 {/* Every rent payment as a block, in date order: what is paid, owed, due today and still to come. */}
                 <PaymentStrip
-                  legend={{ paid: tx.say("strip_paid"), owed: tx.say("strip_owed"), today: tx.say("strip_today"), later: tx.say("strip_later") }}
+                  legend={{ paid: tx.say("strip_paid"), owed: tx.say("strip_owed"), today: tx.say(notHandedOver ? "pc_b_atHandover" : "strip_today"), later: tx.say("strip_later") }}
                   payments={[...rentPaymentsAll]
                     .filter((payment: any) => payment.due_date)
                     .sort((a: any, b: any) => String(a.due_date).localeCompare(String(b.due_date)))
                     .map((payment: any) => {
                       const due = String(payment.due_date).slice(0, 10);
-                      const state = payment.status === "paid" ? "paid" : due < today ? "owed" : due === today ? "today" : "later";
+                      // Before the handover nothing is owed: rent already due is taken then, so it shows as due now, not owed.
+                      const state = payment.status === "paid" ? "paid" : notHandedOver ? (due <= today ? "today" : "later") : due < today ? "owed" : due === today ? "today" : "later";
                       return {
                         key: payment.id,
                         state,
-                        tip: `${shortDate(due, tx.locale)} · ${money(payment.amount, rental.currency)} · ${tx.say(`strip_${state}`)}`
+                        tip: `${shortDate(due, tx.locale)} · ${money(payment.amount, rental.currency)} · ${tx.say(notHandedOver && state === "today" ? "pc_b_atHandover" : `strip_${state}`)}`
                       } as const;
                     })}
                 />
@@ -1151,7 +1157,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 {!needsExistingRentalPaymentSetup &&
                 payments.length > 0 &&
                 ["active", "due_soon", "overdue", "extended", "booked"].includes(String(displayStatus || "").toLowerCase()) &&
-                overduePaymentGroup.length + dueNowPaymentGroup.length + upcomingPaymentGroup.length === 0 &&
+                overduePaymentGroup.length + dueNowPaymentGroup.length + atHandoverPaymentGroup.length + upcomingPaymentGroup.length === 0 &&
                 (!rental.end_date || String(rental.end_date).slice(0, 10) > today) ? (
                   <div className="space-y-3 rounded-lg border border-[var(--warning-line)] bg-[var(--warning-light)] p-3 text-sm font-semibold text-[var(--warning)]">
                     <p>{tx.say("noFuture")}</p>
@@ -1160,6 +1166,12 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 ) : null}
                 {payments.length === 0 && transactions.length === 0 && !awaitingSignature ? (
                   <SectionEmpty>{tx.say("noPayments")}</SectionEmpty>
+                ) : null}
+                {atHandoverPaymentGroup.length > 0 ? (
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--info)]">{tx.say("grp_atHandover", { count: atHandoverPaymentGroup.length })}</p>
+                    {atHandoverPaymentGroup.map((payment: any) => <EditableRentalPaymentRow atHandover key={payment.id} payment={payment} />)}
+                  </div>
                 ) : null}
                 {overduePaymentGroup.length > 0 ? (
                   <div className="space-y-1">

@@ -142,7 +142,9 @@ export function InboxView({
   const lastInbound = [...messages].reverse().find((message) => message.direction === "in");
   // One connection problem is said once, above the reply box, not under every message it stopped.
   const isAuthError = (value: unknown) => /auth|token|unauthor|401|403|credential/i.test(String(value || ""));
-  const disconnectedFailures = messages.filter((message) => message.status === "failed" && isAuthError(message.error)).length;
+  // Only while the latest reply is the one that failed: once a message gets through, the account works again.
+  const lastOutbound = [...messages].reverse().find((message) => message.direction === "out");
+  const disconnectedFailures = lastOutbound?.status === "failed" && isAuthError(lastOutbound.error) ? messages.filter((message) => message.status === "failed" && isAuthError(message.error)).length : 0;
   // The link to a customer is one line in the header; the picker only opens when it is being changed.
   const [relinking, setRelinking] = useState(false);
   useEffect(() => setRelinking(false), [selected?.id]);

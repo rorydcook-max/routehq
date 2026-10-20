@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { inviteUser, type AuthActionState } from "@/app/actions/auth";
 import { operatorLocaleOptions } from "@/lib/i18n/locales";
@@ -12,12 +12,18 @@ const labelClass = "font-semibold text-[var(--foreground-secondary)]";
 export function InviteForm() {
   const say = useTranslations("settingsPage") as unknown as (key: string) => string;
   const [state, formAction, pending] = useActionState(inviteUser, initialState);
+  // Kept in state so a failed invite doesn't wipe the address (the form resets plain fields after
+  // every submit); it is only cleared once the invite has gone.
+  const [email, setEmail] = useState("");
+  useEffect(() => {
+    if (state.success) setEmail("");
+  }, [state]);
 
   return (
     <form action={formAction} className="space-y-4">
       <label className="block">
         <span className={labelClass}>{say("iv_email")}</span>
-        <input autoComplete="email" className="mt-1 w-full" name="email" required type="email" />
+        <input autoComplete="email" className="mt-1 w-full" name="email" onChange={(event) => setEmail(event.target.value)} required type="email" value={email} />
       </label>
       <fieldset className="block">
         <legend className={labelClass}>{say("iv_role")}</legend>

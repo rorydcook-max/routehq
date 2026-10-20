@@ -1478,7 +1478,7 @@
     "fin_setupDetail": "Set up payment records for this rental your team entered.",
     "fin_awaiting": "Awaiting customer - no payment due yet",
     "fin_awaitingDetail": "The customer has not completed the booking form.",
-    "fin_atHandover": "To collect at handover",
+    "fin_atHandover": "{rent} first rent is collected at handover. The schedule is written when the customer signs.",
     "fin_atHandoverDetail": "{amount} due when you hand the vehicle over.",
     "fin_due": "Payment due",
     "fin_dueDetail": "Customer selected pay now. Record payment when received.",
@@ -1501,7 +1501,6 @@
     "fin_backUnused": "up to {amount} for {days, plural, one {# unused day} other {# unused days}}",
     "fin_toGiveBackHow": "Settle it under Vehicle & deposit.",
     "fin_atHandoverWithDeposit": "{total} is collected at handover: {rent} first rent + {deposit} deposit. The schedule is written when the customer signs.",
-    "fin_atHandover": "{rent} first rent is collected at handover. The schedule is written when the customer signs.",
     "nf_eyebrow": "Booking not found",
     "nf_title": "This rental could not be opened",
     "nf_body": "It may have been cancelled, deleted, or belong to another organisation.",
@@ -3437,7 +3436,7 @@
     "team_active": "Active",
     "team_inactive": "Inactive",
     "inv_title": "Invite a team member",
-    "inv_body": "Choose Owner for a business partner, Teammate for staff who handle bookings and handovers.",
+    "inv_body": "They get an email with a link to join. Pick what they can do:",
     "inv_open": "Open the invite page",
     "saveFailed": "That did not save. Try again.",
     "cancel": "Cancel",
@@ -3823,7 +3822,7 @@
     "extra_forBikes": "Scooters and motorbikes",
     "extra_add": "Add an extra",
     "rem_title": "Automatic reminders",
-    "rem_body": "Sent once each, to the customer's chat (LINE or Telegram) or by email. When neither is possible, the message waits in your Inbox for you to send with one tap.",
+    "rem_body": "Each is sent once, to the customer's chat or by email.",
     "rem_handover": "Handover tomorrow",
     "rem_return": "Return in 3 days, and tomorrow",
     "rem_rent_due": "Rent due tomorrow",
@@ -3948,7 +3947,10 @@
     "b_colourCustom": "Pick your own",
     "grp_paid": "Getting paid",
     "grp_prices": "Prices and rules",
-    "grp_online": "Booking online"
+    "grp_online": "Booking online",
+    "mp_replaceTitle": "Paste a new access token",
+    "mp_replaceBlurb": "This reconnects the same account. Your chats and settings stay as they are.",
+    "mp_replaceBtn": "Save the new token"
   },
   "accountPage": {
     "roleOwner": "Owner",
@@ -4230,7 +4232,8 @@
     "link_login": "Go to sign in",
     "iv_removeFailed": "That person could not be removed. Try again.",
     "iv_roleManager": "a manager",
-    "iv_levelFailed": "Couldn't change their level. Try again."
+    "iv_levelFailed": "Couldn't change their level. Try again.",
+    "iv_rateLimited": "Too many invite emails were sent in the last hour. Please try again a little later."
   },
   "calc": {
     "title": "Buying a vehicle",

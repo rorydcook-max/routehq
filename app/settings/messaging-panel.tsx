@@ -22,7 +22,9 @@ const GUIDES = {
 type ProviderKey = keyof typeof GUIDES;
 const labelClass = "font-semibold text-[var(--foreground-secondary)]";
 
-function ConnectForm({ provider, publicUrl }: { provider: ProviderKey; publicUrl: boolean }) {
+// `replacing`: the account is connected but its token stopped working. Pasting a new one
+// updates the same account in place, so there's no disconnect and reconnect.
+function ConnectForm({ provider, publicUrl, replacing = false }: { provider: ProviderKey; publicUrl: boolean; replacing?: boolean }) {
   const say = useTranslations("settingsPage") as unknown as Say;
   const guide = GUIDES[provider];
   const router = useRouter();
@@ -48,11 +50,11 @@ function ConnectForm({ provider, publicUrl }: { provider: ProviderKey; publicUrl
   }
 
   return (
-    <div className="rounded-xl bg-[var(--panel-secondary)]">
+    <div className={replacing ? "mt-3 rounded-xl bg-white" : "rounded-xl bg-[var(--panel-secondary)]"}>
       <button aria-expanded={open} className="flex w-full items-center justify-between gap-3 p-3.5 text-left" onClick={() => setOpen((value) => !value)} type="button">
         <span>
-          <span className="block text-[16px] font-bold text-[var(--foreground)]">{say("mp_connect", { name: say(guide.name) })}</span>
-          <span className="mt-0.5 block font-medium text-[var(--foreground-secondary)]">{say(guide.blurb)}</span>
+          <span className="block text-[16px] font-bold text-[var(--foreground)]">{replacing ? say("mp_replaceTitle") : say("mp_connect", { name: say(guide.name) })}</span>
+          <span className="mt-0.5 block font-medium text-[var(--foreground-secondary)]">{replacing ? say("mp_replaceBlurb") : say(guide.blurb)}</span>
         </span>
         <ChevronDown className={`flex-shrink-0 text-[var(--muted)] transition ${open ? "rotate-180" : ""}`} size={20} />
       </button>
@@ -82,7 +84,7 @@ function ConnectForm({ provider, publicUrl }: { provider: ProviderKey; publicUrl
             </p>
           ) : null}
           <button className="primary-action pressable mt-4" disabled={isPending || !token.trim()} onClick={submit} type="button">
-            {isPending ? say("mp_checking") : say("mp_connectBtn")}
+            {isPending ? say("mp_checking") : replacing ? say("mp_replaceBtn") : say("mp_connectBtn")}
           </button>
         </div>
       ) : null}
@@ -90,7 +92,7 @@ function ConnectForm({ provider, publicUrl }: { provider: ProviderKey; publicUrl
   );
 }
 
-function ConnectedChannel({ channel }: { channel: Channel }) {
+function ConnectedChannel({ channel, publicUrl }: { channel: Channel; publicUrl: boolean }) {
   const say = useTranslations("settingsPage") as unknown as Say;
   const locale = useLocale();
   const router = useRouter();
@@ -144,7 +146,7 @@ function ConnectedChannel({ channel }: { channel: Channel }) {
           <p>
             {channel.send_failed_at ? say("mp_lastFailedOn", { date: shortDate(toWallTime(channel.send_failed_at).slice(0, 10), locale) }) : say("mp_lastFailed")} {tokenRejected ? say("mp_tokenRejected") : ""}
           </p>
-          <p className="mt-1">{say("mp_fix")}</p>
+          {guide ? <ConnectForm provider={channel.provider as ProviderKey} publicUrl={publicUrl} replacing /> : <p className="mt-1">{say("mp_fix")}</p>}
         </div>
       ) : null}
       {channel.last_error ? (
@@ -179,7 +181,7 @@ export function MessagingPanel({ channels, publicUrl }: { channels: Channel[]; p
   return (
     <div className="space-y-2.5">
       {channels.map((channel) => (
-        <ConnectedChannel channel={channel} key={channel.id} />
+        <ConnectedChannel channel={channel} key={channel.id} publicUrl={publicUrl} />
       ))}
       {(Object.keys(GUIDES) as ProviderKey[])
         .filter((provider) => !connected.has(provider))

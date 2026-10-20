@@ -219,7 +219,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
 
   const { data: messagingChannels } = await supabase
     .from("messaging_channels")
-    .select("id, provider, display_name, status, last_error, webhook_key")
+    .select("id, provider, display_name, status, last_error, webhook_key, updated_at")
     .eq("organization_id", organization.id)
     .neq("status", "disconnected")
     .order("created_at", { ascending: true });
@@ -237,6 +237,11 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     const channelId = String(send.conversations?.channel_id || "");
     if (!channelId || lastSendByChannel.has(channelId)) continue;
     lastSendByChannel.set(channelId, { failed: send.status === "failed", error: send.error || null, at: String(send.created_at || "") });
+  }
+  // A failure from before the token was last replaced no longer says anything about the account.
+  for (const channel of (messagingChannels || []) as any[]) {
+    const last = lastSendByChannel.get(channel.id);
+    if (last?.failed && channel.updated_at && new Date(last.at).getTime() < new Date(channel.updated_at).getTime()) lastSendByChannel.delete(channel.id);
   }
   const typedVehicleMakes = (vehicleMakes || []) as VehicleMakeSetting[];
   const typedVehicleModels = (vehicleModels || []) as VehicleModelSetting[];
@@ -366,7 +371,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             })}
           </p>
           <MessagingPanel
-            channels={((messagingChannels || []) as any[]).map((channel) => ({
+            channels={((messagingChannels || []) as any[]).map((channel: any) => ({
               id: channel.id,
               provider: channel.provider,
               display_name: channel.display_name,
@@ -803,9 +808,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           <div className="mt-3">
             <InviteForm />
           </div>
-          <Link className="mt-4 inline-flex text-sm font-bold text-[var(--primary)]" href="/invite">
-            {say("inv_open")}
-          </Link>
         </Card>
       </div>
         </>

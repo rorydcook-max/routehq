@@ -332,8 +332,10 @@ export async function inviteUser(_state: AuthActionState, formData: FormData): P
 
   if (error || !data.user) {
     const message = error?.message || "";
-    if (/already been registered|already registered|already exists/i.test(message)) {
-      return { error: say("iv_failed") };
+    console.error("[invite] inviteUserByEmail failed:", message);
+    // Telling someone to check an address that is fine sends them the wrong way.
+    if (/rate limit|too many|over_email_send_rate_limit/i.test(message)) {
+      return { error: say("iv_rateLimited") };
     }
     return { error: say("iv_failed") };
   }

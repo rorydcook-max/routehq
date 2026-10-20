@@ -763,7 +763,7 @@ export function CalculatorClient({
                 {research.reliability ? (
                   <p className="flex flex-wrap items-center gap-2 text-sm">
                     <Dots count={Math.round(Number(research.reliability))} />
-                    <span className="font-semibold">{t("b_reliability")}</span>
+                    <span className="font-semibold">{say(`b_rel_${Math.min(5, Math.max(1, Math.round(Number(research.reliability))))}`)}</span>
                     {research.parts && t.has(`b_parts_${research.parts}`) ? <span className="rounded-full bg-[var(--panel-tertiary)] px-2.5 py-0.5 text-xs font-bold">{say(`b_parts_${research.parts}`)}</span> : null}
                   </p>
                 ) : null}

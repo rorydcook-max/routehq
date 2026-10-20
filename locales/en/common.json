@@ -4416,7 +4416,6 @@
     "b_costService": "Servicing and repairs, first year (rising {pct}% a year)",
     "b_costTotal": "About {year} a year, {month} a month.",
     "b_reliabilityTitle": "Reliability and known issues",
-    "b_reliability": "reliability",
     "b_parts_easy": "Parts easy to get",
     "b_parts_average": "Parts fairly easy to get",
     "b_parts_hard": "Parts hard or dear to get",
@@ -4436,7 +4435,12 @@
     "othersOffline": "Live adverts can't be searched right now (the web look-up service is unavailable), so no real listings can be shown. Try again later.",
     "b_perMonthHint": "Rent coming in, less running costs. Before the value it loses.",
     "b_perYearHint": "Average over {years} years, after the value it loses and what it sells for.",
-    "figuresRough": "Rough figures for this model, not checked live — change any of them"
+    "figuresRough": "Rough figures for this model, not checked live — change any of them",
+    "b_rel_1": "Unreliable",
+    "b_rel_2": "Below average",
+    "b_rel_3": "Average",
+    "b_rel_4": "Reliable",
+    "b_rel_5": "Very reliable"
   },
   "importer": {
     "dt_vehicles": "Vehicles",

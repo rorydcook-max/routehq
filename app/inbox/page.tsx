@@ -10,6 +10,7 @@ import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import type { InboxConversation, InboxMessage } from "@/lib/inbox/store";
 import { getDefaultOrganization } from "@/lib/organization";
+import { amountDueNowByRental } from "@/lib/rental-balances";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -45,7 +46,7 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
     selected = (data as InboxConversation) || null;
   }
 
-  const [{ data: messages }, { data: bookings }] = await Promise.all([
+  const [{ data: messages }, { data: bookingRows }] = await Promise.all([
     selected
       ? supabase.from("conversation_messages").select("id, conversation_id, direction, message_type, body, status, error, created_at").eq("conversation_id", selected.id).order("created_at", { ascending: true }).limit(300)
       : Promise.resolve({ data: [] }),
@@ -59,6 +60,10 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
           .limit(4)
       : Promise.resolve({ data: [] })
   ]);
+  // "Owed" beside a booking is what is due by today on a vehicle that has gone out, as everywhere else —
+  // not the whole balance, which counts rent months ahead.
+  const dueNow = await amountDueNowByRental(supabase, ((bookingRows || []) as any[]).map((row) => row.id));
+  const bookings = ((bookingRows || []) as any[]).map((row) => ({ ...row, balance_due: dueNow.get(row.id) || 0 }));
 
   const hasChannel = (channels || []).length > 0;
 

@@ -1,4 +1,5 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { amountDueNowByRental } from "@/lib/rental-balances";
 import { lineFlex, lineText, sendLinePushMessage, type LineMessage } from "@/lib/providers/messaging/line";
 
 const THB = (n: number) =>
@@ -84,7 +85,9 @@ export async function fetchSummaryData(organizationId: string): Promise<SummaryD
       .is("deleted_at", null)
   ]);
 
-  const rentals: any[] = rentalsRes.data || [];
+  // "Balance" on a late return is what is owed now, as on every screen — not the whole balance, which counts rent months ahead.
+  const dueNow = await amountDueNowByRental(supabase, (rentalsRes.data || []).map((r: any) => r.id));
+  const rentals: any[] = (rentalsRes.data || []).map((r: any) => ({ ...r, balance_due: dueNow.get(r.id) || 0 }));
   const transactions: any[] = transactionsRes.data || [];
   const vehicles: any[] = vehiclesRes.data || [];
 

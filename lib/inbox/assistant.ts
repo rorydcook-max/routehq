@@ -1,6 +1,7 @@
 import { businessToday } from "@/lib/business-time";
 import { aiTextConfigured, createChatCompletion } from "@/lib/ai-chat";
 import { BLOCKING_RENTAL_STATUSES } from "@/lib/rental-conflicts";
+import { amountDueNowByRental } from "@/lib/rental-balances";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 const MODEL = process.env.OPENAI_ASSISTANT_MODEL || "gpt-4o";
@@ -24,7 +25,7 @@ export async function draftReply(input: { organizationId: string; conversationId
     input.customerId
       ? supabase
           .from("rentals")
-          .select("status, start_date, end_date, rental_rate, pricing_model, balance_due, vehicles(make, model, registration_number)")
+          .select("id, status, start_date, end_date, rental_rate, pricing_model, vehicles(make, model, registration_number)")
           .eq("organization_id", input.organizationId)
           .eq("customer_id", input.customerId)
           .order("start_date", { ascending: false })
@@ -40,6 +41,9 @@ export async function draftReply(input: { organizationId: string; conversationId
     const period = `${rental.start_date} to ${rental.end_date || "open-ended"}`;
     bookedByVehicle.set(rental.vehicle_id, [...(bookedByVehicle.get(rental.vehicle_id) || []), period]);
   }
+
+  // What is owed now (due by today, on a vehicle that has gone out) — not the whole balance, which counts rent months ahead.
+  const dueNow = await amountDueNowByRental(supabase, (rentals || []).map((rental: any) => rental.id));
 
   const thread = [...(messages || [])].reverse();
   if (!thread.some((message: any) => message.direction === "in")) return { ok: false, error: "There's no customer message to reply to yet." };
@@ -66,7 +70,7 @@ export async function draftReply(input: { organizationId: string; conversationId
       from: rental.start_date,
       until: rental.end_date || "open-ended",
       rate: `${Number(rental.rental_rate || 0)} per ${rental.pricing_model === "daily" ? "day" : rental.pricing_model === "weekly" ? "week" : "month"}`,
-      owedNow: Number(rental.balance_due || 0)
+      owedNow: dueNow.get(rental.id) || 0
     }))
   };
 

@@ -780,7 +780,9 @@ export async function submitInspection(formData: FormData) {
     }
 
     // Damage still to be priced: the deposit stays held, and pricing it is a job for the owner.
-    const holdingForDamage = String(formData.get("holdDepositForDamage") || "") === "true" && Boolean(depositSettlement && depositSettlement.retained > 0);
+    // Only with new damage recorded on this check: "keep it until the damage is priced" with no damage is not a state.
+    const newDamageRecorded = damageItems.some((item: any) => !item?.is_pre_existing);
+    const holdingForDamage = newDamageRecorded && String(formData.get("holdDepositForDamage") || "") === "true" && Boolean(depositSettlement && depositSettlement.retained > 0);
     if (holdingForDamage) {
       const admin = createSupabaseAdminClient() as any;
       const { data: heldRental } = await admin.from("rentals").select("vehicle_id, reference, display_code, customers!rentals_customer_id_fkey(full_name), vehicles!rentals_vehicle_id_fkey(make, model)").eq("id", rentalId).maybeSingle();

@@ -396,7 +396,12 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   const returnInspection = inspections.find((inspection: any) => formType(inspection) === "return" && (rental.status === "completed" || onCurrentVehicle(inspection)));
   const customerDocuments = documents.filter((document: any) => document.owner_type === "customer");
   const delivery = deliveryDisplay(rental, bookingLink, tx);
-  const paymentMethod = bookingLink?.preferred_payment_method || null;
+  // What the customer chose on the link; failing that, how they actually paid (cash at handover, say),
+  // so a paid booking never says "Payment method: Not yet selected".
+  const paymentMethod =
+    bookingLink?.preferred_payment_method ||
+    [...(activePayments as any[])].filter((payment) => payment.status === "paid" && payment.payment_method).sort((a, b) => String(b.paid_at || b.updated_at || "").localeCompare(String(a.paid_at || a.updated_at || "")))[0]?.payment_method ||
+    null;
   const paymentTiming = bookingLink?.payment_timing || null;
   const customerReportedPayment = Boolean(bookingLink?.payment_reported_by_customer);
   const paymentConfirmationAmount = Number(rental.deposit_amount || rental.rental_rate || 0);
@@ -426,6 +431,25 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   const extras = extrasSummary(rental, payments, transactions);
   const hasExtras = extrasLines(rental).length > 0 || extras.paid > 0 || extras.open > 0;
   const financialState = (() => {
+    // A finished rental with money still to hand back: that is the one thing left to do, so the
+    // Billing card says it (it used to say "Paid up to date" with the deposit and unused rent unresolved).
+    if (String(rental.status || "") === "completed") {
+      const depositStillHeld = Math.max(0, Number(rental.deposit_held || 0) - Number(rental.deposit_refunded_amount || 0) - Number(rental.deposit_forfeited_amount || 0));
+      const unsettledEarly = (payments as any[]).map((payment) => payment.metadata?.early_return).find((item) => item && !item.settled) || null;
+      const unusedRent = Number(unsettledEarly?.amount || 0);
+      if (depositStillHeld > 0 || unusedRent > 0) {
+        const parts = [
+          depositStillHeld > 0 ? tx.say("fin_backDeposit", { amount: money(depositStillHeld, rental.currency) }) : null,
+          unusedRent > 0 ? tx.say("fin_backUnused", { amount: money(unusedRent, rental.currency), days: Number(unsettledEarly?.unusedDays || 0) }) : null
+        ].filter(Boolean);
+        return {
+          label: tx.say("fin_toGiveBack"),
+          detail: `${parts.join(" · ")}. ${tx.say("fin_toGiveBackHow")}`,
+          amount: null as number | null,
+          tone: "amber" as const
+        };
+      }
+    }
     if (isCancelled) {
       return {
         label: tx.say("fin_cancelled"),

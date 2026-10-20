@@ -640,6 +640,13 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
   // land the customer on an error page. On a slow phone that gap is seconds long, so the button waits.
   const [pageLive, setPageLive] = useState(false);
   useEffect(() => setPageLive(true), []);
+  // Signing happens at the foot of a long page; the "You're all set" card sits under the booking summary.
+  // Bring it into view the moment it appears, or the customer is left looking at the summary wondering if it worked.
+  const doneRef = useRef<HTMLElement>(null);
+  const [justCompleted, setJustCompleted] = useState(false);
+  useEffect(() => {
+    if (justCompleted) doneRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [justCompleted]);
   useEffect(() => {
     const now = new Date();
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
@@ -860,9 +867,10 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         setOriginalAgreementUrl((result as any).originalAgreementUrl || null);
         setExecutionCertificateUrl((result as any).executionCertificateUrl || null);
         setCompleted(true);
+        setJustCompleted(true);
         // The payments for this booking exist now; show them without a reload.
         router.refresh();
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        // (No scroll to the top here: that left the confirmation under the booking summary. The effect above centres it.)
       } catch (submitError) {
         setError(shownError(submitError, t("completeFailed")));
       }
@@ -871,7 +879,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
 
   if (completed) {
     return (
-      <section className="-order-1 rounded-2xl border border-[var(--success-line)] bg-white p-5 text-center shadow-sm">
+      <section ref={doneRef} className="-order-1 scroll-mt-4 rounded-2xl border border-[var(--success-line)] bg-white p-5 text-center shadow-sm">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--success-light)] text-[var(--success)]">
           <CheckCircle2 size={34} />
         </div>

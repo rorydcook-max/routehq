@@ -471,7 +471,11 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
   // Charges the deposit cannot cover are billed to the customer unless the owner says not to.
   const [billUncovered, setBillUncovered] = useState(true);
   // Damage whose cost is not known until it has been looked at: the deposit stays held, nothing goes back yet.
-  const [holdForDamage, setHoldForDamage] = useState(false);
+  const [holdForDamageChoice, setHoldForDamage] = useState(false);
+  // Keeping the deposit "until the damage is priced" only makes sense when new damage was logged on this
+  // check. With none, the option is not offered, and a tick left over from removed damage no longer counts.
+  const newDamageLogged = damageItems.some((item: any) => !item?.is_pre_existing);
+  const holdForDamage = holdForDamageChoice && newDamageLogged;
   const [isPending, startTransition] = useTransition();
   const [uploadProgress, setUploadProgress] = useState("");
   const [uploadError, setUploadError] = useState("");
@@ -1207,7 +1211,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
                 </div>
               ) : null}
             </div>
-            {availableToReconcile > 0 ? (
+            {availableToReconcile > 0 && newDamageLogged ? (
               <label className="flex items-start gap-3 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] px-3 py-3 text-sm font-semibold text-[var(--foreground)]">
                 <input checked={holdForDamage} className="mt-0.5 h-5 w-5 flex-shrink-0" onChange={(event) => setHoldForDamage(event.target.checked)} type="checkbox" />
                 <span>

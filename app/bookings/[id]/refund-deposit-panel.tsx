@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { shownError } from "@/lib/error-text";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -56,6 +56,20 @@ export function RefundDepositPanel({
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
+  // What was just returned or kept, shown straight away: the page refresh that brings the saved
+  // numbers can take seconds, and meanwhile "Still held ฿5,000" with a live Return button invited a second tap.
+  const [pendingOut, setPendingOut] = useState({ refunded: 0, forfeited: 0 });
+  const serverRefunded = Number(depositRefunded || 0);
+  const serverForfeited = Number(depositForfeited || 0);
+  // Once the saved numbers arrive they already include it, so the local amount is dropped.
+  useEffect(() => setPendingOut({ refunded: 0, forfeited: 0 }), [serverRefunded, serverForfeited]);
+  // Same for the unused-rent offer: once the refund is recorded it goes, rather than inviting a second refund.
+  const [earlyRefunded, setEarlyRefunded] = useState(false);
+  const serverEarlyKey = earlyReturn ? `${earlyReturn.amount}-${earlyReturn.unusedDays}` : "none";
+  useEffect(() => setEarlyRefunded(false), [serverEarlyKey]);
+  if (earlyRefunded) earlyReturn = null;
+  depositRefunded = serverRefunded + pendingOut.refunded;
+  depositForfeited = serverForfeited + pendingOut.forfeited;
   const available = useMemo(
     () => Math.max(0, Number(depositHeld || 0) - Number(depositRefunded || 0) - Number(depositForfeited || 0)),
     [depositHeld, depositRefunded, depositForfeited]
@@ -79,6 +93,9 @@ export function RefundDepositPanel({
     startTransition(async () => {
       try {
         await action(formData);
+        const returned = Number(formData.get("returnAmount") || 0);
+        const kept = Number(formData.get("deductionAmount") || 0);
+        if (returned > 0 || kept > 0) setPendingOut((current) => ({ refunded: current.refunded + returned, forfeited: current.forfeited + kept }));
         setActiveForm(null);
         setMessage(successMessage);
         router.refresh();
@@ -262,7 +279,10 @@ export function RefundDepositPanel({
               className="mt-3 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3"
               onSubmit={(event) => {
                 event.preventDefault();
-                submit(new FormData(event.currentTarget), say("ref_refundRecorded"), recordPaymentRefund);
+                submit(new FormData(event.currentTarget), say("ref_refundRecorded"), async (formData) => {
+                  await recordPaymentRefund(formData);
+                  setEarlyRefunded(true);
+                });
               }}
             >
               <label className="block text-xs font-bold text-[var(--foreground-secondary)]">

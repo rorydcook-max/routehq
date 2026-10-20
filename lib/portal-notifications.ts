@@ -1,4 +1,5 @@
 import { niceDate } from "@/lib/nice-date";
+import { wallTimeToIso } from "@/lib/business-time";
 import { tryAutoExtend, type ExtensionOutcome } from "@/lib/auto-extension";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 
@@ -59,20 +60,16 @@ export async function processCustomerPortalAction(supabase: any, actionId: strin
   }
 
   if (action.action_type === "return_confirmation") {
-    const returnDateTime = [content.return_date, content.return_time].filter(Boolean).join("T") || null;
+    // The customer's date and time are Thai wall time: stored as such, not read as UTC (which showed 7 hours late).
+    const returnDateTime = content.return_date ? wallTimeToIso(`${content.return_date}T${content.return_time || "09:00"}`) : null;
     await Promise.all([
       supabase
         .from("rentals")
+        // Where and when the customer will bring it back. (This used to write the delivery location and a
+        // metadata column bookings don't have, so the whole update failed and nothing was saved.)
         .update({
-          delivery_location: content.return_location || undefined,
-          metadata: {
-            customer_confirmed_return: {
-              date: content.return_date || null,
-              time: content.return_time || null,
-              location: content.return_location || null,
-              note: content.note || null
-            }
-          }
+          ...(content.return_location ? { return_location: content.return_location } : {}),
+          ...(content.return_date && content.return_time ? { collection_datetime: wallTimeToIso(`${content.return_date}T${content.return_time}`) } : {})
         })
         .eq("id", action.rental_id)
         .eq("organization_id", organizationId),

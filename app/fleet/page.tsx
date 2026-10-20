@@ -102,7 +102,8 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
             {[
               { count: vehicles.length, label: t("bandVehicles", { count: vehicles.length }), dot: null },
               { count: totalOut, label: t("bandOut"), dot: "var(--band-dot)" },
-              { count: totalFree, label: t("bandFree"), dot: "var(--going-out)" },
+              // Free is green everywhere else (the list legend, the dashboard); orange means going out.
+              { count: totalFree, label: t("bandFree"), dot: "#7ee2a8" },
               ...(attention > 0 ? [{ count: attention, label: t("bandAttention"), dot: "var(--band-alert)" }] : [])
             ].map((pill) => (
               <span className="inline-flex items-center gap-1.5 rounded-2xl bg-[var(--band-soft)] px-3 py-2 text-white" key={pill.label}>
@@ -307,20 +308,27 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
               {group.vehicles.map((vehicle) => (
                 <li key={vehicle.id}>
                   <Link className="flex items-center gap-3 px-3 py-3 active:bg-[var(--panel-secondary)]" href={`/fleet/${vehicle.id}`}>
-                    <VehicleArt colour={vehicle.color} kind={group.kind} model={vehicle.model} />
+                    <VehicleArt colour={vehicle.color} kind={group.kind} model={vehicle.model} size="sm" />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-[17px] font-bold text-[var(--foreground)]">
-                        {vehicle.make} {vehicle.model}
-                      </p>
+                      {/* Name and status share the top line, so a row is three short lines rather than five. */}
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="min-w-0 truncate text-[17px] font-bold text-[var(--foreground)]">
+                          {vehicle.make} {vehicle.model}
+                        </p>
+                        <span className="shrink-0 whitespace-nowrap">
+                          {vehicle.freeUntil ? <Badge tone="green">{t("status_freeUntil", { date: dayMonth(vehicle.freeUntil) })}</Badge> : <Badge tone={statusTone[vehicle.status]}>{t(`status_${vehicle.status}`)}</Badge>}
+                        </span>
+                      </div>
                       {/* Plate and price each stay whole; on a narrow phone the price drops to its own line instead of being cut off. */}
                       <p className="mt-0.5 flex flex-wrap gap-x-1.5 font-medium text-[var(--foreground-secondary)]">
                         <span className="font-mono-data whitespace-nowrap">{vehicle.plate}</span>
                         {priceOf(vehicle) ? <span className="whitespace-nowrap">· {priceOf(vehicle)}</span> : null}
                       </p>
-                      <div className="mt-1.5 flex flex-wrap gap-1.5">
-                        {vehicle.freeUntil ? <Badge tone="green">{t("status_freeUntil", { date: dayMonth(vehicle.freeUntil) })}</Badge> : <Badge tone={statusTone[vehicle.status]}>{t(`status_${vehicle.status}`)}</Badge>}
-                        {vehicle.complianceNext && vehicle.complianceNext.daysLeft <= 30 ? <ComplianceBadge attention={vehicle.complianceAttentionCount} item={vehicle.complianceNext} /> : null}
-                      </div>
+                      {vehicle.complianceNext && vehicle.complianceNext.daysLeft <= 30 ? (
+                        <div className="mt-1.5 flex flex-wrap gap-1.5">
+                          <ComplianceBadge attention={vehicle.complianceAttentionCount} item={vehicle.complianceNext} />
+                        </div>
+                      ) : null}
                       <div className="mt-2 flex items-center gap-2.5">
                         <span aria-hidden="true" className="h-2.5 flex-1 overflow-hidden rounded-full bg-[var(--panel-tertiary)]">
                           <span className="grow-x block h-full rounded-full bg-[var(--chart-in)]" style={{ width: `${Math.max(0, Math.min(100, vehicle.utilization))}%` }} />

@@ -1427,8 +1427,13 @@ export function BookingForm({
         </section>
       ) : null}
 
-      {whatIsMissing() ? <p className="text-center text-sm font-semibold text-[var(--muted)]">{whatIsMissing()}</p> : null}
-      <div className="sticky-actions sticky z-20 -mx-4 flex gap-2 border-t border-[var(--border)] bg-white/95 p-3 backdrop-blur sm:mx-0 sm:rounded-lg sm:border">
+      <div className="sticky-actions sticky z-20 -mx-4 flex flex-wrap gap-2 border-t border-[var(--border)] bg-white/95 p-3 backdrop-blur sm:mx-0 sm:rounded-lg sm:border">
+        {/* Why Continue can't be pressed yet, right beside it (at the end of the page it was off screen on a phone). */}
+        {whatIsMissing() ? (
+          <p className="w-full text-center text-sm font-semibold text-[var(--warning)]" role="status">
+            {whatIsMissing()}
+          </p>
+        ) : null}
         <button
           className="secondary-action pressable flex-1 disabled:opacity-40 sm:flex-none"
           disabled={backDisabled}

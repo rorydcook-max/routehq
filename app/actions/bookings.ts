@@ -2,13 +2,14 @@
 
 import { extrasFrom, priceExtras } from "@/lib/price-rules";
 import { extrasIncomeTag } from "@/lib/extras";
-import { generatePaymentSchedule } from "@/lib/payment-schedule";
+import { billingPeriodAmounts, generatePaymentSchedule } from "@/lib/payment-schedule";
 
 import { said } from "@/lib/i18n/server-text";
 import { completeRentalJobs, tellRentalCustomer } from "@/lib/customer-messages";
 import { allocatePayment, type OpenPayment } from "@/lib/payment-allocation";
 import { customerPaymentLabel } from "@/lib/payment-labels";
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { markOnboardingStep } from "@/lib/onboarding";
 import { activateRental } from "@/lib/rental-activation";
 import { settleExistingRental } from "@/lib/existing-rental";
@@ -453,20 +454,23 @@ async function createBookingOrThrow(formData: FormData) {
   }
 
   // Remember what this vehicle was rented with, so the next booking starts from it instead of a wall of tick boxes.
-  try {
-    const { data: vehicleRow } = await supabase.from("vehicles").select("metadata, deposit_amount").eq("id", vehicleId).eq("organization_id", organizationId).maybeSingle();
-    await supabase
-      .from("vehicles")
-      .update({
-        metadata: { ...((vehicleRow?.metadata as Record<string, unknown> | null) || {}), included_items: includedItems },
-        // A vehicle with no usual deposit takes the first one charged for it.
-        ...(vehicleRow && vehicleRow.deposit_amount == null && depositAmount > 0 ? { deposit_amount: depositAmount } : {})
-      })
-      .eq("id", vehicleId)
-      .eq("organization_id", organizationId);
-  } catch {
-    // A convenience only: the booking itself is already saved.
-  }
+  // A convenience only, so it runs after the reply: the person isn't kept waiting for it.
+  after(async () => {
+    try {
+      const { data: vehicleRow } = await supabase.from("vehicles").select("metadata, deposit_amount").eq("id", vehicleId).eq("organization_id", organizationId).maybeSingle();
+      await supabase
+        .from("vehicles")
+        .update({
+          metadata: { ...((vehicleRow?.metadata as Record<string, unknown> | null) || {}), included_items: includedItems },
+          // A vehicle with no usual deposit takes the first one charged for it.
+          ...(vehicleRow && vehicleRow.deposit_amount == null && depositAmount > 0 ? { deposit_amount: depositAmount } : {})
+        })
+        .eq("id", vehicleId)
+        .eq("organization_id", organizationId);
+    } catch {
+      // The booking itself is already saved.
+    }
+  });
 
   const contractInsert: Record<string, any> = {
     organization_id: organizationId,
@@ -600,6 +604,11 @@ async function createBookingOrThrow(formData: FormData) {
     };
   }
 
+  // The booking points at its agreement whatever happens with the link, so that write runs alongside the link's.
+  // (A Supabase query only runs once something awaits it: Promise.resolve starts it now.)
+  const rentalContractPending: Promise<{ error: { message: string } | null }> = Promise.resolve(
+    supabase.from("rentals").update({ contract_id: contract.id }).eq("id", rental.id).eq("organization_id", organizationId)
+  );
   const { data: bookingLink, error: linkError } = await supabase
     .from("booking_links")
     .insert({
@@ -640,11 +649,7 @@ async function createBookingOrThrow(formData: FormData) {
       .update({ booking_link_id: bookingLink.id })
       .eq("id", contract.id)
       .eq("organization_id", organizationId),
-    supabase
-      .from("rentals")
-      .update({ contract_id: contract.id })
-      .eq("id", rental.id)
-      .eq("organization_id", organizationId)
+    rentalContractPending
   ]);
 
   const updateError = linkUpdateError || contractUpdateError || rentalUpdateError;
@@ -661,21 +666,26 @@ async function createBookingOrThrow(formData: FormData) {
     : `Here is the booking link for the ${vehicleLabel} rental:\n${bookingUrl}\n\nPlease complete your details and sign the rental agreement through the link.\n\n${organization.name}`;
   const urls = shareUrls({ message, phone: customer?.phone, organizationName: organization.name });
 
-  await recordActivityEvent(supabase, {
-    organization_id: organizationId,
-    actor_id: user.id,
-    entity_type: "rental",
-    entity_id: rental.id,
-    vehicle_id: vehicleId,
-    rental_id: rental.id,
-    customer_id: customerId || null,
-    event_type: "booking_created",
-    title: "Booking created",
-    detail: customer
-      ? `${bookingReference(rental)} for ${customer.full_name} and ${vehicle.registration_number}.`
-      : `${bookingReference(rental)} for ${vehicle.registration_number}. Awaiting customer details via booking link.`
+  // The history line and the setup checklist are written just after the reply, so "Booking created" shows at once.
+  after(async () => {
+    await Promise.allSettled([
+      recordActivityEvent(supabase, {
+        organization_id: organizationId,
+        actor_id: user.id,
+        entity_type: "rental",
+        entity_id: rental.id,
+        vehicle_id: vehicleId,
+        rental_id: rental.id,
+        customer_id: customerId || null,
+        event_type: "booking_created",
+        title: "Booking created",
+        detail: customer
+          ? `${bookingReference(rental)} for ${customer.full_name} and ${vehicle.registration_number}.`
+          : `${bookingReference(rental)} for ${vehicle.registration_number}. Awaiting customer details via booking link.`
+      }),
+      markOnboardingStep(supabase, organizationId, "first_booking")
+    ]);
   });
-  await markOnboardingStep(supabase, organizationId, "first_booking");
 
   revalidatePath("/");
   revalidatePath("/bookings");
@@ -1834,9 +1844,15 @@ async function createNextMonthlyPaymentIfNeeded(supabase: any, payment: any) {
   }
 
   const nextDueDate = addMonthsToDate(payment.due_date, 1);
-  if (!nextDueDate || (rental.end_date && nextDueDate > dateOnly(rental.end_date))) {
+  // A payment due on the return day (or later) would pay for time after the vehicle is back: none is made.
+  const endDate = rental.end_date ? dateOnly(rental.end_date) : null;
+  if (!nextDueDate || (endDate && nextDueDate >= endDate)) {
     return;
   }
+  // Less than a month left before the return: that last stretch is charged exactly as a full schedule charges it
+  // (billingPeriodAmounts from the period just paid: its second amount is this next one, part-month when short).
+  const fullRate = Number(rental.rental_rate || payment.amount || 0);
+  const nextAmount = endDate ? billingPeriodAmounts(dateOnly(payment.due_date), endDate, "monthly", fullRate, 60)[1] ?? fullRate : fullRate;
 
   const { data: existingPayments, error: existingError } = await supabase
     .from("rental_payments")
@@ -1867,7 +1883,7 @@ async function createNextMonthlyPaymentIfNeeded(supabase: any, payment: any) {
     due_date: nextDueDate,
     scheduled_date: nextDueDate,
     status: "scheduled",
-    amount: Number(rental.rental_rate || payment.amount || 0),
+    amount: nextAmount,
     currency: rental.currency || payment.currency || "THB",
     metadata: {
       type: "rent",
@@ -2868,8 +2884,6 @@ export async function recordPaymentReceived(paymentId: string, fields: RecordPay
   if (transactionError) {
     throw new Error(transactionError.message);
   }
-  // A referred customer's first rent sets the partner's finder's fee.
-  if (!isDepositPayment && !isChargePayment) await noteReferralFee(supabase, payment.rental_id, amount, payment.metadata).catch(() => null);
 
   const metadata = {
     ...(payment.metadata || {}),
@@ -2900,7 +2914,9 @@ export async function recordPaymentReceived(paymentId: string, fields: RecordPay
     throw new Error(updateError.message);
   }
 
-  if (isPartPayment) {
+  // With the payment marked paid, the rest doesn't depend on each other: it runs together so the save is quick.
+  const insertRemainder = async () => {
+    if (!isPartPayment) return;
     const { error: remainderError } = await supabase.from("rental_payments").insert({
       organization_id: payment.organization_id,
       rental_id: payment.rental_id,
@@ -2930,17 +2946,20 @@ export async function recordPaymentReceived(paymentId: string, fields: RecordPay
     if (remainderError) {
       throw new Error(remainderError.message);
     }
-  }
+  };
 
   // Any reminder task for this payment is now done.
-  await supabase
-    .from("tasks")
-    .update({ completed_at: new Date().toISOString(), completion_notes: "Payment recorded." })
-    .eq("organization_id", payment.organization_id)
-    .eq("rental_payment_id", payment.id)
-    .is("completed_at", null);
+  const closeReminderTasks = async () => {
+    await supabase
+      .from("tasks")
+      .update({ completed_at: new Date().toISOString(), completion_notes: "Payment recorded." })
+      .eq("organization_id", payment.organization_id)
+      .eq("rental_payment_id", payment.id)
+      .is("completed_at", null);
+  };
 
-  if (isDepositPayment) {
+  const addToDepositHeld = async () => {
+    if (!isDepositPayment) return;
     const { data: depositRental } = await supabase
       .from("rentals")
       .select("deposit_held")
@@ -2956,24 +2975,33 @@ export async function recordPaymentReceived(paymentId: string, fields: RecordPay
       })
       .eq("id", payment.rental_id)
       .eq("organization_id", payment.organization_id);
-  }
+  };
 
+  // The next month's rent is shown on the booking as soon as this one is paid, so it is part of the save.
+  const [remainderResult] = await Promise.allSettled([insertRemainder(), closeReminderTasks(), addToDepositHeld(), createNextMonthlyPaymentIfNeeded(supabase, payment)]);
+  if (remainderResult.status === "rejected") throw remainderResult.reason;
+
+  // The history line and a partner's finder's fee are written just after the reply.
   const detail = `Payment received: ${description} ${niceMoney(amount)} via ${method}`;
-  await recordActivityEvent(supabase, {
-    organization_id: payment.organization_id,
-    actor_id: user.id,
-    entity_type: "payment",
-    entity_id: payment.id,
-    vehicle_id: payment.vehicle_id || null,
-    rental_id: payment.rental_id,
-    customer_id: payment.customer_id || null,
-    event_type: "payment_received",
-    title: "Payment received",
-    detail,
-    metadata: { content: detail, payment_method: method, note }
+  after(async () => {
+    await Promise.allSettled([
+      recordActivityEvent(supabase, {
+        organization_id: payment.organization_id,
+        actor_id: user.id,
+        entity_type: "payment",
+        entity_id: payment.id,
+        vehicle_id: payment.vehicle_id || null,
+        rental_id: payment.rental_id,
+        customer_id: payment.customer_id || null,
+        event_type: "payment_received",
+        title: "Payment received",
+        detail,
+        metadata: { content: detail, payment_method: method, note }
+      }),
+      // A referred customer's first rent sets the partner's finder's fee.
+      !isDepositPayment && !isChargePayment ? noteReferralFee(supabase, payment.rental_id, amount, payment.metadata) : Promise.resolve()
+    ]);
   });
-
-  await createNextMonthlyPaymentIfNeeded(supabase, payment);
 
   revalidatePath("/");
   revalidatePath("/bookings");

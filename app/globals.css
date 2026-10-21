@@ -506,7 +506,7 @@ button:disabled {
   transition: background 120ms ease;
 }
 
-.primary-action:hover {
+.primary-action:hover:not(:disabled) {
   opacity: 0.9;
 }
 
@@ -1185,9 +1185,17 @@ a[class*="rounded-lg"][class*="px-"]:active {
   min-height: 44px;
   padding: 10px 20px;
 }
-.primary-action:hover,
-.btn-primary:hover {
+.primary-action:hover:not(:disabled),
+.btn-primary:hover:not(:disabled) {
   background: var(--primary-hover);
+  opacity: 1;
+}
+/* A button that can't be pressed yet looks it, even under the pointer (hover used to make it look ready). */
+.primary-action:disabled,
+.btn-primary:disabled {
+  background: var(--border-strong);
+  color: var(--muted);
+  cursor: not-allowed;
   opacity: 1;
 }
 .secondary-action,

@@ -13,7 +13,7 @@ import { getPublicBookingDetail } from "@/lib/public-booking";
 import { BusinessLogoImage } from "@/components/business-logo-image";
 import { BrandStyle } from "@/components/brand-style";
 import { isMapsUrl, formatDeliveryLocation } from "@/lib/delivery-location";
-import { businessToday, toWallTime } from "@/lib/business-time";
+import { toWallTime } from "@/lib/business-time";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getPortalPayments } from "@/lib/payment-receipts";
 import { bookingRules } from "@/lib/booking-rules";
@@ -316,18 +316,8 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
     );
   }
 
-  if (!detail.completion || !detail.documentStatus || !detail.bookingLink) {
-    return <ErrorState contact={contact} message={t("incompleteMessage")} title={t("incompleteTitle")} />;
-  }
-
   // An unsigned booking whose whole period is already over can't be signed for: those dates are gone.
-  const rentalEnd = String(detail.rental?.end_date || "").slice(0, 10);
-  if (
-    rentalEnd &&
-    rentalEnd < businessToday() &&
-    !detail.completion.agreement &&
-    ["draft", "booked"].includes(String(detail.rental?.status || ""))
-  ) {
+  if (detail.state === "dates_passed") {
     const onlineBooking = organization?.settings?.public_booking?.enabled === true && organization?.slug;
     return (
       <ErrorState
@@ -338,6 +328,10 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
         title={t("datesPassedTitle")}
       />
     );
+  }
+
+  if (!detail.completion || !detail.documentStatus || !detail.bookingLink) {
+    return <ErrorState contact={contact} message={t("incompleteMessage")} title={t("incompleteTitle")} />;
   }
 
   const vehicle = detail.vehicle || {};

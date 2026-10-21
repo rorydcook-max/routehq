@@ -2,6 +2,7 @@ import { buildContractVariables, extractBodyHtml, renderContractTemplate } from 
 import { getCustomerInspectionReports } from "@/lib/booking-rental-documents";
 import { holdDeadline, retakeHold } from "@/lib/booking-holds";
 import { bookingRules } from "@/lib/booking-rules";
+import { businessToday } from "@/lib/business-time";
 import { resolveOrganizationBrandingDisplayUrls } from "@/lib/branding-assets";
 import { defaultRentalContractTemplate, embedLogoInContractVariables, ensureDefaultContractTemplate } from "@/lib/contracts";
 import { loadPublicRentalAgreementForPage } from "@/lib/rental-document-customer-signing";
@@ -9,7 +10,7 @@ import { ensureRentalAgreementDraft } from "@/lib/rental-agreement-automation";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { freshPromptPayQrUrl } from "@/lib/promptpay-qr";
 
-export type PublicBookingState = "not_found" | "expired" | "cancelled" | "taken" | "ready" | "active" | "completed";
+export type PublicBookingState = "not_found" | "expired" | "cancelled" | "taken" | "dates_passed" | "ready" | "active" | "completed";
 
 const documentCategories = ["passport", "driver_license", "selfie"];
 
@@ -80,6 +81,17 @@ export async function getPublicBookingDetail(token: string) {
   if (expiresAt && expiresAt.getTime() < Date.now() && bookingLink.status !== "completed") {
     await supabase.from("booking_links").update({ status: "expired" }).eq("id", bookingLink.id);
     return { state: "expired" as PublicBookingState, bookingLink };
+  }
+
+  // An unsigned booking whose whole period is over: there is nothing left to sign for. Checked before the hold
+  // below, so opening an old link never takes the vehicle again for dates that have gone.
+  if (bookingLink.status !== "completed" && !bookingLink.contract_signed_at && bookingLink.rental_id) {
+    const { data: dated } = await supabase.from("rentals").select("status, end_date").eq("id", bookingLink.rental_id).maybeSingle();
+    const end = String(dated?.end_date || "").slice(0, 10);
+    if (end && end < businessToday() && ["draft", "booked"].includes(String(dated?.status || ""))) {
+      const { data: passedOrg } = await supabase.from("organizations").select("name, slug, settings").eq("id", bookingLink.organization_id).maybeSingle();
+      return { state: "dates_passed" as PublicBookingState, bookingLink, organization: passedOrg };
+    }
   }
 
   // Holds: a customer who comes back after their hold ran out gets the vehicle

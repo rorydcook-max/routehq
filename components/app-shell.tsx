@@ -26,7 +26,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, Fragment } from "react";
-import { getShellContext, signOut, switchActiveOrganization, type ShellContext } from "@/app/actions/auth";
+import { signOut, switchActiveOrganization, type ShellContext } from "@/app/actions/auth";
 import { Toaster } from "@/components/toast";
 import { AskBox } from "@/components/ask-box";
 import { RouteHqLogo } from "@/components/brand-logo";
@@ -106,6 +106,39 @@ const footItems: NavItem[] = [
 const mobileBarKeys: NavKey[] = ["dashboard", "tasks", "inbox"];
 
 /**
+ * The sidebar's badges and business list, shared by every page's shell. Shown at once from the last answer and
+ * fetched again (one at a time) when that is over 15 seconds old, from /api/shell: a GET, so it doesn't reset the
+ * in-app page cache the way a server action call does.
+ */
+const SHELL_MAX_AGE_MS = 15_000;
+const shellCache: { value: ShellContext | null; at: number; pending: Promise<ShellContext | null> | null } = { value: null, at: 0, pending: null };
+
+function loadShellContext(): Promise<ShellContext | null> {
+  if (shellCache.value && Date.now() - shellCache.at < SHELL_MAX_AGE_MS) return Promise.resolve(shellCache.value);
+  if (shellCache.pending) return shellCache.pending;
+  shellCache.pending = fetch("/api/shell", { cache: "no-store", credentials: "same-origin" })
+    .then((response) => (response.ok ? (response.json() as Promise<ShellContext>) : null))
+    .then((context) => {
+      if (context) {
+        shellCache.value = context;
+        shellCache.at = Date.now();
+      }
+      return context;
+    })
+    .catch(() => null)
+    .finally(() => {
+      shellCache.pending = null;
+    });
+  return shellCache.pending;
+}
+
+/** Switching business or signing out: nothing of the last answer is shown again. */
+export function forgetShellContext() {
+  shellCache.value = null;
+  shellCache.at = 0;
+}
+
+/**
  * `hero`: the teal band a page opens with (Lagoon look): on a phone it runs edge to edge behind the logo row,
  * on a computer it is a rounded block at the top of the page.
  */
@@ -119,12 +152,13 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
   // Display only: the middleware and server actions enforce the rule.
   // The brand arrives with the page from the root layout, so their logo is on the first frame: no RouteHQ flash.
   const initialBrand = useInitialShellBrand();
-  const [shell, setShell] = useState<ShellContext>({ role: null, organizations: [], unreadChats: 0, dueTasks: 0, helpReplies: 0, brand: initialBrand });
+  // Every page draws its own shell, so the last answer is reused across taps: the badges are right away, not after a fetch.
+  const [shell, setShell] = useState<ShellContext>(() => shellCache.value ?? { role: null, organizations: [], unreadChats: 0, dueTasks: 0, helpReplies: 0, brand: initialBrand });
   useEffect(() => {
     let cancelled = false;
-    getShellContext()
+    loadShellContext()
       .then((context) => {
-        if (cancelled) return;
+        if (cancelled || !context) return;
         // A failed logo lookup in the refresh must not swap their brand for RouteHQ's: keep the first-frame brand.
         setShell({ ...context, brand: context.brand ?? initialBrand });
       })
@@ -192,7 +226,11 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
               defaultValue={activeBusiness?.id}
               id="business-switcher"
               name="organizationId"
-              onChange={(event) => event.currentTarget.form?.requestSubmit()}
+              onChange={(event) => {
+                // The other business has its own badges and brand: don't show this one's for a moment.
+                forgetShellContext();
+                event.currentTarget.form?.requestSubmit();
+              }}
             >
               {shell.organizations.map((organization) => (
                 <option className="text-[var(--foreground)]" key={organization.id} value={organization.id}>
@@ -245,7 +283,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
               <span aria-hidden="true" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)] text-[14px] font-bold uppercase text-[var(--primary)]">{userEmail.slice(0, 1)}</span>
               <span className="min-w-0 truncate text-sm font-semibold text-[var(--foreground-secondary)]">{userEmail}</span>
             </Link>
-            <form action={signOut}>
+            <form action={signOut} onSubmit={forgetShellContext}>
               <PendingButton aria-label={t("signOut")} className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--foreground)]" pendingLabel="" title={t("signOut")} type="submit">
                 <LogOut size={16} />
               </PendingButton>
@@ -283,7 +321,11 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
                   className="max-w-[150px] truncate rounded-full border border-[var(--border)] bg-white px-2 py-1.5 text-sm font-semibold text-[var(--foreground-secondary)] shadow-sm"
                   defaultValue={activeBusiness?.id}
                   name="organizationId"
-                  onChange={(event) => event.currentTarget.form?.requestSubmit()}
+                  onChange={(event) => {
+                // The other business has its own badges and brand: don't show this one's for a moment.
+                forgetShellContext();
+                event.currentTarget.form?.requestSubmit();
+              }}
                 >
                   {shell.organizations.map((organization) => (
                     <option key={organization.id} value={organization.id}>
@@ -430,7 +472,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
             {userEmail ? (
               <div className="mt-4 flex items-center justify-between gap-3 border-t border-[var(--border)] pt-3">
                 <span className="min-w-0 truncate text-[14px] font-semibold text-[var(--muted)]">{userEmail}</span>
-                <form action={signOut}>
+                <form action={signOut} onSubmit={forgetShellContext}>
                   <PendingButton className="inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full border border-[var(--border)] bg-white px-4 py-2 text-[14px] font-bold text-[var(--foreground)]" pendingLabel="" type="submit">
                     {t("signOut")}
                   </PendingButton>

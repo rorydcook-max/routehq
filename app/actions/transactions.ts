@@ -457,6 +457,8 @@ export async function recordDeliveryCashPaymentAndReceipt(formData: FormData) {
     notifyPaymentReceived({ organizationId, amount: rentalPaymentAmount, customerName, vehicleLabel }).catch(() => null);
   }
 
+  // No revalidatePath here on purpose: it re-renders the open handover form mid-way (slow on a phone signal).
+  // Finishing the handover refreshes every page that shows this money.
   try {
     return await generateReceipt({
       organisationId: organizationId,

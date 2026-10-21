@@ -10,6 +10,9 @@ const nextConfig: NextConfig = {
   // Headless Chrome for PDFs: loaded from node_modules at runtime, not bundled.
   serverExternalPackages: ["puppeteer-core", "@sparticuz/chromium"],
   experimental: {
+    // Going back to a page seen in the last 30 seconds is instant instead of loading it again.
+    // Every save already clears this (revalidatePath), so your own changes always show straight away.
+    staleTimes: { dynamic: 30, static: 180 },
     serverActions: {
       // Photos and videos go straight to storage (lib/direct-uploads.ts) and
       // are shrunk in the browser, so forms are small. On Vercel requests are

@@ -89,9 +89,22 @@ async function loadMessages(locale: string): Promise<Messages> {
   }
 }
 
+// The words the customer pages (booking link, change to sign, online booking, directory) and their error and
+// not-found screens use. The staff app's other ~200 KB of text never reaches a customer's phone.
+const CUSTOMER_NAMESPACES = ["customer", "directory", "errorPages"];
+
+async function isCustomerPage(): Promise<boolean> {
+  try {
+    return Boolean((await headers()).get("x-routehq-customer-page"));
+  } catch {
+    return false;
+  }
+}
+
 export default getRequestConfig(async () => {
-  const locale = await resolveLocale();
+  const [locale, customerPage] = await Promise.all([resolveLocale(), isCustomerPage()]);
   const english = await loadMessages("en");
-  const messages = locale === "en" ? english : merge(english, await loadMessages(locale));
+  const all = locale === "en" ? english : merge(english, await loadMessages(locale));
+  const messages = customerPage ? Object.fromEntries(CUSTOMER_NAMESPACES.filter((key) => key in all).map((key) => [key, all[key]])) : all;
   return { locale, messages, timeZone: "Asia/Bangkok" };
 });

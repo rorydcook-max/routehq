@@ -41,7 +41,7 @@ export default async function PublicCatalogPage({ params, searchParams }: { para
   return (
     <main className="min-h-screen bg-[var(--panel-secondary)] px-4 py-5 text-[var(--foreground)]">
       <BrandStyle colour={catalog.brandColour} />
-      <div className="mx-auto max-w-3xl space-y-5">
+      <div className="mx-auto max-w-4xl space-y-5">
         <div className="flex justify-end">
           <CustomerLanguagePicker />
         </div>

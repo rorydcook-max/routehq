@@ -556,6 +556,14 @@ export async function completePublicBooking(formData: FormData) {
     await supabase.from("booking_links").update({ status: "expired" }).eq("id", bookingLink.id);
     throw new Error("This booking link has expired.");
   }
+  // An unconfirmed booking whose dates are all in the past can't be signed for (the page says so too).
+  if (bookingLink.rental_id && !bookingLink.contract_signed_at) {
+    const { data: datesOf } = await supabase.from("rentals").select("status, end_date").eq("id", bookingLink.rental_id).maybeSingle();
+    const end = String(datesOf?.end_date || "").slice(0, 10);
+    if (end && end < businessToday() && ["draft", "booked"].includes(String(datesOf?.status || ""))) {
+      throw new Error("These dates have passed. Please contact the business to arrange new dates.");
+    }
+  }
   // The hold may have run out while the form was open: take the vehicle back, or stop here.
   if (bookingLink.hold_released_at && bookingLink.status !== "completed") {
     const retaken = await retakeHold(supabase, bookingLink);

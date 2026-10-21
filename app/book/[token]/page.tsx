@@ -13,7 +13,7 @@ import { getPublicBookingDetail } from "@/lib/public-booking";
 import { BusinessLogoImage } from "@/components/business-logo-image";
 import { BrandStyle } from "@/components/brand-style";
 import { isMapsUrl, formatDeliveryLocation } from "@/lib/delivery-location";
-import { toWallTime } from "@/lib/business-time";
+import { businessToday, toWallTime } from "@/lib/business-time";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getPortalPayments } from "@/lib/payment-receipts";
 import { bookingRules } from "@/lib/booking-rules";
@@ -320,6 +320,26 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
     return <ErrorState contact={contact} message={t("incompleteMessage")} title={t("incompleteTitle")} />;
   }
 
+  // An unsigned booking whose whole period is already over can't be signed for: those dates are gone.
+  const rentalEnd = String(detail.rental?.end_date || "").slice(0, 10);
+  if (
+    rentalEnd &&
+    rentalEnd < businessToday() &&
+    !detail.completion.agreement &&
+    ["draft", "booked"].includes(String(detail.rental?.status || ""))
+  ) {
+    const onlineBooking = organization?.settings?.public_booking?.enabled === true && organization?.slug;
+    return (
+      <ErrorState
+        contact={contact}
+        message={t("datesPassedMessage", { business: organization?.name || t("theRentalBusiness") })}
+        rebookHref={onlineBooking ? `/rent/${organization.slug}` : null}
+        rebookLabel={t("bookAgain")}
+        title={t("datesPassedTitle")}
+      />
+    );
+  }
+
   const vehicle = detail.vehicle || {};
   const rental = detail.rental || {};
   const bookingData = (detail.bookingLink?.booking_data || {}) as Record<string, unknown>;
@@ -334,18 +354,21 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   // and after the return if anything is still owed.
   const canPayHere = rental?.id && (detail.state === "active" || detail.state === "completed" || (detail.state === "ready" && detail.completion?.agreement));
   const wantsInvites = rental?.id && customer?.id && (detail.state === "active" || (detail.state === "ready" && detail.completion?.agreement));
-  // These don't depend on each other: fetch them together.
-  const [pendingAmendmentToken, portal, invites] = await Promise.all([
+  // These don't depend on each other: fetch them together (the customer is waiting on a phone).
+  const onRent = detail.state === "active";
+  const [pendingAmendmentToken, portal, invites, activeAnswers, activeOpenEndedOffer] = await Promise.all([
     rental?.id ? pendingAmendmentFor(String(rental.id)) : Promise.resolve(null),
     canPayHere ? getPortalPayments(String(rental.id), detail.org_payment?.promptpay_id) : Promise.resolve({ payments: [], bundle: null } as Awaited<ReturnType<typeof getPortalPayments>>),
     wantsInvites
       ? chatInvites(createSupabaseAdminClient() as any, { organizationId: String(rental.organization_id || organization?.id || ""), customerId: String(customer.id), token }).catch(() => [])
-      : Promise.resolve([])
+      : Promise.resolve([]),
+    onRent ? portalAnswers(rental?.id) : Promise.resolve(null),
+    onRent ? openEndedOffer(vehicle, rental) : Promise.resolve(null),
+    // Messages to this customer (reminders, receipts) go out in the language they read this page in.
+    customer?.id
+      ? (createSupabaseAdminClient() as any).from("customers").update({ preferred_locale: locale }).eq("id", customer.id).neq("preferred_locale", locale).then(() => null, () => null)
+      : Promise.resolve(null)
   ]);
-  // Messages to this customer (reminders, receipts) go out in the language they read this page in.
-  if (customer?.id) {
-    await (createSupabaseAdminClient() as any).from("customers").update({ preferred_locale: locale }).eq("id", customer.id).neq("preferred_locale", locale).then(() => null, () => null);
-  }
   // Before signing, "pay now" shows one QR for what is due at the start.
   // What is due at the start: the first rent and the deposit.
   const firstPaymentAmount = Number(rental?.outstanding_balance || 0) > 0 ? Number(rental.outstanding_balance) : firstRentCharge(rental) + Number(rental?.deposit_amount || 0) + Number(rental?.extras_total || 0);
@@ -452,7 +475,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
 
         {detail.state === "active" ? (
           <ActiveRentalPortal
-            answers={await portalAnswers(rental?.id)}
+            answers={activeAnswers as Awaited<ReturnType<typeof portalAnswers>>}
             bookingData={bookingData}
             deliveryPhotoUrls={detail.deliveryPhotoUrls || []}
             reports={detail.inspectionReports || []}
@@ -460,7 +483,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             organizationName={businessName}
             endNoticeDays={bookingRules(organization?.settings).endNoticeDays}
             extensionRates={rentalRateCard(vehicle, rental)}
-            openEndedOffer={await openEndedOffer(vehicle, rental)}
+            openEndedOffer={activeOpenEndedOffer as Awaited<ReturnType<typeof openEndedOffer>>}
             orgPayment={detail.org_payment}
             ownerContact={ownerContact}
             paymentBundle={portal.bundle}
@@ -552,7 +575,9 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
               completion: detail.completion,
               documentStatus: detail.documentStatus,
               bookingData,
-              contractHtml: detail.contractHtml,
+              // The form shows the agreement's rendered snapshot when there is one; the template copy is then never
+              // used, so it isn't sent (it is ~80 KB on a customer's phone).
+              contractHtml: (detail.rentalDocumentAgreement as { agreement?: { renderedHtmlSnapshot?: string } | null } | null)?.agreement?.renderedHtmlSnapshot ? "" : detail.contractHtml,
               orgPayment: detail.org_payment,
               promptPayQrSvg: firstPaymentQr,
               bookingReference: String(detail.bookingLink?.reference || detail.bookingLink?.reference_number || detail.bookingLink?.id || token).slice(0, 18),

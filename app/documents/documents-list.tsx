@@ -170,7 +170,7 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
                     return (
                       <a className="pressable group block min-w-0" href={document.signedUrl || document.href || "#"} key={document.id} rel="noreferrer" target={document.signedUrl ? "_blank" : undefined} title={label}>
                         {tile}
-                        <span className="mt-1 block truncate text-[14px] font-semibold leading-tight text-[var(--foreground-secondary)] group-hover:text-[var(--primary)]">{label}</span>
+                        <span className="mt-1 line-clamp-2 block text-[14px] font-semibold leading-tight text-[var(--foreground-secondary)] group-hover:text-[var(--primary)]">{label}</span>
                       </a>
                     );
                   })}

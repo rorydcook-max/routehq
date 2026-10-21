@@ -52,6 +52,8 @@ function ComplianceBadge({ item, attention = 0 }: { item?: { key?: string; label
 }
 
 const primaryButton = "primary-action pressable";
+// "3 on rent · 6 free" may wrap at the dot, never inside a phrase.
+const glue = (text: string) => text.split(" · ").map((part) => part.replace(/ /g, "\u00a0")).join(" · ");
 
 type FleetFilter = "out" | "free" | "attention";
 
@@ -151,7 +153,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
             <TileHead title={t("busyTitle")} />
             <span className="flex items-center gap-3">
               <Ring label={`${busy}%`} pct={busy} />
-              <span className="font-semibold text-[var(--foreground-secondary)]">{t("busyDetail")}</span>
+              <span className="text-[14px] font-semibold leading-snug text-[var(--foreground-secondary)] lg:text-[15px]">{t("busyDetail")}</span>
             </span>
           </Link>
           {nextPaper ? (
@@ -159,7 +161,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
               <TileHead icon={<Wrench size={22} />} title={paperName(nextPaper.complianceNext!)} />
               <span>
                 <span className="num block text-[24px] leading-tight">{[nextPaper.make, nextPaper.model].filter(Boolean).join(" ")}</span>
-                <span className="font-semibold">{nextPaper.complianceNext!.daysLeft < 0 ? t("paperLate", { date: dayMonth(nextPaper.complianceNext!.date) }) : t("paperDueOn", { date: dayMonth(nextPaper.complianceNext!.date) })}</span>
+                <span className="font-semibold">{nextPaper.complianceNext!.daysLeft < 0 ? t("paperLate", { date: dayMonth(nextPaper.complianceNext!.date).replace(/ /g, "\u00a0") }) : t("paperDueOn", { date: dayMonth(nextPaper.complianceNext!.date).replace(/ /g, "\u00a0") })}</span>
               </span>
             </Link>
           ) : noDates.length > 0 ? (
@@ -186,7 +188,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                   </span>
                   <span>
                     <span className="num block text-[32px] leading-none">{group.vehicles.length}</span>
-                    <span className="font-semibold text-[var(--foreground-secondary)]">{t("outFree", { out: group.out, free: group.free })}</span>
+                    <span className="font-semibold text-[var(--foreground-secondary)]">{glue(t("outFree", { out: group.out, free: group.free }))}</span>
                   </span>
                 </a>
                 </div>
@@ -238,7 +240,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
               <span className="min-w-0 flex-1">
                 <span className="block text-[22px] font-bold leading-none text-[var(--foreground)]">{group.vehicles.length}</span>
                 <span className="mt-1 block font-semibold leading-tight text-[var(--foreground)]">{locale === "en" ? kindLabel(group.kind, group.vehicles.length).toLowerCase() : kindName(group)}</span>
-                <span className="block font-medium text-[var(--foreground-secondary)]">{t("outFree", { out: group.out, free: group.free })}</span>
+                <span className="block text-[14px] font-medium leading-snug text-[var(--foreground-secondary)]">{glue(t("outFree", { out: group.out, free: group.free }))}</span>
               </span>
             </a>
           ))}
@@ -349,7 +351,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                     <div className="min-w-0 flex-1">
                       {/* Name and status share the top line, so a row is three short lines rather than five. */}
                       <div className="flex items-start justify-between gap-2">
-                        <p className="min-w-0 truncate text-[17px] font-bold text-[var(--foreground)]">
+                        <p className="line-clamp-2 min-w-0 text-[17px] font-bold leading-tight text-[var(--foreground)]">
                           {vehicle.make} {vehicle.model}
                         </p>
                         <span className="shrink-0 whitespace-nowrap">

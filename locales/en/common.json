@@ -867,7 +867,9 @@
     "photoManual": "Photo added. We couldn't read it automatically, so please type the numbers below.",
     "startFrom": "Start on {date} instead",
     "timingLater": "At pickup",
-    "dueAtHandover": "Due when you collect the vehicle"
+    "dueAtHandover": "Due when you collect the vehicle",
+    "datesPassedTitle": "These dates have passed",
+    "datesPassedMessage": "This booking was never confirmed and its dates are now over. Please contact {business} to arrange new dates, or book again."
   },
   "customerMessages": {
     "hi": "Hi {name},",
@@ -1451,7 +1453,7 @@
     "noVehicle": "No vehicle (business cost)",
     "noVehicleHint": "Rent, phone, ads, wages: counted in your totals, not against a vehicle.",
     "businessCost": "Business cost",
-    "afterRefunds": "after {amount} given back",
+    "afterRefunds": "{received} received − {amount} refunded",
     "undo": "Undo"
   },
   "booking": {

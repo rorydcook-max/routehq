@@ -6,7 +6,9 @@
 import { businessToday } from "@/lib/business-time";
 import { planById } from "@/lib/plans";
 import { publicBookingSettings } from "@/lib/public-catalog";
+import { billingPeriodAmounts } from "@/lib/payment-schedule";
 import { seasonsFrom, seasonalRate } from "@/lib/price-rules";
+import { planFor } from "@/lib/rental-estimate";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export type DirectorySettings = { enabled: boolean };
@@ -31,6 +33,8 @@ export type DirectoryVehicle = {
   seats: number | null;
   transmission: string;
   color: string;
+  /** The vehicle's first photo, when one has been uploaded. */
+  photoUrl: string | null;
   dailyRate: number;
   weeklyRate: number;
   monthlyRate: number;
@@ -53,19 +57,18 @@ export type DirectorySearch = { place: string; startDate: string; endDate: strin
 
 const BUSY = ["booked", "active", "due_soon", "overdue", "extended"];
 
-function quoteFor(vehicle: { dailyRate: number; weeklyRate: number; monthlyRate: number }, days: number | null, seasons: ReturnType<typeof seasonsFrom>, startDate: string, endDate: string | null): DirectoryVehicle["quote"] {
-  // High-season prices apply to daily rates, as on the business's own page.
-  const daily = vehicle.dailyRate > 0 ? seasonalRate(vehicle.dailyRate, "daily", seasons, startDate, endDate).rate : 0;
-  if (days === null) {
-    if (vehicle.monthlyRate > 0) return { model: "monthly", rate: vehicle.monthlyRate, total: null };
-    if (vehicle.weeklyRate > 0) return { model: "weekly", rate: vehicle.weeklyRate, total: null };
-    return { model: "daily", rate: daily, total: null };
-  }
-  if (days >= 28 && vehicle.monthlyRate > 0) return { model: "monthly", rate: vehicle.monthlyRate, total: Math.round((vehicle.monthlyRate * days) / 30) };
-  if (days >= 7 && vehicle.weeklyRate > 0 && !daily) return { model: "weekly", rate: vehicle.weeklyRate, total: Math.round((vehicle.weeklyRate * days) / 7) };
-  if (daily > 0) return { model: "daily", rate: daily, total: daily * days };
-  if (vehicle.weeklyRate > 0) return { model: "weekly", rate: vehicle.weeklyRate, total: Math.round((vehicle.weeklyRate * days) / 7) };
-  return { model: "monthly", rate: vehicle.monthlyRate, total: Math.round((vehicle.monthlyRate * days) / 30) };
+/**
+ * The price for these dates, worked out exactly as the business's own booking page does (same plan rule, same
+ * season prices, same period billing), so the directory never promises a price the booking page then refuses.
+ * Null when the vehicle can't be booked for the stay (a monthly-only car for a weekend).
+ */
+function quoteFor(vehicle: { dailyRate: number; weeklyRate: number; monthlyRate: number }, days: number | null, seasons: ReturnType<typeof seasonsFrom>, startDate: string, endDate: string | null): DirectoryVehicle["quote"] | null {
+  const plan = planFor(vehicle, days);
+  if (!plan) return null;
+  const rate = seasonalRate(plan.rate, plan.pricingModel, seasons, startDate, endDate).rate;
+  if (days === null || !endDate) return { model: plan.pricingModel, rate, total: null };
+  const amounts = plan.pricingModel === "daily" ? [days * rate] : billingPeriodAmounts(startDate, endDate, plan.pricingModel, rate, 52);
+  return { model: plan.pricingModel, rate, total: amounts.reduce((sum, amount) => sum + amount, 0) };
 }
 
 export async function searchDirectory(input: DirectorySearch): Promise<DirectoryBusiness[]> {
@@ -109,6 +112,28 @@ export async function searchDirectory(input: DirectorySearch): Promise<Directory
     .or(`end_date.is.null,end_date.gte.${startDate}`);
   const taken = new Set(((busy || []) as any[]).map((rental) => rental.vehicle_id));
 
+  // Each vehicle's lead photo (the first in the order set on the vehicle page), as on the business's own page.
+  const { data: photos } = await admin
+    .from("documents")
+    .select("owner_id, storage_path, extracted_data")
+    .in("owner_id", wanted.map((vehicle) => vehicle.id))
+    .eq("owner_type", "vehicle")
+    .eq("category", "vehicle_photo")
+    .order("created_at", { ascending: true });
+  const leadPhoto = new Map<string, { path: string; order: number }>();
+  for (const row of (photos || []) as any[]) {
+    if (!row.owner_id || !row.storage_path) continue;
+    const order = Number(row.extracted_data?.vehicle_photo_order ?? 9999);
+    const current = leadPhoto.get(row.owner_id);
+    if (!current || order < current.order) leadPhoto.set(row.owner_id, { path: row.storage_path, order });
+  }
+  const photoUrls = new Map<string, string>();
+  const photoPaths = [...leadPhoto.values()].map((photo) => photo.path);
+  if (photoPaths.length) {
+    const { data: signed } = await admin.storage.from("documents").createSignedUrls(photoPaths, 6 * 3600);
+    for (const row of signed || []) if (row?.path && row?.signedUrl) photoUrls.set(row.path, row.signedUrl);
+  }
+
   const { resolveOrganizationBrandingDisplayUrls } = await import("@/lib/branding-assets");
   const businesses: DirectoryBusiness[] = [];
   for (const organization of listed) {
@@ -131,9 +156,12 @@ export async function searchDirectory(input: DirectorySearch): Promise<Directory
       logoUrl,
       currency: String(organization.currency || "THB"),
       vehicles: own
-        .map((vehicle) => {
+        .flatMap((vehicle): DirectoryVehicle[] => {
           const rates = { dailyRate: Number(vehicle.daily_rate || 0), weeklyRate: Number(vehicle.weekly_rate || 0), monthlyRate: Number(vehicle.monthly_rate || 0) };
-          return {
+          const quote = quoteFor(rates, days, seasons, startDate, input.endDate);
+          // Not priced for a stay this short (or no monthly price for an open-ended one): not offered.
+          if (!quote) return [];
+          return [{
             id: vehicle.id,
             make: vehicle.make,
             model: vehicle.model,
@@ -141,14 +169,15 @@ export async function searchDirectory(input: DirectorySearch): Promise<Directory
             kind: String(vehicle.vehicle_categories?.code || ""),
             seats: vehicle.specifications?.seating_capacity ? Number(vehicle.specifications.seating_capacity) : null,
             transmission: String(vehicle.specifications?.transmission || ""),
-        color: String(vehicle.color || ""),
+            color: String(vehicle.color || ""),
+            photoUrl: photoUrls.get(leadPhoto.get(vehicle.id)?.path || "") || null,
             ...rates,
-            quote: quoteFor(rates, days, seasons, startDate, input.endDate),
+            quote,
             deposit: vehicle.deposit_amount != null ? Number(vehicle.deposit_amount) : usualDeposit
-          };
+          }];
         })
         .sort((a, b) => (a.quote.total ?? a.quote.rate) - (b.quote.total ?? b.quote.rate))
     });
   }
-  return businesses.sort((a, b) => a.name.localeCompare(b.name));
+  return businesses.filter((business) => business.vehicles.length > 0).sort((a, b) => a.name.localeCompare(b.name));
 }

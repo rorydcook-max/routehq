@@ -647,7 +647,7 @@ export function ReportsView({ data }: { data: ReportsData }) {
                     <span className="block text-[16px] font-bold text-[var(--foreground)]">{balance.customerName}</span>
                     <span className={`block ${soft}`}>
                       {say("owedRentals", { count: balance.rentalCount })}
-                      {balance.oldestDue ? ` · ${say("owedSince", { date: longDate(balance.oldestDue, locale) })}` : ""}
+                      {balance.oldestDue ? <> · <span className="whitespace-nowrap">{say("owedSince", { date: longDate(balance.oldestDue, locale) })}</span></> : null}
                     </span>
                   </span>
                   <span className="flex shrink-0 items-center gap-1 text-[17px] font-bold text-[var(--foreground)]">

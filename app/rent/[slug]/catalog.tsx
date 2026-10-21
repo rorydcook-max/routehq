@@ -86,10 +86,12 @@ export function Catalog({
           const clash = datesReady ? vehicle.busy.find((period) => clashes(startDate, end, period, gapDays)) : null;
           // When it is taken, say when it next comes free (if it has an end date).
           const freeFrom = clash?.endDate && clash.endDate > startDate ? clash.endDate : null;
-          return { vehicle, free: !clash, freeFrom, openEndedClash: !!clash && !clash.endDate };
+          // Vehicles the customer can book for these dates come first; ones that only rent by the month (or are taken) after.
+          const bookable = !clash && !!planFor(vehicle, days);
+          return { vehicle, free: !clash, bookable, freeFrom, openEndedClash: !!clash && !clash.endDate };
         })
-        .sort((a, b) => Number(b.free) - Number(a.free) || (a.freeFrom || "9999").localeCompare(b.freeFrom || "9999")),
-    [vehicles, startDate, end, datesReady, gapDays]
+        .sort((a, b) => Number(b.bookable) - Number(a.bookable) || Number(b.free) - Number(a.free) || (a.freeFrom || "9999").localeCompare(b.freeFrom || "9999")),
+    [vehicles, startDate, end, days, datesReady, gapDays]
   );
   const freeCount = rows.filter((row) => row.free).length;
 
@@ -163,7 +165,7 @@ export function Catalog({
               : t("freeCountMonthly", { free: freeCount, total: vehicles.length, start: shortDate(startDate, locale) })}
       </p>
 
-      <section className="grid items-start gap-3 lg:grid-cols-2">
+      <section className="grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {rows.map(({ vehicle, free, freeFrom, openEndedClash }) => {
           const headline = headlineRate(vehicle);
           // A monthly-only vehicle can't be booked for a weekend.
@@ -187,31 +189,39 @@ export function Catalog({
             offer !== "monthly" && vehicle.weeklyRate > 0 && headline?.per !== "week" ? t("perWeek", { rate: money(vehicle.weeklyRate) }) : null
           ].filter(Boolean);
           const isOpen = openId === vehicle.id;
+          const headlineKey = headline ? (headline.per === "day" ? "perDay" : headline.per === "week" ? "perWeek" : "perMonth") : null;
+          // "฿11,000" big, "/ month" small: the unit is whatever the translation puts around the amount.
+          const unit = headlineKey ? t(headlineKey, { rate: "" }).trim() : "";
+          const canBook = free && datesReady && bookable;
           return (
-            <article className={`rounded-2xl border border-[var(--border)] bg-white p-4 shadow-sm ${isOpen ? "lg:col-span-2" : ""}`} key={vehicle.id}>
-              {vehicle.photoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img alt={vehicle.name} className="mb-3 aspect-[16/9] w-full rounded-xl object-cover sm:hidden" src={vehicle.photoUrl} />
-              ) : null}
-              <div className="flex items-start gap-3">
-                {vehicle.photoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img alt="" className="hidden h-24 w-36 shrink-0 rounded-xl object-cover sm:block" src={vehicle.photoUrl} />
-                ) : (
-                  <span className="shrink-0">
-                    <VehicleArt colour={vehicle.color} kind={vehicle.kind} model={vehicle.name} size="sm" />
-                  </span>
-                )}
-                <div className="min-w-0 flex-1">
-                  <h3 className="text-lg font-semibold leading-tight">{vehicle.name}</h3>
-                  <p className="mt-0.5 text-sm text-[var(--muted)]">{[vehicle.year, vehicle.color, ...vehicle.details].filter(Boolean).join(" · ")}</p>
+            <article className={`flex flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-white shadow-sm ${isOpen ? "sm:col-span-2 lg:col-span-3" : ""}`} key={vehicle.id}>
+              <div className={`relative ${isOpen ? "sm:flex sm:items-start sm:gap-5 sm:p-5" : ""}`}>
+                <div className={`relative aspect-[16/10] bg-[var(--panel-secondary)] ${isOpen ? "sm:w-64 sm:shrink-0 sm:overflow-hidden sm:rounded-xl" : ""} ${!free ? "opacity-70" : ""}`}>
+                  {vehicle.photoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img alt={vehicle.name} className="h-full w-full object-cover" src={vehicle.photoUrl} />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center">
+                      <VehicleArt className="!h-full !w-full !rounded-none" colour={vehicle.color} kind={vehicle.kind} model={vehicle.name} size="xl" />
+                    </div>
+                  )}
+                  {!free ? (
+                    <span className="absolute left-3 top-3 rounded-full bg-[var(--foreground)]/80 px-3 py-1 text-xs font-bold text-white">
+                      {openEndedClash ? t("onLongTermRental") : t("takenForDates")}
+                    </span>
+                  ) : null}
+                </div>
+                <div className={`flex min-w-0 flex-1 flex-col ${isOpen ? "p-4 sm:p-0" : "p-4"}`}>
+                  <h3 className="text-[17px] font-bold leading-tight text-[var(--foreground)]">{vehicle.name}</h3>
+                  <p className="mt-1 text-sm text-[var(--muted)]">{[vehicle.year, vehicle.color, ...vehicle.details].filter(Boolean).join(" · ")}</p>
                   {headline ? (
-                    <p className="mt-2 text-base font-semibold text-[var(--foreground)]">
-                      {t(headline.per === "day" ? "perDay" : headline.per === "week" ? "perWeek" : "perMonth", { rate: money(headline.amount) })}
-                      {otherRates.length ? <span className="ml-2 text-sm font-medium text-[var(--muted)]">{otherRates.join(" · ")}</span> : null}
+                    <p className="mt-3 flex flex-wrap items-baseline gap-x-1.5">
+                      <span className="text-[22px] font-bold leading-none text-[var(--foreground)]">{money(headline.amount)}</span>
+                      {unit ? <span className="text-sm font-semibold text-[var(--muted)]">{unit}</span> : null}
                     </p>
                   ) : null}
-                  {vehicle.deposit > 0 ? <p className="mt-0.5 text-sm text-[var(--muted)]">{t("depositReturnedAtEnd", { amount: money(vehicle.deposit) })}</p> : null}
+                  {otherRates.length ? <p className="mt-1 text-sm text-[var(--muted)]">{otherRates.join(" · ")}</p> : null}
+                  {vehicle.deposit > 0 ? <p className="mt-1 text-sm text-[var(--muted)]">{t("depositReturnedAtEnd", { amount: money(vehicle.deposit) })}</p> : null}
                   {/* No price for a stay the vehicle can't be booked for: a slice of the monthly rate is not on offer. */}
                   {free && plan && stayTotal && !tooShort ? (
                     <p className="mt-1 text-sm font-semibold text-[var(--primary)]">
@@ -226,16 +236,10 @@ export function Catalog({
                           : t(season.pct > 0 ? "seasonPrice" : "seasonDiscount", { pct: Math.abs(season.pct), names: season.names.join(", ") || t("highSeason") })}
                     </p>
                   ) : null}
-                  {tooShort ? <p className="mt-1 text-sm font-semibold text-[var(--warning)]">{tooShort}</p> : null}
-
-                  {!free ? (
-                    <p className="mt-1 text-sm font-semibold text-[var(--warning)]">
-                      {openEndedClash ? t("onLongTermRental") : t("takenForDates")}
-                    </p>
-                  ) : null}
+                  {tooShort ? <p className="mt-2 text-sm font-semibold text-[var(--warning)]">{tooShort}</p> : null}
                   {!free && freeFrom ? (
                     <button
-                      className="pressable mt-2 inline-flex min-h-10 items-center whitespace-nowrap rounded-full border-2 border-[var(--primary)] bg-white px-4 text-sm font-bold text-[var(--primary)]"
+                      className="pressable mt-3 inline-flex min-h-11 items-center justify-center whitespace-nowrap rounded-full border-2 border-[var(--primary)] bg-white px-4 text-sm font-bold text-[var(--primary)]"
                       onClick={() => {
                         // Keep the length of stay they asked for, starting when this vehicle is free.
                         const length = end ? daysBetween(startDate, end) : 0;
@@ -248,24 +252,26 @@ export function Catalog({
                       {t("startFrom", { date: shortDate(freeFrom, locale) })}
                     </button>
                   ) : null}
+                  {canBook ? (
+                    <div className="mt-auto pt-4">
+                      <button
+                        className={`pressable inline-flex min-h-12 w-full items-center justify-center rounded-full px-4 text-[15px] font-bold ${isOpen ? "border-2 border-[var(--border)] bg-white text-[var(--foreground)] sm:w-auto sm:px-8" : "bg-[var(--primary)] text-white"}`}
+                        onClick={() => {
+                          setError(null);
+                          setChosen([]);
+                          setOpenId(isOpen ? null : vehicle.id);
+                        }}
+                        type="button"
+                      >
+                        {isOpen ? t("close") : t("book")}
+                      </button>
+                    </div>
+                  ) : null}
                 </div>
-                {free && datesReady && bookable ? (
-                  <button
-                    className={`pressable min-h-11 shrink-0 rounded-xl px-4 text-sm font-semibold ${isOpen ? "border border-[var(--border)] bg-white text-[var(--foreground)]" : "bg-[var(--primary)] text-white"}`}
-                    onClick={() => {
-                      setError(null);
-                      setChosen([]);
-                      setOpenId(isOpen ? null : vehicle.id);
-                    }}
-                    type="button"
-                  >
-                    {isOpen ? t("close") : t("book")}
-                  </button>
-                ) : null}
               </div>
 
               {isOpen ? (
-                <form action={(formData) => send(formData, vehicle)} className="mt-4 space-y-3 border-t border-[var(--border)] pt-4">
+                <form action={(formData) => send(formData, vehicle)} className="space-y-3 border-t border-[var(--border)] p-4 sm:p-5">
                   <div className="grid gap-3 sm:grid-cols-2">
                     <label className="block text-sm font-semibold text-[var(--foreground-secondary)]">
                       {t("yourName")}

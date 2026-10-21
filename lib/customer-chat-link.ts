@@ -15,21 +15,40 @@ export type ChatInvite = { provider: string; label: string; url: string; preferr
 /** The code a customer sends from LINE: the start of their booking link's token. */
 const codeOf = (token: string) => String(token || "").slice(0, 12);
 
+/**
+ * Channels whose name couldn't be looked up (a broken token, LINE or Telegram down): not asked again for a while.
+ * The customer's booking page would otherwise wait on a failing call every time it opens.
+ */
+const failedLookups = new Map<string, number>();
+const RETRY_AFTER_MS = 30 * 60_000;
+const LOOKUP_TIMEOUT_MS = 2_000;
+
+function withTimeout<T>(work: Promise<T>, ms: number): Promise<T | null> {
+  return Promise.race([work, new Promise<null>((resolve) => setTimeout(() => resolve(null), ms))]);
+}
+
 /** The account's public name, looked up once and kept on the channel. */
 async function handleFor(admin: any, channel: any): Promise<string | null> {
   if (channel.public_handle) return String(channel.public_handle);
+  const failedAt = failedLookups.get(channel.id);
+  if (failedAt && Date.now() - failedAt < RETRY_AFTER_MS) return null;
   const { data: secrets } = await admin.from("messaging_channel_secrets").select("access_token").eq("channel_id", channel.id).maybeSingle();
   const token = String(secrets?.access_token || "");
   if (!token) return null;
   let handle: string | null = null;
   if (channel.provider === "line") {
-    const info = await lineBotInfo(token);
-    handle = info.ok && info.data.basicId ? String(info.data.basicId) : null;
+    const info = await withTimeout(lineBotInfo(token), LOOKUP_TIMEOUT_MS);
+    handle = info?.ok && info.data.basicId ? String(info.data.basicId) : null;
   } else if (channel.provider === "telegram") {
-    const me = await telegramGetMe(token);
-    handle = me.ok && me.data.result.username ? String(me.data.result.username) : null;
+    const me = await withTimeout(telegramGetMe(token), LOOKUP_TIMEOUT_MS);
+    handle = me?.ok && me.data.result.username ? String(me.data.result.username) : null;
   }
-  if (handle) await admin.from("messaging_channels").update({ public_handle: handle }).eq("id", channel.id).then(() => null, () => null);
+  if (handle) {
+    failedLookups.delete(channel.id);
+    await admin.from("messaging_channels").update({ public_handle: handle }).eq("id", channel.id).then(() => null, () => null);
+  } else {
+    failedLookups.set(channel.id, Date.now());
+  }
   return handle;
 }
 
@@ -48,8 +67,10 @@ export async function chatInvites(admin: any, input: { organizationId: string; c
 
   const preferred = String(customer?.preferred_contact_method || "").toLowerCase();
   const invites: ChatInvite[] = [];
-  for (const channel of channels || []) {
-    const handle = await handleFor(admin, channel).catch(() => null);
+  // Each channel's name is looked up at the same time, not one after another.
+  const handles = await Promise.all((channels || []).map((channel: any) => handleFor(admin, channel).catch(() => null)));
+  for (const [index, channel] of (channels || []).entries()) {
+    const handle = handles[index];
     if (!handle) continue;
     if (channel.provider === "line") {
       const text = `Booking ${codeOf(input.token)}`;

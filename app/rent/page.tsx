@@ -83,49 +83,57 @@ export default async function DirectoryPage({ searchParams }: { searchParams: Pr
               <p className="font-semibold text-[var(--foreground-secondary)]">{t("found", { count: total, businesses: results.length })}</p>
               {results.map((business) => (
                 <section className="rounded-2xl border border-[var(--border)] bg-white p-4 shadow-sm" key={business.slug}>
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
                     <BusinessLogoImage
                       alt={`${business.name} logo`}
-                      className="max-h-12 max-w-[110px] object-contain"
+                      className="max-h-10 max-w-[96px] object-contain"
                       fallback={<span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--primary)] text-lg font-semibold text-white">{business.name.slice(0, 1)}</span>}
                       src={business.logoUrl}
                     />
-                    <div className="min-w-0">
-                      <h2 className="text-lg font-semibold">{business.name}</h2>
+                    <div className="min-w-0 flex-1 basis-40">
+                      <h2 className="text-lg font-semibold leading-tight">{business.name}</h2>
                       <p className="text-sm text-[var(--muted)]">{[business.town, business.region].filter(Boolean).join(", ")}</p>
                     </div>
-                    <Link className="ml-auto shrink-0 text-sm font-bold text-[var(--primary)]" href={`/rent/${business.slug}`}>
+                    <Link className="pressable inline-flex min-h-10 shrink-0 items-center rounded-full border border-[var(--border)] px-4 text-sm font-bold text-[var(--primary)]" href={`/rent/${business.slug}`}>
                       {t("allVehicles")}
                     </Link>
                   </div>
-                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                    {business.vehicles.slice(0, 8).map((vehicle) => (
-                      <div className="flex flex-col rounded-xl border border-[var(--border)] p-3" key={vehicle.id}>
-                        <div className="flex items-center gap-3">
-                          <VehicleArt colour={vehicle.color} kind={(vehicle.kind || "car") as any} model={vehicle.model} size="sm" />
-                          <div className="min-w-0">
-                            <p className="text-[16px] font-bold">
-                              {vehicle.make} {vehicle.model} {vehicle.year ? <span className="font-medium text-[var(--muted)]">{vehicle.year}</span> : null}
-                            </p>
-                            <p className="text-sm text-[var(--muted)]">
-                              {[vehicle.kind ? t(`kind_${vehicle.kind}`) : "", vehicle.seats ? t("seats", { count: vehicle.seats }) : "", vehicle.transmission].filter(Boolean).join(" · ")}
-                            </p>
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {business.vehicles.slice(0, 9).map((vehicle) => (
+                      <div className="flex flex-col overflow-hidden rounded-xl border border-[var(--border)]" key={vehicle.id}>
+                        <div className="aspect-[16/10] bg-[var(--panel-secondary)]">
+                          {vehicle.photoUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img alt={`${vehicle.make} ${vehicle.model}`} className="h-full w-full object-cover" src={vehicle.photoUrl} />
+                          ) : (
+                            <VehicleArt className="!h-full !w-full !rounded-none" colour={vehicle.color} kind={(vehicle.kind || "car") as any} model={vehicle.model} size="xl" />
+                          )}
+                        </div>
+                        <div className="flex flex-1 flex-col p-3">
+                          <p className="text-[16px] font-bold leading-tight">
+                            {vehicle.make} {vehicle.model} {vehicle.year ? <span className="font-medium text-[var(--muted)]">{vehicle.year}</span> : null}
+                          </p>
+                          <p className="mt-0.5 text-sm text-[var(--muted)]">
+                            {[vehicle.kind ? t(`kind_${vehicle.kind}`) : "", vehicle.seats ? t("seats", { count: vehicle.seats }) : "", vehicle.transmission].filter(Boolean).join(" · ")}
+                          </p>
+                          <p className="mt-2 flex flex-wrap items-baseline gap-x-1.5">
+                            <span className="text-[20px] font-bold leading-none">{money(vehicle.quote.rate, business.currency)}</span>
+                            <span className="text-sm font-semibold text-[var(--muted)]">{t(`per_${vehicle.quote.model}`)}</span>
+                          </p>
+                          {vehicle.quote.total !== null ? <p className="mt-0.5 text-sm font-semibold text-[var(--primary)]">{t("total", { amount: money(vehicle.quote.total, business.currency) })}</p> : null}
+                          <p className="mt-0.5 text-sm text-[var(--muted)]">{vehicle.deposit > 0 ? t("deposit", { amount: money(vehicle.deposit, business.currency) }) : t("noDeposit")}</p>
+                          <div className="mt-auto pt-3">
+                            <Link className="pressable inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[var(--primary)] px-4 text-sm font-bold text-white" href={bookHref(business.slug, vehicle.id) as Route}>
+                              {t("book")}
+                            </Link>
                           </div>
                         </div>
-                        <p className="mt-2 text-[15px] font-bold">
-                          {money(vehicle.quote.rate, business.currency)} {t(`per_${vehicle.quote.model}`)}
-                          {vehicle.quote.total !== null ? <span className="font-medium text-[var(--muted)]"> · {t("total", { amount: money(vehicle.quote.total, business.currency) })}</span> : null}
-                        </p>
-                        <p className="text-sm text-[var(--muted)]">{vehicle.deposit > 0 ? t("deposit", { amount: money(vehicle.deposit, business.currency) }) : t("noDeposit")}</p>
-                        <Link className="pressable mt-3 inline-flex min-h-11 items-center justify-center rounded-full bg-[var(--primary)] px-4 text-sm font-semibold text-white" href={bookHref(business.slug, vehicle.id) as Route}>
-                          {t("book")}
-                        </Link>
                       </div>
                     ))}
                   </div>
-                  {business.vehicles.length > 8 ? (
+                  {business.vehicles.length > 9 ? (
                     <Link className="mt-3 inline-flex text-sm font-bold text-[var(--primary)]" href={`/rent/${business.slug}`}>
-                      {t("more", { count: business.vehicles.length - 8 })}
+                      {t("more", { count: business.vehicles.length - 9 })}
                     </Link>
                   ) : null}
                 </section>

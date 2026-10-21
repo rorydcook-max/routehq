@@ -443,16 +443,16 @@ export function TransactionsList({
               <p className="line-clamp-2 break-words font-medium text-[var(--foreground-secondary)]">
                 {who}
                 {transaction.rentalId && transaction.bookingRef ? (
-                  <>
+                  <span className="whitespace-nowrap">
                     {who ? " · " : ""}
-                    <Link className="whitespace-nowrap font-semibold text-[var(--primary)] hover:underline" href={`/bookings/${transaction.rentalId}`} onClick={(event) => event.stopPropagation()}>
+                    <Link className="font-semibold text-[var(--primary)] hover:underline" href={`/bookings/${transaction.rentalId}`} onClick={(event) => event.stopPropagation()}>
                       {transaction.bookingRef}
                     </Link>
-                  </>
+                  </span>
                 ) : null}
               </p>
             ) : null}
-            {note ? <p className="mt-0.5 truncate text-[14px] font-medium text-[var(--muted)]">{note}</p> : null}
+            {note ? <p className="mt-0.5 line-clamp-2 text-[14px] font-medium text-[var(--muted)]">{note}</p> : null}
           </div>
           <p className={`flex-shrink-0 text-[17px] font-bold tabular-nums ${amount.className}`}>
             {amount.prefix}
@@ -603,7 +603,7 @@ export function TransactionsList({
           <div>
             <p className="flex items-center gap-1.5 font-semibold text-[var(--foreground-secondary)]"><Dot color="var(--chart-in)" />{tx.say("moneyIn")}</p>
             <p className="num text-[24px] leading-tight text-[var(--foreground)]">{signedMoney(incomeTotal)}</p>
-            {refundTotal > 0 ? <p className="text-sm font-semibold text-[var(--muted)]">{tx.say("afterRefunds", { amount: money(refundTotal) })}</p> : null}
+            {refundTotal > 0 ? <p className="text-sm font-semibold text-[var(--muted)]">{tx.say("afterRefunds", { received: money(incomeTotal + refundTotal), amount: money(refundTotal) })}</p> : null}
           </div>
           <div>
             <p className="flex items-center gap-1.5 font-semibold text-[var(--foreground-secondary)]"><Dot color="var(--chart-out)" />{tx.say("moneyOut")}</p>

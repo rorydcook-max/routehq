@@ -141,6 +141,23 @@ export async function getPublicBookingDetail(token: string) {
           .limit(1)
       ])
     : Promise.resolve([{ data: [] }, { data: [] }, { data: [] }] as any[]);
+  // Handover/return reports and receipts only need the link too, so they load alongside everything else.
+  // A report that can't be read is left off rather than failing the customer's whole page.
+  const inspectionReportsPending = bookingLink.rental_id ? getCustomerInspectionReports(supabase, bookingLink.organization_id, bookingLink.rental_id).catch(() => []) : Promise.resolve([]);
+  // Receipts the business has issued for this rental: the customer paid, so the receipt is theirs to keep.
+  const receiptsPending: Promise<Array<{ id: string; number: string; url: string }>> = bookingLink.rental_id
+    ? supabase
+        .from("receipts")
+        .select("id, receipt_number, pdf_url")
+        .eq("organisation_id", bookingLink.organization_id)
+        .eq("rental_id", bookingLink.rental_id)
+        .order("created_at", { ascending: true })
+        .then(({ data }: { data: any[] | null }) =>
+          (data || [])
+            .filter((row) => /^https?:\/\//.test(String(row.pdf_url || "")))
+            .map((row) => ({ id: String(row.id), number: String(row.receipt_number || ""), url: String(row.pdf_url) }))
+        )
+    : Promise.resolve([]);
   // Every booking needs an agreement in the document engine. Nothing else
   // creates one, so the first time the page opens a draft is made here.
   const agreementReads = (async () => {
@@ -218,21 +235,7 @@ export async function getPublicBookingDetail(token: string) {
     ),
     markOpened
   ]);
-  const inspectionReports = bookingLink.rental_id ? await getCustomerInspectionReports(supabase, bookingLink.organization_id, bookingLink.rental_id) : [];
-  // Receipts the business has issued for this rental: the customer paid, so the receipt is theirs to keep.
-  const receipts: Array<{ id: string; number: string; url: string }> = bookingLink.rental_id
-    ? await supabase
-        .from("receipts")
-        .select("id, receipt_number, pdf_url")
-        .eq("organisation_id", bookingLink.organization_id)
-        .eq("rental_id", bookingLink.rental_id)
-        .order("created_at", { ascending: true })
-        .then(({ data }: { data: any[] | null }) =>
-          (data || [])
-            .filter((row) => /^https?:\/\//.test(String(row.pdf_url || "")))
-            .map((row) => ({ id: String(row.id), number: String(row.receipt_number || ""), url: String(row.pdf_url) }))
-        )
-    : [];
+  const [inspectionReports, receipts] = await Promise.all([inspectionReportsPending, receiptsPending]);
   const rentalDocumentAgreement = agreementResult.agreement;
   const executedDownloads = agreementResult.downloads;
   const organizationForDisplay = organization

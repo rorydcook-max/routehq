@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { shortDate } from "@/lib/i18n/dates";
-import { RefreshCw, X } from "lucide-react";
+import { X } from "lucide-react";
 import { createVehicleChange, getVehicleChangeOptions, type VehicleChangeOptions } from "@/app/actions/amendments";
 import { AmendmentLinkPanel } from "@/components/rental-adjustment-modal";
 
@@ -101,11 +101,10 @@ export function VehicleChangeButton({ rentalId }: { rentalId: string }) {
   return (
     <>
       <button
-        className="pressable inline-flex min-h-9 items-center justify-center gap-2 rounded-full border border-[var(--border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--foreground-secondary)]"
+        className="pressable inline-flex min-h-11 items-center justify-center whitespace-nowrap rounded-full border-2 border-[var(--border-strong)] bg-white px-3 py-2 text-center font-bold leading-tight text-[var(--foreground)]"
         onClick={load}
         type="button"
       >
-        <RefreshCw size={15} />
         {say("vc_button")}
       </button>
       {open ? (

@@ -28,7 +28,7 @@ async function resolveBookingSite(target: { label: string } | { host: string }, 
   }
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const isPublicRoute =
     pathname === "/login" ||

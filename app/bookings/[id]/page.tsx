@@ -668,7 +668,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 ) : null}
                 <div className="min-w-0 flex-1">
                   <h1 className="text-[28px] leading-tight tracking-[-0.02em] text-[var(--foreground)] lg:text-[36px]">
-                    {customer ? customer.full_name : tx.list("awaitingCustomer")}
+                    {/* A cancelled booking is no longer waiting for anyone. */}
+                    {customer ? customer.full_name : tx.list(rental.status === "cancelled" ? "noCustomer" : "awaitingCustomer")}
                   </h1>
                   <p className="mt-0.5 text-[17px] font-semibold text-[var(--foreground-secondary)]">{vehicleTitle(vehicle)}</p>
                 </div>

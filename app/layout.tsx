@@ -10,6 +10,15 @@ import { headers } from "next/headers";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { shellBrand } from "@/lib/shell-brand";
+import { StaffMessages } from "@/components/staff-messages";
+
+async function isCustomerPage() {
+  try {
+    return Boolean((await headers()).get("x-routehq-customer-page"));
+  } catch {
+    return false;
+  }
+}
 
 /** The signed-in operator's brand (logo, name, colour), so pages open in it rather than switching after load. */
 async function operatorBrand() {
@@ -54,14 +63,15 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [locale, brand] = await Promise.all([getLocale(), operatorBrand()]);
+  const [locale, brand, customerPage] = await Promise.all([getLocale(), operatorBrand(), isCustomerPage()]);
+  const page = <ShellBrandProvider brand={brand}>{children}</ShellBrandProvider>;
   return (
     <html dir={textDirection(locale)} lang={locale}>
       <body>
         <BrandStyle colour={brand?.colour || null} />
-        <NextIntlClientProvider>
-          <ShellBrandProvider brand={brand}>{children}</ShellBrandProvider>
-        </NextIntlClientProvider>
+        {/* Customer pages get only their few words with the page. The staff app loads its words once as a
+            cached file (StaffMessages), so they are not re-sent with every save. */}
+        {customerPage ? <NextIntlClientProvider>{page}</NextIntlClientProvider> : <StaffMessages locale={locale}>{page}</StaffMessages>}
         <ImageShrinker />
         <FlagFont />
       </body>

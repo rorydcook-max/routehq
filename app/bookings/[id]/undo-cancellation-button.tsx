@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import { shownError } from "@/lib/error-text";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { RotateCcw, X } from "lucide-react";
 import { undoCancellation } from "@/app/actions/bookings";
@@ -24,7 +23,6 @@ export function UndoCancellationButton({
   compact = false,
   label,
 }: Props) {
-  const router = useRouter();
   const say = useTranslations("booking") as unknown as (key: string) => string;
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -39,8 +37,8 @@ export function UndoCancellationButton({
         fd.set("rentalId", rentalId);
         fd.set("vehicleId", vehicleId);
         await undoCancellation(fd);
+        // The action refreshes this page itself (revalidatePath) and sends it back with its reply.
         setOpen(false);
-        router.refresh();
       } catch (err) {
         setError(shownError(err, say("undo_failed")));
       }

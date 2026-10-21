@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import { shownError } from "@/lib/error-text";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { AlertTriangle, XCircle } from "lucide-react";
 import { cancelBookingWithDisposition } from "@/app/actions/bookings";
@@ -69,7 +68,6 @@ export function CancelBookingButton({
   compact = false,
   label
 }: Props) {
-  const router = useRouter();
   const say = useTranslations("booking") as unknown as (key: string, values?: Record<string, string | number>) => string;
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<"reason" | "disposition" | "vehicle" | "confirm">("reason");
@@ -147,8 +145,9 @@ export function CancelBookingButton({
         fd.set("repairNotes", repairNotes);
         fd.set("repairExpectedEnd", repairExpectedEnd);
         await cancelBookingWithDisposition(fd);
+        // No router.refresh() here: the action already refreshes this page (revalidatePath) and sends the new page
+        // with its reply, so a refresh would only load the same page a second time.
         reset();
-        router.refresh();
       } catch (err) {
         setError(shownError(err, say("cn_failed")));
       }

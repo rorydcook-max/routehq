@@ -6,7 +6,6 @@ import { toast } from "@/components/toast";
 import { shownError } from "@/lib/error-text";
 import { ArrowDownLeft, ArrowUpRight, Check, ChevronLeft, ChevronRight, Download, Search, Trash2, X } from "lucide-react";
 import { Dot } from "@/components/glance";
-import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { intlLocale } from "@/lib/i18n/dates";
 
@@ -71,7 +70,6 @@ function TransactionEditForm({
   transaction: TransactionListItem;
   vehicles: VehicleOption[];
 }) {
-  const router = useRouter();
   const tx = useTx();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -96,7 +94,6 @@ function TransactionEditForm({
           vehicleId: selectedVehicle?.id || transaction.vehicleId
         });
         onSaved(tx.say("updated"));
-        router.refresh();
       } catch (caught) {
         setError(shownError(caught, tx.say("updateFailed")));
       }
@@ -247,7 +244,6 @@ export function TransactionsList({
   /** Off for teammates: they see what came in and went out, not how the business did. */
   showProfit?: boolean;
 }) {
-  const router = useRouter();
   const tx = useTx();
   const [mode, setMode] = useState<PeriodMode>("month");
   const [anchor, setAnchor] = useState(today);
@@ -351,7 +347,6 @@ export function TransactionsList({
       startTransition(async () => {
         try {
           await deleteTransaction(id);
-          router.refresh();
         } catch (caught) {
           unhide();
           setError(shownError(caught, tx.say("deleteFailed")));
@@ -387,7 +382,6 @@ export function TransactionsList({
         setHiddenIds((current) => new Set([...Array.from(current), ...ids]));
         stopSelecting();
         showToast(tx.say("bulkDeleted", { count: result.deleted }));
-        router.refresh();
       } catch (caught) {
         setError(shownError(caught, tx.say("bulkFailed")));
       } finally {

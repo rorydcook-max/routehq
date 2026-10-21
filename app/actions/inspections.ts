@@ -717,7 +717,8 @@ export async function submitInspection(formData: FormData) {
 
     await createOnDeliveryPaymentRecords(supabase, organizationId, rentalId);
     // Generate payment schedule (idempotent — skips if already exists)
-    await activateRental(rentalId, supabase).catch(() => null);
+    // Out early: rent is for the booked dates (the early days are charged above, or free). Shortened: same length from today.
+    await activateRental(rentalId, supabase, { scheduleFrom: early && earlyChoice !== "shorten" ? early.bookedStart : null }).catch(() => null);
   }
 
   if (mode === "return" && rentalId && !isSwap) {

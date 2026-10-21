@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { MoreHorizontal } from "lucide-react";
@@ -221,7 +220,6 @@ function methodLabel(method: string, tx: Tx) {
  * and see where every baht goes before confirming.
  */
 function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskListItem; siblings: TaskListItem[]; today: string; onClose: () => void }) {
-  const router = useRouter();
   const tx = useTx();
   const receipt = item.receipt;
   const openPayments: OpenPayment[] = [item, ...siblings]
@@ -259,7 +257,6 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
       try {
         await confirmReceiptPayment({ paymentId: item.rentalPaymentId as string, amount: received, date, method, paymentIds: chosenIds, tellCustomer });
         onClose();
-        router.refresh();
       } catch {
         setError(tx.say("errRecord"));
       }
@@ -272,7 +269,6 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
       try {
         await declinePaymentReceipt(item.rentalPaymentId as string);
         onClose();
-        router.refresh();
       } catch {
         setError(tx.say("errUpdate"));
       }
@@ -369,7 +365,6 @@ function TaskRow({ item, organizationId, today, siblings = [], canDecide = true 
   const [showNote, setShowNote] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const [recording, setRecording] = useState(false);
-  const router = useRouter();
   const [receiptError, setReceiptError] = useState<string | null>(null);
   const [isConfirming, startConfirm] = useTransition();
   const receipt = item.kind === "payment" ? item.receipt : null;
@@ -384,7 +379,6 @@ function TaskRow({ item, organizationId, today, siblings = [], canDecide = true 
     startDeciding(async () => {
       const result = await decideEarlyWaiver(item.rentalId as string, decision);
       if (!result.ok) setWaiverError(result.error || tx.say("errConfirm"));
-      else router.refresh();
     });
   }
 
@@ -396,7 +390,6 @@ function TaskRow({ item, organizationId, today, siblings = [], canDecide = true 
     startDeciding(async () => {
       const result = await decideEarlyReturnOwed(item.rentalId as string, decision);
       if (!result.ok) setWaiverError(result.error || tx.say("errConfirm"));
-      else router.refresh();
     });
   }
 
@@ -406,7 +399,6 @@ function TaskRow({ item, organizationId, today, siblings = [], canDecide = true 
     startConfirm(async () => {
       try {
         await confirmReceiptPayment({ paymentId: item.rentalPaymentId as string, amount: receipt.total, date: today, method: receipt.method, paymentIds: receipt.paymentIds });
-        router.refresh();
       } catch {
         setReceiptError(tx.say("errConfirm"));
       }

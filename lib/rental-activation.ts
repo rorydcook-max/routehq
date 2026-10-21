@@ -44,7 +44,12 @@ function bestMatchTransaction(transactions: any[], usedIds: Set<string>, dueDate
   return matched;
 }
 
-export async function activateRental(rentalId: string, supabase: SupabaseClient): Promise<void> {
+/**
+ * `scheduleFrom`: the booked start, when the vehicle went out before it. The rental now starts on the handover
+ * day, but the rent schedule is for the booked dates; the early days are charged separately (or free), so
+ * billing from the handover day would charge them twice (or charge days the owner gave free).
+ */
+export async function activateRental(rentalId: string, supabase: SupabaseClient, options: { scheduleFrom?: string | null } = {}): Promise<void> {
   const { data: rental, error } = await (supabase as any)
     .from("rentals")
     .select("id, organization_id, customer_id, vehicle_id, start_date, end_date, rental_rate, pricing_model, billing_interval, currency, status, extras, extras_total, deposit_amount, deposit_payment_amount, deposit_status, deposit_held")
@@ -81,7 +86,7 @@ export async function activateRental(rentalId: string, supabase: SupabaseClient)
 
   let newPayments: any[] = [];
   if (!hasScheduledFuture) {
-    newPayments = await generatePaymentScheduleInternal(rental, existingRentPayments, supabase);
+    newPayments = await generatePaymentScheduleInternal(rental, existingRentPayments, supabase, options.scheduleFrom || null);
   }
   const extrasPayment = await addExtrasPayment(rental, existingRentPayments, newPayments.length > 0 || existingRentPayments.length > 0, supabase);
   if (extrasPayment) newPayments.push(extrasPayment);
@@ -98,7 +103,8 @@ export async function activateRental(rentalId: string, supabase: SupabaseClient)
 async function generatePaymentScheduleInternal(
   rental: any,
   existingPayments: any[],
-  supabase: SupabaseClient
+  supabase: SupabaseClient,
+  scheduleFrom: string | null = null
 ): Promise<any[]> {
   if (!rental.customer_id || !rental.vehicle_id) return [];
   const rentalRate = Number(rental.rental_rate || 0);
@@ -119,12 +125,19 @@ async function generatePaymentScheduleInternal(
 
   const incomeTransactions: any[] = txRows || [];
 
-  const startDate = new Date(`${startDateStr}T00:00:00.000Z`);
+  // Handed over before the booked start: the schedule covers the booked dates (the early days have their own
+  // charge, or were given free), with the first payment due on the handover day like the rest of the handover.
+  const earlyRow = existingPayments.find((p: any) => p.metadata?.early_start?.booked_start);
+  const bookedStart = dateOnly(scheduleFrom || earlyRow?.metadata?.early_start?.booked_start);
+  const scheduleStartStr = bookedStart && bookedStart > startDateStr ? bookedStart : startDateStr;
+  const firstDueStr = startDateStr;
+  const startDate = new Date(`${scheduleStartStr}T00:00:00.000Z`);
   const endDateStr = dateOnly(rental.end_date) || null;
   const today = businessToday();
 
-  // Build set of dates already covered by existing payments (within 5 days)
-  const existingDates = existingPayments.filter((p: any) => p.metadata?.type !== "extras").map((p: any) => dateOnly(p.due_date)).filter(Boolean);
+  // Build set of dates already covered by existing payments (within 5 days). The early-days charge is not rent
+  // for the booked dates, so it does not count as covering them.
+  const existingDates = existingPayments.filter((p: any) => p.metadata?.type !== "extras" && !p.metadata?.early_start).map((p: any) => dateOnly(p.due_date)).filter(Boolean);
   const isDateCovered = (dueDateStr: string) =>
     existingDates.some((d: string) => Math.abs(daysBetween(dueDateStr, d)) <= 5);
 
@@ -173,26 +186,27 @@ async function generatePaymentScheduleInternal(
     });
   };
 
+  const dueOn = (date: Date, index: number) => (index === 0 ? firstDueStr : date.toISOString().split("T")[0]);
   if (period === "monthly" || period === "month") {
-    const monthsToGenerate = endDateStr ? countBillingPeriods(startDateStr, endDateStr, "monthly", 24) : openEndedMonthCount(startDateStr);
-    const monthAmounts = endDateStr ? billingPeriodAmounts(startDateStr, endDateStr, "monthly", rentalRate, 24) : [];
+    const monthsToGenerate = endDateStr ? countBillingPeriods(scheduleStartStr, endDateStr, "monthly", 24) : openEndedMonthCount(scheduleStartStr);
+    const monthAmounts = endDateStr ? billingPeriodAmounts(scheduleStartStr, endDateStr, "monthly", rentalRate, 24) : [];
     for (let i = 0; i < monthsToGenerate; i++) {
       const dueDate = addMonths(startDate, i);
-      generate(dueDate.toISOString().split("T")[0], i, formatMonthLabel(dueDate), monthAmounts[i]);
+      generate(dueOn(dueDate, i), i, formatMonthLabel(dueDate), monthAmounts[i]);
     }
   } else if (period === "weekly" || period === "week") {
-    const weeksToGenerate = endDateStr ? countBillingPeriods(startDateStr, endDateStr, "weekly", 52) : 12;
-    const weekAmounts = endDateStr ? billingPeriodAmounts(startDateStr, endDateStr, "weekly", rentalRate, 52) : [];
+    const weeksToGenerate = endDateStr ? countBillingPeriods(scheduleStartStr, endDateStr, "weekly", 52) : 12;
+    const weekAmounts = endDateStr ? billingPeriodAmounts(scheduleStartStr, endDateStr, "weekly", rentalRate, 52) : [];
     for (let i = 0; i < weeksToGenerate; i++) {
       const dueDate = addWeeks(startDate, i);
-      generate(dueDate.toISOString().split("T")[0], i, undefined, weekAmounts[i]);
+      generate(dueOn(dueDate, i), i, undefined, weekAmounts[i]);
     }
   } else {
     // Daily and one-off prices: the whole rent is one payment on the first day.
     // (Without this a short rental had no rent recorded at all.)
     const isDaily = period === "daily" || period === "day";
-    const days = isDaily && endDateStr ? Math.max(1, daysBetween(startDateStr, endDateStr)) : 1;
-    generate(startDateStr, 0, isDaily ? `${days} ${days === 1 ? "day" : "days"}` : "Whole rental", isDaily ? rentalRate * days : rentalRate);
+    const days = isDaily && endDateStr ? Math.max(1, daysBetween(scheduleStartStr, endDateStr)) : 1;
+    generate(firstDueStr, 0, isDaily ? `${days} ${days === 1 ? "day" : "days"}` : "Whole rental", isDaily ? rentalRate * days : rentalRate);
   }
 
   if (records.length === 0) return [];

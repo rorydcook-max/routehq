@@ -3,7 +3,6 @@
 import { businessToday } from "@/lib/business-time";
 import { shownError } from "@/lib/error-text";
 import { typedNote } from "@/lib/transaction-notes";
-import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
@@ -152,7 +151,6 @@ function SmallBadge({ children, tone = "neutral" }: { children: React.ReactNode;
 }
 
 export function AddRentalPaymentInlineForm({ organizationId, rentalId, currency = "THB" }: { organizationId: string; rentalId: string; currency?: string | null }) {
-  const router = useRouter();
   const tx = useCtl();
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState("0");
@@ -186,7 +184,6 @@ export function AddRentalPaymentInlineForm({ organizationId, rentalId, currency 
         formData.set("status", status);
         await addRentalPayment(formData);
         setOpen(false);
-        router.refresh();
       } catch (error) {
         setMessage(shownError(error, tx.say("pc_addFailed")));
       }
@@ -253,7 +250,6 @@ export function ExistingRentalPaymentSetupCard({
   rentalRate: number;
   startDate?: string | null;
 }) {
-  const router = useRouter();
   const tx = useCtl();
   const [firstPaymentMode, setFirstPaymentMode] = useState<"collected" | "outstanding">("outstanding");
   const [depositMode, setDepositMode] = useState<"collected" | "pending" | "none">(depositAmount > 0 ? "pending" : "none");
@@ -281,7 +277,6 @@ export function ExistingRentalPaymentSetupCard({
         formData.set("depositDate", depositDate);
         formData.set("depositMethod", depositMethod);
         await setupExistingRentalPayments(formData);
-        router.refresh();
       } catch (error) {
         setMessage(shownError(error, tx.say("pc_setupFailed")));
       }
@@ -436,7 +431,6 @@ function ActionButton({
 }
 
 export function EditableEndDate({ rentalId, currentEndDate, iconOnly = false }: { rentalId: string; currentEndDate?: string | null; iconOnly?: boolean }) {
-  const router = useRouter();
   const tx = useCtl();
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(dateInput(currentEndDate));
@@ -457,7 +451,6 @@ export function EditableEndDate({ rentalId, currentEndDate, iconOnly = false }: 
           return;
         }
         setEditing(false);
-        router.refresh();
       } catch (error) {
         setMessage(shownError(error, tx.say("pc_endFailed")));
       }
@@ -508,7 +501,6 @@ export function EditableEndDate({ rentalId, currentEndDate, iconOnly = false }: 
 
 /** atHandover: the vehicle hasn't gone out yet, so a payment due by now is taken at the handover, not overdue. */
 export function EditableRentalPaymentRow({ payment, atHandover = false }: { payment: RentalPayment; atHandover?: boolean }) {
-  const router = useRouter();
   const tx = useCtl();
   const metadata = payment.metadata || {};
   const isExtension = metadata.type === "extension" || metadata.adjustment_type === "extension";
@@ -558,7 +550,6 @@ export function EditableRentalPaymentRow({ payment, atHandover = false }: { paym
           paidDate: status === "paid" ? paidDate : null
         });
         setEditing(false);
-        router.refresh();
       } catch (error) {
         setMessage(shownError(error, tx.say("pc_updateFailed")));
       }
@@ -577,7 +568,6 @@ export function EditableRentalPaymentRow({ payment, atHandover = false }: { paym
           status: "waived" as any,
           paidDate: null
         });
-        router.refresh();
       } catch (error) {
         setMessage(shownError(error, tx.say("pc_updateFailed")));
       }
@@ -595,7 +585,6 @@ export function EditableRentalPaymentRow({ payment, atHandover = false }: { paym
           note: recordNote
         });
         setRecordingPayment(false);
-        router.refresh();
       } catch (error) {
         setMessage(shownError(error, tx.say("pc_recordFailed")));
       }
@@ -786,7 +775,6 @@ export function EditableRentalPaymentRow({ payment, atHandover = false }: { paym
                       try {
                         await deleteRentalPayment(payment.id);
                         setEditing(false);
-                        router.refresh();
                       } catch (error) {
                         setMessage(shownError(error, tx.say("pc_deletePaymentFailed")));
                       }
@@ -810,7 +798,6 @@ export function EditableRentalPaymentRow({ payment, atHandover = false }: { paym
 }
 
 export function EditableTransactionRow({ transaction }: { transaction: BookingTransaction }) {
-  const router = useRouter();
   const tx = useCtl();
   const isRefund = transaction.type === "refund" || transaction.metadata?.adjustment_type === "early_return";
   const voided = isTransactionVoided(transaction);
@@ -840,7 +827,6 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
           type
         });
         setEditing(false);
-        router.refresh();
       } catch (error) {
         setMessage(shownError(error, tx.say("pc_txFailed")));
       }
@@ -940,7 +926,6 @@ export function EditableTransactionRow({ transaction }: { transaction: BookingTr
                       try {
                         await deleteTransaction(transaction.id);
                         setEditing(false);
-                        router.refresh();
                       } catch (error) {
                         setMessage(shownError(error, tx.say("pc_deleteTxFailed")));
                       }

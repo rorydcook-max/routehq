@@ -1080,6 +1080,7 @@ export async function manuallyActivateRental(rentalId: string, earlyStart?: stri
   // Handed over before the booked start date: the rental starts today, and the extra days are charged, the
   // booking keeps its length, or they're free, as the owner chose (as with the form).
   const handoverDate = todayDate();
+  let scheduleFrom: string | null = null;
   if (rental.start_date && handoverDate < String(rental.start_date).slice(0, 10)) {
     const inWay = await earlyHandoverBlocker(supabase, { organizationId: rental.organization_id, vehicleId: String(rental.vehicle_id || ""), rentalId: cleanId, startDate: rental.start_date, endDate: rental.end_date || null, today: handoverDate });
     if (inWay) return { success: false, error: await said("This vehicle is still out on another rental. Return that rental first, or change the vehicle on this booking.") };
@@ -1087,6 +1088,7 @@ export async function manuallyActivateRental(rentalId: string, earlyStart?: stri
     const early = earlyStartFor(rental, rates, handoverDate);
     const choice = settleEarlyChoice(earlyStart, early, canDecideMoney((await getCurrentMembership())?.role));
     const shortenTo = early && choice === "shorten" ? early.shortenedEnd : null;
+    if (early && choice !== "shorten") scheduleFrom = early.bookedStart;
     const { error: moveError } = await supabase.from("rentals").update({ start_date: handoverDate, ...(shortenTo ? { end_date: shortenTo } : {}) }).eq("id", cleanId).eq("organization_id", rental.organization_id);
     if (moveError) return { success: false, error: isDoubleBookingError(moveError) ? await said(DOUBLE_BOOKING_MESSAGE) : moveError.message };
     if (early) {
@@ -1139,7 +1141,7 @@ export async function manuallyActivateRental(rentalId: string, earlyStart?: stri
       .eq("organization_id", rental.organization_id);
   }
 
-  await activateRental(cleanId, supabase);
+  await activateRental(cleanId, supabase, { scheduleFrom });
 
   await recordActivityEvent(supabase, {
     organization_id: rental.organization_id,

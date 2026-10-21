@@ -37,12 +37,12 @@ function documentBadge(status: CustomerListItem["documentStatus"], say: Say) {
   return <Badge tone="red">{say("doc_none")}</Badge>;
 }
 
-export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
+export function CustomerList({ customers, initialDocuments = "all", initialRentals = "all" }: { customers: CustomerListItem[]; initialDocuments?: string; initialRentals?: string }) {
   const say = useTranslations("customers") as unknown as Say;
   const locale = useLocale();
   const [search, setSearch] = useState("");
-  const [documentFilter, setDocumentFilter] = useState("all");
-  const [rentalFilter, setRentalFilter] = useState("all");
+  const [documentFilter, setDocumentFilter] = useState(initialDocuments);
+  const [rentalFilter, setRentalFilter] = useState(initialRentals);
 
   const filteredCustomers = useMemo(() => {
     const needle = search.trim().toLowerCase();
@@ -147,15 +147,25 @@ export function CustomerList({ customers }: { customers: CustomerListItem[] }) {
                     {item.documentStatus === "complete" ? null : documentBadge(item.documentStatus, say)}
                   </div>
                   <p className={`mt-0.5 line-clamp-2 break-words font-medium ${activeRental ? "font-bold text-[var(--foreground)]" : "text-[var(--foreground-secondary)]"}`}>{line}</p>
+                  {/* On a phone the money sits under the name (beside it, two-word names broke in half). */}
+                  {Number(item.owesNow || 0) > 0 ? (
+                    <p className="mt-0.5 text-[15px] font-bold text-[var(--danger)] sm:hidden">
+                      <span className="num">{money(Number(item.owesNow))}</span> {say("owesLabel")}
+                    </p>
+                  ) : item.lifetimeRevenue > 0 ? (
+                    <p className="mt-0.5 text-[14px] font-medium text-[var(--foreground-secondary)] sm:hidden">
+                      <span className="num text-[var(--foreground)]">{money(item.lifetimeRevenue)}</span> {say("spentLabel")}
+                    </p>
+                  ) : null}
                 </div>
                 {/* What they owe comes first, in red; otherwise what they have spent with you, labelled. Nothing when there is neither. */}
                 {Number(item.owesNow || 0) > 0 ? (
-                  <span className="shrink-0 text-right">
+                  <span className="hidden shrink-0 text-right sm:block">
                     <span className="num block text-[16px] text-[var(--danger)]">{money(Number(item.owesNow))}</span>
                     <span className="block text-[13px] font-semibold text-[var(--danger)]">{say("owesLabel")}</span>
                   </span>
                 ) : item.lifetimeRevenue > 0 ? (
-                  <span className="shrink-0 text-right">
+                  <span className="hidden shrink-0 text-right sm:block">
                     <span className="num block text-[16px] text-[var(--foreground)]">{money(item.lifetimeRevenue)}</span>
                     <span className="block text-[13px] font-medium text-[var(--foreground-secondary)]">{say("spentLabel")}</span>
                   </span>

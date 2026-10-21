@@ -1761,6 +1761,35 @@ h2 { letter-spacing: -0.015em; }
   .hero-band [class*="bg-[var(--band-action)]"]:hover { background: var(--primary-hover); }
 }
 
+/* A plain file box (a receipt, a customer's passport) looks like the rest of the app: a dashed box with a
+   pill button, not the browser's grey "Choose file". Boxes that hide themselves behind their own button are left alone. */
+input[type="file"]:not(.hidden):not(.sr-only) {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px dashed var(--info-line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--primary-light) 60%, #fff);
+  color: var(--foreground-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+input[type="file"]:not(.hidden):not(.sr-only):hover { border-color: var(--primary); background: var(--primary-light); }
+input[type="file"]::file-selector-button {
+  margin-right: 12px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 /* Fold-open rows ("Upcoming - 1 payment"): a neat chevron that turns, never the browser's black triangle.
    Rows that bring their own icon keep it. */
 summary { list-style: none; }

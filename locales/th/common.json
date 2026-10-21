@@ -23,7 +23,7 @@
     "linkStartsToday": "เริ่มวันนี้",
     "linkWasDueToStart": "ควรเริ่ม {date}",
     "waitingForCustomer": "รอลูกค้า",
-    "handoverLate": "ส่งมอบรถช้า · {vehicle}",
+    "handoverLate": "ยังไม่ได้ส่งมอบ · {vehicle}",
     "whoWasDue": "{who} · กำหนด {date}",
     "handOverVehicle": "ส่งมอบ {vehicle}",
     "returnLate": "คืนรถช้า · {vehicle}",
@@ -409,7 +409,9 @@
     "cap_hintPhone": "เปิดกล้องของคุณ",
     "cap_hintPhoneVideo": "เปิดกล้องของคุณ",
     "cap_hintDesk": "หรือลากรูปมาวางที่นี่",
-    "cap_hintDeskVideo": "หรือลากวิดีโอมาวางที่นี่"
+    "cap_hintDeskVideo": "หรือลากวิดีโอมาวางที่นี่",
+    "collectNow": "เก็บเงินตอนนี้",
+    "cashPaymentReturnHint": "ยืนยันเงินสดที่รับตอนคืนรถ และออกใบเสร็จ"
   },
   "translation": {
     "translatedFrom": "แปลจาก {language}",
@@ -873,7 +875,8 @@
     "returningNone": "ไม่พบข้อมูลของคุณ กรุณาเพิ่มเอกสารด้านล่าง",
     "photoManual": "เพิ่มรูปแล้ว ระบบอ่านอัตโนมัติไม่ได้ กรุณาพิมพ์หมายเลขด้านล่าง",
     "startFrom": "เริ่มวันที่ {date} แทน",
-    "timingLater": "จ่ายตอนรับรถ"
+    "timingLater": "จ่ายตอนรับรถ",
+    "dueAtHandover": "ชำระตอนรับรถ"
   },
   "customerMessages": {
     "hi": "สวัสดีคุณ {name}",
@@ -1201,7 +1204,7 @@
     "startsIn": "เริ่มในอีก {days} วัน",
     "startsTomorrow": "เริ่มพรุ่งนี้",
     "startsToday": "เริ่มวันนี้",
-    "handoverOverdue": "เลยกำหนดส่งมอบมา {days} วัน",
+    "handoverOverdue": "ยังไม่ได้ส่งมอบ · ช้า {days} วัน",
     "openEnded": "ไม่กำหนดวันคืน",
     "returnLate": "คืนช้า {days} วัน",
     "dueBackToday": "ครบกำหนดคืนวันนี้",
@@ -1246,7 +1249,9 @@
     "secDone": "จบแล้ว",
     "showAllDone": "ดูที่เสร็จแล้วทั้งหมด {count} รายการ",
     "noCustomer": "ไม่มีลูกค้า (ยังไม่ได้กรอกลิงก์)",
-    "daysSoFar": "เช่ามาแล้ว {days} วัน"
+    "daysSoFar": "เช่ามาแล้ว {days} วัน",
+    "datesPassed": "เลยวันที่จองแล้ว · ยังไม่ยืนยัน",
+    "changeDates": "เปลี่ยนวันที่"
   },
   "inbox": {
     "title": "ข้อความ",
@@ -2718,7 +2723,7 @@
     "nothingIn": "ไม่มีกำหนดการใน {month}",
     "nothingElse": "ไม่มีกำหนดการอื่นในเดือนนี้",
     "earlier": "ก่อนหน้านี้ในเดือนนี้ · {count}",
-    "ev_handoverOverdue": "เลยกำหนดส่งมอบ: {subject}",
+    "ev_handoverOverdue": "ยังไม่ได้ส่งมอบ: {subject}",
     "ev_handover": "ส่งมอบ: {subject}",
     "ev_handedOver": "ส่งมอบแล้ว: {subject}",
     "ev_returned": "คืนแล้ว: {subject}",
@@ -3177,7 +3182,7 @@
     "tab_money": "การชำระเงิน",
     "tab_messages": "ข้อความ",
     "tab_details": "รายละเอียด",
-    "r_notHandedOver": "ยังไม่ได้ส่งมอบ · {count} วัน",
+    "r_notHandedOver": "ยังไม่ได้ส่งมอบ · ช้า {count} วัน",
     "r_startsToday": "เริ่มวันนี้",
     "r_startsIn": "เริ่มในอีก {count} วัน",
     "g_owesDetail": "ถึงกำหนดวันนี้หรือก่อนหน้า"

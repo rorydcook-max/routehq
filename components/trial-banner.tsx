@@ -111,7 +111,7 @@ export function TrialBanner({ placement = "floating" }: { placement?: "floating"
       {placement === "sidebar" ? (
         <Link className="flex min-w-0 items-center gap-2 hover:underline" href={"/settings/billing" as Route}>
           <span aria-hidden="true" className={clsx("h-2 w-2 shrink-0 rounded-full", tone.dot)} />
-          <span className="text-xs font-bold leading-4">{t("trialLeft", { days: days === null || days === undefined ? 30 : days })}</span>
+          <span className="whitespace-nowrap text-xs font-bold leading-4">{t("trialLeft", { days: days === null || days === undefined ? 30 : days })}</span>
         </Link>
       ) : (
         <div className="flex items-center gap-2">

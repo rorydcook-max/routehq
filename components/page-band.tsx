@@ -52,16 +52,35 @@ export function bandTab(active: boolean) {
  * Counts on the band, as pills (Look G): a number in the display face, a few words, and a dot when
  * the count has a colour meaning. One that needs doing something about turns white with a brick number.
  */
-export function BandPills({ items }: { items: Array<{ count: number; label: string; dot?: string | null; alert?: boolean }> }) {
+export function BandPills({ items }: { items: Array<{ count: number; label: string; dot?: string | null; alert?: boolean; href?: string | null; active?: boolean }> }) {
   return (
     <div className="flex flex-wrap gap-2">
       {items.map((item) => {
         const loud = !!item.alert && item.count > 0;
+        const inner = (
+          <>
+            {item.dot ? <span aria-hidden="true" className="inline-block h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ background: item.dot }} /> : null}
+            <span className={`num text-[22px] leading-none ${loud && !item.active ? "text-[var(--danger)]" : ""}`}>{item.count}</span>
+            <span className="font-semibold">{item.label}</span>
+          </>
+        );
+        // A pill with somewhere to go is a filter: tap it to see just those. The chosen one is solid.
+        if (item.href) {
+          return (
+            <Link
+              aria-current={item.active ? "true" : undefined}
+              className={`band-chip pressable inline-flex min-h-11 items-center gap-1.5 rounded-2xl px-3 py-2 ${item.active ? "band-chip-on" : loud ? "band-loud !bg-white !text-[var(--foreground)]" : ""}`}
+              href={item.href as Route}
+              key={item.label}
+              scroll={false}
+            >
+              {inner}
+            </Link>
+          );
+        }
         return (
           <span className={`inline-flex items-center gap-1.5 rounded-2xl px-3 py-2 ${loud ? "band-loud bg-white text-[var(--foreground)]" : "bg-[var(--band-soft)] text-white"}`} key={item.label}>
-            {item.dot ? <span aria-hidden="true" className="inline-block h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ background: item.dot }} /> : null}
-            <span className={`num text-[22px] leading-none ${loud ? "text-[var(--danger)]" : ""}`}>{item.count}</span>
-            <span className="font-semibold">{item.label}</span>
+            {inner}
           </span>
         );
       })}

@@ -178,9 +178,11 @@ function headingOf(item: TaskListItem, today: string, tx: Tx): { title: string; 
 
 function timeLabel(dueAt: string | null) {
   if (!dueAt) return null;
-  const time = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Bangkok" }).format(new Date(dueAt));
-  // Tasks created with a date only are stored at midnight; showing "00:00" adds nothing.
-  return time === "00:00" ? null : time;
+  const when = new Date(dueAt);
+  const time = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Bangkok" }).format(when);
+  // Tasks created with a date only are stored at midnight (local or UTC, which reads as "07:00" here); neither is a real time.
+  if (time === "00:00" || (when.getUTCHours() === 0 && when.getUTCMinutes() === 0)) return null;
+  return time;
 }
 
 type Group = { key: string; tone: "red" | "amber" | "neutral" | "teal"; items: TaskListItem[] };
@@ -412,6 +414,8 @@ function TaskRow({ item, organizationId, today, siblings = [], canDecide = true 
   }
 
   const coversSeveral = !!receipt && receipt.paymentIds.length > 1;
+  // Older extension requests were saved without an action; they still need answering on the booking, not ticking off.
+  const asksAnswer = item.kind === "task" && !item.action && !!item.rentalId && /needs your answer/.test(String(item.title || ""));
   const overdue = !item.completedAt && !!item.dueDate && item.dueDate < today;
   // A time of day only for jobs someone gave a time to; jobs the app raises carry the moment they were raised, which means nothing.
   const time = item.kind === "task" && !item.action ? timeLabel(item.dueAt) : null;
@@ -526,8 +530,8 @@ function TaskRow({ item, organizationId, today, siblings = [], canDecide = true 
             </button>
           </>
         ) : null}
-        {item.kind === "task" && !item.completedAt && item.rentalId && (item.action === "refund" || item.action === "request" || item.action === "settle_deposit") && !waitsForDecider ? (
-          <Link className="primary-action pressable min-h-9 px-3 text-xs" href={`/bookings/${item.rentalId}#${item.action === "request" ? "customer-requests" : "refunds"}`}>
+        {item.kind === "task" && !item.completedAt && item.rentalId && (item.action === "refund" || item.action === "request" || item.action === "settle_deposit" || asksAnswer) && !waitsForDecider ? (
+          <Link className="primary-action pressable min-h-9 px-3 text-xs" href={`/bookings/${item.rentalId}#${item.action === "request" || asksAnswer ? "customer-requests" : "refunds"}`}>
             {item.action === "refund" ? tx.say("recordRefund") : item.action === "settle_deposit" ? tx.say("settleDeposit") : tx.say("answer")}
           </Link>
         ) : null}
@@ -557,11 +561,11 @@ function TaskRow({ item, organizationId, today, siblings = [], canDecide = true 
         {item.kind === "task" && !item.completedAt && !showNote && !item.id.startsWith("request-") && !item.id.startsWith("handover-") && !waitsForDecider && !((item.action === "waive_early" || item.action === "owed_early") && canDecide) ? (
           <>
             {/* One main button per row. A job with its own next step keeps "mark done" and notes behind the dots. */}
-            {!item.action || item.action === "refund" || showMore ? (
+            {(!item.action && !asksAnswer) || item.action === "refund" || showMore ? (
               <form action={completeTask}>
                 <input name="organizationId" type="hidden" value={organizationId} />
                 <input name="taskId" type="hidden" value={item.id} />
-                <PendingButton className={`${item.action ? "secondary-action" : "primary-action"} min-h-9 px-3 text-xs`} pendingLabel={tx.say("saving")} type="submit">
+                <PendingButton className={`${item.action || asksAnswer ? "secondary-action" : "primary-action"} min-h-9 px-3 text-xs`} pendingLabel={tx.say("saving")} type="submit">
                   {item.action === "refund" ? tx.say("noRefund") : tx.say("markDone")}
                 </PendingButton>
               </form>

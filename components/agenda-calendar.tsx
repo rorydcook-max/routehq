@@ -173,7 +173,8 @@ export function AgendaCalendar({
     <Link className="pressable flex min-h-12 items-center gap-3 rounded-xl px-2 py-1.5 hover:bg-[var(--panel-secondary)]" href={event.href as any} key={`${event.id}${late ? "-late" : ""}`}>
       <span className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${TONE[event.tone].icon}`}>{ICON[event.type](17)}</span>
       <span className="min-w-0 flex-1">
-        <span className="block truncate font-semibold text-[var(--foreground)]">{titleOf(event)}</span>
+        {/* Two lines before cutting off: "Not handed over: Suzuki Ciaz · Test Payer" fits on a phone. */}
+        <span className="line-clamp-2 block font-semibold leading-snug text-[var(--foreground)]">{titleOf(event)}</span>
         {late ? <span className="block text-sm font-semibold text-[var(--danger)]">{t("lateSince", { date: fmt(locale, { day: "numeric", month: "short" }).format(asDate(event.date)) })}</span> : null}
       </span>
       <ChevronRight className="shrink-0 text-[var(--muted)]" size={16} />

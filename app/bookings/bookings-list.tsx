@@ -5,6 +5,7 @@ import { kindFromCategory } from "@/lib/vehicle-groups";
 import { businessToday, daysFromToday as businessDaysFromToday } from "@/lib/business-time";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Clock, Search, Trash2, MoreHorizontal } from "lucide-react";
 import { deleteBooking, extendBookingHold } from "@/app/actions/bookings";
@@ -31,6 +32,9 @@ function statusLabel(status: string, tx: Tx) {
 }
 
 const filters = ["all", "booked", "active", "due_soon", "overdue", "completed", "cancelled"] as const;
+// Set from the counts on the band ("4 on rent"), not from the filter row.
+const bandFilters = ["on_rent", "starting", "owing"] as const;
+type BandFilter = (typeof bandFilters)[number];
 
 function money(value: unknown, currency = "THB") {
   return new Intl.NumberFormat("th-TH", { style: "currency", currency, maximumFractionDigits: 0 }).format(Number(value || 0));
@@ -92,6 +96,13 @@ function isDueSoon(booking: any) {
 function matchesFilter(booking: any, filter: string) {
   if (filter === "all") return true;
   if (isCancelledBooking(booking)) return filter === "cancelled";
+  // The three counts on the band.
+  if (filter === "on_rent") return ["active", "due_soon", "overdue", "extended"].includes(String(booking.status || ""));
+  if (filter === "starting") {
+    const start = String(booking.start_date || "").slice(0, 10);
+    return booking.status === "booked" && !!start && start >= businessToday() && start <= businessToday(7);
+  }
+  if (filter === "owing") return Number(booking.balance_due || 0) > 0;
   if (filter === "due_soon") return booking.status === "due_soon" || isDueSoon(booking);
   if (filter === "overdue") return booking.status === "overdue" || (booking.end_date && (businessDaysFromToday(booking.end_date) ?? 0) < 0 && !["completed", "cancelled"].includes(booking.status));
   return booking.status === filter;
@@ -149,10 +160,16 @@ function lateBefore(booking: any, all: any[]) {
   );
 }
 
-function holdState(booking: any, tx: Tx): { ended: boolean; text: string } | null {
+function holdState(booking: any, tx: Tx): { ended: boolean; past?: boolean; text: string } | null {
   const link = booking.booking_link;
   if (!link || ["completed", "cancelled"].includes(String(link.status))) return null;
-  if (link.hold_released_at && booking.status === "draft") return { ended: true, text: tx.say("holdEnded") };
+  // A draft is a booking whose hold ran out (or was never confirmed): its dates are open to others.
+  if (booking.status === "draft") {
+    // Dates already gone by: holding them again makes no sense; the booking wants new dates or cancelling.
+    const last = String(booking.end_date || booking.start_date || "").slice(0, 10);
+    if (last && last < businessToday()) return { ended: true, past: true, text: tx.say("datesPassed") };
+    return { ended: true, text: tx.say("holdEnded") };
+  }
   if (booking.status !== "booked" || !link.hold_until) return null;
   const until = new Date(link.hold_until);
   const when = new Intl.DateTimeFormat(intlLocale(tx.locale), { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Bangkok" }).format(until);
@@ -192,7 +209,17 @@ function customerLabel(booking: any, tx: Tx) {
 export function BookingsList({ bookings }: { bookings: any[] }) {
   const tx = useTx();
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<(typeof filters)[number]>("all");
+  const [filter, setFilter] = useState<(typeof filters)[number] | BandFilter>("all");
+  const router = useRouter();
+  // The row filters work on the spot. While a count on the band is chosen the page's address says so,
+  // so a row filter then goes through the address to turn that count off as well.
+  function chooseFilter(entry: (typeof filters)[number]) {
+    if ((bandFilters as readonly string[]).includes(filter)) {
+      router.replace((entry === "all" ? "/bookings" : `/bookings?status=${entry}`) as never, { scroll: false });
+      return;
+    }
+    setFilter(entry);
+  }
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [allDone, setAllDone] = useState(false);
@@ -201,7 +228,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
   // "/bookings?status=overdue" opens on that filter, so other pages can link straight to "late returns" and the like.
   useEffect(() => {
     const wanted = new URLSearchParams(window.location.search).get("status");
-    if (wanted && (filters as readonly string[]).includes(wanted)) setFilter(wanted as (typeof filters)[number]);
+    if (wanted && ([...filters, ...bandFilters] as readonly string[]).includes(wanted)) setFilter(wanted as (typeof filters)[number] | BandFilter);
   }, []);
 
   function handleDelete(bookingId: string) {
@@ -284,7 +311,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
               <button
                 className={`pressable min-h-10 min-w-fit rounded-full px-4 font-bold ${filter === entry ? "bg-[var(--primary)] text-white" : "bg-white text-[var(--foreground)]"}`}
                 key={entry}
-                onClick={() => setFilter(entry)}
+                onClick={() => chooseFilter(entry)}
                 type="button"
               >
                 {entry === "all" ? tx.say("filterAll") : statusLabel(entry, tx)}
@@ -440,7 +467,13 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                   {hold ? (
                     <p className={`relative z-10 mt-1 w-fit font-semibold ${hold.ended ? "text-[var(--warning)]" : "text-[var(--foreground-secondary)]"}`}>
                       {hold.text}
-                      <ExtendHoldButton ended={hold.ended} rentalId={booking.id} />
+                      {hold.past ? (
+                        <Link className="ml-2 inline-flex min-h-9 items-center whitespace-nowrap rounded-full border border-[var(--border)] bg-white px-3 text-[14px] font-bold text-[var(--primary)]" href={`/bookings/${booking.id}`}>
+                          {tx.say("changeDates")}
+                        </Link>
+                      ) : (
+                        <ExtendHoldButton ended={hold.ended} rentalId={booking.id} />
+                      )}
                     </p>
                   ) : null}
                 </div>

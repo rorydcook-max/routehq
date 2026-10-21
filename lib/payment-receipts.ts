@@ -1,5 +1,6 @@
 import { businessToday } from "@/lib/business-time";
 import { customerPaymentLabel } from "@/lib/payment-labels";
+import { isHandedOver } from "@/lib/rental-balances";
 import { promptPayQrSvg } from "@/lib/promptpay";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -49,6 +50,8 @@ export type PortalPayment = {
   currency: string;
   dueDate: string;
   overdue: boolean;
+  /** Its date has come but the vehicle hasn't gone out yet: it is taken at the handover, not late. */
+  atHandover?: boolean;
   /** PromptPay QR that already carries this amount; null when the business has no PromptPay ID. */
   qrSvg: string | null;
   receiptSentAt: string | null;
@@ -83,13 +86,18 @@ export async function getPortalPayments(
 ): Promise<{ payments: PortalPayment[]; bundle: PortalBundle | null }> {
   if (!rentalId) return { payments: [], bundle: null };
   const admin = createSupabaseAdminClient() as any;
-  const { data } = await admin
-    .from("rental_payments")
-    .select("id, due_date, amount, currency, status, voided, metadata")
-    .eq("rental_id", rentalId)
-    .is("deleted_at", null)
-    .not("status", "in", "(paid,voided,waived,cancelled)")
-    .order("due_date", { ascending: true });
+  const [{ data }, { data: rentalRow }] = await Promise.all([
+    admin
+      .from("rental_payments")
+      .select("id, due_date, amount, currency, status, voided, metadata")
+      .eq("rental_id", rentalId)
+      .is("deleted_at", null)
+      .not("status", "in", "(paid,voided,waived,cancelled)")
+      .order("due_date", { ascending: true }),
+    admin.from("rentals").select("status").eq("id", rentalId).maybeSingle()
+  ]);
+  // Nothing is late until the vehicle has gone out: before the handover a payment is "at handover", not "was due".
+  const handedOver = isHandedOver(rentalRow?.status);
 
   const today = businessToday();
   const horizon = addDays(today, 35);
@@ -115,7 +123,8 @@ export async function getPortalPayments(
         amount,
         currency,
         dueDate,
-        overdue: !!dueDate && dueDate < today,
+        overdue: handedOver && !!dueDate && dueDate < today,
+        atHandover: !handedOver && !!dueDate && dueDate <= today,
         // PromptPay only moves baht.
         qrSvg: promptPayId && currency === "THB" ? await promptPayQrSvg(promptPayId, amount) : null,
         receiptSentAt: receipt?.submitted_at || null,

@@ -568,7 +568,8 @@
     "missing_driverLicenseCountry": "Welches Land hat den Führerschein ausgestellt?",
     "handoverPhotos": "Übergabefotos ({count})",
     "payPlusExtras": "+ Extras {amount}",
-    "payLessExtras": "{amount} für Extras abgezogen"
+    "payLessExtras": "{amount} für Extras abgezogen",
+    "dueAtHandover": "Fällig bei der Fahrzeugübergabe"
   },
   "customerMessages": {
     "hi": "Hallo {name},",

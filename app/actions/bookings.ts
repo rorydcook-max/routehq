@@ -3693,14 +3693,16 @@ export async function extendBookingHold(rentalId: string): Promise<{ success: bo
   const membership = await getCurrentMembership();
   if (!membership) return { success: false, error: await said("Please sign in again.") };
   const admin = createSupabaseAdminClient() as any;
-  const [{ data: link }, { data: organization }] = await Promise.all([
+  const [{ data: link }, { data: organization }, { data: rental }] = await Promise.all([
     admin.from("booking_links").select("id, status, hold_released_at").eq("rental_id", String(rentalId || "")).eq("organization_id", membership.organizationId).is("deleted_at", null).order("created_at", { ascending: false }).limit(1).maybeSingle(),
-    admin.from("organizations").select("settings").eq("id", membership.organizationId).maybeSingle()
+    admin.from("organizations").select("settings").eq("id", membership.organizationId).maybeSingle(),
+    admin.from("rentals").select("status").eq("id", String(rentalId || "")).eq("organization_id", membership.organizationId).maybeSingle()
   ]);
   if (!link) return { success: false, error: await said("This booking has no booking link.") };
   if (["completed", "cancelled"].includes(String(link.status))) return { success: false, error: await said("This booking no longer needs a hold.") };
-  if (link.hold_released_at) {
-    // The dates were opened up: take them back if they are still free.
+  // The dates were opened up (the hold ran out, or the booking is sitting as a draft for any other reason):
+  // take them back if they are still free. A new deadline alone would leave the booking a draft, blocking nothing.
+  if (link.hold_released_at || rental?.status === "draft") {
     const retaken = await retakeHold(admin, { id: link.id, rental_id: rentalId });
     if (!retaken) return { success: false, error: await said("Those dates have since been booked by someone else.") };
   } else {

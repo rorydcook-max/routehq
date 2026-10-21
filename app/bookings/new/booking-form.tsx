@@ -769,13 +769,22 @@ export function BookingForm({
                     {/* Three tight lines: name, plate and price, then where it stands. A list of 13 cars used to be eight screens long. */}
                     <span className="min-w-0 flex-1">
                       <span className="line-clamp-2 block text-[17px] font-bold leading-tight text-[var(--foreground)]">{vehicleTitle(vehicle)}</span>
-                      <span className="mt-0.5 flex flex-wrap items-baseline gap-x-1.5 text-[14px] font-medium text-[var(--foreground-secondary)]">
+                      {/* Plain text, so when it wraps the "·" stays at the end of the first line, never at the start of the second. */}
+                      <span className="mt-0.5 block text-[14px] font-medium text-[var(--foreground-secondary)]">
                         <span className="font-mono-data whitespace-nowrap font-bold text-[var(--muted)]">{vehicle.registration_number}</span>
                         {/* The prices most bookings of this vehicle use. */}
                         {vehicle.daily_rate > 0 || vehicle.monthly_rate > 0 ? (
-                          <span className="whitespace-nowrap font-semibold">· {[vehicle.daily_rate > 0 ? say("per_daily", { amount: money(vehicle.daily_rate, currency) }) : null, vehicle.monthly_rate > 0 ? say("perMonth", { amount: money(vehicle.monthly_rate, currency) }) : null].filter(Boolean).join(" · ")}</span>
+                          <>
+                            {" · "}
+                            {[vehicle.daily_rate > 0 ? say("per_daily", { amount: money(vehicle.daily_rate, currency) }) : null, vehicle.monthly_rate > 0 ? say("perMonth", { amount: money(vehicle.monthly_rate, currency) }) : null].filter(Boolean).map((price, index) => (
+                              <span className="whitespace-nowrap font-semibold" key={price as string}>{index > 0 ? " · " : ""}{price}</span>
+                            ))}
+                          </>
                         ) : Number(vehicle.weekly_rate || 0) > 0 ? null : (
-                          <span className="whitespace-nowrap text-[var(--muted)]">· {say("noPriceYet")}</span>
+                          <>
+                            {" · "}
+                            <span className="whitespace-nowrap text-[var(--muted)]">{say("noPriceYet")}</span>
+                          </>
                         )}
                       </span>
                       <span className="mt-1.5 flex flex-wrap gap-2">

@@ -538,9 +538,10 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
     return remainingDeposit ? String(remainingDeposit) : "";
   });
   // A booking with no deposit (or one already held in full) has no deposit box to fill in.
-  const [depositToCollect] = useState(() => Boolean(deliveryDepositAmount));
+  const [depositToCollect] = useState(() => mode === "delivery" && Boolean(deliveryDepositAmount));
   // Already paid before handover (a transfer, say): there is no cash to count, so the cash boxes stay folded away.
-  const [collectOpen, setCollectOpen] = useState(() => Boolean(deliveryPaymentAmount || deliveryDepositAmount) || !context.hasPaymentSchedule);
+  // At a return the boxes stay folded until "Collect now" is tapped: most returns have nothing to collect.
+  const [collectOpen, setCollectOpen] = useState(() => mode === "delivery" && (Boolean(deliveryPaymentAmount || deliveryDepositAmount) || !context.hasPaymentSchedule));
   const [receiptResult, setReceiptResult] = useState<ReceiptResult | null>(null);
   const [receiptError, setReceiptError] = useState("");
 
@@ -560,8 +561,9 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
   const depositRefundAmount = holdForDamage ? 0 : Math.min(availableToReconcile, Math.max(0, refundOverride ? Number(refundOverride) : calculatedRefund));
   // Rent still owed comes out of the deposit first (as on the server); fuel, damage and cleaning take what is left.
   const uncoveredCharges = Math.max(0, fuelDeficitCharge + damageCharge + cleaningCharge - Math.max(0, availableToReconcile - outstandingBalance));
-  // No deposit held and nothing to take from one: a screen of "0 held, 0 returned" is not a step.
-  const nothingToSettle = mode === "return" && !isSwap && availableToReconcile <= 0 && requestedDeductions <= 0;
+  // No deposit held and no new charge to bill: a screen of "0 held, 0 returned" is not a step. Rent still owed
+  // on its own is said on the signature screen, where it can be collected.
+  const nothingToSettle = mode === "return" && !isSwap && availableToReconcile <= 0 && fuelDeficitCharge + damageCharge + cleaningCharge <= 0;
   const skipDepositStep = depositAlreadyReturned || (mode === "return" && isSwap) || nothingToSettle;
   const steps = mode === "return" ? (skipDepositStep ? returnSteps.filter((item) => item !== "Deposit") : returnSteps) : withoutGps(mode === "condition_report" ? conditionSteps : deliverySteps);
   const preExistingDamage = useMemo(() => {
@@ -1362,10 +1364,18 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
               )}
             </div>
           ) : null}
-          {mode === "return" && !isSwap && outstandingBalance > 0 ? (
-            <div className="mt-4 rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-4">
-              <p className="text-sm font-bold text-[var(--danger)]">{t("stillOwed", { amount: money(outstandingBalance) })}</p>
-              <p className="mt-1 text-xs font-semibold text-[var(--danger)]">{t("stillOwedHint")}</p>
+          {mode === "return" && !isSwap && outstandingBalance > 0 && !receiptResult ? (
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-4">
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-[var(--danger)]">{t("stillOwed", { amount: money(outstandingBalance) })}</p>
+                <p className="mt-1 text-xs font-semibold text-[var(--danger)]">{t("stillOwedHint")}</p>
+              </div>
+              {/* The same cash boxes as the handover, so what is owed can be taken here and receipted. */}
+              {!collectOpen && context.rental?.id ? (
+                <button className="pressable inline-flex min-h-10 items-center whitespace-nowrap rounded-full bg-[var(--danger)] px-4 text-sm font-bold text-white" onClick={() => setCollectOpen(true)} type="button">
+                  {t("collectNow")}
+                </button>
+              ) : null}
             </div>
           ) : null}
           {mode === "return" && !isSwap && context.rental?.end_date && businessToday() < String(context.rental.end_date).slice(0, 10) ? (
@@ -1384,12 +1394,12 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
               </button>
             </div>
           ) : null}
-          {mode === "delivery" && context.rental?.id && !isSwap && collectOpen ? (
+          {(mode === "delivery" || mode === "return") && context.rental?.id && !isSwap && collectOpen ? (
             <div className="mt-4 rounded-lg border border-[var(--border)] bg-white p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-sm font-semibold text-[var(--foreground)]">{t("cashPayment")}</p>
-                  <p className="mt-1 text-xs font-semibold text-[var(--muted)]">{t("cashPaymentHint")}</p>
+                  <p className="mt-1 text-xs font-semibold text-[var(--muted)]">{t(mode === "return" ? "cashPaymentReturnHint" : "cashPaymentHint")}</p>
                 </div>
                 {receiptResult ? (
                   <span className="rounded-full bg-[var(--success-light)] px-3 py-1 text-xs font-semibold uppercase text-[var(--success)]">

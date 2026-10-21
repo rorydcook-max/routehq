@@ -578,7 +578,8 @@
     "returningFound": "Selamat datang kembali! Paspor, SIM, dan foto Anda sudah kami simpan, jadi tidak perlu ditambahkan lagi.",
     "returningPartial": "Selamat datang kembali! Sebagian dokumen Anda sudah ada. Tambahkan yang masih ditandai diperlukan.",
     "returningNone": "Kami tidak menemukan data Anda. Silakan tambahkan dokumen di bawah.",
-    "photoManual": "Foto ditambahkan. Kami tidak bisa membacanya otomatis, jadi ketik nomornya di bawah."
+    "photoManual": "Foto ditambahkan. Kami tidak bisa membacanya otomatis, jadi ketik nomornya di bawah.",
+    "dueAtHandover": "Dibayar saat mengambil kendaraan"
   },
   "customerMessages": {
     "hi": "Halo {name},",

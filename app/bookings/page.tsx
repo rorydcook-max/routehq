@@ -11,7 +11,8 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { businessToday } from "@/lib/business-time";
 import { BookingsList } from "./bookings-list";
 
-export default async function BookingsPage() {
+export default async function BookingsPage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
+  const { status: shown } = await searchParams;
   const [userEmail, organization] = await Promise.all([getCurrentUserEmail(), getDefaultOrganization()]);
   // Holds that ran out without a signature give their dates back.
   await releaseExpiredHolds(createSupabaseAdminClient(), organization.id).catch(() => null);
@@ -40,10 +41,11 @@ export default async function BookingsPage() {
           {/* Money owed is the one that needs doing something about: white, with a brick number, when it is not zero. */}
           <div className="mt-4">
             <BandPills
+              // Each count is a filter: tap it to see just those bookings, tap again for all.
               items={[
-                { count: onRent, label: t("bandOnRent"), dot: "var(--band-dot)" },
-                { count: starting, label: t("bandStarting"), dot: "var(--going-out)" },
-                { count: owing, label: t("bandOwing"), alert: true }
+                { count: onRent, label: t("bandOnRent"), dot: "var(--band-dot)", href: shown === "on_rent" ? "/bookings" : "/bookings?status=on_rent", active: shown === "on_rent" },
+                { count: starting, label: t("bandStarting"), dot: "var(--going-out)", href: shown === "starting" ? "/bookings" : "/bookings?status=starting", active: shown === "starting" },
+                { count: owing, label: t("bandOwing"), alert: true, href: shown === "owing" ? "/bookings" : "/bookings?status=owing", active: shown === "owing" }
               ]}
             />
           </div>
@@ -51,7 +53,7 @@ export default async function BookingsPage() {
       }
     >
 
-      <BookingsList bookings={bookings} />
+      <BookingsList bookings={bookings} key={shown || "all"} />
     </AppShell>
   );
 }

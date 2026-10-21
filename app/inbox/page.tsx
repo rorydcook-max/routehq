@@ -45,6 +45,9 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
       .maybeSingle();
     selected = (data as InboxConversation) || null;
   }
+  // On a computer the first chat opens straight away instead of an empty pane; a phone still shows the list first.
+  const autoSelected = !selected && !selectedId && list.length > 0;
+  if (autoSelected) selected = list[0];
 
   const [{ data: messages }, { data: bookingRows }] = await Promise.all([
     selected
@@ -124,6 +127,7 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
           conversations={list}
           customers={(customers || []) as Array<{ id: string; full_name: string | null; phone: string | null }>}
           filter={filter}
+          autoSelected={autoSelected}
           messages={(messages || []) as InboxMessage[]}
           selected={selected}
         />

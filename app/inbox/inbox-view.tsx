@@ -69,7 +69,8 @@ export function InboxView({
   customers,
   filter,
   messages,
-  selected
+  selected,
+  autoSelected = false
 }: {
   bookings: any[];
   conversations: InboxConversation[];
@@ -77,6 +78,8 @@ export function InboxView({
   filter: "open" | "closed";
   messages: InboxMessage[];
   selected: InboxConversation | null;
+  /** The first chat, opened for a computer's wide screen; a phone keeps showing the list until one is tapped. */
+  autoSelected?: boolean;
 }) {
   const router = useRouter();
   const t = useTranslations("inbox");
@@ -104,7 +107,8 @@ export function InboxView({
   useEffect(() => {
     setDraft("");
     setError(null);
-    if (selected && selected.unread_count > 0) {
+    // A chat opened by itself on a phone isn't on screen, so it stays unread.
+    if (selected && selected.unread_count > 0 && (!autoSelected || window.innerWidth >= 1024)) {
       startQuiet(async () => {
         await markConversationRead(selected.id);
       });
@@ -154,7 +158,7 @@ export function InboxView({
   return (
     <div className="grid overflow-hidden rounded-[var(--radius)] bg-white lg:h-[calc(100vh-150px)] lg:min-h-[480px] lg:grid-cols-[320px_minmax(0,1fr)]">
       {/* Conversation list */}
-      <aside className={`min-h-0 flex-col border-[var(--border)] lg:flex lg:border-r ${selected ? "hidden" : "flex"}`}>
+      <aside className={`min-h-0 flex-col border-[var(--border)] lg:flex lg:border-r ${selected && !autoSelected ? "hidden" : "flex"}`}>
         <div className="flex gap-2 border-b border-[var(--border)] p-3">
           {(["open", "closed"] as const).map((entry) => (
             <Link
@@ -202,7 +206,7 @@ export function InboxView({
       </aside>
 
       {/* Thread */}
-      <section className={`min-h-0 flex-col lg:flex ${selected ? "flex h-[calc(100vh-230px)] min-h-[420px] lg:h-auto" : "hidden"}`}>
+      <section className={`min-h-0 flex-col lg:flex ${selected && !autoSelected ? "flex h-[calc(100vh-230px)] min-h-[420px] lg:h-auto" : "hidden"}`}>
         {!selected ? (
           <p className="m-auto p-8 text-center text-sm text-[var(--muted)]">{say("chooseChat")}</p>
         ) : (

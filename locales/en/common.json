@@ -23,7 +23,7 @@
     "linkStartsToday": "Starts today",
     "linkWasDueToStart": "Was due to start {date}",
     "waitingForCustomer": "Waiting for the customer",
-    "handoverLate": "Handover late · {vehicle}",
+    "handoverLate": "Not handed over · {vehicle}",
     "whoWasDue": "{who} · was due {date}",
     "handOverVehicle": "Hand over {vehicle}",
     "returnLate": "Return late · {vehicle}",
@@ -399,7 +399,7 @@
     "depositKeptForNow": "Deposit kept until the damage is priced",
     "stillOutBlocker": "{customer} still has this vehicle ({code}) until {date}. Return that rental first, or change the vehicle on this booking.",
     "stillOwed": "Still owed on this booking: {amount}",
-    "stillOwedHint": "Collect it now, or it stays on the booking to chase later.",
+    "stillOwedHint": "Collect it now, or leave it on the booking to chase later.",
     "backEarly": "Back {count, plural, one {# day} other {# days}} early. Any refund for unused days is offered on the booking page once this is done.",
     "bookedBetweenBlocker": "{customer} is booked on this vehicle from {from} to {to} ({code}), before this booking starts. Hand it over on this booking's start date, or move one of the bookings to another vehicle.",
     "earlyTitle": "The {days, plural, one {extra day} other {# extra days}} before {date}:",
@@ -429,7 +429,9 @@
     "cap_hintPhone": "Opens your camera",
     "cap_hintPhoneVideo": "Opens your camera",
     "cap_hintDesk": "or drag a photo here",
-    "cap_hintDeskVideo": "or drag a video here"
+    "cap_hintDeskVideo": "or drag a video here",
+    "collectNow": "Collect now",
+    "cashPaymentReturnHint": "Confirm cash received at the return and generate a receipt."
   },
   "translation": {
     "translatedFrom": "Translated from {language}",
@@ -864,7 +866,8 @@
     "returningNone": "We couldn't find you with those details. Please add your documents below.",
     "photoManual": "Photo added. We couldn't read it automatically, so please type the numbers below.",
     "startFrom": "Start on {date} instead",
-    "timingLater": "At pickup"
+    "timingLater": "At pickup",
+    "dueAtHandover": "Due when you collect the vehicle"
   },
   "customerMessages": {
     "hi": "Hi {name},",
@@ -1192,7 +1195,7 @@
     "startsIn": "Starts in {days, plural, one {# day} other {# days}}",
     "startsTomorrow": "Starts tomorrow",
     "startsToday": "Starts today",
-    "handoverOverdue": "Handover overdue by {days, plural, one {# day} other {# days}}",
+    "handoverOverdue": "Not handed over · {days, plural, one {# day} other {# days}} late",
     "openEnded": "Open-ended",
     "returnLate": "Return {days, plural, one {# day} other {# days}} late",
     "dueBackToday": "Due back today",
@@ -1237,7 +1240,9 @@
     "secDone": "Finished",
     "showAllDone": "Show all {count} finished",
     "noCustomer": "No customer (link never filled in)",
-    "daysSoFar": "{days, plural, one {# day} other {# days}} so far"
+    "daysSoFar": "{days, plural, one {# day} other {# days}} so far",
+    "datesPassed": "Dates have passed · not confirmed",
+    "changeDates": "Change dates"
   },
   "inbox": {
     "title": "Inbox",
@@ -2709,7 +2714,7 @@
     "nothingIn": "Nothing scheduled in {month}.",
     "nothingElse": "Nothing else scheduled this month.",
     "earlier": "Earlier this month · {count}",
-    "ev_handoverOverdue": "Handover overdue: {subject}",
+    "ev_handoverOverdue": "Not handed over: {subject}",
     "ev_handover": "Handover: {subject}",
     "ev_handedOver": "Handed over: {subject}",
     "ev_returned": "Returned: {subject}",
@@ -3168,7 +3173,7 @@
     "tab_money": "Payments",
     "tab_messages": "Messages",
     "tab_details": "Details",
-    "r_notHandedOver": "Not handed over · {count, plural, one {# day} other {# days}}",
+    "r_notHandedOver": "Not handed over · {count, plural, one {# day} other {# days}} late",
     "r_startsToday": "Starts today",
     "r_startsIn": "Starts in {count, plural, one {# day} other {# days}}",
     "g_owesDetail": "due today or earlier"

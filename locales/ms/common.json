@@ -578,7 +578,8 @@
     "returningFound": "Selamat kembali! Pasport, lesen memandu dan foto anda sudah ada, jadi tidak perlu ditambah lagi.",
     "returningPartial": "Selamat kembali! Sebahagian dokumen anda sudah ada. Sila tambah yang masih ditanda diperlukan.",
     "returningNone": "Kami tidak menemui anda dengan butiran itu. Sila tambah dokumen anda di bawah.",
-    "photoManual": "Foto ditambah. Kami tidak dapat membacanya secara automatik, sila taip nombor di bawah."
+    "photoManual": "Foto ditambah. Kami tidak dapat membacanya secara automatik, sila taip nombor di bawah.",
+    "dueAtHandover": "Dibayar semasa mengambil kenderaan"
   },
   "customerMessages": {
     "hi": "Hai {name},",

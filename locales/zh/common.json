@@ -578,7 +578,8 @@
     "returningFound": "欢迎回来！我们已有您的护照、驾照和照片，无需再次上传。",
     "returningPartial": "欢迎回来！我们已有您的部分证件，请补充仍显示需要的证件。",
     "returningNone": "没有找到您的记录，请在下方上传证件。",
-    "photoManual": "照片已添加。无法自动读取，请在下方输入号码。"
+    "photoManual": "照片已添加。无法自动读取，请在下方输入号码。",
+    "dueAtHandover": "取车时支付"
   },
   "customerMessages": {
     "hi": "{name}，您好！",

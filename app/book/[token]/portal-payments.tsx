@@ -192,7 +192,9 @@ function PaymentRow({
                 ? t("oneTransferOneReceipt")
                 : payment.overdue
                   ? t("wasDue", { date: shortDate(payment.dueDate, locale) })
-                  : t("dueOn", { date: shortDate(payment.dueDate, locale) })}
+                  : payment.atHandover
+                    ? t("dueAtHandover")
+                    : t("dueOn", { date: shortDate(payment.dueDate, locale) })}
           </p>
         </div>
         {payable ? <button

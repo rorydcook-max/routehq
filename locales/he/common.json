@@ -568,7 +568,8 @@
     "missing_driverLicenseCountry": "איזו מדינה הנפיקה את הרישיון?",
     "handoverPhotos": "תמונות מסירה ({count})",
     "payPlusExtras": "+ תוספות {amount}",
-    "payLessExtras": "קוזזו {amount} ששולמו עבור תוספות"
+    "payLessExtras": "קוזזו {amount} ששולמו עבור תוספות",
+    "dueAtHandover": "לתשלום בעת קבלת הרכב"
   },
   "customerMessages": {
     "hi": "שלום {name},",

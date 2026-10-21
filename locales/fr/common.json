@@ -578,7 +578,8 @@
     "returningFound": "Bon retour ! Nous avons déjà votre passeport, votre permis et votre photo, inutile de les ajouter à nouveau.",
     "returningPartial": "Bon retour ! Une partie de vos documents est déjà enregistrée. Ajoutez ceux encore marqués comme nécessaires.",
     "returningNone": "Nous ne vous avons pas trouvé avec ces informations. Ajoutez vos documents ci-dessous.",
-    "photoManual": "Photo ajoutée. Nous n'avons pas pu la lire automatiquement : saisissez les numéros ci-dessous."
+    "photoManual": "Photo ajoutée. Nous n'avons pas pu la lire automatiquement : saisissez les numéros ci-dessous.",
+    "dueAtHandover": "À régler à la remise du véhicule"
   },
   "customerMessages": {
     "hi": "Bonjour {name},",

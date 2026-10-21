@@ -658,14 +658,15 @@ export function TransactionsList({
 
       {deposits.length > 0 ? (
         <details className="card group overflow-hidden">
-          <summary className="tile-sky flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3">
-            <div>
+          {/* On a phone the two amounts sit under the words (beside them they broke into four short lines). */}
+          <summary className="tile-sky flex cursor-pointer list-none flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+            <div className="min-w-0">
               <h2 className="text-[16px]">{tx.say("deposits", { count: deposits.length })}</h2>
               <p className="text-[12px] text-[var(--muted)]">{tx.say("depositsHint")}</p>
             </div>
-            <p className="text-right text-[13px] text-[var(--foreground-secondary)]">
-              <span className="block tabular-nums">{tx.say("taken", { amount: money(depositsIn) })}</span>
-              <span className="block tabular-nums">{tx.say("returnedAmount", { amount: money(depositsOut) })}</span>
+            <p className="flex gap-3 text-[13px] font-semibold text-[var(--foreground-secondary)] sm:flex-col sm:gap-0 sm:text-right">
+              <span className="whitespace-nowrap tabular-nums">{tx.say("taken", { amount: money(depositsIn) })}</span>
+              <span className="whitespace-nowrap tabular-nums">{tx.say("returnedAmount", { amount: money(depositsOut) })}</span>
             </p>
           </summary>
           <div className="border-t border-[var(--border)]">{renderDays(deposits)}</div>

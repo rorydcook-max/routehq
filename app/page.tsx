@@ -476,12 +476,13 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       href: current ? `/bookings/${current.id}` : next ? `/bookings/${next.id}` : `/fleet/${v.id}`
     };
   });
-  const pill = (count: number, label: string, dot?: string) => (
-    <span className="inline-flex items-center gap-1.5 rounded-2xl bg-[var(--band-soft)] px-3 py-2 text-white">
+  // Each count opens the page that lists those things, like the counts on Fleet and Bookings.
+  const pill = (count: number, label: string, href: string, dot?: string) => (
+    <Link className="band-chip pressable inline-flex min-h-11 items-center gap-1.5 rounded-2xl px-3 py-2" href={href as Route} key={label}>
       {dot ? <Dot color={dot} /> : null}
       <span className="num text-[22px] leading-none">{count}</span>
       <span className="font-semibold">{label}</span>
-    </span>
+    </Link>
   );
   const hero = (
     <div className="flex flex-wrap items-end justify-between gap-4 pb-6 lg:pb-2">
@@ -490,10 +491,10 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
         <h1 className="mt-0.5 text-[34px] leading-[1.05] tracking-[-0.025em] text-white lg:text-[44px]">{greeting}</h1>
         <div className="mt-4 flex flex-wrap gap-2">
           {/* The same two numbers as the To do page, so the dashboard never tells a different story. */}
-          {tasksOverdue > 0 ? pill(tasksOverdue, t("pillOverdue"), "var(--band-alert)") : null}
-          {pill(tasksDueToday, t("pillToDo"))}
-          {pill(weekDays[0].out, t("pillOut"), "var(--going-out)")}
-          {pill(weekDays[0].back, t("pillBack"), "var(--coming-back)")}
+          {tasksOverdue > 0 ? pill(tasksOverdue, t("pillOverdue"), "/tasks", "var(--band-alert)") : null}
+          {pill(tasksDueToday, t("pillToDo"), "/tasks")}
+          {pill(weekDays[0].out, t("pillOut"), "/calendar", "var(--going-out)")}
+          {pill(weekDays[0].back, t("pillBack"), "/calendar", "var(--coming-back)")}
         </div>
       </div>
       {/* On a phone the + in the bar does this. */}

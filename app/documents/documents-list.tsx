@@ -145,11 +145,11 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
                   <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]"><FolderIcon size={20} /></span>
                   <div className="min-w-0 flex-1">
                     {folder.href ? (
-                      <Link className="block truncate text-[17px] font-bold text-[var(--foreground)] hover:text-[var(--primary)]" href={folder.href as any}>
+                      <Link className="line-clamp-2 block text-[17px] font-bold leading-tight text-[var(--foreground)] hover:text-[var(--primary)]" href={folder.href as any}>
                         {folder.label || say("aBooking")}
                       </Link>
                     ) : (
-                      <p className="truncate text-[17px] font-bold text-[var(--foreground)]">{folder.label || say("aBooking")}</p>
+                      <p className="line-clamp-2 text-[17px] font-bold leading-tight text-[var(--foreground)]">{folder.label || say("aBooking")}</p>
                     )}
                     <p className="truncate font-medium text-[var(--foreground-secondary)]">{say("folderLine", { count: folder.files.length, date: longDate(folder.latest.slice(0, 10), locale) })}</p>
                   </div>

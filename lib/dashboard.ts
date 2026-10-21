@@ -173,10 +173,16 @@ export async function getDashboardData(): Promise<DashboardData> {
       return { ...mapRental(row), overdue: late.amount, overdueSince: late.since, depositHeld: 0 };
     });
   // A vehicle booked for next month is free today. "Booked" is kept for one whose booking starts today or has started.
+  // A stored "Reserved" with no live booking behind it (a hold that ran out, say) is shown as what it is: free.
   const todayDate = businessToday();
   for (const vehicle of vehicles) {
     if (vehicle.status !== "Reserved") continue;
-    const starts = rentals.filter((rental) => rental.vehicleId === vehicle.id && rental.status === "Booked").map((rental) => String(rental.start || "").slice(0, 10)).sort();
+    const live = rentals.filter((rental) => rental.vehicleId === vehicle.id);
+    if (live.length === 0) {
+      vehicle.status = "Available";
+      continue;
+    }
+    const starts = live.filter((rental) => rental.status === "Booked").map((rental) => String(rental.start || "").slice(0, 10)).sort();
     if (starts.length > 0 && starts[0] > todayDate) vehicle.freeUntil = starts[0];
   }
   const customers: Customer[] = (customersResult.data || []).map(mapCustomer);

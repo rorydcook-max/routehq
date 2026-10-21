@@ -21,9 +21,61 @@ function addDays(date: string, n: number) {
   return d.toISOString().slice(0, 10);
 }
 
-function formatDate(dateStr: string) {
+// The summary goes to the owner's LINE, so it is written in the owner's language (falling back to the business's).
+type SummaryLocale = "en" | "th";
+const WORDS = {
+  en: {
+    goodMorning: "Good morning! 🌅",
+    nothingToday: "Good morning! 🌅\n\nNothing urgent today. Have a great day!",
+    altText: "RouteHQ daily summary",
+    active: (n: number) => `🚗 On hire (${n})`,
+    today: "⬅ TODAY",
+    tomorrow: "↩ TMW",
+    noReturns: "No returns today or tomorrow",
+    customer: "Customer",
+    vehicle: "Vehicle",
+    overdue: (n: number) => `⚠️ Late returns (${n})`,
+    due: (d: string) => `Due ${d}`,
+    owed: (a: string) => `Owed: ${a}`,
+    paymentsToday: "💰 Payments due today",
+    compliance: (n: number) => `🔴 Paperwork due (${n})`,
+    expires: (d: string) => `Expires ${d}`,
+    monthSoFar: "📈 This month so far",
+    monthNote: "Rent received this month (deposits not included)",
+    tax: "Road tax (ต่อภาษี)",
+    porbor: "Compulsory insurance (พรบ)",
+    insurance: "Full insurance",
+    service: "Service"
+  },
+  th: {
+    goodMorning: "อรุณสวัสดิ์ 🌅",
+    nothingToday: "อรุณสวัสดิ์ 🌅\n\nวันนี้ไม่มีเรื่องด่วน ขอให้เป็นวันที่ดี!",
+    altText: "สรุปประจำวันจาก RouteHQ",
+    active: (n: number) => `🚗 กำลังเช่าอยู่ (${n})`,
+    today: "⬅ วันนี้",
+    tomorrow: "↩ พรุ่งนี้",
+    noReturns: "ไม่มีรถคืนวันนี้หรือพรุ่งนี้",
+    customer: "ลูกค้า",
+    vehicle: "รถ",
+    overdue: (n: number) => `⚠️ คืนรถเกินกำหนด (${n})`,
+    due: (d: string) => `กำหนดคืน ${d}`,
+    owed: (a: string) => `ค้างชำระ: ${a}`,
+    paymentsToday: "💰 ยอดที่ต้องเก็บวันนี้",
+    compliance: (n: number) => `🔴 เอกสารใกล้หมดอายุ (${n})`,
+    expires: (d: string) => `หมดอายุ ${d}`,
+    monthSoFar: "📈 รายได้เดือนนี้",
+    monthNote: "ค่าเช่าที่ได้รับเดือนนี้ (ไม่รวมเงินมัดจำ)",
+    tax: "ต่อภาษีรถ",
+    porbor: "พรบ",
+    insurance: "ประกันภัย",
+    service: "เข้าศูนย์ตามระยะ"
+  }
+};
+type Words = (typeof WORDS)["en"];
+
+function formatDate(dateStr: string, locale: SummaryLocale = "en") {
   if (!dateStr) return "—";
-  return new Date(dateStr).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+  return new Date(dateStr).toLocaleDateString(locale === "th" ? "th-TH" : "en-GB", { day: "numeric", month: "short" });
 }
 
 export type SummaryData = {
@@ -31,22 +83,25 @@ export type SummaryData = {
   lineUserId: string;
   timezone: string;
   currency: string;
+  locale: SummaryLocale;
   notificationSettings: Record<string, boolean>;
   activeRentals: any[];
   returningToday: any[];
   returningTomorrow: any[];
   overdueRentals: any[];
   paymentsExpectedToday: any[];
-  urgentCompliance: any[];
+  urgentCompliance: Array<{ vehicle: string; item: ComplianceItem; expiry: string }>;
   monthRevenue: number;
 };
+
+type ComplianceItem = "tax" | "porbor" | "insurance" | "service";
 
 export async function fetchSummaryData(organizationId: string): Promise<SummaryData | null> {
   const supabase = createSupabaseAdminClient() as any;
 
   const { data: org } = await supabase
     .from("organizations")
-    .select("id, name, trading_name, settings, timezone, currency, line_user_id")
+    .select("id, name, trading_name, settings, timezone, currency, line_user_id, default_locale")
     .eq("id", organizationId)
     .is("deleted_at", null)
     .maybeSingle();
@@ -61,7 +116,7 @@ export async function fetchSummaryData(organizationId: string): Promise<SummaryD
   const tomorrow = tomorrowStr(timezone);
   const in7Days = addDays(today, 7);
 
-  const [rentalsRes, transactionsRes, vehiclesRes] = await Promise.all([
+  const [rentalsRes, transactionsRes, vehiclesRes, ownerRes] = await Promise.all([
     supabase
       .from("rentals")
       .select("id, start_date, end_date, status, balance_due, customers!rentals_customer_id_fkey(full_name, phone), vehicles!rentals_vehicle_id_fkey(make, model, registration_number, metadata)")
@@ -82,8 +137,22 @@ export async function fetchSummaryData(organizationId: string): Promise<SummaryD
       .from("vehicles")
       .select("id, make, model, registration_number, metadata")
       .eq("organization_id", org.id)
-      .is("deleted_at", null)
+      .is("deleted_at", null),
+    supabase
+      .from("organization_members")
+      .select("user_id")
+      .eq("organization_id", org.id)
+      .eq("role", "owner")
+      .eq("is_active", true)
+      .limit(1)
+      .maybeSingle()
   ]);
+  const ownerId = (ownerRes.data as any)?.user_id;
+  const { data: owner } = ownerId
+    ? await supabase.from("users").select("preferred_locale").eq("id", ownerId).maybeSingle()
+    : { data: null };
+  const ownerLocale = owner?.preferred_locale || org.default_locale;
+  const locale: SummaryLocale = String(ownerLocale || "").startsWith("th") ? "th" : "en";
 
   // "Balance" on a late return is what is owed now, as on every screen — not the whole balance, which counts rent months ahead.
   const dueNow = await amountDueNowByRental(supabase, (rentalsRes.data || []).map((r: any) => r.id));
@@ -116,15 +185,15 @@ export async function fetchSummaryData(organizationId: string): Promise<SummaryD
   const paymentsExpectedToday = Array.from(dueByRental.values());
 
   // Compliance alerts: vehicles with compliance dates within 7 days
-  const urgentCompliance: Array<{ vehicle: string; item: string; expiry: string }> = [];
+  const urgentCompliance: SummaryData["urgentCompliance"] = [];
   for (const v of vehicles) {
     const compliance = v.metadata?.compliance || {};
     const label = `${v.make} ${v.model} (${v.registration_number})`;
-    const checks = [
-      { key: "tax_expiry_date", item: "Vehicle Tax (ต่อภาษี)" },
-      { key: "porbor_expiry_date", item: "Compulsory Insurance (พรบ)" },
-      { key: "insurance_expiry_date", item: "Full Insurance" },
-      { key: "next_service_date", item: "Scheduled Service" }
+    const checks: Array<{ key: string; item: ComplianceItem }> = [
+      { key: "tax_expiry_date", item: "tax" },
+      { key: "porbor_expiry_date", item: "porbor" },
+      { key: "insurance_expiry_date", item: "insurance" },
+      { key: "next_service_date", item: "service" }
     ];
     for (const { key, item } of checks) {
       const expiry = compliance[key];
@@ -142,6 +211,7 @@ export async function fetchSummaryData(organizationId: string): Promise<SummaryD
     lineUserId,
     timezone,
     currency: org.currency || "THB",
+    locale,
     notificationSettings: org.settings?.line_notifications || {},
     activeRentals,
     returningToday,
@@ -155,52 +225,52 @@ export async function fetchSummaryData(organizationId: string): Promise<SummaryD
 
 export function buildDailySummaryMessages(data: SummaryData): LineMessage[] {
   const ns = data.notificationSettings;
-
-  // Try to build a Flex Message for rich display
+  const w = WORDS[data.locale] || WORDS.en;
+  const loc = data.locale;
   const bubbles: any[] = [];
 
-  // Header bubble
-  const now = new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: data.timezone });
-  bubbles.push(buildHeaderBubble(data.orgName, now));
+  const now = new Date().toLocaleDateString(loc === "th" ? "th-TH" : "en-GB", { weekday: "long", day: "numeric", month: "long", timeZone: data.timezone });
+  bubbles.push(buildHeaderBubble(w, data.orgName, now));
 
-  // Active rentals section
   if (ns.daily_active_rentals !== false && data.activeRentals.length > 0) {
-    bubbles.push(buildRentalsBubble(data.activeRentals, data.returningToday, data.returningTomorrow));
+    bubbles.push(buildRentalsBubble(w, data.activeRentals, data.returningToday, data.returningTomorrow, todayStr(data.timezone)));
   }
-
-  // Overdue
   if (ns.daily_overdue !== false && data.overdueRentals.length > 0) {
-    bubbles.push(buildOverdueBubble(data.overdueRentals));
+    bubbles.push(buildOverdueBubble(w, loc, data.overdueRentals));
   }
-
-  // Payments today
   if (ns.daily_payments !== false && data.paymentsExpectedToday.length > 0) {
-    bubbles.push(buildPaymentsBubble(data.paymentsExpectedToday));
+    bubbles.push(buildPaymentsBubble(w, data.paymentsExpectedToday));
   }
-
-  // Compliance
   if (ns.daily_compliance !== false && data.urgentCompliance.length > 0) {
-    bubbles.push(buildComplianceBubble(data.urgentCompliance));
+    bubbles.push(buildComplianceBubble(w, loc, data.urgentCompliance));
   }
-
-  // Month metric
   if (ns.daily_revenue !== false) {
-    bubbles.push(buildRevenueBubble(data.monthRevenue));
+    bubbles.push(buildRevenueBubble(w, data.monthRevenue));
   }
 
-  if (bubbles.length === 0) {
-    return [lineText(`Good morning! 🌅\n\nNo urgent items for today. Have a great day!`)];
+  // Only the greeting: nothing worth a card.
+  if (bubbles.length <= 1) {
+    return [lineText(w.nothingToday)];
   }
 
-  return [
-    lineFlex("RouteHQ Daily Summary", {
-      type: "carousel",
-      contents: bubbles
-    })
-  ];
+  return [lineFlex(w.altText, { type: "carousel", contents: bubbles })];
 }
 
-function buildHeaderBubble(orgName: string, dateStr: string) {
+function card(rows: any[]) {
+  return {
+    type: "bubble",
+    size: "kilo",
+    body: { type: "box", layout: "vertical", contents: rows, paddingAll: "16px", spacing: "sm" }
+  };
+}
+
+function names(w: Words, r: any) {
+  const customer = r.customers?.full_name || w.customer;
+  const vehicle = `${r.vehicles?.make || ""} ${r.vehicles?.model || ""}`.trim() || r.vehicles?.registration_number || w.vehicle;
+  return { customer, vehicle };
+}
+
+function buildHeaderBubble(w: Words, orgName: string, dateStr: string) {
   return {
     type: "bubble",
     size: "kilo",
@@ -209,7 +279,7 @@ function buildHeaderBubble(orgName: string, dateStr: string) {
       layout: "vertical",
       contents: [
         { type: "text", text: "RouteHQ", size: "xs", color: "#ffffff80", weight: "bold" },
-        { type: "text", text: "Good morning! 🌅", size: "xl", color: "#ffffff", weight: "bold" },
+        { type: "text", text: w.goodMorning, size: "xl", color: "#ffffff", weight: "bold" },
         { type: "text", text: dateStr, size: "xs", color: "#ffffff99" }
       ],
       backgroundColor: "#0e5e6f",
@@ -218,168 +288,92 @@ function buildHeaderBubble(orgName: string, dateStr: string) {
     body: {
       type: "box",
       layout: "vertical",
-      contents: [
-        { type: "text", text: orgName, size: "sm", color: "#667085", wrap: true }
-      ],
+      contents: [{ type: "text", text: orgName, size: "sm", color: "#667085", wrap: true }],
       paddingAll: "16px"
     }
   };
 }
 
-function buildRentalsBubble(active: any[], today: any[], tomorrow: any[]) {
-  const rows: any[] = [];
-
-  rows.push({ type: "text", text: `🚗 Active Rentals (${active.length})`, weight: "bold", size: "sm", color: "#172026" });
-
+function buildRentalsBubble(w: Words, active: any[], today: any[], tomorrow: any[], todayDate: string) {
+  const rows: any[] = [{ type: "text", text: w.active(active.length), weight: "bold", size: "sm", color: "#172026" }];
   const returning = [...today, ...tomorrow];
   for (const r of returning.slice(0, 5)) {
-    const customer = r.customers?.full_name || "Customer";
-    const vehicle = `${r.vehicles?.make || ""} ${r.vehicles?.model || ""}`.trim() || r.vehicles?.registration_number || "Vehicle";
-    const isToday = r.end_date === todayStr();
+    const { customer, vehicle } = names(w, r);
+    const isToday = r.end_date === todayDate;
     rows.push({
       type: "box",
       layout: "horizontal",
       contents: [
-        { type: "text", text: isToday ? "⬅ TODAY" : "↩ TMW", size: "xs", color: isToday ? "#dc2626" : "#d97706", flex: 2 },
+        { type: "text", text: isToday ? w.today : w.tomorrow, size: "xs", color: isToday ? "#dc2626" : "#d97706", flex: 2 },
         { type: "text", text: customer, size: "xs", flex: 4, wrap: true },
         { type: "text", text: vehicle, size: "xs", color: "#667085", flex: 4, wrap: true }
       ],
       margin: "sm"
     });
   }
-
   if (returning.length === 0) {
-    rows.push({ type: "text", text: "No returns today or tomorrow", size: "xs", color: "#667085", margin: "sm" });
+    rows.push({ type: "text", text: w.noReturns, size: "xs", color: "#667085", margin: "sm" });
   }
-
-  return {
-    type: "bubble",
-    size: "kilo",
-    body: {
-      type: "box",
-      layout: "vertical",
-      contents: rows,
-      paddingAll: "16px",
-      spacing: "sm"
-    }
-  };
+  return card(rows);
 }
 
-function buildOverdueBubble(overdue: any[]) {
-  const rows: any[] = [
-    { type: "text", text: `⚠️ Overdue Returns (${overdue.length})`, weight: "bold", size: "sm", color: "#dc2626" }
-  ];
-
+function buildOverdueBubble(w: Words, loc: SummaryLocale, overdue: any[]) {
+  const rows: any[] = [{ type: "text", text: w.overdue(overdue.length), weight: "bold", size: "sm", color: "#dc2626" }];
   for (const r of overdue.slice(0, 5)) {
-    const customer = r.customers?.full_name || "Customer";
-    const vehicle = `${r.vehicles?.make || ""} ${r.vehicles?.model || ""}`.trim() || r.vehicles?.registration_number || "Vehicle";
+    const { customer, vehicle } = names(w, r);
     const balance = Number(r.balance_due || 0);
-    rows.push({
-      type: "box",
-      layout: "vertical",
-      contents: [
-        { type: "text", text: customer, size: "sm", weight: "bold" },
-        { type: "text", text: `${vehicle} · Due ${formatDate(r.end_date)}`, size: "xs", color: "#667085" },
-        balance > 0
-          ? { type: "text", text: `Balance: ${THB(balance)}`, size: "xs", color: "#dc2626" }
-          : { type: "text", text: " ", size: "xs" }
-      ],
-      margin: "sm"
-    });
+    const lines: any[] = [
+      { type: "text", text: customer, size: "sm", weight: "bold", wrap: true },
+      { type: "text", text: `${vehicle} · ${w.due(formatDate(r.end_date, loc))}`, size: "xs", color: "#667085", wrap: true }
+    ];
+    if (balance > 0) lines.push({ type: "text", text: w.owed(THB(balance)), size: "xs", color: "#dc2626" });
+    rows.push({ type: "box", layout: "vertical", contents: lines, margin: "sm" });
   }
-
-  return {
-    type: "bubble",
-    size: "kilo",
-    body: {
-      type: "box",
-      layout: "vertical",
-      contents: rows,
-      paddingAll: "16px",
-      spacing: "sm"
-    }
-  };
+  return card(rows);
 }
 
-function buildPaymentsBubble(payments: any[]) {
+function buildPaymentsBubble(w: Words, payments: any[]) {
   const total = payments.reduce((s, r) => s + Number(r.balance_due || 0), 0);
   const rows: any[] = [
-    { type: "text", text: `💰 Payments Due Today`, weight: "bold", size: "sm", color: "#172026" },
+    { type: "text", text: w.paymentsToday, weight: "bold", size: "sm", color: "#172026" },
     { type: "text", text: THB(total), size: "lg", weight: "bold", color: "#0e5e6f" }
   ];
-
   for (const r of payments.slice(0, 4)) {
-    const customer = r.customers?.full_name || "Customer";
     rows.push({
       type: "box",
       layout: "horizontal",
       contents: [
-        { type: "text", text: customer, size: "xs", flex: 5 },
+        { type: "text", text: r.customers?.full_name || w.customer, size: "xs", flex: 5, wrap: true },
         { type: "text", text: THB(Number(r.balance_due || 0)), size: "xs", flex: 3, align: "end", weight: "bold" }
       ],
       margin: "sm"
     });
   }
-
-  return {
-    type: "bubble",
-    size: "kilo",
-    body: {
-      type: "box",
-      layout: "vertical",
-      contents: rows,
-      paddingAll: "16px",
-      spacing: "sm"
-    }
-  };
+  return card(rows);
 }
 
-function buildComplianceBubble(items: Array<{ vehicle: string; item: string; expiry: string }>) {
-  const rows: any[] = [
-    { type: "text", text: `🔴 Compliance Alerts (${items.length})`, weight: "bold", size: "sm", color: "#dc2626" }
-  ];
-
+function buildComplianceBubble(w: Words, loc: SummaryLocale, items: SummaryData["urgentCompliance"]) {
+  const rows: any[] = [{ type: "text", text: w.compliance(items.length), weight: "bold", size: "sm", color: "#dc2626" }];
   for (const c of items.slice(0, 5)) {
     rows.push({
       type: "box",
       layout: "vertical",
       contents: [
-        { type: "text", text: c.item, size: "xs", weight: "bold", color: "#172026" },
-        { type: "text", text: `${c.vehicle} · Expires ${formatDate(c.expiry)}`, size: "xs", color: "#667085", wrap: true }
+        { type: "text", text: w[c.item], size: "xs", weight: "bold", color: "#172026" },
+        { type: "text", text: `${c.vehicle} · ${w.expires(formatDate(c.expiry, loc))}`, size: "xs", color: "#667085", wrap: true }
       ],
       margin: "sm"
     });
   }
-
-  return {
-    type: "bubble",
-    size: "kilo",
-    body: {
-      type: "box",
-      layout: "vertical",
-      contents: rows,
-      paddingAll: "16px",
-      spacing: "sm"
-    }
-  };
+  return card(rows);
 }
 
-function buildRevenueBubble(monthRevenue: number) {
-  return {
-    type: "bubble",
-    size: "kilo",
-    body: {
-      type: "box",
-      layout: "vertical",
-      contents: [
-        { type: "text", text: "📈 This Month So Far", weight: "bold", size: "sm", color: "#172026" },
-        { type: "text", text: THB(monthRevenue), size: "xxl", weight: "bold", color: "#0e5e6f", margin: "md" },
-        { type: "text", text: "Rent received this month (deposits not included)", size: "xs", color: "#667085", margin: "sm" }
-      ],
-      paddingAll: "16px",
-      spacing: "sm"
-    }
-  };
+function buildRevenueBubble(w: Words, monthRevenue: number) {
+  return card([
+    { type: "text", text: w.monthSoFar, weight: "bold", size: "sm", color: "#172026" },
+    { type: "text", text: THB(monthRevenue), size: "xxl", weight: "bold", color: "#0e5e6f", margin: "md" },
+    { type: "text", text: w.monthNote, size: "xs", color: "#667085", margin: "sm", wrap: true }
+  ]);
 }
 
 export async function sendDailySummary(organizationId: string): Promise<{ sent: boolean; reason?: string; messages?: LineMessage[]; lineUserId?: string }> {

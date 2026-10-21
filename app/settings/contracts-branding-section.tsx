@@ -166,7 +166,7 @@ export function ContractsBrandingSection({
           signatureUrl={signatureDisplayUrl}
         />
         {organization.signature_authorised_at ? (
-          <p className="px-2 pb-1 font-medium text-[var(--muted)]">{say("b_sigRecorded", { date: longDate(toWallTime(organization.signature_authorised_at).slice(0, 10), locale) })}</p>
+          <p className="px-3.5 pb-3 font-medium text-[var(--muted)]">{say("b_sigRecorded", { date: longDate(toWallTime(organization.signature_authorised_at).slice(0, 10), locale) })}</p>
         ) : null}
         </section>
         {aside}

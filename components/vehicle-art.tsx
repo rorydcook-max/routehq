@@ -115,22 +115,33 @@ export function VehicleArt({
             <path d="M15 17 h21 v11 h-21 z M41 17 h21 v11 h-21 z M67 17 h17 Q92 17 98 28 L67 28 Z" fill={glass} />
           </>
         ) : shape === "scooter" ? (
+          // Step-through scooter: small wheels, low floor, front shield and handlebar.
           <>
-            <path d="M30 42 Q34 28 54 28 L76 28 L84 14 L94 14 L90 28 Q104 30 104 42 Z" stroke={outline} strokeWidth="1.5" style={{ fill: paint }} />
-            <rect fill="#13262b" height="7" rx="3" width="24" x="48" y="22" />
+            <path d="M84 16 L76 40" stroke="#13262b" strokeLinecap="round" strokeWidth="3.5" fill="none" />
+            <path d="M80 14 L92 13" stroke="#13262b" strokeLinecap="round" strokeWidth="3" fill="none" />
+            <path d="M16 40 Q17 29 32 28 L54 28 Q58 28 59 34 L60 38 L72 38 L80 22 Q86 20 88 26 L84 40 Q96 36 102 44 L20 45 Q16 44 16 40 Z" stroke={outline} strokeWidth="1.5" style={{ fill: paint }} />
+            <rect fill="#13262b" height="6" rx="3" width="28" x="26" y="23" />
+            <circle cx="88" cy="24" fill={glass} r="2.6" />
           </>
         ) : (
+          // Motorbike: frame between the wheels, tank, seat, front fork and handlebar, so it reads as a bike, not a kart.
           <>
-            <path d="M34 42 Q38 28 56 27 L78 27 L88 16 L95 16 L87 31 Q97 34 99 42 Z" stroke={outline} strokeWidth="1.5" style={{ fill: paint }} />
-            <path d="M50 27 Q54 20 66 20 L74 20 Q78 24 76 27 Z" fill="#13262b" />
+            <path d="M30 44 L54 37" stroke="#13262b" strokeLinecap="round" strokeWidth="3.5" fill="none" />
+            <path d="M92 44 L80 17" stroke="#13262b" strokeLinecap="round" strokeWidth="3.5" fill="none" />
+            <path d="M75 15 L87 13" stroke="#13262b" strokeLinecap="round" strokeWidth="3" fill="none" />
+            <rect fill="#5b6b70" height="9" rx="2" width="17" x="50" y="34" />
+            <path d="M20 27 L36 25 L38 30 L22 31 Z" style={{ fill: paint }} />
+            <path d="M44 33 Q46 23 60 22 L72 21 Q81 21 82 27 L80 33 Q70 38 56 38 Z" stroke={outline} strokeWidth="1.5" style={{ fill: paint }} />
+            <path d="M30 27 Q34 21 46 22 L58 23 Q55 27 47 28 L33 30 Z" fill="#13262b" />
+            <circle cx="83" cy="22" fill={glass} r="2.8" />
           </>
         )}
         {shape === "scooter" || shape === "motorbike" ? (
           <>
-            <circle cx="24" cy="44" fill="#13262b" r="11" />
-            <circle cx="24" cy="44" fill="#ffffff" r="4" />
-            <circle cx="96" cy="44" fill="#13262b" r="11" />
-            <circle cx="96" cy="44" fill="#ffffff" r="4" />
+            <circle cx={shape === "scooter" ? 26 : 28} cy="44" fill="#13262b" r={shape === "scooter" ? 9.5 : 12} />
+            <circle cx={shape === "scooter" ? 26 : 28} cy="44" fill="#ffffff" r="3.5" />
+            <circle cx={shape === "scooter" ? 92 : 92} cy="44" fill="#13262b" r={shape === "scooter" ? 9.5 : 12} />
+            <circle cx={shape === "scooter" ? 92 : 92} cy="44" fill="#ffffff" r="3.5" />
           </>
         ) : (
           <>

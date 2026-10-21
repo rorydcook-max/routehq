@@ -11,7 +11,7 @@ import type { Route } from "next";
 import { AlertTriangle, Camera, CheckCircle2, ChevronLeft, ChevronRight, FileVideo, Fuel, Gauge, MapPin, ShieldCheck, Smartphone, Trash2 } from "lucide-react";
 import { submitInspection } from "@/app/actions/inspections";
 import { prepareInspectionUploads } from "@/app/actions/uploads";
-import { uploadFormFiles } from "@/lib/direct-upload-client";
+import { compressImage, startEarlyUpload, uploadFormFiles } from "@/lib/direct-upload-client";
 import { recordDeliveryCashPaymentAndReceipt } from "@/app/actions/transactions";
 import type { InspectionContext } from "@/lib/inspection-detail";
 import { earlyStartFor, type EarlyStartChoice } from "@/lib/early-start";
@@ -120,14 +120,38 @@ function FileCapture({
   onSelected?: (file: File) => void;
 }) {
   const [preview, setPreview] = useState<string | null>(null);
+  const [dragging, setDragging] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
   const t = useTranslations("inspection");
   const isVideo = accept.startsWith("video");
 
   return (
     <label
-      className={`block cursor-pointer rounded-lg border ${compact ? "p-2" : "p-4"} ${
-        preview ? "border-[var(--success-line)] bg-white" : compact ? "border-dashed border-[var(--info-line)] bg-[var(--primary-light)]" : "border-dashed border-[var(--info-line)] bg-white"
+      aria-label={label}
+      className={`block cursor-pointer rounded-xl border-2 border-dashed transition-colors ${compact ? "p-2" : "p-3"} ${
+        preview
+          ? "border-solid border-[var(--success-line)] bg-white"
+          : dragging
+            ? "border-[var(--primary)] bg-[var(--primary-light)]"
+            : "border-[var(--info-line)] bg-[var(--primary-light)]/60 hover:border-[var(--primary)] hover:bg-[var(--primary-light)]"
       }`}
+      // On a computer a photo can be dragged straight onto the box.
+      onDragLeave={() => setDragging(false)}
+      onDragOver={(event) => {
+        event.preventDefault();
+        setDragging(true);
+      }}
+      onDrop={(event) => {
+        event.preventDefault();
+        setDragging(false);
+        const input = inputRef.current;
+        const file = event.dataTransfer.files?.[0];
+        if (!input || !file || !file.type.startsWith(isVideo ? "video" : "image")) return;
+        const list = new DataTransfer();
+        list.items.add(file);
+        input.files = list.files;
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+      }}
     >
       {preview ? null : compact ? (
         <span className="flex min-h-[96px] flex-col items-center justify-center gap-2 text-center text-sm font-semibold leading-tight text-[var(--primary)]">
@@ -135,9 +159,20 @@ function FileCapture({
           {label}
         </span>
       ) : (
-        <span className="flex min-h-14 items-center justify-center gap-2.5 rounded-lg bg-[var(--primary-light)] px-3 py-3 text-center text-base font-semibold leading-tight text-[var(--primary)]">
-          <Icon className="shrink-0" size={22} />
-          {label}
+        // The heading above already says what to photograph, so the box just says what it does:
+        // "Take photo" on a phone (it opens the camera), "Upload photo" on a computer.
+        <span className="flex min-h-[132px] flex-col items-center justify-center gap-2 px-3 py-4 text-center">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-[var(--primary)] shadow-[var(--shadow-sm)]">
+            <Icon className="shrink-0" size={22} />
+          </span>
+          <span className="text-base font-bold leading-tight text-[var(--primary)]">
+            <span className="lg:hidden">{t(isVideo ? "cap_takeVideo" : "cap_take")}</span>
+            <span className="hidden lg:inline">{t(isVideo ? "cap_uploadVideo" : "cap_upload")}</span>
+          </span>
+          <span className="text-sm font-medium text-[var(--foreground-secondary)]">
+            <span className="lg:hidden">{t(isVideo ? "cap_hintPhoneVideo" : "cap_hintPhone")}</span>
+            <span className="hidden lg:inline">{t(isVideo ? "cap_hintDeskVideo" : "cap_hintDesk")}</span>
+          </span>
         </span>
       )}
       <input
@@ -145,6 +180,7 @@ function FileCapture({
         capture={capture}
         className="sr-only"
         name={name}
+        ref={inputRef}
         onChange={(event) => {
           const file = event.currentTarget.files?.[0];
           if (!file) {
@@ -591,7 +627,8 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
   async function readOdometer(file: File) {
     setOcrMessage(t("ocrReading"));
     const data = new FormData();
-    data.append("file", file);
+    // Sent shrunk: a full 5 MB camera photo was slow on mobile data and could go over the 4.5 MB request limit.
+    data.append("file", await compressImage(file, 1280, 0.8));
     // Never leave "Reading…" on screen for good: after 20 seconds give up and ask for the number to be typed.
     const giveUp = new AbortController();
     const timer = setTimeout(() => giveUp.abort(), 20000);
@@ -814,7 +851,18 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
   return (
     // Submitting only happens through the Submit button, which uploads the
     // photos first. Pressing Enter in a field must not post the files directly.
-    <form method="post" className="mx-auto max-w-3xl space-y-4" id="inspectionForm" onSubmit={(event) => event.preventDefault()}>
+    <form
+      method="post"
+      className="mx-auto max-w-3xl space-y-4"
+      id="inspectionForm"
+      // Each photo starts uploading as soon as it is taken, so "Finish" doesn't wait on a slow connection.
+      onChange={(event) => {
+        const input = event.target as unknown as HTMLInputElement;
+        if (input?.type !== "file" || !input.files?.length) return;
+        for (const file of Array.from(input.files)) startEarlyUpload(input.name, file, (files) => prepareInspectionUploads(context.organizationId, files));
+      }}
+      onSubmit={(event) => event.preventDefault()}
+    >
       <input name="organizationId" type="hidden" value={context.organizationId} />
       <input name="mode" type="hidden" value={mode} />
       <input name="swap" type="hidden" value={isSwap ? "1" : ""} />

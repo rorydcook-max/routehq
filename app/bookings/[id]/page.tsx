@@ -656,7 +656,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   ) : null}
                 </span>
                 {/* Where the money stands, in one phrase, at the top. The reference is in the breadcrumb and the plate under Vehicle. */}
-                {!awaitingSignature ? <span className={`font-bold ${financialStateClass}`}>{financialState.label}</span> : null}
+                {/* Shown here only when the money tile below isn't already saying the same words. */}
+                {!awaitingSignature && financialState.amount === null ? <span className={`font-bold ${financialStateClass}`}>{financialState.label}</span> : null}
               </div>
               {/* Who has it, and a picture of what they have: the vehicle in its own colour (Lagoon look). */}
               <div className="mt-3 flex items-center gap-3">
@@ -700,9 +701,12 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     )}
                   </div>
                 ) : (
-                  <p className="flex flex-wrap items-center gap-1 font-medium text-[var(--foreground-secondary)]">
-                    <span>{rental.end_date ? tx.say("dateTo", { date: formatDate(rental.start_date, tx) }) : tx.say("fromOpenEnded", { date: formatDate(rental.start_date, tx) })}</span>
-                    <EditableEndDate currentEndDate={rental.end_date} rentalId={rental.id} />
+                  // The pencil stays at the end of the sentence, never alone on a line of its own.
+                  <p className="font-medium text-[var(--foreground-secondary)]">
+                    {rental.end_date ? tx.say("dateTo", { date: formatDate(rental.start_date, tx) }) : tx.say("fromOpenEnded", { date: formatDate(rental.start_date, tx) })}
+                    <span className="ml-1 inline-flex align-middle">
+                      <EditableEndDate currentEndDate={rental.end_date} rentalId={rental.id} />
+                    </span>
                   </p>
                 )}
               </div>

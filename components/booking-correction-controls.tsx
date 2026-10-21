@@ -420,11 +420,12 @@ function ActionButton({
       ? "bg-[var(--primary)] text-white"
       : tone === "danger"
         ? "border border-[var(--danger-line)] bg-[var(--danger-light)] text-[var(--danger)]"
-        : "border border-[var(--border)] bg-white text-[var(--foreground-secondary)]";
+        : "border border-[var(--border)] bg-white text-[var(--foreground)] hover:border-[var(--primary)]";
 
+  // Same shape as every other button in the app: a rounded pill, readable text.
   return (
     <button
-      className={`pressable inline-flex min-h-8 items-center justify-center rounded-lg px-3 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-60 ${className}`}
+      className={`pressable inline-flex min-h-10 items-center justify-center whitespace-nowrap rounded-full px-4 text-[14px] font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${className}`}
       disabled={disabled}
       onClick={onClick}
       type={type}
@@ -608,21 +609,29 @@ export function EditableRentalPaymentRow({ payment, atHandover = false }: { paym
         <div className="min-w-[60%] flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <p className={`font-mono-data font-semibold ${voided ? "text-[var(--muted)] line-through" : "text-[var(--foreground)]"}`}>{money(payment.amount, payment.currency || "THB")}</p>
-            <SmallBadge tone={badgeTone as any}>
-              {(() => {
-                // Say where the payment stands in plain words, not the stored status.
-                if (voided || status === "cancelled") return tx.say("pc_b_cancelled");
-                if (status === "paid") return tx.say("pc_b_paid");
-                if (status === "waived") return tx.say("pc_b_waived");
-                const due = String(payment.due_date || "").slice(0, 10);
-                const todayHere = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date());
-                if (atHandover && (!due || due <= todayHere)) return tx.say("pc_b_atHandover");
-                if (!due) return tx.say("pc_b_noDate");
-                if (due < todayHere) return tx.say("pc_b_overdue");
-                if (due === todayHere) return tx.say("pc_b_dueToday");
-                return tx.say("pc_b_notDue");
-              })()}
-            </SmallBadge>
+            {(() => {
+              // Say where the payment stands in plain words, not the stored status, and colour it to match:
+              // every "Overdue" is red (a stored "pending" past its date used to show an amber "Overdue").
+              const due = String(payment.due_date || "").slice(0, 10);
+              const todayHere = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date());
+              const [label, tone]: [string, string] =
+                voided || status === "cancelled"
+                  ? [tx.say("pc_b_cancelled"), "neutral"]
+                  : status === "paid"
+                    ? [tx.say("pc_b_paid"), "green"]
+                    : status === "waived"
+                      ? [tx.say("pc_b_waived"), "blue"]
+                      : atHandover && (!due || due <= todayHere)
+                        ? [tx.say("pc_b_atHandover"), "blue"]
+                        : !due
+                          ? [tx.say("pc_b_noDate"), badgeTone]
+                          : due < todayHere || status === "overdue"
+                            ? [tx.say("pc_b_overdue"), "red"]
+                            : due === todayHere
+                              ? [tx.say("pc_b_dueToday"), "amber"]
+                              : [tx.say("pc_b_notDue"), "neutral"];
+              return <SmallBadge tone={tone as any}>{label}</SmallBadge>;
+            })()}
             {isExtension ? <SmallBadge tone="blue">{tx.say("pc_extension")}</SmallBadge> : null}
           </div>
           <p className={`text-sm ${voided ? "text-[var(--muted)]" : "text-[var(--muted)]"}`}>{paymentDescription(payment, tx)}</p>

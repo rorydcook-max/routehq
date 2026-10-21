@@ -111,25 +111,25 @@ export function TrialBanner({ placement = "floating" }: { placement?: "floating"
       {placement === "sidebar" ? (
         <Link className="flex min-w-0 items-center gap-2 hover:underline" href={"/settings/billing" as Route}>
           <span aria-hidden="true" className={clsx("h-2 w-2 shrink-0 rounded-full", tone.dot)} />
-          <span className="truncate text-xs font-bold leading-4">{t("trialLeft", { days: days === null || days === undefined ? 30 : days })}</span>
+          <span className="text-xs font-bold leading-4">{t("trialLeft", { days: days === null || days === undefined ? 30 : days })}</span>
         </Link>
       ) : (
         <div className="flex items-center gap-2">
           <span aria-hidden="true" className={clsx("h-2 w-2 shrink-0 rounded-full", tone.dot)} />
-          <p className="text-xs font-bold leading-4">
+          <p className="whitespace-nowrap text-xs font-bold leading-4">
             {t("trialLeft", { days: days === null || days === undefined ? 30 : days })}
           </p>
         </div>
       )}
       <div className="flex shrink-0 items-center gap-2">
         {placement === "sidebar" ? null : (
-          <Link className={clsx("pressable inline-flex items-center justify-center rounded-lg px-3 text-[11px] font-bold", placement === "floating" ? "min-h-6" : "min-h-7", tone.button)} href={"/settings/billing" as Route}>
+          <Link className={clsx("pressable inline-flex items-center justify-center rounded-lg px-3 text-[11px] font-bold", placement === "floating" ? "min-h-8" : "min-h-8", tone.button)} href={"/settings/billing" as Route}>
             {t("subscribeNow")}
           </Link>
         )}
         <button
           aria-label={t("close")}
-          className={clsx("pressable inline-flex items-center justify-center rounded-lg border border-current/15 bg-white/70", placement === "floating" ? "h-6 w-6" : "h-7 w-7")}
+          className={clsx("pressable inline-flex items-center justify-center rounded-lg border border-current/15 bg-white/70", "h-8 w-8")}
           onClick={() => {
             window.localStorage.setItem(dismissKey, String(Date.now() + 24 * 60 * 60 * 1000));
             setHidden(true);

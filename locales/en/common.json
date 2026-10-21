@@ -421,7 +421,15 @@
     "lateFromToday": "From today: back on {date} as booked, {amount} off the rent",
     "lateFromTodayPlain": "From today: back on {date} as booked",
     "lateFromTodayMoves": "From today: every payment date moves {days, plural, one {# day} other {# days}} later",
-    "lateAsBooked": "As booked, from {date}"
+    "lateAsBooked": "As booked, from {date}",
+    "cap_take": "Take photo",
+    "cap_upload": "Upload photo",
+    "cap_takeVideo": "Record video",
+    "cap_uploadVideo": "Upload video",
+    "cap_hintPhone": "Opens your camera",
+    "cap_hintPhoneVideo": "Opens your camera",
+    "cap_hintDesk": "or drag a photo here",
+    "cap_hintDeskVideo": "or drag a video here"
   },
   "translation": {
     "translatedFrom": "Translated from {language}",
@@ -1228,7 +1236,8 @@
     "secUpcoming": "Coming up",
     "secDone": "Finished",
     "showAllDone": "Show all {count} finished",
-    "noCustomer": "No customer (link never filled in)"
+    "noCustomer": "No customer (link never filled in)",
+    "daysSoFar": "{days, plural, one {# day} other {# days}} so far"
   },
   "inbox": {
     "title": "Inbox",
@@ -2579,7 +2588,7 @@
     "th_vehicle": "Vehicle",
     "th_status": "Status",
     "th_rate": "Price",
-    "th_onRent": "On rent, last 12 months",
+    "th_onRent": "Rented (12 mo)",
     "th_paperwork": "Paperwork",
     "th_profit": "Profit",
     "selectAria": "Select {vehicle}",
@@ -2623,7 +2632,15 @@
     "papersMissingTitle": "Paper dates",
     "papersMissingDetail": "{count, plural, one {vehicle has} other {vehicles have}} no tax or insurance dates yet",
     "utilShort": "{pct}% rented",
-    "setPrice": "Set price"
+    "setPrice": "Set price",
+    "p_expired": "{label} expired",
+    "p_serviceLate": "Service overdue",
+    "p_due": "{label} due",
+    "p_ago": "{days, plural, one {# day} other {# days}} ago",
+    "p_in": "in {days, plural, one {# day} other {# days}}",
+    "p_today": "today",
+    "filterAll": "Show all",
+    "filterEmpty": "No vehicles in this group right now."
   },
   "customers": {
     "noRentals": "No rentals yet",
@@ -3005,7 +3022,9 @@
     "gl_condNotSet": "Condition not set",
     "fi_inWord": "Money in",
     "fi_outWord": "Costs",
-    "gl_fleetAvg": "Fleet average {percent}"
+    "gl_fleetAvg": "Fleet average {percent}",
+    "gl_checked": "checked {date}",
+    "gl_lastChecked": "Last checked {date}"
   },
   "customerPage": {
     "back": "Customers",

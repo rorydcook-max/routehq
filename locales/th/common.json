@@ -401,7 +401,15 @@
     "lateFromToday": "เริ่มวันนี้: คืนรถ {date} ตามที่จอง ลดค่าเช่า {amount}",
     "lateFromTodayPlain": "เริ่มวันนี้: คืนรถ {date} ตามที่จอง",
     "lateFromTodayMoves": "เริ่มวันนี้: เลื่อนวันชำระทุกงวดออกไป {days} วัน",
-    "lateAsBooked": "ตามที่จอง เริ่ม {date}"
+    "lateAsBooked": "ตามที่จอง เริ่ม {date}",
+    "cap_take": "ถ่ายรูป",
+    "cap_upload": "อัปโหลดรูป",
+    "cap_takeVideo": "ถ่ายวิดีโอ",
+    "cap_uploadVideo": "อัปโหลดวิดีโอ",
+    "cap_hintPhone": "เปิดกล้องของคุณ",
+    "cap_hintPhoneVideo": "เปิดกล้องของคุณ",
+    "cap_hintDesk": "หรือลากรูปมาวางที่นี่",
+    "cap_hintDeskVideo": "หรือลากวิดีโอมาวางที่นี่"
   },
   "translation": {
     "translatedFrom": "แปลจาก {language}",
@@ -1237,7 +1245,8 @@
     "secUpcoming": "กำลังจะมาถึง",
     "secDone": "จบแล้ว",
     "showAllDone": "ดูที่เสร็จแล้วทั้งหมด {count} รายการ",
-    "noCustomer": "ไม่มีลูกค้า (ยังไม่ได้กรอกลิงก์)"
+    "noCustomer": "ไม่มีลูกค้า (ยังไม่ได้กรอกลิงก์)",
+    "daysSoFar": "เช่ามาแล้ว {days} วัน"
   },
   "inbox": {
     "title": "ข้อความ",
@@ -2588,7 +2597,7 @@
     "th_vehicle": "รถ",
     "th_status": "สถานะ",
     "th_rate": "ราคา",
-    "th_onRent": "ช่วงที่ถูกเช่าใน 12 เดือนล่าสุด",
+    "th_onRent": "ถูกเช่า (12 เดือน)",
     "th_paperwork": "เอกสารรถ",
     "th_profit": "กำไร",
     "selectAria": "เลือก {vehicle}",
@@ -2632,7 +2641,15 @@
     "papersMissingTitle": "วันหมดอายุเอกสาร",
     "papersMissingDetail": "คันที่ยังไม่ได้ใส่วันภาษีหรือประกัน",
     "utilShort": "เช่า {pct}%",
-    "setPrice": "ตั้งราคา"
+    "setPrice": "ตั้งราคา",
+    "p_expired": "{label} หมดอายุ",
+    "p_serviceLate": "เลยกำหนดเช็กระยะ",
+    "p_due": "{label} ครบกำหนด",
+    "p_ago": "{days} วันที่แล้ว",
+    "p_in": "อีก {days} วัน",
+    "p_today": "วันนี้",
+    "filterAll": "ดูทั้งหมด",
+    "filterEmpty": "ตอนนี้ไม่มีรถในกลุ่มนี้"
   },
   "customers": {
     "noRentals": "ยังไม่เคยเช่า",
@@ -3014,7 +3031,9 @@
     "gl_condNotSet": "ยังไม่ระบุสภาพรถ",
     "fi_inWord": "เงินเข้า",
     "fi_outWord": "ค่าใช้จ่าย",
-    "gl_fleetAvg": "ค่าเฉลี่ยทั้งกองรถ {percent}"
+    "gl_fleetAvg": "ค่าเฉลี่ยทั้งกองรถ {percent}",
+    "gl_checked": "ตรวจเมื่อ {date}",
+    "gl_lastChecked": "ตรวจล่าสุด {date}"
   },
   "customerPage": {
     "back": "ลูกค้า",

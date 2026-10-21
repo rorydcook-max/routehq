@@ -1459,7 +1459,7 @@ aside a[class*="bg-[var(--sidebar-active)]"] {
   line-height: 1.8 !important;
 }
 
-/* ── Look G (Oct 2026): planner + widgets ─────────────────────────────────
+/* â”€â”€ Look G (Oct 2026): planner + widgets â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    Prompt for headings and big numbers, Anuphan for everything you read.
    Cards lift off the page with a soft shadow. Each colour means one thing. */
 @font-face {
@@ -1586,7 +1586,7 @@ a.card.pressable:hover {
 .tile-plum { background: var(--messages-light); color: var(--messages-ink); }
 .tile-green { background: var(--success-light); color: #1d4a31; }
 
-/* ── Look G, round 2: movement, depth and a band with some life in it ────── */
+/* â”€â”€ Look G, round 2: movement, depth and a band with some life in it â”€â”€â”€â”€â”€â”€ */
 .tile-mango { background: var(--accent-light); color: #5c3a0c; }
 .tile .tile-title, .tile-title { font-family: var(--font-display); font-weight: 600; font-size: 16px; letter-spacing: -0.005em; }
 h1, .page-hero h1 { letter-spacing: -0.02em; }
@@ -1649,7 +1649,7 @@ h2 { letter-spacing: -0.015em; }
   .content-area :is(div, section) > .card:not(.rise):nth-child(n + 6) { animation-delay: 240ms; }
 }
 
-/* ── Look G, round 3: point at something to learn more ─────────────────────
+/* â”€â”€ Look G, round 3: point at something to learn more â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    Anything with data-tip shows a small dark label above it on hover or keyboard focus.
    The element must already be positioned (relative or absolute). */
 [data-tip]::after {
@@ -1690,7 +1690,7 @@ h2 { letter-spacing: -0.015em; }
 .chart-col { border-radius: 8px; }
 .chart-col:hover { background: var(--panel-secondary); }
 
-/* ── Look G, round 4: computers get a light header ─────────────────────────
+/* â”€â”€ Look G, round 4: computers get a light header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    On a phone the band stays a block of the business colour behind the logo.
    On a computer it was a big solid slab (Rory, 12 Oct): there the page opens on
    its own background, the name in dark Prompt, the counts as white chips. */
@@ -1759,6 +1759,57 @@ h2 { letter-spacing: -0.015em; }
 @media (min-width: 1024px) {
   .hero-band [class*="bg-[var(--band-action)]"] { background: var(--primary); color: #fff; box-shadow: var(--shadow-card); }
   .hero-band [class*="bg-[var(--band-action)]"]:hover { background: var(--primary-hover); }
+}
+
+/* Fold-open rows ("Upcoming - 1 payment"): a neat chevron that turns, never the browser's black triangle.
+   Rows that bring their own icon keep it. */
+summary { list-style: none; }
+/* Number boxes (odometer, amounts) without the browser's tiny up/down arrows: nobody taps those to reach 90,124. */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+summary::-webkit-details-marker { display: none; }
+summary:not([class*="flex"]):not([class*="grid"]):not(:has(svg, i, img))::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin: 0 10px 2px 2px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 150ms ease;
+  vertical-align: middle;
+}
+details[open] > summary:not([class*="flex"]):not([class*="grid"]):not(:has(svg, i, img))::before { transform: rotate(45deg); margin-bottom: 4px; }
+
+/* On touch screens, small text links ("Back to booking", "Calendar â†’", a booking number) get a finger-sized
+   tap area without changing how they look or take up space. */
+@media (pointer: coarse) {
+  :is(main, header, nav) a[class*="text-[var(--primary)]"]:not([class*="min-h"]):not([class*="rounded"]):not([class*="py-"]):not([data-tip]) {
+    position: relative;
+  }
+  :is(main, header, nav) a[class*="text-[var(--primary)]"]:not([class*="min-h"]):not([class*="rounded"]):not([class*="py-"]):not([data-tip])::after {
+    content: "";
+    position: absolute;
+    inset: -10px -6px;
+  }
+}
+
+/* Count chips in the header that filter the page ("4 out earning"). The chosen one is solid. */
+.band-chip {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  border: 1.5px solid transparent;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+.band-chip:hover { background: rgba(255, 255, 255, 0.24); }
+.band-chip-on, .band-chip-on:hover { background: #fff; color: var(--foreground); --band-dot: var(--on-rent); --band-alert: var(--danger); }
+@media (min-width: 1024px) {
+  .hero-band .band-chip { background: #fff; color: var(--foreground); box-shadow: var(--shadow-card); }
+  .hero-band .band-chip:hover { border-color: var(--primary); }
+  .hero-band .band-chip-on, .hero-band .band-chip-on:hover { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .hero-band .band-chip-on .text-white { color: #fff; }
 }
 
 /* A sparkline's label opens below it, so it never covers the number above. */

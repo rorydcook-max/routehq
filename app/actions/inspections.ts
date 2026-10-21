@@ -518,24 +518,30 @@ export async function submitInspection(formData: FormData) {
     damageItems
   });
 
-  const { error: mediaUpdateError } = await supabase
-    .from("inspections")
-    .update({
-      photos: media.photos,
-      video_url: media.videoUrl,
-      photo_document_ids: media.photoDocumentIds,
-      video_document_ids: media.videoDocumentIds,
-      damage_items: media.damageWithPhotos,
-      damage_markers: media.damageWithPhotos
-    })
-    .eq("id", inspection.id)
-    .eq("organization_id", organizationId);
+  // These four don't depend on each other, so they go together rather than one after another.
+  const [{ error: mediaUpdateError }, , { data: vehicle }, { data: customerRow }] = await Promise.all([
+    supabase
+      .from("inspections")
+      .update({
+        photos: media.photos,
+        video_url: media.videoUrl,
+        photo_document_ids: media.photoDocumentIds,
+        video_document_ids: media.videoDocumentIds,
+        damage_items: media.damageWithPhotos,
+        damage_markers: media.damageWithPhotos
+      })
+      .eq("id", inspection.id)
+      .eq("organization_id", organizationId),
+    updateVehicleMileageIfHigher(supabase, organizationId, vehicleId, odometerReading),
+    supabase.from("vehicles").select("make, model, registration_number").eq("id", vehicleId).eq("organization_id", organizationId).maybeSingle(),
+    customerId
+      ? supabase.from("customers").select("full_name").eq("id", customerId).eq("organization_id", organizationId).maybeSingle()
+      : Promise.resolve({ data: null })
+  ]);
 
   if (mediaUpdateError) {
     throw new Error(mediaUpdateError.message);
   }
-
-  await updateVehicleMileageIfHigher(supabase, organizationId, vehicleId, odometerReading);
 
   // New damage found at a return or condition check moves the vehicle's condition down, and its estimated value with it.
   if ((mode === "return" || mode === "condition_report") && damageItems.length) {
@@ -578,24 +584,8 @@ export async function submitInspection(formData: FormData) {
     }
   }
 
-  const { data: vehicle } = await supabase
-    .from("vehicles")
-    .select("make, model, registration_number")
-    .eq("id", vehicleId)
-    .eq("organization_id", organizationId)
-    .maybeSingle();
-
-  let customerName = "Customer";
+  let customerName = (customerRow as { full_name?: string } | null)?.full_name || "Customer";
   let depositSettlement: DepositSettlement | null = null;
-  if (customerId) {
-    const { data: customer } = await supabase
-      .from("customers")
-      .select("full_name")
-      .eq("id", customerId)
-      .eq("organization_id", organizationId)
-      .maybeSingle();
-    customerName = customer?.full_name || customerName;
-  }
 
   if (isSwap && rentalId) {
     const admin = createSupabaseAdminClient() as any;

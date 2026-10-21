@@ -291,13 +291,15 @@ function VehicleListRow({ vehicle, best, comparing, selected, onSelect, href, sa
       <VehicleArt colour={vehicle.color} kind={kindFromCategory(vehicle.category as never)} model={vehicle.model} size="sm" />
       <span className="min-w-0 flex-1">
         <span className="flex items-baseline justify-between gap-3">
-          <span className="truncate text-[16px] font-bold text-[var(--foreground)]">{vehicle.plate || vehicle.label}</span>
+          {/* The name people know the car by leads; the plate and how busy it was sit underneath. */}
+          <span className="truncate text-[16px] font-bold text-[var(--foreground)]">{name || vehicle.plate || vehicle.label}</span>
           <span className={`num shrink-0 text-[17px] ${vehicle.profit >= 0 ? "text-[var(--success)]" : "text-[var(--warning)]"}`}>{money(vehicle.profit)}</span>
         </span>
         {/* "% rented" sits with the vehicle, and the figure on the right says it's profit: the bar below measures the profit. */}
         <span className="flex items-baseline justify-between gap-3">
-          <span className={`truncate ${soft}`}>
-            {name || vehicle.label} · {say("rowRented", { percent: Math.round(vehicle.utilizationRate) })}
+          <span className={`min-w-0 ${soft}`}>
+            {name && vehicle.plate ? <span className="font-mono-data whitespace-nowrap">{vehicle.plate} · </span> : null}
+            <span className="whitespace-nowrap">{say("rowRented", { percent: Math.round(vehicle.utilizationRate) })}</span>
           </span>
           <span className={`shrink-0 whitespace-nowrap ${soft}`}>{say("profit")}</span>
         </span>

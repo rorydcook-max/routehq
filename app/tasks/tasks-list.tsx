@@ -124,6 +124,14 @@ function headingOf(item: TaskListItem, today: string, tx: Tx): { title: string; 
   if (item.kind === "payment") return { title: payText(item, "collect", tx), detail: null };
   // A request nobody has made a job for: named by its kind.
   if (item.request != null) return { title: tx.say(tx.has(`request_${item.request}`) ? `request_${item.request}` : "request_other"), detail: null };
+  // An extension the customer asked for that couldn't be applied: saved as one long English sentence
+  // ("Extension to 2026-11-10 needs your answer - Name - Vehicle (another booking … is in the way)").
+  const extensionAsk = raw.match(/^Extension to (.+?) needs your answer/);
+  if (extensionAsk) {
+    const why = raw.match(/\(([^()]*in the way[^()]*)\)\s*$/);
+    return { title: tx.say("job_extension", { date: savedDate(extensionAsk[1], today, tx) }), detail: why && tx.locale === "en" ? why[1].charAt(0).toUpperCase() + why[1].slice(1) : null };
+  }
+  if (/^Request to switch to monthly/.test(raw)) return { title: tx.say("job_openEnded"), detail: null };
   // Jobs people typed themselves stay exactly as typed.
   if (!item.action) return { title: raw, detail: null };
   // Jobs the app raised are saved as English sentences; the ones it knows are said again in the reader's language.

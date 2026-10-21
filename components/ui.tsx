@@ -42,7 +42,7 @@ export function Fold({
       <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3.5 [&::-webkit-details-marker]:hidden">
         <span className="min-w-0">
           <span className="block text-[16px] font-bold tracking-[-0.01em] text-[var(--foreground)]">{title}</span>
-          {summary ? <span className={clsx("mt-0.5 block truncate", tones[tone])}>{summary}</span> : null}
+          {summary ? <span className={clsx("mt-0.5 line-clamp-2 block", tones[tone])}>{summary}</span> : null}
         </span>
         <ChevronDown className="shrink-0 text-[var(--foreground-secondary)] transition-transform group-open:rotate-180" size={22} strokeWidth={2.2} />
       </summary>

@@ -26,37 +26,52 @@ const statusTone = {
 function ComplianceBadge({ item, attention = 0 }: { item?: { key?: string; label: string; date: string; daysLeft: number } | null; attention?: number }) {
   const t = useTranslations("fleet");
   const c = useTranslations("common");
-  if (!item) return <span className="text-xs text-[var(--muted)]">{t("noDates")}</span>;
+  if (!item) return <span className="text-[13px] font-medium text-[var(--muted)]">{t("noDates")}</span>;
   const tone = item.daysLeft < 0 ? "red" : item.daysLeft <= 30 ? "amber" : "green";
   const days = Math.abs(item.daysLeft);
   // Road tax, insurance and the rest are named in the reader's language.
   const label = item.key && c.has(`paper_${item.key}`) ? c(`paper_${item.key}`) : item.label;
   const isService = item.key === "next_service_date" || item.label === "Service";
-  const text =
-    item.daysLeft < 0
-      ? isService
-        ? t("serviceOverdue", { days })
-        : t("expiredAgo", { label, days })
-      : item.daysLeft === 0
-        ? t("dueToday", { label })
-        : t("dueIn", { label, days });
-  const more = attention > 1 ? ` ${t("plusMore", { count: attention - 1 })}` : "";
-  // Wraps inside its column: "Service overdue 322 days +2 more" was running into the Profit column.
+  // Two tidy lines instead of a pill whose sentence wrapped mid-phrase:
+  // "Road tax expired" (coloured) over "53 days ago · +1 more" (quiet).
+  const what = item.daysLeft < 0 ? (isService ? t("p_serviceLate") : t("p_expired", { label })) : t("p_due", { label });
+  const when = item.daysLeft < 0 ? t("p_ago", { days }) : item.daysLeft === 0 ? t("p_today") : t("p_in", { days });
+  const colour = tone === "red" ? "var(--danger)" : tone === "amber" ? "var(--warning)" : "var(--success)";
   return (
-    <Badge tone={tone}>
-      <span className="whitespace-normal leading-snug">{text + more}</span>
-    </Badge>
+    <span className="flex min-w-0 items-start gap-2">
+      <span aria-hidden="true" className="mt-[7px] h-2 w-2 shrink-0 rounded-full" style={{ background: colour }} />
+      <span className="min-w-0 leading-tight">
+        <span className="line-clamp-2 block text-[14px] font-semibold" style={{ color: tone === "green" ? "var(--foreground)" : colour }}>{what}</span>
+        <span className="block truncate text-[13px] font-medium text-[var(--muted)]">
+          {when}
+          {attention > 1 ? ` · ${t("plusMore", { count: attention - 1 })}` : ""}
+        </span>
+      </span>
+    </span>
   );
 }
 
 const primaryButton = "primary-action pressable";
 
-export default async function FleetPage({ searchParams }: { searchParams: Promise<{ notice?: string }> }) {
-  const { notice } = await searchParams;
+type FleetFilter = "out" | "free" | "attention";
+
+export default async function FleetPage({ searchParams }: { searchParams: Promise<{ notice?: string; show?: string }> }) {
+  const { notice, show } = await searchParams;
+  const filter: FleetFilter | null = show === "out" || show === "free" || show === "attention" ? show : null;
   const userEmail = await getCurrentUserEmail();
   const organization = await getDefaultOrganization();
   const [{ vehicles }, categories] = await Promise.all([getDashboardData(), getVehicleCategories(organization.id)]);
-  const groups = groupVehiclesByKind(vehicles, categories);
+  // The counts at the top are filters: tap "4 out earning" to see just those.
+  const matches = (vehicle: (typeof vehicles)[number]) =>
+    filter === "out"
+      ? vehicle.status === "Rented"
+      : filter === "free"
+        ? vehicle.status === "Available" || Boolean(vehicle.freeUntil)
+        : filter === "attention"
+          ? (vehicle.complianceAttentionCount || 0) > 0
+          : true;
+  const allGroups = groupVehiclesByKind(vehicles, categories);
+  const groups = filter ? groupVehiclesByKind(vehicles.filter(matches), categories) : allGroups;
   // Over the plan's vehicle limit: a nudge, never a block (Rory, 11 Oct).
   const plan = planById(organization.subscription_tier);
   const over = vehiclesOverLimit(plan, vehicles.length, organization.subscription_status);
@@ -99,19 +114,32 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
             </div>
           </div>
           <div className="mt-4 flex flex-wrap gap-2 pb-6 lg:pb-0">
-            {[
-              { count: vehicles.length, label: t("bandVehicles", { count: vehicles.length }), dot: null },
-              { count: totalOut, label: t("bandOut"), dot: "var(--band-dot)" },
-              // Free is green everywhere else (the list legend, the dashboard); orange means going out.
-              { count: totalFree, label: t("bandFree"), dot: "#7ee2a8" },
-              ...(attention > 0 ? [{ count: attention, label: t("bandAttention"), dot: "var(--band-alert)" }] : [])
-            ].map((pill) => (
-              <span className="inline-flex items-center gap-1.5 rounded-2xl bg-[var(--band-soft)] px-3 py-2 text-white" key={pill.label}>
-                {pill.dot ? <Dot color={pill.dot} /> : null}
-                <span className="num text-[22px] leading-none">{pill.count}</span>
-                <span className="font-semibold">{pill.label}</span>
-              </span>
-            ))}
+            {(
+              [
+                { key: null, count: vehicles.length, label: t("bandVehicles", { count: vehicles.length }), dot: null },
+                { key: "out", count: totalOut, label: t("bandOut"), dot: "var(--band-dot)" },
+                // Free is green everywhere else (the list legend, the dashboard); orange means going out.
+                { key: "free", count: totalFree, label: t("bandFree"), dot: "#7ee2a8" },
+                ...(attention > 0 ? [{ key: "attention", count: attention, label: t("bandAttention"), dot: "var(--band-alert)" }] : [])
+              ] as Array<{ key: FleetFilter | null; count: number; label: string; dot: string | null }>
+            ).map((pill) => {
+              const active = pill.key === filter;
+              // Tapping the active filter again clears it.
+              const href = pill.key && !active ? `/fleet?show=${pill.key}` : "/fleet";
+              return (
+                <Link
+                  aria-current={active ? "true" : undefined}
+                  className={`band-chip pressable inline-flex min-h-11 items-center gap-1.5 rounded-2xl px-3 py-2 ${active ? "band-chip-on" : ""}`}
+                  href={href as never}
+                  key={pill.label}
+                  scroll={false}
+                >
+                  {pill.dot ? <Dot color={pill.dot} /> : null}
+                  <span className="num text-[22px] leading-none">{pill.count}</span>
+                  <span className="font-semibold">{pill.label}</span>
+                </Link>
+              );
+            })}
           </div>
         </div>
       }
@@ -148,8 +176,8 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
               <span className="font-semibold">{t("papersOkDetail")}</span>
             </span>
           )}
-          {groups.length > 1
-            ? groups.map((group) => (
+          {allGroups.length > 1
+            ? allGroups.map((group) => (
                 <div className="hidden lg:block" key={`tile-${group.kind}`}>
                 <a className="card pressable tile h-full p-4 text-[var(--foreground)]" href={`#${group.kind}`}>
                   <span className="flex items-center justify-between gap-2">
@@ -198,9 +226,9 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
         </div>
       ) : null}
 
-      {groups.length > 1 ? (
+      {allGroups.length > 1 && !filter ? (
         <div className="mb-5 grid grid-cols-2 gap-3 lg:hidden">
-          {groups.map((group) => (
+          {allGroups.map((group) => (
             <a
               className="card pressable flex items-start gap-3 p-4 transition"
               href={`#${group.kind}`}
@@ -219,6 +247,15 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
 
       <FleetBulkActions archiveAction={bulkArchiveVehicles} deleteAction={bulkDeleteVehicles} organizationId={organization.id} />
 
+      {filter && groups.length === 0 ? (
+        <div className="card flex flex-wrap items-center justify-between gap-3 p-5">
+          <p className="font-semibold text-[var(--foreground-secondary)]">{t("filterEmpty")}</p>
+          <Link className="pressable inline-flex min-h-11 items-center rounded-full border border-[var(--border)] bg-white px-5 font-bold text-[var(--foreground)]" href="/fleet">
+            {t("filterAll")}
+          </Link>
+        </div>
+      ) : null}
+
       <div className="space-y-5">
         {groups.map((group) => (
           <section className="card scroll-mt-4 overflow-hidden" id={group.kind} key={group.kind}>
@@ -236,7 +273,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
             <div className="hidden overflow-x-auto lg:block">
               <table className="w-full table-fixed text-left text-sm">
                 <thead>
-                  <tr className="border-b border-[var(--border)] text-[var(--muted)]">
+                  <tr className="whitespace-nowrap border-b border-[var(--border)] text-[13px] font-semibold text-[var(--muted)]">
                     <th className="w-10 py-2.5 pl-4 pr-2"><span className="sr-only">{t("select")}</span></th>
                     <th className="py-2.5 pr-3">{t("th_vehicle")}</th>
                     {/* Status fits "Free until 8 Nov" on one line; paperwork gets the room for its chip, so rows stay one or two lines tall. */}
@@ -244,7 +281,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                     <th className="w-[116px] px-3 py-2.5">{t("th_rate")}</th>
                     <th className="w-[140px] px-3 py-2.5 xl:w-[160px]">{t("th_onRent")}</th>
                     <th className="w-[190px] px-3 py-2.5 xl:w-[230px]">{t("th_paperwork")}</th>
-                    <th className="hidden w-[120px] px-3 py-2.5 pr-4 xl:table-cell">{t("th_profit")}</th>
+                    <th className="hidden w-[120px] py-2.5 pl-3 pr-5 text-right xl:table-cell">{t("th_profit")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -294,7 +331,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                         <td className="px-3 py-3">
                           <ComplianceBadge attention={vehicle.complianceAttentionCount} item={vehicle.complianceNext} />
                         </td>
-                        <td className="hidden px-3 py-3 xl:table-cell">
+                        <td className="hidden py-3 pl-3 pr-5 text-right xl:table-cell">
                           <span className={`font-mono-data ${vehicle.profit < 0 ? "text-[var(--danger)]" : ""}`}>{money(vehicle.profit)}</span>
                         </td>
                       </tr>

@@ -766,10 +766,19 @@ export function BookingForm({
                   <div className="flex items-start gap-3">
                     <span className="shrink-0 lg:hidden"><VehicleArt colour={(vehicle as any).color} kind={kindFromCategory({ code: String(vehicle.category_code || ""), name: "" })} model={vehicle.model} size="sm" /></span>
                     <span className="hidden shrink-0 lg:block"><VehicleArt colour={(vehicle as any).color} kind={kindFromCategory({ code: String(vehicle.category_code || ""), name: "" })} model={vehicle.model} size="md" /></span>
-                    <span className="min-w-0">
-                      <span className="block text-lg font-semibold text-[var(--foreground)]">{vehicleTitle(vehicle)}</span>
-                      <span className="font-mono-data block text-sm font-bold text-[var(--muted)]">{vehicle.registration_number}</span>
-                      <span className="mt-2 flex flex-wrap gap-2">
+                    {/* Three tight lines: name, plate and price, then where it stands. A list of 13 cars used to be eight screens long. */}
+                    <span className="min-w-0 flex-1">
+                      <span className="line-clamp-2 block text-[17px] font-bold leading-tight text-[var(--foreground)]">{vehicleTitle(vehicle)}</span>
+                      <span className="mt-0.5 flex flex-wrap items-baseline gap-x-1.5 text-[14px] font-medium text-[var(--foreground-secondary)]">
+                        <span className="font-mono-data whitespace-nowrap font-bold text-[var(--muted)]">{vehicle.registration_number}</span>
+                        {/* The prices most bookings of this vehicle use. */}
+                        {vehicle.daily_rate > 0 || vehicle.monthly_rate > 0 ? (
+                          <span className="whitespace-nowrap font-semibold">· {[vehicle.daily_rate > 0 ? say("per_daily", { amount: money(vehicle.daily_rate, currency) }) : null, vehicle.monthly_rate > 0 ? say("perMonth", { amount: money(vehicle.monthly_rate, currency) }) : null].filter(Boolean).join(" · ")}</span>
+                        ) : Number(vehicle.weekly_rate || 0) > 0 ? null : (
+                          <span className="whitespace-nowrap text-[var(--muted)]">· {say("noPriceYet")}</span>
+                        )}
+                      </span>
+                      <span className="mt-1.5 flex flex-wrap gap-2">
                         {(() => {
                           const note = disabled ? null : availabilityNote(busyPeriods[vehicle.id] || [], businessToday(), say, locale);
                           return (
@@ -779,14 +788,6 @@ export function BookingForm({
                           );
                         })()}
                       </span>
-                      {/* The prices most bookings of this vehicle use. */}
-                      {vehicle.daily_rate > 0 || vehicle.monthly_rate > 0 ? (
-                        <span className="mt-1.5 block font-semibold text-[var(--foreground-secondary)]">
-                          {[vehicle.daily_rate > 0 ? say("per_daily", { amount: money(vehicle.daily_rate, currency) }) : null, vehicle.monthly_rate > 0 ? say("perMonth", { amount: money(vehicle.monthly_rate, currency) }) : null].filter(Boolean).join(" · ")}
-                        </span>
-                      ) : Number(vehicle.weekly_rate || 0) > 0 ? null : (
-                        <span className="mt-1.5 block text-sm font-medium text-[var(--muted)]">{say("noPriceYet")}</span>
-                      )}
                     </span>
                   </div>
                 </button>

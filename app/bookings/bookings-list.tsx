@@ -119,7 +119,8 @@ function rentalTimingLabel(booking: any, tx: Tx) {
     if (status !== "booked") return null;
     return tx.say("handoverOverdue", { days: -days });
   }
-  if (!booking.end_date) return tx.say("openEnded");
+  // The dates line already says "open-ended"; this line says how long it has been out.
+  if (!booking.end_date) return booking.start_date ? tx.say("daysSoFar", { days: Math.max(1, -daysFromToday(booking.start_date)) }) : tx.say("openEnded");
   const days = daysFromToday(booking.end_date);
   if (days < 0) return tx.say("returnLate", { days: -days });
   if (days === 0) return tx.say("dueBackToday");

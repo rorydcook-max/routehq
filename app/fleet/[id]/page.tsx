@@ -237,8 +237,12 @@ function Glance({ detail, isOwner }: { detail: VehicleDetail; isOwner: boolean }
         <span className="tile-title">{tx.say("g_mileage")}</span>
         <span className="num text-[22px] leading-none text-[var(--foreground)]">{tx.say("km", { km: Number(detail.vehicle.mileage || 0).toLocaleString("en-US") })}</span>
         <span className={`font-semibold ${byDamage ? toneText.amber : toneText.neutral}`}>
-          {condition?.value ? tx.say(`cond_${condition.value}`) : tx.say("gl_condNotSet")}
-          {latestInspection?.inspected_at ? ` · ${formatDate(latestInspection.inspected_at, tx)}` : ""}
+          {/* "Good · checked 3 Oct 2026", or just "Last checked 3 Oct 2026"; never "Condition not set · 3 Oct". */}
+          {condition?.value
+            ? `${tx.say(`cond_${condition.value}`)}${latestInspection?.inspected_at ? ` · ${tx.say("gl_checked", { date: formatDate(latestInspection.inspected_at, tx) })}` : ""}`
+            : latestInspection?.inspected_at
+              ? tx.say("gl_lastChecked", { date: formatDate(latestInspection.inspected_at, tx) })
+              : tx.say("gl_condNotSet")}
         </span>
       </a>
     </div>

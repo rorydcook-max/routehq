@@ -685,6 +685,8 @@ const copy = {
     customCountry: "Type your country",
     customRegion: "Type your province or region",
     customTown: "Type your town or area",
+    choose: "Choose…",
+    chooseRegionFirst: "Choose the province first",
     fleetType: "What you rent out",
     fleetSize: "How many vehicles",
     primaryLanguage: "Language",
@@ -743,6 +745,8 @@ const copy = {
     customCountry: "พิมพ์ชื่อประเทศ",
     customRegion: "พิมพ์ชื่อจังหวัดหรือภูมิภาค",
     customTown: "พิมพ์ชื่อเมืองหรือย่าน",
+    choose: "เลือก…",
+    chooseRegionFirst: "เลือกจังหวัดก่อน",
     fleetType: "คุณให้เช่าอะไร",
     fleetSize: "มีรถกี่คัน",
     primaryLanguage: "ภาษา",
@@ -858,8 +862,9 @@ export function OnboardingWizard({
     businessName: organization.name || "",
     businessPhone: String((organization as { business_phone?: string | null }).business_phone || ""),
     country: savedLocation.country || "Thailand",
-    region: savedLocation.region || "Surat Thani",
-    town: savedLocation.town || organization.settings?.location || "Koh Samui",
+    // Chosen by the owner, not assumed: a Phuket or Bangkok business used to start on Koh Samui.
+    region: savedLocation.region || "",
+    town: savedLocation.town || organization.settings?.location || "",
     customCountry: "",
     customRegion: "",
     customTown: "",
@@ -993,8 +998,10 @@ export function OnboardingWizard({
                         className={fieldClass}
                         onChange={(event) => {
                           const nextCountry = event.target.value;
-                          const nextRegion = regionOptions(nextCountry)[0]?.name || "Other";
-                          const nextTown = townOptions(nextCountry, nextRegion)[0] || "Other";
+                          // A country with no provinces listed goes straight to typing them; otherwise they pick.
+                          const listed = regionOptions(nextCountry).filter((option) => option.name !== "Other");
+                          const nextRegion = listed.length ? "" : "Other";
+                          const nextTown = listed.length ? "" : "Other";
                           setProfile({ ...profile, country: nextCountry, region: nextRegion, town: nextTown });
                         }}
                         value={profile.country}
@@ -1013,11 +1020,14 @@ export function OnboardingWizard({
                         className={fieldClass}
                         onChange={(event) => {
                           const nextRegion = event.target.value;
-                          const nextTown = townOptions(profile.country, nextRegion)[0] || "Other";
+                          // One town in the province (or "Other"): it is the answer. Several: they pick.
+                          const towns = townOptions(profile.country, nextRegion);
+                          const nextTown = nextRegion === "Other" ? "Other" : towns.length === 1 ? towns[0] : "";
                           setProfile({ ...profile, region: nextRegion, town: nextTown });
                         }}
                         value={profile.region}
                       >
+                        {!profile.region ? <option disabled value="">{t.choose}</option> : null}
                         {currentRegions.map((region) => (
                           <option key={region.name} value={region.name}>
                             {localizedLocationLabel(region.name, profile.language)}
@@ -1027,7 +1037,8 @@ export function OnboardingWizard({
                     </label>
                     <label className="block">
                       <span className={labelClass}>{t.town}</span>
-                      <select className={fieldClass} onChange={(event) => setProfile({ ...profile, town: event.target.value })} value={profile.town}>
+                      <select className={fieldClass} disabled={!profile.region} onChange={(event) => setProfile({ ...profile, town: event.target.value })} value={profile.town}>
+                        {!profile.town ? <option disabled value="">{profile.region ? t.choose : t.chooseRegionFirst}</option> : null}
                         {currentTowns.map((town) => (
                           <option key={town} value={town}>
                             {localizedLocationLabel(town, profile.language)}
@@ -1047,7 +1058,7 @@ export function OnboardingWizard({
                 <ChoiceGrid label={t.fleetType} onChange={(fleetType) => setProfile({ ...profile, fleetType })} options={fleetTypeOptions} value={profile.fleetType} />
                 <ChoiceGrid label={t.fleetSize} onChange={(fleetSize) => setProfile({ ...profile, fleetSize })} options={fleetSizeOptions} value={profile.fleetSize} />
               </div>
-              <FooterActions error={error} onPrimary={submitBusinessProfile} pending={isPending || profile.businessName.trim().length < 2} primaryLabel={t.continue} savingLabel={isPending ? t.saving : t.continue} />
+              <FooterActions error={error} onPrimary={submitBusinessProfile} pending={isPending || profile.businessName.trim().length < 2 || !selectedRegion.trim() || !selectedTown.trim()} primaryLabel={t.continue} savingLabel={isPending ? t.saving : t.continue} />
             </div>
           ) : null}
 

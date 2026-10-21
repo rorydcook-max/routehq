@@ -594,6 +594,16 @@ export function VehicleIdentityFields({
                       autoFocus
                       className="w-full"
                       onChange={(event) => setMakeSearch(event.target.value)}
+                      onKeyDown={(event) => {
+                        // Enter picks the top match (it used to try to submit the whole form); Escape closes the list.
+                        if (event.key === "Enter") {
+                          event.preventDefault();
+                          if (searchedMakes[0]) handleMakeSelect(searchedMakes[0].id);
+                        } else if (event.key === "Escape") {
+                          event.preventDefault();
+                          setMakeDropdownOpen(false);
+                        }
+                      }}
                       placeholder={say("makeSearch")}
                       value={makeSearch}
                     />

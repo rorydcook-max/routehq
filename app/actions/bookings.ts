@@ -1030,7 +1030,7 @@ export async function deleteBooking(rentalId: string): Promise<{ success: boolea
   return { success: true };
 }
 
-export async function manuallyActivateRental(rentalId: string, earlyStart?: string, lateStart?: string): Promise<{ success: boolean; error?: string }> {
+export async function manuallyActivateRental(rentalId: string, earlyStart?: string, lateStart?: string, customerName?: string): Promise<{ success: boolean; error?: string }> {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
     data: { user }
@@ -1051,6 +1051,21 @@ export async function manuallyActivateRental(rentalId: string, earlyStart?: stri
   if (rentalError || !rental) return { success: false, error: rentalError?.message || "Rental not found." };
 
   await ensureMembership(supabase, rental.organization_id, user.id);
+
+  // Going out before the customer filled in their link: the name typed here becomes the customer, so the rent
+  // schedule can be written and anything unpaid shows as owed. (The link later fills in this same record.)
+  if (!rental.customer_id) {
+    const name = String(customerName || "").trim();
+    if (!name) return { success: false, error: await said("Add the customer's name to hand over.") };
+    const { data: created, error: customerError } = await supabase.from("customers").insert({ organization_id: rental.organization_id, full_name: name }).select("id").single();
+    if (customerError || !created?.id) return { success: false, error: customerError?.message || "The customer could not be added." };
+    rental.customer_id = created.id;
+    await Promise.all([
+      supabase.from("rentals").update({ customer_id: created.id }).eq("id", cleanId).eq("organization_id", rental.organization_id),
+      supabase.from("booking_links").update({ customer_id: created.id }).eq("rental_id", cleanId).is("customer_id", null),
+      supabase.from("contracts").update({ customer_id: created.id }).eq("rental_id", cleanId).is("customer_id", null)
+    ]);
+  }
 
   // Handed over before the booked start date: the rental starts today, and the extra days are charged, the
   // booking keeps its length, or they're free, as the owner chose (as with the form).

@@ -2331,7 +2331,8 @@
     "track_atHandover": "เก็บ {amount} ตอนส่งมอบรถ",
     "grp_atHandover": "เก็บตอนส่งมอบรถ — {count} รายการ",
     "pc_b_atHandover": "ตอนส่งมอบ",
-    "hist_late_start": "ส่งมอบรถล่าช้า"
+    "hist_late_start": "ส่งมอบรถล่าช้า",
+    "skip_customerName": "ใครรับรถ? (ชื่อลูกค้า)"
   },
   "newBooking": {
     "pageBack": "กลับไปที่การจอง",

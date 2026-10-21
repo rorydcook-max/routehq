@@ -926,7 +926,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                       >
                         {tx.say("fillHandover")}
                       </Link>
-                      <SkipInspectionButton canWaive={isOwner} early={earlyStartFor(rental, vehicle, businessToday())} late={lateStartFor(rental, businessToday())} rentalId={rental.id} />
+                      <SkipInspectionButton canWaive={isOwner} early={earlyStartFor(rental, vehicle, businessToday())} late={lateStartFor(rental, businessToday())} needsName={!rental.customer_id} rentalId={rental.id} />
                     </div>
                   </div>
                 ) : isRetrospective ? (
@@ -956,7 +956,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     <Link className="primary-action pressable block w-full px-3 py-2 text-center" href={`/inspections/delivery/${rental.id}` as Route}>
                       {tx.say("startHandover")}
                     </Link>
-                    <SkipInspectionButton canWaive={isOwner} early={earlyStartFor(rental, vehicle, businessToday())} late={lateStartFor(rental, businessToday())} rentalId={rental.id} />
+                    <SkipInspectionButton canWaive={isOwner} early={earlyStartFor(rental, vehicle, businessToday())} late={lateStartFor(rental, businessToday())} needsName={!rental.customer_id} rentalId={rental.id} />
                   </div>
                 ) : rental.status === "completed" ? (
                   <div className="sub-surface p-3">

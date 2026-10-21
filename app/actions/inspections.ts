@@ -2,6 +2,7 @@
 
 import { businessToday } from "@/lib/business-time";
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { redirect } from "next/navigation";
 import { applyDepositDeduction, returnDeposit } from "@/app/actions/deposits";
 import { activateRental } from "@/lib/rental-activation";
@@ -10,6 +11,7 @@ import { billRentalCustomer } from "@/lib/charges";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { afterDamage, asCondition, valueForCondition } from "@/lib/vehicle-condition";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseClientAsUser } from "@/lib/supabase/as-user";
 import { notifyOperator } from "@/lib/notify-operator";
 import { earlyReturnOwed, earlyReturnSuggestion } from "@/lib/early-return";
 import { tellRentalCustomer } from "@/lib/customer-messages";
@@ -634,6 +636,24 @@ export async function submitInspection(formData: FormData) {
       .eq("organization_id", organizationId)
       .maybeSingle();
     const handoverDate = todayDate();
+    // Handed over before the customer filled in their link (a walk-in, a paper contract): the name they signed
+    // with becomes the customer, so the rent schedule can be written and anything unpaid shows as owed. When
+    // they open the link later, it fills in this same record rather than starting another.
+    if (bookedRental && !bookedRental.customer_id && customerSignedName) {
+      const { data: created } = await supabase
+        .from("customers")
+        .insert({ organization_id: organizationId, full_name: customerSignedName })
+        .select("id")
+        .single();
+      if (created?.id) {
+        bookedRental.customer_id = created.id;
+        await Promise.all([
+          supabase.from("rentals").update({ customer_id: created.id }).eq("id", rentalId).eq("organization_id", organizationId),
+          supabase.from("booking_links").update({ customer_id: created.id }).eq("rental_id", rentalId).is("customer_id", null),
+          supabase.from("contracts").update({ customer_id: created.id }).eq("rental_id", rentalId).is("customer_id", null)
+        ]);
+      }
+    }
     const startsEarly = bookedRental?.start_date && handoverDate < String(bookedRental.start_date).slice(0, 10);
     // Early: the extra days are charged, the booking keeps its length, or they're free, as the owner chose at the start.
     let early = null as ReturnType<typeof earlyStartFor>;
@@ -679,7 +699,7 @@ export async function submitInspection(formData: FormData) {
         status: "rented",
         availability_status: "rented",
         current_rental_id: rentalId,
-        current_customer_id: customerId
+        current_customer_id: bookedRental?.customer_id || customerId
       })
       .eq("id", vehicleId)
       .eq("organization_id", organizationId);
@@ -940,8 +960,13 @@ export async function submitInspection(formData: FormData) {
   });
 
   if ((mode === "delivery" || mode === "return") && rentalId && customerSignature) {
-    await finaliseInspectionReport({
-      supabase,
+    // The signed report is a PDF that takes several seconds to draw. It is made just after the reply, so the
+    // person handing over isn't left on "Saving…" with the customer waiting; the booking shows it moments later.
+    // After the reply the session's cookies are gone, so it acts as this person with the token taken now
+    // (the report records who signed it off). Without a token it is made before the reply, as before.
+    const accessToken = (await supabase.auth.getSession()).data.session?.access_token || null;
+    const reportInput = {
+      supabase: accessToken ? createSupabaseClientAsUser(accessToken) : supabase,
       organizationId,
       inspectionId: inspection.id,
       rentalId,
@@ -959,7 +984,16 @@ export async function submitInspection(formData: FormData) {
       depositSettlement,
       swap: isSwap,
       photos: media.photos
-    });
+    };
+    const makeReport = async () => {
+      try {
+        await finaliseInspectionReport(reportInput as Parameters<typeof finaliseInspectionReport>[0]);
+      } catch (error) {
+        console.error("inspection report failed", error);
+      }
+    };
+    if (accessToken) after(makeReport);
+    else await makeReport();
   }
 
   if (mode === "return" && !isSwap) {

@@ -47,7 +47,7 @@ function bestMatchTransaction(transactions: any[], usedIds: Set<string>, dueDate
 export async function activateRental(rentalId: string, supabase: SupabaseClient): Promise<void> {
   const { data: rental, error } = await (supabase as any)
     .from("rentals")
-    .select("id, organization_id, customer_id, vehicle_id, start_date, end_date, rental_rate, pricing_model, billing_interval, currency, status, extras, extras_total")
+    .select("id, organization_id, customer_id, vehicle_id, start_date, end_date, rental_rate, pricing_model, billing_interval, currency, status, extras, extras_total, deposit_amount, deposit_payment_amount, deposit_status, deposit_held")
     .eq("id", rentalId)
     .is("deleted_at", null)
     .maybeSingle();
@@ -85,6 +85,7 @@ export async function activateRental(rentalId: string, supabase: SupabaseClient)
   }
   const extrasPayment = await addExtrasPayment(rental, existingRentPayments, newPayments.length > 0 || existingRentPayments.length > 0, supabase);
   if (extrasPayment) newPayments.push(extrasPayment);
+  await addDepositPayment(rental, existingPayRows || [], supabase);
 
   // Try to match existing unmatched payments to income transactions
   await matchPaymentsToTransactions(rental, existingRentPayments, supabase);
@@ -207,6 +208,33 @@ async function generatePaymentScheduleInternal(
   }
 
   return inserted || [];
+}
+
+/**
+ * The deposit agreed on the booking, as a payment due at the handover, when none was taken and none is on the
+ * schedule. The customer's link writes it when they sign; a vehicle that goes out before they do (a walk-in, a
+ * paper contract) had no deposit to collect anywhere.
+ */
+async function addDepositPayment(rental: any, allPayments: any[], supabase: SupabaseClient): Promise<void> {
+  const amount = Number(rental.deposit_payment_amount || rental.deposit_amount || 0);
+  if (!(amount > 0) || !rental.customer_id || !rental.vehicle_id) return;
+  if (Number(rental.deposit_held || 0) > 0 || ["received", "partially_returned", "fully_returned", "forfeited", "partially_forfeited"].includes(String(rental.deposit_status || ""))) return;
+  const hasDeposit = allPayments.some((p: any) => !p.voided && !p.metadata?.voided && p.status !== "voided" && (p.metadata?.type === "deposit" || p.metadata?.is_deposit === true));
+  if (hasDeposit) return;
+  const today = businessToday();
+  const { error } = await (supabase as any).from("rental_payments").insert({
+    organization_id: rental.organization_id,
+    rental_id: rental.id,
+    customer_id: rental.customer_id,
+    vehicle_id: rental.vehicle_id,
+    amount,
+    currency: rental.currency || "THB",
+    scheduled_date: today,
+    due_date: today,
+    status: "pending",
+    metadata: { type: "deposit", is_deposit: true, description: "Security deposit", auto_generated: true }
+  });
+  if (error) console.error("activateRental: failed to add deposit payment:", error.message);
 }
 
 /** Paid extras picked on the booking: one payment, due on the first day, added once. */

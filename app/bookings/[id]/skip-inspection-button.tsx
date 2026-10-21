@@ -8,7 +8,8 @@ import type { LateStart, LateStartChoice } from "@/lib/late-start";
 import { longDate } from "@/lib/i18n/dates";
 import { useLocale } from "next-intl";
 
-export function SkipInspectionButton({ rentalId, early = null, late = null, canWaive = true }: { rentalId: string; early?: EarlyStart | null; late?: LateStart | null; canWaive?: boolean }) {
+export function SkipInspectionButton({ rentalId, early = null, late = null, canWaive = true, needsName = false }: { rentalId: string; early?: EarlyStart | null; late?: LateStart | null; canWaive?: boolean; /** No customer on the booking yet: ask who is taking it. */ needsName?: boolean }) {
+  const [customerName, setCustomerName] = useState("");
   const say = useTranslations("booking") as unknown as (key: string) => string;
   const ask = useTranslations("inspection") as unknown as (key: string, values?: Record<string, string | number>) => string;
   const locale = useLocale();
@@ -21,7 +22,7 @@ export function SkipInspectionButton({ rentalId, early = null, late = null, canW
   function handleConfirm() {
     setError(null);
     startTransition(async () => {
-      const result = await manuallyActivateRental(rentalId, early ? earlyChoice : undefined, late ? lateChoice : undefined);
+      const result = await manuallyActivateRental(rentalId, early ? earlyChoice : undefined, late ? lateChoice : undefined, needsName ? customerName : undefined);
       if (!result.success) {
         setError(result.error || say("skip_failed"));
         setShowConfirm(false);
@@ -54,6 +55,12 @@ export function SkipInspectionButton({ rentalId, early = null, late = null, canW
             </div>
           </fieldset>
         ) : null}
+        {needsName ? (
+          <label className="mb-3 block">
+            <span className="text-xs font-bold text-[var(--foreground)]">{say("skip_customerName")}</span>
+            <input autoFocus className="mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm" onChange={(event) => setCustomerName(event.target.value)} value={customerName} />
+          </label>
+        ) : null}
         {late ? (
           <fieldset className="mb-3">
             <legend className="text-xs font-bold text-[var(--foreground)]">{ask("lateTitle", { days: late.days, date: longDate(late.bookedStart, locale) })}</legend>
@@ -82,7 +89,7 @@ export function SkipInspectionButton({ rentalId, early = null, late = null, canW
         <div className="flex gap-2">
           <button
             className="pressable inline-flex min-h-7 items-center rounded-full bg-[var(--warning)] px-3 text-xs font-bold text-white disabled:opacity-60"
-            disabled={isPending}
+            disabled={isPending || (needsName && customerName.trim().length < 2)}
             onClick={handleConfirm}
             type="button"
           >

@@ -2322,7 +2322,8 @@
     "track_atHandover": "{amount} to collect at handover",
     "grp_atHandover": "To collect at handover — {count, plural, one {# payment} other {# payments}}",
     "pc_b_atHandover": "At handover",
-    "hist_late_start": "Handed over late"
+    "hist_late_start": "Handed over late",
+    "skip_customerName": "Who is taking it? (customer's name)"
   },
   "newBooking": {
     "pageBack": "Back to bookings",

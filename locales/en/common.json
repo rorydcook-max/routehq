@@ -4738,7 +4738,7 @@
     "title": "Partners",
     "subtitle": "Nothing free? Send the customer to a partner. They rent as normal and pay you a one-time finder's fee of {pct}% of the first rent.",
     "offTitle": "The partner network is off",
-    "offBody": "Switch it on to see partners' free vehicles and send customers to them, and to take customers partners send you. Finder's fee: {pct}% of the first rent, one time.",
+    "offBody": "Switch it on to see partners' free vehicles, send customers to them, and take customers they send you.",
     "turnOn": "Turn it on in Settings",
     "findTitle": "What does the customer want?",
     "findBody": "Partners' vehicles that are free for these dates, with their prices.",

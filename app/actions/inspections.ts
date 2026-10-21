@@ -104,66 +104,67 @@ async function uploadInspectionMedia({
     }
   }
 
-  for (const item of media) {
-    const { key, storagePath } = item;
-    const value = { name: item.name, type: item.type, size: item.size };
-    const isVideo = key === "walkaroundVideo" || value.type.startsWith("video/");
-    const isPhoto = key.startsWith("photo_") || key.startsWith("damagePhoto_") || value.type.startsWith("image/");
-    if (!isVideo && !isPhoto) {
+  // Every photo and video is handled together: one round trip each for uploads sent inside the form, then one
+  // insert for all their records. (One at a time, a handover with seven photos waited on a dozen trips in a row.)
+  const items = media
+    .map((item) => {
+      const isVideo = item.key === "walkaroundVideo" || item.type.startsWith("video/");
+      const isPhoto = item.key.startsWith("photo_") || item.key.startsWith("damagePhoto_") || item.type.startsWith("image/");
+      return isVideo || isPhoto ? { ...item, isVideo, documentId: crypto.randomUUID() } : null;
+    })
+    .filter(Boolean) as Array<(typeof media)[number] & { isVideo: boolean; documentId: string }>;
+
+  await Promise.all(
+    items
+      .filter((item) => item.file)
+      .map(async (item) => {
+        const { error: uploadError } = await supabase.storage.from("documents").upload(item.storagePath, item.file, {
+          contentType: item.type || undefined,
+          upsert: false
+        });
+        if (uploadError) throw new Error(uploadError.message);
+      })
+  );
+
+  if (items.length) {
+    const { error: documentError } = await supabase.from("documents").insert(
+      items.map((item) => {
+        const category = item.isVideo ? "inspection_video" : `inspection_${mediaTypeFromField(item.key)}`;
+        return {
+          id: item.documentId,
+          organization_id: organizationId,
+          owner_type: "inspection",
+          owner_id: inspectionId,
+          storage_bucket: "documents",
+          storage_path: item.storagePath,
+          file_name: item.name || `${category}.upload`,
+          mime_type: item.type || null,
+          size_bytes: item.size,
+          category,
+          ocr_status: "not_started",
+          extracted_data: {},
+          uploaded_by: userId
+        };
+      })
+    );
+    if (documentError) throw new Error(documentError.message);
+  }
+
+  for (const item of items) {
+    if (item.isVideo) {
+      videoUrl = item.storagePath;
+      videoDocumentIds.push(item.documentId);
       continue;
     }
-
-    if (item.file) {
-      const { error: uploadError } = await supabase.storage.from("documents").upload(storagePath, item.file, {
-        contentType: value.type || undefined,
-        upsert: false
-      });
-      if (uploadError) {
-        throw new Error(uploadError.message);
-      }
-    }
-
-    const category = isVideo ? "inspection_video" : `inspection_${mediaTypeFromField(key)}`;
-    const { data: document, error: documentError } = await supabase
-      .from("documents")
-      .insert({
-        organization_id: organizationId,
-        owner_type: "inspection",
-        owner_id: inspectionId,
-        storage_bucket: "documents",
-        storage_path: storagePath,
-        file_name: value.name || `${category}.upload`,
-        mime_type: value.type || null,
-        size_bytes: value.size,
-        category,
-        ocr_status: "not_started",
-        extracted_data: {},
-        uploaded_by: userId
-      })
-      .select("id")
-      .single();
-
-    if (documentError) {
-      throw new Error(documentError.message);
-    }
-
-    if (isVideo) {
-      videoUrl = storagePath;
-      videoDocumentIds.push(document.id);
-    } else {
-      const photo = {
-        id: crypto.randomUUID(),
-        type: mediaTypeFromField(key),
-        url: storagePath,
-        thumbnail_url: storagePath,
-        captured_at: new Date().toISOString()
-      };
-      photos.push(photo);
-      photoDocumentIds.push(document.id);
-      if (key.startsWith("damagePhoto_")) {
-        damagePhotoPaths.set(key.replace("damagePhoto_", ""), storagePath);
-      }
-    }
+    photos.push({
+      id: crypto.randomUUID(),
+      type: mediaTypeFromField(item.key),
+      url: item.storagePath,
+      thumbnail_url: item.storagePath,
+      captured_at: new Date().toISOString()
+    });
+    photoDocumentIds.push(item.documentId);
+    if (item.key.startsWith("damagePhoto_")) damagePhotoPaths.set(item.key.replace("damagePhoto_", ""), item.storagePath);
   }
 
   const damageWithPhotos = damageItems.map((item) => ({

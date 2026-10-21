@@ -45,7 +45,8 @@ export async function createSignedUploads(prefix: string, files: UploadRequest[]
   if (files.length > MAX_FILES) throw new Error(`Too many files (${files.length}). The limit is ${MAX_FILES}.`);
   const admin = createSupabaseAdminClient() as any;
   const batch = crypto.randomUUID();
-  const signed: SignedUpload[] = [];
+  // Every file is checked first (so a bad one stops the lot), then all the upload links are made at once.
+  const planned: Array<{ field: string; path: string }> = [];
   for (const file of files) {
     const field = safeField(file.field);
     if (!field) throw new Error("Each upload needs a field name.");
@@ -60,12 +61,15 @@ export async function createSignedUploads(prefix: string, files: UploadRequest[]
     if (!/^(image|video)\//.test(file.type) && file.type !== "application/pdf") {
       throw new Error(`${file.name || "A file"} is not a photo, video or PDF.`);
     }
-    const path = `${prefix}/${batch}/${field}-${safeName(file.name)}`;
-    const { data, error } = await admin.storage.from(UPLOAD_BUCKET).createSignedUploadUrl(path);
-    if (error || !data?.token) throw new Error(error?.message || "Could not prepare the upload.");
-    signed.push({ field, path, token: data.token });
+    planned.push({ field, path: `${prefix}/${batch}/${field}-${safeName(file.name)}` });
   }
-  return signed;
+  return Promise.all(
+    planned.map(async ({ field, path }) => {
+      const { data, error } = await admin.storage.from(UPLOAD_BUCKET).createSignedUploadUrl(path);
+      if (error || !data?.token) throw new Error(error?.message || "Could not prepare the upload.");
+      return { field, path, token: data.token as string };
+    })
+  );
 }
 
 /**
@@ -81,24 +85,26 @@ export async function readUploadedFiles(formData: FormData, prefix: string): Pro
   }
   if (!Array.isArray(parsed)) return [];
   const admin = createSupabaseAdminClient() as any;
-  const files: UploadedFile[] = [];
-  for (const entry of parsed.slice(0, MAX_FILES)) {
-    const path = String(entry?.path || "");
-    if (!path.startsWith(`${prefix}/`) || path.includes("..")) continue;
-    const folder = path.slice(0, path.lastIndexOf("/"));
-    const fileName = path.slice(path.lastIndexOf("/") + 1);
-    const { data } = await admin.storage.from(UPLOAD_BUCKET).list(folder, { search: fileName, limit: 1 });
-    const stored = (data || []).find((item: any) => item.name === fileName);
-    if (!stored) continue;
-    files.push({
-      field: safeField(entry?.field),
-      path,
-      name: String(entry?.name || fileName).slice(0, 200),
-      type: String(stored.metadata?.mimetype || entry?.type || ""),
-      size: Number(stored.metadata?.size || entry?.size || 0)
-    });
-  }
-  return files;
+  // Each file is checked at the same time rather than one after another: a handover sends six or more.
+  const checked = await Promise.all(
+    parsed.slice(0, MAX_FILES).map(async (entry: any): Promise<UploadedFile | null> => {
+      const path = String(entry?.path || "");
+      if (!path.startsWith(`${prefix}/`) || path.includes("..")) return null;
+      const folder = path.slice(0, path.lastIndexOf("/"));
+      const fileName = path.slice(path.lastIndexOf("/") + 1);
+      const { data } = await admin.storage.from(UPLOAD_BUCKET).list(folder, { search: fileName, limit: 1 });
+      const stored = (data || []).find((item: any) => item.name === fileName);
+      if (!stored) return null;
+      return {
+        field: safeField(entry?.field),
+        path,
+        name: String(entry?.name || fileName).slice(0, 200),
+        type: String(stored.metadata?.mimetype || entry?.type || ""),
+        size: Number(stored.metadata?.size || entry?.size || 0)
+      };
+    })
+  );
+  return checked.filter(Boolean) as UploadedFile[];
 }
 
 /** Fetch an uploaded file back as a File, e.g. to read a passport with OCR. */

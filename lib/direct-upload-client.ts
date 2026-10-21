@@ -74,18 +74,25 @@ export async function uploadFormFiles(
   const signed = prepared.uploads;
   if (signed.length !== files.length) throw new Error("The upload could not be prepared. Please try again.");
   const supabase = createSupabaseBrowserClient();
-  const uploaded: Array<{ field: string; path: string; name: string; type: string; size: number }> = [];
+  const uploaded: Array<{ field: string; path: string; name: string; type: string; size: number } | undefined> = new Array(files.length);
   onProgress?.(0, files.length);
-  for (let index = 0; index < files.length; index++) {
-    const { field, file } = files[index];
-    const target = signed[index];
-    const { error } = await supabase.storage.from(bucket).uploadToSignedUrl(target.path, target.token, file, {
-      contentType: file.type || undefined
-    });
-    if (error) throw new Error(`${file.name} could not be uploaded (${error.message}). Check the connection and try again.`);
-    uploaded.push({ field, path: target.path, name: file.name, type: file.type, size: file.size });
-    onProgress?.(index + 1, files.length);
-  }
-  next.set("uploadedFiles", JSON.stringify(uploaded));
+  // Three at a time: much quicker than one by one on mobile data, without crowding a weak connection.
+  let nextIndex = 0;
+  let done = 0;
+  const worker = async () => {
+    while (nextIndex < files.length) {
+      const index = nextIndex++;
+      const { field, file } = files[index];
+      const target = signed[index];
+      const { error } = await supabase.storage.from(bucket).uploadToSignedUrl(target.path, target.token, file, {
+        contentType: file.type || undefined
+      });
+      if (error) throw new Error(`${file.name} could not be uploaded (${error.message}). Check the connection and try again.`);
+      uploaded[index] = { field, path: target.path, name: file.name, type: file.type, size: file.size };
+      onProgress?.(++done, files.length);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(3, files.length) }, worker));
+  next.set("uploadedFiles", JSON.stringify(uploaded.filter(Boolean)));
   return next;
 }

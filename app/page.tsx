@@ -504,11 +504,14 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
     </div>
   );
 
+  // A business with no bookings and no money recorded yet: "nobody owes you" and a ฿0 chart say nothing,
+  // so the money tiles wait until there is something to show (the setup list leads instead).
+  const nothingYet = onboardingStatus.counts.rentals === 0 && transactions.length === 0;
   const firstOverdue = overdueRentals[0];
   // One customer with two late rentals is one customer.
   const overdueCustomers = new Set(overdueRentals.map((r) => r.customer)).size;
   const smallTiles: Array<{ key: string; node: ReactNode }> = [];
-  smallTiles.push({
+  if (!nothingYet) smallTiles.push({
     key: "owed",
     node:
       overdueTotal > 0 ? (
@@ -574,7 +577,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       )
     });
   }
-  const moneyTile = isOwner ? (
+  const moneyTile = isOwner && !nothingYet ? (
     <Link className="card pressable rise col-span-2 block p-4 text-[var(--foreground)]" href="/reports" key="money" style={{ ["--d" as string]: "260ms" } as CSSProperties}>
       <span className="block text-[15px] font-bold">{t("monthSoFar", { month: monthName })}</span>
       <span className={`num mt-1 block text-[32px] leading-tight ${monthlyProfit < 0 ? "text-[var(--danger)]" : ""}`}>{money(monthlyProfit)}</span>
@@ -622,7 +625,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
         </span>
       </Link>
     ) : null;
-  const moneyKpi = isOwner ? (
+  const moneyKpi = isOwner && !nothingYet ? (
     <Link className="card pressable tile !overflow-visible p-4 text-[var(--foreground)]" href="/reports">
       <TileHead icon={<TrendingUp size={22} />} title={t("monthSoFar", { month: monthName })} />
       <span className="block">

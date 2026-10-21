@@ -77,8 +77,8 @@ export function OnboardingChecklist({
       </div>
       {/* One list, one pattern: the steps left, the next one highlighted. Done steps are counted in the bar above. */}
       <ol className="mt-3 space-y-1">
-        {items.map((item, index) => {
-          if (item.completed) return null;
+        {remaining.map((item, index) => {
+          // Numbered 1, 2, 3 among the steps left: a done step in the middle no longer leaves a gap (3, 4, 5, 7).
           const isNext = item === next;
           return (
             <li key={item.step}>

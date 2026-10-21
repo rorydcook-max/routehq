@@ -4262,7 +4262,10 @@
     "iv_removeFailed": "That person could not be removed. Try again.",
     "iv_roleManager": "a manager",
     "iv_levelFailed": "Couldn't change their level. Try again.",
-    "iv_rateLimited": "Too many invite emails were sent in the last hour. Please try again a little later."
+    "iv_rateLimited": "Too many invite emails were sent in the last hour. Please try again a little later.",
+    "trialNote": "Free for 30 days. No card needed.",
+    "showPassword": "Show",
+    "hidePassword": "Hide"
   },
   "calc": {
     "title": "Buying a vehicle",

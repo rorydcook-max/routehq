@@ -1,4 +1,5 @@
 import { releaseExpiredHolds } from "@/lib/booking-holds";
+import { jobNameFor } from "@/lib/job-name";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -105,7 +106,7 @@ export default async function CalendarPage({
                   to: covers.to,
                   today,
                   canDecide: canDecideMoney(membership?.role),
-                  describe: (task) => [task.action && todo.has(`job_${task.action}` as never) ? todo(`job_${task.action}` as never) : task.title.split(" - ")[0], task.customerName, task.vehicleLabel ? task.vehicleLabel.split(" · ")[0] : null].filter(Boolean).join(" · ")
+                  describe: (task) => [jobNameFor(todo as never, task.action, task.title) || task.title.split(" - ")[0], task.customerName, task.vehicleLabel ? task.vehicleLabel.split(" · ")[0] : null].filter(Boolean).join(" · ")
                 })
               ].sort((a, b) => a.date.localeCompare(b.date))}
               initialAnchor={/^\d{4}-\d{2}-\d{2}$/.test(String(params.on || "")) ? String(params.on) : month === today.slice(0, 7) ? today : `${month}-01`}

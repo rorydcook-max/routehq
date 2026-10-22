@@ -75,8 +75,14 @@ export function loadGooglePlaces(): Promise<void> | null {
       script.async = true;
       script.defer = true;
       script.dataset.routehqGooglePlaces = "true";
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&libraries=places&v=weekly`;
-      script.onload = () => resolve();
+      // loading=async is Google's recommended way to load Maps; the places library is then pulled in with importLibrary.
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&libraries=places&v=weekly&loading=async`;
+      script.onload = () => {
+        const maps = w.google?.maps;
+        // The address box uses places; the "drop a pin" map uses maps, marker and geocoding.
+        if (maps?.importLibrary) Promise.all(["places", "maps", "marker", "geocoding"].map((name) => maps.importLibrary(name))).then(() => resolve(), reject);
+        else resolve();
+      };
       script.onerror = () => reject(new Error("Google Maps failed to load."));
       document.head.appendChild(script);
     });

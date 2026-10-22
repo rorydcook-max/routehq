@@ -6,6 +6,7 @@ import { dayOfWeekDate, intlLocale, shortDate as shortDateIn } from "@/lib/i18n/
 import { ArrowRight, Bell, Car, CheckCircle2, TrendingUp, Clock3, FileWarning, KeyRound, Lock, Plus, ReceiptText, RotateCcw, Wallet, MessageCircle } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { businessToday } from "@/lib/business-time";
+import { jobNameFor } from "@/lib/job-name";
 import { OnboardingChecklist } from "@/components/onboarding-checklist";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDashboardData, money } from "@/lib/dashboard";
@@ -113,7 +114,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   ]);
   const todo = await getTranslations("todo");
   // Jobs the app raises are saved as English sentences; the kinds it knows are named in the reader's language, as on To do.
-  const jobName = (action: string | null | undefined) => (action && todo.has(`job_${action}` as never) ? todo(`job_${action}` as never) : null);
+  const jobName = (action: string | null | undefined, title?: string | null) => jobNameFor(todo as never, action, title);
   const shortDate = (value: string) => shortDateIn(value, locale);
   const dayLabel = (value: string) => dayOfWeekDate(value, locale);
   const [onboardingStatus, categories] = await Promise.all([getOnboardingStatus(supabase as any, organization.id), getVehicleCategories(organization.id)]);
@@ -328,7 +329,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       rank: problem ? 0 : waiting ? 2 : 4,
       tone: waiting ? "red" : job.dueDate && job.dueDate < today ? "amber" : "neutral",
       icon: <Bell size={17} />,
-      title: problem ? t("reportsProblem", { who: job.customerName || t("aCustomer") }) : waiting ? (asks > 1 ? t("waitingForAnswers", { who: job.customerName || t("aCustomer"), count: asks }) : t("waitingForAnswer", { who: job.customerName || t("aCustomer") })) : jobName(job.action) || noPlate(job.action === "swap_handover" || job.action === "swap_collection" ? job.title.split(" to ")[0].split(" from ")[0] : job.title.split(" - ")[0]),
+      title: problem ? t("reportsProblem", { who: job.customerName || t("aCustomer") }) : waiting ? (asks > 1 ? t("waitingForAnswers", { who: job.customerName || t("aCustomer"), count: asks }) : t("waitingForAnswer", { who: job.customerName || t("aCustomer") })) : jobName(job.action, job.title) || noPlate(job.action === "swap_handover" || job.action === "swap_collection" ? job.title.split(" to ")[0].split(" from ")[0] : job.title.split(" - ")[0]),
       detail: [waiting ? null : job.customerName, noPlate(job.vehicleLabel)].filter(Boolean).join(" · ") || t("onToDo"),
       href: waiting && job.rentalId ? `/bookings/${job.rentalId}#customer-requests` : "/tasks",
       action: waiting ? t("answer") : t("open")
@@ -401,7 +402,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       canDecide,
       describe: (job) => {
         const waiting = job.action === "request";
-        const what = waiting ? t("waitingForAnswer", { who: job.customerName || t("aCustomer") }) : jobName(job.action) || job.title.split(" - ")[0];
+        const what = waiting ? t("waitingForAnswer", { who: job.customerName || t("aCustomer") }) : jobName(job.action, job.title) || job.title.split(" - ")[0];
         return [what, waiting ? null : job.customerName, noPlate(job.vehicleLabel)].filter(Boolean).join(" · ");
       }
     })

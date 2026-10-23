@@ -626,6 +626,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
   const publicAgreement = detail.rentalDocumentAgreement?.agreement || null;
   const customerSigningEligibility = detail.rentalDocumentAgreement?.eligibility || null;
   const agreementHtml = publicAgreement?.renderedHtmlSnapshot || detail.contractHtml;
+  const [draftOpen, setDraftOpen] = useState(false);
   // The customer signs only the final agreement: prepared with their details
   // and already signed by the business. Until then the text is a preview.
   const readyToSign = publicAgreement?.businessSignatureStatus === "signed";
@@ -1434,20 +1435,22 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             <p className="mt-1.5 text-center text-xs font-semibold text-[var(--muted)]">{t.has("previewScrollHint" as never) ? t("previewScrollHint" as never) : "Scroll inside the box to read it all."}</p>
           </>
         ) : (
-          <details className="group mt-4 rounded-xl border border-[var(--border)] bg-white">
+          // The draft is only built when opened: in the page itself it was ~100 KB of markup nobody had asked to see.
+          <details className="group mt-4 rounded-xl border border-[var(--border)] bg-white" onToggle={(event) => setDraftOpen((event.currentTarget as HTMLDetailsElement).open)}>
             <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-bold text-[var(--primary)] [&::-webkit-details-marker]:hidden">
               <span>{t.has("previewOpen" as never) ? t("previewOpen" as never) : "Read the draft agreement"}</span>
               <span aria-hidden="true" className="text-[var(--muted)] transition group-open:rotate-180">⌄</span>
             </summary>
-            <div className="routehq-contract-preview contract-preview h-[60vh] min-h-[420px] overflow-hidden border-t border-[var(--border)] bg-[var(--panel-secondary)] [overscroll-behavior:contain]">
-              <iframe
-                className="h-full w-full border-0 bg-[var(--panel-secondary)]"
-                loading="lazy"
-                sandbox=""
-                srcDoc={buildContractPreviewDocument(agreementHtml)}
-                title={t("rentalAgreement")}
-              />
-            </div>
+            {draftOpen ? (
+              <div className="routehq-contract-preview contract-preview h-[60vh] min-h-[420px] overflow-hidden border-t border-[var(--border)] bg-[var(--panel-secondary)] [overscroll-behavior:contain]">
+                <iframe
+                  className="h-full w-full border-0 bg-[var(--panel-secondary)]"
+                  sandbox=""
+                  srcDoc={buildContractPreviewDocument(agreementHtml)}
+                  title={t("rentalAgreement")}
+                />
+              </div>
+            ) : null}
           </details>
         )}
         {readyToSign && publicAgreement ? (

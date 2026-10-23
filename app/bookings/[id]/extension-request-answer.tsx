@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import { quoteExplainIn } from "@/lib/i18n/quote-text";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { Route } from "next";
 import { answerExtensionRequest } from "@/app/actions/portal-actions";
@@ -17,7 +16,6 @@ import { longDate } from "@/lib/i18n/dates";
  * extend only as far as the vehicle is free, or decline (alongside).
  */
 export function ExtensionRequestAnswer({ actionId, rentalId, picture, requestedEnd, openEnded }: { actionId: string; rentalId: string; picture: ExtensionPicture | null; requestedEnd: string | null; openEnded: boolean }) {
-  const router = useRouter();
   const t = useTranslations("booking");
   const say = t as unknown as (key: string, values?: Record<string, string | number>) => string;
   const locale = useLocale();
@@ -42,7 +40,6 @@ export function ExtensionRequestAnswer({ actionId, rentalId, picture, requestedE
       const result = await answerExtensionRequest({ actionId, rentalId, ...input });
       setBusy(null);
       if (!result.ok) setError(result.error);
-      else router.refresh();
     });
   }
 

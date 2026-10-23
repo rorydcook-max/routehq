@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { saveBookingRules } from "@/app/actions/online-booking";
@@ -11,7 +10,6 @@ type Say = (key: string, values?: Record<string, string | number>) => string;
 /** Holds and notice periods: set once, applied to every booking. Saves on change. */
 export function BookingRulesPanel({ rules }: { rules: BookingRules }) {
   const say = useTranslations("settingsPage") as unknown as Say;
-  const router = useRouter();
   const [values, setValues] = useState(rules);
   const [failed, setFailed] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -30,7 +28,6 @@ export function BookingRulesPanel({ rules }: { rules: BookingRules }) {
         setValues(rules);
         return;
       }
-      router.refresh();
     });
   }
 

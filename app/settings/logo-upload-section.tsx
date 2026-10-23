@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { updateBusinessLogo } from "@/app/actions/settings";
 import { BusinessLogoImage } from "@/components/business-logo-image";
@@ -10,7 +9,6 @@ export function LogoUploadSection({ logoUrl, orgName }: { logoUrl: string | null
   const say = useTranslations("settingsPage") as unknown as (key: string) => string;
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<{ key: string; type: "error" | "success" } | null>(null);
-  const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
 
   function submit(formData: FormData) {
@@ -20,7 +18,6 @@ export function LogoUploadSection({ logoUrl, orgName }: { logoUrl: string | null
         await updateBusinessLogo(formData);
         setMessage({ key: "lg_done", type: "success" });
         if (fileRef.current) fileRef.current.value = "";
-        router.refresh();
       } catch {
         setMessage({ key: "lg_failed", type: "error" });
       }

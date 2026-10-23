@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Copy, ExternalLink } from "lucide-react";
@@ -14,7 +13,6 @@ type Say = (key: string, values?: Record<string, string | number>) => string;
  */
 export function PublicBookingPanel({ slug, link: shareLink, enabled, holdHours, deposit, offer = "both_monthly", pricedVehicles, totalVehicles }: { slug: string; link?: string; enabled: boolean; holdHours: number; deposit: number; offer?: string; pricedVehicles: number; totalVehicles: number }) {
   const say = useTranslations("settingsPage") as unknown as Say;
-  const router = useRouter();
   const [on, setOn] = useState(enabled);
   const [hours, setHours] = useState(holdHours);
   const [offerValue, setOfferValue] = useState(offer);
@@ -38,7 +36,6 @@ export function PublicBookingPanel({ slug, link: shareLink, enabled, holdHours, 
         setHours(holdHours);
         return;
       }
-      router.refresh();
     });
   }
 

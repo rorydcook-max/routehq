@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { shownError } from "@/lib/error-text";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -47,7 +46,6 @@ export function RefundDepositPanel({
   earlyReturn = null,
   canRefund = true
 }: Props & { canRefund?: boolean }) {
-  const router = useRouter();
   const t = useTranslations("booking");
   const say = t as unknown as Say;
   const [activeForm, setActiveForm] = useState<ActiveForm>(null);
@@ -98,7 +96,6 @@ export function RefundDepositPanel({
         if (returned > 0 || kept > 0) setPendingOut((current) => ({ refunded: current.refunded + returned, forfeited: current.forfeited + kept }));
         setActiveForm(null);
         setMessage(successMessage);
-        router.refresh();
       } catch (caught) {
         setError(shownError(caught, say("ref_wrong")));
       }

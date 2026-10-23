@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { shownError } from "@/lib/error-text";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { generatePaymentScheduleForRental } from "@/app/actions/bookings";
 
@@ -18,7 +17,6 @@ const primaryBtnStyle = {
 } as const;
 
 export function GeneratePaymentScheduleButton({ rentalId }: { rentalId: string }) {
-  const router = useRouter();
   const say = useTranslations("booking") as unknown as (key: string, values?: Record<string, string | number>) => string;
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -38,7 +36,6 @@ export function GeneratePaymentScheduleButton({ rentalId }: { rentalId: string }
         const result = await generatePaymentScheduleForRental(rentalId);
         const count = result?.count || 0;
         setMessage(say("gen_done", { count }));
-        router.refresh();
       } catch (scheduleError) {
         setError(shownError(scheduleError, say("gen_failed")));
       }

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Camera, ImagePlus, Trash2, X } from "lucide-react";
 import { removeVehiclePhoto, reorderVehiclePhotos, uploadVehiclePhotos } from "@/app/actions/vehicles";
@@ -20,7 +19,6 @@ type Say = (key: string, values?: Record<string, string | number>) => string;
 
 export function VehiclePhotoManager({ organizationId, vehicleId, vehicleLabel, photos, art }: VehiclePhotoManagerProps) {
   const say = useTranslations("vehiclePage") as unknown as Say;
-  const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
@@ -44,7 +42,6 @@ export function VehiclePhotoManager({ organizationId, vehicleId, vehicleLabel, p
       try {
         await reorderVehiclePhotos(formData);
         setMessage(say("ph_orderSaved"));
-        router.refresh();
       } catch {
         setMessage(say("ph_orderFailed"));
         setOrderedPhotos(photos);
@@ -83,7 +80,6 @@ export function VehiclePhotoManager({ organizationId, vehicleId, vehicleLabel, p
       try {
         await uploadVehiclePhotos(formData);
         setMessage(say("ph_updated"));
-        router.refresh();
       } catch {
         setMessage(say("ph_uploadFailed"));
       } finally {
@@ -100,7 +96,6 @@ export function VehiclePhotoManager({ organizationId, vehicleId, vehicleLabel, p
         const documentId = String(formData.get("documentId") || "");
         setOrderedPhotos((current) => current.filter((photo) => photo.id !== documentId));
         setMessage(say("ph_removed"));
-        router.refresh();
       } catch {
         setMessage(say("ph_removeFailed"));
       }

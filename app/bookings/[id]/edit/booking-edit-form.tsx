@@ -265,7 +265,6 @@ function PaymentEditor({ payments, rentalId, currency }: { payments: any[]; rent
           paidDate: String(formData.get("paidDate") || "") || null
         });
         setEditingId(null);
-        router.refresh();
       } catch {
         setMessage(say("p_failed"));
       }
@@ -278,7 +277,6 @@ function PaymentEditor({ payments, rentalId, currency }: { payments: any[]; rent
       try {
         await deleteRentalPayment(paymentId);
         setConfirmDeleteId(null);
-        router.refresh();
       } catch {
         setMessage(say("p_failed"));
       }
@@ -291,7 +289,6 @@ function PaymentEditor({ payments, rentalId, currency }: { payments: any[]; rent
       try {
         await addRentalPayment(formData);
         setAdding(false);
-        router.refresh();
       } catch {
         setMessage(say("p_failed"));
       }

@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { saveCustomerMessages, saveReminderKinds } from "@/app/actions/online-booking";
@@ -23,7 +22,6 @@ export function CustomerMessagesPanel({ enabled, hasChannel, emailOn = false, of
     });
   }
   const say = useTranslations("settingsPage") as unknown as (key: string) => string;
-  const router = useRouter();
   const [on, setOn] = useState(enabled);
   const [failed, setFailed] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -38,7 +36,6 @@ export function CustomerMessagesPanel({ enabled, hasChannel, emailOn = false, of
         setOn(!next);
         return;
       }
-      router.refresh();
     });
   }
 

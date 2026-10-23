@@ -4,7 +4,6 @@ import { quoteStay, type Rates } from "@/lib/rental-estimate";
 import { shownError } from "@/lib/error-text";
 import { useEffect, useMemo, useState, useTransition, useRef } from "react";
 import { createPortal } from "react-dom";
-import { useRouter } from "next/navigation";
 import { adjustRental, rescheduleBooking } from "@/app/actions/bookings";
 import { useLocale, useTranslations } from "next-intl";
 import { longDate } from "@/lib/i18n/dates";
@@ -737,9 +736,8 @@ export function RentalAdjustmentButton({
           rentalId={rentalId}
           vehicleLabel={vehicleLabel}
           onClose={() => setOpen(false)}
-          onSuccess={() => {
-            window.location.reload();
-          }}
+          // No reload: each save refreshes this page itself and sends the new page back with its reply.
+          // (A full reload re-downloaded the whole app and flashed a loading screen after every extension.)
         />
       ) : null}
     </>
@@ -807,7 +805,6 @@ function RescheduleSheet({ rentalId, currentStartDate, currentEndDate, currentRa
 /** The pencil beside a not-yet-started booking's dates. */
 export function BookingDatesButton(props: { rentalId: string; currentStartDate?: string | null; currentEndDate?: string | null; currentRate: number; billingPeriod: string; customerName: string; vehicleLabel: string }) {
   const say = useTranslations("booking") as unknown as Say;
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -815,7 +812,7 @@ export function BookingDatesButton(props: { rentalId: string; currentStartDate?:
         <i aria-hidden="true" className="ti ti-pencil text-[13px]" />
       </button>
       {open && typeof document !== "undefined"
-        ? createPortal(<RescheduleSheet {...props} loading={false} onClose={() => setOpen(false)} onSuccess={() => router.refresh()} />, document.body)
+        ? createPortal(<RescheduleSheet {...props} loading={false} onClose={() => setOpen(false)} />, document.body)
         : null}
     </>
   );

@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { CheckCircle2, RotateCcw } from "lucide-react";
@@ -12,7 +11,6 @@ type Say = (key: string, values?: Record<string, string | number>) => string;
 /** "Sorted" closes a conversation; writing again or "Open again" reopens it. */
 export function HelpStatusButton({ threadId, closed }: { threadId: string; closed: boolean }) {
   const say = useTranslations("help") as unknown as Say;
-  const router = useRouter();
   const [pending, start] = useTransition();
   return (
     <button
@@ -21,7 +19,6 @@ export function HelpStatusButton({ threadId, closed }: { threadId: string; close
       onClick={() =>
         start(async () => {
           await setSupportThreadStatus({ threadId, status: closed ? "open" : "closed" });
-          router.refresh();
         })
       }
       type="button"
@@ -35,7 +32,6 @@ export function HelpStatusButton({ threadId, closed }: { threadId: string; close
 /** How the business would like RouteHQ to get back to them. The conversation in RouteHQ is kept either way. */
 export function HelpPreference({ channel, handle, suggestions, canEdit }: { channel: SupportChannel; handle: string; suggestions: Partial<Record<SupportChannel, string>>; canEdit: boolean }) {
   const say = useTranslations("help") as unknown as Say;
-  const router = useRouter();
   const [value, setValue] = useState<SupportChannel>(channel);
   const [contact, setContact] = useState(handle);
   const [saved, setSaved] = useState(false);
@@ -58,7 +54,6 @@ export function HelpPreference({ channel, handle, suggestions, canEdit }: { chan
         return;
       }
       setSaved(true);
-      router.refresh();
     });
   }
 

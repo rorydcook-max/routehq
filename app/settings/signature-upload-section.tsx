@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { updateOwnerSignature } from "@/app/actions/settings";
 
@@ -21,7 +20,6 @@ export function SignatureUploadSection({
   const authorisation = useTranslations("settings.contractsBranding") as unknown as (key: string) => string;
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<{ text: string; type: "error" | "success" } | null>(null);
-  const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const acknowledgementRef = useRef<HTMLInputElement>(null);
 
@@ -31,7 +29,6 @@ export function SignatureUploadSection({
       try {
         await updateOwnerSignature(formData);
         setMessage({ text: say("sg_saved"), type: "success" });
-        router.refresh();
       } catch {
         setMessage({ text: say("sg_failed"), type: "error" });
       }

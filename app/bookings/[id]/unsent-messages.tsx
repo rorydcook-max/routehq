@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Check, Copy, Send } from "lucide-react";
 import { markCustomerMessageSent } from "@/app/actions/communication";
@@ -26,7 +25,6 @@ function appOf(url: string | null) {
  */
 export function UnsentMessages({ messages, customerName, bare = false }: { messages: UnsentMessage[]; customerName: string; bare?: boolean }) {
   const say = useTranslations("booking") as unknown as Say;
-  const router = useRouter();
   const [done, setDone] = useState<string[]>([]);
   const [copied, setCopied] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -37,7 +35,6 @@ export function UnsentMessages({ messages, customerName, bare = false }: { messa
     setDone((current) => [...current, ...ids]);
     startTransition(async () => {
       await Promise.all(ids.map((id) => markCustomerMessageSent(id).catch(() => null)));
-      router.refresh();
     });
   }
   // The newest message says what's current; older ones for the same booking fold away under it.

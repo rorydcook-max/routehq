@@ -41,7 +41,6 @@ export function TeamMemberActions({ memberId, email, role, waiting }: { memberId
       data.set("memberId", memberId);
       const result = await removeTeammate(data);
       if (result.error) setError(result.error);
-      else router.refresh();
     });
   }
 

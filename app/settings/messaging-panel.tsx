@@ -2,7 +2,6 @@
 
 import { toWallTime } from "@/lib/business-time";
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { AlertTriangle, CheckCircle2, ChevronDown, Copy } from "lucide-react";
 import { connectChannel, disconnectChannel } from "@/app/actions/inbox";
@@ -27,7 +26,6 @@ const labelClass = "font-semibold text-[var(--foreground-secondary)]";
 function ConnectForm({ provider, publicUrl, replacing = false }: { provider: ProviderKey; publicUrl: boolean; replacing?: boolean }) {
   const say = useTranslations("settingsPage") as unknown as Say;
   const guide = GUIDES[provider];
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [token, setToken] = useState("");
   const [secret, setSecret] = useState("");
@@ -45,7 +43,6 @@ function ConnectForm({ provider, publicUrl, replacing = false }: { provider: Pro
       setToken("");
       setSecret("");
       setOpen(false);
-      router.refresh();
     });
   }
 
@@ -95,7 +92,6 @@ function ConnectForm({ provider, publicUrl, replacing = false }: { provider: Pro
 function ConnectedChannel({ channel, publicUrl }: { channel: Channel; publicUrl: boolean }) {
   const say = useTranslations("settingsPage") as unknown as Say;
   const locale = useLocale();
-  const router = useRouter();
   const [confirming, setConfirming] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -126,7 +122,6 @@ function ConnectedChannel({ channel, publicUrl }: { channel: Channel; publicUrl:
               onClick={() =>
                 startTransition(async () => {
                   await disconnectChannel(channel.id);
-                  router.refresh();
                 })
               }
               type="button"

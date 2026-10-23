@@ -160,11 +160,12 @@ function daysRemaining(value: string | null | undefined, status: string | null |
   const today = businessToday();
   const daysFromToday = (date: string) =>
     Math.round((new Date(`${date.slice(0, 10)}T00:00:00Z`).getTime() - new Date(`${today}T00:00:00Z`).getTime()) / 86_400_000);
-  if (status === "booked" && startDate) {
+  // Not out yet (a booking, or a draft whose hold ran out): count to the start, never "due back in".
+  if ((status === "booked" || status === "draft") && startDate) {
     const untilStart = daysFromToday(startDate);
     if (untilStart > 0) return untilStart === 1 ? tx.list("startsTomorrow") : tx.list("startsIn", { days: untilStart });
     if (untilStart === 0) return tx.list("startsToday");
-    return tx.list("handoverOverdue", { days: -untilStart });
+    return status === "draft" ? tx.list("datesPassed") : tx.list("handoverOverdue", { days: -untilStart });
   }
   if (!value) {
     // The dates line already says open-ended; say how long it has been out instead.

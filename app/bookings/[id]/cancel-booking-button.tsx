@@ -78,7 +78,7 @@ export function CancelBookingButton({
   const [notes, setNotes] = useState("");
   const [cancelledAt, setCancelledAt] = useState("");
   const [collectionDatetime, setCollectionDatetime] = useState("");
-  const [vehicleDisposition, setVehicleDisposition] = useState<"available" | "repair" | "keep_assigned">(rentalStatus === "booked" ? "keep_assigned" : "available");
+  const [vehicleDisposition, setVehicleDisposition] = useState<"available" | "repair" | "keep_assigned">(rentalStatus === "booked" || rentalStatus === "draft" ? "keep_assigned" : "available");
   const [repairNotes, setRepairNotes] = useState("");
   const [repairExpectedEnd, setRepairExpectedEnd] = useState("");
   const [error, setError] = useState("");
@@ -86,7 +86,8 @@ export function CancelBookingButton({
 
   const hasPayment = totalPaid > 0;
   const hasDeposit = depositHeld > 0;
-  const isPreDelivery = rentalStatus === "booked";
+  // Never went out: a booking, or a draft whose hold ran out. Not asked about ending a rental or collecting the car.
+  const isPreDelivery = rentalStatus === "booked" || rentalStatus === "draft";
   // Before the handover the vehicle never left, so the reasons about ending a rental do not apply.
   const reasonOptions = isPreDelivery ? REASONS.filter((r) => !["customer_cancelled_early", "vehicle_breakdown"].includes(r.value)) : REASONS.filter((r) => r.value !== "customer_cancelled_before_delivery");
   const needsFullFlow = !isPreDelivery || hasPayment || hasDeposit;

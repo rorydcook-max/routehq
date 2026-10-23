@@ -3475,7 +3475,7 @@ export async function undoCancellation(formData: FormData) {
 
   const { data: rental, error: rentalError } = await supabase
     .from("rentals")
-    .select("id, organization_id, vehicle_id, customer_id, status, reference, display_code, delivery_datetime")
+    .select("id, organization_id, vehicle_id, customer_id, status, reference, display_code, delivery_datetime, mileage_at_delivery")
     .eq("id", rentalId)
     .eq("organization_id", organizationId)
     .is("deleted_at", null)
@@ -3487,8 +3487,22 @@ export async function undoCancellation(formData: FormData) {
   await ensureMembership(supabase, organizationId, user.id);
 
   const resolvedVehicleId = vehicleId || rental.vehicle_id;
-  const restoreStatus = rental.delivery_datetime ? "active" : "booked";
+  // Back on rent only if the vehicle really went out (a handover form, a reading at handover, or "handed over
+  // without the form"). A delivery time on the booking is only a plan: restoring that as "on rent" made money
+  // owed on a car that never left.
+  const [{ data: handoverForm }, { data: handedWithoutForm }, { data: links }] = await Promise.all([
+    supabase.from("inspections").select("id").eq("rental_id", rentalId).eq("organization_id", organizationId).eq("inspection_type", "delivery").limit(1),
+    supabase.from("activity_events").select("id").eq("rental_id", rentalId).eq("organization_id", organizationId).eq("event_type", "handed_over_without_form").limit(1),
+    supabase.from("booking_links").select("id, contract_signed_at, customer_details_submitted_at, viewed_at, sent_at, hold_released_at").eq("organization_id", organizationId).eq("rental_id", rentalId).eq("status", "cancelled")
+  ]);
+  const wentOut = rental.mileage_at_delivery != null || (handoverForm || []).length > 0 || (handedWithoutForm || []).length > 0;
+  // An unsigned booking whose hold had already run out was a draft before it was cancelled, and goes back to one.
+  const wasLapsedDraft = !wentOut && (links || []).some((link: any) => link.hold_released_at && !link.contract_signed_at);
+  const restoreStatus = wentOut ? "active" : wasLapsedDraft ? "draft" : "booked";
   const today = businessToday();
+  // The link goes back to where the customer had got to, not straight to "completed" (which showed
+  // "Customer signed" on a booking nobody had signed).
+  const linkStatusOf = (link: any) => (link.contract_signed_at ? "completed" : link.customer_details_submitted_at ? "details_submitted" : link.viewed_at ? "viewed" : link.sent_at ? "sent" : "pending");
 
   const ops: Promise<any>[] = [
     // Restore rental status and clear cancellation fields
@@ -3505,13 +3519,10 @@ export async function undoCancellation(formData: FormData) {
       .eq("id", rentalId)
       .eq("organization_id", organizationId),
 
-    // Restore booking link
-    supabase
-      .from("booking_links")
-      .update({ status: "completed", cancelled_at: null })
-      .eq("organization_id", organizationId)
-      .eq("rental_id", rentalId)
-      .eq("status", "cancelled"),
+    // Restore each booking link to its own stage
+    ...(links || []).map((link: any) =>
+      supabase.from("booking_links").update({ status: linkStatusOf(link), cancelled_at: null }).eq("id", link.id).eq("organization_id", organizationId)
+    ),
 
     // Restore future cancelled payments to scheduled
     supabase

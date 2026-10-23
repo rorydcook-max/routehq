@@ -187,3 +187,17 @@ export function normalizeTransactionType(value: unknown) {
   if (cleaned.includes("finance") || cleaned.includes("loan")) return "finance";
   return "other";
 }
+
+/**
+ * Two names that could be the same person: one is missing, they match, the first names match, or one contains
+ * the other ("Maria" / "Maria Garcia"). A phone number alone is not enough to say a row is someone already saved:
+ * numbers get shared and reused, and a booking attached to the wrong person shows them someone else's rental.
+ */
+export function namesAgree(a: unknown, b: unknown) {
+  const tidy = (value: unknown) => cleanString(value).toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, "").replace(/\s+/g, " ").trim();
+  const x = tidy(a);
+  const y = tidy(b);
+  if (!x || !y || x === y) return true;
+  if (x.includes(y) || y.includes(x)) return true;
+  return x.split(" ")[0] === y.split(" ")[0];
+}

@@ -406,9 +406,27 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
             {tab === "customers" ? (
               preview.customers.length ? (
                 preview.customers.slice(0, shown).map((customer) => <CustomerCard customer={customer} key={customer.key} onChange={(changes) => patch("customers", customer.key, changes)} t={t} />)
-              ) : (
-                <p className="text-sm text-[var(--muted)]">{t("noneHere")}</p>
-              )
+              ) : (() => {
+                // No customer list in the file, but the renters become customers: say so, and who (the count above includes them).
+                const renters = preview.rentals.filter((rental) => rental.include && rental.customerName);
+                const unique = renters.filter((rental, index) => renters.findIndex((other) => (other.phone && other.phone === rental.phone) || other.customerName.toLowerCase() === rental.customerName.toLowerCase()) === index);
+                return unique.length ? (
+                  <div className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-4 text-sm">
+                    <p className="font-semibold text-[var(--foreground)]">{t("customersFromRentals", { count: unique.length })}</p>
+                    <ul className="mt-2 space-y-1 text-[var(--foreground-secondary)]">
+                      {unique.map((rental) => (
+                        <li key={rental.key}>
+                          {rental.customerName}
+                          {rental.phone ? <span className="text-[var(--muted)]"> · {rental.phone}</span> : null}
+                          {rental.existingCustomer ? <span className="text-[var(--muted)]"> · {t("alreadySaved")}</span> : null}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : (
+                  <p className="text-sm text-[var(--muted)]">{t("noneHere")}</p>
+                );
+              })()
             ) : null}
             {tab === "transactions" ? (
               preview.transactions.length ? (

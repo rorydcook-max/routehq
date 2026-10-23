@@ -3,6 +3,7 @@ import { aiTextConfigured, createChatCompletion } from "@/lib/ai-chat";
 import { NextResponse } from "next/server";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { IMPORT_FIELD_KEYS, importFieldKeys } from "@/lib/import/fields";
+import { guessField } from "@/lib/import/header-guess";
 import { googleSheetToSpreadsheetInput, isGoogleSheetsUrl, parseSpreadsheetFile, type ParsedSheet } from "@/lib/import/spreadsheet";
 import { attachExisting, buildPreview, previewCounts } from "@/lib/import/preview";
 import { existingRentals } from "@/lib/import/existing";
@@ -69,18 +70,27 @@ function normaliseAnalysis(raw: any, sheets: ParsedSheet[]) {
       (Array.isArray(match?.column_mappings) ? match.column_mappings : []).map((mapping: any) => [String(mapping?.source_column || ""), mapping])
     );
     const used = new Set<string>();
-    const column_mappings = sheet.headers.map((header) => {
+    const first = sheet.headers.map((header) => {
       const suggestion = suggestions.get(header);
       let field = String(suggestion?.routehq_field || "");
       // One column per field: a second column claiming the same field is left for the user to decide.
       if (!IMPORT_FIELD_KEYS.has(field) || used.has(field)) field = "__ignore__";
       if (field !== "__ignore__") used.add(field);
-      return {
-        source_column: header,
-        routehq_field: field,
-        confidence: field === "__ignore__" ? 0 : Number(suggestion?.confidence || 0),
-        sample_values: samplesFor(sheet, header)
-      };
+      return { header, field, confidence: field === "__ignore__" ? 0 : Number(suggestion?.confidence || 0) };
+    });
+    // Columns the AI didn't place (or every column, when it wasn't available) are read from their headers.
+    const column_mappings = first.map(({ header, field, confidence }) => {
+      let chosen = field;
+      let sure = confidence;
+      if (chosen === "__ignore__") {
+        const guess = guessField(header, used);
+        if (guess && IMPORT_FIELD_KEYS.has(guess)) {
+          chosen = guess;
+          sure = 0.6;
+          used.add(guess);
+        }
+      }
+      return { source_column: header, routehq_field: chosen, confidence: sure, sample_values: samplesFor(sheet, header) };
     });
     const type = String(match?.primary_data_type || "").toLowerCase();
     return {
@@ -246,5 +256,11 @@ Return ONLY JSON:
     raw = null;
   }
   const analysis = normaliseAnalysis(raw, sheets);
-  return NextResponse.json({ analysis, ...(await previewAndBatch(sheets, analysis, sourceName, membership.userId)) });
+  // An answer with no usable mapping: the columns were read from their headers alone, so say so.
+  const aiMapped = Array.isArray((raw as any)?.sheets) && (raw as any).sheets.some((sheet: any) => Array.isArray(sheet?.column_mappings) && sheet.column_mappings.some((mapping: any) => IMPORT_FIELD_KEYS.has(String(mapping?.routehq_field || ""))));
+  return NextResponse.json({
+    analysis,
+    ...(await previewAndBatch(sheets, analysis, sourceName, membership.userId)),
+    ...(aiMapped ? {} : { warning: await said("Automatic mapping is unavailable right now - check how each column was read.") })
+  });
 }

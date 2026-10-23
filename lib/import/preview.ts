@@ -7,7 +7,7 @@
  */
 import { businessToday } from "@/lib/business-time";
 import type { ParsedSheet } from "@/lib/import/spreadsheet";
-import { cleanPlate, cleanString, findByPlate, normalizeTransactionType, parseDateValue, parseIntegerValue, parseKnownNumber, parseNumberValue, plateKey } from "@/lib/import/normalize";
+import { cleanPlate, cleanString, findByPlate, namesAgree, normalizeTransactionType, parseDateValue, parseIntegerValue, parseKnownNumber, parseNumberValue, plateKey } from "@/lib/import/normalize";
 
 export type Mapping = { source_column: string; routehq_field: string };
 export type SheetMapping = { sheet_name: string; primary_data_type: string; column_mappings: Mapping[] };
@@ -166,6 +166,11 @@ export function sheetDataType(value: string, mappings: Mapping[]) {
   const cleaned = cleanString(value).toLowerCase();
   const fields = new Set(mappings.map((mapping) => mapping.routehq_field));
   const isBookings = fields.has("start_date") && ["customer_name", "first_name", "last_name", "full_name"].some((field) => fields.has(field));
+  // An owner's fleet sheet: one row per vehicle (year, colour, its price, tax and insurance dates), with who has it now
+  // alongside. That stays a vehicle list, so a vehicle nobody is renting isn't dropped. A booking export labelled
+  // "vehicles" has renter columns but says little about the vehicles themselves.
+  const describesVehicles = ["year", "color", "make", "model", "monthly_rate", "daily_rate", "weekly_rate", "current_mileage", "tax_expiry_date", "insurance_expiry_date", "porbor_expiry_date", "purchase_price", "estimated_value"].filter((field) => fields.has(field)).length >= 2;
+  if (isBookings && cleaned === "vehicles" && describesVehicles && fields.has("registration_number")) return "vehicles";
   if (isBookings && (cleaned === "vehicles" || cleaned === "customers")) return "rentals";
   if ((DATA_TYPES as readonly string[]).includes(cleaned)) return cleaned as (typeof DATA_TYPES)[number];
   if (fields.has("amount") && fields.has("type")) return "transactions";
@@ -375,7 +380,8 @@ export function buildPreview(sheets: ParsedSheet[], mappings: SheetMapping[]): I
       if (!plate) problems.push("no_plate");
       if (!make || !model) problems.push("no_make_model");
       const mileage = parseIntegerValue(parseKnownNumber(fields.current_mileage));
-      if (mileage === null) problems.push("no_mileage");
+      // Only asked about when the sheet has a mileage column: otherwise it is taken at the first handover.
+      if (mileage === null && "current_mileage" in fields) problems.push("no_mileage");
       // "2566" is a Buddhist year; "66" on a Thai sheet is too.
       const rawYear = parseIntegerValue(fields.year);
       const year = rawYear === null ? null : rawYear > 2400 ? rawYear - 543 : rawYear >= 40 && rawYear <= 99 ? 2500 + rawYear - 543 : rawYear;
@@ -438,7 +444,12 @@ function overlaps(aStart: string | null, aEnd: string | null, bStart: string, bE
  */
 export function attachExisting(preview: ImportPreview, vehicles: ExistingVehicle[], customers: ExistingCustomer[], rentals: ExistingRental[] = []) {
   const vehicleByPlate = new Map(vehicles.map((vehicle) => [plateKey(vehicle.registration_number), vehicle.id]));
-  const customerByPhone = new Map(customers.filter((customer) => cleanPhone(customer.phone)).map((customer) => [cleanPhone(customer.phone), customer.id]));
+  const customerByPhone = new Map(customers.filter((customer) => cleanPhone(customer.phone)).map((customer) => [cleanPhone(customer.phone), customer]));
+  // A phone match counts only when the names agree too (see namesAgree).
+  const byPhoneFor = (phone: string, name: string) => {
+    const match = phone ? customerByPhone.get(phone) : undefined;
+    return match && namesAgree(match.full_name, name) ? match.id : null;
+  };
   const customerByName = new Map(customers.map((customer) => [cleanString(customer.full_name).toLowerCase(), customer.id]));
 
   const mark = (problems: Problem[], problem: Problem) => {
@@ -453,7 +464,7 @@ export function attachExisting(preview: ImportPreview, vehicles: ExistingVehicle
   const addedByPlate = new Map<string, string>();
   for (const rental of preview.rentals) {
     rental.existingVehicleId = rental.plate ? findByPlate(vehicleByPlate, rental.plate) || null : null;
-    rental.existingCustomer = Boolean((rental.phone && customerByPhone.get(rental.phone)) || customerByName.get(rental.customerName.toLowerCase()));
+    rental.existingCustomer = Boolean(byPhoneFor(rental.phone, rental.customerName) || customerByName.get(rental.customerName.toLowerCase()));
     if (rental.existingVehicleId) {
       // The same vehicle is already booked for these dates: the same rental again, or someone else's.
       const clash = rentals.find((existing) => existing.vehicle_id === rental.existingVehicleId && overlaps(rental.startDate, rental.endDate, existing.start_date, existing.end_date));
@@ -497,7 +508,7 @@ export function attachExisting(preview: ImportPreview, vehicles: ExistingVehicle
     if (!transaction.existingVehicleId && !transaction.vehicleKey) mark(transaction.problems, "unknown_vehicle");
   }
   for (const customer of preview.customers) {
-    customer.existingId = (customer.phone && customerByPhone.get(customer.phone)) || customerByName.get(customer.fullName.toLowerCase()) || null;
+    customer.existingId = byPhoneFor(customer.phone, customer.fullName) || customerByName.get(customer.fullName.toLowerCase()) || null;
     if (customer.existingId) mark(customer.problems, "already_a_customer");
   }
   return preview;

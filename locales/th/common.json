@@ -4703,7 +4703,9 @@
     "srcMessages": "ข้อความที่วาง",
     "srcCalendar": "ปฏิทิน",
     "srcSheet": "Google Sheet",
-    "srcPhotos": "รูปถ่าย {count} รูป"
+    "srcPhotos": "รูปถ่าย {count} รูป",
+    "customersFromRentals": "ผู้เช่า {count} คนในแท็บการเช่าจะถูกเพิ่มเป็นลูกค้า:",
+    "alreadySaved": "มีอยู่แล้ว จะใช้ข้อมูลเดิม"
   },
   "errorPages": {
     "notFoundTitle": "ไม่พบหน้านี้",

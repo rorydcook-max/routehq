@@ -1,4 +1,12 @@
 import { phoneVariants, toInternationalPhone } from "@/lib/phone";
+import { namesAgree, parseDateValue } from "@/lib/import/normalize";
+
+/** Paperwork dates as the app stores them (YYYY-MM-DD), whatever way the sheet wrote them ("15/03/2027", "15 มี.ค. 70"). */
+function paperDate(value: unknown) {
+  const text = String(value ?? "").trim();
+  if (!text) return undefined;
+  return parseDateValue(text) || undefined;
+}
 /**
  * Writes an import preview into the business. Every row carries the batch id,
  * so the whole import can be undone. Rows the owner marked "needs a look" go in
@@ -92,16 +100,16 @@ async function upsertVehicle(context: CommitContext, vehicle: PreviewVehicle, re
   const metadata = {
     acquisition: compact({ purchase_mileage: num(vehicle.extra.purchase_mileage) }),
     compliance: compact({
-      tax_expiry_date: vehicle.extra.tax_expiry_date,
+      tax_expiry_date: paperDate(vehicle.extra.tax_expiry_date),
       tax_cost: num(vehicle.extra.tax_cost),
-      insurance_expiry_date: vehicle.extra.insurance_expiry_date,
+      insurance_expiry_date: paperDate(vehicle.extra.insurance_expiry_date),
       insurance_cost: num(vehicle.extra.insurance_cost),
       insurance_sum_insured: num(vehicle.extra.insurance_sum_insured),
       insurance_excess: num(vehicle.extra.insurance_excess),
-      porbor_expiry_date: vehicle.extra.porbor_expiry_date,
+      porbor_expiry_date: paperDate(vehicle.extra.porbor_expiry_date),
       porbor_cost: num(vehicle.extra.porbor_cost),
-      last_service_date: vehicle.extra.last_service_date,
-      next_service_date: vehicle.extra.next_service_date
+      last_service_date: paperDate(vehicle.extra.last_service_date),
+      next_service_date: paperDate(vehicle.extra.next_service_date)
     }),
     finance: compact({
       lender: vehicle.extra.finance_lender,
@@ -180,14 +188,17 @@ async function upsertVehicle(context: CommitContext, vehicle: PreviewVehicle, re
 async function findOrCreateCustomer(context: CommitContext, input: { fullName: string; phone: string; email: string; nationality?: string; passport?: string; licence?: string; existingId?: string | null }, result: CommitResult, cache: Map<string, string>) {
   const { supabase } = context;
   if (input.existingId) return input.existingId;
-  const cacheKey = (input.phone || input.fullName).toLowerCase();
+  // Two different people can share a number in one file: the name is part of the key.
+  const cacheKey = `${input.phone}|${input.fullName}`.toLowerCase();
   if (cache.has(cacheKey)) return cache.get(cacheKey)!;
   if (!input.fullName) return null;
 
   // Same person already in the business: by phone, then by name.
-  const { data: byPhone } = input.phone
-    ? await supabase.from("customers").select("id").eq("organization_id", context.organizationId).in("phone", phoneVariants(input.phone)).is("deleted_at", null).limit(1).maybeSingle()
+  // A phone match counts only when the names agree too: a shared or reused number is not the same person.
+  const { data: phoneMatches } = input.phone
+    ? await supabase.from("customers").select("id, full_name").eq("organization_id", context.organizationId).in("phone", phoneVariants(input.phone)).is("deleted_at", null).limit(5)
     : { data: null };
+  const byPhone = ((phoneMatches || []) as Array<{ id: string; full_name: string | null }>).find((row) => namesAgree(row.full_name, input.fullName)) || null;
   const { data: byName } = byPhone
     ? { data: null }
     : await supabase

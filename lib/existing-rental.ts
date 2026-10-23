@@ -46,23 +46,50 @@ export async function settleExistingRental(supabase: any, input: { rental: any; 
 
   if (depositHeld > 0) {
     const received = `${startDate}T00:00:00.000Z`;
-    const { data: depositPayment } = await supabase
+    // The schedule may already have a deposit row waiting (written when the rental was set up): that row is the
+    // deposit, now marked as held. Adding a second, paid row left the first one showing as owed.
+    const { data: waitingDeposits } = await supabase
       .from("rental_payments")
-      .insert({
-        organization_id: organizationId,
-        rental_id: rental.id,
-        customer_id: rental.customer_id,
-        vehicle_id: rental.vehicle_id,
-        due_date: startDate,
-        scheduled_date: startDate,
-        paid_at: received,
-        status: "paid",
-        amount: depositHeld,
-        currency,
-        metadata: { type: "deposit", is_deposit: true, description: "Security deposit - already held", setup_source: "operator_existing_rental" }
-      })
-      .select("id")
-      .single();
+      .select("id, metadata")
+      .eq("organization_id", organizationId)
+      .eq("rental_id", rental.id)
+      .in("status", ["pending", "overdue", "scheduled"])
+      .is("deleted_at", null);
+    const unpaidDeposits = ((waitingDeposits || []) as any[]).filter((row) => row.metadata?.type === "deposit" || row.metadata?.is_deposit === true);
+    const depositFields = {
+      due_date: startDate,
+      scheduled_date: startDate,
+      paid_at: received,
+      status: "paid",
+      amount: depositHeld,
+      currency
+    };
+    let depositPayment: { id: string } | null = null;
+    if (unpaidDeposits.length) {
+      const [first, ...rest] = unpaidDeposits;
+      const { data } = await supabase
+        .from("rental_payments")
+        .update({ ...depositFields, metadata: { ...(first.metadata || {}), type: "deposit", is_deposit: true, description: "Security deposit - already held", setup_source: "operator_existing_rental" } })
+        .eq("id", first.id)
+        .select("id")
+        .single();
+      depositPayment = data;
+      if (rest.length) await supabase.from("rental_payments").update({ deleted_at: new Date().toISOString() }).in("id", rest.map((row: any) => row.id));
+    } else {
+      const { data } = await supabase
+        .from("rental_payments")
+        .insert({
+          organization_id: organizationId,
+          rental_id: rental.id,
+          customer_id: rental.customer_id,
+          vehicle_id: rental.vehicle_id,
+          ...depositFields,
+          metadata: { type: "deposit", is_deposit: true, description: "Security deposit - already held", setup_source: "operator_existing_rental" }
+        })
+        .select("id")
+        .single();
+      depositPayment = data;
+    }
     await supabase.from("transactions").insert({
       organization_id: organizationId,
       vehicle_id: rental.vehicle_id,

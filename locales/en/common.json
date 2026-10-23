@@ -4694,7 +4694,9 @@
     "srcMessages": "Pasted messages",
     "srcCalendar": "Calendar",
     "srcSheet": "Google Sheet",
-    "srcPhotos": "{count, plural, one {# photo} other {# photos}}"
+    "srcPhotos": "{count, plural, one {# photo} other {# photos}}",
+    "customersFromRentals": "{count, plural, one {The renter on the Rentals tab is added as a customer:} other {The # renters on the Rentals tab are added as customers:}}",
+    "alreadySaved": "already saved, their record is used"
   },
   "errorPages": {
     "notFoundTitle": "We could not find that page",

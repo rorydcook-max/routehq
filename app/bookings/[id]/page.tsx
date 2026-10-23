@@ -634,7 +634,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
           </div>
         ) : null}
         <div className="flex flex-wrap items-center gap-2 text-sm font-bold text-[var(--muted)]">
-          <Link className="text-[var(--primary)]" href="/bookings">{tx.list("title")}</Link>
+          <Link className="-mx-2 -my-3 inline-flex min-h-11 items-center px-2 text-[var(--primary)]" href="/bookings">{tx.list("title")}</Link>
           <span>/</span>
           <span>{bookingReference(rental)}</span>
         </div>

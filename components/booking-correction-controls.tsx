@@ -111,6 +111,8 @@ function basePaymentDescription(payment: RentalPayment, tx: Ctl) {
   // not words someone typed: those payments are named in the reader's language below.
   const appWritten = /^(security deposit|first rental payment|rental payment|rent payment|remaining balance|extension - |\d+ days? rent)\b/i.test(String(metadata.description || "").trim());
   if (metadata.type === "extras") return tx.say("pc_extras", { names: (Array.isArray(metadata.extras) ? metadata.extras : []).join(", ") || "-" });
+  // The early-days charge is saved with English words; name it from its day count instead.
+  if (Number(metadata.early_start?.days) > 0) return tx.say("pc_earlyDays", { days: Number(metadata.early_start.days) });
   if (metadata.description && !appWritten) return metadata.type === "charge" ? tx.say("pc_chargeFor", { reasons: String(metadata.description) }) : String(metadata.description);
   const isExtension = metadata.type === "extension" || metadata.adjustment_type === "extension";
   if (isExtension) return tx.say("pc_extensionDesc", { from: dateLabel(metadata.previous_end_date, tx.locale), to: dateLabel(metadata.new_end_date, tx.locale) });

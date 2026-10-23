@@ -2340,7 +2340,8 @@
     "grp_atHandover": "To collect at handover — {count, plural, one {# payment} other {# payments}}",
     "pc_b_atHandover": "At handover",
     "hist_late_start": "Handed over late",
-    "skip_customerName": "Who is taking it? (customer's name)"
+    "skip_customerName": "Who is taking it? (customer's name)",
+    "pc_earlyDays": "Early handover: {days, plural, one {# day} other {# days}} before the booked start"
   },
   "newBooking": {
     "pageBack": "Back to bookings",
@@ -3013,7 +3014,7 @@
     "gl_profit": "Profit so far",
     "gl_monthIn": "In this month",
     "gl_last6": "Last 6 months",
-    "gl_rented": "Time rented",
+    "gl_rented": "Rented, last 12 months",
     "gl_daysYear": "{count} of {total} days this year",
     "gl_notSetUp": "No dates yet",
     "rp_day": "Day",
@@ -4141,7 +4142,7 @@
     "cameFrom": "Where the money came from",
     "wentOn": "Where the money went",
     "vehiclesTitle": "Vehicle by vehicle",
-    "vehiclesBody": "Tap a vehicle for its full report.",
+    "vehiclesBody": "Tap a vehicle for its full report. \"% rented\" is for the dates chosen above.",
     "vehicleLine": "Rented {percent}% of the time · {count, plural, one {# rental} other {# rentals}}",
     "sortBy": "Sort by",
     "sort_profit": "Most profit first",

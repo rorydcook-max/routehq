@@ -637,12 +637,18 @@ export async function submitInspection(formData: FormData) {
         .select("id")
         .single();
       if (created?.id) {
-        bookedRental.customer_id = created.id;
-        await Promise.all([
+        const [{ error: linkError }] = await Promise.all([
           supabase.from("rentals").update({ customer_id: created.id }).eq("id", rentalId).eq("organization_id", organizationId),
           supabase.from("booking_links").update({ customer_id: created.id }).eq("rental_id", rentalId).is("customer_id", null),
           supabase.from("contracts").update({ customer_id: created.id }).eq("rental_id", rentalId).is("customer_id", null)
         ]);
+        if (linkError) {
+          // Not linked to the booking: take the new record away again, so trying the handover again doesn't leave
+          // a trail of customers with no rentals behind it.
+          await supabase.from("customers").update({ deleted_at: new Date().toISOString() }).eq("id", created.id).eq("organization_id", organizationId);
+          throw new Error(isDoubleBookingError(linkError) ? await said("This vehicle is still out on another rental. Return that rental first, or change the vehicle on this booking.") : linkError.message);
+        }
+        bookedRental.customer_id = created.id;
       }
     }
     const startsEarly = bookedRental?.start_date && handoverDate < String(bookedRental.start_date).slice(0, 10);

@@ -1069,12 +1069,17 @@ export async function manuallyActivateRental(rentalId: string, earlyStart?: stri
     if (!name) return { success: false, error: await said("Add the customer's name to hand over.") };
     const { data: created, error: customerError } = await supabase.from("customers").insert({ organization_id: rental.organization_id, full_name: name }).select("id").single();
     if (customerError || !created?.id) return { success: false, error: customerError?.message || "The customer could not be added." };
-    rental.customer_id = created.id;
-    await Promise.all([
+    const [{ error: linkError }] = await Promise.all([
       supabase.from("rentals").update({ customer_id: created.id }).eq("id", cleanId).eq("organization_id", rental.organization_id),
       supabase.from("booking_links").update({ customer_id: created.id }).eq("rental_id", cleanId).is("customer_id", null),
       supabase.from("contracts").update({ customer_id: created.id }).eq("rental_id", cleanId).is("customer_id", null)
     ]);
+    if (linkError) {
+      // Not linked: take the new record away again so a second try doesn't leave a customer with no rentals.
+      await supabase.from("customers").update({ deleted_at: new Date().toISOString() }).eq("id", created.id).eq("organization_id", rental.organization_id);
+      return { success: false, error: isDoubleBookingError(linkError) ? await said(DOUBLE_BOOKING_MESSAGE) : linkError.message };
+    }
+    rental.customer_id = created.id;
   }
 
   // Handed over before the booked start date: the rental starts today, and the extra days are charged, the

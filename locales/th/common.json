@@ -1166,7 +1166,7 @@
     "job_returnArranged": "ลูกค้านัดคืนรถแล้ว",
     "job_owed_early": "ค่าเช่าที่ต้องตัดสินใจ: {amount} สำหรับวันที่ไม่ได้ใช้",
     "job_owed_early_short": "ค่าเช่าวันที่ไม่ได้ใช้ที่ต้องตัดสินใจ",
-    "job_owed_early_detail": "คืนรถก่อนกำหนด {days} วัน ค้างจ่าย {owed}",
+    "job_owed_early_detail": "คืนรถก่อนกำหนด · {days} วันที่ไม่ได้ใช้ · ค้างจ่าย {owed}",
     "bandOverdue": "เลยกำหนด",
     "bandToday": "วันนี้",
     "bandWeek": "สัปดาห์นี้",

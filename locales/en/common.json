@@ -1157,7 +1157,7 @@
     "job_returnArranged": "The customer arranged the return",
     "job_owed_early": "Rent to decide: {amount} for unused days",
     "job_owed_early_short": "Rent to decide for unused days",
-    "job_owed_early_detail": "Returned {days, plural, one {# day} other {# days}} early, {owed} owed",
+    "job_owed_early_detail": "Back early · {days, plural, one {# unused day} other {# unused days}} · {owed} unpaid",
     "bandOverdue": "overdue",
     "bandToday": "today",
     "bandWeek": "this week",

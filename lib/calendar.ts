@@ -103,18 +103,26 @@ export async function getCalendarEventsBetween(organizationId: string, startDate
     }
   }
 
+  // One row per rental per day, as To do bundles them: rent and an extra charge due the same day are one
+  // thing to collect, not two red rows for the same customer.
+  const paymentGroups = new Map<string, { id: string; rentalId: string; due: string; who: string; total: number }>();
   for (const payment of paymentsResult.data || []) {
     if (payment.voided || payment.metadata?.voided || payment.rentals?.status === "cancelled") continue;
     const due = String(payment.due_date).slice(0, 10);
-    const who = payment.rentals?.customers?.full_name || "Customer";
+    const key = `${payment.rental_id}|${due}`;
+    const group = paymentGroups.get(key);
+    if (group) group.total += Number(payment.amount || 0);
+    else paymentGroups.set(key, { id: payment.id, rentalId: payment.rental_id, due, who: payment.rentals?.customers?.full_name || "Customer", total: Number(payment.amount || 0) });
+  }
+  for (const { id, rentalId, due, who, total } of paymentGroups.values()) {
     events.push({
-      id: `payment-${payment.id}`,
+      id: `payment-${id}`,
       date: due,
-      title: `${due < today ? "Unpaid" : "Payment"} ${money(Number(payment.amount || 0))}: ${who}`,
+      title: `${due < today ? "Unpaid" : "Payment"} ${money(total)}: ${who}`,
       tone: due < today ? "red" : "purple",
-      href: `/bookings/${payment.rental_id}#payment-schedule`,
+      href: `/bookings/${rentalId}#payment-schedule`,
       type: "payment",
-      say: { key: due < today ? "unpaid" : "payment", subject: who, amount: money(Number(payment.amount || 0)) }
+      say: { key: due < today ? "unpaid" : "payment", subject: who, amount: money(total) }
     });
   }
 

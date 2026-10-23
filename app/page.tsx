@@ -349,7 +349,8 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   upcomingItems.sort((a, b) => a.sort.localeCompare(b.sort));
 
   // Counted the way the To do page counts them (open jobs by due date), so the two pages agree.
-  const openTasks = taskList.filter((task: any) => !task.completedAt);
+  // A payment bundled into another one due the same day isn't a job of its own.
+  const openTasks = taskList.filter((task: any) => !task.completedAt && !task.coveredBy);
   const tasksOverdue = openTasks.filter((task: any) => task.dueDate && task.dueDate < today).length;
   const tasksDueToday = openTasks.filter((task: any) => task.dueDate === today).length;
 

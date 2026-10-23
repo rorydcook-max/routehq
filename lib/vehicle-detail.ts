@@ -375,7 +375,7 @@ export async function getVehicleDetail(vehicleId: string, organizationId: string
     supabase.from("reminders").select("*").eq("organization_id", organizationId).eq("vehicle_id", vehicleId).is("deleted_at", null).order("due_date", { ascending: true }),
     // The same jobs To do shows for this vehicle (payments are read from the schedule, not listed here).
     getTaskList(organizationId)
-      .then((items) => ({ data: items.filter((item) => item.kind === "task" && !item.completedAt && item.vehicleId === vehicleId), error: null }))
+      .then((items) => ({ data: items.filter((item) => item.kind === "task" && !item.completedAt && !item.coveredBy && item.vehicleId === vehicleId), error: null }))
       .catch(() => ({ data: [] as TaskListItem[], error: null })),
     supabase.from("gps_devices").select("*").eq("organization_id", organizationId).eq("vehicle_id", vehicleId).is("deleted_at", null).maybeSingle(),
     supabase.from("vehicle_locations").select("*").eq("organization_id", organizationId).eq("vehicle_id", vehicleId).order("recorded_at", { ascending: false }).limit(1).maybeSingle(),

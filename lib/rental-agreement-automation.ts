@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import { authorisationCoversAutomaticSigning } from "@/lib/signature-authorisation";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { recordActivityEventOnce } from "@/lib/supabase/activity";
@@ -214,8 +215,9 @@ export async function countersignRentalAgreementForCustomer({
 }): Promise<CountersignResult> {
   try {
     const context = await loadContext(organizationId, rentalId);
-    const rendered = await render(context);
-    let { document, version } = await latestAgreement(context.admin, organizationId, rentalId);
+    // Drawing up the text and looking up the current agreement don't depend on each other.
+    const [rendered, latest] = await Promise.all([render(context), latestAgreement(context.admin, organizationId, rentalId)]);
+    let { document, version } = latest;
 
     // Already countersigned with exactly this content: nothing to redo.
     if (version && ["finalised", "signed"].includes(String(version.status)) && version.rendered_html_snapshot === rendered.renderedHtml) {
@@ -294,28 +296,33 @@ export async function countersignRentalAgreementForCustomer({
       throw error;
     }
 
-    await recordActivityEventOnce(
-      context.admin,
-      {
-        organization_id: organizationId,
-        actor_id: null,
-        entity_type: "document",
-        entity_id: document.id,
-        vehicle_id: context.rental.vehicle_id || null,
-        rental_id: rentalId,
-        customer_id: context.rental.customer_id || null,
-        event_type: "rental_document_business_signature_applied",
-        title: "Business signature applied automatically",
-        detail: `The business's pre-authorised signature was applied to version ${version.version_number} when the customer submitted their online booking.`,
-        metadata: {
-          document_id: document.id,
-          version_id: version.id,
-          signer_role: "authorised_business_signatory",
-          applied_by: "server",
-          trigger: "customer_online_booking"
-        }
-      },
-      `rental_document_business_signature_applied:${version.id}`
+    // The history line is written after the reply: the customer doesn't wait for it.
+    const signedVersion = version;
+    const signedDocumentId = document.id as string;
+    after(() =>
+      recordActivityEventOnce(
+        context.admin,
+        {
+          organization_id: organizationId,
+          actor_id: null,
+          entity_type: "document",
+          entity_id: signedDocumentId,
+          vehicle_id: context.rental.vehicle_id || null,
+          rental_id: rentalId,
+          customer_id: context.rental.customer_id || null,
+          event_type: "rental_document_business_signature_applied",
+          title: "Business signature applied automatically",
+          detail: `The business's pre-authorised signature was applied to version ${signedVersion.version_number} when the customer submitted their online booking.`,
+          metadata: {
+            document_id: signedDocumentId,
+            version_id: signedVersion.id,
+            signer_role: "authorised_business_signatory",
+            applied_by: "server",
+            trigger: "customer_online_booking"
+          }
+        },
+        `rental_document_business_signature_applied:${signedVersion.id}`
+      ).catch(() => undefined)
     );
 
     return { ok: true, documentId: document.id, versionId: version.id, reused: false };

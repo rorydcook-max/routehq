@@ -1,4 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
+import { after } from "next/server";
 import { htmlToPdf } from "@/lib/html-to-pdf";
 import { buildContractVariables } from "@/lib/contract-rendering";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -464,16 +465,17 @@ export async function completeRentalDocumentCustomerSigning({
   const certPdf = await buildExecutionCertificatePdf(ctx, normalizedSigner, verificationReference);
 
   const storage = (ctx.supabase as any).storage.from("documents");
-  const uploadedPaths: string[] = [];
-  const sigUpload = await storage.upload(sigPath, png, { contentType: "image/png", upsert: false });
-  if (sigUpload.error) throw new Error(sigUpload.error.message);
-  uploadedPaths.push(sigPath);
-  const certUpload = await storage.upload(certPath, certPdf, { contentType: "application/pdf", upsert: false });
-  if (certUpload.error) {
-    await storage.remove(uploadedPaths);
-    throw new Error(certUpload.error.message);
+  // The signature and the proof of signing upload together; if either fails, neither is kept.
+  const uploadedPaths = [sigPath, certPath];
+  const [sigUpload, certUpload] = await Promise.all([
+    storage.upload(sigPath, png, { contentType: "image/png", upsert: false }),
+    storage.upload(certPath, certPdf, { contentType: "application/pdf", upsert: false })
+  ]);
+  const uploadError = sigUpload.error || certUpload.error;
+  if (uploadError) {
+    await storage.remove(uploadedPaths.filter((_, index) => !(index === 0 ? sigUpload.error : certUpload.error)));
+    throw new Error(uploadError.message);
   }
-  uploadedPaths.push(certPath);
 
   const acknowledgements = CUSTOMER_SIGNING_ACKNOWLEDGEMENTS.filter((ack) => acceptedAcknowledgementTypes.includes(ack.type));
   const { data, error } = await (ctx.supabase as any).rpc("complete_rental_document_customer_signing", {
@@ -498,7 +500,8 @@ export async function completeRentalDocumentCustomerSigning({
   }
   const row = Array.isArray(data) ? data[0] : data;
 
-  await recordActivityEventOnce(ctx.supabase, {
+  const executedVersion = ctx.version;
+  after(() => recordActivityEventOnce(ctx.supabase, {
     organization_id: ctx.bookingLink.organization_id,
     entity_type: "document",
     entity_id: ctx.document.id,
@@ -507,12 +510,14 @@ export async function completeRentalDocumentCustomerSigning({
     customer_id: ctx.rental.customer_id,
     event_type: "rental_document_fully_executed",
     title: "Rental agreement fully executed",
-    detail: `${normalizedSigner} signed rental agreement version ${ctx.version.version_number}.`,
-    metadata: { document_id: ctx.document.id, version_id: ctx.version.id, verification_reference: verificationReference }
-  }, `rental_document_fully_executed:${ctx.version.id}`);
+    detail: `${normalizedSigner} signed rental agreement version ${executedVersion.version_number}.`,
+    metadata: { document_id: ctx.document.id, version_id: executedVersion.id, verification_reference: verificationReference }
+  }, `rental_document_fully_executed:${executedVersion.id}`).catch(() => undefined));
 
   const businessSnapshot = settingsObject(ctx.version.business_snapshot);
-  await emailExecutedDocumentToCustomer({
+  // The emailed copy goes out after the customer sees "You're all set": they don't wait for the mail server.
+  const version = ctx.version;
+  after(() => emailExecutedDocumentToCustomer({
     supabase: ctx.supabase,
     organizationId: ctx.bookingLink.organization_id,
     rentalId: ctx.rental.id,
@@ -526,15 +531,32 @@ export async function completeRentalDocumentCustomerSigning({
     businessName: stringValue(businessSnapshot.trading_name || businessSnapshot.legal_name),
     files: [
       {
-        bucket: ctx.version.final_pdf_storage_bucket || ctx.version.pdf_storage_bucket,
-        path: ctx.version.final_pdf_storage_path || ctx.version.pdf_storage_path,
+        bucket: version.final_pdf_storage_bucket || version.pdf_storage_bucket,
+        path: version.final_pdf_storage_path || version.pdf_storage_path,
         filename: "rental-agreement.pdf"
       },
       { bucket: "documents", path: certPath, filename: "execution-certificate.pdf" }
     ]
-  });
+  }).catch((error: unknown) => console.error("[signing] emailing the signed agreement failed", error)));
 
-  return row;
+  // The customer's two download links, made here from what is already known (looking the booking up again
+  // to make them took over a second).
+  const [original, certificate] = await Promise.all([
+    createRentalDocumentSignedUrl(version.final_pdf_storage_bucket || version.pdf_storage_bucket, version.final_pdf_storage_path || version.pdf_storage_path, 10 * 60).catch(() => null),
+    createRentalDocumentSignedUrl("documents", certPath, 10 * 60).catch(() => null)
+  ]);
+
+  return { row, downloads: { original, certificate } };
+}
+
+/** Both download links for the customer's signed agreement, from one lookup (was two full lookups, ~1.3 s). */
+export async function getCustomerExecutedAgreementDownloads(token: string): Promise<{ original: string | null; certificate: string | null }> {
+  const ctx = await loadByToken(token);
+  if (ctx.state !== "found" || !ctx.version || !ctx.certificate) return { original: null, certificate: null };
+  const eligibility = await eligibilityFor(ctx);
+  if (!eligibility.fullyExecuted) return { original: null, certificate: null };
+  const [original, certificate] = await Promise.all([downloadFor(ctx, "original").catch(() => null), downloadFor(ctx, "certificate").catch(() => null)]);
+  return { original, certificate };
 }
 
 export async function getCustomerExecutedAgreementDownload(token: string, kind: "original" | "certificate") {

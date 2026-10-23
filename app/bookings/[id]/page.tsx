@@ -1113,7 +1113,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   // Back early with rent unpaid (set at the return): take off the days after, or keep the booking as it was.
                   const rows = (payments as any[]).filter((payment) => payment.metadata?.early_return_owed && !payment.metadata.early_return_owed.decided && ["scheduled", "pending", "failed", "overdue"].includes(String(payment.status)));
                   if (!rows.length) return null;
-                  const unused = Math.round(rows.reduce((sum, payment) => sum + Number(payment.metadata.early_return_owed.share || 0), 0) / 10) * 10;
+                  // Exactly what "Take it off" takes, so the button and the result agree.
+                  const unused = rows.reduce((sum, payment) => sum + Math.min(Number(payment.amount || 0), Number(payment.metadata.early_return_owed.share || 0)), 0);
                   return <EarlyReturnOwedPanel canDecide={isOwner} days={Number(rows[0].metadata.early_return_owed.unused_days || 0)} owed={money(pendingPaymentAmount, rental.currency)} rentalId={rental.id} unused={money(unused, rental.currency)} />;
                 })()}
                 <p className="text-sm text-[var(--muted)]">

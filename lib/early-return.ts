@@ -74,7 +74,7 @@ export function earlyReturnSuggestion(input: { payments: any[]; returnDate: stri
 const OPEN = ["scheduled", "pending", "failed", "overdue"];
 
 export type EarlyReturnOwed = {
-  /** The part of the unpaid rent that is for days after the return, rounded to the nearest 10. */
+  /** The part of the unpaid rent that is for days after the return: the sum of the shares, so exactly what is taken off. */
   amount: number;
   unusedDays: number;
   /** Each unpaid payment and the part of it for days after the return. */
@@ -97,11 +97,12 @@ export function earlyReturnOwed(input: { payments: any[]; returnDate: string; pr
     const share = unusedShare(rent, index, usedUntil, input.previousEnd, interval);
     if (!share || share.amount <= 0) return;
     unusedDays = Math.max(unusedDays, share.unused);
-    amount += share.amount;
     shares.push({ id: String(payment.id), share: Math.round(share.amount) });
   });
-  const rounded = Math.round(amount / 10) * 10;
-  return rounded > 0 ? { amount: rounded, unusedDays, shares } : null;
+  // The figure offered is exactly what "Take it off" takes: the sum of the per-payment shares (not rounded to 10,
+  // which offered ฿40,070 and then took ฿40,074).
+  amount = shares.reduce((sum, item) => sum + item.share, 0);
+  return amount > 0 ? { amount, unusedDays, shares } : null;
 }
 
 /** For one rent payment: the days its period covers, how many fall after the return, and that share of the amount. */

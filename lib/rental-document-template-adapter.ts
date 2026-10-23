@@ -74,13 +74,9 @@ export async function renderRentalAgreementDraftTemplate({
   templateId?: string | null;
 }): Promise<RentalDocumentTemplateAdapterResult> {
   const businessSnapshot = buildBusinessDocumentSnapshot(organization);
-  const template = templateId
-    ? await loadOrganizationTemplate(supabase, organization.id, templateId)
-    : await ensureDefaultContractTemplate(supabase, organization.id);
-  const templateHtml = String(template?.content_html || template?.body || "");
-  if (!templateHtml) {
-    throw new Error("Contract template has no HTML content.");
-  }
+  // The template and the business logo are fetched at the same time (each is a trip to the database or storage).
+  const templateLoad: Promise<any> = templateId ? loadOrganizationTemplate(supabase, organization.id, templateId) : ensureDefaultContractTemplate(supabase, organization.id);
+  templateLoad.catch(() => undefined);
 
   const variables = buildContractVariables({
     organization: {
@@ -140,7 +136,11 @@ export async function renderRentalAgreementDraftTemplate({
   variables.cleaning_fee = clean(bookingLink?.booking_data?.cleaning_fee || organization?.settings?.cleaning_fee_minimum);
   variables.included_services = Array.isArray(bookingLink?.included_items) ? bookingLink.included_items.join(", ") : "";
 
-  await embedLogoInContractVariables(supabase, variables);
+  const [template] = await Promise.all([templateLoad, embedLogoInContractVariables(supabase, variables)]);
+  const templateHtml = String(template?.content_html || template?.body || "");
+  if (!templateHtml) {
+    throw new Error("Contract template has no HTML content.");
+  }
 
   const tokens = templateTokens(templateHtml);
   const missingVariables = tokens.filter((token) => clean(variables[token]) === "");

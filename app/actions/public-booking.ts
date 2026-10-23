@@ -18,7 +18,7 @@ import { notifyOperator } from "@/lib/notify-operator";
 import { firstRentCharge, generatePaymentSchedule } from "@/lib/payment-schedule";
 import {
   completeRentalDocumentCustomerSigning,
-  getCustomerExecutedAgreementDownload
+  getCustomerExecutedAgreementDownloads
 } from "@/lib/rental-document-customer-signing";
 import { toWallTime, wallTimeToIso, businessToday } from "@/lib/business-time";
 
@@ -868,7 +868,7 @@ export async function completePublicBooking(formData: FormData) {
       "data_handling"
     ].filter((type) => formData.get(`ack_${type}`) === "on");
 
-    await completeRentalDocumentCustomerSigning({
+    const signing = await completeRentalDocumentCustomerSigning({
       token,
       signatureDataUrl: signature,
       signerName: signedName,
@@ -993,10 +993,8 @@ export async function completePublicBooking(formData: FormData) {
       }).catch(() => undefined);
     }
 
-    const [originalAgreementUrl, executionCertificateUrl] = await Promise.all([
-      getCustomerExecutedAgreementDownload(token, "original").catch(() => null),
-      getCustomerExecutedAgreementDownload(token, "certificate").catch(() => null)
-    ]);
+    const links = signing.downloads.original && signing.downloads.certificate ? signing.downloads : await getCustomerExecutedAgreementDownloads(token).catch(() => ({ original: null, certificate: null }));
+    const { original: originalAgreementUrl, certificate: executionCertificateUrl } = links;
 
     notifyOperator(
       organizationId,

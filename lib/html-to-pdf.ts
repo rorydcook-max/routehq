@@ -82,10 +82,62 @@ function withFonts(html: string): string {
   return cleaned.replace(/<html[^>]*>/i, (tag) => `${tag}<head><meta charset="utf-8"/>${FONT_FALLBACK_CSS}</head>`);
 }
 
+/**
+ * One Chrome kept warm between PDFs. Starting Chrome took most of each PDF's time, and signing makes several in
+ * a row (the countersigned agreement, the signed one, the proof of signing). It closes itself after a minute
+ * with nothing to do, and is started again if it has gone away (crashed, or a paused serverless instance).
+ */
+let shared: Promise<Browser> | null = null;
+let idleTimer: ReturnType<typeof setTimeout> | null = null;
+let openPages = 0;
+
+async function warmBrowser(): Promise<Browser> {
+  if (shared) {
+    const browser = await shared.catch(() => null);
+    if (browser && browser.connected) return browser;
+    shared = null;
+  }
+  const launching = launchBrowser();
+  shared = launching;
+  launching.catch(() => {
+    if (shared === launching) shared = null;
+  });
+  return launching;
+}
+
+function closeWhenIdle() {
+  if (idleTimer) clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => {
+    if (openPages > 0 || !shared) return;
+    const closing = shared;
+    shared = null;
+    closing.then((browser) => browser.close()).catch(() => undefined);
+  }, 60_000);
+  idleTimer.unref?.();
+}
+
 export async function htmlToPdf(html: string): Promise<Buffer> {
-  const browser = await launchBrowser();
   try {
-    const page = await browser.newPage();
+    return await renderPdf(await warmBrowser(), html);
+  } catch (error) {
+    // A warm Chrome that died between PDFs: start a fresh one and try once more.
+    if (shared) {
+      const stale = shared;
+      shared = null;
+      stale.then((browser) => browser.close()).catch(() => undefined);
+    }
+    if (error instanceof Error && /Target closed|Protocol error|Connection closed|Session closed|browser has disconnected/i.test(error.message)) {
+      return renderPdf(await warmBrowser(), html);
+    }
+    throw error;
+  }
+}
+
+async function renderPdf(browser: Browser, html: string): Promise<Buffer> {
+  openPages += 1;
+  let page: Awaited<ReturnType<Browser["newPage"]>> | null = null;
+  try {
+    page = await browser.newPage();
     // "load" waits for the font stylesheet and images; fonts.ready then waits
     // for the font files the text actually needs. Neither may hang the request.
     await page.setContent(withFonts(html), { waitUntil: "load", timeout: 30_000 });
@@ -102,6 +154,8 @@ export async function htmlToPdf(html: string): Promise<Buffer> {
     });
     return Buffer.from(pdf);
   } finally {
-    await browser.close().catch(() => undefined);
+    openPages -= 1;
+    await page?.close().catch(() => undefined);
+    closeWhenIdle();
   }
 }

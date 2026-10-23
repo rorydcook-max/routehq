@@ -131,10 +131,16 @@ export async function getDashboardData(): Promise<DashboardData> {
     .in("status", ["scheduled", "pending", "overdue"])
     // Nothing is owed on a booking that was never handed over.
     .in("rentals.status", HANDED_OVER_STATUSES)
-    .lt("due_date", businessToday());
+    .lte("due_date", businessToday());
   const overdueByRental = new Map<string, { amount: number; since: string }>();
+  // Due today is not late yet, but it is today's work: kept apart so the Today list can say so.
+  const dueTodayByRental = new Map<string, number>();
   for (const payment of latePayments || []) {
     if (payment.voided || payment.metadata?.voided) continue;
+    if (String(payment.due_date).slice(0, 10) === businessToday()) {
+      dueTodayByRental.set(payment.rental_id, (dueTodayByRental.get(payment.rental_id) || 0) + Number(payment.amount || 0));
+      continue;
+    }
     const current = overdueByRental.get(payment.rental_id) || { amount: 0, since: payment.due_date };
     current.amount += Number(payment.amount || 0);
     if (payment.due_date < current.since) current.since = payment.due_date;
@@ -163,7 +169,7 @@ export async function getDashboardData(): Promise<DashboardData> {
     .map((row: any) => {
       const late = overdueByRental.get(row.id);
       const held = String(row.deposit_status || "").toLowerCase() === "received" ? Number(row.deposit_held || 0) : 0;
-      return { ...mapRental(row), overdue: late?.amount || 0, overdueSince: late?.since || null, depositHeld: held };
+      return { ...mapRental(row), overdue: late?.amount || 0, overdueSince: late?.since || null, dueToday: dueTodayByRental.get(row.id) || 0, depositHeld: held };
     });
   // Money still owed on a booking that has ended is still owed: it counts on the dashboard too.
   const closedOverdue: Rental[] = rentalRows

@@ -424,6 +424,10 @@ export default async function BookingDetailPage({ params, searchParams }: { para
     .filter((payment: any) => ["pending", "overdue", "scheduled"].includes(String(payment.status || "pending")))
     .filter((payment: any) => !payment.due_date || String(payment.due_date).slice(0, 10) <= today)
     .reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
+  // Something already past its due day (red); otherwise what's outstanding is only due today (amber).
+  const anyPastDue = activePayments.some(
+    (payment: any) => ["pending", "overdue", "scheduled"].includes(String(payment.status || "pending")) && !!payment.due_date && String(payment.due_date).slice(0, 10) < today
+  );
   const customerFormComplete = Boolean(bookingLink?.customer_details_submitted_at || ["details_submitted", "contract_signed", "completed"].includes(String(bookingLink?.status || "")));
   const paymentDueOnDeliveryAmount = Number(rental.first_payment_amount || rental.rental_rate || 0);
   const paidInAll = activePayments.filter((payment: any) => payment.status === "paid").reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0);
@@ -498,12 +502,9 @@ export default async function BookingDetailPage({ params, searchParams }: { para
     // Only what is due by today is outstanding: a payment agreed for later
     // (an extension due at the end of the month, say) is not owed yet.
     if (activeRentalStatus && pendingPaymentAmount > 0) {
-      return {
-        label: tx.say("fin_outstanding"),
-        detail: tx.say("fin_outstandingActive"),
-        amount: pendingPaymentAmount,
-        tone: "red" as const
-      };
+      return anyPastDue
+        ? { label: tx.say("fin_outstanding"), detail: tx.say("fin_outstandingActive"), amount: pendingPaymentAmount, tone: "red" as const }
+        : { label: tx.say("fin_dueNow"), detail: tx.say("fin_dueNowDetail"), amount: pendingPaymentAmount, tone: "amber" as const };
     }
     // Booked and payments have fallen due (rent and deposit on the first day, say). Nothing is owed until the
     // vehicle goes out: it is what the handover collects. Same total as the payment list and the bookings list.
@@ -581,7 +582,9 @@ export default async function BookingDetailPage({ params, searchParams }: { para
   const firstOpenDue = firstOpenRent ? String(firstOpenRent.due_date).slice(0, 10) : null;
   const paidTo = firstOpenDue || trackEnd;
   // Rent fallen due on a booking that hasn't gone out is taken at the handover, not owed.
-  const dueOwed = !notHandedOver && !!firstOpenDue && firstOpenDue <= today;
+  // Late (red, "owed since") only once the due day has gone by; due today is said as such, as in Payments.
+  const dueOwed = !notHandedOver && !!firstOpenDue && firstOpenDue < today;
+  const dueToday = !notHandedOver && firstOpenDue === today;
   const dueAtHandover = notHandedOver && !!firstOpenDue && firstOpenDue <= today;
   const dueThere = firstOpenDue ? openRent.filter((payment: any) => String(payment.due_date).slice(0, 10) === firstOpenDue).reduce((sum: number, payment: any) => sum + Number(payment.amount || 0), 0) : 0;
   const depositHeldNow = String(rental.deposit_status || "") === "received" && Number(rental.deposit_held || 0) > 0;
@@ -742,13 +745,14 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               <RentalTrack
                 dueOn={firstOpenDue}
                 dueOwed={dueOwed}
+                dueToday={dueToday}
                 end={trackEnd!}
                 labels={{
                   start: shortDate(startDay!, tx.locale),
                   end: shortDate(trackEnd!, tx.locale),
                   today: tx.say("track_today"),
                   paid: firstOpenDue ? (firstOpenDue > startDay! ? tx.say("track_paidTo", { date: shortDate(firstOpenDue, tx.locale) }) : null) : tx.say("track_paidAll"),
-                  due: firstOpenDue ? tx.say(dueOwed ? "track_owed" : dueAtHandover ? "track_atHandover" : "track_next", { amount: money(dueThere, rental.currency), date: shortDate(firstOpenDue, tx.locale) }) : null
+                  due: firstOpenDue ? tx.say(dueOwed ? "track_owed" : dueToday ? "track_dueToday" : dueAtHandover ? "track_atHandover" : "track_next", { amount: money(dueThere, rental.currency), date: shortDate(firstOpenDue, tx.locale) }) : null
                 }}
                 paidTo={paidTo}
                 start={startDay!}

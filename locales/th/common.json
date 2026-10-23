@@ -141,7 +141,8 @@
     "lotTipFreeUntil": "ว่างถึง {date}",
     "profitWeeks": "กำไรรายสัปดาห์",
     "weekTip": "สัปดาห์ {date}: {amount}",
-    "planTitle": "กำหนดการ"
+    "planTitle": "กำหนดการ",
+    "amountDueToday": "ครบกำหนดวันนี้ {amount}"
   },
   "vehicles": {
     "addVehicle": "เพิ่มยานพาหนะใหม่",
@@ -2350,7 +2351,8 @@
     "pc_b_atHandover": "ตอนส่งมอบ",
     "hist_late_start": "ส่งมอบรถล่าช้า",
     "skip_customerName": "ใครรับรถ? (ชื่อลูกค้า)",
-    "pc_earlyDays": "ส่งมอบรถก่อนวันเริ่มที่จองไว้ {days} วัน"
+    "pc_earlyDays": "ส่งมอบรถก่อนวันเริ่มที่จองไว้ {days} วัน",
+    "track_dueToday": "{amount} ครบกำหนดวันนี้"
   },
   "newBooking": {
     "pageBack": "กลับไปที่การจอง",

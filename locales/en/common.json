@@ -141,7 +141,8 @@
     "lotTipFreeUntil": "free until {date}",
     "profitWeeks": "Profit week by week",
     "weekTip": "Week of {date}: {amount}",
-    "planTitle": "What's on"
+    "planTitle": "What's on",
+    "amountDueToday": "{amount} due today"
   },
   "nav": {
     "main": "Main",
@@ -2341,7 +2342,8 @@
     "pc_b_atHandover": "At handover",
     "hist_late_start": "Handed over late",
     "skip_customerName": "Who is taking it? (customer's name)",
-    "pc_earlyDays": "Early handover: {days, plural, one {# day} other {# days}} before the booked start"
+    "pc_earlyDays": "Early handover: {days, plural, one {# day} other {# days}} before the booked start",
+    "track_dueToday": "{amount} due today"
   },
   "newBooking": {
     "pageBack": "Back to bookings",

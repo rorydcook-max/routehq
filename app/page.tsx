@@ -233,6 +233,20 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       action: t("collect")
     });
   }
+  // Money due today on a rental that is out (and nothing late on it): today's job, before it becomes overdue.
+  for (const r of rentals) {
+    if (!(r.dueToday && r.dueToday > 0) || (r.overdue || 0) > 0) continue;
+    todayItems.push({
+      key: `pay-today-${r.id}`,
+      rank: 3,
+      tone: "amber",
+      icon: <Wallet size={17} />,
+      title: t("amountDueToday", { amount: money(r.dueToday) }),
+      detail: `${r.customer} · ${noPlate(r.vehicle)}`,
+      href: `/bookings/${r.id}`,
+      action: t("collect")
+    });
+  }
   for (const hold of endingHolds) {
     todayItems.push({
       key: `hold-${hold.rentalId}`,
@@ -359,7 +373,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   const rentalById = new Map([...rentals, ...(dashboardData.closedOverdue || [])].map((r) => [r.id, r]));
   const jobById = new Map(taskList.map((task) => [task.id, task]));
   const vehicleOf = (item: AgendaItem) => {
-    const match = item.key.match(/^(?:at-risk|link-waiting|late-out|out|soon-out|late-in|in|soon-in|pay)-(.+)$/);
+    const match = item.key.match(/^(?:at-risk|link-waiting|late-out|out|soon-out|late-in|in|soon-in|pay-today|pay)-(.+)$/);
     if (match) return vehicleById.get(String(rentalById.get(match[1])?.vehicleId || "")) || null;
     const doc = item.key.match(/^(?:soon-)?doc-([0-9a-f-]{36})-/);
     if (doc) return vehicleById.get(doc[1]) || null;

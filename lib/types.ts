@@ -54,6 +54,8 @@ export type Rental = {
   overdue?: number;
   /** Due date of the oldest of those payments. */
   overdueSince?: string | null;
+  /** Unpaid and due today (not late yet). */
+  dueToday?: number;
   /** Deposit actually received and still held. */
   depositHeld?: number;
 };

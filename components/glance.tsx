@@ -120,6 +120,7 @@ export function RentalTrack({
   paidTo,
   dueOn,
   dueOwed,
+  dueToday = false,
   labels
 }: {
   start: string;
@@ -128,12 +129,15 @@ export function RentalTrack({
   paidTo: string | null;
   dueOn: string | null;
   dueOwed: boolean;
+  /** Due today, not late yet: amber, as in the payment list. */
+  dueToday?: boolean;
   labels: { start: string; end: string; today: string; paid: string | null; due: string | null };
 }) {
   const day = (iso: string) => new Date(`${iso.slice(0, 10)}T00:00:00Z`).getTime();
   const span = Math.max(1, day(end) - day(start));
   const at = (iso: string) => Math.max(0, Math.min(100, ((day(iso) - day(start)) / span) * 100));
   const showToday = today >= start.slice(0, 10) && today <= end.slice(0, 10);
+  const dueColor = dueOwed ? "var(--danger)" : dueToday ? "var(--warning)" : "var(--foreground-secondary)";
   return (
     <div>
       <div className={`relative mx-1.5 h-3.5 rounded-full bg-[var(--panel-tertiary)] ${showToday ? "mt-7" : "mt-1"}`}>
@@ -141,8 +145,8 @@ export function RentalTrack({
         {dueOn ? (
           <span
             aria-hidden="true"
-            className={`absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full shadow-[0_0_0_3px_#fff] ${dueOwed ? "bg-[var(--danger)]" : "bg-[var(--foreground-secondary)]"}`}
-            style={{ left: `${at(dueOn)}%` }}
+            className={`absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full shadow-[0_0_0_3px_#fff] `}
+            style={{ left: `${at(dueOn)}%`, background: dueColor }}
           />
         ) : null}
         {showToday ? (
@@ -159,7 +163,7 @@ export function RentalTrack({
       {labels.paid || labels.due ? (
         <p className="mt-1 flex flex-wrap gap-x-4 gap-y-1 font-semibold text-[var(--foreground-secondary)]">
           {labels.paid ? <span className="inline-flex items-center gap-1.5"><Dot color="var(--success)" />{labels.paid}</span> : null}
-          {labels.due ? <span className={`inline-flex items-center gap-1.5 ${dueOwed ? "font-bold text-[var(--danger)]" : ""}`}><Dot color={dueOwed ? "var(--danger)" : "var(--foreground-secondary)"} />{labels.due}</span> : null}
+          {labels.due ? <span className={`inline-flex items-center gap-1.5 ${dueOwed || dueToday ? "font-bold" : ""}`} style={dueOwed || dueToday ? { color: dueColor } : undefined}><Dot color={dueColor} />{labels.due}</span> : null}
         </p>
       ) : null}
     </div>

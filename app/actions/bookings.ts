@@ -5,7 +5,7 @@ import { extrasIncomeTag } from "@/lib/extras";
 import { billingPeriodAmounts, generatePaymentSchedule } from "@/lib/payment-schedule";
 
 import { said } from "@/lib/i18n/server-text";
-import { completeRentalJobs, tellRentalCustomer } from "@/lib/customer-messages";
+import { completeRentalJobs, retireUnsent, tellRentalCustomer } from "@/lib/customer-messages";
 import { allocatePayment, type OpenPayment } from "@/lib/payment-allocation";
 import { customerPaymentLabel } from "@/lib/payment-labels";
 import { revalidatePath } from "next/cache";
@@ -3475,7 +3475,7 @@ export async function undoCancellation(formData: FormData) {
 
   const { data: rental, error: rentalError } = await supabase
     .from("rentals")
-    .select("id, organization_id, vehicle_id, customer_id, status, reference, display_code, delivery_datetime, mileage_at_delivery")
+    .select("id, organization_id, vehicle_id, customer_id, status, reference, display_code, delivery_datetime, mileage_at_delivery, cancelled_at")
     .eq("id", rentalId)
     .eq("organization_id", organizationId)
     .is("deleted_at", null)
@@ -3543,7 +3543,24 @@ export async function undoCancellation(formData: FormData) {
   if (resolvedVehicleId) await syncVehicleStatusFromBookings(supabase, organizationId, resolvedVehicleId).catch(() => null);
   {
     const admin = createSupabaseAdminClient() as any;
-    await tellRentalCustomer(admin, rentalId, ({ say }) => say("bookingRestored"), { sentBy: user.id, withLink: true, replacesEarlier: true });
+    // "Your booking is back on, sorry for any confusion" only makes sense if the customer heard it was cancelled.
+    // If the cancellation note never went out, it is simply dropped and nothing is said.
+    const { data: toldCancelled } = rental.cancelled_at
+      ? await admin
+          .from("communication_log")
+          .select("id")
+          .eq("organisation_id", organizationId)
+          .eq("rental_id", rentalId)
+          .eq("type", "automated_reminder")
+          .in("status", ["sent", "delivered", "read"])
+          .gte("created_at", rental.cancelled_at)
+          .limit(1)
+      : { data: [{ id: "unknown" }] };
+    if ((toldCancelled || []).length > 0) {
+      await tellRentalCustomer(admin, rentalId, ({ say }) => say("bookingRestored"), { sentBy: user.id, withLink: true, replacesEarlier: true });
+    } else {
+      await retireUnsent(admin, organizationId, rentalId).catch(() => null);
+    }
   }
 
   await recordActivityEvent(supabase, {

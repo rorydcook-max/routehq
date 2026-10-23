@@ -52,7 +52,7 @@ type Input = {
 };
 
 /** Marks a rental's waiting-to-be-sent messages as overtaken, so they are no longer offered for sending. */
-async function retireUnsent(admin: any, organizationId: string, rentalId: string) {
+export async function retireUnsent(admin: any, organizationId: string, rentalId: string) {
   const { data: rows } = await admin
     .from("communication_log")
     .select("id, metadata")

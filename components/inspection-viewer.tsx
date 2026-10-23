@@ -157,7 +157,13 @@ export async function InspectionViewer({ inspection }: { inspection: any }) {
             <PenLine size={17} className="text-[var(--primary)]" />
             {t("viewSignature")}
           </div>
-          <img alt={t("viewSignature")} className="max-h-40 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)]" src={inspection.customer_signature} />
+          {/* A stored data URL is served from its own address (cached), not packed into the page. */}
+          <img
+            alt={t("viewSignature")}
+            className="max-h-40 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)]"
+            loading="lazy"
+            src={String(inspection.customer_signature).startsWith("data:") && inspection.id ? `/api/inspection-signature/${inspection.id}` : inspection.customer_signature}
+          />
           <p className="mt-2 text-sm text-[var(--muted)]">
             {t("viewSignedBy", { name: inspection.customer_signed_name || t("viewCustomer"), when: formatDate(inspection.customer_signed_at, locale, t("viewNotSet")) })}
           </p>

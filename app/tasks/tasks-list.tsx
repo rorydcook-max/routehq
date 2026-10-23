@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { MoreHorizontal } from "lucide-react";
 import { KindChip, jobKind } from "@/components/kind-chip";
@@ -233,6 +233,14 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
   const [error, setError] = useState<string | null>(null);
   const [tellCustomer, setTellCustomer] = useState(true);
   const [isPending, startTransition] = useTransition();
+  // Saved: stays on "Saving…" until the refreshed list drops this job (the panel goes with it), so it never
+  // closes onto the job still listed as unpaid. Closes anyway after a few seconds.
+  const [sent, setSent] = useState(false);
+  useEffect(() => {
+    if (!sent) return;
+    const fallback = window.setTimeout(onClose, 8000);
+    return () => window.clearTimeout(fallback);
+  }, [sent, onClose]);
   const received = Number(value || 0);
   const chosen = openPayments.filter((payment) => chosenIds.includes(payment.id));
   const others = openPayments.filter((payment) => !chosenIds.includes(payment.id));
@@ -256,7 +264,7 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
     startTransition(async () => {
       try {
         await confirmReceiptPayment({ paymentId: item.rentalPaymentId as string, amount: received, date, method, paymentIds: chosenIds, tellCustomer });
-        onClose();
+        setSent(true);
       } catch {
         setError(tx.say("errRecord"));
       }
@@ -344,8 +352,8 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
         <span>{tx.say("tellCustomer")}</span>
       </label>
       <div className="mt-3 flex flex-wrap items-center gap-2">
-        <button className="primary-action stay-primary pressable min-h-10 whitespace-nowrap px-4 text-[14px]" disabled={isPending} onClick={save} type="button">
-          {isPending ? tx.say("saving") : received > 0 ? tx.say("recordAmount", { amount: money(received) }) : tx.say("recordPayment")}
+        <button className="primary-action stay-primary pressable min-h-10 whitespace-nowrap px-4 text-[14px]" disabled={isPending || sent} onClick={save} type="button">
+          {isPending || sent ? tx.say("saving") : received > 0 ? tx.say("recordAmount", { amount: money(received) }) : tx.say("recordPayment")}
         </button>
         <button className="secondary-action pressable min-h-10 whitespace-nowrap px-4 text-[14px]" disabled={isPending} onClick={onClose} type="button">
           {tx.say("cancel")}

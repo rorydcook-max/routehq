@@ -521,6 +521,22 @@ export function EditableRentalPaymentRow({ payment, atHandover = false }: { paym
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  // Saved, and the refreshed page is still on its way: the form stays on "Recording…" until the payment
+  // shows as paid, so it never closes onto the old amounts.
+  const [awaitingRefresh, setAwaitingRefresh] = useState(false);
+  useEffect(() => {
+    if (!awaitingRefresh) return;
+    if (String(payment.status || "") === "paid" || Number(payment.amount || 0) !== Number(recordAmount || 0)) {
+      setAwaitingRefresh(false);
+      setRecordingPayment(false);
+      return;
+    }
+    const fallback = window.setTimeout(() => {
+      setAwaitingRefresh(false);
+      setRecordingPayment(false);
+    }, 8000);
+    return () => window.clearTimeout(fallback);
+  }, [awaitingRefresh, payment.status, payment.amount, recordAmount]);
 
   const badgeTone = voided || status === "cancelled" ? "neutral" : status === "paid" ? "green" : atHandover || status === "waived" ? "blue" : status === "overdue" ? "red" : "amber";
   // Scheduled payments can be recorded too: customers often pay early.
@@ -586,7 +602,7 @@ export function EditableRentalPaymentRow({ payment, atHandover = false }: { paym
           method: recordMethod,
           note: recordNote
         });
-        setRecordingPayment(false);
+        setAwaitingRefresh(true);
       } catch (error) {
         setMessage(shownError(error, tx.say("pc_recordFailed")));
       }
@@ -691,7 +707,7 @@ export function EditableRentalPaymentRow({ payment, atHandover = false }: { paym
           </div>
           {message ? <p className="mt-3 rounded-lg bg-[var(--danger-light)] p-2 text-xs font-semibold text-[var(--danger)]">{message}</p> : null}
           <div className="mt-3 flex flex-wrap gap-2">
-            <ActionButton disabled={isPending} onClick={saveReceivedPayment} tone="primary">{isPending ? tx.say("pc_recording") : tx.say("pc_confirmReceived")}</ActionButton>
+            <ActionButton disabled={isPending || awaitingRefresh} onClick={saveReceivedPayment} tone="primary">{isPending || awaitingRefresh ? tx.say("pc_recording") : tx.say("pc_confirmReceived")}</ActionButton>
             <ActionButton disabled={isPending} onClick={() => setRecordingPayment(false)}>{tx.say("cancelBtn")}</ActionButton>
           </div>
         </div>

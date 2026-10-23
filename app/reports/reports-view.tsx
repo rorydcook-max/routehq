@@ -20,7 +20,7 @@ import {
   YAxis
 } from "recharts";
 import { ArrowDownRight, ArrowLeftRight, ArrowUpRight, Check, CheckCircle2, ChevronRight, Download, Handshake, LayoutGrid, Lightbulb, List, Loader2, TrendingUp } from "lucide-react";
-import { intlLocale, longDate } from "@/lib/i18n/dates";
+import { intlLocale, longDate, sinceDate } from "@/lib/i18n/dates";
 import { Dot, InOutBars, Ring } from "@/components/glance";
 import { VehicleArt } from "@/components/vehicle-art";
 import { kindFromCategory } from "@/lib/vehicle-groups";
@@ -647,7 +647,8 @@ export function ReportsView({ data }: { data: ReportsData }) {
                     <span className="block text-[16px] font-bold text-[var(--foreground)]">{balance.customerName}</span>
                     <span className={`block ${soft}`}>
                       {say("owedRentals", { count: balance.rentalCount })}
-                      {balance.oldestDue ? <> · <span className="whitespace-nowrap">{say("owedSince", { date: longDate(balance.oldestDue, locale) })}</span></> : null}
+                      {/* The dot travels with the date, so a wrap never leaves "1 rental ·" hanging; this year's dates drop the year. */}
+                      {balance.oldestDue ? <span className="whitespace-nowrap"> · {say("owedSince", { date: sinceDate(balance.oldestDue, locale) })}</span> : null}
                     </span>
                   </span>
                   <span className="flex shrink-0 items-center gap-1 text-[17px] font-bold text-[var(--foreground)]">

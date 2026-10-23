@@ -434,12 +434,12 @@ export function TransactionsList({
               ) : null}
             </p>
             {who || (transaction.rentalId && transaction.bookingRef) ? (
-              <p className="line-clamp-2 break-words font-medium text-[var(--foreground-secondary)]">
+              <p className="break-words font-medium text-[var(--foreground-secondary)]">
                 {who}
                 {transaction.rentalId && transaction.bookingRef ? (
                   <span className="whitespace-nowrap">
                     {who ? " · " : ""}
-                    <Link className="font-semibold text-[var(--primary)] hover:underline" href={`/bookings/${transaction.rentalId}`} onClick={(event) => event.stopPropagation()}>
+                    <Link className="-my-3 inline-block py-3 font-semibold text-[var(--primary)] hover:underline" href={`/bookings/${transaction.rentalId}`} onClick={(event) => event.stopPropagation()}>
                       {transaction.bookingRef}
                     </Link>
                   </span>

@@ -24,6 +24,13 @@ export function longDate(iso: string | null | undefined, locale: string) {
   return customerDate(String(iso || ""), locale, true);
 }
 
+/** This year's dates without the year ("27 Sep"), other years with it ("27 Sep 2025"). */
+export function sinceDate(iso: string | null | undefined, locale: string) {
+  const value = String(iso || "");
+  const thisYear = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok", year: "numeric" }).format(new Date());
+  return value.slice(0, 4) === thisYear ? shortDate(value, locale) : longDate(value, locale);
+}
+
 /** "2026-09-30" -> "Wed 30 Sep". Server-rendered pages only for Burmese, Lao and Sinhala (the weekday comes from Intl). */
 export function dayOfWeekDate(iso: string | null | undefined, locale: string) {
   const value = String(iso || "");

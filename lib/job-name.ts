@@ -14,6 +14,11 @@ export function jobNameFor(todo: Todo, action: string | null | undefined, title:
     const amount = String(title || "").match(/\((.+?) of .+? owed/)?.[1];
     return amount ? todo(key, { amount }) : todo("job_owed_early_short" as never);
   }
+  if (action === "refund") {
+    // "Refund to decide - returned 4 days before the paid time ran out (pro rata ฿3,600)"
+    const amount = String(title || "").match(/pro rata (\S+?)\)/)?.[1];
+    if (amount && todo.has("job_refund_amount" as never)) return todo("job_refund_amount" as never, { amount });
+  }
   // Other names that need a figure are only built where the figure is known (To do).
   if (action === "extension" || action === "handover_collect") return null;
   return todo(key);

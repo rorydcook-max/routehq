@@ -171,12 +171,12 @@ export async function getDashboardData(): Promise<DashboardData> {
       const held = String(row.deposit_status || "").toLowerCase() === "received" ? Number(row.deposit_held || 0) : 0;
       return { ...mapRental(row), overdue: late?.amount || 0, overdueSince: late?.since || null, dueToday: dueTodayByRental.get(row.id) || 0, depositHeld: held };
     });
-  // Money still owed on a booking that has ended is still owed: it counts on the dashboard too.
+  // Money still owed on a booking that has ended is still owed (late, or due today): it counts on the dashboard too.
   const closedOverdue: Rental[] = rentalRows
-    .filter((row: any) => ["completed", "cancelled"].includes(String(row.status || "").toLowerCase()) && (overdueByRental.get(row.id)?.amount || 0) > 0)
+    .filter((row: any) => ["completed", "cancelled"].includes(String(row.status || "").toLowerCase()) && ((overdueByRental.get(row.id)?.amount || 0) > 0 || (dueTodayByRental.get(row.id) || 0) > 0))
     .map((row: any) => {
-      const late = overdueByRental.get(row.id)!;
-      return { ...mapRental(row), overdue: late.amount, overdueSince: late.since, depositHeld: 0 };
+      const late = overdueByRental.get(row.id);
+      return { ...mapRental(row), overdue: late?.amount || 0, overdueSince: late?.since || null, dueToday: dueTodayByRental.get(row.id) || 0, depositHeld: 0 };
     });
   // A vehicle booked for next month is free today. "Booked" is kept for one whose booking starts today or has started.
   // A stored "Reserved" with no live booking behind it (a hold that ran out, say) is shown as what it is: free.

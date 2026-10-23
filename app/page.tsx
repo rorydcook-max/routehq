@@ -159,6 +159,8 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
 
   // Only payments past their due date count as overdue.
   const overdueRentals = [...rentals, ...(dashboardData.closedOverdue || [])].filter((r) => (r.overdue || 0) > 0).sort((a, b) => String(a.overdueSince).localeCompare(String(b.overdueSince)));
+  const dueTodayRentals = [...rentals, ...(dashboardData.closedOverdue || [])].filter((r) => (r.dueToday || 0) > 0);
+  const dueTodayTotal = dueTodayRentals.reduce((sum, r) => sum + (r.dueToday || 0), 0);
   const overdueTotal = overdueRentals.reduce((sum, r) => sum + (r.overdue || 0), 0);
   const depositsHeld = metrics.depositsHeld ?? rentals.reduce((sum, r) => sum + (r.depositHeld || 0), 0);
 
@@ -233,8 +235,8 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       action: t("collect")
     });
   }
-  // Money due today on a rental that is out (and nothing late on it): today's job, before it becomes overdue.
-  for (const r of rentals) {
+  // Money due today (and nothing late on that booking): today's job, before it becomes overdue.
+  for (const r of [...rentals, ...(dashboardData.closedOverdue || [])]) {
     if (!(r.dueToday && r.dueToday > 0) || (r.overdue || 0) > 0) continue;
     todayItems.push({
       key: `pay-today-${r.id}`,
@@ -537,6 +539,15 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
           <span>
             <span className="num block text-[28px] leading-tight">{money(overdueTotal)}</span>
             <span className="font-semibold">{overdueCustomers === 1 ? firstName(firstOverdue.customer) : t("customersCount", { count: overdueCustomers })}</span>
+          </span>
+        </Link>
+      ) : dueTodayTotal > 0 ? (
+        // Nothing late, but money is due today: not "nobody owes you money".
+        <Link className="card pressable tile p-4 tile-mango" href={(dueTodayRentals.length === 1 ? `/bookings/${dueTodayRentals[0].id}` : "/tasks") as Route}>
+          <TileHead icon={<Clock3 size={22} />} title={t("tileDueToday")} />
+          <span>
+            <span className="num block text-[28px] leading-tight">{money(dueTodayTotal)}</span>
+            <span className="font-semibold">{new Set(dueTodayRentals.map((r) => r.customer)).size === 1 ? firstName(dueTodayRentals[0].customer) : t("customersCount", { count: new Set(dueTodayRentals.map((r) => r.customer)).size })}</span>
           </span>
         </Link>
       ) : (

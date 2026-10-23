@@ -61,7 +61,7 @@ export function DoNotRent({
 
   if (!open) {
     return (
-      <button className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--muted)] hover:text-[var(--danger)]" onClick={() => setOpen(true)} type="button">
+      <button className="tap-target mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--muted)] hover:text-[var(--danger)]" onClick={() => setOpen(true)} type="button">
         <Ban size={15} />
         {say("dnr_add")}
       </button>

@@ -142,7 +142,8 @@
     "profitWeeks": "กำไรรายสัปดาห์",
     "weekTip": "สัปดาห์ {date}: {amount}",
     "planTitle": "กำหนดการ",
-    "amountDueToday": "ครบกำหนดวันนี้ {amount}"
+    "amountDueToday": "ครบกำหนดวันนี้ {amount}",
+    "tileDueToday": "ครบกำหนดวันนี้"
   },
   "vehicles": {
     "addVehicle": "เพิ่มยานพาหนะใหม่",
@@ -1180,7 +1181,8 @@
     "job_handover": "ยังไม่ได้ส่งมอบรถ",
     "job_handover_collect": "เก็บเงิน {amount} ตอนส่งมอบรถ",
     "handOver": "ส่งมอบรถ",
-    "openBooking": "เปิดการจอง"
+    "openBooking": "เปิดการจอง",
+    "job_refund_amount": "ต้องตัดสินใจเรื่องคืนเงิน: {amount} สำหรับวันที่ไม่ได้ใช้"
   },
   "bookings": {
     "eyebrow": "การจอง",

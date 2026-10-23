@@ -343,7 +343,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             currency: organization.currency,
             zone: organization.timezone.replace("_", " "),
             link: (chunks) => (
-              <Link className="font-bold text-[var(--primary)]" href="/account">
+              <Link className="tap-target font-bold text-[var(--primary)]" href="/account">
                 {chunks}
               </Link>
             )

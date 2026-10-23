@@ -83,9 +83,16 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
   /** The longest period a vehicle is priced for: "฿18,000/mo", else per week, else per day. */
   const priceOf = (vehicle: { monthlyRate: number; weeklyRate: number; dailyRate: number }) =>
     vehicle.monthlyRate > 0 ? t("perMo", { amount: money(vehicle.monthlyRate) }) : vehicle.weeklyRate > 0 ? t("perWk", { amount: money(vehicle.weeklyRate) }) : vehicle.dailyRate > 0 ? t("perDay", { amount: money(vehicle.dailyRate) }) : "";
-  // The year is added when it is not this year: "overdue since 1 Dec" on its own read as a date still to come.
+  // "overdue since 1 Dec" a year back would read as a date still to come, so far-off dates keep the year.
+  // The year only when the date is far enough off to be ambiguous: "Free until 9 Feb" in October needs no
+  // "2027" (which pushed the status pill into the price column).
   const dayMonth = (value: string) =>
-    new Intl.DateTimeFormat(locale === "en" ? "en-GB" : `${locale}-u-ca-gregory-nu-latn`, { day: "numeric", month: "short", ...(value.slice(0, 4) !== new Date().toISOString().slice(0, 4) ? { year: "numeric" } : {}), timeZone: "UTC" }).format(new Date(`${value}T00:00:00Z`));
+    new Intl.DateTimeFormat(locale === "en" ? "en-GB" : `${locale}-u-ca-gregory-nu-latn`, {
+      day: "numeric",
+      month: "short",
+      ...(Math.abs(new Date(`${value.slice(0, 10)}T00:00:00Z`).getTime() - Date.now()) > 300 * 86_400_000 ? { year: "numeric" } : {}),
+      timeZone: "UTC"
+    }).format(new Date(`${value}T00:00:00Z`));
   const [t, c, locale] = await Promise.all([getTranslations("fleet"), getTranslations("common"), getLocale()]);
   // At a glance (Look G): how busy the fleet is, and the next piece of paperwork or service due.
   const busy = vehicles.length > 0 ? Math.round(vehicles.reduce((sum, vehicle) => sum + Number(vehicle.utilization || 0), 0) / vehicles.length) : 0;

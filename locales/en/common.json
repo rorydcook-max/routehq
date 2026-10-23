@@ -142,7 +142,8 @@
     "profitWeeks": "Profit week by week",
     "weekTip": "Week of {date}: {amount}",
     "planTitle": "What's on",
-    "amountDueToday": "{amount} due today"
+    "amountDueToday": "{amount} due today",
+    "tileDueToday": "Due today"
   },
   "nav": {
     "main": "Main",
@@ -1171,7 +1172,8 @@
     "job_handover": "Not handed over yet",
     "job_handover_collect": "{amount} to collect at handover",
     "handOver": "Hand over",
-    "openBooking": "Open booking"
+    "openBooking": "Open booking",
+    "job_refund_amount": "Refund to decide: {amount} for unused days"
   },
   "bookings": {
     "eyebrow": "Bookings",

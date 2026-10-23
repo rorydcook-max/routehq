@@ -1831,6 +1831,15 @@ details[open] > summary:not([class*="flex"]):not([class*="grid"]):not(:has(svg, 
     position: absolute;
     inset: -10px -6px;
   }
+  /* The same for small buttons and links that opt in ("Don't rent to them again", "Not now"). */
+  .tap-target {
+    position: relative;
+  }
+  .tap-target::after {
+    content: "";
+    position: absolute;
+    inset: -8px -4px;
+  }
 }
 
 /* Count chips in the header that filter the page ("4 out earning"). The chosen one is solid. */

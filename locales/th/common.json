@@ -1144,7 +1144,7 @@
     "payTitle_top_up": "ยอดเพิ่ม {amount}",
     "payTitle_extension": "ค่าต่อเวลา {amount}",
     "refundTitle": "คืนเงิน {amount}?",
-    "refundEarlyShort": "คืนรถก่อนกำหนด {days} วัน",
+    "refundEarlyShort": "คืนรถก่อนกำหนด · {days} วันที่ไม่ได้ใช้",
     "refundCancelledShort": "{name} ยกเลิก",
     "daysLate": "เลยกำหนด {count} วัน",
     "payTitle_charge": "เรียกเก็บ {amount}",

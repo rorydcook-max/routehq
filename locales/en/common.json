@@ -1135,7 +1135,7 @@
     "payTitle_top_up": "{amount} top-up",
     "payTitle_extension": "{amount} extension",
     "refundTitle": "{amount} refund?",
-    "refundEarlyShort": "Back {days, plural, one {# day} other {# days}} early",
+    "refundEarlyShort": "Back early · {days, plural, one {# unused day} other {# unused days}}",
     "refundCancelledShort": "{name} cancelled",
     "daysLate": "{count, plural, one {# day late} other {# days late}}",
     "payTitle_charge": "{amount} charge",

@@ -42,6 +42,8 @@ export type TaskListItem = {
   paymentLabel: string | null;
   /** What kind of payment this is, so the screen can name it in the reader's language. */
   pay?: { kind: "deposit" | "top_up" | "extension" | "rent" | "charge" | "extras"; period: string | null } | null;
+  /** Several payments of one kind due the same day on one booking, shown as one job (the others are covered by it). */
+  bundle?: { ids: string[]; total: number } | null;
   /** What kind of request a customer made. */
   request?: string | null;
 };
@@ -285,6 +287,21 @@ export async function getTaskList(organizationId: string): Promise<TaskListItem[
       pay: payKind(row.metadata)
     };
   });
+
+  // Two pieces of the same kind due the same day on one booking (e.g. what was left of the rent after unused days
+  // were taken off) read as one job with the total, not two small ones. Recording it covers both.
+  const sameDay = new Map<string, TaskListItem[]>();
+  for (const item of paymentItems) {
+    if (item.receipt || item.coveredBy || !item.rentalId || !item.dueDate) continue;
+    const key = `${item.rentalId}|${item.dueDate}|${item.pay?.kind || "other"}`;
+    sameDay.set(key, [...(sameDay.get(key) || []), item]);
+  }
+  for (const items of sameDay.values()) {
+    if (items.length < 2) continue;
+    const [lead, ...rest] = items;
+    lead.bundle = { ids: items.map((item) => item.rentalPaymentId as string), total: items.reduce((sum, item) => sum + Number(item.amount || 0), 0) };
+    for (const item of rest) item.coveredBy = lead.id;
+  }
 
   // A booking whose day has come but the vehicle hasn't gone out: hand it over (taking what's due then), or cancel it.
   const handoverItems: TaskListItem[] = handoversDue.map((row) => ({

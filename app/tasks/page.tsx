@@ -14,7 +14,8 @@ export default async function TasksPage() {
   const t = await getTranslations("todo");
   const today = businessToday();
   const weekEnd = businessToday(7);
-  const open = tasks.filter((task: any) => !task.completedAt);
+  // Counted as the list shows them: a payment covered by another job (one receipt, or same-day pieces) isn't its own job.
+  const open = tasks.filter((task: any) => !task.completedAt && !task.coveredBy);
   const overdue = open.filter((task: any) => task.dueDate && task.dueDate < today).length;
   const dueToday = open.filter((task: any) => task.dueDate === today).length;
   const thisWeek = open.filter((task: any) => task.dueDate && task.dueDate > today && task.dueDate <= weekEnd).length;

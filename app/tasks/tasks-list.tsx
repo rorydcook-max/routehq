@@ -63,7 +63,7 @@ function whenShort(item: TaskListItem, today: string, overdue: boolean, tx: Tx) 
 
 /** "฿9,500 rent": the amount leads, the kind follows. */
 function payTitle(item: TaskListItem, tx: Tx) {
-  const amount = money(item.receipt ? item.receipt.total : item.amount || 0);
+  const amount = money(item.receipt ? item.receipt.total : item.bundle ? item.bundle.total : item.amount || 0);
   const kind = item.pay?.kind || "rent";
   return tx.say(tx.has(`payTitle_${kind}`) ? `payTitle_${kind}` : "payTitle_rent", { amount });
 }
@@ -226,10 +226,10 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
     .filter((entry) => entry.rentalPaymentId)
     .map((entry) => ({ id: entry.rentalPaymentId as string, label: payText(entry, "pay", tx), amount: entry.amount || 0, dueDate: entry.dueDate || "9999-12-31" }))
     .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
-  const [value, setValue] = useState(String(receipt?.total || item.amount || ""));
+  const [value, setValue] = useState(String(receipt?.total || item.bundle?.total || item.amount || ""));
   const [date, setDate] = useState(today);
   const [method, setMethod] = useState(receipt?.method || "cash");
-  const [chosenIds, setChosenIds] = useState<string[]>(receipt?.paymentIds?.length ? receipt.paymentIds : [item.rentalPaymentId as string]);
+  const [chosenIds, setChosenIds] = useState<string[]>(receipt?.paymentIds?.length ? receipt.paymentIds : item.bundle?.ids.length ? item.bundle.ids : [item.rentalPaymentId as string]);
   const [error, setError] = useState<string | null>(null);
   const [tellCustomer, setTellCustomer] = useState(true);
   const [isPending, startTransition] = useTransition();

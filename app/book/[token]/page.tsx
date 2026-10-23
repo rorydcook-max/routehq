@@ -339,7 +339,10 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   const bookingData = (detail.bookingLink?.booking_data || {}) as Record<string, unknown>;
   const delivery = deliveryText(rental, bookingData, t, locale);
   const businessName = organization?.name || t("theRentalBusiness");
-  const handedOver = detail.state === "active" || detail.state === "completed";
+  // Handed over: the link's own stage, or the rental itself (a vehicle handed over before the customer filled in
+  // the link is out, though the link still asks for documents and a signature).
+  const handedOver =
+    detail.state === "active" || detail.state === "completed" || ["active", "due_soon", "overdue", "extended", "completed"].includes(String(detail.rental?.status || ""));
   const included = includedItems(detail.bookingLink?.included_items);
   const logoUrl = organization?.logo_display_url || null;
   const ownerContact = organization?.settings?.phone || organization?.settings?.business_phone || organization?.owner_phone || null;

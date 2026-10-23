@@ -1186,7 +1186,9 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         </details>
       </section>
 
-      {/* When the business has already set both the place and the time, they are shown at the top: asking again is only for a customer who wants them changed. */}
+      {/* When the business has already set both the place and the time, they are shown at the top: asking again is only for a customer who wants them changed.
+          Not asked at all once the customer already has the vehicle. */}
+      {detail.vehicleWithCustomer ? null : (
       <HandoverWishes
         agreed={Boolean((customerCollects || String(detail.bookingData.delivery_location || "").trim()) && operatorDeliveryDateTime)}
         changeLabel={customerCollects ? t("collectChange") : t("handoverChange")}
@@ -1224,14 +1226,16 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           </label>
         </div>
       </HandoverWishes>
+      )}
 
-      {/* A cash-only business has nothing to choose between: say how to pay in one line. */}
-      {acceptedMethods.length === 1 && acceptedMethods[0] === "cash" ? (
+      {/* A cash-only business has nothing to choose between: say how to pay in one line ("when you get the
+          vehicle" — so not shown to someone who already has it). */}
+      {acceptedMethods.length === 1 && acceptedMethods[0] === "cash" ? (detail.vehicleWithCustomer ? null : (
         <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
           <SectionTitle icon={CreditCard} label={t("method_cash")} />
           <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{t("method_cash_hint")}</p>
         </section>
-      ) : acceptedMethods.length > 0 ? (
+      )) : acceptedMethods.length > 0 ? (
         <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
           <SectionTitle icon={CreditCard} label={t("howPay")} />
           <div className="mt-4 grid gap-3">

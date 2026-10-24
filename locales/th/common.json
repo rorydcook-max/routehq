@@ -883,7 +883,23 @@
     "datesPassedMessage": "การจองนี้ยังไม่ได้ยืนยันและเลยวันที่จองไปแล้ว กรุณาติดต่อ {business} เพื่อเลือกวันใหม่ หรือจองใหม่อีกครั้ง",
     "embedPoweredBy": "จองกับ {business}",
     "embedBooked": "เราจองรถไว้ให้คุณแล้ว",
-    "embedContinue": "ไปต่อเพื่อจองให้เสร็จ"
+    "embedContinue": "ไปต่อเพื่อจองให้เสร็จ",
+    "slipTitle": "จ่ายแล้วใช่ไหม?",
+    "slipHint": "ส่งสลิปโอนเงิน แล้วเราจะจับคู่กับยอดที่ต้องจ่ายให้",
+    "slipSend": "ส่งสลิป",
+    "slipReading": "กำลังอ่านสลิป…",
+    "slipReadingHint": "ใช้เวลาไม่กี่วินาที",
+    "slipShows": "สลิปของคุณแสดงยอด {amount}",
+    "slipShowsOn": "สลิปของคุณแสดงยอด {amount} วันที่ {date}",
+    "slipIsItFor": "เป็นการจ่าย{name}ใช่ไหม?",
+    "slipYes": "ใช่ ส่งเลย",
+    "slipNo": "ไม่ใช่ เป็นรายการอื่น",
+    "slipWhichOne": "สลิปนี้สำหรับรายการไหน?",
+    "slipNotSlip": "รูปนี้ดูไม่เหมือนสลิปโอนเงิน แต่ยังส่งได้",
+    "slipSentBefore": "คุณเคยส่งสลิปนี้แล้ว ส่งอีกครั้งเฉพาะเมื่อเป็นการจ่ายรายการอื่น",
+    "slipAnother": "ใช้รูปอื่น",
+    "slipSent": "ส่งสลิปแล้ว",
+    "slipAnotherPayment": "ส่งสลิปอื่น"
   },
   "customerMessages": {
     "hi": "สวัสดีคุณ {name}",
@@ -1186,7 +1202,9 @@
     "job_handover_collect": "เก็บเงิน {amount} ตอนส่งมอบรถ",
     "handOver": "ส่งมอบรถ",
     "openBooking": "เปิดการจอง",
-    "job_refund_amount": "ต้องตัดสินใจเรื่องคืนเงิน: {amount} สำหรับวันที่ไม่ได้ใช้"
+    "job_refund_amount": "ต้องตัดสินใจเรื่องคืนเงิน: {amount} สำหรับวันที่ไม่ได้ใช้",
+    "slipMatches": "✓ สลิปแสดง {amount} ยอดถูกต้อง",
+    "slipDiffers": "สลิปแสดง {amount} ไม่ใช่ {total} ตรวจสอบก่อนยืนยัน"
   },
   "bookings": {
     "eyebrow": "การจอง",

@@ -73,15 +73,18 @@ export function tidyReceipt(raw: Record<string, unknown>): ReadReceipt {
   };
 }
 
-/** Reads a receipt or transfer slip photo (or PDF). Business paperwork, not personal: any configured reader may be used. */
-export async function readReceipt(bytes: Buffer, mediaType: string): Promise<ReadReceipt> {
+/**
+ * Reads a receipt or transfer slip photo (or PDF). A business's own receipts aren't personal; a customer's
+ * transfer slip is (names, account digits), so it only goes to the readers allowed personal documents.
+ */
+export async function readReceipt(bytes: Buffer, mediaType: string, personal = false): Promise<ReadReceipt> {
   const raw = await readFileAsJson({
     system: SYSTEM,
     prompt: "Read this receipt or payment slip.",
     bytes,
     mediaType: mediaType || "image/jpeg",
     maxTokens: 500,
-    personal: false
+    personal
   });
   return tidyReceipt(raw);
 }

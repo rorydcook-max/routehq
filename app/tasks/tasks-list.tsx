@@ -464,6 +464,14 @@ function TaskRow({ item, organizationId, today, siblings = [], canDecide = true 
               {tx.say("receiptSent", { method: methodLabel(receipt.method, tx), day: dayLabel(new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date(receipt.submittedAt)), today, tx) })}
             </p>
           ) : null}
+          {receipt?.slip?.amount ? (
+            // What the slip itself says, read when the customer sent it: a match is one less thing to check.
+            Math.abs(receipt.slip.amount - receipt.total) <= 1 ? (
+              <p className="mt-0.5 text-sm font-semibold text-[var(--success)]">{tx.say("slipMatches", { amount: money(receipt.slip.amount) })}</p>
+            ) : (
+              <p className="mt-0.5 text-sm font-semibold text-[var(--warning)]">{tx.say("slipDiffers", { amount: money(receipt.slip.amount), total: money(receipt.total) })}</p>
+            )
+          ) : null}
           {receiptError ? <p className="mt-1 text-[14px] font-semibold text-[var(--danger)]">{receiptError}</p> : null}
           {waitsForDecider ? <p className="mt-1 font-semibold text-[var(--foreground-secondary)]">{tx.say("decidedByOwner")}</p> : null}
           {waiverError ? <p className="mt-1 font-semibold text-[var(--danger)]">{waiverError}</p> : null}
@@ -488,8 +496,8 @@ function TaskRow({ item, organizationId, today, siblings = [], canDecide = true 
           ) : null}
       </div>
 
-      {/* Buttons share the full card width so a row of two or three never breaks onto a second line. */}
-      <div className="flex items-center gap-2 [&_a]:whitespace-nowrap [&_button]:whitespace-nowrap [&>*]:min-w-0 [&>*]:flex-1 [&>a]:justify-center [&>button]:justify-center [&_button]:w-full [&_form]:min-w-0 [&_form]:flex-1 lg:min-w-[19rem] lg:shrink-0 lg:justify-end lg:[&>*]:flex-none lg:[&_button]:w-auto">
+      {/* Buttons share the full card width. Three (a receipt to check) don't fit a phone: confirming takes its own row there. */}
+      <div className="flex flex-wrap items-center gap-2 lg:flex-nowrap [&_a]:whitespace-nowrap [&_button]:whitespace-nowrap [&>*]:min-w-0 [&>*]:flex-1 [&>a]:justify-center [&>button]:justify-center [&_button]:w-full [&_form]:min-w-0 [&_form]:flex-1 lg:min-w-[19rem] lg:shrink-0 lg:justify-end lg:[&>*]:flex-none lg:[&_button]:w-auto">
         {receipt?.url ? (
           <a className="secondary-action pressable min-h-9 px-3 text-[14px]" href={receipt.url} rel="noreferrer" target="_blank">
             {tx.say("viewReceipt")}
@@ -497,7 +505,7 @@ function TaskRow({ item, organizationId, today, siblings = [], canDecide = true 
         ) : null}
         {receipt && !recording ? (
           <>
-            <button className="primary-action pressable min-h-9 px-3 text-xs" disabled={isConfirming} onClick={confirmReceipt} type="button">
+            <button className={`primary-action pressable min-h-9 px-3 text-xs ${receipt?.url ? "order-first basis-full! sm:order-none sm:basis-0!" : ""}`} disabled={isConfirming} onClick={confirmReceipt} type="button">
               {isConfirming ? tx.say("saving") : tx.say("confirmReceived")}
             </button>
             <button className="secondary-action pressable min-h-9 px-3 text-xs" disabled={isConfirming} onClick={() => setRecording(true)} type="button">

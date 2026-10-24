@@ -35,6 +35,8 @@ export type TaskListItem = {
     paymentIds: string[];
     /** The total of those payments. */
     total: number;
+    /** What the slip says (amount and date), when it was read. */
+    slip: { amount: number | null; date: string | null } | null;
   } | null;
   /** This payment is part of another row's receipt, so it isn't listed on its own. */
   coveredBy: string | null;
@@ -278,7 +280,8 @@ export async function getTaskList(organizationId: string): Promise<TaskListItem[
             method: receipt.method || "other",
             note: receipt.note || null,
             paymentIds: group.map((item: any) => item.id),
-            total: group.reduce((sum: number, item: any) => sum + Number(item.amount || 0), 0)
+            total: group.reduce((sum: number, item: any) => sum + Number(item.amount || 0), 0),
+            slip: receipt.read ? { amount: receipt.read.amount ?? null, date: receipt.read.date ?? null } : null
           }
         : null,
       // Free early days a teammate asked for: the "to confirm" job stands in for it until the owner or a manager decides.

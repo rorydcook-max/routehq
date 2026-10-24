@@ -7,6 +7,7 @@ import { useState, useTransition } from "react";
 import { CheckCircle2, Clock, Copy, Wallet } from "lucide-react";
 import { submitPaymentReceipt } from "@/app/actions/public-booking";
 import type { PortalBundle, PortalPayment } from "@/lib/payment-receipts";
+import { SlipMatcher } from "./slip-matcher";
 
 type OrgPayment = {
   promptpay_id?: string | null;
@@ -72,6 +73,19 @@ export function PortalPayments({
   return (
     <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
       <p className="text-xs font-semibold uppercase text-[var(--primary)]">{t("payments")}</p>
+      {/* Paid already: send the slip first, and the page works out what it is for. */}
+      {canPayHere && payments.some((payment) => !payment.receiptSentAt) ? (
+        <div className="mt-3">
+          <SlipMatcher
+            bundle={bundle}
+            defaultMethod={payments[0]?.qrSvg ? "promptpay" : orgPayment?.bank_account_number ? "bank_transfer" : orgPayment?.promptpay_id ? "promptpay" : orgPayment?.wise_link ? "wise" : orgPayment?.revolut_link ? "revolut" : "other"}
+            organizationName={organizationName}
+            payments={payments}
+            shrink={shrinkImage}
+            token={token}
+          />
+        </div>
+      ) : null}
       <div className="mt-3 divide-y divide-[var(--border)]">
         {bundle && canPayHere ? (
           <PaymentRow

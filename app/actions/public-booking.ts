@@ -2,6 +2,9 @@
 
 import { said } from "@/lib/i18n/server-text";
 import { readFileAsJson, visionProvider } from "@/lib/ai-vision";
+import { readReceipt } from "@/lib/receipt-reading";
+import { matchSlip } from "@/lib/slip-matching";
+import { getPortalPayments } from "@/lib/payment-receipts";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { retakeHold } from "@/lib/booking-holds";
@@ -1231,10 +1234,89 @@ export async function completePublicBooking(formData: FormData) {
 
 
 /**
+ * The customer sends a transfer slip without choosing a payment first. It is read (amount, date, reference)
+ * and matched to what they owe, so the page can ask one question: "Is this for October's rent?". Nothing is
+ * saved here: the customer's tap sends it with submitPaymentReceipt, the same as choosing the payment by hand.
+ */
+export async function readPaymentSlip(formData: FormData) {
+  const token = requiredString(formData, "token");
+  const file = formData.get("slip");
+  const supabase = createSupabaseAdminClient() as any;
+  if (!(file instanceof File) || file.size === 0) return { ok: false as const, error: await said("Please add a photo or screenshot of your receipt.") };
+  if (!file.type.startsWith("image/") && file.type !== "application/pdf") return { ok: false as const, error: await said("Please send a photo, a screenshot or a PDF.") };
+  if (file.size > 4 * 1024 * 1024) return { ok: false as const, error: await said("That file is too large. Please send a screenshot instead.") };
+
+  const { data: bookingLink } = await supabase
+    .from("booking_links")
+    .select("id, organization_id, rental_id, status, booking_data")
+    .eq("token", token)
+    .is("deleted_at", null)
+    .maybeSingle();
+  if (!bookingLink?.rental_id || bookingLink.status === "cancelled") return { ok: false as const, error: await said("This booking link could not be found.") };
+
+  const { payments, bundle } = await getPortalPayments(bookingLink.rental_id, null);
+  const candidates = payments.map((payment) => ({ id: payment.id, amount: payment.amount, dueDate: payment.dueDate, receiptSentAt: payment.receiptSentAt }));
+  const unread = { ok: true as const, read: null, match: null, duplicate: false };
+  if (!visionProvider(true)) return unread;
+
+  // Reading costs money: a dozen slips a day per booking is plenty for a real customer.
+  const today = new Date().toISOString().slice(0, 10);
+  const used = recordObject(recordObject(bookingLink.booking_data).slip_reads);
+  const count = used.day === today ? Number(used.count || 0) : 0;
+  if (count >= 12) return unread;
+  await supabase
+    .from("booking_links")
+    .update({ booking_data: { ...recordObject(bookingLink.booking_data), slip_reads: { day: today, count: count + 1 } } })
+    .eq("id", bookingLink.id);
+
+  try {
+    const read = await readReceipt(Buffer.from(await file.arrayBuffer()), file.type, true);
+    if (!read.isReceipt || !read.amount) return { ...unread, read: read.isReceipt ? { amount: null, date: read.date, reference: read.reference, paidBy: read.paidBy } : null, notSlip: !read.isReceipt };
+    // The same slip sent before (same bank reference): say so rather than send it twice.
+    let duplicate = false;
+    if (read.reference) {
+      const { data: rows } = await supabase
+        .from("rental_payments")
+        .select("metadata")
+        .eq("rental_id", bookingLink.rental_id)
+        .eq("organization_id", bookingLink.organization_id)
+        .is("deleted_at", null);
+      duplicate = ((rows || []) as any[]).some((row) => recordObject(recordObject(recordObject(row.metadata).receipt).read).reference === read.reference || recordObject(row.metadata).paid_slip_reference === read.reference);
+    }
+    return {
+      ok: true as const,
+      read: { amount: read.amount, date: read.date, reference: read.reference, paidBy: read.paidBy },
+      match: matchSlip(read.amount, candidates, bundle ? { ids: bundle.ids, amount: bundle.amount } : null),
+      duplicate
+    };
+  } catch (error) {
+    console.error("[readPaymentSlip]", error instanceof Error ? error.message : error);
+    return unread;
+  }
+}
+
+/**
  * The customer has paid outside the app (PromptPay, transfer...) and sends the
  * receipt from their booking page. Nothing is marked as paid here: the receipt
  * waits on the scheduled payment until someone at the business confirms it.
  */
+/** What readPaymentSlip read off the slip, sent back with the customer's tap. Only plain values are kept. */
+function slipReadFrom(formData: FormData) {
+  try {
+    const raw = JSON.parse(String(formData.get("slipRead") || "null"));
+    if (!raw || typeof raw !== "object") return null;
+    const amount = Number(raw.amount);
+    return {
+      amount: Number.isFinite(amount) && amount > 0 ? Math.round(amount * 100) / 100 : null,
+      date: typeof raw.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(raw.date) ? raw.date : null,
+      reference: typeof raw.reference === "string" ? raw.reference.slice(0, 60) : null,
+      paid_by: typeof raw.paidBy === "string" ? raw.paidBy.slice(0, 80) : null
+    };
+  } catch {
+    return null;
+  }
+}
+
 export async function submitPaymentReceipt(formData: FormData) {
   const token = requiredString(formData, "token");
   const paymentId = requiredString(formData, "paymentId");
@@ -1296,7 +1378,8 @@ export async function submitPaymentReceipt(formData: FormData) {
 
   const submittedAt = new Date().toISOString();
   const totalAmount = targets.reduce((sum, row) => sum + Number(row.amount || 0), 0);
-  const receipt = { path: storagePath, submitted_at: submittedAt, method, note, primary: payment.id, covers: targets.map((row) => row.id), amount: totalAmount };
+  const slip = slipReadFrom(formData);
+  const receipt = { path: storagePath, submitted_at: submittedAt, method, note, primary: payment.id, covers: targets.map((row) => row.id), amount: totalAmount, ...(slip ? { read: slip } : {}) };
   const replacedPaths = new Set<string>(targets.map((row) => recordObject(recordObject(row.metadata).receipt).path).filter((path) => typeof path === "string" && path) as string[]);
 
   for (const row of targets) {

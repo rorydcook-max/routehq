@@ -23,6 +23,8 @@ export type PaymentReceipt = {
   covers?: string[];
   /** Total of the payments the customer says this receipt is for. */
   amount?: number;
+  /** What the slip itself says, when it was read: checked against the total by the person confirming. */
+  read?: { amount: number | null; date: string | null; reference: string | null; paid_by: string | null };
 };
 
 /** Several payments paid in one go: one QR for the total, one receipt for all. */

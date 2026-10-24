@@ -874,7 +874,23 @@
     "datesPassedMessage": "This booking was never confirmed and its dates are now over. Please contact {business} to arrange new dates, or book again.",
     "embedPoweredBy": "Book with {business}",
     "embedBooked": "Your car is held for you",
-    "embedContinue": "Continue to your booking"
+    "embedContinue": "Continue to your booking",
+    "slipTitle": "Paid already?",
+    "slipHint": "Send your transfer slip and we'll match it to what you owe.",
+    "slipSend": "Send slip",
+    "slipReading": "Reading your slip…",
+    "slipReadingHint": "This takes a few seconds.",
+    "slipShows": "Your slip shows {amount}.",
+    "slipShowsOn": "Your slip shows {amount} on {date}.",
+    "slipIsItFor": "Is it for {name}?",
+    "slipYes": "Yes, send it",
+    "slipNo": "No, something else",
+    "slipWhichOne": "Which payment is it for?",
+    "slipNotSlip": "That doesn't look like a payment slip, but you can still send it.",
+    "slipSentBefore": "You've sent this slip before. Only send it again if it's for a different payment.",
+    "slipAnother": "Use a different photo",
+    "slipSent": "Slip sent",
+    "slipAnotherPayment": "Send another slip"
   },
   "customerMessages": {
     "hi": "Hi {name},",
@@ -1177,7 +1193,9 @@
     "job_handover_collect": "{amount} to collect at handover",
     "handOver": "Hand over",
     "openBooking": "Open booking",
-    "job_refund_amount": "Refund to decide: {amount} for unused days"
+    "job_refund_amount": "Refund to decide: {amount} for unused days",
+    "slipMatches": "✓ The slip shows {amount}, the right amount",
+    "slipDiffers": "The slip shows {amount}, not {total}. Check before confirming."
   },
   "bookings": {
     "eyebrow": "Bookings",

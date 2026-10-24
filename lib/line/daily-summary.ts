@@ -197,8 +197,10 @@ export async function fetchSummaryData(organizationId: string): Promise<SummaryD
     ];
     for (const { key, item } of checks) {
       const expiry = compliance[key];
-      // Already expired is the most urgent case, so it is included too.
-      if (expiry && expiry <= in7Days) {
+      // Already expired is the most urgent case, so it is included too. Tax and insurance also get a heads-up
+      // 90, 60 and 30 days out: time to get quotes, and Por Ror Bor needs 90+ days left to pay road tax online.
+      const headsUp = item !== "service" && [addDays(today, 90), addDays(today, 60), addDays(today, 30)].includes(String(expiry || "").slice(0, 10));
+      if (expiry && (expiry <= in7Days || headsUp)) {
         urgentCompliance.push({ vehicle: label, item, expiry });
       }
     }

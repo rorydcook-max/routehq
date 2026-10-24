@@ -13,7 +13,8 @@ import { AppShell } from "@/components/app-shell";
 import { VehicleArt } from "@/components/vehicle-art";
 import { DateLeaf, Dot, ElapsedBar, InOutBars, Ring } from "@/components/glance";
 import { PageTabs, type PageTab } from "@/components/page-tabs";
-import { kindFromCategory } from "@/lib/vehicle-groups";
+import { isTwoWheeler, kindFromCategory } from "@/lib/vehicle-groups";
+import { RenewalForm, RenewalHelp } from "./renewal";
 import { RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
 import { InspectionViewer } from "@/components/inspection-viewer";
 import { PendingButton } from "@/components/pending-button";
@@ -361,6 +362,21 @@ function ComplianceSection({ detail, organizationId }: { detail: VehicleDetail; 
   const soonestDays = daysUntil(soonest?.date);
   const needsLook = soonestDays !== null && soonestDays <= 30;
   const toneText = { red: "text-[var(--danger)]", amber: "text-[var(--warning)]", green: "text-[var(--success)]", neutral: "text-[var(--foreground-secondary)]" };
+  // For "how to renew": the vehicle's age decides online road tax or an inspection first; Por Ror Bor's date decides the order.
+  const vehicle = detail.vehicle;
+  const builtYear = Number(vehicle.year || 0) > 2400 ? Number(vehicle.year) - 543 : Number(vehicle.year || 0);
+  const vehicleAge = builtYear > 1950 ? Number(businessToday().slice(0, 4)) - builtYear : null;
+  const twoWheeler = isTwoWheeler(kindFromCategory(detail.category));
+  const porborDaysLeft = daysUntil(vehicle.metadata?.compliance?.porbor_expiry_date);
+  const specs = (vehicle.specifications || {}) as Record<string, unknown>;
+  const paperDetails = [
+    [vehicle.registration_number, vehicle.metadata?.registration_province].filter(Boolean).join(" "),
+    [vehicle.make, vehicle.model, vehicle.trim, vehicle.year].filter(Boolean).join(" "),
+    vehicle.color,
+    vehicle.vin ? `VIN: ${vehicle.vin}` : "",
+    specs.engine_number || vehicle.metadata?.engine_number ? `Engine: ${specs.engine_number || vehicle.metadata?.engine_number}` : "",
+    specs.engine_cc || vehicle.metadata?.engine_cc ? `${specs.engine_cc || vehicle.metadata?.engine_cc} cc` : ""
+  ].filter(Boolean).join("\n");
 
   return (
     <Pane
@@ -385,32 +401,12 @@ function ComplianceSection({ detail, organizationId }: { detail: VehicleDetail; 
                   </p>
                 </div>
               </div>
+              {(item.key === "tax" || item.key === "porbor" || item.key === "insurance") && item.date && (daysUntil(item.date) ?? 999) <= 90 ? (
+                <RenewalHelp details={paperDetails} kind={item.key} porborDaysLeft={porborDaysLeft} twoWheeler={twoWheeler} vehicleAge={vehicleAge} />
+              ) : null}
               <details className="mt-2.5">
                 <summary className="cursor-pointer font-bold text-[var(--primary)]">{item.date ? tx.say("cs_renewed") : tx.say("cs_addDate")}</summary>
-                <form action={renewVehicleCompliance} className="mt-3 grid gap-3 sm:grid-cols-2">
-                  <input name="vehicleId" type="hidden" value={detail.vehicle.id} />
-                  <input name="organizationId" type="hidden" value={organizationId} />
-                  <input name="complianceType" type="hidden" value={item.key} />
-                  <label className="block">
-                    <span className={labelClass}>{tx.say("f_runsOutOn")}</span>
-                    <input className={inputClass} name="newExpiryDate" required type="date" />
-                  </label>
-                  <label className="block">
-                    <span className={labelClass}>{tx.say("f_cost")}</span>
-                    <input className={inputClass} inputMode="decimal" min="0" name="cost" step="0.01" type="number" />
-                  </label>
-                  <label className="block sm:col-span-2">
-                    <span className={labelClass}>{tx.say("f_docPhoto")}</span>
-                    <input className="mt-1 w-full" name="documentFile" type="file" />
-                  </label>
-                  <label className="block sm:col-span-2">
-                    <span className={labelClass}>{tx.say("f_notes")}</span>
-                    <input className={inputClass} name="notes" />
-                  </label>
-                  <PendingButton className="primary-action sm:col-span-2" pendingLabel={tx.say("saving")} type="submit">
-                    {tx.say("save")}
-                  </PendingButton>
-                </form>
+                <RenewalForm complianceType={item.key} organizationId={organizationId} readable={item.key === "tax" || item.key === "porbor" || item.key === "insurance"} vehicleId={detail.vehicle.id} />
               </details>
             </div>
           );

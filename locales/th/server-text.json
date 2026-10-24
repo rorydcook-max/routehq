@@ -258,5 +258,7 @@
   "These dates have passed. Please contact the business to arrange new dates.": "วันที่จองนี้ผ่านไปแล้ว กรุณาติดต่อร้านเพื่อเลือกวันใหม่",
   "Choose a receipt photo.": "เลือกรูปใบเสร็จ",
   "That file is too large. Use a photo under 12 MB.": "ไฟล์ใหญ่เกินไป ใช้รูปที่เล็กกว่า 12 MB",
-  "The receipt could not be read. Fill it in by hand.": "อ่านใบเสร็จไม่ได้ กรุณากรอกเอง"
+  "The receipt could not be read. Fill it in by hand.": "อ่านใบเสร็จไม่ได้ กรุณากรอกเอง",
+  "Choose a photo of the document.": "เลือกรูปเอกสาร",
+  "The document could not be read. Type the date in.": "อ่านเอกสารไม่ได้ กรุณากรอกวันที่เอง"
 }

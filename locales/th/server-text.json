@@ -255,5 +255,8 @@
   "The customer has signed for these dates. Send them the change to sign instead.": "ลูกค้าเซ็นสัญญาตามวันที่เดิมแล้ว ส่งการเปลี่ยนแปลงให้ลูกค้าเซ็นแทน",
   "Some of this booking is already paid. Use Extend or end early instead.": "การจองนี้มีการชำระเงินแล้วบางส่วน ใช้ ต่อเวลา หรือ คืนก่อนกำหนด แทน",
   "Couldn't change the dates.": "เปลี่ยนวันที่ไม่สำเร็จ",
-  "These dates have passed. Please contact the business to arrange new dates.": "วันที่จองนี้ผ่านไปแล้ว กรุณาติดต่อร้านเพื่อเลือกวันใหม่"
+  "These dates have passed. Please contact the business to arrange new dates.": "วันที่จองนี้ผ่านไปแล้ว กรุณาติดต่อร้านเพื่อเลือกวันใหม่",
+  "Choose a receipt photo.": "เลือกรูปใบเสร็จ",
+  "That file is too large. Use a photo under 12 MB.": "ไฟล์ใหญ่เกินไป ใช้รูปที่เล็กกว่า 12 MB",
+  "The receipt could not be read. Fill it in by hand.": "อ่านใบเสร็จไม่ได้ กรุณากรอกเอง"
 }

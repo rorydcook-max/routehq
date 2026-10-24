@@ -1462,7 +1462,20 @@
     "noVehicleHint": "Rent, phone, ads, wages: counted in your totals, not against a vehicle.",
     "businessCost": "Business cost",
     "afterRefunds": "{received} received − {amount} refunded",
-    "undo": "Undo"
+    "undo": "Undo",
+    "receiptSnapTitle": "Have a receipt?",
+    "receiptSnapHint": "Take a photo of it and we'll fill this in for you.",
+    "receiptSnap": "Read receipt",
+    "receiptAnother": "Another photo",
+    "receiptReading": "Reading your receipt…",
+    "receiptReadingHint": "This takes a few seconds.",
+    "receiptFilled": "Filled in from your receipt",
+    "receiptFilledHint": "Check the amount, date and vehicle, then save. The photo is kept as the receipt.",
+    "receiptReadFailed": "We couldn't read that receipt. Fill it in by hand; the photo is still attached.",
+    "receiptNotReceipt": "That doesn't look like a receipt. Try a clearer photo, or fill it in by hand.",
+    "receiptSavedBefore": "This receipt was already saved on {date}. Check you're not recording it twice.",
+    "receiptShortcut": "Add a cost from a receipt photo",
+    "receiptShortcutHint": "Fuel, repairs, insurance: snap it and we fill it in."
   },
   "booking": {
     "open": "Open",

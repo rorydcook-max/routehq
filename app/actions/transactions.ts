@@ -481,6 +481,19 @@ export async function recordDeliveryCashPaymentAndReceipt(formData: FormData) {
   }
 }
 
+/** What the receipt photo said, when the form read it: kept with the receipt, so it isn't read again. */
+function receiptReadFields(formData: FormData) {
+  try {
+    const raw = JSON.parse(String(formData.get("receiptRead") || "null"));
+    if (!raw || typeof raw !== "object") return { ocr_status: "queued", extracted_data: {} };
+    const keep = ["amount", "date", "paidTo", "costType", "plate", "odometer", "reference", "summary", "confidence"];
+    const extracted = Object.fromEntries(keep.filter((key) => key in raw).map((key) => [key, typeof raw[key] === "string" ? String(raw[key]).slice(0, 120) : raw[key]]));
+    return { ocr_status: "completed", extracted_data: extracted };
+  } catch {
+    return { ocr_status: "queued", extracted_data: {} };
+  }
+}
+
 export async function createTransaction(formData: FormData) {
   const supabase = (await createSupabaseServerClient()) as any;
   const {
@@ -548,8 +561,7 @@ export async function createTransaction(formData: FormData) {
         mime_type: receipt.type || null,
         size_bytes: receipt.size,
         category: "receipt",
-        ocr_status: "queued",
-        extracted_data: {},
+        ...receiptReadFields(formData),
         uploaded_by: user.id
       })
       .select("id")

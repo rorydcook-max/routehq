@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { ArrowDownLeft, ArrowUpRight, Camera, Loader2 } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { shortDate } from "@/lib/i18n/dates";
 import { createTransaction, findTransactionMatches } from "@/app/actions/transactions";
@@ -15,6 +15,11 @@ import type { TransactionFormOptions, TransactionFormPrefill } from "@/lib/trans
 const MONEY_IN: string[] = ["rental_income", "charge_recovered", "deposit_received", "deposit_forfeited", "deposit_deduction"];
 // Costs a renter can be responsible for. Insurance, tax and finance are the owner's own.
 const BILLABLE: string[] = ["repair", "maintenance", "servicing", "fine", "fuel", "accessories", "other"];
+
+/** Letters and digits only, so "กข-1234" on a receipt finds "กข 1234" in the fleet. */
+const plateKey = (value: string | null | undefined) => String(value || "").toUpperCase().replace(/[^\p{L}\p{N}]/gu, "");
+
+type ReadReceipt = { isReceipt: boolean; amount: number | null; date: string | null; paidTo: string | null; costType: string | null; plate: string | null; odometer: number | null; reference: string | null; summary: string | null; confidence: number; savedBefore?: string | null };
 
 const inputClass =
   "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2.5 text-[15px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]";
@@ -175,6 +180,61 @@ export function TransactionForm({
     setFormOpen(true);
   }
 
+  // A receipt photo fills the cost in: amount, date, who was paid, what for, and the vehicle when its plate is printed.
+  const [supplier, setSupplier] = useState("");
+  const [mileage, setMileage] = useState("");
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [reading, setReading] = useState(false);
+  const [readError, setReadError] = useState("");
+  const [read, setRead] = useState<ReadReceipt | null>(null);
+  const [receiptPreview, setReceiptPreview] = useState("");
+  const receiptInput = useRef<HTMLInputElement>(null);
+  const snapInput = useRef<HTMLInputElement>(null);
+  useEffect(() => () => { if (receiptPreview) URL.revokeObjectURL(receiptPreview); }, [receiptPreview]);
+
+  async function readReceiptPhoto(file: File) {
+    setReadError("");
+    setRead(null);
+    // The same picture is kept as the cost's receipt.
+    if (receiptInput.current && receiptInput.current.files?.[0] !== file) {
+      const transfer = new DataTransfer();
+      transfer.items.add(file);
+      receiptInput.current.files = transfer.files;
+    }
+    setReceiptPreview(file.type.startsWith("image/") ? URL.createObjectURL(file) : "");
+    setReading(true);
+    try {
+      const body = new FormData();
+      body.set("file", file);
+      const response = await fetch("/api/ocr/receipt", { method: "POST", body });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setReadError(data.error || say("receiptReadFailed"));
+        return;
+      }
+      if (!data.isReceipt) {
+        setReadError(say("receiptNotReceipt"));
+        return;
+      }
+      const found = data as ReadReceipt;
+      if (found.amount) setAmount(String(found.amount));
+      if (found.date) setTransactionDate(found.date);
+      if (found.costType && !linkedTaskId) setType(found.costType);
+      if (found.paidTo) setSupplier(found.paidTo);
+      if (found.odometer) setMileage(String(found.odometer));
+      if (found.paidTo || found.odometer) setMoreOpen(true);
+      if (found.summary && !notes) setNotes(found.summary);
+      const plate = plateKey(found.plate).match(/\d?\p{L}{1,3}\d{1,4}/u)?.[0];
+      const vehicle = plate ? options.vehicles.find((entry) => plateKey(entry.label).startsWith(plate) || plateKey(entry.label).includes(plate)) : null;
+      if (vehicle) setVehicleId(vehicle.id);
+      setRead(found);
+    } catch {
+      setReadError(say("receiptReadFailed"));
+    } finally {
+      setReading(false);
+    }
+  }
+
   const isMoneyIn = MONEY_IN.includes(type);
   // A shop's rent or a phone bill belongs to the business, not to one vehicle.
   const canSkipVehicle = !isMoneyIn && !/refund|deposit/.test(type);
@@ -268,8 +328,51 @@ export function TransactionForm({
         </div>
       ) : null}
 
+      {formOpen && !isMoneyIn ? (
+        <div className="rounded-2xl border border-[var(--border)] bg-white p-4 shadow-[var(--shadow-card)]">
+          <input
+            accept="image/*,application/pdf"
+            className="hidden"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              event.target.value = "";
+              if (file) void readReceiptPhoto(file);
+            }}
+            ref={snapInput}
+            type="file"
+          />
+          <div className="flex flex-wrap items-center gap-3">
+            {receiptPreview ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img alt="" className="h-14 w-14 flex-shrink-0 rounded-lg border border-[var(--border)] object-cover" src={receiptPreview} />
+            ) : (
+              <span className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-lg bg-[var(--primary-light)] text-[var(--primary)]">
+                <Camera aria-hidden="true" size={24} />
+              </span>
+            )}
+            <div className="min-w-[11rem] flex-1">
+              <p className="text-[15px] font-bold text-[var(--foreground)]">{reading ? say("receiptReading") : read ? say("receiptFilled") : say("receiptSnapTitle")}</p>
+              <p className="mt-0.5 text-[13px] font-medium text-[var(--muted)]">
+                {reading ? say("receiptReadingHint") : read ? say("receiptFilledHint") : say("receiptSnapHint")}
+              </p>
+            </div>
+            <button className="secondary-action pressable w-full justify-center sm:w-auto" disabled={reading} onClick={() => snapInput.current?.click()} type="button">
+              {reading ? <Loader2 aria-hidden="true" className="animate-spin" size={17} /> : <Camera aria-hidden="true" size={17} />}
+              {read || readError ? say("receiptAnother") : say("receiptSnap")}
+            </button>
+          </div>
+          {readError ? <p className="mt-3 text-[14px] font-semibold text-[var(--danger)]">{readError}</p> : null}
+          {read?.savedBefore ? (
+            <p className="mt-3 rounded-lg border border-[var(--warning-line,var(--border))] bg-[var(--warning-light,var(--panel-secondary))] px-3 py-2 text-[14px] font-semibold text-[var(--warning)]">
+              {say("receiptSavedBefore", { date: shortDate(read.savedBefore, locale) })}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+
       {formOpen ? (
         <>
+      <input name="receiptRead" type="hidden" value={read ? JSON.stringify(read) : ""} />
       <Card>
         <div className="card-section grid gap-3 sm:grid-cols-2">
           <label className="block sm:col-span-2">
@@ -347,17 +450,17 @@ export function TransactionForm({
           </label>
 
           {isMoneyIn ? null : (
-            <details className="sm:col-span-2">
+            <details className="sm:col-span-2" onToggle={(event) => setMoreOpen((event.currentTarget as HTMLDetailsElement).open)} open={moreOpen}>
               <summary className="cursor-pointer py-1 text-[14px] font-semibold text-[var(--primary)]">{t.has("moreDetails") ? say("moreDetails") : "Who you paid and the mileage (optional)"}</summary>
               <div className="mt-2 grid gap-3 sm:grid-cols-2">
               <label className="block">
                 <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("paidTo")}</span>
-                <input className={inputClass} name="supplier" placeholder={say("paidToPlaceholder")} />
+                <input className={inputClass} name="supplier" onChange={(event) => setSupplier(event.target.value)} placeholder={say("paidToPlaceholder")} value={supplier} />
               </label>
 
               <label className="block">
                 <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("mileage")}</span>
-                <input className={inputClass} min="0" name="mileage" type="number" />
+                <input className={inputClass} min="0" name="mileage" onChange={(event) => setMileage(event.target.value)} type="number" value={mileage} />
               </label>
               </div>
             </details>
@@ -450,7 +553,15 @@ export function TransactionForm({
           <label className="block sm:col-span-2">
             <span className="text-[13px] font-semibold text-[var(--foreground-secondary)]">{say("receipt")}</span>
             {/* No forced camera: a receipt is as often a screenshot or a photo taken earlier. The phone offers camera or library. */}
-            <input accept="image/*,application/pdf" className={`${inputClass} file:mr-3 file:rounded-md file:border-0 file:bg-[var(--primary-light)] file:px-3 file:py-1.5 file:text-[13px] file:font-semibold file:text-[var(--primary)]`} name="receipt" type="file" />
+            <input accept="image/*,application/pdf" className={`${inputClass} file:mr-3 file:rounded-md file:border-0 file:bg-[var(--primary-light)] file:px-3 file:py-1.5 file:text-[13px] file:font-semibold file:text-[var(--primary)]`} name="receipt"
+              onChange={(event) => {
+                // Picked here with nothing typed yet: read it, the same as the button at the top.
+                const file = event.target.files?.[0];
+                if (file && !isMoneyIn && !amount && !reading) void readReceiptPhoto(file);
+              }}
+              ref={receiptInput}
+              type="file"
+            />
           </label>
         </div>
       </Card>

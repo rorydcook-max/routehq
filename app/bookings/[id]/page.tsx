@@ -849,7 +849,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             {customer.do_not_rent_reason ? <span className="block font-semibold">{customer.do_not_rent_reason}</span> : null}
           </div>
         ) : null}
-        {historySignals.length ? <SharedHistory signals={historySignals} /> : null}
+        {historySignals.length ? <SharedHistory reports={historySignals} /> : null}
 
         <UnsentMessages
           customerName={customer?.full_name || tx.say("theCustomer")}

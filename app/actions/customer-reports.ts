@@ -27,7 +27,11 @@ export async function fileCustomerReport(formData: FormData): Promise<Result> {
   const amount = amountText ? Number(amountText) : null;
   const occurredOn = String(formData.get("occurredOn") || "").slice(0, 10) || new Date().toISOString().slice(0, 10);
   const notes = String(formData.get("notes") || "").trim().slice(0, 1000) || null;
+  // What other businesses read, in the reporter's own words, under the business's name: enough to judge it by.
+  const summary = String(formData.get("summary") || "").replace(/\s+/g, " ").trim().slice(0, 600);
   if (!REPORT_KINDS.includes(kind)) return { ok: false, error: await said("Choose what happened.") };
+  if (summary.length < 20) return { ok: false, error: await said("Say what happened in a sentence or two. Other businesses read this to decide for themselves.") };
+  if (String(formData.get("confirm") || "") !== "yes") return { ok: false, error: await said("Tick the box to confirm the report is true and can carry your business name.") };
   if (amount !== null && !(amount >= 0 && amount < 10_000_000)) return { ok: false, error: await said("Check the amount.") };
 
   const [{ data: customer }, { data: rental }] = await Promise.all([
@@ -41,7 +45,7 @@ export async function fileCustomerReport(formData: FormData): Promise<Result> {
   const keys = customerMatchKeys(customer);
   if (!keys.length) return { ok: false, error: await said("Add the customer's passport, licence or phone number first, so other businesses can recognise them.") };
 
-  const { error } = await supabase.from("customer_reports").insert({ organization_id: organizationId, customer_id: customer.id, rental_id: rental.id, kind, amount, occurred_on: occurredOn, notes, match_keys: keys, created_by: membership.userId });
+  const { error } = await supabase.from("customer_reports").insert({ organization_id: organizationId, customer_id: customer.id, rental_id: rental.id, kind, amount, occurred_on: occurredOn, notes, summary, match_keys: keys, created_by: membership.userId });
   if (error) {
     if (/duplicate|unique/i.test(error.message)) return { ok: false, error: await said("This rental already has a report of that kind.") };
     return { ok: false, error: error.message };
@@ -74,6 +78,31 @@ export async function withdrawCustomerReport(formData: FormData): Promise<Result
     .eq("id", id)
     .eq("organization_id", membership.organizationId)
     .is("withdrawn_at", null)
+    .select("customer_id")
+    .maybeSingle();
+  if (error || !data) return { ok: false, error: error?.message || (await said("This report was not found.")) };
+  revalidatePath(`/customers/${data.customer_id}`);
+  return { ok: true };
+}
+
+/**
+ * The customer put it right (paid in the end, damage sorted): the report stays, marked settled with how, so other
+ * businesses see both the problem and that it was resolved. Settling can't be undone; withdraw is for mistakes.
+ */
+export async function settleCustomerReport(formData: FormData): Promise<Result> {
+  const membership = await getCurrentMembership();
+  if (!membership) return { ok: false, error: await said("Please sign in first.") };
+  if (!["owner", "manager"].includes(membership.role)) return { ok: false, error: await said("Only the owner or a manager can change this.") };
+  const supabase = (await createSupabaseServerClient()) as any;
+  const id = String(formData.get("reportId") || "");
+  const note = String(formData.get("note") || "").replace(/\s+/g, " ").trim().slice(0, 300) || null;
+  const { data, error } = await supabase
+    .from("customer_reports")
+    .update({ settled_at: new Date().toISOString(), settled_note: note })
+    .eq("id", id)
+    .eq("organization_id", membership.organizationId)
+    .is("withdrawn_at", null)
+    .is("settled_at", null)
     .select("customer_id")
     .maybeSingle();
   if (error || !data) return { ok: false, error: error?.message || (await said("This report was not found.")) };

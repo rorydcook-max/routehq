@@ -4,13 +4,14 @@
  *
  * A person is recognised by their passport or driving licence number and their phone / WhatsApp number, each turned
  * into a keyed hash before it is stored or compared, so reports can't be browsed or reversed into anyone's details.
- * Other businesses only ever see anonymous summaries (what kind of problem, how much, which month, how many
- * businesses), never who reported it or any notes.
+ * Other businesses see each report with its context (migration 0101): the reporter's own account, the reporting
+ * business and its track record, whether it was settled, and the customer's side, so they can judge for themselves.
+ * Never the reporter's private notes or the customer's details.
  */
 import { createHmac } from "node:crypto";
-import type { HistorySignal } from "@/lib/customer-history-kinds";
+import type { HistoryReport, ReportKind } from "@/lib/customer-history-kinds";
 
-export { REPORT_KINDS, type HistorySignal, type ReportKind } from "@/lib/customer-history-kinds";
+export { REPORT_KINDS, type HistoryReport, type ReportKind } from "@/lib/customer-history-kinds";
 
 type Identifiers = { phone?: string | null; whatsapp_number?: string | null; passport_number?: string | null; driver_license_number?: string | null };
 
@@ -47,17 +48,25 @@ export function customerMatchKeys(customer: Identifiers): string[] {
 }
 
 /** What other businesses have reported about this person, for a business that has them in front of it. */
-export async function sharedHistory(supabase: any, organizationId: string, customer: Identifiers | null | undefined): Promise<HistorySignal[]> {
+export async function sharedHistory(supabase: any, organizationId: string, customer: Identifiers | null | undefined): Promise<HistoryReport[]> {
   if (!customer) return [];
   const keys = customerMatchKeys(customer);
   if (!keys.length) return [];
-  const { data, error } = await supabase.rpc("customer_report_signals", { p_org: organizationId, p_keys: keys });
+  const { data, error } = await supabase.rpc("customer_report_details", { p_org: organizationId, p_keys: keys });
   if (error || !Array.isArray(data)) return [];
   return data.map((row: any) => ({
-    kind: row.kind,
+    id: String(row.id),
+    kind: row.kind as ReportKind,
     amount: row.amount === null || row.amount === undefined ? null : Number(row.amount),
-    latest: String(row.latest),
-    reporters: Number(row.reporters || 1),
-    reports: Number(row.reports || 1)
+    occurredOn: String(row.occurred_on),
+    summary: row.summary || null,
+    business: String(row.business_name || ""),
+    businessSince: String(row.business_since || ""),
+    businessRentals: Number(row.business_rentals || 0),
+    businessReports: Number(row.business_reports || 0),
+    settledAt: row.settled_at || null,
+    settledNote: row.settled_note || null,
+    customerResponse: row.customer_response || null,
+    disputed: row.disputed === true
   }));
 }

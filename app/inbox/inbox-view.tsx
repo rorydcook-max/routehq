@@ -1,7 +1,7 @@
 "use client";
 
 import { SharedHistory } from "@/components/shared-history";
-import type { HistorySignal } from "@/lib/customer-history-kinds";
+import type { HistoryReport } from "@/lib/customer-history-kinds";
 import { toWallTime, businessToday, BUSINESS_TIME_ZONE } from "@/lib/business-time";
 import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
@@ -76,7 +76,7 @@ export function InboxView({
   history = []
 }: {
   /** What other RouteHQ businesses reported about whoever is writing (shared customer history). */
-  history?: HistorySignal[];
+  history?: HistoryReport[];
   bookings: any[];
   conversations: InboxConversation[];
   customers: Array<{ id: string; full_name: string | null; phone: string | null }>;
@@ -280,7 +280,7 @@ export function InboxView({
             </header>
             {history.length ? (
               <div className="border-b border-[var(--border)] px-4 pb-3">
-                <SharedHistory compact signals={history} />
+                <SharedHistory compact reports={history} />
               </div>
             ) : null}
 

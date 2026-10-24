@@ -1032,7 +1032,8 @@
     "setup_signature": "เพิ่มลายเซ็นของคุณ",
     "setupTitleLater": "ตั้งค่าส่วนที่เหลือให้เสร็จ",
     "setup_payment_methods": "บอกวิธีที่ลูกค้าจ่ายเงินให้คุณ",
-    "copy": "คัดลอก"
+    "copy": "คัดลอก",
+    "trialLeftShort": "ทดลองใช้ เหลือ {days} วัน"
   },
   "todo": {
     "eyebrow": "งาน",

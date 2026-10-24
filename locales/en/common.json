@@ -1023,7 +1023,8 @@
     "setup_signature": "Add your signature",
     "setupTitleLater": "Finish setting up",
     "setup_payment_methods": "Say how customers pay you",
-    "copy": "Copy"
+    "copy": "Copy",
+    "trialLeftShort": "Trial: {days, plural, one {# day} other {# days}} left"
   },
   "todo": {
     "eyebrow": "Tasks",

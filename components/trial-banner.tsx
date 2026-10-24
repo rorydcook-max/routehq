@@ -111,7 +111,7 @@ export function TrialBanner({ placement = "floating" }: { placement?: "floating"
       {placement === "sidebar" ? (
         <Link className="flex min-w-0 items-center gap-2 hover:underline" href={"/settings/billing" as Route}>
           <span aria-hidden="true" className={clsx("h-2 w-2 shrink-0 rounded-full", tone.dot)} />
-          <span className="whitespace-nowrap text-xs font-bold leading-4">{t("trialLeft", { days: days === null || days === undefined ? 30 : days })}</span>
+          <span className="truncate text-xs font-bold leading-4">{t("trialLeftShort", { days: days === null || days === undefined ? 30 : days })}</span>
         </Link>
       ) : (
         <div className="flex items-center gap-2">
@@ -129,7 +129,8 @@ export function TrialBanner({ placement = "floating" }: { placement?: "floating"
         )}
         <button
           aria-label={t("close")}
-          className={clsx("pressable inline-flex items-center justify-center rounded-lg border border-current/15 bg-white/70", "h-8 w-8")}
+          // In the narrow sidebar a smaller close button leaves the line room to be read in full.
+          className={clsx("pressable inline-flex items-center justify-center rounded-lg border border-current/15 bg-white/70", placement === "sidebar" ? "h-6 w-6" : "h-8 w-8")}
           onClick={() => {
             window.localStorage.setItem(dismissKey, String(Date.now() + 24 * 60 * 60 * 1000));
             setHidden(true);

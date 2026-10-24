@@ -9,6 +9,7 @@ import { longDate } from "@/lib/i18n/dates";
 import { IMPORT_FIELD_GROUPS, IMPORT_FIELDS } from "@/lib/import/fields";
 import type { ImportPreview, PreviewCustomer, PreviewRental, PreviewTransaction, PreviewVehicle, Problem } from "@/lib/import/preview";
 import { previewCounts } from "@/lib/import/preview";
+import { answerQuestion, importQuestions, type ImportQuestion } from "@/lib/import/questions";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
@@ -17,7 +18,65 @@ const inputClass =
 const smallInput = `${inputClass} py-1.5 text-sm`;
 
 type ColumnMapping = { source_column: string; routehq_field: string; confidence?: number; sample_values?: string[] };
-type SheetMapping = { sheet_name: string; primary_data_type: string; confidence?: number; row_count?: number; column_mappings: ColumnMapping[] };
+type SheetMapping = {
+  sheet_name: string;
+  primary_data_type: string;
+  confidence?: number;
+  row_count?: number;
+  column_mappings: ColumnMapping[];
+  date_order?: "dmy" | "mdy";
+  date_order_unsure?: boolean;
+  date_example?: string | null;
+  rate_period?: "day" | "week" | "month";
+};
+
+/**
+ * The few things the file didn't settle (which way round its dates are, what a rent is per), asked as one-tap
+ * questions above the cards. Each answer re-reads the sheet; the current reading is the highlighted choice, so
+ * leaving them is fine too.
+ */
+function QuickQuestions({ questions, busy, onAnswer, t, locale }: { questions: ImportQuestion[]; busy: boolean; onAnswer: (question: ImportQuestion, answer: string) => void; t: Say; locale: string }) {
+  if (!questions.length) return null;
+  const choice = (question: ImportQuestion, value: string, label: string, current: boolean) => (
+    <button
+      aria-pressed={current}
+      className={`pressable tap-target rounded-full px-3.5 py-1.5 text-sm font-bold ${current ? "bg-[var(--primary)] text-white" : "border border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
+      disabled={busy}
+      key={value}
+      onClick={() => onAnswer(question, value)}
+      type="button"
+    >
+      {label}
+    </button>
+  );
+  return (
+    <div className="mt-4 rounded-xl border border-[var(--primary)]/25 bg-[var(--primary-light)] p-3">
+      <p className="text-sm font-bold text-[var(--foreground)]">{t(questions.length === 1 ? "q_titleOne" : "q_title")}</p>
+      <div className="mt-2 space-y-3">
+        {questions.map((question) => (
+          <div key={question.id}>
+            {question.kind === "date_order" ? (
+              <>
+                <p className="text-sm text-[var(--foreground)]">{t("q_date", { sheet: question.sheet, example: question.example })}</p>
+                <div className="mt-1.5 flex flex-wrap gap-2">
+                  {choice(question, "dmy", longDate(question.dayFirst, locale), question.current === "dmy")}
+                  {choice(question, "mdy", longDate(question.monthFirst, locale), question.current === "mdy")}
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-[var(--foreground)]">{t("q_rent", { sheet: question.sheet, amount: question.amount.toLocaleString(locale), customer: question.customer || "—" })}</p>
+                <div className="mt-1.5 flex flex-wrap gap-2">
+                  {(["day", "week", "month"] as const).map((period) => choice(question, period, t(`q_per_${period}`), question.current === period))}
+                </div>
+              </>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 type Result = {
   counts: { vehicles: number; vehiclesUpdated: number; customers: number; rentals: number; transactions: number; tasks: number };
@@ -117,6 +176,13 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
   const [undone, setUndone] = useState<Set<string>>(new Set());
 
   const counts = useMemo(() => (preview ? previewCounts(preview) : null), [preview]);
+  const questions = useMemo(() => (preview ? importQuestions(mappings, preview) : []), [mappings, preview]);
+
+  function answer(question: ImportQuestion, value: string) {
+    const next = answerQuestion(mappings, question, value) as SheetMapping[];
+    setMappings(next);
+    void remap(next);
+  }
   const clashes = useMemo(
     () =>
       mappings.map((sheet) => {
@@ -178,10 +244,10 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
     setStatus("review");
   }
 
-  async function remap() {
+  async function remap(next: SheetMapping[] = mappings) {
     if (!batchId) return;
     setStatus("remapping");
-    const response = await fetch("/api/import/remap", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ batchId, mappings }) });
+    const response = await fetch("/api/import/remap", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ batchId, mappings: next }) });
     const payload = await response.json().catch(() => ({}));
     if (response.ok && payload.preview) {
       setPreview(payload.preview);
@@ -359,6 +425,7 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
           </p>
           <p className="mt-1 text-sm text-[var(--muted)]">{t("foundBody")}</p>
           {notice ? <p className="mt-3 rounded-lg bg-[var(--warning-light)] px-3 py-2 text-sm font-semibold text-[var(--warning)]">{notice}</p> : null}
+          <QuickQuestions busy={status !== "review"} locale={locale} onAnswer={answer} questions={questions} t={t} />
 
           <div className="mt-4 flex flex-wrap gap-2">
             {(["vehicles", "rentals", "customers", "transactions"] as const).map((key) => {
@@ -506,7 +573,7 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
                 <AlertTriangle size={16} /> {t("clashAll")}
               </p>
             ) : null}
-            <button className="secondary-action pressable mt-3" disabled={hasClashes || status === "remapping"} onClick={remap} type="button">
+            <button className="secondary-action pressable mt-3" disabled={hasClashes || status === "remapping"} onClick={() => void remap()} type="button">
               {status === "remapping" ? <Loader2 className="animate-spin" size={16} /> : null}
               {t("reread")}
             </button>

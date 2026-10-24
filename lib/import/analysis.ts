@@ -6,8 +6,9 @@
 import { IMPORT_FIELD_KEYS } from "@/lib/import/fields";
 import { guessField } from "@/lib/import/header-guess";
 import type { ParsedSheet } from "@/lib/import/spreadsheet";
-import { cleanString, parseDateValue, parseNumberValue } from "@/lib/import/normalize";
+import { cleanString, dateOrderOf, parseDateValue, parseNumberValue } from "@/lib/import/normalize";
 import { looksLikePlate, looksLikeVehicleName, sheetDataType } from "@/lib/import/preview";
+import { learningKey } from "@/lib/import/learnings";
 
 export type ColumnMapping = { source_column: string; routehq_field: string; confidence?: number; sample_values?: string[] };
 export type SheetAnalysis = {
@@ -16,6 +17,10 @@ export type SheetAnalysis = {
   confidence?: number;
   column_mappings: ColumnMapping[];
   row_count?: number;
+  date_order?: "dmy" | "mdy";
+  date_order_unsure?: boolean;
+  date_example?: string | null;
+  rate_period?: "day" | "week" | "month";
 };
 export type Analysis = { detected_data_types: string[]; import_summary: string; sheets: SheetAnalysis[] };
 
@@ -99,7 +104,7 @@ function samplesFor(sheet: ParsedSheet, header: string) {
  * (so anything the AI skipped can still be mapped by hand), unknown field
  * names become "ignore", and row counts come from the file, not the AI.
  */
-export function normaliseAnalysis(raw: any, sheets: ParsedSheet[]): Analysis {
+export function normaliseAnalysis(raw: any, sheets: ParsedSheet[], learned: Map<string, string> = new Map()): Analysis {
   const rawSheets: any[] = Array.isArray(raw?.sheets) ? raw.sheets : [];
   const analysed: SheetAnalysis[] = sheets.map((sheet) => {
     const match = rawSheets.find((item) => item?.sheet_name === sheet.sheetName) || (sheets.length === 1 ? rawSheets[0] : null);
@@ -107,7 +112,16 @@ export function normaliseAnalysis(raw: any, sheets: ParsedSheet[]): Analysis {
       (Array.isArray(match?.column_mappings) ? match.column_mappings : []).map((mapping: any) => [String(mapping?.source_column || ""), mapping])
     );
     const used = new Set<string>();
+    // Headings this business has corrected before are read the way the owner chose, ahead of the AI and the rules.
+    const taught = new Map<string, string>();
+    for (const header of sheet.headers) {
+      const choice = learned.get(learningKey(header));
+      if (!choice || (choice !== "__ignore__" && used.has(choice))) continue;
+      taught.set(header, choice);
+      if (choice !== "__ignore__") used.add(choice);
+    }
     const first = sheet.headers.map((header) => {
+      if (taught.has(header)) return { header, field: taught.get(header)!, confidence: 0.97 };
       const suggestion = suggestions.get(header);
       let field = String(suggestion?.routehq_field || "");
       // One column per field: a second column claiming the same field is left for the user to decide.
@@ -119,7 +133,7 @@ export function normaliseAnalysis(raw: any, sheets: ParsedSheet[]): Analysis {
     const column_mappings = first.map(({ header, field, confidence }) => {
       let chosen = field;
       let sure = confidence;
-      if (chosen === "__ignore__") {
+      if (chosen === "__ignore__" && !taught.has(header)) {
         const guess = guessField(header, used);
         if (guess && IMPORT_FIELD_KEYS.has(guess)) {
           chosen = guess;
@@ -131,7 +145,7 @@ export function normaliseAnalysis(raw: any, sheets: ParsedSheet[]): Analysis {
     });
     // Still unplaced and the AI didn't look at it: read it from its values.
     for (const mapping of column_mappings) {
-      if (mapping.routehq_field !== "__ignore__" || suggestions.has(mapping.source_column)) continue;
+      if (mapping.routehq_field !== "__ignore__" || suggestions.has(mapping.source_column) || taught.has(mapping.source_column)) continue;
       const guess = guessFromValues(sheet.rows.map((row) => cleanString(row[mapping.source_column])).filter(Boolean), used, /^column \d+$/i.test(mapping.source_column));
       if (guess) {
         mapping.routehq_field = guess;
@@ -151,12 +165,18 @@ export function normaliseAnalysis(raw: any, sheets: ParsedSheet[]): Analysis {
     refineByValues(sheet, column_mappings);
     const type = String(match?.primary_data_type || "").toLowerCase();
     const inferred = sheetDataType("", column_mappings);
+    // How this sheet writes 05/06/2026, from every date column at once.
+    const dateColumns = column_mappings.filter((mapping) => DATE_FIELDS.has(mapping.routehq_field)).map((mapping) => mapping.source_column);
+    const dates = dateOrderOf(sheet.rows.flatMap((row) => dateColumns.map((column) => cleanString(row[column]))).filter(Boolean));
     return {
       sheet_name: sheet.sheetName,
       primary_data_type: DATA_TYPES.has(type) ? type : inferred === "payments" ? "transactions" : inferred,
       confidence: Number(match?.confidence || 0),
       column_mappings,
-      row_count: sheet.rows.length
+      row_count: sheet.rows.length,
+      date_order: dates.order,
+      date_order_unsure: dates.unsure,
+      date_example: dates.example
     };
   });
 

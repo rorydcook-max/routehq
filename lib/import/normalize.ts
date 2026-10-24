@@ -81,6 +81,23 @@ export function parseYearValue(value: unknown) {
   return null;
 }
 
+/**
+ * How a sheet writes its numeric dates, from the values themselves: "dmy" when any reads 13/06 or more, "mdy" when
+ * any reads 06/13; when every one could be either (05/06), day first and `unsure`, with an example to ask about.
+ */
+export function dateOrderOf(values: string[]): { order: "dmy" | "mdy"; unsure: boolean; example: string | null } {
+  let ambiguous: string | null = null;
+  for (const value of values) {
+    const match = cleanString(value).match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{2,4})\b/);
+    if (!match) continue;
+    const [first, second] = [Number(match[1]), Number(match[2])];
+    if (first > 12 && second <= 12) return { order: "dmy", unsure: false, example: null };
+    if (second > 12 && first <= 12) return { order: "mdy", unsure: false, example: null };
+    if (first !== second && !ambiguous) ambiguous = cleanString(value).slice(0, match[0].length);
+  }
+  return { order: "dmy", unsure: Boolean(ambiguous), example: ambiguous };
+}
+
 export function parseIntegerValue(value: unknown) {
   const parsed = parseNumberValue(value);
   return parsed === null ? null : Math.round(parsed);
@@ -142,7 +159,11 @@ function withNearestYear(text: string) {
   return candidates[0] ? candidates[0].toISOString().slice(0, 10) : null;
 }
 
-export function parseDateValue(value: unknown) {
+/**
+ * `order`: how this sheet writes 05/06/2026. Worked out once per sheet from any date that settles it (13/06 can only
+ * be day first, 06/13 only month first), so one column never mixes the two. Day first unless the sheet says otherwise.
+ */
+export function parseDateValue(value: unknown, order: "dmy" | "mdy" = "dmy") {
   const raw = cleanString(value);
   if (!raw) {
     return null;
@@ -181,6 +202,7 @@ export function parseDateValue(value: unknown) {
   if (dayFirstMatch) {
     const year = dayFirstMatch[3].length === 2 ? fourDigitYear(dayFirstMatch[3]) : gregorianYear(dayFirstMatch[3]);
     // Day first, as Thailand and Europe write it; a date that only works month first (10/22/2026) is American.
+    if (order === "mdy") return real(year, dayFirstMatch[1], dayFirstMatch[2]) || real(year, dayFirstMatch[2], dayFirstMatch[1]);
     return real(year, dayFirstMatch[2], dayFirstMatch[1]) || real(year, dayFirstMatch[1], dayFirstMatch[2]);
   }
 

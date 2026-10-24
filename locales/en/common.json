@@ -4712,7 +4712,14 @@
     "f_money_in": "Money in (income)",
     "f_money_out": "Money out (expense)",
     "mt_deposit_received": "Deposit taken",
-    "mt_deposit_refunded": "Deposit given back"
+    "mt_deposit_refunded": "Deposit given back",
+    "q_title": "A couple of quick questions",
+    "q_titleOne": "One quick question",
+    "q_date": "In “{sheet}”, does {example} mean…",
+    "q_rent": "In “{sheet}”, is the rent (฿{amount} for {customer})…",
+    "q_per_day": "per day",
+    "q_per_week": "per week",
+    "q_per_month": "per month"
   },
   "errorPages": {
     "notFoundTitle": "We could not find that page",

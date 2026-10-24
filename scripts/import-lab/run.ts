@@ -9,6 +9,8 @@
 import { readFileSync } from "node:fs";
 import { normaliseAnalysis } from "@/lib/import/analysis";
 import { categorizeCostsWithAi, mapColumnsWithAi } from "@/lib/import/ai-assist";
+import { applyCostLearnings } from "@/lib/import/learnings";
+import { importQuestions } from "@/lib/import/questions";
 import { attachExisting, buildPreview, previewCounts, type ImportPreview } from "@/lib/import/preview";
 import { googleSheetToSpreadsheetInput, isGoogleSheetsUrl, parseSpreadsheetFile } from "@/lib/import/spreadsheet";
 import { FIXTURES, type Fixture } from "./fixtures";
@@ -29,16 +31,22 @@ async function run(fixture: Fixture) {
     ? { bytes: Buffer.from(fixture.csv, "utf8"), filename: fixture.filename || `${fixture.name}.csv`, type: "text/csv" }
     : { bytes: workbookBytes(fixture.tabs || []), filename: `${fixture.name}.xlsx` };
   const sheets = await parseSpreadsheetFile(input);
-  const raw = withAi ? await mapColumnsWithAi(sheets) : null;
+  const learnedColumns = new Map(Object.entries(fixture.learned?.columns || {}));
+  const raw = withAi ? await mapColumnsWithAi(sheets, "mixed", learnedColumns) : null;
   if (withAi && !raw) throw new Error("the AI didn't answer");
-  const analysis = normaliseAnalysis(raw, sheets);
+  const analysis = normaliseAnalysis(raw, sheets, learnedColumns);
   const preview: ImportPreview = attachExisting(buildPreview(sheets, analysis.sheets), [], [], []);
+  applyCostLearnings(preview, { columns: learnedColumns, costs: new Map(Object.entries(fixture.learned?.costs || {})) });
   if (withAi) await categorizeCostsWithAi(preview);
   const counts = previewCounts(preview);
   const failures: string[] = [];
   const expect = (withAi && fixture.expectAi) || fixture.expect;
   for (const key of ["vehicles", "rentals", "customers", "transactions"] as const) {
     if (expect[key] !== undefined && counts[key] !== expect[key]) failures.push(`${key}: ${counts[key]}, expected ${expect[key]}`);
+  }
+  if (expect.questions) {
+    const asked = importQuestions(analysis.sheets, preview).map((question) => question.kind);
+    if (JSON.stringify(asked) !== JSON.stringify(expect.questions)) failures.push(`questions: ${JSON.stringify(asked)}, expected ${JSON.stringify(expect.questions)}`);
   }
   for (const check of expect.checks || []) {
     try {

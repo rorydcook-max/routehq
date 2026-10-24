@@ -2,9 +2,9 @@ import { said } from "@/lib/i18n/server-text";
 import { aiTextConfigured } from "@/lib/ai-chat";
 import { NextResponse } from "next/server";
 import { getCurrentMembership } from "@/lib/auth/roles";
-import { IMPORT_FIELD_KEYS } from "@/lib/import/fields";
 import { normaliseAnalysis, type Analysis } from "@/lib/import/analysis";
 import { categorizeCostsWithAi, mapColumnsWithAi } from "@/lib/import/ai-assist";
+import { applyCostLearnings, emptyLearnings, loadLearnings } from "@/lib/import/learnings";
 import { googleSheetToSpreadsheetInput, isGoogleSheetsUrl, parseSpreadsheetFile, type ParsedSheet } from "@/lib/import/spreadsheet";
 import { attachExisting, buildPreview, previewCounts } from "@/lib/import/preview";
 import { existingRentals } from "@/lib/import/existing";
@@ -31,7 +31,9 @@ async function previewAndBatch(sheets: ParsedSheet[], analysis: Analysis, source
     supabase.from("customers").select("id, full_name, phone").eq("organization_id", organization.id).is("deleted_at", null)
   ]);
   const preview = attachExisting(buildPreview(sheets, analysis.sheets), vehicles || [], customers || [], await existingRentals(supabase, organization.id));
-  // Costs the rules couldn't place get a second opinion from the AI (any language); the rules' answer stands otherwise.
+  // Costs described the way this owner has corrected before take their choice; the rest the rules couldn't place get
+  // a second opinion from the AI (any language). The rules' answer stands otherwise.
+  applyCostLearnings(preview, await loadLearnings(supabase, organization.id).catch(() => emptyLearnings()));
   await categorizeCostsWithAi(preview).catch(() => 0);
   const { data: batch } = await supabase
     .from("import_batches")
@@ -130,25 +132,11 @@ export async function POST(request: Request) {
   }
 
   const sourceName = sheetUrl ? "Google Sheet" : (file as File).name;
-  const apiKey = aiTextConfigured() ? "configured" : "";
-  if (!apiKey) {
-    // Without AI the columns can still be mapped by hand.
-    const analysis = normaliseAnalysis(null, sheets);
-    return NextResponse.json({ analysis, ...(await previewAndBatch(sheets, analysis, sourceName, membership.userId)) });
-  }
-
-  const raw = await mapColumnsWithAi(sheets, importType);
-  if (!raw) {
-    // Fall back to the built-in rules rather than blocking the import.
-    const analysis = normaliseAnalysis(null, sheets);
-    return NextResponse.json({ analysis, ...(await previewAndBatch(sheets, analysis, sourceName, membership.userId)), warning: await said("Automatic mapping is unavailable right now - check how each column was read.") });
-  }
-  const analysis = normaliseAnalysis(raw, sheets);
-  // An answer with no usable mapping: the columns were read from their headers alone, so say so.
-  const aiMapped = Array.isArray((raw as any)?.sheets) && (raw as any).sheets.some((sheet: any) => Array.isArray(sheet?.column_mappings) && sheet.column_mappings.some((mapping: any) => IMPORT_FIELD_KEYS.has(String(mapping?.routehq_field || ""))));
-  return NextResponse.json({
-    analysis,
-    ...(await previewAndBatch(sheets, analysis, sourceName, membership.userId)),
-    ...(aiMapped ? {} : { warning: await said("Automatic mapping is unavailable right now - check how each column was read.") })
-  });
+  // Headings this business has re-mapped before are read the way the owner chose.
+  const learned = (await loadLearnings(await createSupabaseServerClient(), membership.organizationId).catch(() => emptyLearnings())).columns;
+  // The built-in rules read the file on their own; the AI, when it's there, checks and corrects that reading.
+  // Either way the owner sees every card before anything is saved.
+  const raw = aiTextConfigured() ? await mapColumnsWithAi(sheets, importType, learned) : null;
+  const analysis = normaliseAnalysis(raw, sheets, learned);
+  return NextResponse.json({ analysis, ...(await previewAndBatch(sheets, analysis, sourceName, membership.userId)) });
 }

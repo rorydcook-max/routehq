@@ -10,7 +10,21 @@ import type { ParsedSheet } from "@/lib/import/spreadsheet";
 import { categorizeCost, cleanPlate, cleanString, findByPlate, namesAgree, parseBooleanValue, normalizeTransactionType, parseDateValue, parseIntegerValue, parseKnownNumber, parseNumberValue, parseYearValue, plateKey } from "@/lib/import/normalize";
 
 export type Mapping = { source_column: string; routehq_field: string };
-export type SheetMapping = { sheet_name: string; primary_data_type: string; column_mappings: Mapping[] };
+export type SheetMapping = {
+  sheet_name: string;
+  primary_data_type: string;
+  column_mappings: Mapping[];
+  /** How the sheet writes 05/06/2026 (see dateOrderOf); `date_example` is a date that could be read either way. */
+  date_order?: "dmy" | "mdy";
+  date_order_unsure?: boolean;
+  date_example?: string | null;
+  /** What the rent is per when the sheet doesn't say: the owner's answer to the quick question. */
+  rate_period?: "day" | "week" | "month";
+};
+
+// The date order of the sheet being read (buildPreview sets it per sheet).
+let DATE_ORDER: "dmy" | "mdy" = "dmy";
+const readDate = (value: unknown) => parseDateValue(value, DATE_ORDER);
 
 /** Why a row needs a look. The screen names each code in the reader's language. */
 export type Problem =
@@ -81,6 +95,8 @@ export type PreviewRental = Base & {
   paidUntil: string | null;
   depositHeld: boolean;
   status: "active" | "booked" | "completed";
+  /** Nothing in the sheet said what the rent is per; the period was assumed (asked about on the import screen). */
+  periodGuessed?: boolean;
   /** Rent comes from a payment sheet in the same file: its payments are recorded as money (not worked out from
    * the rate) and the schedule starts at the next payment due, the day after "paid up to". */
   moneyFromSheet?: boolean;
@@ -151,7 +167,7 @@ function mappedRow(row: Record<string, string>, mappings: Mapping[]) {
   }
   if (rateColumn && !cleanString(output.rate_period)) {
     const hint = ratePeriodFrom(rateColumn);
-    if (hint !== "month" || /month|เดือน/i.test(rateColumn)) output.rate_period = hint;
+    if (hint !== "month" || /month|เดือน|p\/m|\/ ?m\b|\bpm\b/i.test(rateColumn)) output.rate_period = hint;
   }
   return output;
 }
@@ -218,7 +234,7 @@ function splitVehicleName(value: string) {
 function dateOrProblem(value: string, problems: Problem[]) {
   // "-", "n/a" and "?" mean the same as an empty cell.
   if (!cleanString(value) || /^([-–—?]+|n\/?a|none|tbc|tbd)$/i.test(cleanString(value))) return null;
-  const date = parseDateValue(value);
+  const date = readDate(value);
   if (!date) problems.push("bad_date");
   return date;
 }
@@ -335,6 +351,8 @@ function rentalFrom(fields: Record<string, string>, base: Omit<Base, "problems">
     }
   }
   if (!rate) problems.push("no_rate");
+  // The rent came from a column that doesn't say what it's per, and the owner hasn't said either.
+  const periodGuessed = rate !== null && Boolean(cleanString(fields.rental_rate)) && !fields.period_answered && !cleanString(fields.rate_period) && !/month|เดือน|p\/m|day|daily|วัน|week|สัปดาห์/i.test(cleanString(fields.rental_rate));
   // "Returned: yes" ends it whatever the dates say; "no" keeps it out even past its end date.
   const returned = parseBooleanValue(fields.returned);
   let status: PreviewRental["status"] = endDate && endDate < today ? "completed" : startDate && startDate > today ? "booked" : "active";
@@ -378,7 +396,8 @@ function rentalFrom(fields: Record<string, string>, base: Omit<Base, "problems">
     nextDue,
     paidUntil,
     depositHeld: (parseNumberValue(fields.deposit_amount) || 0) > 0,
-    status
+    status,
+    periodGuessed
   };
 }
 
@@ -393,6 +412,7 @@ export function buildPreview(sheets: ParsedSheet[], mappings: SheetMapping[]): I
     const sheet = sheets.find((item) => item.sheetName === sheetMapping.sheet_name) || (sheets.length === 1 ? sheets[0] : null);
     if (!sheet) continue;
     const type = sheetDataType(sheetMapping.primary_data_type, sheetMapping.column_mappings);
+    DATE_ORDER = sheetMapping.date_order === "mdy" ? "mdy" : "dmy";
     // One tab per vehicle ("Yaris กข 1234"): rows without a vehicle of their own are that vehicle's.
     const tabName = sheet.sheetName.split(" · ")[0];
     const monthTab = /^\s*((ม|ก|มี|เม|พ|มิ|ส|ต|ธ)\.?\s?[คพยย]\.?|[a-z]{3,9}\.?)\s*'?\d{2,4}\s*$/i.test(tabName);
@@ -401,6 +421,11 @@ export function buildPreview(sheets: ParsedSheet[], mappings: SheetMapping[]): I
     const before = preview.transactions.length;
     sheet.rows.forEach((row, index) => {
       const fields = mappedRow(row, sheetMapping.column_mappings);
+      // The owner said what the rent is per (the quick question), for a sheet that doesn't say.
+      if (sheetMapping.rate_period && !cleanString(fields.rate_period)) {
+        fields.rate_period = sheetMapping.rate_period;
+        fields.period_answered = "1";
+      }
       if (!Object.values(fields).some((value) => cleanString(value))) return;
       const base = { key: `${type}:${sheet.sheetName}:${index}`, sheet: sheet.sheetName, row: index + 1, include: true };
 
@@ -441,8 +466,8 @@ export function buildPreview(sheets: ParsedSheet[], mappings: SheetMapping[]): I
       if (type === "payments") {
         const vehicleText = cleanString(fields.vehicle_registration || fields.registration_number || fields.vehicle_name || fields.vehicle) || sheetVehicle;
         // The due date sets the schedule; a "paid on" date, when there is one, is when the money came in.
-        const due = parseDateValue(fields.next_payment_date || fields.date || fields.start_date);
-        const paidOn = fields.next_payment_date ? parseDateValue(fields.date) : null;
+        const due = readDate(fields.next_payment_date || fields.date || fields.start_date);
+        const paidOn = fields.next_payment_date ? readDate(fields.date) : null;
         payments.push({
           sheet: sheet.sheetName,
           row: index + 1,
@@ -544,7 +569,7 @@ export function buildPreview(sheets: ParsedSheet[], mappings: SheetMapping[]): I
       if (key && platesSeen.has(key)) problems.push("duplicate_in_file");
       else if (key) platesSeen.set(key, base.key);
 
-      const known = new Set(["registration_number", "vehicle_registration", "make", "model", "trim", "vehicle_name", "year", "color", "current_mileage", "daily_rate", "weekly_rate", "monthly_rate", "customer_name", "phone", "email", "start_date", "end_date", "rental_rate", "rate_period", "deposit_amount", "mileage_at_start", "next_payment_date", "full_name", "price_unclear", "first_name", "last_name", "phone_country_code", "rental_total", "amount_paid", "booking_status", "rental_days", "returned", "rented_now"]);
+      const known = new Set(["registration_number", "vehicle_registration", "make", "model", "trim", "vehicle_name", "year", "color", "current_mileage", "daily_rate", "weekly_rate", "monthly_rate", "customer_name", "phone", "email", "start_date", "end_date", "rental_rate", "rate_period", "deposit_amount", "mileage_at_start", "next_payment_date", "full_name", "price_unclear", "first_name", "last_name", "phone_country_code", "rental_total", "amount_paid", "booking_status", "rental_days", "returned", "rented_now", "period_answered"]);
       const extra = Object.fromEntries(Object.entries(fields).filter(([field, value]) => !known.has(field) && cleanString(value)));
 
       preview.vehicles.push({

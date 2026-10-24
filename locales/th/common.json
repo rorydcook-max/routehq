@@ -4721,7 +4721,14 @@
     "f_money_in": "เงินเข้า (รายรับ)",
     "f_money_out": "เงินออก (รายจ่าย)",
     "mt_deposit_received": "รับเงินมัดจำ",
-    "mt_deposit_refunded": "คืนเงินมัดจำ"
+    "mt_deposit_refunded": "คืนเงินมัดจำ",
+    "q_title": "ขอถามสั้น ๆ สองสามข้อ",
+    "q_titleOne": "ขอถามสั้น ๆ หนึ่งข้อ",
+    "q_date": "ใน “{sheet}” วันที่ {example} หมายถึง…",
+    "q_rent": "ใน “{sheet}” ค่าเช่า (฿{amount} ของ {customer}) คิด…",
+    "q_per_day": "ต่อวัน",
+    "q_per_week": "ต่อสัปดาห์",
+    "q_per_month": "ต่อเดือน"
   },
   "errorPages": {
     "notFoundTitle": "ไม่พบหน้านี้",

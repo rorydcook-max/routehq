@@ -4,6 +4,7 @@ import { said } from "@/lib/i18n/server-text";
 import { commitPreview } from "@/lib/import/commit";
 import { previewCounts, type ImportPreview } from "@/lib/import/preview";
 import { getVehicleCategories } from "@/lib/organization";
+import { rememberCosts } from "@/lib/import/learnings";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 
 // A big file (years of payments) takes a while to write.
@@ -38,6 +39,8 @@ export async function POST(request: Request) {
     .eq("id", batch.id);
 
   if (total) {
+    // What the owner changed on the cards before bringing them in (what a cost was for) is remembered for next time.
+    await rememberCosts(supabase, organization.id, batch.preview as ImportPreview, preview).catch(() => null);
     await recordActivityEvent(supabase, {
       organization_id: organization.id,
       actor_id: membership.userId,

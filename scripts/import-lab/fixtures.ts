@@ -14,8 +14,11 @@ export type Fixture = {
   expect: Expect;
   /** What the AI should add on top of the rules (run with --ai); otherwise `expect` holds for both. */
   expectAi?: Expect;
+  /** Corrections this business made before (heading -> field, cost description -> kind). */
+  learned?: { columns?: Record<string, string>; costs?: Record<string, string> };
 };
-type Expect = { vehicles?: number; rentals?: number; customers?: number; transactions?: number; checks?: Check[] };
+/** `questions`: the quick questions the import screen should ask (their kinds), when given. */
+type Expect = { vehicles?: number; rentals?: number; customers?: number; transactions?: number; checks?: Check[]; questions?: string[] };
 
 const plusDays = (date: string, days: number) => {
   const day = new Date(`${date}T00:00:00Z`);
@@ -256,7 +259,7 @@ export const FIXTURES: Fixture[] = [
       ]
     }],
     expect: {
-      vehicles: 4, rentals: 3,
+      vehicles: 4, rentals: 3, questions: [],
       checks: [
         vehicleHas("กข 1003", { make: "Mazda", monthlyRate: 10000 }),
         rentalHas("กข 1001", { rate: 11000, nextDue: iso(6), paidUntil: iso(5), deposit: 5000 }),
@@ -432,6 +435,44 @@ export const FIXTURES: Fixture[] = [
     }],
     expect: { transactions: 5, checks: [moneyKinds({ other: 5 })] },
     expectAi: { transactions: 5, checks: [moneyNote("Замена масла", "servicing"), moneyNote("更换轮胎", "maintenance"), moneyNote("Reparatur", "repair"), moneyNote("rubbers", "maintenance"), moneyNote("Zoom", "other")] }
+  },
+  {
+    name: "american-dates",
+    about: "A US-style export: 11/05/2026 means 5 November, which a date like 10/22/2026 in the same sheet settles",
+    csv: [
+      "Customer,Vehicle,Plate,Pickup,Return,Daily rate",
+      "Amy,Toyota Yaris,กข 7001,10/22/2026,11/05/2026,1200",
+      "Ben,Honda City,กข 7002,11/02/2026,11/09/2026,1100"
+    ].join("\n"),
+    expect: {
+      rentals: 2, questions: [],
+      checks: [rentalHas("กข 7001", { startDate: "2026-10-22", endDate: "2026-11-05" }), rentalHas("กข 7002", { startDate: "2026-11-02", endDate: "2026-11-09" })]
+    }
+  },
+  {
+    name: "ambiguous-dates",
+    about: "Every date could be either way round (03/04/2026): read day first, and asked about",
+    csv: ["Customer,Car,Plate,From,To,Price per day", "Cara,Mazda 2,กข 7101,03/04/2026,08/04/2026,900", "Dan,Toyota Vios,กข 7102,05/06/2026,09/06/2026,850"].join("\n"),
+    expect: { rentals: 2, questions: ["date_order"], checks: [rentalHas("กข 7101", { startDate: "2026-04-03", endDate: "2026-04-08" })] }
+  },
+  {
+    name: "unclear-rent",
+    about: "A 'Rent' column whose figures could be per day or per month (฿2,500 for two months): asked about",
+    tabs: [{ name: "Rentals", rows: [["Customer", "Bike", "Plate", "Start", "End", "Rent"], ["Joe", "Click", "1กก 1111", dmy(-20), dmy(40), 2500], ["Kim", "PCX", "1กก 2222", dmy(-5), dmy(55), 3500]] }],
+    expect: { rentals: 2, questions: ["rate_period"] }
+  },
+  {
+    name: "learned-corrections",
+    about: "A business's past corrections: 'Rego' is the plate, 'Lot' is ignored, 'Lazada order' is accessories",
+    tabs: [
+      { name: "Cars", rows: [["Rego", "Make", "Model", "Lot"], ["กข 1515", "Toyota", "Vios", "A3"], ["กข 2626", "Honda", "City", "B1"]] },
+      { name: "Costs", rows: [["Date", "Rego", "Item", "Amount"], [dmy(-9), "กข 1515", "Lazada order", 890], [dmy(-4), "กข 2626", "Oil change", 1300]] }
+    ],
+    learned: { columns: { rego: "registration_number", lot: "__ignore__" }, costs: { "lazada order": "accessories" } },
+    expect: {
+      vehicles: 2, transactions: 2,
+      checks: [vehicleHas("กข 1515", { make: "Toyota", extra: {} }), moneyNote("Lazada", "accessories"), moneyNote("Oil change", "servicing")]
+    }
   },
   {
     name: "headerless-notebook",

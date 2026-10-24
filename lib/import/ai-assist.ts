@@ -67,10 +67,10 @@ Return ONLY JSON: {"kinds": {"<cost exactly as given>": "<kind>"}}`;
  * reading, and corrects that reading. Null when the AI is unavailable or answers with nothing usable; the rules'
  * reading is then used as it is.
  */
-export async function mapColumnsWithAi(sheets: ParsedSheet[], importType = "mixed"): Promise<unknown | null> {
+export async function mapColumnsWithAi(sheets: ParsedSheet[], importType = "mixed", learned: Map<string, string> = new Map()): Promise<unknown | null> {
   if (!aiTextConfigured()) return null;
   // The built-in rules read the file first; the AI checks that reading and corrects it, rather than starting cold.
-  const rules = normaliseAnalysis(null, sheets);
+  const rules = normaliseAnalysis(null, sheets, learned);
   const sheetSummary = sheets.map((sheet) => {
     const reading = rules.sheets.find((item) => item.sheet_name === sheet.sheetName);
     return {
@@ -102,6 +102,7 @@ Rules:
 - A TRUE/FALSE or yes/no column on a vehicle sheet saying whether the vehicle is rented out now ("Rental Status", "Rented?") is rented_now.
 - On a sheet of costs, a column describing what was bought or done ("Purchase", "Item", "Description", "รายการ") is type; the vehicle column (often "2019 MG3 2ขฒ7536") is vehicle_registration; the money column ("Cost", "Amount", "ยอด") is amount.
 - A "Received" / "Paid" TRUE/FALSE column next to payment due dates is paid.
+- A payment sheet with both a due date and the date it was actually paid: the due date ("Due date", "Payment due") is next_payment_date and the paid date ("Paid on", "Date paid") is date. With only one date column, it is date.
 - A ledger with separate money columns: income / in / received amounts is money_in, expense / out / spent is money_out.
 - A number of days rented ("Days", "จำนวนวัน") is rental_days; a returned yes/no column is returned.
 - "Column 1", "Column 2"… mean the sheet had no heading row: map those columns from their sample values (a Thai plate is registration_number, a date start_date or end_date, a phone number phone, a scooter or car model vehicle_name, a person's name customer_name, a price rental_rate).

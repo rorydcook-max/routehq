@@ -3,8 +3,10 @@
  * form's "existing rental", and the importer). Marks rent due before
  * "paidBefore" as paid, and records a deposit already held.
  */
-export async function settleExistingRental(supabase: any, input: { rental: any; organizationId: string; userId: string; paidBefore: string | null; depositHeld: number; currency: string }) {
+export async function settleExistingRental(supabase: any, input: { rental: any; organizationId: string; userId: string; paidBefore: string | null; depositHeld: number; currency: string; recordMoney?: boolean }) {
   const { rental, organizationId, userId, paidBefore, depositHeld, currency } = input;
+  // False when the rent received is already in Money in & out (an import with a payment sheet): rows are only marked paid.
+  const recordMoney = input.recordMoney !== false;
   const startDate = String(rental.start_date || "").slice(0, 10);
 
   if (paidBefore) {
@@ -19,6 +21,13 @@ export async function settleExistingRental(supabase: any, input: { rental: any; 
       .order("due_date", { ascending: true });
     for (const payment of (rows || []).filter((row: any) => !row.voided && row.metadata?.type !== "deposit" && row.metadata?.is_deposit !== true)) {
       const due = String(payment.due_date).slice(0, 10);
+      if (!recordMoney) {
+        await supabase
+          .from("rental_payments")
+          .update({ status: "paid", paid_at: `${due}T00:00:00.000Z`, metadata: { ...(payment.metadata || {}), setup_source: "operator_existing_rental", paid_per_sheet: true } })
+          .eq("id", payment.id);
+        continue;
+      }
       const { data: transaction } = await supabase
         .from("transactions")
         .insert({

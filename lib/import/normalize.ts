@@ -201,3 +201,24 @@ export function namesAgree(a: unknown, b: unknown) {
   if (x.includes(y) || y.includes(x)) return true;
   return x.split(" ")[0] === y.split(" ")[0];
 }
+
+/**
+ * What a cost was for, from how the owner described it ("Front wipers", "Brakes, oil change, service",
+ * "Insurance excess for bumper repair"). Checked in order: buying a vehicle, tax, insurance (an excess for a repair is an insurance cost),
+ * fines, fuel, finance, add-ons, repairs ("wiper spray motor" is a repair), servicing, then upkeep. "other" when nothing fits.
+ */
+export function categorizeCost(description: unknown) {
+  const text = cleanString(description).toLowerCase();
+  if (!text) return "other";
+  if (/car purchase|vehicle purchase|bought (the |a )?(car|vehicle|bike)|purchase of (the )?(car|vehicle)|ซื้อรถ/.test(text)) return "vehicle_purchase";
+  if (/\btax\b|registration renewal|ภาษี|ต่อทะเบียน/.test(text)) return "tax";
+  if (/insurance|excess|\bprb\b|p\.r\.b|compulsory|ประกัน|พ\.?ร\.?บ/.test(text)) return "insurance";
+  if (/\bfine\b|ticket|parking fine|police|ค่าปรับ|ใบสั่ง/.test(text)) return "fine";
+  if (/\bfuel\b|petrol|diesel|gasoline|น้ำมันรถ|เติมน้ำมัน/.test(text)) return "fuel";
+  if (/gps|dash ?cam|camera|\bcam\b|infotainment|carplay|android auto|seat cover|tint|key ?fob|armrest|sim card|\bscreen\b|gear (stick|lever) cover|phone holder|accessor|ฟิล์ม|กล้อง/.test(text)) return "accessories";
+  if (/repair|fix|replac|puncture|blowout|broken|motor|caliper|shock|joint|gearbox|belt|bush|strut|wishbone|catch|mirror|button|upholster|suspension|bumper|windscreen|windshield|trim|ซ่อม|เปลี่ยน/.test(text)) return "repair";
+  if (/servic|oil change|\boil\b|transmission oil|filter|ถ่ายน้ำมัน|เช็คระยะ/.test(text)) return "servicing";
+  if (/tyre|tire|wiper|batter|bulb|clean|detail|ceramic|glass coat|wash|polish|brake pad|air ?con|wheel align|balanc|tracking|ล้างรถ|ยาง|แบต/.test(text)) return "maintenance";
+  if (/finance|instal(l)?ment|loan|ค่างวด|ผ่อน/.test(text)) return "finance";
+  return "other";
+}

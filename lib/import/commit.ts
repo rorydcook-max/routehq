@@ -14,7 +14,7 @@ function paperDate(value: unknown) {
  */
 import { businessToday } from "@/lib/business-time";
 import { settleExistingRental } from "@/lib/existing-rental";
-import type { ImportPreview, PreviewRental, PreviewVehicle, Problem } from "@/lib/import/preview";
+import type { ImportPreview, PreviewRental, PreviewTransaction, PreviewVehicle, Problem } from "@/lib/import/preview";
 import { findByPlate } from "@/lib/import/normalize";
 import { activateRental } from "@/lib/rental-activation";
 
@@ -26,7 +26,7 @@ export type CommitResult = {
   failed: string[];
 };
 
-const NEEDS_LOOK: Problem[] = ["no_plate", "no_mileage", "no_year", "bad_date", "no_rate", "no_customer", "paid_until_unknown"];
+const NEEDS_LOOK: Problem[] = ["no_plate", "no_mileage", "no_year", "bad_date", "no_rate", "no_customer", "paid_until_unknown", "payment_gaps", "next_due_from_payments", "end_passed"];
 
 function plateKey(value: unknown) {
   return String(value ?? "").replace(/[\s-]+/g, "").toUpperCase();
@@ -79,7 +79,13 @@ function lookTitle(problems: Problem[], what: string) {
                 ? "customer name missing"
                 : problem === "paid_until_unknown"
                   ? "say what rent is paid up to"
-                  : problem === "duplicate_in_file"
+                  : problem === "payment_gaps"
+                    ? "a payment in the payment sheet is not ticked as received"
+                    : problem === "next_due_from_payments"
+                    ? "check the next payment date (worked out from the last payment)"
+                    : problem === "end_passed"
+                    ? "the end date in the sheet has passed but it is still rented, so no end date was set"
+                    : problem === "duplicate_in_file"
                     ? "listed twice in the file"
                     : ""
     )
@@ -115,7 +121,7 @@ async function upsertVehicle(context: CommitContext, vehicle: PreviewVehicle, re
       lender: vehicle.extra.finance_lender,
       monthly_payment: num(vehicle.extra.finance_monthly_payment),
       outstanding_balance: num(vehicle.extra.finance_outstanding),
-      end_date: vehicle.extra.finance_end_date
+      end_date: paperDate(vehicle.extra.finance_end_date)
     }),
     import: compact({ gps_tracker_url: vehicle.extra.gps_tracker_url, notes: vehicle.extra.notes, mileage_unknown: vehicle.mileage === null ? true : null })
   };
@@ -156,7 +162,8 @@ async function upsertVehicle(context: CommitContext, vehicle: PreviewVehicle, re
       vin: vehicle.extra.vin || null,
       registration_number: vehicle.plate || `IMPORT-${vehicle.row}`,
       color: vehicle.color || null,
-      purchase_date: vehicle.extra.purchase_date || null,
+      purchase_date: paperDate(vehicle.extra.purchase_date) || null,
+      deposit_amount: vehicle.deposit ?? null,
       purchase_price: num(vehicle.extra.purchase_price),
       estimated_value: num(vehicle.extra.estimated_value),
       mileage: vehicle.mileage ?? 0,
@@ -239,7 +246,7 @@ async function findOrCreateCustomer(context: CommitContext, input: { fullName: s
   return data.id as string;
 }
 
-async function createRental(context: CommitContext, rental: PreviewRental, vehicleId: string, customerId: string, result: CommitResult) {
+async function createRental(context: CommitContext, rental: PreviewRental, vehicleId: string, customerId: string, result: CommitResult, ownMoney: Record<string, unknown>[] = []) {
   const { supabase } = context;
   if (!rental.startDate) return null;
   const { data, error } = await supabase
@@ -279,16 +286,25 @@ async function createRental(context: CommitContext, rental: PreviewRental, vehic
       .eq("id", vehicleId)
       .eq("organization_id", context.organizationId);
     if (rental.rate) {
+      // Rent received from a payment sheet goes in first, so the schedule built next links each payment to its month.
+      if (ownMoney.length) {
+        const { error: moneyError } = await supabase.from("transactions").insert(ownMoney.map((record) => ({ ...record, rental_id: data.id, customer_id: customerId })));
+        if (moneyError) result.failed.push(`rent for ${rental.customerName || `row ${rental.row}`}: ${moneyError.message}`);
+        else result.counts.transactions += ownMoney.length;
+      }
       // The same schedule and "paid up to" handling as recording an existing rental by hand.
-      await activateRental(data.id, supabase).catch(() => null);
       const paidBefore = rental.paidUntil ? nextDay(rental.paidUntil) : null;
+      // Rent kept in a payment sheet drifts with the day each renter pays, so the schedule starts at the next payment
+      // due rather than replaying months from the start date; the sheet's payments stay on the rental as its history.
+      await activateRental(data.id, supabase, { billFrom: rental.moneyFromSheet ? paidBefore : null }).catch(() => null);
       await settleExistingRental(supabase, {
         rental: { id: data.id, vehicle_id: vehicleId, customer_id: customerId, start_date: rental.startDate },
         organizationId: context.organizationId,
         userId: context.userId,
         paidBefore,
         depositHeld: rental.depositHeld ? rental.deposit || 0 : 0,
-        currency: context.currency
+        currency: context.currency,
+        recordMoney: !rental.moneyFromSheet
       }).catch(() => null);
       // Tag what the settle step wrote so an undo takes it back too.
       await supabase.from("rental_payments").update({ import_batch_id: context.batchId }).eq("rental_id", data.id).is("import_batch_id", null);
@@ -334,6 +350,21 @@ export async function commitPreview(context: CommitContext, preview: ImportPrevi
     await findOrCreateCustomer(context, { ...customer, existingId: customer.existingId }, result, customerCache);
   }
 
+  // Money rows as they'll be written. Rent from a payment sheet for a rental in this import is written with that rental.
+  const moneyRecord = (transaction: PreviewTransaction, vehicleId: string | null) => ({
+    organization_id: context.organizationId,
+    vehicle_id: vehicleId,
+    transaction_date: transaction.date || businessToday(),
+    type: transaction.type,
+    amount: transaction.amount,
+    currency: context.currency,
+    notes: transaction.notes || null,
+    metadata: { source: "import" },
+    import_batch_id: context.batchId,
+    created_by: context.userId
+  });
+  const writtenWithRental = new Set<string>();
+
   // 3. Who has what now, then past and future rentals.
   for (const rental of preview.rentals) {
     if (!rental.include) continue;
@@ -355,7 +386,9 @@ export async function commitPreview(context: CommitContext, preview: ImportPrevi
     }
     const customerId = await findOrCreateCustomer(context, { fullName: rental.customerName || `Customer (row ${rental.row})`, phone: rental.phone, email: rental.email }, result, customerCache);
     if (!customerId) continue;
-    const rentalId = await createRental(context, rental, vehicleId, customerId, result);
+    const own = preview.transactions.filter((transaction) => transaction.include && transaction.amount !== null && transaction.rentalKey === rental.key);
+    const rentalId = await createRental(context, rental, vehicleId, customerId, result, own.map((transaction) => moneyRecord(transaction, vehicleId)));
+    if (rentalId) for (const transaction of own) writtenWithRental.add(transaction.key);
     const look = rental.problems.filter((problem) => NEEDS_LOOK.includes(problem));
     if (rentalId && look.length && (await addTask(context, vehicleId, rentalId, lookTitle(look, `rental for ${rental.customerName || "unnamed customer"}`)))) result.counts.tasks += 1;
   }
@@ -363,27 +396,14 @@ export async function commitPreview(context: CommitContext, preview: ImportPrevi
   // 4. Money. Years of history can be thousands of rows: written 200 at a time, row by row only if a group fails.
   const money: { row: number; record: Record<string, unknown> }[] = [];
   for (const transaction of preview.transactions) {
-    if (!transaction.include || transaction.amount === null) continue;
-    const vehicleId = (transaction.vehicleKey && vehicleIdByKey.get(transaction.vehicleKey)) || transaction.existingVehicleId;
-    if (!vehicleId) {
+    if (!transaction.include || transaction.amount === null || writtenWithRental.has(transaction.key)) continue;
+    const vehicleId = (transaction.vehicleKey && vehicleIdByKey.get(transaction.vehicleKey)) || transaction.existingVehicleId || null;
+    // A business cost ("NON-VEHICLE PURCHASE") has no vehicle on purpose.
+    if (!vehicleId && !transaction.business) {
       result.failed.push(`row ${transaction.row}: no vehicle ${transaction.plate ? `with plate ${transaction.plate}` : "plate"}`);
       continue;
     }
-    money.push({
-      row: transaction.row,
-      record: {
-        organization_id: context.organizationId,
-        vehicle_id: vehicleId,
-        transaction_date: transaction.date || businessToday(),
-        type: transaction.type,
-        amount: transaction.amount,
-        currency: context.currency,
-        notes: transaction.notes || null,
-        metadata: { source: "import" },
-        import_batch_id: context.batchId,
-        created_by: context.userId
-      }
-    });
+    money.push({ row: transaction.row, record: moneyRecord(transaction, vehicleId) });
   }
   for (let at = 0; at < money.length; at += 200) {
     const group = money.slice(at, at + 200);

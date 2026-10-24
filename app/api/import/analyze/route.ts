@@ -218,7 +218,8 @@ Vehicle, compliance and finance fields: ${importFieldKeys(["Vehicle", "Complianc
 Current rental fields (columns on a vehicle sheet describing who is renting that vehicle now): ${importFieldKeys(["Current rental"]).join(", ")}
 Customer fields: ${importFieldKeys(["Customer"]).join(", ")}, plus phone and email
 Rental sheet fields: vehicle_registration, customer_name, phone, email, start_date, end_date, rental_rate, deposit_amount, mileage_at_start, next_payment_date
-Transaction fields: vehicle_registration, date, type, amount, notes
+Transaction fields: vehicle_registration, date, type, amount, notes, paid
+Rent payment sheets (a vehicle, a due date, an amount and whether it was received): vehicle_registration, date, amount, paid, notes (receipt link)
 
 Headers and values may be Thai: ทะเบียน = registration_number, ยี่ห้อ = make, รุ่น = model, ปี = year, สี = color, เลขไมล์ = current_mileage, ราคา/เดือน or ค่าเช่าต่อเดือน = monthly_rate, ค่าเช่า (of the current renter) = rental_rate, ลูกค้า/ผู้เช่า = customer_name, เบอร์/โทร = phone, วันเริ่ม/รับรถ = start_date, วันคืน/สิ้นสุด = end_date, มัดจำ = deposit_amount, ครบกำหนด/จ่ายครั้งถัดไป = next_payment_date, ภาษี = tax_expiry_date, พรบ = porbor_expiry_date, ประกัน = insurance_expiry_date, จำนวนเงิน/ยอด = amount, วันที่ = date, รายการ/ประเภท = type.
 
@@ -227,6 +228,9 @@ Rules:
 - monthly_rate is the vehicle's advertised price. The rent the current renter actually pays is rental_rate.
 - Exports from other booking systems: separate first and last name columns are first_name and last_name; a booking's status (reserved, cancelled, returned…) is booking_status; the total price of the whole booking is rental_total (a daily rate column is rental_rate); money already paid is amount_paid (not deposit_amount); a phone country code column is phone_country_code; the vehicle's class, category or item name (e.g. "Economy - Toyota Yaris", "1 x Honda Click (2กท 1188)") is vehicle_name unless it is the only place the plate appears, then vehicle_registration.
 - "Asset valuation" or similar is estimated_value. "Outstanding balance" of a financed vehicle is finance_outstanding.
+- A TRUE/FALSE or yes/no column on a vehicle sheet saying whether the vehicle is rented out now ("Rental Status", "Rented?") is rented_now.
+- On a sheet of costs, a column describing what was bought or done ("Purchase", "Item", "Description", "รายการ") is type; the vehicle column (often "2019 MG3 2ขฒ7536") is vehicle_registration; the money column ("Cost", "Amount", "ยอด") is amount.
+- A "Received" / "Paid" TRUE/FALSE column next to payment due dates is paid.
 - sheet_name must exactly match a provided sheet_name.
 
 Sheets: ${JSON.stringify(sheetSummary)}

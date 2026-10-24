@@ -48,8 +48,10 @@ function bestMatchTransaction(transactions: any[], usedIds: Set<string>, dueDate
  * `scheduleFrom`: the booked start, when the vehicle went out before it. The rental now starts on the handover
  * day, but the rent schedule is for the booked dates; the early days are charged separately (or free), so
  * billing from the handover day would charge them twice (or charge days the owner gave free).
+ * `billFrom`: an imported rental whose earlier rent is already settled; the schedule starts here, first payment
+ * due on this day.
  */
-export async function activateRental(rentalId: string, supabase: SupabaseClient, options: { scheduleFrom?: string | null } = {}): Promise<void> {
+export async function activateRental(rentalId: string, supabase: SupabaseClient, options: { scheduleFrom?: string | null; billFrom?: string | null } = {}): Promise<void> {
   const { data: rental, error } = await (supabase as any)
     .from("rentals")
     .select("id, organization_id, customer_id, vehicle_id, start_date, end_date, rental_rate, pricing_model, billing_interval, currency, status, extras, extras_total, deposit_amount, deposit_payment_amount, deposit_status, deposit_held")
@@ -86,7 +88,7 @@ export async function activateRental(rentalId: string, supabase: SupabaseClient,
 
   let newPayments: any[] = [];
   if (!hasScheduledFuture) {
-    newPayments = await generatePaymentScheduleInternal(rental, existingRentPayments, supabase, options.scheduleFrom || null);
+    newPayments = await generatePaymentScheduleInternal(rental, existingRentPayments, supabase, options.scheduleFrom || null, options.billFrom || null);
   }
   const extrasPayment = await addExtrasPayment(rental, existingRentPayments, newPayments.length > 0 || existingRentPayments.length > 0, supabase);
   if (extrasPayment) newPayments.push(extrasPayment);
@@ -104,7 +106,8 @@ async function generatePaymentScheduleInternal(
   rental: any,
   existingPayments: any[],
   supabase: SupabaseClient,
-  scheduleFrom: string | null = null
+  scheduleFrom: string | null = null,
+  billFrom: string | null = null
 ): Promise<any[]> {
   if (!rental.customer_id || !rental.vehicle_id) return [];
   const rentalRate = Number(rental.rental_rate || 0);
@@ -129,8 +132,9 @@ async function generatePaymentScheduleInternal(
   // charge, or were given free), with the first payment due on the handover day like the rest of the handover.
   const earlyRow = existingPayments.find((p: any) => p.metadata?.early_start?.booked_start);
   const bookedStart = dateOnly(scheduleFrom || earlyRow?.metadata?.early_start?.booked_start);
-  const scheduleStartStr = bookedStart && bookedStart > startDateStr ? bookedStart : startDateStr;
-  const firstDueStr = startDateStr;
+  const billStart = dateOnly(billFrom);
+  const scheduleStartStr = billStart && billStart > startDateStr ? billStart : bookedStart && bookedStart > startDateStr ? bookedStart : startDateStr;
+  const firstDueStr = billStart && billStart > startDateStr ? billStart : startDateStr;
   const startDate = new Date(`${scheduleStartStr}T00:00:00.000Z`);
   const endDateStr = dateOnly(rental.end_date) || null;
   const today = businessToday();

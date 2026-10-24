@@ -4696,7 +4696,17 @@
     "srcSheet": "Google Sheet",
     "srcPhotos": "{count, plural, one {# photo} other {# photos}}",
     "customersFromRentals": "{count, plural, one {The renter on the Rentals tab is added as a customer:} other {The # renters on the Rentals tab are added as customers:}}",
-    "alreadySaved": "already saved, their record is used"
+    "alreadySaved": "already saved, their record is used",
+    "mt_maintenance": "Maintenance",
+    "businessCost": "Business cost (no vehicle)",
+    "c_what": "What it was for",
+    "p_date_guessed": "no date in the sheet · took the date of the row above",
+    "p_vehicle_purchase": "buying the vehicle · its purchase price is on the vehicle, so left out",
+    "p_end_passed": "end date has passed but it's marked as rented · no end date set",
+    "p_payment_gaps": "a payment in the payment sheet isn't ticked as received",
+    "p_next_due_from_payments": "check the next payment date (worked out from the last payment)",
+    "f_rented_now": "Rented out now (yes / no)",
+    "f_paid": "Paid / received (yes / no)"
   },
   "errorPages": {
     "notFoundTitle": "We could not find that page",

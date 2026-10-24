@@ -430,7 +430,7 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
             ) : null}
             {tab === "transactions" ? (
               preview.transactions.length ? (
-                preview.transactions.slice(0, shown).map((transaction) => <TransactionRow key={transaction.key} onChange={(changes) => patch("transactions", transaction.key, changes)} t={t} transaction={transaction} vehicleLabel={vehicleLabel(transaction.plate, transaction.vehicleKey)} />)
+                preview.transactions.slice(0, shown).map((transaction) => <TransactionRow key={transaction.key} onChange={(changes) => patch("transactions", transaction.key, changes)} t={t} transaction={transaction} vehicleLabel={transaction.business ? t("businessCost") : vehicleLabel(transaction.plate, transaction.vehicleKey)} />)
               ) : (
                 <p className="text-sm text-[var(--muted)]">{t("noneHere")}</p>
               )
@@ -789,7 +789,7 @@ function CustomerCard({ customer, onChange, t }: { customer: PreviewCustomer; on
   );
 }
 
-const MONEY_TYPES = ["rental_income", "charge_recovered", "repair", "servicing", "fuel", "insurance", "tax", "finance", "fine", "accessories", "refund", "deposit", "other"];
+const MONEY_TYPES = ["rental_income", "charge_recovered", "repair", "servicing", "maintenance", "fuel", "insurance", "tax", "finance", "fine", "accessories", "refund", "deposit", "other"];
 
 function TransactionRow({ transaction, vehicleLabel, onChange, t }: { transaction: PreviewTransaction; vehicleLabel: string; onChange: (changes: Partial<PreviewTransaction>) => void; t: Say }) {
   const faded = !transaction.include ? "opacity-50" : "";
@@ -822,6 +822,11 @@ function TransactionRow({ transaction, vehicleLabel, onChange, t }: { transactio
           <input className={smallInput} inputMode="numeric" onChange={(event) => onChange({ amount: event.target.value ? Number(event.target.value) : null })} value={transaction.amount ?? ""} />
         </label>
       </div>
+      {/* What it was for, as the sheet said it ("Front wipers"): the category above was worked out from this. */}
+      <label className="mt-2 block text-xs font-semibold text-[var(--muted)]">
+        {t("c_what")}
+        <input className={smallInput} onChange={(event) => onChange({ notes: event.target.value })} value={transaction.notes || ""} />
+      </label>
     </div>
   );
 }

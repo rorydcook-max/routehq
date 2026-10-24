@@ -5,6 +5,7 @@ import { MessagesSquare } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageBand } from "@/components/page-band";
 import { InboxView } from "@/app/inbox/inbox-view";
+import { sharedHistory } from "@/lib/customer-history";
 import { MessagesToSend, type ToSendGroup } from "@/app/inbox/messages-to-send";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getCurrentMembership } from "@/lib/auth/roles";
@@ -66,6 +67,14 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
   // "Owed" beside a booking is what is due by today on a vehicle that has gone out, as everywhere else —
   // not the whole balance, which counts rent months ahead.
   const dueNow = await amountDueNowByRental(supabase, ((bookingRows || []) as any[]).map((row) => row.id));
+  // Whoever is writing: what other RouteHQ businesses have reported about them, by the customer they're linked to
+  // or, before they're linked, by the WhatsApp number they write from.
+  const linked = selected?.customer_id
+    ? (await supabase.from("customers").select("phone, whatsapp_number, passport_number, driver_license_number").eq("id", selected.customer_id).eq("organization_id", organization.id).maybeSingle()).data
+    : null;
+  const historySignals = selected
+    ? await sharedHistory(supabase, organization.id, { ...(linked || {}), whatsapp_number: linked?.whatsapp_number || (selected.provider === "whatsapp" ? selected.external_user_id : null) }).catch(() => [])
+    : [];
   const bookings = ((bookingRows || []) as any[]).map((row) => ({ ...row, balance_due: dueNow.get(row.id) || 0 }));
 
   const hasChannel = (channels || []).length > 0;
@@ -128,6 +137,7 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
           customers={(customers || []) as Array<{ id: string; full_name: string | null; phone: string | null }>}
           filter={filter}
           autoSelected={autoSelected}
+          history={historySignals}
           messages={(messages || []) as InboxMessage[]}
           selected={selected}
         />

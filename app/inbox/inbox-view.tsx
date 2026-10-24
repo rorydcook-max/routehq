@@ -1,5 +1,7 @@
 "use client";
 
+import { SharedHistory } from "@/components/shared-history";
+import type { HistorySignal } from "@/lib/customer-history-kinds";
 import { toWallTime, businessToday, BUSINESS_TIME_ZONE } from "@/lib/business-time";
 import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
@@ -70,8 +72,11 @@ export function InboxView({
   filter,
   messages,
   selected,
-  autoSelected = false
+  autoSelected = false,
+  history = []
 }: {
+  /** What other RouteHQ businesses reported about whoever is writing (shared customer history). */
+  history?: HistorySignal[];
   bookings: any[];
   conversations: InboxConversation[];
   customers: Array<{ id: string; full_name: string | null; phone: string | null }>;
@@ -273,6 +278,11 @@ export function InboxView({
                 {selected.status === "open" ? say("markDone") : say("reopen")}
               </button>
             </header>
+            {history.length ? (
+              <div className="border-b border-[var(--border)] px-4 pb-3">
+                <SharedHistory compact signals={history} />
+              </div>
+            ) : null}
 
             {bookings.length > 0 ? (
               <div className="scrollbar-none flex gap-2 overflow-x-auto border-b border-[var(--border)] bg-[var(--panel-secondary)] px-3 py-2">

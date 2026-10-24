@@ -4986,5 +4986,29 @@
     "backOn": "Due back {date}, in {days} days",
     "waitingTitle": "Waiting for the customer to fill in their booking link",
     "waitingLine": "Booked from {date}. Open the booking to send the link again."
+  },
+  "history": {
+    "title": "{count, plural, one {Another RouteHQ business has reported a problem with this customer} other {# other RouteHQ businesses have reported problems with this customer}}",
+    "hint": "Reported by other businesses, matched by passport, licence or phone. Ask the customer about it; it isn't proof on its own.",
+    "times": "{count} times",
+    "kind_unpaid_rent": "Rent not paid",
+    "kind_damage_unpaid": "Damage not paid for",
+    "kind_not_returned": "Vehicle not returned on time",
+    "kind_false_documents": "False documents",
+    "kind_abusive": "Abusive or threatening",
+    "kind_other_serious": "Other serious problem",
+    "add": "Warn other RouteHQ businesses",
+    "formTitle": "Warn other RouteHQ businesses",
+    "formHint": "Other businesses will see what happened, the amount and the month when this person books or messages them — not your business's name or your note.",
+    "what": "What happened",
+    "rental": "Rental",
+    "amount": "Amount (฿)",
+    "when": "When",
+    "notes": "Your note (only you see this)",
+    "notesPlaceholder": "e.g. left without paying the last two months",
+    "send": "Warn others",
+    "cancel": "Cancel",
+    "ownTitle": "You've warned other businesses",
+    "withdraw": "Take back"
   }
 }

@@ -1,3 +1,5 @@
+import { SharedHistory } from "@/components/shared-history";
+import { sharedHistory } from "@/lib/customer-history";
 import Link from "next/link";
 import { canDecideMoney, getCurrentMembership } from "@/lib/auth/roles";
 import type { Route } from "next";
@@ -345,6 +347,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
     .maybeSingle();
   const vehicle = rental.vehicles;
   const customer = rental.customers;
+  // What other RouteHQ businesses reported about this customer (shared customer history).
+  const historySignals = await sharedHistory(supabaseForVehicles, organization.id, customer).catch(() => []);
   // Giving money away (refunds, free early days, unpaid rent taken off) is the owner's or a manager's call.
   const isOwner = canDecideMoney((await getCurrentMembership())?.role);
   // Receipts customers sent stay with their payment; staff open them from the schedule.
@@ -845,6 +849,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             {customer.do_not_rent_reason ? <span className="block font-semibold">{customer.do_not_rent_reason}</span> : null}
           </div>
         ) : null}
+        {historySignals.length ? <SharedHistory signals={historySignals} /> : null}
 
         <UnsentMessages
           customerName={customer?.full_name || tx.say("theCustomer")}

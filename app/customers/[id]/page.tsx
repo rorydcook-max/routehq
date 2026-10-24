@@ -8,6 +8,11 @@ import { ArrowRight, CheckCircle2, FileText, MessageCircle, PenLine, Phone, Plus
 import { updateCustomer, uploadCustomerDocument } from "@/app/actions/customers";
 import { CustomerNotesForm } from "@/app/customers/[id]/customer-notes-form";
 import { DoNotRent } from "@/app/customers/[id]/do-not-rent";
+import { ReportToOthers } from "@/app/customers/[id]/report-to-others";
+import { SharedHistory } from "@/components/shared-history";
+import { getCurrentMembership } from "@/lib/auth/roles";
+import { sharedHistory } from "@/lib/customer-history";
+import { isHandedOver } from "@/lib/rental-balances";
 import { AppShell } from "@/components/app-shell";
 import { PageTabs } from "@/components/page-tabs";
 import { CommunicationPanel } from "@/components/communication-panel";
@@ -459,6 +464,23 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
   const docsIn = [completeness.hasPassport, completeness.hasLicense, completeness.hasSelfie].filter(Boolean).length;
   const owedNow = [...dueByRental.values()].reduce((sum, amount) => sum + amount, 0);
 
+  // Shared customer history: what other RouteHQ businesses reported about this person, and what this one has.
+  const supabase = (await createSupabaseServerClient()) as any;
+  const [signals, { data: ownReportRows }, membership] = await Promise.all([
+    sharedHistory(supabase, organization.id, customer as any),
+    supabase.from("customer_reports").select("id, kind, amount, occurred_on, rental_id").eq("organization_id", organization.id).eq("customer_id", customer.id).is("withdrawn_at", null).order("occurred_on", { ascending: false }),
+    getCurrentMembership()
+  ]);
+  const rentalLabel = (rental: any) => `${[rental.vehicles?.make, rental.vehicles?.model].filter(Boolean).join(" ") || rental.vehicles?.registration_number || "—"} · ${formatDate(rental.start_date, cx)}`;
+  const reportableRentals = (detail.rentals as any[]).filter((rental) => isHandedOver(rental.status)).map((rental) => ({ id: rental.id as string, label: rentalLabel(rental) }));
+  const ownReports = ((ownReportRows || []) as any[]).map((report) => ({
+    id: report.id as string,
+    kind: report.kind as string,
+    amount: report.amount === null ? null : Number(report.amount),
+    occurred_on: String(report.occurred_on),
+    rental_label: reportableRentals.find((rental) => rental.id === report.rental_id)?.label || ""
+  }));
+
   return (
     <AppShell userEmail={userEmail}>
       <div className="space-y-3">
@@ -488,6 +510,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           {licenceDays !== null && licenceDays < 0 ? <p className="mt-1 font-bold text-[var(--danger)]">{cx.say("warnLicence", { date: formatDate(customer.driver_license_expiry, cx) })}</p> : null}
           {passportDays !== null && passportDays < 0 ? <p className="mt-1 font-bold text-[var(--danger)]">{cx.say("warnPassport", { date: formatDate(customer.passport_expiry, cx) })}</p> : null}
           <DoNotRent customerId={customer.id} on={Boolean((customer as any).do_not_rent)} organizationId={organization.id} place="banner" reason={(customer as any).do_not_rent_reason || null} />
+          <SharedHistory signals={signals} />
           <div className="mt-4 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
             <Link className="primary-action pressable col-span-2" href={`/bookings/new?customerId=${customer.id}` as Route}>
               <Plus size={18} />
@@ -511,6 +534,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             </a>
           </div>
           <DoNotRent customerId={customer.id} on={Boolean((customer as any).do_not_rent)} organizationId={organization.id} place="control" reason={null} />
+          <ReportToOthers canReport={["owner", "manager"].includes(String(membership?.role || ""))} customerId={customer.id} rentals={reportableRentals} reports={ownReports} />
         </Card>
 
         {detail.rentals.length > 0 ? (

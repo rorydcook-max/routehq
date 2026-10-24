@@ -14,6 +14,7 @@
     "documents:phase9-probes": "npx supabase db query --file scripts/phase9-adversarial-db-probes.sql",
     "documents:phase10-probes": "npx supabase db query --file scripts/phase10-customer-signing-db-probes.sql",
     "typecheck": "tsc --noEmit",
+    "test:import": "tsx scripts/import-lab/run.ts",
     "check:translations": "node scripts/check-translations.cjs",
     "translate": "node scripts/translate-messages.mjs"
   },
@@ -46,6 +47,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "tailwindcss": "^4.1.7",
+    "tsx": "^4.19.2",
     "typescript": "5.8.2"
   }
 }

@@ -67,6 +67,8 @@ export const IMPORT_FIELDS: ImportField[] = [
   { key: "rental_total", label: "Total price of the booking", group: "Current rental" },
   { key: "amount_paid", label: "Amount already paid", group: "Current rental" },
   { key: "booking_status", label: "Booking status (cancelled ones are left out)", group: "Current rental" },
+  { key: "rental_days", label: "Number of days rented", group: "Current rental" },
+  { key: "returned", label: "Returned (yes / no)", group: "Current rental" },
 
   { key: "full_name", label: "Customer name", group: "Customer" },
   { key: "nationality", label: "Nationality", group: "Customer" },
@@ -78,7 +80,9 @@ export const IMPORT_FIELDS: ImportField[] = [
   { key: "date", label: "Date", group: "Transaction" },
   { key: "type", label: "Type (rent, fuel, repair...)", group: "Transaction" },
   { key: "amount", label: "Amount", group: "Transaction" },
-  { key: "paid", label: "Paid / received (yes / no)", group: "Transaction" }
+  { key: "paid", label: "Paid / received (yes / no)", group: "Transaction" },
+  { key: "money_in", label: "Money in (income)", group: "Transaction" },
+  { key: "money_out", label: "Money out (expense)", group: "Transaction" }
 ];
 
 export const IMPORT_FIELD_KEYS = new Set(IMPORT_FIELDS.map((field) => field.key));

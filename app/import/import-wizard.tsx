@@ -789,7 +789,7 @@ function CustomerCard({ customer, onChange, t }: { customer: PreviewCustomer; on
   );
 }
 
-const MONEY_TYPES = ["rental_income", "charge_recovered", "repair", "servicing", "maintenance", "fuel", "insurance", "tax", "finance", "fine", "accessories", "refund", "deposit", "other"];
+const MONEY_TYPES = ["rental_income", "charge_recovered", "repair", "servicing", "maintenance", "fuel", "insurance", "tax", "finance", "fine", "accessories", "refund", "deposit", "deposit_received", "deposit_refunded", "other"];
 
 function TransactionRow({ transaction, vehicleLabel, onChange, t }: { transaction: PreviewTransaction; vehicleLabel: string; onChange: (changes: Partial<PreviewTransaction>) => void; t: Say }) {
   const faded = !transaction.include ? "opacity-50" : "";

@@ -29,14 +29,56 @@ export function findByPlate<T>(map: Map<string, T>, plate: unknown): T | undefin
   return undefined;
 }
 
+/**
+ * A number as owners write it: "฿12,000", "12000 บาท", "THB 12,000.-", "12,000 บาท/เดือน", "8k/month",
+ * "80,500 กม.", "45,000 km", "(1,200)" for a negative, and "9.500,00" from a sheet saved with comma decimals.
+ */
 export function parseNumberValue(value: unknown) {
-  // "฿12,000", "12000 บาท", "THB 12,000.-" all mean twelve thousand.
-  const cleaned = cleanString(value).replace(/[฿,\s]|THB|บาท|บ\.|\.-$/gi, "");
-  if (!cleaned) {
-    return null;
+  let cleaned = cleanString(value)
+    .replace(/[฿$€£]|THB|baht|บาท|บ\./gi, "")
+    .replace(/\.-$/, "")
+    .trim();
+  if (!cleaned) return null;
+  // What it's per comes after the number: "/เดือน", "per day", " a month".
+  cleaned = cleaned.replace(/\s*(\/|\bper\b|\ba\b\s+(day|week|month)|ต่อ).*$/i, "").trim();
+  // Units after the number.
+  cleaned = cleaned.replace(/\s*(kms?|kilomet\w*|กม\.?|กิโล(เมตร)?|cc|ซีซี|days?|วัน|months?|เดือน|pcs|ชิ้น)\s*$/i, "").trim();
+  const negative = /^\(.*\)$/.test(cleaned);
+  if (negative) cleaned = cleaned.slice(1, -1);
+  let multiplier = 1;
+  if (/^-?[\d.,]+\s*k$/i.test(cleaned)) {
+    multiplier = 1000;
+    cleaned = cleaned.replace(/\s*k$/i, "");
   }
-  const parsed = Number(cleaned);
+  cleaned = cleaned.replace(/\s+/g, "");
+  if (/^-?\d{1,3}(\.\d{3})+,\d{1,2}$/.test(cleaned) || /^-?\d+,\d{1,2}$/.test(cleaned)) {
+    // Comma decimals ("9.500,00", "12,5"): a sheet saved in a European locale.
+    cleaned = cleaned.replace(/\./g, "").replace(",", ".");
+  } else {
+    cleaned = cleaned.replace(/,/g, "");
+  }
+  if (!/^-?\d*\.?\d+$/.test(cleaned)) return null;
+  const parsed = Number(cleaned) * multiplier * (negative ? -1 : 1);
   return Number.isFinite(parsed) ? parsed : null;
+}
+
+/** A vehicle's year as written: "2019", "2565" or "พ.ศ. 2565" (Buddhist), "'20", "66" on a Thai sheet. */
+export function parseYearValue(value: unknown) {
+  const text = cleanString(value);
+  if (!text) return null;
+  const four = text.match(/(?:^|\D)(\d{4})(?:\D|$)/);
+  if (four) {
+    const year = Number(four[1]);
+    return year > 2400 ? year - 543 : year;
+  }
+  const two = text.match(/^\D{0,6}'?(\d{2})\D{0,3}$/);
+  if (!two) return null;
+  const short = Number(two[1]);
+  const thisYear = new Date().getFullYear();
+  // "19", "'20": this century. "66": a Buddhist year (2566), which is how Thai sheets shorten it.
+  if (2000 + short <= thisYear + 1) return 2000 + short;
+  if (short >= 40) return 2500 + short - 543;
+  return null;
 }
 
 export function parseIntegerValue(value: unknown) {
@@ -81,6 +123,25 @@ function fourDigitYear(two: string) {
   return guess > thisYear + 5 ? String(guess + 500 - 543) : String(guess);
 }
 
+const EN_MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+
+function withNearestYear(text: string) {
+  const dayFirst = text.match(/^(\d{1,2})\s*([a-z]{3,}|[ก-๙.]+)$/i);
+  const monthFirst = text.match(/^([a-z]{3,})\.?\s*(\d{1,2})$/i);
+  const day = Number(dayFirst?.[1] || monthFirst?.[2] || 0);
+  const word = (dayFirst?.[2] || monthFirst?.[1] || "").toLowerCase().replace(/\.$/, "");
+  if (!day || !word) return null;
+  const month = /[ก-๙]/.test(word) ? THAI_MONTHS.find(([pattern]) => pattern.test(word))?.[1] : EN_MONTHS.findIndex((name) => word.startsWith(name)) + 1;
+  if (!month) return null;
+  const now = new Date();
+  const thisYear = now.getUTCFullYear();
+  const candidates = [thisYear - 1, thisYear, thisYear + 1]
+    .map((year) => new Date(Date.UTC(year, month - 1, day)))
+    .filter((date) => date.getUTCDate() === day)
+    .sort((a, b) => Math.abs(a.getTime() - now.getTime()) - Math.abs(b.getTime() - now.getTime()));
+  return candidates[0] ? candidates[0].toISOString().slice(0, 10) : null;
+}
+
 export function parseDateValue(value: unknown) {
   const raw = cleanString(value);
   if (!raw) {
@@ -123,8 +184,14 @@ export function parseDateValue(value: unknown) {
     return real(year, dayFirstMatch[2], dayFirstMatch[1]) || real(year, dayFirstMatch[1], dayFirstMatch[2]);
   }
 
+  // No year ("5 Oct", "Oct 5th", "5 ต.ค."): the nearest such date to today, so last week stays last week and a
+  // return date next month stays next month.
+  const noYear = withNearestYear(dateOnly.replace(/(\d+)(st|nd|rd|th)/gi, "$1").replace(/,/g, " ").replace(/\s+/g, " ").trim());
+  if (noYear) return noYear;
+
   // Text dates like "Jul 22 2023". Read the calendar date as written: going
   // through toISOString() would shift it a day back on a server east of UTC.
+  if (!/\d{4}/.test(cleaned)) return null;
   const parsed = new Date(cleaned);
   if (Number.isNaN(parsed.getTime())) {
     return null;
@@ -203,22 +270,26 @@ export function namesAgree(a: unknown, b: unknown) {
 }
 
 /**
- * What a cost was for, from how the owner described it ("Front wipers", "Brakes, oil change, service",
- * "Insurance excess for bumper repair"). Checked in order: buying a vehicle, tax, insurance (an excess for a repair is an insurance cost),
- * fines, fuel, finance, add-ons, repairs ("wiper spray motor" is a repair), servicing, then upkeep. "other" when nothing fits.
+ * What a cost was for, from how the owner described it, in English or Thai ("Front wipers", "Brakes, oil change,
+ * service", "Insurance excess for bumper repair", "เปลี่ยนน้ำมันเครื่อง"). Checked in order: buying a vehicle, tax,
+ * insurance (an excess for a repair is an insurance cost), fines, fuel, servicing (an oil change is servicing even
+ * when it says "replace"), add-ons, repairs, upkeep (tyres, wipers, cleaning), then the weaker words ("replace",
+ * "oil") and finance last ("tire loan" is a tyre). "other" when nothing fits.
  */
 export function categorizeCost(description: unknown) {
   const text = cleanString(description).toLowerCase();
   if (!text) return "other";
-  if (/car purchase|vehicle purchase|bought (the |a )?(car|vehicle|bike)|purchase of (the )?(car|vehicle)|ซื้อรถ/.test(text)) return "vehicle_purchase";
+  if (/car purchase|vehicle purchase|bike purchase|bought (the |a )?(car|vehicle|bike)|purchase of (the )?(car|vehicle|bike)|ซื้อรถ/.test(text)) return "vehicle_purchase";
   if (/\btax\b|registration renewal|ภาษี|ต่อทะเบียน/.test(text)) return "tax";
   if (/insurance|excess|\bprb\b|p\.r\.b|compulsory|ประกัน|พ\.?ร\.?บ/.test(text)) return "insurance";
-  if (/\bfine\b|ticket|parking fine|police|ค่าปรับ|ใบสั่ง/.test(text)) return "fine";
-  if (/\bfuel\b|petrol|diesel|gasoline|น้ำมันรถ|เติมน้ำมัน/.test(text)) return "fuel";
-  if (/gps|dash ?cam|camera|\bcam\b|infotainment|carplay|android auto|seat cover|tint|key ?fob|armrest|sim card|\bscreen\b|gear (stick|lever) cover|phone holder|accessor|ฟิล์ม|กล้อง/.test(text)) return "accessories";
-  if (/repair|fix|replac|puncture|blowout|broken|motor|caliper|shock|joint|gearbox|belt|bush|strut|wishbone|catch|mirror|button|upholster|suspension|bumper|windscreen|windshield|trim|ซ่อม|เปลี่ยน/.test(text)) return "repair";
-  if (/servic|oil change|\boil\b|transmission oil|filter|ถ่ายน้ำมัน|เช็คระยะ/.test(text)) return "servicing";
-  if (/tyre|tire|wiper|batter|bulb|clean|detail|ceramic|glass coat|wash|polish|brake pad|air ?con|wheel align|balanc|tracking|ล้างรถ|ยาง|แบต/.test(text)) return "maintenance";
-  if (/finance|instal(l)?ment|loan|ค่างวด|ผ่อน/.test(text)) return "finance";
+  if (/\bfines?\b|ticket|parking fine|police|ค่าปรับ|ใบสั่ง/.test(text)) return "fine";
+  if (/\bfuel\b|petrol|diesel|gasoline|น้ำมันรถ|เติมน้ำมัน|ค่าน้ำมัน(?!เครื่อง)/.test(text)) return "fuel";
+  if (/servic|oil change|engine oil|น้ำมันเครื่อง|ถ่ายน้ำมัน|เช็คระยะ|เข้าศูนย์/.test(text)) return "servicing";
+  if (/gps|dash ?cam|camera|\bcam\b|infotainment|carplay|android auto|seat cover|tint|key ?fob|armrest|sim card|\bscreen\b|gear (stick|lever) cover|phone holder|accessor|ฟิล์ม|กล้อง|หุ้มเบาะ|ผ้าคลุม/.test(text)) return "accessories";
+  if (/repair|fix|puncture|blowout|broken|motor|caliper|shock|joint|gearbox|belt|bush|strut|wishbone|catch|mirror|button|upholster|suspension|bumper|windscreen|windshield|trim|body ?work|dent|paint|ซ่อม|เคาะ|พ่นสี|ทำสี/.test(text)) return "repair";
+  if (/tyre|tire|wiper|batter|bulb|clean|detail|ceramic|glass coat|wash|polish|brake pad|air ?con|wheel align|balanc|tracking|ยาง|ล้างรถ|แบต|ใบปัดน้ำฝน|ผ้าเบรก|แอร์|หลอดไฟ/.test(text)) return "maintenance";
+  if (/replac|เปลี่ยน/.test(text)) return "repair";
+  if (/\boil\b|filter|transmission oil|กรอง/.test(text)) return "servicing";
+  if (/finance|instal(l)?ment|loan|ค่างวด|ผ่อน|ไฟแนนซ์/.test(text)) return "finance";
   return "other";
 }

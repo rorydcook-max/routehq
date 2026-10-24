@@ -4706,7 +4706,13 @@
     "p_payment_gaps": "a payment in the payment sheet isn't ticked as received",
     "p_next_due_from_payments": "check the next payment date (worked out from the last payment)",
     "f_rented_now": "Rented out now (yes / no)",
-    "f_paid": "Paid / received (yes / no)"
+    "f_paid": "Paid / received (yes / no)",
+    "f_rental_days": "Number of days rented",
+    "f_returned": "Returned (yes / no)",
+    "f_money_in": "Money in (income)",
+    "f_money_out": "Money out (expense)",
+    "mt_deposit_received": "Deposit taken",
+    "mt_deposit_refunded": "Deposit given back"
   },
   "errorPages": {
     "notFoundTitle": "We could not find that page",

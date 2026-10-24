@@ -7,7 +7,7 @@
  */
 import { businessToday } from "@/lib/business-time";
 import type { ParsedSheet } from "@/lib/import/spreadsheet";
-import { categorizeCost, cleanPlate, cleanString, findByPlate, namesAgree, parseBooleanValue, normalizeTransactionType, parseDateValue, parseIntegerValue, parseKnownNumber, parseNumberValue, plateKey } from "@/lib/import/normalize";
+import { categorizeCost, cleanPlate, cleanString, findByPlate, namesAgree, parseBooleanValue, normalizeTransactionType, parseDateValue, parseIntegerValue, parseKnownNumber, parseNumberValue, parseYearValue, plateKey } from "@/lib/import/normalize";
 
 export type Mapping = { source_column: string; routehq_field: string };
 export type SheetMapping = { sheet_name: string; primary_data_type: string; column_mappings: Mapping[] };
@@ -108,7 +108,11 @@ export type PreviewTransaction = Base & {
   business?: boolean;
   /** Rent received for a rental in this import. */
   rentalKey?: string | null;
+  /** The vehicle's name as written next to the plate ("2017 Toyota Yaris"), for a new vehicle card. */
+  vehicleName?: string;
 };
+
+type PaymentRow = { sheet: string; row: number; label: string; plate: string; date: string | null; paidOn?: string | null; amount: number | null; paid: boolean; notes: string };
 
 export type ImportPreview = {
   vehicles: PreviewVehicle[];
@@ -184,16 +188,24 @@ export function sheetDataType(value: string, mappings: Mapping[]) {
   const fields = new Set(mappings.map((mapping) => mapping.routehq_field));
   // Rent due dates with "received yes/no": a record of rent payments per vehicle.
   if (fields.has("paid") && fields.has("amount") && (fields.has("date") || fields.has("next_payment_date"))) return "payments";
-  const isBookings = fields.has("start_date") && ["customer_name", "first_name", "last_name", "full_name"].some((field) => fields.has(field));
+  // Money in / money out columns: a ledger.
+  if (fields.has("money_in") || fields.has("money_out")) return "transactions";
+  const hasCustomer = ["customer_name", "first_name", "last_name", "full_name"].some((field) => fields.has(field));
+  const hasVehicle = ["registration_number", "vehicle_registration", "vehicle_name"].some((field) => fields.has(field));
+  const isBookings = (fields.has("start_date") || fields.has("rental_days")) && hasCustomer;
   // An owner's fleet sheet: one row per vehicle (year, colour, its price, tax and insurance dates), with who has it now
   // alongside. That stays a vehicle list, so a vehicle nobody is renting isn't dropped. A booking export labelled
   // "vehicles" has renter columns but says little about the vehicles themselves.
-  const describesVehicles = ["year", "color", "make", "model", "monthly_rate", "daily_rate", "weekly_rate", "current_mileage", "tax_expiry_date", "insurance_expiry_date", "porbor_expiry_date", "purchase_price", "estimated_value"].filter((field) => fields.has(field)).length >= 2;
-  if (isBookings && cleaned === "vehicles" && describesVehicles && fields.has("registration_number")) return "vehicles";
-  if (isBookings && (cleaned === "vehicles" || cleaned === "customers")) return "rentals";
+  const describesVehicles = ["year", "color", "make", "model", "monthly_rate", "weekly_rate", "current_mileage", "tax_expiry_date", "insurance_expiry_date", "porbor_expiry_date", "purchase_price", "estimated_value", "vin", "transmission"].filter((field) => fields.has(field)).length >= 2;
+  // "Rented out now: yes / no" is a column of a fleet list.
+  if (fields.has("rented_now") && hasVehicle) return "vehicles";
+  if (isBookings && describesVehicles && fields.has("registration_number") && cleaned !== "rentals") return "vehicles";
+  if (isBookings && (cleaned === "vehicles" || cleaned === "customers" || !cleaned)) return "rentals";
   if ((DATA_TYPES as readonly string[]).includes(cleaned)) return cleaned as (typeof DATA_TYPES)[number];
-  if (fields.has("amount") && fields.has("type")) return "transactions";
-  if (fields.has("vehicle_registration") && fields.has("start_date")) return "rentals";
+  // Amounts with what they were for, or with dates: money records (a cost log, rent received).
+  if (fields.has("amount") && (fields.has("type") || fields.has("date")) && !describesVehicles) return "transactions";
+  if (hasVehicle && fields.has("start_date")) return "rentals";
+  if (hasCustomer && !hasVehicle && ["passport_number", "nationality", "email", "phone", "driving_licence_number"].some((field) => fields.has(field))) return "customers";
   if (fields.has("full_name") || fields.has("passport_number") || fields.has("driving_licence_number")) return "customers";
   return "vehicles";
 }
@@ -233,6 +245,21 @@ const MAKE_OF_MODEL: [RegExp, string][] = [
   [/^(ranger|everest)\b/i, "Ford"],
   [/^(vespa|primavera|sprint)\b/i, "Vespa"]
 ];
+const KNOWN_MAKES = /^(toyota|honda|yamaha|nissan|mazda|ford|isuzu|mitsubishi|suzuki|mg|kia|hyundai|bmw|mercedes|benz|vespa|kawasaki|gpx|ducati|triumph|harley|chevrolet|subaru|volvo|lexus|byd|ora|gwm|haval|neta|tesla|piaggio|lambretta|royal enfield|ktm|benelli|stallions)\b/i;
+
+/** A cell that names a vehicle model ("Click 125i", "Toyota Yaris", "PCX"). */
+export function looksLikeVehicleName(value: unknown) {
+  const text = cleanString(value).split(/\s[-–]\s/).pop()!.trim();
+  return Boolean(text) && (KNOWN_MAKES.test(text) || MAKE_OF_MODEL.some(([pattern]) => pattern.test(text)));
+}
+
+/** A cell that is a Thai plate ("กข 1234", "2ขฒ7536", "1กท 555 ภูเก็ต"). */
+export function looksLikePlate(value: unknown) {
+  const text = cleanString(value);
+  const match = text.match(THAI_PLATE);
+  return Boolean(match) && match![0].trim().length >= text.length - 12 && /\d/.test(text);
+}
+
 export function guessMakeModel(name: string): { make: string; model: string } {
   // "Economy - Toyota Yaris", "Compact SUV - Toyota Yaris Cross": the class before the dash isn't the make.
   const text = cleanString(name).split(/\s[-–]\s/).pop()!.trim();
@@ -252,18 +279,45 @@ export function cleanPhone(value: unknown) {
   return digits;
 }
 
-function rentalFrom(fields: Record<string, string>, base: Omit<Base, "problems">, plate: string, today: string): PreviewRental | null {
+function addDays(date: string, days: number) {
+  const day = new Date(`${date}T00:00:00Z`);
+  day.setUTCDate(day.getUTCDate() + days);
+  return day.toISOString().slice(0, 10);
+}
+
+/**
+ * The rental a row describes. On a fleet sheet (`onVehicleRow`) a price alone is the vehicle's price, not a rental:
+ * there has to be a renter or a start date.
+ */
+function rentalFrom(fields: Record<string, string>, base: Omit<Base, "problems">, plate: string, today: string, onVehicleRow = false): PreviewRental | null {
   const customerName = cleanString(fields.customer_name || fields.full_name);
-  const hasAny = customerName || cleanString(fields.start_date) || cleanString(fields.rental_rate);
+  const hasAny = customerName || cleanString(fields.start_date) || (!onVehicleRow && cleanString(fields.rental_rate));
   if (!hasAny) return null;
   const problems: Problem[] = [];
   if (!customerName) problems.push("no_customer");
   const startDate = dateOrProblem(fields.start_date, problems);
   if (!startDate) problems.push("no_start");
-  const endDate = dateOrProblem(fields.end_date, problems);
+  let endDate = dateOrProblem(fields.end_date, problems);
+  // "Days: 7" instead of a return date.
+  const days = parseIntegerValue(fields.rental_days);
+  if (!endDate && startDate && days && days > 0 && days < 1000) endDate = addDays(startDate, days);
   const nextDue = dateOrProblem(fields.next_payment_date, problems);
-  let rate = parseNumberValue(fields.rental_rate || fields.monthly_rate);
+  // The rent: the renter's own rent, else the price per day, week or month that fits how long the rental is.
+  let rate = parseNumberValue(fields.rental_rate);
   let ratePeriod = ratePeriodFrom(fields.rate_period, fields.rental_rate, fields.notes);
+  if (rate === null) {
+    const daily = parseNumberValue(fields.daily_rate);
+    const weekly = parseNumberValue(fields.weekly_rate);
+    const monthly = parseNumberValue(fields.monthly_rate);
+    const short = startDate && endDate ? daysBetween(startDate, endDate) < 28 : !monthly;
+    if (daily !== null && (short || monthly === null)) [rate, ratePeriod] = [daily, "day"];
+    else if (weekly !== null && (short || monthly === null)) [rate, ratePeriod] = [weekly, "week"];
+    else if (monthly !== null) [rate, ratePeriod] = [monthly, "month"];
+  } else if (ratePeriod === "month" && !cleanString(fields.rate_period) && !/month|เดือน|p\/m/i.test(cleanString(fields.rental_rate)) && startDate && endDate && daysBetween(startDate, endDate) < 28 && rate < 3000) {
+    // Nothing says what the rent is per, the rental is a few days and the figure is a day's price (฿250 for a
+    // scooter): per day, not ฿250 a month.
+    ratePeriod = "day";
+  }
   // Only a total for the whole booking: a month or more is priced per month, anything shorter per day.
   let total = parseNumberValue(fields.rental_total);
   if (fields.price_unclear && rate && startDate && endDate && daysBetween(startDate, endDate) < 28 && !cleanString(fields.rate_period)) {
@@ -281,7 +335,11 @@ function rentalFrom(fields: Record<string, string>, base: Omit<Base, "problems">
     }
   }
   if (!rate) problems.push("no_rate");
-  const status: PreviewRental["status"] = endDate && endDate < today ? "completed" : startDate && startDate > today ? "booked" : "active";
+  // "Returned: yes" ends it whatever the dates say; "no" keeps it out even past its end date.
+  const returned = parseBooleanValue(fields.returned);
+  let status: PreviewRental["status"] = endDate && endDate < today ? "completed" : startDate && startDate > today ? "booked" : "active";
+  if (returned === true) status = "completed";
+  if (returned === false && status === "completed") status = "active";
   // Paid up to: the day before the next payment is due, when the sheet says so; paid in full, the end date;
   // otherwise the owner tells us.
   let paidUntil: string | null = null;
@@ -329,13 +387,16 @@ export function buildPreview(sheets: ParsedSheet[], mappings: SheetMapping[]): I
   const preview: ImportPreview = { vehicles: [], rentals: [], customers: [], transactions: [] };
   const today = businessToday();
   const platesSeen = new Map<string, string>();
-  type PaymentRow = { sheet: string; row: number; label: string; plate: string; date: string | null; amount: number | null; paid: boolean; notes: string };
   const payments: PaymentRow[] = [];
 
   for (const sheetMapping of mappings) {
     const sheet = sheets.find((item) => item.sheetName === sheetMapping.sheet_name) || (sheets.length === 1 ? sheets[0] : null);
     if (!sheet) continue;
     const type = sheetDataType(sheetMapping.primary_data_type, sheetMapping.column_mappings);
+    // One tab per vehicle ("Yaris กข 1234"): rows without a vehicle of their own are that vehicle's.
+    const tabName = sheet.sheetName.split(" · ")[0];
+    const monthTab = /^\s*((ม|ก|มี|เม|พ|มิ|ส|ต|ธ)\.?\s?[คพยย]\.?|[a-z]{3,9}\.?)\s*'?\d{2,4}\s*$/i.test(tabName);
+    const sheetVehicle = !monthTab && THAI_PLATE.test(tabName) ? tabName : "";
 
     const before = preview.transactions.length;
     sheet.rows.forEach((row, index) => {
@@ -363,8 +424,11 @@ export function buildPreview(sheets: ParsedSheet[], mappings: SheetMapping[]): I
 
       if (type === "rentals") {
         // "1 x Honda Click 125i (2กท 1188)": the plate, and the vehicle's name if no other column gives it.
-        const split = splitPlateFromName(fields.vehicle_registration || fields.registration_number);
-        if (split.name && !cleanString(fields.vehicle_name)) fields.vehicle_name = split.name;
+        // No plate column: the plate is often inside the vehicle's name ("Economy - Toyota Yaris (กข 1111)").
+        const plateText = cleanString(fields.vehicle_registration || fields.registration_number);
+        const split = splitPlateFromName(plateText || fields.vehicle_name);
+        if (!plateText && split.plate && !/\d/.test(split.plate)) split.plate = "";
+        if (split.name && (!cleanString(fields.vehicle_name) || !plateText)) fields.vehicle_name = split.name;
         const plate = split.plate;
         const rental = rentalFrom(fields, base, plate, today);
         if (!rental) return;
@@ -375,13 +439,17 @@ export function buildPreview(sheets: ParsedSheet[], mappings: SheetMapping[]): I
 
 
       if (type === "payments") {
-        const vehicleText = cleanString(fields.vehicle_registration || fields.registration_number || fields.vehicle_name || fields.vehicle);
+        const vehicleText = cleanString(fields.vehicle_registration || fields.registration_number || fields.vehicle_name || fields.vehicle) || sheetVehicle;
+        // The due date sets the schedule; a "paid on" date, when there is one, is when the money came in.
+        const due = parseDateValue(fields.next_payment_date || fields.date || fields.start_date);
+        const paidOn = fields.next_payment_date ? parseDateValue(fields.date) : null;
         payments.push({
           sheet: sheet.sheetName,
           row: index + 1,
           label: vehicleText,
           plate: splitPlateFromName(vehicleText).plate,
-          date: parseDateValue(fields.date || fields.next_payment_date || fields.start_date),
+          date: due,
+          paidOn,
           amount: parseNumberValue(fields.amount),
           paid: parseBooleanValue(fields.paid) === true,
           notes: cleanString(fields.notes)
@@ -391,24 +459,42 @@ export function buildPreview(sheets: ParsedSheet[], mappings: SheetMapping[]): I
 
       if (type === "transactions") {
         const problems: Problem[] = [];
-        const vehicleText = cleanString(fields.vehicle_registration || fields.registration_number || fields.vehicle_name);
+        const vehicleText = cleanString(fields.vehicle_registration || fields.registration_number || fields.vehicle_name) || sheetVehicle;
         // "NON-VEHICLE PURCHASE", "Office", "General": a cost of the business, not of a vehicle.
         const business = !vehicleText || /non.?vehicle|business|general|office|overhead|admin|ไม่ใช่รถ|ทั่วไป|สำนักงาน/i.test(vehicleText) || (!/\d/.test(vehicleText) && !THAI_PLATE.test(vehicleText));
-        const plate = business ? "" : splitPlateFromName(vehicleText).plate;
-        const amount = parseNumberValue(fields.amount);
+        const split = business ? { plate: "", name: "" } : splitPlateFromName(vehicleText);
+        const plate = split.plate;
+        // A ledger with money in and money out columns: whichever is filled says which way the money went.
+        const moneyIn = parseNumberValue(fields.money_in);
+        const moneyOut = parseNumberValue(fields.money_out);
+        const ledger = "money_in" in fields || "money_out" in fields;
+        const amount = ledger ? (moneyIn ?? moneyOut) : parseNumberValue(fields.amount);
+        const incoming = ledger ? moneyIn !== null : false;
         if (amount === null) problems.push("no_amount");
         const rawDate = cleanString(fields.date);
         const date = dateOrProblem(rawDate, problems);
-        // What it was for: a known kind ("rent", "fuel"), or worked out from the description ("Front wipers").
+        // What it was for: worked out from the description first ("Deposit for windshield trim" is a repair, not a
+        // deposit; "เปลี่ยนน้ำมันเครื่อง" is servicing), then a kind written on its own ("Rent", "Fuel").
         const written = cleanString(fields.type);
+        const described = `${written} ${cleanString(fields.notes)}`.trim();
         const known = normalizeTransactionType(written);
-        // A word or two is a kind ("Rent", "Tax, PRB"); a longer text describes the cost ("Deposit for windshield
-        // trim" is a repair, not a deposit), so the description decides and the kind is the fallback.
-        const describes = written.split(/\s+/).filter(Boolean).length > 2;
-        const worked = known === "other" || describes ? categorizeCost(`${written} ${cleanString(fields.notes)}`) : "other";
-        const kind = worked !== "other" ? worked : known;
+        const worked = categorizeCost(described);
+        let kind = worked !== "other" ? worked : known;
+        if (incoming) {
+          // Money that came in is rent, unless it says it's a deposit or a charge recovered.
+          kind = /deposit|bond|มัดจำ/i.test(described) ? "deposit_received" : /damage|charge|fine|ค่าเสียหาย|ค่าปรับ/i.test(described) ? "charge_recovered" : "rental_income";
+        } else if (ledger && /deposit|bond|มัดจำ/i.test(described) && /return|refund|back|คืน/i.test(described)) {
+          kind = "deposit_refunded";
+        } else if (ledger && ["rental_income", "deposit_received", "deposit", "charge_recovered"].includes(kind)) {
+          // Money going out isn't rent received ("Office rent", "Parking rent").
+          kind = "other";
+        } else if (!written && kind === "other" && cleanString(fields.customer_name)) {
+          // A list of who paid what, with no "what for" column: rent received.
+          kind = "rental_income";
+        }
         // The text is kept as the note unless it was only the kind's own name ("Rent", "Fuel").
-        const notes = [worked !== "other" || kind === "other" || /\s/.test(written) ? written : "", cleanString(fields.notes)].filter(Boolean).join(" · ");
+        const onlyKind = worked === "other" && known !== "other" && !/\s/.test(written);
+        const notes = [onlyKind ? "" : written, cleanString(fields.notes), cleanString(fields.customer_name)].filter(Boolean).join(" · ");
         // Buying a vehicle is its purchase price, not a running cost: listed, left out unless ticked.
         const purchase = kind === "vehicle_purchase";
         if (purchase) problems.push("vehicle_purchase");
@@ -423,7 +509,8 @@ export function buildPreview(sheets: ParsedSheet[], mappings: SheetMapping[]): I
           type: purchase ? "other" : kind,
           amount: amount === null ? null : Math.abs(amount),
           notes,
-          business: business && !purchase
+          business: business && !purchase,
+          vehicleName: split.name
         });
         return;
       }
@@ -432,8 +519,17 @@ export function buildPreview(sheets: ParsedSheet[], mappings: SheetMapping[]): I
       const problems: Problem[] = [];
       const plate = cleanPlate(fields.registration_number || fields.vehicle_registration);
       const combined = splitVehicleName(fields.vehicle_name || fields.vehicle || fields.description);
-      const make = cleanString(fields.make) || combined.make;
-      const model = cleanString(fields.model) || combined.model;
+      let make = cleanString(fields.make) || combined.make;
+      let model = cleanString(fields.model) || combined.model;
+      // A model with no make column ("Yaris", "Toyota Yaris Ativ", "Click 125i"): the make it belongs to.
+      if (!cleanString(fields.make) && cleanString(fields.model)) {
+        const guessed = guessMakeModel(cleanString(fields.model));
+        make = guessed.make;
+        model = guessed.model;
+      } else if (cleanString(fields.vehicle_name) && !cleanString(fields.make)) {
+        const guessed = guessMakeModel(cleanString(fields.vehicle_name));
+        if (guessed.make) [make, model] = [guessed.make, guessed.model];
+      }
       // A template row (tick boxes and ฿0.00 filled down an empty sheet) is not a vehicle.
       if (!plate && !make && !model) return;
       if (!plate) problems.push("no_plate");
@@ -442,14 +538,13 @@ export function buildPreview(sheets: ParsedSheet[], mappings: SheetMapping[]): I
       // Only asked about when the sheet has a mileage column: otherwise it is taken at the first handover.
       if (mileage === null && "current_mileage" in fields) problems.push("no_mileage");
       // "2566" is a Buddhist year; "66" on a Thai sheet is too.
-      const rawYear = parseIntegerValue(fields.year);
-      const year = rawYear === null ? null : rawYear > 2400 ? rawYear - 543 : rawYear >= 40 && rawYear <= 99 ? 2500 + rawYear - 543 : rawYear;
+      const year = parseYearValue(fields.year);
       if (year !== null && (year < 1950 || year > new Date().getFullYear() + 1)) problems.push("no_year");
       const key = plateKey(plate);
       if (key && platesSeen.has(key)) problems.push("duplicate_in_file");
       else if (key) platesSeen.set(key, base.key);
 
-      const known = new Set(["registration_number", "vehicle_registration", "make", "model", "trim", "vehicle_name", "year", "color", "current_mileage", "daily_rate", "weekly_rate", "monthly_rate", "customer_name", "phone", "email", "start_date", "end_date", "rental_rate", "rate_period", "deposit_amount", "mileage_at_start", "next_payment_date", "full_name", "price_unclear", "first_name", "last_name", "phone_country_code", "rental_total", "amount_paid", "booking_status"]);
+      const known = new Set(["registration_number", "vehicle_registration", "make", "model", "trim", "vehicle_name", "year", "color", "current_mileage", "daily_rate", "weekly_rate", "monthly_rate", "customer_name", "phone", "email", "start_date", "end_date", "rental_rate", "rate_period", "deposit_amount", "mileage_at_start", "next_payment_date", "full_name", "price_unclear", "first_name", "last_name", "phone_country_code", "rental_total", "amount_paid", "booking_status", "rental_days", "returned", "rented_now"]);
       const extra = Object.fromEntries(Object.entries(fields).filter(([field, value]) => !known.has(field) && cleanString(value)));
 
       preview.vehicles.push({
@@ -474,9 +569,15 @@ export function buildPreview(sheets: ParsedSheet[], mappings: SheetMapping[]): I
       const rentedNow = parseBooleanValue(fields.rented_now);
       const card = preview.vehicles[preview.vehicles.length - 1];
       // The rent written on the row is the vehicle's price when nobody has it (and its price when no other is given).
-      if (card.monthlyRate === null && parseNumberValue(fields.rental_rate) !== null && ratePeriodFrom(fields.rate_period, fields.rental_rate) === "month") card.monthlyRate = parseNumberValue(fields.rental_rate);
+      const rowRate = parseNumberValue(fields.rental_rate);
+      if (rowRate !== null) {
+        const period = ratePeriodFrom(fields.rate_period, fields.rental_rate);
+        if (period === "month" && card.monthlyRate === null) card.monthlyRate = rowRate;
+        if (period === "week" && card.weeklyRate === null) card.weeklyRate = rowRate;
+        if (period === "day" && card.dailyRate === null) card.dailyRate = rowRate;
+      }
       if (rentedNow === false) return;
-      const rental = rentalFrom(fields, { ...base, key: `rentals:${sheet.sheetName}:${index}` }, plate, today);
+      const rental = rentalFrom(fields, { ...base, key: `rentals:${sheet.sheetName}:${index}` }, plate, today, true);
       if (rental) {
         rental.vehicleKey = base.key;
         // Marked as rented now but the end date has passed: still out, the end date is old.
@@ -564,7 +665,7 @@ function vehicleByName(preview: ImportPreview, label: string) {
  * yet received after the last one that was; or, when none is listed, a period (or as many as the last payment
  * covered) after the last one received. Unpaid entries before the last received one are flagged to check.
  */
-function linkPayments(preview: ImportPreview, payments: Array<{ sheet: string; row: number; label: string; plate: string; date: string | null; amount: number | null; paid: boolean; notes: string }>, byPlate: Map<string, string>, today: string) {
+function linkPayments(preview: ImportPreview, payments: PaymentRow[], byPlate: Map<string, string>, today: string) {
   if (!payments.length) return;
   const keyOf = new Map<string, string | null>();
   const groups = new Map<string, typeof payments>();
@@ -576,7 +677,8 @@ function linkPayments(preview: ImportPreview, payments: Array<{ sheet: string; r
   for (const [key, rows] of groups) {
     const vehicle = preview.vehicles.find((item) => item.key === key) || null;
     const plate = vehicle?.plate || rows[0].plate;
-    const rental = vehicle ? preview.rentals.find((item) => item.vehicleKey === vehicle.key && item.include && item.status === "active") : null;
+    // The current rental: on the vehicle card, or (when the rentals came from a bookings tab) on the same plate.
+    const rental = preview.rentals.find((item) => item.include && item.status === "active" && ((vehicle && item.vehicleKey === vehicle.key) || (plate && item.plate && plateKey(item.plate) === plateKey(plate)))) || null;
     const dated = rows.filter((row) => row.date).sort((a, b) => String(a.date).localeCompare(String(b.date)));
     for (const row of dated) {
       if (!row.paid || row.amount === null || row.amount <= 0) continue;
@@ -589,11 +691,12 @@ function linkPayments(preview: ImportPreview, payments: Array<{ sheet: string; r
         plate,
         existingVehicleId: null,
         vehicleKey: vehicle?.key || null,
-        date: row.date,
+        date: row.paidOn || row.date,
         type: "rental_income",
         amount: row.amount,
         notes: ["Rent", row.notes].filter(Boolean).join(" · "),
-        rentalKey: rental && rental.startDate && String(row.date) >= rental.startDate ? rental.key : null
+        rentalKey: rental && rental.startDate && String(row.date) >= rental.startDate ? rental.key : null,
+        vehicleName: splitPlateFromName(row.label).name
       });
     }
     if (!rental || !rental.startDate) continue;
@@ -626,6 +729,14 @@ export type ExistingCustomer = { id: string; full_name: string; phone: string | 
 /** A booking or rental the business already has, to catch the same rental coming in twice. */
 export type ExistingRental = { vehicle_id: string; start_date: string; end_date: string | null; customer_name: string; customer_phone: string | null };
 
+/** A vehicle card for a plate that only appears on a rental or a money row ("2017 Toyota Yaris", "Click 125i"). */
+function newVehicleCard(sheet: string, row: number, plate: string, name: string, from: "rental" | "money"): PreviewVehicle {
+  const yearText = cleanString(name).match(/(?:^|\s)((19|20)\d{2}|25\d{2})(?=\s|$)/)?.[1] || "";
+  const { make, model } = guessMakeModel(cleanString(name).replace(yearText, " ").replace(/\s+/g, " ").trim());
+  const problems: Problem[] = make && model ? [] : ["no_make_model"];
+  return { key: `vehicles:${sheet}:from-${from}-${row}`, sheet, row, include: true, problems, existingId: null, plate, make, model, trim: "", year: parseYearValue(yearText), color: "", mileage: null, dailyRate: null, weeklyRate: null, monthlyRate: null, extra: {} };
+}
+
 function overlaps(aStart: string | null, aEnd: string | null, bStart: string, bEnd: string | null) {
   if (!aStart) return false;
   return (!bEnd || aStart <= bEnd) && (!aEnd || bStart <= aEnd);
@@ -654,6 +765,7 @@ export function attachExisting(preview: ImportPreview, vehicles: ExistingVehicle
     vehicle.existingId = vehicle.plate ? findByPlate(vehicleByPlate, vehicle.plate) || null : null;
     if (vehicle.existingId) mark(vehicle.problems, "already_in_fleet");
   }
+  const fleetInFile = preview.vehicles.length > 0;
   // A rental on a plate that isn't in the fleet or the file (a notebook line: "Click 2กข 777"): a new vehicle card for it.
   const addedByPlate = new Map<string, string>();
   for (const rental of preview.rentals) {
@@ -689,17 +801,32 @@ export function attachExisting(preview: ImportPreview, vehicles: ExistingVehicle
       }
       continue;
     }
-    const { make, model } = guessMakeModel(rental.vehicleName);
-    const problems: Problem[] = rental.mileageAtStart === null ? ["no_mileage"] : [];
-    if (!make || !model) problems.push("no_make_model");
-    const key = `vehicles:${rental.sheet}:from-rental-${rental.row}`;
-    preview.vehicles.push({ key, sheet: rental.sheet, row: rental.row, include: true, problems, existingId: null, plate: rental.plate, make, model, trim: "", year: null, color: "", mileage: rental.mileageAtStart, dailyRate: rental.ratePeriod === "day" ? rental.rate : null, weeklyRate: rental.ratePeriod === "week" ? rental.rate : null, monthlyRate: rental.ratePeriod === "month" ? rental.rate : null, extra: {} });
-    addedByPlate.set(plateKey(rental.plate), key);
-    rental.vehicleKey = key;
+    const card = newVehicleCard(rental.sheet, rental.row, rental.plate, rental.vehicleName, "rental");
+    if (rental.mileageAtStart === null) card.problems.unshift("no_mileage");
+    Object.assign(card, { mileage: rental.mileageAtStart, dailyRate: rental.ratePeriod === "day" ? rental.rate : null, weeklyRate: rental.ratePeriod === "week" ? rental.rate : null, monthlyRate: rental.ratePeriod === "month" ? rental.rate : null });
+    preview.vehicles.push(card);
+    addedByPlate.set(plateKey(rental.plate), card.key);
+    rental.vehicleKey = card.key;
   }
   for (const transaction of preview.transactions) {
     transaction.existingVehicleId = transaction.plate ? findByPlate(vehicleByPlate, transaction.plate) || null : null;
-    if (!transaction.existingVehicleId && !transaction.vehicleKey && !transaction.business) mark(transaction.problems, "unknown_vehicle");
+    if (transaction.existingVehicleId || transaction.vehicleKey || transaction.business) continue;
+    const added = transaction.plate ? findByPlate(addedByPlate, transaction.plate) : undefined;
+    if (added) {
+      transaction.vehicleKey = added;
+      continue;
+    }
+    // A file of money only (one tab per vehicle, a cost log, rent received): the vehicles it names are new when the
+    // business has none yet, or when the row names the vehicle properly ("Yaris กข 1234"). A bare plate nobody has,
+    // or one missing from the fleet list in the same file, is more likely a typo, so it's flagged instead.
+    if (transaction.plate && /\d/.test(transaction.plate) && !fleetInFile && (vehicles.length === 0 || looksLikeVehicleName(transaction.vehicleName))) {
+      const card = newVehicleCard(transaction.sheet, transaction.row, transaction.plate, transaction.vehicleName || "", "money");
+      preview.vehicles.push(card);
+      addedByPlate.set(plateKey(transaction.plate), card.key);
+      transaction.vehicleKey = card.key;
+      continue;
+    }
+    mark(transaction.problems, "unknown_vehicle");
   }
   for (const customer of preview.customers) {
     customer.existingId = byPhoneFor(customer.phone, customer.fullName) || customerByName.get(customer.fullName.toLowerCase()) || null;

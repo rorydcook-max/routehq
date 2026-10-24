@@ -3,6 +3,7 @@ import { BusinessLogoImage } from "@/components/business-logo-image";
 import { BrandStyle } from "@/components/brand-style";
 import { getPublicCatalog } from "@/lib/public-catalog";
 import { Catalog } from "./catalog";
+import { EmbedHeight } from "./embed-height";
 import { getTranslations } from "next-intl/server";
 import { CustomerLanguagePicker } from "@/components/customer-language-picker";
 
@@ -29,7 +30,7 @@ function Notice({ title, message }: { title: string; message: string }) {
   );
 }
 
-export default async function PublicCatalogPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ from?: string; to?: string; vehicle?: string; via?: string }> }) {
+export default async function PublicCatalogPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ from?: string; to?: string; vehicle?: string; via?: string; embed?: string }> }) {
   const [{ slug }, query] = await Promise.all([params, searchParams]);
   const isoDay = (value: unknown) => (/^\d{4}-\d{2}-\d{2}$/.test(String(value || "")) ? String(value) : null);
   const catalog = await getPublicCatalog(slug);
@@ -37,6 +38,42 @@ export default async function PublicCatalogPage({ params, searchParams }: { para
 
   if (!catalog) return <Notice message={t("catalogNotFoundMessage")} title={t("catalogNotFoundTitle")} />;
   if (!catalog.enabled) return <Notice message={t("catalogOffMessage", { business: catalog.name })} title={t("catalogOffTitle")} />;
+
+  // The booking box on the business's own website (embed.js): just the booking, sized to fit, on a clear background.
+  const embedded = query.embed === "1";
+  if (embedded) {
+    return (
+      <main className="bg-transparent px-1 py-1 text-[var(--foreground)]">
+        <style>{"html,body{background:transparent!important}"}</style>
+        <BrandStyle colour={catalog.brandColour} />
+        <EmbedHeight />
+        <div className="mx-auto max-w-4xl space-y-4">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm font-semibold text-[var(--muted)]">{t("embedPoweredBy", { business: catalog.name })}</p>
+            <CustomerLanguagePicker />
+          </div>
+          <Catalog
+            currency={catalog.currency}
+            offer={catalog.offer}
+            deposit={catalog.deposit}
+            holdHours={catalog.holdHours}
+            organizationName={catalog.name}
+            slug={slug}
+            gapDays={catalog.gapDays}
+            today={catalog.minStart}
+            vehicles={catalog.vehicles}
+            seasons={catalog.seasons}
+            extras={catalog.extras}
+            initialStart={isoDay(query.from)}
+            initialEnd={isoDay(query.to)}
+            initialVehicleId={query.vehicle ? String(query.vehicle).slice(0, 60) : null}
+            source={embedded ? "website" : query.via === "directory" ? "directory" : null}
+            embedded={embedded}
+          />
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-[var(--panel-secondary)] px-4 py-5 text-[var(--foreground)]">

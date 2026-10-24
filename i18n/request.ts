@@ -43,7 +43,7 @@ async function resolveLocale(): Promise<SupportedLocale> {
   try {
     const requestHeaders = await headers();
     if (requestHeaders.get("x-routehq-customer-page")) {
-      const chosen = (await cookies()).get(CUSTOMER_LOCALE_COOKIE)?.value;
+      const chosen = (await cookies()).get(CUSTOMER_LOCALE_COOKIE)?.value || requestHeaders.get("x-routehq-page-lang") || undefined;
       return pickLocale(chosen, requestHeaders.get("accept-language"));
     }
   } catch {

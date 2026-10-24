@@ -251,9 +251,9 @@ function timelineSteps(bookingLink: any, rentalDocuments: BookingRentalDocument[
   ];
   // A customer who booked online, or opened the link without it being sent from here, never had a "Sent" step.
   const source = String((bookingLink?.booking_data as any)?.source || "");
-  const bookedOnline = source === "public_page" || source === "directory";
+  const bookedOnline = source === "public_page" || source === "directory" || source === "website";
   const shown = steps.filter((step) => step.key !== "sent" || (!bookedOnline && (step.complete || !bookingLink?.viewed_at)));
-  if (bookedOnline) shown[0] = { ...shown[0], key: source === "directory" ? "bookedDirectory" : "bookedOnline" };
+  if (bookedOnline) shown[0] = { ...shown[0], key: source === "directory" ? "bookedDirectory" : source === "website" ? "bookedWebsite" : "bookedOnline" };
   // Finished steps in the order they happened, then what is still to come.
   const done = shown.filter((step) => step.complete && step.at).sort((a, b) => String(a.at).localeCompare(String(b.at)));
   return [...done, ...shown.filter((step) => !(step.complete && step.at))];

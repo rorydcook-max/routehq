@@ -53,6 +53,10 @@ export async function proxy(request: NextRequest) {
   // Customer pages take their language from the customer (their choice, or their phone's language), never from whoever is signed in.
   if (pathname.startsWith("/book/") || pathname.startsWith("/amend/") || pathname === "/rent" || pathname.startsWith("/rent/")) {
     request.headers.set("x-routehq-customer-page", "1");
+    // The booking box on a business's own site can say which language to open in (data-lang); a choice the customer
+    // makes on the page still wins.
+    const pageLang = request.nextUrl.searchParams.get("lang");
+    if (pageLang && /^[a-z]{2}(-[A-Za-z]{2,4})?$/.test(pageLang)) request.headers.set("x-routehq-page-lang", pageLang);
   }
   // During first-time setup the wizard sends people to the normal Add vehicle and import screens; everything else waits until setup is finished.
   const isOnboardingAllowedRoute = isPublicRoute || pathname.startsWith("/api/") || pathname.startsWith("/fleet/import") || pathname === "/fleet/new" || pathname === "/help" || pathname.startsWith("/help/");
@@ -230,5 +234,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|sw\\.js|manifest\\.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff2?|ttf|otf)$).*)"]
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|sw\\.js|embed\\.js|manifest\\.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff2?|ttf|otf)$).*)"]
 };

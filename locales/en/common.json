@@ -871,7 +871,10 @@
     "timingLater": "At pickup",
     "dueAtHandover": "Due when you collect the vehicle",
     "datesPassedTitle": "These dates have passed",
-    "datesPassedMessage": "This booking was never confirmed and its dates are now over. Please contact {business} to arrange new dates, or book again."
+    "datesPassedMessage": "This booking was never confirmed and its dates are now over. Please contact {business} to arrange new dates, or book again.",
+    "embedPoweredBy": "Book with {business}",
+    "embedBooked": "Your car is held for you",
+    "embedContinue": "Continue to your booking"
   },
   "customerMessages": {
     "hi": "Hi {name},",
@@ -2346,7 +2349,8 @@
     "hist_late_start": "Handed over late",
     "skip_customerName": "Who is taking it? (customer's name)",
     "pc_earlyDays": "Early handover: {days, plural, one {# day} other {# days}} before the booked start",
-    "track_dueToday": "{amount} due today"
+    "track_dueToday": "{amount} due today",
+    "step_bookedWebsite": "Booked by the customer on your website"
   },
   "newBooking": {
     "pageBack": "Back to bookings",
@@ -4013,7 +4017,10 @@
     "grp_online": "Booking online",
     "mp_replaceTitle": "Paste a new access token",
     "mp_replaceBlurb": "This reconnects the same account. Your chats and settings stay as they are.",
-    "mp_replaceBtn": "Save the new token"
+    "mp_replaceBtn": "Save the new token",
+    "pb_embedTitle": "Booking box for your own website",
+    "pb_embedBody": "Paste this where you want bookings on your website. Customers pick a car and dates there, then finish their booking here. Bookings show as \"Booked on your website\".",
+    "pb_embedCopy": "Copy code"
   },
   "accountPage": {
     "roleOwner": "Owner",

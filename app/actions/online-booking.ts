@@ -87,7 +87,7 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
     .from("booking_links")
     .select("id, customers!inner(phone)")
     .eq("organization_id", organizationId)
-    .in("booking_data->>source", ["public_page", "directory"])
+    .in("booking_data->>source", ["public_page", "directory", "website"])
     .in("status", ["pending", "viewed", "details_submitted"])
     .is("customer_details_submitted_at", null)
     .in("customers.phone", phoneVariants(phone));
@@ -151,8 +151,9 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
     return { ok: false, error: await said("We couldn't start your booking. Please try again.") };
   }
 
-  // Where the customer came from: the business's own page, or the RouteHQ directory.
-  const source = String(formData.get("source") || "") === "directory" ? "directory" : "public_page";
+  // Where the customer came from: the business's page here, the RouteHQ directory, or the booking box on their own website.
+  const asked = String(formData.get("source") || "");
+  const source = asked === "directory" || asked === "website" ? asked : "public_page";
   const bookingData = { delivery_method: "tbd", delivery_location: null, delivery_datetime: null, special_conditions: null, share_channel: source, source };
   const { data: link, error: linkError } = await admin
     .from("booking_links")

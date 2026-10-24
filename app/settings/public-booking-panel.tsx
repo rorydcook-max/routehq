@@ -23,6 +23,9 @@ export function PublicBookingPanel({ slug, link: shareLink, enabled, holdHours, 
   useEffect(() => setOrigin(window.location.origin), []);
   // Their own address (subdomain or domain) when they have one; otherwise this app's /rent page.
   const link = shareLink && !shareLink.includes("/rent/") ? shareLink : `${origin}/rent/${slug}`;
+  // The booking box for their own website: one line to paste, loaded from this app.
+  const [codeCopied, setCodeCopied] = useState(false);
+  const snippet = `<div data-routehq-booking="${slug}"></div>\n<script src="${origin}/embed.js" async></script>`;
 
   function save(next: { enabled: boolean; holdHours: number; deposit?: number; offer?: string }) {
     setFailed(false);
@@ -76,6 +79,28 @@ export function PublicBookingPanel({ slug, link: shareLink, enabled, holdHours, 
                 {say("pb_open")}
               </a>
             </div>
+          </div>
+
+          <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5">
+            <p className="font-semibold text-[var(--foreground)]">{say("pb_embedTitle")}</p>
+            <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{say("pb_embedBody")}</p>
+            <pre className="mt-2.5 overflow-x-auto whitespace-pre-wrap break-all rounded-lg border border-[var(--border)] bg-white p-3 font-mono text-[13px] text-[var(--foreground)]">{snippet}</pre>
+            <button
+              className="secondary-action pressable mt-2.5"
+              onClick={() => {
+                navigator.clipboard
+                  ?.writeText(snippet)
+                  .then(() => {
+                    setCodeCopied(true);
+                    setTimeout(() => setCodeCopied(false), 1500);
+                  })
+                  .catch(() => null);
+              }}
+              type="button"
+            >
+              <Copy size={17} />
+              {codeCopied ? say("copied") : say("pb_embedCopy")}
+            </button>
           </div>
 
           <p className={pricedVehicles < totalVehicles ? "font-bold text-[var(--warning)]" : "font-medium text-[var(--foreground-secondary)]"}>{say("pb_shown", { priced: pricedVehicles, total: totalVehicles })}</p>

@@ -41,8 +41,11 @@ export function Catalog({
   initialStart,
   initialEnd,
   initialVehicleId,
-  source
+  source,
+  embedded = false
 }: {
+  /** Shown in the booking box on the business's own website (embed.js). */
+  embedded?: boolean;
   slug: string;
   organizationName: string;
   vehicles: CatalogVehicle[];
@@ -73,6 +76,7 @@ export function Catalog({
   const [error, setError] = useState<string | null>(null);
   const [chosen, setChosen] = useState<string[]>([]);
   const [isPending, startTransition] = useTransition();
+  const [continueHref, setContinueHref] = useState<string | null>(null);
 
   const money = (value: number) => (currency === "THB" ? `฿${Math.round(value).toLocaleString("en-US")}` : `${currency} ${Math.round(value).toLocaleString("en-US")}`);
   const end = longTerm ? null : endDate || null;
@@ -114,11 +118,30 @@ export function Catalog({
         }
         // Straight on to their details and the agreement. A full page load, so the
         // customer never sees the staff app's loading screen in between.
+        if (embedded && window.parent !== window) {
+          // In the booking box on the business's own site: the page around it carries on at RouteHQ (documents and
+          // signing need the whole screen); a link stays here in case that page can't.
+          const href = new URL(result.href, window.location.origin).toString();
+          window.parent.postMessage({ type: "routehq:continue", href }, "*");
+          setContinueHref(href);
+          return;
+        }
         window.location.assign(result.href);
       } catch {
         setError(t("bookingFailed"));
       }
     });
+  }
+
+  if (continueHref) {
+    return (
+      <section className="rounded-2xl border border-[var(--border)] bg-white p-6 text-center shadow-sm">
+        <h2 className="text-lg font-semibold text-[var(--foreground)]">{t("embedBooked")}</h2>
+        <a className="primary-action pressable mt-4 inline-flex" href={continueHref} rel="noopener" target="_top">
+          {t("embedContinue")}
+        </a>
+      </section>
+    );
   }
 
   return (

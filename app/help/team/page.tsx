@@ -14,7 +14,7 @@ const BANGKOK = "Asia/Bangkok";
 
 /** RouteHQ's own view: every business's Help conversations. Platform admins only. */
 export default async function HelpTeamPage({ searchParams }: { searchParams: Promise<{ show?: string }> }) {
-  const [{ show }, userEmail, membership, t, locale] = await Promise.all([searchParams, getCurrentUserEmail(), getCurrentMembership(), getTranslations("help"), getLocale()]);
+  const [{ show }, userEmail, membership, t, locale, tr] = await Promise.all([searchParams, getCurrentUserEmail(), getCurrentMembership(), getTranslations("help"), getLocale(), getTranslations("renters")]);
   const supabase = (await createSupabaseServerClient()) as any;
   if (!(await isPlatformAdmin(supabase, membership?.userId))) notFound();
   const filter = show === "all" ? "all" : "waiting";
@@ -32,7 +32,7 @@ export default async function HelpTeamPage({ searchParams }: { searchParams: Pro
           <h1 className="page-title">{t("teamTitle")}</h1>
           <p className="page-subtitle mt-2">{t("teamSubtitle")}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {(["waiting", "all"] as const).map((value) => (
             <Link
               className={`rounded-full border px-3.5 py-1.5 text-[15px] font-semibold ${filter === value ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-[var(--panel)] text-[var(--foreground)]"}`}
@@ -42,6 +42,11 @@ export default async function HelpTeamPage({ searchParams }: { searchParams: Pro
               {t(`teamFilter_${value}`)}
             </Link>
           ))}
+          {/* RouteHQ's own renter list sits with the rest of the RouteHQ team's tools. */}
+          <Link className="ml-auto inline-flex items-center gap-1 rounded-full border border-[var(--border)] bg-[var(--panel)] px-3.5 py-1.5 text-[15px] font-semibold text-[var(--primary)]" href={"/platform/renters" as Route}>
+            {tr("link")}
+            <ChevronRight size={16} />
+          </Link>
         </div>
         <section className="card p-2 sm:p-3">
           {threads.length ? (

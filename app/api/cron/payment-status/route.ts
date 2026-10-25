@@ -6,6 +6,7 @@ import { topUpOpenEndedRent } from "@/lib/open-ended-billing";
 import { releaseExpiredHoldsEverywhere } from "@/lib/booking-holds";
 import { alertLateReturns } from "@/lib/late-returns";
 import { syncAllVehicleStatuses } from "@/lib/vehicle-status";
+import { refreshAllRenters } from "@/lib/renters";
 
 // Business-time dates: a UTC date would flag rent as overdue a day early for runs before 07:00 in Thailand.
 const dateOnly = (offsetDays = 0) => businessToday(offsetDays);
@@ -35,6 +36,8 @@ export async function GET(req: NextRequest) {
   await syncAllVehicleStatuses(supabase).catch(() => 0);
   // Handover tomorrow, return coming up, rent due or late, service due: each sent once.
   const customerReminders = await sendDailyCustomerReminders(supabase).catch(() => null);
+  // RouteHQ's copy of renters who said yes: rentals move on (returned, paid, deposit settled), so it is refreshed daily.
+  await refreshAllRenters(supabase).catch(() => 0);
 
   const scheduledResult = await supabase
     .from("rental_payments")

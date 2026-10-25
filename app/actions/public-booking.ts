@@ -3,6 +3,7 @@
 import { said } from "@/lib/i18n/server-text";
 import { readFileAsJson, visionProvider } from "@/lib/ai-vision";
 import { readReceipt } from "@/lib/receipt-reading";
+import { RENTER_HISTORY_VERSION, syncRenterFromCustomer } from "@/lib/renters";
 import { matchSlip } from "@/lib/slip-matching";
 import { getPortalPayments } from "@/lib/payment-receipts";
 import { headers } from "next/headers";
@@ -1474,7 +1475,8 @@ export async function checkReturningCustomer(
 }
 
 /** Bump when the wording of the partner-offers choice changes, so each record says which version was agreed to. */
-const PARTNER_OFFERS_VERSION = "2026-10-25";
+// 2026-10-25b: says RouteHQ keeps a copy of their details and rental history (lib/renters.ts).
+const PARTNER_OFFERS_VERSION = RENTER_HISTORY_VERSION;
 
 /**
  * The customer's choice about trip extras from RouteHQ partners: the optional box on the booking form, or the switch
@@ -1507,5 +1509,7 @@ export async function setPartnerOffers(formData: FormData) {
     source
   });
   if (error) return { ok: false as const, error: await said("We couldn't save your choice. Please try again.") };
+  // RouteHQ's own copy follows the answer straight away: made on a yes, deleted on a no.
+  await syncRenterFromCustomer(supabase, bookingLink.customer_id).catch((syncError) => console.error("[renters]", syncError instanceof Error ? syncError.message : syncError));
   return { ok: true as const, granted };
 }

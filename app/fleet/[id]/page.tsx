@@ -15,6 +15,7 @@ import { DateLeaf, Dot, ElapsedBar, InOutBars, Ring } from "@/components/glance"
 import { PageTabs, type PageTab } from "@/components/page-tabs";
 import { isTwoWheeler, kindFromCategory } from "@/lib/vehicle-groups";
 import { RenewalForm, RenewalHelp } from "./renewal";
+import { partnerQuote } from "@/lib/insurance-partners";
 import { RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
 import { InspectionViewer } from "@/components/inspection-viewer";
 import { PendingButton } from "@/components/pending-button";
@@ -377,6 +378,9 @@ function ComplianceSection({ detail, organizationId }: { detail: VehicleDetail; 
     specs.engine_number || vehicle.metadata?.engine_number ? `Engine: ${specs.engine_number || vehicle.metadata?.engine_number}` : "",
     specs.engine_cc || vehicle.metadata?.engine_cc ? `${specs.engine_cc || vehicle.metadata?.engine_cc} cc` : ""
   ].filter(Boolean).join("\n");
+  // A signed broker partner's quote page for this vehicle (off until one is set up): vehicle details only.
+  const quoteVehicle = { plate: vehicle.registration_number, province: vehicle.metadata?.registration_province, make: vehicle.make, model: vehicle.model, year: builtYear || null, vin: vehicle.vin, cc: (specs.engine_cc || vehicle.metadata?.engine_cc) as string | number | null };
+  const partners = { insurance: partnerQuote("insurance", quoteVehicle), porbor: partnerQuote("porbor", quoteVehicle) };
 
   return (
     <Pane
@@ -402,7 +406,7 @@ function ComplianceSection({ detail, organizationId }: { detail: VehicleDetail; 
                 </div>
               </div>
               {(item.key === "tax" || item.key === "porbor" || item.key === "insurance") && item.date && (daysUntil(item.date) ?? 999) <= 90 ? (
-                <RenewalHelp details={paperDetails} kind={item.key} porborDaysLeft={porborDaysLeft} twoWheeler={twoWheeler} vehicleAge={vehicleAge} />
+                <RenewalHelp details={paperDetails} kind={item.key} partner={item.key === "tax" ? null : partners[item.key]} porborDaysLeft={porborDaysLeft} twoWheeler={twoWheeler} vehicleAge={vehicleAge} />
               ) : null}
               <details className="mt-2.5">
                 <summary className="cursor-pointer font-bold text-[var(--primary)]">{item.date ? tx.say("cs_renewed") : tx.say("cs_addDate")}</summary>

@@ -1,8 +1,10 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
-import { Camera, Check, Copy, ExternalLink, Loader2 } from "lucide-react";
+import { Camera, Check, Copy, ExternalLink, Loader2, ShieldCheck, X } from "lucide-react";
+import type { InsurancePartner } from "@/lib/insurance-partners";
 import { renewVehicleCompliance } from "@/app/actions/vehicles";
 import { PendingButton } from "@/components/pending-button";
 
@@ -100,7 +102,8 @@ export function RenewalHelp({
   vehicleAge,
   twoWheeler,
   porborDaysLeft,
-  details
+  details,
+  partner = null
 }: {
   kind: "tax" | "porbor" | "insurance";
   /** Whole years since the vehicle was first registered; null when the year isn't saved. */
@@ -109,10 +112,26 @@ export function RenewalHelp({
   porborDaysLeft: number | null;
   /** Plate, model, year, chassis number...: what an insurer or the DLT asks for. */
   details: string;
+  /** A licensed broker partner's quote page for this vehicle, when one is signed up (lib/insurance-partners.ts). */
+  partner?: InsurancePartner | null;
 }) {
   const t = useTranslations("vehiclePage");
   const say = t as unknown as Say;
   const [copied, setCopied] = useState(false);
+  const [quoteOpen, setQuoteOpen] = useState(false);
+  // The quote opens over the whole app (drawn on the page body, above the bottom bar); the page behind doesn't scroll.
+  useEffect(() => {
+    if (!quoteOpen) return;
+    const before = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (event: KeyboardEvent) => event.key === "Escape" && setQuoteOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = before;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [quoteOpen]);
+  const licence = partner?.licence ? say("pq_licence", { licence: partner.licence }) : "";
   const inspectionAge = twoWheeler ? 5 : 7;
   const needsInspection = vehicleAge !== null && vehicleAge > inspectionAge;
   const steps: string[] = [];
@@ -131,7 +150,54 @@ export function RenewalHelp({
     steps.push(say("rn_insClaims"));
   }
 
+  // A signed partner: quotes right here, the partner's page and licence, RouteHQ named as not a broker.
+  const quoteBox = partner ? (
+    <div className="mt-2.5 rounded-lg border border-[var(--primary)]/30 bg-[var(--primary-light)] p-3">
+      <div className="flex flex-wrap items-center gap-3">
+        <ShieldCheck aria-hidden="true" className="shrink-0 text-[var(--primary)]" size={22} />
+        <div className="min-w-[10rem] flex-1">
+          <p className="font-bold text-[var(--foreground)]">{say(kind === "porbor" ? "pq_titlePorbor" : "pq_title", { partner: partner.name })}</p>
+          <p className="text-[14px] font-medium text-[var(--foreground-secondary)]">{say("pq_hint")}</p>
+        </div>
+        {partner.embed ? (
+          <button className="primary-action pressable w-full justify-center sm:w-auto" onClick={() => setQuoteOpen(true)} type="button">
+            {say("pq_open")}
+          </button>
+        ) : (
+          <a className="primary-action pressable w-full justify-center sm:w-auto" href={partner.url} rel="noopener" target="_blank">
+            <ExternalLink aria-hidden="true" size={16} />
+            {say("pq_open")}
+          </a>
+        )}
+      </div>
+      <p className="mt-2 text-[12px] leading-snug text-[var(--muted)]">{say("pq_disclosure", { partner: partner.name, licence })}</p>
+    </div>
+  ) : null;
+
   return (
+    <>
+    {quoteBox}
+    {quoteOpen && partner ? createPortal(
+      <div aria-modal="true" className="fixed inset-0 z-[1000] flex flex-col bg-black/50 sm:p-6" role="dialog">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-white sm:mx-auto sm:w-full sm:max-w-3xl sm:rounded-2xl">
+          <div className="flex items-center gap-3 border-b border-[var(--border)] px-4 py-3">
+            <div className="min-w-0 flex-1">
+              <p className="truncate font-bold text-[var(--foreground)]">{say(kind === "porbor" ? "pq_titlePorbor" : "pq_title", { partner: partner.name })}</p>
+              <p className="line-clamp-2 text-[12px] leading-snug text-[var(--muted)]">{say("pq_frameNote", { partner: partner.name, licence })}</p>
+            </div>
+            <a aria-label={say("pq_newTab")} className="secondary-action pressable min-h-9 shrink-0 px-3 text-[14px]" href={partner.url} rel="noopener" target="_blank">
+              <ExternalLink aria-hidden="true" size={15} />
+              <span className="hidden sm:inline">{say("pq_newTab")}</span>
+            </a>
+            <button aria-label={say("pq_close")} className="pressable flex h-10 w-10 items-center justify-center rounded-full bg-[var(--panel-secondary)]" onClick={() => setQuoteOpen(false)} type="button">
+              <X aria-hidden="true" size={18} />
+            </button>
+          </div>
+          <iframe className="min-h-0 w-full flex-1 border-0" referrerPolicy="strict-origin-when-cross-origin" src={partner.url} title={partner.name} />
+        </div>
+      </div>,
+      document.body
+    ) : null}
     <details className="mt-2.5 rounded-lg border border-[var(--border)] bg-white px-3 py-2">
       <summary className="cursor-pointer font-bold text-[var(--primary)]">{say("rn_how")}</summary>
       <ul className="mt-2 space-y-1.5">
@@ -168,5 +234,6 @@ export function RenewalHelp({
       </div>
       <p className="mt-2 text-[13px] text-[var(--muted)]">{say("rn_disclaimer")}</p>
     </details>
+    </>
   );
 }

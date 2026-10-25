@@ -3095,7 +3095,16 @@
     "rn_photoHint": "Add a photo of the new certificate, policy or receipt and we'll fill in the date and cost.",
     "rn_reading": "Reading the document…",
     "rn_readDone": "Filled in from the photo. Check the date before saving.",
-    "rn_readNoDate": "We couldn't find a date on that. Type it in; the photo is still kept."
+    "rn_readNoDate": "We couldn't find a date on that. Type it in; the photo is still kept.",
+    "pq_title": "Insurance quotes from {partner}",
+    "pq_titlePorbor": "Renew Por Ror Bor with {partner}",
+    "pq_hint": "This vehicle's details are filled in, for rental use. Compare and buy without leaving RouteHQ.",
+    "pq_open": "See quotes",
+    "pq_newTab": "New tab",
+    "pq_close": "Close",
+    "pq_disclosure": "RouteHQ is not licensed as an insurance agent or broker. Quotes, advice and policies come from {partner}, a licensed insurance broker{licence}, who is responsible for them. RouteHQ is paid a fixed fee by {partner}, not per policy.",
+    "pq_frameNote": "Provided by {partner}, a licensed broker{licence}. RouteHQ is not a broker.",
+    "pq_licence": " (OIC licence {licence})"
   },
   "customerPage": {
     "back": "Customers",

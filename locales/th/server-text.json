@@ -262,5 +262,6 @@
   "Choose a photo of the document.": "เลือกรูปเอกสาร",
   "The document could not be read. Type the date in.": "อ่านเอกสารไม่ได้ กรุณากรอกวันที่เอง",
   "Say what happened in a sentence or two. Other businesses read this to decide for themselves.": "เล่าสั้น ๆ ว่าเกิดอะไรขึ้น ร้านอื่นจะอ่านเพื่อตัดสินใจเอง",
-  "Tick the box to confirm the report is true and can carry your business name.": "ติ๊กช่องเพื่อยืนยันว่าข้อมูลเป็นความจริงและแสดงพร้อมชื่อร้านของคุณได้"
+  "Tick the box to confirm the report is true and can carry your business name.": "ติ๊กช่องเพื่อยืนยันว่าข้อมูลเป็นความจริงและแสดงพร้อมชื่อร้านของคุณได้",
+  "We couldn't save your choice. Please try again.": "บันทึกตัวเลือกไม่ได้ กรุณาลองอีกครั้ง"
 }

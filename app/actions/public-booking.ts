@@ -6,6 +6,7 @@ import { readReceipt } from "@/lib/receipt-reading";
 import { matchSlip } from "@/lib/slip-matching";
 import { getPortalPayments } from "@/lib/payment-receipts";
 import { headers } from "next/headers";
+import { getLocale, getTranslations } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import { retakeHold } from "@/lib/booking-holds";
 import { organizationSignatureReference } from "@/lib/branding-assets";
@@ -1470,4 +1471,41 @@ export async function checkReturningCustomer(
     selfie: categories.has("selfie"),
     numbers: Boolean(match.passport_number && match.driver_license_number && match.driver_license_country && match.driver_license_expiry)
   };
+}
+
+/** Bump when the wording of the partner-offers choice changes, so each record says which version was agreed to. */
+const PARTNER_OFFERS_VERSION = "2026-10-25";
+
+/**
+ * The customer's choice about trip extras from RouteHQ partners: the optional box on the booking form, or the switch
+ * on their booking page afterwards. RouteHQ's own permission (not the rental business's), kept as a new row each time
+ * with the words shown, the language and where it was given, so it can be proved and is as easy to take back as give.
+ */
+export async function setPartnerOffers(formData: FormData) {
+  const token = requiredString(formData, "token");
+  const granted = String(formData.get("granted") || "") === "yes";
+  const source = String(formData.get("source") || "") === "booking_form" ? "booking_form" : "booking_page";
+  const supabase = createSupabaseAdminClient() as any;
+  const { data: bookingLink } = await supabase
+    .from("booking_links")
+    .select("id, organization_id, customer_id, status")
+    .eq("token", token)
+    .is("deleted_at", null)
+    .maybeSingle();
+  if (!bookingLink?.customer_id || bookingLink.status === "cancelled") return { ok: false as const, error: await said("This booking link could not be found.") };
+  const [t, locale] = await Promise.all([getTranslations("customer"), getLocale()]);
+  const wording = `${t("offersTitle")} ${t("offersBody")}`.slice(0, 1000);
+  const { error } = await supabase.from("renter_consents").insert({
+    organization_id: bookingLink.organization_id,
+    customer_id: bookingLink.customer_id,
+    booking_link_id: bookingLink.id,
+    purpose: "partner_offers",
+    granted,
+    wording,
+    wording_version: PARTNER_OFFERS_VERSION,
+    locale,
+    source
+  });
+  if (error) return { ok: false as const, error: await said("We couldn't save your choice. Please try again.") };
+  return { ok: true as const, granted };
 }

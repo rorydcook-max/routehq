@@ -200,6 +200,10 @@ export async function getPublicBookingDetail(token: string) {
     ensureDefaultContractTemplate(supabase, bookingLink.organization_id).then((data) => ({ data }))
   ]);
 
+  // The customer's current choice about RouteHQ partner offers (latest row wins), read alongside the rest.
+  const partnerOffersRead = bookingLink.customer_id
+    ? supabase.from("renter_consents").select("granted").eq("customer_id", bookingLink.customer_id).eq("purpose", "partner_offers").order("created_at", { ascending: false }).limit(1).maybeSingle()
+    : Promise.resolve({ data: null });
   const [paymentsResult, portalActionsResult, inspectionsResult] = await rentalReads;
 
   const outstandingBalance = (paymentsResult.data || []).reduce((sum: number, payment: any) => {
@@ -316,6 +320,7 @@ export async function getPublicBookingDetail(token: string) {
     contractHtml,
     signedContractUrl,
     rentalDocumentAgreement,
-    executedAgreementDownloads: executedDownloads
+    executedAgreementDownloads: executedDownloads,
+    partnerOffers: Boolean(((await partnerOffersRead) as { data: { granted?: boolean } | null }).data?.granted)
   };
 }

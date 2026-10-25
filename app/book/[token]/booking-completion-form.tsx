@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { CheckCircle2, CreditCard, FileText, IdCard, ImageIcon, MessageCircle, PenLine, Upload, UserRound } from "lucide-react";
-import { checkReturningCustomer, completePublicBooking, reportPublicBookingPayment } from "@/app/actions/public-booking";
+import { checkReturningCustomer, completePublicBooking, reportPublicBookingPayment, setPartnerOffers } from "@/app/actions/public-booking";
 import { preparePublicBookingUploads } from "@/app/actions/uploads";
 import { readIdentityDocument } from "@/app/actions/identity-ocr";
 import { uploadFormFiles } from "@/lib/direct-upload-client";
@@ -48,6 +48,8 @@ type PublicBookingDetail = {
     documents: boolean;
     agreement: boolean;
   };
+  /** The customer said yes to trip extras from RouteHQ partners (their latest choice). */
+  partnerOffers?: boolean;
   documentStatus: {
     passport: boolean;
     driver_license: boolean;
@@ -509,6 +511,28 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
   const [liveEmail, setLiveEmail] = useState(detail.customer?.email || "");
   const [focusField, setFocusField] = useState<"phone" | "email" | null>(null);
   const [agreedAll, setAgreedAll] = useState(false);
+  // Trip extras from RouteHQ partners: optional, never ticked for them, and it doesn't hold up the booking.
+  const [offersTicked, setOffersTicked] = useState(false);
+  const [offersOn, setOffersOn] = useState(Boolean(detail.partnerOffers));
+  const [offersSaving, setOffersSaving] = useState(false);
+  const [offersError, setOffersError] = useState(false);
+  async function saveOffers(granted: boolean, source: "booking_form" | "booking_page") {
+    setOffersSaving(true);
+    setOffersError(false);
+    try {
+      const data = new FormData();
+      data.set("token", detail.token);
+      data.set("granted", granted ? "yes" : "no");
+      data.set("source", source);
+      const result = await setPartnerOffers(data);
+      if (result.ok) setOffersOn(granted);
+      else setOffersError(true);
+    } catch {
+      setOffersError(true);
+    } finally {
+      setOffersSaving(false);
+    }
+  }
   const [preferredDeliveryLocation, setPreferredDeliveryLocation] = useState(formatDeliveryLocation(String(detail.bookingData.delivery_location || "")));
   const [liveStatus, setLiveStatus] = useState(detail.completion);
   const orgPayment = detail.orgPayment;
@@ -867,6 +891,8 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
         setSignedContractUrl(result.signedContractUrl || null);
         setOriginalAgreementUrl((result as any).originalAgreementUrl || null);
         setExecutionCertificateUrl((result as any).executionCertificateUrl || null);
+        // Their choice about partner offers is saved once the booking is signed; a failure here never undoes the booking.
+        if (offersTicked) await saveOffers(true, "booking_form");
         setCompleted(true);
         setJustCompleted(true);
         // The payments for this booking exist now; show them without a reload.
@@ -910,6 +936,14 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           </a>
         ) : null}
         </div>
+        {/* Their choice stays here to change at any time: turning it off is as easy as turning it on. */}
+        <label className="checkbox-label mt-5 items-start rounded-xl bg-[var(--panel-secondary)] p-3 text-left text-sm text-[var(--foreground)]">
+          <input checked={offersOn} className="mt-0.5 flex-shrink-0" disabled={offersSaving} onChange={(event) => void saveOffers(event.target.checked, "booking_page")} type="checkbox" />
+          <span>
+            <span className="block font-semibold">{t("offersTitle")}</span>
+            <span className="mt-0.5 block font-normal leading-snug text-[var(--muted)]">{offersError ? t("offersFailed") : offersOn ? t("offersOnNote") : t("offersBody")}</span>
+          </span>
+        </label>
       </section>
     );
   }
@@ -1492,6 +1526,15 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           />
         </div>
           </>
+        ) : null}
+        {readyToSign && publicAgreement ? (
+          <label className="checkbox-label mt-4 items-start rounded-xl border border-[var(--border)] bg-white p-3 text-sm text-[var(--foreground)]">
+            <input checked={offersTicked} className="mt-0.5 flex-shrink-0" onChange={(event) => setOffersTicked(event.target.checked)} type="checkbox" />
+            <span>
+              <span className="block font-semibold">{t("offersTitle")}</span>
+              <span className="mt-0.5 block font-normal leading-snug text-[var(--muted)]">{t("offersBody")}</span>
+            </span>
+          </label>
         ) : null}
         {error ? <p className="mt-4 rounded-xl bg-[var(--danger-light)] p-3 text-sm font-bold text-[var(--danger)]">{error}</p> : null}
         <button className="pressable mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white disabled:opacity-70" disabled={isPending || !pageLive} key={readyToSign ? "sign" : "review"} type="submit">

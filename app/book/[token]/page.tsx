@@ -570,6 +570,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
               vehicleWithCustomer: ["active", "due_soon", "overdue", "extended"].includes(String(rental?.status || "")),
               customer,
               completion: detail.completion,
+              partnerOffers: detail.partnerOffers,
               documentStatus: detail.documentStatus,
               bookingData,
               // The form shows the agreement's rendered snapshot when there is one; the template copy is then never

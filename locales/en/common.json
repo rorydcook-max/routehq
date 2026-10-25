@@ -890,7 +890,11 @@
     "slipSentBefore": "You've sent this slip before. Only send it again if it's for a different payment.",
     "slipAnother": "Use a different photo",
     "slipSent": "Slip sent",
-    "slipAnotherPayment": "Send another slip"
+    "slipAnotherPayment": "Send another slip",
+    "offersTitle": "Send me trip extras (optional)",
+    "offersBody": "RouteHQ, the booking platform, may message or email me offers from its partners, such as airport transfers, tours and SIM cards. My booking doesn't depend on this, and I can turn it off here at any time.",
+    "offersOnNote": "On. RouteHQ may send you offers from its partners. Untick to stop at any time.",
+    "offersFailed": "We couldn't save your choice. Please try again."
   },
   "customerMessages": {
     "hi": "Hi {name},",

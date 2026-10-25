@@ -944,6 +944,10 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
             <span className="mt-0.5 block font-normal leading-snug text-[var(--muted)]">{offersError ? t("offersFailed") : offersOn ? t("offersOnNote") : t("offersBody")}</span>
           </span>
         </label>
+        <details className="mt-1.5 px-1 text-left text-sm">
+          <summary className="cursor-pointer font-semibold text-[var(--primary)]">{t("offersDetailsLabel")}</summary>
+          <p className="mt-1 leading-snug text-[var(--muted)]">{t("offersDetails")}</p>
+        </details>
       </section>
     );
   }
@@ -1535,6 +1539,12 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
               <span className="mt-0.5 block font-normal leading-snug text-[var(--muted)]">{t("offersBody")}</span>
             </span>
           </label>
+        ) : null}
+        {readyToSign && publicAgreement ? (
+          <details className="mt-1.5 px-1 text-sm">
+            <summary className="cursor-pointer font-semibold text-[var(--primary)]">{t("offersDetailsLabel")}</summary>
+            <p className="mt-1 leading-snug text-[var(--muted)]">{t("offersDetails")}</p>
+          </details>
         ) : null}
         {error ? <p className="mt-4 rounded-xl bg-[var(--danger-light)] p-3 text-sm font-bold text-[var(--danger)]">{error}</p> : null}
         <button className="pressable mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[var(--primary)] px-5 py-3 text-sm font-semibold text-white disabled:opacity-70" disabled={isPending || !pageLive} key={readyToSign ? "sign" : "review"} type="submit">

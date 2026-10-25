@@ -891,10 +891,12 @@
     "slipAnother": "Use a different photo",
     "slipSent": "Slip sent",
     "slipAnotherPayment": "Send another slip",
-    "offersTitle": "Send me trip extras (optional)",
-    "offersBody": "RouteHQ, the booking platform, may keep a copy of my details and rental history (where and when I rent, the vehicle, what I pay, extras, mileage, deposit and damage) and use it to message or email me offers from its partners, such as airport transfers, tours and SIM cards. My booking doesn't depend on this. I can turn it off here at any time, and RouteHQ's copy is then deleted.",
-    "offersOnNote": "On. RouteHQ keeps a copy of your details and rental history and may send you offers from its partners. Untick to stop, and RouteHQ's copy is deleted.",
-    "offersFailed": "We couldn't save your choice. Please try again."
+    "offersTitle": "Share my information with RouteHQ (optional)",
+    "offersBody": "I agree to share my information with RouteHQ, the booking platform, so it can send me offers from its partners. My booking doesn't depend on this, and I can turn it off here at any time.",
+    "offersOnNote": "On. You're sharing your information with RouteHQ for partner offers. Untick to stop, and RouteHQ's copy is deleted.",
+    "offersFailed": "We couldn't save your choice. Please try again.",
+    "offersDetailsLabel": "What's shared",
+    "offersDetails": "My name, contact details, nationality and language, and my rental history: where and when I rent, the vehicle, what I pay, extras, mileage, deposit and damage. RouteHQ may message or email me offers such as airport transfers, tours and SIM cards. Turning this off deletes RouteHQ's copy."
   },
   "customerMessages": {
     "hi": "Hi {name},",

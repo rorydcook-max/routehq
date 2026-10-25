@@ -3,7 +3,7 @@
 import { said } from "@/lib/i18n/server-text";
 import { readFileAsJson, visionProvider } from "@/lib/ai-vision";
 import { readReceipt } from "@/lib/receipt-reading";
-import { RENTER_HISTORY_VERSION, syncRenterFromCustomer } from "@/lib/renters";
+import { syncRenterFromCustomer } from "@/lib/renters";
 import { matchSlip } from "@/lib/slip-matching";
 import { getPortalPayments } from "@/lib/payment-receipts";
 import { headers } from "next/headers";
@@ -1476,7 +1476,8 @@ export async function checkReturningCustomer(
 
 /** Bump when the wording of the partner-offers choice changes, so each record says which version was agreed to. */
 // 2026-10-25b: says RouteHQ keeps a copy of their details and rental history (lib/renters.ts).
-const PARTNER_OFFERS_VERSION = RENTER_HISTORY_VERSION;
+// 2026-10-25c: the short "Share my information with RouteHQ" line, with what is shared one tap away.
+const PARTNER_OFFERS_VERSION = "2026-10-25c";
 
 /**
  * The customer's choice about trip extras from RouteHQ partners: the optional box on the booking form, or the switch
@@ -1496,7 +1497,7 @@ export async function setPartnerOffers(formData: FormData) {
     .maybeSingle();
   if (!bookingLink?.customer_id || bookingLink.status === "cancelled") return { ok: false as const, error: await said("This booking link could not be found.") };
   const [t, locale] = await Promise.all([getTranslations("customer"), getLocale()]);
-  const wording = `${t("offersTitle")} ${t("offersBody")}`.slice(0, 1000);
+  const wording = `${t("offersTitle")} ${t("offersBody")} ${t("offersDetailsLabel")}: ${t("offersDetails")}`.slice(0, 1000);
   const { error } = await supabase.from("renter_consents").insert({
     organization_id: bookingLink.organization_id,
     customer_id: bookingLink.customer_id,

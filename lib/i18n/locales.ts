@@ -45,16 +45,16 @@ export const supportedLocaleOptions: Array<{ code: SupportedLocale; label: strin
 ];
 
 /**
- * Languages the customer pages (booking link, online booking, portal, agreement)
- * are translated into. The others only had the handover form, so they showed
- * English for the booking steps and are not offered until translated.
+ * Languages the customer pages (booking link, online booking, booking page, directory) are offered in: every
+ * supported language, now that each has a full translation (25 Oct 2026). Machine-assisted; native read-throughs
+ * are on the launch checklist.
  */
-export const customerLocaleCodes: readonly SupportedLocale[] = ["en", "th", "zh", "ru", "de", "fr", "he", "id", "ms", "my", "vi"];
-export const customerLocaleOptions = supportedLocaleOptions.filter((option) => customerLocaleCodes.includes(option.code));
+export const customerLocaleCodes: readonly SupportedLocale[] = supportedLocaleCodes;
+export const customerLocaleOptions = supportedLocaleOptions;
 
-/** Languages the operator's own app is translated into. */
-export const operatorLocaleCodes: readonly SupportedLocale[] = ["en", "th"];
-export const operatorLocaleOptions = supportedLocaleOptions.filter((option) => operatorLocaleCodes.includes(option.code));
+/** Languages the operator's own app is offered in: the same full list. */
+export const operatorLocaleCodes: readonly SupportedLocale[] = supportedLocaleCodes;
+export const operatorLocaleOptions = supportedLocaleOptions;
 
 /** Languages written right to left. The page direction follows the reader's language. */
 export const rightToLeftLocales = new Set<string>(["he"]);

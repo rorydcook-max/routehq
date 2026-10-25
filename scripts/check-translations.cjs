@@ -40,7 +40,10 @@ for (const locale of codes) {
   for (const key of keys) {
     if (!present.has(key)) continue;
     try {
-      t(key, valuesFor(key));
+      // Strings with tags (<b>, <link>) format through t.rich with a function per tag, as the screens do.
+      const tags = [...new Set([...String(englishFlat[key]).matchAll(/<\/?([a-zA-Z][\w-]*)\s*\/?>/g)].map((m) => m[1]))];
+      if (tags.length) t.rich(key, { ...valuesFor(key), ...Object.fromEntries(tags.map((tag) => [tag, (chunks) => chunks])) });
+      else t(key, valuesFor(key));
     } catch (e) {
       errors.push(`${key}: ${e.message}`);
     }

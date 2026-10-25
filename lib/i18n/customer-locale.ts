@@ -25,7 +25,9 @@ export function pickLocale(chosen: string | null | undefined, acceptLanguage: st
   for (const { tag } of wanted) {
     const lower = tag.toLowerCase();
     const base = lower.split("-")[0];
-    const mapped = base === "no" || base === "nn" ? "nb" : base === "tl" ? "fil" : base === "iw" ? "he" : base === "in" ? "id" : base;
+    // Traditional Chinese readers (Taiwan, Hong Kong, Macau, or an explicit "Hant" script) get zh-TW; other Chinese is Simplified.
+    const traditional = base === "zh" && /^zh-(tw|hk|mo|hant)/.test(lower);
+    const mapped = traditional ? "zh-TW" : base === "no" || base === "nn" ? "nb" : base === "tl" ? "fil" : base === "iw" ? "he" : base === "in" ? "id" : base;
     if (supported.has(mapped)) return mapped as SupportedLocale;
   }
   return "en";

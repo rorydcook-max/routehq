@@ -3,7 +3,7 @@ import { jobNameFor } from "@/lib/job-name";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
-import { intlLocale } from "@/lib/i18n/dates";
+import { dateFormat } from "@/lib/i18n/dates";
 import type { Route } from "next";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
@@ -31,7 +31,7 @@ function lastDay(month: string) {
 
 function monthLabel(month: string, locale: string) {
   const [year, index] = month.split("-").map(Number);
-  return new Intl.DateTimeFormat(intlLocale(locale), { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(Date.UTC(year, index - 1, 1)));
+  return dateFormat(locale, { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(Date.UTC(year, index - 1, 1)));
 }
 
 export default async function CalendarPage({

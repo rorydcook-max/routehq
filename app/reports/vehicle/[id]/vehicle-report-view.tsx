@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { ChevronRight } from "lucide-react";
-import { intlLocale, longDate, shortDate } from "@/lib/i18n/dates";
+import { dateFormat, longDate, shortDate } from "@/lib/i18n/dates";
 import type { DatePreset, VehicleReportData } from "@/lib/reports";
 import { Dot, Ring } from "@/components/glance";
 import { VehicleArt } from "@/components/vehicle-art";
@@ -110,13 +110,13 @@ export function VehicleReportView({ data }: { data: VehicleReportData }) {
 
   const { vehicle, totalRevenue, totalExpenses, netProfit, utilizationRate, rentalCount, avgDailyRate, roi, rentalDays } = data;
   const lostValue = vehicle.purchasePrice > 0 && vehicle.estimatedValue > 0 ? Math.max(0, vehicle.purchasePrice - vehicle.estimatedValue) : 0;
-  const monthFormat = new Intl.DateTimeFormat(intlLocale(locale), { month: "short", year: "numeric", timeZone: "UTC" });
+  const monthFormat = dateFormat(locale, { month: "short", year: "numeric", timeZone: "UTC" });
   const monthly = data.monthlyData.map((month) => {
     const match = String(month.key || "").match(/^(\d{4})-(\d{2})$/);
     return { ...month, label: match ? monthFormat.format(new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, 1))) : month.label };
   });
   void searchParams;
-  const weekFormat = new Intl.DateTimeFormat(intlLocale(locale), { day: "numeric", month: "short", timeZone: "UTC" });
+  const weekFormat = dateFormat(locale, { day: "numeric", month: "short", timeZone: "UTC" });
   const weekly = (data.weeklyData || []).map((week) => ({ ...week, key: String(week.key || week.label), label: weekFormat.format(new Date(`${String(week.key || week.label)}T00:00:00Z`)) }));
   const busyMonths = monthly.filter((month) => month.revenue !== 0 || month.expenses !== 0).length;
   const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Bangkok" }).format(new Date());

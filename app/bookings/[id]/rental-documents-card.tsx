@@ -1,13 +1,13 @@
 import { Download, FileSignature, ShieldCheck } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { intlLocale } from "@/lib/i18n/dates";
+import { dateFormat } from "@/lib/i18n/dates";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 import { Badge, Pane } from "@/components/ui";
 import type { BookingRentalDocument } from "@/lib/booking-rental-documents";
 
 function formatSignedAt(value: string, locale: string) {
-  return new Intl.DateTimeFormat(intlLocale(locale), {
+  return dateFormat(locale, {
     hour12: false,
     day: "numeric",
     month: "short",

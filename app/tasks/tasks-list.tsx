@@ -10,7 +10,7 @@ import { completeTask } from "@/app/actions/tasks";
 import { decideEarlyWaiver } from "@/app/actions/early-start";
 import { decideEarlyReturnOwed } from "@/app/actions/early-return";
 import { PendingButton } from "@/components/pending-button";
-import { intlLocale, longDate, shortDate } from "@/lib/i18n/dates";
+import { dateFormat, longDate, shortDate } from "@/lib/i18n/dates";
 import { allocatePayment, type OpenPayment } from "@/lib/payment-allocation";
 import type { TaskListItem } from "@/lib/tasks";
 
@@ -80,7 +80,7 @@ function periodText(period: string, tx: Tx) {
     const parsed = Date.parse(`1 ${month[1]} ${month[2]} UTC`);
     if (!Number.isNaN(parsed)) {
       try {
-        return new Intl.DateTimeFormat(intlLocale(tx.locale), { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(parsed));
+        return dateFormat(tx.locale, { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(parsed));
       } catch {
         return period;
       }

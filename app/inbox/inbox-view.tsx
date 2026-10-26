@@ -11,7 +11,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { AlertCircle, ArrowLeft, Check, RotateCcw, Send, Sparkles } from "lucide-react";
 import { linkConversationCustomer, markConversationRead, sendInboxMessage, setConversationStatus, suggestInboxReply } from "@/app/actions/inbox";
 import type { InboxConversation, InboxMessage } from "@/lib/inbox/store";
-import { intlLocale, shortDate as dateInWords } from "@/lib/i18n/dates";
+import { dateFormat, shortDate as dateInWords } from "@/lib/i18n/dates";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
@@ -51,13 +51,13 @@ function when(iso: string | null, say: Say, locale: string) {
   const day = toWallTime(iso).slice(0, 10);
   if (day === businessToday()) return toWallTime(iso).slice(11, 16);
   if (day === businessToday(-1)) return say("yesterday");
-  return date.toLocaleDateString(intlLocale(locale), { day: "numeric", month: "short", timeZone: BUSINESS_TIME_ZONE });
+  return dateFormat(locale, { day: "numeric", month: "short", timeZone: BUSINESS_TIME_ZONE }).format(date);
 }
 
 function dayLabel(iso: string, say: Say, locale: string) {
   const date = new Date(iso);
   if (toWallTime(iso).slice(0, 10) === businessToday()) return say("today");
-  return date.toLocaleDateString(intlLocale(locale), { weekday: "short", day: "numeric", month: "short", timeZone: BUSINESS_TIME_ZONE });
+  return dateFormat(locale, { weekday: "short", day: "numeric", month: "short", timeZone: BUSINESS_TIME_ZONE }).format(date);
 }
 
 function shortDate(value: string | null, say: Say, locale: string) {

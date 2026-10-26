@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Megaphone } from "lucide-react";
 import { fileCustomerReport, settleCustomerReport, withdrawCustomerReport } from "@/app/actions/customer-reports";
 import { REPORT_KINDS } from "@/lib/customer-history-kinds";
+import { dateFormat } from "@/lib/i18n/dates";
 
 export type OwnReport = {
   id: string;
@@ -41,7 +42,7 @@ export function ReportToOthers({ customerId, reports, rentals, canReport }: { cu
   const [settleNote, setSettleNote] = useState("");
   const [error, setError] = useState("");
   const [pending, start] = useTransition();
-  const month = (iso: string) => new Intl.DateTimeFormat(locale, { month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${iso.slice(0, 10)}T00:00:00Z`));
+  const month = (iso: string) => dateFormat(locale, { month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(`${iso.slice(0, 10)}T00:00:00Z`));
 
   const submit = () =>
     start(async () => {

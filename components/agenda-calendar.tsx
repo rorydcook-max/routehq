@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Bell, ChevronLeft, ChevronRight, FileWarning, KeyRound, RotateCcw, Wallet, Wrench } from "lucide-react";
-import { intlLocale } from "@/lib/i18n/dates";
+import { dateFormat } from "@/lib/i18n/dates";
 import type { CalendarEvent } from "@/lib/calendar";
 
 export type AgendaView = "day" | "week" | "month" | "custom";
@@ -40,7 +40,7 @@ function daysBetween(from: string, to: string) {
   return Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000);
 }
 
-const fmt = (locale: string, options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat(intlLocale(locale), { timeZone: "UTC", ...options });
+const fmt = (locale: string, options: Intl.DateTimeFormatOptions) => dateFormat(locale, { timeZone: "UTC", ...options });
 const asDate = (date: string) => new Date(`${date}T00:00:00Z`);
 
 /**

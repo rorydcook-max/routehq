@@ -16,7 +16,7 @@ import { ExtensionRequestAnswer } from "@/app/bookings/[id]/extension-request-an
 import { extensionPicture } from "@/lib/extension-picture";
 import { getLocale, getTranslations } from "next-intl/server";
 import { useLocale, useTranslations } from "next-intl";
-import { intlLocale, longDate, shortDate } from "@/lib/i18n/dates";
+import { dateFormat, longDate, shortDate } from "@/lib/i18n/dates";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { AssignCustomerModal } from "@/app/bookings/[id]/assign-customer-modal";
 import { SkipInspectionButton } from "@/app/bookings/[id]/skip-inspection-button";
@@ -77,7 +77,7 @@ function formatDateTime(value: string | null | undefined, tx: Tx) {
   // A time without an offset is already Thai time; reading it as UTC showed 09:00 handovers as 16:00.
   const instant = wallTimeToIso(value);
   if (!instant) return tx.say("notYet");
-  return new Intl.DateTimeFormat(intlLocale(tx.locale), { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: BUSINESS_TIME_ZONE }).format(new Date(instant));
+  return dateFormat(tx.locale, { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: BUSINESS_TIME_ZONE }).format(new Date(instant));
 }
 
 function formatPaymentMethod(value: string | null | undefined, tx: Tx) {

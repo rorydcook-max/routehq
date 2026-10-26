@@ -16,6 +16,7 @@ import { recordDeliveryCashPaymentAndReceipt } from "@/app/actions/transactions"
 import type { InspectionContext } from "@/lib/inspection-detail";
 import { earlyStartFor, type EarlyStartChoice } from "@/lib/early-start";
 import { lateStartFor, type LateStartChoice } from "@/lib/late-start";
+import { dateFormat } from "@/lib/i18n/dates";
 
 type DamageItem = {
   id: string;
@@ -52,7 +53,7 @@ function formatDate(value: string | null | undefined, locale = "en-GB") {
   if (!value) {
     return "Not set";
   }
-  return new Intl.DateTimeFormat(locale === "en" || locale === "en-GB" ? "en-GB" : `${locale}-u-ca-gregory-nu-latn`, { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
+  return dateFormat(locale === "en-GB" ? "en" : locale, { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
 }
 
 function money(value: unknown) {

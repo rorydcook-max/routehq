@@ -7,7 +7,7 @@ import { shownError } from "@/lib/error-text";
 import { ArrowDownLeft, ArrowUpRight, Check, ChevronLeft, ChevronRight, Download, Search, Trash2, X } from "lucide-react";
 import { Dot } from "@/components/glance";
 import { useLocale, useTranslations } from "next-intl";
-import { intlLocale } from "@/lib/i18n/dates";
+import { dateFormat } from "@/lib/i18n/dates";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 /** The words for this screen, the name of each kind of money entry, and the language for dates. */
@@ -211,7 +211,7 @@ function shiftAnchor(mode: PeriodMode, anchor: string, direction: 1 | -1) {
 }
 
 function fmt(iso: string, options: Intl.DateTimeFormatOptions, locale: string) {
-  return new Intl.DateTimeFormat(intlLocale(locale), { timeZone: "UTC", ...options }).format(fromIso(iso));
+  return dateFormat(locale, { timeZone: "UTC", ...options }).format(fromIso(iso));
 }
 
 function periodLabel(mode: PeriodMode, range: { from: string; to: string }, today: string, tx: Tx) {

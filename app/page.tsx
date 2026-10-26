@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import type { CSSProperties, ReactNode } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
-import { dayOfWeekDate, intlLocale, shortDate as shortDateIn } from "@/lib/i18n/dates";
+import { dateFormat, dayOfWeekDate, intlLocale, shortDate as shortDateIn } from "@/lib/i18n/dates";
 import { ArrowRight, Bell, Car, CheckCircle2, TrendingUp, Clock3, FileWarning, KeyRound, Lock, Plus, ReceiptText, RotateCcw, Wallet, MessageCircle } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { businessToday } from "@/lib/business-time";
@@ -401,7 +401,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       day,
       out: rentals.filter((r) => r.status === "Booked" && String(r.start || "").slice(0, 10) === day).length,
       back: rentals.filter((r) => r.status !== "Booked" && r.end !== "Indefinite" && String(r.end || "").slice(0, 10) === day).length,
-      name: ((short) => (short.replace(/\.$/, "").length > 4 ? new Intl.DateTimeFormat(intlLocale(locale), { weekday: "narrow", timeZone: "UTC" }).format(date) : short))(new Intl.DateTimeFormat(intlLocale(locale), { weekday: "short", timeZone: "UTC" }).format(date)),
+      name: ((short) => (short.replace(/\.$/, "").length > 4 ? dateFormat(locale, { weekday: "narrow", timeZone: "UTC" }).format(date) : short))(dateFormat(locale, { weekday: "short", timeZone: "UTC" }).format(date)),
       number: date.getUTCDate()
     };
   });
@@ -427,7 +427,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   calendarEvents.sort((a, b) => a.date.localeCompare(b.date));
 
   // ── Tiles: one thing each, readable at a glance ──
-  const monthName = new Intl.DateTimeFormat(intlLocale(locale), { month: "long", timeZone: "UTC" }).format(new Date(`${today}T00:00:00Z`));
+  const monthName = dateFormat(locale, { month: "long", timeZone: "UTC" }).format(new Date(`${today}T00:00:00Z`));
   const lastMonthDate = new Date(Date.UTC(Number(today.slice(0, 4)), Number(today.slice(5, 7)) - 2, 1));
   const lastMonth = `${lastMonthDate.getUTCFullYear()}-${String(lastMonthDate.getUTCMonth() + 1).padStart(2, "0")}`;
   // Compared with the same point last month, so the 5th is not measured against a whole month.

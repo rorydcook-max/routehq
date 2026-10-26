@@ -387,7 +387,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
                     <span className="phone-bar-badge absolute -right-3 -top-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[var(--danger)] px-1 font-bold text-white">{badgeFor(item.key)}</span>
                   ) : null}
                 </span>
-                <span className="max-w-full truncate">{item.key === "dashboard" ? t("home") : t(item.key)}</span>
+                <PhoneBarLabel text={item.key === "dashboard" ? t("home") : t(item.key)} />
               </Link>
               </Fragment>
             );
@@ -407,7 +407,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
               ) : null}
             </span>
             {/* Same size as the other labels: buttons otherwise take the page's larger default. */}
-            <span className="max-w-full truncate">{t("more")}</span>
+            <PhoneBarLabel text={t("more")} />
           </button>
         </div>
       </nav>
@@ -487,4 +487,9 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
       <Toaster />
     </div>
   );
+}
+
+/** A bottom-bar label: smaller when the word is long, and two lines rather than "Входя…" in languages with longer words. */
+function PhoneBarLabel({ text }: { text: string }) {
+  return <span className={`phone-bar-label${[...text].length > 7 ? " phone-bar-label-long" : ""}`}>{text}</span>;
 }

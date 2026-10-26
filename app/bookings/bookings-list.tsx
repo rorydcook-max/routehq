@@ -15,7 +15,7 @@ import { RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
 import { Badge, EmptyState } from "@/components/ui";
 import { VehicleArt } from "@/components/vehicle-art";
 import { flagForNationality } from "@/lib/customer-options";
-import { intlLocale, longDate, shortDate } from "@/lib/i18n/dates";
+import { dateFormat, longDate, shortDate } from "@/lib/i18n/dates";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 /** The words for this screen in the reader's language, and the language itself for dates. */
@@ -172,7 +172,7 @@ function holdState(booking: any, tx: Tx): { ended: boolean; past?: boolean; text
   }
   if (booking.status !== "booked" || !link.hold_until) return null;
   const until = new Date(link.hold_until);
-  const when = new Intl.DateTimeFormat(intlLocale(tx.locale), { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Bangkok" }).format(until);
+  const when = dateFormat(tx.locale, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Bangkok" }).format(until);
   return { ended: false, text: tx.say("heldUntil", { when }) };
 }
 

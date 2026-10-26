@@ -2,7 +2,7 @@ import { BUSINESS_TIME_ZONE } from "@/lib/business-time";
 import { Camera, FileVideo, Fuel, Gauge, PenLine, ShieldAlert } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { useTranslations } from "next-intl";
-import { intlLocale } from "@/lib/i18n/dates";
+import { dateFormat } from "@/lib/i18n/dates";
 import { TranslatedText } from "@/components/translated-text";
 import { Badge } from "@/components/ui";
 import { getCurrentMembership } from "@/lib/auth/roles";
@@ -12,7 +12,7 @@ function formatDate(value: string | null | undefined, locale: string, notSet: st
   if (!value) {
     return notSet;
   }
-  return new Intl.DateTimeFormat(intlLocale(locale), {
+  return dateFormat(locale, {
     dateStyle: "medium",
     timeStyle: "short",
     timeZone: BUSINESS_TIME_ZONE

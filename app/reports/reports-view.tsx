@@ -20,7 +20,7 @@ import {
   YAxis
 } from "recharts";
 import { ArrowDownRight, ArrowLeftRight, ArrowUpRight, Check, CheckCircle2, ChevronRight, Download, Handshake, LayoutGrid, Lightbulb, List, Loader2, TrendingUp } from "lucide-react";
-import { intlLocale, longDate, sinceDate } from "@/lib/i18n/dates";
+import { dateFormat, longDate, sinceDate } from "@/lib/i18n/dates";
 import { Dot, InOutBars, Ring } from "@/components/glance";
 import { VehicleArt } from "@/components/vehicle-art";
 import { kindFromCategory } from "@/lib/vehicle-groups";
@@ -513,15 +513,15 @@ export function ReportsView({ data }: { data: ReportsData }) {
   const totalOutstanding = data.outstandingBalances.reduce((sum, balance) => sum + balance.totalBalance, 0);
   const deposits = data.depositSummary;
 
-  const monthFormat = new Intl.DateTimeFormat(intlLocale(locale), { month: "short", year: "numeric", timeZone: "UTC" });
-  const monthShort = new Intl.DateTimeFormat(intlLocale(locale), { month: "short", timeZone: "UTC" });
+  const monthFormat = dateFormat(locale, { month: "short", year: "numeric", timeZone: "UTC" });
+  const monthShort = dateFormat(locale, { month: "short", timeZone: "UTC" });
   const monthly = data.monthlyData.map((month) => {
     const key = String(month.key || "");
     const match = key.match(/^(\d{4})-(\d{2})$/);
     const date = match ? new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, 1)) : null;
     return { ...month, label: date ? monthFormat.format(date) : month.label, short: date ? monthShort.format(date) : month.label };
   });
-  const weekFormat = new Intl.DateTimeFormat(intlLocale(locale), { day: "numeric", month: "short", timeZone: "UTC" });
+  const weekFormat = dateFormat(locale, { day: "numeric", month: "short", timeZone: "UTC" });
   const weekly = (data.weeklyData || []).map((week) => ({ ...week, key: String(week.key || week.label), label: weekFormat.format(new Date(`${String(week.key || week.label)}T00:00:00Z`)) }));
   const busyMonths = monthly.filter((month) => month.revenue !== 0 || month.expenses !== 0).length;
   const periodQuery = `preset=${data.dateRange.preset}&from=${data.dateRange.from}&to=${data.dateRange.to}`;

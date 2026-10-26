@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { useLocale, useTranslations } from "next-intl";
-import { intlLocale } from "@/lib/i18n/dates";
+import { dateFormat } from "@/lib/i18n/dates";
 import { VehicleKindIcon } from "@/components/vehicle-kind-icon";
 import type { AvailabilityBooking, AvailabilityVehicle } from "@/lib/calendar";
 import { kindFromCategory, kindLabel, type VehicleKind } from "@/lib/vehicle-groups";
@@ -27,7 +27,7 @@ function dayOf(iso: string) {
 }
 
 function shortDay(iso: string, locale: string) {
-  return new Intl.DateTimeFormat(intlLocale(locale), { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${iso}T00:00:00Z`));
+  return dateFormat(locale, { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${iso}T00:00:00Z`));
 }
 
 /**
@@ -38,7 +38,7 @@ export function AvailabilityView({ vehicles, month, today }: { vehicles: Availab
   const t = useTranslations("calendar");
   const kinds = useTranslations("common");
   const locale = useLocale();
-  const dayLetter = new Intl.DateTimeFormat(intlLocale(locale), { weekday: "narrow", timeZone: "UTC" });
+  const dayLetter = dateFormat(locale, { weekday: "narrow", timeZone: "UTC" });
   const [year, monthIndex] = month.split("-").map(Number);
   const dayCount = new Date(Date.UTC(year, monthIndex, 0)).getUTCDate();
   const days = Array.from({ length: dayCount }, (_, index) => {

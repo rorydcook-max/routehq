@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Plus, Trash2 } from "lucide-react";
 import { saveExtras, saveSeasons } from "@/app/actions/price-rules";
 import type { Extra, Season } from "@/lib/price-rules";
+import { dateFormat } from "@/lib/i18n/dates";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 const field = "mt-1 w-full";
@@ -26,7 +27,7 @@ function useSave(save: () => Promise<{ ok: boolean; error?: string }>) {
 function DayMonth({ value, onChange, label }: { value: string; onChange: (value: string) => void; label: string }) {
   const locale = useLocale();
   const [month, day] = value ? value.split("-") : ["01", "01"];
-  const months = Array.from({ length: 12 }, (_, index) => new Intl.DateTimeFormat(locale === "en" ? "en-GB" : `${locale}-u-ca-gregory`, { month: "short", timeZone: "UTC" }).format(new Date(Date.UTC(2026, index, 1))));
+  const months = Array.from({ length: 12 }, (_, index) => dateFormat(locale, { month: "short", timeZone: "UTC" }).format(new Date(Date.UTC(2026, index, 1))));
   return (
     <label className="block">
       <span className={small}>{label}</span>

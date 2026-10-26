@@ -291,5 +291,6 @@
   "This report was not found.": "ไม่พบการแจ้งนี้",
   "This vehicle is still out on another rental. Return that rental first, or change the vehicle on this booking.": "รถคันนี้ยังอยู่ในการเช่าอื่น รับคืนการเช่านั้นก่อน หรือเปลี่ยนรถในการจองนี้",
   "{} is empty.": "{} ว่างเปล่า",
-  "{} is larger than {} MB.": "{} มีขนาดเกิน {} MB"
+  "{} is larger than {} MB.": "{} มีขนาดเกิน {} MB",
+  "Your own booking address comes with the Pro plan and above.": "ที่อยู่หน้าจองของคุณเองมีในแพ็กเกจ Pro ขึ้นไป"
 }

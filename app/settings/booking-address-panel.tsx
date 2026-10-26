@@ -12,7 +12,7 @@ import { cleanSubdomain, DNS_A_TARGET, DNS_CNAME_TARGET, isApexDomain, typingSub
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
 /**
- * Where customers book: the RouteHQ address (always), theirshop.routehq.app (Growth and above)
+ * Where customers book: the RouteHQ address (always), theirshop.routehq.app (Pro and above)
  * and their own domain (Business plan).
  */
 export function BookingAddressPanel({

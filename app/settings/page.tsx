@@ -33,7 +33,6 @@ import { DirectoryPanel } from "@/app/settings/directory-panel";
 import { BookingAddressPanel } from "@/app/settings/booking-address-panel";
 import { bookingAddress, canUseOwnDomain, canUseSubdomain, cleanSubdomain, rootDomain, subdomainUrl } from "@/lib/booking-address";
 import { canBeListed, directorySettings } from "@/lib/directory";
-import { DIRECTORY_ADDON_MONTHLY } from "@/lib/plans";
 import { partnerNetworkSettings } from "@/lib/partner-network";
 import { FINDERS_FEE_PCT } from "@/lib/plans";
 import { TeamMemberActions } from "@/app/settings/team-member-actions";
@@ -540,7 +539,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           </Fold>
           <Fold id="directory" summary={directorySettings(organization.settings).enabled && canBeListed(organization as any) && publicBookingSettings(organization.settings).enabled ? say("dir_on") : say("dir_off")} title={say("dir_title")}>
             <DirectoryPanel
-              addonPrice={DIRECTORY_ADDON_MONTHLY}
               allowed={canBeListed(organization as any)}
               bookingPageOn={publicBookingSettings(organization.settings).enabled}
               enabled={directorySettings(organization.settings).enabled}

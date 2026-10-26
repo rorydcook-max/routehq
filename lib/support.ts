@@ -26,7 +26,7 @@ export function supportContacts() {
   };
 }
 
-/** Yearly Growth and above: the import is done for them. */
+/** Yearly Pro and above: the import is done for them. */
 export function importIncluded(organization: { subscription_tier?: string | null; subscription_status?: string | null; billing_interval?: string | null }) {
   return planById(organization.subscription_tier).setupService && organization.billing_interval === "yearly";
 }

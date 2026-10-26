@@ -40,7 +40,7 @@ export async function saveBookingSubdomain(input: { value: string }): Promise<Re
     refresh(org.slug);
     return { ok: true, value: null };
   }
-  if (!canUseSubdomain(org)) return { ok: false, error: await said("Your own booking address comes with the Growth plan and above.") };
+  if (!canUseSubdomain(org)) return { ok: false, error: await said("Your own booking address comes with the Pro plan and above.") };
   const problem = subdomainProblem(value);
   if (problem === "short") return { ok: false, error: await said("Use at least 3 letters or numbers.") };
   if (problem === "chars") return { ok: false, error: await said("Use only letters, numbers and dashes.") };

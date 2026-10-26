@@ -4,7 +4,6 @@
  * booking page, so from the first tap the customer is theirs.
  */
 import { businessToday } from "@/lib/business-time";
-import { planById } from "@/lib/plans";
 import { publicBookingSettings } from "@/lib/public-catalog";
 import { billingPeriodAmounts } from "@/lib/payment-schedule";
 import { seasonsFrom, seasonalRate } from "@/lib/price-rules";
@@ -15,13 +14,13 @@ export type DirectorySettings = { enabled: boolean };
 
 export function directorySettings(settings: unknown): DirectorySettings {
   const raw = (settings && typeof settings === "object" ? (settings as Record<string, any>).directory : null) || {};
-  return { enabled: raw.enabled === true };
+  // On by default (26 Oct 2026): every business is listed unless it switches it off.
+  return { enabled: raw.enabled !== false };
 }
 
-/** Listed when the plan includes it or the add-on is paid (everything is on during the trial), and the business switched it on. */
-export function canBeListed(organization: { subscription_tier: string | null; subscription_status: string | null; directory_addon?: boolean | null }) {
-  const onTrial = String(organization.subscription_status || "trial") === "trial";
-  return onTrial || planById(organization.subscription_tier).directoryIncluded || organization.directory_addon === true;
+/** Every plan can be listed (26 Oct 2026); kept as one place to change if that ever becomes a plan feature again. */
+export function canBeListed(_organization: { subscription_tier: string | null; subscription_status: string | null; directory_addon?: boolean | null }) {
+  return true;
 }
 
 export type DirectoryVehicle = {
@@ -76,12 +75,11 @@ export async function searchDirectory(input: DirectorySearch): Promise<Directory
   const { data: organizations } = await admin
     .from("organizations")
     .select("id, slug, name, trading_name, settings, currency, subscription_tier, subscription_status, directory_addon, logo_url, business_logo_storage_bucket, business_logo_storage_path")
-    .is("deleted_at", null)
-    .eq("settings->directory->>enabled", "true")
-    .eq("settings->public_booking->>enabled", "true");
+    .is("deleted_at", null);
   const place = input.place.trim().toLowerCase();
   const listed = ((organizations || []) as any[]).filter((organization) => {
-    if (!organization.slug || !canBeListed(organization)) return false;
+    // Listed and bookable unless the business switched either off (both on by default).
+    if (!organization.slug || !canBeListed(organization) || !directorySettings(organization.settings).enabled || !publicBookingSettings(organization.settings).enabled) return false;
     if (!place) return true;
     const location = organization.settings?.main_location || {};
     const haystack = [location.town, location.region, location.label, location.country].map((part) => String(part || "").toLowerCase());

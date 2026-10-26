@@ -170,5 +170,6 @@
   "Your own domain comes with the Business plan.": "Собственный домен доступен на тарифе Business.",
   "{} is empty.": "{} пуст.",
   "{} is larger than {} MB.": "{} больше {} МБ.",
-  "{}. Please choose a longer stay or another vehicle.": "{}. Выберите более длительный срок или другой транспорт."
+  "{}. Please choose a longer stay or another vehicle.": "{}. Выберите более длительный срок или другой транспорт.",
+  "Your own booking address comes with the Pro plan and above.": "Собственный адрес бронирования доступен на тарифе Pro и выше."
 }

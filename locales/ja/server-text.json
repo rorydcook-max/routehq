@@ -170,5 +170,6 @@
   "Your own domain comes with the Business plan.": "独自ドメインはビジネスプランで利用できます。",
   "{} is empty.": "{}が空です。",
   "{} is larger than {} MB.": "{}は{} MBを超えています。",
-  "{}. Please choose a longer stay or another vehicle.": "{}。より長い滞在期間か別の車両を選んでください。"
+  "{}. Please choose a longer stay or another vehicle.": "{}。より長い滞在期間か別の車両を選んでください。",
+  "Your own booking address comes with the Pro plan and above.": "独自の予約アドレスはグロースプラン以上で利用できます。"
 }

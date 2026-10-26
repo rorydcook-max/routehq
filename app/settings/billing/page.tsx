@@ -26,6 +26,7 @@ const INCLUDED = [
   "calendar",
   "reports",
   "online",
+  "directory",
   "brand",
   "partners",
   "calculator",

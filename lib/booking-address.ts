@@ -3,7 +3,7 @@ import { planById } from "@/lib/plans";
 /**
  * A business's booking address (Rory, 11 Oct 2026):
  * - routehq.app/rent/<slug>: every business, always works (the directory links here);
- * - <theirshop>.routehq.app: Growth and above;
+ * - <theirshop>.routehq.app: Pro and above;
  * - their own domain, e.g. book.theirshop.com: Business plan.
  * Pure: used by the middleware (edge) as well as pages.
  */

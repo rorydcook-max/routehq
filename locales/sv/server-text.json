@@ -170,5 +170,6 @@
   "Your own domain comes with the Business plan.": "En egen domän ingår i Business.",
   "{} is empty.": "{} är tom.",
   "{} is larger than {} MB.": "{} är större än {} MB.",
-  "{}. Please choose a longer stay or another vehicle.": "{}. Välj en längre vistelse eller ett annat fordon."
+  "{}. Please choose a longer stay or another vehicle.": "{}. Välj en längre vistelse eller ett annat fordon.",
+  "Your own booking address comes with the Pro plan and above.": "En egen bokningsadress ingår i Pro och högre."
 }

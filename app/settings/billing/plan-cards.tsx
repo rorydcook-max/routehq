@@ -4,7 +4,7 @@ import { Check } from "lucide-react";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui";
-import { DIRECTORY_ADDON_MONTHLY, PLANS, YEARLY_MONTHS, yearlyPrice, type Plan } from "@/lib/plans";
+import { PLANS, YEARLY_MONTHS, yearlyPrice, type Plan } from "@/lib/plans";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
@@ -21,7 +21,6 @@ function differences(plan: Plan, say: Say): string[] {
   if (plan.severalLocations) lines.push(say("pl_locations"));
   if (plan.whiteLabel) lines.push(say("pl_whiteLabel"));
   if (plan.customDomain) lines.push(say("pl_ownDomain"));
-  lines.push(plan.directoryIncluded ? say("pl_directoryIn") : say("pl_directoryAddon", { price: baht(DIRECTORY_ADDON_MONTHLY) }));
   if (plan.setupService) lines.push(say("pl_setup"));
   if (plan.prioritySupport) lines.push(say("pl_support"));
   return lines;
@@ -55,10 +54,10 @@ export function PlanCards({ currentTier, vehicles }: { currentTier: string; vehi
         </div>
       </div>
 
-      <div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
+      <div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {PLANS.map((plan) => {
           const current = plan.id === currentTier;
-          const popular = plan.id === "growth";
+          const popular = plan.id === "pro";
           const fits = plan.vehicles === null || vehicles <= plan.vehicles;
           const price = yearly ? yearlyPrice(plan) : plan.monthly;
           return (
@@ -70,7 +69,7 @@ export function PlanCards({ currentTier, vehicles }: { currentTier: string; vehi
                 <div>
                   <p className="text-[18px] font-bold leading-tight text-[var(--foreground)]">{say(`bl_${plan.id}`)}</p>
                   <p className="mt-0.5 text-sm font-semibold text-[var(--foreground-secondary)]">
-                    {plan.vehicles === null ? say("pl_vehiclesMore", { count: PLANS[3].vehicles! + 1 }) : say("pl_vehiclesUpTo", { count: plan.vehicles })}
+                    {plan.vehicles === null ? say("pl_vehiclesMore", { count: PLANS[PLANS.length - 2].vehicles! + 1 }) : say("pl_vehiclesUpTo", { count: plan.vehicles })}
                   </p>
                 </div>
                 {current ? <Badge tone="blue">{say("bl_currentBadge")}</Badge> : popular ? <Badge tone="green">{say("pl_popular")}</Badge> : null}

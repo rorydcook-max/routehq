@@ -7,10 +7,10 @@ import { saveDirectoryListing } from "@/app/actions/partners";
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
 /**
- * Listing on the RouteHQ directory (routehq.app/rent). Needs the online
- * booking page on, and a plan that includes it or the add-on.
+ * Listing on the RouteHQ booking site (routehq.app/rent): on by default, in every plan.
+ * Needs the online booking page on.
  */
-export function DirectoryPanel({ enabled, allowed, bookingPageOn, addonPrice }: { enabled: boolean; allowed: boolean; bookingPageOn: boolean; addonPrice: number }) {
+export function DirectoryPanel({ enabled, allowed, bookingPageOn }: { enabled: boolean; allowed: boolean; bookingPageOn: boolean }) {
   const say = useTranslations("settingsPage") as unknown as Say;
   const [on, setOn] = useState(enabled);
   const [failed, setFailed] = useState(false);
@@ -39,7 +39,6 @@ export function DirectoryPanel({ enabled, allowed, bookingPageOn, addonPrice }: 
         </span>
       </label>
       {!bookingPageOn ? <p className="mt-2 text-sm font-semibold text-[var(--warning)]">{say("dir_needsBookingPage")}</p> : null}
-      {bookingPageOn && !allowed ? <p className="mt-2 text-sm font-semibold text-[var(--foreground-secondary)]">{say("dir_plan", { price: `฿${addonPrice.toLocaleString("en-US")}` })}</p> : null}
       {on && usable ? (
         <a className="mt-2 inline-flex text-sm font-bold text-[var(--primary)]" href="/rent" rel="noreferrer" target="_blank">
           {say("dir_open")}

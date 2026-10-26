@@ -170,5 +170,6 @@
   "Your own domain comes with the Business plan.": "Business 方案才提供自訂網域。",
   "{} is empty.": "{} 是空的。",
   "{} is larger than {} MB.": "{} 大於 {} MB。",
-  "{}. Please choose a longer stay or another vehicle.": "{}。請選擇較長的租期或其他車輛。"
+  "{}. Please choose a longer stay or another vehicle.": "{}。請選擇較長的租期或其他車輛。",
+  "Your own booking address comes with the Pro plan and above.": "Pro 以上方案才提供專屬預約網址。"
 }

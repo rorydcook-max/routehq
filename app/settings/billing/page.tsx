@@ -5,8 +5,8 @@ import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/app-shell";
 import { Badge } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
-import { getDefaultOrganization } from "@/lib/organization";
-import { planById, planForFleet, vehiclesOverLimit } from "@/lib/plans";
+import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization";
+import { fleetMix, fleetText, planById, planForFleet, vehiclesOverLimit } from "@/lib/plans";
 import { supportContacts } from "@/lib/support";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { PlanCards } from "./plan-cards";
@@ -29,6 +29,7 @@ const INCLUDED = [
   "directory",
   "brand",
   "partners",
+  "owners",
   "calculator",
   "languages",
   "phone"
@@ -44,23 +45,26 @@ export default async function BillingPage() {
   const t = await getTranslations("settingsPage");
   const say = t as unknown as Say;
   const supabase = (await createSupabaseServerClient()) as any;
-  const [{ data: organization }, { count: vehicleCount }] = await Promise.all([
+  const [{ data: organization }, { data: vehicleRows }, categories] = await Promise.all([
     supabase
       .from("organizations")
-      .select("subscription_status, subscription_tier, trial_started_at, trial_ends_at, subscription_started_at, next_payment_due, payment_method")
+      .select("subscription_status, subscription_tier, trial_started_at, trial_ends_at, subscription_started_at, next_payment_due, payment_method, currency")
       .eq("id", baseOrganization.id)
       .is("deleted_at", null)
       .maybeSingle(),
-    supabase.from("vehicles").select("id", { count: "exact", head: true }).eq("organization_id", baseOrganization.id).is("deleted_at", null)
+    supabase.from("vehicles").select("category_id").eq("organization_id", baseOrganization.id).is("deleted_at", null),
+    getVehicleCategories(baseOrganization.id)
   ]);
 
   const trialDays = daysUntil(organization?.trial_ends_at);
   const contacts = supportContacts();
   const status = String(organization?.subscription_status || "trial");
   const plan = planById(organization?.subscription_tier);
-  const vehicles = Number(vehicleCount || 0);
-  const over = vehiclesOverLimit(plan, vehicles, status);
-  const suggested = planForFleet(vehicles);
+  const fleet = fleetMix((vehicleRows || []) as Array<{ category_id: string | null }>, categories);
+  const over = vehiclesOverLimit(plan, fleet, status);
+  const isOver = over.cars + over.motorbikes > 0;
+  const suggested = planForFleet(fleet);
+  const currency = String(organization?.currency || "THB");
   const statusName = t.has(`bl_st_${status}` as never) ? say(`bl_st_${status}`) : status.replace(/_/g, " ");
 
   return (
@@ -79,7 +83,10 @@ export default async function BillingPage() {
             <p className="font-semibold text-[var(--muted)]">{say("bl_current")}</p>
             <p className="text-[22px] font-bold leading-tight text-[var(--foreground)]">{say(`bl_${plan.id}`)}</p>
             <p className="mt-1 font-medium text-[var(--foreground-secondary)]">
-              {plan.vehicles === null ? say("pl_fleetNoLimit", { count: vehicles }) : say("pl_fleetOf", { count: vehicles, limit: plan.vehicles })}
+              {say("pl_fleetNow", { fleet: fleetText(fleet, say) })}
+              {plan.cars !== null && plan.motorbikes !== null ? (
+                <span className="block text-sm">{say("pl_planCovers", { fleet: fleetText({ cars: plan.cars, motorbikes: plan.motorbikes }, say) })}</span>
+              ) : null}
             </p>
           </div>
           <Badge tone={status === "active" ? "green" : status === "trial" ? "blue" : "red"}>{statusName}</Badge>
@@ -90,9 +97,9 @@ export default async function BillingPage() {
             <span className="block text-sm font-medium text-[var(--foreground-secondary)]">{say("pl_trialAll", { plan: say(`bl_${suggested.id}`) })}</span>
           </p>
         ) : null}
-        {over > 0 ? (
+        {isOver ? (
           <p className="mt-3 rounded-xl bg-[var(--warning-light)] px-4 py-3 font-medium text-[var(--foreground)]">
-            {say("pl_over", { count: over, plan: say(`bl_${suggested.id}`) })}
+            {say("pl_over", { fleet: fleetText(over, say), plan: say(`bl_${suggested.id}`) })}
           </p>
         ) : null}
       </section>
@@ -111,7 +118,7 @@ export default async function BillingPage() {
       </section>
 
       <div className="card mt-3 p-4">
-        <PlanCards currentTier={plan.id} vehicles={vehicles} />
+        <PlanCards currency={currency} currentTier={plan.id} fleet={fleet} />
       </div>
 
       <section className="card mt-3 p-4">

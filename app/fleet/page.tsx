@@ -13,7 +13,7 @@ import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDashboardData, money } from "@/lib/dashboard";
 import { FleetBulkActions } from "@/app/fleet/fleet-actions";
 import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization";
-import { planById, planForFleet, vehiclesOverLimit } from "@/lib/plans";
+import { fleetMix, fleetText, planById, planForFleet, vehiclesOverLimit } from "@/lib/plans";
 import { groupVehiclesByKind, kindLabel } from "@/lib/vehicle-groups";
 import { dateFormat } from "@/lib/i18n/dates";
 
@@ -77,8 +77,11 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
   const groups = filter ? groupVehiclesByKind(vehicles.filter(matches), categories) : allGroups;
   // Over the plan's vehicle limit: a nudge, never a block (Rory, 11 Oct).
   const plan = planById(organization.subscription_tier);
-  const over = vehiclesOverLimit(plan, vehicles.length, organization.subscription_status);
-  const fitting = planForFleet(vehicles.length);
+  const fleet = fleetMix(vehicles, categories);
+  const over = vehiclesOverLimit(plan, fleet, organization.subscription_status);
+  const isOver = over.cars + over.motorbikes > 0;
+  const fitting = planForFleet(fleet);
+  const plansSay = (await getTranslations("settingsPage")) as unknown as (key: string, values?: Record<string, string | number>) => string;
   const totalOut = vehicles.filter((vehicle) => vehicle.status === "Rented").length;
   const totalFree = vehicles.filter((vehicle) => vehicle.status === "Available" || Boolean(vehicle.freeUntil)).length;
   /** The longest period a vehicle is priced for: "฿18,000/mo", else per week, else per day. */
@@ -207,9 +210,9 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
         <div className="mb-5" />
       )}
 
-      {over > 0 ? (
+      {isOver ? (
         <p className="mb-4 rounded-xl border border-[var(--warning-line)] bg-[var(--warning-light)] p-3 text-sm font-medium text-[var(--foreground)]" role="status">
-          {t("overPlan", { count: over, plan: c.has(`plans_${fitting.id}`) ? c(`plans_${fitting.id}`) : fitting.id })}{" "}
+          {plansSay("pl_over", { fleet: fleetText(over, plansSay), plan: plansSay(`bl_${fitting.id}`) })}{" "}
           <Link className="font-bold text-[var(--primary)]" href="/settings/billing">
             {t("seePlans")}
           </Link>

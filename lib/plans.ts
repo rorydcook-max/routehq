@@ -55,7 +55,7 @@ export const OVER_LIMIT_GRACE_DAYS = 14;
 export const PLANS: Plan[] = [
   { id: "free", monthly: 0, cars: 2, motorbikes: 5, extraCar: 0, extraMotorbike: 0, team: 1, documentReads: 10, comparisonLookups: 2, accountingExport: false, severalLocations: false, whiteLabel: false, customDomain: false, setupService: false, prioritySupport: false },
   { id: "starter", monthly: 490, cars: 8, motorbikes: 20, extraCar: 0, extraMotorbike: 0, team: 2, documentReads: 50, comparisonLookups: 10, accountingExport: true, severalLocations: false, whiteLabel: false, customDomain: false, setupService: false, prioritySupport: false },
-  { id: "pro", monthly: 990, cars: 20, motorbikes: 50, extraCar: 0, extraMotorbike: 0, team: null, documentReads: 300, comparisonLookups: 50, accountingExport: true, severalLocations: true, whiteLabel: true, customDomain: false, setupService: true, prioritySupport: false },
+  { id: "pro", monthly: 990, cars: 20, motorbikes: 40, extraCar: 0, extraMotorbike: 0, team: null, documentReads: 300, comparisonLookups: 50, accountingExport: true, severalLocations: true, whiteLabel: true, customDomain: false, setupService: true, prioritySupport: false },
   { id: "business", monthly: 1490, cars: null, motorbikes: null, extraCar: 40, extraMotorbike: 15, team: null, documentReads: 1000, comparisonLookups: 200, accountingExport: true, severalLocations: true, whiteLabel: true, customDomain: true, setupService: true, prioritySupport: true }
 ];
 

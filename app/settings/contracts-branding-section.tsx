@@ -56,6 +56,7 @@ export function ContractsBrandingSection({
   whiteLabel?: boolean;
 }) {
   const say = useTranslations("settingsPage") as unknown as (key: string, values?: Record<string, string>) => string;
+  const tBrand = useTranslations("settings.contractsBranding");
   const locale = useLocale();
   const labelClass = "font-semibold text-[var(--foreground-secondary)]";
   const accentColour = organization.contract_accent_colour || "#0e5e6f";
@@ -213,7 +214,7 @@ export function ContractsBrandingSection({
 
           <div className="mt-4 border-t border-[var(--border)] pt-3 text-center text-[11px] text-[var(--muted)]">
             <p>{footerText}</p>
-            {poweredByRouteHq ? <p className="mt-1 font-semibold">Powered by RouteHQ</p> : null}
+            {poweredByRouteHq ? <p className="mt-1 font-semibold">{tBrand("poweredBy")}</p> : null}
           </div>
         </div>
         </Fold>

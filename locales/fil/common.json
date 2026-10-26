@@ -3491,7 +3491,7 @@
     "save": "I-save",
     "saving": "Sine-save…",
     "saved": "Na-save",
-    "currencyLine": "Nasa {currency} ang mga presyo at sumusunod sa {zone} ang oras. Ang sarili mong wika ay naka-set sa <link>My account</link>.",
+    "currencyLine": "Nasa {currency} ang mga presyo at sumusunod sa {zone} ang oras. Ang sarili mong wika ay naka-set sa <link>Aking Account</link>.",
     "loc_title": "Kung saan ka nag-o-operate",
     "msg_title": "Mga chat ng customer sa iisang inbox",
     "msg_body": "Ikonekta ang mga account na ginagamit na ng mga customer para i-message ka. Darating ang kanilang chat sa iyong <link>Inbox</link>, at sasagot ka mula sa RouteHQ.",

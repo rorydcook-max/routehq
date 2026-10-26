@@ -1,4 +1,5 @@
 import { customerLocaleOptions } from "@/lib/i18n/locales";
+import { displayNamesLocale } from "@/lib/i18n/dates";
 
 /**
  * Nationalities renters on the islands most often have. Thailand first, then by
@@ -94,7 +95,7 @@ export function flagForNationality(nationality?: string | null) {
 /** A country's name in the reader's language ("ไทย", "สหราชอาณาจักร"), falling back to the English name kept here. */
 export function countryLabel(code: string, fallback: string, locale: string) {
   try {
-    const names = new Intl.DisplayNames([locale === "en" ? "en-GB" : locale, "en"], { type: "region" });
+    const names = new Intl.DisplayNames([displayNamesLocale(locale), "en"], { type: "region" });
     return names.of(code) || fallback;
   } catch {
     return fallback;

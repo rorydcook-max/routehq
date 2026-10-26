@@ -31,7 +31,7 @@ import { VehicleJobs } from "@/app/tasks/tasks-list";
 import { isQuietActivityEvent } from "@/lib/activity-noise";
 import { activityTitle, tidyDetail, visibleActivity } from "@/lib/activity-display";
 import { businessToday, businessNow, toWallTime } from "@/lib/business-time";
-import { longDate } from "@/lib/i18n/dates";
+import { longDate, dateFormat } from "@/lib/i18n/dates";
 
 // The wording for this page is in locales/<language>/common.json under "vehiclePage".
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -489,7 +489,7 @@ function FinancialSection({ detail, isOwner }: { detail: VehicleDetail; isOwner:
   const f = detail.financials;
   const chartMonths = f.monthlyChart.map((month, index) => ({
     key: String(index),
-    label: new Intl.DateTimeFormat(tx.locale === "en" ? "en-GB" : `${tx.locale}-u-ca-gregory-nu-latn`, { month: "short" }).format(new Date(businessNow().getFullYear(), businessNow().getMonth() - (f.monthlyChart.length - 1 - index), 1)),
+    label: dateFormat(tx.locale, { month: "short" }).format(new Date(businessNow().getFullYear(), businessNow().getMonth() - (f.monthlyChart.length - 1 - index), 1)),
     in: month.revenue,
     out: month.expenses
   }));

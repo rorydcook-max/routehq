@@ -4109,7 +4109,12 @@
     "email": "Email",
     "role": "What you can do",
     "changePassword": "Change password",
-    "roleManager": "Manager"
+    "roleManager": "Manager",
+    "themeTitle": "Light or dark",
+    "themeBody": "How RouteHQ looks on this device. 'Same as phone' follows your phone's own light or dark setting.",
+    "themeSystem": "Same as phone",
+    "themeLight": "Light",
+    "themeDark": "Dark"
   },
   "documentsPage": {
     "title": "Documents",

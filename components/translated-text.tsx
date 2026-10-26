@@ -1,5 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import type { ReadableText } from "@/lib/content-translation";
+import { displayNamesLocale } from "@/lib/i18n/dates";
 
 /**
  * Shows typed text in the reader's language when it was written in another,
@@ -13,7 +14,7 @@ export async function TranslatedText({ value, className }: { value: ReadableText
   const [t, locale] = await Promise.all([getTranslations("translation"), getLocale()]);
   let language = value.sourceLanguage || "";
   try {
-    language = new Intl.DisplayNames([locale], { type: "language" }).of(value.sourceLanguage || "") || language;
+    language = new Intl.DisplayNames([displayNamesLocale(locale)], { type: "language" }).of(value.sourceLanguage || "") || language;
   } catch {}
 
   return (

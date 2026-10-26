@@ -4109,7 +4109,12 @@
     "email": "ईमेल",
     "role": "आप क्या कर सकते हैं",
     "changePassword": "पासवर्ड बदलें",
-    "roleManager": "मैनेजर"
+    "roleManager": "मैनेजर",
+    "themeTitle": "लाइट या डार्क",
+    "themeBody": "इस डिवाइस पर RouteHQ कैसा दिखे। 'फ़ोन जैसा' आपके फ़ोन की लाइट या डार्क सेटिंग के अनुसार चलता है।",
+    "themeSystem": "फ़ोन जैसा",
+    "themeLight": "लाइट",
+    "themeDark": "डार्क"
   },
   "documentsPage": {
     "title": "दस्तावेज़",

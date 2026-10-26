@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { longDate } from "@/lib/i18n/dates";
+import { longDate, numberLocale } from "@/lib/i18n/dates";
 import type { Valuation } from "@/lib/vehicle-valuation";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -33,7 +33,7 @@ export function FleetValueView({ rows: initial, currency, canEstimate }: { rows:
   const say = t as unknown as Say;
   const locale = useLocale();
   const money = useMemo(() => {
-    const format = new Intl.NumberFormat(locale === "en" ? "en-GB" : `${locale}-u-nu-latn`, { style: "currency", currency, currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 });
+    const format = new Intl.NumberFormat(numberLocale(locale), { style: "currency", currency, currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 });
     return (value: number) => format.format(Math.round(value));
   }, [locale, currency]);
   const [rows, setRows] = useState(initial);

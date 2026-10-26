@@ -71,5 +71,22 @@ export function brandCss(colour: string | null | undefined) {
 /** The same CSS for any colour, RouteHQ's own included (the settings preview needs that). */
 export function brandCssAlways(colour: string) {
   const palette = brandPalette(colour);
-  return `:root{--primary:${palette.primary};--primary-hover:${palette.hover};--primary-light:${palette.light};--primary-blue:${palette.primary};--primary-blue-hover:${palette.hover};--primary-blue-light:${palette.light};--primary-strong:${palette.hover};--gradient-brand:${palette.primary};--gradient-teal:${palette.primary};--info:${palette.primary};--info-light:${palette.light};--sidebar-active:${palette.primary};--sidebar-text-active:${palette.primary};--kind-move:${palette.primary};--kind-move-bg:${palette.light};--focus-ring:${palette.ring};--focus-ring-strong:${palette.ringStrong};--band:${palette.primary};--band-action:#ffffff;--band-logo-accent:#ffffff;--band-action-ink:${palette.primary};--analytics-panel:${palette.primary};--analytics-card:${palette.hover};}`;
+  return `:root{--primary:${palette.primary};--primary-hover:${palette.hover};--primary-light:${palette.light};--primary-blue:${palette.primary};--primary-blue-hover:${palette.hover};--primary-blue-light:${palette.light};--primary-strong:${palette.hover};--gradient-brand:${palette.primary};--gradient-teal:${palette.primary};--info:${palette.primary};--info-light:${palette.light};--sidebar-active:${palette.primary};--sidebar-text-active:${palette.primary};--kind-move:${palette.primary};--kind-move-bg:${palette.light};--focus-ring:${palette.ring};--focus-ring-strong:${palette.ringStrong};--band:${palette.primary};--band-action:#ffffff;--band-logo-accent:#ffffff;--band-action-ink:${palette.primary};--analytics-panel:${palette.primary};--analytics-card:${palette.hover};}${brandDarkCss(colour)}`;
+}
+
+/** The same colour on a dark page: a dark tint instead of a pale one, and a lighter shade for words in the colour. */
+function brandDarkCss(colour: string) {
+  const palette = brandPalette(colour);
+  const primary = rgb(palette.primary);
+  const surface = [22, 36, 39] as const;
+  const white = [255, 255, 255] as const;
+  const tint = hex(mix(primary, surface, 0.72));
+  let ink = mix(rgb(isBrandColour(colour) ? colour : ROUTEHQ_BRAND), white, 0.35);
+  let guard = 0;
+  while (luminance(ink) < 0.35 && guard < 12) {
+    ink = mix(ink, white, 0.15);
+    guard += 1;
+  }
+  const band = hex(mix(primary, [14, 26, 28] as const, 0.45));
+  return `html:root[data-theme="dark"]{--primary-light:${tint};--primary-blue-light:${tint};--info-light:${tint};--kind-move-bg:${tint};--primary-ink-dark:${hex(ink)};--info:${hex(ink)};--kind-move:${hex(ink)};--sidebar-active:${hex(ink)};--sidebar-text-active:${hex(ink)};--on-rent:${hex(ink)};--band:${band};--analytics-panel:${band};}`;
 }

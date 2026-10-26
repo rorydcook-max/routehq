@@ -1,0 +1,171 @@
+/* =====================================================================
+   Dark mode. The page is dark when <html data-theme="dark">: chosen in My
+   account, or "System" (the default) following the phone or computer, set
+   before the first paint by the script in app/layout.tsx.
+   Same Lagoon colours, turned down: a deep teal-black canvas, slightly lighter
+   surfaces, light text, the teal and mango kept for what you can press.
+   Printing is always light (agreements, receipts, reports).
+   ===================================================================== */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #0e1a1c;
+  --panel: #162427;
+  --panel-secondary: #1c2d31;
+  --panel-tertiary: #24383c;
+  --border: #2a3e42;
+  --border-strong: #3c5559;
+  --line: var(--border);
+
+  --foreground: #e7f1ef;
+  --foreground-secondary: #c4d4d1;
+  --muted: #9aaeab;
+
+  --sidebar-bg: #162427;
+  --sidebar-darker: #0e1a1c;
+  --sidebar-hover: rgba(126, 206, 196, 0.08);
+  --sidebar-text: #c4d4d1;
+  --sidebar-text-muted: #82999a;
+  --sidebar-text-active: #7fd3c8;
+  --sidebar-border: #2a3e42;
+  --sidebar-active: #7fd3c8;
+
+  /* Buttons keep white text, so the teal stays deep enough for it; text in teal uses --primary-text-on-dark. */
+  --primary: #238a7f;
+  --primary-hover: #2a9d91;
+  --primary-light: #193a3b;
+  --primary-blue: #238a7f;
+  --primary-blue-hover: #2a9d91;
+  --primary-blue-light: #193a3b;
+  --primary-strong: #2a9d91;
+  --primary-ink-dark: #72cdc1;
+
+  --accent: #f2a541;
+  --accent-hover: #f5b45c;
+  --accent-ink: #13262b;
+  --accent-light: #3b2f19;
+
+  --band: #123f46;
+  --band-ink: #ffffff;
+  --band-soft: rgba(255, 255, 255, 0.12);
+  --gradient-brand: #123f46;
+  --gradient-teal: #123f46;
+  --gradient-dark: #0e1a1c;
+  --gradient-dark-subtle: #0e1a1c;
+  --analytics-panel: #123f46;
+  --analytics-card: #0f3238;
+
+  --success: #74d29c;
+  --success-light: #17332a;
+  --success-line: #24493a;
+  --warning: #e9b860;
+  --warning-light: #392c13;
+  --warning-line: #57431c;
+  --danger: #f2967c;
+  --danger-light: #3d211a;
+  --danger-line: #5c3226;
+  --info: #72cdc1;
+  --info-light: #193a3b;
+  --info-line: #2a5552;
+  --purple: #c3a8e0;
+  --purple-light: #2c2438;
+  --purple-line: #443857;
+
+  --urgent-red: #f2967c;
+  --urgent-amber: #e9b860;
+  --urgent-orange: #e9b860;
+  --urgent-green: #74d29c;
+
+  --kind-money: #74d29c;
+  --kind-money-bg: #17332a;
+  --kind-refund: #f2967c;
+  --kind-refund-bg: #3d211a;
+  --kind-form: #e9b860;
+  --kind-form-bg: #392c13;
+  --kind-move: #72cdc1;
+  --kind-move-bg: #193a3b;
+  --kind-message: #c3a8e0;
+  --kind-message-bg: #2c2438;
+
+  --on-rent: #72cdc1;
+  --going-out: #f2a541;
+  --coming-back: #7cbfe6;
+  --coming-back-light: #172c3a;
+  --coming-back-ink: #b9dcf2;
+  --messages: #c3a8e0;
+  --messages-light: #2c2438;
+  --messages-ink: #e3d6f2;
+  --chart-in: #34b3c4;
+  --chart-out: #d98a62;
+  --chart-extras: #e3a14f;
+  --chart-charges: #6ea2e0;
+
+  --focus-ring: rgba(114, 205, 193, 0.25);
+  --focus-ring-strong: rgba(114, 205, 193, 0.4);
+  --shadow-float: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.35), 0 10px 28px rgba(0, 0, 0, 0.28);
+  --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.4), 0 16px 36px rgba(0, 0, 0, 0.35);
+  --band-dot: #ffffff;
+  --band-alert: #f6b7a3;
+  --logo-ink: #e7f1ef;
+  --field-bg: var(--panel-secondary);
+}
+
+/* The overrides sit in the earliest layer: an !important there beats Tailwind's own !important utilities (cascade layers reverse for !important). */
+@layer theme {
+/* Surfaces written as plain white in the markup take the dark surface. */
+:root[data-theme="dark"] :is(.bg-white, .\!bg-white, .bg-\[\#fff\], .bg-\[\#ffffff\]) { background-color: var(--panel) !important; }
+:root[data-theme="dark"] :is(.bg-white\/95, .bg-white\/90, .bg-white\/85, .bg-white\/80) { background-color: color-mix(in srgb, var(--panel) 90%, transparent) !important; }
+:root[data-theme="dark"] :is(.bg-white\/70, .bg-white\/60, .bg-white\/50) { background-color: color-mix(in srgb, var(--panel) 70%, transparent) !important; }
+:root[data-theme="dark"] :is(.text-black, .text-\[\#13262b\]) { color: var(--foreground) !important; }
+:root[data-theme="dark"] :is(.border-white) { border-color: var(--border) !important; }
+
+/* Words in the brand teal (links, "See all", active tabs) use a lighter teal that reads on the dark surface.
+   Filled buttons keep the deeper teal behind white text. */
+:root[data-theme="dark"] :is(.text-\[var\(--primary\)\], .text-\[var\(--primary-blue\)\], .text-\[var\(--sidebar-active\)\], .text-\[var\(--info\)\]) { color: var(--primary-ink-dark) !important; }
+:root[data-theme="dark"] .bg-\[var\(--primary\)\] .text-\[var\(--primary\)\] { color: #fff !important; }
+
+/* Fields. */
+:root[data-theme="dark"] :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]), select, textarea) {
+  background-color: var(--panel-secondary) !important;
+  color: var(--foreground) !important;
+  border-color: var(--border-strong) !important;
+}
+:root[data-theme="dark"] :is(input, textarea)::placeholder { color: #7d9390 !important; }
+:root[data-theme="dark"] input[type="file"]:not(.hidden):not(.sr-only) { background: color-mix(in srgb, var(--primary-light) 70%, var(--panel)) !important; }
+
+/* Chips and pieces written in white in globals.css. */
+@media (max-width: 1023px) {
+  :root[data-theme="dark"] .band-chip-on,
+  :root[data-theme="dark"] .band-chip-on:hover { background: var(--panel) !important; color: var(--foreground) !important; }
+}
+:root[data-theme="dark"] .spark-dot { background: var(--panel) !important; }
+:root[data-theme="dark"] .app-sidebar nav a[class*="bg-[var(--primary-light)]"] { background: var(--panel-secondary) !important; }
+:root[data-theme="dark"] .app-sidebar nav a:not([class*="bg-[var(--primary-light)]"]):hover { background: rgba(255, 255, 255, 0.05) !important; }
+@media (min-width: 1024px) {
+  :root[data-theme="dark"] .hero-band { --band-soft: var(--panel) !important; }
+  :root[data-theme="dark"] .hero-band .band-chip { background: var(--panel) !important; }
+}
+
+/* Backdrops behind sheets and dialogs are drawn in the text colour, which is light here: they darken instead. */
+:root[data-theme="dark"] [class*="bg-[var(--foreground)]/"] { background-color: rgba(0, 0, 0, 0.6) !important; }
+/* Solid dark pieces (tooltips, toasts, the dark chip) stay dark with white text. */
+:root[data-theme="dark"] :is(.bg-\[var\(--foreground\)\], .bg-\[var\(--foreground-secondary\)\]) { background-color: #34494d !important; }
+
+/* Pictures of documents and signatures stay on white paper. */
+:root[data-theme="dark"] :is(canvas, .paper, .stay-light) { background-color: #fff !important; color: #13262b !important; color-scheme: light !important; }
+
+@media print {
+  :root[data-theme="dark"] { color-scheme: light !important; }
+}
+
+/* Tiles tinted by meaning: the words go light on the dark tint. */
+:root[data-theme="dark"] .tile-brick { color: #f7c5b5 !important; }
+:root[data-theme="dark"] .tile-green { color: #bfe9cf !important; }
+:root[data-theme="dark"] .tile-mango { color: #f6d7a0 !important; }
+:root[data-theme="dark"] .hero-band .band-loud { background: var(--danger-light) !important; }
+
+/* White written as a variant in the markup ("[&>div]:!bg-white", "hover:bg-white"). */
+:root[data-theme="dark"] .\[\&\>div\]\:\!bg-white > div { background-color: var(--panel) !important; }
+:root[data-theme="dark"] .hover\:bg-white:hover { background-color: var(--panel-secondary) !important; }
+:root[data-theme="dark"] .hover\:bg-white\/90:hover { background-color: var(--panel-secondary) !important; }
+}

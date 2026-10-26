@@ -467,7 +467,8 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
   // Shared customer history: what other RouteHQ businesses reported about this person, and what this one has.
   const supabase = (await createSupabaseServerClient()) as any;
   const [signals, { data: ownReportRows }, membership] = await Promise.all([
-    sharedHistory(supabase, organization.id, customer as any),
+    // As on the booking page: if the shared history can't be read (e.g. its key is missing), the page still opens.
+    sharedHistory(supabase, organization.id, customer as any).catch(() => []),
     supabase.from("customer_reports").select("id, kind, amount, occurred_on, rental_id, summary, settled_at, settled_note, customer_response, disputed_at").eq("organization_id", organization.id).eq("customer_id", customer.id).is("withdrawn_at", null).order("occurred_on", { ascending: false }),
     getCurrentMembership()
   ]);

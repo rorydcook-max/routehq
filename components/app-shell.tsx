@@ -144,6 +144,7 @@ export function forgetShellContext() {
  */
 export function AppShell({ children, userEmail, hero, heroOverlap = false }: { children: React.ReactNode; userEmail?: string | null; hero?: React.ReactNode; heroOverlap?: boolean }) {
   const t = useTranslations("nav");
+  const tBrand = useTranslations("settings.contractsBranding");
   const [fastActionOpen, setFastActionOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const pathname = usePathname();
@@ -173,7 +174,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
   const brandLogo = brand ? (
     <span className="flex min-w-0 flex-col">
       <BusinessLogoImage alt={brand.name} className="max-h-12 max-w-[190px] object-contain object-left" fallback={brandName} src={brand.logoUrl} />
-      {brand.poweredBy ? <span className="mt-0.5 text-[10px] font-semibold text-[var(--sidebar-text-muted)]">Powered by RouteHQ</span> : null}
+      {brand.poweredBy ? <span className="mt-0.5 text-[10px] font-semibold text-[var(--sidebar-text-muted)]">{tBrand("poweredBy")}</span> : null}
     </span>
   ) : null;
   const isTeammate = shell.role === "teammate" || shell.role === "manager";
@@ -491,5 +492,9 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
 
 /** A bottom-bar label: smaller when the word is long, and two lines rather than "Входя…" in languages with longer words. */
 function PhoneBarLabel({ text }: { text: string }) {
-  return <span className={`phone-bar-label${[...text].length > 7 ? " phone-bar-label-long" : ""}`}>{text}</span>;
+  // The longest word decides: a long single word ("Posteingang") cannot wrap, two short ones can.
+  // Letters as the reader sees them: Thai, Lao and Burmese vowel and tone marks sit on a letter and take no width.
+  const width = (value: string) => value.replace(/\p{M}/gu, "").length;
+  const longest = Math.max(...text.split(/\s+/).map(width));
+  return <span className={`phone-bar-label${longest > 9 ? " phone-bar-label-longer" : width(text) > 7 ? " phone-bar-label-long" : ""}`}>{text}</span>;
 }

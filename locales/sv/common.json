@@ -4109,7 +4109,12 @@
     "email": "E-post",
     "role": "Vad du får göra",
     "changePassword": "Byt lösenord",
-    "roleManager": "Chef"
+    "roleManager": "Chef",
+    "themeTitle": "Ljust eller mörkt",
+    "themeBody": "Hur RouteHQ ser ut på den här enheten. ”Som telefonen” följer telefonens ljusa eller mörka läge.",
+    "themeSystem": "Som telefonen",
+    "themeLight": "Ljust",
+    "themeDark": "Mörkt"
   },
   "documentsPage": {
     "title": "Dokument",

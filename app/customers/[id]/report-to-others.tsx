@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Megaphone } from "lucide-react";
 import { fileCustomerReport, settleCustomerReport, withdrawCustomerReport } from "@/app/actions/customer-reports";
 import { REPORT_KINDS } from "@/lib/customer-history-kinds";
-import { dateFormat } from "@/lib/i18n/dates";
+import { dateFormat, numberLocale } from "@/lib/i18n/dates";
 
 export type OwnReport = {
   id: string;
@@ -88,7 +88,7 @@ export function ReportToOthers({ customerId, reports, rentals, canReport }: { cu
                 <div className="flex flex-wrap items-baseline justify-between gap-x-2">
                   <span className="font-bold text-[var(--foreground)]">
                     {t(`kind_${report.kind}`)}
-                    {report.amount ? ` · ฿${Math.round(report.amount).toLocaleString(locale)}` : ""} · {month(report.occurred_on)}
+                    {report.amount ? ` · ฿${Math.round(report.amount).toLocaleString(numberLocale(locale))}` : ""} · {month(report.occurred_on)}
                   </span>
                   {report.settled_at ? <span className="text-xs font-bold text-[var(--success)]">{t("settled")}</span> : report.disputed ? <span className="text-xs font-bold text-[var(--foreground-secondary)]">{t("disputed")}</span> : null}
                 </div>

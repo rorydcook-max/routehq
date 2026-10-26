@@ -4109,7 +4109,12 @@
     "email": "E-post",
     "role": "Hva du kan gjøre",
     "changePassword": "Endre passord",
-    "roleManager": "Leder"
+    "roleManager": "Leder",
+    "themeTitle": "Lyst eller mørkt",
+    "themeBody": "Hvordan RouteHQ ser ut på denne enheten. «Som telefonen» følger telefonens lyse eller mørke modus.",
+    "themeSystem": "Som telefonen",
+    "themeLight": "Lyst",
+    "themeDark": "Mørkt"
   },
   "documentsPage": {
     "title": "Dokumenter",
@@ -4125,7 +4130,7 @@
     "filter_contract": "Eldre avtaler",
     "owner_vehicle": "Kjøretøy",
     "owner_customer": "Kunde",
-    "owner_rental": "Booking",
+    "owner_rental": "Bestilling",
     "owner_contract": "Eldre avtale",
     "aBooking": "en booking",
     "atHandover": "Utleveringsbilder · {booking}",
@@ -4176,7 +4181,7 @@
     "receiptNo": "Kvittering {number}",
     "issuedOn": "Utstedt {date}",
     "filter_receipt": "Kvitteringer",
-    "shortBooking": "Booking",
+    "shortBooking": "Bestilling",
     "shortCustomer": "Kunde",
     "shortVehicle": "Kjøretøy",
     "morePhotos": "+{count}",

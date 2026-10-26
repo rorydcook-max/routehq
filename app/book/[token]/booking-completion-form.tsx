@@ -14,6 +14,7 @@ import { extractBodyHtml } from "@/lib/contract-rendering";
 import { formatDeliveryLocation } from "@/lib/delivery-location";
 import { toWallTime, businessToday } from "@/lib/business-time";
 import { loadGooglePlaces as loadSharedGooglePlaces } from "@/lib/google-places";
+import { displayNamesLocale } from "@/lib/i18n/dates";
 
 declare global {
   interface Window {
@@ -106,7 +107,7 @@ const fieldStyle = {
   padding: "0 12px",
   border: "0.5px solid var(--border)",
   borderRadius: 8,
-  background: "#ffffff",
+  background: "var(--field-bg, #ffffff)",
   color: "var(--foreground)",
   boxSizing: "border-box" as const,
   outline: "none",
@@ -1633,7 +1634,7 @@ function NationalitySelect({ defaultValue, fill, name }: { defaultValue: string;
   // Countries are shown in the customer's language; what is saved stays in English for the business.
   const regionNames = useMemo(() => {
     try {
-      return locale === "en" ? null : new Intl.DisplayNames([locale], { type: "region" });
+      return locale === "en" ? null : new Intl.DisplayNames([displayNamesLocale(locale)], { type: "region" });
     } catch {
       return null;
     }
@@ -2107,7 +2108,7 @@ function UploadCard({
   }, []);
 
   return (
-    <div style={{ borderRadius: 10, border: "0.5px solid var(--border)", background: "#ffffff", padding: "12px 14px", marginBottom: 8 }}>
+    <div style={{ borderRadius: 10, border: "0.5px solid var(--border)", background: "var(--field-bg, #ffffff)", padding: "12px 14px", marginBottom: 8 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 6 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
           <Icon size={16} style={{ color: "var(--primary)", flexShrink: 0 }} />

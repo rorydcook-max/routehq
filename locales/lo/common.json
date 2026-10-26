@@ -4109,7 +4109,12 @@
     "email": "ອີເມວ",
     "role": "ສິ່ງທີ່ທ່ານເຮັດໄດ້",
     "changePassword": "ປ່ຽນລະຫັດຜ່ານ",
-    "roleManager": "ຜູ້ຈັດການ"
+    "roleManager": "ຜູ້ຈັດການ",
+    "themeTitle": "ແຈ້ງ ຫຼື ມືດ",
+    "themeBody": "ລັກສະນະຂອງ RouteHQ ໃນອຸປະກອນນີ້. 'ຕາມໂທລະສັບ' ຈະແຈ້ງ ຫຼື ມືດ ຕາມທີ່ຕັ້ງໄວ້ໃນໂທລະສັບ.",
+    "themeSystem": "ຕາມໂທລະສັບ",
+    "themeLight": "ແຈ້ງ",
+    "themeDark": "ມືດ"
   },
   "documentsPage": {
     "title": "ເອກະສານ",

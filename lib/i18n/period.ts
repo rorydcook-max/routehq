@@ -1,4 +1,4 @@
-import { intlLocale } from "@/lib/i18n/dates";
+import { dateFormat, daysText } from "@/lib/i18n/dates";
 
 /**
  * Rent periods are saved as English text ("October 2026"). This says the month
@@ -11,7 +11,7 @@ export function monthPeriod(period: string | null | undefined, locale: string) {
   const days = text.match(/^(\d+) days?$/);
   if (days) {
     try {
-      return new Intl.NumberFormat(intlLocale(locale), { style: "unit", unit: "day", unitDisplay: "long" }).format(Number(days[1]));
+      return daysText(Number(days[1]), locale);
     } catch {
       return text;
     }
@@ -22,7 +22,7 @@ export function monthPeriod(period: string | null | undefined, locale: string) {
   const parsed = Date.parse(`1 ${month[1]} ${month[2]} UTC`);
   if (Number.isNaN(parsed)) return text;
   try {
-    return new Intl.DateTimeFormat(intlLocale(locale), { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(parsed));
+    return dateFormat(locale, { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(parsed));
   } catch {
     return text;
   }

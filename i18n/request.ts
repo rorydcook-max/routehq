@@ -50,7 +50,8 @@ async function resolveLocale(): Promise<SupportedLocale> {
     // No request to read (a build-time render): fall through to the signed-in person's language.
   }
   // Development only: "routehq_preview_locale" shows the staff app in another language without changing anyone's account.
-  if (process.env.NODE_ENV !== "production") {
+  // ROUTEHQ_PREVIEW_LOCALE=1 allows it on a local production build for language checks; never set it on the live site.
+  if (process.env.NODE_ENV !== "production" || process.env.ROUTEHQ_PREVIEW_LOCALE === "1") {
     try {
       const preview = (await cookies()).get("routehq_preview_locale")?.value;
       if (preview && supported.has(preview)) return preview as SupportedLocale;

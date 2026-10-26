@@ -4109,7 +4109,12 @@
     "email": "Correo electrónico",
     "role": "Qué puede hacer",
     "changePassword": "Cambiar contraseña",
-    "roleManager": "Gerente"
+    "roleManager": "Gerente",
+    "themeTitle": "Claro u oscuro",
+    "themeBody": "Cómo se ve RouteHQ en este dispositivo. «Como el teléfono» sigue el ajuste claro u oscuro de su teléfono.",
+    "themeSystem": "Como el teléfono",
+    "themeLight": "Claro",
+    "themeDark": "Oscuro"
   },
   "documentsPage": {
     "title": "Documentos",

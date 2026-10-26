@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { fetchVehicleMakesForCategory, fetchVehicleModels, fetchVehicleTrims } from "@/lib/vehicle-catalog-db";
 import type { VehicleMake, VehicleModel, VehicleTrim } from "@/lib/vehicle-catalog-db";
 import { Card, Fold } from "@/components/ui";
-import { longDate } from "@/lib/i18n/dates";
+import { longDate, numberLocale } from "@/lib/i18n/dates";
 import { buildAssumptions, evaluate, flatResaleCurve, yearlyLossPct } from "@/lib/vehicle-investment";
 import type { Assumptions, Outcome, RentStyle, Research, Verdict } from "@/lib/vehicle-investment";
 
@@ -195,7 +195,7 @@ export function CalculatorClient({
   const say = t as unknown as Say;
   const locale = useLocale();
   const money = useMemo(() => {
-    const format = new Intl.NumberFormat(locale, { style: "currency", currency, currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 });
+    const format = new Intl.NumberFormat(numberLocale(locale), { style: "currency", currency, currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 });
     return (value: number) => format.format(Math.round(value));
   }, [locale, currency]);
   // Worked-out figures are estimates, so they are shown rounded rather than to the last unit.
@@ -865,7 +865,7 @@ export function CalculatorClient({
                           <p className="shrink-0 font-bold">{money(Number(listing.price))}</p>
                         </div>
                         <p className="mt-1 text-xs text-[var(--foreground-muted)]">
-                          {[listing.mileage_km ? `${Number(listing.mileage_km).toLocaleString(locale)} km` : "", listing.location, listing.source].filter(Boolean).join(" · ")}
+                          {[listing.mileage_km ? `${Number(listing.mileage_km).toLocaleString(numberLocale(locale))} km` : "", listing.location, listing.source].filter(Boolean).join(" · ")}
                         </p>
                         <p className="mt-2 text-sm">
                           {say("otherLine", { amount: about(result.expected.best.perYear), years: result.expected.best.year, pct: result.expected.returnPct.toFixed(1) })}

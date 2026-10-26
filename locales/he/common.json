@@ -4141,7 +4141,12 @@
     "email": "אימייל",
     "role": "מה אתם יכולים לעשות",
     "changePassword": "שינוי סיסמה",
-    "roleManager": "מנהל"
+    "roleManager": "מנהל",
+    "themeTitle": "בהיר או כהה",
+    "themeBody": "איך RouteHQ נראה במכשיר הזה. 'כמו בטלפון' עוקב אחרי הגדרת הבהיר או הכהה של הטלפון.",
+    "themeSystem": "כמו בטלפון",
+    "themeLight": "בהיר",
+    "themeDark": "כהה"
   },
   "documentsPage": {
     "title": "מסמכים",

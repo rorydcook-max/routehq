@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import type { CSSProperties, ReactNode } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
-import { dateFormat, dayOfWeekDate, intlLocale, shortDate as shortDateIn } from "@/lib/i18n/dates";
+import { dateFormat, dayOfWeekDate, shortDate as shortDateIn } from "@/lib/i18n/dates";
 import { ArrowRight, Bell, Car, CheckCircle2, TrendingUp, Clock3, FileWarning, KeyRound, Lock, Plus, ReceiptText, RotateCcw, Wallet, MessageCircle } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { businessToday } from "@/lib/business-time";
@@ -146,7 +146,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   const weekAhead = addDays(today, 7);
   const bangkokHour = (now.getUTCHours() + 7) % 24;
   const greeting = bangkokHour < 12 ? t("goodMorning") : bangkokHour < 18 ? t("goodAfternoon") : t("goodEvening");
-  const headerDate = now.toLocaleDateString(intlLocale(locale), { weekday: "long", day: "numeric", month: "long", timeZone: "Asia/Bangkok" });
+  const headerDate = dateFormat(locale, { weekday: "long", day: "numeric", month: "long", timeZone: "Asia/Bangkok" }).format(now);
 
   // ── Money ────────────────────────────────────────────────────────────────
   // Expenses are stored as positive amounts, so they're recognised by type.

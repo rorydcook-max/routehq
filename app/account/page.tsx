@@ -5,6 +5,7 @@ import { signOut } from "@/app/actions/auth";
 import { AppShell } from "@/components/app-shell";
 import { PendingButton } from "@/components/pending-button";
 import { PushToggle } from "@/components/push-toggle";
+import { ThemePicker } from "@/components/theme-picker";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { defaultCalendarForLocale, supportedCalendarOptions } from "@/lib/i18n/calendars";
 import { operatorLocaleOptions } from "@/lib/i18n/locales";
@@ -77,6 +78,12 @@ export default async function AccountPage() {
               {say("save")}
             </PendingButton>
           </form>
+        </section>
+
+        <section className="card p-4">
+          <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("themeTitle")}</h2>
+          <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("themeBody")}</p>
+          <ThemePicker />
         </section>
 
         <section className="card p-4">

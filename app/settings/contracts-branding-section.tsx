@@ -208,7 +208,7 @@ export function ContractsBrandingSection({
               <p className="text-xs font-bold text-[var(--foreground)]">{organization.authorised_signatory_name || say("b_signerDefault")}</p>
               <p className="text-[11px] text-[var(--muted)]">{organization.authorised_signatory_title || say("b_signerTitleDefault")}</p>
             </div>
-            <BusinessLogoImage alt="Authorised signature" className="h-14 w-36 rounded-lg border border-[var(--border)] bg-white object-contain p-2" src={signatureDisplayUrl} fallback={<div className="h-14 w-36 rounded-lg border border-dashed border-[var(--border)] bg-white p-2 text-center text-[11px] text-[var(--muted)]">{say("b_signature")}</div>} />
+            <BusinessLogoImage alt="Authorised signature" className="stay-light h-14 w-36 rounded-lg border border-[var(--border)] bg-white object-contain p-2" src={signatureDisplayUrl} fallback={<div className="h-14 w-36 rounded-lg border border-dashed border-[var(--border)] bg-white p-2 text-center text-[11px] text-[var(--muted)]">{say("b_signature")}</div>} />
           </div>
 
           <div className="mt-4 border-t border-[var(--border)] pt-3 text-center text-[11px] text-[var(--muted)]">

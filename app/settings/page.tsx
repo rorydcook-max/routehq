@@ -3,7 +3,7 @@ import { planById } from "@/lib/plans";
 import { isEmailConfigured } from "@/lib/email";
 import type { Route } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import { intlLocale } from "@/lib/i18n/dates";
+import { dateFormat } from "@/lib/i18n/dates";
 import {
   approveVehicleCatalogSubmission,
   createVehicleMake,
@@ -708,8 +708,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                         </td>
                         <td className="px-4 py-2 text-[var(--muted)]">
                           {msg.sent_at
-                            ? new Date(msg.sent_at).toLocaleString(intlLocale(locale), { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Bangkok" })
-                            : new Date(msg.created_at).toLocaleString(intlLocale(locale), { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Bangkok" })}
+                            ? dateFormat(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Bangkok" }).format(new Date(msg.sent_at))
+                            : dateFormat(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Bangkok" }).format(new Date(msg.created_at))}
                         </td>
                       </tr>
                     ))}

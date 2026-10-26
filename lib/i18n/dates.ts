@@ -46,6 +46,24 @@ const OWN_NAMES: Record<string, { wLong: string[]; wShort: string[]; wNarrow: st
   },
 };
 
+/**
+ * The locale to hand to Intl.NumberFormat. Burmese, Lao and Sinhala use plain
+ * 0-9 with the usual grouping: the server writes those languages' own digits
+ * and patterns, Chrome writes English ones, and the page would not match.
+ */
+export function numberLocale(locale: string) {
+  if (locale === "en" || OWN_NAMES[locale]) return "en-GB";
+  return `${locale}-u-nu-latn`;
+}
+
+/** "3 days" in the reader's language, the same on the server and in every browser. */
+const OWN_DAYS: Record<string, string> = { my: "ရက်", lo: "ມື້", si: "දින" };
+export function daysText(count: number, locale: string) {
+  const own = OWN_DAYS[locale];
+  if (own) return `${count} ${own}`;
+  return new Intl.NumberFormat(intlLocale(locale), { style: "unit", unit: "day", unitDisplay: "long" }).format(count);
+}
+
 const WEEKDAY_INDEX: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
 
 /**
@@ -106,4 +124,13 @@ export function dayOfWeekDate(iso: string | null | undefined, locale: string) {
   if (!match) return value;
   const weekday = dateFormat(locale, { weekday: "short", timeZone: "UTC" }).format(new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]))));
   return `${weekday} ${shortDate(value, locale)}`;
+}
+
+/**
+ * The locale for Intl.DisplayNames (country and language names). Chrome has no
+ * names in Burmese, Lao or Sinhala and writes English, while the server writes
+ * them in the language: for those three both sides use English, so the page matches.
+ */
+export function displayNamesLocale(locale: string) {
+  return OWN_NAMES[locale] ? "en" : locale === "en" ? "en-GB" : locale;
 }

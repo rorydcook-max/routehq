@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { updateTravelPolicySettings } from "@/app/actions/settings";
 import { PendingButton } from "@/components/pending-button";
 import { jurisdictionByCountry, type TravelPolicySettings } from "@/lib/travel-policy";
+import { displayNamesLocale } from "@/lib/i18n/dates";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 const labelClass = "font-semibold text-[var(--foreground-secondary)]";
@@ -38,7 +39,7 @@ export function TravelPolicyForm({ organizationId, settings }: { organizationId:
   const countryName = (entry: { value: string; code: string | null }) => {
     if (!entry.code) return say("tp_other");
     try {
-      return new Intl.DisplayNames([locale], { type: "region" }).of(entry.code) || entry.value;
+      return new Intl.DisplayNames([displayNamesLocale(locale)], { type: "region" }).of(entry.code) || entry.value;
     } catch {
       return entry.value;
     }

@@ -5,7 +5,7 @@ import { compressImage } from "@/lib/direct-upload-client";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { longDate } from "@/lib/i18n/dates";
+import { longDate, numberLocale } from "@/lib/i18n/dates";
 import { IMPORT_FIELD_GROUPS, IMPORT_FIELDS } from "@/lib/import/fields";
 import type { ImportPreview, PreviewCustomer, PreviewRental, PreviewTransaction, PreviewVehicle, Problem } from "@/lib/import/preview";
 import { previewCounts } from "@/lib/import/preview";
@@ -65,7 +65,7 @@ function QuickQuestions({ questions, busy, onAnswer, t, locale }: { questions: I
               </>
             ) : (
               <>
-                <p className="text-sm text-[var(--foreground)]">{t("q_rent", { sheet: question.sheet, amount: question.amount.toLocaleString(locale), customer: question.customer || "—" })}</p>
+                <p className="text-sm text-[var(--foreground)]">{t("q_rent", { sheet: question.sheet, amount: question.amount.toLocaleString(numberLocale(locale)), customer: question.customer || "—" })}</p>
                 <div className="mt-1.5 flex flex-wrap gap-2">
                   {(["day", "week", "month"] as const).map((period) => choice(question, period, t(`q_per_${period}`), question.current === period))}
                 </div>

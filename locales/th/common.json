@@ -4118,7 +4118,12 @@
     "email": "อีเมล",
     "role": "สิ่งที่คุณทำได้",
     "changePassword": "เปลี่ยนรหัสผ่าน",
-    "roleManager": "ผู้จัดการ"
+    "roleManager": "ผู้จัดการ",
+    "themeTitle": "โหมดสว่างหรือมืด",
+    "themeBody": "หน้าตาของ RouteHQ บนเครื่องนี้ 'ตามโทรศัพท์' จะสว่างหรือมืดตามที่ตั้งไว้ในโทรศัพท์",
+    "themeSystem": "ตามโทรศัพท์",
+    "themeLight": "สว่าง",
+    "themeDark": "มืด"
   },
   "documentsPage": {
     "title": "เอกสาร",

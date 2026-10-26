@@ -4141,7 +4141,12 @@
     "email": "电子邮箱",
     "role": "权限",
     "changePassword": "修改密码",
-    "roleManager": "经理"
+    "roleManager": "经理",
+    "themeTitle": "浅色或深色",
+    "themeBody": "RouteHQ 在此设备上的外观。“跟随手机”会按手机的浅色或深色设置显示。",
+    "themeSystem": "跟随手机",
+    "themeLight": "浅色",
+    "themeDark": "深色"
   },
   "documentsPage": {
     "title": "文档",

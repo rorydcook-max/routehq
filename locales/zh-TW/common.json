@@ -4109,7 +4109,12 @@
     "email": "電子郵件",
     "role": "您的權限",
     "changePassword": "變更密碼",
-    "roleManager": "經理"
+    "roleManager": "經理",
+    "themeTitle": "淺色或深色",
+    "themeBody": "RouteHQ 在此裝置上的外觀。「跟隨手機」會依手機的淺色或深色設定顯示。",
+    "themeSystem": "跟隨手機",
+    "themeLight": "淺色",
+    "themeDark": "深色"
   },
   "documentsPage": {
     "title": "文件",

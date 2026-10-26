@@ -1,6 +1,6 @@
 export const supportedLocaleCodes = [
   "en", "th", "my", "vi", "id", "ms", "zh", "zh-TW", "fil", "hi", "ta", "si",
-  "fr", "ru", "es", "he", "de", "sv", "nb", "lo", "ko", "ja"
+  "fr", "ru", "es", "pt", "he", "de", "sv", "nb", "lo", "ko", "ja"
 ] as const;
 
 export type SupportedLocale = (typeof supportedLocaleCodes)[number];
@@ -18,6 +18,7 @@ export type SupportedLocale = (typeof supportedLocaleCodes)[number];
  *          language; Tamil also covers Tamil speakers from southern India.
  *   fil    Filipino, the standardised form of Tagalog.
  *   nb     Norwegian Bokmal, the written standard most Norwegians use.
+ *   pt     Brazilian Portuguese (Brazil's rental market); readers in Portugal and Africa understand it.
  */
 export const supportedLocaleOptions: Array<{ code: SupportedLocale; label: string; english: string }> = [
   { code: "en", label: "English", english: "English" },
@@ -35,6 +36,7 @@ export const supportedLocaleOptions: Array<{ code: SupportedLocale; label: strin
   { code: "fr", label: "Français (French)", english: "French" },
   { code: "ru", label: "Русский (Russian)", english: "Russian" },
   { code: "es", label: "Español (Spanish)", english: "Spanish" },
+  { code: "pt", label: "Português (Portuguese)", english: "Portuguese (Brazil)" },
   { code: "he", label: "עברית (Hebrew)", english: "Hebrew" },
   { code: "de", label: "Deutsch (German)", english: "German" },
   { code: "sv", label: "Svenska (Swedish)", english: "Swedish" },

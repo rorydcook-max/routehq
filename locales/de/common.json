@@ -2965,7 +2965,7 @@
     "m_atKm": "Bei {km} km",
     "m_log": "Wartung eintragen",
     "m_type": "Was gemacht wurde",
-    "mt_service": "Service",
+    "mt_service": "Wartung",
     "mt_oil_change": "Ölwechsel",
     "mt_repair": "Reparatur",
     "mt_tyres": "Reifen",
@@ -4141,7 +4141,12 @@
     "email": "E-Mail",
     "role": "Was Sie tun können",
     "changePassword": "Passwort ändern",
-    "roleManager": "Manager"
+    "roleManager": "Manager",
+    "themeTitle": "Hell oder dunkel",
+    "themeBody": "So sieht RouteHQ auf diesem Gerät aus. „Wie Handy“ folgt der Hell-/Dunkel-Einstellung Ihres Handys.",
+    "themeSystem": "Wie Handy",
+    "themeLight": "Hell",
+    "themeDark": "Dunkel"
   },
   "documentsPage": {
     "title": "Dokumente",

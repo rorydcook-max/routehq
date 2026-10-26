@@ -4,13 +4,13 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { businessToday } from "@/lib/business-time";
-import { longDate } from "@/lib/i18n/dates";
+import { longDate, dateFormat, numberLocale } from "@/lib/i18n/dates";
 
 /** "7 Oct": the month and year are already in the statement heading. */
 function dayInMonth(date: string, locale: string) {
   const d = new Date(`${String(date).slice(0, 10)}T00:00:00Z`);
   if (isNaN(d.getTime())) return longDate(date, locale);
-  return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : `${locale}-u-ca-gregory`, { day: "numeric", month: "short", timeZone: "UTC" }).format(d);
+  return dateFormat(locale, { day: "numeric", month: "short", timeZone: "UTC" }).format(d);
 }
 import { getDefaultOrganization } from "@/lib/organization";
 import { buildStatements, type VehicleStatement } from "@/lib/owner-statements";
@@ -58,8 +58,8 @@ export default async function OwnerStatementsPage({ searchParams }: { searchPara
   const byOwner = new Map<string, VehicleStatement[]>();
   for (const statement of statements) byOwner.set(statement.partner.name, [...(byOwner.get(statement.partner.name) || []), statement]);
   const currency = organization.currency || "THB";
-  const baht = (value: number) => new Intl.NumberFormat(locale === "en" ? "en-GB" : `${locale}-u-nu-latn`, { style: "currency", currency, currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 }).format(Math.round(value));
-  const monthName = new Intl.DateTimeFormat(locale === "en" ? "en-GB" : `${locale}-u-ca-gregory`, { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${from}T00:00:00Z`));
+  const baht = (value: number) => new Intl.NumberFormat(numberLocale(locale), { style: "currency", currency, currencyDisplay: "narrowSymbol", maximumFractionDigits: 0 }).format(Math.round(value));
+  const monthName = dateFormat(locale, { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${from}T00:00:00Z`));
 
   return (
     <AppShell userEmail={userEmail}>

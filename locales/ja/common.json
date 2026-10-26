@@ -4109,7 +4109,12 @@
     "email": "メール",
     "role": "できること",
     "changePassword": "パスワードを変更",
-    "roleManager": "マネージャー"
+    "roleManager": "マネージャー",
+    "themeTitle": "ライトまたはダーク",
+    "themeBody": "この端末での RouteHQ の表示です。「スマホと同じ」はスマホのライト／ダーク設定に合わせます。",
+    "themeSystem": "スマホと同じ",
+    "themeLight": "ライト",
+    "themeDark": "ダーク"
   },
   "documentsPage": {
     "title": "書類",

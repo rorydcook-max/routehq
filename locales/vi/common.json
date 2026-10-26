@@ -4141,7 +4141,12 @@
     "email": "Email",
     "role": "Quyền của bạn",
     "changePassword": "Đổi mật khẩu",
-    "roleManager": "Quản lý"
+    "roleManager": "Quản lý",
+    "themeTitle": "Sáng hoặc tối",
+    "themeBody": "Giao diện RouteHQ trên thiết bị này. 'Theo điện thoại' sẽ sáng hoặc tối theo cài đặt của điện thoại.",
+    "themeSystem": "Theo điện thoại",
+    "themeLight": "Sáng",
+    "themeDark": "Tối"
   },
   "documentsPage": {
     "title": "Tài liệu",

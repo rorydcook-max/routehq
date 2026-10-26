@@ -4109,7 +4109,12 @@
     "email": "이메일",
     "role": "권한",
     "changePassword": "비밀번호 변경",
-    "roleManager": "매니저"
+    "roleManager": "매니저",
+    "themeTitle": "라이트 또는 다크",
+    "themeBody": "이 기기에서 RouteHQ가 보이는 방식이에요. '휴대폰과 같게'는 휴대폰의 라이트/다크 설정을 따라요.",
+    "themeSystem": "휴대폰과 같게",
+    "themeLight": "라이트",
+    "themeDark": "다크"
   },
   "documentsPage": {
     "title": "문서",

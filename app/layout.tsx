@@ -6,7 +6,8 @@ import { ImageShrinker } from "@/components/image-shrinker";
 import { FlagFont } from "@/components/flag-font";
 import { BrandStyle } from "@/components/brand-style";
 import { ShellBrandProvider } from "@/components/shell-brand-provider";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
+import { THEME_COOKIE, themeScript, type ThemeChoice } from "@/lib/theme";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { shellBrand } from "@/lib/shell-brand";
@@ -36,6 +37,7 @@ async function operatorBrand() {
 // break underneath us, and they load with the page.
 import "@tabler/icons-webfont/dist/tabler-icons.min.css";
 import "./globals.css";
+import "./theme-dark.css";
 
 export const metadata: Metadata = {
   title: {
@@ -55,18 +57,35 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0e5e6f"
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#0e5e6f" },
+    { media: "(prefers-color-scheme: dark)", color: "#123f46" }
+  ]
 };
+
+/** Light, dark, or (no cookie) the device's own setting. */
+async function themeChoice(): Promise<ThemeChoice> {
+  try {
+    const value = (await cookies()).get(THEME_COOKIE)?.value;
+    return value === "light" || value === "dark" ? value : "system";
+  } catch {
+    return "system";
+  }
+}
 
 export default async function RootLayout({
   children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [locale, brand, customerPage] = await Promise.all([getLocale(), operatorBrand(), isCustomerPage()]);
+  const [locale, brand, customerPage, theme] = await Promise.all([getLocale(), operatorBrand(), isCustomerPage(), themeChoice()]);
   const page = <ShellBrandProvider brand={brand}>{children}</ShellBrandProvider>;
   return (
-    <html dir={textDirection(locale)} lang={locale}>
+    // "System" is resolved in the browser before the first paint, so the attribute can differ from the server's: expected.
+    <html data-theme={theme === "system" ? undefined : theme} dir={textDirection(locale)} lang={locale} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body>
         <BrandStyle colour={brand?.colour || null} />
         {/* Customer pages get only their few words with the page. The staff app loads its words once as a

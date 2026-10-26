@@ -160,7 +160,7 @@ export async function InspectionViewer({ inspection }: { inspection: any }) {
           {/* A stored data URL is served from its own address (cached), not packed into the page. */}
           <img
             alt={t("viewSignature")}
-            className="max-h-40 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)]"
+            className="stay-light max-h-40 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)]"
             loading="lazy"
             src={String(inspection.customer_signature).startsWith("data:") && inspection.id ? `/api/inspection-signature/${inspection.id}` : inspection.customer_signature}
           />

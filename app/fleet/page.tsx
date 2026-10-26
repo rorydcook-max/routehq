@@ -15,6 +15,7 @@ import { FleetBulkActions } from "@/app/fleet/fleet-actions";
 import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization";
 import { planById, planForFleet, vehiclesOverLimit } from "@/lib/plans";
 import { groupVehiclesByKind, kindLabel } from "@/lib/vehicle-groups";
+import { dateFormat } from "@/lib/i18n/dates";
 
 const statusTone = {
   Rented: "blue",
@@ -87,7 +88,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
   // The year only when the date is far enough off to be ambiguous: "Free until 9 Feb" in October needs no
   // "2027" (which pushed the status pill into the price column).
   const dayMonth = (value: string) =>
-    new Intl.DateTimeFormat(locale === "en" ? "en-GB" : `${locale}-u-ca-gregory-nu-latn`, {
+    dateFormat(locale, {
       day: "numeric",
       month: "short",
       ...(Math.abs(new Date(`${value.slice(0, 10)}T00:00:00Z`).getTime() - Date.now()) > 300 * 86_400_000 ? { year: "numeric" } : {}),

@@ -50,7 +50,8 @@ export const metadata: Metadata = {
   icons: {
     icon: "/routehq-icon.svg",
     shortcut: "/routehq-icon.svg",
-    apple: "/apple-touch-icon.png"
+    // ?v= so phones fetch the re-centred icon (27 Oct) instead of a cached copy.
+    apple: "/apple-touch-icon.png?v=2"
   },
   // Opens full screen, like an app, when added to a phone's home screen.
   appleWebApp: { capable: true, title: "RouteHQ", statusBarStyle: "default" }

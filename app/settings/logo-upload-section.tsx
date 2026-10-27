@@ -44,7 +44,8 @@ export function LogoUploadSection({ logoUrl, orgName }: { logoUrl: string | null
 
   return (
     <div className="rounded-2xl bg-[var(--panel-secondary)] p-3.5">
-      <div className="flex items-center gap-3">
+      {/* Phones: the words first, the logo under them, so the words aren't squeezed into a narrow column. */}
+      <div className="flex flex-col-reverse items-start gap-3 sm:flex-row sm:items-center">
         {/* The logo, or a dashed space the size a logo will take, like the signature next to it. */}
         {logoUrl ? (
           <span className="flex h-16 w-40 shrink-0 items-center justify-center rounded-xl bg-white p-2">

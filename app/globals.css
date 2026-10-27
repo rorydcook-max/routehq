@@ -1386,6 +1386,24 @@ input:not([type]),
 select {
   height: 44px;
 }
+/* iPhone Safari gives date and time fields a fixed minimum width that ignores width: 100%, so they ran off the
+   right edge of the card (Rory, 27 Oct). Drop the native look and let them size like every other field. */
+input[type="date"],
+input[type="datetime-local"],
+input[type="time"],
+input[type="month"],
+input[type="week"] {
+  -webkit-appearance: none;
+  appearance: none;
+  min-width: 0;
+  max-width: 100%;
+  display: block;
+  text-align: left;
+}
+input::-webkit-date-and-time-value { text-align: left; min-height: 1.4em; margin: 0; }
+input::-webkit-datetime-edit { padding: 0; }
+/* Any field, select or text box can shrink to its container (flex and grid children default to min-width: auto). */
+input, select, textarea { min-width: 0; max-width: 100%; }
 /* Typed values read as content, not headings: regular weight unless a field asks for more. */
 @layer base {
   input, select, textarea { font-weight: 400; }
@@ -1978,3 +1996,149 @@ details[open] > summary:not([class*="flex"]):not([class*="grid"]):not(:has(svg, 
 /* A sideways-scrolling row of chips on a phone: scrolls by swipe, no bar under it. */
 .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* ── Phone pass (27 Oct): an iPhone app's polish — light, generous, frosted ─────────────────────
+   Phones and small tablets only (below 1024px) unless a rule says otherwise; computers are unchanged. */
+
+/* Sheets (the More menu, the + menu): frosted glass, a big rounded top, a grabber, clear of the home indicator. */
+.sheet-grabber { display: block; width: 38px; height: 5px; margin: 0 auto 10px; border-radius: 999px; background: color-mix(in srgb, var(--foreground) 22%, transparent); }
+.sheet-title { font-family: var(--font-display); font-size: 22px; font-weight: 600; letter-spacing: -0.015em; line-height: 1.2; color: var(--foreground); }
+.sheet-group { background: var(--panel); border-radius: 18px; overflow: hidden; box-shadow: 0 0 0 1px var(--border); }
+.sheet-group > .sheet-row { border: 0 !important; border-radius: 0 !important; box-shadow: none !important; background-color: transparent; }
+.sheet-group > .sheet-row + .sheet-row { border-top: 1px solid var(--border) !important; }
+.sheet-group > .sheet-row:hover { background-color: var(--primary-light); }
+@media (max-width: 1023px) {
+  .sheet-scrim { background: color-mix(in srgb, var(--foreground) 32%, transparent) !important; -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
+  .phone-sheet {
+    background: color-mix(in srgb, var(--background) 93%, transparent) !important;
+    -webkit-backdrop-filter: blur(28px) saturate(1.8);
+    backdrop-filter: blur(28px) saturate(1.8);
+    border-radius: 30px 30px 0 0 !important;
+    box-shadow: 0 -12px 40px -12px rgba(16, 38, 43, 0.28), inset 0 1px 0 color-mix(in srgb, #fff 70%, transparent) !important;
+    padding-top: 8px !important;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom)) !important;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .phone-sheet { animation: sheet-up 280ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+  }
+  /* The More menu's page tiles: white on the frosted sheet, like Control Center. */
+  .phone-sheet .grid > a[class*="bg-[var(--panel-secondary)]"] { background: var(--panel); box-shadow: 0 1px 2px rgba(16, 38, 43, 0.06), 0 0 0 1px var(--border); border-radius: 18px; }
+  .phone-sheet .grid > a[class*="bg-[var(--primary-light)]"] { border-radius: 18px; box-shadow: 0 0 0 1.5px var(--primary); }
+}
+@keyframes sheet-up { from { transform: translateY(40px); opacity: 0.4; } to { transform: none; opacity: 1; } }
+
+/* The floating tab bar: the chosen tab sits in a soft lens, the + is a raised button in the business colour. */
+.phone-bar-item { font-weight: 600 !important; transition: background-color 160ms ease, color 160ms ease; }
+.phone-bar-on { background: color-mix(in srgb, var(--primary) 11%, transparent); }
+.phone-bar-plus > span {
+  background: linear-gradient(160deg, color-mix(in srgb, var(--primary) 78%, #fff) 0%, var(--primary) 55%);
+  box-shadow: 0 10px 22px -8px color-mix(in srgb, var(--primary) 70%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition: transform 140ms ease;
+}
+.phone-bar-plus:active > span { transform: scale(0.94); }
+.glass-bar { background: color-mix(in srgb, var(--panel) 88%, transparent); }
+/* Without blur support the bar must still be readable over the page. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass-bar, .phone-sheet, .sticky-actions { background: var(--panel) !important; }
+}
+
+@media (max-width: 1023px) {
+  /* A 16px gutter, and room for the status bar, the notch and the home indicator in the home-screen app. */
+  .content-area {
+    padding-top: calc(12px + env(safe-area-inset-top)) !important;
+    padding-left: max(16px, env(safe-area-inset-left)) !important;
+    padding-right: max(16px, env(safe-area-inset-right)) !important;
+  }
+  .focused-flow .sticky-actions { padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important; }
+
+  /* Every app page gets the soft wash at the top, not only the main pages, so sub-pages don't look flat. */
+  body:has(.content-area):not(:has(.hero-band))::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 340px;
+    background:
+      radial-gradient(120% 80% at 10% 0%, color-mix(in srgb, var(--primary) 13%, transparent) 0%, transparent 70%),
+      radial-gradient(90% 70% at 100% 0%, color-mix(in srgb, var(--primary) 7%, transparent) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: -1;
+  }
+  body:has(.content-area) { background: transparent; }
+
+  /* Header: one scrolling row of chips that runs to the screen edge, with room for their shadows. */
+  .hero-band .chip-row {
+    margin: -8px -16px !important;
+    padding: 8px 16px !important;
+    scroll-padding-inline: 16px;
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 14px, #000 calc(100% - 28px), transparent);
+    mask-image: linear-gradient(to right, transparent 0, #000 14px, #000 calc(100% - 28px), transparent);
+  }
+  /* A tight shadow and a hairline: a wide soft shadow was cut off by the scrolling row and showed as a pale strip. */
+  .hero-band .chip-row .band-chip:not(.band-chip-on), .hero-band .chip-row .band-loud { box-shadow: 0 1px 2px rgba(16, 38, 43, 0.06), 0 0 0 1px var(--border) !important; -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--panel); }
+  .hero-band .chip-row .band-chip-on { box-shadow: none !important; }
+  .hero-band .mt-4:has(> .chip-row), .hero-band .chip-row.mt-4 { margin-top: 16px !important; }
+  .hero-band .chip-row.mt-3 { margin-top: 12px !important; }
+  /* The round add button beside a page's big title. */
+  .band-action { width: 44px; padding: 0; }
+  .band-action svg { width: 22px; height: 22px; }
+
+  /* Sub-page titles (Edit booking, Add vehicle, Fleet value): large and tight, but not so big a long one wraps three times. */
+  .content-area h1.page-title, .content-area h1[class*="text-[26px]"], .content-area h1[class*="text-[28px]"], .content-area h1[class*="text-2xl"] {
+    font-size: 30px !important; line-height: 1.12 !important; letter-spacing: -0.02em;
+  }
+
+  /* Tiles: white cards with a coloured accent, so the page isn't a box of pastels. Only "late" keeps its tint. */
+  .tile-sky, .tile-plum, .tile-green, .tile-mango { background: var(--panel) !important; color: var(--foreground) !important; position: relative; }
+  .tile-sky { --tile-accent: var(--coming-back); }
+  .tile-plum { --tile-accent: var(--messages-ink); }
+  .tile-green { --tile-accent: var(--success); }
+  .tile-mango { --tile-accent: var(--going-out); }
+  .tile-sky, .tile-plum, .tile-green, .tile-mango { box-shadow: var(--shadow-card), inset 4px 0 0 var(--tile-accent) !important; }
+  .tile-sky svg, .tile-plum svg, .tile-mango svg { color: var(--tile-accent); }
+
+  /* A box inside a card: a lighter tint and a smaller radius, so cards don't read as boxes in boxes. */
+  .card :is(div, section, li, a):is([class^="bg-[var(--panel-secondary)]"], [class*=" bg-[var(--panel-secondary)]"]):not([class*="rounded-full"]):not(.pressable):not(button),
+  .card [class*="rounded"][class*="border-[var(--border)]"]:not(input):not(select):not(textarea):not(details):not(summary):not(button):not(a):not([class*="rounded-full"]) {
+    background-color: color-mix(in srgb, var(--panel-secondary) 55%, var(--panel)) !important;
+    border-radius: 16px;
+  }
+
+  /* An empty state inside a card is just the card's content, not a grey box within it. */
+  .card .empty-state { background: transparent !important; border-color: transparent !important; box-shadow: none !important; }
+
+  /* Save / Cancel bars on forms: a floating frosted bar with rounded ends, not a full-width white strip. */
+  .sticky-actions {
+    margin-left: 0 !important; margin-right: 0 !important;
+    border-radius: 26px !important;
+    padding: 8px !important;
+    background: color-mix(in srgb, var(--panel) 90%, transparent) !important;
+    -webkit-backdrop-filter: blur(22px) saturate(1.8) !important;
+    backdrop-filter: blur(22px) saturate(1.8) !important;
+    border: 1px solid color-mix(in srgb, #fff 65%, transparent) !important;
+    box-shadow: 0 18px 40px -16px rgba(16, 38, 43, 0.35), 0 0 0 0.5px rgba(16, 38, 43, 0.08) !important;
+  }
+  .focused-flow .sticky-actions { bottom: calc(10px + env(safe-area-inset-bottom)) !important; padding-bottom: 8px !important; }
+}
+
+/* Customer pages on a phone: room for the notch and the home indicator. */
+@media (max-width: 1023px) {
+  .public-shell { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); padding-bottom: calc(40px + env(safe-area-inset-bottom)); }
+  /* The language pill stays compact so the business name beside it isn't cut short. */
+  .public-shell header select { width: auto !important; max-width: 112px !important; }
+}
+/* iPhones zoom the whole page in when a box with text under 16px is tapped: boxes are 16px on phones. */
+@media (max-width: 1023px) and (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]), select, textarea { font-size: max(16px, 1em) !important; }
+}
+/* Drop-downs on phones look like the other boxes (white, our chevron), not Safari's grey button. */
+@media (max-width: 1023px) {
+  select:not([multiple]):not([size]) {
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235b6b70' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 16px 16px;
+    padding-right: 40px;
+  }
+}

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { canUseOwnDomain, canUseSubdomain, cleanDomain, cleanSubdomain, subdomainProblem } from "@/lib/booking-address";
+import { getCustomPlan } from "@/lib/custom-plan";
 import { said } from "@/lib/i18n/server-text";
 import { alertTeam } from "@/lib/support";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -21,7 +22,9 @@ async function ownerOrg() {
     .eq("id", membership.organizationId)
     .maybeSingle();
   if (!org) return { error: await said("Business not found.") } as const;
-  return { membership, org, admin } as const;
+  // An admin-set custom plan may switch the own domain on or off for this business.
+  const { custom_limits } = await getCustomPlan(org.id);
+  return { membership, org: { ...org, custom_limits }, admin } as const;
 }
 
 function refresh(slug: string) {

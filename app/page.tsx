@@ -79,8 +79,12 @@ function AgendaRow({ item, art, card = false, delay }: { item: AgendaItem; art?:
             {item.detail}
             {item.when ? <span className={item.tone === "red" ? "font-bold text-[var(--danger)]" : ""}> · {item.when}</span> : null}
           </span>
+          {/* Phones: the button sits under the words, so the title gets the whole width instead of wrapping beside it. */}
+          <span className={`mt-2 inline-flex min-h-9 items-center justify-center rounded-full px-4 text-[15px] font-bold sm:hidden ${solid ? "bg-[var(--primary)] text-white" : "border-2 border-[var(--border-strong)] bg-white text-[var(--foreground)]"}`}>
+            {item.action}
+          </span>
         </span>
-        <span className={`inline-flex min-h-9 flex-shrink-0 items-center justify-center rounded-full px-3.5 text-[14px] font-bold sm:min-h-10 sm:min-w-[104px] sm:px-4 sm:text-[15px] ${solid ? "bg-[var(--primary)] text-white" : "border-2 border-[var(--border-strong)] bg-white text-[var(--foreground)]"}`}>
+        <span className={`hidden min-h-10 min-w-[104px] flex-shrink-0 items-center justify-center rounded-full px-4 text-[15px] font-bold sm:inline-flex ${solid ? "bg-[var(--primary)] text-white" : "border-2 border-[var(--border-strong)] bg-white text-[var(--foreground)]"}`}>
           {item.action}
         </span>
       </Link>
@@ -513,8 +517,8 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   const hero = (
     <div className="flex flex-wrap items-end justify-between gap-4 lg:pb-2">
       <div className="min-w-0 flex-1">
-        <p className="font-semibold text-white/90">{headerDate}</p>
-        <h1 className="mt-0.5 text-[34px] leading-[1.05] tracking-[-0.025em] text-white lg:text-[44px]">{greeting}</h1>
+        <p className="font-semibold text-[var(--foreground-secondary)]">{headerDate}</p>
+        <h1 className="mt-0.5 text-[34px] leading-[1.05] tracking-[-0.025em] text-[var(--foreground)] lg:text-[44px]">{greeting}</h1>
         <div className="chip-row -my-1 mt-3 flex flex-wrap gap-2 py-1">
           {/* The same two numbers as the To do page, so the dashboard never tells a different story. */}
           {tasksOverdue > 0 ? pill(tasksOverdue, t("pillOverdue"), "/tasks", "var(--band-alert)") : null}

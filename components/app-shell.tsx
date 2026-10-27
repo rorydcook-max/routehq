@@ -28,6 +28,7 @@ import type { Route } from "next";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, Fragment } from "react";
 import { signOut, switchActiveOrganization, type ShellContext } from "@/app/actions/auth";
+import { adminStopViewing } from "@/app/actions/admin";
 import { Toaster } from "@/components/toast";
 import { AskBox } from "@/components/ask-box";
 import { RouteHqLogo } from "@/components/brand-logo";
@@ -323,6 +324,24 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
       </aside>
 
       <main className="content-area mx-auto lg:ml-[220px] lg:max-w-none">
+        {/* RouteHQ support's temporary access (admin console "View as this business"): the admin sees what they're in
+            and how to leave; the business's own team sees that support has access and until when. */}
+        {shell.viewing ? (
+          <div className="mb-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 rounded-xl bg-[var(--warning-light)] px-4 py-2 text-center text-[14px] font-semibold text-[var(--foreground)]" role="status">
+            <span>
+              Viewing {shell.viewing.organizationName} as RouteHQ support · ends {supportTime(shell.viewing.endsAt)}
+            </span>
+            <form action={adminStopViewing} onSubmit={forgetShellContext}>
+              <PendingButton className="font-bold text-[var(--primary)] underline" pendingLabel="Stopping…" type="submit">
+                Stop viewing
+              </PendingButton>
+            </form>
+          </div>
+        ) : shell.supportUntil ? (
+          <div className="mb-3 rounded-xl bg-[var(--info-light)] px-4 py-2 text-center text-[14px] font-semibold text-[var(--foreground)]" role="status">
+            {t("supportAccess", { time: supportTime(shell.supportUntil) })}
+          </div>
+        ) : null}
         {(() => {
           const topRow = userEmail ? (
           // Phones: logo and (for people in several businesses) the switcher.
@@ -386,24 +405,25 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
       </main>
 
       {/* Phones: a floating glass tab bar - translucent, blurred, with a hairline edge - over the page. */}
-      <nav className={`glass-bar fixed bottom-[calc(12px+env(safe-area-inset-bottom))] left-3 right-3 z-30 rounded-[28px] lg:hidden ${onFocusedFlow ? "hidden" : ""}`}>
+      <nav className={`glass-bar fixed bottom-[calc(10px+env(safe-area-inset-bottom))] left-4 right-4 z-30 rounded-[32px] lg:hidden ${onFocusedFlow ? "hidden" : ""}`}>
         {/* On phones the + lives in the menu bar: floating over the page it sat on top of the buttons at the end of each row. */}
-        <div className={`grid px-1 py-2 ${onFocusedFlow ? "grid-cols-4" : "grid-cols-5"}`}>
+        <div className={`grid gap-0.5 p-1.5 ${onFocusedFlow ? "grid-cols-4" : "grid-cols-5"}`}>
           {mobileBarItems.map((item, index) => {
             const Icon = item.icon;
             return (
               <Fragment key={item.key}>
               {index === 2 && !onFocusedFlow ? (
-                <button aria-label={t("openFastActions")} className="flex items-center justify-center" onClick={() => setFastActionOpen(true)} type="button">
+                <button aria-label={t("openFastActions")} className="phone-bar-plus flex items-center justify-center" onClick={() => setFastActionOpen(true)} type="button">
                   {/* Centred in the bar: its middle sits level with the middle of each icon-and-label pair. */}
-                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--primary)] text-white">
-                    <Plus size={26} />
+                  <span className="flex h-[52px] w-[52px] items-center justify-center rounded-full text-white">
+                    <Plus size={26} strokeWidth={2.4} />
                   </span>
                 </button>
               ) : null}
               <Link
-                className={`phone-bar-item flex min-w-0 flex-col items-center gap-1 rounded-md px-1 py-2 font-bold ${
-                  isActive(item.href) ? "text-[var(--primary)]" : "text-[var(--muted)]"
+                aria-current={isActive(item.href) ? "page" : undefined}
+                className={`phone-bar-item flex min-w-0 flex-col items-center gap-0.5 rounded-[24px] px-1 py-2 ${
+                  isActive(item.href) ? "phone-bar-on text-[var(--primary)]" : "text-[var(--foreground-secondary)]"
                 }`}
                 href={item.href}
                 key={item.key}
@@ -421,8 +441,8 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
           })}
           <button
             aria-expanded={moreOpen}
-            className={`phone-bar-item flex min-w-0 flex-col items-center gap-1 rounded-md px-1 py-2 font-bold ${
-              moreActive || moreOpen ? "text-[var(--primary)]" : "text-[var(--muted)]"
+            className={`phone-bar-item flex min-w-0 flex-col items-center gap-0.5 rounded-[24px] px-1 py-2 ${
+              moreActive || moreOpen ? "phone-bar-on text-[var(--primary)]" : "text-[var(--foreground-secondary)]"
             }`}
             onClick={() => setMoreOpen(true)}
             type="button"
@@ -440,15 +460,17 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
       </nav>
 
       {moreOpen ? (
-        <div className="fixed inset-0 z-50 flex items-end bg-[var(--foreground)]/50 lg:hidden" onClick={() => setMoreOpen(false)}>
+        <div className="sheet-scrim fixed inset-0 z-50 flex items-end lg:hidden" onClick={() => setMoreOpen(false)}>
+          {/* An iPhone-style sheet: frosted, rounded top, a grabber, and clear of the home indicator. */}
           <div
-            className="w-full rounded-t-2xl bg-white p-4 pb-8 shadow-2xl"
+            className="phone-sheet w-full px-4 pt-2"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="mb-2 flex items-center justify-between">
-              <p className="text-[18px] font-bold text-[var(--foreground)]">{t("more")}</p>
-              <button aria-label={t("close")} className="rounded-lg p-1.5 text-[var(--sidebar-text)]" onClick={() => setMoreOpen(false)} type="button">
-                <X size={20} />
+            <span aria-hidden="true" className="sheet-grabber" />
+            <div className="mb-3 flex items-center justify-between">
+              <p className="sheet-title">{t("more")}</p>
+              <button aria-label={t("close")} className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--panel-secondary)] text-[var(--foreground-secondary)]" onClick={() => setMoreOpen(false)} type="button">
+                <X size={18} strokeWidth={2.4} />
               </button>
             </div>
             <div className="max-h-[70vh] space-y-3 overflow-y-auto">
@@ -514,6 +536,15 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
       <Toaster />
     </div>
   );
+}
+
+/** "14:30" for RouteHQ support's access, in Thailand time (where RouteHQ's businesses are). */
+function supportTime(iso: string) {
+  try {
+    return new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Bangkok" }).format(new Date(iso));
+  } catch {
+    return "";
+  }
 }
 
 /** A bottom-bar label: smaller when the word is long, and two lines rather than "Входя…" in languages with longer words. */

@@ -1,4 +1,4 @@
-import { planById } from "@/lib/plans";
+import { effectiveLimits, planById } from "@/lib/plans";
 
 /**
  * A business's booking address (Rory, 11 Oct 2026):
@@ -74,10 +74,11 @@ export function isApexDomain(host: string) {
   return parts.length === 2;
 }
 
-type Plan = { subscription_tier?: string | null; subscription_status?: string | null };
+// custom_limits: an admin-set custom plan can switch the own-domain feature on or off for one business.
+type Plan = { subscription_tier?: string | null; subscription_status?: string | null; custom_limits?: unknown };
 const onTrial = (org: Plan) => String(org.subscription_status || "trial") === "trial";
 export const canUseSubdomain = (org: Plan) => onTrial(org) || planById(org.subscription_tier).whiteLabel;
-export const canUseOwnDomain = (org: Plan) => onTrial(org) || planById(org.subscription_tier).customDomain;
+export const canUseOwnDomain = (org: Plan) => onTrial(org) || effectiveLimits(org).customDomain;
 
 function appUrl() {
   return String(process.env.NEXT_PUBLIC_APP_URL || `https://${rootDomain()}`).replace(/\/$/, "");

@@ -443,12 +443,15 @@ function TaskRow({
     <div className={`card flex flex-col gap-3.5 p-4 ${recording || stacked ? "" : "lg:flex-row lg:items-center lg:gap-6"} ${stacked ? "lg:gap-3" : ""}`}>
       <div className="flex items-center gap-3.5 lg:min-w-0 lg:flex-1">
         {/* In a board column the column already says when; the title and its line are enough at a glance. */}
+        {/* Phones drop the kind picture so the title and its line get the whole width; the late/due words carry the urgency. */}
         {stacked ? (
-          <span className="flex-shrink-0 lg:hidden">
+          <span className="hidden flex-shrink-0 sm:block lg:hidden">
             <KindChip kind={jobKind(item)} />
           </span>
         ) : (
-          <KindChip kind={jobKind(item)} />
+          <span className="hidden flex-shrink-0 sm:block">
+            <KindChip kind={jobKind(item)} />
+          </span>
         )}
         <div className="min-w-0 flex-1">
           <p className={`${stacked ? "text-[19px] lg:text-[16px]" : "text-[19px]"} font-bold leading-tight text-[var(--foreground)]`}>{title}</p>

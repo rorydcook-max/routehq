@@ -22,19 +22,21 @@ export function PageBand({
 }) {
   return (
     <div>
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-3 sm:flex-wrap">
         <div className="min-w-0">
-          <h1 className="text-[32px] leading-tight text-white">{title}</h1>
-          {/* Phones keep the band short: the line under the name shows from tablet width, unless the page needs it. */}
-          {subtitle ? <p className={`mt-1 font-medium text-white/85 ${keepSubtitle ? "" : "hidden sm:block"}`}>{subtitle}</p> : null}
+          <h1 className="text-[32px] leading-tight text-[var(--foreground)]">{title}</h1>
+          {/* Phones keep the header short: the line under the name shows from tablet width, unless the page needs it. */}
+          {subtitle ? <p className={`mt-1 font-medium text-[var(--foreground-secondary)] ${keepSubtitle ? "" : "hidden sm:block"}`}>{subtitle}</p> : null}
         </div>
         {action ? (
+          // Phones: a round button beside the big title, like an iPhone app's top corner; the words show from tablet width.
           <Link
-            className={`pressable min-h-11 items-center gap-2 whitespace-nowrap rounded-full bg-[var(--band-action)] px-4 font-bold text-[var(--band-action-ink)] ${action.desktopOnly ? "hidden lg:inline-flex" : "inline-flex"}`}
+            aria-label={action.label}
+            className={`band-action pressable h-11 min-w-11 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[var(--band-action)] font-bold text-[var(--band-action-ink)] sm:px-4 ${action.desktopOnly ? "hidden lg:inline-flex" : "inline-flex"}`}
             href={action.href as Route}
           >
             {action.icon}
-            {action.label}
+            <span className="hidden sm:inline">{action.label}</span>
           </Link>
         ) : null}
       </div>
@@ -43,9 +45,9 @@ export function PageBand({
   );
 }
 
-/** A tab or filter that sits on the band: white when chosen, see-through otherwise. */
+/** A tab or filter in the header: solid in the business colour when chosen, a white pill otherwise. */
 export function bandTab(active: boolean) {
-  return `pressable inline-flex min-h-10 shrink-0 items-center whitespace-nowrap rounded-full px-4 font-bold ${active ? "band-tab-on bg-white text-[var(--foreground)]" : "bg-[var(--band-soft)] text-white"}`;
+  return `pressable inline-flex min-h-10 shrink-0 items-center whitespace-nowrap rounded-full px-4 font-bold ${active ? "band-tab-on bg-[var(--primary)] text-white" : "bg-[var(--panel)] text-[var(--foreground)] shadow-[var(--shadow-card)]"}`;
 }
 
 /**
@@ -79,7 +81,7 @@ export function BandPills({ items }: { items: Array<{ count: number; label: stri
           );
         }
         return (
-          <span className={`inline-flex items-center gap-1.5 rounded-2xl px-3 py-2 ${loud ? "band-loud bg-white text-[var(--foreground)]" : "bg-[var(--band-soft)] text-white"}`} key={item.label}>
+          <span className={`inline-flex items-center gap-1.5 rounded-2xl px-3 py-2 ${loud ? "band-loud bg-white text-[var(--foreground)]" : "band-chip"}`} key={item.label}>
             {inner}
           </span>
         );

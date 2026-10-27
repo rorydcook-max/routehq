@@ -71,6 +71,12 @@ export async function getPublicBookingDetail(token: string) {
     return { state: "not_found" as PublicBookingState };
   }
 
+  // A business RouteHQ has closed (admin console soft delete): its booking links stop working.
+  const { data: linkOrganization } = await supabase.from("organizations").select("deleted_at").eq("id", bookingLink.organization_id).maybeSingle();
+  if (!linkOrganization || linkOrganization.deleted_at) {
+    return { state: "not_found" as PublicBookingState };
+  }
+
   if (bookingLink.status === "cancelled") {
     // Enough about the business to tell the customer who to contact and where to book again.
     const { data: cancelledOrg } = await supabase.from("organizations").select("name, slug, settings").eq("id", bookingLink.organization_id).maybeSingle();

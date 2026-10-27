@@ -1,0 +1,326 @@
+/* RouteHQ's public website (home, pricing, owners). Always light: the app's Lagoon colours, set here so a visitor
+   whose phone is in dark mode still sees the site as designed. Everything else is Tailwind in the markup. */
+.site {
+  color-scheme: light;
+  --background: #eef5f4;
+  --panel: #ffffff;
+  --panel-secondary: #f3f8f7;
+  --panel-tertiary: #e3eeec;
+  --border: #dbe9e6;
+  --border-strong: #b9d4d0;
+  --foreground: #13262b;
+  --foreground-secondary: #2f4448;
+  --muted: #4b5f63;
+  --primary: #0e5e6f;
+  --primary-hover: #0a4653;
+  --primary-light: #d8eeea;
+  --accent: #f2a541;
+  --accent-light: #fdf0d8;
+  --success: #2b6b47;
+  --success-light: #ddf0e4;
+  --warning: #9a5d0c;
+  --warning-light: #fff1d6;
+  --danger: #b4472c;
+  --danger-light: #fbe6dc;
+  --coming-back: #5aa9d6;
+  --coming-back-light: #e4eff8;
+  --logo-ink: #13262b;
+  min-height: 100vh;
+  background: #ffffff;
+  color: var(--foreground);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: clip;
+}
+
+:global(html):has(.site),
+:global(body):has(.site) {
+  background: #ffffff;
+  color-scheme: light;
+}
+
+.site a:focus-visible,
+.site summary:focus-visible,
+.site select:focus-visible {
+  outline: 3px solid rgba(14, 94, 111, 0.45);
+  outline-offset: 3px;
+  border-radius: 10px;
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.lede {
+  text-wrap: pretty;
+}
+
+/* Soft light behind the hero, and a faint grid that fades out: depth without a picture. */
+.heroGlow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 55% at 72% 38%, rgba(14, 94, 111, 0.13), transparent 70%),
+    radial-gradient(40% 40% at 12% 8%, rgba(242, 165, 65, 0.1), transparent 70%),
+    linear-gradient(180deg, #f3f8f7 0%, #ffffff 78%);
+}
+.heroGrid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(14, 94, 111, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14, 94, 111, 0.06) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(70% 60% at 60% 30%, #000 20%, transparent 75%);
+  -webkit-mask-image: radial-gradient(70% 60% at 60% 30%, #000 20%, transparent 75%);
+}
+
+/* Buttons: the app's pills, a little larger on the website. */
+.btnPrimary,
+.btnSecondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 999px;
+  font-size: 16px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, transform 150ms ease;
+}
+.btnPrimary {
+  background: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 1px 2px rgba(19, 38, 43, 0.12), 0 8px 20px -8px rgba(14, 94, 111, 0.55);
+}
+.btnPrimary:hover {
+  background: var(--primary-hover);
+}
+.btnSecondary {
+  background: #ffffff;
+  color: var(--foreground);
+  border: 1.5px solid var(--border-strong);
+}
+.btnSecondary:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.btnSmall {
+  min-height: 40px;
+  padding: 0 16px;
+  font-size: 15px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .btnPrimary:active,
+  .btnSecondary:active {
+    transform: scale(0.98);
+  }
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.surface {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  box-shadow: 0 1px 2px rgba(19, 38, 43, 0.04), 0 12px 32px -16px rgba(14, 94, 111, 0.18);
+}
+
+/* "Everything else" features: one grouped list on phones, separate tiles from 640px. */
+.featList {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  box-shadow: 0 1px 2px rgba(19, 38, 43, 0.04), 0 12px 32px -16px rgba(14, 94, 111, 0.18);
+  overflow: hidden;
+}
+.featItem {
+  display: flex;
+  gap: 14px;
+  padding: 16px;
+}
+.featItem + .featItem {
+  border-top: 1px solid var(--border);
+}
+@media (min-width: 640px) {
+  .featList {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    background: none;
+    border: 0;
+    box-shadow: none;
+    overflow: visible;
+  }
+  .featItem {
+    display: block;
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    box-shadow: 0 1px 2px rgba(19, 38, 43, 0.04), 0 12px 32px -16px rgba(14, 94, 111, 0.18);
+  }
+  .featItem + .featItem {
+    border-top: 1px solid var(--border);
+  }
+}
+@media (min-width: 1024px) {
+  .featList { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 1280px) {
+  .featList { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+}
+
+.tint {
+  background: linear-gradient(180deg, #f3f8f7 0%, #eef5f4 100%);
+}
+
+.iconTile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--primary-light);
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+/* ── Device frames ──────────────────────────────────────────────────────
+   Everything inside a screen is sized in em, and each screen sets its font
+   size from its own width (container units), so a mock-up scales as one
+   picture at any size instead of reflowing. */
+.phone {
+  position: relative;
+  width: 100%;
+  max-width: 280px;
+  padding: 9px;
+  border-radius: 46px;
+  background: #13262b;
+  box-shadow:
+    inset 0 0 0 1.5px rgba(255, 255, 255, 0.08),
+    0 40px 70px -30px rgba(14, 94, 111, 0.55),
+    0 20px 40px -24px rgba(19, 38, 43, 0.5);
+}
+.phoneScreen {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 9 / 19;
+  border-radius: 38px;
+  background: #eef5f4;
+  container-type: inline-size;
+}
+.phoneNotch {
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  z-index: 3;
+  width: 32%;
+  height: 22px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: #13262b;
+}
+.phoneScale {
+  position: absolute;
+  inset: 0;
+  font-size: 4.3cqw;
+  line-height: 1.35;
+  color: #13262b;
+}
+
+.laptop {
+  position: relative;
+  width: 100%;
+}
+.laptopLid {
+  padding: 1.4% 1.4% 1.6%;
+  border-radius: 18px 18px 6px 6px;
+  background: #13262b;
+  box-shadow:
+    inset 0 0 0 1.5px rgba(255, 255, 255, 0.07),
+    0 50px 80px -40px rgba(14, 94, 111, 0.5),
+    0 24px 48px -30px rgba(19, 38, 43, 0.45);
+}
+.laptopScreen {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  border-radius: 8px;
+  background: #eef5f4;
+  container-type: inline-size;
+}
+.laptopScale {
+  position: absolute;
+  inset: 0;
+  font-size: 1.45cqw;
+  line-height: 1.35;
+  color: #13262b;
+}
+.laptopBase {
+  position: relative;
+  height: 14px;
+  margin: 0 -7%;
+  border-radius: 2px 2px 16px 16px;
+  background: linear-gradient(180deg, #e3ecea 0%, #c4d3d0 60%, #a9bbb8 100%);
+  box-shadow: 0 18px 30px -18px rgba(19, 38, 43, 0.45);
+}
+.laptopBase::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 16%;
+  height: 6px;
+  transform: translateX(-50%);
+  border-radius: 0 0 8px 8px;
+  background: #b3c4c1;
+}
+
+.floatCard {
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 1px 2px rgba(19, 38, 43, 0.06), 0 24px 48px -20px rgba(19, 38, 43, 0.35);
+}
+
+/* FAQ and small menus: native details, with a turning chevron. */
+.details summary {
+  list-style: none;
+  cursor: pointer;
+}
+.details summary::-webkit-details-marker {
+  display: none;
+}
+.details[open] .chevron {
+  transform: rotate(180deg);
+}
+.chevron {
+  transition: transform 180ms ease;
+}
+
+/* Mobile menu panel. */
+.menuPanel {
+  position: absolute;
+  inset-inline: 12px;
+  top: calc(100% + 8px);
+  border-radius: 20px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  box-shadow: 0 24px 48px -20px rgba(19, 38, 43, 0.35);
+}

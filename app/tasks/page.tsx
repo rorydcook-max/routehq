@@ -33,7 +33,7 @@ export default async function TasksPage({ searchParams }: { searchParams: Promis
       userEmail={userEmail}
       hero={
         <div>
-          <h1 className="text-[32px] leading-tight text-white">{t("title")}</h1>
+          <h1 className="text-[32px] leading-tight text-[var(--foreground)]">{t("title")}</h1>
           {/* Late work is the one to act on: white, with a brick number, when it is not zero. */}
           <div className="mt-4">
             <BandPills

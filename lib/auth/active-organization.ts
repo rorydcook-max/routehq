@@ -30,15 +30,57 @@ export function pickActiveMembership(memberships: ActiveMembership[], preferredO
   return [...active].sort((a, b) => String(a.created_at || "").localeCompare(String(b.created_at || "")))[0];
 }
 
-/** Returns the same { data, error } shape as a Supabase single-row query. */
+/**
+ * The name on the temporary membership a RouteHQ admin gets while viewing a business ("View as this business"
+ * in the admin console). Such a membership only counts while its admin_view_sessions row is live.
+ */
+export const SUPPORT_DISPLAY_NAME = "RouteHQ support";
+
+type MembershipRow = ActiveMembership & { display_name?: string | null; organizations?: { deleted_at?: string | null } | null };
+
+const isSupportMembership = (row: MembershipRow) => row.display_name === SUPPORT_DISPLAY_NAME && row.role === "manager";
+
+/**
+ * Returns the same { data, error } shape as a Supabase single-row query, plus `closed`: true when the person's
+ * only businesses have been closed (soft-deleted by RouteHQ), so the app can say so instead of offering setup.
+ *
+ * Two kinds of membership never count: one in a closed business, and a RouteHQ support membership whose viewing
+ * session has ended or run out (checked here, on every request, so an expired session can't keep access).
+ */
 export async function loadActiveMembership(supabase: any, userId: string, preferredOrganizationId?: string | null) {
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from("organization_members")
-    .select("organization_id, role, is_active, created_at")
+    .select("organization_id, role, is_active, created_at, display_name, organizations(deleted_at)")
     .eq("user_id", userId)
     .eq("is_active", true)
     .order("created_at", { ascending: true });
 
-  if (error) return { data: null as ActiveMembership | null, error };
-  return { data: pickActiveMembership((data || []) as ActiveMembership[], preferredOrganizationId), error: null };
+  if (error) {
+    // Older schema or a join problem: fall back to the plain list rather than lock everyone out.
+    ({ data, error } = await supabase
+      .from("organization_members")
+      .select("organization_id, role, is_active, created_at, display_name")
+      .eq("user_id", userId)
+      .eq("is_active", true)
+      .order("created_at", { ascending: true }));
+  }
+  if (error) return { data: null as ActiveMembership | null, error, closed: false };
+
+  const rows = (data || []) as MembershipRow[];
+  const open = rows.filter((row) => !row.organizations?.deleted_at);
+
+  let usable = open;
+  if (open.some(isSupportMembership)) {
+    const { data: sessions, error: sessionError } = await supabase
+      .from("admin_view_sessions")
+      .select("organization_id")
+      .eq("admin_user_id", userId)
+      .is("ended_at", null)
+      .gt("ends_at", new Date().toISOString());
+    const live = new Set(sessionError ? [] : ((sessions || []) as Array<{ organization_id: string }>).map((row) => row.organization_id));
+    usable = open.filter((row) => !isSupportMembership(row) || live.has(row.organization_id));
+  }
+
+  const closed = rows.length > 0 && open.length === 0;
+  return { data: pickActiveMembership(usable.map(({ organizations: _org, display_name: _name, ...rest }) => rest), preferredOrganizationId), error: null, closed };
 }

@@ -9,7 +9,8 @@ import { getCurrentUserEmail } from "@/lib/auth/session";
 import { dateFormat, numberLocale } from "@/lib/i18n/dates";
 import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization";
 import { formatPlanPrice, planCharge } from "@/lib/plan-currency";
-import { changeWaitsForRenewal, fleetMix, fleetText, planById, planForFleet, vehiclesOverLimit } from "@/lib/plans";
+import { changeWaitsForRenewal, effectiveLimits, fleetMix, fleetText, planById, planForFleet, vehiclesOverLimit } from "@/lib/plans";
+import { getCustomPlan } from "@/lib/custom-plan";
 import { promptPayQrSvg } from "@/lib/promptpay";
 import { PendingPlan } from "./pending-plan";
 import { supportContacts } from "@/lib/support";
@@ -62,7 +63,7 @@ export default async function BillingPage() {
     supabase.from("vehicles").select("category_id").eq("organization_id", baseOrganization.id).is("deleted_at", null),
     getVehicleCategories(baseOrganization.id)
   ]);
-  const [membership, locale] = await Promise.all([getCurrentMembership(), getLocale()]);
+  const [membership, locale, customPlan] = await Promise.all([getCurrentMembership(), getLocale(), getCustomPlan(baseOrganization.id)]);
   const canChange = membership?.role === "owner";
   const numbers = numberLocale(locale);
   const longDate = (value: string) => dateFormat(locale, { day: "numeric", month: "long", year: "numeric" }).format(new Date(value));
@@ -70,11 +71,13 @@ export default async function BillingPage() {
   const trialDays = daysUntil(organization?.trial_ends_at);
   const contacts = supportContacts();
   const plan = planById(organization?.subscription_tier);
+  // What this business actually gets: the plan, with any custom limits RouteHQ set for it on top.
+  const limits = effectiveLimits({ subscription_tier: organization?.subscription_tier, custom_limits: customPlan.custom_limits });
   // Free chosen during the trial: once the trial is over they are simply on Free.
   const rawStatus = String(organization?.subscription_status || "trial");
   const status = rawStatus === "trial" && plan.id === "free" && trialDays === 0 ? "active" : rawStatus;
   const fleet = fleetMix((vehicleRows || []) as Array<{ category_id: string | null }>, categories);
-  const over = vehiclesOverLimit(plan, fleet, status);
+  const over = vehiclesOverLimit(limits, fleet, status);
   const isOver = over.cars + over.motorbikes > 0;
   const suggested = planForFleet(fleet);
   const currency = String(organization?.currency || "THB");
@@ -129,8 +132,8 @@ export default async function BillingPage() {
         </div>
         <p className="mt-1 font-medium text-[var(--foreground-secondary)]">
           {say("pl_fleetNow", { fleet: fleetText(fleet, say) })}
-          {plan.cars !== null && plan.motorbikes !== null ? (
-            <span className="block text-sm">{say("pl_planCovers", { fleet: fleetText({ cars: plan.cars, motorbikes: plan.motorbikes }, say) })}</span>
+          {limits.cars !== null && limits.motorbikes !== null ? (
+            <span className="block text-sm">{say("pl_planCovers", { fleet: fleetText({ cars: limits.cars, motorbikes: limits.motorbikes }, say) })}</span>
           ) : null}
         </p>
         {status === "trial" ? (

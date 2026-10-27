@@ -25,7 +25,7 @@ export function PublicShell({
   className?: string;
 }) {
   return (
-    <main className={`min-h-screen bg-[var(--panel-secondary)] px-4 pb-10 pt-4 text-[var(--foreground)] sm:pt-6 ${className}`}>
+    <main className={`public-shell min-h-screen bg-[var(--panel-secondary)] px-4 pb-10 pt-[calc(16px+env(safe-area-inset-top))] text-[var(--foreground)] sm:pt-6 ${className}`}>
       <div className={`mx-auto w-full ${PUBLIC_WIDTH[width]}`}>
         <header className="mb-5 flex h-14 items-center justify-between gap-3">
           <div className="min-w-0 flex-1">{brand}</div>
@@ -58,5 +58,5 @@ export function PublicBrand({ name, logoUrl, detail, href }: { name: string; log
   );
 }
 
-/** The plain white card every public page uses: one look, no extra borders. */
-export const publicCard = "rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm";
+/** The plain white card every public page uses: one look, no extra borders (the same soft card as the app). */
+export const publicCard = "rounded-[24px] bg-white p-5 shadow-[var(--shadow-card)]";

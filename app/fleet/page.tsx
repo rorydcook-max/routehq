@@ -14,7 +14,8 @@ import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDashboardData, money } from "@/lib/dashboard";
 import { FleetBulkActions } from "@/app/fleet/fleet-actions";
 import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization";
-import { fleetMix, fleetText, planById, planForFleet, vehiclesOverLimit } from "@/lib/plans";
+import { effectiveLimits, fleetMix, fleetText, planForFleet, vehiclesOverLimit } from "@/lib/plans";
+import { getCustomPlan } from "@/lib/custom-plan";
 import { groupVehiclesByKind, kindLabel } from "@/lib/vehicle-groups";
 import { dateFormat } from "@/lib/i18n/dates";
 
@@ -77,7 +78,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
   const filter: FleetFilter | null = show === "out" || show === "free" || show === "attention" ? show : null;
   const userEmail = await getCurrentUserEmail();
   const organization = await getDefaultOrganization();
-  const [{ vehicles }, categories] = await Promise.all([getDashboardData(), getVehicleCategories(organization.id)]);
+  const [{ vehicles }, categories, customPlan] = await Promise.all([getDashboardData(), getVehicleCategories(organization.id), getCustomPlan(organization.id)]);
   // The counts at the top are filters: tap "4 out earning" to see just those.
   const matches = (vehicle: (typeof vehicles)[number]) =>
     filter === "out"
@@ -90,7 +91,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
   const allGroups = groupVehiclesByKind(vehicles, categories);
   const groups = filter ? groupVehiclesByKind(vehicles.filter(matches), categories) : allGroups;
   // Over the plan's vehicle limit: a nudge, never a block (Rory, 11 Oct).
-  const plan = planById(organization.subscription_tier);
+  const plan = effectiveLimits({ subscription_tier: organization.subscription_tier, custom_limits: customPlan.custom_limits });
   const fleet = fleetMix(vehicles, categories);
   const over = vehiclesOverLimit(plan, fleet, organization.subscription_status);
   const isOver = over.cars + over.motorbikes > 0;
@@ -127,20 +128,21 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
       heroOverlap
       hero={
         <div>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <h1 className="text-[32px] leading-tight text-white">{t("title")}</h1>
-            <div className="flex flex-wrap gap-2">
-              <Link className="pressable inline-flex min-h-11 items-center gap-2 rounded-full bg-[var(--band-soft)] px-4 font-bold text-white" href="/fleet/import">
+          <div className="flex items-center justify-between gap-3 sm:flex-wrap">
+            <h1 className="text-[32px] leading-tight text-[var(--foreground)]">{t("title")}</h1>
+            <div className="flex shrink-0 gap-2">
+              {/* Phones: importing is in the + sheet, so the header keeps just a round add button beside the title. */}
+              <Link className="pressable hidden min-h-11 items-center gap-2 rounded-full bg-[var(--panel)] px-4 font-bold text-[var(--foreground)] shadow-[var(--shadow-card)] sm:inline-flex" href="/fleet/import">
                 <FileSpreadsheet size={16} />
                 {t("import")}
               </Link>
-              <Link className="pressable inline-flex min-h-11 items-center gap-2 rounded-full bg-[var(--band-action)] px-4 font-bold text-[var(--band-action-ink)]" href="/fleet/new">
+              <Link aria-label={t("addVehicle")} className="band-action pressable inline-flex h-11 min-w-11 items-center justify-center gap-2 rounded-full bg-[var(--band-action)] font-bold text-[var(--band-action-ink)] sm:px-4" href="/fleet/new">
                 <Plus size={16} />
-                {t("addVehicle")}
+                <span className="hidden sm:inline">{t("addVehicle")}</span>
               </Link>
             </div>
           </div>
-          <div className="chip-row mt-4 flex flex-wrap gap-2 pb-6 lg:pb-0">
+          <div className="chip-row mt-4 flex flex-wrap gap-2">
             {(
               [
                 { key: null, count: vehicles.length, label: t("bandVehicles", { count: vehicles.length }), dot: null },
@@ -174,7 +176,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
     >
       {vehicles.length > 0 ? (
         // The row always spans the page: two tiles share it half and half, more tiles share it evenly.
-        <div className={`relative -mt-12 mb-5 grid grid-cols-2 gap-3 lg:mt-0 ${allGroups.length > 1 ? (allGroups.length === 2 ? "lg:grid-cols-4" : "lg:grid-cols-3 xl:grid-cols-5") : "lg:grid-cols-2"}`}>
+        <div className={`relative mb-5 grid grid-cols-2 gap-3 ${allGroups.length > 1 ? (allGroups.length === 2 ? "lg:grid-cols-4" : "lg:grid-cols-3 xl:grid-cols-5") : "lg:grid-cols-2"}`}>
           <Link className="card pressable tile p-4 text-[var(--foreground)]" href="/calendar">
             <TileHead title={t("busyTitle")} />
             <span className="flex items-center gap-3">
@@ -369,7 +371,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
             <ul className="divide-y divide-[var(--border)] lg:hidden">
               {group.vehicles.map((vehicle) => (
                 <li key={vehicle.id}>
-                  <Link className="flex items-center gap-3 px-3 py-3 active:bg-[var(--panel-secondary)]" href={`/fleet/${vehicle.id}`}>
+                  <Link className="flex items-center gap-3 px-4 py-3.5 active:bg-[var(--panel-secondary)]" href={`/fleet/${vehicle.id}`}>
                     <VehicleArt colour={vehicle.color} kind={group.kind} model={vehicle.model} size="sm" />
                     <div className="min-w-0 flex-1">
                       {/* Name and status share the top line, so a row is three short lines rather than five. */}

@@ -72,6 +72,65 @@ export function planById(id: string | null | undefined): Plan {
 }
 
 /**
+ * A custom plan set by a RouteHQ admin (organizations.custom_limits). Every field is optional: a field left out
+ * keeps the plan's own value. For cars, motorbikes and team, null means "no limit".
+ */
+export type CustomLimits = {
+  cars?: number | null;
+  motorbikes?: number | null;
+  team?: number | null;
+  docReads?: number;
+  lookups?: number;
+  customDomain?: boolean;
+  prioritySupport?: boolean;
+};
+
+const limitOrNull = (value: unknown): number | null | undefined => {
+  if (value === null) return null;
+  if (typeof value === "number" && Number.isFinite(value) && value >= 0) return Math.floor(value);
+  return undefined;
+};
+
+/** Reads organizations.custom_limits safely: anything malformed is ignored, so a bad value can never break a page. */
+export function parseCustomLimits(raw: unknown): CustomLimits | null {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  const source = raw as Record<string, unknown>;
+  const limits: CustomLimits = {};
+  for (const key of ["cars", "motorbikes", "team"] as const) {
+    const value = limitOrNull(source[key]);
+    if (value !== undefined) limits[key] = value;
+  }
+  for (const key of ["docReads", "lookups"] as const) {
+    const value = limitOrNull(source[key]);
+    if (typeof value === "number") limits[key] = value;
+  }
+  for (const key of ["customDomain", "prioritySupport"] as const) {
+    if (typeof source[key] === "boolean") limits[key] = source[key] as boolean;
+  }
+  return Object.keys(limits).length ? limits : null;
+}
+
+/**
+ * The limits that apply to a business: its plan's, with any admin-set custom limits on top. With no custom
+ * limits this is exactly planById(subscription_tier). Use it wherever limits are checked or shown.
+ */
+export function effectiveLimits(org: { subscription_tier?: string | null; custom_limits?: unknown } | null | undefined): Plan {
+  const plan = planById(org?.subscription_tier);
+  const custom = parseCustomLimits(org?.custom_limits);
+  if (!custom) return plan;
+  return {
+    ...plan,
+    ...(custom.cars !== undefined ? { cars: custom.cars } : {}),
+    ...(custom.motorbikes !== undefined ? { motorbikes: custom.motorbikes } : {}),
+    ...(custom.team !== undefined ? { team: custom.team } : {}),
+    ...(custom.docReads !== undefined ? { documentReads: custom.docReads } : {}),
+    ...(custom.lookups !== undefined ? { comparisonLookups: custom.lookups } : {}),
+    ...(custom.customDomain !== undefined ? { customDomain: custom.customDomain } : {}),
+    ...(custom.prioritySupport !== undefined ? { prioritySupport: custom.prioritySupport } : {})
+  };
+}
+
+/**
  * A paid-up business moving to a smaller plan (or from yearly to monthly) keeps what it paid for:
  * the change waits for the renewal date and there is nothing to pay now.
  */

@@ -99,11 +99,12 @@ export function PushToggle({ variant = "card" }: { variant?: "card" | "prompt" }
   if (variant === "prompt") {
     if (dismissed || (state !== "off" && state !== "needs-install")) return null;
     return (
-      <div className="card mb-3 flex flex-wrap items-center gap-3 !px-4 !py-3">
+      // Phones: the bell and the words on one line, the two buttons under the words; wider screens keep one row.
+      <div className="card mb-3 flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3">
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
           <Bell size={18} />
         </span>
-        <p className="min-w-[180px] flex-1 font-medium text-[var(--foreground-secondary)]">
+        <p className="min-w-0 flex-1 basis-[calc(100%-56px)] font-semibold text-[var(--foreground)] sm:basis-auto">
           {state === "needs-install" ? (
             t("pushInstall")
           ) : (
@@ -114,6 +115,7 @@ export function PushToggle({ variant = "card" }: { variant?: "card" | "prompt" }
             </>
           )}
         </p>
+        <span className="ms-[52px] flex shrink-0 items-center gap-2 sm:ms-0">
         {state === "off" ? (
           <button className="pressable inline-flex min-h-10 shrink-0 items-center rounded-full bg-[var(--primary)] px-4 font-bold text-white disabled:opacity-60" disabled={busy} onClick={turnOn} type="button">
             {t("turnOn")}
@@ -130,6 +132,7 @@ export function PushToggle({ variant = "card" }: { variant?: "card" | "prompt" }
         >
           {t("notNow")}
         </button>
+        </span>
       </div>
     );
   }

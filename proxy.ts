@@ -4,7 +4,8 @@ import type { Database } from "@/lib/supabase/database.types";
 import { ACTIVE_ORGANIZATION_COOKIE, loadActiveMembership } from "@/lib/auth/active-organization";
 import { canUseOwnDomain, canUseSubdomain, hostTarget, isBookingSitePath, rootDomain } from "@/lib/booking-address";
 
-type BookingSite = { slug: string; tier: string | null; status: string | null; has_domain: boolean };
+// custom_limits: an admin-set custom plan (returned by resolve_booking_host_v2, migration 0108).
+type BookingSite = { slug: string; tier: string | null; status: string | null; has_domain: boolean; custom_limits: unknown };
 // Which business an address belongs to, remembered for a minute so each page view doesn't ask the database.
 const siteCache = new Map<string, { site: BookingSite | null; at: number }>();
 
@@ -13,14 +14,14 @@ async function resolveBookingSite(target: { label: string } | { host: string }, 
   const cached = siteCache.get(cacheKey);
   if (cached && Date.now() - cached.at < 60_000) return cached.site;
   try {
-    const response = await fetch(`${url}/rest/v1/rpc/resolve_booking_host`, {
+    const response = await fetch(`${url}/rest/v1/rpc/resolve_booking_host_v2`, {
       method: "POST",
       headers: { apikey: key, authorization: `Bearer ${key}`, "content-type": "application/json" },
       body: JSON.stringify({ p_label: "label" in target ? target.label : null, p_host: "host" in target ? target.host : null })
     });
     const rows = response.ok ? await response.json() : [];
     const row = Array.isArray(rows) ? rows[0] : null;
-    const site: BookingSite | null = row?.slug ? { slug: row.slug, tier: row.tier, status: row.status, has_domain: Boolean(row.has_domain) } : null;
+    const site: BookingSite | null = row?.slug ? { slug: row.slug, tier: row.tier, status: row.status, has_domain: Boolean(row.has_domain), custom_limits: row.custom_limits ?? null } : null;
     siteCache.set(cacheKey, { site, at: Date.now() });
     return site;
   } catch {
@@ -30,7 +31,19 @@ async function resolveBookingSite(target: { label: string } | { host: string }, 
 
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+  // RouteHQ's own website: the home page (what a signed-out visitor sees at "/", rewritten below), plans, and the page
+  // for vehicle owners. Marked so the root layout sends them no staff-app words.
+  const isSitePage = pathname === "/home" || pathname === "/pricing" || pathname === "/owners";
+  if (isSitePage) request.headers.set("x-routehq-site-page", "1");
+  /** "/" for someone not signed in: the website's home page, at the same address (a rewrite, not a redirect). */
+  const siteHome = () => {
+    const url = request.nextUrl.clone();
+    url.pathname = "/home";
+    request.headers.set("x-routehq-site-page", "1");
+    return NextResponse.rewrite(url, { request });
+  };
   const isPublicRoute =
+    isSitePage ||
     pathname === "/login" ||
     pathname === "/signup" ||
     pathname === "/onboarding" ||
@@ -62,7 +75,8 @@ export async function proxy(request: NextRequest) {
     if (pageLang && /^[a-z]{2}(-[A-Za-z]{2,4})?$/.test(pageLang)) request.headers.set("x-routehq-page-lang", pageLang);
   }
   // During first-time setup the wizard sends people to the normal Add vehicle and import screens; everything else waits until setup is finished.
-  const isOnboardingAllowedRoute = isPublicRoute || pathname.startsWith("/api/") || pathname.startsWith("/fleet/import") || pathname === "/fleet/new" || pathname === "/help" || pathname.startsWith("/help/");
+  // "This business was closed" is shown to members of a business RouteHQ closed, so it needs no working business.
+  const isOnboardingAllowedRoute = isPublicRoute || pathname === "/business-closed" || pathname.startsWith("/api/") || pathname.startsWith("/fleet/import") || pathname === "/fleet/new" || pathname === "/help" || pathname.startsWith("/help/");
   const isSubscriptionAllowedRoute =
     isOnboardingAllowedRoute ||
     pathname === "/settings" ||
@@ -86,7 +100,7 @@ export async function proxy(request: NextRequest) {
       const away = toApp();
       if (away) return away;
     } else {
-      const plan = { subscription_tier: site.tier, subscription_status: site.status };
+      const plan = { subscription_tier: site.tier, subscription_status: site.status, custom_limits: site.custom_limits };
       const allowed = "label" in target ? canUseSubdomain(plan) : site.has_domain && canUseOwnDomain(plan);
       // On a plan without the address, the page still works at its RouteHQ address.
       if (!allowed) {
@@ -106,6 +120,7 @@ export async function proxy(request: NextRequest) {
   }
 
   if (!supabaseUrl || !supabaseAnonKey) {
+    if (pathname === "/") return siteHome();
     if (isPublicRoute) {
       return NextResponse.next({ request });
     }
@@ -139,6 +154,14 @@ export async function proxy(request: NextRequest) {
     data: { user }
   } = await supabase.auth.getUser();
 
+  // Signed out at "/": the website. Signed in: the dashboard, as always.
+  if (!user && pathname === "/") {
+    const rewrite = siteHome();
+    // Keep any session cookie the check above refreshed or cleared.
+    response.cookies.getAll().forEach((cookie) => rewrite.cookies.set(cookie));
+    return rewrite;
+  }
+
   if (!user && !isPublicRoute) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/login";
@@ -162,11 +185,19 @@ export async function proxy(request: NextRequest) {
   }
 
   if (user && !isOnboardingAllowedRoute) {
-    const { data: membership } = await loadActiveMembership(
+    const { data: membership, closed } = await loadActiveMembership(
       supabase,
       user.id,
       request.cookies.get(ACTIVE_ORGANIZATION_COOKIE)?.value || null
     );
+
+    // Their only business was closed by RouteHQ: say so plainly rather than offering to set up a new one.
+    if (!membership?.organization_id && closed) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/business-closed";
+      redirectUrl.search = "";
+      return NextResponse.redirect(redirectUrl);
+    }
 
     // A signed-in user with no organisation has nothing behind the dashboard:
     // send them to set one up rather than letting pages fall back to a default.

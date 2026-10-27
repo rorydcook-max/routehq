@@ -133,8 +133,23 @@ export const ACTION_LABEL: Record<string, string> = {
   trial_extended: "Trial extended",
   founding_on: "Founding price turned on",
   founding_off: "Founding price turned off",
-  plan_activated: "Plan request activated"
+  plan_activated: "Plan request activated",
+  password_reset_sent: "Password reset emailed",
+  password_reset_link: "Password reset link given to admin",
+  email_changed: "Email address changed",
+  member_removed: "Removed from business",
+  custom_plan_set: "Custom plan saved",
+  custom_plan_cleared: "Custom plan cleared",
+  view_started: "RouteHQ support started viewing",
+  view_ended: "RouteHQ support stopped viewing",
+  view_expired: "RouteHQ support access ran out",
+  business_deleted: "Business closed",
+  business_restored: "Business restored",
+  business_purged: "Business deleted permanently"
 };
+
+/** Days a closed (soft-deleted) business waits before it can be deleted for good. */
+export const PURGE_AFTER_DAYS = 30;
 
 export function adminDate(iso: string | null | undefined, withTime = false) {
   if (!iso) return "—";

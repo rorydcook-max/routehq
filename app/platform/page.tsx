@@ -14,10 +14,11 @@ export const dynamic = "force-dynamic";
 export default async function AdminOverviewPage() {
   await requirePlatformAdmin();
   const db = createSupabaseAdminClient() as any;
-  const [userEmail, businesses, { data: log }] = await Promise.all([
+  const [userEmail, businesses, { data: log }, { count: catalogWaiting }] = await Promise.all([
     getCurrentUserEmail(),
     listBusinesses(),
-    db.from("admin_audit_log").select("id, action, organization_id, details, created_at").order("created_at", { ascending: false }).limit(8)
+    db.from("admin_audit_log").select("id, action, organization_id, details, created_at").order("created_at", { ascending: false }).limit(8),
+    db.from("vehicle_catalog_submissions").select("id", { count: "exact", head: true }).eq("status", "pending_review")
   ]);
   const live = businesses.filter((b) => !b.deletedAt);
   const count = (fn: (b: (typeof live)[number]) => boolean) => live.filter(fn).length;
@@ -36,25 +37,37 @@ export default async function AdminOverviewPage() {
     }, 0);
   const names = new Map(businesses.map((b) => [b.id, b.name]));
 
-  const stats: Array<[string, string, string?]> = [
+  const stats: Array<[string, string, string?, string?]> = [
     ["Businesses", String(live.length), `${count((b) => Date.parse(b.createdAt || "") >= weekAgo)} new this week · ${count((b) => Date.parse(b.createdAt || "") >= monthAgo)} in 30 days`],
     ["On a free trial", String(count((b) => b.status === "trial")), `${endingSoon.length} ending in 7 days`],
     ["Paying", String(count((b) => b.status === "active")), `${count((b) => b.status === "past_due")} payment late`],
-    ["Monthly revenue", formatPlanPrice(Math.round(mrr), "THB", "en-GB"), "List prices, founding discount applied"]
+    ["Monthly revenue", formatPlanPrice(Math.round(mrr), "THB", "en-GB"), "List prices, founding discount applied"],
+    ["Catalogue suggestions waiting", String(catalogWaiting || 0), "New makes and models from operators", "/platform/catalog"]
   ];
 
   return (
     <AppShell userEmail={userEmail}>
       <AdminHeader active="/platform" subtitle="Every business on RouteHQ, their plans and trials. Only RouteHQ admins can see this." title="Overview" />
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {stats.map(([label, value, note]) => (
-          <div className="card p-5" key={label}>
-            <p className="text-[14px] font-semibold text-[var(--muted)]">{label}</p>
-            <p className="num mt-1 text-[30px] leading-tight text-[var(--foreground)]">{value}</p>
-            {note ? <p className="mt-1 text-[13px] font-medium text-[var(--foreground-secondary)]">{note}</p> : null}
-          </div>
-        ))}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+        {stats.map(([label, value, note, href]) => {
+          const body = (
+            <>
+              <p className="text-[14px] font-semibold text-[var(--muted)]">{label}</p>
+              <p className="num mt-1 text-[30px] leading-tight text-[var(--foreground)]">{value}</p>
+              {note ? <p className="mt-1 text-[13px] font-medium text-[var(--foreground-secondary)]">{note}</p> : null}
+            </>
+          );
+          return href ? (
+            <Link className="card pressable block p-5 hover:shadow-[0_0_0_2px_var(--primary)]" href={href as Route} key={label}>
+              {body}
+            </Link>
+          ) : (
+            <div className="card p-5" key={label}>
+              {body}
+            </div>
+          );
+        })}
       </div>
 
       <div className="mt-5 grid gap-5 lg:grid-cols-2">

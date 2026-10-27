@@ -118,7 +118,8 @@ export function SignatureUploadSection({
 
   const content = (
     <>
-      <div className="flex items-center gap-3">
+      {/* Phones: the title and its line first, the signature under them, so the words aren't squeezed into a narrow column. */}
+      <div className="flex flex-col-reverse items-start gap-3 sm:flex-row sm:items-center">
         {preview}
         <div className="min-w-0">
           <h2 className="card-title">{say("sg_title")}</h2>

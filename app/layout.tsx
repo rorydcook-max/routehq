@@ -21,11 +21,20 @@ async function isCustomerPage() {
   }
 }
 
+/** RouteHQ's website pages (proxy.ts marks them). */
+async function isSitePage() {
+  try {
+    return Boolean((await headers()).get("x-routehq-site-page"));
+  } catch {
+    return false;
+  }
+}
+
 /** The signed-in operator's brand (logo, name, colour), so pages open in it rather than switching after load. */
 async function operatorBrand() {
   try {
-    // Customer pages carry the business's own brand, and the directory is RouteHQ's: neither takes the signed-in operator's colour.
-    if ((await headers()).get("x-routehq-customer-page")) return null;
+    // Customer pages carry the business's own brand, and the directory and website are RouteHQ's: none takes the signed-in operator's colour.
+    if ((await headers()).get("x-routehq-customer-page") || (await headers()).get("x-routehq-site-page")) return null;
     const membership = await getCurrentMembership();
     if (!membership) return null;
     return await shellBrand((await createSupabaseServerClient()) as any, membership.organizationId);
@@ -58,8 +67,12 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
+  // Edge to edge on iPhones, so env(safe-area-inset-*) is real: the floating tab bar clears the home indicator
+  // and the page pads itself away from the status bar and the notch (see "Phone pass" in globals.css).
+  viewportFit: "cover",
+  // The page header is light now (Oct 27), so the browser's top bar matches the page, not the old teal band.
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#0e5e6f" },
+    { media: "(prefers-color-scheme: light)", color: "#eef5f4" },
     { media: "(prefers-color-scheme: dark)", color: "#123f46" }
   ]
 };
@@ -79,7 +92,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [locale, brand, customerPage, theme] = await Promise.all([getLocale(), operatorBrand(), isCustomerPage(), themeChoice()]);
+  const [locale, brand, customerPage, theme, sitePage] = await Promise.all([getLocale(), operatorBrand(), isCustomerPage(), themeChoice(), isSitePage()]);
   const page = <ShellBrandProvider brand={brand}>{children}</ShellBrandProvider>;
   return (
     // "System" is resolved in the browser before the first paint, so the attribute can differ from the server's: expected.
@@ -91,7 +104,14 @@ export default async function RootLayout({
         <BrandStyle colour={brand?.colour || null} />
         {/* Customer pages get only their few words with the page. The staff app loads its words once as a
             cached file (StaffMessages), so they are not re-sent with every save. */}
-        {customerPage ? <NextIntlClientProvider>{page}</NextIntlClientProvider> : <StaffMessages locale={locale}>{page}</StaffMessages>}
+        {/* The website (home, pricing, owners) is drawn on the server: its few client parts need the language, not the words. */}
+        {customerPage ? (
+          <NextIntlClientProvider>{page}</NextIntlClientProvider>
+        ) : sitePage ? (
+          <NextIntlClientProvider messages={{}}>{page}</NextIntlClientProvider>
+        ) : (
+          <StaffMessages locale={locale}>{page}</StaffMessages>
+        )}
         <ImageShrinker />
         <FlagFont />
       </body>

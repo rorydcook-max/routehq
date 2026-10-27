@@ -41,7 +41,7 @@ export function FastActionSheet({ open, onClose }: { open: boolean; onClose: () 
     const Icon = action.icon;
     return (
       <Link
-        className="action-tile flex items-center gap-3 p-3 text-left transition hover:border-[var(--primary)] hover:bg-[var(--primary-light)]"
+        className="sheet-row flex min-h-[60px] items-center gap-3 px-3.5 py-2.5 text-left transition hover:bg-[var(--primary-light)]"
         href={action.href}
         key={action.key}
         onClick={onClose}
@@ -59,25 +59,26 @@ export function FastActionSheet({ open, onClose }: { open: boolean; onClose: () 
 
   return (
     // Phones: slides up from the bottom, by the thumb. Computers: a box in the middle of the screen.
-    <div className="fixed inset-0 z-50 flex items-end bg-[var(--foreground)]/40 lg:items-center lg:justify-center" onClick={onClose}>
+    <div className="sheet-scrim fixed inset-0 z-50 flex items-end bg-[var(--foreground)]/40 lg:items-center lg:justify-center" onClick={onClose}>
+      {/* Phones: an iPhone-style sheet (frosted, rounded top, grabber). Computers: a box in the middle. */}
       <div
         aria-label={t("quickTitle")}
         aria-modal="true"
-        className="surface-panel max-h-[85vh] w-full overflow-y-auto rounded-t-3xl p-4 pb-6 shadow-xl lg:w-[440px] lg:rounded-2xl lg:pb-4"
+        className="surface-panel phone-sheet max-h-[85vh] w-full overflow-y-auto rounded-t-3xl p-4 pb-6 shadow-xl lg:w-[440px] lg:rounded-2xl lg:pb-4"
         onClick={(event) => event.stopPropagation()}
         role="dialog"
       >
+        <span aria-hidden="true" className="sheet-grabber lg:hidden" />
         <div className="mb-3 flex items-center justify-between gap-3">
-          <h2 className="text-lg font-semibold tracking-[-0.02em] text-[var(--foreground)]">{t("quickTitle")}</h2>
-          <button aria-label={t("close")} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--border)] bg-white text-[var(--foreground-secondary)]" onClick={onClose} type="button">
-            <X size={18} />
+          <h2 className="sheet-title">{t("quickTitle")}</h2>
+          <button aria-label={t("close")} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--panel-secondary)] text-[var(--foreground-secondary)]" onClick={onClose} type="button">
+            <X size={18} strokeWidth={2.4} />
           </button>
         </div>
-        <div className="grid gap-2">
-          {everyday.map(row)}
-          <p className="mt-2 px-1 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{t("quickLessOften")}</p>
-          {lessOften.map(row)}
-        </div>
+        {/* Two groups, each one rounded list like an iPhone settings group. */}
+        <div className="sheet-group grid">{everyday.map(row)}</div>
+        <p className="mb-1.5 mt-4 px-1 font-semibold text-[var(--muted)]">{t("quickLessOften")}</p>
+        <div className="sheet-group grid">{lessOften.map(row)}</div>
       </div>
     </div>
   );

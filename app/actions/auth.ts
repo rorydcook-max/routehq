@@ -83,6 +83,10 @@ export type ShellContext = {
   displayName?: string | null;
   /** A RouteHQ platform admin: the side menu shows the admin console link. Display only; every admin page checks again. */
   platformAdmin?: boolean;
+  /** The admin is viewing this business as RouteHQ support (admin console "View as"): the banner with Stop viewing. */
+  viewing?: { organizationName: string; endsAt: string } | null;
+  /** Someone from RouteHQ support has temporary access to this business until then: the notice their team sees. */
+  supportUntil?: string | null;
 };
 
 export type { ShellBrand } from "@/lib/shell-brand";
@@ -108,7 +112,7 @@ export async function getShellContext(): Promise<ShellContext> {
   const [{ data }, { count }, dueTasks, { count: toSend }, brand, { count: helpReplies }] = await Promise.all([
     supabase
       .from("organization_members")
-      .select("organization_id, organizations(name)")
+      .select("organization_id, organizations(name, deleted_at)")
       .eq("user_id", membership.userId)
       .eq("is_active", true)
       .order("created_at", { ascending: true }),
@@ -138,12 +142,63 @@ export async function getShellContext(): Promise<ShellContext> {
     supabase.from("platform_admins").select("user_id").eq("user_id", membership.userId).maybeSingle()
   ]);
 
-  const organizations = ((data || []) as any[]).map((row) => ({
-    id: row.organization_id as string,
-    name: String(row.organizations?.name || "Business"),
-    active: row.organization_id === membership.organizationId
-  }));
-  return { role: membership.role, organizations, unreadChats: (count || 0) + (toSend || 0), dueTasks, helpReplies: helpReplies || 0, brand, displayName: (me?.full_name as string | null)?.trim() || null, platformAdmin: !!adminRow };
+  // A business RouteHQ has closed is not offered in the switcher.
+  const organizations = ((data || []) as any[])
+    .filter((row) => !row.organizations?.deleted_at)
+    .map((row) => ({
+      id: row.organization_id as string,
+      name: String(row.organizations?.name || "Business"),
+      active: row.organization_id === membership.organizationId
+    }));
+  const support = await supportViewState(supabase, membership.userId, membership.organizationId, organizations);
+  return {
+    role: membership.role,
+    organizations,
+    unreadChats: (count || 0) + (toSend || 0),
+    dueTasks,
+    helpReplies: helpReplies || 0,
+    brand,
+    displayName: (me?.full_name as string | null)?.trim() || null,
+    platformAdmin: !!adminRow,
+    ...support
+  };
+}
+
+/**
+ * RouteHQ support's temporary access ("View as this business", migration 0108). The admin doing it gets their
+ * banner; the business's own team gets "RouteHQ support has access until 14:30". Sessions that have run out are
+ * closed here (membership removed, logged); access itself is already refused on every request by
+ * lib/auth/active-organization.ts. Never throws: before the migration there is simply nothing to show.
+ */
+async function supportViewState(
+  supabase: any,
+  userId: string,
+  organizationId: string,
+  organizations: { id: string; name: string }[]
+): Promise<{ viewing: ShellContext["viewing"]; supportUntil: string | null }> {
+  try {
+    const { data, error } = await supabase
+      .from("admin_view_sessions")
+      .select("id, admin_user_id, organization_id, started_at, ends_at, ended_at, return_organization_id, previous_membership")
+      .is("ended_at", null)
+      .or(`admin_user_id.eq.${userId},organization_id.eq.${organizationId}`);
+    if (error || !data?.length) return { viewing: null, supportUntil: null };
+    const now = Date.now();
+    const sessions = data as Array<{ admin_user_id: string; organization_id: string; ends_at: string }>;
+    if (sessions.some((session) => Date.parse(session.ends_at) <= now)) {
+      const { endExpiredViewSessions } = await import("@/lib/admin-view");
+      await endExpiredViewSessions(data);
+    }
+    const live = sessions.filter((session) => Date.parse(session.ends_at) > now && session.organization_id === organizationId);
+    const mine = live.find((session) => session.admin_user_id === userId);
+    if (mine) {
+      return { viewing: { organizationName: organizations.find((org) => org.id === organizationId)?.name || "this business", endsAt: mine.ends_at }, supportUntil: null };
+    }
+    const until = live.map((session) => session.ends_at).sort().pop() || null;
+    return { viewing: null, supportUntil: until };
+  } catch {
+    return { viewing: null, supportUntil: null };
+  }
 }
 
 /** Switch the business this person is working in. Only businesses they actively belong to are accepted. */
@@ -162,8 +217,12 @@ export async function switchActiveOrganization(formData: FormData) {
     .eq("organization_id", organizationId)
     .eq("is_active", true)
     .maybeSingle();
+  // A business RouteHQ has closed can't be switched to.
+  const { data: target } = membership?.organization_id
+    ? await supabase.from("organizations").select("deleted_at").eq("id", membership.organization_id).maybeSingle()
+    : { data: null };
 
-  if (membership?.organization_id) {
+  if (membership?.organization_id && target && !target.deleted_at) {
     const cookieStore = await cookies();
     cookieStore.set(ACTIVE_ORGANIZATION_COOKIE, membership.organization_id, {
       httpOnly: true,

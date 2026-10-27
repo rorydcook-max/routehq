@@ -22,6 +22,11 @@ export default async function AdminLogPage() {
     const d = row.details || {};
     if (row.action === "plan_changed" && d.from && d.to) return `${d.from.tier}/${d.from.status} → ${d.to.tier}/${d.to.status}${d.to.interval !== d.from.interval ? ` (${d.to.interval})` : ""}`;
     if (row.action === "trial_extended") return `to ${adminDate(d.to)}`;
+    if (row.action === "email_changed") return `${d.from || "—"} → ${d.to || "—"}`;
+    if (row.action === "password_reset_sent" || row.action === "password_reset_link" || row.action === "member_removed") return String(d.email || d.role || "");
+    if (row.action === "view_started") return `Reason: ${d.reason || "—"} · until ${adminDate(d.ends_at, true)}`;
+    if (row.action === "custom_plan_set" && d.to) return `${d.to.price !== null && d.to.price !== undefined ? `price ${d.to.price} · ` : ""}${d.to.limits ? Object.entries(d.to.limits).map(([key, value]) => `${key} ${value === null ? "no limit" : value}`).join(", ") : "plan limits"}`;
+    if (row.action === "business_purged" || row.action === "business_deleted") return String(d.name || "");
     return "";
   };
 

@@ -5,7 +5,8 @@ import { alertSettings } from "@/lib/alerts";
 import { isTelegramConfigured } from "@/lib/telegram";
 import { CalendarFeedCard, EmailAlertsCard, IntegrationCard, TelegramCard } from "@/app/settings/integrations-panel";
 import { SwitchField } from "@/components/switch-field";
-import { fleetMix, fleetText, planById } from "@/lib/plans";
+import { effectiveLimits, fleetMix, fleetText, planById } from "@/lib/plans";
+import { getCustomPlan } from "@/lib/custom-plan";
 import { SettingsTabs } from "@/app/settings/settings-tabs";
 import { isEmailConfigured } from "@/lib/email";
 import type { Route } from "next";
@@ -184,7 +185,9 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     .maybeSingle();
   const isPlatformAdmin = Boolean(platformAdmin);
   const { data: addressRow } = await supabase.from("organizations").select("booking_subdomain, custom_domain, custom_domain_status, trial_ends_at").eq("id", organization.id).maybeSingle();
-  const addressOrg = { ...(organization as any), ...(addressRow || {}) };
+  // Custom limits a RouteHQ admin set for this business (none: the plan's own), read separately so a missing column can't break the page.
+  const customPlan = await getCustomPlan(organization.id);
+  const addressOrg = { ...(organization as any), ...(addressRow || {}), custom_limits: customPlan.custom_limits };
 
   const [
     { data: members },
@@ -315,7 +318,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     travelPolicySettings.island_travel_policy === "not_permitted" ? say("travel_not_permitted") : travelPolicySettings.island_travel_policy === "notice_only" ? say("travel_notice_only") : say("travel_deposit")
   }`;
   // Plan and tools tab: the plan at a glance (the full page is Settings › Plan and subscription).
-  const currentPlan = planById(organization.subscription_tier);
+  const currentPlan = effectiveLimits({ subscription_tier: organization.subscription_tier, custom_limits: customPlan.custom_limits });
   const planStatus = String(organization.subscription_status || "trial");
   const trialEndsAt = addressOrg.trial_ends_at as string | null | undefined;
   const trialDaysLeft = trialEndsAt ? Math.max(0, Math.ceil((new Date(trialEndsAt).getTime() - Date.now()) / (24 * 60 * 60 * 1000))) : null;
@@ -781,7 +784,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               {[
                 { label: say("use_cars"), used: fleetNow.cars, limit: currentPlan.cars },
                 { label: say("use_motorbikes"), used: fleetNow.motorbikes, limit: currentPlan.motorbikes },
-                { label: say("use_team"), used: (members || []).filter((member: any) => member.is_active).length, limit: currentPlan.team }
+                // RouteHQ support's temporary access (admin "view as") is not one of their seats.
+                { label: say("use_team"), used: (members || []).filter((member: any) => member.is_active && member.display_name !== "RouteHQ support").length, limit: currentPlan.team }
               ].map((meter) => {
                 const pct = meter.limit ? Math.min(100, Math.round((meter.used / meter.limit) * 100)) : 0;
                 const over = meter.limit !== null && meter.used > meter.limit;

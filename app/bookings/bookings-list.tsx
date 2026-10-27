@@ -357,8 +357,9 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
             <article className={`card relative !overflow-visible p-4 transition has-[details[open]]:z-30 ${statusCardClasses(booking)}`} key={booking.id}>
               {/* overflow-visible: the ⋯ menu opens past the card's edge (it was cut off at Edit); an open menu sits above the next card. */}
               {/* The vehicle's picture beside the details: its photo, or a drawing in its own colour (Lagoon look). Small on phones so the words keep their room. */}
-              <div className="grid grid-cols-[56px_minmax(0,1fr)] gap-3 md:grid-cols-[104px_minmax(0,1fr)_auto] md:items-center">
-                <Link aria-label={tx.say("photoAlt", { vehicle: vehicleTitle(booking.vehicles) || tx.say("vehicle") })} className="relative z-10 mt-1 self-start md:mt-0 md:self-center" href={`/bookings/${booking.id}`}>
+              {/* Phones drop the picture so the customer, vehicle and dates get the whole width (as on the dashboard's Today list). */}
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-[56px_minmax(0,1fr)] md:grid-cols-[104px_minmax(0,1fr)_auto] md:items-center">
+                <Link aria-label={tx.say("photoAlt", { vehicle: vehicleTitle(booking.vehicles) || tx.say("vehicle") })} className="relative z-10 mt-1 hidden self-start sm:block md:mt-0 md:self-center" href={`/bookings/${booking.id}`}>
                   <span className="block md:hidden"><VehicleArt colour={(booking.vehicles as any)?.color} kind={kindFromCategory((booking.vehicles as any)?.vehicle_categories)} model={booking.vehicles?.model} photoUrl={photoUrl} size="sm" /></span>
                   <span className="hidden md:block"><VehicleArt colour={(booking.vehicles as any)?.color} kind={kindFromCategory((booking.vehicles as any)?.vehicle_categories)} model={booking.vehicles?.model} photoUrl={photoUrl} size="md" /></span>
                 </Link>
@@ -485,9 +486,9 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
 
                 {/* Money only when there is something to say: what is due now in brick, otherwise what has been paid. */}
                 {Number(booking.balance_due) > 0 ? (
-                  <p className="col-start-2 text-[17px] font-bold tabular-nums text-[var(--danger)] md:col-start-auto md:text-right">{tx.say("dueNow", { amount: money(booking.balance_due, booking.currency) })}</p>
+                  <p className="sm:col-start-2 text-[17px] font-bold tabular-nums text-[var(--danger)] md:col-start-auto md:text-right">{tx.say("dueNow", { amount: money(booking.balance_due, booking.currency) })}</p>
                 ) : Number(booking.total_paid) > 0 ? (
-                  <p className="col-start-2 font-bold tabular-nums text-[var(--success)] md:col-start-auto md:text-right">{tx.say("paid")} {money(booking.total_paid, booking.currency)}</p>
+                  <p className="sm:col-start-2 font-bold tabular-nums text-[var(--success)] md:col-start-auto md:text-right">{tx.say("paid")} {money(booking.total_paid, booking.currency)}</p>
                 ) : null}
               </div>
               {confirmDeleteId === booking.id ? (

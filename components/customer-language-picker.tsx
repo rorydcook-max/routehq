@@ -13,11 +13,12 @@ export function CustomerLanguagePicker({ className = "" }: { className?: string 
   const locale = useLocale();
   const t = useTranslations("customer");
   return (
-    <label className={`inline-flex min-h-10 items-center gap-1.5 rounded-full border border-[var(--border)] bg-white ps-3 pe-1 text-[13px] font-semibold text-[var(--foreground-secondary)] ${className}`}>
-      <Globe aria-hidden="true" className="shrink-0 text-[var(--primary)]" size={15} />
+    // Phones: a compact pill (16px text, so iPhones don't zoom in when it's tapped) that leaves the business name room.
+    <label className={`inline-flex min-h-10 items-center gap-1.5 rounded-full bg-white ps-3 pe-1 text-[14px] font-semibold text-[var(--foreground-secondary)] shadow-[var(--shadow-card)] ${className}`}>
+      <Globe aria-hidden="true" className="shrink-0 text-[var(--primary)]" size={16} />
       <select
         aria-label={t("language")}
-        className="!h-auto !w-auto max-w-[170px] cursor-pointer truncate !border-0 !bg-transparent !py-1.5 !pl-0 !pr-6 !text-[13px] font-semibold text-[var(--foreground-secondary)] !shadow-none outline-none"
+        className="!h-auto !w-auto max-w-[118px] cursor-pointer truncate !border-0 !bg-transparent !py-1.5 !pl-0 !pr-6 !text-[16px] font-semibold text-[var(--foreground-secondary)] !shadow-none outline-none sm:max-w-[170px] sm:!text-[14px]"
         onChange={(event) => {
           // A year: the next link this customer opens is in their language too.
           document.cookie = `${CUSTOMER_LOCALE_COOKIE}=${event.target.value}; path=/; max-age=31536000; samesite=lax`;

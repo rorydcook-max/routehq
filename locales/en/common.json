@@ -3845,7 +3845,7 @@
     "bl_trialLeft": "{days, plural, =0 {Your trial ends today} one {# day left in your trial} other {# days left in your trial}}",
     "bl_trialNoDate": "Trial end date not set",
     "bl_howTitle": "How to subscribe",
-    "bl_howBody": "For now we set subscriptions up personally: pay by bank transfer or PromptPay, send us the confirmation, and we switch your plan on, usually the same day. Card payments are coming soon.",
+    "bl_howBody": "Choose a plan above and pay by PromptPay or bank transfer; we switch it on as soon as the payment arrives, usually the same day. Card payments are coming soon.",
     "bl_line": "Message us on LINE",
     "bl_whatsapp": "WhatsApp",
     "bl_email": "Email",
@@ -4091,7 +4091,31 @@
     "pb_embedTitle": "Booking box for your own website",
     "pb_embedBody": "Paste this where you want bookings on your website. Customers pick a car and dates there, then finish their booking here. Bookings show as \"Booked on your website\".",
     "pb_embedCopy": "Copy code",
-    "inc_directory": "Listed on the RouteHQ rental directory"
+    "inc_directory": "Listed on the RouteHQ rental directory",
+    "pl_chooseBtn": "Choose {plan}",
+    "pl_switchFree": "Switch to Free",
+    "pl_saving": "Saving…",
+    "pl_tryAgain": "Something went wrong. Please try again.",
+    "pl_ownerOnly": "Only the business owner can change the plan.",
+    "pl_pendingBadge": "Waiting for payment",
+    "pl_afterTrial": "After your trial: {plan}",
+    "pl_paidUntil": "Paid {interval} · next payment {date}",
+    "pl_intervalMonthly": "monthly",
+    "pl_intervalYearly": "yearly",
+    "pl_pendingTitle": "Pay to switch your plan on",
+    "pl_pendingWhat": "{plan}, paid {interval}: {amount}",
+    "pl_renewalTitle": "Your plan changes at renewal",
+    "pl_renewalBody": "You keep your current plan until {date}, then move to the new one. Nothing to pay now.",
+    "pl_foundingApplied": "Founding offer: half price (normally {amount})",
+    "pl_payPromptPay": "Scan with any Thai banking app to pay {amount}.",
+    "pl_payBank": "Transfer {amount} to:",
+    "pl_payBankOr": "Or transfer to:",
+    "pl_payOther": "We'll reply in Help with how to pay {amount}, usually the same day.",
+    "pl_payAfter": "Then send us the slip. We switch your plan on as soon as the payment arrives, usually the same day.",
+    "pl_paySlip": "Send the payment slip",
+    "pl_cancelRequest": "Cancel this change",
+    "pl_requestSubject": "Plan change: {plan}",
+    "pl_requestMsg": "I'd like to move to {plan}, paid {interval}: {amount}."
   },
   "accountPage": {
     "roleOwner": "Owner",
@@ -4382,7 +4406,9 @@
     "iv_rateLimited": "Too many invite emails were sent in the last hour. Please try again a little later.",
     "trialNote": "Free for 30 days. No card needed.",
     "showPassword": "Show",
-    "hidePassword": "Hide"
+    "hidePassword": "Hide",
+    "continueFree": "Continue on the Free plan",
+    "continueFreeError": "Something went wrong. Please try again."
   },
   "calc": {
     "title": "Buying a vehicle",
@@ -5046,7 +5072,12 @@
     "plan_starter": "Starter",
     "plan_growth": "Growth",
     "plan_pro": "Pro",
-    "plan_business": "Business"
+    "plan_business": "Business",
+    "teamRequest": "Plan change waiting for payment",
+    "teamRequestWhat": "{plan}, {interval}: {amount}",
+    "teamRequestNote": "Check the payment has arrived (the slip is in this conversation), then switch the plan on. Paid time runs from today, or from the current due date if that is later.",
+    "teamActivate": "Payment received: switch plan on",
+    "teamActivating": "Switching on…"
   },
   "inspectStart": {
     "titleOut": "Hand over a vehicle",

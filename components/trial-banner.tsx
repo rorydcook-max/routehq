@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 type SubscriptionPayload = {
   organization?: {
     subscription_status?: string | null;
+    subscription_tier?: string | null;
     trial_ends_at?: string | null;
   } | null;
   daysRemaining?: number | null;
@@ -57,7 +58,9 @@ export function TrialBanner({ placement = "floating" }: { placement?: "floating"
     fetch("/api/subscription/status", { cache: "no-store" })
       .then((response) => (response.ok ? response.json() : null))
       .then((data) => {
-        if (data?.organization?.subscription_status === "trial") {
+        // Free chosen and the trial over: they are simply on Free now, nothing to remind them of.
+        const onFreeAfterTrial = data?.organization?.subscription_tier === "free" && data?.daysRemaining === 0;
+        if (data?.organization?.subscription_status === "trial" && !onFreeAfterTrial) {
           setPayload(data);
           setHidden(false);
         }

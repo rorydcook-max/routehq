@@ -3845,7 +3845,7 @@
     "bl_trialLeft": "{days, plural, =0 {오늘 체험이 종료돼요} other {체험 기간이 #일 남았어요}}",
     "bl_trialNoDate": "체험 종료일이 설정되지 않음",
     "bl_howTitle": "구독 방법",
-    "bl_howBody": "현재는 구독을 직접 설정해 드려요: 계좌 이체나 PromptPay로 결제하고 확인 내역을 보내 주시면 보통 당일에 요금제를 활성화해 드려요. 카드 결제는 곧 지원돼요.",
+    "bl_howBody": "위에서 요금제를 선택하고 PromptPay 또는 계좌 이체로 결제해 주세요. 입금이 확인되면 바로 적용해 드려요. 보통 당일에 처리돼요. 카드 결제는 곧 지원될 예정이에요.",
     "bl_line": "LINE으로 문의하기",
     "bl_whatsapp": "WhatsApp",
     "bl_email": "이메일",
@@ -4091,7 +4091,31 @@
     "pl_forYourFleet": "내 차량 기준: {amount}",
     "pl_bikesNote": "스쿠터, 전기자전거, ATV는 오토바이로, 밴과 픽업은 자동차로 세요.",
     "pl_currencyNote": "가격은 {currency} 기준이에요.",
-    "inc_owners": "차주의 차량 운영: 차량별 수익을 담은 차주 정산서"
+    "inc_owners": "차주의 차량 운영: 차량별 수익을 담은 차주 정산서",
+    "pl_chooseBtn": "{plan} 선택",
+    "pl_switchFree": "Free로 변경",
+    "pl_saving": "저장 중…",
+    "pl_tryAgain": "문제가 발생했어요. 다시 시도해 주세요.",
+    "pl_ownerOnly": "요금제는 사업주만 변경할 수 있어요.",
+    "pl_pendingBadge": "결제 대기 중",
+    "pl_afterTrial": "체험 기간 후: {plan}",
+    "pl_paidUntil": "{interval} 결제 · 다음 결제일 {date}",
+    "pl_intervalMonthly": "월간",
+    "pl_intervalYearly": "연간",
+    "pl_pendingTitle": "결제하면 요금제가 적용돼요",
+    "pl_pendingWhat": "{plan}, {interval} 결제: {amount}",
+    "pl_renewalTitle": "갱신 시 요금제가 변경돼요",
+    "pl_renewalBody": "{date}까지 현재 요금제를 유지하고, 그 후 새 요금제로 변경돼요. 지금은 결제할 금액이 없어요.",
+    "pl_foundingApplied": "런칭 특가: 반값 (정상가 {amount})",
+    "pl_payPromptPay": "태국 은행 앱으로 스캔해 {amount}을(를) 결제해 주세요.",
+    "pl_payBank": "{amount}을(를) 아래 계좌로 이체해 주세요:",
+    "pl_payBankOr": "또는 아래 계좌로 이체:",
+    "pl_payOther": "{amount} 결제 방법을 도움말에서 안내해 드려요. 보통 당일에 답변드려요.",
+    "pl_payAfter": "그다음 이체 영수증을 보내 주세요. 입금이 확인되면 바로 요금제를 적용해 드려요. 보통 당일에 처리돼요.",
+    "pl_paySlip": "이체 영수증 보내기",
+    "pl_cancelRequest": "이 변경 취소",
+    "pl_requestSubject": "요금제 변경: {plan}",
+    "pl_requestMsg": "{plan}({interval} 결제)으로 변경하고 싶어요: {amount}."
   },
   "accountPage": {
     "roleOwner": "대표",
@@ -4382,7 +4406,9 @@
     "iv_rateLimited": "지난 1시간 동안 초대 이메일을 너무 많이 보냈어요. 잠시 후 다시 시도하세요.",
     "trialNote": "30일 무료. 카드 불필요.",
     "showPassword": "보기",
-    "hidePassword": "숨기기"
+    "hidePassword": "숨기기",
+    "continueFree": "Free 요금제로 계속하기",
+    "continueFreeError": "문제가 발생했어요. 다시 시도해 주세요."
   },
   "calc": {
     "title": "차량 구매",
@@ -5046,7 +5072,12 @@
     "plan_starter": "Starter",
     "plan_growth": "Growth",
     "plan_pro": "Pro",
-    "plan_business": "Business"
+    "plan_business": "Business",
+    "teamRequest": "결제 대기 중인 요금제 변경",
+    "teamRequestWhat": "{plan}, {interval}: {amount}",
+    "teamRequestNote": "입금을 확인한 후(영수증은 이 대화에 있어요) 요금제를 적용하세요. 결제 기간은 오늘부터, 또는 현재 만료일이 더 늦으면 그날부터 시작돼요.",
+    "teamActivate": "결제 확인됨: 요금제 적용",
+    "teamActivating": "적용 중…"
   },
   "inspectStart": {
     "titleOut": "차량 인도",

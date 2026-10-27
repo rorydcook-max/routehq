@@ -3845,7 +3845,7 @@
     "bl_trialLeft": "{days, plural, =0 {Din provperiod slutar i dag} one {# dag kvar av din provperiod} other {# dagar kvar av din provperiod}}",
     "bl_trialNoDate": "Slutdatum för provperioden inte angivet",
     "bl_howTitle": "Så tecknar du abonnemang",
-    "bl_howBody": "Just nu ordnar vi abonnemang personligen: betala med banköverföring eller PromptPay, skicka bekräftelsen till oss så aktiverar vi ditt abonnemang, oftast samma dag. Kortbetalningar kommer snart.",
+    "bl_howBody": "Välj ett abonnemang ovan och betala med PromptPay eller banköverföring; vi aktiverar det så snart betalningen kommit in, oftast samma dag. Kortbetalning kommer snart.",
     "bl_line": "Skriv till oss på LINE",
     "bl_whatsapp": "WhatsApp",
     "bl_email": "E-post",
@@ -4091,7 +4091,31 @@
     "pl_forYourFleet": "Din flotta: {amount}",
     "pl_bikesNote": "Skotrar, elcyklar och fyrhjulingar räknas som motorcyklar; skåpbilar och pickuper räknas som bilar.",
     "pl_currencyNote": "Priser i {currency}.",
-    "inc_owners": "Hyr ut fordon åt ägarna: ägarredovisningar med vad varje fordon har tjänat"
+    "inc_owners": "Hyr ut fordon åt ägarna: ägarredovisningar med vad varje fordon har tjänat",
+    "pl_chooseBtn": "Välj {plan}",
+    "pl_switchFree": "Byt till Free",
+    "pl_saving": "Sparar…",
+    "pl_tryAgain": "Något gick fel. Försök igen.",
+    "pl_ownerOnly": "Bara företagets ägare kan ändra abonnemanget.",
+    "pl_pendingBadge": "Väntar på betalning",
+    "pl_afterTrial": "Efter provperioden: {plan}",
+    "pl_paidUntil": "Betalas {interval} · nästa betalning {date}",
+    "pl_intervalMonthly": "månadsvis",
+    "pl_intervalYearly": "årsvis",
+    "pl_pendingTitle": "Betala för att aktivera abonnemanget",
+    "pl_pendingWhat": "{plan}, betalas {interval}: {amount}",
+    "pl_renewalTitle": "Abonnemanget ändras vid förnyelse",
+    "pl_renewalBody": "Du behåller ditt nuvarande abonnemang till {date} och går sedan över till det nya. Inget att betala nu.",
+    "pl_foundingApplied": "Grundarerbjudande: halva priset (normalt {amount})",
+    "pl_payPromptPay": "Skanna med valfri thailändsk bankapp för att betala {amount}.",
+    "pl_payBank": "Överför {amount} till:",
+    "pl_payBankOr": "Eller överför till:",
+    "pl_payOther": "Vi svarar i Hjälp om hur du betalar {amount}, oftast samma dag.",
+    "pl_payAfter": "Skicka sedan kvittot till oss. Vi aktiverar abonnemanget så snart betalningen kommit in, oftast samma dag.",
+    "pl_paySlip": "Skicka betalningskvittot",
+    "pl_cancelRequest": "Avbryt den här ändringen",
+    "pl_requestSubject": "Abonnemangsbyte: {plan}",
+    "pl_requestMsg": "Jag vill byta till {plan}, som betalas {interval}: {amount}."
   },
   "accountPage": {
     "roleOwner": "Ägare",
@@ -4382,7 +4406,9 @@
     "iv_rateLimited": "För många inbjudningsmejl har skickats den senaste timmen. Försök igen lite senare.",
     "trialNote": "Gratis i 30 dagar. Inget kort behövs.",
     "showPassword": "Visa",
-    "hidePassword": "Dölj"
+    "hidePassword": "Dölj",
+    "continueFree": "Fortsätt med Free-abonnemanget",
+    "continueFreeError": "Något gick fel. Försök igen."
   },
   "calc": {
     "title": "Köpa ett fordon",
@@ -5046,7 +5072,12 @@
     "plan_starter": "Starter",
     "plan_growth": "Growth",
     "plan_pro": "Pro",
-    "plan_business": "Business"
+    "plan_business": "Business",
+    "teamRequest": "Abonnemangsbyte väntar på betalning",
+    "teamRequestWhat": "{plan}, {interval}: {amount}",
+    "teamRequestNote": "Kontrollera att betalningen har kommit in (kvittot finns i den här konversationen) och aktivera sedan abonnemanget. Betald tid räknas från i dag, eller från nuvarande förfallodatum om det är senare.",
+    "teamActivate": "Betalning mottagen: aktivera abonnemang",
+    "teamActivating": "Aktiverar…"
   },
   "inspectStart": {
     "titleOut": "Lämna ut ett fordon",

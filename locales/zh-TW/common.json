@@ -3845,7 +3845,7 @@
     "bl_trialLeft": "{days, plural, =0 {您的試用今天到期} other {試用期剩餘 # 天}}",
     "bl_trialNoDate": "未設定試用到期日",
     "bl_howTitle": "如何訂閱",
-    "bl_howBody": "目前我們以人工方式設定訂閱：透過銀行轉帳或 PromptPay 付款，將付款證明傳給我們，我們通常會在當天為您開通方案。信用卡付款即將推出。",
+    "bl_howBody": "請在上方選擇方案，並以 PromptPay 或銀行轉帳付款；款項入帳後我們會立即啟用，通常在當天。信用卡付款即將推出。",
     "bl_line": "在 LINE 聯絡我們",
     "bl_whatsapp": "WhatsApp",
     "bl_email": "電子郵件",
@@ -4091,7 +4091,31 @@
     "pl_forYourFleet": "依您的車隊：{amount}",
     "pl_bikesNote": "速克達、電動自行車和沙灘車算作機車；廂型車和皮卡算作汽車。",
     "pl_currencyNote": "價格以 {currency} 計。",
-    "inc_owners": "代車主經營車輛：提供每輛車收入的車主對帳單"
+    "inc_owners": "代車主經營車輛：提供每輛車收入的車主對帳單",
+    "pl_chooseBtn": "選擇 {plan}",
+    "pl_switchFree": "切換至 Free",
+    "pl_saving": "儲存中…",
+    "pl_tryAgain": "發生錯誤，請再試一次。",
+    "pl_ownerOnly": "只有業主可以變更方案。",
+    "pl_pendingBadge": "等待付款",
+    "pl_afterTrial": "試用期結束後：{plan}",
+    "pl_paidUntil": "{interval} · 下次付款 {date}",
+    "pl_intervalMonthly": "月繳",
+    "pl_intervalYearly": "年繳",
+    "pl_pendingTitle": "付款後即可啟用方案",
+    "pl_pendingWhat": "{plan}，{interval}：{amount}",
+    "pl_renewalTitle": "您的方案將於續約時變更",
+    "pl_renewalBody": "{date} 前您仍使用目前的方案，之後改為新方案。現在無需付款。",
+    "pl_foundingApplied": "創始優惠：半價（原價 {amount}）",
+    "pl_payPromptPay": "使用任何泰國銀行 App 掃描即可支付 {amount}。",
+    "pl_payBank": "請轉帳 {amount} 至：",
+    "pl_payBankOr": "或轉帳至：",
+    "pl_payOther": "我們會在「協助」中回覆如何支付 {amount}，通常當天回覆。",
+    "pl_payAfter": "接著請將轉帳收據傳給我們。款項入帳後我們會立即啟用您的方案，通常在當天。",
+    "pl_paySlip": "傳送轉帳收據",
+    "pl_cancelRequest": "取消此變更",
+    "pl_requestSubject": "方案變更：{plan}",
+    "pl_requestMsg": "我想改用 {plan}，{interval}：{amount}。"
   },
   "accountPage": {
     "roleOwner": "負責人",
@@ -4382,7 +4406,9 @@
     "iv_rateLimited": "過去一小時內傳送的邀請郵件過多，請稍後再試。",
     "trialNote": "免費試用 30 天，無需信用卡。",
     "showPassword": "顯示",
-    "hidePassword": "隱藏"
+    "hidePassword": "隱藏",
+    "continueFree": "繼續使用 Free 方案",
+    "continueFreeError": "發生錯誤，請再試一次。"
   },
   "calc": {
     "title": "購買車輛",
@@ -5046,7 +5072,12 @@
     "plan_starter": "Starter",
     "plan_growth": "Growth",
     "plan_pro": "Pro",
-    "plan_business": "Business"
+    "plan_business": "Business",
+    "teamRequest": "方案變更等待付款",
+    "teamRequestWhat": "{plan}，{interval}：{amount}",
+    "teamRequestNote": "請確認款項已入帳（收據在此對話中），再啟用方案。已付期間從今天起算；若目前到期日較晚，則從到期日起算。",
+    "teamActivate": "已收到付款：啟用方案",
+    "teamActivating": "啟用中…"
   },
   "inspectStart": {
     "titleOut": "交車",

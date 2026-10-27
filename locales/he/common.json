@@ -3877,7 +3877,7 @@
     "bl_trialLeft": "{days, plural, =0 {תקופת הניסיון מסתיימת היום} one {נותר יום אחד לתקופת הניסיון} two {נותרו יומיים לתקופת הניסיון} other {נותרו # ימים לתקופת הניסיון}}",
     "bl_trialNoDate": "תאריך סיום הניסיון לא הוגדר",
     "bl_howTitle": "איך נרשמים למנוי",
-    "bl_howBody": "בשלב זה אנחנו מפעילים מנויים באופן אישי: שלמו בהעברה בנקאית או ב-PromptPay, שלחו לנו את האישור, ואנחנו מפעילים את התוכנית, בדרך כלל באותו יום. תשלום בכרטיס יתאפשר בקרוב.",
+    "bl_howBody": "בחרו תוכנית למעלה ושלמו ב-PromptPay או בהעברה בנקאית; נפעיל אותה ברגע שהתשלום יתקבל, בדרך כלל באותו יום. תשלום בכרטיס יגיע בקרוב.",
     "bl_line": "שלחו לנו הודעה ב-LINE",
     "bl_whatsapp": "WhatsApp",
     "bl_email": "אימייל",
@@ -4123,7 +4123,31 @@
     "pl_forYourFleet": "הצי שלכם: {amount}",
     "pl_bikesNote": "קטנועים, אופניים חשמליים ו־ATV נספרים כאופנועים; ואנים וטנדרים נספרים כמכוניות.",
     "pl_currencyNote": "המחירים ב־{currency}.",
-    "inc_owners": "ניהול רכבים עבור בעליהם: דוחות בעלים עם ההכנסה של כל רכב"
+    "inc_owners": "ניהול רכבים עבור בעליהם: דוחות בעלים עם ההכנסה של כל רכב",
+    "pl_chooseBtn": "בחירת {plan}",
+    "pl_switchFree": "מעבר ל-Free",
+    "pl_saving": "שומר…",
+    "pl_tryAgain": "משהו השתבש. נא לנסות שוב.",
+    "pl_ownerOnly": "רק בעל העסק יכול לשנות את התוכנית.",
+    "pl_pendingBadge": "ממתין לתשלום",
+    "pl_afterTrial": "אחרי תקופת הניסיון: {plan}",
+    "pl_paidUntil": "תשלום {interval} · התשלום הבא {date}",
+    "pl_intervalMonthly": "חודשי",
+    "pl_intervalYearly": "שנתי",
+    "pl_pendingTitle": "יש לשלם כדי להפעיל את התוכנית",
+    "pl_pendingWhat": "{plan}, תשלום {interval}: {amount}",
+    "pl_renewalTitle": "התוכנית שלך תשתנה בחידוש",
+    "pl_renewalBody": "התוכנית הנוכחית נשארת עד {date}, ואז עוברים לחדשה. אין מה לשלם עכשיו.",
+    "pl_foundingApplied": "מבצע מייסדים: חצי מחיר (בדרך כלל {amount})",
+    "pl_payPromptPay": "יש לסרוק בכל אפליקציית בנק תאילנדית כדי לשלם {amount}.",
+    "pl_payBank": "יש להעביר {amount} אל:",
+    "pl_payBankOr": "או להעביר אל:",
+    "pl_payOther": "נשיב בעזרה איך לשלם {amount}, בדרך כלל באותו יום.",
+    "pl_payAfter": "אחר כך שלחו לנו את אישור ההעברה. נפעיל את התוכנית ברגע שהתשלום יתקבל, בדרך כלל באותו יום.",
+    "pl_paySlip": "שליחת אישור ההעברה",
+    "pl_cancelRequest": "ביטול השינוי",
+    "pl_requestSubject": "שינוי תוכנית: {plan}",
+    "pl_requestMsg": "אני רוצה לעבור ל-{plan}, בתשלום {interval}: {amount}."
   },
   "accountPage": {
     "roleOwner": "בעלים",
@@ -4414,7 +4438,9 @@
     "iv_rateLimited": "נשלחו יותר מדי אימיילים של הזמנות בשעה האחרונה. נסו שוב מעט מאוחר יותר.",
     "trialNote": "חינם ל-30 יום. לא צריך כרטיס.",
     "showPassword": "הצגה",
-    "hidePassword": "הסתרה"
+    "hidePassword": "הסתרה",
+    "continueFree": "המשך בתוכנית Free",
+    "continueFreeError": "משהו השתבש. נא לנסות שוב."
   },
   "calc": {
     "title": "קניית רכב",
@@ -5046,7 +5072,12 @@
     "plan_starter": "Starter",
     "plan_growth": "Growth",
     "plan_pro": "Pro",
-    "plan_business": "Business"
+    "plan_business": "Business",
+    "teamRequest": "שינוי תוכנית ממתין לתשלום",
+    "teamRequestWhat": "{plan}, {interval}: {amount}",
+    "teamRequestNote": "יש לוודא שהתשלום התקבל (אישור ההעברה נמצא בשיחה הזו), ואז להפעיל את התוכנית. התקופה בתשלום נספרת מהיום, או ממועד החיוב הנוכחי אם הוא מאוחר יותר.",
+    "teamActivate": "התשלום התקבל: הפעלת התוכנית",
+    "teamActivating": "מפעיל…"
   },
   "inspectStart": {
     "titleOut": "מסירת רכב",

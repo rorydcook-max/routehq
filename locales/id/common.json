@@ -3877,7 +3877,7 @@
     "bl_trialLeft": "{days, plural, =0 {Uji coba Anda berakhir hari ini} other {Sisa # hari uji coba Anda}}",
     "bl_trialNoDate": "Tanggal akhir uji coba belum diatur",
     "bl_howTitle": "Cara berlangganan",
-    "bl_howBody": "Untuk saat ini kami mengatur langganan secara langsung: bayar lewat transfer bank atau PromptPay, kirim bukti pembayarannya, lalu kami aktifkan paket Anda, biasanya di hari yang sama. Pembayaran kartu segera hadir.",
+    "bl_howBody": "Pilih paket di atas dan bayar melalui PromptPay atau transfer bank; kami mengaktifkannya segera setelah pembayaran masuk, biasanya di hari yang sama. Pembayaran dengan kartu segera hadir.",
     "bl_line": "Kirim pesan lewat LINE",
     "bl_whatsapp": "WhatsApp",
     "bl_email": "Email",
@@ -4123,7 +4123,31 @@
     "pl_forYourFleet": "Armada Anda: {amount}",
     "pl_bikesNote": "Skuter, sepeda listrik, dan ATV dihitung sebagai motor; van dan pikap dihitung sebagai mobil.",
     "pl_currencyNote": "Harga dalam {currency}.",
-    "inc_owners": "Kelola kendaraan milik pemilik: laporan pendapatan setiap kendaraan untuk pemiliknya"
+    "inc_owners": "Kelola kendaraan milik pemilik: laporan pendapatan setiap kendaraan untuk pemiliknya",
+    "pl_chooseBtn": "Pilih {plan}",
+    "pl_switchFree": "Beralih ke Free",
+    "pl_saving": "Menyimpan…",
+    "pl_tryAgain": "Terjadi kesalahan. Silakan coba lagi.",
+    "pl_ownerOnly": "Hanya pemilik usaha yang dapat mengubah paket.",
+    "pl_pendingBadge": "Menunggu pembayaran",
+    "pl_afterTrial": "Setelah masa uji coba: {plan}",
+    "pl_paidUntil": "Dibayar {interval} · pembayaran berikutnya {date}",
+    "pl_intervalMonthly": "bulanan",
+    "pl_intervalYearly": "tahunan",
+    "pl_pendingTitle": "Bayar untuk mengaktifkan paket",
+    "pl_pendingWhat": "{plan}, dibayar {interval}: {amount}",
+    "pl_renewalTitle": "Paket Anda berubah saat perpanjangan",
+    "pl_renewalBody": "Anda tetap memakai paket saat ini hingga {date}, lalu pindah ke paket baru. Tidak ada yang perlu dibayar sekarang.",
+    "pl_foundingApplied": "Penawaran perdana: setengah harga (normalnya {amount})",
+    "pl_payPromptPay": "Pindai dengan aplikasi bank Thailand mana pun untuk membayar {amount}.",
+    "pl_payBank": "Transfer {amount} ke:",
+    "pl_payBankOr": "Atau transfer ke:",
+    "pl_payOther": "Kami akan membalas di Bantuan tentang cara membayar {amount}, biasanya di hari yang sama.",
+    "pl_payAfter": "Lalu kirimkan bukti transfer kepada kami. Kami mengaktifkan paket Anda segera setelah pembayaran masuk, biasanya di hari yang sama.",
+    "pl_paySlip": "Kirim bukti transfer",
+    "pl_cancelRequest": "Batalkan perubahan ini",
+    "pl_requestSubject": "Perubahan paket: {plan}",
+    "pl_requestMsg": "Saya ingin pindah ke {plan}, dibayar {interval}: {amount}."
   },
   "accountPage": {
     "roleOwner": "Pemilik",
@@ -4414,7 +4438,9 @@
     "iv_rateLimited": "Terlalu banyak email undangan dikirim dalam satu jam terakhir. Silakan coba lagi nanti.",
     "trialNote": "Gratis 30 hari. Tanpa kartu.",
     "showPassword": "Tampilkan",
-    "hidePassword": "Sembunyikan"
+    "hidePassword": "Sembunyikan",
+    "continueFree": "Lanjutkan dengan paket Free",
+    "continueFreeError": "Terjadi kesalahan. Silakan coba lagi."
   },
   "calc": {
     "title": "Membeli kendaraan",
@@ -5046,7 +5072,12 @@
     "plan_starter": "Starter",
     "plan_growth": "Growth",
     "plan_pro": "Pro",
-    "plan_business": "Business"
+    "plan_business": "Business",
+    "teamRequest": "Perubahan paket menunggu pembayaran",
+    "teamRequestWhat": "{plan}, {interval}: {amount}",
+    "teamRequestNote": "Periksa pembayaran sudah masuk (bukti transfer ada di percakapan ini), lalu aktifkan paket. Masa berbayar dihitung mulai hari ini, atau dari tanggal jatuh tempo saat ini jika lebih lambat.",
+    "teamActivate": "Pembayaran diterima: aktifkan paket",
+    "teamActivating": "Mengaktifkan…"
   },
   "inspectStart": {
     "titleOut": "Serahkan kendaraan",

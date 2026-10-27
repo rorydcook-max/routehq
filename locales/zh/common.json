@@ -3876,7 +3876,7 @@
     "bl_trialLeft": "{days, plural, =0 {试用期今天结束} other {试用期还剩 # 天}}",
     "bl_trialNoDate": "未设置试用结束日期",
     "bl_howTitle": "如何订阅",
-    "bl_howBody": "目前我们采用人工开通订阅：通过银行转账或 PromptPay 付款，将凭证发送给我们，我们通常会在当天为您开通套餐。刷卡支付功能即将推出。",
+    "bl_howBody": "在上方选择套餐，并通过 PromptPay 或银行转账付款；款项到账后我们会立即开通，通常在当天。即将支持银行卡付款。",
     "bl_line": "在 LINE 上联系我们",
     "bl_whatsapp": "WhatsApp",
     "bl_email": "电子邮件",
@@ -4123,7 +4123,31 @@
     "pl_forYourFleet": "按您的车队：{amount}",
     "pl_bikesNote": "踏板车、电动自行车和全地形车按摩托车计算；面包车和皮卡按汽车计算。",
     "pl_currencyNote": "价格以 {currency} 计。",
-    "inc_owners": "代车主经营车辆：为车主提供每辆车收入的车主对账单"
+    "inc_owners": "代车主经营车辆：为车主提供每辆车收入的车主对账单",
+    "pl_chooseBtn": "选择 {plan}",
+    "pl_switchFree": "切换到 Free",
+    "pl_saving": "正在保存…",
+    "pl_tryAgain": "出了点问题，请重试。",
+    "pl_ownerOnly": "只有企业所有者可以更改套餐。",
+    "pl_pendingBadge": "等待付款",
+    "pl_afterTrial": "试用期结束后：{plan}",
+    "pl_paidUntil": "{interval}付费 · 下次付款 {date}",
+    "pl_intervalMonthly": "按月",
+    "pl_intervalYearly": "按年",
+    "pl_pendingTitle": "付款以开通新套餐",
+    "pl_pendingWhat": "{plan}，{interval}付费：{amount}",
+    "pl_renewalTitle": "您的套餐将在续费时变更",
+    "pl_renewalBody": "{date} 之前您将保留当前套餐，之后切换到新套餐。现在无需付款。",
+    "pl_foundingApplied": "首发优惠：半价（原价 {amount}）",
+    "pl_payPromptPay": "使用任意泰国银行 App 扫码支付 {amount}。",
+    "pl_payBank": "转账 {amount} 至：",
+    "pl_payBankOr": "或转账至：",
+    "pl_payOther": "我们会在“帮助”中回复您如何支付 {amount}，通常当天回复。",
+    "pl_payAfter": "然后把转账凭证发给我们。款项到账后我们会立即为您开通套餐，通常在当天。",
+    "pl_paySlip": "发送转账凭证",
+    "pl_cancelRequest": "取消此变更",
+    "pl_requestSubject": "套餐变更：{plan}",
+    "pl_requestMsg": "我想换成 {plan}，{interval}付费：{amount}。"
   },
   "accountPage": {
     "roleOwner": "所有者",
@@ -4414,7 +4438,9 @@
     "iv_rateLimited": "过去一小时内发送的邀请邮件过多，请稍后再试。",
     "trialNote": "免费 30 天，无需银行卡。",
     "showPassword": "显示",
-    "hidePassword": "隐藏"
+    "hidePassword": "隐藏",
+    "continueFree": "继续使用 Free 套餐",
+    "continueFreeError": "出了点问题，请重试。"
   },
   "calc": {
     "title": "购买车辆",
@@ -5046,7 +5072,12 @@
     "plan_starter": "Starter",
     "plan_growth": "Growth",
     "plan_pro": "Pro",
-    "plan_business": "Business"
+    "plan_business": "Business",
+    "teamRequest": "套餐变更待付款",
+    "teamRequestWhat": "{plan}，{interval}：{amount}",
+    "teamRequestNote": "确认款项已到账（转账凭证在此对话中），然后开通套餐。已付时长从今天起算；如果当前到期日更晚，则从到期日起算。",
+    "teamActivate": "已收到付款：开通套餐",
+    "teamActivating": "正在开通…"
   },
   "inspectStart": {
     "titleOut": "交车",

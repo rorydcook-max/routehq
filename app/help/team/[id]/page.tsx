@@ -7,6 +7,10 @@ import { AppShell } from "@/components/app-shell";
 import { HelpStatusButton } from "@/components/help/help-actions";
 import { HelpCompose } from "@/components/help/help-compose";
 import { HelpThread } from "@/components/help/help-thread";
+import { PlanActivateButton } from "@/components/help/plan-activate";
+import { numberLocale } from "@/lib/i18n/dates";
+import { formatPlanPrice } from "@/lib/plan-currency";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { isPlatformAdmin, replyLinkFor } from "@/lib/support";
@@ -22,6 +26,21 @@ export default async function HelpTeamConversationPage({ params }: { params: Pro
   if (!loaded) notFound();
   const { business, thread } = loaded;
   const closed = thread.status === "closed";
+  // A plan the business chose and is paying for: the team switches it on when the money arrives.
+  const { data: request } = await (createSupabaseAdminClient() as any)
+    .from("organizations")
+    .select("pending_plan, pending_interval, pending_amount, pending_currency, plan_requested_at, next_payment_due, subscription_status")
+    .eq("id", thread.organizationId)
+    .maybeSingle();
+  const planRequest = request?.pending_plan
+    ? {
+        what: t("teamRequestWhat", {
+          plan: t(`plan_${request.pending_plan}`),
+          interval: request.pending_interval === "yearly" ? t("teamYearly") : t("teamMonthly"),
+          amount: formatPlanPrice(Number(request.pending_amount || 0), String(request.pending_currency || "THB"), numberLocale(locale))
+        })
+      }
+    : null;
   const outside = business.preference.channel !== "app" ? replyLinkFor(business.preference.channel, business.preference.handle, business.preference.channel === "email" ? `RouteHQ: ${thread.subject}` : "") : null;
 
   return (
@@ -59,6 +78,17 @@ export default async function HelpTeamConversationPage({ params }: { params: Pro
             </a>
           ) : null}
         </section>
+
+        {planRequest ? (
+          <section className="card border-2 border-[var(--warning-line)] p-5">
+            <h2 className="text-[17px] font-bold text-[var(--foreground)]">{t("teamRequest")}</h2>
+            <p className="mt-1 font-semibold text-[var(--foreground)]">{planRequest.what}</p>
+            <p className="mt-1 text-sm font-medium text-[var(--muted)]">{t("teamRequestNote")}</p>
+            <div className="mt-3">
+              <PlanActivateButton organizationId={thread.organizationId} />
+            </div>
+          </section>
+        ) : null}
 
         <section className="card p-4 sm:p-5">
           <HelpThread businessName={business.name} locale={locale} messages={loaded.messages} side="team" />

@@ -3845,7 +3845,7 @@
     "bl_trialLeft": "{days, plural, =0 {Matatapos ngayon ang trial mo} one {# araw na lang sa trial mo} other {# araw na lang sa trial mo}}",
     "bl_trialNoDate": "Hindi naka-set ang katapusan ng trial",
     "bl_howTitle": "Paano mag-subscribe",
-    "bl_howBody": "Sa ngayon, personal naming sine-set up ang subscription: magbayad sa bank transfer o PromptPay, ipadala sa amin ang kumpirmasyon, at io-on namin ang plan mo, kadalasan sa parehong araw. Malapit na ang card payment.",
+    "bl_howBody": "Pumili ng plan sa itaas at magbayad sa PromptPay o bank transfer; i-o-on namin ito pagdating ng bayad, kadalasan sa parehong araw. Malapit nang tumanggap ng bayad sa card.",
     "bl_line": "I-message kami sa LINE",
     "bl_whatsapp": "WhatsApp",
     "bl_email": "Email",
@@ -4091,7 +4091,31 @@
     "pl_forYourFleet": "Fleet mo: {amount}",
     "pl_bikesNote": "Ang scooter, e-bike at ATV ay binibilang na motorsiklo; ang van at pickup ay binibilang na kotse.",
     "pl_currencyNote": "Presyo sa {currency}.",
-    "inc_owners": "Magpatakbo ng sasakyan para sa may-ari: statement ng kinita ng bawat sasakyan"
+    "inc_owners": "Magpatakbo ng sasakyan para sa may-ari: statement ng kinita ng bawat sasakyan",
+    "pl_chooseBtn": "Piliin ang {plan}",
+    "pl_switchFree": "Lumipat sa Free",
+    "pl_saving": "Sine-save…",
+    "pl_tryAgain": "May nagkaproblema. Pakisubukang muli.",
+    "pl_ownerOnly": "Ang may-ari lang ng negosyo ang puwedeng magpalit ng plan.",
+    "pl_pendingBadge": "Naghihintay ng bayad",
+    "pl_afterTrial": "Pagkatapos ng trial: {plan}",
+    "pl_paidUntil": "Bayad nang {interval} · susunod na bayad sa {date}",
+    "pl_intervalMonthly": "buwanan",
+    "pl_intervalYearly": "taunan",
+    "pl_pendingTitle": "Magbayad para i-on ang plan",
+    "pl_pendingWhat": "{plan}, bayad nang {interval}: {amount}",
+    "pl_renewalTitle": "Magbabago ang plan mo sa renewal",
+    "pl_renewalBody": "Mananatili ang kasalukuyang plan mo hanggang {date}, saka lilipat sa bago. Walang babayaran ngayon.",
+    "pl_foundingApplied": "Founding offer: kalahating presyo (karaniwang {amount})",
+    "pl_payPromptPay": "I-scan gamit ang kahit anong Thai banking app para magbayad ng {amount}.",
+    "pl_payBank": "I-transfer ang {amount} sa:",
+    "pl_payBankOr": "O i-transfer sa:",
+    "pl_payOther": "Sasagot kami sa Tulong kung paano magbayad ng {amount}, kadalasan sa parehong araw.",
+    "pl_payAfter": "Pagkatapos, ipadala sa amin ang slip. I-o-on namin ang plan mo pagdating ng bayad, kadalasan sa parehong araw.",
+    "pl_paySlip": "Ipadala ang payment slip",
+    "pl_cancelRequest": "Kanselahin ang pagbabagong ito",
+    "pl_requestSubject": "Pagpalit ng plan: {plan}",
+    "pl_requestMsg": "Gusto kong lumipat sa {plan}, bayad nang {interval}: {amount}."
   },
   "accountPage": {
     "roleOwner": "May-ari",
@@ -4382,7 +4406,9 @@
     "iv_rateLimited": "Masyadong maraming invite email ang naipadala sa nakaraang oras. Pakisubukan ulit mamaya.",
     "trialNote": "Libre sa loob ng 30 araw. Walang card na kailangan.",
     "showPassword": "Ipakita",
-    "hidePassword": "Itago"
+    "hidePassword": "Itago",
+    "continueFree": "Magpatuloy sa Free plan",
+    "continueFreeError": "May nagkaproblema. Pakisubukang muli."
   },
   "calc": {
     "title": "Pagbili ng sasakyan",
@@ -5046,7 +5072,12 @@
     "plan_starter": "Starter",
     "plan_growth": "Growth",
     "plan_pro": "Pro",
-    "plan_business": "Business"
+    "plan_business": "Business",
+    "teamRequest": "Pagpalit ng plan na naghihintay ng bayad",
+    "teamRequestWhat": "{plan}, {interval}: {amount}",
+    "teamRequestNote": "Tingnan kung dumating na ang bayad (nasa usapang ito ang slip), saka i-on ang plan. Ang bayad na panahon ay magsisimula ngayon, o sa kasalukuyang due date kung mas huli iyon.",
+    "teamActivate": "Natanggap ang bayad: i-on ang plan",
+    "teamActivating": "Ino-on…"
   },
   "inspectStart": {
     "titleOut": "Mag-handover ng sasakyan",

@@ -110,4 +110,17 @@ export function yearlyOf(monthly: number, currency: string) {
   return Number((monthly * YEARLY_MONTHS).toFixed(minorDigits(planCurrency(currency))));
 }
 
+/**
+ * What a business is asked to pay for a plan: the full price for its fleet, monthly or for the year,
+ * and half of it for founding members (the first 100 paying businesses).
+ */
+export function planCharge(plan: Plan, fleet: FleetMix, currency: string, interval: "monthly" | "yearly", founding: boolean) {
+  const code = planCurrency(currency);
+  const monthly = fleetMonthly(plan, fleet, code);
+  const full = interval === "yearly" ? yearlyOf(monthly, code) : monthly;
+  const digits = minorDigits(code);
+  const half = Math.ceil((full / 2) * 10 ** digits - 1e-9) / 10 ** digits;
+  return { currency: code, full, amount: founding ? half : full, founding };
+}
+
 export { BUSINESS_INCLUDED };

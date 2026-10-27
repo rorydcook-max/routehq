@@ -5,6 +5,7 @@ import { AppShell } from "@/components/app-shell";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { ContinueFree } from "./continue-free";
 
 async function getAccountSummary(organizationId: string) {
   const supabase = (await createSupabaseServerClient()) as any;
@@ -50,6 +51,7 @@ export default async function TrialExpiredPage() {
             <Link className="primary-action pressable w-full" href={"/settings/billing" as Route}>
               {say("choosePlan")}
             </Link>
+            <ContinueFree />
             {process.env.LINE_OA_ID ? (
               <a className="secondary-action pressable w-full" href={`https://line.me/R/ti/p/${encodeURIComponent(process.env.LINE_OA_ID)}`} rel="noreferrer" target="_blank">
                 {say("moreTime")}

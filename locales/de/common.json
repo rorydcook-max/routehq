@@ -3877,7 +3877,7 @@
     "bl_trialLeft": "{days, plural, =0 {Ihre Testphase endet heute} one {Noch # Tag in Ihrer Testphase} other {Noch # Tage in Ihrer Testphase}}",
     "bl_trialNoDate": "Ende der Testphase nicht festgelegt",
     "bl_howTitle": "So abonnieren Sie",
-    "bl_howBody": "Derzeit richten wir Abonnements persönlich ein: Zahlen Sie per Banküberweisung oder PromptPay, senden Sie uns die Bestätigung, und wir schalten Ihren Tarif frei, meist noch am selben Tag. Kartenzahlung folgt bald.",
+    "bl_howBody": "Wählen Sie oben einen Tarif und bezahlen Sie per PromptPay oder Banküberweisung; wir aktivieren ihn, sobald die Zahlung eingeht, meist noch am selben Tag. Kartenzahlung folgt in Kürze.",
     "bl_line": "Schreiben Sie uns auf LINE",
     "bl_whatsapp": "WhatsApp",
     "bl_email": "E-Mail",
@@ -4123,7 +4123,31 @@
     "pl_forYourFleet": "Ihre Flotte: {amount}",
     "pl_bikesNote": "Roller, E-Bikes und Quads zählen als Motorräder; Transporter und Pick-ups zählen als Autos.",
     "pl_currencyNote": "Preise in {currency}.",
-    "inc_owners": "Fahrzeuge für ihre Eigentümer vermieten: Eigentümerabrechnungen, was jedes Fahrzeug verdient hat"
+    "inc_owners": "Fahrzeuge für ihre Eigentümer vermieten: Eigentümerabrechnungen, was jedes Fahrzeug verdient hat",
+    "pl_chooseBtn": "{plan} wählen",
+    "pl_switchFree": "Zu Free wechseln",
+    "pl_saving": "Wird gespeichert…",
+    "pl_tryAgain": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
+    "pl_ownerOnly": "Nur der Geschäftsinhaber kann den Tarif ändern.",
+    "pl_pendingBadge": "Wartet auf Zahlung",
+    "pl_afterTrial": "Nach Ihrer Testphase: {plan}",
+    "pl_paidUntil": "{interval} bezahlt · nächste Zahlung am {date}",
+    "pl_intervalMonthly": "monatlich",
+    "pl_intervalYearly": "jährlich",
+    "pl_pendingTitle": "Bezahlen, um Ihren Tarif zu aktivieren",
+    "pl_pendingWhat": "{plan}, {interval} bezahlt: {amount}",
+    "pl_renewalTitle": "Ihr Tarif ändert sich bei der Verlängerung",
+    "pl_renewalBody": "Sie behalten Ihren aktuellen Tarif bis {date} und wechseln dann zum neuen. Jetzt ist nichts zu bezahlen.",
+    "pl_foundingApplied": "Gründungsangebot: halber Preis (normalerweise {amount})",
+    "pl_payPromptPay": "Scannen Sie mit einer beliebigen thailändischen Banking-App, um {amount} zu bezahlen.",
+    "pl_payBank": "Überweisen Sie {amount} an:",
+    "pl_payBankOr": "Oder überweisen Sie an:",
+    "pl_payOther": "Wir antworten Ihnen in der Hilfe, wie Sie {amount} bezahlen können, meist noch am selben Tag.",
+    "pl_payAfter": "Senden Sie uns dann den Zahlungsbeleg. Wir aktivieren Ihren Tarif, sobald die Zahlung eingeht, meist noch am selben Tag.",
+    "pl_paySlip": "Zahlungsbeleg senden",
+    "pl_cancelRequest": "Diese Änderung abbrechen",
+    "pl_requestSubject": "Tarifwechsel: {plan}",
+    "pl_requestMsg": "Ich möchte zu {plan} wechseln, {interval} bezahlt: {amount}."
   },
   "accountPage": {
     "roleOwner": "Inhaber",
@@ -4414,7 +4438,9 @@
     "iv_rateLimited": "In der letzten Stunde wurden zu viele Einladungs-E-Mails gesendet. Bitte versuchen Sie es etwas später erneut.",
     "trialNote": "30 Tage kostenlos. Keine Karte nötig.",
     "showPassword": "Anzeigen",
-    "hidePassword": "Verbergen"
+    "hidePassword": "Verbergen",
+    "continueFree": "Mit dem Free-Tarif fortfahren",
+    "continueFreeError": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
   },
   "calc": {
     "title": "Fahrzeugkauf",
@@ -5046,7 +5072,12 @@
     "plan_starter": "Starter",
     "plan_growth": "Growth",
     "plan_pro": "Pro",
-    "plan_business": "Business"
+    "plan_business": "Business",
+    "teamRequest": "Tarifwechsel wartet auf Zahlung",
+    "teamRequestWhat": "{plan}, {interval}: {amount}",
+    "teamRequestNote": "Prüfen Sie, ob die Zahlung eingegangen ist (der Beleg ist in dieser Unterhaltung), und aktivieren Sie dann den Tarif. Die bezahlte Laufzeit beginnt heute oder am aktuellen Fälligkeitsdatum, falls dieses später liegt.",
+    "teamActivate": "Zahlung erhalten: Tarif aktivieren",
+    "teamActivating": "Wird aktiviert…"
   },
   "inspectStart": {
     "titleOut": "Fahrzeug übergeben",

@@ -3845,7 +3845,7 @@
     "bl_trialLeft": "{days, plural, =0 {トライアルは本日で終了します} other {トライアル残り#日}}",
     "bl_trialNoDate": "トライアル終了日未設定",
     "bl_howTitle": "申し込み方法",
-    "bl_howBody": "現在、サブスクリプションは個別に設定しています。銀行振込またはPromptPayで支払い、確認書をお送りいただければ、通常は当日中にプランを有効にします。カード払いは近日対応予定です。",
+    "bl_howBody": "上でプランを選び、PromptPay または銀行振込でお支払いください。入金を確認しだい有効にします（通常は当日中）。カード払いは近日対応予定です。",
     "bl_line": "LINEで問い合わせる",
     "bl_whatsapp": "WhatsApp",
     "bl_email": "メール",
@@ -4091,7 +4091,31 @@
     "pl_forYourFleet": "お客様の台数では: {amount}",
     "pl_bikesNote": "スクーター、電動自転車、ATVはバイク、バンとピックアップは車として数えます。",
     "pl_currencyNote": "価格は{currency}です。",
-    "inc_owners": "オーナーの車両を運用: 車両ごとの収益をまとめたオーナー明細"
+    "inc_owners": "オーナーの車両を運用: 車両ごとの収益をまとめたオーナー明細",
+    "pl_chooseBtn": "{plan} を選択",
+    "pl_switchFree": "Free に切り替える",
+    "pl_saving": "保存中…",
+    "pl_tryAgain": "問題が発生しました。もう一度お試しください。",
+    "pl_ownerOnly": "プランを変更できるのは事業のオーナーのみです。",
+    "pl_pendingBadge": "お支払い待ち",
+    "pl_afterTrial": "トライアル終了後：{plan}",
+    "pl_paidUntil": "{interval} · 次回のお支払い：{date}",
+    "pl_intervalMonthly": "月払い",
+    "pl_intervalYearly": "年払い",
+    "pl_pendingTitle": "お支払い後にプランが有効になります",
+    "pl_pendingWhat": "{plan}（{interval}）：{amount}",
+    "pl_renewalTitle": "プランは更新時に変更されます",
+    "pl_renewalBody": "{date} までは現在のプランのままで、その後新しいプランに移行します。今お支払いいただく必要はありません。",
+    "pl_foundingApplied": "ローンチ特典：半額（通常 {amount}）",
+    "pl_payPromptPay": "タイの銀行アプリでスキャンして {amount} をお支払いください。",
+    "pl_payBank": "{amount} を以下に振り込んでください：",
+    "pl_payBankOr": "または以下に振り込み：",
+    "pl_payOther": "{amount} のお支払い方法をヘルプでご案内します。通常は当日中にご返信します。",
+    "pl_payAfter": "その後、振込明細をお送りください。入金を確認しだいプランを有効にします（通常は当日中）。",
+    "pl_paySlip": "振込明細を送信",
+    "pl_cancelRequest": "この変更を取り消す",
+    "pl_requestSubject": "プラン変更：{plan}",
+    "pl_requestMsg": "{plan}（{interval}）に変更したいです：{amount}。"
   },
   "accountPage": {
     "roleOwner": "オーナー",
@@ -4382,7 +4406,9 @@
     "iv_rateLimited": "過去1時間に送信された招待メールが多すぎます。しばらくしてからもう一度お試しください。",
     "trialNote": "30日間無料。カード不要。",
     "showPassword": "表示",
-    "hidePassword": "隠す"
+    "hidePassword": "隠す",
+    "continueFree": "Free プランで続ける",
+    "continueFreeError": "問題が発生しました。もう一度お試しください。"
   },
   "calc": {
     "title": "車両の購入",
@@ -5046,7 +5072,12 @@
     "plan_starter": "Starter",
     "plan_growth": "Growth",
     "plan_pro": "Pro",
-    "plan_business": "Business"
+    "plan_business": "Business",
+    "teamRequest": "お支払い待ちのプラン変更",
+    "teamRequestWhat": "{plan}（{interval}）：{amount}",
+    "teamRequestNote": "入金を確認してから（振込明細はこの会話内にあります）プランを有効にしてください。支払済み期間は本日から、または現在の期日の方が遅ければその日から開始します。",
+    "teamActivate": "入金確認済み：プランを有効にする",
+    "teamActivating": "有効化中…"
   },
   "inspectStart": {
     "titleOut": "車両を引き渡す",

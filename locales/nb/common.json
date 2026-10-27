@@ -3845,7 +3845,7 @@
     "bl_trialLeft": "{days, plural, =0 {Prøveperioden din slutter i dag} one {# dag igjen av prøveperioden} other {# dager igjen av prøveperioden}}",
     "bl_trialNoDate": "Sluttdato for prøveperioden er ikke satt",
     "bl_howTitle": "Slik abonnerer du",
-    "bl_howBody": "Foreløpig setter vi opp abonnementer personlig: betal med bankoverføring eller PromptPay, send oss bekreftelsen, så slår vi på planen din, vanligvis samme dag. Kortbetaling kommer snart.",
+    "bl_howBody": "Velg et abonnement over og betal med PromptPay eller bankoverføring; vi aktiverer det så snart betalingen er mottatt, vanligvis samme dag. Kortbetaling kommer snart.",
     "bl_line": "Send oss melding på LINE",
     "bl_whatsapp": "WhatsApp",
     "bl_email": "E-post",
@@ -4091,7 +4091,31 @@
     "pl_forYourFleet": "Din flåte: {amount}",
     "pl_bikesNote": "Scootere, elsykler og ATV-er regnes som motorsykler; varebiler og pickuper regnes som biler.",
     "pl_currencyNote": "Priser i {currency}.",
-    "inc_owners": "Leie ut kjøretøy for eierne: eieroppgjør med hva hvert kjøretøy har tjent"
+    "inc_owners": "Leie ut kjøretøy for eierne: eieroppgjør med hva hvert kjøretøy har tjent",
+    "pl_chooseBtn": "Velg {plan}",
+    "pl_switchFree": "Bytt til Free",
+    "pl_saving": "Lagrer…",
+    "pl_tryAgain": "Noe gikk galt. Prøv igjen.",
+    "pl_ownerOnly": "Bare bedriftseieren kan endre abonnementet.",
+    "pl_pendingBadge": "Venter på betaling",
+    "pl_afterTrial": "Etter prøveperioden: {plan}",
+    "pl_paidUntil": "Betales {interval} · neste betaling {date}",
+    "pl_intervalMonthly": "månedlig",
+    "pl_intervalYearly": "årlig",
+    "pl_pendingTitle": "Betal for å aktivere abonnementet",
+    "pl_pendingWhat": "{plan}, betales {interval}: {amount}",
+    "pl_renewalTitle": "Abonnementet endres ved fornyelse",
+    "pl_renewalBody": "Du beholder nåværende abonnement til {date}, deretter går du over til det nye. Ingenting å betale nå.",
+    "pl_foundingApplied": "Grunnleggertilbud: halv pris (vanligvis {amount})",
+    "pl_payPromptPay": "Skann med en hvilken som helst thailandsk bankapp for å betale {amount}.",
+    "pl_payBank": "Overfør {amount} til:",
+    "pl_payBankOr": "Eller overfør til:",
+    "pl_payOther": "Vi svarer i Hjelp med hvordan du betaler {amount}, vanligvis samme dag.",
+    "pl_payAfter": "Send oss deretter kvitteringen. Vi aktiverer abonnementet så snart betalingen er mottatt, vanligvis samme dag.",
+    "pl_paySlip": "Send betalingskvittering",
+    "pl_cancelRequest": "Avbryt denne endringen",
+    "pl_requestSubject": "Abonnementsendring: {plan}",
+    "pl_requestMsg": "Jeg vil gjerne bytte til {plan}, betalt {interval}: {amount}."
   },
   "accountPage": {
     "roleOwner": "Eier",
@@ -4382,7 +4406,9 @@
     "iv_rateLimited": "For mange invitasjoner ble sendt den siste timen. Prøv igjen litt senere.",
     "trialNote": "Gratis i 30 dager. Ingen kort nødvendig.",
     "showPassword": "Vis",
-    "hidePassword": "Skjul"
+    "hidePassword": "Skjul",
+    "continueFree": "Fortsett med Free-abonnementet",
+    "continueFreeError": "Noe gikk galt. Prøv igjen."
   },
   "calc": {
     "title": "Kjøpe et kjøretøy",
@@ -5046,7 +5072,12 @@
     "plan_starter": "Starter",
     "plan_growth": "Growth",
     "plan_pro": "Pro",
-    "plan_business": "Business"
+    "plan_business": "Business",
+    "teamRequest": "Abonnementsendring venter på betaling",
+    "teamRequestWhat": "{plan}, {interval}: {amount}",
+    "teamRequestNote": "Sjekk at betalingen er mottatt (kvitteringen ligger i denne samtalen), og aktiver deretter abonnementet. Betalt periode løper fra i dag, eller fra nåværende forfallsdato hvis den er senere.",
+    "teamActivate": "Betaling mottatt: aktiver abonnement",
+    "teamActivating": "Aktiverer…"
   },
   "inspectStart": {
     "titleOut": "Lever ut et kjøretøy",

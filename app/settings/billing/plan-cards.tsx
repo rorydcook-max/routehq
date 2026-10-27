@@ -1,8 +1,10 @@
 "use client";
 
 import { Check } from "lucide-react";
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
+import { choosePlan } from "@/app/actions/plan";
 import { Badge } from "@/components/ui";
 import { numberLocale } from "@/lib/i18n/dates";
 import { BUSINESS_INCLUDED, PLANS, YEARLY_MONTHS, businessExtras, fleetText, overBy, type FleetMix, type Plan } from "@/lib/plans";
@@ -25,10 +27,45 @@ function differences(plan: Plan, say: Say, number: (value: number) => string): s
   return lines;
 }
 
-export function PlanCards({ currentTier, fleet, currency: rawCurrency }: { currentTier: string; fleet: FleetMix; currency: string }) {
+export function PlanCards({
+  currentTier,
+  currentInterval,
+  status,
+  pendingPlan,
+  canChange,
+  fleet,
+  currency: rawCurrency
+}: {
+  currentTier: string;
+  currentInterval: string;
+  status: string;
+  pendingPlan: string | null;
+  canChange: boolean;
+  fleet: FleetMix;
+  currency: string;
+}) {
   const say = useTranslations("settingsPage") as unknown as Say;
   const locale = useLocale();
-  const [yearly, setYearly] = useState(false);
+  const router = useRouter();
+  const [yearly, setYearly] = useState(currentInterval === "yearly");
+  const [busy, setBusy] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [, startTransition] = useTransition();
+  const choose = (planId: string) => {
+    setBusy(planId);
+    setError(null);
+    startTransition(async () => {
+      const result = await choosePlan({ plan: planId, interval: yearly ? "yearly" : "monthly" }).catch(() => ({ ok: false as const, error: say("pl_tryAgain") }));
+      setBusy(null);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      router.refresh();
+      // The outcome (what to pay, or that Free is on) shows at the top of the page.
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  };
   const currency = planCurrency(rawCurrency);
   const price = (amount: number) => formatPlanPrice(amount, currency, numberLocale(locale));
   const period = (monthly: number) => (yearly ? yearlyOf(monthly, currency) : monthly);
@@ -121,11 +158,32 @@ export function PlanCards({ currentTier, fleet, currency: rawCurrency }: { curre
               </ul>
 
               {!current && !fits ? <p className="mt-3 text-sm font-semibold text-[var(--muted)]">{say("pl_tooSmall")}</p> : null}
+
+              <div className="mt-auto pt-4">
+                {pendingPlan === plan.id ? (
+                  <p className="rounded-lg bg-[var(--warning-light)] px-3 py-2 text-center text-sm font-bold text-[var(--foreground)]">{say("pl_pendingBadge")}</p>
+                ) : current && (plan.monthly === 0 || (status === "active" && currentInterval === (yearly ? "yearly" : "monthly"))) ? null : (
+                  <button
+                    className={`${popular ? "primary-action" : "secondary-action"} pressable w-full disabled:opacity-60`}
+                    disabled={!canChange || busy !== null}
+                    onClick={() => choose(plan.id)}
+                    type="button"
+                  >
+                    {busy === plan.id ? say("pl_saving") : plan.monthly === 0 ? say("pl_switchFree") : say("pl_chooseBtn", { plan: say(`bl_${plan.id}`) })}
+                  </button>
+                )}
+              </div>
             </section>
           );
         })}
       </div>
 
+      {error ? (
+        <p className="mt-3 rounded-xl bg-[var(--danger-light)] px-4 py-3 text-sm font-semibold text-[var(--danger)]" role="alert">
+          {error}
+        </p>
+      ) : null}
+      {!canChange ? <p className="mt-3 text-sm font-semibold text-[var(--muted)]">{say("pl_ownerOnly")}</p> : null}
       <p className="mt-3 text-sm font-medium text-[var(--foreground-secondary)]">
         {say("pl_bikesNote")}
         {currency !== "THB" ? ` ${say("pl_currencyNote", { currency })}` : ""}

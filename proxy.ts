@@ -197,7 +197,7 @@ export async function proxy(request: NextRequest) {
     if (membership?.organization_id) {
       const { data: organization } = await (supabase as any)
         .from("organizations")
-        .select("onboarding_completed, onboarding_skipped, subscription_status, trial_ends_at, next_payment_due")
+        .select("onboarding_completed, onboarding_skipped, subscription_status, subscription_tier, trial_ends_at, next_payment_due")
         .eq("id", membership.organization_id)
         .is("deleted_at", null)
         .maybeSingle();
@@ -215,7 +215,8 @@ export async function proxy(request: NextRequest) {
         const trialEndsAt = organization.trial_ends_at ? new Date(organization.trial_ends_at).getTime() : null;
         const nextPaymentDue = organization.next_payment_due ? new Date(organization.next_payment_due).getTime() : null;
 
-        if (status === "trial" && trialEndsAt && trialEndsAt <= now) {
+        // A business that chose Free during its trial simply carries on, on Free, when the trial ends.
+        if (status === "trial" && trialEndsAt && trialEndsAt <= now && organization.subscription_tier !== "free") {
           return NextResponse.redirect(new URL("/trial-expired", request.url));
         }
 

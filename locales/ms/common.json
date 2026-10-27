@@ -3877,7 +3877,7 @@
     "bl_trialLeft": "{days, plural, =0 {Tempoh percubaan anda tamat hari ini} other {Baki # hari dalam tempoh percubaan anda}}",
     "bl_trialNoDate": "Tarikh tamat percubaan belum ditetapkan",
     "bl_howTitle": "Cara melanggan",
-    "bl_howBody": "Buat masa ini kami menguruskan langganan secara peribadi: bayar melalui pindahan bank atau PromptPay, hantar pengesahan kepada kami, dan kami aktifkan pelan anda, biasanya pada hari yang sama. Bayaran kad akan datang tidak lama lagi.",
+    "bl_howBody": "Pilih pelan di atas dan bayar melalui PromptPay atau pindahan bank; kami aktifkannya sebaik sahaja bayaran diterima, biasanya pada hari yang sama. Pembayaran kad akan datang tidak lama lagi.",
     "bl_line": "Hantar mesej kepada kami di LINE",
     "bl_whatsapp": "WhatsApp",
     "bl_email": "E-mel",
@@ -4123,7 +4123,31 @@
     "pl_forYourFleet": "Armada anda: {amount}",
     "pl_bikesNote": "Skuter, basikal elektrik dan ATV dikira sebagai motosikal; van dan pikap dikira sebagai kereta.",
     "pl_currencyNote": "Harga dalam {currency}.",
-    "inc_owners": "Uruskan kenderaan milik pemilik: penyata pendapatan setiap kenderaan untuk pemiliknya"
+    "inc_owners": "Uruskan kenderaan milik pemilik: penyata pendapatan setiap kenderaan untuk pemiliknya",
+    "pl_chooseBtn": "Pilih {plan}",
+    "pl_switchFree": "Tukar kepada Free",
+    "pl_saving": "Menyimpan…",
+    "pl_tryAgain": "Ada masalah. Sila cuba lagi.",
+    "pl_ownerOnly": "Hanya pemilik perniagaan boleh menukar pelan.",
+    "pl_pendingBadge": "Menunggu pembayaran",
+    "pl_afterTrial": "Selepas percubaan anda: {plan}",
+    "pl_paidUntil": "Dibayar {interval} · bayaran seterusnya {date}",
+    "pl_intervalMonthly": "bulanan",
+    "pl_intervalYearly": "tahunan",
+    "pl_pendingTitle": "Bayar untuk mengaktifkan pelan anda",
+    "pl_pendingWhat": "{plan}, dibayar {interval}: {amount}",
+    "pl_renewalTitle": "Pelan anda bertukar semasa pembaharuan",
+    "pl_renewalBody": "Anda kekal dengan pelan semasa sehingga {date}, kemudian beralih ke pelan baharu. Tiada bayaran sekarang.",
+    "pl_foundingApplied": "Tawaran pengasas: separuh harga (biasanya {amount})",
+    "pl_payPromptPay": "Imbas dengan mana-mana aplikasi perbankan Thailand untuk membayar {amount}.",
+    "pl_payBank": "Pindahkan {amount} ke:",
+    "pl_payBankOr": "Atau pindahkan ke:",
+    "pl_payOther": "Kami akan membalas di Bantuan tentang cara membayar {amount}, biasanya pada hari yang sama.",
+    "pl_payAfter": "Kemudian hantar slip kepada kami. Kami aktifkan pelan anda sebaik sahaja bayaran diterima, biasanya pada hari yang sama.",
+    "pl_paySlip": "Hantar slip pembayaran",
+    "pl_cancelRequest": "Batalkan perubahan ini",
+    "pl_requestSubject": "Tukar pelan: {plan}",
+    "pl_requestMsg": "Saya ingin beralih ke {plan}, dibayar {interval}: {amount}."
   },
   "accountPage": {
     "roleOwner": "Pemilik",
@@ -4414,7 +4438,9 @@
     "iv_rateLimited": "Terlalu banyak e-mel jemputan dihantar dalam sejam yang lalu. Sila cuba lagi sebentar nanti.",
     "trialNote": "Percuma selama 30 hari. Tiada kad diperlukan.",
     "showPassword": "Tunjuk",
-    "hidePassword": "Sembunyi"
+    "hidePassword": "Sembunyi",
+    "continueFree": "Teruskan dengan pelan Free",
+    "continueFreeError": "Ada masalah. Sila cuba lagi."
   },
   "calc": {
     "title": "Membeli kenderaan",
@@ -5046,7 +5072,12 @@
     "plan_starter": "Starter",
     "plan_growth": "Growth",
     "plan_pro": "Pro",
-    "plan_business": "Business"
+    "plan_business": "Business",
+    "teamRequest": "Perubahan pelan menunggu pembayaran",
+    "teamRequestWhat": "{plan}, {interval}: {amount}",
+    "teamRequestNote": "Semak bayaran telah diterima (slip ada dalam perbualan ini), kemudian aktifkan pelan. Tempoh berbayar dikira dari hari ini, atau dari tarikh matang semasa jika lebih lewat.",
+    "teamActivate": "Bayaran diterima: aktifkan pelan",
+    "teamActivating": "Mengaktifkan…"
   },
   "inspectStart": {
     "titleOut": "Serah kenderaan",

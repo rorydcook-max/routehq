@@ -1,12 +1,17 @@
 import type { Route } from "next";
 import { Check } from "lucide-react";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/app-shell";
 import { Badge } from "@/components/ui";
+import { getCurrentMembership } from "@/lib/auth/roles";
 import { getCurrentUserEmail } from "@/lib/auth/session";
+import { dateFormat, numberLocale } from "@/lib/i18n/dates";
 import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization";
-import { fleetMix, fleetText, planById, planForFleet, vehiclesOverLimit } from "@/lib/plans";
+import { formatPlanPrice, planCharge } from "@/lib/plan-currency";
+import { changeWaitsForRenewal, fleetMix, fleetText, planById, planForFleet, vehiclesOverLimit } from "@/lib/plans";
+import { promptPayQrSvg } from "@/lib/promptpay";
+import { PendingPlan } from "./pending-plan";
 import { supportContacts } from "@/lib/support";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { PlanCards } from "./plan-cards";
@@ -48,24 +53,64 @@ export default async function BillingPage() {
   const [{ data: organization }, { data: vehicleRows }, categories] = await Promise.all([
     supabase
       .from("organizations")
-      .select("subscription_status, subscription_tier, trial_started_at, trial_ends_at, subscription_started_at, next_payment_due, payment_method, currency")
+      .select(
+        "subscription_status, subscription_tier, billing_interval, trial_started_at, trial_ends_at, subscription_started_at, next_payment_due, payment_method, currency, pending_plan, pending_interval, pending_amount, pending_currency, plan_request_thread_id, founding_member"
+      )
       .eq("id", baseOrganization.id)
       .is("deleted_at", null)
       .maybeSingle(),
     supabase.from("vehicles").select("category_id").eq("organization_id", baseOrganization.id).is("deleted_at", null),
     getVehicleCategories(baseOrganization.id)
   ]);
+  const [membership, locale] = await Promise.all([getCurrentMembership(), getLocale()]);
+  const canChange = membership?.role === "owner";
+  const numbers = numberLocale(locale);
+  const longDate = (value: string) => dateFormat(locale, { day: "numeric", month: "long", year: "numeric" }).format(new Date(value));
 
   const trialDays = daysUntil(organization?.trial_ends_at);
   const contacts = supportContacts();
-  const status = String(organization?.subscription_status || "trial");
   const plan = planById(organization?.subscription_tier);
+  // Free chosen during the trial: once the trial is over they are simply on Free.
+  const rawStatus = String(organization?.subscription_status || "trial");
+  const status = rawStatus === "trial" && plan.id === "free" && trialDays === 0 ? "active" : rawStatus;
   const fleet = fleetMix((vehicleRows || []) as Array<{ category_id: string | null }>, categories);
   const over = vehiclesOverLimit(plan, fleet, status);
   const isOver = over.cars + over.motorbikes > 0;
   const suggested = planForFleet(fleet);
   const currency = String(organization?.currency || "THB");
   const statusName = t.has(`bl_st_${status}` as never) ? say(`bl_st_${status}`) : status.replace(/_/g, " ");
+  const interval = String(organization?.billing_interval || "monthly");
+
+  // A plan chosen and not yet switched on: what to pay, and how.
+  const pendingPlan = organization?.pending_plan ? planById(organization.pending_plan) : null;
+  let pending: Parameters<typeof PendingPlan>[0] | null = null;
+  if (pendingPlan && organization) {
+    const pendingInterval = organization.pending_interval === "yearly" ? "yearly" : "monthly";
+    const pendingCurrency = String(organization.pending_currency || currency);
+    const amount = Number(organization.pending_amount || 0);
+    // The full price is shown struck through for founding members: worked out again from today's fleet.
+    const full = planCharge(pendingPlan, fleet, pendingCurrency, pendingInterval, false).full;
+    const paidUp = status === "active" && plan.monthly > 0 && organization.next_payment_due && new Date(organization.next_payment_due).getTime() > Date.now();
+    const atRenewal = Boolean(paidUp) && changeWaitsForRenewal({ id: plan.id, interval }, { id: pendingPlan.id, interval: pendingInterval });
+    const promptPayId = String(process.env.ROUTEHQ_PROMPTPAY_ID || "");
+    const amountText = formatPlanPrice(amount, pendingCurrency, numbers);
+    pending = {
+      what: say("pl_pendingWhat", {
+        plan: say(`bl_${pendingPlan.id}`),
+        interval: say(pendingInterval === "yearly" ? "pl_intervalYearly" : "pl_intervalMonthly"),
+        amount: amountText
+      }),
+      amount: amountText,
+      fullAmount: full > amount ? formatPlanPrice(full, pendingCurrency, numbers) : null,
+      qrSvg: pendingCurrency === "THB" && promptPayId && !atRenewal ? await promptPayQrSvg(promptPayId, amount) : null,
+      bankDetails: String(process.env.ROUTEHQ_BANK_DETAILS || "").trim() || null,
+      currency: pendingCurrency,
+      renewalDate: atRenewal ? longDate(organization.next_payment_due) : null,
+      threadId: organization.plan_request_thread_id || null,
+      canChange
+    };
+  }
+  const choseAfterTrial = status === "trial" ? (pendingPlan ? pendingPlan.id : plan.id === "free" ? "free" : null) : null;
 
   return (
     <AppShell userEmail={userEmail}>
@@ -94,7 +139,14 @@ export default async function BillingPage() {
         {status === "trial" ? (
           <p className="mt-3 text-[17px] font-bold text-[var(--foreground)]">
             {trialDays === null ? say("bl_trialNoDate") : say("bl_trialLeft", { days: trialDays })}
-            <span className="block text-sm font-medium text-[var(--foreground-secondary)]">{say("pl_trialAll", { plan: say(`bl_${suggested.id}`) })}</span>
+            <span className="block text-sm font-medium text-[var(--foreground-secondary)]">
+              {choseAfterTrial ? say("pl_afterTrial", { plan: say(`bl_${choseAfterTrial}`) }) : say("pl_trialAll", { plan: say(`bl_${suggested.id}`) })}
+            </span>
+          </p>
+        ) : null}
+        {status === "active" && plan.monthly > 0 && organization?.next_payment_due ? (
+          <p className="mt-3 font-medium text-[var(--foreground-secondary)]">
+            {say("pl_paidUntil", { date: longDate(organization.next_payment_due), interval: say(interval === "yearly" ? "pl_intervalYearly" : "pl_intervalMonthly") })}
           </p>
         ) : null}
         {isOver ? (
@@ -103,6 +155,8 @@ export default async function BillingPage() {
           </p>
         ) : null}
       </section>
+
+      {pending ? <PendingPlan {...pending} /> : null}
 
       <section className="card mt-3 p-4">
         <h2 className="text-[20px] font-bold text-[var(--foreground)]">{say("pl_everyTitle")}</h2>
@@ -118,7 +172,15 @@ export default async function BillingPage() {
       </section>
 
       <div className="card mt-3 p-4">
-        <PlanCards currency={currency} currentTier={plan.id} fleet={fleet} />
+        <PlanCards
+          canChange={canChange}
+          currency={currency}
+          currentInterval={interval}
+          currentTier={plan.id}
+          fleet={fleet}
+          pendingPlan={pendingPlan?.id || null}
+          status={status}
+        />
       </div>
 
       <section className="card mt-3 p-4">

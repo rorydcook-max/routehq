@@ -51,6 +51,8 @@ export const YEARLY_MONTHS = 11;
 export const FINDERS_FEE_PCT = 10;
 export const TRIAL_DAYS = 30;
 export const OVER_LIMIT_GRACE_DAYS = 14;
+/** Founding offer: the first this-many paying businesses keep half price for as long as they stay. */
+export const FOUNDING_SLOTS = 100;
 
 export const PLANS: Plan[] = [
   { id: "free", monthly: 0, cars: 2, motorbikes: 5, extraCar: 0, extraMotorbike: 0, team: 1, documentReads: 10, comparisonLookups: 2, accountingExport: false, severalLocations: false, whiteLabel: false, customDomain: false, setupService: false, prioritySupport: false },
@@ -67,6 +69,16 @@ export function planById(id: string | null | undefined): Plan {
   // "growth" was folded into Pro on 26 Oct 2026; anything saved with it reads as Pro.
   const wanted = String(id || "").toLowerCase() === "growth" ? "pro" : String(id || "").toLowerCase();
   return PLANS.find((plan) => plan.id === wanted) || PRO;
+}
+
+/**
+ * A paid-up business moving to a smaller plan (or from yearly to monthly) keeps what it paid for:
+ * the change waits for the renewal date and there is nothing to pay now.
+ */
+export function changeWaitsForRenewal(current: { id: string; interval: string }, wanted: { id: string; interval: string }) {
+  const from = PLANS.findIndex((plan) => plan.id === current.id);
+  const to = PLANS.findIndex((plan) => plan.id === wanted.id);
+  return to < from || (to === from && current.interval === "yearly" && wanted.interval === "monthly");
 }
 
 /** A fleet as the plans count it. */

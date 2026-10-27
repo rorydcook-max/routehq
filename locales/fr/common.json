@@ -3877,7 +3877,7 @@
     "bl_trialLeft": "{days, plural, =0 {Votre essai se termine aujourd’hui} one {# jour d’essai restant} other {# jours d’essai restants}}",
     "bl_trialNoDate": "Date de fin d’essai non définie",
     "bl_howTitle": "Comment s’abonner",
-    "bl_howBody": "Pour l’instant, nous activons les abonnements à la main : payez par virement bancaire ou PromptPay, envoyez-nous la confirmation et nous activons votre forfait, généralement le jour même. Le paiement par carte arrive bientôt.",
+    "bl_howBody": "Choisissez une formule ci-dessus et payez par PromptPay ou virement bancaire ; nous l'activons dès réception du paiement, généralement le jour même. Le paiement par carte arrive bientôt.",
     "bl_line": "Écrivez-nous sur LINE",
     "bl_whatsapp": "WhatsApp",
     "bl_email": "E-mail",
@@ -4123,7 +4123,31 @@
     "pl_forYourFleet": "Votre flotte : {amount}",
     "pl_bikesNote": "Les scooters, vélos électriques et quads comptent comme des motos ; les fourgons et pick-up comptent comme des voitures.",
     "pl_currencyNote": "Prix en {currency}.",
-    "inc_owners": "Gérez des véhicules pour leurs propriétaires : relevés de ce que chaque véhicule a rapporté"
+    "inc_owners": "Gérez des véhicules pour leurs propriétaires : relevés de ce que chaque véhicule a rapporté",
+    "pl_chooseBtn": "Choisir {plan}",
+    "pl_switchFree": "Passer à Free",
+    "pl_saving": "Enregistrement…",
+    "pl_tryAgain": "Une erreur est survenue. Veuillez réessayer.",
+    "pl_ownerOnly": "Seul le propriétaire de l'entreprise peut changer de formule.",
+    "pl_pendingBadge": "En attente de paiement",
+    "pl_afterTrial": "Après votre essai : {plan}",
+    "pl_paidUntil": "Paiement {interval} · prochain paiement le {date}",
+    "pl_intervalMonthly": "mensuel",
+    "pl_intervalYearly": "annuel",
+    "pl_pendingTitle": "Payez pour activer votre formule",
+    "pl_pendingWhat": "{plan}, paiement {interval} : {amount}",
+    "pl_renewalTitle": "Votre formule change au renouvellement",
+    "pl_renewalBody": "Vous conservez votre formule actuelle jusqu'au {date}, puis passez à la nouvelle. Rien à payer maintenant.",
+    "pl_foundingApplied": "Offre de lancement : moitié prix (normalement {amount})",
+    "pl_payPromptPay": "Scannez avec n'importe quelle appli bancaire thaïlandaise pour payer {amount}.",
+    "pl_payBank": "Virez {amount} à :",
+    "pl_payBankOr": "Ou virez à :",
+    "pl_payOther": "Nous vous indiquerons dans l'Aide comment payer {amount}, généralement le jour même.",
+    "pl_payAfter": "Envoyez-nous ensuite le justificatif. Nous activons votre formule dès réception du paiement, généralement le jour même.",
+    "pl_paySlip": "Envoyer le justificatif de paiement",
+    "pl_cancelRequest": "Annuler ce changement",
+    "pl_requestSubject": "Changement de formule : {plan}",
+    "pl_requestMsg": "Je souhaite passer à {plan}, paiement {interval} : {amount}."
   },
   "accountPage": {
     "roleOwner": "Propriétaire",
@@ -4414,7 +4438,9 @@
     "iv_rateLimited": "Trop d’e-mails d’invitation ont été envoyés dans la dernière heure. Réessayez un peu plus tard.",
     "trialNote": "Gratuit pendant 30 jours. Sans carte.",
     "showPassword": "Afficher",
-    "hidePassword": "Masquer"
+    "hidePassword": "Masquer",
+    "continueFree": "Continuer avec la formule Free",
+    "continueFreeError": "Une erreur est survenue. Veuillez réessayer."
   },
   "calc": {
     "title": "Acheter un véhicule",
@@ -5046,7 +5072,12 @@
     "plan_starter": "Starter",
     "plan_growth": "Growth",
     "plan_pro": "Pro",
-    "plan_business": "Business"
+    "plan_business": "Business",
+    "teamRequest": "Changement de formule en attente de paiement",
+    "teamRequestWhat": "{plan}, {interval} : {amount}",
+    "teamRequestNote": "Vérifiez que le paiement est arrivé (le justificatif est dans cette conversation), puis activez la formule. La période payée court à partir d'aujourd'hui, ou de la date d'échéance actuelle si elle est plus tardive.",
+    "teamActivate": "Paiement reçu : activer la formule",
+    "teamActivating": "Activation…"
   },
   "inspectStart": {
     "titleOut": "Remettre un véhicule",

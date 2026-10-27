@@ -3845,7 +3845,7 @@
     "bl_trialLeft": "{days, plural, =0 {Su prueba termina hoy} one {Queda # día de prueba} other {Quedan # días de prueba}}",
     "bl_trialNoDate": "Fecha de fin de la prueba sin definir",
     "bl_howTitle": "Cómo suscribirse",
-    "bl_howBody": "Por ahora activamos las suscripciones personalmente: pague por transferencia bancaria o PromptPay, envíenos el comprobante y activamos su plan, normalmente el mismo día. El pago con tarjeta llegará pronto.",
+    "bl_howBody": "Elija un plan arriba y pague por PromptPay o transferencia bancaria; lo activamos en cuanto llega el pago, normalmente el mismo día. Pronto podrá pagar con tarjeta.",
     "bl_line": "Escríbanos por LINE",
     "bl_whatsapp": "WhatsApp",
     "bl_email": "Correo electrónico",
@@ -4091,7 +4091,31 @@
     "pl_forYourFleet": "Su flota: {amount}",
     "pl_bikesNote": "Los scooters, las bicicletas eléctricas y los quads cuentan como motos; las furgonetas y las pickups cuentan como coches.",
     "pl_currencyNote": "Precios en {currency}.",
-    "inc_owners": "Gestione vehículos de sus propietarios: liquidaciones con lo que ganó cada vehículo"
+    "inc_owners": "Gestione vehículos de sus propietarios: liquidaciones con lo que ganó cada vehículo",
+    "pl_chooseBtn": "Elegir {plan}",
+    "pl_switchFree": "Cambiar a Free",
+    "pl_saving": "Guardando…",
+    "pl_tryAgain": "Algo salió mal. Inténtelo de nuevo.",
+    "pl_ownerOnly": "Solo el propietario del negocio puede cambiar el plan.",
+    "pl_pendingBadge": "Pendiente de pago",
+    "pl_afterTrial": "Después de su prueba: {plan}",
+    "pl_paidUntil": "Pago {interval} · próximo pago el {date}",
+    "pl_intervalMonthly": "mensual",
+    "pl_intervalYearly": "anual",
+    "pl_pendingTitle": "Pague para activar su plan",
+    "pl_pendingWhat": "{plan}, pago {interval}: {amount}",
+    "pl_renewalTitle": "Su plan cambia en la renovación",
+    "pl_renewalBody": "Mantiene su plan actual hasta el {date} y después pasa al nuevo. No tiene que pagar nada ahora.",
+    "pl_foundingApplied": "Oferta fundadora: mitad de precio (normalmente {amount})",
+    "pl_payPromptPay": "Escanee con cualquier app bancaria tailandesa para pagar {amount}.",
+    "pl_payBank": "Transfiera {amount} a:",
+    "pl_payBankOr": "O transfiera a:",
+    "pl_payOther": "Le responderemos en Ayuda cómo pagar {amount}, normalmente el mismo día.",
+    "pl_payAfter": "Después envíenos el comprobante. Activamos su plan en cuanto llega el pago, normalmente el mismo día.",
+    "pl_paySlip": "Enviar el comprobante de pago",
+    "pl_cancelRequest": "Cancelar este cambio",
+    "pl_requestSubject": "Cambio de plan: {plan}",
+    "pl_requestMsg": "Me gustaría cambiar a {plan}, con pago {interval}: {amount}."
   },
   "accountPage": {
     "roleOwner": "Propietario",
@@ -4382,7 +4406,9 @@
     "iv_rateLimited": "Se enviaron demasiados correos de invitación en la última hora. Inténtelo de nuevo un poco más tarde.",
     "trialNote": "Gratis durante 30 días. Sin tarjeta.",
     "showPassword": "Mostrar",
-    "hidePassword": "Ocultar"
+    "hidePassword": "Ocultar",
+    "continueFree": "Continuar con el plan Free",
+    "continueFreeError": "Algo salió mal. Inténtelo de nuevo."
   },
   "calc": {
     "title": "Comprar un vehículo",
@@ -5046,7 +5072,12 @@
     "plan_starter": "Starter",
     "plan_growth": "Growth",
     "plan_pro": "Pro",
-    "plan_business": "Business"
+    "plan_business": "Business",
+    "teamRequest": "Cambio de plan pendiente de pago",
+    "teamRequestWhat": "{plan}, {interval}: {amount}",
+    "teamRequestNote": "Compruebe que el pago ha llegado (el comprobante está en esta conversación) y active el plan. El tiempo pagado cuenta desde hoy, o desde la fecha de vencimiento actual si es posterior.",
+    "teamActivate": "Pago recibido: activar plan",
+    "teamActivating": "Activando…"
   },
   "inspectStart": {
     "titleOut": "Entregar un vehículo",

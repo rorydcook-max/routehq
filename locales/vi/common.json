@@ -3877,7 +3877,7 @@
     "bl_trialLeft": "{days, plural, =0 {Thời gian dùng thử kết thúc hôm nay} other {Còn # ngày dùng thử}}",
     "bl_trialNoDate": "Chưa đặt ngày kết thúc dùng thử",
     "bl_howTitle": "Cách đăng ký",
-    "bl_howBody": "Hiện tại chúng tôi thiết lập đăng ký trực tiếp: thanh toán bằng chuyển khoản hoặc PromptPay, gửi xác nhận cho chúng tôi, và chúng tôi kích hoạt gói cho bạn, thường trong ngày. Sắp hỗ trợ thanh toán bằng thẻ.",
+    "bl_howBody": "Chọn một gói ở trên và thanh toán qua PromptPay hoặc chuyển khoản ngân hàng; chúng tôi kích hoạt ngay khi nhận được tiền, thường trong ngày. Thanh toán bằng thẻ sẽ sớm có.",
     "bl_line": "Nhắn tin cho chúng tôi qua LINE",
     "bl_whatsapp": "WhatsApp",
     "bl_email": "Email",
@@ -4123,7 +4123,31 @@
     "pl_forYourFleet": "Đội xe của bạn: {amount}",
     "pl_bikesNote": "Xe tay ga, xe đạp điện và xe ATV được tính là xe máy; xe van và xe bán tải được tính là ô tô.",
     "pl_currencyNote": "Giá tính bằng {currency}.",
-    "inc_owners": "Cho thuê xe của chủ xe: báo cáo thu nhập của từng xe cho chủ xe"
+    "inc_owners": "Cho thuê xe của chủ xe: báo cáo thu nhập của từng xe cho chủ xe",
+    "pl_chooseBtn": "Chọn {plan}",
+    "pl_switchFree": "Chuyển sang Free",
+    "pl_saving": "Đang lưu…",
+    "pl_tryAgain": "Đã xảy ra lỗi. Vui lòng thử lại.",
+    "pl_ownerOnly": "Chỉ chủ doanh nghiệp mới có thể đổi gói.",
+    "pl_pendingBadge": "Đang chờ thanh toán",
+    "pl_afterTrial": "Sau thời gian dùng thử: {plan}",
+    "pl_paidUntil": "Thanh toán {interval} · lần thanh toán tiếp theo {date}",
+    "pl_intervalMonthly": "theo tháng",
+    "pl_intervalYearly": "theo năm",
+    "pl_pendingTitle": "Thanh toán để kích hoạt gói",
+    "pl_pendingWhat": "{plan}, thanh toán {interval}: {amount}",
+    "pl_renewalTitle": "Gói của bạn sẽ thay đổi khi gia hạn",
+    "pl_renewalBody": "Bạn vẫn dùng gói hiện tại đến {date}, sau đó chuyển sang gói mới. Hiện chưa cần thanh toán.",
+    "pl_foundingApplied": "Ưu đãi sáng lập: giảm nửa giá (giá gốc {amount})",
+    "pl_payPromptPay": "Quét bằng bất kỳ ứng dụng ngân hàng Thái nào để thanh toán {amount}.",
+    "pl_payBank": "Chuyển khoản {amount} đến:",
+    "pl_payBankOr": "Hoặc chuyển khoản đến:",
+    "pl_payOther": "Chúng tôi sẽ trả lời trong mục Trợ giúp về cách thanh toán {amount}, thường trong ngày.",
+    "pl_payAfter": "Sau đó gửi cho chúng tôi biên lai chuyển khoản. Chúng tôi kích hoạt gói ngay khi nhận được tiền, thường trong ngày.",
+    "pl_paySlip": "Gửi biên lai chuyển khoản",
+    "pl_cancelRequest": "Hủy thay đổi này",
+    "pl_requestSubject": "Đổi gói: {plan}",
+    "pl_requestMsg": "Tôi muốn chuyển sang {plan}, thanh toán {interval}: {amount}."
   },
   "accountPage": {
     "roleOwner": "Chủ sở hữu",
@@ -4414,7 +4438,9 @@
     "iv_rateLimited": "Đã gửi quá nhiều email mời trong giờ qua. Vui lòng thử lại sau ít phút.",
     "trialNote": "Miễn phí 30 ngày. Không cần thẻ.",
     "showPassword": "Hiện",
-    "hidePassword": "Ẩn"
+    "hidePassword": "Ẩn",
+    "continueFree": "Tiếp tục với gói Free",
+    "continueFreeError": "Đã xảy ra lỗi. Vui lòng thử lại."
   },
   "calc": {
     "title": "Mua xe",
@@ -5046,7 +5072,12 @@
     "plan_starter": "Starter",
     "plan_growth": "Growth",
     "plan_pro": "Pro",
-    "plan_business": "Business"
+    "plan_business": "Business",
+    "teamRequest": "Yêu cầu đổi gói đang chờ thanh toán",
+    "teamRequestWhat": "{plan}, {interval}: {amount}",
+    "teamRequestNote": "Kiểm tra tiền đã về (biên lai nằm trong cuộc trò chuyện này), sau đó kích hoạt gói. Thời gian đã trả được tính từ hôm nay, hoặc từ ngày đến hạn hiện tại nếu ngày đó muộn hơn.",
+    "teamActivate": "Đã nhận tiền: kích hoạt gói",
+    "teamActivating": "Đang kích hoạt…"
   },
   "inspectStart": {
     "titleOut": "Giao xe",

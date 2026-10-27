@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ChevronRight } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
-import { BackLink } from "@/components/ui";
+import { AdminHeader } from "@/app/platform/admin-nav";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { isPlatformAdmin } from "@/lib/support";
@@ -25,11 +25,8 @@ export default async function HelpTeamPage({ searchParams }: { searchParams: Pro
   return (
     <AppShell userEmail={userEmail}>
       <div className="space-y-4">
-        <div className="page-hero">
-          <BackLink href="/help" label={t("back")} />
-          <h1 className="page-title">{t("teamTitle")}</h1>
-          <p className="page-subtitle mt-2">{t("teamSubtitle")}</p>
-        </div>
+        {/* Part of the RouteHQ admin console: the same header and tabs as the other admin pages. */}
+        <AdminHeader active="/help/team" subtitle={t("teamSubtitle")} title={t("teamTitle")} />
         <div className="chip-row flex flex-wrap gap-2">
           {(["waiting", "all"] as const).map((value) => (
             <Link
@@ -40,11 +37,6 @@ export default async function HelpTeamPage({ searchParams }: { searchParams: Pro
               {t(`teamFilter_${value}`)}
             </Link>
           ))}
-          {/* RouteHQ's own renter list sits with the rest of the RouteHQ team's tools. */}
-          <Link className="ml-auto inline-flex items-center gap-1 rounded-full border border-[var(--border)] bg-[var(--panel)] px-3.5 py-1.5 text-[15px] font-semibold text-[var(--primary)]" href={"/platform/renters" as Route}>
-            {tr("link")}
-            <ChevronRight size={16} />
-          </Link>
         </div>
         <section className="card p-2 sm:p-3">
           {threads.length ? (

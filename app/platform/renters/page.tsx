@@ -2,7 +2,8 @@ import Link from "next/link";
 import type { Route } from "next";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
-import { ChevronLeft, Download } from "lucide-react";
+import { Download } from "lucide-react";
+import { AdminHeader } from "../admin-nav";
 import { AppShell } from "@/components/app-shell";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { getCurrentUserEmail } from "@/lib/auth/session";
@@ -42,17 +43,10 @@ export default async function RentersPage({ searchParams }: { searchParams: Prom
 
   return (
     <AppShell userEmail={userEmail}>
-      <div className="mx-auto max-w-5xl space-y-4">
-        <Link className="inline-flex items-center gap-1 font-semibold text-[var(--primary)]" href={"/help/team" as Route}>
-          <ChevronLeft size={18} />
-          {t("back")}
-        </Link>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div className="page-hero mb-0 min-w-0 flex-1">
-            <h1 className="page-title">{t("title")}</h1>
-            <p className="page-subtitle page-subtitle-keep mt-2">{t("subtitle")}</p>
-          </div>
-          <a className="secondary-action pressable shrink-0 self-start sm:self-auto" href={`/platform/renters/export${exportQuery ? `?${exportQuery}` : ""}`}>
+      <AdminHeader active="/platform/renters" subtitle={t("subtitle")} title={t("title")} />
+      <div className="space-y-4">
+        <div className="flex justify-end">
+          <a className="secondary-action pressable shrink-0" href={`/platform/renters/export${exportQuery ? `?${exportQuery}` : ""}`}>
             <Download size={17} />
             {t("export")}
           </a>

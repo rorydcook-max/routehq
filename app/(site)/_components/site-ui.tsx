@@ -51,31 +51,21 @@ export const SITE_LINKS = {
   signUp: "/signup"
 } as const;
 
-/** The page column every section uses: 1200px, with a 16px gutter on phones. */
+/** The page column every section uses: 1240px, with a 16px gutter on phones. */
 export function Container({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8 ${className}`}>{children}</div>;
+  return <div className={`mx-auto w-full max-w-[1240px] px-4 sm:px-6 lg:px-10 ${className}`}>{children}</div>;
 }
 
-export function SectionHeading({
-  eyebrow,
-  title,
-  body,
-  align = "center",
-  id
-}: {
-  eyebrow?: string;
-  title: string;
-  body?: string;
-  align?: "center" | "start";
-  id?: string;
-}) {
+/** A small label naming a section. */
+export function Eyebrow({ children, dark = false, className = "" }: { children: ReactNode; dark?: boolean; className?: string }) {
+  return <p className={`${s.eyebrow} ${dark ? s.eyebrowDark : ""} ${className}`}>{children}</p>;
+}
+
+/** The arrow after a link, turned round for right-to-left languages. */
+export function Arrow({ size = 18 }: { size?: number }) {
   return (
-    <div className={align === "center" ? "mx-auto max-w-[720px] text-center" : "max-w-[640px]"}>
-      {eyebrow ? <p className={s.eyebrow}>{eyebrow}</p> : null}
-      <h2 className={`${s.display} mt-3 text-[2rem] text-[var(--foreground)] sm:text-[2.6rem]`} id={id}>
-        {title}
-      </h2>
-      {body ? <p className={`${s.lede} mt-4 text-[1.0625rem] leading-relaxed text-[var(--muted)] sm:text-[1.125rem]`}>{body}</p> : null}
-    </div>
+    <svg aria-hidden="true" className="shrink-0 rtl:-scale-x-100" fill="none" height={size} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width={size}>
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
   );
 }

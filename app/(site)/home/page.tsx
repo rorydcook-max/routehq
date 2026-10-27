@@ -1,41 +1,32 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
-import {
-  ArrowRight,
-  Bell,
-  CalendarDays,
-  Calculator,
-  ChevronDown,
-  Code2,
-  FileCheck2,
-  FileSpreadsheet,
-  Globe,
-  Handshake,
-  Languages,
-  MessagesSquare,
-  QrCode,
-  ScanLine,
-  Search,
-  ShieldCheck,
-  TrendingUp,
-  Upload,
-  Users,
-  Wallet,
-  Camera,
-  Check,
-  Link2,
-  ReceiptText
-} from "lucide-react";
+import { Check, Plus } from "lucide-react";
 import { numberLocale } from "@/lib/i18n/dates";
 import { supportedLocaleCodes } from "@/lib/i18n/locales";
 import { FINDERS_FEE_PCT, FOUNDING_SLOTS, PLANS, TRIAL_DAYS, fleetText } from "@/lib/plans";
-import { formatPlanPrice } from "@/lib/plan-currency";
-import { BookingPhoneMock, DashboardLaptopMock, HandoverPhoneMock, PaidToast, PaymentPhoneMock, TodayPhoneMock } from "../_components/mockups";
-import { Container, SITE_LINKS, SectionHeading, SiteLink } from "../_components/site-ui";
+import { formatPlanPrice, planPrices } from "@/lib/plan-currency";
+import { visitorCurrency } from "@/lib/site-currency";
+import {
+  BookingPhoneMock,
+  DashboardWindowMock,
+  HandoverPhoneMock,
+  LedgerCard,
+  PaidToast,
+  PassportCard,
+  PaymentPhoneMock,
+  ReturnCard,
+  ShopPageMock,
+  TodayPhoneMock,
+  sampleMoney
+} from "../_components/mockups";
+import { Arrow, Container, Eyebrow, SITE_LINKS, SiteLink } from "../_components/site-ui";
 import { FinalCta } from "../_components/final-cta";
 import s from "../site.module.css";
 
 const LANGUAGE_COUNT = supportedLocaleCodes.length;
+
+type Say = (key: string, values?: Record<string, string | number>) => string;
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("site");
@@ -51,60 +42,37 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function SiteHomePage() {
-  const [t, settings, locale] = await Promise.all([getTranslations("site"), getTranslations("settingsPage"), getLocale()]);
-  const say = settings as unknown as (key: string, values?: Record<string, string | number>) => string;
+  const [t, settings, locale, currency, money] = await Promise.all([getTranslations("site"), getTranslations("settingsPage"), getLocale(), visitorCurrency(), sampleMoney()]);
+  const say = settings as unknown as Say;
   const nl = numberLocale(locale);
-  const free = PLANS.find((plan) => plan.monthly === 0)!;
-  const cheapestPaid = PLANS.filter((plan) => plan.monthly > 0).sort((a, b) => a.monthly - b.monthly)[0];
-  const fromPrice = formatPlanPrice(cheapestPaid.monthly, "THB", nl);
+  const price = (amount: number) => formatPlanPrice(amount, currency, nl);
 
-  const rows = [
-    {
-      key: "f1",
-      icon: Link2,
-      points: [ScanLine, FileCheck2, Wallet],
-      visual: <BookingPhoneMock />
-    },
-    {
-      key: "f2",
-      icon: Camera,
-      points: [Camera, Check, FileCheck2],
-      visual: <HandoverPhoneMock />
-    },
-    {
-      key: "f3",
-      icon: QrCode,
-      points: [QrCode, ReceiptText, ShieldCheck],
-      visual: <PaymentPhoneMock />
-    }
+  const facts: Array<{ key: string; values?: Record<string, number> }> = [
+    { key: "Phone" },
+    { key: "Languages", values: { count: LANGUAGE_COUNT } },
+    { key: "Chat" },
+    { key: "Pay" },
+    { key: "NoApp" },
+    { key: "Free", values: { days: TRIAL_DAYS } }
   ];
 
-  const grid = [
-    { icon: Bell, key: "Reminders" },
-    { icon: MessagesSquare, key: "Inbox" },
-    { icon: CalendarDays, key: "Calendar" },
-    { icon: FileCheck2, key: "Paperwork" },
-    { icon: TrendingUp, key: "Reports" },
-    { icon: Handshake, key: "Owners" },
-    { icon: Users, key: "Team" },
-    { icon: Languages, key: "Languages" },
-    { icon: FileSpreadsheet, key: "Importer" },
-    { icon: Calculator, key: "Calculator" }
+  const features: Array<{ key: string; phone: ReactNode; card: ReactNode; ink?: boolean; flip?: boolean }> = [
+    { key: "f1", phone: <BookingPhoneMock />, card: <PassportCard /> },
+    { key: "f2", phone: <HandoverPhoneMock />, card: <ReturnCard />, ink: true, flip: true },
+    { key: "f3", phone: <PaymentPhoneMock />, card: <LedgerCard /> }
   ];
 
-  const grow = [
-    { icon: Globe, key: "BookingPage" },
-    { icon: Search, key: "Directory" },
-    { icon: Code2, key: "Widget" },
-    { icon: Handshake, key: "Partners" }
+  const day = [
+    { time: "08:40", key: "day1", chip: t("dayChip1") },
+    { time: "10:00", key: "day2", chip: t("dayChip2", { count: 8 }) },
+    { time: "10:05", key: "day3", chip: t("mockPaidToast", { amount: money(5600) }), hot: true },
+    { time: "13:20", key: "day4", chip: t("dayChip4") },
+    { time: "16:30", key: "day5", chip: t("dayChip5", { amount: money(3000) }) },
+    { time: "20:00", key: "day6", chip: t("dayChip6", { amount: money(9800) }) }
   ];
 
-  const steps = [
-    { icon: Upload, key: "step1" },
-    { icon: Link2, key: "step2" },
-    { icon: Wallet, key: "step3" }
-  ];
-
+  const index = ["Reminders", "Inbox", "Calendar", "Paperwork", "Reports", "Owners", "Team", "Languages", "Importer", "Calculator"];
+  const grow = ["BookingPage", "Directory", "Widget", "Partners"];
   const faqs = ["Phone", "App", "Trial", "Import", "Line", "Languages", "Bikes", "Cancel", "Who"];
   const faqValues: Record<string, Record<string, string | number>> = {
     Trial: { days: TRIAL_DAYS },
@@ -135,121 +103,138 @@ export default async function SiteHomePage() {
     <>
       <script dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} type="application/ld+json" />
 
-      {/* ── Hero ── */}
-      <section className="relative isolate overflow-hidden">
-        <div className={s.heroGlow} />
-        <div className={s.heroGrid} />
-        <Container className="relative grid items-center gap-12 pb-16 pt-12 sm:pt-16 lg:grid-cols-[1fr_1.15fr] lg:gap-10 lg:pb-24 lg:pt-20">
-          <div className="max-w-[600px]">
-            <p className={s.eyebrow}>
-              <span className="inline-block h-2 w-2 rounded-full bg-[var(--accent)]" />
-              {t("heroEyebrow")}
-            </p>
-            <h1 className={`${s.display} mt-4 text-[2.6rem] text-[var(--foreground)] sm:text-[3.4rem] lg:text-[4rem]`}>{t("heroTitle")}</h1>
-            <p className={`${s.lede} mt-5 max-w-[540px] text-[1.125rem] leading-relaxed text-[var(--muted)] sm:text-[1.2rem]`}>{t("heroBody")}</p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <SiteLink className={s.btnPrimary} href={SITE_LINKS.signUp}>
-                {t("ctaTrial")} <ArrowRight aria-hidden="true" className="rtl:rotate-180" size={18} />
-              </SiteLink>
-              <SiteLink className={s.btnSecondary} href={SITE_LINKS.pricing}>
-                {t("heroSecondary")}
-              </SiteLink>
+      {/* ── Hero: the promise, then the product, big, spilling onto the page below ── */}
+      <section className={s.hero}>
+        <Container className={s.heroTop}>
+          <Eyebrow className={s.rise} dark>
+            {t("heroEyebrow")}
+          </Eyebrow>
+          <h1 className={`${s.heroTitle} ${s.rise} mt-6`}>{t.rich("heroTitle", { hl: (chunks) => <span className={s.hl}>{chunks}</span> })}</h1>
+          <div className={`${s.heroRow} ${s.rise} ${s.rise2}`}>
+            <p className={s.heroSub}>{t("heroBody")}</p>
+            <div>
+              <div className={s.heroActions}>
+                <SiteLink className={`${s.btn} ${s.btnSignal}`} href={SITE_LINKS.signUp}>
+                  {t("ctaTrial")} <Arrow />
+                </SiteLink>
+                <SiteLink className={`${s.textLink} text-white`} href={SITE_LINKS.pricing}>
+                  {t("heroSecondary")}
+                </SiteLink>
+              </div>
+              <p className={s.heroNote}>{t("heroNote", { days: TRIAL_DAYS })}</p>
             </div>
-            <p className="mt-4 text-[15px] text-[var(--muted)]">{t("heroNote", { days: TRIAL_DAYS })}</p>
           </div>
 
-          {/* Phones: the operator's day on a phone. Larger screens: the dashboard, with a customer's booking link in front. */}
-          <div className="relative">
-            <div className="mx-auto w-[78%] max-w-[300px] sm:hidden">
-              <TodayPhoneMock />
-              <PaidToast className="relative mx-auto -mt-14 w-max max-w-full" />
-            </div>
-            <div className="relative hidden sm:block sm:pb-10 sm:ps-[12%] lg:ps-[14%]">
-              <DashboardLaptopMock />
-              <div className="absolute bottom-0 start-0 w-[30%] max-w-[230px]">
+          <div className={`${s.stage} ${s.rise} ${s.rise3}`}>
+            <div className={s.stageDesk}>
+              <DashboardWindowMock />
+              <div className={s.stagePhone}>
                 <BookingPhoneMock />
               </div>
-              <PaidToast className="absolute -top-5 end-2 hidden md:flex" />
+              <PaidToast className={s.stageToast} />
+            </div>
+            <div className={s.stageMobile}>
+              <TodayPhoneMock />
+              <PaidToast className={s.stageToast} />
             </div>
           </div>
         </Container>
       </section>
 
-      {/* ── What we can honestly say ── */}
-      <section aria-label={t("proofLabel")} className="border-y border-[var(--border)] bg-white">
-        <Container className="grid grid-cols-2 gap-x-6 gap-y-4 py-6 md:grid-cols-4">
-          {[
-            { icon: Handshake, text: t("proofBuilt") },
-            { icon: Languages, text: t("proofLanguages", { count: LANGUAGE_COUNT }) },
-            { icon: MessagesSquare, text: t("proofChat") },
-            { icon: QrCode, text: t("proofPromptPay") }
-          ].map(({ icon: Icon, text }) => (
-            <p className="flex items-center gap-2.5 text-[15px] font-semibold text-[var(--foreground-secondary)]" key={text}>
-              <Icon aria-hidden="true" className="shrink-0 text-[var(--primary)]" size={18} />
-              {text}
-            </p>
-          ))}
+      {/* ── Plain facts ── */}
+      <section aria-label={t("proofLabel")}>
+        <Container>
+          <div className={s.facts}>
+            {facts.map(({ key, values }) => (
+              <p className={s.fact} key={key}>
+                <strong>{t(`fact${key}Title`, values || {})}</strong>
+                {t(`fact${key}Body`, values || {})}
+              </p>
+            ))}
+          </div>
         </Container>
       </section>
 
       {/* ── The problem, in one breath ── */}
-      <section className="py-20 sm:py-28">
+      <section className={s.section}>
         <Container>
-          <SectionHeading body={t("introBody")} title={t("introTitle")} />
+          <p className={s.statement}>
+            {t("introTitle")} <span>{t("introBody")}</span>
+          </p>
         </Container>
       </section>
 
-      {/* ── Three things it does best ── */}
-      <section className="pb-8" id="features">
-        <Container className="space-y-20 sm:space-y-28">
-          {rows.map((row, index) => {
-            const Icon = row.icon;
-            return (
-              <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16" key={row.key}>
-                <div className={index % 2 ? "lg:order-2" : ""}>
-                  <div className="flex items-center gap-3">
-                    <span className={s.iconTile}>
-                      <Icon aria-hidden="true" size={22} />
-                    </span>
-                    <p className={s.eyebrow}>{t(`${row.key}Eyebrow`)}</p>
-                  </div>
-                  <h2 className={`${s.display} mt-4 text-[2rem] sm:text-[2.5rem]`}>{t(`${row.key}Title`)}</h2>
-                  <p className={`${s.lede} mt-4 text-[1.0625rem] leading-relaxed text-[var(--muted)]`}>{t(`${row.key}Body`)}</p>
-                  <ul className="mt-6 space-y-3">
-                    {row.points.map((PointIcon, point) => (
-                      <li className="flex items-start gap-3 text-[16px] font-semibold text-[var(--foreground)]" key={point}>
-                        <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)] text-[var(--primary)]">
-                          <PointIcon aria-hidden="true" size={14} strokeWidth={2.5} />
-                        </span>
-                        {t(`${row.key}Point${point + 1}`)}
+      {/* ── Three jobs it does best ── */}
+      <section className="pb-[clamp(88px,11vw,168px)]" id="features">
+        <Container>
+          {features.map((feature) => (
+            <article className={s.feature} key={feature.key}>
+              <div className={s.featureHead}>
+                <div>
+                  <Eyebrow>{t(`${feature.key}Eyebrow`)}</Eyebrow>
+                  <h2 className={`${s.h2} mt-5`}>{t(`${feature.key}Title`)}</h2>
+                </div>
+                <div>
+                  <p className={s.lede}>{t(`${feature.key}Body`)}</p>
+                  <ul className={s.points}>
+                    {[1, 2, 3].map((point) => (
+                      <li key={point}>
+                        <Check aria-hidden="true" size={18} strokeWidth={2.5} />
+                        {t(`${feature.key}Point${point}`)}
                       </li>
                     ))}
                   </ul>
                 </div>
-                <div className={`${s.tint} relative flex justify-center overflow-hidden rounded-[32px] px-6 py-8 sm:py-14 ${index % 2 ? "lg:order-1" : ""}`}>
-                  <div className="w-[58%] max-w-[270px] sm:w-[72%]">{row.visual}</div>
-                </div>
               </div>
-            );
-          })}
+              <div className={`${s.panel} ${feature.ink ? s.panelInk : ""} ${feature.flip ? s.panelFlip : ""}`}>
+                <div className={s.panelPhone}>{feature.phone}</div>
+                <div className={s.panelCard}>{feature.card}</div>
+              </div>
+            </article>
+          ))}
         </Container>
       </section>
 
-      {/* ── Everything else ── */}
-      <section className="py-20 sm:py-28">
-        <Container>
-          <SectionHeading body={t("gridBody")} title={t("gridTitle")} />
-          {/* Phones: one grouped list (icon beside the text). Larger screens: separate tiles. */}
-          <div className={`${s.featList} mt-10 sm:mt-12`}>
-            {grid.map(({ icon: Icon, key }) => (
-              <div className={s.featItem} key={key}>
-                <span className={s.iconTile}>
-                  <Icon aria-hidden="true" size={20} />
-                </span>
-                <div className="min-w-0">
-                  <h3 className="text-[16px] font-semibold leading-snug text-[var(--foreground)] sm:mt-4 sm:text-[17px]">{t(`grid${key}Title`, { count: LANGUAGE_COUNT })}</h3>
-                  <p className="mt-1 text-[15px] leading-relaxed text-[var(--muted)] sm:mt-1.5">{t(`grid${key}Body`)}</p>
+      {/* ── A day with RouteHQ ── */}
+      <section className={`${s.day} ${s.section}`}>
+        <Container className={s.dayGrid}>
+          <div className={s.dayHead}>
+            <Eyebrow dark>{t("dayEyebrow")}</Eyebrow>
+            <h2 className={`${s.h2} mt-5 text-white`}>{t("dayTitle")}</h2>
+            <p className={`${s.heroSub} mt-6`}>{t("dayBody")}</p>
+          </div>
+          <ol className={s.dayList}>
+            {day.map((item) => (
+              <li className={`${s.dayItem} ${item.hot ? s.dayItemHot : ""}`} key={item.key}>
+                <p className={s.dayTime}>{item.time}</p>
+                <div>
+                  <h3 className="text-[19px] font-semibold leading-snug text-white">{t(`${item.key}Title`)}</h3>
+                  <p className="mt-1.5 max-w-[34em] text-[16px] leading-relaxed text-[var(--ink-muted)]">{t(`${item.key}Body`)}</p>
+                  <p className={s.dayChip}>
+                    <span>
+                      <Check aria-hidden="true" size={13} strokeWidth={3} />
+                    </span>
+                    {item.chip}
+                  </p>
                 </div>
+              </li>
+            ))}
+          </ol>
+        </Container>
+      </section>
+
+      {/* ── The rest of the job ── */}
+      <section className={s.section}>
+        <Container className={s.split}>
+          <div className={s.splitSticky}>
+            <h2 className={s.h2}>{t("gridTitle")}</h2>
+            <p className={`${s.lede} mt-5`}>{t("gridBody")}</p>
+          </div>
+          <div className={s.index}>
+            {index.map((key) => (
+              <div className={s.indexItem} key={key}>
+                <h3>{t(`grid${key}Title`, { count: LANGUAGE_COUNT })}</h3>
+                <p>{t(`grid${key}Body`)}</p>
               </div>
             ))}
           </div>
@@ -257,94 +242,102 @@ export default async function SiteHomePage() {
       </section>
 
       {/* ── Bookings coming in ── */}
-      <section className="relative overflow-hidden bg-[var(--primary)] py-20 text-white sm:py-28">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_420px_at_85%_-10%,rgba(255,255,255,0.14),transparent_60%),radial-gradient(700px_380px_at_0%_110%,rgba(0,0,0,0.18),transparent_60%)]" />
-        <Container className="relative">
-          <div className="max-w-[680px]">
-            <p className="font-semibold text-[#9fd6cd]">{t("growEyebrow")}</p>
-            <h2 className={`${s.display} mt-3 text-[2rem] text-white sm:text-[2.6rem]`}>{t("growTitle")}</h2>
-            <p className={`${s.lede} mt-4 text-[1.0625rem] leading-relaxed text-white/80 sm:text-[1.125rem]`}>{t("growBody")}</p>
+      <section className={`${s.paper} ${s.section} overflow-hidden`}>
+        <Container className={s.growGrid}>
+          <div className={s.growHead}>
+            <Eyebrow>{t("growEyebrow")}</Eyebrow>
+            <h2 className={`${s.h2} mt-5`}>{t("growTitle")}</h2>
+            <p className={`${s.lede} mt-5`}>{t("growBody")}</p>
           </div>
-          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {grow.map(({ icon: Icon, key }) => (
-              <div className="rounded-[24px] border border-white/12 bg-white/[0.07] p-5 backdrop-blur-sm" key={key}>
-                <span className="inline-flex h-11 w-11 items-center justify-center rounded-[14px] bg-white/12 text-white">
-                  <Icon aria-hidden="true" size={20} />
-                </span>
-                <h3 className="mt-4 text-[17px] font-semibold text-white">{t(`grow${key}Title`)}</h3>
-                <p className="mt-1.5 text-[15px] leading-relaxed text-white/80">{t(`grow${key}Body`, { pct: FINDERS_FEE_PCT })}</p>
-              </div>
-            ))}
+          <div className={s.growMock}>
+            <ShopPageMock />
           </div>
-          <SiteLink className="mt-10 inline-flex items-center gap-2 font-semibold text-white underline-offset-4 hover:underline" href={SITE_LINKS.directory}>
-            {t("growDirectoryLink")} <ArrowRight aria-hidden="true" className="rtl:rotate-180" size={18} />
-          </SiteLink>
+          <div className={s.growList}>
+            <div>
+              {grow.map((key) => (
+                <div className={s.indexItem} key={key}>
+                  <h3>{t(`grow${key}Title`)}</h3>
+                  <p>{t(`grow${key}Body`, { pct: FINDERS_FEE_PCT })}</p>
+                </div>
+              ))}
+            </div>
+            <SiteLink className={`${s.textLink} mt-4 text-[var(--text)]`} href={SITE_LINKS.directory}>
+              {t("growDirectoryLink")} <Arrow />
+            </SiteLink>
+          </div>
         </Container>
       </section>
 
-      {/* ── How it works ── */}
-      <section className="py-20 sm:py-28">
+      {/* ── Plans in brief ── */}
+      <section className={s.section}>
         <Container>
-          <SectionHeading eyebrow={t("howEyebrow")} title={t("howTitle")} />
-          <ol className="relative mt-14 grid gap-10 md:grid-cols-3 md:gap-8">
-            <span aria-hidden="true" className="absolute start-[16%] end-[16%] top-7 hidden h-px bg-[linear-gradient(90deg,transparent,var(--border-strong)_15%,var(--border-strong)_85%,transparent)] md:block" />
-            {steps.map(({ icon: Icon, key }, index) => (
-              <li className="relative text-center" key={key}>
-                <span className="relative mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-[var(--border)] bg-white text-[var(--primary)] shadow-[0_8px_24px_-12px_rgba(14,94,111,0.45)]">
-                  <Icon aria-hidden="true" size={22} />
-                  <span className="absolute -end-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-[var(--primary)] text-[13px] font-bold text-white">{index + 1}</span>
-                </span>
-                <h3 className="mt-5 text-[19px] font-semibold text-[var(--foreground)]">{t(`${key}Title`)}</h3>
-                <p className="mx-auto mt-2 max-w-[320px] text-[15px] leading-relaxed text-[var(--muted)]">{t(`${key}Body`)}</p>
-              </li>
-            ))}
-          </ol>
+          <div className="flex flex-wrap items-end justify-between gap-x-12 gap-y-6">
+            <div className="max-w-[720px]">
+              <Eyebrow>{t("navPricing")}</Eyebrow>
+              <h2 className={`${s.h2} mt-5`}>{t("plansTitle")}</h2>
+              <p className={`${s.lede} mt-5`}>{t("plansBody")}</p>
+            </div>
+            <SiteLink className={`${s.btn} ${s.btnOutline}`} href={SITE_LINKS.pricing}>
+              {t("priceTeaserLink")} <Arrow />
+            </SiteLink>
+          </div>
+          <div className={s.planRow}>
+            {PLANS.map((plan) => {
+              const hot = plan.id === "pro";
+              const monthly = planPrices(plan, currency).monthly;
+              return (
+                <div className={`${s.planCell} ${hot ? s.planHot : ""}`} key={plan.id}>
+                  <div className="min-w-0">
+                    <p className={s.planName}>
+                      {say(`bl_${plan.id}`)}
+                      {hot ? <span className={s.planBadge}>{say("pl_popular")}</span> : null}
+                    </p>
+                    <p className={`${s.planMeta} mt-1`}>{plan.id === "business" ? say("pl_anySize") : say("pl_upTo", { fleet: fleetText({ cars: plan.cars!, motorbikes: plan.motorbikes! }, say) })}</p>
+                  </div>
+                  <div className="text-end min-[900px]:contents">
+                    <p className={s.planPrice}>{plan.monthly === 0 ? say("pl_free") : price(monthly)}</p>
+                    <p className={`${s.planMeta} ${s.planPer} mt-1 min-[900px]:mt-2`}>{plan.monthly === 0 ? say("pl_forever") : say("bl_perMonth")}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <p className="mt-6 flex items-start gap-3 text-[15px] font-medium text-[var(--text)]">
+            <span aria-hidden="true" className="mt-[7px] h-2 w-2 shrink-0 rounded-full bg-[var(--signal)]" />
+            {t("foundingOffer", { count: FOUNDING_SLOTS })}
+          </p>
         </Container>
       </section>
 
-      {/* ── Pricing and owners, side by side ── */}
-      <section className="pb-20 sm:pb-28">
-        <Container className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
-          <div className={`${s.surface} flex flex-col p-7 sm:p-9`}>
-            <p className={s.eyebrow}>{t("navPricing")}</p>
-            <h2 className={`${s.display} mt-2 text-[1.9rem] sm:text-[2.2rem]`}>{t("priceTeaserTitle")}</h2>
-            <p className="mt-3 text-[1.0625rem] leading-relaxed text-[var(--muted)]">
-              {t("priceTeaserBody", { fleet: fleetText({ cars: free.cars!, motorbikes: free.motorbikes! }, say), price: fromPrice })}
-            </p>
-            <p className="mt-5 rounded-2xl bg-[var(--success-light)] px-4 py-3 text-[15px] font-semibold text-[var(--foreground)]">{t("foundingOffer", { count: FOUNDING_SLOTS })}</p>
-            <div className="mt-auto pt-7">
-              <SiteLink className={s.btnSecondary} href={SITE_LINKS.pricing}>
-                {t("priceTeaserLink")} <ArrowRight aria-hidden="true" className="rtl:rotate-180" size={18} />
-              </SiteLink>
+      {/* ── Owners, then questions ── */}
+      <section className="pb-[clamp(88px,11vw,168px)]">
+        <Container>
+          <div className={s.strip}>
+            <div className="max-w-[640px]">
+              <h2 className={s.h3}>{t("ownersTeaserTitle")}</h2>
+              <p className="mt-2 text-[16px] leading-relaxed text-[var(--text-muted)]">{t("ownersTeaserBody")}</p>
             </div>
+            <SiteLink className={`${s.textLink} text-[var(--text)]`} href={SITE_LINKS.owners}>
+              {t("ownersTeaserLink")} <Arrow />
+            </SiteLink>
           </div>
-          <div className={`${s.surface} flex flex-col p-7 sm:p-9`}>
-            <p className={s.eyebrow}>{t("navOwners")}</p>
-            <h2 className={`${s.display} mt-2 text-[1.9rem] sm:text-[2.2rem]`}>{t("ownersTeaserTitle")}</h2>
-            <p className="mt-3 text-[1.0625rem] leading-relaxed text-[var(--muted)]">{t("ownersTeaserBody")}</p>
-            <div className="mt-auto pt-7">
-              <SiteLink className={s.btnSecondary} href={SITE_LINKS.owners}>
-                {t("ownersTeaserLink")} <ArrowRight aria-hidden="true" className="rtl:rotate-180" size={18} />
-              </SiteLink>
-            </div>
-          </div>
-        </Container>
-      </section>
 
-      {/* ── Questions ── */}
-      <section className={`${s.tint} py-20 sm:py-28`}>
-        <Container className="grid gap-10 lg:grid-cols-[1fr_1.6fr] lg:gap-16">
-          <SectionHeading align="start" body={t("faqBody")} title={t("faqTitle")} />
-          <div className="divide-y divide-[var(--border)] rounded-[24px] border border-[var(--border)] bg-white">
-            {faqs.map((key) => (
-              <details className={`${s.details} group px-5 sm:px-7`} key={key}>
-                <summary className="flex min-h-[64px] items-center justify-between gap-4 py-4 text-[17px] font-semibold text-[var(--foreground)]">
-                  {t(`faq${key}Q`)}
-                  <ChevronDown aria-hidden="true" className={`${s.chevron} shrink-0 text-[var(--muted)]`} size={20} />
-                </summary>
-                <p className="pb-5 pe-8 text-[16px] leading-relaxed text-[var(--muted)]">{t(`faq${key}A`, faqValues[key] || {})}</p>
-              </details>
-            ))}
+          <div className={`${s.split} mt-[clamp(88px,11vw,168px)]`}>
+            <div className={s.splitSticky}>
+              <h2 className={s.h2}>{t("faqTitle")}</h2>
+              <p className={`${s.lede} mt-5`}>{t("faqBody")}</p>
+            </div>
+            <div className={s.faq}>
+              {faqs.map((key) => (
+                <details className={s.faqItem} key={key}>
+                  <summary>
+                    {t(`faq${key}Q`)}
+                    <Plus aria-hidden="true" size={20} />
+                  </summary>
+                  <p>{t(`faq${key}A`, faqValues[key] || {})}</p>
+                </details>
+              ))}
+            </div>
           </div>
         </Container>
       </section>

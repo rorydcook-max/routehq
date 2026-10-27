@@ -1,7 +1,22 @@
-/* RouteHQ's public website (home, pricing, owners). Always light: the app's Lagoon colours, set here so a visitor
-   whose phone is in dark mode still sees the site as designed. Everything else is Tailwind in the markup. */
+/* RouteHQ's public website (home, pricing, owners). Always light below the fold, with deep teal-ink heroes.
+   One accent (the logo's HQ orange), used for the hero highlight and the main call to action only.
+   The app's colour names are kept here too, because the product pictures and the language picker use them. */
 .site {
   color-scheme: light;
+  --ink: #061a1e;
+  --ink-2: #0b272c;
+  --ink-3: #12353b;
+  --ink-line: rgba(214, 240, 236, 0.12);
+  --ink-text: #e9f3f1;
+  --ink-muted: #93aeab;
+  --paper: #f2f6f5;
+  --line: #dfe8e6;
+  --text: #0b1d21;
+  --text-muted: #556a6d;
+  --text-faint: #8fa2a4;
+  --signal: #f6a943;
+  --signal-ink: #1d1206;
+
   --background: #eef5f4;
   --panel: #ffffff;
   --panel-secondary: #f3f8f7;
@@ -27,10 +42,11 @@
   --logo-ink: #13262b;
   min-height: 100vh;
   background: #ffffff;
-  color: var(--foreground);
+  color: var(--text);
   font-size: 16px;
   line-height: 1.6;
   overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
 }
 
 :global(html):has(.site),
@@ -41,201 +57,402 @@
 
 .site a:focus-visible,
 .site summary:focus-visible,
-.site select:focus-visible {
-  outline: 3px solid rgba(14, 94, 111, 0.45);
+.site select:focus-visible,
+.site button:focus-visible {
+  outline: 2px solid var(--signal);
   outline-offset: 3px;
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
+/* ── Type ─────────────────────────────────────────────────────────────── */
 .display {
   font-family: var(--font-display);
-  font-weight: 600;
-  letter-spacing: -0.025em;
-  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
   text-wrap: balance;
 }
-
+.h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+  text-wrap: balance;
+  font-size: clamp(2.1rem, 1.3rem + 3.2vw, 4rem);
+}
+.h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  font-size: clamp(1.4rem, 1.1rem + 1vw, 1.9rem);
+}
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+.eyebrowDark {
+  color: var(--ink-muted);
+}
+.eyebrow::before {
+  content: "";
+  width: 18px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.7;
+}
 .lede {
+  font-size: clamp(1.05rem, 0.98rem + 0.3vw, 1.2rem);
+  line-height: 1.6;
+  color: var(--text-muted);
   text-wrap: pretty;
 }
-
-/* Soft light behind the hero, and a faint grid that fades out: depth without a picture. */
-.heroGlow {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(60% 55% at 72% 38%, rgba(14, 94, 111, 0.13), transparent 70%),
-    radial-gradient(40% 40% at 12% 8%, rgba(242, 165, 65, 0.1), transparent 70%),
-    linear-gradient(180deg, #f3f8f7 0%, #ffffff 78%);
-}
-.heroGrid {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgba(14, 94, 111, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(14, 94, 111, 0.06) 1px, transparent 1px);
-  background-size: 56px 56px;
-  mask-image: radial-gradient(70% 60% at 60% 30%, #000 20%, transparent 75%);
-  -webkit-mask-image: radial-gradient(70% 60% at 60% 30%, #000 20%, transparent 75%);
+.hl {
+  color: var(--signal);
 }
 
-/* Buttons: the app's pills, a little larger on the website. */
-.btnPrimary,
-.btnSecondary {
+/* ── Buttons and links ────────────────────────────────────────────────── */
+.btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  min-height: 48px;
-  padding: 0 22px;
-  border-radius: 999px;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 24px;
+  border-radius: 12px;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: -0.005em;
   white-space: nowrap;
-  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, transform 150ms ease;
-}
-.btnPrimary {
-  background: var(--primary);
-  color: #ffffff;
-  box-shadow: 0 1px 2px rgba(19, 38, 43, 0.12), 0 8px 20px -8px rgba(14, 94, 111, 0.55);
-}
-.btnPrimary:hover {
-  background: var(--primary-hover);
-}
-.btnSecondary {
-  background: #ffffff;
-  color: var(--foreground);
-  border: 1.5px solid var(--border-strong);
-}
-.btnSecondary:hover {
-  border-color: var(--primary);
-  color: var(--primary);
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 }
 .btnSmall {
   min-height: 40px;
   padding: 0 16px;
+  border-radius: 10px;
   font-size: 15px;
 }
+.btnSignal {
+  background: var(--signal);
+  color: var(--signal-ink);
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.12), 0 10px 30px -10px rgba(246, 169, 67, 0.55);
+}
+.btnSignal:hover {
+  background: #ffb95c;
+}
+.btnInk {
+  background: var(--ink);
+  color: #ffffff;
+}
+.btnInk:hover {
+  background: var(--ink-3);
+}
+.btnLight {
+  background: #ffffff;
+  color: var(--ink);
+}
+.btnLight:hover {
+  background: #e6f0ee;
+}
+.btnOutline {
+  border: 1px solid var(--line);
+  background: #ffffff;
+  color: var(--text);
+}
+.btnOutline:hover {
+  border-color: var(--text);
+}
+.btnOutlineDark {
+  border: 1px solid rgba(233, 243, 241, 0.22);
+  color: #ffffff;
+}
+.btnOutlineDark:hover {
+  border-color: #ffffff;
+}
 @media (prefers-reduced-motion: no-preference) {
-  .btnPrimary:active,
-  .btnSecondary:active {
-    transform: scale(0.98);
+  .btn:active {
+    transform: translateY(1px);
   }
 }
-
-.eyebrow {
+.textLink {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: var(--primary);
+  min-height: 44px;
   font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 6px;
+  text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+  transition: text-decoration-color 160ms ease;
+}
+.textLink:hover {
+  text-decoration-color: currentColor;
+}
+
+/* ── Header ───────────────────────────────────────────────────────────── */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(6, 26, 30, 0.86);
+  border-bottom: 1px solid var(--ink-line);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  color: var(--ink-text);
+}
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 8px;
   font-size: 15px;
+  font-weight: 500;
+  color: var(--ink-muted);
+  transition: color 150ms ease;
 }
-
-.surface {
-  background: #ffffff;
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  box-shadow: 0 1px 2px rgba(19, 38, 43, 0.04), 0 12px 32px -16px rgba(14, 94, 111, 0.18);
+.navLink:hover {
+  color: #ffffff;
 }
-
-/* "Everything else" features: one grouped list on phones, separate tiles from 640px. */
-.featList {
-  background: #ffffff;
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  box-shadow: 0 1px 2px rgba(19, 38, 43, 0.04), 0 12px 32px -16px rgba(14, 94, 111, 0.18);
-  overflow: hidden;
-}
-.featItem {
-  display: flex;
-  gap: 14px;
-  padding: 16px;
-}
-.featItem + .featItem {
-  border-top: 1px solid var(--border);
-}
-@media (min-width: 640px) {
-  .featList {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
-    background: none;
-    border: 0;
-    box-shadow: none;
-    overflow: visible;
-  }
-  .featItem {
-    display: block;
-    padding: 20px;
-    background: #ffffff;
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    box-shadow: 0 1px 2px rgba(19, 38, 43, 0.04), 0 12px 32px -16px rgba(14, 94, 111, 0.18);
-  }
-  .featItem + .featItem {
-    border-top: 1px solid var(--border);
-  }
-}
-@media (min-width: 1024px) {
-  .featList { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
-@media (min-width: 1280px) {
-  .featList { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-}
-
-.tint {
-  background: linear-gradient(180deg, #f3f8f7 0%, #eef5f4 100%);
-}
-
-.iconTile {
+.menuButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 44px;
   height: 44px;
-  border-radius: 14px;
-  background: var(--primary-light);
-  color: var(--primary);
-  flex-shrink: 0;
+  border-radius: 10px;
+  border: 1px solid var(--ink-line);
+  color: #ffffff;
+}
+.menuPanel {
+  position: absolute;
+  inset-inline: 12px;
+  top: calc(100% + 8px);
+  padding: 10px;
+  border-radius: 16px;
+  background: var(--ink-2);
+  border: 1px solid var(--ink-line);
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.6);
+}
+.menuLink {
+  display: flex;
+  align-items: center;
+  min-height: 52px;
+  padding: 0 14px;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffffff;
+}
+.menuLink:hover {
+  background: var(--ink-3);
 }
 
-/* ── Device frames ──────────────────────────────────────────────────────
-   Everything inside a screen is sized in em, and each screen sets its font
-   size from its own width (container units), so a mock-up scales as one
-   picture at any size instead of reflowing. */
+/* ── Hero: deep ink, a faint glow and grain, and a white band at the bottom the product picture spills onto ── */
+.hero {
+  --spill: clamp(150px, 19vw, 300px);
+  position: relative;
+  isolation: isolate;
+  color: var(--ink-text);
+  background: linear-gradient(var(--ink), var(--ink)) top / 100% calc(100% - var(--spill)) no-repeat, #ffffff;
+}
+.heroPlain {
+  --spill: 0px;
+}
+.hero::before,
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 var(--spill) 0;
+  z-index: -1;
+  pointer-events: none;
+}
+.hero::before {
+  background:
+    radial-gradient(55% 70% at 88% -10%, rgba(25, 128, 140, 0.42), transparent 70%),
+    radial-gradient(45% 55% at -5% 105%, rgba(14, 94, 111, 0.35), transparent 70%);
+}
+.hero::after {
+  opacity: 0.09;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+.heroTop {
+  padding-top: clamp(52px, 8vw, 124px);
+}
+.heroTitle {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 0.94;
+  color: #ffffff;
+  font-size: clamp(2.85rem, 1.1rem + 7.4vw, 7rem);
+  text-wrap: balance;
+  max-width: 14ch;
+}
+.heroRow {
+  display: grid;
+  gap: 28px;
+  margin-top: clamp(24px, 3vw, 40px);
+}
+@media (min-width: 900px) {
+  .heroRow {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 48px;
+  }
+}
+.heroSub {
+  max-width: 36em;
+  font-size: clamp(1.06rem, 0.98rem + 0.35vw, 1.25rem);
+  line-height: 1.55;
+  color: var(--ink-muted);
+  text-wrap: pretty;
+}
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 24px;
+}
+.heroNote {
+  margin-top: 14px;
+  font-size: 14px;
+  color: var(--ink-muted);
+}
+
+/* The product, big: the dashboard in a window with the customer's phone over its corner (from 768px);
+   on phones, the phone alone, with the "paid" note over it. */
+.stage {
+  position: relative;
+  margin-top: clamp(48px, 7vw, 96px);
+}
+.stageDesk {
+  display: none;
+}
+.stageMobile {
+  position: relative;
+  width: min(80%, 330px);
+  margin-inline: auto;
+}
+@media (min-width: 768px) {
+  .stageDesk {
+    display: block;
+    position: relative;
+    padding-inline-end: 12%;
+  }
+  .stageMobile {
+    display: none;
+  }
+}
+.stagePhone {
+  position: absolute;
+  z-index: 2;
+  inset-inline-end: 0;
+  bottom: -7%;
+  width: 22%;
+}
+.stageToast {
+  position: absolute;
+  z-index: 3;
+  /* Over the empty foot of the sidebar, so it never covers the app's content. */
+  inset-inline-start: -2.5%;
+  bottom: 5%;
+}
+.stageMobile .stageToast {
+  inset-inline-start: auto;
+  inset-inline-end: -6%;
+  top: auto;
+  /* Straddles the phone's bottom edge, below the tab bar. */
+  bottom: -4%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .rise {
+    animation: rise 900ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .rise2 {
+    animation-delay: 90ms;
+  }
+  .rise3 {
+    animation-delay: 220ms;
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+
+/* ── Frames for the product pictures. Inside, everything is sized in em from the frame's own width. ── */
+.window {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 2px 0 0 rgba(255, 255, 255, 0.06) inset,
+    0 60px 120px -40px rgba(0, 0, 0, 0.55),
+    0 30px 70px -40px rgba(14, 94, 111, 0.65);
+  container-type: inline-size;
+}
+.window::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(6, 26, 30, 0.12);
+  pointer-events: none;
+}
+.windowLight {
+  box-shadow:
+    0 0 0 1px var(--line),
+    0 40px 80px -40px rgba(6, 26, 30, 0.35);
+}
+.windowScale {
+  font-size: 1.12cqw;
+  line-height: 1.35;
+  color: #13262b;
+}
 .phone {
   position: relative;
   width: 100%;
-  max-width: 280px;
-  padding: 9px;
-  border-radius: 46px;
-  background: #13262b;
+  padding: 3.2%;
+  border-radius: 15% / 7.2%;
+  background: #0a1517;
   box-shadow:
-    inset 0 0 0 1.5px rgba(255, 255, 255, 0.08),
-    0 40px 70px -30px rgba(14, 94, 111, 0.55),
-    0 20px 40px -24px rgba(19, 38, 43, 0.5);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    0 0 0 1px rgba(0, 0, 0, 0.35),
+    0 50px 90px -30px rgba(0, 0, 0, 0.55),
+    0 24px 40px -24px rgba(6, 26, 30, 0.5);
 }
 .phoneScreen {
   position: relative;
   overflow: hidden;
-  aspect-ratio: 9 / 19;
-  border-radius: 38px;
+  aspect-ratio: 9 / 19.2;
+  border-radius: 12.5% / 5.9%;
   background: #eef5f4;
   container-type: inline-size;
 }
 .phoneNotch {
   position: absolute;
-  top: 9px;
+  top: 2.6%;
   left: 50%;
   z-index: 3;
-  width: 32%;
-  height: 22px;
+  width: 30%;
+  height: 3.6%;
   transform: translateX(-50%);
   border-radius: 999px;
-  background: #13262b;
+  background: #0a1517;
 }
 .phoneScale {
   position: absolute;
@@ -244,62 +461,502 @@
   line-height: 1.35;
   color: #13262b;
 }
+.card {
+  background: #ffffff;
+  border-radius: 1.1em;
+  border: 1px solid var(--line);
+  box-shadow: 0 1px 2px rgba(6, 26, 30, 0.06), 0 34px 60px -30px rgba(6, 26, 30, 0.38);
+  color: var(--text);
+  font-size: clamp(12.5px, 0.6rem + 0.45vw, 15.5px);
+  line-height: 1.4;
+}
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px 12px 12px;
+  border-radius: 14px;
+  background: #ffffff;
+  color: var(--text);
+  box-shadow: 0 0 0 1px rgba(6, 26, 30, 0.06), 0 30px 50px -20px rgba(0, 0, 0, 0.45);
+  white-space: nowrap;
+}
 
-.laptop {
-  position: relative;
-  width: 100%;
+/* ── Sections ─────────────────────────────────────────────────────────── */
+.section {
+  padding-block: clamp(88px, 11vw, 168px);
 }
-.laptopLid {
-  padding: 1.4% 1.4% 1.6%;
-  border-radius: 18px 18px 6px 6px;
-  background: #13262b;
-  box-shadow:
-    inset 0 0 0 1.5px rgba(255, 255, 255, 0.07),
-    0 50px 80px -40px rgba(14, 94, 111, 0.5),
-    0 24px 48px -30px rgba(19, 38, 43, 0.45);
+.sectionTight {
+  padding-block: clamp(64px, 8vw, 112px);
 }
-.laptopScreen {
+.paper {
+  background: var(--paper);
+}
+
+/* Plain facts, right under the hero picture. */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: clamp(56px, 7vw, 96px);
+  border-top: 1px solid var(--line);
+}
+.fact {
+  padding: 16px 0 18px;
+  font-size: 14.5px;
+  line-height: 1.4;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--line);
+}
+.fact:nth-child(odd) {
+  padding-inline-end: 16px;
+}
+.fact:nth-child(even) {
+  padding-inline-start: 16px;
+  border-inline-start: 1px solid var(--line);
+}
+.fact strong {
+  display: block;
+  font-weight: 600;
+  color: var(--text);
+}
+@media (min-width: 1024px) {
+  .facts {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    border-bottom: 1px solid var(--line);
+  }
+  .fact,
+  .fact:nth-child(odd),
+  .fact:nth-child(even) {
+    padding: 20px 20px 22px;
+    border-bottom: 0;
+    border-inline-start: 1px solid var(--line);
+  }
+  .fact:first-child {
+    padding-inline-start: 0;
+    border-inline-start: 0;
+  }
+}
+
+/* One statement in two tones. */
+.statement {
+  max-width: 24em;
+  font-size: clamp(1.6rem, 0.95rem + 2.5vw, 3.1rem);
+  font-weight: 600;
+  line-height: 1.16;
+  letter-spacing: -0.025em;
+  color: var(--text);
+  text-wrap: pretty;
+}
+.statement span {
+  color: var(--text-faint);
+}
+
+/* Feature: heading and words side by side, then a wide panel with the product in it. */
+.feature + .feature {
+  margin-top: clamp(96px, 12vw, 176px);
+}
+.featureHead {
+  display: grid;
+  gap: 20px;
+}
+@media (min-width: 1024px) {
+  .featureHead {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: 72px;
+    align-items: end;
+  }
+}
+.points {
+  margin-top: 24px;
+}
+.points li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+  font-weight: 600;
+  line-height: 1.4;
+}
+.points svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--primary);
+}
+.panel {
   position: relative;
   overflow: hidden;
-  aspect-ratio: 16 / 10;
-  border-radius: 8px;
-  background: #eef5f4;
-  container-type: inline-size;
+  isolation: isolate;
+  margin-top: clamp(32px, 4vw, 56px);
+  height: clamp(470px, 50vw, 660px);
+  border-radius: clamp(18px, 2vw, 28px);
+  background:
+    radial-gradient(60% 80% at 30% 0%, #ffffff, transparent 70%),
+    var(--paper);
+  border: 1px solid var(--line);
 }
-.laptopScale {
+.panelInk {
+  background:
+    radial-gradient(60% 80% at 75% 0%, rgba(25, 128, 140, 0.4), transparent 70%),
+    var(--ink);
+  border-color: var(--ink);
+}
+.panelPhone {
   position: absolute;
-  inset: 0;
-  font-size: 1.45cqw;
-  line-height: 1.35;
-  color: #13262b;
+  top: clamp(36px, 5vw, 72px);
+  inset-inline-start: 7%;
+  width: min(58%, 330px);
 }
-.laptopBase {
+.panelCard {
+  position: absolute;
+  inset-inline-end: 4%;
+  bottom: 24px;
+  width: min(76%, 410px);
+}
+@media (min-width: 768px) {
+  .panelPhone {
+    inset-inline-start: 12%;
+    width: clamp(240px, 26vw, 330px);
+  }
+  .panelCard {
+    inset-inline-end: 9%;
+    top: 50%;
+    bottom: auto;
+    width: clamp(300px, 32vw, 420px);
+    transform: translateY(-42%);
+  }
+  .panelFlip .panelPhone {
+    inset-inline-start: auto;
+    inset-inline-end: 12%;
+  }
+  .panelFlip .panelCard {
+    inset-inline-end: auto;
+    inset-inline-start: 9%;
+  }
+}
+
+/* A day with RouteHQ: times down one rail. */
+.day {
   position: relative;
-  height: 14px;
-  margin: 0 -7%;
-  border-radius: 2px 2px 16px 16px;
-  background: linear-gradient(180deg, #e3ecea 0%, #c4d3d0 60%, #a9bbb8 100%);
-  box-shadow: 0 18px 30px -18px rgba(19, 38, 43, 0.45);
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--ink);
+  color: var(--ink-text);
 }
-.laptopBase::before {
+.day::before {
   content: "";
   position: absolute;
-  left: 50%;
-  top: 0;
-  width: 16%;
-  height: 6px;
-  transform: translateX(-50%);
-  border-radius: 0 0 8px 8px;
-  background: #b3c4c1;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(45% 50% at 0% 0%, rgba(25, 128, 140, 0.35), transparent 70%);
+}
+.dayGrid {
+  display: grid;
+  gap: 48px;
+}
+@media (min-width: 1024px) {
+  .dayGrid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 96px;
+  }
+  .dayHead {
+    position: sticky;
+    top: 132px;
+    align-self: start;
+  }
+}
+.dayList {
+  border-inline-start: 1px solid var(--ink-line);
+}
+.dayItem {
+  position: relative;
+  display: grid;
+  gap: 6px 32px;
+  padding: 26px 0 30px;
+  padding-inline-start: clamp(22px, 3vw, 40px);
+}
+.dayItem + .dayItem {
+  border-top: 1px solid var(--ink-line);
+}
+.dayItem::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: -5px;
+  top: 44px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--ink);
+  box-shadow: 0 0 0 1px var(--ink-muted);
+}
+.dayItemHot::before {
+  background: var(--signal);
+  box-shadow: 0 0 0 5px rgba(246, 169, 67, 0.18);
+}
+@media (min-width: 640px) {
+  .dayItem {
+    grid-template-columns: 7.2rem minmax(0, 1fr);
+  }
+}
+@media (min-width: 1024px) {
+  .dayItem {
+    grid-template-columns: 9.5rem minmax(0, 1fr);
+  }
+}
+.dayTime {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2.3rem, 1.6rem + 2.4vw, 3.5rem);
+  line-height: 1;
+  letter-spacing: -0.045em;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+}
+.dayItemHot .dayTime {
+  color: var(--signal);
+}
+.dayChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 6px 12px 6px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--ink-line);
+  background: var(--ink-2);
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+}
+.dayChip > span:first-child {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(105, 199, 160, 0.18);
+  color: #7fd6b0;
 }
 
-.floatCard {
+/* Two-column layouts with a heading that stays put while the list scrolls. */
+.split {
+  display: grid;
+  gap: 40px;
+}
+@media (min-width: 1024px) {
+  .split {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: 96px;
+  }
+  .splitSticky {
+    position: sticky;
+    top: 120px;
+    align-self: start;
+  }
+}
+.index {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 20px;
+}
+@media (min-width: 640px) {
+  .index {
+    column-gap: 40px;
+  }
+}
+.indexItem {
+  padding: 16px 0 18px;
+  border-top: 1px solid var(--line);
+}
+@media (min-width: 640px) {
+  .indexItem {
+    padding: 20px 0 22px;
+  }
+}
+.indexItem h3 {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text);
+}
+.indexItem p {
+  margin-top: 4px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+@media (min-width: 640px) {
+  .indexItem h3 {
+    font-size: 17px;
+  }
+  .indexItem p {
+    font-size: 15px;
+    line-height: 1.55;
+  }
+}
+
+/* Phones: heading, the picture, then the list. Wide screens: words on the left, the picture on the right. */
+.growGrid {
+  display: grid;
+  gap: 40px;
+}
+@media (min-width: 1024px) {
+  .growGrid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-areas: "head mock" "list mock";
+    grid-template-rows: auto 1fr;
+    column-gap: 80px;
+    row-gap: 32px;
+  }
+  .growHead {
+    grid-area: head;
+  }
+  .growList {
+    grid-area: list;
+  }
+  .growMock {
+    grid-area: mock;
+    align-self: center;
+  }
+}
+@media (min-width: 1280px) {
+  .growMock {
+    margin-inline-end: -12%;
+  }
+}
+
+/* Plans in brief (home) */
+.planRow {
+  display: grid;
+  margin-top: clamp(36px, 4vw, 56px);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  overflow: hidden;
   background: #ffffff;
-  border-radius: 18px;
-  box-shadow: 0 1px 2px rgba(19, 38, 43, 0.06), 0 24px 48px -20px rgba(19, 38, 43, 0.35);
+}
+.planCell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px 16px;
+  padding: 20px;
+}
+.planCell + .planCell {
+  border-top: 1px solid var(--line);
+}
+.planHot {
+  background: var(--ink);
+  color: #ffffff;
+}
+.planName {
+  font-size: 16px;
+  font-weight: 600;
+}
+.planMeta {
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+.planHot .planMeta {
+  color: var(--ink-muted);
+}
+.planPrice {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.7rem, 1.4rem + 1.4vw, 2.9rem);
+  line-height: 1;
+  letter-spacing: -0.035em;
+  text-align: end;
+}
+.planBadge {
+  display: inline-flex;
+  margin-inline-start: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--signal);
+  color: var(--signal-ink);
+  font-size: 12px;
+  font-weight: 700;
+  vertical-align: 2px;
+}
+@media (min-width: 900px) {
+  .planRow {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .planCell {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    padding: 28px 26px 30px;
+  }
+  .planCell + .planCell {
+    border-top: 0;
+    border-inline-start: 1px solid var(--line);
+  }
+  .planHot + .planCell {
+    border-inline-start-color: var(--ink);
+  }
+  .planCell .planPrice {
+    order: 3;
+    margin-top: 40px;
+    text-align: start;
+  }
+  .planCell .planPer {
+    order: 4;
+  }
 }
 
-/* FAQ and small menus: native details, with a turning chevron. */
+/* Owners, in a line */
+.strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px 40px;
+  padding-block: clamp(32px, 4vw, 48px);
+  border-block: 1px solid var(--line);
+}
+
+/* FAQ: native details, with a plus that turns into a cross. */
+.faq {
+  border-bottom: 1px solid var(--line);
+}
+.faqItem {
+  border-top: 1px solid var(--line);
+}
+.faqItem summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 68px;
+  padding-block: 14px;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.35;
+  list-style: none;
+  cursor: pointer;
+}
+.faqItem summary::-webkit-details-marker {
+  display: none;
+}
+.faqItem summary svg {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  transition: transform 200ms ease;
+}
+.faqItem[open] summary svg {
+  transform: rotate(45deg);
+}
+.faqItem p {
+  max-width: 40em;
+  padding-bottom: 22px;
+  padding-inline-end: 32px;
+  color: var(--text-muted);
+}
+
 .details summary {
   list-style: none;
   cursor: pointer;
@@ -314,13 +971,188 @@
   transition: transform 180ms ease;
 }
 
-/* Mobile menu panel. */
-.menuPanel {
+/* The last word on every page */
+.final {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--ink);
+  color: var(--ink-text);
+  padding-block: clamp(96px, 12vw, 180px);
+}
+.final::before {
+  content: "";
   position: absolute;
-  inset-inline: 12px;
-  top: calc(100% + 8px);
-  border-radius: 20px;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(50% 70% at 100% 100%, rgba(25, 128, 140, 0.45), transparent 70%);
+}
+.finalTitle {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 0.95;
+  color: #ffffff;
+  font-size: clamp(2.7rem, 1.1rem + 6vw, 6.25rem);
+  max-width: 13ch;
+  text-wrap: balance;
+}
+
+/* ── Pricing page ─────────────────────────────────────────────────────── */
+.seg {
+  display: inline-flex;
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid var(--ink-line);
+  background: var(--ink-2);
+}
+.segItem {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 9px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+.segItem:hover {
+  color: #ffffff;
+}
+.segOn,
+.segOn:hover {
   background: #ffffff;
-  border: 1px solid var(--border);
-  box-shadow: 0 24px 48px -20px rgba(19, 38, 43, 0.35);
+  color: var(--ink);
+}
+.planCards {
+  display: grid;
+  gap: 12px;
+}
+@media (min-width: 768px) {
+  .planCards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1200px) {
+  .planCards {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+.planCard {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding: 26px 24px 24px;
+  border-radius: 18px;
+  background: #ffffff;
+  color: var(--text);
+  border: 1px solid var(--line);
+  box-shadow: 0 40px 70px -50px rgba(6, 26, 30, 0.45);
+}
+.planCardHot {
+  background: var(--ink-2);
+  border-color: rgba(246, 169, 67, 0.55);
+  color: #ffffff;
+  box-shadow: 0 0 0 1px rgba(246, 169, 67, 0.25), 0 50px 80px -40px rgba(0, 0, 0, 0.6);
+}
+.planCardHot .planMeta {
+  color: var(--ink-muted);
+}
+.planList li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 0;
+  border-top: 1px solid var(--line);
+  font-size: 15px;
+  line-height: 1.45;
+}
+.planCardHot .planList li {
+  border-color: var(--ink-line);
+}
+.planList svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+  color: var(--primary);
+}
+.planCardHot .planList svg {
+  color: var(--signal);
+}
+.heroSpillTall {
+  --spill: clamp(260px, 26vw, 380px);
+}
+.segSelect {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1px solid var(--ink-line);
+  background: var(--ink-2);
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* ── Owners page ──────────────────────────────────────────────────────── */
+.heroOwners {
+  --spill: clamp(160px, 22vw, 260px);
+}
+.ownersGrid {
+  display: grid;
+  gap: 48px;
+}
+.ownersPhone {
+  width: min(78%, 330px);
+  margin-inline: auto;
+}
+@media (min-width: 1024px) {
+  .ownersGrid {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+    gap: 64px;
+    align-items: end;
+  }
+  .ownersPhone {
+    width: 100%;
+    max-width: 360px;
+    margin-inline: auto 0;
+  }
+}
+.steps {
+  display: grid;
+  gap: 0;
+}
+@media (min-width: 900px) {
+  .steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 40px;
+  }
+}
+.step {
+  padding: 28px 0 32px;
+  border-top: 1px solid var(--text);
+}
+.stepNumber {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(3rem, 2rem + 3vw, 4.75rem);
+  line-height: 1;
+  letter-spacing: -0.05em;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The booking-page picture stays readable in a narrow column. */
+@container (max-width: 560px) {
+  .windowRoomy .windowScale {
+    font-size: 2.1cqw;
+  }
+}
+
+/* Scripts with tall marks above and below (Thai, Lao, Burmese and others) need more room between display lines. */
+:global(html:is([lang="th"], [lang="lo"], [lang="my"], [lang="km"], [lang="si"], [lang="ta"], [lang="hi"], [lang="ne"])) :is(.heroTitle, .h2, .finalTitle, .display, .h3) {
+  line-height: 1.22;
+  letter-spacing: -0.01em;
 }

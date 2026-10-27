@@ -4,44 +4,48 @@ import { MobileMenu } from "./mobile-menu";
 import { Container, SITE_LINKS, SiteLink } from "./site-ui";
 import s from "../site.module.css";
 
-/** The website's header: logo, the few places worth going, and the trial. Sticky, dark, 64px. */
+/** The website's header: logo, the few places worth going, sign in and the trial. Sticky, ink, 64px. */
 export async function SiteHeader() {
-  const t = await getTranslations("site");
+  const [t, m] = await Promise.all([getTranslations("site"), getTranslations("marketing")]);
   const items = [
-    { href: SITE_LINKS.features, label: t("navFeatures") },
-    { href: SITE_LINKS.pricing, label: t("navPricing") },
-    { href: SITE_LINKS.directory, label: t("navDirectory") },
-    { href: SITE_LINKS.owners, label: t("navOwners") }
+    { href: SITE_LINKS.features, label: m("navFeatures") },
+    { href: SITE_LINKS.pricing, label: m("navPricing") },
+    { href: SITE_LINKS.directory, label: m("navDirectory") },
+    { href: SITE_LINKS.owners, label: m("navOwners") }
   ];
+  const logo = (
+    <SiteLink aria-label={t("navHome")} className="inline-flex min-h-11 shrink-0 items-center" href={SITE_LINKS.home}>
+      <span className="inline-flex items-center" dir="ltr">
+        <RouteHqLogo className="[&_svg]:h-8 [&_svg]:w-8" showDescriptor={false} tone="dark" />
+      </span>
+    </SiteLink>
+  );
   return (
     <header className={s.header}>
-      <Container className="relative flex h-16 items-center justify-between gap-4">
-        <SiteLink aria-label={t("navHome")} className="inline-flex shrink-0 items-center" href={SITE_LINKS.home}>
-          <span dir="ltr">
-            <RouteHqLogo className="[&_svg]:h-8 [&_svg]:w-8" showDescriptor={false} tone="dark" />
-          </span>
-        </SiteLink>
-        <nav aria-label={t("navLabel")} className="hidden items-center gap-1 md:flex">
+      <Container className={s.headerRow}>
+        {logo}
+        <nav aria-label={t("navLabel")} className={s.nav}>
           {items.map((item) => (
             <SiteLink className={s.navLink} href={item.href} key={item.href}>
               {item.label}
             </SiteLink>
           ))}
         </nav>
-        <div className="hidden items-center gap-2 md:flex">
+        <div className={s.headerActions}>
           <SiteLink className={s.navLink} href={SITE_LINKS.signIn}>
-            {t("navSignIn")}
+            {m("navSignIn")}
           </SiteLink>
           <SiteLink className={`${s.btn} ${s.btnSmall} ${s.btnLight}`} href={SITE_LINKS.signUp}>
-            {t("ctaTrial")}
+            {m("navStart")}
           </SiteLink>
         </div>
         <MobileMenu
           closeLabel={t("navMenuClose")}
           items={items}
+          logo={logo}
           openLabel={t("navMenu")}
-          signIn={{ href: SITE_LINKS.signIn, label: t("navSignIn") }}
-          trial={{ href: SITE_LINKS.signUp, label: t("ctaTrial") }}
+          signIn={{ href: SITE_LINKS.signIn, label: m("navSignIn") }}
+          start={{ href: SITE_LINKS.signUp, label: m("navStart") }}
         />
       </Container>
     </header>

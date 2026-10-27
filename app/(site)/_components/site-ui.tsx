@@ -43,7 +43,7 @@ export function SiteLink({
 
 export const SITE_LINKS = {
   home: "/",
-  features: "/#features",
+  features: "/home#how",
   pricing: "/pricing",
   owners: "/owners",
   directory: "/rent",
@@ -51,21 +51,52 @@ export const SITE_LINKS = {
   signUp: "/signup"
 } as const;
 
-/** The page column every section uses: 1240px, with a 16px gutter on phones. */
+/** The page column every section uses: 1180px, with 24px at the sides (16px on phones). */
 export function Container({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`mx-auto w-full max-w-[1240px] px-4 sm:px-6 lg:px-10 ${className}`}>{children}</div>;
+  return <div className={`${s.container} ${className}`}>{children}</div>;
 }
 
 /** A small label naming a section. */
-export function Eyebrow({ children, dark = false, className = "" }: { children: ReactNode; dark?: boolean; className?: string }) {
-  return <p className={`${s.eyebrow} ${dark ? s.eyebrowDark : ""} ${className}`}>{children}</p>;
+export function Eyebrow({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return <p className={`${s.eyebrow} ${className}`}>{children}</p>;
 }
+
+/** The phrase a headline leans on: the italic serif, in teal. Used with t.rich("...", { hl: Hl }). */
+export function Hl(chunks: ReactNode) {
+  return <em className={s.hl}>{chunks}</em>;
+}
+
+/** A deliberate line break in a headline (<br></br> in the string), kept only from 640px up; narrower screens wrap naturally. */
+export function Br() {
+  return <br className={s.br} />;
+}
+
+/** The tags a headline string may use: t.rich("key", RICH). */
+export const RICH = { hl: Hl, br: Br };
 
 /** The arrow after a link, turned round for right-to-left languages. */
 export function Arrow({ size = 18 }: { size?: number }) {
   return (
-    <svg aria-hidden="true" className="shrink-0 rtl:-scale-x-100" fill="none" height={size} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width={size}>
+    <svg aria-hidden="true" className={s.arrow} fill="none" height={size} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width={size}>
       <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
+  );
+}
+
+/** A small check beside a line that is true. */
+export function Check({ size = 16 }: { size?: number }) {
+  return (
+    <svg aria-hidden="true" className={s.check} fill="none" height={size} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" viewBox="0 0 24 24" width={size}>
+      <path d="M5 12.5l4.5 4.5L19 7.5" />
+    </svg>
+  );
+}
+
+/** The plus on a closed question. */
+export function Plus({ size = 20 }: { size?: number }) {
+  return (
+    <svg aria-hidden="true" className={s.plus} fill="none" height={size} stroke="currentColor" strokeLinecap="round" strokeWidth="2" viewBox="0 0 24 24" width={size}>
+      <path d="M12 5v14M5 12h14" />
     </svg>
   );
 }

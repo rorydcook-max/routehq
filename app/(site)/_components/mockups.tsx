@@ -26,10 +26,20 @@ async function kit() {
   return { t, money, local, format, number, date, currency, qrName };
 }
 
-/** The website's pictures use these, so a page can show the same amounts in its own words. */
+/** The website's pictures use these amounts, so a page can show the same ones in its own words. */
 export async function sampleMoney() {
   const { money } = await kit();
   return money;
+}
+
+/** "Honda City · Lucas Martin": the name only where there is room (not on phones), never an ellipsis. */
+function Sub({ main, detail }: { main: string; detail: string }) {
+  return (
+    <>
+      {main}
+      <span className={s.hideOnPhone}> · {detail}</span>
+    </>
+  );
 }
 
 /* ── Frames ─────────────────────────────────────────────────────────────── */
@@ -52,13 +62,13 @@ export function WindowFrame({ label, address, children, className = "", light = 
   return (
     <div aria-label={label} className={`${s.window} ${light ? `${s.windowLight} ${s.windowRoomy}` : ""} ${className}`} role="img">
       <div aria-hidden="true" className={s.windowScale}>
-        <div className="flex items-center gap-[0.8em] border-b border-[#e3eae9] bg-[#f5f8f7] px-[1.2em] py-[0.75em]">
+        <div className="flex items-center gap-[0.8em] border-b border-[#e6eaef] bg-[#f3f6f8] px-[1.2em] py-[0.75em]">
           <span className="flex gap-[0.45em]">
-            <span className="h-[0.75em] w-[0.75em] rounded-full bg-[#d5dfdd]" />
-            <span className="h-[0.75em] w-[0.75em] rounded-full bg-[#d5dfdd]" />
-            <span className="h-[0.75em] w-[0.75em] rounded-full bg-[#d5dfdd]" />
+            <span className="h-[0.75em] w-[0.75em] rounded-full bg-[#d4dae2]" />
+            <span className="h-[0.75em] w-[0.75em] rounded-full bg-[#d4dae2]" />
+            <span className="h-[0.75em] w-[0.75em] rounded-full bg-[#d4dae2]" />
           </span>
-          <span className="mx-auto flex min-w-0 items-center gap-[0.5em] rounded-[0.6em] bg-white px-[1.2em] py-[0.3em] text-[0.95em] font-medium text-[#56686b] shadow-[0_0_0_1px_#e3eae9]">
+          <span className="mx-auto flex min-w-0 items-center gap-[0.5em] rounded-[0.6em] bg-white px-[1.2em] py-[0.3em] text-[0.95em] font-medium text-[#5f6b7a] shadow-[0_0_0_1px_#e6eaef]">
             <svg className="h-[0.9em] w-[0.9em] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.4" viewBox="0 0 24 24">
               <rect height="10" rx="2" width="14" x="5" y="11" />
               <path d="M8 11V8a4 4 0 0 1 8 0v3" />
@@ -78,41 +88,41 @@ function StatusBar() {
     <div className="flex items-center justify-between px-[1.6em] pt-[0.9em] text-[0.85em] font-semibold">
       <span>9:41</span>
       <span className="flex items-center gap-[0.3em]">
-        <span className="inline-block h-[0.7em] w-[1.1em] rounded-[0.15em] bg-[#13262b]/80" />
-        <span className="inline-block h-[0.7em] w-[1.6em] rounded-[0.2em] border-[0.12em] border-[#13262b]/70" />
+        <span className="inline-block h-[0.7em] w-[1.1em] rounded-[0.15em] bg-[#0b1a2e]/80" />
+        <span className="inline-block h-[0.7em] w-[1.6em] rounded-[0.2em] border-[0.12em] border-[#0b1a2e]/70" />
       </span>
     </div>
   );
 }
 
 /** A car seen from the side: the same simple shape the app draws for a vehicle without a photo. */
-export function CarArt({ colour = "#0e5e6f", className = "", flip = false }: { colour?: string; className?: string; flip?: boolean }) {
+export function CarArt({ colour = "#0b8f8c", className = "", flip = false }: { colour?: string; className?: string; flip?: boolean }) {
   return (
     <svg className={className} style={flip ? { transform: "scaleX(-1)" } : undefined} viewBox="0 0 120 52" xmlns="http://www.w3.org/2000/svg">
       <path d="M6 36c0-5 3-8 8-9l16-3 13-11c3-2.5 6-3.5 10-3.5h27c5 0 8.5 1.8 11.5 5l10 10.5 8 1.8c4 1 6.5 4 6.5 8v4.2c0 2-1.2 3-3 3H9c-2 0-3-1-3-3z" fill={colour} />
-      <path d="M46 14.5h15v10.5H34.5z" fill="#d8eeea" />
-      <path d="M65 14.5h15.5c3 0 5 1 7 3l7.5 7.5H65z" fill="#d8eeea" />
-      <circle cx="31" cy="42" fill="#13262b" r="8.5" />
-      <circle cx="31" cy="42" fill="#c4d3d0" r="3.5" />
-      <circle cx="92" cy="42" fill="#13262b" r="8.5" />
-      <circle cx="92" cy="42" fill="#c4d3d0" r="3.5" />
+      <path d="M46 14.5h15v10.5H34.5z" fill="#d9f4f3" />
+      <path d="M65 14.5h15.5c3 0 5 1 7 3l7.5 7.5H65z" fill="#d9f4f3" />
+      <circle cx="31" cy="42" fill="#0b1a2e" r="8.5" />
+      <circle cx="31" cy="42" fill="#c9d2db" r="3.5" />
+      <circle cx="92" cy="42" fill="#0b1a2e" r="8.5" />
+      <circle cx="92" cy="42" fill="#c9d2db" r="3.5" />
     </svg>
   );
 }
 
 /** A scooter seen from the side, in the same simple style. */
-export function ScooterArt({ colour = "#0e5e6f", className = "" }: { colour?: string; className?: string }) {
+export function ScooterArt({ colour = "#0b8f8c", className = "" }: { colour?: string; className?: string }) {
   return (
     <svg className={className} viewBox="0 0 100 58" xmlns="http://www.w3.org/2000/svg">
-      <path d="M73 30 82 47" stroke="#13262b" strokeLinecap="round" strokeWidth="3.2" />
+      <path d="M73 30 82 47" stroke="#0b1a2e" strokeLinecap="round" strokeWidth="3.2" />
       <path d="M10 41c0-8 6-13 16-13h24c4 0 6 2.4 6 5.6V38h8l7-24h5l-6.6 25.5C68.3 44 65 46 60.5 46H15c-3 0-5-2-5-5z" fill={colour} />
-      <path d="M21 21.5h28c2.6 0 3.8 1.7 3 3.7l-.5 1.3H19.5l-.6-1.4c-.8-1.8.4-3.6 2.1-3.6z" fill="#13262b" />
-      <path d="M68 13.5 80 10.5" stroke="#13262b" strokeLinecap="round" strokeWidth="3.2" />
-      <circle cx="74.8" cy="19" fill="#f6e7b8" r="2.2" />
-      <circle cx="24" cy="47" fill="#13262b" r="8" />
-      <circle cx="24" cy="47" fill="#c4d3d0" r="3" />
-      <circle cx="82" cy="47" fill="#13262b" r="8" />
-      <circle cx="82" cy="47" fill="#c4d3d0" r="3" />
+      <path d="M21 21.5h28c2.6 0 3.8 1.7 3 3.7l-.5 1.3H19.5l-.6-1.4c-.8-1.8.4-3.6 2.1-3.6z" fill="#0b1a2e" />
+      <path d="M68 13.5 80 10.5" stroke="#0b1a2e" strokeLinecap="round" strokeWidth="3.2" />
+      <circle cx="74.8" cy="19" fill="#e6eaef" r="2.2" />
+      <circle cx="24" cy="47" fill="#0b1a2e" r="8" />
+      <circle cx="24" cy="47" fill="#c9d2db" r="3" />
+      <circle cx="82" cy="47" fill="#0b1a2e" r="8" />
+      <circle cx="82" cy="47" fill="#c9d2db" r="3" />
     </svg>
   );
 }
@@ -149,7 +159,7 @@ function FakeQr({ className = "" }: { className?: string }) {
   return (
     <svg className={className} shapeRendering="crispEdges" viewBox={`-1 -1 ${size + 2} ${size + 2}`} xmlns="http://www.w3.org/2000/svg">
       <rect fill="#ffffff" height={size + 2} width={size + 2} x="-1" y="-1" />
-      <path d={d} fill="#13262b" />
+      <path d={d} fill="#0b1a2e" />
     </svg>
   );
 }
@@ -158,7 +168,7 @@ function Pill({ children, solid = false }: { children: ReactNode; solid?: boolea
   return (
     <span
       className={`inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full px-[1em] py-[0.45em] text-[0.95em] font-bold ${
-        solid ? "bg-[#0e5e6f] text-white" : "border-[0.12em] border-[#b9d4d0] bg-white text-[#13262b]"
+        solid ? "bg-[#0b8f8c] text-white" : "border-[0.12em] border-[#c9d2db] bg-white text-[#0b1a2e]"
       }`}
     >
       {children}
@@ -168,7 +178,7 @@ function Pill({ children, solid = false }: { children: ReactNode; solid?: boolea
 
 function Chip({ dot, children }: { dot?: string; children: ReactNode }) {
   return (
-    <span className="inline-flex shrink-0 items-center gap-[0.45em] whitespace-nowrap rounded-[1em] bg-white px-[0.9em] py-[0.5em] font-semibold shadow-[0_1px_2px_rgba(19,38,43,0.06)]">
+    <span className="inline-flex shrink-0 items-center gap-[0.45em] whitespace-nowrap rounded-[1em] bg-white px-[0.9em] py-[0.5em] font-semibold shadow-[0_1px_2px_rgba(6,22,43,0.06)]">
       {dot ? <span className="h-[0.6em] w-[0.6em] rounded-full" style={{ background: dot }} /> : null}
       {children}
     </span>
@@ -190,15 +200,15 @@ export async function DashboardWindowMock({ className = "" }: { className?: stri
     { icon: BarChart3, label: t("mockNavReports") }
   ];
   const rows = [
-    { title: t("mockRowHandover", { vehicle: "Toyota Yaris Ativ" }), sub: "Anna Becker · 10:00", action: t("mockHandOver"), solid: true, colour: "#0e5e6f" },
-    { title: t("mockRowCollect", { amount: money(2400) }), sub: "Kenji Watanabe · Honda Click 160", action: t("mockRecordPayment"), colour: "#f2a541" },
-    { title: t("mockRowReturn", { vehicle: "Honda City" }), sub: "Lucas Martin · 16:30", action: t("mockTakeBack"), colour: "#5aa9d6" }
+    { title: t("mockRowHandover", { vehicle: "Toyota Yaris Ativ" }), sub: "Anna Becker · 10:00", action: t("mockHandOver"), solid: true, colour: "#0b8f8c" },
+    { title: t("mockRowCollect", { amount: money(2400) }), sub: "Kenji Watanabe · Honda Click 160", action: t("mockRecordPayment"), colour: "#12bcb8" },
+    { title: t("mockRowReturn", { vehicle: "Honda City" }), sub: "Lucas Martin · 16:30", action: t("mockTakeBack"), colour: "#4a9ad8" }
   ];
   const bars = [38, 52, 44, 63, 58, 72, 66, 80, 74, 90];
   const week = ["2026-11-09", "2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-14", "2026-11-15"].map((iso) => date(iso, { weekday: "short", day: "numeric" }));
-  const out = { bg: "#d8eeea", fg: "#0a4653" };
-  const going = { bg: "#fdf0d8", fg: "#7a4a0a" };
-  const back = { bg: "#e4eff8", fg: "#173e5e" };
+  const out = { bg: "#d9f4f3", fg: "#0b8f8c" };
+  const going = { bg: "#d9f4f3", fg: "#0b6e6c" };
+  const back = { bg: "#e4eef8", fg: "#1f4f7a" };
   const calendar = [
     { vehicle: "Toyota Yaris Ativ", bars: [{ who: "Anna Becker", from: 4, to: 8, ...going }] },
     { vehicle: "Honda City", bars: [{ who: "Lucas Martin", from: 1, to: 5, ...back }, { who: "Mei Lin", from: 6, to: 8, ...out }] },
@@ -207,13 +217,13 @@ export async function DashboardWindowMock({ className = "" }: { className?: stri
   ];
   return (
     <WindowFrame address="palm.routehq.app" className={className} label={t("mockDashboardLabel")}>
-      <div className="grid aspect-[16/9.2] grid-cols-[15em_1fr] bg-[#eef5f4]">
-        <aside className="flex flex-col gap-[0.3em] border-e border-[#dbe9e6] bg-white px-[1em] py-[1.4em]">
+      <div className="grid aspect-[16/9.2] grid-cols-[15em_1fr] bg-[#f3f6f8]">
+        <aside className="flex flex-col gap-[0.3em] bg-[#0b2140] px-[1em] py-[1.4em] text-white">
           <p className="px-[0.6em] text-[1.15em] font-bold leading-tight">Palm Car Rental</p>
-          <p className="px-[0.7em] text-[0.85em] text-[#4b5f63]">Powered by RouteHQ</p>
+          <p className="px-[0.7em] text-[0.85em] text-white/60">Powered by RouteHQ</p>
           <div className="mt-[1em] flex flex-col gap-[0.2em]">
             {nav.map(({ icon: Icon, label, active }) => (
-              <span className={`flex items-center gap-[0.7em] rounded-[0.8em] px-[0.7em] py-[0.55em] font-semibold ${active ? "bg-[#d8eeea] text-[#0e5e6f]" : "text-[#2f4448]"}`} key={label}>
+              <span className={`flex items-center gap-[0.7em] rounded-[0.8em] px-[0.7em] py-[0.55em] font-semibold ${active ? "bg-[rgba(18,188,184,0.16)] text-[#12bcb8]" : "text-white/70"}`} key={label}>
                 <Icon className="h-[1.2em] w-[1.2em] shrink-0" strokeWidth={2} />
                 {label}
               </span>
@@ -223,35 +233,35 @@ export async function DashboardWindowMock({ className = "" }: { className?: stri
         <div className="min-w-0 px-[2em] py-[1.6em]">
           <div className="flex items-start justify-between gap-[1em]">
             <div>
-              <p className="font-semibold text-[#4b5f63]">{date("2026-11-12", { weekday: "long", day: "numeric", month: "long" })}</p>
-              <p className="mt-[0.1em] text-[2.6em] font-semibold leading-none tracking-[-0.02em]" style={{ fontFamily: "var(--font-display)" }}>
+              <p className="font-semibold text-[#5f6b7a]">{date("2026-11-12", { weekday: "long", day: "numeric", month: "long" })}</p>
+              <p className="mt-[0.1em] text-[2.6em] font-semibold leading-none tracking-[-0.02em]" style={{ fontFamily: "var(--font-site)" }}>
                 {t("mockGoodMorning")}
               </p>
             </div>
-            <span className="inline-flex items-center gap-[0.4em] whitespace-nowrap rounded-full bg-[#0e5e6f] px-[1.1em] py-[0.6em] font-bold text-white">
+            <span className="inline-flex items-center gap-[0.4em] whitespace-nowrap rounded-full bg-[#0b8f8c] px-[1.1em] py-[0.6em] font-bold text-white">
               <Plus className="h-[1.1em] w-[1.1em]" strokeWidth={2.5} /> {t("mockNewBooking")}
             </span>
           </div>
           <div className="mt-[1.1em] flex gap-[0.6em] overflow-hidden">
-            <Chip dot="#b4472c">{t("mockOverdue", { count: 1 })}</Chip>
+            <Chip dot="#d14343">{t("mockOverdue", { count: 1 })}</Chip>
             <Chip>{t("mockForToday", { count: 3 })}</Chip>
-            <Chip dot="#f2a541">{t("mockGoingOut", { count: 2 })}</Chip>
-            <Chip dot="#5aa9d6">{t("mockComingBack", { count: 1 })}</Chip>
+            <Chip dot="#12bcb8">{t("mockGoingOut", { count: 2 })}</Chip>
+            <Chip dot="#4a9ad8">{t("mockComingBack", { count: 1 })}</Chip>
           </div>
           <div className="mt-[1.4em] grid grid-cols-[1.65fr_1fr] gap-[1.2em]">
             <div>
-              <p className="text-[1.45em] font-semibold" style={{ fontFamily: "var(--font-display)" }}>
+              <p className="text-[1.45em] font-semibold" style={{ fontFamily: "var(--font-site)" }}>
                 {t("mockToday")}
               </p>
-              <div className="mt-[0.6em] overflow-hidden rounded-[1.4em] bg-white shadow-[0_1px_2px_rgba(19,38,43,0.06),0_12px_30px_rgba(14,94,111,0.11)]">
+              <div className="mt-[0.6em] overflow-hidden rounded-[1.4em] bg-white shadow-[0_1px_2px_rgba(6,22,43,0.06),0_12px_30px_rgba(6,22,43,0.08)]">
                 {rows.map((row, index) => (
-                  <div className={`flex items-center gap-[0.9em] px-[1.1em] py-[0.95em] ${index ? "border-t border-[#dbe9e6]" : ""}`} key={row.title}>
-                    <span className="flex h-[2.6em] w-[3.2em] shrink-0 items-center justify-center rounded-[0.7em] bg-[#f3f8f7]">
+                  <div className={`flex items-center gap-[0.9em] px-[1.1em] py-[0.95em] ${index ? "border-t border-[#e6eaef]" : ""}`} key={row.title}>
+                    <span className="flex h-[2.6em] w-[3.2em] shrink-0 items-center justify-center rounded-[0.7em] bg-[#f3f6f8]">
                       <CarArt className="w-[2.5em]" colour={row.colour} />
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-bold">{row.title}</span>
-                      <span className="block truncate text-[#4b5f63]">{row.sub}</span>
+                      <span className="block truncate text-[#5f6b7a]">{row.sub}</span>
                     </span>
                     <Pill solid={row.solid}>{row.action}</Pill>
                   </div>
@@ -259,46 +269,46 @@ export async function DashboardWindowMock({ className = "" }: { className?: stri
               </div>
             </div>
             <div className="flex flex-col gap-[1em]">
-              <div className="rounded-[1.4em] bg-white p-[1.1em] shadow-[0_1px_2px_rgba(19,38,43,0.06),0_12px_30px_rgba(14,94,111,0.11)]">
-                <p className="font-semibold text-[#4b5f63]">{t("mockOnRent")}</p>
+              <div className="rounded-[1.4em] bg-white p-[1.1em] shadow-[0_1px_2px_rgba(6,22,43,0.06),0_12px_30px_rgba(6,22,43,0.08)]">
+                <p className="font-semibold text-[#5f6b7a]">{t("mockOnRent")}</p>
                 <div className="mt-[0.6em] flex items-center gap-[0.9em]">
                   <svg className="h-[4.2em] w-[4.2em] -rotate-90" viewBox="0 0 36 36">
-                    <circle cx="18" cy="18" fill="none" r="15" stroke="#e3eeec" strokeWidth="4.5" />
-                    <circle cx="18" cy="18" fill="none" r="15" stroke="#0e5e6f" strokeDasharray="73 94.2" strokeLinecap="round" strokeWidth="4.5" />
+                    <circle cx="18" cy="18" fill="none" r="15" stroke="#e6eaef" strokeWidth="4.5" />
+                    <circle cx="18" cy="18" fill="none" r="15" stroke="#0b8f8c" strokeDasharray="73 94.2" strokeLinecap="round" strokeWidth="4.5" />
                   </svg>
                   <span>
-                    <span className="block text-[1.7em] font-semibold leading-none" style={{ fontFamily: "var(--font-display)" }}>
+                    <span className="block text-[1.7em] font-semibold leading-none" style={{ fontFamily: "var(--font-site)" }}>
                       7/9
                     </span>
-                    <span className="text-[#4b5f63]">{t("mockVehiclesOut")}</span>
+                    <span className="text-[#5f6b7a]">{t("mockVehiclesOut")}</span>
                   </span>
                 </div>
               </div>
-              <div className="flex-1 rounded-[1.4em] bg-white p-[1.1em] shadow-[0_1px_2px_rgba(19,38,43,0.06),0_12px_30px_rgba(14,94,111,0.11)]">
-                <p className="font-semibold text-[#4b5f63]">{t("mockMonthSoFar")}</p>
-                <p className="mt-[0.2em] text-[1.9em] font-semibold leading-none" style={{ fontFamily: "var(--font-display)" }}>
+              <div className="flex-1 rounded-[1.4em] bg-white p-[1.1em] shadow-[0_1px_2px_rgba(6,22,43,0.06),0_12px_30px_rgba(6,22,43,0.08)]">
+                <p className="font-semibold text-[#5f6b7a]">{t("mockMonthSoFar")}</p>
+                <p className="mt-[0.2em] text-[1.9em] font-semibold leading-none" style={{ fontFamily: "var(--font-site)" }}>
                   {money(148600)}
                 </p>
                 <div className="mt-[0.9em] flex h-[3.2em] items-end gap-[0.35em]">
                   {bars.map((height, index) => (
-                    <span className="flex-1 rounded-t-[0.3em]" key={index} style={{ height: `${height}%`, background: index === bars.length - 1 ? "#f2a541" : "#0e5e6f", opacity: index === bars.length - 1 ? 1 : 0.25 + index * 0.06 }} />
+                    <span className="flex-1 rounded-t-[0.3em]" key={index} style={{ height: `${height}%`, background: index === bars.length - 1 ? "#12bcb8" : "#0b8f8c", opacity: index === bars.length - 1 ? 1 : 0.25 + index * 0.06 }} />
                   ))}
                 </div>
               </div>
             </div>
           </div>
-          <div className="mt-[1.2em] rounded-[1.4em] bg-white px-[1.1em] pb-[1em] pt-[0.9em] shadow-[0_1px_2px_rgba(19,38,43,0.06),0_12px_30px_rgba(14,94,111,0.11)]">
+          <div className="mt-[1.2em] rounded-[1.4em] bg-white px-[1.1em] pb-[1em] pt-[0.9em] shadow-[0_1px_2px_rgba(6,22,43,0.06),0_12px_30px_rgba(6,22,43,0.08)]">
             <div className="grid grid-cols-[10em_repeat(7,1fr)] items-center gap-y-[0.45em]">
-              <span className="font-semibold text-[#4b5f63]">{t("mockNavCalendar")}</span>
+              <span className="font-semibold text-[#5f6b7a]">{t("mockNavCalendar")}</span>
               {week.map((day, index) => (
-                <span className={`text-center text-[0.9em] font-semibold ${index === 3 ? "text-[#0e5e6f]" : "text-[#4b5f63]"}`} key={day}>
+                <span className={`text-center text-[0.9em] font-semibold ${index === 3 ? "text-[#0b8f8c]" : "text-[#5f6b7a]"}`} key={day}>
                   {day}
                 </span>
               ))}
               {calendar.map((row) => (
                 <div className="contents" key={row.vehicle}>
                   <span className="truncate pe-[0.6em] font-semibold">{row.vehicle}</span>
-                  <span className="relative col-span-7 grid h-[2em] grid-cols-7 rounded-[0.6em] bg-[#f3f8f7]">
+                  <span className="relative col-span-7 grid h-[2em] grid-cols-7 rounded-[0.6em] bg-[#f3f6f8]">
                     {row.bars.map((bar) => (
                       <span
                         className="m-[0.2em] flex items-center truncate rounded-[0.45em] px-[0.6em] text-[0.85em] font-semibold"
@@ -324,35 +334,35 @@ export async function DashboardWindowMock({ className = "" }: { className?: stri
 export async function TodayPhoneMock({ className = "" }: { className?: string }) {
   const { t, money, date } = await kit();
   const rows = [
-    { title: t("mockRowHandover", { vehicle: "Toyota Yaris Ativ" }), sub: "Anna Becker · 10:00", action: t("mockHandOver"), solid: true, bar: "#0e5e6f" },
-    { title: t("mockRowCollect", { amount: money(2400) }), sub: "Kenji Watanabe", action: t("mockRecordPayment"), bar: "#f2a541" },
-    { title: t("mockRowReturn", { vehicle: "Honda City" }), sub: "Lucas Martin · 16:30", action: t("mockTakeBack"), bar: "#5aa9d6" }
+    { title: t("mockRowHandover", { vehicle: "Toyota Yaris Ativ" }), sub: "Anna Becker · 10:00", action: t("mockHandOver"), solid: true, bar: "#0b8f8c" },
+    { title: t("mockRowCollect", { amount: money(2400) }), sub: "Kenji Watanabe", action: t("mockRecordPayment"), bar: "#12bcb8" },
+    { title: t("mockRowReturn", { vehicle: "Honda City" }), sub: "Lucas Martin · 16:30", action: t("mockTakeBack"), bar: "#4a9ad8" }
   ];
   return (
     <PhoneFrame className={className} label={t("mockTodayLabel")}>
-      <div className="flex h-full flex-col bg-[linear-gradient(180deg,#e3eeec_0%,#eef5f4_40%)]">
+      <div className="flex h-full flex-col bg-[linear-gradient(180deg,#e6eaef_0%,#f3f6f8_40%)]">
         <StatusBar />
         <div className="px-[1.3em] pt-[1.6em]">
           <p className="font-bold">Palm Car Rental</p>
-          <p className="mt-[1.1em] font-semibold text-[#4b5f63]">{date("2026-11-12", { weekday: "long", day: "numeric", month: "long" })}</p>
-          <p className="text-[2.2em] font-semibold leading-[1.05] tracking-[-0.02em]" style={{ fontFamily: "var(--font-display)" }}>
+          <p className="mt-[1.1em] font-semibold text-[#5f6b7a]">{date("2026-11-12", { weekday: "long", day: "numeric", month: "long" })}</p>
+          <p className="text-[2.2em] font-semibold leading-[1.05] tracking-[-0.02em]" style={{ fontFamily: "var(--font-site)" }}>
             {t("mockGoodMorning")}
           </p>
           <div className="mt-[0.9em] flex gap-[0.5em] overflow-hidden">
-            <Chip dot="#b4472c">{t("mockOverdue", { count: 1 })}</Chip>
+            <Chip dot="#d14343">{t("mockOverdue", { count: 1 })}</Chip>
             <Chip>{t("mockForToday", { count: 3 })}</Chip>
           </div>
-          <p className="mt-[1.2em] text-[1.35em] font-semibold" style={{ fontFamily: "var(--font-display)" }}>
+          <p className="mt-[1.2em] text-[1.35em] font-semibold" style={{ fontFamily: "var(--font-site)" }}>
             {t("mockToday")}
           </p>
         </div>
-        <div className="mx-[0.9em] mt-[0.5em] overflow-hidden rounded-[1.4em] bg-white shadow-[0_1px_2px_rgba(19,38,43,0.06),0_12px_30px_rgba(14,94,111,0.11)]">
+        <div className="mx-[0.9em] mt-[0.5em] overflow-hidden rounded-[1.4em] bg-white shadow-[0_1px_2px_rgba(6,22,43,0.06),0_12px_30px_rgba(6,22,43,0.08)]">
           {rows.map((row, index) => (
-            <div className={`flex gap-[0.7em] px-[0.9em] py-[0.85em] ${index ? "border-t border-[#dbe9e6]" : ""}`} key={row.title}>
+            <div className={`flex gap-[0.7em] px-[0.9em] py-[0.85em] ${index ? "border-t border-[#e6eaef]" : ""}`} key={row.title}>
               <span className="w-[0.25em] shrink-0 rounded-full" style={{ background: row.bar }} />
               <span className="min-w-0 flex-1">
                 <span className="block font-bold leading-tight">{row.title}</span>
-                <span className="block truncate text-[#4b5f63]">{row.sub}</span>
+                <span className="block truncate text-[#5f6b7a]">{row.sub}</span>
                 <span className="mt-[0.5em] block">
                   <Pill solid={row.solid}>{row.action}</Pill>
                 </span>
@@ -360,25 +370,29 @@ export async function TodayPhoneMock({ className = "" }: { className?: string })
             </div>
           ))}
         </div>
-        <div className="mt-auto flex items-center justify-around rounded-t-[1.6em] bg-white/90 px-[1em] pb-[1.4em] pt-[0.8em] text-[0.85em] font-semibold text-[#4b5f63]">
-          <span className="flex flex-col items-center text-[#0e5e6f]">
-            <Home className="h-[1.6em] w-[1.6em]" />
-          </span>
-          <span className="flex flex-col items-center">
-            <ListTodo className="h-[1.6em] w-[1.6em]" />
-          </span>
-          <span className="flex h-[3em] w-[3em] items-center justify-center rounded-full bg-[#0e5e6f] text-white">
-            <Plus className="h-[1.6em] w-[1.6em]" />
-          </span>
-          <span className="flex flex-col items-center">
-            <Inbox className="h-[1.6em] w-[1.6em]" />
-          </span>
-          <span className="flex flex-col items-center">
-            <CalendarDays className="h-[1.6em] w-[1.6em]" />
-          </span>
-        </div>
+        <TabBar />
       </div>
     </PhoneFrame>
+  );
+}
+
+/** The app's tab bar at the foot of a phone screen. */
+function TabBar({ active = 0 }: { active?: number }) {
+  const tabs = [Home, ListTodo, null, Inbox, CalendarDays];
+  return (
+    <div className="mt-auto flex items-center justify-around rounded-t-[1.6em] bg-white/90 px-[1em] pb-[1.4em] pt-[0.8em] text-[0.85em] font-semibold text-[#5f6b7a]">
+      {tabs.map((Icon, index) =>
+        Icon ? (
+          <span className={`flex flex-col items-center ${index === active ? "text-[#0b8f8c]" : ""}`} key={index}>
+            <Icon className="h-[1.6em] w-[1.6em]" />
+          </span>
+        ) : (
+          <span className="flex h-[3em] w-[3em] items-center justify-center rounded-full bg-[#0b8f8c] text-white" key={index}>
+            <Plus className="h-[1.6em] w-[1.6em]" />
+          </span>
+        )
+      )}
+    </div>
   );
 }
 
@@ -389,59 +403,63 @@ export async function BookingPhoneMock({ className = "" }: { className?: string 
   const range = `${date("2026-11-12", { day: "numeric", month: "short" })} – ${date("2026-11-19", { day: "numeric", month: "short" })}`;
   return (
     <PhoneFrame className={className} label={t("mockBookingLabel")}>
-      <div className="flex h-full flex-col bg-[#f3f8f7]">
+      <div className="flex h-full flex-col bg-[#f3f6f8]">
         <StatusBar />
         <div className="flex items-center gap-[0.6em] px-[1.2em] pt-[1.4em]">
-          <span className="flex h-[2.2em] w-[2.2em] items-center justify-center rounded-[0.6em] bg-[#0e5e6f] font-bold text-white">P</span>
+          <span className="flex h-[2.2em] w-[2.2em] items-center justify-center rounded-[0.6em] bg-[#0b8f8c] font-bold text-white">P</span>
           <span className="font-bold">Palm Car Rental</span>
         </div>
-        <div className="mx-[0.9em] mt-[1em] rounded-[1.3em] bg-white p-[1em] shadow-[0_1px_2px_rgba(19,38,43,0.06),0_10px_24px_rgba(14,94,111,0.1)]">
-          <p className="font-semibold text-[#4b5f63]">{t("mockYourBooking")}</p>
+        <div className="mx-[0.9em] mt-[1em] rounded-[1.3em] bg-white p-[1em] shadow-[0_1px_2px_rgba(6,22,43,0.06),0_10px_24px_rgba(6,22,43,0.08)]">
+          <p className="font-semibold text-[#5f6b7a]">{t("mockYourBooking")}</p>
           <div className="mt-[0.5em] flex items-center gap-[0.8em]">
-            <span className="flex h-[3.4em] w-[4.6em] shrink-0 items-center justify-center rounded-[0.8em] bg-[#e3eeec]">
-              <CarArt className="w-[3.8em]" colour="#b4472c" />
+            <span className="flex h-[3.4em] w-[4.6em] shrink-0 items-center justify-center rounded-[0.8em] bg-[#e6eaef]">
+              <CarArt className="w-[3.8em]" colour="#0b2140" />
             </span>
             <span className="min-w-0">
               <span className="block text-[1.15em] font-bold leading-tight">Toyota Yaris Ativ</span>
-              <span className="block text-[#4b5f63]">
+              <span className="block text-[#5f6b7a]">
                 {range} · {t("mockDays", { count: 7 })}
               </span>
             </span>
           </div>
           <div className="mt-[0.9em] grid grid-cols-2 gap-[0.5em]">
-            <span className="rounded-[0.8em] bg-[#f3f8f7] px-[0.8em] py-[0.55em]">
-              <span className="block text-[0.9em] text-[#4b5f63]">{t("mockTotal")}</span>
+            <span className="rounded-[0.8em] bg-[#f3f6f8] px-[0.8em] py-[0.55em]">
+              <span className="block text-[0.9em] text-[#5f6b7a]">{t("mockTotal")}</span>
               <span className="block text-[1.2em] font-bold">{money(5600)}</span>
             </span>
-            <span className="rounded-[0.8em] bg-[#f3f8f7] px-[0.8em] py-[0.55em]">
-              <span className="block text-[0.9em] text-[#4b5f63]">{t("mockDeposit")}</span>
+            <span className="rounded-[0.8em] bg-[#f3f6f8] px-[0.8em] py-[0.55em]">
+              <span className="block text-[0.9em] text-[#5f6b7a]">{t("mockDeposit")}</span>
               <span className="block text-[1.2em] font-bold">{money(3000)}</span>
             </span>
           </div>
         </div>
-        <div className="mx-[0.9em] mt-[0.7em] overflow-hidden rounded-[1.3em] bg-white shadow-[0_1px_2px_rgba(19,38,43,0.06)]">
+        <div className="mx-[0.9em] mt-[0.7em] overflow-hidden rounded-[1.3em] bg-white shadow-[0_1px_2px_rgba(6,22,43,0.06)]">
           {[t("mockPassport"), t("mockLicence")].map((label, index) => (
-            <div className={`flex items-center justify-between gap-[0.6em] px-[1em] py-[0.75em] ${index ? "border-t border-[#dbe9e6]" : ""}`} key={label}>
+            <div className={`flex items-center justify-between gap-[0.6em] px-[1em] py-[0.75em] ${index ? "border-t border-[#e6eaef]" : ""}`} key={label}>
               <span className="flex items-center gap-[0.6em] font-semibold">
-                <span className="flex h-[1.9em] w-[2.6em] items-center justify-center rounded-[0.4em] bg-[#e4eff8] text-[#173e5e]">
+                <span className="flex h-[1.9em] w-[2.6em] items-center justify-center rounded-[0.4em] bg-[#e4eef8] text-[#1f4f7a]">
                   <Camera className="h-[1.1em] w-[1.1em]" />
                 </span>
                 {label}
               </span>
-              <span className="inline-flex items-center gap-[0.3em] rounded-full bg-[#ddf0e4] px-[0.7em] py-[0.25em] text-[0.9em] font-bold text-[#2b6b47]">
+              <span className="inline-flex items-center gap-[0.3em] rounded-full bg-[#dcf3e6] px-[0.7em] py-[0.25em] text-[0.9em] font-bold text-[#1f7a4d]">
                 <Check className="h-[1em] w-[1em]" strokeWidth={3} /> {t("mockRead")}
               </span>
             </div>
           ))}
         </div>
-        <div className="mx-[0.9em] mt-[0.7em] rounded-[1.3em] border-[0.12em] border-dashed border-[#b9d4d0] bg-white px-[1em] pb-[0.6em] pt-[0.4em]">
-          <svg className="h-[3.4em] w-full" fill="none" viewBox="0 0 120 40">
-            <path d="M6 30C14 8 22 6 25 24s10 14 17-6 14-10 16 6 9 16 16-4 12-8 15 6 10 8 22-2" stroke="#13262b" strokeLinecap="round" strokeWidth="2.2" />
+        <div className="mx-[0.9em] mt-[0.7em] flex items-center justify-between gap-[0.6em] rounded-[1.3em] bg-white px-[1em] py-[0.75em] shadow-[0_1px_2px_rgba(6,22,43,0.06)]">
+          <span className="font-semibold">{t("mockHandoverTitle")}</span>
+          <span className="text-[#5f6b7a]">{date("2026-11-12", { weekday: "short", day: "numeric", month: "short" })} · 10:00</span>
+        </div>
+        <div className="mx-[0.9em] mt-[0.7em] rounded-[1.3em] border-[0.12em] border-dashed border-[#c9d2db] bg-white px-[1em] pb-[0.6em] pt-[0.6em]">
+          <svg className="h-[4.6em] w-full" fill="none" viewBox="0 0 120 40">
+            <path d="M6 30C14 8 22 6 25 24s10 14 17-6 14-10 16 6 9 16 16-4 12-8 15 6 10 8 22-2" stroke="#0b1a2e" strokeLinecap="round" strokeWidth="2.2" />
           </svg>
-          <p className="border-t border-[#dbe9e6] pt-[0.3em] text-[0.9em] text-[#4b5f63]">{t("mockSignHere")}</p>
+          <p className="border-t border-[#e6eaef] pt-[0.3em] text-[0.9em] text-[#5f6b7a]">{t("mockSignHere")}</p>
         </div>
         <div className="mx-[0.9em] mt-auto pb-[1.6em]">
-          <span className="flex w-full items-center justify-center rounded-full bg-[#0e5e6f] py-[0.85em] text-[1.05em] font-bold text-white">{t("mockSignConfirm")}</span>
+          <span className="flex w-full items-center justify-center rounded-full bg-[#0b8f8c] py-[0.85em] text-[1.05em] font-bold text-white">{t("mockSignConfirm")}</span>
         </div>
       </div>
     </PhoneFrame>
@@ -453,65 +471,65 @@ export async function BookingPhoneMock({ className = "" }: { className?: string 
 export async function HandoverPhoneMock({ className = "" }: { className?: string }) {
   const { t, number } = await kit();
   const tiles = [
-    { colour: "#13262b", flip: false },
-    { colour: "#13262b", flip: true },
-    { colour: "#4b5f63", flip: false },
-    { colour: "#4b5f63", flip: true }
+    { colour: "#0b1a2e", flip: false },
+    { colour: "#0b1a2e", flip: true },
+    { colour: "#5f6b7a", flip: false },
+    { colour: "#5f6b7a", flip: true }
   ];
   return (
     <PhoneFrame className={className} label={t("mockHandoverLabel")}>
-      <div className="flex h-full flex-col bg-[#f3f8f7]">
+      <div className="flex h-full flex-col bg-[#f3f6f8]">
         <StatusBar />
         <div className="flex items-center gap-[0.5em] px-[1em] pt-[1.4em]">
           <span className="flex h-[2.2em] w-[2.2em] items-center justify-center rounded-full bg-white">
             <ChevronLeft className="h-[1.3em] w-[1.3em]" />
           </span>
           <span>
-            <span className="block text-[1.3em] font-semibold leading-tight" style={{ fontFamily: "var(--font-display)" }}>
+            <span className="block text-[1.3em] font-semibold leading-tight" style={{ fontFamily: "var(--font-site)" }}>
               {t("mockHandoverTitle")}
             </span>
-            <span className="block text-[#4b5f63]">Honda City · Lucas Martin</span>
+            <span className="block text-[#5f6b7a]">Honda City · Lucas Martin</span>
           </span>
         </div>
-        <div className="mx-[0.9em] mt-[1em] rounded-[1.3em] bg-white p-[0.9em] shadow-[0_1px_2px_rgba(19,38,43,0.06)]">
+        <div className="mx-[0.9em] mt-[1em] rounded-[1.3em] bg-white p-[0.9em] shadow-[0_1px_2px_rgba(6,22,43,0.06)]">
           <div className="flex items-center justify-between">
             <span className="font-bold">{t("mockPhotos")}</span>
-            <span className="text-[#4b5f63]">{t("mockPhotoCount", { count: 8 })}</span>
+            <span className="text-[#5f6b7a]">{t("mockPhotoCount", { count: 8 })}</span>
           </div>
           <div className="mt-[0.6em] grid grid-cols-2 gap-[0.45em]">
             {tiles.map((tile, index) => (
-              <span className="relative flex aspect-[4/3] items-center justify-center rounded-[0.7em] bg-[linear-gradient(160deg,#e3eeec,#cfe0dd)]" key={index}>
+              <span className="relative flex aspect-[4/3] items-center justify-center rounded-[0.7em] bg-[linear-gradient(160deg,#e6eaef,#cfd6df)]" key={index}>
                 <CarArt className="w-[70%]" colour={index < 2 ? "#e9edec" : "#f5f7f7"} flip={tile.flip} />
-                <span className="absolute bottom-[0.35em] end-[0.35em] flex h-[1.5em] w-[1.5em] items-center justify-center rounded-full bg-white/90 text-[#0e5e6f]">
+                <span className="absolute bottom-[0.35em] end-[0.35em] flex h-[1.5em] w-[1.5em] items-center justify-center rounded-full bg-white/90 text-[#0b8f8c]">
                   <Camera className="h-[0.9em] w-[0.9em]" />
                 </span>
               </span>
             ))}
           </div>
         </div>
-        <div className="mx-[0.9em] mt-[0.7em] overflow-hidden rounded-[1.3em] bg-white shadow-[0_1px_2px_rgba(19,38,43,0.06)]">
+        <div className="mx-[0.9em] mt-[0.7em] overflow-hidden rounded-[1.3em] bg-white shadow-[0_1px_2px_rgba(6,22,43,0.06)]">
           <div className="px-[1em] py-[0.75em]">
             <div className="flex items-center justify-between font-semibold">
               <span>{t("mockFuel")}</span>
               <span>¾</span>
             </div>
-            <div className="mt-[0.45em] h-[0.55em] overflow-hidden rounded-full bg-[#e3eeec]">
-              <div className="h-full w-3/4 rounded-full bg-[#0e5e6f]" />
+            <div className="mt-[0.45em] h-[0.55em] overflow-hidden rounded-full bg-[#e6eaef]">
+              <div className="h-full w-3/4 rounded-full bg-[#0b8f8c]" />
             </div>
           </div>
-          <div className="flex items-center justify-between border-t border-[#dbe9e6] px-[1em] py-[0.75em] font-semibold">
+          <div className="flex items-center justify-between border-t border-[#e6eaef] px-[1em] py-[0.75em] font-semibold">
             <span>{t("mockKm")}</span>
             <span className="tabular-nums">{number(48210)}</span>
           </div>
-          <div className="flex items-center justify-between border-t border-[#dbe9e6] px-[1em] py-[0.75em] font-semibold">
+          <div className="flex items-center justify-between border-t border-[#e6eaef] px-[1em] py-[0.75em] font-semibold">
             <span>{t("mockCustomerSigned")}</span>
-            <span className="flex h-[1.5em] w-[1.5em] items-center justify-center rounded-full bg-[#ddf0e4] text-[#2b6b47]">
+            <span className="flex h-[1.5em] w-[1.5em] items-center justify-center rounded-full bg-[#dcf3e6] text-[#1f7a4d]">
               <Check className="h-[1em] w-[1em]" strokeWidth={3} />
             </span>
           </div>
         </div>
         <div className="mx-[0.9em] mt-auto pb-[1.6em]">
-          <span className="flex w-full items-center justify-center rounded-full bg-[#0e5e6f] py-[0.85em] text-[1.05em] font-bold text-white">{t("mockFinish")}</span>
+          <span className="flex w-full items-center justify-center rounded-full bg-[#0b8f8c] py-[0.85em] text-[1.05em] font-bold text-white">{t("mockFinish")}</span>
         </div>
       </div>
     </PhoneFrame>
@@ -524,55 +542,40 @@ export async function PaymentPhoneMock({ className = "" }: { className?: string 
   const { t, money, qrName } = await kit();
   return (
     <PhoneFrame className={className} label={t("mockPaymentLabel")}>
-      <div className="flex h-full flex-col bg-[#f3f8f7]">
+      <div className="flex h-full flex-col bg-[#f3f6f8]">
         <StatusBar />
-        <div className="mx-[0.9em] mt-[2em] rounded-[1.4em] bg-white p-[1.1em] text-center shadow-[0_1px_2px_rgba(19,38,43,0.06),0_10px_24px_rgba(14,94,111,0.1)]">
-          <p className="font-semibold text-[#4b5f63]">{t("mockScanToPay")}</p>
-          <p className="mt-[0.1em] text-[2em] font-semibold leading-tight" style={{ fontFamily: "var(--font-display)" }}>
+        <div className="mx-[0.9em] mt-[2em] rounded-[1.4em] bg-white p-[1.1em] text-center shadow-[0_1px_2px_rgba(6,22,43,0.06),0_10px_24px_rgba(6,22,43,0.08)]">
+          <p className="font-semibold text-[#5f6b7a]">{t("mockScanToPay")}</p>
+          <p className="mt-[0.1em] text-[2em] font-semibold leading-tight" style={{ fontFamily: "var(--font-site)" }}>
             {money(5600)}
           </p>
-          <div className="mx-auto mt-[0.8em] w-[62%] rounded-[0.8em] border-[0.15em] border-[#dbe9e6] p-[0.5em]">
+          <div className="mx-auto mt-[0.8em] w-[62%] rounded-[0.8em] border-[0.15em] border-[#e6eaef] p-[0.5em]">
             <FakeQr className="block w-full" />
           </div>
-          <p className="mt-[0.6em] text-[0.95em] font-bold tracking-[0.02em] text-[#173e5e]">{qrName}</p>
+          <p className="mt-[0.6em] text-[0.95em] font-bold tracking-[0.02em] text-[#1f4f7a]">{qrName}</p>
         </div>
-        <div className="mx-[0.9em] mt-[0.8em] flex items-start gap-[0.7em] rounded-[1.3em] bg-white p-[0.9em] shadow-[0_1px_2px_rgba(19,38,43,0.06),0_14px_30px_rgba(19,38,43,0.12)]">
-          <span className="flex h-[2.3em] w-[2.3em] shrink-0 items-center justify-center rounded-full bg-[#ddf0e4] text-[#2b6b47]">
+        <div className="mx-[0.9em] mt-[0.8em] flex items-start gap-[0.7em] rounded-[1.3em] bg-white p-[0.9em] shadow-[0_1px_2px_rgba(6,22,43,0.06),0_14px_30px_rgba(6,22,43,0.12)]">
+          <span className="flex h-[2.3em] w-[2.3em] shrink-0 items-center justify-center rounded-full bg-[#dcf3e6] text-[#1f7a4d]">
             <Check className="h-[1.3em] w-[1.3em]" strokeWidth={3} />
           </span>
           <span className="min-w-0">
             <span className="block font-bold leading-tight">{t("mockSlipMatched")}</span>
-            <span className="block text-[#4b5f63]">{money(5600)} · Anna Becker</span>
+            <span className="block text-[#5f6b7a]">{money(5600)} · Anna Becker</span>
           </span>
         </div>
-        <div className="mx-[0.9em] mt-[0.6em] flex items-center justify-between rounded-[1.3em] bg-white px-[0.9em] py-[0.75em] font-semibold shadow-[0_1px_2px_rgba(19,38,43,0.06)]">
+        <div className="mx-[0.9em] mt-[0.6em] flex items-center justify-between rounded-[1.3em] bg-white px-[0.9em] py-[0.75em] font-semibold shadow-[0_1px_2px_rgba(6,22,43,0.06)]">
           <span>{t("mockDepositHeld")}</span>
           <span>{money(3000)}</span>
         </div>
-        <div className="mx-[0.9em] mt-[0.6em] flex items-center justify-between rounded-[1.3em] bg-white px-[0.9em] py-[0.75em] font-semibold shadow-[0_1px_2px_rgba(19,38,43,0.06)]">
+        <div className="mx-[0.9em] mt-[0.6em] flex items-center justify-between rounded-[1.3em] bg-white px-[0.9em] py-[0.75em] font-semibold shadow-[0_1px_2px_rgba(6,22,43,0.06)]">
           <span>{t("mockReceiptSent")}</span>
-          <span className="flex h-[1.5em] w-[1.5em] items-center justify-center rounded-full bg-[#ddf0e4] text-[#2b6b47]">
+          <span className="flex h-[1.5em] w-[1.5em] items-center justify-center rounded-full bg-[#dcf3e6] text-[#1f7a4d]">
             <Check className="h-[1em] w-[1em]" strokeWidth={3} />
           </span>
         </div>
+        <TabBar />
       </div>
     </PhoneFrame>
-  );
-}
-
-/** The small "paid" card that floats beside the hero picture. */
-export async function PaidToast({ className = "" }: { className?: string }) {
-  const { t, money } = await kit();
-  return (
-    <div aria-hidden="true" className={`${s.toast} ${className}`}>
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-[var(--success-light)] text-[var(--success)]">
-        <Check size={20} strokeWidth={3} />
-      </span>
-      <span className="min-w-0">
-        <span className="block text-[16px] font-bold leading-tight">{t("mockPaidToast", { amount: money(5600) })}</span>
-        <span className="block text-[13.5px] leading-tight text-[var(--text-muted)]">{t("mockSlipMatched")}</span>
-      </span>
-    </div>
   );
 }
 
@@ -598,53 +601,53 @@ export async function StatementPhoneMock({ className = "" }: { className?: strin
   }));
   return (
     <PhoneFrame className={className} label={t("mockStatementLabel")}>
-      <div className="flex h-full flex-col bg-[#f3f8f7]">
+      <div className="flex h-full flex-col bg-[#f3f6f8]">
         <StatusBar />
         <div className="px-[1.2em] pt-[1.6em]">
-          <p className="font-semibold text-[#4b5f63]">{date("2026-10-15", { month: "long", year: "numeric" })}</p>
-          <p className="text-[1.6em] font-semibold leading-tight" style={{ fontFamily: "var(--font-display)" }}>
+          <p className="font-semibold text-[#5f6b7a]">{date("2026-10-15", { month: "long", year: "numeric" })}</p>
+          <p className="text-[1.6em] font-semibold leading-tight" style={{ fontFamily: "var(--font-site)" }}>
             {t("mockStatement")}
           </p>
         </div>
-        <div className="mx-[0.9em] mt-[0.9em] flex items-center gap-[0.8em] rounded-[1.3em] bg-white p-[0.9em] shadow-[0_1px_2px_rgba(19,38,43,0.06)]">
-          <span className="flex h-[3em] w-[4.2em] shrink-0 items-center justify-center rounded-[0.8em] bg-[#e3eeec]">
-            <CarArt className="w-[3.4em]" colour="#2f4448" />
+        <div className="mx-[0.9em] mt-[0.9em] flex items-center gap-[0.8em] rounded-[1.3em] bg-white p-[0.9em] shadow-[0_1px_2px_rgba(6,22,43,0.06)]">
+          <span className="flex h-[3em] w-[4.2em] shrink-0 items-center justify-center rounded-[0.8em] bg-[#e6eaef]">
+            <CarArt className="w-[3.4em]" colour="#0b1a2e" />
           </span>
           <span>
             <span className="block font-bold">Toyota Fortuner</span>
-            <span className="block text-[#4b5f63]">Palm Car Rental</span>
+            <span className="block text-[#5f6b7a]">Palm Car Rental</span>
           </span>
         </div>
-        <div className="mx-[0.9em] mt-[0.7em] overflow-hidden rounded-[1.3em] bg-white shadow-[0_1px_2px_rgba(19,38,43,0.06)]">
+        <div className="mx-[0.9em] mt-[0.7em] overflow-hidden rounded-[1.3em] bg-white shadow-[0_1px_2px_rgba(6,22,43,0.06)]">
           {lines.map((line, index) => (
-            <div className={`flex items-center justify-between gap-[0.6em] px-[1em] py-[0.8em] ${index ? "border-t border-[#dbe9e6]" : ""}`} key={line.label}>
+            <div className={`flex items-center justify-between gap-[0.6em] px-[1em] py-[0.8em] ${index ? "border-t border-[#e6eaef]" : ""}`} key={line.label}>
               <span className="min-w-0">
                 <span className="block font-semibold">{line.label}</span>
-                <span className="block text-[0.9em] text-[#4b5f63]">{line.detail}</span>
+                <span className="block text-[0.9em] text-[#5f6b7a]">{line.detail}</span>
               </span>
               <span className="font-bold tabular-nums">{line.amount}</span>
             </div>
           ))}
         </div>
-        <div className="mx-[0.9em] mt-[0.7em] rounded-[1.3em] bg-[#0e5e6f] p-[1em] text-white">
+        <div className="mx-[0.9em] mt-[0.7em] rounded-[1.3em] bg-[#0b8f8c] p-[1em] text-white">
           <p className="font-semibold opacity-85">{t("mockYourShare")}</p>
-          <p className="text-[2em] font-semibold leading-tight" style={{ fontFamily: "var(--font-display)" }}>
+          <p className="text-[2em] font-semibold leading-tight" style={{ fontFamily: "var(--font-site)" }}>
             {money(24640)}
           </p>
         </div>
-        <div className="mx-[0.9em] mt-[0.7em] rounded-[1.3em] bg-white p-[1em] shadow-[0_1px_2px_rgba(19,38,43,0.06)]">
-          <p className="font-semibold text-[#4b5f63]">{t("mockLastMonths")}</p>
+        <div className="mx-[0.9em] mt-[0.7em] rounded-[1.3em] bg-white p-[1em] shadow-[0_1px_2px_rgba(6,22,43,0.06)]">
+          <p className="font-semibold text-[#5f6b7a]">{t("mockLastMonths")}</p>
           <div className="mt-[0.7em] flex h-[4.6em] items-end gap-[0.5em]">
             {months.map((month, index) => (
               <span className="flex min-w-0 flex-1 flex-col items-center gap-[0.3em]" key={month.iso}>
-                <span className="w-full rounded-[0.35em]" style={{ height: `${month.height}em`, background: index === months.length - 1 ? "#0e5e6f" : "#cfe3df" }} />
-                <span className="text-[0.75em] font-semibold text-[#4b5f63]">{month.label}</span>
+                <span className="w-full rounded-[0.35em]" style={{ height: `${month.height}em`, background: index === months.length - 1 ? "#0b8f8c" : "#cfe6e5" }} />
+                <span className="text-[0.75em] font-semibold text-[#5f6b7a]">{month.label}</span>
               </span>
             ))}
           </div>
         </div>
-        <div className="mx-[0.9em] mt-[0.7em] flex items-center gap-[0.6em] rounded-[1.3em] bg-white px-[1em] py-[0.8em] font-semibold shadow-[0_1px_2px_rgba(19,38,43,0.06)]">
-          <span className="flex h-[1.5em] w-[1.5em] shrink-0 items-center justify-center rounded-full bg-[#ddf0e4] text-[#2b6b47]">
+        <div className="mx-[0.9em] mt-[0.7em] flex items-center gap-[0.6em] rounded-[1.3em] bg-white px-[1em] py-[0.8em] font-semibold shadow-[0_1px_2px_rgba(6,22,43,0.06)]">
+          <span className="flex h-[1.5em] w-[1.5em] shrink-0 items-center justify-center rounded-full bg-[#dcf3e6] text-[#1f7a4d]">
             <Check className="h-[0.95em] w-[0.95em]" strokeWidth={3} />
           </span>
           {t("mockTaxRenewed")}
@@ -656,13 +659,13 @@ export async function StatementPhoneMock({ className = "" }: { className?: strin
 
 /* ── Detail cards that sit beside a phone in the feature panels ─────────── */
 
-function CardHead({ icon, title, sub }: { icon: ReactNode; title: string; sub?: string }) {
+function CardHead({ icon, title, sub }: { icon: ReactNode; title: string; sub?: ReactNode }) {
   return (
     <div className="flex items-center gap-[0.8em] border-b border-[var(--line)] px-[1.3em] py-[1em]">
-      <span className="flex h-[2.4em] w-[2.4em] shrink-0 items-center justify-center rounded-[0.7em] bg-[#e4eff8] text-[#173e5e]">{icon}</span>
+      <span className="flex h-[2.4em] w-[2.4em] shrink-0 items-center justify-center rounded-[0.7em] bg-[#e4eef8] text-[#1f4f7a]">{icon}</span>
       <span className="min-w-0">
         <span className="block font-bold leading-tight">{title}</span>
-        {sub ? <span className="block truncate text-[0.92em] text-[var(--text-muted)]">{sub}</span> : null}
+        {sub ? <span className="block text-[0.92em] text-[var(--muted)]">{sub}</span> : null}
       </span>
     </div>
   );
@@ -683,12 +686,12 @@ export async function PassportCard({ className = "" }: { className?: string }) {
       <dl className="px-[1.3em] py-[0.4em]">
         {rows.map(([label, value]) => (
           <div className="flex items-baseline justify-between gap-[1em] border-b border-dashed border-[var(--line)] py-[0.7em] last:border-0" key={label}>
-            <dt className="text-[var(--text-muted)]">{label}</dt>
+            <dt className="text-[var(--muted)]">{label}</dt>
             <dd className="font-semibold tracking-[0.01em]">{value}</dd>
           </div>
         ))}
       </dl>
-      <div className="flex items-center gap-[0.5em] rounded-b-[1.1em] bg-[#ddf0e4] px-[1.3em] py-[0.75em] font-semibold text-[#2b6b47]">
+      <div className="flex items-center gap-[0.5em] rounded-b-[1.1em] bg-[#dcf3e6] px-[1.3em] py-[0.75em] font-semibold text-[#1f7a4d]">
         <Check className="h-[1.1em] w-[1.1em]" strokeWidth={3} /> {t("mockAddedToBooking")}
       </div>
     </div>
@@ -700,20 +703,20 @@ export async function ReturnCard({ className = "" }: { className?: string }) {
   const { t, money } = await kit();
   return (
     <div aria-hidden="true" className={`${s.card} ${className}`}>
-      <CardHead icon={<Camera className="h-[1.2em] w-[1.2em]" />} sub="Honda City · Lucas Martin" title={t("mockCompareTitle")} />
+      <CardHead icon={<Camera className="h-[1.2em] w-[1.2em]" />} sub={<Sub detail="Lucas Martin" main="Honda City" />} title={t("mockCompareTitle")} />
       <div className="grid grid-cols-2 gap-[0.6em] p-[1em]">
         {[t("mockCompareOut"), t("mockCompareBack")].map((label, index) => (
           <div key={label}>
-            <div className="flex aspect-[4/3] items-center justify-center rounded-[0.7em] bg-[linear-gradient(160deg,#e3eeec,#cad9d6)]">
+            <div className="flex aspect-[4/3] items-center justify-center rounded-[0.7em] bg-[linear-gradient(160deg,#e6eaef,#cfd6df)]">
               <CarArt className="w-[78%]" colour={index ? "#eef1f0" : "#f6f8f8"} />
             </div>
-            <p className="mt-[0.4em] text-[0.9em] font-semibold text-[var(--text-muted)]">{label}</p>
+            <p className="mt-[0.4em] text-[0.9em] font-semibold text-[var(--muted)]">{label}</p>
           </div>
         ))}
       </div>
       <div className="flex items-center justify-between gap-[1em] border-t border-[var(--line)] px-[1.3em] py-[0.8em] font-semibold">
         <span className="flex items-center gap-[0.5em]">
-          <span className="flex h-[1.5em] w-[1.5em] items-center justify-center rounded-full bg-[#ddf0e4] text-[#2b6b47]">
+          <span className="flex h-[1.5em] w-[1.5em] items-center justify-center rounded-full bg-[#dcf3e6] text-[#1f7a4d]">
             <Check className="h-[0.95em] w-[0.95em]" strokeWidth={3} />
           </span>
           {t("mockNoNewDamage")}
@@ -737,17 +740,17 @@ export async function LedgerCard({ className = "" }: { className?: string }) {
   ];
   return (
     <div aria-hidden="true" className={`${s.card} ${className}`}>
-      <CardHead icon={<FileText className="h-[1.2em] w-[1.2em]" />} sub="Toyota Yaris Ativ · Anna Becker" title={t("mockLedgerTitle")} />
+      <CardHead icon={<FileText className="h-[1.2em] w-[1.2em]" />} sub={<Sub detail="Anna Becker" main="Toyota Yaris Ativ" />} title={t("mockLedgerTitle")} />
       <div className="px-[1.3em] py-[0.3em]">
         {rows.map((row) => (
           <div className="flex items-center justify-between gap-[1em] border-b border-[var(--line)] py-[0.75em] last:border-0" key={row.label}>
             <span className="flex min-w-0 items-center gap-[0.6em]">
-              <span className="flex h-[1.5em] w-[1.5em] shrink-0 items-center justify-center rounded-full bg-[#ddf0e4] text-[#2b6b47]">
+              <span className="flex h-[1.5em] w-[1.5em] shrink-0 items-center justify-center rounded-full bg-[#dcf3e6] text-[#1f7a4d]">
                 <Check className="h-[0.95em] w-[0.95em]" strokeWidth={3} />
               </span>
               <span className="min-w-0">
                 <span className="block font-semibold leading-tight">{row.label}</span>
-                <span className="block text-[0.9em] text-[var(--text-muted)]">{row.sub}</span>
+                <span className="block text-[0.9em] text-[var(--muted)]">{row.sub}</span>
               </span>
             </span>
             <span className="font-bold tabular-nums">{row.amount}</span>
@@ -767,35 +770,35 @@ export async function LedgerCard({ className = "" }: { className?: string }) {
 export async function ShopPageMock({ className = "" }: { className?: string }) {
   const { t, money } = await kit();
   const vehicles = [
-    { name: "Honda Click 160", kind: "scooter", price: money(250), colour: "#b4472c" },
-    { name: "Toyota Yaris Ativ", kind: "car", price: money(1100), colour: "#0e5e6f" },
-    { name: "Yamaha NMAX", kind: "scooter", price: money(350), colour: "#13262b" },
-    { name: "Toyota Fortuner", kind: "car", price: money(2200), colour: "#4b5f63" }
+    { name: "Honda Click 160", kind: "scooter", price: money(250), colour: "#0b2140" },
+    { name: "Toyota Yaris Ativ", kind: "car", price: money(1100), colour: "#0b8f8c" },
+    { name: "Yamaha NMAX", kind: "scooter", price: money(350), colour: "#0b1a2e" },
+    { name: "Toyota Fortuner", kind: "car", price: money(2200), colour: "#5f6b7a" }
   ];
   return (
     <WindowFrame address="palm.routehq.app/book" className={className} label={t("mockShopLabel")} light>
-      <div className="bg-[#f3f8f7] px-[2.4em] pb-[2.4em] pt-[2em] text-[1.3em]">
+      <div className="bg-[#f3f6f8] px-[2.4em] pb-[2.4em] pt-[2em] text-[1.3em]">
         <div className="flex items-center justify-between gap-[1em]">
           <span className="flex items-center gap-[0.8em]">
-            <span className="flex h-[3em] w-[3em] items-center justify-center rounded-[0.8em] bg-[#0e5e6f] text-[1.2em] font-bold text-white">P</span>
+            <span className="flex h-[3em] w-[3em] items-center justify-center rounded-[0.8em] bg-[#0b8f8c] text-[1.2em] font-bold text-white">P</span>
             <span>
               <span className="block text-[1.5em] font-bold leading-tight">Palm Car Rental</span>
-              <span className="block text-[#4b5f63]">{t("mockShopTagline")}</span>
+              <span className="block text-[#5f6b7a]">{t("mockShopTagline")}</span>
             </span>
           </span>
-          <span className="rounded-full border border-[#dbe9e6] bg-white px-[1em] py-[0.4em] font-semibold text-[#4b5f63]">EN</span>
+          <span className="rounded-full border border-[#e6eaef] bg-white px-[1em] py-[0.4em] font-semibold text-[#5f6b7a]">EN</span>
         </div>
         <div className="mt-[1.6em] grid grid-cols-2 gap-[1em]">
           {vehicles.map((vehicle) => (
-            <div className="overflow-hidden rounded-[1.2em] bg-white shadow-[0_1px_2px_rgba(19,38,43,0.06),0_12px_30px_rgba(14,94,111,0.08)]" key={vehicle.name}>
-              <div className="flex aspect-[16/8] items-center justify-center bg-[#e3eeec]">
+            <div className="overflow-hidden rounded-[1.2em] bg-white shadow-[0_1px_2px_rgba(6,22,43,0.06),0_12px_30px_rgba(6,22,43,0.06)]" key={vehicle.name}>
+              <div className="flex aspect-[16/8] items-center justify-center bg-[#e6eaef]">
                 {vehicle.kind === "car" ? <CarArt className="w-[62%]" colour={vehicle.colour} /> : <ScooterArt className="w-[44%]" colour={vehicle.colour} />}
               </div>
               <div className="flex flex-wrap items-end justify-between gap-x-[0.8em] gap-y-[0.3em] p-[1em]">
                 <span>
                   <span className="block whitespace-nowrap text-[1.15em] font-bold">{vehicle.name}</span>
-                  <span className="mt-[0.2em] inline-flex items-center gap-[0.4em] text-[#2b6b47]">
-                    <span className="h-[0.55em] w-[0.55em] rounded-full bg-[#2b6b47]" /> {t("mockAvailable")}
+                  <span className="mt-[0.2em] inline-flex items-center gap-[0.4em] text-[#1f7a4d]">
+                    <span className="h-[0.55em] w-[0.55em] rounded-full bg-[#1f7a4d]" /> {t("mockAvailable")}
                   </span>
                 </span>
                 <span className="shrink-0 text-end">

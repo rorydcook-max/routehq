@@ -2,48 +2,49 @@ import { getTranslations } from "next-intl/server";
 import { AuthLanguage } from "@/components/auth-language";
 import { RouteHqLogo } from "@/components/brand-logo";
 import { Container, SITE_LINKS, SiteLink } from "./site-ui";
+import s from "../site.module.css";
 
 /** The website's footer: where to go next, the language (the same choice the sign-in pages keep), and the name. */
 export async function SiteFooter() {
-  const t = await getTranslations("site");
+  const m = await getTranslations("marketing");
   const columns = [
     {
-      title: t("footerProduct"),
+      title: m("footerProduct"),
       links: [
-        { href: SITE_LINKS.features, label: t("navFeatures") },
-        { href: SITE_LINKS.pricing, label: t("navPricing") },
-        { href: SITE_LINKS.owners, label: t("navOwners") }
+        { href: SITE_LINKS.features, label: m("navFeatures") },
+        { href: SITE_LINKS.pricing, label: m("navPricing") },
+        { href: SITE_LINKS.owners, label: m("navOwners") }
       ]
     },
     {
-      title: t("footerRenters"),
-      links: [{ href: SITE_LINKS.directory, label: t("footerDirectory") }]
+      title: m("footerRenters"),
+      links: [{ href: SITE_LINKS.directory, label: m("footerDirectory") }]
     },
     {
-      title: t("footerAccount"),
+      title: m("footerAccount"),
       links: [
-        { href: SITE_LINKS.signIn, label: t("navSignIn") },
-        { href: SITE_LINKS.signUp, label: t("ctaTrial") }
+        { href: SITE_LINKS.signIn, label: m("navSignIn") },
+        { href: SITE_LINKS.signUp, label: m("navStart") }
       ]
     }
   ];
   return (
-    <footer className="bg-[var(--paper)] text-[var(--text)]">
-      <Container className="pb-10 pt-16 sm:pt-20">
-        <div className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-[1.6fr_repeat(3,1fr)]">
-          <div className="col-span-2 max-w-[340px] md:col-span-1">
+    <footer className={s.footer}>
+      <Container>
+        <div className={s.footerGrid}>
+          <div className={s.footerBrand}>
             <span className="inline-block" dir="ltr">
               <RouteHqLogo className="[&_svg]:h-8 [&_svg]:w-8" showDescriptor={false} />
             </span>
-            <p className="mt-4 text-[15px] leading-relaxed text-[var(--text-muted)]">{t("footerTagline")}</p>
+            <p>{m("footerTagline")}</p>
           </div>
           {columns.map((column) => (
             <div key={column.title}>
-              <h2 className="text-[14px] font-semibold text-[var(--text)]">{column.title}</h2>
-              <ul className="mt-3">
+              <h2 className={s.footerTitle}>{column.title}</h2>
+              <ul className={s.footerList}>
                 {column.links.map((link) => (
                   <li key={link.href}>
-                    <SiteLink className="inline-flex min-h-10 items-center text-[15px] text-[var(--text-muted)] transition-colors hover:text-[var(--text)]" href={link.href}>
+                    <SiteLink className={s.footerLink} href={link.href}>
                       {link.label}
                     </SiteLink>
                   </li>
@@ -52,10 +53,10 @@ export async function SiteFooter() {
             </div>
           ))}
         </div>
-        <div className="mt-14 flex flex-col-reverse items-start justify-between gap-4 border-t border-[var(--line)] pt-6 sm:flex-row sm:items-center">
-          <p className="text-[14px] text-[var(--text-muted)]">{t("footerCopyright", { year: String(new Date().getFullYear()) })}</p>
-          <div className="flex items-center gap-3">
-            <span className="sr-only">{t("footerLanguage")}</span>
+        <div className={s.footerBottom}>
+          <p>{m("footerCopyright", { year: String(new Date().getFullYear()) })}</p>
+          <div className="[&_label]:min-h-11">
+            <span className="sr-only">{m("footerLanguage")}</span>
             <AuthLanguage />
           </div>
         </div>

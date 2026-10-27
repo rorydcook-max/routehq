@@ -4,6 +4,7 @@ import { useEffect, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Copy, ExternalLink } from "lucide-react";
 import { savePublicBookingSettings } from "@/app/actions/online-booking";
+import { SwitchField } from "@/components/switch-field";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
@@ -44,13 +45,7 @@ export function PublicBookingPanel({ slug, link: shareLink, enabled, holdHours, 
 
   return (
     <div className="space-y-4">
-      <label className="flex cursor-pointer items-start gap-3">
-        <input checked={on} className="mt-1 h-5 w-5 shrink-0" disabled={isPending} onChange={(event) => save({ enabled: event.target.checked, holdHours: hours })} type="checkbox" />
-        <span>
-          <span className="block text-[16px] font-bold text-[var(--foreground)]">{say("pb_title")}</span>
-          <span className="mt-1 block font-medium text-[var(--foreground-secondary)]">{say("pb_body")}</span>
-        </span>
-      </label>
+      <SwitchField checked={on} description={say("pb_body")} disabled={isPending} label={say("pb_title")} onChange={(event) => save({ enabled: event.target.checked, holdHours: hours })} />
 
       {on ? (
         <>

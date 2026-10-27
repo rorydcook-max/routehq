@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { savePartnerNetwork } from "@/app/actions/partners";
+import { SwitchField } from "@/components/switch-field";
 type PartnerNetworkSettings = { enabled: boolean; reach: "town" | "region" | "country"; blocked: string[] };
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -30,22 +31,16 @@ export function PartnerNetworkPanel({ initial, pct }: { initial: PartnerNetworkS
 
   return (
     <div>
-      <label className="flex min-h-11 cursor-pointer items-start gap-3">
-        <input
-          checked={enabled}
-          className="mt-1 h-5 w-5 shrink-0"
-          disabled={isPending}
-          onChange={(event) => {
-            setEnabled(event.target.checked);
-            save({ enabled: event.target.checked, reach });
-          }}
-          type="checkbox"
-        />
-        <span>
-          <span className="block text-[16px] font-bold text-[var(--foreground)]">{say("pn_switch")}</span>
-          <span className="mt-1 block font-medium text-[var(--foreground-secondary)]">{say("pn_body", { pct })}</span>
-        </span>
-      </label>
+      <SwitchField
+        checked={enabled}
+        description={say("pn_body", { pct })}
+        disabled={isPending}
+        label={say("pn_switch")}
+        onChange={(event) => {
+          setEnabled(event.target.checked);
+          save({ enabled: event.target.checked, reach });
+        }}
+      />
       {enabled ? (
         <div className="mt-4 space-y-3">
           <label className="block">

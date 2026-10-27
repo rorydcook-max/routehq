@@ -1,5 +1,5 @@
 import { toWallTime } from "@/lib/business-time";
-import { getTravelPolicySettings, type IslandTravelPolicy } from "@/lib/travel-policy";
+import { feeOn, getTravelPolicySettings, type IslandTravelPolicy } from "@/lib/travel-policy";
 
 function escapeHtml(value: unknown) {
   return String(value ?? "")
@@ -593,7 +593,17 @@ export function buildContractVariables({
     })(),
     deposit_amount: formatAmount(rental?.deposit_amount),
     secondary_deposit_amount: formatAmount(settings.secondary_deposit_amount),
-    mileage_limit: formatAmount(settings.mileage_limit),
+    // Distance switched off in Settings = unlimited. The setting is per month, so the agreement says so.
+    mileage_limit: feeOn(settings, "mileage_limit")
+      ? `${formatAmount(settings.mileage_limit)} km per month / ${formatAmount(settings.mileage_limit)} กม. ต่อเดือน`
+      : "Unlimited / ไม่จำกัด",
+    // Each fee switched off in Settings is left out of the agreement (the template checks these).
+    fuel_charge_enabled: feeOn(settings, "fuel_charge_per_increment"),
+    late_fee_enabled: feeOn(settings, "late_fee_percentage"),
+    cleaning_fee_enabled: feeOn(settings, "cleaning_fee_minimum"),
+    smoking_fee_enabled: feeOn(settings, "smoking_fee_maximum"),
+    emergency_repair_enabled: feeOn(settings, "emergency_repair_limit"),
+    deposit_return_days_enabled: feeOn(settings, "deposit_return_days"),
     fuel_charge_per_increment: formatAmount(settings.fuel_charge_per_increment),
     late_fee_percentage: formatAmount(settings.late_fee_percentage),
     cleaning_fee_minimum: formatAmount(settings.cleaning_fee_minimum),

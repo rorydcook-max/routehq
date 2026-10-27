@@ -302,11 +302,11 @@
         <div class="info-cell"><div class="info-label">Rate / ค่าเช่า</div><div class="info-value">฿{{rental_rate}}</div></div>
         <div class="info-cell"><div class="info-label">Billing period / รอบบิล</div><div class="info-value">{{billing_period_label}} / {{billing_period_label_th}}</div></div>
         <div class="info-cell"><div class="info-label">Payment due / วันครบกำหนด</div><div class="info-value">{{payment_due_label}} / {{payment_due_label_th}}</div></div>
-        <div class="info-cell"><div class="info-label">Late fee / ค่าปรับล่าช้า</div><div class="info-value">{{late_fee_percentage}}%</div></div>
+        {{#if late_fee_enabled}}<div class="info-cell"><div class="info-label">Late fee / ค่าปรับล่าช้า</div><div class="info-value">{{late_fee_percentage}}%</div></div>{{/if}}
       </div>
       <div class="bilingual-section">
-        <div class="lang-en">Rental payments are charged at ฿{{rental_rate}} per {{billing_period_label}} and are due {{payment_due_label}}. Fuel level is recorded at the time of vehicle handover. A fuel shortage may be charged at ฿{{fuel_charge_per_increment}} per one-eighth gauge increment. Late payment, early termination, damage, cleaning and other charges may be deducted from the deposit or invoiced separately.</div>
-        <div class="lang-th">ค่าเช่าคิดในอัตรา ฿{{rental_rate}} ต่อ{{billing_period_label_th}} และครบกำหนดชำระ{{payment_due_label_th}} ระดับน้ำมันจะถูกบันทึกในขณะส่งมอบยานพาหนะ หากคืนน้ำมันต่ำกว่าเดิมอาจมีค่าธรรมเนียม ฿{{fuel_charge_per_increment}} ต่อหนึ่งในแปดขีดบนมาตรวัด การชำระล่าช้า การยกเลิกก่อนกำหนด ความเสียหาย ค่าทำความสะอาด และค่าใช้จ่ายอื่น ๆ อาจถูกหักจากเงินประกันหรือเรียกเก็บเพิ่มเติม</div>
+        <div class="lang-en">Rental payments are charged at ฿{{rental_rate}} per {{billing_period_label}} and are due {{payment_due_label}}. Fuel level is recorded at the time of vehicle handover.{{#if fuel_charge_enabled}} A fuel shortage may be charged at ฿{{fuel_charge_per_increment}} per one-eighth gauge increment.{{/if}} Late payment, early termination, damage, cleaning and other charges may be deducted from the deposit or invoiced separately.</div>
+        <div class="lang-th">ค่าเช่าคิดในอัตรา ฿{{rental_rate}} ต่อ{{billing_period_label_th}} และครบกำหนดชำระ{{payment_due_label_th}} ระดับน้ำมันจะถูกบันทึกในขณะส่งมอบยานพาหนะ {{#if fuel_charge_enabled}}หากคืนน้ำมันต่ำกว่าเดิมอาจมีค่าธรรมเนียม ฿{{fuel_charge_per_increment}} ต่อหนึ่งในแปดขีดบนมาตรวัด {{/if}}การชำระล่าช้า การยกเลิกก่อนกำหนด ความเสียหาย ค่าทำความสะอาด และค่าใช้จ่ายอื่น ๆ อาจถูกหักจากเงินประกันหรือเรียกเก็บเพิ่มเติม</div>
       </div>
     </div>
   </section>
@@ -316,8 +316,8 @@
     <div class="section-body">
       <div class="info-grid grid-3">
         <div class="info-cell"><div class="info-label">Deposit / เงินประกัน</div><div class="info-value">฿{{deposit_amount}}</div></div>
-        <div class="info-cell"><div class="info-label">Return period / ระยะเวลาคืนเงิน</div><div class="info-value">{{deposit_return_days}} business days</div></div>
-        <div class="info-cell"><div class="info-label">Cleaning fee / ค่าทำความสะอาด</div><div class="info-value">from ฿{{cleaning_fee_minimum}}</div></div>
+        <div class="info-cell"><div class="info-label">Return period / ระยะเวลาคืนเงิน</div><div class="info-value">{{#if deposit_return_days_enabled}}{{deposit_return_days}} business days / {{deposit_return_days}} วันทำการ{{else}}After the return check / หลังตรวจคืนรถ{{/if}}</div></div>
+        {{#if cleaning_fee_enabled}}<div class="info-cell"><div class="info-label">Cleaning fee / ค่าทำความสะอาด</div><div class="info-value">from ฿{{cleaning_fee_minimum}}</div></div>{{/if}}
       </div>
       <div class="bilingual-section">
         <div class="lang-en">The security deposit is held as security for unpaid rent, damage, fines, missing items, cleaning, fuel, late return and any other liability arising from this rental.</div>
@@ -345,8 +345,9 @@
         <div class="lang-th">ผู้เช่าต้องดูแลยานพาหนะอย่างเหมาะสม ตรวจไฟเตือน สภาพยาง น้ำมันเครื่องและของเหลวตามความเหมาะสม และแจ้งผู้ให้เช่าทันทีเมื่อมีความผิดปกติ อุบัติเหตุ รถเสีย หรือเสียงผิดปกติ</div>
       </div>
       <div class="bilingual-section">
-        <div class="lang-en">The Renter may not authorise repairs except in an emergency and only up to ฿{{emergency_repair_limit}} without prior written approval.</div>
-        <div class="lang-th">ผู้เช่าไม่มีสิทธิอนุมัติการซ่อม เว้นแต่เป็นเหตุฉุกเฉินและไม่เกิน ฿{{emergency_repair_limit}} โดยไม่ได้รับอนุมัติเป็นลายลักษณ์อักษรล่วงหน้า</div>
+        {{#if emergency_repair_enabled}}<div class="lang-en">The Renter may not authorise repairs except in an emergency and only up to ฿{{emergency_repair_limit}} without prior written approval.</div>
+        <div class="lang-th">ผู้เช่าไม่มีสิทธิอนุมัติการซ่อม เว้นแต่เป็นเหตุฉุกเฉินและไม่เกิน ฿{{emergency_repair_limit}} โดยไม่ได้รับอนุมัติเป็นลายลักษณ์อักษรล่วงหน้า</div>{{else}}<div class="lang-en">The Renter may not authorise any repair without the Owner's prior approval, except what is needed to keep people safe.</div>
+        <div class="lang-th">ผู้เช่าไม่มีสิทธิอนุมัติการซ่อมใด ๆ โดยไม่ได้รับอนุมัติจากผู้ให้เช่าล่วงหน้า เว้นแต่สิ่งที่จำเป็นเพื่อความปลอดภัยของบุคคล</div>{{/if}}
       </div>
     </div>
   </section>
@@ -458,14 +459,16 @@
     <div class="section-body">
       <div class="clause">
         <div class="bilingual-section">
-          <div class="lang-en"><span class="clause-num">18.1 Deposit return.</span> Any remaining deposit will normally be returned within {{deposit_return_days}} business days after return inspection, payment reconciliation and confirmation that no further fines or charges are due.</div>
-          <div class="lang-th"><span class="clause-num">18.1 การคืนเงินประกัน.</span> เงินประกันคงเหลือจะคืนโดยปกติภายใน {{deposit_return_days}} วันทำการ หลังจากตรวจคืนรถ กระทบยอดการชำระเงิน และยืนยันว่าไม่มีค่าปรับหรือค่าใช้จ่ายเพิ่มเติม</div>
+          {{#if deposit_return_days_enabled}}<div class="lang-en"><span class="clause-num">18.1 Deposit return.</span> Any remaining deposit will normally be returned within {{deposit_return_days}} business days after return inspection, payment reconciliation and confirmation that no further fines or charges are due.</div>
+          <div class="lang-th"><span class="clause-num">18.1 การคืนเงินประกัน.</span> เงินประกันคงเหลือจะคืนโดยปกติภายใน {{deposit_return_days}} วันทำการ หลังจากตรวจคืนรถ กระทบยอดการชำระเงิน และยืนยันว่าไม่มีค่าปรับหรือค่าใช้จ่ายเพิ่มเติม</div>{{else}}<div class="lang-en"><span class="clause-num">18.1 Deposit return.</span> Any remaining deposit will be returned after return inspection, payment reconciliation and confirmation that no further fines or charges are due.</div>
+          <div class="lang-th"><span class="clause-num">18.1 การคืนเงินประกัน.</span> เงินประกันคงเหลือจะคืนหลังจากตรวจคืนรถ กระทบยอดการชำระเงิน และยืนยันว่าไม่มีค่าปรับหรือค่าใช้จ่ายเพิ่มเติม</div>{{/if}}
         </div>
       </div>
       <div class="clause">
         <div class="bilingual-section">
-          <div class="lang-en"><span class="clause-num">18.2 Smoking and cleaning.</span> Smoking, pets, excessive sand, stains, odour or unreasonable dirt may incur cleaning charges up to ฿{{smoking_fee_maximum}} or more where professional cleaning is required.</div>
-          <div class="lang-th"><span class="clause-num">18.2 การสูบบุหรี่และทำความสะอาด.</span> การสูบบุหรี่ สัตว์เลี้ยง ทรายมากเกินไป คราบ กลิ่น หรือความสกปรกเกินสมควร อาจมีค่าทำความสะอาดสูงสุด ฿{{smoking_fee_maximum}} หรือมากกว่านั้นหากต้องทำความสะอาดโดยผู้เชี่ยวชาญ</div>
+          {{#if smoking_fee_enabled}}<div class="lang-en"><span class="clause-num">18.2 Smoking and cleaning.</span> Smoking, pets, excessive sand, stains, odour or unreasonable dirt may incur cleaning charges up to ฿{{smoking_fee_maximum}} or more where professional cleaning is required.</div>
+          <div class="lang-th"><span class="clause-num">18.2 การสูบบุหรี่และทำความสะอาด.</span> การสูบบุหรี่ สัตว์เลี้ยง ทรายมากเกินไป คราบ กลิ่น หรือความสกปรกเกินสมควร อาจมีค่าทำความสะอาดสูงสุด ฿{{smoking_fee_maximum}} หรือมากกว่านั้นหากต้องทำความสะอาดโดยผู้เชี่ยวชาญ</div>{{else}}<div class="lang-en"><span class="clause-num">18.2 Smoking and cleaning.</span> Smoking, pets, excessive sand, stains, odour or unreasonable dirt may incur cleaning charges where professional cleaning is required.</div>
+          <div class="lang-th"><span class="clause-num">18.2 การสูบบุหรี่และทำความสะอาด.</span> การสูบบุหรี่ สัตว์เลี้ยง ทรายมากเกินไป คราบ กลิ่น หรือความสกปรกเกินสมควร อาจมีค่าทำความสะอาดหากต้องทำความสะอาดโดยผู้เชี่ยวชาญ</div>{{/if}}
         </div>
       </div>
       <div class="clause">

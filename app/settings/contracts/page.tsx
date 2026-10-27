@@ -8,7 +8,7 @@ import { buildSampleContractVariables, embedLogoInContractVariables, ensureDefau
 import { markOnboardingStep } from "@/lib/onboarding";
 import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { getTravelPolicySettings } from "@/lib/travel-policy";
+import { feeOn, getTravelPolicySettings } from "@/lib/travel-policy";
 import { AgreementTerms } from "./agreement-terms";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -27,13 +27,16 @@ export default async function ContractSettingsPage() {
 
   const policy = getTravelPolicySettings(organization.settings);
   const amount = (value: number) => `${BAHT}${Math.round(Number(value) || 0).toLocaleString("en-US")}`;
+  // A fee switched off in Settings shows as such, the way the agreement leaves it out.
+  const off = say("tp_offShort");
   const numbers = [
-    { label: say("ag_n_late"), value: `${policy.late_fee_percentage}%` },
-    { label: say("ag_n_depositBack"), value: say("ag_n_days", { count: policy.deposit_return_days }) },
-    { label: say("ag_n_fuel"), value: amount(policy.fuel_charge_per_increment) },
-    { label: say("ag_n_cleaning"), value: amount(policy.cleaning_fee_minimum) },
-    { label: say("ag_n_smoking"), value: amount(policy.smoking_fee_maximum) },
-    { label: say("ag_n_repair"), value: amount(policy.emergency_repair_limit) },
+    { label: say("tp_km"), value: feeOn(policy, "mileage_limit") ? policy.mileage_limit.toLocaleString("en-US") : say("tp_off_mileage_limit") },
+    { label: say("ag_n_late"), value: feeOn(policy, "late_fee_percentage") ? `${policy.late_fee_percentage}%` : off },
+    { label: say("ag_n_depositBack"), value: feeOn(policy, "deposit_return_days") ? say("ag_n_days", { count: policy.deposit_return_days }) : say("tp_off_deposit_return_days") },
+    { label: say("ag_n_fuel"), value: feeOn(policy, "fuel_charge_per_increment") ? amount(policy.fuel_charge_per_increment) : off },
+    { label: say("ag_n_cleaning"), value: feeOn(policy, "cleaning_fee_minimum") ? amount(policy.cleaning_fee_minimum) : off },
+    { label: say("ag_n_smoking"), value: feeOn(policy, "smoking_fee_maximum") ? amount(policy.smoking_fee_maximum) : off },
+    { label: say("ag_n_repair"), value: feeOn(policy, "emergency_repair_limit") ? amount(policy.emergency_repair_limit) : say("tp_off_emergency_repair_limit") },
     { label: say("ag_n_area"), value: policy.home_territory },
     { label: say("ag_n_law"), value: policy.jurisdiction }
   ];

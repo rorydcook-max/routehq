@@ -629,7 +629,7 @@ export function BookingEditForm({
               <h2 className={sectionTitle}>{say("i_title")}</h2>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
                 {includedOptions.map((item, index) => (
-                  <label className="checkbox-label min-h-[44px] rounded-xl bg-[var(--panel-secondary)] px-3.5 py-2 font-semibold text-[var(--foreground)]" key={item}>
+                  <label className="checkbox-label rounded-xl bg-[var(--panel-secondary)] px-3.5 py-[11px] font-semibold text-[var(--foreground)]" key={item}>
                     <input className="flex-shrink-0" defaultChecked={selectedItems.includes(item)} name="includedItems" type="checkbox" value={item} />
                     <span>{words(`inc_${index}`)}</span>
                   </label>

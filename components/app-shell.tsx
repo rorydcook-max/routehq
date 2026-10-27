@@ -262,7 +262,8 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
           )}
         </div>
         {/* On a short laptop screen the rows tighten so every link, Settings included, stays in view without scrolling. */}
-        <nav className="min-h-0 flex-1 overflow-y-auto [scrollbar-width:thin]">
+        {/* Room above and below the links so the chosen one's shadow isn't trimmed by the scrolling list. */}
+        <nav className="-my-1.5 min-h-0 flex-1 overflow-y-auto py-1.5 [scrollbar-width:thin]">
           {groups.map((group, groupIndex) => (
             <div className={groupIndex ? "mt-3 [@media(max-height:960px)]:mt-1.5" : ""} key={group.heading || "today"}>
               {group.heading ? <p className="px-3 pb-0.5 text-[14px] font-bold text-[var(--sidebar-text-muted)]">{t(group.heading)}</p> : null}

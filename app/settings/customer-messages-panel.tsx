@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { saveCustomerMessages, saveReminderKinds } from "@/app/actions/online-booking";
+import { SwitchField } from "@/components/switch-field";
 
 const KINDS = ["handover", "return", "rent_due", "rent_late", "vehicle_due", "signature"];
 
@@ -41,13 +42,7 @@ export function CustomerMessagesPanel({ enabled, hasChannel, emailOn = false, of
 
   return (
     <div>
-      <label className="flex min-h-11 cursor-pointer items-start gap-3">
-        <input checked={on} className="mt-1 h-5 w-5 shrink-0" disabled={isPending} onChange={(event) => change(event.target.checked)} type="checkbox" />
-        <span>
-          <span className="block text-[16px] font-bold text-[var(--foreground)]">{say("cm_title")}</span>
-          <span className="mt-1 block font-medium text-[var(--foreground-secondary)]">{say("cm_body")}</span>
-        </span>
-      </label>
+      <SwitchField checked={on} description={say("cm_body")} disabled={isPending} label={say("cm_title")} onChange={(event) => change(event.target.checked)} />
       {on && !hasChannel ? <p className="mt-3 rounded-xl bg-[var(--warning-light)] px-4 py-3 font-medium text-[var(--foreground)]">{say(emailOn ? "cm_noChannelEmail" : "cm_noChannel")}</p> : null}
       {on && hasChannel ? <p className="mt-3 font-medium text-[var(--foreground-secondary)]">{say("cm_firstMessage")}</p> : null}
       {on ? (

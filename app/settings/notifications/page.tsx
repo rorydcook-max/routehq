@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/app-shell";
 import { PendingButton } from "@/components/pending-button";
+import { SwitchField } from "@/components/switch-field";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDefaultOrganization } from "@/lib/organization";
 import { saveNotificationSettings } from "@/app/actions/settings";
@@ -10,17 +11,7 @@ import { LineTestButton } from "@/app/settings/line-test-button";
 
 function NotificationToggle({ name, label, description, defaultChecked }: { name: string; label: string; description: string; defaultChecked: boolean }) {
   return (
-    <label className="flex cursor-pointer items-start justify-between gap-4 rounded-xl bg-[var(--panel-secondary)] p-3.5">
-      <div className="flex-1">
-        <p className="text-[16px] font-bold leading-tight text-[var(--foreground)]">{label}</p>
-        <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{description}</p>
-      </div>
-      <div className="relative mt-0.5 flex-shrink-0">
-        <input className="peer sr-only" defaultChecked={defaultChecked} name={name} type="checkbox" value="on" />
-        <div className="h-7 w-12 rounded-full bg-[var(--border-strong)] transition-colors peer-checked:bg-[var(--primary)]" />
-        <div className="absolute left-0.5 top-0.5 h-6 w-6 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
-      </div>
-    </label>
+    <SwitchField className="rounded-xl bg-[var(--panel-secondary)] p-3.5" defaultChecked={defaultChecked} description={description} label={label} name={name} value="on" />
   );
 }
 

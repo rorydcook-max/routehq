@@ -1,4 +1,7 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
+import { ChevronDown } from "lucide-react";
+import { SwitchField } from "@/components/switch-field";
 import { planById } from "@/lib/plans";
 import { isEmailConfigured } from "@/lib/email";
 import type { Route } from "next";
@@ -144,6 +147,15 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const t = await getTranslations("settingsPage");
   const say = t as unknown as Say;
   const locale = await getLocale();
+  /**
+   * The one-line summary of a setting that can be switched on and off (Rory, 27 Oct): always
+   * "Enabled: what that means" or "Disabled: what that means", the state word in bold.
+   */
+  const stateLine = (key: string, on: boolean, values: Record<string, string | number> = {}) =>
+    (t.rich as unknown as (key: string, values: Record<string, unknown>) => ReactNode)(key, {
+      ...values,
+      b: (chunks: ReactNode) => <span className={on ? "font-bold text-[var(--success)]" : "font-bold text-[var(--foreground)]"}>{chunks}</span>
+    });
   const { data: vehicleRates } = await ((await createSupabaseServerClient()) as any)
     .from("vehicles")
     .select("daily_rate, weekly_rate, monthly_rate")
@@ -246,6 +258,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const typedVehicleModels = (vehicleModels || []) as VehicleModelSetting[];
   const typedRecentTrims = (recentTrims || []) as VehicleTrimSetting[];
   const typedCatalogSubmissions = (catalogSubmissionsResult.data || []) as VehicleCatalogSubmissionSetting[];
+  const catalogWaiting = typedCatalogSubmissions.filter((submission) => submission.status === "pending_review").length;
   const brandingDisplayUrls = await resolveOrganizationBrandingDisplayUrls(supabase, organization, { allowExternalUrl: true });
   const organizationSettings = organization.settings && typeof organization.settings === "object" && !Array.isArray(organization.settings)
     ? (organization.settings as Record<string, unknown>)
@@ -302,7 +315,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     <AppShell
       hero={
         <PageBand title={say("title")}>
-          <nav aria-label={say("title")} className="scrollbar-none -mx-[14px] flex gap-2 overflow-x-auto px-[14px] sm:mx-0 sm:flex-wrap sm:px-0">
+          <nav aria-label={say("title")} className="scrollbar-none -mx-[14px] -my-1.5 flex gap-2 overflow-x-auto px-[14px] py-1.5 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
             {SETTINGS_TABS.map((entry) => (
               <Link aria-current={tab === entry.key ? "page" : undefined} className={bandTab(tab === entry.key)} href={`/settings?tab=${entry.key}` as Route} key={entry.key}>
                 {say(`tab_${entry.key}`)}
@@ -435,19 +448,16 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                 offer={publicBookingSettings(organization.settings).offer}
               />
             </Fold>
-            <Fold id="paying-ahead" summary={organization.upfront_discount_enabled ? say("ahead_on") : say("ahead_off")} title={say("ahead_title")}>
+            <Fold id="paying-ahead" summary={organization.upfront_discount_enabled ? stateLine("st_aheadOn", true) : stateLine("st_aheadOff", false)} title={say("ahead_title")}>
               <p className="mb-3 font-medium text-[var(--foreground-secondary)]">{say("ahead_body")}</p>
               <form action={updateUpfrontDiscountSettings} className="mt-3 space-y-3">
-                <label className="checkbox-label sub-surface min-h-10 font-semibold text-[var(--foreground)]" style={{ display: "flex", alignItems: "center", padding: "8px 12px" }}>
-                  <input
-                    className="flex-shrink-0"
-                    defaultChecked={Boolean(organization.upfront_discount_enabled)}
-                    name="upfront_discount_enabled"
-                    type="checkbox"
-                    value="true"
-                  />
-                  <span>{say("ahead_offer")}</span>
-                </label>
+                <SwitchField
+                  defaultChecked={Boolean(organization.upfront_discount_enabled)}
+                  label={say("ahead_offer")}
+                  labelClassName="font-semibold text-[var(--foreground)]"
+                  name="upfront_discount_enabled"
+                  value="true"
+                />
                 <div className="grid gap-3 sm:grid-cols-3">
                   <label className="block">
                     <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("ahead_months")}</span>
@@ -492,7 +502,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               <h2 className="px-1 pt-1 text-[17px] font-bold text-[var(--foreground-secondary)]">{say("grp_prices")}</h2>
             <Fold
               id="high-season"
-              summary={seasonsFrom(organization.settings).length ? say("season_summary", { count: seasonsFrom(organization.settings).length }) : say("season_none")}
+              summary={seasonsFrom(organization.settings).length ? stateLine("st_seasonOn", true, { count: seasonsFrom(organization.settings).length }) : stateLine("st_seasonOff", false)}
               title={say("season_title")}
             >
               <SeasonsPanel initial={seasonsFrom(organization.settings)} />
@@ -512,7 +522,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             </div>
           <div className="space-y-3">
             <h2 className="px-1 pt-1 text-[17px] font-bold text-[var(--foreground-secondary)]">{say("grp_online")}</h2>
-          <Fold id="booking-page" summary={publicBookingSettings(organization.settings).enabled ? say("book_on") : say("book_off")} title={say("book_title")}>
+          <Fold id="booking-page" summary={publicBookingSettings(organization.settings).enabled ? stateLine("st_bookOn", true) : stateLine("st_bookOff", false)} title={say("book_title")}>
             <PublicBookingPanel
               enabled={publicBookingSettings(organization.settings).enabled}
               deposit={publicBookingSettings(organization.settings).deposit}
@@ -537,14 +547,14 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               suggestion={cleanSubdomain(String(organization.name || organization.slug).replace(/\b(car|cars|rent|rental|rentals|test\d*)\b/gi, "")) || cleanSubdomain(organization.slug).slice(0, 20)}
             />
           </Fold>
-          <Fold id="directory" summary={directorySettings(organization.settings).enabled && canBeListed(organization as any) && publicBookingSettings(organization.settings).enabled ? say("dir_on") : say("dir_off")} title={say("dir_title")}>
+          <Fold id="directory" summary={directorySettings(organization.settings).enabled && canBeListed(organization as any) && publicBookingSettings(organization.settings).enabled ? stateLine("st_dirOn", true) : stateLine("st_dirOff", false)} title={say("dir_title")}>
             <DirectoryPanel
               allowed={canBeListed(organization as any)}
               bookingPageOn={publicBookingSettings(organization.settings).enabled}
               enabled={directorySettings(organization.settings).enabled}
             />
           </Fold>
-          <Fold id="partner-network" summary={partnerNetworkSettings(organization.settings).enabled ? say("pn_on") : say("pn_off")} title={say("pn_title")}>
+          <Fold id="partner-network" summary={partnerNetworkSettings(organization.settings).enabled ? stateLine("st_pnOn", true) : stateLine("st_pnOff", false)} title={say("pn_title")}>
             <PartnerNetworkPanel initial={partnerNetworkSettings(organization.settings)} pct={FINDERS_FEE_PCT} />
           </Fold>
           <Fold id="holds" summary={say("hold_summary", { hours: bookingRules(organization.settings).holdHours })} title={say("hold_title")}>
@@ -614,43 +624,25 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               <input name="line_user_id" type="hidden" value={lineUserId} />
 
               {/* Master toggle */}
-              <label className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-[var(--border)] p-3">
-                <div>
-                  <p className="font-bold text-[var(--foreground)]">{say("line_enable")}</p>
-                  <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{say("line_enableBody")}</p>
-                </div>
-                <div className="relative flex-shrink-0">
-                  <input
-                    className="peer sr-only"
-                    defaultChecked={organization.line_notifications_enabled ?? false}
-                    name="line_notifications_enabled"
-                    type="checkbox"
-                    value="on"
-                  />
-                  <div className="h-6 w-11 rounded-full bg-[var(--border)] transition-colors peer-checked:bg-[var(--primary)]" />
-                  <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
-                </div>
-              </label>
+              <SwitchField
+                className="rounded-lg border border-[var(--border)] p-3"
+                defaultChecked={organization.line_notifications_enabled ?? false}
+                description={say("line_enableBody")}
+                label={say("line_enable")}
+                name="line_notifications_enabled"
+                value="on"
+              />
 
               {/* Daily summary sub-settings */}
-              <div className="ml-2 space-y-3 border-l-2 border-[var(--border)] pl-4">
-                <label className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-[var(--border)] p-3">
-                  <div>
-                    <p className="font-bold text-[var(--foreground)]">{say("line_daily")}</p>
-                    <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{say("line_dailyBody")}</p>
-                  </div>
-                  <div className="relative flex-shrink-0">
-                    <input
-                      className="peer sr-only"
-                      defaultChecked={organization.line_daily_summary_enabled ?? true}
-                      name="line_daily_summary_enabled"
-                      type="checkbox"
-                      value="on"
-                    />
-                    <div className="h-6 w-11 rounded-full bg-[var(--border)] transition-colors peer-checked:bg-[var(--primary)]" />
-                    <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
-                  </div>
-                </label>
+              <div className="ms-2 space-y-3 border-s-2 border-[var(--border)] ps-4">
+                <SwitchField
+                  className="rounded-lg border border-[var(--border)] p-3"
+                  defaultChecked={organization.line_daily_summary_enabled ?? true}
+                  description={say("line_dailyBody")}
+                  label={say("line_daily")}
+                  name="line_daily_summary_enabled"
+                  value="on"
+                />
 
                 {/* The summary goes out once a day at 08:00 Bangkok (vercel.json); the time is kept as is. */}
                 <input name="line_daily_summary_time" type="hidden" value={organization.line_daily_summary_time ?? "08:00"} />
@@ -814,11 +806,22 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         <>
       {isPlatformAdmin ? (
       <div className="mt-4">
-        <Card>
-          <SectionHeader eyebrow="Vehicle catalog" title="Makes, models, and trims" />
-          <p className="mt-2 text-xs text-[var(--muted)]">
-            Platform admin tools for reviewing user submissions and curating the global vehicle catalog.
-          </p>
+        {/* RouteHQ team only. Folded, with the number of suggestions waiting on the closed line (Rory, 27 Oct). */}
+        <details className="card group p-4">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
+            <span className="min-w-0">
+              <span className="block text-[18px] font-bold text-[var(--foreground)]">Makes, models, and trims</span>
+              <span className="mt-0.5 block text-sm font-medium text-[var(--muted)]">Platform admin tools for reviewing user submissions and curating the global vehicle catalog.</span>
+            </span>
+            <span className="flex shrink-0 items-center gap-2">
+              {catalogWaiting > 0 ? (
+                <span aria-label={`${catalogWaiting} waiting for review`} className="inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-[var(--danger)] px-2 text-sm font-bold text-white">
+                  {catalogWaiting}
+                </span>
+              ) : null}
+              <ChevronDown className="text-[var(--muted)] transition-transform group-open:rotate-180" size={20} />
+            </span>
+          </summary>
 
           <div className="mt-3">
             <div className="rounded-lg border border-[var(--border)] bg-white p-3">
@@ -1121,7 +1124,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               </div>
             </div>
           </div>
-        </Card>
+        </details>
       </div>
       ) : null}
         </>

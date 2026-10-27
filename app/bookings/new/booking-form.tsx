@@ -1037,7 +1037,7 @@ export function BookingForm({
                 <label
                   className="checkbox-label sub-surface min-h-12 font-bold text-[var(--foreground-secondary)]"
                   key={item}
-                  style={{ display: "flex", alignItems: "center", padding: "10px 12px" }}
+                  style={{ display: "flex", padding: "13px 12px" }}
                 >
                   <input
                     checked={includedItems.includes(item)}

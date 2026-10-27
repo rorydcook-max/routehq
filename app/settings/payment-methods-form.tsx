@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { updatePaymentSettings } from "@/app/actions/settings";
+import { SwitchField } from "@/components/switch-field";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 const labelClass = "font-semibold text-[var(--foreground-secondary)]";
@@ -214,13 +215,7 @@ function MethodCard({
 }) {
   return (
     <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5">
-      <label className="flex cursor-pointer items-start gap-3">
-        <input checked={checked} className="mt-1 h-5 w-5 shrink-0" disabled={disabled} onChange={(event) => onToggle?.(name, event.target.checked)} type="checkbox" />
-        <span>
-          <span className="block text-[16px] font-bold text-[var(--foreground)]">{label}</span>
-          <span className="mt-0.5 block font-medium text-[var(--foreground-secondary)]">{description}</span>
-        </span>
-      </label>
+      <SwitchField checked={checked} description={description} disabled={disabled} label={label} onChange={(event) => onToggle?.(name, event.target.checked)} />
       {checked ? children : null}
     </div>
   );

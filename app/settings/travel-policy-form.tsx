@@ -5,7 +5,8 @@ import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { updateTravelPolicySettings } from "@/app/actions/settings";
 import { PendingButton } from "@/components/pending-button";
-import { jurisdictionByCountry, type TravelPolicySettings } from "@/lib/travel-policy";
+import { feeOn, jurisdictionByCountry, type FeeKey, type TravelPolicySettings } from "@/lib/travel-policy";
+import { SwitchField } from "@/components/switch-field";
 import { displayNamesLocale } from "@/lib/i18n/dates";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -117,25 +118,34 @@ export function TravelPolicyForm({ organizationId, settings }: { organizationId:
         ) : (
           <input name="secondaryDepositAmount" type="hidden" value={settings.secondary_deposit_amount} />
         )}
-        <label className="mt-3 flex cursor-pointer items-start gap-3">
-          <input className="mt-1 h-5 w-5 shrink-0" defaultChecked={settings.geofence_monitoring_enabled} name="geofenceMonitoringEnabled" type="checkbox" />
-          <span>
-            <span className="block font-bold text-[var(--foreground)]">{say("tp_gps")}</span>
-            <span className="mt-0.5 block font-medium text-[var(--foreground-secondary)]">{say("tp_gpsHelp")}</span>
-          </span>
-        </label>
+        <SwitchField
+          className="mt-3"
+          defaultChecked={settings.geofence_monitoring_enabled}
+          description={say("tp_gpsHelp")}
+          label={say("tp_gps")}
+          labelClassName="font-bold text-[var(--foreground)]"
+          name="geofenceMonitoringEnabled"
+        />
       </section>
 
       <section>
         <p className={headingClass}>{say("tp_fees")}</p>
-        <div className="mt-2.5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <NumberField defaultValue={settings.mileage_limit} label={say("tp_km")} name="mileageLimit" />
-          <NumberField defaultValue={settings.fuel_charge_per_increment} label={say("tp_fuel")} name="fuelChargePerIncrement" step="0.01" />
-          <NumberField defaultValue={settings.late_fee_percentage} label={say("tp_late")} name="lateFeePercentage" step="0.01" />
-          <NumberField defaultValue={settings.cleaning_fee_minimum} label={say("tp_cleaning")} name="cleaningFeeMinimum" step="0.01" />
-          <NumberField defaultValue={settings.smoking_fee_maximum} label={say("tp_smoking")} name="smokingFeeMaximum" step="0.01" />
-          <NumberField defaultValue={settings.emergency_repair_limit} label={say("tp_repairs")} name="emergencyRepairLimit" step="0.01" />
-          <NumberField defaultValue={settings.deposit_return_days} label={say("tp_depositDays")} name="depositReturnDays" />
+        <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{say("tp_feesHelp")}</p>
+        {/* One row per fee: switch and name on the left, amount on the right, so every box lines up
+            however long the name is in each language (Rory, 27 Oct). Off = left out of the agreement. */}
+        <div className="mt-2.5 grid gap-2">
+          {FEES.map((fee) => (
+            <FeeRow
+              defaultValue={settings[fee.key]}
+              key={fee.key}
+              label={say(fee.label)}
+              name={fee.name}
+              offText={say(`tp_off_${fee.key}`)}
+              on={feeOn(settings, fee.key)}
+              onName={`feeOn_${fee.key}`}
+              step={fee.step}
+            />
+          ))}
         </div>
       </section>
 
@@ -151,11 +161,45 @@ export function TravelPolicyForm({ organizationId, settings }: { organizationId:
   );
 }
 
-function NumberField({ defaultValue, label, name, step = "1" }: { defaultValue: number; label: string; name: string; step?: string }) {
+const FEES: Array<{ key: FeeKey; name: string; label: string; step: string }> = [
+  { key: "mileage_limit", name: "mileageLimit", label: "tp_km", step: "1" },
+  { key: "fuel_charge_per_increment", name: "fuelChargePerIncrement", label: "tp_fuel", step: "0.01" },
+  { key: "late_fee_percentage", name: "lateFeePercentage", label: "tp_late", step: "0.01" },
+  { key: "cleaning_fee_minimum", name: "cleaningFeeMinimum", label: "tp_cleaning", step: "0.01" },
+  { key: "smoking_fee_maximum", name: "smokingFeeMaximum", label: "tp_smoking", step: "0.01" },
+  { key: "emergency_repair_limit", name: "emergencyRepairLimit", label: "tp_repairs", step: "0.01" },
+  { key: "deposit_return_days", name: "depositReturnDays", label: "tp_depositDays", step: "1" }
+];
+
+/** A fee or limit with its own switch. Switched off, the amount is kept (hidden) for when it comes back on. */
+function FeeRow({ defaultValue, label, name, on: initialOn, onName, offText, step }: { defaultValue: number; label: string; name: string; on: boolean; onName: string; offText: string; step: string }) {
+  const [on, setOn] = useState(initialOn);
+  const [value, setValue] = useState(String(defaultValue));
   return (
-    <label className="block">
-      <span className={labelClass}>{label}</span>
-      <input className="mt-1 w-full" defaultValue={defaultValue} inputMode="decimal" min="0" name={name} step={step} type="number" />
-    </label>
+    <div className="flex min-h-[60px] items-center justify-between gap-3 rounded-xl bg-[var(--panel-secondary)] px-3.5 py-2.5">
+      <label className="flex min-w-0 cursor-pointer items-start gap-3">
+        <input checked={on} className="switch" name={onName} onChange={(event) => setOn(event.target.checked)} role="switch" type="checkbox" value="on" />
+        <span className="min-w-0 font-semibold leading-6 text-[var(--foreground)]">{label}</span>
+      </label>
+      {on ? (
+        <input
+          aria-label={label}
+          className="w-28 shrink-0 text-end"
+          inputMode="decimal"
+          min="0"
+          name={name}
+          onChange={(event) => setValue(event.target.value)}
+          required
+          step={step}
+          type="number"
+          value={value}
+        />
+      ) : (
+        <>
+          <span className="shrink-0 text-end font-semibold text-[var(--muted)]">{offText}</span>
+          <input name={name} type="hidden" value={value} />
+        </>
+      )}
+    </div>
   );
 }

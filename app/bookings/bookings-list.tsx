@@ -347,7 +347,8 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
             const photoUrl = booking.vehicles?.primary_photo_url;
             const effectiveStatus = isCancelledBooking(booking) ? "cancelled" : String(booking.status || "");
             return (
-            <article className={`card relative p-4 transition ${statusCardClasses(booking)}`} key={booking.id}>
+            <article className={`card relative !overflow-visible p-4 transition has-[details[open]]:z-30 ${statusCardClasses(booking)}`} key={booking.id}>
+              {/* overflow-visible: the ⋯ menu opens past the card's edge (it was cut off at Edit); an open menu sits above the next card. */}
               {/* The vehicle's picture beside the details: its photo, or a drawing in its own colour (Lagoon look). Small on phones so the words keep their room. */}
               <div className="grid grid-cols-[56px_minmax(0,1fr)] gap-3 md:grid-cols-[104px_minmax(0,1fr)_auto] md:items-center">
                 <Link aria-label={tx.say("photoAlt", { vehicle: vehicleTitle(booking.vehicles) || tx.say("vehicle") })} className="relative z-10 mt-1 self-start md:mt-0 md:self-center" href={`/bookings/${booking.id}`}>

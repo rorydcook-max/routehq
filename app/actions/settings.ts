@@ -13,7 +13,7 @@ import { supportedLocaleCodes } from "@/lib/i18n/locales";
 import { recordActivityEvent } from "@/lib/supabase/activity";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { jurisdictionByCountry, mergeTravelPolicySettings, type HomeTerritoryType, type IslandTravelPolicy } from "@/lib/travel-policy";
+import { FEE_KEYS, jurisdictionByCountry, mergeTravelPolicySettings, type HomeTerritoryType, type IslandTravelPolicy } from "@/lib/travel-policy";
 import { requireOwner } from "@/lib/auth/roles";
 import { sendDailySummary } from "@/lib/line/daily-summary";
 import { getActiveMembership } from "@/lib/auth/active-organization-server";
@@ -707,6 +707,8 @@ export async function updateTravelPolicySettings(formData: FormData) {
     smoking_fee_maximum: requiredNumberFromForm(formData, "smokingFeeMaximum", 2000),
     emergency_repair_limit: requiredNumberFromForm(formData, "emergencyRepairLimit", 2000),
     deposit_return_days: requiredNumberFromForm(formData, "depositReturnDays", 5),
+    // Each fee has a switch; a switched-off one keeps its amount for when it's switched back on.
+    fees_off: FEE_KEYS.filter((key) => formData.get(`feeOn_${key}`) !== "on"),
     // One place for contact details: Business (LINE, WhatsApp) and payment methods (PromptPay).
     owner_line_id: String(organization.line_id || ""),
     owner_whatsapp: String(organization.whatsapp || ""),

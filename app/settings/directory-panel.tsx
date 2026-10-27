@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { saveDirectoryListing } from "@/app/actions/partners";
+import { SwitchField } from "@/components/switch-field";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
@@ -31,13 +32,14 @@ export function DirectoryPanel({ enabled, allowed, bookingPageOn }: { enabled: b
 
   return (
     <div>
-      <label className={`flex min-h-11 items-start gap-3 ${usable ? "cursor-pointer" : "opacity-70"}`}>
-        <input checked={on && usable} className="mt-1 h-5 w-5 shrink-0" disabled={isPending || !usable} onChange={(event) => change(event.target.checked)} type="checkbox" />
-        <span>
-          <span className="block text-[16px] font-bold text-[var(--foreground)]">{say("dir_switch")}</span>
-          <span className="mt-1 block font-medium text-[var(--foreground-secondary)]">{say("dir_body")}</span>
-        </span>
-      </label>
+      <SwitchField
+        checked={on && usable}
+        className={usable ? "" : "opacity-70"}
+        description={say("dir_body")}
+        disabled={isPending || !usable}
+        label={say("dir_switch")}
+        onChange={(event) => change(event.target.checked)}
+      />
       {!bookingPageOn ? <p className="mt-2 text-sm font-semibold text-[var(--warning)]">{say("dir_needsBookingPage")}</p> : null}
       {on && usable ? (
         <a className="mt-2 inline-flex text-sm font-bold text-[var(--primary)]" href="/rent" rel="noreferrer" target="_blank">

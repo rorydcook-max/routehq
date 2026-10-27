@@ -16,10 +16,28 @@ export type TravelPolicySettings = {
   smoking_fee_maximum: number;
   emergency_repair_limit: number;
   deposit_return_days: number;
+  /** Fees and limits the business has switched off (Rory, 27 Oct): left out of the agreement; distance off = unlimited. */
+  fees_off: FeeKey[];
   owner_line_id: string;
   owner_whatsapp: string;
   promptpay_id: string;
 };
+
+/** The fees and limits in Settings, each of which can be switched off. */
+export const FEE_KEYS = [
+  "mileage_limit",
+  "fuel_charge_per_increment",
+  "late_fee_percentage",
+  "cleaning_fee_minimum",
+  "smoking_fee_maximum",
+  "emergency_repair_limit",
+  "deposit_return_days"
+] as const;
+export type FeeKey = (typeof FEE_KEYS)[number];
+
+export function feeOn(settings: Pick<TravelPolicySettings, "fees_off">, key: FeeKey) {
+  return !settings.fees_off.includes(key);
+}
 
 export const jurisdictionByCountry: Record<string, string> = {
   Thailand: "the Kingdom of Thailand",
@@ -47,6 +65,7 @@ export const travelPolicyDefaults: TravelPolicySettings = {
   smoking_fee_maximum: 2000,
   emergency_repair_limit: 2000,
   deposit_return_days: 5,
+  fees_off: [],
   owner_line_id: "",
   owner_whatsapp: "",
   promptpay_id: ""
@@ -81,6 +100,7 @@ export function getTravelPolicySettings(settings: Record<string, any> | null | u
     smoking_fee_maximum: numberSetting(source, "smoking_fee_maximum"),
     emergency_repair_limit: numberSetting(source, "emergency_repair_limit"),
     deposit_return_days: numberSetting(source, "deposit_return_days"),
+    fees_off: Array.isArray(source.fees_off) ? (source.fees_off as string[]).filter((key): key is FeeKey => (FEE_KEYS as readonly string[]).includes(key)) : [],
     owner_line_id: String(source.owner_line_id || source.line_id || ""),
     owner_whatsapp: String(source.owner_whatsapp || source.whatsapp || ""),
     promptpay_id: String(source.promptpay_id || "")

@@ -142,21 +142,63 @@ body {
   }
 }
 
-input[type="checkbox"],
-input[type="radio"] {
-  accent-color: var(--primary);
-  cursor: pointer;
-  flex-shrink: 0;
-  height: 16px;
-  margin: 0;
-  position: relative;
-  top: -1px;
-  vertical-align: middle;
-  width: 16px;
+/* In the base layer so a checkbox's own classes (mt-1, h-5 w-5) win: unlayered, this margin: 0 and top: -1px
+   overrode them and every checkbox beside a bold or two-line label sat too high (Rory, 27 Oct). */
+@layer base {
+  input[type="checkbox"],
+  input[type="radio"] {
+    accent-color: var(--primary);
+    cursor: pointer;
+    flex-shrink: 0;
+    height: 16px;
+    margin: 0;
+    vertical-align: middle;
+    width: 16px;
+  }
 }
 
+/* An on/off switch for settings that are enabled or disabled (components/switch-field.tsx). A real checkbox
+   underneath, so forms and screen readers treat it as one. */
+input[type="checkbox"].switch {
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--border-strong, #c9d3d8);
+  border-radius: 999px;
+  cursor: pointer;
+  flex-shrink: 0;
+  height: 24px;
+  margin: 0;
+  position: relative;
+  transition: background-color 150ms ease;
+  width: 42px;
+}
+input[type="checkbox"].switch::before {
+  background: #fff;
+  border-radius: 999px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  content: "";
+  height: 18px;
+  left: 3px;
+  position: absolute;
+  top: 3px;
+  transition: transform 150ms ease;
+  width: 18px;
+}
+input[type="checkbox"].switch:checked { background: var(--primary); }
+input[type="checkbox"].switch:checked::before { transform: translateX(18px); }
+input[type="checkbox"].switch:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+input[type="checkbox"].switch:disabled { cursor: default; opacity: 0.55; }
+[dir="rtl"] input[type="checkbox"].switch:checked::before { transform: translateX(-18px); }
+[dir="rtl"] input[type="checkbox"].switch::before { left: auto; right: 3px; }
+
+/* The box lines up with the first line of its words, so a label that wraps to two lines (a long item name,
+   another language) doesn't leave the box floating between them. */
+.checkbox-label > input[type="checkbox"],
+.checkbox-label > input[type="radio"] {
+  margin-top: calc((1.4em - 16px) / 2);
+}
 .checkbox-label {
-  align-items: center;
+  align-items: flex-start;
   color: var(--foreground-secondary);
   cursor: pointer;
   display: flex;

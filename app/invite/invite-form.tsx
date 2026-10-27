@@ -30,7 +30,7 @@ export function InviteForm() {
         <div className="mt-1.5 space-y-2">
           {APP_ROLES.map((role) => (
             <label className="flex cursor-pointer items-start gap-3 rounded-xl bg-[var(--panel-secondary)] p-3.5 has-[:checked]:bg-[var(--primary-light)] has-[:checked]:ring-2 has-[:checked]:ring-[var(--primary)]" key={role.value}>
-              <input className="mt-1 h-5 w-5 shrink-0" defaultChecked={role.value === "teammate"} name="role" type="radio" value={role.value} />
+              <input className="mt-0.5 h-5 w-5 shrink-0" defaultChecked={role.value === "teammate"} name="role" type="radio" value={role.value} />
               <span>
                 <span className="block font-bold text-[var(--foreground)]">{say(`iv_${role.value}`)}</span>
                 <span className="mt-0.5 block font-medium text-[var(--foreground-secondary)]">{say(`iv_${role.value}Body`)}</span>

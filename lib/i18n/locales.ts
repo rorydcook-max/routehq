@@ -19,31 +19,36 @@ export type SupportedLocale = (typeof supportedLocaleCodes)[number];
  *   fil    Filipino, the standardised form of Tagalog.
  *   nb     Norwegian Bokmal, the written standard most Norwegians use.
  *   pt     Brazilian Portuguese (Brazil's rental market); readers in Portugal and Africa understand it.
+ *
+ * Order (Rory, 27 Oct 2026): alphabetical by each language's own name, the way language lists are
+ * usually sorted: Latin-script names A–Z first, then the other scripts (Cyrillic, Hebrew, the Indian
+ * scripts, Thai, Lao, Burmese, Korean, Japanese, Chinese). Written out rather than sorted at run time so
+ * the server and every browser show the same order. Every language picker reads this list.
  */
 export const supportedLocaleOptions: Array<{ code: SupportedLocale; label: string; english: string }> = [
-  { code: "en", label: "English", english: "English" },
-  { code: "th", label: "ไทย (Thai)", english: "Thai" },
-  { code: "my", label: "မြန်မာ (Burmese)", english: "Burmese" },
-  { code: "vi", label: "Tiếng Việt (Vietnamese)", english: "Vietnamese" },
   { code: "id", label: "Bahasa Indonesia (Indonesian)", english: "Indonesian" },
   { code: "ms", label: "Bahasa Melayu (Malay)", english: "Malay" },
-  { code: "zh", label: "简体中文 (Chinese, Simplified)", english: "Chinese (Simplified)" },
-  { code: "zh-TW", label: "繁體中文 (Chinese, Traditional - Taiwan)", english: "Chinese (Traditional, Taiwan)" },
+  { code: "de", label: "Deutsch (German)", english: "German" },
+  { code: "en", label: "English", english: "English" },
+  { code: "es", label: "Español (Spanish)", english: "Spanish" },
+  { code: "fr", label: "Français (French)", english: "French" },
+  { code: "nb", label: "Norsk (Norwegian)", english: "Norwegian (Bokmal)" },
+  { code: "pt", label: "Português (Portuguese)", english: "Portuguese (Brazil)" },
+  { code: "sv", label: "Svenska (Swedish)", english: "Swedish" },
   { code: "fil", label: "Tagalog (Filipino)", english: "Filipino (Tagalog)" },
+  { code: "vi", label: "Tiếng Việt (Vietnamese)", english: "Vietnamese" },
+  { code: "ru", label: "Русский (Russian)", english: "Russian" },
+  { code: "he", label: "עברית (Hebrew)", english: "Hebrew" },
   { code: "hi", label: "हिन्दी (Hindi)", english: "Hindi" },
   { code: "ta", label: "தமிழ் (Tamil)", english: "Tamil" },
   { code: "si", label: "සිංහල (Sinhala)", english: "Sinhala" },
-  { code: "fr", label: "Français (French)", english: "French" },
-  { code: "ru", label: "Русский (Russian)", english: "Russian" },
-  { code: "es", label: "Español (Spanish)", english: "Spanish" },
-  { code: "pt", label: "Português (Portuguese)", english: "Portuguese (Brazil)" },
-  { code: "he", label: "עברית (Hebrew)", english: "Hebrew" },
-  { code: "de", label: "Deutsch (German)", english: "German" },
-  { code: "sv", label: "Svenska (Swedish)", english: "Swedish" },
-  { code: "nb", label: "Norsk (Norwegian)", english: "Norwegian (Bokmal)" },
+  { code: "th", label: "ไทย (Thai)", english: "Thai" },
   { code: "lo", label: "ລາວ (Lao)", english: "Lao" },
+  { code: "my", label: "မြန်မာ (Burmese)", english: "Burmese" },
   { code: "ko", label: "한국어 (Korean)", english: "Korean" },
-  { code: "ja", label: "日本語 (Japanese)", english: "Japanese" }
+  { code: "ja", label: "日本語 (Japanese)", english: "Japanese" },
+  { code: "zh", label: "简体中文 (Chinese, Simplified)", english: "Chinese (Simplified)" },
+  { code: "zh-TW", label: "繁體中文 (Chinese, Traditional - Taiwan)", english: "Chinese (Traditional, Taiwan)" }
 ];
 
 /**

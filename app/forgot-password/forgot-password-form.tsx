@@ -3,7 +3,7 @@
 import { useEffect, useState, useActionState } from "react";
 import { useTranslations } from "next-intl";
 import { requestPasswordReset, type AuthActionState } from "@/app/actions/auth";
-import { authError, authInput, authLabel, authSuccess } from "@/components/auth-card";
+import { authError, authInput, authLabel, authStack, authSuccess } from "@/components/auth-card";
 
 const initialState: AuthActionState = {};
 
@@ -17,7 +17,7 @@ export function ForgotPasswordForm({ defaultEmail = "", signedIn = false }: { de
   }, []);
 
   return (
-    <form action={formAction} className="space-y-4">
+    <form action={formAction} className={authStack}>
       <input name="origin" type="hidden" value={origin} />
       <label className="block">
         <span className={authLabel}>{say("email")}</span>
@@ -35,9 +35,11 @@ export function ForgotPasswordForm({ defaultEmail = "", signedIn = false }: { de
           say("sendLink")
         )}
       </button>
-      <a className="secondary-action w-full" href={signedIn ? "/account" : "/login"}>
-        {signedIn ? say("backToAccount") : say("backToSignIn")}
-      </a>
+      <p className="text-center">
+        <a className="font-bold text-[var(--primary)] hover:underline" href={signedIn ? "/account" : "/login"}>
+          {signedIn ? say("backToAccount") : say("backToSignIn")}
+        </a>
+      </p>
     </form>
   );
 }

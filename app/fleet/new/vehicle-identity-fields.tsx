@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import { ChevronDown } from "lucide-react";
+import { Camera, ChevronDown } from "lucide-react";
 import { Fold } from "@/components/ui";
 import {
   fetchVehicleMakesForCategory,
@@ -482,11 +482,16 @@ export function VehicleIdentityFields({
 
   return (
     <>
-      <div className="card p-4">
-        <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("bookTitle")}</h2>
-        <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("bookBody")}</p>
+      {/* The fastest way in, so it carries the accent tint and a "Fastest" tag. */}
+      <div className="card bg-[var(--primary-light)] p-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <h2 className="card-title">{say("bookTitle")}</h2>
+          <span className="badge inline-flex items-center bg-white text-[var(--primary)]">{say("bookFastest")}</span>
+        </div>
+        <p className="measure mt-1 font-medium text-[var(--foreground-secondary)]">{say("bookBody")}</p>
         {/* A proper button, in the reader's language. No forced camera: the phone offers the camera or an existing photo or PDF. */}
-        <label className="secondary-action pressable mt-3 w-full cursor-pointer">
+        <label className="secondary-action pressable mt-3 inline-flex w-full cursor-pointer bg-white sm:w-auto">
+          <Camera aria-hidden="true" className="shrink-0" size={18} />
           {bookFileName ? say("bookChange") : say("bookLabel")}
           <input
             accept="image/*,application/pdf"
@@ -517,7 +522,7 @@ export function VehicleIdentityFields({
 
       {/* overflow visible: the make list drops below the card and must not be cut off. */}
       <div className="card p-4" style={{ overflow: "visible" }}>
-        <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("identTitle")}</h2>
+        <h2 className="card-title">{say("identTitle")}</h2>
         {catalogStatus === "loading" ? <p className="mt-3 text-sm font-semibold text-[var(--primary)]">{say("catLoading")}</p> : null}
         {catalogStatus === "error" ? <p className="mt-3 rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">{catalogMessage}</p> : null}
 
@@ -568,7 +573,7 @@ export function VehicleIdentityFields({
                 value={make && model ? "ok" : ""}
               />
               <button
-                className="flex min-h-[44px] w-full items-center justify-between gap-3 rounded-xl border border-[var(--border-strong)] bg-white px-3 py-2 text-left text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)]"
+                className="flex h-11 w-full items-center justify-between gap-3 rounded-xl border border-[var(--border-strong)] bg-white px-3 text-left text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)]"
                 onClick={() => setMakeDropdownOpen((open) => !open)}
                 type="button"
               >
@@ -634,7 +639,8 @@ export function VehicleIdentityFields({
           </label>
           <label className="block">
             <span className={labelClass}>{say("model")}</span>
-            <select className={inputClass} disabled={!selectedMakeId && !manualMake} onChange={(event) => handleModelSelect(event.target.value)} value={manualModel ? "__manual__" : selectedModelId}>
+            {/* Until a make is chosen the list is plainly unavailable: faded, grey text. */}
+            <select className={`${inputClass} disabled:cursor-not-allowed disabled:text-[var(--muted)] disabled:opacity-50`} disabled={!selectedMakeId && !manualMake} onChange={(event) => handleModelSelect(event.target.value)} value={manualModel ? "__manual__" : selectedModelId}>
               <option value="">{selectedMakeId ? say("modelSelect") : say("modelFirst")}</option>
               {models.map((item) => (
                 <option key={item.id} value={item.id}>
@@ -656,7 +662,7 @@ export function VehicleIdentityFields({
                 ))}
               </select>
             ) : (
-              <input className={inputClass} inputMode="numeric" max={new Date().getFullYear() + 1} maxLength={4} min="1950" onChange={(event) => setYear(event.target.value.replace(/\D/g, "").slice(0, 4))} placeholder={String(new Date().getFullYear() - 2)} type="number" value={year} />
+              <input className={inputClass} inputMode="numeric" max={new Date().getFullYear() + 1} maxLength={4} min="1950" onChange={(event) => setYear(event.target.value.replace(/\D/g, "").slice(0, 4))} placeholder={(t as unknown as (key: string, values: Record<string, number>) => string)("yearPlaceholder", { year: new Date().getFullYear() - 3 })} type="number" value={year} />
             )}
           </label>
         </div>
@@ -701,6 +707,7 @@ export function VehicleIdentityFields({
             {manualTrim && visibleTrims.length > 0 ? (
               <input className={inputClass} onChange={(event) => setTrim(event.target.value)} placeholder={say("trimCustom")} value={trim} />
             ) : null}
+            <span className="mt-1 block font-medium text-[var(--muted)]">{say("trimHint")}</span>
           </label>
         </div>
 

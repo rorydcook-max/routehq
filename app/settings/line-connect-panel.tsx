@@ -50,17 +50,22 @@ export function LineConnectPanel({ organizationId, lineOaId }: { organizationId:
   const sendUrl = code ? `https://line.me/R/oaMessage/${encodeURIComponent(oa)}/?${encodeURIComponent(code)}` : "";
 
   return (
-    <div className="mt-3 space-y-4 rounded-xl bg-[var(--panel-secondary)] p-3.5">
-      <div className="space-y-2">
-        <p className="text-[16px] font-bold text-[var(--foreground)]">{say("lc_step1")}</p>
+    <ol className="mt-3 space-y-4 rounded-2xl bg-[var(--panel-secondary)] p-3.5">
+      <li className="flex gap-3">
+        <StepNumber n={1} />
+        <div className="min-w-0 flex-1 space-y-2">
+        <p className="card-subtitle leading-7">{say("lc_step1Title")}</p>
         <p className="font-medium text-[var(--foreground-secondary)]">{say("lc_step1Body", { account: oa })}</p>
         <a className="secondary-action pressable" href={`https://line.me/R/ti/p/${encodeURIComponent(oa)}`} rel="noreferrer" target="_blank">
           {say("lc_addFriend")}
         </a>
-      </div>
+        </div>
+      </li>
 
-      <div className="space-y-2">
-        <p className="text-[16px] font-bold text-[var(--foreground)]">{say("lc_step2")}</p>
+      <li className="flex gap-3">
+        <StepNumber n={2} />
+        <div className="min-w-0 flex-1 space-y-2">
+        <p className="card-subtitle leading-7">{say("lc_step2Title")}</p>
         {code ? (
           <>
             <div className="flex flex-wrap items-center gap-2">
@@ -89,7 +94,17 @@ export function LineConnectPanel({ organizationId, lineOaId }: { organizationId:
           </button>
         )}
         {failed ? <p className="font-bold text-[var(--danger)]">{say("lc_failed")}</p> : null}
-      </div>
-    </div>
+        </div>
+      </li>
+    </ol>
+  );
+}
+
+/** A numbered step marker, so the two steps read as a sequence rather than two headings. */
+function StepNumber({ n }: { n: number }) {
+  return (
+    <span aria-hidden="true" className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] text-sm font-bold text-white">
+      {n}
+    </span>
   );
 }

@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { updatePreferredLocale } from "@/app/actions/settings";
 import { signOut } from "@/app/actions/auth";
 import { AppShell } from "@/components/app-shell";
+import { PageBand } from "@/components/page-band";
 import { PendingButton } from "@/components/pending-button";
 import { PushToggle } from "@/components/push-toggle";
 import { ThemePicker } from "@/components/theme-picker";
@@ -39,17 +40,40 @@ export default async function AccountPage() {
   const roleLabel = membership.role === "owner" ? say("roleOwner") : membership.role === "manager" ? say("roleManager") : say("roleTeammate");
 
   return (
-    <AppShell userEmail={membership.email}>
-      <div className="page-hero mb-4">
-        <h1 className="page-title">{profile?.full_name || membership.email}</h1>
-        <p className="page-subtitle page-subtitle-keep mt-1">
-          {organization?.name ? say("roleAt", { role: roleLabel, business: organization.name }) : roleLabel}
-        </p>
-      </div>
+    // The same page header as every other operator page (the teal band on phones), not a plain one of its own.
+    <AppShell
+      hero={<PageBand keepSubtitle subtitle={organization?.name ? say("roleAt", { role: roleLabel, business: organization.name }) : roleLabel} title={profile?.full_name || membership.email} />}
+      userEmail={membership.email}
+    >
+      {/* One column of settings, sign-in first: no masonry holes between cards of different heights. */}
+      <div className="page-form space-y-4">
+        <section className="card p-5">
+          <h2 className="card-title">{say("signInTitle")}</h2>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            <div className="rounded-2xl bg-[var(--panel-secondary)] p-3.5">
+              <p className="font-medium text-[var(--foreground-secondary)]">{say("email")}</p>
+              <p className="break-all text-[16px] font-bold text-[var(--foreground)]">{membership.email}</p>
+            </div>
+            <div className="rounded-2xl bg-[var(--panel-secondary)] p-3.5">
+              <p className="font-medium text-[var(--foreground-secondary)]">{say("role")}</p>
+              <p className="text-[16px] font-bold text-[var(--foreground)]">{roleLabel}</p>
+            </div>
+          </div>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <a className="secondary-action pressable whitespace-nowrap" href="/forgot-password">
+              {say("changePassword")}
+            </a>
+            {/* Sign out is in the sidebar too: here it is a quiet red text button, not a second outlined one. */}
+            <form action={signOut} className="ms-auto">
+              <PendingButton className="pressable min-h-11 whitespace-nowrap rounded-full px-3 font-bold text-[var(--danger)] hover:bg-[var(--danger-light)]" pendingLabel="" type="submit">
+                {nav("signOut")}
+              </PendingButton>
+            </form>
+          </div>
+        </section>
 
-      <div className="grid items-start gap-4 lg:grid-cols-2">
-        <section className="card p-4">
-          <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("languageTitle")}</h2>
+        <section className="card p-5">
+          <h2 className="card-title">{say("languageTitle")}</h2>
           <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("languageBody")}</p>
           {/* Keyed by the saved values so the form shows them after a save (React resets forms to their first defaults). */}
           <form action={updatePreferredLocale} className="mt-3 space-y-3" key={`${locale}-${profile?.preferred_calendar || ""}`}>
@@ -80,40 +104,16 @@ export default async function AccountPage() {
           </form>
         </section>
 
-        <section className="card p-4">
-          <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("themeTitle")}</h2>
+        <section className="card p-5">
+          <h2 className="card-title">{say("themeTitle")}</h2>
           <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("themeBody")}</p>
           <ThemePicker />
         </section>
 
-        <section className="card p-4">
-          <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("alertsTitle")}</h2>
+        <section className="card p-5">
+          <h2 className="card-title">{say("alertsTitle")}</h2>
           <div className="mt-2">
             <PushToggle />
-          </div>
-        </section>
-
-        <section className="card p-4">
-          <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("signInTitle")}</h2>
-          <div className="mt-3 space-y-2">
-            <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5">
-              <p className="font-medium text-[var(--foreground-secondary)]">{say("email")}</p>
-              <p className="break-all text-[16px] font-bold text-[var(--foreground)]">{membership.email}</p>
-            </div>
-            <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5">
-              <p className="font-medium text-[var(--foreground-secondary)]">{say("role")}</p>
-              <p className="text-[16px] font-bold text-[var(--foreground)]">{roleLabel}</p>
-            </div>
-          </div>
-          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-            <a className="secondary-action pressable whitespace-nowrap" href="/forgot-password">
-              {say("changePassword")}
-            </a>
-            <form action={signOut}>
-              <PendingButton className="secondary-action pressable w-full whitespace-nowrap sm:w-auto" pendingLabel="" type="submit">
-                {nav("signOut")}
-              </PendingButton>
-            </form>
           </div>
         </section>
       </div>

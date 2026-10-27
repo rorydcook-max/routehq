@@ -111,7 +111,7 @@ export function SkipInspectionButton({ rentalId, early = null, late = null, canW
   return (
     <>
       <button
-        className="pressable inline-flex w-full items-center justify-center rounded-full border border-[var(--border)] bg-white px-3 py-2 text-sm font-bold text-[var(--foreground-secondary)]"
+        className="pressable inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[var(--border-strong)] bg-white px-4 py-2 font-bold text-[var(--foreground)] sm:w-auto"
         onClick={() => setShowConfirm(true)}
         type="button"
       >

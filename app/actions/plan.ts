@@ -10,6 +10,7 @@ import { getVehicleCategories } from "@/lib/organization";
 import { formatPlanPrice, planCharge } from "@/lib/plan-currency";
 import { FOUNDING_SLOTS, PLANS, changeWaitsForRenewal, fleetMix, planById, type PlanId } from "@/lib/plans";
 import { alertTeam, isPlatformAdmin } from "@/lib/support";
+import { logAdminAction } from "@/lib/admin";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -198,6 +199,10 @@ export async function activatePlanRequest(input: { organizationId: string }): Pr
   if (organization.plan_request_thread_id) {
     await admin.from("support_threads").update({ status: "closed", unread_by_team: false }).eq("id", organization.plan_request_thread_id);
   }
+  await logAdminAction(
+    { userId: membership.userId, email: membership.email ?? null },
+    { action: "plan_activated", organizationId: organization.id, details: { plan, interval, founding } }
+  );
   await notifyOperator(organization.id, `✅ Your RouteHQ plan is now ${plan.charAt(0).toUpperCase()}${plan.slice(1)}`, "plan_activated", "/settings/billing");
   revalidatePath("/settings/billing");
   if (organization.plan_request_thread_id) revalidatePath(`/help/team/${organization.plan_request_thread_id}`);

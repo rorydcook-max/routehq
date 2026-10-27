@@ -86,6 +86,8 @@ export function TransactionForm({
   const [matches, setMatches] = useState<MatchResult[]>(startsLinked || startAsCost || startAsFine ? [] : waitingHere);
   const [showAllMatches, setShowAllMatches] = useState(false);
   const [dismissedMatches, setDismissedMatches] = useState(false);
+  // Which waiting payment is picked; the first one until someone chooses.
+  const [pickedMatchId, setPickedMatchId] = useState("");
   // While there are payments being waited for, they are the whole screen; the form opens when one is chosen or it is something else.
   const [formOpen, setFormOpen] = useState(startsLinked || startAsCost || startAsFine || waitingHere.length === 0);
   const [isMatching, startMatchTransition] = useTransition();
@@ -255,20 +257,19 @@ export function TransactionForm({
       <input name="taskId" type="hidden" value={linkedTaskId} />
 
       {/* The first question is the simplest one: did money come in or go out? */}
-      <div className="grid grid-cols-2 gap-3">
+      {/* A segmented control: one 44px track, the chosen side a raised white pill in the brand teal. */}
+      <div aria-label={`${say("moneyIn")} / ${say("moneyOut")}`} className="grid h-11 grid-cols-2 gap-1 rounded-full bg-[var(--panel-tertiary)] p-1" role="group">
         {[true, false].map((moneyIn) => {
           const chosen = isMoneyIn === moneyIn;
-          const colour = moneyIn ? "var(--chart-in)" : "var(--chart-out)";
           return (
             <button
               aria-pressed={chosen}
-              className={`pressable flex min-h-14 items-center justify-center gap-2 rounded-2xl border-2 text-[16px] font-bold transition ${chosen ? "text-white shadow-[var(--shadow-card)]" : "bg-white text-[var(--foreground)]"}`}
+              className={`pressable flex h-9 items-center justify-center gap-2 rounded-full text-[15px] font-semibold transition ${chosen ? "bg-white text-[var(--primary)] shadow-[var(--shadow-sm)]" : "text-[var(--foreground-secondary)] hover:text-[var(--foreground)]"}`}
               key={String(moneyIn)}
               onClick={() => chooseDirection(moneyIn)}
-              style={chosen ? { background: colour, borderColor: colour } : { borderColor: "var(--border)" }}
               type="button"
             >
-              {moneyIn ? <ArrowDownLeft aria-hidden="true" size={20} /> : <ArrowUpRight aria-hidden="true" size={20} />}
+              {moneyIn ? <ArrowDownLeft aria-hidden="true" size={18} /> : <ArrowUpRight aria-hidden="true" size={18} />}
               {moneyIn ? say("moneyIn") : say("moneyOut")}
             </button>
           );
@@ -282,54 +283,62 @@ export function TransactionForm({
       ) : null}
 
       {matches.length > 0 ? (
-        <div className="rounded-xl border border-[var(--primary)] bg-[var(--primary-light)] p-4">
+        // The standard card. Each payment is a row you pick (the whole row is the target), then one primary button.
+        <div className="card p-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-[15px] font-semibold text-[var(--foreground)]">
-                {matches.length === 1 ? say("matchOne") : say("matchMany")}
-              </p>
-              <p className="mt-0.5 text-[13px] text-[var(--foreground-secondary)]">{say("matchHint")}</p>
+              <p className="card-title">{matches.length === 1 ? say("matchOne") : say("matchMany")}</p>
+              <p className="mt-0.5 text-[14px] text-[var(--foreground-secondary)]">{say("matchHint")}</p>
             </div>
             {isMatching ? <span className="text-xs font-semibold text-[var(--muted)]">{say("checking")}</span> : null}
           </div>
-          <div className="mt-3 space-y-2">
-            {(showAllMatches ? matches : matches.slice(0, 5)).map((match) => (
-              <div className="rounded-lg border border-[var(--info-line)] bg-white p-3" key={match.id}>
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <p className="font-semibold text-[var(--foreground)]">{matchLabel(match)}</p>
-                    <p className="mt-1 text-sm text-[var(--muted)]">
-                      {[match.customerName, matchWhen(match)].filter(Boolean).join(" · ")}
-                    </p>
-                  </div>
-                  <button className="primary-action pressable min-h-9 px-3 text-xs" onClick={() => acceptMatch(match)} type="button">
-                    {say("yesThis")}
-                  </button>
-                </div>
-              </div>
-            ))}
+          <div className="mt-3 space-y-2" role="radiogroup">
+            {(showAllMatches ? matches : matches.slice(0, 5)).map((match) => {
+              const picked = (pickedMatchId || matches[0]?.id) === match.id;
+              return (
+                <label className={`pressable flex cursor-pointer items-start gap-3 rounded-2xl border p-3.5 ${picked ? "border-[var(--primary)] bg-[var(--primary-light)]" : "border-transparent bg-[var(--panel-secondary)]"}`} key={match.id}>
+                  <input checked={picked} className="mt-1 h-4 w-4 shrink-0 accent-[var(--primary)]" name="waitingPayment" onChange={() => setPickedMatchId(match.id)} type="radio" value={match.id} />
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-semibold text-[var(--foreground)]">{matchLabel(match)}</span>
+                    <span className="mt-0.5 block text-sm text-[var(--foreground-secondary)]">{[match.customerName, matchWhen(match)].filter(Boolean).join(" · ")}</span>
+                  </span>
+                </label>
+              );
+            })}
           </div>
           {!showAllMatches && matches.length > 5 ? (
             <button className="mt-3 block text-sm font-semibold text-[var(--primary)]" onClick={() => setShowAllMatches(true)} type="button">
               {say("showMore", { count: matches.length - 5 })}
             </button>
           ) : null}
-          <button
-            className="mt-3 text-sm font-semibold text-[var(--primary)]"
-            onClick={() => {
-              setDismissedMatches(true);
-              setMatches([]);
-              setFormOpen(true);
-            }}
-            type="button"
-          >
-            {say("somethingElse")}
-          </button>
+          <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <button
+              className="secondary-action pressable"
+              onClick={() => {
+                setDismissedMatches(true);
+                setMatches([]);
+                setFormOpen(true);
+              }}
+              type="button"
+            >
+              {say("somethingElse")}
+            </button>
+            <button
+              className="primary-action pressable"
+              onClick={() => {
+                const match = matches.find((item) => item.id === (pickedMatchId || matches[0]?.id));
+                if (match) acceptMatch(match);
+              }}
+              type="button"
+            >
+              {say("useThisPayment")}
+            </button>
+          </div>
         </div>
       ) : null}
 
       {formOpen && !isMoneyIn ? (
-        <div className="rounded-2xl border border-[var(--border)] bg-white p-4 shadow-[var(--shadow-card)]">
+        <div className="card p-4">
           <input
             accept="image/*,application/pdf"
             className="hidden"

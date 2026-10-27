@@ -10,8 +10,8 @@ import { priceFor, type PartnerVehicle, type ReferralRow } from "@/lib/partner-p
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
-const inputClass =
-  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2.5 text-[15px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15";
+// The global field style (44px, regular weight), so these line up with the Search button beside them.
+const inputClass = "mt-1 w-full";
 
 const KINDS = ["any", "car", "scooter", "motorbike", "van", "atv", "ebike"];
 
@@ -90,7 +90,7 @@ export function PartnersView({ referrals, today }: { referrals: ReferralRow[]; t
     <div className="space-y-4">
       {/* 1. What the customer wants */}
       <section className="card p-4">
-        <h2 className="text-[17px] font-bold text-[var(--foreground)]">{t("findTitle")}</h2>
+        <h2 className="card-title">{t("findTitle")}</h2>
         <p className="mt-1 text-sm text-[var(--muted)]">{t("findBody")}</p>
         <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_1fr_1fr_auto]">
           <label className="block text-sm font-semibold text-[var(--foreground-secondary)]">
@@ -122,7 +122,7 @@ export function PartnersView({ referrals, today }: { referrals: ReferralRow[]; t
       {/* 2. What partners have free */}
       {results ? (
         <section className="card p-4">
-          <h2 className="text-[17px] font-bold text-[var(--foreground)]">{results.length ? t("freeTitle", { count: results.length }) : t("noneTitle")}</h2>
+          <h2 className="card-title">{results.length ? t("freeTitle", { count: results.length }) : t("noneTitle")}</h2>
           {!results.length ? <p className="mt-1 text-sm text-[var(--muted)]">{t("noneBody")}</p> : null}
           <div className="mt-3 grid gap-3 md:grid-cols-2">
             {results.map((vehicle) => {
@@ -143,7 +143,7 @@ export function PartnersView({ referrals, today }: { referrals: ReferralRow[]; t
                   </p>
                   <p className="text-sm text-[var(--muted)]">{t("deposit", { amount: baht(vehicle.deposit, vehicle.currency) })}</p>
                   <button
-                    className={`${chosen ? "primary-action" : "secondary-action"} pressable mt-3 min-h-10 px-3 text-sm`}
+                    className={`${chosen ? "primary-action" : "secondary-action"} pressable mt-3 min-h-11 px-4`}
                     onClick={() => {
                       setPicked(vehicle);
                       setSent(null);
@@ -163,7 +163,7 @@ export function PartnersView({ referrals, today }: { referrals: ReferralRow[]; t
       {/* 3. Send the customer */}
       {picked && !sent ? (
         <section className="card p-4">
-          <h2 className="text-[17px] font-bold text-[var(--foreground)]">{t("sendTitle", { vehicle: `${picked.make} ${picked.model}`, partner: picked.business })}</h2>
+          <h2 className="card-title">{t("sendTitle", { vehicle: `${picked.make} ${picked.model}`, partner: picked.business })}</h2>
           <p className="mt-1 text-sm text-[var(--muted)]">{t("sendBody")}</p>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             <label className="block text-sm font-semibold text-[var(--foreground-secondary)]">
@@ -183,8 +183,8 @@ export function PartnersView({ referrals, today }: { referrals: ReferralRow[]; t
       ) : null}
 
       {sent ? (
-        <section className="card border border-[var(--success-line)] bg-[var(--success-light)] p-4">
-          <h2 className="text-[17px] font-bold text-[var(--foreground)]">{t("sentTitle", { partner: sent.partner })}</h2>
+        <section className="card !bg-[var(--success-light)] p-4">
+          <h2 className="card-title">{t("sentTitle", { partner: sent.partner })}</h2>
           <p className="mt-1 text-sm text-[var(--foreground-secondary)]">{t("sentBody")}</p>
           <p className="mt-3 break-all rounded-lg bg-white px-3 py-2 font-mono text-sm text-[var(--foreground)]">{sent.bookingUrl}</p>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -202,8 +202,8 @@ export function PartnersView({ referrals, today }: { referrals: ReferralRow[]; t
 
       {/* 4. Fees */}
       {owed.length ? (
-        <section className="card border border-[var(--warning-line)] bg-[var(--warning-light)] p-4">
-          <h2 className="text-[17px] font-bold text-[var(--foreground)]">{t("owedTitle", { count: owed.length })}</h2>
+        <section className="card !bg-[var(--warning-light)] p-4">
+          <h2 className="card-title">{t("owedTitle", { count: owed.length })}</h2>
           <ul className="mt-2 space-y-2">
             {owed.map((row) => (
               <li className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-white px-3 py-2" key={row.id}>
@@ -211,7 +211,7 @@ export function PartnersView({ referrals, today }: { referrals: ReferralRow[]; t
                   {baht(row.feeAmount || 0)} {t("toPartner", { partner: row.partner })} · {row.customerName || t("aCustomer")}
                   {row.feeDueAt ? <span className="text-[var(--muted)]"> · {t("by", { date: row.feeDueAt })}</span> : null}
                 </span>
-                <button className="secondary-action pressable min-h-10 px-3 text-sm" disabled={paying === row.id} onClick={() => payFee(row.id)} type="button">
+                <button className="secondary-action pressable min-h-11 px-4" disabled={paying === row.id} onClick={() => payFee(row.id)} type="button">
                   {paying === row.id ? <Loader2 className="animate-spin" size={15} /> : <Check size={15} />} {t("markPaid")}
                 </button>
               </li>
@@ -238,7 +238,7 @@ function ReferralList({ rows, paid, t, titleKey, emptyKey }: { rows: ReferralRow
   };
   return (
     <section className="card p-4">
-      <h2 className="text-[17px] font-bold text-[var(--foreground)]">{t(titleKey)}</h2>
+      <h2 className="card-title">{t(titleKey)}</h2>
       {rows.length ? (
         <ul className="mt-2 divide-y divide-[var(--border)]">
           {rows.map((row) => {

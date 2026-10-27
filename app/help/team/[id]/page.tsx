@@ -1,9 +1,8 @@
-import Link from "next/link";
-import type { Route } from "next";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
-import { ChevronLeft, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
+import { BackLink } from "@/components/ui";
 import { HelpStatusButton } from "@/components/help/help-actions";
 import { HelpCompose } from "@/components/help/help-compose";
 import { HelpThread } from "@/components/help/help-thread";
@@ -45,12 +44,9 @@ export default async function HelpTeamConversationPage({ params }: { params: Pro
 
   return (
     <AppShell userEmail={userEmail}>
-      <div className="mx-auto max-w-3xl space-y-4">
-        <Link className="inline-flex items-center gap-1 font-semibold text-[var(--primary)]" href={"/help/team" as Route}>
-          <ChevronLeft size={18} />
-          {t("teamTitle")}
-        </Link>
+      <div className="page-form space-y-4">
         <div className="page-hero">
+          <BackLink href="/help/team" label={t("teamTitle")} />
           <h1 className="page-title break-words">{thread.subject}</h1>
           <p className="page-subtitle mt-2">
             {business.name} · {t(`topic_${thread.topic}`)} · {t(`teamStatus_${thread.status}`)}
@@ -81,7 +77,7 @@ export default async function HelpTeamConversationPage({ params }: { params: Pro
 
         {planRequest ? (
           <section className="card border-2 border-[var(--warning-line)] p-5">
-            <h2 className="text-[17px] font-bold text-[var(--foreground)]">{t("teamRequest")}</h2>
+            <h2 className="card-title">{t("teamRequest")}</h2>
             <p className="mt-1 font-semibold text-[var(--foreground)]">{planRequest.what}</p>
             <p className="mt-1 text-sm font-medium text-[var(--muted)]">{t("teamRequestNote")}</p>
             <div className="mt-3">
@@ -94,7 +90,7 @@ export default async function HelpTeamConversationPage({ params }: { params: Pro
           <HelpThread businessName={business.name} locale={locale} messages={loaded.messages} side="team" />
         </section>
         <section className="card p-5">
-          <h2 className="text-[17px] font-bold text-[var(--foreground)]">{t("teamReplyTitle")}</h2>
+          <h2 className="card-title">{t("teamReplyTitle")}</h2>
           <p className="mt-1 font-medium text-[var(--muted)]">{t("teamReplyNote")}</p>
           <div className="mt-3">
             <HelpCompose asTeam mode="reply" threadId={thread.id} />

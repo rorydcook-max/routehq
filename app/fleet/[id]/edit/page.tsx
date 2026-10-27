@@ -7,7 +7,8 @@ import { AppShell } from "@/components/app-shell";
 import { LocalizedDateInput } from "@/components/localized-date-input";
 import { MoneyInput } from "@/components/money-input";
 import { PendingButton } from "@/components/pending-button";
-import { Fold } from "@/components/ui";
+import { BackLink, Fold } from "@/components/ui";
+import { VehicleTitle } from "@/components/vehicle-identity";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { ensureDefaultBranch } from "@/lib/branches";
@@ -77,6 +78,22 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
     ]
       .filter(Boolean)
       .join(" · ") || say("noPrices");
+  // Collapsed sections say what is filled in, not what the section is for.
+  const dateOrNotSet = (value: unknown) => (value ? longDate(String(value).slice(0, 10), preferredLocale) : say("notSetShort"));
+  const datesSummary = say("datesSummarySet", {
+    tax: dateOrNotSet(compliance.tax_expiry_date),
+    insurance: dateOrNotSet(compliance.insurance_expiry_date || compliance.porbor_expiry_date),
+    service: dateOrNotSet(compliance.next_service_date)
+  });
+  const moreSummary =
+    [
+      specifications.transmission,
+      specifications.fuel_type,
+      specifications.seating_capacity ? say("seatsCount", { count: Number(specifications.seating_capacity) }) : null,
+      specifications.engine_cc ? `${specifications.engine_cc} cc` : null
+    ]
+      .filter(Boolean)
+      .join(" · ") || say("moreNotSet");
   const dateField = (labelKey: string, name: string, value: unknown) => (
     <label className="block">
       <span className={labelClass}>{say(labelKey)}</span>
@@ -98,13 +115,10 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
 
   return (
     <AppShell userEmail={userEmail}>
-      <div className="mx-auto max-w-3xl">
+      <div className="page-form">
         <div className="page-hero mb-4">
-          <Link className="font-bold text-[var(--primary)]" href={`/fleet/${vehicle.id}`}>
-            {say("backToVehicle")}
-          </Link>
-          <h1 className="page-title mt-2">{say("editTitle", { name: `${vehicle.make} ${vehicle.model}` })}</h1>
-          <p className="page-subtitle page-subtitle-keep mt-1">{vehicle.registration_number}</p>
+          <BackLink href={`/fleet/${vehicle.id}`} label={`${vehicle.make} ${vehicle.model}`} />
+          <VehicleTitle as="h1" className="gap-x-3" name={say("editTitle", { name: `${vehicle.make} ${vehicle.model}` })} nameClassName="page-title" plate={vehicle.registration_number} plateClassName="!px-2 !py-1 !text-[14px]" province={vehicle.metadata?.registration_province} year={vehicle.year} />
         </div>
 
         <form action={updateVehicle} className="space-y-3">
@@ -118,10 +132,13 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
               {moneyField("weekly", "weeklyRate", rateOrEmpty(vehicle.weekly_rate))}
               {moneyField("monthly", "monthlyRate", rateOrEmpty(vehicle.monthly_rate))}
             </div>
-            <label className="mt-4 block sm:max-w-xs">
+            {/* The field keeps a third of the row; its hint uses the full width instead of wrapping over three lines. */}
+            <label className="mt-4 block">
               <span className={labelClass}>{say("deposit")}</span>
-              <MoneyInput currency={currency} defaultValue={valueOrEmpty((vehicle as any).deposit_amount)} name="depositAmount" />
-              <span className="mt-1 block font-medium text-[var(--muted)]">{usualDeposit > 0 ? say("depositHintUsual", { amount: `฿${usualDeposit.toLocaleString("en-US")}` }) : say("depositHintNone")}</span>
+              <span className="block sm:max-w-[calc((100%-2rem)/3)]">
+                <MoneyInput currency={currency} defaultValue={valueOrEmpty((vehicle as any).deposit_amount)} name="depositAmount" />
+              </span>
+              <span className="measure mt-1 block font-medium text-[var(--muted)]">{usualDeposit > 0 ? say("depositHintUsual", { amount: `฿${usualDeposit.toLocaleString("en-US")}` }) : say("depositHintNone")}</span>
             </label>
           </Fold>
           <Fold summary={`${vehicle.make} ${vehicle.model} · ${vehicle.registration_number}`} title={say("identTitle")}>
@@ -161,7 +178,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
               </label>
             </div>
           </Fold>
-          <Fold summary={say("datesSummary")} title={say("datesTitle")}>
+          <Fold summary={datesSummary} title={say("datesTitle")}>
             <div className="grid gap-4 sm:grid-cols-2">
               {dateField("tax", "taxExpiryDate", compliance.tax_expiry_date)}
               {dateField("porbor", "porborExpiryDate", compliance.porbor_expiry_date)}
@@ -183,7 +200,7 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
               {dateField("oil", "oilChangeDueDate", compliance.oil_change_due_date)}
             </div>
           </Fold>
-          <Fold summary={say("moreSummary")} title={say("moreTitle")}>
+          <Fold summary={moreSummary} title={say("moreTitle")}>
             <div className="grid gap-4 sm:grid-cols-2">
               {textField("vin", "vin", vehicle.vin)}
               {textField("transmission", "transmission", specifications.transmission)}
@@ -273,7 +290,8 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
         </form>
 
         {/* Archiving and deleting live here, one step away from the list, so neither happens by a slip of the thumb. */}
-        <div className="mt-3">
+        <div className="mt-8">
+          <h2 className="card-subtitle mb-2 text-[var(--danger)]">{say("dangerZone")}</h2>
           <Fold summary={say("goneSummary")} title={say("goneTitle")}>
             <div className="space-y-4">
               <form action={archiveVehicle} className="flex flex-wrap items-center justify-between gap-3">

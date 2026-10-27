@@ -100,10 +100,11 @@ type PublicBookingDetail = {
   } | null;
 };
 
+// The same 44px field as the rest of the app and the other customer pages (16px text, so phones don't zoom in).
 const fieldStyle = {
-  height: 42,
+  height: 44,
   width: "100%",
-  fontSize: 14,
+  fontSize: 16,
   padding: "0 12px",
   border: "0.5px solid var(--border)",
   borderRadius: 8,
@@ -932,23 +933,27 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
           </a>
         ) : null}
         {executionCertificateUrl ? (
-          <a className="pressable inline-flex min-h-[44px] items-center justify-center rounded-full border border-[var(--border)] bg-white px-5 py-3 text-sm font-semibold text-[var(--primary)]" href={executionCertificateUrl} rel="noreferrer" target="_blank">
+          // The standard secondary button: the same 2px brand outline as every other outlined button.
+          <a className="pressable inline-flex min-h-[44px] items-center justify-center rounded-full border-2 border-[var(--primary)] bg-white px-5 py-3 text-sm font-semibold text-[var(--primary)]" href={executionCertificateUrl} rel="noreferrer" target="_blank">
             {t("proofOfSigning")}
           </a>
         ) : null}
         </div>
-        {/* Their choice stays here to change at any time: turning it off is as easy as turning it on. */}
-        <label className="checkbox-label mt-5 items-start rounded-xl bg-[var(--panel-secondary)] p-3 text-left text-sm text-[var(--foreground)]">
-          <input checked={offersOn} className="mt-0.5 flex-shrink-0" disabled={offersSaving} onChange={(event) => void saveOffers(event.target.checked, "booking_page")} type="checkbox" />
-          <span>
-            <span className="block font-semibold">{t("offersTitle")}</span>
-            <span className="mt-0.5 block font-normal leading-snug text-[var(--muted)]">{offersError ? t("offersFailed") : offersOn ? t("offersOnNote") : t("offersBody")}</span>
-          </span>
-        </label>
-        <details className="mt-1.5 px-1 text-left text-sm">
-          <summary className="cursor-pointer font-semibold text-[var(--primary)]">{t("offersDetailsLabel")}</summary>
-          <p className="mt-1 leading-snug text-[var(--muted)]">{t("offersDetails")}</p>
-        </details>
+        {/* Their choice stays here to change at any time: turning it off is as easy as turning it on.
+            "What's shared" sits inside the same box, lined up with the text it explains. */}
+        <div className="mt-5 rounded-2xl bg-[var(--panel-secondary)] p-3.5 text-left text-sm text-[var(--foreground)]">
+          <label className="flex cursor-pointer items-start gap-3">
+            <input checked={offersOn} className="mt-0 h-5 w-5 flex-shrink-0 cursor-pointer accent-[var(--primary)]" disabled={offersSaving} onChange={(event) => void saveOffers(event.target.checked, "booking_page")} type="checkbox" />
+            <span>
+              <span className="block font-semibold">{t("offersTitle")}</span>
+              <span className="mt-0.5 block font-normal leading-snug text-[var(--muted)]">{offersError ? t("offersFailed") : offersOn ? t("offersOnNote") : t("offersBody")}</span>
+            </span>
+          </label>
+          <details className="ms-8 mt-2">
+            <summary className="cursor-pointer font-semibold text-[var(--primary)] hover:underline">{t("offersDetailsLabel")}</summary>
+            <p className="mt-1 leading-snug text-[var(--muted)]">{t("offersDetails")}</p>
+          </details>
+        </div>
       </section>
     );
   }

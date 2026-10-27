@@ -4,7 +4,7 @@ import { useLocale } from "next-intl";
 import { createCustomer } from "@/app/actions/customers";
 import { AppShell } from "@/components/app-shell";
 import { PendingButton } from "@/components/pending-button";
-import { Fold } from "@/components/ui";
+import { BackLink, Fold } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { commonCountries, countryLabel, customerLanguages, phoneCodeOptions } from "@/lib/customer-options";
 import { DuplicatePhoneHint } from "@/components/duplicate-phone-hint";
@@ -40,7 +40,8 @@ function PhoneFields({ codeName, inputName, codeLabel, required = false }: { cod
           </option>
         ))}
       </select>
-      <input className={inputClass} inputMode="tel" name={inputName} placeholder="812345678" required={required} type="tel" />
+      {/* Spaced like a real number so it reads as an example, not a value already typed in. */}
+      <input className={inputClass} inputMode="tel" name={inputName} placeholder="81 234 5678" required={required} type="tel" />
     </div>
   );
 }
@@ -51,12 +52,11 @@ export default async function NewCustomerPage() {
 
   return (
     <AppShell userEmail={userEmail}>
-      <div className="mx-auto max-w-3xl">
+      {/* Left-aligned form column, so the title starts where every other page's does. */}
+      <div className="page-form">
         <div className="page-hero mb-4">
-          <Link className="font-bold text-[var(--primary)]" href="/customers">
-            {say("backToList")}
-          </Link>
-          <h1 className="page-title mt-2">{say("new_title")}</h1>
+          <BackLink href="/customers" label={say("back")} />
+          <h1 className="page-title">{say("new_title")}</h1>
           <p className="page-subtitle page-subtitle-keep mt-1">{say("new_subtitle")}</p>
         </div>
 

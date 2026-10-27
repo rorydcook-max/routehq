@@ -8,7 +8,7 @@ import { AppShell } from "@/components/app-shell";
 import { LocalizedDateInput } from "@/components/localized-date-input";
 import { MoneyInput } from "@/components/money-input";
 import { PendingButton } from "@/components/pending-button";
-import { Fold } from "@/components/ui";
+import { BackLink, Fold } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { ensureDefaultBranch } from "@/lib/branches";
 import { defaultCalendarForLocale } from "@/lib/i18n/calendars";
@@ -65,12 +65,10 @@ export default async function NewVehiclePage() {
 
   return (
     <AppShell userEmail={userEmail}>
-      <div className="mx-auto max-w-3xl">
+      <div className="page-form">
         <div className="page-hero mb-4">
-          <Link className="font-bold text-[var(--primary)]" href="/fleet">
-            {say("backToFleet")}
-          </Link>
-          <div className="mt-2 flex items-start justify-between gap-3">
+          <BackLink href="/fleet" label={say("backFleet")} />
+          <div className="flex items-start justify-between gap-3">
             <h1 className="page-title">{say("addTitle")}</h1>
             <Link className="secondary-action pressable shrink-0" href="/fleet/import">
               {say("import")}

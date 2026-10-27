@@ -35,11 +35,15 @@ export default async function HelpPage({ searchParams }: { searchParams: Promise
   const plan = planById(org.subscription_tier);
   const initialTopic = (SUPPORT_TOPICS as readonly string[]).includes(String(askedTopic)) ? (askedTopic as SupportTopic) : "question";
   const date = (iso: string) => new Intl.DateTimeFormat(locale === "th" ? "th-TH" : "en-GB", { timeZone: BANGKOK, day: "numeric", month: "short" }).format(new Date(iso));
+  // The time too, so two conversations on the same day with the same subject can be told apart.
+  const time = (iso: string) => new Intl.DateTimeFormat("en-GB", { timeZone: BANGKOK, hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
   const hasDirect = Boolean(contacts.whatsappUrl || contacts.lineUrl || contacts.email);
 
   return (
     <AppShell hero={<PageBand keepSubtitle subtitle={t("subtitle")} title={t("title")} />} userEmail={userEmail}>
-      <div className="max-w-3xl space-y-4">
+      {/* Full content width like To do and Inbox: writing and conversations on the left, how we reach you on a right rail. One column on phones. */}
+      <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="min-w-0 space-y-4">
 
         {team ? (
           <Link className="card pressable flex items-center gap-3 p-4" href={"/help/team" as Route}>
@@ -50,7 +54,7 @@ export default async function HelpPage({ searchParams }: { searchParams: Promise
         ) : null}
 
         <section className="card p-5" id="write">
-          <h2 className="text-[17px] font-bold text-[var(--foreground)]">{t("newTitle")}</h2>
+          <h2 className="card-title">{t("newTitle")}</h2>
           <div className="mt-3">
             <HelpCompose
               hints={{ import: included ? t("importIncluded", { plan: t(`plan_${plan.id}`) }) : t("importHelp") }}
@@ -61,7 +65,7 @@ export default async function HelpPage({ searchParams }: { searchParams: Promise
         </section>
 
         <section className="card p-5">
-          <h2 className="text-[17px] font-bold text-[var(--foreground)]">{t("yourConversations")}</h2>
+          <h2 className="card-title">{t("yourConversations")}</h2>
           {threads.length ? (
             <ul className="mt-2 divide-y divide-[var(--border)]">
               {threads.map((thread) => (
@@ -71,7 +75,7 @@ export default async function HelpPage({ searchParams }: { searchParams: Promise
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-[16px] font-bold text-[var(--foreground)]">{thread.subject}</span>
                       <span className="block font-medium text-[var(--muted)]">
-                        {t(`topic_${thread.topic}`)} · {date(thread.lastMessageAt)}
+                        {t(`topic_${thread.topic}`)} · {date(thread.lastMessageAt)}, {time(thread.lastMessageAt)}
                       </span>
                     </span>
                     <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-[13px] font-bold ${thread.status === "answered" ? "bg-[var(--primary)] text-white" : "bg-[var(--panel-secondary)] text-[var(--foreground-secondary)]"}`}>{t(`status_${thread.status}`)}</span>
@@ -84,9 +88,11 @@ export default async function HelpPage({ searchParams }: { searchParams: Promise
             <p className="mt-2 font-medium text-[var(--foreground-secondary)]">{t("noConversations")}</p>
           )}
         </section>
+      </div>
 
+      <aside className="min-w-0 space-y-4">
         <section className="card p-5">
-          <h2 className="text-[17px] font-bold text-[var(--foreground)]">{t("prefTitle")}</h2>
+          <h2 className="card-title">{t("prefTitle")}</h2>
           <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{t("prefBody")}</p>
           <div className="mt-3">
             <HelpPreference
@@ -100,7 +106,7 @@ export default async function HelpPage({ searchParams }: { searchParams: Promise
 
         {hasDirect ? (
           <section className="card p-5">
-            <h2 className="text-[17px] font-bold text-[var(--foreground)]">{t("directTitle")}</h2>
+            <h2 className="card-title">{t("directTitle")}</h2>
             <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{t("directBody")}</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {contacts.whatsappUrl ? (
@@ -124,6 +130,7 @@ export default async function HelpPage({ searchParams }: { searchParams: Promise
             </div>
           </section>
         ) : null}
+      </aside>
       </div>
     </AppShell>
   );

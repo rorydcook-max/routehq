@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { toast } from "@/components/toast";
 import { shownError } from "@/lib/error-text";
-import { ArrowDownLeft, ArrowUpRight, Check, ChevronLeft, ChevronRight, Download, Search, Trash2, X } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Check, ChevronDown, ChevronLeft, ChevronRight, Download, Plus, Search, Trash2, X } from "lucide-react";
 import { Dot } from "@/components/glance";
+import { EmptyState } from "@/components/ui";
 import { useLocale, useTranslations } from "next-intl";
 import { dateFormat } from "@/lib/i18n/dates";
 
@@ -448,7 +449,7 @@ export function TransactionsList({
             ) : null}
             {note ? <p className="mt-0.5 line-clamp-2 text-[14px] font-medium text-[var(--muted)]">{note}</p> : null}
           </div>
-          <p className={`flex-shrink-0 text-[17px] font-bold tabular-nums ${amount.className}`}>
+          <p className={`flex-shrink-0 text-[17px] font-semibold tabular-nums ${amount.className}`}>
             {amount.prefix}
             {money(transaction.amount, transaction.currency)}
           </p>
@@ -537,12 +538,23 @@ export function TransactionsList({
               <p className="text-sm text-[var(--muted)]">{items.length === 0 ? tx.say("nothingYet") : tx.say("entries", { count: items.length })}</p>
             </div>
           </div>
-          <p className="num text-[20px] text-[var(--foreground)]">{signedMoney(total)}</p>
+          <p className="text-[18px] font-semibold tabular-nums text-[var(--foreground)]">{signedMoney(total)}</p>
         </header>
         {items.length === 0 ? (
-          <p className="border-t border-[var(--border)] px-4 py-6 text-center text-sm text-[var(--muted)]">
-            {search.trim() ? tx.say("noMatch") : side === "in" ? tx.say("noIncome") : tx.say("noCosts")}
-          </p>
+          // An empty side still holds its column, with a way to fill it.
+          <div className="border-t border-[var(--border)]">
+            <EmptyState
+              action={
+                search.trim() ? undefined : (
+                  <Link className="secondary-action pressable" href={side === "in" ? "/transactions/new" : "/transactions/new?cost=1"}>
+                    <Plus size={16} />
+                    {side === "in" ? tx.say("recordIncome") : tx.say("recordCost")}
+                  </Link>
+                )
+              }
+              title={search.trim() ? tx.say("noMatch") : side === "in" ? tx.say("noIncome") : tx.say("noCosts")}
+            />
+          </div>
         ) : (
           renderDays(items)
         )}
@@ -596,12 +608,13 @@ export function TransactionsList({
         <div className={`grid gap-3 ${showProfit ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-2"}`}>
           <div>
             <p className="flex items-center gap-1.5 font-semibold text-[var(--foreground-secondary)]"><Dot color="var(--chart-in)" />{tx.say("moneyIn")}</p>
-            <p className="num text-[24px] leading-tight text-[var(--foreground)]">{signedMoney(incomeTotal)}</p>
+            {/* One headline figure per card in the display face (profit, when shown); the others in tabular semibold. */}
+            <p className={`${showProfit ? "text-[22px] font-semibold tabular-nums" : "num text-[24px]"} leading-tight text-[var(--foreground)]`}>{signedMoney(incomeTotal)}</p>
             {refundTotal > 0 ? <p className="text-sm font-semibold text-[var(--muted)]">{tx.say("afterRefunds", { received: money(incomeTotal + refundTotal), amount: money(refundTotal) })}</p> : null}
           </div>
           <div>
             <p className="flex items-center gap-1.5 font-semibold text-[var(--foreground-secondary)]"><Dot color="var(--chart-out)" />{tx.say("moneyOut")}</p>
-            <p className="num text-[24px] leading-tight text-[var(--foreground)]">{money(expenseTotal)}</p>
+            <p className="text-[22px] font-semibold leading-tight tabular-nums text-[var(--foreground)]">{money(expenseTotal)}</p>
           </div>
           {showProfit ? (
             <div className="col-span-2 rounded-xl bg-[var(--panel-secondary)] px-3 py-2 sm:col-span-1 sm:bg-transparent sm:p-0">
@@ -610,7 +623,8 @@ export function TransactionsList({
             </div>
           ) : null}
         </div>
-        {incomeTotal > 0 && incomeTotal + expenseTotal > 0 ? (
+        {/* The in/out split only says something when there is money on both sides. */}
+        {incomeTotal > 0 && expenseTotal > 0 ? (
           <div aria-hidden="true" className="mt-3 flex h-3 overflow-hidden rounded-full bg-[var(--panel-tertiary)]">
             <span className="bg-[var(--chart-in)]" style={{ width: `${(incomeTotal / (incomeTotal + expenseTotal)) * 100}%` }} />
             <span className="border-l-2 border-white bg-[var(--chart-out)]" style={{ width: `${(expenseTotal / (incomeTotal + expenseTotal)) * 100}%` }} />
@@ -623,11 +637,11 @@ export function TransactionsList({
           <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" size={16} />
           <input className="input-with-leading-icon w-full" onChange={(event) => setSearch(event.target.value)} placeholder={tx.say("searchPlaceholder")} value={search} />
         </label>
-        <button className="secondary-action pressable min-h-[38px] px-3 text-[13px]" onClick={() => (selecting ? stopSelecting() : setSelecting(true))} type="button">
+        <button className="secondary-action pressable min-h-11 whitespace-nowrap px-4 text-[14px]" onClick={() => (selecting ? stopSelecting() : setSelecting(true))} type="button">
           {selecting ? tx.say("done") : tx.say("select")}
         </button>
         {/* Everything in this period as a spreadsheet, for an accountant. */}
-        <a aria-label={tx.say("exportSheet")} className="secondary-action pressable min-h-10 gap-1.5 px-3 text-[14px]" download href={`/api/export/money?from=${range.from}&to=${range.to}`} title={tx.say("exportSheet")}>
+        <a aria-label={tx.say("exportSheet")} className="secondary-action pressable min-h-11 gap-1.5 px-4 text-[14px]" download href={`/api/export/money?from=${range.from}&to=${range.to}`} title={tx.say("exportSheet")}>
           <Download size={16} />
           <span className="hidden lg:inline">{tx.say("exportShort")}</span>
         </a>
@@ -651,17 +665,19 @@ export function TransactionsList({
       </div>
 
       {deposits.length > 0 ? (
-        <details className="card group overflow-hidden">
+        // p-0: the card's own child padding left white slivers at the rounded corners round the strip.
+        <details className="card group overflow-hidden p-0">
           {/* On a phone the two amounts sit under the words (beside them they broke into four short lines). */}
-          <summary className="tile-sky flex cursor-pointer list-none flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+          <summary className="flex cursor-pointer list-none flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3 [&::-webkit-details-marker]:hidden">
             <div className="min-w-0">
-              <h2 className="text-[16px]">{tx.say("deposits", { count: deposits.length })}</h2>
-              <p className="text-[12px] text-[var(--muted)]">{tx.say("depositsHint")}</p>
+              <h2 className="card-title">{tx.say("deposits", { count: deposits.length })}</h2>
+              <p className="text-[13px] text-[var(--muted)]">{tx.say("depositsHint")}</p>
             </div>
-            <p className="flex gap-3 text-[13px] font-semibold text-[var(--foreground-secondary)] sm:flex-col sm:gap-0 sm:text-right">
+            <p className="flex gap-3 text-[13px] font-semibold text-[var(--foreground-secondary)] sm:ms-auto sm:flex-col sm:gap-0 sm:text-right">
               <span className="whitespace-nowrap tabular-nums">{tx.say("taken", { amount: money(depositsIn) })}</span>
               <span className="whitespace-nowrap tabular-nums">{tx.say("returnedAmount", { amount: money(depositsOut) })}</span>
             </p>
+            <ChevronDown aria-hidden="true" className="hidden shrink-0 text-[var(--foreground-secondary)] transition-transform group-open:rotate-180 sm:block" size={20} />
           </summary>
           <div className="border-t border-[var(--border)]">{renderDays(deposits)}</div>
         </details>

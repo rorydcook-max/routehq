@@ -1,8 +1,7 @@
 import Link from "next/link";
-import type { Route } from "next";
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/app-shell";
-import { Card } from "@/components/ui";
+import { BackLink, Card } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getBookingDetail, getCustomersForSelector } from "@/lib/bookings";
 import { getDefaultOrganization } from "@/lib/organization";
@@ -18,7 +17,7 @@ export default async function EditBookingPage({ params }: { params: Promise<{ id
   if (!detail) {
     return (
       <AppShell userEmail={userEmail}>
-        <div className="mx-auto max-w-2xl">
+        <div className="page-form">
           <Card className="p-5">
             <h1 className="text-[22px] font-bold text-[var(--foreground)]">{say("nf_title")}</h1>
             <p className="mt-2 font-medium text-[var(--foreground-secondary)]">{say("nf_body")}</p>
@@ -47,17 +46,11 @@ export default async function EditBookingPage({ params }: { params: Promise<{ id
 
   return (
     <AppShell userEmail={userEmail}>
-      <div className="space-y-3">
-        <div className="flex flex-wrap items-center gap-2 font-bold text-[var(--muted)]">
-          <Link className="text-[var(--primary)]" href="/bookings">
-            {say("crumbBookings")}
-          </Link>
-          <span>/</span>
-          <Link className="text-[var(--primary)]" href={`/bookings/${detail.rental.id}` as Route}>
-            {detail.rental.reference || detail.rental.display_code || say("booking")}
-          </Link>
-          <span>/</span>
-          <span>{say("crumbEdit")}</span>
+      <div className="page-form space-y-3">
+        <div>
+          <BackLink href={`/bookings/${detail.rental.id}`} label={detail.rental.customers?.full_name || detail.rental.reference || detail.rental.display_code || say("booking")} />
+          <h1 className="text-[28px] leading-tight tracking-[-0.02em] text-[var(--foreground)]">{say("title")}</h1>
+          <p className="mt-0.5 font-semibold text-[var(--foreground-secondary)]">{detail.rental.reference || detail.rental.display_code || say("booking")}</p>
         </div>
 
         <BookingEditForm

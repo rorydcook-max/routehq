@@ -59,7 +59,7 @@ export function HelpPreference({ channel, handle, suggestions, canEdit }: { chan
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap gap-2" role="radiogroup">
+      <div className="chip-row flex flex-wrap gap-2" role="radiogroup">
         {SUPPORT_CHANNELS.map((option) => (
           <button
             aria-checked={value === option}
@@ -89,10 +89,12 @@ export function HelpPreference({ channel, handle, suggestions, canEdit }: { chan
           />
         </label>
       ) : null}
-      <p className="font-medium text-[var(--foreground-secondary)]">{value === "app" ? say("prefAppNote") : say("prefOtherNote", { channel: say(`channel_${value}`) })}</p>
+      {/* "Here in RouteHQ" needs no note: the card's own line already says we reply here with an alert. */}
+      {value !== "app" ? <p className="font-medium text-[var(--foreground-secondary)]">{say("prefOtherNote", { channel: say(`channel_${value}`) })}</p> : null}
       {canEdit ? (
         <div className="flex items-center gap-3">
-          <button className="secondary-action pressable" disabled={pending || (value === channel && contact === handle)} onClick={save} type="button">
+          {/* The only action in this card, so it is the primary one. */}
+          <button className="primary-action pressable" disabled={pending || (value === channel && contact === handle)} onClick={save} type="button">
             {pending ? say("saving") : say("savePref")}
           </button>
           {saved ? <span className="font-semibold text-[var(--success)]">{say("saved")}</span> : null}

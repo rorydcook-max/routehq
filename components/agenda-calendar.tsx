@@ -128,8 +128,10 @@ export function AgendaCalendar({
       return model ? `${paper} · ${model}` : paper;
     }
     if (!subject) return titleOf(event);
-    if (event.type === "rental_start") return `↗ ${model}`;
-    if (event.type === "rental_end" || event.type === "rental_due") return `↙ ${model}`;
+    // Handovers and returns say the verb and who: "Out · Somchai", "Back · Somchai" (an arrow and a model name told you neither).
+    const customer = String(words?.subject || "").split(" · ")[1]?.trim().split(/\s+/)[0] || "";
+    if (event.type === "rental_start") return `${t("chipOut")} · ${customer || model}`;
+    if (event.type === "rental_end" || event.type === "rental_due") return `${t("chipBack")} · ${customer || model}`;
     return model;
   };
 
@@ -250,7 +252,8 @@ export function AgendaCalendar({
             const isToday = date === today;
             return (
               <button
-                className={`pressable flex min-h-[52px] min-w-0 flex-col items-stretch rounded-xl p-1 text-left ${roomy ? "lg:min-h-[104px]" : ""} ${date === chosen ? "bg-[var(--primary-light)] ring-2 ring-[var(--primary)]" : isToday ? "bg-white ring-2 ring-[var(--border-strong)]" : date < today ? "bg-[var(--panel-secondary)]" : "bg-white shadow-[0_1px_3px_rgba(19,38,43,0.08)]"}`}
+                // Every day on the same surface; days gone by are faded instead of tinted (the tint read as the "active" part of the month).
+                className={`pressable flex min-h-[52px] min-w-0 flex-col items-stretch rounded-xl p-1 text-left ${roomy ? "lg:min-h-[104px]" : ""} ${date === chosen ? "bg-[var(--primary-light)] ring-2 ring-[var(--primary)]" : isToday ? "bg-white ring-2 ring-[var(--border-strong)]" : "bg-white shadow-[0_1px_3px_rgba(19,38,43,0.08)]"}`}
                 key={date}
                 onClick={() => setSelected(date)}
                 type="button"
@@ -258,12 +261,15 @@ export function AgendaCalendar({
                 <span className={`num inline-flex h-7 min-w-7 items-center justify-center self-center rounded-full px-1 text-[15px] ${roomy ? "lg:self-start" : ""} ${isToday ? "bg-[var(--primary)] text-white" : date < today ? "text-[var(--muted)]" : "text-[var(--foreground)]"}`}>
                   {asDate(date).getUTCDate()}
                 </span>
-                <span className={`mt-1 flex flex-wrap justify-center gap-0.5 ${roomy ? "lg:hidden" : ""}`}>
-                  {list.slice(0, 6).map((event) => <span className={`h-2 w-2 rounded-full ${TONE[event.tone].dot}`} key={event.id} />)}
+                {/* Up to three dots and a "+" for more: six wrapped onto two rows and broke the grid. */}
+                <span className={`mt-1 flex flex-nowrap items-center justify-center gap-0.5 ${roomy ? "lg:hidden" : ""} ${date < today && !isToday ? "opacity-60" : ""}`}>
+                  {list.slice(0, 3).map((event) => <span className={`h-2 w-2 shrink-0 rounded-full ${TONE[event.tone].dot}`} key={event.id} />)}
+                  {list.length > 3 ? <span className="text-[12px] font-bold leading-none text-[var(--muted)]">+</span> : null}
                 </span>
-                <span className={`mt-1 hidden space-y-0.5 ${roomy ? "lg:block" : ""}`}>
+                <span className={`mt-1 hidden space-y-0.5 ${roomy ? "lg:block" : ""} ${date < today && !isToday && date !== chosen ? "opacity-60" : ""}`}>
                   {list.slice(0, 3).map((event) => (
-                    <span className={`block truncate rounded-md border-l-[3px] bg-[var(--panel-secondary)] px-1.5 py-0.5 text-[14px] font-semibold ${event.tone === "green" ? "text-[var(--muted)]" : "text-[var(--foreground)]"} ${TONE[event.tone].chip}`} key={event.id} title={titleOf(event)}>
+                    // The accent is a straight bar on the left edge: a rounded corner on it drew a "(".
+                    <span className={`block truncate rounded-r-md border-l-[3px] bg-[var(--panel-secondary)] px-1.5 py-0.5 text-[14px] font-semibold ${event.tone === "green" ? "text-[var(--muted)]" : "text-[var(--foreground)]"} ${TONE[event.tone].chip}`} key={event.id} title={titleOf(event)}>
                       {chipOf(event)}
                     </span>
                   ))}
@@ -326,17 +332,18 @@ export function AgendaCalendar({
         </div>
       ) : (
         <div className="mt-3 flex items-center gap-2">
-          <button aria-label={t("previous")} className="pressable flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[var(--border)] bg-white text-[var(--foreground)]" onClick={() => step(-1)} type="button">
-            <ChevronLeft size={18} />
+          {/* Same month navigation as the By vehicle view: 44px round buttons, an 18px title. */}
+          <button aria-label={t("previous")} className="pressable flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[var(--border-strong)] bg-white text-[var(--foreground)]" onClick={() => step(-1)} type="button">
+            <ChevronLeft size={20} />
           </button>
-          <p className="min-w-0 flex-1 truncate text-center text-[17px] font-bold text-[var(--foreground)]">{label}</p>
+          <p className="min-w-0 flex-1 truncate text-center text-[18px] font-bold text-[var(--foreground)]">{label}</p>
           {!atToday ? (
-            <button className="pressable min-h-10 shrink-0 whitespace-nowrap rounded-full border border-[var(--border)] bg-white px-3 text-[14px] font-bold text-[var(--primary)]" onClick={() => setAnchor(view === "month" ? `${today.slice(0, 7)}-01` : today)} type="button">
+            <button className="pressable min-h-11 shrink-0 whitespace-nowrap rounded-full border border-[var(--border-strong)] bg-white px-3 text-[14px] font-bold text-[var(--primary)]" onClick={() => setAnchor(view === "month" ? `${today.slice(0, 7)}-01` : today)} type="button">
               {t("today")}
             </button>
           ) : null}
-          <button aria-label={t("next")} className="pressable flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[var(--border)] bg-white text-[var(--foreground)]" onClick={() => step(1)} type="button">
-            <ChevronRight size={18} />
+          <button aria-label={t("next")} className="pressable flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[var(--border-strong)] bg-white text-[var(--foreground)]" onClick={() => step(1)} type="button">
+            <ChevronRight size={20} />
           </button>
         </div>
       )}

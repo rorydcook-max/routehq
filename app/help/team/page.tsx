@@ -2,8 +2,9 @@ import Link from "next/link";
 import type { Route } from "next";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
+import { BackLink } from "@/components/ui";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { isPlatformAdmin } from "@/lib/support";
@@ -23,16 +24,13 @@ export default async function HelpTeamPage({ searchParams }: { searchParams: Pro
 
   return (
     <AppShell userEmail={userEmail}>
-      <div className="mx-auto max-w-4xl space-y-4">
-        <Link className="inline-flex items-center gap-1 font-semibold text-[var(--primary)]" href={"/help" as Route}>
-          <ChevronLeft size={18} />
-          {t("back")}
-        </Link>
+      <div className="space-y-4">
         <div className="page-hero">
+          <BackLink href="/help" label={t("back")} />
           <h1 className="page-title">{t("teamTitle")}</h1>
           <p className="page-subtitle mt-2">{t("teamSubtitle")}</p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="chip-row flex flex-wrap gap-2">
           {(["waiting", "all"] as const).map((value) => (
             <Link
               className={`rounded-full border px-3.5 py-1.5 text-[15px] font-semibold ${filter === value ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-[var(--panel)] text-[var(--foreground)]"}`}

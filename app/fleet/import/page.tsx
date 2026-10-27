@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { BackLink } from "@/components/ui";
 import { ImportWizard, type RecentImport } from "@/app/import/import-wizard";
 import { AppShell } from "@/components/app-shell";
 import { getTranslations } from "next-intl/server";
@@ -23,13 +23,11 @@ export default async function ImportVehiclesPage() {
 
   return (
     <AppShell userEmail={userEmail}>
-      <div className="mx-auto max-w-5xl">
-        <div className="mb-4">
-          <Link className="font-bold text-[var(--primary)]" href="/fleet">
-            {t("back")}
-          </Link>
-          <h1 className="page-title mt-2">{t("title")}</h1>
-          <p className="page-subtitle mt-2">{t("subtitle")}</p>
+      <div className="page-form">
+        <div className="page-hero mb-4">
+          <BackLink href="/fleet" label={t("back")} />
+          <h1 className="page-title">{t("title")}</h1>
+          <p className="page-subtitle measure mt-2">{t("subtitle")}</p>
         </div>
 
         <ImportWizard recent={recent} />

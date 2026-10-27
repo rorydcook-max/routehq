@@ -18,6 +18,7 @@ import {
   MoreHorizontal,
   ReceiptText,
   Settings,
+  ShieldCheck,
   Users,
   X
 } from "lucide-react";
@@ -189,7 +190,11 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
   const moreItems = allNavItems.filter((item) => !mobileBarKeys.includes(item.key)).sort((a, b) => Number(b.key === "bookings") - Number(a.key === "bookings"));
 
   const onFocusedFlow = !!pathname && (pathname.startsWith("/inspections") || /\/(new|edit|import)(\/|$)/.test(pathname));
-  const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+  // Handover and return checks belong to Bookings, a condition report to Fleet: the menu keeps your place during them.
+  const isActive = (href: string) =>
+    href === "/"
+      ? pathname === "/"
+      : pathname.startsWith(href) || (href === "/bookings" && /^\/inspections\/(delivery|return)/.test(pathname)) || (href === "/fleet" && pathname.startsWith("/inspections/condition"));
   const moreActive = moreItems.some((item) => isActive(item.href));
   const badgeFor = (key: NavKey) => (key === "inbox" ? shell.unreadChats : key === "tasks" ? shell.dueTasks : key === "help" ? shell.helpReplies : 0);
 
@@ -248,10 +253,13 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
               <AskBox variant="sidebar" />
             </div>
           ) : null}
-          {onFocusedFlow ? null : (
+          {/* Kept in place (just hidden) during a form, so the search box doesn't change width from page to page. */}
+          {(
             <button
+              aria-hidden={onFocusedFlow || undefined}
               aria-label={t("quickAdd")}
-              className={`flex h-10 items-center justify-center gap-2 rounded-full bg-[var(--primary)] text-sm font-bold text-white shadow-[var(--shadow-sm)] transition hover:bg-[var(--primary-hover)] ${isTeammate ? "w-full px-3" : "w-10 shrink-0"}`}
+              tabIndex={onFocusedFlow ? -1 : undefined}
+              className={`${onFocusedFlow ? "invisible" : ""} flex h-10 items-center justify-center gap-2 rounded-full bg-[var(--primary)] text-sm font-bold text-white shadow-[var(--shadow-sm)] transition hover:bg-[var(--primary-hover)] ${isTeammate ? "w-full px-3" : "w-10 shrink-0"}`}
               data-tip={isTeammate ? undefined : t("quickAdd")}
               onClick={() => setFastActionOpen(true)}
               type="button"
@@ -270,6 +278,21 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
               <div className="space-y-0.5">{group.items.map((item) => sideLink(item))}</div>
             </div>
           ))}
+          {/* RouteHQ's own console: only platform admins see this link (each admin page checks again on the server). */}
+          {shell.platformAdmin ? (
+            <div className="mt-3 [@media(max-height:960px)]:mt-1.5">
+              <p className="px-3 pb-0.5 text-[14px] font-bold text-[var(--sidebar-text-muted)]">RouteHQ</p>
+              <Link
+                className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm font-semibold transition [@media(max-height:960px)]:py-1.5 ${
+                  pathname.startsWith("/platform") ? "bg-[var(--primary-light)] text-[var(--primary)]" : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--foreground)]"
+                }`}
+                href={"/platform" as Route}
+              >
+                <ShieldCheck className="shrink-0" size={16} />
+                Admin console
+              </Link>
+            </div>
+          ) : null}
         </nav>
         <div className="mt-2 flex gap-1 border-t border-[var(--sidebar-border)] pt-2">
           {visibleFootItems.map((item) => sideLink(item, true))}
@@ -280,10 +303,15 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
           </div>
         )}
         {userEmail ? (
-          <div className="mt-2 flex items-center gap-2 rounded-xl bg-white p-1.5 pl-2 shadow-[var(--shadow-sm)]">
-            <Link className="flex min-w-0 flex-1 items-center gap-2 rounded-lg hover:text-[var(--primary)]" href="/account" title={t("myAccount")}>
-              <span aria-hidden="true" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)] text-[14px] font-bold uppercase text-[var(--primary)]">{userEmail.slice(0, 1)}</span>
-              <span className="min-w-0 truncate text-sm font-semibold text-[var(--foreground-secondary)]">{userEmail}</span>
+          <div className={`mt-2 flex items-center gap-2 rounded-xl bg-white p-1.5 pl-2 shadow-[var(--shadow-sm)] ${pathname.startsWith("/account") ? "ring-2 ring-[var(--primary)]" : ""}`}>
+            <Link aria-current={pathname.startsWith("/account") ? "page" : undefined} className="flex min-w-0 flex-1 items-center gap-2 rounded-lg hover:text-[var(--primary)]" href="/account" title={`${t("myAccount")} · ${userEmail}`}>
+              <span aria-hidden="true" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)] text-[13px] font-bold uppercase text-[var(--primary)]">
+                {(shell.displayName ? shell.displayName.split(/\s+/).slice(0, 2).map((part) => part[0]).join("") : userEmail.slice(0, 1)) || "?"}
+              </span>
+              <span className="min-w-0 leading-tight">
+                <span className="block truncate text-sm font-bold text-[var(--foreground)]">{shell.displayName || userEmail.split("@")[0]}</span>
+                <span className="block truncate text-[12px] font-medium text-[var(--muted)]">{userEmail}</span>
+              </span>
             </Link>
             <form action={signOut} onSubmit={forgetShellContext}>
               <PendingButton aria-label={t("signOut")} className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--foreground)]" pendingLabel="" title={t("signOut")} type="submit">
@@ -371,7 +399,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
               {index === 2 && !onFocusedFlow ? (
                 <button aria-label={t("openFastActions")} className="flex items-center justify-center" onClick={() => setFastActionOpen(true)} type="button">
                   {/* Centred in the bar: its middle sits level with the middle of each icon-and-label pair. */}
-                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-ink)]">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--primary)] text-white">
                     <Plus size={26} />
                   </span>
                 </button>

@@ -99,9 +99,11 @@ export function PushToggle({ variant = "card" }: { variant?: "card" | "prompt" }
   if (variant === "prompt") {
     if (dismissed || (state !== "off" && state !== "needs-install")) return null;
     return (
-      <div className="mb-3 flex items-center gap-3 rounded-[10px] border-[0.5px] border-[var(--border)] bg-[var(--panel)] px-3.5 py-2.5">
-        <Bell className="shrink-0 text-[var(--primary)]" size={18} />
-        <p className="min-w-0 flex-1 text-sm text-[var(--foreground-secondary)]">
+      <div className="card mb-3 flex items-center gap-3 !px-4 !py-3">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
+          <Bell size={18} />
+        </span>
+        <p className="min-w-0 flex-1 font-medium text-[var(--foreground-secondary)]">
           {state === "needs-install" ? (
             t("pushInstall")
           ) : (
@@ -113,13 +115,13 @@ export function PushToggle({ variant = "card" }: { variant?: "card" | "prompt" }
           )}
         </p>
         {state === "off" ? (
-          <button className="tap-target pressable shrink-0 rounded-full bg-[var(--primary)] px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60" disabled={busy} onClick={turnOn} type="button">
+          <button className="pressable inline-flex min-h-10 shrink-0 items-center rounded-full bg-[var(--primary)] px-4 font-bold text-white disabled:opacity-60" disabled={busy} onClick={turnOn} type="button">
             {t("turnOn")}
           </button>
         ) : null}
         <button
           aria-label={t("notNow")}
-          className="tap-target pressable shrink-0 rounded-full px-2 py-1.5 text-xs font-semibold text-[var(--muted)]"
+          className="pressable inline-flex min-h-10 shrink-0 items-center rounded-full px-3 font-semibold text-[var(--foreground-secondary)] hover:bg-[var(--panel-secondary)]"
           onClick={() => {
             window.localStorage.setItem(DISMISS_KEY, "1");
             setDismissed(true);
@@ -134,7 +136,7 @@ export function PushToggle({ variant = "card" }: { variant?: "card" | "prompt" }
 
   return (
     <div className="space-y-3">
-      <p className="font-medium text-[var(--foreground-secondary)]">{say("ps_body")}</p>
+      <p className="measure font-medium text-[var(--foreground-secondary)]">{say("ps_body")}</p>
       {state === "checking" ? <p className="font-medium text-[var(--muted)]">{say("ps_checking")}</p> : null}
       {state === "unsupported" ? <p className="font-medium text-[var(--foreground)]">{say("ps_unsupported")}</p> : null}
       {state === "needs-install" ? (

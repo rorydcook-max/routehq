@@ -103,12 +103,12 @@ export function SignatureUploadSection({
   const preview = signatureUrl ? (
     <img
       alt={orgName}
-      className="h-12 w-32 rounded-lg border border-[var(--border)] bg-white object-contain p-2"
+      className="stay-light h-16 w-40 shrink-0 rounded-xl bg-white object-contain p-2 ring-1 ring-[var(--border)]"
       src={signatureUrl}
     />
   ) : (
-    <div className="flex h-12 w-32 shrink-0 items-center justify-center rounded-lg bg-[var(--primary-light)] text-[var(--primary)]">
-      <span className="ti ti-signature text-lg" aria-hidden="true" />
+    <div aria-hidden="true" className="flex h-16 w-40 shrink-0 items-center justify-center rounded-xl border-2 border-dashed border-[var(--border-strong)] bg-white text-sm font-semibold text-[var(--muted)]">
+      {say("b_signature")}
     </div>
   );
 
@@ -121,8 +121,8 @@ export function SignatureUploadSection({
       <div className="flex items-center gap-3">
         {preview}
         <div className="min-w-0">
-          <h2 className="text-lg font-bold leading-tight text-[var(--foreground)]">{say("sg_title")}</h2>
-          <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{say("sg_body")}</p>
+          <h2 className="card-title">{say("sg_title")}</h2>
+          <p className="mt-0.5 text-sm font-medium text-[var(--foreground-secondary)]">{say("sg_body")}</p>
         </div>
       </div>
       {signatoryReady ? (
@@ -131,7 +131,7 @@ export function SignatureUploadSection({
         <p className="rounded-xl bg-[var(--warning-light)] px-4 py-3 font-medium text-[var(--foreground)]">{say("sg_first")}</p>
       )}
       {!signatureUrl || replacing ? (
-        <label className="flex w-full cursor-pointer items-start gap-3 rounded-xl bg-white p-3 font-medium text-[var(--foreground)]">
+        <label className="flex w-full cursor-pointer items-start gap-3 rounded-2xl bg-[var(--panel-secondary)] p-3.5 font-medium text-[var(--foreground)]">
           <input className="mt-0.5 h-5 w-5 shrink-0" disabled={!signatoryReady} ref={acknowledgementRef} type="checkbox" />
           <span>{authorisation("signatureAuthorisation")}</span>
         </label>
@@ -146,7 +146,7 @@ export function SignatureUploadSection({
             {say("sg_keep")}
           </button>
         ) : signatureUrl ? (
-          <button className="secondary-action" disabled={isPending} onClick={handleRemove} style={{ color: "var(--danger)" }} type="button">
+          <button className="pressable min-h-11 rounded-full px-3 font-bold text-[var(--danger)] hover:bg-[var(--danger-light)]" disabled={isPending} onClick={handleRemove} type="button">
             {say("pm_remove")}
           </button>
         ) : null}
@@ -157,12 +157,13 @@ export function SignatureUploadSection({
     </>
   );
 
+  // Sits straight inside its card (no inset panel), so its title lines up with the other card titles.
   if (signatureUrl) {
-    return <div className="flex flex-col gap-3 rounded-xl bg-[var(--panel-secondary)] p-3.5">{content}</div>;
+    return <div className="flex flex-col gap-3">{content}</div>;
   }
 
   return (
-    <form method="post" className="flex flex-col gap-3 rounded-xl bg-[var(--panel-secondary)] p-3.5" onSubmit={handleUpload}>
+    <form method="post" className="flex flex-col gap-3" onSubmit={handleUpload}>
       {content}
     </form>
   );

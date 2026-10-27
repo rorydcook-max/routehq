@@ -14,7 +14,8 @@ import { billingPeriodAmounts } from "@/lib/payment-schedule";
 import { extrasFor, priceExtras, seasonalRate, type Extra, type Season } from "@/lib/price-rules";
 import { isTwoWheeler } from "@/lib/vehicle-groups";
 
-const inputClass = "mt-1.5 w-full rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15";
+// The app's standard 44px field: the same height on every public page.
+const inputClass = "mt-1.5 w-full text-base";
 
 function addDays(iso: string, days: number) {
   const date = new Date(`${iso}T00:00:00Z`);
@@ -98,6 +99,8 @@ export function Catalog({
     [vehicles, startDate, end, days, datesReady, gapDays]
   );
   const freeCount = rows.filter((row) => row.free).length;
+  // The first vehicle to come free when none are (rows are sorted by that date).
+  const earliest = rows.find((row) => row.freeFrom) || null;
 
   function send(formData: FormData, vehicle: CatalogVehicle) {
     setError(null);
@@ -151,20 +154,22 @@ export function Catalog({
           <CalendarDays className="text-[var(--primary)]" size={18} />
           {t("whenDoYouNeedIt")}
         </div>
-        <div aria-label={t("typeOfRental")} className={`mt-3 grid-cols-2 gap-1 rounded-xl bg-[var(--panel-secondary)] p-1 text-sm font-semibold ${bothOffered ? "grid" : "hidden"}`} role="group">
-          <button aria-pressed={longTerm} className={`min-h-11 rounded-lg px-2 ${longTerm ? "bg-white text-[var(--foreground)] shadow-sm" : "text-[var(--muted)]"}`} onClick={() => setLongTerm(true)} type="button">
+        {/* The app's one segmented control: tinted track, the chosen option white, the other in readable ink. */}
+        <div aria-label={t("typeOfRental")} className={`mt-3 w-full grid-cols-2 gap-1 rounded-full bg-[var(--panel-tertiary)] p-1 text-sm font-bold sm:w-auto ${bothOffered ? "grid sm:inline-grid" : "hidden"}`} role="group">
+          <button aria-pressed={longTerm} className={`min-h-10 rounded-full px-5 ${longTerm ? "bg-white text-[var(--foreground)] shadow-[0_1px_3px_rgba(19,38,43,0.12)]" : "text-[var(--foreground-secondary)]"}`} onClick={() => setLongTerm(true)} type="button">
             {t("monthly")}
           </button>
-          <button aria-pressed={!longTerm} className={`min-h-11 rounded-lg px-2 ${!longTerm ? "bg-white text-[var(--foreground)] shadow-sm" : "text-[var(--muted)]"}`} onClick={() => setLongTerm(false)} type="button">
+          <button aria-pressed={!longTerm} className={`min-h-10 rounded-full px-5 ${!longTerm ? "bg-white text-[var(--foreground)] shadow-[0_1px_3px_rgba(19,38,43,0.12)]" : "text-[var(--foreground-secondary)]"}`} onClick={() => setLongTerm(false)} type="button">
             {t("setDates")}
           </button>
         </div>
-        <p className="mt-2 text-sm leading-5 text-[var(--muted)]">
+        <p className="measure mt-2 text-sm leading-5 text-[var(--muted)]">
           {longTerm
             ? t("monthlyExplain")
             : t("setDatesExplain")}
         </p>
-        <div className={`mt-3 grid gap-3 ${longTerm ? "" : "sm:grid-cols-2"}`}>
+        {/* Two columns either way, so a lone start date isn't stretched across the whole card. */}
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <label className="block text-sm font-semibold text-[var(--foreground-secondary)]">
             {longTerm ? t("starting") : t("from")}
             <input className={inputClass} min={today} onChange={(event) => setStartDate(event.target.value || today)} type="date" value={startDate} />
@@ -178,15 +183,24 @@ export function Catalog({
         </div>
       </section>
 
-      <p className="px-1 text-sm font-semibold text-[var(--foreground-secondary)]">
-        {vehicles.length === 0
-          ? t("noVehiclesListed")
-          : !datesReady
-            ? t("chooseDatesToSee")
-            : end
-              ? t("freeCountDates", { free: freeCount, total: vehicles.length, start: shortDate(startDate, locale), end: shortDate(end, locale) })
-              : t("freeCountMonthly", { free: freeCount, total: vehicles.length, start: shortDate(startDate, locale) })}
-      </p>
+      {datesReady && vehicles.length > 0 && freeCount === 0 ? (
+        // Nothing free: say so plainly, with the earliest date anything comes free, in a notice rather than a grey line.
+        <div className="rounded-2xl bg-[var(--warning-light)] px-4 py-3 text-sm font-semibold text-[var(--foreground)]">
+          {earliest
+            ? t("noneFreeEarliest", { start: shortDate(startDate, locale), date: shortDate(earliest.freeFrom as string, locale), vehicle: earliest.vehicle.name })
+            : t("noneFree", { start: shortDate(startDate, locale) })}
+        </div>
+      ) : (
+        <p className="px-1 text-sm font-semibold text-[var(--foreground-secondary)]">
+          {vehicles.length === 0
+            ? t("noVehiclesListed")
+            : !datesReady
+              ? t("chooseDatesToSee")
+              : end
+                ? t("freeCountDates", { free: freeCount, total: vehicles.length, start: shortDate(startDate, locale), end: shortDate(end, locale) })
+                : t("freeCountMonthly", { free: freeCount, total: vehicles.length, start: shortDate(startDate, locale) })}
+        </p>
+      )}
 
       <section className="grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {rows.map(({ vehicle, free, freeFrom, openEndedClash }) => {
@@ -218,8 +232,9 @@ export function Catalog({
           const canBook = free && datesReady && bookable;
           return (
             <article className={`flex flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-white shadow-sm ${isOpen ? "sm:col-span-2 lg:col-span-3" : ""}`} key={vehicle.id}>
-              <div className={`relative ${isOpen ? "sm:flex sm:items-start sm:gap-5 sm:p-5" : ""}`}>
-                <div className={`relative aspect-[16/10] bg-[var(--panel-secondary)] ${isOpen ? "sm:w-64 sm:shrink-0 sm:overflow-hidden sm:rounded-xl" : ""} ${!free ? "opacity-70" : ""}`}>
+              <div className={`relative ${isOpen ? "sm:flex sm:items-start sm:gap-5 sm:p-5" : "flex flex-1 flex-col"}`}>
+                {/* Capped at 176px on phones, so three vehicles aren't a long scroll of pictures. */}
+                <div className={`relative aspect-[16/10] max-h-44 w-full bg-[var(--panel-secondary)] sm:max-h-none ${isOpen ? "sm:w-64 sm:shrink-0 sm:overflow-hidden sm:rounded-xl" : ""} ${!free ? "[&>div]:opacity-60 [&>img]:opacity-60" : ""}`}>
                   {vehicle.photoUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img alt={vehicle.name} className="h-full w-full object-cover" src={vehicle.photoUrl} />
@@ -229,22 +244,24 @@ export function Catalog({
                     </div>
                   )}
                   {!free ? (
-                    <span className="absolute left-3 top-3 rounded-full bg-[var(--foreground)]/80 px-3 py-1 text-xs font-bold text-white">
-                      {openEndedClash ? t("onLongTermRental") : t("takenForDates")}
+                    // A light, neutral badge with dark ink (readable on any photo), saying until when rather than just "taken".
+                    <span className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-[var(--foreground)] shadow-sm">
+                      {openEndedClash ? t("onLongTermRental") : freeFrom ? t("bookedUntil", { date: shortDate(freeFrom, locale) }) : t("takenForDates")}
                     </span>
                   ) : null}
                 </div>
                 <div className={`flex min-w-0 flex-1 flex-col ${isOpen ? "p-4 sm:p-0" : "p-4"}`}>
                   <h3 className="text-[17px] font-bold leading-tight text-[var(--foreground)]">{vehicle.name}</h3>
-                  <p className="mt-1 text-sm text-[var(--muted)]">{[vehicle.year, vehicle.color, ...vehicle.details].filter(Boolean).join(" · ")}</p>
+                  {/* Every card has the same lines in the same places (a dash where something is missing), so prices and buttons line up across a row. */}
+                  <p className="mt-1 min-h-5 text-sm text-[var(--muted)]">{[vehicle.year, vehicle.color, ...vehicle.details].filter(Boolean).join(" · ") || "—"}</p>
                   {headline ? (
                     <p className="mt-3 flex flex-wrap items-baseline gap-x-1.5">
                       <span className="text-[22px] font-bold leading-none text-[var(--foreground)]">{money(headline.amount)}</span>
                       {unit ? <span className="text-sm font-semibold text-[var(--muted)]">{unit}</span> : null}
                     </p>
                   ) : null}
-                  {otherRates.length ? <p className="mt-1 text-sm text-[var(--muted)]">{otherRates.join(" · ")}</p> : null}
-                  {vehicle.deposit > 0 ? <p className="mt-1 text-sm text-[var(--muted)]">{t("depositReturnedAtEnd", { amount: money(vehicle.deposit) })}</p> : null}
+                  <p className="mt-1 min-h-5 text-sm text-[var(--muted)]">{otherRates.length ? otherRates.join(" · ") : " "}</p>
+                  <p className="mt-1 text-sm text-[var(--muted)]">{vehicle.deposit > 0 ? t("depositReturnedAtEnd", { amount: money(vehicle.deposit) }) : t("noDeposit")}</p>
                   {/* No price for a stay the vehicle can't be booked for: a slice of the monthly rate is not on offer. */}
                   {free && plan && stayTotal && !tooShort ? (
                     <p className="mt-1 text-sm font-semibold text-[var(--primary)]">
@@ -261,8 +278,10 @@ export function Catalog({
                   ) : null}
                   {tooShort ? <p className="mt-2 text-sm font-semibold text-[var(--warning)]">{tooShort}</p> : null}
                   {!free && freeFrom ? (
+                    // Pinned to the bottom of the card, like Book, so the buttons in a row share one line.
+                    <div className="mt-auto pt-4">
                     <button
-                      className="pressable mt-3 inline-flex min-h-11 items-center justify-center whitespace-nowrap rounded-full border-2 border-[var(--primary)] bg-white px-4 text-sm font-bold text-[var(--primary)]"
+                      className="pressable inline-flex min-h-12 w-full items-center justify-center whitespace-nowrap rounded-full border-2 border-[var(--primary)] bg-white px-4 text-[15px] font-bold text-[var(--primary)]"
                       onClick={() => {
                         // Keep the length of stay they asked for, starting when this vehicle is free.
                         const length = end ? daysBetween(startDate, end) : 0;
@@ -274,6 +293,7 @@ export function Catalog({
                     >
                       {t("startFrom", { date: shortDate(freeFrom, locale) })}
                     </button>
+                    </div>
                   ) : null}
                   {canBook ? (
                     <div className="mt-auto pt-4">

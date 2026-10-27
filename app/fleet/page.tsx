@@ -7,8 +7,9 @@ import { AppShell } from "@/components/app-shell";
 import { Badge, EmptyState } from "@/components/ui";
 import { OutFreeSummary, VehicleKindIcon } from "@/components/vehicle-kind-icon";
 import { VehicleArt } from "@/components/vehicle-art";
+import { PlateChip, VehicleTitle } from "@/components/vehicle-identity";
 import { Dot, Ring, TileHead } from "@/components/glance";
-import { Wrench } from "lucide-react";
+import { CalendarClock } from "lucide-react";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDashboardData, money } from "@/lib/dashboard";
 import { FleetBulkActions } from "@/app/fleet/fleet-actions";
@@ -24,10 +25,23 @@ const statusTone = {
   Reserved: "amber"
 } as const;
 
-function ComplianceBadge({ item, attention = 0 }: { item?: { key?: string; label: string; date: string; daysLeft: number } | null; attention?: number }) {
+/** Every status as a soft tint (teal for on rent, green for free, amber for booked), never one solid pill among tints. */
+function StatusPill({ status, label }: { status: keyof typeof statusTone; label: string }) {
+  if (statusTone[status] === "blue") return <span className="badge inline-flex items-center bg-[var(--primary-light)] text-[var(--primary)]">{label}</span>;
+  return <Badge tone={statusTone[status]}>{label}</Badge>;
+}
+
+function ComplianceBadge({ item, attention = 0, addHref }: { item?: { key?: string; label: string; date: string; daysLeft: number } | null; attention?: number; addHref?: string }) {
   const t = useTranslations("fleet");
   const c = useTranslations("common");
-  if (!item) return <span className="text-[13px] font-medium text-[var(--muted)]">{t("noDates")}</span>;
+  if (!item) {
+    // A quiet way in rather than "No dates recorded" repeated down the column.
+    return addHref ? (
+      <Link className="text-[14px] font-semibold text-[var(--primary)] hover:underline" href={addHref as never}>{t("addDates")}</Link>
+    ) : (
+      <span className="text-[13px] font-medium text-[var(--muted)]">—</span>
+    );
+  }
   const tone = item.daysLeft < 0 ? "red" : item.daysLeft <= 30 ? "amber" : "green";
   const days = Math.abs(item.daysLeft);
   // Road tax, insurance and the rest are named in the reader's language.
@@ -126,7 +140,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
               </Link>
             </div>
           </div>
-          <div className="mt-4 flex flex-wrap gap-2 pb-6 lg:pb-0">
+          <div className="chip-row mt-4 flex flex-wrap gap-2 pb-6 lg:pb-0">
             {(
               [
                 { key: null, count: vehicles.length, label: t("bandVehicles", { count: vehicles.length }), dot: null },
@@ -159,7 +173,8 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
       userEmail={userEmail}
     >
       {vehicles.length > 0 ? (
-        <div className="relative -mt-12 mb-5 grid grid-cols-2 gap-3 lg:mt-0 lg:grid-cols-4">
+        // The row always spans the page: two tiles share it half and half, more tiles share it evenly.
+        <div className={`relative -mt-12 mb-5 grid grid-cols-2 gap-3 lg:mt-0 ${allGroups.length > 1 ? (allGroups.length === 2 ? "lg:grid-cols-4" : "lg:grid-cols-3 xl:grid-cols-5") : "lg:grid-cols-2"}`}>
           <Link className="card pressable tile p-4 text-[var(--foreground)]" href="/calendar">
             <TileHead title={t("busyTitle")} />
             <span className="flex items-center gap-3">
@@ -169,7 +184,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
           </Link>
           {nextPaper ? (
             <Link className="card pressable tile tile-brick p-4" href={`/fleet/${nextPaper.id}`}>
-              <TileHead icon={<Wrench size={22} />} title={paperName(nextPaper.complianceNext!)} />
+              <TileHead icon={<CalendarClock size={22} />} title={paperName(nextPaper.complianceNext!)} />
               <span>
                 <span className="num block text-[24px] leading-tight">{[nextPaper.make, nextPaper.model].filter(Boolean).join(" ")}</span>
                 <span className="font-semibold">{nextPaper.complianceNext!.daysLeft < 0 ? t("paperLate", { date: dayMonth(nextPaper.complianceNext!.date).replace(/ /g, "\u00a0") }) : t("paperDueOn", { date: dayMonth(nextPaper.complianceNext!.date).replace(/ /g, "\u00a0") })}</span>
@@ -177,10 +192,11 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
             </Link>
           ) : noDates.length > 0 ? (
             <Link className="card pressable tile p-4 text-[var(--foreground)]" href={`/fleet/${noDates[0].id}/edit` as never}>
-              <TileHead icon={<Wrench size={22} />} title={t("papersMissingTitle")} />
+              <TileHead title={t("papersMissingTitle")} />
               <span>
                 <span className="num block text-[28px] leading-tight">{noDates.length}</span>
-                <span className="font-semibold text-[var(--foreground-secondary)]">{t("papersMissingDetail", { count: noDates.length })}</span>
+                <span className="measure block font-normal text-[var(--foreground-secondary)]">{t("papersMissingDetail", { count: noDates.length })}</span>
+                <span className="mt-1 block font-semibold text-[var(--primary)]">{t("addDates")}</span>
               </span>
             </Link>
           ) : (
@@ -309,20 +325,16 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                           <Link className="flex min-w-0 items-center gap-3 rounded-md outline-none focus:ring-2 focus:ring-[var(--primary)]/25" href={href}>
                             <VehicleArt colour={vehicle.color} kind={group.kind} model={vehicle.model} size="sm" />
                             <span className="min-w-0">
-                              <span className="block truncate font-semibold text-[var(--foreground)] group-hover:text-[var(--primary)]">
-                                {vehicle.make} {vehicle.model}
-                              </span>
-                              <span className="block truncate text-[14px] text-[var(--muted)]">
-                                <span className="font-mono-data">{vehicle.plate}</span> · {vehicle.year || t("yearUnknown")}
-                                {/* A mileage nobody has entered yet isn't "0 km". */}
-                                {vehicle.mileage > 0 ? ` · ${vehicle.mileage.toLocaleString()} km` : ""}
-                              </span>
+                              {/* The one vehicle header: name, year, plate chip. */}
+                              <VehicleTitle name={`${vehicle.make} ${vehicle.model}`} nameClassName="truncate font-semibold text-[var(--foreground)] group-hover:text-[var(--primary)]" plate={vehicle.plate} year={vehicle.year} />
+                              {/* A mileage nobody has entered yet isn't "0 km". */}
+                              {vehicle.mileage > 0 ? <span className="mt-0.5 block truncate text-[14px] tabular-nums text-[var(--muted)]">{vehicle.mileage.toLocaleString()} km</span> : null}
                             </span>
                           </Link>
                         </td>
                         <td className="px-3 py-3">
                           <span className="inline-block whitespace-nowrap">
-                            {vehicle.freeUntil ? <Badge tone="green">{t("status_freeUntil", { date: dayMonth(vehicle.freeUntil) })}</Badge> : <Badge tone={statusTone[vehicle.status]}>{t(`status_${vehicle.status}`)}</Badge>}
+                            {vehicle.freeUntil ? <Badge tone="green">{t("status_freeUntil", { date: dayMonth(vehicle.freeUntil) })}</Badge> : <StatusPill label={t(`status_${vehicle.status}`)} status={vehicle.status} />}
                           </span>
                         </td>
                         <td className="px-3 py-3">
@@ -338,14 +350,14 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                             <span aria-hidden="true" className="h-2.5 flex-1 overflow-hidden rounded-full bg-[var(--panel-tertiary)]">
                               <span className="grow-x block h-full rounded-full bg-[var(--chart-in)]" style={{ width: `${Math.max(0, Math.min(100, vehicle.utilization))}%` }} />
                             </span>
-                            <span className="num w-11 text-right text-[var(--foreground)]">{vehicle.utilization}%</span>
+                            <span className="w-11 text-right font-semibold tabular-nums text-[var(--foreground)]">{vehicle.utilization}%</span>
                           </div>
                         </td>
                         <td className="px-3 py-3">
-                          <ComplianceBadge attention={vehicle.complianceAttentionCount} item={vehicle.complianceNext} />
+                          <ComplianceBadge addHref={`/fleet/${vehicle.id}/edit`} attention={vehicle.complianceAttentionCount} item={vehicle.complianceNext} />
                         </td>
                         <td className="hidden py-3 pl-3 pr-5 text-right xl:table-cell">
-                          <span className={`font-mono-data ${vehicle.profit < 0 ? "text-[var(--danger)]" : ""}`}>{money(vehicle.profit)}</span>
+                          <span className={`font-semibold tabular-nums ${vehicle.profit < 0 ? "text-[var(--danger)]" : ""}`}>{money(vehicle.profit)}</span>
                         </td>
                       </tr>
                     );
@@ -366,13 +378,14 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                           {vehicle.make} {vehicle.model}
                         </p>
                         <span className="shrink-0 whitespace-nowrap">
-                          {vehicle.freeUntil ? <Badge tone="green">{t("status_freeUntil", { date: dayMonth(vehicle.freeUntil) })}</Badge> : <Badge tone={statusTone[vehicle.status]}>{t(`status_${vehicle.status}`)}</Badge>}
+                          {vehicle.freeUntil ? <Badge tone="green">{t("status_freeUntil", { date: dayMonth(vehicle.freeUntil) })}</Badge> : <StatusPill label={t(`status_${vehicle.status}`)} status={vehicle.status} />}
                         </span>
                       </div>
                       {/* Plate and price each stay whole; on a narrow phone the price drops to its own line instead of being cut off. */}
-                      <p className="mt-0.5 flex flex-wrap gap-x-1.5 font-medium text-[var(--foreground-secondary)]">
-                        <span className="font-mono-data whitespace-nowrap">{vehicle.plate}</span>
-                        {priceOf(vehicle) ? <span className="whitespace-nowrap">· {priceOf(vehicle)}</span> : null}
+                      <p className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 font-medium text-[var(--foreground-secondary)]">
+                        <PlateChip plate={vehicle.plate} />
+                        {vehicle.year ? <span className="whitespace-nowrap text-[var(--muted)]">{vehicle.year}</span> : null}
+                        {priceOf(vehicle) ? <span className="whitespace-nowrap tabular-nums">· {priceOf(vehicle)}</span> : null}
                       </p>
                       {vehicle.complianceNext && vehicle.complianceNext.daysLeft <= 30 ? (
                         <div className="mt-1.5 flex flex-wrap gap-1.5">
@@ -383,7 +396,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                         <span aria-hidden="true" className="h-2.5 flex-1 overflow-hidden rounded-full bg-[var(--panel-tertiary)]">
                           <span className="grow-x block h-full rounded-full bg-[var(--chart-in)]" style={{ width: `${Math.max(0, Math.min(100, vehicle.utilization))}%` }} />
                         </span>
-                        <span className="num flex-shrink-0 whitespace-nowrap text-right text-[15px] text-[var(--foreground)]">{t("utilShort", { pct: vehicle.utilization })}</span>
+                        <span className="flex-shrink-0 whitespace-nowrap text-right text-[15px] font-semibold tabular-nums text-[var(--foreground)]">{t("utilShort", { pct: vehicle.utilization })}</span>
                       </div>
                     </div>
                   </Link>

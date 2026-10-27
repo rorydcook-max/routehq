@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { Handshake } from "lucide-react";
+import { Handshake, Search, Send } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageBand } from "@/components/page-band";
-import { VehicleArt } from "@/components/vehicle-art";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { businessToday } from "@/lib/business-time";
 import { getDefaultOrganization } from "@/lib/organization";
@@ -19,23 +18,29 @@ export default async function PartnersPage() {
 
   return (
     <AppShell hero={<PageBand keepSubtitle subtitle={t("subtitle", { pct: FINDERS_FEE_PCT })} title={t("title")} />} userEmail={userEmail}>
-      <div className="max-w-5xl">
+      {/* Full content width, like the other overview pages. */}
+      <div>
         {settings.enabled ? (
           <PartnersView referrals={referrals} today={businessToday()} />
         ) : (
           <section className="card p-5 lg:p-7">
-            <div aria-hidden="true" className="mb-4 flex items-center gap-3">
-              <VehicleArt colour="white" kind="car" model="City" size="sm" />
-              <span className="h-[3px] w-6 rounded-full bg-[var(--border-strong)]" />
-              <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-[var(--accent-light)] text-[#5c3a0c]">
-                <Handshake size={26} />
-              </span>
-              <span className="h-[3px] w-6 rounded-full bg-[var(--border-strong)]" />
-              <VehicleArt colour="red" kind="scooter" model="Click" size="sm" />
-            </div>
-            <p className="text-[20px] font-bold text-[var(--foreground)]">{t("offTitle")}</p>
-            <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{t("offBody", { pct: FINDERS_FEE_PCT })}</p>
-            <Link className="primary-action pressable mt-4" href="/settings?tab=rentals#partner-network">
+            <h2 className="card-title">{t("offTitle")}</h2>
+            <p className="measure mt-1 font-medium text-[var(--foreground-secondary)]">{t("offBody", { pct: FINDERS_FEE_PCT })}</p>
+            {/* How it works, in three steps: the same tile shape and tint for each, so none reads as a warning. */}
+            <ol className="mt-5 grid gap-3 md:grid-cols-3">
+              {[
+                { icon: <Search size={22} />, text: t("how_1") },
+                { icon: <Send size={22} />, text: t("how_2") },
+                { icon: <Handshake size={22} />, text: t("how_3", { pct: FINDERS_FEE_PCT }) }
+              ].map((step, index) => (
+                <li className="rounded-2xl bg-[var(--panel-secondary)] p-4" key={index}>
+                  <span aria-hidden="true" className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">{step.icon}</span>
+                  <p className="mt-3 text-[13px] font-bold uppercase tracking-[0.06em] text-[var(--muted)]">{t("how_step", { n: index + 1 })}</p>
+                  <p className="mt-0.5 font-semibold text-[var(--foreground)]">{step.text}</p>
+                </li>
+              ))}
+            </ol>
+            <Link className="primary-action pressable mt-5" href="/settings?tab=rentals#partner-network">
               {t("turnOn")}
             </Link>
           </section>

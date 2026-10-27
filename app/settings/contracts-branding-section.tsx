@@ -4,14 +4,17 @@ import { updateContractBrandingSettings } from "@/app/actions/settings";
 import { longDate } from "@/lib/i18n/dates";
 import { LogoUploadSection } from "@/app/settings/logo-upload-section";
 import { SignatureUploadSection } from "@/app/settings/signature-upload-section";
-import { BusinessLogoImage } from "@/components/business-logo-image";
 import { PendingButton } from "@/components/pending-button";
 import { Fold, Pane } from "@/components/ui";
 import { customerLocaleOptions } from "@/lib/i18n/locales";
 import { BrandColourField } from "@/app/settings/brand-colour-field";
 
+// Fields take the global 44px height and regular weight; only the radius/border are set here.
 const inputClass =
-  "mt-1 min-h-11 w-full rounded-xl border border-[var(--border-strong)] bg-white px-3 text-[15px] font-semibold text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]";
+  "mt-1 w-full rounded-xl border border-[var(--border-strong)] bg-white px-3 text-[15px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]";
+
+/** The business details form. The brand card on the right joins it with form="…" so one action saves both. */
+const FORM_ID = "business-details";
 
 export type ContractsBrandingOrganization = {
   id: string;
@@ -37,18 +40,26 @@ export type ContractsBrandingOrganization = {
   signature_authorised_at: string | null;
 };
 
+/**
+ * The Business tab. Left: the business details (everyday contact details, then the rarely touched
+ * agreement details folded away) and where you operate. Right: the brand (logo, colour, "Powered by"),
+ * the signature, and the rental agreement. Each card that has a form ends with its own Save.
+ */
 export function ContractsBrandingSection({
   logoDisplayUrl,
   organization,
   signatureDisplayUrl,
   whiteLabel = false,
   footer,
-  aside
+  aside,
+  locations
 }: {
   /** A line under the details (currency and time zone). */
   footer?: React.ReactNode;
-  /** Other business settings for the right-hand column (agreement, locations). */
+  /** The rental agreement card, under the signature on the right. */
   aside?: React.ReactNode;
+  /** Where you operate, under the business details on the left. */
+  locations?: React.ReactNode;
   logoDisplayUrl: string | null;
   organization: ContractsBrandingOrganization;
   signatureDisplayUrl: string | null;
@@ -56,168 +67,124 @@ export function ContractsBrandingSection({
   whiteLabel?: boolean;
 }) {
   const say = useTranslations("settingsPage") as unknown as (key: string, values?: Record<string, string>) => string;
-  const tBrand = useTranslations("settings.contractsBranding");
   const locale = useLocale();
   const labelClass = "font-semibold text-[var(--foreground-secondary)]";
   const accentColour = organization.contract_accent_colour || "#0e5e6f";
   const tradingName = organization.trading_name || organization.name;
-  const legalName = organization.legal_name || tradingName;
-  const footerText = organization.contract_footer_text || "Issued by the rental business named in this agreement.";
   const poweredByRouteHq = organization.powered_by_routehq_enabled ?? true;
 
   return (
     <div className="grid items-start gap-3 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-    <Pane summary={say("b_body")} title={say("b_title")}>
-      <form action={updateContractBrandingSettings} className="space-y-4">
-        <div className="grid gap-3 sm:grid-cols-2">
-            <label className="block">
-              <span className={labelClass}>{say("b_name")}</span>
-              <input className={inputClass} defaultValue={organization.trading_name || organization.name} name="trading_name" />
-            </label>
-            <label className="block">
-              <span className={labelClass}>{say("b_phone")}</span>
-              <input className={inputClass} defaultValue={organization.business_phone || ""} name="business_phone" type="tel" />
-            </label>
-            <label className="block">
-              <span className={labelClass}>{say("b_whatsapp")}</span>
-              <input className={inputClass} defaultValue={organization.whatsapp || ""} name="whatsapp" />
-            </label>
-            <label className="block">
-              <span className={labelClass}>{say("b_line")}</span>
-              <input className={inputClass} defaultValue={organization.line_id || ""} name="line_id" />
-            </label>
-            <label className="block">
-              <span className={labelClass}>{say("b_email")}</span>
-              <input className={inputClass} defaultValue={organization.business_email || ""} name="business_email" type="email" />
-            </label>
-            <label className="block sm:col-span-2">
-              <span className={labelClass}>{say("b_address")}</span>
-              <textarea className={`${inputClass} min-h-20 py-2`} defaultValue={organization.business_address || ""} name="business_address" />
-            </label>
-        </div>
+      <div className="grid gap-3">
+        <Pane summary={say("b_body")} title={say("b_title")}>
+          <form action={updateContractBrandingSettings} className="space-y-4" id={FORM_ID}>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="block sm:col-span-2">
+                <span className={labelClass}>{say("b_name")}</span>
+                <input className={inputClass} defaultValue={organization.trading_name || organization.name} name="trading_name" />
+              </label>
+              <label className="block">
+                <span className={labelClass}>{say("b_phone")}</span>
+                <input className={inputClass} defaultValue={organization.business_phone || ""} name="business_phone" type="tel" />
+              </label>
+              <label className="block">
+                <span className={labelClass}>{say("b_whatsapp")}</span>
+                <input className={inputClass} defaultValue={organization.whatsapp || ""} name="whatsapp" />
+              </label>
+              <label className="block">
+                <span className={labelClass}>{say("b_line")}</span>
+                <input className={inputClass} defaultValue={organization.line_id || ""} name="line_id" />
+              </label>
+              <label className="block">
+                <span className={labelClass}>{say("b_email")}</span>
+                <input className={inputClass} defaultValue={organization.business_email || ""} name="business_email" type="email" />
+              </label>
+              <label className="block sm:col-span-2">
+                <span className={labelClass}>{say("b_address")}</span>
+                <textarea className={`${inputClass} min-h-20 resize-none py-2`} defaultValue={organization.business_address || ""} name="business_address" rows={2} />
+              </label>
+            </div>
 
-        {/* Set once, rarely touched: kept one tap away so the everyday details stay a short screen. */}
-        <Fold summary={say("b_moreSummary")} title={say("b_moreTitle")}>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <label className="block">
-              <span className={labelClass}>{say("b_legal")}</span>
-              <input className={inputClass} defaultValue={organization.legal_name || ""} name="legal_name" />
-            </label>
-            <label className="block">
-              <span className={labelClass}>{say("b_tax")}</span>
-              <input className={inputClass} defaultValue={organization.registration_or_tax_number || ""} name="registration_or_tax_number" />
-            </label>
-            <label className="block">
-              <span className={labelClass}>{say("b_signer")}</span>
-              <input className={inputClass} defaultValue={organization.authorised_signatory_name || ""} name="authorised_signatory_name" />
-            </label>
-            <label className="block">
-              <span className={labelClass}>{say("b_signerTitle")}</span>
-              <input className={inputClass} defaultValue={organization.authorised_signatory_title || ""} name="authorised_signatory_title" />
-            </label>
-            <label className="block">
-              <span className={labelClass}>{say("b_language")}</span>
-              <select className={inputClass} defaultValue={organization.default_contract_locale || organization.default_locale || "en"} name="default_contract_locale">
-                {customerLocaleOptions.map((locale) => (
-                  <option key={locale.code} value={locale.code}>
-                    {locale.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="block sm:col-span-2">
-              <span className={labelClass}>{say("b_footer")}</span>
-              <input className={inputClass} defaultValue={organization.contract_footer_text || ""} name="contract_footer_text" />
-            </label>
-          </div>
-        </Fold>
+            {/* Set once, rarely touched: kept one tap away so the everyday details stay a short screen. */}
+            <Fold summary={say("b_moreSummary")} title={say("b_moreTitle")}>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className="block">
+                  <span className={labelClass}>{say("b_legal")}</span>
+                  <input className={inputClass} defaultValue={organization.legal_name || ""} name="legal_name" />
+                </label>
+                <label className="block">
+                  <span className={labelClass}>{say("b_tax")}</span>
+                  <input className={inputClass} defaultValue={organization.registration_or_tax_number || ""} name="registration_or_tax_number" />
+                </label>
+                <label className="block">
+                  <span className={labelClass}>{say("b_signer")}</span>
+                  <input className={inputClass} defaultValue={organization.authorised_signatory_name || ""} name="authorised_signatory_name" />
+                </label>
+                <label className="block">
+                  <span className={labelClass}>{say("b_signerTitle")}</span>
+                  <input className={inputClass} defaultValue={organization.authorised_signatory_title || ""} name="authorised_signatory_title" />
+                </label>
+                <label className="block">
+                  <span className={labelClass}>{say("b_language")}</span>
+                  <select className={inputClass} defaultValue={organization.default_contract_locale || organization.default_locale || "en"} name="default_contract_locale">
+                    {customerLocaleOptions.map((option) => (
+                      <option key={option.code} value={option.code}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block sm:col-span-2">
+                  <span className={labelClass}>{say("b_footer")}</span>
+                  <input className={inputClass} defaultValue={organization.contract_footer_text || ""} name="contract_footer_text" />
+                </label>
+              </div>
+            </Fold>
 
-        {/* Their brand: one colour and their logo, on every page a customer sees and, on a white-label plan, in the app itself. */}
-        <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5">
-          <p className="font-bold text-[var(--foreground)]">{say("b_brandTitle")}</p>
-          <p className="mt-1 text-sm text-[var(--muted)]">{whiteLabel ? say("b_brandBodyApp") : say("b_brandBody")}</p>
-          <div className="mt-3 space-y-3">
-            <BrandColourField customLabel={say("b_colourCustom")} hint={say("b_colourHint")} initial={accentColour} key={accentColour} label={say("b_colour")} />
-            <label className={`checkbox-label sub-surface min-h-10 w-fit max-w-full font-semibold text-[var(--foreground)] ${whiteLabel ? "" : "opacity-60"}`} style={{ display: "flex", alignItems: "center", padding: "8px 12px" }}>
-              <input defaultChecked={poweredByRouteHq || !whiteLabel} disabled={!whiteLabel} name="powered_by_routehq_enabled" type="checkbox" value="true" />
+            <PendingButton className="primary-action w-full sm:w-auto" pendingLabel={say("saving")} savedLabel={say("saved")} type="submit">
+              {say("save")}
+            </PendingButton>
+          </form>
+          {footer ? <div className="mt-4 border-t border-[var(--border)] pt-3">{footer}</div> : null}
+        </Pane>
+        {locations}
+      </div>
+
+      <div className="grid gap-3">
+        {/* Their brand in one place: logo, colour and "Powered by", on every page a customer sees and,
+            on a white-label plan, in the app itself. The logo saves as soon as it is chosen; the colour
+            and the "Powered by" choice belong to the business details form and save with it. */}
+        <section className="card p-4">
+          <h2 className="card-title">{say("b_brandTitle")}</h2>
+          <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{whiteLabel ? say("b_brandBodyApp") : say("b_brandBody")}</p>
+          <div className="mt-3 space-y-4">
+            <LogoUploadSection logoUrl={logoDisplayUrl} orgName={tradingName} />
+            <BrandColourField customLabel={say("b_colourCustom")} form={FORM_ID} hint={say("b_colourHint")} initial={accentColour} key={accentColour} label={say("b_colour")} previewLabel={say("b_colourPreview")} />
+            <label className={`flex cursor-pointer items-start gap-3 font-medium text-[var(--foreground)] ${whiteLabel ? "" : "opacity-60"}`}>
+              <input className="mt-0.5 h-5 w-5 shrink-0" defaultChecked={poweredByRouteHq || !whiteLabel} disabled={!whiteLabel} form={FORM_ID} name="powered_by_routehq_enabled" type="checkbox" value="true" />
               <span>
                 {say("b_powered")}
-                {!whiteLabel ? <span className="block text-sm font-medium text-[var(--muted)]">{say("b_poweredPlan")}</span> : null}
+                {!whiteLabel ? <span className="block text-sm text-[var(--muted)]">{say("b_poweredPlan")}</span> : null}
               </span>
             </label>
           </div>
-        </div>
-
-        <PendingButton className="primary-action w-full sm:w-auto" pendingLabel={say("saving")} savedLabel={say("saved")} type="submit">
-          {say("save")}
-        </PendingButton>
-      </form>
-      {footer ? <div className="mt-4 border-t border-[var(--border)] pt-3">{footer}</div> : null}
-    </Pane>
-
-      <div className="grid gap-3">
-        <section className="card p-1 [&>div]:!bg-white">
-          <LogoUploadSection logoUrl={logoDisplayUrl} orgName={tradingName} />
+          <button className="primary-action pressable mt-4 w-full sm:w-auto" form={FORM_ID} type="submit">
+            {say("save")}
+          </button>
         </section>
-        <section className="card p-1 [&>div]:!bg-white">
-        <SignatureUploadSection
-          authorisedSignatoryName={organization.authorised_signatory_name}
-          authorisedSignatoryTitle={organization.authorised_signatory_title}
-          orgName={tradingName}
-          signatureUrl={signatureDisplayUrl}
-        />
-        {organization.signature_authorised_at ? (
-          <p className="px-3.5 pb-3 font-medium text-[var(--muted)]">{say("b_sigRecorded", { date: longDate(toWallTime(organization.signature_authorised_at).slice(0, 10), locale) })}</p>
-        ) : null}
+
+        <section className="card p-4">
+          <SignatureUploadSection
+            authorisedSignatoryName={organization.authorised_signatory_name}
+            authorisedSignatoryTitle={organization.authorised_signatory_title}
+            orgName={tradingName}
+            signatureUrl={signatureDisplayUrl}
+          />
+          {organization.signature_authorised_at ? (
+            <p className="mt-3 text-sm font-medium text-[var(--muted)]">{say("b_sigRecorded", { date: longDate(toWallTime(organization.signature_authorised_at).slice(0, 10), locale) })}</p>
+          ) : null}
         </section>
         {aside}
-        <Fold summary={say("b_prevSummary")} title={say("b_prevTitle")}>
-        <div className="rounded-lg border border-[var(--border)] bg-white p-4">
-          <div className="flex items-start justify-between gap-4 border-b border-[var(--border)] pb-4">
-            <BusinessLogoImage alt={`${tradingName} logo`} className="h-14 w-auto max-w-[200px] object-contain object-left" src={logoDisplayUrl} />
-            <div className="text-right">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.08em]" style={{ color: accentColour }}>
-                {say("b_prevHead")}
-              </p>
-              <p className="mt-1 text-lg font-semibold text-[var(--foreground)]">{tradingName}</p>
-              <p className="text-xs text-[var(--muted)]">{legalName}</p>
-            </div>
-          </div>
-
-          <div className="mt-4 rounded-lg border-l-4 bg-[var(--panel-secondary)] p-3" style={{ borderColor: accentColour }}>
-            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{say("b_between")}</p>
-            <p className="mt-2 text-base font-semibold text-[var(--foreground)]">{legalName}</p>
-            <p className="text-sm text-[var(--muted)]">{say("b_and")}</p>
-            <p className="text-base font-semibold text-[var(--foreground)]">Alex Morgan</p>
-          </div>
-
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-lg border border-[var(--border)] p-3">
-              <p className="text-[11px] font-bold uppercase text-[var(--muted)]">{say("b_customer")}</p>
-              <p className="mt-1 text-sm font-bold text-[var(--foreground)]">Alex Morgan</p>
-              <p className="text-xs text-[var(--muted)]">{say("b_passport")}</p>
-            </div>
-            <div className="rounded-lg border border-[var(--border)] p-3">
-              <p className="text-[11px] font-bold uppercase text-[var(--muted)]">{say("b_vehicle")}</p>
-              <p className="mt-1 text-sm font-bold text-[var(--foreground)]">Toyota Yaris Ativ</p>
-              <p className="text-xs text-[var(--muted)]">กข 1234 Bangkok</p>
-            </div>
-          </div>
-
-          <div className="mt-4 flex items-end justify-between gap-3 border-t border-[var(--border)] pt-4">
-            <div>
-              <p className="text-xs font-bold text-[var(--foreground)]">{organization.authorised_signatory_name || say("b_signerDefault")}</p>
-              <p className="text-[11px] text-[var(--muted)]">{organization.authorised_signatory_title || say("b_signerTitleDefault")}</p>
-            </div>
-            <BusinessLogoImage alt="Authorised signature" className="stay-light h-14 w-36 rounded-lg border border-[var(--border)] bg-white object-contain p-2" src={signatureDisplayUrl} fallback={<div className="h-14 w-36 rounded-lg border border-dashed border-[var(--border)] bg-white p-2 text-center text-[11px] text-[var(--muted)]">{say("b_signature")}</div>} />
-          </div>
-
-          <div className="mt-4 border-t border-[var(--border)] pt-3 text-center text-[11px] text-[var(--muted)]">
-            <p>{footerText}</p>
-            {poweredByRouteHq ? <p className="mt-1 font-semibold">{tBrand("poweredBy")}</p> : null}
-          </div>
-        </div>
-        </Fold>
       </div>
     </div>
   );

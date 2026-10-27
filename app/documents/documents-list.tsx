@@ -5,7 +5,8 @@ import { useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { CalendarDays, Car, ChevronRight, FileSignature, FileText, Images, Search, UserRound } from "lucide-react";
 import type { DocumentListItem } from "@/lib/documents-hub";
-import { longDate } from "@/lib/i18n/dates";
+import { longDate, shortDate } from "@/lib/i18n/dates";
+import { EmptyState } from "@/components/ui";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
@@ -98,25 +99,26 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
   void rows;
 
   return (
-    <div className="space-y-3">
-      <div className="space-y-2.5">
-        <label className="relative block">
-          <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--foreground-secondary)]" size={18} />
+    <div className="space-y-4">
+      {/* The same toolbar as Bookings: search on the left, filters on the right, one row on a wide screen. */}
+      <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+        <label className="relative block min-w-0 flex-1">
+          <Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted)]" size={18} />
           <input
             aria-label={say("search")}
-            className="input-with-leading-icon w-full"
+            className="input-with-leading-icon min-h-11 w-full rounded-full border border-[var(--border)] bg-white pr-4 text-[var(--foreground)] outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
             onChange={(event) => setSearch(event.target.value)}
             placeholder={say("search")}
             value={search}
           />
         </label>
         {ownerTypes.length > 2 ? (
-          // One row that scrolls sideways on a phone (three wrapped rows pushed the files down); wraps from tablet width.
-          <div aria-label={say("show")} className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0" role="group">
+          // One scrolling line on a phone (with a fade at the edge), a normal row on desktop.
+          <div aria-label={say("show")} className="chip-row flex flex-wrap gap-2 xl:justify-end" role="group">
             {ownerTypes.map((type) => (
               <button
                 aria-pressed={ownerFilter === type}
-                className={`pressable shrink-0 whitespace-nowrap rounded-full border-2 px-4 py-2 text-[14px] font-bold ${ownerFilter === type ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground-secondary)]"}`}
+                className={`pressable min-h-11 min-w-fit shrink-0 whitespace-nowrap rounded-full border px-4 font-bold ${ownerFilter === type ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border-strong)] bg-white text-[var(--foreground)]"}`}
                 key={type}
                 onClick={() => setOwnerFilter(type)}
                 type="button"
@@ -129,12 +131,10 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
       </div>
 
       {filtered.length === 0 ? (
-        <div className="card p-4">
-          <p className="text-[17px] font-bold text-[var(--foreground)]">{documents.length === 0 ? say("emptyTitle") : say("noMatchTitle")}</p>
-          <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{documents.length === 0 ? say("emptyBody") : say("noMatchBody")}</p>
-        </div>
+        <EmptyState description={documents.length === 0 ? say("emptyBody") : say("noMatchBody")} title={documents.length === 0 ? say("emptyTitle") : say("noMatchTitle")} />
       ) : (
-        <div className="grid gap-3 xl:grid-cols-2">
+        // items-start: each card is only as tall as its files (a one-file card no longer stretches to match its 36-file neighbour).
+        <div className="grid items-start gap-3 xl:grid-cols-2">
           {(search.trim() ? folders : folders.slice(0, dayLimit * 2)).map((folder) => {
             const expanded = open.has(folder.key);
             const shown = expanded ? folder.files : folder.files.slice(0, 5);
@@ -158,10 +158,18 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
                 <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6 xl:grid-cols-4 2xl:grid-cols-6">
                   {shown.map((document) => {
                     const picture = document.mimeType?.startsWith("image/") && document.signedUrl;
-                    const label = fileLabel(document);
+                    const baseLabel = fileLabel(document);
+                    // Two of the same kind (an older and a newer licence): the date tells them apart.
+                    const twin = shown.filter((other) => fileLabel(other) === baseLabel).length > 1;
+                    const label = twin && document.createdAt ? `${baseLabel} · ${shortDate(String(document.createdAt).slice(0, 10), locale)}` : baseLabel;
+                    const PlaceholderIcon = document.ownerType === "customer" ? UserRound : document.ownerType === "inspection" ? Images : FileText;
                     const tile = picture ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img alt={label} className="aspect-[4/3] w-full rounded-xl bg-[var(--panel-secondary)] object-cover" loading="lazy" src={document.signedUrl as string} />
+                      // An icon sits under the picture, so a slow or failed load shows what the file is rather than a blank grey box.
+                      <span className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-xl bg-[var(--panel-secondary)] text-[var(--primary)]">
+                        <PlaceholderIcon aria-hidden="true" size={22} />
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img alt={label} className="absolute inset-0 h-full w-full object-cover" loading="lazy" onError={(event) => { event.currentTarget.style.display = "none"; }} src={document.signedUrl as string} />
+                      </span>
                     ) : (
                       <span className={`flex aspect-[4/3] w-full items-center justify-center rounded-xl ${document.ownerType === "signed" ? "bg-[var(--success-light)] text-[var(--success)]" : "bg-[var(--panel-secondary)] text-[var(--primary)]"}`}>
                         {document.ownerType === "signed" ? <FileSignature size={22} /> : document.ownerType === "inspection" ? <Images size={22} /> : <FileText size={22} />}
@@ -170,13 +178,13 @@ export function DocumentsList({ documents }: { documents: DocumentListItem[] }) 
                     return (
                       <a className="pressable group block min-w-0" href={document.signedUrl || document.href || "#"} key={document.id} rel="noreferrer" target={document.signedUrl ? "_blank" : undefined} title={label}>
                         {tile}
-                        <span className="mt-1 line-clamp-2 block text-[14px] font-semibold leading-tight text-[var(--foreground-secondary)] group-hover:text-[var(--primary)]">{label}</span>
+                        <span className="mt-1 block truncate text-[14px] font-semibold leading-tight text-[var(--foreground-secondary)] group-hover:text-[var(--primary)]">{label}</span>
                       </a>
                     );
                   })}
                   {folder.files.length > shown.length ? (
                     <button
-                      className="pressable flex aspect-[4/3] w-full items-center justify-center rounded-xl bg-[var(--panel-secondary)] font-bold text-[var(--primary)]"
+                      className="pressable flex aspect-[4/3] w-full items-center justify-center self-start rounded-xl bg-[var(--primary-light)] font-bold text-[var(--primary)] transition hover:bg-[var(--primary)] hover:text-white"
                       onClick={() => setOpen((current) => new Set(current).add(folder.key))}
                       type="button"
                     >

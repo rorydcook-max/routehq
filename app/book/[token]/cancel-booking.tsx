@@ -33,7 +33,8 @@ export function CancelBooking({ token, organizationName }: { token: string; orga
     return (
       <p className="pb-4 text-center text-sm text-[var(--muted)]">
         {t("plansChanged")}{" "}
-        <button className="min-h-11 font-semibold text-[var(--foreground-secondary)] underline underline-offset-2" onClick={() => setOpen(true)} type="button">
+        {/* The product's one link style: brand ink, underlined only on hover. */}
+        <button className="min-h-11 font-semibold text-[var(--primary)] hover:underline" onClick={() => setOpen(true)} type="button">
           {t("cancelThisBooking")}
         </button>
       </p>

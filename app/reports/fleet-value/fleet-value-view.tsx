@@ -5,12 +5,20 @@ import { useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { longDate, numberLocale } from "@/lib/i18n/dates";
 import type { Valuation } from "@/lib/vehicle-valuation";
+import { VehicleArt } from "@/components/vehicle-art";
+import { VehicleTitle } from "@/components/vehicle-identity";
+import type { VehicleKind } from "@/lib/vehicle-groups";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
 export type ValueRow = {
   id: string;
+  /** Make, model and version; the year is shown beside it. */
   name: string;
+  year: string | number | null;
+  colour: string | null;
+  model: string | null;
+  kind: VehicleKind;
   plate: string;
   hasYear: boolean;
   condition: string | null;
@@ -69,9 +77,14 @@ export function FleetValueView({ rows: initial, currency, canEstimate }: { rows:
 
   return (
     <div className="space-y-4">
-      <section className="rounded-2xl border border-[var(--border)] bg-white p-5">
+      <section className="card p-5">
         <p className="text-sm font-semibold text-[var(--muted)]">{t("worthNow")}</p>
-        <p className="mt-1 text-4xl font-bold">{money(worth)}</p>
+        {/* Nothing valued yet is not "worth ฿0": say so plainly instead of a zero headline. */}
+        {valued > 0 ? (
+          <p className="num mt-1 text-4xl leading-tight">{money(worth)}</p>
+        ) : (
+          <p className="mt-1 text-[26px] font-semibold leading-tight text-[var(--foreground-secondary)]">{t("notEstimatedYet")}</p>
+        )}
         <p className="mt-2 text-sm text-[var(--foreground-secondary)]">
           {say("valuedCount", { valued, total: rows.length })}
         </p>
@@ -91,7 +104,7 @@ export function FleetValueView({ rows: initial, currency, canEstimate }: { rows:
                 <p className="mt-1 text-xs text-[var(--muted)]">{t("checkingHint")}</p>
               </div>
             ) : toCheck.length ? (
-              <button className="btn-primary w-full justify-center py-3 sm:w-auto sm:px-6" onClick={() => estimate(toCheck)} type="button">
+              <button className="btn-primary w-full justify-center sm:w-auto sm:px-6" onClick={() => estimate(toCheck)} type="button">
                 {say("estimate", { count: toCheck.length })}
               </button>
             ) : (
@@ -102,21 +115,26 @@ export function FleetValueView({ rows: initial, currency, canEstimate }: { rows:
         ) : null}
       </section>
 
-      <ul className="space-y-3">
+      <ul className="grid gap-3 xl:grid-cols-2">
         {rows.map((row) => {
           const change = row.paid && row.value ? row.value - row.paid : null;
           const underInsured = row.sumInsured && row.value ? row.sumInsured < row.value * 0.85 : false;
           return (
-            <li className="rounded-2xl border border-[var(--border)] bg-white p-4" key={row.id}>
+            <li className="card p-4" key={row.id}>
               <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <Link className="font-bold text-[var(--foreground)] hover:underline" href={`/fleet/${row.id}`}>
-                    {row.name}
-                  </Link>
-                  <p className="text-sm text-[var(--muted)]">{[row.plate, row.mileage ? `${row.mileage.toLocaleString("en-US")} km` : null].filter(Boolean).join(" · ")}</p>
-                </div>
+                <Link className="group flex min-w-0 items-center gap-3" href={`/fleet/${row.id}`}>
+                  <VehicleArt colour={row.colour} kind={row.kind} model={row.model} size="sm" />
+                  <span className="min-w-0">
+                    <VehicleTitle name={row.name} nameClassName="font-semibold text-[var(--foreground)] group-hover:underline" plate={row.plate} year={row.year} />
+                    {row.mileage ? <span className="mt-0.5 block text-sm tabular-nums text-[var(--muted)]">{`${row.mileage.toLocaleString("en-US")} km`}</span> : null}
+                  </span>
+                </Link>
                 <div className="shrink-0 text-right">
-                  <p className="text-lg font-bold">{row.value ? money(row.value) : t("notValued")}</p>
+                  {row.value ? (
+                    <p className="text-[17px] font-semibold tabular-nums">{money(row.value)}</p>
+                  ) : (
+                    <span className="badge inline-flex items-center bg-[var(--panel-tertiary)] text-[var(--muted)]">{t("notValued")}</span>
+                  )}
                   {row.ownFigure ? <p className="text-xs text-[var(--muted)]">{t("yourFigure")}</p> : null}
                 </div>
               </div>
@@ -149,19 +167,19 @@ export function FleetValueView({ rows: initial, currency, canEstimate }: { rows:
                 ) : null}
                 {row.sumInsured ? <p className={underInsured ? "font-semibold text-[var(--warning)]" : ""}>{say(underInsured ? "underInsured" : "insuredFor", { amount: money(row.sumInsured) })}</p> : null}
               </div>
-              <div className="mt-3 flex flex-wrap gap-4 text-sm font-semibold text-[var(--primary)]">
-                <Link href={`/fleet/${row.id}/edit`}>{row.paid ? t("editFigures") : t("addPaid")}</Link>
+              <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm font-semibold">
                 {canEstimate && !working ? (
-                  <button onClick={() => estimate([row])} type="button">
+                  <button className="secondary-action pressable !min-h-9 !px-4 !text-[14px]" onClick={() => estimate([row])} type="button">
                     {row.valuation ? t("checkAgain") : t("estimateOne")}
                   </button>
                 ) : null}
+                <Link className="text-[var(--primary)] hover:underline" href={`/fleet/${row.id}/edit`}>{row.paid ? t("editFigures") : t("addPaid")}</Link>
               </div>
             </li>
           );
         })}
       </ul>
-      <p className="text-xs text-[var(--muted)]">{t("footnote")}</p>
+      <p className="measure text-xs text-[var(--muted)]">{t("footnote")}</p>
     </div>
   );
 }

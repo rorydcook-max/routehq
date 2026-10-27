@@ -1,7 +1,6 @@
-import type { Route } from "next";
-import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/app-shell";
+import { BackLink } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { agreementExtraTerms } from "@/lib/contract-rendering";
 import { buildSampleContractVariables, embedLogoInContractVariables, ensureDefaultContractTemplate } from "@/lib/contracts";
@@ -39,16 +38,14 @@ export default async function ContractSettingsPage() {
     { label: say("ag_n_repair"), value: feeOn(policy, "emergency_repair_limit") ? amount(policy.emergency_repair_limit) : say("tp_off_emergency_repair_limit") },
     { label: say("ag_n_area"), value: policy.home_territory },
     { label: say("ag_n_law"), value: policy.jurisdiction }
-  ];
+  ].map((row) => ({ ...row, value: String(row.value || "").replace(/^[a-z]/, (letter) => letter.toUpperCase()) })); // "the Kingdom of Thailand" reads as a value, not mid-sentence
 
   return (
     <AppShell userEmail={userEmail}>
-      <div className="mx-auto max-w-3xl">
+      <div className="page-form">
         <div className="page-hero mb-4">
-          <Link className="font-bold text-[var(--primary)]" href={"/settings?tab=business" as Route}>
-            {say("backToSettings")}
-          </Link>
-          <h1 className="page-title mt-2">{say("ag_title")}</h1>
+          <BackLink href="/settings?tab=business" label={say("title")} />
+          <h1 className="page-title">{say("ag_title")}</h1>
           <p className="page-subtitle page-subtitle-keep mt-1">{say("ag_subtitle")}</p>
         </div>
 

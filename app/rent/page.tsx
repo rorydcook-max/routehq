@@ -1,10 +1,10 @@
 import type { Metadata, Route } from "next";
-import { Search } from "lucide-react";
+import { ChevronRight, MapPin, Search } from "lucide-react";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { BusinessLogoImage } from "@/components/business-logo-image";
 import { RouteHqLogo } from "@/components/brand-logo";
-import { CustomerLanguagePicker } from "@/components/customer-language-picker";
+import { PublicShell, publicCard } from "@/components/public-shell";
 import { VehicleArt } from "@/components/vehicle-art";
 import { businessToday } from "@/lib/business-time";
 import { searchDirectory, type DirectoryBusiness } from "@/lib/directory";
@@ -12,6 +12,8 @@ import { searchDirectory, type DirectoryBusiness } from "@/lib/directory";
 export const dynamic = "force-dynamic";
 
 const KINDS = ["any", "car", "scooter", "motorbike", "van", "atv", "ebike"];
+/** Where most rentals are: quick starts before anyone has searched. Place names, so not translated. */
+const POPULAR = ["Koh Samui", "Phuket", "Chiang Mai"];
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("directory");
@@ -35,21 +37,25 @@ export default async function DirectoryPage({ searchParams }: { searchParams: Pr
   const searched = Boolean(params.from || params.place || params.kind);
   const results: DirectoryBusiness[] = searched ? await searchDirectory({ place, startDate, endDate, kind }) : [];
   const total = results.reduce((sum, business) => sum + business.vehicles.length, 0);
-  const inputClass = "mt-1 w-full rounded-xl border border-[var(--border)] bg-white px-3 py-3 text-[16px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15";
+  // Every control in the search row is the app's standard 44px field, so tops and bottoms line up with the button.
+  const inputClass = "mt-1 w-full text-[16px]";
   const bookHref = (slug: string, vehicleId: string) => `/rent/${slug}?from=${startDate}${endDate ? `&to=${endDate}` : ""}&vehicle=${vehicleId}&via=directory`;
 
   return (
-    <main className="min-h-screen bg-[var(--panel-secondary)] px-4 py-5 text-[var(--foreground)]">
-      <div className="mx-auto max-w-4xl space-y-5">
-        <div className="flex items-center justify-between gap-3">
-          <a aria-label="RouteHQ" href="/rent"><RouteHqLogo className="h-7 w-auto" showDescriptor={false} /></a>
-          <CustomerLanguagePicker />
-        </div>
-        <header className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
+    <PublicShell
+      brand={
+        <a aria-label="RouteHQ" className="inline-flex" href="/rent">
+          <RouteHqLogo showDescriptor={false} />
+        </a>
+      }
+      width="wide"
+    >
+      <div className="space-y-5">
+        <header className={publicCard}>
           <h1 className="text-2xl font-semibold">{t("title")}</h1>
-          <p className="mt-1 text-[15px] text-[var(--muted)]">{t("subtitle")}</p>
-          <form action="/rent" className="mt-4 grid gap-3 sm:grid-cols-[1.2fr_1fr_1fr_1fr_auto]" method="get">
-            <label className="block text-sm font-semibold text-[var(--foreground-secondary)]">
+          <p className="measure mt-1 text-[15px] text-[var(--muted)]">{t("subtitle")}</p>
+          <form action="/rent" className="mt-4 grid items-end gap-3 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr_auto]" method="get">
+            <label className="block text-sm font-semibold text-[var(--foreground-secondary)] sm:col-span-2 lg:col-span-1">
               {t("where")}
               <input className={inputClass} defaultValue={place} name="place" placeholder={t("wherePlaceholder")} />
             </label>
@@ -71,7 +77,7 @@ export default async function DirectoryPage({ searchParams }: { searchParams: Pr
                 ))}
               </select>
             </label>
-            <button className="pressable mt-1 inline-flex min-h-[50px] items-center justify-center gap-2 self-end rounded-full bg-[var(--primary)] px-5 text-[16px] font-semibold text-white" type="submit">
+            <button className="pressable inline-flex h-11 items-center justify-center gap-2 rounded-full bg-[var(--primary)] px-6 text-[16px] font-semibold text-white sm:col-span-2 lg:col-span-1" type="submit">
               <Search size={18} /> {t("search")}
             </button>
           </form>
@@ -146,11 +152,47 @@ export default async function DirectoryPage({ searchParams }: { searchParams: Pr
             </section>
           )
         ) : (
-          <p className="text-center text-sm text-[var(--muted)]">{t("hint")}</p>
+          // Before a search: popular places to start from and how booking works, instead of an empty page.
+          <>
+            <section>
+              <h2 className="text-lg font-semibold">{t("popularTitle")}</h2>
+              <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                {POPULAR.map((spot) => (
+                  <Link
+                    className="pressable flex items-center justify-between gap-3 rounded-2xl border border-[var(--border)] bg-white p-4 shadow-sm hover:border-[var(--primary)]"
+                    href={`/rent?place=${encodeURIComponent(spot)}&from=${today}` as Route}
+                    key={spot}
+                  >
+                    <span className="flex items-center gap-3">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
+                        <MapPin size={18} />
+                      </span>
+                      <span className="font-semibold">{spot}</span>
+                    </span>
+                    <ChevronRight className="text-[var(--muted)] rtl:rotate-180" size={18} />
+                  </Link>
+                ))}
+              </div>
+            </section>
+            <section className={publicCard}>
+              <h2 className="text-lg font-semibold">{t("howTitle")}</h2>
+              <ol className="mt-4 grid gap-4 sm:grid-cols-3">
+                {[1, 2, 3].map((step) => (
+                  <li className="flex gap-3" key={step}>
+                    <span className="num flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] text-sm font-bold text-white">{step}</span>
+                    <span>
+                      <span className="block font-semibold">{t(`step${step}Title`)}</span>
+                      <span className="mt-0.5 block text-sm text-[var(--muted)]">{t(`step${step}Body`)}</span>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          </>
         )}
 
-        <p className="pb-6 text-center text-xs text-[var(--muted)]">{t("footer")}</p>
+        <p className="measure mx-auto pb-2 text-center text-xs text-[var(--muted)]">{t("footer")}</p>
       </div>
-    </main>
+    </PublicShell>
   );
 }

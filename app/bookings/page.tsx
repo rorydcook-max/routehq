@@ -45,7 +45,7 @@ export default async function BookingsPage({ searchParams }: { searchParams: Pro
               items={[
                 { count: onRent, label: t("bandOnRent"), dot: "var(--band-dot)", href: shown === "on_rent" ? "/bookings" : "/bookings?status=on_rent", active: shown === "on_rent" },
                 { count: starting, label: t("bandStarting"), dot: "var(--going-out)", href: shown === "starting" ? "/bookings" : "/bookings?status=starting", active: shown === "starting" },
-                { count: owing, label: t("bandOwing"), alert: true, href: shown === "owing" ? "/bookings" : "/bookings?status=owing", active: shown === "owing" }
+                { count: owing, label: t("bandOwing"), dot: "var(--danger)", alert: true, href: shown === "owing" ? "/bookings" : "/bookings?status=owing", active: shown === "owing" }
               ]}
             />
           </div>

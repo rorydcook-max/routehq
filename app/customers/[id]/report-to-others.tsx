@@ -78,9 +78,10 @@ export function ReportToOthers({ customerId, reports, rentals, canReport }: { cu
     });
 
   return (
-    <div>
+    // "contents": the link and any open form sit in the parent's row of quiet controls, beside "Don't rent to them again".
+    <div className="contents">
       {reports.length ? (
-        <div className="mt-3 rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
+        <div className="w-full rounded-xl bg-[var(--panel-secondary)] p-3">
           <p className="text-sm font-bold text-[var(--foreground)]">{t("ownTitle")}</p>
           <ul className="mt-2 space-y-2">
             {reports.map((report) => (
@@ -127,12 +128,12 @@ export function ReportToOthers({ customerId, reports, rentals, canReport }: { cu
       ) : null}
 
       {!canReport || !rentals.length ? null : !open ? (
-        <button className="tap-target mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--muted)] hover:text-[var(--warning)]" onClick={() => setOpen(true)} type="button">
+        <button className="tap-target inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--muted)] hover:text-[var(--warning)]" onClick={() => setOpen(true)} type="button">
           <Megaphone size={15} />
           {t("add")}
         </button>
       ) : (
-        <div className="mt-3 rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
+        <div className="w-full rounded-xl bg-[var(--panel-secondary)] p-3">
           <p className="font-bold text-[var(--foreground)]">{t("formTitle")}</p>
           <p className="mt-1 text-sm text-[var(--muted)]">{t("formHint")}</p>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">

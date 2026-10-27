@@ -23,6 +23,7 @@ import { ArrowDownRight, ArrowLeftRight, ArrowUpRight, Check, CheckCircle2, Chev
 import { dateFormat, longDate, sinceDate } from "@/lib/i18n/dates";
 import { Dot, InOutBars, Ring } from "@/components/glance";
 import { VehicleArt } from "@/components/vehicle-art";
+import { VehicleTitle } from "@/components/vehicle-identity";
 import { kindFromCategory } from "@/lib/vehicle-groups";
 import type { DatePreset, ReportsData, VehicleMetrics } from "@/lib/reports";
 
@@ -39,9 +40,9 @@ export function money(value: number) {
   return `${rounded < 0 ? "-" : ""}${BAHT}${Math.abs(rounded).toLocaleString("en-US")}`;
 }
 
-const h2 = "text-[17px] font-bold text-[var(--foreground)]";
+const h2 = "card-title";
 const soft = "font-medium text-[var(--foreground-secondary)]";
-const tile = "rounded-xl bg-[var(--panel-secondary)] p-3.5";
+const tile = "rounded-2xl bg-[var(--panel-secondary)] p-3.5";
 
 /** How a figure moved against the period before. Nothing shown when there is nothing to compare with. */
 function Change({ change, upIsBad = false, say }: { change: number | null; upIsBad?: boolean; say: Say }) {
@@ -148,7 +149,7 @@ export function Breakdown({ title, rows, typeLabel, say, palette = CHART_COLORS,
                 <span className="flex items-center justify-between gap-3">
                   <span className="flex min-w-0 items-center gap-2 font-semibold text-[var(--foreground)]"><Dot color={slice.color} />{slice.name}</span>
                   <span className="whitespace-nowrap">
-                    <span className="num text-[16px] text-[var(--foreground)]">{money(slice.amount)}</span>
+                    <span className="text-[16px] font-semibold tabular-nums text-[var(--foreground)]">{money(slice.amount)}</span>
                     {total > 0 ? <span className={`ml-1.5 ${soft}`}>{Math.round((slice.amount / total) * 100)}%</span> : null}
                   </span>
                 </span>
@@ -239,8 +240,7 @@ function VehicleTile({ vehicle, comparing, selected, onSelect, href, say }: { ve
       <span className="flex items-center gap-3">
         <VehicleArt colour={vehicle.color} kind={kindFromCategory(vehicle.category as never)} model={vehicle.model} size="sm" />
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-[16px] font-bold text-[var(--foreground)]">{vehicle.plate || vehicle.label}</span>
-          <span className={`block truncate ${soft}`}>{name || vehicle.label}</span>
+          <VehicleTitle name={name || vehicle.label} nameClassName="truncate text-[16px] font-semibold text-[var(--foreground)]" plate={name ? vehicle.plate : null} />
         </span>
         {comparing ? (
           <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 ${selected ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white"}`}>
@@ -291,14 +291,13 @@ function VehicleListRow({ vehicle, best, comparing, selected, onSelect, href, sa
       <VehicleArt colour={vehicle.color} kind={kindFromCategory(vehicle.category as never)} model={vehicle.model} size="sm" />
       <span className="min-w-0 flex-1">
         <span className="flex items-baseline justify-between gap-3">
-          {/* The name people know the car by leads; the plate and how busy it was sit underneath. */}
-          <span className="truncate text-[16px] font-bold text-[var(--foreground)]">{name || vehicle.plate || vehicle.label}</span>
-          <span className={`num shrink-0 text-[17px] ${vehicle.profit >= 0 ? "text-[var(--success)]" : "text-[var(--warning)]"}`}>{money(vehicle.profit)}</span>
+          {/* The one vehicle header: the name people know it by, then the plate chip; how busy it was sits underneath. */}
+          <VehicleTitle name={name || vehicle.label} nameClassName="truncate text-[16px] font-semibold text-[var(--foreground)]" plate={name ? vehicle.plate : null} />
+          <span className={`shrink-0 text-[17px] font-semibold tabular-nums ${vehicle.profit >= 0 ? "text-[var(--success)]" : "text-[var(--warning)]"}`}>{money(vehicle.profit)}</span>
         </span>
         {/* "% rented" sits with the vehicle, and the figure on the right says it's profit: the bar below measures the profit. */}
         <span className="flex items-baseline justify-between gap-3">
           <span className={`min-w-0 ${soft}`}>
-            {name && vehicle.plate ? <span className="font-mono-data whitespace-nowrap">{vehicle.plate} · </span> : null}
             <span className="whitespace-nowrap">{say("rowRented", { percent: Math.round(vehicle.utilizationRate) })}</span>
           </span>
           <span className={`shrink-0 whitespace-nowrap ${soft}`}>{say("profit")}</span>
@@ -562,6 +561,9 @@ export function ReportsView({ data }: { data: ReportsData }) {
         <p className={`mt-2 ${soft}`}>{say("range", { from: longDate(data.dateRange.from, locale), to: longDate(data.dateRange.to, locale) })}</p>
       </div>
 
+      {/* Two independent columns on a laptop, so a short card never leaves a hole beside a tall one.
+          Left: profit, who owes, the months. Right: what stands out, deposits. */}
+      <div className="grid content-start gap-3 [&>*]:min-w-0">
       {/* The headline */}
       <section className="card p-4">
         <p className={soft}>{say("profit")}</p>
@@ -570,17 +572,18 @@ export function ReportsView({ data }: { data: ReportsData }) {
         <div className="mt-3 grid grid-cols-2 gap-2">
           <div className={tile}>
             <p className={soft}>{say("moneyIn")}</p>
-            <p className="num flex items-center gap-1.5 text-[22px] text-[var(--foreground)]"><Dot color="var(--chart-in)" />{money(data.totalRevenue)}</p>
+            <p className="flex items-center gap-1.5 text-[20px] font-semibold tabular-nums text-[var(--foreground)]"><Dot color="var(--chart-in)" />{money(data.totalRevenue)}</p>
             {data.refunds > 0 ? <p className={soft}>{say("afterRefunds", { amount: money(data.refunds) })}</p> : null}
             <Change change={data.revenueChange} say={say} />
           </div>
           <div className={tile}>
             <p className={soft}>{say("moneyOut")}</p>
-            <p className="num flex items-center gap-1.5 text-[22px] text-[var(--foreground)]"><Dot color="var(--chart-out)" />{money(data.totalExpenses)}</p>
+            <p className="flex items-center gap-1.5 text-[20px] font-semibold tabular-nums text-[var(--foreground)]"><Dot color="var(--chart-out)" />{money(data.totalExpenses)}</p>
             <Change change={data.expensesChange} say={say} upIsBad />
           </div>
         </div>
-        {data.totalRevenue > 0 ? (
+        {/* A spent/kept bar with nothing spent is one solid line that says nothing: shown only when there are costs. */}
+        {data.totalRevenue > 0 && data.totalExpenses > 0 ? (
           (() => {
             const spent = Math.min(100, Math.round((data.totalExpenses / data.totalRevenue) * 100));
             return (
@@ -601,34 +604,6 @@ export function ReportsView({ data }: { data: ReportsData }) {
         )}
       </section>
 
-      <div className="grid content-start gap-3">
-      <Link className="card pressable flex items-center justify-between gap-3 p-4" href={"/reports/fleet-value" as any}>
-        <span aria-hidden="true" className="inline-flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[var(--primary-light)] text-[var(--primary)]"><TrendingUp size={22} /></span>
-        <span className="min-w-0 flex-1">
-          <span className="block font-bold text-[var(--foreground)]">{say("fleetValueLink")}</span>
-          <span className={soft}>{say("fleetValueLinkHint")}</span>
-        </span>
-        <span aria-hidden className="text-xl text-[var(--muted)]">›</span>
-      </Link>
-      <Link className="card pressable flex items-center justify-between gap-3 p-4" href={"/reports/owners" as any}>
-        <span aria-hidden="true" className="inline-flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[var(--accent-light)] text-[#5c3a0c]"><Handshake size={22} /></span>
-        <span className="min-w-0 flex-1">
-          <span className="block font-bold text-[var(--foreground)]">{say("ownersLink")}</span>
-          <span className={soft}>{say("ownersLinkHint")}</span>
-        </span>
-        <span aria-hidden className="text-xl text-[var(--muted)]">›</span>
-      </Link>
-      <Link className="card pressable flex items-center justify-between gap-3 p-4" href="/transactions">
-        <span aria-hidden="true" className="inline-flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[var(--panel-secondary)] text-[var(--foreground-secondary)]"><ArrowLeftRight size={22} /></span>
-        <span className="min-w-0 flex-1">
-          <span className="block font-bold text-[var(--foreground)]">{say("allMoney")}</span>
-          <span className={soft}>{say("allMoneyHint", { count: data.recentTransactions.length })}</span>
-        </span>
-        <span aria-hidden className="text-xl text-[var(--muted)]">›</span>
-      </Link>
-      </div>
-
-      <div className="grid content-start gap-3 [&>*]:min-w-0">
       {/* Who owes money */}
       <section className="card p-4">
         <h2 className={h2}>{say("owedTitle")}</h2>
@@ -651,7 +626,7 @@ export function ReportsView({ data }: { data: ReportsData }) {
                       {balance.oldestDue ? <span className="whitespace-nowrap"> · {say("owedSince", { date: sinceDate(balance.oldestDue, locale) })}</span> : null}
                     </span>
                   </span>
-                  <span className="flex shrink-0 items-center gap-1 text-[17px] font-bold text-[var(--foreground)]">
+                  <span className="flex shrink-0 items-center gap-1 text-[17px] font-semibold tabular-nums text-[var(--foreground)]">
                     {money(balance.totalBalance)}
                     <ChevronRight className="text-[var(--primary)]" size={18} />
                   </span>
@@ -667,36 +642,52 @@ export function ReportsView({ data }: { data: ReportsData }) {
       </div>
       </div>
 
-      {/* Deposits: held for customers, never income until kept */}
+      <div className="grid content-start gap-3 [&>*]:min-w-0">
+      {/* The insight sits up here beside the profit, not buried at the foot of the page. */}
+      {nothingAtAll ? (
+        <section className="card p-4">
+          <h2 className={h2}>{say("emptyTitle")}</h2>
+          <p className={`mt-1 ${soft}`}>{say("emptyBody")}</p>
+          <Link className="primary-action pressable mt-3 w-full sm:w-auto" href="/transactions/new">
+            {say("emptyButton")}
+          </Link>
+        </section>
+      ) : (
+        <InsightsPanel data={data} locale={locale} say={say} />
+      )}
+
+      {/* Deposits: held for customers, never income until kept. The standard inset tile, no colour of its own. */}
       <section className="card p-4">
         <h2 className={h2}>{say("depositsTitle")}</h2>
-        <p className={`mt-1 ${soft}`}>{say("depositsBody")}</p>
+        <p className={`measure mt-1 ${soft}`}>{say("depositsBody")}</p>
         <div className="mt-3 grid grid-cols-2 gap-2">
-          <div className="tile-sky col-span-2 rounded-xl p-3.5">
-            <p className="font-semibold">{say("depositsHolding")}</p>
-            <p className="num text-[26px] leading-tight">{money(deposits.totalDepositsCurrentlyHeld)}</p>
+          <div className={`${tile} col-span-2`}>
+            <p className={soft}>{say("depositsHolding")}</p>
+            <p className="num text-[26px] leading-tight text-[var(--foreground)]">{money(deposits.totalDepositsCurrentlyHeld)}</p>
           </div>
           <div className={tile}>
             <p className={soft}>{say("depositsTaken")}</p>
-            <p className="text-[17px] font-bold text-[var(--foreground)]">{money(deposits.totalDepositsReceivedInPeriod)}</p>
+            <p className="text-[17px] font-semibold tabular-nums text-[var(--foreground)]">{money(deposits.totalDepositsReceivedInPeriod)}</p>
           </div>
           <div className={tile}>
             <p className={soft}>{say("depositsReturned")}</p>
-            <p className="text-[17px] font-bold text-[var(--foreground)]">{money(deposits.totalDepositsReturnedInPeriod)}</p>
+            <p className="text-[17px] font-semibold tabular-nums text-[var(--foreground)]">{money(deposits.totalDepositsReturnedInPeriod)}</p>
           </div>
           <div className={`${tile} col-span-2`}>
             <p className={soft}>{say("depositsKept")}</p>
-            <p className="text-[17px] font-bold text-[var(--foreground)]">{money(deposits.totalDepositsForfeitedInPeriod)}</p>
+            <p className="text-[17px] font-semibold tabular-nums text-[var(--foreground)]">{money(deposits.totalDepositsForfeitedInPeriod)}</p>
           </div>
         </div>
       </section>
+      </div>
 
       <div className="empty:hidden lg:hidden">
         {busyMonths >= 2 ? <MonthRows months={monthly} say={say} /> : <WeekBars say={say} weeks={weekly} />}
       </div>
 
       {data.revenueByType.length > 0 || data.expensesByType.length > 0 ? (
-        <div className="grid gap-3 lg:col-span-2 lg:grid-cols-2 [&>*]:min-w-0">
+        // items-start: an empty side keeps its own short height instead of stretching to match the ring beside it.
+        <div className="grid gap-3 lg:col-span-2 lg:grid-cols-2 lg:items-start [&>*]:min-w-0">
           <Breakdown
             footer={
               data.refunds > 0 ? (
@@ -724,9 +715,10 @@ export function ReportsView({ data }: { data: ReportsData }) {
           <h2 className={h2}>{say("vehiclesTitle")}</h2>
           <p className={`mt-1 ${soft}`}>{compareMode ? say("compareHelp", { count: selected.size }) : say("vehiclesBody")}</p>
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <label className="min-w-0 basis-full sm:basis-auto sm:flex-1">
+            {/* The sort sits on the left at its own width; Compare and the view switch on the right. */}
+            <label className="min-w-0 basis-full sm:basis-auto sm:flex-none">
               <span className="sr-only">{say("sortBy")}</span>
-              <select aria-label={say("sortBy")} className="w-full" onChange={(event) => setSortKey(event.target.value as SortKey)} value={sortKey}>
+              <select aria-label={say("sortBy")} className="w-full sm:w-[220px]" onChange={(event) => setSortKey(event.target.value as SortKey)} value={sortKey}>
                 {SORTS.map((key) => (
                   <option key={key} value={key}>
                     {say(`sort_${key}`)}
@@ -737,7 +729,7 @@ export function ReportsView({ data }: { data: ReportsData }) {
             {sortedVehicles.length > 1 ? (
               <button
                 aria-pressed={compareMode}
-                className={`pressable min-h-11 shrink-0 rounded-full px-4 font-bold ${compareMode ? "bg-[var(--primary)] text-white" : "bg-[var(--panel-secondary)] text-[var(--primary)]"}`}
+                className={`pressable min-h-11 shrink-0 rounded-full px-4 font-bold sm:ml-auto ${compareMode ? "bg-[var(--primary)] text-white" : "bg-[var(--panel-secondary)] text-[var(--primary)]"}`}
                 onClick={() => {
                   setCompareMode((value) => !value);
                   setSelected(new Set());
@@ -747,7 +739,7 @@ export function ReportsView({ data }: { data: ReportsData }) {
                 {compareMode ? say("compareDone") : say("compare")}
               </button>
             ) : null}
-            <div className="ml-auto flex shrink-0 rounded-full bg-[var(--panel-secondary)] p-1" role="group">
+            <div className={`ml-auto flex shrink-0 rounded-full bg-[var(--panel-secondary)] p-1 ${sortedVehicles.length > 1 ? "sm:ml-0" : ""}`} role="group">
               {(["list", "grid"] as const).map((view) => (
                 <button
                   aria-label={say(view === "list" ? "viewList" : "viewGrid")}
@@ -789,22 +781,33 @@ export function ReportsView({ data }: { data: ReportsData }) {
         </section>
       ) : null}
 
-      {nothingAtAll ? (
-        <section className="card p-4">
-          <h2 className={h2}>{say("emptyTitle")}</h2>
-          <p className={`mt-1 ${soft}`}>{say("emptyBody")}</p>
-          <Link className="primary-action pressable mt-3 w-full" href="/transactions/new">
-            {say("emptyButton")}
-          </Link>
-        </section>
-      ) : (
-        <InsightsPanel data={data} locale={locale} say={say} />
-      )}
+      {/* The way on to the other reports: one compact row, every icon on the same neutral tile. */}
+      <div className="grid gap-3 lg:col-span-2 lg:grid-cols-3 [&>*]:min-w-0">
+        {[
+          { href: "/reports/fleet-value", icon: TrendingUp, title: say("fleetValueLink"), hint: say("fleetValueLinkHint") },
+          { href: "/reports/owners", icon: Handshake, title: say("ownersLink"), hint: say("ownersLinkHint") },
+          { href: "/transactions", icon: ArrowLeftRight, title: say("allMoney"), hint: say("allMoneyHint", { count: data.recentTransactions.length }) }
+        ].map((link) => {
+          const Icon = link.icon;
+          return (
+            <Link className="card pressable flex items-center gap-3 p-4" href={link.href as never} key={link.href}>
+              <span aria-hidden="true" className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-[var(--panel-secondary)] text-[var(--primary)]"><Icon size={21} /></span>
+              <span className="min-w-0 flex-1">
+                <span className="block font-semibold text-[var(--foreground)]">{link.title}</span>
+                <span className={`block text-[14px] ${soft}`}>{link.hint}</span>
+              </span>
+              <ChevronRight aria-hidden="true" className="shrink-0 text-[var(--muted)]" size={18} />
+            </Link>
+          );
+        })}
+      </div>
 
-      <section className="card p-4">
-        <h2 className={h2}>{say("exportTitle")}</h2>
-        <p className={`mt-1 ${soft}`}>{say("exportBody")}</p>
-        <div className="mt-3 flex gap-2 [&>*]:flex-1">
+      <section className="card flex flex-col gap-3 p-4 lg:col-span-2 lg:flex-row lg:items-center lg:justify-between">
+        <div className="min-w-0">
+          <h2 className={h2}>{say("exportTitle")}</h2>
+          <p className={`mt-1 ${soft}`}>{say("exportBody")}</p>
+        </div>
+        <div className="flex shrink-0 gap-2 [&>*]:flex-1 lg:[&>*]:flex-none">
           <a className="secondary-action pressable" download href={exportHref("pdf")}>
             <Download size={18} /> {say("exportPdf")}
           </a>

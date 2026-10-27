@@ -72,7 +72,8 @@ export function PortalPayments({
 
   return (
     <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
-      <p className="text-xs font-semibold uppercase text-[var(--primary)]">{t("payments")}</p>
+      {/* The standard card title, like every other card heading (not a small teal caption). */}
+      <h2 className="card-title">{t("payments")}</h2>
       {/* Paid already: send the slip first, and the page works out what it is for. */}
       {canPayHere && payments.some((payment) => !payment.receiptSentAt) ? (
         <div className="mt-3">
@@ -122,7 +123,7 @@ export function PortalPayments({
           />
         ))}
       </div>
-      <p className="mt-3 text-xs leading-5 text-[var(--muted)]">{canPayHere || !t.has("payCashOnly" as never) ? t("payingInCash", { business: organizationName }) : (t as unknown as (key: string, values: Record<string, string>) => string)("payCashOnly", { business: organizationName })}</p>
+      <p className="mt-3 text-sm leading-5 text-[var(--muted)]">{canPayHere || !t.has("payCashOnly" as never) ? t("payingInCash", { business: organizationName }) : (t as unknown as (key: string, values: Record<string, string>) => string)("payCashOnly", { business: organizationName })}</p>
     </section>
   );
 }

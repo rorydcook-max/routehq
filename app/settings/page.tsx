@@ -2,7 +2,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
 import { SwitchField } from "@/components/switch-field";
-import { planById } from "@/lib/plans";
+import { fleetMix, fleetText, planById } from "@/lib/plans";
+import { SettingsTabs } from "@/app/settings/settings-tabs";
 import { isEmailConfigured } from "@/lib/email";
 import type { Route } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -60,7 +61,7 @@ import { getDefaultOrganization, getTravelPolicySettings, getVehicleCategories }
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const inputClass =
-  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[13px] text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]";
+  "mt-1 w-full rounded-lg border border-[var(--border)] bg-white px-3 text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--focus-ring)]";
 
 type VehicleMakeSetting = {
   id: string;
@@ -149,16 +150,19 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const locale = await getLocale();
   /**
    * The one-line summary of a setting that can be switched on and off (Rory, 27 Oct): always
-   * "Enabled: what that means" or "Disabled: what that means", the state word in bold.
+   * "Enabled: what that means" or "Disabled: what that means", the state word in bold
+   * (green when enabled, muted grey when disabled, so what is on stands out when scanning).
    */
   const stateLine = (key: string, on: boolean, values: Record<string, string | number> = {}) =>
     (t.rich as unknown as (key: string, values: Record<string, unknown>) => ReactNode)(key, {
       ...values,
-      b: (chunks: ReactNode) => <span className={on ? "font-bold text-[var(--success)]" : "font-bold text-[var(--foreground)]"}>{chunks}</span>
+      b: (chunks: ReactNode) => <span className={on ? "font-bold text-[var(--success)]" : "font-bold text-[var(--muted)]"}>{chunks}</span>
     });
+  // The small heading above each group of settings on the Rentals tab: quieter than the card titles under it.
+  const groupHeading = "px-1 pt-1 text-[13px] font-semibold uppercase tracking-[0.06em] text-[var(--muted)]";
   const { data: vehicleRates } = await ((await createSupabaseServerClient()) as any)
     .from("vehicles")
-    .select("daily_rate, weekly_rate, monthly_rate")
+    .select("daily_rate, weekly_rate, monthly_rate, category_id")
     .eq("organization_id", organization.id)
     .is("deleted_at", null);
   const publicVehicleCounts = {
@@ -176,7 +180,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     .limit(1)
     .maybeSingle();
   const isPlatformAdmin = Boolean(platformAdmin);
-  const { data: addressRow } = await supabase.from("organizations").select("booking_subdomain, custom_domain, custom_domain_status").eq("id", organization.id).maybeSingle();
+  const { data: addressRow } = await supabase.from("organizations").select("booking_subdomain, custom_domain, custom_domain_status, trial_ends_at").eq("id", organization.id).maybeSingle();
   const addressOrg = { ...(organization as any), ...(addressRow || {}) };
 
   const [
@@ -276,9 +280,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
 
   const lineUserId = organization.line_user_id ?? null;
   const lineOaId = process.env.LINE_OA_ID ?? "";
-  const maskedLineUserId = lineUserId
-    ? `${"•".repeat(Math.max(0, lineUserId.length - 4))}${lineUserId.slice(-4)}`
-    : null;
   const typedLineMessages = (lineMessages ?? []) as Array<{
     id: string;
     type: string;
@@ -310,18 +311,30 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const travelSummary = `${travelPolicySettings.home_territory || say("travel_noHome")} · ${
     travelPolicySettings.island_travel_policy === "not_permitted" ? say("travel_not_permitted") : travelPolicySettings.island_travel_policy === "notice_only" ? say("travel_notice_only") : say("travel_deposit")
   }`;
+  // Plan and tools tab: the plan at a glance (the full page is Settings › Plan and subscription).
+  const currentPlan = planById(organization.subscription_tier);
+  const planStatus = String(organization.subscription_status || "trial");
+  const trialEndsAt = addressOrg.trial_ends_at as string | null | undefined;
+  const trialDaysLeft = trialEndsAt ? Math.max(0, Math.ceil((new Date(trialEndsAt).getTime() - Date.now()) / (24 * 60 * 60 * 1000))) : null;
+  const fleetNow = fleetMix((vehicleRates || []) as Array<{ category_id: string | null }>, categories);
+  // Friendly names for the currency and time zone line; anything else is shown as stored.
+  const currencyName = organization.currency === "THB" ? say("currencyThb") : organization.currency;
+  const zoneName = organization.timezone === "Asia/Bangkok" ? say("zoneBangkok") : organization.timezone.replace("_", " ");
 
   return (
     <AppShell
       hero={
         <PageBand title={say("title")}>
-          <nav aria-label={say("title")} className="scrollbar-none -mx-[14px] -my-1.5 flex gap-2 overflow-x-auto px-[14px] py-1.5 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
-            {SETTINGS_TABS.map((entry) => (
-              <Link aria-current={tab === entry.key ? "page" : undefined} className={bandTab(tab === entry.key)} href={`/settings?tab=${entry.key}` as Route} key={entry.key}>
-                {say(`tab_${entry.key}`)}
-              </Link>
-            ))}
-          </nav>
+          <SettingsTabs
+            label={say("title")}
+            tabs={SETTINGS_TABS.map((entry) => ({
+              key: entry.key,
+              label: say(`tab_${entry.key}`),
+              href: `/settings?tab=${entry.key}`,
+              className: bandTab(tab === entry.key),
+              active: tab === entry.key
+            }))}
+          />
         </PageBand>
       }
       userEmail={userEmail}
@@ -333,27 +346,32 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
       <div>
         <ContractsBrandingSection
           aside={
-            <>
-              <section className="card p-4">
-                <h2 className="text-[18px] font-bold text-[var(--foreground)]">{say("terms_title")}</h2>
-                <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{say("terms_body")}</p>
-                <Link className="primary-action pressable mt-3" href="/settings/contracts">
+            <section className="card p-4">
+              <h2 className="card-title">{say("terms_title")}</h2>
+              <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("terms_body")}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Link className="primary-action pressable" href="/settings/contracts">
                   {say("terms_btn")}
                 </Link>
-              </section>
-              <section className="card p-4">
-                <h2 className="text-[18px] font-bold text-[var(--foreground)]">{say("loc_title")}</h2>
-                <div className="mt-2">
-                  <BranchList branches={branches} organizationId={organization.id} />
-                </div>
-              </section>
-            </>
+                <Link className="secondary-action pressable" href={"/settings/contracts#sample" as Route}>
+                  {say("terms_sample")}
+                </Link>
+              </div>
+            </section>
+          }
+          locations={
+            <section className="card p-4">
+              <h2 className="card-title">{say("loc_title")}</h2>
+              <div className="mt-3">
+                <BranchList branches={branches} organizationId={organization.id} />
+              </div>
+            </section>
           }
           footer={
-        <p className="font-medium text-[var(--foreground-secondary)]">
+        <p className="text-sm font-medium text-[var(--foreground-secondary)]">
           {t.rich("currencyLine", {
-            currency: organization.currency,
-            zone: organization.timezone.replace("_", " "),
+            currency: currencyName,
+            zone: zoneName,
             link: (chunks) => (
               <Link className="tap-target font-bold text-[var(--primary)]" href="/account">
                 {chunks}
@@ -371,9 +389,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         </>
       ) : null}
       {tab === "messaging" ? (
-        <Card>
-          <SectionHeader title={say("msg_title")} />
-          <p className="mb-4 mt-2 font-medium text-[var(--foreground-secondary)]">
+        <Card className="scroll-mt-4 p-4">
+          <div className="scroll-mt-4" id="chat-accounts" />
+          <h2 className="card-title">{say("msg_title")}</h2>
+          <p className="measure mb-4 mt-1 font-medium text-[var(--foreground-secondary)]">
             {t.rich("msg_body", {
               link: (chunks) => (
                 <Link className="font-bold text-[var(--primary)]" href="/inbox">
@@ -399,9 +418,9 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
       ) : null}
       {tab === "messaging" ? (
         <div className="mt-4">
-          <Card>
-            <SectionHeader title={say("msgOut_title")} />
-            <div className="mt-3">
+          <Card className="p-4">
+            <h2 className="card-title">{say("msgOut_title")}</h2>
+            <div className="mt-2">
               <CustomerMessagesPanel
                 enabled={customerMessagesOn(organization.settings)}
                 off={remindersOff(organization.settings)}
@@ -416,7 +435,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         <div className="grid items-start gap-4 lg:grid-cols-2">
           <div className="space-y-4">
             <div className="space-y-3">
-              <h2 className="px-1 pt-1 text-[17px] font-bold text-[var(--foreground-secondary)]">{say("grp_paid")}</h2>
+              <h2 className={groupHeading}>{say("grp_paid")}</h2>
             <Fold id="payment-methods" summary={paymentSummary} title={say("pay_title")}>
               <p className="mb-3 font-medium text-[var(--foreground-secondary)]">{say("pay_body")}</p>
               <PaymentMethodsForm
@@ -460,7 +479,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                 />
                 <div className="grid gap-3 sm:grid-cols-3">
                   <label className="block">
-                    <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("ahead_months")}</span>
+                    <span className="font-semibold text-[var(--foreground-secondary)]">{say("ahead_months")}</span>
                     <input
                       className={inputClass}
                       defaultValue={String(organization.upfront_discount_min_periods ?? 3)}
@@ -470,7 +489,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                     />
                   </label>
                   <label className="block">
-                    <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("ahead_price")}</span>
+                    <span className="font-semibold text-[var(--foreground-secondary)]">{say("ahead_price")}</span>
                     <input
                       className={inputClass}
                       defaultValue={organization.upfront_discount_rate ? String(organization.upfront_discount_rate) : ""}
@@ -482,7 +501,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                     />
                   </label>
                   <label className="block">
-                    <span className="text-[11px] font-medium text-[var(--foreground-secondary)]">{say("ahead_label")}</span>
+                    <span className="font-semibold text-[var(--foreground-secondary)]">{say("ahead_label")}</span>
                     <input
                       className={inputClass}
                       defaultValue={organization.upfront_discount_label || ""}
@@ -499,7 +518,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             </Fold>
             </div>
               <div className="space-y-3">
-              <h2 className="px-1 pt-1 text-[17px] font-bold text-[var(--foreground-secondary)]">{say("grp_prices")}</h2>
+              <h2 className={groupHeading}>{say("grp_prices")}</h2>
             <Fold
               id="high-season"
               summary={seasonsFrom(organization.settings).length ? stateLine("st_seasonOn", true, { count: seasonsFrom(organization.settings).length }) : stateLine("st_seasonOff", false)}
@@ -518,10 +537,14 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               <p className="font-medium text-[var(--foreground-secondary)]">{say("travel_body")}</p>
               <TravelPolicyForm organizationId={organization.id} settings={travelPolicySettings} />
             </Fold>
+            {/* Booking rules (holds and notice) sit with the other rules, not under "Booking online". */}
+            <Fold id="holds" summary={say("hold_summary", { hours: bookingRules(organization.settings).holdHours })} title={say("hold_title")}>
+              <BookingRulesPanel rules={bookingRules(organization.settings)} />
+            </Fold>
             </div>
             </div>
           <div className="space-y-3">
-            <h2 className="px-1 pt-1 text-[17px] font-bold text-[var(--foreground-secondary)]">{say("grp_online")}</h2>
+            <h2 className={groupHeading}>{say("grp_online")}</h2>
           <Fold id="booking-page" summary={publicBookingSettings(organization.settings).enabled ? stateLine("st_bookOn", true) : stateLine("st_bookOff", false)} title={say("book_title")}>
             <PublicBookingPanel
               enabled={publicBookingSettings(organization.settings).enabled}
@@ -557,51 +580,41 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           <Fold id="partner-network" summary={partnerNetworkSettings(organization.settings).enabled ? stateLine("st_pnOn", true) : stateLine("st_pnOff", false)} title={say("pn_title")}>
             <PartnerNetworkPanel initial={partnerNetworkSettings(organization.settings)} pct={FINDERS_FEE_PCT} />
           </Fold>
-          <Fold id="holds" summary={say("hold_summary", { hours: bookingRules(organization.settings).holdHours })} title={say("hold_title")}>
-            <BookingRulesPanel rules={bookingRules(organization.settings)} />
-          </Fold>
           </div>
         </div>
       ) : null}
       {tab === "notifications" ? (
-        <>
-      <Card>
-        <SectionHeader title={say("push_title")} />
-        <div className="card-section">
+        <div className="space-y-4">
+      <Card className="p-4">
+        <h2 className="card-title">{say("push_title")}</h2>
+        <div className="mt-2">
           <PushToggle />
         </div>
       </Card>
-      <div className="mt-4">
-        <Card>
-          <SectionHeader title={say("line_title")} />
-          <p className="mt-2 font-medium text-[var(--foreground-secondary)]">{say("line_body")}</p>
-
-          {/* Connection status */}
-          <div className="mt-3 flex flex-col gap-3 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3">
-              <div className={`h-3 w-3 flex-shrink-0 rounded-full ${lineUserId ? "bg-[var(--success)]" : "bg-[var(--warning)]"}`} />
-              <div>
-                <p className="text-sm font-semibold text-[var(--foreground)]">
-                  {lineUserId ? say("line_connected") : say("line_notConnected")}
-                </p>
-                {lineUserId && maskedLineUserId ? (
-                  <p className="font-medium text-[var(--foreground-secondary)]">{say("line_account", { id: String(lineUserId).slice(-4) })}</p>
-                ) : (
-                  <p className="font-medium text-[var(--foreground-secondary)]">{say("line_follow")}</p>
-                )}
-              </div>
+        <Card className="p-4" >
+          <div id="line" className="scroll-mt-4" />
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h2 className="card-title">{say("line_title")}</h2>
+              <p className="measure mt-1 font-medium text-[var(--foreground-secondary)]">{say("line_body")}</p>
             </div>
-            <div className="flex items-center gap-2">
-              {lineUserId && (
-                <form action={disconnectLine}>
-                  <input name="organizationId" type="hidden" value={organization.id} />
-                  <PendingButton className="secondary-action" pendingLabel={say("line_disconnecting")} type="submit">
-                    {say("line_disconnect")}
-                  </PendingButton>
-                </form>
-              )}
-            </div>
+            <Badge tone={lineUserId ? "green" : "amber"}>{lineUserId ? say("line_connected") : say("line_notConnected")}</Badge>
           </div>
+
+          {/* Connected: which LINE account, and a way to disconnect it. */}
+          {lineUserId ? (
+            <div className="mt-3 flex flex-col gap-3 rounded-2xl bg-[var(--panel-secondary)] p-3.5 sm:flex-row sm:items-center sm:justify-between">
+              <p className="font-medium text-[var(--foreground-secondary)]">{say("line_account", { id: String(lineUserId).slice(-4) })}</p>
+              <form action={disconnectLine}>
+                <input name="organizationId" type="hidden" value={organization.id} />
+                <PendingButton className="secondary-action" pendingLabel={say("line_disconnecting")} type="submit">
+                  {say("line_disconnect")}
+                </PendingButton>
+              </form>
+            </div>
+          ) : (
+            <p className="mt-3 font-medium text-[var(--foreground-secondary)]">{say("line_follow")}</p>
+          )}
 
           {/* Not connected: add the RouteHQ LINE account, then send a one-time code. */}
           {!lineUserId && <LineConnectPanel lineOaId={lineOaId} organizationId={organization.id} />}
@@ -617,37 +630,31 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             </div>
           ) : null}
 
-          {/* Notification settings — shown when connected */}
+          {/* Notification settings, shown when connected. */}
           {lineUserId && (
-            <form action={updateLineSettings} className="mt-3 space-y-5">
+            <form action={updateLineSettings} className="mt-4 space-y-3">
               <input name="organizationId" type="hidden" value={organization.id} />
               <input name="line_user_id" type="hidden" value={lineUserId} />
-
-              {/* Master toggle */}
-              <SwitchField
-                className="rounded-lg border border-[var(--border)] p-3"
-                defaultChecked={organization.line_notifications_enabled ?? false}
-                description={say("line_enableBody")}
-                label={say("line_enable")}
-                name="line_notifications_enabled"
-                value="on"
-              />
-
-              {/* Daily summary sub-settings */}
-              <div className="ms-2 space-y-3 border-s-2 border-[var(--border)] ps-4">
+              <div className="divide-y divide-[var(--border)]">
                 <SwitchField
-                  className="rounded-lg border border-[var(--border)] p-3"
+                  className="pb-3"
+                  defaultChecked={organization.line_notifications_enabled ?? false}
+                  description={say("line_enableBody")}
+                  label={say("line_enable")}
+                  name="line_notifications_enabled"
+                  value="on"
+                />
+                <SwitchField
+                  className="pt-3"
                   defaultChecked={organization.line_daily_summary_enabled ?? true}
                   description={say("line_dailyBody")}
                   label={say("line_daily")}
                   name="line_daily_summary_enabled"
                   value="on"
                 />
-
-                {/* The summary goes out once a day at 08:00 Bangkok (vercel.json); the time is kept as is. */}
-                <input name="line_daily_summary_time" type="hidden" value={organization.line_daily_summary_time ?? "08:00"} />
               </div>
-
+              {/* The summary goes out once a day at 08:00 Bangkok (vercel.json); the time is kept as is. */}
+              <input name="line_daily_summary_time" type="hidden" value={organization.line_daily_summary_time ?? "08:00"} />
               <PendingButton className="primary-action w-full sm:w-auto" pendingLabel={say("saving")} savedLabel={say("saved")} type="submit">
                 {say("line_save")}
               </PendingButton>
@@ -656,8 +663,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
 
           {/* Test button */}
           {lineUserId && (
-            <div className="mt-3 rounded-lg border border-[var(--border)] p-3">
-              <p className="font-bold text-[var(--foreground)]">{say("line_test")}</p>
+            <div className="mt-4 rounded-2xl bg-[var(--panel-secondary)] p-3.5">
+              <p className="card-subtitle">{say("line_test")}</p>
               <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("line_testBody")}</p>
               <div className="mt-3">
                 <LineTestButton />
@@ -665,13 +672,12 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             </div>
           )}
 
-          {/* Message log */}
-          <div className="mt-3">
-            <p className="font-bold text-[var(--foreground)]">{say("line_recent")}</p>
+          {/* Message log: only once LINE is connected; before that it is just noise. */}
+          {lineUserId ? (
+          <div className="mt-4">
+            <p className="card-subtitle">{say("line_recent")}</p>
             {typedLineMessages.length === 0 ? (
-              <p className="mt-3 rounded-lg border border-dashed border-[var(--border)] p-3 text-sm text-[var(--muted)]">
-                {say("line_none")}
-              </p>
+              <p className="mt-2 font-medium text-[var(--muted)]">{say("line_none")}</p>
             ) : (
               <div className="mt-3 overflow-x-auto rounded-lg border border-[var(--border)]">
                 <table className="w-full text-sm">
@@ -708,71 +714,65 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               </div>
             )}
           </div>
+          ) : null}
         </Card>
-      </div>
-        </>
-      ) : null}
-      {tab === "more" ? (
-        <>
-      <div className="mt-4">
-        <Card>
-          <div className="flex flex-col gap-3 px-2 py-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("imp_title")}</h2>
-              <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("imp_body")}</p>
-            </div>
-            <Link className="primary-action pressable" href="/fleet/import">
-              {say("imp_btn")}
-            </Link>
+      
+        {/* Alert types live on their own page; until LINE is connected nothing can be sent, so the card says so and waits. */}
+        <Card className="p-4">
+          <div className={lineUserId ? "" : "opacity-60"}>
+            <h2 className="card-title">{say("which_title")}</h2>
+            <p className="measure mt-1 font-medium text-[var(--foreground-secondary)]">{say("which_body")}</p>
           </div>
-        </Card>
-      </div>
-        </>
-      ) : null}
-      {tab === "notifications" ? (
-        <>
-      <div className="mt-4">
-        <Card>
-          <div className="flex flex-col gap-3 px-2 py-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("which_title")}</h2>
-              <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("which_body")}</p>
-            </div>
-            <Link className="primary-action pressable" href="/settings/notifications">
+          {lineUserId ? (
+            <Link className="primary-action pressable mt-3" href="/settings/notifications">
               {say("which_btn")}
             </Link>
-          </div>
+          ) : (
+            <p className="mt-3 rounded-2xl bg-[var(--warning-light)] px-4 py-3 font-medium text-[var(--foreground)]">{say("which_needsLine")}</p>
+          )}
         </Card>
-      </div>
-        </>
+        </div>
       ) : null}
       {tab === "more" ? (
-        <>
-      <div className="mt-4">
-        <Card>
-          <div className="flex flex-col gap-3 px-2 py-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("plan_title")}</h2>
-              <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("plan_body")}</p>
+        <div className="grid items-start gap-4 lg:grid-cols-2">
+          {/* The plan at a glance, so the tab isn't just two links. */}
+          <Card className="p-4">
+            <h2 className="card-title">{say("plan_title")}</h2>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <p className="text-[22px] font-semibold leading-tight text-[var(--foreground)]">{say(`bl_${currentPlan.id}`)}</p>
+              <Badge tone={planStatus === "active" ? "green" : planStatus === "trial" ? "blue" : "red"}>
+                {t.has(`bl_st_${planStatus}` as never) ? say(`bl_st_${planStatus}`) : planStatus.replace(/_/g, " ")}
+              </Badge>
             </div>
-            <Link className="primary-action pressable" href={"/settings/billing" as Route}>
+            <div className="mt-2 space-y-0.5 font-medium text-[var(--foreground-secondary)]">
+              {planStatus === "trial" && trialDaysLeft !== null ? <p className="font-semibold text-[var(--foreground)]">{say("bl_trialLeft", { days: trialDaysLeft })}</p> : null}
+              <p>{say("pl_fleetNow", { fleet: fleetText(fleetNow, say) })}</p>
+              {currentPlan.cars !== null && currentPlan.motorbikes !== null ? <p>{say("pl_planCovers", { fleet: fleetText({ cars: currentPlan.cars, motorbikes: currentPlan.motorbikes }, say) })}</p> : null}
+            </div>
+            <Link className="primary-action pressable mt-4" href={"/settings/billing" as Route}>
               {say("plan_btn")}
             </Link>
-          </div>
-        </Card>
-      </div>
-        </>
+          </Card>
+          <Card className="p-4">
+            <h2 className="card-title">{say("imp_title")}</h2>
+            <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("imp_body")}</p>
+            <Link className="secondary-action pressable mt-4" href="/fleet/import">
+              {say("imp_btn")}
+            </Link>
+          </Card>
+        </div>
       ) : null}
       {tab === "team" ? (
-        <>
-      <div className="mt-4 grid items-start gap-3 xl:grid-cols-[1.15fr_0.85fr]">
-        <Card>
-          <SectionHeader title={say("team_title")} />
-          <div className="mt-4 space-y-3">
+        <div className="space-y-4">
+        {/* One list of people across the full width, then the invite form below it at form width:
+            side by side, a short list sat next to a tall form and left a big empty block. */}
+        <Card className="p-4">
+          <h2 className="card-title">{say("team_title")}</h2>
+          <div className="mt-2 divide-y divide-[var(--border)]">
             {(members || []).filter((member: any) => member.is_active).map((member: any) => (
-              <div className="flex flex-col gap-3 rounded-lg border border-[var(--border)] p-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between" key={member.id}>
-                <div>
-                  <p className="font-bold text-[var(--foreground)]">{member.display_name || member.invited_email || (member.user_id === user?.id ? userEmail : say("team_user"))}</p>
+              <div className="flex flex-col gap-3 py-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between" key={member.id}>
+                <div className="min-w-0">
+                  <p className="font-bold text-[var(--foreground)] [overflow-wrap:anywhere]">{member.display_name || member.invited_email || (member.user_id === user?.id ? userEmail : say("team_user"))}</p>
                   {/* Second line only when it adds something: the email under a name, or that they've joined. */}
                   {member.display_name && member.invited_email ? (
                     <p className="text-sm text-[var(--muted)]">{member.invited_email}</p>
@@ -780,27 +780,28 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                     <p className="text-sm text-[var(--muted)]">{say("team_activeAccount")}</p>
                   ) : null}
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <Badge tone="neutral">{member.role === "owner" ? say("team_owner") : member.role === "manager" ? say("team_manager") : say("team_mate")}</Badge>
                   {waitingMembers.has(member.id) ? <Badge tone="amber">{say("team_waiting")}</Badge> : null}
                 </div>
                 {viewerIsOwner && member.user_id !== user?.id ? (
-                  <TeamMemberActions email={member.invited_email || null} memberId={member.id} role={member.role === "owner" ? "owner" : member.role === "manager" ? "manager" : "teammate"} waiting={waitingMembers.has(member.id)} />
+                  <div className="page-form">
+                    <TeamMemberActions email={member.invited_email || null} memberId={member.id} role={member.role === "owner" ? "owner" : member.role === "manager" ? "manager" : "teammate"} waiting={waitingMembers.has(member.id)} />
+                  </div>
                 ) : null}
               </div>
             ))}
           </div>
         </Card>
 
-        <Card>
-          <SectionHeader title={say("inv_title")} />
-          <p className="mt-2 font-medium text-[var(--foreground-secondary)]">{say("inv_body")}</p>
+        <Card className="page-form p-4">
+          <h2 className="card-title">{say("inv_title")}</h2>
+          <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("inv_body")}</p>
           <div className="mt-3">
             <InviteForm />
           </div>
         </Card>
-      </div>
-        </>
+        </div>
       ) : null}
       {tab === "more" ? (
         <>
@@ -810,7 +811,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         <details className="card group p-4">
           <summary className="flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
             <span className="min-w-0">
-              <span className="block text-[18px] font-bold text-[var(--foreground)]">Makes, models, and trims</span>
+              <span className="card-title block">Makes, models, and trims</span>
               <span className="mt-0.5 block text-sm font-medium text-[var(--muted)]">Platform admin tools for reviewing user submissions and curating the global vehicle catalog.</span>
             </span>
             <span className="flex shrink-0 items-center gap-2">

@@ -43,8 +43,8 @@ type Listing = Research & {
 
 const CATEGORIES = ["car", "scooter", "motorcycle", "van", "atv", "ebike"];
 const OTHER = "__other";
-const inputCls =
-  "mt-1 w-full rounded-xl border border-[var(--border-strong)] bg-white px-3 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15";
+// The global field style (44px, regular weight).
+const inputCls = "mt-1 w-full";
 const labelCls = "block text-sm font-medium text-[var(--foreground-secondary)]";
 
 const VERDICT_TONE: Record<Verdict, string> = {
@@ -54,13 +54,15 @@ const VERDICT_TONE: Record<Verdict, string> = {
   no: "bg-[var(--danger)] text-white"
 };
 
-function Num({ label, value, onChange, hint, suffix }: { label: string; value: number; onChange: (value: number) => void; hint?: string; suffix?: string }) {
+function Num({ label, value, onChange, hint, suffix, prefix }: { label: string; value: number; onChange: (value: number) => void; hint?: string; suffix?: string; prefix?: string }) {
   return (
     <label className={labelCls}>
       {label}
       <span className="relative block">
+        {/* Money shows its sign in front, as amounts are written everywhere else. */}
+        {prefix ? <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 pt-1 font-semibold text-[var(--foreground-secondary)]">{prefix}</span> : null}
         <input
-          className={inputCls + (suffix ? " pr-12" : "")}
+          className={inputCls + (suffix ? " pr-12" : "") + (prefix ? " !pl-8" : "")}
           inputMode="decimal"
           min={0}
           onChange={(event) => onChange(Number(event.target.value) || 0)}
@@ -217,6 +219,8 @@ export function CalculatorClient({
   const [modelText, setModelText] = useState("");
   const [year, setYear] = useState(thisYear);
   const [trim, setTrim] = useState("");
+  /** Tapped "Work it out" before filling enough in: the hint under the button turns red instead of the button just not working. */
+  const [triedEarly, setTriedEarly] = useState(false);
   const [price, setPrice] = useState(0);
   const [mileage, setMileage] = useState(0);
   const [style, setStyle] = useState<RentStyle>(defaultStyle);
@@ -497,12 +501,14 @@ export function CalculatorClient({
   const worthAfter = outcome && best ? [1, 3, best.year].filter((year, index, all) => all.indexOf(year) === index && year <= outcome.expected.rows.length).map((year) => outcome.expected.rows[year - 1]) : [];
 
   return (
-    <div className="max-w-2xl space-y-4">
+    // The form column (768px, left-aligned with the page gutter), as on every form.
+    <div className="page-form space-y-4">
       <Card className="p-4">
-        <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+        {/* Both pill groups on this card share one size and weight. */}
+        <div className="chip-row flex flex-wrap gap-2">
           {CATEGORIES.map((code) => (
             <button
-              className={`shrink-0 rounded-full border px-4 py-2 text-sm font-semibold ${category === code ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border-strong)] bg-white text-[var(--foreground-secondary)]"}`}
+              className={`pressable min-h-11 shrink-0 whitespace-nowrap rounded-full border px-4 font-bold ${category === code ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border-strong)] bg-white text-[var(--foreground)]"}`}
               key={code}
               onClick={() => setCategory(code)}
               type="button"
@@ -572,10 +578,9 @@ export function CalculatorClient({
                 ))}
               </select>
             </label>
-          ) : (
-            <span />
-          )}
-          <Num label={t("price")} onChange={setPrice} suffix={currency === "THB" ? "฿" : currency} value={price} />
+          ) : null}
+          {/* No empty half-row beside Year: the price moves up next to it when there is no version to choose. */}
+          <Num label={t("price")} onChange={setPrice} prefix={currency === "THB" ? "฿" : currency} value={price} />
           <Num label={t("mileage")} onChange={setMileage} suffix="km" value={mileage} />
         </div>
 
@@ -583,7 +588,7 @@ export function CalculatorClient({
         <div className="mt-1 flex flex-wrap gap-2">
           {(["monthly", "daily", "mix"] as RentStyle[]).map((option) => (
             <button
-              className={`pressable min-h-11 whitespace-nowrap rounded-full border-2 px-4 py-2 font-semibold ${style === option ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border)] bg-white text-[var(--foreground)]"}`}
+              className={`pressable min-h-11 whitespace-nowrap rounded-full border px-4 font-bold ${style === option ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border-strong)] bg-white text-[var(--foreground)]"}`}
               key={option}
               onClick={() => setStyle(option)}
               type="button"
@@ -605,9 +610,11 @@ export function CalculatorClient({
           </div>
         ) : null}
 
-        <button className="btn-primary mt-5 w-full justify-center py-3 text-base disabled:opacity-50" disabled={!ready || busy} onClick={workItOut} type="button">
+        {/* Always tappable: a pale disabled button gave no hint of what was missing. */}
+        <button className="btn-primary mt-5 min-h-11 w-full justify-center" disabled={busy} onClick={() => (ready ? workItOut() : setTriedEarly(true))} type="button">
           {busy ? t("working") : t("workItOut")}
         </button>
+        {!ready && !busy ? <p className={`mt-2 text-center text-sm font-semibold ${triedEarly ? "text-[var(--danger)]" : "text-[var(--muted)]"}`}>{t("needMore")}</p> : null}
         {busy ? <ResearchProgress elapsed={elapsed} say={say} /> : null}
       </Card>
 

@@ -1,6 +1,24 @@
 import { clsx } from "clsx";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ChevronLeft } from "lucide-react";
+import Link from "next/link";
+import type { Route } from "next";
 import type { ReactNode } from "react";
+
+/**
+ * The one way back on a sub-page: a chevron and the name of where it goes ("Settings", "Fleet", "Honda City"),
+ * above the page title. Every sub-page, form and flow uses this, in the same place.
+ */
+export function BackLink({ href, label, className }: { href: string; label: string; className?: string }) {
+  return (
+    <Link
+      className={clsx("pressable -ms-1 mb-3 inline-flex min-h-9 items-center gap-0.5 rounded-full pe-2 text-[14px] font-semibold text-[var(--primary)] hover:underline", className)}
+      href={href as Route}
+    >
+      <ChevronLeft aria-hidden="true" className="rtl:rotate-180" size={18} strokeWidth={2.4} />
+      {label}
+    </Link>
+  );
+}
 
 export function Card({
   children,
@@ -41,7 +59,7 @@ export function Fold({
     <details className="card group scroll-mt-4 overflow-hidden" id={id} open={open}>
       <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3.5 [&::-webkit-details-marker]:hidden">
         <span className="min-w-0">
-          <span className="block text-[16px] font-bold tracking-[-0.01em] text-[var(--foreground)]">{title}</span>
+          <span className="card-title block !text-[17px]">{title}</span>
           {summary ? <span className={clsx("mt-0.5 line-clamp-2 block", tones[tone])}>{summary}</span> : null}
         </span>
         <ChevronDown className="shrink-0 text-[var(--foreground-secondary)] transition-transform group-open:rotate-180" size={22} strokeWidth={2.2} />
@@ -56,7 +74,7 @@ export function Pane({ title, summary, tone = "neutral", id, children }: { title
   const tones = { neutral: "font-medium text-[var(--foreground-secondary)]", red: "font-bold text-[var(--danger)]", green: "font-bold text-[var(--success)]", amber: "font-bold text-[var(--warning)]" };
   return (
     <section className="card scroll-mt-4 p-4" id={id}>
-      <h2 className="text-[18px] font-bold tracking-[-0.01em] text-[var(--foreground)]">{title}</h2>
+      <h2 className="card-title">{title}</h2>
       {summary ? <p className={clsx("mt-0.5", tones[tone])}>{summary}</p> : null}
       <div className="mt-3">{children}</div>
     </section>
@@ -96,7 +114,7 @@ export function SectionHeader({
     <div className="card-header">
       <div>
         {eyebrow ? <p className="card-header-label text-[var(--primary)]">{eyebrow}</p> : null}
-        <h2 className="text-[16px] font-bold tracking-[-0.01em] text-[var(--foreground)]">{title}</h2>
+        <h2 className="card-title">{title}</h2>
       </div>
       {action}
     </div>

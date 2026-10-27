@@ -42,12 +42,20 @@ export function CustomerMessagesPanel({ enabled, hasChannel, emailOn = false, of
 
   return (
     <div>
-      <SwitchField checked={on} description={say("cm_body")} disabled={isPending} label={say("cm_title")} onChange={(event) => change(event.target.checked)} />
-      {on && !hasChannel ? <p className="mt-3 rounded-xl bg-[var(--warning-light)] px-4 py-3 font-medium text-[var(--foreground)]">{say(emailOn ? "cm_noChannelEmail" : "cm_noChannel")}</p> : null}
-      {on && hasChannel ? <p className="mt-3 font-medium text-[var(--foreground-secondary)]">{say("cm_firstMessage")}</p> : null}
+      <SwitchField checked={on} description={<span className="measure block">{say("cm_body")}</span>} disabled={isPending} label={say("cm_title")} onChange={(event) => change(event.target.checked)} />
+      {/* Lined up with the switch's label and description, with the way to fix it right there. */}
+      {on && !hasChannel ? (
+        <div className="mt-3 rounded-2xl bg-[var(--warning-light)] px-4 py-3 sm:ms-[54px]">
+          <p className="measure font-medium text-[var(--foreground)]">{say(emailOn ? "cm_noChannelEmail" : "cm_noChannel")}</p>
+          <a className="secondary-action pressable mt-3" href="#chat-accounts">
+            {say("cm_connect")}
+          </a>
+        </div>
+      ) : null}
+      {on && hasChannel ? <p className="measure mt-3 font-medium text-[var(--foreground-secondary)] sm:ms-[54px]">{say("cm_firstMessage")}</p> : null}
       {on ? (
-        <div className="mt-4 rounded-xl border border-[var(--border)] p-3">
-          <p className="font-bold text-[var(--foreground)]">{say("rem_title")}</p>
+        <div className="mt-4 rounded-2xl bg-[var(--panel-secondary)] p-3.5 sm:ms-[54px]">
+          <p className="card-subtitle">{say("rem_title")}</p>
           <p className="mt-1 text-sm text-[var(--muted)]">{say("rem_body")}</p>
           <div className="mt-2 grid gap-x-6 gap-y-1 lg:grid-cols-2">
             {KINDS.map((kind) => (

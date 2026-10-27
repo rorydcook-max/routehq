@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/app-shell";
+import { BackLink } from "@/components/ui";
+import { kindFromCategory } from "@/lib/vehicle-groups";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -14,7 +15,7 @@ export default async function FleetValuePage() {
   const t = await getTranslations("fleetValue");
   const { data } = await supabase
     .from("vehicles")
-    .select("id, make, model, trim, year, registration_number, mileage, purchase_price, purchase_date, estimated_value, metadata, status")
+    .select("id, make, model, trim, year, color, registration_number, mileage, purchase_price, purchase_date, estimated_value, metadata, status, vehicle_categories!vehicles_category_id_fkey(code, name)")
     .eq("organization_id", organization.id)
     .is("deleted_at", null)
     .neq("status", "retired")
@@ -26,7 +27,11 @@ export default async function FleetValuePage() {
     const own = vehicle.estimated_value == null ? null : Number(vehicle.estimated_value);
     return {
       id: vehicle.id,
-      name: [vehicle.year, vehicle.make, vehicle.model, vehicle.trim].filter(Boolean).join(" "),
+      name: [vehicle.make, vehicle.model, vehicle.trim].filter(Boolean).join(" "),
+      year: vehicle.year || null,
+      colour: vehicle.color || null,
+      model: vehicle.model || null,
+      kind: kindFromCategory(vehicle.vehicle_categories || null),
       plate: vehicle.registration_number || "",
       hasYear: Boolean(vehicle.year),
       condition: vehicle.metadata?.condition?.value || null,
@@ -43,13 +48,11 @@ export default async function FleetValuePage() {
 
   return (
     <AppShell userEmail={userEmail}>
-      <div className="max-w-4xl">
+      <div>
         <div className="page-hero mb-5">
-          <Link className="text-sm font-bold text-[var(--primary)]" href="/reports">
-            {t("back")}
-          </Link>
-          <h1 className="page-title mt-2">{t("title")}</h1>
-          <p className="page-subtitle mt-2">{t("subtitle")}</p>
+          <BackLink href="/reports" label={t("back")} />
+          <h1 className="page-title">{t("title")}</h1>
+          <p className="page-subtitle measure mt-2">{t("subtitle")}</p>
         </div>
         <FleetValueView canEstimate={researchAvailable()} currency={organization.currency || "THB"} rows={rows} />
       </div>

@@ -694,27 +694,38 @@ export function BookingForm({
         </div>
       ) : null}
       <div className={step === 0 ? "content-section" : "hidden"}>
-        <div className="grid grid-cols-2 gap-2">
+        {/* Two choices with a radio circle each, so which one is picked doesn't rest on a faint tint. */}
+        <div className="grid grid-cols-2 gap-2" role="radiogroup">
           <button
-            className={`pressable rounded-lg border p-3 text-left ${bookingMode === "booking_link" ? "border-[var(--primary)] bg-[var(--primary-light)]" : "border-[var(--border)] bg-white"}`}
+            aria-checked={bookingMode === "booking_link"}
+            className={`pressable flex items-start gap-2.5 rounded-xl border p-3 text-left ${bookingMode === "booking_link" ? "border-[var(--primary)] bg-[var(--primary-light)] ring-1 ring-[var(--primary)]" : "border-[var(--border)] bg-white"}`}
             onClick={() => setBookingMode("booking_link")}
+            role="radio"
             type="button"
           >
-            <p className="font-semibold text-[var(--foreground)]">{say("newBooking")}</p>
-            <p className="mt-1 text-xs leading-5 text-[var(--muted)]">{say("newBookingBody")}</p>
+            <RadioDot on={bookingMode === "booking_link"} />
+            <span className="min-w-0">
+              <span className="block font-semibold text-[var(--foreground)]">{say("newBooking")}</span>
+              <span className="mt-1 block text-sm leading-5 text-[var(--muted)]">{say("newBookingBody")}</span>
+            </span>
           </button>
           <button
-            className={`pressable rounded-lg border p-3 text-left ${bookingMode === "existing_rental" ? "border-[var(--primary)] bg-[var(--primary-light)]" : "border-[var(--border)] bg-white"}`}
+            aria-checked={bookingMode === "existing_rental"}
+            className={`pressable flex items-start gap-2.5 rounded-xl border p-3 text-left ${bookingMode === "existing_rental" ? "border-[var(--primary)] bg-[var(--primary-light)] ring-1 ring-[var(--primary)]" : "border-[var(--border)] bg-white"}`}
             onClick={() => {
               setBookingMode("existing_rental");
               setCustomerSkipped(false);
               // A rental already under way needs its customer chosen first.
               if (!selectedCustomer) setStep((current) => (current >= 2 ? 1 : current));
             }}
+            role="radio"
             type="button"
           >
-            <p className="font-semibold text-[var(--foreground)]">{say("alreadyOut")}</p>
-            <p className="mt-1 text-xs leading-5 text-[var(--muted)]">{say("alreadyOutBody")}</p>
+            <RadioDot on={bookingMode === "existing_rental"} />
+            <span className="min-w-0">
+              <span className="block font-semibold text-[var(--foreground)]">{say("alreadyOut")}</span>
+              <span className="mt-1 block text-sm leading-5 text-[var(--muted)]">{say("alreadyOutBody")}</span>
+            </span>
           </button>
         </div>
       </div>
@@ -769,29 +780,24 @@ export function BookingForm({
                     {/* Three tight lines: name, plate and price, then where it stands. A list of 13 cars used to be eight screens long. */}
                     <span className="min-w-0 flex-1">
                       <span className="line-clamp-2 block text-[17px] font-bold leading-tight text-[var(--foreground)]">{vehicleTitle(vehicle)}</span>
-                      {/* Plain text, so when it wraps the "·" stays at the end of the first line, never at the start of the second. */}
-                      <span className="mt-0.5 block text-[14px] font-medium text-[var(--foreground-secondary)]">
-                        <span className="font-mono-data whitespace-nowrap font-bold text-[var(--muted)]">{vehicle.registration_number}</span>
-                        {/* The prices most bookings of this vehicle use. */}
-                        {vehicle.daily_rate > 0 || vehicle.monthly_rate > 0 ? (
-                          <>
-                            {" · "}
-                            {[vehicle.daily_rate > 0 ? say("per_daily", { amount: money(vehicle.daily_rate, currency) }) : null, vehicle.monthly_rate > 0 ? say("perMonth", { amount: money(vehicle.monthly_rate, currency) }) : null].filter(Boolean).map((price, index) => (
-                              <span className="whitespace-nowrap font-semibold" key={price as string}>{index > 0 ? " · " : ""}{price}</span>
-                            ))}
-                          </>
-                        ) : Number(vehicle.weekly_rate || 0) > 0 ? null : (
-                          <>
-                            {" · "}
-                            <span className="whitespace-nowrap text-[var(--muted)]">{say("noPriceYet")}</span>
-                          </>
-                        )}
-                      </span>
+                      {/* The plate on its own line and the prices under it: no dangling "·", and the prices wrap inside the card instead of running past its edge. */}
+                      <span className="mt-0.5 block truncate font-mono-data text-[14px] font-bold text-[var(--muted)]">{vehicle.registration_number}</span>
+                      {/* The prices most bookings of this vehicle use. */}
+                      {vehicle.daily_rate > 0 || vehicle.monthly_rate > 0 ? (
+                        <span className="block text-[14px] font-semibold text-[var(--foreground-secondary)]">
+                          {[vehicle.daily_rate > 0 ? say("per_daily", { amount: money(vehicle.daily_rate, currency) }) : null, vehicle.monthly_rate > 0 ? say("perMonth", { amount: money(vehicle.monthly_rate, currency) }) : null].filter(Boolean).map((price, index) => (
+                            <span className="whitespace-nowrap" key={price as string}>{index > 0 ? " · " : ""}{price}</span>
+                          ))}
+                        </span>
+                      ) : Number(vehicle.weekly_rate || 0) > 0 ? null : (
+                        <span className="block text-[14px] font-medium text-[var(--muted)]">{say("noPriceYet")}</span>
+                      )}
                       <span className="mt-1.5 flex flex-wrap gap-2">
                         {(() => {
                           const note = disabled ? null : availabilityNote(busyPeriods[vehicle.id] || [], businessToday(), say, locale);
                           return (
-                            <Badge tone={disabled ? "neutral" : note ? (note.late ? "red" : note.out ? "blue" : "amber") : "green"}>
+                            // A soft amber tag for "busy until", never the solid teal of a button (it can still be booked for later dates).
+                            <Badge tone={disabled ? "neutral" : note ? (note.late ? "red" : note.out ? "amber" : "neutral") : "green"}>
                               {disabled ? (t.has(`vs_${vehicle.status}`) ? say(`vs_${vehicle.status}`) : vehicle.status) : note?.text || say("vs_available")}
                             </Badge>
                           );
@@ -1901,16 +1907,22 @@ function GooglePinModal({
   );
 }
 
-function Header({ icon: Icon, eyebrow, title }: { icon: LucideIcon; eyebrow: string; title: string }) {
+function RadioDot({ on }: { on: boolean }) {
   return (
-    <div className="flex items-start gap-3">
+    <span aria-hidden="true" className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${on ? "border-[var(--primary)]" : "border-[var(--border-strong)]"}`}>
+      {on ? <span className="h-2.5 w-2.5 rounded-full bg-[var(--primary)]" /> : null}
+    </span>
+  );
+}
+
+// The step number is already above the progress bar, so the card only names the step (no "Step 1" eyebrow again).
+function Header({ icon: Icon, title }: { icon: LucideIcon; eyebrow?: string; title: string }) {
+  return (
+    <div className="flex items-center gap-3">
       <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[var(--primary-light)] text-[var(--primary)]">
         <Icon size={21} />
       </span>
-      <div>
-        <p className="text-xs font-semibold uppercase text-[var(--primary)]">{eyebrow}</p>
-        <h2 className="text-xl font-semibold text-[var(--foreground)]">{title}</h2>
-      </div>
+      <h2 className="card-title">{title}</h2>
     </div>
   );
 }

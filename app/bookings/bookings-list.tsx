@@ -71,9 +71,9 @@ function isCancelledBooking(booking: any) {
   return String(booking.status || "").toLowerCase() === "cancelled" || String(booking.booking_link?.status || "").toLowerCase() === "cancelled";
 }
 
-/** The status pill says where the booking is; the card itself stays plain. Cancelled ones fade. */
-function statusCardClasses(booking: any) {
-  return isCancelledBooking(booking) ? "opacity-70" : "";
+/** The status pill says where the booking is; the card itself stays plain and readable, cancelled or not. */
+function statusCardClasses(_booking: any) {
+  return "";
 }
 
 /** Where the customer is with their booking link. Same wording as the booking page; nothing when there's no live link. */
@@ -299,17 +299,17 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
           <label className={`relative min-w-0 flex-1 ${bookings.length > 5 || search ? "block" : "hidden"}`}>
             <Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted)]" size={18} />
             <input
-              className="input-with-leading-icon w-full rounded-full border-0 bg-white pr-4 font-medium text-[var(--foreground)] outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
+              className="input-with-leading-icon min-h-11 w-full rounded-full border border-[var(--border)] bg-white pr-4 text-[var(--foreground)] outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
               onChange={(event) => setSearch(event.target.value)}
               placeholder={tx.say("searchPlaceholder")}
               value={search}
             />
           </label>
-          {/* Wraps onto a second row on a phone: scrolling sideways hid half the filters with no sign they were there. */}
-          <div className={`flex-wrap gap-2 xl:justify-end ${showFilters ? "flex" : "hidden"}`}>
+          {/* One scrolling line on a phone (with a fade at the edge), a normal row on desktop. */}
+          <div className={`chip-row flex-wrap gap-2 xl:justify-end ${showFilters ? "flex" : "hidden"}`}>
             {usefulFilters.map((entry) => (
               <button
-                className={`pressable min-h-10 min-w-fit rounded-full px-4 font-bold ${filter === entry ? "bg-[var(--primary)] text-white" : "bg-white text-[var(--foreground)]"}`}
+                className={`pressable min-h-11 min-w-fit rounded-full border px-4 font-bold ${filter === entry ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--border-strong)] bg-white text-[var(--foreground)]"}`}
                 key={entry}
                 onClick={() => chooseFilter(entry)}
                 type="button"
@@ -339,13 +339,20 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                 <span className="num inline-flex min-w-7 items-center justify-center rounded-full bg-white px-2 py-0.5 text-[14px] text-[var(--foreground-secondary)]">{section.items.length}</span>
               </h2>
             ) : null}
-            <div className="grid gap-3 xl:grid-cols-2 xl:items-start">
+            {/* Cards in a row share one height (content anchored to the top), so a row never looks ragged. */}
+            <div className="grid gap-3 xl:grid-cols-2">
           {(section.key === "done" && !allDone ? section.items.slice(0, 4) : section.items).map((booking) => {
             const timingLabel = rentalTimingLabel(booking, tx);
             const hold = holdState(booking, tx);
             const waitingOn = lateBefore(booking, bookings);
             const photoUrl = booking.vehicles?.primary_photo_url;
             const effectiveStatus = isCancelledBooking(booking) ? "cancelled" : String(booking.status || "");
+            // Badges only for the exception. Under "Coming up" every card is booked, so "Booked" says nothing;
+            // a signed link is the normal case, so only an unsigned one gets a badge.
+            const showStatusBadge = !(section.key === "upcoming" && effectiveStatus === "booked");
+            const linkSigned = ["completed", "contract_signed"].includes(String(booking.booking_link?.status));
+            const showLinkBadge = ["booked", "draft"].includes(effectiveStatus) && !linkSigned && Boolean(linkLabel(booking.booking_link?.status, tx));
+            const hasBadges = showStatusBadge || showLinkBadge;
             return (
             <article className={`card relative !overflow-visible p-4 transition has-[details[open]]:z-30 ${statusCardClasses(booking)}`} key={booking.id}>
               {/* overflow-visible: the ⋯ menu opens past the card's edge (it was cut off at Edit); an open menu sits above the next card. */}
@@ -360,12 +367,8 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                   {/* One badge for where the booking is, and one more only while it waits on the customer's link. The dots stay in the corner however the badges wrap. */}
                   <div className="flex items-start gap-1.5 pr-8">
                   <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
-                    <Badge tone={statusTone(effectiveStatus)}>{statusLabel(effectiveStatus, tx)}</Badge>
-                    {["booked", "draft"].includes(effectiveStatus) && linkLabel(booking.booking_link?.status, tx) ? (
-                    <Badge tone={["completed", "contract_signed"].includes(String(booking.booking_link?.status)) ? "green" : booking.booking_link?.status === "viewed" ? "blue" : "amber"}>
-                      {linkLabel(booking.booking_link?.status, tx)}
-                    </Badge>
-                  ) : null}
+                    {showStatusBadge ? <Badge tone={statusTone(effectiveStatus)}>{statusLabel(effectiveStatus, tx)}</Badge> : null}
+                    {showLinkBadge ? <Badge tone="amber">{linkLabel(booking.booking_link?.status, tx)}</Badge> : null}
                   </div>
                     {/* Edit, extend, cancel and delete stay one tap away without crowding every card. */}
                     <details className="absolute right-2.5 top-2.5 z-10">
@@ -426,12 +429,12 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                     </details>
                   </div>
 
-                  <Link className="mt-2 block text-[19px] font-bold leading-tight text-[var(--foreground)] after:absolute after:inset-0 after:content-[''] hover:text-[var(--primary)]" href={`/bookings/${booking.id}`}>
+                  <Link className={`${hasBadges ? "mt-2" : ""} block pr-8 text-[19px] font-bold leading-tight text-[var(--foreground)] after:absolute after:inset-0 after:content-[''] hover:text-[var(--primary)]`} href={`/bookings/${booking.id}`}>
                     {booking.customers ? (
                       customerLabel(booking, tx)
                     ) : booking.status === "cancelled" ? (
-                      // Nothing is awaited on a cancelled booking: the link was never filled in.
-                      <span className="text-[var(--muted)]">{tx.say("noCustomer")}</span>
+                      // Nothing is awaited on a cancelled booking: the link was never filled in (said on the line below).
+                      <span className="text-[var(--foreground-secondary)]">{tx.say("noCustomer")}</span>
                     ) : (
                       <span className="inline-flex items-center gap-1.5 text-[var(--warning)]"><Clock size={18} /> {tx.say("awaitingCustomer")}</span>
                     )}
@@ -441,6 +444,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                   <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">
                     {vehicleTitle(booking.vehicles) || tx.say("vehicle")} · {formatRange(booking.start_date, booking.end_date, tx)}
                   </p>
+                  {!booking.customers && booking.status === "cancelled" ? <p className="mt-0.5 font-medium text-[var(--muted)]">{tx.say("linkNotCompleted")}</p> : null}
                   {timingLabel ? <p className="mt-1 font-bold text-[var(--foreground)]">{timingLabel}</p> : null}
           {(() => {
             // Only a rental that is out and has an end: the bar runs from handover to return, filled up to today.
@@ -452,7 +456,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
             const done = Math.max(0, Math.min(100, ((day(businessToday()) - day(start)) / (day(end) - day(start))) * 100));
             const late = businessToday() > end;
             return (
-              <span aria-hidden="true" className="mt-2 block h-2 max-w-sm overflow-hidden rounded-full bg-[var(--panel-tertiary)]">
+              <span aria-hidden="true" className="mt-2 block h-2 w-full overflow-hidden rounded-full bg-[var(--panel-tertiary)]">
                 <span className="grow-x block h-full rounded-full" style={{ width: `${late ? 100 : done}%`, background: late ? "var(--danger)" : "var(--on-rent)" }} />
               </span>
             );

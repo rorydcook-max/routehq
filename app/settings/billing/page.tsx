@@ -3,7 +3,7 @@ import { Check } from "lucide-react";
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/app-shell";
-import { Badge } from "@/components/ui";
+import { BackLink, Badge } from "@/components/ui";
 import { getCurrentMembership } from "@/lib/auth/roles";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { dateFormat, numberLocale } from "@/lib/i18n/dates";
@@ -115,27 +115,24 @@ export default async function BillingPage() {
   return (
     <AppShell userEmail={userEmail}>
       <div className="page-hero mb-4">
-        <Link className="font-bold text-[var(--primary)]" href={"/settings?tab=more" as Route}>
-          {say("backToSettings")}
-        </Link>
-        <h1 className="page-title mt-2">{say("bl_title")}</h1>
-        <p className="page-subtitle mt-2">{say("pl_subtitle")}</p>
+        <BackLink href="/settings?tab=more" label={say("title")} />
+        <h1 className="page-title">{say("bl_title")}</h1>
+        <p className="page-subtitle mt-1">{say("pl_subtitle")}</p>
       </div>
 
       <section className="card p-4">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <p className="font-semibold text-[var(--muted)]">{say("bl_current")}</p>
-            <p className="text-[22px] font-bold leading-tight text-[var(--foreground)]">{say(`bl_${plan.id}`)}</p>
-            <p className="mt-1 font-medium text-[var(--foreground-secondary)]">
-              {say("pl_fleetNow", { fleet: fleetText(fleet, say) })}
-              {plan.cars !== null && plan.motorbikes !== null ? (
-                <span className="block text-sm">{say("pl_planCovers", { fleet: fleetText({ cars: plan.cars, motorbikes: plan.motorbikes }, say) })}</span>
-              ) : null}
-            </p>
-          </div>
+        <p className="font-semibold text-[var(--muted)]">{say("bl_current")}</p>
+        {/* Plan name and its status on one line. */}
+        <div className="mt-0.5 flex flex-wrap items-center gap-2">
+          <p className="text-[22px] font-semibold leading-tight text-[var(--foreground)]">{say(`bl_${plan.id}`)}</p>
           <Badge tone={status === "active" ? "green" : status === "trial" ? "blue" : "red"}>{statusName}</Badge>
         </div>
+        <p className="mt-1 font-medium text-[var(--foreground-secondary)]">
+          {say("pl_fleetNow", { fleet: fleetText(fleet, say) })}
+          {plan.cars !== null && plan.motorbikes !== null ? (
+            <span className="block text-sm">{say("pl_planCovers", { fleet: fleetText({ cars: plan.cars, motorbikes: plan.motorbikes }, say) })}</span>
+          ) : null}
+        </p>
         {status === "trial" ? (
           <p className="mt-3 text-[17px] font-bold text-[var(--foreground)]">
             {trialDays === null ? say("bl_trialNoDate") : say("bl_trialLeft", { days: trialDays })}
@@ -158,8 +155,22 @@ export default async function BillingPage() {
 
       {pending ? <PendingPlan {...pending} /> : null}
 
+      {/* The plans straight after your own plan; what every plan includes comes after them. */}
+      <div className="card mt-3 p-4">
+        <PlanCards
+          canChange={canChange}
+          currency={currency}
+          currentInterval={interval}
+          currentTier={plan.id}
+          fleet={fleet}
+          pendingPlan={pendingPlan?.id || null}
+          status={status}
+          suggestedTier={suggested.id}
+        />
+      </div>
+
       <section className="card mt-3 p-4">
-        <h2 className="text-[20px] font-bold text-[var(--foreground)]">{say("pl_everyTitle")}</h2>
+        <h2 className="card-title">{say("pl_everyTitle")}</h2>
         <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("pl_everyBody")}</p>
         <ul className="mt-3 grid gap-x-6 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
           {INCLUDED.map((key) => (
@@ -171,24 +182,13 @@ export default async function BillingPage() {
         </ul>
       </section>
 
-      <div className="card mt-3 p-4">
-        <PlanCards
-          canChange={canChange}
-          currency={currency}
-          currentInterval={interval}
-          currentTier={plan.id}
-          fleet={fleet}
-          pendingPlan={pendingPlan?.id || null}
-          status={status}
-        />
-      </div>
-
       <section className="card mt-3 p-4">
-        <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("bl_howTitle")}</h2>
-        <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("bl_howBody")}</p>
-        {/* Support channels come from the environment so no placeholder number or address ships. */}
+        <h2 className="card-title">{say("bl_howTitle")}</h2>
+        <p className="measure mt-1 font-medium text-[var(--foreground-secondary)]">{say("bl_howBody")}</p>
+        {/* Support channels come from the environment so no placeholder number or address ships.
+            All secondary: the way to pay starts from a plan's Choose button above. */}
         <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-          <Link className="primary-action pressable" href={"/help?topic=billing" as Route}>
+          <Link className="secondary-action pressable" href={"/help?topic=billing" as Route}>
             {say("bl_help")}
           </Link>
           {contacts.lineUrl ? (

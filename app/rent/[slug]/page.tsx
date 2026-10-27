@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { BusinessLogoImage } from "@/components/business-logo-image";
 import { BrandStyle } from "@/components/brand-style";
+import { PublicBrand, PublicShell, publicCard } from "@/components/public-shell";
 import { getPublicCatalog } from "@/lib/public-catalog";
 import { Catalog } from "./catalog";
 import { EmbedHeight } from "./embed-height";
@@ -18,15 +18,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 function Notice({ title, message }: { title: string; message: string }) {
   return (
-    <main className="min-h-screen bg-[var(--panel-secondary)] px-4 py-10">
-      <div className="mx-auto mb-3 flex max-w-xl justify-end">
-        <CustomerLanguagePicker />
-      </div>
-      <section className="mx-auto max-w-xl rounded-2xl border border-[var(--border)] bg-white p-6 text-center shadow-sm">
+    <PublicShell width="narrow">
+      <section className={`${publicCard} text-center`}>
         <h1 className="text-2xl font-semibold text-[var(--foreground)]">{title}</h1>
-        <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{message}</p>
+        <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--muted)]">{message}</p>
       </section>
-    </main>
+    </PublicShell>
   );
 }
 
@@ -76,25 +73,11 @@ export default async function PublicCatalogPage({ params, searchParams }: { para
   }
 
   return (
-    <main className="min-h-screen bg-[var(--panel-secondary)] px-4 py-5 text-[var(--foreground)]">
+    // The business sits in the shared header row (logo and name left, language right), not in a card of its own.
+    <PublicShell brand={<PublicBrand detail={catalog.location || t("vehicleRental")} logoUrl={catalog.logoUrl} name={catalog.name} />} width="wide">
       <BrandStyle colour={catalog.brandColour} />
-      <div className="mx-auto max-w-4xl space-y-5">
-        <div className="flex justify-end">
-          <CustomerLanguagePicker />
-        </div>
-        <header className="flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
-          <BusinessLogoImage
-            alt={`${catalog.name} logo`}
-            className="max-h-[56px] max-w-[140px] object-contain"
-            fallback={<span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[var(--primary)] text-lg font-semibold text-white">{catalog.name.slice(0, 1)}</span>}
-            src={catalog.logoUrl}
-          />
-          <div className="min-w-0">
-            <h1 className="text-xl font-semibold">{catalog.name}</h1>
-            <p className="text-sm text-[var(--muted)]">{catalog.location || t("vehicleRental")}</p>
-          </div>
-        </header>
-
+      <div className="space-y-5">
+        <h1 className="sr-only">{catalog.name}</h1>
         <Catalog
           currency={catalog.currency}
           offer={catalog.offer}
@@ -113,6 +96,6 @@ export default async function PublicCatalogPage({ params, searchParams }: { para
           source={query.via === "directory" ? "directory" : null}
         />
       </div>
-    </main>
+    </PublicShell>
   );
 }

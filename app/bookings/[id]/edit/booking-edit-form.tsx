@@ -8,10 +8,12 @@ import { useLocale, useTranslations } from "next-intl";
 import { MapPin, Plus } from "lucide-react";
 import { addRentalPayment, deleteRentalPayment, updateBooking, updateRentalPayment } from "@/app/actions/bookings";
 import { CustomerSelector } from "@/components/customer-selector";
+import { VehicleChangeButton } from "@/app/bookings/[id]/vehicle-change-button";
 import { Badge } from "@/components/ui";
 import { isMapsUrl } from "@/lib/delivery-location";
 import { toWallTime } from "@/lib/business-time";
 import { longDate } from "@/lib/i18n/dates";
+import { kindFromCategory } from "@/lib/vehicle-groups";
 import { loadGooglePlaces as loadSharedGooglePlaces } from "@/lib/google-places";
 
 // The wording for this screen is in locales/<language>/common.json under
@@ -48,7 +50,7 @@ const pricingOptions = ["daily", "weekly", "monthly", "custom"];
 const currencies = ["THB", "USD", "IDR", "PHP", "MYR", "SGD", "VND", "AUD", "GBP", "EUR"];
 const moneySymbol = "฿";
 const labelClass = "font-semibold text-[var(--foreground-secondary)]";
-const sectionTitle = "text-[17px] font-bold text-[var(--foreground)]";
+const sectionTitle = "card-title";
 
 function money(value: unknown, currency = "THB") {
   const amount = Math.round(Number(value || 0)).toLocaleString("en-US");
@@ -312,13 +314,22 @@ function PaymentEditor({ payments, rentalId, currency }: { payments: any[]; rent
     <section className="card p-4">
       <h2 className={sectionTitle}>{say("p_title")}</h2>
       {message ? <p className="mt-3 rounded-xl bg-[var(--danger-light)] px-4 py-3 font-bold text-[var(--danger)]">{message}</p> : null}
-      {!hasUpcomingRentPayments ? <p className="mt-2 font-medium text-[var(--foreground-secondary)]">{say("p_none")}</p> : null}
+      {/* Only when there is nothing listed: above two paid rows it contradicted them. */}
+      {payments.length === 0 && !hasUpcomingRentPayments ? <p className="mt-2 font-medium text-[var(--foreground-secondary)]">{say("p_none")}</p> : null}
 
       <div className="mt-3 grid gap-2.5">
         {payments.map((payment) => {
           const voided = isVoidedPayment(payment);
           const kind = String(payment?.metadata?.type || "");
           const description = payment?.metadata?.description || (t.has(`pt_${kind}` as never) ? say(`pt_${kind}`) : kind) || say("p_defaultDesc");
+          // The row says what kind of payment it is (Rent, Deposit) rather than a worked-out note such as "69 days before the booked start".
+          const kindLabel = t.has(`pt_${kind}` as never) ? say(`pt_${kind}`) : description;
+          const paid = payment.status === "paid";
+          const whenLine = paid && payment.paid_at
+            ? say("p_paid", { date: longDate(dateInput(payment.paid_at), locale) })
+            : payment.due_date
+              ? say("p_due", { date: longDate(dateInput(payment.due_date), locale) })
+              : say("p_noDate");
           if (editingId === payment.id) {
             return (
               <form action={(formData) => savePayment(payment, formData)} className="grid gap-3 rounded-xl bg-[var(--panel-secondary)] p-3.5 sm:grid-cols-2" key={payment.id}>
@@ -356,7 +367,7 @@ function PaymentEditor({ payments, rentalId, currency }: { payments: any[]; rent
                 <div className="min-w-0">
                   <p className={`text-[17px] font-bold leading-tight text-[var(--foreground)] ${voided ? "line-through" : ""}`}>{money(payment.amount, payment.currency || currency)}</p>
                   <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">
-                    {description} · {payment.due_date ? say("p_due", { date: longDate(dateInput(payment.due_date), locale) }) : say("p_noDate")}
+                    {kindLabel} · {whenLine}
                   </p>
                 </div>
                 <Badge tone={voided ? "neutral" : payment.status === "paid" ? "green" : payment.status === "overdue" ? "red" : "amber"}>{statusName(voided ? "voided" : payment.status || "pending")}</Badge>
@@ -469,6 +480,18 @@ export function BookingEditForm({
         </p>
       ) : null}
 
+      {/* Outside the form: changing the vehicle is its own flow (with its own dialog), not part of Save changes. */}
+      <section className="card p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className={sectionTitle}>{say("v_title")}</h2>
+            <p className="mt-2 text-[17px] font-bold leading-tight text-[var(--foreground)]">{vehicleTitle(vehicle)}</p>
+            <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{vehicle?.registration_number || say("v_noPlate")}</p>
+          </div>
+          {!["completed", "cancelled", "draft"].includes(String(rental.status)) ? <VehicleChangeButton rentalId={rental.id} /> : null}
+        </div>
+      </section>
+
       <form
         action={async (formData) => {
           setSaveError("");
@@ -488,19 +511,13 @@ export function BookingEditForm({
             window.scrollTo({ top: 0, behavior: "smooth" });
           }
         }}
-        className="grid items-start gap-3 lg:grid-cols-2"
+        className="grid gap-3"
         id="booking-edit-form"
       >
         <input name="rentalId" type="hidden" value={rental.id} />
 
+        {/* One column, in the order a booking is thought about: customer, dates and price, handover, what is included. */}
         <div className="space-y-3">
-          <section className="card p-4">
-            <h2 className={sectionTitle}>{say("v_title")}</h2>
-            <p className="mt-2 text-[17px] font-bold leading-tight text-[var(--foreground)]">{vehicleTitle(vehicle)}</p>
-            <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{vehicle?.registration_number || say("v_noPlate")}</p>
-            <p className="mt-2 font-medium text-[var(--muted)]">{say("v_change")}</p>
-          </section>
-
           {agreementSigned ? (
             // Signed terms: shown as words, and sent back unchanged so the save goes through.
             <section className="card p-4">
@@ -628,12 +645,21 @@ export function BookingEditForm({
             <section className="card p-4">
               <h2 className={sectionTitle}>{say("i_title")}</h2>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                {includedOptions.map((item, index) => (
-                  <label className="checkbox-label rounded-xl bg-[var(--panel-secondary)] px-3.5 py-[11px] font-semibold text-[var(--foreground)]" key={item}>
-                    <input className="flex-shrink-0" defaultChecked={selectedItems.includes(item)} name="includedItems" type="checkbox" value={item} />
-                    <span>{words(`inc_${index}`)}</span>
-                  </label>
-                ))}
+                {/* Only the extras that fit this vehicle: no helmets on a car, no car seat on a scooter. Anything already ticked stays. */}
+                {includedOptions.map((item, index) => {
+                  const kind = kindFromCategory(vehicle?.vehicle_categories);
+                  const fourWheels = kind === "car" || kind === "van";
+                  const twoWheels = kind === "motorbike" || kind === "scooter" || kind === "ebike";
+                  const bikeOnly = ["Helmet", "Second helmet", "Rain poncho"].includes(item);
+                  const carOnly = item === "Car seat";
+                  if (!selectedItems.includes(item) && ((fourWheels && bikeOnly) || (twoWheels && carOnly))) return null;
+                  return (
+                    <label className="checkbox-label min-h-11 rounded-xl bg-[var(--panel-secondary)] px-3.5 py-[11px] font-semibold text-[var(--foreground)]" key={item}>
+                      <input className="flex-shrink-0" defaultChecked={selectedItems.includes(item)} name="includedItems" type="checkbox" value={item} />
+                      <span className="min-w-0 truncate" title={words(`inc_${index}`)}>{words(`inc_${index}`)}</span>
+                    </label>
+                  );
+                })}
               </div>
               <label className="mt-3 block">
                 <span className={labelClass}>{say("i_special")}</span>
@@ -644,8 +670,7 @@ export function BookingEditForm({
         </div>
       </form>
 
-      <PaymentEditor currency={currency} payments={payments} rentalId={rental.id} />
-
+      {/* Save sits straight under the fields it saves; payments below save one at a time. */}
       <div className="sticky-actions sticky z-10 -mx-1 flex gap-2 bg-[var(--background)] px-1 py-3 sm:justify-end [&>*:last-child]:flex-1 sm:[&>*:last-child]:flex-none">
         <Link className="secondary-action pressable justify-center" href={`/bookings/${rental.id}` as Route}>
           {say("cancel")}
@@ -654,6 +679,8 @@ export function BookingEditForm({
           {saving ? say("saving") : say("save")}
         </button>
       </div>
+
+      <PaymentEditor currency={currency} payments={payments} rentalId={rental.id} />
     </>
   );
 }

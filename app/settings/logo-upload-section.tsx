@@ -43,21 +43,31 @@ export function LogoUploadSection({ logoUrl, orgName }: { logoUrl: string | null
   }
 
   return (
-    <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5">
+    <div className="rounded-2xl bg-[var(--panel-secondary)] p-3.5">
       <div className="flex items-center gap-3">
-        {logoUrl ? <BusinessLogoImage alt={orgName} className="h-12 w-auto max-w-[160px] shrink-0 object-contain object-left" src={logoUrl} /> : null}
+        {/* The logo, or a dashed space the size a logo will take, like the signature next to it. */}
+        {logoUrl ? (
+          <span className="flex h-16 w-40 shrink-0 items-center justify-center rounded-xl bg-white p-2">
+            <BusinessLogoImage alt={orgName} className="max-h-full w-auto max-w-full object-contain" src={logoUrl} />
+          </span>
+        ) : (
+          <span aria-hidden="true" className="flex h-16 w-40 shrink-0 items-center justify-center rounded-xl border-2 border-dashed border-[var(--border-strong)] bg-white text-sm font-semibold text-[var(--muted)]">
+            {say("lg_placeholder")}
+          </span>
+        )}
         <div className="min-w-0">
-          <h2 className="text-lg font-bold leading-tight text-[var(--foreground)]">{logoUrl ? say("lg_title") : say("lg_uploadTitle")}</h2>
-          <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{logoUrl ? say("lg_body") : say("lg_uploadBody")}</p>
+          <h3 className="card-subtitle">{logoUrl ? say("lg_title") : say("lg_uploadTitle")}</h3>
+          <p className="mt-0.5 text-sm font-medium text-[var(--foreground-secondary)]">{logoUrl ? say("lg_body") : say("lg_uploadBody")}</p>
         </div>
       </div>
       <input accept="image/png,image/jpeg,image/webp" className="hidden" data-keep-original onChange={uploadChosen} ref={fileRef} type="file" />
       <div className="mt-3 flex flex-wrap gap-2">
-        <button className={logoUrl ? "secondary-action" : "primary-action"} disabled={isPending} onClick={() => fileRef.current?.click()} type="button">
+        {/* Secondary: the brand card's one primary action is Save. */}
+        <button className="secondary-action" disabled={isPending} onClick={() => fileRef.current?.click()} type="button">
           {isPending ? say("lg_working") : logoUrl ? say("lg_replace") : say("lg_upload")}
         </button>
         {logoUrl ? (
-          <button className="secondary-action" disabled={isPending} onClick={handleRemove} style={{ color: "var(--danger)" }} type="button">
+          <button className="pressable min-h-11 rounded-full px-3 font-bold text-[var(--danger)] hover:bg-[var(--danger-light)]" disabled={isPending} onClick={handleRemove} type="button">
             {say("lg_remove")}
           </button>
         ) : null}

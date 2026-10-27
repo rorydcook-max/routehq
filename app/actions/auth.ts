@@ -79,6 +79,10 @@ export type ShellContext = {
   helpReplies: number;
   /** The operator's brand, when their plan lets it replace RouteHQ's in the app. */
   brand: import("@/lib/shell-brand").ShellBrand | null;
+  /** The person's own name, for the account chip. */
+  displayName?: string | null;
+  /** A RouteHQ platform admin: the side menu shows the admin console link. Display only; every admin page checks again. */
+  platformAdmin?: boolean;
 };
 
 export type { ShellBrand } from "@/lib/shell-brand";
@@ -128,13 +132,18 @@ export async function getShellContext(): Promise<ShellContext> {
     shellBrand(supabase, membership.organizationId),
     supabase.from("support_threads").select("id", { count: "exact", head: true }).eq("organization_id", membership.organizationId).eq("unread_by_business", true)
   ]);
+  // Their name for the account chip in the side menu (the email is the fallback), and whether to show the RouteHQ admin link.
+  const [{ data: me }, { data: adminRow }] = await Promise.all([
+    supabase.from("users").select("full_name").eq("id", membership.userId).maybeSingle(),
+    supabase.from("platform_admins").select("user_id").eq("user_id", membership.userId).maybeSingle()
+  ]);
 
   const organizations = ((data || []) as any[]).map((row) => ({
     id: row.organization_id as string,
     name: String(row.organizations?.name || "Business"),
     active: row.organization_id === membership.organizationId
   }));
-  return { role: membership.role, organizations, unreadChats: (count || 0) + (toSend || 0), dueTasks, helpReplies: helpReplies || 0, brand };
+  return { role: membership.role, organizations, unreadChats: (count || 0) + (toSend || 0), dueTasks, helpReplies: helpReplies || 0, brand, displayName: (me?.full_name as string | null)?.trim() || null, platformAdmin: !!adminRow };
 }
 
 /** Switch the business this person is working in. Only businesses they actively belong to are accepted. */

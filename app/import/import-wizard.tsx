@@ -161,6 +161,8 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
   // Messages pasted from a LINE or WhatsApp chat.
   const [chatOpen, setChatOpen] = useState(false);
   const [chatText, setChatText] = useState("");
+  // Earlier imports show three; the rest are one tap away.
+  const [showAllRecent, setShowAllRecent] = useState(false);
   const [status, setStatus] = useState<"idle" | "analyzing" | "review" | "remapping" | "importing" | "done" | "error">("idle");
   const [batchId, setBatchId] = useState<string | null>(null);
   const [preview, setPreview] = useState<ImportPreview | null>(null);
@@ -301,24 +303,20 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
   return (
     <div className="space-y-5">
       {/* 1. The file */}
+      {/* One left edge for everything in the card: help first, then the inputs, then the button that reads them. */}
       <section className="card p-4">
-        <div className="flex items-start gap-3">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[var(--primary-light)] text-[var(--primary)]">
-            <FileSpreadsheet size={22} />
-          </span>
-          <div>
-            <h2 className="text-xl font-semibold text-[var(--foreground)]">{t("s1")}</h2>
-            <p className="mt-1 text-sm text-[var(--muted)]">{t("s1Body")}</p>
-            <p className="mt-1 text-sm">
-              <Link className="font-semibold text-[var(--primary)]" href={"/help?topic=import" as any}>
-                {t("sendToUs")}
-              </Link>
-            </p>
-          </div>
-        </div>
-        <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          <label className="block">
-            <span className="secondary-action pressable w-full cursor-pointer">{file ? file.name : t("file")}</span>
+        <h2 className="card-title flex items-center gap-2">
+          <FileSpreadsheet aria-hidden="true" className="shrink-0 text-[var(--primary)]" size={20} />
+          {t("s1")}
+        </h2>
+        <p className="measure mt-1 text-sm text-[var(--foreground-secondary)]">{t("s1Body")}</p>
+        <p className="measure mt-1 text-sm text-[var(--muted)]">{chatText.trim() ? t("chatWorks") : photos.length ? t("photosWork") : t("whatWorks")}</p>
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          <label className="block min-w-0">
+            <span className="secondary-action pressable w-full cursor-pointer">
+              <FileSpreadsheet aria-hidden="true" className="shrink-0" size={18} />
+              <span className="truncate">{file ? file.name : t("file")}</span>
+            </span>
             <input
               accept=".csv,.xlsx,.xls,.ics,.txt,text/csv,text/calendar,text/plain,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
               className="sr-only"
@@ -332,9 +330,9 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
               type="file"
             />
           </label>
-          <label className="block">
+          <label className="block min-w-0">
             <span className="secondary-action pressable w-full cursor-pointer">
-              <Camera size={18} />
+              <Camera className="shrink-0" size={18} />
               {photos.length ? t("photosChosen", { count: photos.length }) : t("photos")}
             </span>
             <input
@@ -354,10 +352,10 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
               type="file"
             />
           </label>
-          <label className="block">
+          <label className="col-span-2 block">
             <span className="sr-only">{t("orLink")}</span>
             <input
-              className={`${inputClass} mt-0`}
+              className={`${inputClass} mt-0 h-11 !py-0`}
               onChange={(event) => {
                 setSheetUrl(event.target.value);
                 setFile(null);
@@ -407,12 +405,22 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
             {t("chatOpen")}
           </button>
         )}
-        <p className="mt-3 text-sm text-[var(--muted)]">{chatText.trim() ? t("chatWorks") : photos.length ? t("photosWork") : t("whatWorks")}</p>
-        <button className="primary-action pressable mt-4 w-full sm:w-auto" disabled={status === "analyzing" || (!file && !sheetUrl.trim() && !photos.length && !chatText.trim())} onClick={analyzeFile} type="button">
+        <button
+          className="primary-action pressable mt-4 w-full sm:w-auto"
+          disabled={status === "analyzing" || (!file && !sheetUrl.trim() && !photos.length && !chatText.trim())}
+          onClick={analyzeFile}
+          title={!file && !sheetUrl.trim() && !photos.length && !chatText.trim() ? t("readNeeds") : undefined}
+          type="button"
+        >
           {status === "analyzing" ? <Loader2 className="animate-spin" size={18} /> : null}
           {status === "analyzing" ? (photos.length ? t("readingPhotos", { count: photos.length }) : t("reading")) : t("read")}
         </button>
         {error ? <p className="mt-3 rounded-lg bg-[var(--danger-light)] px-3 py-2 text-sm font-semibold text-[var(--danger)]">{error}</p> : null}
+        <p className="mt-3 text-sm">
+          <Link className="font-semibold text-[var(--primary)]" href={"/help?topic=import" as any}>
+            {t("sendToUs")}
+          </Link>
+        </p>
       </section>
 
       {/* 2. What we found, in RouteHQ's shape */}
@@ -653,18 +661,24 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
       {/* Earlier imports, each one undoable for 30 days */}
       {recent.length ? (
         <section className="card p-4">
-          <h2 className="text-[17px] font-bold text-[var(--foreground)]">{t("recentTitle")}</h2>
+          <h2 className="card-title">{t("recentTitle")}</h2>
           <ul className="mt-2 divide-y divide-[var(--border)]">
-            {recent.map((item) => {
+            {(showAllRecent ? recent : recent.slice(0, 3)).map((item) => {
               const gone = item.status === "undone" || undone.has(item.id);
+              // Only what came in: "3 vehicles · 4 rentals", never "0 customers, 0 money records".
+              const countLine = (["vehicles", "rentals", "customers", "transactions"] as const)
+                .filter((key) => Number(item.counts[key] || 0) > 0)
+                .map((key) => t(`cnt_${key}`, { count: Number(item.counts[key]) }))
+                .join(" · ");
+              const when = `${longDate(item.createdAt.slice(0, 10), locale)}, ${new Date(item.createdAt).toLocaleTimeString(numberLocale(locale), { hour: "2-digit", minute: "2-digit" })}`;
               return (
-                <li className="flex flex-wrap items-center justify-between gap-2 py-2" key={item.id}>
-                  <div>
-                    <p className="font-semibold text-[var(--foreground)]">{sourceLabel(item.sourceName, t)}</p>
-                    <p className="text-sm text-[var(--muted)]">
-                      {longDate(item.createdAt.slice(0, 10), locale)} · {t("recentCounts", { vehicles: item.counts.vehicles || 0, rentals: item.counts.rentals || 0, customers: item.counts.customers || 0, transactions: item.counts.transactions || 0 })}
-                      {gone ? ` · ${t("undone")}` : ""}
+                <li className="flex flex-wrap items-center justify-between gap-2 py-2.5" key={item.id}>
+                  <div className="min-w-0">
+                    <p className="flex flex-wrap items-center gap-2 font-semibold text-[var(--foreground)]">
+                      {sourceLabel(item.sourceName, t)}
+                      <span className={`badge inline-flex items-center ${gone ? "bg-[var(--panel-tertiary)] text-[var(--muted)]" : "bg-[var(--success-light)] text-[var(--success)]"}`}>{gone ? t("undone") : t("imported")}</span>
                     </p>
+                    <p className="text-sm text-[var(--muted)]">{[when, countLine].filter(Boolean).join(" · ")}</p>
                   </div>
                   {!gone && item.status === "imported" ? (
                     <button className="secondary-action pressable min-h-10 px-3 text-sm" onClick={() => undo(item.id)} type="button">
@@ -675,6 +689,11 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
               );
             })}
           </ul>
+          {recent.length > 3 && !showAllRecent ? (
+            <button className="mt-1 text-sm font-semibold text-[var(--primary)]" onClick={() => setShowAllRecent(true)} type="button">
+              {t("showAll", { count: recent.length })}
+            </button>
+          ) : null}
         </section>
       ) : null}
     </div>

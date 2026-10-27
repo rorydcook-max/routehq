@@ -36,7 +36,7 @@ import { CommunicationPanel } from "@/components/communication-panel";
 import { BookingDatesButton, RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
 import { InspectionViewer } from "@/components/inspection-viewer";
 import { PendingButton } from "@/components/pending-button";
-import { Badge, Card, Pane, SectionHeader } from "@/components/ui";
+import { BackLink, Badge, Card, Pane, SectionHeader } from "@/components/ui";
 import { PageTabs } from "@/components/page-tabs";
 import { OpenOnHash } from "@/components/open-on-hash";
 import { getCurrentUserEmail } from "@/lib/auth/session";
@@ -640,20 +640,12 @@ export default async function BookingDetailPage({ params, searchParams }: { para
             </Link>
           </div>
         ) : null}
-        <div className="flex flex-wrap items-center gap-2 text-sm font-bold text-[var(--muted)]">
-          <Link className="-mx-2 -my-3 inline-flex min-h-11 items-center px-2 text-[var(--primary)]" href="/bookings">{tx.list("title")}</Link>
-          <span>/</span>
-          <span>{bookingReference(rental)}</span>
-        </div>
+        <BackLink className="!mb-0" href="/bookings" label={tx.list("title")} />
 
         <Card>
           <div className="card-section flex flex-col gap-4">
-            <div className="min-w-0 lg:flex lg:flex-row-reverse lg:items-center lg:gap-6">
-              {vehicle ? (
-                <Link aria-label={vehicleTitle(vehicle)} className="mb-3 block lg:mb-0 lg:w-[320px] lg:shrink-0" href={`/fleet/${vehicle.id}` as Route}>
-                  <VehicleArt colour={(vehicle as any).color} kind={kindFromCategory((vehicle as any).vehicle_categories)} model={(vehicle as any).model} size="lg" />
-                </Link>
-              ) : null}
+            {/* No big picture of the vehicle here: it pushed the dates and money down and said nothing new. The vehicle is a link under the name. */}
+            <div className="min-w-0">
               <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="flex flex-wrap items-center gap-2">
@@ -679,7 +671,14 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     {/* A cancelled booking is no longer waiting for anyone. */}
                     {customer ? customer.full_name : tx.list(rental.status === "cancelled" ? "noCustomer" : "awaitingCustomer")}
                   </h1>
-                  <p className="mt-0.5 text-[17px] font-semibold text-[var(--foreground-secondary)]">{vehicleTitle(vehicle)}</p>
+                  <p className="mt-0.5 text-[17px] font-semibold text-[var(--foreground-secondary)]">
+                    {vehicle ? (
+                      <Link className="hover:text-[var(--primary)] hover:underline" href={`/fleet/${vehicle.id}` as Route}>{vehicleTitle(vehicle)}</Link>
+                    ) : (
+                      vehicleTitle(vehicle)
+                    )}
+                    <span className="text-[var(--muted)]"> · {bookingReference(rental)}</span>
+                  </p>
                 </div>
               </div>
               {awaitingSignature && holdUntil ? (
@@ -692,7 +691,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
               </div>
             </div>
             {/* The two numbers you check first. */}
-            <div className="grid grid-cols-2 gap-2.5">
+            <div className="grid gap-2.5 min-[480px]:grid-cols-2">
               <div className="rounded-xl bg-[var(--background)] px-3.5 py-3">
                 <p className="font-semibold text-[var(--muted)]">{tx.say("dates")}</p>
                 <p className="mt-0.5 text-[20px] font-bold leading-tight text-[var(--foreground)]">{daysRemaining(rental.end_date, rental.status, rental.start_date, tx)}</p>
@@ -701,7 +700,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                   <div className="mt-2.5 flex items-center gap-1.5 sm:gap-2">
                     <DateLeaf date={rental.start_date} locale={tx.locale} tone={isCancelled ? "var(--muted)" : undefined} />
                     <ArrowRight aria-hidden="true" className="hidden text-[var(--muted)] sm:block" size={18} />
-                    <DateLeaf date={rental.end_date} locale={tx.locale} tone={isCancelled ? "var(--muted)" : "var(--coming-back)"} />
+                    {/* Both leaves in the same dark teal: white on the light blue failed contrast. */}
+                    <DateLeaf date={rental.end_date} locale={tx.locale} tone={isCancelled ? "var(--muted)" : undefined} />
                     <span className="sr-only">{tx.say("dateTo", { date: formatDate(rental.start_date, tx) })}</span>
                     {isCancelled || rental.status === "completed" ? null : rental.status === "booked" && !bookingLink?.contract_signed_at && !renterSignatureOf(rentalDocuments) ? (
                       <BookingDatesButton billingPeriod={String(rental.billing_interval || rental.pricing_model || "")} currentEndDate={rental.end_date} currentRate={Number(rental.rental_rate || 0)} currentStartDate={rental.start_date} customerName={customer?.full_name || tx.list("awaitingCustomerShort")} rentalId={rental.id} vehicleLabel={vehicleTitle(vehicle)} />
@@ -728,7 +728,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 <p className="font-medium text-[var(--foreground-secondary)]">{financialState.amount !== null ? tx.say(`ratePer_${["daily", "weekly", "monthly"].includes(String(rental.pricing_model)) ? rental.pricing_model : "other"}`, { amount: money(rental.rental_rate, rental.currency) }) : financialState.detail}</p>
                 {!isCancelled && rentAgreed > 0 && !!rental.end_date ? (
                   <>
-                    <PartBar part={rentPaid} whole={rentAgreed} />
+                    {/* An empty grey bar looked broken: the bar shows only once something is paid. */}
+                    {rentPaid > 0 ? <PartBar part={rentPaid} whole={rentAgreed} /> : null}
                     <p className="mt-1 font-semibold text-[var(--foreground-secondary)]">{tx.say("paidOfTotal", { paid: money(rentPaid, rental.currency), total: money(rentAgreed, rental.currency) })}</p>
                     {rentGivenBack > 0 ? <p className="font-semibold text-[var(--foreground-secondary)]">{tx.say("givenBackLine", { amount: money(rentGivenBack, rental.currency) })}</p> : null}
                   </>
@@ -745,7 +746,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                 ) : null}
               </div>
             </div>
-            {showTrack ? (
+            {/* Before the handover the track had nothing to show (no rent running, nothing paid) and only repeated the tiles above. */}
+            {showTrack && !notHandedOver ? (
               <RentalTrack
                 dueOn={firstOpenDue}
                 dueOwed={dueOwed}
@@ -934,15 +936,8 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     <p className="text-sm text-[var(--muted)]">
                       {tx.say("noFormOptional", { ago: startedAgoLabel(rental.start_date, tx) })}
                     </p>
-                    <div className="grid gap-2 sm:grid-cols-2">
-                      <Link
-                        className="pressable flex items-center justify-center rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-center text-sm font-bold text-[var(--foreground-secondary)]"
-                        href={`/inspections/delivery/${rental.id}` as Route}
-                      >
-                        {tx.say("fillHandover")}
-                      </Link>
-                      <SkipInspectionButton canWaive={isOwner} early={earlyStartFor(rental, vehicle, businessToday())} late={lateStartFor(rental, businessToday())} needsName={!rental.customer_id} rentalId={rental.id} />
-                    </div>
+                    {/* The form itself opens from "Start handover" at the top of the page. */}
+                    <SkipInspectionButton canWaive={isOwner} early={earlyStartFor(rental, vehicle, businessToday())} late={lateStartFor(rental, businessToday())} needsName={!rental.customer_id} rentalId={rental.id} />
                   </div>
                 ) : isRetrospective ? (
                   // Retrospective, already active, no inspection: soft prompt
@@ -962,15 +957,14 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                     </Link>
                   </div>
                 ) : rental.status === "booked" ? (
-                  // New booking: prominent start inspection + skip
+                  // New booking: "Start handover" is the main button at the top of the page, so this says where things stand
+                  // and keeps only the other way through (handing over without the form).
                   <div className="sub-surface space-y-2 p-3">
                     <div className="flex items-center gap-2 font-semibold text-[var(--foreground)]">
-                      <AlertTriangle className="text-[var(--warning)]" size={18} />
+                      <Clock className="text-[var(--muted)]" size={18} />
                       {tx.say("handoverForm")}
                     </div>
-                    <Link className="primary-action pressable block w-full px-3 py-2 text-center" href={`/inspections/delivery/${rental.id}` as Route}>
-                      {tx.say("startHandover")}
-                    </Link>
+                    <p className="text-sm text-[var(--foreground-secondary)]">{tx.say("handoverNotYet")}</p>
                     <SkipInspectionButton canWaive={isOwner} early={earlyStartFor(rental, vehicle, businessToday())} late={lateStartFor(rental, businessToday())} needsName={!rental.customer_id} rentalId={rental.id} />
                   </div>
                 ) : rental.status === "completed" ? (

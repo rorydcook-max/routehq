@@ -73,16 +73,16 @@ export function AmendmentSignForm({ token, contentHash, renterName }: { token: s
 
   return (
     <section className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
-      <h2 className="text-lg font-semibold">{t("signToAgree")}</h2>
-      <label className="mt-3 flex items-start gap-3 rounded-xl border border-[var(--border)] p-3 text-sm">
-        <input checked={accepted} className="mt-1 h-4 w-4" onChange={(event) => setAccepted(event.target.checked)} type="checkbox" />
+      <h2 className="card-title">{t("signToAgree")}</h2>
+      <label className="mt-3 flex cursor-pointer items-start gap-3 rounded-2xl bg-[var(--panel-secondary)] p-3.5 text-sm">
+        <input checked={accepted} className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer accent-[var(--primary)]" onChange={(event) => setAccepted(event.target.checked)} type="checkbox" />
         <span>{t("amendConsent")}</span>
       </label>
       <label className="mt-3 block text-sm font-bold">
         {t("yourFullName")}
         <input
           autoComplete="name"
-          className="mt-1 h-11 w-full rounded-xl border border-[var(--border)] px-3 text-base font-normal"
+          className="mt-1 w-full text-base font-normal"
           onChange={(event) => setName(event.target.value)}
           value={name}
         />

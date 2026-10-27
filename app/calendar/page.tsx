@@ -74,7 +74,8 @@ export default async function CalendarPage({
       {byVehicle ? (
         <div className="space-y-4">
           <div className="content-section flex items-center justify-between gap-2">
-            <Link aria-label={t("prevMonth")} className="secondary-action pressable !w-11 !px-0 shrink-0" href={`/calendar?view=vehicles&month=${shiftMonth(month, -1)}` as Route}>
+            {/* Same month navigation as the agenda view: 44px round buttons, an 18px title. */}
+            <Link aria-label={t("prevMonth")} className="pressable flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[var(--border-strong)] bg-white text-[var(--foreground)]" href={`/calendar?view=vehicles&month=${shiftMonth(month, -1)}` as Route}>
               <ChevronLeft size={20} />
             </Link>
             <div className="flex min-w-0 flex-col items-center">
@@ -85,7 +86,7 @@ export default async function CalendarPage({
                 </Link>
               ) : null}
             </div>
-            <Link aria-label={t("nextMonth")} className="secondary-action pressable !w-11 !px-0 shrink-0" href={`/calendar?view=vehicles&month=${shiftMonth(month, 1)}` as Route}>
+            <Link aria-label={t("nextMonth")} className="pressable flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[var(--border-strong)] bg-white text-[var(--foreground)]" href={`/calendar?view=vehicles&month=${shiftMonth(month, 1)}` as Route}>
               <ChevronRight size={20} />
             </Link>
           </div>

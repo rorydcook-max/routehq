@@ -52,7 +52,7 @@
   --sidebar-active-from: #12BCB8;
   --sidebar-active-to: #1F6BFF;
   --sidebar-text: rgba(255,255,255,0.6);
-  --sidebar-text-muted: rgba(255,255,255,0.3);
+  --sidebar-text-muted: rgba(255,255,255,0.6);
   --sidebar-text-active: #ffffff;
   --sidebar-border: rgba(255,255,255,0.08);
 
@@ -1059,7 +1059,7 @@ aside a[class*="bg-[var(--sidebar-active)]"] {
   --sidebar-darker: #eef5f4;
   --sidebar-hover: rgba(14, 94, 111, 0.06);
   --sidebar-text: #2f4448;
-  --sidebar-text-muted: #6b7f83;
+  --sidebar-text-muted: #56696d;
   --sidebar-text-active: #0e5e6f;
   --sidebar-border: #dbe9e6;
   --sidebar-active: #0e5e6f;
@@ -1076,9 +1076,10 @@ aside a[class*="bg-[var(--sidebar-active)]"] {
   --accent-hover: #e8952a;
   --accent-ink: #13262b;
   --accent-light: #fdf0d8;
-  --band-action: var(--accent);
+  /* The main action on the teal band: white with teal text, so every primary action reads as the same teal family (no orange). */
+  --band-action: #ffffff;
   --band-logo-accent: #f2a541;
-  --band-action-ink: var(--accent-ink);
+  --band-action-ink: var(--primary);
 
   /* Header bands (Today, Fleet): the teal block the page opens with. */
   --band: #0e5e6f;
@@ -1379,8 +1380,15 @@ input[type="password"],
 input[type="date"],
 input[type="datetime-local"],
 input[type="time"],
+input[type="search"],
+input[type="url"],
+input:not([type]),
 select {
   height: 44px;
+}
+/* Typed values read as content, not headings: regular weight unless a field asks for more. */
+@layer base {
+  input, select, textarea { font-weight: 400; }
 }
 input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):focus,
 select:focus,
@@ -1497,7 +1505,35 @@ aside a[class*="bg-[var(--sidebar-active)]"] {
    (76px tall, 12px up), which would otherwise cover them until the end of the page. */
 .sticky-actions { bottom: calc(96px + env(safe-area-inset-bottom)); }
 .focused-flow .sticky-actions { bottom: 0; }
-@media (min-width: 1024px) { .sticky-actions { bottom: 0; } }
+@media (min-width: 1024px) { .sticky-actions { bottom: 12px; } }
+/* The bar reads as one solid surface floating over the form, not a grey strip through it. */
+.sticky-actions {
+  background: var(--panel) !important;
+  backdrop-filter: none !important;
+  box-shadow: 0 10px 30px -12px rgba(16, 38, 43, 0.28), 0 0 0 1px var(--border);
+  border-color: transparent !important;
+  align-items: center;
+}
+@media (min-width: 640px) { .sticky-actions { border-radius: 18px !important; padding: 12px !important; } }
+
+/* Shared building blocks (design pass, Oct 2026). Use these instead of one-off sizes. */
+/* One card title for every card: display face, 18px, semibold. */
+.card-title { font-family: var(--font-display); font-size: 18px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.3; color: var(--foreground); }
+/* A sub-heading inside a card. */
+.card-subtitle { font-size: 15px; font-weight: 600; color: var(--foreground); }
+/* Two page widths only: lists use the full width; forms and flows use this column, left-aligned with the page title. */
+.page-form { max-width: 768px; width: 100%; }
+/* Rows of chips or tabs: one line that scrolls sideways on phones, with a fade so it's clear there's more. */
+@media (max-width: 1023px) {
+  .chip-row { display: flex; flex-wrap: nowrap !important; overflow-x: auto; scrollbar-width: none; scroll-padding-inline: 16px;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); }
+  .chip-row::-webkit-scrollbar { display: none; }
+  .chip-row > * { flex-shrink: 0; }
+}
+/* Help text reads best at a comfortable line length. */
+.measure { max-width: 68ch; }
+/* A button that can't be used yet is plainly grey, not a washed-out teal. */
+.primary-action:disabled, .btn-primary:disabled { background: var(--panel-tertiary) !important; color: var(--muted) !important; box-shadow: none !important; opacity: 1 !important; cursor: not-allowed; }
 
 /* Trial reminder floating above the phone menu (last week of the trial): the page gets the same
    height again at the end, so the last row and its buttons are never stuck underneath it. */
@@ -1663,7 +1699,8 @@ h2 { letter-spacing: -0.015em; }
 
 /* Movement: things arrive rather than appear. Nothing moves for people who ask for less motion. */
 @media (prefers-reduced-motion: no-preference) {
-  .rise { animation: g-rise 520ms cubic-bezier(0.2, 0.7, 0.2, 1) backwards; animation-delay: var(--d, 0ms); }
+  /* Quick and subtle: the page should feel there at once, so the stagger is half the written delay and short. */
+.rise { animation: g-rise 300ms cubic-bezier(0.2, 0.7, 0.2, 1) backwards; animation-delay: calc(var(--d, 0ms) * 0.4); }
   .grow-x { animation: g-grow-x 760ms cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: var(--d, 0ms); transform-origin: left center; }
   .grow-y { animation: g-grow-y 640ms cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: var(--d, 0ms); transform-origin: center bottom; }
   .ring-draw { animation: g-ring 1100ms cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: var(--d, 200ms); }
@@ -1909,7 +1946,9 @@ details[open] > summary:not([class*="flex"]):not([class*="grid"]):not(:has(svg, 
 
 /* The side menu sits on the page's own background, no dividing line; the page you are on is a white chip that lifts. */
 .app-sidebar { background: var(--background); border-right-color: transparent; }
-.app-sidebar nav a[class*="bg-[var(--primary-light)]"] { background: #fff; box-shadow: var(--shadow-card); font-weight: 700; }
+/* The chosen page: a white pill with a hairline edge (a soft shadow bled into the row below). Same in the list and at the foot. */
+.app-sidebar a[class*="bg-[var(--primary-light)]"] { background: #fff; box-shadow: 0 1px 2px rgba(16, 38, 43, 0.06), 0 0 0 1px var(--border); font-weight: 700; }
+.app-sidebar a[data-account][aria-current="page"] { box-shadow: 0 0 0 2px var(--primary); }
 .app-sidebar nav a:not([class*="bg-[var(--primary-light)]"]):hover { background: rgba(255, 255, 255, 0.7); }
 
 /* A sideways-scrolling row of chips on a phone: scrolls by swipe, no bar under it. */

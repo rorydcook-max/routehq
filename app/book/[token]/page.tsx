@@ -10,8 +10,8 @@ import { ActiveRentalPortal } from "./active-rental-portal";
 import { CancelBooking } from "./cancel-booking";
 import { BookingCompletionForm } from "./booking-completion-form";
 import { getPublicBookingDetail } from "@/lib/public-booking";
-import { BusinessLogoImage } from "@/components/business-logo-image";
 import { BrandStyle } from "@/components/brand-style";
+import { PublicBrand, PublicShell } from "@/components/public-shell";
 import { isMapsUrl, formatDeliveryLocation } from "@/lib/delivery-location";
 import { toWallTime } from "@/lib/business-time";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -23,7 +23,6 @@ import { chatInvites } from "@/lib/customer-chat-link";
 import { promptPayQrSvg } from "@/lib/promptpay";
 import { PortalPayments } from "./portal-payments";
 import { getLocale, getTranslations } from "next-intl/server";
-import { CustomerLanguagePicker } from "@/components/customer-language-picker";
 
 /** The page's words in the customer's language. Passed to the helpers below so they stay plain functions. */
 type T = Awaited<ReturnType<typeof getTranslations>>;
@@ -246,14 +245,11 @@ function formatSummaryDate(value: unknown, t: T, locale: string) {
   return customerDate(date, locale);
 }
 
-async function ErrorState({ title, message, contact, rebookHref, rebookLabel }: { title: string; message: string; contact?: string | null; rebookHref?: string | null; rebookLabel?: string }) {
+async function ErrorState({ title, message, contact, rebookHref, rebookLabel, brand }: { title: string; message: string; contact?: string | null; rebookHref?: string | null; rebookLabel?: string; brand?: ReactNode }) {
   const t = await getTranslations("customer");
   return (
-    <main className="min-h-screen bg-[var(--panel-secondary)] px-4 py-8">
-      <div className="mx-auto mb-3 flex max-w-xl justify-end">
-        <CustomerLanguagePicker />
-      </div>
-      <section className="mx-auto max-w-xl rounded-2xl border border-[var(--border)] bg-white p-6 text-center shadow-sm">
+    <PublicShell brand={brand} width="narrow">
+      <section className="rounded-2xl border border-[var(--border)] bg-white p-6 text-center shadow-sm">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[var(--danger-light)] text-[var(--danger)]">
           <AlertTriangle />
         </div>
@@ -265,12 +261,12 @@ async function ErrorState({ title, message, contact, rebookHref, rebookLabel }: 
           </a>
         ) : null}
         {contact ? (
-          <a className={`pressable mt-5 inline-flex rounded-xl px-5 py-3 text-sm font-semibold ${rebookHref ? "ml-2 border border-[var(--border)] bg-white text-[var(--foreground)]" : "bg-[var(--primary)] text-white"}`} href={contact}>
+          <a className={`pressable mt-5 inline-flex rounded-full px-5 py-3 text-sm font-semibold ${rebookHref ? "ml-2 border-2 border-[var(--primary)] bg-white text-[var(--primary)]" : "bg-[var(--primary)] text-white"}`} href={contact}>
             {t("contactBusiness")}
           </a>
         ) : null}
       </section>
-    </main>
+    </PublicShell>
   );
 }
 
@@ -286,15 +282,18 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   const organization = detail.organization || {};
   const customer = detail.customer || {};
   const contact = contactHref(organization?.settings?.phone || organization?.settings?.business_phone || customer?.phone);
+  // Who the page is from, in the shared header row: the business logo or letter, and its name.
+  const errorBrand = organization?.name ? <PublicBrand logoUrl={organization?.logo_display_url || null} name={String(organization.name)} /> : undefined;
 
   if (detail.state === "expired") {
-    return <ErrorState contact={contact} message={t("expiredMessage", { business: organization?.name || t("theRentalBusiness") })} title={t("expiredTitle")} />;
+    return <ErrorState brand={errorBrand} contact={contact} message={t("expiredMessage", { business: organization?.name || t("theRentalBusiness") })} title={t("expiredTitle")} />;
   }
 
   if (detail.state === "taken") {
     const onlineBooking = organization?.settings?.public_booking?.enabled === true && organization?.slug;
     return (
       <ErrorState
+        brand={errorBrand}
         contact={contact}
         message={onlineBooking ? t("takenMessageOnline") : t("takenMessageContact", { business: organization?.name || t("theRentalBusiness") })}
         rebookHref={onlineBooking ? `/rent/${organization.slug}` : null}
@@ -307,6 +306,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
     const onlineBooking = organization?.settings?.public_booking?.enabled === true && organization?.slug;
     return (
       <ErrorState
+        brand={errorBrand}
         contact={contact}
         message={t("cancelledMessage", { business: organization?.name || t("theRentalBusiness") })}
         rebookHref={onlineBooking ? `/rent/${organization.slug}` : null}
@@ -321,6 +321,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
     const onlineBooking = organization?.settings?.public_booking?.enabled === true && organization?.slug;
     return (
       <ErrorState
+        brand={errorBrand}
         contact={contact}
         message={t("datesPassedMessage", { business: organization?.name || t("theRentalBusiness") })}
         rebookHref={onlineBooking ? `/rent/${organization.slug}` : null}
@@ -331,7 +332,7 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
   }
 
   if (!detail.completion || !detail.documentStatus || !detail.bookingLink) {
-    return <ErrorState contact={contact} message={t("incompleteMessage")} title={t("incompleteTitle")} />;
+    return <ErrorState brand={errorBrand} contact={contact} message={t("incompleteMessage")} title={t("incompleteTitle")} />;
   }
 
   const vehicle = detail.vehicle || {};
@@ -376,47 +377,47 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
 
   const bookingSummary = (
     <>
-          <div className="mt-5 rounded-2xl border border-[var(--border)] bg-[var(--panel-secondary)] p-4">
-            <div className="flex items-start gap-3">
-              <span className="shrink-0">
-                <VehicleArt colour={vehicle.color} kind={kindFromCategory(vehicle.vehicle_categories)} model={vehicle.model} size="sm" />
-              </span>
-              <div>
-                <h2 className="text-2xl font-semibold">{vehicleTitle(vehicle)}</h2>
-                <p className="mt-1 text-sm font-bold text-[var(--muted)]"><bdi>{vehicle.registration_number || t("platePending")}</bdi>{vehicle.color ? <> · <bdi>{vehicle.color}</bdi></> : null}</p>
-              </div>
-            </div>
-            {/* One fact per line on a phone: two columns broke prices and place names across four lines. */}
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <Info icon={CalendarDays} label={t("rentalPeriod")} value={rental.is_indefinite && detail.state !== "completed" ? t("openEndedFrom", { date: formatSummaryDate(rental.start_date, t, locale) }) : t("dateRange", { start: formatSummaryDate(rental.start_date, t, locale), end: formatSummaryDate(rental.end_date, t, locale) })} />
-              <Info icon={CreditCard} label={t("rateAndDeposit")} value={`${rateLabel(rental, t)}${extrasText(rental, t)}\n${Number(rental.deposit_amount || 0) > 0 ? t("depositAmount", { amount: money(rental.deposit_amount, rental.currency || "THB") }) : t("noDeposit")}`} />
-              {/* Once the customer has the vehicle, where and when it was to be handed over is old news. */}
-              {handedOver ? null : <Info icon={ReceiptText} label={t("firstPaymentDue")} value={paymentDueText(rental, bookingData, t, locale)} />}
-              {handedOver ? null : <Info icon={MapPin} label={t("handover")} value={delivery.location} />}
-              {handedOver ? null : <Info icon={Clock} label={t("handoverTime")} value={delivery.time} />}
+          {/* One white surface: the vehicle, then the facts as tinted tiles (no grey card nested inside the white one). */}
+          <div className="mt-4 flex items-start gap-3">
+            <span className="shrink-0">
+              <VehicleArt colour={vehicle.color} kind={kindFromCategory(vehicle.vehicle_categories)} model={vehicle.model} size="sm" />
+            </span>
+            <div className="min-w-0">
+              <h2 className="text-2xl font-semibold">{vehicleTitle(vehicle)}</h2>
+              <p className="mt-1 text-sm font-bold text-[var(--muted)]"><bdi>{vehicle.registration_number || t("platePending")}</bdi>{vehicle.color ? <> · <bdi>{vehicle.color}</bdi></> : null}</p>
+              {/* What's included sits with the vehicle it comes with, not floating under the details. */}
+              {included.length ? (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {included.map((item) => (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[var(--primary-light)] px-3 py-1 text-xs font-bold text-[var(--primary)]" key={item}>
+                      <ShieldCheck size={14} />
+                      {includedItemKey(item) && t.has(includedItemKey(item) as never) ? t(includedItemKey(item) as never) : item}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
             </div>
           </div>
-
-          {included.length ? (
-            <div className="mt-4 flex flex-wrap gap-2">
-              {included.map((item) => (
-                <span className="inline-flex items-center gap-1 rounded-full bg-[var(--primary-light)] px-3 py-1.5 text-xs font-bold text-[var(--primary)]" key={item}>
-                  <ShieldCheck size={14} />
-                  {includedItemKey(item) && t.has(includedItemKey(item) as never) ? t(includedItemKey(item) as never) : item}
-                </span>
-              ))}
-            </div>
-          ) : null}
+          {/* One fact per line on a phone: two columns broke prices and place names across four lines. Tiles keep their own height. */}
+          <div className="mt-4 grid items-start gap-3 sm:grid-cols-2">
+            <Info icon={CalendarDays} label={t("rentalPeriod")} value={rental.is_indefinite && detail.state !== "completed" ? t("openEndedFrom", { date: formatSummaryDate(rental.start_date, t, locale) }) : t("dateRange", { start: formatSummaryDate(rental.start_date, t, locale), end: formatSummaryDate(rental.end_date, t, locale) })} />
+            <Info icon={CreditCard} label={t("rateAndDeposit")} value={`${rateLabel(rental, t)}${extrasText(rental, t)}\n${Number(rental.deposit_amount || 0) > 0 ? t("depositAmount", { amount: money(rental.deposit_amount, rental.currency || "THB") }) : t("noDeposit")}`} />
+            {/* Once the customer has the vehicle, where and when it was to be handed over is old news. */}
+            {handedOver ? null : <Info icon={ReceiptText} label={t("firstPaymentDue")} value={paymentDueText(rental, bookingData, t, locale)} />}
+            {/* Where and when in one tile, so no tile is left alone on the last row. */}
+            {handedOver ? null : <Info icon={MapPin} label={t("handover")} more={{ icon: Clock, label: t("handoverTime"), value: delivery.time }} value={delivery.location} />}
+          </div>
     </>
   );
 
   return (
-    <main className="min-h-screen bg-[var(--panel-secondary)] px-4 py-5 text-[var(--foreground)]">
+    <PublicShell brand={<PublicBrand detail={t("rentalBooking")} logoUrl={logoUrl} name={String(organization?.name || businessName)} />} width="narrow">
       <BrandStyle colour={organization?.contract_accent_colour} />
-      <div className="mx-auto max-w-3xl space-y-5">
+      {/* A flex column, so the confirmation ("You're all set") can move itself to the top once the booking is signed. */}
+      <div className="flex flex-col gap-5">
         {pendingAmendmentToken ? (
           <a
-            className="pressable flex items-center justify-between gap-3 rounded-2xl border border-[var(--info-line)] bg-[var(--primary-light)] p-4 shadow-sm"
+            className="pressable -order-2 flex items-center justify-between gap-3 rounded-2xl border border-[var(--info-line)] bg-[var(--primary-light)] p-4 shadow-sm"
             href={`/amend/${pendingAmendmentToken}`}
           >
             <span>
@@ -426,26 +427,12 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
             <span className="shrink-0 rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white">{t("review")}</span>
           </a>
         ) : null}
-        <div className="flex justify-end">
-          <CustomerLanguagePicker />
-        </div>
-        <header className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
-          <div className={logoUrl ? "space-y-2" : "flex items-center gap-3"}>
-            <BusinessLogoImage
-              alt={`${organization.name} logo`}
-              className="block h-auto max-h-16 w-auto max-w-[240px] object-contain object-left"
-              fallback={<span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--primary)] text-lg font-semibold text-white">{String(organization?.name || "F").slice(0, 1)}</span>}
-              src={logoUrl}
-            />
-            <div>
-              <p className="text-sm font-semibold text-[var(--primary)]">{t("rentalBooking")}</p>
-              {logoUrl ? null : <h1 className="text-xl font-semibold">{organization?.name || ""}</h1>}
-            </div>
-          </div>
-
+        {/* The business is in the header row above; this card is the booking itself. */}
+        <header className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm [&>h1+div]:mt-0">
+          <h1 className="sr-only">{t("rentalBooking")}</h1>
           {/* On rent, the page leads with the rental itself; what was booked is one tap away. */}
           {detail.state === "active" ? (
-            <details className="mt-4">
+            <details>
               <summary className="cursor-pointer text-sm font-semibold text-[var(--primary)]">{t("yourBookingDetails")}</summary>
               {bookingSummary}
             </details>
@@ -559,7 +546,8 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
           </section>
           </>
         ) : (
-          <div className="flex flex-col gap-5">
+          // "contents": these join the page's own column, so the signed confirmation (order -1) rises above the booking card.
+          <div className="contents">
           {detail.state === "ready" ? (
             <PortalPayments bundle={portal.bundle} orgPayment={detail.org_payment} organizationName={businessName} payments={portal.payments} token={token} />
           ) : null}
@@ -594,15 +582,29 @@ export default async function PublicBookingPage({ params }: { params: Promise<{ 
           </div>
         )}
       </div>
-    </main>
+    </PublicShell>
   );
 }
 
-async function Info({ className = "", icon: Icon, label, value }: { className?: string; icon: typeof Clock; label: string; value: string }) {
+/** One fact about the booking as a tinted tile. `more` adds a second fact under the first (handover place, then time). */
+async function Info({ className = "", icon: Icon, label, value, more }: { className?: string; icon: typeof Clock; label: string; value: string; more?: { icon: typeof Clock; label: string; value: string } }) {
+  return (
+    <div className={`rounded-2xl bg-[var(--background)] p-3.5 ${className}`}>
+      <InfoPart icon={Icon} label={label} value={value} />
+      {more ? (
+        <div className="mt-3">
+          <InfoPart icon={more.icon} label={more.label} value={more.value} />
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+async function InfoPart({ icon: Icon, label, value }: { icon: typeof Clock; label: string; value: string }) {
   const t = await getTranslations("customer");
   const lines = value.split("\n");
   return (
-    <div className={`rounded-xl bg-[var(--background)] p-3.5 ${className}`}>
+    <>
       <div className="flex items-center gap-2 font-semibold text-[var(--muted)]">
         <Icon className="text-[var(--primary)]" size={16} />
         {label}
@@ -622,7 +624,7 @@ async function Info({ className = "", icon: Icon, label, value }: { className?: 
           )
         )).reduce<ReactNode[]>((nodes, node, index) => (index ? [...nodes, "\n", node] : [node]), [])}
       </p>
-    </div>
+    </>
   );
 }
 

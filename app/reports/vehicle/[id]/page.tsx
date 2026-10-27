@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/app-shell";
+import { BackLink } from "@/components/ui";
+import { VehicleTitle } from "@/components/vehicle-identity";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDefaultOrganization } from "@/lib/organization";
 import { getVehicleReportData, type DatePreset } from "@/lib/reports";
@@ -28,11 +29,17 @@ export default async function VehicleReportPage({
   return (
     <AppShell userEmail={userEmail}>
       <div className="page-hero mb-4">
-        <Link className="font-bold text-[var(--primary)]" href="/reports">
-          {say("vr_back")}
-        </Link>
-        <h1 className="page-title mt-2">{data.vehicle.plate || data.vehicle.label}</h1>
-        {name ? <p className="page-subtitle page-subtitle-keep mt-1">{name}</p> : null}
+        <BackLink href="/reports" label={say("vr_back")} />
+        {/* The one vehicle header: name, year, plate chip (the plate is no longer the title). */}
+        <VehicleTitle
+          as="h1"
+          className="gap-x-3"
+          name={name || data.vehicle.label}
+          nameClassName="page-title"
+          plate={name ? data.vehicle.plate : null}
+          plateClassName="!px-2 !py-1 !text-[14px]"
+          year={(data.vehicle as unknown as { year?: string | number | null }).year}
+        />
       </div>
       <VehicleReportView data={data} />
     </AppShell>

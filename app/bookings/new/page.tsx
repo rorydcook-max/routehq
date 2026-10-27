@@ -1,10 +1,9 @@
 import { releaseExpiredHolds } from "@/lib/booking-holds";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/app-shell";
-import { Card, SectionHeader } from "@/components/ui";
+import { BackLink, Card, SectionHeader } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDefaultOrganization } from "@/lib/organization";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -97,14 +96,11 @@ export default async function NewBookingPage({ searchParams }: { searchParams: P
   return (
     <AppShell userEmail={userEmail}>
       {/* Left-aligned like every other page (it used to sit in a centred column, so the title jumped on the way in). */}
-      <div className="max-w-2xl">
+      <div className="page-form">
         <div className="page-hero mb-5">
           <div>
-            <Link className="inline-flex items-center gap-1 text-sm font-bold text-[var(--primary)] hover:underline" href="/bookings">
-              <ArrowLeft size={14} />
-              {t("pageBack")}
-            </Link>
-            <h1 className="page-title mt-3">{t("pageTitle")}</h1>
+            <BackLink href="/bookings" label={t("pageBack")} />
+            <h1 className="page-title">{t("pageTitle")}</h1>
             <p className="page-subtitle mt-2 hidden sm:block">{t("pageSubtitle")}</p>
           </div>
         </div>

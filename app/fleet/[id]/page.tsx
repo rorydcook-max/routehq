@@ -11,7 +11,7 @@ import { VehiclePhotoManager } from "@/app/fleet/[id]/vehicle-photo-manager";
 import { VehicleTimeline, type VehicleTimelineEvent } from "@/app/fleet/[id]/vehicle-timeline";
 import { AppShell } from "@/components/app-shell";
 import { VehicleArt } from "@/components/vehicle-art";
-import { DateLeaf, Dot, ElapsedBar, InOutBars, Ring } from "@/components/glance";
+import { Dot, ElapsedBar, InOutBars, Ring } from "@/components/glance";
 import { PageTabs, type PageTab } from "@/components/page-tabs";
 import { isTwoWheeler, kindFromCategory } from "@/lib/vehicle-groups";
 import { RenewalForm, RenewalHelp } from "./renewal";
@@ -19,7 +19,8 @@ import { partnerQuote } from "@/lib/insurance-partners";
 import { RentalAdjustmentButton } from "@/components/rental-adjustment-modal";
 import { InspectionViewer } from "@/components/inspection-viewer";
 import { PendingButton } from "@/components/pending-button";
-import { Badge, Card, Pane, ProgressBar } from "@/components/ui";
+import { BackLink, Badge, Card, Pane, ProgressBar } from "@/components/ui";
+import { VehicleTitle, vehicleName } from "@/components/vehicle-identity";
 import { amountDueNowByRental } from "@/lib/rental-balances";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getCurrentUserEmail } from "@/lib/auth/session";
@@ -54,6 +55,17 @@ function money(value: unknown) {
 
 function percent(value: unknown) {
   return `${Math.round(Number(value || 0))}%`;
+}
+
+/** "Thu 22 Oct": a booking's start or end on one short line. */
+function shortDay(value: string, locale: string) {
+  return dateFormat(locale, { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${toWallTime(value).slice(0, 10)}T00:00:00Z`));
+}
+
+/** Short month names: en-GB says "Sept" beside "Nov" and "Dec"; three letters for all of them. */
+function shortMonth(date: Date, locale: string) {
+  const name = dateFormat(locale, { month: "short" }).format(date);
+  return locale.startsWith("en") ? name.slice(0, 3) : name;
 }
 
 function formatDate(value: string | null | undefined, tx: Vx) {
@@ -116,29 +128,20 @@ function EmptyState({ children, action }: { children: React.ReactNode; action?: 
   );
 }
 
-function Plate({ registration, province }: { registration: string; province?: string }) {
-  return (
-    <div className="thai-plate min-w-48">
-      <span className="thai-plate-number font-mono-data">{registration}</span>
-      {province ? <span className="thai-plate-province">{province}</span> : null}
-    </div>
-  );
-}
-
 function InfoRow({ label, value, danger = false }: { label: string; value: React.ReactNode; danger?: boolean }) {
   return (
-    <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5">
+    <div className="rounded-2xl bg-[var(--panel-secondary)] p-3.5">
       <p className="font-semibold text-[var(--muted)]">{label}</p>
-      <p className={`mt-0.5 text-[17px] font-bold tabular-nums ${danger ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{value}</p>
+      <p className={`mt-0.5 text-[17px] font-semibold tabular-nums ${danger ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{value}</p>
     </div>
   );
 }
 
 function QuickActions({ vehicleId, status, rentalId }: { vehicleId: string; status: string; rentalId?: string | null }) {
   const tx = useVx();
-  // The main button follows what the vehicle is doing: out with a customer, the next thing wanted is that booking.
+  // The main button follows what the vehicle is doing. Out with a customer, the card just below already opens the booking, so recording money is the main thing here.
   const primary = rentalId
-    ? { href: `/bookings/${rentalId}`, label: tx.say("a_openBooking"), icon: CalendarDays }
+    ? { href: detailUrl("/transactions/new", vehicleId), label: tx.say("a_recordMoney"), icon: ReceiptText }
     : status === "available"
       ? { href: detailUrl("/bookings/new", vehicleId), label: tx.say("a_newBooking"), icon: CalendarDays }
       : { href: detailUrl("/transactions/new", vehicleId), label: tx.say("a_recordMoney"), icon: ReceiptText };
@@ -156,14 +159,11 @@ function QuickActions({ vehicleId, status, rentalId }: { vehicleId: string; stat
 
   return (
     <div className="space-y-2">
-      {/* Out with a customer: the card just below already opens the booking, so it is not offered twice. */}
-      {rentalId ? null : (
-        <Link className="pressable primary-action w-full !px-3 text-center leading-tight" href={primary.href as Route}>
-          <PrimaryIcon className="shrink-0" size={18} />
-          {primary.label}
-        </Link>
-      )}
-      <div className="grid grid-cols-2 gap-2">
+      <Link className="pressable primary-action w-full !px-3 text-center leading-tight" href={primary.href as Route}>
+        <PrimaryIcon className="shrink-0" size={18} />
+        {primary.label}
+      </Link>
+      <div className={`grid gap-2 ${shown.length > 1 ? "grid-cols-2" : "grid-cols-1"}`}>
         {shown.map((action) => {
           const Icon = action.icon;
           return (
@@ -206,13 +206,17 @@ function Glance({ detail, isOwner }: { detail: VehicleDetail; isOwner: boolean }
   const condition = (detail.vehicle as any).metadata?.condition;
   const byDamage = condition?.by === "damage";
   const latestInspection = detail.inspections[0];
-  const tile = "card pressable flex min-h-[132px] flex-col justify-between gap-2 p-4";
+  // Title at the top, one value, one caption at the bottom: every tile's value in the same face and size.
+  const tile = "card pressable flex min-h-[132px] flex-col justify-start gap-2.5 p-4";
+  const value = "num text-[22px] leading-tight";
 
   return (
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
       <a className={tile} href="#money">
         <span className="tile-title">{isOwner ? tx.say("gl_profit") : tx.say("gl_monthIn")}</span>
-        <span className={`num text-[22px] leading-none ${isOwner && f.lifetimeProfit < 0 ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{money(isOwner ? f.lifetimeProfit : f.currentMonthRevenue)}</span>
+        <span className={`${value} ${isOwner && f.lifetimeProfit < 0 ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{money(isOwner ? f.lifetimeProfit : f.currentMonthRevenue)}</span>
+        {/* One bar is not a trend: the little chart waits for two months with money. */}
+        {months.filter((month) => month.revenue > 0 || month.expenses > 0).length < 2 ? null : (
         <span aria-hidden="true" className="flex h-[30px] items-end justify-between border-b-2 border-[var(--border)]">
           {months.map((month) => (
             <span className="flex items-end gap-[2px]" key={month.label}>
@@ -221,24 +225,25 @@ function Glance({ detail, isOwner }: { detail: VehicleDetail; isOwner: boolean }
             </span>
           ))}
         </span>
-        <span className="font-semibold text-[var(--foreground-secondary)]">{tx.say("gl_last6")}</span>
+        )}
+        <span className="mt-auto font-semibold text-[var(--foreground-secondary)]">{isOwner ? tx.say("gl_allTime") : tx.say("gl_thisMonth")}</span>
       </a>
       <a className={tile} href="#rentals">
         <span className="tile-title">{tx.say("gl_rented")}</span>
-        <span className="flex items-center gap-3">
-          <Ring label={percent(u.twelveMonth)} labelSize={15} pct={u.twelveMonth} size={66} stroke={7} />
+        <span className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+          <Ring label={percent(u.twelveMonth)} labelSize={13} pct={u.twelveMonth} size={66} stroke={7} />
           <span className="font-semibold leading-snug text-[var(--foreground-secondary)]">{tx.say("gl_fleetAvg", { percent: percent(u.fleetAverage) })}</span>
         </span>
       </a>
       <a className={tile} href="#upkeep">
         <span className="tile-title">{tx.say("g_paper")}</span>
-        <span className="text-[18px] font-bold leading-tight text-[var(--foreground)]">{soonest ? soonest.name : tx.say("gl_notSetUp")}</span>
-        <span className={`font-bold ${soonest ? toneText[soonestUrgency.tone] : "text-[var(--primary)]"}`}>{soonest ? soonestUrgency.label : tx.say("g_addDates")}</span>
+        <span className={`${value} text-[var(--foreground)]`}>{soonest ? soonest.name : tx.say("gl_notSetUp")}</span>
+        <span className={`mt-auto font-semibold ${soonest ? toneText[soonestUrgency.tone] : "text-[var(--primary)]"}`}>{soonest ? soonestUrgency.label : tx.say("g_addDates")}</span>
       </a>
       <a className={tile} href="#checks">
         <span className="tile-title">{tx.say("g_mileage")}</span>
-        <span className="num text-[22px] leading-none text-[var(--foreground)]">{tx.say("km", { km: Number(detail.vehicle.mileage || 0).toLocaleString("en-US") })}</span>
-        <span className={`font-semibold ${byDamage ? toneText.amber : toneText.neutral}`}>
+        <span className={`${value} text-[var(--foreground)]`}>{tx.say("km", { km: Number(detail.vehicle.mileage || 0).toLocaleString("en-US") })}</span>
+        <span className={`mt-auto font-semibold ${byDamage ? toneText.amber : toneText.neutral}`}>
           {/* "Good · checked 3 Oct 2026", or just "Last checked 3 Oct 2026"; never "Condition not set · 3 Oct". */}
           {condition?.value
             ? `${tx.say(`cond_${condition.value}`)}${latestInspection?.inspected_at ? ` · ${tx.say("gl_checked", { date: formatDate(latestInspection.inspected_at, tx) })}` : ""}`
@@ -319,10 +324,11 @@ function ActiveRentalCard({ detail, dueNow }: { detail: VehicleDetail; dueNow: n
         <InfoRow
           label={tx.say("ar_period")}
           value={rental.end_date && rental.start_date ? (
-            <span className="mt-1.5 flex items-center gap-1.5 sm:gap-2">
-              <DateLeaf date={toWallTime(rental.start_date).slice(0, 10)} locale={tx.locale} />
-              <ArrowRight aria-hidden="true" className="hidden text-[var(--muted)] sm:block" size={16} />
-              <DateLeaf date={toWallTime(rental.end_date).slice(0, 10)} locale={tx.locale} tone="var(--coming-back)" />
+            // One line ("Thu 22 Oct → Mon 4 Jan") so all four tiles stay the same short height.
+            <span className="inline-flex flex-wrap items-center gap-x-1.5">
+              <span className="whitespace-nowrap">{shortDay(rental.start_date, tx.locale)}</span>
+              <ArrowRight aria-hidden="true" className="text-[var(--muted)]" size={15} />
+              <span className="whitespace-nowrap">{shortDay(rental.end_date, tx.locale)}</span>
               <span className="sr-only">{tx.say("ar_range", { from: formatDate(rental.start_date, tx), to: formatDate(rental.end_date, tx) })}</span>
             </span>
           ) : tx.say("ar_rangeOpen", { from: formatDate(rental.start_date, tx) })}
@@ -489,21 +495,23 @@ function FinancialSection({ detail, isOwner }: { detail: VehicleDetail; isOwner:
   const f = detail.financials;
   const chartMonths = f.monthlyChart.map((month, index) => ({
     key: String(index),
-    label: dateFormat(tx.locale, { month: "short" }).format(new Date(businessNow().getFullYear(), businessNow().getMonth() - (f.monthlyChart.length - 1 - index), 1)),
+    label: shortMonth(new Date(businessNow().getFullYear(), businessNow().getMonth() - (f.monthlyChart.length - 1 - index), 1), tx.locale),
     in: month.revenue,
     out: month.expenses
   }));
+  // A year of empty stubs with one bar says nothing: the chart waits for two months with money in or out.
+  const monthsWithMoney = chartMonths.filter((month) => month.in > 0 || month.out > 0).length;
 
   return (
+    // No summary line: it only repeated a figure shown in the tile above and in the rows below.
     <Pane
-      summary={isOwner ? tx.say("fi_summary", { profit: money(f.lifetimeProfit) }) : tx.say("fi_summaryTeam", { amount: money(f.currentMonthRevenue) })}
       title={tx.say("fi_title")}
       tone={isOwner && f.lifetimeProfit < 0 ? "red" : "neutral"}
     >
-      {/* Profit, what was paid and what it is worth are the owner's; a teammate sees the money in and out. */}
-      <div className="grid grid-cols-2 gap-2.5">
+      {/* Three figures: this month, money in all time, costs all time. Profit is already the first tile above the tabs.
+          What was paid and what it is worth are the owner's; a teammate sees the money in and out. */}
+      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
         <InfoRow label={tx.say("fi_month")} value={money(f.currentMonthRevenue)} />
-        {isOwner ? <InfoRow danger={f.lifetimeProfit < 0} label={tx.say("fi_profit")} value={money(f.lifetimeProfit)} /> : null}
         <InfoRow label={tx.say("fi_totalIn")} value={money(f.lifetimeRevenue)} />
         <InfoRow label={tx.say("fi_totalOut")} value={money(f.lifetimeExpenses)} />
         {isOwner && f.purchasePrice > 0 ? <InfoRow label={tx.say("fi_purchase")} value={money(f.purchasePrice)} /> : null}
@@ -511,7 +519,8 @@ function FinancialSection({ detail, isOwner }: { detail: VehicleDetail; isOwner:
         {isOwner && f.purchasePrice > 0 && f.estimatedValue > 0 ? <InfoRow label={tx.say("fi_depreciation")} value={money(f.depreciation)} /> : null}
         {isOwner && f.purchasePrice > 0 ? <InfoRow danger={f.roi < 0} label={tx.say("fi_roi")} value={percent(f.roi)} /> : null}
       </div>
-      <div className="mt-3 rounded-xl bg-[var(--panel-secondary)] p-3.5">
+      {monthsWithMoney < 2 ? null : (
+      <div className="mt-3 rounded-2xl bg-[var(--panel-secondary)] p-3.5">
         <p className="font-bold text-[var(--foreground)]">{tx.say("fi_chart")}</p>
         {[
           { months: chartMonths, className: "hidden sm:block" },
@@ -526,6 +535,7 @@ function FinancialSection({ detail, isOwner }: { detail: VehicleDetail; isOwner:
           <span className="inline-flex items-center gap-1.5"><Dot color="var(--chart-out)" />{tx.say("fi_outWord")}</span>
         </p>
       </div>
+      )}
       {/* Every payment in and out for this vehicle sits under its totals: one subject, one row on the page. */}
       <TransactionsSection detail={detail} />
     </Pane>
@@ -933,7 +943,6 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
   }
 
   const { vehicle } = detail;
-  const title = [vehicle.make, vehicle.model, vehicle.trim, vehicle.year].filter(Boolean).join(" ");
   const status = String(vehicle.status || "").toLowerCase();
   const statusTone = status === "rented" ? "blue" : status === "available" ? "green" : status === "reserved" || status === "maintenance" ? "amber" : "neutral";
   // Only what has fallen due, the same figure the booking page shows.
@@ -995,26 +1004,34 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
   return (
     <AppShell userEmail={userEmail}>
       <div className="space-y-3">
-        <div className="flex flex-wrap items-center gap-2 font-bold text-[var(--muted)]">
-          <Link className="text-[var(--primary)]" href="/fleet">{tx.say("fleet")}</Link>
-          <span>/</span>
-          <span>{[vehicle.make, vehicle.model].filter(Boolean).join(" ")}</span>
-        </div>
+        <BackLink className="!mb-0" href="/fleet" label={tx.say("fleet")} />
 
         <Card>
           <div className="card-section">
-            <div className="grid gap-4 lg:grid-cols-[minmax(0,1.45fr)_minmax(340px,0.9fr)] lg:items-stretch">
+            {/* The photo takes about two fifths; the name, plate and actions get the room. */}
+            <div className="grid gap-4 lg:grid-cols-[minmax(0,0.8fr)_minmax(340px,1.2fr)] lg:items-stretch">
               <VehiclePhotoManager art={<VehicleArt colour={vehicle.color} kind={kindFromCategory(detail.category)} model={vehicle.model} size="xl" />} organizationId={organization.id} photos={detail.photos} vehicleId={vehicle.id} vehicleLabel={[vehicle.make, vehicle.model].filter(Boolean).join(" ")} />
               <div className="flex min-w-0 flex-col justify-between gap-4">
                 <div className="min-w-0">
                   <div className="mb-2 flex flex-wrap items-center gap-2">
-                    <Badge tone={statusTone}>{tx.has(`vs_${status}`) ? tx.say(`vs_${status}`) : vehicle.status}</Badge>
+                    {statusTone === "blue" ? (
+                      <span className="badge inline-flex items-center bg-[var(--primary-light)] text-[var(--primary)]">{tx.has(`vs_${status}`) ? tx.say(`vs_${status}`) : vehicle.status}</span>
+                    ) : (
+                      <Badge tone={statusTone}>{tx.has(`vs_${status}`) ? tx.say(`vs_${status}`) : vehicle.status}</Badge>
+                    )}
                   </div>
-                  <h1 className="max-w-full text-[26px] font-bold leading-tight tracking-[-0.01em] text-[var(--foreground)]">{title}</h1>
-                  <div className="mt-3">
-                    <Plate province={vehicle.metadata?.registration_province} registration={vehicle.registration_number} />
-                  </div>
-                  {rateLine ? <p className="mt-3 text-[17px] font-bold text-[var(--foreground)]">{rateLine}</p> : null}
+                  {/* The one vehicle header: name, year, plate chip. */}
+                  <VehicleTitle
+                    as="h1"
+                    className="gap-x-3"
+                    name={vehicleName(vehicle)}
+                    nameClassName="max-w-full text-[26px] font-semibold leading-tight tracking-[-0.01em] text-[var(--foreground)]"
+                    plate={vehicle.registration_number}
+                    plateClassName="!px-2 !py-1 !text-[15px]"
+                    province={vehicle.metadata?.registration_province}
+                    year={vehicle.year}
+                  />
+                  {rateLine ? <p className="mt-3 text-[17px] font-semibold tabular-nums text-[var(--foreground)]">{rateLine}</p> : null}
                 </div>
                 <QuickActions rentalId={detail.activeRental?.id || null} status={vehicle.status} vehicleId={vehicle.id} />
               </div>

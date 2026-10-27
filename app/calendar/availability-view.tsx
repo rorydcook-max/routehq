@@ -6,6 +6,7 @@ import { VehicleKindIcon } from "@/components/vehicle-kind-icon";
 import type { AvailabilityBooking, AvailabilityVehicle } from "@/lib/calendar";
 import { kindFromCategory, kindLabel, type VehicleKind } from "@/lib/vehicle-groups";
 import { ScrollToToday } from "./scroll-to-today";
+import { ChevronRight } from "lucide-react";
 
 const barClasses: Record<AvailabilityBooking["state"], string> = {
   out: "bg-[var(--primary)] text-white",
@@ -13,6 +14,9 @@ const barClasses: Record<AvailabilityBooking["state"], string> = {
   late: "bg-[var(--danger)] text-white",
   returned: "bg-[var(--panel-secondary)] text-[var(--muted)] border border-[var(--border)]"
 };
+
+/** Booked, but the handover day has passed and it never went out: late, so red like a late return (the legend's "Late"). */
+const lateHandoverClasses = barClasses.late;
 
 // The words for each state are in the language files (calendar.st_<state>).
 
@@ -67,10 +71,10 @@ export function AvailabilityView({ vehicles, month, today }: { vehicles: Availab
         <p className="text-sm font-semibold text-[var(--foreground)]">
           {freeToday === null ? t("vehicleCount", { count: vehicles.length }) : t("freeToday", { free: freeToday, total: vehicles.length })}
         </p>
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[var(--foreground-secondary)]">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] font-semibold text-[var(--foreground-secondary)]">
           {(["out", "booked", "late", "returned"] as const).map((state) => (
             <span className="inline-flex items-center gap-1.5" key={state}>
-              <span className={`h-3 w-5 rounded ${barClasses[state]}`} />
+              <span className={`h-3 w-3 rounded-[3px] ${barClasses[state]} ${state === "returned" ? "!border-[var(--border-strong)]" : ""}`} />
               {t(`st_${state}`)}
             </span>
           ))}
@@ -123,18 +127,31 @@ export function AvailabilityView({ vehicles, month, today }: { vehicles: Availab
                         title={t("freeTap", { vehicle: vehicle.name })}
                       />
                     ))}
-                    {vehicle.bookings.map((booking) => (
-                      <Link
-                        className={`z-10 mx-0.5 flex h-7 items-center overflow-hidden px-1.5 text-[11px] font-semibold ${barClasses[booking.state]} ${booking.startsBefore ? "rounded-l-none" : "rounded-l-md"} ${booking.runsOn ? "rounded-r-none" : "rounded-r-md"}`}
-                        href={`/bookings/${booking.id}` as Route}
-                        key={booking.id}
-                        style={{ gridColumn: `${dayOf(booking.from)} / ${dayOf(booking.to) + 1}`, gridRow: 1 }}
-                        title={booking.state === "late" && booking.dueBack ? `${booking.customer} · ${t("lateBar", { date: shortDay(booking.dueBack, locale), days: booking.daysLate || 1 })}` : `${booking.customer} · ${t(`st_${booking.state}`)}`}
-                      >
-                        {/* A late bar runs on to today; the text says when it was actually due so the bar's end is not read as the return date. */}
-                        <span className="truncate">{booking.state === "late" && booking.dueBack ? `${booking.customer} · ${t("lateBar", { date: shortDay(booking.dueBack, locale), days: booking.daysLate || 1 })}` : booking.customer}</span>
-                      </Link>
-                    ))}
+                    {vehicle.bookings.map((booking) => {
+                      // Booked, its first day gone by, and still not handed over: red, as late as a late return.
+                      const handoverLate = booking.state === "booked" && !booking.startsBefore && booking.from < today;
+                      const lateDays = handoverLate ? Math.round((new Date(`${today}T00:00:00Z`).getTime() - new Date(`${booking.from}T00:00:00Z`).getTime()) / 86_400_000) : 0;
+                      const text =
+                        booking.state === "late" && booking.dueBack
+                          ? `${booking.customer} · ${t("lateBar", { date: shortDay(booking.dueBack, locale), days: booking.daysLate || 1 })}`
+                          : handoverLate
+                            ? `${booking.customer} · ${t("handoverLateBar", { days: lateDays })}`
+                            : booking.customer;
+                      return (
+                        <Link
+                          // overflow-clip (not hidden) so the name can stay pinned beside the vehicle column while the bar scrolls.
+                          className={`z-10 mx-0.5 flex h-7 items-center overflow-clip px-1.5 text-[11px] font-semibold ${handoverLate ? lateHandoverClasses : barClasses[booking.state]} ${booking.startsBefore ? "rounded-l-none" : "rounded-l-md"} ${booking.runsOn ? "rounded-r-none" : "rounded-r-md"}`}
+                          href={`/bookings/${booking.id}` as Route}
+                          key={booking.id}
+                          style={{ gridColumn: `${dayOf(booking.from)} / ${dayOf(booking.to) + 1}`, gridRow: 1 }}
+                          title={`${text} · ${shortDay(booking.from, locale)} – ${shortDay(booking.to, locale)}${booking.state === "late" || handoverLate ? "" : ` · ${t(`st_${booking.state}`)}`}`}
+                        >
+                          {/* A late bar runs on to today; the text says when it was actually due so the bar's end is not read as the return date. */}
+                          <span className="sticky left-[116px] min-w-0 flex-1 truncate sm:left-[172px]">{text}</span>
+                          {booking.runsOn ? <ChevronRight aria-hidden="true" className="-mr-1 shrink-0 opacity-80" size={14} /> : null}
+                        </Link>
+                      );
+                    })}
                   </div>
                 </div>
               ))}

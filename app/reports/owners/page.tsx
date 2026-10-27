@@ -2,6 +2,8 @@ import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
+import { BackLink, EmptyState } from "@/components/ui";
+import { VehicleTitle } from "@/components/vehicle-identity";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { businessToday } from "@/lib/business-time";
 import { longDate, dateFormat, numberLocale } from "@/lib/i18n/dates";
@@ -63,15 +65,15 @@ export default async function OwnerStatementsPage({ searchParams }: { searchPara
 
   return (
     <AppShell userEmail={userEmail}>
-      <div className="mx-auto max-w-3xl space-y-4">
+      <div className="page-form space-y-4">
         <div className="page-hero print:hidden">
-          <Link className="text-sm font-bold text-[var(--primary)]" href="/reports">
-            {say("back")}
-          </Link>
-          <h1 className="page-title mt-2">{say("title")}</h1>
-          <p className="page-subtitle mt-2">{say("subtitle")}</p>
+          <BackLink href="/reports" label={say("back")} />
+          <h1 className="page-title">{say("title")}</h1>
+          <p className="page-subtitle measure mt-2">{say("subtitle")}</p>
         </div>
 
+        {/* No vehicle is owned by someone else: a month to step through would only lead to more empty months. */}
+        {owned.length === 0 ? null : (
         <div className="flex items-center justify-between gap-2 print:hidden">
           <Link aria-label={say("previous")} className="secondary-action pressable !px-3" href={`/reports/owners?month=${shiftMonth(month, -1)}`}>
             <ChevronLeft size={18} />
@@ -81,11 +83,19 @@ export default async function OwnerStatementsPage({ searchParams }: { searchPara
             <ChevronRight size={18} />
           </Link>
         </div>
+        )}
 
         {byOwner.size === 0 ? (
-          <div className="card p-5">
-            <p className="font-bold">{say("noneTitle")}</p>
-            <p className="mt-1 text-[var(--foreground-secondary)]">{say("noneBody")}</p>
+          <div className="card">
+            <EmptyState
+              action={
+                <Link className="secondary-action pressable" href="/fleet">
+                  {say("noneAction")}
+                </Link>
+              }
+              description={say("noneBody")}
+              title={say("noneTitle")}
+            />
           </div>
         ) : (
           <>
@@ -99,16 +109,14 @@ export default async function OwnerStatementsPage({ searchParams }: { searchPara
                   <p className="text-sm font-semibold text-[var(--muted)]">
                     {organization.name} · {monthName}
                   </p>
-                  <h2 className="mt-1 text-xl font-bold">{say("statementFor", { name: owner })}</h2>
+                  <h2 className="card-title mt-1">{say("statementFor", { name: owner })}</h2>
                   {list[0].partner.phone ? <p className="text-sm text-[var(--muted)]">{list[0].partner.phone}</p> : null}
-                  <p className="mt-3 text-3xl font-bold">{baht(totalShare)}</p>
+                  <p className="num mt-3 text-3xl">{baht(totalShare)}</p>
                   <p className="text-sm text-[var(--foreground-secondary)]">{say("theirShare")}</p>
-                  <div className="mt-4 space-y-4">
+                  <div className="mt-4 space-y-3">
                     {list.map((item) => (
-                      <div className="rounded-xl border border-[var(--border)] p-3" key={item.vehicleId}>
-                        <p className="font-bold">
-                          {item.name} <span className="font-medium text-[var(--muted)]">{item.plate}</span>
-                        </p>
+                      <div className="rounded-2xl bg-[var(--panel-secondary)] p-3.5" key={item.vehicleId}>
+                        <VehicleTitle name={item.name} plate={item.plate} />
                         <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-sm sm:grid-cols-4">
                           <dt className="text-[var(--muted)]">{say("moneyIn")}</dt>
                           <dd className="text-right font-semibold sm:text-left">{baht(item.income)}</dd>

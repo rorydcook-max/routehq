@@ -48,17 +48,18 @@ export function BranchList({ branches, organizationId }: { branches: Branch[]; o
   const [isAddingBranch, setIsAddingBranch] = useState(false);
 
   return (
-    <div className="card-section space-y-2.5">
+    <div className="space-y-2.5">
       {branches.map((branch) => {
         const isEditing = editingBranchId === branch.id;
+        const contact = [branch.phone, branch.email].filter(Boolean).join(" / ");
         return (
-          <div className="rounded-xl bg-[var(--panel-secondary)] p-3.5" key={branch.id}>
+          <div className="rounded-2xl bg-[var(--panel-secondary)] p-3.5" key={branch.id}>
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-[16px] font-bold leading-tight text-[var(--foreground)]">{branch.name}</p>
-                <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">
-                  {[branch.address || say("br_noAddress"), [branch.phone, branch.email].filter(Boolean).join(" / ") || say("br_noContact")].join(" · ")}
-                </p>
+                <p className="card-subtitle leading-tight">{branch.name}</p>
+                <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{branch.address || say("br_noAddress")}</p>
+                {/* Contact details on their own line, muted when there are none. */}
+                <p className={`mt-0.5 text-sm font-medium ${contact ? "text-[var(--foreground-secondary)]" : "text-[var(--muted)]"}`}>{contact || say("br_noContact")}</p>
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 {branch.is_active ? null : <Badge tone="amber">{say("br_inactive")}</Badge>}
@@ -100,13 +101,13 @@ export function BranchList({ branches, organizationId }: { branches: Branch[]; o
                   <input className="flex-shrink-0" defaultChecked={branch.is_active} name="isActive" type="checkbox" />
                   <span className="font-semibold text-[var(--foreground)]">{say("br_active")}</span>
                 </label>
-                <div className="flex gap-2 sm:col-span-2">
+                <div className="flex flex-wrap gap-2 sm:col-span-2">
+                  <PendingButton className="primary-action" pendingLabel={say("saving")} savedLabel={say("saved")} type="submit">
+                    {say("save")}
+                  </PendingButton>
                   <button className="secondary-action" onClick={() => setEditingBranchId(null)} type="button">
                     {say("cancel")}
                   </button>
-                  <PendingButton className="primary-action flex-1" pendingLabel={say("saving")} savedLabel={say("saved")} type="submit">
-                    {say("save")}
-                  </PendingButton>
                 </div>
               </form>
             ) : null}
@@ -118,13 +119,13 @@ export function BranchList({ branches, organizationId }: { branches: Branch[]; o
         <form action={createBranch} className="grid gap-3 rounded-xl bg-[var(--panel-secondary)] p-3.5 sm:grid-cols-2">
           <input name="organizationId" type="hidden" value={organizationId} />
           <BranchFields say={say} />
-          <div className="flex gap-2 sm:col-span-2">
+          <div className="flex flex-wrap gap-2 sm:col-span-2">
+            <PendingButton className="primary-action" pendingLabel={say("br_adding")} type="submit">
+              {say("br_add")}
+            </PendingButton>
             <button className="secondary-action" onClick={() => setIsAddingBranch(false)} type="button">
               {say("cancel")}
             </button>
-            <PendingButton className="primary-action flex-1" pendingLabel={say("br_adding")} type="submit">
-              {say("br_add")}
-            </PendingButton>
           </div>
         </form>
       ) : (

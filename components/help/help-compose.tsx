@@ -92,7 +92,7 @@ export function HelpCompose({
       {mode === "new" ? (
         <div>
           <p className="font-semibold text-[var(--foreground)]">{say("aboutLabel")}</p>
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div className="chip-row mt-2 flex flex-wrap gap-2">
             {PICKABLE_TOPICS.map((value) => (
               <button
                 aria-pressed={topic === value}
@@ -111,7 +111,7 @@ export function HelpCompose({
       <label className="block">
         <span className="sr-only">{say("messageLabel")}</span>
         <textarea
-          className="block min-h-[120px] w-full"
+          className="block min-h-[120px] w-full resize-y"
           disabled={busy}
           onChange={(event) => setBody(event.target.value)}
           placeholder={mode === "new" ? say(`placeholder_${topic}`) : asTeam ? say("placeholderTeam") : say("placeholderReply")}
@@ -140,7 +140,8 @@ export function HelpCompose({
           <Paperclip size={17} />
           {say("addFiles")}
         </button>
-        <button className="primary-action pressable" disabled={busy} onClick={send} type="button">
+        {/* Send stays disabled until there is something to send: words or a file. */}
+        <button className="primary-action pressable disabled:opacity-40" disabled={busy || (!body.trim() && !files.length)} onClick={send} type="button">
           <Send size={17} />
           {busy ? progress || say("sending") : mode === "new" ? say("send") : say("sendReply")}
         </button>

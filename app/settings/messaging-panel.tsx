@@ -50,7 +50,7 @@ function ConnectForm({ provider, publicUrl, replacing = false }: { provider: Pro
     <div className={replacing ? "mt-3 rounded-xl bg-white" : "rounded-xl bg-[var(--panel-secondary)]"}>
       <button aria-expanded={open} className="flex w-full items-center justify-between gap-3 p-3.5 text-left" onClick={() => setOpen((value) => !value)} type="button">
         <span>
-          <span className="block text-[16px] font-bold text-[var(--foreground)]">{replacing ? say("mp_replaceTitle") : say("mp_connect", { name: say(guide.name) })}</span>
+          <span className="card-subtitle block">{replacing ? say("mp_replaceTitle") : say("mp_connect", { name: say(guide.name) })}</span>
           <span className="mt-0.5 block font-medium text-[var(--foreground-secondary)]">{replacing ? say("mp_replaceBlurb") : say(guide.blurb)}</span>
         </span>
         <ChevronDown className={`flex-shrink-0 text-[var(--muted)] transition ${open ? "rotate-180" : ""}`} size={20} />
@@ -105,7 +105,7 @@ function ConnectedChannel({ channel, publicUrl }: { channel: Channel; publicUrl:
         <div className="flex items-center gap-3">
           {channel.send_error ? <AlertTriangle className="flex-shrink-0 text-[var(--danger)]" size={22} /> : <CheckCircle2 className="flex-shrink-0 text-[var(--success)]" size={22} />}
           <div>
-            <p className="text-[16px] font-bold leading-tight text-[var(--foreground)]">{channel.display_name || providerName}</p>
+            <p className="card-subtitle leading-tight">{channel.display_name || providerName}</p>
             <p className={`mt-0.5 ${channel.send_error ? "font-bold text-[var(--danger)]" : "font-medium text-[var(--foreground-secondary)]"}`}>
               {providerName} · {channel.send_error ? say("mp_connectedBad") : say("mp_connected")}
             </p>
@@ -183,7 +183,7 @@ export function MessagingPanel({ channels, publicUrl }: { channels: Channel[]; p
         .map((provider) => (
           <ConnectForm key={provider} provider={provider} publicUrl={publicUrl} />
         ))}
-      <p className="px-1 font-medium text-[var(--foreground-secondary)]">{say("mp_soon")}</p>
+      <p className="measure text-sm font-medium text-[var(--muted)]">{say("mp_soon")}</p>
     </div>
   );
 }

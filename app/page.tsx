@@ -68,7 +68,7 @@ function AgendaRow({ item, art, card = false, delay }: { item: AgendaItem; art?:
   return (
     <li className={delay === undefined ? undefined : "rise"} style={delay === undefined ? undefined : ({ ["--d" as string]: `${delay}ms` } as CSSProperties)}>
       <Link className={`group flex items-center gap-3.5 transition ${card ? "card pressable p-3" : "px-4 py-3.5 hover:bg-[var(--panel-secondary)]"}`} href={item.href as Route}>
-        {art || <span className={`inline-flex flex-shrink-0 items-center justify-center ${card ? "h-11 w-14 rounded-xl" : "h-10 w-10 rounded-xl"} ${TONE_CLASSES[item.tone]}`}>{item.icon}</span>}
+        {art || <span className={`inline-flex flex-shrink-0 items-center justify-center ${card ? "h-11 w-14 rounded-xl" : "h-10 w-14 rounded-xl"} ${TONE_CLASSES[item.tone]}`}>{item.icon}</span>}
         <span className="min-w-0 flex-1">
           <span className="block text-[16px] font-bold leading-tight text-[var(--foreground)]">{item.title}</span>
           <span className="line-clamp-2 block font-medium text-[var(--foreground-secondary)]">
@@ -76,7 +76,7 @@ function AgendaRow({ item, art, card = false, delay }: { item: AgendaItem; art?:
             {item.when ? <span className={item.tone === "red" ? "font-bold text-[var(--danger)]" : ""}> · {item.when}</span> : null}
           </span>
         </span>
-        <span className={`inline-flex min-h-10 flex-shrink-0 items-center justify-center rounded-full px-4 font-bold ${solid ? "bg-[var(--primary)] text-white" : "border-2 border-[var(--border-strong)] bg-white text-[var(--foreground)]"}`}>
+        <span className={`inline-flex min-h-10 min-w-[104px] flex-shrink-0 items-center justify-center rounded-full px-4 font-bold ${solid ? "bg-[var(--primary)] text-white" : "border-2 border-[var(--border-strong)] bg-white text-[var(--foreground)]"}`}>
           {item.action}
         </span>
       </Link>
@@ -271,7 +271,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       title: t("messagesToSend", { count: unsent.count, who: unsent.who || t("aCustomer") }),
       detail: t("messagesToSendDetail"),
       href: `/bookings/${rentalId}#unsent-messages`,
-      action: t("open")
+      action: t("send")
     });
   }
   for (const r of receiptsWaiting) {
@@ -334,7 +334,11 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
     .sort((a, b) => Number(b.action === "request") - Number(a.action === "request") || String(a.dueDate).localeCompare(String(b.dueDate)));
   // Two requests on one booking are answered on the same screen, so they are one row here, not two identical ones.
   const requestsOn = (rentalId?: string | null) => jobsDue.filter((other) => other.action === "request" && !!rentalId && other.rentalId === rentalId).length;
-  const jobRows = jobsDue.filter((job, index) => !(job.action === "request" && job.rentalId && jobsDue.findIndex((other) => other.action === "request" && other.rentalId === job.rentalId) !== index));
+  // A handover or return job for a booking that already has its row above ("Not handed over · Honda City") is the same job: one row, not two.
+  const bookingRowFor = (rentalId?: string | null) => !!rentalId && todayItems.some((item) => ["late-out-", "out-", "late-in-", "in-", "at-risk-"].some((prefix) => item.key === `${prefix}${rentalId}`));
+  const jobRows = jobsDue
+    .filter((job) => job.action === "request" || !bookingRowFor(job.rentalId))
+    .filter((job, index, all) => !(job.action === "request" && job.rentalId && all.findIndex((other) => other.action === "request" && other.rentalId === job.rentalId) !== index));
   for (const job of jobRows.slice(0, 3)) {
     const waiting = job.action === "request";
     const asks = waiting ? requestsOn(job.rentalId) : 0;
@@ -348,7 +352,7 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       title: problem ? t("reportsProblem", { who: job.customerName || t("aCustomer") }) : waiting ? (asks > 1 ? t("waitingForAnswers", { who: job.customerName || t("aCustomer"), count: asks }) : t("waitingForAnswer", { who: job.customerName || t("aCustomer") })) : jobName(job.action, job.title) || noPlate(job.action === "swap_handover" || job.action === "swap_collection" ? job.title.split(" to ")[0].split(" from ")[0] : job.title.split(" - ")[0]),
       detail: [waiting ? null : job.customerName, noPlate(job.vehicleLabel)].filter(Boolean).join(" · ") || t("onToDo"),
       href: waiting && job.rentalId ? `/bookings/${job.rentalId}#customer-requests` : "/tasks",
-      action: waiting ? t("answer") : t("open")
+      action: waiting ? t("answer") : ["refund", "waive_early", "owed_early"].includes(String(job.action || "")) ? t("decide") : t("open")
     });
   }
   if (jobRows.length > 3) {

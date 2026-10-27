@@ -16,7 +16,20 @@ const labelClass = "font-semibold text-[var(--foreground-secondary)]";
  * screen: who signs, their signature drawn with a finger (or a photo of it),
  * and their agreement to it being used. One Save.
  */
-export function SignatureForm({ defaultName, defaultTitle, ready, backHref }: { defaultName: string; defaultTitle: string; ready: boolean; backHref: string }) {
+export function SignatureForm({
+  defaultName,
+  defaultTitle,
+  ready,
+  backHref,
+  signatureUrl = null
+}: {
+  defaultName: string;
+  defaultTitle: string;
+  ready: boolean;
+  backHref: string;
+  /** The signature already saved, shown on the "saved" card. */
+  signatureUrl?: string | null;
+}) {
   const say = useTranslations("settingsPage") as unknown as Say;
   const authorisation = useTranslations("settings.contractsBranding") as unknown as (key: string) => string;
   const router = useRouter();
@@ -64,6 +77,8 @@ export function SignatureForm({ defaultName, defaultTitle, ready, backHref }: { 
   }
 
   if (saved || (ready && !changing)) {
+    // The signature just drawn, or the one already saved.
+    const shownSignature = saved ? (!usePhoto && drawn ? drawn : null) : signatureUrl;
     return (
       <section className="card p-4">
         <div className="flex items-start gap-3">
@@ -71,17 +86,21 @@ export function SignatureForm({ defaultName, defaultTitle, ready, backHref }: { 
             <Check size={24} />
           </span>
           <div>
-            <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("sig_readyTitle")}</h2>
+            <h2 className="card-title">{say("sig_readyTitle")}</h2>
             <p className="font-medium text-[var(--foreground-secondary)]">{say("sig_readyBody", { name: name || defaultName })}</p>
           </div>
         </div>
+        {shownSignature ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img alt={say("sig_signature")} className="stay-light mt-4 h-20 w-56 max-w-full rounded-xl bg-white object-contain p-2 ring-1 ring-[var(--border)]" src={shownSignature} />
+        ) : null}
         {!saved ? (
-          <div className="mt-4 grid gap-2">
-            <a className="primary-action pressable w-full sm:w-auto" href={backHref}>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <a className="primary-action pressable" href={backHref}>
               {say("sig_done")}
             </a>
-            <button className="secondary-action pressable w-full sm:w-auto" onClick={() => setChanging(true)} type="button">
-              {say("sig_change")}
+            <button className="secondary-action pressable" onClick={() => setChanging(true)} type="button">
+              {say("sg_replace")}
             </button>
           </div>
         ) : null}

@@ -169,17 +169,18 @@ export function CommunicationPanel({
         </div>
       </div>
 
-      <div className="rounded-xl border border-[var(--border)] bg-[var(--panel)] p-3">
-        <div className="grid grid-cols-2 gap-2">
+      {/* The ways to reach them side by side as compact buttons: one lone wide button in a grey box looked unfinished. */}
+      <div>
+        <div className="flex flex-wrap gap-2">
           {channels.length === 0 ? (
-            <p className="col-span-2 text-sm text-[var(--muted)]">{say("cp_noChannels")}</p>
+            <p className="text-sm text-[var(--muted)]">{say("cp_noChannels")}</p>
           ) : (
             channels.map((channel) => (
               <div className="relative" key={channel.key}>
                 <button
                   aria-label={channel.label}
-                  className={`flex h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-full border px-3 text-sm font-semibold bg-[var(--panel-secondary)] text-[var(--foreground-secondary)] transition hover:border-[var(--primary)] hover:text-[var(--primary)] ${
-                    preferred === channel.key ? "border-[var(--primary)] ring-2 ring-[var(--primary)]/25" : "border-[var(--border)]"
+                  className={`flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-full border-2 bg-white px-4 font-bold text-[var(--foreground)] transition hover:border-[var(--primary)] hover:text-[var(--primary)] ${
+                    preferred === channel.key ? "border-[var(--primary)] ring-2 ring-[var(--primary)]/25" : "border-[var(--border-strong)]"
                   }`}
                   onClick={() => openExternal(channel)}
                   title={`${channel.label}: ${channel.handle}`}
@@ -210,13 +211,13 @@ export function CommunicationPanel({
         </div>
       </div>
 
-      <div className="rounded-xl border border-[var(--border)] bg-[var(--panel)] p-3">
-        <label className="flex gap-2">
-          <span className="mt-2 text-[var(--primary)]">
+      <div>
+        <label className="flex items-center gap-2">
+          <span className="text-[var(--primary)]">
             <StickyNote size={16} />
           </span>
           <input
-            className="min-h-10 min-w-0 flex-1 rounded-lg border border-[var(--border-strong)] bg-white px-3 py-2 text-sm outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
+            className="min-w-0 flex-1 rounded-lg border border-[var(--border-strong)] bg-white px-3 py-2 outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15"
             onChange={(event) => setNote(event.target.value)}
             onKeyDown={(event) => {
               if ((event.metaKey || event.ctrlKey) && event.key === "Enter") saveNote();
@@ -224,7 +225,7 @@ export function CommunicationPanel({
             placeholder={say("cp_addNote")}
             value={note}
           />
-          <button className="btn-primary min-h-10 shrink-0" disabled={isPending || !note.trim()} onClick={saveNote} type="button">
+          <button className="btn-secondary min-h-11 shrink-0" disabled={isPending || !note.trim()} onClick={saveNote} type="button">
             {isPending ? say("saving") : say("cp_save")}
           </button>
         </label>

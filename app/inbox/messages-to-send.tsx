@@ -12,23 +12,24 @@ export type ToSendGroup = { key: string; customerName: string; bookingRef: strin
 /**
  * Messages written for customers who have no chat open with the business yet.
  * Shown in the inbox so the owner finds them where they look for messages,
- * not only on each booking. One row per booking; tap to open and send.
+ * not only on each booking. One row per booking; open it to send.
+ * A plain card in the brand colours (no accent of its own), rows the full width of the card.
  */
 export function MessagesToSend({ groups }: { groups: ToSendGroup[] }) {
   const say = useTranslations("inbox") as unknown as Say;
   const total = groups.reduce((sum, group) => sum + group.messages.length, 0);
   return (
-    <section className="mb-4 rounded-[24px] bg-[var(--messages-light)] p-4 shadow-[var(--shadow-card)]">
+    <section className="card mb-4 p-4 sm:p-5">
       <div className="flex items-center gap-3">
-        <span className="num inline-flex h-12 min-w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[var(--messages)] px-2 text-[22px] text-white">{total}</span>
-        <h2 className="text-[19px] leading-tight text-[var(--messages-ink)]">{say("toSendTitle", { count: total })}</h2>
+        <span className="num inline-flex h-9 min-w-9 flex-shrink-0 items-center justify-center rounded-full bg-[var(--primary)] px-2.5 text-[16px] font-bold text-white">{total}</span>
+        <h2 className="card-title">{say("toSendTitle", { count: total })}</h2>
       </div>
-      <p className="mt-2 text-[var(--messages-ink)]">{say("toSendWhy")}</p>
-      <div className="mt-3 grid gap-2 lg:grid-cols-2 lg:items-start">
+      <p className="measure mt-2 font-medium text-[var(--foreground-secondary)]">{say("toSendWhy")}</p>
+      <div className="mt-4 grid gap-2">
         {groups.map((group) => (
-          <details className="rounded-2xl bg-white" key={group.key}>
-            <summary className="flex cursor-pointer items-center justify-between gap-3 px-3 py-3">
-              <span aria-hidden="true" className="num inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[var(--messages-light)] text-[15px] text-[var(--messages-ink)]">
+          <details className="rounded-2xl bg-[var(--panel-secondary)]" key={group.key}>
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3 py-3 [&::-webkit-details-marker]:hidden">
+              <span aria-hidden="true" className="num inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)] text-[15px] text-[var(--primary)]">
                 {initialsOf(group.customerName)}
               </span>
               <span className="min-w-0 flex-1">
@@ -37,12 +38,13 @@ export function MessagesToSend({ groups }: { groups: ToSendGroup[] }) {
                   {[group.bookingRef, say("toSendCount", { count: group.messages.length })].filter(Boolean).join(" · ")}
                 </span>
               </span>
-              <span className="shrink-0 text-sm font-semibold text-[var(--primary)]">{say("toSendOpen")}</span>
+              {/* The standard outline button, as on the dashboard. */}
+              <span className="secondary-action pointer-events-none min-h-9 shrink-0 px-4 text-sm">{say("toSendOpen")}</span>
             </summary>
             <div className="border-t border-[var(--border)] p-3">
               <UnsentMessages bare customerName={group.customerName} messages={group.messages} />
               {group.rentalId ? (
-                <Link className="mt-3 inline-block text-sm font-semibold text-[var(--primary)]" href={`/bookings/${group.rentalId}`}>
+                <Link className="mt-3 inline-block text-sm font-semibold text-[var(--primary)] hover:underline" href={`/bookings/${group.rentalId}`}>
                   {say("toSendBooking")}
                 </Link>
               ) : null}

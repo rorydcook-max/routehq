@@ -6,6 +6,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { Plus, Search, UserRound, X } from "lucide-react";
 import { createInlineCustomer } from "@/app/actions/customers";
 import { commonCountries, flagForNationality, phoneCodeOptions, countryLabel } from "@/lib/customer-options";
+import { initialsOf } from "@/components/glance";
 
 type SelectorCustomer = {
   id: string;
@@ -97,20 +98,29 @@ export function CustomerSelector({
     <div className="relative">
       <input name={name} type="hidden" value={selectedId} />
       <button
-        className="flex w-full items-center justify-between gap-3 rounded-lg border border-[var(--border)] bg-white px-3 py-3 text-left text-sm text-[var(--foreground)]"
+        className="flex w-full items-center justify-between gap-3 rounded-lg border border-[var(--border)] bg-white px-3 py-3 text-left text-[var(--foreground)]"
         onClick={() => setOpen(true)}
         type="button"
       >
+        {/* Chosen: initials (as everywhere else), name, and phone or nationality, with "Change". Not chosen: a prompt and a search icon. */}
         <span className="flex min-w-0 items-center gap-3">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)] text-lg">
-            {selectedCustomer ? flagForNationality(selectedCustomer.nationality) : <UserRound className="text-[var(--primary)]" size={18} />}
+          <span className="num flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)] text-[15px] text-[var(--primary)]">
+            {selectedCustomer ? initialsOf(selectedCustomer.full_name) : <UserRound className="text-[var(--primary)]" size={18} />}
           </span>
           <span className="min-w-0">
             <span className="block truncate font-bold">{selectedCustomer?.full_name || say("sel_select")}</span>
-            <span className="block truncate text-xs text-[var(--muted)]">{selectedCustomer?.phone || say("search")}</span>
+            {selectedCustomer ? (
+              selectedCustomer.phone || selectedCustomer.nationality ? (
+                <span className="block truncate text-sm text-[var(--muted)]">
+                  {[selectedCustomer.phone, selectedCustomer.nationality ? `${flagForNationality(selectedCustomer.nationality)} ${selectedCustomer.nationality}` : null].filter(Boolean).join(" · ")}
+                </span>
+              ) : null
+            ) : (
+              <span className="block truncate text-sm text-[var(--muted)]">{say("search")}</span>
+            )}
           </span>
         </span>
-        <Search className="text-[var(--muted)]" size={18} />
+        {selectedCustomer ? <span className="shrink-0 font-semibold text-[var(--primary)]">{say("sel_change")}</span> : <Search className="text-[var(--muted)]" size={18} />}
       </button>
 
       {open ? (

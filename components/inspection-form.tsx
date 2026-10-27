@@ -4,6 +4,8 @@ import { businessToday, toWallTime } from "@/lib/business-time";
 import { shownError } from "@/lib/error-text";
 import { isTwoWheeler, kindFromCategory } from "@/lib/vehicle-groups";
 import { VehicleArt } from "@/components/vehicle-art";
+import { VehicleTitle } from "@/components/vehicle-identity";
+import { BackLink } from "@/components/ui";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
@@ -38,8 +40,9 @@ type ReceiptResult = {
 const inputClass =
   "mt-2 w-full rounded-lg border border-[var(--border)] bg-white px-4 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15";
 
+// The app's one button shape: a 44px pill.
 const touchButton =
-  "pressable inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold";
+  "pressable inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 py-2.5 text-[15px] font-semibold";
 
 const deliverySteps = ["Confirm", "Odometer", "Fuel", "Walkaround", "Damage", "GPS", "Signature"];
 const returnSteps = ["Confirm", "Odometer", "Fuel", "Walkaround", "Damage", "Deposit", "Signature"];
@@ -56,6 +59,12 @@ function formatDate(value: string | null | undefined, locale = "en-GB") {
   return dateFormat(locale === "en-GB" ? "en" : locale, { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
 }
 
+/** "31 Oct": the year is clear from the booking, so the short choice lines leave it out. */
+function shortDate(value: string | null | undefined, locale = "en-GB") {
+  if (!value) return "";
+  return dateFormat(locale === "en-GB" ? "en" : locale, { day: "numeric", month: "short" }).format(new Date(value));
+}
+
 function money(value: unknown) {
   return new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB", maximumFractionDigits: 0 }).format(Number(value || 0));
 }
@@ -70,33 +79,35 @@ function daysBetween(start: string | null | undefined) {
   return Math.max(0, Math.round((Date.parse(`${businessToday()}T00:00:00Z`) - startDay) / 86_400_000) + 1);
 }
 
+/**
+ * One step: the standard card, as tall as what is in it. The step's name is already in the progress line above,
+ * so the old eyebrow is not repeated here (the prop stays so callers need not change).
+ */
 function StepShell({
-  eyebrow,
   title,
   children
 }: {
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
   children: React.ReactNode;
 }) {
   return (
-    <section className="min-h-[56vh] rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-4 shadow-[0_14px_32px_rgba(25,63,72,0.08)] sm:p-6">
-      <p className="text-xs font-semibold uppercase text-[var(--primary)]">{eyebrow}</p>
-      <h2 className="mt-1 text-2xl font-semibold text-[var(--foreground)]">{title}</h2>
+    <section className="card p-4 sm:p-6">
+      <h2 className="text-2xl font-semibold text-[var(--foreground)]">{title}</h2>
       <div className="mt-5">{children}</div>
     </section>
   );
 }
 
+/** One line, "Step 1 of 6 · Confirm vehicle", over a thin track: no box of its own. */
 function Progress({ steps, step }: { steps: string[]; step: number }) {
   const t = useTranslations("inspection");
   return (
-    <div className="sticky top-0 z-20 -mx-4 border-b border-[var(--border)] bg-[var(--panel-secondary)]/95 px-4 py-3 backdrop-blur sm:mx-0 sm:rounded-lg sm:border">
-      <div className="flex items-center justify-between text-xs font-bold text-[var(--muted)]">
-        <span>{t("stepOf", { current: step + 1, total: steps.length })}</span>
-        <span>{t(`steps.${steps[step]}`)}</span>
-      </div>
-      <div className="mt-2 h-2 overflow-hidden rounded-full bg-white">
+    <div className="sticky top-0 z-20 -mx-4 bg-[var(--background)]/95 px-4 py-2.5 backdrop-blur sm:mx-0 sm:px-0">
+      <p className="text-[13px] font-semibold text-[var(--foreground-secondary)]">
+        {t("stepOf", { current: step + 1, total: steps.length })} · {t(`steps.${steps[step]}`)}
+      </p>
+      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[var(--panel-tertiary)]">
         <div className="h-full rounded-full bg-[var(--primary)] transition-all" style={{ width: `${((step + 1) / steps.length) * 100}%` }} />
       </div>
     </div>
@@ -856,7 +867,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
     // photos first. Pressing Enter in a field must not post the files directly.
     <form
       method="post"
-      className="mx-auto max-w-3xl space-y-4"
+      className="page-form space-y-4"
       id="inspectionForm"
       // Each photo starts uploading as soon as it is taken, so "Finish" doesn't wait on a slow connection.
       onChange={(event) => {
@@ -889,18 +900,31 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
       <input name="billUncoveredCharges" type="hidden" value={billUncovered && uncoveredCharges > 0 ? "true" : ""} />
       <input name="holdDepositForDamage" type="hidden" value={holdForDamage ? "true" : ""} />
 
+      {/* The way back sits above everything, like every other sub-page. */}
+      <BackLink
+        className="!mb-0"
+        href={context.rental?.id ? `/bookings/${context.rental.id}` : `/fleet/${context.vehicle.id}`}
+        label={context.rental?.id ? t("backBooking") : [context.vehicle.make, context.vehicle.model].filter(Boolean).join(" ")}
+      />
       <Progress step={step} steps={steps} />
 
       {step === 0 ? (
         <StepShell eyebrow={t("eyebrowVehicleConfirmation")} title={mode === "return" ? t("titleConfirmReturn") : mode === "condition_report" ? t("titleStartCondition") : t("titleConfirmHandover")}>
-          <div className="rounded-xl border border-[var(--border)] bg-white p-4">
+          <div className="rounded-2xl bg-[var(--panel-secondary)] p-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
               <span className="shrink-0 self-start">
                 <VehicleArt colour={(context.vehicle as any).color} kind={kindFromCategory(context.vehicle.vehicle_categories)} model={(context.vehicle as any).model} size="md" />
               </span>
-              <div>
-                <p className="text-2xl font-semibold text-[var(--foreground)]">{titleFor(context)}</p>
-                <p className="font-mono-data mt-1 text-lg font-semibold text-[var(--foreground)]">{context.vehicle.registration_number}</p>
+              <div className="min-w-0">
+                {/* The one vehicle header: name, year, plate chip. */}
+                <VehicleTitle
+                  className="gap-x-3"
+                  name={[context.vehicle.make, context.vehicle.model, context.vehicle.trim].filter(Boolean).join(" ")}
+                  nameClassName="text-xl font-semibold text-[var(--foreground)]"
+                  plate={context.vehicle.registration_number}
+                  plateClassName="!px-2 !py-1 !text-[14px]"
+                  year={context.vehicle.year}
+                />
                 <p className="mt-2 text-sm text-[var(--muted)]">
                   {mode === "return" && context.customer?.full_name ? context.customer.full_name : null}
                   {mode !== "return" && context.customer?.full_name ? `${context.customer.full_name} · ` : ""}
@@ -924,11 +948,10 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
                   <p className="mt-2 rounded-lg bg-[var(--warning-light)] px-3 py-2 text-sm font-semibold text-[var(--warning)]">{t("notSignedNote")}</p>
                 ) : null}
                 {mode === "return" ? (
-                  <p className="mt-2 rounded-lg bg-[var(--panel-secondary)] px-3 py-2 font-semibold text-[var(--foreground-secondary)]">
-                    <span>
-                      {handoverKm != null ? `${t("odometerAtDelivery", { km: handoverKm.toLocaleString("en-US") })} · ` : ""}
-                      {t("rentalLengthDays", { count: daysBetween(context.rental?.start_date) })}
-                    </span>
+                  // Two small facts in regular weight, each kept whole: quieter than the customer's name above.
+                  <p className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm text-[var(--foreground-secondary)]">
+                    {handoverKm != null ? <span className="whitespace-nowrap tabular-nums">{t("outAtKm", { km: handoverKm.toLocaleString("en-US") })}</span> : null}
+                    <span className="whitespace-nowrap">{t("rentalLengthDays", { count: daysBetween(context.rental?.start_date) })}</span>
                   </p>
                 ) : null}
               </div>
@@ -945,7 +968,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
                     { value: "free", label: canWaive || early.amount <= 0 ? (early.bookedEnd ? t("earlyFreeBack", { date: formatDate(early.bookedEnd, locale) }) : t("earlyFree")) : t("earlyAskFree") }
                   ].filter(Boolean) as { value: EarlyStartChoice; label: string }[]
                 ).map((option) => (
-                  <label className={`flex min-h-12 cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 text-sm font-semibold ${earlyChoice === option.value ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground)]"}`} key={option.value}>
+                  <label className={`flex min-h-12 cursor-pointer items-center gap-3 rounded-2xl border px-3.5 py-2.5 text-sm font-semibold ${earlyChoice === option.value ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground)]"}`} key={option.value}>
                     <input checked={earlyChoice === option.value} className="h-4 w-4 accent-[var(--primary)]" name="earlyStartChoice" onChange={() => setEarlyChoice(option.value)} type="radio" value={option.value} />
                     {option.label}
                   </label>
@@ -954,25 +977,30 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
             </fieldset>
           ) : null}
           {late && !blocker ? (
-            <fieldset className="mt-4">
-              <legend className="text-sm font-bold text-[var(--foreground)]">{t("lateTitle", { days: late.days, date: formatDate(late.bookedStart, locale) })}</legend>
-              <div className="mt-2 space-y-2">
+            <fieldset className="mt-5">
+              {/* A short heading and two radio cards, each a bold choice over one grey line of what it means. */}
+              <legend className="card-subtitle">{t("lateHeading", { days: late.days })}</legend>
+              <div className="mt-2 grid gap-2 sm:grid-cols-2">
                 {(
                   [
                     {
                       value: "from_handover",
-                      label: late.openEnded
-                        ? t("lateFromTodayMoves", { days: late.days })
+                      title: t("lateOptTodayTitle"),
+                      detail: late.openEnded
+                        ? t("lateOptTodayDetailMoves", { days: late.days })
                         : late.credit > 0
-                          ? t("lateFromToday", { date: formatDate(late.bookedEnd, locale), amount: money(late.credit) })
-                          : t("lateFromTodayPlain", { date: formatDate(late.bookedEnd, locale) })
+                          ? t("lateOptTodayDetail", { date: shortDate(late.bookedEnd, locale), amount: money(late.credit) })
+                          : t("lateOptTodayDetailPlain", { date: shortDate(late.bookedEnd, locale) })
                     },
-                    { value: "as_booked", label: t("lateAsBooked", { date: formatDate(late.bookedStart, locale) }) }
-                  ] as { value: LateStartChoice; label: string }[]
+                    { value: "as_booked", title: t("lateOptBookedTitle"), detail: t("lateOptBookedDetail", { date: shortDate(late.bookedStart, locale) }) }
+                  ] as { value: LateStartChoice; title: string; detail: string }[]
                 ).map((option) => (
-                  <label className={`flex min-h-12 cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 text-sm font-semibold ${lateChoice === option.value ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]" : "border-[var(--border)] bg-white text-[var(--foreground)]"}`} key={option.value}>
-                    <input checked={lateChoice === option.value} className="h-4 w-4 accent-[var(--primary)]" name="lateStartChoice" onChange={() => setLateChoice(option.value)} type="radio" value={option.value} />
-                    {option.label}
+                  <label className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-3.5 ${lateChoice === option.value ? "border-[var(--primary)] bg-[var(--primary-light)]" : "border-[var(--border)] bg-white"}`} key={option.value}>
+                    <input checked={lateChoice === option.value} className="mt-1 h-4 w-4 shrink-0 accent-[var(--primary)]" name="lateStartChoice" onChange={() => setLateChoice(option.value)} type="radio" value={option.value} />
+                    <span className="min-w-0">
+                      <span className="block font-semibold text-[var(--foreground)]">{option.title}</span>
+                      <span className="block text-sm text-[var(--foreground-secondary)]">{option.detail}</span>
+                    </span>
                   </label>
                 ))}
               </div>
@@ -980,7 +1008,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
           ) : null}
           {blocker ? null : (
             <button
-              className={`${touchButton} mt-5 w-full bg-[var(--primary)] text-white shadow-lg`}
+              className={`${touchButton} mt-5 w-full bg-[var(--primary)] text-white sm:w-auto sm:min-w-[240px] sm:px-8`}
               onClick={() => {
                 // Charged extra days are collected with the rent at handover (and come off again if the answer changes).
                 const add = early && earlyChoice === "charge" ? early.amount : 0;
@@ -1523,11 +1551,6 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
       ) : null}
 
       {nav()}
-
-      <Link className="inline-flex items-center gap-2 text-sm font-bold text-[var(--primary)]" href={(context.rental?.id ? `/bookings/${context.rental.id}` : `/fleet/${context.vehicle.id}`) as Route}>
-        <ChevronLeft size={16} />
-        {context.rental?.id ? t("backToBooking") : t("backToVehicle")}
-      </Link>
     </form>
   );
 }

@@ -43,7 +43,7 @@ export function PendingPlan({
 
   return (
     <section className="card mt-3 border-2 border-[var(--warning-line)] p-4" id="pending-plan">
-      <h2 className="text-[20px] font-bold text-[var(--foreground)]">{renewalDate ? say("pl_renewalTitle") : say("pl_pendingTitle")}</h2>
+      <h2 className="card-title">{renewalDate ? say("pl_renewalTitle") : say("pl_pendingTitle")}</h2>
       <p className="mt-1 text-[17px] font-bold text-[var(--foreground)]">{what}</p>
       {fullAmount ? <p className="mt-0.5 text-sm font-semibold text-[var(--success)]">{say("pl_foundingApplied", { amount: fullAmount })}</p> : null}
 

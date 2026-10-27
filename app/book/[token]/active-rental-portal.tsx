@@ -16,7 +16,8 @@ import { PortalPayments } from "./portal-payments";
 type OpenEndedOffer = { monthlyRate: number; firstDue: string };
 type ActionType = "extension_request" | "return_confirmation" | "problem_report" | "question";
 
-const inputClass = "mt-2 w-full rounded-xl border border-[var(--border)] bg-white px-4 py-3 text-base text-[var(--foreground)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/15";
+// The app's standard 44px field, as on the other customer pages. (Textareas set their own height.)
+const inputClass = "mt-2 w-full text-base";
 
 export function ActiveRentalPortal({
   token,

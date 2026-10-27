@@ -10,6 +10,7 @@ import { completeTask } from "@/app/actions/tasks";
 import { decideEarlyWaiver } from "@/app/actions/early-start";
 import { decideEarlyReturnOwed } from "@/app/actions/early-return";
 import { PendingButton } from "@/components/pending-button";
+import { EmptyState } from "@/components/ui";
 import { dateFormat, longDate, shortDate } from "@/lib/i18n/dates";
 import { allocatePayment, type OpenPayment } from "@/lib/payment-allocation";
 import type { TaskListItem } from "@/lib/tasks";
@@ -283,13 +284,18 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
     });
   }
 
-  const field = "mt-1 h-10 w-full rounded-lg border border-[var(--border-strong)] bg-white px-3 text-sm";
+  // Fields take the app's standard 44px height; no one-off sizes here.
+  const field = "mt-1 w-full";
   return (
-    <div className="mt-2 rounded-lg border border-[var(--border)] bg-[var(--panel-secondary)] p-3">
+    <div className="mt-2 rounded-2xl bg-[var(--panel-secondary)] p-3.5">
       <div className="grid gap-2 sm:grid-cols-3">
         <label className="text-xs font-semibold text-[var(--foreground-secondary)]">
           {tx.say("amountArrived")}
-          <input autoFocus className={field} inputMode="decimal" min="0" onChange={(event) => setValue(event.target.value)} step="0.01" type="number" value={value} />
+          {/* ฿ as a prefix, as in the app's other money fields; decimals stay allowed here (satang). */}
+          <span className="relative mt-1 block">
+            <span aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 select-none text-sm font-medium text-[var(--foreground-secondary)]">฿</span>
+            <input autoFocus className="input-with-leading-symbol w-full" inputMode="decimal" min="0" onChange={(event) => setValue(event.target.value)} step="0.01" type="number" value={value} />
+          </span>
         </label>
         <label className="text-xs font-semibold text-[var(--foreground-secondary)]">
           {tx.say("dateReceived")}
@@ -433,23 +439,27 @@ function TaskRow({ item, organizationId, today, siblings = [], canDecide = true 
       <div className="flex items-center gap-3.5 lg:min-w-0 lg:flex-1">
         <KindChip kind={jobKind(item)} />
         <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-3">
-            <p className="text-[19px] font-bold leading-tight text-[var(--foreground)]">{title}</p>
-            {when ? (
-              <p className={`shrink-0 whitespace-nowrap pt-0.5 font-bold ${overdue ? "text-[var(--danger)]" : "text-[var(--foreground-secondary)]"}`}>
-                {when}
-                {time && !item.completedAt && item.dueDate ? ` · ${time}` : ""}
-              </p>
-            ) : null}
-          </div>
-          {line ? (
-            item.rentalId || item.vehicleId ? (
-              <Link className="mt-0.5 block font-medium text-[var(--foreground-secondary)]" href={item.rentalId ? `/bookings/${item.rentalId}` : `/fleet/${item.vehicleId}`}>
-                {line}
-              </Link>
-            ) : (
-              <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">{line}</p>
-            )
+          <p className="text-[19px] font-bold leading-tight text-[var(--foreground)]">{title}</p>
+          {/* When it is due leads the line under the title ("4 days late · Playwright Tester · Honda City"), so it sits with the job it belongs to. */}
+          {when || line ? (
+            <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">
+              {when ? (
+                <span className={`whitespace-nowrap font-bold ${overdue ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>
+                  {when}
+                  {time && !item.completedAt && item.dueDate ? ` · ${time}` : ""}
+                </span>
+              ) : null}
+              {when && line ? <span aria-hidden="true"> · </span> : null}
+              {line ? (
+                item.rentalId || item.vehicleId ? (
+                  <Link className="hover:underline" href={item.rentalId ? `/bookings/${item.rentalId}` : `/fleet/${item.vehicleId}`}>
+                    {line}
+                  </Link>
+                ) : (
+                  <span>{line}</span>
+                )
+              ) : null}
+            </p>
           ) : null}
         </div>
       </div>
@@ -485,11 +495,11 @@ function TaskRow({ item, organizationId, today, siblings = [], canDecide = true 
               <input
                 aria-label={tx.say("noteLabel")}
                 autoFocus
-                className="min-h-10 flex-1 rounded-lg border border-[var(--border)] px-3 text-sm"
+                className="flex-1"
                 name="notes"
                 placeholder={tx.say("notePlaceholder")}
               />
-              <PendingButton className="primary-action min-h-10 px-4 text-sm" pendingLabel={tx.say("saving")} type="submit">
+              <PendingButton className="primary-action min-h-11 px-4 text-sm" pendingLabel={tx.say("saving")} type="submit">
                 {tx.say("saveDone")}
               </PendingButton>
             </form>
@@ -635,15 +645,18 @@ export function TasksList({
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-2">
+      {/* The same segmented control as the dashboard's Day / Week / Month: a tinted track, the chosen one white. */}
+      <div className="inline-flex rounded-full bg-[var(--panel-tertiary)] p-1" role="tablist">
         {([
           ["open", tx.say("tabOpenShort")],
           ["done", tx.say("tabDone")]
         ] as const).map(([value, label]) => (
           <button
-            className={`pressable min-h-10 rounded-full px-5 font-bold ${filter === value ? "bg-[var(--primary)] text-white" : "bg-white text-[var(--foreground)]"}`}
+            aria-selected={filter === value}
+            className={`pressable min-h-9 whitespace-nowrap rounded-full px-4 text-[14px] font-bold ${filter === value ? "bg-white text-[var(--foreground)] shadow-[0_1px_3px_rgba(19,38,43,0.12)]" : "text-[var(--foreground-secondary)]"}`}
             key={value}
             onClick={() => setFilter(value)}
+            role="tab"
             type="button"
           >
             {label}
@@ -653,10 +666,7 @@ export function TasksList({
 
       {filter === "open" ? (
         groups.length === 0 ? (
-          <div className="empty-state">
-            <p className="text-lg font-semibold text-[var(--foreground)]">{tx.say("emptyTitle")}</p>
-            <p className="mt-2 text-sm text-[var(--muted)]">{tx.say("emptyBody")}</p>
-          </div>
+          <EmptyState description={tx.say("emptyBody")} title={tx.say("emptyTitle")} />
         ) : (
           groups.map((group) => {
             const limited = group.key === "later" && !showAllLater && group.items.length > laterLimit;
@@ -664,8 +674,9 @@ export function TasksList({
             return (
               <section className={`space-y-2.5 ${group.key === "week" || group.key === "later" ? "calm-actions" : ""}`} key={group.key}>
                 <div className="flex items-center gap-2.5 px-1 pt-1">
-                  <h2 className="text-[18px] font-bold text-[var(--foreground)]">{tx.say(`group_${group.key}`)}</h2>
-                  <span className={`inline-flex min-w-7 items-center justify-center rounded-full px-2 py-0.5 text-[14px] font-bold ${group.tone === "red" ? "bg-[var(--danger)] text-white" : "bg-[var(--panel-tertiary)] text-[var(--foreground)]"}`}>{group.items.length}</span>
+                  <h2 className="card-title">{tx.say(`group_${group.key}`)}</h2>
+                  {/* One count pill in two tones: red tint for late work, neutral tint for the rest. */}
+                  <span className={`inline-flex min-w-7 items-center justify-center rounded-full px-2 py-0.5 text-[14px] font-bold tabular-nums ${group.tone === "red" ? "bg-[var(--danger-light)] text-[var(--danger)]" : "bg-[var(--panel-tertiary)] text-[var(--foreground-secondary)]"}`}>{group.items.length}</span>
                 </div>
                 {items.map((item) => (
                   <TaskRow canDecide={canDecide} item={item} key={item.id} organizationId={organizationId} siblings={item.kind === "payment" ? siblingsOf(item) : []} today={today} />
@@ -680,9 +691,7 @@ export function TasksList({
           })
         )
       ) : done.length === 0 ? (
-        <div className="empty-state">
-          <p className="text-lg font-semibold text-[var(--foreground)]">{tx.say("noFinished")}</p>
-        </div>
+        <EmptyState title={tx.say("noFinished")} />
       ) : (
         <section className="space-y-2.5">
           {done.slice(0, 50).map((item) => (

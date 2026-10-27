@@ -21,7 +21,7 @@ export function RatesFields({ currency, usualDeposit = 0 }: { currency: string; 
 
   return (
     <div className="card p-4" ref={cardRef}>
-      <h2 className="text-[17px] font-bold text-[var(--foreground)]">{say("ratesTitle")}</h2>
+      <h2 className="card-title">{say("ratesTitle")}</h2>
       <p className="mt-1 font-medium text-[var(--foreground-secondary)]">{say("ratesBody")}</p>
       <div className="mt-3 grid gap-4 sm:grid-cols-3">
         <label className="block">

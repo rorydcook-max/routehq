@@ -3,7 +3,7 @@
 import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 import { signUpWithEmail, type AuthActionState } from "@/app/actions/auth";
-import { authError, authInput, authLabel, authSuccess } from "@/components/auth-card";
+import { authError, authHelp, authInput, authLabel, authStack, authSuccess } from "@/components/auth-card";
 
 const initialState: AuthActionState = {};
 
@@ -27,7 +27,7 @@ export function SignupForm() {
   }
 
   return (
-    <form action={formAction} className="space-y-4">
+    <form action={formAction} className={authStack}>
       {/* What they are signing up for, before anything is asked of them. */}
       <p className="rounded-xl bg-[var(--success-light)] px-3.5 py-2.5 font-semibold text-[var(--success)]">{say("trialNote")}</p>
       <label className="block">
@@ -58,7 +58,7 @@ export function SignupForm() {
             </button>
           </span>
         </label>
-        <span className="mt-1 block font-medium text-[var(--foreground-secondary)]">{say("passwordHelp")}</span>
+        <span className={authHelp}>{say("passwordHelp")}</span>
       </div>
       {state.error ? <p className={authError}>{state.error}</p> : null}
       <button className="primary-action w-full" disabled={pending}>

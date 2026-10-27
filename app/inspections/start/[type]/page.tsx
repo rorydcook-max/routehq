@@ -7,6 +7,7 @@ import { ChevronRight } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageBand } from "@/components/page-band";
 import { VehicleArt } from "@/components/vehicle-art";
+import { VehicleTitle } from "@/components/vehicle-identity";
 import { initialsOf } from "@/components/glance";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { shortDate } from "@/lib/i18n/dates";
@@ -71,7 +72,7 @@ export default async function StartInspectionPage({ params }: { params: Promise<
 
   return (
     <AppShell hero={<PageBand subtitle={say(out ? "introOut" : "introBack")} keepSubtitle title={say(out ? "titleOut" : "titleBack")} />} userEmail={userEmail}>
-      <div className="mx-auto max-w-2xl">
+      <div className="page-form">
         {ready.length === 0 ? (
           <div className="card p-6 text-center">
             <p className="text-[17px] font-semibold text-[var(--foreground)]">{say(out ? "emptyOut" : "emptyBack")}</p>
@@ -88,10 +89,7 @@ export default async function StartInspectionPage({ params }: { params: Promise<
                   <Link className="card pressable flex items-center gap-3.5 p-3" href={`/inspections/${type}/${rental.id}` as Route}>
                     <VehicleArt colour={rental.vehicles?.color} kind={kindFromCategory(rental.vehicles?.vehicle_categories)} model={rental.vehicles?.model} size="sm" />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-[17px] font-bold text-[var(--foreground)]">
-                        {rental.vehicles?.make} {rental.vehicles?.model}
-                        {rental.vehicles?.registration_number ? <span className="font-mono-data ml-2 font-medium text-[var(--muted)]">{rental.vehicles.registration_number}</span> : null}
-                      </p>
+                      <VehicleTitle name={`${rental.vehicles?.make || ""} ${rental.vehicles?.model || ""}`.trim()} nameClassName="truncate text-[17px] font-semibold text-[var(--foreground)]" plate={rental.vehicles?.registration_number} />
                       <p className="mt-0.5 flex items-center gap-2 truncate font-medium text-[var(--foreground-secondary)]">
                         <span aria-hidden="true" className="num inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)] text-[12px] text-[var(--primary)]">{initialsOf(rental.customers?.full_name)}</span>
                         <span className="truncate">{rental.customers?.full_name || say("noCustomer")}</span>

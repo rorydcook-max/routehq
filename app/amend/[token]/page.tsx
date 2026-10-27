@@ -4,8 +4,8 @@ import { AlertTriangle, CheckCircle2, FileText } from "lucide-react";
 import { loadPublicAmendment } from "@/lib/public-amendment";
 import { AmendmentSignForm } from "./amendment-sign-form";
 import { getLocale, getTranslations } from "next-intl/server";
-import { CustomerLanguagePicker } from "@/components/customer-language-picker";
 import { BrandStyle } from "@/components/brand-style";
+import { PublicBrand, PublicShell } from "@/components/public-shell";
 
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
@@ -19,21 +19,18 @@ function contactHref(phone: string | null) {
   return `https://wa.me/${digits.startsWith("0") ? `66${digits.slice(1)}` : digits}`;
 }
 
-function Message({ tone, title, children, colour = null }: { tone: "red" | "green"; title: string; children: React.ReactNode; colour?: string | null }) {
+function Message({ tone, title, children, colour = null, business = null }: { tone: "red" | "green"; title: string; children: React.ReactNode; colour?: string | null; business?: string | null }) {
   return (
-    <main className="min-h-screen bg-[var(--panel-secondary)] px-4 py-8 text-[var(--foreground)]">
+    <PublicShell brand={business ? <PublicBrand name={business} /> : undefined} width="narrow">
       <BrandStyle colour={colour} />
-      <div className="mx-auto mb-3 flex max-w-xl justify-end">
-        <CustomerLanguagePicker />
-      </div>
-      <section className="mx-auto max-w-xl rounded-2xl border border-[var(--border)] bg-white p-6 text-center shadow-sm">
+      <section className="rounded-2xl border border-[var(--border)] bg-white p-6 text-center shadow-sm">
         <div className={`mx-auto flex h-14 w-14 items-center justify-center rounded-full ${tone === "red" ? "bg-[var(--danger-light)] text-[var(--danger)]" : "bg-[var(--success-light)] text-[var(--success)]"}`}>
           {tone === "red" ? <AlertTriangle /> : <CheckCircle2 />}
         </div>
-        <h1 className="mt-4 text-2xl font-semibold">{title}</h1>
-        <div className="mt-2 text-sm leading-6 text-[var(--muted)]">{children}</div>
+        <h1 className="mt-4 text-2xl font-semibold [text-wrap:balance]">{title}</h1>
+        <div className="mx-auto mt-2 max-w-lg text-sm leading-6 text-[var(--muted)] [text-wrap:balance]">{children}</div>
       </section>
-    </main>
+    </PublicShell>
   );
 }
 
@@ -55,7 +52,7 @@ export default async function AmendmentPage({ params }: { params: Promise<{ toke
 
   if (amendment.state === "cancelled") {
     return (
-      <Message colour={amendment.brandColour} title={t("amendWithdrawnTitle")} tone="red">
+      <Message business={amendment.businessName} colour={amendment.brandColour} title={t("amendWithdrawnTitle")} tone="red">
         <p>{t("amendWithdrawnMessage", { business: amendment.businessName })}</p>
         {contactLink}
       </Message>
@@ -63,7 +60,7 @@ export default async function AmendmentPage({ params }: { params: Promise<{ toke
   }
   if (amendment.state === "expired") {
     return (
-      <Message colour={amendment.brandColour} title={t("amendExpiredTitle")} tone="red">
+      <Message business={amendment.businessName} colour={amendment.brandColour} title={t("amendExpiredTitle")} tone="red">
         <p>{t("amendExpiredMessage", { business: amendment.businessName })}</p>
         {contactLink}
       </Message>
@@ -71,15 +68,16 @@ export default async function AmendmentPage({ params }: { params: Promise<{ toke
   }
   if (amendment.state === "signed") {
     return (
-      <Message colour={amendment.brandColour} title={t("amendSignedTitle")} tone="green">
+      <Message business={amendment.businessName} colour={amendment.brandColour} title={t("amendSignedTitle")} tone="green">
         <p>
           {amendment.signerName ? t("amendThanksNamed", { name: amendment.signerName, business: amendment.businessName }) : t("amendThanks", { business: amendment.businessName })}
         </p>
-        {/* Say what is now agreed, so nobody has to open the PDF to check. */}
+        {/* Which booking this was for, then what is now agreed, so nobody has to open the PDF to check. */}
+        {amendment.vehicleLabel ? <p className="mt-3 text-sm font-bold text-[var(--foreground)]">{amendment.vehicleLabel}</p> : null}
         {amendment.rows.length ? (
           <div className="mt-4 space-y-2 text-left">
             {amendmentDisplayRows(amendment.changes, locale, t as unknown as (key: string, values?: Record<string, string | number>) => string).map((row) => (
-              <div className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3" key={row.key}>
+              <div className="rounded-2xl bg-[var(--panel-secondary)] p-3" key={row.key}>
                 <p className="text-xs font-semibold uppercase text-[var(--muted)]">{row.label}</p>
                 <p className="mt-1 text-sm font-semibold text-[var(--foreground)]"><bdi>{row.after}</bdi></p>
               </div>
@@ -96,19 +94,15 @@ export default async function AmendmentPage({ params }: { params: Promise<{ toke
   }
 
   return (
-    <main className="min-h-screen bg-[var(--panel-secondary)] px-4 py-5 text-[var(--foreground)]">
+    <PublicShell brand={<PublicBrand name={amendment.businessName} />} width="narrow">
       <BrandStyle colour={amendment.brandColour} />
-      <div className="mx-auto max-w-2xl space-y-4">
-        <div className="flex justify-end">
-          <CustomerLanguagePicker />
-        </div>
+      <div className="space-y-5">
         <header className="rounded-2xl border border-[var(--border)] bg-white p-5 shadow-sm">
-          <p className="text-xs font-semibold uppercase text-[var(--primary)]">{amendment.businessName}</p>
-          <h1 className="mt-1 text-2xl font-semibold">{t("amendChangesTitle")}</h1>
+          <h1 className="text-2xl font-semibold">{t("amendChangesTitle")}</h1>
           <p className="mt-1 text-sm font-bold text-[var(--muted)]">{amendment.vehicleLabel}</p>
           <div className="mt-4 space-y-2">
             {amendmentDisplayRows(amendment.changes, locale, t as unknown as (key: string, values?: Record<string, string | number>) => string).map((row) => (
-              <div className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3" key={row.key}>
+              <div className="rounded-2xl bg-[var(--panel-secondary)] p-3" key={row.key}>
                 <p className="text-xs font-semibold uppercase text-[var(--muted)]">{row.label}</p>
                 <p className="mt-1 text-sm">
                   {row.before ? <span className="text-[var(--muted)] line-through">{row.before}</span> : null}
@@ -128,6 +122,6 @@ export default async function AmendmentPage({ params }: { params: Promise<{ toke
 
         <AmendmentSignForm contentHash={amendment.contentHash} renterName={amendment.renterName} token={amendment.token} />
       </div>
-    </main>
+    </PublicShell>
   );
 }

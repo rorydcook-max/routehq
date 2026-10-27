@@ -4,7 +4,7 @@ import { kindFromCategory } from "@/lib/vehicle-groups";
 import type { Route } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
-import { ArrowRight, CheckCircle2, FileText, MessageCircle, PenLine, Phone, Plus } from "lucide-react";
+import { ArrowRight, FileText, MessageCircle, PenLine, Phone, Plus, Upload } from "lucide-react";
 import { updateCustomer, uploadCustomerDocument } from "@/app/actions/customers";
 import { CustomerNotesForm } from "@/app/customers/[id]/customer-notes-form";
 import { DoNotRent } from "@/app/customers/[id]/do-not-rent";
@@ -17,7 +17,7 @@ import { AppShell } from "@/components/app-shell";
 import { PageTabs } from "@/components/page-tabs";
 import { CommunicationPanel } from "@/components/communication-panel";
 import { PendingButton } from "@/components/pending-button";
-import { Badge, Card, Pane } from "@/components/ui";
+import { BackLink, Badge, Card, Pane } from "@/components/ui";
 import { DateLeaf, ElapsedBar, Ring, TileHead, initialsOf } from "@/components/glance";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { businessToday } from "@/lib/business-time";
@@ -97,6 +97,25 @@ function InfoTile({ label, value, danger = false }: { label: string; value: Reac
   );
 }
 
+/** A figure at the top of the page: label, value, caption, always in that order and from the top. */
+function StatTile({ label, value, caption, tone = "neutral", href }: { label: string; value: string; caption: string; tone?: "neutral" | "green" | "amber" | "red"; href?: string }) {
+  const captionTone = { neutral: "text-[var(--foreground-secondary)]", green: "text-[var(--success)]", amber: "text-[var(--warning)]", red: "text-[var(--danger)]" }[tone];
+  const body = (
+    <>
+      <p className="font-semibold text-[var(--muted)]">{label}</p>
+      <p className={`num mt-1 text-[28px] leading-tight ${tone === "red" ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{value}</p>
+      <p className={`mt-0.5 line-clamp-2 font-semibold ${captionTone}`}>{caption}</p>
+    </>
+  );
+  return href ? (
+    <a className="card pressable block p-4" href={href}>
+      {body}
+    </a>
+  ) : (
+    <div className="card p-4">{body}</div>
+  );
+}
+
 function preferredContactMethod(customer: any) {
   if (customer.preferred_contact_method) return customer.preferred_contact_method;
   if (customer.whatsapp_number) return "whatsapp";
@@ -145,19 +164,21 @@ function ActiveRentalCard({ rental, customerId, dueNow }: { rental: any; custome
         </p>
       </div>
       {rental.status !== "booked" && rental.start_date && rental.end_date ? <ElapsedBar end={String(rental.end_date)} late={late} start={String(rental.start_date)} /> : null}
-      <div className="mt-3 grid grid-cols-2 gap-2.5">
+      {/* "Due now" only when something is due: a half-width box saying "Nothing" took room to say nothing. */}
+      <div className={`mt-3 grid gap-2.5 ${dueNow > 0 ? "grid-cols-2" : ""}`}>
         <InfoTile
           label={cx.say("r_period")}
           value={rental.end_date && rental.start_date ? (
             <span className="mt-1.5 flex items-center gap-1.5 sm:gap-2">
               <DateLeaf date={String(rental.start_date)} locale={locale} />
               <ArrowRight aria-hidden="true" className="hidden text-[var(--muted)] sm:block" size={16} />
-              <DateLeaf date={String(rental.end_date)} locale={locale} tone="var(--coming-back)" />
+              {/* Both leaves dark teal: white on light blue failed contrast. */}
+              <DateLeaf date={String(rental.end_date)} locale={locale} />
               <span className="sr-only">{cx.say("r_range", { from: formatDate(rental.start_date, cx), to: formatDate(rental.end_date, cx) })}</span>
             </span>
           ) : cx.say("r_rangeOpen", { from: formatDate(rental.start_date, cx) })}
         />
-        <InfoTile danger={dueNow > 0} label={cx.say("r_dueNow")} value={dueNow > 0 ? money(dueNow) : cx.say("r_nothing")} />
+        {dueNow > 0 ? <InfoTile danger label={cx.say("r_dueNow")} value={money(dueNow)} /> : null}
       </div>
       <div className="mt-3 grid gap-2 sm:flex">
         <Link className="primary-action pressable" href={`/bookings/${rental.id}` as Route}>
@@ -334,7 +355,11 @@ function DocumentRow({ kind, files, customerId, organizationId }: { kind: "passp
         </div>
       ) : null}
       <details className="mt-2.5">
-        <summary className="cursor-pointer font-bold text-[var(--primary)]">{have ? cx.say("doc_addAnother") : cx.say("doc_add")}</summary>
+        {/* A compact outline button with an upload icon, not a full-width disclosure row. */}
+        <summary className="secondary-action pressable inline-flex w-fit cursor-pointer list-none items-center gap-1.5 [&::-webkit-details-marker]:hidden">
+          <Upload aria-hidden="true" size={16} />
+          {have ? cx.say("doc_addAnother") : cx.say("doc_add")}
+        </summary>
         <form action={uploadCustomerDocument} className="mt-3 grid gap-3">
           <input name="customerId" type="hidden" value={customerId} />
           <input name="organizationId" type="hidden" value={organizationId} />
@@ -424,7 +449,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
   if (!detail) {
     return (
       <AppShell userEmail={userEmail}>
-        <div className="mx-auto max-w-2xl">
+        <div className="page-form">
           <Card className="p-5">
             <h1 className="text-[22px] font-bold text-[var(--foreground)]">{cx.say("notFoundTitle")}</h1>
             <p className="mt-2 font-medium text-[var(--foreground-secondary)]">{cx.say("notFoundBody")}</p>
@@ -490,15 +515,12 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
   return (
     <AppShell userEmail={userEmail}>
       <div className="space-y-3">
-        <div className="flex flex-wrap items-center gap-2 font-bold text-[var(--muted)]">
-          <Link className="text-[var(--primary)]" href="/customers">
-            {cx.say("back")}
-          </Link>
-          <span>/</span>
-          <span>{customer.full_name}</span>
-        </div>
+        <BackLink className="!mb-0" href="/customers" label={cx.say("back")} />
 
         <Card className="p-4">
+          {/* Who they are on the left, what you can do on the right, on one row on a wide screen. */}
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div className="min-w-0">
           {/* The documents tile below says the same once there are rentals; the badge is for a new customer with no tiles yet. */}
           {detail.rentals.length === 0 ? (
             <Badge tone={docsTone}>{completeness.status === "complete" ? cx.say("docsOk") : completeness.status === "none" ? cx.say("docsNone") : cx.say("docsMissing")}</Badge>
@@ -507,17 +529,20 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             <span aria-hidden="true" className="num inline-flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)] text-[20px] text-[var(--primary)]">
               {initialsOf(customer.full_name)}
             </span>
-            <h1 className="min-w-0 text-[28px] leading-tight text-[var(--foreground)]">{customer.full_name}</h1>
+            <div className="min-w-0">
+              <h1 className="min-w-0 text-[28px] leading-tight text-[var(--foreground)]">{customer.full_name}</h1>
+              {/* What we know, never what is missing: a missing nationality is asked for under Details. */}
+              {customer.nationality || customer.phone ? (
+                <p className="mt-0.5 text-[17px] font-semibold text-[var(--foreground-secondary)]">
+                  {[customer.nationality ? `${flagForNationality(customer.nationality)} ${customer.nationality}` : null, customer.phone || null].filter(Boolean).join(" · ")}
+                </p>
+              ) : null}
+            </div>
           </div>
-          <p className="mt-1 text-[17px] font-semibold text-[var(--foreground-secondary)]">
-            {customer.nationality ? `${flagForNationality(customer.nationality)} ${customer.nationality}` : cx.say("noNationality")}
-            {customer.phone ? ` · ${customer.phone}` : ""}
-          </p>
           {licenceDays !== null && licenceDays < 0 ? <p className="mt-1 font-bold text-[var(--danger)]">{cx.say("warnLicence", { date: formatDate(customer.driver_license_expiry, cx) })}</p> : null}
           {passportDays !== null && passportDays < 0 ? <p className="mt-1 font-bold text-[var(--danger)]">{cx.say("warnPassport", { date: formatDate(customer.passport_expiry, cx) })}</p> : null}
-          <DoNotRent customerId={customer.id} on={Boolean((customer as any).do_not_rent)} organizationId={organization.id} place="banner" reason={(customer as any).do_not_rent_reason || null} />
-          <SharedHistory reports={signals} />
-          <div className="mt-4 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+          </div>
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap lg:shrink-0 lg:justify-end">
             <Link className="primary-action pressable col-span-2" href={`/bookings/new?customerId=${customer.id}` as Route}>
               <Plus size={18} />
               {cx.say("newBooking")}
@@ -539,50 +564,35 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
               {cx.say("editDetails")}
             </a>
           </div>
-          <DoNotRent customerId={customer.id} on={Boolean((customer as any).do_not_rent)} organizationId={organization.id} place="control" reason={null} />
-          <ReportToOthers canReport={["owner", "manager"].includes(String(membership?.role || ""))} customerId={customer.id} rentals={reportableRentals} reports={ownReports} />
+          </div>
+          <DoNotRent customerId={customer.id} on={Boolean((customer as any).do_not_rent)} organizationId={organization.id} place="banner" reason={(customer as any).do_not_rent_reason || null} />
+          <SharedHistory reports={signals} />
+          {/* The two quiet controls side by side on one line, evenly spaced (they stacked with uneven gaps). */}
+          <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2">
+            <DoNotRent customerId={customer.id} on={Boolean((customer as any).do_not_rent)} organizationId={organization.id} place="control" reason={null} />
+            <ReportToOthers canReport={["owner", "manager"].includes(String(membership?.role || ""))} customerId={customer.id} rentals={reportableRentals} reports={ownReports} />
+          </div>
         </Card>
 
         {detail.rentals.length > 0 ? (
+        // Four tiles, one template: a label, a 28px value, a caption, all from the top. Colour only in the caption.
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <div className="card tile p-4 text-[var(--foreground)]">
-            <TileHead title={cx.say("h_title")} />
-            <span>
-              <span className="num block text-[32px] leading-none">{detail.rentals.length}</span>
-              <span className="font-semibold text-[var(--foreground-secondary)]">{cx.say("g_days", { count: detail.totalRentalDays })}</span>
-            </span>
-          </div>
-          <div className="card tile p-4 text-[var(--foreground)]">
-            <TileHead title={cx.say("h_paid")} />
-            <span>
-              <span className="num block text-[26px] leading-tight">{money(totalIncome)}</span>
-              <span className="font-semibold text-[var(--foreground-secondary)]">{cx.say("g_notDeposits")}</span>
-            </span>
-          </div>
-          {owedNow > 0 ? (
-            <a className="card pressable tile tile-brick p-4" href="#payments">
-              <TileHead title={cx.say("g_owes")} />
-              <span>
-                <span className="num block text-[26px] leading-tight">{money(owedNow)}</span>
-                <span className="font-semibold">{cx.say("g_owesDetail")}</span>
-              </span>
-            </a>
-          ) : (
-            <div className="card tile tile-green p-4">
-              <TileHead title={cx.say("g_owesNothing")} />
-              <span className="flex items-center gap-3">
-                <span className="inline-flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-[var(--success)] text-white"><CheckCircle2 size={24} strokeWidth={2.4} /></span>
-                <span className="font-semibold">{cx.say("g_owesNothingDetail")}</span>
-              </span>
-            </div>
-          )}
-          <a className="card pressable tile p-4 text-[var(--foreground)]" href="#documents">
-            <TileHead title={cx.say("g_docs")} />
-            <span className="flex flex-col items-start gap-2 min-[420px]:flex-row min-[420px]:items-center min-[420px]:gap-3">
-              <Ring color={docsIn === 3 ? "var(--success)" : "var(--going-out)"} label={`${docsIn}/3`} pct={(docsIn / 3) * 100} size={68} stroke={9} track="var(--panel-tertiary)" />
-              <span className="min-w-0 font-semibold text-[var(--foreground-secondary)]">{docsIn === 3 ? cx.say("docsOk") : cx.say("g_docsMissing", { count: 3 - docsIn })}</span>
-            </span>
-          </a>
+          <StatTile caption={cx.say("g_days", { count: detail.totalRentalDays })} label={cx.say("h_title")} value={String(detail.rentals.length)} />
+          <StatTile caption={cx.say("g_notDeposits")} label={cx.say("h_paid")} value={money(totalIncome)} />
+          <StatTile
+            caption={owedNow > 0 ? cx.say("g_owesDetail") : cx.say("g_owesNothingDetail")}
+            href={owedNow > 0 ? "#payments" : undefined}
+            label={cx.say("g_balance")}
+            tone={owedNow > 0 ? "red" : "green"}
+            value={money(owedNow)}
+          />
+          <StatTile
+            caption={docsIn === 3 ? cx.say("docs_ok") : cx.say("g_docsMissingList", { list: missingDocs.join(", ").toLocaleLowerCase(cx.locale) })}
+            href="#documents"
+            label={cx.say("g_docs")}
+            tone={docsIn === 3 ? "green" : "amber"}
+            value={cx.say("g_docsOf", { count: docsIn })}
+          />
         </div>
         ) : null}
 
@@ -603,7 +613,8 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             <Pane
               id="documents"
               open={completeness.status !== "complete"}
-              summary={completeness.status === "complete" ? cx.say("docs_ok") : cx.say("docs_missing", { list: missingDocs.join(", ") })}
+              // The rows below say which ones are missing; the summary only counts, so it doesn't repeat them.
+              summary={completeness.status === "complete" ? cx.say("docs_ok") : cx.say("g_docsOf", { count: docsIn })}
               title={cx.say("docs_title")}
               tone={completeness.status === "complete" ? "green" : "amber"}
             >

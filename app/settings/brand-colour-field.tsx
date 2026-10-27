@@ -10,7 +10,23 @@ const PRESETS = ["#0e5e6f", "#1f7a5c", "#1d4ed8", "#1e3a5f", "#6d28d9", "#be185d
  * The brand colour picker. Picking a colour re-colours the page straight away
  * (a preview), so the owner sees what customers will see before they save.
  */
-export function BrandColourField({ initial, label, customLabel, hint }: { initial: string; label: string; customLabel: string; hint: string }) {
+export function BrandColourField({
+  initial,
+  label,
+  customLabel,
+  hint,
+  previewLabel,
+  form
+}: {
+  initial: string;
+  label: string;
+  customLabel: string;
+  hint: string;
+  /** The name of the small sample row under the swatches, so it doesn't read as stray buttons. */
+  previewLabel?: string;
+  /** The id of the form the colour is saved with, when the field sits outside it. */
+  form?: string;
+}) {
   const [colour, setColour] = useState(isBrandColour(initial) ? initial.toLowerCase() : ROUTEHQ_BRAND);
   const palette = brandPalette(colour);
 
@@ -32,8 +48,9 @@ export function BrandColourField({ initial, label, customLabel, hint }: { initia
 
   return (
     <div>
-      <span className="font-semibold text-[var(--foreground-secondary)]">{label}</span>
-      <input name="contract_accent_colour" type="hidden" value={colour} />
+      <span className="block font-semibold text-[var(--foreground-secondary)]">{label}</span>
+      <input form={form} name="contract_accent_colour" type="hidden" value={colour} />
+      <span className="mt-0.5 block text-sm text-[var(--muted)]">{hint}</span>
       <div className="mt-2 flex flex-wrap items-center gap-2">
         {PRESETS.map((preset) => {
           const on = preset === colour;
@@ -56,12 +73,13 @@ export function BrandColourField({ initial, label, customLabel, hint }: { initia
           <input className="sr-only" onChange={(event) => isBrandColour(event.target.value) && setColour(event.target.value.toLowerCase())} type="color" value={colour} />
         </label>
       </div>
+      {/* A labelled sample of how buttons and tints come out in this colour. */}
       <div className="mt-3 flex items-center gap-2" aria-hidden="true">
-        <span className="rounded-lg px-3 py-2 text-sm font-bold text-white" style={{ background: palette.primary }}>Aa</span>
-        <span className="rounded-lg px-3 py-2 text-sm font-bold text-white" style={{ background: palette.hover }}>Aa</span>
-        <span className="rounded-lg px-3 py-2 text-sm font-bold" style={{ background: palette.light, color: palette.primary }}>Aa</span>
+        {previewLabel ? <span className="me-1 text-sm font-semibold text-[var(--muted)]">{previewLabel}</span> : null}
+        <span className="rounded-full px-3 py-1.5 text-sm font-bold text-white" style={{ background: palette.primary }}>Aa</span>
+        <span className="rounded-full px-3 py-1.5 text-sm font-bold text-white" style={{ background: palette.hover }}>Aa</span>
+        <span className="rounded-full px-3 py-1.5 text-sm font-bold" style={{ background: palette.light, color: palette.primary }}>Aa</span>
       </div>
-      <span className="mt-1 block text-sm text-[var(--muted)]">{hint}</span>
     </div>
   );
 }

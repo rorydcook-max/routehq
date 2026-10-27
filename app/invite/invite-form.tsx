@@ -28,7 +28,8 @@ export function InviteForm() {
       <fieldset className="block">
         <legend className={labelClass}>{say("iv_role")}</legend>
         <div className="mt-1.5 space-y-2">
-          {APP_ROLES.map((role) => (
+          {/* Least access first, so the safe choice is the obvious one. */}
+          {[...APP_ROLES].sort((a, b) => ["teammate", "manager", "owner"].indexOf(a.value) - ["teammate", "manager", "owner"].indexOf(b.value)).map((role) => (
             <label className="flex cursor-pointer items-start gap-3 rounded-xl bg-[var(--panel-secondary)] p-3.5 has-[:checked]:bg-[var(--primary-light)] has-[:checked]:ring-2 has-[:checked]:ring-[var(--primary)]" key={role.value}>
               <input className="mt-0.5 h-5 w-5 shrink-0" defaultChecked={role.value === "teammate"} name="role" type="radio" value={role.value} />
               <span>
@@ -51,7 +52,7 @@ export function InviteForm() {
       </label>
       {state.error ? <p className="rounded-xl bg-[var(--danger-light)] px-4 py-3 font-bold text-[var(--danger)]">{state.error}</p> : null}
       {state.success ? <p className="rounded-xl bg-[var(--success-light)] px-4 py-3 font-bold text-[var(--success)]">{state.success}</p> : null}
-      <button className="primary-action w-full" disabled={pending}>
+      <button className="primary-action w-full sm:w-auto" disabled={pending}>
         {pending ? (
           <>
             <span aria-hidden="true" className="spinner" />

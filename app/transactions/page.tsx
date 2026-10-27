@@ -36,7 +36,7 @@ export default async function TransactionsPage({
       ) : null}
 
       {/* The everyday cost: a receipt in hand. One tap to the camera. */}
-      <Link className="pressable mb-4 flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-white p-3.5 shadow-[var(--shadow-card)]" href="/transactions/new?cost=1">
+      <Link className="card pressable mb-4 flex items-center gap-3 p-3.5" href="/transactions/new?cost=1">
         <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
           <Camera aria-hidden="true" size={22} />
         </span>

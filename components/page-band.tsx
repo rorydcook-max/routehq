@@ -54,7 +54,7 @@ export function bandTab(active: boolean) {
  */
 export function BandPills({ items }: { items: Array<{ count: number; label: string; dot?: string | null; alert?: boolean; href?: string | null; active?: boolean }> }) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="chip-row -my-1 flex flex-wrap gap-2 py-1">
       {items.map((item) => {
         const loud = !!item.alert && item.count > 0;
         const inner = (

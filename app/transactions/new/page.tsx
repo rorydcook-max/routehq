@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/app-shell";
+import { BackLink } from "@/components/ui";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDefaultOrganization } from "@/lib/organization";
 import { getTransactionFormOptions, getTransactionFormPrefill } from "@/lib/transactions";
@@ -31,12 +31,10 @@ export default async function NewTransactionPage({
 
   return (
     <AppShell userEmail={userEmail}>
-      <div className="mx-auto max-w-3xl">
+      <div className="page-form">
         <div className="page-hero mb-5">
-          <Link className="text-sm font-bold text-[var(--primary)]" href={costForBooking ? `/bookings/${costForBooking}` : "/transactions"}>
-            {costForBooking ? t("backToBooking") : t("back")}
-          </Link>
-          <h1 className="page-title mt-2">{costForBooking ? t("costTitle") : fine ? t("fineTitle") : t("recordTitle")}</h1>
+          <BackLink href={costForBooking ? `/bookings/${costForBooking}` : "/transactions"} label={costForBooking ? t("backBookingLabel") : t("backLabel")} />
+          <h1 className="page-title">{costForBooking ? t("costTitle") : fine ? t("fineTitle") : t("recordTitle")}</h1>
           <p className="page-subtitle mt-2">{costForBooking ? t("costSubtitle") : fine ? t("fineSubtitle") : t("recordSubtitle")}</p>
         </div>
 

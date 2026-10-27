@@ -17,10 +17,6 @@ export async function SiteFooter() {
       ]
     },
     {
-      title: m("footerRenters"),
-      links: [{ href: SITE_LINKS.directory, label: m("footerDirectory") }]
-    },
-    {
       title: m("footerAccount"),
       links: [
         { href: SITE_LINKS.signIn, label: m("navSignIn") },

@@ -32,7 +32,7 @@ export async function sampleMoney() {
   return money;
 }
 
-/** "Honda City · Lucas Martin": the name only where there is room (not on phones), never an ellipsis. */
+/** "Toyota Corolla · Lucas Martin": the name only where there is room (not on phones), never an ellipsis. */
 function Sub({ main, detail }: { main: string; detail: string }) {
   return (
     <>
@@ -95,35 +95,31 @@ function StatusBar() {
   );
 }
 
-/** A car seen from the side: the same simple shape the app draws for a vehicle without a photo. */
-export function CarArt({ colour = "#0b8f8c", className = "", flip = false }: { colour?: string; className?: string; flip?: boolean }) {
-  return (
-    <svg className={className} style={flip ? { transform: "scaleX(-1)" } : undefined} viewBox="0 0 120 52" xmlns="http://www.w3.org/2000/svg">
-      <path d="M6 36c0-5 3-8 8-9l16-3 13-11c3-2.5 6-3.5 10-3.5h27c5 0 8.5 1.8 11.5 5l10 10.5 8 1.8c4 1 6.5 4 6.5 8v4.2c0 2-1.2 3-3 3H9c-2 0-3-1-3-3z" fill={colour} />
-      <path d="M46 14.5h15v10.5H34.5z" fill="#d9f4f3" />
-      <path d="M65 14.5h15.5c3 0 5 1 7 3l7.5 7.5H65z" fill="#d9f4f3" />
-      <circle cx="31" cy="42" fill="#0b1a2e" r="8.5" />
-      <circle cx="31" cy="42" fill="#c9d2db" r="3.5" />
-      <circle cx="92" cy="42" fill="#0b1a2e" r="8.5" />
-      <circle cx="92" cy="42" fill="#c9d2db" r="3.5" />
-    </svg>
-  );
-}
+/* Real vehicles, photographed (public/site/vehicles, credits in CREDITS.md): a card at 16:10 and a thumbnail at 4:3. */
+const VEHICLES = {
+  yaris: { name: "Toyota Yaris", file: "toyota-yaris" },
+  corolla: { name: "Toyota Corolla", file: "toyota-corolla" },
+  pajero: { name: "Mitsubishi Pajero Sport", file: "mitsubishi-pajero-sport" },
+  vespa: { name: "Vespa VXL 125", file: "vespa-vxl" }
+} as const;
+type VehicleId = keyof typeof VEHICLES;
+const vehicleName = (id: VehicleId) => VEHICLES[id].name;
 
-/** A scooter seen from the side, in the same simple style. */
-export function ScooterArt({ colour = "#0b8f8c", className = "" }: { colour?: string; className?: string }) {
+/** A vehicle photo that fills its box. `thumb` uses the small 4:3 file; `flip` mirrors it (for a second angle). */
+function VehiclePhoto({ id, thumb = false, flip = false, className = "" }: { id: VehicleId; thumb?: boolean; flip?: boolean; className?: string }) {
+  const v = VEHICLES[id];
   return (
-    <svg className={className} viewBox="0 0 100 58" xmlns="http://www.w3.org/2000/svg">
-      <path d="M73 30 82 47" stroke="#0b1a2e" strokeLinecap="round" strokeWidth="3.2" />
-      <path d="M10 41c0-8 6-13 16-13h24c4 0 6 2.4 6 5.6V38h8l7-24h5l-6.6 25.5C68.3 44 65 46 60.5 46H15c-3 0-5-2-5-5z" fill={colour} />
-      <path d="M21 21.5h28c2.6 0 3.8 1.7 3 3.7l-.5 1.3H19.5l-.6-1.4c-.8-1.8.4-3.6 2.1-3.6z" fill="#0b1a2e" />
-      <path d="M68 13.5 80 10.5" stroke="#0b1a2e" strokeLinecap="round" strokeWidth="3.2" />
-      <circle cx="74.8" cy="19" fill="#e6eaef" r="2.2" />
-      <circle cx="24" cy="47" fill="#0b1a2e" r="8" />
-      <circle cx="24" cy="47" fill="#c9d2db" r="3" />
-      <circle cx="82" cy="47" fill="#0b1a2e" r="8" />
-      <circle cx="82" cy="47" fill="#c9d2db" r="3" />
-    </svg>
+    // eslint-disable-next-line @next/next/no-img-element -- a fixed, pre-sized asset inside a drawn mockup
+    <img
+      alt={v.name}
+      className={`block h-full w-full object-cover ${className}`}
+      decoding="async"
+      height={thumb ? 300 : 750}
+      loading="lazy"
+      src={`/site/vehicles/${v.file}${thumb ? "-thumb" : ""}.webp`}
+      style={flip ? { transform: "scaleX(-1)" } : undefined}
+      width={thumb ? 400 : 1200}
+    />
   );
 }
 
@@ -200,9 +196,9 @@ export async function DashboardWindowMock({ className = "" }: { className?: stri
     { icon: BarChart3, label: t("mockNavReports") }
   ];
   const rows = [
-    { title: t("mockRowHandover", { vehicle: "Toyota Yaris Ativ" }), sub: "Anna Becker · 10:00", action: t("mockHandOver"), solid: true, colour: "#0b8f8c" },
-    { title: t("mockRowCollect", { amount: money(2400) }), sub: "Kenji Watanabe · Honda Click 160", action: t("mockRecordPayment"), colour: "#12bcb8" },
-    { title: t("mockRowReturn", { vehicle: "Honda City" }), sub: "Lucas Martin · 16:30", action: t("mockTakeBack"), colour: "#4a9ad8" }
+    { title: t("mockRowHandover", { vehicle: vehicleName("yaris") }), sub: "Anna Becker · 10:00", action: t("mockHandOver"), solid: true, vehicle: "yaris" as VehicleId },
+    { title: t("mockRowCollect", { amount: money(2400) }), sub: `Kenji Watanabe · ${vehicleName("vespa")}`, action: t("mockRecordPayment"), vehicle: "vespa" as VehicleId },
+    { title: t("mockRowReturn", { vehicle: vehicleName("corolla") }), sub: "Lucas Martin · 16:30", action: t("mockTakeBack"), vehicle: "corolla" as VehicleId }
   ];
   const bars = [38, 52, 44, 63, 58, 72, 66, 80, 74, 90];
   const week = ["2026-11-09", "2026-11-10", "2026-11-11", "2026-11-12", "2026-11-13", "2026-11-14", "2026-11-15"].map((iso) => date(iso, { weekday: "short", day: "numeric" }));
@@ -210,10 +206,10 @@ export async function DashboardWindowMock({ className = "" }: { className?: stri
   const going = { bg: "#d9f4f3", fg: "#0b6e6c" };
   const back = { bg: "#e4eef8", fg: "#1f4f7a" };
   const calendar = [
-    { vehicle: "Toyota Yaris Ativ", bars: [{ who: "Anna Becker", from: 4, to: 8, ...going }] },
-    { vehicle: "Honda City", bars: [{ who: "Lucas Martin", from: 1, to: 5, ...back }, { who: "Mei Lin", from: 6, to: 8, ...out }] },
-    { vehicle: "Honda Click 160", bars: [{ who: "Kenji Watanabe", from: 2, to: 7, ...out }] },
-    { vehicle: "Toyota Fortuner", bars: [{ who: "Sofia Rossi", from: 1, to: 8, ...out }] }
+    { vehicle: vehicleName("yaris"), bars: [{ who: "Anna Becker", from: 4, to: 8, ...going }] },
+    { vehicle: vehicleName("corolla"), bars: [{ who: "Lucas Martin", from: 1, to: 5, ...back }, { who: "Mei Lin", from: 6, to: 8, ...out }] },
+    { vehicle: vehicleName("vespa"), bars: [{ who: "Kenji Watanabe", from: 2, to: 7, ...out }] },
+    { vehicle: vehicleName("pajero"), bars: [{ who: "Sofia Rossi", from: 1, to: 8, ...out }] }
   ];
   return (
     <WindowFrame address="palm.routehq.app" className={className} label={t("mockDashboardLabel")}>
@@ -256,8 +252,8 @@ export async function DashboardWindowMock({ className = "" }: { className?: stri
               <div className="mt-[0.6em] overflow-hidden rounded-[1.4em] bg-white shadow-[0_1px_2px_rgba(6,22,43,0.06),0_12px_30px_rgba(6,22,43,0.08)]">
                 {rows.map((row, index) => (
                   <div className={`flex items-center gap-[0.9em] px-[1.1em] py-[0.95em] ${index ? "border-t border-[#e6eaef]" : ""}`} key={row.title}>
-                    <span className="flex h-[2.6em] w-[3.2em] shrink-0 items-center justify-center rounded-[0.7em] bg-[#f3f6f8]">
-                      <CarArt className="w-[2.5em]" colour={row.colour} />
+                    <span className="block h-[2.6em] w-[3.5em] shrink-0 overflow-hidden rounded-[0.7em] bg-[#f3f6f8]">
+                      <VehiclePhoto id={row.vehicle} thumb />
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-bold">{row.title}</span>
@@ -298,7 +294,7 @@ export async function DashboardWindowMock({ className = "" }: { className?: stri
             </div>
           </div>
           <div className="mt-[1.2em] rounded-[1.4em] bg-white px-[1.1em] pb-[1em] pt-[0.9em] shadow-[0_1px_2px_rgba(6,22,43,0.06),0_12px_30px_rgba(6,22,43,0.08)]">
-            <div className="grid grid-cols-[10em_repeat(7,1fr)] items-center gap-y-[0.45em]">
+            <div className="grid grid-cols-[12.5em_repeat(7,1fr)] items-center gap-y-[0.45em]">
               <span className="font-semibold text-[#5f6b7a]">{t("mockNavCalendar")}</span>
               {week.map((day, index) => (
                 <span className={`text-center text-[0.9em] font-semibold ${index === 3 ? "text-[#0b8f8c]" : "text-[#5f6b7a]"}`} key={day}>
@@ -334,9 +330,9 @@ export async function DashboardWindowMock({ className = "" }: { className?: stri
 export async function TodayPhoneMock({ className = "" }: { className?: string }) {
   const { t, money, date } = await kit();
   const rows = [
-    { title: t("mockRowHandover", { vehicle: "Toyota Yaris Ativ" }), sub: "Anna Becker · 10:00", action: t("mockHandOver"), solid: true, bar: "#0b8f8c" },
+    { title: t("mockRowHandover", { vehicle: vehicleName("yaris") }), sub: "Anna Becker · 10:00", action: t("mockHandOver"), solid: true, bar: "#0b8f8c" },
     { title: t("mockRowCollect", { amount: money(2400) }), sub: "Kenji Watanabe", action: t("mockRecordPayment"), bar: "#12bcb8" },
-    { title: t("mockRowReturn", { vehicle: "Honda City" }), sub: "Lucas Martin · 16:30", action: t("mockTakeBack"), bar: "#4a9ad8" }
+    { title: t("mockRowReturn", { vehicle: vehicleName("corolla") }), sub: "Lucas Martin · 16:30", action: t("mockTakeBack"), bar: "#4a9ad8" }
   ];
   return (
     <PhoneFrame className={className} label={t("mockTodayLabel")}>
@@ -412,11 +408,11 @@ export async function BookingPhoneMock({ className = "" }: { className?: string 
         <div className="mx-[0.9em] mt-[1em] rounded-[1.3em] bg-white p-[1em] shadow-[0_1px_2px_rgba(6,22,43,0.06),0_10px_24px_rgba(6,22,43,0.08)]">
           <p className="font-semibold text-[#5f6b7a]">{t("mockYourBooking")}</p>
           <div className="mt-[0.5em] flex items-center gap-[0.8em]">
-            <span className="flex h-[3.4em] w-[4.6em] shrink-0 items-center justify-center rounded-[0.8em] bg-[#e6eaef]">
-              <CarArt className="w-[3.8em]" colour="#0b2140" />
+            <span className="block h-[3.4em] w-[4.6em] shrink-0 overflow-hidden rounded-[0.8em] bg-[#e6eaef]">
+              <VehiclePhoto id="yaris" thumb />
             </span>
             <span className="min-w-0">
-              <span className="block text-[1.15em] font-bold leading-tight">Toyota Yaris Ativ</span>
+              <span className="block text-[1.15em] font-bold leading-tight">{vehicleName("yaris")}</span>
               <span className="block text-[#5f6b7a]">
                 {range} · {t("mockDays", { count: 7 })}
               </span>
@@ -471,10 +467,10 @@ export async function BookingPhoneMock({ className = "" }: { className?: string 
 export async function HandoverPhoneMock({ className = "" }: { className?: string }) {
   const { t, number } = await kit();
   const tiles = [
-    { colour: "#0b1a2e", flip: false },
-    { colour: "#0b1a2e", flip: true },
-    { colour: "#5f6b7a", flip: false },
-    { colour: "#5f6b7a", flip: true }
+    { flip: false, zoom: "" },
+    { flip: true, zoom: "" },
+    { flip: false, zoom: "origin-[22%_72%] scale-[2.4]" },
+    { flip: false, zoom: "origin-[80%_72%] scale-[2.4]" }
   ];
   return (
     <PhoneFrame className={className} label={t("mockHandoverLabel")}>
@@ -488,7 +484,7 @@ export async function HandoverPhoneMock({ className = "" }: { className?: string
             <span className="block text-[1.3em] font-semibold leading-tight" style={{ fontFamily: "var(--font-site)" }}>
               {t("mockHandoverTitle")}
             </span>
-            <span className="block text-[#5f6b7a]">Honda City · Lucas Martin</span>
+            <span className="block text-[#5f6b7a]">{vehicleName("corolla")} · Lucas Martin</span>
           </span>
         </div>
         <div className="mx-[0.9em] mt-[1em] rounded-[1.3em] bg-white p-[0.9em] shadow-[0_1px_2px_rgba(6,22,43,0.06)]">
@@ -498,8 +494,8 @@ export async function HandoverPhoneMock({ className = "" }: { className?: string
           </div>
           <div className="mt-[0.6em] grid grid-cols-2 gap-[0.45em]">
             {tiles.map((tile, index) => (
-              <span className="relative flex aspect-[4/3] items-center justify-center rounded-[0.7em] bg-[linear-gradient(160deg,#e6eaef,#cfd6df)]" key={index}>
-                <CarArt className="w-[70%]" colour={index < 2 ? "#e9edec" : "#f5f7f7"} flip={tile.flip} />
+              <span className="relative block aspect-[4/3] overflow-hidden rounded-[0.7em] bg-[#e6eaef]" key={index}>
+                <VehiclePhoto className={tile.zoom} flip={tile.flip} id="corolla" thumb />
                 <span className="absolute bottom-[0.35em] end-[0.35em] flex h-[1.5em] w-[1.5em] items-center justify-center rounded-full bg-white/90 text-[#0b8f8c]">
                   <Camera className="h-[0.9em] w-[0.9em]" />
                 </span>
@@ -611,10 +607,10 @@ export async function StatementPhoneMock({ className = "" }: { className?: strin
         </div>
         <div className="mx-[0.9em] mt-[0.9em] flex items-center gap-[0.8em] rounded-[1.3em] bg-white p-[0.9em] shadow-[0_1px_2px_rgba(6,22,43,0.06)]">
           <span className="flex h-[3em] w-[4.2em] shrink-0 items-center justify-center rounded-[0.8em] bg-[#e6eaef]">
-            <CarArt className="w-[3.4em]" colour="#0b1a2e" />
+            <VehiclePhoto id="pajero" thumb />
           </span>
           <span>
-            <span className="block font-bold">Toyota Fortuner</span>
+            <span className="block font-bold">{vehicleName("pajero")}</span>
             <span className="block text-[#5f6b7a]">Palm Car Rental</span>
           </span>
         </div>
@@ -703,12 +699,12 @@ export async function ReturnCard({ className = "" }: { className?: string }) {
   const { t, money } = await kit();
   return (
     <div aria-hidden="true" className={`${s.card} ${className}`}>
-      <CardHead icon={<Camera className="h-[1.2em] w-[1.2em]" />} sub={<Sub detail="Lucas Martin" main="Honda City" />} title={t("mockCompareTitle")} />
+      <CardHead icon={<Camera className="h-[1.2em] w-[1.2em]" />} sub={<Sub detail="Lucas Martin" main={vehicleName("corolla")} />} title={t("mockCompareTitle")} />
       <div className="grid grid-cols-2 gap-[0.6em] p-[1em]">
         {[t("mockCompareOut"), t("mockCompareBack")].map((label, index) => (
           <div key={label}>
-            <div className="flex aspect-[4/3] items-center justify-center rounded-[0.7em] bg-[linear-gradient(160deg,#e6eaef,#cfd6df)]">
-              <CarArt className="w-[78%]" colour={index ? "#eef1f0" : "#f6f8f8"} />
+            <div className="aspect-[4/3] overflow-hidden rounded-[0.7em] bg-[#e6eaef]">
+              <VehiclePhoto id="corolla" thumb />
             </div>
             <p className="mt-[0.4em] text-[0.9em] font-semibold text-[var(--muted)]">{label}</p>
           </div>
@@ -740,7 +736,7 @@ export async function LedgerCard({ className = "" }: { className?: string }) {
   ];
   return (
     <div aria-hidden="true" className={`${s.card} ${className}`}>
-      <CardHead icon={<FileText className="h-[1.2em] w-[1.2em]" />} sub={<Sub detail="Anna Becker" main="Toyota Yaris Ativ" />} title={t("mockLedgerTitle")} />
+      <CardHead icon={<FileText className="h-[1.2em] w-[1.2em]" />} sub={<Sub detail="Anna Becker" main={vehicleName("yaris")} />} title={t("mockLedgerTitle")} />
       <div className="px-[1.3em] py-[0.3em]">
         {rows.map((row) => (
           <div className="flex items-center justify-between gap-[1em] border-b border-[var(--line)] py-[0.75em] last:border-0" key={row.label}>
@@ -770,10 +766,10 @@ export async function LedgerCard({ className = "" }: { className?: string }) {
 export async function ShopPageMock({ className = "" }: { className?: string }) {
   const { t, money } = await kit();
   const vehicles = [
-    { name: "Honda Click 160", kind: "scooter", price: money(250), colour: "#0b2140" },
-    { name: "Toyota Yaris Ativ", kind: "car", price: money(1100), colour: "#0b8f8c" },
-    { name: "Yamaha NMAX", kind: "scooter", price: money(350), colour: "#0b1a2e" },
-    { name: "Toyota Fortuner", kind: "car", price: money(2200), colour: "#5f6b7a" }
+    { id: "vespa" as VehicleId, price: money(450) },
+    { id: "yaris" as VehicleId, price: money(1100) },
+    { id: "corolla" as VehicleId, price: money(1300) },
+    { id: "pajero" as VehicleId, price: money(2200) }
   ];
   return (
     <WindowFrame address="palm.routehq.app/book" className={className} label={t("mockShopLabel")} light>
@@ -790,13 +786,13 @@ export async function ShopPageMock({ className = "" }: { className?: string }) {
         </div>
         <div className="mt-[1.6em] grid grid-cols-2 gap-[1em]">
           {vehicles.map((vehicle) => (
-            <div className="overflow-hidden rounded-[1.2em] bg-white shadow-[0_1px_2px_rgba(6,22,43,0.06),0_12px_30px_rgba(6,22,43,0.06)]" key={vehicle.name}>
-              <div className="flex aspect-[16/8] items-center justify-center bg-[#e6eaef]">
-                {vehicle.kind === "car" ? <CarArt className="w-[62%]" colour={vehicle.colour} /> : <ScooterArt className="w-[44%]" colour={vehicle.colour} />}
+            <div className="overflow-hidden rounded-[1.2em] bg-white shadow-[0_1px_2px_rgba(6,22,43,0.06),0_12px_30px_rgba(6,22,43,0.06)]" key={vehicle.id}>
+              <div className="aspect-[16/10] overflow-hidden bg-[#e6eaef]">
+                <VehiclePhoto id={vehicle.id} />
               </div>
               <div className="flex flex-wrap items-end justify-between gap-x-[0.8em] gap-y-[0.3em] p-[1em]">
                 <span>
-                  <span className="block whitespace-nowrap text-[1.15em] font-bold">{vehicle.name}</span>
+                  <span className="block whitespace-nowrap text-[1.15em] font-bold">{vehicleName(vehicle.id)}</span>
                   <span className="mt-[0.2em] inline-flex items-center gap-[0.4em] text-[#1f7a4d]">
                     <span className="h-[0.55em] w-[0.55em] rounded-full bg-[#1f7a4d]" /> {t("mockAvailable")}
                   </span>

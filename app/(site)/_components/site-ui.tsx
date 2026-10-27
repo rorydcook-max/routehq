@@ -46,7 +46,7 @@ export const SITE_LINKS = {
   features: "/home#how",
   pricing: "/pricing",
   owners: "/owners",
-  directory: "/rent",
+  // No link to the renters' booking site (/rent): it is moving to its own consumer brand, and this site speaks to rental businesses.
   signIn: "/login",
   signUp: "/signup"
 } as const;
@@ -66,13 +66,32 @@ export function Hl(chunks: ReactNode) {
   return <em className={s.hl}>{chunks}</em>;
 }
 
-/** A deliberate line break in a headline (<br></br> in the string), kept only from 640px up; narrower screens wrap naturally. */
+/**
+ * A deliberate line break in a headline (<br></br> in the string), kept only from 640px up; narrower screens wrap
+ * naturally. It carries a real space first, so "business,<br></br>for" never reads "business,for" when the break is
+ * hidden (Chinese and Japanese, which use no word spaces, hide the space too: see .brSpace).
+ */
 export function Br() {
-  return <br className={s.br} />;
+  return (
+    <>
+      <span className={s.brSpace}> </span>
+      <br className={s.br} />
+    </>
+  );
 }
 
-/** The tags a headline string may use: t.rich("key", RICH). */
-export const RICH = { hl: Hl, br: Br };
+/** One phrase in a headline set in teal, same face and weight (<em> in the string). Used once per page at most. */
+export function TealWord(chunks: ReactNode) {
+  return <span className={s.tealWord}>{chunks}</span>;
+}
+
+/**
+ * The tags a headline string may use: t.rich("key", RICH). The italic serif belongs to exactly two headlines, the home
+ * hero and the closing call to action (Rory, 27 Oct), which use RICH_SERIF; everywhere else an <hl> left in a string
+ * (an older translation, say) is drawn as plain text.
+ */
+export const RICH = { hl: (chunks: ReactNode) => chunks, br: Br, em: TealWord };
+export const RICH_SERIF = { hl: Hl, br: Br, em: TealWord };
 
 /** The arrow after a link, turned round for right-to-left languages. */
 export function Arrow({ size = 18 }: { size?: number }) {

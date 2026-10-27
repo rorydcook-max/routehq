@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { StatementPhoneMock } from "../_components/mockups";
 import { FinalCta } from "../_components/final-cta";
-import { Arrow, Container, Eyebrow, RICH, SITE_LINKS, SiteLink } from "../_components/site-ui";
+import { Container, Eyebrow, RICH, SITE_LINKS, SiteLink } from "../_components/site-ui";
 import s from "../site.module.css";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -28,11 +28,6 @@ export default async function OwnersPage() {
             <Eyebrow>{m("ownersEyebrow")}</Eyebrow>
             <h1 className={`${s.h1} ${s.h1Owners} mt-6`}>{m.rich("ownersTitle", RICH)}</h1>
             <p className={`${s.lede} ${s.heroBody}`}>{m("ownersBody")}</p>
-            <div className={s.heroActions}>
-              <SiteLink className={`${s.btn} ${s.btnLight}`} href={SITE_LINKS.directory}>
-                {m("ownersCta")} <Arrow />
-              </SiteLink>
-            </div>
           </div>
           <div className={`${s.ownersPhone} ${s.rise}`}>
             <StatementPhoneMock />

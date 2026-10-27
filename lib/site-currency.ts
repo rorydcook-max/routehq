@@ -1,7 +1,7 @@
 /**
  * The currency the public website shows money in: the visitor's own, US dollars when we can't tell
- * (Rory, 27 Oct 2026). Country from Vercel's x-vercel-ip-country header; locally (no header) the region
- * of the browser's Accept-Language (th-TH → THB). Only currencies lib/plan-currency.ts has a rate for.
+ * (Rory, 27 Oct 2026). Country from Vercel's x-vercel-ip-country header; where there is no such header (a local
+ * server), SITE_DEFAULT_COUNTRY. Never the browser's language. Only currencies lib/plan-currency.ts has a rate for.
  */
 
 import { headers } from "next/headers";
@@ -28,20 +28,15 @@ export function isSiteCurrency(code: string | null | undefined) {
   return Boolean(upper) && planCurrency(upper) === upper;
 }
 
-/** The visitor's currency, from the request. Defaults to USD. */
+/**
+ * The visitor's currency, from where they are, never from their language: someone in Thailand with a phone set to
+ * English (UK) pays in baht, not pounds (Rory, 27 Oct 2026). (1) Vercel's x-vercel-ip-country header; (2) the
+ * SITE_DEFAULT_COUNTRY env var, for servers without that header (the local build sets TH); (3) US dollars.
+ * The pricing page's currency picker stays as the manual override.
+ */
 export async function visitorCurrency(): Promise<string> {
   const list = await headers();
-  const fromIp = currencyForCountry(list.get("x-vercel-ip-country"));
-  if (fromIp) return fromIp;
-  const languages = String(list.get("accept-language") || "")
-    .split(",")
-    .map((part) => part.split(";")[0].trim());
-  for (const tag of languages) {
-    const region = tag.split("-").slice(1).find((piece) => /^[A-Za-z]{2}$/.test(piece));
-    const found = currencyForCountry(region);
-    if (found) return found;
-  }
-  return "USD";
+  return currencyForCountry(list.get("x-vercel-ip-country")) || currencyForCountry(process.env.SITE_DEFAULT_COUNTRY) || "USD";
 }
 
 /**

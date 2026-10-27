@@ -1078,7 +1078,7 @@ aside a[class*="bg-[var(--sidebar-active)]"] {
   --accent-light: #fdf0d8;
   /* The main action on the teal band: white with teal text, so every primary action reads as the same teal family (no orange). */
   --band-action: #ffffff;
-  --band-logo-accent: #f2a541;
+  --band-logo-accent: #12bcb8;
   --band-action-ink: var(--primary);
 
   /* Header bands (Today, Fleet): the teal block the page opens with. */

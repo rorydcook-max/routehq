@@ -10,7 +10,6 @@ export async function SiteHeader() {
   const items = [
     { href: SITE_LINKS.features, label: m("navFeatures") },
     { href: SITE_LINKS.pricing, label: m("navPricing") },
-    { href: SITE_LINKS.directory, label: m("navDirectory") },
     { href: SITE_LINKS.owners, label: m("navOwners") }
   ];
   const logo = (

@@ -7,16 +7,16 @@ import { FOUNDING_SLOTS, PLANS, TRIAL_DAYS, fleetText } from "@/lib/plans";
 import { formatPlanPrice, planPrices } from "@/lib/plan-currency";
 import { visitorCurrency } from "@/lib/site-currency";
 import { BookingPhoneMock, DashboardWindowMock, HandoverPhoneMock, LedgerCard, PassportCard, PaymentPhoneMock, ReturnCard, ShopPageMock, TodayPhoneMock, sampleMoney } from "../_components/mockups";
-import { Arrow, Check, Container, Eyebrow, Plus, RICH, SITE_LINKS, SiteLink } from "../_components/site-ui";
+import { Arrow, Check, Container, Eyebrow, Plus, RICH, RICH_SERIF, SITE_LINKS, SiteLink } from "../_components/site-ui";
 import { FinalCta } from "../_components/final-cta";
 import s from "../site.module.css";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("site");
-  const title = t("metaHomeTitle");
-  const description = t("metaHomeDescription", { days: TRIAL_DAYS });
+  const m = await getTranslations("marketing");
+  const title = m("metaTitle");
+  const description = m("metaDescription");
   return {
     title: { absolute: title },
     description,
@@ -51,7 +51,7 @@ export default async function SiteHomePage() {
     applicationCategory: "BusinessApplication",
     applicationSubCategory: "Vehicle rental management",
     operatingSystem: "Web, Android, iOS",
-    description: t("metaHomeDescription", { days: TRIAL_DAYS }),
+    description: m("metaDescription"),
     inLanguage: [...supportedLocaleCodes],
     offers: {
       "@type": "AggregateOffer",
@@ -72,7 +72,7 @@ export default async function SiteHomePage() {
         <Container>
           <div className={s.rise}>
             <Eyebrow>{m("heroEyebrow")}</Eyebrow>
-            <h1 className={`${s.h1} mt-6`}>{m.rich("heroTitle", RICH)}</h1>
+            <h1 className={`${s.h1} mt-6`}>{m.rich("heroTitle", RICH_SERIF)}</h1>
             <p className={`${s.lede} ${s.heroBody}`}>{m("heroBody")}</p>
             <div className={s.heroActions}>
               <SiteLink className={`${s.btn} ${s.btnLight}`} href={SITE_LINKS.signUp}>
@@ -98,9 +98,21 @@ export default async function SiteHomePage() {
         </Container>
       </section>
 
-      {/* 2. Facts */}
+      {/* 2. On autopilot: what RouteHQ did this morning without anyone touching it, then the plain facts */}
       <section aria-label={t("proofLabel")} className={s.sectionBottom}>
         <Container>
+          <div className={s.auto}>
+            <p className={s.autoTitle}>{m("autoTitle")}</p>
+            <ol className={s.autoFeed}>
+              {[1, 2, 3, 4, 5, 6].map((n) => (
+                <li className={s.autoItem} key={n}>
+                  <Check />
+                  <span className={s.autoText}>{m(`auto${n}`)}</span>
+                  <time className={s.autoTime}>{m(`auto${n}Time`)}</time>
+                </li>
+              ))}
+            </ol>
+          </div>
           <ul className={s.facts}>
             {[1, 2, 3, 4].map((n) => (
               <li className={s.fact} key={n}>
@@ -112,19 +124,17 @@ export default async function SiteHomePage() {
         </Container>
       </section>
 
-      {/* 3. The problem */}
+      {/* 3. Things you'll never do again: the old jobs, struck through */}
       <section className={`${s.mist} ${s.section}`}>
         <Container>
           <div className={s.head}>
-            <Eyebrow>{m("problemEyebrow")}</Eyebrow>
-            <h2 className={s.h2}>{m.rich("problemTitle", RICH)}</h2>
-            <p className={s.lede}>{m("problemBody")}</p>
+            <Eyebrow>{m("neverEyebrow")}</Eyebrow>
+            <h2 className={s.h2}>{m("neverTitle")}</h2>
           </div>
-          <ul className={s.row4}>
-            {[1, 2, 3, 4].map((n) => (
-              <li className={s.rowItem} key={n}>
-                <h3>{m(`pain${n}Title`)}</h3>
-                <p>{m(`pain${n}Body`)}</p>
+          <ul className={s.never}>
+            {[1, 2, 3, 4, 5].map((n) => (
+              <li key={n}>
+                <s>{m(`never${n}`)}</s>
               </li>
             ))}
           </ul>
@@ -214,6 +224,7 @@ export default async function SiteHomePage() {
           <div className={`${s.head} ${s.headWide}`}>
             <Eyebrow>{m("growEyebrow")}</Eyebrow>
             <h2 className={s.h2}>{m.rich("growTitle", RICH)}</h2>
+            <p className={s.lede}>{m("growBody")}</p>
           </div>
         </Container>
         <Container className={s.growGrid}>
@@ -226,9 +237,6 @@ export default async function SiteHomePage() {
                 </li>
               ))}
             </ul>
-            <SiteLink className={`${s.link} mt-6`} href={SITE_LINKS.directory}>
-              {m("growLink")} <Arrow />
-            </SiteLink>
           </div>
           <div>
             <ShopPageMock />

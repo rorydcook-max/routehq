@@ -106,7 +106,11 @@
 .headWide {
   max-width: 760px;
 }
-/* A deliberate headline break, only where there is room for it. */
+/* A deliberate headline break, only where there is room for it. The space before it is real, so a hidden break never
+   glues two words; scripts without word spaces drop it. */
+.site:is(:lang(ja), :lang(zh)) .brSpace {
+  display: none;
+}
 .br {
   display: none;
 }
@@ -177,6 +181,13 @@
   color: var(--teal-deep);
 }
 .dark .hl {
+  color: var(--teal);
+}
+/* The one teal phrase on a page that isn't the hero: same face and weight, colour only. */
+.tealWord {
+  color: var(--teal-deep);
+}
+.dark .tealWord {
   color: var(--teal);
 }
 .eyebrow {
@@ -554,6 +565,95 @@
   color: var(--text);
   font-size: clamp(12.5px, 0.6rem + 0.45vw, 15.5px);
   line-height: 1.4;
+}
+
+/* ── On autopilot: a feed of what happened without you, under the hero picture.
+   A row you swipe on phones, a 3×2 grid from 900px. ─────────────────── */
+.auto {
+  padding-top: 48px;
+}
+.autoTitle {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--teal-deep);
+}
+.autoFeed {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  margin-inline: -16px;
+  padding: 2px 16px 6px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.autoFeed::-webkit-scrollbar {
+  display: none;
+}
+.autoItem {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #ffffff;
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+  scroll-snap-align: start;
+}
+.autoText {
+  color: var(--text);
+}
+.autoTime {
+  margin-inline-start: auto;
+  padding-inline-start: 12px;
+  font-size: 13px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+@media (min-width: 900px) {
+  .auto {
+    padding-top: 72px;
+  }
+  .autoFeed {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-inline: 0;
+    padding: 0;
+    overflow: visible;
+  }
+}
+
+/* ── Things you'll never do again: big lines with a teal stroke through them ── */
+.never {
+  margin-top: 48px;
+}
+.never li {
+  padding-block: 10px;
+  break-inside: avoid;
+  font-size: clamp(28px, 3.4vw, 44px);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--muted);
+}
+.never s {
+  text-decoration-line: line-through;
+  text-decoration-color: var(--teal);
+  text-decoration-thickness: 3px;
+}
+@media (min-width: 900px) {
+  .never {
+    columns: 2;
+    column-gap: 48px;
+  }
 }
 
 /* ── Facts: one row of four under the hero picture ──────────────────── */
@@ -1035,7 +1135,7 @@
 }
 @media (min-width: 900px) {
   .footerGrid {
-    grid-template-columns: 1.6fr repeat(3, 1fr);
+    grid-template-columns: 2fr 1fr 1fr;
   }
   .footerBrand {
     grid-column: span 1;
@@ -1366,7 +1466,7 @@ details[open] > .select .chevron {
 }
 
 /* Scripts with marks above and below the line (Thai, Lao, Burmese, Khmer, Sinhala, Tamil) need taller display lines. */
-.site:is(:lang(th), :lang(lo), :lang(my), :lang(km), :lang(si), :lang(ta)) :is(.h1, .h2, .h3, .stepTitle, .planPrice, .planCardPrice, .menuLink) {
+.site:is(:lang(th), :lang(lo), :lang(my), :lang(km), :lang(si), :lang(ta)) :is(.h1, .h2, .h3, .stepTitle, .planPrice, .planCardPrice, .menuLink, .never li) {
   line-height: 1.25;
   letter-spacing: 0;
 }

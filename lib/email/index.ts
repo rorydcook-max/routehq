@@ -37,6 +37,37 @@ export interface EmailProvider {
   send(message: EmailMessage): Promise<{ messageId: string }>;
 }
 
+/**
+ * Resend (resend.com) over its HTTP API, no SDK. Needs EMAIL_PROVIDER=resend, RESEND_API_KEY and
+ * EMAIL_FROM (e.g. "RouteHQ <alerts@routehq.app>", on a domain verified in Resend with DKIM/SPF).
+ */
+function createResendProvider(): EmailProvider {
+  const key = process.env.RESEND_API_KEY;
+  const from = process.env.EMAIL_FROM;
+  if (!key || !from) throw new Error("EMAIL_PROVIDER is resend but RESEND_API_KEY or EMAIL_FROM is missing.");
+  return {
+    name: "resend",
+    async send(message) {
+      const res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          from,
+          to: [message.to],
+          subject: message.subject,
+          text: message.text,
+          reply_to: message.replyTo || undefined,
+          attachments: message.attachments?.map((file) => ({ filename: file.filename, content: Buffer.from(file.content).toString("base64") })),
+          tags: message.metadata ? Object.entries(message.metadata).map(([name, value]) => ({ name, value: value.replace(/[^\w-]/g, "_").slice(0, 256) })) : undefined
+        })
+      });
+      const json = (await res.json().catch(() => ({}))) as { id?: string; message?: string };
+      if (!res.ok || !json.id) throw new Error(json.message || `Resend HTTP ${res.status}`);
+      return { messageId: json.id };
+    }
+  };
+}
+
 function configuredProviderName() {
   return String(process.env.EMAIL_PROVIDER || "").trim().toLowerCase();
 }
@@ -45,9 +76,7 @@ function resolveProvider(): EmailProvider | null {
   const name = configuredProviderName();
   if (!name) return null;
 
-  // Register providers here once one is chosen, e.g.:
-  //   if (name === "postmark") return createPostmarkProvider();
-  //   if (name === "resend") return createResendProvider();
+  if (name === "resend") return createResendProvider();
 
   throw new Error(`EMAIL_PROVIDER is set to "${name}" but no adapter is implemented for it.`);
 }

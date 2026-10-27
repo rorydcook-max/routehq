@@ -99,11 +99,11 @@ export function PushToggle({ variant = "card" }: { variant?: "card" | "prompt" }
   if (variant === "prompt") {
     if (dismissed || (state !== "off" && state !== "needs-install")) return null;
     return (
-      <div className="card mb-3 flex items-center gap-3 !px-4 !py-3">
+      <div className="card mb-3 flex flex-wrap items-center gap-3 !px-4 !py-3">
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--primary-light)] text-[var(--primary)]">
           <Bell size={18} />
         </span>
-        <p className="min-w-0 flex-1 font-medium text-[var(--foreground-secondary)]">
+        <p className="min-w-[180px] flex-1 font-medium text-[var(--foreground-secondary)]">
           {state === "needs-install" ? (
             t("pushInstall")
           ) : (

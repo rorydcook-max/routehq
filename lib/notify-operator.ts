@@ -1,6 +1,9 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { sendLineMessage } from "@/services/messaging/line";
 import { sendPushToOrganization } from "@/lib/push";
+import { alertSettings, wantsAlert } from "@/lib/alerts";
+import { isEmailConfigured, sendEmail } from "@/lib/email";
+import { isTelegramConfigured, sendTelegram } from "@/lib/telegram";
 
 const PUSH_TITLES: Record<string, string> = {
   portal_action: "Customer request",
@@ -8,12 +11,27 @@ const PUSH_TITLES: Record<string, string> = {
   contract_signed: "Booking signed",
   return_inspection: "Vehicle returned",
   new_message: "New message",
-  support_reply: "RouteHQ Help"
+  support_reply: "RouteHQ Help",
+  plan_activated: "Your plan"
 };
 
+/** Where an email alert goes: the address set in Integrations, else the business's owners. */
+async function alertEmails(supabase: any, organisationId: string, emailTo: string | null | undefined): Promise<string[]> {
+  if (emailTo && /.+@.+\..+/.test(emailTo)) return [emailTo.trim()];
+  const { data: owners } = await supabase.from("organization_members").select("user_id").eq("organization_id", organisationId).eq("role", "owner").eq("is_active", true);
+  const emails: string[] = [];
+  for (const owner of (owners || []) as Array<{ user_id: string | null }>) {
+    if (!owner.user_id) continue;
+    const { data } = await supabase.auth.admin.getUserById(owner.user_id);
+    if (data?.user?.email) emails.push(data.user.email);
+  }
+  return emails;
+}
+
 /**
- * Sends a text notification to the operator's LINE account.
- * Always fails silently — never throws — so it never breaks the main flow.
+ * Tells the business something happened: an alert on their devices, LINE, email and Telegram,
+ * each only if switched on for this kind of event (Settings › Notifications).
+ * Always fails silently - never throws - so it never breaks the main flow.
  */
 export async function notifyOperator(
   organisationId: string,
@@ -27,42 +45,65 @@ export async function notifyOperator(
 
     const { data: org } = await supabase
       .from("organizations")
-      .select("line_user_id, line_channel_access_token, line_notifications_enabled, settings")
+      .select("name, line_user_id, line_channel_access_token, line_notifications_enabled, settings")
       .eq("id", organisationId)
       .maybeSingle();
+    if (!org) return;
+    const settings = org.settings || {};
+    // The words without a leading emoji, for places that show their own title.
+    const plain = message.replace(/^[^\p{L}\p{N}฿$€£]+/u, "").trim();
+    const title = PUSH_TITLES[type] || "RouteHQ";
+    const appUrl = String(process.env.NEXT_PUBLIC_APP_URL || "").replace(/\/$/, "");
+    const link = appUrl ? `${appUrl}${url}` : "";
 
-    // Per-alert switches apply to both the phone alert and LINE.
-    if (org?.settings?.line_notifications?.[`event_${type}`] === false) return;
-    // Phones and computers that asked for alerts. Emoji that lead LINE messages are dropped from the alert text.
-    await sendPushToOrganization(supabase, organisationId, {
-      title: PUSH_TITLES[type] || "RouteHQ",
-      body: message.replace(/^[^\p{L}\p{N}฿]+/u, ""),
-      url
-    });
+    const jobs: Promise<unknown>[] = [];
 
-    if (!org?.line_user_id) return;
-    if (org.line_notifications_enabled === false) return;
-    // Per-alert switches from Settings → Notifications (all on unless turned off).
-    if (org.settings?.line_notifications?.[`event_${type}`] === false) return;
+    if (wantsAlert(settings, type, "push")) {
+      jobs.push(sendPushToOrganization(supabase, organisationId, { title, body: plain, url }).catch(() => null));
+    }
 
-    const accessToken: string =
-      org.line_channel_access_token ?? process.env.LINE_CHANNEL_ACCESS_TOKEN ?? "";
-    if (!accessToken) return;
+    if (org.line_user_id && org.line_notifications_enabled !== false && wantsAlert(settings, type, "line")) {
+      const accessToken: string = org.line_channel_access_token ?? process.env.LINE_CHANNEL_ACCESS_TOKEN ?? "";
+      if (accessToken) {
+        jobs.push(
+          sendLineMessage(accessToken, org.line_user_id, [{ type: "text", text: message }]).then((result) =>
+            supabase.from("line_messages").insert({
+              organisation_id: organisationId,
+              type,
+              recipient_line_id: org.line_user_id,
+              message_content: { type: "text", text: message },
+              status: result.success ? "sent" : "failed",
+              sent_at: result.success ? new Date().toISOString() : null,
+              error: result.error ?? null
+            })
+          )
+        );
+      }
+    }
 
-    const result = await sendLineMessage(accessToken, org.line_user_id, [
-      { type: "text", text: message }
-    ]);
+    if (settings.telegram_chat_id && isTelegramConfigured() && wantsAlert(settings, type, "telegram")) {
+      jobs.push(sendTelegram(settings.telegram_chat_id, link ? `${message}\n${link}` : message));
+    }
 
-    await supabase.from("line_messages").insert({
-      organisation_id: organisationId,
-      type,
-      recipient_line_id: org.line_user_id,
-      message_content: { type: "text", text: message },
-      status: result.success ? "sent" : "failed",
-      sent_at: result.success ? new Date().toISOString() : null,
-      error: result.error ?? null
-    });
+    if (isEmailConfigured() && wantsAlert(settings, type, "email")) {
+      jobs.push(
+        alertEmails(supabase, organisationId, alertSettings(settings).email_to).then((emails) =>
+          Promise.all(
+            emails.map((to) =>
+              sendEmail({
+                to,
+                subject: `${title}: ${plain.slice(0, 80)}`,
+                text: `${plain}\n\n${link ? `Open in RouteHQ: ${link}\n\n` : ""}You get this because email alerts are on for ${org.name || "your business"}. Change them in Settings › Notifications.`,
+                metadata: { kind: "operator_alert", type }
+              })
+            )
+          )
+        )
+      );
+    }
+
+    await Promise.allSettled(jobs);
   } catch {
-    // Silent — never surface to caller
+    // Silent - never surface to caller
   }
 }

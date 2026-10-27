@@ -5,6 +5,7 @@ import type { Route } from "next";
 const TABS = [
   { href: "/platform", label: "Overview" },
   { href: "/platform/businesses", label: "Businesses" },
+  { href: "/platform/catalog", label: "Vehicle catalogue" },
   { href: "/platform/log", label: "Admin log" },
   { href: "/platform/renters", label: "Renters" },
   { href: "/help/team", label: "Help queue" }

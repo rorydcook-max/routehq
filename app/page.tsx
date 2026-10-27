@@ -68,15 +68,19 @@ function AgendaRow({ item, art, card = false, delay }: { item: AgendaItem; art?:
   return (
     <li className={delay === undefined ? undefined : "rise"} style={delay === undefined ? undefined : ({ ["--d" as string]: `${delay}ms` } as CSSProperties)}>
       <Link className={`group flex items-center gap-3.5 transition ${card ? "card pressable p-3" : "px-4 py-3.5 hover:bg-[var(--panel-secondary)]"}`} href={item.href as Route}>
-        {art || <span className={`inline-flex flex-shrink-0 items-center justify-center ${card ? "h-11 w-14 rounded-xl" : "h-10 w-14 rounded-xl"} ${TONE_CLASSES[item.tone]}`}>{item.icon}</span>}
+        {/* Phones drop the picture so the words get the width; a coloured bar at the start keeps the urgency visible. */}
+        <span className={`w-1 self-stretch rounded-full sm:hidden ${item.tone === "red" ? "bg-[var(--danger)]" : item.tone === "amber" ? "bg-[var(--warning)]" : item.tone === "teal" ? "bg-[var(--primary)]" : "bg-[var(--border-strong)]"}`} />
+        <span className="hidden sm:contents">
+          {art || <span className={`inline-flex flex-shrink-0 items-center justify-center ${card ? "h-11 w-14 rounded-xl" : "h-10 w-14 rounded-xl"} ${TONE_CLASSES[item.tone]}`}>{item.icon}</span>}
+        </span>
         <span className="min-w-0 flex-1">
-          <span className="block text-[16px] font-bold leading-tight text-[var(--foreground)]">{item.title}</span>
+          <span className="block text-[16px] font-bold leading-snug text-[var(--foreground)]">{item.title}</span>
           <span className="line-clamp-2 block font-medium text-[var(--foreground-secondary)]">
             {item.detail}
             {item.when ? <span className={item.tone === "red" ? "font-bold text-[var(--danger)]" : ""}> · {item.when}</span> : null}
           </span>
         </span>
-        <span className={`inline-flex min-h-10 min-w-[104px] flex-shrink-0 items-center justify-center rounded-full px-4 font-bold ${solid ? "bg-[var(--primary)] text-white" : "border-2 border-[var(--border-strong)] bg-white text-[var(--foreground)]"}`}>
+        <span className={`inline-flex min-h-9 flex-shrink-0 items-center justify-center rounded-full px-3.5 text-[14px] font-bold sm:min-h-10 sm:min-w-[104px] sm:px-4 sm:text-[15px] ${solid ? "bg-[var(--primary)] text-white" : "border-2 border-[var(--border-strong)] bg-white text-[var(--foreground)]"}`}>
           {item.action}
         </span>
       </Link>
@@ -507,11 +511,11 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
     </Link>
   );
   const hero = (
-    <div className="flex flex-wrap items-end justify-between gap-4 pb-6 lg:pb-2">
+    <div className="flex flex-wrap items-end justify-between gap-4 lg:pb-2">
       <div className="min-w-0 flex-1">
         <p className="font-semibold text-white/90">{headerDate}</p>
         <h1 className="mt-0.5 text-[34px] leading-[1.05] tracking-[-0.025em] text-white lg:text-[44px]">{greeting}</h1>
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="chip-row -my-1 mt-3 flex flex-wrap gap-2 py-1">
           {/* The same two numbers as the To do page, so the dashboard never tells a different story. */}
           {tasksOverdue > 0 ? pill(tasksOverdue, t("pillOverdue"), "/tasks", "var(--band-alert)") : null}
           {pill(tasksDueToday, t("pillToDo"), "/tasks")}
@@ -708,8 +712,10 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       ) : null}
 
       <div className="grid gap-5 lg:grid-cols-12 lg:gap-6">
-        <div className="min-w-0 space-y-5 lg:col-span-8">
-          <section className="card rise relative -mt-12 p-3 lg:mt-0 lg:p-5">
+        {/* Phones open on what needs doing (Today), then the money tiles, then the week, then the fleet in brief.
+            Computers keep the week first with the tiles and fleet in the side column. */}
+        <div className="flex min-w-0 flex-col gap-5 lg:col-span-8">
+          <section className="card rise relative order-3 p-3 lg:order-1 lg:p-5">
             <header className="flex items-baseline justify-between gap-3 px-1 pb-3">
               <h2 className="text-[20px] text-[var(--foreground)] lg:text-[22px]">{t("planTitle")}</h2>
               <PanelLink href="/calendar">{t("calendar")}</PanelLink>
@@ -720,15 +726,15 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
 
           {/* Phones: the car park comes after the week. Computers have it in the side column. */}
           {lot.length > 0 ? (
-            <div className="lg:hidden">
-              <FleetLot action={<PanelLink href="/fleet">{t("fleet")}</PanelLink>} labels={lotLabels} title={t("yourFleet")} vehicles={lot} />
+            <div className="order-4 lg:hidden">
+              <FleetLot compact action={<PanelLink href="/fleet">{t("fleet")}</PanelLink>} labels={lotLabels} title={t("yourFleet")} vehicles={lot} />
             </div>
           ) : null}
 
-          {/* On a phone the tiles come straight after the week. */}
-          <div className="grid grid-cols-2 gap-3 lg:hidden">{tiles}</div>
+          {/* On a phone the tiles (money, overdue, deposits) come right after Today. */}
+          <div className="order-2 grid grid-cols-2 gap-3 lg:hidden">{tiles}</div>
 
-          <section>
+          <section className="order-1 lg:order-2">
             <header className="mb-2.5 flex items-center justify-between gap-3 px-1">
               <h2 className="text-[22px] text-[var(--foreground)]">{t("todayTitle")}</h2>
               <PanelLink href="/tasks">{t("allJobs")}</PanelLink>

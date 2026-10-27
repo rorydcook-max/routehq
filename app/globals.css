@@ -1788,24 +1788,51 @@ h2 { letter-spacing: -0.015em; }
   --band-dot: #ffffff;
   --band-alert: #f6b7a3;
 }
-@media (min-width: 1024px) {
-  .hero-band {
-    --band-soft: #ffffff;
-    --band-dot: var(--on-rent);
-    --band-alert: var(--danger);
-    background: transparent !important;
-    color: var(--foreground) !important;
-    overflow: visible !important;
-    border-radius: 0 !important;
-    padding: 6px 2px 24px !important;
-    margin-bottom: 0 !important;
+/* Oct 27: the light header now applies at every size (Rory: the teal slab with rings and a sun looked dated on phones). */
+.hero-band {
+  --band-soft: #ffffff;
+  --band-dot: var(--on-rent);
+  --band-alert: var(--danger);
+  background: transparent !important;
+  color: var(--foreground) !important;
+  overflow: visible !important;
+  border-radius: 0 !important;
+  padding: 2px 2px 20px !important;
+  margin-bottom: 0 !important;
+}
+@media (min-width: 1024px) { .hero-band { padding: 6px 2px 24px !important; } }
+.hero-band .band-art { display: none; }
+.hero-band .text-white { color: var(--foreground); }
+.hero-band :is(.text-white\/90, .text-white\/85, .text-white\/80) { color: var(--foreground-secondary); }
+.hero-band [class*="bg-[var(--band-soft)]"] { box-shadow: var(--shadow-card); }
+.hero-band .band-tab-on { background: var(--primary); color: #fff; }
+.hero-band .band-loud { background: var(--danger-light); }
+/* Phones: a soft wash of the business colour behind the top of the page, fading into the background (no hard edge). */
+@media (max-width: 1023px) {
+  body:has(.hero-band)::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 340px;
+    background:
+      radial-gradient(120% 80% at 10% 0%, color-mix(in srgb, var(--primary) 16%, transparent) 0%, transparent 70%),
+      radial-gradient(90% 70% at 100% 0%, color-mix(in srgb, var(--primary) 9%, transparent) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: -1;
   }
-  .hero-band .band-art { display: none; }
-  .hero-band .text-white { color: var(--foreground); }
-  .hero-band :is(.text-white\/90, .text-white\/85, .text-white\/80) { color: var(--foreground-secondary); }
-  .hero-band [class*="bg-[var(--band-soft)]"] { box-shadow: var(--shadow-card); }
-  .hero-band .band-tab-on { background: var(--primary); color: #fff; }
-  .hero-band .band-loud { background: var(--danger-light); }
+  /* The page colour comes from <html> here, so the wash shows through. */
+  body:has(.hero-band) { background: transparent; }
+  /* iOS-sized reading text on phones. */
+  body { font-size: 16px; }
+  .hero-band h1 { font-size: 34px !important; letter-spacing: -0.025em; }
+}
+/* The floating tab bar on phones: frosted glass with a hairline edge and a soft long shadow. */
+.glass-bar {
+  background: color-mix(in srgb, var(--panel) 72%, transparent);
+  -webkit-backdrop-filter: blur(22px) saturate(1.8);
+  backdrop-filter: blur(22px) saturate(1.8);
+  border: 1px solid color-mix(in srgb, #ffffff 65%, transparent);
+  box-shadow: 0 18px 40px -16px rgba(16, 38, 43, 0.35), 0 0 0 0.5px rgba(16, 38, 43, 0.08);
 }
 
 /* A number's change, as a small chip: green up, brick down. Point at it for the sentence. */
@@ -1846,10 +1873,8 @@ h2 { letter-spacing: -0.015em; }
 @keyframes g-wipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
 
 /* On the light header the page's main action is a solid button in the business colour. */
-@media (min-width: 1024px) {
-  .hero-band [class*="bg-[var(--band-action)]"] { background: var(--primary); color: #fff; box-shadow: var(--shadow-card); }
-  .hero-band [class*="bg-[var(--band-action)]"]:hover { background: var(--primary-hover); }
-}
+.hero-band [class*="bg-[var(--band-action)]"] { background: var(--primary); color: #fff; box-shadow: var(--shadow-card); }
+.hero-band [class*="bg-[var(--band-action)]"]:hover { background: var(--primary-hover); }
 
 /* A plain file box (a receipt, a customer's passport) looks like the rest of the app: a dashed box with a
    pill button, not the browser's grey "Choose file". Boxes that hide themselves behind their own button are left alone. */
@@ -1933,12 +1958,11 @@ details[open] > summary:not([class*="flex"]):not([class*="grid"]):not(:has(svg, 
 }
 .band-chip:hover { background: rgba(255, 255, 255, 0.24); }
 .band-chip-on, .band-chip-on:hover { background: #fff; color: var(--foreground); --band-dot: var(--on-rent); --band-alert: var(--danger); }
-@media (min-width: 1024px) {
-  .hero-band .band-chip { background: #fff; color: var(--foreground); box-shadow: var(--shadow-card); }
-  .hero-band .band-chip:hover { border-color: var(--primary); }
-  .hero-band .band-chip-on, .hero-band .band-chip-on:hover { background: var(--primary); border-color: var(--primary); color: #fff; }
-  .hero-band .band-chip-on .text-white { color: #fff; }
-}
+/* Header count chips: white glass pills on the light header, at every size. */
+.hero-band .band-chip { background: color-mix(in srgb, #fff 86%, transparent); color: var(--foreground); box-shadow: var(--shadow-card); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+.hero-band .band-chip:hover { border-color: var(--primary); }
+.hero-band .band-chip-on, .hero-band .band-chip-on:hover { background: var(--primary); border-color: var(--primary); color: #fff; }
+.hero-band .band-chip-on .text-white { color: #fff; }
 
 /* A sparkline's label opens below it, so it never covers the number above. */
 .spark-hit[data-tip]::after { bottom: auto; top: calc(100% + 8px); transform: translate(-50%, -4px); }

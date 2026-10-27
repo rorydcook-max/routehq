@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import type { Route } from "next";
+import { useEffect, useMemo, useState, useTransition, type ReactNode } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { MoreHorizontal } from "lucide-react";
 import { KindChip, jobKind } from "@/components/kind-chip";
@@ -14,6 +15,7 @@ import { EmptyState } from "@/components/ui";
 import { dateFormat, longDate, shortDate } from "@/lib/i18n/dates";
 import { allocatePayment, type OpenPayment } from "@/lib/payment-allocation";
 import type { TaskListItem } from "@/lib/tasks";
+import { BOARD_BUCKETS, BUCKET_LABEL_KEY, bucketOf, type Bucket } from "./buckets";
 
 type Filter = "open" | "done";
 
@@ -185,27 +187,14 @@ function timeLabel(dueAt: string | null) {
   return time;
 }
 
-type Group = { key: string; tone: "red" | "amber" | "neutral" | "teal"; items: TaskListItem[] };
-
-function groupOpen(items: TaskListItem[], today: string): Group[] {
-  const weekEnd = addDays(today, 7);
-  const groups: Group[] = [
-    { key: "receipts", tone: "teal", items: [] },
-    { key: "overdue", tone: "red", items: [] },
-    { key: "today", tone: "amber", items: [] },
-    { key: "week", tone: "neutral", items: [] },
-    { key: "later", tone: "neutral", items: [] }
-  ];
-  for (const item of items) {
-    const due = item.dueDate;
-    // A customer is waiting on these, whenever the payment falls due.
-    if (item.receipt) groups[0].items.push(item);
-    else if (due && due < today) groups[1].items.push(item);
-    else if (due === today) groups[2].items.push(item);
-    else if (due && due <= weekEnd) groups[3].items.push(item);
-    else groups[4].items.push(item);
+/** Open jobs by column. Within a column a receipt to check leads (a customer is waiting on it); the rest keep their order. */
+function bucketOpen(items: TaskListItem[], today: string): Record<Bucket, TaskListItem[]> {
+  const buckets: Record<Bucket, TaskListItem[]> = { overdue: [], next3: [], next7: [], next30: [], later: [] };
+  for (const item of items) buckets[bucketOf(item, today)].push(item);
+  for (const key of Object.keys(buckets) as Bucket[]) {
+    buckets[key] = [...buckets[key].filter((item) => item.receipt), ...buckets[key].filter((item) => !item.receipt)];
   }
-  return groups.filter((group) => group.items.length > 0);
+  return buckets;
 }
 
 const METHODS = ["cash", "bank_transfer", "promptpay", "wise", "revolut", "other"] as const;
@@ -287,8 +276,9 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
   // Fields take the app's standard 44px height; no one-off sizes here.
   const field = "mt-1 w-full";
   return (
-    <div className="mt-2 rounded-2xl bg-[var(--panel-secondary)] p-3.5">
-      <div className="grid gap-2 sm:grid-cols-3">
+    // Sized by the room it has, not the screen: in a board column the three fields stack.
+    <div className="@container mt-2 rounded-2xl bg-[var(--panel-secondary)] p-3.5">
+      <div className="grid gap-2 @lg:grid-cols-3">
         <label className="text-xs font-semibold text-[var(--foreground-secondary)]">
           {tx.say("amountArrived")}
           {/* ฿ as a prefix, as in the app's other money fields; decimals stay allowed here (satang). */}
@@ -374,7 +364,22 @@ function ReceivePaymentPanel({ item, siblings, today, onClose }: { item: TaskLis
   );
 }
 
-function TaskRow({ item, organizationId, today, siblings = [], canDecide = true }: { item: TaskListItem; organizationId: string; today: string; siblings?: TaskListItem[]; canDecide?: boolean }) {
+function TaskRow({
+  item,
+  organizationId,
+  today,
+  siblings = [],
+  canDecide = true,
+  stacked = false
+}: {
+  item: TaskListItem;
+  organizationId: string;
+  today: string;
+  siblings?: TaskListItem[];
+  canDecide?: boolean;
+  /** A card in a board column: stays stacked on computers too, with a smaller title and one detail line. */
+  stacked?: boolean;
+}) {
   const tx = useTx();
   const [showNote, setShowNote] = useState(false);
   const [showMore, setShowMore] = useState(false);
@@ -435,14 +440,21 @@ function TaskRow({ item, organizationId, today, siblings = [], canDecide = true 
   return (
     // While a payment is being recorded the card stacks on computers too: the form takes the full width
     // under the heading instead of sharing the row with the icon and running over it.
-    <div className={`card flex flex-col gap-3.5 p-4 ${recording ? "" : "lg:flex-row lg:items-center lg:gap-6"}`}>
+    <div className={`card flex flex-col gap-3.5 p-4 ${recording || stacked ? "" : "lg:flex-row lg:items-center lg:gap-6"} ${stacked ? "lg:gap-3" : ""}`}>
       <div className="flex items-center gap-3.5 lg:min-w-0 lg:flex-1">
-        <KindChip kind={jobKind(item)} />
+        {/* In a board column the column already says when; the title and its line are enough at a glance. */}
+        {stacked ? (
+          <span className="flex-shrink-0 lg:hidden">
+            <KindChip kind={jobKind(item)} />
+          </span>
+        ) : (
+          <KindChip kind={jobKind(item)} />
+        )}
         <div className="min-w-0 flex-1">
-          <p className="text-[19px] font-bold leading-tight text-[var(--foreground)]">{title}</p>
+          <p className={`${stacked ? "text-[19px] lg:text-[16px]" : "text-[19px]"} font-bold leading-tight text-[var(--foreground)]`}>{title}</p>
           {/* When it is due leads the line under the title ("4 days late · Playwright Tester · Honda City"), so it sits with the job it belongs to. */}
           {when || line ? (
-            <p className="mt-0.5 font-medium text-[var(--foreground-secondary)]">
+            <p className={`mt-0.5 font-medium text-[var(--foreground-secondary)] ${stacked ? "lg:truncate lg:text-[14px]" : ""}`} title={stacked ? [when, line].filter(Boolean).join(" · ") : undefined}>
               {when ? (
                 <span className={`whitespace-nowrap font-bold ${overdue ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>
                   {when}
@@ -489,7 +501,7 @@ function TaskRow({ item, organizationId, today, siblings = [], canDecide = true 
             <ReceivePaymentPanel item={item} onClose={() => setRecording(false)} siblings={siblings} today={today} />
           ) : null}
           {showNote && !item.completedAt ? (
-            <form action={completeTask} className="mt-2 flex flex-col gap-2 sm:flex-row">
+            <form action={completeTask} className={`mt-2 flex flex-col gap-2 sm:flex-row ${stacked ? "lg:flex-col" : ""}`}>
               <input name="organizationId" type="hidden" value={organizationId} />
               <input name="taskId" type="hidden" value={item.id} />
               <input
@@ -507,7 +519,14 @@ function TaskRow({ item, organizationId, today, siblings = [], canDecide = true 
       </div>
 
       {/* Buttons share the full card width. Three (a receipt to check) don't fit a phone: confirming takes its own row there. */}
-      <div className="flex flex-wrap items-center gap-2 lg:flex-nowrap [&_a]:whitespace-nowrap [&_button]:whitespace-nowrap [&>*]:min-w-0 [&>*]:flex-1 [&>a]:justify-center [&>button]:justify-center [&_button]:w-full [&_form]:min-w-0 [&_form]:flex-1 lg:min-w-[19rem] lg:shrink-0 lg:justify-end lg:[&>*]:flex-none lg:[&_button]:w-auto">
+      {/* In a board column the buttons wrap onto their own lines instead of squeezing their words. */}
+      <div
+        className={
+          stacked
+            ? "flex flex-wrap items-center gap-2 [&_a]:whitespace-nowrap [&_button]:whitespace-nowrap [&>*]:min-w-0 [&>*]:flex-1 [&>a]:justify-center [&>button]:justify-center [&_button]:w-full [&_form]:min-w-0 [&_form]:flex-1 lg:[&>*]:min-w-fit lg:[&_form]:min-w-fit"
+            : "flex flex-wrap items-center gap-2 lg:flex-nowrap [&_a]:whitespace-nowrap [&_button]:whitespace-nowrap [&>*]:min-w-0 [&>*]:flex-1 [&>a]:justify-center [&>button]:justify-center [&_button]:w-full [&_form]:min-w-0 [&_form]:flex-1 lg:min-w-[19rem] lg:shrink-0 lg:justify-end lg:[&>*]:flex-none lg:[&_button]:w-auto"
+        }
+      >
         {receipt?.url ? (
           <a className="secondary-action pressable min-h-9 px-3 text-[14px]" href={receipt.url} rel="noreferrer" target="_blank">
             {tx.say("viewReceipt")}
@@ -515,7 +534,7 @@ function TaskRow({ item, organizationId, today, siblings = [], canDecide = true 
         ) : null}
         {receipt && !recording ? (
           <>
-            <button className={`primary-action pressable min-h-9 px-3 text-xs ${receipt?.url ? "order-first basis-full! sm:order-none sm:basis-0!" : ""}`} disabled={isConfirming} onClick={confirmReceipt} type="button">
+            <button className={`primary-action pressable min-h-9 px-3 text-xs ${receipt?.url ? `order-first basis-full! sm:order-none sm:basis-0! ${stacked ? "lg:order-first lg:basis-full!" : ""}` : ""}`} disabled={isConfirming} onClick={confirmReceipt} type="button">
               {isConfirming ? tx.say("saving") : tx.say("confirmReceived")}
             </button>
             <button className="secondary-action pressable min-h-9 px-3 text-xs" disabled={isConfirming} onClick={() => setRecording(true)} type="button">
@@ -614,7 +633,8 @@ export function TasksList({
   organizationId,
   today,
   laterLimit = 5,
-  canDecide = true
+  canDecide = true,
+  show = null
 }: {
   tasks: TaskListItem[];
   organizationId: string;
@@ -622,6 +642,8 @@ export function TasksList({
   laterLimit?: number;
   /** Owner or manager: can decide refunds and free days. */
   canDecide?: boolean;
+  /** The band pill chosen (?show=): only that column's jobs. */
+  show?: Bucket | null;
 }) {
   const tx = useTx();
   const [filter, setFilter] = useState<Filter>("open");
@@ -640,8 +662,83 @@ export function TasksList({
     () => tasks.filter((task) => !!task.completedAt).sort((a, b) => String(b.completedAt).localeCompare(String(a.completedAt))),
     [tasks]
   );
-  const groups = useMemo(() => groupOpen(open, today), [open, today]);
+  const buckets = useMemo(() => bucketOpen(open, today), [open, today]);
 
+  // Jobs not due yet keep their buttons quiet, so the solid ones mean "now".
+  const calm = (bucket: Bucket) => (bucket === "next7" || bucket === "next30" || bucket === "later" ? "calm-actions" : "");
+  const row = (item: TaskListItem) => (
+    <TaskRow canDecide={canDecide} item={item} key={item.id} organizationId={organizationId} siblings={item.kind === "payment" ? siblingsOf(item) : []} stacked today={today} />
+  );
+  const nothingHere = <p className="px-1 font-medium text-[var(--muted)]">{tx.say("nothingHere")}</p>;
+  const heading = (bucket: Bucket, count: number, extra?: ReactNode) => (
+    <div className="flex items-center gap-2.5 px-1 pt-1">
+      <h2 className="card-title">{tx.say(BUCKET_LABEL_KEY[bucket])}</h2>
+      {/* One count pill in two tones: red tint for late work, neutral tint for the rest. */}
+      <span className={`inline-flex min-w-7 items-center justify-center rounded-full px-2 py-0.5 text-[14px] font-bold tabular-nums ${bucket === "overdue" && count > 0 ? "bg-[var(--danger-light)] text-[var(--danger)]" : "bg-[var(--panel-tertiary)] text-[var(--foreground-secondary)]"}`}>{count}</span>
+      {extra}
+    </div>
+  );
+
+  function openView() {
+    if (open.length === 0) return <EmptyState description={tx.say("emptyBody")} title={tx.say("emptyTitle")} />;
+
+    // A pill on the band chosen: just those jobs, as cards side by side on a computer.
+    if (show) {
+      const items = buckets[show];
+      return (
+        <section className={`space-y-3 ${calm(show)}`}>
+          {heading(
+            show,
+            items.length,
+            <Link className="ml-auto whitespace-nowrap font-semibold text-[var(--primary)] hover:underline" href={"/tasks" as Route} scroll={false}>
+              {tx.say("showAllJobs")}
+            </Link>
+          )}
+          {items.length === 0 ? nothingHere : <div className="grid gap-2.5 lg:grid-cols-2 lg:items-start lg:gap-4 xl:grid-cols-3">{items.map(row)}</div>}
+        </section>
+      );
+    }
+
+    const later = buckets.later;
+    const limited = !showAllLater && later.length > laterLimit;
+    return (
+      <>
+        {/* Phones and tablets: one list in four sections. Computers: the same four sections as columns side by side
+            (two by two where the screen is narrow), each scrolling with the page. */}
+        <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-5 lg:gap-y-8 xl:grid-cols-4">
+          {BOARD_BUCKETS.map((bucket) => {
+            const items = buckets[bucket];
+            return (
+              // An empty section is left out of the phone's list; on the board it keeps its place with one calm line.
+              <section className={`min-w-0 space-y-2.5 ${items.length === 0 ? "hidden lg:block" : ""} ${calm(bucket)}`} key={bucket}>
+                {heading(bucket, items.length)}
+                {items.length === 0 ? nothingHere : items.map(row)}
+              </section>
+            );
+          })}
+          {/* No date, or more than 30 days off: the end of the phone's list. On a computer it is the quiet line under the board. */}
+          {later.length > 0 ? (
+            <section className={`space-y-2.5 lg:hidden ${calm("later")}`}>
+              {heading("later", later.length)}
+              {(limited ? later.slice(0, laterLimit) : later).map(row)}
+              {limited ? (
+                <button className="pressable w-full rounded-full bg-white px-4 py-3 font-bold text-[var(--primary)]" onClick={() => setShowAllLater(true)} type="button">
+                  {tx.say("showMore", { count: later.length - laterLimit })}
+                </button>
+              ) : null}
+            </section>
+          ) : null}
+        </div>
+        {later.length > 0 ? (
+          <p className="hidden px-1 pt-2 lg:block">
+            <Link className="font-semibold text-[var(--foreground-secondary)] hover:text-[var(--primary)] hover:underline" href={"/tasks?show=later" as Route} scroll={false}>
+              {tx.say("laterLink", { count: later.length })}
+            </Link>
+          </p>
+        ) : null}
+      </>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -665,31 +762,7 @@ export function TasksList({
       </div>
 
       {filter === "open" ? (
-        groups.length === 0 ? (
-          <EmptyState description={tx.say("emptyBody")} title={tx.say("emptyTitle")} />
-        ) : (
-          groups.map((group) => {
-            const limited = group.key === "later" && !showAllLater && group.items.length > laterLimit;
-            const items = limited ? group.items.slice(0, laterLimit) : group.items;
-            return (
-              <section className={`space-y-2.5 ${group.key === "week" || group.key === "later" ? "calm-actions" : ""}`} key={group.key}>
-                <div className="flex items-center gap-2.5 px-1 pt-1">
-                  <h2 className="card-title">{tx.say(`group_${group.key}`)}</h2>
-                  {/* One count pill in two tones: red tint for late work, neutral tint for the rest. */}
-                  <span className={`inline-flex min-w-7 items-center justify-center rounded-full px-2 py-0.5 text-[14px] font-bold tabular-nums ${group.tone === "red" ? "bg-[var(--danger-light)] text-[var(--danger)]" : "bg-[var(--panel-tertiary)] text-[var(--foreground-secondary)]"}`}>{group.items.length}</span>
-                </div>
-                {items.map((item) => (
-                  <TaskRow canDecide={canDecide} item={item} key={item.id} organizationId={organizationId} siblings={item.kind === "payment" ? siblingsOf(item) : []} today={today} />
-                ))}
-                {limited ? (
-                  <button className="pressable w-full rounded-full bg-white px-4 py-3 font-bold text-[var(--primary)]" onClick={() => setShowAllLater(true)} type="button">
-                    {tx.say("showMore", { count: group.items.length - laterLimit })}
-                  </button>
-                ) : null}
-              </section>
-            );
-          })
-        )
+        openView()
       ) : done.length === 0 ? (
         <EmptyState title={tx.say("noFinished")} />
       ) : (

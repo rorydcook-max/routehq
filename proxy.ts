@@ -49,7 +49,10 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith("/api/inbox/") ||
     // Scheduled jobs have no user session; they check CRON_SECRET themselves.
     pathname.startsWith("/api/cron/") ||
-    pathname === "/api/line/daily-summary";
+    pathname === "/api/line/daily-summary" ||
+    // Calendar apps subscribing to a business's booking feed (a secret token in the address), and the RouteHQ Telegram bot.
+    pathname.startsWith("/api/calendar/") ||
+    pathname === "/api/telegram/webhook";
   // Customer pages take their language from the customer (their choice, or their phone's language), never from whoever is signed in.
   if (pathname.startsWith("/book/") || pathname.startsWith("/amend/") || pathname === "/rent" || pathname.startsWith("/rent/")) {
     request.headers.set("x-routehq-customer-page", "1");

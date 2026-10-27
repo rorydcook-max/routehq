@@ -331,7 +331,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
             <Link aria-label={brand?.name || "RouteHQ dashboard"} className="min-w-0" href="/">
               {brand ? (
                 // On the coloured band the logo sits on a white tab; if the file is missing, their name goes there instead.
-                <span className={`flex h-8 max-w-[160px] items-center ${hero ? "rounded-md bg-white px-1.5" : ""}`}>
+                <span className="flex h-8 max-w-[160px] items-center">
                   <BusinessLogoImage
                     alt={brand.name}
                     className="h-7 max-w-[140px] object-contain object-left"
@@ -340,7 +340,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
                   />
                 </span>
               ) : (
-                <RouteHqLogo className="h-7 w-auto" showDescriptor={false} tone={hero ? "dark" : "light"} />
+                <RouteHqLogo className="h-7 w-auto" showDescriptor={false} tone="light" />
               )}
             </Link>
             <span className="ml-auto">{!isTeammate ? <AskBox variant="icon" /> : null}</span>
@@ -368,13 +368,9 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
           </div>
           ) : null;
           return hero ? (
-            <div className={`hero-band relative -mx-[14px] -mt-[14px] overflow-hidden rounded-b-[32px] bg-[var(--band)] px-[14px] pt-[14px] text-[var(--band-ink)] sm:-mx-6 sm:-mt-5 sm:px-6 lg:mx-0 lg:mt-0 lg:rounded-[28px] lg:px-8 lg:pt-7 ${heroOverlap ? "mb-0 pb-10 lg:pb-[72px]" : "mb-4 pb-6 lg:mb-5 lg:pb-7"}`}>
-              <svg aria-hidden="true" className="band-art" viewBox="0 0 420 320">
-                <circle cx="250" cy="150" fill="none" r="96" stroke="currentColor" strokeOpacity="0.16" strokeWidth="2" />
-                <circle cx="250" cy="150" fill="none" r="146" stroke="currentColor" strokeOpacity="0.11" strokeWidth="2" />
-                <circle cx="250" cy="150" fill="none" r="198" stroke="currentColor" strokeOpacity="0.07" strokeWidth="2" />
-                <circle className="sun" cx="250" cy="150" fill="#f2a541" r="34" />
-              </svg>
+            // The page header (Oct 27): light at every size, on the page's own background with a soft wash of the
+            // business colour behind it on phones. The old solid teal slab with rings and a sun read as dated.
+            <div className={`hero-band relative ${heroOverlap ? "mb-1" : "mb-1"}`}>
               <div className="relative">
                 {topRow}
                 {hero}
@@ -389,7 +385,8 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
         {isTeammate ? null : <TrialBanner placement="inline" />}
       </main>
 
-      <nav className={`fixed bottom-[calc(12px+env(safe-area-inset-bottom))] left-3 right-3 z-30 rounded-[24px] border border-[var(--border)] bg-white shadow-[var(--shadow-float)] lg:hidden ${onFocusedFlow ? "hidden" : ""}`}>
+      {/* Phones: a floating glass tab bar - translucent, blurred, with a hairline edge - over the page. */}
+      <nav className={`glass-bar fixed bottom-[calc(12px+env(safe-area-inset-bottom))] left-3 right-3 z-30 rounded-[28px] lg:hidden ${onFocusedFlow ? "hidden" : ""}`}>
         {/* On phones the + lives in the menu bar: floating over the page it sat on top of the buttons at the end of each row. */}
         <div className={`grid px-1 py-2 ${onFocusedFlow ? "grid-cols-4" : "grid-cols-5"}`}>
           {mobileBarItems.map((item, index) => {

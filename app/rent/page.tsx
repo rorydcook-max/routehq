@@ -6,6 +6,7 @@ import { BusinessLogoImage } from "@/components/business-logo-image";
 import { RouteHqLogo } from "@/components/brand-logo";
 import { PublicShell, publicCard } from "@/components/public-shell";
 import { VehicleArt } from "@/components/vehicle-art";
+import { renterUrl } from "@/lib/booking-address";
 import { businessToday } from "@/lib/business-time";
 import { searchDirectory, type DirectoryBusiness } from "@/lib/directory";
 
@@ -18,7 +19,14 @@ const POPULAR = ["Koh Samui", "Phuket", "Chiang Mai"];
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("directory");
   // The renter site is Lokalkeys (Rory, 28 Oct), not the operator software's "| Lokalfleet" title template.
-  return { title: { absolute: `${t("title")} | Lokalkeys` }, description: t("subtitle"), applicationName: "Lokalkeys", openGraph: { siteName: "Lokalkeys" } };
+  // One address for search engines: lokalkeys.com, whether the page was reached there or at lokalfleet.com/rent.
+  return {
+    title: { absolute: `${t("title")} | Lokalkeys` },
+    description: t("subtitle"),
+    applicationName: "Lokalkeys",
+    alternates: { canonical: `${renterUrl()}/` },
+    openGraph: { siteName: "Lokalkeys", url: `${renterUrl()}/` }
+  };
 }
 
 function money(value: number, currency: string) {

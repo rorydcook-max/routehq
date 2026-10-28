@@ -21,6 +21,51 @@ export function rootDomain() {
   return String(process.env.NEXT_PUBLIC_ROOT_DOMAIN || "lokalfleet.com").toLowerCase().replace(/^www\./, "");
 }
 
+/** Lokalkeys, the renter booking site (Rory, 28 Oct 2026): its own domain, served by this same app at /rent. */
+export function renterDomain() {
+  return String(process.env.NEXT_PUBLIC_RENTER_DOMAIN || "lokalkeys.com").toLowerCase().replace(/^www\./, "");
+}
+
+/** The renter site's address, for links to it ("https://lokalkeys.com"). */
+export function renterUrl() {
+  return String(process.env.NEXT_PUBLIC_RENTER_URL || `https://${renterDomain()}`).replace(/\/$/, "");
+}
+
+/**
+ * Extra domains that only send people on to a main one: lokalfleet.app → lokalfleet.com, lokalkeys.app → lokalkeys.com.
+ * SITE_ALIAS_DOMAINS can add more as "alias=main,alias=main".
+ */
+function aliasDomains(): Record<string, string> {
+  const map: Record<string, string> = { [`www.${rootDomain()}`]: rootDomain(), [`www.${renterDomain()}`]: renterDomain(), "lokalfleet.app": rootDomain(), "www.lokalfleet.app": rootDomain(), "lokalkeys.app": renterDomain(), "www.lokalkeys.app": renterDomain() };
+  for (const pair of String(process.env.SITE_ALIAS_DOMAINS || "").split(",")) {
+    const [from, to] = pair.split("=").map((part) => part.trim().toLowerCase());
+    if (from && to) map[from] = to;
+  }
+  return map;
+}
+
+function bareHost(rawHost: string | null | undefined) {
+  return String(rawHost || "").toLowerCase().replace(/:\d+$/, "");
+}
+
+/** The main domain an alias host should send people to, or null when the host is not an alias. */
+export function aliasTarget(rawHost: string | null | undefined): string | null {
+  const host = bareHost(rawHost);
+  const target = aliasDomains()[host];
+  return target && target !== host ? target : null;
+}
+
+/** Whether a request is for the renter site (lokalkeys.com). In development, `lokalkeys.localhost` works too. */
+export function isRenterHost(rawHost: string | null | undefined) {
+  const host = bareHost(rawHost);
+  return host === renterDomain() || host === "lokalkeys.localhost";
+}
+
+/** Paths that belong to the renter site; anything else on its domain goes to Lokalfleet. */
+export function isRenterSitePath(pathname: string) {
+  return isBookingSitePath(pathname);
+}
+
 export function cleanSubdomain(value: string) {
   return String(value || "")
     .toLowerCase()
@@ -63,6 +108,9 @@ export function cleanDomain(value: string) {
   if (!/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/.test(host)) return null;
   const root = rootDomain();
   if (host === root || host.endsWith(`.${root}`) || host.endsWith(".vercel.app")) return null;
+  // A business can't claim one of our own domains as its booking address.
+  const renter = renterDomain();
+  if (host === renter || host.endsWith(`.${renter}`) || aliasTarget(host)) return null;
   return host;
 }
 
@@ -113,6 +161,8 @@ export function hostTarget(rawHost: string | null | undefined): { label: string 
   if (!host || host === "localhost" || !host.includes(".") || /^[\d.]+$/.test(host) || host.startsWith("[")) return null;
   const root = rootDomain();
   if (host === root || host === `www.${root}` || host.endsWith(".vercel.app")) return null;
+  // Our own other domains (Lokalkeys, aliases) are never a business's booking address.
+  if (isRenterHost(host) || aliasTarget(host)) return null;
   for (const base of [root, "localhost"]) {
     if (host.endsWith(`.${base}`)) {
       const label = host.slice(0, -(base.length + 1));

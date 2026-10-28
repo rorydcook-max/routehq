@@ -4,7 +4,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/lib/supabase/database.types";
 import { ACTIVE_ORGANIZATION_COOKIE, loadActiveMembership } from "@/lib/auth/active-organization";
-import { canUseOwnDomain, canUseSubdomain, hostTarget, isBookingSitePath, rootDomain } from "@/lib/booking-address";
+import { aliasTarget, canUseOwnDomain, canUseSubdomain, hostTarget, isBookingSitePath, isRenterHost, isRenterSitePath, rootDomain } from "@/lib/booking-address";
 import { signedOutLocale, STAFF_LOCALE_COOKIE } from "@/lib/i18n/staff-locale";
 import { DEFAULT_SITE_LOCALE, isSitePath, localizeSitePath, SITE_LOCALE_HEADER, splitSiteLocale } from "@/lib/site/locale-path";
 
@@ -54,6 +54,24 @@ const BOT = /bot|crawl|spider|slurp|facebookexternalhit|embedly|preview|lighthou
 
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+  const requestHost = request.headers.get("host");
+  // Our extra domains (lokalfleet.app, lokalkeys.app, www.*) send people to the main one, same path.
+  const alias = aliasTarget(requestHost);
+  if (alias) return NextResponse.redirect(new URL(`https://${alias}${pathname}${request.nextUrl.search}`), 308);
+  // Lokalkeys (lokalkeys.com), the renter booking site: its home is the /rent search; booking links work there too;
+  // anything else (the operator app, the Lokalfleet website) belongs on lokalfleet.com.
+  if (isRenterHost(requestHost)) {
+    if (!isRenterSitePath(pathname)) {
+      const appHome = String(process.env.NEXT_PUBLIC_APP_URL || `https://${rootDomain()}`).replace(/\/$/, "");
+      if (!/\/\/(localhost|127\.0\.0\.1)(:|\/|$)/.test(appHome)) return NextResponse.redirect(new URL(`${pathname}${request.nextUrl.search}`, appHome));
+    }
+    if (pathname === "/") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/rent";
+      request.headers.set("x-routehq-customer-page", "1");
+      return NextResponse.rewrite(url, { request });
+    }
+  }
   // Lokalfleet's own website: home (what a signed-out visitor sees at "/", rewritten below), plans, FAQ, contact, guides and
   // free resources. Marked so the root layout sends them no staff-app words. (/owners was dropped on 28 Oct 2026.)
   // Each language has its own address (lib/site/locale-path.ts): English at the root, others under /<code>/.

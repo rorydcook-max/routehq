@@ -57,10 +57,10 @@ export const metadata: Metadata = {
   applicationName: "Lokalfleet",
   metadataBase: new URL("https://lokalfleet.com"),
   icons: {
-    icon: "/routehq-icon.svg",
-    shortcut: "/routehq-icon.svg",
+    icon: "/lokalfleet-icon.svg?v=4",
+    shortcut: "/lokalfleet-icon.svg?v=4",
     // ?v= so phones fetch the re-centred icon (27 Oct) instead of a cached copy.
-    apple: "/apple-touch-icon.png?v=3"
+    apple: "/apple-touch-icon.png?v=4"
   },
   // Opens full screen, like an app, when added to a phone's home screen.
   appleWebApp: { capable: true, title: "Lokalfleet", statusBarStyle: "default" }

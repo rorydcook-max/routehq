@@ -65,7 +65,7 @@ export default async function SiteHomePage() {
       highPrice: Math.max(...PLANS.map((plan) => plan.monthly)),
       offerCount: PLANS.length
     },
-    publisher: { "@type": "Organization", name: "Lokalfleet", url: "https://lokalfleet.com", logo: "https://lokalfleet.com/routehq-logo.svg" }
+    publisher: { "@type": "Organization", name: "Lokalfleet", url: "https://lokalfleet.com", logo: "https://lokalfleet.com/lokalfleet-logo.svg" }
   };
 
   return (

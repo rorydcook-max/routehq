@@ -46,7 +46,7 @@ export async function renderContractDocx(doc: ContractDocument, logo: Logo): Pro
   const script = SCRIPT_FONT[doc.locale];
   const font = { ascii: "Arial", hAnsi: "Arial", cs: script || "Arial", eastAsia: script || "Arial" };
   const run = (text: string, opts: { bold?: boolean; size?: number; color?: string } = {}) =>
-    new TextRun({ text, font, bold: opts.bold, size: opts.size ?? 19, color: opts.color ?? INK });
+    new TextRun({ text, font, bold: opts.bold, size: opts.size ?? 21, color: opts.color ?? INK });
   const para = (text: string, opts: { bold?: boolean; size?: number; color?: string; after?: number; before?: number; align?: (typeof AlignmentType)[keyof typeof AlignmentType] } = {}) =>
     new Paragraph({
       spacing: { after: opts.after ?? 100, before: opts.before ?? 0, line: 276 },
@@ -80,7 +80,8 @@ export async function renderContractDocx(doc: ContractDocument, logo: Logo): Pro
           ]
         })
       : para(text.en, { ...opts, after: 100 });
-  const label = (text: Bi) => [para(text.en, { bold: true, size: 18, after: two && text.local ? 0 : 40 }), ...(two && text.local ? [para(text.local, { size: 16, color: MUTED, after: 40 })] : [])];
+  // 10.5pt minimum for contract text: Thailand's rental contract rules ask for letters at least 2 mm high.
+  const label = (text: Bi) => [para(text.en, { bold: true, size: 21, after: two && text.local ? 0 : 40 }), ...(two && text.local ? [para(text.local, { size: 21, color: MUTED, after: 40 })] : [])];
 
   const children: Array<Paragraph | Table> = [];
   // Title block

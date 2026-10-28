@@ -59,11 +59,11 @@ h1 .loc{display:block;font-size:13pt;color:var(--teal)}
 h2,.h>*{font-size:11pt;margin:14px 0 6px;padding-top:6px;border-top:1px solid var(--line)}
 .h>*{margin-top:14px}
 p,.clause>*{margin:0 0 7px}
-table{width:100%;border-collapse:collapse;margin:4px 0 10px;font-size:9.5pt;page-break-inside:auto}
+table{width:100%;border-collapse:collapse;margin:4px 0 10px;font-size:10.5pt;page-break-inside:auto}
 tr{page-break-inside:avoid}
 th,td{border:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:top}
 .fields th{width:42%;background:var(--mist);font-weight:600}
-.lbl-local{display:block;font-weight:400;color:var(--muted);font-size:8.5pt}
+.lbl-local{display:block;font-weight:400;color:var(--muted);font-size:10.5pt}
 .blank{display:block;min-height:14px}
 .sign th{width:42%;background:var(--mist)}.sign td{height:56px}
 .grid thead th{background:var(--mist)}.grid td{height:26px}

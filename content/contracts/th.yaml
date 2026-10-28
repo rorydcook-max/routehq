@@ -1,8 +1,11 @@
 # Lokalfleet vehicle rental agreement — THAILAND (English + Thai, Thai prevails).
 # Built from master.en.yaml. Same section ids, clause ids, field keys and conditions.
-# Thailand-only additions end in "_cc": deposit.5_cc, insurance.7_cc, damage.6_cc, data.3_cc.
+# Thailand-only additions end in "_cc": parties.2_cc, deposit.5_cc, insurance.7_cc, damage.6_cc, data.3_cc.
 # Country clauses adapted to Thai law: renter.2, vehicle.2, deposit.3, deposit.4, use.2, use.3, area.2,
 # insurance.1, accident.1, fines.2, data.1, data.2, general.4, general.5.
+# Oct 2026: aligned with the Contract Committee Notice on car and motorcycle rental (B.E. 2568, in force
+# 30 Dec 2025) and its standard forms ก/ข: deposit, fee, early-return, replacement-vehicle and termination
+# clauses rewritten. RENDERER: the Notice requires Thai text at least 2 mm high, max 11 characters per inch.
 # Not reviewed by a lawyer. Every legal statement was checked against the public sources listed under `sources`.
 
 country: TH
@@ -33,6 +36,18 @@ words:
   blank_hint: { en: "(fill in)", local: "(กรอกข้อมูล)" }
 # Sources checked for Thailand (public information only). Primary / government sources first.
 sources:
+  - url: "https://nanlocal.go.th/public/download.php?filename=%E0%B9%80%E0%B8%AD%E0%B8%81%E0%B8%AA%E0%B8%B2%E0%B8%A3%E0%B9%81%E0%B8%99%E0%B8%9A%20%E0%B8%A7875.2.pdf&filepath=dispatch_upload/backend/core_dispatch_424587_3.pdf&document_root=core-website.com"
+    supports: "Royal Gazette text (provincial mirror; ratchakitcha.soc.go.th blocked) of the Contract Committee Notice making car and motorcycle rental a contract-controlled business B.E. 2568, signed 22 Sept 2568 (2025), in force 90 days after Gazette publication. Cl.3 scope (private cars/pickups and motorcycles for personal use, incl. online rentals, excl. leasing); cl.4 Thai, letters at least 2 mm, max 11 per inch, terms per form ก (car) / ข (motorcycle); cl.5 banned terms: excluding operator liability for breach, unilateral changes adding burden, termination or deposit forfeiture/deduction without consumer breach, PDPA-breaching data use; cl.6 two identical copies, one to consumer at signing. Form ก/ข: 2.1 annual tax paid (car must be a rental car); 2.2 insurance valid for the whole rental; 6 replacement vehicle of same or similar model if unusable over one day from accident or maintenance, unless consumer's unlawful fault; 7 hourly/daily late-return fines stated in the contract; 8 joint check at return, full deposit refund in cash/transfer/cheque on the day of return and by credit card within 45 days, deductions only for actual damage the operator objects to at return, with verifiable evidence; 9 fines refunded only at actual, economical, necessary cost with evidence; 10 no sublet/lending; 11 no unlawful use or leaving Thailand; 12 consumer liable for damage from drink/drug driving; 13 missing fuel charged only at actual cost with evidence; 14 early return not the operator's fault: notice at least 24 h (daily) or 'within 30 days' (monthly/yearly), pro-rata rent refund and deposit per cl.8 (parties.2_cc, vehicle.2, deposit.*, cancellation.3-5, fuel.3, accident.3, fines.*, damage.*, termination.1, signatures.1)."
+  - url: "https://www.ocpb.go.th/news_view.php?nid=17005"
+    supports: "OCPB, 3 Oct 2025: Notice published; in force 30 Dec 2025; Thai contracts, plain wording without hidden conditions, all costs, fines and fees stated in full; terms limiting operator liability banned (parties.2_cc, fee clauses)."
+  - url: "https://www.ocpb.go.th/news_view.php?nid=17127"
+    supports: "OCPB, 10 Nov 2025: standard form must cover vehicle, duties, period, delivery/return place, rent and payment, replacement-vehicle conditions, and bans unfair termination or deposit forfeiture; in force 90 days after Gazette publication, from 30 Dec 2025 (accident.3, deposit.5_cc, termination.1)."
+  - url: "https://www.nishimura.com/en/knowledge/publications/20251105-116631"
+    supports: "Nishimura & Asahi law-firm summary: Gazette publication 1 Oct 2025, effective 30 Dec 2025; 2 mm / 11 characters per inch; five banned terms; Consumer Protection Act s.35 ter (non-conforming terms read as conforming), s.35 quater (banned terms void), s.57 (up to 1 year prison and/or THB 200,000 fine for not delivering a compliant contract), s.59 (directors liable)."
+  - url: "https://aseanconsumer.org/read-news-ocpb-declares-car-and-motorcycle-rental-services-as-controlled-contract-businesses"
+    supports: "ASEAN Consumer (OCPB release): standardised contract forms mandatory from 30 Dec 2025; costs, penalties and fees must be fully stated."
+  - url: "https://legardy.com/blogs/car-rental-contract-deposit-penalties-thailand"
+    supports: "Legardy, 17 Sept 2026: deposit refund same day (cash/transfer, no damage), 7 days by card, 7/15 days after deductions; monthly early-return notice 'within seven days'. These figures differ from the Gazette mirror (same day / 45 days; 'within thirty days'), so this template uses the stricter of both: same day for cash/transfer, 7 days for cards, at most 7 days' notice (deposit.2, cancellation.3-5)."
   - url: "https://treaties.un.org/doc/publication/mtdsg/volume%20i/chapter%20xi/xi-b-19.en.pdf"
     supports: "UN Treaty Collection, 1968 Vienna Convention on Road Traffic: Thailand signed 8 Nov 1968 and ratified 1 May 2020; Thailand declared it treats mopeds as motorcycles (renter.2)."
   - url: "https://www.dlt.go.th/th/public-news/3535"
@@ -78,7 +93,7 @@ sources:
   - url: "https://www.thaipbs.or.th/news/content/1886"
     supports: "Department of Land Transport (via Thai PBS): taking a Thai car to Laos or Cambodia needs an international vehicle permit / car passport, country sign, inspection certificate, English plates and registration, and the destination's insurance rules (area.2)."
   - url: "https://www.matichon.co.th/local/news_5059214"
-    supports: "OCPB contract-control announcement B.E. 2567 covers bookings for new car and motorcycle sales (not rentals); no contract-control announcement for vehicle rental was found, so general Unfair Contract Terms Act and Consumer Protection rules apply."
+    supports: "OCPB contract-control announcement B.E. 2567 covers bookings for new car and motorcycle sales, not rentals; rentals are covered separately by the B.E. 2568 Notice above."
 title:
   en: Vehicle Rental Agreement
   local: "สัญญาเช่ารถ"
@@ -104,6 +119,9 @@ sections:
       - id: parties.1
         en: "This agreement is made on {{renter_contract_date}} between the rental business named above (the \"Owner\") and the person named in section 2 (the \"Renter\"). Where there is more than one renter or driver, each of them is jointly responsible for every obligation in this agreement."
         local: "สัญญานี้ทำขึ้นเมื่อวันที่ {{renter_contract_date}} ระหว่างผู้ประกอบการให้เช่ารถตามที่ระบุข้างต้น (“ผู้ให้เช่า”) กับบุคคลตามที่ระบุในข้อ 2 (“ผู้เช่า”) หากมีผู้เช่าหรือผู้ขับขี่มากกว่าหนึ่งคน ทุกคนต้องร่วมกันรับผิดตามหน้าที่ทุกข้อในสัญญานี้"
+      - id: parties.2_cc
+        en: "This agreement is intended to meet the Contract Committee Notice making car and motorcycle rental a contract-controlled business, B.E. 2568 (2025), dated 22 September 2025 and in force from 30 December 2025, and its standard contract forms (form ก for cars, form ข for motorcycles). Where any term of this agreement conflicts with the Notice or its standard form, or is less favourable to the Renter than they are, the terms of the Notice and its standard form apply instead. This agreement is made in two identical copies, and the Owner gives one to the Renter as soon as it is signed."
+        local: "สัญญานี้จัดทำขึ้นเพื่อให้เป็นไปตามประกาศคณะกรรมการว่าด้วยสัญญา เรื่อง ให้ธุรกิจการให้บริการเช่ารถยนต์และรถจักรยานยนต์เป็นธุรกิจที่ควบคุมสัญญา พ.ศ. 2568 ลงวันที่ 22 กันยายน พ.ศ. 2568 ซึ่งใช้บังคับตั้งแต่วันที่ 30 ธันวาคม พ.ศ. 2568 และแบบสัญญามาตรฐานท้ายประกาศ (แบบ ก สำหรับรถยนต์ และแบบ ข สำหรับรถจักรยานยนต์) หากข้อความใดในสัญญานี้ขัดหรือแย้งกับประกาศหรือแบบสัญญามาตรฐานดังกล่าว หรือเป็นคุณแก่ผู้เช่าน้อยกว่า ให้ใช้ข้อความตามประกาศและแบบสัญญามาตรฐานแทน สัญญานี้ทำขึ้นเป็นสองฉบับมีข้อความถูกต้องตรงกัน และผู้ให้เช่าต้องส่งมอบสัญญาหนึ่งฉบับให้แก่ผู้เช่าทันทีที่คู่สัญญาลงนาม"
 
   - id: renter
     title: { en: "2. The Renter and drivers", local: "2. ผู้เช่าและผู้ขับขี่" }
@@ -147,8 +165,8 @@ sections:
         en: "The Owner rents the vehicle described above, with the accessories listed, to the Renter for the rental period and on the terms of this agreement. The vehicle remains the property of the Owner at all times."
         local: "ผู้ให้เช่าตกลงให้ผู้เช่าเช่ารถตามรายละเอียดข้างต้น พร้อมอุปกรณ์ที่ระบุไว้ ตลอดระยะเวลาเช่าและตามเงื่อนไขของสัญญานี้ รถยังคงเป็นกรรมสิทธิ์ของผู้ให้เช่าตลอดเวลา"
       - id: vehicle.2
-        en: "The Owner confirms that the vehicle is registered with the Department of Land Transport for the kind of use the law requires (for example, as a rental car, รย.11, where the law requires it), that its annual vehicle tax is paid, that compulsory insurance (พ.ร.บ.) is valid for the whole rental period, and that it is handed over in a roadworthy condition with a copy of its registration and insurance documents."
-        local: "ผู้ให้เช่ายืนยันว่ารถคันนี้จดทะเบียนกับกรมการขนส่งทางบกตามลักษณะการใช้ที่กฎหมายกำหนด (เช่น จดทะเบียนเป็นรถยนต์บริการให้เช่า รย.11 ในกรณีที่กฎหมายกำหนด) ได้ชำระภาษีรถประจำปีแล้ว มีประกันภัยภาคบังคับ (พ.ร.บ.) ที่มีผลคุ้มครองตลอดระยะเวลาเช่า และส่งมอบรถในสภาพพร้อมใช้งานอย่างปลอดภัย พร้อมสำเนาเอกสารทะเบียนรถและเอกสารประกันภัย"
+        en: "The Owner confirms that the vehicle's annual vehicle tax is paid as the law requires (and, for a car, that it is registered with the Department of Land Transport as a rental car, รย.11); that compulsory insurance (พ.ร.บ.) and any other insurance the Department of Land Transport rules require for rental vehicles are valid for the whole rental period, with the insurer and policy numbers given to the Renter; and that the vehicle is handed over in a roadworthy condition with a copy of its registration and insurance documents."
+        local: "ผู้ให้เช่ายืนยันว่าได้ชำระภาษีรถประจำปีของรถคันนี้ตามกฎหมายแล้ว (และสำหรับรถยนต์ ต้องเป็นรถยนต์บริการให้เช่าที่จดทะเบียนกับกรมการขนส่งทางบก รย.11) มีประกันภัยภาคบังคับ (พ.ร.บ.) และประกันภัยอื่นที่ระเบียบกรมการขนส่งทางบกกำหนดสำหรับรถบริการให้เช่า ซึ่งมีผลคุ้มครองตลอดระยะเวลาเช่า โดยแจ้งชื่อบริษัทประกันภัยและเลขที่กรมธรรม์ให้ผู้เช่าทราบ และส่งมอบรถในสภาพพร้อมใช้งานอย่างปลอดภัย พร้อมสำเนาเอกสารทะเบียนรถและเอกสารประกันภัย"
         country: true
 
   - id: period
@@ -171,8 +189,8 @@ sections:
         en: "Late return: a return more than one hour late may be charged as an extra day at the daily rate."
         local: "การคืนรถล่าช้า: หากคืนรถล่าช้าเกินหนึ่งชั่วโมง ผู้ให้เช่าอาจคิดค่าเช่าเพิ่มอีกหนึ่งวันตามอัตรารายวัน"
       - id: period.4
-        en: "If the vehicle is not returned and the Renter cannot be reached within 24 hours of the end time, the Owner may treat the vehicle as stolen, report it to the police and recover it, at the Renter's cost."
-        local: "หากผู้เช่าไม่คืนรถและไม่สามารถติดต่อผู้เช่าได้ภายใน 24 ชั่วโมงนับจากเวลาสิ้นสุดการเช่า ผู้ให้เช่าอาจถือว่ารถถูกลักไป แจ้งความต่อเจ้าหน้าที่ตำรวจ และติดตามนำรถกลับคืน โดยผู้เช่าเป็นผู้รับผิดชอบค่าใช้จ่าย"
+        en: "If the vehicle is not returned and the Renter cannot be reached within 24 hours of the end time, the Owner may treat the vehicle as stolen, report it to the police and recover it. The Renter pays the reasonable, evidenced costs of recovery."
+        local: "หากผู้เช่าไม่คืนรถและไม่สามารถติดต่อผู้เช่าได้ภายใน 24 ชั่วโมงนับจากเวลาสิ้นสุดการเช่า ผู้ให้เช่าอาจถือว่ารถถูกลักไป แจ้งความต่อเจ้าหน้าที่ตำรวจ และติดตามนำรถกลับคืน โดยผู้เช่าต้องรับผิดชอบค่าใช้จ่ายตามสมควรในการติดตามนำรถกลับคืนที่มีหลักฐานตรวจสอบได้"
 
   - id: charges
     title: { en: "5. Rent and payment", local: "5. ค่าเช่าและการชำระเงิน" }
@@ -201,46 +219,46 @@ sections:
       - { key: deposit_return_text, en: "Returned within", local: "คืนภายใน" }
     clauses:
       - id: deposit.1
-        en: "The deposit secures the Renter's obligations: unpaid rent, damage up to the amount the Renter is liable for, fuel, mileage, cleaning, late return, lost keys or accessories, traffic fines and any other amount owed under this agreement."
-        local: "เงินประกันใช้เป็นหลักประกันการปฏิบัติตามหน้าที่ของผู้เช่า ได้แก่ ค่าเช่าที่ค้างชำระ ค่าเสียหายไม่เกินจำนวนที่ผู้เช่าต้องรับผิด ค่าน้ำมัน ค่าระยะทาง ค่าทำความสะอาด ค่าคืนรถล่าช้า ค่ากุญแจหรืออุปกรณ์ที่สูญหาย ค่าปรับจราจร และเงินอื่นใดที่ผู้เช่าต้องชำระตามสัญญานี้"
+        en: "The deposit secures the Renter's obligations under this agreement. The Owner may deduct from it only: unpaid rent; the late-return and excess-mileage charges stated in sections 4 and 8; and the actual, evidenced cost of loss or damage caused by the Renter's fault or breach of this agreement (damage up to the amount the Renter is liable for, missing fuel, necessary cleaning, lost keys or accessories, and traffic fines the Owner has actually paid). No part of the deposit may be kept or deducted if the Renter has not breached this agreement."
+        local: "เงินประกันใช้เป็นหลักประกันการปฏิบัติตามสัญญานี้ของผู้เช่า ผู้ให้เช่ามีสิทธิหักเงินประกันได้เฉพาะ ค่าเช่าที่ค้างชำระ ค่าปรับการคืนรถล่าช้าและค่าระยะทางส่วนเกินตามที่ระบุในข้อ 4 และข้อ 8 และค่าใช้จ่ายหรือค่าเสียหายที่เกิดขึ้นจริงและมีหลักฐานตรวจสอบได้ อันเกิดจากความผิดหรือการผิดสัญญาของผู้เช่า (ได้แก่ ค่าเสียหายไม่เกินจำนวนที่ผู้เช่าต้องรับผิด ค่าน้ำมันส่วนที่ขาด ค่าทำความสะอาดที่จำเป็น ค่ากุญแจหรืออุปกรณ์ที่สูญหาย และค่าปรับจราจรที่ผู้ให้เช่าได้ชำระไปจริง) ผู้ให้เช่าจะริบหรือหักเงินประกันส่วนใดไม่ได้หากผู้เช่ามิได้ผิดสัญญา"
       - id: deposit.2
-        en: "The Owner returns the deposit, less any amounts properly deducted, after the vehicle has been returned and checked. The Owner gives the Renter a written list of any deduction with photos, receipts or quotes. If the amounts owed are more than the deposit, the Renter pays the difference within 7 days of being told."
-        local: "ผู้ให้เช่าจะคืนเงินประกันหลังหักจำนวนที่หักได้โดยชอบแล้ว เมื่อได้รับรถคืนและตรวจสภาพเรียบร้อย ผู้ให้เช่าต้องแจ้งรายการหักเงินเป็นลายลักษณ์อักษรแก่ผู้เช่า พร้อมภาพถ่าย ใบเสร็จ หรือใบเสนอราคา หากจำนวนเงินที่ผู้เช่าต้องชำระสูงกว่าเงินประกัน ผู้เช่าต้องชำระส่วนต่างภายใน 7 วันนับจากวันที่ได้รับแจ้ง"
+        en: "The Owner checks the vehicle and accessories with the Renter as soon as they are returned. If there is no damage or loss, the Owner returns the full deposit: in cash, by bank transfer or by cheque on the same day the vehicle is returned, or, for a credit or debit card payment or hold, by refunding or releasing it within 7 days of the return. If there is damage or loss caused by the Renter's fault, the Owner must point it out at the return check, may claim only the actual damage shown by evidence the Renter can check (photos, receipts or garage quotes), gives the Renter a written list of deductions, and returns the balance in the same way and within the same time. If the amounts owed are more than the deposit, the Renter pays the difference within 7 days of receiving that list. Where the return period stated above is longer than these times, these times apply."
+        local: "ผู้ให้เช่าต้องตรวจรับสภาพรถและอุปกรณ์ร่วมกับผู้เช่าทันทีที่ได้รับรถคืน หากรถและอุปกรณ์ไม่ชำรุด ไม่เสียหาย และไม่สูญหาย ผู้ให้เช่าต้องคืนเงินประกันเต็มจำนวน โดยคืนเป็นเงินสด เงินโอน หรือเช็ค ภายในวันที่ได้รับรถคืน หรือคืนเงินหรือยกเลิกการกันวงเงินผ่านบัตรเครดิตหรือบัตรเดบิตภายใน 7 วันนับแต่วันที่ได้รับรถคืน หากรถหรืออุปกรณ์ชำรุด เสียหาย หรือสูญหายโดยเหตุอันเป็นความผิดของผู้เช่า ผู้ให้เช่าต้องทักท้วงความเสียหายในขณะที่ผู้เช่าส่งมอบรถคืน และมีสิทธิเรียกค่าเสียหายได้เพียงเท่าที่เกิดความเสียหายจริง โดยต้องมีหลักฐานหรือเอกสารที่ผู้เช่าตรวจสอบได้ (ภาพถ่าย ใบเสร็จ หรือใบเสนอราคาจากอู่) แจ้งรายการหักเงินเป็นลายลักษณ์อักษรแก่ผู้เช่า และคืนเงินประกันส่วนที่เหลือด้วยวิธีและภายในระยะเวลาเดียวกัน หากจำนวนเงินที่ผู้เช่าต้องชำระสูงกว่าเงินประกัน ผู้เช่าต้องชำระส่วนต่างภายใน 7 วันนับจากวันที่ได้รับรายการดังกล่าว หากระยะเวลาคืนเงินประกันที่ระบุข้างต้นยาวกว่าระยะเวลาในข้อนี้ ให้ใช้ระยะเวลาในข้อนี้"
       - id: deposit.3
-        en: "Traffic fines in Thailand, including camera fines sent by post, often reach the Owner weeks after a rental ends. The Owner may keep a reasonable part of the deposit, no more than the fines the Owner has reason to expect, for up to 30 days after the return, and must return it promptly if no fine arrives."
-        local: "ใบสั่งจราจรในประเทศไทย รวมถึงใบสั่งจากกล้องตรวจจับที่ส่งทางไปรษณีย์ มักส่งถึงผู้ให้เช่าหลายสัปดาห์หลังสิ้นสุดการเช่า ผู้ให้เช่าอาจกันเงินประกันไว้ในจำนวนที่สมควร ไม่เกินค่าปรับที่มีเหตุอันควรคาดว่าจะได้รับ เป็นเวลาไม่เกิน 30 วันนับจากวันคืนรถ และต้องคืนเงินส่วนนั้นโดยเร็วหากไม่มีใบสั่งส่งมา"
+        en: "Traffic fines in Thailand, including camera fines sent by post, can reach the Owner weeks after a rental ends. The Owner does not hold back any part of the deposit for fines that have not yet arrived. If a fine for an offence committed during the rental reaches the Owner later, the Owner may claim from the Renter only the amount actually paid, with the ticket and receipt (section 14)."
+        local: "ใบสั่งจราจรในประเทศไทย รวมถึงใบสั่งจากกล้องตรวจจับที่ส่งทางไปรษณีย์ อาจส่งถึงผู้ให้เช่าหลายสัปดาห์หลังสิ้นสุดการเช่า ผู้ให้เช่าจะไม่กันเงินประกันส่วนใดไว้สำหรับค่าปรับที่ยังไม่ได้รับใบสั่ง หากภายหลังผู้ให้เช่าได้รับใบสั่งสำหรับการกระทำผิดที่เกิดขึ้นระหว่างการเช่า ผู้ให้เช่ามีสิทธิเรียกเก็บจากผู้เช่าได้เพียงเท่าที่ได้ชำระไปจริง โดยแสดงใบสั่งและใบเสร็จ (ข้อ 14)"
         country: true
       - id: deposit.4
         en: "The Owner will not keep the Renter's original passport or national ID card as a deposit or guarantee. The Owner may check the originals and take a copy or photo of them to identify the Renter (section 17)."
         local: "ผู้ให้เช่าจะไม่ยึดหนังสือเดินทางหรือบัตรประจำตัวประชาชนฉบับจริงของผู้เช่าไว้เป็นเงินประกันหรือหลักประกัน ผู้ให้เช่าอาจตรวจดูเอกสารฉบับจริงและถ่ายสำเนาหรือถ่ายภาพไว้เพื่อยืนยันตัวตนของผู้เช่า (ข้อ 17)"
         country: true
       - id: deposit.5_cc
-        en: "No part of the deposit is kept as a penalty. The Owner deducts only amounts actually owed and the fees set out in this agreement, which the parties agree are a fair estimate of the Owner's real costs."
-        local: "ผู้ให้เช่าจะไม่ริบเงินประกันส่วนใดไว้เป็นเบี้ยปรับ ผู้ให้เช่าจะหักเฉพาะจำนวนเงินที่ผู้เช่าค้างชำระจริงและค่าธรรมเนียมที่ระบุไว้ในสัญญานี้ ซึ่งคู่สัญญาตกลงกันว่าเป็นการประมาณค่าใช้จ่ายจริงของผู้ให้เช่าอย่างเป็นธรรม"
+        en: "No part of the deposit is kept as a penalty, and none of it is forfeited or deducted when the Renter has not breached this agreement. The Owner deducts only amounts actually owed and supported by evidence, and the charges agreed in advance in this agreement that the Contract Committee Notice allows (such as late-return charges)."
+        local: "ผู้ให้เช่าจะไม่ริบเงินประกันส่วนใดไว้เป็นเบี้ยปรับ และจะไม่ริบหรือหักเงินประกันหากผู้เช่ามิได้ผิดสัญญา ผู้ให้เช่าจะหักเฉพาะจำนวนเงินที่ผู้เช่าต้องชำระจริงซึ่งมีหลักฐานตรวจสอบได้ และค่าใช้จ่ายที่ตกลงกันไว้ล่วงหน้าในสัญญานี้ซึ่งประกาศคณะกรรมการว่าด้วยสัญญาให้เรียกเก็บได้ (เช่น ค่าปรับการคืนรถล่าช้า)"
 
   - id: cancellation
     title: { en: "7. Cancellation and early return", local: "7. การยกเลิกและการคืนรถก่อนกำหนด" }
     clauses:
       - id: cancellation.1
         if: cancel_free_hours
-        en: "The Renter may cancel free of charge up to {{cancel_free_hours}} hours before the start time. A later cancellation costs {{cancel_fee_percent}}% of the rent for the booked period (or of the first month on a monthly rental). If the Renter does not arrive at the start time and does not tell the Owner (a no-show), the Owner may keep the full amount paid for the first {{no_show_days}} day(s) and release the vehicle."
-        local: "ผู้เช่ายกเลิกการจองได้โดยไม่มีค่าใช้จ่าย หากแจ้งล่วงหน้าไม่น้อยกว่า {{cancel_free_hours}} ชั่วโมงก่อนเวลาเริ่มเช่า หากยกเลิกหลังจากนั้น ผู้เช่าต้องชำระค่ายกเลิกร้อยละ {{cancel_fee_percent}} ของค่าเช่าตามระยะเวลาที่จอง (หรือของค่าเช่าเดือนแรกในกรณีเช่ารายเดือน) หากผู้เช่าไม่มารับรถตามเวลาเริ่มเช่าและไม่แจ้งผู้ให้เช่า ผู้ให้เช่ามีสิทธิเก็บเงินที่ชำระแล้วสำหรับ {{no_show_days}} วันแรกไว้ทั้งหมด และนำรถไปให้ผู้อื่นเช่าได้"
+        en: "The Renter may cancel free of charge up to {{cancel_free_hours}} hours before the start time. A later cancellation costs {{cancel_fee_percent}}% of the rent for the booked period (or of the first month on a monthly rental). If the Renter does not arrive at the start time and does not tell the Owner (a no-show), the Owner may keep the amount paid for the first {{no_show_days}} day(s) and release the vehicle. These amounts are the parties' estimate of the Owner's loss from a late cancellation. The security deposit (section 6) is always refunded in full when a booking is cancelled before the start."
+        local: "ผู้เช่ายกเลิกการจองได้โดยไม่มีค่าใช้จ่าย หากแจ้งล่วงหน้าไม่น้อยกว่า {{cancel_free_hours}} ชั่วโมงก่อนเวลาเริ่มเช่า หากยกเลิกหลังจากนั้น ผู้เช่าต้องชำระค่ายกเลิกร้อยละ {{cancel_fee_percent}} ของค่าเช่าตามระยะเวลาที่จอง (หรือของค่าเช่าเดือนแรกในกรณีเช่ารายเดือน) หากผู้เช่าไม่มารับรถตามเวลาเริ่มเช่าและไม่แจ้งผู้ให้เช่า ผู้ให้เช่ามีสิทธิเก็บเงินที่ชำระแล้วสำหรับ {{no_show_days}} วันแรกไว้ และนำรถไปให้ผู้อื่นเช่าได้ จำนวนเงินดังกล่าวเป็นการประมาณการความเสียหายของผู้ให้เช่าจากการยกเลิกล่าช้าที่คู่สัญญาตกลงกัน ส่วนเงินประกันตามข้อ 6 ผู้ให้เช่าต้องคืนเต็มจำนวนเสมอเมื่อมีการยกเลิกการจองก่อนเริ่มเช่า"
       - id: cancellation.2
         unless: cancel_free_hours
-        en: "Cancellation by the Renter before the start time: the Owner keeps any booking payment that this agreement or the booking confirmation says is non-refundable, and refunds the rest."
-        local: "การยกเลิกโดยผู้เช่าก่อนเวลาเริ่มเช่า: ผู้ให้เช่ามีสิทธิเก็บเงินค่าจองส่วนที่สัญญานี้หรือหลักฐานยืนยันการจองระบุว่าไม่คืน และต้องคืนเงินส่วนที่เหลือ"
+        en: "Cancellation by the Renter before the start time: the Owner keeps any booking payment that this agreement or the booking confirmation says, before booking, is non-refundable, and refunds the rest. The security deposit (section 6) is always refunded in full."
+        local: "การยกเลิกโดยผู้เช่าก่อนเวลาเริ่มเช่า: ผู้ให้เช่ามีสิทธิเก็บเงินค่าจองส่วนที่สัญญานี้หรือหลักฐานยืนยันการจองได้แจ้งไว้ก่อนการจองว่าไม่คืน และต้องคืนเงินส่วนที่เหลือ ส่วนเงินประกันตามข้อ 6 ผู้ให้เช่าต้องคืนเต็มจำนวนเสมอ"
       - id: cancellation.3
         when: { early_return: none }
-        en: "Early return: rent for the booked period is not refunded if the Renter returns the vehicle early."
-        local: "การคืนรถก่อนกำหนด: หากผู้เช่าคืนรถก่อนกำหนด ผู้ให้เช่าจะไม่คืนค่าเช่าสำหรับระยะเวลาที่จองไว้"
+        en: "Early return: if the Renter wants to return the vehicle before the end of the rental for a reason that is not the Owner's fault, the Renter tells the Owner at least 24 hours in advance (daily rentals) or 7 days in advance (monthly or yearly rentals). Once the vehicle is returned, the Owner refunds the rent for the remaining period in proportion and returns the deposit as set out in section 6. If the Renter does not give this notice, the Owner may keep only the rent for the notice period."
+        local: "การคืนรถก่อนกำหนด: หากผู้เช่าประสงค์จะคืนรถก่อนสิ้นสุดระยะเวลาเช่าโดยมิใช่ความผิดของผู้ให้เช่า ผู้เช่าต้องแจ้งให้ผู้ให้เช่าทราบล่วงหน้าไม่น้อยกว่า 24 ชั่วโมง (กรณีเช่ารายวัน) หรือ 7 วัน (กรณีเช่ารายเดือนหรือรายปี) เมื่อผู้เช่าส่งมอบรถคืนแล้ว ผู้ให้เช่าต้องคืนค่าเช่าตามสัดส่วนระยะเวลาที่เหลืออยู่ และคืนเงินประกันตามข้อ 6 หากผู้เช่าไม่แจ้งล่วงหน้าดังกล่าว ผู้ให้เช่ามีสิทธิเก็บค่าเช่าสำหรับระยะเวลาที่ต้องแจ้งล่วงหน้านั้นเท่านั้น"
       - id: cancellation.4
         when: { early_return: prorata }
-        en: "Early return: the Owner refunds the rent for the full unused days, less an early-return fee of {{currency}} {{early_return_fee}}. Long-term discounts that no longer apply may be recalculated at the rate for the period actually used."
-        local: "การคืนรถก่อนกำหนด: ผู้ให้เช่าจะคืนค่าเช่าสำหรับวันเต็มที่ไม่ได้ใช้ หักค่าธรรมเนียมคืนรถก่อนกำหนด {{currency}} {{early_return_fee}} ส่วนลดการเช่าระยะยาวที่ไม่เข้าเงื่อนไขแล้วอาจคำนวณใหม่ตามอัตราสำหรับระยะเวลาที่ใช้จริง"
+        en: "Early return: if the Renter returns the vehicle early for a reason that is not the Owner's fault, after telling the Owner at least 24 hours in advance (daily rentals) or 7 days in advance (monthly or yearly rentals), the Owner refunds the rent for the remaining period in proportion and returns the deposit as set out in section 6. An early-return fee of {{currency}} {{early_return_fee}} applies only if the Renter did not give that notice, and is never more than the rent for the notice period."
+        local: "การคืนรถก่อนกำหนด: หากผู้เช่าคืนรถก่อนกำหนดโดยมิใช่ความผิดของผู้ให้เช่า และได้แจ้งให้ผู้ให้เช่าทราบล่วงหน้าไม่น้อยกว่า 24 ชั่วโมง (กรณีเช่ารายวัน) หรือ 7 วัน (กรณีเช่ารายเดือนหรือรายปี) ผู้ให้เช่าต้องคืนค่าเช่าตามสัดส่วนระยะเวลาที่เหลืออยู่ และคืนเงินประกันตามข้อ 6 ค่าธรรมเนียมคืนรถก่อนกำหนด {{currency}} {{early_return_fee}} เรียกเก็บได้เฉพาะกรณีที่ผู้เช่าไม่ได้แจ้งล่วงหน้าดังกล่าว และต้องไม่เกินค่าเช่าสำหรับระยะเวลาที่ต้องแจ้งล่วงหน้า"
       - id: cancellation.5
         when: { rate_period: month }
-        en: "Monthly rentals: either party may end the rental by giving {{notice_days}} days' written notice. Without notice, the Renter pays rent for the notice period."
-        local: "การเช่ารายเดือน: คู่สัญญาฝ่ายใดฝ่ายหนึ่งอาจเลิกการเช่าได้โดยบอกกล่าวเป็นลายลักษณ์อักษรล่วงหน้า {{notice_days}} วัน หากผู้เช่าไม่บอกกล่าวล่วงหน้า ผู้เช่าต้องชำระค่าเช่าสำหรับระยะเวลาบอกกล่าวนั้น"
+        en: "Monthly rentals: the Renter may end the rental early by giving written notice of {{notice_days}} days, or 7 days if that is shorter, and the rent for the remaining period is then refunded in proportion. The Owner may end the rental before the agreed end date only if the Renter breaches this agreement (section 15). The Owner does not have to renew the rental when an agreed rental period ends."
+        local: "การเช่ารายเดือน: ผู้เช่าอาจเลิกการเช่าก่อนกำหนดได้โดยบอกกล่าวเป็นลายลักษณ์อักษรล่วงหน้า {{notice_days}} วัน หรือ 7 วันหากระยะเวลาดังกล่าวสั้นกว่า และผู้ให้เช่าต้องคืนค่าเช่าตามสัดส่วนระยะเวลาที่เหลืออยู่ ผู้ให้เช่าจะเลิกการเช่าก่อนครบกำหนดได้เฉพาะกรณีที่ผู้เช่าผิดสัญญาตามข้อ 15 เท่านั้น ทั้งนี้ ผู้ให้เช่าไม่มีหน้าที่ต้องต่ออายุการเช่าเมื่อครบกำหนดระยะเวลาเช่าที่ตกลงกัน"
       - id: cancellation.6
         en: "If the Owner cannot provide the vehicle (or a similar or better one) at the start time, the Renter may cancel and receive a full refund of everything paid."
         local: "หากผู้ให้เช่าไม่สามารถส่งมอบรถ (หรือรถที่ใกล้เคียงกันหรือดีกว่า) ได้ตามเวลาเริ่มเช่า ผู้เช่ามีสิทธิยกเลิกและได้รับเงินที่ชำระไปแล้วคืนทั้งหมด"
@@ -257,8 +275,8 @@ sections:
         en: "Fuel policy: full-to-full. The vehicle is handed over with a full tank and must be returned full."
         local: "นโยบายน้ำมัน: รับเต็มคืนเต็ม ผู้ให้เช่าส่งมอบรถพร้อมน้ำมันเต็มถัง และผู้เช่าต้องคืนรถโดยเติมน้ำมันเต็มถัง"
       - id: fuel.3
-        en: "Missing fuel is charged at the local pump price plus a refuelling service fee of {{currency}} {{fuel_service_fee}}. Using the wrong fuel is the Renter's responsibility, including towing and repair."
-        local: "น้ำมันที่ขาดไปคิดตามราคาหน้าปั๊มในพื้นที่ บวกค่าบริการเติมน้ำมัน {{currency}} {{fuel_service_fee}} หากผู้เช่าเติมน้ำมันผิดประเภท ผู้เช่าต้องรับผิดชอบค่าใช้จ่ายทั้งหมด รวมถึงค่าลากรถและค่าซ่อม"
+        en: "Missing fuel (or battery charge) is charged only at what the Owner actually pays to refill it, kept economical, necessary and reasonable, with a receipt or other evidence. A refuelling service charge, up to {{currency}} {{fuel_service_fee}}, applies only where the Owner actually pays that cost to a third party and shows the receipt. Using the wrong fuel is the Renter's responsibility, including the actual, evidenced cost of towing and repair."
+        local: "ค่าน้ำมัน (หรือค่าพลังงานแบตเตอรี่) ส่วนที่ขาด ผู้ให้เช่าเรียกเก็บได้เพียงเท่าที่ได้ใช้จ่ายไปจริง โดยประหยัด ตามความจำเป็น และมีเหตุผลอันสมควร พร้อมใบเสร็จหรือหลักฐานที่ตรวจสอบได้ ค่าบริการเติมน้ำมันไม่เกิน {{currency}} {{fuel_service_fee}} เรียกเก็บได้เฉพาะกรณีที่ผู้ให้เช่าได้ชำระค่าบริการดังกล่าวให้แก่บุคคลภายนอกจริงและแสดงใบเสร็จ หากผู้เช่าเติมน้ำมันผิดประเภท ผู้เช่าต้องรับผิดชอบค่าลากรถและค่าซ่อมที่เกิดขึ้นจริงและมีหลักฐาน"
       - id: fuel.4
         if: mileage_limit
         en: "Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometre costs {{currency}} {{excess_km_fee}}."
@@ -292,8 +310,8 @@ sections:
         local: "ห้ามกระทำการดังต่อไปนี้: ขับขี่ขณะเมาสุราหรือเสพยาเสพติด หรือมีระดับแอลกอฮอล์เกินกว่าที่กฎหมายกำหนด ใช้โทรศัพท์ขณะขับขี่ เว้นแต่ใช้อุปกรณ์เสริมที่ไม่ต้องถือ แข่งรถ ผาดโผน หรือขับขี่นอกถนน (เว้นแต่รถออกแบบมาเพื่อการนั้นและผู้ให้เช่ายินยอม) ลากจูงหรือดันสิ่งใด รับขนคนโดยสารหรือสิ่งของเพื่อรับค่าตอบแทน ขนสิ่งของผิดกฎหมายหรือวัตถุอันตราย ใช้รถรับจ้างผ่านแอปพลิเคชัน รับส่งสินค้า สอนขับรถ หรือนำรถไปให้ผู้อื่นเช่าต่อ และยินยอมให้ผู้ที่ไม่ได้ระบุชื่อในข้อ 2 ขับขี่"
       - id: use.5
         when: { smoking: no }
-        en: "Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odour removal.{{/if}}"
-        local: "ห้ามสูบบุหรี่และบุหรี่ไฟฟ้าในรถ{{#if smoking_fee}} หากฝ่าฝืน ผู้เช่าต้องชำระค่ากำจัดกลิ่น {{currency}} {{smoking_fee}}{{/if}}"
+        en: "Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} If this rule is broken and odour removal is needed, the Renter pays its actual, evidenced cost, up to {{currency}} {{smoking_fee}}.{{/if}}"
+        local: "ห้ามสูบบุหรี่และบุหรี่ไฟฟ้าในรถ{{#if smoking_fee}} หากฝ่าฝืนและจำเป็นต้องกำจัดกลิ่น ผู้เช่าต้องชำระค่ากำจัดกลิ่นตามที่จ่ายจริงและมีหลักฐาน ไม่เกิน {{currency}} {{smoking_fee}}{{/if}}"
       - id: use.6
         when: { pets: no }
         en: "Pets and animals are not allowed in or on the vehicle, except assistance animals."
@@ -335,18 +353,18 @@ sections:
         local: "รถคันนี้มีประกันภัยรถยนต์ชั้น 1 เพิ่มเติม ซึ่งคุ้มครองความเสียหายต่อรถที่เช่าและต่อบุคคลภายนอก ในแต่ละครั้งผู้เช่าจะจ่ายไม่เกินค่าเสียหายส่วนแรกที่ระบุข้างต้น หากผู้เช่าได้ปฏิบัติตามข้อกำหนดของสัญญานี้"
       - id: insurance.3
         when: { insurance_level: third_party }
-        en: "The vehicle also has third-party insurance (such as class 3) covering damage to other people's property. It does not cover damage to or theft of the rented vehicle: the Renter is responsible for those (section 12)."
-        local: "รถคันนี้มีประกันภัยความรับผิดต่อบุคคลภายนอกเพิ่มเติม (เช่น ชั้น 3) ซึ่งคุ้มครองความเสียหายต่อทรัพย์สินของผู้อื่น แต่ไม่คุ้มครองความเสียหายหรือการสูญหายของรถที่เช่า ซึ่งผู้เช่าต้องรับผิดชอบเอง (ข้อ 12)"
+        en: "The vehicle also has third-party insurance (such as class 3) covering damage to other people's property. It does not cover damage to or theft of the rented vehicle: the Renter is responsible for that damage or loss where it is caused by the Renter's fault or that of the persons using the vehicle with the Renter (section 12)."
+        local: "รถคันนี้มีประกันภัยความรับผิดต่อบุคคลภายนอกเพิ่มเติม (เช่น ชั้น 3) ซึ่งคุ้มครองความเสียหายต่อทรัพย์สินของผู้อื่น แต่ไม่คุ้มครองความเสียหายหรือการสูญหายของรถที่เช่า ซึ่งผู้เช่าต้องรับผิดชอบเองหากเกิดจากความผิดของผู้เช่าหรือของบุคคลที่ใช้รถร่วมกับผู้เช่า (ข้อ 12)"
       - id: insurance.4
         when: { insurance_level: compulsory }
-        en: "The vehicle has only the compulsory insurance. The Renter is responsible for damage to the rented vehicle, its theft, and damage to other people's property (section 12)."
-        local: "รถคันนี้มีเพียงประกันภัยภาคบังคับ (พ.ร.บ.) เท่านั้น ผู้เช่าต้องรับผิดชอบความเสียหายต่อรถที่เช่า การสูญหายของรถ และความเสียหายต่อทรัพย์สินของผู้อื่น (ข้อ 12)"
+        en: "The vehicle has only the compulsory insurance. The Renter is responsible for damage to or loss of the rented vehicle, and for damage to other people's property, caused by the Renter's fault or that of the persons using the vehicle with the Renter (section 12)."
+        local: "รถคันนี้มีเพียงประกันภัยภาคบังคับ (พ.ร.บ.) เท่านั้น ผู้เช่าต้องรับผิดชอบความเสียหายหรือการสูญหายของรถที่เช่า และความเสียหายต่อทรัพย์สินของผู้อื่น ที่เกิดจากความผิดของผู้เช่าหรือของบุคคลที่ใช้รถร่วมกับผู้เช่า (ข้อ 12)"
       - id: insurance.5
-        en: "Insurance does not protect the Renter, and the Renter pays in full, when damage or loss happens: while driving under the influence, without a valid licence for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or reckless acts, or when keys were left with the vehicle. Tyres, wheels, glass, underbody, interior, keys and accessories are often excluded by insurers and are the Renter's responsibility unless the Owner confirms in writing that they are covered."
-        local: "ประกันภัยไม่คุ้มครองผู้เช่า และผู้เช่าต้องรับผิดชอบเต็มจำนวน หากความเสียหายหรือการสูญหายเกิดขึ้นขณะ: ขับขี่ขณะเมาสุราหรือเสพยาเสพติด ไม่มีใบอนุญาตขับรถที่ใช้ได้สำหรับรถประเภทนี้ ผู้ขับขี่ไม่ได้ระบุชื่อในข้อ 2 อยู่นอกพื้นที่ที่อนุญาต ใช้รถในลักษณะต้องห้าม (ข้อ 9) กระทำโดยจงใจหรือประมาทเลินเล่ออย่างร้ายแรง หรือทิ้งกุญแจไว้กับรถ ยาง ล้อ กระจก ใต้ท้องรถ ภายในห้องโดยสาร กุญแจ และอุปกรณ์ มักไม่อยู่ในความคุ้มครองของบริษัทประกันภัย และเป็นความรับผิดชอบของผู้เช่า เว้นแต่ผู้ให้เช่ายืนยันเป็นลายลักษณ์อักษรว่าอยู่ในความคุ้มครอง"
+        en: "Insurance does not protect the Renter, and the Renter pays the actual loss in full, when damage or loss happens: while driving under the influence, without a valid licence for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or reckless acts, or when keys were left with the vehicle. Tyres, wheels, glass, underbody, interior, keys and accessories are often excluded by insurers; damage to them caused by the Renter's fault is the Renter's responsibility unless the Owner confirms in writing that they are covered."
+        local: "ประกันภัยไม่คุ้มครองผู้เช่า และผู้เช่าต้องรับผิดชอบความเสียหายที่เกิดขึ้นจริงเต็มจำนวน หากความเสียหายหรือการสูญหายเกิดขึ้นขณะ: ขับขี่ขณะเมาสุราหรือเสพยาเสพติด ไม่มีใบอนุญาตขับรถที่ใช้ได้สำหรับรถประเภทนี้ ผู้ขับขี่ไม่ได้ระบุชื่อในข้อ 2 อยู่นอกพื้นที่ที่อนุญาต ใช้รถในลักษณะต้องห้าม (ข้อ 9) กระทำโดยจงใจหรือประมาทเลินเล่ออย่างร้ายแรง หรือทิ้งกุญแจไว้กับรถ ยาง ล้อ กระจก ใต้ท้องรถ ภายในห้องโดยสาร กุญแจ และอุปกรณ์ มักไม่อยู่ในความคุ้มครองของบริษัทประกันภัย ความเสียหายต่อสิ่งเหล่านี้ที่เกิดจากความผิดของผู้เช่าเป็นความรับผิดชอบของผู้เช่า เว้นแต่ผู้ให้เช่ายืนยันเป็นลายลักษณ์อักษรว่าอยู่ในความคุ้มครอง"
       - id: insurance.6
-        en: "Personal belongings left in or on the vehicle are not insured by the Owner. The Owner is not responsible for their loss or damage."
-        local: "ทรัพย์สินส่วนตัวที่ทิ้งไว้ในหรือบนรถไม่อยู่ในความคุ้มครองประกันภัยของผู้ให้เช่า และผู้ให้เช่าไม่ต้องรับผิดชอบต่อการสูญหายหรือเสียหายของทรัพย์สินดังกล่าว"
+        en: "Personal belongings left in or on the vehicle are not insured by the Owner. The Owner is not responsible for their loss or damage, unless it is caused by the Owner's own fault or breach of this agreement."
+        local: "ทรัพย์สินส่วนตัวที่ทิ้งไว้ในหรือบนรถไม่อยู่ในความคุ้มครองประกันภัยของผู้ให้เช่า และผู้ให้เช่าไม่ต้องรับผิดชอบต่อการสูญหายหรือเสียหายของทรัพย์สินดังกล่าว เว้นแต่เกิดจากความผิดหรือการผิดสัญญาของผู้ให้เช่าเอง"
       - id: insurance.7_cc
         en: "Voluntary insurance in Thailand comes in classes (1, 2+, 2, 3+, 3) with different cover; classes 2+ and 3+ cover damage to the rented vehicle only in the cases the policy states. The Owner tells the Renter which class applies, the insurer's claim hotline and the policy excess before the rental starts."
         local: "ประกันภัยรถภาคสมัครใจในประเทศไทยแบ่งเป็นหลายประเภท (ชั้น 1, 2+, 2, 3+, 3) ซึ่งให้ความคุ้มครองแตกต่างกัน ประกันภัยชั้น 2+ และ 3+ คุ้มครองความเสียหายของรถที่เช่าเฉพาะกรณีที่ระบุในกรมธรรม์เท่านั้น ผู้ให้เช่าต้องแจ้งผู้เช่าก่อนเริ่มการเช่าว่ารถมีประกันภัยประเภทใด หมายเลขแจ้งเหตุของบริษัทประกันภัย และค่าเสียหายส่วนแรกตามกรมธรรม์"
@@ -355,24 +373,24 @@ sections:
     title: { en: "12. Damage, theft and loss", local: "12. ความเสียหาย การโจรกรรม และการสูญหาย" }
     clauses:
       - id: damage.1
-        en: "The Renter is responsible for the vehicle from handover until it is returned and checked. The condition at handover is recorded in Annex A with photos; anything not recorded there is treated as new unless it is normal wear and tear."
-        local: "ผู้เช่าต้องรับผิดชอบรถตั้งแต่รับมอบจนถึงเวลาที่คืนรถและตรวจสภาพเรียบร้อย สภาพรถเมื่อส่งมอบบันทึกไว้ในภาคผนวก ก พร้อมภาพถ่าย ความเสียหายใดที่ไม่ได้บันทึกไว้ให้ถือว่าเกิดขึ้นใหม่ เว้นแต่เป็นการเสื่อมสภาพตามปกติจากการใช้งาน"
+        en: "The Renter is responsible for the vehicle from handover until it is returned and checked. The condition at handover is recorded in Annex A with photos. At the return check the Owner must point out any damage or loss it claims. Damage that was not recorded at handover and is pointed out at the return check is treated as having happened during the rental, unless the Renter shows otherwise or it is normal wear and tear."
+        local: "ผู้เช่าต้องรับผิดชอบรถตั้งแต่รับมอบจนถึงเวลาที่คืนรถและตรวจสภาพเรียบร้อย สภาพรถเมื่อส่งมอบบันทึกไว้ในภาคผนวก ก พร้อมภาพถ่าย ในการตรวจสภาพเมื่อคืนรถ ผู้ให้เช่าต้องทักท้วงความเสียหายหรือการสูญหายที่จะเรียกร้อง ความเสียหายที่ไม่ได้บันทึกไว้เมื่อส่งมอบและผู้ให้เช่าได้ทักท้วงในขณะคืนรถ ให้ถือว่าเกิดขึ้นระหว่างการเช่า เว้นแต่ผู้เช่าพิสูจน์ได้เป็นอย่างอื่น หรือเป็นการเสื่อมสภาพตามปกติจากการใช้งาน"
       - id: damage.2
-        en: "Repair costs are based on a quote or invoice from a garage, or on the damage price list in Annex B where one is attached. The Renter may ask to see the quote, and may get a second quote from a garage the Owner approves within 3 days."
-        local: "ค่าซ่อมคิดตามใบเสนอราคาหรือใบแจ้งหนี้จากอู่ซ่อมรถ หรือตามอัตราค่าเสียหายในภาคผนวก ข หากมีแนบไว้ ผู้เช่ามีสิทธิขอดูใบเสนอราคา และขอใบเสนอราคาที่สองจากอู่ที่ผู้ให้เช่าเห็นชอบได้ภายใน 3 วัน"
+        en: "The Renter pays only the actual cost of repairing damage caused by the Renter's fault, based on a quote or invoice from a garage that the Renter may check. Where Annex B is attached, its prices are the most the Renter pays for those items; if the actual cost is lower, the lower amount applies. The Renter may ask to see the quote, and may get a second quote from a garage the Owner approves within 3 days."
+        local: "ผู้เช่าต้องชำระเฉพาะค่าซ่อมที่เกิดขึ้นจริงสำหรับความเสียหายที่เกิดจากความผิดของผู้เช่า โดยคิดตามใบเสนอราคาหรือใบแจ้งหนี้จากอู่ซ่อมรถที่ผู้เช่าตรวจสอบได้ หากมีภาคผนวก ข แนบไว้ ราคาในภาคผนวก ข เป็นจำนวนสูงสุดที่ผู้เช่าต้องชำระสำหรับรายการนั้น หากค่าใช้จ่ายจริงต่ำกว่า ให้คิดตามค่าใช้จ่ายจริง ผู้เช่ามีสิทธิขอดูใบเสนอราคา และขอใบเสนอราคาที่สองจากอู่ที่ผู้ให้เช่าเห็นชอบได้ภายใน 3 วัน"
       - id: damage.3
         if: loss_of_use_fee
-        en: "While the vehicle cannot be rented because of damage caused during this rental, the Renter pays loss of use of {{currency}} {{loss_of_use_fee}} per day, for up to {{loss_of_use_max_days}} days."
-        local: "ในระหว่างที่รถไม่สามารถให้เช่าได้เนื่องจากความเสียหายที่เกิดขึ้นระหว่างการเช่านี้ ผู้เช่าต้องชำระค่าขาดประโยชน์วันละ {{currency}} {{loss_of_use_fee}} ไม่เกิน {{loss_of_use_max_days}} วัน"
+        en: "If damage caused by the Renter's fault means the vehicle must be off the road for repair, the Renter pays the Owner's actual, evidenced loss of rental income for the days it is being repaired (for example, bookings that had to be cancelled), up to {{currency}} {{loss_of_use_fee}} per day and for no more than {{loss_of_use_max_days}} days."
+        local: "หากความเสียหายที่เกิดจากความผิดของผู้เช่าทำให้ต้องนำรถเข้าซ่อมและไม่สามารถให้เช่าได้ ผู้เช่าต้องชดใช้ค่าขาดประโยชน์เท่าที่ผู้ให้เช่าเสียหายจริงและมีหลักฐานตรวจสอบได้ (เช่น การจองที่ต้องยกเลิก) สำหรับวันที่รถอยู่ระหว่างการซ่อม ไม่เกินวันละ {{currency}} {{loss_of_use_fee}} และไม่เกิน {{loss_of_use_max_days}} วัน"
       - id: damage.4
-        en: "If the vehicle or its keys are stolen, the Renter must report it to the police at once and give the Owner the police report. Where the theft happened because the vehicle was left unlocked, with the keys, or outside the permitted area, the Renter pays the value of the vehicle as stated in Annex B (or its market value)."
-        local: "หากรถหรือกุญแจรถถูกลัก ผู้เช่าต้องแจ้งความต่อเจ้าหน้าที่ตำรวจทันที และมอบสำเนาบันทึกประจำวันให้ผู้ให้เช่า หากการโจรกรรมเกิดขึ้นเพราะไม่ได้ล็อกรถ ทิ้งกุญแจไว้กับรถ หรือนำรถออกนอกพื้นที่ที่อนุญาต ผู้เช่าต้องชดใช้มูลค่ารถตามที่ระบุในภาคผนวก ข (หรือตามราคาตลาด)"
+        en: "If the vehicle or its keys are stolen, the Renter must report it to the police at once and give the Owner the police report. Where the theft happened because the vehicle was left unlocked, with the keys, or outside the permitted area, the Renter pays the vehicle's market value at the time of the theft (Annex B gives the agreed reference value), less any amount the Owner recovers from insurance."
+        local: "หากรถหรือกุญแจรถถูกลัก ผู้เช่าต้องแจ้งความต่อเจ้าหน้าที่ตำรวจทันที และมอบสำเนาบันทึกประจำวันให้ผู้ให้เช่า หากการโจรกรรมเกิดขึ้นเพราะไม่ได้ล็อกรถ ทิ้งกุญแจไว้กับรถ หรือนำรถออกนอกพื้นที่ที่อนุญาต ผู้เช่าต้องชดใช้มูลค่ารถตามราคาตลาด ณ เวลาที่เกิดเหตุ (โดยใช้มูลค่าที่ระบุในภาคผนวก ข เป็นเกณฑ์อ้างอิง) หักด้วยจำนวนเงินที่ผู้ให้เช่าได้รับจากบริษัทประกันภัย"
       - id: damage.5
-        en: "Lost keys, remote controls, helmets, documents, number plates and accessories are charged at their replacement cost, plus any locksmith or re-registration cost."
-        local: "กุญแจ รีโมต หมวกนิรภัย เอกสาร แผ่นป้ายทะเบียน และอุปกรณ์ที่สูญหาย คิดตามราคาจัดหาใหม่ รวมถึงค่าช่างกุญแจหรือค่าดำเนินการทางทะเบียนใหม่ (ถ้ามี)"
+        en: "Keys, remote controls, helmets, documents, number plates and accessories lost through the Renter's fault are charged at their actual, evidenced replacement cost, plus any locksmith or re-registration cost actually paid."
+        local: "กุญแจ รีโมต หมวกนิรภัย เอกสาร แผ่นป้ายทะเบียน และอุปกรณ์ที่สูญหายเพราะความผิดของผู้เช่า คิดตามราคาจัดหาใหม่ที่จ่ายจริงและมีหลักฐาน รวมถึงค่าช่างกุญแจหรือค่าดำเนินการทางทะเบียนใหม่ที่จ่ายจริง (ถ้ามี)"
       - id: damage.6_cc
-        en: "The Renter is not responsible for normal wear and tear or for damage that results from proper use of the vehicle. The Owner should raise any claim about damage promptly after the return; under Thai law, the Owner's court claims about this agreement must be filed within six months of the vehicle's return."
-        local: "ผู้เช่าไม่ต้องรับผิดในการเสื่อมสภาพตามปกติหรือความเสียหายที่เกิดจากการใช้รถโดยชอบ ผู้ให้เช่าควรแจ้งเรียกร้องค่าเสียหายโดยเร็วหลังได้รับรถคืน ทั้งนี้ ตามกฎหมายไทย ผู้ให้เช่าต้องฟ้องคดีเกี่ยวกับสัญญาเช่านี้ภายในหกเดือนนับแต่วันที่ได้รับรถคืน"
+        en: "The Renter is not responsible for normal wear and tear or for damage that results from proper use of the vehicle. Damage the Owner does not point out at the return check cannot be deducted from the deposit. Under Thai law, the Owner's court claims about this agreement must be filed within six months of the vehicle's return."
+        local: "ผู้เช่าไม่ต้องรับผิดในการเสื่อมสภาพตามปกติหรือความเสียหายที่เกิดจากการใช้รถโดยชอบ ความเสียหายที่ผู้ให้เช่ามิได้ทักท้วงในขณะตรวจสภาพเมื่อคืนรถ ผู้ให้เช่าจะนำมาหักจากเงินประกันไม่ได้ ทั้งนี้ ตามกฎหมายไทย ผู้ให้เช่าต้องฟ้องคดีเกี่ยวกับสัญญาเช่านี้ภายในหกเดือนนับแต่วันที่ได้รับรถคืน"
 
   - id: accident
     title: { en: "13. Accidents and breakdowns", local: "13. อุบัติเหตุและรถเสีย" }
@@ -385,8 +403,8 @@ sections:
         en: "Breakdowns: the Renter must stop safely, tell the Owner and follow the Owner's instructions. The Renter must not have the vehicle repaired without the Owner's permission, except for minor emergency costs up to {{currency}} {{emergency_repair_limit}}, which the Owner refunds against a receipt."
         local: "รถเสีย: ผู้เช่าต้องจอดรถในที่ปลอดภัย แจ้งผู้ให้เช่า และปฏิบัติตามคำแนะนำของผู้ให้เช่า ห้ามผู้เช่านำรถไปซ่อมโดยไม่ได้รับอนุญาตจากผู้ให้เช่า เว้นแต่ค่าใช้จ่ายฉุกเฉินเล็กน้อยไม่เกิน {{currency}} {{emergency_repair_limit}} ซึ่งผู้ให้เช่าจะคืนเงินให้เมื่อได้รับใบเสร็จ"
       - id: accident.3
-        en: "If the vehicle stops working through no fault of the Renter, the Owner will repair it or provide a similar vehicle within 24 hours of being told where reasonably possible. If the Owner cannot, the Renter may end the rental and receive a refund of the rent for the unused days."
-        local: "หากรถใช้งานไม่ได้โดยไม่ใช่ความผิดของผู้เช่า ผู้ให้เช่าจะซ่อมรถหรือจัดหารถที่ใกล้เคียงกันให้ภายใน 24 ชั่วโมงนับจากได้รับแจ้ง เท่าที่สามารถทำได้ตามสมควร หากผู้ให้เช่าทำไม่ได้ ผู้เช่ามีสิทธิเลิกการเช่าและได้รับคืนค่าเช่าสำหรับวันที่ไม่ได้ใช้"
+        en: "Replacement vehicle: if the rented vehicle cannot be used for more than one day because of an accident or for maintenance or repair, the Owner provides a replacement vehicle of the same or a similar model until the rented vehicle is repaired and can be used normally, unless the vehicle cannot be used because of the Renter's fault in breaking the law. If the Owner does not provide one, the Renter may end the rental and receive a refund of the rent for the unused days and the deposit as set out in section 6."
+        local: "การจัดรถทดแทน: หากรถที่เช่าไม่สามารถใช้งานได้เนื่องจากอุบัติเหตุ หรือเพื่อการบำรุงรักษาหรือซ่อมแซม เป็นเวลามากกว่าหนึ่งวัน ผู้ให้เช่าต้องจัดหารถรุ่นเดียวกันหรือใกล้เคียงกันมาทดแทนให้ผู้เช่า จนกว่ารถคันที่เช่าจะได้รับการซ่อมจนใช้งานได้ตามปกติ เว้นแต่รถไม่สามารถใช้งานได้เนื่องจากความผิดของผู้เช่าที่ได้กระทำผิดกฎหมาย หากผู้ให้เช่าไม่จัดหารถทดแทน ผู้เช่ามีสิทธิเลิกการเช่าและได้รับคืนค่าเช่าสำหรับวันที่ไม่ได้ใช้ และเงินประกันตามข้อ 6"
       - id: accident.4
         en: "The Renter must report any warning light, unusual noise, puncture or fault promptly and must not keep using a vehicle that is unsafe."
         local: "ผู้เช่าต้องแจ้งผู้ให้เช่าโดยเร็วเมื่อมีไฟเตือน เสียงผิดปกติ ยางรั่ว หรือความบกพร่องใด และห้ามใช้รถต่อไปหากรถอยู่ในสภาพไม่ปลอดภัย"
@@ -395,22 +413,22 @@ sections:
     title: { en: "14. Fines, tolls and parking", local: "14. ค่าปรับ ค่าผ่านทาง และค่าที่จอดรถ" }
     clauses:
       - id: fines.1
-        en: "The Renter pays all traffic and parking fines, tolls, towing, impound and clamping costs arising during the rental, including fines that reach the Owner after the vehicle is returned, plus a handling fee of {{currency}} {{fine_admin_fee}} per fine."
-        local: "ผู้เช่าต้องชำระค่าปรับจราจรและค่าปรับการจอดรถ ค่าผ่านทาง ค่าลากรถ ค่ารับรถคืนจากที่ยึด และค่าปลดล็อกล้อ ที่เกิดขึ้นระหว่างการเช่าทั้งหมด รวมถึงค่าปรับที่ส่งถึงผู้ให้เช่าหลังคืนรถแล้ว พร้อมค่าดำเนินการ {{currency}} {{fine_admin_fee}} ต่อใบสั่ง"
+        en: "The Renter pays traffic and parking fines, tolls, towing, impound and clamping costs arising from the use of the vehicle during the rental, including fines that reach the Owner after the vehicle is returned. Where the Owner has paid any of them, the Renter refunds only what the Owner actually paid, kept economical, necessary and reasonable, against the ticket or receipt. A handling cost, up to {{currency}} {{fine_admin_fee}} per fine, is charged only where it is an actual, evidenced cost (such as a bank or postal charge)."
+        local: "ผู้เช่าต้องชำระค่าปรับจราจรและค่าปรับการจอดรถ ค่าผ่านทาง ค่าลากรถ ค่ารับรถคืนจากที่ยึด และค่าปลดล็อกล้อ ที่เกิดจากการใช้รถระหว่างการเช่า รวมถึงค่าปรับที่ส่งถึงผู้ให้เช่าหลังคืนรถแล้ว หากผู้ให้เช่าได้ชำระเงินดังกล่าวไปแล้ว ผู้เช่าต้องชดใช้คืนเพียงเท่าที่ผู้ให้เช่าได้ใช้จ่ายไปจริง โดยประหยัด ตามความจำเป็น และมีเหตุผลอันสมควร โดยผู้ให้เช่าต้องแสดงใบสั่งหรือใบเสร็จ ค่าดำเนินการไม่เกิน {{currency}} {{fine_admin_fee}} ต่อใบสั่ง เรียกเก็บได้เฉพาะกรณีที่เป็นค่าใช้จ่ายที่เกิดขึ้นจริงและมีหลักฐาน (เช่น ค่าธรรมเนียมธนาคารหรือค่าไปรษณีย์)"
       - id: fines.2
-        en: "Under the Land Traffic Act, when the driver is not identified at the scene, a ticket may be sent to the vehicle's owner or possessor. The Owner may give the Renter's name, ID and contact details and a copy of this agreement to the police or the issuing authority so that the ticket is issued to or transferred to the Renter, where the law allows. If the Owner has to pay a fine caused during the rental, the Renter refunds it."
-        local: "ตามพระราชบัญญัติจราจรทางบก กรณีไม่ทราบตัวผู้ขับขี่ ณ ที่เกิดเหตุ เจ้าพนักงานอาจส่งใบสั่งไปยังเจ้าของรถหรือผู้ครอบครองรถ ผู้ให้เช่าอาจแจ้งชื่อ เลขประจำตัว และข้อมูลติดต่อของผู้เช่า พร้อมสำเนาสัญญานี้ ต่อเจ้าพนักงานตำรวจหรือหน่วยงานที่ออกใบสั่ง เพื่อให้ออกใบสั่งหรือโอนใบสั่งไปยังผู้เช่า เท่าที่กฎหมายอนุญาต หากผู้ให้เช่าต้องชำระค่าปรับที่เกิดขึ้นระหว่างการเช่า ผู้เช่าต้องชดใช้คืนให้ผู้ให้เช่า"
+        en: "Under the Land Traffic Act, when the driver is not identified at the scene, a ticket may be sent to the vehicle's owner or possessor. The Owner may give the Renter's name, ID and contact details and a copy of this agreement to the police or the issuing authority so that the ticket is issued to or transferred to the Renter, where the law allows. If the Owner has to pay a fine caused by the Renter during the rental, the Renter refunds the amount actually paid, against the ticket and receipt."
+        local: "ตามพระราชบัญญัติจราจรทางบก กรณีไม่ทราบตัวผู้ขับขี่ ณ ที่เกิดเหตุ เจ้าพนักงานอาจส่งใบสั่งไปยังเจ้าของรถหรือผู้ครอบครองรถ ผู้ให้เช่าอาจแจ้งชื่อ เลขประจำตัว และข้อมูลติดต่อของผู้เช่า พร้อมสำเนาสัญญานี้ ต่อเจ้าพนักงานตำรวจหรือหน่วยงานที่ออกใบสั่ง เพื่อให้ออกใบสั่งหรือโอนใบสั่งไปยังผู้เช่า เท่าที่กฎหมายอนุญาต หากผู้ให้เช่าต้องชำระค่าปรับที่เกิดจากความผิดของผู้เช่าระหว่างการเช่า ผู้เช่าต้องชดใช้คืนเพียงเท่าที่ผู้ให้เช่าได้ชำระไปจริง โดยผู้ให้เช่าต้องแสดงใบสั่งและใบเสร็จ"
         country: true
 
   - id: termination
     title: { en: "15. Ending the agreement by the Owner", local: "15. การเลิกสัญญาโดยผู้ให้เช่า" }
     clauses:
       - id: termination.1
-        en: "The Owner may end this agreement and take the vehicle back at once if the Renter: does not pay on time; gave false details; lets an unnamed person drive; uses the vehicle unlawfully or against section 9; takes it outside the permitted area without permission; tampers with the odometer or tracker; abandons it; or puts the vehicle or other people at serious risk. The Owner may then deduct what the Renter owes under this agreement, including reasonable recovery costs, and refunds any remaining prepaid rent for the days after the vehicle is recovered."
-        local: "ผู้ให้เช่ามีสิทธิบอกเลิกสัญญานี้และนำรถกลับคืนได้ทันที หากผู้เช่า: ไม่ชำระเงินตามกำหนด ให้ข้อมูลอันเป็นเท็จ ยินยอมให้ผู้ที่ไม่ได้ระบุชื่อขับขี่ ใช้รถโดยผิดกฎหมายหรือฝ่าฝืนข้อ 9 นำรถออกนอกพื้นที่ที่อนุญาตโดยไม่ได้รับอนุญาต ดัดแปลงเครื่องวัดระยะทางหรือเครื่องติดตาม ละทิ้งรถ หรือทำให้รถหรือผู้อื่นตกอยู่ในความเสี่ยงร้ายแรง ในกรณีดังกล่าว ผู้ให้เช่ามีสิทธิหักเงินที่ผู้เช่าต้องชำระตามสัญญานี้ รวมถึงค่าใช้จ่ายตามสมควรในการนำรถกลับคืน และต้องคืนค่าเช่าที่ชำระล่วงหน้าส่วนที่เหลือสำหรับวันหลังจากที่ได้รับรถคืนแล้วให้แก่ผู้เช่า"
+        en: "The Owner may end this agreement and take the vehicle back at once if the Renter breaches it, namely if the Renter: does not pay on time; gave false details; lets an unnamed person drive; uses the vehicle unlawfully or against section 9; takes it outside the permitted area without permission; tampers with the odometer or tracker; abandons it; or otherwise breaches a material term in a way that puts the vehicle or other people at serious risk. The Owner may not end this agreement early if the Renter has not breached it. On ending it, the Owner may deduct what the Renter owes under this agreement, including reasonable, evidenced recovery costs, refunds any remaining prepaid rent for the days after the vehicle is recovered, and returns the deposit as set out in section 6."
+        local: "ผู้ให้เช่ามีสิทธิบอกเลิกสัญญานี้และนำรถกลับคืนได้ทันทีเมื่อผู้เช่าผิดสัญญา ได้แก่ กรณีที่ผู้เช่า: ไม่ชำระเงินตามกำหนด ให้ข้อมูลอันเป็นเท็จ ยินยอมให้ผู้ที่ไม่ได้ระบุชื่อขับขี่ ใช้รถโดยผิดกฎหมายหรือฝ่าฝืนข้อ 9 นำรถออกนอกพื้นที่ที่อนุญาตโดยไม่ได้รับอนุญาต ดัดแปลงเครื่องวัดระยะทางหรือเครื่องติดตาม ละทิ้งรถ หรือผิดเงื่อนไขอันเป็นสาระสำคัญอื่นใดของสัญญาจนทำให้รถหรือผู้อื่นตกอยู่ในความเสี่ยงร้ายแรง ผู้ให้เช่าจะบอกเลิกสัญญาก่อนครบกำหนดไม่ได้หากผู้เช่ามิได้ผิดสัญญา เมื่อบอกเลิกสัญญาแล้ว ผู้ให้เช่ามีสิทธิหักเงินที่ผู้เช่าต้องชำระตามสัญญานี้ รวมถึงค่าใช้จ่ายตามสมควรในการนำรถกลับคืนที่มีหลักฐานตรวจสอบได้ และต้องคืนค่าเช่าที่ชำระล่วงหน้าส่วนที่เหลือสำหรับวันหลังจากที่ได้รับรถคืนแล้ว และคืนเงินประกันตามข้อ 6 ให้แก่ผู้เช่า"
       - id: termination.2
-        en: "The Renter must make the vehicle available for collection, and pays reasonable recovery costs where the Owner has to fetch it."
-        local: "ผู้เช่าต้องจัดให้ผู้ให้เช่าสามารถรับรถคืนได้ และต้องชำระค่าใช้จ่ายตามสมควรในการนำรถกลับ หากผู้ให้เช่าต้องไปรับรถเอง"
+        en: "The Renter must make the vehicle available for collection, and pays the reasonable, evidenced costs of recovery where the Owner has to fetch it because of the Renter's breach."
+        local: "ผู้เช่าต้องจัดให้ผู้ให้เช่าสามารถรับรถคืนได้ และต้องชำระค่าใช้จ่ายตามสมควรที่มีหลักฐานตรวจสอบได้ในการนำรถกลับ หากผู้ให้เช่าต้องไปรับรถเองเพราะการผิดสัญญาของผู้เช่า"
 
   - id: return
     title: { en: "16. Returning the vehicle", local: "16. การคืนรถ" }
@@ -420,12 +438,12 @@ sections:
         local: "ผู้เช่าต้องคืนรถพร้อมกุญแจ เอกสาร และอุปกรณ์ โดยมีระดับน้ำมันตามที่ตกลงในข้อ 8 และอยู่ในสภาพสะอาดตามสมควร คู่สัญญาทั้งสองฝ่ายจะตรวจสภาพรถร่วมกัน และบันทึกสภาพรถ เลขไมล์ และระดับน้ำมันไว้ในภาคผนวก ก พร้อมภาพถ่าย หากผู้เช่าไม่อยู่ร่วมตรวจสภาพ ให้ถือภาพถ่ายที่ระบุวันที่ของผู้ให้เช่าเป็นหลักฐาน"
       - id: return.2
         if: cleaning_fee
-        en: "A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more if specialist cleaning is needed, against a receipt)."
-        local: "หากคืนรถโดยภายในรถมีฝุ่น ทราย โคลน คราบ เศษอาหาร หรือกลิ่นมากเกินปกติ ผู้เช่าต้องชำระค่าทำความสะอาด {{currency}} {{cleaning_fee}} (หรือมากกว่านั้นหากต้องใช้บริการทำความสะอาดเฉพาะทาง โดยมีใบเสร็จ)"
+        en: "If the vehicle is returned with excessive dirt, sand, mud, stains, food or odour inside and cleaning is actually needed, the Renter pays the actual, evidenced cost of cleaning, up to {{currency}} {{cleaning_fee}}. Normal dirt from ordinary use is not charged."
+        local: "หากคืนรถโดยภายในรถมีฝุ่น ทราย โคลน คราบ เศษอาหาร หรือกลิ่นมากเกินปกติ และจำเป็นต้องทำความสะอาดจริง ผู้เช่าต้องชำระค่าทำความสะอาดตามที่จ่ายจริงและมีหลักฐาน ไม่เกิน {{currency}} {{cleaning_fee}} ความสกปรกตามปกติจากการใช้งานจะไม่มีการเรียกเก็บ"
       - id: return.3
         unless: cleaning_fee
-        en: "A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside may be charged the reasonable cost of cleaning."
-        local: "หากคืนรถโดยภายในรถมีฝุ่น ทราย โคลน คราบ เศษอาหาร หรือกลิ่นมากเกินปกติ ผู้ให้เช่าอาจเรียกเก็บค่าทำความสะอาดตามจริงในอัตราที่สมควร"
+        en: "If the vehicle is returned with excessive dirt, sand, mud, stains, food or odour inside, the Owner may charge the actual, reasonable cost of cleaning, with evidence."
+        local: "หากคืนรถโดยภายในรถมีฝุ่น ทราย โคลน คราบ เศษอาหาร หรือกลิ่นมากเกินปกติ ผู้ให้เช่าอาจเรียกเก็บค่าทำความสะอาดตามที่จ่ายจริงในอัตราที่สมควร โดยมีหลักฐานตรวจสอบได้"
 
   - id: data
     title: { en: "17. Personal data and documents", local: "17. ข้อมูลส่วนบุคคลและเอกสาร" }
@@ -446,8 +464,8 @@ sections:
     title: { en: "18. General terms", local: "18. ข้อกำหนดทั่วไป" }
     clauses:
       - id: general.1
-        en: "Messages: notices under this agreement may be sent by phone, message app (LINE, WhatsApp, Telegram or similar), SMS or email to the contact details in sections 1 and 2, and count as received when sent."
-        local: "การแจ้งข้อความ: การบอกกล่าวตามสัญญานี้อาจทำทางโทรศัพท์ แอปพลิเคชันส่งข้อความ (LINE, WhatsApp, Telegram หรือแอปพลิเคชันอื่นทำนองเดียวกัน) SMS หรืออีเมล ตามข้อมูลติดต่อในข้อ 1 และข้อ 2 และให้ถือว่าได้รับเมื่อส่งแล้ว"
+        en: "Messages: notices under this agreement may be sent by phone, message app (LINE, WhatsApp, Telegram or similar), SMS or email to the contact details in sections 1 and 2, and count as received when they reach that contact."
+        local: "การแจ้งข้อความ: การบอกกล่าวตามสัญญานี้อาจทำทางโทรศัพท์ แอปพลิเคชันส่งข้อความ (LINE, WhatsApp, Telegram หรือแอปพลิเคชันอื่นทำนองเดียวกัน) SMS หรืออีเมล ตามข้อมูลติดต่อในข้อ 1 และข้อ 2 และให้ถือว่าได้รับเมื่อข้อความส่งถึงช่องทางติดต่อดังกล่าว"
       - id: general.2
         en: "Force majeure: neither party is responsible for a delay or failure caused by events outside their control, such as natural disasters, floods, storms, government orders or ferry cancellations. Rent for days the vehicle could not be used because of such an event is agreed fairly between the parties."
         local: "เหตุสุดวิสัย: คู่สัญญาไม่ต้องรับผิดในความล่าช้าหรือการไม่ปฏิบัติตามสัญญาที่เกิดจากเหตุที่อยู่นอกเหนือการควบคุม เช่น ภัยธรรมชาติ น้ำท่วม พายุ คำสั่งของทางราชการ หรือการยกเลิกเรือข้ามฟาก ค่าเช่าสำหรับวันที่ไม่สามารถใช้รถได้เพราะเหตุดังกล่าว ให้คู่สัญญาตกลงกันอย่างเป็นธรรม"
@@ -472,8 +490,8 @@ sections:
     signature: true
     clauses:
       - id: signatures.1
-        en: "By signing, the parties confirm they have read and understood this agreement, including Annexes A and B, and agree to it. The Renter confirms they received a copy."
-        local: "คู่สัญญาได้อ่านและเข้าใจสัญญานี้ รวมถึงภาคผนวก ก และภาคผนวก ข แล้ว และตกลงตามสัญญานี้ จึงลงลายมือชื่อไว้เป็นสำคัญ ผู้เช่ายืนยันว่าได้รับสำเนาสัญญาแล้ว"
+        en: "By signing, the parties confirm they have read and understood this agreement, including Annexes A and B, and agree to it. This agreement is made in two identical copies; each party keeps one, and the Renter confirms they received their copy at signing."
+        local: "คู่สัญญาได้อ่านและเข้าใจสัญญานี้ รวมถึงภาคผนวก ก และภาคผนวก ข แล้ว และตกลงตามสัญญานี้ จึงลงลายมือชื่อไว้เป็นสำคัญ สัญญานี้ทำขึ้นเป็นสองฉบับมีข้อความถูกต้องตรงกัน คู่สัญญาเก็บไว้ฝ่ายละหนึ่งฉบับ และผู้เช่ายืนยันว่าได้รับสัญญาฉบับของตนในขณะลงนามแล้ว"
     sign_rows:
       - { en: "Owner (name, signature, date)", local: "ผู้ให้เช่า (ชื่อ ลายมือชื่อ วันที่)" }
       - { en: "Renter (name, signature, date)", local: "ผู้เช่า (ชื่อ ลายมือชื่อ วันที่)" }
@@ -505,8 +523,8 @@ sections:
     pricelist: true
     clauses:
       - id: annex_b.1
-        en: "Agreed prices for common damage and lost items. Damage not listed is charged per section 12."
-        local: "ราคาที่ตกลงกันสำหรับความเสียหายทั่วไปและสิ่งของที่สูญหาย ความเสียหายที่ไม่ได้ระบุไว้ให้คิดตามข้อ 12"
+        en: "Agreed maximum prices for common damage and lost items, charged only where the damage or loss is caused by the Renter's fault; if the actual, evidenced cost is lower, the lower amount applies. Damage not listed is charged per section 12."
+        local: "ราคาสูงสุดที่ตกลงกันสำหรับความเสียหายทั่วไปและสิ่งของที่สูญหาย ซึ่งเรียกเก็บเฉพาะกรณีที่ความเสียหายหรือการสูญหายเกิดจากความผิดของผู้เช่า หากค่าใช้จ่ายจริงที่มีหลักฐานต่ำกว่า ให้คิดตามค่าใช้จ่ายจริง ความเสียหายที่ไม่ได้ระบุไว้ให้คิดตามข้อ 12"
     price_rows:
       - { en: "Scratch, per panel (polish / repaint)", local: "รอยขีดข่วน ต่อชิ้นส่วน (ขัด / ทำสีใหม่)" }
       - { en: "Dent, per panel", local: "รอยบุบ ต่อชิ้นส่วน" }

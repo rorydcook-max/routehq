@@ -3,6 +3,7 @@ import { cookies, headers } from "next/headers";
 import { CUSTOMER_LOCALE_COOKIE, pickLocale } from "@/lib/i18n/customer-locale";
 import { supportedLocaleCodes, type SupportedLocale } from "@/lib/i18n/locales";
 import { signedOutLocale, STAFF_LOCALE_COOKIE } from "@/lib/i18n/staff-locale";
+import { SITE_LOCALE_HEADER } from "@/lib/site/locale-path";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -42,6 +43,12 @@ async function resolveLocale(): Promise<SupportedLocale> {
   // Customer pages: the language the customer picked, else the first language their phone asks for that we have.
   try {
     const requestHeaders = await headers();
+    // RouteHQ's website: the language is in the address (/th/pricing), passed on by proxy.ts. It wins over the cookie
+    // and the signed-in person's own language, so each address always shows one language (what search engines index).
+    if (requestHeaders.get("x-routehq-site-page")) {
+      const siteLocale = requestHeaders.get(SITE_LOCALE_HEADER);
+      if (siteLocale && supported.has(siteLocale)) return siteLocale as SupportedLocale;
+    }
     if (requestHeaders.get("x-routehq-customer-page")) {
       const chosen = (await cookies()).get(CUSTOMER_LOCALE_COOKIE)?.value || requestHeaders.get("x-routehq-page-lang") || undefined;
       return pickLocale(chosen, requestHeaders.get("accept-language"));

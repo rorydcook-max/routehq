@@ -10,6 +10,7 @@ const TABS = [
   { href: "/platform/log", label: "Admin log" },
   { href: "/platform/renters", label: "Renters" },
   { href: "/platform/messages", label: "Messages" },
+  { href: "/platform/leads", label: "Leads" },
   { href: "/help/team", label: "Help queue" }
 ];
 

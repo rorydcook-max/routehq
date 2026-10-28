@@ -1,0 +1,820 @@
+/* The website's guides and free resources. Same system as site.module.css (its colour and type tokens are set on
+   .site and inherited here): ink and white, one teal, Geist, 1px lines, pill buttons. */
+
+/* ── Topic filter on the dark hero: pills that are links (/guides/category/<topic>) ── */
+.filters {
+  display: flex;
+  gap: 8px;
+  margin-top: 32px;
+  margin-inline: -16px;
+  padding: 2px 16px 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.filters::-webkit-scrollbar {
+  display: none;
+}
+@media (min-width: 768px) {
+  .filters {
+    flex-wrap: wrap;
+    margin-inline: 0;
+    padding: 0;
+    overflow: visible;
+  }
+}
+.filter {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--line-dark);
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--muted-dark);
+  white-space: nowrap;
+  transition: color 150ms ease, border-color 150ms ease;
+}
+.filter:hover {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.32);
+}
+.filterOn,
+.filterOn:hover {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: var(--ink);
+}
+
+/* ── Cards (guides and resources) ───────────────────────────────────── */
+.grid {
+  display: grid;
+  gap: 16px;
+}
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1100px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.card {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: #ffffff;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.card:hover {
+  border-color: rgba(6, 22, 43, 0.24);
+  box-shadow: var(--frame-shadow-light);
+}
+.cardTitle {
+  margin-top: 12px;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+/* The whole card is the link: the title's link covers it. */
+.cardTitle a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+}
+.cardBody {
+  margin-top: 8px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.cardMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-top: auto;
+  padding-top: 20px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.cardMeta > * + *::before {
+  content: "·";
+  margin-inline-end: 12px;
+}
+.tag {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--teal-deep);
+}
+.tagOnDark {
+  color: var(--teal);
+}
+/* Two fields side by side would be cramped in the form's narrow column: one under the other. */
+.stack {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+.fallback {
+  margin-bottom: 24px;
+  font-size: 15px;
+  color: var(--muted);
+}
+.empty {
+  padding: 32px 0;
+  border-block: 1px solid var(--line);
+  font-size: 17px;
+  color: var(--muted);
+}
+
+/* ── Article hero: the plain dark hero, compact ─────────────────────── */
+.articleHero {
+  padding-top: clamp(40px, 6vw, 80px);
+  padding-bottom: clamp(48px, 6vw, 80px);
+}
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  font-size: 14px;
+  color: var(--muted-dark);
+}
+.crumbs a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  transition: color 150ms ease;
+}
+.crumbs a:hover {
+  color: #ffffff;
+}
+.articleTitle {
+  max-width: 880px;
+  margin-top: 20px;
+  font-size: clamp(34px, 4.6vw, 58px);
+  font-weight: 600;
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+  text-wrap: balance;
+}
+/* Scripts with marks above and below the line need taller display lines (as site.module.css does for its headings). */
+.articleTitle:is(:lang(th), :lang(lo), :lang(my), :lang(si), :lang(ta)),
+.prose:is(:lang(th), :lang(lo), :lang(my), :lang(si), :lang(ta)) h2 {
+  line-height: 1.3;
+  letter-spacing: 0;
+}
+.articleLede {
+  max-width: 720px;
+  margin-top: 20px;
+}
+.byline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-top: 32px;
+  font-size: 15px;
+  color: var(--muted-dark);
+}
+.bylineName {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  color: #ffffff;
+}
+.bylineFacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+.bylineFacts > * + *::before {
+  content: "·";
+  margin-inline-end: 12px;
+}
+.avatar {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--teal);
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 700;
+}
+.avatarLarge {
+  width: 56px;
+  height: 56px;
+  font-size: 22px;
+}
+
+/* ── Reading layout: contents on the side from 1024px, a 720px column for the text ── */
+.articleLayout {
+  display: grid;
+  gap: 40px;
+}
+@media (min-width: 1024px) {
+  .articleLayout {
+    grid-template-columns: 220px minmax(0, 720px);
+    gap: 72px;
+  }
+}
+.toc {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .toc {
+    display: block;
+    position: sticky;
+    top: 96px;
+    align-self: start;
+    max-height: calc(100vh - 128px);
+    overflow-y: auto;
+  }
+}
+.tocTitle {
+  margin-bottom: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.toc ul {
+  border-inline-start: 1px solid var(--line);
+}
+.tocLink {
+  display: block;
+  margin-inline-start: -1px;
+  padding: 8px 0 8px 16px;
+  padding-inline: 16px 0;
+  border-inline-start: 1px solid transparent;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--muted);
+  transition: color 150ms ease, border-color 150ms ease;
+}
+.tocLink:hover {
+  color: var(--text);
+  border-color: var(--teal-deep);
+}
+.articleMain {
+  min-width: 0;
+}
+
+/* ── The article text ───────────────────────────────────────────────── */
+.prose {
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--text);
+  overflow-wrap: break-word;
+}
+@media (min-width: 768px) {
+  .prose {
+    font-size: 19px;
+  }
+}
+.prose > :first-child {
+  margin-top: 0;
+}
+.prose :is(p, ul, ol, blockquote, :global(.table-wrap), img, hr) {
+  margin-top: 1.1em;
+}
+.prose h2 {
+  margin-top: 2.4em;
+  font-size: clamp(26px, 2.4vw, 32px);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  scroll-margin-top: 96px;
+}
+.prose h3 {
+  margin-top: 1.8em;
+  font-size: 21px;
+  line-height: 1.3;
+  scroll-margin-top: 96px;
+}
+.prose h2 + :is(p, ul, ol),
+.prose h3 + :is(p, ul, ol) {
+  margin-top: 0.6em;
+}
+.prose ul {
+  padding-inline-start: 1.3em;
+  list-style: disc;
+}
+.prose ol {
+  padding-inline-start: 1.5em;
+  list-style: decimal;
+}
+.prose li {
+  margin-top: 0.45em;
+  padding-inline-start: 0.2em;
+}
+.prose li::marker {
+  color: var(--teal-deep);
+}
+.prose strong {
+  font-weight: 600;
+}
+.prose a {
+  color: var(--teal-deep);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+.prose a:hover {
+  color: var(--text);
+}
+.prose blockquote {
+  padding: 2px 0;
+  padding-inline-start: 20px;
+  border-inline-start: 3px solid var(--teal);
+  color: var(--text);
+}
+.prose blockquote p:first-child {
+  margin-top: 0;
+}
+.prose hr {
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+.prose img {
+  border-radius: 16px;
+  border: 1px solid var(--line);
+}
+.prose code {
+  padding: 0.1em 0.35em;
+  border-radius: 6px;
+  background: var(--mist);
+  font-size: 0.9em;
+}
+.prose :global(.table-wrap) {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+  line-height: 1.5;
+}
+.prose th {
+  padding: 12px 16px;
+  background: var(--mist);
+  font-weight: 600;
+  text-align: start;
+  white-space: nowrap;
+}
+.prose td {
+  padding: 12px 16px;
+  border-top: 1px solid var(--line);
+  vertical-align: top;
+}
+.prose td + td,
+.prose th + th {
+  border-inline-start: 1px solid var(--line);
+}
+
+/* ── Free resource card inside an article (mid-way and at the end) ──── */
+.leadCard {
+  display: grid;
+  gap: 20px;
+  margin-block: 48px;
+  padding: 28px 24px;
+  border: 1px solid var(--line);
+  border-inline-start: 3px solid var(--teal);
+  border-radius: 20px;
+  background: var(--mist);
+}
+@media (min-width: 640px) {
+  .leadCard {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    padding: 28px 32px;
+  }
+}
+.leadCardTitle {
+  margin-top: 8px;
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+.leadCardBody {
+  margin-top: 6px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+@media (max-width: 639px) {
+  .leadCard .leadCardCta {
+    width: 100%;
+  }
+}
+
+/* ── After the article: questions, the author, related guides ───────── */
+.afterBlock {
+  margin-top: 64px;
+}
+.afterTitle {
+  margin-bottom: 20px;
+  font-size: clamp(26px, 2.4vw, 32px);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+.author {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 1px solid var(--line);
+}
+.authorName {
+  font-size: 17px;
+  font-weight: 600;
+}
+.authorRole {
+  font-size: 15px;
+  color: var(--muted);
+}
+.authorBio {
+  max-width: 560px;
+  margin-top: 8px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.relatedHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 24px;
+  margin-bottom: 32px;
+}
+
+/* ── Resource landing page: about + preview on the left, the form on the right (sticky) ── */
+.resourceLayout {
+  display: grid;
+  gap: 48px;
+}
+@media (min-width: 1024px) {
+  .resourceLayout {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 24px;
+    align-items: start;
+  }
+  .resourceMain {
+    grid-column: span 7;
+  }
+  .resourceAside {
+    grid-column: 9 / span 4;
+    position: sticky;
+    top: 96px;
+  }
+}
+.resourceMain,
+.resourceAside {
+  min-width: 0;
+}
+/* On phones the form comes straight after the hero, before the details. */
+@media (max-width: 1023px) {
+  .resourceAside {
+    order: -1;
+  }
+}
+.inside {
+  margin-top: 20px;
+  border-bottom: 1px solid var(--line);
+}
+.inside li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+.inside li svg {
+  margin-top: 3px;
+}
+.sectionTitle {
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+.formats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+.format {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+.disclaimer {
+  margin-top: 24px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+/* A sheet of the template on a mist table, fading out at the bottom. */
+.paperStage {
+  margin-top: 20px;
+  padding: 24px 16px 0;
+  border-radius: 24px;
+  background: var(--mist);
+  overflow: hidden;
+}
+@media (min-width: 640px) {
+  .paperStage {
+    padding: 40px 48px 0;
+  }
+}
+.paper {
+  position: relative;
+  max-height: 440px;
+  overflow: hidden;
+  padding: 28px 24px;
+  border: 1px solid var(--line);
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+  background: #ffffff;
+  box-shadow: var(--frame-shadow-light);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text);
+}
+@media (min-width: 640px) {
+  .paper {
+    padding: 40px 44px;
+  }
+}
+.paper::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 120px;
+  background: linear-gradient(rgba(255, 255, 255, 0), #ffffff);
+}
+.paper :is(h1, h2, h3) {
+  margin-top: 1.4em;
+  font-size: 1.15em;
+  line-height: 1.3;
+}
+.paper h1 {
+  margin-top: 0;
+  font-size: 1.6em;
+}
+.paper :is(p, ul, ol, blockquote) {
+  margin-top: 0.8em;
+}
+.paper ul {
+  padding-inline-start: 1.2em;
+  list-style: disc;
+}
+.paper blockquote {
+  padding: 8px 12px;
+  border-inline-start: 3px solid var(--teal);
+  background: var(--mist);
+}
+.paper strong {
+  font-weight: 600;
+}
+.paper :global(.table-wrap) {
+  margin-top: 0.8em;
+  overflow-x: auto;
+}
+.paper table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.paper :is(th, td) {
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  text-align: start;
+}
+.paper table {
+  table-layout: fixed;
+}
+.paper :is(th, td):first-child {
+  width: 42%;
+}
+
+/* ── The form that gives the download ───────────────────────────────── */
+.gate {
+  padding: 28px 24px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: var(--frame-shadow-light);
+}
+@media (min-width: 640px) {
+  .gate {
+    padding: 32px;
+  }
+}
+.gateTitle {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+.gateBody {
+  margin-top: 6px;
+  font-size: 15px;
+  color: var(--muted);
+}
+.gateForm {
+  margin-top: 24px;
+}
+.consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--text);
+  cursor: pointer;
+}
+.consent input {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin: 1px 0 0;
+  accent-color: var(--teal-deep);
+  cursor: pointer;
+}
+.privacy {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.gateSend {
+  width: 100%;
+}
+.downloads {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+}
+.download {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 64px;
+  padding: 12px 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #ffffff;
+  color: var(--text);
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+.download:hover {
+  border-color: var(--teal-deep);
+  background: var(--mist);
+}
+.downloadPrimary {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: #ffffff;
+}
+.downloadPrimary:hover {
+  border-color: var(--ink-2);
+  background: var(--ink-2);
+}
+.downloadIcon {
+  flex-shrink: 0;
+  color: var(--teal-deep);
+}
+.downloadPrimary .downloadIcon {
+  color: var(--teal);
+}
+.downloadText {
+  display: grid;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.downloadText small {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.downloadPrimary .downloadText small {
+  color: var(--muted-dark);
+}
+.gateNote {
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ── Home: "Free for rental businesses", before the last word ───────── */
+.free {
+  display: grid;
+  gap: 40px;
+  margin-top: 48px;
+}
+@media (min-width: 1024px) {
+  .free {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 64px;
+    align-items: start;
+  }
+}
+.freeMagnet {
+  display: flex;
+  flex-direction: column;
+  padding: 28px 24px;
+  border-radius: 24px;
+  background: var(--ink);
+  color: #ffffff;
+}
+@media (min-width: 640px) {
+  .freeMagnet {
+    padding: 36px 32px;
+  }
+}
+.freeMagnet .leadCardBody {
+  color: var(--muted-dark);
+}
+.freeMagnet .btnRow {
+  margin-top: 28px;
+}
+.freeList {
+  border-bottom: 1px solid var(--line);
+}
+.freeItem {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 0 22px;
+  border-top: 1px solid var(--line);
+}
+.freeItem h3 {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.freeItem h3 a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+.freeItem p {
+  margin-top: 4px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.freeItem:hover h3 {
+  color: var(--teal-deep);
+}
+.listLabel {
+  margin-bottom: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.btnRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}

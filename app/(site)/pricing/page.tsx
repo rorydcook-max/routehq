@@ -7,6 +7,8 @@ import { supportedLocaleCodes } from "@/lib/i18n/locales";
 import { BUSINESS_INCLUDED, PLANS, TRIAL_DAYS, YEARLY_MONTHS, fleetText, type Plan } from "@/lib/plans";
 import { formatPlanPrice, planCurrency, planPrices, yearlyOf } from "@/lib/plan-currency";
 import { isSiteCurrency, visitorCurrency } from "@/lib/site-currency";
+import { localizeSitePath } from "@/lib/site/locale-path";
+import { siteMetadata } from "@/lib/site/seo";
 import { FinalCta } from "../_components/final-cta";
 import { Check, Container, Eyebrow, Plus, RICH, SITE_LINKS, SiteLink, r } from "../_components/site-ui";
 import s from "../site.module.css";
@@ -24,12 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const cheapestPaid = PLANS.filter((plan) => plan.monthly > 0).sort((a, b) => a.monthly - b.monthly)[0];
   const title = t("metaPricingTitle");
   const description = t("metaPricingDescription", { price: formatPlanPrice(planPrices(cheapestPaid, currency).monthly, currency, numberLocale(locale)), days: TRIAL_DAYS });
-  return {
-    title,
-    description,
-    alternates: { canonical: "/pricing" },
-    openGraph: { type: "website", url: "/pricing", siteName: "RouteHQ", title: `${title} | RouteHQ`, description }
-  };
+  return siteMetadata({ path: "/pricing", locale, title, description });
 }
 
 /** What a plan has: the same lines as the plan cards in Settings → Plan, worded by the same (already translated) keys. */
@@ -68,7 +65,7 @@ export default async function PricingPage({ searchParams }: { searchParams: Prom
     const code = next.currency ?? currency;
     if (code !== detected) query.set("currency", code);
     const text = query.toString();
-    return r(`/pricing${text ? `?${text}` : ""}`);
+    return r(localizeSitePath(`/pricing${text ? `?${text}` : ""}`, locale));
   };
   let currencyName = (code: string) => code;
   try {

@@ -1,8 +1,7 @@
 "use server";
 
-import { createHash } from "node:crypto";
-import { headers } from "next/headers";
 import { getLocale } from "next-intl/server";
+import { EMAIL_PATTERN, formText, requestIpHash } from "@/lib/site/request-hash";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { alertTeam } from "@/lib/support";
 import { CONTACT_FLEETS, CONTACT_TOPICS, type ContactState } from "@/lib/contact";
@@ -15,20 +14,9 @@ import { CONTACT_FLEETS, CONTACT_TOPICS, type ContactState } from "@/lib/contact
 
 const LIMITS = { name: 120, email: 200, phone: 40, business: 120, message: 4000 } as const;
 const PER_HOUR = 5;
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
-function text(formData: FormData, key: string, max: number) {
-  return String(formData.get(key) || "")
-    .trim()
-    .slice(0, max);
-}
-
-async function ipHash() {
-  const list = await headers();
-  const ip = list.get("x-forwarded-for")?.split(",")[0]?.trim() || list.get("x-real-ip") || "unknown";
-  const salt = process.env.CONTACT_IP_SALT || "routehq-contact-v1";
-  return createHash("sha256").update(`${ip}|${salt}`).digest("hex");
-}
+const EMAIL = EMAIL_PATTERN;
+const text = formText;
+const ipHash = requestIpHash;
 
 export async function sendContactMessage(previous: ContactState, formData: FormData): Promise<ContactState> {
   const n = (previous?.n || 0) + 1;

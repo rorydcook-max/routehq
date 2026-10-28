@@ -7,6 +7,12 @@ const nextConfig: NextConfig = {
   // Lets a production build run beside `next dev` (NEXT_DIST_DIR=.next-build).
   distDir: process.env.NEXT_DIST_DIR || ".next",
   outputFileTracingRoot: path.join(__dirname),
+  // The website's guides and free resources are Markdown read at run time (lib/site/content.ts), and the downloads
+  // are served from outside public/ through a signed link (app/api/download/[slug]): ship them with the server.
+  outputFileTracingIncludes: {
+    "/**": ["./content/**/*"],
+    "/api/download/**": ["./downloads/**/*"]
+  },
   // Headless Chrome for PDFs: loaded from node_modules at runtime, not bundled.
   serverExternalPackages: ["puppeteer-core", "@sparticuz/chromium"],
   async redirects() {

@@ -4,10 +4,20 @@ import { useLocale } from "next-intl";
 import { Globe } from "lucide-react";
 import { operatorLocaleOptions } from "@/lib/i18n/locales";
 import { STAFF_LOCALE_COOKIE } from "@/lib/i18n/staff-locale";
+import { isSitePath, localizeSitePath, splitSiteLocale } from "@/lib/site/locale-path";
 
-/** Keeps a signed-out language choice on this device and redraws the page in it (also the website header's picker). */
+/**
+ * Keeps a signed-out language choice on this device and redraws the page in it (also the website header's picker).
+ * On RouteHQ's website each language has its own address, so there it opens that language's address (/th/pricing);
+ * the cookie still carries the choice to sign-in and the app.
+ */
 export function chooseSignedOutLanguage(code: string) {
   document.cookie = `${STAFF_LOCALE_COOKIE}=${code}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
+  const { locale, rest } = splitSiteLocale(window.location.pathname);
+  if (locale || isSitePath(rest)) {
+    window.location.assign(`${localizeSitePath(rest, code)}${window.location.search}${window.location.hash}`);
+    return;
+  }
   window.location.reload();
 }
 

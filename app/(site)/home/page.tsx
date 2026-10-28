@@ -8,22 +8,21 @@ import { formatPlanPrice, planPrices } from "@/lib/plan-currency";
 import { visitorCurrency } from "@/lib/site-currency";
 import { BookingPhoneMock, DashboardWindowMock, HandoverPhoneMock, ImportMock, LedgerCard, PassportCard, PaymentPhoneMock, ReturnCard, ShopPageMock, TodayPhoneMock, sampleMoney } from "../_components/mockups";
 import { Arrow, Check, Container, Eyebrow, Plus, RICH, RICH_SERIF, SITE_LINKS, SiteLink } from "../_components/site-ui";
+import { siteMetadata } from "@/lib/site/seo";
+import { getResource, listGuides } from "@/lib/site/content";
+import { CATEGORY_KEY } from "../_components/content-ui";
 import { FinalCta } from "../_components/final-cta";
 import s from "../site.module.css";
+import c from "../content.module.css";
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
+/** The free resource the home page offers. */
+const FEATURED_RESOURCE = "rental-agreement";
+
 export async function generateMetadata(): Promise<Metadata> {
-  const m = await getTranslations("marketing");
-  const title = m("metaTitle");
-  const description = m("metaDescription");
-  return {
-    title: { absolute: title },
-    description,
-    alternates: { canonical: "/" },
-    openGraph: { type: "website", url: "/", siteName: "RouteHQ", title, description },
-    twitter: { card: "summary_large_image", title, description }
-  };
+  const [m, locale] = await Promise.all([getTranslations("marketing"), getLocale()]);
+  return siteMetadata({ path: "/", locale, title: m("metaTitle"), description: m("metaDescription"), absoluteTitle: true });
 }
 
 export default async function SiteHomePage() {
@@ -31,6 +30,12 @@ export default async function SiteHomePage() {
   const say = settings as unknown as Say;
   const nl = numberLocale(locale);
   const price = (amount: number) => formatPlanPrice(amount, currency, nl);
+  // The free template and the latest guides, in this language when written, else English.
+  const ownGuides = listGuides(locale);
+  const guidesLocale = ownGuides.length ? undefined : "en";
+  const latest = (ownGuides.length ? ownGuides : listGuides("en")).slice(0, 3);
+  const magnetResource = getResource(locale, FEATURED_RESOURCE);
+  const magnet = magnetResource ? { resource: magnetResource, locale: undefined } : getResource("en", FEATURED_RESOURCE) ? { resource: getResource("en", FEATURED_RESOURCE)!, locale: "en" } : null;
 
   const steps: Array<{ n: string; key: string; phone: ReactNode; card: ReactNode; dark?: boolean }> = [
     { n: "01", key: "step1", phone: <BookingPhoneMock />, card: <PassportCard /> },
@@ -352,6 +357,59 @@ export default async function SiteHomePage() {
           </div>
         </Container>
       </section>
+
+      {/* 11. Free for rental businesses: the free template and the latest guides */}
+      {magnet || latest.length ? (
+        <section aria-labelledby="free-title" className={`${s.mist} ${s.section}`}>
+          <Container>
+            <div className={`${s.head} ${s.headWide}`}>
+              <Eyebrow>{m("homeFreeEyebrow")}</Eyebrow>
+              <h2 className={s.h2} id="free-title">
+                {m("homeFreeTitle")}
+              </h2>
+            </div>
+            <div className={c.free}>
+              {magnet ? (
+                <div className={c.freeMagnet}>
+                  <p className={`${c.tag} ${c.tagOnDark}`}>{m("leadEyebrow")}</p>
+                  <p className={c.leadCardTitle}>{magnet.resource.title}</p>
+                  <p className={c.leadCardBody}>{magnet.resource.description}</p>
+                  <div className={c.btnRow}>
+                    <SiteLink className={`${s.btn} ${s.btnLight}`} href={`/resources/${magnet.resource.slug}`} locale={magnet.locale}>
+                      {m("resourceOpen")} <Arrow />
+                    </SiteLink>
+                  </div>
+                </div>
+              ) : null}
+              {latest.length ? (
+                <div>
+                  <p className={c.listLabel}>{m("homeFreeGuides")}</p>
+                  <ul className={c.freeList}>
+                    {latest.map((guide) => (
+                      <li className={c.freeItem} key={guide.slug}>
+                        <div className="min-w-0">
+                          <h3>
+                            <SiteLink href={`/guides/${guide.slug}`} locale={guidesLocale}>
+                              {guide.title}
+                            </SiteLink>
+                          </h3>
+                          <p>
+                            {m(CATEGORY_KEY[guide.category])} · {m("readTime", { minutes: guide.readingMinutes })}
+                          </p>
+                        </div>
+                        <Arrow />
+                      </li>
+                    ))}
+                  </ul>
+                  <SiteLink className={`${s.link} mt-4`} href={SITE_LINKS.guides}>
+                    {m("guidesSeeAll")} <Arrow />
+                  </SiteLink>
+                </div>
+              ) : null}
+            </div>
+          </Container>
+        </section>
+      ) : null}
 
       <FinalCta />
     </>

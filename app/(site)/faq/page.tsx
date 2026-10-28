@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { siteMetadata } from "@/lib/site/seo";
 import { supportedLocaleCodes } from "@/lib/i18n/locales";
 import { TRIAL_DAYS } from "@/lib/plans";
 import { FinalCta } from "../_components/final-cta";
@@ -22,15 +23,8 @@ const VALUES: Record<number, Record<string, number>> = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  const m = await getTranslations("marketing");
-  const title = m("metaFaqTitle");
-  const description = m("metaFaqDescription");
-  return {
-    title,
-    description,
-    alternates: { canonical: "/faq" },
-    openGraph: { type: "website", url: "/faq", siteName: "RouteHQ", title: `${title} | RouteHQ`, description }
-  };
+  const [m, locale] = await Promise.all([getTranslations("marketing"), getLocale()]);
+  return siteMetadata({ path: "/faq", locale, title: m("metaFaqTitle"), description: m("metaFaqDescription") });
 }
 
 export default async function FaqPage() {

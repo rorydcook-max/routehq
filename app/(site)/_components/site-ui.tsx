@@ -1,20 +1,30 @@
 import type { Route } from "next";
 import Link from "next/link";
 import type { MouseEventHandler, ReactNode } from "react";
+import { useLocale } from "next-intl";
+import { localizeSitePath } from "@/lib/site/locale-path";
 import s from "../site.module.css";
 
 /** Website addresses as typed routes (the marketing pages are new, so their route types may not be generated yet). */
 export const r = (path: string) => path as Route;
 
 /** Website pages that open each other in place. */
-const IN_SITE = new Set(["/pricing", "/faq", "/contact"]);
+const IN_SITE = new Set(["/pricing", "/faq", "/contact", "/guides", "/resources"]);
+const inSite = (path: string) => IN_SITE.has(path) || path.startsWith("/guides/") || path.startsWith("/resources/");
 
 /**
  * A link from the website. Between website pages it opens in place; anywhere else (the app's sign-in, the directory,
  * "/" which is the dashboard once signed in) it is a normal page load, because the root layout, which holds the app's
  * words, is not drawn again on an in-place change and the website sends none.
+ * Website addresses keep the page's language: on /th/pricing, "/faq" becomes "/th/faq" (lib/site/locale-path.ts).
  */
-export function SiteLink({
+export function SiteLink({ locale: forced, ...props }: Omit<Parameters<typeof SiteAnchor>[0], "inPlace"> & { /** Link to this language's address instead of the page's (an English guide shown on a Thai page). */ locale?: string }) {
+  const locale = useLocale();
+  return <SiteAnchor {...props} href={localizeSitePath(props.href, forced ?? locale)} inPlace={inSite(props.href.split(/[?#]/)[0])} />;
+}
+
+function SiteAnchor({
+  inPlace,
   href,
   className,
   children,
@@ -26,8 +36,10 @@ export function SiteLink({
   children: ReactNode;
   onClick?: MouseEventHandler<HTMLAnchorElement>;
   "aria-label"?: string;
+  "aria-current"?: "page";
+  inPlace?: boolean;
 }) {
-  if (IN_SITE.has(href.split(/[?#]/)[0])) {
+  if (inPlace) {
     return (
       <Link className={className} href={r(href)} onClick={onClick} {...aria}>
         {children}
@@ -47,6 +59,8 @@ export const SITE_LINKS = {
   pricing: "/pricing",
   faq: "/faq",
   contact: "/contact",
+  guides: "/guides",
+  resources: "/resources",
   // No link to the renters' booking site (/rent): it is moving to its own consumer brand, and this site speaks to rental businesses.
   signIn: "/login",
   signUp: "/signup"

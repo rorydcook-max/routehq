@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { siteMetadata } from "@/lib/site/seo";
 import { supportContacts } from "@/lib/support";
 import { FinalCta } from "../_components/final-cta";
 import { Arrow, Container, Eyebrow, SITE_LINKS, SiteLink } from "../_components/site-ui";
@@ -34,15 +35,8 @@ const FORM_KEYS = [
 ];
 
 export async function generateMetadata(): Promise<Metadata> {
-  const m = await getTranslations("marketing");
-  const title = m("metaContactTitle");
-  const description = m("metaContactDescription");
-  return {
-    title,
-    description,
-    alternates: { canonical: "/contact" },
-    openGraph: { type: "website", url: "/contact", siteName: "RouteHQ", title: `${title} | RouteHQ`, description }
-  };
+  const [m, locale] = await Promise.all([getTranslations("marketing"), getLocale()]);
+  return siteMetadata({ path: "/contact", locale, title: m("metaContactTitle"), description: m("metaContactDescription") });
 }
 
 export default async function ContactPage() {

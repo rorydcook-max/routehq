@@ -11,6 +11,8 @@ export async function SiteHeader() {
   const items = [
     { href: SITE_LINKS.features, label: m("navFeatures") },
     { href: SITE_LINKS.pricing, label: m("navPricing") },
+    { href: SITE_LINKS.guides, label: m("navGuides") },
+    { href: SITE_LINKS.resources, label: m("navResources") },
     { href: SITE_LINKS.faq, label: m("navFaq") },
     { href: SITE_LINKS.contact, label: m("navContact") }
   ];

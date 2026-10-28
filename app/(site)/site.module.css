@@ -319,7 +319,8 @@
 .headerActions {
   display: none;
 }
-@media (min-width: 900px) {
+/* Six links in the bar (Guides and Free resources joined it, 28 Oct): the full bar from 1180px, the menu below. */
+@media (min-width: 1180px) {
   .headerRow {
     grid-template-columns: 1fr auto 1fr;
   }
@@ -356,7 +357,7 @@
   justify-self: end;
   color: #ffffff;
 }
-@media (min-width: 900px) {
+@media (min-width: 1180px) {
   .menuButton {
     display: none;
   }
@@ -1126,7 +1127,7 @@
 }
 @media (min-width: 900px) {
   .footerGrid {
-    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
   }
   .footerBrand {
     grid-column: span 1;

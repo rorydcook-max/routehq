@@ -20,7 +20,7 @@ const DOWNLOADS = join(process.cwd(), "downloads");
 
 export const GUIDE_CATEGORIES = ["starting", "legal", "operations", "money", "marketing"] as const;
 export type GuideCategory = (typeof GUIDE_CATEGORIES)[number];
-export const DOWNLOAD_FORMATS = ["docx", "pdf"] as const;
+export const DOWNLOAD_FORMATS = ["docx", "pdf", "xlsx"] as const;
 export type DownloadFormat = (typeof DOWNLOAD_FORMATS)[number];
 
 export type FaqItem = { q: string; a: string };
@@ -297,7 +297,7 @@ export function resourceFiles(slug: string): ResourceFile[] {
   if (!SLUG.test(slug)) return [];
   const files: ResourceFile[] = [];
   for (const name of listDir(join(DOWNLOADS, slug))) {
-    const match = name.match(/^([A-Za-z]{2,3}(?:-[A-Za-z]{2})?)\.(docx|pdf)$/);
+    const match = name.match(/^([A-Za-z]{2,3}(?:-[A-Za-z]{2})?)\.(docx|pdf|xlsx)$/);
     if (!match || !locales.has(match[1])) continue;
     try {
       const bytes = statSync(join(DOWNLOADS, slug, name)).size;

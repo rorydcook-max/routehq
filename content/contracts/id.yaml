@@ -1,0 +1,529 @@
+# Lokalfleet vehicle rental agreement — INDONESIA (English + Bahasa Indonesia; the Indonesian version prevails).
+# Structure, ids, field keys and conditions follow master.en.yaml. Country additions end in "_cc".
+# Prepared from public sources only (listed under `sources`); not reviewed by an Indonesian advocate.
+
+country: ID
+locale: id
+language: Indonesian
+currency: IDR
+prevailing_language: { en: Indonesian, local: bahasa Indonesia }
+local_language: { en: Indonesian, local: bahasa Indonesia }
+country_name: { en: Indonesia, local: Indonesia }
+currency_name: { en: "Indonesian rupiah (IDR)", local: "rupiah (Rp)" }
+jurisdiction: { en: the Republic of Indonesia, local: Negara Republik Indonesia }
+court_place: { en: "the District Court (Pengadilan Negeri) for the area where the vehicle was rented", local: Pengadilan Negeri di wilayah tempat kendaraan disewa }
+words:
+  per_day: { en: per day, local: per hari }
+  per_week: { en: per week, local: per minggu }
+  per_month: { en: per month, local: per bulan }
+  day: { en: day, local: hari }
+  month: { en: month, local: bulan }
+  days: { en: days, local: hari }
+  business_days: { en: business days after return, local: hari kerja setelah pengembalian }
+  car: { en: Car, local: Mobil }
+  motorbike: { en: Motorbike / scooter, local: Sepeda motor / skuter }
+  ins_compulsory: { en: "Compulsory insurance only (Jasa Raharja)", local: "Hanya asuransi wajib (Jasa Raharja)" }
+  ins_third_party: { en: "Compulsory + third-party liability insurance (TJH)", local: "Asuransi wajib + asuransi tanggung jawab hukum pihak ketiga (TJH)" }
+  ins_comprehensive: { en: "Comprehensive (all-risk) insurance", local: "Asuransi komprehensif (all risk / gabungan)" }
+  free: { en: Free, local: Gratis }
+  payment_default: { en: "Cash, bank transfer or QRIS", local: "Tunai, transfer bank atau QRIS" }
+  blank_hint: { en: "(fill in)", local: "(diisi)" }
+
+sources:
+  - url: https://peraturan.bpk.go.id/Details/38661/uu-no-24-tahun-2009
+    supports: "Law 24/2009 art. 31: agreements involving Indonesian parties must be in Indonesian; with a foreign party they are also written in that party's language and/or English (general.4)."
+  - url: https://setkab.go.id/ada-perpres-no-63-2019-komunikasi-di-kantor-pemerintah-dan-swasta-wajib-gunakan-bahasa-indonesia/
+    supports: "Presidential Regulation 63/2019 on the use of Indonesian; art. 26 repeats the contract-language rule and art. 26(4) lets the parties agree which language governs if versions differ (general.4)."
+  - url: https://www.hukumonline.com/klinik/a/wajibkah-membuat-kontrak-dalam-dua-bahasa-jika-melibatkan-pihak-asing--lt4dd480ffe6cb1/
+    supports: "Explains UU 24/2009 art. 31 and Perpres 63/2019 art. 26(1)-(4); bilingual contracts allowed; risk of a contract not in Indonesian being challenged as void; advises agreeing a prevailing language."
+  - url: https://peraturan.bpk.go.id/Details/38654/uu-no-22-tahun-2009
+    supports: "Road Traffic Law 22/2009 (LLAJ): art. 57 (SNI helmet as motorcycle equipment), 77 (driving licence required), 106(5)-(9) (carry STNK and SIM, seatbelts, SNI helmets for rider and passenger, max one passenger on a motorcycle without sidecar), penalties in arts. 281, 288, 289, 291 (renter.2, vehicle.2, vehicle.3_cc, use.2, use.3)."
+  - url: https://www.hukumonline.com/klinik/a/undang-undang-yang-mewajibkan-penggunaan-helm-standar-cl4957/
+    supports: "Quotes LLAJ art. 57(2), 106(8) and 291(1)-(2): rider and passenger must wear SNI helmets; rider is liable for a passenger without a helmet (use.2)."
+  - url: https://www.hukumonline.com/klinik/a/aturan-sabuk-keselamatan-untuk-pengemudi-dan-penumpang-mobil-lt5d3a9d9aa4ce4
+    supports: "LLAJ art. 106(6) and 289: seatbelt duty applies to the driver and front passenger; no statutory child-seat rule identified (use.3)."
+  - url: https://peraturan.bpk.go.id/Download/210908/Perpol%20Nomor%205%20Tahun%202021.pdf
+    supports: "Police Regulation 5/2021 on driving licences: SIM classes (A for cars; C, CI, CII for motorcycles by engine size) and requirements for foreigners to obtain an Indonesian SIM (passport plus KITAS/KITAP or other permit) (renter.2)."
+  - url: https://peraturan.go.id/files/Peraturan+POLRI-no-2-tahun-2023.pdf
+    supports: "Police Regulation 2/2023 amending Perpol 5/2021: international driving permits; a foreign-issued permit is valid in Indonesia under an international convention or agreement (renter.2)."
+  - url: https://www.hukumonline.com/klinik/a/dasar-hukum-sim-internasional-lt592e221b26fc2/
+    supports: "LLAJ art. 85(4) and Perpol 2/2023 art. 3(12)-(13): foreign licences/IDPs recognised only under international agreements; notes Indonesia's ratification of the 1968 Vienna Convention is not confirmed (uncertainty flagged in renter.2 wording)."
+  - url: https://www.hukumonline.com/berita/a/mengenali-kategori-sim-c-terbaru-lt60b4a251a5de4/
+    supports: "SIM C split into C, CI and CII by motorcycle engine capacity under Perpol 5/2021 (renter.2)."
+  - url: https://www.smartraveller.gov.au/destinations/asia/indonesia
+    supports: "Australian Government advice: to drive in Indonesia you need an Indonesian licence or an IDP; check the licence covers motorbikes; always wear a helmet; do not hand over your passport (renter.2, deposit.4)."
+  - url: https://bali.antaranews.com/berita/373757/bali-luncurkan-edaran-tatanan-baru-bagi-turis-asing
+    supports: "Bali Provincial Circular SE 7/2025 for foreign tourists (March 2025): carry an international or national SIM, obey traffic rules, wear helmets, do not exceed vehicle capacity, use roadworthy four-wheel vehicles from licensed rental businesses, transact in rupiah/QRIS."
+  - url: https://www.antaranews.com/berita/3530361/kadishub-bali-s
+    supports: "Bali Transport Agency (May 2023): foreigners need the proper licence to rent a motorbike; the Governor's announced motorbike-rental ban for foreign tourists was still under discussion and not in force."
+  - url: https://otomotifnet.gridoto.com/read/233725844/wna-dilarang-sewa-motor-di-bali-hanya-boleh-pakai-mobil-dari-agen-travel
+    supports: "Governor Koster's 12 March 2023 announcement of a planned ban on foreign tourists renting motorbikes in Bali (context for operators; no enacted regulation found)."
+  - url: https://peraturan.bpk.go.id/Details/39140/uu-no-6-tahun-2011
+    supports: "Immigration Law 6/2011 art. 71: every foreigner must show and submit their travel document or stay permit when asked by an immigration officer, so the passport/KITAS should not be held by the Owner (deposit.4)."
+  - url: https://peraturan.bpk.go.id/Details/229798/uu-no-27-tahun-2022
+    supports: "Personal Data Protection Law 27/2022 (UU PDP): lawful bases incl. contract and legal obligation, purpose limitation, security, retention limits, data-subject rights; fully in force from October 2024 (data.1, data.2)."
+  - url: https://www.hukumonline.com/berita/a/melihat-prinsip-dan-dasar-pemrosesan-data-pribadi-lt64a2df2ad70ce/?page=all
+    supports: "Summary of UU PDP processing bases (consent, contract, legal obligation, legitimate interest, etc.), purpose limitation, security and deletion after the retention period (data.1)."
+  - url: https://peraturan.bpk.go.id/Details/45288/uu-no-8-tahun-1999
+    supports: "Consumer Protection Law 8/1999 art. 18: standard clauses that shift the business's liability, refuse refunds of money paid, or bind the consumer to new rules set unilaterally are void; art. 45 consumer dispute routes (termination.1, damage.1, general.3, general.5)."
+  - url: https://www.hukumonline.com/klinik/a/klausula-eksonerasi-lt4d0894211ad0e/
+    supports: "Quotes UU 8/1999 art. 18(1)(a)-(h) and explains that prohibited standard clauses are void by law."
+  - url: https://www.hukumonline.com/klinik/a/wajibkah-mengembalikan-rumah-sewa-seperti-keadaan-semula--lt4f62f72c54fe8/
+    supports: "Civil Code (KUHPerdata) lease rules arts. 1548-1600: art. 1563 (condition at handover, need for a handover description) and art. 1564 (lessee liable for damage caused by their fault or by persons they allow) (damage.1, Annex A)."
+  - url: https://oto.detik.com/berita/d-7508485/swdkllj-dibayar-tiap-tahun-segini-besar-santunan-yang-didapat
+    supports: "SWDKLLJ is a mandatory contribution paid yearly with vehicle tax to Jasa Raharja; benefits under PMK 15 and 16/2017 (death IDR 50m, permanent disability up to IDR 50m, medical up to IDR 20m) for accident victims; not a vehicle-damage cover (vehicle.2, insurance.1)."
+  - url: https://finansial.bisnis.com/read/20230823/215/1687494/jasa-raharja-ungkap-penyebab-santunan-kecelakaan-tidak-dibayar-termasuk-tabrakan-di-lenteng-agung
+    supports: "Jasa Raharja (UU 34/1964 jo. PP 18/1965) does not compensate at-fault drivers in multi-vehicle collisions, single-vehicle accidents, drunk victims or racing (insurance.1)."
+  - url: https://finansial.bisnis.com/read/20230326/215/1640682/sebelum-mudik-kenali-jenis-asuransi-kendaraan-bermotor-comprehensive-dan-tlo
+    supports: "Comprehensive vs Total Loss Only (TLO) motor insurance: TLO pays only if repair costs are at least 75% of the vehicle's value or the vehicle is stolen and not found within 60 days; optional TJH (third-party liability) extension (insurance.3, insurance.7_cc)."
+  - url: https://www.fortuneidn.com/business/5-hal-penting-yang-memudahkan-pengajuan-klaim-asuransi-rental-mobil-00-xkln4-3cf0wj
+    supports: "Rental cars must be insured for commercial (not private) use; the standard PSAKBI policy does not cover embezzlement or fraud; check renter's SIM/KTP and valid STNK (vehicle.2, insurance.5)."
+  - url: https://oto.detik.com/berita/d-5506757/dapat-surat-tilang-elektronik-tapi-kendaraan-bukan-punya-kita-lagi-ini-yang-harus-dilakukan
+    supports: "ETLE camera tickets: the registered owner must confirm the driver or pay within 8 days, otherwise the vehicle registration is blocked from day 9; confirmation online or in person (deposit.3, fines.2, fines.3_cc)."
+  - url: https://www.detik.com/bali/berita/d-6420054/pemilik-rental-motor-di-bali-diminta-rajin-cek-aplikasi-tilang-elektronik/amp
+    supports: "Bali police to rental owners: ETLE data goes to the registered owner, unpaid tickets block the STNK so vehicle tax cannot be paid; owners should check the ETLE app at each return and pass tickets to the renter (fines.3_cc)."
+  - url: https://kabar24.bisnis.com/read/20260313/243/1960254/peraturan-dan-pantangan-saat-nyepi-di-bali-beserta-sanksi-bagi-pelanggarnya
+    supports: "Nyepi (Day of Silence) rules in Bali, including no travel on roads during Nyepi and sanctions (use.8_cc)."
+  - url: https://www.goodnewsfromindonesia.id/2025/03/03/daftar-nomor-telepon-gawat-darurat-di-indonesia-dan-fungsi-nomor-112
+    supports: "Indonesian emergency numbers: 112 general emergency, 110 police, 118/119 ambulance (accident.1)."
+
+title:
+  en: Vehicle Rental Agreement
+  local: Perjanjian Sewa Kendaraan
+subtitle:
+  en: "Car, motorbike and scooter rental. {{country_name}}"
+  local: "Sewa mobil, sepeda motor dan skuter. {{country_name}}"
+footer:
+  en: "Vehicle rental agreement · {{business_name}}"
+  local: "Perjanjian sewa kendaraan · {{business_name}}"
+page_words: { page: "Page / Halaman", of: "of / dari" }
+
+sections:
+
+  - id: parties
+    title: { en: "1. The parties", local: "1. Para pihak" }
+    fields:
+      - { key: business_name, en: "Owner (rental business)", local: "Pemilik (usaha penyewaan)" }
+      - { key: business_reg_no, en: "Business ID (NIB) / tax ID (NPWP)", local: "Nomor Induk Berusaha (NIB) / NPWP" }
+      - { key: business_address, en: "Business address", local: "Alamat usaha" }
+      - { key: business_phone, en: "Phone / WhatsApp", local: "Telepon / WhatsApp" }
+      - { key: business_email, en: "Email", local: "Email" }
+    clauses:
+      - id: parties.1
+        en: "This agreement is made on {{renter_contract_date}} between the rental business named above (the “Owner”) and the person named in section 2 (the “Renter”). Where there is more than one renter or driver, each of them is jointly responsible for every obligation in this agreement."
+        local: "Perjanjian ini dibuat pada tanggal {{renter_contract_date}} antara usaha penyewaan yang disebut di atas (“Pemilik”) dan orang yang disebut dalam Pasal 2 (“Penyewa”). Apabila terdapat lebih dari satu penyewa atau pengemudi, masing-masing bertanggung jawab secara tanggung renteng atas setiap kewajiban dalam perjanjian ini."
+
+  - id: renter
+    title: { en: "2. The Renter and drivers", local: "2. Penyewa dan pengemudi" }
+    fields:
+      - { key: renter_name, en: "Full name (as on passport or ID)", local: "Nama lengkap (sesuai paspor atau KTP)" }
+      - { key: renter_nationality, en: "Nationality", local: "Kewarganegaraan" }
+      - { key: renter_dob, en: "Date of birth", local: "Tanggal lahir" }
+      - { key: renter_id_no, en: "Passport, KTP or KITAS/KITAP number", local: "Nomor paspor, KTP atau KITAS/KITAP" }
+      - { key: renter_home_address, en: "Home address", local: "Alamat tempat tinggal" }
+      - { key: renter_local_address, en: "Local address during the rental (hotel / villa / guesthouse)", local: "Alamat selama masa sewa (hotel / vila / penginapan)" }
+      - { key: renter_phone, en: "Phone / WhatsApp", local: "Telepon / WhatsApp" }
+      - { key: renter_email, en: "Email", local: "Email" }
+      - { key: renter_licence, en: "Driving licence number, class (e.g. SIM A / SIM C) and issuing country", local: "Nomor SIM, golongan (misalnya SIM A / SIM C) dan negara penerbit" }
+      - { key: renter_licence_expiry, en: "Licence expiry date", local: "Tanggal berakhir masa berlaku SIM" }
+      - { key: renter_idp, en: "International Driving Permit (number and categories / not required)", local: "SIM internasional / IDP (nomor dan kategori / tidak diperlukan)" }
+      - { key: renter_emergency, en: "Emergency contact (name and phone)", local: "Kontak darurat (nama dan telepon)" }
+      - { key: driver2_details, en: "Additional driver (name, ID, licence), if any", local: "Pengemudi tambahan (nama, identitas, SIM), jika ada" }
+    clauses:
+      - id: renter.1
+        en: "The Renter confirms that the details above are true and complete, and that every person who will drive or ride the vehicle is named here. Only the Renter and any additional driver named above may drive or ride the vehicle."
+        local: "Penyewa menyatakan bahwa data di atas benar dan lengkap, dan bahwa setiap orang yang akan mengemudikan kendaraan tercantum di sini. Hanya Penyewa dan pengemudi tambahan yang tercantum di atas yang boleh mengemudikan kendaraan."
+      - id: renter.2
+        en: "Every driver must hold a driving licence that is valid in Indonesia for this class of vehicle and carry it at all times while driving: an Indonesian SIM A for cars or SIM C (C, CI or CII, depending on engine size) for motorbikes, or a valid foreign licence for the same class together with an International Driving Permit (IDP) covering that class (category A for motorbikes, B for cars) or another permit recognised in Indonesia. A car licence does not allow a person to ride a motorbike. The Owner may refuse to hand over the vehicle if these documents cannot be shown. Driving without the right licence is a traffic offence and removes insurance protection (section 11)."
+        local: "Setiap pengemudi wajib memiliki surat izin mengemudi yang berlaku di Indonesia untuk golongan kendaraan ini dan membawanya setiap kali mengemudi, yaitu: SIM A Indonesia untuk mobil atau SIM C (C, CI atau CII sesuai kapasitas mesin) untuk sepeda motor; atau SIM asing yang masih berlaku untuk golongan yang sama disertai International Driving Permit (IDP/SIM internasional) yang mencakup golongan tersebut (kategori A untuk sepeda motor, B untuk mobil) atau izin lain yang diakui di Indonesia. SIM mobil tidak berlaku untuk mengendarai sepeda motor. Pemilik berhak menolak menyerahkan kendaraan apabila dokumen tersebut tidak dapat ditunjukkan. Mengemudi tanpa SIM yang sesuai merupakan pelanggaran lalu lintas dan menghilangkan perlindungan asuransi (Pasal 11)."
+        country: true
+
+  - id: vehicle
+    title: { en: "3. The vehicle", local: "3. Kendaraan" }
+    fields:
+      - { key: vehicle_type_label, en: "Type", local: "Jenis" }
+      - { key: vehicle_make_model, en: "Make and model", local: "Merek dan tipe" }
+      - { key: vehicle_year, en: "Year", local: "Tahun pembuatan" }
+      - { key: vehicle_plate, en: "Registration (plate) number", local: "Nomor polisi (pelat nomor)" }
+      - { key: vehicle_colour, en: "Colour", local: "Warna" }
+      - { key: renter_vin, en: "Chassis / VIN number", local: "Nomor rangka / VIN" }
+      - { key: out_odometer, en: "Odometer at handover", local: "Odometer saat serah terima" }
+      - { key: out_fuel, en: "Fuel / battery level at handover", local: "Level bahan bakar / baterai saat serah terima" }
+      - { key: renter_accessories, en: "Accessories handed over (helmets, keys, STNK, child seat, phone holder, etc.)", local: "Perlengkapan yang diserahkan (helm, kunci, STNK, kursi anak, dudukan ponsel, dll.)" }
+      - { key: renter_stnk_valid, en: "STNK and vehicle tax valid until", local: "STNK dan pajak kendaraan berlaku sampai" }
+    clauses:
+      - id: vehicle.1
+        en: "The Owner rents the vehicle described above, with the accessories listed, to the Renter for the rental period and on the terms of this agreement. The vehicle remains the property of the Owner at all times."
+        local: "Pemilik menyewakan kendaraan yang diuraikan di atas, beserta perlengkapan yang tercantum, kepada Penyewa untuk masa sewa dan dengan syarat-syarat perjanjian ini. Kendaraan tetap menjadi milik Pemilik setiap saat."
+      - id: vehicle.2
+        en: "The Owner confirms that the vehicle is registered in Indonesia with a valid STNK (vehicle registration certificate); that its annual motor vehicle tax (PKB), together with the compulsory Jasa Raharja accident contribution (SWDKLLJ), has been paid and stays valid for the whole rental period; that any voluntary insurance covers use as a rental vehicle; and that the vehicle is handed over roadworthy, with the equipment the law requires (including SNI-standard helmets for motorbikes). The BPKB (ownership book) stays with the Owner."
+        local: "Pemilik menyatakan bahwa kendaraan terdaftar di Indonesia dengan STNK yang berlaku; bahwa Pajak Kendaraan Bermotor (PKB) tahunan beserta Sumbangan Wajib Dana Kecelakaan Lalu Lintas Jalan (SWDKLLJ) Jasa Raharja telah dibayar dan tetap berlaku selama seluruh masa sewa; bahwa asuransi sukarela (jika ada) mencakup penggunaan sebagai kendaraan sewa; dan bahwa kendaraan diserahkan dalam keadaan laik jalan, dengan perlengkapan yang diwajibkan undang-undang (termasuk helm berstandar SNI untuk sepeda motor). BPKB tetap disimpan oleh Pemilik."
+        country: true
+      - id: vehicle.3_cc
+        en: "The original STNK is handed over with the vehicle and must be carried whenever the vehicle is used, because the police may ask to see it together with the driving licence. The Renter must not leave it in an unattended vehicle, must keep it safe and must return it with the vehicle. A lost STNK or number plate is charged under section 12."
+        local: "STNK asli diserahkan bersama kendaraan dan wajib dibawa setiap kali kendaraan digunakan, karena polisi dapat memintanya bersama SIM. Penyewa tidak boleh meninggalkannya di dalam kendaraan yang ditinggal, wajib menyimpannya dengan aman dan mengembalikannya bersama kendaraan. STNK atau pelat nomor yang hilang dikenakan biaya sesuai Pasal 12."
+
+  - id: period
+    title: { en: "4. Rental period, pickup and return", local: "4. Masa sewa, pengambilan dan pengembalian" }
+    fields:
+      - { key: renter_start, en: "Start (date and time)", local: "Mulai (tanggal dan jam)" }
+      - { key: renter_end, en: "End (date and time)", local: "Berakhir (tanggal dan jam)" }
+      - { key: renter_pickup_place, en: "Pickup / delivery place", local: "Tempat pengambilan / pengantaran" }
+      - { key: renter_return_place, en: "Return / collection place", local: "Tempat pengembalian / penjemputan" }
+    clauses:
+      - id: period.1
+        en: "The Renter must return the vehicle at the agreed place, date and time. An extension is valid only when the Owner agrees to it in writing (a message is enough) and the extra rent is paid."
+        local: "Penyewa wajib mengembalikan kendaraan di tempat, tanggal dan jam yang disepakati. Perpanjangan sewa hanya berlaku apabila disetujui Pemilik secara tertulis (pesan singkat sudah cukup) dan biaya sewa tambahan telah dibayar."
+      - id: period.2
+        if: late_hour_fee
+        en: "Late return: after a grace period of {{late_grace_minutes}} minutes, each started hour costs {{currency}} {{late_hour_fee}}. A return more than {{late_full_day_hours}} hours late is charged as an extra full day at the daily rate."
+        local: "Keterlambatan pengembalian: setelah masa toleransi {{late_grace_minutes}} menit, setiap jam yang dimulai dikenakan biaya {{currency}} {{late_hour_fee}}. Keterlambatan lebih dari {{late_full_day_hours}} jam dikenakan biaya satu hari penuh tambahan sesuai tarif harian."
+      - id: period.3
+        unless: late_hour_fee
+        en: "Late return: a return more than one hour late may be charged as an extra day at the daily rate."
+        local: "Keterlambatan pengembalian: keterlambatan lebih dari satu jam dapat dikenakan biaya satu hari tambahan sesuai tarif harian."
+      - id: period.4
+        en: "If the vehicle is not returned and the Renter cannot be reached within 24 hours of the end time, the Owner may treat the vehicle as stolen or embezzled, report it to the police and recover it, at the Renter's cost."
+        local: "Apabila kendaraan tidak dikembalikan dan Penyewa tidak dapat dihubungi dalam waktu 24 jam setelah waktu berakhirnya sewa, Pemilik dapat menganggap kendaraan dicuri atau digelapkan, melaporkannya kepada polisi dan mengambil kembali kendaraan tersebut atas biaya Penyewa."
+
+  - id: charges
+    title: { en: "5. Rent and payment", local: "5. Harga sewa dan pembayaran" }
+    fields:
+      - { key: rate_text, en: "Rental rate", local: "Tarif sewa" }
+      - { key: renter_total, en: "Total rent for this booking", local: "Total harga sewa untuk pemesanan ini" }
+      - { key: delivery_fee_text, en: "Delivery / collection fee", local: "Biaya pengantaran / penjemputan" }
+      - { key: payment_methods, en: "Payment methods accepted", local: "Metode pembayaran yang diterima" }
+    clauses:
+      - id: charges.1
+        en: "The Renter pays the rent stated above in advance, unless the Owner agrees otherwise in writing. Prices are in {{currency_name}}, and payments are made in rupiah."
+        local: "Penyewa membayar harga sewa di atas di muka, kecuali Pemilik menyetujui lain secara tertulis. Harga dinyatakan dalam {{currency_name}} dan pembayaran dilakukan dalam rupiah."
+      - id: charges.2
+        when: { rate_period: month }
+        en: "Monthly rentals: rent is paid monthly in advance on the same day each month. A payment more than 3 days late allows the Owner to end the rental and collect the vehicle (section 15)."
+        local: "Sewa bulanan: harga sewa dibayar setiap bulan di muka pada tanggal yang sama setiap bulan. Keterlambatan pembayaran lebih dari 3 hari memberi hak kepada Pemilik untuk mengakhiri sewa dan mengambil kendaraan (Pasal 15)."
+      - id: charges.3
+        en: "Extras (child seats, delivery, additional drivers, phone holders, insurance upgrades and similar) cost what is written in this agreement or what the Owner confirmed in writing before the rental."
+        local: "Biaya tambahan (kursi anak, pengantaran, pengemudi tambahan, dudukan ponsel, peningkatan asuransi dan sejenisnya) sesuai dengan yang tertulis dalam perjanjian ini atau yang dikonfirmasi Pemilik secara tertulis sebelum masa sewa."
+
+  - id: deposit
+    title: { en: "6. Security deposit", local: "6. Uang jaminan (deposit)" }
+    fields:
+      - { key: deposit_text, en: "Deposit", local: "Uang jaminan" }
+      - { key: renter_deposit_method, en: "Paid by (cash / transfer / card hold)", local: "Dibayar dengan (tunai / transfer / blokir kartu)" }
+      - { key: deposit_return_text, en: "Returned within", local: "Dikembalikan dalam waktu" }
+    clauses:
+      - id: deposit.1
+        en: "The deposit secures the Renter's obligations: unpaid rent, damage up to the amount the Renter is liable for, fuel, mileage, cleaning, late return, lost keys or accessories, traffic fines and any other amount owed under this agreement."
+        local: "Uang jaminan menjamin kewajiban Penyewa: sewa yang belum dibayar, kerusakan sampai jumlah yang menjadi tanggung jawab Penyewa, bahan bakar, jarak tempuh, pembersihan, keterlambatan pengembalian, kunci atau perlengkapan yang hilang, denda lalu lintas dan jumlah lain yang terutang berdasarkan perjanjian ini."
+      - id: deposit.2
+        en: "The Owner returns the deposit, less any amounts properly deducted, after the vehicle has been returned and checked. The Owner gives the Renter a written list of any deduction with photos, receipts or quotes. If the amounts owed are more than the deposit, the Renter pays the difference within 7 days of being told."
+        local: "Pemilik mengembalikan uang jaminan, dikurangi jumlah yang dipotong secara sah, setelah kendaraan dikembalikan dan diperiksa. Pemilik memberikan kepada Penyewa daftar tertulis setiap potongan beserta foto, kuitansi atau penawaran harga. Apabila jumlah yang terutang melebihi uang jaminan, Penyewa membayar selisihnya dalam waktu 7 hari sejak diberi tahu."
+      - id: deposit.3
+        en: "Traffic fines often arrive after a rental ends, especially camera tickets (ETLE) sent to the vehicle's registered owner. The Owner may keep a reasonable part of the deposit, no more than the expected fines and handling fees, for up to 30 days to cover fines the Owner has reason to expect, and must return it promptly if none arrive or once they are settled."
+        local: "Denda lalu lintas sering datang setelah masa sewa berakhir, terutama tilang elektronik (ETLE) yang dikirim kepada pemilik kendaraan yang terdaftar. Pemilik dapat menahan sebagian uang jaminan secara wajar, tidak lebih dari perkiraan denda dan biaya administrasinya, paling lama 30 hari untuk menutup denda yang patut diduga akan datang, dan wajib segera mengembalikannya apabila tidak ada denda atau setelah denda diselesaikan."
+        country: true
+      - id: deposit.4
+        en: "The Owner will not keep the Renter's original passport, KTP (identity card), KITAS/KITAP or driving licence as a deposit. Foreign visitors must be able to show their passport or stay permit to officials when asked. The Owner may take a copy or photo of these documents to identify the Renter (section 17)."
+        local: "Pemilik tidak akan menahan paspor asli, KTP, KITAS/KITAP atau SIM milik Penyewa sebagai jaminan. Warga negara asing wajib dapat menunjukkan paspor atau izin tinggalnya kepada petugas apabila diminta. Pemilik dapat membuat salinan atau foto dokumen tersebut untuk mengidentifikasi Penyewa (Pasal 17)."
+        country: true
+
+  - id: cancellation
+    title: { en: "7. Cancellation and early return", local: "7. Pembatalan dan pengembalian lebih awal" }
+    clauses:
+      - id: cancellation.1
+        if: cancel_free_hours
+        en: "The Renter may cancel free of charge up to {{cancel_free_hours}} hours before the start time. A later cancellation costs {{cancel_fee_percent}}% of the rent for the booked period (or of the first month on a monthly rental). If the Renter does not arrive at the start time and does not tell the Owner (a no-show), the Owner may keep the full amount paid for the first {{no_show_days}} day(s) and release the vehicle."
+        local: "Penyewa dapat membatalkan tanpa biaya paling lambat {{cancel_free_hours}} jam sebelum waktu mulai. Pembatalan setelah itu dikenakan biaya {{cancel_fee_percent}}% dari harga sewa untuk masa yang dipesan (atau dari bulan pertama untuk sewa bulanan). Apabila Penyewa tidak datang pada waktu mulai dan tidak memberi tahu Pemilik (tidak hadir), Pemilik dapat menahan seluruh pembayaran untuk {{no_show_days}} hari pertama dan menyewakan kendaraan kepada pihak lain."
+      - id: cancellation.2
+        unless: cancel_free_hours
+        en: "Cancellation by the Renter before the start time: the Owner keeps any booking payment that this agreement or the booking confirmation says is non-refundable, and refunds the rest."
+        local: "Pembatalan oleh Penyewa sebelum waktu mulai: Pemilik menahan pembayaran pemesanan yang menurut perjanjian ini atau konfirmasi pemesanan tidak dapat dikembalikan, dan mengembalikan sisanya."
+      - id: cancellation.3
+        when: { early_return: none }
+        en: "Early return: rent for the booked period is not refunded if the Renter returns the vehicle early."
+        local: "Pengembalian lebih awal: harga sewa untuk masa yang dipesan tidak dikembalikan apabila Penyewa mengembalikan kendaraan lebih awal."
+      - id: cancellation.4
+        when: { early_return: prorata }
+        en: "Early return: the Owner refunds the rent for the full unused days, less an early-return fee of {{currency}} {{early_return_fee}}. Long-term discounts that no longer apply may be recalculated at the rate for the period actually used."
+        local: "Pengembalian lebih awal: Pemilik mengembalikan harga sewa untuk hari penuh yang tidak digunakan, dikurangi biaya pengembalian lebih awal sebesar {{currency}} {{early_return_fee}}. Potongan harga sewa jangka panjang yang tidak lagi berlaku dapat dihitung ulang sesuai tarif untuk masa yang benar-benar digunakan."
+      - id: cancellation.5
+        when: { rate_period: month }
+        en: "Monthly rentals: either party may end the rental by giving {{notice_days}} days' written notice. Without notice, the Renter pays rent for the notice period."
+        local: "Sewa bulanan: masing-masing pihak dapat mengakhiri sewa dengan pemberitahuan tertulis {{notice_days}} hari sebelumnya. Tanpa pemberitahuan, Penyewa membayar harga sewa untuk masa pemberitahuan tersebut."
+      - id: cancellation.6
+        en: "If the Owner cannot provide the vehicle (or a similar or better one) at the start time, the Renter may cancel and receive a full refund of everything paid."
+        local: "Apabila Pemilik tidak dapat menyediakan kendaraan (atau kendaraan yang setara atau lebih baik) pada waktu mulai, Penyewa dapat membatalkan dan menerima pengembalian penuh atas seluruh pembayaran."
+
+  - id: fuel
+    title: { en: "8. Fuel, charging and mileage", local: "8. Bahan bakar, pengisian daya dan jarak tempuh" }
+    clauses:
+      - id: fuel.1
+        when: { fuel_policy: same }
+        en: "Fuel policy: same-to-same. The vehicle must be returned with at least the fuel (or battery) level it had at handover."
+        local: "Ketentuan bahan bakar: sama dengan saat serah terima. Kendaraan wajib dikembalikan dengan level bahan bakar (atau baterai) paling sedikit sama dengan saat serah terima."
+      - id: fuel.2
+        when: { fuel_policy: full }
+        en: "Fuel policy: full-to-full. The vehicle is handed over with a full tank and must be returned full."
+        local: "Ketentuan bahan bakar: penuh ke penuh. Kendaraan diserahkan dengan tangki penuh dan wajib dikembalikan dalam keadaan penuh."
+      - id: fuel.3
+        en: "Missing fuel is charged at the local pump price plus a refuelling service fee of {{currency}} {{fuel_service_fee}}. Using the wrong fuel is the Renter's responsibility, including towing and repair."
+        local: "Kekurangan bahan bakar dikenakan biaya sesuai harga SPBU setempat ditambah biaya layanan pengisian sebesar {{currency}} {{fuel_service_fee}}. Penggunaan jenis bahan bakar yang salah menjadi tanggung jawab Penyewa, termasuk biaya derek dan perbaikan."
+      - id: fuel.4
+        if: mileage_limit
+        en: "Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometre costs {{currency}} {{excess_km_fee}}."
+        local: "Batas jarak tempuh: {{mileage_limit}} km per {{mileage_period_label}}. Setiap kilometer tambahan dikenakan biaya {{currency}} {{excess_km_fee}}."
+      - id: fuel.5
+        unless: mileage_limit
+        en: "Mileage: unlimited, within the permitted area (section 10)."
+        local: "Jarak tempuh: tidak terbatas, di dalam wilayah yang diizinkan (Pasal 10)."
+      - id: fuel.6
+        en: "The Renter must not tamper with the odometer, speed limiter or GPS tracker. Tampering is a serious breach (section 15)."
+        local: "Penyewa dilarang mengubah atau merusak odometer, pembatas kecepatan atau pelacak GPS. Tindakan tersebut merupakan pelanggaran berat (Pasal 15)."
+
+  - id: use
+    title: { en: "9. Safe and lawful use", local: "9. Penggunaan yang aman dan sesuai hukum" }
+    clauses:
+      - id: use.1
+        en: "The Renter must drive or ride carefully, obey all traffic laws, and keep the vehicle locked with the keys removed whenever it is left. Keys must never be left in or on the vehicle."
+        local: "Penyewa wajib mengemudi dengan hati-hati, mematuhi semua peraturan lalu lintas, dan selalu mengunci kendaraan serta mencabut kuncinya setiap kali kendaraan ditinggalkan. Kunci tidak boleh ditinggalkan di dalam atau di atas kendaraan."
+      - id: use.2
+        when: { vehicle_type: [motorbike, ""] }
+        en: "Motorbikes and scooters: as Indonesian traffic law requires, the rider and any passenger must wear a fastened helmet that meets the Indonesian national standard (SNI) at all times. The Owner provides SNI helmets for the rider and one passenger. No more than one passenger, and no passenger who cannot reach the footrests safely."
+        local: "Sepeda motor dan skuter: sesuai ketentuan undang-undang lalu lintas, pengendara dan penumpang wajib selalu mengenakan helm berstandar nasional Indonesia (SNI) dengan tali terkunci. Pemilik menyediakan helm SNI untuk pengendara dan satu penumpang. Penumpang paling banyak satu orang, dan tidak boleh membonceng penumpang yang kakinya tidak dapat mencapai pijakan kaki dengan aman."
+        country: true
+      - id: use.3
+        when: { vehicle_type: [car, ""] }
+        en: "Cars: the driver and front passenger must wear a seatbelt, as the law requires, and every other occupant should wear one where fitted. Children should travel in a suitable child seat or restraint. The number of passengers must not exceed the number of seats."
+        local: "Mobil: pengemudi dan penumpang di samping pengemudi wajib mengenakan sabuk keselamatan sesuai ketentuan undang-undang, dan penumpang lain sebaiknya juga mengenakannya apabila tersedia. Anak-anak sebaiknya menggunakan kursi atau pengaman anak yang sesuai. Jumlah penumpang tidak boleh melebihi jumlah tempat duduk."
+        country: true
+      - id: use.4
+        en: "It is forbidden to: drive under the influence of alcohol or drugs; use a phone while driving except hands-free; race, perform stunts or drive off-road or on beaches (unless the vehicle is meant for it and the Owner agreed); tow or push anything; carry goods for payment, illegal goods or dangerous loads; use the vehicle for ride-hailing, delivery work, driving lessons or to rent it to anyone else; let anyone not named in section 2 drive or ride."
+        local: "Penyewa dilarang: mengemudi di bawah pengaruh alkohol atau narkotika; menggunakan telepon saat mengemudi kecuali dengan perangkat bebas genggam; balapan, melakukan atraksi atau mengemudi di luar jalan atau di pantai (kecuali kendaraan memang diperuntukkan untuk itu dan Pemilik menyetujuinya); menarik atau mendorong apa pun; mengangkut barang dengan bayaran, barang terlarang atau muatan berbahaya; menggunakan kendaraan untuk ojek/taksi daring, jasa pengiriman, latihan mengemudi atau menyewakannya kepada orang lain; membiarkan orang yang tidak tercantum dalam Pasal 2 mengemudikan kendaraan."
+      - id: use.5
+        when: { smoking: no }
+        en: "Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odour removal.{{/if}}"
+        local: "Dilarang merokok dan menggunakan rokok elektrik di dalam kendaraan.{{#if smoking_fee}} Pelanggaran atas larangan ini dikenakan biaya penghilangan bau sebesar {{currency}} {{smoking_fee}}.{{/if}}"
+      - id: use.6
+        when: { pets: no }
+        en: "Pets and animals are not allowed in or on the vehicle, except assistance animals."
+        local: "Hewan peliharaan dan hewan lain tidak boleh dibawa di dalam atau di atas kendaraan, kecuali hewan pendamping bagi penyandang disabilitas."
+      - id: use.7
+        when: { pets: fee }
+        en: "Pets are allowed if they are kept in a carrier or on a seat cover. A pet cleaning fee of {{currency}} {{pet_fee}} applies."
+        local: "Hewan peliharaan boleh dibawa apabila ditempatkan di dalam kandang angkut atau di atas pelapis jok. Dikenakan biaya pembersihan sebesar {{currency}} {{pet_fee}}."
+      - id: use.8_cc
+        en: "In Bali, roads are closed to traffic on Nyepi (the Day of Silence) and may be closed for a short time for ceremonies. The Renter must not use the vehicle on Nyepi except as the authorities allow in an emergency, and must follow the instructions of the police and local village officers (pecalang). Nyepi days within the rental period are charged as normal unless agreed otherwise."
+        local: "Di Bali, jalan ditutup untuk lalu lintas pada Hari Raya Nyepi dan dapat ditutup sementara untuk upacara adat. Penyewa tidak boleh menggunakan kendaraan pada Hari Nyepi kecuali dalam keadaan darurat yang diizinkan pihak berwenang, dan wajib mengikuti arahan polisi dan pecalang. Hari Nyepi dalam masa sewa tetap dikenakan biaya sewa seperti biasa, kecuali disepakati lain."
+
+  - id: area
+    title: { en: "10. Permitted area", local: "10. Wilayah penggunaan" }
+    fields:
+      - { key: area_of_use, en: "The vehicle may be used in", local: "Kendaraan boleh digunakan di" }
+    clauses:
+      - id: area.1
+        en: "The vehicle must stay within the permitted area above. Taking it further, including by ferry to another island (for example from Bali to Java, Lombok or Nusa Penida), needs the Owner's written permission first, and the Renter pays any ferry fees, delays and recovery costs."
+        local: "Kendaraan wajib tetap berada di wilayah penggunaan di atas. Membawanya ke luar wilayah tersebut, termasuk dengan kapal penyeberangan ke pulau lain (misalnya dari Bali ke Jawa, Lombok atau Nusa Penida), memerlukan izin tertulis Pemilik terlebih dahulu, dan Penyewa menanggung biaya penyeberangan, keterlambatan dan biaya pengambilan kembali kendaraan."
+      - id: area.2
+        en: "The vehicle must not leave Indonesia under any circumstances. Insurance does not cover it outside Indonesia or outside the permitted area."
+        local: "Kendaraan tidak boleh dibawa ke luar wilayah Indonesia dalam keadaan apa pun. Asuransi tidak menanggung kendaraan di luar Indonesia atau di luar wilayah penggunaan yang diizinkan."
+        country: true
+      - id: area.3
+        en: "The vehicle may be fitted with a GPS tracker, used only for security, recovery and checking that this agreement is kept."
+        local: "Kendaraan dapat dilengkapi pelacak GPS yang hanya digunakan untuk keamanan, pengambilan kembali kendaraan dan memastikan perjanjian ini dipatuhi."
+
+  - id: insurance
+    title: { en: "11. Insurance", local: "11. Asuransi" }
+    fields:
+      - { key: insurance_text, en: "Insurance on this vehicle", local: "Asuransi kendaraan ini" }
+      - { key: insurance_excess_text, en: "Renter's excess (most the Renter pays per incident, if the rules are kept)", local: "Risiko sendiri Penyewa (jumlah maksimal yang dibayar Penyewa per kejadian, apabila ketentuan dipatuhi)" }
+    clauses:
+      - id: insurance.1
+        en: "Every registered vehicle in Indonesia carries the compulsory Jasa Raharja road accident cover, paid with the annual vehicle tax (SWDKLLJ). It pays fixed benefits to road accident victims for death, permanent disability and medical costs, within legal limits and exclusions (for example, a driver who caused a collision or a single-vehicle accident is usually not covered). It does not cover damage to the rented vehicle, to other vehicles or to property."
+        local: "Setiap kendaraan yang terdaftar di Indonesia dilindungi santunan wajib kecelakaan lalu lintas Jasa Raharja yang dibayar bersama pajak kendaraan tahunan (SWDKLLJ). Santunan ini dibayarkan kepada korban kecelakaan lalu lintas untuk kematian, cacat tetap dan biaya perawatan, dalam batas dan pengecualian yang ditetapkan peraturan (misalnya, pengemudi penyebab tabrakan atau korban kecelakaan tunggal pada umumnya tidak dijamin). Santunan ini tidak menanggung kerusakan kendaraan sewa, kendaraan lain atau harta benda."
+        country: true
+      - id: insurance.2
+        when: { insurance_level: comprehensive }
+        en: "The vehicle also has comprehensive (all-risk) insurance covering damage to and theft of the rented vehicle and, where the policy includes it, third-party liability. Per incident, the Renter pays no more than the excess shown above, provided the Renter has kept the rules of this agreement."
+        local: "Kendaraan juga diasuransikan secara komprehensif (all risk) yang menanggung kerusakan dan kehilangan kendaraan sewa serta, apabila termasuk dalam polis, tanggung jawab hukum terhadap pihak ketiga. Untuk setiap kejadian, Penyewa membayar tidak lebih dari risiko sendiri yang tercantum di atas, dengan syarat Penyewa telah mematuhi ketentuan perjanjian ini."
+      - id: insurance.3
+        when: { insurance_level: third_party }
+        en: "The vehicle also has third-party liability insurance (TJH) covering damage to other people's property up to the policy limit. It does not cover damage to or theft of the rented vehicle: the Renter is responsible for those as set out in section 12."
+        local: "Kendaraan juga memiliki asuransi tanggung jawab hukum pihak ketiga (TJH) yang menanggung kerusakan harta benda orang lain sampai batas polis. Asuransi ini tidak menanggung kerusakan atau kehilangan kendaraan sewa: Penyewa bertanggung jawab atas hal tersebut sebagaimana diatur dalam Pasal 12."
+      - id: insurance.4
+        when: { insurance_level: compulsory }
+        en: "The vehicle has only the compulsory insurance. The Renter is responsible, as set out in section 12, for damage to the rented vehicle, its theft, and damage to other people's property."
+        local: "Kendaraan hanya memiliki asuransi wajib. Penyewa bertanggung jawab, sebagaimana diatur dalam Pasal 12, atas kerusakan kendaraan sewa, kehilangan karena pencurian, dan kerusakan harta benda orang lain."
+      - id: insurance.5
+        en: "Insurance does not protect the Renter, and the Renter pays in full, when damage or loss happens: while driving under the influence, without a valid licence for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or reckless acts, when keys were left with the vehicle, or when the vehicle is not returned (standard Indonesian motor policies do not cover embezzlement). Tyres, wheels, glass, underbody, interior, keys and accessories are often excluded by insurers and are the Renter's responsibility unless the Owner confirms in writing that they are covered."
+        local: "Asuransi tidak melindungi Penyewa, dan Penyewa menanggung seluruh kerugian, apabila kerusakan atau kehilangan terjadi: saat mengemudi di bawah pengaruh alkohol atau narkotika, tanpa SIM yang berlaku untuk kendaraan tersebut, oleh pengemudi yang tidak tercantum dalam Pasal 2, di luar wilayah penggunaan, selama penggunaan yang dilarang (Pasal 9), karena perbuatan yang disengaja atau sembrono, ketika kunci ditinggalkan pada kendaraan, atau ketika kendaraan tidak dikembalikan (polis standar asuransi kendaraan di Indonesia tidak menanggung penggelapan). Ban, velg, kaca, bagian bawah kendaraan, interior, kunci dan perlengkapan sering dikecualikan oleh perusahaan asuransi dan menjadi tanggung jawab Penyewa, kecuali Pemilik menyatakan secara tertulis bahwa hal tersebut ditanggung."
+      - id: insurance.6
+        en: "Personal belongings left in or on the vehicle are not insured by the Owner. The Owner is not responsible for their loss or damage."
+        local: "Barang pribadi yang ditinggalkan di dalam atau di atas kendaraan tidak diasuransikan oleh Pemilik. Pemilik tidak bertanggung jawab atas kehilangan atau kerusakannya."
+      - id: insurance.7_cc
+        en: "If the vehicle's own insurance is Total Loss Only (TLO), it pays only when the vehicle is stolen and not found within the period in the policy, or when repair costs reach the threshold in the policy (usually 75% of the vehicle's value). Other damage is treated as uninsured under section 12. The Owner tells the Renter before the rental if the cover is TLO."
+        local: "Apabila asuransi kendaraan hanya berupa Total Loss Only (TLO), asuransi tersebut hanya membayar apabila kendaraan dicuri dan tidak ditemukan dalam jangka waktu yang ditentukan polis, atau apabila biaya perbaikan mencapai batas yang ditentukan polis (umumnya 75% dari nilai kendaraan). Kerusakan lainnya diperlakukan sebagai tidak diasuransikan sesuai Pasal 12. Pemilik memberi tahu Penyewa sebelum masa sewa apabila pertanggungannya TLO."
+
+  - id: damage
+    title: { en: "12. Damage, theft and loss", local: "12. Kerusakan, pencurian dan kehilangan" }
+    clauses:
+      - id: damage.1
+        en: "The Renter is responsible for the vehicle from handover until it is returned and checked. The condition at handover is recorded in Annex A with photos; anything not recorded there is treated as new damage unless it is normal wear and tear, or the Renter shows that it was not caused by the Renter, a driver or passenger, or a breach of this agreement (for example, a hidden mechanical defect)."
+        local: "Penyewa bertanggung jawab atas kendaraan sejak serah terima sampai kendaraan dikembalikan dan diperiksa. Kondisi saat serah terima dicatat dalam Lampiran A beserta foto; kerusakan yang tidak tercatat di sana dianggap sebagai kerusakan baru, kecuali merupakan keausan wajar, atau Penyewa dapat menunjukkan bahwa kerusakan tersebut tidak disebabkan oleh Penyewa, pengemudi atau penumpang, atau pelanggaran perjanjian ini (misalnya cacat mesin yang tersembunyi)."
+      - id: damage.2
+        en: "Repair costs are based on a quote or invoice from a garage, or on the damage price list in Annex B where one is attached. The Renter may ask to see the quote, and may get a second quote from a garage the Owner approves within 3 days."
+        local: "Biaya perbaikan didasarkan pada penawaran harga atau faktur dari bengkel, atau pada daftar harga kerusakan dalam Lampiran B apabila dilampirkan. Penyewa berhak melihat penawaran harga tersebut dan dapat meminta penawaran kedua dari bengkel yang disetujui Pemilik dalam waktu 3 hari."
+      - id: damage.3
+        if: loss_of_use_fee
+        en: "While the vehicle cannot be rented because of damage caused during this rental, the Renter pays loss of use of {{currency}} {{loss_of_use_fee}} per day, for up to {{loss_of_use_max_days}} days."
+        local: "Selama kendaraan tidak dapat disewakan karena kerusakan yang terjadi dalam masa sewa ini, Penyewa membayar ganti rugi kehilangan penggunaan sebesar {{currency}} {{loss_of_use_fee}} per hari, paling lama {{loss_of_use_max_days}} hari."
+      - id: damage.4
+        en: "If the vehicle or its keys are stolen, the Renter must report it to the police at once and give the Owner the police report. Where the theft happened because the vehicle was left unlocked, with the keys, or outside the permitted area, the Renter pays the value of the vehicle as stated in Annex B (or its market value)."
+        local: "Apabila kendaraan atau kuncinya dicuri, Penyewa wajib segera melaporkannya kepada polisi dan menyerahkan surat tanda laporan polisi kepada Pemilik. Apabila pencurian terjadi karena kendaraan ditinggalkan tidak terkunci, dengan kunci terpasang, atau di luar wilayah penggunaan, Penyewa membayar nilai kendaraan sebagaimana tercantum dalam Lampiran B (atau nilai pasarnya)."
+      - id: damage.5
+        en: "Lost keys, remote controls, helmets, documents (including the STNK), number plates and accessories are charged at their replacement cost, plus any locksmith or re-registration cost."
+        local: "Kunci, remote, helm, dokumen (termasuk STNK), pelat nomor dan perlengkapan yang hilang dikenakan biaya penggantian, ditambah biaya tukang kunci atau pengurusan ulang dokumen."
+
+  - id: accident
+    title: { en: "13. Accidents and breakdowns", local: "13. Kecelakaan dan kerusakan mesin" }
+    clauses:
+      - id: accident.1
+        en: "In an accident, the Renter must: make the area safe and get medical help if anyone is hurt (emergency 112, police 110, ambulance 118 or 119); call the Owner straight away on the number in section 1; report the accident to the police when anyone is injured or when the Owner, the insurer or the law requires it, and obtain the police report, which insurance and Jasa Raharja claims usually need; take photos of all vehicles, plates, the place and any damage; note the other party's name, phone, plate and insurance; and not admit fault, pay or accept money, or sign any settlement, without the Owner's agreement."
+        local: "Dalam hal terjadi kecelakaan, Penyewa wajib: mengamankan lokasi dan mencari pertolongan medis apabila ada yang terluka (darurat 112, polisi 110, ambulans 118 atau 119); segera menghubungi Pemilik di nomor dalam Pasal 1; melaporkan kecelakaan kepada polisi apabila ada korban luka atau apabila diwajibkan oleh Pemilik, perusahaan asuransi atau undang-undang, dan memperoleh laporan polisi yang biasanya diperlukan untuk klaim asuransi dan Jasa Raharja; memotret semua kendaraan, pelat nomor, lokasi dan kerusakan; mencatat nama, telepon, nomor polisi dan asuransi pihak lain; dan tidak mengakui kesalahan, membayar atau menerima uang, atau menandatangani surat perdamaian tanpa persetujuan Pemilik."
+        country: true
+      - id: accident.2
+        en: "Breakdowns: the Renter must stop safely, tell the Owner and follow the Owner's instructions. The Renter must not have the vehicle repaired without the Owner's permission, except for minor emergency costs up to {{currency}} {{emergency_repair_limit}}, which the Owner refunds against a receipt."
+        local: "Kerusakan mesin: Penyewa wajib berhenti dengan aman, memberi tahu Pemilik dan mengikuti arahan Pemilik. Penyewa tidak boleh memperbaiki kendaraan tanpa izin Pemilik, kecuali untuk biaya darurat kecil sampai {{currency}} {{emergency_repair_limit}}, yang akan diganti Pemilik dengan kuitansi."
+      - id: accident.3
+        en: "If the vehicle stops working through no fault of the Renter, the Owner will repair it or provide a similar vehicle within 24 hours of being told where reasonably possible. If the Owner cannot, the Renter may end the rental and receive a refund of the rent for the unused days."
+        local: "Apabila kendaraan tidak dapat digunakan bukan karena kesalahan Penyewa, Pemilik akan memperbaikinya atau menyediakan kendaraan yang setara dalam waktu 24 jam sejak diberi tahu, sepanjang wajar dapat dilakukan. Apabila Pemilik tidak dapat melakukannya, Penyewa dapat mengakhiri sewa dan menerima pengembalian harga sewa untuk hari yang tidak digunakan."
+      - id: accident.4
+        en: "The Renter must report any warning light, unusual noise, puncture or fault promptly and must not keep using a vehicle that is unsafe."
+        local: "Penyewa wajib segera melaporkan setiap lampu peringatan, suara tidak wajar, ban bocor atau gangguan, dan tidak boleh terus menggunakan kendaraan yang tidak aman."
+
+  - id: fines
+    title: { en: "14. Fines, tolls and parking", local: "14. Denda, tol dan parkir" }
+    clauses:
+      - id: fines.1
+        en: "The Renter pays all traffic and parking fines, tolls, towing, impound and clamping costs arising during the rental, including fines that reach the Owner after the vehicle is returned, plus a handling fee of {{currency}} {{fine_admin_fee}} per fine."
+        local: "Penyewa membayar semua denda tilang dan parkir, biaya tol, derek, penyimpanan kendaraan sitaan dan penguncian roda yang timbul selama masa sewa, termasuk denda yang diterima Pemilik setelah kendaraan dikembalikan, ditambah biaya administrasi sebesar {{currency}} {{fine_admin_fee}} per denda."
+      - id: fines.2
+        en: "The Owner may give the Renter's name and details to the police (including through the ETLE confirmation process) or the issuing authority, so that a fine is issued to the Renter as the driver, where the law allows."
+        local: "Pemilik dapat memberikan nama dan data Penyewa kepada polisi (termasuk melalui proses konfirmasi ETLE) atau instansi penerbit, agar denda dikenakan kepada Penyewa sebagai pengemudi, sepanjang diperbolehkan oleh hukum."
+        country: true
+      - id: fines.3_cc
+        en: "Camera tickets (ETLE): the confirmation notice is sent to the vehicle's registered owner and must be answered within a short deadline (currently 8 days), or the vehicle's registration may be blocked. The Owner will tell the Renter promptly and send a copy of the notice, and will name the Renter as the driver where possible. If the Owner has to pay the fine to avoid the block, the Renter refunds it with the handling fee in this section, against a copy of the notice and the proof of payment."
+        local: "Tilang elektronik (ETLE): surat konfirmasi dikirim kepada pemilik kendaraan yang terdaftar dan harus ditanggapi dalam batas waktu singkat (saat ini 8 hari), atau registrasi kendaraan dapat diblokir. Pemilik akan segera memberi tahu Penyewa dan mengirimkan salinan surat tersebut, serta menyebut Penyewa sebagai pengemudi apabila memungkinkan. Apabila Pemilik harus membayar denda untuk menghindari pemblokiran, Penyewa mengganti denda tersebut beserta biaya administrasi dalam pasal ini, berdasarkan salinan surat konfirmasi dan bukti pembayaran."
+
+  - id: termination
+    title: { en: "15. Ending the agreement by the Owner", local: "15. Pengakhiran perjanjian oleh Pemilik" }
+    clauses:
+      - id: termination.1
+        en: "The Owner may end this agreement and take the vehicle back at once if the Renter: does not pay on time; gave false details; lets an unnamed person drive; uses the vehicle unlawfully or against section 9; takes it outside the permitted area without permission; tampers with the odometer or tracker; abandons it; or puts the vehicle or other people at serious risk. The Owner may deduct from the rent paid for the unused period the amounts the Renter owes and the costs and losses caused by the breach, and refunds any balance."
+        local: "Pemilik dapat mengakhiri perjanjian ini dan segera mengambil kembali kendaraan apabila Penyewa: tidak membayar tepat waktu; memberikan data yang tidak benar; membiarkan orang yang tidak tercantum mengemudikan kendaraan; menggunakan kendaraan secara melawan hukum atau bertentangan dengan Pasal 9; membawanya ke luar wilayah penggunaan tanpa izin; mengubah atau merusak odometer atau pelacak; menelantarkan kendaraan; atau membahayakan kendaraan atau orang lain secara serius. Pemilik dapat memotong harga sewa yang telah dibayar untuk masa yang tidak digunakan dengan jumlah yang terutang oleh Penyewa serta biaya dan kerugian akibat pelanggaran tersebut, dan mengembalikan sisanya."
+      - id: termination.2
+        en: "The Renter must make the vehicle available for collection, and pays reasonable recovery costs where the Owner has to fetch it."
+        local: "Penyewa wajib menyerahkan kendaraan untuk diambil, dan membayar biaya pengambilan yang wajar apabila Pemilik harus menjemput kendaraan tersebut."
+
+  - id: return
+    title: { en: "16. Returning the vehicle", local: "16. Pengembalian kendaraan" }
+    clauses:
+      - id: return.1
+        en: "The vehicle must be returned with its keys, documents (including the STNK) and accessories, with the fuel level agreed in section 8, and reasonably clean. Both parties check the vehicle together and record the condition, odometer and fuel in Annex A with photos. If the Renter is not present at the check, the Owner's dated photos are accepted as the record."
+        local: "Kendaraan wajib dikembalikan beserta kunci, dokumen (termasuk STNK) dan perlengkapannya, dengan level bahan bakar sesuai Pasal 8, dan dalam keadaan cukup bersih. Para pihak memeriksa kendaraan bersama-sama dan mencatat kondisi, odometer dan bahan bakar dalam Lampiran A beserta foto. Apabila Penyewa tidak hadir saat pemeriksaan, foto bertanggal dari Pemilik diterima sebagai catatan."
+      - id: return.2
+        if: cleaning_fee
+        en: "A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more if specialist cleaning is needed, against a receipt)."
+        local: "Kendaraan yang dikembalikan dengan kotoran, pasir, lumpur, noda, sisa makanan atau bau yang berlebihan di dalamnya dikenakan biaya pembersihan sebesar {{currency}} {{cleaning_fee}} (lebih apabila diperlukan pembersihan khusus, dengan kuitansi)."
+      - id: return.3
+        unless: cleaning_fee
+        en: "A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside may be charged the reasonable cost of cleaning."
+        local: "Kendaraan yang dikembalikan dengan kotoran, pasir, lumpur, noda, sisa makanan atau bau yang berlebihan di dalamnya dapat dikenakan biaya pembersihan yang wajar."
+
+  - id: data
+    title: { en: "17. Personal data and documents", local: "17. Data pribadi dan dokumen" }
+    clauses:
+      - id: data.1
+        en: "Under the Personal Data Protection Law (Law 27/2022), the Owner collects the Renter's and drivers' names, contact details, ID and licence details, copies of documents and photos of the vehicle only to provide this rental, prove identity, comply with the law, handle fines (including ETLE), claims and disputes, and keep business records. The Owner keeps them only as long as needed for those purposes and the law, keeps them secure, does not sell them, and may mark copies of ID documents with their purpose and date. The Renter may ask to see, correct or delete their data, within the limits of the law."
+        local: "Berdasarkan Undang-Undang Nomor 27 Tahun 2022 tentang Pelindungan Data Pribadi, Pemilik mengumpulkan nama, kontak, data identitas dan SIM, salinan dokumen Penyewa dan pengemudi serta foto kendaraan hanya untuk melaksanakan sewa ini, membuktikan identitas, mematuhi hukum, menangani denda (termasuk ETLE), klaim dan sengketa, serta menyimpan catatan usaha. Pemilik menyimpan data tersebut hanya selama diperlukan untuk tujuan tersebut dan sesuai ketentuan hukum, menjaga keamanannya, tidak menjualnya, dan dapat memberi tanda tujuan dan tanggal pada salinan dokumen identitas. Penyewa berhak meminta akses, perbaikan atau penghapusan datanya, dalam batas yang diatur oleh hukum."
+        country: true
+      - id: data.2
+        en: "The Renter agrees that copies of their documents and the inspection photos and videos may be used as evidence of identity and of the vehicle's condition, and may be given to insurers, the police and authorities when needed for a claim, fine or legal requirement. They will not be used for any other purpose."
+        local: "Penyewa menyetujui bahwa salinan dokumennya serta foto dan video pemeriksaan dapat digunakan sebagai bukti identitas dan kondisi kendaraan, dan dapat diberikan kepada perusahaan asuransi, polisi dan instansi berwenang apabila diperlukan untuk klaim, denda atau kewajiban hukum. Data tersebut tidak akan digunakan untuk tujuan lain."
+        country: true
+
+  - id: general
+    title: { en: "18. General terms", local: "18. Ketentuan umum" }
+    clauses:
+      - id: general.1
+        en: "Messages: notices under this agreement may be sent by phone, message app (WhatsApp, Telegram or similar), SMS or email to the contact details in sections 1 and 2, and count as received when sent."
+        local: "Pemberitahuan: pemberitahuan berdasarkan perjanjian ini dapat disampaikan melalui telepon, aplikasi pesan (WhatsApp, Telegram atau sejenisnya), SMS atau email ke kontak dalam Pasal 1 dan 2, dan dianggap diterima pada saat dikirim."
+      - id: general.2
+        en: "Force majeure: neither party is responsible for a delay or failure caused by events outside their control, such as natural disasters, floods, volcanic eruptions, storms, government orders or ferry cancellations. Rent for days the vehicle could not be used because of such an event is agreed fairly between the parties."
+        local: "Keadaan kahar: tidak ada pihak yang bertanggung jawab atas keterlambatan atau kegagalan yang disebabkan oleh peristiwa di luar kendalinya, seperti bencana alam, banjir, letusan gunung berapi, badai, perintah pemerintah atau pembatalan kapal penyeberangan. Harga sewa untuk hari-hari ketika kendaraan tidak dapat digunakan karena peristiwa tersebut disepakati secara adil oleh para pihak."
+      - id: general.3
+        en: "Whole agreement: this agreement, its annexes and any special conditions are the whole agreement. Changes are valid only in writing and agreed by both parties (a message from both parties is enough). If any part is found invalid, the rest still applies."
+        local: "Keseluruhan perjanjian: perjanjian ini, lampirannya dan syarat khusus (jika ada) merupakan keseluruhan perjanjian. Perubahan hanya berlaku apabila dibuat secara tertulis dan disetujui kedua belah pihak (pesan dari kedua pihak sudah cukup). Apabila ada bagian yang dinyatakan tidak sah, bagian lainnya tetap berlaku."
+      - id: general.4
+        en: "Language: this agreement is written in English and {{local_language}}, in line with Law 24/2009 and Presidential Regulation 63/2019. If the two versions differ, the {{prevailing_language}} version applies."
+        local: "Bahasa: perjanjian ini dibuat dalam bahasa Inggris dan {{local_language}}, sesuai dengan Undang-Undang Nomor 24 Tahun 2009 dan Peraturan Presiden Nomor 63 Tahun 2019. Apabila terdapat perbedaan antara kedua versi, yang berlaku adalah versi {{prevailing_language}}."
+        country: true
+      - id: general.5
+        en: "Governing law: this agreement is governed by the laws of {{jurisdiction}}. The parties will first try to settle any dispute by discussion (musyawarah); if they cannot, the dispute is decided by {{court_place}}. This does not limit the Renter's right to use the consumer dispute settlement body (BPSK) where the law allows."
+        local: "Hukum yang berlaku: perjanjian ini tunduk pada hukum {{jurisdiction}}. Para pihak terlebih dahulu akan menyelesaikan setiap sengketa secara musyawarah untuk mufakat; apabila tidak tercapai, sengketa diselesaikan melalui {{court_place}}. Ketentuan ini tidak membatasi hak Penyewa untuk menempuh penyelesaian melalui Badan Penyelesaian Sengketa Konsumen (BPSK) sepanjang diperbolehkan oleh hukum."
+        country: true
+      - id: general.6
+        if: special_terms
+        en: "Special conditions agreed between the parties: {{special_terms}}"
+        local: "Syarat khusus yang disepakati para pihak: {{special_terms}}"
+
+  - id: signatures
+    title: { en: "Signatures", local: "Tanda tangan" }
+    signature: true
+    clauses:
+      - id: signatures.1
+        en: "By signing, the parties confirm they have read and understood this agreement, including Annexes A and B, and agree to it. The Renter confirms they received a copy."
+        local: "Dengan menandatangani, para pihak menyatakan telah membaca dan memahami perjanjian ini, termasuk Lampiran A dan B, serta menyetujuinya. Penyewa menyatakan telah menerima salinannya."
+    sign_rows:
+      - { en: "Owner (name, signature, date)", local: "Pemilik (nama, tanda tangan, tanggal)" }
+      - { en: "Renter (name, signature, date)", local: "Penyewa (nama, tanda tangan, tanggal)" }
+      - { en: "Additional driver (name, signature, date)", local: "Pengemudi tambahan (nama, tanda tangan, tanggal)" }
+
+  - id: annex_a
+    title: { en: "Annex A: Handover and return check", local: "Lampiran A: Pemeriksaan serah terima dan pengembalian" }
+    page_break: true
+    checklist: true
+    clauses:
+      - id: annex_a.1
+        en: "Mark existing scratches (S), dents (D), cracks (C) and missing items (M). Take photos of all four sides, the dashboard (odometer and fuel), the interior and any damage, at both handover and return."
+        local: "Tandai goresan (S), penyok (D), retak (C) dan barang yang tidak ada (M). Ambil foto keempat sisi kendaraan, dasbor (odometer dan bahan bakar), interior dan setiap kerusakan, baik saat serah terima maupun saat pengembalian."
+    check_rows:
+      - { en: "Odometer", local: "Odometer" }
+      - { en: "Fuel / battery level", local: "Level bahan bakar / baterai" }
+      - { en: "Body: front / rear / left / right", local: "Bodi: depan / belakang / kiri / kanan" }
+      - { en: "Glass, mirrors and lights", local: "Kaca, spion dan lampu" }
+      - { en: "Tyres and wheels", local: "Ban dan velg" }
+      - { en: "Interior and seats", local: "Interior dan jok" }
+      - { en: "Keys, remote, STNK", local: "Kunci, remote, STNK" }
+      - { en: "Helmets / child seat / accessories", local: "Helm / kursi anak / perlengkapan" }
+      - { en: "Photos taken (number)", local: "Jumlah foto yang diambil" }
+      - { en: "Owner's and Renter's initials", local: "Paraf Pemilik dan Penyewa" }
+    columns: { item: { en: "Item", local: "Bagian" }, out: { en: "At handover", local: "Saat serah terima" }, in: { en: "At return", local: "Saat pengembalian" } }
+
+  - id: annex_b
+    title: { en: "Annex B: Damage and replacement price list", local: "Lampiran B: Daftar harga kerusakan dan penggantian" }
+    pricelist: true
+    clauses:
+      - id: annex_b.1
+        en: "Agreed prices for common damage and lost items. Damage not listed is charged per section 12."
+        local: "Harga yang disepakati untuk kerusakan umum dan barang yang hilang. Kerusakan yang tidak tercantum dikenakan biaya sesuai Pasal 12."
+    price_rows:
+      - { en: "Scratch, per panel (polish / repaint)", local: "Goresan, per panel (poles / cat ulang)" }
+      - { en: "Dent, per panel", local: "Penyok, per panel" }
+      - { en: "Mirror", local: "Spion" }
+      - { en: "Headlight / tail light / indicator", local: "Lampu depan / lampu belakang / lampu sein" }
+      - { en: "Tyre (each)", local: "Ban (per buah)" }
+      - { en: "Key / remote", local: "Kunci / remote" }
+      - { en: "Helmet", local: "Helm" }
+      - { en: "Number plate replacement", local: "Penggantian pelat nomor" }
+      - { en: "Vehicle value (for total loss or theft)", local: "Nilai kendaraan (untuk kerugian total atau pencurian)" }
+    columns: { item: { en: "Item", local: "Uraian" }, price: { en: "Price", local: "Harga" } }

@@ -34,6 +34,12 @@ export function isSiteCurrency(code: string | null | undefined) {
  * SITE_DEFAULT_COUNTRY env var, for servers without that header (the local build sets TH); (3) US dollars.
  * The pricing page's currency picker stays as the manual override.
  */
+/** The visitor's country code (same sources as the currency), or "" when unknown. */
+export async function visitorCountry(): Promise<string> {
+  const list = await headers();
+  return String(list.get("x-vercel-ip-country") || process.env.SITE_DEFAULT_COUNTRY || "").trim().toUpperCase();
+}
+
 export async function visitorCurrency(): Promise<string> {
   const list = await headers();
   return currencyForCountry(list.get("x-vercel-ip-country")) || currencyForCountry(process.env.SITE_DEFAULT_COUNTRY) || "USD";

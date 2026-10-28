@@ -10,12 +10,18 @@ import { EMAIL_PATTERN, formText, requestIpHash } from "@/lib/site/request-hash"
 import { siteOrigin } from "@/lib/site/seo";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { alertTeam } from "@/lib/support";
+import { CONTRACT_BUILDER_SLUG, contractCountryFor, hasContractDetails, parseContractForm } from "@/lib/contract-builder/fields";
+import { inspectLogo, LOGO_MAX_BYTES } from "@/lib/contract-builder/logo";
 
 /**
  * The free-resource form (/resources/<slug>). Saved with the service role (leads has no insert policy), then the
  * download links are shown straight away, emailed too when email sending is set up, and the team is alerted.
  * A filled-in honeypot pretends to succeed and saves nothing; more than ten requests an hour from one address are
  * turned away. The address is kept only as a salted hash (lib/site/request-hash.ts, shared with the contact form).
+ *
+ * The rental agreement is the contract builder (Rory, 28 Oct 2026): whatever the operator typed into its optional
+ * fields (business, logo, vehicle, prices, rules) is kept with the lead, and the links build their own agreement in
+ * English and their country's language: a Word file and a print page that saves as PDF.
  */
 
 const LIMITS = { email: 200, name: 120, business: 120, source: 300 } as const;
@@ -38,14 +44,15 @@ export async function requestLead(previous: LeadState, formData: FormData): Prom
   if (!values.email) return { n, status: "error", error: "required", values };
   if (!EMAIL_PATTERN.test(values.email)) return { n, status: "error", error: "email", values };
   if (!isContentSlug(slug) || !resourceLocales(slug).length) return { n, status: "error", error: "failed", values };
+  const builder = slug === CONTRACT_BUILDER_SLUG;
   const country = (LEAD_COUNTRIES as readonly string[]).includes(values.country) || values.country === "other" ? values.country : null;
   const fleet = (LEAD_FLEETS as readonly string[]).includes(values.fleet) ? values.fleet : null;
   const source = formText(formData, "source", LIMITS.source);
 
   try {
     const [m, locale] = await Promise.all([getTranslations("marketing"), getLocale()]);
-    const files = resourceFiles(slug);
-    if (!files.length) return { n, status: "error", error: "failed", values };
+    const files = builder ? [] : resourceFiles(slug);
+    if (!builder && !files.length) return { n, status: "error", error: "failed", values };
 
     const db = createSupabaseAdminClient() as any;
     const hash = await requestIpHash();
@@ -70,16 +77,43 @@ export async function requestLead(previous: LeadState, formData: FormData): Prom
       .single();
     if (error || !data) return { n, status: "error", error: "failed", values };
 
+    const downloads: LeadDownload[] = [];
+    if (builder) {
+      // Their agreement: the country version from the country they chose, their details, and their logo if they sent one.
+      const contract = parseContractForm(formData);
+      if (!contract.business_name && values.business) contract.business_name = values.business;
+      const contractCountry = contractCountryFor(country);
+      let logoPath: string | null = null;
+      const upload = formData.get("c_logo");
+      if (upload && typeof upload === "object" && "arrayBuffer" in upload && upload.size > 0 && upload.size <= LOGO_MAX_BYTES) {
+        const bytes = Buffer.from(await upload.arrayBuffer());
+        const info = inspectLogo(bytes);
+        if (info) {
+          const path = `leads/${data.id}/logo.${info.ext}`;
+          const { error: uploadError } = await db.storage.from("branding").upload(path, bytes, { contentType: info.mime, upsert: true });
+          if (!uploadError) logoPath = path;
+        }
+      }
+      await db.from("leads").update({ contract: hasContractDetails(contract) ? contract : null, contract_country: contractCountry, logo_path: logoPath }).eq("id", data.id);
+      for (const [format, label, detail] of [
+        ["contract-docx", m("contractDocx"), m("contractDocxDetail")],
+        ["contract-print", m("contractPrint"), m("contractPrintDetail")]
+      ] as const) {
+        const token = createDownloadToken({ slug, locale, format, lead: data.id });
+        if (!token) return { n, status: "error", error: "failed", values };
+        downloads.push({ href: downloadHref(slug, token), label, detail, primary: downloads.length === 0, open: format === "contract-print" });
+      }
+    }
+
     // One link per file: the visitor's language first, then English, then the rest; Word before PDF.
     const rank = (code: string) => (code === locale ? 0 : code === "en" ? 1 : 2);
     const sorted = [...files].sort((a, b) => rank(a.locale) - rank(b.locale) || (LANGUAGE_NAME.get(a.locale) || a.locale).localeCompare(LANGUAGE_NAME.get(b.locale) || b.locale) || a.format.localeCompare(b.format));
-    const downloads: LeadDownload[] = [];
     for (const file of sorted) {
       const token = createDownloadToken({ slug, locale: file.locale, format: file.format });
       if (!token) return { n, status: "error", error: "failed", values };
       downloads.push({
         href: downloadHref(slug, token),
-        label: file.format === "docx" ? m("downloadDocx") : m("downloadPdf"),
+        label: file.format === "docx" ? m("downloadDocx") : file.format === "xlsx" ? m("downloadXlsx") : m("downloadPdf"),
         detail: `${LANGUAGE_NAME.get(file.locale) || file.locale} · ${fileSize(file.bytes)}`,
         primary: downloads.length === 0
       });

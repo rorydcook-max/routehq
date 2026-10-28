@@ -1,0 +1,697 @@
+# Lokalfleet vehicle rental agreement: CAMBODIA (English + Khmer). Generated from master.en.yaml by build_country.py.
+# Prevailing language: Khmer. Article 5 of the Constitution makes Khmer the official language, and Prakas 0067 (2022) under the
+# Law on Consumer Protection (2019) requires standard-form consumer contracts to be prepared in Khmer, so the Khmer version prevails.
+# Currency: USD, which is widely used alongside the riel; the form's {{currency}} value is kept as given.
+# Not reviewed by a lawyer. Country-specific statements are limited to what public sources (listed under `sources`) support;
+# where a rule could not be verified the text uses cautious wording ("where the law requires").
+country: KH
+locale: km
+language: Khmer
+currency: USD
+prevailing_language:
+  en: Khmer
+  local: ភាសាខ្មែរ
+local_language:
+  en: Khmer
+  local: ភាសាខ្មែរ
+country_name:
+  en: Cambodia
+  local: កម្ពុជា
+currency_name:
+  en: US dollars
+  local: ដុល្លារអាមេរិក
+jurisdiction:
+  en: the Kingdom of Cambodia
+  local: ព្រះរាជាណាចក្រកម្ពុជា
+court_place:
+  en: the province or capital where the vehicle was rented
+  local: ខេត្ត ឬរាជធានី ដែលបានជួលយានយន្ត
+words:
+  per_day:
+    en: per day
+    local: ក្នុងមួយថ្ងៃ
+  per_week:
+    en: per week
+    local: ក្នុងមួយសប្តាហ៍
+  per_month:
+    en: per month
+    local: ក្នុងមួយខែ
+  day:
+    en: day
+    local: ថ្ងៃ
+  month:
+    en: month
+    local: ខែ
+  days:
+    en: days
+    local: ថ្ងៃ
+  business_days:
+    en: business days after return
+    local: ថ្ងៃធ្វើការ បន្ទាប់ពីប្រគល់ត្រឡប់មកវិញ
+  car:
+    en: Car
+    local: រថយន្ត
+  motorbike:
+    en: Motorbike / scooter
+    local: ម៉ូតូ / ម៉ូតូស្កូតឺ
+  ins_compulsory:
+    en: Compulsory insurance only
+    local: ធានារ៉ាប់រងកាតព្វកិច្ចតែប៉ុណ្ណោះ
+  ins_third_party:
+    en: Compulsory + third-party insurance
+    local: ធានារ៉ាប់រងកាតព្វកិច្ច + ធានារ៉ាប់រងភាគីទីបី
+  ins_comprehensive:
+    en: Comprehensive (first-class) insurance
+    local: ធានារ៉ាប់រងគ្រប់ជ្រុងជ្រោយ (ថ្នាក់ទីមួយ)
+  free:
+    en: Free
+    local: ឥតគិតថ្លៃ
+  payment_default:
+    en: Cash, bank transfer or QR payment
+    local: សាច់ប្រាក់ ការផ្ទេរតាមធនាគារ ឬការទូទាត់តាម QR (KHQR)
+  blank_hint:
+    en: (fill in)
+    local: (សូមបំពេញ)
+sources:
+- url: https://www.constituteproject.org/constitution/Cambodia_2008
+  supports: 'Constitution of the Kingdom of Cambodia, Article 5: the official language and script is Khmer (basis for Khmer prevailing).'
+- url: https://www.dfdl.com/insights/legal-and-tax-updates/cambodia-implementation-of-prakas-on-unfair-contract-terms
+  supports: 'Law on Consumer Protection (2 Nov 2019) and Prakas 0067 on Unfair Contract Terms (1 Mar 2022): standard-form consumer contracts must be prepared in Khmer; clauses excluding or limiting the business operator''s liability, or allowing unilateral changes or arbitrary termination, are unfair.'
+- url: https://www.dfdl.com/insights/legal-and-tax-updates/the-implementation-of-cambodias-new-civil-code/
+  supports: 'Civil Code (Royal Kram NS/RKM/1207/030, 8 Dec 2007; in force 21 Dec 2011): contracts formed by consent; remedies for breach; advance exclusion of liability for intentional or grossly negligent non-performance is void; pre-agreed damages allowed.'
+- url: https://www.smartraveller.gov.au/destinations/asia/cambodia
+  supports: 'Australian Smartraveller: a car or motorcycle over 125cc needs a Cambodian licence, or a foreign licence plus IDP (carry both); up to 125cc can be ridden without a licence under Cambodian law; helmets compulsory; speeding fines paid at a payment centre within 30 days.'
+- url: https://www.gov.uk/foreign-travel-advice/cambodia/safety-and-security
+  supports: 'UK FCDO: to hire a car or motorcycle over 125cc you may need a 1949 IDP and national licence; long-term drivers need a Cambodian licence; on-the-spot fines for riding without a helmet; do not hand over a passport as a guarantee for a motorcycle or scooter.'
+- url: https://khmer.voanews.com/a/new-law-to-address-the-high-death-toll-on-cambodia-roads/3121604.html
+  supports: 'VOA (28 Dec 2015): new Road Traffic Law in force 1 Jan 2016; all riders on a motorbike, including a child passenger, must wear a helmet; Article 36 lets parties settle property-only accidents between themselves.'
+- url: https://grsproadsafety.org/?p=713
+  supports: Road Traffic Law approved by the Senate 30 Dec 2014 and signed by the King 9 Jan 2015; covers drink-driving, speeding, helmets, licensing and vehicle registration.
+- url: https://www.tilleke.com/wp-content/uploads/2019/11/Insurance-and-reinsurance-in-Cambodia-overview-Tilleke-Gibbins-2019.pdf
+  supports: 'Law on Insurance (2014): compulsory insurance for motor vehicles; third-party liability insurance for certain commercial motor vehicles as set by MEF prakas; implementing regulation status unclear (as of 2019).'
+- url: https://www.insurancebusinessmag.com/asia/news/breaking-news/cambodia-regulator-eyes-stronger-uptake-of-compulsory-insurance-567080.aspx
+  supports: 'Insurance Business Asia (3 Mar 2026): Insurance Regulator of Cambodia says the law requires motor third-party liability insurance for business vehicles, but implementation remains uneven.'
+- url: https://treatydatabase.overheid.nl/en/Treaty/Details/007193_p
+  supports: Cambodia acceded to the 1949 Geneva Convention on Road Traffic (14 Mar 1956), the convention behind the 1949-type International Driving Permit.
+- url: https://m.phnompenhpost.com/national/siem-reap-reminded-tourist-moto-car-rental-ban
+  supports: 'Phnom Penh Post (20 Nov 2017): Siem Reap governor reminded businesses that renting or lending motorbikes and cars to foreigners in Siem Reap town is forbidden (bicycles and e-bicycles excepted), a rule in place since 2002.'
+- url: https://www.cambodianess.com/article/should-bicycle-and-motorcycle-rental-service-be-stopped-in-siem-reap
+  supports: 'Cambodianess (7 Jan 2024): Siem Reap rental rules say international tourists may rent only bicycles or e-bikes; a later Cambodianess article (14 Oct 2026) describes the ban as a measure "previously implemented", so current enforcement is unclear.'
+- url: https://travel.state.gov/content/travel/en/international-travel/International-Travel-Country-Information-Pages/Cambodia.html
+  supports: 'US State Department: do not give your passport as collateral for motorcycle rentals; carry copies of passport and licence; cooperate with police after an accident.'
+- url: https://www.gov.uk/foreign-travel-advice/cambodia/getting-help
+  supports: 'UK FCDO emergency numbers for Cambodia: police 117, fire 118, ambulance 119.'
+- url: https://www.hlc.com/en/publications/cambodia-moves-to-enact-comprehensive-data-privacy-law
+  supports: 'Hogan Lovells (28 Jul 2025): Cambodia''s Law on Personal Data Protection was still a draft; no comprehensive data protection law in force at that date.'
+- url: https://aseancob.org/coverage-and-blue-card
+  supports: 'ASEAN Compulsory Motor Insurance (Blue Card) system for cross-border vehicles covers Cambodia, Laos and Thailand: separate cross-border insurance is needed.'
+title:
+  en: Vehicle Rental Agreement
+  local: កិច្ចសន្យាជួលយានយន្ត
+subtitle:
+  en: Car, motorbike and scooter rental. {{country_name}}
+  local: ការជួលរថយន្ត ម៉ូតូ និងម៉ូតូស្កូតឺ។ {{country_name}}
+footer:
+  en: Vehicle rental agreement · {{business_name}}
+  local: កិច្ចសន្យាជួលយានយន្ត · {{business_name}}
+page_words:
+  page: Page
+  of: of
+sections:
+- id: parties
+  title:
+    en: 1. The parties
+    local: ១. ភាគីនៃកិច្ចសន្យា
+  fields:
+  - key: business_name
+    en: Owner (rental business)
+    local: ម្ចាស់ (អាជីវកម្មជួល)
+  - key: business_reg_no
+    en: Business registration / tax ID
+    local: លេខចុះបញ្ជីអាជីវកម្ម / លេខអត្តសញ្ញាណកម្មសារពើពន្ធ
+  - key: business_address
+    en: Business address
+    local: អាសយដ្ឋានអាជីវកម្ម
+  - key: business_phone
+    en: Phone / WhatsApp / LINE
+    local: ទូរស័ព្ទ / WhatsApp / LINE
+  - key: business_email
+    en: Email
+    local: អ៊ីមែល
+  clauses:
+  - id: parties.1
+    en: This agreement is made on {{renter_contract_date}} between the rental business named above (the "Owner") and the person named in section 2 (the "Renter"). Where there is more than one renter or driver, each of them is jointly responsible for every obligation in this agreement.
+    local: កិច្ចសន្យានេះធ្វើឡើងនៅថ្ងៃទី {{renter_contract_date}} រវាងអាជីវកម្មជួលដែលមានឈ្មោះខាងលើ ("ម្ចាស់") និងបុគ្គលដែលមានឈ្មោះនៅផ្នែកទី ២ ("អ្នកជួល")។ ប្រសិនបើមានអ្នកជួល ឬអ្នកបើកបរច្រើនជាងម្នាក់ ម្នាក់ៗទទួលខុសត្រូវរួមគ្នាចំពោះកាតព្វកិច្ចទាំងអស់ក្នុងកិច្ចសន្យានេះ។
+- id: renter
+  title:
+    en: 2. The Renter and drivers
+    local: ២. អ្នកជួល និងអ្នកបើកបរ
+  fields:
+  - key: renter_name
+    en: Full name (as on passport or ID)
+    local: ឈ្មោះពេញ (តាមលិខិតឆ្លងដែន ឬអត្តសញ្ញាណប័ណ្ណ)
+  - key: renter_nationality
+    en: Nationality
+    local: សញ្ជាតិ
+  - key: renter_dob
+    en: Date of birth
+    local: ថ្ងៃខែឆ្នាំកំណើត
+  - key: renter_id_no
+    en: Passport or national ID number
+    local: លេខលិខិតឆ្លងដែន ឬអត្តសញ្ញាណប័ណ្ណ
+  - key: renter_home_address
+    en: Home address
+    local: អាសយដ្ឋានស្រុកកំណើត
+  - key: renter_local_address
+    en: Local address during the rental (hotel / villa / condo)
+    local: កន្លែងស្នាក់នៅអំឡុងពេលជួល (សណ្ឋាគារ / វីឡា / ខុនដូ)
+  - key: renter_phone
+    en: Phone / WhatsApp
+    local: ទូរស័ព្ទ / WhatsApp
+  - key: renter_email
+    en: Email
+    local: អ៊ីមែល
+  - key: renter_licence
+    en: Driving licence number, class and issuing country
+    local: លេខប័ណ្ណបើកបរ ប្រភេទ និងប្រទេសដែលចេញ
+  - key: renter_licence_expiry
+    en: Licence expiry date
+    local: កាលបរិច្ឆេទផុតសុពលភាពប័ណ្ណបើកបរ
+  - key: renter_idp
+    en: International Driving Permit (number / not required)
+    local: ប័ណ្ណបើកបរអន្តរជាតិ (លេខ / មិនតម្រូវ)
+  - key: renter_emergency
+    en: Emergency contact (name and phone)
+    local: អ្នកទំនាក់ទំនងពេលអាសន្ន (ឈ្មោះ និងលេខទូរស័ព្ទ)
+  - key: driver2_details
+    en: Additional driver (name, ID, licence), if any
+    local: អ្នកបើកបរបន្ថែម (ឈ្មោះ អត្តសញ្ញាណ ប័ណ្ណបើកបរ) ប្រសិនបើមាន
+  clauses:
+  - id: renter.1
+    en: The Renter confirms that the details above are true and complete, and that every person who will drive or ride the vehicle is named here. Only the Renter and any additional driver named above may drive or ride the vehicle.
+    local: អ្នកជួលបញ្ជាក់ថា ព័ត៌មានខាងលើពិតប្រាកដ និងពេញលេញ ហើយអ្នកដែលនឹងបើកបរ ឬជិះយានយន្តទាំងអស់ មានឈ្មោះនៅទីនេះ។ មានតែអ្នកជួល និងអ្នកបើកបរបន្ថែមដែលមានឈ្មោះខាងលើប៉ុណ្ណោះ ដែលអាចបើកបរ ឬជិះយានយន្តបាន។
+  - id: renter.2
+    en: Every driver must hold any driving licence the law requires for this class of vehicle and carry it at all times while driving. For a car or a motorbike over 125cc, this is a Cambodian licence, or a foreign licence together with an International Driving Permit where the authorities accept it. Where the law does not require a licence (for some small motorbikes), the Renter must still be able to ride safely, and insurance may not apply to an unlicensed rider. A car licence does not allow a person to ride a motorbike.
+    local: អ្នកបើកបរគ្រប់រូបត្រូវមានប័ណ្ណបើកបរដែលច្បាប់តម្រូវ សម្រាប់ប្រភេទយានយន្តនេះ ហើយត្រូវយកតាមខ្លួនជានិច្ចពេលបើកបរ។ សម្រាប់រថយន្ត ឬម៉ូតូលើសពី 125cc គឺប័ណ្ណបើកបរកម្ពុជា ឬប័ណ្ណបើកបរបរទេសរួមជាមួយប័ណ្ណបើកបរអន្តរជាតិ ក្នុងករណីដែលអាជ្ញាធរទទួលស្គាល់។ ក្នុងករណីដែលច្បាប់មិនតម្រូវឱ្យមានប័ណ្ណបើកបរ (សម្រាប់ម៉ូតូតូចៗមួយចំនួន) អ្នកជួលនៅតែត្រូវមានសមត្ថភាពជិះប្រកបដោយសុវត្ថិភាព ហើយធានារ៉ាប់រងអាចមិនអនុវត្តចំពោះអ្នកជិះដែលគ្មានប័ណ្ណបើកបរ។ ប័ណ្ណបើកបររថយន្ត មិនអនុញ្ញាតឱ្យជិះម៉ូតូទេ។
+    country: true
+- id: vehicle
+  title:
+    en: 3. The vehicle
+    local: ៣. យានយន្ត
+  fields:
+  - key: vehicle_type_label
+    en: Type
+    local: ប្រភេទ
+  - key: vehicle_make_model
+    en: Make and model
+    local: ម៉ាក និងម៉ូដែល
+  - key: vehicle_year
+    en: Year
+    local: ឆ្នាំ
+  - key: vehicle_plate
+    en: Registration (plate) number
+    local: ផ្លាកលេខ
+  - key: vehicle_colour
+    en: Colour
+    local: ពណ៌
+  - key: renter_vin
+    en: Chassis / VIN number
+    local: លេខតួ / VIN
+  - key: out_odometer
+    en: Odometer at handover
+    local: លេខគីឡូម៉ែត្រ ពេលប្រគល់
+  - key: out_fuel
+    en: Fuel / battery level at handover
+    local: កម្រិតប្រេង / ថ្ម ពេលប្រគល់
+  - key: renter_accessories
+    en: Accessories handed over (helmets, keys, child seat, phone holder, etc.)
+    local: គ្រឿងបន្លាស់ដែលបានប្រគល់ (មួកសុវត្ថិភាព សោ កៅអីកុមារ ទម្រទូរស័ព្ទ ។ល។)
+  clauses:
+  - id: vehicle.1
+    en: The Owner rents the vehicle described above, with the accessories listed, to the Renter for the rental period and on the terms of this agreement. The vehicle remains the property of the Owner at all times.
+    local: ម្ចាស់ជួលយានយន្តដែលបានរៀបរាប់ខាងលើ រួមទាំងគ្រឿងបន្លាស់ដែលបានរាយ ដល់អ្នកជួល សម្រាប់រយៈពេលជួល និងតាមលក្ខខណ្ឌនៃកិច្ចសន្យានេះ។ យានយន្តនៅតែជាកម្មសិទ្ធិរបស់ម្ចាស់ជានិច្ច។
+  - id: vehicle.2
+    en: The Owner confirms that the vehicle is registered, that any road tax due is paid, that it carries any insurance the law requires for vehicles used in a rental business for the whole rental period, and that it is handed over in a roadworthy condition with its registration card.
+    local: ម្ចាស់បញ្ជាក់ថា យានយន្តត្រូវបានចុះបញ្ជី ពន្ធផ្លូវដែលត្រូវបង់ត្រូវបានបង់រួចហើយ យានយន្តមានធានារ៉ាប់រងណាមួយដែលច្បាប់តម្រូវ សម្រាប់យានយន្តប្រើក្នុងអាជីវកម្មជួល ពេញមួយរយៈពេលជួល ហើយត្រូវបានប្រគល់ក្នុងស្ថានភាពល្អសម្រាប់ធ្វើដំណើរលើផ្លូវ រួមជាមួយកាតចុះបញ្ជីយានយន្ត។
+    country: true
+- id: period
+  title:
+    en: 4. Rental period, pickup and return
+    local: ៤. រយៈពេលជួល ការទទួល និងការប្រគល់ត្រឡប់
+  fields:
+  - key: renter_start
+    en: Start (date and time)
+    local: ចាប់ផ្តើម (កាលបរិច្ឆេទ និងម៉ោង)
+  - key: renter_end
+    en: End (date and time)
+    local: បញ្ចប់ (កាលបរិច្ឆេទ និងម៉ោង)
+  - key: renter_pickup_place
+    en: Pickup / delivery place
+    local: កន្លែងទទួល / ដឹកជូន
+  - key: renter_return_place
+    en: Return / collection place
+    local: កន្លែងប្រគល់ត្រឡប់ / មកយកវិញ
+  clauses:
+  - id: period.1
+    en: The Renter must return the vehicle at the agreed place, date and time. An extension is valid only when the Owner agrees to it in writing (a message is enough) and the extra rent is paid.
+    local: អ្នកជួលត្រូវប្រគល់យានយន្តត្រឡប់មកវិញ នៅកន្លែង កាលបរិច្ឆេទ និងម៉ោងដែលបានព្រមព្រៀង។ ការពន្យារពេលមានសុពលភាព លុះត្រាតែម្ចាស់យល់ព្រមជាលាយលក្ខណ៍អក្សរ (សារមួយគឺគ្រប់គ្រាន់) ហើយថ្លៃជួលបន្ថែមត្រូវបានបង់រួច។
+  - id: period.2
+    if: late_hour_fee
+    en: 'Late return: after a grace period of {{late_grace_minutes}} minutes, each started hour costs {{currency}} {{late_hour_fee}}. A return more than {{late_full_day_hours}} hours late is charged as an extra full day at the daily rate.'
+    local: ការប្រគល់យឺត៖ បន្ទាប់ពីរយៈពេលអនុគ្រោះ {{late_grace_minutes}} នាទី ម៉ោងនីមួយៗដែលបានចាប់ផ្តើម គិតថ្លៃ {{currency}} {{late_hour_fee}}។ ការប្រគល់យឺតលើសពី {{late_full_day_hours}} ម៉ោង គិតជាមួយថ្ងៃពេញបន្ថែម តាមអត្រាប្រចាំថ្ងៃ។
+  - id: period.3
+    unless: late_hour_fee
+    en: 'Late return: a return more than one hour late may be charged as an extra day at the daily rate.'
+    local: ការប្រគល់យឺត៖ ការប្រគល់យឺតលើសពីមួយម៉ោង អាចត្រូវគិតជាមួយថ្ងៃបន្ថែម តាមអត្រាប្រចាំថ្ងៃ។
+  - id: period.4
+    en: If the vehicle is not returned and the Renter cannot be reached within 24 hours of the end time, the Owner may treat the vehicle as stolen, report it to the police and recover it, at the Renter's cost.
+    local: ប្រសិនបើយានយន្តមិនត្រូវបានប្រគល់មកវិញ ហើយមិនអាចទាក់ទងអ្នកជួលបាន ក្នុងរយៈពេល ២៤ ម៉ោង គិតពីម៉ោងបញ្ចប់ ម្ចាស់អាចចាត់ទុកថាយានយន្តត្រូវបានលួច រាយការណ៍ទៅនគរបាល និងយកយានយន្តមកវិញ ដោយអ្នកជួលជាអ្នកចេញថ្លៃ។
+- id: charges
+  title:
+    en: 5. Rent and payment
+    local: ៥. ថ្លៃជួល និងការទូទាត់
+  fields:
+  - key: rate_text
+    en: Rental rate
+    local: អត្រាថ្លៃជួល
+  - key: renter_total
+    en: Total rent for this booking
+    local: ថ្លៃជួលសរុបសម្រាប់ការកក់នេះ
+  - key: delivery_fee_text
+    en: Delivery / collection fee
+    local: ថ្លៃដឹកជូន / មកយកវិញ
+  - key: payment_methods
+    en: Payment methods accepted
+    local: វិធីទូទាត់ដែលទទួលយក
+  clauses:
+  - id: charges.1
+    en: The Renter pays the rent stated above in advance, unless the Owner agrees otherwise in writing. Prices are in {{currency_name}}.
+    local: អ្នកជួលបង់ថ្លៃជួលដែលបានបញ្ជាក់ខាងលើជាមុន លើកលែងតែម្ចាស់យល់ព្រមផ្សេងពីនេះជាលាយលក្ខណ៍អក្សរ។ តម្លៃគិតជា{{currency_name}}។
+  - id: charges.2
+    when:
+      rate_period: month
+    en: 'Monthly rentals: rent is paid monthly in advance on the same day each month. A payment more than 3 days late allows the Owner to end the rental and collect the vehicle (section 15).'
+    local: ការជួលប្រចាំខែ៖ ថ្លៃជួលត្រូវបង់ជាមុនប្រចាំខែ នៅថ្ងៃដដែលនៃខែនីមួយៗ។ ការបង់យឺតលើសពី ៣ ថ្ងៃ អនុញ្ញាតឱ្យម្ចាស់បញ្ចប់ការជួល និងយកយានយន្តមកវិញ (ផ្នែកទី ១៥)។
+  - id: charges.3
+    en: Extras (child seats, delivery, additional drivers, phone holders, insurance upgrades and similar) cost what is written in this agreement or what the Owner confirmed in writing before the rental.
+    local: សេវាបន្ថែម (កៅអីកុមារ ការដឹកជូន អ្នកបើកបរបន្ថែម ទម្រទូរស័ព្ទ ការដំឡើងធានារ៉ាប់រង និងសេវាស្រដៀងគ្នា) មានតម្លៃតាមដែលបានសរសេរក្នុងកិច្ចសន្យានេះ ឬតាមដែលម្ចាស់បានបញ្ជាក់ជាលាយលក្ខណ៍អក្សរ មុនពេលជួល។
+- id: deposit
+  title:
+    en: 6. Security deposit
+    local: ៦. ប្រាក់កក់ធានា
+  fields:
+  - key: deposit_text
+    en: Deposit
+    local: ប្រាក់កក់ធានា
+  - key: renter_deposit_method
+    en: Paid by (cash / transfer / card hold)
+    local: បង់ដោយ (សាច់ប្រាក់ / ផ្ទេរ / ការរក្សាទុកលើកាត)
+  - key: deposit_return_text
+    en: Returned within
+    local: ប្រគល់វិញក្នុងរយៈពេល
+  clauses:
+  - id: deposit.1
+    en: 'The deposit secures the Renter''s obligations: unpaid rent, damage up to the amount the Renter is liable for, fuel, mileage, cleaning, late return, lost keys or accessories, traffic fines and any other amount owed under this agreement.'
+    local: ប្រាក់កក់ធានាធានាកាតព្វកិច្ចរបស់អ្នកជួល៖ ថ្លៃជួលមិនទាន់បង់ ការខូចខាតរហូតដល់ចំនួនដែលអ្នកជួលត្រូវទទួលខុសត្រូវ ប្រេង ចម្ងាយផ្លូវ ការសម្អាត ការប្រគល់យឺត សោ ឬគ្រឿងបន្លាស់ដែលបាត់ ប្រាក់ពិន័យចរាចរណ៍ និងចំនួនទឹកប្រាក់ផ្សេងទៀតដែលជំពាក់តាមកិច្ចសន្យានេះ។
+  - id: deposit.2
+    en: The Owner returns the deposit, less any amounts properly deducted, after the vehicle has been returned and checked. The Owner gives the Renter a written list of any deduction with photos, receipts or quotes. If the amounts owed are more than the deposit, the Renter pays the difference within 7 days of being told.
+    local: ម្ចាស់ប្រគល់ប្រាក់កក់ធានាវិញ ដោយកាត់ចំនួនដែលកាត់បានត្រឹមត្រូវ បន្ទាប់ពីយានយន្តត្រូវបានប្រគល់មកវិញ និងត្រួតពិនិត្យរួច។ ម្ចាស់ផ្តល់បញ្ជីការកាត់ប្រាក់ជាលាយលក្ខណ៍អក្សរ ជាមួយរូបថត វិក្កយបត្រ ឬសម្រង់តម្លៃ ដល់អ្នកជួល។ ប្រសិនបើចំនួនដែលជំពាក់លើសពីប្រាក់កក់ធានា អ្នកជួលបង់ភាពខុសគ្នាក្នុងរយៈពេល ៧ ថ្ងៃ បន្ទាប់ពីទទួលបានការជូនដំណឹង។
+  - id: deposit.3
+    en: Some traffic fines, such as camera speeding fines, can reach the Owner after a rental ends and must be paid within a set time. The Owner may keep a reasonable part of the deposit for up to 30 days to cover fines the Owner has reason to expect, and must return it promptly if none arrive.
+    local: ប្រាក់ពិន័យចរាចរណ៍មួយចំនួន ដូចជាប្រាក់ពិន័យល្បឿនពីកាមេរ៉ា អាចមកដល់ម្ចាស់ក្រោយពេលការជួលបញ្ចប់ ហើយត្រូវបង់ក្នុងរយៈពេលកំណត់។ ម្ចាស់អាចរក្សាទុកផ្នែកមួយសមរម្យនៃប្រាក់កក់ធានា រហូតដល់ ៣០ ថ្ងៃ ដើម្បីបង់ប្រាក់ពិន័យដែលម្ចាស់មានហេតុផលរំពឹងថានឹងមាន ហើយត្រូវប្រគល់វិញភ្លាមៗ ប្រសិនបើគ្មានប្រាក់ពិន័យមកដល់។
+    country: true
+  - id: deposit.4
+    en: The Owner will not keep the Renter's original passport or national ID card as a deposit, and the Renter should not offer it. The Owner may take a copy or photo of them to identify the Renter (section 17).
+    local: ម្ចាស់នឹងមិនរក្សាទុកលិខិតឆ្លងដែន ឬអត្តសញ្ញាណប័ណ្ណច្បាប់ដើមរបស់អ្នកជួល ជាប្រាក់កក់ធានាទេ ហើយអ្នកជួលមិនគួរផ្តល់ឱ្យឡើយ។ ម្ចាស់អាចថតចម្លង ឬថតរូបឯកសារទាំងនោះ ដើម្បីផ្ទៀងផ្ទាត់អត្តសញ្ញាណអ្នកជួល (ផ្នែកទី ១៧)។
+    country: true
+- id: cancellation
+  title:
+    en: 7. Cancellation and early return
+    local: ៧. ការលុបចោល និងការប្រគល់មុនកាលកំណត់
+  clauses:
+  - id: cancellation.1
+    if: cancel_free_hours
+    en: The Renter may cancel free of charge up to {{cancel_free_hours}} hours before the start time. A later cancellation costs {{cancel_fee_percent}}% of the rent for the booked period (or of the first month on a monthly rental). If the Renter does not arrive at the start time and does not tell the Owner (a no-show), the Owner may keep the full amount paid for the first {{no_show_days}} day(s) and release the vehicle.
+    local: អ្នកជួលអាចលុបចោលដោយឥតគិតថ្លៃ រហូតដល់ {{cancel_free_hours}} ម៉ោង មុនម៉ោងចាប់ផ្តើម។ ការលុបចោលយឺតជាងនេះ គិតថ្លៃ {{cancel_fee_percent}}% នៃថ្លៃជួលសម្រាប់រយៈពេលដែលបានកក់ (ឬនៃខែទីមួយ សម្រាប់ការជួលប្រចាំខែ)។ ប្រសិនបើអ្នកជួលមិនមកដល់នៅម៉ោងចាប់ផ្តើម ហើយមិនជូនដំណឹងម្ចាស់ (មិនមកទទួល) ម្ចាស់អាចរក្សាទុកចំនួនទឹកប្រាក់ដែលបានបង់ទាំងអស់សម្រាប់ {{no_show_days}} ថ្ងៃដំបូង ហើយយកយានយន្តទៅជួលបន្តបាន។
+  - id: cancellation.2
+    unless: cancel_free_hours
+    en: 'Cancellation by the Renter before the start time: the Owner keeps any booking payment that this agreement or the booking confirmation says is non-refundable, and refunds the rest.'
+    local: ការលុបចោលដោយអ្នកជួល មុនម៉ោងចាប់ផ្តើម៖ ម្ចាស់រក្សាទុកប្រាក់កក់ដែលកិច្ចសន្យានេះ ឬការបញ្ជាក់ការកក់ចែងថាមិនអាចសងវិញបាន ហើយសងប្រាក់ដែលនៅសល់វិញ។
+  - id: cancellation.3
+    when:
+      early_return: none
+    en: 'Early return: rent for the booked period is not refunded if the Renter returns the vehicle early.'
+    local: ការប្រគល់មុនកាលកំណត់៖ ថ្លៃជួលសម្រាប់រយៈពេលដែលបានកក់ មិនត្រូវបានសងវិញទេ ប្រសិនបើអ្នកជួលប្រគល់យានយន្តមុនកាលកំណត់។
+  - id: cancellation.4
+    when:
+      early_return: prorata
+    en: 'Early return: the Owner refunds the rent for the full unused days, less an early-return fee of {{currency}} {{early_return_fee}}. Long-term discounts that no longer apply may be recalculated at the rate for the period actually used.'
+    local: ការប្រគល់មុនកាលកំណត់៖ ម្ចាស់សងថ្លៃជួលសម្រាប់ថ្ងៃពេញដែលមិនបានប្រើវិញ ដោយកាត់ថ្លៃប្រគល់មុនកាលកំណត់ {{currency}} {{early_return_fee}}។ ការបញ្ចុះតម្លៃសម្រាប់ការជួលរយៈពេលវែង ដែលលែងអនុវត្ត អាចត្រូវគណនាឡើងវិញ តាមអត្រាសម្រាប់រយៈពេលដែលបានប្រើពិតប្រាកដ។
+  - id: cancellation.5
+    when:
+      rate_period: month
+    en: 'Monthly rentals: either party may end the rental by giving {{notice_days}} days'' written notice. Without notice, the Renter pays rent for the notice period.'
+    local: ការជួលប្រចាំខែ៖ ភាគីណាមួយអាចបញ្ចប់ការជួល ដោយជូនដំណឹងជាលាយលក្ខណ៍អក្សរ {{notice_days}} ថ្ងៃជាមុន។ ប្រសិនបើគ្មានការជូនដំណឹង អ្នកជួលបង់ថ្លៃជួលសម្រាប់រយៈពេលជូនដំណឹងនោះ។
+  - id: cancellation.6
+    en: If the Owner cannot provide the vehicle (or a similar or better one) at the start time, the Renter may cancel and receive a full refund of everything paid.
+    local: ប្រសិនបើម្ចាស់មិនអាចផ្តល់យានយន្ត (ឬយានយន្តស្រដៀងគ្នា ឬល្អជាង) នៅម៉ោងចាប់ផ្តើម អ្នកជួលអាចលុបចោល និងទទួលបានប្រាក់ដែលបានបង់ទាំងអស់វិញ។
+- id: fuel
+  title:
+    en: 8. Fuel, charging and mileage
+    local: ៨. ប្រេងឥន្ធនៈ ការសាកថ្ម និងចម្ងាយផ្លូវ
+  clauses:
+  - id: fuel.1
+    when:
+      fuel_policy: same
+    en: 'Fuel policy: same-to-same. The vehicle must be returned with at least the fuel (or battery) level it had at handover.'
+    local: គោលការណ៍ប្រេង៖ ទទួលប៉ុណ្ណា ប្រគល់ប៉ុណ្ណឹង។ យានយន្តត្រូវប្រគល់មកវិញ ដោយមានកម្រិតប្រេង (ឬថ្ម) យ៉ាងហោចណាស់ស្មើនឹងពេលប្រគល់។
+  - id: fuel.2
+    when:
+      fuel_policy: full
+    en: 'Fuel policy: full-to-full. The vehicle is handed over with a full tank and must be returned full.'
+    local: គោលការណ៍ប្រេង៖ ពេញទៅពេញមក។ យានយន្តត្រូវបានប្រគល់ជូនជាមួយធុងប្រេងពេញ ហើយត្រូវប្រគល់មកវិញពេញធុង។
+  - id: fuel.3
+    en: Missing fuel is charged at the local pump price plus a refuelling service fee of {{currency}} {{fuel_service_fee}}. Using the wrong fuel is the Renter's responsibility, including towing and repair.
+    local: ប្រេងដែលខ្វះ គិតតាមតម្លៃស្ថានីយប្រេងក្នុងតំបន់ បូកថ្លៃសេវាចាក់ប្រេង {{currency}} {{fuel_service_fee}}។ ការចាក់ប្រេងខុសប្រភេទ ជាការទទួលខុសត្រូវរបស់អ្នកជួល រួមទាំងថ្លៃអូស និងថ្លៃជួសជុល។
+  - id: fuel.4
+    if: mileage_limit
+    en: 'Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometre costs {{currency}} {{excess_km_fee}}.'
+    local: ចម្ងាយផ្លូវដែលអនុញ្ញាត៖ {{mileage_limit}} គីឡូម៉ែត្រ ក្នុងមួយ{{mileage_period_label}}។ គីឡូម៉ែត្រនីមួយៗដែលលើស គិតថ្លៃ {{currency}} {{excess_km_fee}}។
+  - id: fuel.5
+    unless: mileage_limit
+    en: 'Mileage: unlimited, within the permitted area (section 10).'
+    local: ចម្ងាយផ្លូវ៖ គ្មានដែនកំណត់ ក្នុងតំបន់ដែលអនុញ្ញាត (ផ្នែកទី ១០)។
+  - id: fuel.6
+    en: The Renter must not tamper with the odometer, speed limiter or GPS tracker. Tampering is a serious breach (section 15).
+    local: អ្នកជួលមិនត្រូវកែប្រែ នាឡិកាគីឡូម៉ែត្រ ឧបករណ៍កំណត់ល្បឿន ឬឧបករណ៍តាមដាន GPS ឡើយ។ ការកែប្រែគឺជាការរំលោភធ្ងន់ធ្ងរ (ផ្នែកទី ១៥)។
+- id: use
+  title:
+    en: 9. Safe and lawful use
+    local: ៩. ការប្រើប្រាស់ប្រកបដោយសុវត្ថិភាព និងស្របច្បាប់
+  clauses:
+  - id: use.1
+    en: The Renter must drive or ride carefully, obey all traffic laws, and keep the vehicle locked with the keys removed whenever it is left. Keys must never be left in or on the vehicle.
+    local: អ្នកជួលត្រូវបើកបរ ឬជិះដោយប្រុងប្រយ័ត្ន គោរពច្បាប់ចរាចរណ៍ទាំងអស់ ហើយចាក់សោយានយន្ត និងដកសោចេញ រាល់ពេលចាកចេញពីយានយន្ត។ មិនត្រូវទុកសោនៅក្នុង ឬលើយានយន្តជាដាច់ខាត។
+  - id: use.2
+    when:
+      vehicle_type:
+      - motorbike
+      - ''
+    en: 'Motorbikes and scooters: the Road Traffic Law requires the rider and every passenger, including children, to wear a helmet. Helmets must be fastened at all times. No more than one passenger, and no passenger who cannot reach the footrests safely.'
+    local: ម៉ូតូ និងម៉ូតូស្កូតឺ៖ ច្បាប់ស្តីពីចរាចរណ៍ផ្លូវគោក តម្រូវឱ្យអ្នកជិះ និងអ្នកដំណើរគ្រប់រូប រួមទាំងកុមារ ពាក់មួកសុវត្ថិភាព។ មួកសុវត្ថិភាពត្រូវតែរឹតខ្សែជានិច្ច។ អ្នកដំណើរមិនលើសពីម្នាក់ ហើយមិនត្រូវមានអ្នកដំណើរដែលមិនអាចដាក់ជើងលើកន្លែងដាក់ជើងបានដោយសុវត្ថិភាព។
+    country: true
+  - id: use.3
+    when:
+      vehicle_type:
+      - car
+      - ''
+    en: 'Cars: the driver and passengers must wear seatbelts where the law requires them, and the Owner asks every occupant to wear one. Children must use a suitable child seat where the law requires one, and the number of passengers must not exceed the number of seats.'
+    local: រថយន្ត៖ អ្នកបើកបរ និងអ្នកដំណើរត្រូវពាក់ខ្សែក្រវាត់សុវត្ថិភាព ក្នុងករណីដែលច្បាប់តម្រូវ ហើយម្ចាស់ស្នើឱ្យអ្នកជិះទាំងអស់ពាក់។ កុមារត្រូវប្រើកៅអីកុមារដែលសមរម្យ ក្នុងករណីដែលច្បាប់តម្រូវ ហើយចំនួនអ្នកដំណើរមិនត្រូវលើសចំនួនកៅអីឡើយ។
+    country: true
+  - id: use.4
+    en: 'It is forbidden to: drive under the influence of alcohol or drugs, or above the legal limit; use a phone while driving except hands-free; race, perform stunts or drive off-road (unless the vehicle is meant for it and the Owner agreed); tow or push anything; carry goods for payment, illegal goods or dangerous loads; use the vehicle for ride-hailing, delivery work, driving lessons or to rent it to anyone else; let anyone not named in section 2 drive or ride.'
+    local: ហាមឃាត់៖ បើកបរក្រោមឥទ្ធិពលគ្រឿងស្រវឹង ឬគ្រឿងញៀន ឬលើសកម្រិតដែលច្បាប់កំណត់; ប្រើទូរស័ព្ទពេលបើកបរ លើកលែងតែប្រព័ន្ធមិនប្រើដៃ; ប្រណាំង សម្តែងក្បាច់ ឬបើកបរក្រៅផ្លូវ (លើកលែងតែយានយន្តត្រូវបានរចនាសម្រាប់ការនោះ ហើយម្ចាស់យល់ព្រម); អូស ឬរុញអ្វីមួយ; ដឹកទំនិញដើម្បីយកថ្លៃ ទំនិញខុសច្បាប់ ឬបន្ទុកគ្រោះថ្នាក់; ប្រើយានយន្តសម្រាប់សេវាដឹកអ្នកដំណើរតាមកម្មវិធី ការងារដឹកជញ្ជូន ការបង្រៀនបើកបរ ឬជួលបន្តឱ្យអ្នកដទៃ; អនុញ្ញាតឱ្យអ្នកដែលគ្មានឈ្មោះនៅផ្នែកទី ២ បើកបរ ឬជិះ។
+  - id: use.5
+    when:
+      smoking: false
+    en: Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odour removal.{{/if}}
+    local: មិនអនុញ្ញាតឱ្យជក់បារី ឬបារីអេឡិចត្រូនិកក្នុងយានយន្តទេ។{{#if smoking_fee}} ការបំពានវិធាននេះ គិតថ្លៃ {{currency}} {{smoking_fee}} សម្រាប់ការលុបក្លិន។{{/if}}
+  - id: use.6
+    when:
+      pets: false
+    en: Pets and animals are not allowed in or on the vehicle, except assistance animals.
+    local: មិនអនុញ្ញាតឱ្យមានសត្វចិញ្ចឹម និងសត្វផ្សេងៗ នៅក្នុង ឬលើយានយន្តទេ លើកលែងតែសត្វជំនួយ។
+  - id: use.7
+    when:
+      pets: fee
+    en: Pets are allowed if they are kept in a carrier or on a seat cover. A pet cleaning fee of {{currency}} {{pet_fee}} applies.
+    local: អនុញ្ញាតឱ្យមានសត្វចិញ្ចឹម ប្រសិនបើដាក់ក្នុងទ្រុង ឬលើក្រណាត់គ្របកៅអី។ មានថ្លៃសម្អាតសត្វចិញ្ចឹម {{currency}} {{pet_fee}}។
+- id: area
+  title:
+    en: 10. Permitted area
+    local: ១០. តំបន់ដែលអនុញ្ញាត
+  fields:
+  - key: area_of_use
+    en: The vehicle may be used in
+    local: យានយន្តអាចប្រើប្រាស់បាននៅ
+  clauses:
+  - id: area.1
+    en: The vehicle must stay within the permitted area above. Taking it further, on a ferry or to another island, needs the Owner's written permission first, and the Renter pays any ferry fees, delays and recovery costs.
+    local: យានយន្តត្រូវស្ថិតនៅក្នុងតំបន់ដែលអនុញ្ញាតខាងលើ។ ការយកទៅឆ្ងាយជាងនេះ ឡើងសាឡាង ឬទៅកោះផ្សេង ត្រូវមានការអនុញ្ញាតជាលាយលក្ខណ៍អក្សរពីម្ចាស់ជាមុន ហើយអ្នកជួលបង់ថ្លៃសាឡាង ការពន្យារពេល និងថ្លៃយកយានយន្តមកវិញ។
+  - id: area.2
+    en: The vehicle must not leave Cambodia under any circumstances. Taking a vehicle into Thailand, Laos, Vietnam or any other country needs special permits, customs papers and cross-border insurance, which this rental does not include. Insurance does not cover the vehicle outside Cambodia or outside the permitted area.
+    local: យានយន្តមិនត្រូវចាកចេញពីប្រទេសកម្ពុជា ក្នុងករណីណាក៏ដោយ។ ការយកយានយន្តចូលប្រទេសថៃ ឡាវ វៀតណាម ឬប្រទេសផ្សេងទៀត ត្រូវការលិខិតអនុញ្ញាតពិសេស ឯកសារគយ និងធានារ៉ាប់រងឆ្លងដែន ដែលមិនរួមបញ្ចូលក្នុងការជួលនេះទេ។ ធានារ៉ាប់រងមិនគ្របដណ្តប់យានយន្ត នៅក្រៅប្រទេសកម្ពុជា ឬក្រៅតំបន់ដែលអនុញ្ញាតឡើយ។
+    country: true
+  - id: area.3
+    en: The vehicle may be fitted with a GPS tracker, used only for security, recovery and checking that this agreement is kept.
+    local: យានយន្តអាចត្រូវបានបំពាក់ឧបករណ៍តាមដាន GPS ដែលប្រើតែសម្រាប់សុវត្ថិភាព ការយកមកវិញ និងការត្រួតពិនិត្យថាកិច្ចសន្យានេះត្រូវបានគោរព។
+  - id: area.4_cc
+    en: 'Local rules: some provincial authorities, including Siem Reap, have restricted renting motorbikes and cars to foreign tourists. The Owner confirms that it may lawfully rent this vehicle to the Renter at the place of rental, and the Renter must follow any local rules on where they may drive or ride.'
+    local: វិធានមូលដ្ឋាន៖ អាជ្ញាធរខេត្តមួយចំនួន រួមទាំងខេត្តសៀមរាប បានដាក់កម្រិតលើការជួលម៉ូតូ និងរថយន្តដល់ភ្ញៀវទេសចរបរទេស។ ម្ចាស់បញ្ជាក់ថា ខ្លួនអាចជួលយានយន្តនេះដល់អ្នកជួល នៅកន្លែងជួលបានដោយស្របច្បាប់ ហើយអ្នកជួលត្រូវគោរពវិធានមូលដ្ឋានណាមួយ អំពីកន្លែងដែលខ្លួនអាចបើកបរបាន។
+    country: true
+- id: insurance
+  title:
+    en: 11. Insurance
+    local: ១១. ធានារ៉ាប់រង
+  fields:
+  - key: insurance_text
+    en: Insurance on this vehicle
+    local: ធានារ៉ាប់រងលើយានយន្តនេះ
+  - key: insurance_excess_text
+    en: Renter's excess (most the Renter pays per incident, if the rules are kept)
+    local: ចំណែកខូចខាតដែលអ្នកជួលត្រូវបង់ (ច្រើនបំផុតក្នុងមួយករណី ប្រសិនបើគោរពលក្ខខណ្ឌ)
+  clauses:
+  - id: insurance.1
+    en: The vehicle has any compulsory insurance that Cambodian law requires. The Law on Insurance makes third-party liability insurance compulsory for certain business vehicles; such cover pays for injury or damage to other people up to the policy limits. It does not cover damage to the rented vehicle itself.
+    local: យានយន្តមានធានារ៉ាប់រងកាតព្វកិច្ចណាមួយ ដែលច្បាប់កម្ពុជាតម្រូវ។ ច្បាប់ស្តីពីការធានារ៉ាប់រង កំណត់ឱ្យធានារ៉ាប់រងទំនួលខុសត្រូវភាគីទីបី ជាកាតព្វកិច្ចសម្រាប់យានយន្តអាជីវកម្មមួយចំនួន។ ធានារ៉ាប់រងនេះ ចេញថ្លៃរបួស ឬការខូចខាតដល់អ្នកដទៃ ក្នុងដែនកំណត់នៃបណ្ណសន្យារ៉ាប់រង។ វាមិនគ្របដណ្តប់ការខូចខាតលើយានយន្តដែលជួលនោះទេ។
+    country: true
+  - id: insurance.2
+    when:
+      insurance_level: comprehensive
+    en: The vehicle also has comprehensive insurance covering damage to the rented vehicle and to third parties. Per incident, the Renter pays no more than the excess shown above, provided the Renter has kept the rules of this agreement.
+    local: យានយន្តក៏មានធានារ៉ាប់រងគ្រប់ជ្រុងជ្រោយ ដែលគ្របដណ្តប់ការខូចខាតលើយានយន្តដែលជួល និងភាគីទីបី។ ក្នុងករណីនីមួយៗ អ្នកជួលបង់មិនលើសពីចំណែកខូចខាតដែលបានបង្ហាញខាងលើ ដរាបណាអ្នកជួលបានគោរពវិធាននៃកិច្ចសន្យានេះ។
+  - id: insurance.3
+    when:
+      insurance_level: third_party
+    en: 'The vehicle also has third-party insurance covering damage to other people''s property. It does not cover damage to or theft of the rented vehicle: the Renter is responsible for those (section 12).'
+    local: យានយន្តក៏មានធានារ៉ាប់រងភាគីទីបី ដែលគ្របដណ្តប់ការខូចខាតលើទ្រព្យសម្បត្តិរបស់អ្នកដទៃ។ វាមិនគ្របដណ្តប់ការខូចខាត ឬការលួចយានយន្តដែលជួលទេ៖ អ្នកជួលទទួលខុសត្រូវលើការទាំងនោះ (ផ្នែកទី ១២)។
+  - id: insurance.4
+    when:
+      insurance_level: compulsory
+    en: The vehicle has only the compulsory insurance. The Renter is responsible for damage to the rented vehicle, its theft, and damage to other people's property (section 12).
+    local: យានយន្តមានតែធានារ៉ាប់រងកាតព្វកិច្ចប៉ុណ្ណោះ។ អ្នកជួលទទួលខុសត្រូវចំពោះការខូចខាតលើយានយន្តដែលជួល ការលួច និងការខូចខាតលើទ្រព្យសម្បត្តិរបស់អ្នកដទៃ (ផ្នែកទី ១២)។
+  - id: insurance.5
+    en: 'Insurance does not protect the Renter, and the Renter pays in full, when damage or loss happens: while driving under the influence, without a valid licence for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or reckless acts, or when keys were left with the vehicle. Tyres, wheels, glass, underbody, interior, keys and accessories are often excluded by insurers and are the Renter''s responsibility unless the Owner confirms in writing that they are covered.'
+    local: ធានារ៉ាប់រងមិនការពារអ្នកជួលទេ ហើយអ្នកជួលបង់ពេញចំនួន នៅពេលការខូចខាត ឬការបាត់បង់កើតឡើង៖ ពេលបើកបរក្រោមឥទ្ធិពលគ្រឿងស្រវឹង ឬគ្រឿងញៀន ដោយគ្មានប័ណ្ណបើកបរត្រឹមត្រូវសម្រាប់យានយន្ត ដោយអ្នកបើកបរដែលគ្មានឈ្មោះនៅផ្នែកទី ២ នៅក្រៅតំបន់ដែលអនុញ្ញាត អំឡុងពេលប្រើប្រាស់ដែលហាមឃាត់ (ផ្នែកទី ៩) តាមរយៈសកម្មភាពចេតនា ឬធ្វេសប្រហែសធ្ងន់ធ្ងរ ឬនៅពេលទុកសោជាមួយយានយន្ត។ សំបកកង់ កង់ កញ្ចក់ ផ្នែកខាងក្រោមតួ ផ្នែកខាងក្នុង សោ និងគ្រឿងបន្លាស់ ច្រើនតែត្រូវបានក្រុមហ៊ុនធានារ៉ាប់រងដកចេញ ហើយជាការទទួលខុសត្រូវរបស់អ្នកជួល លើកលែងតែម្ចាស់បញ្ជាក់ជាលាយលក្ខណ៍អក្សរថាត្រូវបានគ្របដណ្តប់។
+  - id: insurance.6
+    en: Personal belongings left in or on the vehicle are not insured by the Owner. The Owner is not responsible for their loss or damage, unless it is caused by the Owner's own fault.
+    local: របស់របរផ្ទាល់ខ្លួនដែលទុកនៅក្នុង ឬលើយានយន្ត មិនត្រូវបានធានារ៉ាប់រងដោយម្ចាស់ទេ។ ម្ចាស់មិនទទួលខុសត្រូវចំពោះការបាត់បង់ ឬការខូចខាតរបស់ទាំងនោះទេ លើកលែងតែវាបណ្តាលមកពីកំហុសរបស់ម្ចាស់ផ្ទាល់។
+- id: damage
+  title:
+    en: 12. Damage, theft and loss
+    local: ១២. ការខូចខាត ការលួច និងការបាត់បង់
+  clauses:
+  - id: damage.1
+    en: The Renter is responsible for the vehicle from handover until it is returned and checked. The condition at handover is recorded in Annex A with photos; anything not recorded there is treated as new unless it is normal wear and tear.
+    local: អ្នកជួលទទួលខុសត្រូវលើយានយន្ត ចាប់ពីពេលប្រគល់ រហូតដល់ពេលប្រគល់មកវិញ និងត្រួតពិនិត្យរួច។ ស្ថានភាពពេលប្រគល់ត្រូវបានកត់ត្រាក្នុងឧបសម្ព័ន្ធ ក ជាមួយរូបថត; អ្វីដែលមិនបានកត់ត្រានៅទីនោះ ត្រូវចាត់ទុកជាការខូចខាតថ្មី លើកលែងតែជាការរិចរិលធម្មតា។
+  - id: damage.2
+    en: Repair costs are based on a quote or invoice from a garage, or on the damage price list in Annex B where one is attached. The Renter may ask to see the quote, and may get a second quote from a garage the Owner approves within 3 days.
+    local: ថ្លៃជួសជុលផ្អែកលើសម្រង់តម្លៃ ឬវិក្កយបត្រពីយានដ្ឋាន ឬលើតារាងតម្លៃការខូចខាតក្នុងឧបសម្ព័ន្ធ ខ ប្រសិនបើមានភ្ជាប់។ អ្នកជួលអាចស្នើសុំមើលសម្រង់តម្លៃ ហើយអាចយកសម្រង់តម្លៃទីពីរ ពីយានដ្ឋានដែលម្ចាស់យល់ព្រម ក្នុងរយៈពេល ៣ ថ្ងៃ។
+  - id: damage.3
+    if: loss_of_use_fee
+    en: While the vehicle cannot be rented because of damage caused during this rental, the Renter pays loss of use of {{currency}} {{loss_of_use_fee}} per day, for up to {{loss_of_use_max_days}} days.
+    local: អំឡុងពេលដែលយានយន្តមិនអាចជួលបាន ដោយសារការខូចខាតដែលកើតឡើងក្នុងការជួលនេះ អ្នកជួលបង់ថ្លៃបាត់បង់ការប្រើប្រាស់ {{currency}} {{loss_of_use_fee}} ក្នុងមួយថ្ងៃ រហូតដល់ {{loss_of_use_max_days}} ថ្ងៃ។
+  - id: damage.4
+    en: If the vehicle or its keys are stolen, the Renter must report it to the police at once and give the Owner the police report. Where the theft happened because the vehicle was left unlocked, with the keys, or outside the permitted area, the Renter pays the value of the vehicle as stated in Annex B (or its market value).
+    local: ប្រសិនបើយានយន្ត ឬសោត្រូវបានលួច អ្នកជួលត្រូវរាយការណ៍ទៅនគរបាលភ្លាមៗ ហើយផ្តល់របាយការណ៍នគរបាលដល់ម្ចាស់។ ក្នុងករណីដែលការលួចកើតឡើងដោយសារយានយន្តត្រូវបានទុកចោលដោយមិនចាក់សោ ទុកសោជាមួយ ឬនៅក្រៅតំបន់ដែលអនុញ្ញាត អ្នកជួលបង់តម្លៃយានយន្តតាមដែលបានបញ្ជាក់ក្នុងឧបសម្ព័ន្ធ ខ (ឬតម្លៃទីផ្សារ)។
+  - id: damage.5
+    en: Lost keys, remote controls, helmets, documents, number plates and accessories are charged at their replacement cost, plus any locksmith or re-registration cost.
+    local: សោ ឧបករណ៍បញ្ជាពីចម្ងាយ មួកសុវត្ថិភាព ឯកសារ ផ្លាកលេខ និងគ្រឿងបន្លាស់ដែលបាត់ គិតតាមថ្លៃជំនួស បូកថ្លៃជាងសោ ឬថ្លៃចុះបញ្ជីឡើងវិញ។
+- id: accident
+  title:
+    en: 13. Accidents and breakdowns
+    local: ១៣. គ្រោះថ្នាក់ និងការខូចយានយន្ត
+  clauses:
+  - id: accident.1
+    en: 'In an accident, the Renter must: make the area safe and get medical help if anyone is hurt (ambulance 119, police 117); call the Owner straight away on the number in section 1; call the police and the insurer''s hotline when the Owner or the law requires it; take photos of all vehicles, plates, the place and any damage; note the other party''s name, phone, plate and insurance; and not admit fault, pay or accept money, or agree a private settlement, without the Owner''s agreement.'
+    local: ពេលមានគ្រោះថ្នាក់ អ្នកជួលត្រូវ៖ ធ្វើឱ្យកន្លែងនោះមានសុវត្ថិភាព និងស្វែងរកជំនួយវេជ្ជសាស្ត្រ ប្រសិនបើមានអ្នករបួស (រថយន្តសង្គ្រោះ 119 នគរបាល 117); ទូរស័ព្ទទៅម្ចាស់ភ្លាមៗ តាមលេខនៅផ្នែកទី ១; ទូរស័ព្ទទៅនគរបាល និងខ្សែទូរស័ព្ទបន្ទាន់របស់ក្រុមហ៊ុនធានារ៉ាប់រង នៅពេលម្ចាស់ ឬច្បាប់តម្រូវ; ថតរូបយានយន្តទាំងអស់ ផ្លាកលេខ ទីកន្លែង និងការខូចខាត; កត់ត្រាឈ្មោះ លេខទូរស័ព្ទ ផ្លាកលេខ និងធានារ៉ាប់រងរបស់ភាគីម្ខាងទៀត; ហើយមិនត្រូវទទួលស្គាល់កំហុស បង់ ឬទទួលប្រាក់ ឬព្រមព្រៀងដោះស្រាយឯកជន ដោយគ្មានការយល់ព្រមពីម្ចាស់។
+    country: true
+  - id: accident.2
+    en: 'Breakdowns: the Renter must stop safely, tell the Owner and follow the Owner''s instructions. The Renter must not have the vehicle repaired without the Owner''s permission, except for minor emergency costs up to {{currency}} {{emergency_repair_limit}}, which the Owner refunds against a receipt.'
+    local: ការខូចយានយន្ត៖ អ្នកជួលត្រូវឈប់នៅកន្លែងមានសុវត្ថិភាព ជូនដំណឹងម្ចាស់ និងធ្វើតាមការណែនាំរបស់ម្ចាស់។ អ្នកជួលមិនត្រូវឱ្យគេជួសជុលយានយន្ត ដោយគ្មានការអនុញ្ញាតពីម្ចាស់ទេ លើកលែងតែថ្លៃបន្ទាន់តិចតួច រហូតដល់ {{currency}} {{emergency_repair_limit}} ដែលម្ចាស់សងវិញ ដោយមានបង្កាន់ដៃ។
+  - id: accident.3
+    en: If the vehicle stops working through no fault of the Renter, the Owner will repair it or provide a similar vehicle within 24 hours of being told where reasonably possible. If the Owner cannot, the Renter may end the rental and receive a refund of the rent for the unused days.
+    local: ប្រសិនបើយានយន្តឈប់ដំណើរការ មិនមែនដោយកំហុសរបស់អ្នកជួល ម្ចាស់នឹងជួសជុល ឬផ្តល់យានយន្តស្រដៀងគ្នា ក្នុងរយៈពេល ២៤ ម៉ោង បន្ទាប់ពីទទួលបានការជូនដំណឹង តាមដែលអាចធ្វើបាន។ ប្រសិនបើម្ចាស់មិនអាចធ្វើបាន អ្នកជួលអាចបញ្ចប់ការជួល និងទទួលបានថ្លៃជួលសម្រាប់ថ្ងៃដែលមិនបានប្រើវិញ។
+  - id: accident.4
+    en: The Renter must report any warning light, unusual noise, puncture or fault promptly and must not keep using a vehicle that is unsafe.
+    local: អ្នកជួលត្រូវរាយការណ៍ភ្លាមៗ អំពីភ្លើងព្រមាន សំឡេងមិនធម្មតា កង់បែក ឬការខូចណាមួយ ហើយមិនត្រូវបន្តប្រើយានយន្តដែលគ្មានសុវត្ថិភាពឡើយ។
+- id: fines
+  title:
+    en: 14. Fines, tolls and parking
+    local: ១៤. ប្រាក់ពិន័យ ថ្លៃផ្លូវ និងថ្លៃចំណត
+  clauses:
+  - id: fines.1
+    en: The Renter pays all traffic and parking fines, tolls, towing, impound and clamping costs arising during the rental, including fines that reach the Owner after the vehicle is returned, plus a handling fee of {{currency}} {{fine_admin_fee}} per fine.
+    local: អ្នកជួលបង់ប្រាក់ពិន័យចរាចរណ៍ និងចំណតទាំងអស់ ថ្លៃផ្លូវ ថ្លៃអូស ថ្លៃរឹបអូស និងថ្លៃចាក់សោកង់ ដែលកើតឡើងអំឡុងពេលជួល រួមទាំងប្រាក់ពិន័យដែលមកដល់ម្ចាស់ បន្ទាប់ពីយានយន្តត្រូវបានប្រគល់មកវិញ បូកថ្លៃដំណើរការ {{currency}} {{fine_admin_fee}} ក្នុងមួយប្រាក់ពិន័យ។
+  - id: fines.2
+    en: The Owner may give the Renter's name and details to the traffic police or the issuing authority so that a fine is transferred to the Renter, where the law allows.
+    local: ម្ចាស់អាចផ្តល់ឈ្មោះ និងព័ត៌មានរបស់អ្នកជួល ដល់នគរបាលចរាចរណ៍ ឬអាជ្ញាធរដែលចេញប្រាក់ពិន័យ ដើម្បីផ្ទេរប្រាក់ពិន័យទៅអ្នកជួល ក្នុងករណីដែលច្បាប់អនុញ្ញាត។
+    country: true
+- id: termination
+  title:
+    en: 15. Ending the agreement by the Owner
+    local: ១៥. ការបញ្ចប់កិច្ចសន្យាដោយម្ចាស់
+  clauses:
+  - id: termination.1
+    en: 'The Owner may end this agreement and take the vehicle back at once if the Renter: does not pay on time; gave false details; lets an unnamed person drive; uses the vehicle unlawfully or against section 9; takes it outside the permitted area without permission; tampers with the odometer or tracker; abandons it; or puts the vehicle or other people at serious risk. The Owner may then deduct what the Renter owes under this agreement, including reasonable recovery costs, and refunds any remaining prepaid rent for the days after the vehicle is recovered.'
+    local: ម្ចាស់អាចបញ្ចប់កិច្ចសន្យានេះ និងយកយានយន្តមកវិញភ្លាមៗ ដោយមិនសងថ្លៃជួលនៃរយៈពេលបច្ចុប្បន្ន ប្រសិនបើអ្នកជួល៖ មិនបង់ប្រាក់ទាន់ពេល; ផ្តល់ព័ត៌មានមិនពិត; អនុញ្ញាតឱ្យអ្នកគ្មានឈ្មោះបើកបរ; ប្រើយានយន្តខុសច្បាប់ ឬផ្ទុយនឹងផ្នែកទី ៩; យកវាចេញក្រៅតំបន់ដែលអនុញ្ញាត ដោយគ្មានការអនុញ្ញាត; កែប្រែនាឡិកាគីឡូម៉ែត្រ ឬឧបករណ៍តាមដាន; បោះបង់ចោលយានយន្ត; ឬធ្វើឱ្យយានយន្ត ឬអ្នកដទៃប្រឈមនឹងហានិភ័យធ្ងន់ធ្ងរ។
+  - id: termination.2
+    en: The Renter must make the vehicle available for collection, and pays reasonable recovery costs where the Owner has to fetch it.
+    local: អ្នកជួលត្រូវធ្វើឱ្យយានយន្តអាចមកយកបាន ហើយបង់ថ្លៃយកមកវិញដែលសមរម្យ ក្នុងករណីដែលម្ចាស់ត្រូវទៅយកវាដោយខ្លួនឯង។
+- id: return
+  title:
+    en: 16. Returning the vehicle
+    local: ១៦. ការប្រគល់យានយន្តត្រឡប់មកវិញ
+  clauses:
+  - id: return.1
+    en: The vehicle must be returned with its keys, documents and accessories, with the fuel level agreed in section 8, and reasonably clean. Both parties check the vehicle together and record the condition, odometer and fuel in Annex A with photos. If the Renter is not present at the check, the Owner's dated photos are accepted as the record.
+    local: យានយន្តត្រូវប្រគល់មកវិញ ជាមួយសោ ឯកសារ និងគ្រឿងបន្លាស់ ជាមួយកម្រិតប្រេងដែលបានព្រមព្រៀងនៅផ្នែកទី ៨ និងស្អាតសមរម្យ។ ភាគីទាំងពីរត្រួតពិនិត្យយានយន្តជាមួយគ្នា ហើយកត់ត្រាស្ថានភាព លេខគីឡូម៉ែត្រ និងប្រេង ក្នុងឧបសម្ព័ន្ធ ក ជាមួយរូបថត។ ប្រសិនបើអ្នកជួលមិនមានវត្តមាននៅពេលត្រួតពិនិត្យ រូបថតដែលមានកាលបរិច្ឆេទរបស់ម្ចាស់ ត្រូវទទួលយកជាកំណត់ត្រា។
+  - id: return.2
+    if: cleaning_fee
+    en: A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more if specialist cleaning is needed, against a receipt).
+    local: យានយន្តដែលប្រគល់មកវិញ ដោយមានធូលី ខ្សាច់ ភក់ ស្នាមប្រឡាក់ អាហារ ឬក្លិនច្រើនពេកនៅខាងក្នុង គិតថ្លៃសម្អាត {{currency}} {{cleaning_fee}} (ច្រើនជាងនេះ ប្រសិនបើត្រូវការការសម្អាតពិសេស ដោយមានបង្កាន់ដៃ)។
+  - id: return.3
+    unless: cleaning_fee
+    en: A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside may be charged the reasonable cost of cleaning.
+    local: យានយន្តដែលប្រគល់មកវិញ ដោយមានធូលី ខ្សាច់ ភក់ ស្នាមប្រឡាក់ អាហារ ឬក្លិនច្រើនពេកនៅខាងក្នុង អាចត្រូវគិតថ្លៃសម្អាតដែលសមរម្យ។
+- id: data
+  title:
+    en: 17. Personal data and documents
+    local: ១៧. ទិន្នន័យផ្ទាល់ខ្លួន និងឯកសារ
+  clauses:
+  - id: data.1
+    en: The Owner collects the Renter's and drivers' names, contact details, ID and licence details, copies of documents and photos of the vehicle only to provide this rental, prove identity, comply with the law, handle fines, claims and disputes, and keep business records. The Owner keeps them only as long as needed for those purposes and the law, keeps them secure, does not sell them, and follows any personal data law that applies in Cambodia.
+    local: ម្ចាស់ប្រមូលឈ្មោះ ព័ត៌មានទំនាក់ទំនង ព័ត៌មានអត្តសញ្ញាណ និងប័ណ្ណបើកបរ ច្បាប់ចម្លងឯកសារ និងរូបថតយានយន្ត របស់អ្នកជួល និងអ្នកបើកបរ តែដើម្បីផ្តល់ការជួលនេះ ផ្ទៀងផ្ទាត់អត្តសញ្ញាណ គោរពច្បាប់ ដោះស្រាយប្រាក់ពិន័យ ការទាមទារសំណង និងវិវាទ និងរក្សាកំណត់ត្រាអាជីវកម្ម។ ម្ចាស់រក្សាទុកព័ត៌មានទាំងនោះ តែក្នុងរយៈពេលដែលចាំបាច់សម្រាប់គោលបំណងទាំងនោះ និងតាមច្បាប់ រក្សាឱ្យមានសុវត្ថិភាព មិនលក់ ហើយគោរពច្បាប់ស្តីពីទិន្នន័យផ្ទាល់ខ្លួនណាមួយ ដែលអនុវត្តនៅកម្ពុជា។
+    country: true
+  - id: data.2
+    en: The Renter agrees that copies of their documents and the inspection photos and videos may be used as evidence of identity and of the vehicle's condition, and may be given to insurers, the police and authorities when needed for a claim, fine or legal requirement.
+    local: អ្នកជួលយល់ព្រមថា ច្បាប់ចម្លងឯកសាររបស់ខ្លួន និងរូបថត និងវីដេអូនៃការត្រួតពិនិត្យ អាចប្រើជាភស្តុតាងនៃអត្តសញ្ញាណ និងស្ថានភាពយានយន្ត ហើយអាចផ្តល់ដល់ក្រុមហ៊ុនធានារ៉ាប់រង នគរបាល និងអាជ្ញាធរ នៅពេលចាំបាច់សម្រាប់ការទាមទារសំណង ប្រាក់ពិន័យ ឬតម្រូវការផ្លូវច្បាប់។
+    country: true
+- id: general
+  title:
+    en: 18. General terms
+    local: ១៨. លក្ខខណ្ឌទូទៅ
+  clauses:
+  - id: general.1
+    en: 'Messages: notices under this agreement may be sent by phone, message app (WhatsApp, LINE, Telegram, Zalo or similar), SMS or email to the contact details in sections 1 and 2, and count as received when sent.'
+    local: ការជូនដំណឹង៖ ការជូនដំណឹងតាមកិច្ចសន្យានេះ អាចផ្ញើតាមទូរស័ព្ទ កម្មវិធីផ្ញើសារ (WhatsApp, LINE, Telegram, Zalo ឬស្រដៀងគ្នា) SMS ឬអ៊ីមែល ទៅព័ត៌មានទំនាក់ទំនងនៅផ្នែកទី ១ និង ២ ហើយត្រូវចាត់ទុកថាបានទទួល នៅពេលផ្ញើ។
+  - id: general.2
+    en: 'Force majeure: neither party is responsible for a delay or failure caused by events outside their control, such as natural disasters, floods, storms, government orders or ferry cancellations. Rent for days the vehicle could not be used because of such an event is agreed fairly between the parties.'
+    local: ករណីប្រធានសក្តិ៖ គ្មានភាគីណាទទួលខុសត្រូវចំពោះការពន្យារពេល ឬការមិនអនុវត្ត ដែលបណ្តាលមកពីព្រឹត្តិការណ៍ក្រៅការគ្រប់គ្រង ដូចជាគ្រោះធម្មជាតិ ទឹកជំនន់ ព្យុះ បទបញ្ជារបស់រដ្ឋាភិបាល ឬការលុបចោលសាឡាងទេ។ ថ្លៃជួលសម្រាប់ថ្ងៃដែលមិនអាចប្រើយានយន្តបាន ដោយសារព្រឹត្តិការណ៍បែបនេះ ត្រូវព្រមព្រៀងគ្នាដោយយុត្តិធម៌រវាងភាគី។
+  - id: general.3
+    en: 'Whole agreement: this agreement, its annexes and any special conditions are the whole agreement. Changes are valid only in writing (a message from both parties is enough). If any part is found invalid, the rest still applies.'
+    local: កិច្ចព្រមព្រៀងទាំងមូល៖ កិច្ចសន្យានេះ ឧបសម្ព័ន្ធ និងលក្ខខណ្ឌពិសេសណាមួយ គឺជាកិច្ចព្រមព្រៀងទាំងមូល។ ការផ្លាស់ប្តូរមានសុពលភាព លុះត្រាតែធ្វើជាលាយលក្ខណ៍អក្សរ (សារពីភាគីទាំងពីរគឺគ្រប់គ្រាន់)។ ប្រសិនបើផ្នែកណាមួយត្រូវបានរកឃើញថាមិនមានសុពលភាព ផ្នែកដែលនៅសល់នៅតែអនុវត្ត។
+  - id: general.4
+    en: 'Language: this agreement is written in English and {{local_language}}. If the two versions differ, the {{prevailing_language}} version applies. The Renter may ask the Owner to explain any part before signing.'
+    local: ភាសា៖ កិច្ចសន្យានេះសរសេរជាភាសាអង់គ្លេស និង{{local_language}}។ ប្រសិនបើកំណែទាំងពីរខុសគ្នា កំណែ{{prevailing_language}}ត្រូវយកជាការ។ អ្នកជួលអាចស្នើឱ្យម្ចាស់ពន្យល់ផ្នែកណាមួយ មុនពេលចុះហត្ថលេខា។
+    country: true
+  - id: general.5
+    en: 'Governing law: this agreement is governed by the laws of {{jurisdiction}}, including the Civil Code and the Law on Consumer Protection. The parties will first try to settle any dispute by discussion; if they cannot, the competent courts of {{court_place}} decide.'
+    local: ច្បាប់គ្រប់គ្រង៖ កិច្ចសន្យានេះស្ថិតក្រោមច្បាប់នៃ{{jurisdiction}} រួមទាំងក្រមរដ្ឋប្បវេណី និងច្បាប់ស្តីពីកិច្ចការពារអ្នកប្រើប្រាស់។ ភាគីនឹងព្យាយាមដោះស្រាយវិវាទតាមរយៈការពិភាក្សាជាមុនសិន; ប្រសិនបើមិនអាចដោះស្រាយបាន តុលាការមានសមត្ថកិច្ចនៃ{{court_place}} ជាអ្នកសម្រេច។
+    country: true
+  - id: general.6
+    if: special_terms
+    en: 'Special conditions agreed between the parties: {{special_terms}}'
+    local: លក្ខខណ្ឌពិសេសដែលភាគីបានព្រមព្រៀង៖ {{special_terms}}
+- id: signatures
+  title:
+    en: Signatures
+    local: ហត្ថលេខា
+  signature: true
+  clauses:
+  - id: signatures.1
+    en: By signing, the parties confirm they have read and understood this agreement, including Annexes A and B, and agree to it. The Renter confirms they received a copy.
+    local: តាមរយៈការចុះហត្ថលេខា ភាគីបញ្ជាក់ថា បានអាន និងយល់កិច្ចសន្យានេះ រួមទាំងឧបសម្ព័ន្ធ ក និង ខ ហើយយល់ព្រម។ អ្នកជួលបញ្ជាក់ថា បានទទួលច្បាប់ចម្លងមួយ។
+  sign_rows:
+  - en: Owner (name, signature, date)
+    local: ម្ចាស់ (ឈ្មោះ ហត្ថលេខា កាលបរិច្ឆេទ)
+  - en: Renter (name, signature, date)
+    local: អ្នកជួល (ឈ្មោះ ហត្ថលេខា កាលបរិច្ឆេទ)
+  - en: Additional driver (name, signature, date)
+    local: អ្នកបើកបរបន្ថែម (ឈ្មោះ ហត្ថលេខា កាលបរិច្ឆេទ)
+- id: annex_a
+  title:
+    en: 'Annex A: Handover and return check'
+    local: ឧបសម្ព័ន្ធ ក៖ ការត្រួតពិនិត្យពេលប្រគល់ និងពេលទទួលត្រឡប់
+  page_break: true
+  checklist: true
+  clauses:
+  - id: annex_a.1
+    en: Mark existing scratches (S), dents (D), cracks (C) and missing items (M). Take photos of all four sides, the dashboard (odometer and fuel), the interior and any damage, at both handover and return.
+    local: សម្គាល់ស្នាមឆូត (S) ស្នាមផត (D) ស្នាមប្រេះ (C) និងរបស់ដែលបាត់ (M) ដែលមានស្រាប់។ ថតរូបទាំងបួនជ្រុង ផ្ទាំងបង្ហាញ (លេខគីឡូម៉ែត្រ និងប្រេង) ផ្នែកខាងក្នុង និងការខូចខាតណាមួយ ទាំងពេលប្រគល់ និងពេលទទួលត្រឡប់។
+  check_rows:
+  - en: Odometer
+    local: លេខគីឡូម៉ែត្រ
+  - en: Fuel / battery level
+    local: កម្រិតប្រេង / ថ្ម
+  - en: 'Body: front / rear / left / right'
+    local: តួ៖ មុខ / ក្រោយ / ឆ្វេង / ស្តាំ
+  - en: Glass, mirrors and lights
+    local: កញ្ចក់ កញ្ចក់ចំហៀង និងភ្លើង
+  - en: Tyres and wheels
+    local: សំបកកង់ និងកង់
+  - en: Interior and seats
+    local: ផ្នែកខាងក្នុង និងកៅអី
+  - en: Keys, remote, documents
+    local: សោ ឧបករណ៍បញ្ជា ឯកសារ
+  - en: Helmets / child seat / accessories
+    local: មួកសុវត្ថិភាព / កៅអីកុមារ / គ្រឿងបន្លាស់
+  - en: Photos taken (number)
+    local: រូបថតដែលបានថត (ចំនួន)
+  - en: Owner's and Renter's initials
+    local: អក្សរកាត់ហត្ថលេខារបស់ម្ចាស់ និងអ្នកជួល
+  columns:
+    item:
+      en: Item
+      local: ធាតុ
+    out:
+      en: At handover
+      local: ពេលប្រគល់
+    in:
+      en: At return
+      local: ពេលទទួលត្រឡប់
+- id: annex_b
+  title:
+    en: 'Annex B: Damage and replacement price list'
+    local: ឧបសម្ព័ន្ធ ខ៖ តារាងតម្លៃការខូចខាត និងការជំនួស
+  pricelist: true
+  clauses:
+  - id: annex_b.1
+    en: Agreed prices for common damage and lost items. Damage not listed is charged per section 12.
+    local: តម្លៃដែលបានព្រមព្រៀង សម្រាប់ការខូចខាតទូទៅ និងរបស់ដែលបាត់។ ការខូចខាតដែលមិនមានក្នុងបញ្ជី គិតតាមផ្នែកទី ១២។
+  price_rows:
+  - en: Scratch, per panel (polish / repaint)
+    local: ស្នាមឆូត ក្នុងមួយបន្ទះ (ប៉ូលា / លាបថ្នាំឡើងវិញ)
+  - en: Dent, per panel
+    local: ស្នាមផត ក្នុងមួយបន្ទះ
+  - en: Mirror
+    local: កញ្ចក់ចំហៀង
+  - en: Headlight / tail light / indicator
+    local: ភ្លើងមុខ / ភ្លើងក្រោយ / ភ្លើងសេ
+  - en: Tyre (each)
+    local: សំបកកង់ (មួយ)
+  - en: Key / remote
+    local: សោ / ឧបករណ៍បញ្ជា
+  - en: Helmet
+    local: មួកសុវត្ថិភាព
+  - en: Number plate replacement
+    local: ការជំនួសផ្លាកលេខ
+  - en: Vehicle value (for total loss or theft)
+    local: តម្លៃយានយន្ត (សម្រាប់ការខូចខាតទាំងស្រុង ឬការលួច)
+  columns:
+    item:
+      en: Item
+      local: ធាតុ
+    price:
+      en: Price
+      local: តម្លៃ

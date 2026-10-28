@@ -1,0 +1,657 @@
+country: XX
+locale: en
+language: English
+currency: USD
+prevailing_language:
+  en: English
+  local: ''
+local_language:
+  en: English
+  local: ''
+country_name:
+  en: For use in the country where the vehicle is rented
+  local: ''
+currency_name:
+  en: the currency stated in this agreement
+  local: ''
+jurisdiction:
+  en: the country where the vehicle is rented
+  local: ''
+court_place:
+  en: the place where the vehicle was rented
+  local: ''
+words:
+  per_day:
+    en: per day
+    local: ''
+  per_week:
+    en: per week
+    local: ''
+  per_month:
+    en: per month
+    local: ''
+  day:
+    en: day
+    local: ''
+  month:
+    en: month
+    local: ''
+  days:
+    en: days
+    local: ''
+  business_days:
+    en: business days after return
+    local: ''
+  car:
+    en: Car
+    local: ''
+  motorbike:
+    en: Motorbike / scooter
+    local: ''
+  ins_compulsory:
+    en: Compulsory insurance only
+    local: ''
+  ins_third_party:
+    en: Compulsory + third-party insurance
+    local: ''
+  ins_comprehensive:
+    en: Comprehensive (first-class) insurance
+    local: ''
+  free:
+    en: Free
+    local: ''
+  payment_default:
+    en: Cash, bank transfer or QR payment
+    local: ''
+  blank_hint:
+    en: (fill in)
+    local: ''
+sources:
+- url: https://lokalfleet.com/guides/rental-agreement-what-to-include
+  supports: General checklist; no country-specific rules in this version
+title:
+  en: Vehicle Rental Agreement
+  local: Vehicle Rental Agreement
+subtitle:
+  en: Car, motorbike and scooter rental
+  local: ''
+footer:
+  en: Vehicle rental agreement · {{business_name}}
+  local: ''
+page_words:
+  page: Page
+  of: of
+sections:
+- id: parties
+  title:
+    en: 1. The parties
+    local: ''
+  fields:
+  - key: business_name
+    en: Owner (rental business)
+    local: ''
+  - key: business_reg_no
+    en: Business registration / tax ID
+    local: ''
+  - key: business_address
+    en: Business address
+    local: ''
+  - key: business_phone
+    en: Phone / WhatsApp / LINE
+    local: ''
+  - key: business_email
+    en: Email
+    local: ''
+  clauses:
+  - id: parties.1
+    en: This agreement is made on {{renter_contract_date}} between the rental business named above (the "Owner") and the person named in section 2 (the "Renter"). Where there is more than one renter or driver, each of them is jointly responsible for every obligation in this agreement.
+    local: ''
+- id: renter
+  title:
+    en: 2. The Renter and drivers
+    local: ''
+  fields:
+  - key: renter_name
+    en: Full name (as on passport or ID)
+    local: ''
+  - key: renter_nationality
+    en: Nationality
+    local: ''
+  - key: renter_dob
+    en: Date of birth
+    local: ''
+  - key: renter_id_no
+    en: Passport or national ID number
+    local: ''
+  - key: renter_home_address
+    en: Home address
+    local: ''
+  - key: renter_local_address
+    en: Local address during the rental (hotel / villa / condo)
+    local: ''
+  - key: renter_phone
+    en: Phone / WhatsApp
+    local: ''
+  - key: renter_email
+    en: Email
+    local: ''
+  - key: renter_licence
+    en: Driving licence number, class and issuing country
+    local: ''
+  - key: renter_licence_expiry
+    en: Licence expiry date
+    local: ''
+  - key: renter_idp
+    en: International Driving Permit (number / not required)
+    local: ''
+  - key: renter_emergency
+    en: Emergency contact (name and phone)
+    local: ''
+  - key: driver2_details
+    en: Additional driver (name, ID, licence), if any
+    local: ''
+  clauses:
+  - id: renter.1
+    en: The Renter confirms that the details above are true and complete, and that every person who will drive or ride the vehicle is named here. Only the Renter and any additional driver named above may drive or ride the vehicle.
+    local: ''
+  - id: renter.2
+    en: Every driver must hold a valid driving licence for this class of vehicle, carried at all times while driving, together with any International Driving Permit the law requires. A car licence does not allow a person to ride a motorbike.
+    local: ''
+    country: true
+- id: vehicle
+  title:
+    en: 3. The vehicle
+    local: ''
+  fields:
+  - key: vehicle_type_label
+    en: Type
+    local: ''
+  - key: vehicle_make_model
+    en: Make and model
+    local: ''
+  - key: vehicle_year
+    en: Year
+    local: ''
+  - key: vehicle_plate
+    en: Registration (plate) number
+    local: ''
+  - key: vehicle_colour
+    en: Colour
+    local: ''
+  - key: renter_vin
+    en: Chassis / VIN number
+    local: ''
+  - key: out_odometer
+    en: Odometer at handover
+    local: ''
+  - key: out_fuel
+    en: Fuel / battery level at handover
+    local: ''
+  - key: renter_accessories
+    en: Accessories handed over (helmets, keys, child seat, phone holder, etc.)
+    local: ''
+  clauses:
+  - id: vehicle.1
+    en: The Owner rents the vehicle described above, with the accessories listed, to the Renter for the rental period and on the terms of this agreement. The vehicle remains the property of the Owner at all times.
+    local: ''
+  - id: vehicle.2
+    en: The Owner confirms that the vehicle is registered, that its road tax is paid and that compulsory insurance is valid for the whole rental period, and that it is handed over in a roadworthy condition.
+    local: ''
+    country: true
+- id: period
+  title:
+    en: 4. Rental period, pickup and return
+    local: ''
+  fields:
+  - key: renter_start
+    en: Start (date and time)
+    local: ''
+  - key: renter_end
+    en: End (date and time)
+    local: ''
+  - key: renter_pickup_place
+    en: Pickup / delivery place
+    local: ''
+  - key: renter_return_place
+    en: Return / collection place
+    local: ''
+  clauses:
+  - id: period.1
+    en: The Renter must return the vehicle at the agreed place, date and time. An extension is valid only when the Owner agrees to it in writing (a message is enough) and the extra rent is paid.
+    local: ''
+  - id: period.2
+    if: late_hour_fee
+    en: 'Late return: after a grace period of {{late_grace_minutes}} minutes, each started hour costs {{currency}} {{late_hour_fee}}. A return more than {{late_full_day_hours}} hours late is charged as an extra full day at the daily rate.'
+    local: ''
+  - id: period.3
+    unless: late_hour_fee
+    en: 'Late return: a return more than one hour late may be charged as an extra day at the daily rate.'
+    local: ''
+  - id: period.4
+    en: If the vehicle is not returned and the Renter cannot be reached within 24 hours of the end time, the Owner may treat the vehicle as stolen, report it to the police and recover it, at the Renter's cost.
+    local: ''
+- id: charges
+  title:
+    en: 5. Rent and payment
+    local: ''
+  fields:
+  - key: rate_text
+    en: Rental rate
+    local: ''
+  - key: renter_total
+    en: Total rent for this booking
+    local: ''
+  - key: delivery_fee_text
+    en: Delivery / collection fee
+    local: ''
+  - key: payment_methods
+    en: Payment methods accepted
+    local: ''
+  clauses:
+  - id: charges.1
+    en: The Renter pays the rent stated above in advance, unless the Owner agrees otherwise in writing. Prices are in {{currency_name}}.
+    local: ''
+  - id: charges.2
+    when:
+      rate_period: month
+    en: 'Monthly rentals: rent is paid monthly in advance on the same day each month. A payment more than 3 days late allows the Owner to end the rental and collect the vehicle (section 15).'
+    local: ''
+  - id: charges.3
+    en: Extras (child seats, delivery, additional drivers, phone holders, insurance upgrades and similar) cost what is written in this agreement or what the Owner confirmed in writing before the rental.
+    local: ''
+- id: deposit
+  title:
+    en: 6. Security deposit
+    local: ''
+  fields:
+  - key: deposit_text
+    en: Deposit
+    local: ''
+  - key: renter_deposit_method
+    en: Paid by (cash / transfer / card hold)
+    local: ''
+  - key: deposit_return_text
+    en: Returned within
+    local: ''
+  clauses:
+  - id: deposit.1
+    en: 'The deposit secures the Renter''s obligations: unpaid rent, damage up to the amount the Renter is liable for, fuel, mileage, cleaning, late return, lost keys or accessories, traffic fines and any other amount owed under this agreement.'
+    local: ''
+  - id: deposit.2
+    en: The Owner returns the deposit, less any amounts properly deducted, after the vehicle has been returned and checked. The Owner gives the Renter a written list of any deduction with photos, receipts or quotes. If the amounts owed are more than the deposit, the Renter pays the difference within 7 days of being told.
+    local: ''
+  - id: deposit.3
+    en: Traffic fines often arrive after a rental ends. The Owner may keep a reasonable part of the deposit for up to 30 days to cover fines the Owner has reason to expect, and must return it promptly if none arrive.
+    local: ''
+    country: true
+  - id: deposit.4
+    en: The Owner will not keep the Renter's original passport or national ID card as a deposit. The Owner may take a copy or photo of them to identify the Renter (section 17).
+    local: ''
+    country: true
+- id: cancellation
+  title:
+    en: 7. Cancellation and early return
+    local: ''
+  clauses:
+  - id: cancellation.1
+    if: cancel_free_hours
+    en: The Renter may cancel free of charge up to {{cancel_free_hours}} hours before the start time. A later cancellation costs {{cancel_fee_percent}}% of the rent for the booked period (or of the first month on a monthly rental). If the Renter does not arrive at the start time and does not tell the Owner (a no-show), the Owner may keep the full amount paid for the first {{no_show_days}} day(s) and release the vehicle.
+    local: ''
+  - id: cancellation.2
+    unless: cancel_free_hours
+    en: 'Cancellation by the Renter before the start time: the Owner keeps any booking payment that this agreement or the booking confirmation says is non-refundable, and refunds the rest.'
+    local: ''
+  - id: cancellation.3
+    when:
+      early_return: none
+    en: 'Early return: rent for the booked period is not refunded if the Renter returns the vehicle early.'
+    local: ''
+  - id: cancellation.4
+    when:
+      early_return: prorata
+    en: 'Early return: the Owner refunds the rent for the full unused days, less an early-return fee of {{currency}} {{early_return_fee}}. Long-term discounts that no longer apply may be recalculated at the rate for the period actually used.'
+    local: ''
+  - id: cancellation.5
+    when:
+      rate_period: month
+    en: 'Monthly rentals: either party may end the rental by giving {{notice_days}} days'' written notice. Without notice, the Renter pays rent for the notice period.'
+    local: ''
+  - id: cancellation.6
+    en: If the Owner cannot provide the vehicle (or a similar or better one) at the start time, the Renter may cancel and receive a full refund of everything paid.
+    local: ''
+- id: fuel
+  title:
+    en: 8. Fuel, charging and mileage
+    local: ''
+  clauses:
+  - id: fuel.1
+    when:
+      fuel_policy: same
+    en: 'Fuel policy: same-to-same. The vehicle must be returned with at least the fuel (or battery) level it had at handover.'
+    local: ''
+  - id: fuel.2
+    when:
+      fuel_policy: full
+    en: 'Fuel policy: full-to-full. The vehicle is handed over with a full tank and must be returned full.'
+    local: ''
+  - id: fuel.3
+    en: Missing fuel is charged at the local pump price plus a refuelling service fee of {{currency}} {{fuel_service_fee}}. Using the wrong fuel is the Renter's responsibility, including towing and repair.
+    local: ''
+  - id: fuel.4
+    if: mileage_limit
+    en: 'Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometre costs {{currency}} {{excess_km_fee}}.'
+    local: ''
+  - id: fuel.5
+    unless: mileage_limit
+    en: 'Mileage: unlimited, within the permitted area (section 10).'
+    local: ''
+  - id: fuel.6
+    en: The Renter must not tamper with the odometer, speed limiter or GPS tracker. Tampering is a serious breach (section 15).
+    local: ''
+- id: use
+  title:
+    en: 9. Safe and lawful use
+    local: ''
+  clauses:
+  - id: use.1
+    en: The Renter must drive or ride carefully, obey all traffic laws, and keep the vehicle locked with the keys removed whenever it is left. Keys must never be left in or on the vehicle.
+    local: ''
+  - id: use.2
+    when:
+      vehicle_type:
+      - motorbike
+      - ''
+    en: 'Motorbikes and scooters: the rider and any passenger must wear a fastened helmet at all times. No more than one passenger, and no passenger who cannot reach the footrests safely.'
+    local: ''
+    country: true
+  - id: use.3
+    when:
+      vehicle_type:
+      - car
+      - ''
+    en: 'Cars: every occupant must wear a seatbelt, children must use a suitable child seat where the law requires one, and the number of passengers must not exceed the number of seats.'
+    local: ''
+    country: true
+  - id: use.4
+    en: 'It is forbidden to: drive under the influence of alcohol or drugs, or above the legal limit; use a phone while driving except hands-free; race, perform stunts or drive off-road (unless the vehicle is meant for it and the Owner agreed); tow or push anything; carry goods for payment, illegal goods or dangerous loads; use the vehicle for ride-hailing, delivery work, driving lessons or to rent it to anyone else; let anyone not named in section 2 drive or ride.'
+    local: ''
+  - id: use.5
+    when:
+      smoking: false
+    en: Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odour removal.{{/if}}
+    local: ''
+  - id: use.6
+    when:
+      pets: false
+    en: Pets and animals are not allowed in or on the vehicle, except assistance animals.
+    local: ''
+  - id: use.7
+    when:
+      pets: fee
+    en: Pets are allowed if they are kept in a carrier or on a seat cover. A pet cleaning fee of {{currency}} {{pet_fee}} applies.
+    local: ''
+- id: area
+  title:
+    en: 10. Permitted area
+    local: ''
+  fields:
+  - key: area_of_use
+    en: The vehicle may be used in
+    local: ''
+  clauses:
+  - id: area.1
+    en: The vehicle must stay within the permitted area above. Taking it further, on a ferry or to another island, needs the Owner's written permission first, and the Renter pays any ferry fees, delays and recovery costs.
+    local: ''
+  - id: area.2
+    en: The vehicle must not leave the country under any circumstances. Insurance does not cover it outside the country or outside the permitted area.
+    local: ''
+    country: true
+  - id: area.3
+    en: The vehicle may be fitted with a GPS tracker, used only for security, recovery and checking that this agreement is kept.
+    local: ''
+- id: insurance
+  title:
+    en: 11. Insurance
+    local: ''
+  fields:
+  - key: insurance_text
+    en: Insurance on this vehicle
+    local: ''
+  - key: insurance_excess_text
+    en: Renter's excess (most the Renter pays per incident, if the rules are kept)
+    local: ''
+  clauses:
+  - id: insurance.1
+    en: The vehicle has the compulsory insurance required by law, which covers injury to people and, depending on the country, limited damage to others. It does not cover damage to the rented vehicle itself.
+    local: ''
+    country: true
+  - id: insurance.2
+    when:
+      insurance_level: comprehensive
+    en: The vehicle also has comprehensive insurance covering damage to the rented vehicle and to third parties. Per incident, the Renter pays no more than the excess shown above, provided the Renter has kept the rules of this agreement.
+    local: ''
+  - id: insurance.3
+    when:
+      insurance_level: third_party
+    en: 'The vehicle also has third-party insurance covering damage to other people''s property. It does not cover damage to or theft of the rented vehicle: the Renter is responsible for those (section 12).'
+    local: ''
+  - id: insurance.4
+    when:
+      insurance_level: compulsory
+    en: The vehicle has only the compulsory insurance. The Renter is responsible for damage to the rented vehicle, its theft, and damage to other people's property (section 12).
+    local: ''
+  - id: insurance.5
+    en: 'Insurance does not protect the Renter, and the Renter pays in full, when damage or loss happens: while driving under the influence, without a valid licence for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or reckless acts, or when keys were left with the vehicle. Tyres, wheels, glass, underbody, interior, keys and accessories are often excluded by insurers and are the Renter''s responsibility unless the Owner confirms in writing that they are covered.'
+    local: ''
+  - id: insurance.6
+    en: Personal belongings left in or on the vehicle are not insured by the Owner. The Owner is not responsible for their loss or damage.
+    local: ''
+- id: damage
+  title:
+    en: 12. Damage, theft and loss
+    local: ''
+  clauses:
+  - id: damage.1
+    en: The Renter is responsible for the vehicle from handover until it is returned and checked. The condition at handover is recorded in Annex A with photos; anything not recorded there is treated as new unless it is normal wear and tear.
+    local: ''
+  - id: damage.2
+    en: Repair costs are based on a quote or invoice from a garage, or on the damage price list in Annex B where one is attached. The Renter may ask to see the quote, and may get a second quote from a garage the Owner approves within 3 days.
+    local: ''
+  - id: damage.3
+    if: loss_of_use_fee
+    en: While the vehicle cannot be rented because of damage caused during this rental, the Renter pays loss of use of {{currency}} {{loss_of_use_fee}} per day, for up to {{loss_of_use_max_days}} days.
+    local: ''
+  - id: damage.4
+    en: If the vehicle or its keys are stolen, the Renter must report it to the police at once and give the Owner the police report. Where the theft happened because the vehicle was left unlocked, with the keys, or outside the permitted area, the Renter pays the value of the vehicle as stated in Annex B (or its market value).
+    local: ''
+  - id: damage.5
+    en: Lost keys, remote controls, helmets, documents, number plates and accessories are charged at their replacement cost, plus any locksmith or re-registration cost.
+    local: ''
+- id: accident
+  title:
+    en: 13. Accidents and breakdowns
+    local: ''
+  clauses:
+  - id: accident.1
+    en: 'In an accident, the Renter must: make the area safe and get medical help if anyone is hurt; call the Owner straight away on the number in section 1; call the police and the insurer''s hotline when the Owner or the law requires it; take photos of all vehicles, plates, the place and any damage; note the other party''s name, phone, plate and insurance; and not admit fault, pay or accept money without the Owner''s agreement.'
+    local: ''
+    country: true
+  - id: accident.2
+    en: 'Breakdowns: the Renter must stop safely, tell the Owner and follow the Owner''s instructions. The Renter must not have the vehicle repaired without the Owner''s permission, except for minor emergency costs up to {{currency}} {{emergency_repair_limit}}, which the Owner refunds against a receipt.'
+    local: ''
+  - id: accident.3
+    en: If the vehicle stops working through no fault of the Renter, the Owner will repair it or provide a similar vehicle within 24 hours of being told where reasonably possible. If the Owner cannot, the Renter may end the rental and receive a refund of the rent for the unused days.
+    local: ''
+  - id: accident.4
+    en: The Renter must report any warning light, unusual noise, puncture or fault promptly and must not keep using a vehicle that is unsafe.
+    local: ''
+- id: fines
+  title:
+    en: 14. Fines, tolls and parking
+    local: ''
+  clauses:
+  - id: fines.1
+    en: The Renter pays all traffic and parking fines, tolls, towing, impound and clamping costs arising during the rental, including fines that reach the Owner after the vehicle is returned, plus a handling fee of {{currency}} {{fine_admin_fee}} per fine.
+    local: ''
+  - id: fines.2
+    en: The Owner may give the Renter's name and details to the police or the issuing authority so that a fine is transferred to the Renter, where the law allows.
+    local: ''
+    country: true
+- id: termination
+  title:
+    en: 15. Ending the agreement by the Owner
+    local: ''
+  clauses:
+  - id: termination.1
+    en: 'The Owner may end this agreement and take the vehicle back at once if the Renter: does not pay on time; gave false details; lets an unnamed person drive; uses the vehicle unlawfully or against section 9; takes it outside the permitted area without permission; tampers with the odometer or tracker; abandons it; or puts the vehicle or other people at serious risk. The Owner may then deduct what the Renter owes under this agreement, including reasonable recovery costs, and refunds any remaining prepaid rent for the days after the vehicle is recovered.'
+    local: ''
+  - id: termination.2
+    en: The Renter must make the vehicle available for collection, and pays reasonable recovery costs where the Owner has to fetch it.
+    local: ''
+- id: return
+  title:
+    en: 16. Returning the vehicle
+    local: ''
+  clauses:
+  - id: return.1
+    en: The vehicle must be returned with its keys, documents and accessories, with the fuel level agreed in section 8, and reasonably clean. Both parties check the vehicle together and record the condition, odometer and fuel in Annex A with photos. If the Renter is not present at the check, the Owner's dated photos are accepted as the record.
+    local: ''
+  - id: return.2
+    if: cleaning_fee
+    en: A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more if specialist cleaning is needed, against a receipt).
+    local: ''
+  - id: return.3
+    unless: cleaning_fee
+    en: A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside may be charged the reasonable cost of cleaning.
+    local: ''
+- id: data
+  title:
+    en: 17. Personal data and documents
+    local: ''
+  clauses:
+  - id: data.1
+    en: The Owner collects the Renter's and drivers' names, contact details, ID and licence details, copies of documents and photos of the vehicle only to provide this rental, prove identity, comply with the law, handle fines, claims and disputes, and keep business records. The Owner keeps them only as long as needed for those purposes and the law, keeps them secure, and does not sell them.
+    local: ''
+    country: true
+  - id: data.2
+    en: The Renter agrees that copies of their documents and the inspection photos and videos may be used as evidence of identity and of the vehicle's condition, and may be given to insurers, the police and authorities when needed for a claim, fine or legal requirement.
+    local: ''
+    country: true
+- id: general
+  title:
+    en: 18. General terms
+    local: ''
+  clauses:
+  - id: general.1
+    en: 'Messages: notices under this agreement may be sent by phone, message app (WhatsApp, LINE, Telegram, Zalo or similar), SMS or email to the contact details in sections 1 and 2, and count as received when sent.'
+    local: ''
+  - id: general.2
+    en: 'Force majeure: neither party is responsible for a delay or failure caused by events outside their control, such as natural disasters, floods, storms, government orders or ferry cancellations. Rent for days the vehicle could not be used because of such an event is agreed fairly between the parties.'
+    local: ''
+  - id: general.3
+    en: 'Whole agreement: this agreement, its annexes and any special conditions are the whole agreement. Changes are valid only in writing (a message from both parties is enough). If any part is found invalid, the rest still applies.'
+    local: ''
+  - id: general.4
+    en: 'Language: this agreement is written in English. If it is translated, the English version applies.'
+    local: ''
+    country: true
+  - id: general.5
+    en: 'Governing law: this agreement is governed by the laws of {{jurisdiction}}. The parties will first try to settle any dispute by discussion; if they cannot, the competent courts of {{court_place}} decide.'
+    local: ''
+    country: true
+  - id: general.6
+    if: special_terms
+    en: 'Special conditions agreed between the parties: {{special_terms}}'
+    local: ''
+- id: signatures
+  title:
+    en: Signatures
+    local: ''
+  signature: true
+  clauses:
+  - id: signatures.1
+    en: By signing, the parties confirm they have read and understood this agreement, including Annexes A and B, and agree to it. The Renter confirms they received a copy.
+    local: ''
+  sign_rows:
+  - en: Owner (name, signature, date)
+    local: ''
+  - en: Renter (name, signature, date)
+    local: ''
+  - en: Additional driver (name, signature, date)
+    local: ''
+- id: annex_a
+  title:
+    en: 'Annex A: Handover and return check'
+    local: ''
+  page_break: true
+  checklist: true
+  clauses:
+  - id: annex_a.1
+    en: Mark existing scratches (S), dents (D), cracks (C) and missing items (M). Take photos of all four sides, the dashboard (odometer and fuel), the interior and any damage, at both handover and return.
+    local: ''
+  check_rows:
+  - en: Odometer
+    local: ''
+  - en: Fuel / battery level
+    local: ''
+  - en: 'Body: front / rear / left / right'
+    local: ''
+  - en: Glass, mirrors and lights
+    local: ''
+  - en: Tyres and wheels
+    local: ''
+  - en: Interior and seats
+    local: ''
+  - en: Keys, remote, documents
+    local: ''
+  - en: Helmets / child seat / accessories
+    local: ''
+  - en: Photos taken (number)
+    local: ''
+  - en: Owner's and Renter's initials
+    local: ''
+  columns:
+    item:
+      en: Item
+      local: ''
+    out:
+      en: At handover
+      local: ''
+    in:
+      en: At return
+      local: ''
+- id: annex_b
+  title:
+    en: 'Annex B: Damage and replacement price list'
+    local: ''
+  pricelist: true
+  clauses:
+  - id: annex_b.1
+    en: Agreed prices for common damage and lost items. Damage not listed is charged per section 12.
+    local: ''
+  price_rows:
+  - en: Scratch, per panel (polish / repaint)
+    local: ''
+  - en: Dent, per panel
+    local: ''
+  - en: Mirror
+    local: ''
+  - en: Headlight / tail light / indicator
+    local: ''
+  - en: Tyre (each)
+    local: ''
+  - en: Key / remote
+    local: ''
+  - en: Helmet
+    local: ''
+  - en: Number plate replacement
+    local: ''
+  - en: Vehicle value (for total loss or theft)
+    local: ''
+  columns:
+    item:
+      en: Item
+      local: ''
+    price:
+      en: Price
+      local: ''

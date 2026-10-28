@@ -1,0 +1,512 @@
+# Lokalfleet vehicle rental agreement — VIETNAM (English + Vietnamese, Vietnamese prevails).
+# Structure copied from master.en.yaml. Country clauses adapted to Vietnamese law as checked in October 2026.
+# Vietnam-only additions: vehicle.docs_cc (documents to carry), fines.camera_cc (camera fines / phạt nguội).
+# Not legal advice. Sources listed under `sources`.
+
+country: VN
+locale: vi
+language: Vietnamese
+currency: VND
+prevailing_language: { en: Vietnamese, local: "tiếng Việt" }
+local_language: { en: Vietnamese, local: "tiếng Việt" }
+country_name: { en: Vietnam, local: "Việt Nam" }
+currency_name: { en: "Vietnamese dong (VND)", local: "đồng Việt Nam (VND)" }
+jurisdiction: { en: "the Socialist Republic of Vietnam", local: "nước Cộng hòa xã hội chủ nghĩa Việt Nam" }
+court_place: { en: "Vietnam, determined under the Civil Procedure Code", local: "Việt Nam, được xác định theo Bộ luật Tố tụng dân sự" }
+words:
+  per_day: { en: per day, local: "mỗi ngày" }
+  per_week: { en: per week, local: "mỗi tuần" }
+  per_month: { en: per month, local: "mỗi tháng" }
+  day: { en: day, local: "ngày" }
+  month: { en: month, local: "tháng" }
+  days: { en: days, local: "ngày" }
+  business_days: { en: business days after return, local: "ngày làm việc sau khi trả xe" }
+  car: { en: Car, local: "Ô tô" }
+  motorbike: { en: Motorbike / scooter, local: "Xe máy / xe tay ga" }
+  ins_compulsory: { en: "Compulsory civil liability insurance only", local: "Chỉ có bảo hiểm bắt buộc trách nhiệm dân sự" }
+  ins_third_party: { en: "Compulsory + voluntary third-party liability insurance", local: "Bảo hiểm bắt buộc + bảo hiểm tự nguyện trách nhiệm dân sự với bên thứ ba" }
+  ins_comprehensive: { en: "Comprehensive insurance (incl. physical damage to the vehicle)", local: "Bảo hiểm toàn diện (gồm bảo hiểm vật chất xe)" }
+  free: { en: Free, local: "Miễn phí" }
+  payment_default: { en: "Cash, bank transfer or QR payment", local: "Tiền mặt, chuyển khoản ngân hàng hoặc thanh toán QR" }
+  blank_hint: { en: "(fill in)", local: "(điền vào)" }
+# Sources checked for this country (public information only), with one line on what each supports.
+sources:
+  - url: "https://thuvienphapluat.vn/van-ban/Giao-thong-Van-tai/Law-36-2024-QH15-Road-Traffic-Order-and-Safety-620124.aspx"
+    supports: "Law No. 36/2024/QH15 on Road Traffic Order and Safety (full text), in force from 1 January 2025."
+  - url: "https://hethongphapluat.com/luat-trat-tu-an-toan-giao-thong-duong-bo-2024/dieu-9"
+    supports: "Law 36/2024 Art. 9(2): driving with any alcohol concentration in blood or breath is prohibited (zero tolerance); Art. 9(7): handing a motor vehicle to a person not qualified to drive it is prohibited."
+  - url: "https://hethongphapluat.com/luat-trat-tu-an-toan-giao-thong-duong-bo-2024/dieu-10"
+    supports: "Law 36/2024 Art. 10(2)-(3): seatbelts for driver and passengers at belted seats; children under 10 and under 1.35 m may not sit in the driver's row (unless the car has one row) and must use suitable child safety devices."
+  - url: "https://luatvietnam.vn/giao-thong/lap-ghe-an-toan-cho-tre-em-tren-o-to-863-105344-article.html"
+    supports: "The child safety device requirement of Art. 10(3) applies from 1 January 2026 (Art. 88(2) of Law 36/2024)."
+  - url: "https://hethongphapluat.com/luat-trat-tu-an-toan-giao-thong-duong-bo-2024/dieu-33"
+    supports: "Law 36/2024 Art. 33: motorbike rider may carry one passenger (two only in listed cases, e.g. a child under 12); rider and passenger must wear a helmet meeting the national standard with the strap fastened; passengers may not stand, sit on handlebars or carry bulky items."
+  - url: "https://hethongphapluat.com/luat-trat-tu-an-toan-giao-thong-duong-bo-2024/dieu-56"
+    supports: "Law 36/2024 Art. 56: documents a driver must carry (registration certificate or permitted certified copy, licence, inspection certificate for vehicles that need one, compulsory insurance certificate); documents in the electronic identity account may be shown instead."
+  - url: "https://hethongphapluat.com/luat-trat-tu-an-toan-giao-thong-duong-bo-2024/dieu-57"
+    supports: "Law 36/2024 Art. 57: licence classes. A1 = motorbikes up to 125 cc / 11 kW; A = above that; B = cars up to 8 seats besides the driver and light trucks up to 3,500 kg."
+  - url: "https://hethongphapluat.com/luat-trat-tu-an-toan-giao-thong-duong-bo-2024/dieu-59"
+    supports: "Law 36/2024 Art. 59: minimum age 18 for classes A1, A and B (16 for mopeds)."
+  - url: "https://luatvietnam.vn/giao-thong/luat-trat-tu-an-toan-giao-thong-duong-bo-2024-quy-dinh-nhu-the-nao-ve-giay-phep-lai-xe-hang-a1-863-100479-article.html"
+    supports: "Law 36/2024 Art. 89: licences issued before 1 January 2025 remain valid for the term and vehicles stated on them."
+  - url: "https://xaydungchinhsach.chinhphu.vn/toan-van-thong-tu-12-2025-tt-bca-cua-bo-cong-an-quy-dinh-ve-sat-hach-cap-giay-phep-lai-xe-119250303174347028.htm"
+    supports: "Circular 12/2025/TT-BCA (Ministry of Public Security, government portal): Art. 24 conversion of foreign licences; Art. 29 IDPs recognised under a treaty Vietnam is party to are used according to that treaty."
+  - url: "https://daibieunhandan.vn/print/10330947.html"
+    supports: "Vietnam acceded to the 1968 Vienna Convention on Road Traffic (2014); an IDP from a Convention country is valid in Vietnam only together with the matching national licence; residents of 3+ months may convert a foreign licence."
+  - url: "https://lsvn.vn/thiet-hai-nao-se-duoc-doanh-nghiep-bao-hiem-xe-co-gioi-boi-thuong-1697152694-a136310.html"
+    supports: "Decree 67/2023/NĐ-CP: compulsory civil liability insurance of motor vehicle owners covers injury/death and property damage of third parties and injury/death of passengers; limits VND 150 million per person per accident (injury/death), VND 50 million (motorbikes) / VND 100 million (cars) per accident for property."
+  - url: "https://vbpl.vn/van-ban/chi-tiet/bo-luat-dan-su-so-91-2015-qh13--95942"
+    supports: "Civil Code 2015 (Law 91/2015/QH13), official database: Art. 328 đặt cọc, Art. 329 ký cược, Art. 418 agreed contract penalties, Arts. 472-482 property lease (Art. 482: lessee bears the risk during late return)."
+  - url: "https://nhanchinh.vn/ky-cuoc-dieu-329"
+    supports: "Text of Civil Code Art. 329: ký cược is money or valuables handed by the lessee of movable property to the lessor to secure the return of the leased property."
+  - url: "https://luatvietnam.vn/an-ninh-trat-tu/nghi-dinh-282-2025-nd-cp-xu-phat-vi-pham-hanh-chinh-trong-an-ninh-trat-tu-an-toan-xa-hoi-417708-d1.html"
+    supports: "Decree 282/2025/NĐ-CP (replaces Decree 144/2021): fines for pledging or accepting as pledge passports and other international travel documents, for unlawfully holding another person's passport, and for pledging citizen ID cards."
+  - url: "https://congan.angiang.gov.vn/quy-dinh-moi-xu-phat-vi-pham-hanh-chinh-doi-voi-hanh-vi-vi-pham-cac-quy-dinh-ve-xuat-canh-nhap-canh-qua-canh-cu-tru-va-di-lai-co-hieu-luc-ke-tu-ngay-15122025"
+    supports: "Provincial police: Decree 282/2025/NĐ-CP issued 30 October 2025, in force 15 December 2025; Art. 21 covers entry/exit document violations."
+  - url: "https://luatduonggia.vn/phap-luat/ho-chieu-co-duoc-cam-co-khong-cam-duoc-bao-nhieu-tien/"
+    supports: "Law on Exit and Entry of Vietnamese Citizens 2019, Art. 4: pledging or accepting as pledge exit/entry documents (passports) is prohibited."
+  - url: "https://lsvn.vn/phat-tien-co-so-luu-tru-giu-can-cuoc-cua-khach-a167113.html"
+    supports: "Law on Identification 2023, Art. 7: holding ID cards contrary to law and pledging/accepting them as pledge are prohibited."
+  - url: "https://thuvienphapluat.vn/van-ban/Quyen-dan-su/Nghi-dinh-356-2025-ND-CP-huong-dan-Luat-Bao-ve-du-lieu-ca-nhan-687428.aspx"
+    supports: "Decree 356/2025/NĐ-CP guiding the Personal Data Protection Law: in force 1 January 2026; Decree 13/2023/NĐ-CP ceases to be effective; household businesses and micro-enterprises exempt from some duties (Art. 41)."
+  - url: "https://luatvietnam.vn/tin-van-ban-moi/da-co-luat-bao-ve-du-lieu-ca-nhan-2025-so-91-2025-qh15-186-102925-article.html"
+    supports: "Personal Data Protection Law No. 91/2025/QH15, in force 1 January 2026."
+  - url: "https://hatinh.gov.vn/vi/bai-viet/xu-ly-the-nao-voi-tai-xe-thue-xe-tu-lai-khi-bi-phat-nguoi"
+    supports: "Provincial government: camera-detected violations (phạt nguội) on self-drive rental cars; under Decree 168/2024/NĐ-CP the owner must cooperate and may identify the renter with the rental contract, ID and licence, and the renter is then fined."
+  - url: "https://khoaluat.duytan.edu.vn/goc-hoc-tap/vuong-mac-ve-tham-quyen-giai-quyet-tranh-chap-hop-dong-cua-toa-an-theo-lanh-tho"
+    supports: "Civil Procedure Code 2015 Arts. 39-40: territorial jurisdiction; in contract disputes the plaintiff may choose the court where the contract is performed."
+  - url: "https://luatvietnam.vn/linh-vuc-khac/se-thay-cac-so-113-114-115-bang-dau-so-nao-883-104078-article.html"
+    supports: "Emergency numbers 113 (police), 114 (fire/rescue), 115 (ambulance) under Circular 22/2014/TT-BTTTT; a single number is only proposed."
+title:
+  en: Vehicle Rental Agreement
+  local: "Hợp đồng thuê xe"
+subtitle:
+  en: "Car, motorbike and scooter rental. {{country_name}}"
+  local: "Cho thuê ô tô, xe máy và xe tay ga. {{country_name}}"
+footer:
+  en: "Vehicle rental agreement · {{business_name}}"
+  local: "Hợp đồng thuê xe · {{business_name}}"
+page_words: { page: Trang, of: / }
+
+sections:
+
+  - id: parties
+    title: { en: "1. The parties", local: "1. Các bên" }
+    fields:
+      - { key: business_name, en: "Owner (rental business)", local: "Bên cho thuê (cơ sở cho thuê xe)" }
+      - { key: business_reg_no, en: "Business registration / tax ID", local: "Số đăng ký kinh doanh / mã số thuế" }
+      - { key: business_address, en: "Business address", local: "Địa chỉ kinh doanh" }
+      - { key: business_phone, en: "Phone / WhatsApp / Zalo", local: "Điện thoại / WhatsApp / Zalo" }
+      - { key: business_email, en: "Email", local: "Email" }
+    clauses:
+      - id: parties.1
+        en: 'This agreement is made on {{renter_contract_date}} between the rental business named above (the "Owner") and the person named in section 2 (the "Renter"). Where there is more than one renter or driver, each of them is jointly responsible for every obligation in this agreement.'
+        local: 'Hợp đồng này được lập ngày {{renter_contract_date}} giữa cơ sở cho thuê xe nêu trên ("Bên cho thuê") và người có tên tại mục 2 ("Bên thuê"). Nếu có nhiều người thuê hoặc người lái, mỗi người đều liên đới chịu trách nhiệm đối với mọi nghĩa vụ trong hợp đồng này.'
+
+  - id: renter
+    title: { en: "2. The Renter and drivers", local: "2. Bên thuê và người lái" }
+    fields:
+      - { key: renter_name, en: "Full name (as on passport or ID card)", local: "Họ và tên (theo hộ chiếu hoặc thẻ căn cước)" }
+      - { key: renter_nationality, en: "Nationality", local: "Quốc tịch" }
+      - { key: renter_dob, en: "Date of birth", local: "Ngày sinh" }
+      - { key: renter_id_no, en: "Passport or ID card number", local: "Số hộ chiếu hoặc số thẻ căn cước" }
+      - { key: renter_home_address, en: "Home address", local: "Địa chỉ thường trú" }
+      - { key: renter_local_address, en: "Local address during the rental (hotel / homestay / apartment)", local: "Địa chỉ lưu trú trong thời gian thuê (khách sạn / homestay / căn hộ)" }
+      - { key: renter_phone, en: "Phone / WhatsApp / Zalo", local: "Điện thoại / WhatsApp / Zalo" }
+      - { key: renter_email, en: "Email", local: "Email" }
+      - { key: renter_licence, en: "Driving licence number, class and issuing country", local: "Số giấy phép lái xe, hạng và nước cấp" }
+      - { key: renter_licence_expiry, en: "Licence expiry date", local: "Ngày hết hạn giấy phép lái xe" }
+      - { key: renter_idp, en: "International Driving Permit under the 1968 Convention (number / not required)", local: "Giấy phép lái xe quốc tế theo Công ước 1968 (số / không cần)" }
+      - { key: renter_emergency, en: "Emergency contact (name and phone)", local: "Người liên hệ khẩn cấp (họ tên và số điện thoại)" }
+      - { key: driver2_details, en: "Additional driver (name, ID, licence), if any", local: "Người lái bổ sung (họ tên, giấy tờ tùy thân, giấy phép lái xe), nếu có" }
+    clauses:
+      - id: renter.1
+        en: "The Renter confirms that the details above are true and complete, and that every person who will drive or ride the vehicle is named here. Only the Renter and any additional driver named above may drive or ride the vehicle."
+        local: "Bên thuê xác nhận các thông tin trên là đúng và đầy đủ, và mọi người sẽ lái xe đều có tên tại đây. Chỉ Bên thuê và người lái bổ sung có tên nêu trên mới được lái xe."
+      - id: renter.2
+        en: "Every driver must be at least 18 years old and hold a driving licence valid in Vietnam for this vehicle, and carry it while driving. Under Vietnamese law, motorbikes need class A1 (up to 125 cc or 11 kW) or class A (above that), and cars of up to 8 seats besides the driver need class B. Vietnamese licences issued before 2025 remain valid for the vehicles shown on them. A foreign licence can be used only together with an International Driving Permit issued under the 1968 Vienna Convention on Road Traffic, or after it has been converted into a Vietnamese licence. Permits issued under other conventions may not be accepted. A car licence does not allow a person to ride a motorbike. The Owner will not hand over the vehicle to a driver without the required licence."
+        local: "Mọi người lái xe phải đủ 18 tuổi trở lên, có giấy phép lái xe có giá trị tại Việt Nam phù hợp với loại xe thuê và mang theo khi lái xe. Theo pháp luật Việt Nam, xe mô tô cần giấy phép lái xe hạng A1 (đến 125 cm3 hoặc 11 kW) hoặc hạng A (trên mức đó); ô tô chở người đến 08 chỗ (không kể chỗ của người lái) cần hạng B. Giấy phép lái xe Việt Nam cấp trước năm 2025 tiếp tục được sử dụng cho loại xe ghi trên giấy phép. Giấy phép lái xe nước ngoài chỉ được sử dụng kèm theo giấy phép lái xe quốc tế cấp theo Công ước Viên năm 1968 về giao thông đường bộ, hoặc sau khi đã đổi sang giấy phép lái xe Việt Nam. Giấy phép cấp theo các công ước khác có thể không được công nhận. Giấy phép lái ô tô không cho phép điều khiển xe mô tô. Bên cho thuê sẽ không giao xe cho người không có giấy phép lái xe theo quy định."
+        country: true
+
+  - id: vehicle
+    title: { en: "3. The vehicle", local: "3. Xe thuê" }
+    fields:
+      - { key: vehicle_type_label, en: "Type", local: "Loại xe" }
+      - { key: vehicle_make_model, en: "Make and model", local: "Nhãn hiệu và kiểu xe" }
+      - { key: vehicle_year, en: "Year", local: "Năm sản xuất" }
+      - { key: vehicle_plate, en: "Registration (plate) number", local: "Biển số xe" }
+      - { key: vehicle_colour, en: "Colour", local: "Màu sơn" }
+      - { key: renter_vin, en: "Chassis / VIN number", local: "Số khung / số VIN" }
+      - { key: out_odometer, en: "Odometer at handover", local: "Số km khi giao xe" }
+      - { key: out_fuel, en: "Fuel / battery level at handover", local: "Mức nhiên liệu / pin khi giao xe" }
+      - { key: renter_accessories, en: "Accessories handed over (helmets, keys, child seat, phone holder, etc.)", local: "Phụ kiện bàn giao (mũ bảo hiểm, chìa khóa, ghế trẻ em, giá đỡ điện thoại, v.v.)" }
+    clauses:
+      - id: vehicle.1
+        en: "The Owner rents the vehicle described above, with the accessories listed, to the Renter for the rental period and on the terms of this agreement. The vehicle remains the property of the Owner at all times."
+        local: "Bên cho thuê cho Bên thuê thuê xe nêu trên, kèm các phụ kiện đã liệt kê, trong thời hạn thuê và theo các điều khoản của hợp đồng này. Xe luôn thuộc quyền sở hữu của Bên cho thuê."
+      - id: vehicle.2
+        en: "The Owner confirms that: the vehicle is registered in Vietnam; its compulsory civil liability insurance is valid for the whole rental period; its technical safety and environmental inspection certificate (đăng kiểm) is valid where the law requires one; any road-use fee is paid where applicable; and it is handed over in a roadworthy condition."
+        local: "Bên cho thuê xác nhận: xe đã được đăng ký tại Việt Nam; bảo hiểm bắt buộc trách nhiệm dân sự của chủ xe cơ giới còn hiệu lực trong suốt thời gian thuê; giấy chứng nhận kiểm định an toàn kỹ thuật và bảo vệ môi trường (đăng kiểm) còn hiệu lực đối với xe phải kiểm định theo quy định; phí sử dụng đường bộ đã được nộp (nếu có); và xe được giao trong tình trạng đủ điều kiện tham gia giao thông."
+        country: true
+      - id: vehicle.docs_cc
+        en: "The Owner hands over with the vehicle the documents the driver must carry under the Road Traffic Order and Safety Law: the vehicle registration certificate (or a copy where the law allows), the compulsory insurance certificate and, for vehicles that need one, the inspection certificate. Electronic versions may be used where the law allows. The Renter keeps these documents safe and returns them with the vehicle."
+        local: "Bên cho thuê giao kèm theo xe các giấy tờ người lái phải mang theo theo Luật Trật tự, an toàn giao thông đường bộ: chứng nhận đăng ký xe (hoặc bản sao trong trường hợp pháp luật cho phép), giấy chứng nhận bảo hiểm bắt buộc và, đối với xe phải kiểm định, giấy chứng nhận kiểm định. Có thể dùng giấy tờ điện tử khi pháp luật cho phép. Bên thuê phải giữ gìn các giấy tờ này và trả lại cùng với xe."
+
+  - id: period
+    title: { en: "4. Rental period, pickup and return", local: "4. Thời hạn thuê, nhận và trả xe" }
+    fields:
+      - { key: renter_start, en: "Start (date and time)", local: "Bắt đầu (ngày và giờ)" }
+      - { key: renter_end, en: "End (date and time)", local: "Kết thúc (ngày và giờ)" }
+      - { key: renter_pickup_place, en: "Pickup / delivery place", local: "Địa điểm nhận / giao xe" }
+      - { key: renter_return_place, en: "Return / collection place", local: "Địa điểm trả / thu hồi xe" }
+    clauses:
+      - id: period.1
+        en: "The Renter must return the vehicle at the agreed place, date and time. An extension is valid only when the Owner agrees to it in writing (a message is enough) and the extra rent is paid."
+        local: "Bên thuê phải trả xe đúng địa điểm, ngày và giờ đã thỏa thuận. Việc gia hạn chỉ có hiệu lực khi Bên cho thuê đồng ý bằng văn bản (tin nhắn là đủ) và tiền thuê thêm đã được thanh toán."
+      - id: period.2
+        if: late_hour_fee
+        en: "Late return: after a grace period of {{late_grace_minutes}} minutes, each started hour costs {{currency}} {{late_hour_fee}}. A return more than {{late_full_day_hours}} hours late is charged as an extra full day at the daily rate. The Renter bears the risk of loss or damage to the vehicle during any late return."
+        local: "Trả xe trễ: sau thời gian ân hạn {{late_grace_minutes}} phút, mỗi giờ bắt đầu tính phí {{currency}} {{late_hour_fee}}. Trả xe trễ quá {{late_full_day_hours}} giờ được tính thêm một ngày theo giá thuê ngày. Bên thuê chịu rủi ro về mất mát, hư hỏng của xe trong thời gian chậm trả."
+      - id: period.3
+        unless: late_hour_fee
+        en: "Late return: a return more than one hour late may be charged as an extra day at the daily rate. The Renter bears the risk of loss or damage to the vehicle during any late return."
+        local: "Trả xe trễ: trả xe trễ quá một giờ có thể bị tính thêm một ngày theo giá thuê ngày. Bên thuê chịu rủi ro về mất mát, hư hỏng của xe trong thời gian chậm trả."
+      - id: period.4
+        en: "If the vehicle is not returned and the Renter cannot be reached within 24 hours of the end time, the Owner may treat the vehicle as stolen or misappropriated, report it to the police and recover it, at the Renter's cost."
+        local: "Nếu xe không được trả và không liên lạc được với Bên thuê trong vòng 24 giờ kể từ thời điểm kết thúc thuê, Bên cho thuê có quyền coi như xe bị chiếm đoạt, trình báo cơ quan công an và thu hồi xe; Bên thuê chịu mọi chi phí phát sinh."
+
+  - id: charges
+    title: { en: "5. Rent and payment", local: "5. Tiền thuê và thanh toán" }
+    fields:
+      - { key: rate_text, en: "Rental rate", local: "Giá thuê" }
+      - { key: renter_total, en: "Total rent for this booking", local: "Tổng tiền thuê của lần đặt này" }
+      - { key: delivery_fee_text, en: "Delivery / collection fee", local: "Phí giao / nhận xe" }
+      - { key: payment_methods, en: "Payment methods accepted", local: "Hình thức thanh toán" }
+    clauses:
+      - id: charges.1
+        en: "The Renter pays the rent stated above in advance, unless the Owner agrees otherwise in writing. Prices are in {{currency_name}}."
+        local: "Bên thuê thanh toán trước tiền thuê nêu trên, trừ khi Bên cho thuê đồng ý khác bằng văn bản. Giá được tính bằng {{currency_name}}."
+      - id: charges.2
+        when: { rate_period: month }
+        en: "Monthly rentals: rent is paid monthly in advance on the same day each month. A payment more than 3 days late allows the Owner to end the rental and collect the vehicle (section 15)."
+        local: "Thuê theo tháng: tiền thuê được trả trước hằng tháng vào cùng một ngày mỗi tháng. Nếu chậm thanh toán quá 3 ngày, Bên cho thuê có quyền chấm dứt việc thuê và thu hồi xe (mục 15)."
+      - id: charges.3
+        en: "Extras (child seats, delivery, additional drivers, phone holders, insurance upgrades and similar) cost what is written in this agreement or what the Owner confirmed in writing before the rental."
+        local: "Các dịch vụ thêm (ghế trẻ em, giao xe, người lái bổ sung, giá đỡ điện thoại, nâng cấp bảo hiểm và tương tự) có giá theo hợp đồng này hoặc theo xác nhận bằng văn bản của Bên cho thuê trước khi thuê."
+
+  - id: deposit
+    title: { en: "6. Security deposit", local: "6. Tiền ký cược" }
+    fields:
+      - { key: deposit_text, en: "Deposit", local: "Tiền ký cược" }
+      - { key: renter_deposit_method, en: "Paid by (cash / transfer / card hold)", local: "Hình thức (tiền mặt / chuyển khoản / tạm giữ trên thẻ)" }
+      - { key: deposit_return_text, en: "Returned within", local: "Hoàn trả trong vòng" }
+    clauses:
+      - id: deposit.1
+        en: "The deposit (ký cược under Article 329 of the Civil Code) secures the return of the vehicle and the Renter's other obligations: unpaid rent, damage up to the amount the Renter is liable for, fuel, mileage, cleaning, late return, lost keys or accessories, traffic fines and any other amount owed under this agreement."
+        local: "Tiền ký cược (theo Điều 329 Bộ luật Dân sự) bảo đảm việc trả lại xe và các nghĩa vụ khác của Bên thuê: tiền thuê chưa trả, thiệt hại trong phạm vi Bên thuê phải chịu, nhiên liệu, số km vượt, vệ sinh, trả xe trễ, mất chìa khóa hoặc phụ kiện, tiền phạt vi phạm giao thông và mọi khoản khác phải trả theo hợp đồng này."
+      - id: deposit.2
+        en: "The Owner returns the deposit, less any amounts properly deducted, after the vehicle has been returned and checked. The Owner gives the Renter a written list of any deduction with photos, receipts or quotes. If the amounts owed are more than the deposit, the Renter pays the difference within 7 days of being told."
+        local: "Bên cho thuê hoàn trả tiền ký cược, sau khi trừ các khoản được khấu trừ hợp lý, khi xe đã được trả và kiểm tra. Bên cho thuê gửi Bên thuê danh sách bằng văn bản các khoản khấu trừ kèm ảnh, hóa đơn hoặc báo giá. Nếu số tiền phải trả lớn hơn tiền ký cược, Bên thuê thanh toán phần chênh lệch trong vòng 7 ngày kể từ khi được thông báo."
+      - id: deposit.3
+        en: "Fines recorded by traffic cameras (phạt nguội) often reach the Owner weeks after a rental ends. The Owner may keep a reasonable part of the deposit for up to 30 days after the return to cover fines the Owner has reason to expect, and must return it promptly if none arrive. Either party may check the plate number for recorded violations on the Traffic Police Department's website."
+        local: "Vi phạm giao thông ghi nhận qua camera (phạt nguội) thường được thông báo đến Bên cho thuê sau khi kết thúc thuê vài tuần. Bên cho thuê có thể giữ lại một phần hợp lý của tiền ký cược tối đa 30 ngày kể từ ngày trả xe để thanh toán các khoản phạt có căn cứ dự kiến, và phải hoàn trả ngay nếu không có khoản phạt nào. Mỗi bên đều có thể tra cứu vi phạm theo biển số xe trên trang thông tin điện tử của Cục Cảnh sát giao thông."
+        country: true
+      - id: deposit.4
+        en: "The Owner will not keep the Renter's original passport, ID card or other entry/exit document as a deposit or security. Vietnamese law forbids pledging these documents or accepting them as a pledge, and holding another person's passport or ID card unlawfully. The Owner may check the originals and take a copy or photo of them to identify the Renter (section 17)."
+        local: "Bên cho thuê không giữ bản gốc hộ chiếu, thẻ căn cước hoặc giấy tờ xuất nhập cảnh khác của Bên thuê để làm tiền ký cược hay bảo đảm. Pháp luật Việt Nam cấm cầm cố, nhận cầm cố các giấy tờ này và cấm giữ trái phép hộ chiếu, thẻ căn cước của người khác. Bên cho thuê được kiểm tra bản gốc và chụp ảnh hoặc sao chụp để xác định danh tính Bên thuê (mục 17)."
+        country: true
+
+  - id: cancellation
+    title: { en: "7. Cancellation and early return", local: "7. Hủy đặt xe và trả xe sớm" }
+    clauses:
+      - id: cancellation.1
+        if: cancel_free_hours
+        en: "The Renter may cancel free of charge up to {{cancel_free_hours}} hours before the start time. A later cancellation costs {{cancel_fee_percent}}% of the rent for the booked period (or of the first month on a monthly rental). If the Renter does not arrive at the start time and does not tell the Owner (a no-show), the Owner may keep the full amount paid for the first {{no_show_days}} day(s) and release the vehicle."
+        local: "Bên thuê được hủy miễn phí chậm nhất {{cancel_free_hours}} giờ trước thời điểm bắt đầu. Hủy sau thời hạn đó phải trả {{cancel_fee_percent}}% tiền thuê của thời gian đã đặt (hoặc của tháng đầu nếu thuê theo tháng). Nếu Bên thuê không đến nhận xe đúng giờ và không báo cho Bên cho thuê, Bên cho thuê được giữ toàn bộ số tiền đã trả cho {{no_show_days}} ngày đầu và được cho người khác thuê xe."
+      - id: cancellation.2
+        unless: cancel_free_hours
+        en: "Cancellation by the Renter before the start time: the Owner keeps any booking payment that this agreement or the booking confirmation says is non-refundable, and refunds the rest."
+        local: "Bên thuê hủy trước thời điểm bắt đầu: Bên cho thuê giữ lại khoản tiền đặt xe mà hợp đồng này hoặc xác nhận đặt xe ghi là không hoàn lại, và hoàn trả phần còn lại."
+      - id: cancellation.3
+        when: { early_return: none }
+        en: "Early return: rent for the booked period is not refunded if the Renter returns the vehicle early."
+        local: "Trả xe sớm: tiền thuê của thời gian đã đặt không được hoàn lại nếu Bên thuê trả xe sớm."
+      - id: cancellation.4
+        when: { early_return: prorata }
+        en: "Early return: the Owner refunds the rent for the full unused days, less an early-return fee of {{currency}} {{early_return_fee}}. Long-term discounts that no longer apply may be recalculated at the rate for the period actually used."
+        local: "Trả xe sớm: Bên cho thuê hoàn lại tiền thuê của những ngày trọn vẹn chưa sử dụng, sau khi trừ phí trả xe sớm {{currency}} {{early_return_fee}}. Ưu đãi thuê dài hạn không còn phù hợp có thể được tính lại theo giá của thời gian thực tế sử dụng."
+      - id: cancellation.5
+        when: { rate_period: month }
+        en: "Monthly rentals: either party may end the rental by giving {{notice_days}} days' written notice. Without notice, the Renter pays rent for the notice period."
+        local: "Thuê theo tháng: mỗi bên có thể chấm dứt việc thuê bằng cách thông báo bằng văn bản trước {{notice_days}} ngày. Nếu không báo trước, Bên thuê phải trả tiền thuê cho thời gian báo trước."
+      - id: cancellation.6
+        en: "If the Owner cannot provide the vehicle (or a similar or better one) at the start time, the Renter may cancel and receive a full refund of everything paid."
+        local: "Nếu Bên cho thuê không thể giao xe (hoặc xe tương tự hay tốt hơn) vào thời điểm bắt đầu, Bên thuê có quyền hủy và được hoàn lại toàn bộ số tiền đã trả."
+
+  - id: fuel
+    title: { en: "8. Fuel, charging and mileage", local: "8. Nhiên liệu, sạc điện và số km" }
+    clauses:
+      - id: fuel.1
+        when: { fuel_policy: same }
+        en: "Fuel policy: same-to-same. The vehicle must be returned with at least the fuel (or battery) level it had at handover."
+        local: "Chính sách nhiên liệu: nhận sao trả vậy. Xe phải được trả với mức nhiên liệu (hoặc pin) ít nhất bằng lúc nhận."
+      - id: fuel.2
+        when: { fuel_policy: full }
+        en: "Fuel policy: full-to-full. The vehicle is handed over with a full tank and must be returned full."
+        local: "Chính sách nhiên liệu: nhận đầy trả đầy. Xe được giao với bình nhiên liệu đầy và phải được trả lại đầy bình."
+      - id: fuel.3
+        en: "Missing fuel is charged at the local pump price plus a refuelling service fee of {{currency}} {{fuel_service_fee}}. Using the wrong fuel is the Renter's responsibility, including towing and repair."
+        local: "Nhiên liệu thiếu được tính theo giá bán lẻ tại địa phương cộng phí dịch vụ đổ nhiên liệu {{currency}} {{fuel_service_fee}}. Bên thuê chịu trách nhiệm nếu đổ sai loại nhiên liệu, bao gồm chi phí cứu hộ và sửa chữa."
+      - id: fuel.4
+        if: mileage_limit
+        en: "Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometre costs {{currency}} {{excess_km_fee}}."
+        local: "Số km cho phép: {{mileage_limit}} km mỗi {{mileage_period_label}}. Mỗi km vượt tính phí {{currency}} {{excess_km_fee}}."
+      - id: fuel.5
+        unless: mileage_limit
+        en: "Mileage: unlimited, within the permitted area (section 10)."
+        local: "Số km: không giới hạn, trong phạm vi khu vực được phép sử dụng (mục 10)."
+      - id: fuel.6
+        en: "The Renter must not tamper with the odometer, speed limiter or GPS tracker. Tampering is a serious breach (section 15)."
+        local: "Bên thuê không được can thiệp vào đồng hồ đo km, bộ giới hạn tốc độ hoặc thiết bị định vị GPS. Hành vi can thiệp là vi phạm nghiêm trọng (mục 15)."
+
+  - id: use
+    title: { en: "9. Safe and lawful use", local: "9. Sử dụng xe an toàn và đúng pháp luật" }
+    clauses:
+      - id: use.1
+        en: "The Renter must drive or ride carefully, obey all traffic laws, and keep the vehicle locked with the keys removed whenever it is left. Keys must never be left in or on the vehicle."
+        local: "Bên thuê phải lái xe cẩn thận, chấp hành mọi quy định về giao thông, và luôn khóa xe, rút chìa khóa mỗi khi rời xe. Tuyệt đối không để chìa khóa trong hoặc trên xe."
+      - id: use.2
+        when: { vehicle_type: [motorbike, ""] }
+        en: "Motorbikes and scooters: the rider and any passenger must wear a helmet that meets the national standard, with the strap correctly fastened. The rider may carry only one passenger; the law allows a second passenger only in limited cases (such as a child under 12). No passenger who cannot reach the footrests safely. Passengers must not stand on the vehicle, sit on the handlebars or carry bulky items."
+        local: "Xe máy và xe tay ga: người lái và người được chở phải đội mũ bảo hiểm đạt quy chuẩn kỹ thuật quốc gia và cài quai đúng quy cách. Người lái chỉ được chở một người; pháp luật chỉ cho phép chở thêm người thứ hai trong một số trường hợp hạn chế (như chở trẻ em dưới 12 tuổi). Không chở người không thể đặt chân lên chỗ để chân một cách an toàn. Người được chở không được đứng trên xe, ngồi trên tay lái hoặc mang vác vật cồng kềnh."
+        country: true
+      - id: use.3
+        when: { vehicle_type: [car, ""] }
+        en: "Cars: the driver and every passenger must wear a seatbelt at every seat that has one. A child under 10 years old and under 1.35 m tall must not sit in the same row as the driver (unless the car has only one row of seats) and must use a suitable child safety device, as the law requires. The number of passengers must not exceed the number of seats."
+        local: "Ô tô: người lái và mọi người được chở phải thắt dây đai an toàn tại những chỗ có trang bị dây đai. Trẻ em dưới 10 tuổi và cao dưới 1,35 mét không được ngồi cùng hàng ghế với người lái xe (trừ xe chỉ có một hàng ghế) và phải sử dụng thiết bị an toàn phù hợp cho trẻ em theo quy định của pháp luật. Số người được chở không được vượt quá số chỗ ngồi."
+        country: true
+      - id: use.4
+        en: "It is forbidden to: drive or ride with any alcohol in the blood or breath (Vietnam has a zero limit) or under the influence of drugs; hold or use a phone or other device while driving or riding, except hands-free where the law allows; race, perform stunts or drive off-road (unless the vehicle is meant for it and the Owner agreed); tow or push anything; carry goods for payment, illegal goods or dangerous loads; use the vehicle for ride-hailing, delivery work, driving lessons or to rent it to anyone else; let anyone not named in section 2 drive or ride."
+        local: "Nghiêm cấm: lái xe khi trong máu hoặc hơi thở có nồng độ cồn (Việt Nam không cho phép bất kỳ mức nồng độ cồn nào) hoặc khi sử dụng chất ma túy; cầm hoặc sử dụng điện thoại, thiết bị điện tử khác khi đang lái xe, trừ hình thức rảnh tay khi pháp luật cho phép; đua xe, biểu diễn hoặc chạy xe địa hình (trừ khi xe dành cho mục đích đó và Bên cho thuê đồng ý); kéo hoặc đẩy bất cứ vật gì; chở hàng thuê, hàng cấm hoặc hàng nguy hiểm; dùng xe để chạy xe công nghệ, giao hàng, dạy lái xe hoặc cho người khác thuê lại; để người không có tên tại mục 2 lái xe."
+      - id: use.5
+        when: { smoking: no }
+        en: "Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odour removal.{{/if}}"
+        local: "Không được hút thuốc lá hoặc thuốc lá điện tử trong xe.{{#if smoking_fee}} Vi phạm sẽ chịu phí khử mùi {{currency}} {{smoking_fee}}.{{/if}}"
+      - id: use.6
+        when: { pets: no }
+        en: "Pets and animals are not allowed in or on the vehicle, except assistance animals."
+        local: "Không được mang thú cưng hoặc động vật lên xe, trừ động vật hỗ trợ người khuyết tật."
+      - id: use.7
+        when: { pets: fee }
+        en: "Pets are allowed if they are kept in a carrier or on a seat cover. A pet cleaning fee of {{currency}} {{pet_fee}} applies."
+        local: "Được mang thú cưng nếu để trong lồng hoặc trên tấm phủ ghế. Áp dụng phí vệ sinh {{currency}} {{pet_fee}}."
+
+  - id: area
+    title: { en: "10. Permitted area", local: "10. Khu vực được phép sử dụng" }
+    fields:
+      - { key: area_of_use, en: "The vehicle may be used in", local: "Xe được sử dụng trong phạm vi" }
+    clauses:
+      - id: area.1
+        en: "The vehicle must stay within the permitted area above. Taking it further, on a ferry or to another island, needs the Owner's written permission first, and the Renter pays any ferry fees, delays and recovery costs."
+        local: "Xe chỉ được sử dụng trong khu vực nêu trên. Muốn đưa xe ra ngoài khu vực, lên phà hoặc ra đảo khác phải có sự đồng ý trước bằng văn bản của Bên cho thuê, và Bên thuê chịu mọi chi phí phà, chậm trễ và thu hồi xe."
+      - id: area.2
+        en: "The vehicle must not leave Vietnam unless the Owner has given prior written permission and every cross-border permit the law requires has been obtained. The Renter is fully responsible for any loss or damage outside Vietnam or outside the permitted area that insurance does not cover."
+        local: "Không được đưa xe ra khỏi lãnh thổ Việt Nam, trừ khi có sự đồng ý trước bằng văn bản của Bên cho thuê và đã có đầy đủ giấy phép qua biên giới theo quy định của pháp luật. Bên thuê chịu toàn bộ trách nhiệm đối với mọi mất mát, hư hỏng xảy ra ngoài lãnh thổ Việt Nam hoặc ngoài khu vực được phép mà bảo hiểm không chi trả."
+        country: true
+      - id: area.3
+        en: "The vehicle may be fitted with a GPS tracker, used only for security, recovery and checking that this agreement is kept."
+        local: "Xe có thể được lắp thiết bị định vị GPS, chỉ dùng cho mục đích an ninh, thu hồi xe và kiểm tra việc thực hiện hợp đồng này."
+
+  - id: insurance
+    title: { en: "11. Insurance", local: "11. Bảo hiểm" }
+    fields:
+      - { key: insurance_text, en: "Insurance on this vehicle", local: "Bảo hiểm của xe" }
+      - { key: insurance_excess_text, en: "Renter's excess (most the Renter pays per incident, if the rules are kept)", local: "Mức khấu trừ của Bên thuê (số tiền tối đa Bên thuê trả cho mỗi sự cố, nếu tuân thủ hợp đồng)" }
+    clauses:
+      - id: insurance.1
+        en: "The vehicle has the compulsory civil liability insurance for motor vehicle owners required by Decree 67/2023/NĐ-CP. Up to the limits set by law, it covers injury or death of third parties and of passengers, and damage to third parties' property. It does not cover damage to or theft of the rented vehicle itself; that needs voluntary physical damage insurance (bảo hiểm vật chất xe)."
+        local: "Xe có bảo hiểm bắt buộc trách nhiệm dân sự của chủ xe cơ giới theo Nghị định 67/2023/NĐ-CP. Trong mức trách nhiệm do pháp luật quy định, bảo hiểm này chi trả thiệt hại về sức khỏe, tính mạng của người thứ ba và hành khách, và thiệt hại về tài sản của người thứ ba. Bảo hiểm này không chi trả hư hỏng hoặc mất cắp của chính xe thuê; các rủi ro đó cần có bảo hiểm vật chất xe tự nguyện."
+        country: true
+      - id: insurance.2
+        when: { insurance_level: comprehensive }
+        en: "The vehicle also has comprehensive insurance, including physical damage cover for the rented vehicle and extra cover for third parties. Per incident, the Renter pays no more than the excess shown above, provided the Renter has kept the rules of this agreement."
+        local: "Xe còn có bảo hiểm toàn diện, gồm bảo hiểm vật chất cho xe thuê và bảo hiểm bổ sung cho người thứ ba. Với mỗi sự cố, Bên thuê chỉ trả tối đa mức khấu trừ nêu trên, với điều kiện Bên thuê đã tuân thủ hợp đồng này."
+      - id: insurance.3
+        when: { insurance_level: third_party }
+        en: "The vehicle also has voluntary third-party liability insurance, which increases the cover for damage to other people and their property. It does not cover damage to or theft of the rented vehicle: the Renter is responsible for those (section 12)."
+        local: "Xe còn có bảo hiểm tự nguyện trách nhiệm dân sự, nâng mức chi trả cho thiệt hại về người và tài sản của người khác. Bảo hiểm này không chi trả hư hỏng hoặc mất cắp của xe thuê: Bên thuê chịu trách nhiệm đối với các thiệt hại đó (mục 12)."
+      - id: insurance.4
+        when: { insurance_level: compulsory }
+        en: "The vehicle has only the compulsory insurance. The Renter is responsible for damage to the rented vehicle, its theft, and any damage to other people or their property above what the compulsory insurance pays (section 12)."
+        local: "Xe chỉ có bảo hiểm bắt buộc. Bên thuê chịu trách nhiệm về hư hỏng, mất cắp xe thuê, và mọi thiệt hại về người và tài sản của người khác vượt quá mức bảo hiểm bắt buộc chi trả (mục 12)."
+      - id: insurance.5
+        en: "Insurance does not protect the Renter, and the Renter pays in full, when damage or loss happens: while driving with alcohol or drugs, without a valid licence for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or reckless acts, or when keys were left with the vehicle. Tyres, wheels, glass, underbody, interior, keys and accessories are often excluded by insurers and are the Renter's responsibility unless the Owner confirms in writing that they are covered."
+        local: "Bảo hiểm không bảo vệ Bên thuê, và Bên thuê bồi thường toàn bộ, khi thiệt hại hoặc mất mát xảy ra: khi lái xe có nồng độ cồn hoặc sử dụng ma túy, không có giấy phép lái xe hợp lệ cho loại xe, do người lái không có tên tại mục 2, ngoài khu vực được phép, trong khi sử dụng xe vào mục đích bị cấm (mục 9), do cố ý hoặc liều lĩnh, hoặc khi để chìa khóa cùng xe. Lốp, vành, kính, gầm xe, nội thất, chìa khóa và phụ kiện thường bị loại trừ khỏi bảo hiểm và do Bên thuê chịu trách nhiệm, trừ khi Bên cho thuê xác nhận bằng văn bản là được bảo hiểm."
+      - id: insurance.6
+        en: "Personal belongings left in or on the vehicle are not insured by the Owner. The Owner is not responsible for their loss or damage."
+        local: "Đồ dùng cá nhân để trong hoặc trên xe không được Bên cho thuê bảo hiểm. Bên cho thuê không chịu trách nhiệm về việc mất mát hoặc hư hỏng các đồ dùng đó."
+
+  - id: damage
+    title: { en: "12. Damage, theft and loss", local: "12. Hư hỏng, mất cắp và mất mát" }
+    clauses:
+      - id: damage.1
+        en: "The Renter is responsible for the vehicle from handover until it is returned and checked. The condition at handover is recorded in Annex A with photos; anything not recorded there is treated as new unless it is normal wear and tear."
+        local: "Bên thuê chịu trách nhiệm về xe từ khi nhận xe cho đến khi xe được trả và kiểm tra. Tình trạng xe khi giao được ghi tại Phụ lục A kèm ảnh chụp; mọi hư hỏng không được ghi nhận tại đó được coi là mới phát sinh, trừ hao mòn tự nhiên."
+      - id: damage.2
+        en: "Repair costs are based on a quote or invoice from a garage, or on the damage price list in Annex B where one is attached. The Renter may ask to see the quote, and may get a second quote from a garage the Owner approves within 3 days."
+        local: "Chi phí sửa chữa được tính theo báo giá hoặc hóa đơn của garage, hoặc theo bảng giá hư hỏng tại Phụ lục B nếu có. Bên thuê có quyền yêu cầu xem báo giá và có thể lấy báo giá thứ hai từ một garage được Bên cho thuê chấp thuận trong vòng 3 ngày."
+      - id: damage.3
+        if: loss_of_use_fee
+        en: "While the vehicle cannot be rented because of damage caused during this rental, the Renter pays loss of use of {{currency}} {{loss_of_use_fee}} per day, for up to {{loss_of_use_max_days}} days."
+        local: "Trong thời gian xe không thể cho thuê do hư hỏng phát sinh trong lần thuê này, Bên thuê bồi thường thiệt hại do không khai thác được xe {{currency}} {{loss_of_use_fee}} mỗi ngày, tối đa {{loss_of_use_max_days}} ngày."
+      - id: damage.4
+        en: "If the vehicle or its keys are stolen, the Renter must report it to the police at once and give the Owner the police confirmation. Where the theft happened because the vehicle was left unlocked, with the keys, or outside the permitted area, the Renter pays the value of the vehicle as stated in Annex B (or its market value)."
+        local: "Nếu xe hoặc chìa khóa bị mất cắp, Bên thuê phải trình báo ngay cho cơ quan công an và giao cho Bên cho thuê giấy xác nhận trình báo. Nếu việc mất cắp xảy ra do không khóa xe, để chìa khóa cùng xe hoặc để xe ngoài khu vực được phép, Bên thuê bồi thường giá trị xe theo Phụ lục B (hoặc theo giá thị trường)."
+      - id: damage.5
+        en: "Lost keys, remote controls, helmets, documents, number plates and accessories are charged at their replacement cost, plus any locksmith or re-registration cost."
+        local: "Chìa khóa, điều khiển, mũ bảo hiểm, giấy tờ, biển số và phụ kiện bị mất được tính theo chi phí thay thế, cộng chi phí thợ khóa hoặc chi phí làm lại giấy tờ, biển số (nếu có)."
+
+  - id: accident
+    title: { en: "13. Accidents and breakdowns", local: "13. Tai nạn và hỏng xe" }
+    clauses:
+      - id: accident.1
+        en: "In an accident, the Renter must: stop, make the area safe, keep the scene as it is and help anyone who is hurt; call 115 for an ambulance and 113 for the police when anyone is hurt or the law requires it; call the Owner straight away on the number in section 1, and the insurer's hotline when the Owner asks; take photos of all vehicles, plates, the place and any damage; note the other party's name, phone, plate and insurance; and not admit fault, pay or accept money, or sign any settlement without the Owner's agreement, except a record made by the police."
+        local: "Khi xảy ra tai nạn, Bên thuê phải: dừng xe, bảo đảm an toàn khu vực, giữ nguyên hiện trường và cứu giúp người bị nạn; gọi 115 (cấp cứu) và 113 (công an) khi có người bị thương hoặc khi pháp luật yêu cầu; gọi ngay cho Bên cho thuê theo số điện thoại tại mục 1, và gọi đường dây nóng của công ty bảo hiểm khi Bên cho thuê yêu cầu; chụp ảnh các xe, biển số, hiện trường và hư hỏng; ghi lại họ tên, số điện thoại, biển số và bảo hiểm của bên kia; và không nhận lỗi, không trả hoặc nhận tiền, không ký thỏa thuận giải quyết nào khi chưa có sự đồng ý của Bên cho thuê, trừ biên bản do cơ quan công an lập."
+        country: true
+      - id: accident.2
+        en: "Breakdowns: the Renter must stop safely, tell the Owner and follow the Owner's instructions. The Renter must not have the vehicle repaired without the Owner's permission, except for minor emergency costs up to {{currency}} {{emergency_repair_limit}}, which the Owner refunds against a receipt."
+        local: "Hỏng xe: Bên thuê phải dừng xe an toàn, báo cho Bên cho thuê và làm theo hướng dẫn của Bên cho thuê. Bên thuê không được tự sửa xe khi chưa được Bên cho thuê cho phép, trừ chi phí khẩn cấp nhỏ đến {{currency}} {{emergency_repair_limit}}, được Bên cho thuê hoàn lại khi có hóa đơn."
+      - id: accident.3
+        en: "If the vehicle stops working through no fault of the Renter, the Owner will repair it or provide a similar vehicle within 24 hours of being told where reasonably possible. If the Owner cannot, the Renter may end the rental and receive a refund of the rent for the unused days."
+        local: "Nếu xe hỏng không do lỗi của Bên thuê, Bên cho thuê sẽ sửa chữa hoặc cung cấp xe tương tự trong vòng 24 giờ kể từ khi được thông báo, nếu có thể thực hiện một cách hợp lý. Nếu Bên cho thuê không thực hiện được, Bên thuê có quyền chấm dứt việc thuê và được hoàn lại tiền thuê của những ngày chưa sử dụng."
+      - id: accident.4
+        en: "The Renter must report any warning light, unusual noise, puncture or fault promptly and must not keep using a vehicle that is unsafe."
+        local: "Bên thuê phải báo ngay khi có đèn cảnh báo, tiếng kêu bất thường, thủng lốp hoặc hư hỏng, và không được tiếp tục sử dụng xe không an toàn."
+
+  - id: fines
+    title: { en: "14. Fines, tolls and parking", local: "14. Tiền phạt, phí đường bộ và đỗ xe" }
+    clauses:
+      - id: fines.1
+        en: "The Renter pays all traffic and parking fines, tolls, towing, impound and clamping costs arising during the rental, including fines that reach the Owner after the vehicle is returned, plus a handling fee of {{currency}} {{fine_admin_fee}} per fine."
+        local: "Bên thuê thanh toán mọi khoản tiền phạt vi phạm giao thông và đỗ xe, phí đường bộ, chi phí cứu hộ, tạm giữ và khóa bánh xe phát sinh trong thời gian thuê, kể cả các khoản phạt được thông báo đến Bên cho thuê sau khi đã trả xe, cộng phí xử lý {{currency}} {{fine_admin_fee}} cho mỗi khoản phạt."
+      - id: fines.2
+        en: "The Owner may give the Renter's name, ID and licence details and a copy of this agreement to the police or the issuing authority so that a violation is handled against the Renter as the driver, as the law allows."
+        local: "Bên cho thuê được cung cấp họ tên, thông tin giấy tờ tùy thân, giấy phép lái xe của Bên thuê và bản sao hợp đồng này cho cơ quan công an hoặc cơ quan có thẩm quyền để xử lý vi phạm đối với Bên thuê là người điều khiển xe, theo quy định của pháp luật."
+        country: true
+      - id: fines.camera_cc
+        en: "Camera fines (phạt nguội): when the Owner is notified of a violation recorded during the rental, the Owner sends the Renter a copy of the notice. The Renter must cooperate with the authority, attend in person when required, and pay the fine and any late-payment charge. If the Renter does not cooperate and the Owner is fined as the vehicle owner, the Renter repays the Owner that fine and the related costs."
+        local: "Phạt nguội: khi Bên cho thuê nhận được thông báo vi phạm được ghi nhận trong thời gian thuê, Bên cho thuê gửi bản sao thông báo cho Bên thuê. Bên thuê phải phối hợp với cơ quan có thẩm quyền, trực tiếp có mặt khi được yêu cầu, và nộp tiền phạt cùng mọi khoản tiền chậm nộp. Nếu Bên thuê không phối hợp và Bên cho thuê bị xử phạt với tư cách chủ xe, Bên thuê phải hoàn trả cho Bên cho thuê khoản tiền phạt đó và các chi phí liên quan."
+
+  - id: termination
+    title: { en: "15. Ending the agreement by the Owner", local: "15. Bên cho thuê chấm dứt hợp đồng" }
+    clauses:
+      - id: termination.1
+        en: "The Owner may end this agreement and take the vehicle back at once if the Renter: does not pay on time; gave false details; lets an unnamed person drive; uses the vehicle unlawfully or against section 9; takes it outside the permitted area without permission; tampers with the odometer or tracker; abandons it; or puts the vehicle or other people at serious risk. The Owner may then deduct what the Renter owes under this agreement, including reasonable recovery costs, and refunds any remaining prepaid rent for the days after the vehicle is recovered."
+        local: "Bên cho thuê có quyền chấm dứt hợp đồng và thu hồi xe ngay nếu Bên thuê: không thanh toán đúng hạn; khai thông tin sai sự thật; để người không có tên lái xe; sử dụng xe trái pháp luật hoặc trái mục 9; đưa xe ra ngoài khu vực được phép mà không được đồng ý; can thiệp vào đồng hồ đo km hoặc thiết bị định vị; bỏ mặc xe; hoặc gây nguy hiểm nghiêm trọng cho xe hoặc người khác. Khi đó, Bên cho thuê được khấu trừ các khoản Bên thuê phải trả theo hợp đồng này, kể cả chi phí thu hồi xe hợp lý, và hoàn lại cho Bên thuê phần tiền thuê đã trả trước còn lại cho những ngày sau khi thu hồi xe."
+      - id: termination.2
+        en: "The Renter must make the vehicle available for collection, and pays reasonable recovery costs where the Owner has to fetch it."
+        local: "Bên thuê phải tạo điều kiện để Bên cho thuê thu hồi xe, và chịu chi phí thu hồi hợp lý nếu Bên cho thuê phải đến lấy xe."
+
+  - id: return
+    title: { en: "16. Returning the vehicle", local: "16. Trả xe" }
+    clauses:
+      - id: return.1
+        en: "The vehicle must be returned with its keys, documents and accessories, with the fuel level agreed in section 8, and reasonably clean. Both parties check the vehicle together and record the condition, odometer and fuel in Annex A with photos. If the Renter is not present at the check, the Owner's dated photos are accepted as the record."
+        local: "Xe phải được trả kèm chìa khóa, giấy tờ và phụ kiện, với mức nhiên liệu đã thỏa thuận tại mục 8, và tương đối sạch sẽ. Hai bên cùng kiểm tra xe và ghi tình trạng, số km và nhiên liệu vào Phụ lục A kèm ảnh chụp. Nếu Bên thuê không có mặt khi kiểm tra, ảnh chụp có ghi ngày giờ của Bên cho thuê được dùng làm căn cứ."
+      - id: return.2
+        if: cleaning_fee
+        en: "A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more if specialist cleaning is needed, against a receipt)."
+        local: "Xe trả lại có nhiều bụi bẩn, cát, bùn, vết bẩn, thức ăn hoặc mùi hôi bên trong sẽ chịu phí vệ sinh {{currency}} {{cleaning_fee}} (cao hơn nếu cần vệ sinh chuyên sâu, theo hóa đơn)."
+      - id: return.3
+        unless: cleaning_fee
+        en: "A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside may be charged the reasonable cost of cleaning."
+        local: "Xe trả lại có nhiều bụi bẩn, cát, bùn, vết bẩn, thức ăn hoặc mùi hôi bên trong có thể bị tính chi phí vệ sinh hợp lý."
+
+  - id: data
+    title: { en: "17. Personal data and documents", local: "17. Dữ liệu cá nhân và giấy tờ" }
+    clauses:
+      - id: data.1
+        en: "The Owner collects the Renter's and drivers' names, contact details, ID and licence details, copies of documents, photos of the vehicle and, where a tracker is fitted, location data, only to provide this rental, prove identity, comply with the law, handle fines, claims and disputes, and keep business records. The Owner processes them in line with the Personal Data Protection Law and its guiding decree, keeps them only as long as needed for those purposes and the law, keeps them secure, and does not sell them. The Renter may ask to see, correct or delete their data, subject to the Owner's legal duties to keep records."
+        local: "Bên cho thuê thu thập họ tên, thông tin liên lạc, thông tin giấy tờ tùy thân và giấy phép lái xe, bản sao giấy tờ của Bên thuê và người lái, ảnh chụp xe và, nếu xe có thiết bị định vị, dữ liệu vị trí, chỉ để thực hiện việc cho thuê này, xác minh danh tính, tuân thủ pháp luật, xử lý tiền phạt, yêu cầu bồi thường và tranh chấp, và lưu trữ hồ sơ kinh doanh. Bên cho thuê xử lý dữ liệu theo Luật Bảo vệ dữ liệu cá nhân và nghị định hướng dẫn, chỉ lưu giữ trong thời gian cần thiết cho các mục đích đó và theo quy định của pháp luật, bảo mật dữ liệu và không bán dữ liệu. Bên thuê có quyền yêu cầu xem, chỉnh sửa hoặc xóa dữ liệu của mình, trừ trường hợp Bên cho thuê phải lưu giữ theo quy định của pháp luật."
+        country: true
+      - id: data.2
+        en: "By signing, the Renter consents to this processing and agrees that copies of their documents and the inspection photos and videos may be used as evidence of identity and of the vehicle's condition, and may be given to insurers, the police and other competent authorities when needed for a claim, fine or legal requirement."
+        local: "Bằng việc ký hợp đồng, Bên thuê đồng ý với việc xử lý dữ liệu nêu trên và đồng ý rằng bản sao giấy tờ cùng ảnh, video kiểm tra xe có thể được dùng làm chứng cứ về danh tính và tình trạng xe, và có thể được cung cấp cho công ty bảo hiểm, cơ quan công an và cơ quan có thẩm quyền khác khi cần cho việc bồi thường, xử phạt hoặc theo yêu cầu của pháp luật."
+        country: true
+
+  - id: general
+    title: { en: "18. General terms", local: "18. Điều khoản chung" }
+    clauses:
+      - id: general.1
+        en: "Messages: notices under this agreement may be sent by phone, message app (Zalo, WhatsApp, Telegram or similar), SMS or email to the contact details in sections 1 and 2, and count as received when sent."
+        local: "Thông báo: các thông báo theo hợp đồng này có thể được gửi qua điện thoại, ứng dụng nhắn tin (Zalo, WhatsApp, Telegram hoặc tương tự), tin nhắn SMS hoặc email theo thông tin liên lạc tại mục 1 và mục 2, và được coi là đã nhận khi gửi đi."
+      - id: general.2
+        en: "Force majeure: neither party is responsible for a delay or failure caused by events outside their control, such as natural disasters, floods, storms, government orders or ferry cancellations. Rent for days the vehicle could not be used because of such an event is agreed fairly between the parties."
+        local: "Sự kiện bất khả kháng: không bên nào chịu trách nhiệm về việc chậm trễ hoặc không thực hiện được nghĩa vụ do sự kiện ngoài khả năng kiểm soát, như thiên tai, lũ lụt, bão, lệnh của cơ quan nhà nước hoặc hủy chuyến phà. Tiền thuê cho những ngày không thể sử dụng xe do sự kiện đó sẽ được hai bên thỏa thuận một cách công bằng."
+      - id: general.3
+        en: "Whole agreement: this agreement, its annexes and any special conditions are the whole agreement. Changes are valid only in writing (a message from both parties is enough). If any part is found invalid, the rest still applies."
+        local: "Toàn bộ thỏa thuận: hợp đồng này, các phụ lục và điều kiện riêng (nếu có) là toàn bộ thỏa thuận giữa các bên. Mọi thay đổi chỉ có hiệu lực khi lập bằng văn bản (tin nhắn của cả hai bên là đủ). Nếu một phần của hợp đồng bị vô hiệu, các phần còn lại vẫn có hiệu lực."
+      - id: general.4
+        en: "Language: this agreement is written in English and {{local_language}}. If the two versions differ, the {{prevailing_language}} version applies."
+        local: "Ngôn ngữ: hợp đồng này được lập bằng tiếng Anh và {{local_language}}. Nếu hai bản có nội dung khác nhau, bản {{prevailing_language}} được áp dụng."
+        country: true
+      - id: general.5
+        en: "Governing law: this agreement is governed by the laws of {{jurisdiction}}, in particular the Civil Code's rules on property lease. The parties will first try to settle any dispute by discussion; if they cannot, the competent People's Court in {{court_place}} decides."
+        local: "Luật áp dụng: hợp đồng này được điều chỉnh bởi pháp luật của {{jurisdiction}}, đặc biệt là các quy định của Bộ luật Dân sự về hợp đồng thuê tài sản. Các bên sẽ ưu tiên giải quyết tranh chấp bằng thương lượng; nếu không thành, Tòa án nhân dân có thẩm quyền tại {{court_place}} sẽ giải quyết."
+        country: true
+      - id: general.6
+        if: special_terms
+        en: "Special conditions agreed between the parties: {{special_terms}}"
+        local: "Điều kiện riêng do các bên thỏa thuận: {{special_terms}}"
+
+  - id: signatures
+    title: { en: "Signatures", local: "Chữ ký" }
+    signature: true
+    clauses:
+      - id: signatures.1
+        en: "By signing, the parties confirm they have read and understood this agreement, including Annexes A and B, and agree to it. The Renter confirms they received a copy."
+        local: "Bằng việc ký tên, các bên xác nhận đã đọc, hiểu rõ và đồng ý với hợp đồng này, bao gồm Phụ lục A và Phụ lục B. Bên thuê xác nhận đã nhận một bản hợp đồng."
+    sign_rows:
+      - { en: "Owner (name, signature, date)", local: "Bên cho thuê (họ tên, chữ ký, ngày)" }
+      - { en: "Renter (name, signature, date)", local: "Bên thuê (họ tên, chữ ký, ngày)" }
+      - { en: "Additional driver (name, signature, date)", local: "Người lái bổ sung (họ tên, chữ ký, ngày)" }
+
+  - id: annex_a
+    title: { en: "Annex A: Handover and return check", local: "Phụ lục A: Biên bản kiểm tra khi giao và trả xe" }
+    page_break: true
+    checklist: true
+    clauses:
+      - id: annex_a.1
+        en: "Mark existing scratches (S), dents (D), cracks (C) and missing items (M). Take photos of all four sides, the dashboard (odometer and fuel), the interior and any damage, at both handover and return."
+        local: "Đánh dấu vết xước (S), vết móp (D), vết nứt (C) và đồ bị thiếu (M). Chụp ảnh bốn phía xe, bảng đồng hồ (số km và nhiên liệu), nội thất và mọi hư hỏng, cả khi giao và khi trả xe."
+    check_rows:
+      - { en: "Odometer", local: "Số km (đồng hồ công-tơ-mét)" }
+      - { en: "Fuel / battery level", local: "Mức nhiên liệu / pin" }
+      - { en: "Body: front / rear / left / right", local: "Thân xe: trước / sau / trái / phải" }
+      - { en: "Glass, mirrors and lights", local: "Kính, gương và đèn" }
+      - { en: "Tyres and wheels", local: "Lốp và vành" }
+      - { en: "Interior and seats", local: "Nội thất và ghế" }
+      - { en: "Keys, remote, documents", local: "Chìa khóa, điều khiển, giấy tờ xe" }
+      - { en: "Helmets / child seat / accessories", local: "Mũ bảo hiểm / ghế trẻ em / phụ kiện" }
+      - { en: "Photos taken (number)", local: "Số ảnh đã chụp" }
+      - { en: "Owner's and Renter's initials", local: "Chữ ký tắt của Bên cho thuê và Bên thuê" }
+    columns: { item: { en: "Item", local: "Hạng mục" }, out: { en: "At handover", local: "Khi giao xe" }, in: { en: "At return", local: "Khi trả xe" } }
+
+  - id: annex_b
+    title: { en: "Annex B: Damage and replacement price list", local: "Phụ lục B: Bảng giá hư hỏng và thay thế" }
+    pricelist: true
+    clauses:
+      - id: annex_b.1
+        en: "Agreed prices for common damage and lost items. Damage not listed is charged per section 12."
+        local: "Giá thỏa thuận cho các hư hỏng và mất mát thường gặp. Hư hỏng không có trong danh sách được tính theo mục 12."
+    price_rows:
+      - { en: "Scratch, per panel (polish / repaint)", local: "Vết xước, mỗi tấm (đánh bóng / sơn lại)" }
+      - { en: "Dent, per panel", local: "Vết móp, mỗi tấm" }
+      - { en: "Mirror", local: "Gương" }
+      - { en: "Headlight / tail light / indicator", local: "Đèn pha / đèn hậu / đèn xi-nhan" }
+      - { en: "Tyre (each)", local: "Lốp (mỗi chiếc)" }
+      - { en: "Key / remote", local: "Chìa khóa / điều khiển" }
+      - { en: "Helmet", local: "Mũ bảo hiểm" }
+      - { en: "Number plate replacement", local: "Làm lại biển số" }
+      - { en: "Vehicle value (for total loss or theft)", local: "Giá trị xe (khi tổn thất toàn bộ hoặc mất cắp)" }
+    columns: { item: { en: "Item", local: "Hạng mục" }, price: { en: "Price", local: "Giá" } }

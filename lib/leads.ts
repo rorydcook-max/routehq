@@ -12,7 +12,8 @@ export const LEAD_COUNTRIES = [
   "DE", "FR", "ES", "PT", "IT", "NL", "SE", "NO", "DK", "FI", "CH", "AT", "PL", "RU", "ZA", "KE"
 ] as const;
 
-export type LeadDownload = { href: string; label: string; detail: string; primary: boolean };
+/** open: shown in a new tab instead of saved (the contract builder's print page). */
+export type LeadDownload = { href: string; label: string; detail: string; primary: boolean; open?: boolean };
 
 export type LeadValues = { email: string; name: string; business: string; country: string; fleet: string; consent: boolean };
 

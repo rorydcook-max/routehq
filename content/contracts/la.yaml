@@ -1,0 +1,692 @@
+# Lokalfleet vehicle rental agreement: LAOS (English + Lao). Generated from master.en.yaml by build_country.py.
+# Prevailing language: Lao. Article 110 of the 2015 Constitution makes Lao the official language and script, and
+# authorities and courts work from Lao text, so the Lao version prevails.
+# Not reviewed by a lawyer. Country-specific statements are limited to what public sources (listed under `sources`) support;
+# where a rule could not be verified the text uses cautious wording ("where the law requires").
+country: LA
+locale: lo
+language: Lao
+currency: LAK
+prevailing_language:
+  en: Lao
+  local: ພາສາລາວ
+local_language:
+  en: Lao
+  local: ພາສາລາວ
+country_name:
+  en: Laos
+  local: ສປປ ລາວ
+currency_name:
+  en: Lao kip
+  local: ກີບລາວ
+jurisdiction:
+  en: the Lao People's Democratic Republic
+  local: ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ
+court_place:
+  en: the province or capital where the vehicle was rented
+  local: ແຂວງ ຫຼື ນະຄອນຫຼວງ ບ່ອນທີ່ໄດ້ເຊົ່າພາຫະນະ
+words:
+  per_day:
+    en: per day
+    local: ຕໍ່ມື້
+  per_week:
+    en: per week
+    local: ຕໍ່ອາທິດ
+  per_month:
+    en: per month
+    local: ຕໍ່ເດືອນ
+  day:
+    en: day
+    local: ມື້
+  month:
+    en: month
+    local: ເດືອນ
+  days:
+    en: days
+    local: ມື້
+  business_days:
+    en: business days after return
+    local: ມື້ລັດຖະການ ຫຼັງຈາກສົ່ງຄືນ
+  car:
+    en: Car
+    local: ລົດໃຫຍ່
+  motorbike:
+    en: Motorbike / scooter
+    local: ລົດຈັກ / ລົດສະກູດເຕີ
+  ins_compulsory:
+    en: Compulsory insurance only
+    local: ປະກັນໄພພາກບັງຄັບເທົ່ານັ້ນ
+  ins_third_party:
+    en: Compulsory + third-party insurance
+    local: ປະກັນໄພພາກບັງຄັບ + ປະກັນໄພບຸກຄົນທີສາມ
+  ins_comprehensive:
+    en: Comprehensive (first-class) insurance
+    local: ປະກັນໄພຮອບດ້ານ (ຊັ້ນໜຶ່ງ)
+  free:
+    en: Free
+    local: ບໍ່ເສຍຄ່າ
+  payment_default:
+    en: Cash, bank transfer or QR payment
+    local: ເງິນສົດ, ໂອນຜ່ານທະນາຄານ ຫຼື ຈ່າຍຜ່ານ QR
+  blank_hint:
+    en: (fill in)
+    local: (ຂຽນໃສ່)
+sources:
+- url: https://www.constituteproject.org/constitution/Laos_2015
+  supports: 'Constitution of the Lao PDR (2015), Article 110: Lao language and script are the official language and script (basis for Lao prevailing).'
+- url: https://www.dfdl.com/insights/legal-and-tax-updates/lao-pdr-legal-update-lao-pdr-enacts-civil-code/
+  supports: Civil Code No. 55/NA (adopted 6 Dec 2018, in force 26 May 2020) replaced the Law on Contract and Tort (2008) and other civil laws; it now governs contracts.
+- url: https://kpl.gov.la/En/detail.aspx?id=25138
+  supports: 'Lao News Agency (KPL): Law on Land Traffic (endorsed 17 Jan 2013), Article 18: driver and front-seat passenger of 4+ wheel vehicles must wear seatbelts; children who cannot use normal seatbelts need suitable seats.'
+- url: https://kpl.gov.la/En/detail.aspx?id=97786
+  supports: 'Lao News Agency (KPL), traffic police 2026: motorcycle riders and passengers must wear helmets; car occupants must wear seatbelts; drivers must carry licence, vehicle registration, technical inspection certificate, road tax receipt and insurance papers.'
+- url: https://laotradeportal.gov.la/en-gb/site/display/2475
+  supports: 'Land Transport Law No. 04/NA (16 Nov 2021), Article 29: all land vehicles used in the Lao PDR must be registered.'
+- url: https://conventuslaw.com/report/amended-law-on-insurance-in-laos/
+  supports: 'Amended Law on Insurance (gazetted 30 Mar 2020, in force 15 Apr 2020): motorised land vehicles are on the compulsory third-party liability insurance list; sanctions not clearly specified.'
+- url: https://treatydatabase.overheid.nl/en/Treaty/Details/007193_p
+  supports: Laos acceded to the 1949 Geneva Convention on Road Traffic (6 Mar 1959), the convention behind the 1949-type International Driving Permit.
+- url: https://www.gov.uk/foreign-travel-advice/laos/safety-and-security
+  supports: 'UK FCDO: drivers need a 1949 IDP plus their national licence; police may stop cars and ask for ID; drivers may have to pay third-party compensation even if not at fault; Lao insurers cover a small share of costs; do not leave a passport as a deposit when hiring motorbikes.'
+- url: https://travel.state.gov/content/travel/en/international-travel/International-Travel-Country-Information-Pages/Laos.html
+  supports: 'US State Department: never provide your passport as collateral for rentals; drivers in an accident should remain at the scene and contact the rental company and its insurer.'
+- url: https://www.smartraveller.gov.au/destinations/asia/laos
+  supports: 'Australian Smartraveller: get an IDP before travel; always wear a helmet; police may fine or detain people who do not show ID; reports of motorbike hire scams over existing damage.'
+- url: https://www.gov.uk/foreign-travel-advice/laos/getting-help
+  supports: 'UK FCDO emergency numbers for Laos: police 1191, ambulance 1195, fire 1190.'
+- url: https://www.multilaw.com/Multilaw/Data_Protection_Laws_Guide/DataProtection_Guide_Laos.aspx
+  supports: 'Law on Electronic Data Protection No. 25/NA (12 May 2017): consent needed for sensitive data and for transfer of data abroad; data subjects have access, correction and deletion rights; Civil Code recognises privacy.'
+- url: https://laotradeportal.gov.la/en-gb/site/display/596
+  supports: 'GMS Cross-Border Transport Facilitation Agreement (Laos, Thailand, Viet Nam): vehicles in international traffic are subject to registration, temporary-importation and permit rules.'
+- url: https://aseancob.org/coverage-and-blue-card
+  supports: 'ASEAN Compulsory Motor Insurance (Blue Card) system for cross-border vehicles covers Laos, Thailand and Cambodia: separate cross-border insurance is needed.'
+title:
+  en: Vehicle Rental Agreement
+  local: ສັນຍາເຊົ່າພາຫະນະ
+subtitle:
+  en: Car, motorbike and scooter rental. {{country_name}}
+  local: ການເຊົ່າລົດໃຫຍ່, ລົດຈັກ ແລະ ລົດສະກູດເຕີ. {{country_name}}
+footer:
+  en: Vehicle rental agreement · {{business_name}}
+  local: ສັນຍາເຊົ່າພາຫະນະ · {{business_name}}
+page_words:
+  page: Page
+  of: of
+sections:
+- id: parties
+  title:
+    en: 1. The parties
+    local: 1. ຄູ່ສັນຍາ
+  fields:
+  - key: business_name
+    en: Owner (rental business)
+    local: ຜູ້ໃຫ້ເຊົ່າ (ທຸລະກິດໃຫ້ເຊົ່າ)
+  - key: business_reg_no
+    en: Business registration / tax ID
+    local: ເລກທະບຽນວິສາຫະກິດ / ເລກປະຈຳຕົວຜູ້ເສຍອາກອນ
+  - key: business_address
+    en: Business address
+    local: ທີ່ຢູ່ທຸລະກິດ
+  - key: business_phone
+    en: Phone / WhatsApp / LINE
+    local: ໂທລະສັບ / WhatsApp / LINE
+  - key: business_email
+    en: Email
+    local: ອີເມວ
+  clauses:
+  - id: parties.1
+    en: This agreement is made on {{renter_contract_date}} between the rental business named above (the "Owner") and the person named in section 2 (the "Renter"). Where there is more than one renter or driver, each of them is jointly responsible for every obligation in this agreement.
+    local: ສັນຍາສະບັບນີ້ ເຮັດຂຶ້ນໃນວັນທີ {{renter_contract_date}} ລະຫວ່າງ ທຸລະກິດໃຫ້ເຊົ່າທີ່ມີຊື່ຂ້າງເທິງ ("ຜູ້ໃຫ້ເຊົ່າ") ແລະ ບຸກຄົນທີ່ມີຊື່ໃນພາກທີ 2 ("ຜູ້ເຊົ່າ"). ຖ້າມີຜູ້ເຊົ່າ ຫຼື ຜູ້ຂັບຂີ່ຫຼາຍກວ່າໜຶ່ງຄົນ, ແຕ່ລະຄົນຕ້ອງຮັບຜິດຊອບຮ່ວມກັນຕໍ່ທຸກພັນທະໃນສັນຍານີ້.
+- id: renter
+  title:
+    en: 2. The Renter and drivers
+    local: 2. ຜູ້ເຊົ່າ ແລະ ຜູ້ຂັບຂີ່
+  fields:
+  - key: renter_name
+    en: Full name (as on passport or ID)
+    local: ຊື່ ແລະ ນາມສະກຸນ (ຕາມໜັງສືຜ່ານແດນ ຫຼື ບັດປະຈຳຕົວ)
+  - key: renter_nationality
+    en: Nationality
+    local: ສັນຊາດ
+  - key: renter_dob
+    en: Date of birth
+    local: ວັນເດືອນປີເກີດ
+  - key: renter_id_no
+    en: Passport or national ID number
+    local: ເລກໜັງສືຜ່ານແດນ ຫຼື ບັດປະຈຳຕົວ
+  - key: renter_home_address
+    en: Home address
+    local: ທີ່ຢູ່ບ້ານເກີດ
+  - key: renter_local_address
+    en: Local address during the rental (hotel / villa / condo)
+    local: ທີ່ພັກໃນໄລຍະເຊົ່າ (ໂຮງແຮມ / ວິລລາ / ຄອນໂດ)
+  - key: renter_phone
+    en: Phone / WhatsApp
+    local: ໂທລະສັບ / WhatsApp
+  - key: renter_email
+    en: Email
+    local: ອີເມວ
+  - key: renter_licence
+    en: Driving licence number, class and issuing country
+    local: ເລກໃບຂັບຂີ່, ປະເພດ ແລະ ປະເທດທີ່ອອກໃຫ້
+  - key: renter_licence_expiry
+    en: Licence expiry date
+    local: ວັນໝົດອາຍຸໃບຂັບຂີ່
+  - key: renter_idp
+    en: International Driving Permit (number / not required)
+    local: ໃບອະນຸຍາດຂັບຂີ່ສາກົນ (ເລກທີ / ບໍ່ຈຳເປັນ)
+  - key: renter_emergency
+    en: Emergency contact (name and phone)
+    local: ຜູ້ຕິດຕໍ່ສຸກເສີນ (ຊື່ ແລະ ເບີໂທ)
+  - key: driver2_details
+    en: Additional driver (name, ID, licence), if any
+    local: ຜູ້ຂັບຂີ່ເພີ່ມເຕີມ (ຊື່, ບັດປະຈຳຕົວ, ໃບຂັບຂີ່), ຖ້າມີ
+  clauses:
+  - id: renter.1
+    en: The Renter confirms that the details above are true and complete, and that every person who will drive or ride the vehicle is named here. Only the Renter and any additional driver named above may drive or ride the vehicle.
+    local: ຜູ້ເຊົ່າຢືນຢັນວ່າ ຂໍ້ມູນຂ້າງເທິງນີ້ຖືກຕ້ອງ ແລະ ຄົບຖ້ວນ, ແລະ ທຸກຄົນທີ່ຈະຂັບ ຫຼື ຂີ່ພາຫະນະ ມີຊື່ຢູ່ໃນນີ້. ມີແຕ່ຜູ້ເຊົ່າ ແລະ ຜູ້ຂັບຂີ່ເພີ່ມເຕີມທີ່ມີຊື່ຂ້າງເທິງເທົ່ານັ້ນ ທີ່ສາມາດຂັບ ຫຼື ຂີ່ພາຫະນະໄດ້.
+  - id: renter.2
+    en: Every driver must hold a valid driving licence for this class of vehicle and carry it at all times while driving. A driver who does not hold a Lao licence must carry their national licence together with an International Driving Permit (1949 Geneva Convention type). A car licence does not allow a person to ride a motorbike.
+    local: ຜູ້ຂັບຂີ່ທຸກຄົນຕ້ອງມີໃບຂັບຂີ່ທີ່ຍັງບໍ່ໝົດອາຍຸ ສຳລັບປະເພດພາຫະນະນີ້ ແລະ ຕ້ອງພົກຕິດຕົວຕະຫຼອດເວລາທີ່ຂັບຂີ່. ຜູ້ຂັບຂີ່ທີ່ບໍ່ມີໃບຂັບຂີ່ລາວ ຕ້ອງພົກໃບຂັບຂີ່ຂອງປະເທດຕົນ ພ້ອມກັບໃບອະນຸຍາດຂັບຂີ່ສາກົນ (ແບບສົນທິສັນຍາເຈນີວາ ປີ 1949). ໃບຂັບຂີ່ລົດໃຫຍ່ ບໍ່ອະນຸຍາດໃຫ້ຂີ່ລົດຈັກ.
+    country: true
+  - id: renter.3_cc
+    en: Police in Laos may stop vehicles and ask for identification at any time. Every driver must carry their driving licence, any International Driving Permit and their passport or ID (or a copy where the police accept it) while driving.
+    local: ຕຳຫຼວດໃນ ສປປ ລາວ ອາດຈະເອີ້ນຈອດພາຫະນະ ແລະ ຂໍກວດເອກະສານປະຈຳຕົວໄດ້ທຸກເວລາ. ຜູ້ຂັບຂີ່ທຸກຄົນຕ້ອງພົກໃບຂັບຂີ່, ໃບອະນຸຍາດຂັບຂີ່ສາກົນ (ຖ້າມີ) ແລະ ໜັງສືຜ່ານແດນ ຫຼື ບັດປະຈຳຕົວ (ຫຼື ສຳເນົາ ໃນກໍລະນີທີ່ຕຳຫຼວດຍອມຮັບ) ຕະຫຼອດເວລາທີ່ຂັບຂີ່.
+    country: true
+- id: vehicle
+  title:
+    en: 3. The vehicle
+    local: 3. ພາຫະນະ
+  fields:
+  - key: vehicle_type_label
+    en: Type
+    local: ປະເພດ
+  - key: vehicle_make_model
+    en: Make and model
+    local: ຍີ່ຫໍ້ ແລະ ລຸ້ນ
+  - key: vehicle_year
+    en: Year
+    local: ປີ
+  - key: vehicle_plate
+    en: Registration (plate) number
+    local: ເລກທະບຽນ (ປ້າຍ)
+  - key: vehicle_colour
+    en: Colour
+    local: ສີ
+  - key: renter_vin
+    en: Chassis / VIN number
+    local: ເລກຈັກ / ເລກຖັງ (VIN)
+  - key: out_odometer
+    en: Odometer at handover
+    local: ເລກໄມລ໌ ຕອນຮັບລົດ
+  - key: out_fuel
+    en: Fuel / battery level at handover
+    local: ລະດັບນ້ຳມັນ / ແບັດເຕີຣີ ຕອນຮັບລົດ
+  - key: renter_accessories
+    en: Accessories handed over (helmets, keys, child seat, phone holder, etc.)
+    local: ອຸປະກອນທີ່ມອບໃຫ້ (ໝວກກັນກະທົບ, ກະແຈ, ບ່ອນນັ່ງເດັກ, ທີ່ວາງໂທລະສັບ ແລະ ອື່ນໆ)
+  clauses:
+  - id: vehicle.1
+    en: The Owner rents the vehicle described above, with the accessories listed, to the Renter for the rental period and on the terms of this agreement. The vehicle remains the property of the Owner at all times.
+    local: ຜູ້ໃຫ້ເຊົ່າ ໃຫ້ເຊົ່າພາຫະນະທີ່ລະບຸຂ້າງເທິງ ພ້ອມອຸປະກອນທີ່ໄດ້ລົງລາຍການໄວ້ ແກ່ຜູ້ເຊົ່າ ຕາມໄລຍະເຊົ່າ ແລະ ເງື່ອນໄຂຂອງສັນຍານີ້. ພາຫະນະຍັງເປັນກຳມະສິດຂອງຜູ້ໃຫ້ເຊົ່າຕະຫຼອດເວລາ.
+  - id: vehicle.2
+    en: The Owner confirms that the vehicle is registered in Laos, that its road tax is paid, that it has a valid technical inspection certificate where one is required, that compulsory insurance is valid for the whole rental period, and that it is handed over in a roadworthy condition with its registration and insurance papers.
+    local: ຜູ້ໃຫ້ເຊົ່າຢືນຢັນວ່າ ພາຫະນະໄດ້ຂຶ້ນທະບຽນຢູ່ ສປປ ລາວ, ໄດ້ເສຍຄ່າທຳນຽມທາງແລ້ວ, ມີໃບຢັ້ງຢືນການກວດກາເຕັກນິກທີ່ຍັງໃຊ້ໄດ້ ໃນກໍລະນີທີ່ກຳນົດ, ມີປະກັນໄພພາກບັງຄັບທີ່ມີຜົນຕະຫຼອດໄລຍະເຊົ່າ, ແລະ ມອບໃຫ້ໃນສະພາບພ້ອມໃຊ້ງານໃນທ້ອງທາງ ພ້ອມເອກະສານທະບຽນ ແລະ ເອກະສານປະກັນໄພ.
+    country: true
+- id: period
+  title:
+    en: 4. Rental period, pickup and return
+    local: 4. ໄລຍະເຊົ່າ, ການຮັບ ແລະ ການສົ່ງຄືນ
+  fields:
+  - key: renter_start
+    en: Start (date and time)
+    local: ເລີ່ມ (ວັນທີ ແລະ ເວລາ)
+  - key: renter_end
+    en: End (date and time)
+    local: ສິ້ນສຸດ (ວັນທີ ແລະ ເວລາ)
+  - key: renter_pickup_place
+    en: Pickup / delivery place
+    local: ສະຖານທີ່ຮັບ / ສົ່ງລົດໃຫ້
+  - key: renter_return_place
+    en: Return / collection place
+    local: ສະຖານທີ່ສົ່ງຄືນ / ມາຮັບລົດຄືນ
+  clauses:
+  - id: period.1
+    en: The Renter must return the vehicle at the agreed place, date and time. An extension is valid only when the Owner agrees to it in writing (a message is enough) and the extra rent is paid.
+    local: ຜູ້ເຊົ່າຕ້ອງສົ່ງພາຫະນະຄືນ ຕາມສະຖານທີ່, ວັນທີ ແລະ ເວລາທີ່ຕົກລົງກັນ. ການຕໍ່ໄລຍະເຊົ່າ ມີຜົນສະເພາະເມື່ອຜູ້ໃຫ້ເຊົ່າເຫັນດີເປັນລາຍລັກອັກສອນ (ຂໍ້ຄວາມກໍພຽງພໍ) ແລະ ໄດ້ຈ່າຍຄ່າເຊົ່າເພີ່ມແລ້ວ.
+  - id: period.2
+    if: late_hour_fee
+    en: 'Late return: after a grace period of {{late_grace_minutes}} minutes, each started hour costs {{currency}} {{late_hour_fee}}. A return more than {{late_full_day_hours}} hours late is charged as an extra full day at the daily rate.'
+    local: 'ການສົ່ງຄືນຊ້າ: ຫຼັງຈາກໄລຍະຜ່ອນຜັນ {{late_grace_minutes}} ນາທີ, ທຸກຊົ່ວໂມງທີ່ເລີ່ມ ຄິດຄ່າ {{currency}} {{late_hour_fee}}. ການສົ່ງຄືນຊ້າກວ່າ {{late_full_day_hours}} ຊົ່ວໂມງ ຈະຄິດເປັນມື້ເຕັມເພີ່ມອີກໜຶ່ງມື້ ຕາມອັດຕາລາຍວັນ.'
+  - id: period.3
+    unless: late_hour_fee
+    en: 'Late return: a return more than one hour late may be charged as an extra day at the daily rate.'
+    local: 'ການສົ່ງຄືນຊ້າ: ການສົ່ງຄືນຊ້າກວ່າໜຶ່ງຊົ່ວໂມງ ອາດຈະຄິດເປັນມື້ເພີ່ມ ຕາມອັດຕາລາຍວັນ.'
+  - id: period.4
+    en: If the vehicle is not returned and the Renter cannot be reached within 24 hours of the end time, the Owner may treat the vehicle as stolen, report it to the police and recover it, at the Renter's cost.
+    local: ຖ້າບໍ່ໄດ້ສົ່ງພາຫະນະຄືນ ແລະ ບໍ່ສາມາດຕິດຕໍ່ຜູ້ເຊົ່າໄດ້ ພາຍໃນ 24 ຊົ່ວໂມງ ນັບຈາກເວລາສິ້ນສຸດ, ຜູ້ໃຫ້ເຊົ່າອາດຈະຖືວ່າພາຫະນະຖືກລັກ, ແຈ້ງຕຳຫຼວດ ແລະ ຕິດຕາມເອົາຄືນ ໂດຍຜູ້ເຊົ່າເປັນຜູ້ຮັບຜິດຊອບຄ່າໃຊ້ຈ່າຍ.
+- id: charges
+  title:
+    en: 5. Rent and payment
+    local: 5. ຄ່າເຊົ່າ ແລະ ການຊຳລະ
+  fields:
+  - key: rate_text
+    en: Rental rate
+    local: ອັດຕາຄ່າເຊົ່າ
+  - key: renter_total
+    en: Total rent for this booking
+    local: ຄ່າເຊົ່າທັງໝົດສຳລັບການຈອງນີ້
+  - key: delivery_fee_text
+    en: Delivery / collection fee
+    local: ຄ່າສົ່ງ / ຄ່າມາຮັບລົດ
+  - key: payment_methods
+    en: Payment methods accepted
+    local: ວິທີຊຳລະທີ່ຮັບ
+  clauses:
+  - id: charges.1
+    en: The Renter pays the rent stated above in advance, unless the Owner agrees otherwise in writing. Prices are in {{currency_name}}.
+    local: ຜູ້ເຊົ່າຈ່າຍຄ່າເຊົ່າທີ່ລະບຸຂ້າງເທິງລ່ວງໜ້າ ເວັ້ນເສຍແຕ່ຜູ້ໃຫ້ເຊົ່າຕົກລົງເປັນຢ່າງອື່ນເປັນລາຍລັກອັກສອນ. ລາຄາເປັນ {{currency_name}}.
+  - id: charges.2
+    when:
+      rate_period: month
+    en: 'Monthly rentals: rent is paid monthly in advance on the same day each month. A payment more than 3 days late allows the Owner to end the rental and collect the vehicle (section 15).'
+    local: 'ການເຊົ່າລາຍເດືອນ: ຈ່າຍຄ່າເຊົ່າລ່ວງໜ້າເປັນລາຍເດືອນ ໃນວັນທີດຽວກັນຂອງທຸກເດືອນ. ການຈ່າຍຊ້າເກີນ 3 ມື້ ເຮັດໃຫ້ຜູ້ໃຫ້ເຊົ່າມີສິດຍົກເລີກການເຊົ່າ ແລະ ຮັບພາຫະນະຄືນ (ພາກທີ 15).'
+  - id: charges.3
+    en: Extras (child seats, delivery, additional drivers, phone holders, insurance upgrades and similar) cost what is written in this agreement or what the Owner confirmed in writing before the rental.
+    local: ລາຍການເພີ່ມເຕີມ (ບ່ອນນັ່ງເດັກ, ການສົ່ງລົດ, ຜູ້ຂັບຂີ່ເພີ່ມ, ທີ່ວາງໂທລະສັບ, ການເພີ່ມປະກັນໄພ ແລະ ອື່ນໆ) ມີລາຄາຕາມທີ່ຂຽນໄວ້ໃນສັນຍານີ້ ຫຼື ຕາມທີ່ຜູ້ໃຫ້ເຊົ່າໄດ້ຢືນຢັນເປັນລາຍລັກອັກສອນກ່ອນການເຊົ່າ.
+- id: deposit
+  title:
+    en: 6. Security deposit
+    local: 6. ເງິນມັດຈຳຄ້ຳປະກັນ
+  fields:
+  - key: deposit_text
+    en: Deposit
+    local: ເງິນມັດຈຳ
+  - key: renter_deposit_method
+    en: Paid by (cash / transfer / card hold)
+    local: ຊຳລະໂດຍ (ເງິນສົດ / ໂອນ / ລັອກວົງເງິນບັດ)
+  - key: deposit_return_text
+    en: Returned within
+    local: ສົ່ງຄືນພາຍໃນ
+  clauses:
+  - id: deposit.1
+    en: 'The deposit secures the Renter''s obligations: unpaid rent, damage up to the amount the Renter is liable for, fuel, mileage, cleaning, late return, lost keys or accessories, traffic fines and any other amount owed under this agreement.'
+    local: 'ເງິນມັດຈຳໃຊ້ຄ້ຳປະກັນພັນທະຂອງຜູ້ເຊົ່າ: ຄ່າເຊົ່າທີ່ຍັງບໍ່ໄດ້ຈ່າຍ, ຄວາມເສຍຫາຍ ເຖິງຈຳນວນທີ່ຜູ້ເຊົ່າຕ້ອງຮັບຜິດຊອບ, ນ້ຳມັນ, ໄລຍະທາງ, ການທຳຄວາມສະອາດ, ການສົ່ງຄືນຊ້າ, ກະແຈ ຫຼື ອຸປະກອນທີ່ເສຍ, ຄ່າປັບໃໝຈະລາຈອນ ແລະ ຈຳນວນອື່ນໆ ທີ່ຕ້ອງຈ່າຍຕາມສັນຍານີ້.'
+  - id: deposit.2
+    en: The Owner returns the deposit, less any amounts properly deducted, after the vehicle has been returned and checked. The Owner gives the Renter a written list of any deduction with photos, receipts or quotes. If the amounts owed are more than the deposit, the Renter pays the difference within 7 days of being told.
+    local: ຜູ້ໃຫ້ເຊົ່າສົ່ງເງິນມັດຈຳຄືນ ຫຼັງຈາກຫັກຈຳນວນທີ່ຫັກໄດ້ຢ່າງຖືກຕ້ອງ ເມື່ອໄດ້ຮັບພາຫະນະຄືນ ແລະ ກວດກາແລ້ວ. ຜູ້ໃຫ້ເຊົ່າຕ້ອງໃຫ້ລາຍການຫັກເງິນເປັນລາຍລັກອັກສອນ ພ້ອມຮູບພາບ, ໃບບິນ ຫຼື ໃບສະເໜີລາຄາ. ຖ້າຈຳນວນທີ່ຕ້ອງຈ່າຍຫຼາຍກວ່າເງິນມັດຈຳ, ຜູ້ເຊົ່າຕ້ອງຈ່າຍສ່ວນຕ່າງພາຍໃນ 7 ມື້ ນັບຈາກໄດ້ຮັບແຈ້ງ.
+  - id: deposit.3
+    en: Some traffic fines can reach the Owner after a rental ends. The Owner may keep a reasonable part of the deposit for up to 30 days to cover fines the Owner has reason to expect, and must return it promptly if none arrive.
+    local: ຄ່າປັບໃໝຈະລາຈອນບາງຢ່າງ ອາດມາຮອດຜູ້ໃຫ້ເຊົ່າ ຫຼັງຈາກສິ້ນສຸດການເຊົ່າແລ້ວ. ຜູ້ໃຫ້ເຊົ່າອາດຈະເກັບເງິນມັດຈຳສ່ວນໜຶ່ງໃນຈຳນວນທີ່ສົມເຫດສົມຜົນ ໄວ້ບໍ່ເກີນ 30 ມື້ ເພື່ອຈ່າຍຄ່າປັບໃໝທີ່ມີເຫດຜົນຄາດວ່າຈະມີ, ແລະ ຕ້ອງສົ່ງຄືນໂດຍໄວ ຖ້າບໍ່ມີຄ່າປັບໃໝມາ.
+    country: true
+  - id: deposit.4
+    en: The Owner will not keep the Renter's original passport or national ID card as a deposit, and the Renter should not offer it. The Owner may take a copy or photo of them to identify the Renter (section 17).
+    local: ຜູ້ໃຫ້ເຊົ່າຈະບໍ່ເກັບໜັງສືຜ່ານແດນ ຫຼື ບັດປະຈຳຕົວສະບັບແທ້ຂອງຜູ້ເຊົ່າໄວ້ເປັນເງິນມັດຈຳ, ແລະ ຜູ້ເຊົ່າບໍ່ຄວນມອບໃຫ້. ຜູ້ໃຫ້ເຊົ່າອາດຈະສຳເນົາ ຫຼື ຖ່າຍຮູບເອກະສານດັ່ງກ່າວ ເພື່ອຢືນຢັນຕົວຕົນຂອງຜູ້ເຊົ່າ (ພາກທີ 17).
+    country: true
+- id: cancellation
+  title:
+    en: 7. Cancellation and early return
+    local: 7. ການຍົກເລີກ ແລະ ການສົ່ງຄືນກ່ອນກຳນົດ
+  clauses:
+  - id: cancellation.1
+    if: cancel_free_hours
+    en: The Renter may cancel free of charge up to {{cancel_free_hours}} hours before the start time. A later cancellation costs {{cancel_fee_percent}}% of the rent for the booked period (or of the first month on a monthly rental). If the Renter does not arrive at the start time and does not tell the Owner (a no-show), the Owner may keep the full amount paid for the first {{no_show_days}} day(s) and release the vehicle.
+    local: ຜູ້ເຊົ່າສາມາດຍົກເລີກໄດ້ໂດຍບໍ່ເສຍຄ່າ ກ່ອນເວລາເລີ່ມຕົ້ນ {{cancel_free_hours}} ຊົ່ວໂມງ. ການຍົກເລີກຫຼັງຈາກນັ້ນ ເສຍຄ່າ {{cancel_fee_percent}}% ຂອງຄ່າເຊົ່າສຳລັບໄລຍະທີ່ຈອງ (ຫຼື ຂອງເດືອນທຳອິດ ສຳລັບການເຊົ່າລາຍເດືອນ). ຖ້າຜູ້ເຊົ່າບໍ່ມາຕາມເວລາເລີ່ມຕົ້ນ ແລະ ບໍ່ແຈ້ງຜູ້ໃຫ້ເຊົ່າ (ບໍ່ມາຮັບ), ຜູ້ໃຫ້ເຊົ່າອາດຈະເກັບເງິນທີ່ຈ່າຍແລ້ວທັງໝົດ ສຳລັບ {{no_show_days}} ມື້ທຳອິດ ແລະ ນຳພາຫະນະໄປໃຫ້ເຊົ່າຕໍ່ໄດ້.
+  - id: cancellation.2
+    unless: cancel_free_hours
+    en: 'Cancellation by the Renter before the start time: the Owner keeps any booking payment that this agreement or the booking confirmation says is non-refundable, and refunds the rest.'
+    local: 'ການຍົກເລີກໂດຍຜູ້ເຊົ່າ ກ່ອນເວລາເລີ່ມຕົ້ນ: ຜູ້ໃຫ້ເຊົ່າເກັບເງິນຈອງສ່ວນທີ່ສັນຍານີ້ ຫຼື ການຢືນຢັນການຈອງ ລະບຸວ່າບໍ່ສາມາດຂໍຄືນໄດ້, ແລະ ສົ່ງສ່ວນທີ່ເຫຼືອຄືນ.'
+  - id: cancellation.3
+    when:
+      early_return: none
+    en: 'Early return: rent for the booked period is not refunded if the Renter returns the vehicle early.'
+    local: 'ການສົ່ງຄືນກ່ອນກຳນົດ: ຖ້າຜູ້ເຊົ່າສົ່ງພາຫະນະຄືນກ່ອນກຳນົດ ຈະບໍ່ໄດ້ຮັບຄ່າເຊົ່າຂອງໄລຍະທີ່ຈອງຄືນ.'
+  - id: cancellation.4
+    when:
+      early_return: prorata
+    en: 'Early return: the Owner refunds the rent for the full unused days, less an early-return fee of {{currency}} {{early_return_fee}}. Long-term discounts that no longer apply may be recalculated at the rate for the period actually used.'
+    local: 'ການສົ່ງຄືນກ່ອນກຳນົດ: ຜູ້ໃຫ້ເຊົ່າຄືນຄ່າເຊົ່າສຳລັບມື້ເຕັມທີ່ບໍ່ໄດ້ໃຊ້ ຫັກຄ່າທຳນຽມສົ່ງຄືນກ່ອນກຳນົດ {{currency}} {{early_return_fee}}. ສ່ວນຫຼຸດການເຊົ່າໄລຍະຍາວທີ່ບໍ່ເຂົ້າເງື່ອນໄຂແລ້ວ ອາດຈະຄິດໄລ່ໃໝ່ ຕາມອັດຕາຂອງໄລຍະທີ່ໃຊ້ຕົວຈິງ.'
+  - id: cancellation.5
+    when:
+      rate_period: month
+    en: 'Monthly rentals: either party may end the rental by giving {{notice_days}} days'' written notice. Without notice, the Renter pays rent for the notice period.'
+    local: 'ການເຊົ່າລາຍເດືອນ: ຄູ່ສັນຍາຝ່າຍໃດຝ່າຍໜຶ່ງ ສາມາດຍົກເລີກການເຊົ່າໄດ້ ໂດຍແຈ້ງເປັນລາຍລັກອັກສອນລ່ວງໜ້າ {{notice_days}} ມື້. ຖ້າບໍ່ແຈ້ງລ່ວງໜ້າ, ຜູ້ເຊົ່າຕ້ອງຈ່າຍຄ່າເຊົ່າສຳລັບໄລຍະແຈ້ງລ່ວງໜ້ານັ້ນ.'
+  - id: cancellation.6
+    en: If the Owner cannot provide the vehicle (or a similar or better one) at the start time, the Renter may cancel and receive a full refund of everything paid.
+    local: ຖ້າຜູ້ໃຫ້ເຊົ່າບໍ່ສາມາດສະໜອງພາຫະນະ (ຫຼື ພາຫະນະທີ່ຄ້າຍຄືກັນ ຫຼື ດີກວ່າ) ໃນເວລາເລີ່ມຕົ້ນ, ຜູ້ເຊົ່າສາມາດຍົກເລີກ ແລະ ໄດ້ຮັບເງິນທີ່ຈ່າຍທັງໝົດຄືນ.
+- id: fuel
+  title:
+    en: 8. Fuel, charging and mileage
+    local: 8. ນ້ຳມັນ, ການສາກໄຟ ແລະ ໄລຍະທາງ
+  clauses:
+  - id: fuel.1
+    when:
+      fuel_policy: same
+    en: 'Fuel policy: same-to-same. The vehicle must be returned with at least the fuel (or battery) level it had at handover.'
+    local: 'ນະໂຍບາຍນ້ຳມັນ: ຮັບເທົ່າໃດ ສົ່ງເທົ່ານັ້ນ. ຕ້ອງສົ່ງພາຫະນະຄືນ ໂດຍມີລະດັບນ້ຳມັນ (ຫຼື ແບັດເຕີຣີ) ຢ່າງໜ້ອຍເທົ່າກັບຕອນຮັບລົດ.'
+  - id: fuel.2
+    when:
+      fuel_policy: full
+    en: 'Fuel policy: full-to-full. The vehicle is handed over with a full tank and must be returned full.'
+    local: 'ນະໂຍບາຍນ້ຳມັນ: ຮັບເຕັມ ສົ່ງເຕັມ. ພາຫະນະມອບໃຫ້ພ້ອມນ້ຳມັນເຕັມຖັງ ແລະ ຕ້ອງສົ່ງຄືນເຕັມຖັງ.'
+  - id: fuel.3
+    en: Missing fuel is charged at the local pump price plus a refuelling service fee of {{currency}} {{fuel_service_fee}}. Using the wrong fuel is the Renter's responsibility, including towing and repair.
+    local: ນ້ຳມັນທີ່ຂາດ ຄິດຕາມລາຄາປ້ຳນ້ຳມັນທ້ອງຖິ່ນ ບວກຄ່າບໍລິການເຕີມນ້ຳມັນ {{currency}} {{fuel_service_fee}}. ການເຕີມນ້ຳມັນຜິດປະເພດ ແມ່ນຄວາມຮັບຜິດຊອບຂອງຜູ້ເຊົ່າ ລວມທັງຄ່າລາກລົດ ແລະ ຄ່າສ້ອມແປງ.
+  - id: fuel.4
+    if: mileage_limit
+    en: 'Mileage allowance: {{mileage_limit}} km per {{mileage_period_label}}. Each extra kilometre costs {{currency}} {{excess_km_fee}}.'
+    local: 'ໄລຍະທາງທີ່ອະນຸຍາດ: {{mileage_limit}} ກມ ຕໍ່ {{mileage_period_label}}. ທຸກກິໂລແມັດທີ່ເກີນ ຄິດຄ່າ {{currency}} {{excess_km_fee}}.'
+  - id: fuel.5
+    unless: mileage_limit
+    en: 'Mileage: unlimited, within the permitted area (section 10).'
+    local: 'ໄລຍະທາງ: ບໍ່ຈຳກັດ ພາຍໃນເຂດທີ່ອະນຸຍາດ (ພາກທີ 10).'
+  - id: fuel.6
+    en: The Renter must not tamper with the odometer, speed limiter or GPS tracker. Tampering is a serious breach (section 15).
+    local: ຜູ້ເຊົ່າຕ້ອງບໍ່ດັດແປງ ເລກໄມລ໌, ອຸປະກອນຈຳກັດຄວາມໄວ ຫຼື ເຄື່ອງຕິດຕາມ GPS. ການດັດແປງຖືເປັນການລະເມີດຮ້າຍແຮງ (ພາກທີ 15).
+- id: use
+  title:
+    en: 9. Safe and lawful use
+    local: 9. ການນຳໃຊ້ຢ່າງປອດໄພ ແລະ ຖືກຕ້ອງຕາມກົດໝາຍ
+  clauses:
+  - id: use.1
+    en: The Renter must drive or ride carefully, obey all traffic laws, and keep the vehicle locked with the keys removed whenever it is left. Keys must never be left in or on the vehicle.
+    local: ຜູ້ເຊົ່າຕ້ອງຂັບ ຫຼື ຂີ່ດ້ວຍຄວາມລະມັດລະວັງ, ປະຕິບັດຕາມກົດຈະລາຈອນທຸກຂໍ້, ແລະ ລັອກພາຫະນະ ພ້ອມເອົາກະແຈອອກ ທຸກຄັ້ງທີ່ອອກຈາກພາຫະນະ. ຫ້າມປະກະແຈໄວ້ໃນ ຫຼື ເທິງພາຫະນະເດັດຂາດ.
+  - id: use.2
+    when:
+      vehicle_type:
+      - motorbike
+      - ''
+    en: 'Motorbikes and scooters: Lao traffic rules require the rider and every passenger to wear a helmet. Helmets must be fastened at all times. No more than one passenger, and no passenger who cannot reach the footrests safely.'
+    local: 'ລົດຈັກ ແລະ ລົດສະກູດເຕີ: ລະບຽບຈະລາຈອນຂອງລາວ ກຳນົດໃຫ້ຜູ້ຂັບຂີ່ ແລະ ຜູ້ຊ້ອນທ້າຍທຸກຄົນ ຕ້ອງໃສ່ໝວກກັນກະທົບ. ຕ້ອງລັດສາຍໝວກກັນກະທົບຕະຫຼອດເວລາ. ຊ້ອນທ້າຍໄດ້ບໍ່ເກີນໜຶ່ງຄົນ, ແລະ ຫ້າມຊ້ອນທ້າຍຜູ້ທີ່ບໍ່ສາມາດວາງຕີນເທິງບ່ອນພັກຕີນໄດ້ຢ່າງປອດໄພ.'
+    country: true
+  - id: use.3
+    when:
+      vehicle_type:
+      - car
+      - ''
+    en: 'Cars: the Law on Land Traffic requires the driver and front-seat passenger to wear seatbelts, and children who cannot use a normal seatbelt to have a suitable child seat. The Owner asks every occupant to wear a seatbelt. The number of passengers must not exceed the number of seats.'
+    local: 'ລົດໃຫຍ່: ກົດໝາຍວ່າດ້ວຍການຈະລາຈອນທາງບົກ ກຳນົດໃຫ້ຜູ້ຂັບຂີ່ ແລະ ຜູ້ໂດຍສານບ່ອນນັ່ງໜ້າ ຕ້ອງຄາດສາຍແອວນິລະໄພ, ແລະ ເດັກທີ່ບໍ່ສາມາດໃຊ້ສາຍແອວປົກກະຕິໄດ້ ຕ້ອງມີບ່ອນນັ່ງເດັກທີ່ເໝາະສົມ. ຜູ້ໃຫ້ເຊົ່າຂໍໃຫ້ທຸກຄົນໃນລົດຄາດສາຍແອວນິລະໄພ. ຈຳນວນຜູ້ໂດຍສານຕ້ອງບໍ່ເກີນຈຳນວນບ່ອນນັ່ງ.'
+    country: true
+  - id: use.4
+    en: 'It is forbidden to: drive under the influence of alcohol or drugs, or above the legal limit; use a phone while driving except hands-free; race, perform stunts or drive off-road (unless the vehicle is meant for it and the Owner agreed); tow or push anything; carry goods for payment, illegal goods or dangerous loads; use the vehicle for ride-hailing, delivery work, driving lessons or to rent it to anyone else; let anyone not named in section 2 drive or ride.'
+    local: 'ຫ້າມ: ຂັບຂີ່ໃນຂະນະມຶນເມົາເຫຼົ້າ ຫຼື ສານເສບຕິດ, ຫຼື ເກີນຂີດຈຳກັດທີ່ກົດໝາຍກຳນົດ; ໃຊ້ໂທລະສັບໃນຂະນະຂັບຂີ່ ເວັ້ນເສຍແຕ່ແບບບໍ່ໃຊ້ມືຖື; ແຂ່ງລົດ, ສະແດງຜາດໂຜນ ຫຼື ຂັບອອກນອກທາງ (ເວັ້ນເສຍແຕ່ພາຫະນະອອກແບບມາເພື່ອການນັ້ນ ແລະ ຜູ້ໃຫ້ເຊົ່າເຫັນດີ); ລາກ ຫຼື ຍູ້ສິ່ງໃດໆ; ບັນທຸກສິນຄ້າເພື່ອຮັບຄ່າຈ້າງ, ສິນຄ້າຜິດກົດໝາຍ ຫຼື ສິ່ງຂອງອັນຕະລາຍ; ໃຊ້ພາຫະນະເພື່ອບໍລິການຮັບສົ່ງຜູ້ໂດຍສານຜ່ານແອັບ, ວຽກສົ່ງເຄື່ອງ, ສອນຂັບລົດ ຫຼື ນຳໄປໃຫ້ຜູ້ອື່ນເຊົ່າຕໍ່; ໃຫ້ຜູ້ທີ່ບໍ່ມີຊື່ໃນພາກທີ 2 ຂັບ ຫຼື ຂີ່.'
+  - id: use.5
+    when:
+      smoking: false
+    en: Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odour removal.{{/if}}
+    local: ຫ້າມສູບຢາ ແລະ ຢາສູບໄຟຟ້າ ໃນພາຫະນະ.{{#if smoking_fee}} ການລະເມີດຂໍ້ນີ້ ເສຍຄ່າທຳນຽມກຳຈັດກິ່ນ {{currency}} {{smoking_fee}}.{{/if}}
+  - id: use.6
+    when:
+      pets: false
+    en: Pets and animals are not allowed in or on the vehicle, except assistance animals.
+    local: ຫ້າມນຳສັດລ້ຽງ ແລະ ສັດຕ່າງໆ ເຂົ້າໃນ ຫຼື ຂຶ້ນເທິງພາຫະນະ ຍົກເວັ້ນສັດຊ່ວຍເຫຼືອຄົນພິການ.
+  - id: use.7
+    when:
+      pets: fee
+    en: Pets are allowed if they are kept in a carrier or on a seat cover. A pet cleaning fee of {{currency}} {{pet_fee}} applies.
+    local: ອະນຸຍາດໃຫ້ນຳສັດລ້ຽງໄດ້ ຖ້າໃສ່ໃນກະຕ່າ ຫຼື ກັບຜ້າຄຸມບ່ອນນັ່ງ. ມີຄ່າທຳຄວາມສະອາດສັດລ້ຽງ {{currency}} {{pet_fee}}.
+- id: area
+  title:
+    en: 10. Permitted area
+    local: 10. ເຂດທີ່ອະນຸຍາດ
+  fields:
+  - key: area_of_use
+    en: The vehicle may be used in
+    local: ພາຫະນະສາມາດໃຊ້ໄດ້ໃນເຂດ
+  clauses:
+  - id: area.1
+    en: The vehicle must stay within the permitted area above. Taking it further, on a ferry or to another island, needs the Owner's written permission first, and the Renter pays any ferry fees, delays and recovery costs.
+    local: ພາຫະນະຕ້ອງຢູ່ພາຍໃນເຂດທີ່ອະນຸຍາດຂ້າງເທິງ. ການນຳໄປໄກກວ່ານັ້ນ, ຂຶ້ນເຮືອຂ້າມຟາກ ຫຼື ໄປເກາະອື່ນ ຕ້ອງໄດ້ຮັບອະນຸຍາດເປັນລາຍລັກອັກສອນຈາກຜູ້ໃຫ້ເຊົ່າກ່ອນ, ແລະ ຜູ້ເຊົ່າຈ່າຍຄ່າເຮືອຂ້າມຟາກ, ຄວາມລ່າຊ້າ ແລະ ຄ່າໃຊ້ຈ່າຍໃນການນຳພາຫະນະກັບຄືນ.
+  - id: area.2
+    en: The vehicle must not leave Laos under any circumstances. Taking a vehicle into Thailand, Vietnam, China or any other country needs special permits, customs papers and cross-border insurance, which this rental does not include. Insurance does not cover the vehicle outside Laos or outside the permitted area.
+    local: ຫ້າມນຳພາຫະນະອອກນອກ ສປປ ລາວ ບໍ່ວ່າໃນກໍລະນີໃດໆ. ການນຳພາຫະນະເຂົ້າປະເທດໄທ, ຫວຽດນາມ, ຈີນ ຫຼື ປະເທດອື່ນ ຕ້ອງມີໃບອະນຸຍາດພິເສດ, ເອກະສານພາສີ ແລະ ປະກັນໄພຂ້າມແດນ ເຊິ່ງບໍ່ລວມຢູ່ໃນການເຊົ່ານີ້. ປະກັນໄພບໍ່ຄຸ້ມຄອງພາຫະນະ ຢູ່ນອກ ສປປ ລາວ ຫຼື ນອກເຂດທີ່ອະນຸຍາດ.
+    country: true
+  - id: area.3
+    en: The vehicle may be fitted with a GPS tracker, used only for security, recovery and checking that this agreement is kept.
+    local: ພາຫະນະອາດຈະຕິດຕັ້ງເຄື່ອງຕິດຕາມ GPS ເຊິ່ງໃຊ້ສະເພາະເພື່ອຄວາມປອດໄພ, ການຕິດຕາມເອົາຄືນ ແລະ ການກວດສອບວ່າໄດ້ປະຕິບັດຕາມສັນຍານີ້.
+- id: insurance
+  title:
+    en: 11. Insurance
+    local: 11. ປະກັນໄພ
+  fields:
+  - key: insurance_text
+    en: Insurance on this vehicle
+    local: ປະກັນໄພຂອງພາຫະນະນີ້
+  - key: insurance_excess_text
+    en: Renter's excess (most the Renter pays per incident, if the rules are kept)
+    local: ຄ່າເສຍຫາຍສ່ວນທຳອິດຂອງຜູ້ເຊົ່າ (ສູງສຸດທີ່ຜູ້ເຊົ່າຈ່າຍຕໍ່ຄັ້ງ, ຖ້າປະຕິບັດຕາມເງື່ອນໄຂ)
+  clauses:
+  - id: insurance.1
+    en: The vehicle has the compulsory third-party insurance required by Lao law for motor vehicles. It covers liability to other people up to the policy limits, which may be low. It does not cover damage to the rented vehicle itself.
+    local: ພາຫະນະມີປະກັນໄພບຸກຄົນທີສາມພາກບັງຄັບ ຕາມທີ່ກົດໝາຍລາວກຳນົດສຳລັບພາຫະນະກົນຈັກ. ປະກັນໄພນີ້ຄຸ້ມຄອງຄວາມຮັບຜິດຊອບຕໍ່ບຸກຄົນອື່ນ ພາຍໃນວົງເງິນຂອງສັນຍາປະກັນໄພ ເຊິ່ງອາດຈະຕ່ຳ. ບໍ່ຄຸ້ມຄອງຄວາມເສຍຫາຍຂອງພາຫະນະທີ່ເຊົ່າເອງ.
+    country: true
+  - id: insurance.2
+    when:
+      insurance_level: comprehensive
+    en: The vehicle also has comprehensive insurance covering damage to the rented vehicle and to third parties. Per incident, the Renter pays no more than the excess shown above, provided the Renter has kept the rules of this agreement.
+    local: ພາຫະນະຍັງມີປະກັນໄພຮອບດ້ານ ທີ່ຄຸ້ມຄອງຄວາມເສຍຫາຍຂອງພາຫະນະທີ່ເຊົ່າ ແລະ ບຸກຄົນທີສາມ. ໃນແຕ່ລະເຫດການ, ຜູ້ເຊົ່າຈ່າຍບໍ່ເກີນຄ່າເສຍຫາຍສ່ວນທຳອິດທີ່ລະບຸຂ້າງເທິງ ໂດຍມີເງື່ອນໄຂວ່າຜູ້ເຊົ່າໄດ້ປະຕິບັດຕາມສັນຍານີ້.
+  - id: insurance.3
+    when:
+      insurance_level: third_party
+    en: 'The vehicle also has third-party insurance covering damage to other people''s property. It does not cover damage to or theft of the rented vehicle: the Renter is responsible for those (section 12).'
+    local: 'ພາຫະນະຍັງມີປະກັນໄພບຸກຄົນທີສາມ ທີ່ຄຸ້ມຄອງຄວາມເສຍຫາຍຕໍ່ຊັບສິນຂອງຜູ້ອື່ນ. ບໍ່ຄຸ້ມຄອງຄວາມເສຍຫາຍ ຫຼື ການລັກພາຫະນະທີ່ເຊົ່າ: ຜູ້ເຊົ່າເປັນຜູ້ຮັບຜິດຊອບ (ພາກທີ 12).'
+  - id: insurance.4
+    when:
+      insurance_level: compulsory
+    en: The vehicle has only the compulsory insurance. The Renter is responsible for damage to the rented vehicle, its theft, and damage to other people's property (section 12).
+    local: ພາຫະນະມີແຕ່ປະກັນໄພພາກບັງຄັບເທົ່ານັ້ນ. ຜູ້ເຊົ່າຮັບຜິດຊອບຄວາມເສຍຫາຍຂອງພາຫະນະທີ່ເຊົ່າ, ການລັກ ແລະ ຄວາມເສຍຫາຍຕໍ່ຊັບສິນຂອງຜູ້ອື່ນ (ພາກທີ 12).
+  - id: insurance.5
+    en: 'Insurance does not protect the Renter, and the Renter pays in full, when damage or loss happens: while driving under the influence, without a valid licence for the vehicle, by a driver not named in section 2, outside the permitted area, during forbidden use (section 9), through deliberate or reckless acts, or when keys were left with the vehicle. Tyres, wheels, glass, underbody, interior, keys and accessories are often excluded by insurers and are the Renter''s responsibility unless the Owner confirms in writing that they are covered.'
+    local: 'ປະກັນໄພບໍ່ປົກປ້ອງຜູ້ເຊົ່າ ແລະ ຜູ້ເຊົ່າຕ້ອງຈ່າຍເຕັມຈຳນວນ ເມື່ອຄວາມເສຍຫາຍ ຫຼື ການເສຍເກີດຂຶ້ນ: ໃນຂະນະມຶນເມົາ, ໂດຍບໍ່ມີໃບຂັບຂີ່ທີ່ຖືກຕ້ອງສຳລັບພາຫະນະ, ໂດຍຜູ້ຂັບຂີ່ທີ່ບໍ່ມີຊື່ໃນພາກທີ 2, ຢູ່ນອກເຂດທີ່ອະນຸຍາດ, ໃນລະຫວ່າງການນຳໃຊ້ທີ່ຫ້າມ (ພາກທີ 9), ຈາກການກະທຳໂດຍເຈດຕະນາ ຫຼື ປະໝາດຮ້າຍແຮງ, ຫຼື ເມື່ອປະກະແຈໄວ້ກັບພາຫະນະ. ຢາງ, ລໍ້, ແວ່ນ, ພື້ນລຸ່ມລົດ, ພາຍໃນ, ກະແຈ ແລະ ອຸປະກອນ ມັກຖືກຍົກເວັ້ນໂດຍບໍລິສັດປະກັນໄພ ແລະ ເປັນຄວາມຮັບຜິດຊອບຂອງຜູ້ເຊົ່າ ເວັ້ນເສຍແຕ່ຜູ້ໃຫ້ເຊົ່າຢືນຢັນເປັນລາຍລັກອັກສອນວ່າໄດ້ຮັບການຄຸ້ມຄອງ.'
+  - id: insurance.6
+    en: Personal belongings left in or on the vehicle are not insured by the Owner. The Owner is not responsible for their loss or damage.
+    local: ເຄື່ອງໃຊ້ສ່ວນຕົວທີ່ປະໄວ້ໃນ ຫຼື ເທິງພາຫະນະ ບໍ່ໄດ້ຮັບການປະກັນໄພຈາກຜູ້ໃຫ້ເຊົ່າ. ຜູ້ໃຫ້ເຊົ່າບໍ່ຮັບຜິດຊອບຕໍ່ການເສຍ ຫຼື ຄວາມເສຍຫາຍຂອງເຄື່ອງເຫຼົ່ານັ້ນ.
+- id: damage
+  title:
+    en: 12. Damage, theft and loss
+    local: 12. ຄວາມເສຍຫາຍ, ການລັກ ແລະ ການເສຍ
+  clauses:
+  - id: damage.1
+    en: The Renter is responsible for the vehicle from handover until it is returned and checked. The condition at handover is recorded in Annex A with photos; anything not recorded there is treated as new unless it is normal wear and tear.
+    local: ຜູ້ເຊົ່າຮັບຜິດຊອບພາຫະນະ ນັບແຕ່ຮັບລົດ ຈົນກວ່າຈະສົ່ງຄືນ ແລະ ກວດກາແລ້ວ. ສະພາບຕອນຮັບລົດ ບັນທຶກໄວ້ໃນເອກະສານຊ້ອນທ້າຍ A ພ້ອມຮູບພາບ; ສິ່ງໃດທີ່ບໍ່ໄດ້ບັນທຶກໄວ້ ຖືວ່າເປັນຄວາມເສຍຫາຍໃໝ່ ເວັ້ນເສຍແຕ່ເປັນການສຶກຫຼໍ່ຕາມປົກກະຕິ.
+  - id: damage.2
+    en: Repair costs are based on a quote or invoice from a garage, or on the damage price list in Annex B where one is attached. The Renter may ask to see the quote, and may get a second quote from a garage the Owner approves within 3 days.
+    local: ຄ່າສ້ອມແປງ ອີງຕາມໃບສະເໜີລາຄາ ຫຼື ໃບບິນຈາກອູ່, ຫຼື ຕາມລາຍການລາຄາຄວາມເສຍຫາຍໃນເອກະສານຊ້ອນທ້າຍ B ຖ້າມີແນບມາ. ຜູ້ເຊົ່າສາມາດຂໍເບິ່ງໃບສະເໜີລາຄາ, ແລະ ສາມາດຂໍໃບສະເໜີລາຄາທີສອງ ຈາກອູ່ທີ່ຜູ້ໃຫ້ເຊົ່າເຫັນດີ ພາຍໃນ 3 ມື້.
+  - id: damage.3
+    if: loss_of_use_fee
+    en: While the vehicle cannot be rented because of damage caused during this rental, the Renter pays loss of use of {{currency}} {{loss_of_use_fee}} per day, for up to {{loss_of_use_max_days}} days.
+    local: ໃນໄລຍະທີ່ບໍ່ສາມາດໃຫ້ເຊົ່າພາຫະນະໄດ້ ຍ້ອນຄວາມເສຍຫາຍທີ່ເກີດຂຶ້ນໃນການເຊົ່າຄັ້ງນີ້, ຜູ້ເຊົ່າຈ່າຍຄ່າເສຍໂອກາດ {{currency}} {{loss_of_use_fee}} ຕໍ່ມື້, ບໍ່ເກີນ {{loss_of_use_max_days}} ມື້.
+  - id: damage.4
+    en: If the vehicle or its keys are stolen, the Renter must report it to the police at once and give the Owner the police report. Where the theft happened because the vehicle was left unlocked, with the keys, or outside the permitted area, the Renter pays the value of the vehicle as stated in Annex B (or its market value).
+    local: ຖ້າພາຫະນະ ຫຼື ກະແຈຖືກລັກ, ຜູ້ເຊົ່າຕ້ອງແຈ້ງຕຳຫຼວດທັນທີ ແລະ ມອບບົດລາຍງານຂອງຕຳຫຼວດໃຫ້ຜູ້ໃຫ້ເຊົ່າ. ຖ້າການລັກເກີດຂຶ້ນຍ້ອນປະພາຫະນະໄວ້ໂດຍບໍ່ລັອກ, ປະກະແຈໄວ້ ຫຼື ຢູ່ນອກເຂດທີ່ອະນຸຍາດ, ຜູ້ເຊົ່າຕ້ອງຈ່າຍມູນຄ່າພາຫະນະ ຕາມທີ່ລະບຸໃນເອກະສານຊ້ອນທ້າຍ B (ຫຼື ມູນຄ່າຕາມລາຄາຕະຫຼາດ).
+  - id: damage.5
+    en: Lost keys, remote controls, helmets, documents, number plates and accessories are charged at their replacement cost, plus any locksmith or re-registration cost.
+    local: ກະແຈ, ຣີໂໝດ, ໝວກກັນກະທົບ, ເອກະສານ, ປ້າຍທະບຽນ ແລະ ອຸປະກອນ ທີ່ເສຍ ຄິດຕາມລາຄາທົດແທນ ບວກຄ່າຊ່າງກະແຈ ຫຼື ຄ່າອອກທະບຽນໃໝ່.
+- id: accident
+  title:
+    en: 13. Accidents and breakdowns
+    local: 13. ອຸບັດຕິເຫດ ແລະ ລົດເພ
+  clauses:
+  - id: accident.1
+    en: 'In an accident, the Renter must: stay at the scene, make the area safe and get medical help if anyone is hurt (ambulance 1195, police 1191); call the Owner straight away on the number in section 1; call the police and the insurer''s hotline when the Owner or the law requires it; take photos of all vehicles, plates, the place and any damage; note the other party''s name, phone, plate and insurance; and not admit fault, pay or accept money without the Owner''s agreement, unless the police require it.'
+    local: 'ເມື່ອເກີດອຸບັດຕິເຫດ, ຜູ້ເຊົ່າຕ້ອງ: ຢູ່ບ່ອນເກີດເຫດ, ເຮັດໃຫ້ບໍລິເວນປອດໄພ ແລະ ຂໍຄວາມຊ່ວຍເຫຼືອທາງການແພດ ຖ້າມີຜູ້ບາດເຈັບ (ລົດໂຮງໝໍ 1195, ຕຳຫຼວດ 1191); ໂທຫາຜູ້ໃຫ້ເຊົ່າທັນທີ ຕາມເບີໃນພາກທີ 1; ໂທຫາຕຳຫຼວດ ແລະ ສາຍດ່ວນຂອງບໍລິສັດປະກັນໄພ ເມື່ອຜູ້ໃຫ້ເຊົ່າ ຫຼື ກົດໝາຍກຳນົດ; ຖ່າຍຮູບພາຫະນະທຸກຄັນ, ປ້າຍທະບຽນ, ສະຖານທີ່ ແລະ ຄວາມເສຍຫາຍ; ບັນທຶກຊື່, ເບີໂທ, ປ້າຍທະບຽນ ແລະ ປະກັນໄພຂອງຄູ່ກໍລະນີ; ແລະ ບໍ່ຍອມຮັບຜິດ, ບໍ່ຈ່າຍ ຫຼື ບໍ່ຮັບເງິນ ໂດຍບໍ່ໄດ້ຮັບຄວາມເຫັນດີຈາກຜູ້ໃຫ້ເຊົ່າ, ເວັ້ນເສຍແຕ່ຕຳຫຼວດກຳນົດ.'
+    country: true
+  - id: accident.2
+    en: 'Breakdowns: the Renter must stop safely, tell the Owner and follow the Owner''s instructions. The Renter must not have the vehicle repaired without the Owner''s permission, except for minor emergency costs up to {{currency}} {{emergency_repair_limit}}, which the Owner refunds against a receipt.'
+    local: 'ລົດເພ: ຜູ້ເຊົ່າຕ້ອງຈອດໃນບ່ອນປອດໄພ, ແຈ້ງຜູ້ໃຫ້ເຊົ່າ ແລະ ປະຕິບັດຕາມຄຳແນະນຳຂອງຜູ້ໃຫ້ເຊົ່າ. ຜູ້ເຊົ່າຕ້ອງບໍ່ນຳພາຫະນະໄປສ້ອມແປງ ໂດຍບໍ່ໄດ້ຮັບອະນຸຍາດຈາກຜູ້ໃຫ້ເຊົ່າ, ຍົກເວັ້ນຄ່າໃຊ້ຈ່າຍສຸກເສີນເລັກນ້ອຍ ບໍ່ເກີນ {{currency}} {{emergency_repair_limit}} ເຊິ່ງຜູ້ໃຫ້ເຊົ່າຈະຄືນໃຫ້ ເມື່ອມີໃບບິນ.'
+  - id: accident.3
+    en: If the vehicle stops working through no fault of the Renter, the Owner will repair it or provide a similar vehicle within 24 hours of being told where reasonably possible. If the Owner cannot, the Renter may end the rental and receive a refund of the rent for the unused days.
+    local: ຖ້າພາຫະນະເສຍ ໂດຍບໍ່ແມ່ນຄວາມຜິດຂອງຜູ້ເຊົ່າ, ຜູ້ໃຫ້ເຊົ່າຈະສ້ອມແປງ ຫຼື ຈັດຫາພາຫະນະທີ່ຄ້າຍຄືກັນໃຫ້ ພາຍໃນ 24 ຊົ່ວໂມງ ນັບຈາກໄດ້ຮັບແຈ້ງ ເທົ່າທີ່ສາມາດເຮັດໄດ້. ຖ້າຜູ້ໃຫ້ເຊົ່າບໍ່ສາມາດເຮັດໄດ້, ຜູ້ເຊົ່າສາມາດຍົກເລີກການເຊົ່າ ແລະ ໄດ້ຮັບຄ່າເຊົ່າຂອງມື້ທີ່ບໍ່ໄດ້ໃຊ້ຄືນ.
+  - id: accident.4
+    en: The Renter must report any warning light, unusual noise, puncture or fault promptly and must not keep using a vehicle that is unsafe.
+    local: ຜູ້ເຊົ່າຕ້ອງແຈ້ງໂດຍໄວ ເມື່ອມີໄຟເຕືອນ, ສຽງຜິດປົກກະຕິ, ຢາງຮົ່ວ ຫຼື ຂໍ້ບົກຜ່ອງໃດໆ ແລະ ຕ້ອງບໍ່ໃຊ້ພາຫະນະທີ່ບໍ່ປອດໄພຕໍ່ໄປ.
+- id: fines
+  title:
+    en: 14. Fines, tolls and parking
+    local: 14. ຄ່າປັບໃໝ, ຄ່າທາງ ແລະ ຄ່າຈອດລົດ
+  clauses:
+  - id: fines.1
+    en: The Renter pays all traffic and parking fines, tolls, towing, impound and clamping costs arising during the rental, including fines that reach the Owner after the vehicle is returned, plus a handling fee of {{currency}} {{fine_admin_fee}} per fine.
+    local: ຜູ້ເຊົ່າຈ່າຍຄ່າປັບໃໝຈະລາຈອນ ແລະ ການຈອດລົດ, ຄ່າທາງ, ຄ່າລາກລົດ, ຄ່າຍຶດລົດ ແລະ ຄ່າລັອກລໍ້ ທັງໝົດທີ່ເກີດຂຶ້ນໃນໄລຍະເຊົ່າ ລວມທັງຄ່າປັບໃໝທີ່ມາຮອດຜູ້ໃຫ້ເຊົ່າ ຫຼັງຈາກສົ່ງພາຫະນະຄືນແລ້ວ, ບວກຄ່າດຳເນີນການ {{currency}} {{fine_admin_fee}} ຕໍ່ຄ່າປັບໃໝແຕ່ລະລາຍການ.
+  - id: fines.2
+    en: The Owner may give the Renter's name and details to the traffic police or the issuing authority so that a fine is transferred to the Renter, where the law allows.
+    local: ຜູ້ໃຫ້ເຊົ່າອາດຈະແຈ້ງຊື່ ແລະ ຂໍ້ມູນຂອງຜູ້ເຊົ່າ ໃຫ້ຕຳຫຼວດຈະລາຈອນ ຫຼື ໜ່ວຍງານທີ່ອອກຄ່າປັບໃໝ ເພື່ອໂອນຄ່າປັບໃໝໃຫ້ຜູ້ເຊົ່າ ເທົ່າທີ່ກົດໝາຍອະນຸຍາດ.
+    country: true
+- id: termination
+  title:
+    en: 15. Ending the agreement by the Owner
+    local: 15. ການຍົກເລີກສັນຍາໂດຍຜູ້ໃຫ້ເຊົ່າ
+  clauses:
+  - id: termination.1
+    en: 'The Owner may end this agreement and take the vehicle back at once if the Renter: does not pay on time; gave false details; lets an unnamed person drive; uses the vehicle unlawfully or against section 9; takes it outside the permitted area without permission; tampers with the odometer or tracker; abandons it; or puts the vehicle or other people at serious risk. The Owner may then deduct what the Renter owes under this agreement, including reasonable recovery costs, and refunds any remaining prepaid rent for the days after the vehicle is recovered.'
+    local: 'ຜູ້ໃຫ້ເຊົ່າອາດຈະຍົກເລີກສັນຍານີ້ ແລະ ຮັບພາຫະນະຄືນທັນທີ ໂດຍບໍ່ຄືນຄ່າເຊົ່າຂອງໄລຍະປັດຈຸບັນ ຖ້າຜູ້ເຊົ່າ: ບໍ່ຈ່າຍຕາມກຳນົດ; ໃຫ້ຂໍ້ມູນບໍ່ຖືກຕ້ອງ; ໃຫ້ຜູ້ທີ່ບໍ່ມີຊື່ຂັບຂີ່; ໃຊ້ພາຫະນະຜິດກົດໝາຍ ຫຼື ຂັດກັບພາກທີ 9; ນຳອອກນອກເຂດທີ່ອະນຸຍາດ ໂດຍບໍ່ໄດ້ຮັບອະນຸຍາດ; ດັດແປງເລກໄມລ໌ ຫຼື ເຄື່ອງຕິດຕາມ; ປະຖິ້ມພາຫະນະ; ຫຼື ເຮັດໃຫ້ພາຫະນະ ຫຼື ຜູ້ອື່ນຕົກຢູ່ໃນຄວາມສ່ຽງຮ້າຍແຮງ.'
+  - id: termination.2
+    en: The Renter must make the vehicle available for collection, and pays reasonable recovery costs where the Owner has to fetch it.
+    local: ຜູ້ເຊົ່າຕ້ອງໃຫ້ຜູ້ໃຫ້ເຊົ່າສາມາດມາຮັບພາຫະນະໄດ້, ແລະ ຈ່າຍຄ່າໃຊ້ຈ່າຍທີ່ສົມເຫດສົມຜົນ ໃນກໍລະນີທີ່ຜູ້ໃຫ້ເຊົ່າຕ້ອງໄປຮັບພາຫະນະເອງ.
+- id: return
+  title:
+    en: 16. Returning the vehicle
+    local: 16. ການສົ່ງພາຫະນະຄືນ
+  clauses:
+  - id: return.1
+    en: The vehicle must be returned with its keys, documents and accessories, with the fuel level agreed in section 8, and reasonably clean. Both parties check the vehicle together and record the condition, odometer and fuel in Annex A with photos. If the Renter is not present at the check, the Owner's dated photos are accepted as the record.
+    local: ຕ້ອງສົ່ງພາຫະນະຄືນ ພ້ອມກະແຈ, ເອກະສານ ແລະ ອຸປະກອນ, ມີລະດັບນ້ຳມັນຕາມທີ່ຕົກລົງໃນພາກທີ 8, ແລະ ສະອາດພໍສົມຄວນ. ຄູ່ສັນຍາທັງສອງຝ່າຍ ກວດກາພາຫະນະຮ່ວມກັນ ແລະ ບັນທຶກສະພາບ, ເລກໄມລ໌ ແລະ ນ້ຳມັນ ໃນເອກະສານຊ້ອນທ້າຍ A ພ້ອມຮູບພາບ. ຖ້າຜູ້ເຊົ່າບໍ່ຢູ່ໃນເວລາກວດກາ, ຮູບພາບທີ່ມີວັນທີຂອງຜູ້ໃຫ້ເຊົ່າ ຈະຖືເປັນບັນທຶກ.
+  - id: return.2
+    if: cleaning_fee
+    en: A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside costs a cleaning fee of {{currency}} {{cleaning_fee}} (more if specialist cleaning is needed, against a receipt).
+    local: ພາຫະນະທີ່ສົ່ງຄືນ ໂດຍມີຂີ້ຝຸ່ນ, ຊາຍ, ຂີ້ຕົມ, ຮອຍເປື້ອນ, ອາຫານ ຫຼື ກິ່ນເໝັນ ພາຍໃນຫຼາຍເກີນໄປ ເສຍຄ່າທຳຄວາມສະອາດ {{currency}} {{cleaning_fee}} (ຫຼາຍກວ່ານັ້ນ ຖ້າຕ້ອງໃຊ້ການທຳຄວາມສະອາດພິເສດ ຕາມໃບບິນ).
+  - id: return.3
+    unless: cleaning_fee
+    en: A vehicle returned with excessive dirt, sand, mud, stains, food or odour inside may be charged the reasonable cost of cleaning.
+    local: ພາຫະນະທີ່ສົ່ງຄືນ ໂດຍມີຂີ້ຝຸ່ນ, ຊາຍ, ຂີ້ຕົມ, ຮອຍເປື້ອນ, ອາຫານ ຫຼື ກິ່ນເໝັນ ພາຍໃນຫຼາຍເກີນໄປ ອາດຈະຖືກຄິດຄ່າທຳຄວາມສະອາດ ຕາມຈຳນວນທີ່ສົມເຫດສົມຜົນ.
+- id: data
+  title:
+    en: 17. Personal data and documents
+    local: 17. ຂໍ້ມູນສ່ວນບຸກຄົນ ແລະ ເອກະສານ
+  clauses:
+  - id: data.1
+    en: The Owner collects the Renter's and drivers' names, contact details, ID and licence details, copies of documents and photos of the vehicle only to provide this rental, prove identity, comply with the law, handle fines, claims and disputes, and keep business records. The Owner keeps them only as long as needed for those purposes and the law, keeps them secure, does not sell them, and does not send them abroad without the Renter's consent. The Renter may ask to see, correct or delete their data where the law allows.
+    local: ຜູ້ໃຫ້ເຊົ່າເກັບກຳຊື່, ຂໍ້ມູນຕິດຕໍ່, ຂໍ້ມູນບັດປະຈຳຕົວ ແລະ ໃບຂັບຂີ່, ສຳເນົາເອກະສານ ແລະ ຮູບພາບພາຫະນະ ຂອງຜູ້ເຊົ່າ ແລະ ຜູ້ຂັບຂີ່ ສະເພາະເພື່ອໃຫ້ບໍລິການເຊົ່ານີ້, ຢືນຢັນຕົວຕົນ, ປະຕິບັດຕາມກົດໝາຍ, ຈັດການຄ່າປັບໃໝ, ການຮຽກຮ້ອງ ແລະ ຂໍ້ຂັດແຍ່ງ, ແລະ ເກັບບັນທຶກທຸລະກິດ. ຜູ້ໃຫ້ເຊົ່າເກັບຮັກສາຂໍ້ມູນໄວ້ ສະເພາະເທົ່າທີ່ຈຳເປັນສຳລັບຈຸດປະສົງເຫຼົ່ານັ້ນ ແລະ ຕາມກົດໝາຍ, ຮັກສາໃຫ້ປອດໄພ, ບໍ່ຂາຍ, ແລະ ບໍ່ສົ່ງໄປຕ່າງປະເທດ ໂດຍບໍ່ໄດ້ຮັບຄວາມຍິນຍອມຈາກຜູ້ເຊົ່າ. ຜູ້ເຊົ່າສາມາດຂໍເບິ່ງ, ແກ້ໄຂ ຫຼື ລຶບຂໍ້ມູນຂອງຕົນ ເທົ່າທີ່ກົດໝາຍອະນຸຍາດ.
+    country: true
+  - id: data.2
+    en: The Renter agrees that copies of their documents and the inspection photos and videos may be used as evidence of identity and of the vehicle's condition, and may be given to insurers, the police and authorities when needed for a claim, fine or legal requirement.
+    local: ຜູ້ເຊົ່າເຫັນດີວ່າ ສຳເນົາເອກະສານຂອງຕົນ ແລະ ຮູບພາບ ແລະ ວິດີໂອການກວດກາ ອາດຈະໃຊ້ເປັນຫຼັກຖານຢືນຢັນຕົວຕົນ ແລະ ສະພາບຂອງພາຫະນະ, ແລະ ອາດຈະມອບໃຫ້ບໍລິສັດປະກັນໄພ, ຕຳຫຼວດ ແລະ ເຈົ້າໜ້າທີ່ ເມື່ອຈຳເປັນສຳລັບການຮຽກຮ້ອງ, ຄ່າປັບໃໝ ຫຼື ຂໍ້ກຳນົດທາງກົດໝາຍ.
+    country: true
+- id: general
+  title:
+    en: 18. General terms
+    local: 18. ເງື່ອນໄຂທົ່ວໄປ
+  clauses:
+  - id: general.1
+    en: 'Messages: notices under this agreement may be sent by phone, message app (WhatsApp, LINE, Telegram, Zalo or similar), SMS or email to the contact details in sections 1 and 2, and count as received when sent.'
+    local: 'ການແຈ້ງ: ການແຈ້ງຕາມສັນຍານີ້ ອາດຈະສົ່ງທາງໂທລະສັບ, ແອັບສົ່ງຂໍ້ຄວາມ (WhatsApp, LINE, Telegram, Zalo ຫຼື ຄ້າຍຄືກັນ), SMS ຫຼື ອີເມວ ຕາມຂໍ້ມູນຕິດຕໍ່ໃນພາກທີ 1 ແລະ 2, ແລະ ຖືວ່າໄດ້ຮັບແລ້ວ ເມື່ອສົ່ງ.'
+  - id: general.2
+    en: 'Force majeure: neither party is responsible for a delay or failure caused by events outside their control, such as natural disasters, floods, storms, government orders or ferry cancellations. Rent for days the vehicle could not be used because of such an event is agreed fairly between the parties.'
+    local: 'ເຫດສຸດວິໄສ: ບໍ່ມີຝ່າຍໃດຕ້ອງຮັບຜິດຊອບຕໍ່ຄວາມລ່າຊ້າ ຫຼື ການບໍ່ປະຕິບັດ ທີ່ເກີດຈາກເຫດການນອກເໜືອການຄວບຄຸມ ເຊັ່ນ ໄພທຳມະຊາດ, ນ້ຳຖ້ວມ, ພາຍຸ, ຄຳສັ່ງຂອງລັດ ຫຼື ການຍົກເລີກເຮືອຂ້າມຟາກ. ຄ່າເຊົ່າສຳລັບມື້ທີ່ບໍ່ສາມາດໃຊ້ພາຫະນະໄດ້ ຍ້ອນເຫດການດັ່ງກ່າວ ໃຫ້ຄູ່ສັນຍາຕົກລົງກັນຢ່າງຍຸຕິທຳ.'
+  - id: general.3
+    en: 'Whole agreement: this agreement, its annexes and any special conditions are the whole agreement. Changes are valid only in writing (a message from both parties is enough). If any part is found invalid, the rest still applies.'
+    local: 'ສັນຍາທັງໝົດ: ສັນຍານີ້, ເອກະສານຊ້ອນທ້າຍ ແລະ ເງື່ອນໄຂພິເສດ ແມ່ນຂໍ້ຕົກລົງທັງໝົດ. ການປ່ຽນແປງມີຜົນ ສະເພາະເມື່ອເຮັດເປັນລາຍລັກອັກສອນ (ຂໍ້ຄວາມຈາກທັງສອງຝ່າຍກໍພຽງພໍ). ຖ້າສ່ວນໃດສ່ວນໜຶ່ງບໍ່ມີຜົນ, ສ່ວນທີ່ເຫຼືອຍັງມີຜົນບັງຄັບໃຊ້.'
+  - id: general.4
+    en: 'Language: this agreement is written in English and {{local_language}}. If the two versions differ, the {{prevailing_language}} version applies. The Renter may ask the Owner to explain any part before signing.'
+    local: 'ພາສາ: ສັນຍານີ້ຂຽນເປັນພາສາອັງກິດ ແລະ {{local_language}}. ຖ້າສອງສະບັບແຕກຕ່າງກັນ, ໃຫ້ຖືສະບັບ{{prevailing_language}}ເປັນຫຼັກ. ຜູ້ເຊົ່າສາມາດຂໍໃຫ້ຜູ້ໃຫ້ເຊົ່າອະທິບາຍສ່ວນໃດກໍໄດ້ ກ່ອນລົງລາຍເຊັນ.'
+    country: true
+  - id: general.5
+    en: 'Governing law: this agreement is governed by the laws of {{jurisdiction}}, including the Civil Code. The parties will first try to settle any dispute by discussion; if they cannot, the competent courts of {{court_place}} decide.'
+    local: 'ກົດໝາຍທີ່ນຳໃຊ້: ສັນຍານີ້ຢູ່ພາຍໃຕ້ກົດໝາຍຂອງ {{jurisdiction}} ລວມທັງປະມວນກົດໝາຍແພ່ງ. ຄູ່ສັນຍາຈະພະຍາຍາມແກ້ໄຂຂໍ້ຂັດແຍ່ງໂດຍການປຶກສາຫາລືກັນກ່ອນ; ຖ້າບໍ່ສາມາດຕົກລົງກັນໄດ້, ສານທີ່ມີສິດອຳນາດຂອງ {{court_place}} ເປັນຜູ້ຕັດສິນ.'
+    country: true
+  - id: general.6
+    if: special_terms
+    en: 'Special conditions agreed between the parties: {{special_terms}}'
+    local: 'ເງື່ອນໄຂພິເສດທີ່ຄູ່ສັນຍາຕົກລົງກັນ: {{special_terms}}'
+- id: signatures
+  title:
+    en: Signatures
+    local: ລາຍເຊັນ
+  signature: true
+  clauses:
+  - id: signatures.1
+    en: By signing, the parties confirm they have read and understood this agreement, including Annexes A and B, and agree to it. The Renter confirms they received a copy.
+    local: ໂດຍການລົງລາຍເຊັນ, ຄູ່ສັນຍາຢືນຢັນວ່າ ໄດ້ອ່ານ ແລະ ເຂົ້າໃຈສັນຍານີ້ ລວມທັງເອກະສານຊ້ອນທ້າຍ A ແລະ B, ແລະ ເຫັນດີນຳ. ຜູ້ເຊົ່າຢືນຢັນວ່າ ໄດ້ຮັບສຳເນົາແລ້ວ.
+  sign_rows:
+  - en: Owner (name, signature, date)
+    local: ຜູ້ໃຫ້ເຊົ່າ (ຊື່, ລາຍເຊັນ, ວັນທີ)
+  - en: Renter (name, signature, date)
+    local: ຜູ້ເຊົ່າ (ຊື່, ລາຍເຊັນ, ວັນທີ)
+  - en: Additional driver (name, signature, date)
+    local: ຜູ້ຂັບຂີ່ເພີ່ມເຕີມ (ຊື່, ລາຍເຊັນ, ວັນທີ)
+- id: annex_a
+  title:
+    en: 'Annex A: Handover and return check'
+    local: 'ເອກະສານຊ້ອນທ້າຍ A: ການກວດກາຕອນຮັບ ແລະ ຕອນສົ່ງຄືນ'
+  page_break: true
+  checklist: true
+  clauses:
+  - id: annex_a.1
+    en: Mark existing scratches (S), dents (D), cracks (C) and missing items (M). Take photos of all four sides, the dashboard (odometer and fuel), the interior and any damage, at both handover and return.
+    local: ໝາຍຮອຍຂີດຂ່ວນ (S), ຮອຍບຸບ (D), ຮອຍແຕກ (C) ແລະ ສິ່ງທີ່ຂາດ (M) ທີ່ມີຢູ່ແລ້ວ. ຖ່າຍຮູບທັງສີ່ດ້ານ, ໜ້າປັດ (ເລກໄມລ໌ ແລະ ນ້ຳມັນ), ພາຍໃນ ແລະ ຄວາມເສຍຫາຍທຸກຈຸດ ທັງຕອນຮັບລົດ ແລະ ຕອນສົ່ງຄືນ.
+  check_rows:
+  - en: Odometer
+    local: ເລກໄມລ໌
+  - en: Fuel / battery level
+    local: ລະດັບນ້ຳມັນ / ແບັດເຕີຣີ
+  - en: 'Body: front / rear / left / right'
+    local: 'ຕົວລົດ: ໜ້າ / ຫຼັງ / ຊ້າຍ / ຂວາ'
+  - en: Glass, mirrors and lights
+    local: ແວ່ນ, ກະຈົກ ແລະ ໄຟ
+  - en: Tyres and wheels
+    local: ຢາງ ແລະ ລໍ້
+  - en: Interior and seats
+    local: ພາຍໃນ ແລະ ບ່ອນນັ່ງ
+  - en: Keys, remote, documents
+    local: ກະແຈ, ຣີໂໝດ, ເອກະສານ
+  - en: Helmets / child seat / accessories
+    local: ໝວກກັນກະທົບ / ບ່ອນນັ່ງເດັກ / ອຸປະກອນ
+  - en: Photos taken (number)
+    local: ຮູບທີ່ຖ່າຍ (ຈຳນວນ)
+  - en: Owner's and Renter's initials
+    local: ຕົວຫຍໍ້ລາຍເຊັນ ຜູ້ໃຫ້ເຊົ່າ ແລະ ຜູ້ເຊົ່າ
+  columns:
+    item:
+      en: Item
+      local: ລາຍການ
+    out:
+      en: At handover
+      local: ຕອນຮັບລົດ
+    in:
+      en: At return
+      local: ຕອນສົ່ງຄືນ
+- id: annex_b
+  title:
+    en: 'Annex B: Damage and replacement price list'
+    local: 'ເອກະສານຊ້ອນທ້າຍ B: ລາຍການລາຄາຄວາມເສຍຫາຍ ແລະ ການທົດແທນ'
+  pricelist: true
+  clauses:
+  - id: annex_b.1
+    en: Agreed prices for common damage and lost items. Damage not listed is charged per section 12.
+    local: ລາຄາທີ່ຕົກລົງກັນ ສຳລັບຄວາມເສຍຫາຍທົ່ວໄປ ແລະ ສິ່ງຂອງທີ່ເສຍ. ຄວາມເສຍຫາຍທີ່ບໍ່ໄດ້ລົງລາຍການ ຄິດຕາມພາກທີ 12.
+  price_rows:
+  - en: Scratch, per panel (polish / repaint)
+    local: ຮອຍຂີດຂ່ວນ, ຕໍ່ແຜ່ນ (ຂັດ / ພົ່ນສີໃໝ່)
+  - en: Dent, per panel
+    local: ຮອຍບຸບ, ຕໍ່ແຜ່ນ
+  - en: Mirror
+    local: ກະຈົກ
+  - en: Headlight / tail light / indicator
+    local: ໄຟໜ້າ / ໄຟທ້າຍ / ໄຟລ້ຽວ
+  - en: Tyre (each)
+    local: ຢາງ (ຕໍ່ເສັ້ນ)
+  - en: Key / remote
+    local: ກະແຈ / ຣີໂໝດ
+  - en: Helmet
+    local: ໝວກກັນກະທົບ
+  - en: Number plate replacement
+    local: ປ່ຽນປ້າຍທະບຽນ
+  - en: Vehicle value (for total loss or theft)
+    local: ມູນຄ່າພາຫະນະ (ກໍລະນີເສຍຫາຍທັງໝົດ ຫຼື ຖືກລັກ)
+  columns:
+    item:
+      en: Item
+      local: ລາຍການ
+    price:
+      en: Price
+      local: ລາຄາ

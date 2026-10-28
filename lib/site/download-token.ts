@@ -10,7 +10,8 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 
 export const DOWNLOAD_TTL_SECONDS = 7 * 24 * 60 * 60;
 
-export type DownloadClaim = { slug: string; locale: string; format: string; exp: number };
+/** lead: for a personalised file (the contract builder), the lead whose details it is built from. */
+export type DownloadClaim = { slug: string; locale: string; format: string; exp: number; lead?: string };
 
 function secret(): Buffer | null {
   const own = process.env.DOWNLOAD_SECRET;
@@ -30,7 +31,7 @@ function sign(payload: string, key: Buffer) {
 export function createDownloadToken(claim: Omit<DownloadClaim, "exp">, ttlSeconds = DOWNLOAD_TTL_SECONDS): string | null {
   const key = secret();
   if (!key) return null;
-  const payload = b64(JSON.stringify({ s: claim.slug, l: claim.locale, f: claim.format, e: Math.floor(Date.now() / 1000) + ttlSeconds }));
+  const payload = b64(JSON.stringify({ s: claim.slug, l: claim.locale, f: claim.format, e: Math.floor(Date.now() / 1000) + ttlSeconds, ...(claim.lead ? { k: claim.lead } : {}) }));
   return `${payload}.${sign(payload, key)}`;
 }
 
@@ -45,7 +46,7 @@ export function verifyDownloadToken(token: string | null | undefined): DownloadC
   if (expected.length !== given.length || !timingSafeEqual(expected, given)) return null;
   try {
     const data = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
-    const claim: DownloadClaim = { slug: String(data.s || ""), locale: String(data.l || ""), format: String(data.f || ""), exp: Number(data.e) };
+    const claim: DownloadClaim = { slug: String(data.s || ""), locale: String(data.l || ""), format: String(data.f || ""), exp: Number(data.e), ...(data.k ? { lead: String(data.k) } : {}) };
     if (!claim.slug || !claim.locale || !claim.format || !Number.isFinite(claim.exp) || claim.exp < Date.now() / 1000) return null;
     return claim;
   } catch {

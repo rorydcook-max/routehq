@@ -5,9 +5,11 @@ type RouteHqLogoProps = {
   tone?: "light" | "dark";
   className?: string;
   showDescriptor?: boolean;
+  /** "fleet": Lokalfleet, the operator software. "keys": Lokalkeys, the renter booking site (same mark). */
+  product?: "fleet" | "keys";
 };
 
-export function RouteHqLogo({ className, showDescriptor = true, tone = "light", variant = "full" }: RouteHqLogoProps) {
+export function RouteHqLogo({ className, product = "fleet", showDescriptor = true, tone = "light", variant = "full" }: RouteHqLogoProps) {
   const onDark = tone === "dark";
 
   if (variant === "mark") {
@@ -26,7 +28,7 @@ export function RouteHqLogo({ className, showDescriptor = true, tone = "light", 
       <div className="min-w-0">
         <div className="flex items-baseline whitespace-nowrap text-[1.35rem] font-black leading-none tracking-[-0.04em]">
           <span className={onDark ? "text-white" : "text-[var(--logo-ink,#1B2430)]"}>Lokal</span>
-          <span className={onDark ? "text-[var(--band-logo-accent,#12BCB8)]" : "text-[#06B6B6]"}>fleet</span>
+          <span className={onDark ? "text-[var(--band-logo-accent,#12BCB8)]" : "text-[#06B6B6]"}>{product === "keys" ? "keys" : "fleet"}</span>
         </div>
         {/* No English strapline under the name: the name is enough, in every language. */}
       </div>

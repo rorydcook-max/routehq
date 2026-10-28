@@ -17,7 +17,8 @@ const POPULAR = ["Koh Samui", "Phuket", "Chiang Mai"];
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("directory");
-  return { title: t("title"), description: t("subtitle") };
+  // The renter site is Lokalkeys (Rory, 28 Oct), not the operator software's "| Lokalfleet" title template.
+  return { title: { absolute: `${t("title")} | Lokalkeys` }, description: t("subtitle"), applicationName: "Lokalkeys", openGraph: { siteName: "Lokalkeys" } };
 }
 
 function money(value: number, currency: string) {
@@ -44,8 +45,8 @@ export default async function DirectoryPage({ searchParams }: { searchParams: Pr
   return (
     <PublicShell
       brand={
-        <a aria-label="Lokalfleet" className="inline-flex" href="/rent">
-          <RouteHqLogo showDescriptor={false} />
+        <a aria-label="Lokalkeys" className="inline-flex" href="/rent">
+          <RouteHqLogo product="keys" showDescriptor={false} />
         </a>
       }
       width="wide"

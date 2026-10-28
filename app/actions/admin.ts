@@ -133,7 +133,7 @@ export async function adminSendPasswordReset(_state: PersonActionState, formData
   const sent = await sendEmail({
     to: email,
     subject: "Reset your Lokalfleet password",
-    text: `Hello,\n\nRouteHQ support has sent you a link to choose a new password:\n\n${link}\n\nThe link works once and stops working after a short while. If you didn't ask for this, you can ignore this email: your password stays the same.\n\nRouteHQ`,
+    text: `Hello,\n\nLokalfleet support has sent you a link to choose a new password:\n\n${link}\n\nThe link works once and stops working after a short while. If you didn't ask for this, you can ignore this email: your password stays the same.\n\nLokalfleet`,
     metadata: { kind: "admin_password_reset" }
   });
   if (sent.status === "sent") {
@@ -183,7 +183,7 @@ export async function adminChangeEmail(_state: PersonActionState, formData: Form
     sendEmail({
       to,
       subject: "Your Lokalfleet email address was changed",
-      text: `Hello,\n\nRouteHQ support changed the email address you sign in with${before ? ` from ${before}` : ""} to ${email}.\n\nIf you didn't ask for this, reply to this email or contact Lokalfleet support straight away.\n\nRouteHQ`,
+      text: `Hello,\n\nLokalfleet support changed the email address you sign in with${before ? ` from ${before}` : ""} to ${email}.\n\nIf you didn't ask for this, reply to this email or contact Lokalfleet support straight away.\n\nLokalfleet`,
       metadata: { kind: "admin_email_changed" }
     });
   const results = await Promise.all([notice(email), ...(before ? [notice(before)] : [])]);

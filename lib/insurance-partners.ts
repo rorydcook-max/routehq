@@ -1,17 +1,17 @@
 /**
- * Insurance quotes inside RouteHQ, from a licensed broker partner (Rory, 25 Oct 2026: embedded quotes for voluntary
+ * Insurance quotes inside Lokalfleet, from a licensed broker partner (Rory, 25 Oct 2026: embedded quotes for voluntary
  * insurance, and Por Ror Bor). Off until a partner is signed: nothing shows unless its settings are in the hosting
  * environment.
  *
- * Why it is set up this way (OIC good-practice guidelines, in force 24 Jul 2026): RouteHQ isn't licensed as an agent
- * or broker, so the quote and the sale are the partner's, under the partner's licence, and RouteHQ is paid a fixed
+ * Why it is set up this way (OIC good-practice guidelines, in force 24 Jul 2026): Lokalfleet isn't licensed as an agent
+ * or broker, so the quote and the sale are the partner's, under the partner's licence, and Lokalfleet is paid a fixed
  * platform fee, never per policy. Every place the partner appears says so.
  *
  * Settings, per product (INSURANCE_ for voluntary insurance, PORBOR_ for compulsory):
  *   <P>_PARTNER_NAME     the broker's name as customers know it ("Roojai")
  *   <P>_PARTNER_LICENCE  their OIC broker licence number, shown next to their name
  *   <P>_PARTNER_URL      the quote page; {plate} {province} {make} {model} {year} {vin} {cc} {use} are filled in
- *   <P>_PARTNER_EMBED    "1" when the partner allows their page inside RouteHQ; otherwise it opens in a new tab
+ *   <P>_PARTNER_EMBED    "1" when the partner allows their page inside Lokalfleet; otherwise it opens in a new tab
  */
 
 export type InsuranceProduct = "insurance" | "porbor";

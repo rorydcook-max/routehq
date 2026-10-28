@@ -1,16 +1,16 @@
 /*
- * RouteHQ booking box for a rental business's own website.
+ * Lokalfleet booking box for a rental business's own website.
  *
  *   <div data-routehq-booking="your-shop"></div>
- *   <script src="https://routehq.app/embed.js" async></script>
+ *   <script src="https://lokalfleet.com/embed.js" async></script>
  *
  * Optional on the div: data-lang="th" (or en, zh, ru…), data-vehicle="<vehicle id>" to open on one vehicle.
- * The box shows the business's vehicles, prices and free dates and grows to fit; booking continues on RouteHQ,
+ * The box shows the business's vehicles, prices and free dates and grows to fit; booking continues on Lokalfleet,
  * where the customer adds documents and signs.
  */
 (function () {
   var script = document.currentScript;
-  var origin = script && script.src ? new URL(script.src).origin : "https://routehq.app";
+  var origin = script && script.src ? new URL(script.src).origin : "https://lokalfleet.com";
 
   function mount(box) {
     if (box.getAttribute("data-routehq-mounted")) return;
@@ -32,7 +32,7 @@
     window.addEventListener("message", function (event) {
       if (event.origin !== origin || event.source !== frame.contentWindow || !event.data) return;
       if (event.data.type === "routehq:height" && typeof event.data.height === "number") frame.style.height = Math.max(320, Math.ceil(event.data.height)) + "px";
-      // Booking made: carry on at RouteHQ in the same tab (documents and signing need the whole screen).
+      // Booking made: carry on at Lokalfleet in the same tab (documents and signing need the whole screen).
       if (event.data.type === "routehq:continue" && typeof event.data.href === "string" && event.data.href.indexOf(origin + "/book/") === 0) window.location.assign(event.data.href);
     });
   }

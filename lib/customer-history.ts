@@ -1,5 +1,5 @@
 /**
- * Shared customer history across RouteHQ businesses (migration 0100). A business reports a rental that ended badly;
+ * Shared customer history across Lokalfleet businesses (migration 0100). A business reports a rental that ended badly;
  * other businesses are warned when the same person books or gets in touch with them.
  *
  * A person is recognised by their passport or driving licence number and their phone / WhatsApp number, each turned

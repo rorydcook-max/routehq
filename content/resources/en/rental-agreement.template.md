@@ -5,7 +5,7 @@
 # Keep the Markdown simple: headings, paragraphs, "- " lists, tables, **bold**, "> " notes, and "---" for a new page.
 # Blanks are runs of underscores inside a sentence; a line of only underscores would be read as a page break.
 fileName: "Vehicle rental agreement"
-footer: "Vehicle rental agreement template from RouteHQ · routehq.app"
+footer: "Vehicle rental agreement template from Lokalfleet · lokalfleet.com"
 page: "Page"
 of: "of"
 # Table rows (by their first cell) that get room to write or sign in.

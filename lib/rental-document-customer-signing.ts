@@ -402,7 +402,7 @@ async function buildExecutionCertificatePdf(ctx: any, signerName: string, verifi
     </div>
     <h2>Acknowledgements</h2>
     <ul>${acknowledgements}</ul>
-    <p class="muted">RouteHQ is not a contracting party. The agreement is issued by the rental business.</p>
+    <p class="muted">Lokalfleet is not a contracting party. The agreement is issued by the rental business.</p>
   </body></html>`;
   return htmlToPdf(html);
 }

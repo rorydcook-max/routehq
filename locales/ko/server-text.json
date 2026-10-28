@@ -87,7 +87,7 @@
   "Switch to the business you want to work in and try again.": "작업할 업체로 전환한 후 다시 시도하세요.",
   "Telegram didn't accept that bot token. {}": "Telegram이 봇 토큰을 받아들이지 않았어요. {}",
   "That address is already used by another business.": "그 주소는 이미 다른 업체가 사용 중이에요.",
-  "That address is kept for RouteHQ. Try another.": "그 주소는 RouteHQ용으로 예약돼 있어요. 다른 주소를 시도하세요.",
+  "That address is kept for Lokalfleet. Try another.": "그 주소는 Lokalfleet용으로 예약돼 있어요. 다른 주소를 시도하세요.",
   "That connection no longer exists.": "그 연결은 더 이상 존재하지 않아요.",
   "That conversation no longer exists.": "그 문의는 더 이상 존재하지 않아요.",
   "That customer has signed for their vehicle, so they need to sign the change. Open their booking and use More > Change vehicle.": "고객이 차량 인수에 서명했기 때문에 변경 사항에도 서명해야 해요. 예약을 열고 더 보기 > 차량 변경을 사용하세요.",

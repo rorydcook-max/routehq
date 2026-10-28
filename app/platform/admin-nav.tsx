@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 
-/** Tabs across the top of the RouteHQ admin console. */
+/** Tabs across the top of the Lokalfleet admin console. */
 const TABS = [
   { href: "/platform", label: "Overview" },
   { href: "/platform/businesses", label: "Businesses" },
@@ -17,7 +17,7 @@ const TABS = [
 export function AdminHeader({ active, title, subtitle }: { active: string; title: string; subtitle?: string }) {
   return (
     <header className="mb-6">
-      <p className="text-[13px] font-bold uppercase tracking-[0.08em] text-[var(--primary)]">RouteHQ admin</p>
+      <p className="text-[13px] font-bold uppercase tracking-[0.08em] text-[var(--primary)]">Lokalfleet admin</p>
       <h1 className="page-title mt-1">{title}</h1>
       {subtitle ? <p className="measure mt-1.5 font-medium text-[var(--foreground-secondary)]">{subtitle}</p> : null}
       <nav aria-label="Admin sections" className="chip-row mt-5 flex flex-wrap gap-2">

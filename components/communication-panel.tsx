@@ -47,7 +47,7 @@ export function CommunicationPanel({
   booking,
   rentalId,
   organisationId,
-  businessName = "RouteHQ",
+  businessName = "Lokalfleet",
   bookingPortalUrl,
   customerId,
   revalidatePathname,

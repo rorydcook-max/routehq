@@ -4,7 +4,7 @@ import { isPlatformAdmin } from "@/lib/support";
 import { listRenters } from "@/lib/renters-data";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-/** The renter list as a spreadsheet (one row per rental), for partner campaigns. RouteHQ team only. */
+/** The renter list as a spreadsheet (one row per rental), for partner campaigns. Lokalfleet team only. */
 export async function GET(request: NextRequest) {
   const membership = await getCurrentMembership();
   const supabase = (await createSupabaseServerClient()) as any;

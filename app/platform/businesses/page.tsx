@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 type Query = { q?: string; plan?: string; status?: string; soon?: string; deleted?: string };
 
-/** Every business on RouteHQ: search by name or owner email, filter by plan and status. Platform admins only. */
+/** Every business on Lokalfleet: search by name or owner email, filter by plan and status. Platform admins only. */
 export default async function AdminBusinessesPage({ searchParams }: { searchParams: Promise<Query> }) {
   await requirePlatformAdmin();
   const [query, userEmail, all] = await Promise.all([searchParams, getCurrentUserEmail(), listBusinesses()]);

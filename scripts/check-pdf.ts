@@ -8,7 +8,7 @@ import { htmlToPdf } from "../lib/html-to-pdf";
 
 async function main() {
   const html = `<!doctype html><html><head><meta charset="utf-8"/><style>h1{font-size:20px}</style></head><body>
-    <h1>RouteHQ PDF check</h1>
+    <h1>Lokalfleet PDF check</h1>
     <p>English: The renter agrees to return the vehicle.</p>
     <p>Thai: ผู้เช่าตกลงที่จะคืนรถ</p>
     <p>Burmese: ငှားရမ်းသူသည် ယာဉ်ကို ပြန်အပ်ရန် သဘောတူသည်။</p>

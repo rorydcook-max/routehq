@@ -63,7 +63,7 @@ export function buildDailySummaryMessage(params: {
 }): LineMessage {
   const lines: string[] = [];
 
-  lines.push("🚗 RouteHQ Daily Summary");
+  lines.push("🚗 Lokalfleet Daily Summary");
   lines.push(params.businessName);
   lines.push("──────────────────");
 
@@ -112,7 +112,7 @@ export function buildDailySummaryMessage(params: {
   lines.push("");
   lines.push("──────────────────");
   lines.push(`💰 Revenue this month: ฿${formatRevenue(params.monthlyRevenue)}`);
-  lines.push("routehq.app");
+  lines.push("lokalfleet.com");
 
   return { type: "text", text: lines.join("\n") };
 }
@@ -144,7 +144,7 @@ export function buildPaymentReminderMessage(params: {
   lines.push(`Questions? Contact ${params.ownerName} at ${params.ownerPhone}`);
   lines.push("");
   lines.push("Thank you 🙏");
-  lines.push("routehq.app");
+  lines.push("lokalfleet.com");
 
   return { type: "text", text: lines.join("\n") };
 }
@@ -169,7 +169,7 @@ export function buildBookingLinkMessage(params: {
   lines.push("");
   lines.push(`For help, contact us at ${params.ownerPhone}`);
   lines.push("");
-  lines.push("routehq.app");
+  lines.push("lokalfleet.com");
 
   return { type: "text", text: lines.join("\n") };
 }

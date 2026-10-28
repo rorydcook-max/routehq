@@ -39,7 +39,7 @@ function isEnabled(ns: Record<string, boolean>, key: string): boolean {
 }
 
 function buildEventBubble(emoji: string, title: string, body: string, color = "#0e5e6f") {
-  return lineFlex(`RouteHQ: ${title}`, {
+  return lineFlex(`Lokalfleet: ${title}`, {
     type: "bubble",
     size: "kilo",
     header: {

@@ -1,5 +1,5 @@
 /**
- * A rental that already existed before it was recorded in RouteHQ (the booking
+ * A rental that already existed before it was recorded in Lokalfleet (the booking
  * form's "existing rental", and the importer). Marks rent due before
  * "paidBefore" as paid, and records a deposit already held.
  */

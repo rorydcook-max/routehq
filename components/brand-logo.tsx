@@ -25,8 +25,8 @@ export function RouteHqLogo({ className, showDescriptor = true, tone = "light", 
       <RouteHqMark className="h-10 w-10 shrink-0" navy={onDark ? "#ffffff" : "var(--logo-ink, #1B2430)"} teal={onDark ? "var(--band-logo-accent, #12BCB8)" : "#06B6B6"} />
       <div className="min-w-0">
         <div className="flex items-baseline whitespace-nowrap text-[1.35rem] font-black leading-none tracking-[-0.04em]">
-          <span className={onDark ? "text-white" : "text-[var(--logo-ink,#1B2430)]"}>Route</span>
-          <span className={onDark ? "text-[var(--band-logo-accent,#12BCB8)]" : "text-[#06B6B6]"}>HQ</span>
+          <span className={onDark ? "text-white" : "text-[var(--logo-ink,#1B2430)]"}>Lokal</span>
+          <span className={onDark ? "text-[var(--band-logo-accent,#12BCB8)]" : "text-[#06B6B6]"}>fleet</span>
         </div>
         {/* No English strapline under the name: the name is enough, in every language. */}
       </div>

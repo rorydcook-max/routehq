@@ -81,7 +81,7 @@ export async function mapColumnsWithAi(sheets: ParsedSheet[], importType = "mixe
     };
   });
 
-  const prompt = `You map spreadsheet columns for RouteHQ, software for small vehicle rental businesses in Thailand.
+  const prompt = `You map spreadsheet columns for Lokalfleet, software for small vehicle rental businesses in Thailand.
 
 Requested import type: ${importType}
 
@@ -106,7 +106,7 @@ Rules:
 - A ledger with separate money columns: income / in / received amounts is money_in, expense / out / spent is money_out.
 - A number of days rented ("Days", "จำนวนวัน") is rental_days; a returned yes/no column is returned.
 - "Column 1", "Column 2"… mean the sheet had no heading row: map those columns from their sample values (a Thai plate is registration_number, a date start_date or end_date, a phone number phone, a scooter or car model vehicle_name, a person's name customer_name, a price rental_rate).
-- first_reading is how RouteHQ's built-in rules read each sheet ("__ignore__" = not placed). Keep what is right, correct what is wrong, and place what it missed.
+- first_reading is how Lokalfleet's built-in rules read each sheet ("__ignore__" = not placed). Keep what is right, correct what is wrong, and place what it missed.
 - sheet_name must exactly match a provided sheet_name.
 
 Sheets: ${JSON.stringify(sheetSummary)}

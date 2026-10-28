@@ -51,7 +51,7 @@ const NOTICE: Record<string, { text: string; good: boolean }> = {
 
 const limitText = (value: number | null) => (value === null ? "No limit" : value.toLocaleString("en-GB"));
 
-/** One business, from RouteHQ's side: its plan and trial, its team, its size, and everything admins did to it. */
+/** One business, from Lokalfleet's side: its plan and trial, its team, its size, and everything admins did to it. */
 export default async function AdminBusinessPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ done?: string }> }) {
   const admin = await requirePlatformAdmin();
   const [{ id }, { done }, userEmail] = await Promise.all([params, searchParams, getCurrentUserEmail()]);
@@ -80,7 +80,7 @@ export default async function AdminBusinessPage({ params, searchParams }: { para
   const customAvailable = "custom_limits" in org;
   const limits = effectiveLimits(org);
 
-  // View as this business (migration 0108): who from RouteHQ is in it right now. Ran-out sessions are tidied first.
+  // View as this business (migration 0108): who from Lokalfleet is in it right now. Ran-out sessions are tidied first.
   const viewAvailable = await viewSessionsAvailable();
   let liveSessions: ViewSession[] = [];
   if (viewAvailable) {
@@ -101,7 +101,7 @@ export default async function AdminBusinessPage({ params, searchParams }: { para
       <BackLink href="/platform/businesses" label="Businesses" />
       <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
-          <p className="text-[13px] font-bold uppercase tracking-[0.08em] text-[var(--primary)]">RouteHQ admin</p>
+          <p className="text-[13px] font-bold uppercase tracking-[0.08em] text-[var(--primary)]">Lokalfleet admin</p>
           <h1 className="page-title mt-1 flex flex-wrap items-center gap-3">
             {org.name}
             <StatusPill status={status} />
@@ -148,7 +148,7 @@ export default async function AdminBusinessPage({ params, searchParams }: { para
         <section className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-[var(--warning-light)] p-4">
           <p className="font-semibold text-[var(--foreground)]">
             {liveSessions
-              .map((session) => `${session.admin_user_id === admin.userId ? "You are" : `${authUsers.get(session.admin_user_id)?.email || "A RouteHQ admin"} is`} viewing this business until ${viewTime(session.ends_at)} · “${session.reason || ""}”`)
+              .map((session) => `${session.admin_user_id === admin.userId ? "You are" : `${authUsers.get(session.admin_user_id)?.email || "A Lokalfleet admin"} is`} viewing this business until ${viewTime(session.ends_at)} · “${session.reason || ""}”`)
               .join(" · ")}
           </p>
           {myLiveSession ? (
@@ -383,7 +383,7 @@ export default async function AdminBusinessPage({ params, searchParams }: { para
                 return (
                   <tr className="align-top" key={person.user_id || person.invited_email}>
                     <td className="px-5 py-3">
-                      <span className="block font-bold">{isSupport ? "RouteHQ support (temporary)" : person.display_name || person.auth?.email || person.invited_email || "—"}</span>
+                      <span className="block font-bold">{isSupport ? "Lokalfleet support (temporary)" : person.display_name || person.auth?.email || person.invited_email || "—"}</span>
                       <span className="block text-[13px] font-medium text-[var(--muted)]">{person.auth?.email || person.invited_email || ""}</span>
                     </td>
                     <td className="px-5 py-3 font-semibold capitalize">{person.role}</td>
@@ -432,7 +432,7 @@ export default async function AdminBusinessPage({ params, searchParams }: { para
           <div className="min-w-0">
             <h3 className="text-[16px] font-bold text-[var(--foreground)]">View as this business</h3>
             <p className="measure mt-0.5 text-[14px] font-medium text-[var(--foreground-secondary)]">
-              You join their team as “RouteHQ support” for 2 hours and see the app exactly as they do. They see a notice at the top of their app while you have access. Ends when you click Stop viewing, or after 2 hours.
+              You join their team as “Lokalfleet support” for 2 hours and see the app exactly as they do. They see a notice at the top of their app while you have access. Ends when you click Stop viewing, or after 2 hours.
             </p>
             {!viewAvailable ? (
               <p className="mt-3 rounded-xl bg-[var(--warning-light)] px-4 py-3 text-[14px] font-semibold text-[var(--foreground)]">

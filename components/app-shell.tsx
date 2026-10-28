@@ -153,7 +153,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
 
   // Teammates cannot use business settings, so the link is hidden for them.
   // Display only: the middleware and server actions enforce the rule.
-  // The brand arrives with the page from the root layout, so their logo is on the first frame: no RouteHQ flash.
+  // The brand arrives with the page from the root layout, so their logo is on the first frame: no Lokalfleet flash.
   const initialBrand = useInitialShellBrand();
   // Every page draws its own shell, so the last answer is reused across taps: the badges are right away, not after a fetch.
   const [shell, setShell] = useState<ShellContext>(() => shellCache.value ?? { role: null, organizations: [], unreadChats: 0, dueTasks: 0, helpReplies: 0, brand: initialBrand });
@@ -162,7 +162,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
     loadShellContext()
       .then((context) => {
         if (cancelled || !context) return;
-        // A failed logo lookup in the refresh must not swap their brand for RouteHQ's: keep the first-frame brand.
+        // A failed logo lookup in the refresh must not swap their brand for Lokalfleet's: keep the first-frame brand.
         setShell({ ...context, brand: context.brand ?? initialBrand });
       })
       .catch(() => undefined);
@@ -279,10 +279,10 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
               <div className="space-y-0.5">{group.items.map((item) => sideLink(item))}</div>
             </div>
           ))}
-          {/* RouteHQ's own console: only platform admins see this link (each admin page checks again on the server). */}
+          {/* Lokalfleet's own console: only platform admins see this link (each admin page checks again on the server). */}
           {shell.platformAdmin ? (
             <div className="mt-3 [@media(max-height:960px)]:mt-1.5">
-              <p className="px-3 pb-0.5 text-[14px] font-bold text-[var(--sidebar-text-muted)]">RouteHQ</p>
+              <p className="px-3 pb-0.5 text-[14px] font-bold text-[var(--sidebar-text-muted)]">Lokalfleet</p>
               <Link
                 className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm font-semibold transition [@media(max-height:960px)]:py-1.5 ${
                   pathname.startsWith("/platform") ? "bg-[var(--primary-light)] text-[var(--primary)]" : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--foreground)]"
@@ -324,12 +324,12 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
       </aside>
 
       <main className="content-area mx-auto lg:ml-[220px] lg:max-w-none">
-        {/* RouteHQ support's temporary access (admin console "View as this business"): the admin sees what they're in
+        {/* Lokalfleet support's temporary access (admin console "View as this business"): the admin sees what they're in
             and how to leave; the business's own team sees that support has access and until when. */}
         {shell.viewing ? (
           <div className="mb-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 rounded-xl bg-[var(--warning-light)] px-4 py-2 text-center text-[14px] font-semibold text-[var(--foreground)]" role="status">
             <span>
-              Viewing {shell.viewing.organizationName} as RouteHQ support · ends {supportTime(shell.viewing.endsAt)}
+              Viewing {shell.viewing.organizationName} as Lokalfleet support · ends {supportTime(shell.viewing.endsAt)}
             </span>
             <form action={adminStopViewing} onSubmit={forgetShellContext}>
               <PendingButton className="font-bold text-[var(--primary)] underline" pendingLabel="Stopping…" type="submit">
@@ -347,7 +347,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
           // Phones: logo and (for people in several businesses) the switcher.
           // Account and sign-out live under More, away from thumbs.
           <div className="mb-3 flex items-center justify-between gap-2 lg:hidden">
-            <Link aria-label={brand?.name || "RouteHQ dashboard"} className="min-w-0" href="/">
+            <Link aria-label={brand?.name || "Lokalfleet dashboard"} className="min-w-0" href="/">
               {brand ? (
                 // On the coloured band the logo sits on a white tab; if the file is missing, their name goes there instead.
                 <span className="flex h-8 max-w-[160px] items-center">
@@ -538,7 +538,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
   );
 }
 
-/** "14:30" for RouteHQ support's access, in Thailand time (where RouteHQ's businesses are). */
+/** "14:30" for Lokalfleet support's access, in Thailand time (where Lokalfleet's businesses are). */
 function supportTime(iso: string) {
   try {
     return new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Bangkok" }).format(new Date(iso));

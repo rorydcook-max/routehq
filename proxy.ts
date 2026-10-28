@@ -54,7 +54,7 @@ const BOT = /bot|crawl|spider|slurp|facebookexternalhit|embedly|preview|lighthou
 
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
-  // RouteHQ's own website: home (what a signed-out visitor sees at "/", rewritten below), plans, FAQ, contact, guides and
+  // Lokalfleet's own website: home (what a signed-out visitor sees at "/", rewritten below), plans, FAQ, contact, guides and
   // free resources. Marked so the root layout sends them no staff-app words. (/owners was dropped on 28 Oct 2026.)
   // Each language has its own address (lib/site/locale-path.ts): English at the root, others under /<code>/.
   // A prefixed address is served from the unprefixed page with the language in a request header.
@@ -138,7 +138,7 @@ export async function proxy(request: NextRequest) {
     // Scheduled jobs have no user session; they check CRON_SECRET themselves.
     pathname.startsWith("/api/cron/") ||
     pathname === "/api/line/daily-summary" ||
-    // Calendar apps subscribing to a business's booking feed (a secret token in the address), and the RouteHQ Telegram bot.
+    // Calendar apps subscribing to a business's booking feed (a secret token in the address), and the Lokalfleet Telegram bot.
     pathname.startsWith("/api/calendar/") ||
     pathname === "/api/telegram/webhook";
   // Customer pages take their language from the customer (their choice, or their phone's language), never from whoever is signed in.
@@ -150,7 +150,7 @@ export async function proxy(request: NextRequest) {
     if (pageLang && /^[a-z]{2}(-[A-Za-z]{2,4})?$/.test(pageLang)) request.headers.set("x-routehq-page-lang", pageLang);
   }
   // During first-time setup the wizard sends people to the normal Add vehicle and import screens; everything else waits until setup is finished.
-  // "This business was closed" is shown to members of a business RouteHQ closed, so it needs no working business.
+  // "This business was closed" is shown to members of a business Lokalfleet closed, so it needs no working business.
   const isOnboardingAllowedRoute = isPublicRoute || pathname === "/business-closed" || pathname.startsWith("/api/") || pathname.startsWith("/fleet/import") || pathname === "/fleet/new" || pathname === "/help" || pathname.startsWith("/help/");
   const isSubscriptionAllowedRoute =
     isOnboardingAllowedRoute ||
@@ -161,8 +161,8 @@ export async function proxy(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  // Booking addresses: theirshop.routehq.app and a business's own domain open that business's booking page.
-  // Booking links and the booking page keep working there; anything else goes to RouteHQ itself.
+  // Booking addresses: theirshop.lokalfleet.com and a business's own domain open that business's booking page.
+  // Booking links and the booking page keep working there; anything else goes to Lokalfleet itself.
   const target = hostTarget(request.headers.get("host"));
   if (target && supabaseUrl && supabaseAnonKey) {
     const appHome = String(process.env.NEXT_PUBLIC_APP_URL || `https://${rootDomain()}`).replace(/\/$/, "");
@@ -177,7 +177,7 @@ export async function proxy(request: NextRequest) {
     } else {
       const plan = { subscription_tier: site.tier, subscription_status: site.status, custom_limits: site.custom_limits };
       const allowed = "label" in target ? canUseSubdomain(plan) : site.has_domain && canUseOwnDomain(plan);
-      // On a plan without the address, the page still works at its RouteHQ address.
+      // On a plan without the address, the page still works at its Lokalfleet address.
       if (!allowed) {
         const destination = `${pathname === "/" ? `/rent/${site.slug}` : pathname}${request.nextUrl.search}`;
         if (!appOnLocalhost) return NextResponse.redirect(new URL(destination, appHome));
@@ -271,7 +271,7 @@ export async function proxy(request: NextRequest) {
       request.cookies.get(ACTIVE_ORGANIZATION_COOKIE)?.value || null
     );
 
-    // Their only business was closed by RouteHQ: say so plainly rather than offering to set up a new one.
+    // Their only business was closed by Lokalfleet: say so plainly rather than offering to set up a new one.
     if (!membership?.organization_id && closed) {
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = "/business-closed";

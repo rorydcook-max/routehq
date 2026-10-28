@@ -1,6 +1,6 @@
 /**
- * Telegram alerts for operators, through one RouteHQ bot (Integrations, 27 Oct 2026).
- * Setup (once, by RouteHQ): create a bot with @BotFather, then set
+ * Telegram alerts for operators, through one Lokalfleet bot (Integrations, 27 Oct 2026).
+ * Setup (once, by Lokalfleet): create a bot with @BotFather, then set
  *   TELEGRAM_BOT_TOKEN, TELEGRAM_BOT_USERNAME (without @) and TELEGRAM_WEBHOOK_SECRET (any long random string),
  * and open /api/telegram/setup while signed in as a platform admin to point the bot at /api/telegram/webhook.
  * An operator connects by tapping a t.me link with a one-time code; the bot's /start message carries the code

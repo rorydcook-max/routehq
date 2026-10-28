@@ -94,7 +94,7 @@ function firstLine(text: string) {
   return `${cut.slice(0, Math.max(cut.lastIndexOf(" "), 40)).replace(/[,;:\s]+$/, "")}…`;
 }
 
-/** A business starts a conversation with the RouteHQ team. */
+/** A business starts a conversation with the Lokalfleet team. */
 export async function startSupportThread(formData: FormData): Promise<Result<{ id: string }>> {
   const me = await who();
   if (!me) return { ok: false, error: await said("Please sign in first.") };
@@ -123,7 +123,7 @@ export async function startSupportThread(formData: FormData): Promise<Result<{ i
   return { ok: true, id: thread.id };
 }
 
-/** A reply in a conversation, from the business or (for platform admins on the team page) from RouteHQ. */
+/** A reply in a conversation, from the business or (for platform admins on the team page) from Lokalfleet. */
 export async function replySupportThread(formData: FormData): Promise<Result> {
   const me = await who();
   if (!me) return { ok: false, error: await said("Please sign in first.") };
@@ -142,7 +142,7 @@ export async function replySupportThread(formData: FormData): Promise<Result> {
   const now = new Date().toISOString();
   if (asTeam) {
     await admin.from("support_threads").update({ last_message_at: now, status: "answered", unread_by_business: true, unread_by_team: false }).eq("id", thread.id);
-    await notifyOperator(thread.organization_id, `💬 RouteHQ replied: ${firstLine(body) || thread.subject}`, "support_reply", `/help/${thread.id}`);
+    await notifyOperator(thread.organization_id, `💬 Lokalfleet replied: ${firstLine(body) || thread.subject}`, "support_reply", `/help/${thread.id}`);
   } else {
     await admin.from("support_threads").update({ last_message_at: now, status: "open", unread_by_team: true }).eq("id", thread.id);
     const { data: org } = await admin.from("organizations").select("name").eq("id", thread.organization_id).maybeSingle();
@@ -168,7 +168,7 @@ export async function setSupportThreadStatus(input: { threadId: string; status: 
   return { ok: true };
 }
 
-/** How the business prefers to hear back from RouteHQ. */
+/** How the business prefers to hear back from Lokalfleet. */
 export async function saveSupportPreference(input: { channel: string; handle: string }): Promise<Result> {
   const me = await who();
   if (!me) return { ok: false, error: await said("Please sign in first.") };

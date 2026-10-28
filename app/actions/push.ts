@@ -33,6 +33,6 @@ export async function sendTestPush(): Promise<{ ok: boolean; sent: number }> {
   const membership = await getCurrentMembership();
   if (!membership || !pushConfigured()) return { ok: false, sent: 0 };
   const admin = createSupabaseAdminClient() as any;
-  const sent = await sendPushToOrganization(admin, membership.organizationId, { title: "RouteHQ", body: "Alerts are working on this device.", url: "/tasks", tag: "test" }, { onlyUserId: membership.userId });
+  const sent = await sendPushToOrganization(admin, membership.organizationId, { title: "Lokalfleet", body: "Alerts are working on this device.", url: "/tasks", tag: "test" }, { onlyUserId: membership.userId });
   return { ok: sent > 0, sent };
 }

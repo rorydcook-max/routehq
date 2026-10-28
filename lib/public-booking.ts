@@ -71,7 +71,7 @@ export async function getPublicBookingDetail(token: string) {
     return { state: "not_found" as PublicBookingState };
   }
 
-  // A business RouteHQ has closed (admin console soft delete): its booking links stop working.
+  // A business Lokalfleet has closed (admin console soft delete): its booking links stop working.
   const { data: linkOrganization } = await supabase.from("organizations").select("deleted_at").eq("id", bookingLink.organization_id).maybeSingle();
   if (!linkOrganization || linkOrganization.deleted_at) {
     return { state: "not_found" as PublicBookingState };
@@ -206,7 +206,7 @@ export async function getPublicBookingDetail(token: string) {
     ensureDefaultContractTemplate(supabase, bookingLink.organization_id).then((data) => ({ data }))
   ]);
 
-  // The customer's current choice about RouteHQ partner offers (latest row wins), read alongside the rest.
+  // The customer's current choice about Lokalfleet partner offers (latest row wins), read alongside the rest.
   const partnerOffersRead = bookingLink.customer_id
     ? supabase.from("renter_consents").select("granted").eq("customer_id", bookingLink.customer_id).eq("purpose", "partner_offers").order("created_at", { ascending: false }).limit(1).maybeSingle()
     : Promise.resolve({ data: null });

@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
   await syncAllVehicleStatuses(supabase).catch(() => 0);
   // Handover tomorrow, return coming up, rent due or late, service due: each sent once.
   const customerReminders = await sendDailyCustomerReminders(supabase).catch(() => null);
-  // RouteHQ's copy of renters who said yes: rentals move on (returned, paid, deposit settled), so it is refreshed daily.
+  // Lokalfleet's copy of renters who said yes: rentals move on (returned, paid, deposit settled), so it is refreshed daily.
   await refreshAllRenters(supabase).catch(() => 0);
 
   const scheduledResult = await supabase

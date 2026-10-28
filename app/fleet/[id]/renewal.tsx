@@ -95,7 +95,7 @@ export function RenewalForm({ vehicleId, organizationId, complianceType, readabl
 
 /**
  * How to renew road tax, Por Ror Bor or insurance, for this vehicle. Plain guidance and the official DLT link only:
- * RouteHQ isn't a licensed insurance broker, so it doesn't link to insurers or take a cut (OIC rules, July 2026).
+ * Lokalfleet isn't a licensed insurance broker, so it doesn't link to insurers or take a cut (OIC rules, July 2026).
  */
 export function RenewalHelp({
   kind,
@@ -150,7 +150,7 @@ export function RenewalHelp({
     steps.push(say("rn_insClaims"));
   }
 
-  // A signed partner: quotes right here, the partner's page and licence, RouteHQ named as not a broker.
+  // A signed partner: quotes right here, the partner's page and licence, Lokalfleet named as not a broker.
   const quoteBox = partner ? (
     <div className="mt-2.5 rounded-lg border border-[var(--primary)]/30 bg-[var(--primary-light)] p-3">
       <div className="flex flex-wrap items-center gap-3">

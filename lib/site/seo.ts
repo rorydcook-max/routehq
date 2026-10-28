@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import { supportedLocaleCodes } from "@/lib/i18n/locales";
 import { DEFAULT_SITE_LOCALE, hreflangFor, localizeSitePath } from "@/lib/site/locale-path";
 
-/** The website's canonical origin (NEXT_PUBLIC_SITE_URL, else https://routehq.app), without a trailing slash. */
+/** The website's canonical origin (NEXT_PUBLIC_SITE_URL, else https://lokalfleet.com), without a trailing slash. */
 export function siteOrigin() {
-  return String(process.env.NEXT_PUBLIC_SITE_URL || "https://routehq.app").replace(/\/$/, "");
+  return String(process.env.NEXT_PUBLIC_SITE_URL || "https://lokalfleet.com").replace(/\/$/, "");
 }
 
-/** The full address of a website page in a language: ("/pricing", "th") → https://routehq.app/th/pricing. */
+/** The full address of a website page in a language: ("/pricing", "th") → https://lokalfleet.com/th/pricing. */
 export function siteUrl(path: string, locale: string) {
   return `${siteOrigin()}${localizeSitePath(path, locale)}`;
 }
@@ -36,7 +36,7 @@ export function siteMetadata({ path, locale, title, description, available, abso
     title: absoluteTitle ? { absolute: title } : title,
     description,
     alternates,
-    openGraph: { type, url: alternates.canonical as string, siteName: "RouteHQ", title: absoluteTitle ? title : `${title} | RouteHQ`, description, locale: ogLocale(locale) },
+    openGraph: { type, url: alternates.canonical as string, siteName: "Lokalfleet", title: absoluteTitle ? title : `${title} | Lokalfleet`, description, locale: ogLocale(locale) },
     twitter: { card: "summary_large_image", title, description }
   };
 }

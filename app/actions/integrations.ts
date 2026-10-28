@@ -63,7 +63,7 @@ export async function saveAlertEmail(formData: FormData): Promise<Result> {
   return saveSettings(found.db, found.org.id, settings);
 }
 
-/** A one-time link that opens the RouteHQ bot in Telegram; sending it links that chat to this business. */
+/** A one-time link that opens the Lokalfleet bot in Telegram; sending it links that chat to this business. */
 export async function connectTelegram(): Promise<Result> {
   if (!isTelegramConfigured()) return { ok: false, error: await said("Telegram isn't available yet.") };
   const found = await ownerOrg();

@@ -212,11 +212,11 @@ export async function DashboardWindowMock({ className = "" }: { className?: stri
     { vehicle: vehicleName("pajero"), bars: [{ who: "Sofia Rossi", from: 1, to: 8, ...out }] }
   ];
   return (
-    <WindowFrame address="palm.routehq.app" className={className} label={t("mockDashboardLabel")}>
+    <WindowFrame address="palm.lokalfleet.com" className={className} label={t("mockDashboardLabel")}>
       <div className="grid aspect-[16/9.2] grid-cols-[15em_1fr] bg-[#f3f6f8]">
         <aside className="flex flex-col gap-[0.3em] bg-[#0b2140] px-[1em] py-[1.4em] text-white">
           <p className="px-[0.6em] text-[1.15em] font-bold leading-tight">Palm Car Rental</p>
-          <p className="px-[0.7em] text-[0.85em] text-white/60">Powered by RouteHQ</p>
+          <p className="px-[0.7em] text-[0.85em] text-white/60">Powered by Lokalfleet</p>
           <div className="mt-[1em] flex flex-col gap-[0.2em]">
             {nav.map(({ icon: Icon, label, active }) => (
               <span className={`flex items-center gap-[0.7em] rounded-[0.8em] px-[0.7em] py-[0.55em] font-semibold ${active ? "bg-[rgba(18,188,184,0.16)] text-[#12bcb8]" : "text-white/70"}`} key={label}>
@@ -575,7 +575,7 @@ export async function PaymentPhoneMock({ className = "" }: { className?: string 
   );
 }
 
-/* ── Moving in: what a business sends, and what RouteHQ makes of it ────── */
+/* ── Moving in: what a business sends, and what Lokalfleet makes of it ────── */
 
 export async function ImportMock({ className = "" }: { className?: string }) {
   const [{ number }, m] = await Promise.all([kit(), getTranslations("marketing")]);
@@ -656,7 +656,7 @@ function CardHead({ icon, title, sub }: { icon: ReactNode; title: string; sub?: 
   );
 }
 
-/** What RouteHQ read from a passport photo. */
+/** What Lokalfleet read from a passport photo. */
 export async function PassportCard({ className = "" }: { className?: string }) {
   const { t, date } = await kit();
   const rows = [
@@ -761,7 +761,7 @@ export async function ShopPageMock({ className = "" }: { className?: string }) {
     { id: "pajero" as VehicleId, price: money(2200) }
   ];
   return (
-    <WindowFrame address="palm.routehq.app/book" className={className} label={t("mockShopLabel")} light>
+    <WindowFrame address="palm.lokalfleet.com/book" className={className} label={t("mockShopLabel")} light>
       <div className="bg-[#f3f6f8] px-[2.4em] pb-[2.4em] pt-[2em] text-[1.3em]">
         <div className="flex items-center justify-between gap-[1em]">
           <span className="flex items-center gap-[0.8em]">

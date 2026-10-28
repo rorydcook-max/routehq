@@ -87,7 +87,7 @@
   "Switch to the business you want to work in and try again.": "作業したい事業者に切り替えてから、もう一度お試しください。",
   "Telegram didn't accept that bot token. {}": "Telegramがそのボットトークンを受け付けませんでした。{}",
   "That address is already used by another business.": "そのアドレスはすでに別の事業者が使用しています。",
-  "That address is kept for RouteHQ. Try another.": "そのアドレスはRouteHQ用に予約されています。別のアドレスをお試しください。",
+  "That address is kept for Lokalfleet. Try another.": "そのアドレスはLokalfleet用に予約されています。別のアドレスをお試しください。",
   "That connection no longer exists.": "その接続はもう存在しません。",
   "That conversation no longer exists.": "その会話はもう存在しません。",
   "That customer has signed for their vehicle, so they need to sign the change. Open their booking and use More > Change vehicle.": "この顧客は車両について署名済みのため、変更にも署名が必要です。予約を開き、「その他 > 車両を変更」を使ってください。",

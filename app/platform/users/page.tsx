@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 const SHOWN = 100;
 
-/** Every sign-in account on RouteHQ: which businesses each person is in, when they last signed in, and help for them. */
+/** Every sign-in account on Lokalfleet: which businesses each person is in, when they last signed in, and help for them. */
 export default async function AdminUsersPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   await requirePlatformAdmin();
   const { q } = await searchParams;
@@ -34,7 +34,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: P
 
   return (
     <AppShell userEmail={userEmail}>
-      <AdminHeader active="/platform/users" subtitle="Every RouteHQ account. Search by email to find someone, see their businesses and help them sign in." title="Users" />
+      <AdminHeader active="/platform/users" subtitle="Every Lokalfleet account. Search by email to find someone, see their businesses and help them sign in." title="Users" />
 
       <form className="mb-4 flex flex-wrap items-end gap-2" role="search">
         <label className="!mb-0 min-w-[240px] flex-1">
@@ -84,7 +84,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: P
                               <Link className="font-semibold text-[var(--primary)] hover:underline" href={`/platform/businesses/${row.organization_id}` as Route}>
                                 {org?.name || "Deleted business"}
                               </Link>
-                              <span className="font-medium capitalize text-[var(--foreground-secondary)]"> · {row.display_name === "RouteHQ support" ? "RouteHQ support (temporary)" : row.role}</span>
+                              <span className="font-medium capitalize text-[var(--foreground-secondary)]"> · {row.display_name === "Lokalfleet support" ? "Lokalfleet support (temporary)" : row.role}</span>
                               {!row.is_active ? <span className="font-medium text-[var(--muted)]"> · removed</span> : null}
                               {org?.deleted_at ? <span className="font-bold text-[var(--danger)]"> · business closed</span> : null}
                             </li>

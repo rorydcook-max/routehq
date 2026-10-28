@@ -4,7 +4,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 /**
  * Only allow redirects to a path on this site. Without this, a crafted link
  * such as /auth/callback?next=https://evil.example would send someone from
- * RouteHQ's domain straight to an attacker's page. Protocol-relative paths
+ * Lokalfleet's domain straight to an attacker's page. Protocol-relative paths
  * ("//evil.example") and backslash tricks are rejected for the same reason.
  */
 function safeNextPath(value: string | null) {

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { activatePlanRequest } from "@/app/actions/plan";
 
-/** RouteHQ team: the business's payment arrived, switch its plan on. */
+/** Lokalfleet team: the business's payment arrived, switch its plan on. */
 export function PlanActivateButton({ organizationId }: { organizationId: string }) {
   const t = useTranslations("help");
   const router = useRouter();

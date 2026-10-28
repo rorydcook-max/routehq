@@ -1,8 +1,8 @@
-# RouteHQ — Codex Project Instructions
+# Lokalfleet — Codex Project Instructions
 
 ## Product Identity
 
-This project is RouteHQ: a production-grade, SaaS-ready vehicle rental operating system for Southeast Asia.
+This project is Lokalfleet: a production-grade, SaaS-ready vehicle rental operating system for Southeast Asia.
 
 It is NOT car-only rental software.
 

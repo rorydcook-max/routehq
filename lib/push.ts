@@ -25,7 +25,7 @@ function configure() {
     configured = false;
     return false;
   }
-  webpush.setVapidDetails(process.env.VAPID_SUBJECT || `mailto:${process.env.SUPPORT_EMAIL || "support@routehq.app"}`, publicKey, privateKey);
+  webpush.setVapidDetails(process.env.VAPID_SUBJECT || `mailto:${process.env.SUPPORT_EMAIL || "support@lokalfleet.com"}`, publicKey, privateKey);
   configured = true;
   return true;
 }
@@ -34,7 +34,7 @@ export function pushConfigured() {
   return configure();
 }
 
-/** Sends to these people's devices, whichever business they turned alerts on in (used for RouteHQ's own team). Never throws. */
+/** Sends to these people's devices, whichever business they turned alerts on in (used for Lokalfleet's own team). Never throws. */
 export async function sendPushToUsers(admin: any, userIds: string[], message: PushMessage): Promise<number> {
   try {
     if (!configure() || !userIds.length) return 0;

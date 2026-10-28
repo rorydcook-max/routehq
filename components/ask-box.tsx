@@ -24,7 +24,7 @@ type Turn = {
 };
 
 /**
- * "Ask RouteHQ": a question box available on every page. It answers from the
+ * "Ask Lokalfleet": a question box available on every page. It answers from the
  * business's own records, and can make a few changes when asked. Every change
  * is shown first and saved only when the owner presses Confirm.
  */

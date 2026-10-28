@@ -21,7 +21,7 @@ async function isCustomerPage() {
   }
 }
 
-/** RouteHQ's website pages (proxy.ts marks them). */
+/** Lokalfleet's website pages (proxy.ts marks them). */
 async function isSitePage() {
   try {
     return Boolean((await headers()).get("x-routehq-site-page"));
@@ -33,7 +33,7 @@ async function isSitePage() {
 /** The signed-in operator's brand (logo, name, colour), so pages open in it rather than switching after load. */
 async function operatorBrand() {
   try {
-    // Customer pages carry the business's own brand, and the directory and website are RouteHQ's: none takes the signed-in operator's colour.
+    // Customer pages carry the business's own brand, and the directory and website are Lokalfleet's: none takes the signed-in operator's colour.
     if ((await headers()).get("x-routehq-customer-page") || (await headers()).get("x-routehq-site-page")) return null;
     const membership = await getCurrentMembership();
     if (!membership) return null;
@@ -50,12 +50,12 @@ import "./theme-dark.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "RouteHQ",
-    template: "%s | RouteHQ"
+    default: "Lokalfleet",
+    template: "%s | Lokalfleet"
   },
   description: "The command centre for vehicle rental operations.",
-  applicationName: "RouteHQ",
-  metadataBase: new URL("https://routehq.app"),
+  applicationName: "Lokalfleet",
+  metadataBase: new URL("https://lokalfleet.com"),
   icons: {
     icon: "/routehq-icon.svg",
     shortcut: "/routehq-icon.svg",
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png?v=3"
   },
   // Opens full screen, like an app, when added to a phone's home screen.
-  appleWebApp: { capable: true, title: "RouteHQ", statusBarStyle: "default" }
+  appleWebApp: { capable: true, title: "Lokalfleet", statusBarStyle: "default" }
 };
 
 export const viewport: Viewport = {

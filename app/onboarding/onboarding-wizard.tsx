@@ -667,12 +667,12 @@ function normalizeDateToIso(value: string | null | undefined) {
 // The wizard keeps its own words because the language is chosen on its first screen, before it is saved to the account.
 const copy = {
   en: {
-    setupTitle: "Set up RouteHQ",
+    setupTitle: "Set up Lokalfleet",
     saving: "Saving…",
     continue: "Continue",
     setupComplete: "All set",
     setupCompleteBody: "Opening your dashboard…",
-    step1Title: "Welcome to RouteHQ",
+    step1Title: "Welcome to Lokalfleet",
     step1Subtitle: "Three short steps and you are ready to take bookings.",
     businessName: "Business name",
     businessPhone: "Phone number customers can call",
@@ -710,7 +710,7 @@ const copy = {
     alreadyExpired: (item: string) => `${item} has already run out`,
     nextUpcoming: (item: string, date: string) => `Next date: ${item}, ${date}. We will remind you before then.`,
     remindersTitle: "Reminders before things run out",
-    remindersBody: "Tax, insurance and services: RouteHQ tells you before they are due.",
+    remindersBody: "Tax, insurance and services: Lokalfleet tells you before they are due.",
     vehicleLater: "Add your vehicles any time from Fleet.",
     lineTitle: "Get alerts on LINE",
     lineBody: "A morning summary, and an alert when a customer books, pays or is late. Connect LINE any time from Settings.",
@@ -727,12 +727,12 @@ const copy = {
     nextService: "Next service"
   },
   th: {
-    setupTitle: "ตั้งค่า RouteHQ",
+    setupTitle: "ตั้งค่า Lokalfleet",
     saving: "กำลังบันทึก…",
     continue: "ต่อไป",
     setupComplete: "เรียบร้อยแล้ว",
     setupCompleteBody: "กำลังเปิดหน้าหลักของคุณ…",
-    step1Title: "ยินดีต้อนรับสู่ RouteHQ",
+    step1Title: "ยินดีต้อนรับสู่ Lokalfleet",
     step1Subtitle: "อีกแค่สามขั้นตอนสั้น ๆ คุณก็พร้อมรับการจอง",
     businessName: "ชื่อธุรกิจ",
     businessPhone: "เบอร์โทรที่ลูกค้าติดต่อได้",
@@ -770,7 +770,7 @@ const copy = {
     alreadyExpired: (item: string) => `${item}หมดอายุแล้ว`,
     nextUpcoming: (item: string, date: string) => `วันถัดไป: ${item} ${date} เราจะเตือนคุณก่อนถึงวันนั้น`,
     remindersTitle: "เตือนก่อนหมดอายุ",
-    remindersBody: "ภาษี ประกัน และเช็กระยะ RouteHQ จะบอกคุณก่อนถึงกำหนด",
+    remindersBody: "ภาษี ประกัน และเช็กระยะ Lokalfleet จะบอกคุณก่อนถึงกำหนด",
     vehicleLater: "เพิ่มรถได้ทุกเมื่อจากเมนูรถ",
     lineTitle: "รับการแจ้งเตือนทาง LINE",
     lineBody: "สรุปทุกเช้า และแจ้งเตือนเมื่อลูกค้าจอง จ่ายเงิน หรือคืนรถช้า เชื่อมต่อ LINE ได้ในหน้าตั้งค่า ใช้เวลาประมาณหนึ่งนาที",

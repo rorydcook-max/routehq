@@ -49,7 +49,7 @@ export default async function ResourcePage({ params }: Props) {
     url,
     encodingFormat: resource.formats.map((format) => (format === "pdf" ? "application/pdf" : "application/vnd.openxmlformats-officedocument.wordprocessingml.document")),
     isAccessibleForFree: true,
-    publisher: { "@type": "Organization", name: "RouteHQ", url: siteOrigin() }
+    publisher: { "@type": "Organization", name: "Lokalfleet", url: siteOrigin() }
   };
 
   return (

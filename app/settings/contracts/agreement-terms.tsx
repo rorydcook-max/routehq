@@ -16,7 +16,7 @@ const soft = "font-medium text-[var(--foreground-secondary)]";
 /**
  * The owner's side of the rental agreement, with nothing technical in it.
  *
- * RouteHQ writes the agreement: the layout, the standard terms in English and
+ * Lokalfleet writes the agreement: the layout, the standard terms in English and
  * Thai, and the details of each booking. The owner adds their own terms as
  * plain sentences, one box each, and sees the result straight away. The page
  * used to be an editor for the agreement's raw HTML, and what was saved there

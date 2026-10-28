@@ -1,14 +1,14 @@
 import type { MetadataRoute } from "next";
 
 /**
- * Lets owners add RouteHQ to their home screen, where it opens like an app and can send alerts.
- * Always RouteHQ's own name and icon (Rory, 27 Oct: better for the brand), whatever the business's plan;
+ * Lets owners add Lokalfleet to their home screen, where it opens like an app and can send alerts.
+ * Always Lokalfleet's own name and icon (Rory, 27 Oct: better for the brand), whatever the business's plan;
  * a business's own logo and colour still show inside the app and on its customer pages.
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "RouteHQ",
-    short_name: "RouteHQ",
+    name: "Lokalfleet",
+    short_name: "Lokalfleet",
     description: "Run your vehicle rental business from your phone.",
     start_url: "/",
     scope: "/",

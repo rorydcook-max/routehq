@@ -2,15 +2,15 @@ import { effectiveLimits, planById } from "@/lib/plans";
 
 /**
  * A business's booking address (Rory, 11 Oct 2026):
- * - routehq.app/rent/<slug>: every business, always works (the directory links here);
- * - <theirshop>.routehq.app: Pro and above;
+ * - lokalfleet.com/rent/<slug>: every business, always works (the directory links here);
+ * - <theirshop>.lokalfleet.com: Pro and above;
  * - their own domain, e.g. book.theirshop.com: Business plan.
  * Pure: used by the middleware (edge) as well as pages.
  */
 
 export const RESERVED_SUBDOMAINS = new Set([
   "www", "app", "api", "admin", "help", "support", "mail", "email", "smtp", "rent", "book", "booking", "bookings", "static", "assets", "cdn",
-  "dev", "staging", "test", "demo", "status", "blog", "docs", "routehq", "team", "login", "signup", "account", "billing", "partners", "directory"
+  "dev", "staging", "test", "demo", "status", "blog", "docs", "routehq", "lokalfleet", "lokalkeys", "team", "login", "signup", "account", "billing", "partners", "directory"
 ]);
 
 /** Vercel's address for a domain pointed at the project. */
@@ -18,7 +18,7 @@ export const DNS_CNAME_TARGET = "cname.vercel-dns.com";
 export const DNS_A_TARGET = "76.76.21.21";
 
 export function rootDomain() {
-  return String(process.env.NEXT_PUBLIC_ROOT_DOMAIN || "routehq.app").toLowerCase().replace(/^www\./, "");
+  return String(process.env.NEXT_PUBLIC_ROOT_DOMAIN || "lokalfleet.com").toLowerCase().replace(/^www\./, "");
 }
 
 export function cleanSubdomain(value: string) {
@@ -97,7 +97,7 @@ export function subdomainUrl(label: string) {
 
 export type BookingAddressOrg = Plan & { slug: string; booking_subdomain?: string | null; custom_domain?: string | null; custom_domain_status?: string | null };
 
-/** The address to share: their own domain once it works, else their subdomain, else the RouteHQ path. */
+/** The address to share: their own domain once it works, else their subdomain, else the Lokalfleet path. */
 export function bookingAddress(org: BookingAddressOrg): { url: string; kind: "domain" | "subdomain" | "path" } {
   if (org.custom_domain && org.custom_domain_status === "live" && canUseOwnDomain(org)) return { url: `https://${org.custom_domain}`, kind: "domain" };
   if (org.booking_subdomain && canUseSubdomain(org)) return { url: subdomainUrl(org.booking_subdomain), kind: "subdomain" };

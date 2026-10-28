@@ -12,7 +12,7 @@ import { supportedLocaleOptions } from "@/lib/i18n/locales";
 
 const OWNER_ONLY = "Only the business owner can use the assistant.";
 
-/** "Ask RouteHQ": answers a question from the business's records, or proposes a change for the owner to confirm. */
+/** "Ask Lokalfleet": answers a question from the business's records, or proposes a change for the owner to confirm. */
 export async function askRouteHq(question: string, history: AskTurn[] = []): Promise<AskAnswer> {
   const membership = await getCurrentMembership();
   if (!membership) return { ok: false, error: await said("Please sign in again.") };

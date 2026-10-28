@@ -13,7 +13,7 @@ import { parseCustomLimits, type CustomLimits } from "@/lib/plans";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-/** RouteHQ admin console actions. Each one checks the person is a platform admin, makes the change, and logs it. */
+/** Lokalfleet admin console actions. Each one checks the person is a platform admin, makes the change, and logs it. */
 
 const TIERS = ["free", "starter", "pro", "business"] as const;
 // Typed as never so the code after a `back(...)` knows it stopped there.
@@ -132,7 +132,7 @@ export async function adminSendPasswordReset(_state: PersonActionState, formData
 
   const sent = await sendEmail({
     to: email,
-    subject: "Reset your RouteHQ password",
+    subject: "Reset your Lokalfleet password",
     text: `Hello,\n\nRouteHQ support has sent you a link to choose a new password:\n\n${link}\n\nThe link works once and stops working after a short while. If you didn't ask for this, you can ignore this email: your password stays the same.\n\nRouteHQ`,
     metadata: { kind: "admin_password_reset" }
   });
@@ -182,8 +182,8 @@ export async function adminChangeEmail(_state: PersonActionState, formData: Form
   const notice = (to: string) =>
     sendEmail({
       to,
-      subject: "Your RouteHQ email address was changed",
-      text: `Hello,\n\nRouteHQ support changed the email address you sign in with${before ? ` from ${before}` : ""} to ${email}.\n\nIf you didn't ask for this, reply to this email or contact RouteHQ support straight away.\n\nRouteHQ`,
+      subject: "Your Lokalfleet email address was changed",
+      text: `Hello,\n\nRouteHQ support changed the email address you sign in with${before ? ` from ${before}` : ""} to ${email}.\n\nIf you didn't ask for this, reply to this email or contact Lokalfleet support straight away.\n\nRouteHQ`,
       metadata: { kind: "admin_email_changed" }
     });
   const results = await Promise.all([notice(email), ...(before ? [notice(before)] : [])]);
@@ -298,8 +298,8 @@ async function setActiveOrganizationCookie(organizationId: string | null) {
 }
 
 /**
- * Start viewing a business as RouteHQ support: a short reason, a temporary manager membership named
- * "RouteHQ support", a session that ends after 2 hours, and the app switched to that business.
+ * Start viewing a business as Lokalfleet support: a short reason, a temporary manager membership named
+ * "Lokalfleet support", a session that ends after 2 hours, and the app switched to that business.
  */
 export async function adminStartViewing(formData: FormData) {
   const admin = await requirePlatformAdmin();
@@ -396,7 +396,7 @@ export async function adminDeleteBusiness(formData: FormData) {
 
   const { error } = await db.from("organizations").update({ deleted_at: new Date().toISOString() }).eq("id", organizationId).is("deleted_at", null);
   if (error) back(organizationId, "error");
-  // Anyone from RouteHQ viewing it loses access now.
+  // Anyone from Lokalfleet viewing it loses access now.
   const { data: open } = await db.from("admin_view_sessions").select("*").eq("organization_id", organizationId).is("ended_at", null);
   for (const session of (open || []) as ViewSession[]) await endViewSession(session, "stopped", admin.email);
   await logAdminAction(admin, { action: "business_deleted", organizationId, details: { name: org.name, paid_until: paidUp ? org.next_payment_due : null } });

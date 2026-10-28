@@ -1,7 +1,7 @@
 import { requirePlatformAdmin } from "@/lib/admin";
 import { setTelegramWebhook } from "@/lib/telegram";
 
-/** One-time setup by a RouteHQ platform admin: points the Telegram bot at this app's webhook. */
+/** One-time setup by a Lokalfleet platform admin: points the Telegram bot at this app's webhook. */
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {

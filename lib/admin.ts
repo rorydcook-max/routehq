@@ -4,8 +4,8 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isPlatformAdmin } from "@/lib/support";
 
 /**
- * RouteHQ admin console: helpers for platform admins only (table platform_admins).
- * The console is RouteHQ's internal tool, so its words are English only and live in the code, not the locale files.
+ * Lokalfleet admin console: helpers for platform admins only (table platform_admins).
+ * The console is Lokalfleet's internal tool, so its words are English only and live in the code, not the locale files.
  */
 
 export type AdminUser = { userId: string; email: string | null };
@@ -139,9 +139,9 @@ export const ACTION_LABEL: Record<string, string> = {
   member_removed: "Removed from business",
   custom_plan_set: "Custom plan saved",
   custom_plan_cleared: "Custom plan cleared",
-  view_started: "RouteHQ support started viewing",
-  view_ended: "RouteHQ support stopped viewing",
-  view_expired: "RouteHQ support access ran out",
+  view_started: "Lokalfleet support started viewing",
+  view_ended: "Lokalfleet support stopped viewing",
+  view_expired: "Lokalfleet support access ran out",
   business_deleted: "Business closed",
   business_restored: "Business restored",
   business_purged: "Business deleted permanently"

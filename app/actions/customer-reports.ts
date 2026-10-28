@@ -11,7 +11,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 type Result = { ok: true } | { ok: false; error: string };
 
 /**
- * "Warn other RouteHQ businesses": a report about a rental that ended badly. It needs a rental the vehicle actually
+ * "Warn other Lokalfleet businesses": a report about a rental that ended badly. It needs a rental the vehicle actually
  * went out on, and something to recognise the person by (passport, licence or phone); the owner or a manager files it.
  */
 export async function fileCustomerReport(formData: FormData): Promise<Result> {
@@ -59,7 +59,7 @@ export async function fileCustomerReport(formData: FormData): Promise<Result> {
     rental_id: rental.id,
     event_type: "customer_reported",
     title: "Other businesses warned",
-    detail: `Reported to other RouteHQ businesses: ${kind.replace(/_/g, " ")}${amount ? ` (฿${amount.toLocaleString("en-US")})` : ""}.`
+    detail: `Reported to other Lokalfleet businesses: ${kind.replace(/_/g, " ")}${amount ? ` (฿${amount.toLocaleString("en-US")})` : ""}.`
   });
   revalidatePath(`/customers/${customer.id}`);
   return { ok: true };

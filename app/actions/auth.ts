@@ -75,17 +75,17 @@ export type ShellContext = {
   unreadChats: number;
   /** Payments and jobs due today or overdue, shown as a badge on To do. */
   dueTasks: number;
-  /** Help conversations with a reply from RouteHQ not yet read. */
+  /** Help conversations with a reply from Lokalfleet not yet read. */
   helpReplies: number;
-  /** The operator's brand, when their plan lets it replace RouteHQ's in the app. */
+  /** The operator's brand, when their plan lets it replace Lokalfleet's in the app. */
   brand: import("@/lib/shell-brand").ShellBrand | null;
   /** The person's own name, for the account chip. */
   displayName?: string | null;
-  /** A RouteHQ platform admin: the side menu shows the admin console link. Display only; every admin page checks again. */
+  /** A Lokalfleet platform admin: the side menu shows the admin console link. Display only; every admin page checks again. */
   platformAdmin?: boolean;
-  /** The admin is viewing this business as RouteHQ support (admin console "View as"): the banner with Stop viewing. */
+  /** The admin is viewing this business as Lokalfleet support (admin console "View as"): the banner with Stop viewing. */
   viewing?: { organizationName: string; endsAt: string } | null;
-  /** Someone from RouteHQ support has temporary access to this business until then: the notice their team sees. */
+  /** Someone from Lokalfleet support has temporary access to this business until then: the notice their team sees. */
   supportUntil?: string | null;
 };
 
@@ -136,13 +136,13 @@ export async function getShellContext(): Promise<ShellContext> {
     shellBrand(supabase, membership.organizationId),
     supabase.from("support_threads").select("id", { count: "exact", head: true }).eq("organization_id", membership.organizationId).eq("unread_by_business", true)
   ]);
-  // Their name for the account chip in the side menu (the email is the fallback), and whether to show the RouteHQ admin link.
+  // Their name for the account chip in the side menu (the email is the fallback), and whether to show the Lokalfleet admin link.
   const [{ data: me }, { data: adminRow }] = await Promise.all([
     supabase.from("users").select("full_name").eq("id", membership.userId).maybeSingle(),
     supabase.from("platform_admins").select("user_id").eq("user_id", membership.userId).maybeSingle()
   ]);
 
-  // A business RouteHQ has closed is not offered in the switcher.
+  // A business Lokalfleet has closed is not offered in the switcher.
   const organizations = ((data || []) as any[])
     .filter((row) => !row.organizations?.deleted_at)
     .map((row) => ({
@@ -165,8 +165,8 @@ export async function getShellContext(): Promise<ShellContext> {
 }
 
 /**
- * RouteHQ support's temporary access ("View as this business", migration 0108). The admin doing it gets their
- * banner; the business's own team gets "RouteHQ support has access until 14:30". Sessions that have run out are
+ * Lokalfleet support's temporary access ("View as this business", migration 0108). The admin doing it gets their
+ * banner; the business's own team gets "Lokalfleet support has access until 14:30". Sessions that have run out are
  * closed here (membership removed, logged); access itself is already refused on every request by
  * lib/auth/active-organization.ts. Never throws: before the migration there is simply nothing to show.
  */
@@ -217,7 +217,7 @@ export async function switchActiveOrganization(formData: FormData) {
     .eq("organization_id", organizationId)
     .eq("is_active", true)
     .maybeSingle();
-  // A business RouteHQ has closed can't be switched to.
+  // A business Lokalfleet has closed can't be switched to.
   const { data: target } = membership?.organization_id
     ? await supabase.from("organizations").select("deleted_at").eq("id", membership.organization_id).maybeSingle()
     : { data: null };
@@ -340,7 +340,7 @@ export async function inviteUser(_state: AuthActionState, formData: FormData): P
   const admin = createSupabaseAdminClient() as any;
   const label = say(role === "owner" ? "iv_roleOwner" : role === "manager" ? "iv_roleManager" : "iv_roleTeammate");
 
-  // Someone who already has a RouteHQ account - perhaps working for another
+  // Someone who already has a Lokalfleet account - perhaps working for another
   // business too - is added directly. There is no invite email to send them:
   // they switch to this business from the business menu after signing in.
   const { data: existingUserId, error: lookupError } = await admin.rpc("find_auth_user_id_by_email", { p_email: email });

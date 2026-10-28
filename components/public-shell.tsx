@@ -19,7 +19,7 @@ export function PublicShell({
   className = ""
 }: {
   width: keyof typeof PUBLIC_WIDTH;
-  /** Left of the header row: the business (PublicBrand) or the RouteHQ logo. */
+  /** Left of the header row: the business (PublicBrand) or the Lokalfleet logo. */
   brand?: ReactNode;
   children: ReactNode;
   className?: string;

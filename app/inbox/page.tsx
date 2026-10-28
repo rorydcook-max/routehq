@@ -67,7 +67,7 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
   // "Owed" beside a booking is what is due by today on a vehicle that has gone out, as everywhere else —
   // not the whole balance, which counts rent months ahead.
   const dueNow = await amountDueNowByRental(supabase, ((bookingRows || []) as any[]).map((row) => row.id));
-  // Whoever is writing: what other RouteHQ businesses have reported about them, by the customer they're linked to
+  // Whoever is writing: what other Lokalfleet businesses have reported about them, by the customer they're linked to
   // or, before they're linked, by the WhatsApp number they write from.
   const linked = selected?.customer_id
     ? (await supabase.from("customers").select("phone, whatsapp_number, passport_number, driver_license_number").eq("id", selected.customer_id).eq("organization_id", organization.id).maybeSingle()).data

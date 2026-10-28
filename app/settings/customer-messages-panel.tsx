@@ -7,7 +7,7 @@ import { SwitchField } from "@/components/switch-field";
 
 const KINDS = ["handover", "return", "rent_due", "rent_late", "vehicle_due", "signature"];
 
-/** One switch for the messages RouteHQ sends customers on the business's behalf. Saves on change. */
+/** One switch for the messages Lokalfleet sends customers on the business's behalf. Saves on change. */
 export function CustomerMessagesPanel({ enabled, hasChannel, emailOn = false, off: initialOff = [] }: { enabled: boolean; hasChannel: boolean; emailOn?: boolean; off?: string[] }) {
   const [off, setOff] = useState<string[]>(initialOff);
   function toggle(kind: string, on: boolean) {

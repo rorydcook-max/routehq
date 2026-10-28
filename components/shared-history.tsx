@@ -8,8 +8,8 @@ import { dateFormat } from "@/lib/i18n/dates";
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
 /**
- * What other RouteHQ businesses have reported about this person (shared customer history), with what is needed to
- * judge it: each report in the reporter's own words, who reported it and their track record (how long on RouteHQ,
+ * What other Lokalfleet businesses have reported about this person (shared customer history), with what is needed to
+ * judge it: each report in the reporter's own words, who reported it and their track record (how long on Lokalfleet,
  * how many rentals, how many customers they have reported), whether it was settled, and the customer's side. A
  * warning to ask about, not a verdict, and the wording says so.
  */

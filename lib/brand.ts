@@ -1,11 +1,11 @@
 /**
  * An operator's brand colour, turned into the handful of CSS variables the whole
- * app is drawn with. One colour in; RouteHQ works out the hover, the tint and
+ * app is drawn with. One colour in; Lokalfleet works out the hover, the tint and
  * the focus ring so everything stays readable.
  */
 
 export const ROUTEHQ_BRAND = "#0e5e6f";
-/** RouteHQ's colours before Lagoon: a business that has one saved simply has RouteHQ's own. */
+/** Lokalfleet's colours before Lagoon: a business that has one saved simply has Lokalfleet's own. */
 const EARLIER_ROUTEHQ = ["#24456b"];
 
 export function isBrandColour(value: unknown): value is string {
@@ -62,13 +62,13 @@ export function brandPalette(colour: string): BrandPalette {
   };
 }
 
-/** The CSS that re-colours a page. Empty when the colour is RouteHQ's own. */
+/** The CSS that re-colours a page. Empty when the colour is Lokalfleet's own. */
 export function brandCss(colour: string | null | undefined) {
   if (!isBrandColour(colour) || colour.toLowerCase() === ROUTEHQ_BRAND || EARLIER_ROUTEHQ.includes(colour.toLowerCase())) return "";
   return brandCssAlways(colour);
 }
 
-/** The same CSS for any colour, RouteHQ's own included (the settings preview needs that). */
+/** The same CSS for any colour, Lokalfleet's own included (the settings preview needs that). */
 export function brandCssAlways(colour: string) {
   const palette = brandPalette(colour);
   return `:root{--primary:${palette.primary};--primary-hover:${palette.hover};--primary-light:${palette.light};--primary-blue:${palette.primary};--primary-blue-hover:${palette.hover};--primary-blue-light:${palette.light};--primary-strong:${palette.hover};--gradient-brand:${palette.primary};--gradient-teal:${palette.primary};--info:${palette.primary};--info-light:${palette.light};--sidebar-active:${palette.primary};--sidebar-text-active:${palette.primary};--kind-move:${palette.primary};--kind-move-bg:${palette.light};--focus-ring:${palette.ring};--focus-ring-strong:${palette.ringStrong};--band:${palette.primary};--band-action:#ffffff;--band-logo-accent:#ffffff;--band-action-ink:${palette.primary};--analytics-panel:${palette.primary};--analytics-card:${palette.hover};}${brandDarkCss(colour)}`;

@@ -1,6 +1,6 @@
 /**
  * The importer's preview: a spreadsheet, read through its column mapping, turned
- * into the records RouteHQ would create, in RouteHQ's own shape. The owner sees
+ * into the records Lokalfleet would create, in Lokalfleet's own shape. The owner sees
  * and corrects these cards; nothing is written until they say so.
  *
  * Rows with a problem are kept, marked "needs a look", not thrown away.

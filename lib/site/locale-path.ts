@@ -1,7 +1,7 @@
 import { supportedLocaleCodes } from "@/lib/i18n/locales";
 
 /**
- * Language-prefixed addresses for RouteHQ's own website (SEO: one address per language).
+ * Language-prefixed addresses for Lokalfleet's own website (SEO: one address per language).
  *
  * English lives at the root (/pricing, /guides/<slug>); every other language under its code (/th/pricing,
  * /zh-TW/guides/<slug>). proxy.ts strips the prefix, serves the unprefixed page and passes the language in

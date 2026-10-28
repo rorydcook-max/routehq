@@ -41,7 +41,7 @@ export function publicBookingSettings(settings: any): PublicBookingSettings {
   const hours = Number(raw?.hold_hours);
   const deposit = Number(raw?.deposit);
   return {
-    // On by default (26 Oct 2026): the online booking page is how the RouteHQ booking site books a business.
+    // On by default (26 Oct 2026): the online booking page is how the Lokalfleet booking site books a business.
     enabled: raw?.enabled !== false,
     holdHours: Number.isFinite(hours) && hours > 0 ? Math.min(hours, 168) : 24,
     deposit: Number.isFinite(deposit) && deposit > 0 ? deposit : 0,

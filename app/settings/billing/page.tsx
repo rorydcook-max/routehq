@@ -71,7 +71,7 @@ export default async function BillingPage() {
   const trialDays = daysUntil(organization?.trial_ends_at);
   const contacts = supportContacts();
   const plan = planById(organization?.subscription_tier);
-  // What this business actually gets: the plan, with any custom limits RouteHQ set for it on top.
+  // What this business actually gets: the plan, with any custom limits Lokalfleet set for it on top.
   const limits = effectiveLimits({ subscription_tier: organization?.subscription_tier, custom_limits: customPlan.custom_limits });
   // Free chosen during the trial: once the trial is over they are simply on Free.
   const rawStatus = String(organization?.subscription_status || "trial");
@@ -202,7 +202,7 @@ export default async function BillingPage() {
             </a>
           ) : null}
           {contacts.email ? (
-            <a className="secondary-action pressable" href={`mailto:${contacts.email}?subject=${encodeURIComponent("RouteHQ subscription")}`}>
+            <a className="secondary-action pressable" href={`mailto:${contacts.email}?subject=${encodeURIComponent("Lokalfleet subscription")}`}>
               {say("bl_email")}
             </a>
           ) : null}

@@ -74,7 +74,7 @@ const RULES: Array<[string, RegExp]> = [
   ["type", /^\s*(purchase|item|description|category|type|what|details?|expense item|for|รายการ|ประเภท|รายละเอียด)\s*$/i]
 ];
 
-/** The RouteHQ field a header most likely means, skipping fields already used. Null if nothing fits. */
+/** The Lokalfleet field a header most likely means, skipping fields already used. Null if nothing fits. */
 export function guessField(header: string, used: Set<string>): string | null {
   // "Date (2)", "Date (heading)": the same heading again, or a date written as a heading row.
   const text = String(header || "").replace(/\s*\((\d+|heading)\)\s*$/, "").trim();

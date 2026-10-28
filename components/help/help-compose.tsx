@@ -11,7 +11,7 @@ import { PICKABLE_TOPICS, SUPPORT_ACCEPT, SUPPORT_BUCKET, SUPPORT_MAX_FILES, fil
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
 /**
- * Write to the RouteHQ team (or, on the team page, back to a business), with files:
+ * Write to the Lokalfleet team (or, on the team page, back to a business), with files:
  * spreadsheets, photos of notebooks and registration books, PDFs. Files go straight
  * from the phone to storage, so large ones are fine.
  */

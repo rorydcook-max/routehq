@@ -53,7 +53,7 @@ export async function POST(request: Request) {
   const formData = await request.formData();
   const file = formData.get("file");
 
-  // Photos of registration books, notebook pages and lists: read into RouteHQ's own fields.
+  // Photos of registration books, notebook pages and lists: read into Lokalfleet's own fields.
   const photos = formData.getAll("photo").filter((item): item is File => item instanceof File && item.size > 0 && item.type.startsWith("image/"));
   if (photos.length) {
     if (!visionProvider()) return NextResponse.json({ error: await said("Reading photos isn't switched on yet. Send them to us in Help and we'll bring them in.") }, { status: 400 });

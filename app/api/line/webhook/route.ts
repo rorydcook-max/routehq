@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
     if (e.type === "follow") {
       await reply(
         e.replyToken,
-        "Welcome to RouteHQ! To get your fleet alerts here, open RouteHQ → Settings → LINE, tap “Get a connection code” and send the code to this chat."
+        "Welcome to Lokalfleet! To get your fleet alerts here, open Lokalfleet → Settings → LINE, tap “Get a connection code” and send the code to this chat."
       );
       continue;
     }
@@ -81,11 +81,11 @@ export async function POST(req: NextRequest) {
       if (!match) continue;
       const result = await linkWithCode(userId, match[0]);
       if (result.ok) {
-        await reply(e.replyToken, `✅ Connected. RouteHQ alerts and your morning summary for ${result.name} will arrive in this chat.`);
+        await reply(e.replyToken, `✅ Connected. Lokalfleet alerts and your morning summary for ${result.name} will arrive in this chat.`);
       } else if (result.reason === "expired") {
-        await reply(e.replyToken, "That code has expired. Get a new one in RouteHQ → Settings → LINE and send it here.");
+        await reply(e.replyToken, "That code has expired. Get a new one in Lokalfleet → Settings → LINE and send it here.");
       } else {
-        await reply(e.replyToken, "That code wasn't recognised. Check it in RouteHQ → Settings → LINE and try again.");
+        await reply(e.replyToken, "That code wasn't recognised. Check it in Lokalfleet → Settings → LINE and try again.");
       }
     }
   }

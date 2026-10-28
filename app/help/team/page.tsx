@@ -13,7 +13,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const BANGKOK = "Asia/Bangkok";
 
-/** RouteHQ's own view: every business's Help conversations. Platform admins only. */
+/** Lokalfleet's own view: every business's Help conversations. Platform admins only. */
 export default async function HelpTeamPage({ searchParams }: { searchParams: Promise<{ show?: string }> }) {
   const [{ show }, userEmail, membership, t, locale, tr] = await Promise.all([searchParams, getCurrentUserEmail(), getCurrentMembership(), getTranslations("help"), getLocale(), getTranslations("renters")]);
   const supabase = (await createSupabaseServerClient()) as any;
@@ -25,7 +25,7 @@ export default async function HelpTeamPage({ searchParams }: { searchParams: Pro
   return (
     <AppShell userEmail={userEmail}>
       <div className="space-y-4">
-        {/* Part of the RouteHQ admin console: the same header and tabs as the other admin pages. */}
+        {/* Part of the Lokalfleet admin console: the same header and tabs as the other admin pages. */}
         <AdminHeader active="/help/team" subtitle={t("teamSubtitle")} title={t("teamTitle")} />
         <div className="chip-row flex flex-wrap gap-2">
           {(["waiting", "all"] as const).map((value) => (

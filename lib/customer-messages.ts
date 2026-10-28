@@ -233,7 +233,7 @@ export async function messageCustomer(admin: any, input: Input): Promise<Custome
 
   // 2. Email, the one channel a business can start a conversation on.
   if (customer?.email && isEmailConfigured()) {
-    const result = await sendEmail({ to: customer.email, subject: wording.t("emailSubject", { business: organization?.name || "RouteHQ" }), text: body });
+    const result = await sendEmail({ to: customer.email, subject: wording.t("emailSubject", { business: organization?.name || "Lokalfleet" }), text: body });
     if (result.status === "sent") {
       await log("sent", "email", { provider: result.provider });
       return { sent: true, via: "email" };

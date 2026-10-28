@@ -31,10 +31,10 @@ export function pickActiveMembership(memberships: ActiveMembership[], preferredO
 }
 
 /**
- * The name on the temporary membership a RouteHQ admin gets while viewing a business ("View as this business"
+ * The name on the temporary membership a Lokalfleet admin gets while viewing a business ("View as this business"
  * in the admin console). Such a membership only counts while its admin_view_sessions row is live.
  */
-export const SUPPORT_DISPLAY_NAME = "RouteHQ support";
+export const SUPPORT_DISPLAY_NAME = "Lokalfleet support";
 
 type MembershipRow = ActiveMembership & { display_name?: string | null; organizations?: { deleted_at?: string | null } | null };
 
@@ -42,9 +42,9 @@ const isSupportMembership = (row: MembershipRow) => row.display_name === SUPPORT
 
 /**
  * Returns the same { data, error } shape as a Supabase single-row query, plus `closed`: true when the person's
- * only businesses have been closed (soft-deleted by RouteHQ), so the app can say so instead of offering setup.
+ * only businesses have been closed (soft-deleted by Lokalfleet), so the app can say so instead of offering setup.
  *
- * Two kinds of membership never count: one in a closed business, and a RouteHQ support membership whose viewing
+ * Two kinds of membership never count: one in a closed business, and a Lokalfleet support membership whose viewing
  * session has ended or run out (checked here, on every request, so an expired session can't keep access).
  */
 export async function loadActiveMembership(supabase: any, userId: string, preferredOrganizationId?: string | null) {

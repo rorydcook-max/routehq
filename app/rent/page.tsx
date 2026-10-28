@@ -44,7 +44,7 @@ export default async function DirectoryPage({ searchParams }: { searchParams: Pr
   return (
     <PublicShell
       brand={
-        <a aria-label="RouteHQ" className="inline-flex" href="/rent">
+        <a aria-label="Lokalfleet" className="inline-flex" href="/rent">
           <RouteHqLogo showDescriptor={false} />
         </a>
       }

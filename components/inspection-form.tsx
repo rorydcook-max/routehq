@@ -1541,7 +1541,7 @@ export function InspectionForm({ context, unsigned = false, blocker = null, bloc
           {typeof navigator !== "undefined" && "share" in navigator ? (
             <button
               className={`${touchButton} mt-4 border border-[var(--border)] bg-white text-[var(--foreground-secondary)]`}
-              onClick={() => navigator.share?.({ title: "RouteHQ inspection summary", text: `${titleFor(context)} inspection summary is ready.` })}
+              onClick={() => navigator.share?.({ title: "Lokalfleet inspection summary", text: `${titleFor(context)} inspection summary is ready.` })}
               type="button"
             >
               {t("shareWithCustomer")}

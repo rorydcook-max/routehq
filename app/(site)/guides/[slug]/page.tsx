@@ -69,7 +69,7 @@ export default async function GuidePage({ params }: Props) {
       mainEntityOfPage: { "@type": "WebPage", "@id": url },
       ...(guide.cover ? { image: guide.cover.startsWith("http") ? guide.cover : `${siteOrigin()}${guide.cover}` } : {}),
       author: { "@type": "Person", name: author, jobTitle: m("authorRole"), description: m("authorBio") },
-      publisher: { "@type": "Organization", name: "RouteHQ", url: siteOrigin(), logo: { "@type": "ImageObject", url: `${siteOrigin()}/routehq-logo.svg` } }
+      publisher: { "@type": "Organization", name: "Lokalfleet", url: siteOrigin(), logo: { "@type": "ImageObject", url: `${siteOrigin()}/routehq-logo.svg` } }
     },
     {
       "@context": "https://schema.org",

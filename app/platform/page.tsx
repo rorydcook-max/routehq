@@ -33,7 +33,7 @@ export default async function AdminOverviewPage() {
     .filter((b) => b.status === "active")
     .reduce((sum, b) => {
       const monthly = b.customPrice ?? planById(b.tier).monthly;
-      return sum + (b.foundingMember ? monthly / 2 : monthly) * (b.interval === "yearly" ? 11 / 12 : 1);
+      return sum + monthly * (b.interval === "yearly" ? 11 / 12 : 1);
     }, 0);
   const names = new Map(businesses.map((b) => [b.id, b.name]));
 
@@ -41,7 +41,7 @@ export default async function AdminOverviewPage() {
     ["Businesses", String(live.length), `${count((b) => Date.parse(b.createdAt || "") >= weekAgo)} new this week · ${count((b) => Date.parse(b.createdAt || "") >= monthAgo)} in 30 days`],
     ["On a free trial", String(count((b) => b.status === "trial")), `${endingSoon.length} ending in 7 days`],
     ["Paying", String(count((b) => b.status === "active")), `${count((b) => b.status === "past_due")} payment late`],
-    ["Monthly revenue", formatPlanPrice(Math.round(mrr), "THB", "en-GB"), "List prices, founding discount applied"],
+    ["Monthly revenue", formatPlanPrice(Math.round(mrr), "THB", "en-GB"), "List prices, custom prices where set"],
     ["Catalogue suggestions waiting", String(catalogWaiting || 0), "New makes and models from operators", "/platform/catalog"]
   ];
 

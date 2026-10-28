@@ -4,7 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { ChevronDown } from "lucide-react";
 import { numberLocale } from "@/lib/i18n/dates";
 import { supportedLocaleCodes } from "@/lib/i18n/locales";
-import { BUSINESS_INCLUDED, FOUNDING_SLOTS, PLANS, TRIAL_DAYS, YEARLY_MONTHS, fleetText, type Plan } from "@/lib/plans";
+import { BUSINESS_INCLUDED, PLANS, TRIAL_DAYS, YEARLY_MONTHS, fleetText, type Plan } from "@/lib/plans";
 import { formatPlanPrice, planCurrency, planPrices, yearlyOf } from "@/lib/plan-currency";
 import { isSiteCurrency, visitorCurrency } from "@/lib/site-currency";
 import { FinalCta } from "../_components/final-cta";
@@ -42,7 +42,6 @@ function differences(plan: Plan, say: Say, number: (value: number) => string, lo
   if (plan.severalLocations) lines.push(say("pl_locations"));
   if (plan.whiteLabel) lines.push(logoLine);
   if (plan.customDomain) lines.push(say("pl_ownDomain"));
-  if (plan.setupService) lines.push(say("pl_setup"));
   if (plan.prioritySupport) lines.push(say("pl_support"));
   return lines;
 }
@@ -84,10 +83,9 @@ export default async function PricingPage({ searchParams }: { searchParams: Prom
   const cardLines = Object.fromEntries(PLANS.map((plan) => [plan.id, differences(plan, say, number, m("planLogoShort"))]));
   const moreLines = PLANS.some((plan) => lines[plan.id].length > CARD_LINES);
 
-  const included = ["Bookings", "Handover", "Payments", "Reminders", "Inbox", "Paperwork", "Reports", "Owners", "BookingPage", "Partners", "Languages"];
-  const faqs = ["Founding", "Yearly", "Trial", "Bikes", "Currency", "Grow"];
+  const included = ["Import", "Bookings", "Handover", "Payments", "Reminders", "Inbox", "Paperwork", "Reports", "Owners", "BookingPage", "Partners", "Languages"];
+  const faqs = ["Yearly", "Trial", "Bikes", "Currency", "Grow"];
   const faqValues: Record<string, Record<string, string | number>> = {
-    Founding: { count: FOUNDING_SLOTS },
     Yearly: { months: YEARLY_MONTHS },
     Trial: { days: TRIAL_DAYS }
   };

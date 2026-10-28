@@ -16,7 +16,6 @@ type Say = (key: string, values?: Record<string, string | number>) => string;
 export function PendingPlan({
   what,
   amount,
-  fullAmount,
   qrSvg,
   bankDetails,
   currency,
@@ -26,7 +25,6 @@ export function PendingPlan({
 }: {
   what: string;
   amount: string;
-  fullAmount: string | null;
   qrSvg: string | null;
   bankDetails: string | null;
   currency: string;
@@ -45,7 +43,6 @@ export function PendingPlan({
     <section className="card mt-3 border-2 border-[var(--warning-line)] p-4" id="pending-plan">
       <h2 className="card-title">{renewalDate ? say("pl_renewalTitle") : say("pl_pendingTitle")}</h2>
       <p className="mt-1 text-[17px] font-bold text-[var(--foreground)]">{what}</p>
-      {fullAmount ? <p className="mt-0.5 text-sm font-semibold text-[var(--success)]">{say("pl_foundingApplied", { amount: fullAmount })}</p> : null}
 
       {renewalDate ? (
         <p className="mt-3 font-medium text-[var(--foreground-secondary)]">{say("pl_renewalBody", { date: renewalDate })}</p>

@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
   outputFileTracingRoot: path.join(__dirname),
   // Headless Chrome for PDFs: loaded from node_modules at runtime, not bundled.
   serverExternalPackages: ["puppeteer-core", "@sparticuz/chromium"],
+  async redirects() {
+    // The "For owners" page was dropped (28 Oct 2026): the website speaks only to rental businesses for now.
+    return [{ source: "/owners", destination: "/home", permanent: true }];
+  },
   experimental: {
     // Going back to a page seen in the last 30 seconds is instant instead of loading it again.
     // Every save already clears this (revalidatePath), so your own changes always show straight away.

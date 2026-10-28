@@ -81,19 +81,6 @@ export async function adminExtendTrial(formData: FormData) {
   back(organizationId, "trial");
 }
 
-/** Founding member price (half price for life) on or off. */
-export async function adminSetFounding(formData: FormData) {
-  const admin = await requirePlatformAdmin();
-  const organizationId = String(formData.get("organizationId") || "");
-  const on = formData.get("on") === "1";
-  const { db, org } = await current(organizationId);
-  const { error } = await db.from("organizations").update({ founding_member: on }).eq("id", organizationId);
-  if (error) back(organizationId, "error");
-  await logAdminAction(admin, { action: on ? "founding_on" : "founding_off", organizationId, details: { was: !!org.founding_member } });
-  revalidatePath("/platform", "layout");
-  back(organizationId, "founding");
-}
-
 /* ------------------------------------------------------------------ People (Users page and business Team table) */
 
 export type PersonActionState = { ok?: string; error?: string; link?: string };

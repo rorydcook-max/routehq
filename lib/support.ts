@@ -26,9 +26,9 @@ export function supportContacts() {
   };
 }
 
-/** Yearly Pro and above: the import is done for them. */
-export function importIncluded(organization: { subscription_tier?: string | null; subscription_status?: string | null; billing_interval?: string | null }) {
-  return planById(organization.subscription_tier).setupService && organization.billing_interval === "yearly";
+/** Importing a business's existing records is free on every plan (Rory, 28 Oct): the team finishes what the assistant can't. */
+export function importIncluded(_organization: { subscription_tier?: string | null; subscription_status?: string | null; billing_interval?: string | null }) {
+  return true;
 }
 
 export async function isPlatformAdmin(supabase: any, userId: string | null | undefined) {

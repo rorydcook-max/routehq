@@ -104,7 +104,7 @@ export default async function RootLayout({
         <BrandStyle colour={brand?.colour || null} />
         {/* Customer pages get only their few words with the page. The staff app loads its words once as a
             cached file (StaffMessages), so they are not re-sent with every save. */}
-        {/* The website (home, pricing, owners) is drawn on the server: its few client parts need the language, not the words. */}
+        {/* The website (home, pricing) is drawn on the server: its few client parts need the language, not the words. */}
         {customerPage ? (
           <NextIntlClientProvider>{page}</NextIntlClientProvider>
         ) : sitePage ? (

@@ -22,7 +22,6 @@ function differences(plan: Plan, say: Say, number: (value: number) => string): s
   if (plan.severalLocations) lines.push(say("pl_locations"));
   if (plan.whiteLabel) lines.push(say("pl_whiteLabel"));
   if (plan.customDomain) lines.push(say("pl_ownDomain"));
-  if (plan.setupService) lines.push(say("pl_setup"));
   if (plan.prioritySupport) lines.push(say("pl_support"));
   return lines;
 }
@@ -105,9 +104,6 @@ export function PlanCards({
           </button>
         </div>
       </div>
-
-      {/* The founding offer is worth seeing before the prices, not as a footnote under them. */}
-      <p className="mt-4 rounded-2xl bg-[var(--success-light)] px-4 py-3 font-semibold text-[var(--foreground)]">{say("pl_founding")}</p>
 
       <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         {PLANS.map((plan) => {

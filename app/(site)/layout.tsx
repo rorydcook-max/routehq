@@ -12,7 +12,7 @@ const serif = Instrument_Serif({ subsets: ["latin"], weight: "400", style: "ital
 
 /**
  * RouteHQ's public website: the home page signed-out visitors see at "/" (proxy.ts rewrites "/" to /home for them),
- * /pricing and /owners. Server-rendered, in the visitor's language (the same choice the sign-in pages use).
+ * /pricing. Server-rendered, in the visitor's language (the same choice the sign-in pages use).
  */
 export default async function SiteLayout({ children }: { children: ReactNode }) {
   const t = await getTranslations("site");

@@ -31,9 +31,9 @@ async function resolveBookingSite(target: { label: string } | { host: string }, 
 
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
-  // RouteHQ's own website: the home page (what a signed-out visitor sees at "/", rewritten below), plans, and the page
-  // for vehicle owners. Marked so the root layout sends them no staff-app words.
-  const isSitePage = pathname === "/home" || pathname === "/pricing" || pathname === "/owners";
+  // RouteHQ's own website: the home page (what a signed-out visitor sees at "/", rewritten below) and plans. Marked so
+  // the root layout sends them no staff-app words. (/owners was dropped on 28 Oct 2026; next.config redirects it home.)
+  const isSitePage = pathname === "/home" || pathname === "/pricing";
   if (isSitePage) request.headers.set("x-routehq-site-page", "1");
   /** "/" for someone not signed in: the website's home page, at the same address (a rewrite, not a redirect). */
   const siteHome = () => {

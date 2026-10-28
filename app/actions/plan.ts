@@ -8,7 +8,7 @@ import { numberLocale } from "@/lib/i18n/dates";
 import { notifyOperator } from "@/lib/notify-operator";
 import { getVehicleCategories } from "@/lib/organization";
 import { formatPlanPrice, planCharge } from "@/lib/plan-currency";
-import { FOUNDING_SLOTS, PLANS, changeWaitsForRenewal, fleetMix, planById, type PlanId } from "@/lib/plans";
+import { PLANS, changeWaitsForRenewal, fleetMix, planById, type PlanId } from "@/lib/plans";
 import { alertTeam, isPlatformAdmin } from "@/lib/support";
 import { logAdminAction } from "@/lib/admin";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -27,13 +27,7 @@ type Result<T = {}> = ({ ok: true } & T) | { ok: false; error: string };
 type Interval = "monthly" | "yearly";
 
 const ORG_FIELDS =
-  "id, name, currency, subscription_status, subscription_tier, billing_interval, trial_ends_at, next_payment_due, subscription_started_at, pending_plan, pending_interval, plan_request_thread_id, founding_member";
-
-async function foundingAvailable(admin: any, organization: { founding_member?: boolean | null }) {
-  if (organization.founding_member) return true;
-  const { count } = await admin.from("organizations").select("id", { count: "exact", head: true }).eq("founding_member", true);
-  return (count || 0) < FOUNDING_SLOTS;
-}
+  "id, name, currency, subscription_status, subscription_tier, billing_interval, trial_ends_at, next_payment_due, subscription_started_at, pending_plan, pending_interval, plan_request_thread_id";
 
 async function fleetOf(admin: any, organizationId: string) {
   const [{ data: rows }, categories] = await Promise.all([
@@ -81,8 +75,7 @@ export async function choosePlan(input: { plan: string; interval: string }): Pro
   }
 
   const fleet = await fleetOf(admin, organization.id);
-  const founding = await foundingAvailable(admin, organization);
-  const charge = planCharge(wanted, fleet, organization.currency || "THB", interval, founding);
+  const charge = planCharge(wanted, fleet, organization.currency || "THB", interval);
   // Paid up and moving down: nothing to pay now; the change waits for the renewal date.
   const atRenewal = paidUp(organization) && changeWaitsForRenewal({ id: current.id, interval: organization.billing_interval || "monthly" }, { id: wanted.id, interval });
 
@@ -129,7 +122,7 @@ export async function choosePlan(input: { plan: string; interval: string }): Pro
   const { error } = await admin.from("organizations").update(update).eq("id", organization.id);
   if (error) return { ok: false, error: error.message };
 
-  await alertTeam(`${organization.name || "A business"} chose ${wanted.id} (${interval}) · ${charge.currency} ${charge.amount}${charge.founding ? " founding" : ""}${atRenewal ? " · at renewal" : ""}`, String(threadId));
+  await alertTeam(`${organization.name || "A business"} chose ${wanted.id} (${interval}) · ${charge.currency} ${charge.amount}${atRenewal ? " · at renewal" : ""}`, String(threadId));
   revalidatePath("/settings/billing");
   revalidatePath("/help");
   return { ok: true, outcome: atRenewal ? "atRenewal" : "pay" };
@@ -176,7 +169,6 @@ export async function activatePlanRequest(input: { organizationId: string }): Pr
   const interval: Interval = organization.pending_interval === "yearly" ? "yearly" : "monthly";
   const due = organization.next_payment_due ? new Date(organization.next_payment_due) : null;
   const start = due && due.getTime() > Date.now() ? due : new Date();
-  const founding = await foundingAvailable(admin, organization);
   const plan = organization.pending_plan as PlanId;
   const { error } = await admin
     .from("organizations")
@@ -186,7 +178,6 @@ export async function activatePlanRequest(input: { organizationId: string }): Pr
       subscription_status: "active",
       subscription_started_at: organization.subscription_started_at || new Date().toISOString(),
       next_payment_due: addInterval(start, interval).toISOString(),
-      founding_member: founding,
       pending_plan: null,
       pending_interval: null,
       pending_amount: null,
@@ -201,7 +192,7 @@ export async function activatePlanRequest(input: { organizationId: string }): Pr
   }
   await logAdminAction(
     { userId: membership.userId, email: membership.email ?? null },
-    { action: "plan_activated", organizationId: organization.id, details: { plan, interval, founding } }
+    { action: "plan_activated", organizationId: organization.id, details: { plan, interval } }
   );
   await notifyOperator(organization.id, `✅ Your RouteHQ plan is now ${plan.charAt(0).toUpperCase()}${plan.slice(1)}`, "plan_activated", "/settings/billing");
   revalidatePath("/settings/billing");

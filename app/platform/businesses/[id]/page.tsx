@@ -11,7 +11,6 @@ import {
   adminPurgeBusiness,
   adminRestoreBusiness,
   adminSetCustomPlan,
-  adminSetFounding,
   adminSetPlan,
   adminStartViewing,
   adminStopViewing
@@ -29,7 +28,6 @@ export const dynamic = "force-dynamic";
 const NOTICE: Record<string, { text: string; good: boolean }> = {
   plan: { text: "Plan saved.", good: true },
   trial: { text: "Trial end moved.", good: true },
-  founding: { text: "Founding price updated.", good: true },
   custom: { text: "Custom plan saved. It applies straight away.", good: true },
   custom_cleared: { text: "Custom plan cleared: they're back on the plan's own price and limits.", good: true },
   custom_error: { text: "Couldn't save the custom plan. Use whole numbers of 0 or more and try again.", good: false },
@@ -190,7 +188,6 @@ export default async function AdminBusinessPage({ params, searchParams }: { para
           <h2 className="card-title">Plan and billing</h2>
           <p className="mt-0.5 text-[14px] font-medium text-[var(--muted)]">
             {status === "active" ? `Next payment ${adminDate(org.next_payment_due)}` : status === "trial" ? `Trial ends ${adminDate(org.trial_ends_at)}` : ADMIN_STATUS_LABEL[status] || status}
-            {org.founding_member ? " · founding price (half)" : ""}
           </p>
           <form action={adminSetPlan} className="mt-4 grid gap-3 sm:grid-cols-3">
             <input name="organizationId" type="hidden" value={id} />
@@ -267,20 +264,6 @@ export default async function AdminBusinessPage({ params, searchParams }: { para
               </label>
               <PendingButton className="secondary-action pressable" pendingLabel="Saving…" type="submit">
                 Set date
-              </PendingButton>
-            </form>
-          </section>
-
-          <section className="card flex flex-wrap items-center justify-between gap-3 p-5">
-            <div className="min-w-0">
-              <h2 className="card-title">Founding price</h2>
-              <p className="mt-0.5 text-[14px] font-medium text-[var(--muted)]">{org.founding_member ? "Enabled: half price for as long as they stay." : "Disabled: they pay the list price."}</p>
-            </div>
-            <form action={adminSetFounding}>
-              <input name="organizationId" type="hidden" value={id} />
-              <input name="on" type="hidden" value={org.founding_member ? "0" : "1"} />
-              <PendingButton className="secondary-action pressable" pendingLabel="Saving…" type="submit">
-                {org.founding_member ? "Turn off" : "Turn on"}
               </PendingButton>
             </form>
           </section>

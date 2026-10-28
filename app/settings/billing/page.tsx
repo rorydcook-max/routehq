@@ -8,7 +8,7 @@ import { getCurrentMembership } from "@/lib/auth/roles";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { dateFormat, numberLocale } from "@/lib/i18n/dates";
 import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization";
-import { formatPlanPrice, planCharge } from "@/lib/plan-currency";
+import { formatPlanPrice } from "@/lib/plan-currency";
 import { changeWaitsForRenewal, effectiveLimits, fleetMix, fleetText, planById, planForFleet, vehiclesOverLimit } from "@/lib/plans";
 import { getCustomPlan } from "@/lib/custom-plan";
 import { promptPayQrSvg } from "@/lib/promptpay";
@@ -55,7 +55,7 @@ export default async function BillingPage() {
     supabase
       .from("organizations")
       .select(
-        "subscription_status, subscription_tier, billing_interval, trial_started_at, trial_ends_at, subscription_started_at, next_payment_due, payment_method, currency, pending_plan, pending_interval, pending_amount, pending_currency, plan_request_thread_id, founding_member"
+        "subscription_status, subscription_tier, billing_interval, trial_started_at, trial_ends_at, subscription_started_at, next_payment_due, payment_method, currency, pending_plan, pending_interval, pending_amount, pending_currency, plan_request_thread_id"
       )
       .eq("id", baseOrganization.id)
       .is("deleted_at", null)
@@ -91,8 +91,6 @@ export default async function BillingPage() {
     const pendingInterval = organization.pending_interval === "yearly" ? "yearly" : "monthly";
     const pendingCurrency = String(organization.pending_currency || currency);
     const amount = Number(organization.pending_amount || 0);
-    // The full price is shown struck through for founding members: worked out again from today's fleet.
-    const full = planCharge(pendingPlan, fleet, pendingCurrency, pendingInterval, false).full;
     const paidUp = status === "active" && plan.monthly > 0 && organization.next_payment_due && new Date(organization.next_payment_due).getTime() > Date.now();
     const atRenewal = Boolean(paidUp) && changeWaitsForRenewal({ id: plan.id, interval }, { id: pendingPlan.id, interval: pendingInterval });
     const promptPayId = String(process.env.ROUTEHQ_PROMPTPAY_ID || "");
@@ -104,7 +102,6 @@ export default async function BillingPage() {
         amount: amountText
       }),
       amount: amountText,
-      fullAmount: full > amount ? formatPlanPrice(full, pendingCurrency, numbers) : null,
       qrSvg: pendingCurrency === "THB" && promptPayId && !atRenewal ? await promptPayQrSvg(promptPayId, amount) : null,
       bankDetails: String(process.env.ROUTEHQ_BANK_DETAILS || "").trim() || null,
       currency: pendingCurrency,

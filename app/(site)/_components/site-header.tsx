@@ -9,8 +9,7 @@ export async function SiteHeader() {
   const [t, m] = await Promise.all([getTranslations("site"), getTranslations("marketing")]);
   const items = [
     { href: SITE_LINKS.features, label: m("navFeatures") },
-    { href: SITE_LINKS.pricing, label: m("navPricing") },
-    { href: SITE_LINKS.owners, label: m("navOwners") }
+    { href: SITE_LINKS.pricing, label: m("navPricing") }
   ];
   const logo = (
     <SiteLink aria-label={t("navHome")} className="inline-flex min-h-11 shrink-0 items-center" href={SITE_LINKS.home}>

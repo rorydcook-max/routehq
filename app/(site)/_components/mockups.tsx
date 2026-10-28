@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
-import { BarChart3, CalendarDays, Camera, Car, Check, ChevronLeft, FileText, Home, Inbox, ListTodo, Plus, Users } from "lucide-react";
+import { BarChart3, CalendarDays, Camera, Car, Check, ChevronLeft, FileSpreadsheet, FileText, Home, Inbox, ListTodo, Plus, Users } from "lucide-react";
 import { numberLocale } from "@/lib/i18n/dates";
 import { formatPlanPrice } from "@/lib/plan-currency";
 import { sampleAmount, visitorCurrency } from "@/lib/site-currency";
@@ -575,81 +575,70 @@ export async function PaymentPhoneMock({ className = "" }: { className?: string 
   );
 }
 
-/* ── An owner's monthly statement ───────────────────────────────────────── */
+/* ── Moving in: what a business sends, and what RouteHQ makes of it ────── */
 
-export async function StatementPhoneMock({ className = "" }: { className?: string }) {
-  const { t, local, format, date } = await kit();
-  // Rounded in the visitor's currency first, so the statement still adds up.
-  const rentals = local(38400);
-  const costs = local(3200);
-  const share = Math.round((rentals - costs) * 0.3);
-  const yours = Number((rentals - costs - share).toFixed(2));
-  const lines = [
-    { label: t("mockRentals"), detail: t("mockRentalCount", { count: 4 }), amount: format(rentals) },
-    { label: t("mockCosts"), detail: t("mockCostsDetail"), amount: `−${format(costs)}` },
-    { label: t("mockOperatorShare"), detail: "30%", amount: `−${format(share)}` }
+export async function ImportMock({ className = "" }: { className?: string }) {
+  const [{ number }, m] = await Promise.all([kit(), getTranslations("marketing")]);
+  const files = [
+    { icon: FileSpreadsheet, name: m("importFile1") },
+    { icon: Camera, name: m("importFile2") },
+    { icon: FileText, name: m("importFile3") }
   ];
-  const money = (_thb?: number) => format(yours);
-  const months = ["2026-05-15", "2026-06-15", "2026-07-15", "2026-08-15", "2026-09-15", "2026-10-15"].map((iso, index) => ({
-    iso,
-    label: date(iso, { month: "short" }),
-    height: [2.2, 1.6, 2.9, 3.4, 2.6, 3.8][index]
-  }));
+  const rows = [
+    { label: m("importRowFleet"), count: 12 },
+    { label: m("importRowCustomers"), count: 214 },
+    { label: m("importRowBookings"), count: 486 },
+    { label: m("importRowPayments"), count: 1132 }
+  ];
   return (
-    <PhoneFrame className={className} label={t("mockStatementLabel")}>
-      <div className="flex h-full flex-col bg-[#f3f6f8]">
-        <StatusBar />
-        <div className="px-[1.2em] pt-[1.6em]">
-          <p className="font-semibold text-[#5f6b7a]">{date("2026-10-15", { month: "long", year: "numeric" })}</p>
-          <p className="text-[1.6em] font-semibold leading-tight" style={{ fontFamily: "var(--font-site)" }}>
-            {t("mockStatement")}
-          </p>
-        </div>
-        <div className="mx-[0.9em] mt-[0.9em] flex items-center gap-[0.8em] rounded-[1.3em] bg-white p-[0.9em] shadow-[0_1px_2px_rgba(6,22,43,0.06)]">
-          <span className="flex h-[3em] w-[4.2em] shrink-0 items-center justify-center rounded-[0.8em] bg-[#e6eaef]">
-            <VehiclePhoto id="pajero" thumb />
-          </span>
-          <span>
-            <span className="block font-bold">{vehicleName("pajero")}</span>
-            <span className="block text-[#5f6b7a]">Palm Car Rental</span>
-          </span>
-        </div>
-        <div className="mx-[0.9em] mt-[0.7em] overflow-hidden rounded-[1.3em] bg-white shadow-[0_1px_2px_rgba(6,22,43,0.06)]">
-          {lines.map((line, index) => (
-            <div className={`flex items-center justify-between gap-[0.6em] px-[1em] py-[0.8em] ${index ? "border-t border-[#e6eaef]" : ""}`} key={line.label}>
-              <span className="min-w-0">
-                <span className="block font-semibold">{line.label}</span>
-                <span className="block text-[0.9em] text-[#5f6b7a]">{line.detail}</span>
-              </span>
-              <span className="font-bold tabular-nums">{line.amount}</span>
-            </div>
-          ))}
-        </div>
-        <div className="mx-[0.9em] mt-[0.7em] rounded-[1.3em] bg-[#0b8f8c] p-[1em] text-white">
-          <p className="font-semibold opacity-85">{t("mockYourShare")}</p>
-          <p className="text-[2em] font-semibold leading-tight" style={{ fontFamily: "var(--font-site)" }}>
-            {money(24640)}
-          </p>
-        </div>
-        <div className="mx-[0.9em] mt-[0.7em] rounded-[1.3em] bg-white p-[1em] shadow-[0_1px_2px_rgba(6,22,43,0.06)]">
-          <p className="font-semibold text-[#5f6b7a]">{t("mockLastMonths")}</p>
-          <div className="mt-[0.7em] flex h-[4.6em] items-end gap-[0.5em]">
-            {months.map((month, index) => (
-              <span className="flex min-w-0 flex-1 flex-col items-center gap-[0.3em]" key={month.iso}>
-                <span className="w-full rounded-[0.35em]" style={{ height: `${month.height}em`, background: index === months.length - 1 ? "#0b8f8c" : "#cfe6e5" }} />
-                <span className="text-[0.75em] font-semibold text-[#5f6b7a]">{month.label}</span>
-              </span>
+    <div aria-hidden="true" className={`${s.importScene} ${className}`}>
+      <div className={s.importFiles}>
+        <p className={s.importLabel}>{m("importSend")}</p>
+        {files.map(({ icon: Icon, name }) => (
+          <div className={s.importFile} key={name}>
+            <span className={s.importIcon}>
+              <Icon className="h-[1.2em] w-[1.2em]" strokeWidth={2} />
+            </span>
+            <span className="min-w-0 truncate" dir="ltr">
+              {name}
+            </span>
+          </div>
+        ))}
+      </div>
+      <svg className={s.importArrow} fill="none" height="24" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 48 24" width="48">
+        <path d="M2 12h42M36 5l8 7-8 7" />
+      </svg>
+      <div className="min-w-0">
+        <p className={s.importLabel}>{m("importGet")}</p>
+        <div className={s.card}>
+          <div className="flex items-center gap-[0.8em] border-b border-[var(--line)] px-[1.3em] py-[1em]">
+            <span className="flex h-[2.4em] w-[2.4em] shrink-0 items-center justify-center rounded-[0.7em] bg-[#d9f4f3] text-[#0b8f8c]">
+              <Check className="h-[1.2em] w-[1.2em]" strokeWidth={2.5} />
+            </span>
+            <span className="font-bold leading-tight">{m("importCardTitle")}</span>
+          </div>
+          <div className="px-[1.3em] py-[0.3em]">
+            {rows.map((row) => (
+              <div className="flex items-center justify-between gap-[1em] border-b border-[var(--line)] py-[0.75em] last:border-0" key={row.label}>
+                <span className="flex min-w-0 items-center gap-[0.6em] font-semibold">
+                  <span className="flex h-[1.5em] w-[1.5em] shrink-0 items-center justify-center rounded-full bg-[#d9f4f3] text-[#0b8f8c]">
+                    <Check className="h-[0.95em] w-[0.95em]" strokeWidth={3} />
+                  </span>
+                  {row.label}
+                </span>
+                <span className="font-bold tabular-nums">{number(row.count)}</span>
+              </div>
             ))}
           </div>
-        </div>
-        <div className="mx-[0.9em] mt-[0.7em] flex items-center gap-[0.6em] rounded-[1.3em] bg-white px-[1em] py-[0.8em] font-semibold shadow-[0_1px_2px_rgba(6,22,43,0.06)]">
-          <span className="flex h-[1.5em] w-[1.5em] shrink-0 items-center justify-center rounded-full bg-[#dcf3e6] text-[#1f7a4d]">
-            <Check className="h-[0.95em] w-[0.95em]" strokeWidth={3} />
-          </span>
-          {t("mockTaxRenewed")}
+          <div className="flex items-center rounded-b-[1.1em] border-t border-[var(--line)] bg-[#f3f6f8] px-[1.3em] py-[0.8em]">
+            <span className="inline-flex items-center gap-[0.5em] rounded-full bg-white px-[0.8em] py-[0.3em] text-[0.92em] font-semibold text-[#5f6b7a] shadow-[0_0_0_1px_rgba(6,22,43,0.1)]">
+              <span className="h-[0.5em] w-[0.5em] rounded-full bg-[#0b8f8c]" />
+              {m("importCardFoot")}
+            </span>
+          </div>
         </div>
       </div>
-    </PhoneFrame>
+    </div>
   );
 }
 

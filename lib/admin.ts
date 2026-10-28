@@ -77,7 +77,6 @@ export type AdminBusiness = {
   createdAt: string | null;
   deletedAt: string | null;
   pendingPlan: string | null;
-  foundingMember: boolean;
   customPrice: number | null;
   customLimits: Record<string, unknown> | null;
   vehicles: number;
@@ -113,7 +112,6 @@ export async function listBusinesses(): Promise<AdminBusiness[]> {
       createdAt: org.created_at ?? null,
       deletedAt: org.deleted_at ?? null,
       pendingPlan: org.pending_plan ?? null,
-      foundingMember: !!org.founding_member,
       customPrice: org.custom_price ?? null,
       customLimits: org.custom_limits ?? null,
       vehicles: vehicleCount.get(org.id) || 0,
@@ -131,6 +129,7 @@ export const ADMIN_TIER_LABEL: Record<string, string> = { free: "Free", starter:
 export const ACTION_LABEL: Record<string, string> = {
   plan_changed: "Plan changed",
   trial_extended: "Trial extended",
+  // Kept so old log rows still read: the founding offer was dropped on 28 Oct 2026.
   founding_on: "Founding price turned on",
   founding_off: "Founding price turned off",
   plan_activated: "Plan request activated",

@@ -1,4 +1,4 @@
-/* RouteHQ's public website (home, pricing, owners).
+/* RouteHQ's public website (home, pricing).
    Ink and white with one teal, Geist for everything and an italic serif for the one phrase a headline leans on.
    Every surface is a 1px line or a product frame; nothing else decorates. */
 .site {
@@ -423,17 +423,6 @@
 @media (min-width: 1180px) {
   .heroCards {
     --spill: 300px;
-  }
-}
-.h1Owners {
-  font-size: clamp(40px, 5.2vw, 64px);
-}
-@media (min-width: 1024px) {
-  .heroOwners {
-    --spill: 150px;
-  }
-  .heroOwnersText {
-    padding-bottom: calc(var(--spill) + 96px);
   }
 }
 .hero::before {
@@ -1411,57 +1400,98 @@ details[open] > .select .chevron {
   font-weight: 500;
 }
 
-/* ── Owners page ────────────────────────────────────────────────────── */
-.ownersGrid {
+/* ── Moving in: the free import. Text then picture on phones; 5 + 7 columns from 1024px. ── */
+.importRow {
   display: grid;
-  gap: 48px;
-}
-.ownersPhone {
-  width: min(78%, 320px);
-  margin-inline: auto;
+  gap: 40px;
+  align-items: center;
 }
 @media (min-width: 1024px) {
-  .ownersGrid {
-    grid-template-columns: minmax(0, 1fr) 320px;
-    gap: 64px;
-    align-items: end;
+  .importRow {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 24px;
   }
-  .ownersPhone {
-    width: 100%;
-    max-width: 320px;
-    margin-inline: auto 0;
+  .importText {
+    grid-column: span 5;
   }
-}
-.stepsRow {
-  display: grid;
-  gap: 40px 24px;
-}
-@media (min-width: 900px) {
-  .stepsRow {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .importVisual {
+    grid-column: span 7;
   }
 }
-.stepsRow .stepNum {
-  font-size: 44px;
-}
-.stepsRow .stepTitle {
-  font-size: 24px;
+.importNote {
+  max-width: 440px;
   margin-top: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--muted);
 }
-.stepsRow .stepBody {
-  margin-top: 10px;
-}
-.opRow {
+/* What you send → what you get: side by side from 640px, stacked with the arrow pointing down below that. */
+.importScene {
   display: grid;
-  gap: 24px;
-  align-items: center;
-  padding-block: 40px;
-  border-block: 1px solid var(--line);
+  gap: 12px;
+  font-size: clamp(13px, 0.6rem + 0.45vw, 15.5px);
+  line-height: 1.4;
+  color: var(--text);
 }
-@media (min-width: 900px) {
-  .opRow {
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 48px;
+@media (min-width: 640px) {
+  .importScene {
+    grid-template-columns: minmax(0, 0.85fr) auto minmax(0, 1.2fr);
+    gap: 20px;
+    align-items: center;
+  }
+}
+.importFiles {
+  display: grid;
+  gap: 10px;
+}
+.importLabel {
+  margin-bottom: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.importFiles .importLabel {
+  margin-bottom: 0;
+}
+.importFile {
+  display: flex;
+  align-items: center;
+  gap: 0.8em;
+  min-width: 0;
+  padding: 0.75em 1em;
+  border: 1px solid var(--line);
+  border-radius: 1em;
+  background: #ffffff;
+  box-shadow: var(--frame-shadow-light);
+  font-weight: 600;
+}
+.importIcon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2.4em;
+  height: 2.4em;
+  border-radius: 0.7em;
+  background: #e4eef8;
+  color: #1f4f7a;
+}
+.importArrow {
+  justify-self: center;
+  /* Turned to point down; the extra margin makes room for its height once turned. */
+  margin-block: 12px;
+  color: var(--teal-deep);
+  transform: rotate(90deg);
+}
+@media (min-width: 640px) {
+  .importArrow {
+    margin-block: 22px 0;
+    transform: none;
+  }
+  :global([dir="rtl"]) .importArrow {
+    transform: scaleX(-1);
   }
 }
 

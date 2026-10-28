@@ -3,10 +3,10 @@ import type { ReactNode } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { numberLocale } from "@/lib/i18n/dates";
 import { supportedLocaleCodes } from "@/lib/i18n/locales";
-import { FOUNDING_SLOTS, PLANS, TRIAL_DAYS, fleetText } from "@/lib/plans";
+import { PLANS, TRIAL_DAYS, fleetText } from "@/lib/plans";
 import { formatPlanPrice, planPrices } from "@/lib/plan-currency";
 import { visitorCurrency } from "@/lib/site-currency";
-import { BookingPhoneMock, DashboardWindowMock, HandoverPhoneMock, LedgerCard, PassportCard, PaymentPhoneMock, ReturnCard, ShopPageMock, TodayPhoneMock, sampleMoney } from "../_components/mockups";
+import { BookingPhoneMock, DashboardWindowMock, HandoverPhoneMock, ImportMock, LedgerCard, PassportCard, PaymentPhoneMock, ReturnCard, ShopPageMock, TodayPhoneMock, sampleMoney } from "../_components/mockups";
 import { Arrow, Check, Container, Eyebrow, Plus, RICH, RICH_SERIF, SITE_LINKS, SiteLink } from "../_components/site-ui";
 import { FinalCta } from "../_components/final-cta";
 import s from "../site.module.css";
@@ -176,6 +176,33 @@ export default async function SiteHomePage() {
         </Container>
       </section>
 
+      {/* 4b. Moving in: RouteHQ brings a business's records in for it, free. The picture follows the words on phones. */}
+      <section aria-labelledby="moving-in" className={s.sectionBottom}>
+        <Container className={s.importRow}>
+          <div className={s.importText}>
+            <div className={s.head}>
+              <Eyebrow>{m("importEyebrow")}</Eyebrow>
+              <h2 className={s.h2} id="moving-in">
+                {m("importTitle")}
+              </h2>
+              <p className={s.body}>{m("importBody")}</p>
+            </div>
+            <ul className={s.checks}>
+              {[1, 2, 3].map((n) => (
+                <li key={n}>
+                  <Check />
+                  {m(`import${n}`)}
+                </li>
+              ))}
+            </ul>
+            <p className={s.importNote}>{m("importNote")}</p>
+          </div>
+          <div className={s.importVisual}>
+            <ImportMock />
+          </div>
+        </Container>
+      </section>
+
       {/* 5. Every morning */}
       <section className={`${s.mist} ${s.section}`}>
         <Container className={s.dayGrid}>
@@ -288,8 +315,7 @@ export default async function SiteHomePage() {
               );
             })}
           </div>
-          <p className={`${s.body} ${s.wide} mt-6`}>{t("foundingOffer", { count: FOUNDING_SLOTS })}</p>
-          <SiteLink className={`${s.link} mt-4`} href={SITE_LINKS.pricing}>
+          <SiteLink className={`${s.link} mt-6`} href={SITE_LINKS.pricing}>
             {m("priceLink")} <Arrow />
           </SiteLink>
         </Container>

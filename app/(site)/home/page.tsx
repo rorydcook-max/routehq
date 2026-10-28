@@ -333,16 +333,21 @@ export default async function SiteHomePage() {
           </div>
           <div className={`${s.twoCol} mt-[var(--section)]`}>
             <h2 className={s.h2}>{m("faqTitle")}</h2>
-            <div className={s.faq}>
-              {[1, 2, 3, 4, 5].map((n) => (
-                <details className={s.faqItem} key={n}>
-                  <summary>
-                    {m(`faq${n}Q`)}
-                    <Plus />
-                  </summary>
-                  <p>{m(`faq${n}A`)}</p>
-                </details>
-              ))}
+            <div>
+              <div className={s.faq}>
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <details className={s.faqItem} key={n}>
+                    <summary>
+                      {m(`faq${n}Q`)}
+                      <Plus />
+                    </summary>
+                    <p>{m(`faq${n}A`)}</p>
+                  </details>
+                ))}
+              </div>
+              <SiteLink className={`${s.link} mt-4`} href={SITE_LINKS.faq}>
+                {m("faqSeeAll")} <Arrow />
+              </SiteLink>
             </div>
           </div>
         </Container>

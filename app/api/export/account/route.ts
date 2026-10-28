@@ -42,6 +42,11 @@ export async function GET() {
     return NextResponse.json({ error: membershipError?.message || "No organization found for this user." }, { status: 400 });
   }
 
+  // Every customer's details are in this file, so only the owner can download it.
+  if (membership.role !== "owner") {
+    return NextResponse.json({ error: await said("Only the owner can download all records.") }, { status: 403 });
+  }
+
   const organizationId = membership.organization_id;
   const [vehicles, customers, rentals, transactions, documents] = await Promise.all([
     supabase.from("vehicles").select("*").eq("organization_id", organizationId).is("deleted_at", null),

@@ -12,7 +12,9 @@ export async function SiteFooter() {
       title: m("footerProduct"),
       links: [
         { href: SITE_LINKS.features, label: m("navFeatures") },
-        { href: SITE_LINKS.pricing, label: m("navPricing") }
+        { href: SITE_LINKS.pricing, label: m("navPricing") },
+        { href: SITE_LINKS.faq, label: m("navFaq") },
+        { href: SITE_LINKS.contact, label: m("navContact") }
       ]
     },
     {

@@ -9,7 +9,7 @@ import s from "../site.module.css";
 type Item = { href: string; label: string };
 
 /** The website menu on phones: a button that opens a full-screen ink panel, closed again on every page change. */
-export function MobileMenu({ items, signIn, start, logo, openLabel, closeLabel }: { items: Item[]; signIn: Item; start: Item; logo: ReactNode; openLabel: string; closeLabel: string }) {
+export function MobileMenu({ items, signIn, start, logo, language, openLabel, closeLabel }: { items: Item[]; signIn: Item; start: Item; logo: ReactNode; language: ReactNode; openLabel: string; closeLabel: string }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -49,6 +49,7 @@ export function MobileMenu({ items, signIn, start, logo, openLabel, closeLabel }
             ))}
           </nav>
           <div className={s.menuActions}>
+            {language}
             <SiteLink className={`${s.btn} ${s.btnOutline}`} href={signIn.href}>
               {signIn.label}
             </SiteLink>

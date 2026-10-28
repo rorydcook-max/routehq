@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { RouteHqLogo } from "@/components/brand-logo";
 import { MobileMenu } from "./mobile-menu";
+import { SiteLanguage } from "./site-language";
 import { Container, SITE_LINKS, SiteLink } from "./site-ui";
 import s from "../site.module.css";
 
@@ -9,7 +10,9 @@ export async function SiteHeader() {
   const [t, m] = await Promise.all([getTranslations("site"), getTranslations("marketing")]);
   const items = [
     { href: SITE_LINKS.features, label: m("navFeatures") },
-    { href: SITE_LINKS.pricing, label: m("navPricing") }
+    { href: SITE_LINKS.pricing, label: m("navPricing") },
+    { href: SITE_LINKS.faq, label: m("navFaq") },
+    { href: SITE_LINKS.contact, label: m("navContact") }
   ];
   const logo = (
     <SiteLink aria-label={t("navHome")} className="inline-flex min-h-11 shrink-0 items-center" href={SITE_LINKS.home}>
@@ -30,6 +33,7 @@ export async function SiteHeader() {
           ))}
         </nav>
         <div className={s.headerActions}>
+          <SiteLanguage label={m("footerLanguage")} variant="compact" />
           <SiteLink className={s.navLink} href={SITE_LINKS.signIn}>
             {m("navSignIn")}
           </SiteLink>
@@ -40,6 +44,7 @@ export async function SiteHeader() {
         <MobileMenu
           closeLabel={t("navMenuClose")}
           items={items}
+          language={<SiteLanguage label={m("footerLanguage")} variant="row" />}
           logo={logo}
           openLabel={t("navMenu")}
           signIn={{ href: SITE_LINKS.signIn, label: m("navSignIn") }}

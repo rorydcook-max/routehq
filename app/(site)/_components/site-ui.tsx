@@ -7,7 +7,7 @@ import s from "../site.module.css";
 export const r = (path: string) => path as Route;
 
 /** Website pages that open each other in place. */
-const IN_SITE = new Set(["/pricing"]);
+const IN_SITE = new Set(["/pricing", "/faq", "/contact"]);
 
 /**
  * A link from the website. Between website pages it opens in place; anywhere else (the app's sign-in, the directory,
@@ -45,6 +45,8 @@ export const SITE_LINKS = {
   home: "/",
   features: "/home#how",
   pricing: "/pricing",
+  faq: "/faq",
+  contact: "/contact",
   // No link to the renters' booking site (/rent): it is moving to its own consumer brand, and this site speaks to rental businesses.
   signIn: "/login",
   signUp: "/signup"

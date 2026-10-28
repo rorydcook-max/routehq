@@ -5,17 +5,22 @@ import { Globe } from "lucide-react";
 import { operatorLocaleOptions } from "@/lib/i18n/locales";
 import { STAFF_LOCALE_COOKIE } from "@/lib/i18n/staff-locale";
 
+/** Keeps a signed-out language choice on this device and redraws the page in it (also the website header's picker). */
+export function chooseSignedOutLanguage(code: string) {
+  document.cookie = `${STAFF_LOCALE_COOKIE}=${code}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
+  window.location.reload();
+}
+
+/** The languages offered, by their own names without the "(…)" note. */
+export const signedOutLanguages = operatorLocaleOptions.map((option) => ({ code: option.code, label: option.label.replace(/ \(.*\)$/, "") }));
+
 /**
  * Language choice on the sign-in pages, every language the app is written in. Kept on this device until the person signs in.
  * Drawn as the same compact pill as the customer pages' language picker, so it never outgrows its row.
  */
 export function AuthLanguage() {
   const locale = useLocale();
-
-  function choose(code: string) {
-    document.cookie = `${STAFF_LOCALE_COOKIE}=${code}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
-    window.location.reload();
-  }
+  const choose = chooseSignedOutLanguage;
 
   return (
     <label className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full border border-[var(--border)] bg-white ps-3 pe-1 text-[13px] font-semibold text-[var(--foreground-secondary)]">
@@ -26,9 +31,9 @@ export function AuthLanguage() {
         onChange={(event) => choose(event.target.value)}
         value={locale}
       >
-        {operatorLocaleOptions.map((option) => (
+        {signedOutLanguages.map((option) => (
           <option key={option.code} lang={option.code} value={option.code}>
-            {option.label.replace(/ \(.*\)$/, "")}
+            {option.label}
           </option>
         ))}
       </select>

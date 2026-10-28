@@ -53,12 +53,13 @@ export async function signAttachments(admin: any, attachments: SupportAttachment
 
 /**
  * Tells the RouteHQ team someone wrote in: a phone alert to every platform admin who turned alerts on,
- * plus LINE and Telegram when those are set up. Never throws.
+ * plus LINE and Telegram when those are set up. Never throws. `path` opens somewhere other than the Help thread
+ * (the website's contact messages go to /platform/messages).
  */
-export async function alertTeam(text: string, threadId: string) {
+export async function alertTeam(text: string, threadId: string, path?: string) {
   try {
     const admin = createSupabaseAdminClient() as any;
-    const url = `/help/team/${threadId}`;
+    const url = path || `/help/team/${threadId}`;
     const { data: admins } = await admin.from("platform_admins").select("user_id");
     const ids = ((admins || []) as any[]).map((row) => row.user_id).filter(Boolean);
     if (ids.length) await sendPushToUsers(admin, ids, { title: "RouteHQ Help", body: text, url, tag: `support-${threadId}` });

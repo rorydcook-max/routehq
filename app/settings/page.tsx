@@ -806,6 +806,20 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               })}
             </div>
           </Card>
+          {/* Every record in one file, any time (the FAQ promises it). Owner only: it holds every customer's details. */}
+          {viewerIsOwner ? (
+            <Card className="p-5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <h2 className="card-title">{say("export_title")}</h2>
+                  <p className="mt-1 text-[15px] text-[var(--muted)]">{say("export_body")}</p>
+                </div>
+                <a className="secondary-action pressable" download href="/api/export/account">
+                  {say("export_btn")}
+                </a>
+              </div>
+            </Card>
+          ) : null}
         </div>
       ) : null}
       {tab === "team" ? (

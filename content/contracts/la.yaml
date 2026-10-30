@@ -233,6 +233,12 @@ sections:
     en: The Owner confirms that the vehicle is registered in Laos, that its road tax is paid, that it has a valid technical inspection certificate where one is required, that compulsory insurance is valid for the whole rental period, and that it is handed over in a roadworthy condition with its registration and insurance papers.
     local: ຜູ້ໃຫ້ເຊົ່າຢືນຢັນວ່າ ພາຫະນະໄດ້ຂຶ້ນທະບຽນຢູ່ ສປປ ລາວ, ໄດ້ເສຍຄ່າທຳນຽມທາງແລ້ວ, ມີໃບຢັ້ງຢືນການກວດກາເຕັກນິກທີ່ຍັງໃຊ້ໄດ້ ໃນກໍລະນີທີ່ກຳນົດ, ມີປະກັນໄພພາກບັງຄັບທີ່ມີຜົນຕະຫຼອດໄລຍະເຊົ່າ, ແລະ ມອບໃຫ້ໃນສະພາບພ້ອມໃຊ້ງານໃນທ້ອງທາງ ພ້ອມເອກະສານທະບຽນ ແລະ ເອກະສານປະກັນໄພ.
     country: true
+  - id: vehicle.3
+    en: "The Owner keeps the vehicle serviced as the manufacturer recommends, including oil changes, inspections and worn parts, and pays for normal mechanical repairs and wear unless this agreement says otherwise. On longer rentals the Owner arranges servicing with the Renter at a convenient time and returns the vehicle promptly; if servicing takes more than one day, section 13 applies."
+    local: "ຜູ້ໃຫ້ເຊົ່າບຳລຸງຮັກສາພາຫະນະ ຕາມຄຳແນະນຳຂອງຜູ້ຜະລິດ ລວມທັງການປ່ຽນນ້ຳມັນເຄື່ອງ, ການກວດກາ ແລະ ການປ່ຽນຊິ້ນສ່ວນທີ່ສຶກຫຼໍ່, ແລະ ຮັບຜິດຊອບຄ່າສ້ອມແປງກົນຈັກຕາມປົກກະຕິ ແລະ ການສຶກຫຼໍ່ຈາກການນຳໃຊ້ ເວັ້ນເສຍແຕ່ສັນຍານີ້ກຳນົດໄວ້ເປັນຢ່າງອື່ນ. ສຳລັບການເຊົ່າໄລຍະຍາວ, ຜູ້ໃຫ້ເຊົ່າຈະນັດໝາຍການບຳລຸງຮັກສາກັບຜູ້ເຊົ່າ ໃນເວລາທີ່ສະດວກ ແລະ ສົ່ງພາຫະນະຄືນໂດຍໄວ; ຖ້າການບຳລຸງຮັກສາໃຊ້ເວລາເກີນໜຶ່ງມື້, ໃຫ້ນຳໃຊ້ພາກທີ 13."
+  - id: vehicle.4
+    en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tyres, lights, brakes, oil and coolant look normal, keeping it clean enough to drive safely, and not driving or riding it if it becomes unsafe or unroadworthy."
+    local: "ໃນໄລຍະເຊົ່າ, ຜູ້ເຊົ່າຕ້ອງເບິ່ງແຍງສະພາບປະຈຳວັນຂອງພາຫະນະ: ກວດເບິ່ງວ່າຢາງ, ໄຟ, ເບກ, ນ້ຳມັນເຄື່ອງ ແລະ ນ້ຳຢາຫຼໍ່ເຢັນ ຢູ່ໃນສະພາບປົກກະຕິ, ຮັກສາຄວາມສະອາດໃຫ້ພຽງພໍທີ່ຈະຂັບຂີ່ໄດ້ຢ່າງປອດໄພ, ແລະ ບໍ່ຂັບ ຫຼື ຂີ່ພາຫະນະ ຖ້າພາຫະນະບໍ່ປອດໄພ ຫຼື ບໍ່ພ້ອມໃຊ້ງານໃນທ້ອງທາງ."
 - id: period
   title:
     en: 4. Rental period, pickup and return
@@ -265,6 +271,10 @@ sections:
   - id: period.4
     en: If the vehicle is not returned and the Renter cannot be reached within 24 hours of the end time, the Owner may treat the vehicle as stolen, report it to the police and recover it, at the Renter's cost.
     local: ຖ້າບໍ່ໄດ້ສົ່ງພາຫະນະຄືນ ແລະ ບໍ່ສາມາດຕິດຕໍ່ຜູ້ເຊົ່າໄດ້ ພາຍໃນ 24 ຊົ່ວໂມງ ນັບຈາກເວລາສິ້ນສຸດ, ຜູ້ໃຫ້ເຊົ່າອາດຈະຖືວ່າພາຫະນະຖືກລັກ, ແຈ້ງຕຳຫຼວດ ແລະ ຕິດຕາມເອົາຄືນ ໂດຍຜູ້ເຊົ່າເປັນຜູ້ຮັບຜິດຊອບຄ່າໃຊ້ຈ່າຍ.
+  - id: period.5
+    when: { rate_period: month }
+    en: "Rolling monthly rental: where no end date is written above, the rental continues from month to month on the same terms until either party ends it as set out in section 7. An agreed extension does not need a new agreement."
+    local: "ການເຊົ່າລາຍເດືອນແບບຕໍ່ເນື່ອງ: ຖ້າບໍ່ມີວັນສິ້ນສຸດຂຽນໄວ້ຂ້າງເທິງ, ການເຊົ່າຈະສືບຕໍ່ເປັນເດືອນຕໍ່ເດືອນ ຕາມເງື່ອນໄຂເດີມ ຈົນກວ່າຄູ່ສັນຍາຝ່າຍໃດຝ່າຍໜຶ່ງຈະຍົກເລີກ ຕາມທີ່ກຳນົດໄວ້ໃນພາກທີ 7. ການຕໍ່ໄລຍະເຊົ່າທີ່ຕົກລົງກັນແລ້ວ ບໍ່ຈຳເປັນຕ້ອງເຮັດສັນຍາໃໝ່."
 - id: charges
   title:
     en: 5. Rent and payment
@@ -383,6 +393,9 @@ sections:
   - id: fuel.6
     en: The Renter must not tamper with the odometer, speed limiter or GPS tracker. Tampering is a serious breach (section 15).
     local: ຜູ້ເຊົ່າຕ້ອງບໍ່ດັດແປງ ເລກໄມລ໌, ອຸປະກອນຈຳກັດຄວາມໄວ ຫຼື ເຄື່ອງຕິດຕາມ GPS. ການດັດແປງຖືເປັນການລະເມີດຮ້າຍແຮງ (ພາກທີ 15).
+  - id: fuel.7
+    en: "Only the fuel type stated by the manufacturer (or in the vehicle's documents) may be used. If the wrong fuel is put in, the Renter pays the actual, evidenced cost of draining the tank and of any repair it causes."
+    local: "ໃຫ້ໃຊ້ສະເພາະປະເພດນ້ຳມັນທີ່ຜູ້ຜະລິດກຳນົດ (ຫຼື ທີ່ລະບຸໃນເອກະສານຂອງພາຫະນະ) ເທົ່ານັ້ນ. ຖ້າເຕີມນ້ຳມັນຜິດປະເພດ, ຜູ້ເຊົ່າຕ້ອງຈ່າຍຄ່າໃຊ້ຈ່າຍຕົວຈິງທີ່ມີຫຼັກຖານ ສຳລັບການຖ່າຍນ້ຳມັນອອກຈາກຖັງ ແລະ ການສ້ອມແປງໃດໆ ທີ່ເກີດຈາກເຫດນັ້ນ."
 - id: use
   title:
     en: 9. Safe and lawful use
@@ -408,8 +421,8 @@ sections:
     local: 'ລົດໃຫຍ່: ກົດໝາຍວ່າດ້ວຍການຈະລາຈອນທາງບົກ ກຳນົດໃຫ້ຜູ້ຂັບຂີ່ ແລະ ຜູ້ໂດຍສານບ່ອນນັ່ງໜ້າ ຕ້ອງຄາດສາຍແອວນິລະໄພ, ແລະ ເດັກທີ່ບໍ່ສາມາດໃຊ້ສາຍແອວປົກກະຕິໄດ້ ຕ້ອງມີບ່ອນນັ່ງເດັກທີ່ເໝາະສົມ. ຜູ້ໃຫ້ເຊົ່າຂໍໃຫ້ທຸກຄົນໃນລົດຄາດສາຍແອວນິລະໄພ. ຈຳນວນຜູ້ໂດຍສານຕ້ອງບໍ່ເກີນຈຳນວນບ່ອນນັ່ງ.'
     country: true
   - id: use.4
-    en: 'It is forbidden to: drive under the influence of alcohol or drugs, or above the legal limit; use a phone while driving except hands-free; race, perform stunts or drive off-road (unless the vehicle is meant for it and the Owner agreed); tow or push anything; carry goods for payment, illegal goods or dangerous loads; use the vehicle for ride-hailing, delivery work, driving lessons or to rent it to anyone else; let anyone not named in section 2 drive or ride.'
-    local: 'ຫ້າມ: ຂັບຂີ່ໃນຂະນະມຶນເມົາເຫຼົ້າ ຫຼື ສານເສບຕິດ, ຫຼື ເກີນຂີດຈຳກັດທີ່ກົດໝາຍກຳນົດ; ໃຊ້ໂທລະສັບໃນຂະນະຂັບຂີ່ ເວັ້ນເສຍແຕ່ແບບບໍ່ໃຊ້ມືຖື; ແຂ່ງລົດ, ສະແດງຜາດໂຜນ ຫຼື ຂັບອອກນອກທາງ (ເວັ້ນເສຍແຕ່ພາຫະນະອອກແບບມາເພື່ອການນັ້ນ ແລະ ຜູ້ໃຫ້ເຊົ່າເຫັນດີ); ລາກ ຫຼື ຍູ້ສິ່ງໃດໆ; ບັນທຸກສິນຄ້າເພື່ອຮັບຄ່າຈ້າງ, ສິນຄ້າຜິດກົດໝາຍ ຫຼື ສິ່ງຂອງອັນຕະລາຍ; ໃຊ້ພາຫະນະເພື່ອບໍລິການຮັບສົ່ງຜູ້ໂດຍສານຜ່ານແອັບ, ວຽກສົ່ງເຄື່ອງ, ສອນຂັບລົດ ຫຼື ນຳໄປໃຫ້ຜູ້ອື່ນເຊົ່າຕໍ່; ໃຫ້ຜູ້ທີ່ບໍ່ມີຊື່ໃນພາກທີ 2 ຂັບ ຫຼື ຂີ່.'
+    en: "It is forbidden to: drive under the influence of alcohol or drugs, or above the legal limit; use a phone while driving except hands-free; race, perform stunts or drive off-road (unless the vehicle is meant for it and the Owner agreed); tow or push anything; carry passengers outside the cabin or on a load bed; carry goods for payment, illegal goods or dangerous loads; use the vehicle for ride-hailing, delivery work, driving lessons or to rent it to anyone else; let anyone not named in section 2 drive or ride."
+    local: "ຫ້າມ: ຂັບຂີ່ໃນຂະນະມຶນເມົາເຫຼົ້າ ຫຼື ສານເສບຕິດ, ຫຼື ເກີນຂີດຈຳກັດທີ່ກົດໝາຍກຳນົດ; ໃຊ້ໂທລະສັບໃນຂະນະຂັບຂີ່ ເວັ້ນເສຍແຕ່ແບບບໍ່ໃຊ້ມືຖື; ແຂ່ງລົດ, ສະແດງຜາດໂຜນ ຫຼື ຂັບອອກນອກທາງ (ເວັ້ນເສຍແຕ່ພາຫະນະອອກແບບມາເພື່ອການນັ້ນ ແລະ ຜູ້ໃຫ້ເຊົ່າເຫັນດີ); ລາກ ຫຼື ຍູ້ສິ່ງໃດໆ; ບັນທຸກຜູ້ໂດຍສານຢູ່ນອກຫ້ອງໂດຍສານ ຫຼື ຢູ່ເທິງກະບະບັນທຸກ; ບັນທຸກສິນຄ້າເພື່ອຮັບຄ່າຈ້າງ, ສິນຄ້າຜິດກົດໝາຍ ຫຼື ສິ່ງຂອງອັນຕະລາຍ; ໃຊ້ພາຫະນະເພື່ອບໍລິການຮັບສົ່ງຜູ້ໂດຍສານຜ່ານແອັບ, ວຽກສົ່ງເຄື່ອງ, ສອນຂັບລົດ ຫຼື ນຳໄປໃຫ້ຜູ້ອື່ນເຊົ່າຕໍ່; ໃຫ້ຜູ້ທີ່ບໍ່ມີຊື່ໃນພາກທີ 2 ຂັບ ຫຼື ຂີ່."
   - id: use.5
     when:
       smoking: false
@@ -520,6 +533,9 @@ sections:
   - id: accident.4
     en: The Renter must report any warning light, unusual noise, puncture or fault promptly and must not keep using a vehicle that is unsafe.
     local: ຜູ້ເຊົ່າຕ້ອງແຈ້ງໂດຍໄວ ເມື່ອມີໄຟເຕືອນ, ສຽງຜິດປົກກະຕິ, ຢາງຮົ່ວ ຫຼື ຂໍ້ບົກຜ່ອງໃດໆ ແລະ ຕ້ອງບໍ່ໃຊ້ພາຫະນະທີ່ບໍ່ປອດໄພຕໍ່ໄປ.
+  - id: accident.5
+    en: "Breakdowns caused by misuse: if a mechanical fault or damage is caused by the Renter's misuse or negligence, for example ignoring a warning light, continuing to drive after a fault appears, the wrong fuel, overloading, towing, racing or driving off-road, and this is shown by a mechanic's report or other evidence, the Renter has no right to a refund under section 13 for that breakdown, and pays the actual, evidenced cost of repair and recovery. The Owner may deduct these costs from the deposit and invoice the Renter for any balance."
+    local: "ລົດເພຍ້ອນການນຳໃຊ້ບໍ່ຖືກຕ້ອງ: ຖ້າຂໍ້ບົກຜ່ອງທາງກົນຈັກ ຫຼື ຄວາມເສຍຫາຍ ເກີດຈາກການນຳໃຊ້ບໍ່ຖືກຕ້ອງ ຫຼື ຄວາມປະໝາດຂອງຜູ້ເຊົ່າ ເຊັ່ນ: ບໍ່ສົນໃຈໄຟເຕືອນ, ສືບຕໍ່ຂັບຂີ່ຫຼັງຈາກມີຂໍ້ບົກຜ່ອງ, ເຕີມນ້ຳມັນຜິດປະເພດ, ບັນທຸກເກີນ, ລາກຈູງ, ແຂ່ງລົດ ຫຼື ຂັບອອກນອກທາງ, ແລະ ມີບົດລາຍງານຂອງຊ່າງ ຫຼື ຫຼັກຖານອື່ນພິສູດໄດ້, ຜູ້ເຊົ່າບໍ່ມີສິດໄດ້ຮັບຄ່າເຊົ່າຄືນຕາມພາກທີ 13 ສຳລັບການເພນັ້ນ, ແລະ ຕ້ອງຈ່າຍຄ່າໃຊ້ຈ່າຍຕົວຈິງທີ່ມີຫຼັກຖານ ສຳລັບການສ້ອມແປງ ແລະ ການລາກລົດ. ຜູ້ໃຫ້ເຊົ່າອາດຈະຫັກຄ່າໃຊ້ຈ່າຍເຫຼົ່ານີ້ຈາກເງິນມັດຈຳ ແລະ ອອກໃບແຈ້ງໜີ້ໃຫ້ຜູ້ເຊົ່າສຳລັບສ່ວນທີ່ເຫຼືອ."
 - id: fines
   title:
     en: 14. Fines, tolls and parking
@@ -578,8 +594,8 @@ sections:
     local: 18. ເງື່ອນໄຂທົ່ວໄປ
   clauses:
   - id: general.1
-    en: 'Messages: notices under this agreement may be sent by phone, message app (WhatsApp, LINE, Telegram, Zalo or similar), SMS or email to the contact details in sections 1 and 2, and count as received when sent.'
-    local: 'ການແຈ້ງ: ການແຈ້ງຕາມສັນຍານີ້ ອາດຈະສົ່ງທາງໂທລະສັບ, ແອັບສົ່ງຂໍ້ຄວາມ (WhatsApp, LINE, Telegram, Zalo ຫຼື ຄ້າຍຄືກັນ), SMS ຫຼື ອີເມວ ຕາມຂໍ້ມູນຕິດຕໍ່ໃນພາກທີ 1 ແລະ 2, ແລະ ຖືວ່າໄດ້ຮັບແລ້ວ ເມື່ອສົ່ງ.'
+    en: "Messages: notices under this agreement may be sent by phone, message app (WhatsApp, LINE, Telegram, Zalo or similar), SMS or email to the contact details in sections 1 and 2, and count as received when sent. Messages, call logs and photos exchanged this way may be used as evidence of what was agreed."
+    local: "ການແຈ້ງ: ການແຈ້ງຕາມສັນຍານີ້ ອາດຈະສົ່ງທາງໂທລະສັບ, ແອັບສົ່ງຂໍ້ຄວາມ (WhatsApp, LINE, Telegram, Zalo ຫຼື ຄ້າຍຄືກັນ), SMS ຫຼື ອີເມວ ຕາມຂໍ້ມູນຕິດຕໍ່ໃນພາກທີ 1 ແລະ 2, ແລະ ຖືວ່າໄດ້ຮັບແລ້ວ ເມື່ອສົ່ງ. ຂໍ້ຄວາມ, ບັນທຶກການໂທ ແລະ ຮູບພາບ ທີ່ສົ່ງຫາກັນຜ່ານຊ່ອງທາງດັ່ງກ່າວ ສາມາດໃຊ້ເປັນຫຼັກຖານວ່າໄດ້ຕົກລົງຫຍັງກັນ."
   - id: general.2
     en: 'Force majeure: neither party is responsible for a delay or failure caused by events outside their control, such as natural disasters, floods, storms, government orders or ferry cancellations. Rent for days the vehicle could not be used because of such an event is agreed fairly between the parties.'
     local: 'ເຫດສຸດວິໄສ: ບໍ່ມີຝ່າຍໃດຕ້ອງຮັບຜິດຊອບຕໍ່ຄວາມລ່າຊ້າ ຫຼື ການບໍ່ປະຕິບັດ ທີ່ເກີດຈາກເຫດການນອກເໜືອການຄວບຄຸມ ເຊັ່ນ ໄພທຳມະຊາດ, ນ້ຳຖ້ວມ, ພາຍຸ, ຄຳສັ່ງຂອງລັດ ຫຼື ການຍົກເລີກເຮືອຂ້າມຟາກ. ຄ່າເຊົ່າສຳລັບມື້ທີ່ບໍ່ສາມາດໃຊ້ພາຫະນະໄດ້ ຍ້ອນເຫດການດັ່ງກ່າວ ໃຫ້ຄູ່ສັນຍາຕົກລົງກັນຢ່າງຍຸຕິທຳ.'

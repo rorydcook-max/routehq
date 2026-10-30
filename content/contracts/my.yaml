@@ -147,6 +147,12 @@ sections:
         en: "The Owner confirms that: the vehicle is registered with JPJ and its motor vehicle licence (road tax) is valid; it is insured as the Road Transport Act 1987 requires, for use as a rental vehicle, for the whole rental period; the Owner holds any operator licence or permit the law requires to rent it out (for example from APAD in Peninsular Malaysia, from LPKP in Sabah and Sarawak, or from the Ministry of Tourism for tourism hire-and-drive vehicles); and the vehicle is handed over in a roadworthy condition."
         local: "Pemilik mengesahkan bahawa: kenderaan itu didaftarkan dengan JPJ dan lesen kenderaan motornya (cukai jalan) sah; kenderaan itu diinsuranskan sebagaimana dikehendaki oleh Akta Pengangkutan Jalan 1987, untuk kegunaan sebagai kenderaan sewa, bagi seluruh tempoh sewaan; Pemilik memegang apa-apa lesen pengendali atau permit yang dikehendaki oleh undang-undang untuk menyewakannya (contohnya daripada APAD di Semenanjung Malaysia, daripada LPKP di Sabah dan Sarawak, atau daripada Kementerian Pelancongan bagi kenderaan sewa pandu sendiri pelancongan); dan kenderaan itu diserahkan dalam keadaan layak digunakan di jalan raya."
         country: true
+      - id: vehicle.3
+        en: "The Owner keeps the vehicle serviced as the manufacturer recommends, including oil changes, inspections and worn parts, and pays for normal mechanical repairs and wear unless this agreement says otherwise. On longer rentals the Owner arranges servicing with the Renter at a convenient time and returns the vehicle promptly; if servicing takes more than one day, section 13 applies."
+        local: "Pemilik menyenggara kenderaan seperti yang disyorkan oleh pengeluar, termasuk penukaran minyak enjin, pemeriksaan dan penggantian alat ganti yang haus, dan menanggung kos pembaikan mekanikal biasa dan haus lusuh, melainkan dinyatakan sebaliknya dalam perjanjian ini. Bagi sewaan jangka panjang, Pemilik mengatur servis bersama Penyewa pada masa yang sesuai dan memulangkan kenderaan dengan segera; jika servis mengambil masa lebih daripada satu hari, Bahagian 13 terpakai."
+      - id: vehicle.4
+        en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tyres, lights, brakes, oil and coolant look normal, keeping it clean enough to drive safely, and not driving or riding it if it becomes unsafe or unroadworthy."
+        local: "Sepanjang tempoh sewaan, Penyewa menjaga keadaan harian kenderaan: memeriksa bahawa tayar, lampu, brek, minyak enjin dan bahan penyejuk kelihatan normal, memastikan kenderaan cukup bersih untuk dipandu dengan selamat, dan tidak memandu atau menunggang kenderaan itu jika ia menjadi tidak selamat atau tidak layak digunakan di jalan raya."
 
   - id: period
     title: { en: "4. Rental period, pickup and return", local: "4. Tempoh sewaan, pengambilan dan pemulangan" }
@@ -170,6 +176,10 @@ sections:
       - id: period.4
         en: "If the vehicle is not returned and the Renter cannot be reached within 24 hours of the end time, the Owner may treat the vehicle as stolen, report it to the police and recover it, at the Renter's cost."
         local: "Jika kenderaan tidak dipulangkan dan Penyewa tidak dapat dihubungi dalam tempoh 24 jam selepas masa tamat, Pemilik boleh menganggap kenderaan itu dicuri, membuat laporan polis dan mendapatkannya semula, atas kos Penyewa."
+      - id: period.5
+        when: { rate_period: month }
+        en: "Rolling monthly rental: where no end date is written above, the rental continues from month to month on the same terms until either party ends it as set out in section 7. An agreed extension does not need a new agreement."
+        local: "Sewaan bulanan berterusan: jika tiada tarikh tamat ditulis di atas, sewaan diteruskan dari bulan ke bulan atas terma yang sama sehingga mana-mana pihak menamatkannya sebagaimana yang ditetapkan dalam Bahagian 7. Lanjutan yang dipersetujui tidak memerlukan perjanjian baharu."
 
   - id: charges
     title: { en: "5. Rent and payment", local: "5. Sewa dan bayaran" }
@@ -264,6 +274,9 @@ sections:
       - id: fuel.6
         en: "The Renter must not tamper with the odometer, speed limiter or GPS tracker. Tampering is a serious breach (section 15)."
         local: "Penyewa tidak boleh mengusik odometer, pengehad kelajuan atau penjejak GPS. Perbuatan mengusik adalah pelanggaran yang serius (Bahagian 15)."
+      - id: fuel.7
+        en: "Only the fuel type stated by the manufacturer (or in the vehicle's documents) may be used. If the wrong fuel is put in, the Renter pays the actual, evidenced cost of draining the tank and of any repair it causes."
+        local: "Hanya jenis minyak yang dinyatakan oleh pengeluar (atau dalam dokumen kenderaan) boleh digunakan. Jika minyak yang salah diisi, Penyewa membayar kos sebenar yang dibuktikan untuk mengosongkan tangki dan apa-apa pembaikan yang disebabkannya."
 
   - id: use
     title: { en: "9. Safe and lawful use", local: "9. Penggunaan yang selamat dan sah" }
@@ -282,8 +295,8 @@ sections:
         local: "Kereta: setiap penumpang, di tempat duduk hadapan dan belakang, mesti memakai tali pinggang keledar. Kanak-kanak mesti berada dalam sistem kekangan kanak-kanak (kerusi kanak-kanak) yang sesuai jika dikehendaki oleh undang-undang, sebagaimana yang diwajibkan di Malaysia sejak 2020 bagi kanak-kanak kecil; Penyewa hendaklah meminta kerusi kanak-kanak daripada Pemilik semasa membuat tempahan. Bilangan penumpang tidak boleh melebihi bilangan tempat duduk."
         country: true
       - id: use.4
-        en: "It is forbidden to: drive under the influence of alcohol or drugs, or above the legal limit; use a phone while driving except hands-free; race, perform stunts or drive off-road (unless the vehicle is meant for it and the Owner agreed); tow or push anything; carry goods for payment, illegal goods or dangerous loads; use the vehicle for ride-hailing, delivery work, driving lessons or to rent it to anyone else; let anyone not named in section 2 drive or ride."
-        local: "Adalah dilarang untuk: memandu di bawah pengaruh alkohol atau dadah, atau melebihi had yang dibenarkan undang-undang; menggunakan telefon semasa memandu kecuali secara bebas tangan; berlumba, melakukan aksi berbahaya atau memandu di luar jalan raya (melainkan kenderaan itu dibuat untuknya dan Pemilik bersetuju); menunda atau menolak apa-apa; membawa barang untuk bayaran, barang haram atau muatan berbahaya; menggunakan kenderaan untuk e-hailing, kerja penghantaran, kelas memandu atau menyewakannya kepada orang lain; membenarkan sesiapa yang tidak dinamakan dalam Bahagian 2 memandu atau menunggang."
+        en: "It is forbidden to: drive under the influence of alcohol or drugs, or above the legal limit; use a phone while driving except hands-free; race, perform stunts or drive off-road (unless the vehicle is meant for it and the Owner agreed); tow or push anything; carry passengers outside the cabin or on a load bed; carry goods for payment, illegal goods or dangerous loads; use the vehicle for ride-hailing, delivery work, driving lessons or to rent it to anyone else; let anyone not named in section 2 drive or ride."
+        local: "Adalah dilarang untuk: memandu di bawah pengaruh alkohol atau dadah, atau melebihi had yang dibenarkan undang-undang; menggunakan telefon semasa memandu kecuali secara bebas tangan; berlumba, melakukan aksi berbahaya atau memandu di luar jalan raya (melainkan kenderaan itu dibuat untuknya dan Pemilik bersetuju); menunda atau menolak apa-apa; membawa penumpang di luar kabin atau di ruang muatan terbuka; membawa barang untuk bayaran, barang haram atau muatan berbahaya; menggunakan kenderaan untuk e-hailing, kerja penghantaran, kelas memandu atau menyewakannya kepada orang lain; membenarkan sesiapa yang tidak dinamakan dalam Bahagian 2 memandu atau menunggang."
       - id: use.5
         when: { smoking: no }
         en: "Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odour removal.{{/if}}"
@@ -378,6 +391,9 @@ sections:
       - id: accident.4
         en: "The Renter must report any warning light, unusual noise, puncture or fault promptly and must not keep using a vehicle that is unsafe."
         local: "Penyewa mesti melaporkan dengan segera apa-apa lampu amaran, bunyi luar biasa, tayar pancit atau kerosakan, dan tidak boleh terus menggunakan kenderaan yang tidak selamat."
+      - id: accident.5
+        en: "Breakdowns caused by misuse: if a mechanical fault or damage is caused by the Renter's misuse or negligence, for example ignoring a warning light, continuing to drive after a fault appears, the wrong fuel, overloading, towing, racing or driving off-road, and this is shown by a mechanic's report or other evidence, the Renter has no right to a refund under section 13 for that breakdown, and pays the actual, evidenced cost of repair and recovery. The Owner may deduct these costs from the deposit and invoice the Renter for any balance."
+        local: "Kerosakan akibat salah guna: jika kerosakan mekanikal atau kerosakan lain disebabkan oleh salah guna atau kecuaian Penyewa, contohnya mengabaikan lampu amaran, terus memandu selepas kerosakan berlaku, menggunakan minyak yang salah, muatan berlebihan, menunda, berlumba atau memandu di luar jalan raya, dan perkara ini dibuktikan melalui laporan mekanik atau bukti lain, Penyewa tidak berhak mendapat bayaran balik di bawah Bahagian 13 bagi kerosakan tersebut, dan membayar kos sebenar yang dibuktikan bagi pembaikan dan menunda kenderaan. Pemilik boleh menolak kos ini daripada deposit dan menghantar invois kepada Penyewa bagi apa-apa baki."
 
   - id: fines
     title: { en: "14. Fines, tolls and parking", local: "14. Saman, tol dan letak kereta" }
@@ -431,8 +447,8 @@ sections:
     title: { en: "18. General terms", local: "18. Terma am" }
     clauses:
       - id: general.1
-        en: "Messages: notices under this agreement may be sent by phone, message app (WhatsApp, Telegram, WeChat or similar), SMS or email to the contact details in sections 1 and 2, and count as received when sent."
-        local: "Mesej: notis di bawah perjanjian ini boleh dihantar melalui telefon, aplikasi mesej (WhatsApp, Telegram, WeChat atau seumpamanya), SMS atau e-mel kepada butiran hubungan dalam Bahagian 1 dan 2, dan dianggap diterima apabila dihantar."
+        en: "Messages: notices under this agreement may be sent by phone, message app (WhatsApp, Telegram, WeChat or similar), SMS or email to the contact details in sections 1 and 2, and count as received when sent. Messages, call logs and photos exchanged this way may be used as evidence of what was agreed."
+        local: "Mesej: notis di bawah perjanjian ini boleh dihantar melalui telefon, aplikasi mesej (WhatsApp, Telegram, WeChat atau seumpamanya), SMS atau e-mel kepada butiran hubungan dalam Bahagian 1 dan 2, dan dianggap diterima apabila dihantar. Mesej, log panggilan dan gambar yang ditukar melalui cara ini boleh digunakan sebagai bukti tentang apa yang telah dipersetujui."
       - id: general.2
         en: "Force majeure: neither party is responsible for a delay or failure caused by events outside their control, such as natural disasters, floods, storms, government orders or ferry cancellations. Rent for days the vehicle could not be used because of such an event is agreed fairly between the parties."
         local: "Force majeure: tiada pihak bertanggungjawab atas kelewatan atau kegagalan yang disebabkan oleh peristiwa di luar kawalan mereka, seperti bencana alam, banjir, ribut, perintah kerajaan atau pembatalan feri. Sewa bagi hari kenderaan tidak dapat digunakan akibat peristiwa sedemikian dipersetujui secara adil antara pihak-pihak."

@@ -5,7 +5,9 @@
 # insurance.1, accident.1, fines.2, data.1, data.2, general.4, general.5.
 # Oct 2026: aligned with the Contract Committee Notice on car and motorcycle rental (B.E. 2568, in force
 # 30 Dec 2025) and its standard forms ก/ข: deposit, fee, early-return, replacement-vehicle and termination
-# clauses rewritten. RENDERER: the Notice requires Thai text at least 2 mm high, max 11 characters per inch.
+# clauses rewritten. Later Oct 2026: new master clauses vehicle.3, vehicle.4, period.5, fuel.7, accident.5 added;
+# vehicle.3, period.5 and accident.5 adapted to the Notice (replacement vehicle, no termination without breach,
+# evidenced deductions only). RENDERER: the Notice requires Thai text at least 2 mm high, max 11 characters per inch.
 # Not reviewed by a lawyer. Every legal statement was checked against the public sources listed under `sources`.
 
 country: TH
@@ -168,6 +170,12 @@ sections:
         en: "The Owner confirms that the vehicle's annual vehicle tax is paid as the law requires (and, for a car, that it is registered with the Department of Land Transport as a rental car, รย.11); that compulsory insurance (พ.ร.บ.) and any other insurance the Department of Land Transport rules require for rental vehicles are valid for the whole rental period, with the insurer and policy numbers given to the Renter; and that the vehicle is handed over in a roadworthy condition with a copy of its registration and insurance documents."
         local: "ผู้ให้เช่ายืนยันว่าได้ชำระภาษีรถประจำปีของรถคันนี้ตามกฎหมายแล้ว (และสำหรับรถยนต์ ต้องเป็นรถยนต์บริการให้เช่าที่จดทะเบียนกับกรมการขนส่งทางบก รย.11) มีประกันภัยภาคบังคับ (พ.ร.บ.) และประกันภัยอื่นที่ระเบียบกรมการขนส่งทางบกกำหนดสำหรับรถบริการให้เช่า ซึ่งมีผลคุ้มครองตลอดระยะเวลาเช่า โดยแจ้งชื่อบริษัทประกันภัยและเลขที่กรมธรรม์ให้ผู้เช่าทราบ และส่งมอบรถในสภาพพร้อมใช้งานอย่างปลอดภัย พร้อมสำเนาเอกสารทะเบียนรถและเอกสารประกันภัย"
         country: true
+      - id: vehicle.3
+        en: "The Owner keeps the vehicle serviced as the manufacturer recommends, including oil changes, inspections and worn parts, and pays for normal mechanical repairs and wear and tear; the Renter pays only for damage or faults caused by the Renter's fault, as set out in sections 12 and 13. On longer rentals the Owner arranges servicing with the Renter at a convenient time and returns the vehicle promptly; if the vehicle cannot be used for more than one day because of servicing or repair, the Owner provides a replacement vehicle of the same or a similar model as set out in section 13."
+        local: "ผู้ให้เช่าต้องบำรุงรักษารถตามที่ผู้ผลิตแนะนำ รวมถึงการเปลี่ยนน้ำมันเครื่อง การตรวจเช็ก และการเปลี่ยนชิ้นส่วนที่สึกหรอ และรับผิดชอบค่าซ่อมเครื่องยนต์และกลไกตามปกติและการเสื่อมสภาพจากการใช้งานตามปกติ โดยผู้เช่ารับผิดชอบเฉพาะความเสียหายหรือความบกพร่องที่เกิดจากความผิดของผู้เช่าตามข้อ 12 และข้อ 13 ในกรณีเช่าระยะยาว ผู้ให้เช่าจะนัดหมายการบำรุงรักษากับผู้เช่าในเวลาที่สะดวก และส่งมอบรถคืนให้ผู้เช่าโดยเร็ว หากรถไม่สามารถใช้งานได้เป็นเวลามากกว่าหนึ่งวันเนื่องจากการบำรุงรักษาหรือซ่อมแซม ผู้ให้เช่าต้องจัดหารถรุ่นเดียวกันหรือใกล้เคียงกันมาทดแทนตามข้อ 13"
+      - id: vehicle.4
+        en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tyres, lights, brakes, oil and coolant look normal, keeping it clean enough to drive safely, and not driving or riding it if it becomes unsafe or unroadworthy."
+        local: "ระหว่างการเช่า ผู้เช่าต้องดูแลสภาพรถในการใช้งานประจำวัน โดยตรวจดูว่ายาง ไฟ เบรก น้ำมันเครื่อง และน้ำหล่อเย็นอยู่ในสภาพปกติ ดูแลรถให้สะอาดเพียงพอที่จะขับขี่ได้อย่างปลอดภัย และไม่ขับขี่รถหากรถอยู่ในสภาพไม่ปลอดภัยหรือไม่พร้อมใช้งานบนถนน"
 
   - id: period
     title: { en: "4. Rental period, pickup and return", local: "4. ระยะเวลาเช่า การรับรถ และการคืนรถ" }
@@ -191,6 +199,10 @@ sections:
       - id: period.4
         en: "If the vehicle is not returned and the Renter cannot be reached within 24 hours of the end time, the Owner may treat the vehicle as stolen, report it to the police and recover it. The Renter pays the reasonable, evidenced costs of recovery."
         local: "หากผู้เช่าไม่คืนรถและไม่สามารถติดต่อผู้เช่าได้ภายใน 24 ชั่วโมงนับจากเวลาสิ้นสุดการเช่า ผู้ให้เช่าอาจถือว่ารถถูกลักไป แจ้งความต่อเจ้าหน้าที่ตำรวจ และติดตามนำรถกลับคืน โดยผู้เช่าต้องรับผิดชอบค่าใช้จ่ายตามสมควรในการติดตามนำรถกลับคืนที่มีหลักฐานตรวจสอบได้"
+      - id: period.5
+        when: { rate_period: month }
+        en: "Rolling monthly rental: where no end date is written above, the rental continues from month to month on the same terms until it is ended as set out in section 7; the Owner may end it before the end of a monthly period only if the Renter breaches this agreement (section 15). An agreed extension does not need a new agreement."
+        local: "การเช่ารายเดือนแบบต่อเนื่อง: หากไม่ได้ระบุวันสิ้นสุดการเช่าไว้ข้างต้น ให้การเช่าดำเนินต่อไปเป็นรายเดือนตามเงื่อนไขเดิม จนกว่าจะมีการเลิกการเช่าตามข้อ 7 ทั้งนี้ ผู้ให้เช่าจะเลิกการเช่าก่อนครบรอบเดือนได้เฉพาะกรณีที่ผู้เช่าผิดสัญญาตามข้อ 15 เท่านั้น การขยายระยะเวลาเช่าที่ตกลงกันแล้วไม่ต้องทำสัญญาฉบับใหม่"
 
   - id: charges
     title: { en: "5. Rent and payment", local: "5. ค่าเช่าและการชำระเงิน" }
@@ -288,6 +300,9 @@ sections:
       - id: fuel.6
         en: "The Renter must not tamper with the odometer, speed limiter or GPS tracker. Tampering is a serious breach (section 15)."
         local: "ห้ามผู้เช่าดัดแปลงหรือแก้ไขเครื่องวัดระยะทาง อุปกรณ์จำกัดความเร็ว หรือเครื่องติดตาม GPS การกระทำดังกล่าวถือเป็นการผิดสัญญาร้ายแรง (ข้อ 15)"
+      - id: fuel.7
+        en: "Only the fuel type stated by the manufacturer (or in the vehicle's documents) may be used. If the wrong fuel is put in, the Renter pays the actual, evidenced cost of draining the tank and of any repair it causes."
+        local: "ให้ใช้เฉพาะชนิดน้ำมันเชื้อเพลิงที่ผู้ผลิตกำหนด (หรือที่ระบุไว้ในเอกสารประจำรถ) เท่านั้น หากเติมน้ำมันผิดชนิด ผู้เช่าต้องชำระค่าใช้จ่ายที่เกิดขึ้นจริงและมีหลักฐานตรวจสอบได้ในการถ่ายน้ำมันออกจากถัง และค่าซ่อมความเสียหายที่เกิดจากการนั้น"
 
   - id: use
     title: { en: "9. Safe and lawful use", local: "9. การใช้รถอย่างปลอดภัยและถูกกฎหมาย" }
@@ -306,8 +321,8 @@ sections:
         local: "รถยนต์: กฎหมายไทยกำหนดให้ผู้ขับขี่และคนโดยสารทุกคนทั้งเบาะหน้าและเบาะหลังต้องคาดเข็มขัดนิรภัย และเด็กอายุไม่เกิน 6 ปีต้องนั่งในที่นั่งนิรภัยสำหรับเด็กที่เหมาะสม หากต้องใช้ที่นั่งนิรภัยสำหรับเด็ก ผู้เช่าต้องแจ้งขอจากผู้ให้เช่า จำนวนคนโดยสารต้องไม่เกินจำนวนที่นั่ง"
         country: true
       - id: use.4
-        en: "It is forbidden to: drive under the influence of alcohol or drugs, or above the legal limit; use a phone while driving except hands-free; race, perform stunts or drive off-road (unless the vehicle is meant for it and the Owner agreed); tow or push anything; carry passengers or goods for payment, illegal goods or dangerous loads; use the vehicle for ride-hailing, delivery work, driving lessons or to rent it to anyone else; let anyone not named in section 2 drive or ride."
-        local: "ห้ามกระทำการดังต่อไปนี้: ขับขี่ขณะเมาสุราหรือเสพยาเสพติด หรือมีระดับแอลกอฮอล์เกินกว่าที่กฎหมายกำหนด ใช้โทรศัพท์ขณะขับขี่ เว้นแต่ใช้อุปกรณ์เสริมที่ไม่ต้องถือ แข่งรถ ผาดโผน หรือขับขี่นอกถนน (เว้นแต่รถออกแบบมาเพื่อการนั้นและผู้ให้เช่ายินยอม) ลากจูงหรือดันสิ่งใด รับขนคนโดยสารหรือสิ่งของเพื่อรับค่าตอบแทน ขนสิ่งของผิดกฎหมายหรือวัตถุอันตราย ใช้รถรับจ้างผ่านแอปพลิเคชัน รับส่งสินค้า สอนขับรถ หรือนำรถไปให้ผู้อื่นเช่าต่อ และยินยอมให้ผู้ที่ไม่ได้ระบุชื่อในข้อ 2 ขับขี่"
+        en: "It is forbidden to: drive under the influence of alcohol or drugs, or above the legal limit; use a phone while driving except hands-free; race, perform stunts or drive off-road (unless the vehicle is meant for it and the Owner agreed); tow or push anything; carry passengers outside the cabin or on a load bed; carry passengers or goods for payment, illegal goods or dangerous loads; use the vehicle for ride-hailing, delivery work, driving lessons or to rent it to anyone else; let anyone not named in section 2 drive or ride."
+        local: "ห้ามกระทำการดังต่อไปนี้: ขับขี่ขณะเมาสุราหรือเสพยาเสพติด หรือมีระดับแอลกอฮอล์เกินกว่าที่กฎหมายกำหนด ใช้โทรศัพท์ขณะขับขี่ เว้นแต่ใช้อุปกรณ์เสริมที่ไม่ต้องถือ แข่งรถ ผาดโผน หรือขับขี่นอกถนน (เว้นแต่รถออกแบบมาเพื่อการนั้นและผู้ให้เช่ายินยอม) ลากจูงหรือดันสิ่งใด ให้ผู้โดยสารนั่งนอกห้องโดยสารหรือบนกระบะบรรทุก รับขนคนโดยสารหรือสิ่งของเพื่อรับค่าตอบแทน ขนสิ่งของผิดกฎหมายหรือวัตถุอันตราย ใช้รถรับจ้างผ่านแอปพลิเคชัน รับส่งสินค้า สอนขับรถ หรือนำรถไปให้ผู้อื่นเช่าต่อ และยินยอมให้ผู้ที่ไม่ได้ระบุชื่อในข้อ 2 ขับขี่"
       - id: use.5
         when: { smoking: no }
         en: "Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} If this rule is broken and odour removal is needed, the Renter pays its actual, evidenced cost, up to {{currency}} {{smoking_fee}}.{{/if}}"
@@ -408,6 +423,9 @@ sections:
       - id: accident.4
         en: "The Renter must report any warning light, unusual noise, puncture or fault promptly and must not keep using a vehicle that is unsafe."
         local: "ผู้เช่าต้องแจ้งผู้ให้เช่าโดยเร็วเมื่อมีไฟเตือน เสียงผิดปกติ ยางรั่ว หรือความบกพร่องใด และห้ามใช้รถต่อไปหากรถอยู่ในสภาพไม่ปลอดภัย"
+      - id: accident.5
+        en: "Breakdowns caused by misuse: this clause applies only where a mechanical fault or damage is shown, by a mechanic's report or other evidence the Renter can check, to have been caused by the Renter's misuse or negligence, for example ignoring a warning light, continuing to drive after a fault appears, using the wrong fuel, overloading, towing, racing or driving off-road. In that case the Renter pays the actual, evidenced cost of repair and recovery. The replacement-vehicle and refund rights in section 13 still apply unless the vehicle cannot be used because of the Renter's fault in breaking the law. The Owner may deduct these costs from the deposit only as set out in section 6, with a written list and the evidence, and the Renter pays any balance within 7 days of receiving that list."
+        local: "รถเสียจากการใช้งานผิดวิธี: ข้อนี้ใช้บังคับเฉพาะกรณีที่มีรายงานของช่างหรือหลักฐานอื่นที่ผู้เช่าตรวจสอบได้ แสดงว่าความบกพร่องทางกลไกหรือความเสียหายเกิดจากการใช้งานผิดวิธีหรือความประมาทเลินเล่อของผู้เช่า เช่น ไม่สนใจไฟเตือน ขับขี่ต่อไปหลังจากพบความบกพร่อง เติมน้ำมันผิดชนิด บรรทุกเกินพิกัด ลากจูง แข่งรถ หรือขับขี่นอกถนน ในกรณีดังกล่าว ผู้เช่าต้องชำระค่าซ่อมและค่าลากหรือเคลื่อนย้ายรถที่เกิดขึ้นจริงและมีหลักฐานตรวจสอบได้ ทั้งนี้ สิทธิได้รับรถทดแทนและสิทธิได้รับคืนค่าเช่าตามข้อ 13 ยังคงมีอยู่ เว้นแต่รถไม่สามารถใช้งานได้เนื่องจากความผิดของผู้เช่าที่ได้กระทำผิดกฎหมาย ผู้ให้เช่าจะหักค่าใช้จ่ายดังกล่าวจากเงินประกันได้เฉพาะตามข้อ 6 โดยแจ้งรายการหักเงินเป็นลายลักษณ์อักษรพร้อมหลักฐาน และผู้เช่าต้องชำระส่วนที่เกินภายใน 7 วันนับจากวันที่ได้รับรายการดังกล่าว"
 
   - id: fines
     title: { en: "14. Fines, tolls and parking", local: "14. ค่าปรับ ค่าผ่านทาง และค่าที่จอดรถ" }
@@ -464,8 +482,8 @@ sections:
     title: { en: "18. General terms", local: "18. ข้อกำหนดทั่วไป" }
     clauses:
       - id: general.1
-        en: "Messages: notices under this agreement may be sent by phone, message app (LINE, WhatsApp, Telegram or similar), SMS or email to the contact details in sections 1 and 2, and count as received when they reach that contact."
-        local: "การแจ้งข้อความ: การบอกกล่าวตามสัญญานี้อาจทำทางโทรศัพท์ แอปพลิเคชันส่งข้อความ (LINE, WhatsApp, Telegram หรือแอปพลิเคชันอื่นทำนองเดียวกัน) SMS หรืออีเมล ตามข้อมูลติดต่อในข้อ 1 และข้อ 2 และให้ถือว่าได้รับเมื่อข้อความส่งถึงช่องทางติดต่อดังกล่าว"
+        en: "Messages: notices under this agreement may be sent by phone, message app (LINE, WhatsApp, Telegram or similar), SMS or email to the contact details in sections 1 and 2, and count as received when they reach that contact. Messages, call logs and photos exchanged this way may be used as evidence of what was agreed."
+        local: "การแจ้งข้อความ: การบอกกล่าวตามสัญญานี้อาจทำทางโทรศัพท์ แอปพลิเคชันส่งข้อความ (LINE, WhatsApp, Telegram หรือแอปพลิเคชันอื่นทำนองเดียวกัน) SMS หรืออีเมล ตามข้อมูลติดต่อในข้อ 1 และข้อ 2 และให้ถือว่าได้รับเมื่อข้อความส่งถึงช่องทางติดต่อดังกล่าว ทั้งนี้ ข้อความ บันทึกการโทร และภาพถ่ายที่ส่งถึงกันผ่านช่องทางดังกล่าว อาจใช้เป็นพยานหลักฐานแสดงสิ่งที่คู่สัญญาได้ตกลงกันไว้"
       - id: general.2
         en: "Force majeure: neither party is responsible for a delay or failure caused by events outside their control, such as natural disasters, floods, storms, government orders or ferry cancellations. Rent for days the vehicle could not be used because of such an event is agreed fairly between the parties."
         local: "เหตุสุดวิสัย: คู่สัญญาไม่ต้องรับผิดในความล่าช้าหรือการไม่ปฏิบัติตามสัญญาที่เกิดจากเหตุที่อยู่นอกเหนือการควบคุม เช่น ภัยธรรมชาติ น้ำท่วม พายุ คำสั่งของทางราชการ หรือการยกเลิกเรือข้ามฟาก ค่าเช่าสำหรับวันที่ไม่สามารถใช้รถได้เพราะเหตุดังกล่าว ให้คู่สัญญาตกลงกันอย่างเป็นธรรม"

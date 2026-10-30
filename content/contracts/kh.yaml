@@ -234,6 +234,12 @@ sections:
     en: The Owner confirms that the vehicle is registered, that any road tax due is paid, that it carries any insurance the law requires for vehicles used in a rental business for the whole rental period, and that it is handed over in a roadworthy condition with its registration card.
     local: ម្ចាស់បញ្ជាក់ថា យានយន្តត្រូវបានចុះបញ្ជី ពន្ធផ្លូវដែលត្រូវបង់ត្រូវបានបង់រួចហើយ យានយន្តមានធានារ៉ាប់រងណាមួយដែលច្បាប់តម្រូវ សម្រាប់យានយន្តប្រើក្នុងអាជីវកម្មជួល ពេញមួយរយៈពេលជួល ហើយត្រូវបានប្រគល់ក្នុងស្ថានភាពល្អសម្រាប់ធ្វើដំណើរលើផ្លូវ រួមជាមួយកាតចុះបញ្ជីយានយន្ត។
     country: true
+  - id: vehicle.3
+    en: "The Owner keeps the vehicle serviced as the manufacturer recommends, including oil changes, inspections and worn parts, and pays for normal mechanical repairs and wear unless this agreement says otherwise. On longer rentals the Owner arranges servicing with the Renter at a convenient time and returns the vehicle promptly; if servicing takes more than one day, section 13 applies."
+    local: "ម្ចាស់ថែទាំយានយន្តតាមការណែនាំរបស់ក្រុមហ៊ុនផលិត រួមទាំងការប្តូរប្រេងម៉ាស៊ីន ការត្រួតពិនិត្យ និងការប្តូរគ្រឿងបន្លាស់ដែលពុកផុយ ហើយចេញថ្លៃជួសជុលមេកានិចធម្មតា និងការពុកផុយតាមការប្រើប្រាស់ លើកលែងតែកិច្ចសន្យានេះចែងផ្សេងពីនេះ។ សម្រាប់ការជួលរយៈពេលវែង ម្ចាស់រៀបចំការថែទាំជាមួយអ្នកជួល នៅពេលវេលាដែលសមស្រប ហើយប្រគល់យានយន្តត្រឡប់មកវិញភ្លាមៗ; ប្រសិនបើការថែទាំចំណាយពេលលើសពីមួយថ្ងៃ ត្រូវអនុវត្តផ្នែកទី ១៣។"
+  - id: vehicle.4
+    en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tyres, lights, brakes, oil and coolant look normal, keeping it clean enough to drive safely, and not driving or riding it if it becomes unsafe or unroadworthy."
+    local: "ក្នុងអំឡុងពេលជួល អ្នកជួលថែរក្សាស្ថានភាពប្រចាំថ្ងៃរបស់យានយន្ត៖ ពិនិត្យមើលថាកង់ ភ្លើង ហ្វ្រាំង ប្រេងម៉ាស៊ីន និងទឹកត្រជាក់ម៉ាស៊ីន មានសភាពធម្មតា រក្សាយានយន្តឱ្យស្អាតល្មមសម្រាប់បើកបរដោយសុវត្ថិភាព ហើយមិនបើកបរ ឬជិះយានយន្ត ប្រសិនបើវាក្លាយជាគ្មានសុវត្ថិភាព ឬមិនសមស្របសម្រាប់ធ្វើដំណើរលើផ្លូវ។"
 - id: period
   title:
     en: 4. Rental period, pickup and return
@@ -266,6 +272,10 @@ sections:
   - id: period.4
     en: If the vehicle is not returned and the Renter cannot be reached within 24 hours of the end time, the Owner may treat the vehicle as stolen, report it to the police and recover it, at the Renter's cost.
     local: ប្រសិនបើយានយន្តមិនត្រូវបានប្រគល់មកវិញ ហើយមិនអាចទាក់ទងអ្នកជួលបាន ក្នុងរយៈពេល ២៤ ម៉ោង គិតពីម៉ោងបញ្ចប់ ម្ចាស់អាចចាត់ទុកថាយានយន្តត្រូវបានលួច រាយការណ៍ទៅនគរបាល និងយកយានយន្តមកវិញ ដោយអ្នកជួលជាអ្នកចេញថ្លៃ។
+  - id: period.5
+    when: { rate_period: month }
+    en: "Rolling monthly rental: where no end date is written above, the rental continues from month to month on the same terms until either party ends it as set out in section 7. An agreed extension does not need a new agreement."
+    local: "ការជួលប្រចាំខែបន្តបន្ទាប់៖ ប្រសិនបើគ្មានកាលបរិច្ឆេទបញ្ចប់សរសេរនៅខាងលើ ការជួលបន្តពីមួយខែទៅមួយខែ តាមលក្ខខណ្ឌដដែល រហូតដល់ភាគីណាមួយបញ្ចប់ការជួល ដូចមានចែងក្នុងផ្នែកទី ៧។ ការពន្យារពេលដែលបានព្រមព្រៀង មិនតម្រូវឱ្យធ្វើកិច្ចសន្យាថ្មីឡើយ។"
 - id: charges
   title:
     en: 5. Rent and payment
@@ -384,6 +394,9 @@ sections:
   - id: fuel.6
     en: The Renter must not tamper with the odometer, speed limiter or GPS tracker. Tampering is a serious breach (section 15).
     local: អ្នកជួលមិនត្រូវកែប្រែ នាឡិកាគីឡូម៉ែត្រ ឧបករណ៍កំណត់ល្បឿន ឬឧបករណ៍តាមដាន GPS ឡើយ។ ការកែប្រែគឺជាការរំលោភធ្ងន់ធ្ងរ (ផ្នែកទី ១៥)។
+  - id: fuel.7
+    en: "Only the fuel type stated by the manufacturer (or in the vehicle's documents) may be used. If the wrong fuel is put in, the Renter pays the actual, evidenced cost of draining the tank and of any repair it causes."
+    local: "អនុញ្ញាតឱ្យប្រើតែប្រភេទប្រេងឥន្ធនៈដែលក្រុមហ៊ុនផលិតបានកំណត់ (ឬដែលមានចែងក្នុងឯកសាររបស់យានយន្ត) ប៉ុណ្ណោះ។ ប្រសិនបើចាក់ប្រេងខុសប្រភេទ អ្នកជួលបង់ថ្លៃជាក់ស្តែងដែលមានភស្តុតាង សម្រាប់ការបង្ហូរប្រេងចេញពីធុង និងការជួសជុលណាមួយដែលបណ្តាលមកពីការនោះ។"
 - id: use
   title:
     en: 9. Safe and lawful use
@@ -409,8 +422,8 @@ sections:
     local: រថយន្ត៖ អ្នកបើកបរ និងអ្នកដំណើរត្រូវពាក់ខ្សែក្រវាត់សុវត្ថិភាព ក្នុងករណីដែលច្បាប់តម្រូវ ហើយម្ចាស់ស្នើឱ្យអ្នកជិះទាំងអស់ពាក់។ កុមារត្រូវប្រើកៅអីកុមារដែលសមរម្យ ក្នុងករណីដែលច្បាប់តម្រូវ ហើយចំនួនអ្នកដំណើរមិនត្រូវលើសចំនួនកៅអីឡើយ។
     country: true
   - id: use.4
-    en: 'It is forbidden to: drive under the influence of alcohol or drugs, or above the legal limit; use a phone while driving except hands-free; race, perform stunts or drive off-road (unless the vehicle is meant for it and the Owner agreed); tow or push anything; carry goods for payment, illegal goods or dangerous loads; use the vehicle for ride-hailing, delivery work, driving lessons or to rent it to anyone else; let anyone not named in section 2 drive or ride.'
-    local: ហាមឃាត់៖ បើកបរក្រោមឥទ្ធិពលគ្រឿងស្រវឹង ឬគ្រឿងញៀន ឬលើសកម្រិតដែលច្បាប់កំណត់; ប្រើទូរស័ព្ទពេលបើកបរ លើកលែងតែប្រព័ន្ធមិនប្រើដៃ; ប្រណាំង សម្តែងក្បាច់ ឬបើកបរក្រៅផ្លូវ (លើកលែងតែយានយន្តត្រូវបានរចនាសម្រាប់ការនោះ ហើយម្ចាស់យល់ព្រម); អូស ឬរុញអ្វីមួយ; ដឹកទំនិញដើម្បីយកថ្លៃ ទំនិញខុសច្បាប់ ឬបន្ទុកគ្រោះថ្នាក់; ប្រើយានយន្តសម្រាប់សេវាដឹកអ្នកដំណើរតាមកម្មវិធី ការងារដឹកជញ្ជូន ការបង្រៀនបើកបរ ឬជួលបន្តឱ្យអ្នកដទៃ; អនុញ្ញាតឱ្យអ្នកដែលគ្មានឈ្មោះនៅផ្នែកទី ២ បើកបរ ឬជិះ។
+    en: "It is forbidden to: drive under the influence of alcohol or drugs, or above the legal limit; use a phone while driving except hands-free; race, perform stunts or drive off-road (unless the vehicle is meant for it and the Owner agreed); tow or push anything; carry passengers outside the cabin or on a load bed; carry goods for payment, illegal goods or dangerous loads; use the vehicle for ride-hailing, delivery work, driving lessons or to rent it to anyone else; let anyone not named in section 2 drive or ride."
+    local: "ហាមឃាត់៖ បើកបរក្រោមឥទ្ធិពលគ្រឿងស្រវឹង ឬគ្រឿងញៀន ឬលើសកម្រិតដែលច្បាប់កំណត់; ប្រើទូរស័ព្ទពេលបើកបរ លើកលែងតែប្រព័ន្ធមិនប្រើដៃ; ប្រណាំង សម្តែងក្បាច់ ឬបើកបរក្រៅផ្លូវ (លើកលែងតែយានយន្តត្រូវបានរចនាសម្រាប់ការនោះ ហើយម្ចាស់យល់ព្រម); អូស ឬរុញអ្វីមួយ; ដឹកអ្នកដំណើរនៅខាងក្រៅបន្ទប់អ្នកដំណើរ ឬលើកន្លែងផ្ទុកទំនិញ; ដឹកទំនិញដើម្បីយកថ្លៃ ទំនិញខុសច្បាប់ ឬបន្ទុកគ្រោះថ្នាក់; ប្រើយានយន្តសម្រាប់សេវាដឹកអ្នកដំណើរតាមកម្មវិធី ការងារដឹកជញ្ជូន ការបង្រៀនបើកបរ ឬជួលបន្តឱ្យអ្នកដទៃ; អនុញ្ញាតឱ្យអ្នកដែលគ្មានឈ្មោះនៅផ្នែកទី ២ បើកបរ ឬជិះ។"
   - id: use.5
     when:
       smoking: false
@@ -525,6 +538,9 @@ sections:
   - id: accident.4
     en: The Renter must report any warning light, unusual noise, puncture or fault promptly and must not keep using a vehicle that is unsafe.
     local: អ្នកជួលត្រូវរាយការណ៍ភ្លាមៗ អំពីភ្លើងព្រមាន សំឡេងមិនធម្មតា កង់បែក ឬការខូចណាមួយ ហើយមិនត្រូវបន្តប្រើយានយន្តដែលគ្មានសុវត្ថិភាពឡើយ។
+  - id: accident.5
+    en: "Breakdowns caused by misuse: if a mechanical fault or damage is caused by the Renter's misuse or negligence, for example ignoring a warning light, continuing to drive after a fault appears, the wrong fuel, overloading, towing, racing or driving off-road, and this is shown by a mechanic's report or other evidence, the Renter has no right to a refund under section 13 for that breakdown, and pays the actual, evidenced cost of repair and recovery. The Owner may deduct these costs from the deposit and invoice the Renter for any balance."
+    local: "ការខូចយានយន្តដោយសារការប្រើប្រាស់ខុស៖ ប្រសិនបើការខូចមេកានិច ឬការខូចខាត បណ្តាលមកពីការប្រើប្រាស់ខុស ឬការធ្វេសប្រហែសរបស់អ្នកជួល ឧទាហរណ៍ មិនអើពើនឹងភ្លើងព្រមាន បន្តបើកបរបន្ទាប់ពីមានការខូច ចាក់ប្រេងខុសប្រភេទ ដឹកលើសទម្ងន់ អូសទាញ ប្រណាំង ឬបើកបរក្រៅផ្លូវ ហើយការនេះត្រូវបានបញ្ជាក់ដោយរបាយការណ៍របស់ជាងជួសជុល ឬភស្តុតាងផ្សេងទៀត អ្នកជួលគ្មានសិទ្ធិទទួលបានការសងប្រាក់វិញតាមផ្នែកទី ១៣ សម្រាប់ការខូចនោះទេ ហើយត្រូវបង់ថ្លៃជាក់ស្តែងដែលមានភស្តុតាង សម្រាប់ការជួសជុល និងការអូសយានយន្ត។ ម្ចាស់អាចកាត់ថ្លៃទាំងនេះពីប្រាក់កក់ធានា ហើយចេញវិក្កយបត្រទៅអ្នកជួលសម្រាប់ចំនួនដែលនៅសល់។"
 - id: fines
   title:
     en: 14. Fines, tolls and parking
@@ -583,8 +599,8 @@ sections:
     local: ១៨. លក្ខខណ្ឌទូទៅ
   clauses:
   - id: general.1
-    en: 'Messages: notices under this agreement may be sent by phone, message app (WhatsApp, LINE, Telegram, Zalo or similar), SMS or email to the contact details in sections 1 and 2, and count as received when sent.'
-    local: ការជូនដំណឹង៖ ការជូនដំណឹងតាមកិច្ចសន្យានេះ អាចផ្ញើតាមទូរស័ព្ទ កម្មវិធីផ្ញើសារ (WhatsApp, LINE, Telegram, Zalo ឬស្រដៀងគ្នា) SMS ឬអ៊ីមែល ទៅព័ត៌មានទំនាក់ទំនងនៅផ្នែកទី ១ និង ២ ហើយត្រូវចាត់ទុកថាបានទទួល នៅពេលផ្ញើ។
+    en: "Messages: notices under this agreement may be sent by phone, message app (WhatsApp, LINE, Telegram, Zalo or similar), SMS or email to the contact details in sections 1 and 2, and count as received when sent. Messages, call logs and photos exchanged this way may be used as evidence of what was agreed."
+    local: "ការជូនដំណឹង៖ ការជូនដំណឹងតាមកិច្ចសន្យានេះ អាចផ្ញើតាមទូរស័ព្ទ កម្មវិធីផ្ញើសារ (WhatsApp, LINE, Telegram, Zalo ឬស្រដៀងគ្នា) SMS ឬអ៊ីមែល ទៅព័ត៌មានទំនាក់ទំនងនៅផ្នែកទី ១ និង ២ ហើយត្រូវចាត់ទុកថាបានទទួល នៅពេលផ្ញើ។ សារ កំណត់ត្រាការហៅទូរស័ព្ទ និងរូបថត ដែលបានផ្លាស់ប្តូរតាមរបៀបនេះ អាចប្រើជាភស្តុតាងនៃអ្វីដែលបានព្រមព្រៀងគ្នា។"
   - id: general.2
     en: 'Force majeure: neither party is responsible for a delay or failure caused by events outside their control, such as natural disasters, floods, storms, government orders or ferry cancellations. Rent for days the vehicle could not be used because of such an event is agreed fairly between the parties.'
     local: ករណីប្រធានសក្តិ៖ គ្មានភាគីណាទទួលខុសត្រូវចំពោះការពន្យារពេល ឬការមិនអនុវត្ត ដែលបណ្តាលមកពីព្រឹត្តិការណ៍ក្រៅការគ្រប់គ្រង ដូចជាគ្រោះធម្មជាតិ ទឹកជំនន់ ព្យុះ បទបញ្ជារបស់រដ្ឋាភិបាល ឬការលុបចោលសាឡាងទេ។ ថ្លៃជួលសម្រាប់ថ្ងៃដែលមិនអាចប្រើយានយន្តបាន ដោយសារព្រឹត្តិការណ៍បែបនេះ ត្រូវព្រមព្រៀងគ្នាដោយយុត្តិធម៌រវាងភាគី។

@@ -198,6 +198,12 @@ sections:
     en: The Owner confirms that the vehicle is registered, that its road tax is paid and that compulsory insurance is valid for the whole rental period, and that it is handed over in a roadworthy condition.
     local: ''
     country: true
+  - id: vehicle.3
+    en: The Owner keeps the vehicle serviced as the manufacturer recommends, including oil changes, inspections and worn parts, and pays for normal mechanical repairs and wear unless this agreement says otherwise. On longer rentals the Owner arranges servicing with the Renter at a convenient time and returns the vehicle promptly; if servicing takes more than one day, section 13 applies.
+    local: The Owner keeps the vehicle serviced as the manufacturer recommends, including oil changes, inspections and worn parts, and pays for normal mechanical repairs and wear unless this agreement says otherwise. On longer rentals the Owner arranges servicing with the Renter at a convenient time and returns the vehicle promptly; if servicing takes more than one day, section 13 applies.
+  - id: vehicle.4
+    en: 'During the rental the Renter looks after the vehicle''s day-to-day condition: checking that tyres, lights, brakes, oil and coolant look normal, keeping it clean enough to drive safely, and not driving or riding it if it becomes unsafe or unroadworthy.'
+    local: 'During the rental the Renter looks after the vehicle''s day-to-day condition: checking that tyres, lights, brakes, oil and coolant look normal, keeping it clean enough to drive safely, and not driving or riding it if it becomes unsafe or unroadworthy.'
 - id: period
   title:
     en: 4. Rental period, pickup and return
@@ -230,6 +236,11 @@ sections:
   - id: period.4
     en: If the vehicle is not returned and the Renter cannot be reached within 24 hours of the end time, the Owner may treat the vehicle as stolen, report it to the police and recover it, at the Renter's cost.
     local: ''
+  - id: period.5
+    en: 'Rolling monthly rental: where no end date is written above, the rental continues from month to month on the same terms until either party ends it as set out in section 7. An agreed extension does not need a new agreement.'
+    when:
+      rate_period: month
+    local: 'Rolling monthly rental: where no end date is written above, the rental continues from month to month on the same terms until either party ends it as set out in section 7. An agreed extension does not need a new agreement.'
 - id: charges
   title:
     en: 5. Rent and payment
@@ -348,6 +359,9 @@ sections:
   - id: fuel.6
     en: The Renter must not tamper with the odometer, speed limiter or GPS tracker. Tampering is a serious breach (section 15).
     local: ''
+  - id: fuel.7
+    en: Only the fuel type stated by the manufacturer (or in the vehicle's documents) may be used. If the wrong fuel is put in, the Renter pays the actual, evidenced cost of draining the tank and of any repair it causes.
+    local: Only the fuel type stated by the manufacturer (or in the vehicle's documents) may be used. If the wrong fuel is put in, the Renter pays the actual, evidenced cost of draining the tank and of any repair it causes.
 - id: use
   title:
     en: 9. Safe and lawful use
@@ -373,7 +387,7 @@ sections:
     local: ''
     country: true
   - id: use.4
-    en: 'It is forbidden to: drive under the influence of alcohol or drugs, or above the legal limit; use a phone while driving except hands-free; race, perform stunts or drive off-road (unless the vehicle is meant for it and the Owner agreed); tow or push anything; carry goods for payment, illegal goods or dangerous loads; use the vehicle for ride-hailing, delivery work, driving lessons or to rent it to anyone else; let anyone not named in section 2 drive or ride.'
+    en: 'It is forbidden to: drive under the influence of alcohol or drugs, or above the legal limit; use a phone while driving except hands-free; race, perform stunts or drive off-road (unless the vehicle is meant for it and the Owner agreed); tow or push anything; carry passengers outside the cabin or on a load bed; carry goods for payment, illegal goods or dangerous loads; use the vehicle for ride-hailing, delivery work, driving lessons or to rent it to anyone else; let anyone not named in section 2 drive or ride.'
     local: ''
   - id: use.5
     when:
@@ -485,6 +499,9 @@ sections:
   - id: accident.4
     en: The Renter must report any warning light, unusual noise, puncture or fault promptly and must not keep using a vehicle that is unsafe.
     local: ''
+  - id: accident.5
+    en: 'Breakdowns caused by misuse: if a mechanical fault or damage is caused by the Renter''s misuse or negligence, for example ignoring a warning light, continuing to drive after a fault appears, the wrong fuel, overloading, towing, racing or driving off-road, and this is shown by a mechanic''s report or other evidence, the Renter has no right to a refund under section 13 for that breakdown, and pays the actual, evidenced cost of repair and recovery. The Owner may deduct these costs from the deposit and invoice the Renter for any balance.'
+    local: 'Breakdowns caused by misuse: if a mechanical fault or damage is caused by the Renter''s misuse or negligence, for example ignoring a warning light, continuing to drive after a fault appears, the wrong fuel, overloading, towing, racing or driving off-road, and this is shown by a mechanic''s report or other evidence, the Renter has no right to a refund under section 13 for that breakdown, and pays the actual, evidenced cost of repair and recovery. The Owner may deduct these costs from the deposit and invoice the Renter for any balance.'
 - id: fines
   title:
     en: 14. Fines, tolls and parking
@@ -543,7 +560,7 @@ sections:
     local: ''
   clauses:
   - id: general.1
-    en: 'Messages: notices under this agreement may be sent by phone, message app (WhatsApp, LINE, Telegram, Zalo or similar), SMS or email to the contact details in sections 1 and 2, and count as received when sent.'
+    en: 'Messages: notices under this agreement may be sent by phone, message app (WhatsApp, LINE, Telegram, Zalo or similar), SMS or email to the contact details in sections 1 and 2, and count as received when sent. Messages, call logs and photos exchanged this way may be used as evidence of what was agreed.'
     local: ''
   - id: general.2
     en: 'Force majeure: neither party is responsible for a delay or failure caused by events outside their control, such as natural disasters, floods, storms, government orders or ferry cancellations. Rent for days the vehicle could not be used because of such an event is agreed fairly between the parties.'

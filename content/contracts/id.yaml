@@ -159,6 +159,12 @@ sections:
         en: "The Owner confirms that the vehicle is registered in Indonesia with a valid STNK (vehicle registration certificate); that its annual motor vehicle tax (PKB), together with the compulsory Jasa Raharja accident contribution (SWDKLLJ), has been paid and stays valid for the whole rental period; that any voluntary insurance covers use as a rental vehicle; and that the vehicle is handed over roadworthy, with the equipment the law requires (including SNI-standard helmets for motorbikes). The BPKB (ownership book) stays with the Owner."
         local: "Pemilik menyatakan bahwa kendaraan terdaftar di Indonesia dengan STNK yang berlaku; bahwa Pajak Kendaraan Bermotor (PKB) tahunan beserta Sumbangan Wajib Dana Kecelakaan Lalu Lintas Jalan (SWDKLLJ) Jasa Raharja telah dibayar dan tetap berlaku selama seluruh masa sewa; bahwa asuransi sukarela (jika ada) mencakup penggunaan sebagai kendaraan sewa; dan bahwa kendaraan diserahkan dalam keadaan laik jalan, dengan perlengkapan yang diwajibkan undang-undang (termasuk helm berstandar SNI untuk sepeda motor). BPKB tetap disimpan oleh Pemilik."
         country: true
+      - id: vehicle.3
+        en: "The Owner keeps the vehicle serviced as the manufacturer recommends, including oil changes, inspections and worn parts, and pays for normal mechanical repairs and wear unless this agreement says otherwise. On longer rentals the Owner arranges servicing with the Renter at a convenient time and returns the vehicle promptly; if servicing takes more than one day, section 13 applies."
+        local: "Pemilik merawat kendaraan sesuai anjuran pabrikan, termasuk penggantian oli, pemeriksaan berkala dan penggantian suku cadang yang aus, serta menanggung biaya perbaikan mekanis biasa dan keausan wajar, kecuali ditentukan lain dalam perjanjian ini. Untuk sewa jangka panjang, Pemilik mengatur jadwal servis bersama Penyewa pada waktu yang sesuai dan segera mengembalikan kendaraan; apabila servis memakan waktu lebih dari satu hari, berlaku Pasal 13."
+      - id: vehicle.4
+        en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tyres, lights, brakes, oil and coolant look normal, keeping it clean enough to drive safely, and not driving or riding it if it becomes unsafe or unroadworthy."
+        local: "Selama masa sewa, Penyewa menjaga kondisi harian kendaraan: memeriksa bahwa ban, lampu, rem, oli dan cairan pendingin tampak normal, menjaga kendaraan cukup bersih agar aman dikendarai, dan tidak mengemudikan kendaraan apabila kendaraan menjadi tidak aman atau tidak laik jalan."
       - id: vehicle.3_cc
         en: "The original STNK is handed over with the vehicle and must be carried whenever the vehicle is used, because the police may ask to see it together with the driving licence. The Renter must not leave it in an unattended vehicle, must keep it safe and must return it with the vehicle. A lost STNK or number plate is charged under section 12."
         local: "STNK asli diserahkan bersama kendaraan dan wajib dibawa setiap kali kendaraan digunakan, karena polisi dapat memintanya bersama SIM. Penyewa tidak boleh meninggalkannya di dalam kendaraan yang ditinggal, wajib menyimpannya dengan aman dan mengembalikannya bersama kendaraan. STNK atau pelat nomor yang hilang dikenakan biaya sesuai Pasal 12."
@@ -185,6 +191,10 @@ sections:
       - id: period.4
         en: "If the vehicle is not returned and the Renter cannot be reached within 24 hours of the end time, the Owner may treat the vehicle as stolen or embezzled, report it to the police and recover it, at the Renter's cost."
         local: "Apabila kendaraan tidak dikembalikan dan Penyewa tidak dapat dihubungi dalam waktu 24 jam setelah waktu berakhirnya sewa, Pemilik dapat menganggap kendaraan dicuri atau digelapkan, melaporkannya kepada polisi dan mengambil kembali kendaraan tersebut atas biaya Penyewa."
+      - id: period.5
+        when: { rate_period: month }
+        en: "Rolling monthly rental: where no end date is written above, the rental continues from month to month on the same terms until either party ends it as set out in section 7. An agreed extension does not need a new agreement."
+        local: "Sewa bulanan bergulir: apabila tidak ada tanggal berakhir yang tertulis di atas, sewa berlanjut dari bulan ke bulan dengan ketentuan yang sama sampai salah satu pihak mengakhirinya sebagaimana diatur dalam Pasal 7. Perpanjangan yang disepakati tidak memerlukan perjanjian baru."
 
   - id: charges
     title: { en: "5. Rent and payment", local: "5. Harga sewa dan pembayaran" }
@@ -279,6 +289,9 @@ sections:
       - id: fuel.6
         en: "The Renter must not tamper with the odometer, speed limiter or GPS tracker. Tampering is a serious breach (section 15)."
         local: "Penyewa dilarang mengubah atau merusak odometer, pembatas kecepatan atau pelacak GPS. Tindakan tersebut merupakan pelanggaran berat (Pasal 15)."
+      - id: fuel.7
+        en: "Only the fuel type stated by the manufacturer (or in the vehicle's documents) may be used. If the wrong fuel is put in, the Renter pays the actual, evidenced cost of draining the tank and of any repair it causes."
+        local: "Hanya jenis bahan bakar yang ditentukan oleh pabrikan (atau dalam dokumen kendaraan) yang boleh digunakan. Apabila diisi bahan bakar yang salah, Penyewa membayar biaya nyata yang dapat dibuktikan untuk pengurasan tangki dan setiap perbaikan yang diakibatkannya."
 
   - id: use
     title: { en: "9. Safe and lawful use", local: "9. Penggunaan yang aman dan sesuai hukum" }
@@ -297,8 +310,8 @@ sections:
         local: "Mobil: pengemudi dan penumpang di samping pengemudi wajib mengenakan sabuk keselamatan sesuai ketentuan undang-undang, dan penumpang lain sebaiknya juga mengenakannya apabila tersedia. Anak-anak sebaiknya menggunakan kursi atau pengaman anak yang sesuai. Jumlah penumpang tidak boleh melebihi jumlah tempat duduk."
         country: true
       - id: use.4
-        en: "It is forbidden to: drive under the influence of alcohol or drugs; use a phone while driving except hands-free; race, perform stunts or drive off-road or on beaches (unless the vehicle is meant for it and the Owner agreed); tow or push anything; carry goods for payment, illegal goods or dangerous loads; use the vehicle for ride-hailing, delivery work, driving lessons or to rent it to anyone else; let anyone not named in section 2 drive or ride."
-        local: "Penyewa dilarang: mengemudi di bawah pengaruh alkohol atau narkotika; menggunakan telepon saat mengemudi kecuali dengan perangkat bebas genggam; balapan, melakukan atraksi atau mengemudi di luar jalan atau di pantai (kecuali kendaraan memang diperuntukkan untuk itu dan Pemilik menyetujuinya); menarik atau mendorong apa pun; mengangkut barang dengan bayaran, barang terlarang atau muatan berbahaya; menggunakan kendaraan untuk ojek/taksi daring, jasa pengiriman, latihan mengemudi atau menyewakannya kepada orang lain; membiarkan orang yang tidak tercantum dalam Pasal 2 mengemudikan kendaraan."
+        en: "It is forbidden to: drive under the influence of alcohol or drugs; use a phone while driving except hands-free; race, perform stunts or drive off-road or on beaches (unless the vehicle is meant for it and the Owner agreed); tow or push anything; carry passengers outside the cabin or on a load bed; carry goods for payment, illegal goods or dangerous loads; use the vehicle for ride-hailing, delivery work, driving lessons or to rent it to anyone else; let anyone not named in section 2 drive or ride."
+        local: "Penyewa dilarang: mengemudi di bawah pengaruh alkohol atau narkotika; menggunakan telepon saat mengemudi kecuali dengan perangkat bebas genggam; balapan, melakukan atraksi atau mengemudi di luar jalan atau di pantai (kecuali kendaraan memang diperuntukkan untuk itu dan Pemilik menyetujuinya); menarik atau mendorong apa pun; mengangkut penumpang di luar kabin atau di bak muatan; mengangkut barang dengan bayaran, barang terlarang atau muatan berbahaya; menggunakan kendaraan untuk ojek/taksi daring, jasa pengiriman, latihan mengemudi atau menyewakannya kepada orang lain; membiarkan orang yang tidak tercantum dalam Pasal 2 mengemudikan kendaraan."
       - id: use.5
         when: { smoking: no }
         en: "Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odour removal.{{/if}}"
@@ -399,6 +412,9 @@ sections:
       - id: accident.4
         en: "The Renter must report any warning light, unusual noise, puncture or fault promptly and must not keep using a vehicle that is unsafe."
         local: "Penyewa wajib segera melaporkan setiap lampu peringatan, suara tidak wajar, ban bocor atau gangguan, dan tidak boleh terus menggunakan kendaraan yang tidak aman."
+      - id: accident.5
+        en: "Breakdowns caused by misuse: if a mechanical fault or damage is caused by the Renter's misuse or negligence, for example ignoring a warning light, continuing to drive after a fault appears, the wrong fuel, overloading, towing, racing or driving off-road, and this is shown by a mechanic's report or other evidence, the Renter has no right to a refund under section 13 for that breakdown, and pays the actual, evidenced cost of repair and recovery. The Owner may deduct these costs from the deposit and invoice the Renter for any balance."
+        local: "Kerusakan akibat penyalahgunaan: apabila gangguan mekanis atau kerusakan disebabkan oleh penyalahgunaan atau kelalaian Penyewa, misalnya mengabaikan lampu peringatan, tetap mengemudi setelah muncul gangguan, menggunakan bahan bakar yang salah, kelebihan muatan, menarik sesuatu, balapan atau mengemudi di luar jalan, dan hal ini dibuktikan dengan laporan mekanik atau bukti lain, Penyewa tidak berhak atas pengembalian harga sewa berdasarkan Pasal 13 untuk kerusakan tersebut, dan membayar biaya nyata yang dapat dibuktikan untuk perbaikan dan evakuasi kendaraan. Pemilik dapat memotong biaya tersebut dari uang jaminan dan menagihkan sisanya kepada Penyewa."
 
   - id: fines
     title: { en: "14. Fines, tolls and parking", local: "14. Denda, tol dan parkir" }
@@ -455,8 +471,8 @@ sections:
     title: { en: "18. General terms", local: "18. Ketentuan umum" }
     clauses:
       - id: general.1
-        en: "Messages: notices under this agreement may be sent by phone, message app (WhatsApp, Telegram or similar), SMS or email to the contact details in sections 1 and 2, and count as received when sent."
-        local: "Pemberitahuan: pemberitahuan berdasarkan perjanjian ini dapat disampaikan melalui telepon, aplikasi pesan (WhatsApp, Telegram atau sejenisnya), SMS atau email ke kontak dalam Pasal 1 dan 2, dan dianggap diterima pada saat dikirim."
+        en: "Messages: notices under this agreement may be sent by phone, message app (WhatsApp, Telegram or similar), SMS or email to the contact details in sections 1 and 2, and count as received when sent. Messages, call logs and photos exchanged this way may be used as evidence of what was agreed."
+        local: "Pemberitahuan: pemberitahuan berdasarkan perjanjian ini dapat disampaikan melalui telepon, aplikasi pesan (WhatsApp, Telegram atau sejenisnya), SMS atau email ke kontak dalam Pasal 1 dan 2, dan dianggap diterima pada saat dikirim. Pesan, catatan panggilan dan foto yang dipertukarkan melalui cara tersebut dapat digunakan sebagai bukti mengenai apa yang telah disepakati."
       - id: general.2
         en: "Force majeure: neither party is responsible for a delay or failure caused by events outside their control, such as natural disasters, floods, volcanic eruptions, storms, government orders or ferry cancellations. Rent for days the vehicle could not be used because of such an event is agreed fairly between the parties."
         local: "Keadaan kahar: tidak ada pihak yang bertanggung jawab atas keterlambatan atau kegagalan yang disebabkan oleh peristiwa di luar kendalinya, seperti bencana alam, banjir, letusan gunung berapi, badai, perintah pemerintah atau pembatalan kapal penyeberangan. Harga sewa untuk hari-hari ketika kendaraan tidak dapat digunakan karena peristiwa tersebut disepakati secara adil oleh para pihak."

@@ -148,6 +148,12 @@ sections:
         en: "The Owner confirms that: the vehicle is registered in Vietnam; its compulsory civil liability insurance is valid for the whole rental period; its technical safety and environmental inspection certificate (đăng kiểm) is valid where the law requires one; any road-use fee is paid where applicable; and it is handed over in a roadworthy condition."
         local: "Bên cho thuê xác nhận: xe đã được đăng ký tại Việt Nam; bảo hiểm bắt buộc trách nhiệm dân sự của chủ xe cơ giới còn hiệu lực trong suốt thời gian thuê; giấy chứng nhận kiểm định an toàn kỹ thuật và bảo vệ môi trường (đăng kiểm) còn hiệu lực đối với xe phải kiểm định theo quy định; phí sử dụng đường bộ đã được nộp (nếu có); và xe được giao trong tình trạng đủ điều kiện tham gia giao thông."
         country: true
+      - id: vehicle.3
+        en: "The Owner keeps the vehicle serviced as the manufacturer recommends, including oil changes, inspections and worn parts, and pays for normal mechanical repairs and wear unless this agreement says otherwise. On longer rentals the Owner arranges servicing with the Renter at a convenient time and returns the vehicle promptly; if servicing takes more than one day, section 13 applies."
+        local: "Bên cho thuê bảo dưỡng xe theo khuyến nghị của nhà sản xuất, bao gồm thay dầu, kiểm tra định kỳ và thay phụ tùng hao mòn, và chịu chi phí sửa chữa cơ khí thông thường và hao mòn tự nhiên, trừ khi hợp đồng này quy định khác. Đối với thuê dài hạn, Bên cho thuê sắp xếp lịch bảo dưỡng với Bên thuê vào thời điểm thuận tiện và giao lại xe ngay; nếu việc bảo dưỡng kéo dài hơn một ngày, áp dụng mục 13."
+      - id: vehicle.4
+        en: "During the rental the Renter looks after the vehicle's day-to-day condition: checking that tyres, lights, brakes, oil and coolant look normal, keeping it clean enough to drive safely, and not driving or riding it if it becomes unsafe or unroadworthy."
+        local: "Trong thời gian thuê, Bên thuê giữ gìn tình trạng hằng ngày của xe: kiểm tra lốp, đèn, phanh, dầu máy và nước làm mát ở tình trạng bình thường, giữ xe đủ sạch để lái an toàn, và không lái xe nếu xe trở nên không an toàn hoặc không đủ điều kiện tham gia giao thông."
       - id: vehicle.docs_cc
         en: "The Owner hands over with the vehicle the documents the driver must carry under the Road Traffic Order and Safety Law: the vehicle registration certificate (or a copy where the law allows), the compulsory insurance certificate and, for vehicles that need one, the inspection certificate. Electronic versions may be used where the law allows. The Renter keeps these documents safe and returns them with the vehicle."
         local: "Bên cho thuê giao kèm theo xe các giấy tờ người lái phải mang theo theo Luật Trật tự, an toàn giao thông đường bộ: chứng nhận đăng ký xe (hoặc bản sao trong trường hợp pháp luật cho phép), giấy chứng nhận bảo hiểm bắt buộc và, đối với xe phải kiểm định, giấy chứng nhận kiểm định. Có thể dùng giấy tờ điện tử khi pháp luật cho phép. Bên thuê phải giữ gìn các giấy tờ này và trả lại cùng với xe."
@@ -174,6 +180,10 @@ sections:
       - id: period.4
         en: "If the vehicle is not returned and the Renter cannot be reached within 24 hours of the end time, the Owner may treat the vehicle as stolen or misappropriated, report it to the police and recover it, at the Renter's cost."
         local: "Nếu xe không được trả và không liên lạc được với Bên thuê trong vòng 24 giờ kể từ thời điểm kết thúc thuê, Bên cho thuê có quyền coi như xe bị chiếm đoạt, trình báo cơ quan công an và thu hồi xe; Bên thuê chịu mọi chi phí phát sinh."
+      - id: period.5
+        when: { rate_period: month }
+        en: "Rolling monthly rental: where no end date is written above, the rental continues from month to month on the same terms until either party ends it as set out in section 7. An agreed extension does not need a new agreement."
+        local: "Thuê theo tháng liên tục: nếu không ghi ngày kết thúc ở trên, việc thuê tiếp tục từ tháng này sang tháng khác với cùng các điều kiện cho đến khi một bên chấm dứt theo mục 7. Việc gia hạn đã thỏa thuận không cần lập hợp đồng mới."
 
   - id: charges
     title: { en: "5. Rent and payment", local: "5. Tiền thuê và thanh toán" }
@@ -268,6 +278,9 @@ sections:
       - id: fuel.6
         en: "The Renter must not tamper with the odometer, speed limiter or GPS tracker. Tampering is a serious breach (section 15)."
         local: "Bên thuê không được can thiệp vào đồng hồ đo km, bộ giới hạn tốc độ hoặc thiết bị định vị GPS. Hành vi can thiệp là vi phạm nghiêm trọng (mục 15)."
+      - id: fuel.7
+        en: "Only the fuel type stated by the manufacturer (or in the vehicle's documents) may be used. If the wrong fuel is put in, the Renter pays the actual, evidenced cost of draining the tank and of any repair it causes."
+        local: "Chỉ được sử dụng loại nhiên liệu do nhà sản xuất quy định (hoặc ghi trong giấy tờ của xe). Nếu đổ sai nhiên liệu, Bên thuê thanh toán chi phí thực tế, có chứng từ, cho việc xả bình nhiên liệu và mọi sửa chữa phát sinh từ việc đó."
 
   - id: use
     title: { en: "9. Safe and lawful use", local: "9. Sử dụng xe an toàn và đúng pháp luật" }
@@ -286,8 +299,8 @@ sections:
         local: "Ô tô: người lái và mọi người được chở phải thắt dây đai an toàn tại những chỗ có trang bị dây đai. Trẻ em dưới 10 tuổi và cao dưới 1,35 mét không được ngồi cùng hàng ghế với người lái xe (trừ xe chỉ có một hàng ghế) và phải sử dụng thiết bị an toàn phù hợp cho trẻ em theo quy định của pháp luật. Số người được chở không được vượt quá số chỗ ngồi."
         country: true
       - id: use.4
-        en: "It is forbidden to: drive or ride with any alcohol in the blood or breath (Vietnam has a zero limit) or under the influence of drugs; hold or use a phone or other device while driving or riding, except hands-free where the law allows; race, perform stunts or drive off-road (unless the vehicle is meant for it and the Owner agreed); tow or push anything; carry goods for payment, illegal goods or dangerous loads; use the vehicle for ride-hailing, delivery work, driving lessons or to rent it to anyone else; let anyone not named in section 2 drive or ride."
-        local: "Nghiêm cấm: lái xe khi trong máu hoặc hơi thở có nồng độ cồn (Việt Nam không cho phép bất kỳ mức nồng độ cồn nào) hoặc khi sử dụng chất ma túy; cầm hoặc sử dụng điện thoại, thiết bị điện tử khác khi đang lái xe, trừ hình thức rảnh tay khi pháp luật cho phép; đua xe, biểu diễn hoặc chạy xe địa hình (trừ khi xe dành cho mục đích đó và Bên cho thuê đồng ý); kéo hoặc đẩy bất cứ vật gì; chở hàng thuê, hàng cấm hoặc hàng nguy hiểm; dùng xe để chạy xe công nghệ, giao hàng, dạy lái xe hoặc cho người khác thuê lại; để người không có tên tại mục 2 lái xe."
+        en: "It is forbidden to: drive or ride with any alcohol in the blood or breath (Vietnam has a zero limit) or under the influence of drugs; hold or use a phone or other device while driving or riding, except hands-free where the law allows; race, perform stunts or drive off-road (unless the vehicle is meant for it and the Owner agreed); tow or push anything; carry passengers outside the cabin or on a load bed; carry goods for payment, illegal goods or dangerous loads; use the vehicle for ride-hailing, delivery work, driving lessons or to rent it to anyone else; let anyone not named in section 2 drive or ride."
+        local: "Nghiêm cấm: lái xe khi trong máu hoặc hơi thở có nồng độ cồn (Việt Nam không cho phép bất kỳ mức nồng độ cồn nào) hoặc khi sử dụng chất ma túy; cầm hoặc sử dụng điện thoại, thiết bị điện tử khác khi đang lái xe, trừ hình thức rảnh tay khi pháp luật cho phép; đua xe, biểu diễn hoặc chạy xe địa hình (trừ khi xe dành cho mục đích đó và Bên cho thuê đồng ý); kéo hoặc đẩy bất cứ vật gì; chở người ngồi bên ngoài khoang xe hoặc trên thùng chở hàng; chở hàng thuê, hàng cấm hoặc hàng nguy hiểm; dùng xe để chạy xe công nghệ, giao hàng, dạy lái xe hoặc cho người khác thuê lại; để người không có tên tại mục 2 lái xe."
       - id: use.5
         when: { smoking: no }
         en: "Smoking and vaping are not allowed in the vehicle.{{#if smoking_fee}} Breaking this rule costs a fee of {{currency}} {{smoking_fee}} for odour removal.{{/if}}"
@@ -382,6 +395,9 @@ sections:
       - id: accident.4
         en: "The Renter must report any warning light, unusual noise, puncture or fault promptly and must not keep using a vehicle that is unsafe."
         local: "Bên thuê phải báo ngay khi có đèn cảnh báo, tiếng kêu bất thường, thủng lốp hoặc hư hỏng, và không được tiếp tục sử dụng xe không an toàn."
+      - id: accident.5
+        en: "Breakdowns caused by misuse: if a mechanical fault or damage is caused by the Renter's misuse or negligence, for example ignoring a warning light, continuing to drive after a fault appears, the wrong fuel, overloading, towing, racing or driving off-road, and this is shown by a mechanic's report or other evidence, the Renter has no right to a refund under section 13 for that breakdown, and pays the actual, evidenced cost of repair and recovery. The Owner may deduct these costs from the deposit and invoice the Renter for any balance."
+        local: "Hỏng xe do sử dụng sai: nếu hư hỏng cơ khí hoặc thiệt hại do Bên thuê sử dụng sai hoặc cẩu thả gây ra, ví dụ bỏ qua đèn cảnh báo, tiếp tục lái xe sau khi xuất hiện hư hỏng, đổ sai nhiên liệu, chở quá tải, kéo vật khác, đua xe hoặc chạy xe địa hình, và điều này được chứng minh bằng biên bản của thợ sửa chữa hoặc chứng cứ khác, Bên thuê không được hoàn tiền thuê theo mục 13 đối với lần hỏng xe đó, và phải thanh toán chi phí thực tế, có chứng từ, cho việc sửa chữa và cứu hộ. Bên cho thuê có quyền khấu trừ các chi phí này vào tiền ký cược và yêu cầu Bên thuê thanh toán phần còn thiếu."
 
   - id: fines
     title: { en: "14. Fines, tolls and parking", local: "14. Tiền phạt, phí đường bộ và đỗ xe" }
@@ -438,8 +454,8 @@ sections:
     title: { en: "18. General terms", local: "18. Điều khoản chung" }
     clauses:
       - id: general.1
-        en: "Messages: notices under this agreement may be sent by phone, message app (Zalo, WhatsApp, Telegram or similar), SMS or email to the contact details in sections 1 and 2, and count as received when sent."
-        local: "Thông báo: các thông báo theo hợp đồng này có thể được gửi qua điện thoại, ứng dụng nhắn tin (Zalo, WhatsApp, Telegram hoặc tương tự), tin nhắn SMS hoặc email theo thông tin liên lạc tại mục 1 và mục 2, và được coi là đã nhận khi gửi đi."
+        en: "Messages: notices under this agreement may be sent by phone, message app (Zalo, WhatsApp, Telegram or similar), SMS or email to the contact details in sections 1 and 2, and count as received when sent. Messages, call logs and photos exchanged this way may be used as evidence of what was agreed."
+        local: "Thông báo: các thông báo theo hợp đồng này có thể được gửi qua điện thoại, ứng dụng nhắn tin (Zalo, WhatsApp, Telegram hoặc tương tự), tin nhắn SMS hoặc email theo thông tin liên lạc tại mục 1 và mục 2, và được coi là đã nhận khi gửi đi. Tin nhắn, nhật ký cuộc gọi và hình ảnh trao đổi qua các hình thức này có thể được dùng làm chứng cứ về những nội dung đã thỏa thuận."
       - id: general.2
         en: "Force majeure: neither party is responsible for a delay or failure caused by events outside their control, such as natural disasters, floods, storms, government orders or ferry cancellations. Rent for days the vehicle could not be used because of such an event is agreed fairly between the parties."
         local: "Sự kiện bất khả kháng: không bên nào chịu trách nhiệm về việc chậm trễ hoặc không thực hiện được nghĩa vụ do sự kiện ngoài khả năng kiểm soát, như thiên tai, lũ lụt, bão, lệnh của cơ quan nhà nước hoặc hủy chuyến phà. Tiền thuê cho những ngày không thể sử dụng xe do sự kiện đó sẽ được hai bên thỏa thuận một cách công bằng."

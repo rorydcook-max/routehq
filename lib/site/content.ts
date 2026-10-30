@@ -51,6 +51,8 @@ export type ResourceMeta = {
   inside: string[];
   formats: DownloadFormat[];
   date: string;
+  /** False for pages that exist for search (the country and city versions of the agreement): not in the list, but in the sitemap. */
+  listed: boolean;
 };
 export type Resource = ResourceMeta & { html: string };
 export type ResourceFile = { locale: string; format: DownloadFormat; bytes: number };
@@ -248,6 +250,7 @@ function readResource(locale: string, slug: string): Resource | null {
       inside: list(data.inside),
       formats: formats.length ? formats : ["pdf"],
       date: isoDate(data.date),
+      listed: data.listed !== false,
       html: renderMarkdown(body, locale).html,
       draft: data.draft === true
     } as Resource & { draft: boolean };
@@ -260,13 +263,13 @@ export function getResource(locale: string, slug: string): Resource | null {
   return resource && !isDraft(resource) ? resource : null;
 }
 
-/** Every published resource in a language. */
-export function listResources(locale: string): ResourceMeta[] {
+/** Every published resource in a language; pages marked `listed: false` only when asked for (the sitemap). */
+export function listResources(locale: string, { unlisted = false }: { unlisted?: boolean } = {}): ResourceMeta[] {
   if (!locales.has(locale)) return [];
   return listDir(join(CONTENT, "resources", locale))
     .filter((name) => name.endsWith(".md") && !name.endsWith(".template.md") && !name.startsWith("_"))
     .map((name) => getResource(locale, name.slice(0, -3)))
-    .filter((resource): resource is Resource => Boolean(resource))
+    .filter((resource): resource is Resource => Boolean(resource) && (unlisted || resource!.listed))
     .sort((a, b) => b.date.localeCompare(a.date) || a.title.localeCompare(b.title));
 }
 
@@ -277,7 +280,7 @@ export function resourceLocales(slug: string): string[] {
 
 export function allResourceSlugs(): string[] {
   const slugs = new Set<string>();
-  for (const locale of supportedLocaleCodes) for (const resource of listResources(locale)) slugs.add(resource.slug);
+  for (const locale of supportedLocaleCodes) for (const resource of listResources(locale, { unlisted: true })) slugs.add(resource.slug);
   return [...slugs];
 }
 

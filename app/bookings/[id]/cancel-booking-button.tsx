@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { createPortal } from "react-dom";
 import { shownError } from "@/lib/error-text";
 import { useTranslations } from "next-intl";
 import { AlertTriangle, XCircle } from "lucide-react";
@@ -248,8 +249,11 @@ export function CancelBookingButton({
         {label || say("cn_label")}
       </button>
 
-      {open ? (
-        <div className="fixed inset-0 z-50 flex items-end bg-[var(--foreground)]/60 p-3 sm:items-center sm:justify-center">
+      {/* Drawn on the page body, not inside the card: from the bookings list a card's own lines painted over the
+          sheet, and the phone menu covered its buttons. It scrolls on its own and clears the menu and home bar. */}
+      {open && typeof document !== "undefined" ? createPortal(
+        <div className="fixed inset-0 z-[70] overflow-y-auto overscroll-contain bg-[var(--foreground)]/60" role="dialog" aria-modal="true">
+          <div className="flex min-h-full items-end justify-center p-3 pb-[calc(12px+env(safe-area-inset-bottom))] sm:items-center">
           <div className="w-full max-w-lg rounded-2xl border border-[var(--danger-line)] bg-white shadow-2xl">
 
             <div className="flex items-start gap-3 border-b border-[var(--danger-line)] bg-[var(--danger-light)] p-4 rounded-t-2xl">
@@ -580,7 +584,9 @@ export function CancelBookingButton({
               </div>
             </div>
           </div>
-        </div>
+          </div>
+        </div>,
+        document.body
       ) : null}
     </>
   );

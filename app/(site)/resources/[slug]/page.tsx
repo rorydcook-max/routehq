@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
-import { CONTRACT_BUILDER_SLUG } from "@/lib/contract-builder/fields";
+import { CONTRACT_BUILDER_PAGES, CONTRACT_BUILDER_SLUG, isContractBuilder } from "@/lib/contract-builder/fields";
 import { LEAD_COUNTRIES, leadCountryOptions } from "@/lib/leads";
 import { visitorCountry } from "@/lib/site-currency";
 import { getResource, resourceLocales, resourcePreview } from "@/lib/site/content";
@@ -57,11 +57,15 @@ export default async function ResourcePage({ params }: Props) {
   const [{ slug }, locale, m] = await Promise.all([params, getLocale(), getTranslations("marketing")]);
   const resource = getResource(locale, slug);
   if (!resource) notFound();
-  const builder = slug === CONTRACT_BUILDER_SLUG;
+  const builder = isContractBuilder(slug);
   const words = Object.fromEntries((builder ? [...FORM_KEYS, ...BUILDER_KEYS] : FORM_KEYS).map((key) => [key, m(key)]));
-  const here = builder ? await visitorCountry() : "";
+  // A country or city page starts on its own country; the main page on the visitor's.
+  const here = builder ? CONTRACT_BUILDER_PAGES[slug] || (await visitorCountry()) : "";
   const initialCountry = (LEAD_COUNTRIES as readonly string[]).includes(here) ? here : "";
-  const preview = resourcePreview(locale, slug) || resourcePreview("en", slug);
+  const preview =
+    resourcePreview(locale, slug) ||
+    resourcePreview("en", slug) ||
+    (builder ? resourcePreview(locale, CONTRACT_BUILDER_SLUG) || resourcePreview("en", CONTRACT_BUILDER_SLUG) : null);
   const url = siteUrl(`/resources/${slug}`, locale);
   const jsonLd = {
     "@context": "https://schema.org",

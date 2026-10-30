@@ -222,6 +222,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
   }
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleteErrorId, setDeleteErrorId] = useState<string | null>(null);
   const [allDone, setAllDone] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -236,6 +237,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
     startTransition(async () => {
       const result = await deleteBooking(bookingId);
       if (!result.success) {
+        setDeleteErrorId(bookingId);
         setDeleteError(result.error || tx.say("deleteFailed"));
         setConfirmDeleteId(null);
       }
@@ -321,7 +323,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
         </div>
       </div>
 
-      {deleteError ? (
+      {deleteError && !deleteErrorId ? (
         <p className="rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-3 text-sm font-semibold text-[var(--danger)]">{deleteError}</p>
       ) : null}
       {filtered.length === 0 ? (
@@ -372,11 +374,12 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                     {showLinkBadge ? <Badge tone="amber">{linkLabel(booking.booking_link?.status, tx)}</Badge> : null}
                   </div>
                     {/* Edit, extend, cancel and delete stay one tap away without crowding every card. */}
-                    <details className="absolute right-2.5 top-2.5 z-10">
+                    {/* z-20: above the card's own tappable lines (z-10), which painted over the open menu. */}
+                    <details className="absolute right-2.5 top-2.5 z-20">
                       <summary aria-label={tx.say("moreOptions")} className="pressable flex h-8 w-8 cursor-pointer list-none items-center justify-center rounded-full text-[var(--muted)] hover:bg-[var(--panel-secondary)] [&::-webkit-details-marker]:hidden">
                         <MoreHorizontal size={18} />
                       </summary>
-                      <div className="absolute right-0 top-full z-20 mt-1 flex min-w-[150px] flex-col items-stretch gap-1.5 rounded-lg border border-[var(--border)] bg-white p-2 text-left shadow-lg">
+                      <div className="absolute right-0 top-full z-20 mt-1 flex min-w-[170px] flex-col items-stretch gap-1.5 whitespace-nowrap rounded-lg border border-[var(--border)] bg-white p-2 text-left shadow-lg">
                 <Link className="pressable inline-flex min-h-8 items-center justify-center rounded-full border border-[var(--border)] bg-white px-3 py-1.5 text-[14px] font-semibold text-[var(--foreground-secondary)]" href={`/bookings/${booking.id}/edit`}>
                   {tx.say("edit")}
                 </Link>
@@ -418,12 +421,17 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                 ) : null}
                 {confirmDeleteId === booking.id ? null : (
                   <button
-                    className="pressable inline-flex min-h-8 items-center justify-center rounded-full border border-[var(--danger-line)] bg-[var(--danger-light)] px-2 text-[var(--danger)]"
-                    onClick={() => { setConfirmDeleteId(booking.id); setDeleteError(null); }}
-                    title={tx.say("deleteBooking")}
+                    className="pressable inline-flex min-h-8 items-center justify-center gap-1.5 rounded-full border border-[var(--danger-line)] bg-[var(--danger-light)] px-3 py-1.5 text-[14px] font-semibold text-[var(--danger)]"
+                    onClick={(event) => {
+                      // Close the menu so the confirm box below the card is what's in view (it opened hidden behind it).
+                      event.currentTarget.closest("details")?.removeAttribute("open");
+                      setConfirmDeleteId(booking.id);
+                      setDeleteError(null);
+                    }}
                     type="button"
                   >
                     <Trash2 size={14} />
+                    {tx.say("deleteBooking")}
                   </button>
                 )}
               </div>
@@ -491,8 +499,14 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                   <p className="sm:col-start-2 font-bold tabular-nums text-[var(--success)] md:col-start-auto md:text-right">{tx.say("paid")} {money(booking.total_paid, booking.currency)}</p>
                 ) : null}
               </div>
+              {deleteError && deleteErrorId === booking.id ? (
+                // Said on the card that was tapped: at the top of the list it was off-screen, so delete seemed to do nothing.
+                <p className="relative z-10 mt-2 rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-2 text-sm font-semibold text-[var(--danger)]" ref={(el) => el?.scrollIntoView({ block: "nearest", behavior: "smooth" })} role="alert">
+                  {deleteError}
+                </p>
+              ) : null}
               {confirmDeleteId === booking.id ? (
-                <div className="relative z-10 mt-2 rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-2">
+                <div className="relative z-10 mt-2 rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-2" ref={(el) => el?.scrollIntoView({ block: "nearest", behavior: "smooth" })}>
                   <p className="mb-2 text-xs font-semibold text-[var(--danger)]">
                     {tx.rich("deleteConfirm", { b: (chunks: React.ReactNode) => <strong>{chunks}</strong> })}
                   </p>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { createPortal } from "react-dom";
 import { shownError } from "@/lib/error-text";
 import { useTranslations } from "next-intl";
 import { RotateCcw, X } from "lucide-react";
@@ -60,8 +61,10 @@ export function UndoCancellationButton({
         {label || say("undo_label")}
       </button>
 
-      {open ? (
-        <div className="fixed inset-0 z-50 flex items-end bg-[var(--foreground)]/60 p-3 sm:items-center sm:justify-center">
+      {/* On the page body, above the phone menu (see the cancel sheet): a card's lines must not paint over it. */}
+      {open && typeof document !== "undefined" ? createPortal(
+        <div className="fixed inset-0 z-[70] overflow-y-auto overscroll-contain bg-[var(--foreground)]/60" role="dialog" aria-modal="true">
+          <div className="flex min-h-full items-end justify-center p-3 pb-[calc(12px+env(safe-area-inset-bottom))] sm:items-center">
           <div className="w-full max-w-md rounded-2xl border border-[var(--border)] bg-white shadow-2xl">
 
             <div className="flex items-start gap-3 rounded-t-2xl border-b border-[var(--border)] bg-[var(--panel-secondary)] p-4">
@@ -131,7 +134,9 @@ export function UndoCancellationButton({
               </div>
             </div>
           </div>
-        </div>
+          </div>
+        </div>,
+        document.body
       ) : null}
     </>
   );

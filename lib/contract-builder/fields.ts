@@ -8,6 +8,28 @@
 /** The free resource that is the contract builder (its page shows the extra fields; its links build the file). */
 export const CONTRACT_BUILDER_SLUG = "rental-agreement";
 
+/**
+ * Every page that is the contract builder, with the country it starts on: the main page (visitor's country) and the
+ * country and city versions written for search ("free rental agreement for Thailand / Bali / Phuket"). Each has its
+ * own content/resources/<locale>/<slug>.md; they're `listed: false`, so only the main one shows in the list.
+ */
+export const CONTRACT_BUILDER_PAGES: Readonly<Record<string, string | null>> = {
+  "rental-agreement": null,
+  "rental-agreement-thailand": "TH",
+  "rental-agreement-phuket": "TH",
+  "rental-agreement-koh-samui": "TH",
+  "rental-agreement-chiang-mai": "TH",
+  "rental-agreement-indonesia": "ID",
+  "rental-agreement-bali": "ID",
+  "rental-agreement-vietnam": "VN",
+  "rental-agreement-malaysia": "MY",
+  "rental-agreement-philippines": "PH",
+  "rental-agreement-laos": "LA",
+  "rental-agreement-cambodia": "KH"
+};
+
+export const isContractBuilder = (slug: string) => Object.prototype.hasOwnProperty.call(CONTRACT_BUILDER_PAGES, slug);
+
 export const CONTRACT_COUNTRIES =["TH", "ID", "VN", "MY", "PH", "LA", "KH", "XX"] as const;
 export type ContractCountry = (typeof CONTRACT_COUNTRIES)[number];
 

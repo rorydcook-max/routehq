@@ -10,7 +10,7 @@ import { EMAIL_PATTERN, formText, requestIpHash } from "@/lib/site/request-hash"
 import { siteOrigin } from "@/lib/site/seo";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { alertTeam } from "@/lib/support";
-import { CONTRACT_BUILDER_SLUG, contractCountryFor, hasContractDetails, parseContractForm } from "@/lib/contract-builder/fields";
+import { contractCountryFor, isContractBuilder, hasContractDetails, parseContractForm } from "@/lib/contract-builder/fields";
 import { inspectLogo, LOGO_MAX_BYTES } from "@/lib/contract-builder/logo";
 
 /**
@@ -44,7 +44,7 @@ export async function requestLead(previous: LeadState, formData: FormData): Prom
   if (!values.email) return { n, status: "error", error: "required", values };
   if (!EMAIL_PATTERN.test(values.email)) return { n, status: "error", error: "email", values };
   if (!isContentSlug(slug) || !resourceLocales(slug).length) return { n, status: "error", error: "failed", values };
-  const builder = slug === CONTRACT_BUILDER_SLUG;
+  const builder = isContractBuilder(slug);
   const country = (LEAD_COUNTRIES as readonly string[]).includes(values.country) || values.country === "other" ? values.country : null;
   const fleet = (LEAD_FLEETS as readonly string[]).includes(values.fleet) ? values.fleet : null;
   const source = formText(formData, "source", LIMITS.source);

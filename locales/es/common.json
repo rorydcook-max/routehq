@@ -1301,10 +1301,10 @@
     "datesPassed": "Fechas pasadas · sin confirmar",
     "changeDates": "Cambiar fechas",
     "linkNotCompleted": "El enlace de reserva no se completó",
-    "deleteRecordsTitle": "Esta reserva tiene registros",
+    "deleteRecordsTitle": "Estos registros también se eliminarán",
     "deleteRecordsPayments": "Pagos registrados: {count}",
-    "deleteRecordsInspections": "Revisiones de entrega o devolución: {count}",
-    "deleteRecordsSigned": "Un contrato firmado (se guarda, pero oculto)",
+    "deleteRecordsInspections": "Revisiones de entrega y devolución, con fotos: {count}",
+    "deleteRecordsSigned": "Excepto el contrato firmado: se oculta, pero se guarda",
     "deleteRecordsBody": "No se puede deshacer.",
     "deleteAnyway": "Eliminar de todos modos"
   },
@@ -2733,7 +2733,7 @@
     "filterEmpty": "No hay vehículos en este grupo en este momento.",
     "bandVehicles": "{count, plural, one {vehículo} other {vehículos}}",
     "addDates": "Añadir fechas",
-    "deleteWithBookings": "¿Eliminar este vehículo y sus {count} reservas en curso o próximas?",
+    "deleteWithBookings": "También elimina sus {count} reservas en curso o próximas, con sus pagos y revisiones. No se puede deshacer.",
     "deleteWithBookingsBtn": "Eliminar vehículo y reservas"
   },
   "customers": {
@@ -3421,7 +3421,7 @@
     "archiveBtn": "Archivar vehículo",
     "archiving": "Archivando…",
     "deleteLead": "Eliminar",
-    "deleteBody": "lo elimina para siempre, junto con sus reservas en curso o próximas.",
+    "deleteBody": "lo elimina para siempre, junto con sus reservas en curso o próximas y sus pagos.",
     "n_placeholder": "Todo lo que convenga recordar: particularidades, avisos de mantenimiento, dónde está la llave de repuesto",
     "n_auto": "Se guarda al salir del campo",
     "n_edited": "Última edición el {date}",

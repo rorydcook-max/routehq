@@ -1301,10 +1301,10 @@
     "datesPassed": "日程が過ぎました · 未確定",
     "changeDates": "日程を変更",
     "linkNotCompleted": "予約リンクが完了していません",
-    "deleteRecordsTitle": "この予約には記録があります",
+    "deleteRecordsTitle": "これらの記録も削除されます",
     "deleteRecordsPayments": "記録された支払い：{count}",
-    "deleteRecordsInspections": "引き渡し・返却チェック：{count}",
-    "deleteRecordsSigned": "署名済みの契約書（保存されますが、非表示になります）",
+    "deleteRecordsInspections": "引き渡し・返却時のチェック（写真付き）：{count}",
+    "deleteRecordsSigned": "署名済みの契約書は除く：非表示になりますが保管されます",
     "deleteRecordsBody": "元に戻せません。",
     "deleteAnyway": "それでも削除"
   },
@@ -2733,7 +2733,7 @@
     "filterAll": "すべて表示",
     "filterEmpty": "現在このグループに車両はありません。",
     "addDates": "日付を追加",
-    "deleteWithBookings": "この車両と、進行中または今後の予約{count}件を削除しますか？",
+    "deleteWithBookings": "進行中または今後の予約{count}件と、その支払い・チェック記録も削除されます。元に戻せません。",
     "deleteWithBookingsBtn": "車両と予約を削除"
   },
   "customers": {
@@ -3421,7 +3421,7 @@
     "archiveBtn": "車両をアーカイブ",
     "archiving": "アーカイブ中…",
     "deleteLead": "削除",
-    "deleteBody": "進行中または今後の予約とあわせて完全に削除します。",
+    "deleteBody": "完全に削除します。進行中または今後の予約とその支払いも削除されます。",
     "n_placeholder": "覚えておきたいこと：クセ、点検のリマインダー、スペアキーの場所",
     "n_auto": "他の場所をタップすると保存されます",
     "n_edited": "最終編集 {date}",

@@ -1341,10 +1341,10 @@
     "datesPassed": "התאריכים עברו · לא אושר",
     "changeDates": "שנה תאריכים",
     "linkNotCompleted": "קישור ההזמנה לא הושלם",
-    "deleteRecordsTitle": "להזמנה הזו יש רשומות",
+    "deleteRecordsTitle": "גם הרשומות האלה יימחקו",
     "deleteRecordsPayments": "תשלומים שנרשמו: {count}",
-    "deleteRecordsInspections": "בדיקות מסירה או החזרה: {count}",
-    "deleteRecordsSigned": "הסכם חתום (נשמר בתיק, אבל מוסתר)",
+    "deleteRecordsInspections": "בדיקות מסירה והחזרה, עם תמונות: {count}",
+    "deleteRecordsSigned": "חוץ מהחוזה החתום: הוא מוסתר אבל נשמר",
     "deleteRecordsBody": "אי אפשר לבטל את זה.",
     "deleteAnyway": "למחוק בכל זאת"
   },
@@ -2773,7 +2773,7 @@
     "filterAll": "הצגת הכול",
     "filterEmpty": "אין רכבים בקבוצה זו כרגע.",
     "addDates": "הוספת תאריכים",
-    "deleteWithBookings": "למחוק את הרכב הזה ואת {count} ההזמנות הנוכחיות או הקרובות שלו?",
+    "deleteWithBookings": "זה ימחק גם את {count} ההזמנות הנוכחיות או הקרובות שלו, עם התשלומים והבדיקות. אי אפשר לבטל את זה.",
     "deleteWithBookingsBtn": "למחוק את הרכב וההזמנות"
   },
   "customers": {
@@ -3461,7 +3461,7 @@
     "archiveBtn": "העברת הרכב לארכיון",
     "archiving": "מעביר לארכיון…",
     "deleteLead": "מחיקה",
-    "deleteBody": "מסיר אותו לצמיתות, יחד עם כל ההזמנות הנוכחיות או הקרובות.",
+    "deleteBody": "מסיר אותו לצמיתות, יחד עם הזמנות נוכחיות או קרובות והתשלומים שלהן.",
     "n_placeholder": "כל דבר שכדאי לזכור: מאפיינים מיוחדים, תזכורות טיפול, איפה המפתח הרזרבי",
     "n_auto": "נשמר כשמקישים במקום אחר",
     "n_edited": "נערך לאחרונה {date}",

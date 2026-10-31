@@ -1301,10 +1301,10 @@
     "datesPassed": "Datoene har passert · ikke bekreftet",
     "changeDates": "Endre datoer",
     "linkNotCompleted": "Bestillingslenken ble ikke fullført",
-    "deleteRecordsTitle": "Denne bestillingen har registreringer",
+    "deleteRecordsTitle": "Disse oppføringene slettes også",
     "deleteRecordsPayments": "Registrerte betalinger: {count}",
-    "deleteRecordsInspections": "Kontroller ved utlevering eller retur: {count}",
-    "deleteRecordsSigned": "En signert avtale (lagres, men skjules)",
+    "deleteRecordsInspections": "Utleverings- og innleveringskontroller, med bilder: {count}",
+    "deleteRecordsSigned": "Ikke den signerte avtalen: den skjules, men beholdes",
     "deleteRecordsBody": "Dette kan ikke angres.",
     "deleteAnyway": "Slett likevel"
   },
@@ -2733,7 +2733,7 @@
     "filterEmpty": "Ingen kjøretøy i denne gruppen akkurat nå.",
     "bandVehicles": "{count, plural, one {kjøretøy} other {kjøretøy}}",
     "addDates": "Legg til datoer",
-    "deleteWithBookings": "Slette dette kjøretøyet og de {count} pågående eller kommende bestillingene?",
+    "deleteWithBookings": "Dette sletter også {count} pågående eller kommende bestillinger, med betalinger og kontroller. Det kan ikke angres.",
     "deleteWithBookingsBtn": "Slett kjøretøy og bestillinger"
   },
   "customers": {
@@ -3421,7 +3421,7 @@
     "archiveBtn": "Arkiver kjøretøy",
     "archiving": "Arkiverer…",
     "deleteLead": "Slett",
-    "deleteBody": "fjerner det for godt, sammen med eventuelle pågående eller kommende bestillinger.",
+    "deleteBody": "fjerner det for godt, sammen med pågående eller kommende bestillinger og betalingene deres.",
     "n_placeholder": "Verdt å huske: særpreg, servicepåminnelser, hvor ekstrahjulnøkkelen er",
     "n_auto": "Lagres når du klikker deg videre",
     "n_edited": "Sist redigert {date}",

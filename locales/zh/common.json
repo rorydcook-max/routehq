@@ -1341,10 +1341,10 @@
     "datesPassed": "日期已过 · 未确认",
     "changeDates": "更改日期",
     "linkNotCompleted": "预订链接未完成",
-    "deleteRecordsTitle": "此预订有记录",
+    "deleteRecordsTitle": "这些记录也会被删除",
     "deleteRecordsPayments": "已记录的付款：{count}",
-    "deleteRecordsInspections": "交车或还车检查：{count}",
-    "deleteRecordsSigned": "已签署的合同（保留存档，但会隐藏）",
+    "deleteRecordsInspections": "交车和还车检查（含照片）：{count}",
+    "deleteRecordsSigned": "已签署的合同除外：会隐藏，但仍保留存档",
     "deleteRecordsBody": "此操作无法撤销。",
     "deleteAnyway": "仍然删除"
   },
@@ -2773,7 +2773,7 @@
     "filterEmpty": "此分组目前没有车辆。",
     "bandVehicles": "{count, select, other {辆车}}",
     "addDates": "添加日期",
-    "deleteWithBookings": "删除此车辆及其 {count} 个进行中或即将到来的预订？",
+    "deleteWithBookings": "这也会删除它的{count}个进行中或即将到来的预订及其付款和检查记录。此操作无法撤销。",
     "deleteWithBookingsBtn": "删除车辆和预订"
   },
   "customers": {
@@ -3461,7 +3461,7 @@
     "archiveBtn": "归档车辆",
     "archiving": "正在归档…",
     "deleteLead": "删除",
-    "deleteBody": "永久删除，并一并删除所有进行中或即将到来的预订。",
+    "deleteBody": "永久删除，并一并删除进行中或即将到来的预订及其付款。",
     "n_placeholder": "任何值得记下的事情：小毛病、保养提醒、备用钥匙存放处",
     "n_auto": "点击离开时自动保存",
     "n_edited": "最后编辑于 {date}",

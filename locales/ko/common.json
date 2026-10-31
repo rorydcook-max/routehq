@@ -1301,10 +1301,10 @@
     "datesPassed": "날짜 지남 · 미확인",
     "changeDates": "날짜 변경",
     "linkNotCompleted": "예약 링크가 완료되지 않았어요",
-    "deleteRecordsTitle": "이 예약에는 기록이 있습니다",
+    "deleteRecordsTitle": "이 기록도 함께 삭제돼요",
     "deleteRecordsPayments": "기록된 결제: {count}",
-    "deleteRecordsInspections": "인도 또는 반납 점검: {count}",
-    "deleteRecordsSigned": "서명된 계약서(보관되지만 숨겨짐)",
+    "deleteRecordsInspections": "인도 및 반납 점검(사진 포함): {count}",
+    "deleteRecordsSigned": "서명된 계약서는 제외: 숨겨지지만 보관돼요",
     "deleteRecordsBody": "되돌릴 수 없어요.",
     "deleteAnyway": "그래도 삭제"
   },
@@ -2733,7 +2733,7 @@
     "filterAll": "전체 보기",
     "filterEmpty": "지금 이 그룹에 차량이 없어요.",
     "addDates": "날짜 추가",
-    "deleteWithBookings": "이 차량과 진행 중이거나 예정된 예약 {count}건을 삭제할까요?",
+    "deleteWithBookings": "진행 중이거나 예정된 예약 {count}건과 그 결제·점검 기록도 함께 삭제돼요. 되돌릴 수 없어요.",
     "deleteWithBookingsBtn": "차량과 예약 삭제"
   },
   "customers": {
@@ -3421,7 +3421,7 @@
     "archiveBtn": "차량 보관",
     "archiving": "보관 중…",
     "deleteLead": "삭제",
-    "deleteBody": "진행 중이거나 예정된 예약과 함께 영구 삭제합니다.",
+    "deleteBody": "영구적으로 삭제합니다. 진행 중이거나 예정된 예약과 그 결제도 함께 삭제돼요.",
     "n_placeholder": "기억할 내용: 특이 사항, 정비 알림, 보조 키 위치",
     "n_auto": "다른 곳을 탭하면 저장돼요",
     "n_edited": "마지막 편집 {date}",

@@ -1301,10 +1301,10 @@
     "datesPassed": "Datumen har passerat · inte bekräftad",
     "changeDates": "Ändra datum",
     "linkNotCompleted": "Bokningslänken slutfördes inte",
-    "deleteRecordsTitle": "Den här bokningen har registreringar",
+    "deleteRecordsTitle": "De här posterna raderas också",
     "deleteRecordsPayments": "Registrerade betalningar: {count}",
-    "deleteRecordsInspections": "Kontroller vid utlämning eller återlämning: {count}",
-    "deleteRecordsSigned": "Ett signerat avtal (sparas, men döljs)",
+    "deleteRecordsInspections": "Utlämnings- och återlämningskontroller, med foton: {count}",
+    "deleteRecordsSigned": "Inte det signerade avtalet: det döljs men sparas",
     "deleteRecordsBody": "Det går inte att ångra.",
     "deleteAnyway": "Radera ändå"
   },
@@ -2733,7 +2733,7 @@
     "filterAll": "Visa alla",
     "filterEmpty": "Inga fordon i den här gruppen just nu.",
     "addDates": "Lägg till datum",
-    "deleteWithBookings": "Radera fordonet och dess {count} pågående eller kommande bokningar?",
+    "deleteWithBookings": "Det raderar också {count} pågående eller kommande bokningar, med betalningar och kontroller. Det går inte att ångra.",
     "deleteWithBookingsBtn": "Radera fordon och bokningar"
   },
   "customers": {
@@ -3421,7 +3421,7 @@
     "archiveBtn": "Arkivera fordon",
     "archiving": "Arkiverar…",
     "deleteLead": "Radera",
-    "deleteBody": "tar bort det för gott, tillsammans med pågående eller kommande bokningar.",
+    "deleteBody": "tar bort det för gott, tillsammans med pågående eller kommande bokningar och deras betalningar.",
     "n_placeholder": "Allt värt att komma ihåg: egenheter, servicepåminnelser, var reservnyckeln finns",
     "n_auto": "Sparas när du trycker utanför",
     "n_edited": "Senast redigerad {date}",

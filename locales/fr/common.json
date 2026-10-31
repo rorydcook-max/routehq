@@ -1341,10 +1341,10 @@
     "datesPassed": "Dates dépassées · non confirmé",
     "changeDates": "Modifier les dates",
     "linkNotCompleted": "Le lien de réservation n'a pas été complété",
-    "deleteRecordsTitle": "Cette réservation contient des enregistrements",
+    "deleteRecordsTitle": "Ces enregistrements seront aussi supprimés",
     "deleteRecordsPayments": "Paiements enregistrés : {count}",
-    "deleteRecordsInspections": "Contrôles de remise ou de retour : {count}",
-    "deleteRecordsSigned": "Un contrat signé (conservé, mais masqué)",
+    "deleteRecordsInspections": "Contrôles de remise et de retour, avec photos : {count}",
+    "deleteRecordsSigned": "Sauf le contrat signé : il est masqué mais conservé",
     "deleteRecordsBody": "Impossible d'annuler.",
     "deleteAnyway": "Supprimer quand même"
   },
@@ -2773,7 +2773,7 @@
     "filterAll": "Tout afficher",
     "filterEmpty": "Aucun véhicule dans ce groupe pour le moment.",
     "addDates": "Ajouter des dates",
-    "deleteWithBookings": "Supprimer ce véhicule et ses {count} réservations en cours ou à venir ?",
+    "deleteWithBookings": "Cela supprime aussi ses {count} réservations en cours ou à venir, avec leurs paiements et contrôles. C'est irréversible.",
     "deleteWithBookingsBtn": "Supprimer le véhicule et les réservations"
   },
   "customers": {
@@ -3461,7 +3461,7 @@
     "archiveBtn": "Archiver le véhicule",
     "archiving": "Archivage…",
     "deleteLead": "Supprimer",
-    "deleteBody": "le supprime définitivement, ainsi que ses réservations en cours ou à venir.",
+    "deleteBody": "le supprime définitivement, avec ses réservations en cours ou à venir et leurs paiements.",
     "n_placeholder": "Tout ce qui vaut la peine d’être noté : particularités, rappels d’entretien, où se trouve le double de clé",
     "n_auto": "Enregistré quand vous quittez le champ",
     "n_edited": "Dernière modification le {date}",

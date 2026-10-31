@@ -1341,10 +1341,10 @@
     "returnLate": "Pengembalian terlambat {days} hari",
     "dueBackIn": "Harus kembali dalam {days} hari",
     "linkNotCompleted": "Tautan pemesanan belum diselesaikan",
-    "deleteRecordsTitle": "Pemesanan ini memiliki catatan",
+    "deleteRecordsTitle": "Catatan ini juga akan dihapus",
     "deleteRecordsPayments": "Pembayaran tercatat: {count}",
-    "deleteRecordsInspections": "Pemeriksaan serah terima atau pengembalian: {count}",
-    "deleteRecordsSigned": "Perjanjian yang sudah ditandatangani (disimpan sebagai bukti, tapi disembunyikan)",
+    "deleteRecordsInspections": "Pemeriksaan serah terima dan pengembalian, dengan foto: {count}",
+    "deleteRecordsSigned": "Kecuali perjanjian yang sudah ditandatangani: disembunyikan, tetapi tetap disimpan",
     "deleteRecordsBody": "Tindakan ini tidak dapat dibatalkan.",
     "deleteAnyway": "Tetap hapus"
   },
@@ -2773,7 +2773,7 @@
     "filterAll": "Tampilkan semua",
     "filterEmpty": "Tidak ada kendaraan di grup ini saat ini.",
     "addDates": "Tambah tanggal",
-    "deleteWithBookings": "Hapus kendaraan ini beserta {count} pemesanan yang berjalan atau mendatang?",
+    "deleteWithBookings": "Ini juga menghapus {count} pemesanan yang berjalan atau mendatang, beserta pembayaran dan pemeriksaannya. Tidak bisa dibatalkan.",
     "deleteWithBookingsBtn": "Hapus kendaraan dan pemesanan"
   },
   "customers": {
@@ -3461,7 +3461,7 @@
     "archiveBtn": "Arsipkan kendaraan",
     "archiving": "Mengarsipkan…",
     "deleteLead": "Hapus",
-    "deleteBody": "menghapusnya permanen, beserta pemesanan yang berjalan atau mendatang.",
+    "deleteBody": "menghapusnya permanen, beserta pemesanan yang berjalan atau mendatang dan pembayarannya.",
     "n_placeholder": "Apa pun yang perlu diingat: kebiasaan unik, pengingat servis, letak kunci cadangan",
     "n_auto": "Tersimpan saat Anda mengetuk di luar",
     "n_edited": "Terakhir diubah {date}",

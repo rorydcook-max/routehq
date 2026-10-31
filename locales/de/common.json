@@ -1341,10 +1341,10 @@
     "datesPassed": "Termine verstrichen · nicht bestätigt",
     "changeDates": "Termine ändern",
     "linkNotCompleted": "Buchungslink wurde nicht abgeschlossen",
-    "deleteRecordsTitle": "Zu dieser Buchung gibt es Einträge",
+    "deleteRecordsTitle": "Diese Einträge werden ebenfalls gelöscht",
     "deleteRecordsPayments": "Erfasste Zahlungen: {count}",
-    "deleteRecordsInspections": "Übergabe- oder Rückgabeprüfungen: {count}",
-    "deleteRecordsSigned": "Ein unterschriebener Vertrag (bleibt gespeichert, wird aber ausgeblendet)",
+    "deleteRecordsInspections": "Übergabe- und Rückgabeprüfungen mit Fotos: {count}",
+    "deleteRecordsSigned": "Nicht der unterschriebene Vertrag: Er wird ausgeblendet, bleibt aber gespeichert",
     "deleteRecordsBody": "Das lässt sich nicht rückgängig machen.",
     "deleteAnyway": "Trotzdem löschen"
   },
@@ -2773,7 +2773,7 @@
     "filterAll": "Alle anzeigen",
     "filterEmpty": "Derzeit keine Fahrzeuge in dieser Gruppe.",
     "addDates": "Daten hinzufügen",
-    "deleteWithBookings": "Dieses Fahrzeug und seine {count} laufenden oder anstehenden Buchungen löschen?",
+    "deleteWithBookings": "Damit werden auch seine {count} laufenden oder anstehenden Buchungen samt Zahlungen und Prüfungen gelöscht. Das lässt sich nicht rückgängig machen.",
     "deleteWithBookingsBtn": "Fahrzeug und Buchungen löschen"
   },
   "customers": {
@@ -3461,7 +3461,7 @@
     "archiveBtn": "Fahrzeug archivieren",
     "archiving": "Wird archiviert…",
     "deleteLead": "Löschen",
-    "deleteBody": "entfernt es endgültig, samt laufender oder anstehender Buchungen.",
+    "deleteBody": "entfernt es endgültig, samt laufender oder anstehender Buchungen und deren Zahlungen.",
     "n_placeholder": "Alles, was man sich merken sollte: Eigenheiten, Serviceerinnerungen, wo der Ersatzschlüssel ist",
     "n_auto": "Wird beim Verlassen des Felds gespeichert",
     "n_edited": "Zuletzt bearbeitet {date}",

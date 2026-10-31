@@ -1301,10 +1301,10 @@
     "datesPassed": "Lumipas na ang mga petsa · hindi kumpirmadong",
     "changeDates": "Baguhin ang mga petsa",
     "linkNotCompleted": "Hindi natapos ang booking link",
-    "deleteRecordsTitle": "May mga record ang booking na ito",
+    "deleteRecordsTitle": "Mabubura rin ang mga record na ito",
     "deleteRecordsPayments": "Mga naitalang bayad: {count}",
-    "deleteRecordsInspections": "Mga check sa pag-abot o pagbalik: {count}",
-    "deleteRecordsSigned": "Isang pinirmahang kasunduan (itatago sa records, pero hindi ipapakita)",
+    "deleteRecordsInspections": "Mga check sa handover at pagbalik, may litrato: {count}",
+    "deleteRecordsSigned": "Maliban sa pinirmahang kasunduan: itatago pero mananatiling naka-file",
     "deleteRecordsBody": "Hindi na ito maibabalik.",
     "deleteAnyway": "Burahin pa rin"
   },
@@ -2733,7 +2733,7 @@
     "filterAll": "Ipakita lahat",
     "filterEmpty": "Walang sasakyan sa grupong ito ngayon.",
     "addDates": "Magdagdag ng petsa",
-    "deleteWithBookings": "Burahin ang sasakyang ito at ang {count} kasalukuyan o paparating na booking nito?",
+    "deleteWithBookings": "Mabubura rin ang {count} kasalukuyan o paparating na booking nito, pati mga bayad at check. Hindi na ito maibabalik.",
     "deleteWithBookingsBtn": "Burahin ang sasakyan at mga booking"
   },
   "customers": {
@@ -3421,7 +3421,7 @@
     "archiveBtn": "I-archive ang sasakyan",
     "archiving": "Ina-archive…",
     "deleteLead": "I-delete",
-    "deleteBody": "permanenteng binubura ito, kasama ang anumang kasalukuyan o paparating na booking.",
+    "deleteBody": "permanenteng binubura ito, kasama ang mga kasalukuyan o paparating na booking at ang mga bayad nito.",
     "n_placeholder": "Anumang dapat tandaan: kakaibang ugali nito, paalala sa service, nasaan ang spare key",
     "n_auto": "Nase-save kapag nag-tap ka sa labas",
     "n_edited": "Huling na-edit {date}",

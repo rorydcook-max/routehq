@@ -1301,10 +1301,10 @@
     "datesPassed": "As datas já passaram · não confirmada",
     "changeDates": "Alterar datas",
     "linkNotCompleted": "O link de reserva não foi concluído",
-    "deleteRecordsTitle": "Esta reserva tem registros",
+    "deleteRecordsTitle": "Estes registros também serão excluídos",
     "deleteRecordsPayments": "Pagamentos registrados: {count}",
-    "deleteRecordsInspections": "Vistorias de entrega ou devolução: {count}",
-    "deleteRecordsSigned": "Um contrato assinado (guardado, mas oculto)",
+    "deleteRecordsInspections": "Vistorias de entrega e devolução, com fotos: {count}",
+    "deleteRecordsSigned": "Exceto o contrato assinado: fica oculto, mas guardado",
     "deleteRecordsBody": "Não dá para desfazer.",
     "deleteAnyway": "Excluir mesmo assim"
   },
@@ -2733,7 +2733,7 @@
     "filterAll": "Mostrar todos",
     "filterEmpty": "Nenhum veículo neste grupo no momento.",
     "addDates": "Adicionar datas",
-    "deleteWithBookings": "Excluir este veículo e suas {count} reservas em andamento ou futuras?",
+    "deleteWithBookings": "Isso também exclui as {count} reservas em andamento ou futuras, com pagamentos e vistorias. Não pode ser desfeito.",
     "deleteWithBookingsBtn": "Excluir veículo e reservas"
   },
   "customers": {
@@ -3421,7 +3421,7 @@
     "archiveBtn": "Arquivar veículo",
     "archiving": "Arquivando…",
     "deleteLead": "Excluir",
-    "deleteBody": "remove de vez, junto com as reservas em andamento ou futuras.",
+    "deleteBody": "remove de vez, junto com as reservas em andamento ou futuras e seus pagamentos.",
     "n_placeholder": "Algo que valha lembrar: manias, lembretes de revisão, onde fica a chave reserva",
     "n_auto": "Salva quando você toca fora",
     "n_edited": "Editado em {date}",

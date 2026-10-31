@@ -1301,10 +1301,10 @@
     "datesPassed": "Dates have passed · not confirmed",
     "changeDates": "Change dates",
     "linkNotCompleted": "Booking link wasn't completed",
-    "deleteRecordsTitle": "This booking has records on it",
+    "deleteRecordsTitle": "These records will be deleted too",
     "deleteRecordsPayments": "Payments recorded: {count}",
-    "deleteRecordsInspections": "Handover or return checks: {count}",
-    "deleteRecordsSigned": "A signed agreement (kept on file, but hidden)",
+    "deleteRecordsInspections": "Handover and return checks, with photos: {count}",
+    "deleteRecordsSigned": "Not the signed agreement: it's hidden but kept on file",
     "deleteRecordsBody": "This can't be undone.",
     "deleteAnyway": "Delete anyway"
   },
@@ -2733,7 +2733,7 @@
     "filterAll": "Show all",
     "filterEmpty": "No vehicles in this group right now.",
     "addDates": "Add dates",
-    "deleteWithBookings": "Delete this vehicle and its {count} current or upcoming bookings?",
+    "deleteWithBookings": "This also deletes its {count} current or upcoming bookings, with their payments and checks. This can't be undone.",
     "deleteWithBookingsBtn": "Delete vehicle and bookings"
   },
   "customers": {
@@ -3421,7 +3421,7 @@
     "archiveBtn": "Archive vehicle",
     "archiving": "Archiving…",
     "deleteLead": "Delete",
-    "deleteBody": "removes it for good, along with any current or upcoming bookings.",
+    "deleteBody": "removes it for good, along with any current or upcoming bookings and their payments.",
     "n_placeholder": "Anything worth remembering: quirks, service reminders, where the spare key is",
     "n_auto": "Saves when you tap away",
     "n_edited": "Last edited {date}",

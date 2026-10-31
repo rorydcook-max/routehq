@@ -1341,10 +1341,10 @@
     "datesPassed": "Tarikh telah berlalu · belum disahkan",
     "changeDates": "Tukar tarikh",
     "linkNotCompleted": "Pautan tempahan tidak dilengkapkan",
-    "deleteRecordsTitle": "Tempahan ini mempunyai rekod",
+    "deleteRecordsTitle": "Rekod ini juga akan dipadam",
     "deleteRecordsPayments": "Bayaran direkodkan: {count}",
-    "deleteRecordsInspections": "Pemeriksaan serahan atau pemulangan: {count}",
-    "deleteRecordsSigned": "Perjanjian yang ditandatangani (disimpan sebagai bukti, tetapi disembunyikan)",
+    "deleteRecordsInspections": "Pemeriksaan serahan dan pemulangan, dengan foto: {count}",
+    "deleteRecordsSigned": "Kecuali perjanjian yang ditandatangani: disembunyikan tetapi disimpan",
     "deleteRecordsBody": "Ini tidak boleh dibuat asal.",
     "deleteAnyway": "Padam juga"
   },
@@ -2773,7 +2773,7 @@
     "filterAll": "Tunjuk semua",
     "filterEmpty": "Tiada kenderaan dalam kumpulan ini sekarang.",
     "addDates": "Tambah tarikh",
-    "deleteWithBookings": "Padam kenderaan ini dan {count} tempahan semasa atau akan datang?",
+    "deleteWithBookings": "Ini juga memadam {count} tempahan semasa atau akan datang, bersama bayaran dan pemeriksaannya. Tidak boleh dibuat asal.",
     "deleteWithBookingsBtn": "Padam kenderaan dan tempahan"
   },
   "customers": {
@@ -3461,7 +3461,7 @@
     "archiveBtn": "Arkibkan kenderaan",
     "archiving": "Mengarkibkan…",
     "deleteLead": "Padam",
-    "deleteBody": "memadamnya terus, bersama sebarang tempahan semasa atau akan datang.",
+    "deleteBody": "memadamnya terus, bersama tempahan semasa atau akan datang dan bayarannya.",
     "n_placeholder": "Apa-apa yang patut diingat: keanehan, peringatan servis, tempat kunci pendua",
     "n_auto": "Disimpan apabila anda ketik di tempat lain",
     "n_edited": "Kali terakhir diedit {date}",

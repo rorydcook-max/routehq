@@ -1341,10 +1341,10 @@
     "datesPassed": "Đã qua ngày · chưa được xác nhận",
     "changeDates": "Đổi ngày",
     "linkNotCompleted": "Liên kết đặt xe chưa được hoàn tất",
-    "deleteRecordsTitle": "Đặt xe này có dữ liệu được ghi lại",
+    "deleteRecordsTitle": "Các bản ghi này cũng sẽ bị xóa",
     "deleteRecordsPayments": "Khoản thanh toán đã ghi: {count}",
-    "deleteRecordsInspections": "Lần kiểm tra khi giao hoặc trả xe: {count}",
-    "deleteRecordsSigned": "Một hợp đồng đã ký (được lưu làm bằng chứng nhưng ẩn đi)",
+    "deleteRecordsInspections": "Kiểm tra lúc giao và nhận lại xe, kèm ảnh: {count}",
+    "deleteRecordsSigned": "Trừ hợp đồng đã ký: được ẩn nhưng vẫn lưu lại",
     "deleteRecordsBody": "Không thể hoàn tác.",
     "deleteAnyway": "Vẫn xóa"
   },
@@ -2773,7 +2773,7 @@
     "filterEmpty": "Hiện không có phương tiện nào trong nhóm này.",
     "bandVehicles": "{count, plural, other {xe}}",
     "addDates": "Thêm ngày",
-    "deleteWithBookings": "Xóa xe này cùng {count} đặt xe đang diễn ra hoặc sắp tới?",
+    "deleteWithBookings": "Thao tác này cũng xóa {count} đặt xe đang diễn ra hoặc sắp tới, cùng thanh toán và biên bản kiểm tra. Không thể hoàn tác.",
     "deleteWithBookingsBtn": "Xóa xe và đặt xe"
   },
   "customers": {
@@ -3461,7 +3461,7 @@
     "archiveBtn": "Lưu trữ xe",
     "archiving": "Đang lưu trữ…",
     "deleteLead": "Xóa",
-    "deleteBody": "xóa vĩnh viễn, cùng mọi đặt xe đang diễn ra hoặc sắp tới.",
+    "deleteBody": "xóa vĩnh viễn, cùng các đặt xe đang diễn ra hoặc sắp tới và thanh toán của chúng.",
     "n_placeholder": "Ghi chú: đặc điểm riêng, lịch bảo dưỡng, vị trí chìa khóa phụ",
     "n_auto": "Tự động lưu khi bạn bấm ra ngoài",
     "n_edited": "Chỉnh sửa lần cuối {date}",

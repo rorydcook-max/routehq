@@ -1301,10 +1301,10 @@
     "datesPassed": "日期已過 · 未確認",
     "changeDates": "變更日期",
     "linkNotCompleted": "預訂連結未完成",
-    "deleteRecordsTitle": "此預訂有紀錄",
+    "deleteRecordsTitle": "這些紀錄也會被刪除",
     "deleteRecordsPayments": "已記錄的付款：{count}",
-    "deleteRecordsInspections": "交車或還車檢查：{count}",
-    "deleteRecordsSigned": "已簽署的合約（保留存檔，但會隱藏）",
+    "deleteRecordsInspections": "交車和還車檢查（含照片）：{count}",
+    "deleteRecordsSigned": "已簽署的合約除外：會隱藏，但仍保留存檔",
     "deleteRecordsBody": "此操作無法復原。",
     "deleteAnyway": "仍然刪除"
   },
@@ -2733,7 +2733,7 @@
     "filterAll": "顯示全部",
     "filterEmpty": "此分類目前沒有車輛。",
     "addDates": "新增日期",
-    "deleteWithBookings": "要刪除此車輛及其 {count} 筆進行中或即將到來的預訂嗎？",
+    "deleteWithBookings": "這也會刪除它的{count}筆進行中或即將到來的預訂及其付款和檢查紀錄。此操作無法復原。",
     "deleteWithBookingsBtn": "刪除車輛和預訂"
   },
   "customers": {
@@ -3421,7 +3421,7 @@
     "archiveBtn": "封存車輛",
     "archiving": "封存中…",
     "deleteLead": "刪除",
-    "deleteBody": "永久刪除，並一併刪除任何進行中或即將到來的預訂。",
+    "deleteBody": "永久刪除，並一併刪除進行中或即將到來的預訂及其付款。",
     "n_placeholder": "值得記下的事：特殊狀況、保養提醒、備用鑰匙放在哪裡",
     "n_auto": "點選其他地方即自動儲存",
     "n_edited": "上次編輯 {date}",

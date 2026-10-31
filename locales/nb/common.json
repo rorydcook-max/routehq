@@ -145,7 +145,17 @@
     "tileDueToday": "Forfaller i dag",
     "messagesToSend": "{count, plural, one {Melding} other {# meldinger}} å sende til {who}",
     "decide": "Avgjør",
-    "send": "Send"
+    "send": "Send",
+    "msgTitle": "Meldinger",
+    "msgNew": "{count} nye",
+    "msgInbox": "Innboks",
+    "msgSomeone": "Kunde",
+    "msgYou": "Du:",
+    "msgNone": "Ingen meldinger ennå.",
+    "msgConnect": "Koble til LINE eller Telegram, så vises kundemeldinger her.",
+    "msgConnectBtn": "Koble til",
+    "bkTitle": "Bestillinger",
+    "bkAll": "Alle bestillinger"
   },
   "vehicles": {
     "addVehicle": "Legg til kjøretøy",

@@ -145,7 +145,17 @@
     "tileDueToday": "今日到期",
     "messagesToSend": "{count} 条消息待发送给 {who}",
     "decide": "决定",
-    "send": "发送"
+    "send": "发送",
+    "msgTitle": "消息",
+    "msgNew": "{count} 条新消息",
+    "msgInbox": "收件箱",
+    "msgSomeone": "客户",
+    "msgYou": "你：",
+    "msgNone": "还没有消息。",
+    "msgConnect": "连接 LINE 或 Telegram 后，客户消息会显示在这里。",
+    "msgConnectBtn": "连接",
+    "bkTitle": "预订",
+    "bkAll": "全部预订"
   },
   "settings": {
     "contractsBranding": {

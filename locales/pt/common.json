@@ -145,7 +145,17 @@
     "amountDueToday": "{amount} vencem hoje",
     "tileDueToday": "Vence hoje",
     "decide": "Decidir",
-    "send": "Enviar"
+    "send": "Enviar",
+    "msgTitle": "Mensagens",
+    "msgNew": "{count} novas",
+    "msgInbox": "Caixa de entrada",
+    "msgSomeone": "Cliente",
+    "msgYou": "Você:",
+    "msgNone": "Nenhuma mensagem ainda.",
+    "msgConnect": "Conecte o LINE ou o Telegram e as mensagens dos clientes aparecem aqui.",
+    "msgConnectBtn": "Conectar",
+    "bkTitle": "Reservas",
+    "bkAll": "Todas as reservas"
   },
   "nav": {
     "main": "Principal",

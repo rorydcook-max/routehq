@@ -145,7 +145,17 @@
     "amountDueToday": "ครบกำหนดวันนี้ {amount}",
     "tileDueToday": "ครบกำหนดวันนี้",
     "decide": "ตัดสินใจ",
-    "send": "ส่ง"
+    "send": "ส่ง",
+    "msgTitle": "ข้อความ",
+    "msgNew": "ใหม่ {count}",
+    "msgInbox": "กล่องข้อความ",
+    "msgSomeone": "ลูกค้า",
+    "msgYou": "คุณ:",
+    "msgNone": "ยังไม่มีข้อความ",
+    "msgConnect": "เชื่อมต่อ LINE หรือ Telegram แล้วข้อความจากลูกค้าจะแสดงที่นี่",
+    "msgConnectBtn": "เชื่อมต่อ",
+    "bkTitle": "การจอง",
+    "bkAll": "การจองทั้งหมด"
   },
   "vehicles": {
     "addVehicle": "เพิ่มรถ",

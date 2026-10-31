@@ -145,7 +145,17 @@
     "amountDueToday": "今日が期限 {amount}",
     "tileDueToday": "今日が期限",
     "decide": "判断する",
-    "send": "送信"
+    "send": "送信",
+    "msgTitle": "メッセージ",
+    "msgNew": "新着 {count}",
+    "msgInbox": "受信箱",
+    "msgSomeone": "お客様",
+    "msgYou": "あなた：",
+    "msgNone": "まだメッセージはありません。",
+    "msgConnect": "LINE または Telegram を接続すると、お客様のメッセージがここに表示されます。",
+    "msgConnectBtn": "接続",
+    "bkTitle": "予約",
+    "bkAll": "すべての予約"
   },
   "settings": {
     "contractsBranding": {

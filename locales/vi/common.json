@@ -145,7 +145,17 @@
     "tileDueToday": "Đến hạn hôm nay",
     "messagesToSend": "{count} tin nhắn cần gửi cho {who}",
     "decide": "Quyết định",
-    "send": "Gửi"
+    "send": "Gửi",
+    "msgTitle": "Tin nhắn",
+    "msgNew": "{count} mới",
+    "msgInbox": "Hộp thư",
+    "msgSomeone": "Khách hàng",
+    "msgYou": "Bạn:",
+    "msgNone": "Chưa có tin nhắn.",
+    "msgConnect": "Kết nối LINE hoặc Telegram để tin nhắn của khách hiện ở đây.",
+    "msgConnectBtn": "Kết nối",
+    "bkTitle": "Đặt xe",
+    "bkAll": "Tất cả đặt xe"
   },
   "settings": {
     "contractsBranding": {

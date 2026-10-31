@@ -145,7 +145,17 @@
     "tileDueToday": "Dapat bayaran ngayon",
     "messagesToSend": "{count, plural, one {Mensahe} other {# mensahe}} na ipapadala kay {who}",
     "decide": "Magpasya",
-    "send": "Ipadala"
+    "send": "Ipadala",
+    "msgTitle": "Mga mensahe",
+    "msgNew": "{count} bago",
+    "msgInbox": "Inbox",
+    "msgSomeone": "Customer",
+    "msgYou": "Ikaw:",
+    "msgNone": "Wala pang mensahe.",
+    "msgConnect": "Ikonekta ang LINE o Telegram at lalabas dito ang mga mensahe ng customer.",
+    "msgConnectBtn": "Ikonekta",
+    "bkTitle": "Mga booking",
+    "bkAll": "Lahat ng booking"
   },
   "vehicles": {
     "addVehicle": "Magdagdag ng sasakyan",

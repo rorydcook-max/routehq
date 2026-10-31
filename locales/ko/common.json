@@ -145,7 +145,17 @@
     "tileDueToday": "오늘 청구",
     "messagesToSend": "{who}에게 보낼 메시지 {count}개",
     "decide": "결정하기",
-    "send": "보내기"
+    "send": "보내기",
+    "msgTitle": "메시지",
+    "msgNew": "새 메시지 {count}",
+    "msgInbox": "받은편지함",
+    "msgSomeone": "고객",
+    "msgYou": "나:",
+    "msgNone": "아직 메시지가 없어요.",
+    "msgConnect": "LINE이나 Telegram을 연결하면 고객 메시지가 여기에 표시돼요.",
+    "msgConnectBtn": "연결",
+    "bkTitle": "예약",
+    "bkAll": "전체 예약"
   },
   "vehicles": {
     "addVehicle": "차량 추가",

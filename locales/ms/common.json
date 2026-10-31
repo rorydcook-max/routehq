@@ -145,7 +145,17 @@
     "amountDueToday": "{amount} perlu dibayar hari ini",
     "tileDueToday": "Perlu dibayar hari ini",
     "decide": "Putuskan",
-    "send": "Hantar"
+    "send": "Hantar",
+    "msgTitle": "Mesej",
+    "msgNew": "{count} baharu",
+    "msgInbox": "Peti masuk",
+    "msgSomeone": "Pelanggan",
+    "msgYou": "Anda:",
+    "msgNone": "Belum ada mesej.",
+    "msgConnect": "Sambungkan LINE atau Telegram dan mesej pelanggan akan muncul di sini.",
+    "msgConnectBtn": "Sambung",
+    "bkTitle": "Tempahan",
+    "bkAll": "Semua tempahan"
   },
   "settings": {
     "contractsBranding": {

@@ -145,7 +145,17 @@
     "amountDueToday": "{amount} ຮອດກຳນົດມື້ນີ້",
     "tileDueToday": "ຮອດກຳນົດມື້ນີ້",
     "decide": "ຕັດສິນໃຈ",
-    "send": "ສົ່ງ"
+    "send": "ສົ່ງ",
+    "msgTitle": "ຂໍ້ຄວາມ",
+    "msgNew": "ໃໝ່ {count}",
+    "msgInbox": "ກ່ອງຂໍ້ຄວາມ",
+    "msgSomeone": "ລູກຄ້າ",
+    "msgYou": "ທ່ານ:",
+    "msgNone": "ຍັງບໍ່ມີຂໍ້ຄວາມ.",
+    "msgConnect": "ເຊື່ອມຕໍ່ LINE ຫຼື Telegram ແລ້ວຂໍ້ຄວາມຈາກລູກຄ້າຈະສະແດງຢູ່ນີ້.",
+    "msgConnectBtn": "ເຊື່ອມຕໍ່",
+    "bkTitle": "ການຈອງ",
+    "bkAll": "ການຈອງທັງໝົດ"
   },
   "vehicles": {
     "addVehicle": "ເພີ່ມລົດ",

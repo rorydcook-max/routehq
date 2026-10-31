@@ -145,7 +145,17 @@
     "tileDueToday": "Jatuh tempo hari ini",
     "messagesToSend": "{count} pesan untuk dikirim ke {who}",
     "decide": "Putuskan",
-    "send": "Kirim"
+    "send": "Kirim",
+    "msgTitle": "Pesan",
+    "msgNew": "{count} baru",
+    "msgInbox": "Kotak masuk",
+    "msgSomeone": "Pelanggan",
+    "msgYou": "Anda:",
+    "msgNone": "Belum ada pesan.",
+    "msgConnect": "Hubungkan LINE atau Telegram dan pesan pelanggan akan muncul di sini.",
+    "msgConnectBtn": "Hubungkan",
+    "bkTitle": "Pemesanan",
+    "bkAll": "Semua pemesanan"
   },
   "settings": {
     "contractsBranding": {

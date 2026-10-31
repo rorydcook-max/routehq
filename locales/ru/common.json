@@ -145,7 +145,17 @@
     "amountDueToday": "{amount} к оплате сегодня",
     "tileDueToday": "К оплате сегодня",
     "decide": "Решить",
-    "send": "Отправить"
+    "send": "Отправить",
+    "msgTitle": "Сообщения",
+    "msgNew": "новых: {count}",
+    "msgInbox": "Входящие",
+    "msgSomeone": "Клиент",
+    "msgYou": "Вы:",
+    "msgNone": "Сообщений пока нет.",
+    "msgConnect": "Подключите LINE или Telegram, и сообщения клиентов появятся здесь.",
+    "msgConnectBtn": "Подключить",
+    "bkTitle": "Бронирования",
+    "bkAll": "Все бронирования"
   },
   "settings": {
     "contractsBranding": {

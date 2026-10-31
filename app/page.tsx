@@ -143,6 +143,39 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
       .limit(50)
       .then((result: any) => ({ ...result, data: (result?.data || []).filter((row: any) => !row.metadata?.superseded) }), () => ({ data: [] }))
   ]);
+  // Messages and bookings at a glance (Rory, 31 Oct 2026): the latest chats with what's new, and the three booking
+  // counts the Bookings page leads with (same rules, same links).
+  const bookingsT = await getTranslations("bookings");
+  const weekEndForCounts = businessToday(7);
+  const todayForCounts = businessToday();
+  const db = supabase as any;
+  const [channelsResult, chatsResult, unreadResult, onRentCount, startingCount, owingCount] = await Promise.all([
+    db.from("messaging_channels").select("id", { count: "exact", head: true }).eq("organization_id", organization.id).neq("status", "disconnected"),
+    db
+      .from("conversations")
+      .select("id, display_name, unread_count, last_message_at, last_message_preview, last_message_direction")
+      .eq("organization_id", organization.id)
+      .eq("status", "open")
+      .order("last_message_at", { ascending: false, nullsFirst: false })
+      .limit(3),
+    db.from("conversations").select("unread_count").eq("organization_id", organization.id).eq("status", "open").gt("unread_count", 0),
+    db.from("rentals").select("id", { count: "exact", head: true }).eq("organization_id", organization.id).is("deleted_at", null).in("status", ["active", "due_soon", "overdue", "extended"]),
+    db.from("rentals").select("id", { count: "exact", head: true }).eq("organization_id", organization.id).is("deleted_at", null).eq("status", "booked").gte("start_date", todayForCounts).lte("start_date", weekEndForCounts),
+    db.from("rentals").select("id", { count: "exact", head: true }).eq("organization_id", organization.id).is("deleted_at", null).neq("status", "cancelled").gt("balance_due", 0)
+  ]);
+  const hasChatChannel = (channelsResult?.count || 0) > 0;
+  const latestChats = ((chatsResult?.data || []) as Array<{ id: string; display_name: string | null; unread_count: number | null; last_message_at: string | null; last_message_preview: string | null; last_message_direction: string | null }>).filter((chat) => chat.last_message_at);
+  const unreadTotal = ((unreadResult?.data || []) as Array<{ unread_count: number | null }>).reduce((sum, row) => sum + Number(row.unread_count || 0), 0);
+  const bookingCounts = { onRent: onRentCount?.count || 0, starting: startingCount?.count || 0, owing: owingCount?.count || 0 };
+  const chatTimeZone = (organization as any).timezone || "Asia/Bangkok";
+  const chatWhen = (iso: string) => {
+    const at = new Date(iso);
+    const day = dateFormat(locale, { year: "numeric", month: "2-digit", day: "2-digit", timeZone: chatTimeZone }).format(at);
+    const nowDay = dateFormat(locale, { year: "numeric", month: "2-digit", day: "2-digit", timeZone: chatTimeZone }).format(new Date());
+    return day === nowDay
+      ? dateFormat(locale, { hour: "2-digit", minute: "2-digit", timeZone: chatTimeZone }).format(at)
+      : dateFormat(locale, { day: "numeric", month: "short", timeZone: chatTimeZone }).format(at);
+  };
   const unsentByRental = new Map<string, { count: number; who: string }>();
   for (const row of ((unsentResult?.data || []) as any[]).filter((entry) => entry.metadata?.handoff_label)) {
     const found = unsentByRental.get(row.rental_id) || { count: 0, who: String(row.customers?.full_name || "") };
@@ -692,6 +725,80 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
   const STRIP_COLS: Record<number, string> = { 1: "lg:grid-cols-1", 2: "lg:grid-cols-2", 3: "lg:grid-cols-3", 4: "lg:grid-cols-4" };
   const lotLabels = { late: t("legendLate"), back: t("weekBack"), rent: t("legendOnRent"), out: t("weekOut"), free: t("lotFree"), off: t("lotOff") };
 
+  // ── Messages: what's new, and the latest three chats (each opens in the Inbox) ──
+  const messagesCard = (
+    <section className="card rise p-3 lg:p-4">
+      <header className="flex items-center justify-between gap-3 px-1 pb-2">
+        <h2 className="flex items-center gap-2 text-[20px] text-[var(--foreground)]">
+          {t("msgTitle")}
+          {unreadTotal > 0 ? <span className="rounded-full bg-[var(--primary)] px-2 py-0.5 text-[13px] font-bold leading-tight text-white">{t("msgNew", { count: unreadTotal })}</span> : null}
+        </h2>
+        <PanelLink href={"/inbox" as Route}>{t("msgInbox")}</PanelLink>
+      </header>
+      {latestChats.length > 0 ? (
+        <ul className="divide-y divide-[var(--border)]">
+          {latestChats.map((chat) => {
+            const unread = Number(chat.unread_count || 0) > 0;
+            const name = chat.display_name || t("msgSomeone");
+            return (
+              <li key={chat.id}>
+                <Link className="pressable flex items-center gap-3 rounded-xl px-1 py-2.5" href={`/inbox?c=${chat.id}` as Route}>
+                  <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--primary-light)] text-[15px] font-bold uppercase text-[var(--primary)]">{name.trim().slice(0, 1) || "?"}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-baseline justify-between gap-2">
+                      <span className={`truncate ${unread ? "font-bold text-[var(--foreground)]" : "font-semibold text-[var(--foreground)]"}`}>{name}</span>
+                      <span className={`shrink-0 text-[13px] tabular-nums ${unread ? "font-bold text-[var(--primary)]" : "text-[var(--muted)]"}`}>{chat.last_message_at ? chatWhen(chat.last_message_at) : ""}</span>
+                    </span>
+                    <span className="flex items-center justify-between gap-2">
+                      <span className={`truncate text-[14px] ${unread ? "font-semibold text-[var(--foreground-secondary)]" : "text-[var(--muted)]"}`}>
+                        {chat.last_message_direction === "outbound" ? `${t("msgYou")} ` : ""}
+                        {chat.last_message_preview || ""}
+                      </span>
+                      {unread ? <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] px-1 text-[12px] font-bold text-white">{chat.unread_count}</span> : null}
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      ) : hasChatChannel ? (
+        <p className="px-1 pb-1 text-[var(--muted)]">{t("msgNone")}</p>
+      ) : (
+        <div className="flex flex-wrap items-center justify-between gap-3 px-1 pb-1">
+          <p className="min-w-0 flex-1 basis-48 text-[var(--foreground-secondary)]">{t("msgConnect")}</p>
+          <Link className="secondary-action pressable" href={"/settings?tab=messaging" as Route}>{t("msgConnectBtn")}</Link>
+        </div>
+      )}
+    </section>
+  );
+
+  // ── Bookings: the same three counts as the Bookings page, each opening that list ──
+  const bookingsCard = (
+    <section className="card rise p-3 lg:p-4">
+      <header className="flex items-center justify-between gap-3 px-1 pb-2.5">
+        <h2 className="text-[20px] text-[var(--foreground)]">{t("bkTitle")}</h2>
+        <PanelLink href={"/bookings" as Route}>{t("bkAll")}</PanelLink>
+      </header>
+      <div className="grid grid-cols-3 gap-2">
+        {[
+          { key: "on_rent", count: bookingCounts.onRent, label: bookingsT("bandOnRent"), dot: "var(--primary)" },
+          { key: "starting", count: bookingCounts.starting, label: bookingsT("bandStarting"), dot: "var(--going-out)" },
+          { key: "owing", count: bookingCounts.owing, label: bookingsT("bandOwing"), dot: "var(--danger)", alert: true }
+        ].map((item) => (
+          <Link
+            className={`pressable flex flex-col gap-1 rounded-xl p-3 ${item.alert && item.count > 0 ? "bg-[var(--danger-light)]" : "bg-[var(--panel-secondary)]"}`}
+            href={`/bookings?status=${item.key}` as Route}
+            key={item.key}
+          >
+            <span className={`num text-[26px] leading-none ${item.alert && item.count > 0 ? "text-[var(--danger)]" : "text-[var(--foreground)]"}`}>{item.count}</span>
+            <span className="flex items-center gap-1.5 text-[13px] font-semibold leading-tight text-[var(--foreground-secondary)]"><Dot color={item.dot} />{item.label}</span>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+
   return (
     <AppShell heroOverlap hero={hero} userEmail={userEmail}>
 
@@ -719,7 +826,11 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
         {/* Phones open on what needs doing (Today), then the money tiles, then the week, then the fleet in brief.
             Computers keep the week first with the tiles and fleet in the side column. */}
         <div className="flex min-w-0 flex-col gap-5 lg:col-span-8">
-          <section className="card rise relative order-3 p-3 lg:order-1 lg:p-5">
+          {/* Phones: messages and bookings right after Today. Computers have them at the top of the side column. */}
+          <div className="order-2 lg:hidden">{messagesCard}</div>
+          <div className="order-3 lg:hidden">{bookingsCard}</div>
+
+          <section className="card rise relative order-5 p-3 lg:order-1 lg:p-5">
             <header className="flex items-baseline justify-between gap-3 px-1 pb-3">
               <h2 className="text-[20px] text-[var(--foreground)] lg:text-[22px]">{t("planTitle")}</h2>
               <PanelLink href="/calendar">{t("calendar")}</PanelLink>
@@ -730,13 +841,13 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
 
           {/* Phones: the car park comes after the week. Computers have it in the side column. */}
           {lot.length > 0 ? (
-            <div className="order-4 lg:hidden">
+            <div className="order-6 lg:hidden">
               <FleetLot compact action={<PanelLink href="/fleet">{t("fleet")}</PanelLink>} labels={lotLabels} title={t("yourFleet")} vehicles={lot} />
             </div>
           ) : null}
 
           {/* On a phone the tiles (money, overdue, deposits) come right after Today. */}
-          <div className="order-2 grid grid-cols-2 gap-3 lg:hidden">{tiles}</div>
+          <div className="order-4 grid grid-cols-2 gap-3 lg:hidden">{tiles}</div>
 
           <section className="order-1 lg:order-2">
             <header className="mb-2.5 flex items-center justify-between gap-3 px-1">
@@ -761,6 +872,8 @@ export default async function Home({ searchParams }: { searchParams?: Promise<{ 
 
         {/* On a computer the tiles stand in their own column beside the week. */}
         <aside className="hidden min-w-0 content-start gap-5 lg:col-span-4 lg:grid">
+          {messagesCard}
+          {bookingsCard}
           {sideTiles.length > 0 ? (
             <div className="grid grid-cols-2 gap-3">
               {sideTiles.map((tile, index) => (

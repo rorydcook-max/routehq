@@ -145,7 +145,17 @@
     "tileDueToday": "Dus aujourd'hui",
     "messagesToSend": "{count, plural, one {Message} other {# messages}} à envoyer à {who}",
     "decide": "Décider",
-    "send": "Envoyer"
+    "send": "Envoyer",
+    "msgTitle": "Messages",
+    "msgNew": "{count} nouveaux",
+    "msgInbox": "Boîte de réception",
+    "msgSomeone": "Client",
+    "msgYou": "Vous :",
+    "msgNone": "Aucun message pour l'instant.",
+    "msgConnect": "Connectez LINE ou Telegram et les messages des clients s'afficheront ici.",
+    "msgConnectBtn": "Connecter",
+    "bkTitle": "Réservations",
+    "bkAll": "Toutes les réservations"
   },
   "settings": {
     "contractsBranding": {

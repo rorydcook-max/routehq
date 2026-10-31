@@ -145,7 +145,17 @@
     "amountDueToday": "आज {amount} देय",
     "tileDueToday": "आज देय",
     "decide": "तय करें",
-    "send": "भेजें"
+    "send": "भेजें",
+    "msgTitle": "संदेश",
+    "msgNew": "{count} नए",
+    "msgInbox": "इनबॉक्स",
+    "msgSomeone": "ग्राहक",
+    "msgYou": "आप:",
+    "msgNone": "अभी कोई संदेश नहीं।",
+    "msgConnect": "LINE या Telegram जोड़ें, फिर ग्राहकों के संदेश यहाँ दिखेंगे।",
+    "msgConnectBtn": "जोड़ें",
+    "bkTitle": "बुकिंग",
+    "bkAll": "सभी बुकिंग"
   },
   "vehicles": {
     "addVehicle": "वाहन जोड़ें",

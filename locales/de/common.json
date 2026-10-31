@@ -145,7 +145,17 @@
     "amountDueToday": "{amount} heute fällig",
     "tileDueToday": "Heute fällig",
     "decide": "Entscheiden",
-    "send": "Senden"
+    "send": "Senden",
+    "msgTitle": "Nachrichten",
+    "msgNew": "{count} neu",
+    "msgInbox": "Posteingang",
+    "msgSomeone": "Kunde",
+    "msgYou": "Sie:",
+    "msgNone": "Noch keine Nachrichten.",
+    "msgConnect": "Verbinden Sie LINE oder Telegram, dann erscheinen Kundennachrichten hier.",
+    "msgConnectBtn": "Verbinden",
+    "bkTitle": "Buchungen",
+    "bkAll": "Alle Buchungen"
   },
   "vehicles": {
     "addVehicle": "Fahrzeug hinzufügen",

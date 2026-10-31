@@ -145,7 +145,17 @@
     "amountDueToday": "{amount} לתשלום היום",
     "tileDueToday": "לתשלום היום",
     "decide": "החלטה",
-    "send": "שליחה"
+    "send": "שליחה",
+    "msgTitle": "הודעות",
+    "msgNew": "{count} חדשות",
+    "msgInbox": "תיבת הודעות",
+    "msgSomeone": "לקוח",
+    "msgYou": "את/ה:",
+    "msgNone": "אין הודעות עדיין.",
+    "msgConnect": "חברו את LINE או Telegram והודעות הלקוחות יופיעו כאן.",
+    "msgConnectBtn": "חיבור",
+    "bkTitle": "הזמנות",
+    "bkAll": "כל ההזמנות"
   },
   "vehicles": {
     "addVehicle": "הוספת רכב",

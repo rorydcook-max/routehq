@@ -145,7 +145,17 @@
     "tileDueToday": "இன்று செலுத்த வேண்டியவை",
     "messagesToSend": "{who} அவர்களுக்கு அனுப்ப வேண்டிய {count, plural, one {செய்தி} other {# செய்திகள்}}",
     "decide": "முடிவுசெய்",
-    "send": "அனுப்பு"
+    "send": "அனுப்பு",
+    "msgTitle": "செய்திகள்",
+    "msgNew": "{count} புதியவை",
+    "msgInbox": "இன்பாக்ஸ்",
+    "msgSomeone": "வாடிக்கையாளர்",
+    "msgYou": "நீங்கள்:",
+    "msgNone": "இன்னும் செய்திகள் இல்லை.",
+    "msgConnect": "LINE அல்லது Telegram-ஐ இணைத்தால் வாடிக்கையாளர் செய்திகள் இங்கே தோன்றும்.",
+    "msgConnectBtn": "இணை",
+    "bkTitle": "முன்பதிவுகள்",
+    "bkAll": "அனைத்து முன்பதிவுகளும்"
   },
   "vehicles": {
     "addVehicle": "வாகனத்தைச் சேர்",

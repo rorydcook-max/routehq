@@ -145,7 +145,17 @@
     "tileDueToday": "Pendiente hoy",
     "messagesToSend": "{count, plural, one {Mensaje} other {# mensajes}} para enviar a {who}",
     "decide": "Decidir",
-    "send": "Enviar"
+    "send": "Enviar",
+    "msgTitle": "Mensajes",
+    "msgNew": "{count} nuevos",
+    "msgInbox": "Bandeja",
+    "msgSomeone": "Cliente",
+    "msgYou": "Tú:",
+    "msgNone": "Aún no hay mensajes.",
+    "msgConnect": "Conecta LINE o Telegram y los mensajes de clientes aparecerán aquí.",
+    "msgConnectBtn": "Conectar",
+    "bkTitle": "Reservas",
+    "bkAll": "Todas las reservas"
   },
   "vehicles": {
     "addVehicle": "Añadir vehículo",

@@ -145,7 +145,17 @@
     "amountDueToday": "{amount} att betala i dag",
     "tileDueToday": "Förfaller i dag",
     "decide": "Besluta",
-    "send": "Skicka"
+    "send": "Skicka",
+    "msgTitle": "Meddelanden",
+    "msgNew": "{count} nya",
+    "msgInbox": "Inkorg",
+    "msgSomeone": "Kund",
+    "msgYou": "Du:",
+    "msgNone": "Inga meddelanden än.",
+    "msgConnect": "Anslut LINE eller Telegram så visas kundmeddelanden här.",
+    "msgConnectBtn": "Anslut",
+    "bkTitle": "Bokningar",
+    "bkAll": "Alla bokningar"
   },
   "vehicles": {
     "addVehicle": "Lägg till fordon",

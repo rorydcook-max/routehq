@@ -145,7 +145,17 @@
     "amountDueToday": "{amount} due today",
     "tileDueToday": "Due today",
     "decide": "Decide",
-    "send": "Send"
+    "send": "Send",
+    "msgTitle": "Messages",
+    "msgNew": "{count} new",
+    "msgInbox": "Inbox",
+    "msgSomeone": "Customer",
+    "msgYou": "You:",
+    "msgNone": "No messages yet.",
+    "msgConnect": "Connect LINE or Telegram and customer messages show up here.",
+    "msgConnectBtn": "Connect",
+    "bkTitle": "Bookings",
+    "bkAll": "All bookings"
   },
   "nav": {
     "main": "Main",

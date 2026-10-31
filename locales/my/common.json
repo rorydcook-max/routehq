@@ -395,7 +395,17 @@
     "tileDueToday": "ယနေ့ ပေးချေရန်",
     "messagesToSend": "{who} ထံ ပို့ရန် မက်ဆေ့ချ် {count} စောင်",
     "decide": "ဆုံးဖြတ်ရန်",
-    "send": "ပို့ရန်"
+    "send": "ပို့ရန်",
+    "msgTitle": "မက်ဆေ့ချ်များ",
+    "msgNew": "အသစ် {count}",
+    "msgInbox": "ဝင်စာပုံး",
+    "msgSomeone": "ဖောက်သည်",
+    "msgYou": "သင်:",
+    "msgNone": "မက်ဆေ့ချ် မရှိသေးပါ။",
+    "msgConnect": "LINE သို့မဟုတ် Telegram ချိတ်ဆက်ပါက ဖောက်သည်မက်ဆေ့ချ်များ ဤနေရာတွင် ပေါ်လာပါမည်။",
+    "msgConnectBtn": "ချိတ်ဆက်ရန်",
+    "bkTitle": "ဘိုကင်များ",
+    "bkAll": "ဘိုကင်အားလုံး"
   },
   "vehicles": {
     "addVehicle": "ယာဉ် ထည့်ရန်",

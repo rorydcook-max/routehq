@@ -145,7 +145,17 @@
     "amountDueToday": "අද ගෙවිය යුතු {amount}",
     "tileDueToday": "අද ගෙවිය යුතු",
     "decide": "තීරණය කරන්න",
-    "send": "යවන්න"
+    "send": "යවන්න",
+    "msgTitle": "පණිවිඩ",
+    "msgNew": "නව {count}",
+    "msgInbox": "එන ලිපි",
+    "msgSomeone": "පාරිභෝගිකයා",
+    "msgYou": "ඔබ:",
+    "msgNone": "තවම පණිවිඩ නැත.",
+    "msgConnect": "LINE හෝ Telegram සම්බන්ධ කළ විට පාරිභෝගික පණිවිඩ මෙහි පෙන්වයි.",
+    "msgConnectBtn": "සම්බන්ධ කරන්න",
+    "bkTitle": "වෙන්කිරීම්",
+    "bkAll": "සියලු වෙන්කිරීම්"
   },
   "vehicles": {
     "addVehicle": "වාහනය එක් කරන්න",

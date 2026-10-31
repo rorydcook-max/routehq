@@ -145,7 +145,17 @@
     "amountDueToday": "今天應付 {amount}",
     "tileDueToday": "今天到期",
     "decide": "決定",
-    "send": "傳送"
+    "send": "傳送",
+    "msgTitle": "訊息",
+    "msgNew": "{count} 則新訊息",
+    "msgInbox": "收件匣",
+    "msgSomeone": "客戶",
+    "msgYou": "你：",
+    "msgNone": "還沒有訊息。",
+    "msgConnect": "連接 LINE 或 Telegram 後，客戶訊息會顯示在這裡。",
+    "msgConnectBtn": "連接",
+    "bkTitle": "預訂",
+    "bkAll": "全部預訂"
   },
   "vehicles": {
     "addVehicle": "新增車輛",

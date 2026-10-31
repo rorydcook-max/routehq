@@ -91,7 +91,9 @@ export default async function PricingPage({ searchParams }: { searchParams: Prom
     <>
       <section className={`${s.dark} ${s.hero} ${s.heroCards}`}>
         <Container>
-          <div className={s.rise}>
+          {/* Above the plan cards: both rise in with an animation (each its own layer), and the cards, coming later,
+              painted over the open currency list. */}
+          <div className={`${s.rise} relative z-30`}>
             <Eyebrow>{m("pricingEyebrow")}</Eyebrow>
             <h1 className={`${s.h1} mt-6`}>{m.rich("pricingTitle", RICH)}</h1>
             <p className={`${s.lede} ${s.heroBody}`}>{m("pricingBody")}</p>

@@ -1224,7 +1224,8 @@
 }
 .selectList {
   position: absolute;
-  inset-inline-end: 0;
+  /* Lined up with the button's start edge: aligned to its end, the list ran off the screen on phones. */
+  inset-inline-start: 0;
   z-index: 20;
   width: min(280px, calc(100vw - 32px));
   max-height: 340px;

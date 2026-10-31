@@ -1,0 +1,12 @@
+# Never upload local secrets or build output when deploying from this computer with the Vercel CLI.
+.env
+.env.*
+!.env.example
+*.bak
+.next/
+.next-build/
+node_modules/
+locales/_shots/
+locales/_pending/
+locales/_audit/
+audit/

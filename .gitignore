@@ -32,3 +32,5 @@ Thumbs.db
 # Local scratch output (scripts/check-pdf.ts)
 /tmp/
 /.next-build/
+.vercel
+.env*

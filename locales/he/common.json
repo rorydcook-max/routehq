@@ -449,7 +449,8 @@
     "g_money": "כסף",
     "g_tools": "כלים",
     "home": "בית",
-    "supportAccess": "לתמיכה של RoveHQ יש גישה לעסק שלכם עד {time}."
+    "supportAccess": "לתמיכה של RoveHQ יש גישה לעסק שלכם עד {time}.",
+    "language": "שפה"
   },
   "customer": {
     "theRentalBusiness": "חברת ההשכרה",
@@ -2777,7 +2778,15 @@
     "deleteWithBookingsBtn": "למחוק את הרכב וההזמנות",
     "noticeOwnerOnly": "רק בעל העסק יכול למחוק רכבים.",
     "bulkDeleteWarning": "מוחק אותם עם כל ההזמנות והרשומות. אי אפשר לבטל את זה.",
-    "deleteVehicleConfirm": "מוחק את הרכב עם ההוצאות, המסמכים והתמונות שלו. אי אפשר לבטל את זה."
+    "deleteVehicleConfirm": "מוחק את הרכב עם ההוצאות, המסמכים והתמונות שלו. אי אפשר לבטל את זה.",
+    "qp_title": "מחיר השכרה",
+    "qp_period": "לפי",
+    "qp_day": "ליום",
+    "qp_week": "לשבוע",
+    "qp_month": "לחודש",
+    "qp_save": "שמירה",
+    "qp_cancel": "ביטול",
+    "qp_failed": "לא ניתן לשמור את המחיר. נסו שוב."
   },
   "customers": {
     "noRentals": "אין השכרות עדיין",

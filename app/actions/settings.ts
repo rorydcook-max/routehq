@@ -1595,3 +1595,21 @@ export async function sendTestLineSummary(): Promise<{ success: boolean; message
   }
   return { success: true, message: "Sent. Check LINE." };
 }
+
+/**
+ * The sidebar's language button (Rory, 31 Oct 2026): changes only your own language, in one tap.
+ * Same column as My account's language setting; the calendar is left as it is.
+ */
+export async function setMyLanguage(locale: string): Promise<{ success: boolean }> {
+  if (!supportedLocales.has(locale)) return { success: false };
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+  if (!user) return { success: false };
+  const admin = createSupabaseAdminClient() as any;
+  const { error } = await admin.from("users").update({ preferred_locale: locale }).eq("id", user.id);
+  if (error) return { success: false };
+  revalidatePath("/", "layout");
+  return { success: true };
+}

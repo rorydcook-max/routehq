@@ -175,7 +175,8 @@
     "g_money": "Money",
     "g_tools": "Tools",
     "home": "Home",
-    "supportAccess": "RoveHQ support has access to your business until {time}."
+    "supportAccess": "RoveHQ support has access to your business until {time}.",
+    "language": "Language"
   },
   "vehicles": {
     "addVehicle": "Add vehicle",
@@ -2737,7 +2738,15 @@
     "deleteWithBookingsBtn": "Delete vehicle and bookings",
     "noticeOwnerOnly": "Only the business owner can delete vehicles.",
     "bulkDeleteWarning": "Deletes them with all their bookings and records. This can't be undone.",
-    "deleteVehicleConfirm": "This deletes the vehicle with its costs, papers and photos. This can't be undone."
+    "deleteVehicleConfirm": "This deletes the vehicle with its costs, papers and photos. This can't be undone.",
+    "qp_title": "Rental price",
+    "qp_period": "Per",
+    "qp_day": "per day",
+    "qp_week": "per week",
+    "qp_month": "per month",
+    "qp_save": "Save",
+    "qp_cancel": "Cancel",
+    "qp_failed": "Couldn't save the price. Try again."
   },
   "customers": {
     "noRentals": "No rentals yet",

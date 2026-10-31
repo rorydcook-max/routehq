@@ -449,7 +449,8 @@
     "g_money": "Keuangan",
     "g_tools": "Alat",
     "home": "Beranda",
-    "supportAccess": "Tim dukungan RoveHQ memiliki akses ke usaha Anda hingga {time}."
+    "supportAccess": "Tim dukungan RoveHQ memiliki akses ke usaha Anda hingga {time}.",
+    "language": "Bahasa"
   },
   "customer": {
     "theRentalBusiness": "pihak rental",
@@ -2777,7 +2778,15 @@
     "deleteWithBookingsBtn": "Hapus kendaraan dan pemesanan",
     "noticeOwnerOnly": "Hanya pemilik usaha yang bisa menghapus kendaraan.",
     "bulkDeleteWarning": "Menghapusnya beserta semua pemesanan dan catatannya. Tidak bisa dibatalkan.",
-    "deleteVehicleConfirm": "Menghapus kendaraan beserta biaya, dokumen, dan fotonya. Tidak bisa dibatalkan."
+    "deleteVehicleConfirm": "Menghapus kendaraan beserta biaya, dokumen, dan fotonya. Tidak bisa dibatalkan.",
+    "qp_title": "Harga sewa",
+    "qp_period": "Per",
+    "qp_day": "per hari",
+    "qp_week": "per minggu",
+    "qp_month": "per bulan",
+    "qp_save": "Simpan",
+    "qp_cancel": "Batal",
+    "qp_failed": "Harga tidak bisa disimpan. Coba lagi."
   },
   "customers": {
     "noRentals": "Belum ada sewa",

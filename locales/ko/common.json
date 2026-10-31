@@ -449,7 +449,8 @@
     "g_money": "자금",
     "g_tools": "도구",
     "home": "홈",
-    "supportAccess": "RoveHQ 지원팀이 {time}까지 업체에 접근할 수 있어요."
+    "supportAccess": "RoveHQ 지원팀이 {time}까지 업체에 접근할 수 있어요.",
+    "language": "언어"
   },
   "customer": {
     "theRentalBusiness": "렌터카 업체",
@@ -2737,7 +2738,15 @@
     "deleteWithBookingsBtn": "차량과 예약 삭제",
     "noticeOwnerOnly": "사업체 소유자만 차량을 삭제할 수 있어요.",
     "bulkDeleteWarning": "모든 예약과 기록까지 함께 삭제돼요. 되돌릴 수 없어요.",
-    "deleteVehicleConfirm": "차량을 비용, 서류, 사진과 함께 삭제해요. 되돌릴 수 없어요."
+    "deleteVehicleConfirm": "차량을 비용, 서류, 사진과 함께 삭제해요. 되돌릴 수 없어요.",
+    "qp_title": "대여 요금",
+    "qp_period": "기준",
+    "qp_day": "하루",
+    "qp_week": "1주",
+    "qp_month": "1개월",
+    "qp_save": "저장",
+    "qp_cancel": "취소",
+    "qp_failed": "요금을 저장하지 못했어요. 다시 시도해 주세요."
   },
   "customers": {
     "noRentals": "렌탈 내역 없음",

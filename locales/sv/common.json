@@ -449,7 +449,8 @@
     "g_money": "Pengar",
     "g_tools": "Verktyg",
     "home": "Hem",
-    "supportAccess": "RoveHQ-supporten har åtkomst till ditt företag till {time}."
+    "supportAccess": "RoveHQ-supporten har åtkomst till ditt företag till {time}.",
+    "language": "Språk"
   },
   "customer": {
     "theRentalBusiness": "uthyrningsföretaget",
@@ -2737,7 +2738,15 @@
     "deleteWithBookingsBtn": "Radera fordon och bokningar",
     "noticeOwnerOnly": "Bara företagets ägare kan radera fordon.",
     "bulkDeleteWarning": "Raderar dem med alla bokningar och poster. Det går inte att ångra.",
-    "deleteVehicleConfirm": "Raderar fordonet med kostnader, papper och foton. Det går inte att ångra."
+    "deleteVehicleConfirm": "Raderar fordonet med kostnader, papper och foton. Det går inte att ångra.",
+    "qp_title": "Hyrespris",
+    "qp_period": "Per",
+    "qp_day": "per dag",
+    "qp_week": "per vecka",
+    "qp_month": "per månad",
+    "qp_save": "Spara",
+    "qp_cancel": "Avbryt",
+    "qp_failed": "Det gick inte att spara priset. Försök igen."
   },
   "customers": {
     "noRentals": "Inga uthyrningar än",

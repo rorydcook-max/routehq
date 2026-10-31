@@ -175,7 +175,8 @@
     "g_money": "Dinheiro",
     "g_tools": "Ferramentas",
     "home": "Início",
-    "supportAccess": "O suporte do RoveHQ tem acesso à sua empresa até {time}."
+    "supportAccess": "O suporte do RoveHQ tem acesso à sua empresa até {time}.",
+    "language": "Idioma"
   },
   "vehicles": {
     "addVehicle": "Adicionar veículo",
@@ -2737,7 +2738,15 @@
     "deleteWithBookingsBtn": "Excluir veículo e reservas",
     "noticeOwnerOnly": "Só o dono do negócio pode excluir veículos.",
     "bulkDeleteWarning": "Exclui com todas as reservas e registros. Não pode ser desfeito.",
-    "deleteVehicleConfirm": "Exclui o veículo com custos, documentos e fotos. Não pode ser desfeito."
+    "deleteVehicleConfirm": "Exclui o veículo com custos, documentos e fotos. Não pode ser desfeito.",
+    "qp_title": "Preço do aluguel",
+    "qp_period": "Por",
+    "qp_day": "por dia",
+    "qp_week": "por semana",
+    "qp_month": "por mês",
+    "qp_save": "Salvar",
+    "qp_cancel": "Cancelar",
+    "qp_failed": "Não foi possível salvar o preço. Tente de novo."
   },
   "customers": {
     "noRentals": "Nenhum aluguel ainda",

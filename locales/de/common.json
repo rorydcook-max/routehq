@@ -449,7 +449,8 @@
     "g_money": "Finanzen",
     "g_tools": "Werkzeuge",
     "home": "Start",
-    "supportAccess": "Der RoveHQ-Support hat bis {time} Zugriff auf Ihren Betrieb."
+    "supportAccess": "Der RoveHQ-Support hat bis {time} Zugriff auf Ihren Betrieb.",
+    "language": "Sprache"
   },
   "customer": {
     "theRentalBusiness": "der Vermieter",
@@ -2777,7 +2778,15 @@
     "deleteWithBookingsBtn": "Fahrzeug und Buchungen löschen",
     "noticeOwnerOnly": "Nur der Inhaber kann Fahrzeuge löschen.",
     "bulkDeleteWarning": "Löscht sie samt allen Buchungen und Einträgen. Das lässt sich nicht rückgängig machen.",
-    "deleteVehicleConfirm": "Löscht das Fahrzeug samt Kosten, Unterlagen und Fotos. Das lässt sich nicht rückgängig machen."
+    "deleteVehicleConfirm": "Löscht das Fahrzeug samt Kosten, Unterlagen und Fotos. Das lässt sich nicht rückgängig machen.",
+    "qp_title": "Mietpreis",
+    "qp_period": "Pro",
+    "qp_day": "pro Tag",
+    "qp_week": "pro Woche",
+    "qp_month": "pro Monat",
+    "qp_save": "Speichern",
+    "qp_cancel": "Abbrechen",
+    "qp_failed": "Preis konnte nicht gespeichert werden. Bitte erneut versuchen."
   },
   "customers": {
     "noRentals": "Noch keine Mieten",

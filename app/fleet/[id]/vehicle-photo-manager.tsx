@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { Camera, ImagePlus, Trash2, X } from "lucide-react";
+import { Camera, ImagePlus, Move, Trash2, X } from "lucide-react";
 import { removeVehiclePhoto, reorderVehiclePhotos, uploadVehiclePhotos } from "@/app/actions/vehicles";
 import type { VehicleDetailDocument } from "@/lib/vehicle-detail";
 
@@ -180,7 +180,15 @@ export function VehiclePhotoManager({ organizationId, vehicleId, vehicleLabel, p
                       movePhoto(photo.id);
                     }}
                   >
-                    {photo.url ? <img alt="" className="h-44 w-full object-cover" src={photo.url} /> : <div className="h-44" />}
+                    <div className={`relative ${orderedPhotos.length > 1 ? "cursor-grab active:cursor-grabbing" : ""}`}>
+                      {photo.url ? <img alt="" className="pointer-events-none h-44 w-full object-cover" draggable={false} src={photo.url} /> : <div className="h-44" />}
+                      {/* Shows the photos can be dragged into order. */}
+                      {orderedPhotos.length > 1 ? (
+                        <span aria-hidden="true" className="absolute left-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-[var(--foreground)] shadow-sm">
+                          <Move size={18} />
+                        </span>
+                      ) : null}
+                    </div>
                     <div className="flex items-center justify-between gap-2 p-3">
                       {index === 0 ? (
                         <span className="font-bold text-[var(--foreground)]">{say("ph_main")}</span>

@@ -1170,3 +1170,35 @@ export async function bulkDeleteVehicles(formData: FormData) {
   }
   await purgeVehicles(organizationId, vehicleIds);
 }
+
+/**
+ * Quick price from the fleet list (Rory, 31 Oct 2026): one rate, per day, week or month, without opening the
+ * edit page. The other rates are worked out from it when a booking is taken, as on the vehicle form.
+ */
+export async function setVehicleRate(formData: FormData): Promise<{ success: boolean; error?: string }> {
+  const supabase = (await createSupabaseServerClient()) as any;
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "You must be signed in." };
+
+  const vehicleId = String(formData.get("vehicleId") || "");
+  const period = String(formData.get("period") || "");
+  const amount = Math.round(Number(String(formData.get("rate") || "").replace(/,/g, "")));
+  const column = ({ day: "daily_rate", week: "weekly_rate", month: "monthly_rate" } as Record<string, string>)[period];
+  if (!vehicleId || !column) return { success: false, error: "Choose day, week or month." };
+  if (!Number.isFinite(amount) || amount <= 0) return { success: false, error: "Enter a price." };
+
+  const membership = await getCurrentMembership();
+  if (!membership) return { success: false, error: "You must be signed in." };
+  const { error } = await supabase
+    .from("vehicles")
+    .update({ [column]: amount })
+    .eq("id", vehicleId)
+    .eq("organization_id", membership.organizationId);
+  if (error) return { success: false, error: error.message };
+
+  revalidatePath("/fleet");
+  revalidatePath(`/fleet/${vehicleId}`);
+  return { success: true };
+}

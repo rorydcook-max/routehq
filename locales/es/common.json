@@ -449,7 +449,8 @@
     "g_money": "Dinero",
     "g_tools": "Herramientas",
     "home": "Inicio",
-    "supportAccess": "El soporte de RoveHQ tiene acceso a su empresa hasta las {time}."
+    "supportAccess": "El soporte de RoveHQ tiene acceso a su empresa hasta las {time}.",
+    "language": "Idioma"
   },
   "customer": {
     "theRentalBusiness": "el negocio de alquiler",
@@ -2737,7 +2738,15 @@
     "deleteWithBookingsBtn": "Eliminar vehículo y reservas",
     "noticeOwnerOnly": "Solo el propietario del negocio puede eliminar vehículos.",
     "bulkDeleteWarning": "Los elimina con todas sus reservas y registros. No se puede deshacer.",
-    "deleteVehicleConfirm": "Elimina el vehículo con sus gastos, documentos y fotos. No se puede deshacer."
+    "deleteVehicleConfirm": "Elimina el vehículo con sus gastos, documentos y fotos. No se puede deshacer.",
+    "qp_title": "Precio de alquiler",
+    "qp_period": "Por",
+    "qp_day": "por día",
+    "qp_week": "por semana",
+    "qp_month": "por mes",
+    "qp_save": "Guardar",
+    "qp_cancel": "Cancelar",
+    "qp_failed": "No se pudo guardar el precio. Inténtalo de nuevo."
   },
   "customers": {
     "noRentals": "Sin alquileres todavía",

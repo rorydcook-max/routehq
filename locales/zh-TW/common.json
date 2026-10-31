@@ -449,7 +449,8 @@
     "g_money": "金流",
     "g_tools": "工具",
     "home": "首頁",
-    "supportAccess": "RoveHQ 客服可存取您的店家，直到 {time}。"
+    "supportAccess": "RoveHQ 客服可存取您的店家，直到 {time}。",
+    "language": "語言"
   },
   "customer": {
     "theRentalBusiness": "租車業者",
@@ -2737,7 +2738,15 @@
     "deleteWithBookingsBtn": "刪除車輛和預訂",
     "noticeOwnerOnly": "只有企業擁有者可以刪除車輛。",
     "bulkDeleteWarning": "連同所有預訂和紀錄一起刪除。此操作無法復原。",
-    "deleteVehicleConfirm": "刪除車輛及其費用、證件和照片。此操作無法復原。"
+    "deleteVehicleConfirm": "刪除車輛及其費用、證件和照片。此操作無法復原。",
+    "qp_title": "租金",
+    "qp_period": "按",
+    "qp_day": "每天",
+    "qp_week": "每週",
+    "qp_month": "每月",
+    "qp_save": "儲存",
+    "qp_cancel": "取消",
+    "qp_failed": "價格儲存失敗，請再試一次。"
   },
   "customers": {
     "noRentals": "尚無租車紀錄",

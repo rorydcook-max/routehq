@@ -449,7 +449,8 @@
     "g_money": "资金",
     "g_tools": "工具",
     "home": "首页",
-    "supportAccess": "RoveHQ 客服可访问您的商家，直到 {time}。"
+    "supportAccess": "RoveHQ 客服可访问您的商家，直到 {time}。",
+    "language": "语言"
   },
   "customer": {
     "theRentalBusiness": "租车行",
@@ -2777,7 +2778,15 @@
     "deleteWithBookingsBtn": "删除车辆和预订",
     "noticeOwnerOnly": "只有企业所有者可以删除车辆。",
     "bulkDeleteWarning": "连同其所有预订和记录一起删除。此操作无法撤销。",
-    "deleteVehicleConfirm": "删除车辆及其费用、证件和照片。此操作无法撤销。"
+    "deleteVehicleConfirm": "删除车辆及其费用、证件和照片。此操作无法撤销。",
+    "qp_title": "租金",
+    "qp_period": "按",
+    "qp_day": "每天",
+    "qp_week": "每周",
+    "qp_month": "每月",
+    "qp_save": "保存",
+    "qp_cancel": "取消",
+    "qp_failed": "价格保存失败，请重试。"
   },
   "customers": {
     "noRentals": "暂无租车记录",

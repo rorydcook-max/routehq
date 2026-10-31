@@ -449,7 +449,8 @@
     "g_money": "Tài chính",
     "g_tools": "Công cụ",
     "home": "Trang chủ",
-    "supportAccess": "Bộ phận hỗ trợ RoveHQ có quyền truy cập doanh nghiệp của bạn đến {time}."
+    "supportAccess": "Bộ phận hỗ trợ RoveHQ có quyền truy cập doanh nghiệp của bạn đến {time}.",
+    "language": "Ngôn ngữ"
   },
   "customer": {
     "theRentalBusiness": "bên cho thuê",
@@ -2777,7 +2778,15 @@
     "deleteWithBookingsBtn": "Xóa xe và đặt xe",
     "noticeOwnerOnly": "Chỉ chủ doanh nghiệp mới xóa được xe.",
     "bulkDeleteWarning": "Xóa cùng mọi đặt xe và bản ghi của chúng. Không thể hoàn tác.",
-    "deleteVehicleConfirm": "Xóa xe cùng chi phí, giấy tờ và ảnh. Không thể hoàn tác."
+    "deleteVehicleConfirm": "Xóa xe cùng chi phí, giấy tờ và ảnh. Không thể hoàn tác.",
+    "qp_title": "Giá thuê",
+    "qp_period": "Theo",
+    "qp_day": "mỗi ngày",
+    "qp_week": "mỗi tuần",
+    "qp_month": "mỗi tháng",
+    "qp_save": "Lưu",
+    "qp_cancel": "Hủy",
+    "qp_failed": "Không lưu được giá. Hãy thử lại."
   },
   "customers": {
     "noRentals": "Chưa có lượt thuê nào",

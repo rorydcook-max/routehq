@@ -449,7 +449,8 @@
     "g_money": "Økonomi",
     "g_tools": "Verktøy",
     "home": "Hjem",
-    "supportAccess": "RoveHQ-kundestøtte har tilgang til firmaet ditt til {time}."
+    "supportAccess": "RoveHQ-kundestøtte har tilgang til firmaet ditt til {time}.",
+    "language": "Språk"
   },
   "customer": {
     "theRentalBusiness": "utleiebedriften",
@@ -2737,7 +2738,15 @@
     "deleteWithBookingsBtn": "Slett kjøretøy og bestillinger",
     "noticeOwnerOnly": "Bare eieren av bedriften kan slette kjøretøy.",
     "bulkDeleteWarning": "Sletter dem med alle bestillinger og oppføringer. Det kan ikke angres.",
-    "deleteVehicleConfirm": "Sletter kjøretøyet med kostnader, papirer og bilder. Det kan ikke angres."
+    "deleteVehicleConfirm": "Sletter kjøretøyet med kostnader, papirer og bilder. Det kan ikke angres.",
+    "qp_title": "Leiepris",
+    "qp_period": "Per",
+    "qp_day": "per dag",
+    "qp_week": "per uke",
+    "qp_month": "per måned",
+    "qp_save": "Lagre",
+    "qp_cancel": "Avbryt",
+    "qp_failed": "Kunne ikke lagre prisen. Prøv igjen."
   },
   "customers": {
     "noRentals": "Ingen utleie ennå",

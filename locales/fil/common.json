@@ -449,7 +449,8 @@
     "g_money": "Pera",
     "g_tools": "Mga Tool",
     "home": "Tahanan",
-    "supportAccess": "May access ang RoveHQ support sa iyong negosyo hanggang {time}."
+    "supportAccess": "May access ang RoveHQ support sa iyong negosyo hanggang {time}.",
+    "language": "Wika"
   },
   "customer": {
     "theRentalBusiness": "ang negosyo sa pagpapaupa",
@@ -2737,7 +2738,15 @@
     "deleteWithBookingsBtn": "Burahin ang sasakyan at mga booking",
     "noticeOwnerOnly": "Ang may-ari lang ng negosyo ang puwedeng magbura ng sasakyan.",
     "bulkDeleteWarning": "Buburahin ang mga ito kasama ang lahat ng booking at record. Hindi na ito maibabalik.",
-    "deleteVehicleConfirm": "Buburahin ang sasakyan kasama ang mga gastos, papeles at litrato nito. Hindi na ito maibabalik."
+    "deleteVehicleConfirm": "Buburahin ang sasakyan kasama ang mga gastos, papeles at litrato nito. Hindi na ito maibabalik.",
+    "qp_title": "Presyo ng renta",
+    "qp_period": "Kada",
+    "qp_day": "kada araw",
+    "qp_week": "kada linggo",
+    "qp_month": "kada buwan",
+    "qp_save": "I-save",
+    "qp_cancel": "Kanselahin",
+    "qp_failed": "Hindi na-save ang presyo. Subukan ulit."
   },
   "customers": {
     "noRentals": "Wala pang rental",

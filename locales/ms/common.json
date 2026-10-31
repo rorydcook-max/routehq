@@ -449,7 +449,8 @@
     "g_money": "Wang",
     "g_tools": "Alatan",
     "home": "Utama",
-    "supportAccess": "Sokongan RoveHQ mempunyai akses kepada perniagaan anda sehingga {time}."
+    "supportAccess": "Sokongan RoveHQ mempunyai akses kepada perniagaan anda sehingga {time}.",
+    "language": "Bahasa"
   },
   "customer": {
     "theRentalBusiness": "syarikat sewa",
@@ -2777,7 +2778,15 @@
     "deleteWithBookingsBtn": "Padam kenderaan dan tempahan",
     "noticeOwnerOnly": "Hanya pemilik perniagaan boleh memadam kenderaan.",
     "bulkDeleteWarning": "Memadamnya bersama semua tempahan dan rekod. Tidak boleh dibuat asal.",
-    "deleteVehicleConfirm": "Memadam kenderaan bersama kos, dokumen dan fotonya. Tidak boleh dibuat asal."
+    "deleteVehicleConfirm": "Memadam kenderaan bersama kos, dokumen dan fotonya. Tidak boleh dibuat asal.",
+    "qp_title": "Harga sewa",
+    "qp_period": "Setiap",
+    "qp_day": "sehari",
+    "qp_week": "seminggu",
+    "qp_month": "sebulan",
+    "qp_save": "Simpan",
+    "qp_cancel": "Batal",
+    "qp_failed": "Harga tidak dapat disimpan. Cuba lagi."
   },
   "customers": {
     "noRentals": "Belum ada sewaan",

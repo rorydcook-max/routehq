@@ -31,6 +31,7 @@ import { signOut, switchActiveOrganization, type ShellContext } from "@/app/acti
 import { adminStopViewing } from "@/app/actions/admin";
 import { Toaster } from "@/components/toast";
 import { AskBox } from "@/components/ask-box";
+import { SidebarLanguage } from "@/components/sidebar-language";
 import { RouteHqLogo } from "@/components/brand-logo";
 import { BrandStyle } from "@/components/brand-style";
 import { BusinessLogoImage } from "@/components/business-logo-image";
@@ -314,6 +315,7 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
                 <span className="block truncate text-[12px] font-medium text-[var(--muted)]">{userEmail}</span>
               </span>
             </Link>
+            <SidebarLanguage compact />
             <form action={signOut} onSubmit={forgetShellContext}>
               <PendingButton aria-label={t("signOut")} className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--foreground)]" pendingLabel="" title={t("signOut")} type="submit">
                 <LogOut size={16} />
@@ -520,7 +522,8 @@ export function AppShell({ children, userEmail, hero, heroOverlap = false }: { c
             </div>
             {userEmail ? (
               <div className="mt-4 flex items-center justify-between gap-3 border-t border-[var(--border)] pt-3">
-                <span className="min-w-0 truncate text-[14px] font-semibold text-[var(--muted)]">{userEmail}</span>
+                <span className="min-w-0 flex-1 truncate text-[14px] font-semibold text-[var(--muted)]">{userEmail}</span>
+                <SidebarLanguage className="shrink-0 border border-[var(--border)] !rounded-full bg-white" />
                 <form action={signOut} onSubmit={forgetShellContext}>
                   <PendingButton className="inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full border border-[var(--border)] bg-white px-4 py-2 text-[14px] font-bold text-[var(--foreground)]" pendingLabel="" type="submit">
                     {t("signOut")}

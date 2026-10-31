@@ -449,7 +449,8 @@
     "g_money": "Finances",
     "g_tools": "Outils",
     "home": "Accueil",
-    "supportAccess": "Le support RoveHQ a accès à votre entreprise jusqu'à {time}."
+    "supportAccess": "Le support RoveHQ a accès à votre entreprise jusqu'à {time}.",
+    "language": "Langue"
   },
   "customer": {
     "theRentalBusiness": "le loueur",
@@ -2777,7 +2778,15 @@
     "deleteWithBookingsBtn": "Supprimer le véhicule et les réservations",
     "noticeOwnerOnly": "Seul le propriétaire de l'entreprise peut supprimer des véhicules.",
     "bulkDeleteWarning": "Les supprime avec toutes leurs réservations et données. C'est irréversible.",
-    "deleteVehicleConfirm": "Supprime le véhicule avec ses frais, papiers et photos. C'est irréversible."
+    "deleteVehicleConfirm": "Supprime le véhicule avec ses frais, papiers et photos. C'est irréversible.",
+    "qp_title": "Prix de location",
+    "qp_period": "Par",
+    "qp_day": "par jour",
+    "qp_week": "par semaine",
+    "qp_month": "par mois",
+    "qp_save": "Enregistrer",
+    "qp_cancel": "Annuler",
+    "qp_failed": "Impossible d'enregistrer le prix. Réessayez."
   },
   "customers": {
     "noRentals": "Aucune location pour l’instant",

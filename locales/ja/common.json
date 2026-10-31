@@ -449,7 +449,8 @@
     "g_money": "お金",
     "g_tools": "ツール",
     "home": "ホーム",
-    "supportAccess": "RoveHQサポートは{time}まであなたの事業者アカウントにアクセスできます。"
+    "supportAccess": "RoveHQサポートは{time}まであなたの事業者アカウントにアクセスできます。",
+    "language": "言語"
   },
   "customer": {
     "returningAsk": "以前ご利用いただいたことがありますか？",
@@ -2737,7 +2738,15 @@
     "deleteWithBookingsBtn": "車両と予約を削除",
     "noticeOwnerOnly": "車両を削除できるのはオーナーだけです。",
     "bulkDeleteWarning": "すべての予約と記録ごと削除します。元に戻せません。",
-    "deleteVehicleConfirm": "車両を費用・書類・写真ごと削除します。元に戻せません。"
+    "deleteVehicleConfirm": "車両を費用・書類・写真ごと削除します。元に戻せません。",
+    "qp_title": "レンタル料金",
+    "qp_period": "単位",
+    "qp_day": "1日あたり",
+    "qp_week": "1週間あたり",
+    "qp_month": "1か月あたり",
+    "qp_save": "保存",
+    "qp_cancel": "キャンセル",
+    "qp_failed": "料金を保存できませんでした。もう一度お試しください。"
   },
   "customers": {
     "noRentals": "まだレンタルがありません",

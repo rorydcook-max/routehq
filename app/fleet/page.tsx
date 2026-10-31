@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import { useTranslations } from "next-intl";
 import { FileSpreadsheet, Plus } from "lucide-react";
-import { bulkArchiveVehicles, bulkDeleteVehicles } from "@/app/actions/vehicles";
+import { bulkArchiveVehicles, bulkDeleteVehicles, setVehicleRate } from "@/app/actions/vehicles";
 import { AppShell } from "@/components/app-shell";
 import { Badge, EmptyState } from "@/components/ui";
 import { OutFreeSummary, VehicleKindIcon } from "@/components/vehicle-kind-icon";
@@ -13,6 +13,7 @@ import { CalendarClock } from "lucide-react";
 import { getCurrentUserEmail } from "@/lib/auth/session";
 import { getDashboardData, money } from "@/lib/dashboard";
 import { FleetBulkActions } from "@/app/fleet/fleet-actions";
+import { QuickPrice } from "@/app/fleet/quick-price";
 import { getDefaultOrganization, getVehicleCategories } from "@/lib/organization";
 import { effectiveLimits, fleetMix, fleetText, planForFleet, vehiclesOverLimit } from "@/lib/plans";
 import { getCustomPlan } from "@/lib/custom-plan";
@@ -344,7 +345,7 @@ export default async function FleetPage({ searchParams }: { searchParams: Promis
                           {priceOf(vehicle) ? (
                             <Link className="font-mono-data block" href={href}>{priceOf(vehicle)}</Link>
                           ) : (
-                            <Link className="block whitespace-nowrap font-semibold text-[var(--primary)] hover:underline" href={`/fleet/${vehicle.id}/edit` as never}>{t("setPrice")}</Link>
+                            <QuickPrice currency={organization.currency || "THB"} saveAction={setVehicleRate} vehicleId={vehicle.id} />
                           )}
                         </td>
                         <td className="px-3 py-3">

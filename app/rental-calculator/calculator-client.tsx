@@ -70,9 +70,9 @@ function Num({ label, value, onChange, hint, suffix, prefix }: { label: string; 
           value={Number.isFinite(value) && value !== 0 ? value : ""}
           placeholder="0"
         />
-        {suffix ? <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 pt-1 text-sm text-[var(--foreground-muted)]">{suffix}</span> : null}
+        {suffix ? <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 pt-1 text-sm text-[var(--muted)]">{suffix}</span> : null}
       </span>
-      {hint ? <span className="mt-1 block text-xs font-normal text-[var(--foreground-muted)]">{hint}</span> : null}
+      {hint ? <span className="mt-1 block text-xs font-normal text-[var(--muted)]">{hint}</span> : null}
     </label>
   );
 }
@@ -90,10 +90,10 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
-    <div className="rounded-xl bg-[var(--surface-muted,#f6f7f9)] p-3">
-      <dt className="text-[var(--foreground-muted)]">{label}</dt>
+    <div className="rounded-xl bg-[var(--panel-secondary)] p-3">
+      <dt className="text-[var(--muted)]">{label}</dt>
       <dd className="mt-1 text-lg font-bold">{value}</dd>
-      {hint ? <dd className="mt-0.5 text-xs text-[var(--foreground-muted)]">{hint}</dd> : null}
+      {hint ? <dd className="mt-0.5 text-xs text-[var(--muted)]">{hint}</dd> : null}
     </div>
   );
 }
@@ -113,7 +113,7 @@ function RangeBar({ low, high, typical, price }: { low: number; high: number; ty
   const at = (value: number) => Math.round(Math.min(1, Math.max(0, (value - low) / span)) * 100);
   return (
     <div className="relative mt-3 h-2 rounded-full bg-[var(--panel-tertiary)]">
-      <span aria-hidden className="absolute top-1/2 h-3.5 w-0.5 -translate-y-1/2 bg-[var(--foreground-muted)]" style={{ left: `${at(typical)}%` }} />
+      <span aria-hidden className="absolute top-1/2 h-3.5 w-0.5 -translate-y-1/2 bg-[var(--muted)]" style={{ left: `${at(typical)}%` }} />
       <span aria-hidden className="absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-[var(--primary)] shadow" style={{ left: `${at(price)}%` }} />
     </div>
   );
@@ -141,8 +141,8 @@ function ResearchProgress({ elapsed, say }: { elapsed: number; say: Say }) {
   // Moves quickly at first and slows near the end, never claiming to be finished.
   const pct = Math.min(95, Math.round(100 * (1 - Math.exp(-elapsed / 35))));
   return (
-    <div aria-live="polite" id="calc-progress" className="mt-4 scroll-mt-24 rounded-xl border border-[var(--border)] bg-[var(--surface-muted,#f6f7f9)] p-4">
-      <div className="h-2 w-full overflow-hidden rounded-full bg-white">
+    <div aria-live="polite" id="calc-progress" className="mt-4 scroll-mt-24 rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-4">
+      <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--panel-tertiary)]">
         <div className="h-full rounded-full bg-[var(--primary)] transition-all duration-1000 ease-out" style={{ width: `${Math.max(6, pct)}%` }} />
       </div>
       <ul className="mt-3 space-y-2 text-sm">
@@ -151,7 +151,7 @@ function ResearchProgress({ elapsed, say }: { elapsed: number; say: Say }) {
           const done = next ? elapsed >= next.from : false;
           const now = elapsed >= step.from && !done;
           return (
-            <li className={`flex items-center gap-2 ${done ? "text-[var(--success)]" : now ? "font-semibold text-[var(--foreground)]" : "text-[var(--foreground-muted)]"}`} key={step.key}>
+            <li className={`flex items-center gap-2 ${done ? "text-[var(--success)]" : now ? "font-semibold text-[var(--foreground)]" : "text-[var(--muted)]"}`} key={step.key}>
               <span aria-hidden className={`inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${done ? "border-[var(--success)] bg-[var(--success)] text-[10px] text-white" : now ? "animate-pulse border-[var(--primary)] bg-[var(--primary)]/20" : "border-[var(--border-strong)]"}`}>
                 {done ? "✓" : ""}
               </span>
@@ -160,7 +160,7 @@ function ResearchProgress({ elapsed, say }: { elapsed: number; say: Say }) {
           );
         })}
       </ul>
-      <p className="mt-3 text-xs text-[var(--foreground-muted)]">{say("workingHint")}</p>
+      <p className="mt-3 text-xs text-[var(--muted)]">{say("workingHint")}</p>
     </div>
   );
 }
@@ -662,7 +662,7 @@ export function CalculatorClient({
                     {market.verdict === "below" ? say("b_priceBelow", { amount: about(market.gap) }) : market.verdict === "above" ? say("b_priceAbove", { amount: about(market.gap) }) : t("b_priceFair")}
                   </p>
                   <RangeBar high={market.high} low={market.low} price={assumptions.price} typical={market.typical} />
-                  <p className="mt-2 text-xs text-[var(--foreground-muted)]">{say("b_priceRange", { low: money(market.low), typical: money(market.typical), high: money(market.high) })}</p>
+                  <p className="mt-2 text-xs text-[var(--muted)]">{say("b_priceRange", { low: money(market.low), typical: money(market.typical), high: money(market.high) })}</p>
                 </>
               ) : (
                 <p className="text-sm text-[var(--foreground-secondary)]">{t("b_priceUnknown")}</p>
@@ -700,7 +700,7 @@ export function CalculatorClient({
               </div>
               <p className="mt-2 text-sm text-[var(--foreground-secondary)]">{say("b_occupancy", { pct: assumptions.occupancy, amount: about((assumptions.rentMonthly * assumptions.occupancy) / 100) })}</p>
               {research?.rates && Object.keys(research.rates).length ? (
-                <div className="mt-3 rounded-xl bg-[var(--surface-muted,#f6f7f9)] p-3">
+                <div className="mt-3 rounded-xl bg-[var(--panel-secondary)] p-3">
                   <p className="text-sm font-bold">{say("ratesTitle", { place: place || "-" })}</p>
                   <dl className="mt-2 space-y-1.5 text-sm">
                     {(["day", "week", "month"] as const).map((period) => {
@@ -711,13 +711,13 @@ export function CalculatorClient({
                           <dt className="text-[var(--foreground-secondary)]">{t(`per_${period}`)}</dt>
                           <dd className="text-right">
                             <span className="font-bold">{money(range.low)} – {money(range.high)}</span>
-                            <span className="block text-xs text-[var(--foreground-muted)]">{say("ratesAverage", { amount: money(range.average) })}</span>
+                            <span className="block text-xs text-[var(--muted)]">{say("ratesAverage", { amount: money(range.average) })}</span>
                           </dd>
                         </div>
                       );
                     })}
                   </dl>
-                  <p className="mt-2 text-xs text-[var(--foreground-muted)]">
+                  <p className="mt-2 text-xs text-[var(--muted)]">
                     {say("ratesFrom", {
                       count: Object.values(research.rates).reduce((sum, range) => sum + (range?.count || 0), 0),
                       dropped: Object.values(research.rates).reduce((sum, range) => sum + (range?.dropped || 0), 0)
@@ -784,7 +784,7 @@ export function CalculatorClient({
                         </span>
                         <span>
                           {item.issue}
-                          {Number(item.typical_cost) > 0 ? <span className="text-[var(--foreground-muted)]"> · {say("b_issueCost", { amount: money(Number(item.typical_cost)) })}</span> : null}
+                          {Number(item.typical_cost) > 0 ? <span className="text-[var(--muted)]"> · {say("b_issueCost", { amount: money(Number(item.typical_cost)) })}</span> : null}
                         </span>
                       </li>
                     ))}
@@ -804,10 +804,10 @@ export function CalculatorClient({
                     <p className="mt-2 text-sm font-semibold">{t("b_altIntro")}</p>
                     <ul className="mt-1 space-y-2">
                       {research.alternatives.slice(0, 3).map((alt, index) => (
-                        <li className="rounded-xl bg-[var(--surface-muted,#f6f7f9)] p-3 text-sm" key={index}>
+                        <li className="rounded-xl bg-[var(--panel-secondary)] p-3 text-sm" key={index}>
                           <p className="font-bold">{alt.name}</p>
                           {Number(alt.typical_price) > 0 || Number(alt.rent_month) > 0 ? (
-                            <p className="text-xs text-[var(--foreground-muted)]">{say("b_altLine", { price: money(Number(alt.typical_price) || 0), rent: money(Number(alt.rent_month) || 0) })}</p>
+                            <p className="text-xs text-[var(--muted)]">{say("b_altLine", { price: money(Number(alt.typical_price) || 0), rent: money(Number(alt.rent_month) || 0) })}</p>
                           ) : null}
                           {alt.why ? <p className="mt-1 text-[var(--foreground-secondary)]">{alt.why}</p> : null}
                         </li>
@@ -829,7 +829,7 @@ export function CalculatorClient({
                   <Stat key={row.year} label={say("b_worthAfter", { years: row.year })} value={about(row.value)} />
                 ))}
               </dl>
-              <p className="mt-2 text-xs text-[var(--foreground-muted)]">{say("b_lossPerYear", { pct: yearlyLossPct(assumptions.resalePct, best.year) })}</p>
+              <p className="mt-2 text-xs text-[var(--muted)]">{say("b_lossPerYear", { pct: yearlyLossPct(assumptions.resalePct, best.year) })}</p>
             </Section>
 
             {research?.notes?.length ? (
@@ -848,13 +848,13 @@ export function CalculatorClient({
                 {searching ? t("searching") : t("findOthers")}
               </button>
             </div>
-            {searching ? <p className="mt-2 text-center text-sm text-[var(--foreground-muted)]">{t("searchingHint")}</p> : null}
+            {searching ? <p className="mt-2 text-center text-sm text-[var(--muted)]">{t("searchingHint")}</p> : null}
           </Card>
 
           {listings ? (
             <Card className="p-4">
               <h2 className="text-base font-bold">{say("othersTitle", { amount: money(assumptions.price) })}</h2>
-              {ranked.length > 0 ? <p className="mt-1 text-xs text-[var(--foreground-muted)]">{t("othersNote")}</p> : null}
+              {ranked.length > 0 ? <p className="mt-1 text-xs text-[var(--muted)]">{t("othersNote")}</p> : null}
               {ranked.length === 0 ? (
                 <p className="mt-2 text-sm text-[var(--foreground-secondary)]">{searchFailed === "offline" ? t("othersOffline") : searchFailed ? t("othersFailed") : t("othersNone")}</p>
               ) : (
@@ -871,13 +871,13 @@ export function CalculatorClient({
                           </p>
                           <p className="shrink-0 font-bold">{money(Number(listing.price))}</p>
                         </div>
-                        <p className="mt-1 text-xs text-[var(--foreground-muted)]">
+                        <p className="mt-1 text-xs text-[var(--muted)]">
                           {[listing.mileage_km ? `${Number(listing.mileage_km).toLocaleString(numberLocale(locale))} km` : "", listing.location, listing.source].filter(Boolean).join(" · ")}
                         </p>
                         <p className="mt-2 text-sm">
                           {say("otherLine", { amount: about(result.expected.best.perYear), years: result.expected.best.year, pct: result.expected.returnPct.toFixed(1) })}
                         </p>
-                        <p className={`text-sm font-semibold ${gap >= 0 ? "text-[var(--success)]" : "text-[var(--foreground-muted)]"}`}>
+                        <p className={`text-sm font-semibold ${gap >= 0 ? "text-[var(--success)]" : "text-[var(--muted)]"}`}>
                           {say(gap >= 0 ? "otherMore" : "otherLess", { amount: about(Math.abs(gap)), model: subject.model })}
                         </p>
                         {listing.why ? <p className="mt-1 text-sm text-[var(--foreground-secondary)]">{listing.why}</p> : null}
@@ -900,7 +900,7 @@ export function CalculatorClient({
           <Fold title={t("yearByYear")} summary={say("yearSummary", { years: outcome.expected.rows.length })}>
             <table className="w-full text-right text-sm">
               <thead>
-                <tr className="text-xs text-[var(--foreground-muted)]">
+                <tr className="text-xs text-[var(--muted)]">
                   <th className="py-2 text-left font-medium">{t("colSell")}</th>
                   <th className="py-2 font-medium">{t("colEarned")}</th>
                   <th className="py-2 font-medium">{t("colWorth")}</th>
@@ -918,7 +918,7 @@ export function CalculatorClient({
                 ))}
               </tbody>
             </table>
-            <p className="mt-3 text-xs text-[var(--foreground-muted)]">{t("yearNote")}</p>
+            <p className="mt-3 text-xs text-[var(--muted)]">{t("yearNote")}</p>
           </Fold>
 
           <Fold title={t("figures")} summary={research ? (liveData ? say("figuresFrom", { place: place || "-" }) : t("figuresRough")) : t("figuresUsual")}>
@@ -935,7 +935,7 @@ export function CalculatorClient({
             </div>
             {sources.length ? (
               <div className="mt-4">
-                <p className="text-xs font-semibold text-[var(--foreground-muted)]">{t("sources")}</p>
+                <p className="text-xs font-semibold text-[var(--muted)]">{t("sources")}</p>
                 <ul className="mt-1 space-y-1 text-sm">
                   {sources.slice(0, 8).map((source) => (
                     <li className="truncate" key={source.url}>
@@ -947,7 +947,7 @@ export function CalculatorClient({
                 </ul>
               </div>
             ) : null}
-            <p className="mt-4 text-xs text-[var(--foreground-muted)]">{research ? say(`confidence_${research.confidence === "high" || research.confidence === "medium" ? research.confidence : "low"}`) : t("noResearch")}</p>
+            <p className="mt-4 text-xs text-[var(--muted)]">{research ? say(`confidence_${research.confidence === "high" || research.confidence === "medium" ? research.confidence : "low"}`) : t("noResearch")}</p>
           </Fold>
         </>
       ) : null}
@@ -963,7 +963,7 @@ export function CalculatorClient({
                     {index === 0 && comparable.length > 1 ? "★ " : ""}
                     {[row.vehicle_year, row.vehicle_make, row.vehicle_model].filter(Boolean).join(" ")}
                   </p>
-                  <p className="text-xs text-[var(--foreground-muted)]">
+                  <p className="text-xs text-[var(--muted)]">
                     {money(Number(row.purchase_price || 0))} · {say("compareLine", { years: row.results!.bestYear, pct: row.results!.returnPct })}
                   </p>
                 </div>
@@ -976,7 +976,7 @@ export function CalculatorClient({
         </Card>
       ) : null}
 
-      {assumptions ? <p className="px-1 text-center text-xs text-[var(--foreground-muted)]">{t("caveat")}</p> : null}
+      {assumptions ? <p className="px-1 text-center text-xs text-[var(--muted)]">{t("caveat")}</p> : null}
     </div>
   );
 }

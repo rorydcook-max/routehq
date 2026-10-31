@@ -458,7 +458,8 @@
     "g_money": "การเงิน",
     "g_tools": "เครื่องมือ",
     "home": "หน้าแรก",
-    "supportAccess": "ทีมซัพพอร์ต RoveHQ เข้าถึงธุรกิจของคุณได้จนถึง {time}"
+    "supportAccess": "ทีมซัพพอร์ต RoveHQ เข้าถึงธุรกิจของคุณได้จนถึง {time}",
+    "language": "ภาษา"
   },
   "customer": {
     "theRentalBusiness": "ร้านเช่ารถ",
@@ -2746,7 +2747,15 @@
     "deleteWithBookingsBtn": "ลบรถและการจอง",
     "noticeOwnerOnly": "เฉพาะเจ้าของธุรกิจเท่านั้นที่ลบรถได้",
     "bulkDeleteWarning": "ลบพร้อมการจองและข้อมูลทั้งหมด ย้อนกลับไม่ได้",
-    "deleteVehicleConfirm": "ลบรถพร้อมค่าใช้จ่าย เอกสาร และรูปถ่าย ย้อนกลับไม่ได้"
+    "deleteVehicleConfirm": "ลบรถพร้อมค่าใช้จ่าย เอกสาร และรูปถ่าย ย้อนกลับไม่ได้",
+    "qp_title": "ราคาเช่า",
+    "qp_period": "ต่อ",
+    "qp_day": "ต่อวัน",
+    "qp_week": "ต่อสัปดาห์",
+    "qp_month": "ต่อเดือน",
+    "qp_save": "บันทึก",
+    "qp_cancel": "ยกเลิก",
+    "qp_failed": "บันทึกราคาไม่ได้ ลองอีกครั้ง"
   },
   "customers": {
     "noRentals": "ยังไม่เคยเช่า",

@@ -71,7 +71,7 @@ export function LoanFields({ currency, loan }: { currency: string; loan?: Vehicl
       </div>
 
       {showSummary ? (
-        <dl className="grid gap-x-4 gap-y-1 rounded-xl border border-[var(--border)] bg-[var(--surface-muted,white)] p-3 text-sm sm:grid-cols-2">
+        <dl className="grid gap-x-4 gap-y-1 rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3 text-sm sm:grid-cols-2">
           {f.borrowed !== null ? <Row label={t("loanBorrowed")} value={money(f.borrowed)} /> : null}
           {f.totalCost !== null ? <Row label={t("loanTotalCost")} value={money(f.totalCost)} strong /> : null}
           {f.interest !== null ? (

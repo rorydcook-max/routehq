@@ -223,6 +223,7 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deleteErrorId, setDeleteErrorId] = useState<string | null>(null);
+  const [confirmRecords, setConfirmRecords] = useState<{ id: string; signed: boolean; payments: number; inspections: number } | null>(null);
   const [allDone, setAllDone] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -232,10 +233,17 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
     if (wanted && ([...filters, ...bandFilters] as readonly string[]).includes(wanted)) setFilter(wanted as (typeof filters)[number] | BandFilter);
   }, []);
 
-  function handleDelete(bookingId: string) {
+  function handleDelete(bookingId: string, confirmed = false) {
     setDeleteError(null);
     startTransition(async () => {
-      const result = await deleteBooking(bookingId);
+      const result = await deleteBooking(bookingId, confirmed);
+      // Real records on it (payments, inspections, a signed agreement): ask once more, saying what will go.
+      if (result.needsConfirm) {
+        setConfirmDeleteId(null);
+        setConfirmRecords({ id: bookingId, ...result.needsConfirm });
+        return;
+      }
+      setConfirmRecords(null);
       if (!result.success) {
         setDeleteErrorId(bookingId);
         setDeleteError(result.error || tx.say("deleteFailed"));
@@ -504,6 +512,44 @@ export function BookingsList({ bookings }: { bookings: any[] }) {
                 <p className="relative z-10 mt-2 rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-2 text-sm font-semibold text-[var(--danger)]" ref={(el) => el?.scrollIntoView({ block: "nearest", behavior: "smooth" })} role="alert">
                   {deleteError}
                 </p>
+              ) : null}
+              {confirmRecords && confirmRecords.id === booking.id ? (
+                <div className="relative z-10 mt-2 rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-3 text-[var(--danger)]" ref={(el) => el?.scrollIntoView({ block: "nearest", behavior: "smooth" })} role="alertdialog">
+                  <p className="text-sm font-bold">{tx.say("deleteRecordsTitle")}</p>
+                  <ul className="mt-1.5 space-y-1 text-sm">
+                    {[
+                      confirmRecords.payments > 0 ? tx.say("deleteRecordsPayments", { count: String(confirmRecords.payments) }) : null,
+                      confirmRecords.inspections > 0 ? tx.say("deleteRecordsInspections", { count: String(confirmRecords.inspections) }) : null,
+                      confirmRecords.signed ? tx.say("deleteRecordsSigned") : null
+                    ]
+                      .filter(Boolean)
+                      .map((line) => (
+                        <li className="flex items-start gap-2 leading-snug" key={String(line)}>
+                          <span aria-hidden="true" className="flex h-[1.375em] shrink-0 items-center"><span className="h-1.5 w-1.5 rounded-full bg-[var(--danger)]" /></span>
+                          <span>{line}</span>
+                        </li>
+                      ))}
+                  </ul>
+                  {confirmRecords.payments > 0 || confirmRecords.inspections > 0 ? <p className="mt-2 text-xs font-semibold">{tx.say("deleteRecordsBody")}</p> : null}
+                  <div className="mt-2.5 flex gap-2">
+                    <button
+                      className="pressable inline-flex min-h-8 items-center rounded-full bg-[var(--danger)] px-3 text-xs font-bold text-white disabled:opacity-60"
+                      disabled={isPending}
+                      onClick={() => handleDelete(booking.id, true)}
+                      type="button"
+                    >
+                      {isPending ? tx.say("deleting") : tx.say("deleteAnyway")}
+                    </button>
+                    <button
+                      className="pressable inline-flex min-h-8 items-center rounded-full border border-[var(--border)] bg-white px-3 text-xs font-bold text-[var(--foreground-secondary)]"
+                      disabled={isPending}
+                      onClick={() => setConfirmRecords(null)}
+                      type="button"
+                    >
+                      {tx.say("back")}
+                    </button>
+                  </div>
+                </div>
               ) : null}
               {confirmDeleteId === booking.id ? (
                 <div className="relative z-10 mt-2 rounded-lg border border-[var(--danger-line)] bg-[var(--danger-light)] p-2" ref={(el) => el?.scrollIntoView({ block: "nearest", behavior: "smooth" })}>

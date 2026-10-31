@@ -1284,7 +1284,7 @@
     "paid": "Betalt",
     "dueNow": "Att betala nu {amount}",
     "nothingDue": "Inget att betala nu",
-    "deleteConfirm": "Radera bokningen permanent? Endast bokningar som lagts in av misstag kan raderas. När det finns ett signerat avtal, en betalning eller ett överlämningsformulär, använd <b>Avboka</b> i stället så att uppgifterna sparas.",
+    "deleteConfirm": "Radera den här bokningen? Den försvinner från bokningar, kalender och rapporter. Använd det för testbokningar eller bokningar som skapats av misstag. För en riktig bokning som inte blev av, använd hellre <b>Avboka bokning</b>, som sparar historiken.",
     "deleting": "Raderar…",
     "confirmDelete": "Bekräfta radering",
     "back": "Avbryt",
@@ -1300,7 +1300,13 @@
     "daysSoFar": "{days, plural, one {# dag} other {# dagar}} hittills",
     "datesPassed": "Datumen har passerat · inte bekräftad",
     "changeDates": "Ändra datum",
-    "linkNotCompleted": "Bokningslänken slutfördes inte"
+    "linkNotCompleted": "Bokningslänken slutfördes inte",
+    "deleteRecordsTitle": "Den här bokningen har registreringar",
+    "deleteRecordsPayments": "Registrerade betalningar: {count}",
+    "deleteRecordsInspections": "Kontroller vid utlämning eller återlämning: {count}",
+    "deleteRecordsSigned": "Ett signerat avtal: sparas som bevis men visas inte längre någonstans",
+    "deleteRecordsBody": "Betalningar och kontroller raderas för gott och försvinner ur rapporterna. Det går inte att ångra.",
+    "deleteAnyway": "Radera ändå"
   },
   "inbox": {
     "title": "Inkorg",
@@ -2665,7 +2671,7 @@
     "summary": "{count, plural, one {# fordon} other {# fordon}} · {out} uthyrda · {free} lediga nu",
     "import": "Importera",
     "addVehicle": "Lägg till fordon",
-    "noticeBookings": "Fordonet är uthyrt eller har en kommande bokning, så det raderades inte. Avsluta eller avboka dess bokningar först, eller arkivera det i stället.",
+    "noticeBookings": "Ett valt fordon är uthyrt eller har en kommande bokning, så inget raderades. Öppna fordonet för att radera det tillsammans med bokningarna, eller arkivera det i stället.",
     "emptyTitle": "Inga fordon än",
     "emptyBody": "Lägg till ditt första fordon för att börja ta emot bokningar.",
     "outFree": "{out} ute · {free} lediga",
@@ -2726,7 +2732,9 @@
     "p_today": "idag",
     "filterAll": "Visa alla",
     "filterEmpty": "Inga fordon i den här gruppen just nu.",
-    "addDates": "Lägg till datum"
+    "addDates": "Lägg till datum",
+    "deleteWithBookings": "Det här fordonet har {count} pågående eller kommande bokningar. Raderar du det raderas de också.",
+    "deleteWithBookingsBtn": "Radera fordon och bokningar"
   },
   "customers": {
     "noRentals": "Inga uthyrningar än",
@@ -3413,7 +3421,7 @@
     "archiveBtn": "Arkivera fordon",
     "archiving": "Arkiverar…",
     "deleteLead": "Radera",
-    "deleteBody": "tar bort det permanent. Endast för fordon som lagts till av misstag; det kan inte raderas medan det är uthyrt eller bokat.",
+    "deleteBody": "tar bort det för gott. Har det pågående eller kommande bokningar kan de raderas tillsammans med det.",
     "n_placeholder": "Allt värt att komma ihåg: egenheter, servicepåminnelser, var reservnyckeln finns",
     "n_auto": "Sparas när du trycker utanför",
     "n_edited": "Senast redigerad {date}",

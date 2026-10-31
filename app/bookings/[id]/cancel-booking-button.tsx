@@ -493,9 +493,14 @@ export function CancelBookingButton({
                 <div className="space-y-3">
                   <div className="rounded-xl border border-[var(--border)] bg-[var(--panel-secondary)] p-3 space-y-2">
                     <p className="text-xs font-semibold uppercase text-[var(--muted)]">{say("cn_reason")}</p>
-                    <ul className="space-y-0.5">
+                    {/* Both lists share one bullet: a dot centred on the first line (sized in em, so it stays aligned
+                        however large the phone's text is set). */}
+                    <ul className="space-y-1">
                       {selectedReasons.map(r => (
-                        <li className="text-sm font-bold text-[var(--foreground)]" key={r.value}>• {say(`cn_r_${r.value}`)}</li>
+                        <li className="flex items-start gap-2 text-sm font-bold leading-snug text-[var(--foreground)]" key={r.value}>
+                          <span aria-hidden="true" className="flex h-[1.375em] shrink-0 items-center"><span className="h-1.5 w-1.5 rounded-full bg-[var(--foreground)]" /></span>
+                          <span>{say(`cn_r_${r.value}`)}</span>
+                        </li>
                       ))}
                     </ul>
                     {notes && <p className="text-xs text-[var(--muted)]">"{notes}"</p>}
@@ -505,9 +510,9 @@ export function CancelBookingButton({
                       <p className="text-xs font-semibold uppercase text-[var(--muted)] mb-2">{say("cn_whatHappens")}</p>
                       <ul className="space-y-1">
                         {dispositionSummary().map((line, i) => (
-                          <li className="flex items-start gap-2 text-sm text-[var(--foreground)]" key={i}>
-                            <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--danger)]" />
-                            {line}
+                          <li className="flex items-start gap-2 text-sm leading-snug text-[var(--foreground)]" key={i}>
+                            <span aria-hidden="true" className="flex h-[1.375em] shrink-0 items-center"><span className="h-1.5 w-1.5 rounded-full bg-[var(--danger)]" /></span>
+                            <span>{line}</span>
                           </li>
                         ))}
                       </ul>

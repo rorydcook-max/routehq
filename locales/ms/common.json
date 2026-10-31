@@ -1324,7 +1324,7 @@
     "paid": "Dibayar",
     "dueNow": "Perlu dibayar sekarang {amount}",
     "nothingDue": "Tiada bayaran perlu dibuat sekarang",
-    "deleteConfirm": "Padam tempahan ini secara kekal? Hanya tempahan yang dimasukkan tersilap boleh dipadam. Setelah ada perjanjian bertandatangan, bayaran atau borang serahan, gunakan <b>Batalkan tempahan</b> supaya rekod disimpan.",
+    "deleteConfirm": "Padam tempahan ini? Ia akan hilang daripada senarai tempahan, kalendar dan laporan anda. Gunakan untuk tempahan ujian atau yang dibuat secara tidak sengaja. Untuk tempahan sebenar yang tidak jadi, gunakan <b>Batalkan tempahan</b>, yang menyimpan sejarahnya.",
     "deleting": "Memadam…",
     "confirmDelete": "Sahkan padam",
     "back": "Batal",
@@ -1340,7 +1340,13 @@
     "daysSoFar": "{days} hari setakat ini",
     "datesPassed": "Tarikh telah berlalu · belum disahkan",
     "changeDates": "Tukar tarikh",
-    "linkNotCompleted": "Pautan tempahan tidak dilengkapkan"
+    "linkNotCompleted": "Pautan tempahan tidak dilengkapkan",
+    "deleteRecordsTitle": "Tempahan ini mempunyai rekod",
+    "deleteRecordsPayments": "Bayaran direkodkan: {count}",
+    "deleteRecordsInspections": "Pemeriksaan serahan atau pemulangan: {count}",
+    "deleteRecordsSigned": "Perjanjian yang ditandatangani: disimpan sebagai bukti, tetapi tidak lagi dipaparkan di mana-mana",
+    "deleteRecordsBody": "Bayaran dan pemeriksaan dipadam terus dan keluar daripada laporan anda. Tidak boleh dibuat asal.",
+    "deleteAnyway": "Padam juga"
   },
   "inbox": {
     "title": "Peti masuk",
@@ -2705,7 +2711,7 @@
     "summary": "{count} kenderaan · {out} sedang disewa · {free} kosong sekarang",
     "import": "Import",
     "addVehicle": "Tambah kenderaan",
-    "noticeBookings": "Kenderaan itu sedang disewa atau ada tempahan akan datang, jadi ia tidak dipadam. Selesaikan atau batalkan tempahannya dahulu, atau arkibkannya sahaja.",
+    "noticeBookings": "Kenderaan yang dipilih sedang disewa atau ada tempahan akan datang, jadi tiada apa yang dipadam. Buka kenderaan itu untuk memadamnya bersama tempahannya, atau arkibkan sahaja.",
     "emptyTitle": "Belum ada kenderaan",
     "emptyBody": "Tambah kenderaan pertama anda untuk mula menerima tempahan.",
     "outFree": "{out} keluar · {free} kosong",
@@ -2766,7 +2772,9 @@
     "p_today": "hari ini",
     "filterAll": "Tunjuk semua",
     "filterEmpty": "Tiada kenderaan dalam kumpulan ini sekarang.",
-    "addDates": "Tambah tarikh"
+    "addDates": "Tambah tarikh",
+    "deleteWithBookings": "Kenderaan ini ada {count} tempahan semasa atau akan datang. Memadamnya juga akan memadam tempahan itu.",
+    "deleteWithBookingsBtn": "Padam kenderaan dan tempahan"
   },
   "customers": {
     "noRentals": "Belum ada sewaan",
@@ -3453,7 +3461,7 @@
     "archiveBtn": "Arkibkan kenderaan",
     "archiving": "Mengarkibkan…",
     "deleteLead": "Padam",
-    "deleteBody": "membuangnya buat selama-lamanya. Hanya untuk kenderaan yang ditambah secara tidak sengaja; ia tidak boleh dipadam semasa disewa atau ditempah.",
+    "deleteBody": "memadamnya terus. Jika ada tempahan semasa atau akan datang, tempahan itu boleh dipadam bersamanya.",
     "n_placeholder": "Apa-apa yang patut diingat: keanehan, peringatan servis, tempat kunci pendua",
     "n_auto": "Disimpan apabila anda ketik di tempat lain",
     "n_edited": "Kali terakhir diedit {date}",

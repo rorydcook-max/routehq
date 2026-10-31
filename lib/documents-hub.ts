@@ -115,7 +115,7 @@ export async function getDocumentList(organizationId: string, limit = 150): Prom
     ])
   ];
   const { data: rentals } = rentalIds.length
-    ? await supabase.from("rentals").select("id, reference, display_code, customers!rentals_customer_id_fkey(full_name)").in("id", rentalIds)
+    ? await supabase.from("rentals").select("id, reference, display_code, deleted_at, customers!rentals_customer_id_fkey(full_name)").in("id", rentalIds)
     : { data: [] };
 
   const vehicleLabels = new Map((vehiclesResult.data || []).map((row: any) => [row.id, [row.registration_number, row.make, row.model].filter(Boolean).join(" ")]));
@@ -206,5 +206,12 @@ export async function getDocumentList(organizationId: string, limit = 150): Prom
     }))
   );
 
-  return [...signedItems, ...receiptItems, ...uploads].sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+  // A deleted booking's papers leave the list with it. Signed records stay in the database (they can't be deleted),
+  // but the owner deleted the booking, so they aren't shown.
+  const deletedRentals = new Set((rentals || []).filter((row: any) => row.deleted_at).map((row: any) => row.id));
+  const fromDeleted = (item: DocumentListItem) =>
+    (item.ownerType === "signed" || item.ownerType === "receipt" || item.ownerType === "rental") && deletedRentals.has(String(item.ownerId));
+  return [...signedItems, ...receiptItems, ...uploads]
+    .filter((item) => !fromDeleted(item))
+    .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
 }

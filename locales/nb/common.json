@@ -1284,7 +1284,7 @@
     "paid": "Betalt",
     "dueNow": "Forfalt nå {amount}",
     "nothingDue": "Ingenting forfaller nå",
-    "deleteConfirm": "Slette denne bestillingen permanent? Bare bestillinger lagt inn ved en feil kan slettes. Når det finnes en signert avtale, en betaling eller et overleveringsskjema, bruk <b>Kanseller bestilling</b> i stedet, slik at opplysningene beholdes.",
+    "deleteConfirm": "Slette denne bestillingen? Den forsvinner fra bestillinger, kalender og rapporter. Bruk dette for testbestillinger eller bestillinger laget ved en feil. For en ekte bestilling som ikke ble noe av, bruk heller <b>Avbestill booking</b>, som tar vare på historikken.",
     "deleting": "Sletter…",
     "confirmDelete": "Bekreft sletting",
     "back": "Avbryt",
@@ -1300,7 +1300,13 @@
     "daysSoFar": "{days, plural, one {# dag} other {# dager}} hittil",
     "datesPassed": "Datoene har passert · ikke bekreftet",
     "changeDates": "Endre datoer",
-    "linkNotCompleted": "Bestillingslenken ble ikke fullført"
+    "linkNotCompleted": "Bestillingslenken ble ikke fullført",
+    "deleteRecordsTitle": "Denne bestillingen har registreringer",
+    "deleteRecordsPayments": "Registrerte betalinger: {count}",
+    "deleteRecordsInspections": "Kontroller ved utlevering eller retur: {count}",
+    "deleteRecordsSigned": "En signert avtale: lagres som bevis, men vises ikke lenger noe sted",
+    "deleteRecordsBody": "Betalinger og kontroller slettes for godt og forsvinner fra rapportene. Dette kan ikke angres.",
+    "deleteAnyway": "Slett likevel"
   },
   "inbox": {
     "title": "Innboks",
@@ -2665,7 +2671,7 @@
     "summary": "{count, plural, one {# kjøretøy} other {# kjøretøy}} · {out} utleid · {free} ledig nå",
     "import": "Importer",
     "addVehicle": "Legg til kjøretøy",
-    "noticeBookings": "Kjøretøyet er utleid eller har en kommende booking, så det ble ikke slettet. Fullfør eller avbryt bookingene først, eller arkiver det i stedet.",
+    "noticeBookings": "Et valgt kjøretøy er utleid eller har en kommende bestilling, så ingenting ble slettet. Åpne kjøretøyet for å slette det sammen med bestillingene, eller arkiver det i stedet.",
     "emptyTitle": "Ingen kjøretøy ennå",
     "emptyBody": "Legg til ditt første kjøretøy for å begynne å ta imot bestillinger.",
     "outFree": "{out} utleid · {free} ledig",
@@ -2726,7 +2732,9 @@
     "filterAll": "Vis alle",
     "filterEmpty": "Ingen kjøretøy i denne gruppen akkurat nå.",
     "bandVehicles": "{count, plural, one {kjøretøy} other {kjøretøy}}",
-    "addDates": "Legg til datoer"
+    "addDates": "Legg til datoer",
+    "deleteWithBookings": "Dette kjøretøyet har {count} pågående eller kommende bestillinger. Sletter du det, slettes de også.",
+    "deleteWithBookingsBtn": "Slett kjøretøy og bestillinger"
   },
   "customers": {
     "noRentals": "Ingen utleie ennå",
@@ -3413,7 +3421,7 @@
     "archiveBtn": "Arkiver kjøretøy",
     "archiving": "Arkiverer…",
     "deleteLead": "Slett",
-    "deleteBody": "fjerner det for godt. Kun for kjøretøy lagt til ved en feiltakelse; det kan ikke slettes mens det er utleid eller booket.",
+    "deleteBody": "fjerner det for godt. Har det pågående eller kommende bestillinger, kan de slettes sammen med det.",
     "n_placeholder": "Verdt å huske: særpreg, servicepåminnelser, hvor ekstrahjulnøkkelen er",
     "n_auto": "Lagres når du klikker deg videre",
     "n_edited": "Sist redigert {date}",

@@ -1324,7 +1324,7 @@
     "paid": "Bezahlt",
     "dueNow": "Jetzt fällig {amount}",
     "nothingDue": "Derzeit nichts fällig",
-    "deleteConfirm": "Diese Buchung endgültig löschen? Nur versehentlich erfasste Buchungen können gelöscht werden. Sobald ein unterschriebener Vertrag, eine Zahlung oder ein Übergabeprotokoll vorliegt, nutzen Sie stattdessen <b>Buchung stornieren</b>, damit die Unterlagen erhalten bleiben.",
+    "deleteConfirm": "Diese Buchung löschen? Sie verschwindet aus Buchungen, Kalender und Berichten. Nutzen Sie das für Testbuchungen oder versehentlich angelegte Buchungen. Für eine echte Buchung, die nicht zustande kam, nutzen Sie stattdessen <b>Buchung stornieren</b>, dann bleibt ihr Verlauf erhalten.",
     "deleting": "Wird gelöscht…",
     "confirmDelete": "Löschen bestätigen",
     "back": "Abbrechen",
@@ -1340,7 +1340,13 @@
     "daysSoFar": "Bisher {days, plural, one {# Tag} other {# Tage}}",
     "datesPassed": "Termine verstrichen · nicht bestätigt",
     "changeDates": "Termine ändern",
-    "linkNotCompleted": "Buchungslink wurde nicht abgeschlossen"
+    "linkNotCompleted": "Buchungslink wurde nicht abgeschlossen",
+    "deleteRecordsTitle": "Zu dieser Buchung gibt es Einträge",
+    "deleteRecordsPayments": "Erfasste Zahlungen: {count}",
+    "deleteRecordsInspections": "Übergabe- oder Rückgabeprüfungen: {count}",
+    "deleteRecordsSigned": "Ein unterschriebener Vertrag: bleibt als Nachweis gespeichert, wird aber nirgends mehr angezeigt",
+    "deleteRecordsBody": "Zahlungen und Prüfungen werden endgültig gelöscht und fallen aus Ihren Berichten. Das lässt sich nicht rückgängig machen.",
+    "deleteAnyway": "Trotzdem löschen"
   },
   "inbox": {
     "title": "Posteingang",
@@ -2705,7 +2711,7 @@
     "summary": "{count, plural, one {# Fahrzeug} other {# Fahrzeuge}} · {out} vermietet · {free} jetzt frei",
     "import": "Importieren",
     "addVehicle": "Fahrzeug hinzufügen",
-    "noticeBookings": "Dieses Fahrzeug ist vermietet oder hat eine bevorstehende Buchung, daher wurde es nicht gelöscht. Beenden oder stornieren Sie zuerst seine Buchungen, oder archivieren Sie es stattdessen.",
+    "noticeBookings": "Ein ausgewähltes Fahrzeug ist vermietet oder hat eine anstehende Buchung, daher wurde nichts gelöscht. Öffnen Sie das Fahrzeug, um es zusammen mit seinen Buchungen zu löschen, oder archivieren Sie es.",
     "emptyTitle": "Noch keine Fahrzeuge",
     "emptyBody": "Fügen Sie Ihr erstes Fahrzeug hinzu, um Buchungen anzunehmen.",
     "outFree": "{out} vermietet · {free} frei",
@@ -2766,7 +2772,9 @@
     "p_today": "heute",
     "filterAll": "Alle anzeigen",
     "filterEmpty": "Derzeit keine Fahrzeuge in dieser Gruppe.",
-    "addDates": "Daten hinzufügen"
+    "addDates": "Daten hinzufügen",
+    "deleteWithBookings": "Dieses Fahrzeug hat {count} laufende oder anstehende Buchungen. Beim Löschen werden sie mitgelöscht.",
+    "deleteWithBookingsBtn": "Fahrzeug und Buchungen löschen"
   },
   "customers": {
     "noRentals": "Noch keine Mieten",
@@ -3453,7 +3461,7 @@
     "archiveBtn": "Fahrzeug archivieren",
     "archiving": "Wird archiviert…",
     "deleteLead": "Löschen",
-    "deleteBody": "entfernt es endgültig. Nur für ein versehentlich hinzugefügtes Fahrzeug; es kann nicht gelöscht werden, solange es vermietet oder gebucht ist.",
+    "deleteBody": "entfernt es endgültig. Hat es laufende oder anstehende Buchungen, können diese mitgelöscht werden.",
     "n_placeholder": "Alles, was man sich merken sollte: Eigenheiten, Serviceerinnerungen, wo der Ersatzschlüssel ist",
     "n_auto": "Wird beim Verlassen des Felds gespeichert",
     "n_edited": "Zuletzt bearbeitet {date}",

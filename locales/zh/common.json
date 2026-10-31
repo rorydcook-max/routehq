@@ -1324,7 +1324,7 @@
     "paid": "已付",
     "dueNow": "现应付 {amount}",
     "nothingDue": "当前无应付款",
-    "deleteConfirm": "永久删除此预订？只有误录的预订才能删除。一旦有已签署的协议、付款或交车表，请改用<b>取消预订</b>，以保留记录。",
+    "deleteConfirm": "删除这个预订？它会从预订列表、日历和报表中消失。适用于测试预订或误建的预订。对于未能进行的真实预订，请改用<b>取消订单</b>，这样会保留其记录。",
     "deleting": "删除中…",
     "confirmDelete": "确认删除",
     "back": "取消",
@@ -1340,7 +1340,13 @@
     "daysSoFar": "已进行 {days} 天",
     "datesPassed": "日期已过 · 未确认",
     "changeDates": "更改日期",
-    "linkNotCompleted": "预订链接未完成"
+    "linkNotCompleted": "预订链接未完成",
+    "deleteRecordsTitle": "此预订有记录",
+    "deleteRecordsPayments": "已记录的付款：{count}",
+    "deleteRecordsInspections": "交车或还车检查：{count}",
+    "deleteRecordsSigned": "已签署的合同：作为证据保存，但不再在任何地方显示",
+    "deleteRecordsBody": "付款和检查将被永久删除，并从报表中移除。此操作无法撤销。",
+    "deleteAnyway": "仍然删除"
   },
   "inbox": {
     "title": "收件箱",
@@ -2705,7 +2711,7 @@
     "summary": "{count} 辆车 · {out} 辆已出租 · {free} 辆空闲",
     "import": "导入",
     "addVehicle": "添加车辆",
-    "noticeBookings": "该车辆当前已出租或有即将到来的预订，因此无法删除。请先完成或取消其预订，或者改为将其归档。",
+    "noticeBookings": "所选车辆正在出租或有即将到来的预订，因此未删除任何内容。请打开该车辆，将其连同预订一起删除，或将其归档。",
     "emptyTitle": "暂无车辆",
     "emptyBody": "添加您的第一辆车，开始接受预订。",
     "outFree": "{out} 已出租 · {free} 空闲",
@@ -2766,7 +2772,9 @@
     "filterAll": "显示全部",
     "filterEmpty": "此分组目前没有车辆。",
     "bandVehicles": "{count, select, other {辆车}}",
-    "addDates": "添加日期"
+    "addDates": "添加日期",
+    "deleteWithBookings": "此车辆有{count}个进行中或即将到来的预订。删除车辆也会删除这些预订。",
+    "deleteWithBookingsBtn": "删除车辆和预订"
   },
   "customers": {
     "noRentals": "暂无租车记录",
@@ -3453,7 +3461,7 @@
     "archiveBtn": "归档车辆",
     "archiving": "正在归档…",
     "deleteLead": "删除",
-    "deleteBody": "彻底删除。仅适用于误加的车辆；在出租或有预订期间无法删除。",
+    "deleteBody": "永久删除。如果有进行中或即将到来的预订，可以一并删除。",
     "n_placeholder": "任何值得记下的事情：小毛病、保养提醒、备用钥匙存放处",
     "n_auto": "点击离开时自动保存",
     "n_edited": "最后编辑于 {date}",

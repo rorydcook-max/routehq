@@ -1320,7 +1320,7 @@
     "paid": "Lunas",
     "dueNow": "Tagihan saat ini {amount}",
     "nothingDue": "Tidak ada tagihan saat ini",
-    "deleteConfirm": "Hapus pemesanan ini secara permanen? Hanya pemesanan yang salah dimasukkan yang dapat dihapus. Jika sudah ada perjanjian yang ditandatangani, pembayaran, atau formulir serah terima, gunakan <b>Batalkan pemesanan</b> agar catatannya tetap tersimpan.",
+    "deleteConfirm": "Hapus pemesanan ini? Pemesanan akan hilang dari daftar pemesanan, kalender, dan laporan Anda. Gunakan untuk pemesanan uji coba atau yang dibuat tidak sengaja. Untuk pemesanan sungguhan yang batal, gunakan <b>Batalkan pemesanan</b>, yang menyimpan riwayatnya.",
     "deleting": "Menghapus…",
     "confirmDelete": "Konfirmasi hapus",
     "back": "Batal",
@@ -1340,7 +1340,13 @@
     "handoverOverdue": "Belum diserahkan · terlambat {days} hari",
     "returnLate": "Pengembalian terlambat {days} hari",
     "dueBackIn": "Harus kembali dalam {days} hari",
-    "linkNotCompleted": "Tautan pemesanan belum diselesaikan"
+    "linkNotCompleted": "Tautan pemesanan belum diselesaikan",
+    "deleteRecordsTitle": "Pemesanan ini memiliki catatan",
+    "deleteRecordsPayments": "Pembayaran tercatat: {count}",
+    "deleteRecordsInspections": "Pemeriksaan serah terima atau pengembalian: {count}",
+    "deleteRecordsSigned": "Perjanjian yang sudah ditandatangani: disimpan sebagai bukti, tapi tidak lagi ditampilkan di mana pun",
+    "deleteRecordsBody": "Pembayaran dan pemeriksaan dihapus permanen dan keluar dari laporan Anda. Tidak bisa dibatalkan.",
+    "deleteAnyway": "Tetap hapus"
   },
   "inbox": {
     "title": "Kotak Masuk",
@@ -2705,7 +2711,7 @@
     "summary": "{count} kendaraan · {out} sedang disewa · {free} kosong sekarang",
     "import": "Impor",
     "addVehicle": "Tambah kendaraan",
-    "noticeBookings": "Kendaraan itu sedang disewa atau punya pemesanan mendatang, jadi tidak dihapus. Selesaikan atau batalkan pemesanannya dulu, atau arsipkan saja.",
+    "noticeBookings": "Kendaraan yang dipilih sedang disewa atau punya pemesanan mendatang, jadi tidak ada yang dihapus. Buka kendaraan itu untuk menghapusnya beserta pemesanannya, atau arsipkan saja.",
     "emptyTitle": "Belum ada kendaraan",
     "emptyBody": "Tambahkan kendaraan pertama Anda untuk mulai menerima pemesanan.",
     "outFree": "{out} keluar · {free} kosong",
@@ -2766,7 +2772,9 @@
     "p_today": "hari ini",
     "filterAll": "Tampilkan semua",
     "filterEmpty": "Tidak ada kendaraan di grup ini saat ini.",
-    "addDates": "Tambah tanggal"
+    "addDates": "Tambah tanggal",
+    "deleteWithBookings": "Kendaraan ini punya {count} pemesanan yang berjalan atau mendatang. Menghapusnya juga menghapus pemesanan itu.",
+    "deleteWithBookingsBtn": "Hapus kendaraan dan pemesanan"
   },
   "customers": {
     "noRentals": "Belum ada sewa",
@@ -3453,7 +3461,7 @@
     "archiveBtn": "Arsipkan kendaraan",
     "archiving": "Mengarsipkan…",
     "deleteLead": "Hapus",
-    "deleteBody": "menghapusnya selamanya. Hanya untuk kendaraan yang ditambahkan karena keliru; tidak bisa dihapus saat sedang disewa atau dipesan.",
+    "deleteBody": "menghapusnya permanen. Jika ada pemesanan yang berjalan atau mendatang, pemesanan itu bisa ikut dihapus.",
     "n_placeholder": "Apa pun yang perlu diingat: kebiasaan unik, pengingat servis, letak kunci cadangan",
     "n_auto": "Tersimpan saat Anda mengetuk di luar",
     "n_edited": "Terakhir diubah {date}",

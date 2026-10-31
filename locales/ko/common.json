@@ -1284,7 +1284,7 @@
     "paid": "결제 완료",
     "dueNow": "지금 청구금액 {amount}",
     "nothingDue": "현재 청구금액 없음",
-    "deleteConfirm": "이 예약을 영구 삭제할까요? 실수로 입력한 예약만 삭제할 수 있어요. 서명된 계약서, 결제, 인도 양식이 있으면 기록이 남도록 <b>예약 취소</b>를 사용하세요.",
+    "deleteConfirm": "이 예약을 삭제할까요? 예약 목록, 캘린더, 보고서에서 사라집니다. 테스트 예약이나 실수로 만든 예약에 사용하세요. 진행되지 않은 실제 예약은 기록이 남는 <b>예약 취소</b>를 사용하세요.",
     "deleting": "삭제 중...",
     "confirmDelete": "삭제 확인",
     "back": "취소",
@@ -1300,7 +1300,13 @@
     "daysSoFar": "지금까지 {days}일",
     "datesPassed": "날짜 지남 · 미확인",
     "changeDates": "날짜 변경",
-    "linkNotCompleted": "예약 링크가 완료되지 않았어요"
+    "linkNotCompleted": "예약 링크가 완료되지 않았어요",
+    "deleteRecordsTitle": "이 예약에는 기록이 있습니다",
+    "deleteRecordsPayments": "기록된 결제: {count}",
+    "deleteRecordsInspections": "인도 또는 반납 점검: {count}",
+    "deleteRecordsSigned": "서명된 계약서: 증거로 보관되지만 더 이상 어디에도 표시되지 않습니다",
+    "deleteRecordsBody": "결제와 점검이 영구 삭제되고 보고서에서도 빠집니다. 되돌릴 수 없습니다.",
+    "deleteAnyway": "그래도 삭제"
   },
   "inbox": {
     "title": "받은 편지함",
@@ -2665,7 +2671,7 @@
     "summary": "차량 {count}대 · 렌탈 중 {out}대 · 지금 가능 {free}대",
     "import": "가져오기",
     "addVehicle": "차량 추가",
-    "noticeBookings": "이 차량은 렌탈 중이거나 예정된 예약이 있어서 삭제하지 않았어요. 먼저 예약을 완료하거나 취소하거나, 대신 보관 처리하세요.",
+    "noticeBookings": "선택한 차량이 대여 중이거나 예정된 예약이 있어 아무것도 삭제되지 않았습니다. 해당 차량을 열어 예약과 함께 삭제하거나 보관하세요.",
     "emptyTitle": "아직 차량이 없어요",
     "emptyBody": "첫 차량을 추가하고 예약을 받기 시작하세요.",
     "outFree": "렌탈 중 {out} · 가능 {free}",
@@ -2726,7 +2732,9 @@
     "p_today": "오늘",
     "filterAll": "전체 보기",
     "filterEmpty": "지금 이 그룹에 차량이 없어요.",
-    "addDates": "날짜 추가"
+    "addDates": "날짜 추가",
+    "deleteWithBookings": "이 차량에는 진행 중이거나 예정된 예약이 {count}건 있습니다. 차량을 삭제하면 예약도 삭제됩니다.",
+    "deleteWithBookingsBtn": "차량과 예약 삭제"
   },
   "customers": {
     "noRentals": "렌탈 내역 없음",
@@ -3413,7 +3421,7 @@
     "archiveBtn": "차량 보관",
     "archiving": "보관 중…",
     "deleteLead": "삭제",
-    "deleteBody": "하면 영구히 사라져요. 실수로 추가한 차량에만 사용하세요. 렌탈 중이거나 예약된 차량은 삭제할 수 없어요.",
+    "deleteBody": "영구적으로 삭제합니다. 진행 중이거나 예정된 예약이 있으면 함께 삭제할 수 있습니다.",
     "n_placeholder": "기억할 내용: 특이 사항, 정비 알림, 보조 키 위치",
     "n_auto": "다른 곳을 탭하면 저장돼요",
     "n_edited": "마지막 편집 {date}",

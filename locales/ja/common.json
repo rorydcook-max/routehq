@@ -1284,7 +1284,7 @@
     "paid": "支払い済み",
     "dueNow": "今回の請求 {amount}",
     "nothingDue": "現在の請求はありません",
-    "deleteConfirm": "この予約を完全に削除しますか？削除できるのは誤って入力した予約だけです。署名済みの契約書、支払い、引き渡しフォームがある場合は、記録を残すため<b>予約をキャンセル</b>を使ってください。",
+    "deleteConfirm": "この予約を削除しますか？予約一覧、カレンダー、レポートから消えます。テスト予約や誤って作成した予約に使ってください。実際の予約が取りやめになった場合は、履歴が残る<b>予約をキャンセル</b>を使ってください。",
     "deleting": "削除中…",
     "confirmDelete": "削除を確定",
     "back": "キャンセル",
@@ -1300,7 +1300,13 @@
     "daysSoFar": "これまで {days} 日",
     "datesPassed": "日程が過ぎました · 未確定",
     "changeDates": "日程を変更",
-    "linkNotCompleted": "予約リンクが完了していません"
+    "linkNotCompleted": "予約リンクが完了していません",
+    "deleteRecordsTitle": "この予約には記録があります",
+    "deleteRecordsPayments": "記録された支払い：{count}",
+    "deleteRecordsInspections": "引き渡し・返却チェック：{count}",
+    "deleteRecordsSigned": "署名済みの契約書：証拠として保存されますが、どこにも表示されなくなります",
+    "deleteRecordsBody": "支払いとチェックは完全に削除され、レポートからも外れます。元に戻せません。",
+    "deleteAnyway": "それでも削除"
   },
   "inbox": {
     "title": "受信箱",
@@ -2665,7 +2671,7 @@
     "summary": "{count}台 · 貸出中{out}台 · 現在空き{free}台",
     "import": "インポート",
     "addVehicle": "車両を追加",
-    "noticeBookings": "この車両は貸出中か今後の予約があるため、削除されませんでした。先に予約を完了またはキャンセルするか、代わりにアーカイブしてください。",
+    "noticeBookings": "選択した車両が貸出中か今後の予約があるため、何も削除されませんでした。その車両を開いて予約ごと削除するか、アーカイブしてください。",
     "emptyTitle": "まだ車両がありません",
     "emptyBody": "最初の車両を追加して予約の受付を始めましょう。",
     "outFree": "貸出中{out} · 空き{free}",
@@ -2726,7 +2732,9 @@
     "p_today": "今日",
     "filterAll": "すべて表示",
     "filterEmpty": "現在このグループに車両はありません。",
-    "addDates": "日付を追加"
+    "addDates": "日付を追加",
+    "deleteWithBookings": "この車両には進行中または今後の予約が{count}件あります。削除すると予約も削除されます。",
+    "deleteWithBookingsBtn": "車両と予約を削除"
   },
   "customers": {
     "noRentals": "まだレンタルがありません",
@@ -3413,7 +3421,7 @@
     "archiveBtn": "車両をアーカイブ",
     "archiving": "アーカイブ中…",
     "deleteLead": "削除",
-    "deleteBody": "すると完全に消えます。誤って追加した車両のみ対象で、貸出中や予約中は削除できません。",
+    "deleteBody": "完全に削除します。進行中または今後の予約がある場合は、一緒に削除できます。",
     "n_placeholder": "覚えておきたいこと：クセ、点検のリマインダー、スペアキーの場所",
     "n_auto": "他の場所をタップすると保存されます",
     "n_edited": "最終編集 {date}",

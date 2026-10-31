@@ -1284,7 +1284,7 @@
     "paid": "Pago",
     "dueNow": "A pagar agora {amount}",
     "nothingDue": "Nada a pagar agora",
-    "deleteConfirm": "Excluir esta reserva definitivamente? Só é possível excluir reservas criadas por engano. Se já houver um contrato assinado, um pagamento ou um formulário de entrega, use <b>Cancelar reserva</b> para manter os registros.",
+    "deleteConfirm": "Excluir esta reserva? Ela some das suas reservas, do calendário e dos relatórios. Use para reservas de teste ou criadas por engano. Para uma reserva real que não aconteceu, use <b>Cancelar reserva</b>, que mantém o histórico.",
     "deleting": "Excluindo…",
     "confirmDelete": "Confirmar exclusão",
     "back": "Cancelar",
@@ -1300,7 +1300,13 @@
     "daysSoFar": "{days, plural, one {# dia} other {# dias}} até agora",
     "datesPassed": "As datas já passaram · não confirmada",
     "changeDates": "Alterar datas",
-    "linkNotCompleted": "O link de reserva não foi concluído"
+    "linkNotCompleted": "O link de reserva não foi concluído",
+    "deleteRecordsTitle": "Esta reserva tem registros",
+    "deleteRecordsPayments": "Pagamentos registrados: {count}",
+    "deleteRecordsInspections": "Vistorias de entrega ou devolução: {count}",
+    "deleteRecordsSigned": "Um contrato assinado: guardado como prova, mas não aparece mais em lugar nenhum",
+    "deleteRecordsBody": "Pagamentos e vistorias são excluídos de vez e saem dos seus relatórios. Não dá para desfazer.",
+    "deleteAnyway": "Excluir mesmo assim"
   },
   "inbox": {
     "title": "Mensagens",
@@ -2665,7 +2671,7 @@
     "summary": "{count, plural, one {# veículo} other {# veículos}} · {out} alugados · {free} livres agora",
     "import": "Importar",
     "addVehicle": "Adicionar veículo",
-    "noticeBookings": "Esse veículo está alugado ou tem uma reserva próxima, por isso não foi excluído. Encerre ou cancele as reservas dele primeiro, ou arquive-o.",
+    "noticeBookings": "Um veículo selecionado está alugado ou tem uma reserva futura, então nada foi excluído. Abra esse veículo para excluí-lo junto com as reservas, ou arquive-o.",
     "emptyTitle": "Nenhum veículo ainda",
     "emptyBody": "Adicione seu primeiro veículo para começar a receber reservas.",
     "outFree": "{out} alugados · {free} livres",
@@ -2726,7 +2732,9 @@
     "p_today": "hoje",
     "filterAll": "Mostrar todos",
     "filterEmpty": "Nenhum veículo neste grupo no momento.",
-    "addDates": "Adicionar datas"
+    "addDates": "Adicionar datas",
+    "deleteWithBookings": "Este veículo tem {count} reservas em andamento ou futuras. Excluí-lo também exclui as reservas.",
+    "deleteWithBookingsBtn": "Excluir veículo e reservas"
   },
   "customers": {
     "noRentals": "Nenhum aluguel ainda",
@@ -3413,7 +3421,7 @@
     "archiveBtn": "Arquivar veículo",
     "archiving": "Arquivando…",
     "deleteLead": "Excluir",
-    "deleteBody": "remove de vez. Só para veículo adicionado por engano; não pode ser excluído enquanto estiver alugado ou reservado.",
+    "deleteBody": "remove de vez. Se tiver reservas em andamento ou futuras, elas podem ser excluídas junto.",
     "n_placeholder": "Algo que valha lembrar: manias, lembretes de revisão, onde fica a chave reserva",
     "n_auto": "Salva quando você toca fora",
     "n_edited": "Editado em {date}",

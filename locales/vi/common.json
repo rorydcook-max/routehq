@@ -1324,7 +1324,7 @@
     "paid": "Đã thanh toán",
     "dueNow": "Cần thanh toán ngay {amount}",
     "nothingDue": "Không còn khoản nào đến hạn",
-    "deleteConfirm": "Xóa vĩnh viễn đơn đặt xe này? Chỉ có thể xóa các đơn nhập nhầm. Khi đã có hợp đồng đã ký, khoản thanh toán hoặc biên bản giao xe, hãy dùng <b>Hủy đặt xe</b> để giữ lại hồ sơ.",
+    "deleteConfirm": "Xóa đặt xe này? Nó sẽ biến mất khỏi danh sách đặt xe, lịch và báo cáo. Dùng cho đặt xe thử nghiệm hoặc tạo nhầm. Với đặt xe thật nhưng không diễn ra, hãy dùng <b>Hủy đơn đặt xe</b>, cách này giữ lại lịch sử.",
     "deleting": "Đang xóa…",
     "confirmDelete": "Xác nhận xóa",
     "back": "Hủy",
@@ -1340,7 +1340,13 @@
     "daysSoFar": "Đã {days} ngày",
     "datesPassed": "Đã qua ngày · chưa được xác nhận",
     "changeDates": "Đổi ngày",
-    "linkNotCompleted": "Liên kết đặt xe chưa được hoàn tất"
+    "linkNotCompleted": "Liên kết đặt xe chưa được hoàn tất",
+    "deleteRecordsTitle": "Đặt xe này có dữ liệu được ghi lại",
+    "deleteRecordsPayments": "Khoản thanh toán đã ghi: {count}",
+    "deleteRecordsInspections": "Lần kiểm tra khi giao hoặc trả xe: {count}",
+    "deleteRecordsSigned": "Một hợp đồng đã ký: được lưu làm bằng chứng nhưng không còn hiển thị ở đâu nữa",
+    "deleteRecordsBody": "Các khoản thanh toán và lần kiểm tra sẽ bị xóa vĩnh viễn và không còn trong báo cáo. Không thể hoàn tác.",
+    "deleteAnyway": "Vẫn xóa"
   },
   "inbox": {
     "title": "Hộp thư",
@@ -2705,7 +2711,7 @@
     "summary": "{count} xe · {out} đang cho thuê · {free} đang trống",
     "import": "Nhập",
     "addVehicle": "Thêm xe",
-    "noticeBookings": "Xe đó đang được cho thuê hoặc có lịch đặt sắp tới nên không thể xóa. Vui lòng hoàn thành hoặc hủy các lịch đặt trước, hoặc lưu trữ xe đó.",
+    "noticeBookings": "Một xe đã chọn đang được thuê hoặc có đặt xe sắp tới, nên không có gì bị xóa. Mở xe đó để xóa cùng các đặt xe của nó, hoặc lưu trữ xe.",
     "emptyTitle": "Chưa có xe nào",
     "emptyBody": "Thêm xe đầu tiên để bắt đầu nhận đặt xe.",
     "outFree": "{out} đang cho thuê · {free} đang trống",
@@ -2766,7 +2772,9 @@
     "filterAll": "Hiển thị tất cả",
     "filterEmpty": "Hiện không có phương tiện nào trong nhóm này.",
     "bandVehicles": "{count, plural, other {xe}}",
-    "addDates": "Thêm ngày"
+    "addDates": "Thêm ngày",
+    "deleteWithBookings": "Xe này có {count} đặt xe đang diễn ra hoặc sắp tới. Xóa xe cũng sẽ xóa các đặt xe đó.",
+    "deleteWithBookingsBtn": "Xóa xe và đặt xe"
   },
   "customers": {
     "noRentals": "Chưa có lượt thuê nào",
@@ -3453,7 +3461,7 @@
     "archiveBtn": "Lưu trữ xe",
     "archiving": "Đang lưu trữ…",
     "deleteLead": "Xóa",
-    "deleteBody": "xóa vĩnh viễn. Chỉ dùng cho xe thêm nhầm; không thể xóa khi xe đang cho thuê hoặc có lịch đặt.",
+    "deleteBody": "xóa vĩnh viễn. Nếu xe có đặt xe đang diễn ra hoặc sắp tới, có thể xóa luôn cùng xe.",
     "n_placeholder": "Ghi chú: đặc điểm riêng, lịch bảo dưỡng, vị trí chìa khóa phụ",
     "n_auto": "Tự động lưu khi bạn bấm ra ngoài",
     "n_edited": "Chỉnh sửa lần cuối {date}",

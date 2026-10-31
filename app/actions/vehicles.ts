@@ -9,6 +9,7 @@ import { getCurrentMembership } from "@/lib/auth/roles";
 import { asCondition, valueForCondition } from "@/lib/vehicle-condition";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { deleteBooking } from "@/app/actions/bookings";
 
 function numberFromForm(formData: FormData, key: string) {
   const value = String(formData.get(key) || "").replace(/,/g, "").trim();
@@ -1088,16 +1089,27 @@ export async function deleteVehicle(formData: FormData) {
     throw new Error("Vehicle is required.");
   }
 
-  // A vehicle out on rent or booked can't be deleted from under its booking.
-  const { count: liveBookings } = await supabase
+  // A vehicle out on rent or booked can't be deleted from under its booking. On the vehicle page the owner
+  // can confirm deleting its current and upcoming bookings with it (Rory, 31 Oct 2026: test vehicles).
+  const { data: liveRows } = await supabase
     .from("rentals")
-    .select("id", { count: "exact", head: true })
+    .select("id")
     .eq("organization_id", organizationId)
     .eq("vehicle_id", vehicleId)
     .is("deleted_at", null)
-    .in("status", ["booked", "active", "due_soon", "overdue", "extended"]);
-  if ((liveBookings || 0) > 0) {
-    redirect("/fleet?notice=vehicle-has-bookings");
+    .in("status", ["draft", "booked", "active", "due_soon", "overdue", "extended"]);
+  const liveIds: string[] = (liveRows || []).map((r: { id: string }) => r.id);
+  if (liveIds.length > 0) {
+    const isOwner = (await getCurrentMembership())?.role === "owner";
+    if (!isOwner || String(formData.get("deleteBookings") || "") !== "1") {
+      redirect("/fleet?notice=vehicle-has-bookings");
+    }
+    for (const id of liveIds) {
+      const result = await deleteBooking(id, true);
+      if (!result.success) {
+        throw new Error(result.error || "Could not delete this vehicle's bookings.");
+      }
+    }
   }
 
   const { error } = await supabase

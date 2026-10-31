@@ -95,9 +95,9 @@ export function UndoCancellationButton({
                   say("undo_l3"),
                   say("undo_l4"),
                 ].map((line, i) => (
-                  <div className="flex items-start gap-2 text-sm text-[var(--foreground)]" key={i}>
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--primary)]" />
-                    {line}
+                  <div className="flex items-start gap-2 text-sm leading-snug text-[var(--foreground)]" key={i}>
+                    <span aria-hidden="true" className="flex h-[1.375em] shrink-0 items-center"><span className="h-1.5 w-1.5 rounded-full bg-[var(--primary)]" /></span>
+                    <span>{line}</span>
                   </div>
                 ))}
               </div>

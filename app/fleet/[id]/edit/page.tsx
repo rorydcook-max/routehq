@@ -60,6 +60,14 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
 
   // What was paid, what it is worth and any loan are for the owner only.
   const isOwner = (await getCurrentMembership())?.role === "owner";
+  // Current and upcoming bookings: deleting the vehicle deletes them too (owner only), so the confirm says how many.
+  const { count: liveBookings } = await supabase
+    .from("rentals")
+    .select("id", { count: "exact", head: true })
+    .eq("organization_id", organization.id)
+    .eq("vehicle_id", vehicle.id)
+    .is("deleted_at", null)
+    .in("status", ["draft", "booked", "active", "due_soon", "overdue", "extended"]);
   const specifications = vehicle.specifications || {};
   const acquisition = vehicle.metadata?.acquisition || {};
   const compliance = vehicle.metadata?.compliance || {};
@@ -308,7 +316,14 @@ export default async function EditVehiclePage({ params }: { params: Promise<{ id
                 <p className="min-w-0 flex-1 basis-60 font-medium text-[var(--foreground-secondary)]">
                   <span className="font-bold text-[var(--foreground)]">{say("deleteLead")}</span>: {say("deleteBody")}
                 </p>
-                <ConfirmDeleteVehicleButton deleteAction={deleteVehicle} label={`${vehicle.make} ${vehicle.model}`} organizationId={organization.id} vehicleId={vehicle.id} />
+                <ConfirmDeleteVehicleButton
+                  canDeleteBookings={isOwner}
+                  deleteAction={deleteVehicle}
+                  label={`${vehicle.make} ${vehicle.model}`}
+                  liveBookings={liveBookings || 0}
+                  organizationId={organization.id}
+                  vehicleId={vehicle.id}
+                />
               </div>
             </div>
           </Fold>

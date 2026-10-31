@@ -1284,7 +1284,7 @@
     "paid": "Paid",
     "dueNow": "Due now {amount}",
     "nothingDue": "Nothing due now",
-    "deleteConfirm": "Delete this booking permanently? Only bookings entered by mistake can be deleted. Once there is a signed agreement, a payment or a handover form, use <b>Cancel booking</b> instead so the records are kept.",
+    "deleteConfirm": "Delete this booking? It disappears from your bookings, calendar and reports. Use this for test bookings or ones entered by mistake. For a real booking that didn't go ahead, use <b>Cancel booking</b> instead, which keeps its history.",
     "deleting": "Deleting…",
     "confirmDelete": "Confirm delete",
     "back": "Cancel",
@@ -1300,7 +1300,13 @@
     "daysSoFar": "{days, plural, one {# day} other {# days}} so far",
     "datesPassed": "Dates have passed · not confirmed",
     "changeDates": "Change dates",
-    "linkNotCompleted": "Booking link wasn't completed"
+    "linkNotCompleted": "Booking link wasn't completed",
+    "deleteRecordsTitle": "This booking has records on it",
+    "deleteRecordsPayments": "Payments recorded: {count}",
+    "deleteRecordsInspections": "Handover or return checks: {count}",
+    "deleteRecordsSigned": "A signed agreement: kept on file as evidence, but no longer shown anywhere",
+    "deleteRecordsBody": "Payments and checks are deleted for good and drop out of your reports. This can't be undone.",
+    "deleteAnyway": "Delete anyway"
   },
   "inbox": {
     "title": "Inbox",
@@ -2665,7 +2671,7 @@
     "summary": "{count, plural, one {# vehicle} other {# vehicles}} · {out} out on rent · {free} free now",
     "import": "Import",
     "addVehicle": "Add vehicle",
-    "noticeBookings": "That vehicle is out on rent or has a booking coming up, so it wasn't deleted. Finish or cancel its bookings first, or archive it instead.",
+    "noticeBookings": "A selected vehicle is out on rent or has a booking coming up, so nothing was deleted. Open that vehicle to delete it together with its bookings, or archive it instead.",
     "emptyTitle": "No vehicles yet",
     "emptyBody": "Add your first vehicle to start taking bookings.",
     "outFree": "{out} out · {free} free",
@@ -2726,7 +2732,9 @@
     "p_today": "today",
     "filterAll": "Show all",
     "filterEmpty": "No vehicles in this group right now.",
-    "addDates": "Add dates"
+    "addDates": "Add dates",
+    "deleteWithBookings": "This vehicle has {count} current or upcoming bookings. Deleting it also deletes them.",
+    "deleteWithBookingsBtn": "Delete vehicle and bookings"
   },
   "customers": {
     "noRentals": "No rentals yet",
@@ -3413,7 +3421,7 @@
     "archiveBtn": "Archive vehicle",
     "archiving": "Archiving…",
     "deleteLead": "Delete",
-    "deleteBody": "removes it for good. Only for a vehicle added by mistake; it cannot be deleted while it is on rent or booked.",
+    "deleteBody": "removes it for good. If it has current or upcoming bookings, they can be deleted with it.",
     "n_placeholder": "Anything worth remembering: quirks, service reminders, where the spare key is",
     "n_auto": "Saves when you tap away",
     "n_edited": "Last edited {date}",

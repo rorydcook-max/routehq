@@ -63,26 +63,52 @@ export function ConfirmDeleteVehicleButton({
   vehicleId,
   organizationId,
   label,
-  deleteAction
+  deleteAction,
+  liveBookings = 0,
+  canDeleteBookings = false
 }: {
   vehicleId: string;
   organizationId: string;
   label: string;
   deleteAction: (formData: FormData) => void | Promise<void>;
+  /** Current or upcoming bookings on this vehicle. */
+  liveBookings?: number;
+  /** Owner only: may delete those bookings together with the vehicle. */
+  canDeleteBookings?: boolean;
 }) {
   const t = useTranslations("fleet");
   const [confirming, setConfirming] = useState(false);
+  const blocked = liveBookings > 0 && !canDeleteBookings;
   if (!confirming) {
     return (
       <button
         aria-label={t("deleteAria", { label })}
-        className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--danger-line)] bg-white text-[var(--danger)] hover:bg-[var(--danger-light)]"
+        className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--danger-line)] bg-white text-[var(--danger)] hover:bg-[var(--danger-light)] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white"
+        disabled={blocked}
         onClick={() => setConfirming(true)}
-        title={t("deleteVehicle")}
+        title={blocked ? t("noticeBookings") : t("deleteVehicle")}
         type="button"
       >
         <Trash2 size={16} />
       </button>
+    );
+  }
+  if (liveBookings > 0) {
+    return (
+      <form action={deleteAction} className="grid max-w-xs gap-2 rounded-xl border border-[var(--danger-line)] bg-[var(--danger-light)] p-3" role="alertdialog">
+        <input name="vehicleId" type="hidden" value={vehicleId} />
+        <input name="organizationId" type="hidden" value={organizationId} />
+        <input name="deleteBookings" type="hidden" value="1" />
+        <p className="text-xs font-semibold leading-snug text-[var(--danger)]">{t("deleteWithBookings", { count: liveBookings })}</p>
+        <div className="flex flex-wrap items-center gap-1">
+          <PendingButton className="inline-flex h-8 items-center justify-center rounded-lg bg-[var(--danger)] px-3 text-xs font-bold text-white" pendingLabel="…" type="submit">
+            {t("deleteWithBookingsBtn")}
+          </PendingButton>
+          <button className="inline-flex h-8 items-center justify-center rounded-full border border-[var(--border)] bg-white px-3 text-xs font-semibold" onClick={() => setConfirming(false)} type="button">
+            {t("keep")}
+          </button>
+        </div>
+      </form>
     );
   }
   return (

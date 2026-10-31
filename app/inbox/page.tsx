@@ -60,6 +60,7 @@ export default async function InboxPage({ searchParams }: { searchParams: Promis
           .select("id, status, start_date, end_date, balance_due, reference, display_code, vehicles(make, model, registration_number)")
           .eq("organization_id", organization.id)
           .eq("customer_id", selected.customer_id)
+          .is("deleted_at", null)
           .order("start_date", { ascending: false })
           .limit(4)
       : Promise.resolve({ data: [] })

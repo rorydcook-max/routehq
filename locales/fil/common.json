@@ -1284,7 +1284,7 @@
     "paid": "Bayad na",
     "dueNow": "Dapat bayaran ngayon {amount}",
     "nothingDue": "Walang dapat bayaran ngayon",
-    "deleteConfirm": "Burahin nang tuluyan ang booking na ito? Mga booking lang na nailagay nang mali ang puwedeng burahin. Kapag may pinirmahang kasunduan, bayad o form ng pag-abot na, gamitin ang <b>Kanselahin ang booking</b> para mapanatili ang mga talaan.",
+    "deleteConfirm": "Burahin ang booking na ito? Mawawala ito sa iyong mga booking, kalendaryo at report. Gamitin ito para sa test booking o booking na nagawa nang hindi sinasadya. Para sa totoong booking na hindi natuloy, gamitin ang <b>Kanselahin ang booking</b>, na nag-iingat ng kasaysayan nito.",
     "deleting": "Tinatanggal…",
     "confirmDelete": "Kumpirmahin ang pagtanggal",
     "back": "Kanselahin",
@@ -1300,7 +1300,13 @@
     "daysSoFar": "{days, plural, one {# araw} other {# araw}} na ang nakalipas",
     "datesPassed": "Lumipas na ang mga petsa · hindi kumpirmadong",
     "changeDates": "Baguhin ang mga petsa",
-    "linkNotCompleted": "Hindi natapos ang booking link"
+    "linkNotCompleted": "Hindi natapos ang booking link",
+    "deleteRecordsTitle": "May mga record ang booking na ito",
+    "deleteRecordsPayments": "Mga naitalang bayad: {count}",
+    "deleteRecordsInspections": "Mga check sa pag-abot o pagbalik: {count}",
+    "deleteRecordsSigned": "Isang pinirmahang kasunduan: itatago bilang ebidensya, pero hindi na ipapakita kahit saan",
+    "deleteRecordsBody": "Permanenteng mabubura ang mga bayad at check at mawawala sa iyong mga report. Hindi na ito maibabalik.",
+    "deleteAnyway": "Burahin pa rin"
   },
   "inbox": {
     "title": "Inbox",
@@ -2665,7 +2671,7 @@
     "summary": "{count, plural, one {# sasakyan} other {# sasakyan}} · {out} nakarenta · {free} bakante ngayon",
     "import": "Mag-import",
     "addVehicle": "Magdagdag ng sasakyan",
-    "noticeBookings": "Nakarenta ang sasakyang iyon o may paparating na booking, kaya hindi ito nabura. Tapusin o kanselahin muna ang mga booking nito, o i-archive na lang.",
+    "noticeBookings": "May napiling sasakyan na nakarenta o may paparating na booking, kaya walang nabura. Buksan ang sasakyang iyon para burahin ito kasama ang mga booking nito, o i-archive na lang.",
     "emptyTitle": "Wala pang sasakyan",
     "emptyBody": "Idagdag ang iyong unang sasakyan para magsimulang tumanggap ng booking.",
     "outFree": "{out} nakalabas · {free} bakante",
@@ -2726,7 +2732,9 @@
     "p_today": "ngayon",
     "filterAll": "Ipakita lahat",
     "filterEmpty": "Walang sasakyan sa grupong ito ngayon.",
-    "addDates": "Magdagdag ng petsa"
+    "addDates": "Magdagdag ng petsa",
+    "deleteWithBookings": "May {count} kasalukuyan o paparating na booking ang sasakyang ito. Kapag binura ito, mabubura rin ang mga iyon.",
+    "deleteWithBookingsBtn": "Burahin ang sasakyan at mga booking"
   },
   "customers": {
     "noRentals": "Wala pang rental",
@@ -3413,7 +3421,7 @@
     "archiveBtn": "I-archive ang sasakyan",
     "archiving": "Ina-archive…",
     "deleteLead": "I-delete",
-    "deleteBody": "tuluyan itong inaalis. Para lang sa sasakyang naidagdag nang hindi sinasadya; hindi ito mai-delete habang nakarenta o naka-book.",
+    "deleteBody": "permanenteng binubura ito. Kung may kasalukuyan o paparating na booking, puwede itong burahin kasama nito.",
     "n_placeholder": "Anumang dapat tandaan: kakaibang ugali nito, paalala sa service, nasaan ang spare key",
     "n_auto": "Nase-save kapag nag-tap ka sa labas",
     "n_edited": "Huling na-edit {date}",

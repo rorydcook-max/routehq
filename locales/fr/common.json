@@ -1324,7 +1324,7 @@
     "paid": "Payé",
     "dueNow": "Dû maintenant {amount}",
     "nothingDue": "Rien à régler",
-    "deleteConfirm": "Supprimer définitivement cette réservation ? Seules les réservations saisies par erreur peuvent être supprimées. Dès qu'il existe un contrat signé, un paiement ou un formulaire de remise, utilisez plutôt <b>Annuler la réservation</b> pour conserver les registres.",
+    "deleteConfirm": "Supprimer cette réservation ? Elle disparaît de vos réservations, du calendrier et des rapports. À utiliser pour les réservations de test ou créées par erreur. Pour une vraie réservation qui n'a pas eu lieu, utilisez plutôt <b>Annuler la réservation</b>, qui garde son historique.",
     "deleting": "Suppression…",
     "confirmDelete": "Confirmer la suppression",
     "back": "Annuler",
@@ -1340,7 +1340,13 @@
     "daysSoFar": "{days, plural, one {# jour} many {# jours} other {# jours}} à ce jour",
     "datesPassed": "Dates dépassées · non confirmé",
     "changeDates": "Modifier les dates",
-    "linkNotCompleted": "Le lien de réservation n'a pas été complété"
+    "linkNotCompleted": "Le lien de réservation n'a pas été complété",
+    "deleteRecordsTitle": "Cette réservation contient des enregistrements",
+    "deleteRecordsPayments": "Paiements enregistrés : {count}",
+    "deleteRecordsInspections": "Contrôles de remise ou de retour : {count}",
+    "deleteRecordsSigned": "Un contrat signé : conservé comme preuve, mais plus affiché nulle part",
+    "deleteRecordsBody": "Les paiements et les contrôles sont supprimés définitivement et sortent de vos rapports. Impossible d'annuler.",
+    "deleteAnyway": "Supprimer quand même"
   },
   "inbox": {
     "title": "Boîte de réception",
@@ -2705,7 +2711,7 @@
     "summary": "{count, plural, one {# véhicule} other {# véhicules}} · {out} en location · {free} libres maintenant",
     "import": "Importer",
     "addVehicle": "Ajouter un véhicule",
-    "noticeBookings": "Ce véhicule est en location ou a une réservation à venir, il n’a donc pas été supprimé. Terminez ou annulez d’abord ses réservations, ou archivez-le.",
+    "noticeBookings": "Un véhicule sélectionné est en location ou a une réservation à venir, donc rien n'a été supprimé. Ouvrez ce véhicule pour le supprimer avec ses réservations, ou archivez-le.",
     "emptyTitle": "Aucun véhicule pour l’instant",
     "emptyBody": "Ajoutez votre premier véhicule pour commencer à prendre des réservations.",
     "outFree": "{out} en location · {free} libres",
@@ -2766,7 +2772,9 @@
     "p_today": "aujourd’hui",
     "filterAll": "Tout afficher",
     "filterEmpty": "Aucun véhicule dans ce groupe pour le moment.",
-    "addDates": "Ajouter des dates"
+    "addDates": "Ajouter des dates",
+    "deleteWithBookings": "Ce véhicule a {count} réservations en cours ou à venir. Le supprimer les supprime aussi.",
+    "deleteWithBookingsBtn": "Supprimer le véhicule et les réservations"
   },
   "customers": {
     "noRentals": "Aucune location pour l’instant",
@@ -3453,7 +3461,7 @@
     "archiveBtn": "Archiver le véhicule",
     "archiving": "Archivage…",
     "deleteLead": "Supprimer",
-    "deleteBody": "le retire définitivement. Uniquement pour un véhicule ajouté par erreur ; il ne peut pas être supprimé tant qu’il est en location ou réservé.",
+    "deleteBody": "le supprime définitivement. S'il a des réservations en cours ou à venir, elles peuvent être supprimées avec lui.",
     "n_placeholder": "Tout ce qui vaut la peine d’être noté : particularités, rappels d’entretien, où se trouve le double de clé",
     "n_auto": "Enregistré quand vous quittez le champ",
     "n_edited": "Dernière modification le {date}",

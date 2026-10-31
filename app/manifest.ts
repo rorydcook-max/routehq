@@ -16,10 +16,10 @@ export default function manifest(): MetadataRoute.Manifest {
     background_color: "#f0f4f8",
     theme_color: "#06162b",
     icons: [
-      { src: "/icon-192.png?v=5", sizes: "192x192", type: "image/png" },
-      { src: "/icon-512.png?v=5", sizes: "512x512", type: "image/png" },
+      { src: "/icon-192.png?v=6", sizes: "192x192", type: "image/png" },
+      { src: "/icon-512.png?v=6", sizes: "512x512", type: "image/png" },
       // Android crops a maskable icon to a circle or squircle: this one keeps the mark inside the safe zone.
-      { src: "/icon-maskable-512.png?v=5", sizes: "512x512", type: "image/png", purpose: "maskable" }
+      { src: "/icon-maskable-512.png?v=6", sizes: "512x512", type: "image/png", purpose: "maskable" }
     ]
   };
 }

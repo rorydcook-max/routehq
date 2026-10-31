@@ -57,10 +57,10 @@ export const metadata: Metadata = {
   applicationName: "RoveHQ",
   metadataBase: new URL("https://rovehq.app"),
   icons: {
-    icon: "/rovehq-icon.svg?v=5",
-    shortcut: "/rovehq-icon.svg?v=5",
+    icon: "/rovehq-icon.svg?v=6",
+    shortcut: "/rovehq-icon.svg?v=6",
     // ?v= so phones fetch the re-centred icon (27 Oct) instead of a cached copy.
-    apple: "/apple-touch-icon.png?v=5"
+    apple: "/apple-touch-icon.png?v=6"
   },
   // Opens full screen, like an app, when added to a phone's home screen.
   appleWebApp: { capable: true, title: "RoveHQ", statusBarStyle: "default" }

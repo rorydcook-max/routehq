@@ -1,4 +1,4 @@
--- Full delete of a booking or a vehicle (Rory, 31 Oct 2026): delete means everything goes,
+﻿-- Full delete of a booking or a vehicle (Rory, 31 Oct 2026): delete means everything goes,
 -- including a signed agreement; archive is how an owner keeps records.
 -- Signed agreement records stay protected from edits and from any other delete: only the purge
 -- functions below set rovehq.purge for their own transaction.
@@ -123,7 +123,7 @@ begin
   delete from rentals where id = p_rental;
 
   return query select distinct f.bucket, f.path from _purge_files f where f.bucket is not null and f.path is not null and f.path <> '';
-  delete from _purge_files;
+  delete from _purge_files where true;
 end; $$;
 
 -- Deletes a vehicle, every booking it has ever had, and its costs, papers, photos and history.
@@ -180,7 +180,7 @@ begin
   delete from vehicles where id = p_vehicle;
 
   return query select distinct f.bucket, f.path from _purge_vehicle_files f where f.bucket is not null and f.path is not null and f.path <> '';
-  delete from _purge_vehicle_files;
+  delete from _purge_vehicle_files where true;
 end; $$;
 
 revoke all on function public.purge_rental(uuid) from public, anon, authenticated;

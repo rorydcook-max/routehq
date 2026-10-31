@@ -21,3 +21,7 @@ Perjanjian ini mengatur semuanya, dalam bahasa Inggris berdampingan dengan bahas
 Isi data usaha Anda (opsional) dan semuanya langsung tercetak: logo, nama dan alamat usaha, kendaraan, harga dan deposit, aturan BBM dan kilometer, denda keterlambatan dan pembatalan, asuransi, larangan merokok dan hewan, serta syarat tambahan Anda. Kolom yang dikosongkan menjadi garis untuk ditulis tangan. Anda mendapat file Word yang bisa diedit dan halaman siap cetak yang bisa disimpan sebagai PDF.
 
 Panduan lengkap ada di [What to put in a vehicle rental agreement](/guides/rental-agreement-what-to-include) (bahasa Inggris).
+
+## Untuk Indonesia dan Bali
+
+Halaman khusus dengan aturan setempat, formulirnya langsung memakai versi Indonesia: [Indonesia](/id/resources/rental-agreement-indonesia) · [Bali](/id/resources/rental-agreement-bali).

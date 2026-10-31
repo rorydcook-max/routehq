@@ -26,3 +26,11 @@ This agreement covers them. It's written for small car, motorbike and scooter re
 You get an editable Word file and a print-ready page you can save as PDF. The renter's details stay blank for handover.
 
 For what each clause is for, read [What to put in a vehicle rental agreement](/guides/rental-agreement-what-to-include).
+
+## By country and city
+
+Each page explains what that country's version covers and starts the form on it:
+
+- **Thailand:** [Thailand](/resources/rental-agreement-thailand) · [Phuket](/resources/rental-agreement-phuket) · [Koh Samui](/resources/rental-agreement-koh-samui) · [Chiang Mai](/resources/rental-agreement-chiang-mai)
+- **Indonesia:** [Indonesia](/resources/rental-agreement-indonesia) · [Bali](/resources/rental-agreement-bali)
+- [Vietnam](/resources/rental-agreement-vietnam) · [Malaysia](/resources/rental-agreement-malaysia) · [Philippines](/resources/rental-agreement-philippines) · [Laos](/resources/rental-agreement-laos) · [Cambodia](/resources/rental-agreement-cambodia)

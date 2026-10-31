@@ -26,3 +26,7 @@ inside:
 คุณจะได้ไฟล์ Word ที่แก้ไขได้ และหน้าพร้อมพิมพ์ที่บันทึกเป็น PDF ได้ ข้อมูลผู้เช่าเว้นว่างไว้กรอกตอนส่งมอบรถ
 
 อ่านว่าแต่ละข้อมีไว้ทำไมได้ที่ [สัญญาเช่ารถควรมีอะไรบ้าง](/guides/rental-agreement-what-to-include)
+
+## แยกตามพื้นที่
+
+หน้าที่อธิบายเรื่องเฉพาะของแต่ละพื้นที่ แบบฟอร์มตั้งเป็นฉบับประเทศไทยไว้แล้ว: [ทั่วประเทศไทย](/th/resources/rental-agreement-thailand) · [ภูเก็ต](/th/resources/rental-agreement-phuket) · [เกาะสมุย](/th/resources/rental-agreement-koh-samui) · [เชียงใหม่](/th/resources/rental-agreement-chiang-mai)

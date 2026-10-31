@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { getCurrentMembership } from "@/lib/auth/roles";
-import { canUseOwnDomain, canUseSubdomain, cleanDomain, cleanSubdomain, subdomainProblem } from "@/lib/booking-address";
+import { canUseOwnDomain, canUseSubdomain, cleanDomain, cleanSubdomain, rootDomain, subdomainProblem } from "@/lib/booking-address";
 import { getCustomPlan } from "@/lib/custom-plan";
 import { said } from "@/lib/i18n/server-text";
 import { alertTeam } from "@/lib/support";
@@ -38,8 +38,10 @@ export async function saveBookingSubdomain(input: { value: string }): Promise<Re
   if ("error" in who) return { ok: false, error: who.error as string };
   const { org, admin } = who;
   const value = cleanSubdomain(input.value);
+  const previous = (org.booking_subdomain as string | null) || null;
   if (!value) {
     await admin.from("organizations").update({ booking_subdomain: null }).eq("id", org.id);
+    if (previous) await removeProjectDomain(`${previous}.${rootDomain()}`);
     refresh(org.slug);
     return { ok: true, value: null };
   }
@@ -50,8 +52,20 @@ export async function saveBookingSubdomain(input: { value: string }): Promise<Re
   if (problem === "reserved") return { ok: false, error: await said("That address is kept for RoveHQ. Try another.") };
   const { data: taken } = await admin.from("organizations").select("id").ilike("booking_subdomain", value).is("deleted_at", null).neq("id", org.id).limit(1);
   if (taken?.length) return { ok: false, error: await said("Another business already has that address. Try another.") };
+  // rovehq.app's DNS is at Cloudflare (its registrar), so Vercel can't issue one wildcard certificate for
+  // *.rovehq.app. Each business's subdomain is added to the project instead (a catch-all CNAME at Cloudflare
+  // points them all at Vercel), and gets its own certificate within a minute or so.
+  const host = `${value}.${rootDomain()}`;
+  if (value !== previous && vercelDomainsConfigured()) {
+    const added = await addProjectDomain(host);
+    if (!added.ok) return { ok: false, error: added.error || (await said("Could not add the address. Please try again.")) };
+  }
   const { error } = await admin.from("organizations").update({ booking_subdomain: value }).eq("id", org.id);
-  if (error) return { ok: false, error: error.code === "23505" ? await said("Another business already has that address. Try another.") : error.message };
+  if (error) {
+    if (value !== previous && vercelDomainsConfigured()) await removeProjectDomain(host);
+    return { ok: false, error: error.code === "23505" ? await said("Another business already has that address. Try another.") : error.message };
+  }
+  if (previous && previous !== value && vercelDomainsConfigured()) await removeProjectDomain(`${previous}.${rootDomain()}`);
   refresh(org.slug);
   return { ok: true, value };
 }

@@ -1,5 +1,5 @@
 /**
- * The Lokalfleet fields a spreadsheet column can be imported into. One list feeds
+ * The RoveHQ fields a spreadsheet column can be imported into. One list feeds
  * both the AI mapping prompt and the manual mapping dropdown, so they can't
  * drift apart.
  */

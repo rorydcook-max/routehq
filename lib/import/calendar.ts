@@ -116,7 +116,7 @@ Return JSON: {"events":[{"i":0,"is_rental":true,"vehicle_registration":"2กข 
   return Array.isArray(parsed.events) ? (parsed.events as any[]) : [];
 }
 
-/** Turns calendar events into a rentals sheet in Lokalfleet's own columns. */
+/** Turns calendar events into a rentals sheet in RoveHQ's own columns. */
 export async function calendarToSheets(events: CalendarEvent[], options: { from?: string } = {}): Promise<{ sheets: ParsedSheet[]; events: number; rentals: number; skipped: number }> {
   // Long-finished bookings are history the owner rarely needs; keep the last year and everything ahead.
   const from = options.from || new Date(Date.now() - 365 * 86_400_000).toISOString().slice(0, 10);

@@ -18,7 +18,7 @@ function plainText(messages: unknown): string {
       if (row) lines.push(row);
       return;
     }
-    if (node.type === "text" && typeof node.text === "string" && node.text !== "Lokalfleet") lines.push(node.text);
+    if (node.type === "text" && typeof node.text === "string" && node.text !== "RoveHQ") lines.push(node.text);
     for (const key of ["contents", "header", "body", "footer"]) if (node[key]) walk(node[key]);
   };
   walk(messages);
@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
         }
       }
       for (const recipient of recipients) {
-        const sent = await sendEmail({ to: recipient, subject: `${org.name || "Lokalfleet"}: your morning summary`, text: `${text}${appUrl ? `\n\nOpen Lokalfleet: ${appUrl}` : ""}`, metadata: { kind: "daily_summary" } });
+        const sent = await sendEmail({ to: recipient, subject: `${org.name || "RoveHQ"}: your morning summary`, text: `${text}${appUrl ? `\n\nOpen RoveHQ: ${appUrl}` : ""}`, metadata: { kind: "daily_summary" } });
         results.push({ org: org.name, channel: "email", success: sent.status === "sent", error: sent.status === "failed" ? sent.error : undefined });
       }
     }

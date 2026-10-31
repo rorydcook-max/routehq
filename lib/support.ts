@@ -4,15 +4,15 @@ import { sendPushToUsers } from "@/lib/push";
 import { planById } from "@/lib/plans";
 
 /**
- * Help: a conversation between a business and the Lokalfleet team, with files.
- * The business chooses how it prefers to hear back (in Lokalfleet, WhatsApp, LINE
+ * Help: a conversation between a business and the RoveHQ team, with files.
+ * The business chooses how it prefers to hear back (in RoveHQ, WhatsApp, LINE
  * or email); the in-app conversation is always there either way.
  */
 
 export * from "@/lib/support-shared";
 import { SUPPORT_BUCKET, type SupportAttachment } from "@/lib/support-shared";
 
-/** Lokalfleet's own contact details, set at launch (launch checklist: "Support contact details"). Only those set are shown. */
+/** RoveHQ's own contact details, set at launch (launch checklist: "Support contact details"). Only those set are shown. */
 export function supportContacts() {
   const whatsapp = String(process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP || process.env.SUPPORT_WHATSAPP || "").replace(/[^\d+]/g, "");
   const line = String(process.env.NEXT_PUBLIC_SUPPORT_LINE || process.env.LINE_OA_ID || "").trim();
@@ -52,7 +52,7 @@ export async function signAttachments(admin: any, attachments: SupportAttachment
 }
 
 /**
- * Tells the Lokalfleet team someone wrote in: a phone alert to every platform admin who turned alerts on,
+ * Tells the RoveHQ team someone wrote in: a phone alert to every platform admin who turned alerts on,
  * plus LINE and Telegram when those are set up. Never throws. `path` opens somewhere other than the Help thread
  * (the website's contact messages go to /platform/messages).
  */
@@ -62,7 +62,7 @@ export async function alertTeam(text: string, threadId: string, path?: string) {
     const url = path || `/help/team/${threadId}`;
     const { data: admins } = await admin.from("platform_admins").select("user_id");
     const ids = ((admins || []) as any[]).map((row) => row.user_id).filter(Boolean);
-    if (ids.length) await sendPushToUsers(admin, ids, { title: "Lokalfleet Help", body: text, url, tag: `support-${threadId}` });
+    if (ids.length) await sendPushToUsers(admin, ids, { title: "RoveHQ Help", body: text, url, tag: `support-${threadId}` });
 
     const base = String(process.env.NEXT_PUBLIC_APP_URL || "").replace(/\/$/, "");
     const full = `${text}${base ? `\n${base}${url}` : ""}`;

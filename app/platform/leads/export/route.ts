@@ -4,7 +4,7 @@ import { isPlatformAdmin } from "@/lib/support";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-/** The website's leads (free-resource downloads) as a spreadsheet, newest first. Lokalfleet team only. */
+/** The website's leads (free-resource downloads) as a spreadsheet, newest first. RoveHQ team only. */
 export async function GET(request: NextRequest) {
   const membership = await getCurrentMembership();
   const supabase = (await createSupabaseServerClient()) as any;

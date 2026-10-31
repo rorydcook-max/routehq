@@ -1,4 +1,4 @@
-// Lokalfleet service worker: shows alerts and opens the right page when one is tapped.
+// RoveHQ service worker: shows alerts and opens the right page when one is tapped.
 // It deliberately caches nothing, so the app can never get stuck on an old version.
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim()));
@@ -11,7 +11,7 @@ self.addEventListener("push", (event) => {
     data = { body: event.data ? event.data.text() : "" };
   }
   event.waitUntil(
-    self.registration.showNotification(data.title || "Lokalfleet", {
+    self.registration.showNotification(data.title || "RoveHQ", {
       body: data.body || "",
       icon: "/icon-192.png",
       badge: "/icon-192.png",

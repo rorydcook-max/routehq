@@ -44,7 +44,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     headers: {
       "Content-Type": TYPES[claim.format] || "application/octet-stream",
       "Content-Length": String(size),
-      "Content-Disposition": `attachment; filename="lokalfleet-${claim.slug}-${claim.locale}.${claim.format}"`,
+      "Content-Disposition": `attachment; filename="rovehq-${claim.slug}-${claim.locale}.${claim.format}"`,
       "Cache-Control": "private, no-store",
       "X-Robots-Tag": "noindex, nofollow"
     }

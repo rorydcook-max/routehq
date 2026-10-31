@@ -128,7 +128,7 @@ Give every renter a short card or message with these steps, and follow your own:
 7. **Replacement vehicle.** Under the standard contract forms, you must provide a similar vehicle if the rented one is off the road for more than one day because of an accident, unless the renter caused it by breaking the law.
 8. **Settle the deposit properly.** Record the damage at return, get a quote, deduct actual cost only, and return the rest within the contract's timings.
 
-Lokalfleet stores timestamped handover photos with each booking, so you can show the vehicle's condition before the renter took it. Use the [handover checklist](/resources/handover-checklist) at both ends.
+RoveHQ stores timestamped handover photos with each booking, so you can show the vehicle's condition before the renter took it. Use the [handover checklist](/resources/handover-checklist) at both ends.
 
 ## Writing insurance into the rental agreement
 
@@ -155,4 +155,4 @@ Our [free bilingual rental agreement](/resources/rental-agreement) includes thes
 - [ ] Renters have the accident steps and your number
 - [ ] Renewal dates are tracked for every vehicle
 
-Get the paperwork right before the next claim, not after. Download the [free bilingual rental agreement](/resources/rental-agreement), or [sign up for Lokalfleet](/signup) to keep insurance details, expiry reminders and handover photos with every booking.
+Get the paperwork right before the next claim, not after. Download the [free bilingual rental agreement](/resources/rental-agreement), or [sign up for RoveHQ](/signup) to keep insurance details, expiry reminders and handover photos with every booking.

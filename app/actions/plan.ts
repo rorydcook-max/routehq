@@ -18,7 +18,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
  * Choosing a plan (27 Oct 2026). There is no payment provider yet, so:
  * - Free switches straight away (after the trial, if one is running).
  * - A paid plan is a request: the plans page shows what to pay (PromptPay QR or
- *   transfer), a Help conversation is opened for the slip, and the Lokalfleet team
+ *   transfer), a Help conversation is opened for the slip, and the RoveHQ team
  *   switches the plan on when the money arrives (`activatePlanRequest`).
  * Moving to a cheaper plan while paid up waits for the renewal date.
  */
@@ -155,7 +155,7 @@ function addInterval(from: Date, interval: Interval) {
 }
 
 /**
- * Lokalfleet team: the payment arrived, switch the plan on. Paid time runs from the later of today and the
+ * RoveHQ team: the payment arrived, switch the plan on. Paid time runs from the later of today and the
  * current due date, so paying early never loses days.
  */
 export async function activatePlanRequest(input: { organizationId: string }): Promise<Result> {
@@ -194,7 +194,7 @@ export async function activatePlanRequest(input: { organizationId: string }): Pr
     { userId: membership.userId, email: membership.email ?? null },
     { action: "plan_activated", organizationId: organization.id, details: { plan, interval } }
   );
-  await notifyOperator(organization.id, `✅ Your Lokalfleet plan is now ${plan.charAt(0).toUpperCase()}${plan.slice(1)}`, "plan_activated", "/settings/billing");
+  await notifyOperator(organization.id, `✅ Your RoveHQ plan is now ${plan.charAt(0).toUpperCase()}${plan.slice(1)}`, "plan_activated", "/settings/billing");
   revalidatePath("/settings/billing");
   if (organization.plan_request_thread_id) revalidatePath(`/help/team/${organization.plan_request_thread_id}`);
   return { ok: true };

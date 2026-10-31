@@ -15,8 +15,8 @@ type Say = (key: string, values?: Record<string, string | number>) => string;
 type Query = { q?: string; town?: string; nationality?: string; now?: string; rate?: string };
 
 /**
- * Lokalfleet's own list of renters who said yes to partner offers, with their rental history across every business:
- * for planning partner offers and retargeting. Lokalfleet team (platform admins) only; operators never see it.
+ * RoveHQ's own list of renters who said yes to partner offers, with their rental history across every business:
+ * for planning partner offers and retargeting. RoveHQ team (platform admins) only; operators never see it.
  */
 export default async function RentersPage({ searchParams }: { searchParams: Promise<Query> }) {
   const [query, userEmail, membership, tRaw, locale] = await Promise.all([searchParams, getCurrentUserEmail(), getCurrentMembership(), getTranslations("renters"), getLocale()]);

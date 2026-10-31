@@ -896,7 +896,7 @@ async function requirePlatformAdmin() {
     .maybeSingle();
 
   if (error || !platformAdmin) {
-    throw new Error("Only Lokalfleet platform admins can manage the global vehicle catalog.");
+    throw new Error("Only RoveHQ platform admins can manage the global vehicle catalog.");
   }
 
   return { supabase, user };
@@ -1314,7 +1314,7 @@ export async function researchVehicleCatalogSubmission(formData: FormData) {
 
   const client = new OpenAI({ apiKey }) as any;
   const model = process.env.OPENAI_CATALOG_RESEARCH_MODEL || process.env.OPENAI_TRIM_CATALOG_MODEL || "gpt-4o";
-  const prompt = `You are researching vehicle catalog data for Lokalfleet, a Southeast Asia vehicle rental operating system.
+  const prompt = `You are researching vehicle catalog data for RoveHQ, a Southeast Asia vehicle rental operating system.
 
 Research this user-submitted vehicle catalog suggestion using web search:
 - Make: ${submission.make_name || "unknown"}
@@ -1329,7 +1329,7 @@ Research this user-submitted vehicle catalog suggestion using web search:
 - Seats: ${submission.seating_capacity || "unknown"}
 - Drivetrain: ${submission.drivetrain || "unknown"}
 
-Focus on Thailand and Southeast Asia market availability. Check whether the submitted make/model/trim likely exists, whether it may be misspelled, and whether there are related trims for the same model/year range that Lokalfleet may be missing.
+Focus on Thailand and Southeast Asia market availability. Check whether the submitted make/model/trim likely exists, whether it may be misspelled, and whether there are related trims for the same model/year range that RoveHQ may be missing.
 
 Return only JSON with this structure:
 {
@@ -1531,7 +1531,7 @@ export async function updateLineSettings(formData: FormData) {
 }
 
 /**
- * A short code the owner sends to the Lokalfleet LINE account to connect it
+ * A short code the owner sends to the RoveHQ LINE account to connect it
  * (see app/api/line/webhook). Valid for 30 minutes; a new code replaces the old.
  */
 export async function createLineLinkCode(organizationId: string): Promise<{ ok: true; code: string } | { ok: false; error: string }> {

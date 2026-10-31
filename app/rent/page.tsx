@@ -18,14 +18,14 @@ const POPULAR = ["Koh Samui", "Phuket", "Chiang Mai"];
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("directory");
-  // The renter site is Lokalkeys (Rory, 28 Oct), not the operator software's "| Lokalfleet" title template.
-  // One address for search engines: lokalkeys.com, whether the page was reached there or at lokalfleet.com/rent.
+  // The renter site is Rove (Rory, 28 Oct), not the operator software's "| RoveHQ" title template.
+  // One address for search engines: rove.rent, whether the page was reached there or at rovehq.app/rent.
   return {
-    title: { absolute: `${t("title")} | Lokalkeys` },
+    title: { absolute: `${t("title")} | Rove` },
     description: t("subtitle"),
-    applicationName: "Lokalkeys",
+    applicationName: "Rove",
     alternates: { canonical: `${renterUrl()}/` },
-    openGraph: { siteName: "Lokalkeys", url: `${renterUrl()}/` }
+    openGraph: { siteName: "Rove", url: `${renterUrl()}/` }
   };
 }
 
@@ -53,7 +53,7 @@ export default async function DirectoryPage({ searchParams }: { searchParams: Pr
   return (
     <PublicShell
       brand={
-        <a aria-label="Lokalkeys" className="inline-flex" href="/rent">
+        <a aria-label="Rove" className="inline-flex" href="/rent">
           <RouteHqLogo product="keys" showDescriptor={false} />
         </a>
       }

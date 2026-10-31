@@ -1,7 +1,7 @@
 /**
- * Adds a business's own domain to the Lokalfleet project on Vercel, which then issues its certificate
+ * Adds a business's own domain to the RoveHQ project on Vercel, which then issues its certificate
  * (launch checklist: "Own domain on the Business plan" needs VERCEL_API_TOKEN and VERCEL_PROJECT_ID).
- * Without them the domain is saved and the Lokalfleet team connects it by hand from a Help conversation.
+ * Without them the domain is saved and the RoveHQ team connects it by hand from a Help conversation.
  */
 
 const API = "https://api.vercel.com";

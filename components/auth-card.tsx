@@ -20,7 +20,7 @@ export function AuthCard({
       <div className="w-full max-w-md">
         {/* The same header row as the public pages: logo left, language pill right, fixed height, outside the card. */}
         <header className="mb-4 flex h-12 items-center justify-between gap-3">
-          <a aria-label="Lokalfleet" href="/login">
+          <a aria-label="RoveHQ" href="/login">
             <RouteHqLogo />
           </a>
           {language ? <AuthLanguage /> : null}

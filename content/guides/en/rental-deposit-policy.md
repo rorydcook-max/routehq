@@ -66,7 +66,7 @@ Track how much you collect against how much you pay out in repairs. If repairs r
 | **Card pre-authorisation** | Nothing is charged unless you need it; tourists like it | Needs a card terminal or payment provider that supports holds. Holds expire, and releases can take up to two weeks to show on the renter's statement |
 | **Card charge then refund** | Works with any card terminal | Card fees are usually not returned on refund; refunds take days |
 
-Whatever you use, write the deposit amount, method and refund conditions on the agreement and get it signed before the keys leave your hand. Lokalfleet reads payment slips and matches them to bookings, which helps with the fake slip problem.
+Whatever you use, write the deposit amount, method and refund conditions on the agreement and get it signed before the keys leave your hand. RoveHQ reads payment slips and matches them to bookings, which helps with the fake slip problem.
 
 ## Why holding passports is a bad idea
 
@@ -153,4 +153,4 @@ For ready-made wording, use our [message templates](/resources/message-templates
 
 ## Get your deposit policy on paper
 
-Download the free bilingual [rental agreement](/resources/rental-agreement), add your deposit amounts and damage price list, and use it from your next rental. When you want deposits, payment slips and handover photos tracked against each booking, [create a free Lokalfleet account](/signup).
+Download the free bilingual [rental agreement](/resources/rental-agreement), add your deposit amounts and damage price list, and use it from your next rental. When you want deposits, payment slips and handover photos tracked against each booking, [create a free RoveHQ account](/signup).

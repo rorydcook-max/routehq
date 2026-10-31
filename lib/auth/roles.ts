@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient, getRequestUser } from "@/lib/supabase/server";
 
 /**
- * Lokalfleet has two roles for now:
+ * RoveHQ has two roles for now:
  *
  *   owner    - full control, including business settings, billing and the team
  *   teammate - day-to-day work (bookings, fleet, customers, inspections,

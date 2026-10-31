@@ -21,7 +21,7 @@ async function isCustomerPage() {
   }
 }
 
-/** Lokalfleet's website pages (proxy.ts marks them). */
+/** RoveHQ's website pages (proxy.ts marks them). */
 async function isSitePage() {
   try {
     return Boolean((await headers()).get("x-routehq-site-page"));
@@ -33,7 +33,7 @@ async function isSitePage() {
 /** The signed-in operator's brand (logo, name, colour), so pages open in it rather than switching after load. */
 async function operatorBrand() {
   try {
-    // Customer pages carry the business's own brand, and the directory and website are Lokalfleet's: none takes the signed-in operator's colour.
+    // Customer pages carry the business's own brand, and the directory and website are RoveHQ's: none takes the signed-in operator's colour.
     if ((await headers()).get("x-routehq-customer-page") || (await headers()).get("x-routehq-site-page")) return null;
     const membership = await getCurrentMembership();
     if (!membership) return null;
@@ -50,20 +50,20 @@ import "./theme-dark.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Lokalfleet",
-    template: "%s | Lokalfleet"
+    default: "RoveHQ",
+    template: "%s | RoveHQ"
   },
   description: "The command centre for vehicle rental operations.",
-  applicationName: "Lokalfleet",
-  metadataBase: new URL("https://lokalfleet.com"),
+  applicationName: "RoveHQ",
+  metadataBase: new URL("https://rovehq.app"),
   icons: {
-    icon: "/lokalfleet-icon.svg?v=5",
-    shortcut: "/lokalfleet-icon.svg?v=5",
+    icon: "/rovehq-icon.svg?v=5",
+    shortcut: "/rovehq-icon.svg?v=5",
     // ?v= so phones fetch the re-centred icon (27 Oct) instead of a cached copy.
     apple: "/apple-touch-icon.png?v=5"
   },
   // Opens full screen, like an app, when added to a phone's home screen.
-  appleWebApp: { capable: true, title: "Lokalfleet", statusBarStyle: "default" }
+  appleWebApp: { capable: true, title: "RoveHQ", statusBarStyle: "default" }
 };
 
 export const viewport: Viewport = {

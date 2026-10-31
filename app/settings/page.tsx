@@ -137,7 +137,7 @@ function browserSafeAssetFallback(value: string | null | undefined) {
 }
 
 // The wording for the parts operators see is in locales/<language>/common.json under
-// "settingsPage". The vehicle catalogue tools at the bottom are for Lokalfleet staff only.
+// "settingsPage". The vehicle catalogue tools at the bottom are for RoveHQ staff only.
 const SETTINGS_TABS = [{ key: "business" }, { key: "rentals" }, { key: "messaging" }, { key: "notifications" }, { key: "team" }, { key: "more" }] as const;
 
 type Say = (key: string, values?: Record<string, string | number>) => string;
@@ -185,7 +185,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     .maybeSingle();
   const isPlatformAdmin = Boolean(platformAdmin);
   const { data: addressRow } = await supabase.from("organizations").select("booking_subdomain, custom_domain, custom_domain_status, trial_ends_at").eq("id", organization.id).maybeSingle();
-  // Custom limits a Lokalfleet admin set for this business (none: the plan's own), read separately so a missing column can't break the page.
+  // Custom limits a RoveHQ admin set for this business (none: the plan's own), read separately so a missing column can't break the page.
   const customPlan = await getCustomPlan(organization.id);
   const addressOrg = { ...(organization as any), ...(addressRow || {}), custom_limits: customPlan.custom_limits };
 
@@ -640,7 +640,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             <p className="mt-3 font-medium text-[var(--foreground-secondary)]">{say("line_follow")}</p>
           )}
 
-          {/* Not connected: add the Lokalfleet LINE account, then send a one-time code. */}
+          {/* Not connected: add the RoveHQ LINE account, then send a one-time code. */}
           {!lineUserId && <LineConnectPanel lineOaId={lineOaId} organizationId={organization.id} />}
 
           {/* Developers only: where LINE should send messages. Operators never need this. */}
@@ -784,8 +784,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
               {[
                 { label: say("use_cars"), used: fleetNow.cars, limit: currentPlan.cars },
                 { label: say("use_motorbikes"), used: fleetNow.motorbikes, limit: currentPlan.motorbikes },
-                // Lokalfleet support's temporary access (admin "view as") is not one of their seats.
-                { label: say("use_team"), used: (members || []).filter((member: any) => member.is_active && member.display_name !== "Lokalfleet support").length, limit: currentPlan.team }
+                // RoveHQ support's temporary access (admin "view as") is not one of their seats.
+                { label: say("use_team"), used: (members || []).filter((member: any) => member.is_active && member.display_name !== "RoveHQ support").length, limit: currentPlan.team }
               ].map((meter) => {
                 const pct = meter.limit ? Math.min(100, Math.round((meter.used / meter.limit) * 100)) : 0;
                 const over = meter.limit !== null && meter.used > meter.limit;

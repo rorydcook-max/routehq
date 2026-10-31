@@ -32,7 +32,7 @@ function refresh(slug: string) {
   revalidatePath(`/rent/${slug}`);
 }
 
-/** theirshop.lokalfleet.com. Empty clears it. */
+/** theirshop.rovehq.app. Empty clears it. */
 export async function saveBookingSubdomain(input: { value: string }): Promise<Result<{ value: string | null }>> {
   const who = await ownerOrg();
   if ("error" in who) return { ok: false, error: who.error as string };
@@ -47,7 +47,7 @@ export async function saveBookingSubdomain(input: { value: string }): Promise<Re
   const problem = subdomainProblem(value);
   if (problem === "short") return { ok: false, error: await said("Use at least 3 letters or numbers.") };
   if (problem === "chars") return { ok: false, error: await said("Use only letters, numbers and dashes.") };
-  if (problem === "reserved") return { ok: false, error: await said("That address is kept for Lokalfleet. Try another.") };
+  if (problem === "reserved") return { ok: false, error: await said("That address is kept for RoveHQ. Try another.") };
   const { data: taken } = await admin.from("organizations").select("id").ilike("booking_subdomain", value).is("deleted_at", null).neq("id", org.id).limit(1);
   if (taken?.length) return { ok: false, error: await said("Another business already has that address. Try another.") };
   const { error } = await admin.from("organizations").update({ booking_subdomain: value }).eq("id", org.id);
@@ -86,7 +86,7 @@ export async function saveOwnDomain(input: { value: string }): Promise<Result<{ 
   if (previous && previous !== domain) await removeProjectDomain(previous);
 
   if (status === "waiting_team") {
-    // Until Lokalfleet can add domains itself, the team connects it by hand: open a Help conversation so it isn't missed.
+    // Until RoveHQ can add domains itself, the team connects it by hand: open a Help conversation so it isn't missed.
     const { data: thread } = await admin
       .from("support_threads")
       .insert({ organization_id: org.id, created_by: who.membership.userId, topic: "domain", subject: `Connect ${domain}`, status: "open", unread_by_team: true })
@@ -101,7 +101,7 @@ export async function saveOwnDomain(input: { value: string }): Promise<Result<{ 
   return { ok: true, value: domain, status };
 }
 
-/** "Check again": live once the DNS record points at Lokalfleet. */
+/** "Check again": live once the DNS record points at RoveHQ. */
 export async function checkOwnDomain(): Promise<Result<{ status: string | null }>> {
   const who = await ownerOrg();
   if ("error" in who) return { ok: false, error: who.error as string };

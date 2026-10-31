@@ -7,7 +7,7 @@ import { DEFAULT_SITE_LOCALE, hreflangFor } from "@/lib/site/locale-path";
 import { siteUrl } from "@/lib/site/seo";
 
 /**
- * Every page of Lokalfleet's website in every language it exists in, each with its hreflang alternates. Pages written
+ * Every page of RoveHQ's website in every language it exists in, each with its hreflang alternates. Pages written
  * for every language (home, pricing, FAQ, contact, the guide and resource lists) are listed in all of them; a guide or
  * resource only in the languages it has been written in. The staff app is never listed.
  */

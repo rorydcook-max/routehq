@@ -28,7 +28,7 @@ export async function loadPublicAmendment(token: string): Promise<PublicAmendmen
   const admin = createSupabaseAdminClient() as any;
   const { data: amendment } = await admin.from("rental_amendments").select("*").eq("token", clean).maybeSingle();
   if (!amendment) return { state: "not_found" };
-  // A business Lokalfleet has closed (admin console soft delete): its links stop working.
+  // A business RoveHQ has closed (admin console soft delete): its links stop working.
   const { data: amendmentOrganization } = await admin.from("organizations").select("deleted_at").eq("id", amendment.organization_id).maybeSingle();
   if (!amendmentOrganization || amendmentOrganization.deleted_at) return { state: "not_found" };
 

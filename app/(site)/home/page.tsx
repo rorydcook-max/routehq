@@ -51,8 +51,8 @@ export default async function SiteHomePage() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "Lokalfleet",
-    url: "https://lokalfleet.com",
+    name: "RoveHQ",
+    url: "https://rovehq.io",
     applicationCategory: "BusinessApplication",
     applicationSubCategory: "Vehicle rental management",
     operatingSystem: "Web, Android, iOS",
@@ -65,7 +65,7 @@ export default async function SiteHomePage() {
       highPrice: Math.max(...PLANS.map((plan) => plan.monthly)),
       offerCount: PLANS.length
     },
-    publisher: { "@type": "Organization", name: "Lokalfleet", url: "https://lokalfleet.com", logo: "https://lokalfleet.com/lokalfleet-logo.svg" }
+    publisher: { "@type": "Organization", name: "RoveHQ", url: "https://rovehq.io", logo: "https://rovehq.io/rovehq-logo.svg" }
   };
 
   return (
@@ -103,7 +103,7 @@ export default async function SiteHomePage() {
         </Container>
       </section>
 
-      {/* 2. On autopilot: what Lokalfleet did this morning without anyone touching it, then the plain facts */}
+      {/* 2. On autopilot: what RoveHQ did this morning without anyone touching it, then the plain facts */}
       <section aria-label={t("proofLabel")} className={s.sectionBottom}>
         <Container>
           <div className={s.auto}>
@@ -181,7 +181,7 @@ export default async function SiteHomePage() {
         </Container>
       </section>
 
-      {/* 4b. Moving in: Lokalfleet brings a business's records in for it, free. The picture follows the words on phones. */}
+      {/* 4b. Moving in: RoveHQ brings a business's records in for it, free. The picture follows the words on phones. */}
       <section aria-labelledby="moving-in" className={s.sectionBottom}>
         <Container className={s.importRow}>
           <div className={s.importText}>

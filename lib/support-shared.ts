@@ -21,7 +21,7 @@ export function supportPreference(settings: unknown): { channel: SupportChannel;
   return { channel, handle: String(raw.handle || "") };
 }
 
-/** Where the team replies outside Lokalfleet, when the business asked for that. */
+/** Where the team replies outside RoveHQ, when the business asked for that. */
 export function replyLinkFor(channel: SupportChannel, handle: string, text = ""): string | null {
   const value = handle.trim();
   if (!value) return null;

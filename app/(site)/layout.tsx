@@ -11,7 +11,7 @@ const geist = Geist({ subsets: ["latin", "latin-ext"], display: "swap", variable
 const serif = Instrument_Serif({ subsets: ["latin"], weight: "400", style: "italic", display: "swap", variable: "--font-site-serif" });
 
 /**
- * Lokalfleet's public website: the home page signed-out visitors see at "/" (proxy.ts rewrites "/" to /home for them),
+ * RoveHQ's public website: the home page signed-out visitors see at "/" (proxy.ts rewrites "/" to /home for them),
  * /pricing. Server-rendered, in the visitor's language (the same choice the sign-in pages use).
  */
 export default async function SiteLayout({ children }: { children: ReactNode }) {

@@ -11,7 +11,7 @@ type Say = (key: string, values?: Record<string, string | number>) => string;
 
 /**
  * The plan a business chose and is paying for: what to pay and how, the slip, and a way to change its mind.
- * Paid plans are switched on by the Lokalfleet team when the money arrives (no payment provider yet).
+ * Paid plans are switched on by the RoveHQ team when the money arrives (no payment provider yet).
  */
 export function PendingPlan({
   what,

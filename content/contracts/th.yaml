@@ -1,4 +1,4 @@
-# Lokalfleet vehicle rental agreement — THAILAND (English + Thai, Thai prevails).
+# RoveHQ vehicle rental agreement — THAILAND (English + Thai, Thai prevails).
 # Built from master.en.yaml. Same section ids, clause ids, field keys and conditions.
 # Thailand-only additions end in "_cc": parties.2_cc, deposit.5_cc, insurance.7_cc, damage.6_cc, data.3_cc.
 # Country clauses adapted to Thai law: renter.2, vehicle.2, deposit.3, deposit.4, use.2, use.3, area.2,

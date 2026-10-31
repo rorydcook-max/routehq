@@ -16,7 +16,7 @@ import { isPlatformAdmin, replyLinkFor } from "@/lib/support";
 import { loadThread } from "@/lib/support-data";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-/** One conversation, answered by the Lokalfleet team. */
+/** One conversation, answered by the RoveHQ team. */
 export default async function HelpTeamConversationPage({ params }: { params: Promise<{ id: string }> }) {
   const [{ id }, userEmail, membership, t, locale] = await Promise.all([params, getCurrentUserEmail(), getCurrentMembership(), getTranslations("help"), getLocale()]);
   const supabase = (await createSupabaseServerClient()) as any;
@@ -40,7 +40,7 @@ export default async function HelpTeamConversationPage({ params }: { params: Pro
         })
       }
     : null;
-  const outside = business.preference.channel !== "app" ? replyLinkFor(business.preference.channel, business.preference.handle, business.preference.channel === "email" ? `Lokalfleet: ${thread.subject}` : "") : null;
+  const outside = business.preference.channel !== "app" ? replyLinkFor(business.preference.channel, business.preference.handle, business.preference.channel === "email" ? `RoveHQ: ${thread.subject}` : "") : null;
 
   return (
     <AppShell userEmail={userEmail}>

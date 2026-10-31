@@ -1,8 +1,8 @@
-# Lokalfleet — Codex Project Instructions
+# RoveHQ — Codex Project Instructions
 
 ## Product Identity
 
-This project is Lokalfleet: a production-grade, SaaS-ready vehicle rental operating system for Southeast Asia.
+This project is RoveHQ: a production-grade, SaaS-ready vehicle rental operating system for Southeast Asia.
 
 It is NOT car-only rental software.
 

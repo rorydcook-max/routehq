@@ -10,7 +10,7 @@ import { AdminHeader, StatusPill } from "./admin-nav";
 
 export const dynamic = "force-dynamic";
 
-/** Lokalfleet admin console: the state of the whole platform at a glance. Platform admins only. */
+/** RoveHQ admin console: the state of the whole platform at a glance. Platform admins only. */
 export default async function AdminOverviewPage() {
   await requirePlatformAdmin();
   const db = createSupabaseAdminClient() as any;
@@ -47,7 +47,7 @@ export default async function AdminOverviewPage() {
 
   return (
     <AppShell userEmail={userEmail}>
-      <AdminHeader active="/platform" subtitle="Every business on Lokalfleet, their plans and trials. Only Lokalfleet admins can see this." title="Overview" />
+      <AdminHeader active="/platform" subtitle="Every business on RoveHQ, their plans and trials. Only RoveHQ admins can see this." title="Overview" />
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
         {stats.map(([label, value, note, href]) => {

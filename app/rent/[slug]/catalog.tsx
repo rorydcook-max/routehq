@@ -122,7 +122,7 @@ export function Catalog({
         // Straight on to their details and the agreement. A full page load, so the
         // customer never sees the staff app's loading screen in between.
         if (embedded && window.parent !== window) {
-          // In the booking box on the business's own site: the page around it carries on at Lokalfleet (documents and
+          // In the booking box on the business's own site: the page around it carries on at RoveHQ (documents and
           // signing need the whole screen); a link stays here in case that page can't.
           const href = new URL(result.href, window.location.origin).toString();
           window.parent.postMessage({ type: "routehq:continue", href }, "*");

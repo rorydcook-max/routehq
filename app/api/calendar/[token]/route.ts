@@ -54,10 +54,10 @@ export async function GET(_request: Request, { params }: { params: Promise<{ tok
 
   const appUrl = String(process.env.NEXT_PUBLIC_APP_URL || "").replace(/\/$/, "");
   const now = stamp(new Date());
-  const lines: string[] = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Lokalfleet//Bookings//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH", `X-WR-CALNAME:${esc(`${org.name || "Lokalfleet"} bookings`)}`, "X-WR-TIMEZONE:Asia/Bangkok", "REFRESH-INTERVAL;VALUE=DURATION:PT1H", "X-PUBLISHED-TTL:PT1H"];
+  const lines: string[] = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//RoveHQ//Bookings//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH", `X-WR-CALNAME:${esc(`${org.name || "RoveHQ"} bookings`)}`, "X-WR-TIMEZONE:Asia/Bangkok", "REFRESH-INTERVAL;VALUE=DURATION:PT1H", "X-PUBLISHED-TTL:PT1H"];
 
   const event = (uid: string, summary: string, date: string, time: string | null, location: string | null, description: string, updated: string | null) => {
-    lines.push("BEGIN:VEVENT", `UID:${uid}@lokalfleet.com`, `DTSTAMP:${updated ? stamp(new Date(updated)) : now}`);
+    lines.push("BEGIN:VEVENT", `UID:${uid}@rovehq.app`, `DTSTAMP:${updated ? stamp(new Date(updated)) : now}`);
     if (time) {
       const start = new Date(time);
       lines.push(`DTSTART:${stamp(start)}`, `DTEND:${stamp(new Date(start.getTime() + 30 * 60_000))}`);

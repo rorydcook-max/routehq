@@ -127,8 +127,8 @@ export async function generateReceipt(input: GenerateReceiptInput) {
     : {};
   const logoDataUri = await logoUrlToDataUri(supabase, String(organization.business_logo_storage_path || organizationSettings.business_logo_storage_path || organization.logo_url || ""));
   const receiptBrandHtml = logoDataUri
-    ? `<img src="${escapeHtml(logoDataUri)}" alt="${escapeHtml(organization.name || "Lokalfleet")} logo" style="max-width: 200px; max-height: 80px; object-fit: contain; margin: 0 auto 8px; display: block;" />`
-    : `<p style="font-size: 20px; font-weight: 700; color: #1a1d21; margin: 4px 0;">${escapeHtml(organization.name || "Lokalfleet")}</p>`;
+    ? `<img src="${escapeHtml(logoDataUri)}" alt="${escapeHtml(organization.name || "RoveHQ")} logo" style="max-width: 200px; max-height: 80px; object-fit: contain; margin: 0 auto 8px; display: block;" />`
+    : `<p style="font-size: 20px; font-weight: 700; color: #1a1d21; margin: 4px 0;">${escapeHtml(organization.name || "RoveHQ")}</p>`;
 
   const receiptHtml = `
 <div style="font-family: Arial, sans-serif; max-width: 400px; margin: 0 auto; padding: 24px; border: 1px solid #e3e6e8; border-radius: 8px;">

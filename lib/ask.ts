@@ -255,7 +255,7 @@ export async function answerQuestion(question: string, language = "English", his
     console.warn("[ask] failed:", why.slice(0, 300));
     // Out of credit won't fix itself in a moment, so it says so rather than "try again".
     if (/no credits|insufficient_quota|exceeded your current quota|billing/i.test(why)) {
-      return { ok: false, error: "The assistant's AI service is out of credit, so it can't answer right now. Everything else in Lokalfleet works as normal." };
+      return { ok: false, error: "The assistant's AI service is out of credit, so it can't answer right now. Everything else in RoveHQ works as normal." };
     }
     return { ok: false, error: "Couldn't reach the assistant just now. Try again in a moment." };
   }

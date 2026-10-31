@@ -32,7 +32,7 @@ const LINE = "C9D1DA";
 const MIST = "F3F6F8";
 const TEAL = "0B8F8C";
 const SCRIPT_FONT: Record<string, string> = { th: "Leelawadee UI", lo: "Leelawadee UI", km: "Khmer UI" };
-const CREDIT = "Free template from Lokalfleet · lokalfleet.com";
+const CREDIT = "Free template from RoveHQ · rovehq.io";
 
 type Logo = { data: Buffer; type: "png" | "jpg"; width: number; height: number } | null;
 
@@ -174,7 +174,7 @@ export async function renderContractDocx(doc: ContractDocument, logo: Logo): Pro
   });
 
   const file = new Document({
-    creator: "Lokalfleet",
+    creator: "RoveHQ",
     title: `${doc.title.en}${b.name ? ` · ${b.name}` : ""}`,
     styles: { default: { document: { run: { font: "Arial", size: 19 } } } },
     sections: [{ properties: { page: { margin: { top: 1300, bottom: 1000, left: 900, right: 900, header: 400, footer: 400 } } }, headers: { default: header }, footers: { default: footer }, children }]

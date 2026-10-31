@@ -12,8 +12,8 @@ import { getRequestUser } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 /**
- * Shown to the team of a business Lokalfleet has closed (admin console › Delete business, a soft delete that can be
- * undone for 30 days). Nothing in the business can be used; they can contact Lokalfleet, start a new business or
+ * Shown to the team of a business RoveHQ has closed (admin console › Delete business, a soft delete that can be
+ * undone for 30 days). Nothing in the business can be used; they can contact RoveHQ, start a new business or
  * sign in with another account.
  */
 export default async function BusinessClosedPage() {

@@ -40,5 +40,5 @@ const server = createServer(async (request, response) => {
 });
 
 server.listen(port, () => {
-  console.log(`Lokalfleet prototype available at http://localhost:${port}`);
+  console.log(`RoveHQ prototype available at http://localhost:${port}`);
 });

@@ -1,9 +1,9 @@
 /**
- * What rental businesses using Lokalfleet actually charge for a model.
+ * What rental businesses using RoveHQ actually charge for a model.
  *
  * Small operators rent through marketplaces, walk-ins and partners, so their
  * prices are rarely published anywhere a web search can find. The prices they
- * set in Lokalfleet are the real ones. Only a combined middle figure is ever
+ * set in RoveHQ are the real ones. Only a combined middle figure is ever
  * returned, and only when enough different businesses have the model that no
  * single business's price can be worked out from it.
  */

@@ -5,7 +5,7 @@ export type ShellBrand = {
   name: string;
   logoUrl: string | null;
   colour: string | null;
-  /** Show the small "Powered by Lokalfleet" line under their logo. */
+  /** Show the small "Powered by RoveHQ" line under their logo. */
   poweredBy: boolean;
 };
 

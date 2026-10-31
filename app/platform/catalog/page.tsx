@@ -86,7 +86,7 @@ function candidateSpecs(candidate: any) {
 }
 
 
-/** Lokalfleet admin console: the shared makes, models and trims every business picks from, and operators' suggestions. */
+/** RoveHQ admin console: the shared makes, models and trims every business picks from, and operators' suggestions. */
 export default async function AdminCatalogPage() {
   await requirePlatformAdmin();
   const supabase = (await createSupabaseServerClient()) as any;

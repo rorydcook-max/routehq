@@ -149,7 +149,7 @@ export async function POST(request: NextRequest) {
     return settle({ ...data, notes_en: notesEn, notes_by_locale: { [locale]: data.notes || [] }, at_price: price });
   };
 
-  // What other Lokalfleet businesses really charge for this model replaces the web's guess at rent: it is the truer figure.
+  // What other RoveHQ businesses really charge for this model replaces the web's guess at rent: it is the truer figure.
   const respond = async (research: Record<string, any>, pages: unknown[], how: "saved" | "rechecked" | "fresh", checkedAt?: string) => {
     let platform = null;
     try {

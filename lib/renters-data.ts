@@ -1,4 +1,4 @@
-/** Reading Lokalfleet's renter list for the Lokalfleet team (lib/renters.ts writes it). Server only. */
+/** Reading RoveHQ's renter list for the RoveHQ team (lib/renters.ts writes it). Server only. */
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export type RenterRental = {
@@ -94,7 +94,7 @@ export async function listRenters(filters: RenterFilters = {}) {
   return { renters, towns: allTowns, nationalities: allNationalities };
 }
 
-/** Headline numbers: how big the list is and how it is growing against everyone who booked through Lokalfleet. */
+/** Headline numbers: how big the list is and how it is growing against everyone who booked through RoveHQ. */
 export async function renterStats() {
   const admin = createSupabaseAdminClient() as any;
   const [{ count: optedIn }, { data: bookers }, { data: rentals }] = await Promise.all([

@@ -1,13 +1,13 @@
 name: Anan
 role:
-  en: "Founder of Lokalfleet and car rental operator"
-  th: "ผู้ก่อตั้ง Lokalfleet และเจ้าของธุรกิจรถเช่า"
+  en: "Founder of RoveHQ and car rental operator"
+  th: "ผู้ก่อตั้ง RoveHQ และเจ้าของธุรกิจรถเช่า"
 bio:
   en: >-
     Anan runs a small long-term car rental fleet on Koh Samui, Thailand. Like
     most independent operators, he started out running the business on
     notebooks, spreadsheets and chat apps, and found where that approach stops
-    working as a fleet grows. He built Lokalfleet to solve those everyday
+    working as a fleet grows. He built RoveHQ to solve those everyday
     problems, and to give other small rental
     businesses in Southeast Asia simple, phone-first tools. He writes these
     guides from an operator's point of view, for people running or starting
@@ -16,10 +16,10 @@ bio:
     อนันต์ทำธุรกิจรถเช่าระยะยาวขนาดเล็กบนเกาะสมุย
     เช่นเดียวกับร้านรถเช่าอิสระส่วนใหญ่ เขาเริ่มต้นด้วยสมุดจด ไฟล์ Excel
     และแอปแชท และได้เห็นว่าวิธีนี้เริ่มไม่พอเมื่อรถมากขึ้น
-    เขาจึงสร้าง Lokalfleet ขึ้นมาเพื่อแก้ปัญหาที่เจอในงานประจำวัน
+    เขาจึงสร้าง RoveHQ ขึ้นมาเพื่อแก้ปัญหาที่เจอในงานประจำวัน
     และเพื่อให้ร้านรถเช่าเล็ก ๆ ในเอเชียตะวันออกเฉียงใต้มีเครื่องมือที่ใช้ง่ายบนมือถือ
     บทความเหล่านี้เขียนจากมุมมองของคนทำร้านรถเช่าจริง
     สำหรับคนที่กำลังทำหรือกำลังจะเริ่มธุรกิจรถเช่าของตัวเอง
 short:
-  en: "Anan runs a small car rental fleet on Koh Samui and built Lokalfleet."
-  th: "อนันต์ทำธุรกิจรถเช่าบนเกาะสมุย และเป็นผู้สร้าง Lokalfleet"
+  en: "Anan runs a small car rental fleet on Koh Samui and built RoveHQ."
+  th: "อนันต์ทำธุรกิจรถเช่าบนเกาะสมุย และเป็นผู้สร้าง RoveHQ"

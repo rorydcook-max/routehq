@@ -23,7 +23,7 @@ export type ReportableRental = { id: string; label: string };
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
 /**
- * "Warn other Lokalfleet businesses" about a rental that ended badly, and the reports this business has already filed
+ * "Warn other RoveHQ businesses" about a rental that ended badly, and the reports this business has already filed
  * about the customer. A report carries the business's name and its own account of what happened, so other businesses
  * can judge it; it can be marked settled when the customer puts it right, or withdrawn if it was a mistake.
  */

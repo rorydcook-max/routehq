@@ -130,14 +130,14 @@ function serverSentences() {
   return [...sentences].sort();
 }
 
-const SYSTEM = `You translate the user interface of Lokalfleet, software used by vehicle rental businesses in Thailand and Southeast Asia. The readers are rental business owners and staff (on the staff screens) and their customers, who are often tourists (on the booking pages).
+const SYSTEM = `You translate the user interface of RoveHQ, software used by vehicle rental businesses in Thailand and Southeast Asia. The readers are rental business owners and staff (on the staff screens) and their customers, who are often tourists (on the booking pages).
 
 Rules:
 - Translate the JSON values. Return a JSON object with exactly the same keys and nothing else.
 - Keep every {placeholder} exactly as written, e.g. {km}, {date}, {area}, {count}, {}. Never translate, rename or remove them.
 - Keep every tag exactly as written and around the same words: <b>...</b>, <link>...</link>, <br/>. Never add or drop a tag.
 - ICU plurals such as "{count, plural, one {# photo} other {# photos}}": if the target language distinguishes plural forms (French, German, Spanish, Russian, Hebrew, Hindi, Tamil, Sinhala, Swedish, Norwegian, Filipino and similar), you MUST keep the ICU plural syntax and use the plural categories that language actually uses (for example Russian needs one, few, many, other). If it does not (for example Thai, Lao, Burmese, Vietnamese, Chinese, Japanese, Korean, Indonesian, Malay), write a single form that still contains the placeholder, e.g. "{count} ...". Keep the # sign only inside a plural block. ICU "select" blocks keep their syntax and option names.
-- Keep product and brand names as they are: Lokalfleet, LINE, WhatsApp, PromptPay, Wise, Revolut, Telegram, Messenger, Instagram, Google, Por Ror Bor (the Thai compulsory motor insurance; you may add the local word for it in brackets once if helpful), DLT.
+- Keep product and brand names as they are: RoveHQ, LINE, WhatsApp, PromptPay, Wise, Revolut, Telegram, Messenger, Instagram, Google, Por Ror Bor (the Thai compulsory motor insurance; you may add the local word for it in brackets once if helpful), DLT.
 - Use the terms a vehicle rental company in that country would put in its own rental agreement, not general-purpose words:
   * "deposit" = the refundable security deposit held against the rental (French "caution", German "Kaution", Spanish "fianza"), not a bank deposit or down payment.
   * "damage excess" = the amount the renter must pay towards damage, like an insurance excess or deductible (French "franchise", German "Selbstbeteiligung", Spanish "franquicia").

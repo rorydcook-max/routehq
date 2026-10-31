@@ -8,7 +8,7 @@ import { isSitePath, localizeSitePath, splitSiteLocale } from "@/lib/site/locale
 
 /**
  * Keeps a signed-out language choice on this device and redraws the page in it (also the website header's picker).
- * On Lokalfleet's website each language has its own address, so there it opens that language's address (/th/pricing);
+ * On RoveHQ's website each language has its own address, so there it opens that language's address (/th/pricing);
  * the cookie still carries the choice to sign-in and the app.
  */
 export function chooseSignedOutLanguage(code: string) {

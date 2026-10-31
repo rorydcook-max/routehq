@@ -15,14 +15,14 @@ faq:
   - q: "Does HQ Rental Software work for motorbikes?"
     a: "HQ says it powers car and van rental out of the box and adapts to motorbikes, boats and equipment 'with a few simple configurations'. Try it during their 7-day free trial to check it fits your workflow."
   - q: "Which is best for a small fleet in Thailand or Indonesia?"
-    a: "It depends on size and needs. If you have 1 to 30 cars or motorbikes, take payments by bank transfer or QR, and talk to customers on LINE or WhatsApp, look for a phone-first tool with local payment support and a free plan, such as Lokalfleet."
+    a: "It depends on size and needs. If you have 1 to 30 cars or motorbikes, take payments by bank transfer or QR, and talk to customers on LINE or WhatsApp, look for a phone-first tool with local payment support and a free plan, such as RoveHQ."
 ---
 
 RentWorks Plus and HQ Rental Software are two of the better-known names in car rental software. Both are established, each says it has more than 1,000 operators as customers, and both are good at what they were built for. The question for a small operator is whether what they were built for matches your business.
 
 This guide sets out what each product says about itself on its own website, who it's likely to suit, and where a smaller, phone-first tool might fit better. All facts are taken from the companies' public websites **as of October 2026**. Features and prices change, so check their sites before you decide.
 
-> We make Lokalfleet, so we have an interest here. We've tried to describe both products fairly, using their own words and links, and to be honest about where they are the better choice.
+> We make RoveHQ, so we have an interest here. We've tried to describe both products fairly, using their own words and links, and to be honest about where they are the better choice.
 
 ## RentWorks Plus at a glance
 
@@ -65,7 +65,7 @@ Each plan includes one branch, with extra branches at $50 a month. Annual billin
 
 ## Side-by-side comparison (as of October 2026)
 
-| | RentWorks Plus | HQ Rental Software | Lokalfleet |
+| | RentWorks Plus | HQ Rental Software | RoveHQ |
 |---|---|---|---|
 | Best fit | Dealership loaners, multi-location, airport, franchise; independents from 15 cars | Car and van rental of all sizes; adaptable to motorbikes and boats | Independent operators with 1 to 30 cars and motorbikes |
 | Public pricing | No, quote only | Yes, from $120/month plus onboarding fee | Yes, with a free plan |
@@ -99,7 +99,7 @@ Then compare that with your income. For example, a motorbike rented at ฿250 a 
 
 **Choose HQ Rental Software if** you want published pricing, a broad set of integrations, channel management with sites like Expedia and Turo, and a booking engine on your own website. It suits growing car and van rental businesses, especially those taking card payments through Stripe or PayPal, and fleets of 10 to 50 vehicles that want to start without a sales process. The 30+ languages and Singapore hosting help in Asia.
 
-**Choose Lokalfleet if** you're a small independent operator, roughly 1 to 30 vehicles, renting cars, motorbikes or scooters in Southeast Asia, running the business from your phone, and talking to customers on LINE, WhatsApp or Telegram. Lokalfleet reads PromptPay and QRIS payment slips and matches them to bookings, produces bilingual agreements with e-signature, and records handover photos with a timestamp. It's available in 23 languages, has a free plan, and you can sign up yourself in a few minutes.
+**Choose RoveHQ if** you're a small independent operator, roughly 1 to 30 vehicles, renting cars, motorbikes or scooters in Southeast Asia, running the business from your phone, and talking to customers on LINE, WhatsApp or Telegram. RoveHQ reads PromptPay and QRIS payment slips and matches them to bookings, produces bilingual agreements with e-signature, and records handover photos with a timestamp. It's available in 23 languages, has a free plan, and you can sign up yourself in a few minutes.
 
 If you're still on a notebook and chat apps, our guide on [when spreadsheets and chat apps stop working](/guides/rental-software-vs-spreadsheets) covers what to fix first.
 
@@ -117,6 +117,6 @@ Whichever you look at, ask the same questions so you can compare fairly:
 
 Whatever software you use, a clear agreement and good handover photos do most of the work in a dispute. Our [free bilingual rental agreement](/resources/rental-agreement) and [handover checklist](/resources/handover-checklist) work with any system, or none.
 
-## Try Lokalfleet free
+## Try RoveHQ free
 
-If you fit the small-fleet description above, [create a free Lokalfleet account](/signup). Send us your current spreadsheet, photos and chat exports and we'll import them for free, so you can see your own fleet in it before you decide anything.
+If you fit the small-fleet description above, [create a free RoveHQ account](/signup). Send us your current spreadsheet, photos and chat exports and we'll import them for free, so you can see your own fleet in it before you decide anything.

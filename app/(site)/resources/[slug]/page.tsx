@@ -23,7 +23,7 @@ const FORM_KEYS = [
   "leadPrivacy", "countryOther", "fleet1", "fleet2", "fleet3", "fleet4"
 ];
 
-/** The contract builder's words: its folded fields, the ready panel and what Lokalfleet does with agreements. */
+/** The contract builder's words: its folded fields, the ready panel and what RoveHQ does with agreements. */
 const BUILDER_KEYS = [
   "cbTitle", "cbBody", "cbGroupBusiness", "cbGroupVehicle", "cbGroupPrices", "cbGroupRules", "cbBlankNote",
   "cb_logo", "cb_business_reg_no", "cb_business_phone", "cb_business_email", "cb_business_address",
@@ -76,7 +76,7 @@ export default async function ResourcePage({ params }: Props) {
     url,
     encodingFormat: resource.formats.map((format) => (format === "pdf" ? "application/pdf" : format === "xlsx" ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" : "application/vnd.openxmlformats-officedocument.wordprocessingml.document")),
     isAccessibleForFree: true,
-    publisher: { "@type": "Organization", name: "Lokalfleet", url: siteOrigin() }
+    publisher: { "@type": "Organization", name: "RoveHQ", url: siteOrigin() }
   };
 
   return (

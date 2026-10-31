@@ -75,7 +75,7 @@ export function InboxView({
   autoSelected = false,
   history = []
 }: {
-  /** What other Lokalfleet businesses reported about whoever is writing (shared customer history). */
+  /** What other RoveHQ businesses reported about whoever is writing (shared customer history). */
   history?: HistoryReport[];
   bookings: any[];
   conversations: InboxConversation[];

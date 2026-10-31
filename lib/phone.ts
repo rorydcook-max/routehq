@@ -1,5 +1,5 @@
 /**
- * Phone numbers as Lokalfleet stores them: international, "+66812345670".
+ * Phone numbers as RoveHQ stores them: international, "+66812345670".
  * A number typed the Thai way ("081 234 5670") is Thai; one starting with + keeps its country.
  */
 export function toInternationalPhone(value: unknown, defaultCode = "+66"): string | null {

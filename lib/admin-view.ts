@@ -3,7 +3,7 @@ import { SUPPORT_DISPLAY_NAME } from "@/lib/auth/active-organization";
 
 /**
  * "View as this business" (admin console, migration 0108). A platform admin gets a temporary membership in the
- * business (role manager, display name "Lokalfleet support") and an admin_view_sessions row saying why and until
+ * business (role manager, display name "RoveHQ support") and an admin_view_sessions row saying why and until
  * when. lib/auth/active-organization.ts ignores the membership once the session has ended or run out, on every
  * request; the helpers here tidy up afterwards (membership removed, session closed, admin log written).
  */
@@ -88,7 +88,7 @@ export async function endExpiredViewSessions(sessions: ViewSession[]) {
   }
 }
 
-/** "14:30", in Thailand time (where Lokalfleet's businesses are). */
+/** "14:30", in Thailand time (where RoveHQ's businesses are). */
 export function viewTime(iso: string) {
   return new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Bangkok" }).format(new Date(iso));
 }

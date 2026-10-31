@@ -39,7 +39,7 @@ export interface EmailProvider {
 
 /**
  * Resend (resend.com) over its HTTP API, no SDK. Needs EMAIL_PROVIDER=resend, RESEND_API_KEY and
- * EMAIL_FROM (e.g. "Lokalfleet <alerts@lokalfleet.com>", on a domain verified in Resend with DKIM/SPF).
+ * EMAIL_FROM (e.g. "RoveHQ <alerts@rovehq.app>", on a domain verified in Resend with DKIM/SPF).
  */
 function createResendProvider(): EmailProvider {
   const key = process.env.RESEND_API_KEY;

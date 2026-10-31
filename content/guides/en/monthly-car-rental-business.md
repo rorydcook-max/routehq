@@ -68,7 +68,7 @@ One bad monthly renter can cost more than a season of good ones. A short, consis
 - **History.** Returning customers and referrals are your best renters. For new ones, a short call or video chat tells you a lot.
 - **Purpose.** Ask what they will use the vehicle for. Delivery riding, ride-hailing and sub-renting are common reasons for heavy wear, and the standard contract forbids sub-letting or lending the vehicle without your written permission.
 
-Keep a simple record of who you rented to and how it went. Lokalfleet keeps renter history across bookings, so you can see at a glance whether someone returned their last vehicle late or damaged.
+Keep a simple record of who you rented to and how it went. RoveHQ keeps renter history across bookings, so you can see at a glance whether someone returned their last vehicle late or damaged.
 
 ## Deposits for long rentals
 
@@ -91,7 +91,7 @@ Most long-stay customers prefer to pay month by month. That's fine, as long as t
 - **A late-payment rule in the contract**, such as a grace period of two days, then a daily fee, and the right to collect the vehicle after a stated number of days unpaid. Be careful that the rule is proportionate and written into the agreement before the rental starts.
 - **Receipts for every payment**, showing the period covered.
 
-Lokalfleet reads payment slips, matches them to the right booking and sends reminders over LINE, WhatsApp or Telegram, which removes most of the monthly chasing. If you prefer to do it by hand, our [message templates](/resources/message-templates) include payment reminders in several languages.
+RoveHQ reads payment slips, matches them to the right booking and sends reminders over LINE, WhatsApp or Telegram, which removes most of the monthly chasing. If you prefer to do it by hand, our [message templates](/resources/message-templates) include payment reminders in several languages.
 
 ## Maintenance during a rental: who pays what
 
@@ -188,4 +188,4 @@ Write the contract in Thai, as the rules require, and give the renter an English
 - **30 days before any renewal**: tax, พ.ร.บ., insurance.
 - **At the end**: inspection with photos, deposit back on time, ask for a review or a booking for next season.
 
-Ready to set up long rentals properly? Download the [free bilingual rental agreement](/resources/rental-agreement), filled in with your business details, or [start with Lokalfleet for free](/signup) to automate payments, reminders and handovers for every monthly renter.
+Ready to set up long rentals properly? Download the [free bilingual rental agreement](/resources/rental-agreement), filled in with your business details, or [start with RoveHQ for free](/signup) to automate payments, reminders and handovers for every monthly renter.

@@ -46,7 +46,7 @@ export function LeadForm({ resource, source, words, countries, builder = false, 
       </div>
     );
     if (builder) {
-      // The agreement: say the links last 7 days before the buttons, and what Lokalfleet does with agreements.
+      // The agreement: say the links last 7 days before the buttons, and what RoveHQ does with agreements.
       return (
         <div ref={done} role="status" tabIndex={-1} className="outline-none">
           <p className={c.gateTitle}>{words.contractReadyTitle}</p>

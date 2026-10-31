@@ -136,10 +136,10 @@ Keep handover and return photos for as long as a claim could reasonably come up,
 
 A simple folder structure works for a few vehicles: one folder per booking, with the agreement, payment slip and photos inside. Once you have more vehicles, it becomes hard to find the right photo quickly.
 
-## How Lokalfleet does timestamped handover photos
+## How RoveHQ does timestamped handover photos
 
-Lokalfleet records handover and return photos inside each booking, with the time each photo was taken saved alongside it. The photos sit next to the signed agreement and the deposit record, so when a renter questions a scratch weeks later, you open the booking and everything is there. You do not need to scroll through your camera roll or a chat history.
+RoveHQ records handover and return photos inside each booking, with the time each photo was taken saved alongside it. The photos sit next to the signed agreement and the deposit record, so when a renter questions a scratch weeks later, you open the booking and everything is there. You do not need to scroll through your camera roll or a chat history.
 
 ## Make it a habit
 
-Print or download the free [handover checklist](/resources/handover-checklist) and use it on your next rental. If you want the photos, agreement and deposit kept together in one place for every booking, [create a free Lokalfleet account](/signup).
+Print or download the free [handover checklist](/resources/handover-checklist) and use it on your next rental. If you want the photos, agreement and deposit kept together in one place for every booking, [create a free RoveHQ account](/signup).

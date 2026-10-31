@@ -29,7 +29,7 @@ export function HelpStatusButton({ threadId, closed }: { threadId: string; close
   );
 }
 
-/** How the business would like Lokalfleet to get back to them. The conversation in Lokalfleet is kept either way. */
+/** How the business would like RoveHQ to get back to them. The conversation in RoveHQ is kept either way. */
 export function HelpPreference({ channel, handle, suggestions, canEdit }: { channel: SupportChannel; handle: string; suggestions: Partial<Record<SupportChannel, string>>; canEdit: boolean }) {
   const say = useTranslations("help") as unknown as Say;
   const [value, setValue] = useState<SupportChannel>(channel);
@@ -89,7 +89,7 @@ export function HelpPreference({ channel, handle, suggestions, canEdit }: { chan
           />
         </label>
       ) : null}
-      {/* "Here in Lokalfleet" needs no note: the card's own line already says we reply here with an alert. */}
+      {/* "Here in RoveHQ" needs no note: the card's own line already says we reply here with an alert. */}
       {value !== "app" ? <p className="font-medium text-[var(--foreground-secondary)]">{say("prefOtherNote", { channel: say(`channel_${value}`) })}</p> : null}
       {canEdit ? (
         <div className="flex items-center gap-3">

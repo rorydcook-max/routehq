@@ -5,7 +5,7 @@ import { adminChangeEmail, adminRemoveMember, adminSendPasswordReset, type Perso
 import { PendingButton } from "@/components/pending-button";
 
 /**
- * What a Lokalfleet admin can do for one person: send a password reset link, change their sign-in email, take them
+ * What a RoveHQ admin can do for one person: send a password reset link, change their sign-in email, take them
  * out of a business. Used on the Users page and in a business's Team table. Every action is checked and logged
  * on the server.
  */

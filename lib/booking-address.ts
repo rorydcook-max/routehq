@@ -2,15 +2,15 @@ import { effectiveLimits, planById } from "@/lib/plans";
 
 /**
  * A business's booking address (Rory, 11 Oct 2026):
- * - lokalfleet.com/rent/<slug>: every business, always works (the directory links here);
- * - <theirshop>.lokalfleet.com: Pro and above;
+ * - rovehq.app/rent/<slug>: every business, always works (the directory links here);
+ * - <theirshop>.rovehq.app: Pro and above;
  * - their own domain, e.g. book.theirshop.com: Business plan.
  * Pure: used by the middleware (edge) as well as pages.
  */
 
 export const RESERVED_SUBDOMAINS = new Set([
   "www", "app", "api", "admin", "help", "support", "mail", "email", "smtp", "rent", "book", "booking", "bookings", "static", "assets", "cdn",
-  "dev", "staging", "test", "demo", "status", "blog", "docs", "routehq", "lokalfleet", "lokalkeys", "team", "login", "signup", "account", "billing", "partners", "directory"
+  "dev", "staging", "test", "demo", "status", "blog", "docs", "routehq", "rovehq", "rove", "site", "team", "login", "signup", "account", "billing", "partners", "directory"
 ]);
 
 /** Vercel's address for a domain pointed at the project. */
@@ -18,25 +18,51 @@ export const DNS_CNAME_TARGET = "cname.vercel-dns.com";
 export const DNS_A_TARGET = "76.76.21.21";
 
 export function rootDomain() {
-  return String(process.env.NEXT_PUBLIC_ROOT_DOMAIN || "lokalfleet.com").toLowerCase().replace(/^www\./, "");
+  return String(process.env.NEXT_PUBLIC_ROOT_DOMAIN || "rovehq.app").toLowerCase().replace(/^www\./, "");
 }
 
-/** Lokalkeys, the renter booking site (Rory, 28 Oct 2026): its own domain, served by this same app at /rent. */
+/** Rove, the renter booking site (Rory, 28 Oct 2026): its own domain, served by this same app at /rent. */
 export function renterDomain() {
-  return String(process.env.NEXT_PUBLIC_RENTER_DOMAIN || "lokalkeys.com").toLowerCase().replace(/^www\./, "");
+  return String(process.env.NEXT_PUBLIC_RENTER_DOMAIN || "rove.rent").toLowerCase().replace(/^www\./, "");
 }
 
-/** The renter site's address, for links to it ("https://lokalkeys.com"). */
+/** The renter site's address, for links to it ("https://rove.rent"). */
 export function renterUrl() {
   return String(process.env.NEXT_PUBLIC_RENTER_URL || `https://${renterDomain()}`).replace(/\/$/, "");
 }
 
 /**
- * Extra domains that only send people on to a main one: lokalfleet.app → lokalfleet.com, lokalkeys.app → lokalkeys.com.
+ * The RoveHQ website (Rory, 31 Oct 2026): home, plans, guides and free resources on rovehq.io, while the platform
+ * (sign-in, the app, booking addresses) is on rovehq.app. Same app; the middleware sends each page to its domain.
+ */
+export function siteDomain() {
+  const fromUrl = String(process.env.NEXT_PUBLIC_SITE_URL || "").replace(/^[a-z]+:\/\//i, "").replace(/[/:].*$/, "");
+  return String(process.env.NEXT_PUBLIC_SITE_DOMAIN || fromUrl || "rovehq.io").toLowerCase().replace(/^www\./, "");
+}
+
+/** Whether a request is for the website domain (rovehq.io). In development, `site.localhost` works too. */
+export function isMarketingHost(rawHost: string | null | undefined) {
+  const host = bareHost(rawHost);
+  return host === siteDomain() || host === "site.localhost";
+}
+
+/** Whether a request is for the platform's own domain (rovehq.app), not a booking address or another domain. */
+export function isAppHost(rawHost: string | null | undefined) {
+  return bareHost(rawHost) === rootDomain();
+}
+
+/**
+ * Extra domains that only send people on to a main one: www.* to the bare domain, rovehq.co to the website.
  * SITE_ALIAS_DOMAINS can add more as "alias=main,alias=main".
  */
 function aliasDomains(): Record<string, string> {
-  const map: Record<string, string> = { [`www.${rootDomain()}`]: rootDomain(), [`www.${renterDomain()}`]: renterDomain(), "lokalfleet.app": rootDomain(), "www.lokalfleet.app": rootDomain(), "lokalkeys.app": renterDomain(), "www.lokalkeys.app": renterDomain() };
+  const map: Record<string, string> = {
+    [`www.${rootDomain()}`]: rootDomain(),
+    [`www.${renterDomain()}`]: renterDomain(),
+    [`www.${siteDomain()}`]: siteDomain(),
+    "rovehq.co": siteDomain(),
+    "www.rovehq.co": siteDomain()
+  };
   for (const pair of String(process.env.SITE_ALIAS_DOMAINS || "").split(",")) {
     const [from, to] = pair.split("=").map((part) => part.trim().toLowerCase());
     if (from && to) map[from] = to;
@@ -55,13 +81,13 @@ export function aliasTarget(rawHost: string | null | undefined): string | null {
   return target && target !== host ? target : null;
 }
 
-/** Whether a request is for the renter site (lokalkeys.com). In development, `lokalkeys.localhost` works too. */
+/** Whether a request is for the renter site (rove.rent). In development, `rove.localhost` works too. */
 export function isRenterHost(rawHost: string | null | undefined) {
   const host = bareHost(rawHost);
-  return host === renterDomain() || host === "lokalkeys.localhost";
+  return host === renterDomain() || host === "rove.localhost";
 }
 
-/** Paths that belong to the renter site; anything else on its domain goes to Lokalfleet. */
+/** Paths that belong to the renter site; anything else on its domain goes to RoveHQ. */
 export function isRenterSitePath(pathname: string) {
   return isBookingSitePath(pathname);
 }
@@ -110,7 +136,8 @@ export function cleanDomain(value: string) {
   if (host === root || host.endsWith(`.${root}`) || host.endsWith(".vercel.app")) return null;
   // A business can't claim one of our own domains as its booking address.
   const renter = renterDomain();
-  if (host === renter || host.endsWith(`.${renter}`) || aliasTarget(host)) return null;
+  const site = siteDomain();
+  if (host === renter || host.endsWith(`.${renter}`) || host === site || host.endsWith(`.${site}`) || aliasTarget(host)) return null;
   return host;
 }
 
@@ -145,7 +172,7 @@ export function subdomainUrl(label: string) {
 
 export type BookingAddressOrg = Plan & { slug: string; booking_subdomain?: string | null; custom_domain?: string | null; custom_domain_status?: string | null };
 
-/** The address to share: their own domain once it works, else their subdomain, else the Lokalfleet path. */
+/** The address to share: their own domain once it works, else their subdomain, else the RoveHQ path. */
 export function bookingAddress(org: BookingAddressOrg): { url: string; kind: "domain" | "subdomain" | "path" } {
   if (org.custom_domain && org.custom_domain_status === "live" && canUseOwnDomain(org)) return { url: `https://${org.custom_domain}`, kind: "domain" };
   if (org.booking_subdomain && canUseSubdomain(org)) return { url: subdomainUrl(org.booking_subdomain), kind: "subdomain" };
@@ -161,8 +188,8 @@ export function hostTarget(rawHost: string | null | undefined): { label: string 
   if (!host || host === "localhost" || !host.includes(".") || /^[\d.]+$/.test(host) || host.startsWith("[")) return null;
   const root = rootDomain();
   if (host === root || host === `www.${root}` || host.endsWith(".vercel.app")) return null;
-  // Our own other domains (Lokalkeys, aliases) are never a business's booking address.
-  if (isRenterHost(host) || aliasTarget(host)) return null;
+  // Our own other domains (Rove, aliases) are never a business's booking address.
+  if (isRenterHost(host) || isMarketingHost(host) || aliasTarget(host)) return null;
   for (const base of [root, "localhost"]) {
     if (host.endsWith(`.${base}`)) {
       const label = host.slice(0, -(base.length + 1));

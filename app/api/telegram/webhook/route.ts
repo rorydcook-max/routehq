@@ -2,7 +2,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { sendTelegram } from "@/lib/telegram";
 
 /**
- * Messages to the Lokalfleet Telegram bot. The only thing it does: link a chat to a business.
+ * Messages to the RoveHQ Telegram bot. The only thing it does: link a chat to a business.
  * Settings › Integrations gives a t.me/<bot>?start=<code> link; Telegram sends "/start <code>" here and the chat id
  * is saved on that business (settings.telegram_chat_id). Codes are single use and last 30 minutes.
  */
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
 
   const match = text.match(/^\/start(?:@\w+)?\s+([A-Za-z0-9]{6,64})$/);
   if (!match) {
-    await sendTelegram(chatId, "Hello! To get Lokalfleet alerts here, open Lokalfleet › Settings › Integrations and tap \"Connect Telegram\".");
+    await sendTelegram(chatId, "Hello! To get RoveHQ alerts here, open RoveHQ › Settings › Integrations and tap \"Connect Telegram\".");
     return Response.json({ ok: true });
   }
 
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
   const settings = (org?.settings || {}) as Record<string, any>;
   const expired = !settings.telegram_link_expires || Date.parse(settings.telegram_link_expires) < Date.now();
   if (!org || expired) {
-    await sendTelegram(chatId, "That link has expired. Open Lokalfleet › Settings › Integrations and tap \"Connect Telegram\" again.");
+    await sendTelegram(chatId, "That link has expired. Open RoveHQ › Settings › Integrations and tap \"Connect Telegram\" again.");
     return Response.json({ ok: true });
   }
 
@@ -35,6 +35,6 @@ export async function POST(request: Request) {
   delete next.telegram_link_code;
   delete next.telegram_link_expires;
   await db.from("organizations").update({ settings: next }).eq("id", org.id);
-  await sendTelegram(chatId, `✅ Connected. Lokalfleet alerts for ${org.name || "your business"} will arrive here. Choose which ones in Settings › Notifications.`);
+  await sendTelegram(chatId, `✅ Connected. RoveHQ alerts for ${org.name || "your business"} will arrive here. Choose which ones in Settings › Notifications.`);
   return Response.json({ ok: true });
 }

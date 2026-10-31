@@ -42,6 +42,6 @@ Pasangkan pengingat dengan jam kembali yang jelas di [perjanjian sewa](/id/resou
 
 ## Biarkan pengingat terkirim sendiri
 
-Menyalin template memang membantu, tapi tetap harus ada yang ingat mengirim pengingat pengembalian jam 8 pagi. Lokalfleet mengirim pengingat pembayaran, pengambilan dan pengembalian secara otomatis lewat WhatsApp, LINE atau Telegram, dalam bahasa penyewa, memakai data yang sudah ada di booking.
+Menyalin template memang membantu, tapi tetap harus ada yang ingat mengirim pengingat pengembalian jam 8 pagi. RoveHQ mengirim pengingat pembayaran, pengambilan dan pengembalian secara otomatis lewat WhatsApp, LINE atau Telegram, dalam bahasa penyewa, memakai data yang sudah ada di booking.
 
-Unduh templatenya dan atur balasan cepat Anda hari ini. Saat siap mengotomatiskan pengingat, [mulai gratis dengan Lokalfleet](/signup).
+Unduh templatenya dan atur balasan cepat Anda hari ini. Saat siap mengotomatiskan pengingat, [mulai gratis dengan RoveHQ](/signup).

@@ -1,6 +1,6 @@
 ---
 fileName: "LINE-and-WhatsApp-message-templates-for-rental-businesses"
-footer: "Message templates for rental businesses · lokalfleet.com"
+footer: "Message templates for rental businesses · rovehq.io"
 page: "Page"
 of: "of"
 ---
@@ -208,4 +208,4 @@ As the cancellation was made {notice_given, e.g. less than 48 hours} before pick
 
 Just reply with what suits you best.
 
-> Lokalfleet sends payment, pickup and return reminders automatically from the booking details, in the renter's language. Start free at lokalfleet.com/signup.
+> RoveHQ sends payment, pickup and return reminders automatically from the booking details, in the renter's language. Start free at rovehq.io/signup.

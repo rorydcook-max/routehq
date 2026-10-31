@@ -134,7 +134,7 @@ Every rental needs a written agreement, even for one day. It should state:
 
 Use our free [rental agreement](/resources/rental-agreement), which is bilingual and filled in with your details.
 
-Then photograph the bike at every handover and return, in front of the renter, from the same angles every time. Our [vehicle handover checklist guide](/guides/vehicle-handover-checklist) gives the 12-photo protocol, and Lokalfleet saves those photos with a timestamp against each booking so you can find them later in a dispute.
+Then photograph the bike at every handover and return, in front of the renter, from the same angles every time. Our [vehicle handover checklist guide](/guides/vehicle-handover-checklist) gives the 12-photo protocol, and RoveHQ saves those photos with a timestamp against each booking so you can find them later in a dispute.
 
 ## Helmets and safety kit
 
@@ -169,8 +169,8 @@ Most new shops get their first customers from a handful of channels. Do these we
 - **Google Business Profile.** Create a [Google Business Profile](https://business.google.com) with accurate opening hours, your location pin, photos of real bikes and prices. Ask happy customers for reviews and reply to every review, good or bad.
 - **Social media.** Post your current available bikes, monthly deals and short videos. Facebook groups for expats and digital nomads in your area are a strong source of long-stay renters.
 - **Chat apps.** Most renters will message you on WhatsApp, LINE, Telegram or Zalo, depending on the country. Reply fast and keep standard answers ready. Our [message templates](/resources/message-templates) cover prices, deposits, handover and return.
-- **A booking page.** A simple page showing your bikes, prices and a booking form lets people book at midnight instead of waiting for you to answer. Lokalfleet includes a free booking page connected to your calendar, so you do not double-book.
-- **Lokalkeys.** List your shop on [Lokalkeys](https://lokalkeys.com), where renters look specifically for independent local operators rather than big brands.
+- **A booking page.** A simple page showing your bikes, prices and a booking form lets people book at midnight instead of waiting for you to answer. RoveHQ includes a free booking page connected to your calendar, so you do not double-book.
+- **Rove.** List your shop on [Rove](https://rove.rent), where renters look specifically for independent local operators rather than big brands.
 - **Partners.** Guesthouses, villa managers and co-working spaces will often recommend a reliable shop, especially if you deliver.
 
 ## Running costs and break-even
@@ -219,7 +219,7 @@ Run your own numbers in the [pricing calculator](/resources/pricing-calculator) 
 A simple order of work for the first month, once the bikes are bought and registered:
 
 1. **Week 1: paperwork and kit.** Agreement printed or digital, damage price list, deposit rules, helmets, phone holders, a first-aid kit and a toolkit in the shop.
-2. **Week 1: listings.** Google Business Profile live with real photos, a booking page, a Lokalkeys listing and your chat app number on everything.
+2. **Week 1: listings.** Google Business Profile live with real photos, a booking page, a Rove listing and your chat app number on everything.
 3. **Week 2: partners.** Visit ten nearby guesthouses, villa managers and co-working spaces with a price card. Offer free delivery for their guests.
 4. **Week 2–3: routine.** Practise the handover photos until they take under five minutes. Keep a maintenance log from the first day.
 5. **Week 4: review.** Which bikes rented most? Which messages took longest to answer? Which questions came up again and again? Adjust prices, write standard replies, and decide whether you need more of one model.
@@ -228,4 +228,4 @@ After the first month, look at your numbers once a week: bikes rented, days empt
 
 ## Get started
 
-Start with the free [pricing calculator](/resources/pricing-calculator) to check your numbers, and download the bilingual [rental agreement](/resources/rental-agreement) before your first renter arrives. When you are ready to take bookings, deposits and handover photos in one place, [create a free Lokalfleet account](/signup). The free plan covers small fleets.
+Start with the free [pricing calculator](/resources/pricing-calculator) to check your numbers, and download the bilingual [rental agreement](/resources/rental-agreement) before your first renter arrives. When you are ready to take bookings, deposits and handover photos in one place, [create a free RoveHQ account](/signup). The free plan covers small fleets.

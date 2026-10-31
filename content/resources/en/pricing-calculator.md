@@ -19,4 +19,4 @@ Change the yellow cells for one car or scooter: what you paid, your prices, how 
 
 It's useful before you buy (is a second Fortuner worth it, or four more scooters?) and when you set prices for the season. The example numbers are only there to show how it works: replace them with yours.
 
-If you're starting out, read [How to start a motorbike or scooter rental business](/guides/start-a-scooter-rental-business) alongside it. And once you're running, [Lokalfleet](/signup) records real bookings, payments and costs per vehicle, so you can check the plan against what actually happens.
+If you're starting out, read [How to start a motorbike or scooter rental business](/guides/start-a-scooter-rental-business) alongside it. And once you're running, [RoveHQ](/signup) records real bookings, payments and costs per vehicle, so you can check the plan against what actually happens.

@@ -27,7 +27,7 @@ const WORDS = {
   en: {
     goodMorning: "Good morning! 🌅",
     nothingToday: "Good morning! 🌅\n\nNothing urgent today. Have a great day!",
-    altText: "Lokalfleet daily summary",
+    altText: "RoveHQ daily summary",
     active: (n: number) => `🚗 On hire (${n})`,
     today: "⬅ TODAY",
     tomorrow: "↩ TMW",
@@ -50,7 +50,7 @@ const WORDS = {
   th: {
     goodMorning: "อรุณสวัสดิ์ 🌅",
     nothingToday: "อรุณสวัสดิ์ 🌅\n\nวันนี้ไม่มีเรื่องด่วน ขอให้เป็นวันที่ดี!",
-    altText: "สรุปประจำวันจาก Lokalfleet",
+    altText: "สรุปประจำวันจาก RoveHQ",
     active: (n: number) => `🚗 กำลังเช่าอยู่ (${n})`,
     today: "⬅ วันนี้",
     tomorrow: "↩ พรุ่งนี้",
@@ -280,7 +280,7 @@ function buildHeaderBubble(w: Words, orgName: string, dateStr: string) {
       type: "box",
       layout: "vertical",
       contents: [
-        { type: "text", text: "Lokalfleet", size: "xs", color: "#ffffff80", weight: "bold" },
+        { type: "text", text: "RoveHQ", size: "xs", color: "#ffffff80", weight: "bold" },
         { type: "text", text: w.goodMorning, size: "xl", color: "#ffffff", weight: "bold" },
         { type: "text", text: dateStr, size: "xs", color: "#ffffff99" }
       ],

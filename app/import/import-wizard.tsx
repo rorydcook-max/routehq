@@ -423,7 +423,7 @@ export function ImportWizard({ recent = [] }: { defaultImportType?: string; rece
         </p>
       </section>
 
-      {/* 2. What we found, in Lokalfleet's shape */}
+      {/* 2. What we found, in RoveHQ's shape */}
       {(status === "review" || status === "remapping" || status === "importing") && preview && counts ? (
         <section className="card p-4">
           <h2 className="text-xl font-semibold text-[var(--foreground)]">{t("foundTitle")}</h2>

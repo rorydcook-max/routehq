@@ -12,7 +12,7 @@ faq:
   - q: "Is rental software worth it for a very small fleet?"
     a: "If it costs nothing or very little, usually yes. One avoided double booking or one deposit dispute you can settle with a timestamped photo often covers a year of a paid plan. Start on a free plan and only pay when the fleet grows."
   - q: "Will I lose my existing bookings and customer history if I switch?"
-    a: "You shouldn't. Ask any software company whether they import your existing spreadsheet, customer list and photos, and whether that costs extra. Lokalfleet imports sheets, photos and chat exports for free."
+    a: "You shouldn't. Ask any software company whether they import your existing spreadsheet, customer list and photos, and whether that costs extra. RoveHQ imports sheets, photos and chat exports for free."
   - q: "Can I keep using LINE or WhatsApp with my customers?"
     a: "Yes. Good rental software works alongside the chat apps your customers already use. It sends reminders and links over LINE, WhatsApp or Telegram, while the booking, agreement and payment record live in one place."
   - q: "What is the most important feature to look for?"
@@ -121,7 +121,7 @@ Not a 7-day trial. A plan you can run a small fleet on indefinitely, so you can 
 
 ### Free import of your existing data
 
-Your spreadsheet, customer list and photos are years of work. Ask whether the company imports them for you, and whether there's a fee. Lokalfleet imports your existing sheets, photos and chat exports for free, so you start with your history rather than an empty screen.
+Your spreadsheet, customer list and photos are years of work. Ask whether the company imports them for you, and whether there's a fee. RoveHQ imports your existing sheets, photos and chat exports for free, so you start with your history rather than an empty screen.
 
 ### Questions to ask before you sign up
 
@@ -142,8 +142,8 @@ Your spreadsheet, customer list and photos are years of work. Ask whether the co
 5. **Start doing handover photos in the app from day one.** This is the habit that pays back fastest.
 6. **Turn on your booking page last,** once you trust the calendar.
 
-When everything sits in one place, the morning check becomes: open the app, see who's picking up and returning today, see which deposits are still held. In Lokalfleet that's the first screen, with LINE, WhatsApp or Telegram reminders already sent to today's renters.
+When everything sits in one place, the morning check becomes: open the app, see who's picking up and returning today, see which deposits are still held. In RoveHQ that's the first screen, with LINE, WhatsApp or Telegram reminders already sent to today's renters.
 
 ## Try it with your own fleet
 
-If some of this sounds familiar, you can [sign up for Lokalfleet free](/signup) and send us your current spreadsheet, photos and chats; we'll import them at no cost. Not ready yet? Start with the [pricing calculator](/resources/pricing-calculator) and see what your vehicles earn, or read our guide to [RentWorks Plus and HQ Rental alternatives](/guides/rentworks-hq-rental-alternative) if you're comparing tools.
+If some of this sounds familiar, you can [sign up for RoveHQ free](/signup) and send us your current spreadsheet, photos and chats; we'll import them at no cost. Not ready yet? Start with the [pricing calculator](/resources/pricing-calculator) and see what your vehicles earn, or read our guide to [RentWorks Plus and HQ Rental alternatives](/guides/rentworks-hq-rental-alternative) if you're comparing tools.

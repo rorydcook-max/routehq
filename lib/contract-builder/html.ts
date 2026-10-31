@@ -79,6 +79,6 @@ footer.foot{margin-top:18px;color:var(--muted);font-size:8pt;text-align:center}
 <h1>${esc(doc.title.en)}${two && doc.title.local ? `<span class="loc" lang="${doc.locale}">${esc(doc.title.local)}</span>` : ""}</h1>
 <p class="subtitle">${esc(doc.subtitle.en)}${two && doc.subtitle.local ? ` · <span lang="${doc.locale}">${esc(doc.subtitle.local)}</span>` : ""}</p>
 ${body}
-<footer class="foot">${esc(doc.footer.en)}<br>Free template from Lokalfleet · lokalfleet.com</footer>
+<footer class="foot">${esc(doc.footer.en)}<br>Free template from RoveHQ · rovehq.io</footer>
 </main></body></html>`;
 }

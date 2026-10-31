@@ -489,7 +489,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
   const docsIn = [completeness.hasPassport, completeness.hasLicense, completeness.hasSelfie].filter(Boolean).length;
   const owedNow = [...dueByRental.values()].reduce((sum, amount) => sum + amount, 0);
 
-  // Shared customer history: what other Lokalfleet businesses reported about this person, and what this one has.
+  // Shared customer history: what other RoveHQ businesses reported about this person, and what this one has.
   const supabase = (await createSupabaseServerClient()) as any;
   const [signals, { data: ownReportRows }, membership] = await Promise.all([
     // As on the booking page: if the shared history can't be read (e.g. its key is missing), the page still opens.
@@ -653,7 +653,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                   outstanding_balance: dueNow,
                   deposit_held: Number(activeRental?.deposit_held || 0)
                 }}
-                businessName={organization.name || "Lokalfleet"}
+                businessName={organization.name || "RoveHQ"}
                 customer={{
                   id: customer.id,
                   name: customer.full_name,

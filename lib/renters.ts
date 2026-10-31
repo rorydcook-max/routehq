@@ -1,6 +1,6 @@
 /**
- * Lokalfleet's own copy of renters who said yes to partner offers (migration 0103): one renter across every business they
- * rented from, with their contact details and a snapshot of each rental, kept for Lokalfleet's offers and partners.
+ * RoveHQ's own copy of renters who said yes to partner offers (migration 0103): one renter across every business they
+ * rented from, with their contact details and a snapshot of each rental, kept for RoveHQ's offers and partners.
  *
  * Only renters whose latest answer is yes to the wording that covers it (version RENTER_HISTORY_VERSION or later) are
  * copied. A no deletes the copy (contact details and rentals), leaving only the match keys and dates.
@@ -8,7 +8,7 @@
  */
 import { customerMatchKeys } from "@/lib/customer-history";
 
-/** The partner-offers wording that tells the renter Lokalfleet keeps their details and rental history. */
+/** The partner-offers wording that tells the renter RoveHQ keeps their details and rental history. */
 export const RENTER_HISTORY_VERSION = "2026-10-25b";
 
 type Admin = any;
@@ -35,7 +35,7 @@ async function findRenter(admin: Admin, keys: string[], organizationId: string, 
   return data?.id ? String(data.id) : null;
 }
 
-/** Brings Lokalfleet's copy of one customer up to date: copies, refreshes or (after a no) deletes it. */
+/** Brings RoveHQ's copy of one customer up to date: copies, refreshes or (after a no) deletes it. */
 export async function syncRenterFromCustomer(admin: Admin, customerId: string): Promise<"copied" | "removed" | "skipped"> {
   const { data: customer } = await admin
     .from("customers")

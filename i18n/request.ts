@@ -43,7 +43,7 @@ async function resolveLocale(): Promise<SupportedLocale> {
   // Customer pages: the language the customer picked, else the first language their phone asks for that we have.
   try {
     const requestHeaders = await headers();
-    // Lokalfleet's website: the language is in the address (/th/pricing), passed on by proxy.ts. It wins over the cookie
+    // RoveHQ's website: the language is in the address (/th/pricing), passed on by proxy.ts. It wins over the cookie
     // and the signed-in person's own language, so each address always shows one language (what search engines index).
     if (requestHeaders.get("x-routehq-site-page")) {
       const siteLocale = requestHeaders.get(SITE_LOCALE_HEADER);

@@ -1,6 +1,6 @@
 ---
 fileName: "Template-pesan-WhatsApp-LINE-usaha-rental"
-footer: "Template pesan untuk usaha rental · lokalfleet.com"
+footer: "Template pesan untuk usaha rental · rovehq.io"
 page: "Halaman"
 of: "dari"
 ---
@@ -208,4 +208,4 @@ Karena pembatalan dilakukan {waktu_pemberitahuan, misalnya kurang dari 48 jam} s
 
 Silakan balas pilihan yang paling cocok untuk Anda.
 
-> Lokalfleet mengirim pengingat pembayaran, pengambilan dan pengembalian secara otomatis dari data booking, dalam bahasa penyewa. Mulai gratis di lokalfleet.com/signup.
+> RoveHQ mengirim pengingat pembayaran, pengambilan dan pengembalian secara otomatis dari data booking, dalam bahasa penyewa. Mulai gratis di rovehq.io/signup.

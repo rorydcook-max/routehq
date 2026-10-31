@@ -42,7 +42,7 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
   const startDate = String(formData.get("startDate") || "").trim();
   const endDate = String(formData.get("endDate") || "").trim() || null;
   const name = String(formData.get("name") || "").trim().slice(0, 120);
-  // Stored the way the rest of Lokalfleet stores numbers: +66812345670.
+  // Stored the way the rest of RoveHQ stores numbers: +66812345670.
   const typedPhone = String(formData.get("phone") || "").replace(/[\s\-().]/g, "").slice(0, 24);
   const phone = toInternationalPhone(typedPhone) || typedPhone;
 
@@ -151,7 +151,7 @@ export async function bookOnline(formData: FormData): Promise<Result<{ href: str
     return { ok: false, error: await said("We couldn't start your booking. Please try again.") };
   }
 
-  // Where the customer came from: the business's page here, the Lokalfleet directory, or the booking box on their own website.
+  // Where the customer came from: the business's page here, the RoveHQ directory, or the booking box on their own website.
   const asked = String(formData.get("source") || "");
   const source = asked === "directory" || asked === "website" ? asked : "public_page";
   const bookingData = { delivery_method: "tbd", delivery_location: null, delivery_datetime: null, special_conditions: null, share_channel: source, source };

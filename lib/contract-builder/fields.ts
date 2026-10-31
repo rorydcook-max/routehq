@@ -2,7 +2,7 @@
  * The free contract builder (Rory, 28 Oct 2026): what an operator can type in on /resources/rental-agreement so their
  * download is their own agreement, in English and their country's language. Every field is optional; anything left
  * empty prints as a blank line to fill in by hand. The renter's details are never asked: they're blank lines for
- * handover (or filled automatically when the operator uses Lokalfleet).
+ * handover (or filled automatically when the operator uses RoveHQ).
  */
 
 /** The free resource that is the contract builder (its page shows the extra fields; its links build the file). */

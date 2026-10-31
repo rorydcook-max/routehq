@@ -8,7 +8,7 @@ import { createLineLinkCode, lineConnectionStatus } from "@/app/actions/settings
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
 /**
- * Connect LINE in two taps: add the Lokalfleet account as a friend, then send it
+ * Connect LINE in two taps: add the RoveHQ account as a friend, then send it
  * a one-time code. The webhook links whoever sends the code, and this panel
  * notices and refreshes the page.
  */

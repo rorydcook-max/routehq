@@ -49,7 +49,7 @@ type PublicBookingDetail = {
     documents: boolean;
     agreement: boolean;
   };
-  /** The customer said yes to trip extras from Lokalfleet partners (their latest choice). */
+  /** The customer said yes to trip extras from RoveHQ partners (their latest choice). */
   partnerOffers?: boolean;
   documentStatus: {
     passport: boolean;
@@ -513,7 +513,7 @@ export function BookingCompletionForm({ detail }: { detail: PublicBookingDetail 
   const [liveEmail, setLiveEmail] = useState(detail.customer?.email || "");
   const [focusField, setFocusField] = useState<"phone" | "email" | null>(null);
   const [agreedAll, setAgreedAll] = useState(false);
-  // Trip extras from Lokalfleet partners: optional, never ticked for them, and it doesn't hold up the booking.
+  // Trip extras from RoveHQ partners: optional, never ticked for them, and it doesn't hold up the booking.
   const [offersTicked, setOffersTicked] = useState(false);
   const [offersOn, setOffersOn] = useState(Boolean(detail.partnerOffers));
   const [offersSaving, setOffersSaving] = useState(false);

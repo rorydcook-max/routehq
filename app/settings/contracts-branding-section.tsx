@@ -63,7 +63,7 @@ export function ContractsBrandingSection({
   logoDisplayUrl: string | null;
   organization: ContractsBrandingOrganization;
   signatureDisplayUrl: string | null;
-  /** Their plan lets their logo replace Lokalfleet's inside the app (everything is on during the trial). */
+  /** Their plan lets their logo replace RoveHQ's inside the app (everything is on during the trial). */
   whiteLabel?: boolean;
 }) {
   const say = useTranslations("settingsPage") as unknown as (key: string, values?: Record<string, string>) => string;

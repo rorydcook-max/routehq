@@ -4,7 +4,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/lib/supabase/database.types";
 import { ACTIVE_ORGANIZATION_COOKIE, loadActiveMembership } from "@/lib/auth/active-organization";
-import { aliasTarget, canUseOwnDomain, canUseSubdomain, hostTarget, isBookingSitePath, isRenterHost, isRenterSitePath, rootDomain } from "@/lib/booking-address";
+import { aliasTarget, canUseOwnDomain, canUseSubdomain, hostTarget, isAppHost, isBookingSitePath, isMarketingHost, isRenterHost, isRenterSitePath, rootDomain, siteDomain } from "@/lib/booking-address";
 import { signedOutLocale, STAFF_LOCALE_COOKIE } from "@/lib/i18n/staff-locale";
 import { DEFAULT_SITE_LOCALE, isSitePath, localizeSitePath, SITE_LOCALE_HEADER, splitSiteLocale } from "@/lib/site/locale-path";
 
@@ -55,11 +55,11 @@ const BOT = /bot|crawl|spider|slurp|facebookexternalhit|embedly|preview|lighthou
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const requestHost = request.headers.get("host");
-  // Our extra domains (lokalfleet.app, lokalkeys.app, www.*) send people to the main one, same path.
+  // Our extra domains (rovehq.app, rove.app, www.*) send people to the main one, same path.
   const alias = aliasTarget(requestHost);
   if (alias) return NextResponse.redirect(new URL(`https://${alias}${pathname}${request.nextUrl.search}`), 308);
-  // Lokalkeys (lokalkeys.com), the renter booking site: its home is the /rent search; booking links work there too;
-  // anything else (the operator app, the Lokalfleet website) belongs on lokalfleet.com.
+  // Rove (rove.rent), the renter booking site: its home is the /rent search; booking links work there too;
+  // anything else (the operator app, the RoveHQ website) belongs on rovehq.app.
   if (isRenterHost(requestHost)) {
     if (!isRenterSitePath(pathname)) {
       const appHome = String(process.env.NEXT_PUBLIC_APP_URL || `https://${rootDomain()}`).replace(/\/$/, "");
@@ -72,7 +72,7 @@ export async function proxy(request: NextRequest) {
       return NextResponse.rewrite(url, { request });
     }
   }
-  // Lokalfleet's own website: home (what a signed-out visitor sees at "/", rewritten below), plans, FAQ, contact, guides and
+  // RoveHQ's own website: home (what a signed-out visitor sees at "/", rewritten below), plans, FAQ, contact, guides and
   // free resources. Marked so the root layout sends them no staff-app words. (/owners was dropped on 28 Oct 2026.)
   // Each language has its own address (lib/site/locale-path.ts): English at the root, others under /<code>/.
   // A prefixed address is served from the unprefixed page with the language in a request header.
@@ -131,6 +131,22 @@ export async function proxy(request: NextRequest) {
       : siteRewrite
         ? NextResponse.rewrite(siteRewrite, { request })
         : NextResponse.next({ request });
+  // Two domains (Rory, 31 Oct 2026): the website on rovehq.io, the platform on rovehq.app. On the website's domain
+  // only website pages (and their downloads) are served, anything else goes to the platform; on the platform's
+  // domain, website pages go to rovehq.io. In development (localhost) both are simply served here.
+  const siteOriginUrl = String(process.env.NEXT_PUBLIC_SITE_URL || `https://${siteDomain()}`).replace(/\/$/, "");
+  const appHomeUrl = String(process.env.NEXT_PUBLIC_APP_URL || `https://${rootDomain()}`).replace(/\/$/, "");
+  const isLocalUrl = (url: string) => /\/\/(localhost|127\.0\.0\.1|[^/:]+\.localhost)(:|\/|$)/.test(url);
+  const websiteHome = prefixedSite && unprefixed === "/";
+  if (isMarketingHost(requestHost)) {
+    const websitePath = pathname === "/" || isSitePage || websiteHome || pathname === "/robots.txt" || pathname === "/sitemap.xml" || pathname.startsWith("/api/download/");
+    if (!websitePath && !isLocalUrl(appHomeUrl)) return NextResponse.redirect(new URL(`${pathname}${request.nextUrl.search}`, appHomeUrl));
+    // The website needs no session: "/" is always the home page here, signed in or not.
+    if (pathname === "/") return siteHome();
+    if (websitePath) return pass();
+  } else if (isAppHost(requestHost) && !isLocalUrl(siteOriginUrl) && (isSitePage || websiteHome)) {
+    return NextResponse.redirect(new URL(`${pathname}${request.nextUrl.search}`, siteOriginUrl), 308);
+  }
   const isPublicRoute =
     isSitePage ||
     pathname === "/robots.txt" ||
@@ -156,7 +172,7 @@ export async function proxy(request: NextRequest) {
     // Scheduled jobs have no user session; they check CRON_SECRET themselves.
     pathname.startsWith("/api/cron/") ||
     pathname === "/api/line/daily-summary" ||
-    // Calendar apps subscribing to a business's booking feed (a secret token in the address), and the Lokalfleet Telegram bot.
+    // Calendar apps subscribing to a business's booking feed (a secret token in the address), and the RoveHQ Telegram bot.
     pathname.startsWith("/api/calendar/") ||
     pathname === "/api/telegram/webhook";
   // Customer pages take their language from the customer (their choice, or their phone's language), never from whoever is signed in.
@@ -168,7 +184,7 @@ export async function proxy(request: NextRequest) {
     if (pageLang && /^[a-z]{2}(-[A-Za-z]{2,4})?$/.test(pageLang)) request.headers.set("x-routehq-page-lang", pageLang);
   }
   // During first-time setup the wizard sends people to the normal Add vehicle and import screens; everything else waits until setup is finished.
-  // "This business was closed" is shown to members of a business Lokalfleet closed, so it needs no working business.
+  // "This business was closed" is shown to members of a business RoveHQ closed, so it needs no working business.
   const isOnboardingAllowedRoute = isPublicRoute || pathname === "/business-closed" || pathname.startsWith("/api/") || pathname.startsWith("/fleet/import") || pathname === "/fleet/new" || pathname === "/help" || pathname.startsWith("/help/");
   const isSubscriptionAllowedRoute =
     isOnboardingAllowedRoute ||
@@ -179,8 +195,8 @@ export async function proxy(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  // Booking addresses: theirshop.lokalfleet.com and a business's own domain open that business's booking page.
-  // Booking links and the booking page keep working there; anything else goes to Lokalfleet itself.
+  // Booking addresses: theirshop.rovehq.app and a business's own domain open that business's booking page.
+  // Booking links and the booking page keep working there; anything else goes to RoveHQ itself.
   const target = hostTarget(request.headers.get("host"));
   if (target && supabaseUrl && supabaseAnonKey) {
     const appHome = String(process.env.NEXT_PUBLIC_APP_URL || `https://${rootDomain()}`).replace(/\/$/, "");
@@ -195,7 +211,7 @@ export async function proxy(request: NextRequest) {
     } else {
       const plan = { subscription_tier: site.tier, subscription_status: site.status, custom_limits: site.custom_limits };
       const allowed = "label" in target ? canUseSubdomain(plan) : site.has_domain && canUseOwnDomain(plan);
-      // On a plan without the address, the page still works at its Lokalfleet address.
+      // On a plan without the address, the page still works at its RoveHQ address.
       if (!allowed) {
         const destination = `${pathname === "/" ? `/rent/${site.slug}` : pathname}${request.nextUrl.search}`;
         if (!appOnLocalhost) return NextResponse.redirect(new URL(destination, appHome));
@@ -247,7 +263,10 @@ export async function proxy(request: NextRequest) {
     data: { user }
   } = await supabase.auth.getUser();
 
-  // Signed out at "/": the website. Signed in: the dashboard, as always.
+  // Signed out at "/": the website (on rovehq.app, a visit to rovehq.io's home). Signed in: the dashboard, as always.
+  if (!user && pathname === "/" && isAppHost(requestHost) && !isLocalUrl(siteOriginUrl)) {
+    return NextResponse.redirect(new URL("/", siteOriginUrl));
+  }
   if (!user && pathname === "/") {
     const rewrite = siteHome();
     // Keep any session cookie the check above refreshed or cleared.
@@ -289,7 +308,7 @@ export async function proxy(request: NextRequest) {
       request.cookies.get(ACTIVE_ORGANIZATION_COOKIE)?.value || null
     );
 
-    // Their only business was closed by Lokalfleet: say so plainly rather than offering to set up a new one.
+    // Their only business was closed by RoveHQ: say so plainly rather than offering to set up a new one.
     if (!membership?.organization_id && closed) {
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = "/business-closed";

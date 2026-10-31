@@ -1475,13 +1475,13 @@ export async function checkReturningCustomer(
 }
 
 /** Bump when the wording of the partner-offers choice changes, so each record says which version was agreed to. */
-// 2026-10-25b: says Lokalfleet keeps a copy of their details and rental history (lib/renters.ts).
-// 2026-10-25c: the short "Share my information with Lokalfleet" line, with what is shared one tap away.
+// 2026-10-25b: says RoveHQ keeps a copy of their details and rental history (lib/renters.ts).
+// 2026-10-25c: the short "Share my information with RoveHQ" line, with what is shared one tap away.
 const PARTNER_OFFERS_VERSION = "2026-10-25c";
 
 /**
- * The customer's choice about trip extras from Lokalfleet partners: the optional box on the booking form, or the switch
- * on their booking page afterwards. Lokalfleet's own permission (not the rental business's), kept as a new row each time
+ * The customer's choice about trip extras from RoveHQ partners: the optional box on the booking form, or the switch
+ * on their booking page afterwards. RoveHQ's own permission (not the rental business's), kept as a new row each time
  * with the words shown, the language and where it was given, so it can be proved and is as easy to take back as give.
  */
 export async function setPartnerOffers(formData: FormData) {
@@ -1510,7 +1510,7 @@ export async function setPartnerOffers(formData: FormData) {
     source
   });
   if (error) return { ok: false as const, error: await said("We couldn't save your choice. Please try again.") };
-  // Lokalfleet's own copy follows the answer straight away: made on a yes, deleted on a no.
+  // RoveHQ's own copy follows the answer straight away: made on a yes, deleted on a no.
   await syncRenterFromCustomer(supabase, bookingLink.customer_id).catch((syncError) => console.error("[renters]", syncError instanceof Error ? syncError.message : syncError));
   return { ok: true as const, granted };
 }

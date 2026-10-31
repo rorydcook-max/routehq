@@ -11,7 +11,7 @@ const PUSH_TITLES: Record<string, string> = {
   contract_signed: "Booking signed",
   return_inspection: "Vehicle returned",
   new_message: "New message",
-  support_reply: "Lokalfleet Help",
+  support_reply: "RoveHQ Help",
   plan_activated: "Your plan"
 };
 
@@ -52,7 +52,7 @@ export async function notifyOperator(
     const settings = org.settings || {};
     // The words without a leading emoji, for places that show their own title.
     const plain = message.replace(/^[^\p{L}\p{N}฿$€£]+/u, "").trim();
-    const title = PUSH_TITLES[type] || "Lokalfleet";
+    const title = PUSH_TITLES[type] || "RoveHQ";
     const appUrl = String(process.env.NEXT_PUBLIC_APP_URL || "").replace(/\/$/, "");
     const link = appUrl ? `${appUrl}${url}` : "";
 
@@ -93,7 +93,7 @@ export async function notifyOperator(
               sendEmail({
                 to,
                 subject: `${title}: ${plain.slice(0, 80)}`,
-                text: `${plain}\n\n${link ? `Open in Lokalfleet: ${link}\n\n` : ""}You get this because email alerts are on for ${org.name || "your business"}. Change them in Settings › Notifications.`,
+                text: `${plain}\n\n${link ? `Open in RoveHQ: ${link}\n\n` : ""}You get this because email alerts are on for ${org.name || "your business"}. Change them in Settings › Notifications.`,
                 metadata: { kind: "operator_alert", type }
               })
             )

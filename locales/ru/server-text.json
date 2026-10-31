@@ -87,7 +87,7 @@
   "Switch to the business you want to work in and try again.": "Переключитесь на бизнес, в котором хотите работать, и попробуйте ещё раз.",
   "Telegram didn't accept that bot token. {}": "Telegram не принял этот токен бота. {}",
   "That address is already used by another business.": "Этот адрес уже используется другим бизнесом.",
-  "That address is kept for Lokalfleet. Try another.": "Этот адрес зарезервирован для Lokalfleet. Попробуйте другой.",
+  "That address is kept for RoveHQ. Try another.": "Этот адрес зарезервирован для RoveHQ. Попробуйте другой.",
   "That connection no longer exists.": "Это подключение больше не существует.",
   "That conversation no longer exists.": "Это обращение больше не существует.",
   "That customer has signed for their vehicle, so they need to sign the change. Open their booking and use More > Change vehicle.": "Этот клиент подписал документы на свой транспорт, поэтому ему нужно подписать изменение. Откройте его бронирование и выберите Ещё > Сменить транспорт.",

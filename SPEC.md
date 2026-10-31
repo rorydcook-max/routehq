@@ -1,11 +1,11 @@
-# Lokalfleet — Product Specification v1.0
+# RoveHQ — Product Specification v1.0
 *Compiled: May 2026*
 
 ---
 
 ## 1. Product Overview
 
-**Lokalfleet** is a vehicle rental fleet management platform designed initially for small-to-medium rental operators in Thailand and Southeast Asia, with a roadmap to scale as a commercial SaaS product. The first version is built for a single owner-operator managing a mixed fleet of cars, with Thai compliance requirements, THB as primary currency, and mobile-first usage patterns.
+**RoveHQ** is a vehicle rental fleet management platform designed initially for small-to-medium rental operators in Thailand and Southeast Asia, with a roadmap to scale as a commercial SaaS product. The first version is built for a single owner-operator managing a mixed fleet of cars, with Thai compliance requirements, THB as primary currency, and mobile-first usage patterns.
 
 **Primary users:** Fleet owner/operator (Rory) and partner — both working primarily from mobile with occasional laptop use.
 
@@ -19,7 +19,7 @@
 
 - **Mobile-first.** Every feature must work cleanly on a phone. No feature requires a laptop.
 - **Speed of capture.** Adding a transaction, logging a delivery, or recording a repair should take under 30 seconds on mobile.
-- **Replace the spreadsheet.** Every piece of data currently tracked manually (compliance dates, transactions, rental payments, mileage) must have a home in Lokalfleet. Nothing should require a separate spreadsheet.
+- **Replace the spreadsheet.** Every piece of data currently tracked manually (compliance dates, transactions, rental payments, mileage) must have a home in RoveHQ. Nothing should require a separate spreadsheet.
 - **Eliminate memory-to-data lag.** The biggest current pain point is data entered from memory hours or days after the fact. The app must make real-time capture frictionless.
 - **Alert before the problem.** Compliance expiries, payment dues, and service intervals surface as escalating alerts — not discovered by chance.
 
@@ -467,11 +467,11 @@ New events can be added directly from the calendar: type, vehicle, date/time, no
 
 ### 13.1 Recommended Hardware
 
-**Teltonika FMP100** — plug-and-play (cigarette lighter socket, no wiring required), suitable for car rental. Supported by Teltonika's own connectivity SIM with auto top-up, managed via their IoT platform. API integration with Lokalfleet is available.
+**Teltonika FMP100** — plug-and-play (cigarette lighter socket, no wiring required), suitable for car rental. Supported by Teltonika's own connectivity SIM with auto top-up, managed via their IoT platform. API integration with RoveHQ is available.
 
 Alternative: any Teltonika FMB/FMC series device for wired installation.
 
-### 13.2 GPS Features in Lokalfleet
+### 13.2 GPS Features in RoveHQ
 
 - Live location map of all fleet vehicles (dashboard widget and full-screen map view)
 - Last seen timestamp and location for each vehicle
@@ -634,7 +634,7 @@ All integrations are provider-agnostic — switching providers requires no code 
 
 **Bank transfer (Thai)** — direct transfer to Thai bank account. Confirmed manually when owner sees it in their bank app. Slip photo can be uploaded to the rental record.
 
-**Wise** — used for international customers without a Thai bank account. Transfers arrive in the owner's Wise account. Logged manually in Lokalfleet with amount and date.
+**Wise** — used for international customers without a Thai bank account. Transfers arrive in the owner's Wise account. Logged manually in RoveHQ with amount and date.
 
 **Revolut** — same as Wise. Used for European customers primarily. Logged manually.
 
@@ -746,7 +746,7 @@ The following is already in the codebase and does NOT need to be rebuilt:
 
 ### 23.1 Concept
 
-Lokalfleet supports rental businesses operating across multiple locations or branches. A single-location operator (like the initial use case on Koh Samui) simply ignores branch features entirely — they add no friction. A growing operator can define branches and assign vehicles and staff accordingly.
+RoveHQ supports rental businesses operating across multiple locations or branches. A single-location operator (like the initial use case on Koh Samui) simply ignores branch features entirely — they add no friction. A growing operator can define branches and assign vehicles and staff accordingly.
 
 ### 23.2 Data Model
 
@@ -785,7 +785,7 @@ Lokalfleet supports rental businesses operating across multiple locations or bra
 
 ### 24.1 Concept
 
-A peer-to-peer availability sharing network between Lokalfleet operators. When an operator has a customer ready to rent but no available vehicles, the Partner Network surfaces opted-in vehicles from nearby operators. The booking is facilitated through Lokalfleet, the end customer deals only with the original operator, and revenue/commission is split between the two businesses.
+A peer-to-peer availability sharing network between RoveHQ operators. When an operator has a customer ready to rent but no available vehicles, the Partner Network surfaces opted-in vehicles from nearby operators. The booking is facilitated through RoveHQ, the end customer deals only with the original operator, and revenue/commission is split between the two businesses.
 
 This formalises and automates the informal WhatsApp/LINE networks that already exist between rental operators in Thai tourist areas.
 
@@ -799,14 +799,14 @@ This formalises and automates the informal WhatsApp/LINE networks that already e
 5. Partner confirms or declines
 6. If confirmed: booking proceeds normally from the customer's perspective
 7. Customer contract is with the booking operator
-8. Commission/revenue split is recorded in Lokalfleet for both parties
+8. Commission/revenue split is recorded in RoveHQ for both parties
 
 **For the operator lending the vehicle (the supply operator):**
 1. Opts each vehicle into the Partner Network per vehicle (toggle in vehicle settings)
 2. Sets per-vehicle partner terms: partner rental rate (may differ from public rate), deposit requirement, commission percentage, blackout dates
 3. Receives booking requests via in-app notification and WhatsApp/LINE
 4. Confirms or declines each request
-5. Handles vehicle handover as normal using Lokalfleet delivery/return forms
+5. Handles vehicle handover as normal using RoveHQ delivery/return forms
 6. Revenue recorded against their account minus the agreed commission
 
 ### 24.3 Data Shared vs Private
@@ -825,8 +825,8 @@ This formalises and automates the informal WhatsApp/LINE networks that already e
 
 ### 24.4 Trust & Vetting
 
-- Operators join the Partner Network by opt-in within their Lokalfleet account
-- v1: open network — any Lokalfleet account can participate
+- Operators join the Partner Network by opt-in within their RoveHQ account
+- v1: open network — any RoveHQ account can participate
 - Future: verified badge system, rating/review between operators, approval-based network tiers
 - Each operator independently controls which of their vehicles are visible to the network
 - A vehicle can be removed from the network at any time
@@ -835,8 +835,8 @@ This formalises and automates the informal WhatsApp/LINE networks that already e
 
 - Each operator is responsible for their own vehicles and their own customer relationships
 - The Partner Network facilitates introductions and bookings only
-- A standard inter-operator agreement template is provided by Lokalfleet (accepted on network join)
-- Dispute resolution between operators is handled outside Lokalfleet in v1
+- A standard inter-operator agreement template is provided by RoveHQ (accepted on network join)
+- Dispute resolution between operators is handled outside RoveHQ in v1
 
 ### 24.6 Build Phase
 
@@ -874,7 +874,7 @@ The compliance dates just entered are shown as a live alert preview: "Your [vehi
 If no dates are urgent, show the next upcoming one. If all are far away, show a green "All compliance up to date" screen — still satisfying.
 
 **Step 4 — Connect LINE notifications**
-"Get daily summaries and alerts on LINE." Show a QR code to add the Lokalfleet LINE Official Account. Explain in one sentence what they'll receive. Mark as optional but show the value: "Most operators find this the most useful feature."
+"Get daily summaries and alerts on LINE." Show a QR code to add the RoveHQ LINE Official Account. Explain in one sentence what they'll receive. Mark as optional but show the value: "Most operators find this the most useful feature."
 
 On completion: confetti animation, "You're all set" screen showing a summary of what was created, and a redirect to the dashboard — which now shows real data, real alerts, real value.
 
@@ -897,7 +897,7 @@ Progress percentage shown. Completing all items unlocks a "Setup Complete" badge
 
 Available on Growth tier and above. Promoted during trial and on the pricing page.
 
-A Lokalfleet team member (Thai-speaking support agent) contacts the operator within 24 hours of signup via LINE. They offer to:
+A RoveHQ team member (Thai-speaking support agent) contacts the operator within 24 hours of signup via LINE. They offer to:
 - Enter all vehicles on the operator's behalf (from photos of blue books sent via LINE)
 - Set up compliance dates from photographed documents
 - Import any spreadsheet data they have
@@ -905,9 +905,9 @@ A Lokalfleet team member (Thai-speaking support agent) contacts the operator wit
 
 This is a manual process tracked via an internal admin tool. Target: operator has all vehicles entered and compliance dates set within 48 hours of requesting concierge setup, without touching the app themselves.
 
-This service removes the single biggest adoption barrier — the effort of initial data entry — and creates an immediate human relationship with the Lokalfleet brand.
+This service removes the single biggest adoption barrier — the effort of initial data entry — and creates an immediate human relationship with the RoveHQ brand.
 
-Internal admin tool needed: a support agent view where a Lokalfleet team member can enter data on behalf of an organisation without being an org member. Flagged as "support session" in the activity log.
+Internal admin tool needed: a support agent view where a RoveHQ team member can enter data on behalf of an organisation without being an org member. Flagged as "support session" in the activity log.
 
 ### 25.4 Blue Book OCR as Primary Onboarding
 
@@ -957,7 +957,7 @@ All notifications are opt-in per category in Settings → Notifications. Default
 
 ### 26.3 Automatic Customer Payment Reminders
 
-Lokalfleet sends payment reminders to renters on behalf of the operator. Operator never has to manually chase rent.
+RoveHQ sends payment reminders to renters on behalf of the operator. Operator never has to manually chase rent.
 
 **Reminder schedule (configurable per rental):**
 - 5 days before payment due: "Friendly reminder" message with payment QR code
@@ -969,7 +969,7 @@ Lokalfleet sends payment reminders to renters on behalf of the operator. Operato
 - Rental details (vehicle, period, amount due)
 - PromptPay QR code (generated from operator's PromptPay ID stored in settings)
 - Operator's LINE/WhatsApp contact for questions
-- Branded with Lokalfleet + operator's business name
+- Branded with RoveHQ + operator's business name
 
 **Operator controls:**
 - Enable/disable automatic reminders per rental
@@ -991,11 +991,11 @@ Generated automatically every January for each active organisation. Delivered vi
 - Total km tracked across fleet
 - Year-on-year comparison (if second year or beyond)
 - Compliance renewals completed
-- A personalised message from Lokalfleet
+- A personalised message from RoveHQ
 
-**Format:** Beautifully designed PDF — not a spreadsheet export, a proper visual report. The kind of document an operator would photograph and share. Branded with Lokalfleet.
+**Format:** Beautifully designed PDF — not a spreadsheet export, a proper visual report. The kind of document an operator would photograph and share. Branded with RoveHQ.
 
-**Purpose:** Demonstrates value, gets shared organically, reinforces the switching cost of leaving (this report only exists because of the data in Lokalfleet).
+**Purpose:** Demonstrates value, gets shared organically, reinforces the switching cost of leaving (this report only exists because of the data in RoveHQ).
 
 ---
 
@@ -1007,7 +1007,7 @@ The 30-day trial is full access, no feature limits, no credit card required.
 
 Day 1: Welcome LINE message with setup wizard link and offer of concierge onboarding.
 Day 3: If fewer than 2 vehicles entered — "Need help getting set up?" LINE message with concierge offer.
-Day 7: "Here's what Lokalfleet tracked for you this week" — a mini summary of activity so far.
+Day 7: "Here's what RoveHQ tracked for you this week" — a mini summary of activity so far.
 Day 14: Mid-trial check-in — "You're halfway through your trial. Here's what you've saved time on." Show the number of alerts fired, transactions recorded, km tracked.
 Day 25: "Your trial ends in 5 days" — pricing summary, annual billing discount highlighted, one-tap to subscribe.
 Day 28: Final reminder with a direct link to subscribe. Offer a 7-day extension if they contact support.
@@ -1069,11 +1069,11 @@ This is a genuinely useful feature that operators cannot get anywhere else. It c
 
 Permanently visible on the dashboard (cannot be dismissed or hidden). Shows:
 
-- "Lokalfleet costs you ฿[price]/day"
+- "RoveHQ costs you ฿[price]/day"
 - "Your fleet generated ฿[daily average] per day this month"
-- "Lokalfleet costs [X]% of your monthly revenue"
+- "RoveHQ costs [X]% of your monthly revenue"
 
-For an operator paying ฿990/month with a fleet generating ฿40,000/month: "Lokalfleet costs 2.5% of your monthly revenue." Framed this way, the subscription is obviously worth it.
+For an operator paying ฿990/month with a fleet generating ฿40,000/month: "RoveHQ costs 2.5% of your monthly revenue." Framed this way, the subscription is obviously worth it.
 
 ### 28.2 Per-Vehicle Profitability Clarity
 
@@ -1089,7 +1089,7 @@ This is only valuable and only ethical with genuine data. Don't build until ther
 
 ### 28.4 Public Rental Calculator (Marketing Website)
 
-A simplified version of the rental calculator embedded on the Lokalfleet marketing website — no account required.
+A simplified version of the rental calculator embedded on the RoveHQ marketing website — no account required.
 
 Inputs: vehicle make/model (rough), purchase price, estimated monthly rental rate.
 Output: monthly profit estimate, payback period, 3-year ROI.
@@ -1106,18 +1106,18 @@ When a referred operator signs up and completes their trial, both parties get on
 
 Referral tracking is simple: referral code in the signup URL, stored against the new account, credit applied automatically when trial converts to paid.
 
-A leaderboard of top referrers (opt-in) in the Lokalfleet operator community group. Social recognition within the community drives referrals more effectively than financial incentives alone in the Thai market.
+A leaderboard of top referrers (opt-in) in the RoveHQ operator community group. Social recognition within the community drives referrals more effectively than financial incentives alone in the Thai market.
 
 ---
 
 ## 29. Community & Network Effects
 
-### 29.1 Lokalfleet Operator Community
+### 29.1 RoveHQ Operator Community
 
-A LINE group (primary) and Facebook group (secondary) for Lokalfleet operators. Managed by the Lokalfleet Thai-speaking team member.
+A LINE group (primary) and Facebook group (secondary) for RoveHQ operators. Managed by the RoveHQ Thai-speaking team member.
 
 Content:
-- Tips and best practices for using Lokalfleet
+- Tips and best practices for using RoveHQ
 - Thai rental market news and discussion
 - Seasonal advice (high season prep, low season cost reduction)
 - Feature announcements and previews
@@ -1125,7 +1125,7 @@ Content:
 
 Rules: no competitor promotion, no spam, Thai and English welcome.
 
-This community creates social switching cost — leaving Lokalfleet means leaving the network of operators you've built relationships with.
+This community creates social switching cost — leaving RoveHQ means leaving the network of operators you've built relationships with.
 
 ### 29.2 In-App Feature Announcements
 
@@ -1173,9 +1173,9 @@ These features should be built in this priority order, as they directly impact t
 
 ### 31.1 Overview
 
-When a rental booking is marked as complete (return inspection submitted), Lokalfleet automatically sends a review request to the customer via WhatsApp or LINE after a configurable delay. The request contains direct links to the operator's Google and Facebook review pages.
+When a rental booking is marked as complete (return inspection submitted), RoveHQ automatically sends a review request to the customer via WhatsApp or LINE after a configurable delay. The request contains direct links to the operator's Google and Facebook review pages.
 
-Note: Google and Facebook do not allow programmatic review publishing or iframe embeds. The flow is message → customer taps link → opens Google/Facebook in their browser → leaves review there. Lokalfleet tracks whether the link was sent and clicked but cannot confirm a review was actually posted.
+Note: Google and Facebook do not allow programmatic review publishing or iframe embeds. The flow is message → customer taps link → opens Google/Facebook in their browser → leaves review there. RoveHQ tracks whether the link was sent and clicked but cannot confirm a review was actually posted.
 
 ### 31.2 Trigger
 
@@ -1214,7 +1214,7 @@ Thank you!
 [Business Name]
 ```
 
-Links are tracked via a redirect through Lokalfleet (`/r/review/{token}`) so click-through can be recorded in the booking timeline.
+Links are tracked via a redirect through RoveHQ (`/r/review/{token}`) so click-through can be recorded in the booking timeline.
 
 Operator can customise the message template in Settings → Messages → Review Request Template.
 
@@ -1298,7 +1298,7 @@ Phase 3 feature — build after LINE messaging integration is complete, as it sh
 
 ### 32.1 Overview
 
-Payment handling in the Thai and SEA rental market is fundamentally different from Western markets. Most transactions are cash or manual bank transfer. Credit cards are rare. Thai payment methods (PromptPay, QR) are unavailable to foreign customers. Lokalfleet must accommodate all of these gracefully without requiring payment processing integrations to function.
+Payment handling in the Thai and SEA rental market is fundamentally different from Western markets. Most transactions are cash or manual bank transfer. Credit cards are rare. Thai payment methods (PromptPay, QR) are unavailable to foreign customers. RoveHQ must accommodate all of these gracefully without requiring payment processing integrations to function.
 
 ### 32.2 Accepted Payment Methods (Operator Settings)
 
@@ -1376,7 +1376,7 @@ During the **delivery inspection form** (app/inspections/delivery/[rentalId]/pag
 
 **Receipt generation:**
 Auto-generate a simple PDF receipt containing:
-- Lokalfleet + operator business name and logo
+- RoveHQ + operator business name and logo
 - Receipt number (auto-generated: REC-YYYY-XXXX format)
 - Date and time
 - Customer name
@@ -1628,7 +1628,7 @@ Phase 2 completion feature — build alongside booking link improvements. The se
 
 ### 34.1 The Thai Vehicle Rental Market
 
-The formal Thai car rental market is well documented — approximately 239,000 vehicles available for short-term rental as of 2017, growing significantly since. The formal segment is dominated by Thai Rent A Car, Sixt, Hertz, Avis, and Enterprise. These operators already have enterprise software and are not Lokalfleet's target.
+The formal Thai car rental market is well documented — approximately 239,000 vehicles available for short-term rental as of 2017, growing significantly since. The formal segment is dominated by Thai Rent A Car, Sixt, Hertz, Avis, and Enterprise. These operators already have enterprise software and are not RoveHQ's target.
 
 The informal and semi-formal segment is the opportunity. This segment is invisible to official data sources — DBD registration, TAT licensing, insurance records, and finance company data all systematically exclude operators who:
 - Operate without formal business registration
@@ -1638,7 +1638,7 @@ The informal and semi-formal segment is the opportunity. This segment is invisib
 
 The true number of informal operators is therefore higher than any formal estimate suggests. A reasonable estimate for Thailand is **25,000–50,000+ informal and semi-formal rental operators nationally**, covering both cars and motorcycles. Motorcycle rental operators are the larger segment by volume (every tourist beach town has dozens), car rental operators are fewer but higher value per customer.
 
-### 34.2 Lokalfleet's Addressable Market
+### 34.2 RoveHQ's Addressable Market
 
 Not all informal operators are ready for software. The realistic addressable market is operators who are "feeling the friction" — large enough to be losing track of things but not large enough to have hired staff to manage it. This segment has specific characteristics:
 
@@ -1688,7 +1688,7 @@ Existing rental management software (Loopit, CarCEO, HQ Rental Software, Rent Ce
 - Minimum viable fleet sizes of 20–50+ vehicles
 - Pricing of $100–500/month USD
 
-None of these products are accessible, affordable, or culturally relevant to a Thai operator managing 5 cars from their phone in Thai. Lokalfleet's positioning — built for SEA, mobile-first, Thai language, PromptPay/QR payment, LINE integration, priced at ฿590–4,990/month — is differentiated by design, not just by price.
+None of these products are accessible, affordable, or culturally relevant to a Thai operator managing 5 cars from their phone in Thai. RoveHQ's positioning — built for SEA, mobile-first, Thai language, PromptPay/QR payment, LINE integration, priced at ฿590–4,990/month — is differentiated by design, not just by price.
 
 ### 34.6 Primary Customer Persona
 
@@ -1730,7 +1730,7 @@ Based on market sizing and accessibility:
 
 ### 35.1 Overview
 
-Lokalfleet solves the communication context problem without requiring unified inbox API access. Rather than pulling messages into Lokalfleet, the platform pushes booking context to wherever the conversation is happening, and provides structured in-portal communication options that reduce unstructured messaging volume over time.
+RoveHQ solves the communication context problem without requiring unified inbox API access. Rather than pulling messages into RoveHQ, the platform pushes booking context to wherever the conversation is happening, and provides structured in-portal communication options that reduce unstructured messaging volume over time.
 
 ### 35.2 Customer Contact Channels
 
@@ -2139,7 +2139,7 @@ Build in this order:
 
 ### 36.1 The Problem
 
-Entering historical and ongoing financial data is the biggest adoption barrier for Lokalfleet. An operator with 6 cars and 1 year of history faces hundreds of individual transaction entries before the platform shows meaningful financial intelligence. For operators with more vehicles or longer history, this becomes the primary reason not to adopt.
+Entering historical and ongoing financial data is the biggest adoption barrier for RoveHQ. An operator with 6 cars and 1 year of history faces hundreds of individual transaction entries before the platform shows meaningful financial intelligence. For operators with more vehicles or longer history, this becomes the primary reason not to adopt.
 
 The platform's value proposition — financial visibility, profitability per vehicle, ROI tracking — is dramatically diminished if operators don't have real data. Getting data in quickly and accurately is therefore a product-critical problem, not just a UX nicety.
 
@@ -2169,7 +2169,7 @@ Much faster than the current single-transaction form for entering historical dat
 
 **Approach 3 — AI-assisted import from bank statement**
 
-Operator uploads a bank statement PDF or CSV export. Lokalfleet uses AI (OpenAI) to parse the statement, identify likely rental income vs expenses, suggest transaction types and vehicle associations, and present for review before importing.
+Operator uploads a bank statement PDF or CSV export. RoveHQ uses AI (OpenAI) to parse the statement, identify likely rental income vs expenses, suggest transaction types and vehicle associations, and present for review before importing.
 
 This is particularly useful for operators whose accountant exports bank data. The AI doesn't need to be perfect — it just needs to reduce the categorisation work from 100% manual to 20% correction.
 
@@ -2219,7 +2219,7 @@ When a recurring transaction's due date arrives:
 
 If auto-add is enabled: transaction is created automatically on the due date with status 'recorded' and a note "Auto-added from recurring transaction". Operator sees it in the transactions list and can void it if it wasn't actually paid.
 
-This handles the core problem: Lokalfleet can't confirm payment was made, so the operator is prompted to confirm rather than having the system assume.
+This handles the core problem: RoveHQ can't confirm payment was made, so the operator is prompted to confirm rather than having the system assume.
 
 **Recurring transaction list**
 

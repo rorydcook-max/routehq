@@ -1,6 +1,6 @@
 ---
 fileName: "Vehicle-handover-and-return-checklist"
-footer: "Vehicle handover and return checklist · lokalfleet.com"
+footer: "Vehicle handover and return checklist · rovehq.io"
 page: "Page"
 of: "of"
 tall: ["Renter signature", "Staff signature", "Notes"]

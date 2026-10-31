@@ -46,7 +46,7 @@ export async function listBusinessThreads(supabase: any, organizationId: string)
   return ((data || []) as any[]).map((thread) => row(thread, "business"));
 }
 
-/** Every business's conversations, for the Lokalfleet team. */
+/** Every business's conversations, for the RoveHQ team. */
 export async function listTeamThreads(filter: "waiting" | "all"): Promise<SupportThreadRow[]> {
   const admin = createSupabaseAdminClient() as any;
   let query = admin

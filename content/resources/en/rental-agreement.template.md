@@ -2,7 +2,7 @@
 # The preview text of the free rental agreement (generated from content/contracts/xx.yaml; the downloads
 # themselves are built per country by lib/contract-builder). Regenerate rather than edit by hand.
 fileName: "Vehicle rental agreement"
-footer: "Vehicle rental agreement template from Lokalfleet · lokalfleet.com"
+footer: "Vehicle rental agreement template from RoveHQ · rovehq.io"
 page: "Page"
 of: "of"
 tall: ["Signature", "Owner's signature", "Renter's signature"]

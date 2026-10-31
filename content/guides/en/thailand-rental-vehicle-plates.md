@@ -112,7 +112,7 @@ The difference for you: a rental car is driven by the renter, a ride-hailing car
 
 Whatever your plates, if you rent cars or motorbikes to consumers, the [Contract Committee notice of 22 September 2025](https://www.ocpb.go.th/news_view_en.php?nid=17127) makes vehicle rental a contract-controlled business from 30 December 2025. You must use a Thai-language contract that contains the terms of the official car form (แบบ ก) or motorbike form (แบบ ข), give the renter a signed copy straight away, and avoid banned clauses such as keeping the deposit when the renter has not breached the contract. The forms also require you to keep annual tax paid and insurance in force for the whole rental, and to supply a replacement vehicle if the rented one is off the road for more than a day because of an accident or maintenance. Thai media have reported that non-compliant contracts can lead to [up to a year in prison](https://www.thaipost.net/general-news/1062325/).
 
-Our [free bilingual rental agreement](/resources/rental-agreement) is built around these forms and filled in with your details. Lokalfleet then sends it for e-signature and stores the signed copy against the booking, so you can always show which version the renter signed. Pair it with the [handover checklist](/resources/handover-checklist), because the forms expect a recorded condition report at pick-up and return.
+Our [free bilingual rental agreement](/resources/rental-agreement) is built around these forms and filled in with your details. RoveHQ then sends it for e-signature and stores the signed copy against the booking, so you can always show which version the renter signed. Pair it with the [handover checklist](/resources/handover-checklist), because the forms expect a recorded condition report at pick-up and return.
 
 ## Before you buy your next vehicle
 
@@ -123,4 +123,4 @@ Our [free bilingual rental agreement](/resources/rental-agreement) is built arou
 
 If you're planning longer rentals, read [how to run a monthly car and scooter rental business](/guides/monthly-car-rental-business) next.
 
-Get your paperwork right before the fleet grows. Download the [free bilingual rental agreement](/resources/rental-agreement), or [create a free Lokalfleet account](/signup) to send agreements for e-signature and keep each vehicle's tax, insurance and inspection dates in one place.
+Get your paperwork right before the fleet grows. Download the [free bilingual rental agreement](/resources/rental-agreement), or [create a free RoveHQ account](/signup) to send agreements for e-signature and keep each vehicle's tax, insurance and inspection dates in one place.

@@ -1,4 +1,4 @@
-/* Lokalfleet's public website (home, pricing).
+/* RoveHQ's public website (home, pricing).
    Ink and white with one teal, Geist for everything and an italic serif for the one phrase a headline leans on.
    Every surface is a 1px line or a product frame; nothing else decorates. */
 .site {
@@ -139,7 +139,7 @@
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
     gap: 24px;
   }
-  /* Why Lokalfleet: the headline needs the wider column, and its body still has to stay at two lines. */
+  /* Why RoveHQ: the headline needs the wider column, and its body still has to stay at two lines. */
   .twoColWhy {
     grid-template-columns: minmax(0, 580px) minmax(0, 1fr);
   }
@@ -159,7 +159,7 @@
   letter-spacing: -0.03em;
   text-wrap: balance;
 }
-/* Why Lokalfleet sits beside its body, so it is set a touch smaller to keep "Built by a rental business," on one line. */
+/* Why RoveHQ sits beside its body, so it is set a touch smaller to keep "Built by a rental business," on one line. */
 .h2Why {
   font-size: clamp(34px, 3.6vw, 50px);
 }

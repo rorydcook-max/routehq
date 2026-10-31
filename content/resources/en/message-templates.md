@@ -40,6 +40,6 @@ Pair the reminders with a clear return time in your [rental agreement](/resource
 
 ## Let the reminders send themselves
 
-Copying templates works, but somebody still has to remember to send the return reminder at 8am. Lokalfleet sends payment, pickup and return reminders automatically over LINE, WhatsApp or Telegram, in the renter's language, using the details already in the booking.
+Copying templates works, but somebody still has to remember to send the return reminder at 8am. RoveHQ sends payment, pickup and return reminders automatically over LINE, WhatsApp or Telegram, in the renter's language, using the details already in the booking.
 
-Download the templates and set up your quick replies today. When you're ready to automate the reminders, [start free with Lokalfleet](/signup).
+Download the templates and set up your quick replies today. When you're ready to automate the reminders, [start free with RoveHQ](/signup).

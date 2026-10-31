@@ -347,7 +347,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
     .maybeSingle();
   const vehicle = rental.vehicles;
   const customer = rental.customers;
-  // What other Lokalfleet businesses reported about this customer (shared customer history).
+  // What other RoveHQ businesses reported about this customer (shared customer history).
   const historySignals = await sharedHistory(supabaseForVehicles, organization.id, customer).catch(() => []);
   // Giving money away (refunds, free early days, unpaid rent taken off) is the owner's or a manager's call.
   const isOwner = canDecideMoney((await getCurrentMembership())?.role);
@@ -1046,7 +1046,7 @@ export default async function BookingDetailPage({ params, searchParams }: { para
                       deposit_held: Number(rental.deposit_held || 0)
                     }}
                     bookingPortalUrl={bookingPortalUrl}
-                    businessName={organization.name || "Lokalfleet"}
+                    businessName={organization.name || "RoveHQ"}
                     customer={{
                       id: customer.id,
                       name: customer.full_name,

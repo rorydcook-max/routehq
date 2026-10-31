@@ -1,5 +1,5 @@
 /**
- * Lokalfleet's plans (Rory, 11 Oct 2026; four plans from 26 Oct). Charged by fleet size,
+ * RoveHQ's plans (Rory, 11 Oct 2026; four plans from 26 Oct). Charged by fleet size,
  * with cars and motorbikes counted separately (a motorbike is not "half a car"):
  * a shop with 40 scooters and no cars still fits a small plan. Everything that
  * runs a rental is in every plan, owner tools included. Limits are nudges, never
@@ -36,11 +36,11 @@ export type Plan = {
   comparisonLookups: number;
   accountingExport: boolean;
   severalLocations: boolean;
-  /** Logo in the app itself, "Powered by Lokalfleet" removable, booking address theirshop.lokalfleet.com. */
+  /** Logo in the app itself, "Powered by RoveHQ" removable, booking address theirshop.rovehq.app. */
   whiteLabel: boolean;
   /** Booking page on the business's own domain (book.theirshop.com). */
   customDomain: boolean;
-  /** Import and setup done by Lokalfleet, on the yearly plan. */
+  /** Import and setup done by RoveHQ, on the yearly plan. */
   setupService: boolean;
   prioritySupport: boolean;
 };
@@ -70,7 +70,7 @@ export function planById(id: string | null | undefined): Plan {
 }
 
 /**
- * A custom plan set by a Lokalfleet admin (organizations.custom_limits). Every field is optional: a field left out
+ * A custom plan set by a RoveHQ admin (organizations.custom_limits). Every field is optional: a field left out
  * keeps the plan's own value. For cars, motorbikes and team, null means "no limit".
  */
 export type CustomLimits = {

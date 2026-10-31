@@ -37,7 +37,7 @@ export async function contractFile(leadId: string, format: ContractFormat, words
   if (!found) return null;
   const doc = buildContract(found.country, found.lead.contract || {});
   if (!doc) return null;
-  const name = `lokalfleet-rental-agreement-${doc.country.toLowerCase()}`;
+  const name = `rovehq-rental-agreement-${doc.country.toLowerCase()}`;
   if (format === "contract-docx") {
     const body = await renderContractDocx(doc, found.logo ? { data: found.logo.data, type: found.logo.type, width: found.logo.width, height: found.logo.height } : null);
     return { body, type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", fileName: `${name}.docx` };

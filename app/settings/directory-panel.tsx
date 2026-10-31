@@ -8,7 +8,7 @@ import { SwitchField } from "@/components/switch-field";
 type Say = (key: string, values?: Record<string, string | number>) => string;
 
 /**
- * Listing on the Lokalfleet booking site (lokalfleet.com/rent): on by default, in every plan.
+ * Listing on the RoveHQ booking site (rovehq.app/rent): on by default, in every plan.
  * Needs the online booking page on.
  */
 export function DirectoryPanel({ enabled, allowed, bookingPageOn }: { enabled: boolean; allowed: boolean; bookingPageOn: boolean }) {

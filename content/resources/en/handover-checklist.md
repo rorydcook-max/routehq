@@ -38,6 +38,6 @@ For the full routine, including what to say at handover and how to handle a rent
 
 ## Paper or phone
 
-Paper works and costs nothing. The weak points are lost sheets and photos scattered across a staff member's phone. Lokalfleet records the same checklist on your phone, attaches the timestamped photos to the booking, and lets the renter sign on screen, so the return check can be compared with the handover side by side.
+Paper works and costs nothing. The weak points are lost sheets and photos scattered across a staff member's phone. RoveHQ records the same checklist on your phone, attaches the timestamped photos to the booking, and lets the renter sign on screen, so the return check can be compared with the handover side by side.
 
-Download the checklist, print it, and use it on your next rental. When you want it digital, you can [start free with Lokalfleet](/signup).
+Download the checklist, print it, and use it on your next rental. When you want it digital, you can [start free with RoveHQ](/signup).

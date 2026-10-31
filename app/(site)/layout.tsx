@@ -17,7 +17,8 @@ const serif = Instrument_Serif({ subsets: ["latin"], weight: "400", style: "ital
 export default async function SiteLayout({ children }: { children: ReactNode }) {
   const t = await getTranslations("site");
   return (
-    <div className={`${s.site} ${geist.variable} ${serif.variable}`}>
+    // light-island: the website has its own fixed look, so the app's dark mode (theme-dark.css) leaves it as drawn.
+    <div className={`light-island ${s.site} ${geist.variable} ${serif.variable}`}>
       <a className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-3 focus:z-50 focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:font-semibold focus:text-[#06162b]" href="#main">
         {t("skipToContent")}
       </a>

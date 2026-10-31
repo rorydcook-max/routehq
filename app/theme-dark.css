@@ -169,3 +169,29 @@
 :root[data-theme="dark"] .hover\:bg-white:hover { background-color: var(--panel-secondary) !important; }
 :root[data-theme="dark"] .hover\:bg-white\/90:hover { background-color: var(--panel-secondary) !important; }
 }
+
+/* Light islands (Rory, 31 Oct 2026): the public website and its pictures of the app have their own fixed look, so
+   nothing above repaints them. Each rule mirrors one above with one more class, so it wins. They sit in the same
+   "theme" layer: an !important outside a layer loses to one inside it. */
+@layer theme {
+:root[data-theme="dark"] .light-island { color-scheme: light; }
+:root[data-theme="dark"] .light-island :is(.bg-white, .\!bg-white, .bg-\[\#fff\], .bg-\[\#ffffff\]) { background-color: #fff !important; }
+:root[data-theme="dark"] .light-island :is(.bg-white\/95) { background-color: rgb(255 255 255 / 0.95) !important; }
+:root[data-theme="dark"] .light-island :is(.bg-white\/90) { background-color: rgb(255 255 255 / 0.9) !important; }
+:root[data-theme="dark"] .light-island :is(.bg-white\/85) { background-color: rgb(255 255 255 / 0.85) !important; }
+:root[data-theme="dark"] .light-island :is(.bg-white\/80) { background-color: rgb(255 255 255 / 0.8) !important; }
+:root[data-theme="dark"] .light-island :is(.bg-white\/70) { background-color: rgb(255 255 255 / 0.7) !important; }
+:root[data-theme="dark"] .light-island :is(.bg-white\/60) { background-color: rgb(255 255 255 / 0.6) !important; }
+:root[data-theme="dark"] .light-island :is(.bg-white\/50) { background-color: rgb(255 255 255 / 0.5) !important; }
+:root[data-theme="dark"] .light-island .text-black { color: #000 !important; }
+:root[data-theme="dark"] .light-island .text-\[\#13262b\] { color: #13262b !important; }
+:root[data-theme="dark"] .light-island .border-white { border-color: #fff !important; }
+:root[data-theme="dark"] .light-island .\[\&\>div\]\:\!bg-white > div { background-color: #fff !important; }
+:root[data-theme="dark"] .light-island .hover\:bg-white:hover { background-color: #fff !important; }
+:root[data-theme="dark"] .light-island .hover\:bg-white\/90:hover { background-color: rgb(255 255 255 / 0.9) !important; }
+:root[data-theme="dark"] .light-island :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]), select, textarea) {
+  background-color: #fff !important;
+  color: #06162b !important;
+  border-color: #d4dde6 !important;
+}
+}

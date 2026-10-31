@@ -1,6 +1,7 @@
 import { said } from "@/lib/i18n/server-text";
 import { NextResponse } from "next/server";
 import { readFileAsJson, visionProvider } from "@/lib/ai-vision";
+import { regDocForReader } from "@/lib/registration-document";
 
 const extractionSchema = {
   type: "object",
@@ -70,6 +71,8 @@ export async function POST(request: Request) {
 
   const formData = await request.formData();
   const file = formData.get("file");
+  // The business's country decides which document to expect (lib/registration-document.ts).
+  const doc = regDocForReader(String(formData.get("country") || ""));
 
   if (!(file instanceof File) || file.size === 0) {
     return NextResponse.json({ error: await said("Upload a logbook image or PDF first.") }, { status: 400 });
@@ -84,8 +87,8 @@ export async function POST(request: Request) {
     try {
       const extracted = await readFileAsJson({
         system:
-          "Extract vehicle registration/logbook fields from Thai blue books, car titles, registration books, and vehicle logbooks. If a field is unreadable, return null. Dates must be ISO YYYY-MM-DD when possible. Preserve Thai registration text if shown.",
-        prompt: `Read this vehicle title/logbook/blue book and extract fields for a fleet management vehicle form. Return JSON with exactly these keys: ${extractionSchema.required.join(", ")}. year, engine_cc and seating_capacity are integers or null; confidence is a number from 0 to 1; everything else is a string or null.`,
+          `Extract vehicle registration fields from ${doc}, or any other vehicle title, registration book or logbook. If a field is unreadable, return null. Dates must be ISO YYYY-MM-DD when possible. Keep the registration number as written, in its own script.`,
+        prompt: `Read this vehicle registration document and extract fields for a fleet management vehicle form. Return JSON with exactly these keys: ${extractionSchema.required.join(", ")}. year, engine_cc and seating_capacity are integers or null; confidence is a number from 0 to 1; everything else is a string or null.`,
         bytes,
         mediaType: file.type,
         maxTokens: 1200
@@ -122,7 +125,7 @@ export async function POST(request: Request) {
         {
           role: "system",
           content:
-            "Extract vehicle registration/logbook fields from Thai blue books, car titles, registration books, and vehicle logbooks. Return JSON only. If a field is unreadable, return null. Dates must be ISO YYYY-MM-DD when possible. Preserve Thai registration text if shown."
+            `Extract vehicle registration fields from ${doc}, or any other vehicle title, registration book or logbook. Return JSON only. If a field is unreadable, return null. Dates must be ISO YYYY-MM-DD when possible. Keep the registration number as written, in its own script.`
         },
         {
           role: "user",
@@ -130,7 +133,7 @@ export async function POST(request: Request) {
             {
               type: "input_text",
               text:
-                "Read this vehicle title/logbook/blue book and extract fields for a fleet management vehicle form. Focus on registration number, VIN or chassis/frame number, make, model, year, color, engine size, and renewal dates."
+                "Read this vehicle registration document and extract fields for a fleet management vehicle form. Focus on registration number, VIN or chassis/frame number, make, model, year, color, engine size, and renewal dates."
             },
             filePart
           ]

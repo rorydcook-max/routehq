@@ -3420,8 +3420,8 @@
     "engine": "Laki ng makina (cc)",
     "drivetrain": "Drive (2WD, 4WD)",
     "body": "Uri ng body",
-    "bookTitle": "Kunan ng litrato ang blue book",
-    "bookBody": "Binabasa namin ang registration book at pinupunan ang kaya namin. Tingnan ang detalye bago i-save.",
+    "bookTitle": "Kunan ng litrato ang {doc}",
+    "bookBody": "Binabasa namin ang {doc} at pinupunan ang kaya namin. Tingnan ang detalye bago i-save.",
     "bookLabel": "Kumuha o pumili ng litrato",
     "bookReading": "Binabasa ang dokumento…",
     "bookDone": "Napunan ang nabasa namin. Tingnan ang bawat field bago i-save.",
@@ -3498,7 +3498,15 @@
     "loanTotalCost": "Kabuuang babayaran",
     "loanInterest": "Interes",
     "loanFlatRate": "{rate}% kada taon, flat",
-    "loanStillToPay": "Natitirang babayaran"
+    "loanStillToPay": "Natitirang babayaran",
+    "regDoc_TH": "blue book",
+    "regDoc_ID": "BPKB o STNK",
+    "regDoc_VN": "registration certificate (cà vẹt)",
+    "regDoc_MY": "VOC (geran)",
+    "regDoc_PH": "OR/CR",
+    "regDoc_LA": "registration book",
+    "regDoc_KH": "registration card",
+    "regDoc_default": "rehistro ng sasakyan"
   },
   "bookingEdit": {
     "crumbBookings": "Mga booking",

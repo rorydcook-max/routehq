@@ -3460,8 +3460,8 @@
     "engine": "Hubraum (cc)",
     "drivetrain": "Antrieb (2WD, 4WD)",
     "body": "Karosserieform",
-    "bookTitle": "Foto vom Fahrzeugbrief (Blue Book) aufnehmen",
-    "bookBody": "Wir lesen das Zulassungsbuch und füllen aus, was wir können. Prüfen Sie die Angaben vor dem Speichern.",
+    "bookTitle": "{doc} fotografieren",
+    "bookBody": "Wir lesen {doc} und füllen aus, was wir können. Prüfen Sie die Angaben vor dem Speichern.",
     "bookLabel": "Foto aufnehmen oder auswählen",
     "bookReading": "Dokument wird gelesen…",
     "bookDone": "Ausgefüllt, was wir lesen konnten. Prüfen Sie jedes Feld vor dem Speichern.",
@@ -3538,7 +3538,15 @@
     "loanTotalCost": "Gesamtkosten",
     "loanInterest": "Zinsen",
     "loanFlatRate": "{rate} % p. a., flat",
-    "loanStillToPay": "Noch zu zahlen"
+    "loanStillToPay": "Noch zu zahlen",
+    "regDoc_TH": "Fahrzeugbrief (Blue Book)",
+    "regDoc_ID": "BPKB oder STNK",
+    "regDoc_VN": "Zulassungsbescheinigung (cà vẹt)",
+    "regDoc_MY": "VOC (Geran)",
+    "regDoc_PH": "OR/CR",
+    "regDoc_LA": "Zulassungsbuch",
+    "regDoc_KH": "Zulassungskarte",
+    "regDoc_default": "Zulassungsdokument"
   },
   "bookingEdit": {
     "crumbBookings": "Buchungen",

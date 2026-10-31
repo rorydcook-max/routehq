@@ -3420,8 +3420,8 @@
     "engine": "Cilindrada (cc)",
     "drivetrain": "Tracción (2WD, 4WD)",
     "body": "Carrocería",
-    "bookTitle": "Haga una foto del libro azul",
-    "bookBody": "Leemos el libro de registro y rellenamos lo que podemos. Compruebe los datos antes de guardar.",
+    "bookTitle": "Haz una foto del {doc}",
+    "bookBody": "Leemos el {doc} y rellenamos lo que podemos. Revisa los datos antes de guardar.",
     "bookLabel": "Hacer o elegir una foto",
     "bookReading": "Leyendo el documento…",
     "bookDone": "Rellenamos lo que pudimos leer. Compruebe cada campo antes de guardar.",
@@ -3498,7 +3498,15 @@
     "loanTotalCost": "Total a pagar",
     "loanInterest": "Intereses",
     "loanFlatRate": "{rate} % anual, fijo",
-    "loanStillToPay": "Pendiente de pago"
+    "loanStillToPay": "Pendiente de pago",
+    "regDoc_TH": "libro azul (blue book)",
+    "regDoc_ID": "BPKB o STNK",
+    "regDoc_VN": "certificado de registro (cà vẹt)",
+    "regDoc_MY": "VOC (geran)",
+    "regDoc_PH": "OR/CR",
+    "regDoc_LA": "libro de registro",
+    "regDoc_KH": "carné de registro",
+    "regDoc_default": "documento de registro"
   },
   "bookingEdit": {
     "crumbBookings": "Reservas",

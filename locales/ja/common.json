@@ -3420,8 +3420,8 @@
     "engine": "排気量（cc）",
     "drivetrain": "駆動方式（2WD、4WD）",
     "body": "ボディタイプ",
-    "bookTitle": "ブルーブックを撮影",
-    "bookBody": "登録簿を読み取り、可能な項目を自動入力します。保存前に内容を確認してください。",
+    "bookTitle": "{doc}を撮影",
+    "bookBody": "{doc}を読み取り、可能な項目を自動入力します。保存前に内容を確認してください。",
     "bookLabel": "写真を撮影または選択",
     "bookReading": "書類を読み取り中…",
     "bookDone": "読み取れた項目を入力しました。保存前に各項目を確認してください。",
@@ -3498,7 +3498,15 @@
     "loanTotalCost": "支払総額",
     "loanInterest": "利息",
     "loanFlatRate": "年{rate}%（アドオン）",
-    "loanStillToPay": "残りの支払額"
+    "loanStillToPay": "残りの支払額",
+    "regDoc_TH": "ブルーブック（車両登録簿）",
+    "regDoc_ID": "BPKB または STNK",
+    "regDoc_VN": "車両登録証（cà vẹt）",
+    "regDoc_MY": "VOC（geran）",
+    "regDoc_PH": "OR/CR",
+    "regDoc_LA": "車両登録簿",
+    "regDoc_KH": "車両登録カード",
+    "regDoc_default": "車両登録書類"
   },
   "bookingEdit": {
     "crumbBookings": "予約",

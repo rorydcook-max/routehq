@@ -3460,8 +3460,8 @@
     "engine": "Kapasitas mesin (cc)",
     "drivetrain": "Penggerak (2WD, 4WD)",
     "body": "Tipe bodi",
-    "bookTitle": "Foto buku biru",
-    "bookBody": "Kami membaca buku registrasi dan mengisi apa yang bisa. Periksa detailnya sebelum menyimpan.",
+    "bookTitle": "Foto {doc}",
+    "bookBody": "Kami membaca {doc} dan mengisi apa yang bisa. Periksa detailnya sebelum menyimpan.",
     "bookLabel": "Ambil atau pilih foto",
     "bookReading": "Membaca dokumen…",
     "bookDone": "Sudah diisi sejauh yang bisa terbaca. Periksa setiap kolom sebelum menyimpan.",
@@ -3538,7 +3538,15 @@
     "loanTotalCost": "Total yang dibayar",
     "loanInterest": "Bunga",
     "loanFlatRate": "{rate}% per tahun, flat",
-    "loanStillToPay": "Sisa yang harus dibayar"
+    "loanStillToPay": "Sisa yang harus dibayar",
+    "regDoc_TH": "buku biru (buku registrasi)",
+    "regDoc_ID": "BPKB atau STNK",
+    "regDoc_VN": "sertifikat registrasi (cà vẹt)",
+    "regDoc_MY": "VOC (geran)",
+    "regDoc_PH": "OR/CR",
+    "regDoc_LA": "buku registrasi",
+    "regDoc_KH": "kartu registrasi",
+    "regDoc_default": "dokumen registrasi kendaraan"
   },
   "bookingEdit": {
     "crumbBookings": "Pemesanan",

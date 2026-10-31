@@ -3460,8 +3460,8 @@
     "engine": "נפח מנוע (סמ\"ק)",
     "drivetrain": "הנעה (2WD, 4WD)",
     "body": "סוג מרכב",
-    "bookTitle": "צלמו את רישיון הרכב (הספר הכחול)",
-    "bookBody": "אנחנו קוראים את רישיון הרכב וממלאים מה שאפשר. בדקו את הפרטים לפני השמירה.",
+    "bookTitle": "צלמו את {doc}",
+    "bookBody": "אנחנו קוראים את {doc} וממלאים מה שאפשר. בדקו את הפרטים לפני השמירה.",
     "bookLabel": "צילום או בחירת תמונה",
     "bookReading": "קורא את המסמך…",
     "bookDone": "מילאנו מה שהצלחנו לקרוא. בדקו כל שדה לפני השמירה.",
@@ -3538,7 +3538,15 @@
     "loanTotalCost": "סך הכול לתשלום",
     "loanInterest": "ריבית",
     "loanFlatRate": "{rate}% לשנה, קבועה",
-    "loanStillToPay": "נותר לתשלום"
+    "loanStillToPay": "נותר לתשלום",
+    "regDoc_TH": "הספר הכחול (רישיון הרכב)",
+    "regDoc_ID": "BPKB או STNK",
+    "regDoc_VN": "תעודת הרישום (cà vẹt)",
+    "regDoc_MY": "VOC (geran)",
+    "regDoc_PH": "OR/CR",
+    "regDoc_LA": "ספר הרישום",
+    "regDoc_KH": "כרטיס הרישום",
+    "regDoc_default": "מסמך רישום הרכב"
   },
   "bookingEdit": {
     "crumbBookings": "הזמנות",

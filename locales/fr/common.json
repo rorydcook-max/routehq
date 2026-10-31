@@ -3460,8 +3460,8 @@
     "engine": "Cylindrée (cc)",
     "drivetrain": "Transmission (2WD, 4WD)",
     "body": "Carrosserie",
-    "bookTitle": "Prenez en photo le livret bleu",
-    "bookBody": "Nous lisons le livret d’immatriculation et remplissons ce que nous pouvons. Vérifiez les informations avant d’enregistrer.",
+    "bookTitle": "Prendre en photo : {doc}",
+    "bookBody": "Nous lisons le document ({doc}) et remplissons ce que nous pouvons. Vérifiez avant d'enregistrer.",
     "bookLabel": "Prendre ou choisir une photo",
     "bookReading": "Lecture du document…",
     "bookDone": "Nous avons rempli ce que nous avons pu lire. Vérifiez chaque champ avant d’enregistrer.",
@@ -3538,7 +3538,15 @@
     "loanTotalCost": "Coût total",
     "loanInterest": "Intérêts",
     "loanFlatRate": "{rate} % par an, fixe",
-    "loanStillToPay": "Reste à payer"
+    "loanStillToPay": "Reste à payer",
+    "regDoc_TH": "carnet bleu (blue book)",
+    "regDoc_ID": "BPKB ou STNK",
+    "regDoc_VN": "certificat d'immatriculation (cà vẹt)",
+    "regDoc_MY": "VOC (geran)",
+    "regDoc_PH": "OR/CR",
+    "regDoc_LA": "carnet d'immatriculation",
+    "regDoc_KH": "carte d'immatriculation",
+    "regDoc_default": "certificat d'immatriculation"
   },
   "bookingEdit": {
     "crumbBookings": "Réservations",

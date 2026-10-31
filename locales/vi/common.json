@@ -3460,8 +3460,8 @@
     "engine": "Dung tích động cơ (cc)",
     "drivetrain": "Hệρ dẫn động (2WD, 4WD)",
     "body": "Kiểu dáng",
-    "bookTitle": "Chụp ảnh đăng ký xe (sơ mi)",
-    "bookBody": "Chúng tôi sẽ đọc thông tin đăng ký và điền các mục có thể. Hãy kiểm tra lại trước khi lưu.",
+    "bookTitle": "Chụp ảnh {doc}",
+    "bookBody": "Chúng tôi sẽ đọc {doc} và điền các mục có thể. Hãy kiểm tra lại trước khi lưu.",
     "bookLabel": "Chụp hoặc chọn ảnh",
     "bookReading": "Đang đọc tài liệu…",
     "bookDone": "Đã điền các thông tin đọc được. Hãy kiểm tra từng trường trước khi lưu.",
@@ -3538,7 +3538,15 @@
     "loanTotalCost": "Tổng số tiền phải trả",
     "loanInterest": "Tiền lãi",
     "loanFlatRate": "{rate}%/năm, lãi phẳng",
-    "loanStillToPay": "Còn phải trả"
+    "loanStillToPay": "Còn phải trả",
+    "regDoc_TH": "sổ đăng ký xe (sổ xanh)",
+    "regDoc_ID": "BPKB hoặc STNK",
+    "regDoc_VN": "giấy đăng ký xe (cà vẹt)",
+    "regDoc_MY": "VOC (geran)",
+    "regDoc_PH": "OR/CR",
+    "regDoc_LA": "sổ đăng ký xe",
+    "regDoc_KH": "thẻ đăng ký xe",
+    "regDoc_default": "giấy tờ đăng ký xe"
   },
   "bookingEdit": {
     "crumbBookings": "Đặt xe",

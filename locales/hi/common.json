@@ -3420,8 +3420,8 @@
     "engine": "इंजन साइज़ (cc)",
     "drivetrain": "ड्राइव (2WD, 4WD)",
     "body": "बॉडी टाइप",
-    "bookTitle": "ब्लू बुक की फ़ोटो लें",
-    "bookBody": "हम रजिस्ट्रेशन बुक पढ़कर जो हो सके भर देते हैं। सेव करने से पहले जानकारी जाँच लें।",
+    "bookTitle": "{doc} की फ़ोटो लें",
+    "bookBody": "हम {doc} पढ़कर जितना हो सके भर देते हैं। सहेजने से पहले जाँच लें।",
     "bookLabel": "फ़ोटो लें या चुनें",
     "bookReading": "दस्तावेज़ पढ़ रहे हैं…",
     "bookDone": "जो पढ़ सके वह भर दिया। सेव करने से पहले हर फ़ील्ड जाँच लें।",
@@ -3498,7 +3498,15 @@
     "loanTotalCost": "कुल भुगतान",
     "loanInterest": "ब्याज",
     "loanFlatRate": "{rate}% सालाना, फ़्लैट",
-    "loanStillToPay": "अभी चुकाना बाकी"
+    "loanStillToPay": "अभी चुकाना बाकी",
+    "regDoc_TH": "ब्लू बुक (पंजीकरण पुस्तिका)",
+    "regDoc_ID": "BPKB या STNK",
+    "regDoc_VN": "पंजीकरण प्रमाणपत्र (cà vẹt)",
+    "regDoc_MY": "VOC (geran)",
+    "regDoc_PH": "OR/CR",
+    "regDoc_LA": "पंजीकरण पुस्तिका",
+    "regDoc_KH": "पंजीकरण कार्ड",
+    "regDoc_default": "वाहन पंजीकरण दस्तावेज़"
   },
   "bookingEdit": {
     "crumbBookings": "बुकिंग",

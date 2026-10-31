@@ -3420,8 +3420,8 @@
     "engine": "Motorstørrelse (cc)",
     "drivetrain": "Drivverk (2WD, 4WD)",
     "body": "Karosseritype",
-    "bookTitle": "Ta et bilde av vognkortet",
-    "bookBody": "Vi leser vognkortet og fyller ut det vi kan. Sjekk opplysningene før du lagrer.",
+    "bookTitle": "Ta bilde av {doc}",
+    "bookBody": "Vi leser {doc} og fyller ut det vi kan. Sjekk opplysningene før du lagrer.",
     "bookLabel": "Ta eller velg et bilde",
     "bookReading": "Leser dokumentet…",
     "bookDone": "Fylte ut det vi kunne lese. Sjekk alle felt før lagring.",
@@ -3498,7 +3498,15 @@
     "loanTotalCost": "Totalt du betaler",
     "loanInterest": "Renter",
     "loanFlatRate": "{rate} % i året, flat",
-    "loanStillToPay": "Gjenstår å betale"
+    "loanStillToPay": "Gjenstår å betale",
+    "regDoc_TH": "vognkortet (blue book)",
+    "regDoc_ID": "BPKB eller STNK",
+    "regDoc_VN": "registreringsbeviset (cà vẹt)",
+    "regDoc_MY": "VOC (geran)",
+    "regDoc_PH": "OR/CR",
+    "regDoc_LA": "registreringsboken",
+    "regDoc_KH": "registreringskortet",
+    "regDoc_default": "vognkortet"
   },
   "bookingEdit": {
     "crumbBookings": "Bestillinger",

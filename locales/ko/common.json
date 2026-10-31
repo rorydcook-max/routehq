@@ -3420,8 +3420,8 @@
     "engine": "배기량 (cc)",
     "drivetrain": "구동 방식 (2WD, 4WD)",
     "body": "차체 유형",
-    "bookTitle": "차량 등록증(블루북) 사진 찍기",
-    "bookBody": "등록증을 읽고 가능한 항목을 채워 드려요. 저장 전에 내용을 확인하세요.",
+    "bookTitle": "{doc} 사진 찍기",
+    "bookBody": "{doc}을(를) 읽고 가능한 항목을 채워요. 저장하기 전에 확인하세요.",
     "bookLabel": "사진 찍기 또는 선택",
     "bookReading": "서류 읽는 중…",
     "bookDone": "읽을 수 있는 항목을 채웠어요. 저장 전에 각 항목을 확인하세요.",
@@ -3498,7 +3498,15 @@
     "loanTotalCost": "총 납부액",
     "loanInterest": "이자",
     "loanFlatRate": "연 {rate}%(고정)",
-    "loanStillToPay": "남은 납부액"
+    "loanStillToPay": "남은 납부액",
+    "regDoc_TH": "블루북(차량 등록부)",
+    "regDoc_ID": "BPKB 또는 STNK",
+    "regDoc_VN": "차량 등록증(cà vẹt)",
+    "regDoc_MY": "VOC(geran)",
+    "regDoc_PH": "OR/CR",
+    "regDoc_LA": "차량 등록부",
+    "regDoc_KH": "차량 등록 카드",
+    "regDoc_default": "차량 등록 서류"
   },
   "bookingEdit": {
     "crumbBookings": "예약",

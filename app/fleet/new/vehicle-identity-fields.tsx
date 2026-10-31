@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Camera, ChevronDown } from "lucide-react";
 import { Fold } from "@/components/ui";
+import { regDocKey } from "@/lib/registration-document";
 import {
   fetchVehicleMakesForCategory,
   fetchVehicleModels,
@@ -112,14 +113,18 @@ function dedupeTrimsForPicker(trims: VehicleTrim[]) {
 export function VehicleIdentityFields({
   categories,
   initialMakes,
-  inputClass
+  inputClass,
+  country
 }: {
   categories: Category[];
   initialMakes: VehicleMake[];
   inputClass: string;
+  /** The business's country: names its registration document (blue book, BPKB, OR/CR...). */
+  country?: string | null;
 }) {
   const t = useTranslations("vehicleForm");
-  const say = t as unknown as (key: string) => string;
+  const say = t as unknown as (key: string, values?: Record<string, string>) => string;
+  const regDoc = say(regDocKey(country));
   const labelClass = "font-semibold text-[var(--foreground-secondary)]";
   const categoryLabel = (category: Category) => (t.has(`cat_${category.code}` as never) ? say(`cat_${category.code}`) : category.name);
   const [categoryId, setCategoryId] = useState(categories[0]?.id || "");
@@ -422,6 +427,7 @@ export function VehicleIdentityFields({
     setOcrStatus("reading");
     const ocrFormData = new FormData();
     ocrFormData.append("file", file);
+    ocrFormData.append("country", country || "");
 
     try {
       const response = await fetch("/api/ocr/vehicle-logbook", {
@@ -485,10 +491,10 @@ export function VehicleIdentityFields({
       {/* The fastest way in, so it carries the accent tint and a "Fastest" tag. */}
       <div className="card bg-[var(--primary-light)] p-4">
         <div className="flex flex-wrap items-center gap-2">
-          <h2 className="card-title">{say("bookTitle")}</h2>
+          <h2 className="card-title">{say("bookTitle", { doc: regDoc })}</h2>
           <span className="badge inline-flex items-center bg-white text-[var(--primary)]">{say("bookFastest")}</span>
         </div>
-        <p className="measure mt-1 font-medium text-[var(--foreground-secondary)]">{say("bookBody")}</p>
+        <p className="measure mt-1 font-medium text-[var(--foreground-secondary)]">{say("bookBody", { doc: regDoc })}</p>
         {/* A proper button, in the reader's language. No forced camera: the phone offers the camera or an existing photo or PDF. */}
         <label className="secondary-action pressable mt-3 inline-flex w-full cursor-pointer bg-white sm:w-auto">
           <Camera aria-hidden="true" className="shrink-0" size={18} />

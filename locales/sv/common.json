@@ -3420,8 +3420,8 @@
     "engine": "Motorstorlek (cc)",
     "drivetrain": "Drivning (2WD, 4WD)",
     "body": "Karosstyp",
-    "bookTitle": "Fotografera den blå boken",
-    "bookBody": "Vi läser registreringsboken och fyller i det vi kan. Kontrollera uppgifterna innan du sparar.",
+    "bookTitle": "Ta en bild av {doc}",
+    "bookBody": "Vi läser {doc} och fyller i det vi kan. Kontrollera uppgifterna innan du sparar.",
     "bookLabel": "Ta eller välj ett foto",
     "bookReading": "Läser dokumentet…",
     "bookDone": "Ifyllt med det vi kunde läsa. Kontrollera varje fält innan du sparar.",
@@ -3498,7 +3498,15 @@
     "loanTotalCost": "Totalt att betala",
     "loanInterest": "Ränta",
     "loanFlatRate": "{rate} % per år, fast",
-    "loanStillToPay": "Kvar att betala"
+    "loanStillToPay": "Kvar att betala",
+    "regDoc_TH": "registreringsboken (blue book)",
+    "regDoc_ID": "BPKB eller STNK",
+    "regDoc_VN": "registreringsbeviset (cà vẹt)",
+    "regDoc_MY": "VOC (geran)",
+    "regDoc_PH": "OR/CR",
+    "regDoc_LA": "registreringsboken",
+    "regDoc_KH": "registreringskortet",
+    "regDoc_default": "registreringsbeviset"
   },
   "bookingEdit": {
     "crumbBookings": "Bokningar",

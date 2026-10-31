@@ -3420,8 +3420,8 @@
     "engine": "排氣量（cc）",
     "drivetrain": "驅動方式（2WD、4WD）",
     "body": "車身類型",
-    "bookTitle": "拍攝藍色行照本",
-    "bookBody": "我們會讀取行照並盡量自動填入。儲存前請確認資料。",
+    "bookTitle": "拍攝{doc}",
+    "bookBody": "我們會辨識{doc}並自動填寫相關資訊。儲存前請核對內容。",
     "bookLabel": "拍照或選擇照片",
     "bookReading": "正在讀取文件…",
     "bookDone": "已填入可讀取的資料。儲存前請逐欄確認。",
@@ -3498,7 +3498,15 @@
     "loanTotalCost": "總共支付",
     "loanInterest": "利息",
     "loanFlatRate": "年利率 {rate}%（固定）",
-    "loanStillToPay": "尚需支付"
+    "loanStillToPay": "尚需支付",
+    "regDoc_TH": "藍本（車輛登記簿）",
+    "regDoc_ID": "BPKB 或 STNK",
+    "regDoc_VN": "車輛登記證（cà vẹt）",
+    "regDoc_MY": "VOC（geran）",
+    "regDoc_PH": "OR/CR",
+    "regDoc_LA": "車輛登記簿",
+    "regDoc_KH": "車輛登記卡",
+    "regDoc_default": "車輛登記文件"
   },
   "bookingEdit": {
     "crumbBookings": "預約",

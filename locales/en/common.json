@@ -3420,8 +3420,8 @@
     "engine": "Engine size (cc)",
     "drivetrain": "Drive (2WD, 4WD)",
     "body": "Body type",
-    "bookTitle": "Take a photo of the blue book",
-    "bookBody": "We read the registration book and fill in what we can. Check the details before saving.",
+    "bookTitle": "Take a photo of the {doc}",
+    "bookBody": "We read the {doc} and fill in what we can. Check the details before saving.",
     "bookLabel": "Take or choose a photo",
     "bookReading": "Reading the document…",
     "bookDone": "Filled in what we could read. Check each field before saving.",
@@ -3498,7 +3498,15 @@
     "loanTotalCost": "Total you pay",
     "loanInterest": "Interest",
     "loanFlatRate": "{rate}% a year, flat",
-    "loanStillToPay": "Still to pay"
+    "loanStillToPay": "Still to pay",
+    "regDoc_TH": "blue book",
+    "regDoc_ID": "BPKB or STNK",
+    "regDoc_VN": "registration certificate (cà vẹt)",
+    "regDoc_MY": "VOC (geran)",
+    "regDoc_PH": "OR/CR",
+    "regDoc_LA": "registration book",
+    "regDoc_KH": "registration card",
+    "regDoc_default": "registration document"
   },
   "bookingEdit": {
     "crumbBookings": "Bookings",

@@ -3460,8 +3460,8 @@
     "engine": "排量 (cc)",
     "drivetrain": "驱动方式 (两驱、四驱)",
     "body": "车身类型",
-    "bookTitle": "拍摄绿本照片",
-    "bookBody": "我们将识别登记证并自动填写相关信息。保存前请核对详情。",
+    "bookTitle": "拍摄{doc}",
+    "bookBody": "我们将识别{doc}并自动填写相关信息。保存前请核对详情。",
     "bookLabel": "拍照或选择照片",
     "bookReading": "正在读取文档…",
     "bookDone": "已填入识别到的信息。保存前请核对各项。",
@@ -3538,7 +3538,15 @@
     "loanTotalCost": "总共支付",
     "loanInterest": "利息",
     "loanFlatRate": "年利率 {rate}%（固定）",
-    "loanStillToPay": "尚需支付"
+    "loanStillToPay": "尚需支付",
+    "regDoc_TH": "蓝本（车辆登记簿）",
+    "regDoc_ID": "BPKB 或 STNK",
+    "regDoc_VN": "车辆登记证（cà vẹt）",
+    "regDoc_MY": "VOC（geran）",
+    "regDoc_PH": "OR/CR",
+    "regDoc_LA": "车辆登记簿",
+    "regDoc_KH": "车辆登记卡",
+    "regDoc_default": "车辆登记证件"
   },
   "bookingEdit": {
     "crumbBookings": "预订",

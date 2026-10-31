@@ -81,7 +81,7 @@ export default async function NewVehiclePage() {
         <form action={createVehicle} className="space-y-3">
           <input name="organizationId" type="hidden" value={organization.id} />
 
-          <VehicleIdentityFields categories={categories} initialMakes={vehicleMakes || []} inputClass={inputClass} />
+          <VehicleIdentityFields categories={categories} country={(organization as any).country_code} initialMakes={vehicleMakes || []} inputClass={inputClass} />
 
           <RatesFields currency={currency} usualDeposit={Number(organizationSettings?.settings?.public_booking?.deposit || 0)} />
 

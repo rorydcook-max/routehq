@@ -3460,8 +3460,8 @@
     "engine": "Saiz enjin (cc)",
     "drivetrain": "Pemacu (2WD, 4WD)",
     "body": "Jenis badan",
-    "bookTitle": "Ambil foto buku biru",
-    "bookBody": "Kami membaca buku pendaftaran dan mengisi apa yang boleh. Semak butiran sebelum menyimpan.",
+    "bookTitle": "Ambil foto {doc}",
+    "bookBody": "Kami membaca {doc} dan mengisi apa yang boleh. Semak butiran sebelum menyimpan.",
     "bookLabel": "Ambil atau pilih foto",
     "bookReading": "Membaca dokumen…",
     "bookDone": "Diisi apa yang dapat dibaca. Semak setiap ruangan sebelum menyimpan.",
@@ -3538,7 +3538,15 @@
     "loanTotalCost": "Jumlah yang dibayar",
     "loanInterest": "Faedah",
     "loanFlatRate": "{rate}% setahun, kadar rata",
-    "loanStillToPay": "Baki untuk dibayar"
+    "loanStillToPay": "Baki untuk dibayar",
+    "regDoc_TH": "buku biru (blue book)",
+    "regDoc_ID": "BPKB atau STNK",
+    "regDoc_VN": "sijil pendaftaran (cà vẹt)",
+    "regDoc_MY": "VOC (geran)",
+    "regDoc_PH": "OR/CR",
+    "regDoc_LA": "buku pendaftaran",
+    "regDoc_KH": "kad pendaftaran",
+    "regDoc_default": "dokumen pendaftaran kenderaan"
   },
   "bookingEdit": {
     "crumbBookings": "Tempahan",
